@@ -1,143 +1,254 @@
-Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32B1366067
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 08:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8E63009EE;
+	Wed, 25 Mar 2026 09:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774425720; cv=none; b=Qr1F/0oIzAc8tG/DbMHOZwhxQnwdiWkVVRAEFiMNoLgyJvKgICcTQ+Vvepqay05TsrK4JwmMm9C9Vhq+teS/FLv3AeUibJOYzevwsioZHCxjB9O25kUb1ineJGqmBKUVHrJ5TfzsmSBpzfPSmU8GiIjaT/HSWDgYaF851qSRDDA=
+	t=1774429430; cv=none; b=F3O5MD4B05+3UWs6Fky2xbC5XdkySeLqz8CyddLJF+xdk+Q0D7+/sFu4zfLvkzGlg6pP6qIpCtGyVC3l0oxqzGrBJHRa7m+WjMEUvz1UXCTGsP4ZSbK+lKBzdSzGMiKBbZ61Y1RCwTx/bcV6BCjhmSesafKdDPm0zxzNGDnVTYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774425720; c=relaxed/simple;
-	bh=VlBxR/SzYAHrqVgrVE6UN8eEpY06CR6hnRPY1BAcTpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yvue6IsG/+bDp9s3C/NZAbDozWOcvg7ZuxUtLLZaKhNLP7YDjTI+/asF2QG6OpZDNUdr+x5D89ZwNMVz7taBCSwbP3q9UZC8CAjzWHQVx1ybLRM2jNnNlb1AihdL1Zgnd+3CsNriO3krHvFvgtv7xs7QUeOJqnljLAV0qCisxSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=Ph+hHuz/; arc=none smtp.client-ip=139.138.36.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1774429430; c=relaxed/simple;
+	bh=w/GTjS8YC8uH+Sy4A1EDV8UGyt/H8PZtAnk1cljNo8w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V8m2+w1/2n/gLPP7U78UyRjRHp1p7mkDRl3UkWewqrJs9bc5DtbFXbA23Dttat/lXZByS+Rxl9AX8hP2fku8ezIaNlhJAaAVv/8L6Eu8QJqd77vfefMjNpECMAmQevVoy2PVmoWwtrwsHOb6ais2oLLocpwLB12w1Rka8x2iZTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fLn3NICR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="Ph+hHuz/"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1774425717; x=1805961717;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VlBxR/SzYAHrqVgrVE6UN8eEpY06CR6hnRPY1BAcTpo=;
-  b=Ph+hHuz/nZjJ0NqtPBiGutYR9dUWNmCUb2ZhpAMXbhn+7WXVudZz92Mv
-   SynZORhKK87mqhkiSzC19kC86+4aWByig7R+cQ113/mTVKosD+hDC1eOb
-   1ew7bNYxZdEdNrmhyabRyVO/AL+0OFeocciEEc//gY0mcWH2W3DYUr19A
-   Z8jzyzsPAJBzOOsfU6kYOvpU5rwrAp/kJC3gxeJnn3ixBTYjFwknvCV9L
-   bnSGtJr9lA6XJS2USyp8NNLoK3pDWJmBOCS+7S1ghbGYBrWu3UNVv9EDu
-   KAqrsghWnm4aPnAtsiLAt656/WJl7GdaDZ90rJhQheqlMZhwiL/OVKLoP
-   w==;
-X-CSE-ConnectionGUID: PCNhnxPhSgKECBgONalvCQ==
-X-CSE-MsgGUID: Bq6ha/7DQBqfZSa2X5ikpg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="222015061"
-X-IronPort-AV: E=Sophos;i="6.23,139,1770562800"; 
-   d="scan'208";a="222015061"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2026 17:00:47 +0900
-Received: from az2uksmgm2.o.css.fujitsu.com (unknown [10.151.22.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 705DB1002803
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 08:00:47 +0000 (UTC)
-Received: from az2nlsmom3.fujitsu.com (az2nlsmom3.o.css.fujitsu.com [10.150.26.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 2909A1809C30
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 08:00:47 +0000 (UTC)
-Received: from sm-arm-grace07 (sm-x86-stp01.soft.fujitsu.com [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmom3.fujitsu.com (Postfix) with ESMTPS id 53168101BB54;
-	Wed, 25 Mar 2026 08:00:41 +0000 (UTC)
-Date: Wed, 25 Mar 2026 17:00:37 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fLn3NICR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C50B2C4CEF7;
+	Wed, 25 Mar 2026 09:03:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774429430;
+	bh=w/GTjS8YC8uH+Sy4A1EDV8UGyt/H8PZtAnk1cljNo8w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fLn3NICRRfLAwA8fdLwt9a3S1jWOlTsyhgvm9TKxtZQRkOTPn8eHM0Xie9VDcCkZ/
+	 8GJrVhP3m4gxmWaHeYlqNHI+OKhIvY/oJIVcpXXModAzVFaBKxCcb5IdkMSHsXYcg8
+	 XO313s7oi20EAwUjxewUYW3Wta5AzC082RHyrjwFrm+YIr98GK8PK9KLX9+mDX3XC4
+	 vGyt6W2oHGh8pDpJDbHCyrvtvQTgvJx8WHlZqYIYMiRGk3+fPTmKI2yMJ3yNGO6Oj+
+	 NzaBbOgn605Hf2tAPp7Y+JBWc7/JLkhdGfhSc8tn0x/LKgFlIWJt4A7uE6w4llufPk
+	 RTldLE+GWj4pg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w5K9T-00000005Trk-21XU;
+	Wed, 25 Mar 2026 09:03:47 +0000
+Date: Wed, 25 Mar 2026 09:03:47 +0000
+Message-ID: <86o6kc46x8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+Cc: kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 0/3] KVM: arm64: selftests: Basic nested guest support
-Message-ID: <acOWJT39NGrmfSbQ@sm-arm-grace07>
+Subject: Re: [PATCH 1/3] KVM: arm64: selftests: Add library functions for NV
+In-Reply-To: <20260325003620.2214766-2-weilin.chang@arm.com>
 References: <20260325003620.2214766-1-weilin.chang@arm.com>
+	<20260325003620.2214766-2-weilin.chang@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260325003620.2214766-1-weilin.chang@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Wei Lin,
-
-On Wed, Mar 25, 2026 at 12:36:17AM +0000, Wei-Lin Chang wrote:
-> Hi,
+On Wed, 25 Mar 2026 00:36:18 +0000,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> This series adds basic support for running nested guests (L2) in
-> kselftest. The first patch adds library functions. While designing the
-> APIs for userspace, I referenced Joey's approach for kvm-unit-tests [1].
-> In summary, four preparatory functions are provided for userspace to
-> set up state to run an L2 in EL1:
+> The API is designed for userspace to first call prepare_{l2_stack,
+> hyp_state, eret_destination, nested_sync_handler}, with a function
+> supplied to prepare_eret_destination() to be run in L2. Then run_l2()
+> can be called in L1 to run the given function in L2.
 > 
->  - prepare_l2_stack()            <- sets up stack for L2
->  - prepare_hyp_state()           <- sets up vEL2 registers
->  - prepare_eret_destination()    <- userspace passes a function pointer
->                                     for L2 to run
->  - prepare_nested_sync_handler() <- sets up hvc handler in order to
->                                     regain control after L2's hvc
-> 
-> After calling those functions, userspace can vcpu_run(), and when
-> run_l2() is called within the guest, the supplied function will be run
-> in L2, with the control flow managed by the library code in nested.c and
-> nested_asm.S. After running the L2 function, run_l2() will automatically
-> return. Note that the L2 function supplied by the user does not have to
-> call hvc.
-> 
-> Patch 2 demonstrates usage of the APIs introduced above, with a simple
-> L1 -> L2 -> L1 sequence, with an empty L2 function.
-> 
-> Patch 3 enhances the library functions by setting up L2 -> L1 stage-2
-> translation. Currently the translation is simple, with start level 0, 4
-> levels, 4KB granules, normal cachable, 48-bit IA, 40-bit OA.
-> 
-> [1]: https://lore.kernel.org/kvmarm/20260306142656.2775185-1-joey.gouly@arm.com/
-
-Look like this selftest assumes nested guest's MMU is disabled (L2 IPA
-to L1 IPA to PA), but I couldn's find the explicit SCTLR.M bit operation in this
-series, how do you make sure it is always off?
-
-Thanks,
-Itaru.
-
-> 
-> Wei-Lin Chang (3):
->   KVM: arm64: selftests: Add library functions for NV
->   KVM: arm64: sefltests: Add basic NV selftest
->   KVM: arm64: selftests: Enable stage-2 in NV preparation functions
-> 
->  tools/testing/selftests/kvm/Makefile.kvm      |   3 +
->  .../selftests/kvm/arm64/hello_nested.c        |  65 ++++++++
->  .../selftests/kvm/include/arm64/nested.h      |  25 +++
->  .../selftests/kvm/include/arm64/processor.h   |   9 +
->  .../testing/selftests/kvm/lib/arm64/nested.c  | 154 ++++++++++++++++++
->  .../selftests/kvm/lib/arm64/nested_asm.S      |  35 ++++
->  6 files changed, 291 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/arm64/hello_nested.c
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm      |  2 +
+>  .../selftests/kvm/include/arm64/nested.h      | 18 ++++++
+>  .../testing/selftests/kvm/lib/arm64/nested.c  | 61 +++++++++++++++++++
+>  .../selftests/kvm/lib/arm64/nested_asm.S      | 35 +++++++++++
+>  4 files changed, 116 insertions(+)
 >  create mode 100644 tools/testing/selftests/kvm/include/arm64/nested.h
 >  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested.c
 >  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested_asm.S
 > 
-> -- 
-> 2.43.0
-> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index 98da9fa4b8b7..5e681e8e0cd7 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -34,6 +34,8 @@ LIBKVM_arm64 += lib/arm64/gic.c
+>  LIBKVM_arm64 += lib/arm64/gic_v3.c
+>  LIBKVM_arm64 += lib/arm64/gic_v3_its.c
+>  LIBKVM_arm64 += lib/arm64/handlers.S
+> +LIBKVM_arm64 += lib/arm64/nested.c
+> +LIBKVM_arm64 += lib/arm64/nested_asm.S
+>  LIBKVM_arm64 += lib/arm64/processor.c
+>  LIBKVM_arm64 += lib/arm64/spinlock.c
+>  LIBKVM_arm64 += lib/arm64/ucall.c
+> diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
+> new file mode 100644
+> index 000000000000..739ff2ee0161
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/arm64/nested.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * ARM64 Nested virtualization defines
+> + */
+> +
+> +#ifndef SELFTEST_KVM_NESTED_H
+> +#define SELFTEST_KVM_NESTED_H
+> +
+> +void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+> +void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+> +void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc);
+> +void prepare_nested_sync_handler(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+> +
+> +void run_l2(void);
+> +void after_hvc(void);
+> +void do_hvc(void);
+> +
+> +#endif /* SELFTEST_KVM_NESTED_H */
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
+> new file mode 100644
+> index 000000000000..111d02f44cfe
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
+> @@ -0,0 +1,61 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * ARM64 Nested virtualization helpers
+> + */
+> +
+> +#include "kvm_util.h"
+> +#include "nested.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +
+> +#include <asm/sysreg.h>
+> +
+> +static void hvc_handler(struct ex_regs *regs)
+> +{
+> +	GUEST_ASSERT_EQ(get_current_el(), 2);
+> +	GUEST_PRINTF("hvc handler\n");
+> +	regs->pstate = PSR_MODE_EL2h | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
+> +	regs->pc = (u64)after_hvc;
+> +}
+> +
+> +void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+> +{
+> +	size_t l2_stack_size;
+> +	uint64_t l2_stack_paddr;
+> +
+> +	l2_stack_size = vm->page_size == 4096 ? DEFAULT_STACK_PGS * vm->page_size :
+> +					 vm->page_size;
+
+Please use symbolic constants. Also, this looks wrong if the default
+stack size is 32k and the page size is 16k. You probably want to
+express a stack size directly, rather than a number of pages.
+
+> +	l2_stack_paddr = __vm_phy_pages_alloc(vm, l2_stack_size / vm->page_size,
+> +					      0, 0, false);
+> +	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), l2_stack_paddr + l2_stack_size);
+> +}
+> +
+> +void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_RW);
+
+Surely the E2H value matters. Or are you planning to only run this on
+configuration that hardcode E2H==0? That'd be pretty limiting.
+
+> +}
+> +
+> +void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc)
+> +{
+> +	vm_paddr_t do_hvc_paddr = addr_gva2gpa(vm, (vm_vaddr_t)do_hvc);
+> +	vm_paddr_t l2_pc_paddr = addr_gva2gpa(vm, (vm_vaddr_t)l2_pc);
+> +
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SPSR_EL2), PSR_MODE_EL1h |
+> +							    PSR_D_BIT     |
+> +							    PSR_A_BIT     |
+> +							    PSR_I_BIT     |
+> +							    PSR_F_BIT);
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ELR_EL2), l2_pc_paddr);
+> +	/* HACK: use TPIDR_EL2 to pass address, see run_l2() in nested_asm.S */
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), do_hvc_paddr);
+> +}
+> +
+> +void prepare_nested_sync_handler(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vm->handlers) {
+> +		vm_init_descriptor_tables(vm);
+> +		vcpu_init_descriptor_tables(vcpu);
+> +	}
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_LOWER_64,
+> +				ESR_ELx_EC_HVC64, hvc_handler);
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/nested_asm.S b/tools/testing/selftests/kvm/lib/arm64/nested_asm.S
+> new file mode 100644
+> index 000000000000..4ecf2d510a6f
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/arm64/nested_asm.S
+> @@ -0,0 +1,35 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * ARM64 Nested virtualization assembly helpers
+> + */
+> +
+> +.globl run_l2
+> +.globl after_hvc
+> +.globl do_hvc
+> +run_l2:
+> +	/*
+> +	 * At this point TPIDR_EL2 will contain the gpa of do_hvc from
+> +	 * prepare_eret_destination(). gpa of do_hvc have to be passed in
+> +	 * because we want L2 to issue an hvc after it returns from the user
+> +	 * passed function. In order for that to happen the lr must be
+> +	 * controlled, which at this point holds the value of the address of
+> +	 * the next instruction after this run_l2() call, which is not useful
+> +	 * for L2. Additionally, L1 can't translate gva into gpa, so we can't
+> +	 * calculate it here.
+> +	 *
+> +	 * So first save lr, then move TPIDR_EL2 to lr so when the user supplied
+> +	 * L2 function returns, L2 jumps to do_hvc and let the L1 hvc handler
+> +	 * take control. This implies we expect the L2 code to preserve lr and
+> +	 * calls a regular ret in the end, which is true for normal C functions.
+> +	 * The hvc handler will jump back to after_hvc when finished, and lr
+> +	 * will be restored and we can return run_l2().
+> +	 */
+> +	stp	x29, lr, [sp, #-16]!
+> +	mrs	x0, tpidr_el2
+> +	mov	lr, x0
+> +	eret
+> +after_hvc:
+> +	ldp	x29, lr, [sp], #16
+> +	ret
+> +do_hvc:
+> +	hvc #0
+
+This probably works for a single instruction L2 guest, but not having
+any save/restore of the L2 context makes it hard to build anything on
+top of this.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
