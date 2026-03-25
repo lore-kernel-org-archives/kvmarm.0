@@ -1,105 +1,90 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C8F19995E
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 12:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774441018; cv=pass; b=eR/Z1IHRJDRp0dD05jA9+SxyzjxMqcOz0mGdhtokedfpPw9en2Cdzdo2a1CMhgJpei4vaKB2LaMNJutTme2tniStRPcHB8AfeQE04CudvbHyEOKbuncVS9br9T9qOUk/Py3halWbIEU7YDTnVdTvWQG5ZCoyTa34qvhoNl6pGp8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774441018; c=relaxed/simple;
-	bh=Wox9yCBHIxSy+j7gCVEVu0Sn7F+MiAmK3t4AcWGw4tg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dHa9ZyVd0MaRjIEjC5fwpbbfgUKL0gKD6ts2xruyjuZ/Ej1Yko/cEaE8IaJhnH4jCkdcRKD0JTbeSnyXLZBdM+2vvPa1mSMV7gihrJFWNpL8Y4zejBeZpdJTi24zp7O8pskEvXCWmktk832r3vEa6NQgNqV9b3dV8Lt1ZKeZu5I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TH6T0V+c; arc=pass smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6223D8918
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 13:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774444509; cv=none; b=SsTEQ2BlIV31bqr5/BRQRaLZcFDAtLrlIkmjep0P71N7xHWTbJg4KUsz/HqMBGgeoFwEePkSwNXVmJ+Pfqdq1L/1p+iSmE4jKd+aM8WYFbdJLqCqgfCSEh1bkLhKjLHKJ8nlCs+WZlqlKxE0h12ponQzfQ+o9VxoUVgQ7/ukhYU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774444509; c=relaxed/simple;
+	bh=pDs4rtEJ9z76dFAJhmmNFOtAXbxIxQwbcLbJvXoX10o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aEhzjxQB7Pn6UhQSNpzyLmTo5Rq4YTDrPusqYm6niCezvPUmSa8YiH0PJkHHB2VClfFigIcfOuLXH0B0Jl8iOByoB4kPiC7pijYtyZ4t69BhKaVJ/qVY89wtgXlRWQC2REjoITh3Acq4r5sxfmDMSljL54HdR8avl/Pa51DUJOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YNuUW6kz; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TH6T0V+c"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-509062d829dso476071cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 05:16:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774441015; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OBxvgbW7BFfdyjaqlYKFHQ3FtPBHHdONxn5TE6jf03RhiOIH4VXhw5Yzyeu52Mr0D7
-         fGYcuYFAJKib4AY7rO/8lgI7oAGccc7YsqSTLZ40rgfV+/10JbU+0i9s38734liXWec3
-         9pa6vvx2At3wyRihY6PxVIeK8KifHx5yXkQpJOYEFQ6qwBFknLj3zzYtSXe/FUYLJS4e
-         AF052nrI+TOxoRgph/rMOoAD9z+CGFzEJ1hno8p6YI6g5HU/3DGzY2+z7P/logcryjWN
-         GvTiim8u4goWOObE0dMsd0KKWv53qS61aNz6y0Wpr7oW+dN9edjn7nKRfXnCW1iEwBD6
-         LS9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=6HiReDp40rAShKhFmk6aQGrdV2dk4gym9DDo3pfkhCw=;
-        fh=e0+M+aINqnz8CcGoTSfr7rEayruJCVzJzH/dE5SpPAo=;
-        b=jQ2ZSyhb9zgTwYKIJd1borqWZi/F1hJKTkwUlnTFsnfgGTmbZDitmH/XRpylTInfHh
-         Y3XwD3Pe0x9sC9d0KcpCoZ96ek0JArXo/DC08FNf8Q4mSOl53N1tJQ4nvY1TXM2foDq9
-         FoBv/Swi2BIXGmegZ2SLIWrRB8GNIQi76AIz7XqF+fWkrBujmmjr5vQIumIKCTJiKtIR
-         iJHQgV5odrABN8RXNTp6Jj6HMzElPg0dfrd1BccAl5tyX93/i4Dq8F+cuSygpm/CZWlT
-         f2E4PvKuliXuFjstY2NBsTXsXl29NsjdMAbf6nLAgQEA3RVGSsgxgv0pScXf3ZGFKxVy
-         CmXQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YNuUW6kz"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48569636800so69945e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 06:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774441015; x=1775045815; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HiReDp40rAShKhFmk6aQGrdV2dk4gym9DDo3pfkhCw=;
-        b=TH6T0V+cjmPOaZkqAgHA9vjtipqGULIXt2Uhqz9k22uKgIfPW5K/+JYVL203Tw3ZYD
-         RMVg5q2Flqc67LmV96xb7ORY7LUUalLMAjIhJF2PdVx2BzaVY1Lq3tg8FN20IhDoZoMJ
-         qSe8zMPO9NdzborapTVmIBZJuVv7drnKuM5awsVYD+/Fku+OlH4Q56DvZNpMlc08T9B4
-         n85cgrrRNcroZVBmLfuEnH01FjAQq9A1GZQOxLyX7AXNc2OA2S8IQK8PZKdGxXdOEn1h
-         ShhhMnstgEYtpH3yNhaWtXoIqrc7DbGKIhP/TKXxfa6YE//cfq7FpomZMdw6vuPWNFZn
-         wYng==
+        d=google.com; s=20251104; t=1774444505; x=1775049305; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fr/xJXr+pWIqYUCMaECKCggQV4ePG6j5BQohThHEf40=;
+        b=YNuUW6kzbcj9WrjTvJru3w0Vyjou9PKGG3493nTZ9KiESEvIz2QpsQqWaopJLnQs5i
+         KEx6SvEGEMeIQ+YiSQpLXly1hYjNNqu/VCzOuu+X7glgDy8BmPe3FEzgOGegUvvML93P
+         cbw3PlQ1TAUyUCfhKJDKEk7x7n6Bpf5XHygo9Z3toIncekIbPqyjN3qb9Y4qgQf/Mbye
+         PGm+hpcEUe0OmopElCzceBYbUsqsiq1iUtUpUCfDas+cXU9ENc8BJnozTTmQvT0qQlKM
+         sZqdAAHY2llI3FQi3fmRuvNwm69Z2BeboNtqof+AJoc8aZhvnEAXLPLAiA7WofS/UlWv
+         41Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774441015; x=1775045815;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6HiReDp40rAShKhFmk6aQGrdV2dk4gym9DDo3pfkhCw=;
-        b=mQGh1FtncdKkTJO2u851c1elhb0hk7rd/g35ksrUkOxtqL/E+j0J7kf+wuZ3qUEsS0
-         l7L8xJHrJBxTQQHPZYHp8KNvJlV/33qrQUlj09i+omB+0X4ruiQYlOZgUAj9r/u3rqsL
-         wQ2d0rTbDmLVtZ3qZgVCn2dZ116875TGwG2uQJScxHPr6lfdVzJudLqxqRXn7RXKGrrn
-         McSZXjNAViPoGxHG1pU9yLHZUNmQAm1VmPssBSI2667li+cIVIWrpb77ptqIGwC6XBf7
-         4GgcQFgpeNF/IftYECjUFyUayC3JyMTIW50a6nO0fKjVpWaQQEqnU734nul2SdNtKNH2
-         aOJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6a0E8iBRqRlUCBkZ7wg41X77WrpPdZqUXM90HDKBjDVYPd7nIC52cEvicF/0jqfE9VxqJRzk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YywCvv9p7j9BqYphOypuUSxKBDflfp+ScQC1hZe0hSmFwefp4WE
-	nw6KpXVtRDBxoRODWBrakuo5YmhXWpeAwMHQoCgqtz26f/X38it5uMBYt3aST+tsaufgQ4ERjwL
-	zJ+43arWYRvFkRe6iFWF4e5NHjNRlfABXoU0PjVFW
-X-Gm-Gg: ATEYQzz8JDetsnCKAGnmLxlw3ey8/oro9FOrRuhDHxGdiuwayJ14xoOtjGPsRjcPsVb
-	iRAS9evLBKElUP/y18gNSZlsPU2nrp2p3+9TC5DorpYZp0h9tBLJVTHa4vM7eMCCapg8j0nRhUj
-	wROj8WLQQooPUjh7/B8ATcaIo0jFHWzjrP5Rcrox+paFCQH9Ghlq0UNpoaArVXniTDkjYiKwQCq
-	c6HTIbsd+XH7EZkHPA+0+H2eY192KmuwJlvS0LkGLF4TYVVT3xuRBxZhFpYJEg+Bdn9Ori41ZPp
-	mXw9tcXMu/hvH3pwUaUm48QYjezwoHYKGA7M+Q==
-X-Received: by 2002:a05:622a:5a8d:b0:509:1c2c:866 with SMTP id
- d75a77b69052e-50b83d1af72mr10972521cf.11.1774441014886; Wed, 25 Mar 2026
- 05:16:54 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774444505; x=1775049305;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fr/xJXr+pWIqYUCMaECKCggQV4ePG6j5BQohThHEf40=;
+        b=sTM5ACRkkmLa6Cbjto1PFamBCsu1mY7KkQ5nP9fYUopt5RUoYUwUGVaq0FSqfE+gwu
+         TInuF/AQW5L2f5JZA9a4p8OjRS378ebaYz9PCn8EQvB5Qxq0WKOi5OVEb8MeWtH2HeVM
+         mL1/dRXJx+PXXiU2HehsCQAc88H7f37tlQ+goJoPgPqkJcpsnuyRuV40Ma/95LrZwiua
+         KlyQ8kUvHIEzYDfYB9gnp5Ikfj0KQK2MyPC47qIrqLNap9Z7fyy8uuJbZ6LT9v5SEWfP
+         8UKOKDFm8h3zzzs2bhLJi9dv564ExE7if8Ke7uNwtWBBdtlDpW5XznAM2HkRWo4MTVkr
+         ID0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXhFC6rlbLPY/HjxgyV6Y9Uh8TX/+QXkDcPMOJT2eF+AEe4YTKOU6lzvdhCHHNx5RklZaHHIdQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzlfx5nec55yp4yVx45cXCtgrot4OVLVWuk8A/nIXNstRBGKlPB
+	gTlBCIJiXQ5nMiIqcFEZr6ZMvkdLCNqOKGpF/S4GTiB2OTazPtuS/4bT6zbNoYeIXA==
+X-Gm-Gg: ATEYQzwsMCgCcat+GFjEJF3ixaWOrEuCwVVtwhCQOsZQwKp7t0JbCkVEAzUe9xnp9/m
+	nF62qZnmnQLSpO1vr0CaAKNXvdzbGv+E2stluFM2GfkGGPszRRXTRUB6VGHg3TD/Ln9NXyIMWBe
+	YGQRZ20hCeXW++jIfL+gpwkcO65IG9y5/05M7BHymeafPNDexjIFMh5Gi9IWRvUnPlU/Wgj8BRb
+	wyoiMLGlvTcM5srRJT1DhJ/0N2tFkpuWFO81DcoCimJma7GOCkIiZ3/x0wR9gToro1glQBv1sX6
+	D1xq92XUIauPQ01hRzPVFfu9EMP0QLR1/v+9857xvJ5gz9f9ZRzJTKs1BO9U+KyuqEXmoFHGNzM
+	PciNN75I0HHLIXzYYx567dREIKrEp+GF5jT6sqdeBjiCuznfdWKi5+31j/HSLuAjwa4xzM4o04h
+	/qE5LqVsCW+lTTLSa0n6k4VCUxs0vsaf6RUwfdDlrwTfqWPolUZLqO+3CFHfL13FvCBc4=
+X-Received: by 2002:a05:600c:2d43:b0:483:6a76:11a6 with SMTP id 5b1f17b1804b1-4871787d9e2mr493345e9.5.1774444504645;
+        Wed, 25 Mar 2026 06:15:04 -0700 (PDT)
+Received: from google.com (209.13.205.35.bc.googleusercontent.com. [35.205.13.209])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-487116ee514sm157350785e9.13.2026.03.25.06.15.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 06:15:04 -0700 (PDT)
+Date: Wed, 25 Mar 2026 13:15:00 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com,
+	mark.rutland@arm.com, oupton@kernel.org, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com
+Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with
+ imm16 != 0
+Message-ID: <acPf1J2dOLvpXHhE@google.com>
+References: <20260325113138.4171430-1-sebastianene@google.com>
+ <acPIdoA8oc7T8wKX@google.com>
+ <86ldfg3ze2.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260325113138.4171430-1-sebastianene@google.com>
- <acPIdoA8oc7T8wKX@google.com> <acPJ3Z9hDKc0Sm2t@google.com>
-In-Reply-To: <acPJ3Z9hDKc0Sm2t@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 25 Mar 2026 12:16:17 +0000
-X-Gm-Features: AQROBzAMJ0mLdR0624TEieVBSiHs3RBFsNy7Xl2T_dOXjsqgRi5JInx2E5cEcKU
-Message-ID: <CA+EHjTzeRiUvhDwAExpscWJfPNoRujeRAJ5dEDV4SMpOJK1K6A@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with
- imm16 != 0
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, 
-	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, 
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ldfg3ze2.wl-maz@kernel.org>
 
-On Wed, 25 Mar 2026 at 11:41, Sebastian Ene <sebastianene@google.com> wrote:
->
-> On Wed, Mar 25, 2026 at 11:35:18AM +0000, Vincent Donnefort wrote:
+On Wed, Mar 25, 2026 at 11:46:29AM +0000, Marc Zyngier wrote:
+> On Wed, 25 Mar 2026 11:35:18 +0000,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
 > > On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
 > > > The ARM Service Calling Convention (SMCCC) specifies that the function
 > > > identifier and parameters should be passed in registers, leaving the
@@ -109,55 +94,61 @@ On Wed, 25 Mar 2026 at 11:41, Sebastian Ene <sebastianene@google.com> wrote:
 > > > Enforce the host kernel running under pKVM to use an immediate value
 > > > of 0 by decoding the ISS from the ESR_EL2 and return a not supported
 > > > error code back to the caller.
-> > >
+> > > 
 > > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
 > > > ---
 > > > v1 -> v2:
-> > >
+> > > 
 > > >  - Dropped injecting an UNDEF and return an error instead
 > > >    (SMCCC_RET_NOT_SUPPORTED)
 > > >  - Used the mask ESR_ELx_xVC_IMM_MASK instead of masking with U16_MAX
 > > >  - Updated the title of the commit message from:
 > > >    "[PATCH] KVM: arm64: Inject UNDEF when host is executing an
 > > >     smc with imm16 != 0
-> >
+> > 
 > > > ---
 > > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 ++++++
 > > >  1 file changed, 6 insertions(+)
-> > >
+> > > 
 > > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > > > index e7790097db93..4ffe30fd8707 100644
 > > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > > > @@ -762,6 +762,12 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
-> > >             handle_host_hcall(host_ctxt);
-> > >             break;
-> > >     case ESR_ELx_EC_SMC64:
-> > > +           if (ESR_ELx_xVC_IMM_MASK & esr) {
-> > > +                   cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
-> > > +                   kvm_skip_host_instr();
-> > > +                   break;
-> > > +           }
+> > >  		handle_host_hcall(host_ctxt);
+> > >  		break;
+> > >  	case ESR_ELx_EC_SMC64:
+> > > +		if (ESR_ELx_xVC_IMM_MASK & esr) {
+> > > +			cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
+> > > +			kvm_skip_host_instr();
+> > > +			break;
+> > > +		}
 > > > +
-> >
+> > 
 > > I wonder if it isn't better to move that into handle_host_smc() as this is part
 > > of how we handle the SMC after all? (and it calls that kvm_skip_host_instr()
 > > already)
-> >
->
-> I was thinking of doing that as well but I prefer this since we don't
-> have to look again at the esr in the callee.
+> 
+> Yes, that'd be vastly better.
+> 
 
-This is a non-trivial amount of code to have in a switch. Can you
-please put it in a helper?
+good, I will update the patch to do this.
+
+> It also begs the question: if you don't want to handle SMCs with a
+> non-zero immediate, why is it OK to do it for HVCs?
+
+I talked a bit with Will about this before writing it. My understanding is that we
+don't have to do it for HVCs because the interface with the hypervisor
+is controlled by us whereas with non-standard SMCs we need at least to
+tell the host that we are not handling non-zero imm16.
+ 
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 
 Thanks,
-/fuad
-
->
-> > >             handle_host_smc(host_ctxt);
-> > >             break;
-> > >     case ESR_ELx_EC_IABT_LOW:
-> > > --
-> > > 2.53.0.1018.g2bb0e51243-goog
-> > >
+Sebastian
