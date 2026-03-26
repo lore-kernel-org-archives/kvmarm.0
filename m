@@ -1,46 +1,46 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB533A1691
-	for <kvmarm@lists.linux.dev>; Thu, 26 Mar 2026 18:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930DF34D385
+	for <kvmarm@lists.linux.dev>; Thu, 26 Mar 2026 21:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774549281; cv=none; b=Q/pFu0MhyRRZVBlHglGXTGnMtcIUCA2nnUB7/f3nz1fNm/0WXANhHllricAfnWT8Zf/F/db3h+cveRJ2QpQEAWvGTsueuqDqvG5DsmAISTNmcPv+1FLpiIaakv27rRzU3SThJrs2M+QbbsDzrDTPLUfH+nbhv519LE67ZLb00E8=
+	t=1774559780; cv=none; b=kKuxt6zS0mGMYb2Hd6RJ6gr8QtD9sgfjMcx7TP7golcoQv9ux6fUfS+YhE5BqjLrxtzy73/vUUiPjXEtULa0bLSXDXWjnhkRIZABy0w2j35q7umTfXGDOW4jWar4+0tgi59HQo09KJREwRLYkStE2yehoH8SnAZvR2h6FvzbvGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774549281; c=relaxed/simple;
-	bh=iUpkYvHbuGQP6Dw7lRN7ijRYKwL4SoItz2X0gx4MLnw=;
+	s=arc-20240116; t=1774559780; c=relaxed/simple;
+	bh=c+mJTClcUcrdmuit2k+9X3HYT3cHU10p3egwMFS7/v0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N0bCRYtGAV7TIvfyL2m9ftQ5xHHAHo3FSEJDD/+IrCI9D655vaIOGbSTac9iaWL4/YK7xM3YoAKZg5HIyUbRO/2FU5ebZRV/nFnaUVaCAMsr8f3cNyhLbx+kOsh//1Sbn+Bv1zjPwBTbJHz/qCoSn0buvt8t0YaDeruHva2WTXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0kplvyf; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BIuQHQ8EEMoCaunsgd95DqokaGv2/F+/Trmgj98KwOcpIxLn2JYHT4o/mySMiVhd9ixEtuO42P2mNhiKy+rzZA3OPmtkzf0fFQILNx8xm2LsvDLvnupWGKu664n15pXhFTOcmNlDtZW030bwL+jIvkX/73OK5GpvxQ83BskK/Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=r39wWu6d; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0kplvyf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1F6C116C6;
-	Thu, 26 Mar 2026 18:21:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774549280;
-	bh=iUpkYvHbuGQP6Dw7lRN7ijRYKwL4SoItz2X0gx4MLnw=;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="r39wWu6d"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 246C82BC0;
+	Thu, 26 Mar 2026 14:16:11 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB1CA3F905;
+	Thu, 26 Mar 2026 14:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774559777; bh=c+mJTClcUcrdmuit2k+9X3HYT3cHU10p3egwMFS7/v0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H0kplvyfivAHamFYFZxxfLFSvziykz+g1pxObnat8zxnPzTCgDAdRPCP+V1wa9KJn
-	 2cGkRDmVZGww58rMsMNtXP5Fusw3j84nr1oenjeVIrQkPOuZO/wAZ8uiN0LLU17sNE
-	 oO3G1jwYWQ66dzMdpDWWbq2NjWJMH9eDSPF/BQDOHTLK8mzEeJEykfOuDTVa3jREBn
-	 K6Wkx5Ye62BD9jju3fw6HipLDbb1xkbM4bSlUmGfxNnjwuTHGAgqtWC5+mvxOVCn/p
-	 zY/jFrqF/ZjQQiXpEOZvUJxjkhbg79Cc2Q/mTr6p23GkeXtVTGBPNliwuTliVKt9ud
-	 xQIdHKzINpuJQ==
-Date: Thu, 26 Mar 2026 18:21:15 +0000
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Yabin Cui <yabinc@google.com>
-Subject: Re: [PATCH v3 3/3] KVM: arm64: Don't pass host_debug_state to BRBE
- world-switch routines
-Message-ID: <acV5G3ntjXZKBGsm@willie-the-truck>
-References: <20260326141214.18990-1-will@kernel.org>
- <20260326141214.18990-4-will@kernel.org>
+	b=r39wWu6dqOWJPENHgQsBGzW4+ocqFqyBXBXCDNkzHc1HfZ+ubRxUq2jZdRO6WGhd0
+	 2zHMTaLHrehYeL1CNq/MXVFBrldUtwo4JIshPo45JaWLIQjQTQr0DAYqzcMjGmF+yI
+	 dcLMW4w5CbuKGwX65UdeYfm+kzYcMwiZqYLPoTy4=
+Date: Thu, 26 Mar 2026 21:16:06 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 3/3] KVM: arm64: selftests: Enable stage-2 in NV
+ preparation functions
+Message-ID: <3b6cppbfja7bczelm7kgxut6tdyvtiulbbfjyfvwhvthpaigu4@pybgo4yzhrus>
+References: <20260325003620.2214766-1-weilin.chang@arm.com>
+ <20260325003620.2214766-4-weilin.chang@arm.com>
+ <86mrzw468z.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,46 +49,154 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260326141214.18990-4-will@kernel.org>
+In-Reply-To: <86mrzw468z.wl-maz@kernel.org>
 
-On Thu, Mar 26, 2026 at 02:12:13PM +0000, Will Deacon wrote:
-> Now that the SPE and BRBE nVHE world-switch routines operate on the
-> host_debug_state directly, tweak the BRBE code to do the same for
-> consistency.
+On Wed, Mar 25, 2026 at 09:18:20AM +0000, Marc Zyngier wrote:
+> On Wed, 25 Mar 2026 00:36:20 +0000,
+> Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> > 
+> > Introduce library functions for setting up guest stage-2 page tables,
+> > then use that to give L2 an identity mapped stage-2 and enable it.
+> > 
+> > The translation and stage-2 page table built is simple, start level 0,
+> > 4 levels, 4KB granules, normal cachable, 48-bit IA, 40-bit OA.
 > 
-> This is purely cosmetic.
+> That's a no go. The most common NV-capable out there can realistically
+> only do 16kB at S2, and is limited to 36bit IPA. We can't really
+> afford to say "too bad" and leave the main development platform behind.
+
+Interesting, I didn't know that! I didn't consider the guest stage-2
+granule size < host stage-2 granule size case either.
+
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
-> Cc: James Clark <james.clark@linaro.org>
-> Cc: Leo Yan <leo.yan@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Fuad Tabba <tabba@google.com>
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+> > 
+> > The nested page table code is adapted from lib/x86/vmx.c.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 84bc80f4e36b..50413171bd1a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -156,9 +156,9 @@ static void __trace_switch_to_host(void)
->  			  *host_data_ptr(host_debug_state.trfcr_el1));
->  }
->  
-> -static void __debug_save_brbe(u64 *brbcr_el1)
-> +static void __debug_save_brbe(void)
->  {
-> -	*brbcr_el1 = 0;
-> +	u64 *brbcr_el1 = host_data_ptr(host_debug_state.brbcr_el1);
+> I guess this starting point is the main issue.
+> 
+> > 
+> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > ---
+> >  .../selftests/kvm/include/arm64/nested.h      |  7 ++
+> >  .../selftests/kvm/include/arm64/processor.h   |  9 ++
+> >  .../testing/selftests/kvm/lib/arm64/nested.c  | 97 ++++++++++++++++++-
+> >  3 files changed, 111 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
+> > index 739ff2ee0161..0be10a775e48 100644
+> > --- a/tools/testing/selftests/kvm/include/arm64/nested.h
+> > +++ b/tools/testing/selftests/kvm/include/arm64/nested.h
+> > @@ -6,6 +6,13 @@
+> >  #ifndef SELFTEST_KVM_NESTED_H
+> >  #define SELFTEST_KVM_NESTED_H
+> >  
+> > +uint64_t get_l1_vtcr(void);
+> > +
+> > +void nested_map(struct kvm_vm *vm, vm_paddr_t guest_pgd,
+> > +		uint64_t nested_paddr, uint64_t paddr, uint64_t size);
+> > +void nested_map_memslot(struct kvm_vm *vm, vm_paddr_t guest_pgd,
+> > +			uint32_t memslot);
+> > +
+> >  void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+> >  void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+> >  void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc);
+> > diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+> > index ac97a1c436fc..5de2e932d95a 100644
+> > --- a/tools/testing/selftests/kvm/include/arm64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+> > @@ -104,6 +104,15 @@
+> >  #define TCR_HA			(UL(1) << 39)
+> >  #define TCR_DS			(UL(1) << 59)
+> >  
+> > +/* VTCR_EL2 specific flags */
+> > +#define VTCR_EL2_T0SZ_BITS(x)	((UL(64) - (x)) << VTCR_EL2_T0SZ_SHIFT)
+> > +
+> > +#define VTCR_EL2_SL0_LV0_4K	(UL(2) << VTCR_EL2_SL0_SHIFT)
+> > +#define VTCR_EL2_SL0_LV1_4K	(UL(1) << VTCR_EL2_SL0_SHIFT)
+> > +#define VTCR_EL2_SL0_LV2_4K	(UL(0) << VTCR_EL2_SL0_SHIFT)
+> > +
+> > +#define VTCR_EL2_PS_40_BITS	(UL(2) << VTCR_EL2_PS_SHIFT)
+> > +
+> >  /*
+> >   * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+> >   */
+> > diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
+> > index 111d02f44cfe..910f8cd30f96 100644
+> > --- a/tools/testing/selftests/kvm/lib/arm64/nested.c
+> > +++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
+> > @@ -1,8 +1,11 @@
+> >  // SPDX-License-Identifier: GPL-2.0
+> >  /*
+> > - * ARM64 Nested virtualization helpers
+> > + * ARM64 Nested virtualization helpers, nested page table code adapted from
+> > + * ../x86/vmx.c.
+> >   */
+> >  
+> > +#include <linux/sizes.h>
+> > +
+> >  #include "kvm_util.h"
+> >  #include "nested.h"
+> >  #include "processor.h"
+> > @@ -18,6 +21,87 @@ static void hvc_handler(struct ex_regs *regs)
+> >  	regs->pc = (u64)after_hvc;
+> >  }
+> >  
+> > +uint64_t get_l1_vtcr(void)
+> > +{
+> > +	return VTCR_EL2_PS_40_BITS | VTCR_EL2_TG0_4K | VTCR_EL2_ORGN0_WBWA |
+> > +	       VTCR_EL2_IRGN0_WBWA | VTCR_EL2_SL0_LV0_4K | VTCR_EL2_T0SZ_BITS(48);
+> 
+> Irk. See above.
+> 
+> > +}
+> > +
+> > +static void __nested_pg_map(struct kvm_vm *vm, uint64_t guest_pgd,
+> > +		     uint64_t nested_paddr, uint64_t paddr, uint64_t flags)
+> > +{
+> > +	uint8_t attr_idx = flags & (PTE_ATTRINDX_MASK >> PTE_ATTRINDX_SHIFT);
+> > +	uint64_t pg_attr;
+> > +	uint64_t *ptep;
+> > +
+> > +	TEST_ASSERT((nested_paddr % vm->page_size) == 0,
+> > +		"L2 IPA not on page boundary,\n"
+> > +		"  nested_paddr: 0x%lx vm->page_size: 0x%x", nested_paddr, vm->page_size);
+> > +	TEST_ASSERT((paddr % vm->page_size) == 0,
+> > +		"Guest physical address not on page boundary,\n"
+> > +		"  paddr: 0x%lx vm->page_size: 0x%x", paddr, vm->page_size);
+> > +	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
+> > +		"Physical address beyond maximum supported,\n"
+> > +		"  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+> > +		paddr, vm->max_gfn, vm->page_size);
+> > +
+> > +	ptep = addr_gpa2hva(vm, guest_pgd) + ((nested_paddr >> 39) & 0x1ffu) * 8;
+> > +	if (!*ptep)
+> > +		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PGD_TYPE_TABLE | PTE_VALID;
+> > +	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 30) & 0x1ffu) * 8;
+> > +	if (!*ptep)
+> > +		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PUD_TYPE_TABLE | PTE_VALID;
+> > +	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 21) & 0x1ffu) * 8;
+> > +	if (!*ptep)
+> > +		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PMD_TYPE_TABLE | PTE_VALID;
+> > +	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 12) & 0x1ffu) * 8;
+> > +
+> > +	pg_attr = PTE_AF | PTE_ATTRINDX(attr_idx) | PTE_TYPE_PAGE | PTE_VALID;
+> > +	pg_attr |= PTE_SHARED;
+> > +
+> > +	*ptep = (paddr & GENMASK(47, 12)) | pg_attr;
+> 
+> Please use named constants, and write a page table generator that is
+> independent of page, IA and OA sizes, as advertised to the guest.
 
-Oh no, I've been sashiko'd!
+Ack, and yes, I should absolutely consider what is advertised to the
+guest...
 
-The above is definitely not "purely cosmetic" and I should retain the
-'*brbcr_el1 = 0; ' line.
+Thanks,
+Wei-Lin Chang
 
-Will
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
