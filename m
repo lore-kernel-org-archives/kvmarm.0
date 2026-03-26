@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88624070F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA6E4070F7;
 	Thu, 26 Mar 2026 15:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774539337; cv=none; b=jWpYbmlcbooqdWzZalBdwBnUcWPwO9mwReNinGKz3W1jcSpRp3YBRMX+iMzu03c40wCl1erL14dEToIRE0yZemLRgc/zd/9tN3hGoqle2YDNsUb5wtE4b5HeLdtmwt/0HQCKfdAsTLp4fgnwZ0iETCLIl5L3+xlGco5iju8/EOk=
+	t=1774539337; cv=none; b=DOsUSpm+GLTcFLpCvt/M7inweBPfucQCOvQbusGmb4Tk1elHqXFwtcLJyxPBfKHrcTD4mf1cE5WxTAO9FfYovGApa1gRnCGvx7+fiyGCuow77N/g9XheKk2F1QTttmjnkRQxJmn7LcRdG05f73JTSwfcmErtNOQOhw/4TGwkpQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774539337; c=relaxed/simple;
-	bh=CrWdCZA8JdxCY9eF4XTewZwde0WwVr8is3+3aUovL/s=;
+	bh=BRbmzUOJBjqYkQ5YB+hmyXy64v2qULuFBJxfbjyyGRY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sO5g4EVZOT3wWIVR1pD2WZ4dm+vlMmXApUIJAFNGY+MTThBo+xp/TZ8lPyMatKOipkvi20rNjz7wZ1Zy02d+C5jpO5fA9OZBGLcFa/vljXCr55pR3TE7o0VcYAaIbnd5Owgl63uk/uGjMu8cWT/udvfRvITv9dZu3RN6MumcjvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3WpifxG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NXKue4CR36gGLEWCoADbgZ1xxT2ReXfci8vSqwplQbUEyxFauYeZ6OzTT804Wx1YcRt/+ZR0pl1dJ5b4ZtrrTml4W6Lc5KxT5/ztYPiA1wBXgo3GAVWq4/Yyfc3GKxkJ7JHBLoD+ULVSkKjWNsqPmn1iNvIrRzERryKzymaNVFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VI4WsgMA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3WpifxG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 872E7C2BCB6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VI4WsgMA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C404C2BCB4;
 	Thu, 26 Mar 2026 15:35:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1774539337;
-	bh=CrWdCZA8JdxCY9eF4XTewZwde0WwVr8is3+3aUovL/s=;
+	bh=BRbmzUOJBjqYkQ5YB+hmyXy64v2qULuFBJxfbjyyGRY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b3WpifxGUJ0U+zRraD1mwOcqxlKJxl0XsxXA0UB8dEis2gVni1mDng1sNGNmuypj/
-	 sy+90bvZBbuG09nz2KtR75yJsG82uAdDMHCcnHCLExLu4DKK4MYYdvMJCY+d2gKROJ
-	 EprjcfFZlfSaTeGbJklAZRrmzkl/FMdj276pBhftxi+3DwKZDmz1+z6OuWhVkScmJj
-	 kXMUo9F/jG3GYEpj9daSZZ6yV/vllCWqNgGTpsNovCL3eHp8EHxK5GQhEw1q3beWXd
-	 Xy4TikF0MPv+Kds6ps4bNmgdZbCtIoEzCWjiCrJFPG2VGFm1Lz/JMOgs0jPdTXFWue
-	 D6kewkfi+c7+w==
+	b=VI4WsgMAyvo2ow4/RFEWZKHyYZp4RTvpwDfyWPwNxRH0T8UxkIAjVytwiiAOevfw9
+	 +v/XYWBCuBjD/JSRHFCmsfzf3x/EXyFeSP2OIwewcqGEO7PL7x4YQl5sa0XBJwT86O
+	 ssu/0tsjthkio9FagoBHJ+ppyGR9FDOwhE19hZmNFbggTLY34CnHu1Wr2pVe8RNwpm
+	 qbOO1nj12O9Hstzkdx6bs19sxIfux0hsrdinOUJ30L2ZwQ/5jIGEWZJwy3vAiKNLqf
+	 OoBM5eLAq/fKmTPjhJkqJ6xccKwWmg9C9foPxJDHyDFBSsxhCoHgvhFyUqMeCpeBhU
+	 gcjjWqz0+bupw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w5mkB-000000060II-37mF;
+	id 1w5mkB-000000060II-2BdE;
 	Thu, 26 Mar 2026 15:35:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 07/15] KVM: arm64: vgic-v5: Transfer edge pending state to ICH_PPI_PENDRx_EL2
-Date: Thu, 26 Mar 2026 15:35:22 +0000
-Message-ID: <20260326153530.3981879-8-maz@kernel.org>
+Subject: [PATCH 06/15] KVM: arm64: vgic-v5: Hold config_lock while finalizing GICv5 PPIs
+Date: Thu, 26 Mar 2026 15:35:21 +0000
+Message-ID: <20260326153530.3981879-7-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260326153530.3981879-1-maz@kernel.org>
 References: <20260326153530.3981879-1-maz@kernel.org>
@@ -60,35 +60,45 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-While it is perfectly correct to leave the pending state of a level
-interrupt as is when queuing it (it is, after all, only driven by
-the line), edge pending state must be transfered, as nothing will
-lower it.
+Finalizing the PPI state is done without holding any lock, which
+means that two vcpus can race against each other and have one zeroing
+the state while another one is setting it, or even maybe using it.
 
-Fixes: 4d591252bacb2 ("KVM: arm64: gic-v5: Implement PPI interrupt injection")
+Fixing this is done by:
+
+- holding the config lock while performing the initialisation
+
+- checking if SW_PPI has already been advertised, meaning that
+  we have already completed the initialisation once
+
+Fixes: 8f1fbe2fd2792 ("KVM: arm64: gic-v5: Finalize GICv5 PPIs and generate mask")
 Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v5.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v5.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 119d7d01d0e77..422741c86c6a8 100644
+index 2b6cd5c3f9c2f..119d7d01d0e77 100644
 --- a/arch/arm64/kvm/vgic/vgic-v5.c
 +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -445,8 +445,11 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
+@@ -172,6 +172,16 @@ int vgic_v5_finalize_ppi_state(struct kvm *kvm)
+ 	if (!vgic_is_v5(kvm))
+ 		return 0;
  
- 		irq = vgic_get_vcpu_irq(vcpu, intid);
++	guard(mutex)(&kvm->arch.config_lock);
++
++	/*
++	 * If SW_PPI has been advertised, then we know we already
++	 * initialised the whole thing, and we can return early. Yes,
++	 * this is pretty hackish as far as state tracking goes...
++	 */
++	if (test_bit(GICV5_ARCH_PPI_SW_PPI, kvm->arch.vgic.gicv5_vm.vgic_ppi_mask))
++		return 0;
++
+ 	/* The PPI state for all VCPUs should be the same. Pick the first. */
+ 	vcpu0 = kvm_get_vcpu(kvm, 0);
  
--		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-+		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
- 			__assign_bit(i, pendr, irq_is_pending(irq));
-+			if (irq->config == VGIC_CONFIG_EDGE)
-+				irq->pending_latch = false;
-+		}
- 
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
 -- 
 2.47.3
 
