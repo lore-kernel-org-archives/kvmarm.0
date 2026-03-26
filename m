@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11864035CD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D121E4035CF;
 	Thu, 26 Mar 2026 15:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774539336; cv=none; b=LnedolcOdHm7yuDYVRb3sz/KVrTS/n2GhtBBoaCXEVHsgOAJWw5pONEsdImuxwbDgaCA8dzN31NwxO+2HzZrFCfhWriywvB9FftrdAwFFdRpTU8dadPg7MKNy+u+pzTcEMAykCaTdT1wMQFKGZnVgrgygASvfPhkBvC89Fuxx0I=
+	t=1774539336; cv=none; b=KsLZmRHgGQoXDxHaocESf+npFl083ecrRjp/B2CPST1jSu6EjCWtRbZeTapOFPUKthTpQuBcCzQtmRujC/96p5642RbyRrUrd60mWqqjeBFgdCVNsdbfGhuyUvafQxtMrrEgB83Hkmvxl7aAHAC1G8bSTDIAdBaIwbvhn6ntb2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774539336; c=relaxed/simple;
-	bh=CRKbEfZ640ydmcu//sv1gFU5INDkhE46iAfYl1MgcF8=;
+	bh=L1mSvPjSIYoG8LtAIHtXZGudc3PJdk/BtNGgyIfZ3nY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u2BzJIh37SMvphiBmXCpKm4a14utX+P+KELICoMYmBJ6PEOJ4ehSe7jeMPpW9Jt08wMZeH3oeZyyMZ1bNp2HWLY5L5H5lYAY4uM5s9Mildpr5DR6pf+54aDcFv01gYRrgGnIYfbS1MQ/vpZwUho5chIkepNFktQiIArkSULavUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8rVpchG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=JfqN5boT2uXLj7v+JoFLzDaaSK82w77n2ONRNoUuJXb2U+tibbUHd142ZbNaV49blxuMVTWVRdEWppUP1HclOuFn4Ku8lrAm4BySKZH4Z/gQA/AGr1aE63HlTVHR7mU8F3iZ+GbXIKgEtUqCRmjKc0/UZFqyIIGfX951tn5xVLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bfoV327f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8rVpchG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A88DEC116C6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bfoV327f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EB4BC2BCB4;
 	Thu, 26 Mar 2026 15:35:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1774539336;
-	bh=CRKbEfZ640ydmcu//sv1gFU5INDkhE46iAfYl1MgcF8=;
+	bh=L1mSvPjSIYoG8LtAIHtXZGudc3PJdk/BtNGgyIfZ3nY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L8rVpchGwIjTieyIvgQKJFxHWnjEq2rvcxYSk/P9V9UVjiIa3op5jPp7AM13iiW+l
-	 bJKtP1xOJ6CVBha9ulfypthUY2nxniMXP4CYW4G3Tm+++epYoRXtpw4s/m/PU951gf
-	 Rf7lveLssaKTRaohN1sHnhjTt7ASgkSv1rxwk2unDvF+nkMbLmmh4WGhkKufKmvfXc
-	 4y08cglxTUjeXnIgWODPDn4bXq0XstfEh9lIkRxkBUbLU7KvitUY5ZJkApxO8e7Njt
-	 BDxtb69eBxH/wdqYUVfrBwunX8AbLsiuptuAa1Xb3CxzqKkWZQMnukwzaAmSLaJ8K2
-	 lp8zR+qOITR9g==
+	b=bfoV327fJ0oy9O00rrNJkeQYzD5b3uvDehN/+psrdwR157578h7h9M+lGiPGSvKVP
+	 sQamcXC5qi8JdRKa5DeY9bDyT1wQDUvUUG+DNm9fIA98P9rBAI/sOo8zjBkMZtC+s7
+	 ntLMPbqbi37po59lYuAAxE2qqzzWi+4zsxjDK0LyPLCb6E7a5K2H7Itum3VCSJCTMf
+	 SQPAwLUa2e/uwUiPzd2idLPowOxP3ewf/OW2LCxEDY+mJQE5VTm8xx6neq7trcHRMa
+	 7lFAB2aYj/cljuE8w+1rK/q00wbltrTT3jGRUJdgGV6XPGvhjCWsyvYDacZrzbPs0c
+	 kNsFL2VGUbxeg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w5mkA-000000060II-2hXR;
+	id 1w5mkA-000000060II-1qbh;
 	Thu, 26 Mar 2026 15:35:34 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 02/15] KVM: arm64: Don't skip per-vcpu NV initialisation
-Date: Thu, 26 Mar 2026 15:35:17 +0000
-Message-ID: <20260326153530.3981879-3-maz@kernel.org>
+Subject: [PATCH 01/15] KVM: arm64: vgic: Don't reset cpuif/redist addresses at finalize time
+Date: Thu, 26 Mar 2026 15:35:16 +0000
+Message-ID: <20260326153530.3981879-2-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260326153530.3981879-1-maz@kernel.org>
 References: <20260326153530.3981879-1-maz@kernel.org>
@@ -60,49 +60,50 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Some GICv5-related rework have resulted in the NV sanitisation of
-registers being skipped for secondary vcpus, which is a pretty bad
-idea.
+Although we are OK with rewriting idregs at finalize time, resetting
+the guest's cpuif (GICv3) or redistributor (GICv3) addresses once
+we start running the guest is a pretty bad idea.
 
-Hoist the NV init early so that it is always executed.
+Move back this initialisation to vgic creation time.
 
-Fixes: cbd8c958be54a ("KVM: arm64: Return early from kvm_finalize_sys_regs() if guest has run")
-Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
+Fixes: a258a383b9177 ("KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE")
+Link: https://patch.msgid.link/20260323174713.3183111-1-maz@kernel.org
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e1001544d4f40..18e2d2fccedb8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5772,6 +5772,12 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 47169604100f2..fd872079f2a24 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -147,6 +147,15 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 	kvm->arch.vgic.implementation_rev = KVM_VGIC_IMP_REV_LATEST;
+ 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
  
- 	guard(mutex)(&kvm->arch.config_lock);
- 
-+	if (vcpu_has_nv(vcpu)) {
-+		int ret = kvm_init_nv_sysregs(vcpu);
-+		if (ret)
-+			return ret;
++	switch (type) {
++	case KVM_DEV_TYPE_ARM_VGIC_V2:
++		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
++		break;
++	case KVM_DEV_TYPE_ARM_VGIC_V3:
++		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
++		break;
 +	}
-+
- 	if (kvm_vm_has_ran_once(kvm))
- 		return 0;
++	
+ 	/*
+ 	 * We've now created the GIC. Update the system register state
+ 	 * to accurately reflect what we've created.
+@@ -684,10 +693,8 @@ void kvm_vgic_finalize_idregs(struct kvm *kvm)
  
-@@ -5820,12 +5826,6 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
- 		kvm_vgic_finalize_idregs(kvm);
- 	}
- 
--	if (vcpu_has_nv(vcpu)) {
--		int ret = kvm_init_nv_sysregs(vcpu);
--		if (ret)
--			return ret;
--	}
--
- 	return 0;
- }
- 
+ 	switch (type) {
+ 	case KVM_DEV_TYPE_ARM_VGIC_V2:
+-		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+ 		break;
+ 	case KVM_DEV_TYPE_ARM_VGIC_V3:
+-		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+ 		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+ 		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+ 		break;
 -- 
 2.47.3
 
