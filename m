@@ -1,85 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631F6227599
-	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A863F0AA8
+	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774620176; cv=none; b=C96xFu2OMjWx8yHu5xvrfTnODkUcb1FnunlqeZd5C940IBDQhUwPui6ECXzHgtqLmhPhuIoahrFiVpg+1QTIX6EGdVKFzaEeAFv1Es0fXsgxHmDTVKBcCk7twF462pVUJfnmk+9HCur8pR1U2woTWDg6vdmbFvDrFeke6d4Y2Bk=
+	t=1774622272; cv=none; b=s5tZlK2HxtOx9UmrpGPJ0E0t+11/RnSQMeaKkt2olr6UsV0jLnQQdMKIZwtD3ocT+mp+yiJziqqvZwSC0/n5ISWknUww+kK+YAP2kN+P2YEegFvQA7GQLfJdyQ1h4P81wMZ4pfJkevKtLgdge0jk3mbXv92RFeEpePgxnEglHTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774620176; c=relaxed/simple;
-	bh=be2pSVdKYs2XTtccvYTydqz5T0J6rzFdyQOTW0pLEsY=;
+	s=arc-20240116; t=1774622272; c=relaxed/simple;
+	bh=rBaosBE0xHnpR4CfpExm5lZKwHweHdm8x+3Ll2q+xvc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MU33FmsYXohASuMZdyxcDQtlLHOeLpnTDtxy41hP5LT72pa54JiRMT21roP2BVByhIKdX+2AFZJ6mdoHDhhMC6Ku1vVN+yjjbc7LGaEClTjjjDA+p6g8x0n7WBvbBcgBjixXjeK+Ls1ZPi+E/pTRTPuzjht6ndIpJyLIUBLBjl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rM+S9W/t; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type:Content-Disposition; b=LiC4hIIO8r42X1RIqHHaBqlHM8CqAi0WuL87HdiT3h2UiYlnkAfGs7PDQSgWGtpvLS85t+OuibL1SskNlMJ3AYak4vzhA1TmY1Xgidvt732zpTuCXPtBUWLaS3wa/dLlot/R6HvnUporXx8D6Taxpl65FwEH6QE6JrLBlYXzMnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VVSUr77H; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rM+S9W/t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5826CC19423;
-	Fri, 27 Mar 2026 14:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774620176;
-	bh=be2pSVdKYs2XTtccvYTydqz5T0J6rzFdyQOTW0pLEsY=;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VVSUr77H"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A7C035B1;
+	Fri, 27 Mar 2026 07:37:43 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE4EA3F905;
+	Fri, 27 Mar 2026 07:37:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774622269; bh=rBaosBE0xHnpR4CfpExm5lZKwHweHdm8x+3Ll2q+xvc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rM+S9W/tuRvb49c7BWCDLqctBJVkG6x3Rqu7RZ6S1RkyEF6i9xr/aZLoqvQ8uaL03
-	 iqpS+QZluJYiuIXV7f0ljEE3GHEXcFsUDE0AaeFqy4Xt0+885WI5W0Ob9ptNepEmbo
-	 liFiT+uUIiwNo3faRMQTvJAAW8K4/IjxX+0N9hp7otssMqPp1lYJFaCsbd9s6w1HS9
-	 ERWNIUdlJmtt3TXcEmKGAkbF2Rwzn+28zrd1F1taFzsClWdVchdE/8w+xeSJa1qddA
-	 d/KAAufqvZJukOxQEgmt0jmJWO7UifVtrA8K2oDUPA7LGEY5uKfN2xHZyGAduFHOA9
-	 fY3VrYssZWg0Q==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v4 38/38] drivers/virt: pkvm: Add Kconfig dependency on DMA_RESTRICTED_POOL
-Date: Fri, 27 Mar 2026 14:00:37 +0000
-Message-ID: <20260327140039.21228-39-will@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260327140039.21228-1-will@kernel.org>
-References: <20260327140039.21228-1-will@kernel.org>
+	b=VVSUr77HEC3cZ3e8mCoZA+3RLhgaRRNOUCuGTX6S559KKiuhtB6vxpOV40N48ssFM
+	 tRX1PBw05CUIVrknE5F+TWpeG6ixsYLwHJkHNF71t4MqaBoqOnKwggWDvL44kkeAZy
+	 UMFtNdDxN0UrjL202wp0PPAieLzEmHevI+2cMZLs=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	liuyonglong@huawei.com,
+	Jonathan.Cameron@huawei.com,
+	yezhenyu2@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH] arm64/kvm: Enable eager hugepage splitting if HDBSS is available
+Date: Fri, 27 Mar 2026 14:37:39 +0000
+Message-ID: <acaWMwB2emS7HrHW@devkitleo>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <6cce203f-89d9-4e9d-8b28-9629eb53b180@huawei.com>
+References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-5-zhengtian10@huawei.com> <acQj5grOdZT8LUGp@devkitleo> <acQna2hLwdr1juTN@devkitleo> <6cce203f-89d9-4e9d-8b28-9629eb53b180@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-pKVM guests practically rely on CONFIG_DMA_RESTRICTED_POOL=y in order
-to establish shared memory regions with the host for virtio buffers.
+On Fri, Mar 27, 2026 at 03:40:30PM +0800, Tian Zheng wrote:
+> 
+> On 3/26/2026 2:20 AM, Leonardo Bras wrote:
+> > FEAT_HDBSS speeds up guest memory dirty tracking by avoiding a page fault
+> > and saving the entry in a tracking structure.
+> > 
+> > That may be a problem when we have guest memory backed by hugepages or
+> > transparent huge pages, as it's not possible to do on-demand hugepage
+> > splitting, relying only on eager hugepage splitting.
+> > 
+> > So, at stage2 initialization, enable eager hugepage splitting with
+> > chunk = PAGE_SIZE if the system supports HDBSS.
+> > 
+> > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+> > ---
+> >   arch/arm64/kvm/mmu.c | 8 ++++++--
+> >   1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 070a01e53fcb..bdfa72b7c073 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -993,22 +993,26 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+> >   	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
+> >   	if (!mmu->last_vcpu_ran) {
+> >   		err = -ENOMEM;
+> >   		goto out_destroy_pgtable;
+> >   	}
+> >   	for_each_possible_cpu(cpu)
+> >   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+> > -	 /* The eager page splitting is disabled by default */
+> > -	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +	 /* The eager page splitting is disabled by default if system has no HDBSS */
+> > +	if (system_supports_hacdbs())
+> > +		mmu->split_page_chunk_size = PAGE_SIZE;
+> > +	else
+> > +		mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +
+> >   	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> >   	mmu->pgd_phys = __pa(pgt->pgd);
+> >   	if (kvm_is_nested_s2_mmu(kvm, mmu))
+> >   		kvm_init_nested_s2_mmu(mmu);
+> >   	return 0;
+> >   out_destroy_pgtable:
+> 
+> 
+> Thanks again for sending this patch. I'll integrate it into the next version
+> and run some tests.
+> 
+> 
 
-Make CONFIG_ARM_PKVM_GUEST depend on CONFIG_DMA_RESTRICTED_POOL to avoid
-the inevitable segmentation faults experience if you have the former but
-not the latter.
-
-Reported-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- drivers/virt/coco/pkvm-guest/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/virt/coco/pkvm-guest/Kconfig b/drivers/virt/coco/pkvm-guest/Kconfig
-index d2f344f1f98f..928b8e1668cc 100644
---- a/drivers/virt/coco/pkvm-guest/Kconfig
-+++ b/drivers/virt/coco/pkvm-guest/Kconfig
-@@ -1,6 +1,6 @@
- config ARM_PKVM_GUEST
- 	bool "Arm pKVM protected guest driver"
--	depends on ARM64
-+	depends on ARM64 && DMA_RESTRICTED_POOL
- 	help
- 	  Protected guests running under the pKVM hypervisor on arm64
- 	  are isolated from the host and must issue hypercalls to enable
--- 
-2.53.0.1018.g2bb0e51243-goog
-
+Awesome, thanks!
+Leo
