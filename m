@@ -1,120 +1,211 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A863F0AA8
-	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFC23F8DED;
+	Fri, 27 Mar 2026 14:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774622272; cv=none; b=s5tZlK2HxtOx9UmrpGPJ0E0t+11/RnSQMeaKkt2olr6UsV0jLnQQdMKIZwtD3ocT+mp+yiJziqqvZwSC0/n5ISWknUww+kK+YAP2kN+P2YEegFvQA7GQLfJdyQ1h4P81wMZ4pfJkevKtLgdge0jk3mbXv92RFeEpePgxnEglHTc=
+	t=1774622955; cv=none; b=JNRPdpj7iv9pCg6a9Hb5yxHIh4O63RPIU+usbgS/npPBPfdzE3AFuEYFWE5ebHXn0ucNkroTEX1HVKUwTDR8Ud3lHjPGTkyygX+B2sbiXIPcHcocxFPpftvVp/b5e9Me6szYreJZeg5HJHyiGPMZyFRPS2y9zsvX+Ice5XrBdfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774622272; c=relaxed/simple;
-	bh=rBaosBE0xHnpR4CfpExm5lZKwHweHdm8x+3Ll2q+xvc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=LiC4hIIO8r42X1RIqHHaBqlHM8CqAi0WuL87HdiT3h2UiYlnkAfGs7PDQSgWGtpvLS85t+OuibL1SskNlMJ3AYak4vzhA1TmY1Xgidvt732zpTuCXPtBUWLaS3wa/dLlot/R6HvnUporXx8D6Taxpl65FwEH6QE6JrLBlYXzMnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VVSUr77H; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1774622955; c=relaxed/simple;
+	bh=bGI/cAugrNnig4KQOyBbkhQzweiFkpeRdiDXpd6DHe8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=inFWNyrF7VV90u22F9BIA/iQgkeOVpvBBJ5pcrbB/9hvf32ZrXkYI1DbHc1C2FctvqML5q1kj8Jbl8fuJqtdC2KN1TKDBHjezhiSqmBk8iY3cWHyVhtmUhwERKMqJHIXOkLu34cTt3oHyssXplrOwRYEMSe22YfUj9AUj+HQrOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C/jm2dmR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VVSUr77H"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A7C035B1;
-	Fri, 27 Mar 2026 07:37:43 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE4EA3F905;
-	Fri, 27 Mar 2026 07:37:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774622269; bh=rBaosBE0xHnpR4CfpExm5lZKwHweHdm8x+3Ll2q+xvc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VVSUr77HEC3cZ3e8mCoZA+3RLhgaRRNOUCuGTX6S559KKiuhtB6vxpOV40N48ssFM
-	 tRX1PBw05CUIVrknE5F+TWpeG6ixsYLwHJkHNF71t4MqaBoqOnKwggWDvL44kkeAZy
-	 UMFtNdDxN0UrjL202wp0PPAieLzEmHevI+2cMZLs=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	liuyonglong@huawei.com,
-	Jonathan.Cameron@huawei.com,
-	yezhenyu2@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/jm2dmR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BFC4C19423;
+	Fri, 27 Mar 2026 14:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774622954;
+	bh=bGI/cAugrNnig4KQOyBbkhQzweiFkpeRdiDXpd6DHe8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C/jm2dmRjOh6fraMMQ4iojohVQmL/HM+bEnLFDCyIdSen6wG4z7QHm+U8z32tHi4k
+	 uC/DCDo9SJ6w0SJO0jjwSVJxpnbSX9Liw3QWjyMkKXpVpBDd4Ny9ZlTxs47xQP3F8F
+	 CiIGMA2I7wRfeh0QlMQPliOsWuKqjqFM8HYtwKyh6mQkr6gEROCPSvESPs5D3AslTZ
+	 CiiIMHUvftAXSSkLFt07sHBOHnto1QFryRr8+XIfoVUjGwlfwz6JsjjU9HMEUjHGGA
+	 6WWmn81OJQetqULZ0KPFgXf6IU+KXaYgY8Ub6CN81OrfKf8gkjYR4BUL8zA7G+AIst
+	 nOKf8YcPuc0ZA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w68Uq-00000006OdQ-0zc8;
+	Fri, 27 Mar 2026 14:49:12 +0000
+Date: Fri, 27 Mar 2026 14:49:11 +0000
+Message-ID: <86ecl549aw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH] arm64/kvm: Enable eager hugepage splitting if HDBSS is available
-Date: Fri, 27 Mar 2026 14:37:39 +0000
-Message-ID: <acaWMwB2emS7HrHW@devkitleo>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <6cce203f-89d9-4e9d-8b28-9629eb53b180@huawei.com>
-References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-5-zhengtian10@huawei.com> <acQj5grOdZT8LUGp@devkitleo> <acQna2hLwdr1juTN@devkitleo> <6cce203f-89d9-4e9d-8b28-9629eb53b180@huawei.com>
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v2 21/30] KVM: arm64: Kill topup_memcache from kvm_s2_fault
+In-Reply-To: <20260327113618.4051534-22-maz@kernel.org>
+References: <20260327113618.4051534-1-maz@kernel.org>
+	<20260327113618.4051534-22-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Mar 27, 2026 at 03:40:30PM +0800, Tian Zheng wrote:
+On Fri, 27 Mar 2026 11:36:09 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On 3/26/2026 2:20 AM, Leonardo Bras wrote:
-> > FEAT_HDBSS speeds up guest memory dirty tracking by avoiding a page fault
-> > and saving the entry in a tracking structure.
-> > 
-> > That may be a problem when we have guest memory backed by hugepages or
-> > transparent huge pages, as it's not possible to do on-demand hugepage
-> > splitting, relying only on eager hugepage splitting.
-> > 
-> > So, at stage2 initialization, enable eager hugepage splitting with
-> > chunk = PAGE_SIZE if the system supports HDBSS.
-> > 
-> > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> > ---
-> >   arch/arm64/kvm/mmu.c | 8 ++++++--
-> >   1 file changed, 6 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 070a01e53fcb..bdfa72b7c073 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -993,22 +993,26 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
-> >   	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
-> >   	if (!mmu->last_vcpu_ran) {
-> >   		err = -ENOMEM;
-> >   		goto out_destroy_pgtable;
-> >   	}
-> >   	for_each_possible_cpu(cpu)
-> >   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
-> > -	 /* The eager page splitting is disabled by default */
-> > -	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> > +	 /* The eager page splitting is disabled by default if system has no HDBSS */
-> > +	if (system_supports_hacdbs())
-> > +		mmu->split_page_chunk_size = PAGE_SIZE;
-> > +	else
-> > +		mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> > +
-> >   	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
-> >   	mmu->pgd_phys = __pa(pgt->pgd);
-> >   	if (kvm_is_nested_s2_mmu(kvm, mmu))
-> >   		kvm_init_nested_s2_mmu(mmu);
-> >   	return 0;
-> >   out_destroy_pgtable:
+> The topup_memcache field can be easily replaced by the equivalent
+> conditions, and the resulting code is not much worse.
 > 
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> Thanks again for sending this patch. I'll integrate it into the next version
-> and run some tests.
-> 
-> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index e8bda71e862b2..5b05caecdbd92 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1712,7 +1712,6 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+>  
+>  struct kvm_s2_fault {
+>  	bool writable;
+> -	bool topup_memcache;
+>  	bool mte_allowed;
+>  	bool is_vma_cacheable;
+>  	bool s2_force_noncacheable;
+> @@ -1983,9 +1982,8 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  		.logging_active = logging_active,
+>  		.force_pte = logging_active,
+>  		.prot = KVM_PGTABLE_PROT_R,
+> -		.topup_memcache = !perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu)),
+>  	};
+> -	void *memcache;
+> +	void *memcache = NULL;
+>  	int ret;
+>  
+>  	/*
+> @@ -1994,9 +1992,11 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  	 * only exception to this is when dirty logging is enabled at runtime
+>  	 * and a write fault needs to collapse a block entry into a table.
+>  	 */
+> -	ret = prepare_mmu_memcache(s2fd->vcpu, fault.topup_memcache, &memcache);
+> -	if (ret)
+> -		return ret;
+> +	if (!perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu))) {
+> +		ret = prepare_mmu_memcache(s2fd->vcpu, true, &memcache);
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+>  	/*
+>  	 * Let's check if we will get back a huge page backed by hugetlbfs, or
 
-Awesome, thanks!
-Leo
+Sashiko has spotted [1] an interesting corner case here, which is that the
+original code always initialises memcache to its correct value, while
+we now only do it in a limited number of cases.
+
+I'm proposing to restore the original behaviour by folding the
+following change into this patch, splitting the retrieval of the
+memcache pointer from the top-up and avoiding the ugly pointer
+indirection:
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1fe7182be45ac..03e1f389339c7 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1513,25 +1513,22 @@ static bool kvm_vma_is_cacheable(struct vm_area_struct *vma)
+ 	}
+ }
+ 
+-static int prepare_mmu_memcache(struct kvm_vcpu *vcpu, bool topup_memcache,
+-				void **memcache)
++static void *get_mmu_memcache(struct kvm_vcpu *vcpu)
+ {
+-	int min_pages;
+-
+ 	if (!is_protected_kvm_enabled())
+-		*memcache = &vcpu->arch.mmu_page_cache;
++		return &vcpu->arch.mmu_page_cache;
+ 	else
+-		*memcache = &vcpu->arch.pkvm_memcache;
+-
+-	if (!topup_memcache)
+-		return 0;
++		return &vcpu->arch.pkvm_memcache;
++}
+ 
+-	min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
++static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
++{
++	int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+ 
+ 	if (!is_protected_kvm_enabled())
+-		return kvm_mmu_topup_memory_cache(*memcache, min_pages);
++		return kvm_mmu_topup_memory_cache(memcache, min_pages);
+ 
+-	return topup_hyp_memcache(*memcache, min_pages);
++	return topup_hyp_memcache(memcache, min_pages);
+ }
+ 
+ /*
+@@ -1589,7 +1586,8 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	gfn_t gfn;
+ 	int ret;
+ 
+-	ret = prepare_mmu_memcache(s2fd->vcpu, true, &memcache);
++	memcache = get_mmu_memcache(s2fd->vcpu);
++	ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -1993,7 +1991,7 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+ 	struct kvm_s2_fault_vma_info s2vi = {};
+ 	enum kvm_pgtable_prot prot;
+-	void *memcache = NULL;
++	void *memcache;
+ 	int ret;
+ 
+ 	/*
+@@ -2002,9 +2000,10 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	 * only exception to this is when dirty logging is enabled at runtime
+ 	 * and a write fault needs to collapse a block entry into a table.
+ 	 */
++	memcache = get_mmu_memcache(s2fd->vcpu);
+ 	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
+ 			    kvm_is_write_fault(s2fd->vcpu))) {
+-		ret = prepare_mmu_memcache(s2fd->vcpu, true, &memcache);
++		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+ 		if (ret)
+ 			return ret;
+ 	}
+
+The bot has also pointed out a couple of cases where memcache and
+permission faults interact badly. I'll look into them separately, as
+they predate this rework.
+
+Thanks,
+
+	M.
+
+[1] https://sashiko.dev/#/patchset/20260327113618.4051534-1-maz%40kernel.org?patch=12134
+
+-- 
+Without deviation from the norm, progress is not possible.
