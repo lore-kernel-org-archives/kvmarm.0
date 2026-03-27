@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709FC38B13E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA1C38E136;
 	Fri, 27 Mar 2026 11:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774611388; cv=none; b=gE2eHvAQuTQVA2uNBYNb9tobSrp5h8RPTEoj3iiQi2RcXCkEFh9qr2RFUYFFOsAd+CkPJhyGBvrx9pMryHtARmaR367p2dGVlHpLy4e4YytTD+7CCPwXzVbypS21wiPY1BLo0b1aM0WvlJbL7hJiMM/YDYig5WAbl3Fdy5yDu4w=
+	t=1774611388; cv=none; b=ATyxgj2UAtsrZvAf+LWL71d7hdsSikFbSDLHIIO7dT6p9xn06G/KQDjbwX7vkUSqwAvK+K7z6WMogmqq8iJriJ19pJlotdlQsRl9uh6fcG1pQPkyCQy1Kc2xvQXj83dqm2Xnv8mN68QpUa40I2htTmerxKzzHjVn4khk9I35GuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774611388; c=relaxed/simple;
-	bh=tKlJeqRs+lNAXLMbIZCSYajfPwVkHyxypi6fRUMjj6E=;
+	bh=0glThNb9QbjDwvXTy2EB6goDvXJ2brPHca8WtXY6vtE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cSli4NBd2T7HzhlivuGRHgWW3JTxNjS/V7sulk+ReVz006HDtJFKb+IqPBf/IRe/sN+B4YdquYgit5JF5Za8wqgdRatMprj8T6zXXGFD45TCnZzEar8U/TrCxbpAW1ptaGaaVuLRm3ZE25l8RHThfX3N5a54TiU4jJit0NuMGso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHBdEFSm; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cSjr8cX8v83ieFkNx/sxgtABNCy/Vj12ceRKurez5qP1wg97vVUHP8F9FILRhZxgabSgxHY3WI8Nyc0yy/qZXZvBzLrSekVC4t++80PRFdE8Zp5ASqUEvoU2gzbva2cs1q/EkORoomIp8S8VclCE4kzFRiJPIrRU0lGNEn/mwS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EouL09t5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHBdEFSm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E2F8C2BCB0;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EouL09t5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81CB3C2BCB8;
 	Fri, 27 Mar 2026 11:36:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1774611388;
-	bh=tKlJeqRs+lNAXLMbIZCSYajfPwVkHyxypi6fRUMjj6E=;
+	bh=0glThNb9QbjDwvXTy2EB6goDvXJ2brPHca8WtXY6vtE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CHBdEFSmhB/Xv6AbxhEoul2ahdd54LgFkWOfo+sCfOL05Y/4tzRjW7i/B2yNhlTpO
-	 WTPqcIGN0rR1aa5wyJn/3yj+x9LDVvFxQ3Y0EudsrMi0dy+YN/BCw0oSJpFuX1hzlh
-	 6vIvXjtNhtoeNItC8pfOSq2TRXSMN6UKDgZbHalfUfC4mvg7RZhMqCN8TelHJnfexf
-	 g7tesUUzYtvNTrPAQtsXmv+1I0AOXlRHYaSrQAKBwxdyGXO/zjqW38HZ9qloEHTStJ
-	 D7wSlDqQHBvINVv/Mi2oKqHbDdw+5tyGyr5PNnlYgr3M3D5cyHmbAv8WwjLCJ4h/BU
-	 qzSaqlk2Lcy4A==
+	b=EouL09t5GpnG6Zp4wSj9iJaPyh7KVPB0O0ptJGxPhc8EZgYAXALIDfW289wvscpFq
+	 giwQKCCZZGljIY7PO2zF7D9DKtu82EErbfJIv7bqS+W953ntHOSaWZKv2ruRp3UWXq
+	 3Yf3xlEm0ffZMF2OBLYOboT/KpK4zQnBTbVboJBbqlRxIQbHpECaNdeUaOIxOiUnww
+	 7oP3qTU1e+rWYau9JTDj+l5ij/hh1qNL8h1iDyZ8I14WX08Jnhuz4Tqob1OvpfTpyP
+	 LPTQ3J1WBNrNluf0Dc9gXBMoaOOz7Apx4DYT0cw/hXzRZjp11hlou4NSE4PAfA37C4
+	 pyfsa0eOP4ZQg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w65UI-00000006K4a-1vdP;
+	id 1w65UI-00000006K4a-2uss;
 	Fri, 27 Mar 2026 11:36:26 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Quentin Perret <qperret@google.com>
-Subject: [PATCH v2 18/30] KVM: arm64: Constrain fault_granule to kvm_s2_fault_map()
-Date: Fri, 27 Mar 2026 11:36:06 +0000
-Message-ID: <20260327113618.4051534-19-maz@kernel.org>
+Subject: [PATCH v2 19/30] KVM: arm64: Kill write_fault from kvm_s2_fault
+Date: Fri, 27 Mar 2026 11:36:07 +0000
+Message-ID: <20260327113618.4051534-20-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260327113618.4051534-1-maz@kernel.org>
 References: <20260327113618.4051534-1-maz@kernel.org>
@@ -61,89 +61,71 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The notion of fault_granule is specific to kvm_s2_fault_map(), and
-is unused anywhere else.
-
-Move this variable locally, removing it from kvm_s2_fault.
+We already have kvm_is_write_fault() as a predicate indicating
+a S2 fault on a write, and we're better off just using that instead
+of duplicating the state.
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/mmu.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/mmu.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1e0d93d6d265a..981c04a74ab7a 100644
+index 981c04a74ab7a..7dab0c3faa5bf 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1724,7 +1724,6 @@ struct kvm_s2_fault {
- 	bool logging_active;
- 	bool force_pte;
- 	long vma_pagesize;
--	long fault_granule;
- 	enum kvm_pgtable_prot prot;
- 	struct page *page;
- 	vm_flags_t vm_flags;
-@@ -1908,9 +1907,9 @@ static phys_addr_t get_ipa(const struct kvm_s2_fault *fault)
- static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 			    struct kvm_s2_fault *fault, void *memcache)
- {
--	bool fault_is_perm = kvm_s2_fault_is_perm(s2fd);
- 	struct kvm *kvm = s2fd->vcpu->kvm;
- 	struct kvm_pgtable *pgt;
-+	long perm_fault_granule;
- 	int ret;
- 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+@@ -1711,7 +1711,6 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+ }
  
-@@ -1920,14 +1919,17 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 	if (mmu_invalidate_retry(kvm, fault->mmu_seq))
- 		goto out_unlock;
+ struct kvm_s2_fault {
+-	bool write_fault;
+ 	bool exec_fault;
+ 	bool writable;
+ 	bool topup_memcache;
+@@ -1799,7 +1798,7 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
+ 		return ret;
  
-+	perm_fault_granule = (kvm_s2_fault_is_perm(s2fd) ?
-+			      kvm_vcpu_trap_get_perm_fault_granule(s2fd->vcpu) : 0);
-+
- 	/*
- 	 * If we are not forced to use page mapping, check if we are
- 	 * backed by a THP and thus use block mapping if possible.
- 	 */
- 	if (fault->vma_pagesize == PAGE_SIZE &&
- 	    !(fault->force_pte || fault->s2_force_noncacheable)) {
--		if (fault_is_perm && fault->fault_granule > PAGE_SIZE) {
--			fault->vma_pagesize = fault->fault_granule;
-+		if (perm_fault_granule > PAGE_SIZE) {
-+			fault->vma_pagesize = perm_fault_granule;
- 		} else {
- 			fault->vma_pagesize = transparent_hugepage_adjust(kvm, s2fd->memslot,
- 									  s2fd->hva, &fault->pfn,
-@@ -1940,15 +1942,15 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 	fault->pfn = __kvm_faultin_pfn(s2fd->memslot, get_canonical_gfn(s2fd, fault),
+-				       fault->write_fault ? FOLL_WRITE : 0,
++				       kvm_is_write_fault(s2fd->vcpu) ? FOLL_WRITE : 0,
+ 				       &fault->writable, &fault->page);
+ 	if (unlikely(is_error_noslot_pfn(fault->pfn))) {
+ 		if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
+@@ -1850,7 +1849,7 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+ 			 */
+ 			fault->s2_force_noncacheable = true;
  		}
- 	}
- 
--	if (!fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
-+	if (!perm_fault_granule && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
- 		sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
- 
- 	/*
- 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
--	 * permissions only if fault->vma_pagesize equals fault->fault_granule. Otherwise,
-+	 * permissions only if vma_pagesize equals perm_fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_is_perm && fault->vma_pagesize == fault->fault_granule) {
-+	if (fault->vma_pagesize == perm_fault_granule) {
+-	} else if (fault->logging_active && !fault->write_fault) {
++	} else if (fault->logging_active && !kvm_is_write_fault(s2fd->vcpu)) {
  		/*
- 		 * Drop the SW bits in favour of those stored in the
- 		 * PTE, which will be preserved.
-@@ -1984,7 +1986,6 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 		 * Only actually map the page as writable if this was a write
+ 		 * fault.
+@@ -1980,21 +1979,17 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ {
+ 	bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+-	bool write_fault = kvm_is_write_fault(s2fd->vcpu);
+ 	bool logging_active = memslot_is_logging(s2fd->memslot);
+ 	struct kvm_s2_fault fault = {
  		.logging_active = logging_active,
  		.force_pte = logging_active,
  		.prot = KVM_PGTABLE_PROT_R,
--		.fault_granule = perm_fault ? kvm_vcpu_trap_get_perm_fault_granule(s2fd->vcpu) : 0,
- 		.write_fault = write_fault,
+-		.write_fault = write_fault,
  		.exec_fault = kvm_vcpu_trap_is_exec_fault(s2fd->vcpu),
- 		.topup_memcache = !perm_fault || (logging_active && write_fault),
+-		.topup_memcache = !perm_fault || (logging_active && write_fault),
++		.topup_memcache = !perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu)),
+ 	};
+ 	void *memcache;
+ 	int ret;
+ 
+-	VM_WARN_ON_ONCE(fault.write_fault && fault.exec_fault);
+-
+ 	/*
+ 	 * Permission faults just need to update the existing leaf entry,
+ 	 * and so normally don't require allocations from the memcache. The
 -- 
 2.47.3
 
