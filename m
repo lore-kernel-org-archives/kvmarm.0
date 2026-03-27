@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0443BA24F
-	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3001B2264A7
+	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774620103; cv=none; b=ITebBcNbrNjJ022WStgDXNWgrFfo5uB/gX0So7BPhUAmNxeXPkYHTKu6ippEQWLlqIG2CbCgIuCvnUbxzvVnOgKfCr6hXIw/vse0XBfZ71zK4q2AlzkNevkL5M/YSOWBlQitqXpxh4S18ZkYb82X5wPcPUwNo6XjLRndtwBI5G0=
+	t=1774620107; cv=none; b=pCl0WyS/Bd665R+iYrZj5llJs2zh9EF9HWT8iZ23epqvb4ERP/y+wtWvjlHiY9urcRugFqnQieUNlqKJzy4IoJtAVv7GXC2KQ3ChQIPseCyWPakfP/YySgy7VVXjpR3x4Mbjpai59zxPh3Xmq5IDHAcZ4nvsu/7c9zguQCYCUbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774620103; c=relaxed/simple;
-	bh=zuC6OOhAKUR5agNWsBffKqsykDcFTTogE8Z2bho5xJE=;
+	s=arc-20240116; t=1774620107; c=relaxed/simple;
+	bh=pg3rhx9t9Whm8ZmzowMLSfZvJMvUSy26V3uyjJDEPQw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xf9AQEi3+RBZbXJDDnXDJKCpV0RlNSteuWdr22r/fU/6JMPIcwii7j7UwAtc8yRxkHIoaH0VP4x2QKbV8PiskvOQvZw6bLVX0QmJV9EzuJST7fYT8nwzT6kZouExkjClc7P0b+40M6zKy8qH8xoRQ5FppExyNZ8qbZdzqcIfMUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YodXb647; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=HAOvbsgDMEbLX60b3sbQKrFPg2U+0miQh2q/p9SUSGbGlsbMJqkCGQSL7ZcJPdO/In0F5YJNJ+HMKaeI2kdxNU/04an1wFHHdKQywlA34R4Sxh00RgUyC8ntUt2as/GWVsu8aOElWPsLrjljz1NGmBCnxAidLKs+Syc0QGlAo98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eM3PRzrL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YodXb647"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE22C2BC9E;
-	Fri, 27 Mar 2026 14:01:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eM3PRzrL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4890BC2BCB1;
+	Fri, 27 Mar 2026 14:01:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774620103;
-	bh=zuC6OOhAKUR5agNWsBffKqsykDcFTTogE8Z2bho5xJE=;
+	s=k20201202; t=1774620107;
+	bh=pg3rhx9t9Whm8ZmzowMLSfZvJMvUSy26V3uyjJDEPQw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YodXb647Cdg5qXjKpZzb4td6IfMv0hmoB7ROTAJXMdL3PgeCSIkqiu96Yxu6yWpJr
-	 7Ysb7RvmDeUGpg957aI79fvxidd40YucIVvWSz4WXQIIi4A58tmG544YRkWgLHWZpr
-	 Clw9z9BqiBmJnRtqqN/6gF9undqSxwhsmyOSpLp0V4TJtL7cFjpRnkY+i7Kkec2k2/
-	 9ReQMeyStALXaGHak/sVIa9dQUJDP/DrhFaz6vc6OAuavSJeZB/0GetCwWFZPIEOSe
-	 R4koTVzC394XbWrqy7tOvBzMQzHJGIwIL3ztIIH2nyxrMpmG+lggcY9Htboapt56xy
-	 3ZC1IXz1Wr5cA==
+	b=eM3PRzrLKPVwmLywO2Qutwub1rbC0kaD+37VmBdVzF3T3b9tJQGhAebNWeXvD1pgb
+	 8h59PgYkybDo6wdlHlHliE3xQiqYHhuJ93JzZIs1uU3/0uBbJa+91hTiXs4tOQlpdR
+	 8e/ZcWafk/l3E/gdatYb3nycxGXr5Xte4WNN+CwQKhqPkInkwEQnI188lrgXSpDfhj
+	 Nu2IwlHSl7/+jNL4f3xUPO1GfXIDAct3uP3QvPVI2NjzJAeOK8h+KK5kws1tASQCuC
+	 xEx9ruzUjKLwA+H1ZFPXq+x9nYX8uxsFXTByVM+CX8pH39xLt+kz08ZjCxPt1OF1c+
+	 DAep3cCpji0Lw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v4 16/38] KVM: arm64: Hook up reclaim hypercall to pkvm_pgtable_stage2_destroy()
-Date: Fri, 27 Mar 2026 14:00:15 +0000
-Message-ID: <20260327140039.21228-17-will@kernel.org>
+Subject: [PATCH v4 17/38] KVM: arm64: Factor out pKVM host exception injection logic
+Date: Fri, 27 Mar 2026 14:00:16 +0000
+Message-ID: <20260327140039.21228-18-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260327140039.21228-1-will@kernel.org>
 References: <20260327140039.21228-1-will@kernel.org>
@@ -55,70 +55,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-During teardown of a protected guest, its memory pages must be reclaimed
-from the hypervisor by issuing the '__pkvm_reclaim_dying_guest_page'
-hypercall.
+inject_undef64() open-codes the logic to inject an exception into the
+pKVM host. In preparation for reusing this logic to inject a data abort
+on an unhandled stage-2 fault from the host, factor out the meat and
+potatoes of the function into a new inject_host_exception() function
+which takes the ESR as a parameter.
 
-Add a new helper, __pkvm_pgtable_stage2_reclaim(), which is called
-during the VM teardown operation to reclaim pages from the hypervisor
-and drop the GUP pin on the host.
-
+Cc: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
 Tested-by: Fuad Tabba <tabba@google.com>
 Tested-by: Mostafa Saleh <smostafa@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/pkvm.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 49 ++++++++++++++----------------
+ 1 file changed, 23 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 1814e17d600e..8be91051699e 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -322,6 +322,32 @@ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 	return 0;
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 7294c94f9296..adfc0bc15398 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -705,43 +705,40 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+ 	kvm_skip_host_instr();
  }
  
-+static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64 end)
-+{
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-+	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-+	struct pkvm_mapping *mapping;
-+	int ret;
+-/*
+- * Inject an Undefined Instruction exception into the host.
+- *
+- * This is open-coded to allow control over PSTATE construction without
+- * complicating the generic exception entry helpers.
+- */
+-static void inject_undef64(void)
++static void inject_host_exception(u64 esr)
+ {
+-	u64 spsr_mask, vbar, sctlr, old_spsr, new_spsr, esr, offset;
++	u64 sctlr, spsr_el1, spsr_el2, exc_offset = except_type_sync;
++	const u64 spsr_mask = PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT |
++			      PSR_V_BIT | PSR_DIT_BIT | PSR_PAN_BIT;
+ 
+-	spsr_mask = PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT | PSR_V_BIT | PSR_DIT_BIT | PSR_PAN_BIT;
++	exc_offset += CURRENT_EL_SP_ELx_VECTOR;
 +
-+	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
-+		struct page *page;
-+
-+		ret = kvm_call_hyp_nvhe(__pkvm_reclaim_dying_guest_page,
-+					handle, mapping->gfn);
-+		if (WARN_ON(ret))
-+			return ret;
-+
-+		page = pfn_to_page(mapping->pfn);
-+		WARN_ON_ONCE(mapping->nr_pages != 1);
-+		unpin_user_pages_dirty_lock(&page, 1, true);
-+		account_locked_vm(current->mm, 1, false);
-+		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-+		kfree(mapping);
-+	}
-+
-+	return 0;
++	spsr_el1 = spsr_el2 = read_sysreg_el2(SYS_SPSR);
++	spsr_el2 &= spsr_mask;
++	spsr_el2 |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
++		    PSR_MODE_EL1h;
+ 
+-	vbar = read_sysreg_el1(SYS_VBAR);
+ 	sctlr = read_sysreg_el1(SYS_SCTLR);
+-	old_spsr = read_sysreg_el2(SYS_SPSR);
+-
+-	new_spsr = old_spsr & spsr_mask;
+-	new_spsr |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
+-	new_spsr |= PSR_MODE_EL1h;
+-
+ 	if (!(sctlr & SCTLR_EL1_SPAN))
+-		new_spsr |= PSR_PAN_BIT;
++		spsr_el2 |= PSR_PAN_BIT;
+ 
+ 	if (sctlr & SCTLR_ELx_DSSBS)
+-		new_spsr |= PSR_SSBS_BIT;
++		spsr_el2 |= PSR_SSBS_BIT;
+ 
+ 	if (system_supports_mte())
+-		new_spsr |= PSR_TCO_BIT;
+-
+-	esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
+-	offset = CURRENT_EL_SP_ELx_VECTOR + except_type_sync;
++		spsr_el2 |= PSR_TCO_BIT;
+ 
+ 	write_sysreg_el1(esr, SYS_ESR);
+ 	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
+-	write_sysreg_el1(old_spsr, SYS_SPSR);
+-	write_sysreg_el2(vbar + offset, SYS_ELR);
+-	write_sysreg_el2(new_spsr, SYS_SPSR);
++	write_sysreg_el1(spsr_el1, SYS_SPSR);
++	write_sysreg_el2(read_sysreg_el1(SYS_VBAR) + exc_offset, SYS_ELR);
++	write_sysreg_el2(spsr_el2, SYS_SPSR);
 +}
 +
- static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64 end)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-@@ -355,7 +381,10 @@ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
- 		kvm->arch.pkvm.is_dying = true;
- 	}
- 
--	__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
-+	if (kvm_vm_is_protected(kvm))
-+		__pkvm_pgtable_stage2_reclaim(pgt, addr, addr + size);
-+	else
-+		__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
++static void inject_host_undef64(void)
++{
++	inject_host_exception((ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) |
++			       ESR_ELx_IL);
  }
  
- void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+ static bool handle_host_mte(u64 esr)
+@@ -764,7 +761,7 @@ static bool handle_host_mte(u64 esr)
+ 		return false;
+ 	}
+ 
+-	inject_undef64();
++	inject_host_undef64();
+ 	return true;
+ }
+ 
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
