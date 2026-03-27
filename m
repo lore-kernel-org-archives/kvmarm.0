@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B302DF155
-	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C53A289E06
+	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 14:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774620058; cv=none; b=gfHB45DpGKrPm8il0sRPcydeYVhgJFGzjmyCDaUTqjHR4X2+h3Wuca+VV8ob+E4UcZTxx6GIXWRQJjm2rWUCyyiHLUV5YIfZ1ymvZaMH8oC0yOL+v9RE+o2N8lSs0bN7QcpAYh2OGTfpxQ01AtBx4qGNfbsaSI1pgVz5yE85q5E=
+	t=1774620061; cv=none; b=utrMUle0I87N7FMKaB00Fc0sXfnk7KdG3OiwRhCHmlodjW8TNXUYWpWYVB/Neg39GPkfxI8JmqA3QJz5gmhw13QTnsstixt7vQIBkMhd5TKNvnNQFIbll5ICaeO7PAzR4zOPZnNCq013Zzzip+TCiyRzBjBWUJagmKk8rPqZzRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774620058; c=relaxed/simple;
-	bh=oRXTTRgczig8LPFqQrC03P5UVc2knZV/Mhzu7vhCAjE=;
+	s=arc-20240116; t=1774620061; c=relaxed/simple;
+	bh=QaZdw+cKvQLXGdg14aZy7asM3jAbDolMGcxEF/Z3CVE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Slo7Ykj/rKIyQWNu/m7JbJ9llJzagcR7nbZICCy3Nl70cDb+SH0Mg9MwzlZoIcQAHoASWGn9mvuFfVFhJtbj+rQSUtrUM7KOGq4EpppSuiBpV/22GMUnzUnOuP+PfDYR1VMiP8xAIU0+w2/yTysLC85KKzknzvfYYqPkZ7oY9gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyT4x2Mt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=k+rQHa+k2yUaawH8I4dj+djAgFL8bX0OhiN5AZ+OI1Ai2Ij2wFjucDvp1q7OYzrqIsf7SAF496UIw6KV2jauQaIPDFV3IPlhO8G6wG3LU8RehOFYPRhW1/QMpyoIfuulwv5ls71aZGZOAc3rhjtdAZOhHnpCRP74siQ4w17B3nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ycz1wOij; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyT4x2Mt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2D3FC19423;
-	Fri, 27 Mar 2026 14:00:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ycz1wOij"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3481BC19423;
+	Fri, 27 Mar 2026 14:00:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774620057;
-	bh=oRXTTRgczig8LPFqQrC03P5UVc2knZV/Mhzu7vhCAjE=;
+	s=k20201202; t=1774620060;
+	bh=QaZdw+cKvQLXGdg14aZy7asM3jAbDolMGcxEF/Z3CVE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LyT4x2MtThRTkNGlwHzJo3ABU02F9J6U8oITwVZKm/c73NHOlsXvQCay7G9ixkyRO
-	 5fXzcQpgxPEgNXTzF2EpUk90b4ESxaHHawHtmYsFIB8LgL83ixJNKjs5BFWcOIIxm1
-	 3Z3/VLlE5Ge1KQ8BPY8Zr2BnQoPeVA7soKjK3D7eRHYGBL1dIRLFgDWrAdp60H8BlJ
-	 yVk4MQbIfJ7pMhPZOWYLWTOYpMyIT02cw3MYHrZhyz1Fln6MoIeg6AamDgoT0pMNiP
-	 qpWxDFDi2LOQgKCyvMPyypJ/BLlk3O+IdtV2ZA4qbiVw2fa+X+qLDTIhXu0vXnnsaa
-	 Cv5rUtnkXbUZA==
+	b=Ycz1wOijK9lypWq44ZhQ9nW3bypsyhNMcXmAI5YlT4qlcAQdrDVI7SS9wwUnApkGb
+	 w70OH21mudmIycY4muSteKOFiWaaDUAcKqckHo8c73d3Tq8ed7ciy6bWDqkFzDLScy
+	 m2vPPZesIsuM1KKbTU7gs8JqpobCkm2iIZzpdyZjUitAAB+S4Hk/0cHjXvcQkNVYpK
+	 zaQCicTkpJzWEC8yKYxksM5dsROxhgEblujUu/6Ffw1vg7oqG37cwzaakZXOb7rZc7
+	 JH76+hOol4xN5JkK/VNSBDPcIxsu5xDzIdv4dPjKqHbfOz5h4hBpj344VJj0p1MRKV
+	 QLAwWKsWSHp2A==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v4 02/38] KVM: arm64: Don't leak stage-2 page-table if VM fails to init under pKVM
-Date: Fri, 27 Mar 2026 14:00:01 +0000
-Message-ID: <20260327140039.21228-3-will@kernel.org>
+Subject: [PATCH v4 03/38] KVM: arm64: Move handle check into pkvm_pgtable_stage2_destroy_range()
+Date: Fri, 27 Mar 2026 14:00:02 +0000
+Message-ID: <20260327140039.21228-4-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260327140039.21228-1-will@kernel.org>
 References: <20260327140039.21228-1-will@kernel.org>
@@ -55,41 +55,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If pkvm_init_host_vm() fails, we should free the stage-2 page-table
-previously allocated by kvm_init_stage2_mmu().
+When pKVM is enabled, a VM has a 'handle' allocated by the hypervisor
+in kvm_arch_init_vm() and released later by kvm_arch_destroy_vm().
 
-Cc: Fuad Tabba <tabba@google.com>
+Consequently, the only time __pkvm_pgtable_stage2_unmap() can run into
+an uninitialised 'handle' is on the kvm_arch_init_vm() failure path,
+where we destroy the empty stage-2 page-table if we fail to allocate a
+handle.
+
+Move the handle check into pkvm_pgtable_stage2_destroy_range(), which
+will additionally handle protected VMs in subsequent patches.
+
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Tested-by: Fuad Tabba <tabba@google.com>
 Tested-by: Mostafa Saleh <smostafa@google.com>
-Fixes: 07aeb70707b1 ("KVM: arm64: Reserve pKVM handle during pkvm_init_host_vm()")
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pkvm.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 410ffd41fd73..3589fc08266c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -236,7 +236,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 		 */
- 		ret = pkvm_init_host_vm(kvm);
- 		if (ret)
--			goto err_free_cpumask;
-+			goto err_uninit_mmu;
- 	}
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index d7a0f69a9982..7797813f4dbe 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -329,9 +329,6 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+ 	struct pkvm_mapping *mapping;
+ 	int ret;
  
- 	kvm_vgic_early_init(kvm);
-@@ -252,6 +252,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+-	if (!handle)
+-		return 0;
+-
+ 	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+ 		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+ 					mapping->nr_pages);
+@@ -347,6 +344,12 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+ 					u64 addr, u64 size)
+ {
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
++	pkvm_handle_t handle = kvm->arch.pkvm.handle;
++
++	if (!handle)
++		return;
++
+ 	__pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
+ }
  
- 	return 0;
- 
-+err_uninit_mmu:
-+	kvm_uninit_stage2_mmu(kvm);
- err_free_cpumask:
- 	free_cpumask_var(kvm->arch.supported_cpus);
- err_unshare_kvm:
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
