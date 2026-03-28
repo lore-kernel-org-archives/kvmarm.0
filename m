@@ -1,46 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9611437CD5A
-	for <kvmarm@lists.linux.dev>; Fri, 27 Mar 2026 19:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B95824677B
+	for <kvmarm@lists.linux.dev>; Sat, 28 Mar 2026 05:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774639695; cv=none; b=eqgJVF7qaSLf/ItS4Q98zsdWxgP32AhXo5SHa+5kpaOMVoy8pzsyLBcqY425q0hu6gCsJWZAmWCssNOJUgXtKQ4YlURAkNaRVC0wxX8yaXzUcyLrMxq18nUoSCf3KM6Uc16UAiCT+xctA5Ue/zBYftnNsBTkHxH5KVP6nEbIgqk=
+	t=1774675937; cv=none; b=ivyeBnPzRdGbHWVcM1/yx/c+KdNrqMG/TajavbqvmeSFRuwgWjyY9ATq0JH6HK1pCPVr4Q8GtdOaPy8lc1SsWyrd8y0z6yVUyWRHVRi6d1UmENNV0kTPFoNXA+qv6uZLXm9uTGm8W2whr7JlOs/uBKY8kmYZDk2LvRm+JzHVDFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774639695; c=relaxed/simple;
-	bh=dRH5suto7lKdlh/Gq94DqSDdG+gmYwpQzMTnbymFdHk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=izx2BL5AVfCavFXawjk1Eg9c1G1RsDv+ypsVDLA7KWSRwLCu5gRG5GjfTXbNCKqYTB+2XOhIZokFcaVxcq9Kf7AJFwGtKZ6JPv5faj/kQeSgSqqI4vzhRTGGW0Np4Lhp7LReJ2fUZQP9F6kUUalava9ddXN7+ULuYXyZDaNL5U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkqvL1CU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774675937; c=relaxed/simple;
+	bh=p6lz8//QcBPyGWeIMhackmvndYzCYQ4x4eCh5/dmWP8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SI9TGdtcHbZasNyU75sHUb0Mjzxad8+Xqj42QIpZY4USg79g8+S5aAYyj8UQDCyjaAxjgOCutN8tqy2hatDtq2CtpdAmRRGoCzLJzW1snuNApJuN8+STPMvn6dq1LLKYGA1sUwEnAuszPZChAh3K//QmtzpS2LsntuhgFggtqJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LiNvA6Gv; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkqvL1CU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87BBDC2BC9E;
-	Fri, 27 Mar 2026 19:28:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774639695;
-	bh=dRH5suto7lKdlh/Gq94DqSDdG+gmYwpQzMTnbymFdHk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XkqvL1CUY8iC67H1eEZ8OzYTS+Iej4ii7s0VvZJblR3L7K9qhoq80tp4y19lAj/0F
-	 IEPOgh/hDIi7vn4N/6iOIs5Ek5UcAG7lHUkscxrR81+WJGUMipS6MTqsj+yQk24v+S
-	 b0YOIlvsNpvr/ZKY3/INpAxHNXkbceIEkjDwyvK9xobjSZUei92SQLoNpjtbH8DQsb
-	 uyDkonP7P73RM4QWAzLfxuWP3Ne2prk3apknNtrSgbAgDTHD7cpZgmCRMBGOJFHPKw
-	 JKD+bWEfEunIZyintxGCaIY4/Bc+lbxeDfezvNv0xFjTtvURm4cVKXTDhkuYKsturL
-	 h5Pq6U3sAS09Q==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/2] KVM: arm64: Destroy stage-2 page-table in kvm_arch_destroy_vm()
-Date: Fri, 27 Mar 2026 19:27:57 +0000
-Message-ID: <20260327192758.21739-3-will@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260327192758.21739-1-will@kernel.org>
-References: <20260327192758.21739-1-will@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LiNvA6Gv"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774675932;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zOJ9iIsuZvHL5cyLqdAmY9/F0c2z+tYW7wmPGa32F7A=;
+	b=LiNvA6Gv9B9EL4M01WVY9OIl4HG+G7cPdHPvRKnlGleR/TB3rZQ3i3HILU6oWbDiumeg2q
+	LFs98nuOGnPNP8afIRjenAYkQQAagYf8kpOdxwbTk1NJZk3oNlYk5VzL+iBneaoCBJ1Dj0
+	iyFmCK/OGLBW5mqJVrYyqbFVZF2oazI=
+From: Zenghui Yu <zenghui.yu@linux.dev>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	"Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+Subject: [PATCH] KVM: arm64: ptdump: Initialize parser_state before pgtable walk
+Date: Sat, 28 Mar 2026 13:31:55 +0800
+Message-ID: <20260328053155.12219-1-zenghui.yu@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,35 +43,85 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-kvm_arch_destroy_vm() can be called on the kvm_create_vm() error path
-after we have failed to register the MMU notifiers for the new VM. In
-this case, we cannot rely on the MMU ->release() notifier to call
-kvm_arch_flush_shadow_all() and so the stage-2 page-table allocated in
-kvm_arch_init_vm() will be leaked.
+From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
 
-Explicitly destroy the stage-2 page-table in kvm_arch_destroy_vm(), so
-that we clean up after kvm_arch_destroy_vm() without relying on the MMU
-notifiers.
+If we go through the "need a bigger buffer" path in seq_read_iter(), which
+is likely to happen as we're dumping page tables, we will pass the
+populated-by-last-run st::parser_state to
+kvm_pgtable_walk()/kvm_ptdump_visitor(). As a result, the output of
+stage2_page_tables on my box looks like
 
-Link: https://sashiko.dev/#/patchset/20260327140039.21228-1-will%40kernel.org?patch=12265
-Signed-off-by: Will Deacon <will@kernel.org>
+0x0000000240000000-0x0000000000000000   17179869175G 1
+0x0000000000000000-0x0000000000200000           2M 2   R   px ux  AF BLK
+0x0000000000200000-0x0000000040000000        1022M 2
+0x0000000040000000-0x0000000040200000           2M 2   R W PXNUXN AF BLK
+[...]
+
+Fix it by always initializing st::parser_state before starting a new
+pgtable walk.
+
+Besides, remove st::range as it's not used by note_page(); remove the
+explicit initialization of parser_state::start_address as it will be
+initialized in note_page() anyway.
+
+Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
 ---
- arch/arm64/kvm/arm.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/ptdump.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 410ffd41fd73..29bfa79555b2 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -301,6 +301,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 	if (is_protected_kvm_enabled())
- 		pkvm_destroy_hyp_vm(kvm);
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index 6a8836207a79..5dfd526c6dc9 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -22,7 +22,6 @@ struct kvm_ptdump_guest_state {
+ 	struct ptdump_pg_state	parser_state;
+ 	struct addr_marker	ipa_marker[MARKERS_LEN];
+ 	struct ptdump_pg_level	level[KVM_PGTABLE_MAX_LEVELS];
+-	struct ptdump_range	range[MARKERS_LEN];
+ };
  
-+	kvm_uninit_stage2_mmu(kvm);
- 	kvm_destroy_mpidr_data(kvm);
+ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+@@ -131,16 +130,7 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
  
- 	kfree(kvm->arch.sysreg_masks);
+ 	st->ipa_marker[0].name		= "Guest IPA";
+ 	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
+-	st->range[0].end		= BIT(pgtable->ia_bits);
+-
+ 	st->kvm				= kvm;
+-	st->parser_state = (struct ptdump_pg_state) {
+-		.marker		= &st->ipa_marker[0],
+-		.level		= -1,
+-		.pg_level	= &st->level[0],
+-		.ptdump.range	= &st->range[0],
+-		.start_address	= 0,
+-	};
+ 
+ 	return st;
+ }
+@@ -151,14 +141,18 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+ 	struct kvm_ptdump_guest_state *st = m->private;
+ 	struct kvm *kvm = st->kvm;
+ 	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+-	struct ptdump_pg_state *parser_state = &st->parser_state;
+ 	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
+ 		.cb	= kvm_ptdump_visitor,
+-		.arg	= parser_state,
++		.arg	= &st->parser_state,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF,
+ 	};
+ 
+-	parser_state->seq = m;
++	st->parser_state = (struct ptdump_pg_state) {
++		.marker		= &st->ipa_marker[0],
++		.level		= -1,
++		.pg_level	= &st->level[0],
++		.seq		= m,
++	};
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
 -- 
-2.53.0.1018.g2bb0e51243-goog
+2.53.0
 
