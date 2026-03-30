@@ -1,125 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DA7306D2A;
-	Mon, 30 Mar 2026 12:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB963A4537
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774873068; cv=none; b=q2JL4bde+BvCSTKlfu750r6w4wATGnKRIcRizQOTAI/Daah3Se+hwgApTgx3jRKhp+SlLfr37gcrDVC+/qTeqXghzh0D5GDdZ1M5tA0apk8CNtfNhm9nDpXSYqvNXGR+oiJawPKxsVgxJDbXj2tPsnMRtEvkQpkC2sFfKe45gB4=
+	t=1774880653; cv=none; b=t6ztoGFsojnyJCuLfr0ogK1iWMrHIverQMWsVEL2/Wpwhi3biihrTjw/s1JtkDuGPXyJ8VkdjRnD+uH2dWXf9bNXiaXL30bK62eNNy9BcQNnYj7DeiEfnrZa4ltj1h/MQPqMWI1eVHhQpQZtBCL1C5MydyOaYAN0gfT4ySvnp6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774873068; c=relaxed/simple;
-	bh=zeKFVpdAfIum0NKsvb2F2pCJfenzKs8whCcofbsI9Js=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EikA263QQdvothWQGAcASx4ym2NZi5hqF1hZl0LXv8s0wMZmj6HsWY3HiNswgy0llmT/Dzn3Rig4nTc1BxJ1jkDLAyVsQhU0ituTpcZoNFFD95LcL1NZ50sOakdrFq9wyZ+tR3apNlWWYi987c/LHe4Ra1lZSQUBqmiHDO6X07A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=naxpmJpu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774880653; c=relaxed/simple;
+	bh=2eW6sHmbZ7b93psa4zGm5MipRN4YlZLRTWJvlr/YYz8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RUe3w9+4rQ4Sjaqgv3pGHXI7Iccx0okC4iYbxOTzsVfnuc917PgzoFJvmQXvh6rJ7erYDJxN72W4Y2lMLjAdEVuukodLxBeA4fUluWeFMaafGi54JRlGyM+dWK57elJ8XxB861TkbLu5dj3iiwxIxY/g0c+4moPWVEjGlITGk4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bvHoGVd+; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="naxpmJpu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED12C4CEF7;
-	Mon, 30 Mar 2026 12:17:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774873067;
-	bh=zeKFVpdAfIum0NKsvb2F2pCJfenzKs8whCcofbsI9Js=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=naxpmJpudZmV6cJ2x3BxM2UAxdDKK6zOxpRWUSCx0VMwLBXL84/DFUlWV5fE9h+S+
-	 9SFx/+SHIMWaCcAKmpdQZ0LChs37rgXC8qGSzNDLSglWsdJYDsmgJ5BM6xMeyb0gID
-	 dVPka1n8WQ9QmHba8CQb4yS5Vr7H1sPCZvBS0L5EJ9wLnK8RrRYsQmNgfbhFLebJEp
-	 Ec8L7efFMrGk/ieoZvlRfQCilFy146xciS7Cr+4CadLELFsILNcSqDzITk7TLmBwS1
-	 xVFWoqfWVRFhil7QW8+aQWz4MCt7a+49OqryJ2FuSZWRCbLwzZwEbyvL0VDDPmiLE8
-	 eXtcwnXvpCngg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w7BYv-000000074gj-04eQ;
-	Mon, 30 Mar 2026 12:17:45 +0000
-Date: Mon, 30 Mar 2026 13:17:44 +0100
-Message-ID: <878qb9cxzr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown
- <broonie@kernel.org>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-In-Reply-To: <2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
-References: <20251120172540.2267180-1-maz@kernel.org>
-	<20251120172540.2267180-36-maz@kernel.org>
-	<2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bvHoGVd+"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7219F1A2D;
+	Mon, 30 Mar 2026 07:24:05 -0700 (PDT)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CE66C3FC23;
+	Mon, 30 Mar 2026 07:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774880651; bh=2eW6sHmbZ7b93psa4zGm5MipRN4YlZLRTWJvlr/YYz8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bvHoGVd+CYe7OTrueuNQrF3ebx4c6FpynK2X8wqnxeCAPjaG5H/rFHOgq9Jpo3Y6G
+	 2XjgnsLRf5YLzqTPru7iZXABCyA+E7Ap5NCidSo1Rcxc3htE+pDn0RyCH9I2xtHuVk
+	 WS2qWqdkllW/vMhHuyVcUhhM0F4U8h890XQzON8o=
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: kvmarm@lists.linux.dev,
+	will@kernel.org
+Cc: kvm@vger.kernel.org,
+	alexandru.elisei@arm.com,
+	oupton@kernel.org,
+	maz@kernel.org,
+	tabba@google.com,
+	aneesh.kumar@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH v7 00/17] kvmtool: arm64: Handle PSCI calls in userspace
+Date: Mon, 30 Mar 2026 15:23:17 +0100
+Message-ID: <20260330142334.3309961-1-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vishnu@os.amperecomputing.com, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, 30 Mar 2026 12:51:51 +0100,
-Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
-> 
-> Hi Fuad Tabba,
 
-To be brutally honest, I doubt Fuad really cares about NV,
+This is version 7 of the patch series, originally posted by Oliver [0].
 
->    I'm trying to run nested VMs on Ampere platforms after this patch
-> series(v6.19+) but nested VMs are not booting and triggering soft
-> lockups on L0 and L0 hang. But just before this patch I could able to
-> successfully boot the Nested VMs.
+Use SMCCC filtering capability in to handle PSCI calls in the userspace.
 
-So the host dies? There isn't much here that interacts with the host
-at all. Worse case, the L1 dies by not making progress.
+Changes since v7:
+ Link: https://lkml.kernel.org/r/20260227165624.1519865-1-suzuki.poulose@arm.com
+ - Drop linux/const.h from the list of headers updated. Retain, one time update
+   to fix the build break.
 
-> 
-> I bisected the failure to a single commit which is this patch which is
-> causing the issue.
-> 
-> I would like to understand from you that did you observed anything
-> like that?
+Changes since v5:
+Link: https://lkml.kernel.org/r/20260108175753.1292097-1-suzuki.poulose@arm.com
+ - Fix build break by importing linux/const.h from Linux UAP headers
+ - Clean up the util/update_headers, issue warning for missing files.
+ - Fix the psci.h source to Linux UAPI headers.
+ - Rebased to Linux headers v6.19 (to match the tip of the tree)
 
-No. If I had, I wouldn't have merged the series.
+Changes since v4:
+Link: https://lkml.kernel.org/r/20250930103130.197534-1-suzuki.poulose@arm.com
 
-> 
-> Were you able to boot Nested VMs successfully after v6.19+?
+ - Update headers to v6.18
+ - Remove duplicate assignment of pause_req_cpu (Marc)
+ - Flip the command line to opt in for PSCI in userspace, retaining default
+   in kernel handling. (Marc)
+ - Collect Review from Marc, thanks!
 
-I boot L3s every day.
+Changes since v3:
+ - Address Will's comment on the race between pause/resume - Patch 1
+ - Rebase on to v6.17-rc7
+ - Drop importing cputype.h, which was not used by the series
 
-> LOG:
-> [  164.647367] Call trace:
-> [  164.647368]  smp_call_function_many_cond+0x334/0x7a0 (P)
-> [  164.647372]  smp_call_function_many+0x20/0x40
-> [  164.647374]  kvm_make_all_cpus_request+0xec/0x1b8
-> [  164.647377]  vgic_queue_irq_unlock+0x1c8/0x2c8
-> [  164.647380]  kvm_vgic_inject_irq+0x194/0x1e0
-> [  164.647381]  kvm_vm_ioctl_irq_line+0x170/0x400
-> [  164.647386]  kvm_vm_ioctl+0x7b8/0xc88
-> [  164.647389]  __arm64_sys_ioctl+0xb4/0x118
-> [  164.647393]  invoke_syscall+0x6c/0x100
-> [  164.647397]  el0_svc_common.constprop.0+0x48/0xf0
-> [  164.647398]  do_el0_svc+0x24/0x38
-> [  164.647400]  el0_svc+0x3c/0x170
-> [  164.647403]  el0t_64_sync_handler+0xa0/0xe8
-> [  164.647405]  el0t_64_sync+0x1b0/0x1b8
+[0] https://lore.kernel.org/all/20230802234255.466782-1-oliver.upton@linux.dev/
 
-This trace is about interrupt injection from userspace, not
-deactivation of a HW interrupt.
+Oliver Upton (12):
+  Import arm-smccc.h from Linux v6.19
+  arm64: Stash kvm_vcpu_init for later use
+  arm64: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+  arm64: Expose ARM64_CORE_REG() for general use
+  arm64: Add support for finding vCPU for given MPIDR
+  arm64: Add skeleton implementation for PSCI
+  arm64: psci: Implement CPU_SUSPEND
+  arm64: psci: Implement CPU_ON
+  arm64: psci: Implement AFFINITY_INFO
+  arm64: psci: Implement MIGRATE_INFO_TYPE
+  arm64: psci: Implement SYSTEM_{OFF,RESET}
+  arm64: smccc: Start sending PSCI to userspace
 
-None of that makes much sense.
+Suzuki K Poulose (5):
+  headers: Update linux/const.h from linux sources
+  util/update_headers: Clean up header copying
+  util/update_headers: Warn about missing header files
+  update_headers: arm64: Track uapi/linux/psci.h for PSCI definitions
+  arm64: Sync headers from Linux v6.19 for psci.h
 
-	M.
+ Makefile                            |   2 +
+ arm64/include/asm/smccc.h           |  65 ++++++
+ arm64/include/kvm/kvm-arch.h        |   2 +
+ arm64/include/kvm/kvm-config-arch.h |   8 +-
+ arm64/include/kvm/kvm-cpu-arch.h    |  30 ++-
+ arm64/kvm-cpu.c                     |  51 +++--
+ arm64/kvm.c                         |  20 ++
+ arm64/psci.c                        | 207 +++++++++++++++++++
+ arm64/smccc.c                       |  81 ++++++++
+ include/linux/arm-smccc.h           | 305 ++++++++++++++++++++++++++++
+ include/linux/const.h               |  53 +++++
+ include/linux/kernel.h              |   3 -
+ include/linux/psci.h                |  52 +++++
+ kvm-cpu.c                           |  13 ++
+ util/update_headers.sh              |  23 ++-
+ 15 files changed, 874 insertions(+), 41 deletions(-)
+ create mode 100644 arm64/include/asm/smccc.h
+ create mode 100644 arm64/psci.c
+ create mode 100644 arm64/smccc.c
+ create mode 100644 include/linux/arm-smccc.h
+ create mode 100644 include/linux/const.h
 
 -- 
-Jazz isn't dead. It just smells funny.
+2.43.0
+
