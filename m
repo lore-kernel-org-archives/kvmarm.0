@@ -1,332 +1,244 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1573B8BB1
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 10:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E47F2FFFB5;
+	Mon, 30 Mar 2026 10:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774865264; cv=none; b=a/XdGQroYTW5KEEi2LvFVWey5BCxHQIyudQGqTK85RsSrIYoH7RoGL9pY57KI81rBwI2ZUfoPQQ/fbltGog5fStenR8SSjN5SjaAElct+hDX1O3wRwSiC0VdFusk03L2/Fx0IWtARvbDlgT4EcMaALAOVN2V0lkLaMfHxvVWYx8=
+	t=1774866979; cv=none; b=TYtWl4fPa9kbzXbv+w6jcFipdOmylZIQLtEkmRo3HEE2FBI8Ql5HDuuYFbveoZCzxzC5rQ25e2oCWK0dfZGDoAV3akx+LkjeaNAxJICPTc5dTaqH33zd4OG6NPK03WfmMMgBCxWhXktVC9gsjYp4778bR10Dxb/cGcwKs25oIQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774865264; c=relaxed/simple;
-	bh=Vb9xxtHsTHwRbzD7GU8OESZOKbk4eyUOZTuHVncJqrw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K1myravoVD4herLAXbdy/pTlMO7YtwiMMIBANZr5BKe/mApTR2pKyUus+a/C7RNY9jSrOA+0K9mcXqa3t10FvgnKeiNFcX+VFCiocEnMBIqzkkbu9c71XtywsuDb9EZG1TLBoVlsPnZdz6xpX1JL0xfrVHOXhL7TavPfFNMX7Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=f/3+x1/2; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1774866979; c=relaxed/simple;
+	bh=jz2gi11NiG/KZMld4u+nIsujltktGVyGRcWg97yjGS0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=r6cSxc5D1fbrLd72puTDW5iygL2FnWnvEvF8ZB0/n5pDH9db/HCf35TspR1xampBCdocU7dKu00fPZSUBc4fmN5NwzkD/A0KwAtCZMsqVk6qnct4cjJ5ax3wfFaBQe3b3UF9+R2LZ7zHdr9MP2D/APJ5kQNLkbFEShHPyNcZCbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZVn46wu2; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="f/3+x1/2"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZVn46wu2"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B266A1BF3;
-	Mon, 30 Mar 2026 03:07:36 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E77803F915;
-	Mon, 30 Mar 2026 03:07:40 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C50A1684;
+	Mon, 30 Mar 2026 03:36:11 -0700 (PDT)
+Received: from [10.57.13.56] (unknown [10.57.13.56])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B9B03F915;
+	Mon, 30 Mar 2026 03:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774865262; bh=Vb9xxtHsTHwRbzD7GU8OESZOKbk4eyUOZTuHVncJqrw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f/3+x1/2VERKOhutWBXZBELrTUAbk7W/MrKR6o8yuXOk1TMKjLgjirYbc08fs+Zbu
-	 DvVg3CpQ4Henpk4kT7JVgqTOQk7BVnW9IdOaY596wWkD1qUYgZPvEUkdEkI8PuWhyM
-	 hpNiKCxVjYDxUYh9/bvpDXEflvOGQ5RDWYdv4fmg=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH 4/4] KVM: arm64: nv: Create nested IPA direct map to speed up reverse map removal
-Date: Mon, 30 Mar 2026 11:06:33 +0100
-Message-ID: <20260330100633.2817076-5-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260330100633.2817076-1-weilin.chang@arm.com>
-References: <20260330100633.2817076-1-weilin.chang@arm.com>
+	t=1774866977; bh=jz2gi11NiG/KZMld4u+nIsujltktGVyGRcWg97yjGS0=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=ZVn46wu2i0+k6UlKc80S1S6R1+BCanT5RW1OehNARboz2md1u1ESA54kYJcVM8fBY
+	 ru8ufmp1ujB0annXg4MAPeQhzK9RROmf01Ve0Ua31mnUjJcUxFQL236bmdNf52m0M+
+	 JJcgTQyjFMTTQ5Snfcr4hbVwbu765iwiOSlaGI9I=
+Message-ID: <9bf7ad5a-9a07-4150-9dbb-c3cf7cac0cb7@arm.com>
+Date: Mon, 30 Mar 2026 11:36:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v13 30/48] KVM: arm64: Handle Realm PSCI requests
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com>
+ <20260318155413.793430-31-steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20260318155413.793430-31-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Iterating through the whole reverse map to find which entries to remove
-when handling guest hypervisor TLBIs is not efficient. Create a direct
-map that goes from nested IPA to canonical IPA so that the canonical
-IPA range affected by the TLBI can be quickly determined, then remove
-the entries in the reverse map accordingly.
+On 18/03/2026 15:53, Steven Price wrote:
+> The RMM needs to be informed of the target REC when a PSCI call is made
+> with an MPIDR argument. Expose an ioctl to the userspace in case the PSCI
+> is handled by it.
+> 
+> [NOTE: A future version of the RMM specification is likely to remove the
+> need for this ioctl.]
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/include/asm/kvm_host.h |   3 +
- arch/arm64/kvm/mmu.c              |   2 +
- arch/arm64/kvm/nested.c           | 131 ++++++++++++++++++++----------
- 3 files changed, 95 insertions(+), 41 deletions(-)
+This will need to stay for the PSCI_CPU_ON case, where the host has to
+acknowledge the onlining of a vCPU.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 06f83bb7ff1d..6b0858805530 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -220,6 +220,9 @@ struct kvm_s2_mmu {
- 	/* canonical IPA to nested IPA range lookup, protected by kvm.mmu_lock */
- 	struct maple_tree nested_revmap_mt;
- 
-+	/* nested IPA to canonical IPA range lookup, protected by kvm.mmu_lock */
-+	struct maple_tree nested_direct_mt;
-+
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- 	struct dentry *shadow_pt_debugfs_dentry;
- #endif
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2b413d3dc790..9f27a9669ec9 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1010,6 +1010,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 		kvm_init_nested_s2_mmu(mmu);
- 
- 	mt_init(&mmu->nested_revmap_mt);
-+	mt_init(&mmu->nested_direct_mt);
- 
- 	return 0;
- 
-@@ -1112,6 +1113,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	mtree_destroy(&mmu->nested_revmap_mt);
- 
- 	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
-+		mtree_destroy(&mmu->nested_direct_mt);
- 		kvm_init_nested_s2_mmu(mmu);
- 	}
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 125fa21ca2e7..4c96130abf82 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -45,13 +45,12 @@ struct vncr_tlb {
- #define S2_MMU_PER_VCPU		2
- 
- /*
-- * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree payload
-- * layout:
-+ * Per shadow S2 reverse & direct map maple tree payload layout:
-  *
-- * bits 55-12: nested IPA bits 55-12
-- * bit 0: polluted, 1 for polluted, 0 for not
-+ * bits 55-12: {nested, canonical} IPA bits 55-12
-+ * bit 0: polluted, 1 for polluted, 0 for not, only used in reverse map
-  */
--#define NESTED_IPA_MASK		GENMASK_ULL(55, 12)
-+#define ADDR_MASK		GENMASK_ULL(55, 12)
- #define UNKNOWN_IPA		BIT(0)
- 
- void kvm_init_nested(struct kvm *kvm)
-@@ -915,74 +914,118 @@ static int record_accel(struct kvm_s2_mmu *mmu, gpa_t gpa,
- void kvm_remove_nested_revmap(struct kvm_s2_mmu *mmu, u64 addr, u64 size)
- {
- 	/*
--	 * Iterate through the mt of this mmu, remove all unpolluted canonical
--	 * ipa ranges that maps to ranges that are strictly within
--	 * [addr, addr + size).
-+	 * For all ranges in direct_mt that are completely covered by the range
-+	 * we are TLBIing [addr, addr + size), we remove the reverse map AND
-+	 * its corresponding direct map together, when these conditions are
-+	 * met:
-+	 *
-+	 * 1. The TLBI range completely covers the stored nested IPA range.
-+	 * 2. The reverse map is not polluted. This ensures the reverse map
-+	 *    and the direct map are 1:1.
- 	 */
--	struct maple_tree *mt = &mmu->nested_revmap_mt;
--	void *entry;
--	u64 nested_ipa, nested_ipa_end, addr_end = addr + size;
--	size_t revmap_size;
-+	struct maple_tree *direct_mt = &mmu->nested_direct_mt;
-+	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
-+	gpa_t nested_ipa_start = addr;
-+	gpa_t nested_ipa_end = addr + size - 1;
-+	u64 entry_ipa, entry_nested_ipa;
-+	u64 ipa, ipa_end;
- 
--	MA_STATE(mas, mt, 0, ULONG_MAX);
-+	MA_STATE(mas_nested_ipa, direct_mt, nested_ipa_start, nested_ipa_end);
-+	entry_ipa = (u64)mas_find_range(&mas_nested_ipa, nested_ipa_end);
- 
--	mas_for_each(&mas, entry, ULONG_MAX) {
--		if ((u64)entry & UNKNOWN_IPA)
--			continue;
-+	while (entry_ipa && mas_nested_ipa.index <= nested_ipa_end) {
-+		ipa = entry_ipa & ADDR_MASK;
-+		ipa_end = ipa + mas_nested_ipa.last - mas_nested_ipa.index;
- 
--		revmap_size = mas.last - mas.index + 1;
--		nested_ipa = (u64)entry & NESTED_IPA_MASK;
--		nested_ipa_end = nested_ipa + revmap_size;
-+		/* Use ipa range to find the corresponding entry in revmap. */
-+		MA_STATE(mas_ipa, revmap_mt, ipa, ipa_end);
-+		entry_nested_ipa = (u64)mas_find_range(&mas_ipa, ipa_end);
- 
--		if (nested_ipa >= addr && nested_ipa_end <= addr_end) {
--			accel_clear_mmu_range(mmu, mas.index, revmap_size);
--			mas_erase(&mas);
-+		/*
-+		 * Reverse and direct map are created together at s2 faults,
-+		 * thus every direct map range should also have a corresponding
-+		 * reverse map range, however that can be polluted.
-+		 */
-+		BUG_ON(!entry_nested_ipa);
-+
-+		/* The two conditions outlined above. */
-+		if (!(entry_nested_ipa & UNKNOWN_IPA) &&
-+		    mas_nested_ipa.index >= addr &&
-+		    mas_nested_ipa.last <= nested_ipa_end) {
-+			/*
-+			 * If the reverse map isn't polluted, the direct and
-+			 * reverse map are expected to be 1:1, thus they must
-+			 * have the same size.
-+			 */
-+			BUG_ON(mas_ipa.last - mas_ipa.index !=
-+			       mas_nested_ipa.last - mas_nested_ipa.index);
-+
-+			accel_clear_mmu_range(mmu, mas_ipa.index,
-+					      mas_ipa.last - mas_ipa.index + 1);
-+			mas_erase(&mas_ipa);
-+			mas_erase(&mas_nested_ipa);
- 		}
-+		entry_ipa = (u64)mas_find_range(&mas_nested_ipa, nested_ipa_end);
- 	}
- }
- 
- int kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
- 			     gpa_t fault_ipa, size_t map_size)
- {
--	struct maple_tree *mt = &mmu->nested_revmap_mt;
--	gpa_t start = ipa;
--	gpa_t end = ipa + map_size - 1;
-+	struct maple_tree *direct_mt = &mmu->nested_direct_mt;
-+	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
-+	gpa_t ipa_start = ipa;
-+	gpa_t ipa_end = ipa + map_size - 1;
-+	gpa_t fault_ipa_end = fault_ipa + map_size - 1;
- 	u64 entry, new_entry = 0;
- 	int r = 0;
- 
- 	lockdep_assert_held_write(kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
- 
--	MA_STATE(mas, mt, start, end);
-+	MA_STATE(mas_ipa, revmap_mt, ipa_start, ipa_end);
-+	MA_STATE(mas_nested_ipa, direct_mt, fault_ipa, fault_ipa_end);
- 
- 	r = record_accel(mmu, ipa, map_size);
- 	if (r)
- 		goto out;
- 
--	entry = (u64)mas_find_range(&mas, end);
-+	r = mas_store_gfp(&mas_nested_ipa, (void *)ipa, GFP_KERNEL_ACCOUNT);
-+	/*
-+	 * In the case of direct map store failure, don't clean up
-+	 * record_accel()'s successfully installed accel mt entry. Keeping
-+	 * it is fine as it will just cause us to check a few more s2 mmus
-+	 * in the mmu notifier.
-+	 */
-+	if (r)
-+		goto out;
-+
-+	entry = (u64)mas_find_range(&mas_ipa, ipa_end);
- 
- 	if (entry) {
- 		/* maybe just a perm update... */
--		if (!(entry & UNKNOWN_IPA) && mas.index == start &&
--		    mas.last == end &&
--		    fault_ipa == (entry & NESTED_IPA_MASK))
-+		if (!(entry & UNKNOWN_IPA) && mas_ipa.index == ipa_start &&
-+		    mas_ipa.last == ipa_end &&
-+		    fault_ipa == (entry & ADDR_MASK))
- 			goto out;
- 		/*
- 		 * Remove every overlapping range, then create a "polluted"
- 		 * range that spans all these ranges and store it.
- 		 */
--		while (entry && mas.index <= end) {
--			start = min(mas.index, start);
--			end = max(mas.last, end);
--			mas_erase(&mas);
--			entry = (u64)mas_find_range(&mas, end);
-+		while (entry && mas_ipa.index <= ipa_end) {
-+			ipa_start = min(mas_ipa.index, ipa_start);
-+			ipa_end = max(mas_ipa.last, ipa_end);
-+			mas_erase(&mas_ipa);
-+			entry = (u64)mas_find_range(&mas_ipa, ipa_end);
- 		}
- 		new_entry |= UNKNOWN_IPA;
- 	} else {
- 		new_entry |= fault_ipa;
- 	}
- 
--	mas_set_range(&mas, start, end);
--	r = mas_store_gfp(&mas, (void *)new_entry, GFP_KERNEL_ACCOUNT);
-+	mas_set_range(&mas_ipa, ipa_start, ipa_end);
-+	r = mas_store_gfp(&mas_ipa, (void *)new_entry, GFP_KERNEL_ACCOUNT);
-+	if (r)
-+		mas_erase(&mas_nested_ipa);
- out:
- 	return r;
- }
-@@ -1371,13 +1414,14 @@ void kvm_nested_s2_wp(struct kvm *kvm)
- static void unmap_mmu_ipa_range(struct kvm_s2_mmu *mmu, gpa_t gpa,
- 				  size_t unmap_size, bool may_block)
- {
--	struct maple_tree *mt = &mmu->nested_revmap_mt;
-+	struct maple_tree *direct_mt = &mmu->nested_direct_mt;
-+	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
- 	gpa_t start = gpa;
- 	gpa_t end = gpa + unmap_size - 1;
- 	u64 entry;
- 	size_t entry_size;
- 
--	MA_STATE(mas, mt, gpa, end);
-+	MA_STATE(mas, revmap_mt, gpa, end);
- 	entry = (u64)mas_find_range(&mas, end);
- 
- 	while (entry && mas.index <= end) {
-@@ -1388,15 +1432,18 @@ static void unmap_mmu_ipa_range(struct kvm_s2_mmu *mmu, gpa_t gpa,
- 		 * touches any polluted range.
- 		 */
- 		if (entry & UNKNOWN_IPA) {
--			mtree_destroy(mt);
-+			mtree_destroy(direct_mt);
-+			mtree_destroy(revmap_mt);
- 			accel_clear_mmu(mmu);
- 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu),
- 					       may_block);
- 			return;
- 		}
-+		/* not polluted, direct map and reverse map must be 1:1 */
-+		mtree_erase(direct_mt, entry & ADDR_MASK);
- 		mas_erase(&mas);
- 		accel_clear_mmu_range(mmu, mas.index, entry_size);
--		kvm_stage2_unmap_range(mmu, entry & NESTED_IPA_MASK, entry_size,
-+		kvm_stage2_unmap_range(mmu, entry & ADDR_MASK, entry_size,
- 				       may_block);
- 		/*
- 		 * Other maple tree operations during preemption could render
-@@ -1447,6 +1494,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
- 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
- 
- 		if (kvm_s2_mmu_valid(mmu)) {
-+			mtree_destroy(&mmu->nested_direct_mt);
- 			mtree_destroy(&mmu->nested_revmap_mt);
- 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
- 		}
-@@ -2135,6 +2183,7 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
- 
- 		write_lock(&vcpu->kvm->mmu_lock);
- 		if (mmu->pending_unmap) {
-+			mtree_destroy(&mmu->nested_direct_mt);
- 			mtree_destroy(&mmu->nested_revmap_mt);
- 			accel_clear_mmu(mmu);
- 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
--- 
-2.43.0
+> 
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+
+For the record, we can drop the UAPI following our discussions and 
+implicitly do the PSCI complete before REC_ENTER, similar to what
+we do for the SET_RIPAS request. The VMM/KVM can treat the case
+as a normal PSCI_CPU_ON request and return the result as in normal
+VMs.
+
+The target REC may ENTER before we complete the reporting, but we can
+handle this error case (RMI_ERROR_REC) and return -EAGAIN to the
+userspace.
+
+Suzuki
+
+
+> ---
+> Changes since v12:
+>   * Chance return code for non-realms to -ENXIO to better represent that
+>     the ioctl is invalid for non-realms (checkpatch is insistent that
+>     "ENOSYS means 'invalid syscall nr' and nothing else").
+> Changes since v11:
+>   * RMM->RMI renaming.
+> Changes since v6:
+>   * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
+>   * Minor renaming/formatting fixes.
+> ---
+>   arch/arm64/include/asm/kvm_rmi.h |  3 +++
+>   arch/arm64/kvm/arm.c             | 25 +++++++++++++++++++++++++
+>   arch/arm64/kvm/psci.c            | 30 ++++++++++++++++++++++++++++++
+>   arch/arm64/kvm/rmi.c             | 14 ++++++++++++++
+>   4 files changed, 72 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 38208be3c602..1ee5ed0f5ab2 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -117,6 +117,9 @@ int realm_map_non_secure(struct realm *realm,
+>   			 unsigned long size,
+>   			 enum kvm_pgtable_prot prot,
+>   			 struct kvm_mmu_memory_cache *memcache);
+> +int realm_psci_complete(struct kvm_vcpu *source,
+> +			struct kvm_vcpu *target,
+> +			unsigned long status);
+>   
+>   static inline bool kvm_realm_is_private_address(struct realm *realm,
+>   						unsigned long addr)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 304fb1f2b3ff..61182eb0cf70 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1846,6 +1846,22 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>   	return __kvm_arm_vcpu_set_events(vcpu, events);
+>   }
+>   
+> +static int kvm_arm_vcpu_rmi_psci_complete(struct kvm_vcpu *vcpu,
+> +					  struct kvm_arm_rmi_psci_complete *arg)
+> +{
+> +	struct kvm_vcpu *target = kvm_mpidr_to_vcpu(vcpu->kvm, arg->target_mpidr);
+> +
+> +	if (!target)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * RMM v1.0 only supports PSCI_RET_SUCCESS or PSCI_RET_DENIED
+> +	 * for the status. But, let us leave it to the RMM to filter
+> +	 * for making this future proof.
+> +	 */
+> +	return realm_psci_complete(vcpu, target, arg->psci_status);
+> +}
+> +
+>   long kvm_arch_vcpu_ioctl(struct file *filp,
+>   			 unsigned int ioctl, unsigned long arg)
+>   {
+> @@ -1974,6 +1990,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>   
+>   		return kvm_arm_vcpu_finalize(vcpu, what);
+>   	}
+> +	case KVM_ARM_VCPU_RMI_PSCI_COMPLETE: {
+> +		struct kvm_arm_rmi_psci_complete req;
+> +
+> +		if (!vcpu_is_rec(vcpu))
+> +			return -ENXIO;
+> +		if (copy_from_user(&req, argp, sizeof(req)))
+> +			return -EFAULT;
+> +		return kvm_arm_vcpu_rmi_psci_complete(vcpu, &req);
+> +	}
+>   	default:
+>   		r = -EINVAL;
+>   	}
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 3b5dbe9a0a0e..a68f3c1878a5 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -103,6 +103,12 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>   
+>   	reset_state->reset = true;
+>   	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> +	/*
+> +	 * Make sure we issue PSCI_COMPLETE before the VCPU can be
+> +	 * scheduled.
+> +	 */
+> +	if (vcpu_is_rec(vcpu))
+> +		realm_psci_complete(source_vcpu, vcpu, PSCI_RET_SUCCESS);
+>   
+>   	/*
+>   	 * Make sure the reset request is observed if the RUNNABLE mp_state is
+> @@ -115,6 +121,11 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>   
+>   out_unlock:
+>   	spin_unlock(&vcpu->arch.mp_state_lock);
+> +	if (vcpu_is_rec(vcpu) && ret != PSCI_RET_SUCCESS) {
+> +		realm_psci_complete(source_vcpu, vcpu,
+> +				    ret == PSCI_RET_ALREADY_ON ?
+> +				    PSCI_RET_SUCCESS : PSCI_RET_DENIED);
+> +	}
+>   	return ret;
+>   }
+>   
+> @@ -142,6 +153,25 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>   	/* Ignore other bits of target affinity */
+>   	target_affinity &= target_affinity_mask;
+>   
+> +	if (vcpu_is_rec(vcpu)) {
+> +		struct kvm_vcpu *target_vcpu;
+> +
+> +		/* RMM supports only zero affinity level */
+> +		if (lowest_affinity_level != 0)
+> +			return PSCI_RET_INVALID_PARAMS;
+> +
+> +		target_vcpu = kvm_mpidr_to_vcpu(kvm, target_affinity);
+> +		if (!target_vcpu)
+> +			return PSCI_RET_INVALID_PARAMS;
+> +
+> +		/*
+> +		 * Provide the references of the source and target RECs to the
+> +		 * RMM so that the RMM can complete the PSCI request.
+> +		 */
+> +		realm_psci_complete(vcpu, target_vcpu, PSCI_RET_SUCCESS);
+> +		return PSCI_RET_SUCCESS;
+> +	}
+> +
+>   	/*
+>   	 * If one or more VCPU matching target affinity are running
+>   	 * then ON else OFF
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 30292814b1ec..e56c8af2ad61 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -353,6 +353,20 @@ static void free_rtt(phys_addr_t phys)
+>   	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
+>   }
+>   
+> +int realm_psci_complete(struct kvm_vcpu *source, struct kvm_vcpu *target,
+> +			unsigned long status)
+> +{
+> +	int ret;
+> +
+> +	ret = rmi_psci_complete(virt_to_phys(source->arch.rec.rec_page),
+> +				virt_to_phys(target->arch.rec.rec_page),
+> +				status);
+> +	if (ret)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>   static int realm_rtt_create(struct realm *realm,
+>   			    unsigned long addr,
+>   			    int level,
 
