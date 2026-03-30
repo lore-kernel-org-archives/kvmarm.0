@@ -1,116 +1,135 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42063BFE2F;
-	Mon, 30 Mar 2026 10:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A563BE15F
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 10:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774867974; cv=none; b=UIohcqqPWxcrxcdWOdR3X9xhttcrJMkYOgk6H3g4PsK3qDwwnuELw6tr8793GQjZ3EXdokWP+rfff/C9RTWaDAKQOhsdN3ZaYcWS6Hlm5NK02Hge8iXfB5QsB78Jgzqtfhy3E2y/jr1+H9WzKaodLWjI1NS0uyv6+6eWohYp3c4=
+	t=1774868088; cv=none; b=T1bDiEy7DvnbEBzBqNJsW2p78NZUC2M7MWa28adhGRESte+WhLL1IrqVOdis1sRE/PD8p2z9r3NUVA7RCwEynrebORWRemo6iNF9ad+Jvit7BZ/pxr5XUK+OmmzEx1rpm4yxiqMg/XHVPEClcjXhZjbX2MMt9hOt8UEzFAs48kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774867974; c=relaxed/simple;
-	bh=+19Be+jxc7eVo6ptCT9N5p5AxdrCYoGU6ESzG8t9WMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fYgPhsGm36R7/Wy/hI68pfTzAUSH1mCJrwR9QwDTYnMeqpQSh10xCGRPkX5IUDy7hmMJi+LHnT1xBOau21dvxWHoG64Soc5ZtG0kAqgfJQZ8DyUYcoa4p06pqoC2+paQHmladYayv/jkRKEPNHcpQ9b7Eo0pa+Xitz/GKOT5Rp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Ww1bWqYF; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1774868088; c=relaxed/simple;
+	bh=n8/FjOxzEWawetfjf8dTLKWl6TONEIaNu/yMlW5S67w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N7k4PCsi9npqZO56lf8mysTOh8z5nsk3e2W/wY2Co044pyex4qm150v7yg+5aRYRu7l2qPRCRx6pk1s7FBMKT7a0XC4p0IJlH9QLFqb2L0oxmA/DLLuEPIuN5OBT6Q+cBCL5i4t6skI3mDQB7ViSSY0JyF0BwK9PhWNzLWT4krY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z0gv2PzD; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Ww1bWqYF"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43A1B1C2B;
-	Mon, 30 Mar 2026 03:52:47 -0700 (PDT)
-Received: from [10.57.13.56] (unknown [10.57.13.56])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CEE5E3F915;
-	Mon, 30 Mar 2026 03:52:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774867973; bh=+19Be+jxc7eVo6ptCT9N5p5AxdrCYoGU6ESzG8t9WMM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ww1bWqYFHkJLZhcCE6e8ZBiflNW2C5IphbVCSs/zVp/vxuEClcMS56xJox2ODahwj
-	 LRbyhNBB3fyWq5WX4kJWb+mBsO+xQWPASS6t7IPQrBSXBMZlSMjqaAR1bIi5HLon85
-	 iF0M837dqYrazZwcQ7FR4BsQCvEpvt9PN+k5O8Co=
-Message-ID: <4a2ab5b0-dec6-4ee2-8790-f27c2501f653@arm.com>
-Date: Mon, 30 Mar 2026 11:52:48 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z0gv2PzD"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48542d5aa9eso39288625e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 03:54:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774868085; x=1775472885; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OCpQaHn340hA9gXHDWXNQio0q+3ps0T5nKIr2QuIXig=;
+        b=Z0gv2PzD1rhWh89tT18DL4rpTo6wRq4PtIDRyduMSrshacKd1PUAI4TT1HwOQyJuro
+         1ddbCTCP70CSaSmXrsi3APMg/21oGWqn3rU9jxAzMZ1MXfzRvqZATMoHWdBon3AjrUvt
+         u5NLwWuQgWvX4LStX8jGhoemmtGingsBCxDIVcRPArFJ1j/kfncZ4nRxTLZYWPCy3xut
+         8wQtNdUaJA/gLlD+Kw12dTLWyUAyr2xDUpr+ibi9/1OX4TsZmk2ydDPXYMII/A247KHT
+         WZ1azLpbo+KAW3bEIzVa305gkLfdD6yMTLQrxUC6IHpNDVfpgXGF/vNxnXTeAxp12rzW
+         nd9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774868085; x=1775472885;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OCpQaHn340hA9gXHDWXNQio0q+3ps0T5nKIr2QuIXig=;
+        b=EUZGK9onWUH3G9Fj+YGoht439w+WlCEh9GCMe3GcCIGyTUKRxjRlWMJvrnUJ1jv46n
+         h+UqolrK5tbC2L2ZBYQMhRAJxurMRozEgyJz0KU8lS4vdphuFQ3DxdxvHaYIDwoi/ln9
+         Dq61MSIQz4Uwwa76/2HL0fuXk/Woirx4FEcl3VkHIyJ+gDXKBngbU68DRNnIQu/jr8lB
+         SaZAk/UKFI5iOzdAcB0aZBzUitnJzzyLQSueIh5tVYOxExzBzKrjdn1Ze3E1X/s1s4ks
+         z4hi3QXWgqxzDczJTcYd6qSu9lFN7q4BloP10ctqN3hTFKEYEJm3z1ah/oXjq5DEReLs
+         1hMQ==
+X-Gm-Message-State: AOJu0YwIj645F7QUbyk26oZ7NPafyHqEFOrf7Hq/d+EquFWIILvt9BMw
+	xQDGmMzZ1NkBQsne2kA4xVGFb4viBEnzXiI4GxgST0yKF/wlsjmTploIZHKcgVlrBNc5ZYVPvHo
+	oC/jy73o2aGXpkaoHx9sfz/7UXEJullwGvDLDx6HWcwmsJaHpjG292XtI8TUqIwHTZ8XEbRq0Yg
+	aHwLjTiC4JUtKNwkTxeSt2Go/jOT75+Jt92Fh7+7ulMwGXr6OXUs687ADYlW7GTPWtvqz7
+X-Received: from wmro3.prod.google.com ([2002:a05:600c:3783:b0:483:41b6:adeb])
+ (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:5290:b0:486:fcdf:c065 with SMTP id 5b1f17b1804b1-4872808d317mr201624445e9.27.1774868084528;
+ Mon, 30 Mar 2026 03:54:44 -0700 (PDT)
+Date: Mon, 30 Mar 2026 10:54:41 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 32/48] arm64: Don't expose stolen time for realm
- guests
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-33-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260318155413.793430-33-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260330105441.3226904-1-sebastianene@google.com>
+Subject: [PATCH v3] KVM: arm64: Prevent the host from using an smc with imm16
+ != 0
+From: Sebastian Ene <sebastianene@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, android-kvm@google.com
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, 
+	maz@kernel.org, oupton@kernel.org, sebastianene@google.com, 
+	suzuki.poulose@arm.com, tabba@google.com, vdonnefort@google.com, 
+	will@kernel.org, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 18/03/2026 15:53, Steven Price wrote:
-> It doesn't make much sense as a realm guest wouldn't want to trust the
-> host. It will also need some extra work to ensure that KVM will only
-> attempt to write into a shared memory region. So for now just disable
-> it.
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v7:
->   * Update the documentation to add a note about stolen time being
->     unavailable in a realm.
-> ---
->   Documentation/virt/kvm/api.rst | 3 +++
->   arch/arm64/kvm/arm.c           | 5 ++++-
->   2 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index bc180c853faf..70911fe6d435 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -9240,6 +9240,9 @@ is supported, than the other should as well and vice versa.  For arm64
->   see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
->   For x86 see Documentation/virt/kvm/x86/msr.rst "MSR_KVM_STEAL_TIME".
->   
-> +Note that steal time accounting is not available when a guest is running
-> +within a Arm CCA realm (machine type KVM_VM_TYPE_ARM_REALM).
-> +
->   8.25 KVM_CAP_S390_DIAG318
->   -------------------------
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 61182eb0cf70..7d92ddb06460 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -469,7 +469,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   		r = system_supports_mte();
->   		break;
->   	case KVM_CAP_STEAL_TIME:
-> -		r = kvm_arm_pvtime_supported();
-> +		if (kvm_is_realm(kvm))
-> +			r = 0;
-> +		else
-> +			r = kvm_arm_pvtime_supported();
+The ARM Service Calling Convention (SMCCC) specifies that the function
+identifier and parameters should be passed in registers, leaving the
+16-bit immediate field un-handled in pKVM when an SMC instruction is
+trapped.
+Since the HVC is a private interface between EL2 and the host,
+enforce the host kernel running under pKVM to use an immediate value
+of 0 only when using SMCs to make it clear for non-compliant software
+talking to Trustzone that we only use SMCCC.
 
-Could this be handled in kvm_realm_ext_allowed() ?
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+---
+v2 -> current:
+ - move the ESR decoding of the imm16 in the handle_host_smc where it
+   was supposed to be
+ - updated the commit message to include the reason behind while we are
+   not doing for HVCs as well
+ - updated the commit message to clarify that pKVM is not handling the
+   imm16
 
-Suzuki
+v1 -> v2:
+ - Dropped injecting an UNDEF and return an error instead
+   (SMCCC_RET_NOT_SUPPORTED)
+ - Used the mask ESR_ELx_xVC_IMM_MASK instead of masking with U16_MAX
+ - Updated the title of the commit message from:
+   "[PATCH] KVM: arm64: Inject UNDEF when host is executing an
+    smc with imm16 != 0"
 
+Link to v2:
+https://lore.kernel.org/all/20260325113138.4171430-1-sebastianene@google.com/
+Link to v1:
+https://lore.kernel.org/all/20260324135728.3532400-1-sebastianene@google.com/
 
->   		break;
->   	case KVM_CAP_ARM_EL1_32BIT:
->   		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index e7790097db93..461cf5cb5ac7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -676,8 +676,14 @@ static void default_host_smc_handler(struct kvm_cpu_context *host_ctxt)
+ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(u64, func_id, host_ctxt, 0);
++	u64 esr = read_sysreg_el2(SYS_ESR);
+ 	bool handled;
+ 
++	if (esr & ESR_ELx_xVC_IMM_MASK) {
++		cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
++		goto exit_skip_instr;
++	}
++
+ 	func_id &= ~ARM_SMCCC_CALL_HINTS;
+ 
+ 	handled = kvm_host_psci_handler(host_ctxt, func_id);
+@@ -686,6 +692,7 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+ 	if (!handled)
+ 		default_host_smc_handler(host_ctxt);
+ 
++exit_skip_instr:
+ 	/* SMC was trapped, move ELR past the current PC. */
+ 	kvm_skip_host_instr();
+ }
+-- 
+2.53.0.1018.g2bb0e51243-goog
 
