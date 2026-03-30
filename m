@@ -1,188 +1,148 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038681EE7C6
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 06:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD3E372B2C
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 09:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774851732; cv=none; b=s4xQjAgEXRbQLyt9OZqJ6Ei2AxdcrGrlPaFYDODJDCGsO5IIpAuJQvXr81nbi4PhD+zlSx0g7F8fTZKwq+gVgeKzA91tDjCa0DpMiJaV/pr8Vd8U2Bvkr8/mojFaWrf1IJy+rNfTq2OejFSCg/Fi8Y96JDVxAsq/RECGNw5JPgs=
+	t=1774863668; cv=none; b=A+tb1/rKY9ANEJBLVbQbD3k7aS0r5A8NRFdr+NP4+5afVsLaRHFQi6tILORyOC/6Afl4CLJr/FW/fcJv/L79fIcqF0UcX42sm3Zv9djlyUC2B9EghChWlxKtOIZVcxOz+IuahBENhVTaIRP9ixlaXXFQSU1Na9oiNbhHnexYkLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774851732; c=relaxed/simple;
-	bh=2Q3sHfHVl0uTOU0PkxV4Dtu553zyQ5HsII5inPyRfTw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rsMPLNL2ZJbT1+v+BN9oEBq14HrxfIkR6nnBfmI/dUju8dpU5QBX5Rr21dE7pUp0pVqhkGPAO3YTCQweSYzLZepoEIksI2HKxliJv4mns5kS3puL0KuUNtKUVJlRZ3jKm95DvgpDBvArFI8NFr2dQjXh+7kdCrbssKs3C62O9fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ITBmfkdG; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1774863668; c=relaxed/simple;
+	bh=z4lDoyrwIQfXoh05jn3lKF2DCTkvjwaG2w5l2u1YWNg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z3HdyvnnDx5Ocg2ke4xRLIcG7r7CzwqC/2TjmZSamcIod+zgooMXzl3WUvgJRcPEZvxepLXsKzUZp96Vv383FDr4+3E55r2Y1esjZ11SsJe4ykCKMKni396LyKLFwi61R67l1OJxYTRK3U6FN55bj9Pm/oEFeOhWtmh4IswFOWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dFXKmpNS; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ITBmfkdG"
-Message-ID: <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774851728;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JRGlqTUddNs22qbjK1XF9AytOTARdjde3qWaPPuWarI=;
-	b=ITBmfkdGvwuPDXnsffYC3RL1CaOmCF/2VlOTHdKT+Q7ImF10cXOMIoVaLLRIU4blXOt6tP
-	duQCcmk2g36LuwcQWBgCNhYQYhVZf0XcLdzLJABnsHxs6Gkks4lvw9jpYB4A7jo5ZZy2Hs
-	0Pk3+FiE2FReGdaXwbt6hKscxnFc+Cc=
-Date: Mon, 30 Mar 2026 14:21:50 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dFXKmpNS"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a2ad56dbb2so2293437e87.3
+        for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 02:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774863666; x=1775468466; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zZNGZDhto4jkAxNh9++YfrnwQanqMAXiu2o8XL7KzB8=;
+        b=dFXKmpNSDZn4Q4Rp43Jsh+oVv52yo6b8tdYuQNYw7YmehrXQcxexydS3zYENMmyjwe
+         gDtwYk4YDIQ8+9uiKKFoZMX+zsEJthp/W+jXrnsyqXHhODhoGh7FvS+k+6SmnxQf+mRf
+         ffPsVcjNDsmb9unt34sT2iZv628wnqGyuWNCq5tUDy8ta39C4ZsNUuF3dIHf+HSsc3DT
+         8K2h3fz8L92P10Q7VbHvKqGkrDHswbZw/ls4zRyo0oaF8Owh2WF/xEHvaEYGiEhfu5gX
+         56phWake0dJzMghEd0Jb1bXpnpLwHF5QhI3ssr+t9QjUZO5w1xUCZLdoOJQjn6/raqOO
+         TUiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774863666; x=1775468466;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zZNGZDhto4jkAxNh9++YfrnwQanqMAXiu2o8XL7KzB8=;
+        b=FNuqByrth5lU65fwPmUlzVDTqysI9b8BfGFa0B2nVh+cYxoj2dFET9TwsIbCXwFmhs
+         QLIvIbNLQOQ4BSeCL1K4896FYXeECE8K0d30k1Zt6v47z16av7CeRuTtp0ai8hoPGXVi
+         eybClHrtEIQMxR1eB5/PPXYO0pyFnIRteezE0oHDDoN/0bUhocuwcSQtBztUHdBzZuGr
+         PWju2eySluO3naSm/2RLyuz6K+l+mGAPyh6PtqBSHnglm8rvadA/4QUCjGh8N3h35LN8
+         e5Xrl5CN3RaOtKysA+6XfWNhpLSRD8FNl64EQkxNQgWcWORZ72EhrL6sf2Chrg8+be21
+         FX9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWj8zYcPOlFn7nFfbbKoRwV/7XRw/cnMBxEdI8UewCgf5z5KOnuG7w/86zFhH105eDl4wQL48w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzkEHrtCCwOmVOR9Pmi2FEKvefYyPmeyefp+ZDHFORGbICGW7wY
+	2wjBYdWkicO5gKqzqEtvGEdqGjnfYn96oiijSEK7ImCGgVIX6ErS5Tv7QJ61cteXHA==
+X-Gm-Gg: ATEYQzw4kdqWDBIPP3SsggVOSUqnMcFAwvJnepsCrg8XYSbMHpju6P/YmedT/w9fX0Q
+	ZCUPXPBe8vBYodKcLE5/5gi/xYDMD4VMkKZ9/P+ihh8o/MPyrJ8rsIRAJOuPma4vUcCblDZzoNE
+	rYrqcOVo4YiAj7PkUjrjEGq8Xm276JrObZHAb6ZQPAwAS/+ECcrEi/2LcuW/Zy2qrW+zGsWj/RJ
+	9ob0Tr0+PX4vQggF6u/O3JoCZaYyI8qL0F3f1npTNu6+o9SJItH1jq3JEPqjK7IDL6uKSVrLiIk
+	+uTy2r/XZt/X+dicKEE6cbRYuGj1M3M/jiM/xqlGnUoYYMXzuNi6dvEy4cVzVlBCBxunJJdLrod
+	VTG93jM3OzvXsIgqqsjs+n99wW/g/sHXjxHzCRmVdSxu5hmvLZIGS6TccGj++x/Cjpy1+KQID5Y
+	4HeswbkQ8pwu02qGakYnhMW9MGiSo7dpSG7kXDBgBSjxxT48Xe4JCYe11yQdB+PozGVA==
+X-Received: by 2002:a05:6512:3f0c:b0:5a2:7a31:9194 with SMTP id 2adb3069b0e04-5a2ab80d971mr3942218e87.19.1774863664954;
+        Mon, 30 Mar 2026 02:41:04 -0700 (PDT)
+Received: from google.com (27.69.88.34.bc.googleusercontent.com. [34.88.69.27])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2b145f1dfsm1563489e87.79.2026.03.30.02.41.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 02:41:04 -0700 (PDT)
+Date: Mon, 30 Mar 2026 09:41:01 +0000
+From: Quentin Perret <qperret@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: pkvm: Rollback refcount on hyp share/unshare
+ error
+Message-ID: <acpCq1qZCMFqocs3@google.com>
+References: <20260324172757.2147153-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
- fault-in on !mmap()'d memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
- Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>,
- Vlastimil Babka <vbabka@suse.cz>, Xiaoyao Li <xiaoyao.li@intel.com>,
- David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
- James Houghton <jthoughton@google.com>
-References: <20250729225455.670324-1-seanjc@google.com>
- <20250729225455.670324-25-seanjc@google.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20250729225455.670324-25-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324172757.2147153-1-vdonnefort@google.com>
 
-Hi,
+Hey Vincent,
 
-On 7/30/25 6:54 AM, Sean Christopherson wrote:
-> Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
-> memory that supports mmap(), but that is not currently mapped into host
-> userspace and/or has a userspace address (in the memslot) that points at
-> something other than the target guest_memfd range.  Mapping guest_memfd
-> memory into the guest is supposed to operate completely independently from
-> any userspace mappings.
+On Tuesday 24 Mar 2026 at 17:27:57 (+0000), Vincent Donnefort wrote:
+> If one of the HVC __pkvm_host_share_hyp or __pkvm_host_unshare_hyp fails,
+> rollback the refcount to ensure the hyp_shared_pfns tracking reflects
+> the actual sharing status.
+
+If any of these hypercalls fail I think we're still in trouble as
+kvm_{un}share_hyp() work on multi-page ranges and we could leak pages in
+a borked state if we fail halfway through. And failing any of these
+hypercalls is also sign of a bigger problem somewhere else so I wasn't
+too worried.
+
+But if we're going to fix this properly, I'd suggest also improving the
+error handling in kvm_share_hyp(). 'Fixing' kvm_unshare_hyp() is a bit
+harder because we must tell the caller to leak the data structure that
+was shared I presume, so maybe we just keep the WARN and cross our
+fingers :)
+
+Cheers,
+Quentin
+
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
->  1 file changed, 64 insertions(+)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 17d64a1e11e5..0fb41d2c8b44 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -493,11 +493,17 @@ static int share_pfn_hyp(u64 pfn)
+>  		goto unlock;
+>  	}
+>  
+> +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+> +	if (ret) {
+> +		kfree(this);
+> +		goto unlock;
+> +	}
+> +
+>  	this->pfn = pfn;
+>  	this->count = 1;
+>  	rb_link_node(&this->node, parent, node);
+>  	rb_insert_color(&this->node, &hyp_shared_pfns);
+> -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+> +
+>  unlock:
+>  	mutex_unlock(&hyp_shared_pfns_lock);
+>  
+> @@ -521,9 +527,15 @@ static int unshare_pfn_hyp(u64 pfn)
+>  	if (this->count)
+>  		goto unlock;
+>  
+> +	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
+> +	if (ret) {
+> +		this->count++;
+> +		goto unlock;
+> +	}
+> +
+>  	rb_erase(&this->node, &hyp_shared_pfns);
+>  	kfree(this);
+> -	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
+> +
+>  unlock:
+>  	mutex_unlock(&hyp_shared_pfns_lock);
+>  
 > 
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> index 088053d5f0f5..b86bf89a71e0 100644
-> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -13,6 +13,7 @@
->  
->  #include <linux/bitmap.h>
->  #include <linux/falloc.h>
-> +#include <linux/sizes.h>
->  #include <setjmp.h>
->  #include <signal.h>
->  #include <sys/mman.h>
-> @@ -21,6 +22,7 @@
->  
->  #include "kvm_util.h"
->  #include "test_util.h"
-> +#include "ucall_common.h"
->  
->  static void test_file_read_write(int fd)
->  {
-> @@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
->  	kvm_vm_free(vm);
->  }
->  
-> +static void guest_code(uint8_t *mem, uint64_t size)
-> +{
-> +	size_t i;
-> +
-> +	for (i = 0; i < size; i++)
-> +		__GUEST_ASSERT(mem[i] == 0xaa,
-> +			       "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
-> +
-> +	memset(mem, 0xff, size);
-> +	GUEST_DONE();
-> +}
-> +
-> +static void test_guest_memfd_guest(void)
-> +{
-> +	/*
-> +	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
-> +	 * the guest's code, stack, and page tables, and low memory contains
-> +	 * the PCI hole and other MMIO regions that need to be avoided.
-> +	 */
-> +	const uint64_t gpa = SZ_4G;
-> +	const int slot = 1;
-> +
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	uint8_t *mem;
-> +	size_t size;
-> +	int fd, i;
-> +
-> +	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
-> +		return;
-> +
-> +	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
-> +
-> +	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
-> +		    "Default VM type should always support guest_memfd mmap()");
-> +
-> +	size = vm->page_size;
-> +	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
-
-This test fails on arm64 when vm->page_size is 4k and host's page_size
-is 64k:
-
-[root@localhost kvm]# ./guest_memfd_test
-Random seed: 0x6b8b4567
-__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='660'
-==== Test Assertion Failure ====
-  include/kvm_util.h:683: fd >= 0
-  pid=889 tid=889 errno=22 - Invalid argument
-     1	0x000000000040262b: vm_create_guest_memfd at kvm_util.h:683
-     2	 (inlined by) test_guest_memfd_guest at guest_memfd_test.c:450
-     3	 (inlined by) main at guest_memfd_test.c:491
-     4	0x00007fff8f56af3b: ?? ??:0
-     5	0x00007fff8f56b007: ?? ??:0
-     6	0x0000000000402a2f: _start at ??:?
-  KVM_CREATE_GUEST_MEMFD failed, rc: -1 errno: 22 (Invalid argument)
-
-Thanks,
-Zenghui
-
-> +	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
-> +
-> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
-> +	memset(mem, 0xaa, size);
-> +	munmap(mem, size);
-> +
-> +	virt_pg_map(vm, gpa, gpa);
-> +	vcpu_args_set(vcpu, 2, gpa, size);
-> +	vcpu_run(vcpu);
-> +
-> +	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
-> +
-> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
-> +	for (i = 0; i < size; i++)
-> +		TEST_ASSERT_EQ(mem[i], 0xff);
-> +
-> +	close(fd);
-> +	kvm_vm_free(vm);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->  	unsigned long vm_types, vm_type;
-> @@ -314,4 +376,6 @@ int main(int argc, char *argv[])
->  
->  	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
->  		test_guest_memfd(vm_type);
-> +
-> +	test_guest_memfd_guest();
->  }
+> base-commit: c369299895a591d96745d6492d4888259b004a9e
+> -- 
+> 2.53.0.1018.g2bb0e51243-goog
+> 
