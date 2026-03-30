@@ -1,148 +1,246 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD3E372B2C
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 09:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3B13B7B92
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 10:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774863668; cv=none; b=A+tb1/rKY9ANEJBLVbQbD3k7aS0r5A8NRFdr+NP4+5afVsLaRHFQi6tILORyOC/6Afl4CLJr/FW/fcJv/L79fIcqF0UcX42sm3Zv9djlyUC2B9EghChWlxKtOIZVcxOz+IuahBENhVTaIRP9ixlaXXFQSU1Na9oiNbhHnexYkLY=
+	t=1774865224; cv=none; b=iKFuAhy9P2wtQUTRAf7QuyF4jANNs1oG7t+31dcuezR+hXleNFhEHsFFg41usoJSEBsX1F71y3y64jykaMco3DQzn6iWSOe9erJfvvZa1jJqT7VgkY2LxRi7bux6/Vxgkfw4AgVOrbuPb7fSwCB3yD1OrN2l4UVFDpLhW1XKqqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774863668; c=relaxed/simple;
-	bh=z4lDoyrwIQfXoh05jn3lKF2DCTkvjwaG2w5l2u1YWNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z3HdyvnnDx5Ocg2ke4xRLIcG7r7CzwqC/2TjmZSamcIod+zgooMXzl3WUvgJRcPEZvxepLXsKzUZp96Vv383FDr4+3E55r2Y1esjZ11SsJe4ykCKMKni396LyKLFwi61R67l1OJxYTRK3U6FN55bj9Pm/oEFeOhWtmh4IswFOWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dFXKmpNS; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1774865224; c=relaxed/simple;
+	bh=WiZexc2ub8nU/DOmgIujcFqlS73bkRYd4DhNzKaOO50=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AmKPcafUHENoNS6UzgifUbRmJI9aSZXXvajA/ytpJp2Vy9Y+Ls6h4F+g7scXDlqqMmMNnTr7SEjKmV9ac1BNn9NHGtgXImJA0RTUsiH0pm7ygj9Pr4lx5CIY/UK3l8mK4Cth3U7MWfQA5ZrWUo/TjNLs6iaZ9MSgZL2AcISQcn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pV1SqD7m; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dFXKmpNS"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a2ad56dbb2so2293437e87.3
-        for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 02:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774863666; x=1775468466; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZNGZDhto4jkAxNh9++YfrnwQanqMAXiu2o8XL7KzB8=;
-        b=dFXKmpNSDZn4Q4Rp43Jsh+oVv52yo6b8tdYuQNYw7YmehrXQcxexydS3zYENMmyjwe
-         gDtwYk4YDIQ8+9uiKKFoZMX+zsEJthp/W+jXrnsyqXHhODhoGh7FvS+k+6SmnxQf+mRf
-         ffPsVcjNDsmb9unt34sT2iZv628wnqGyuWNCq5tUDy8ta39C4ZsNUuF3dIHf+HSsc3DT
-         8K2h3fz8L92P10Q7VbHvKqGkrDHswbZw/ls4zRyo0oaF8Owh2WF/xEHvaEYGiEhfu5gX
-         56phWake0dJzMghEd0Jb1bXpnpLwHF5QhI3ssr+t9QjUZO5w1xUCZLdoOJQjn6/raqOO
-         TUiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774863666; x=1775468466;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zZNGZDhto4jkAxNh9++YfrnwQanqMAXiu2o8XL7KzB8=;
-        b=FNuqByrth5lU65fwPmUlzVDTqysI9b8BfGFa0B2nVh+cYxoj2dFET9TwsIbCXwFmhs
-         QLIvIbNLQOQ4BSeCL1K4896FYXeECE8K0d30k1Zt6v47z16av7CeRuTtp0ai8hoPGXVi
-         eybClHrtEIQMxR1eB5/PPXYO0pyFnIRteezE0oHDDoN/0bUhocuwcSQtBztUHdBzZuGr
-         PWju2eySluO3naSm/2RLyuz6K+l+mGAPyh6PtqBSHnglm8rvadA/4QUCjGh8N3h35LN8
-         e5Xrl5CN3RaOtKysA+6XfWNhpLSRD8FNl64EQkxNQgWcWORZ72EhrL6sf2Chrg8+be21
-         FX9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWj8zYcPOlFn7nFfbbKoRwV/7XRw/cnMBxEdI8UewCgf5z5KOnuG7w/86zFhH105eDl4wQL48w=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzkEHrtCCwOmVOR9Pmi2FEKvefYyPmeyefp+ZDHFORGbICGW7wY
-	2wjBYdWkicO5gKqzqEtvGEdqGjnfYn96oiijSEK7ImCGgVIX6ErS5Tv7QJ61cteXHA==
-X-Gm-Gg: ATEYQzw4kdqWDBIPP3SsggVOSUqnMcFAwvJnepsCrg8XYSbMHpju6P/YmedT/w9fX0Q
-	ZCUPXPBe8vBYodKcLE5/5gi/xYDMD4VMkKZ9/P+ihh8o/MPyrJ8rsIRAJOuPma4vUcCblDZzoNE
-	rYrqcOVo4YiAj7PkUjrjEGq8Xm276JrObZHAb6ZQPAwAS/+ECcrEi/2LcuW/Zy2qrW+zGsWj/RJ
-	9ob0Tr0+PX4vQggF6u/O3JoCZaYyI8qL0F3f1npTNu6+o9SJItH1jq3JEPqjK7IDL6uKSVrLiIk
-	+uTy2r/XZt/X+dicKEE6cbRYuGj1M3M/jiM/xqlGnUoYYMXzuNi6dvEy4cVzVlBCBxunJJdLrod
-	VTG93jM3OzvXsIgqqsjs+n99wW/g/sHXjxHzCRmVdSxu5hmvLZIGS6TccGj++x/Cjpy1+KQID5Y
-	4HeswbkQ8pwu02qGakYnhMW9MGiSo7dpSG7kXDBgBSjxxT48Xe4JCYe11yQdB+PozGVA==
-X-Received: by 2002:a05:6512:3f0c:b0:5a2:7a31:9194 with SMTP id 2adb3069b0e04-5a2ab80d971mr3942218e87.19.1774863664954;
-        Mon, 30 Mar 2026 02:41:04 -0700 (PDT)
-Received: from google.com (27.69.88.34.bc.googleusercontent.com. [34.88.69.27])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2b145f1dfsm1563489e87.79.2026.03.30.02.41.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 02:41:04 -0700 (PDT)
-Date: Mon, 30 Mar 2026 09:41:01 +0000
-From: Quentin Perret <qperret@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: pkvm: Rollback refcount on hyp share/unshare
- error
-Message-ID: <acpCq1qZCMFqocs3@google.com>
-References: <20260324172757.2147153-1-vdonnefort@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pV1SqD7m"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7855E1BF3;
+	Mon, 30 Mar 2026 03:06:55 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B33533F915;
+	Mon, 30 Mar 2026 03:06:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774865221; bh=WiZexc2ub8nU/DOmgIujcFqlS73bkRYd4DhNzKaOO50=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pV1SqD7mbs2drzteiqah10JAJ8066fD2/JaEPWnUQw6oHCCaa43wQLT9IByBb1bkK
+	 eqS0U34GyfQvbGg0N/Gpoi56PEk2U+7NmklK4C/2XztjVQ+HHhDzpizgZO2uFA/eH8
+	 styJ4FsFfgG8L6GWGPMKjYQflagEIg/jDNhs1MEU=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH 0/4] KVM: arm64: nv: Implement nested stage-2 reverse map
+Date: Mon, 30 Mar 2026 11:06:29 +0100
+Message-ID: <20260330100633.2817076-1-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260324172757.2147153-1-vdonnefort@google.com>
+Content-Transfer-Encoding: 8bit
 
-Hey Vincent,
+Hi,
 
-On Tuesday 24 Mar 2026 at 17:27:57 (+0000), Vincent Donnefort wrote:
-> If one of the HVC __pkvm_host_share_hyp or __pkvm_host_unshare_hyp fails,
-> rollback the refcount to ensure the hyp_shared_pfns tracking reflects
-> the actual sharing status.
+This series optimizes the shadow s2 mmu unmapping during MMU notifiers.
 
-If any of these hypercalls fail I think we're still in trouble as
-kvm_{un}share_hyp() work on multi-page ranges and we could leak pages in
-a borked state if we fail halfway through. And failing any of these
-hypercalls is also sign of a bigger problem somewhere else so I wasn't
-too worried.
+Motivation
+==========
 
-But if we're going to fix this properly, I'd suggest also improving the
-error handling in kvm_share_hyp(). 'Fixing' kvm_unshare_hyp() is a bit
-harder because we must tell the caller to leak the data structure that
-was shared I presume, so maybe we just keep the WARN and cross our
-fingers :)
+KVM registers MMU notifiers to unmap stage-2 mappings for the guest when
+the backing memory's userspace VA to PA translation has changed, some
+reasons include memory reclaim and and migration. In the non-NV case
+this is straight forward, the registered function simply unmaps the VM's
+IPA from the stage-2 page tables. However, in the NV case the nested
+MMUs store nested IPA to PA mappings, and we have no clue which of these
+nested mappings are backed by the same memory that the MMU notifiers are
+unmapping. The consequence is that since we don't know which nested
+mappings should be removed, we can only unmap every nested MMU in its
+entirety within the guest to be safe. This kills performance when MMU
+notifiers are called often, and we would like a better alternative than
+unmapping all shadow stage-2s everytime.
 
-Cheers,
-Quentin
+Design
+======
 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 17d64a1e11e5..0fb41d2c8b44 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -493,11 +493,17 @@ static int share_pfn_hyp(u64 pfn)
->  		goto unlock;
->  	}
->  
-> +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
-> +	if (ret) {
-> +		kfree(this);
-> +		goto unlock;
-> +	}
-> +
->  	this->pfn = pfn;
->  	this->count = 1;
->  	rb_link_node(&this->node, parent, node);
->  	rb_insert_color(&this->node, &hyp_shared_pfns);
-> -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
-> +
->  unlock:
->  	mutex_unlock(&hyp_shared_pfns_lock);
->  
-> @@ -521,9 +527,15 @@ static int unshare_pfn_hyp(u64 pfn)
->  	if (this->count)
->  		goto unlock;
->  
-> +	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
-> +	if (ret) {
-> +		this->count++;
-> +		goto unlock;
-> +	}
-> +
->  	rb_erase(&this->node, &hyp_shared_pfns);
->  	kfree(this);
-> -	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
-> +
->  unlock:
->  	mutex_unlock(&hyp_shared_pfns_lock);
->  
-> 
-> base-commit: c369299895a591d96745d6492d4888259b004a9e
-> -- 
-> 2.53.0.1018.g2bb0e51243-goog
-> 
+The basic idea is create a reverse map from the canonical IPA to the
+nested IPA, so that when the MMU notifier informs us about the canonical
+IPA range that must be unmapped, we can look up the reverse map to find
+the nested IPA range affected and unmap it from the nested MMU. To
+achieve fine grained unmapping, each nested MMU is equipped with its own
+reverse map.
+
+The maple tree is chosen to store the reverse map, mainly for its good
+support for dealing with ranges. Two methods of storing the reverse map
+are considered: either using the canonical IPA as the key for the tree,
+or using the PA as the key for the tree, the value stored is the nested
+IPA range for both. In this series the method using canonical IPA as the
+key is implemented, which I believe is a better scheme. A comparison
+between the two is presented in a later section.
+
+It is possible for a nested context to have multiple nested IPA ranges
+mapped to the same IPA. In these cases idealy our reverse map should
+contain 1-to-many relations, so that we are able to find all nested IPA
+ranges to unmap during MMU notifiers. However since this requires more
+information than what a 64 bit maple tree value can store, we will be
+forced to store the information in allocated data pointed to by the
+maple tree value. This creates extra memory we have to manage, and
+increases the maintenance effort from tracking 1-to-many mappings, for
+example by keeping a linked list of nested IPA ranges.
+
+Instead, we introduce what is called the "polluted" canonical IPA
+ranges, which means for these canonical IPA ranges we have lost track of
+what nested IPA ranges are mapped to this canonical IPA range. Polluted
+canonical IPA ranges are created when at shadow stage-2 fault time, we
+find that the canonical IPA range we are trying to insert to the reverse
+map overlaps one or more pre-existing ranges, in this case the minimum
+polluted spanning range is calculated and inserted to replace all
+pre-existing ranges.
+
+Example:
+|||| means existing range, ---- means empty range
+
+input:            $$$$$$$$$$$$$$$$$$$$$$$$$$
+tree:  --||||-----|||||||---------||||||||||-----------
+
+free overlaps:
+       --||||------------------------------------------
+insert spanning polluted range:
+       --||||-----||||||||||||||||||||||||||-----------
+                  ^^^^^^^^polluted!^^^^^^^^^
+
+Later when a request to unmap a canonical IPA range arises which affects
+a polluted canonical IPA range, simply fall back to unmapping the entire
+nested MMU.
+
+MMU notifier optimization
+=========================
+
+Every nested MMU keeps its own reverse map, therefore we must check
+every nested MMU when we unmap canonical IPA ranges in the MMU notifier,
+which is not efficient. We can leverage the canonical stage-2 MMU's
+unused maple tree to point to the nested MMUs that hold mappings
+of each stored canonical IPA range. This is implemented in patch 2 with
+more detail in the commit message.
+
+TLBI handling
+=============
+
+When a guest hypervisor issues a TLBI for a specific IPA range, KVM
+unmaps that range from all the effected shadow stage-2s. During this we
+get the opportunity to remove the reverse map, and lower the probability
+of creating polluted reverse map ranges at subsequent stage-2 faults.
+
+However, the TLBI ranges are specified in nested IPA, so in order to
+locate the affected ranges in the reverse map maple tree, which is a
+mapping from canonical IPA to nested IPA, we can only iterate through
+the entire tree and check each entry. This is implemented in patch 3.
+
+In patch 4, we further improve this by introducing a direct map that
+goes from nested IPA to canonical IPA, allowing us to quicky locate
+which reverse mapping to remove when handed a nested IPA range during
+TLBI handling.
+
+Reverse map key, canonical IPA vs PA
+====================================
+
+This is a brief comparison of using either canonical IPA or PA as the
+key to the reverse map, base on the 4 aspects of the implementation.
+
+Reverse map creation
+--------------------
+
+Using both canonical IPA and PA requires almost identical operations.
+
+Canonical IPA unmapping (MMU notifier)
+--------------------------------------
+
+For canonical IPA as the key, simply search the reverse map and
+invalidate the retrieved nested IPA range.
+
+For PA as the key, we must first translate the given canonical IPA range
+into PA either via
+
+a) walking the user space page table or..
+b) calling kvm_gmem_get_pfn() if the memslot is a guest_memfd one
+
+Further, kvm_gmem_get_pfn() forcefully allocates the physical page if
+the queried canonical IPA is not faulted in. This of course is not
+acceptable for our use case, so writing some guest_memfd code will be
+required for this to work.
+
+Canonical IPA unmapping optimization
+------------------------------------
+
+Using both canonical IPA and PA requires identical operation.
+
+TLBI handling
+-------------
+
+For canonical IPA as the key, like said above we can either:
+
+a) iterate the reverse map to find the entry to remove, or
+b) create a direct map to find the canonical IPA range
+
+For PA as the key, it is more straightforward, simply find the PA by
+walking the shadow stage-2, then remove the PA range from the reverse
+map. However this still requires a page table walk.
+
+Summary
+-------
+
+I believe it is clear that using canonical IPA as the key saves us a lot
+of trouble:
+
+a) no page table walks are required
+b) we go from dealing with 3 address spaces (PA, canonical IPA, nested
+IPA) to 2 (canonical IPA, nested IPA)
+c) the problem with guest_memfd is circumvented
+
+Locking
+=======
+
+All maple trees are protected by kvm.mmu_lock, therefore no maple tree
+locks are taken.
+
+Testing
+=======
+
+The current plan to test is to enhance kselftest with NV capability, so
+that we can instruct L1 and L2 to set up and access memory to populate
+shadow page tables, userspace can then trigger MMU notifiers by e.g.
+munmap, mremap, etc. During these operations userspace can read the
+shadow page tables exposed in debugfs [1] to check whether the shadow
+page tables are in an expected state or not.
+
+Thanks!
+
+[1]: https://lore.kernel.org/kvmarm/20260317182638.1592507-2-weilin.chang@arm.com
+
+Wei-Lin Chang (4):
+  KVM: arm64: nv: Avoid full shadow s2 unmap
+  KVM: arm64: nv: Accelerate canonical IPA unmapping with canonical s2
+    mmu maple tree
+  KVM: arm64: nv: Remove reverse map entries during TLBI handling
+  KVM: arm64: nv: Create nested IPA direct map to speed up reverse map
+    removal
+
+ arch/arm64/include/asm/kvm_host.h   |   7 +
+ arch/arm64/include/asm/kvm_nested.h |   5 +
+ arch/arm64/kvm/mmu.c                |  32 ++-
+ arch/arm64/kvm/nested.c             | 342 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/sys_regs.c           |   3 +
+ 5 files changed, 382 insertions(+), 7 deletions(-)
+
+-- 
+2.43.0
+
