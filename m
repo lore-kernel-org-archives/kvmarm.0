@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50657324B33
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0643242BD
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882247; cv=none; b=nfNyAJHrvlFsbiysrp0+SyErNBzE+64YqKuEFuSJ2nDo9ga997lSC1RGmlQJztpSpQ4pvvkFGX/SSmv9cqO2aiq6Ml+k9YRkBJzOYEbG743P2jnALCB7mpvvoC+p1cVr83H49e5JLhX8oNWXB82l+1tPtUeDpLd5VrQ5MheOG7I=
+	t=1774882250; cv=none; b=eoX8AvhQV2iys8+JgxHVvPsOAbWAX8c65ntRoDUC7pCovHxM3IoLTsP71GEduCK5AsNFna5F9kurTUBQohYr9K9aExyV3FaJ8qB3OGWkKBcAfKR10TQzDjR50fcI8rWpl7IOrsB5g1nhYsXHfg2gk0hYMpjeyBeXk+VwGtoMyMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882247; c=relaxed/simple;
-	bh=AQTCIMB9v84Q8tCnDop59lw8DExK5gGe2dtCnLlLy+w=;
+	s=arc-20240116; t=1774882250; c=relaxed/simple;
+	bh=GiSskl8OLA12RfOjYegapiMD5zVMQpADJ6x/WJGQmpQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DPTlCEjfaYjqBFO9H1UC+KZ8GlERvCYEPgfyAPr7HBhRAKB0M9nJSpHxlmPZUHnv/wAbNar1qRQskR3426Dw3swk8g3tXSrxtDKx6f8itLBwrCWGrDrEstqXH/xDTfebNDwzqIOTLJZcS+sKWnJYFpZ/S3Vi1LfYpOv+Ko+l2Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZbBkBsU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Pxb5mXb+CSV9YKWLOgpRwSZtrxHKUKjkV8fBGy961MzLXie9AhkCfp0iq0cpCyJOSV1TrckfVooq97zyLBwcQt0tqTnehmmwcyVUlruZ+7AKiMDZZDfdVojEsRrjQdOepx9LFC2+S1OPH7dic6eibKlF0OuabJgW43DcR8yHA/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBYb6CSv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZbBkBsU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F1CC4CEF7;
-	Mon, 30 Mar 2026 14:50:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBYb6CSv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3DDCC4CEF7;
+	Mon, 30 Mar 2026 14:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774882247;
-	bh=AQTCIMB9v84Q8tCnDop59lw8DExK5gGe2dtCnLlLy+w=;
+	s=k20201202; t=1774882250;
+	bh=GiSskl8OLA12RfOjYegapiMD5zVMQpADJ6x/WJGQmpQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eZbBkBsUJKCF/Nr0StZnLHmstvf8g0Vd3W1JMPW0n1g3hP8CYlbiDxBn4Xj7GH3xS
-	 DTKeTWmJ2XAdTbTt2FnrE/WFLTVXFUP2m7HmVL86L81rQHYW4ZQA8HmhSIclSjj3dq
-	 8QCcGo/aCemgEncw+DOnTc04GhLtck6zsjiMxTPPXfS1ZdLVmwM5VsXduegtTS85x2
-	 ti+h0TG0QZTMKE4aksoJzlasWm/8eXXUYFs2Ts55A2fy/B/ukRtTAT9MNFegDo74jX
-	 edP+VpXpX3f3Pt/KL6EYFv1gXyuURSZ2X8566S9RIYiR1NNFHIUgQwAjb5zNysW+U/
-	 FtJbzAFKKltgQ==
+	b=rBYb6CSvb0qq4VRZK4TH0YhGUUtgPYKfm5g69OM1x1bCv5Zp8f1tJguRkM3LNoMdj
+	 m4hZt6LKkNPVTjLToBmw3lWE2Cn3It40yvLporQU496rEDTJzRTLugOT5cOHdz8XjJ
+	 Dzu8OIiuwd69ReU7x/G3UDRYsQIs+VGlbu0FfP0f1e/2S1qKeRpQ5OB89Rtn4LtAsK
+	 TB+rakES9BH2rPwhBH3yZlxbHE76E+RaiZgfqTc8LDEbljuDzlrQakY7MU4r0beW7A
+	 5lk6bu+SDAlZ9LR1eSFm3Bdar/J51PPN1nR/0bd/jnLdFMWJlGM7ER4X7GS6fYCfhe
+	 2+ZOoo9J+muTw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v5 35/38] KVM: arm64: Extend pKVM page ownership selftests to cover forced reclaim
-Date: Mon, 30 Mar 2026 15:48:36 +0100
-Message-ID: <20260330144841.26181-36-will@kernel.org>
+Subject: [PATCH v5 36/38] KVM: arm64: Extend pKVM page ownership selftests to cover guest hvcs
+Date: Mon, 30 Mar 2026 15:48:37 +0100
+Message-ID: <20260330144841.26181-37-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260330144841.26181-1-will@kernel.org>
 References: <20260330144841.26181-1-will@kernel.org>
@@ -55,43 +55,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extend the pKVM page ownership selftests to forcefully reclaim a donated
-page and check that it cannot be re-donated at the same IPA.
+Now that the guest can share and unshare memory with the host using
+hypercalls, extend the pKVM page ownership selftest to exercise these
+new transitions.
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Tested-by: Mostafa Saleh <smostafa@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 30 +++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d8f8ebe59129..0775a82ee4fe 100644
+index 0775a82ee4fe..28a471d1927c 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -1815,8 +1815,20 @@ void pkvm_ownership_selftest(void *base)
+@@ -1814,11 +1814,41 @@ void pkvm_ownership_selftest(void *base)
+ 	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
  	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
  
- 	selftest_state.host = PKVM_PAGE_OWNED;
--	selftest_state.guest[0] = PKVM_NOPAGE;
--	assert_transition_res(0,	__pkvm_host_reclaim_page_guest, gfn, vm);
-+	selftest_state.guest[0] = PKVM_POISON;
-+	assert_transition_res(0,	__pkvm_host_force_reclaim_page_guest, phys);
++	selftest_state.host = PKVM_PAGE_SHARED_BORROWED;
++	selftest_state.guest[0] = PKVM_PAGE_SHARED_OWNED;
++	assert_transition_res(0,	__pkvm_guest_share_host, vcpu, gfn);
++	assert_transition_res(-EPERM,	__pkvm_guest_share_host, vcpu, gfn);
 +	assert_transition_res(-EPERM,	__pkvm_host_donate_guest, pfn, gfn, vcpu);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
 +	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
++	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn + 1, 1, vcpu, prot);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
 +
 +	selftest_state.host = PKVM_NOPAGE;
-+	selftest_state.guest[1] = PKVM_PAGE_OWNED;
-+	assert_transition_res(0,	__pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
-+
-+	selftest_state.host = PKVM_PAGE_OWNED;
-+	selftest_state.guest[1] = PKVM_NOPAGE;
-+	assert_transition_res(0,	__pkvm_host_reclaim_page_guest, gfn + 1, vm);
++	selftest_state.guest[0] = PKVM_PAGE_OWNED;
++	assert_transition_res(0,	__pkvm_guest_unshare_host, vcpu, gfn);
++	assert_transition_res(-EPERM,	__pkvm_guest_unshare_host, vcpu, gfn);
 +	assert_transition_res(-EPERM,	__pkvm_host_donate_guest, pfn, gfn, vcpu);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_guest, pfn, gfn + 1, vcpu);
 +	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
++	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn + 1, 1, vcpu, prot);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
++
+ 	selftest_state.host = PKVM_PAGE_OWNED;
+ 	selftest_state.guest[0] = PKVM_POISON;
+ 	assert_transition_res(0,	__pkvm_host_force_reclaim_page_guest, phys);
+ 	assert_transition_res(-EPERM,	__pkvm_host_donate_guest, pfn, gfn, vcpu);
+ 	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, 1, vcpu, prot);
++	assert_transition_res(-EHWPOISON, __pkvm_guest_share_host, vcpu, gfn);
++	assert_transition_res(-EHWPOISON, __pkvm_guest_unshare_host, vcpu, gfn);
  
  	selftest_state.host = PKVM_NOPAGE;
- 	selftest_state.hyp = PKVM_PAGE_OWNED;
+ 	selftest_state.guest[1] = PKVM_PAGE_OWNED;
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
