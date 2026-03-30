@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6655329E5C
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A691324B23
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882157; cv=none; b=mTmsKS4JcY78sdLR797QaJPwa+/Izz1cz4vG3p7adkzQTmSKdTYzGuIb8/QkBvyxZ9kUXf1qNP9N3Oxoibm3vrQdjgaFn8BJX4LHCogFE2Wgj698dzJRhkjHhaQxmUwjOPZKcnxXcNHUJ23tbuSLi+zVW2yl9WpINLIBIf5zfUU=
+	t=1774882161; cv=none; b=RYw+gyX3x8kTKlYSQfn072GtOVbvS+/mjfpmVcV46XOyFCt4Q5PfJip+orhARalrMC8umGmg4dJlz81znxuXBnQeJR5j6CHAsv0ZFNuGt1F4+2KiBfm8PNCJVPOiwvIfZfGGZhn/4o4YGgAGjiMoB4dn9a0jlGfvf+gIa+vUUJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882157; c=relaxed/simple;
-	bh=/BxvkufNMC6Kn6LsbaQ15SUXIbt9TyUSXKShJCXUoWE=;
+	s=arc-20240116; t=1774882161; c=relaxed/simple;
+	bh=7P+uzxldFf+9qg+nRD40JCugsSDrZRwu1jtKYArToK8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DZhqHktkt3uuDoUdtVspYPLl0KuP1Oi0RNqogCYANFZ99TqnadRN+xJhQZxhaV6w/QwJw0SOqR83NsB2vI2mE3s17LGM5lP4/5Kg1I8pZNctz2ncsio1y1vG+zHNEmQkGpLGbD+B8uPinFX1SwO3p6MzkyVP7JG/6ajtXXSMcVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmK69iyx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Z8nZ3H0Or+2/tTy4q5nIrcyRr02fFhHOdxLUhBNAkfVk5pR3ksjaJcKfiqZEeIrXyQC4bBxL57L3tdtKyeQyhe1Oz2xHROq2U2GyDk5t9OTGaOk7amRIFCsoQUDZWFzJBkJfZCx9LroOGWN14GBcA7FMq0iVS1PM7CNbhfsyYSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMeOEdH2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmK69iyx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EADDFC19423;
-	Mon, 30 Mar 2026 14:49:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMeOEdH2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41056C2BCB1;
+	Mon, 30 Mar 2026 14:49:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774882157;
-	bh=/BxvkufNMC6Kn6LsbaQ15SUXIbt9TyUSXKShJCXUoWE=;
+	s=k20201202; t=1774882161;
+	bh=7P+uzxldFf+9qg+nRD40JCugsSDrZRwu1jtKYArToK8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BmK69iyx+JhAIZBWrndMgC+BCS1MaOyE2m3a6gSYBJyU4lH7pqCoK4BzxNxI0i5EA
-	 vpA22sqjU90E/PBNulTizk/T/zGg8tHmdF9DUUKPilnW+WDqOP/ANDgIoDvOD0SGDQ
-	 wWQhLrhw0DO/j6xvbiaqHR/jjc75FCLvqhmHog+PShS3VqP3FN/tyvJuoCwG4MH1A3
-	 OnqSvhsy/1KY9IWuEJ0qo1gm5xyJr8ztqOr1ja1xe1aUiIMEBhreAwA+Ja/LVH/Rcf
-	 jokn+I0GOdh5LlyATlnFxu1CldNRLJROqc1b39YXcHHfSpEPrrTeczYM6zQZQ45/fx
-	 qmtimgninF79g==
+	b=VMeOEdH2h+jUvGV7ydQh9oSm/Dj1t2ykqHJYdjyvymnP3dDB/nxB++AdjPzaWCHlq
+	 OXBDjpVwU4hKwy7zMgh8H8dMSRofvftFiAMVTexSWcEGMrvp1diz52/JiDZoLFevqe
+	 3YAZhO/uUOy5bBbQN+6Peg+D5eZ6r9tDoogKbIcdTFA3bOJ3mZkNl0vhBt0+uSW2Cb
+	 FulM8Gy/h5nKWvwz0qdUqtHQLcxGD0PPtWokTLZLUj3oXo/vaTqc+mnbYXSkw4JzVz
+	 gm2qVysFx9KbOxomjdEMSujIh3gQNxai9mVJweAFIXxMi9yj6797dRyy9uv/yZdhW6
+	 3TuEttyqW1h/w==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v5 08/38] KVM: arm64: Ignore MMU notifier callbacks for protected VMs
-Date: Mon, 30 Mar 2026 15:48:09 +0100
-Message-ID: <20260330144841.26181-9-will@kernel.org>
+Subject: [PATCH v5 09/38] KVM: arm64: Prevent unsupported memslot operations on protected VMs
+Date: Mon, 30 Mar 2026 15:48:10 +0100
+Message-ID: <20260330144841.26181-10-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260330144841.26181-1-will@kernel.org>
 References: <20260330144841.26181-1-will@kernel.org>
@@ -55,117 +55,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In preparation for supporting the donation of pinned pages to protected
-VMs, return early from the MMU notifiers when called for a protected VM,
-as the necessary hypercalls are exposed only for non-protected guests.
+Protected VMs do not support deleting or moving memslots after first
+run nor do they support read-only or dirty logging.
+
+Return -EPERM to userspace if such an operation is attempted.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Tested-by: Fuad Tabba <tabba@google.com>
 Tested-by: Mostafa Saleh <smostafa@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmu.c  |  9 ++++++---
- arch/arm64/kvm/pkvm.c | 19 ++++++++++++++++++-
- 2 files changed, 24 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/mmu.c  | 13 +++++++++++++
+ arch/arm64/kvm/pkvm.c |  6 ++++++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 17d64a1e11e5..5e7821fe0fc4 100644
+index 5e7821fe0fc4..b3cc5dfe5723 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -340,6 +340,9 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
- void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
- 			    u64 size, bool may_block)
- {
-+	if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
-+		return;
-+
- 	__unmap_stage2_range(mmu, start, size, may_block);
- }
- 
-@@ -2223,7 +2226,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	if (!kvm->arch.mmu.pgt)
-+	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
- 		return false;
- 
- 	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
-@@ -2238,7 +2241,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	u64 size = (range->end - range->start) << PAGE_SHIFT;
- 
--	if (!kvm->arch.mmu.pgt)
-+	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
- 		return false;
- 
- 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
-@@ -2254,7 +2257,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	u64 size = (range->end - range->start) << PAGE_SHIFT;
- 
--	if (!kvm->arch.mmu.pgt)
-+	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
- 		return false;
- 
- 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 42f6e50825ac..dd93dfdfe52d 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -407,7 +407,12 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 
- int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
--	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(pgt->mmu)->mmu_lock);
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-+
-+	if (WARN_ON(kvm_vm_is_protected(kvm)))
-+		return -EPERM;
-+
-+	lockdep_assert_held_write(&kvm->mmu_lock);
- 
- 	return __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
- }
-@@ -419,6 +424,9 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	struct pkvm_mapping *mapping;
+@@ -2414,6 +2414,19 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	hva_t hva, reg_end;
  	int ret = 0;
  
-+	if (WARN_ON(kvm_vm_is_protected(kvm)))
-+		return -EPERM;
++	if (kvm_vm_is_protected(kvm)) {
++		/* Cannot modify memslots once a pVM has run. */
++		if (pkvm_hyp_vm_is_created(kvm) &&
++		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
++			return -EPERM;
++		}
 +
- 	lockdep_assert_held(&kvm->mmu_lock);
- 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
- 		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
-@@ -450,6 +458,9 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
- 	struct pkvm_mapping *mapping;
- 	bool young = false;
- 
-+	if (WARN_ON(kvm_vm_is_protected(kvm)))
-+		return false;
++		if (new &&
++		    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
++			return -EPERM;
++		}
++	}
 +
- 	lockdep_assert_held(&kvm->mmu_lock);
- 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
- 		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
-@@ -461,12 +472,18 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
- int pkvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
- 				    enum kvm_pgtable_walk_flags flags)
+ 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+ 			change != KVM_MR_FLAGS_ONLY)
+ 		return 0;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index dd93dfdfe52d..94b70eb80aa8 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -192,10 +192,16 @@ int pkvm_create_hyp_vm(struct kvm *kvm)
  {
-+	if (WARN_ON(kvm_vm_is_protected(kvm_s2_mmu_to_kvm(pgt->mmu))))
-+		return -EPERM;
-+
- 	return kvm_call_hyp_nvhe(__pkvm_host_relax_perms_guest, addr >> PAGE_SHIFT, prot);
- }
+ 	int ret = 0;
  
- void pkvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
- 				 enum kvm_pgtable_walk_flags flags)
- {
-+	if (WARN_ON(kvm_vm_is_protected(kvm_s2_mmu_to_kvm(pgt->mmu))))
-+		return;
-+
- 	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_mkyoung_guest, addr >> PAGE_SHIFT));
- }
++	/*
++	 * Synchronise with kvm_arch_prepare_memory_region(), as we
++	 * prevent memslot modifications on a pVM that has been run.
++	 */
++	mutex_lock(&kvm->slots_lock);
+ 	mutex_lock(&kvm->arch.config_lock);
+ 	if (!pkvm_hyp_vm_is_created(kvm))
+ 		ret = __pkvm_create_hyp_vm(kvm);
+ 	mutex_unlock(&kvm->arch.config_lock);
++	mutex_unlock(&kvm->slots_lock);
  
+ 	return ret;
+ }
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
