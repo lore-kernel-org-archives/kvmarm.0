@@ -1,129 +1,188 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C34A18C02E
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 04:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038681EE7C6
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 06:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774846674; cv=none; b=jLcOyJoDhHbryu/E2Fn1bKqj3EtQc2tVkp3Th5wXta8GDWfZmhd1DBobFUQud/COr+C7oK1hyQnY0C+5lrO6H7WIBmwe0D1vDqom4k6LhSy5ut8NvwNPxUgNQAZFnLNKiMoMxU0HifWgX1QAWyPco8ChhT35/jiV/OK/iplpepo=
+	t=1774851732; cv=none; b=s4xQjAgEXRbQLyt9OZqJ6Ei2AxdcrGrlPaFYDODJDCGsO5IIpAuJQvXr81nbi4PhD+zlSx0g7F8fTZKwq+gVgeKzA91tDjCa0DpMiJaV/pr8Vd8U2Bvkr8/mojFaWrf1IJy+rNfTq2OejFSCg/Fi8Y96JDVxAsq/RECGNw5JPgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774846674; c=relaxed/simple;
-	bh=QaLFBPGPcR9DUZ8VRQyMuGIuOhU4fJIFDEX7tp7QiuA=;
+	s=arc-20240116; t=1774851732; c=relaxed/simple;
+	bh=2Q3sHfHVl0uTOU0PkxV4Dtu553zyQ5HsII5inPyRfTw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tTUkzfn0VlrXv3fo1QWNOPGdGioHAQmqbjnnWSopohtvG+gl0V7sIYboU+eXZIfgeFbSkxKDbkz04S8bwjgnm5Wo0eDMTQWWPc9HVIEMaZAeZ9qu7DlyPxjzp2EfUzdrH3ifeuis4LAV7wZsTzkBibDSQbp5//vLI3wlT5aX2EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vV3xvxKG; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 In-Reply-To:Content-Type; b=rsMPLNL2ZJbT1+v+BN9oEBq14HrxfIkR6nnBfmI/dUju8dpU5QBX5Rr21dE7pUp0pVqhkGPAO3YTCQweSYzLZepoEIksI2HKxliJv4mns5kS3puL0KuUNtKUVJlRZ3jKm95DvgpDBvArFI8NFr2dQjXh+7kdCrbssKs3C62O9fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ITBmfkdG; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vV3xvxKG"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A57931C2B;
-	Sun, 29 Mar 2026 21:57:45 -0700 (PDT)
-Received: from [10.164.18.48] (unknown [10.164.18.48])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 745763F915;
-	Sun, 29 Mar 2026 21:57:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774846671; bh=QaLFBPGPcR9DUZ8VRQyMuGIuOhU4fJIFDEX7tp7QiuA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vV3xvxKG1nY/L7ne/t/EU5usEAdqjd/SQdX7SFtzF920hbTP5O3CQpdnNk02bR6r5
-	 5GscpPsBhu2DvYGZ/Bfwo67cAB9SsdQqv2U35zpc9/oArHDaQ6iK/kmut+jkt9Bgvt
-	 JkWREKPXgYOG8wfhQfgKTiWYWWk2jQToqOCi8iwY=
-Message-ID: <849e40d3-f77b-45ba-bf03-744e8a306b2b@arm.com>
-Date: Mon, 30 Mar 2026 10:27:45 +0530
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ITBmfkdG"
+Message-ID: <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774851728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JRGlqTUddNs22qbjK1XF9AytOTARdjde3qWaPPuWarI=;
+	b=ITBmfkdGvwuPDXnsffYC3RL1CaOmCF/2VlOTHdKT+Q7ImF10cXOMIoVaLLRIU4blXOt6tP
+	duQCcmk2g36LuwcQWBgCNhYQYhVZf0XcLdzLJABnsHxs6Gkks4lvw9jpYB4A7jo5ZZy2Hs
+	0Pk3+FiE2FReGdaXwbt6hKscxnFc+Cc=
+Date: Mon, 30 Mar 2026 14:21:50 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/30] KVM: arm64: Isolate mmap_read_lock inside new
- kvm_s2_fault_get_vma_info() helper
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
- Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>
-References: <20260327113618.4051534-1-maz@kernel.org>
- <20260327113618.4051534-5-maz@kernel.org>
+Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
+ fault-in on !mmap()'d memory
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+ Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
+ James Houghton <jthoughton@google.com>
+References: <20250729225455.670324-1-seanjc@google.com>
+ <20250729225455.670324-25-seanjc@google.com>
 Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20260327113618.4051534-5-maz@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20250729225455.670324-25-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+Hi,
 
-
-On 27/03/26 5:05 PM, Marc Zyngier wrote:
-> From: Fuad Tabba <tabba@google.com>
+On 7/30/25 6:54 AM, Sean Christopherson wrote:
+> Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
+> memory that supports mmap(), but that is not currently mapped into host
+> userspace and/or has a userspace address (in the memslot) that points at
+> something other than the target guest_memfd range.  Mapping guest_memfd
+> memory into the guest is supposed to operate completely independently from
+> any userspace mappings.
 > 
-> Extract the VMA lookup and metadata snapshotting logic from
-> kvm_s2_fault_pin_pfn() into a tightly-scoped sub-helper.
-> 
-> This refactoring structurally fixes a TOCTOU (Time-Of-Check to
-> Time-Of-Use) vulnerability and Use-After-Free risk involving the vma
-> pointer. In the previous layout, the mmap_read_lock is taken, the vma is
-> looked up, and then the lock is dropped before the function continues to
-> map the PFN. While an explicit vma = NULL safeguard was present, the vma
-> variable was still lexically in scope for the remainder of the function.
-> 
-> By isolating the locked region into kvm_s2_fault_get_vma_info(), the vma
-> pointer becomes a local variable strictly confined to that sub-helper.
-> Because the pointer's scope literally ends when the sub-helper returns,
-> it is not possible for the subsequent page fault logic in
-> kvm_s2_fault_pin_pfn() to accidentally access the vanished VMA,
-> eliminating this bug class by design.
-
-Makes sense.
-
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
-
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/arm64/kvm/mmu.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+>  .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
+>  1 file changed, 64 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 5079a58b65b14..1f2c2200ccd8d 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1740,7 +1740,7 @@ struct kvm_s2_fault {
->  	vm_flags_t vm_flags;
->  };
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index 088053d5f0f5..b86bf89a71e0 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -13,6 +13,7 @@
 >  
-> -static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
-> +static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+>  #include <linux/bitmap.h>
+>  #include <linux/falloc.h>
+> +#include <linux/sizes.h>
+>  #include <setjmp.h>
+>  #include <signal.h>
+>  #include <sys/mman.h>
+> @@ -21,6 +22,7 @@
+>  
+>  #include "kvm_util.h"
+>  #include "test_util.h"
+> +#include "ucall_common.h"
+>  
+>  static void test_file_read_write(int fd)
 >  {
->  	struct vm_area_struct *vma;
->  	struct kvm *kvm = fault->vcpu->kvm;
-> @@ -1774,9 +1774,6 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+> @@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
+>  	kvm_vm_free(vm);
+>  }
 >  
->  	fault->is_vma_cacheable = kvm_vma_is_cacheable(vma);
->  
-> -	/* Don't use the VMA after the unlock -- it may have vanished */
-> -	vma = NULL;
-> -
->  	/*
->  	 * Read mmu_invalidate_seq so that KVM can detect if the results of
->  	 * vma_lookup() or __kvm_faultin_pfn() become stale prior to
-> @@ -1788,6 +1785,17 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
->  	fault->mmu_seq = kvm->mmu_invalidate_seq;
->  	mmap_read_unlock(current->mm);
->  
-> +	return 0;
+> +static void guest_code(uint8_t *mem, uint64_t size)
+> +{
+> +	size_t i;
+> +
+> +	for (i = 0; i < size; i++)
+> +		__GUEST_ASSERT(mem[i] == 0xaa,
+> +			       "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
+> +
+> +	memset(mem, 0xff, size);
+> +	GUEST_DONE();
 > +}
 > +
-> +static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+> +static void test_guest_memfd_guest(void)
 > +{
-> +	int ret;
+> +	/*
+> +	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
+> +	 * the guest's code, stack, and page tables, and low memory contains
+> +	 * the PCI hole and other MMIO regions that need to be avoided.
+> +	 */
+> +	const uint64_t gpa = SZ_4G;
+> +	const int slot = 1;
 > +
-> +	ret = kvm_s2_fault_get_vma_info(fault);
-> +	if (ret)
-> +		return ret;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	uint8_t *mem;
+> +	size_t size;
+> +	int fd, i;
 > +
->  	fault->pfn = __kvm_faultin_pfn(fault->memslot, fault->gfn,
->  				       fault->write_fault ? FOLL_WRITE : 0,
->  				       &fault->writable, &fault->page);
+> +	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
+> +		return;
+> +
+> +	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+> +
+> +	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
+> +		    "Default VM type should always support guest_memfd mmap()");
+> +
+> +	size = vm->page_size;
+> +	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
 
+This test fails on arm64 when vm->page_size is 4k and host's page_size
+is 64k:
+
+[root@localhost kvm]# ./guest_memfd_test
+Random seed: 0x6b8b4567
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='660'
+==== Test Assertion Failure ====
+  include/kvm_util.h:683: fd >= 0
+  pid=889 tid=889 errno=22 - Invalid argument
+     1	0x000000000040262b: vm_create_guest_memfd at kvm_util.h:683
+     2	 (inlined by) test_guest_memfd_guest at guest_memfd_test.c:450
+     3	 (inlined by) main at guest_memfd_test.c:491
+     4	0x00007fff8f56af3b: ?? ??:0
+     5	0x00007fff8f56b007: ?? ??:0
+     6	0x0000000000402a2f: _start at ??:?
+  KVM_CREATE_GUEST_MEMFD failed, rc: -1 errno: 22 (Invalid argument)
+
+Thanks,
+Zenghui
+
+> +	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
+> +
+> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +	memset(mem, 0xaa, size);
+> +	munmap(mem, size);
+> +
+> +	virt_pg_map(vm, gpa, gpa);
+> +	vcpu_args_set(vcpu, 2, gpa, size);
+> +	vcpu_run(vcpu);
+> +
+> +	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
+> +
+> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +	for (i = 0; i < size; i++)
+> +		TEST_ASSERT_EQ(mem[i], 0xff);
+> +
+> +	close(fd);
+> +	kvm_vm_free(vm);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	unsigned long vm_types, vm_type;
+> @@ -314,4 +376,6 @@ int main(int argc, char *argv[])
+>  
+>  	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+>  		test_guest_memfd(vm_type);
+> +
+> +	test_guest_memfd_guest();
+>  }
