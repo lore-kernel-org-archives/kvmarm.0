@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2673D9036
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7592C3DA5B8
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 14:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774880657; cv=none; b=cBHKL9Vvhriu2xTRjlt/6CAwo/ouNMDhyoFyiMij7SUmRsvMypCniDgxb2MVEByvl5Kclm2xc+/7uN9sX+5YsSe+wDmVIOr+w/tDk4vm/uyVVANFofmzFgVP27QYdgYoc/fmwXucPumXHEHInzz111zAF80pNUBrIAQkdO6WLuk=
+	t=1774880659; cv=none; b=mjWpVhyoYgijymlpVCbqAvwR+wnWTl4zGQGA84X6QecQawBm3r63+BAn9k4csGbbdWf4xZN3JXjrlauFTcbrQlbjSN7dwMkO5YHNqkNNxBOkZe+XbEDx7h0z/t/PItmuLQFJsDlTbZBWYF8bth3iJmm5fNw6gf2oFVdviHAJM1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774880657; c=relaxed/simple;
-	bh=7X/UQORjTe0Fzi/AdU6GU+4kh3/A+t/fVz3dIspZI1w=;
+	s=arc-20240116; t=1774880659; c=relaxed/simple;
+	bh=fwjLbSUCVBKp2+5ehukf18tkFtjg9ytsRTv5sZMnrL8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UcdPrBrDXlfItS8d4hlyBGyiDkQJEb6a6VU3fEb6W2v4vvahiBnFUV61QfP8gYWSX1mohiDUXmbfOGUu6A7SPWpcl3W9a1W44LBGrR65ytyuCl/eZQ1CbdE51DKPtyk5qf7q8NkzjwGSAVVLKSoaMrn3sO1j1yCL2x7VEOEC3WA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Rn+zfFKz; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=sCHSiesCAbaEWEMsIY9xEPlTO1CVf1N1Im7Wp8eg+B7XYd4FkH1aZo3amrBwLUhwbhBkQE243BVMW2/T5Iw31MPNL5e7C96QNm+jEXt4RUJSPVMBp8g+JPVacoPcy+KimUC9PUfBtFWxZqMzyjdPeXLHgzJOCykWr1nNLRdpuj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VBbvGlrn; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Rn+zfFKz"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VBbvGlrn"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AF6A1A2D;
-	Mon, 30 Mar 2026 07:24:09 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 163C61D15;
+	Mon, 30 Mar 2026 07:24:11 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 948DF3F915;
-	Mon, 30 Mar 2026 07:24:13 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 66B753F915;
+	Mon, 30 Mar 2026 07:24:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774880655; bh=7X/UQORjTe0Fzi/AdU6GU+4kh3/A+t/fVz3dIspZI1w=;
+	t=1774880656; bh=fwjLbSUCVBKp2+5ehukf18tkFtjg9ytsRTv5sZMnrL8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rn+zfFKz8bJsL7gDA7U7lfvfLGPU802moFnx5InYjDrHXNdCy0GmDaRcP2Ero5pCE
-	 whbCQqRzMbuvsyb52Sqg5dvvsm4e1uDUGn3oscW500FTQ3Kd+m7/eevNx0cV71X3Yj
-	 jXrkV7+qwjL3N9XMKde6pgtmgN6aFNeIXV6X5MfU=
+	b=VBbvGlrnK4+zQf2F6UvXQIBUv1L8yMQwGP9hgn9sgIWC1XQ/yJ6KCXqXVtiZG/m+s
+	 kK4EdtOTcZR2O3mULTeFCccHKGI9yYgfgDgSoebJ2D2xLnwQg/p5s9Fku9kKDqYG4z
+	 MnytV7AdUWLGQTJg+JC6qepDYdOeYeDknALtrspg=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev,
 	will@kernel.org
@@ -37,9 +37,9 @@ Cc: kvm@vger.kernel.org,
 	aneesh.kumar@kernel.org,
 	linux-kernel@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v7 02/17] util/update_headers: Clean up header copying
-Date: Mon, 30 Mar 2026 15:23:19 +0100
-Message-ID: <20260330142334.3309961-3-suzuki.poulose@arm.com>
+Subject: [PATCH v7 03/17] util/update_headers: Warn about missing header files
+Date: Mon, 30 Mar 2026 15:23:20 +0100
+Message-ID: <20260330142334.3309961-4-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260330142334.3309961-1-suzuki.poulose@arm.com>
 References: <20260330142334.3309961-1-suzuki.poulose@arm.com>
@@ -51,57 +51,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We copy two kinds of headers. Generic Linux UAPI headers and the ASM UAPI headers
-for arch specific targets. Introduce helper functions for each and centralise
-the copy process
+Warn about missing header files, rather than silently ignoring.
 
+Cc: Will Deacon <will@kernel.org>
+Link: https://lore.kernel.org/all/aYoCiXg8pSC_bwIv@willie-the-truck/
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- util/update_headers.sh | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ util/update_headers.sh | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/util/update_headers.sh b/util/update_headers.sh
-index af75ca36..7902dddb 100755
+index 7902dddb..2f981ca3 100755
 --- a/util/update_headers.sh
 +++ b/util/update_headers.sh
-@@ -28,17 +28,19 @@ then
- 	exit 1
- fi
- 
--cp -- "$LINUX_ROOT/include/uapi/linux/kvm.h" include/linux
-+copy_uapi_linux_header () {
-+	cp -- "$LINUX_ROOT/include/uapi/linux/$1" include/linux
-+}
- 
--for header in $VIRTIO_LIST
-+for header in kvm.h $VIRTIO_LIST
- do
--	cp -- "$LINUX_ROOT/include/uapi/linux/$header" include/linux
-+	copy_uapi_linux_header $header
- done
- 
+@@ -40,11 +40,14 @@ done
  unset KVMTOOL_PATH
  
--copy_optional_arch () {
--	local src="$LINUX_ROOT/arch/$arch/include/uapi/$1"
-+copy_uapi_asm_header () {
-+	local src="$LINUX_ROOT/arch/$arch/include/uapi/asm/$1"
+ copy_uapi_asm_header () {
+-	local src="$LINUX_ROOT/arch/$arch/include/uapi/asm/$1"
++	local file="arch/$arch/include/uapi/asm/$1"
++	local src="$LINUX_ROOT/$file"
  
  	if [ -r "$src" ]
  	then
-@@ -51,8 +53,9 @@ do
- 	KVMTOOL_PATH=$arch
+ 		cp -- "$src" "$KVMTOOL_PATH/include/asm/"
++	else
++		echo "Warning: Unable to find $file, skipping..."
+ 	fi
+ }
  
- 	case $arch in
--		arm64) copy_optional_arch asm/sve_context.h ;;
-+		arm64)
-+			copy_uapi_asm_header sve_context.h
-+			;;
- 	esac
--	cp -- "$LINUX_ROOT/arch/$arch/include/uapi/asm/kvm.h" \
--		"$KVMTOOL_PATH/include/asm"
-+	copy_uapi_asm_header kvm.h
- done
 -- 
 2.43.0
 
