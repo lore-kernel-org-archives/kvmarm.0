@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6DE78F3E
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 04:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C34A18C02E
+	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 04:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774845199; cv=none; b=R6sElzJqA+/HdDzBbeWKjlGAPuySPqLMWcm14J3sWpHodvuXjk+adkXjiDReujAe+56Dj+V+dHGwxgff/yPOe9bFLHlmQSMr/wGY52jltpOUVoOjDpwx9z65qAUCntbxXJ41OXxcF1GhHtCbv0gtZ3aKhxmhoqYHRkixal7CbB0=
+	t=1774846674; cv=none; b=jLcOyJoDhHbryu/E2Fn1bKqj3EtQc2tVkp3Th5wXta8GDWfZmhd1DBobFUQud/COr+C7oK1hyQnY0C+5lrO6H7WIBmwe0D1vDqom4k6LhSy5ut8NvwNPxUgNQAZFnLNKiMoMxU0HifWgX1QAWyPco8ChhT35/jiV/OK/iplpepo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774845199; c=relaxed/simple;
-	bh=1p2nxp7zPmbLPGIYzAgHmPQw4RKW7Te37pm+Fj7BROU=;
+	s=arc-20240116; t=1774846674; c=relaxed/simple;
+	bh=QaLFBPGPcR9DUZ8VRQyMuGIuOhU4fJIFDEX7tp7QiuA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qJcjfv58kfHwPRZvHgjQpGR3tjCrwBu0/hviOvy2XaH6mlw5R7GT4l43BVG3azZkCzjmzyPWEaYy16N8H0MfXhyUGoKHumhKHOM5YXX5rx8QzFyMMG1D8Hvxgp/PnGWiwTCnE2efuZ6+2TFyvf0nkIQs7np+LlvjyLZDzHh5LxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ghNaBF+k; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=tTUkzfn0VlrXv3fo1QWNOPGdGioHAQmqbjnnWSopohtvG+gl0V7sIYboU+eXZIfgeFbSkxKDbkz04S8bwjgnm5Wo0eDMTQWWPc9HVIEMaZAeZ9qu7DlyPxjzp2EfUzdrH3ifeuis4LAV7wZsTzkBibDSQbp5//vLI3wlT5aX2EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vV3xvxKG; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ghNaBF+k"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vV3xvxKG"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6BF051C2B;
-	Sun, 29 Mar 2026 21:33:11 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A57931C2B;
+	Sun, 29 Mar 2026 21:57:45 -0700 (PDT)
 Received: from [10.164.18.48] (unknown [10.164.18.48])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60A5D3F915;
-	Sun, 29 Mar 2026 21:33:14 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 745763F915;
+	Sun, 29 Mar 2026 21:57:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774845197; bh=1p2nxp7zPmbLPGIYzAgHmPQw4RKW7Te37pm+Fj7BROU=;
+	t=1774846671; bh=QaLFBPGPcR9DUZ8VRQyMuGIuOhU4fJIFDEX7tp7QiuA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ghNaBF+kXm2UZ2wflipgYKvuu6yI+wUHgaSlATiiAZ9YEewZG18eg0IJqCB2IMvZp
-	 UuhwMXGoAns1BlVh0S/NNHre87OuKPgfTwSIF57sV2XAR2I07HFEOHMKluphezyQCq
-	 rKJWFhhEMzIV8Am0gbHMExdNEjVRGsk0OOoSqOmM=
-Message-ID: <e9f72d56-86f5-443b-9d82-5c52b13efbf2@arm.com>
-Date: Mon, 30 Mar 2026 10:03:11 +0530
+	b=vV3xvxKG1nY/L7ne/t/EU5usEAdqjd/SQdX7SFtzF920hbTP5O3CQpdnNk02bR6r5
+	 5GscpPsBhu2DvYGZ/Bfwo67cAB9SsdQqv2U35zpc9/oArHDaQ6iK/kmut+jkt9Bgvt
+	 JkWREKPXgYOG8wfhQfgKTiWYWWk2jQToqOCi8iwY=
+Message-ID: <849e40d3-f77b-45ba-bf03-744e8a306b2b@arm.com>
+Date: Mon, 30 Mar 2026 10:27:45 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/30] KVM: arm64: Extract PFN resolution in
- user_mem_abort()
+Subject: Re: [PATCH v2 04/30] KVM: arm64: Isolate mmap_read_lock inside new
+ kvm_s2_fault_get_vma_info() helper
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
@@ -44,28 +44,37 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
  Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
  Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>
 References: <20260327113618.4051534-1-maz@kernel.org>
- <20260327113618.4051534-4-maz@kernel.org>
+ <20260327113618.4051534-5-maz@kernel.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20260327113618.4051534-4-maz@kernel.org>
+In-Reply-To: <20260327113618.4051534-5-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+
+
 
 On 27/03/26 5:05 PM, Marc Zyngier wrote:
 > From: Fuad Tabba <tabba@google.com>
 > 
-> Extract the section of code responsible for pinning the physical page
-> frame number (PFN) backing the faulting IPA into a new helper,
-> kvm_s2_fault_pin_pfn().
+> Extract the VMA lookup and metadata snapshotting logic from
+> kvm_s2_fault_pin_pfn() into a tightly-scoped sub-helper.
 > 
-> This helper encapsulates the critical section where the mmap_read_lock
-> is held, the VMA is looked up, the mmu invalidate sequence is sampled,
-> and the PFN is ultimately resolved via __kvm_faultin_pfn(). It also
-> handles the early exits for hardware poisoned pages and noslot PFNs.
+> This refactoring structurally fixes a TOCTOU (Time-Of-Check to
+> Time-Of-Use) vulnerability and Use-After-Free risk involving the vma
+> pointer. In the previous layout, the mmap_read_lock is taken, the vma is
+> looked up, and then the lock is dropped before the function continues to
+> map the PFN. While an explicit vma = NULL safeguard was present, the vma
+> variable was still lexically in scope for the remainder of the function.
 > 
-> By isolating this region, we can begin to organize the state variables
-> required for PFN resolution into the kvm_s2_fault struct, clearing out
-> a significant amount of local variable clutter from user_mem_abort().
+> By isolating the locked region into kvm_s2_fault_get_vma_info(), the vma
+> pointer becomes a local variable strictly confined to that sub-helper.
+> Because the pointer's scope literally ends when the sub-helper returns,
+> it is not possible for the subsequent page fault logic in
+> kvm_s2_fault_pin_pfn() to accidentally access the vanished VMA,
+> eliminating this bug class by design.
+
+Makes sense.
+
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
@@ -73,133 +82,48 @@ On 27/03/26 5:05 PM, Marc Zyngier wrote:
 Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
 
 > ---
->  arch/arm64/kvm/mmu.c | 105 ++++++++++++++++++++++++-------------------
->  1 file changed, 59 insertions(+), 46 deletions(-)
+>  arch/arm64/kvm/mmu.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index b366bde15a429..5079a58b65b14 100644
+> index 5079a58b65b14..1f2c2200ccd8d 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1740,55 +1740,11 @@ struct kvm_s2_fault {
+> @@ -1740,7 +1740,7 @@ struct kvm_s2_fault {
 >  	vm_flags_t vm_flags;
 >  };
 >  
-> -static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> -			  struct kvm_s2_trans *nested,
-> -			  struct kvm_memory_slot *memslot, unsigned long hva,
-> -			  bool fault_is_perm)
-> +static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+> -static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+> +static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
 >  {
-> -	int ret = 0;
-> -	struct kvm_s2_fault fault_data = {
-> -		.vcpu = vcpu,
-> -		.fault_ipa = fault_ipa,
-> -		.nested = nested,
-> -		.memslot = memslot,
-> -		.hva = hva,
-> -		.fault_is_perm = fault_is_perm,
-> -		.ipa = fault_ipa,
-> -		.logging_active = memslot_is_logging(memslot),
-> -		.force_pte = memslot_is_logging(memslot),
-> -		.s2_force_noncacheable = false,
-> -		.vfio_allow_any_uc = false,
-> -		.prot = KVM_PGTABLE_PROT_R,
-> -	};
-> -	struct kvm_s2_fault *fault = &fault_data;
-> -	struct kvm *kvm = vcpu->kvm;
 >  	struct vm_area_struct *vma;
-> -	void *memcache;
-> -	struct kvm_pgtable *pgt;
-> -	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
-> -
-> -	if (fault->fault_is_perm)
-> -		fault->fault_granule = kvm_vcpu_trap_get_perm_fault_granule(fault->vcpu);
-> -	fault->write_fault = kvm_is_write_fault(fault->vcpu);
-> -	fault->exec_fault = kvm_vcpu_trap_is_exec_fault(fault->vcpu);
-> -	VM_WARN_ON_ONCE(fault->write_fault && fault->exec_fault);
-> +	struct kvm *kvm = fault->vcpu->kvm;
+>  	struct kvm *kvm = fault->vcpu->kvm;
+> @@ -1774,9 +1774,6 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
 >  
-> -	/*
-> -	 * Permission faults just need to update the existing leaf entry,
-> -	 * and so normally don't require allocations from the memcache. The
-> -	 * only exception to this is when dirty logging is enabled at runtime
-> -	 * and a write fault needs to collapse a block entry into a table.
-> -	 */
-> -	fault->topup_memcache = !fault->fault_is_perm ||
-> -				(fault->logging_active && fault->write_fault);
-> -	ret = prepare_mmu_memcache(fault->vcpu, fault->topup_memcache, &memcache);
-> -	if (ret)
-> -		return ret;
-> -
-> -	/*
-> -	 * Let's check if we will get back a huge page backed by hugetlbfs, or
-> -	 * get block mapping for device MMIO region.
-> -	 */
->  	mmap_read_lock(current->mm);
->  	vma = vma_lookup(current->mm, fault->hva);
->  	if (unlikely(!vma)) {
-> @@ -1842,6 +1798,63 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (is_error_noslot_pfn(fault->pfn))
->  		return -EFAULT;
+>  	fault->is_vma_cacheable = kvm_vma_is_cacheable(vma);
 >  
-> +	return 1;
+> -	/* Don't use the VMA after the unlock -- it may have vanished */
+> -	vma = NULL;
+> -
+>  	/*
+>  	 * Read mmu_invalidate_seq so that KVM can detect if the results of
+>  	 * vma_lookup() or __kvm_faultin_pfn() become stale prior to
+> @@ -1788,6 +1785,17 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+>  	fault->mmu_seq = kvm->mmu_invalidate_seq;
+>  	mmap_read_unlock(current->mm);
+>  
+> +	return 0;
 > +}
 > +
-> +static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +			  struct kvm_s2_trans *nested,
-> +			  struct kvm_memory_slot *memslot, unsigned long hva,
-> +			  bool fault_is_perm)
+> +static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
 > +{
-> +	int ret = 0;
-> +	struct kvm_s2_fault fault_data = {
-> +		.vcpu = vcpu,
-> +		.fault_ipa = fault_ipa,
-> +		.nested = nested,
-> +		.memslot = memslot,
-> +		.hva = hva,
-> +		.fault_is_perm = fault_is_perm,
-> +		.ipa = fault_ipa,
-> +		.logging_active = memslot_is_logging(memslot),
-> +		.force_pte = memslot_is_logging(memslot),
-> +		.s2_force_noncacheable = false,
-> +		.vfio_allow_any_uc = false,
-> +		.prot = KVM_PGTABLE_PROT_R,
-> +	};
-> +	struct kvm_s2_fault *fault = &fault_data;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	void *memcache;
-> +	struct kvm_pgtable *pgt;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+> +	int ret;
 > +
-> +	if (fault->fault_is_perm)
-> +		fault->fault_granule = kvm_vcpu_trap_get_perm_fault_granule(fault->vcpu);
-> +	fault->write_fault = kvm_is_write_fault(fault->vcpu);
-> +	fault->exec_fault = kvm_vcpu_trap_is_exec_fault(fault->vcpu);
-> +	VM_WARN_ON_ONCE(fault->write_fault && fault->exec_fault);
-> +
-> +	/*
-> +	 * Permission faults just need to update the existing leaf entry,
-> +	 * and so normally don't require allocations from the memcache. The
-> +	 * only exception to this is when dirty logging is enabled at runtime
-> +	 * and a write fault needs to collapse a block entry into a table.
-> +	 */
-> +	fault->topup_memcache = !fault->fault_is_perm ||
-> +				(fault->logging_active && fault->write_fault);
-> +	ret = prepare_mmu_memcache(fault->vcpu, fault->topup_memcache, &memcache);
+> +	ret = kvm_s2_fault_get_vma_info(fault);
 > +	if (ret)
 > +		return ret;
 > +
-> +	/*
-> +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
-> +	 * get block mapping for device MMIO region.
-> +	 */
-> +	ret = kvm_s2_fault_pin_pfn(fault);
-> +	if (ret != 1)
-> +		return ret;
-> +
-> +	ret = 0;
-> +
->  	/*
->  	 * Check if this is non-struct page memory PFN, and cannot support
->  	 * CMOs. It could potentially be unsafe to access as cacheable.
+>  	fault->pfn = __kvm_faultin_pfn(fault->memslot, fault->gfn,
+>  				       fault->write_fault ? FOLL_WRITE : 0,
+>  				       &fault->writable, &fault->page);
 
