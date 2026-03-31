@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D613AA502;
-	Tue, 31 Mar 2026 11:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818793A6400
+	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 11:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774955154; cv=none; b=gku/mTitXTuLad9FcXLWp1YsuHqvxjGTVzppNtIdtcinslI79E1OkQwZx8TtCq5x+Hmd05MoQiPWVu9PjULOUxDj5vtowuCOEOYtIWtZ+dSQJhGd+m1tbjiUTwkK6il4H6YE6U87nKExx4xHKvE+GmibTK7QLIBCLseQGLzPBWU=
+	t=1774956009; cv=none; b=pIQZi2Ub0GYUT+LRhRlswyh3iGXRVaSPfeXemHeuih5i8FdVaf0OxmNSCPFTFDdvqJtkyssJznCbZTRwT+64qFm7pfUq1D5CYX87A9aSXR7EXoWq6DUDEHhMhFKWv0y7ibRaqOJ03LmecWnK+Yrlu6JXl9zedhBDZi6e7zSQBf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774955154; c=relaxed/simple;
-	bh=SXqEk71BSaaBeUSF2ew0z1un4HM7vo7rVW84ixT4WY4=;
+	s=arc-20240116; t=1774956009; c=relaxed/simple;
+	bh=n1ZePIbPk37s4fDM2JRxX9OGO38qfVv+3mF2l5ZHx4U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VAm6lXFtULMaiU+xN7C+uySIaGsYiylO5z3CZ1u26QICMLKiUTWHZtoehl9I1Qvz5FqalecPFdt+m0QeNfLoqhNcJTIAMiSuyo8nJzzU+aMKRUNxVlgPbmw35/K4rxUFxwCuu49QlgIbix9BLaWoXqttwKex0X7FMKc7p0hNf8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=H7Gb0/Lc; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=uEgx/10hnlyaqhU5RzqAUPZ653hyPfc+rbU4yNJQ4QZ0Hn/Cf80QVGtojPrVqgKcYUpWqJ1Hjo2RNv7aSN3GXnlwVbR0htbAGbAgTrNU1qy2Q8J3R28nEZKuNZMXV+R+wtnIH8LqwikE+jtlEO7bIAP65VAgl7fMHPuIY2oc9L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AyickMe9; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="H7Gb0/Lc"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AyickMe9"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3D4C4983;
-	Tue, 31 Mar 2026 04:05:45 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06C6C1D31;
+	Tue, 31 Mar 2026 04:20:02 -0700 (PDT)
 Received: from [10.57.17.66] (unknown [10.57.17.66])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF3FA3F641;
-	Tue, 31 Mar 2026 04:05:48 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6114F3F641;
+	Tue, 31 Mar 2026 04:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774955151; bh=SXqEk71BSaaBeUSF2ew0z1un4HM7vo7rVW84ixT4WY4=;
+	t=1774956007; bh=n1ZePIbPk37s4fDM2JRxX9OGO38qfVv+3mF2l5ZHx4U=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=H7Gb0/LcvB0+eLbF5RvOApy2pS6wZvhm623HaPVBt4XeMLB0uQZ16neUC2vLOdAzl
-	 0soNXv7Pgbu6loJbbx8OAh8hXbrM4Vw+1kwi75/1fWNtgf32alsML8n3SklnvDsOPy
-	 2ZY0jSixIxU7I23ihVmOkK9wYuhcN3f7T3RfUEEk=
-Message-ID: <152f5070-fda6-4381-bc40-4a70908c27c1@arm.com>
-Date: Tue, 31 Mar 2026 12:05:47 +0100
+	b=AyickMe9wbMD8Fc6tfFysdPK5l72V8ovZVsDJj7Rrlr9HGRNq+lasflNzmYd3p/5Y
+	 knSwLpQCMxJGtZR7mQD2278qbwlaUElPPwRl02MDq8G3kkAFjuBNv7nXSyXjWSfJvn
+	 wCPBgyafkofu/BNtznjbx3UHtLH60JM2avqbxXeM=
+Message-ID: <afc5bd00-28ca-413b-b047-ee53589c285d@arm.com>
+Date: Tue, 31 Mar 2026 12:20:04 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,255 +35,180 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 10/48] arm64: RMI: Ensure that the RMM has GPT entries
- for memory
+Subject: Re: [PATCH v2 01/11] arm64: Skip update of an idreg field affected by
+ an override
 Content-Language: en-GB
-To: Mathieu Poirier <mathieu.poirier@linaro.org>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-11-steven.price@arm.com> <acrj-cKphy4hJsEG@p14s>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, Fuad Tabba <tabba@google.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oupton@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20260302115653.1517326-1-maz@kernel.org>
+ <20260302115653.1517326-2-maz@kernel.org> <abwXl35xQ2ze1XwJ@arm.com>
+ <a35839df-74a0-46b3-b5e8-7e0a066b210d@arm.com> <acQgq4oNWP__3qvV@arm.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <acrj-cKphy4hJsEG@p14s>
+In-Reply-To: <acQgq4oNWP__3qvV@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Mathieu,
-
-On 30/03/2026 21:58, Mathieu Poirier wrote:
-> Hi,
-> 
-> On Wed, Mar 18, 2026 at 03:53:34PM +0000, Steven Price wrote:
->> The RMM may not be tracking all the memory of the system at boot. Create
->> the necessary tracking state and GPTs within the RMM so that all boot
->> memory can be delegated to the RMM as needed during runtime.
+On 25/03/2026 17:51, Catalin Marinas wrote:
+> On Wed, Mar 25, 2026 at 02:54:28PM +0000, Suzuki K Poulose wrote:
+>> On 19/03/2026 15:34, Catalin Marinas wrote:
+>>> On Mon, Mar 02, 2026 at 11:56:42AM +0000, Marc Zyngier wrote:
+>>>> When computing the new value od an idreg that contains a field
+>>>> affected by an override, do not update that particular field.
+>>>>
+>>>> The value computed at init-time must be kept as-is, as that's
+>>>> what the user has asked for, for better or worse.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>>> ---
+>>>>    arch/arm64/kernel/cpufeature.c | 7 +++++++
+>>>>    1 file changed, 7 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>>>> index c31f8e17732a3..28fc77443ccd3 100644
+>>>> --- a/arch/arm64/kernel/cpufeature.c
+>>>> +++ b/arch/arm64/kernel/cpufeature.c
+>>>> @@ -1224,6 +1224,13 @@ static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
+>>>>    		s64 ftr_cur = arm64_ftr_value(ftrp, reg->sys_val);
+>>>>    		s64 ftr_new = arm64_ftr_value(ftrp, new);
+>>>> +		/*
+>>>> +		 * Don't alter the initial value that has been forced
+>>>> +		 * by an override.
+>>>> +		 */
+>>>> +		if ((reg->override->mask & arm64_ftr_mask(ftrp)) == arm64_ftr_mask(ftrp))
+>>>> +			continue;
+>>>
+>>> I got lost in the in the cpufeature framework, so I may be missing
+>>> something.
+>>>
+>>> Let's say the primary CPU has a feature field with value 2 and we want
+>>> to override it to value 1. For e.g. a LOWER_SAFE feature, boot_cpu_data
+>>> will stored the overridden value of 1.
+>>>
+>>> A secondary CPU comes online with the same feature missing, so value 0.
+>>> With the above change, we no longer update the system-wide feature
+>>> value, leave it as 1. Later on, for a system feature we may turn it on
+>>> even though the secondary CPU does not support it.
+>>>
+>>> In summary, this makes the overridden field sticky for secondary CPUs
+>>> even if they don't support it.
 >>
->> Note: support is currently missing for SROs which means that if the RMM
->> needs memory donating this will fail (and render CCA unusable in Linux).
+>> That is true. I think we should let the secondary CPUs alter the values,
+>> with initial CPU feature value with the override value set, the system
+>> could then choose the safest among the override and the others.
+> 
+> It works for me. We should add a comment somewhere that the override is
+> not expected to work for features where we allow differences (some
+> FTR_NONSTRICT).
+> 
+>>> Unrelated to your patch, I think we can similarly fail to reject
+>>> secondary CPUs in check_early_cpu_features() -> verify_local_cpu_caps()
+>>> because of __read_sysreg_by_encoding() which uses the override value
+>>> unconditionally. From this perspective, we are now consistent with your
+>>> patch above.
 >>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> New patch for v13
->> ---
->>   arch/arm64/kvm/rmi.c | 89 ++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 89 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 9590dff9a2c1..80aedc85e94a 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -4,6 +4,7 @@
->>    */
->>   
->>   #include <linux/kvm_host.h>
->> +#include <linux/memblock.h>
->>   
->>   #include <asm/kvm_pgtable.h>
->>   #include <asm/rmi_cmds.h>
->> @@ -56,6 +57,18 @@ static int rmi_check_version(void)
->>   	return 0;
->>   }
->>   
->> +/*
->> + * These are the 'default' sizes when passing 0 as the tracking_region_size.
->> + * TODO: Support other granule sizes
->> + */
->> +#ifdef CONFIG_PAGE_SIZE_4KB
->> +#define RMM_GRANULE_TRACKING_SIZE	SZ_1G
->> +#elif defined(CONFIG_PAGE_SIZE_16KB)
->> +#define RMM_GRANULE_TRACKING_SIZE	SZ_32M
->> +#elif defined(CONFIG_PAGE_SIZE_64KB)
->> +#define RMM_GRANULE_TRACKING_SIZE	SZ_512M
->> +#endif
->> +
->>   static int rmi_configure(void)
->>   {
->>   	struct rmm_config *config __free(free_page) = NULL;
->> @@ -95,6 +108,80 @@ static int rmi_configure(void)
->>   	return 0;
->>   }
->>   
->> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
->> +{
->> +	start = ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
+>> This is true as well and the override takes the priority and with the
+>> wrong level of override value the system could be made to think that
+>> some features are available even when it is unsafe to do so.
+>> We should sanitise the values read by __read_sysreg_by_encoding() with
+>> the "overrides". I can cook something up.
 > 
-> This will produce an error on systems where the start of system memory is not
-> aligned to RMM_GRANULE_TRACKING_SIZE.  For instance, on QEMU-SBSA the system
-> memory starts at 0x100_4300_0000.  With the above and RMM_GRANULE_TRACKING_SIZE
-> set to SZ_1G, @start becomes 0x100_4000_0000, which falls outside the memory map
-> known to the TF-A.  I fixed it with these modifications:
+> Or remove this check if we expect the override to only work on the
+> resulting sanitised value, not individual checks.
 
-Thanks for raising this. This would need to be addressed in the RMM
-spec, I have raised it with the team and will be addressed soon.
+True, but if some capabilities are PERCPU local features, then there is
+no way to override them with the controls. I have the following patch,
+that could do the trick :
 
-> 
-> LINUX:
-> 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 10ff1c3bddaf..21bfbbe2f047 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -424,7 +424,9 @@ static int rmi_configure(void)
->   
->   static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
->   {
-> -       start = ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
-> +       phys_addr_t offset;
-> +
-> +       offset = start - ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
->          end = ALIGN(end, RMM_GRANULE_TRACKING_SIZE);
->   
->          while (start < end) {
-> @@ -439,7 +441,13 @@ static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
->                                  start);
->                          return -ENODEV;
->                  }
-> -               start += RMM_GRANULE_TRACKING_SIZE;
-> +
-> +               if (offset) {
-> +                       start += (RMM_GRANULE_TRACKING_SIZE - offset);
-> +                       offset = 0;
-> +               } else {
-> +                       start += RMM_GRANULE_TRACKING_SIZE;
-> +               }
->          }
->   
->          return 0;
-> 
-> RMM:
-> 
-> diff --git a/runtime/rmi/granule.c b/runtime/rmi/granule.c
-> index cef521fc0869..60358d9ee81e 100644
-> --- a/runtime/rmi/granule.c
-> +++ b/runtime/rmi/granule.c
-> @@ -209,9 +209,11 @@ void smc_granule_tracking_get(unsigned long addr,
->                  return;
->          }
->   
-> +#if 0
->          if (!ALIGNED(addr, RMM_INTERNAL_TRACKING_REGION_SIZE)) {
->                  return;
->          }
-> +#endif
->   
->          g = find_granule(addr);
->          if (g != NULL) {
-> 
-> This is likely not the right fix but hopefully provides some guidance.  Send me
-> your patches when you have an idea and I'll test them.
+--8>--
 
-We will send you the update once it is fixed in the RMM spec. The rough 
-idea is to remove the ALIGNMENT restrictions and return a Range that
-the host can iterate over to find "regions" with the same type of
-memory.
+arm64: Apply overrides to CPU local capabilities
 
+If an override has been applied, make sure we apply that for the
+secondary CPUs too, to limit the features.
 
-Cheers
-Suzuki
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+  arch/arm64/kernel/cpufeature.c | 40 +++++++++++++++++++++++++++-------
+  1 file changed, 32 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 2e1e4de9a2cd..2b494302b767 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1217,10 +1217,41 @@ void __init init_cpu_features(struct 
+cpuinfo_arm64 *info)
+  		init_cpu_ftr_reg(SYS_GMID_EL1, info->reg_gmid);
+  }
+
++/*
++ * Sanitise the register fields to clamp the values to the overrides that
++ * has been applied.
++ */
++static u64 override_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 val)
++{
++	const struct arm64_ftr_bits *ftrp;
++
++	if (!reg || !reg->override->mask)
++		return val;
++
++	for (ftrp = reg->ftr_bits; ftrp->width; ftrp++) {
++		u64 ftr_mask = arm64_ftr_mask(ftrp);
++		s64 ftr_val, ftr_ovr, ftr_safe;
++
++		/* Skip the fields not overridden */
++		if ((ftr_mask & reg->override->mask) != ftr_mask)
++			continue;
++
++		ftr_val = arm64_ftr_value(ftrp, val);
++		ftr_ovr = arm64_ftr_value(ftrp, reg->override->val);
++		ftr_safe = arm64_ftr_safe_value(ftrp, ftr_ovr, ftr_val);
++
++		if (ftr_safe != ftr_val)
++			val = arm64_ftr_set_value(ftrp, val, ftr_safe);
++	}
++	return val;
++}
++
+  static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
+  {
+  	const struct arm64_ftr_bits *ftrp;
+
++	/* Apply the overrides */
++	new = override_cpu_ftr_reg(reg, new);
+  	for (ftrp = reg->ftr_bits; ftrp->width; ftrp++) {
+  		s64 ftr_cur = arm64_ftr_value(ftrp, reg->sys_val);
+  		s64 ftr_new = arm64_ftr_value(ftrp, new);
+@@ -1524,7 +1555,6 @@ EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
+   */
+  u64 __read_sysreg_by_encoding(u32 sys_id)
+  {
+-	struct arm64_ftr_reg *regp;
+  	u64 val;
+
+  	switch (sys_id) {
+@@ -1577,13 +1607,7 @@ u64 __read_sysreg_by_encoding(u32 sys_id)
+  		return 0;
+  	}
+
+-	regp  = get_arm64_ftr_reg(sys_id);
+-	if (regp) {
+-		val &= ~regp->override->mask;
+-		val |= (regp->override->val & regp->override->mask);
+-	}
+-
+-	return val;
++	return override_cpu_ftr_reg(get_arm64_ftr_reg(sys_id), val);
+  }
+
+  #include <linux/irqchip/arm-gic-v3.h>
+-- 
+2.43.0
+
 
 
 > 
-> Thanks,
-> Mathieu
-> 
-> 
->> +	end = ALIGN(end, RMM_GRANULE_TRACKING_SIZE);
->> +
->> +	while (start < end) {
->> +		unsigned long ret, category, state;
->> +
->> +		ret = rmi_granule_tracking_get(start, &category, &state);
->> +		if (ret != RMI_SUCCESS ||
->> +		    state != RMI_TRACKING_FINE ||
->> +		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
->> +			/* TODO: Set granule tracking in this case */
->> +			kvm_err("Granule tracking for region isn't fine/conventional: %llx",
->> +				start);
->> +			return -ENODEV;
->> +		}
->> +		start += RMM_GRANULE_TRACKING_SIZE;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static unsigned long rmi_l0gpt_size(void)
->> +{
->> +	return 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
->> +				      rmm_feat_reg1));
->> +}
->> +
->> +static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
->> +{
->> +	unsigned long l0gpt_sz = rmi_l0gpt_size();
->> +
->> +	start = ALIGN_DOWN(start, l0gpt_sz);
->> +	end = ALIGN(end, l0gpt_sz);
->> +
->> +	while (start < end) {
->> +		int ret = rmi_gpt_l1_create(start);
->> +
->> +		if (ret && ret != RMI_ERROR_GPT) {
->> +			/*
->> +			 * FIXME: Handle SRO so that memory can be donated for
->> +			 * the tables.
->> +			 */
->> +			kvm_err("GPT Level1 table missing for %llx\n", start);
->> +			return -ENOMEM;
->> +		}
->> +		start += l0gpt_sz;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int rmi_init_metadata(void)
->> +{
->> +	phys_addr_t start, end;
->> +	const struct memblock_region *r;
->> +
->> +	for_each_mem_region(r) {
->> +		int ret;
->> +
->> +		start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
->> +		end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
->> +		ret = rmi_verify_memory_tracking(start, end);
->> +		if (ret)
->> +			return ret;
->> +		ret = rmi_create_gpts(start, end);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>   static int rmm_check_features(void)
->>   {
->>   	if (kvm_lpa2_is_enabled() && !rmi_has_feature(RMI_FEATURE_REGISTER_0_LPA2)) {
->> @@ -120,6 +207,8 @@ void kvm_init_rmi(void)
->>   		return;
->>   	if (rmi_configure())
->>   		return;
->> +	if (rmi_init_metadata())
->> +		return;
->>   
->>   	/* Future patch will enable static branch kvm_rmi_is_available */
->>   }
->> -- 
->> 2.43.0
->>
->>
 
