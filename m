@@ -1,150 +1,269 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AA71A304A
-	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 02:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E270B2877F7
+	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 03:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774924874; cv=none; b=RKh64J4vlJK6BitnZYXc5GCBi5mLYwAnb0/TQCHtkjz9tYstKCaHglBcMyUX8pQCOrL1J/zhQLL8gI+Ab+Dr4QxNSPrfnpufPvEJjrB3Lo/m+MxwYDt/VltWp17xcBrFEP0AopySTCMaB+hOFeHlxyhaGtVYY5lNf9S4VNPjgS4=
+	t=1774927869; cv=none; b=ICWvfWhygco4JV8gYy6T9DkJyGEwfYg0wfRpnHRruKtMzacFrbwxpDZCfEmJanKZqj0FI0bljvFy3kAgIVTszP8AnF1mo8ZZ+wIkWTJV6gNDZPMMbQ7UUPBacPbpDQwZm7At3Sa3ev628iDHRW5wpGpHR9l8o20jVs52GZJm59o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774924874; c=relaxed/simple;
-	bh=ObRxpbE/eUS3h8F3m+U6Yj6wv+FCD3d3U1SDjVIZ6jw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7yv4RmT1JZakLFaWTW6U5gbxbphLyVC/l1z3maYmE1dUWaUJ28yUa5/G1NjXMy2tu/F3bjrR967JaMw+90CEROuB36qM963ZjihszUF/ZGdi0mFmD92YAgy5izNaJ/BmmZhfEEOC0UxQ/SVloB7xrI6Toh1ubE4Tyiuug2/Wu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aPqBRjBx; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1774927869; c=relaxed/simple;
+	bh=xWAz2vfxxyrbPfnyEcrbzm08uOYTH60HDJlet3HGVt8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BBQH8kqd7Av1MF2IflLYzTiJV/LXxALusS8NA7/yrI48LN5e7oTAAJ0N19dt0+EhmJWRgr/o76t7IdUgkyCZSnVXPch3XF6AUWkFbT6UfWQuf3NfR7CCxnu3zY/lviYyKIYhq3jaduwx1gcXKcHfZk0tG5Jctr6SGcJoKBwJWRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vq9yU+Lw; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPqBRjBx"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-486fd27754bso50915845e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 19:41:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774924871; x=1775529671; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXnJaJoemcaiDGH1WZmG/hzLsuogYk0N7x2l4+nhrvM=;
-        b=aPqBRjBxL55uVoZgfy3Rk9jrKOhDOf+7EoJHdlMTVb2+5rmJjEy0V9np2wfAHgQGVT
-         lW2TKwFCByg7sBDlFlHRzvHYUCbDs/CNy5FdLPSdf5/Oc64bdxCScmTvZpi7oxxWrjZ1
-         pCuyCwFfl4/fnFi9FjIj5HEIDHKQ1lX8M9LFIhHRhIr+N1UxoOq/LexXLaAnw0haij9p
-         KudDGG8llSSff5iyWgBRRPtRbUHl1FqejvK9TxDmDt0TWjZDHfJdN9RmzV2JRaV6xECX
-         bXqqSpLewGMSwez3vFo1msTYCSCtMtWHh9yESKmpmhtbOv0YKI3GgH9hQVzoIEjf32th
-         QTig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774924871; x=1775529671;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LXnJaJoemcaiDGH1WZmG/hzLsuogYk0N7x2l4+nhrvM=;
-        b=A978465fXk+f1cT/6JFBCRIarO5NMJCvXQqwvxvpzi7lxLg6sN/KHFN7LR9rx8gUhF
-         vSmYleSVqKtsswX9X4ArTImKx9W1mz6HD6kY+14vK6a5nRuRnAubbG1c3ZcY5YVhwjhy
-         TDE5wWj0Fy+5Wqo9hzYfHZWXZUNikweakEMmemHV32PurDZF+lEM0HVWTB40KmVBK/1Y
-         hMF+fqdvRXDtsYYOz9AY+uUY650Yls1l4Ik6RF6V/CnySnxh8/dggzAqb+0dJ7BsgnPq
-         DghgzB4pub8xyVWPXX0iZWNrv8YbZpDvE5ntF7Y6FNKjEp/Y2nmma+2sJURESzh9a0PY
-         Q8Xg==
-X-Gm-Message-State: AOJu0YzATrORbzIrG4T/4L59PdF8Mm9PgljIpZSHRVZUucdtBB76fD4D
-	i12ACTkzE97hV3YV3ndz9eq/ghscR4cq7QSoBwzZZ/mPq6zMAdsAhNIKfJcA48KXFA==
-X-Gm-Gg: ATEYQzwnXkcKMZEq2df2ULKlLRGfeXDvLxGfhU/OJggpjVPoBehnHEjIGmWWvTrly6X
-	QSsDRsAN1TkznY65n3uVlnqJqlXoLp7j9pCXL7K9ObuGHk0iZ2u6vlHK19gU7TYU1Jw0L1oq02z
-	bhpb3+er6M0iQYxSLFRjeX0j6DM4qOhThRPbfb5IIlqzHpou1ym5jftNVPu9vy+OAXyQHuqIz3R
-	Gsq6vazhG2tTkqwxSz+4/zY9wHSj68qbxUHVk+E6GhXvwrk2xtSjqX/7NETjbD5sP49P9r79QFs
-	dMcsk0kDHhhxCJHnSrWZU9JQvFj2XPcDCBTqA3pVl2n6v50FpkK8bf/xBjoIr1/w1juHJ++nMYt
-	/tF6EXBPLV9W+jetKNMG4tLkqJOiczBgWL9QYUyc+smX8cAl8PZX22tfOlgo4UJNN5z1RTYs5os
-	rQtRgjf6hzXYTf6NPy/TCn8Sd1NTdXXsTp4nEqJySnDE9EYhAWo1d0McrVCag/8dm8Wzo=
-X-Received: by 2002:a05:600c:c090:b0:487:338:b4df with SMTP id 5b1f17b1804b1-4873de6ca3dmr61799345e9.15.1774924871032;
-        Mon, 30 Mar 2026 19:41:11 -0700 (PDT)
-Received: from google.com (198.115.140.34.bc.googleusercontent.com. [34.140.115.198])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4873062ec9bsm219312745e9.7.2026.03.30.19.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 19:41:09 -0700 (PDT)
-Date: Tue, 31 Mar 2026 03:41:05 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com,
-	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com,
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com
-Subject: Re: [PATCH v3] KVM: arm64: Prevent the host from using an smc with
- imm16 != 0
-Message-ID: <acs0Qbjfdmlkvd1e@google.com>
-References: <20260330105441.3226904-1-sebastianene@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vq9yU+Lw"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6CCDE1BCA;
+	Mon, 30 Mar 2026 20:31:00 -0700 (PDT)
+Received: from [10.57.18.211] (unknown [10.57.18.211])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F0D3A3F641;
+	Mon, 30 Mar 2026 20:31:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774927866; bh=xWAz2vfxxyrbPfnyEcrbzm08uOYTH60HDJlet3HGVt8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vq9yU+LwH8v+2F1F3o0fefBH1/kUCb8hMfrZE4Q8g4kFfT7nkyFx53XkMPZz7K4Gz
+	 iCDO+Im3XfdX/V46EpxEGIjyu6IP55FeRLbN4EEkUJ0CQvd6mdZapIzTb7uFpR+tEg
+	 olOu+UbvkDZtmQzgHzrEgR3OHrGiuZONCwJjMLIk=
+Message-ID: <40b94374-b171-4f72-bb8b-d215fee630c6@arm.com>
+Date: Tue, 31 Mar 2026 09:00:59 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330105441.3226904-1-sebastianene@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/30] KVM: arm64: Extract stage-2 permission logic in
+ user_mem_abort()
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
+ Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>
+References: <20260327113618.4051534-1-maz@kernel.org>
+ <20260327113618.4051534-6-maz@kernel.org>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20260327113618.4051534-6-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 30, 2026 at 10:54:41AM +0000, Sebastian Ene wrote:
-> The ARM Service Calling Convention (SMCCC) specifies that the function
-> identifier and parameters should be passed in registers, leaving the
-> 16-bit immediate field un-handled in pKVM when an SMC instruction is
-> trapped.
-> Since the HVC is a private interface between EL2 and the host,
-> enforce the host kernel running under pKVM to use an immediate value
-> of 0 only when using SMCs to make it clear for non-compliant software
-> talking to Trustzone that we only use SMCCC.
+
+
+On 27/03/26 5:05 PM, Marc Zyngier wrote:
+> From: Fuad Tabba <tabba@google.com>
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> Extract the logic that computes the stage-2 protections and checks for
+> various permission faults (e.g., execution faults on non-cacheable
+> memory) into a new helper function, kvm_s2_fault_compute_prot(). This
+> helper also handles injecting atomic/exclusive faults back into the
+> guest when necessary.
+> 
+> This refactoring step separates the permission computation from the
+> mapping logic, making the main fault handler flow clearer.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
 
 > ---
-> v2 -> current:
->  - move the ESR decoding of the imm16 in the handle_host_smc where it
->    was supposed to be
->  - updated the commit message to include the reason behind while we are
->    not doing for HVCs as well
->  - updated the commit message to clarify that pKVM is not handling the
->    imm16
+>  arch/arm64/kvm/mmu.c | 163 +++++++++++++++++++++++--------------------
+>  1 file changed, 87 insertions(+), 76 deletions(-)
 > 
-> v1 -> v2:
->  - Dropped injecting an UNDEF and return an error instead
->    (SMCCC_RET_NOT_SUPPORTED)
->  - Used the mask ESR_ELx_xVC_IMM_MASK instead of masking with U16_MAX
->  - Updated the title of the commit message from:
->    "[PATCH] KVM: arm64: Inject UNDEF when host is executing an
->     smc with imm16 != 0"
-> 
-> Link to v2:
-> https://lore.kernel.org/all/20260325113138.4171430-1-sebastianene@google.com/
-> Link to v1:
-> https://lore.kernel.org/all/20260324135728.3532400-1-sebastianene@google.com/
-> 
-> ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index e7790097db93..461cf5cb5ac7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -676,8 +676,14 @@ static void default_host_smc_handler(struct kvm_cpu_context *host_ctxt)
->  static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(u64, func_id, host_ctxt, 0);
-> +	u64 esr = read_sysreg_el2(SYS_ESR);
->  	bool handled;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1f2c2200ccd8d..d1ffdce18631a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1809,6 +1809,89 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+>  	return 1;
+>  }
 >  
-> +	if (esr & ESR_ELx_xVC_IMM_MASK) {
-> +		cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
-> +		goto exit_skip_instr;
+> +static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
+> +{
+> +	struct kvm *kvm = fault->vcpu->kvm;
+> +
+> +	/*
+> +	 * Check if this is non-struct page memory PFN, and cannot support
+> +	 * CMOs. It could potentially be unsafe to access as cacheable.
+> +	 */
+> +	if (fault->vm_flags & (VM_PFNMAP | VM_MIXEDMAP) && !pfn_is_map_memory(fault->pfn)) {
+> +		if (fault->is_vma_cacheable) {
+> +			/*
+> +			 * Whilst the VMA owner expects cacheable mapping to this
+> +			 * PFN, hardware also has to support the FWB and CACHE DIC
+> +			 * features.
+> +			 *
+> +			 * ARM64 KVM relies on kernel VA mapping to the PFN to
+> +			 * perform cache maintenance as the CMO instructions work on
+> +			 * virtual addresses. VM_PFNMAP region are not necessarily
+> +			 * mapped to a KVA and hence the presence of hardware features
+> +			 * S2FWB and CACHE DIC are mandatory to avoid the need for
+> +			 * cache maintenance.
+> +			 */
+> +			if (!kvm_supports_cacheable_pfnmap())
+> +				return -EFAULT;
+> +		} else {
+> +			/*
+> +			 * If the page was identified as device early by looking at
+> +			 * the VMA flags, vma_pagesize is already representing the
+> +			 * largest quantity we can map.  If instead it was mapped
+> +			 * via __kvm_faultin_pfn(), vma_pagesize is set to PAGE_SIZE
+> +			 * and must not be upgraded.
+> +			 *
+> +			 * In both cases, we don't let transparent_hugepage_adjust()
+> +			 * change things at the last minute.
+> +			 */
+> +			fault->s2_force_noncacheable = true;
+> +		}
+> +	} else if (fault->logging_active && !fault->write_fault) {
+> +		/*
+> +		 * Only actually map the page as writable if this was a write
+> +		 * fault.
+> +		 */
+> +		fault->writable = false;
 > +	}
 > +
->  	func_id &= ~ARM_SMCCC_CALL_HINTS;
+> +	if (fault->exec_fault && fault->s2_force_noncacheable)
+> +		return -ENOEXEC;
+> +
+> +	/*
+> +	 * Guest performs atomic/exclusive operations on memory with unsupported
+> +	 * attributes (e.g. ld64b/st64b on normal memory when no FEAT_LS64WB)
+> +	 * and trigger the exception here. Since the memslot is valid, inject
+> +	 * the fault back to the guest.
+> +	 */
+> +	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(fault->vcpu))) {
+> +		kvm_inject_dabt_excl_atomic(fault->vcpu, kvm_vcpu_get_hfar(fault->vcpu));
+> +		return 1;
+> +	}
+> +
+> +	if (fault->nested)
+> +		adjust_nested_fault_perms(fault->nested, &fault->prot, &fault->writable);
+> +
+> +	if (fault->writable)
+> +		fault->prot |= KVM_PGTABLE_PROT_W;
+> +
+> +	if (fault->exec_fault)
+> +		fault->prot |= KVM_PGTABLE_PROT_X;
+> +
+> +	if (fault->s2_force_noncacheable) {
+> +		if (fault->vfio_allow_any_uc)
+> +			fault->prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+> +		else
+> +			fault->prot |= KVM_PGTABLE_PROT_DEVICE;
+> +	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
+> +		fault->prot |= KVM_PGTABLE_PROT_X;
+> +	}
+> +
+> +	if (fault->nested)
+> +		adjust_nested_exec_perms(kvm, fault->nested, &fault->prot);
+> +
+> +	return 0;
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_s2_trans *nested,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> @@ -1863,68 +1946,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >  
->  	handled = kvm_host_psci_handler(host_ctxt, func_id);
-> @@ -686,6 +692,7 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
->  	if (!handled)
->  		default_host_smc_handler(host_ctxt);
+>  	ret = 0;
 >  
-> +exit_skip_instr:
->  	/* SMC was trapped, move ELR past the current PC. */
->  	kvm_skip_host_instr();
->  }
-> -- 
-> 2.53.0.1018.g2bb0e51243-goog
-> 
+> -	/*
+> -	 * Check if this is non-struct page memory PFN, and cannot support
+> -	 * CMOs. It could potentially be unsafe to access as cacheable.
+> -	 */
+> -	if (fault->vm_flags & (VM_PFNMAP | VM_MIXEDMAP) && !pfn_is_map_memory(fault->pfn)) {
+> -		if (fault->is_vma_cacheable) {
+> -			/*
+> -			 * Whilst the VMA owner expects cacheable mapping to this
+> -			 * PFN, hardware also has to support the FWB and CACHE DIC
+> -			 * features.
+> -			 *
+> -			 * ARM64 KVM relies on kernel VA mapping to the PFN to
+> -			 * perform cache maintenance as the CMO instructions work on
+> -			 * virtual addresses. VM_PFNMAP region are not necessarily
+> -			 * mapped to a KVA and hence the presence of hardware features
+> -			 * S2FWB and CACHE DIC are mandatory to avoid the need for
+> -			 * cache maintenance.
+> -			 */
+> -			if (!kvm_supports_cacheable_pfnmap())
+> -				ret = -EFAULT;
+> -		} else {
+> -			/*
+> -			 * If the page was identified as device early by looking at
+> -			 * the VMA flags, fault->vma_pagesize is already representing the
+> -			 * largest quantity we can map.  If instead it was mapped
+> -			 * via __kvm_faultin_pfn(), fault->vma_pagesize is set to PAGE_SIZE
+> -			 * and must not be upgraded.
+> -			 *
+> -			 * In both cases, we don't let transparent_hugepage_adjust()
+> -			 * change things at the last minute.
+> -			 */
+> -			fault->s2_force_noncacheable = true;
+> -		}
+> -	} else if (fault->logging_active && !fault->write_fault) {
+> -		/*
+> -		 * Only actually map the page as fault->writable if this was a write
+> -		 * fault.
+> -		 */
+> -		fault->writable = false;
+> +	ret = kvm_s2_fault_compute_prot(fault);
+> +	if (ret == 1) {
+> +		ret = 1; /* fault injected */
+> +		goto out_put_page;
+>  	}
+> -
+> -	if (fault->exec_fault && fault->s2_force_noncacheable)
+> -		ret = -ENOEXEC;
+> -
+>  	if (ret)
+>  		goto out_put_page;
+>  
+> -	/*
+> -	 * Guest performs atomic/exclusive operations on memory with unsupported
+> -	 * attributes (e.g. ld64b/st64b on normal memory when no FEAT_LS64WB)
+> -	 * and trigger the exception here. Since the fault->memslot is valid, inject
+> -	 * the fault back to the guest.
+> -	 */
+> -	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(fault->vcpu))) {
+> -		kvm_inject_dabt_excl_atomic(fault->vcpu, kvm_vcpu_get_hfar(fault->vcpu));
+> -		ret = 1;
+> -		goto out_put_page;
+> -	}
+> -
+> -	if (fault->nested)
+> -		adjust_nested_fault_perms(fault->nested, &fault->prot, &fault->writable);
+> -
+>  	kvm_fault_lock(kvm);
+>  	pgt = fault->vcpu->arch.hw_mmu->pgt;
+>  	if (mmu_invalidate_retry(kvm, fault->mmu_seq)) {
+> @@ -1961,24 +1990,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		}
+>  	}
+>  
+> -	if (fault->writable)
+> -		fault->prot |= KVM_PGTABLE_PROT_W;
+> -
+> -	if (fault->exec_fault)
+> -		fault->prot |= KVM_PGTABLE_PROT_X;
+> -
+> -	if (fault->s2_force_noncacheable) {
+> -		if (fault->vfio_allow_any_uc)
+> -			fault->prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+> -		else
+> -			fault->prot |= KVM_PGTABLE_PROT_DEVICE;
+> -	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
+> -		fault->prot |= KVM_PGTABLE_PROT_X;
+> -	}
+> -
+> -	if (fault->nested)
+> -		adjust_nested_exec_perms(kvm, fault->nested, &fault->prot);
+> -
+>  	/*
+>  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
+>  	 * permissions only if fault->vma_pagesize equals fault->fault_granule. Otherwise,
+
