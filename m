@@ -1,89 +1,73 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7452C39BFF1
-	for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 20:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AA71A304A
+	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 02:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774904319; cv=none; b=sFwXgpg2F80//Gb0fQwHw4DVD/2iyH0bgnAUGetD+7I8rAQv6C4/YDfkJv9Iu4Mw0rQvDuWGQVZ0nBHlIGuJLQFs1j+aBYKDOdpiFaxX5afz0owkUF+4Byy900drFGVJfjiOEhW21p2FckAPhkVx+MI4ZJIKbkicfl6MEzZCQP8=
+	t=1774924874; cv=none; b=RKh64J4vlJK6BitnZYXc5GCBi5mLYwAnb0/TQCHtkjz9tYstKCaHglBcMyUX8pQCOrL1J/zhQLL8gI+Ab+Dr4QxNSPrfnpufPvEJjrB3Lo/m+MxwYDt/VltWp17xcBrFEP0AopySTCMaB+hOFeHlxyhaGtVYY5lNf9S4VNPjgS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774904319; c=relaxed/simple;
-	bh=CRmFwhZ9DgLfZWDSog6+tG2wzgNWOv5/Op/t2/OxVlY=;
+	s=arc-20240116; t=1774924874; c=relaxed/simple;
+	bh=ObRxpbE/eUS3h8F3m+U6Yj6wv+FCD3d3U1SDjVIZ6jw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qsycB56bxURakVZTw13mfU0tA2D3ewoE76EJS7cjck8VnfIuYaoIM+DcxoVUNO9iBS+I7LJaD8AC21nKs8uiGJ0sf0wqib/zlJ3SgNDv/Li1/wiKCtxJAprVyZpDcTzvA/0PeFIseJ0iVdtsJjerWaQVtwIhjcOAxX7xM23zdUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SGu9akNB; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=E7yv4RmT1JZakLFaWTW6U5gbxbphLyVC/l1z3maYmE1dUWaUJ28yUa5/G1NjXMy2tu/F3bjrR967JaMw+90CEROuB36qM963ZjihszUF/ZGdi0mFmD92YAgy5izNaJ/BmmZhfEEOC0UxQ/SVloB7xrI6Toh1ubE4Tyiuug2/Wu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aPqBRjBx; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SGu9akNB"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82cd6614a90so142855b3a.3
-        for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 13:58:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPqBRjBx"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-486fd27754bso50915845e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 30 Mar 2026 19:41:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1774904317; x=1775509117; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1774924871; x=1775529671; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=frztTOmTf3SkuLYaPWUosPvcRTJGFbSFXLD1W9fYAwY=;
-        b=SGu9akNBAM+VsU4blXHQ1AtsY0qB9M9ZKHufZTaoNE8Ml0U6mDFvYkzH5CyMjZSHLX
-         gdXSzaLg7n53jAa6o1/BpRSJcSc4FRBrhvtmHFbw8dyERPMRPzuu/KRhhiFElT9M1WOK
-         v0jCGxsztRvlLjHVDYoQOy5z86eA1SnoQejQG8UdCvdlRt+3lQu4KRENjvUcINWDpw+H
-         uu/lm4H7VGEKd2U7WZdRh/LrXLSVxLoiG10nCmFUm6p8+kWzBwZ/VoTUXiaTUWEQ89va
-         lH++N7A6RfDIAtkIe7yMrncPEOr8o707aF6tibtwROZfqKR/ygDY4Bt2Nev6ETko5cKv
-         lTgg==
+        bh=LXnJaJoemcaiDGH1WZmG/hzLsuogYk0N7x2l4+nhrvM=;
+        b=aPqBRjBxL55uVoZgfy3Rk9jrKOhDOf+7EoJHdlMTVb2+5rmJjEy0V9np2wfAHgQGVT
+         lW2TKwFCByg7sBDlFlHRzvHYUCbDs/CNy5FdLPSdf5/Oc64bdxCScmTvZpi7oxxWrjZ1
+         pCuyCwFfl4/fnFi9FjIj5HEIDHKQ1lX8M9LFIhHRhIr+N1UxoOq/LexXLaAnw0haij9p
+         KudDGG8llSSff5iyWgBRRPtRbUHl1FqejvK9TxDmDt0TWjZDHfJdN9RmzV2JRaV6xECX
+         bXqqSpLewGMSwez3vFo1msTYCSCtMtWHh9yESKmpmhtbOv0YKI3GgH9hQVzoIEjf32th
+         QTig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774904317; x=1775509117;
+        d=1e100.net; s=20251104; t=1774924871; x=1775529671;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=frztTOmTf3SkuLYaPWUosPvcRTJGFbSFXLD1W9fYAwY=;
-        b=OxUj2gplST/W+VIEM5i3ctA0Cfu6UJ8uv3hD6oJzyA3M8tJ3W8Jg/WsqIQ5ILEDWO0
-         hUTPYhlTud2+qqS516oEGPacDEx/RC4bzoSVPb8fcuuDUs9pNflIdSpTzwVEYkzRenH3
-         Dvuk3zdhnxMUWLpSvo1aNrkkbldIKhhUeicxfUFJNOouaAPAnVaSf8DXlsm9QvhWC+BB
-         Cr+RIDGgvwk2cM4/izDpVCsMregPs/rKe8rc8vi4TKYciJgjyQvnFGslMbmS8wlXsk2E
-         lXDLIPa4tpIAw+HCJZ4Og9E/BmU/1lv95Q5uTzskejyZQ/UhWSsYPqpMWMg2fvU1OydM
-         SB7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXj98aIIFDCYj8bDxmmQF1VZ5wtCs/MHPxgvwhKQSfsfVLAN2p5PAhdvTY0rrdqeZRTUwFle9Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyzLipP4m7qaE5JBGiBRwZbLEwrlidGCBm2sC+Ka7M/FLI7tBB+
-	ujuWDEcS3dbM/JFDcIoORixnWpq/fKffdQZIoc9b/GekK+T/TuHhfHeFQWM5qaUr+q8=
-X-Gm-Gg: ATEYQzwj0uk1l0sOUbh4vmS+pPXCtRn4HlZ/uZiVeca2t3kvolvPl+0LLEpOuEiPG31
-	+6GG3y0G9sZKjEgEyt61fxUDitkueQGEQhR7B6HuZx6mAI/kltKj9SAp3Bh7aTciRhY50C1vIhS
-	dCNTc/1nzc8SoDKojWqdfNiEfjVL2GtEOEN5/1QtVfuIE6mg12qgI0edh+mNEkDPi8bjmC8Fpd3
-	chnf1QJWXuo+jXcqyQvakP1B2jxVtTOZVv7jmp3ZQ/GXufhiFl5FMsTCbt9+/ZK/iPn5Rnqg+yy
-	EaATDjg4aOaZl39iSJTq2wAcx7dblPFfLVEacaNjhKSAFXSMXw0hGjUBTMQy/Z7GGqJuSxpYc9O
-	DmWMeUN5W30qbms4bJgT8OYgKiFJvF0vBLPaCfx18t/dKyrMR0gxrbHygzm6mrOLO8HI89zN9xn
-	4OOLn1x3DPJ2aWT2T7eCv8wtPOLrQ=
-X-Received: by 2002:a05:6a00:ad88:b0:82a:6d9d:3f84 with SMTP id d2e1a72fcca58-82c96002905mr13353400b3a.33.1774904316640;
-        Mon, 30 Mar 2026 13:58:36 -0700 (PDT)
-Received: from p14s ([2604:3d09:148c:c800:e8c9:5e1e:f42a:2b73])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca85fc6c8sm7426575b3a.45.2026.03.30.13.58.34
+        bh=LXnJaJoemcaiDGH1WZmG/hzLsuogYk0N7x2l4+nhrvM=;
+        b=A978465fXk+f1cT/6JFBCRIarO5NMJCvXQqwvxvpzi7lxLg6sN/KHFN7LR9rx8gUhF
+         vSmYleSVqKtsswX9X4ArTImKx9W1mz6HD6kY+14vK6a5nRuRnAubbG1c3ZcY5YVhwjhy
+         TDE5wWj0Fy+5Wqo9hzYfHZWXZUNikweakEMmemHV32PurDZF+lEM0HVWTB40KmVBK/1Y
+         hMF+fqdvRXDtsYYOz9AY+uUY650Yls1l4Ik6RF6V/CnySnxh8/dggzAqb+0dJ7BsgnPq
+         DghgzB4pub8xyVWPXX0iZWNrv8YbZpDvE5ntF7Y6FNKjEp/Y2nmma+2sJURESzh9a0PY
+         Q8Xg==
+X-Gm-Message-State: AOJu0YzATrORbzIrG4T/4L59PdF8Mm9PgljIpZSHRVZUucdtBB76fD4D
+	i12ACTkzE97hV3YV3ndz9eq/ghscR4cq7QSoBwzZZ/mPq6zMAdsAhNIKfJcA48KXFA==
+X-Gm-Gg: ATEYQzwnXkcKMZEq2df2ULKlLRGfeXDvLxGfhU/OJggpjVPoBehnHEjIGmWWvTrly6X
+	QSsDRsAN1TkznY65n3uVlnqJqlXoLp7j9pCXL7K9ObuGHk0iZ2u6vlHK19gU7TYU1Jw0L1oq02z
+	bhpb3+er6M0iQYxSLFRjeX0j6DM4qOhThRPbfb5IIlqzHpou1ym5jftNVPu9vy+OAXyQHuqIz3R
+	Gsq6vazhG2tTkqwxSz+4/zY9wHSj68qbxUHVk+E6GhXvwrk2xtSjqX/7NETjbD5sP49P9r79QFs
+	dMcsk0kDHhhxCJHnSrWZU9JQvFj2XPcDCBTqA3pVl2n6v50FpkK8bf/xBjoIr1/w1juHJ++nMYt
+	/tF6EXBPLV9W+jetKNMG4tLkqJOiczBgWL9QYUyc+smX8cAl8PZX22tfOlgo4UJNN5z1RTYs5os
+	rQtRgjf6hzXYTf6NPy/TCn8Sd1NTdXXsTp4nEqJySnDE9EYhAWo1d0McrVCag/8dm8Wzo=
+X-Received: by 2002:a05:600c:c090:b0:487:338:b4df with SMTP id 5b1f17b1804b1-4873de6ca3dmr61799345e9.15.1774924871032;
+        Mon, 30 Mar 2026 19:41:11 -0700 (PDT)
+Received: from google.com (198.115.140.34.bc.googleusercontent.com. [34.140.115.198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4873062ec9bsm219312745e9.7.2026.03.30.19.41.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 13:58:36 -0700 (PDT)
-Date: Mon, 30 Mar 2026 14:58:33 -0600
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v13 10/48] arm64: RMI: Ensure that the RMM has GPT
- entries for memory
-Message-ID: <acrj-cKphy4hJsEG@p14s>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-11-steven.price@arm.com>
+        Mon, 30 Mar 2026 19:41:09 -0700 (PDT)
+Date: Tue, 31 Mar 2026 03:41:05 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, android-kvm@google.com,
+	catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com,
+	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com
+Subject: Re: [PATCH v3] KVM: arm64: Prevent the host from using an smc with
+ imm16 != 0
+Message-ID: <acs0Qbjfdmlkvd1e@google.com>
+References: <20260330105441.3226904-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -92,213 +76,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260318155413.793430-11-steven.price@arm.com>
+In-Reply-To: <20260330105441.3226904-1-sebastianene@google.com>
 
-Hi,
+On Mon, Mar 30, 2026 at 10:54:41AM +0000, Sebastian Ene wrote:
+> The ARM Service Calling Convention (SMCCC) specifies that the function
+> identifier and parameters should be passed in registers, leaving the
+> 16-bit immediate field un-handled in pKVM when an SMC instruction is
+> trapped.
+> Since the HVC is a private interface between EL2 and the host,
+> enforce the host kernel running under pKVM to use an immediate value
+> of 0 only when using SMCs to make it clear for non-compliant software
+> talking to Trustzone that we only use SMCCC.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
 
-On Wed, Mar 18, 2026 at 03:53:34PM +0000, Steven Price wrote:
-> The RMM may not be tracking all the memory of the system at boot. Create
-> the necessary tracking state and GPTs within the RMM so that all boot
-> memory can be delegated to the RMM as needed during runtime.
-> 
-> Note: support is currently missing for SROs which means that if the RMM
-> needs memory donating this will fail (and render CCA unusable in Linux).
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+
 > ---
-> New patch for v13
-> ---
->  arch/arm64/kvm/rmi.c | 89 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 89 insertions(+)
+> v2 -> current:
+>  - move the ESR decoding of the imm16 in the handle_host_smc where it
+>    was supposed to be
+>  - updated the commit message to include the reason behind while we are
+>    not doing for HVCs as well
+>  - updated the commit message to clarify that pKVM is not handling the
+>    imm16
 > 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 9590dff9a2c1..80aedc85e94a 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -4,6 +4,7 @@
->   */
->  
->  #include <linux/kvm_host.h>
-> +#include <linux/memblock.h>
->  
->  #include <asm/kvm_pgtable.h>
->  #include <asm/rmi_cmds.h>
-> @@ -56,6 +57,18 @@ static int rmi_check_version(void)
->  	return 0;
->  }
->  
-> +/*
-> + * These are the 'default' sizes when passing 0 as the tracking_region_size.
-> + * TODO: Support other granule sizes
-> + */
-> +#ifdef CONFIG_PAGE_SIZE_4KB
-> +#define RMM_GRANULE_TRACKING_SIZE	SZ_1G
-> +#elif defined(CONFIG_PAGE_SIZE_16KB)
-> +#define RMM_GRANULE_TRACKING_SIZE	SZ_32M
-> +#elif defined(CONFIG_PAGE_SIZE_64KB)
-> +#define RMM_GRANULE_TRACKING_SIZE	SZ_512M
-> +#endif
-> +
->  static int rmi_configure(void)
+> v1 -> v2:
+>  - Dropped injecting an UNDEF and return an error instead
+>    (SMCCC_RET_NOT_SUPPORTED)
+>  - Used the mask ESR_ELx_xVC_IMM_MASK instead of masking with U16_MAX
+>  - Updated the title of the commit message from:
+>    "[PATCH] KVM: arm64: Inject UNDEF when host is executing an
+>     smc with imm16 != 0"
+> 
+> Link to v2:
+> https://lore.kernel.org/all/20260325113138.4171430-1-sebastianene@google.com/
+> Link to v1:
+> https://lore.kernel.org/all/20260324135728.3532400-1-sebastianene@google.com/
+> 
+> ---
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index e7790097db93..461cf5cb5ac7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -676,8 +676,14 @@ static void default_host_smc_handler(struct kvm_cpu_context *host_ctxt)
+>  static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
 >  {
->  	struct rmm_config *config __free(free_page) = NULL;
-> @@ -95,6 +108,80 @@ static int rmi_configure(void)
->  	return 0;
->  }
+>  	DECLARE_REG(u64, func_id, host_ctxt, 0);
+> +	u64 esr = read_sysreg_el2(SYS_ESR);
+>  	bool handled;
 >  
-> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
-> +{
-> +	start = ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
-
-This will produce an error on systems where the start of system memory is not
-aligned to RMM_GRANULE_TRACKING_SIZE.  For instance, on QEMU-SBSA the system
-memory starts at 0x100_4300_0000.  With the above and RMM_GRANULE_TRACKING_SIZE
-set to SZ_1G, @start becomes 0x100_4000_0000, which falls outside the memory map
-known to the TF-A.  I fixed it with these modifications:
-
-LINUX:
-
-diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index 10ff1c3bddaf..21bfbbe2f047 100644
---- a/arch/arm64/kvm/rmi.c
-+++ b/arch/arm64/kvm/rmi.c
-@@ -424,7 +424,9 @@ static int rmi_configure(void)
- 
- static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
- {
--       start = ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
-+       phys_addr_t offset;
-+
-+       offset = start - ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
-        end = ALIGN(end, RMM_GRANULE_TRACKING_SIZE);
- 
-        while (start < end) {
-@@ -439,7 +441,13 @@ static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
-                                start);
-                        return -ENODEV;
-                }
--               start += RMM_GRANULE_TRACKING_SIZE;
-+
-+               if (offset) {
-+                       start += (RMM_GRANULE_TRACKING_SIZE - offset);
-+                       offset = 0;
-+               } else {
-+                       start += RMM_GRANULE_TRACKING_SIZE;
-+               }
-        }
- 
-        return 0;
-
-RMM:
-
-diff --git a/runtime/rmi/granule.c b/runtime/rmi/granule.c
-index cef521fc0869..60358d9ee81e 100644
---- a/runtime/rmi/granule.c
-+++ b/runtime/rmi/granule.c
-@@ -209,9 +209,11 @@ void smc_granule_tracking_get(unsigned long addr,
-                return;
-        }
- 
-+#if 0
-        if (!ALIGNED(addr, RMM_INTERNAL_TRACKING_REGION_SIZE)) {
-                return;
-        }
-+#endif
- 
-        g = find_granule(addr);
-        if (g != NULL) {
-
-This is likely not the right fix but hopefully provides some guidance.  Send me
-your patches when you have an idea and I'll test them.
-
-Thanks,
-Mathieu
-
-
-> +	end = ALIGN(end, RMM_GRANULE_TRACKING_SIZE);
-> +
-> +	while (start < end) {
-> +		unsigned long ret, category, state;
-> +
-> +		ret = rmi_granule_tracking_get(start, &category, &state);
-> +		if (ret != RMI_SUCCESS ||
-> +		    state != RMI_TRACKING_FINE ||
-> +		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
-> +			/* TODO: Set granule tracking in this case */
-> +			kvm_err("Granule tracking for region isn't fine/conventional: %llx",
-> +				start);
-> +			return -ENODEV;
-> +		}
-> +		start += RMM_GRANULE_TRACKING_SIZE;
+> +	if (esr & ESR_ELx_xVC_IMM_MASK) {
+> +		cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
+> +		goto exit_skip_instr;
 > +	}
 > +
-> +	return 0;
-> +}
-> +
-> +static unsigned long rmi_l0gpt_size(void)
-> +{
-> +	return 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
-> +				      rmm_feat_reg1));
-> +}
-> +
-> +static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
-> +{
-> +	unsigned long l0gpt_sz = rmi_l0gpt_size();
-> +
-> +	start = ALIGN_DOWN(start, l0gpt_sz);
-> +	end = ALIGN(end, l0gpt_sz);
-> +
-> +	while (start < end) {
-> +		int ret = rmi_gpt_l1_create(start);
-> +
-> +		if (ret && ret != RMI_ERROR_GPT) {
-> +			/*
-> +			 * FIXME: Handle SRO so that memory can be donated for
-> +			 * the tables.
-> +			 */
-> +			kvm_err("GPT Level1 table missing for %llx\n", start);
-> +			return -ENOMEM;
-> +		}
-> +		start += l0gpt_sz;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rmi_init_metadata(void)
-> +{
-> +	phys_addr_t start, end;
-> +	const struct memblock_region *r;
-> +
-> +	for_each_mem_region(r) {
-> +		int ret;
-> +
-> +		start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
-> +		end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
-> +		ret = rmi_verify_memory_tracking(start, end);
-> +		if (ret)
-> +			return ret;
-> +		ret = rmi_create_gpts(start, end);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int rmm_check_features(void)
->  {
->  	if (kvm_lpa2_is_enabled() && !rmi_has_feature(RMI_FEATURE_REGISTER_0_LPA2)) {
-> @@ -120,6 +207,8 @@ void kvm_init_rmi(void)
->  		return;
->  	if (rmi_configure())
->  		return;
-> +	if (rmi_init_metadata())
-> +		return;
+>  	func_id &= ~ARM_SMCCC_CALL_HINTS;
 >  
->  	/* Future patch will enable static branch kvm_rmi_is_available */
+>  	handled = kvm_host_psci_handler(host_ctxt, func_id);
+> @@ -686,6 +692,7 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+>  	if (!handled)
+>  		default_host_smc_handler(host_ctxt);
+>  
+> +exit_skip_instr:
+>  	/* SMC was trapped, move ELR past the current PC. */
+>  	kvm_skip_host_instr();
 >  }
 > -- 
-> 2.43.0
-> 
+> 2.53.0.1018.g2bb0e51243-goog
 > 
