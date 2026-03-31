@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656402E1C7C;
-	Tue, 31 Mar 2026 17:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CC333ADB2;
+	Tue, 31 Mar 2026 17:18:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774976580; cv=none; b=HNLINsOU8u8//v/T+QbPvLCWriECdw8y0kDEVcpdEAlO19QXMgF2lFHgj6nnXfceuZV3fCiQQ3oTZoqmVFSbihLd79EX9D+XrFgWbj9SEnJAPSz0yN2DLYdPiXvdHVlRfNFBpZ511MFsnAlhS+BIIHf4F5+aiIYf2TGIhqD05As=
+	t=1774977507; cv=none; b=Jf6yHh0pQQ5ZedGppqsIt6iZ3n2cbOnmizHZXK2vODtru5ex7z5w1GW7SR3bzoNjW7qq863I7knRZ7r3ivyqrF3StizpEd6z/HNLh1ruTm3oukISRBrt0TWSCWvNd/279xtz4WditNz7g9FT1YY04ZPPoqGaDIyvCxn37OYoO8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774976580; c=relaxed/simple;
-	bh=oH5g+TxOejieBcDKtfbs/WsgaSlYxvr2NX9/JoIYhLY=;
+	s=arc-20240116; t=1774977507; c=relaxed/simple;
+	bh=kAtT+QMsvY0b0D4WEvkSsztTqm4Br+XUWhee6KZuar0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MJ5sx+Rct/Q/y4gs4CzeRmW4az5jmtdI8APdCVlfILQ24N9PP7la9gLEwFpvT+TXRwW6i/NDcdoG34vvAzHOf4t46pwreqUT2Fb5FFZ9LXcRTSYveeBiLr7myx12lRxqCyGbUNZRZlLiGB5Uxj94ve6U9YaWrH6UxczTUt4BltI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pG/YU4Bz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=epLlQZ8Oku5n8C4UB0NN8HnP5/wtOfANIaAK1goaZx7SHu0n3Ef4QQvMV/Sy8E+ryNmlPdqFzIp7xhVALdJS1Jx08bxWTB1nJJAhSKujo/20pdZfO8DndeCN5a3dFqvj/nk36NkLMOxsrmrr5qHoW1fP6LbaHtgXkLYTHARUvBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKqcFZ89; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pG/YU4Bz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE38DC19424;
-	Tue, 31 Mar 2026 17:02:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKqcFZ89"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4E7BC19423;
+	Tue, 31 Mar 2026 17:18:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774976579;
-	bh=oH5g+TxOejieBcDKtfbs/WsgaSlYxvr2NX9/JoIYhLY=;
+	s=k20201202; t=1774977506;
+	bh=kAtT+QMsvY0b0D4WEvkSsztTqm4Br+XUWhee6KZuar0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pG/YU4Bzlq9TQ6O4UODbxn/yuhmmYDdkdU2/taFiI7fydUvEk9ZBICmEy1aXoQDcl
-	 fSP8qrcH1qQjfH7/YFd/pWvbbxqce8lLWVXGsV389v1KOTPo6B4+sdnp6ZuZVw7MHI
-	 Tjqdh7pe7NM/j8RlrmKQ9osIob8lc7yHFX2JjRCGztYbDqoFU9u0UN2VDYArz+H4UH
-	 jN0xHJRLNIUoG5E2e4FcbAvGn+fflZZUtoexJn/ZJAueLRKkSTKdMePEbSAqXzFyQm
-	 EvBxo++YMFP8kOq1REaZ/oGTlC59I0rhVw5/D1M6l+T8Pty+pIht9U8P/ZbUK1/40v
-	 /2e3FxY2lMlAA==
+	b=gKqcFZ899bob4d+c7+CryUpDIAB6LbMhwqsgUufKfjOs8163EWVn3djc9cBI6Ny/T
+	 7C9LSwq26cylluwTG0eRkztlAEP/KoT9MhN0t5CLgoAyPTrPWECHU3NsXebHFShCe6
+	 BDowfAkGQUiIQ5XhC1JWHPSi6VRbXucjJ26xazBLnTcbs8EiXCiXK80dsgJ59bUZhw
+	 kLuDfFF7XCDEXCtU4r2wOVt9wqoHR3ZcJ4ewiWHacactyvGxi0lF2UeqpesiG79Du9
+	 vE6/JArFSsiMkaHZ2yGftHny0419Ycpy57RPfYNNj27JY2oA1wTifjLBB0mOWlJ4jn
+	 p243xtkoRwfgg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w7cUT-00000007Ydk-29gg;
-	Tue, 31 Mar 2026 17:02:57 +0000
-Date: Tue, 31 Mar 2026 18:02:57 +0100
-Message-ID: <868qb83pa6.wl-maz@kernel.org>
+	id 1w7cjQ-00000007Yuy-2g0v;
+	Tue, 31 Mar 2026 17:18:24 +0000
+Date: Tue, 31 Mar 2026 18:18:24 +0100
+Message-ID: <867bqr534v.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "kvmarm@lists.linux.dev"
@@ -48,11 +48,11 @@ Cc: "kvmarm@lists.linux.dev"
 	"broonie@kernel.org"
 	<broonie@kernel.org>,
 	nd <nd@arm.com>
-Subject: Re: [PATCH 12/15] KVM: arm64: Remove evaluation of timer state in kvm_cpu_has_pending_timer()
-In-Reply-To: <2779510cb9795d1c934d2122478485847930358a.camel@arm.com>
+Subject: Re: [PATCH 09/15] KVM: arm64: vgic-v5: align priority comparison with other GICs
+In-Reply-To: <729851f0e7d277d308adf04d0008156a01f482bb.camel@arm.com>
 References: <20260326153530.3981879-1-maz@kernel.org>
-	<20260326153530.3981879-13-maz@kernel.org>
-	<2779510cb9795d1c934d2122478485847930358a.camel@arm.com>
+	<20260326153530.3981879-10-maz@kernel.org>
+	<729851f0e7d277d308adf04d0008156a01f482bb.camel@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,150 +69,93 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, kvmarm@lists.linux.dev, kvm@vger.ker
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 31 Mar 2026 16:44:04 +0100,
+On Tue, 31 Mar 2026 16:09:10 +0100,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 >=20
 > On Thu, 2026-03-26 at 15:35 +0000, Marc Zyngier wrote:
-> > The vgic-v5 code added some evaluations of the timers in a helper
-> > funtion
-> > (kvm_cpu_has_pending_timer()) that is called to determine whether
-> > the vcpu can wake-up.
+> > The way the effective priority mask is computed, and then compared
+> > to the priority of an interrupt to decide whether to wake-up or not,
+> > is slightly odd, and breaks at the limits.
 > >=20
-> > But looking at the timer there is wrong:
+> > This could result in spurious wake-ups that are undesirable.
 > >=20
-> > - we want to see timers that are signalling an interrupt to the
-> > =C2=A0 vcpu, and not just that have a pending interrupt
+> > Adopt the GICv[23] logic instead, which checks that the priority
+> > value
+> > is strictly lower than the mask.
 > >=20
-> > - we already have kvm_arch_vcpu_runnable() that evaluates the
-> > =C2=A0 state of interrupts
-> >=20
-> > - kvm_cpu_has_pending_timer() really is about WFIT, as the timeout
-> > =C2=A0 does not generate an interrupt, and is therefore distinct from
-> > =C2=A0 the point above
-> >=20
-> > As a consequence, revert these changes.
-> >=20
-> > Fixes: 9491c63b6cd7b ("KVM: arm64: gic-v5: Enlighten arch timer for
-> > GICv5")
+> > Fixes: 933e5288fa971 ("KVM: arm64: gic-v5: Check for pending PPIs")
 > > Link:
 > > https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff=
 %40arm.com
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> > =C2=A0arch/arm64/kvm/arch_timer.c | 6 +-----
-> > =C2=A01 file changed, 1 insertion(+), 5 deletions(-)
+> > =C2=A0arch/arm64/kvm/vgic/vgic-v5.c | 4 ++--
+> > =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
 > >=20
-> > diff --git a/arch/arm64/kvm/arch_timer.c
-> > b/arch/arm64/kvm/arch_timer.c
-> > index 37279f8748695..6608c47d1f628 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -402,11 +402,7 @@ static bool kvm_timer_should_fire(struct
-> > arch_timer_context *timer_ctx)
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c
+> > b/arch/arm64/kvm/vgic/vgic-v5.c
+> > index 0f269321ece4b..75372bbfb6a6a 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> > @@ -238,7 +238,7 @@ static u32
+> > vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+> > =C2=A0	 */
+> > =C2=A0	priority_mask =3D FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR,
+> > cpu_if->vgic_vmcr);
 > > =C2=A0
-> > =C2=A0int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
-> > =C2=A0{
-> > -	struct arch_timer_context *vtimer =3D vcpu_vtimer(vcpu);
-> > -	struct arch_timer_context *ptimer =3D vcpu_ptimer(vcpu);
-> > -
-> > -	return kvm_timer_should_fire(vtimer) ||
-> > kvm_timer_should_fire(ptimer) ||
-> > -	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (vcpu_has_wfit_active(vcpu) && w=
-fit_delay_ns(vcpu) =3D=3D
-> > 0);
-> > +	return vcpu_has_wfit_active(vcpu) && wfit_delay_ns(vcpu) =3D=3D
-> > 0;
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0/*
+> > -	return min(highest_ap, priority_mask + 1);
+> > +	return min(highest_ap, priority_mask);
 >=20
 > Hi Marc,
 >=20
-> It appears that I'd misunderstood the intent of this function when I
-> originally wrote this bit code. That is: I agree that these checks
-> shouldn't be here.
+> This part of your change (dropping the `- 1`) is not correct for GICv5.
+> The GICv[23] PMR works differently to the GICv5 PCR.
 >=20
-> However, said checks are needed somewhere. With GICv5, we directly
-> inject the timer state (when possible, at least) which means that we
-> never see the timer interrupt firing on the host, and don't track if it
-> is pending or not in struct vgic_irq as the pending state is driven by
-> the hardware itself. The result of this is that we explicitly need to
-> check if the timer interrupt would be pending if the guest were running
-> somewhere.
+> For GICv[23] the mask is exclusive, i.e., only higher priority (lower
+> numerical value) interrupts are of sufficient priority to be signalled.
 >=20
-> I've run with this complete series and have tested the following
-> change. It is sufficient to catch this case, and does it as part of
-> checking if there are pending interrupts, i.e., a more appropriate
-> place called via kvm_arch_vcpu_runnable(). It is yet-another GICv5
-> special case, however. I'd love to hear your thoughts.
+> For GICv5, the priority of an interrupt can be equal to or higher than
+> (numerically lower than) the mask. See DMSQKF in the GICv5 spec:
 >=20
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index cbea4d9ee9552..f8b95721857c3 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -400,6 +400,14 @@ static bool kvm_timer_should_fire(struct arch_timer_=
-context *timer_ctx)
->         return cval <=3D now;
->  }
-> =20
-> +int kvm_cpu_timer_should_fire(struct kvm_vcpu *vcpu)
-> +{
-> +       struct arch_timer_context *vtimer =3D vcpu_vtimer(vcpu);
-> +       struct arch_timer_context *ptimer =3D vcpu_ptimer(vcpu);
-> +
-> +       return kvm_timer_should_fire(vtimer) || kvm_timer_should_fire(pti=
-mer);
-> +}
-> +
->  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
->  {
->         return vcpu_has_wfit_active(vcpu) && wfit_delay_ns(vcpu) =3D=3D 0;
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 7680ced92f715..ffb91f535efe8 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -1238,6 +1238,9 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
->                 if (READ_ONCE(vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db_fi=
-red))
->                         return true;
-> =20
-> +               if (kvm_cpu_timer_should_fire(vcpu))
-> +                       return true;
-> +
+> A physical interrupt has Sufficient priority to be signaled when all of
+> the following are true:
+>    * The priority of the interrupt is higher than the physical running
+>    priority for the Physical Interrupt Domain.
+>    * The priority of the interrupt is equal to or higher than the
+>    Physical Priority Mask for the Physical Interrupt Domain.
+>   =20
+> Therefore, we require this `+ 1` for the priority_mask in order to allow
+> us to combine the active priority and priority mask. Else, they operate on
+> different scales.
+>=20
+> I'd tried to explain this in a comment that lies just outside the diff,
+> but hadn't explicitly called out that GICv5 operates differently to
+> GICv[23] in this regard. Apologies.
 
-This unfortunately seems to suffer from the exact same problem: you
-are evaluating the output of the timer independently of the enable
-bits gating the timer interrupt at the GIC level.
+Nothing to apologise about, this is me not being able to read.
 
-With this, you can disable the timers at the GIC level, arm the timers
-so that they are in a firing position, and enter WFI: the vcpu will
-exit WFI immediately, which is not the expected result.
+>   =20
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0/*
+> > @@ -367,7 +367,7 @@ bool vgic_v5_has_pending_ppi(struct kvm_vcpu
+> > *vcpu)
+> > =C2=A0
+> > =C2=A0		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
+> > =C2=A0			has_pending =3D (irq->enabled &&
+> > irq_is_pending(irq) &&
+> > -				=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 irq->priority <=3D
+> > priority_mask);
+> > +				=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 irq->priority <
+> > priority_mask);
+>=20
+> I agree that this was wrong and should never have included the
+> equality. This was definitely a bug!
 
-I'd suggest something like this instead (compile tested only):
+Cool. I'll revert the revert of the first hunk and keep the second
+one.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 75372bbfb6a6a..e7d23d0519e8b 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -365,9 +365,13 @@ bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
-=20
- 		irq =3D vgic_get_vcpu_irq(vcpu, intid);
-=20
--		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
--			has_pending =3D (irq->enabled && irq_is_pending(irq) &&
-+		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
-+			bool pending;
-+
-+			pending =3D irq->hw ? vgic_get_phys_line_level(irq) : irq_is_pending(ir=
-q);
-+			has_pending =3D (irq->enabled && pending &&
- 				       irq->priority < priority_mask);
-+		}
-=20
- 		vgic_put_irq(vcpu->kvm, irq);
-=20
-
-Thanks,
+Thanks!
 
 	M.
 
