@@ -1,172 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BA93ED5C2;
-	Tue, 31 Mar 2026 09:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1588E2EA16A
+	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 10:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774950180; cv=none; b=av+1rmQS5Nd/HR4r8pRH3sQmHNeSjIOhOWfH0fJKC6msZW6KHbCu98hisGASxQkvm3RdSEvIQDGQ2GuUCfYh9Jgrmm63JRQibI/QefHSzA9rbiXSojtrpVJRGdRXFSxE4CEIGvZNBaCdRBDYImYt/29wg9bnDthXuN42TzUjjhQ=
+	t=1774952343; cv=none; b=NtNCvf5ZKSYekBFnYANWANHCd2+aEPfqKPYsxHanPFhFKSbFs0kYugBPNo0roSt/1F0wQt9RGgBaMNpybGjDtV8+42T4fW0E5xV4fhfQ7JlKmagxlM2Sj4uWST7rqKXnjIYvA98bUmkEpkRGvTB4cxfgWEIfn2YX2XjnhuqLCeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774950180; c=relaxed/simple;
-	bh=Wz1JPZfYFZ/7NHEBqvrgk49xoWPlVfGaLJ0JuwcL59Y=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rXn81DkGPcPeTxGE+Sy3BzBJz+ntPeJevQbn12g8W9NJynQpNncvCed9YUy7IaDRrlDgKvsU8OA/dfh31nYeUUj8oovkg/Lugybcw58HFs3bK3orrrcE99z0gtEjbbfOV1ZCQY/1MGaazyhLRLNotoJLLkvq2v0QDFc/mFQFgl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IgEPV76C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774952343; c=relaxed/simple;
+	bh=LNkgaBupfNB4ugKnElfoJ44h22XXJr16J30q723B68I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pfpryBcfzyPukBWlGAXsUjNBDTCrD0OWvsNkQr5raTM8c5hgyHzD8zwyxZUStf1By3GEATCzUffcIp8zGNcyy+wi3emVqEeTNP4jeUD9SsigNBE8YaJOfR9VJKa+P3NLq/lT7Kwg5chfWtCnfNL4V/alE1BEm0sIKJ+dtCRkoOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=dW4blMzh; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IgEPV76C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E8C3C19423;
-	Tue, 31 Mar 2026 09:43:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774950180;
-	bh=Wz1JPZfYFZ/7NHEBqvrgk49xoWPlVfGaLJ0JuwcL59Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IgEPV76ClMMw4kJ9lusAJKJ3rOwdntvbZsOyRSsNzCGLJlYx0/MeL3ZmWEVr+ANjG
-	 rns8L+YdnWl0TNfyDYr9PgggVNaBtIY87RZ0ZZLIdVyvanagus9T9Cb3JPS9/1Ieh3
-	 xuboOczfpKyIABb2MVZbS7zNBflmHiD3cE/O6WawXn7X8tvwT5JCWWVe4AQFs03APD
-	 IIl6Z0NqjTqCgz3UYcn6UywafENS29rI+MG9Q2Mek6ObjJ70Cewq7+0Mvcy9YXK6HA
-	 GpDfbyLvd+bpH2hrudIXWwH0ZJ9JqmqE9884adyi0iNPwQIeFrXjl7nxiX1j498eaF
-	 ybb1Y0dELnRYA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w7Vcf-00000007Pek-20fN;
-	Tue, 31 Mar 2026 09:42:57 +0000
-Date: Tue, 31 Mar 2026 10:42:57 +0100
-Message-ID: <86a4vo49ni.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown
- <broonie@kernel.org>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-In-Reply-To: <1e050b67-2276-41ad-9265-796ba853dc7c@os.amperecomputing.com>
-References: <20251120172540.2267180-1-maz@kernel.org>
-	<20251120172540.2267180-36-maz@kernel.org>
-	<2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
-	<878qb9cxzr.wl-maz@kernel.org>
-	<1e050b67-2276-41ad-9265-796ba853dc7c@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="dW4blMzh"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78351493B;
+	Tue, 31 Mar 2026 03:18:55 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33DA53F7D8;
+	Tue, 31 Mar 2026 03:19:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774952341; bh=LNkgaBupfNB4ugKnElfoJ44h22XXJr16J30q723B68I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dW4blMzh3hdGi0O/UAif71kYDtd9vMsbyLB53ph6vLXiQZkmRV/HJvfXfeRxwTEJG
+	 VH/zVYXnni6n7T0IKeGEoD7fbWZ2ZrQSNzyRZehAfykH5TnJZcPP4bH55GKQQxSSdB
+	 1E/htMhOcv4ljlwhSqdPrbTcgAlmCQN4SCnmembY=
+Date: Tue, 31 Mar 2026 11:18:54 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Don't populate TPIDR_EL2 in finalise_el2()
+Message-ID: <acufjq_3NZGdv0hN@J2N7QTR9R3>
+References: <20260330152927.26300-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vishnu@os.amperecomputing.com, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330152927.26300-1-will@kernel.org>
 
-On Tue, 31 Mar 2026 07:31:54 +0100,
-Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
+On Mon, Mar 30, 2026 at 04:29:26PM +0100, Will Deacon wrote:
+> When running with VHE, TPIDR_EL2 is only used for the percpu offset once
+> the ARM64_HAS_VIRT_HOST_EXTN capability has been detected, at which
+> point cpu_copy_el2regs() will populate its contents from TPIDR_EL1.
 > 
-> Hi Marc,
-> Many thanks for your reply.
+> Remove the redundant initialisation of TPIDR_EL2 from finalise_el2().
+
+It wasn't clear to me how this worked for both the boot CPU and
+secondaries, since they both call finalise_el2(). How about a slightly
+more elaborate commit message, e.g.
+
+| Currently, it is not necessary for __finalise_el2() to configure
+| TPIDR_EL2:
+|
+| * The hyp stub code does not consume the value of TPIDR_EL2.
+|
+| * On the boot cpu, TPIDR_EL1 is used for the percpu offset until the
+|   ARM64_HAS_VIRT_HOST_EXTN cpucap is detected and boot alternatives
+|   are patched. Before boot alternatives are patched,
+|   cpu_copy_el2regs() will copy TPIDR_EL1 into TPIDR_EL2. It is not
+|   necessary for __finalise_el2() to initialise TPIDR_EL2 before this.
+|
+| * Secondary CPUs are brought up after boot alternatives have been
+|   patched, and __secondary_switched() will initialize TPIDR_EL2 in
+|   'init_cpu_task', after finalise_el2() calls __finalise_el2()
+|
+| * KVM hyp code which may consume TPIDR_EL2 is brought up after all
+|   secondaries have been booted, once TPIDR_El2 has been configured on
+|   all CPUs.
+|
+| Remove the redundant initialisation from __finalise_el2().
+
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> ---
 > 
-> On 30-03-2026 17:47, Marc Zyngier wrote:
-> > On Mon, 30 Mar 2026 12:51:51 +0100,
-> > Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
-> >> 
-> >> Hi Fuad Tabba,
-> > 
-> > To be brutally honest, I doubt Fuad really cares about NV,
+> I spotted this by inspection as part of an ill-fated (abandoned) attempt
+> at repurposing tpidr_elx for something else.
 > 
-> I see Tested-by: fuad Tabba on this patch so tried to reach out him.
-
-Rather than the author of the patch?
-
+>  arch/arm64/kernel/hyp-stub.S | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> > 
-> >>     I'm trying to run nested VMs on Ampere platforms after this patch
-> >> series(v6.19+) but nested VMs are not booting and triggering soft
-> >> lockups on L0 and L0 hang. But just before this patch I could able to
-> >> successfully boot the Nested VMs.
-> > 
-> > So the host dies? There isn't much here that interacts with the host
-> > at all. Worse case, the L1 dies by not making progress.
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index 085bc9972f6b..8b8614c0b9a5 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -105,11 +105,9 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+>  	msr_hcr_el2 x0
+>  	isb
+>  
+> -	// Use the EL1 allocated stack, per-cpu offset
+> +	// Use the EL1 allocated stack
+>  	mrs	x0, sp_el1
+>  	mov	sp, x0
+> -	mrs	x0, tpidr_el1
+> -	msr	tpidr_el2, x0
+>  
+>  	// FP configuration, vectors
+>  	mrs_s	x0, SYS_CPACR_EL12
+> -- 
+> 2.53.0.1018.g2bb0e51243-goog
 > 
-> Initially L1 become unresponsive then L0 becomes unresponsive, soft
-> lockups and L0 hang.
-
-I've never seen this in the past 6 months. Doesn't mean there is no
-bug, but so far I haven't seen any of that.
-
-[...]
-
-> >> Were you able to boot Nested VMs successfully after v6.19+?
-> > 
-> > I boot L3s every day.
-> 
-> Do you mean L2s or L3s on top of L2s?
-
-I'm running an L0 host, itself running L1 guests, themselves running
-L2 guests, themselves running L3 guests. That's what "running L3s"
-means.
-
-> I running L1 and L2 using latest QEMU, do you use QEMU or kvmtool run
-> L1 and L2 in your regression tests?
-
-Both. And that really shouldn't matter.
-
-> 
-> 
-> > 
-> >> LOG:
-> >> [  164.647367] Call trace:
-> >> [  164.647368]  smp_call_function_many_cond+0x334/0x7a0 (P)
-> >> [  164.647372]  smp_call_function_many+0x20/0x40
-> >> [  164.647374]  kvm_make_all_cpus_request+0xec/0x1b8
-> >> [  164.647377]  vgic_queue_irq_unlock+0x1c8/0x2c8
-> >> [  164.647380]  kvm_vgic_inject_irq+0x194/0x1e0
-> >> [  164.647381]  kvm_vm_ioctl_irq_line+0x170/0x400
-> >> [  164.647386]  kvm_vm_ioctl+0x7b8/0xc88
-> >> [  164.647389]  __arm64_sys_ioctl+0xb4/0x118
-> >> [  164.647393]  invoke_syscall+0x6c/0x100
-> >> [  164.647397]  el0_svc_common.constprop.0+0x48/0xf0
-> >> [  164.647398]  do_el0_svc+0x24/0x38
-> >> [  164.647400]  el0_svc+0x3c/0x170
-> >> [  164.647403]  el0t_64_sync_handler+0xa0/0xe8
-> >> [  164.647405]  el0t_64_sync+0x1b0/0x1b8
-> > 
-> > This trace is about interrupt injection from userspace, not
-> > deactivation of a HW interrupt.
-> > None of that makes much sense.
-> 
-> Although this behavior is puzzling, it matches the trace I typically
-> observe on L0. After reverting the patch, I was able to boot L2 guests
-> successfully.
-
-Well, this patch fixes real bugs, so it isn't going anywhere.
-
-The patch you are reverting addresses the deactivation of a HW
-interrupt, which is likely to be a timer (that's the only one we
-support). The stacktrace points to the userspace injection of an SPI.
-
-If we need to broadcast IPI, that's because there is no other SPI
-currently in flight. But if a CPU is not responding to the IPI, what
-is it doing? How does this interact with the patch you are reverting?
-
-Given that I don't know what you're running, how you are running it,
-that I don't have access to whatever HW you are using, and that you
-are providing no useful information that'd help me debug this, I will
-leave it up to you to debug it and come back with a detailed analysis
-of the problem.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
