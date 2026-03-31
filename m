@@ -1,54 +1,54 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428913E559E
-	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 19:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030A43E317F
+	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 19:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774986147; cv=none; b=nMpPO0rPE+UppxIK2vKhIF7/gth/ER7kEGc6nsFQUTPoS06Qk3yevNXBiatTTT4xaQTWAFCC11b8Ydv0U5Bdvm9xTtw1wYv/5ELOsrPsMCbvBC8k91qsR8nY2bsPc3N/oxer9kk73E1JMqDz51DGV+jME8tzovIj/7YvHz0w0R4=
+	t=1774986149; cv=none; b=TLyC6wR3ochqkxKoy8zG6pBnvpc434GokG50Q5lVUELZ0UcXwPlXkWG7IAWiKeacFTx4RwUVi5EJGpsaRCbOdn29qbSUSWTh8N6fMHqQUmXHOTBFMhVJ7oeKWz7bionesNwDTLxqXPKY9/2eLLo6gfKsMsah2PbovTTjFCfslPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774986147; c=relaxed/simple;
-	bh=n4fhcjg0fQb/2J9WY6YgHfApmfQaurJyvDnXjYmfZLg=;
+	s=arc-20240116; t=1774986149; c=relaxed/simple;
+	bh=uI0SPO45nQ55zfm6jOzEO7zUNIVAxE6AaTYr9tc1xrw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FtqfHQuDjyaA/Qw+q9nRD5F1MwPWsGvtPgRcGrltTN0qUOwC97b+haUjCWYc4T+8jLNren3gSnEKxFwUPOHyStYBQpsJ7BesmJQf0kjyoWlNC/JZnnD9J56yNk+qijhZcRiHHKpWowMgHGruKMH/2gYrBImZmOy0HT0n9ebZGDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PSry/MvY; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=OVVUiP5Gc8BgQsft4vIhfQ59S+e7pK+ExAlqK2J4T4gKb3O/pEbsL6IrFfohTv30njYeAmZDszF5B4leRuoPfjLEmRCzcy/HZ8FBNZk7k5vj2uZI1iZf4kflrEiph2hd8fxuB+hXg2HNvhdfp3aiW/uumN6hs+S5VAbTwEFdTfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c2q35KoV; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PSry/MvY"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82a6906e35fso183206b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 12:42:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c2q35KoV"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35d9e67f6dcso8953104a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 12:42:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774986145; x=1775590945; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1774986147; x=1775590947; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EDxS3RLGSrG2H/pkS7vidJMr8Di538wm6I+VqwzPhms=;
-        b=PSry/MvYy8yIQvu2D09+YHsZQVmCerMm+D2D9gHALxF1GCgfQF0XjWbZZ8VK/xZyoO
-         Dz67yqnHe9fIKwTbntCqP1Njc+2gBOnoganmhlDD9dMloHMxiZ+8eWvt8D0FZMXBuzox
-         7m0f6sBGKWlaXjxATt54vvtCvMMt6Eg+97rW1BtLo5Ov1SzHCTxkQVaX5x1YQfS+DVaf
-         VnEXhrR22XcSEKdFj3Rd2wzbnhH5QGDyT4CUzRbxnITZbHHrNydR2uITzoa+8pAaUuPJ
-         YQmQCSivKlF/LuI/YGLZBwHBRMLlr0nhnWUFfEgVmukS/WBCB68rrObtjyo7uh9+TuXJ
-         xQFw==
+        bh=EMAEEYc33pbDyh5jLNn4+2ckaUXnuUr3hoaO2wyMBMY=;
+        b=c2q35KoVKaczWCz487Y2O6zsnbmqXXAAgZ0NXirV68/p4UkdbhTjofEYT3XoF8sBjG
+         BKyE0lOmP9s0hAXvh2nB3rmjZ4DJQXwLzFLX8BpvkGrZ5W4FcqaLuNLVkcFO6JECxerF
+         HF3g9xGcyneZ1z/P2efBkQ14P9mr5OKBvO3wQn4AC1WK0PPw3HVbVVdV0TKKaSUVMUuL
+         GxZUpHFZ8eligF8UdKP8etWAWwL5gANk7SqOvBU5o13sm3CdLbb5EgauClAWzC/GExnd
+         xhs7hBdZBQvoUnO6mvrm5hJFPYNR5/FVD4jQTojnl4q7E/s45nNL+HtF5EV5li2rVmuJ
+         vo7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774986145; x=1775590945;
+        d=1e100.net; s=20251104; t=1774986147; x=1775590947;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EDxS3RLGSrG2H/pkS7vidJMr8Di538wm6I+VqwzPhms=;
-        b=OYb7edhMzQqAwtc0G664mLk1OeJgE8LWQ2DNCrRNQnJ9TAIxo/vVep9Qq2kpQuPVMA
-         bqowwP4H1vtc44EiBlGe5BNyMBt4bfw6eFNKMwB0BcEMJhrKjnKGoUvgaZC7+4JmCUeW
-         yZONTJC7yCi3ej6+fFybpfL2o0401OfWQrNsVnimru16ssHo1n30nRJ3ESbwdeqLwL59
-         4BQDZx+Lx2m72sK3VRvfqz+jhSt4lqEQ1EyhosOL0fnrhXHfE60m0hSPQyFMKJTzK8v7
-         8QxxcJ2JWrvvJMH+oPnL/jBUmYmCJM3fV0U2LHx0y09B6uwa81MRNntIW3fztzHv8/OW
-         dnPA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+aOGGN0Qv31LnA4PoVXoeQwlJ0OB9ZALYcjcBSekKaJ7BytDHQMIhNsMGANpGMIDmhl8r0aM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz6+SZE0HPg0fSUq3EzDP6S9dmJp/P5uTaT90WwRh38RQFxfH9n
-	ZXahl71T4wjsoHckwQY/du+mHnfr2TToLm5SwHN2MTQ/SfN2kGlP09jD1YN6LcFZELmaEc5X45e
-	8l3BhQ2PQcA==
-X-Received: from pfud21.prod.google.com ([2002:a05:6a00:10d5:b0:82a:1d94:6f65])
- (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1ca8:b0:82a:15a1:14d
- with SMTP id d2e1a72fcca58-82ceaa5635emr441207b3a.14.1774986145378; Tue, 31
- Mar 2026 12:42:25 -0700 (PDT)
-Date: Tue, 31 Mar 2026 12:42:00 -0700
+        bh=EMAEEYc33pbDyh5jLNn4+2ckaUXnuUr3hoaO2wyMBMY=;
+        b=rQGpKIUiqFUtYEvw0SGNJs7oxPsXc7OTY0VY3uvdSqyo0FiSISkkiHwvp/hYTlMQGq
+         bCd1BpTz/oed2iK9qpKr90zSl/A/tk56Ba8rnJdS13/Bl8hYcP7WRl3xTTWKNRarMNJV
+         gViY1FY+JsFupB0ec9Lnqc2qjYpnpbY4GwgssiV4NkEc7ZYgF1PglGSSeTEpz1PvW4+r
+         +USRK/5rTyd/Z6bZr4B1Pz+xdiet63qv3v47DVWB/GgZSl8+sHGYegpHBs6Wa/eI+bWE
+         FjKfoIQo3JMOTNiwtqZFKBQme/pymRNGElARik98sUkFhmetpV0LdwkwH4QQubbr9Eo1
+         lpdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXsxYTOJ7FcgsYnlCs8aBpeyE5waFZxvk6dH2Y9EduspCYJrRBh3sbLOzTcK/YXCQfFSfVaeMg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwB6aSJQXvnXknBhmGwe6yQTYfQ89tnAuFaQBXezD8r4TioVf7k
+	F/YvOgeZv5Fw33XTN09BNHS/zU339ZJJsmNQFoHi9a+MUutMINQsso+nDQPJ1zD0Z9tO0NefHsK
+	YvYgKfniJ1g==
+X-Received: from pjpe5.prod.google.com ([2002:a17:90a:9a85:b0:35d:9d42:3153])
+ (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1850:b0:359:ff8a:ee4f
+ with SMTP id 98e67ed59e1d1-35dc6e9bc88mr571073a91.7.1774986147217; Tue, 31
+ Mar 2026 12:42:27 -0700 (PDT)
+Date: Tue, 31 Mar 2026 12:42:01 -0700
 In-Reply-To: <20260331194202.1722082-1-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260331194202.1722082-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.53.0.1118.gaef5881109-goog
-Message-ID: <20260331194202.1722082-8-vipinsh@google.com>
-Subject: [PATCH v4 7/9] KVM: selftests: Print sticky KVM selftests runner
- status at bottom
+Message-ID: <20260331194202.1722082-9-vipinsh@google.com>
+Subject: [PATCH v4 8/9] KVM: selftests: Add rule to generate default tests for
+ KVM selftests runner
 From: Vipin Sharma <vipinsh@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
 Cc: seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
@@ -70,83 +70,86 @@ Cc: seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com,
 	ajones@ventanamicro.com, Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Print current state of the KVM selftest runner during its execution.
-Show it as the bottom most line, make it sticky and colored. Provide
-the following information:
-- Total number of tests selected for run.
-- How many have executed.
-- Total for each end state.
+Add 'tests_install' rule in the Makefile.kvm to auto generate default
+testcases for KVM selftests runner. Preserve the hierarchy of test
+executables for autogenerated files. Remove these testcases on
+invocation of 'make clean'.
 
-Example:
-
-Total: 3/3 Passed: 1 Failed: 1 Skipped: 0 Timed Out: 0 No Run: 1
+Autogeneration of default test files allows runner to execute default
+testcases easily. These default testcases don't need to be checked in as
+they are just executing the test without any command line options.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- .../selftests/kvm/runner/test_runner.py       | 21 +++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ tools/testing/selftests/kvm/.gitignore   |  1 +
+ tools/testing/selftests/kvm/Makefile.kvm | 26 +++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/testing/selftests/kvm/runner/test_runner.py
-index e8e8fd91c1ad..66a3c3711a8a 100644
---- a/tools/testing/selftests/kvm/runner/test_runner.py
-+++ b/tools/testing/selftests/kvm/runner/test_runner.py
-@@ -15,6 +15,7 @@ logger = logging.getLogger("runner")
- class TestRunner:
-     def __init__(self, testcases, args):
-         self.tests = []
-+        self.status = {x: 0 for x in SelftestStatus}
-         self.output_dir = args.output
-         self.jobs = args.jobs
-         self.print_stds = {
-@@ -33,9 +34,19 @@ class TestRunner:
-         test.run()
-         return test
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 95af97b1ff9e..548d435bde2f 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -7,6 +7,7 @@
+ !*.S
+ !*.sh
+ !*.test
++default.test
+ !.gitignore
+ !config
+ !settings
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 6471fa214a9f..fb9439cb5f3d 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ include ../../../build/Build.include
  
-+    def _sticky_update(self):
-+        print(f"\r\033[1mTotal: {self.tests_ran}/{len(self.tests)}" \
-+                f"\033[32;1m Passed: {self.status[SelftestStatus.PASSED]}" \
-+                f"\033[31;1m Failed: {self.status[SelftestStatus.FAILED]}" \
-+                f"\033[33;1m Skipped: {self.status[SelftestStatus.SKIPPED]}"\
-+                f"\033[91;1m Timed Out: {self.status[SelftestStatus.TIMED_OUT]}"\
-+                f"\033[34;1m No Run: {self.status[SelftestStatus.NO_RUN]}\033[0m",
-+                end="\r", flush=True)
+-all:
++all: tests_install
+ 
+ LIBKVM += lib/assert.c
+ LIBKVM += lib/elf.c
+@@ -330,11 +330,15 @@ $(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
+ $(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+ 
++# Default testcases for KVM selftests runner will be generated in this directory.
++DEFAULT_TESTCASES = testcases_default_gen
 +
-     def _log_result(self, test_result):
-         print_level = self.print_stds.get(test_result.status, "full")
+ EXTRA_CLEAN += $(GEN_HDRS) \
+ 	       $(LIBKVM_OBJS) \
+ 	       $(SPLIT_TEST_GEN_OBJ) \
+ 	       $(TEST_DEP_FILES) \
+ 	       $(TEST_GEN_OBJ) \
++	       $(OUTPUT)/$(DEFAULT_TESTCASES) \
+ 	       cscope.*
  
-+        print("\033[2K", end="\r", flush=True)
-         if (print_level == "full" or print_level == "stdout"):
-             logger.info("*** stdout ***\n" + test_result.stdout)
-         if (print_level == "full" or print_level == "stderr"):
-@@ -43,8 +54,16 @@ class TestRunner:
-         if (print_level != "off"):
-             logger.log(test_result.status, f"[{test_result.status.name}] {test_result.test_path}")
- 
-+        self.status[test_result.status] += 1
-+        # Sticky bottom line
-+        self._sticky_update()
+ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
+@@ -363,3 +367,23 @@ cscope:
+ 	find . -name '*.c' \
+ 		-exec realpath --relative-base=$(PWD) {} \;) | sort -u > cscope.files
+ 	cscope -b
 +
-     def start(self):
-         ret = 0
-+        self.tests_ran = 0
++# Generate runner testcases in DEFAULT_TESTCASES directory.
++# $(OUTPUT) is either CWD or specified in the make command.
++tests_install: list_progs = $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS))
++tests_install:
++	$(foreach tc, $(TEST_PROGS), \
++		$(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(patsubst %.sh,%,$(tc))))
++	$(foreach tc, $(TEST_PROGS), \
++		$(shell echo $(tc) > $(patsubst %.sh,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
 +
-+        # Show initial progress
-+        self._sticky_update()
- 
-         with concurrent.futures.ProcessPoolExecutor(max_workers=self.jobs) as executor:
-             all_futures = []
-@@ -54,9 +73,11 @@ class TestRunner:
- 
-             for future in concurrent.futures.as_completed(all_futures):
-                 test_result = future.result()
-+                self.tests_ran += 1
-                 self._log_result(test_result)
-                 if (test_result.status not in [SelftestStatus.PASSED,
-                                                SelftestStatus.NO_RUN,
-                                                SelftestStatus.SKIPPED]):
-                     ret = 1
-+        print("\n")
-         return ret
++	$(foreach tc, $(list_progs), \
++		$(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(tc)))
++	$(foreach tc, $(list_progs), \
++		$(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
++
++	@if [ ! -d $(OUTPUT)/runner ]; then             \
++		cp -r $(selfdir)/kvm/runner $(OUTPUT);  \
++	fi
++
++	@:
 -- 
 2.53.0.1118.gaef5881109-goog
 
