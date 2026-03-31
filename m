@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D9C386566
-	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 06:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1200837CD39
+	for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 07:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774940278; cv=none; b=nYxoKqVqpUlAdRrq47ShPHgbtbyMP4a/a1s6wA3PEJENCRo/iIo6P72GNQIGAzbGo4D4Xy01lVGA4f8zqEcvX6EpyvwMIOIuHgHMkg2xyxs5Pa+e7Xb2y20CPCqPJYuP8cjm3Yo6bMe85Pi3ACIpV76Zn9oJixTNBnQvFtRl5sQ=
+	t=1774941073; cv=none; b=fRKHKWmuaFwJMQy2IJ7jsQjnLfn2SBpfi1ENokoslvcZiy097vZHqmXgp60P8rrzuzQ5/cgFDI10DeUYwtBgGe2HlGoN1YnX44hrkOQBNajhiGJSCZgClXNoOiXLwGrniU3UMgPJT4R/LWQgYxy2vH8jZjE0v13H5vP7kdVMIpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774940278; c=relaxed/simple;
-	bh=2tOMaJp56iXUOV/xkh3Q08VCKzhADZC2/A1u7wVNqcE=;
+	s=arc-20240116; t=1774941073; c=relaxed/simple;
+	bh=2SiH6CKgnh1H6NsZAZBece6LP/f2wHoqT/JSzoVa0D4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nvBhT/5ryA19QUOFIZgrxi61nkiIelTRH5CHalpq7VfHfCjSnpPX1nyB7AqKNQ/P1TAjqI6mCGWs3dE2c3WWDsQcg3FFZ76lgK5CSV2xoZOWUGrLhH7om5zcxF4YFjIRcrjx0vP1YhsrNYA8QQYZh3Uyp46glt+IplQ+N2VsP9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jUXTOiLI; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=XvnPZF9bHwhQwZIig6O37kQdezZIcpYld7p+lVC3nIV53CNlbesUQz1bRE1nbtsIuIn1gEN5l22Q8mNP7ZetMedOhsRJRll9lvpfyDnHdbEOHSvTtDikvZy9OXMflqiIcm6OSWl7dzChXN4eQ3Y3WFzSP0FoZA70yKyBjsJH740=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZiaxDb2i; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jUXTOiLI"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZiaxDb2i"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47AC4495B;
-	Mon, 30 Mar 2026 23:57:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A09491596;
+	Tue, 31 Mar 2026 00:11:05 -0700 (PDT)
 Received: from [10.57.18.211] (unknown [10.57.18.211])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A77703F7D8;
-	Mon, 30 Mar 2026 23:57:51 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDE0C3F641;
+	Tue, 31 Mar 2026 00:11:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774940275; bh=2tOMaJp56iXUOV/xkh3Q08VCKzhADZC2/A1u7wVNqcE=;
+	t=1774941071; bh=2SiH6CKgnh1H6NsZAZBece6LP/f2wHoqT/JSzoVa0D4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jUXTOiLI9uc4O/BtVmCD3Pfg6t+oABR1hnVEsw1GT0cmK6m8Z8yv2axk3OU8o/8ns
-	 E+sb+tkKwzB96Osa4oxz67fau7jGEOlCGveXKEBX4SYadsF6KoNdegLMx9hyzeKSKi
-	 zmUnKQuO2UoHxyr3MRgMXyzl4mtuN2b8FKFr48No=
-Message-ID: <8bd2b649-01b5-44f4-a034-c202e226e97c@arm.com>
-Date: Tue, 31 Mar 2026 12:27:48 +0530
+	b=ZiaxDb2imkt5mju3NjuHU0SG6oqITQ2pfgBob/9neKocePc7CZ9665498i5NzgOoH
+	 cFDfhUlmv8XEfYTvlgRM1tEuFqlHlof8sIk6WOaxvGWguO4dz5dmnnAWLyMPYAJ58J
+	 3aOpP5e/m+FjP8rF7UeKulGErUVKby0isHTXxHQA=
+Message-ID: <1c92ac00-80c3-4fb2-82ae-ab365cc0ffd8@arm.com>
+Date: Tue, 31 Mar 2026 12:41:04 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/30] KVM: arm64: Hoist MTE validation check out of
- MMU lock path
+Subject: Re: [PATCH v2 13/30] KVM: arm64: Clean up control flow in
+ kvm_s2_fault_map()
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
@@ -44,80 +44,80 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
  Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
  Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>
 References: <20260327113618.4051534-1-maz@kernel.org>
- <20260327113618.4051534-13-maz@kernel.org>
+ <20260327113618.4051534-14-maz@kernel.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20260327113618.4051534-13-maz@kernel.org>
+In-Reply-To: <20260327113618.4051534-14-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+
+
 
 On 27/03/26 5:06 PM, Marc Zyngier wrote:
 > From: Fuad Tabba <tabba@google.com>
 > 
-> Simplify the non-cacheable attributes assignment by using a ternary
-> operator. Additionally, hoist the MTE validation check (mte_allowed) out
-> of kvm_s2_fault_map() and into kvm_s2_fault_compute_prot(). This allows
-> us to fail faster and avoid acquiring the KVM MMU lock unnecessarily
-> when the VMM introduces a disallowed VMA for an MTE-enabled guest.
+> Clean up the KVM MMU lock retry loop by pre-assigning the error code.
+> Add clear braces to the THP adjustment integration for readability, and
+> safely unnest the transparent hugepage logic branches.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+
 > ---
->  arch/arm64/kvm/mmu.c | 28 ++++++++++++----------------
->  1 file changed, 12 insertions(+), 16 deletions(-)
+>  arch/arm64/kvm/mmu.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 0c71e3a9af8b0..ee2a548999b1b 100644
+> index ee2a548999b1b..c6cd6ce5254be 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1870,18 +1870,21 @@ static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
->  	if (fault->exec_fault)
->  		fault->prot |= KVM_PGTABLE_PROT_X;
+> @@ -1897,10 +1897,9 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
 >  
-> -	if (fault->s2_force_noncacheable) {
-> -		if (fault->vm_flags & VM_ALLOW_ANY_UNCACHED)
-> -			fault->prot |= KVM_PGTABLE_PROT_NORMAL_NC;
-> -		else
-> -			fault->prot |= KVM_PGTABLE_PROT_DEVICE;
-> -	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
-> +	if (fault->s2_force_noncacheable)
-> +		fault->prot |= (fault->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
-> +			       KVM_PGTABLE_PROT_NORMAL_NC : KVM_PGTABLE_PROT_DEVICE;
-> +	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
->  		fault->prot |= KVM_PGTABLE_PROT_X;
+>  	kvm_fault_lock(kvm);
+>  	pgt = fault->vcpu->arch.hw_mmu->pgt;
+> -	if (mmu_invalidate_retry(kvm, fault->mmu_seq)) {
+> -		ret = -EAGAIN;
+> +	ret = -EAGAIN;
+> +	if (mmu_invalidate_retry(kvm, fault->mmu_seq))
+>  		goto out_unlock;
 > -	}
-
-Is not the existing code block bit more cleaner though ?
-
 >  
->  	if (fault->nested)
->  		adjust_nested_exec_perms(kvm, fault->nested, &fault->prot);
+>  	/*
+>  	 * If we are not forced to use page mapping, check if we are
+> @@ -1908,16 +1907,17 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+>  	 */
+>  	if (fault->vma_pagesize == PAGE_SIZE &&
+>  	    !(fault->force_pte || fault->s2_force_noncacheable)) {
+> -		if (fault->fault_is_perm && fault->fault_granule > PAGE_SIZE)
+> +		if (fault->fault_is_perm && fault->fault_granule > PAGE_SIZE) {
+>  			fault->vma_pagesize = fault->fault_granule;
+> -		else
+> +		} else {
+>  			fault->vma_pagesize = transparent_hugepage_adjust(kvm, fault->memslot,
+>  									  fault->hva, &fault->pfn,
+>  									  &fault->fault_ipa);
 >  
-> +	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
-> +		/* Check the VMM hasn't introduced a new disallowed VMA */
-> +		if (!fault->mte_allowed)
-> +			return -EFAULT;
-> +	}
-> +
->  	return 0;
->  }
->  
-> @@ -1918,15 +1921,8 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+> -		if (fault->vma_pagesize < 0) {
+> -			ret = fault->vma_pagesize;
+> -			goto out_unlock;
+> +			if (fault->vma_pagesize < 0) {
+> +				ret = fault->vma_pagesize;
+> +				goto out_unlock;
+> +			}
 >  		}
 >  	}
 >  
-> -	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
-> -		/* Check the VMM hasn't introduced a new disallowed VMA */
-> -		if (fault->mte_allowed) {
-> -			sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
-> -		} else {
-> -			ret = -EFAULT;
-> -			goto out_unlock;
-> -		}
-> -	}
-> +	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
-> +		sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
+> @@ -1951,7 +1951,9 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+>  	if (fault->writable && !ret)
+>  		mark_page_dirty_in_slot(kvm, fault->memslot, fault->gfn);
 >  
->  	/*
->  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
+> -	return ret != -EAGAIN ? ret : 0;
+> +	if (ret != -EAGAIN)
+> +		return ret;
+> +	return 0;
+>  }
+>  
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 
