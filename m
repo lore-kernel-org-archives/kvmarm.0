@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535413F23CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890973F165E;
 	Wed,  1 Apr 2026 10:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775039793; cv=none; b=Kz5eCMbSbrSrWiSLSQiBPQ2pJxrDSp50PM2kWX04iYpCY1ViAsnVRJkjN5MQKvjqT2c1wNmI+89FdTlZP1ELIxuv/smHbHk0enJRsuIr4qBm8Ar55M1FzA9wkd0nFsPHE3UdX8mckIftoomCxpRbCXTg7uC4tupQ5u6Q9nfqfbI=
+	t=1775039793; cv=none; b=eCVavjYCLm8oY5J7PuWs5L/XA6HywNUp6vs5u3bmXRET1+h9P3+Vi/MeU9S7iSS10rN41Vi/zG03CjIospAD8Q3rRypilgpGYvbiSr+4UtY92OFw3StDP4Av+J88GUyxNnpZSSdyazJAQD8my7eZcQVk0gfIoy11oEEYiIzRlrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775039793; c=relaxed/simple;
-	bh=eXE9Q7fOTHuVMVAJDSqKZS9kp+vZ41E2oC5DvdD/1Co=;
+	bh=VNQmel/RHchk3IkeD8XwVhbuSIq6/9zgSHmZmW9QO1Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PZ9PN8cMe2yvG/JHVZTwdB9VM4SFJEuAheE2h+ROt6flbes3TgVjqxnYj7Uqy08FPG+n7FRHGk7l95ux0xlML4u5WWk2Kmsrl3XHgKRAFrxDn6TZf8M8XxVyejlJdq61Tpoecf3NEMgUM4kCLZGJthCRRLttYEMGheLeDKbIE6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uEN9gI+o; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=adKm8XcH8+cmjjYiGeYM+MK6Kb06Yfs1qC648m8LCF/Kbw8CI3+m0E+6iHZ7DY3T02y2UQEsUsw9S+hYWmIrdZfrhbI6Ie1wwLTC2MQSYzSf7lqwL8m2oF0Qt88368SxLvzQEVW6mQYZNBf2tuyFB+MOKECIlKZEMZNhLitwh68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfUXyR/6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEN9gI+o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34FFCC2BCB3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfUXyR/6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67019C2BC9E;
 	Wed,  1 Apr 2026 10:36:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1775039793;
-	bh=eXE9Q7fOTHuVMVAJDSqKZS9kp+vZ41E2oC5DvdD/1Co=;
+	bh=VNQmel/RHchk3IkeD8XwVhbuSIq6/9zgSHmZmW9QO1Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uEN9gI+okR178H3w2TuvDBRBg6ye8PeUrLj7xU6vkeazPZOHiFIk4pQn95/KyDIdS
-	 yD1SgDo3Kq/Kd1MxVjb49rEIudEaDZPVnoacDsWLFmI8eH6DecK5wODmyR47FOVYeu
-	 cxPLPfayqKXcnxilTVrA/MP0Prf7cTwKgwqaiEw/G5GMrZufy3b0vPQjKb2qtRz9Ui
-	 oDrOumdPSS9W8Pi06H/EBhhl6k8BY7vU0/BuObSnI0rV9NtIvUIBzQPZO046whrJAU
-	 W4pdVXClJWbzZOotLC/n88tTCoz/8CzRBXV78H3k0RLUMFffFUY4YvAiurc7IaevNv
-	 aZyDo7TTpdDpQ==
+	b=TfUXyR/6hePeVSF98VoeaEBUvF7b+/thk5w94u4oNpA9kYuWpxlrCXBlFQLoHIeKa
+	 hHotA+wb9+yHdo0XE46yuGbN7a/vs37NitQAFexAAcni5UqjAEKW1Vz+bqMoe9MGSr
+	 in+ZdNI4Es5Hj8I84BeWyWSOlGCb9MthQJ+eTuNvUgtfDQ+NAZnGD9JODJ4N007Q7Q
+	 GM0kVFVkq75byxBXH1/lQWUyh9QLbkdTW0akX4CnQFdQ1gQZQPMbAwpyGnYcRDtY9Y
+	 tncBQGjzxWXvc5Oyobrv8Dk+/2aBc27B1J71MTEyyi+xzIk1cOtbgONV2QH5fFK/RM
+	 Gv1jWwMDvofkw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w7sw3-00000007oRQ-1e9E;
+	id 1w7sw3-00000007oRQ-2cmo;
 	Wed, 01 Apr 2026 10:36:31 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 10/16] KVM: arm64: vgic-v5: Correctly set dist->ready once initialised
-Date: Wed,  1 Apr 2026 11:36:05 +0100
-Message-ID: <20260401103611.357092-11-maz@kernel.org>
+Subject: [PATCH v2 11/16] KVM: arm64: Kill arch_timer_context::direct field
+Date: Wed,  1 Apr 2026 11:36:06 +0100
+Message-ID: <20260401103611.357092-12-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260401103611.357092-1-maz@kernel.org>
 References: <20260401103611.357092-1-maz@kernel.org>
@@ -60,53 +60,78 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-kvm_vgic_map_resources() targetting a v5 model results in vgic->dist_ready
-never being set. This doesn't result in anything really bad, only
-some more heavy locking as we go and re-init something for no good reason.
+The newly introduced arch_timer_context::direct field is a bit pointless,
+as it is always set on timers that are... err... direct, while
+we already have a way to get to that by doing a get_map() operation.
 
-Rejig the code to correctly set the ready flag in all non-failing
-cases.
+Additionally, this field is:
+
+- only set when get_map() is called
+
+- never cleared
+
+and the single point where it is actually checked doesn't call get_map()
+at all.
+
+At this stage, it is probably better to just kill it, and rely on
+get_map() to give us the correct information.
 
 Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Fixes: f4d37c7c35769 ("KVM: arm64: gic-v5: Create and initialise vgic_v5")
+Fixes: 9491c63b6cd7b ("KVM: arm64: gic-v5: Enlighten arch timer for GICv5")
 Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/arch_timer.c  | 15 +++++++++------
+ include/kvm/arm_arch_timer.h |  3 ---
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index fd872079f2a24..ecb0aea180327 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -657,16 +657,20 @@ int kvm_vgic_map_resources(struct kvm *kvm)
- 		needs_dist = false;
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 67b989671b410..37279f8748695 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -183,10 +183,6 @@ void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
+ 		map->emul_ptimer = vcpu_ptimer(vcpu);
  	}
  
--	if (ret || !needs_dist)
-+	if (ret)
- 		goto out;
+-	map->direct_vtimer->direct = true;
+-	if (map->direct_ptimer)
+-		map->direct_ptimer->direct = true;
+-
+ 	trace_kvm_get_timer_map(vcpu->vcpu_id, map);
+ }
  
--	dist_base = dist->vgic_dist_base;
--	mutex_unlock(&kvm->arch.config_lock);
-+	if (needs_dist) {
-+		dist_base = dist->vgic_dist_base;
-+		mutex_unlock(&kvm->arch.config_lock);
+@@ -462,8 +458,15 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 		return;
  
--	ret = vgic_register_dist_iodev(kvm, dist_base, type);
--	if (ret) {
--		kvm_err("Unable to register VGIC dist MMIO regions\n");
--		goto out_slots;
-+		ret = vgic_register_dist_iodev(kvm, dist_base, type);
-+		if (ret) {
-+			kvm_err("Unable to register VGIC dist MMIO regions\n");
-+			goto out_slots;
-+		}
-+	} else {
-+		mutex_unlock(&kvm->arch.config_lock);
- 	}
+ 	/* Skip injecting on GICv5 for directly injected (DVI'd) timers */
+-	if (vgic_is_v5(vcpu->kvm) && timer_ctx->direct)
+-		return;
++	if (vgic_is_v5(vcpu->kvm)) {
++		struct timer_map map;
++
++		get_timer_map(vcpu, &map);
++
++		if (map.direct_ptimer == timer_ctx ||
++		    map.direct_vtimer == timer_ctx)
++			return;
++	}
  
- 	smp_store_release(&dist->ready, true);
+ 	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+ 			    timer_irq(timer_ctx),
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index a7754e0a2ef41..bf8cc9589bd09 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -76,9 +76,6 @@ struct arch_timer_context {
+ 
+ 	/* Duplicated state from arch_timer.c for convenience */
+ 	u32				host_timer_irq;
+-
+-	/* Is this a direct timer? */
+-	bool				direct;
+ };
+ 
+ struct timer_map {
 -- 
 2.47.3
 
