@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470452BEC4E
-	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 13:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F37239FCB6
+	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 13:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775050419; cv=none; b=gld6fVmYGC8Eq1p3lGoZD1o/g7bcYo89LbJCeGi9Jxm69jyz64O/ZNWUT/WR0Tmtt85kcaZByVFSRhlQRaW20jmwOhcN5w5DffRNgX0Ipk3T5AfSslTb0xPOzqUhnMfD3d4ce4CsWKQVvJAqE6ulj9mUawgvdRgprz1OHPq/QTw=
+	t=1775050512; cv=none; b=mPzZkSYM9fwVbWNnD/MTIn7imYw2I+i+sipHtahNtzlNIEmzY1aW/h9XSXJsvJkpiBK/TCrWlkI5WT/LWRFHmMVjhDjZsN/lLeAsl1fZ6yhLMx0hW718BtdSlBylAQue0LTgDAw1QpcteVO+n465ahp+yjuspIXw++mYMhyZ/bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775050419; c=relaxed/simple;
-	bh=u2gA5z/ZbfkLAE1DgTTuoq+UeEly+WXscysmUm3Qsq4=;
+	s=arc-20240116; t=1775050512; c=relaxed/simple;
+	bh=2TAiYxjzVwdqX//M0tim4X32TxlCbCXsOAveLah/O3U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EONDPjGfpaniD2pte1q0Rq2PnFF32i8tQYmkMAOkhg+MudoFGWcwv1p/sOU0rXSSIwNARPejhDUwuJfC3dZNEkfcnN1TFBoCSEcEb47qWrh6CebzYA5M+miicTUW/neDR3OWr6bYdqKDhhdlC2DEP+YZj/PSZQ8Q6diFbOTbs20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RrjOLnO3; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7vwqlm5W2abpnT7dGZ5aXJMQ6idjhtmgxmUCNPYuhKCzauHcSLonIUghxh5w1S4HlnPYxw4LBuxL6nyZYmzDtK/F2KXJfobRlQXNFOTJnNOb47I1gXsXNAV/bMGBX0JJ+cwXFaSGUrJgJuDwjdGYWqBbHN+k0ZzWBXhc1SixkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcM/v+IF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RrjOLnO3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55B6FC4CEF7;
-	Wed,  1 Apr 2026 13:33:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcM/v+IF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF9EC116C6;
+	Wed,  1 Apr 2026 13:35:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775050419;
-	bh=u2gA5z/ZbfkLAE1DgTTuoq+UeEly+WXscysmUm3Qsq4=;
+	s=k20201202; t=1775050511;
+	bh=2TAiYxjzVwdqX//M0tim4X32TxlCbCXsOAveLah/O3U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RrjOLnO3Ng86Zf3a7hqAtZQ38GjlF3Sqjp0X7l8Z0E7s2q5xleRk0UqrElA3+Yu2b
-	 XgTOJY6NkNd3xLnOJrYdVz/IXGsps3BcK5CYPGtt7BGnXZA7PZ1zv9ck6R3H/D71KO
-	 DGU7KA3lD6tc3wKOVJ0oHyVnui/qZqTBZlBoI+iyG7WpUI+ERM+UaiCO+bjhT1bZev
-	 uAs03WJbSnCuAiGQqOre3t2g3aXilLCs2HLdvxmV/lCQXIHsjek51AbZaHEviEZK1i
-	 CJvvNXA8mTb1QO00KWzQLf4xpZ41nO/Px51g2AIADI/uyGi575/zntZAvSV/1lG+KA
-	 ofceWRRlmbsfQ==
-Date: Wed, 1 Apr 2026 14:33:33 +0100
+	b=TcM/v+IFj6IIz8mSM13m6fQRWoKjz3T3opLQesDd1Z+ZC9PoV4La0283nxpxB9Oo4
+	 /2TRb1M8hfSxS8sbSONGcKVEsJyQxRK8MXIBAV5zC/VfYC7tVxztfehS7EwbTFflfB
+	 Wizi9VyGmvSvFf+6lsHR+zKTGnYizea5QPOrLBMLsAuhX0nutizORO4CwCtHgowehq
+	 m2hXmRxrrJUbiKoUkBcl32rFlujrY7g3fLnqFocajl/UAfNbSMEDQFZdRbV/PoSC2/
+	 tr13xLcdMemmVKWLIyKAUrmyUkA6KhJ4EU/0OlOVcySGIaER3DA93gZ7wkW+55F2F2
+	 mFPQxguyJ5nRA==
+Date: Wed, 1 Apr 2026 14:35:05 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -38,11 +38,14 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: Fix teardown of non-protected VMs with
- pKVM
-Message-ID: <b7c54873-b53e-4737-a2f1-29e6b0f2f674@sirena.org.uk>
-References: <20260331155056.28220-1-will@kernel.org>
+	Alexandru Elisei <alexandru.elisei@arm.com>, Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v5 11/38] KVM: arm64: Split teardown hypercall into two
+ phases
+Message-ID: <ab5383dd-b3c9-4f08-97fe-b96d14850dd5@sirena.org.uk>
+References: <20260330144841.26181-1-will@kernel.org>
+ <20260330144841.26181-12-will@kernel.org>
+ <0cf948e9-be64-4c75-97f8-a560442eb5d2@sirena.org.uk>
+ <acwfcFytYX7eHAUZ@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,48 +53,45 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="VKjDXFZzISaRr2EE"
+	protocol="application/pgp-signature"; boundary="HMblpO9oyn5+ZS2O"
 Content-Disposition: inline
-In-Reply-To: <20260331155056.28220-1-will@kernel.org>
-X-Cookie: Sentient plasmoids are a gas.
+In-Reply-To: <acwfcFytYX7eHAUZ@willie-the-truck>
+X-Cookie: "Yo baby yo baby yo."
 
 
---VKjDXFZzISaRr2EE
+--HMblpO9oyn5+ZS2O
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Mar 31, 2026 at 04:50:52PM +0100, Will Deacon wrote:
+On Tue, Mar 31, 2026 at 08:24:32PM +0100, Will Deacon wrote:
+> On Tue, Mar 31, 2026 at 08:15:40PM +0100, Mark Brown wrote:
 
-> This time, it spotted that my fix (introduced in v5 [1] of the pKVM
-> series) to prevent taking a reference on a VM in the 'is_dying' state
-> also prevents unsharing of pages shared with a non-protected VM if that
-> VM is torn down by its VM fd being destroyed, rather than the usual path
-> via the MMU notifiers.
+> > We've started seeing WARN_ON()s generated in -next on N1DSP when running
+> > kvm-unit-tests under pKVM:
 
-> Rather than send a v6 of the whole series, here are three patches that
-> apply on top of v5 and fix the issue by (a) preventing teardown of a
-> referenced VM and (b) allowing some references to be taken on a dying
-> VM. As an added bonus, this simplifies the locking on the reclaim path
-> because now a VM reference is enough to stop the page-tables from going
-> away.
+> > 1821 23:03:59.721620  <4>[   17.558270] ------------[ cut here ]------------
+> > 1822 23:03:59.725053  <4>[   17.558274] WARNING: arch/arm64/kvm/pkvm.c:373 at __pkvm_pgtable_stage2_unshare+0xbc/0xfc, CPU#3: qemu-system-aar/390
 
-This series fixes the warnings I reported with pKVM on N1DSP yesterday:
+> Aha! That's probably the thing I tried to fix today. Please can you try
+> these patches on top?
 
-Tested-by: Mark Brown <broonie@kernel.org>
+> https://lore.kernel.org/r/20260331155056.28220-1-will@kernel.org
 
---VKjDXFZzISaRr2EE
+Yes, those seem to stop the warnings showing up.
+
+--HMblpO9oyn5+ZS2O
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnNHqwACgkQJNaLcl1U
-h9CwMgf/fs8y9kNrlWFlAgNkzhfQnswRnqeKgN/WBQoa+ICQlo10qCf/fIXAIYuj
-eiEfPzbOlhE8b1jpwyGPMaeNT0R3VME5RqHjTH0iMxkZNMcchbsV075VfPjeFIhS
-Mha9t6CdJ2wfydRzUAjuHHGDsCSrMBDVs07sTpJw8CIz6znZFX/YfbxKs0meuRGj
-F/RLlgyTtz4IdnIwk82pCiYz/uQm+boFHvkKe+/koKsewy6gTs+/sV2ik9tNGVlP
-WTDpGktEbaIu7mchxtkv+rylgszxwR6piyba9qWE8SfppLvaspKXOb5RUDH/cq//
-QFKMBIqswWyAZoTTfJ1neby0ZPm5Rg==
-=/3Az
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnNHwkACgkQJNaLcl1U
+h9B31wf+Ml5vYmGKXL7N1xiYL/XeWbiWf7r2JRHRkjOJyiyzZiwO3OnrLa0cx3qB
+spVaiKrjPytYNV5eRyswYHvA08EkE6szcvY+D/zrDCow/y9AFnewd7PPaT5+OhBP
+hZRO7Au/xkZcU7E0k6FQP3WHviUtYpcNUxFU4X563qagE2makCX0DVDOT0Nr3696
+A0qom3PNXvZdAtWnaTzFtoPMwE+KmmJhIXM6R7RoXEFNFaw5uXaJAf4Bcx6Z8/8U
+ML1v86MQNx+zRfO4Zup4Vl2nw7k2d7AOygbZp5/5WDCBCyvX4AbmvAaeLXMkUUor
+pCCV+EU1wVK+7QFHvo1YqNh5TcQE/g==
+=QqUb
 -----END PGP SIGNATURE-----
 
---VKjDXFZzISaRr2EE--
+--HMblpO9oyn5+ZS2O--
