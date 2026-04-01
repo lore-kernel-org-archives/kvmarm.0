@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A541D3F20FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30A33F23A6;
 	Wed,  1 Apr 2026 10:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775039792; cv=none; b=NaQ3AqCnULf5ZKbp1xFa0wYUW+50dSpMCgPCT4drjw2Lo+gdbPY1WrIaOF9FHx6/pzmDKC3KWBW28liTh0b2Fe97iIBm/XM1ylO2MQgo2D5RWJp29DrZf8Ucov3gFbnG1rmK+NOWaTwqtLa5lpBuQRES6Dowo32JAsZ7IA1m9M8=
+	t=1775039793; cv=none; b=XhHd7hMPwIhhU3mKkHc0SjVQHcRv+8CE8I+jRXNyntknRZRbvaJ2UejsxJ8tc1wEKsdGa1eulcIGYcCsChYsl8+Z3k+rwwGmyqOlLJHPIPawnJ95D9Hpsy6EuN4p6PTyKfRtei6loQYRb9y36mJVO0SMKikRF1+aOe7n+gQUiws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775039792; c=relaxed/simple;
-	bh=tCagDxGfX64OrjM6zObYSFRfzhSvNvykWS0XRcrR0rQ=;
+	s=arc-20240116; t=1775039793; c=relaxed/simple;
+	bh=3N8Es+J9SHXb1LH4kFixxcN/1+h78f4vRX6JJRGxg6E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SbVZztMkPX7pb0XtEUkRAx7YObOVkL70WMH4XV3fjNt+4ZfASExdmjmMP6XchTnEu/UJfn8P3q6hhseOwvowKwGjos93fcZVHuTZKL7Tc3OiVIUuM846w9qFixF2PkWJiQjLypm4hIVaS2ESZLq0GNDImcmZt5D2yKY97rnq48Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWR9bW+i; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Y4YPPYWvS9uKB/lKRojTaauteD1pM3tsdqzwwWgj3H9ociJ5onX7yVPvIjU5jkEhUzdwd8gCd+ivzDuXx97zE+aTC5vAysLGjL0rhIyqUNXJfXNGebBuVDTJr25ffc9Sk2B4bpei2OCZebojH+RG2x5eMTtoeuCc+ZSXrkT98nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hx+B6sD+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWR9bW+i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819DFC2BC9E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hx+B6sD+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6758C2BCB5;
 	Wed,  1 Apr 2026 10:36:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1775039792;
-	bh=tCagDxGfX64OrjM6zObYSFRfzhSvNvykWS0XRcrR0rQ=;
+	bh=3N8Es+J9SHXb1LH4kFixxcN/1+h78f4vRX6JJRGxg6E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DWR9bW+iPs3/2IeSxx+TfhxLe6EwPAHTZt3djdzrr9iOWLN6v/qZUB6wg8LSo7riQ
-	 ffTjLzRSTeXXVOa9KgPwrnJWNZN1OAKmD97r+5fRjlxfN0Dwa9HgvkUZaHIAEPh2WE
-	 01Rpcaz0THHECF7iMnjBxnDtveyrbbaWk8Qw9SFRKi+MkXRCCquG3oQgkUOWHw8RQZ
-	 ZLLfCZeTn18S6bLTl0bUHDJmioh6gi3Jt6OhUZ1kglNdRrJP0thjhh0JjNUITYu67G
-	 Smw5wo8WgQkBcOvGyxZq71v9Yy6UQ3dPCxGw2Q6Zsbq0LNY/BSXePKyjtirsA05VPA
-	 euHc7HY4WOmeA==
+	b=hx+B6sD+msfwXlp8i73Z7Ny5eibir9ie5wxDidGL6n5CjpeLoQrxM/TL0H8oOcWY8
+	 I6YQXhbelfO8sdjAPunu5ElLlz5jRb6q6mwA9yteqRqfXXUCVx9o6aJ+OIRC0kRkXA
+	 OV8+mTn8I0y7agJ3YW/r1x+QIGj3XnHuzl5QhMYtbvr3uH+nnYBZndkuAb4c97Z39F
+	 fhZy9zX62pkNOunqkI7WC8cjjHtdHXoEO7itYUfPA1fpJ2fe8TP+Eu0JuxLF0PujkV
+	 QtHvMAIeArpN2XrnDey8I2Dt1IN0oarkB8ZZkA12RJZ9OJqFHYUbWiWYvdrEvHBqHP
+	 ELmLhKmZ1uExw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w7sw2-00000007oRQ-31R8;
-	Wed, 01 Apr 2026 10:36:30 +0000
+	id 1w7sw2-00000007oRQ-4169;
+	Wed, 01 Apr 2026 10:36:31 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 07/16] KVM: arm64: vgic-v5: Transfer edge pending state to ICH_PPI_PENDRx_EL2
-Date: Wed,  1 Apr 2026 11:36:02 +0100
-Message-ID: <20260401103611.357092-8-maz@kernel.org>
+Subject: [PATCH v2 08/16] KVM: arm64: vgic-v5: Cast vgic_apr to u32 to avoid undefined behaviours
+Date: Wed,  1 Apr 2026 11:36:03 +0100
+Message-ID: <20260401103611.357092-9-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260401103611.357092-1-maz@kernel.org>
 References: <20260401103611.357092-1-maz@kernel.org>
@@ -60,36 +60,44 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-While it is perfectly correct to leave the pending state of a level
-interrupt as is when queuing it (it is, after all, only driven by
-the line), edge pending state must be transfered, as nothing will
-lower it.
+Passing a u64 to __builtin_ctz() is odd, and requires some digging to
+figure out why this construct is indeed safe as long as the HW is
+correct.
+
+But it is much easier to make it clear to the compiler by casting
+the u64 into an intermediate u32, and be done with the UD.
 
 Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Fixes: 4d591252bacb2 ("KVM: arm64: gic-v5: Implement PPI interrupt injection")
+Fixes: 933e5288fa971 ("KVM: arm64: gic-v5: Check for pending PPIs")
 Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v5.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v5.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 119d7d01d0e77..422741c86c6a8 100644
+index 422741c86c6a8..0f269321ece4b 100644
 --- a/arch/arm64/kvm/vgic/vgic-v5.c
 +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -445,8 +445,11 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
+@@ -212,7 +212,7 @@ int vgic_v5_finalize_ppi_state(struct kvm *kvm)
+ static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+-	u32 highest_ap, priority_mask;
++	u32 highest_ap, priority_mask, apr;
  
- 		irq = vgic_get_vcpu_irq(vcpu, intid);
+ 	/*
+ 	 * If the guest's CPU has not opted to receive interrupts, then the
+@@ -227,7 +227,8 @@ static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+ 	 * priority. Explicitly use the 32-bit version here as we have 32
+ 	 * priorities. 32 then means that there are no active priorities.
+ 	 */
+-	highest_ap = cpu_if->vgic_apr ? __builtin_ctz(cpu_if->vgic_apr) : 32;
++	apr = cpu_if->vgic_apr;
++	highest_ap = apr ? __builtin_ctz(apr) : 32;
  
--		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-+		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
- 			__assign_bit(i, pendr, irq_is_pending(irq));
-+			if (irq->config == VGIC_CONFIG_EDGE)
-+				irq->pending_latch = false;
-+		}
- 
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
+ 	/*
+ 	 * An interrupt is of sufficient priority if it is equal to or
 -- 
 2.47.3
 
