@@ -1,109 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCF127F754;
-	Tue, 31 Mar 2026 23:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3C854739
+	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 02:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774998137; cv=none; b=iq0wWzA/XzPwGFcbLEwPW/ExPZujV1Fr1D8mozNUN8eOZJzyBbhkxibTZ6dL8PjP6S6a3FqRMtzJmoJSz7VeSFl8K7iuGIr6Ud+d+Tr05eseJULzCqa1gmrX4RnYDXvfUacrgBzXMMjYylI+edi9FKhX/IRyu6BJ2VMdNzDKtWM=
+	t=1775009941; cv=none; b=OtdAsffjSHV7ukWeStQt/rnqzs4aai4XIfWDzH/ROCLsZiZWBarJh/Ues+KNbC0NYc6VdB2KbZGiy1/KbBx+N5cW/o21DQR1AJVUSybQE7tBijhwmzsO0tgqpjbyMvXr20StGawl2F89BlHlNviIgxF2jkW035x7v+OloJXfYyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774998137; c=relaxed/simple;
-	bh=OW/XLNdysiIJQF3nWAMI661DMkxF2EE8210XPK0GwVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XyAlJa7cye1SUZYYzYA9/SqaBvO24s9kG9tZXxr1JGpwC4nmWjVAbKUmNc39/LPZF8fBqOgax9DVFQV2QWNPdCsZmNMmfVWVf+DO207OYUTl38HTlarn6szUgo/pXAGf9ljuOGty+eJeLdX19udtuBhboysZPS9oml/bnhAiijU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwmoBV31; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775009941; c=relaxed/simple;
+	bh=OAYHliIlM+bHFdWsU9AAJuB9TaySU2rcmCJ1sAPfzcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qd95jiRo1GnXhjUPGI88GdGnAoPzZB5D7yRbt6E9gH6GlpDUOzDTJJ8H9NuLiryb4h/Hcs0FoJZsQBeOv34Wq/I5Ften2DgBLesjvGi9Uls8JBt59OI13vGh4lTakxMtRqQNivQvSMknSh1Z4IjIdelEtyZ+2MYq/W1EzbeE9E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kEaO0BkH; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwmoBV31"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E52C19423;
-	Tue, 31 Mar 2026 23:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774998136;
-	bh=OW/XLNdysiIJQF3nWAMI661DMkxF2EE8210XPK0GwVY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gwmoBV31HBuFTBWIcAl71LqzfnjvY2UucgtAwiuH8/LcGsNGi69QsiPTfrnOllVfC
-	 XhvDLU3wEHIObeBiIGft+j+AxZoQYUqeSfuFaAYFiehaJI4S7vJDJathBpaV2pLQCL
-	 WxIVHDKNMLDFSBP4yvfyCBzYUD4QaVZ+UXm+5dTGaBlgQCGYqfm4Fq1FDguCX5nW8+
-	 qdqEUE1pA/2scuA2fiyhzuL/jE7mf4kI3LD94HaoFzfh5JlxiwbBqlyCKqWRMrEwgQ
-	 +E+82OcByxTpBjOwFO/AdqTK8aC/7FCzuN/l00Bzy+ZCTbejjJ1PotbBdSwkmsPQs8
-	 pSmlW3JzXi5ew==
-Date: Tue, 31 Mar 2026 18:02:13 -0500
-From: Rob Herring <robh@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH V3 7/7] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-Message-ID: <20260331230213.GB2082670-robh@kernel.org>
-References: <20241216040831.2448257-1-anshuman.khandual@arm.com>
- <20241216040831.2448257-8-anshuman.khandual@arm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kEaO0BkH"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7B14C3161;
+	Tue, 31 Mar 2026 19:18:46 -0700 (PDT)
+Received: from [10.164.18.48] (unknown [10.164.18.48])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 26B7B3F7D8;
+	Tue, 31 Mar 2026 19:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1775009932; bh=OAYHliIlM+bHFdWsU9AAJuB9TaySU2rcmCJ1sAPfzcs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kEaO0BkH5h6mtyaUhm0lermJN5ONxSpVxxPfEr2vd+1uHxyeVJu3GRkBBxv5X4hYQ
+	 8z0e2XYlHPjjv/0gCxrEU4R8EcFjHqgv3TS9QRPNlBvYqzjxpZBl3UjNaxYDvi/gZf
+	 SBq6sZiMoqttAH5a2gyapB8uPgMlnqU08Zyev6e8=
+Message-ID: <7694e707-9249-40ee-a053-404bc3e1b734@arm.com>
+Date: Wed, 1 Apr 2026 07:48:46 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241216040831.2448257-8-anshuman.khandual@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/30] KVM: arm64: Hoist MTE validation check out of
+ MMU lock path
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
+ Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>
+References: <20260327113618.4051534-1-maz@kernel.org>
+ <20260327113618.4051534-13-maz@kernel.org>
+ <8bd2b649-01b5-44f4-a034-c202e226e97c@arm.com> <865x6b4zwh.wl-maz@kernel.org>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <865x6b4zwh.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 16, 2024 at 09:38:31AM +0530, Anshuman Khandual wrote:
-> Currently there can be maximum 16 breakpoints, and 16 watchpoints available
-> on a given platform - as detected from ID_AA64DFR0_EL1.[BRPs|WRPs] register
-> fields. But these breakpoint, and watchpoints can be extended further up to
-> 64 via a new arch feature FEAT_Debugv8p9.
-> 
-> This first enables banked access for the breakpoint and watchpoint register
-> set via MDSELR_EL1, extended exceptions via MDSCR_EL1.EMBWE and determining
-> available breakpoints and watchpoints in the platform from ID_AA64DFR1_EL1,
-> when FEAT_Debugv8p9 is enabled.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V3:
-> 
-> - Used SYS_FIELD_PREP() in read_wb_reg() and write_wb_reg()
-> - Added MAX_PER_BANK based BUILD_BUG_ON() tests in arch_hw_breakpoint_init()
-> - Dropped local variables i.e mdsel_bank and index
-> - Derived bank and index from MAX_PER_BANK as required
-> 
->  arch/arm64/include/asm/debug-monitors.h |  1 +
->  arch/arm64/include/asm/hw_breakpoint.h  | 47 ++++++++++++++++++------
->  arch/arm64/kernel/debug-monitors.c      | 15 +++++---
->  arch/arm64/kernel/hw_breakpoint.c       | 48 +++++++++++++++++++++++--
->  4 files changed, 95 insertions(+), 16 deletions(-)
-> 
 
-[...]
 
->  void enable_debug_monitors(enum dbg_active_el el)
->  {
-> -	u32 mdscr, enable = 0;
-> +	u64 mdscr, enable = 0;
->  
->  	WARN_ON(preemptible());
->  
-> @@ -90,6 +91,9 @@ void enable_debug_monitors(enum dbg_active_el el)
->  	    this_cpu_inc_return(kde_ref_count) == 1)
->  		enable |= DBG_MDSCR_KDE;
->  
-> +	if (is_debug_v8p9_enabled())
-> +		enable |= DBG_MDSCR_EMBWE;
+On 31/03/26 11:58 PM, Marc Zyngier wrote:
+> On Tue, 31 Mar 2026 07:57:48 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>
+>> On 27/03/26 5:06 PM, Marc Zyngier wrote:
+>>> From: Fuad Tabba <tabba@google.com>
+>>>
+>>> Simplify the non-cacheable attributes assignment by using a ternary
+>>> operator. Additionally, hoist the MTE validation check (mte_allowed) out
+>>> of kvm_s2_fault_map() and into kvm_s2_fault_compute_prot(). This allows
+>>> us to fail faster and avoid acquiring the KVM MMU lock unnecessarily
+>>> when the VMM introduces a disallowed VMA for an MTE-enabled guest.
+>>>
+>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/kvm/mmu.c | 28 ++++++++++++----------------
+>>>  1 file changed, 12 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index 0c71e3a9af8b0..ee2a548999b1b 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -1870,18 +1870,21 @@ static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
+>>>  	if (fault->exec_fault)
+>>>  		fault->prot |= KVM_PGTABLE_PROT_X;
+>>>  
+>>> -	if (fault->s2_force_noncacheable) {
+>>> -		if (fault->vm_flags & VM_ALLOW_ANY_UNCACHED)
+>>> -			fault->prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+>>> -		else
+>>> -			fault->prot |= KVM_PGTABLE_PROT_DEVICE;
+>>> -	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
+>>> +	if (fault->s2_force_noncacheable)
+>>> +		fault->prot |= (fault->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
+>>> +			       KVM_PGTABLE_PROT_NORMAL_NC : KVM_PGTABLE_PROT_DEVICE;
+>>> +	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+>>>  		fault->prot |= KVM_PGTABLE_PROT_X;
+>>> -	}
+>>
+>> Is not the existing code block bit more cleaner though ?
+> 
+> What is wrong with this? Are you stating a matter of personal taste ?
+> > Ternary operators are great at making things more readable by reducing
+> the amount of nesting, and I'm all in favour of anything that makes
+> this $%^&*( code easier to parse.
+> 
+> Or are you pointing out a technical issue?
 
-Just to record my own findings, this is in the wrong place. This will 
-cause the below code to run every time, not just on the first enable or 
-kernel or user mode breakpoints. it needs to be moved into the below if.
-
-> +
->  	if (enable && debug_enabled) {
->  		mdscr = mdscr_read();
->  		mdscr |= enable;
+There is no technical issue here. Just that the existing code block
+appeared bit easier to read but as you mentioned earlier that is
+probably subjective. Never mind and please feel free to ignore this
+comment.
