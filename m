@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45E73E0238;
-	Wed,  1 Apr 2026 10:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCE23F165E;
+	Wed,  1 Apr 2026 10:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775039791; cv=none; b=HVV0f/ZzH6B3Z7HdhEvYSQ1NBaSOS7OkP2YKwrEbP8scNGmOpbFCd63cWsXEnh/0rZ+tGw4xCf4UMwCfsM6wh1hBQEWS4GXj/ZkfgFZGJfCgT6BhQls9H9CvC0J6S0FA9E3cwXHIPwfDG6j7NWmYpihloka21Z6PMeHBiSTCz9I=
+	t=1775039792; cv=none; b=MGYlkJfo+PnHzxjPoj4sTE6xZZyu6mWiG13APq7OW3SZmqGqk/JmfZbvH3s7oj9ZrKt0JuOiuO/rZB49qoUyQXl7SgMoyl498yAxIYstt5qbCQj0nJTVnYHBAZWPeWtQQzYmw64sEftoQ5Em6rJ06nfG01YoqPC+Q1G5onehM0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775039791; c=relaxed/simple;
-	bh=w1fPDoEy+oy5xwwPakENiPrrfB6YomaGgYQhWWBLZ28=;
+	s=arc-20240116; t=1775039792; c=relaxed/simple;
+	bh=CFePSoo9MRelTjN7d6tKirqt9VLTbTDHcdGyM9MrxaU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j+cjFlp1F3uq5jr/M6livdmpjOLp6q6yjM51NIYlbPUawyCtoInt9FxeSzFaQEnCUrEk9UgcniBLmnZzoLpZ2kzPI6pkv5EdQEbRm4cu5kCYvM0Eh6wH184bL55yx/PQAW/BbXh33yB/kx/+GoCFpskBJ5ZQNHiktNnraY3ULC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOM3cFCV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=f//OgYKdxA5JUUYtNkWjHxLLn6z212NVaENRsnM26rZRQD+KoDZeZ4ObENWiAETLX9eotxeFUCP05BM0zcFClKDMq73tOpcT7B6jVVv03yEC88mvFK81aJhhRJdTtcM6ct1GCxXuKMoCGpoU5Odjvqk57sOHHbMvoS671Rh4P3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reD3drKD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOM3cFCV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A99ACC2BCB4;
-	Wed,  1 Apr 2026 10:36:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reD3drKD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE5FC2BCB4;
+	Wed,  1 Apr 2026 10:36:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775039791;
-	bh=w1fPDoEy+oy5xwwPakENiPrrfB6YomaGgYQhWWBLZ28=;
+	s=k20201202; t=1775039792;
+	bh=CFePSoo9MRelTjN7d6tKirqt9VLTbTDHcdGyM9MrxaU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UOM3cFCV64rMtE5hNq8o3dDdcXx1cOQDxnDTb1pGvqzkCpTLppnGis9Rwftwgi6Kb
-	 KHPk9WFE2wYA068y2Gy0y9qXOHulmnnTKZ+yeHPe4SBYnqiC7Qwv8eIFGyhUYjN0At
-	 /u2IVQ4vrhWavSOHluTjDhefJNgn08fBd4P+/qDQkZlN3Dyf46lCsaz+kOHm/fi0eP
-	 xHU1Q6pstfIjj7l0MCUuJRPrNXQIK4qn2p5z9xhcKA7QeUbNWrswHjtdG4/ZiS5U0x
-	 05XeRcbvzMZilzN760IJtUevishKUPXVhAT9jD8ktShNHBbvRY9xMOJnsTCYsTcuH7
-	 v8RkPAhPeVjgg==
+	b=reD3drKDITbjHXo+09xcvh/m9AxfUnvjslVLZ5TCQ/LOBiI9sIF/AaM0ONdFXAGEN
+	 F7WisRBp/Mm2570vN90c6kYVvlVOlCgJ2mZEcZIP2LM1GW87Vb3mtIkYV+/sH9f/2D
+	 AXhyGolStCkrpHd9KdjWxGLhX84d1rVkjVtR4WqKT9/JY1XbubdbSdg1wDE+9Slmh6
+	 qlMqb9FtH4c4K1vOhETxWicQE2e0z3RDOUfru4uvEOCPoN4TyBmprLUX7uylywp5+o
+	 bcJ37MIyLrMZjvhUzwWQM7lTFRWNXhSWbR5z6Qv0VJPX7FtOxAvhoA+uYr/nnStB6M
+	 Y3ZU6lBeSAJIg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w7sw1-00000007oRQ-3fzO;
-	Wed, 01 Apr 2026 10:36:29 +0000
+	id 1w7sw2-00000007oRQ-0O3X;
+	Wed, 01 Apr 2026 10:36:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 03/16] arm64: Fix field references for ICH_PPI_DVIR[01]_EL2
-Date: Wed,  1 Apr 2026 11:35:58 +0100
-Message-ID: <20260401103611.357092-4-maz@kernel.org>
+Subject: [PATCH v2 04/16] KVM: arm64: Fix writeable mask for ID_AA64PFR2_EL1
+Date: Wed,  1 Apr 2026 11:35:59 +0100
+Message-ID: <20260401103611.357092-5-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260401103611.357092-1-maz@kernel.org>
 References: <20260401103611.357092-1-maz@kernel.org>
@@ -60,35 +60,38 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ICH_PPI_DVIR[01]_EL2 registers should refer to the ICH_PPI_DVIRx_EL2
-fields, instead of ICH_PPI_DVIx_EL2.
+The writeable mask for fields in ID_AA64PFR2_EL1 has been accidentally
+inverted, which isn't a very good idea.
+
+Restore the expected polarity.
 
 Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Fixes: 2808a8337078f ("arm64/sysreg: Add remaining GICv5 ICC_ & ICH_ sysregs for KVM support")
+Fixes: a258a383b9177 ("KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE")
 Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 51dcca5b2fa6e..3b57cb692c5be 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -4888,11 +4888,11 @@ Field	0	DVI0
- EndSysregFields
- 
- Sysreg	ICH_PPI_DVIR0_EL2	3	4	12	10	0
--Fields ICH_PPI_DVIx_EL2
-+Fields ICH_PPI_DVIRx_EL2
- EndSysreg
- 
- Sysreg	ICH_PPI_DVIR1_EL2	3	4	12	10	1
--Fields ICH_PPI_DVIx_EL2
-+Fields ICH_PPI_DVIRx_EL2
- EndSysreg
- 
- SysregFields	ICH_PPI_ENABLERx_EL2
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 18e2d2fccedb8..6a96cb7ba9a3c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3304,10 +3304,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 				       ID_AA64PFR1_EL1_MPAM_frac |
+ 				       ID_AA64PFR1_EL1_MTE)),
+ 	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
+-		    ~(ID_AA64PFR2_EL1_FPMR |
+-		      ID_AA64PFR2_EL1_MTEFAR |
+-		      ID_AA64PFR2_EL1_MTESTOREONLY |
+-		      ID_AA64PFR2_EL1_GCIE)),
++		    (ID_AA64PFR2_EL1_FPMR		|
++		     ID_AA64PFR2_EL1_MTEFAR		|
++		     ID_AA64PFR2_EL1_MTESTOREONLY	|
++		     ID_AA64PFR2_EL1_GCIE)),
+ 	ID_UNALLOCATED(4,3),
+ 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+ 	ID_HIDDEN(ID_AA64SMFR0_EL1),
 -- 
 2.47.3
 
