@@ -1,161 +1,151 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3457431E848
-	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 03:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3916437D116
+	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 03:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775012497; cv=none; b=CGltSNVBFSHfvwM6lGj2SII8f2KtgRuyQk1ZsKKv8aujkYC/PUgbD2j54A6J7saImiXNauCjbDhXCH5ZQM14OBA7yhNsvlOgrsP+jwK4BJJ93qDxenlNk5QhxsToL8S9erGkokouowWWu4y6FQoKhkAsg6WxDlBl8viVP3MIeiA=
+	t=1775013499; cv=none; b=j78kLOKQOx6f8mDDEEg5NzvdrsomjKr6lrw6NUx5AjNyKm+oy/BR4RUbr4WRCWk8RH9j+iNoncw2Nya8vKnXfBIsKhMt0FWPZ4VOMm5mBYF4fYIi26tX3Ol2fMUOVu2SmGTOe9rUoFHB790tfbXumOqISC04EqROu/OOVOW4NuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775012497; c=relaxed/simple;
-	bh=ckPkDolwtt/HMixMNBfum3Ujevylij8wrK9B13Bpq9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N7x/eFkKTO6m6F7JZXymzVmxe2GLbJ3shsHCQuooUfF6SAtInUngBiHXgwvH0txejgPH251o1wLVWWiW0NayjWSB2eKBAEw6NT873uFBFJVNYVpi7/5y5Q3IUYYLXlBcG5h6CbJOKD8Uqt2Y4zsRd20M8BNeRSHkhN/ZlO1bJwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kNxkPD4m; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1775013499; c=relaxed/simple;
+	bh=ffCwt7tLZzRDrhNmFIilVOdNcywEiho2JhdBiZv7pXI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NQ+MBvsBLwKJYnQGNNizEQl4pzdjK/ImTCvzqd1pTrhyv5CvmydbjJvepCjjukyoUpaR+jQKeFFfD/KgASHOJzPrcRBdCRmh/RkwJzoyBUbydNoekl4/aVz63Oz2yKv/GAnHzSN8/9hOa6lscwFPeJZO3sBLq8cBDhZgIeXLGiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=GRP1Cq94; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kNxkPD4m"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4887fd35e60so7084225e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 31 Mar 2026 20:01:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775012490; x=1775617290; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pAhQRpBpSmCBJe7SZDFc/utVWYKkz+s/X4+iBM+yncU=;
-        b=kNxkPD4mPUVugA1nSwOjN8ny1TUFaJAN2bGTNhMHqA55KEE/8xeV6h1oBXQVukcmzF
-         bfpYfkZDMHF5Pkm+UUdrIBIjnUSInThcJtH+4lcrUYJcc+L9IeGKAvYaOJA3rdo7bp/R
-         IP7xbvpriB2Zvz5dg+NVnV3Qs7nGroM8UeWUCaKaLaHB0OCbhVam7qTjFpTMqPN+KV2S
-         4FUGPCeAKBUHN9hNFC7PEOx7UAJRW0ixusac//sog+QncciKzmIdBsH+eJZZNQHvBE4Z
-         ZEI1h1Fh6IF+cgwDvBQQU2sGeEHV6hACebrHR0cLj6maKt1xXGso+jYaFfUqAPG80ZfX
-         ZYcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775012490; x=1775617290;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pAhQRpBpSmCBJe7SZDFc/utVWYKkz+s/X4+iBM+yncU=;
-        b=bWeqVdI7wETl+60eJs1jobfGc7FqpZITtkndt6d/Uy6Q+lJdg5zMcOmTSW6HddOwc9
-         tZQBEpRzBdLtGlhVFkRxFVEKkLSlSoi4T1PeocJ8vztxDS0iliH+U11SRYa0S7IEpjZs
-         bAZ3DLzkmsbeftDukii4w20aOlg1jKIBA00Rc+RuRb0M/OjmwjlMNzAWmZ8WhxW9cXwx
-         0mN6fxwmFjbpz7qXF63NlFFgMwWaqbfGABHVW23foCOSnKKYkEb99K2v/QF9YrX8H4X9
-         4WGSUkhcV6DoRyk+2zFYl18gSyUXhtCW/yL5AKreO2dZKXlbOL2h/ydtvF0PjSgB5FWZ
-         bgPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNAK6+9Q54ejebN7xaIDdSak40qlIRfxetsBe1wdG2Iw0b8Z829v4nDSd78jz9Uvm1GrSzBH4=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywrmg7AqPe9vcfuvMTpKPJwnCvgCb6ovETEsTSTaEJrUHuXlXiC
-	ivhwDgC5XiPTbtKKV4Wm5SSGz+AP91pgBvuaaPY1OeVbKc6LYZahDShoFDHdkA/trA==
-X-Gm-Gg: ATEYQzxqxbc3gI2i7JDNPWHfanCRfua3f3gOgrl+oiasefroUx72fSdVhdXVI3Tbik7
-	GmPqlYmacVZByxRETyaFIMq5TAFVpGt5q2LvzZPTJd4EU1Unw3JmninMl9ywGGyAoXXhXToEUX/
-	oZadVCpbbDBZgANXDyb+nLk00IC9TIl0nSJqgyK6t+ZgVlhABsPeJg0GMMhxzEGNPoLzsfFhqmi
-	kw9VPDG1rPUJ1u58Jz9x4XvFK++areoq3nBcGA23aWBvW/cKMSBrrMf6MGRu0bBvbu3ULSJtPfh
-	FOv9Mx2QZdDCOXJbFeupFd68f8jjG2tUV3MN1VVd1RTndNk9c5rPnmn68Jxh3PNmuBWPcAcr2OP
-	Q672vQZ/iUpeTW7ACpzb6dUqZLG+TJEGPt2UIkJjnVaJRECY4AdrXmj7AW+v2CAsgwIGUgzHpo7
-	y8l7C/oBMoa57a6iCgy8qkT4FvVp/E4Koa/igDP227fkD8T/MMPmfBUyRKDRopDDqEaeA4nSmdS
-	g3Nzw==
-X-Received: by 2002:a05:600c:c178:b0:486:f8e9:add5 with SMTP id 5b1f17b1804b1-48883591777mr27188255e9.19.1775012489318;
-        Tue, 31 Mar 2026 20:01:29 -0700 (PDT)
-Received: from google.com (198.115.140.34.bc.googleusercontent.com. [34.140.115.198])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e80140esm76029395e9.4.2026.03.31.20.01.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 20:01:28 -0700 (PDT)
-Date: Wed, 1 Apr 2026 04:01:25 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Quentin Perret <qperret@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: pkvm: Rollback refcount on hyp share/unshare
- error
-Message-ID: <acyKhZL2di_QQ9xm@google.com>
-References: <20260324172757.2147153-1-vdonnefort@google.com>
- <acpCq1qZCMFqocs3@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="GRP1Cq94"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC0712E99;
+	Tue, 31 Mar 2026 20:18:11 -0700 (PDT)
+Received: from [10.164.18.48] (unknown [10.164.18.48])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9313C3F915;
+	Tue, 31 Mar 2026 20:18:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1775013497; bh=ffCwt7tLZzRDrhNmFIilVOdNcywEiho2JhdBiZv7pXI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GRP1Cq94GtnROBZ9zfMNV5opZ7cwxhg70F8oVYaFLJq/c4KPnS/dnn7jRp2E1vjIH
+	 a3FEnk4RPX2Yr2BsdLpUZm9hEx7JOTWCwJCTPM9VfrCrNH9Ay09Cb63q05hw3QUeba
+	 1bxp6gCAzFJ7txvh8b+tpTY9E1pFqKQFSAgPRXoM=
+Message-ID: <ee8eaa98-fe0d-4c13-b441-f6e8ba1aac5f@arm.com>
+Date: Wed, 1 Apr 2026 08:48:11 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acpCq1qZCMFqocs3@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 17/30] KVM: arm64: Replace fault_is_perm with a helper
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
+ Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>
+References: <20260327113618.4051534-1-maz@kernel.org>
+ <20260327113618.4051534-18-maz@kernel.org>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20260327113618.4051534-18-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 30, 2026 at 09:41:01AM +0000, Quentin Perret wrote:
-> Hey Vincent,
+On 27/03/26 5:06 PM, Marc Zyngier wrote:
+> Carrying a boolean to indicate that a given fault is a permission fault
+> is slightly odd, as this is a property of the fault itself, and we'd
+> better avoid duplicating state.
 > 
-> On Tuesday 24 Mar 2026 at 17:27:57 (+0000), Vincent Donnefort wrote:
-> > If one of the HVC __pkvm_host_share_hyp or __pkvm_host_unshare_hyp fails,
-> > rollback the refcount to ensure the hyp_shared_pfns tracking reflects
-> > the actual sharing status.
+> For this purpose, introduce a kvm_s2_fault_is_perm() predicate that
+> can take a fault descriptor as a parameter. fault_is_perm is therefore
+> dropped from kvm_s2_fault.
 > 
-> If any of these hypercalls fail I think we're still in trouble as
-> kvm_{un}share_hyp() work on multi-page ranges and we could leak pages in
-> a borked state if we fail halfway through. And failing any of these
-> hypercalls is also sign of a bigger problem somewhere else so I wasn't
-> too worried.
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
 
-Yes, my bad, I haven't made that clear in the commit message: a failed HVC
-right now is very much unlikely. I meant more to future proof and this isn't
-fixing an existing corner case. 
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
 
+>  arch/arm64/kvm/mmu.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
 > 
-> But if we're going to fix this properly, I'd suggest also improving the
-> error handling in kvm_share_hyp(). 'Fixing' kvm_unshare_hyp() is a bit
-> harder because we must tell the caller to leak the data structure that
-> was shared I presume, so maybe we just keep the WARN and cross our
-> fingers :)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 09e32f08028e4..1e0d93d6d265a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1711,8 +1711,6 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+>  }
+>  
+>  struct kvm_s2_fault {
+> -	bool fault_is_perm;
+> -
+>  	bool write_fault;
+>  	bool exec_fault;
+>  	bool writable;
+> @@ -1732,6 +1730,11 @@ struct kvm_s2_fault {
+>  	vm_flags_t vm_flags;
+>  };
+>  
+> +static bool kvm_s2_fault_is_perm(const struct kvm_s2_fault_desc *s2fd)
+> +{
+> +	return kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+> +}
+> +
+>  static int kvm_s2_fault_get_vma_info(const struct kvm_s2_fault_desc *s2fd,
+>  				     struct kvm_s2_fault *fault)
+>  {
+> @@ -1888,7 +1891,7 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>  	if (s2fd->nested)
+>  		adjust_nested_exec_perms(kvm, s2fd->nested, &fault->prot);
+>  
+> -	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
+> +	if (!kvm_s2_fault_is_perm(s2fd) && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
+>  		/* Check the VMM hasn't introduced a new disallowed VMA */
+>  		if (!fault->mte_allowed)
+>  			return -EFAULT;
+> @@ -1905,6 +1908,7 @@ static phys_addr_t get_ipa(const struct kvm_s2_fault *fault)
+>  static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  			    struct kvm_s2_fault *fault, void *memcache)
+>  {
+> +	bool fault_is_perm = kvm_s2_fault_is_perm(s2fd);
+>  	struct kvm *kvm = s2fd->vcpu->kvm;
+>  	struct kvm_pgtable *pgt;
+>  	int ret;
+> @@ -1922,7 +1926,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  	 */
+>  	if (fault->vma_pagesize == PAGE_SIZE &&
+>  	    !(fault->force_pte || fault->s2_force_noncacheable)) {
+> -		if (fault->fault_is_perm && fault->fault_granule > PAGE_SIZE) {
+> +		if (fault_is_perm && fault->fault_granule > PAGE_SIZE) {
+>  			fault->vma_pagesize = fault->fault_granule;
+>  		} else {
+>  			fault->vma_pagesize = transparent_hugepage_adjust(kvm, s2fd->memslot,
+> @@ -1936,7 +1940,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  		}
+>  	}
+>  
+> -	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
+> +	if (!fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
+>  		sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
+>  
+>  	/*
+> @@ -1944,7 +1948,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  	 * permissions only if fault->vma_pagesize equals fault->fault_granule. Otherwise,
+>  	 * kvm_pgtable_stage2_map() should be called to change block size.
+>  	 */
+> -	if (fault->fault_is_perm && fault->vma_pagesize == fault->fault_granule) {
+> +	if (fault_is_perm && fault->vma_pagesize == fault->fault_granule) {
+>  		/*
+>  		 * Drop the SW bits in favour of those stored in the
+>  		 * PTE, which will be preserved.
+> @@ -1977,7 +1981,6 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  	bool write_fault = kvm_is_write_fault(s2fd->vcpu);
+>  	bool logging_active = memslot_is_logging(s2fd->memslot);
+>  	struct kvm_s2_fault fault = {
+> -		.fault_is_perm = perm_fault,
+>  		.logging_active = logging_active,
+>  		.force_pte = logging_active,
+>  		.prot = KVM_PGTABLE_PROT_R,
 
-ack
-
-> 
-> Cheers,
-> Quentin
-> 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 17d64a1e11e5..0fb41d2c8b44 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -493,11 +493,17 @@ static int share_pfn_hyp(u64 pfn)
-> >  		goto unlock;
-> >  	}
-> >  
-> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
-> > +	if (ret) {
-> > +		kfree(this);
-> > +		goto unlock;
-> > +	}
-> > +
-> >  	this->pfn = pfn;
-> >  	this->count = 1;
-> >  	rb_link_node(&this->node, parent, node);
-> >  	rb_insert_color(&this->node, &hyp_shared_pfns);
-> > -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
-> > +
-> >  unlock:
-> >  	mutex_unlock(&hyp_shared_pfns_lock);
-> >  
-> > @@ -521,9 +527,15 @@ static int unshare_pfn_hyp(u64 pfn)
-> >  	if (this->count)
-> >  		goto unlock;
-> >  
-> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
-> > +	if (ret) {
-> > +		this->count++;
-> > +		goto unlock;
-> > +	}
-> > +
-> >  	rb_erase(&this->node, &hyp_shared_pfns);
-> >  	kfree(this);
-> > -	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
-> > +
-> >  unlock:
-> >  	mutex_unlock(&hyp_shared_pfns_lock);
-> >  
-> > 
-> > base-commit: c369299895a591d96745d6492d4888259b004a9e
-> > -- 
-> > 2.53.0.1018.g2bb0e51243-goog
-> > 
