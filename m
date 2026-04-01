@@ -1,97 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F37239FCB6
-	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 13:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A462F546D;
+	Wed,  1 Apr 2026 14:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775050512; cv=none; b=mPzZkSYM9fwVbWNnD/MTIn7imYw2I+i+sipHtahNtzlNIEmzY1aW/h9XSXJsvJkpiBK/TCrWlkI5WT/LWRFHmMVjhDjZsN/lLeAsl1fZ6yhLMx0hW718BtdSlBylAQue0LTgDAw1QpcteVO+n465ahp+yjuspIXw++mYMhyZ/bs=
+	t=1775055316; cv=none; b=BPhZspltY4iTyxsoJ2o8Yox74oFQld3uLhzZ2j4JOAYyrcwaBcXzEOgmpDzBJEGV2c0oyYiid57eqkIKX9hxyEcbZ2EhVmak84RB2Cscn33iiv36GzxslMaEOIlLB7zpPSu8NbXtZig7E/3cYoIJnNQP1xvNSm06kzVOLPA221k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775050512; c=relaxed/simple;
-	bh=2TAiYxjzVwdqX//M0tim4X32TxlCbCXsOAveLah/O3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7vwqlm5W2abpnT7dGZ5aXJMQ6idjhtmgxmUCNPYuhKCzauHcSLonIUghxh5w1S4HlnPYxw4LBuxL6nyZYmzDtK/F2KXJfobRlQXNFOTJnNOb47I1gXsXNAV/bMGBX0JJ+cwXFaSGUrJgJuDwjdGYWqBbHN+k0ZzWBXhc1SixkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcM/v+IF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775055316; c=relaxed/simple;
+	bh=VeR08XCObrTVrJHc8UD63osOnrnssAf50udSK2lVMCQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DbWs4fMRmrzjgYW3smWeNJxoO0HFQO/LGJQGZKZwbab1/IOohVsp7H41ZA/WcupoyFW+gbexPBDejUQx2UXv/7gsdXNVQreUIZVAvmC1rgfoKe0o9gF13lbAWH5RjygLumMb0q5KyCaHnfotXxDkgmTNGP19ByLRLHQtHCMOzlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JT31f108; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcM/v+IF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF9EC116C6;
-	Wed,  1 Apr 2026 13:35:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JT31f108"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73DC2C4CEF7;
+	Wed,  1 Apr 2026 14:55:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775050511;
-	bh=2TAiYxjzVwdqX//M0tim4X32TxlCbCXsOAveLah/O3U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TcM/v+IFj6IIz8mSM13m6fQRWoKjz3T3opLQesDd1Z+ZC9PoV4La0283nxpxB9Oo4
-	 /2TRb1M8hfSxS8sbSONGcKVEsJyQxRK8MXIBAV5zC/VfYC7tVxztfehS7EwbTFflfB
-	 Wizi9VyGmvSvFf+6lsHR+zKTGnYizea5QPOrLBMLsAuhX0nutizORO4CwCtHgowehq
-	 m2hXmRxrrJUbiKoUkBcl32rFlujrY7g3fLnqFocajl/UAfNbSMEDQFZdRbV/PoSC2/
-	 tr13xLcdMemmVKWLIyKAUrmyUkA6KhJ4EU/0OlOVcySGIaER3DA93gZ7wkW+55F2F2
-	 mFPQxguyJ5nRA==
-Date: Wed, 1 Apr 2026 14:35:05 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v5 11/38] KVM: arm64: Split teardown hypercall into two
- phases
-Message-ID: <ab5383dd-b3c9-4f08-97fe-b96d14850dd5@sirena.org.uk>
-References: <20260330144841.26181-1-will@kernel.org>
- <20260330144841.26181-12-will@kernel.org>
- <0cf948e9-be64-4c75-97f8-a560442eb5d2@sirena.org.uk>
- <acwfcFytYX7eHAUZ@willie-the-truck>
+	s=k20201202; t=1775055316;
+	bh=VeR08XCObrTVrJHc8UD63osOnrnssAf50udSK2lVMCQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JT31f108PEDGpAmUUv3qK7QKsPxQBFR/4aAF5ywGzAbFiEcX7F99CEBLLCekqNxE5
+	 ftTQx8TI8axXSgmUxhgNWRB0igLuN5GUjnBwyYGNum4Pq7pEUNqR/0nkG+mvFG9ZVI
+	 x5VqWOdLegcw8SBruOJ6aRIt/kYEeIIjh+YInRj5bDoYXk4tE9az5UlSmz1RAmgMq3
+	 G/tQhEmkXbORfeoSXvtF/KoP5RDMUhFf+pNsLMGviaxAhwVelm1Li1RMVP1xbo6o/d
+	 Yqn3OYqQgMb9LIjPEFikXLQ9lhnQjgqsTpnYxMn7x/UNNJs1vyUJlhwm5Qr2OnnxqV
+	 YkQRHPfiTDB1A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w7wyO-00000007uLn-0OWp;
+	Wed, 01 Apr 2026 14:55:12 +0000
+Date: Wed, 01 Apr 2026 15:55:11 +0100
+Message-ID: <86341e4to0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	android-kvm@google.com,
+	joey.gouly@arm.com,
+	korneld@google.com,
+	mrigendra.chaubey@gmail.com,
+	oupton@kernel.org,
+	perlarsen@google.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH] KVM: arm64: Pass a 64bit function-id in the SMC handlers
+In-Reply-To: <20260401123201.389906-1-sebastianene@google.com>
+References: <20260401123201.389906-1-sebastianene@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="HMblpO9oyn5+ZS2O"
-Content-Disposition: inline
-In-Reply-To: <acwfcFytYX7eHAUZ@willie-the-truck>
-X-Cookie: "Yo baby yo baby yo."
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, joey.gouly@arm.com, korneld@google.com, mrigendra.chaubey@gmail.com, oupton@kernel.org, perlarsen@google.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 01 Apr 2026 13:32:01 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
+> 
+> Make the SMC handlers accept a 64bit value for the function-id to keep
+> it uniform with the rest of the code and prevent a u64 -> u32 -> u64
+> conversion as it currently happens when we handle PSCI.
 
---HMblpO9oyn5+ZS2O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+That seems overly creative. The spec says (2.5, from ARM DEN 0028 1.6
+G):
 
-On Tue, Mar 31, 2026 at 08:24:32PM +0100, Will Deacon wrote:
-> On Tue, Mar 31, 2026 at 08:15:40PM +0100, Mark Brown wrote:
+"The Function Identifier is passed on W0 on every SMC and HVC
+call. Its 32-bit integer value indicates which function is being
+requested by the caller. It is always passed as the first argument to
+every SMC or HVC call in R0 or W0."
 
-> > We've started seeing WARN_ON()s generated in -next on N1DSP when running
-> > kvm-unit-tests under pKVM:
+which indicates that it is *always* a 32bit value.
 
-> > 1821 23:03:59.721620  <4>[   17.558270] ------------[ cut here ]------------
-> > 1822 23:03:59.725053  <4>[   17.558274] WARNING: arch/arm64/kvm/pkvm.c:373 at __pkvm_pgtable_stage2_unshare+0xbc/0xfc, CPU#3: qemu-system-aar/390
+So if you have a 64bit value somewhere, *that* should be fixed, not
+propagated arbitrarily.
 
-> Aha! That's probably the thing I tried to fix today. Please can you try
-> these patches on top?
+Thanks,
 
-> https://lore.kernel.org/r/20260331155056.28220-1-will@kernel.org
+	M.
 
-Yes, those seem to stop the warnings showing up.
-
---HMblpO9oyn5+ZS2O
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnNHwkACgkQJNaLcl1U
-h9B31wf+Ml5vYmGKXL7N1xiYL/XeWbiWf7r2JRHRkjOJyiyzZiwO3OnrLa0cx3qB
-spVaiKrjPytYNV5eRyswYHvA08EkE6szcvY+D/zrDCow/y9AFnewd7PPaT5+OhBP
-hZRO7Au/xkZcU7E0k6FQP3WHviUtYpcNUxFU4X563qagE2makCX0DVDOT0Nr3696
-A0qom3PNXvZdAtWnaTzFtoPMwE+KmmJhIXM6R7RoXEFNFaw5uXaJAf4Bcx6Z8/8U
-ML1v86MQNx+zRfO4Zup4Vl2nw7k2d7AOygbZp5/5WDCBCyvX4AbmvAaeLXMkUUor
-pCCV+EU1wVK+7QFHvo1YqNh5TcQE/g==
-=QqUb
------END PGP SIGNATURE-----
-
---HMblpO9oyn5+ZS2O--
+-- 
+Without deviation from the norm, progress is not possible.
