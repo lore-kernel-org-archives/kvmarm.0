@@ -1,147 +1,290 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011036.outbound.protection.outlook.com [52.101.70.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641BD3624CC;
-	Wed,  1 Apr 2026 15:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775057705; cv=none; b=DX4J71WL+36V0qZ+hIi3jOz0yA6rcB3xns0+9fz0OoUB0eHSmrOfZHzuejy1l0qOidThAEAK5Zg8CQJMNFngtyGys3S5xTAACrnuy0JL3pED9+dsn0LeYzQURAx776lkVCB0euef0wnuS4teh0EcIX4UV+IFmPLQm0s+JPAop9o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775057705; c=relaxed/simple;
-	bh=QgTT44z0NxNCrsnzVjVQsYysuC3wHT4k/C7Gkmdg7OM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IC3i0UxPDc6k+OBvblv6vV8v7iOCgUq06cCPPZjfNjIPZxauKdkn0GXw2oHcLkKx7UYBLHA6tDifDRYZScQRTAnFA0YRn/7Ihsp/tSLq7NwOKjHab32zQDSlBarcXHrLbazRDfSaRq6I2XcKNyY/xZq+geLNucU83wMywHA1KIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKaR5u3X; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D78739B951
+	for <kvmarm@lists.linux.dev>; Wed,  1 Apr 2026 16:23:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.36
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775060589; cv=fail; b=NUv6eOSoODHNGPV8f+W/GUqfIGsbZN2QcUtAfs102vNKYHpqfx6vHMgKbrUqzhz0yJENeMiGqzBRwvO4UB3HI684sjh6U0vD5bai2GvQs/hWV7JA+cnR4e7m+TSEdLexMC2P+VV2tdQqT2eUIObmoHTCPMe/RLj/nlKPEAnXYGs=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775060589; c=relaxed/simple;
+	bh=5l/g/0CfSRc1e7WOW9M9XSTkZ7SjTd9hmWN57npOxb4=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=No94ct/E21WWBjNwtSsxbFPJrNLp3Sm/tqsW0KQWOALpLpzuRbEfT69jL8OH+qJPvv04M1f1CL6C7aI2frv51ITmanobzy8+ACHLp/GFbByVsxXPsmlC/ObppSNr5M8Ce1xZEWTY4I+nK0MOkxVpwL9zwutKPxCHEmNYtQgnFRE=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qTTEsHU1; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qTTEsHU1; arc=fail smtp.client-ip=52.101.70.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKaR5u3X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04B7BC4CEF7;
-	Wed,  1 Apr 2026 15:35:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775057705;
-	bh=QgTT44z0NxNCrsnzVjVQsYysuC3wHT4k/C7Gkmdg7OM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kKaR5u3X7DgnIy5ki+PaykDZ3pqyRkcKAT0154uuKjx/U0gWQadZQvKqzqt7XcXlk
-	 EmrsUHIlngNc6fv1MkgkIQHVEbMW3e/BehXcXuaJIeO4e/oD0BY/9Z4J/FTvh5c/Wd
-	 tAlIgZHZBHyv3DUaABZITLlbAwlpQ72pe0YTXA8kbwC+9KqD1/HjBbCRM3ZbtO14gF
-	 iwCmQoNHXC0r6UnFn9nUF0DYBbiojHNMHrhu4niqKy2ajTY2MOedZW8pY5gLJffHlF
-	 6tnoKYJ6119Vm0dUOLLCBkgBhPM4OS9PuBZvenYi77yluFMh5gnS+84B4+CW36lixI
-	 A5ysy9GFD9FtQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w7xax-00000007vQP-0EBN;
-	Wed, 01 Apr 2026 15:35:03 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v2 00/30] KVM: arm64: Combined user_mem_abort() rework
-Date: Wed,  1 Apr 2026 16:34:53 +0100
-Message-ID: <177505767869.364380.5690355355277236875.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260327113618.4051534-1-maz@kernel.org>
-References: <20260327113618.4051534-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qTTEsHU1";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qTTEsHU1"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=NbcY03Cgjh0O/TBlNEaWt56aPrf4aHk2PhO1tRP2KcpRALngyEzWpMgBNO9smH6VJQENaMEGBkTmPYvsa7ldZNirzeik0uYpBFnmWJCWqEa3lLbULSPLyOINSN1xXOL1Fr9nFHD13o64OlabLqyeqhbLQjGbitlyrECHn1ENhuVNK1d3gvPzm7y2eo935ZVr6W0yxf79MvlviPurivWDMfzCPN8yUd7bCF2YoM3ML6Ve1WdSLNmSYS/2bXhpmM+ktT2g0chyPzhU7wcEQ79+dZ8r7O9po4rdqhKYs2a2tq+k0QCrHPJEsr/vpAAqsPYTUnHCKA/S4ih14rDDhRIJrA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/IV5Af936hUwI51CMAETSccI5Fp94i9wAOweF0aeOhE=;
+ b=ArcSoV8Il6E6kvqO837njzrLMIx9Yx3h8+/hcz3c8IQsmVzViHu0l93RXWTOEb95o0dUai4gmhzWsXsGgmErAt3YqSt55Pv00VZqXeiHHz+749mk5oZoxwBh1gehX8nJtIoHIGd/nTBxMZs0tEcfBBA5pQ9WPAzFqOVkUze7/cGqMoGVyky7D5FKy7EYvjK7HL1vN115a5V29O01Dn25MMB6UNry4xNXShK+f/hacmNY1APuZOre9aqyn0ofLVV2fHO9R8M7MDIEI5QAUKqVLqLRKiU7fl56gJil0DTBgiDAwwBGahJ89v7G18+FEvgb99fm1vvfrlutLJucTP59BQ==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/IV5Af936hUwI51CMAETSccI5Fp94i9wAOweF0aeOhE=;
+ b=qTTEsHU1PuBQ3tzpXzZnt6NSz9XuIGdAlKng4+ModD8LK+uXZhtOiKBFPiVsU7nLFJhrROwWZZcQ4t8d/lufDPyQrS5gKnAfyR6z+qIAKX7erDEIiQAaVjwBgo7uuYuQwWL3Rpd71K6tEEvzBYxoKNUE1qcHoYh0SmYwS7IihSw=
+Received: from DU2PR04CA0328.eurprd04.prod.outlook.com (2603:10a6:10:2b5::33)
+ by PAWPR08MB8912.eurprd08.prod.outlook.com (2603:10a6:102:33d::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.28; Wed, 1 Apr
+ 2026 16:23:01 +0000
+Received: from DB5PEPF00014B95.eurprd02.prod.outlook.com
+ (2603:10a6:10:2b5:cafe::79) by DU2PR04CA0328.outlook.office365.com
+ (2603:10a6:10:2b5::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.30 via Frontend Transport; Wed,
+ 1 Apr 2026 16:23:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ DB5PEPF00014B95.mail.protection.outlook.com (10.167.8.233) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.17
+ via Frontend Transport; Wed, 1 Apr 2026 16:23:01 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ds7XSQiZWzwbXLu6PU4m+S48F/dG1MjENBzFqwYfIlDBQofdirOgsaaSyR0ZI3Q19T4fr5ydoAGTywf2/ewH/jfit5OsCLjtbZC5KYeOIv2ctFHpw3mU42G1lpTvo0EslSpyj+JiO3mmX/aOXU64Y1HAJkJs/mi0xV1vwotiptng3SEiEjMXk0w3mvuNVrng9WDW5YGOvhjEWQgOJT9q7JNC3L3rS3VCWaOyo2n/xmyOAz97OoTSkLWGBqi7aO/aPinlLa0mif96jsKHcQeh58Z/saYz/j6E/zaA5WgeQJRWY8Nw3C3AXjN76Xkyq5ICslWSF1rOUg0BFs9zacX1OA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/IV5Af936hUwI51CMAETSccI5Fp94i9wAOweF0aeOhE=;
+ b=DYF3gCi/LEzoyzk7V5BLgNu6WUP6aKJ9SPd6pWt02osFKMkh7t/zpDdhFRl3sG5UtFpmGsdnZVoXqcNGAesgmX5Pgcfw+SkPnhHSHdjJLDF656Heviz3jHujv3hZgUfroOvw4vdKe/qLdtNEojON6tE7bF8rUSY1TZjWpmn3GrvQBtCLjGO8giBY6PWZfWefYLClp8SSgA9XwHA/aoDwVhzQiASbvW57RcyTG+x7RVkxVPyeFR7mOGhhicelc7zHcsE7W/y236d59wY46SnzB7olkm3Fe8KZ3ifbTSY1p/FMK5Z02dUime7UoxLDzSJRCnIQJF/PWIr/dE2KoMM/xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/IV5Af936hUwI51CMAETSccI5Fp94i9wAOweF0aeOhE=;
+ b=qTTEsHU1PuBQ3tzpXzZnt6NSz9XuIGdAlKng4+ModD8LK+uXZhtOiKBFPiVsU7nLFJhrROwWZZcQ4t8d/lufDPyQrS5gKnAfyR6z+qIAKX7erDEIiQAaVjwBgo7uuYuQwWL3Rpd71K6tEEvzBYxoKNUE1qcHoYh0SmYwS7IihSw=
+Received: from AS4PR08MB8241.eurprd08.prod.outlook.com (2603:10a6:20b:504::10)
+ by VI0PR08MB11646.eurprd08.prod.outlook.com (2603:10a6:800:308::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.28; Wed, 1 Apr
+ 2026 16:21:58 +0000
+Received: from AS4PR08MB8241.eurprd08.prod.outlook.com
+ ([fe80::dde1:493a:db27:de27]) by AS4PR08MB8241.eurprd08.prod.outlook.com
+ ([fe80::dde1:493a:db27:de27%6]) with mapi id 15.20.9769.014; Wed, 1 Apr 2026
+ 16:21:57 +0000
+From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+To: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly
+	<Joey.Gouly@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "broonie@kernel.org"
+	<broonie@kernel.org>
+Subject: [PATCH] KVM: arm64: vgic-v5: Fold PPI state for all exposed PPIs
+Thread-Topic: [PATCH] KVM: arm64: vgic-v5: Fold PPI state for all exposed PPIs
+Thread-Index: AQHcwfOpGfOoVj9MZkKxsX8ZIufonQ==
+Date: Wed, 1 Apr 2026 16:21:57 +0000
+Message-ID: <20260401162152.932243-1-sascha.bischoff@arm.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: git-send-email 2.34.1
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+x-ms-traffictypediagnostic:
+	AS4PR08MB8241:EE_|VI0PR08MB11646:EE_|DB5PEPF00014B95:EE_|PAWPR08MB8912:EE_
+X-MS-Office365-Filtering-Correlation-Id: c25339d8-b0b3-4890-0a92-08de900af1f6
+x-checkrecipientrouted: true
+nodisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info-Original:
+ VfFzdN9JbMaZc1q+gXrRZaE7J3B96HhVVTPPO5Lsy/tq92d9T6CGehkdpmWYu6o0DcL2euyzTVKWNzIIbvd8lHFOk9SoMRVaZU9iDEq4XotHpyBiTdzsdttmqXXOpM4hMOZD2hcZUMzjiImRTEwIZ0ZzS2xVUkUo/MrC1QifYQbybQzypMIvozGWq5lq6FzVOrqJ4M4U+ioQgFbtb97GsULOdUy3VrokMWBq69iexn2r6iRnL2bVIF0Y3H343NecH/IZlPL9hbSRnW3pzKhF+/AMzeffQupdDKtobgcjTpMsE01ZnT/TSOL+buhRMtgkmbbjQ60VoHykuNecvGpe383aUcrI/f28OQldBcPSR6dBAcOcB8TOD83BzpnIE0W+mxNq7g7iEZjSSlLgTY13SjWULKS+fryngYuNCWDrc9XNCe0xFg9FI5XCfB9/y1H175BlTJkxbi0DEi4KrFSMa041UHvyvDUU3HZ3Y3UijZiQpVm9gtSOZ3nU4hHtpfl4+EiL7TmLCaffbekZmy3/qScXwtqYVAb9yevr04C9pZZFzoAO1rDL9BzMjcS2GipGq4qxmZNg/rwbxxmS70XTvq95szIir6FSZBSLF8u5nYyaD2O5aGZU4gOEG7eFrsVUP/cEq505z1ZuTMyPqP6uQzSym+RNShmdFVOW5GpB2OeW0x5jHhAniX9gDaw0tpR9qVBElebpSo6obeG1DYpawzXeoGzFOvf5fXp5UeFPM8OuU1A7sOHUd39F+n/wIaZVTJhuRfVw3TJpuJh1fsjMXWQ/ea8WwjE2ZQowjkg9+bQ=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR08MB8241.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Exchange-RoutingPolicyChecked:
+ IxqDr40YLB0l6IxYT6BDc7W83jK0TQZHqyaHO8yncE2c99hw6Q8rrM7sBtc5ifL8BH95TI2NfQ6S1NYKbD3wTX3le7UWtTpMLyNvE28oxD9j1SLEfENqfTQgn0Z8p5guI05XmrqYYPWC9n4YF2qwm6W/v+G2Mv7R36bioBOLWbE/wOhFmWPiQNPcaQM3i1Vdwkl9f6jzi3dHqq6/oTvIb6tgW0gKdoz9/vUZzxJgPE1eP1f8r/+JEvKNNcpKcBY7MFRoGnrOVt0Sp8i/0ICuZqVTcMo863So3+acRgjcAgxu8AmRvdAdk74p6SOagnz4RRPEPu1KY6qeAz4J6RChBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB11646
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DB5PEPF00014B95.eurprd02.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	d7c8b113-c6e1-4570-71db-08de900acbee
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|14060799003|36860700016|35042699022|376014|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	eP8M7o9vFpzW7CR1ZWMfCouJXKQ4CLgceoAGo0vyfbEBPhfCw3IE62ej1ADZMoxKsr0xOpKQHAJ0hq7zT1+NLnsRnijxSMv3o0icJzQfNWK0riOcIdhEKX5b8yNGL/OmvqZpHHvhDdY8IYHU6VGk4MGbQ7EVwweitTEFDhF/V4eOPVVaYp1ICwmQh/bEh7ujln3GMvueV4MWuUCZCV14+rR3GVw3d/WzPQAq2tw+gUpYzfbg7v5ATVr6dbmzjATePu3FDqD2zM8EN32hjXws17mH570S6B1UxYiQdbo3jENlArBm1yMABVQ0Q2qTG2QmYTaxVkPASUx9OXB0jEbu6S5T5xdZayyn0m9rNJkOlaCoMU8igHFCmuzTN7NGAGO2VBONx9oB0Y+SS2gOvXpKAm2ZqXfc0i8U47JFFmISQibJ7pgskX1REa6amfNTc/pS4ZMVwIm8aJ2Vw31LCKjLaucQ0rNbNeTnql5YGECZr5mZxXON4W+UKxfNwhYXvpEmMXj481n4wkSYxvRRta4rMemvSIVGyx/NKhVAx3igXRojzmcvqVdsu4ihzlANfGRklviswSxbJbJMQoW1irQkbtLfWisgCjcCecga+8lFjl9RnRUNPORHLwHiFJcH3mmWW1ZxFx0WRR0UXAnclVDr59a7sCwV5PCFJfJDP181UEILx/2D9pu42U39Sl+tvaUmmEPvmmBUdzlX64T/PTxiNIhARyB35uqHxVU8pbSz6JomSehbcVS6msAtzsPhMkVRu4B75lFjU7G4+54ZGMkeUg==
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(14060799003)(36860700016)(35042699022)(376014)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	PhhXLQTxgXBHJ1WDjmMv8tASEEqfoLUTrPg8omQmxDGnKncWozsTUwgU7ZQOyQrmPOHnOHd/k8x7kxZ+d4gCAauAXmMZYqH8umuoX28sUk2wsXptqLkeIQ2GRGjQouPuyUgJTBAn2acFMxVpavzAzTnuzLtFaZfvDCH463z9dqhxVC3iq0WH3IuZJ7vyCXdDN3mbrO9dh3xYk9usgY58wxluIDrKnRVEVSYNiYN0KOTSqX9D6vLfSLx4MteTYAVzhlD2IxOfgoDHYzSqQ7E3sZIPphN7906kneR6oZWYW5ak6clHyV2OB5BVCI+UcYeUjKSSq1EC/iIu+oZc0B+DBuWzulg405WzxUE3BMws7s16CSnMD1w3yrlMbeBehtzeF3KQCD6BFZcUOCSQHILxzyKNNI/x+8upvDMazkEJ7LgYZmz+4IRZpGTO4gbk0uQz
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 16:23:01.5464
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c25339d8-b0b3-4890-0a92-08de900af1f6
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB5PEPF00014B95.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB8912
 
-On Fri, 27 Mar 2026 11:35:48 +0000, Marc Zyngier wrote:
-> Fuad and I have been working on this "put a stick of dynamite in
-> user_mem_abort() and watch the resulting firework" project, and it
-> looks surprisingly OK so far. Disappointingly so, I'd even say.
-> 
-> This v2 is has very few changes from the original posting (cleaning up
-> the comments in Fuad's series [1], and some minor restructuring in
-> mine [2]), but I wanted to post the combined series for people's
-> awareness and for the sake of running it through sashiko.
-> 
-> [...]
+GICv5 supports up to 128 PPIs, which would introduce a large amount of
+overhead if all of them were actively tracked. Rather than keeping
+track of all 128 potential PPIs, we instead only consider the set of
+architected PPIs (the first 64). Moreover, we further reduce that set
+by only exposing a subset of the PPIs to a guest. In practice, this
+means that only 4 PPIs are typically exposed to a guest - the SW_PPI,
+PMUIRQ, and the timers.
 
-Applied to next, thanks!
+When folding the PPI state, changed bits in the active or pending were
+used to choose which state to sync back. However, this breaks badly
+for Edge interrupts when exiting the guest before it has consumed the
+edge. There is no change in pending state detected, and the edge is
+lost forever.
 
-[01/30] KVM: arm64: Extract VMA size resolution in user_mem_abort()
-        commit: 66fcf492008db407e8d600ceaefd2c8a8070c5ae
-[02/30] KVM: arm64: Introduce struct kvm_s2_fault to user_mem_abort()
-        commit: 0b236c72c02df36992b7d6ff29cbe5abef973250
-[03/30] KVM: arm64: Extract PFN resolution in user_mem_abort()
-        commit: bae99813c6a9ce474cbb7b6553dc6e379b2f4375
-[04/30] KVM: arm64: Isolate mmap_read_lock inside new kvm_s2_fault_get_vma_info() helper
-        commit: f5a5bb8de11863bd92f4188b7e823e3fca4d68e6
-[05/30] KVM: arm64: Extract stage-2 permission logic in user_mem_abort()
-        commit: a6e11bd6e1bd9ea9a42738c5a6ac12881b5fcb36
-[06/30] KVM: arm64: Extract page table mapping in user_mem_abort()
-        commit: 5557a3f843bcef3de9a1237020348b2859812170
-[07/30] KVM: arm64: Simplify nested VMA shift calculation
-        commit: 2175ca5384ba9f3d1f45745522cdeb5865488400
-[08/30] KVM: arm64: Remove redundant state variables from struct kvm_s2_fault
-        commit: 9a57bc1b3c6b1f583f43acf7719d66e6b30ef2a9
-[09/30] KVM: arm64: Simplify return logic in user_mem_abort()
-        commit: 3825373b91b0fbedc65205a59f95379aaf596aad
-[10/30] KVM: arm64: Initialize struct kvm_s2_fault completely at declaration
-        commit: 975bad4bb21e4eea7ecc0f32f4cbbb91a9c8d48f
-[11/30] KVM: arm64: Optimize early exit checks in kvm_s2_fault_pin_pfn()
-        commit: 3456943e8786d56aa2bd3f99e9ad2d735a9879c8
-[12/30] KVM: arm64: Hoist MTE validation check out of MMU lock path
-        commit: 84699747aa554197f6d5b4f4c9d1bcb6cb28e21f
-[13/30] KVM: arm64: Clean up control flow in kvm_s2_fault_map()
-        commit: 11f8f1b8a97b63b180f7aa021ec9abdead283025
-[14/30] KVM: arm64: Kill fault->ipa
-        commit: 5729560e2c3cb67a22a1d72688e0bb8e96798313
-[15/30] KVM: arm64: Make fault_ipa immutable
-        commit: f583a53c2b8a4bd77f090bb76512eb87bc80f2c4
-[16/30] KVM: arm64: Move fault context to const structure
-        commit: c6f4d84643498bc855e2f6719a3233ded0e2dc63
-[17/30] KVM: arm64: Replace fault_is_perm with a helper
-        commit: fe4b6f824f267739ef2c5f2f047c317eceb587c3
-[18/30] KVM: arm64: Constrain fault_granule to kvm_s2_fault_map()
-        commit: 31571929e8a894d06291a9501b2be22cffe14443
-[19/30] KVM: arm64: Kill write_fault from kvm_s2_fault
-        commit: 49902d7e010614888253a90252f4704edb2fe3e3
-[20/30] KVM: arm64: Kill exec_fault from kvm_s2_fault
-        commit: c0d699915a835364b1c8d1eca11e11e7b82f0705
-[21/30] KVM: arm64: Kill topup_memcache from kvm_s2_fault
-        commit: 1a3cd7cb5547979f96ec2a0920b8e39939c58db3
-[22/30] KVM: arm64: Move VMA-related information to kvm_s2_fault_vma_info
-        commit: 4ff2ce512063ae79976c23b6fe2130611bcbae62
-[23/30] KVM: arm64: Kill logging_active from kvm_s2_fault
-        commit: 18e1312879db0af5bfd1b1a8b6771d314ccd3ca9
-[24/30] KVM: arm64: Restrict the scope of the 'writable' attribute
-        commit: 08abf09f4d763565ee9ed084401b7ac92f8b4952
-[25/30] KVM: arm64: Move kvm_s2_fault.{pfn,page} to kvm_s2_vma_info
-        commit: f8dad9602ff305b879fa23688becd578102ba547
-[26/30] KVM: arm64: Replace force_pte with a max_map_size attribute
-        commit: 29a5681843a52570ca9597bf355be33fe8753eb0
-[27/30] KVM: arm64: Move device mapping management into kvm_s2_fault_pin_pfn()
-        commit: e314a4dbdb8b29b7e9a69afb8831a15a6d15c1ed
-[28/30] KVM: arm64: Directly expose mapping prot and kill kvm_s2_fault
-        commit: adb70b3a8b31e9eb05f2ec3c76d85f9a7a8c8cbc
-[29/30] KVM: arm64: Simplify integration of adjust_nested_*_perms()
-        commit: fb9888fdfada0b5ad977f08f7550432a08aacbb1
-[30/30] KVM: arm64: Convert gmem_abort() to struct kvm_s2_fault_desc
-        commit: e9550374d13a4bfd0b8a711733f5d423c2e56b96
+Given the reduced set of PPIs exposed to the guest, and the issues
+around tracking the edges, drop the tracking of changed state, and
+instead iterate over the limited subset of PPIs exposed to the guest
+directly.
 
-Cheers,
+This change drops the second copy of the PPI pending state used for
+detecting edges in the pending state, and reworks
+vgic_v5_fold_ppi_state() to iterate over the VM's PPI mask instead.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+---
+ arch/arm64/include/asm/kvm_host.h |  9 +--------
+ arch/arm64/kvm/hyp/vgic-v5-sr.c   |  6 +++---
+ arch/arm64/kvm/vgic/vgic-v5.c     | 28 +++++-----------------------
+ 3 files changed, 9 insertions(+), 34 deletions(-)
 
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index a7dc0aac3b934..729bd32207fa6 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -803,14 +803,7 @@ struct kvm_host_data {
+=20
+ 	/* PPI state tracking for GICv5-based guests */
+ 	struct {
+-		/*
+-		 * For tracking the PPI pending state, we need both the entry
+-		 * state and exit state to correctly detect edges as it is
+-		 * possible that an interrupt has been injected in software in
+-		 * the interim.
+-		 */
+-		DECLARE_BITMAP(pendr_entry, VGIC_V5_NR_PRIVATE_IRQS);
+-		DECLARE_BITMAP(pendr_exit, VGIC_V5_NR_PRIVATE_IRQS);
++		DECLARE_BITMAP(pendr, VGIC_V5_NR_PRIVATE_IRQS);
+=20
+ 		/* The saved state of the regs when leaving the guest */
+ 		DECLARE_BITMAP(activer_exit, VGIC_V5_NR_PRIVATE_IRQS);
+diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5-s=
+r.c
+index 2c4304ffa9f33..47e6bcd437029 100644
+--- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
+@@ -37,7 +37,7 @@ void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_=
+if)
+=20
+ 	bitmap_write(host_data_ptr(vgic_v5_ppi_state)->activer_exit,
+ 		     read_sysreg_s(SYS_ICH_PPI_ACTIVER0_EL2), 0, 64);
+-	bitmap_write(host_data_ptr(vgic_v5_ppi_state)->pendr_exit,
++	bitmap_write(host_data_ptr(vgic_v5_ppi_state)->pendr,
+ 		     read_sysreg_s(SYS_ICH_PPI_PENDR0_EL2), 0, 64);
+=20
+ 	cpu_if->vgic_ppi_priorityr[0] =3D read_sysreg_s(SYS_ICH_PPI_PRIORITYR0_EL=
+2);
+@@ -52,7 +52,7 @@ void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_=
+if)
+ 	if (VGIC_V5_NR_PRIVATE_IRQS =3D=3D 128) {
+ 		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->activer_exit,
+ 			     read_sysreg_s(SYS_ICH_PPI_ACTIVER1_EL2), 64, 64);
+-		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->pendr_exit,
++		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->pendr,
+ 			     read_sysreg_s(SYS_ICH_PPI_PENDR1_EL2), 64, 64);
+=20
+ 		cpu_if->vgic_ppi_priorityr[8] =3D read_sysreg_s(SYS_ICH_PPI_PRIORITYR8_E=
+L2);
+@@ -87,7 +87,7 @@ void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *c=
+pu_if)
+ 		       SYS_ICH_PPI_ENABLER0_EL2);
+=20
+ 	/* Update the pending state of the NON-DVI'd PPIs, only */
+-	bitmap_andnot(pendr, host_data_ptr(vgic_v5_ppi_state)->pendr_entry,
++	bitmap_andnot(pendr, host_data_ptr(vgic_v5_ppi_state)->pendr,
+ 		      cpu_if->vgic_ppi_dvir, VGIC_V5_NR_PRIVATE_IRQS);
+ 	write_sysreg_s(bitmap_read(pendr, 0, 64), SYS_ICH_PPI_PENDR0_EL2);
+=20
+diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+index 8680a8354db9d..fdd39ea7f83ec 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5.c
++++ b/arch/arm64/kvm/vgic/vgic-v5.c
+@@ -385,24 +385,14 @@ bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
+ void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
+-	DECLARE_BITMAP(changed_active, VGIC_V5_NR_PRIVATE_IRQS);
+-	DECLARE_BITMAP(changed_pending, VGIC_V5_NR_PRIVATE_IRQS);
+-	DECLARE_BITMAP(changed_bits, VGIC_V5_NR_PRIVATE_IRQS);
+-	unsigned long *activer, *pendr_entry, *pendr;
++	unsigned long *activer, *pendr;
+ 	int i;
+=20
+ 	activer =3D host_data_ptr(vgic_v5_ppi_state)->activer_exit;
+-	pendr_entry =3D host_data_ptr(vgic_v5_ppi_state)->pendr_entry;
+-	pendr =3D host_data_ptr(vgic_v5_ppi_state)->pendr_exit;
++	pendr =3D host_data_ptr(vgic_v5_ppi_state)->pendr;
+=20
+-	bitmap_xor(changed_active, cpu_if->vgic_ppi_activer, activer,
+-		   VGIC_V5_NR_PRIVATE_IRQS);
+-	bitmap_xor(changed_pending, pendr_entry, pendr,
+-		   VGIC_V5_NR_PRIVATE_IRQS);
+-	bitmap_or(changed_bits, changed_active, changed_pending,
+-		  VGIC_V5_NR_PRIVATE_IRQS);
+-
+-	for_each_set_bit(i, changed_bits, VGIC_V5_NR_PRIVATE_IRQS) {
++	for_each_set_bit(i, vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask,
++			 VGIC_V5_NR_PRIVATE_IRQS) {
+ 		u32 intid =3D vgic_v5_make_ppi(i);
+ 		struct vgic_irq *irq;
+=20
+@@ -462,15 +452,7 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
+ 	 * incoming changes are merged with the outgoing changes on the return
+ 	 * path.
+ 	 */
+-	bitmap_copy(host_data_ptr(vgic_v5_ppi_state)->pendr_entry, pendr,
+-		    VGIC_V5_NR_PRIVATE_IRQS);
+-
+-	/*
+-	 * Make sure that we can correctly detect "edges" in the PPI
+-	 * state. There's a path where we never actually enter the guest, and
+-	 * failure to do this risks losing pending state
+-	 */
+-	bitmap_copy(host_data_ptr(vgic_v5_ppi_state)->pendr_exit, pendr,
++	bitmap_copy(host_data_ptr(vgic_v5_ppi_state)->pendr, pendr,
+ 		    VGIC_V5_NR_PRIVATE_IRQS);
+ }
+=20
+--=20
+2.34.1
