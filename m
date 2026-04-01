@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91BB31985D;
-	Wed,  1 Apr 2026 18:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4136D26ED3A;
+	Wed,  1 Apr 2026 18:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775068111; cv=none; b=eOnfSkjN/rvswx7xCzBEBdOZYE2tm3M3Lm7f/fHPskFUfycUiVX97zwVxuyP/Vq5I1a0WIYArqQkI0uC5W253erx0cBbUBMrTsiga7xJcoTRqNuRFuoBHkCCIUxgV2tbjEdej80iyKRDv3mZN92sXBNY3uo3u/jZinsqoW0fzWY=
+	t=1775068466; cv=none; b=MvrBOoDtxqWkxtow9ePkC8LHNAszU0aV/VKjUmleJb028yrIGbAQvvGOjDXnLc5Joexb6MtnR0anynXNaNZdIOH9Kp183PxUbkEz3TDJDjG0BZFfJZew5FKZOTOyPpcmv7KnR8sjULSRJmr7uMRYYoTrrRy3bdmk1z3ZHAcHusA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775068111; c=relaxed/simple;
-	bh=cnuQKE7lR20BabjHW0Z1mMe+3X8ukWTNhbfSYIsBuuM=;
+	s=arc-20240116; t=1775068466; c=relaxed/simple;
+	bh=dO+BD9cO9N8RSn0sOYOFuPOx43WTUyGwJd3SdmpK9SU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=grmw1QEF/EUrrGvQPxRvzCDPpiNQDNFYsXq+QIILOFFT9djnQ5uFplSu/nLcb+tFW8ZuUEHHf3vUFqjC+6yX46ggCusbnteTpN2h8AroyBZOexh5erFRGGD1R1ALdZsmO2OfpERweNZsBAVwaSKsH876YkCylKsWTzbDlMrsGak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z7opBMyF; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=X5HynHfHxsCuAyfl2kg5XVgFDm73scnGL12MK8Kpt/EX60ahw3OJpNB4Tr8udsNJFW8yRM2bpJr1RAWuhsSe4MAZRiUuhbsQuK7qzfaX0tdhDwuYjVDG9H8YYt6d8BhayQYoHPsxTe7Mo+12WamLaXPNybSg8A0HufLNxE/UD6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFdkmzqN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z7opBMyF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8855DC19423;
-	Wed,  1 Apr 2026 18:28:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFdkmzqN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1B20C4CEF7;
+	Wed,  1 Apr 2026 18:34:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775068111;
-	bh=cnuQKE7lR20BabjHW0Z1mMe+3X8ukWTNhbfSYIsBuuM=;
+	s=k20201202; t=1775068465;
+	bh=dO+BD9cO9N8RSn0sOYOFuPOx43WTUyGwJd3SdmpK9SU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z7opBMyFzdVQ8jvFFedCtygTsIf7j1jyf4+hCklIJQ0bdCnG9Y/uDQxFFyo56eVir
-	 Ua4oVf3U1nBNsckbdGch4EPq1/4tqcuqs/i8SB9YPT+ICLlXxz0m1cqy6bNa6yK9hI
-	 MRU5hK6YS7IDdKEl6oqqCYQSy78qT2K4rcmxpP6sAI8SFZDLkFzJ4PzmgcRtXIG2FS
-	 meSMCffkkUcT7x+1G9PsQI+MyULqK8UniFAyF0Mj68iVjqFuYEA+dMFsFzszyfIC28
-	 yxoIHhiykdq0CMKlytlQQfCeklKDqJWk3aaFLJ72jT1qrtZAbWw2e8BG8eAQPzF9D5
-	 XD+hbcg9i3nLQ==
+	b=gFdkmzqN6CHljPMLcy78KqizGp3k1K69gDvpedMIPztmshPS/NyI2cS2Cxhl+sCoF
+	 WMSIw0wnG147j3koCKEAVj/P/HULkoDyZ8igAIrwHoZsFN/x9Po9KZnEheDl8fXJl0
+	 LGi3RBUxmB07ljyxo0obY1G8E/tDpy7AOSr903qokwyqaZq7q1jK7PMAZcblDP1vGr
+	 bdtQO55329EXxsI2ow8O6ReLXuad1iM0+NKVQJUUoXRP1XFEAgRklEdQNpC2E9XINg
+	 1Al6p8l91s4Y/V3bEevjsLwz1axcN/jFXJZyDhuTvoG0KalMS5SyIHYVdDDUU+Wvcs
+	 FYBTU3jz6UZhg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w80In-00000007ywO-15Gd;
-	Wed, 01 Apr 2026 18:28:29 +0000
-Date: Wed, 01 Apr 2026 19:28:28 +0100
-Message-ID: <877bqqcz77.wl-maz@kernel.org>
+	id 1w80OV-00000007z2x-3Afd;
+	Wed, 01 Apr 2026 18:34:23 +0000
+Date: Wed, 01 Apr 2026 19:34:23 +0100
+Message-ID: <875x6acyxc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sebastian Ene <sebastianene@google.com>
 Cc: catalin.marinas@arm.com,
@@ -50,10 +50,11 @@ Cc: catalin.marinas@arm.com,
 	will@kernel.org,
 	yuzenghui@huawei.com
 Subject: Re: [PATCH] KVM: arm64: Pass a 64bit function-id in the SMC handlers
-In-Reply-To: <ac1UNj7Z1uVL4Nf6@google.com>
+In-Reply-To: <877bqqcz77.wl-maz@kernel.org>
 References: <20260401123201.389906-1-sebastianene@google.com>
 	<86341e4to0.wl-maz@kernel.org>
 	<ac1UNj7Z1uVL4Nf6@google.com>
+	<877bqqcz77.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,65 +70,64 @@ X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, kvmarm@list
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 01 Apr 2026 18:21:58 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Wed, 01 Apr 2026 19:28:28 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Wed, Apr 01, 2026 at 03:55:11PM +0100, Marc Zyngier wrote:
-> > On Wed, 01 Apr 2026 13:32:01 +0100,
-> > Sebastian Ene <sebastianene@google.com> wrote:
+> On Wed, 01 Apr 2026 18:21:58 +0100,
+> Sebastian Ene <sebastianene@google.com> wrote:
+> > 
+> > On Wed, Apr 01, 2026 at 03:55:11PM +0100, Marc Zyngier wrote:
+> > > On Wed, 01 Apr 2026 13:32:01 +0100,
+> > > Sebastian Ene <sebastianene@google.com> wrote:
+> > > > 
+> > > > Make the SMC handlers accept a 64bit value for the function-id to keep
+> > > > it uniform with the rest of the code and prevent a u64 -> u32 -> u64
+> > > > conversion as it currently happens when we handle PSCI.
 > > > 
-> > > Make the SMC handlers accept a 64bit value for the function-id to keep
-> > > it uniform with the rest of the code and prevent a u64 -> u32 -> u64
-> > > conversion as it currently happens when we handle PSCI.
+> > > That seems overly creative. The spec says (2.5, from ARM DEN 0028 1.6
+> > > G):
 > > 
-> > That seems overly creative. The spec says (2.5, from ARM DEN 0028 1.6
-> > G):
+> > I'm not plannig to be *overly creative*. Thanks for pointing out the ARM
+> > spec.
+> > 
+> > > 
+> > > "The Function Identifier is passed on W0 on every SMC and HVC
+> > > call. Its 32-bit integer value indicates which function is being
+> > > requested by the caller. It is always passed as the first argument to
+> > > every SMC or HVC call in R0 or W0."
+> > > 
+> > > which indicates that it is *always* a 32bit value.
+> > > 
+> > > So if you have a 64bit value somewhere, *that* should be fixed, not
+> > > propagated arbitrarily.
+> > 
+> > If you have a non SMCCC call that happen to have the first 32-bits of
+> > the function-id matching either PSCI or FF-A you will end up handling
+> > them instead of forwarding it to Trustzone because func_id is declared as:
+> >
+> > DECLARE_REG(u64, func_id, host_ctxt, 0);
 > 
-> I'm not plannig to be *overly creative*. Thanks for pointing out the ARM
-> spec.
+> Again, the correct approach to prevent the propagation of something
+> that is known to be wrong. Something like this:
 > 
-> > 
-> > "The Function Identifier is passed on W0 on every SMC and HVC
-> > call. Its 32-bit integer value indicates which function is being
-> > requested by the caller. It is always passed as the first argument to
-> > every SMC or HVC call in R0 or W0."
-> > 
-> > which indicates that it is *always* a 32bit value.
-> > 
-> > So if you have a 64bit value somewhere, *that* should be fixed, not
-> > propagated arbitrarily.
-> 
-> If you have a non SMCCC call that happen to have the first 32-bits of
-> the function-id matching either PSCI or FF-A you will end up handling
-> them instead of forwarding it to Trustzone because func_id is declared as:
->
-> DECLARE_REG(u64, func_id, host_ctxt, 0);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 007fc993f2319..dae993a1d081b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -694,6 +694,11 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+>  	DECLARE_REG(u64, func_id, host_ctxt, 0);
+>  	bool handled;
+>  
+> +	if (upper_32_bits(func_id)) {
+> +		cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
+> +		kvm_skip_host_instr();
 
-Again, the correct approach to prevent the propagation of something
-that is known to be wrong. Something like this:
+Plus the obviously missing:
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 007fc993f2319..dae993a1d081b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -694,6 +694,11 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
- 	DECLARE_REG(u64, func_id, host_ctxt, 0);
- 	bool handled;
- 
-+	if (upper_32_bits(func_id)) {
-+		cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
-+		kvm_skip_host_instr();
-+	}
-+
- 	func_id &= ~ARM_SMCCC_CALL_HINTS;
- 
- 	handled = kvm_host_psci_handler(host_ctxt, func_id);
++		return;
 
-Because forwarding something that is blatantly illegal to the secure
-side is not something we should accept at all (just like we now refuse
-non-zero SMC immediate values).
-
-Thanks,
+> +	}
+> +
 
 	M.
 
