@@ -1,57 +1,57 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A50F35F8B7
-	for <kvmarm@lists.linux.dev>; Thu,  2 Apr 2026 04:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662E225F984
+	for <kvmarm@lists.linux.dev>; Thu,  2 Apr 2026 04:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775103708; cv=none; b=mnog47Q/F5kTwCnCjwr8qke/x7muyZLAACV4hrtJzsDFcLOUyamZOJyHjC7byiDiarKZeVwdM7NyXO67Iabq4AkhIn5TU1varf1DhZ1kb+KG6ID2/RgdvRfbZB8vWpKy8bl/iOqrU6XR3vJkXIYeAID6z5GsQBb8PmtP9IxJzfc=
+	t=1775103709; cv=none; b=U6ZJJoV4PmEUx+Id7fhY7pl1PpmutP5LzYinyE+MEYJ8Gq0Rjvz1FJNEXhm4OSxBmKZcIZ6RGlKcZdYwHnQMcUZvqTAZC74uEttOWS+u0wO746x9qVkRkJdwrNpe4MTo7KsOqihcazRG3oPWcIQSU0p6e4CORh9JXaZ6YJ81SW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775103708; c=relaxed/simple;
-	bh=yw9tEuE1PQ1s+BPXZGbYHqcOz3+DA1Qct11WhoZf20g=;
+	s=arc-20240116; t=1775103709; c=relaxed/simple;
+	bh=Lg84P6WX7WikjKSmAWOSyc4s4+OgW0xFlJXZrRJro9Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXz9YUZVeSjrgx/ZaufqJm7MJ/ZLk1dmtBk8rwfeeceD5fW/ZY9jbzobWCIGVz3ZBehbS3BmKdu1jdYre4eMXHwO9CLbtvsHvvC3IZ5VhxTzdVLE//OnIZYT302+0mC2FXo4ykVOr58IMaarohlo0NUTskSuvTq+IbypnS1e4hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AmJUAepR; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=aIpyEmgI3BVPZppE2IFcSsqnfEwVGOUSWbTbO72fv3M2bJdsaIWf0WRx6PVqV8NrbuaoNtk32Jjdma89lk0KCVVNLFac4fjVpdvjIWRxk4SaW/qmZazkPtgYg6KfsETUp2rT0OGYrWS5j7KptEcjLtFVqcHUtGpi8okHlT9PW5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=a5puEDKT; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AmJUAepR"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 631Ik9DT3661500;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="a5puEDKT"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 631HfK8u3639069;
 	Thu, 2 Apr 2026 04:21:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=0JeY4mJA3oacMiL4x
-	mIgM58uTK4IVMVMOGVAYrrZIok=; b=AmJUAepRtEvs7V2Uf+0lj9Zc9NmA9DUh7
-	lKsCSRzqZMiYQSHPZdeABeYz/K0cIDBIfaolsT3MCV9qPx7TWvFHP7PV+zE7CJ3G
-	9YnmW1wQ+gPPDMlz56LOKpPTVuiPPPOx7VfgDm57j9EhRcQnywEMi8qZeTmydXRm
-	0QhvhhqH/WdlR1p8mMzfsN5IIzanAKhdraOUFDa2gDWwDaACn8wD9VHijLpClKj1
-	ozPp29bIFgwUqDplXDJbLDfjI0zi4tRbpXbmNNwEsxjyyMHuZ1gWFkYuj9GNRRbD
-	YGdQnZibsrmEx23Jectwz6BDnQNxvLUrQF2H7PcwKPYK+ZFUEA8QA==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d65dcjecu-1
+	:mime-version:references:subject:to; s=pp1; bh=bKdCZerzHV/o2sihq
+	acITT6K5c6M8fOM4XNG7XWjN1g=; b=a5puEDKTOv+W2E4W25tujlChOS4kvrapg
+	V0JQwrmWim/MH/40YOM+9JyltcRiA2ipaNS4qRSI54b7FiTFHCMBR0d/st6DO/Wy
+	zyOJJYL1mf1pa7qacKdv0wEke0GJgfY3KIfACRq2VWVG6M76D/lOnd+vzp2TL0nI
+	Ayd4xJTzP2yphc8xOCsdcCSSJgoWhEoZFN7d4CXVUD0K47AvUf6RJwPKIsdw7+5N
+	koPSaEfLH5wedQGRYfJb+8ZD1OcDIlNG4G3Ho7AsaeLWj0oXS8ksUui5G3yGSGV6
+	hnKMLjvMj45aNM3wW7QXe2nMq0lnrDOvcabns/kZKFdfXMUIbE9qA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d66msabrq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Apr 2026 04:21:33 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6320Lhpa013936;
+	Thu, 02 Apr 2026 04:21:34 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 631NlQ25021713;
 	Thu, 2 Apr 2026 04:21:33 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6ttkrheq-1
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4d6sasrsau-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 02 Apr 2026 04:21:33 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6324LTRv45089136
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6324LTLv45089138
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Thu, 2 Apr 2026 04:21:29 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F74C2004B;
+	by IMSVA (Postfix) with ESMTP id 9383F20043;
 	Thu,  2 Apr 2026 04:21:29 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CEEB92004D;
-	Thu,  2 Apr 2026 04:21:28 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3795A2004E;
+	Thu,  2 Apr 2026 04:21:29 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  2 Apr 2026 04:21:28 +0000 (GMT)
+	Thu,  2 Apr 2026 04:21:29 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -71,9 +71,9 @@ Cc: Andreas Grapentin <Andreas.Grapentin@ibm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 08/27] arm64: Extract pstate definitions from ptrace
-Date: Thu,  2 Apr 2026 06:21:04 +0200
-Message-ID: <20260402042125.3948963-9-seiden@linux.ibm.com>
+Subject: [PATCH v1 09/27] KVM: arm64: Share kvm_emulate definitions
+Date: Thu,  2 Apr 2026 06:21:05 +0200
+Message-ID: <20260402042125.3948963-10-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260402042125.3948963-1-seiden@linux.ibm.com>
 References: <20260402042125.3948963-1-seiden@linux.ibm.com>
@@ -85,348 +85,628 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=RsjI7SmK c=1 sm=1 tr=0 ts=69cdeece cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Authority-Analysis: v=2.4 cv=J6enLQnS c=1 sm=1 tr=0 ts=69cdeece cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=i1ah5YvoNV5MJ1hGTMsA:9
-X-Proofpoint-GUID: IxaziuGC0ikzOX9RHBQuowTzx3Kd6Das
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDAzNCBTYWx0ZWRfX+8fxAomASttw
- XGSF/959DGP6LSUaJTfCGgzADKV5y3N5zZFau/YvcfwkpSn/h8LVk2poAnxNwIKADy+ZNewRqtl
- g6G7baCNrLx1bVmCgIx/7DNQCW+LzjNZblL9hPUQUwx9kVZXbX16H1aaSk9FmDIRV5LKDBnVDvU
- Bn1LD+HdAPN0Kbnw2L0kvJyetBICKTvkktLbfr1DowZ8ghJ30EEdjsqvA0Nk0DVbKrXAeIG3M+y
- kSuM/BgKD7lVQQZKuiJ0xcm4IvxFOfjcEe+hFy75O6NMUijmvGQ81dCGe3rRqK71YJRPN3uJPxa
- RJFsVdboEMhUo3AcJl3HFFcA6H4OhCtmlOImwxDi1tFpYfNBUQzOZNmMdS1uYLOXpi9pLMmQnuU
- 6OavvWJHX6jUPu6OqoVe4YK4j2UCKbKLdJwNg9rcj5pYQqkIBMhZsifoWi0ZzPOfpsvWPLRjNUG
- NW7jHAxKNNiuDFKqJYQ==
-X-Proofpoint-ORIG-GUID: IxaziuGC0ikzOX9RHBQuowTzx3Kd6Das
+ a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=HWX1mkjk11RNJ6LnsRgA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDAzNCBTYWx0ZWRfX/uCDyU3GNpIz
+ KxMkWu651klYgxL5//sCG96NaNqxVbsXZzkmT7gyRSDWN9HAn7z4L9vYJrFKfo1FfuKrG499NKS
+ qr+TNJKrNEpCBZfKNiHrbp+BRi0RlNAOdFw98TBXqKfvh9A0625K7NYTAs6/T4hzLq+ufrLNLa5
+ L2xE7gpVDIeIFx5DyZIVKJetcaNtPWlssB9GpTgrggXSeXfQ/PmnP8AWS135VP3P+xWHOkHR810
+ /DqUBCclI0tgpbHdc63gmODPpfVwPemy7qNWjuWY8yJahzLSHSQeeu0Wxm84QuJEEDdw01xa+nm
+ PT9svd1f1vKo6my0ax5TwGPDE/gUaoCbmOSWpm1/Kpy0PdPDZPrBz83Iha0Z6bBvdYQpVmgOmfh
+ P09V3wWpo91VrKM3CWcM9EgBM0Z4jeGNxlaSSZq7zXUtQTmQZeRGOxzuxSc/RYb6uwOp9AL2Ojd
+ InLQetf6IHcvZ9gqyXw==
+X-Proofpoint-GUID: O6sKMaJNJDncakis4XTS1Ohjb_cgm2uU
+X-Proofpoint-ORIG-GUID: O6sKMaJNJDncakis4XTS1Ohjb_cgm2uU
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-02_01,2026-04-01_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
- suspectscore=0 malwarescore=0 spamscore=0 clxscore=1015 phishscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2604020034
+ suspectscore=0 clxscore=1015 adultscore=0 priorityscore=1501 bulkscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604020034
 
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Move functions and definitions useful for emulating arm64 instructions
+to include/kvm/arm64.
 
-Split all definitions that can be used by non-native architectures into a
-separate file pstate.h. This allows other architectures using
-the pstate definitions. While at it refactor SPSR related definitions
-to use the BIT(n) macro and move them into sysreg-defs.h
-
+Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/ptrace.h      | 34 +-----------------
- arch/arm64/include/uapi/asm/Kbuild   |  1 +
- arch/arm64/include/uapi/asm/ptrace.h | 49 +------------------------
- include/arch/arm64/asm/pstate.h      | 46 ++++++++++++++++++++++++
- include/arch/arm64/asm/sysreg-defs.h | 42 ++++++++++++++++++++++
- include/uapi/arch/arm64/asm/pstate.h | 53 ++++++++++++++++++++++++++++
- 6 files changed, 144 insertions(+), 81 deletions(-)
- create mode 100644 include/arch/arm64/asm/pstate.h
- create mode 100644 include/uapi/arch/arm64/asm/pstate.h
+ arch/arm64/include/asm/kvm_emulate.h       | 235 +-----------------
+ arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  13 -
+ include/kvm/arm64/kvm_emulate.h            | 268 +++++++++++++++++++++
+ 3 files changed, 269 insertions(+), 247 deletions(-)
+ create mode 100644 include/kvm/arm64/kvm_emulate.h
 
-diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
-index 39582511ad72..72ea0a8af960 100644
---- a/arch/arm64/include/asm/ptrace.h
-+++ b/arch/arm64/include/asm/ptrace.h
-@@ -9,6 +9,7 @@
- #define __ASM_PTRACE_H
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 822f6077b107..39fa3a12730c 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -23,18 +23,7 @@
+ #include <asm/virt.h>
  
- #include <asm/cpufeature.h>
-+#include <asm/pstate.h>
- 
- #include <uapi/asm/ptrace.h>
- 
-@@ -28,10 +29,6 @@
- 
- #define GIC_PRIO_PSR_I_SET	GICV3_PRIO_PSR_I_SET
- 
--/* Additional SPSR bits not exposed in the UABI */
--#define PSR_MODE_THREAD_BIT	(1 << 0)
--#define PSR_IL_BIT		(1 << 20)
+ #include <kvm/arm64/kvm_arm.h>
 -
- /* AArch32-specific ptrace requests */
- #define COMPAT_PTRACE_GETREGS		12
- #define COMPAT_PTRACE_SETREGS		13
-@@ -42,41 +39,12 @@
- #define COMPAT_PTRACE_GETHBPREGS	29
- #define COMPAT_PTRACE_SETHBPREGS	30
- 
--/* SPSR_ELx bits for exceptions taken from AArch32 */
--#define PSR_AA32_MODE_MASK	0x0000001f
--#define PSR_AA32_MODE_USR	0x00000010
--#define PSR_AA32_MODE_FIQ	0x00000011
--#define PSR_AA32_MODE_IRQ	0x00000012
--#define PSR_AA32_MODE_SVC	0x00000013
--#define PSR_AA32_MODE_ABT	0x00000017
--#define PSR_AA32_MODE_HYP	0x0000001a
--#define PSR_AA32_MODE_UND	0x0000001b
--#define PSR_AA32_MODE_SYS	0x0000001f
--#define PSR_AA32_T_BIT		0x00000020
--#define PSR_AA32_F_BIT		0x00000040
--#define PSR_AA32_I_BIT		0x00000080
--#define PSR_AA32_A_BIT		0x00000100
--#define PSR_AA32_E_BIT		0x00000200
--#define PSR_AA32_PAN_BIT	0x00400000
--#define PSR_AA32_SSBS_BIT	0x00800000
--#define PSR_AA32_DIT_BIT	0x01000000
--#define PSR_AA32_Q_BIT		0x08000000
--#define PSR_AA32_V_BIT		0x10000000
--#define PSR_AA32_C_BIT		0x20000000
--#define PSR_AA32_Z_BIT		0x40000000
--#define PSR_AA32_N_BIT		0x80000000
--#define PSR_AA32_IT_MASK	0x0600fc00	/* If-Then execution state mask */
--#define PSR_AA32_GE_MASK	0x000f0000
+-#define CURRENT_EL_SP_EL0_VECTOR	0x0
+-#define CURRENT_EL_SP_ELx_VECTOR	0x200
+-#define LOWER_EL_AArch64_VECTOR		0x400
+-#define LOWER_EL_AArch32_VECTOR		0x600
 -
- #ifdef CONFIG_CPU_BIG_ENDIAN
- #define PSR_AA32_ENDSTATE	PSR_AA32_E_BIT
- #else
- #define PSR_AA32_ENDSTATE	0
- #endif
+-enum exception_type {
+-	except_type_sync	= 0,
+-	except_type_irq		= 0x80,
+-	except_type_fiq		= 0x100,
+-	except_type_serror	= 0x180,
+-};
++#include <kvm/arm64/kvm_emulate.h>
  
--/* AArch32 CPSR bits, as seen in AArch32 */
--#define COMPAT_PSR_DIT_BIT	0x00200000
+ #define kvm_exception_type_names		\
+ 	{ except_type_sync,	"SYNC"   },	\
+@@ -45,36 +34,8 @@ enum exception_type {
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+ 
+-void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr);
+-int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
+-int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+ int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr);
+-void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+-
+-static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
+-{
+-	return kvm_inject_sea(vcpu, false, addr);
+-}
+-
+-static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
+-{
+-	return kvm_inject_sea(vcpu, true, addr);
+-}
+-
+-static inline int kvm_inject_serror(struct kvm_vcpu *vcpu)
+-{
+-	/*
+-	 * ESR_ELx.ISV (later renamed to IDS) indicates whether or not
+-	 * ESR_ELx.ISS contains IMPLEMENTATION DEFINED syndrome information.
+-	 *
+-	 * Set the bit when injecting an SError w/o an ESR to indicate ISS
+-	 * does not follow the architected format.
+-	 */
+-	return kvm_inject_serror_esr(vcpu, ESR_ELx_ISV);
+-}
+-
+-void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+ 
+ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+ int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+@@ -160,24 +121,6 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+ 	*vcpu_cpsr(vcpu) |= PSR_AA32_T_BIT;
+ }
+ 
+-/*
+- * vcpu_get_reg and vcpu_set_reg should always be passed a register number
+- * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
+- * AArch32 with banked registers.
+- */
+-static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
+-					 u8 reg_num)
+-{
+-	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
+-}
+-
+-static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+-				unsigned long val)
+-{
+-	if (reg_num != 31)
+-		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+-}
+-
+ static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
+ {
+ 	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
+@@ -361,82 +304,11 @@ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.disr_el1;
+ }
+ 
+-static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
+-}
+-
+-static __always_inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_ISV);
+-}
+-
+ static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_esr(vcpu) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
+ }
+ 
+-static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SSE);
+-}
+-
+-static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SF);
+-}
+-
+-static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+-{
+-	return (kvm_vcpu_get_esr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+-}
+-
+-static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
+-}
+-
+-/* Always check for S1PTW *before* using this. */
+-static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
+-}
+-
+-static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_CM);
+-}
+-
+-static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
+-{
+-	return 1 << ((kvm_vcpu_get_esr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+-}
+-
+-/* This one is not specific to Data Abort */
+-static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_IL);
+-}
+-
+-static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+-{
+-	return ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+-}
+-
+-static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+-}
+-
+-static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
+-}
+-
+-static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
+-}
+ 
+ static inline
+ bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
+@@ -472,36 +344,6 @@ static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+-{
+-	u64 esr = kvm_vcpu_get_esr(vcpu);
+-	return ESR_ELx_SYS64_ISS_RT(esr);
+-}
+-
+-static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+-{
+-	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+-		/*
+-		 * Only a permission fault on a S1PTW should be
+-		 * considered as a write. Otherwise, page tables baked
+-		 * in a read-only memslot will result in an exception
+-		 * being delivered in the guest.
+-		 *
+-		 * The drawback is that we end-up faulting twice if the
+-		 * guest is using any of HW AF/DB: a translation fault
+-		 * to map the page containing the PT (read only at
+-		 * first), then a permission fault to allow the flags
+-		 * to be set.
+-		 */
+-		return kvm_vcpu_trap_is_permission_fault(vcpu);
+-	}
+-
+-	if (kvm_vcpu_trap_is_iabt(vcpu))
+-		return false;
+-
+-	return kvm_vcpu_dabt_iswrite(vcpu);
+-}
+-
+ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ {
+ 	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+@@ -537,81 +379,6 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
+ 	return vcpu_read_sys_reg(vcpu, r) & bit;
+ }
+ 
+-static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
+-						    unsigned long data,
+-						    unsigned int len)
+-{
+-	if (kvm_vcpu_is_be(vcpu)) {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return be16_to_cpu(data & 0xffff);
+-		case 4:
+-			return be32_to_cpu(data & 0xffffffff);
+-		default:
+-			return be64_to_cpu(data);
+-		}
+-	} else {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return le16_to_cpu(data & 0xffff);
+-		case 4:
+-			return le32_to_cpu(data & 0xffffffff);
+-		default:
+-			return le64_to_cpu(data);
+-		}
+-	}
+-
+-	return data;		/* Leave LE untouched */
+-}
+-
+-static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+-						    unsigned long data,
+-						    unsigned int len)
+-{
+-	if (kvm_vcpu_is_be(vcpu)) {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return cpu_to_be16(data & 0xffff);
+-		case 4:
+-			return cpu_to_be32(data & 0xffffffff);
+-		default:
+-			return cpu_to_be64(data);
+-		}
+-	} else {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return cpu_to_le16(data & 0xffff);
+-		case 4:
+-			return cpu_to_le32(data & 0xffffffff);
+-		default:
+-			return cpu_to_le64(data);
+-		}
+-	}
+-
+-	return data;		/* Leave LE untouched */
+-}
+-
+-static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+-{
+-	WARN_ON(vcpu_get_flag(vcpu, PENDING_EXCEPTION));
+-	vcpu_set_flag(vcpu, INCREMENT_PC);
+-}
+-
+-#define kvm_pend_exception(v, e)					\
+-	do {								\
+-		WARN_ON(vcpu_get_flag((v), INCREMENT_PC));		\
+-		vcpu_set_flag((v), PENDING_EXCEPTION);			\
+-		vcpu_set_flag((v), e);					\
+-	} while (0)
 -
  /*
-  * These are 'magic' values for PTRACE_PEEKUSR that return info about where a
-  * process is located in memory.
-diff --git a/arch/arm64/include/uapi/asm/Kbuild b/arch/arm64/include/uapi/asm/Kbuild
-index b45584e83448..43d1a8ab98e1 100644
---- a/arch/arm64/include/uapi/asm/Kbuild
-+++ b/arch/arm64/include/uapi/asm/Kbuild
-@@ -5,3 +5,4 @@ generic-y += kvm_para.h
+  * Returns a 'sanitised' view of CPTR_EL2, translating from nVHE to the VHE
+  * format if E2H isn't set.
+diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+index 4fdfeabefeb4..15e1e5db73e1 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
++++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+@@ -13,19 +13,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
  
- shared-uapi-y += kvm.h
- shared-uapi-y += sve_context.h
-+shared-uapi-y += pstate.h
-diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-index 6fed93fb2536..6e743eb021e8 100644
---- a/arch/arm64/include/uapi/asm/ptrace.h
-+++ b/arch/arm64/include/uapi/asm/ptrace.h
-@@ -24,54 +24,7 @@
- 
- #include <asm/hwcap.h>
- #include <asm/sve_context.h>
+-static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+-{
+-	if (vcpu_mode_is_32bit(vcpu)) {
+-		kvm_skip_instr32(vcpu);
+-	} else {
+-		*vcpu_pc(vcpu) += 4;
+-		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
+-	}
 -
+-	/* advance the singlestep state machine */
+-	*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+-}
 -
--/*
-- * PSR bits
-- */
--#define PSR_MODE_EL0t	0x00000000
--#define PSR_MODE_EL1t	0x00000004
--#define PSR_MODE_EL1h	0x00000005
--#define PSR_MODE_EL2t	0x00000008
--#define PSR_MODE_EL2h	0x00000009
--#define PSR_MODE_EL3t	0x0000000c
--#define PSR_MODE_EL3h	0x0000000d
--#define PSR_MODE_MASK	0x0000000f
--
--/* AArch32 CPSR bits */
--#define PSR_MODE32_BIT		0x00000010
--
--/* AArch64 SPSR bits */
--#define PSR_F_BIT	0x00000040
--#define PSR_I_BIT	0x00000080
--#define PSR_A_BIT	0x00000100
--#define PSR_D_BIT	0x00000200
--#define PSR_BTYPE_MASK	0x00000c00
--#define PSR_SSBS_BIT	0x00001000
--#define PSR_PAN_BIT	0x00400000
--#define PSR_UAO_BIT	0x00800000
--#define PSR_DIT_BIT	0x01000000
--#define PSR_TCO_BIT	0x02000000
--#define PSR_V_BIT	0x10000000
--#define PSR_C_BIT	0x20000000
--#define PSR_Z_BIT	0x40000000
--#define PSR_N_BIT	0x80000000
--
--#define PSR_BTYPE_SHIFT		10
--
--/*
-- * Groups of PSR bits
-- */
--#define PSR_f		0xff000000	/* Flags		*/
--#define PSR_s		0x00ff0000	/* Status		*/
--#define PSR_x		0x0000ff00	/* Extension		*/
--#define PSR_c		0x000000ff	/* Control		*/
--
--/* Convenience names for the values of PSTATE.BTYPE */
--#define PSR_BTYPE_NONE		(0b00 << PSR_BTYPE_SHIFT)
--#define PSR_BTYPE_JC		(0b01 << PSR_BTYPE_SHIFT)
--#define PSR_BTYPE_C		(0b10 << PSR_BTYPE_SHIFT)
--#define PSR_BTYPE_J		(0b11 << PSR_BTYPE_SHIFT)
-+#include <asm/pstate.h>
- 
- /* syscall emulation path in ptrace */
- #define PTRACE_SYSEMU		  31
-diff --git a/include/arch/arm64/asm/pstate.h b/include/arch/arm64/asm/pstate.h
+ /*
+  * Skip an instruction which has been emulated at hyp while most guest sysregs
+  * are live.
+diff --git a/include/kvm/arm64/kvm_emulate.h b/include/kvm/arm64/kvm_emulate.h
 new file mode 100644
-index 000000000000..3ff6073a0eaa
+index 000000000000..25322b95af21
 --- /dev/null
-+++ b/include/arch/arm64/asm/pstate.h
-@@ -0,0 +1,46 @@
++++ b/include/kvm/arm64/kvm_emulate.h
+@@ -0,0 +1,268 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef KVM_ARM64_KVM_EMULATE_H
++#define KVM_ARM64_KVM_EMULATE_H
 +
-+#ifndef __ASM_PSTATE_H
-+#define __ASM_PSTATE_H
-+
++#include <asm/esr.h>
++#include <asm/pstate.h>
 +#include <asm/sysreg-defs.h>
-+#ifdef __arm64__
-+#include <uapi/asm/pstate.h>
-+#else
-+#include <uapi/arch/arm64/asm/pstate.h>
-+#endif // __arm64__
 +
-+/* Additional SPSR bits not exposed in the UABI */
-+#define PSR_MODE_THREAD_BIT	BIT(0)
-+#define PSR_IL_BIT		SPSR_IL
++static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu);
++static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu);
++static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu);
++static inline bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu);
++static u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu);
++static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu);
 +
-+/* SPSR_ELx bits for exceptions taken from AArch32 */
-+#define PSR_AA32_MODE_MASK	SPSR_MODE_MASK
-+#define PSR_AA32_MODE_USR	(SPSR_MODE_32BIT | SPSR32_MODE_USR)
-+#define PSR_AA32_MODE_FIQ	(SPSR_MODE_32BIT | SPSR32_MODE_FIQ)
-+#define PSR_AA32_MODE_IRQ	(SPSR_MODE_32BIT | SPSR32_MODE_IRQ)
-+#define PSR_AA32_MODE_SVC	(SPSR_MODE_32BIT | SPSR32_MODE_SVC)
-+#define PSR_AA32_MODE_ABT	(SPSR_MODE_32BIT | SPSR32_MODE_ABT)
-+#define PSR_AA32_MODE_HYP	(SPSR_MODE_32BIT | SPSR32_MODE_HYP)
-+#define PSR_AA32_MODE_UND	(SPSR_MODE_32BIT | SPSR32_MODE_UND)
-+#define PSR_AA32_MODE_SYS	(SPSR_MODE_32BIT | SPSR32_MODE_SYS)
-+#define PSR_AA32_T_BIT		SPSR32_T
-+#define PSR_AA32_F_BIT		SPSR_F
-+#define PSR_AA32_I_BIT		SPSR_I
-+#define PSR_AA32_A_BIT		SPSR_A
-+#define PSR_AA32_E_BIT		SPSR32_E
-+#define PSR_AA32_PAN_BIT	SPSR_PAN
-+#define PSR_AA32_SSBS_BIT	SPSR32_SSBS
-+#define PSR_AA32_DIT_BIT	SPSR_DIT
-+#define PSR_AA32_Q_BIT		SPSR32_Q
-+#define PSR_AA32_V_BIT		SPSR_V
-+#define PSR_AA32_C_BIT		SPSR_C
-+#define PSR_AA32_Z_BIT		SPSR_Z
-+#define PSR_AA32_N_BIT		SPSR_N
-+#define PSR_AA32_IT_MASK	SPSR32_IT_MASK	/* If-Then execution state mask */
-+#define PSR_AA32_GE_MASK	SPSR32_GE_MASK
++#define CURRENT_EL_SP_EL0_VECTOR	0x0
++#define CURRENT_EL_SP_ELx_VECTOR	0x200
++#define LOWER_EL_AArch64_VECTOR		0x400
++#define LOWER_EL_AArch32_VECTOR		0x600
 +
-+/* AArch32 CPSR bits, as seen in AArch32 */
-+#define COMPAT_PSR_DIT_BIT	0x00200000
++enum exception_type {
++	except_type_sync	= 0,
++	except_type_irq		= 0x80,
++	except_type_fiq		= 0x100,
++	except_type_serror	= 0x180,
++};
 +
-+#endif /* __ASM_PSTATE_H */
-diff --git a/include/arch/arm64/asm/sysreg-defs.h b/include/arch/arm64/asm/sysreg-defs.h
-index d5196f293e19..4460fae38623 100644
---- a/include/arch/arm64/asm/sysreg-defs.h
-+++ b/include/arch/arm64/asm/sysreg-defs.h
-@@ -470,6 +470,48 @@
- #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
- #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
- 
-+#define SPSR_PPEND			BIT(33)
-+#define SPSR_N				BIT(31)
-+#define SPSR_Z				BIT(30)
-+#define SPSR_C				BIT(29)
-+#define SPSR_V				BIT(28)
-+#define SPSR32_Q			BIT(27)
-+#define SPSR32_IT_MASK			(GENMASK(26, 25) | GENMASK(15, 10))
-+#define SPSR64_TCO			BIT(25)
-+#define SPSR_DIT			BIT(24)
-+#define SPSR64_UAO			BIT(23)
-+#define SPSR32_SSBS			BIT(23)
-+#define SPSR_PAN			BIT(22)
-+#define SPSR_SS				BIT(21)
-+#define SPSR_IL				BIT(20)
-+#define SPSR32_GE_MASK			GENMASK(19, 16)
-+#define SPSR64_SSBS			BIT(12)
-+#define SPSR64_BTYPE_SHIFT		10
-+#define SPSR64_BTYPE_MASK		(UL(3) << SPSR64_BTYPE_SHIFT)
-+#define SPSR64_D			BIT(9)
-+#define SPSR32_E			BIT(9)
-+#define SPSR_A				BIT(8)
-+#define SPSR_I				BIT(7)
-+#define SPSR_F				BIT(6)
-+#define SPSR32_T			BIT(5)
-+#define SPSR_MODE_MASK			UL(0x1f)
-+#define SPSR_MODE_32BIT			BIT(4)
-+#define SPSR64_MODE_EL0			UL(0x0)
-+#define SPSR64_MODE_EL1t		UL(0x4)
-+#define SPSR64_MODE_EL1h		UL(0x5)
-+#define SPSR64_MODE_EL2t		UL(0x8)
-+#define SPSR64_MODE_EL2h		UL(0x9)
-+#define SPSR64_MODE_EL3t		UL(0xc)
-+#define SPSR64_MODE_EL3h		UL(0xd)
-+#define SPSR32_MODE_USR			UL(0x0)
-+#define SPSR32_MODE_FIQ			UL(0x1)
-+#define SPSR32_MODE_IRQ			UL(0x2)
-+#define SPSR32_MODE_SVC			UL(0x3)
-+#define SPSR32_MODE_ABT			UL(0x7)
-+#define SPSR32_MODE_HYP			UL(0xa)
-+#define SPSR32_MODE_UND			UL(0xb)
-+#define SPSR32_MODE_SYS			UL(0xf)
++void kvm_skip_instr32(struct kvm_vcpu *vcpu);
 +
- #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
- #define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
- 
-diff --git a/include/uapi/arch/arm64/asm/pstate.h b/include/uapi/arch/arm64/asm/pstate.h
-new file mode 100644
-index 000000000000..87b2acec9ac2
---- /dev/null
-+++ b/include/uapi/arch/arm64/asm/pstate.h
-@@ -0,0 +1,53 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++void kvm_inject_undefined(struct kvm_vcpu *vcpu);
++int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
++int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
++void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
 +
-+#ifndef _UAPI__ASM_PSTATE_H
-+#define _UAPI__ASM_PSTATE_H
++static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
++{
++	return kvm_inject_sea(vcpu, false, addr);
++}
++
++static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
++{
++	return kvm_inject_sea(vcpu, true, addr);
++}
++
++static inline int kvm_inject_serror(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * ESR_ELx.ISV (later renamed to IDS) indicates whether or not
++	 * ESR_ELx.ISS contains IMPLEMENTATION DEFINED syndrome information.
++	 *
++	 * Set the bit when injecting an SError w/o an ESR to indicate ISS
++	 * does not follow the architected format.
++	 */
++	return kvm_inject_serror_esr(vcpu, ESR_ELx_ISV);
++}
++
++void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
++
++static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
++{
++	if (vcpu_mode_is_32bit(vcpu)) {
++		kvm_skip_instr32(vcpu);
++	} else {
++		*vcpu_pc(vcpu) += 4;
++		*vcpu_cpsr(vcpu) &= ~SPSR64_BTYPE_MASK;
++	}
++
++	/* advance the singlestep state machine */
++	*vcpu_cpsr(vcpu) &= ~SPSR_SS;
++}
 +
 +/*
-+ * PSR bits
++ * vcpu_get_reg and vcpu_set_reg should always be passed a register number
++ * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
++ * AArch32 with banked registers.
 + */
-+#define PSR_MODE_EL0t  0x00000000
-+#define PSR_MODE_EL1t  0x00000004
-+#define PSR_MODE_EL1h  0x00000005
-+#define PSR_MODE_EL2t  0x00000008
-+#define PSR_MODE_EL2h  0x00000009
-+#define PSR_MODE_EL3t  0x0000000c
-+#define PSR_MODE_EL3h  0x0000000d
-+#define PSR_MODE_MASK  0x0000000f
++static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
++						  u8 reg_num)
++{
++	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
++}
 +
-+/* AArch32 CPSR bits */
-+#define PSR_MODE32_BIT         0x00000010
++static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
++					 unsigned long val)
++{
++	if (reg_num != 31)
++		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
++}
 +
-+/* AArch64 SPSR bits */
-+#define PSR_F_BIT      0x00000040
-+#define PSR_I_BIT      0x00000080
-+#define PSR_A_BIT      0x00000100
-+#define PSR_D_BIT      0x00000200
-+#define PSR_BTYPE_MASK 0x00000c00
-+#define PSR_SSBS_BIT   0x00001000
-+#define PSR_PAN_BIT    0x00400000
-+#define PSR_UAO_BIT    0x00800000
-+#define PSR_DIT_BIT    0x01000000
-+#define PSR_TCO_BIT    0x02000000
-+#define PSR_V_BIT      0x10000000
-+#define PSR_C_BIT      0x20000000
-+#define PSR_Z_BIT      0x40000000
-+#define PSR_N_BIT      0x80000000
++static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
++}
 +
-+#define PSR_BTYPE_SHIFT                10
++static __always_inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_ISV);
++}
 +
-+/*
-+ * Groups of PSR bits
-+ */
-+#define PSR_f          0xff000000      /* Flags                */
-+#define PSR_s          0x00ff0000      /* Status               */
-+#define PSR_x          0x0000ff00      /* Extension            */
-+#define PSR_c          0x000000ff      /* Control              */
++static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SSE);
++}
 +
-+/* Convenience names for the values of PSTATE.BTYPE */
-+#define PSR_BTYPE_NONE         (0b00 << PSR_BTYPE_SHIFT)
-+#define PSR_BTYPE_JC           (0b01 << PSR_BTYPE_SHIFT)
-+#define PSR_BTYPE_C            (0b10 << PSR_BTYPE_SHIFT)
-+#define PSR_BTYPE_J            (0b11 << PSR_BTYPE_SHIFT)
++static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SF);
++}
 +
-+#endif /* _UAPI__ASM_PSTATE_H */
++static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
++{
++	return (kvm_vcpu_get_esr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
++}
++
++static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
++}
++
++/* Always check for S1PTW *before* using this. */
++static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
++}
++
++static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_CM);
++}
++
++static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
++{
++	return 1 << ((kvm_vcpu_get_esr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
++}
++
++/* This one is not specific to Data Abort */
++static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_IL);
++}
++
++static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
++{
++	return ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
++}
++
++static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
++}
++
++static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
++}
++
++static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
++{
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++
++	return ESR_ELx_SYS64_ISS_RT(esr);
++}
++
++static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
++}
++
++static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
++{
++	if (kvm_vcpu_abt_iss1tw(vcpu)) {
++		/*
++		 * Only a permission fault on a S1PTW should be
++		 * considered as a write. Otherwise, page tables baked
++		 * in a read-only memslot will result in an exception
++		 * being delivered in the guest.
++		 *
++		 * The drawback is that we end-up faulting twice if the
++		 * guest is using any of HW AF/DB: a translation fault
++		 * to map the page containing the PT (read only at
++		 * first), then a permission fault to allow the flags
++		 * to be set.
++		 */
++		return kvm_vcpu_trap_is_permission_fault(vcpu);
++	}
++
++	if (kvm_vcpu_trap_is_iabt(vcpu))
++		return false;
++
++	return kvm_vcpu_dabt_iswrite(vcpu);
++}
++
++static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
++						    unsigned long data,
++						    unsigned int len)
++{
++	if (kvm_vcpu_is_be(vcpu)) {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return be16_to_cpu(data & 0xffff);
++		case 4:
++			return be32_to_cpu(data & 0xffffffff);
++		default:
++			return be64_to_cpu(data);
++		}
++	} else {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return le16_to_cpu(data & 0xffff);
++		case 4:
++			return le32_to_cpu(data & 0xffffffff);
++		default:
++			return le64_to_cpu(data);
++		}
++	}
++
++	return data;		/* Leave LE untouched */
++}
++
++static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
++						    unsigned long data,
++						    unsigned int len)
++{
++	if (kvm_vcpu_is_be(vcpu)) {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return cpu_to_be16(data & 0xffff);
++		case 4:
++			return cpu_to_be32(data & 0xffffffff);
++		default:
++			return cpu_to_be64(data);
++		}
++	} else {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return cpu_to_le16(data & 0xffff);
++		case 4:
++			return cpu_to_le32(data & 0xffffffff);
++		default:
++			return cpu_to_le64(data);
++		}
++	}
++
++	return data;		/* Leave LE untouched */
++}
++
++static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
++{
++	WARN_ON(vcpu_get_flag(vcpu, PENDING_EXCEPTION));
++	vcpu_set_flag(vcpu, INCREMENT_PC);
++}
++
++#define kvm_pend_exception(v, e)					\
++	do {								\
++		WARN_ON(vcpu_get_flag((v), INCREMENT_PC));		\
++		vcpu_set_flag((v), PENDING_EXCEPTION);			\
++		vcpu_set_flag((v), e);					\
++	} while (0)
++
++#endif /* KVM_ARM64_KVM_EMULATE_H */
 -- 
 2.51.0
 
