@@ -1,313 +1,124 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A44438F92F
-	for <kvmarm@lists.linux.dev>; Thu,  2 Apr 2026 04:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD453C5DD6;
+	Thu,  2 Apr 2026 08:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775103787; cv=none; b=Ymugpw3xiKXVwu8NQsKAJVJItJA/gq7TktvQ7CSafKPpFOHJXX6fb8QCScRzFxEZJqyW4qJ4uJWfS3pKviCDgXNQIEytKbmpVb2gSeO+7m2W66+Iw635sptWuQTCIVMBl9jV7ml0t4tCEbrskPoF/Pi3s7x8uWLGTzXEKIpKR90=
+	t=1775119995; cv=none; b=u8onWIHeFqZEMODpAC6bQUER7YFeoWHQqvAHT5HV2HmPRMwYZwcycNBhT7S29XHkvDZEibAxUkodf6OUNnTjrB4ocnsXvm8fOiEIzPnAV31JVhqntfBSL8y1oQMwlt+YWd6ZKNdatAAIqVES23Is+2FjaL/ty4cj8NpEuys0z8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775103787; c=relaxed/simple;
-	bh=Mvq8py788Mh3mfU1nMZB4AH7UlET8EH9TQAvEePsR9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M8JNIvZsBP0jV3A4jgqzgwnh/R8k13NUzLj9XxuzDotiTEIcxGRcvMZkqX9sdrJYQMNXx81KC7KZNsUTKK7yIubrgMkBmiqrt8bH0LMOO2bxzFwroWRPlVMb6QGtR8Q777T7jbx/3khUw3nq7T7mQ1u63LYkwdWJK7GlCNFn418=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cPMtE2Hy; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1775119995; c=relaxed/simple;
+	bh=mAWIF3VXWEwtLEYPz9EWgbxyGTiHb5GqWAttGVHaYEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L5UIb6fR1nVLwkpgmRydSIXqaovy29G3EJQ9eUPDOHm3pGqH2sB/ghfvz9EvkP7E62GJKq0JvUPcl4/0IpEzKvPMVpwCVFwfuhiNYOM0ZGm5+pcoxLWoLmT1BdGLWv6o4mVHeN9Bsz6MsDzcQmJ6cNWTWjv+ZMBPX3PT+H/JiIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQqpbJ0v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cPMtE2Hy"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 631GcAQ32736917;
-	Thu, 2 Apr 2026 04:21:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=fD1TTBBAaZWpV5o+U
-	E2XEa0yqcF+08G1LVCR89fnulE=; b=cPMtE2Hyrp5n4rdS6um4KWFcf/1EXvVSN
-	f25I63U8zdMK6KbtVQL/Bldy+dyC4rEE6V9UitXbD+X9bpcuoZwCe4WPLJlRIg7W
-	Q+SKluddpE1LnjbLiPH9/bq6S1YsNy3HSwdchHr00tQSlgx+jBaEVPbDR+VU9rcI
-	1QnxO7oOUX8FqyCdALTMHQgrsVYUix7zVuNDltnvXjU++dc+gxmrtRooXcSZSBWg
-	9MT3ZvRi2bSM3w+5zLfCV2Q8HYdzH55RNonLExz3W6V5IBaAO1A9nTgTVH1Ja6Rv
-	UU+tbXiuDFOIKjeXSzYyYCQRX/YOs0Ji3nOpGuDs4OHr+Ndtl7HzA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d64dgtjgs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Apr 2026 04:21:35 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 631NdoeG005980;
-	Thu, 2 Apr 2026 04:21:34 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6spy8q9d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Apr 2026 04:21:34 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6324LUNq18481482
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 2 Apr 2026 04:21:30 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5D60420040;
-	Thu,  2 Apr 2026 04:21:30 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B7802005A;
-	Thu,  2 Apr 2026 04:21:30 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  2 Apr 2026 04:21:29 +0000 (GMT)
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc: Andreas Grapentin <Andreas.Grapentin@ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 11/27] KVM: arm64: Access elements of vcpu_gp_regs individually
-Date: Thu,  2 Apr 2026 06:21:07 +0200
-Message-ID: <20260402042125.3948963-12-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260402042125.3948963-1-seiden@linux.ibm.com>
-References: <20260402042125.3948963-1-seiden@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQqpbJ0v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74DDAC116C6;
+	Thu,  2 Apr 2026 08:53:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775119994;
+	bh=mAWIF3VXWEwtLEYPz9EWgbxyGTiHb5GqWAttGVHaYEI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jQqpbJ0vZixC0aLnDCEFNMvuwGJ6jgTbOpPbCDiZKAaOCa5XRVaUXyoapYFiy58FB
+	 8fOKqltBV+C2ZUoj7kQvKekwJEzswl+RjNV5mtJEICvcS3N1PXJYLnsrdYL6hEwL7p
+	 7d07V6XHJjR57OSrOFw8TKH82Q19mQIsPsksLz33F6aHyr8QqJGedVcnvkuNdFfwM+
+	 GofMVuYEk5uiJogd+j1NhiYH/Uo7YOdNCCtEqAHzgk6V0bgr7r7kr00LRYEhegJqKA
+	 +5oNmhtgvSIyj4yEdbkgPAmY5LTdADpdPDRfG11BXLbHW4j1TqhFLlFVw6e7naNfJo
+	 K3JTeW/y7bigg==
+Message-ID: <3898bcc1-f02d-44ae-b13a-4ea52a5a998d@kernel.org>
+Date: Thu, 2 Apr 2026 10:53:05 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 00/27] KVM: s390: Introduce arm64 KVM
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Andreas Grapentin <Andreas.Grapentin@ibm.com>,
+ Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Gautam Gala
+ <ggala@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+ Marc Zyngier <maz@kernel.org>,
+ Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+ Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, Will Deacon <will@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20260402042125.3948963-1-seiden@linux.ibm.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20260402042125.3948963-1-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDAzNCBTYWx0ZWRfXwnXo7rk54/lj
- ZRJmse7Koyq21A5W4w1YfJLUv2mJQBW6g4/RmH99dTidA+0/TLdu+QrMYCrV7dFcobo5YEONj+4
- EmbsIOENEr6iPrtj7EBaP9vt3FdpEUsPhbPYA6xFY6ooLKWeAoEHJ3LwHETYgNyv4NceMdQfB5C
- 3z8tjSB04sflSkM4iKRKZjTCyuKZrkNR+X8SUCpbFsu8v8w03rQS06AMFtSQAwsuRJpXauW1O4T
- YVFmsqLa9GQsBQmIrk7WNW7+vFwyl6RRfWu5N7KMHpIHPpHzMB69pcU8eR2tNdyTyvoBbP2/FIz
- JgRvVMrue9jGIhurseeDEAzmaQX06JDYTiYkKjoTokp7WQ99pZMwz9ntXdnviykT8vcyEpa9fOu
- 8fiZAIj25C66SC1VHsX6FAfbGC67FmZpaPXdWYvqWhXa4UAp8WyN8ToCZ4IQlynAjfr98FBkoA1
- TvcRWKyAxamPHSXQ/Xw==
-X-Authority-Analysis: v=2.4 cv=QKZlhwLL c=1 sm=1 tr=0 ts=69cdeecf cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8 a=MeYYmaBpUeygDV1_9ykA:9
-X-Proofpoint-GUID: IY5dAn9zvF4cuCpuYfMr0mA_YuRnqvol
-X-Proofpoint-ORIG-GUID: IY5dAn9zvF4cuCpuYfMr0mA_YuRnqvol
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-02_01,2026-04-01_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 phishscore=0 adultscore=0 impostorscore=0 clxscore=1015
- spamscore=0 bulkscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604020034
 
-While for arm64 the members of vcpu_gp_regs are allocated continuous
-this is not necessarily true for other architectures implementing ARM.
+> 
+> KVM on s390:
+> 	The SAE (Start Arm Execution) instruction is introduced as the
+> 	s390 mechanism for running Arm64 guests, and a new kvm-arm64 module is
+> 	built up incrementally.
+> 
+> Upcoming patch series will introduce system-register handling, interrupt
+> support, hypercalls, and additional features such as PMU.
 
-Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
-the vcpu context but the address of the gp-register array field in the
-user_pt_reg struct.
+Pretty cool stuff.
 
-Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- arch/arm64/include/asm/kvm_emulate.h       | 9 +++++++--
- arch/arm64/include/asm/kvm_host.h          | 2 +-
- arch/arm64/kvm/hyp/exception.c             | 7 +++++--
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 4 ++--
- arch/arm64/kvm/hyp/include/hyp/switch.h    | 6 +++---
- arch/arm64/kvm/reset.c                     | 3 ++-
- include/kvm/arm64/kvm_emulate.h            | 4 ++--
- virt/kvm/arm64/guest.c                     | 6 +++---
- 8 files changed, 25 insertions(+), 16 deletions(-)
+What's the rough timeline for the other work?
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 39fa3a12730c..41eac2b5de14 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -95,12 +95,17 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
- 
- static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->pc;
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.pc;
- }
- 
- static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->pstate;
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.pstate;
-+}
-+
-+static __always_inline unsigned long *vcpu_sp_el0(const struct kvm_vcpu *vcpu)
-+{
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.sp;
- }
- 
- static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ae9e507f2c7c..7e473b895740 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1050,7 +1050,7 @@ struct kvm_vcpu_arch {
- #define vcpu_clear_on_unsupported_cpu(vcpu)				\
- 	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
- 
--#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
-+#define vcpu_gp_regs(v)		((v)->arch.ctxt.regs.regs)
- 
- /*
-  * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index bef40ddb16db..82611442a2d1 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -277,6 +277,9 @@ static const u8 return_offsets[8][2] = {
- 	[7] = { 4, 4 },		/* FIQ, unused */
- };
- 
-+#define OFFSETOF_PT_REG(__r) offsetof(struct user_pt_regs, __r)
-+#define COMPAT_IDX(__c) ((OFFSETOF_PT_REG(__c) - OFFSETOF_PT_REG(regs[0])) / sizeof(u64))
-+
- static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- {
- 	unsigned long spsr = *vcpu_cpsr(vcpu);
-@@ -292,12 +295,12 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 	switch(mode) {
- 	case PSR_AA32_MODE_ABT:
- 		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
--		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
-+		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_abt)] = return_address;
- 		break;
- 
- 	case PSR_AA32_MODE_UND:
- 		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
--		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
-+		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_und)] = return_address;
- 		break;
- 	}
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-index 15e1e5db73e1..4e4cb67824c0 100644
---- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-@@ -20,11 +20,11 @@
- static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
-+	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
- 
- 	kvm_skip_instr(vcpu);
- 
--	write_sysreg_el2(vcpu_gp_regs(vcpu)->pstate, SYS_SPSR);
-+	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 2597e8bda867..79e6e6cc9f81 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -416,7 +416,7 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
- static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	arm64_mops_reset_regs(vcpu_gp_regs(vcpu), vcpu->arch.fault.esr_el2);
-+	arm64_mops_reset_regs(&vcpu->arch.ctxt.regs, vcpu->arch.fault.esr_el2);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
- 
- 	/*
-@@ -857,7 +857,7 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu)
- 	/*
- 	 * Check for the conditions of Cortex-A510's #2077057. When these occur
- 	 * SPSR_EL2 can't be trusted, but isn't needed either as it is
--	 * unchanged from the value in vcpu_gp_regs(vcpu)->pstate.
-+	 * unchanged from the value in vcpu_gp_cpsr(vcpu).
- 	 * Are we single-stepping the guest, and took a PAC exception from the
- 	 * active-not-pending state?
- 	 */
-@@ -867,7 +867,7 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu)
- 	    ESR_ELx_EC(read_sysreg_el2(SYS_ESR)) == ESR_ELx_EC_PAC)
- 		write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
- 
--	vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
-+	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 036bf2dff976..d039f1d7116a 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -219,12 +219,13 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 
- 	/* Reset core registers */
- 	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
-+	*vcpu_pc(vcpu) = 0;
- 	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
- 	vcpu->arch.ctxt.spsr_abt = 0;
- 	vcpu->arch.ctxt.spsr_und = 0;
- 	vcpu->arch.ctxt.spsr_irq = 0;
- 	vcpu->arch.ctxt.spsr_fiq = 0;
--	vcpu_gp_regs(vcpu)->pstate = pstate;
-+	*vcpu_cpsr(vcpu) = pstate;
- 
- 	/* Reset system registers */
- 	kvm_reset_sys_regs(vcpu);
-diff --git a/include/kvm/arm64/kvm_emulate.h b/include/kvm/arm64/kvm_emulate.h
-index 25322b95af21..0e16d18e53d2 100644
---- a/include/kvm/arm64/kvm_emulate.h
-+++ b/include/kvm/arm64/kvm_emulate.h
-@@ -77,14 +77,14 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
- static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
- 						  u8 reg_num)
- {
--	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
-+	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)[reg_num];
- }
- 
- static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
- 					 unsigned long val)
- {
- 	if (reg_num != 31)
--		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
-+		vcpu_gp_regs(vcpu)[reg_num] = val;
- }
- 
- static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm64/guest.c b/virt/kvm/arm64/guest.c
-index 83e33e0143b9..e283a4456df8 100644
---- a/virt/kvm/arm64/guest.c
-+++ b/virt/kvm/arm64/guest.c
-@@ -81,16 +81,16 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
- 		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
- 		off /= 2;
--		return &vcpu_gp_regs(vcpu)->regs[off];
-+		return &vcpu_gp_regs(vcpu)[off];
- 
- 	case KVM_REG_ARM_CORE_REG(regs.sp):
--		return &vcpu_gp_regs(vcpu)->sp;
-+		return vcpu_sp_el0(vcpu);
- 
- 	case KVM_REG_ARM_CORE_REG(regs.pc):
- 		return vcpu_pc(vcpu);
- 
- 	case KVM_REG_ARM_CORE_REG(regs.pstate):
--		return &vcpu_gp_regs(vcpu)->pstate;
-+		return vcpu_cpsr(vcpu);
- 
- 	case KVM_REG_ARM_CORE_REG(sp_el1):
- 		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
+Regarding I/O, I guess it is primarily VIRTIO (VIRTIO_PCI) for these VMs
+only?
+
 -- 
-2.51.0
+Cheers,
 
+David
