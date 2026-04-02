@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3FF370D5D
-	for <kvmarm@lists.linux.dev>; Thu,  2 Apr 2026 04:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE2637107B
+	for <kvmarm@lists.linux.dev>; Thu,  2 Apr 2026 04:22:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775103731; cv=none; b=DkNdsE7JaEJcPTvJ53Kj6KyX544LzRPu2UNa9saOG17OxeNN0SWJ/NHyPZYDiqE006rhz9rg5/BpyETELF7OWR6BEbA+bFD02Rz1U5BG7iUprHWuo+lJV++MJqnoiJQcJAj7PQyG2bLr0J70aJh8N61Ab4aSYnkyhWc9hi+U6To=
+	t=1775103734; cv=none; b=aDJvscYVdhSPjtN0UrIXKKSnhelxk7JeVq9nMkrolOBYhSOlpXY9FvTGPK+TmIrW5TLSeuiumOIiBeVQEqWQnF7vHVR43HWpBbD9g79LKzKDtG2yLe/DxdMSbiEYYWp+mRkSVL7ZdgpHe4iXqlFluILuckl7Km4aazWkH6Knw+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775103731; c=relaxed/simple;
-	bh=ddMHSUfBTK0KXVtypvo0RHL9v5ekCkwPgsehoIFaBm8=;
+	s=arc-20240116; t=1775103734; c=relaxed/simple;
+	bh=b4ciwGSTk9gLGlhbPHM0FL6kn+ZS1Of3V4Pyyawn/eQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fqsyDBQTLWRPcaqjm50xrn+2CKit8muB8XK3hsR5aRqLL1P/J6DtxXGv/fHwPRBWCi5KvqHBUFTLBDkKklkK7+Nrmgno67prEcLwiPCxtXafXB1bf0nOCcqLyq9S4VugSZaAml7CIWOIJqlGUey/XsetdhoKDVZMeaFYxA3DJPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ob2vFlFt; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=lTUEmEYVXWxF1GZTKjkm5pS1J01geEJ/n9UZjERsplFiMaNXkWXUQdrXQnscLoHhrEf30mDtmE2rEpCFbGFLmJI9mkOkX2RGf3aOCq3Bzyxvks53ENdE83uU/f4MbNlx9srLT2z8ntec9UMg8fd2RASO6lWxJHVw0FLL/MDkON0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ULQN7Sxm; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ob2vFlFt"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 631M53qK015098;
-	Thu, 2 Apr 2026 04:21:36 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ULQN7Sxm"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63241sRt184140;
+	Thu, 2 Apr 2026 04:21:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=0Hbru0WwSxaucT6O7
-	EBXw/N8MIolR6UQlKZzwHt+fSM=; b=ob2vFlFtNapLAZt9By42h+D2lCk/iFVc6
-	nmaILo/52yOb571MYiRMZ4cONjsB9FmlEiWbXT2G5JceTd8gyBf1ee5QCsbNIugc
-	lpKY0vzu+DnQV2RWJJaH+SB+9aBHlgD/fJvPUkfaSNzzOKvkAYmW1V/0XJrLkduw
-	+m/UkA+26GyAqEA6p+B+8/A/k3tL/gNE9iqGSC4wE4a+QikWA5yAfMPZtLrpjRDg
-	ZUfv+LWdHA9TQrjFcrNQSrPP6APNuxjmauYHi78OpoPiU8NCE7ydGV38XHtV8jrR
-	IH9eUP+tH63+ma9HUvw4FoO2yH0m+XG5LgY17BZmNyNFDEYaSu0lA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d66q3b7dk-1
+	:mime-version:references:subject:to; s=pp1; bh=QFrC7i1qrw5IuLqVG
+	ezmu8kKixR7+wT0EBZV7s4tSks=; b=ULQN7SxmLaKILPc5e1eg3M19malaM9L77
+	HTJTLke31HYlofV9Q6imLbc7lzMPNh8On/1GDgcF6jRpmBbUGh/bRn1PxGXYG4Ib
+	l4z8i6HhldrcQ/FzcYo0Gaw3CzGCYD+uQEtbICXi1wJMxar+HY6q5Qmr9CQO7UpQ
+	Fhj9NqorSuoSIWg12LrfxKr0hJZRo6vTZPorv+dkXeko4cWwBzjkNG8dcXhWjEzx
+	eJwOVJCi8ZuOM3QqAHdJKCDNhD6Nwjqy9jVx/U2xaOKhrjzDJ+RNXtefSdU2u2dz
+	aqEyFN/vmiVLDOPY9neUMUAyR//fq4Cv0FNhrcLDpMA9bPQAlchaQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d66nnu7sw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Apr 2026 04:21:35 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63201aX7022197;
-	Thu, 2 Apr 2026 04:21:34 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6tan8kb0-1
+	Thu, 02 Apr 2026 04:21:34 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63217hvS013897;
+	Thu, 2 Apr 2026 04:21:33 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6ttkrhep-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Apr 2026 04:21:34 +0000
+	Thu, 02 Apr 2026 04:21:32 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6324LUbh24576326
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6324LSsQ17236336
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 2 Apr 2026 04:21:30 GMT
+	Thu, 2 Apr 2026 04:21:28 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 053D02004E;
-	Thu,  2 Apr 2026 04:21:30 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0A98120040;
+	Thu,  2 Apr 2026 04:21:28 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9A2A32004B;
-	Thu,  2 Apr 2026 04:21:29 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A00A620043;
+	Thu,  2 Apr 2026 04:21:27 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  2 Apr 2026 04:21:29 +0000 (GMT)
+	Thu,  2 Apr 2026 04:21:27 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -71,9 +71,9 @@ Cc: Andreas Grapentin <Andreas.Grapentin@ibm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 10/27] KVM: arm64: Make some arm64 KVM code shareable
-Date: Thu,  2 Apr 2026 06:21:06 +0200
-Message-ID: <20260402042125.3948963-11-seiden@linux.ibm.com>
+Subject: [PATCH v1 05/27] arm64: Extract sysreg definitions
+Date: Thu,  2 Apr 2026 06:21:01 +0200
+Message-ID: <20260402042125.3948963-6-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260402042125.3948963-1-seiden@linux.ibm.com>
 References: <20260402042125.3948963-1-seiden@linux.ibm.com>
@@ -85,1171 +85,1533 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dPT5MW4jYTqn7iLOLq6NMjZT1SnkGr6d
-X-Authority-Analysis: v=2.4 cv=frzRpV4f c=1 sm=1 tr=0 ts=69cdeecf cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Proofpoint-GUID: sHGRiyKXLb2KwFJOJYByF4znF3YJ3yjD
+X-Authority-Analysis: v=2.4 cv=KslAGGWN c=1 sm=1 tr=0 ts=69cdeece cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=vbCobAosysR5EIkJmscA:9
-X-Proofpoint-ORIG-GUID: dPT5MW4jYTqn7iLOLq6NMjZT1SnkGr6d
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDAzNCBTYWx0ZWRfXxe1huZBTsN6d
- fPdo4cJgvBqiiKOtI+bvWkgDG9Uowr9bnXYVU6at37gx4VPTQtXfqXOdYD1ZOQCNrxoObQSuJyE
- wGjlBG8En7EFR0fZzD2pXHMblF8x53Z30IWn1xg/PnnIQfkI8uMFWmZvhom5wJ/qeUQX9zJHMmM
- l1q0T1XSgHSlAFhDsqJfL//L28gzsJDZxPz7MO4c4QMD7X/ao2IKaYKpK/djYd2GX3svQIChK47
- 32WX5jqMMHjyEOmjKlV5piikh7bhB1TXKhOfww88O25CTrm6//ssklRDTEWznq3z57IhqacoeSd
- ubxKNlFh8xZgx5f+7L2eEBswIzr/ASnq7wGSZ6hXZilTFj63HaBI5QNw0ZAvu+2HEEj44sMIizr
- 7QbVg3QeGEoLkX8xYaPHKJid/ngntIA/xqgMR8NBPh6qrvqiTtMxPV130bjaHrPnEreThFRTrb0
- hLH/jy9/nSYPf7MzyJg==
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=7CQSdrXTAAAA:8
+ a=bLA8gJAdCuSLcqbII5sA:9 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDAzNCBTYWx0ZWRfX5KMwfX+2ZDcI
+ cx3XnsPL8Is/jmR1rJnTt/uASfmX//98zvfjUi/85H4ZmT8QhQJpOmdNKxTrDpZOEKI+IIXpsZQ
+ xa3mO7l0aBfS2BANhYl6C6AZfnjYAuM1vgilfZ2AB/qQXEb9AGm80VBjckVVSUCI2azx0IR4UVR
+ lvpZk3ISMJtlZOEZJc4wvrcx8hF5S7ICwM1Z7Oo1VaIi6ChFb54L601hVGIqe8TRffFKVBMtkB2
+ jpJ45RT4sqO4wApD2tKrbBdeGtZ3qeEK7X7SkE5iYow9xgSly1z5vCffO48Qj49juvvQ9Pt63r8
+ GxtAxTVxNTaKtWcSLVgpzfvLPRbkmfsAehsu3DlvG/pXFrl8enGe88/b+JK08j7INZhnRAOsEVt
+ jwbSrWuKKnDoDdySyLBMr0hM222msMruiIviGpwIv8iSRQ58D+6ZkDnAHMAoA6C+45nETREEGjB
+ enwGGosGbcfd28owDow==
+X-Proofpoint-ORIG-GUID: sHGRiyKXLb2KwFJOJYByF4znF3YJ3yjD
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-02_01,2026-04-01_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
- lowpriorityscore=0 bulkscore=0 adultscore=0 suspectscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604020034
+ malwarescore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ phishscore=0 adultscore=0 bulkscore=0 impostorscore=0 clxscore=1015
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2604020034
 
-Support sharing architecture-agnostic KVM-arm64 code between different
-architectures. Introduce a new directory virt/kvm/arm64 which holds
-arm64-KVM code that can be used by multiple architectures implementing
-the arm64-KVM API.
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Additionally, to improve portability slightly modify core_reg_addr to
-use functions instead of direct field accesses.
+Split all definitions that can be used by non-native architectures into
+a separate file sysreg-defs.h. The generated sysreg definitions are
+generated into sysreg-defs-gen.h. This allows other architectures using
+the sysreg definitions.
 
-Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- MAINTAINERS                               |   1 +
- arch/arm64/kvm/Makefile                   |   5 +-
- arch/arm64/kvm/arm.c                      |  48 ----
- arch/arm64/kvm/guest.c                    | 292 ---------------------
- arch/arm64/kvm/handle_exit.c              |  52 +---
- arch/arm64/kvm/trace_arm.h                |  25 --
- include/kvm/arm64/guest.h                 |   5 +-
- include/kvm/arm64/handle_exit.h           |  14 +
- include/kvm/arm64/kvm_host.h              |   9 +
- virt/kvm/arm64/Makefile.kvm               |  12 +
- virt/kvm/arm64/arm.c                      |  54 ++++
- virt/kvm/arm64/guest.c                    | 302 ++++++++++++++++++++++
- virt/kvm/arm64/handle_exit.c              |  54 ++++
- {arch/arm64/kvm => virt/kvm/arm64}/mmio.c |   1 +
- virt/kvm/arm64/trace.h                    |  42 +++
- 15 files changed, 500 insertions(+), 416 deletions(-)
- create mode 100644 include/kvm/arm64/handle_exit.h
- create mode 100644 virt/kvm/arm64/Makefile.kvm
- create mode 100644 virt/kvm/arm64/arm.c
- create mode 100644 virt/kvm/arm64/guest.c
- create mode 100644 virt/kvm/arm64/handle_exit.c
- rename {arch/arm64/kvm => virt/kvm/arm64}/mmio.c (99%)
- create mode 100644 virt/kvm/arm64/trace.h
+ arch/arm64/include/asm/Kbuild                 |   2 +-
+ .../include/asm/{sysreg.h => sysreg-defs.h}   | 302 +-----
+ arch/arm64/include/asm/sysreg.h               | 972 +-----------------
+ arch/arm64/tools/Makefile                     |  14 +-
+ arch/arm64/tools/Makefile.sysreg              |  12 +
+ arch/arm64/tools/gen-sysreg.awk               |   6 +-
+ 6 files changed, 33 insertions(+), 1275 deletions(-)
+ copy arch/arm64/include/asm/{sysreg.h => sysreg-defs.h} (80%)
+ create mode 100644 arch/arm64/tools/Makefile.sysreg
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 075463117c2b..bac2ba07c916 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13998,6 +13998,7 @@ F:	arch/arm64/include/uapi/asm/kvm*
- F:	include/kvm/arm64/
- F:	include/uapi/arch/arm64/asm/kvm*
- F:	arch/arm64/kvm/
-+F:	virt/kvm/arm64/
- F:	include/kvm/arm_*
- F:	tools/testing/selftests/kvm/*/arm64/
- F:	tools/testing/selftests/kvm/arm64/
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 3ebc0570345c..94ea6f0546b0 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -6,6 +6,7 @@
- ccflags-y += -I $(src)
+diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
+index d2ff8f6c3231..76f6cf2b952b 100644
+--- a/arch/arm64/include/asm/Kbuild
++++ b/arch/arm64/include/asm/Kbuild
+@@ -17,4 +17,4 @@ generic-y += parport.h
+ generic-y += user.h
  
- include $(srctree)/virt/kvm/Makefile.kvm
-+include $(srctree)/virt/kvm/arm64/Makefile.kvm
+ generated-y += cpucap-defs.h
+-generated-y += sysreg-defs.h
++generated-y += sysreg-gen-defs.h
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg-defs.h
+similarity index 80%
+copy from arch/arm64/include/asm/sysreg.h
+copy to arch/arm64/include/asm/sysreg-defs.h
+index f4436ecc630c..d5196f293e19 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg-defs.h
+@@ -1,20 +1,9 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * Macros for accessing system registers with older binutils.
+- *
+- * Copyright (C) 2014 ARM Ltd.
+- * Author: Catalin Marinas <catalin.marinas@arm.com>
+- */
  
- obj-$(CONFIG_KVM) += kvm.o
- obj-$(CONFIG_KVM) += hyp/
-@@ -13,7 +14,7 @@ obj-$(CONFIG_KVM) += hyp/
- CFLAGS_sys_regs.o += -Wno-override-init
- CFLAGS_handle_exit.o += -Wno-override-init
+-#ifndef __ASM_SYSREG_H
+-#define __ASM_SYSREG_H
++#ifndef __ASM_SYSREG_DEFS_H
++#define __ASM_SYSREG_DEFS_H
  
--kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
-+kvm-y += arm.o mmu.o psci.o hypercalls.o pvtime.o \
- 	 inject_fault.o va_layout.o handle_exit.o config.o \
- 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
-@@ -26,6 +27,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
- 	 vgic/vgic-v5.o
+ #include <linux/bits.h>
+-#include <linux/stringify.h>
+-#include <linux/kasan-tags.h>
+-#include <linux/kconfig.h>
+-
+-#include <asm/gpr-num.h>
  
-+kvm-y += $(shared-arm64-obj)
-+
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
- kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
- kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 47630730260f..41f2e5c1b953 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1515,54 +1515,6 @@ unsigned long system_supported_vcpu_features(void)
- 	return features;
- }
+ /*
+  * ARMv8 ARM reserves the following encoding for system registers:
+@@ -50,35 +39,6 @@
+ #define sys_reg_CRm(id)	(((id) >> CRm_shift) & CRm_mask)
+ #define sys_reg_Op2(id)	(((id) >> Op2_shift) & Op2_mask)
  
--static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
--					const struct kvm_vcpu_init *init)
--{
--	unsigned long features = init->features[0];
--	int i;
--
--	if (features & ~KVM_VCPU_VALID_FEATURES)
--		return -ENOENT;
--
--	for (i = 1; i < ARRAY_SIZE(init->features); i++) {
--		if (init->features[i])
--			return -ENOENT;
--	}
--
--	if (features & ~system_supported_vcpu_features())
--		return -EINVAL;
--
--	/*
--	 * For now make sure that both address/generic pointer authentication
--	 * features are requested by the userspace together.
--	 */
--	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features) !=
--	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features))
--		return -EINVAL;
--
--	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
--		return 0;
--
--	/* MTE is incompatible with AArch32 */
--	if (kvm_has_mte(vcpu->kvm))
--		return -EINVAL;
--
--	/* NV is incompatible with AArch32 */
--	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
--		return -EINVAL;
--
--	return 0;
--}
--
--static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
--				  const struct kvm_vcpu_init *init)
--{
--	unsigned long features = init->features[0];
--
--	return !bitmap_equal(vcpu->kvm->arch.vcpu_features, &features,
--			     KVM_VCPU_MAX_FEATURES);
--}
--
- static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 557c380ffa37..161840c357e0 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -64,250 +64,6 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- 		       sizeof(kvm_vcpu_stats_desc),
- };
- 
--static bool core_reg_offset_is_vreg(u64 off)
--{
--	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
--		off < KVM_REG_ARM_CORE_REG(fp_regs.fpsr);
--}
--
--static u64 core_reg_offset_from_id(u64 id)
--{
--	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
--}
--
--static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
--{
--	int size;
--
--	switch (off) {
--	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
--	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
--	case KVM_REG_ARM_CORE_REG(regs.sp):
--	case KVM_REG_ARM_CORE_REG(regs.pc):
--	case KVM_REG_ARM_CORE_REG(regs.pstate):
--	case KVM_REG_ARM_CORE_REG(sp_el1):
--	case KVM_REG_ARM_CORE_REG(elr_el1):
--	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
--	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
--		size = sizeof(__u64);
--		break;
--
--	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
--	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
--		size = sizeof(__uint128_t);
--		break;
--
--	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
--	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
--		size = sizeof(__u32);
--		break;
--
--	default:
--		return -EINVAL;
--	}
--
--	if (!IS_ALIGNED(off, size / sizeof(__u32)))
--		return -EINVAL;
--
--	/*
--	 * The KVM_REG_ARM64_SVE regs must be used instead of
--	 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
--	 * SVE-enabled vcpus:
--	 */
--	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
--		return -EINVAL;
--
--	return size;
--}
--
--static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
--{
--	u64 off = core_reg_offset_from_id(reg->id);
--	int size = core_reg_size_from_offset(vcpu, off);
--
--	if (size < 0)
--		return NULL;
--
--	if (KVM_REG_SIZE(reg->id) != size)
--		return NULL;
--
--	switch (off) {
--	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
--	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
--		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
--		off /= 2;
--		return &vcpu->arch.ctxt.regs.regs[off];
--
--	case KVM_REG_ARM_CORE_REG(regs.sp):
--		return &vcpu->arch.ctxt.regs.sp;
--
--	case KVM_REG_ARM_CORE_REG(regs.pc):
--		return &vcpu->arch.ctxt.regs.pc;
--
--	case KVM_REG_ARM_CORE_REG(regs.pstate):
--		return &vcpu->arch.ctxt.regs.pstate;
--
--	case KVM_REG_ARM_CORE_REG(sp_el1):
--		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
--
--	case KVM_REG_ARM_CORE_REG(elr_el1):
--		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
--
--	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
--		return __ctxt_sys_reg(&vcpu->arch.ctxt, SPSR_EL1);
--
--	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_ABT]):
--		return &vcpu->arch.ctxt.spsr_abt;
--
--	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_UND]):
--		return &vcpu->arch.ctxt.spsr_und;
--
--	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_IRQ]):
--		return &vcpu->arch.ctxt.spsr_irq;
--
--	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_FIQ]):
--		return &vcpu->arch.ctxt.spsr_fiq;
--
--	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
--	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
--		off -= KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]);
--		off /= 4;
--		return &vcpu->arch.ctxt.fp_regs.vregs[off];
--
--	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
--		return &vcpu->arch.ctxt.fp_regs.fpsr;
--
--	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
--		return &vcpu->arch.ctxt.fp_regs.fpcr;
--
--	default:
--		return NULL;
--	}
--}
--
--static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
--{
--	/*
--	 * Because the kvm_regs structure is a mix of 32, 64 and
--	 * 128bit fields, we index it as if it was a 32bit
--	 * array. Hence below, nr_regs is the number of entries, and
--	 * off the index in the "array".
--	 */
--	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
--	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
--	void *addr;
--	u32 off;
--
--	/* Our ID is an index into the kvm_regs struct. */
--	off = core_reg_offset_from_id(reg->id);
--	if (off >= nr_regs ||
--	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
--		return -ENOENT;
--
--	addr = core_reg_addr(vcpu, reg);
--	if (!addr)
--		return -EINVAL;
--
--	if (copy_to_user(uaddr, addr, KVM_REG_SIZE(reg->id)))
--		return -EFAULT;
--
--	return 0;
--}
--
--static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
--{
--	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
--	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
--	__uint128_t tmp;
--	void *valp = &tmp, *addr;
--	u64 off;
--	int err = 0;
--
--	/* Our ID is an index into the kvm_regs struct. */
--	off = core_reg_offset_from_id(reg->id);
--	if (off >= nr_regs ||
--	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
--		return -ENOENT;
--
--	addr = core_reg_addr(vcpu, reg);
--	if (!addr)
--		return -EINVAL;
--
--	if (KVM_REG_SIZE(reg->id) > sizeof(tmp))
--		return -EINVAL;
--
--	if (copy_from_user(valp, uaddr, KVM_REG_SIZE(reg->id))) {
--		err = -EFAULT;
--		goto out;
--	}
--
--	if (off == KVM_REG_ARM_CORE_REG(regs.pstate)) {
--		u64 mode = (*(u64 *)valp) & PSR_AA32_MODE_MASK;
--		switch (mode) {
--		case PSR_AA32_MODE_USR:
--			if (!kvm_supports_32bit_el0())
--				return -EINVAL;
--			break;
--		case PSR_AA32_MODE_FIQ:
--		case PSR_AA32_MODE_IRQ:
--		case PSR_AA32_MODE_SVC:
--		case PSR_AA32_MODE_ABT:
--		case PSR_AA32_MODE_UND:
--		case PSR_AA32_MODE_SYS:
--			if (!vcpu_el1_is_32bit(vcpu))
--				return -EINVAL;
--			break;
--		case PSR_MODE_EL2h:
--		case PSR_MODE_EL2t:
--			if (!vcpu_has_nv(vcpu))
--				return -EINVAL;
--			fallthrough;
--		case PSR_MODE_EL0t:
--		case PSR_MODE_EL1t:
--		case PSR_MODE_EL1h:
--			if (vcpu_el1_is_32bit(vcpu))
--				return -EINVAL;
--			break;
--		default:
--			err = -EINVAL;
--			goto out;
--		}
--	}
--
--	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
--
--	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
--		int i, nr_reg;
--
--		switch (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK) {
--		/*
--		 * Either we are dealing with user mode, and only the
--		 * first 15 registers (+ PC) must be narrowed to 32bit.
--		 * AArch32 r0-r14 conveniently map to AArch64 x0-x14.
--		 */
--		case PSR_AA32_MODE_USR:
--		case PSR_AA32_MODE_SYS:
--			nr_reg = 15;
--			break;
--
--		/*
--		 * Otherwise, this is a privileged mode, and *all* the
--		 * registers must be narrowed to 32bit.
--		 */
--		default:
--			nr_reg = 31;
--			break;
--		}
--
--		for (i = 0; i < nr_reg; i++)
--			vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
--
--		*vcpu_pc(vcpu) = (u32)*vcpu_pc(vcpu);
--	}
--out:
--	return err;
--}
--
- #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
- #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
- #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
-@@ -545,54 +301,6 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
- 	return -EINVAL;
- }
- 
--static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
--				 u64 __user *uindices)
--{
--	unsigned int i;
--	int n = 0;
--
--	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
--		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
--		int size = core_reg_size_from_offset(vcpu, i);
--
--		if (size < 0)
--			continue;
--
--		switch (size) {
--		case sizeof(__u32):
--			reg |= KVM_REG_SIZE_U32;
--			break;
--
--		case sizeof(__u64):
--			reg |= KVM_REG_SIZE_U64;
--			break;
--
--		case sizeof(__uint128_t):
--			reg |= KVM_REG_SIZE_U128;
--			break;
--
--		default:
--			WARN_ON(1);
--			continue;
--		}
--
--		if (uindices) {
--			if (put_user(reg, uindices))
--				return -EFAULT;
--			uindices++;
--		}
--
--		n++;
--	}
--
--	return n;
--}
--
--static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
--{
--	return copy_core_reg_indices(vcpu, NULL);
--}
--
- static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
- {
- 	const unsigned int slices = vcpu_sve_slices(vcpu);
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index cc7d5d1709cb..fc92f6ade8a4 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -24,11 +24,11 @@
- 
- #include <kvm/arm_hypercalls.h>
- 
-+#include <kvm/arm64/handle_exit.h>
-+
- #define CREATE_TRACE_POINTS
- #include "trace_handle_exit.h"
- 
--typedef int (*exit_handle_fn)(struct kvm_vcpu *);
--
- static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
- {
- 	if (!arm64_is_ras_serror(esr) || arm64_is_fatal_ras_serror(NULL, esr))
-@@ -213,17 +213,6 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
--{
--	u64 esr = kvm_vcpu_get_esr(vcpu);
--
--	kvm_pr_unimpl("Unknown exception class: esr: %#016llx -- %s\n",
--		      esr, esr_get_class_string(esr));
--
--	kvm_inject_undefined(vcpu);
--	return 1;
--}
+-#ifndef CONFIG_BROKEN_GAS_INST
+-
+-#ifdef __ASSEMBLER__
+-// The space separator is omitted so that __emit_inst(x) can be parsed as
+-// either an assembler directive or an assembler macro argument.
+-#define __emit_inst(x)			.inst(x)
+-#else
+-#define __emit_inst(x)			".inst " __stringify((x)) "\n\t"
+-#endif
+-
+-#else  /* CONFIG_BROKEN_GAS_INST */
+-
+-#ifndef CONFIG_CPU_BIG_ENDIAN
+-#define __INSTR_BSWAP(x)		(x)
+-#else  /* CONFIG_CPU_BIG_ENDIAN */
+-#define __INSTR_BSWAP(x)		((((x) << 24) & 0xff000000)	| \
+-					 (((x) <<  8) & 0x00ff0000)	| \
+-					 (((x) >>  8) & 0x0000ff00)	| \
+-					 (((x) >> 24) & 0x000000ff))
+-#endif	/* CONFIG_CPU_BIG_ENDIAN */
+-
+-#ifdef __ASSEMBLER__
+-#define __emit_inst(x)			.long __INSTR_BSWAP(x)
+-#else  /* __ASSEMBLER__ */
+-#define __emit_inst(x)			".long " __stringify(__INSTR_BSWAP(x)) "\n\t"
+-#endif	/* __ASSEMBLER__ */
+-
+-#endif	/* CONFIG_BROKEN_GAS_INST */
 -
  /*
-  * Guest access to SVE registers should be routed to this handler only
-  * when the system doesn't support SVE.
-@@ -373,7 +362,7 @@ static int handle_other(struct kvm_vcpu *vcpu)
- 	return 1;
- }
+  * Instructions for modifying PSTATE fields.
+  * As per Arm ARM for v8-A, Section "C.5.1.3 op0 == 0b00, architectural hints,
+@@ -100,29 +60,6 @@
+ #define PSTATE_DIT			pstate_field(3, 2)
+ #define PSTATE_TCO			pstate_field(3, 4)
  
--static exit_handle_fn arm_exit_handlers[] = {
-+exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
- 	[ESR_ELx_EC_CP15_32]	= kvm_handle_cp15_32,
-@@ -404,41 +393,6 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_GCS]	= kvm_handle_gcs,
- };
- 
--static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
--{
--	u64 esr = kvm_vcpu_get_esr(vcpu);
--	u8 esr_ec = ESR_ELx_EC(esr);
+-#define SET_PSTATE_PAN(x)		SET_PSTATE((x), PAN)
+-#define SET_PSTATE_UAO(x)		SET_PSTATE((x), UAO)
+-#define SET_PSTATE_SSBS(x)		SET_PSTATE((x), SSBS)
+-#define SET_PSTATE_DIT(x)		SET_PSTATE((x), DIT)
+-#define SET_PSTATE_TCO(x)		SET_PSTATE((x), TCO)
 -
--	return arm_exit_handlers[esr_ec];
--}
+-#define set_pstate_pan(x)		asm volatile(SET_PSTATE_PAN(x))
+-#define set_pstate_uao(x)		asm volatile(SET_PSTATE_UAO(x))
+-#define set_pstate_ssbs(x)		asm volatile(SET_PSTATE_SSBS(x))
+-#define set_pstate_dit(x)		asm volatile(SET_PSTATE_DIT(x))
+-
+-/* Register-based PAN access, for save/restore purposes */
+-#define SYS_PSTATE_PAN			sys_reg(3, 0, 4, 2, 3)
+-
+-#define __SYS_BARRIER_INSN(op0, op1, CRn, CRm, op2, Rt)			\
+-	__emit_inst(0xd5000000					|	\
+-		    sys_insn((op0), (op1), (CRn), (CRm), (op2))	|	\
+-		    ((Rt) & 0x1f))
+-
+-#define SB_BARRIER_INSN			__SYS_BARRIER_INSN(0, 3, 3, 0, 7, 31)
+-#define GSB_SYS_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 0, 31)
+-#define GSB_ACK_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 1, 31)
+-
+ /* Data cache zero operations */
+ #define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
+ #define SYS_DC_IGSW			sys_insn(1, 0, 7, 6, 4)
+@@ -173,7 +110,7 @@
+  * come from here. The header relies on the definition of sys_reg()
+  * earlier in this file.
+  */
+-#include "asm/sysreg-defs.h"
++#include "asm/sysreg-gen-defs.h"
+ 
+ /*
+  * System registers, organised loosely by encoding but grouped together
+@@ -835,40 +772,6 @@
+ #define SCTLR_ELx_A	 (BIT(1))
+ #define SCTLR_ELx_M	 (BIT(0))
+ 
+-#ifdef CONFIG_CPU_BIG_ENDIAN
+-#define ENDIAN_SET_EL2		SCTLR_ELx_EE
+-#else
+-#define ENDIAN_SET_EL2		0
+-#endif
+-
+-#define INIT_SCTLR_EL2_MMU_ON						\
+-	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
+-	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
+-	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
+-
+-#define INIT_SCTLR_EL2_MMU_OFF \
+-	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+-
+-/* SCTLR_EL1 specific flags. */
+-#ifdef CONFIG_CPU_BIG_ENDIAN
+-#define ENDIAN_SET_EL1		(SCTLR_EL1_E0E | SCTLR_ELx_EE)
+-#else
+-#define ENDIAN_SET_EL1		0
+-#endif
+-
+-#define INIT_SCTLR_EL1_MMU_OFF \
+-	(ENDIAN_SET_EL1 | SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | \
+-	 SCTLR_EL1_EIS  | SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
+-
+-#define INIT_SCTLR_EL1_MMU_ON \
+-	(SCTLR_ELx_M      | SCTLR_ELx_C      | SCTLR_ELx_SA    | \
+-	 SCTLR_EL1_SA0    | SCTLR_EL1_SED    | SCTLR_ELx_I     | \
+-	 SCTLR_EL1_DZE    | SCTLR_EL1_UCT    | SCTLR_EL1_nTWE  | \
+-	 SCTLR_ELx_IESB   | SCTLR_EL1_SPAN   | SCTLR_ELx_ITFSB | \
+-	 ENDIAN_SET_EL1   | SCTLR_EL1_UCI    | SCTLR_EL1_EPAN  | \
+-	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
+-	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
+-
+ /* MAIR_ELx memory attributes (used by Linux) */
+ #define MAIR_ATTR_DEVICE_nGnRnE		UL(0x00)
+ #define MAIR_ATTR_DEVICE_nGnRE		UL(0x04)
+@@ -898,30 +801,13 @@
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2		0x3
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MAX		0x7
+ 
+-#ifdef CONFIG_ARM64_PA_BITS_52
+-#define ID_AA64MMFR0_EL1_PARANGE_MAX	ID_AA64MMFR0_EL1_PARANGE_52
+-#else
+-#define ID_AA64MMFR0_EL1_PARANGE_MAX	ID_AA64MMFR0_EL1_PARANGE_48
+-#endif
+-
+-#if defined(CONFIG_ARM64_4K_PAGES)
+-#define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN4_SHIFT
+-#define ID_AA64MMFR0_EL1_TGRAN_LPA2		ID_AA64MMFR0_EL1_TGRAN4_52_BIT
+-#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MIN
+-#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MAX
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN4_2_SHIFT
+-#elif defined(CONFIG_ARM64_16K_PAGES)
+-#define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN16_SHIFT
+-#define ID_AA64MMFR0_EL1_TGRAN_LPA2		ID_AA64MMFR0_EL1_TGRAN16_52_BIT
+-#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MIN
+-#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MAX
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN16_2_SHIFT
+-#elif defined(CONFIG_ARM64_64K_PAGES)
+-#define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN64_SHIFT
+-#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MIN
+-#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MAX
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN64_2_SHIFT
+-#endif
++#define ARM64_MIN_PARANGE_BITS		32
++
++#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_DEFAULT	0x0
++#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_NONE		0x1
++#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MIN		0x2
++#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2		0x3
++#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MAX		0x7
+ 
+ #define CPACR_EL1_FPEN_EL1EN	(BIT(20)) /* enable EL1 access */
+ #define CPACR_EL1_FPEN_EL0EN	(BIT(21)) /* enable EL0 access, if EL1EN set */
+@@ -936,21 +822,6 @@
+ #define SYS_GCR_EL1_RRND	(BIT(16))
+ #define SYS_GCR_EL1_EXCL_MASK	0xffffUL
+ 
+-#ifdef CONFIG_KASAN_HW_TAGS
+-/*
+- * KASAN always uses a whole byte for its tags. With CONFIG_KASAN_HW_TAGS it
+- * only uses tags in the range 0xF0-0xFF, which we map to MTE tags 0x0-0xF.
+- */
+-#define __MTE_TAG_MIN		(KASAN_TAG_MIN & 0xf)
+-#define __MTE_TAG_MAX		(KASAN_TAG_MAX & 0xf)
+-#define __MTE_TAG_INCL		GENMASK(__MTE_TAG_MAX, __MTE_TAG_MIN)
+-#define KERNEL_GCR_EL1_EXCL	(SYS_GCR_EL1_EXCL_MASK & ~__MTE_TAG_INCL)
+-#else
+-#define KERNEL_GCR_EL1_EXCL	SYS_GCR_EL1_EXCL_MASK
+-#endif
+-
+-#define KERNEL_GCR_EL1		(SYS_GCR_EL1_RRND | KERNEL_GCR_EL1_EXCL)
+-
+ /* RGSR_EL1 Definitions */
+ #define SYS_RGSR_EL1_TAG_MASK	0xfUL
+ #define SYS_RGSR_EL1_SEED_SHIFT	8
+@@ -1101,153 +972,8 @@
+ #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
+ #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
+ 
+-#ifdef __ASSEMBLER__
+-
+-	.macro	mrs_s, rt, sreg
+-	 __emit_inst(0xd5200000|(\sreg)|(.L__gpr_num_\rt))
+-	.endm
+-
+-	.macro	msr_s, sreg, rt
+-	__emit_inst(0xd5000000|(\sreg)|(.L__gpr_num_\rt))
+-	.endm
+-
+-	.macro	msr_hcr_el2, reg
+-#if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
+-	dsb	nsh
+-	msr	hcr_el2, \reg
+-	isb
+-#else
+-	msr	hcr_el2, \reg
+-#endif
+-	.endm
+-#else
+-
++#ifndef __ASSEMBLY__
+ #include <linux/bitfield.h>
+-#include <linux/build_bug.h>
+-#include <linux/types.h>
+-#include <asm/alternative.h>
+-
+-#define DEFINE_MRS_S						\
+-	__DEFINE_ASM_GPR_NUMS					\
+-"	.macro	mrs_s, rt, sreg\n"				\
+-	__emit_inst(0xd5200000|(\\sreg)|(.L__gpr_num_\\rt))	\
+-"	.endm\n"
+-
+-#define DEFINE_MSR_S						\
+-	__DEFINE_ASM_GPR_NUMS					\
+-"	.macro	msr_s, sreg, rt\n"				\
+-	__emit_inst(0xd5000000|(\\sreg)|(.L__gpr_num_\\rt))	\
+-"	.endm\n"
+-
+-#define UNDEFINE_MRS_S						\
+-"	.purgem	mrs_s\n"
+-
+-#define UNDEFINE_MSR_S						\
+-"	.purgem	msr_s\n"
+-
+-#define __mrs_s(v, r)						\
+-	DEFINE_MRS_S						\
+-"	mrs_s " v ", " __stringify(r) "\n"			\
+-	UNDEFINE_MRS_S
+-
+-#define __msr_s(r, v)						\
+-	DEFINE_MSR_S						\
+-"	msr_s " __stringify(r) ", " v "\n"			\
+-	UNDEFINE_MSR_S
 -
 -/*
-- * We may be single-stepping an emulated instruction. If the emulation
-- * has been completed in the kernel, we can return to userspace with a
-- * KVM_EXIT_DEBUG, otherwise userspace needs to complete its
-- * emulation first.
+- * Unlike read_cpuid, calls to read_sysreg are never expected to be
+- * optimized away or replaced with synthetic values.
 - */
--static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
--{
--	int handled;
+-#define read_sysreg(r) ({					\
+-	u64 __val;						\
+-	asm volatile("mrs %0, " __stringify(r) : "=r" (__val));	\
+-	__val;							\
+-})
 -
--	/*
--	 * See ARM ARM B1.14.1: "Hyp traps on instructions
--	 * that fail their condition code check"
--	 */
--	if (!kvm_condition_valid(vcpu)) {
--		kvm_incr_pc(vcpu);
--		handled = 1;
--	} else {
--		exit_handle_fn exit_handler;
+-/*
+- * The "Z" constraint normally means a zero immediate, but when combined with
+- * the "%x0" template means XZR.
+- */
+-#define write_sysreg(v, r) do {					\
+-	u64 __val = (u64)(v);					\
+-	asm volatile("msr " __stringify(r) ", %x0"		\
+-		     : : "rZ" (__val));				\
+-} while (0)
 -
--		exit_handler = kvm_get_exit_handler(vcpu);
--		handled = exit_handler(vcpu);
--	}
+-/*
+- * For registers without architectural names, or simply unsupported by
+- * GAS.
+- *
+- * __check_r forces warnings to be generated by the compiler when
+- * evaluating r which wouldn't normally happen due to being passed to
+- * the assembler via __stringify(r).
+- */
+-#define read_sysreg_s(r) ({						\
+-	u64 __val;							\
+-	u32 __maybe_unused __check_r = (u32)(r);			\
+-	asm volatile(__mrs_s("%0", r) : "=r" (__val));			\
+-	__val;								\
+-})
 -
--	return handled;
--}
+-/*
+- * The "Z" constraint combined with the "%x0" template should be enough
+- * to force XZR generation if (v) is a constant 0 value but LLVM does not
+- * yet understand that modifier/constraint combo so a conditional is required
+- * to nudge the compiler into using XZR as a source for a 0 constant value.
+- */
+-#define write_sysreg_s(v, r) do {					\
+-	u64 __val = (u64)(v);						\
+-	u32 __maybe_unused __check_r = (u32)(r);			\
+-	if (__builtin_constant_p(__val) && __val == 0)			\
+-		asm volatile(__msr_s(r, "xzr"));			\
+-	else								\
+-		asm volatile(__msr_s(r, "%x0") : : "r" (__val));	\
+-} while (0)
 -
+-/*
+- * Modify bits in a sysreg. Bits in the clear mask are zeroed, then bits in the
+- * set mask are set. Other bits are left as-is.
+- */
+-#define sysreg_clear_set(sysreg, clear, set) do {			\
+-	u64 __scs_val = read_sysreg(sysreg);				\
+-	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
+-	if (__scs_new != __scs_val)					\
+-		write_sysreg(__scs_new, sysreg);			\
+-} while (0)
+-
+-#define sysreg_clear_set_hcr(clear, set) do {				\
+-	u64 __scs_val = read_sysreg(hcr_el2);				\
+-	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
+-	if (__scs_new != __scs_val)					\
+-		write_sysreg_hcr(__scs_new);			\
+-} while (0)
+-
+-#define sysreg_clear_set_s(sysreg, clear, set) do {			\
+-	u64 __scs_val = read_sysreg_s(sysreg);				\
+-	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
+-	if (__scs_new != __scs_val)					\
+-		write_sysreg_s(__scs_new, sysreg);			\
+-} while (0)
+-
+-#define write_sysreg_hcr(__val) do {					\
+-	if (IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23) &&		\
+-	   (!system_capabilities_finalized() ||				\
+-	    alternative_has_cap_unlikely(ARM64_WORKAROUND_AMPERE_AC04_CPU_23))) \
+-		asm volatile("dsb nsh; msr hcr_el2, %x0; isb"		\
+-			     : : "rZ" (__val));				\
+-	else								\
+-		asm volatile("msr hcr_el2, %x0"				\
+-			     : : "rZ" (__val));				\
+-} while (0)
+-
+-#define read_sysreg_par() ({						\
+-	u64 par;							\
+-	asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));	\
+-	par = read_sysreg(par_el1);					\
+-	asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));	\
+-	par;								\
+-})
+ 
+ #define SYS_FIELD_VALUE(reg, field, val)	reg##_##field##_##val
+ 
+@@ -1260,7 +986,5 @@
+ #define SYS_FIELD_PREP_ENUM(reg, field, val)		\
+ 		 FIELD_PREP(reg##_##field##_MASK,	\
+ 			    SYS_FIELD_VALUE(reg, field, val))
+-
+-#endif
+-
+-#endif	/* __ASM_SYSREG_H */
++#endif /* __ASSEMBLER__ */
++#endif	/* __ASM_SYSREG_DEFS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index f4436ecc630c..6209debd9410 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -15,40 +15,7 @@
+ #include <linux/kconfig.h>
+ 
+ #include <asm/gpr-num.h>
+-
+-/*
+- * ARMv8 ARM reserves the following encoding for system registers:
+- * (Ref: ARMv8 ARM, Section: "System instruction class encoding overview",
+- *  C5.2, version:ARM DDI 0487A.f)
+- *	[20-19] : Op0
+- *	[18-16] : Op1
+- *	[15-12] : CRn
+- *	[11-8]  : CRm
+- *	[7-5]   : Op2
+- */
+-#define Op0_shift	19
+-#define Op0_mask	0x3
+-#define Op1_shift	16
+-#define Op1_mask	0x7
+-#define CRn_shift	12
+-#define CRn_mask	0xf
+-#define CRm_shift	8
+-#define CRm_mask	0xf
+-#define Op2_shift	5
+-#define Op2_mask	0x7
+-
+-#define sys_reg(op0, op1, crn, crm, op2) \
+-	(((op0) << Op0_shift) | ((op1) << Op1_shift) | \
+-	 ((crn) << CRn_shift) | ((crm) << CRm_shift) | \
+-	 ((op2) << Op2_shift))
+-
+-#define sys_insn	sys_reg
+-
+-#define sys_reg_Op0(id)	(((id) >> Op0_shift) & Op0_mask)
+-#define sys_reg_Op1(id)	(((id) >> Op1_shift) & Op1_mask)
+-#define sys_reg_CRn(id)	(((id) >> CRn_shift) & CRn_mask)
+-#define sys_reg_CRm(id)	(((id) >> CRm_shift) & CRm_mask)
+-#define sys_reg_Op2(id)	(((id) >> Op2_shift) & Op2_mask)
++#include <asm/sysreg-defs.h>
+ 
+ #ifndef CONFIG_BROKEN_GAS_INST
+ 
+@@ -79,27 +46,6 @@
+ 
+ #endif	/* CONFIG_BROKEN_GAS_INST */
+ 
+-/*
+- * Instructions for modifying PSTATE fields.
+- * As per Arm ARM for v8-A, Section "C.5.1.3 op0 == 0b00, architectural hints,
+- * barriers and CLREX, and PSTATE access", ARM DDI 0487 C.a, system instructions
+- * for accessing PSTATE fields have the following encoding:
+- *	Op0 = 0, CRn = 4
+- *	Op1, Op2 encodes the PSTATE field modified and defines the constraints.
+- *	CRm = Imm4 for the instruction.
+- *	Rt = 0x1f
+- */
+-#define pstate_field(op1, op2)		((op1) << Op1_shift | (op2) << Op2_shift)
+-#define PSTATE_Imm_shift		CRm_shift
+-#define ENCODE_PSTATE(x, r)		(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
+-#define SET_PSTATE(x, r)		__emit_inst(ENCODE_PSTATE(x, r))
+-
+-#define PSTATE_PAN			pstate_field(0, 4)
+-#define PSTATE_UAO			pstate_field(0, 3)
+-#define PSTATE_SSBS			pstate_field(3, 1)
+-#define PSTATE_DIT			pstate_field(3, 2)
+-#define PSTATE_TCO			pstate_field(3, 4)
+-
+ #define SET_PSTATE_PAN(x)		SET_PSTATE((x), PAN)
+ #define SET_PSTATE_UAO(x)		SET_PSTATE((x), UAO)
+ #define SET_PSTATE_SSBS(x)		SET_PSTATE((x), SSBS)
+@@ -123,718 +69,6 @@
+ #define GSB_SYS_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 0, 31)
+ #define GSB_ACK_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 1, 31)
+ 
+-/* Data cache zero operations */
+-#define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
+-#define SYS_DC_IGSW			sys_insn(1, 0, 7, 6, 4)
+-#define SYS_DC_IGDSW			sys_insn(1, 0, 7, 6, 6)
+-#define SYS_DC_CSW			sys_insn(1, 0, 7, 10, 2)
+-#define SYS_DC_CGSW			sys_insn(1, 0, 7, 10, 4)
+-#define SYS_DC_CGDSW			sys_insn(1, 0, 7, 10, 6)
+-#define SYS_DC_CISW			sys_insn(1, 0, 7, 14, 2)
+-#define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
+-#define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
+-
+-#define SYS_IC_IALLUIS			sys_insn(1, 0, 7, 1, 0)
+-#define SYS_IC_IALLU			sys_insn(1, 0, 7, 5, 0)
+-#define SYS_IC_IVAU			sys_insn(1, 3, 7, 5, 1)
+-
+-#define SYS_DC_IVAC			sys_insn(1, 0, 7, 6, 1)
+-#define SYS_DC_IGVAC			sys_insn(1, 0, 7, 6, 3)
+-#define SYS_DC_IGDVAC			sys_insn(1, 0, 7, 6, 5)
+-
+-#define SYS_DC_CVAC			sys_insn(1, 3, 7, 10, 1)
+-#define SYS_DC_CGVAC			sys_insn(1, 3, 7, 10, 3)
+-#define SYS_DC_CGDVAC			sys_insn(1, 3, 7, 10, 5)
+-
+-#define SYS_DC_CVAU			sys_insn(1, 3, 7, 11, 1)
+-
+-#define SYS_DC_CVAP			sys_insn(1, 3, 7, 12, 1)
+-#define SYS_DC_CGVAP			sys_insn(1, 3, 7, 12, 3)
+-#define SYS_DC_CGDVAP			sys_insn(1, 3, 7, 12, 5)
+-
+-#define SYS_DC_CVADP			sys_insn(1, 3, 7, 13, 1)
+-#define SYS_DC_CGVADP			sys_insn(1, 3, 7, 13, 3)
+-#define SYS_DC_CGDVADP			sys_insn(1, 3, 7, 13, 5)
+-
+-#define SYS_DC_CIVAC			sys_insn(1, 3, 7, 14, 1)
+-#define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
+-#define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
+-
+-#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
+-#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
+-#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
+-
+-#define SYS_DC_CIVAPS			sys_insn(1, 0, 7, 15, 1)
+-#define SYS_DC_CIGDVAPS			sys_insn(1, 0, 7, 15, 5)
+-
+-/*
+- * Automatically generated definitions for system registers, the
+- * manual encodings below are in the process of being converted to
+- * come from here. The header relies on the definition of sys_reg()
+- * earlier in this file.
+- */
+-#include "asm/sysreg-defs.h"
+-
+-/*
+- * System registers, organised loosely by encoding but grouped together
+- * where the architected name contains an index. e.g. ID_MMFR<n>_EL1.
+- */
+-#define SYS_SVCR_SMSTOP_SM_EL0		sys_reg(0, 3, 4, 2, 3)
+-#define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
+-#define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
+-
+-#define SYS_DBGBVRn_EL1(n)		sys_reg(2, 0, 0, n, 4)
+-#define SYS_DBGBCRn_EL1(n)		sys_reg(2, 0, 0, n, 5)
+-#define SYS_DBGWVRn_EL1(n)		sys_reg(2, 0, 0, n, 6)
+-#define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
+-#define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
+-
+-#define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
+-#define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
+-#define OSLSR_EL1_OSLM_NI		0
+-#define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
+-#define OSLSR_EL1_OSLK			BIT(1)
+-
+-#define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
+-#define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
+-#define SYS_DBGCLAIMSET_EL1		sys_reg(2, 0, 7, 8, 6)
+-#define SYS_DBGCLAIMCLR_EL1		sys_reg(2, 0, 7, 9, 6)
+-#define SYS_DBGAUTHSTATUS_EL1		sys_reg(2, 0, 7, 14, 6)
+-#define SYS_MDCCSR_EL0			sys_reg(2, 3, 0, 1, 0)
+-#define SYS_DBGDTR_EL0			sys_reg(2, 3, 0, 4, 0)
+-#define SYS_DBGDTRRX_EL0		sys_reg(2, 3, 0, 5, 0)
+-#define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
+-#define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
+-
+-#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
+-#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
+-#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
+-
+-#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+-#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
+-#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))
+-#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)
+-#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)
+-#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)
+-#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)
+-#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)
+-#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)
+-#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)
+-#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)
+-#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)
+-#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)
+-#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)
+-#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)
+-#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)
+-#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)
+-#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)
+-#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)
+-#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)
+-#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)
+-#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)
+-#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)
+-#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)
+-#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)
+-#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)
+-#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)
+-#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)
+-#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)
+-#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)
+-#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)
+-#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)
+-#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)
+-#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)
+-#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)
+-#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)
+-#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
+-#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)
+-#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)
+-#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)
+-#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))
+-#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)
+-#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)
+-#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)
+-#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)
+-#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)
+-#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)
+-#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)
+-#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)
+-#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)
+-#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)
+-#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)
+-#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)
+-#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)
+-#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)
+-#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)
+-#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)
+-#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)
+-#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)
+-#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)
+-
+-/* ETM */
+-#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+-
+-#define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
+-#define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
+-#define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
+-
+-#define SYS_ACTLR_EL1			sys_reg(3, 0, 1, 0, 1)
+-#define SYS_RGSR_EL1			sys_reg(3, 0, 1, 0, 5)
+-#define SYS_GCR_EL1			sys_reg(3, 0, 1, 0, 6)
+-
+-#define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
+-#define SYS_APIAKEYHI_EL1		sys_reg(3, 0, 2, 1, 1)
+-#define SYS_APIBKEYLO_EL1		sys_reg(3, 0, 2, 1, 2)
+-#define SYS_APIBKEYHI_EL1		sys_reg(3, 0, 2, 1, 3)
+-
+-#define SYS_APDAKEYLO_EL1		sys_reg(3, 0, 2, 2, 0)
+-#define SYS_APDAKEYHI_EL1		sys_reg(3, 0, 2, 2, 1)
+-#define SYS_APDBKEYLO_EL1		sys_reg(3, 0, 2, 2, 2)
+-#define SYS_APDBKEYHI_EL1		sys_reg(3, 0, 2, 2, 3)
+-
+-#define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
+-#define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
+-
+-#define SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
+-#define SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
+-
+-#define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+-
+-#define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
+-#define SYS_AFSR1_EL1			sys_reg(3, 0, 5, 1, 1)
+-#define SYS_ESR_EL1			sys_reg(3, 0, 5, 2, 0)
+-
+-#define SYS_ERRIDR_EL1			sys_reg(3, 0, 5, 3, 0)
+-#define SYS_ERRSELR_EL1			sys_reg(3, 0, 5, 3, 1)
+-#define SYS_ERXFR_EL1			sys_reg(3, 0, 5, 4, 0)
+-#define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
+-#define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
+-#define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
+-#define SYS_ERXPFGF_EL1			sys_reg(3, 0, 5, 4, 4)
+-#define SYS_ERXPFGCTL_EL1		sys_reg(3, 0, 5, 4, 5)
+-#define SYS_ERXPFGCDN_EL1		sys_reg(3, 0, 5, 4, 6)
+-#define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
+-#define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
+-#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
+-#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
+-#define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+-#define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
+-
+-#define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
+-
+-#define SYS_PAR_EL1_F			BIT(0)
+-/* When PAR_EL1.F == 1 */
+-#define SYS_PAR_EL1_FST			GENMASK(6, 1)
+-#define SYS_PAR_EL1_PTW			BIT(8)
+-#define SYS_PAR_EL1_S			BIT(9)
+-#define SYS_PAR_EL1_AssuredOnly		BIT(12)
+-#define SYS_PAR_EL1_TopLevel		BIT(13)
+-#define SYS_PAR_EL1_Overlay		BIT(14)
+-#define SYS_PAR_EL1_DirtyBit		BIT(15)
+-#define SYS_PAR_EL1_F1_IMPDEF		GENMASK_ULL(63, 48)
+-#define SYS_PAR_EL1_F1_RES0		(BIT(7) | BIT(10) | GENMASK_ULL(47, 16))
+-#define SYS_PAR_EL1_RES1		BIT(11)
+-/* When PAR_EL1.F == 0 */
+-#define SYS_PAR_EL1_SH			GENMASK_ULL(8, 7)
+-#define SYS_PAR_EL1_NS			BIT(9)
+-#define SYS_PAR_EL1_F0_IMPDEF		BIT(10)
+-#define SYS_PAR_EL1_NSE			BIT(11)
+-#define SYS_PAR_EL1_PA			GENMASK_ULL(51, 12)
+-#define SYS_PAR_EL1_ATTR		GENMASK_ULL(63, 56)
+-#define SYS_PAR_EL1_F0_RES0		(GENMASK_ULL(6, 1) | GENMASK_ULL(55, 52))
+-
+-/* Buffer error reporting */
+-#define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
+-#define PMBSR_EL1_FAULT_FSC_MASK	PMBSR_EL1_MSS_MASK
+-
+-#define PMBSR_EL1_BUF_BSC_SHIFT		PMBSR_EL1_MSS_SHIFT
+-#define PMBSR_EL1_BUF_BSC_MASK		PMBSR_EL1_MSS_MASK
+-
+-#define PMBSR_EL1_BUF_BSC_FULL		0x1UL
+-
+-/*** End of Statistical Profiling Extension ***/
+-
+-#define TRBSR_EL1_BSC_MASK		GENMASK(5, 0)
+-#define TRBSR_EL1_BSC_SHIFT		0
+-
+-#define SYS_PMINTENSET_EL1		sys_reg(3, 0, 9, 14, 1)
+-#define SYS_PMINTENCLR_EL1		sys_reg(3, 0, 9, 14, 2)
+-
+-#define SYS_PMMIR_EL1			sys_reg(3, 0, 9, 14, 6)
+-
+-#define SYS_MAIR_EL1			sys_reg(3, 0, 10, 2, 0)
+-#define SYS_AMAIR_EL1			sys_reg(3, 0, 10, 3, 0)
+-
+-#define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
+-#define SYS_DISR_EL1			sys_reg(3, 0, 12, 1, 1)
+-
+-#define SYS_ICC_IAR0_EL1		sys_reg(3, 0, 12, 8, 0)
+-#define SYS_ICC_EOIR0_EL1		sys_reg(3, 0, 12, 8, 1)
+-#define SYS_ICC_HPPIR0_EL1		sys_reg(3, 0, 12, 8, 2)
+-#define SYS_ICC_BPR0_EL1		sys_reg(3, 0, 12, 8, 3)
+-#define SYS_ICC_AP0Rn_EL1(n)		sys_reg(3, 0, 12, 8, 4 | n)
+-#define SYS_ICC_AP0R0_EL1		SYS_ICC_AP0Rn_EL1(0)
+-#define SYS_ICC_AP0R1_EL1		SYS_ICC_AP0Rn_EL1(1)
+-#define SYS_ICC_AP0R2_EL1		SYS_ICC_AP0Rn_EL1(2)
+-#define SYS_ICC_AP0R3_EL1		SYS_ICC_AP0Rn_EL1(3)
+-#define SYS_ICC_AP1Rn_EL1(n)		sys_reg(3, 0, 12, 9, n)
+-#define SYS_ICC_AP1R0_EL1		SYS_ICC_AP1Rn_EL1(0)
+-#define SYS_ICC_AP1R1_EL1		SYS_ICC_AP1Rn_EL1(1)
+-#define SYS_ICC_AP1R2_EL1		SYS_ICC_AP1Rn_EL1(2)
+-#define SYS_ICC_AP1R3_EL1		SYS_ICC_AP1Rn_EL1(3)
+-#define SYS_ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
+-#define SYS_ICC_RPR_EL1			sys_reg(3, 0, 12, 11, 3)
+-#define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
+-#define SYS_ICC_ASGI1R_EL1		sys_reg(3, 0, 12, 11, 6)
+-#define SYS_ICC_SGI0R_EL1		sys_reg(3, 0, 12, 11, 7)
+-#define SYS_ICC_IAR1_EL1		sys_reg(3, 0, 12, 12, 0)
+-#define SYS_ICC_EOIR1_EL1		sys_reg(3, 0, 12, 12, 1)
+-#define SYS_ICC_HPPIR1_EL1		sys_reg(3, 0, 12, 12, 2)
+-#define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
+-#define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
+-#define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
+-#define SYS_ICC_IGRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
+-#define SYS_ICC_IGRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
+-
+-#define SYS_ACCDATA_EL1			sys_reg(3, 0, 13, 0, 5)
+-
+-#define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
+-
+-#define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
+-
+-#define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
+-#define SYS_RNDRRS_EL0			sys_reg(3, 3, 2, 4, 1)
+-
+-#define SYS_PMCR_EL0			sys_reg(3, 3, 9, 12, 0)
+-#define SYS_PMCNTENSET_EL0		sys_reg(3, 3, 9, 12, 1)
+-#define SYS_PMCNTENCLR_EL0		sys_reg(3, 3, 9, 12, 2)
+-#define SYS_PMOVSCLR_EL0		sys_reg(3, 3, 9, 12, 3)
+-#define SYS_PMSWINC_EL0			sys_reg(3, 3, 9, 12, 4)
+-#define SYS_PMCEID0_EL0			sys_reg(3, 3, 9, 12, 6)
+-#define SYS_PMCEID1_EL0			sys_reg(3, 3, 9, 12, 7)
+-#define SYS_PMCCNTR_EL0			sys_reg(3, 3, 9, 13, 0)
+-#define SYS_PMXEVTYPER_EL0		sys_reg(3, 3, 9, 13, 1)
+-#define SYS_PMXEVCNTR_EL0		sys_reg(3, 3, 9, 13, 2)
+-#define SYS_PMUSERENR_EL0		sys_reg(3, 3, 9, 14, 0)
+-#define SYS_PMOVSSET_EL0		sys_reg(3, 3, 9, 14, 3)
+-
+-#define SYS_TPIDR_EL0			sys_reg(3, 3, 13, 0, 2)
+-#define SYS_TPIDRRO_EL0			sys_reg(3, 3, 13, 0, 3)
+-#define SYS_TPIDR2_EL0			sys_reg(3, 3, 13, 0, 5)
+-
+-#define SYS_SCXTNUM_EL0			sys_reg(3, 3, 13, 0, 7)
+-
+-/* Definitions for system register interface to AMU for ARMv8.4 onwards */
+-#define SYS_AM_EL0(crm, op2)		sys_reg(3, 3, 13, (crm), (op2))
+-#define SYS_AMCR_EL0			SYS_AM_EL0(2, 0)
+-#define SYS_AMCFGR_EL0			SYS_AM_EL0(2, 1)
+-#define SYS_AMCGCR_EL0			SYS_AM_EL0(2, 2)
+-#define SYS_AMUSERENR_EL0		SYS_AM_EL0(2, 3)
+-#define SYS_AMCNTENCLR0_EL0		SYS_AM_EL0(2, 4)
+-#define SYS_AMCNTENSET0_EL0		SYS_AM_EL0(2, 5)
+-#define SYS_AMCNTENCLR1_EL0		SYS_AM_EL0(3, 0)
+-#define SYS_AMCNTENSET1_EL0		SYS_AM_EL0(3, 1)
+-
+-/*
+- * Group 0 of activity monitors (architected):
+- *                op0  op1  CRn   CRm       op2
+- * Counter:       11   011  1101  010:n<3>  n<2:0>
+- * Type:          11   011  1101  011:n<3>  n<2:0>
+- * n: 0-15
+- *
+- * Group 1 of activity monitors (auxiliary):
+- *                op0  op1  CRn   CRm       op2
+- * Counter:       11   011  1101  110:n<3>  n<2:0>
+- * Type:          11   011  1101  111:n<3>  n<2:0>
+- * n: 0-15
+- */
+-
+-#define SYS_AMEVCNTR0_EL0(n)		SYS_AM_EL0(4 + ((n) >> 3), (n) & 7)
+-#define SYS_AMEVTYPER0_EL0(n)		SYS_AM_EL0(6 + ((n) >> 3), (n) & 7)
+-#define SYS_AMEVCNTR1_EL0(n)		SYS_AM_EL0(12 + ((n) >> 3), (n) & 7)
+-#define SYS_AMEVTYPER1_EL0(n)		SYS_AM_EL0(14 + ((n) >> 3), (n) & 7)
+-
+-/* AMU v1: Fixed (architecturally defined) activity monitors */
+-#define SYS_AMEVCNTR0_CORE_EL0		SYS_AMEVCNTR0_EL0(0)
+-#define SYS_AMEVCNTR0_CONST_EL0		SYS_AMEVCNTR0_EL0(1)
+-#define SYS_AMEVCNTR0_INST_RET_EL0	SYS_AMEVCNTR0_EL0(2)
+-#define SYS_AMEVCNTR0_MEM_STALL		SYS_AMEVCNTR0_EL0(3)
+-
+-#define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+-
+-#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
+-#define SYS_CNTVCT_EL0			sys_reg(3, 3, 14, 0, 2)
+-#define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+-#define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+-
+-#define SYS_CNTP_TVAL_EL0		sys_reg(3, 3, 14, 2, 0)
+-#define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
+-#define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
+-
+-#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
+-#define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
+-#define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
+-
+-#define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+-#define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+-#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
+-#define SYS_AARCH32_CNTVCT		sys_reg(0, 1, 0, 14, 0)
+-#define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+-#define SYS_AARCH32_CNTPCTSS		sys_reg(0, 8, 0, 14, 0)
+-#define SYS_AARCH32_CNTVCTSS		sys_reg(0, 9, 0, 14, 0)
+-
+-#define __PMEV_op2(n)			((n) & 0x7)
+-#define __CNTR_CRm(n)			(0x8 | (((n) >> 3) & 0x3))
+-#define SYS_PMEVCNTSVRn_EL1(n)		sys_reg(2, 0, 14, __CNTR_CRm(n), __PMEV_op2(n))
+-#define SYS_PMEVCNTRn_EL0(n)		sys_reg(3, 3, 14, __CNTR_CRm(n), __PMEV_op2(n))
+-#define __TYPER_CRm(n)			(0xc | (((n) >> 3) & 0x3))
+-#define SYS_PMEVTYPERn_EL0(n)		sys_reg(3, 3, 14, __TYPER_CRm(n), __PMEV_op2(n))
+-
+-#define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+-
+-#define	SYS_SPMCGCRn_EL1(n)		sys_reg(2, 0, 9, 13, ((n) & 1))
+-
+-#define __SPMEV_op2(n)			((n) & 0x7)
+-#define __SPMEV_crm(p, n)		((((p) & 7) << 1) | (((n) >> 3) & 1))
+-#define SYS_SPMEVCNTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b000, n), __SPMEV_op2(n))
+-#define	SYS_SPMEVFILT2Rn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b011, n), __SPMEV_op2(n))
+-#define	SYS_SPMEVFILTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b010, n), __SPMEV_op2(n))
+-#define	SYS_SPMEVTYPERn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b001, n), __SPMEV_op2(n))
+-
+-#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+-#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+-
+-#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+-#define SYS_SCTLR2_EL2			sys_reg(3, 4, 1, 0, 3)
+-#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+-#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
+-#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
+-#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+-#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
+-
+-#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
+-#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+-#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+-#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+-
+-#define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+-#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+-#define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+-#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+-#define SYS_SPSR_irq			sys_reg(3, 4, 4, 3, 0)
+-#define SYS_SPSR_abt			sys_reg(3, 4, 4, 3, 1)
+-#define SYS_SPSR_und			sys_reg(3, 4, 4, 3, 2)
+-#define SYS_SPSR_fiq			sys_reg(3, 4, 4, 3, 3)
+-#define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
+-#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
+-#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+-#define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+-#define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+-#define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+-#define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
+-
+-#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+-#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
+-
+-#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+-#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
+-
+-#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+-#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+-#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
+-#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+-#define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+-#define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+-#define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+-#define SYS_ICH_AP0R2_EL2		__SYS__AP0Rx_EL2(2)
+-#define SYS_ICH_AP0R3_EL2		__SYS__AP0Rx_EL2(3)
+-
+-#define __SYS__AP1Rx_EL2(x)		sys_reg(3, 4, 12, 9, x)
+-#define SYS_ICH_AP1R0_EL2		__SYS__AP1Rx_EL2(0)
+-#define SYS_ICH_AP1R1_EL2		__SYS__AP1Rx_EL2(1)
+-#define SYS_ICH_AP1R2_EL2		__SYS__AP1Rx_EL2(2)
+-#define SYS_ICH_AP1R3_EL2		__SYS__AP1Rx_EL2(3)
+-
+-#define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
+-#define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
+-#define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
+-#define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
+-
+-#define __SYS__LR0_EL2(x)		sys_reg(3, 4, 12, 12, x)
+-#define SYS_ICH_LR0_EL2			__SYS__LR0_EL2(0)
+-#define SYS_ICH_LR1_EL2			__SYS__LR0_EL2(1)
+-#define SYS_ICH_LR2_EL2			__SYS__LR0_EL2(2)
+-#define SYS_ICH_LR3_EL2			__SYS__LR0_EL2(3)
+-#define SYS_ICH_LR4_EL2			__SYS__LR0_EL2(4)
+-#define SYS_ICH_LR5_EL2			__SYS__LR0_EL2(5)
+-#define SYS_ICH_LR6_EL2			__SYS__LR0_EL2(6)
+-#define SYS_ICH_LR7_EL2			__SYS__LR0_EL2(7)
+-
+-#define __SYS__LR8_EL2(x)		sys_reg(3, 4, 12, 13, x)
+-#define SYS_ICH_LR8_EL2			__SYS__LR8_EL2(0)
+-#define SYS_ICH_LR9_EL2			__SYS__LR8_EL2(1)
+-#define SYS_ICH_LR10_EL2		__SYS__LR8_EL2(2)
+-#define SYS_ICH_LR11_EL2		__SYS__LR8_EL2(3)
+-#define SYS_ICH_LR12_EL2		__SYS__LR8_EL2(4)
+-#define SYS_ICH_LR13_EL2		__SYS__LR8_EL2(5)
+-#define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+-#define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+-
+-#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
+-#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
+-#define SYS_SCXTNUM_EL2			sys_reg(3, 4, 13, 0, 7)
+-
+-#define __AMEV_op2(m)			(m & 0x7)
+-#define __AMEV_CRm(n, m)		(n | ((m & 0x8) >> 3))
+-#define __SYS__AMEVCNTVOFF0n_EL2(m)	sys_reg(3, 4, 13, __AMEV_CRm(0x8, m), __AMEV_op2(m))
+-#define SYS_AMEVCNTVOFF0n_EL2(m)	__SYS__AMEVCNTVOFF0n_EL2(m)
+-#define __SYS__AMEVCNTVOFF1n_EL2(m)	sys_reg(3, 4, 13, __AMEV_CRm(0xA, m), __AMEV_op2(m))
+-#define SYS_AMEVCNTVOFF1n_EL2(m)	__SYS__AMEVCNTVOFF1n_EL2(m)
+-
+-#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+-#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+-#define SYS_CNTHP_TVAL_EL2		sys_reg(3, 4, 14, 2, 0)
+-#define SYS_CNTHP_CTL_EL2		sys_reg(3, 4, 14, 2, 1)
+-#define SYS_CNTHP_CVAL_EL2		sys_reg(3, 4, 14, 2, 2)
+-#define SYS_CNTHV_TVAL_EL2		sys_reg(3, 4, 14, 3, 0)
+-#define SYS_CNTHV_CTL_EL2		sys_reg(3, 4, 14, 3, 1)
+-#define SYS_CNTHV_CVAL_EL2		sys_reg(3, 4, 14, 3, 2)
+-
+-/* VHE encodings for architectural EL0/1 system registers */
+-#define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
+-#define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+-#define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+-#define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+-#define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+-#define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+-#define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+-#define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+-#define SYS_TFSR_EL12			sys_reg(3, 5, 5, 6, 0)
+-#define SYS_PMSCR_EL12			sys_reg(3, 5, 9, 9, 0)
+-#define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+-#define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+-#define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
+-#define SYS_SCXTNUM_EL12		sys_reg(3, 5, 13, 0, 7)
+-#define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
+-#define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
+-#define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
+-#define SYS_CNTP_CVAL_EL02		sys_reg(3, 5, 14, 2, 2)
+-#define SYS_CNTV_TVAL_EL02		sys_reg(3, 5, 14, 3, 0)
+-#define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+-#define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
+-
+-#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+-
+-/* AT instructions */
+-#define AT_Op0 1
+-#define AT_CRn 7
+-
+-#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
+-#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
+-#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
+-#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
+-#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
+-#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
+-#define OP_AT_S1E1A	sys_insn(AT_Op0, 0, AT_CRn, 9, 2)
+-#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
+-#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
+-#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
+-#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
+-#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
+-#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
+-#define OP_AT_S1E2A	sys_insn(AT_Op0, 4, AT_CRn, 9, 2)
+-
+-/* TLBI instructions */
+-#define TLBI_Op0	1
+-
+-#define TLBI_Op1_EL1	0	/* Accessible from EL1 or higher */
+-#define TLBI_Op1_EL2	4	/* Accessible from EL2 or higher */
+-
+-#define TLBI_CRn_XS	8	/* Extra Slow (the common one) */
+-#define TLBI_CRn_nXS	9	/* not Extra Slow (which nobody uses)*/
+-
+-#define TLBI_CRm_IPAIS	0	/* S2 Inner-Shareable */
+-#define TLBI_CRm_nROS	1	/* non-Range, Outer-Sharable */
+-#define TLBI_CRm_RIS	2	/* Range, Inner-Sharable */
+-#define TLBI_CRm_nRIS	3	/* non-Range, Inner-Sharable */
+-#define TLBI_CRm_IPAONS	4	/* S2 Outer and Non-Shareable */
+-#define TLBI_CRm_ROS	5	/* Range, Outer-Sharable */
+-#define TLBI_CRm_RNS	6	/* Range, Non-Sharable */
+-#define TLBI_CRm_nRNS	7	/* non-Range, Non-Sharable */
+-
+-#define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
+-#define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
+-#define OP_TLBI_ASIDE1OS		sys_insn(1, 0, 8, 1, 2)
+-#define OP_TLBI_VAAE1OS			sys_insn(1, 0, 8, 1, 3)
+-#define OP_TLBI_VALE1OS			sys_insn(1, 0, 8, 1, 5)
+-#define OP_TLBI_VAALE1OS		sys_insn(1, 0, 8, 1, 7)
+-#define OP_TLBI_RVAE1IS			sys_insn(1, 0, 8, 2, 1)
+-#define OP_TLBI_RVAAE1IS		sys_insn(1, 0, 8, 2, 3)
+-#define OP_TLBI_RVALE1IS		sys_insn(1, 0, 8, 2, 5)
+-#define OP_TLBI_RVAALE1IS		sys_insn(1, 0, 8, 2, 7)
+-#define OP_TLBI_VMALLE1IS		sys_insn(1, 0, 8, 3, 0)
+-#define OP_TLBI_VAE1IS			sys_insn(1, 0, 8, 3, 1)
+-#define OP_TLBI_ASIDE1IS		sys_insn(1, 0, 8, 3, 2)
+-#define OP_TLBI_VAAE1IS			sys_insn(1, 0, 8, 3, 3)
+-#define OP_TLBI_VALE1IS			sys_insn(1, 0, 8, 3, 5)
+-#define OP_TLBI_VAALE1IS		sys_insn(1, 0, 8, 3, 7)
+-#define OP_TLBI_RVAE1OS			sys_insn(1, 0, 8, 5, 1)
+-#define OP_TLBI_RVAAE1OS		sys_insn(1, 0, 8, 5, 3)
+-#define OP_TLBI_RVALE1OS		sys_insn(1, 0, 8, 5, 5)
+-#define OP_TLBI_RVAALE1OS		sys_insn(1, 0, 8, 5, 7)
+-#define OP_TLBI_RVAE1			sys_insn(1, 0, 8, 6, 1)
+-#define OP_TLBI_RVAAE1			sys_insn(1, 0, 8, 6, 3)
+-#define OP_TLBI_RVALE1			sys_insn(1, 0, 8, 6, 5)
+-#define OP_TLBI_RVAALE1			sys_insn(1, 0, 8, 6, 7)
+-#define OP_TLBI_VMALLE1			sys_insn(1, 0, 8, 7, 0)
+-#define OP_TLBI_VAE1			sys_insn(1, 0, 8, 7, 1)
+-#define OP_TLBI_ASIDE1			sys_insn(1, 0, 8, 7, 2)
+-#define OP_TLBI_VAAE1			sys_insn(1, 0, 8, 7, 3)
+-#define OP_TLBI_VALE1			sys_insn(1, 0, 8, 7, 5)
+-#define OP_TLBI_VAALE1			sys_insn(1, 0, 8, 7, 7)
+-#define OP_TLBI_VMALLE1OSNXS		sys_insn(1, 0, 9, 1, 0)
+-#define OP_TLBI_VAE1OSNXS		sys_insn(1, 0, 9, 1, 1)
+-#define OP_TLBI_ASIDE1OSNXS		sys_insn(1, 0, 9, 1, 2)
+-#define OP_TLBI_VAAE1OSNXS		sys_insn(1, 0, 9, 1, 3)
+-#define OP_TLBI_VALE1OSNXS		sys_insn(1, 0, 9, 1, 5)
+-#define OP_TLBI_VAALE1OSNXS		sys_insn(1, 0, 9, 1, 7)
+-#define OP_TLBI_RVAE1ISNXS		sys_insn(1, 0, 9, 2, 1)
+-#define OP_TLBI_RVAAE1ISNXS		sys_insn(1, 0, 9, 2, 3)
+-#define OP_TLBI_RVALE1ISNXS		sys_insn(1, 0, 9, 2, 5)
+-#define OP_TLBI_RVAALE1ISNXS		sys_insn(1, 0, 9, 2, 7)
+-#define OP_TLBI_VMALLE1ISNXS		sys_insn(1, 0, 9, 3, 0)
+-#define OP_TLBI_VAE1ISNXS		sys_insn(1, 0, 9, 3, 1)
+-#define OP_TLBI_ASIDE1ISNXS		sys_insn(1, 0, 9, 3, 2)
+-#define OP_TLBI_VAAE1ISNXS		sys_insn(1, 0, 9, 3, 3)
+-#define OP_TLBI_VALE1ISNXS		sys_insn(1, 0, 9, 3, 5)
+-#define OP_TLBI_VAALE1ISNXS		sys_insn(1, 0, 9, 3, 7)
+-#define OP_TLBI_RVAE1OSNXS		sys_insn(1, 0, 9, 5, 1)
+-#define OP_TLBI_RVAAE1OSNXS		sys_insn(1, 0, 9, 5, 3)
+-#define OP_TLBI_RVALE1OSNXS		sys_insn(1, 0, 9, 5, 5)
+-#define OP_TLBI_RVAALE1OSNXS		sys_insn(1, 0, 9, 5, 7)
+-#define OP_TLBI_RVAE1NXS		sys_insn(1, 0, 9, 6, 1)
+-#define OP_TLBI_RVAAE1NXS		sys_insn(1, 0, 9, 6, 3)
+-#define OP_TLBI_RVALE1NXS		sys_insn(1, 0, 9, 6, 5)
+-#define OP_TLBI_RVAALE1NXS		sys_insn(1, 0, 9, 6, 7)
+-#define OP_TLBI_VMALLE1NXS		sys_insn(1, 0, 9, 7, 0)
+-#define OP_TLBI_VAE1NXS			sys_insn(1, 0, 9, 7, 1)
+-#define OP_TLBI_ASIDE1NXS		sys_insn(1, 0, 9, 7, 2)
+-#define OP_TLBI_VAAE1NXS		sys_insn(1, 0, 9, 7, 3)
+-#define OP_TLBI_VALE1NXS		sys_insn(1, 0, 9, 7, 5)
+-#define OP_TLBI_VAALE1NXS		sys_insn(1, 0, 9, 7, 7)
+-#define OP_TLBI_IPAS2E1IS		sys_insn(1, 4, 8, 0, 1)
+-#define OP_TLBI_RIPAS2E1IS		sys_insn(1, 4, 8, 0, 2)
+-#define OP_TLBI_IPAS2LE1IS		sys_insn(1, 4, 8, 0, 5)
+-#define OP_TLBI_RIPAS2LE1IS		sys_insn(1, 4, 8, 0, 6)
+-#define OP_TLBI_ALLE2OS			sys_insn(1, 4, 8, 1, 0)
+-#define OP_TLBI_VAE2OS			sys_insn(1, 4, 8, 1, 1)
+-#define OP_TLBI_ALLE1OS			sys_insn(1, 4, 8, 1, 4)
+-#define OP_TLBI_VALE2OS			sys_insn(1, 4, 8, 1, 5)
+-#define OP_TLBI_VMALLS12E1OS		sys_insn(1, 4, 8, 1, 6)
+-#define OP_TLBI_RVAE2IS			sys_insn(1, 4, 8, 2, 1)
+-#define OP_TLBI_RVALE2IS		sys_insn(1, 4, 8, 2, 5)
+-#define OP_TLBI_ALLE2IS			sys_insn(1, 4, 8, 3, 0)
+-#define OP_TLBI_VAE2IS			sys_insn(1, 4, 8, 3, 1)
+-#define OP_TLBI_ALLE1IS			sys_insn(1, 4, 8, 3, 4)
+-#define OP_TLBI_VALE2IS			sys_insn(1, 4, 8, 3, 5)
+-#define OP_TLBI_VMALLS12E1IS		sys_insn(1, 4, 8, 3, 6)
+-#define OP_TLBI_IPAS2E1OS		sys_insn(1, 4, 8, 4, 0)
+-#define OP_TLBI_IPAS2E1			sys_insn(1, 4, 8, 4, 1)
+-#define OP_TLBI_RIPAS2E1		sys_insn(1, 4, 8, 4, 2)
+-#define OP_TLBI_RIPAS2E1OS		sys_insn(1, 4, 8, 4, 3)
+-#define OP_TLBI_IPAS2LE1OS		sys_insn(1, 4, 8, 4, 4)
+-#define OP_TLBI_IPAS2LE1		sys_insn(1, 4, 8, 4, 5)
+-#define OP_TLBI_RIPAS2LE1		sys_insn(1, 4, 8, 4, 6)
+-#define OP_TLBI_RIPAS2LE1OS		sys_insn(1, 4, 8, 4, 7)
+-#define OP_TLBI_RVAE2OS			sys_insn(1, 4, 8, 5, 1)
+-#define OP_TLBI_RVALE2OS		sys_insn(1, 4, 8, 5, 5)
+-#define OP_TLBI_RVAE2			sys_insn(1, 4, 8, 6, 1)
+-#define OP_TLBI_RVALE2			sys_insn(1, 4, 8, 6, 5)
+-#define OP_TLBI_ALLE2			sys_insn(1, 4, 8, 7, 0)
+-#define OP_TLBI_VAE2			sys_insn(1, 4, 8, 7, 1)
+-#define OP_TLBI_ALLE1			sys_insn(1, 4, 8, 7, 4)
+-#define OP_TLBI_VALE2			sys_insn(1, 4, 8, 7, 5)
+-#define OP_TLBI_VMALLS12E1		sys_insn(1, 4, 8, 7, 6)
+-#define OP_TLBI_IPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 1)
+-#define OP_TLBI_RIPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 2)
+-#define OP_TLBI_IPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 5)
+-#define OP_TLBI_RIPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 6)
+-#define OP_TLBI_ALLE2OSNXS		sys_insn(1, 4, 9, 1, 0)
+-#define OP_TLBI_VAE2OSNXS		sys_insn(1, 4, 9, 1, 1)
+-#define OP_TLBI_ALLE1OSNXS		sys_insn(1, 4, 9, 1, 4)
+-#define OP_TLBI_VALE2OSNXS		sys_insn(1, 4, 9, 1, 5)
+-#define OP_TLBI_VMALLS12E1OSNXS		sys_insn(1, 4, 9, 1, 6)
+-#define OP_TLBI_RVAE2ISNXS		sys_insn(1, 4, 9, 2, 1)
+-#define OP_TLBI_RVALE2ISNXS		sys_insn(1, 4, 9, 2, 5)
+-#define OP_TLBI_ALLE2ISNXS		sys_insn(1, 4, 9, 3, 0)
+-#define OP_TLBI_VAE2ISNXS		sys_insn(1, 4, 9, 3, 1)
+-#define OP_TLBI_ALLE1ISNXS		sys_insn(1, 4, 9, 3, 4)
+-#define OP_TLBI_VALE2ISNXS		sys_insn(1, 4, 9, 3, 5)
+-#define OP_TLBI_VMALLS12E1ISNXS		sys_insn(1, 4, 9, 3, 6)
+-#define OP_TLBI_IPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 0)
+-#define OP_TLBI_IPAS2E1NXS		sys_insn(1, 4, 9, 4, 1)
+-#define OP_TLBI_RIPAS2E1NXS		sys_insn(1, 4, 9, 4, 2)
+-#define OP_TLBI_RIPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 3)
+-#define OP_TLBI_IPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 4)
+-#define OP_TLBI_IPAS2LE1NXS		sys_insn(1, 4, 9, 4, 5)
+-#define OP_TLBI_RIPAS2LE1NXS		sys_insn(1, 4, 9, 4, 6)
+-#define OP_TLBI_RIPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 7)
+-#define OP_TLBI_RVAE2OSNXS		sys_insn(1, 4, 9, 5, 1)
+-#define OP_TLBI_RVALE2OSNXS		sys_insn(1, 4, 9, 5, 5)
+-#define OP_TLBI_RVAE2NXS		sys_insn(1, 4, 9, 6, 1)
+-#define OP_TLBI_RVALE2NXS		sys_insn(1, 4, 9, 6, 5)
+-#define OP_TLBI_ALLE2NXS		sys_insn(1, 4, 9, 7, 0)
+-#define OP_TLBI_VAE2NXS			sys_insn(1, 4, 9, 7, 1)
+-#define OP_TLBI_ALLE1NXS		sys_insn(1, 4, 9, 7, 4)
+-#define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
+-#define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
+-
+-/* Misc instructions */
+-#define OP_GCSPUSHX			sys_insn(1, 0, 7, 7, 4)
+-#define OP_GCSPOPCX			sys_insn(1, 0, 7, 7, 5)
+-#define OP_GCSPOPX			sys_insn(1, 0, 7, 7, 6)
+-#define OP_GCSPUSHM			sys_insn(1, 3, 7, 7, 0)
+-
+-#define OP_BRB_IALL			sys_insn(1, 1, 7, 2, 4)
+-#define OP_BRB_INJ			sys_insn(1, 1, 7, 2, 5)
+-#define OP_CFP_RCTX			sys_insn(1, 3, 7, 3, 4)
+-#define OP_DVP_RCTX			sys_insn(1, 3, 7, 3, 5)
+-#define OP_COSP_RCTX			sys_insn(1, 3, 7, 3, 6)
+-#define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
+-
+-/*
+- * BRBE Instructions
+- */
+-#define BRB_IALL_INSN	__emit_inst(0xd5000000 | OP_BRB_IALL | (0x1f))
+-#define BRB_INJ_INSN	__emit_inst(0xd5000000 | OP_BRB_INJ  | (0x1f))
+-
+-/* Common SCTLR_ELx flags. */
+-#define SCTLR_ELx_ENTP2	(BIT(60))
+-#define SCTLR_ELx_DSSBS	(BIT(44))
+-#define SCTLR_ELx_ATA	(BIT(43))
+-
+-#define SCTLR_ELx_EE_SHIFT	25
+-#define SCTLR_ELx_ENIA_SHIFT	31
+-
+-#define SCTLR_ELx_ITFSB	 (BIT(37))
+-#define SCTLR_ELx_ENIA	 (BIT(SCTLR_ELx_ENIA_SHIFT))
+-#define SCTLR_ELx_ENIB	 (BIT(30))
+-#define SCTLR_ELx_LSMAOE (BIT(29))
+-#define SCTLR_ELx_nTLSMD (BIT(28))
+-#define SCTLR_ELx_ENDA	 (BIT(27))
+-#define SCTLR_ELx_EE     (BIT(SCTLR_ELx_EE_SHIFT))
+-#define SCTLR_ELx_EIS	 (BIT(22))
+-#define SCTLR_ELx_IESB	 (BIT(21))
+-#define SCTLR_ELx_TSCXT	 (BIT(20))
+-#define SCTLR_ELx_WXN	 (BIT(19))
+-#define SCTLR_ELx_ENDB	 (BIT(13))
+-#define SCTLR_ELx_I	 (BIT(12))
+-#define SCTLR_ELx_EOS	 (BIT(11))
+-#define SCTLR_ELx_SA	 (BIT(3))
+-#define SCTLR_ELx_C	 (BIT(2))
+-#define SCTLR_ELx_A	 (BIT(1))
+-#define SCTLR_ELx_M	 (BIT(0))
+-
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ #define ENDIAN_SET_EL2		SCTLR_ELx_EE
+ #else
+@@ -869,35 +103,6 @@
+ 	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
+ 	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
+ 
+-/* MAIR_ELx memory attributes (used by Linux) */
+-#define MAIR_ATTR_DEVICE_nGnRnE		UL(0x00)
+-#define MAIR_ATTR_DEVICE_nGnRE		UL(0x04)
+-#define MAIR_ATTR_NORMAL_NC		UL(0x44)
+-#define MAIR_ATTR_NORMAL_TAGGED		UL(0xf0)
+-#define MAIR_ATTR_NORMAL		UL(0xff)
+-#define MAIR_ATTR_MASK			UL(0xff)
+-
+-/* Position the attr at the correct index */
+-#define MAIR_ATTRIDX(attr, idx)		((attr) << ((idx) * 8))
+-
+-/* id_aa64mmfr0 */
+-#define ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MIN	0x0
+-#define ID_AA64MMFR0_EL1_TGRAN4_LPA2		ID_AA64MMFR0_EL1_TGRAN4_52_BIT
+-#define ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MAX	0x7
+-#define ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MIN	0x0
+-#define ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MAX	0x7
+-#define ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MIN	0x1
+-#define ID_AA64MMFR0_EL1_TGRAN16_LPA2		ID_AA64MMFR0_EL1_TGRAN16_52_BIT
+-#define ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MAX	0xf
+-
+-#define ARM64_MIN_PARANGE_BITS		32
+-
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_DEFAULT	0x0
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_NONE		0x1
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MIN		0x2
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2		0x3
+-#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MAX		0x7
+-
+ #ifdef CONFIG_ARM64_PA_BITS_52
+ #define ID_AA64MMFR0_EL1_PARANGE_MAX	ID_AA64MMFR0_EL1_PARANGE_52
+ #else
+@@ -923,19 +128,6 @@
+ #define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN64_2_SHIFT
+ #endif
+ 
+-#define CPACR_EL1_FPEN_EL1EN	(BIT(20)) /* enable EL1 access */
+-#define CPACR_EL1_FPEN_EL0EN	(BIT(21)) /* enable EL0 access, if EL1EN set */
+-
+-#define CPACR_EL1_SMEN_EL1EN	(BIT(24)) /* enable EL1 access */
+-#define CPACR_EL1_SMEN_EL0EN	(BIT(25)) /* enable EL0 access, if EL1EN set */
+-
+-#define CPACR_EL1_ZEN_EL1EN	(BIT(16)) /* enable EL1 access */
+-#define CPACR_EL1_ZEN_EL0EN	(BIT(17)) /* enable EL0 access, if EL1EN set */
+-
+-/* GCR_EL1 Definitions */
+-#define SYS_GCR_EL1_RRND	(BIT(16))
+-#define SYS_GCR_EL1_EXCL_MASK	0xffffUL
+-
+ #ifdef CONFIG_KASAN_HW_TAGS
  /*
-  * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
-  * proper exit to userspace.
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 9c60f6465c78..40c656937136 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -136,31 +136,6 @@ TRACE_EVENT(kvm_mmio_emulate,
- 		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
- );
+  * KASAN always uses a whole byte for its tags. With CONFIG_KASAN_HW_TAGS it
+@@ -951,156 +143,6 @@
  
--TRACE_EVENT(kvm_mmio_nisv,
--	TP_PROTO(unsigned long vcpu_pc, unsigned long esr,
--		 unsigned long far, unsigned long ipa),
--	TP_ARGS(vcpu_pc, esr, far, ipa),
--
--	TP_STRUCT__entry(
--		__field(	unsigned long,	vcpu_pc		)
--		__field(	unsigned long,	esr		)
--		__field(	unsigned long,	far		)
--		__field(	unsigned long,	ipa		)
--	),
--
--	TP_fast_assign(
--		__entry->vcpu_pc		= vcpu_pc;
--		__entry->esr			= esr;
--		__entry->far			= far;
--		__entry->ipa			= ipa;
--	),
--
--	TP_printk("ipa %#016lx, esr %#016lx, far %#016lx, pc %#016lx",
--		  __entry->ipa, __entry->esr,
--		  __entry->far, __entry->vcpu_pc)
--);
--
--
- TRACE_EVENT(kvm_set_way_flush,
- 	    TP_PROTO(unsigned long vcpu_pc, bool cache),
- 	    TP_ARGS(vcpu_pc, cache),
-diff --git a/include/kvm/arm64/guest.h b/include/kvm/arm64/guest.h
-index fa67d992e8fd..ac042ed71157 100644
---- a/include/kvm/arm64/guest.h
-+++ b/include/kvm/arm64/guest.h
-@@ -4,7 +4,10 @@
- #define __KVM_ARM64_GUEST_H__
+ #define KERNEL_GCR_EL1		(SYS_GCR_EL1_RRND | KERNEL_GCR_EL1_EXCL)
  
- /* Implemented by virt/kvm/arm64/guest.c */
--unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
-+int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+int copy_core_reg_indices(const struct kvm_vcpu *vcpu, u64 __user *uindices);
-+unsigned long num_core_regs(const struct kvm_vcpu *vcpu);
+-/* RGSR_EL1 Definitions */
+-#define SYS_RGSR_EL1_TAG_MASK	0xfUL
+-#define SYS_RGSR_EL1_SEED_SHIFT	8
+-#define SYS_RGSR_EL1_SEED_MASK	0xffffUL
+-
+-/* TFSR{,E0}_EL1 bit definitions */
+-#define SYS_TFSR_EL1_TF0_SHIFT	0
+-#define SYS_TFSR_EL1_TF1_SHIFT	1
+-#define SYS_TFSR_EL1_TF0	(UL(1) << SYS_TFSR_EL1_TF0_SHIFT)
+-#define SYS_TFSR_EL1_TF1	(UL(1) << SYS_TFSR_EL1_TF1_SHIFT)
+-
+-/* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
+-#define SYS_MPIDR_SAFE_VAL	(BIT(31))
+-
+-/* GIC Hypervisor interface registers */
+-/* ICH_LR*_EL2 bit definitions */
+-#define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
+-
+-#define ICH_LR_EOI		(1ULL << 41)
+-#define ICH_LR_GROUP		(1ULL << 60)
+-#define ICH_LR_HW		(1ULL << 61)
+-#define ICH_LR_STATE		(3ULL << 62)
+-#define ICH_LR_PENDING_BIT	(1ULL << 62)
+-#define ICH_LR_ACTIVE_BIT	(1ULL << 63)
+-#define ICH_LR_PHYS_ID_SHIFT	32
+-#define ICH_LR_PHYS_ID_MASK	(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
+-#define ICH_LR_PRIORITY_SHIFT	48
+-#define ICH_LR_PRIORITY_MASK	(0xffULL << ICH_LR_PRIORITY_SHIFT)
+-
+-/*
+- * Permission Indirection Extension (PIE) permission encodings.
+- * Encodings with the _O suffix, have overlays applied (Permission Overlay Extension).
+- */
+-#define PIE_NONE_O	UL(0x0)
+-#define PIE_R_O		UL(0x1)
+-#define PIE_X_O		UL(0x2)
+-#define PIE_RX_O	UL(0x3)
+-#define PIE_RW_O	UL(0x5)
+-#define PIE_RWnX_O	UL(0x6)
+-#define PIE_RWX_O	UL(0x7)
+-#define PIE_R		UL(0x8)
+-#define PIE_GCS		UL(0x9)
+-#define PIE_RX		UL(0xa)
+-#define PIE_RW		UL(0xc)
+-#define PIE_RWX		UL(0xe)
+-#define PIE_MASK	UL(0xf)
+-
+-#define PIRx_ELx_BITS_PER_IDX		4
+-#define PIRx_ELx_PERM_SHIFT(idx)	((idx) * PIRx_ELx_BITS_PER_IDX)
+-#define PIRx_ELx_PERM_PREP(idx, perm)	(((perm) & PIE_MASK) << PIRx_ELx_PERM_SHIFT(idx))
+-
+-/*
+- * Permission Overlay Extension (POE) permission encodings.
+- */
+-#define POE_NONE	UL(0x0)
+-#define POE_R		UL(0x1)
+-#define POE_X		UL(0x2)
+-#define POE_RX		UL(0x3)
+-#define POE_W		UL(0x4)
+-#define POE_RW		UL(0x5)
+-#define POE_WX		UL(0x6)
+-#define POE_RWX		UL(0x7)
+-#define POE_MASK	UL(0xf)
+-
+-#define POR_ELx_BITS_PER_IDX		4
+-#define POR_ELx_PERM_SHIFT(idx)		((idx) * POR_ELx_BITS_PER_IDX)
+-#define POR_ELx_PERM_GET(idx, reg)	(((reg) >> POR_ELx_PERM_SHIFT(idx)) & POE_MASK)
+-#define POR_ELx_PERM_PREP(idx, perm)	(((perm) & POE_MASK) << POR_ELx_PERM_SHIFT(idx))
+-
+-/*
+- * Definitions for Guarded Control Stack
+- */
+-
+-#define GCS_CAP_ADDR_MASK		GENMASK(63, 12)
+-#define GCS_CAP_ADDR_SHIFT		12
+-#define GCS_CAP_ADDR_WIDTH		52
+-#define GCS_CAP_ADDR(x)			FIELD_GET(GCS_CAP_ADDR_MASK, x)
+-
+-#define GCS_CAP_TOKEN_MASK		GENMASK(11, 0)
+-#define GCS_CAP_TOKEN_SHIFT		0
+-#define GCS_CAP_TOKEN_WIDTH		12
+-#define GCS_CAP_TOKEN(x)		FIELD_GET(GCS_CAP_TOKEN_MASK, x)
+-
+-#define GCS_CAP_VALID_TOKEN		0x1
+-#define GCS_CAP_IN_PROGRESS_TOKEN	0x5
+-
+-#define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
+-					       GCS_CAP_VALID_TOKEN)
+-/*
+- * Definitions for GICv5 instructions
+- */
+-#define GICV5_OP_GIC_CDAFF		sys_insn(1, 0, 12, 1, 3)
+-#define GICV5_OP_GIC_CDDI		sys_insn(1, 0, 12, 2, 0)
+-#define GICV5_OP_GIC_CDDIS		sys_insn(1, 0, 12, 1, 0)
+-#define GICV5_OP_GIC_CDHM		sys_insn(1, 0, 12, 2, 1)
+-#define GICV5_OP_GIC_CDEN		sys_insn(1, 0, 12, 1, 1)
+-#define GICV5_OP_GIC_CDEOI		sys_insn(1, 0, 12, 1, 7)
+-#define GICV5_OP_GIC_CDPEND		sys_insn(1, 0, 12, 1, 4)
+-#define GICV5_OP_GIC_CDPRI		sys_insn(1, 0, 12, 1, 2)
+-#define GICV5_OP_GIC_CDRCFG		sys_insn(1, 0, 12, 1, 5)
+-#define GICV5_OP_GICR_CDIA		sys_insn(1, 0, 12, 3, 0)
+-
+-/* Definitions for GIC CDAFF */
+-#define GICV5_GIC_CDAFF_IAFFID_MASK	GENMASK_ULL(47, 32)
+-#define GICV5_GIC_CDAFF_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDAFF_IRM_MASK	BIT_ULL(28)
+-#define GICV5_GIC_CDAFF_ID_MASK		GENMASK_ULL(23, 0)
+-
+-/* Definitions for GIC CDDI */
+-#define GICV5_GIC_CDDI_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDDI_ID_MASK		GENMASK_ULL(23, 0)
+-
+-/* Definitions for GIC CDDIS */
+-#define GICV5_GIC_CDDIS_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDDIS_TYPE(r)		FIELD_GET(GICV5_GIC_CDDIS_TYPE_MASK, r)
+-#define GICV5_GIC_CDDIS_ID_MASK		GENMASK_ULL(23, 0)
+-#define GICV5_GIC_CDDIS_ID(r)		FIELD_GET(GICV5_GIC_CDDIS_ID_MASK, r)
+-
+-/* Definitions for GIC CDEN */
+-#define GICV5_GIC_CDEN_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDEN_ID_MASK		GENMASK_ULL(23, 0)
+-
+-/* Definitions for GIC CDHM */
+-#define GICV5_GIC_CDHM_HM_MASK		BIT_ULL(32)
+-#define GICV5_GIC_CDHM_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDHM_ID_MASK		GENMASK_ULL(23, 0)
+-
+-/* Definitions for GIC CDPEND */
+-#define GICV5_GIC_CDPEND_PENDING_MASK	BIT_ULL(32)
+-#define GICV5_GIC_CDPEND_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDPEND_ID_MASK	GENMASK_ULL(23, 0)
+-
+-/* Definitions for GIC CDPRI */
+-#define GICV5_GIC_CDPRI_PRIORITY_MASK	GENMASK_ULL(39, 35)
+-#define GICV5_GIC_CDPRI_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDPRI_ID_MASK		GENMASK_ULL(23, 0)
+-
+-/* Definitions for GIC CDRCFG */
+-#define GICV5_GIC_CDRCFG_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDRCFG_ID_MASK	GENMASK_ULL(23, 0)
+-
+-/* Definitions for GICR CDIA */
+-#define GICV5_GIC_CDIA_VALID_MASK	BIT_ULL(32)
+-#define GICV5_GICR_CDIA_VALID(r)	FIELD_GET(GICV5_GIC_CDIA_VALID_MASK, r)
+-#define GICV5_GIC_CDIA_TYPE_MASK	GENMASK_ULL(31, 29)
+-#define GICV5_GIC_CDIA_ID_MASK		GENMASK_ULL(23, 0)
+-
+-#define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
+-#define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
+-
+ #ifdef __ASSEMBLER__
  
- #endif /* __KVM_ARM64_GUEST_H__ */
-diff --git a/include/kvm/arm64/handle_exit.h b/include/kvm/arm64/handle_exit.h
+ 	.macro	mrs_s, rt, sreg
+@@ -1249,18 +291,6 @@
+ 	par;								\
+ })
+ 
+-#define SYS_FIELD_VALUE(reg, field, val)	reg##_##field##_##val
+-
+-#define SYS_FIELD_GET(reg, field, val)		\
+-		 FIELD_GET(reg##_##field##_MASK, val)
+-
+-#define SYS_FIELD_PREP(reg, field, val)		\
+-		 FIELD_PREP(reg##_##field##_MASK, val)
+-
+-#define SYS_FIELD_PREP_ENUM(reg, field, val)		\
+-		 FIELD_PREP(reg##_##field##_MASK,	\
+-			    SYS_FIELD_VALUE(reg, field, val))
+-
+ #endif
+ 
+ #endif	/* __ASM_SYSREG_H */
+diff --git a/arch/arm64/tools/Makefile b/arch/arm64/tools/Makefile
+index c2b34e761006..aee011abc2b9 100644
+--- a/arch/arm64/tools/Makefile
++++ b/arch/arm64/tools/Makefile
+@@ -3,26 +3,18 @@
+ gen := arch/$(ARCH)/include/generated
+ kapi := $(gen)/asm
+ 
+-kapisyshdr-y := cpucap-defs.h sysreg-defs.h
++include $(srctree)/arch/arm64/tools/Makefile.sysreg
+ 
+-kapi-hdrs-y := $(addprefix $(kapi)/, $(kapisyshdr-y))
+-
+-targets += $(addprefix ../../../, $(kapi-hdrs-y))
++targets += $(addprefix ../../../, $(kapi)/cpucap-defs.h)
+ 
+ PHONY += kapi
+ 
+ all: $(syscall64) kapi
+ 
+-kapi:   $(kapi-hdrs-y)
++kapi:   $(kapi)/cpucap-defs.h
+ 
+ quiet_cmd_gen_cpucaps = GEN     $@
+       cmd_gen_cpucaps = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
+ 
+-quiet_cmd_gen_sysreg = GEN     $@
+-      cmd_gen_sysreg = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
+-
+ $(kapi)/cpucap-defs.h: $(src)/gen-cpucaps.awk $(src)/cpucaps FORCE
+ 	$(call if_changed,gen_cpucaps)
+-
+-$(kapi)/sysreg-defs.h: $(src)/gen-sysreg.awk $(src)/sysreg FORCE
+-	$(call if_changed,gen_sysreg)
+diff --git a/arch/arm64/tools/Makefile.sysreg b/arch/arm64/tools/Makefile.sysreg
 new file mode 100644
-index 000000000000..ef253e1f2cb3
+index 000000000000..1c2096208f14
 --- /dev/null
-+++ b/include/kvm/arm64/handle_exit.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef KVM_ARM64_HANDLE_EXIT_H
-+#define KVM_ARM64_HANDLE_EXIT_H
-+
-+#include <linux/kvm_host.h>
-+
-+typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-+extern exit_handle_fn arm_exit_handlers[255];
-+
-+int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu);
-+exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu);
-+int handle_trap_exceptions(struct kvm_vcpu *vcpu);
-+
-+#endif /* KVM_ARM64_HANDLE_EXIT_H */
-diff --git a/include/kvm/arm64/kvm_host.h b/include/kvm/arm64/kvm_host.h
-index 3a434f47497b..21117e4fd546 100644
---- a/include/kvm/arm64/kvm_host.h
-+++ b/include/kvm/arm64/kvm_host.h
-@@ -28,6 +28,12 @@ struct vcpu_reset_state {
- 	bool		reset;
- };
- 
-+/* Implemented in virt/kvm/arm64/arm.c */
-+int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
-+				 const struct kvm_vcpu_init *init);
-+bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
-+			   const struct kvm_vcpu_init *init);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-@@ -75,6 +81,9 @@ static inline bool kvm_supports_32bit_el0(void)
- 	return false;
- }
- 
-+/* Implemented in architecture specific code */
-+unsigned long system_supported_vcpu_features(void);
-+
- #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
- 
- /*
-diff --git a/virt/kvm/arm64/Makefile.kvm b/virt/kvm/arm64/Makefile.kvm
-new file mode 100644
-index 000000000000..ac969bf1c016
---- /dev/null
-+++ b/virt/kvm/arm64/Makefile.kvm
++++ b/arch/arm64/tools/Makefile.sysreg
 @@ -0,0 +1,12 @@
 +# SPDX-License-Identifier: GPL-2.0
-+#
-+# Makefile for Kernel-based Virtual Machine modules for arm64 guests
-+#
-+KVM_ARM64 ?= $(KVM)/arm64
 +
-+shared-arm64-obj := \
-+	$(KVM_ARM64)/arm.o \
-+	$(KVM_ARM64)/guest.o \
-+	$(KVM_ARM64)/handle_exit.o \
-+	$(KVM_ARM64)/mmio.o \
++targets += $(addprefix ../../../, $(kapi)/sysreg-gen-defs.h)
 +
-diff --git a/virt/kvm/arm64/arm.c b/virt/kvm/arm64/arm.c
-new file mode 100644
-index 000000000000..b47adef65e5f
---- /dev/null
-+++ b/virt/kvm/arm64/arm.c
-@@ -0,0 +1,54 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++kapi:   $(kapi)/sysreg-gen-defs.h
 +
-+#include <linux/preempt.h>
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_mmu.h>
++quiet_cmd_gen_sysreg = GEN     $@
++      cmd_gen_sysreg = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
 +
-+int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
-+				 const struct kvm_vcpu_init *init)
-+{
-+	unsigned long features = init->features[0];
-+	int i;
++$(kapi)/sysreg-gen-defs.h: $(srctree)/arch/arm64/tools/gen-sysreg.awk $(srctree)/arch/arm64/tools/sysreg FORCE
++	$(call if_changed,gen_sysreg)
 +
-+	if (features & ~KVM_VCPU_VALID_FEATURES)
-+		return -ENOENT;
-+
-+	for (i = 1; i < ARRAY_SIZE(init->features); i++) {
-+		if (init->features[i])
-+			return -ENOENT;
-+	}
-+
-+	if (features & ~system_supported_vcpu_features())
-+		return -EINVAL;
-+
-+	/*
-+	 * For now make sure that both address/generic pointer authentication
-+	 * features are requested by the userspace together.
-+	 */
-+	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features) !=
-+	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features))
-+		return -EINVAL;
-+
-+	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
-+		return 0;
-+
-+	/* MTE is incompatible with AArch32 */
-+	if (kvm_has_mte(vcpu->kvm))
-+		return -EINVAL;
-+
-+	/* NV is incompatible with AArch32 */
-+	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
-+			   const struct kvm_vcpu_init *init)
-+{
-+	unsigned long features = init->features[0];
-+
-+	return !bitmap_equal(vcpu->kvm->arch.vcpu_features, &features,
-+			     KVM_VCPU_MAX_FEATURES);
-+}
-diff --git a/virt/kvm/arm64/guest.c b/virt/kvm/arm64/guest.c
-new file mode 100644
-index 000000000000..83e33e0143b9
---- /dev/null
-+++ b/virt/kvm/arm64/guest.c
-@@ -0,0 +1,302 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/kvm_host.h>
-+#include <linux/kvm.h>
-+#include <asm/pstate.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_nested.h>
-+#include <asm/sigcontext.h>
-+
-+#include <kvm/arm64/guest.h>
-+
-+static bool core_reg_offset_is_vreg(u64 off)
-+{
-+	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
-+		off < KVM_REG_ARM_CORE_REG(fp_regs.fpsr);
-+}
-+
-+static u64 core_reg_offset_from_id(u64 id)
-+{
-+	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
-+}
-+
-+static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
-+{
-+	int size;
-+
-+	switch (off) {
-+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-+	case KVM_REG_ARM_CORE_REG(regs.sp):
-+	case KVM_REG_ARM_CORE_REG(regs.pc):
-+	case KVM_REG_ARM_CORE_REG(regs.pstate):
-+	case KVM_REG_ARM_CORE_REG(sp_el1):
-+	case KVM_REG_ARM_CORE_REG(elr_el1):
-+	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
-+	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
-+		size = sizeof(__u64);
-+		break;
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
-+		size = sizeof(__uint128_t);
-+		break;
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
-+	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
-+		size = sizeof(__u32);
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	if (!IS_ALIGNED(off, size / sizeof(__u32)))
-+		return -EINVAL;
-+
-+	/*
-+	 * The KVM_REG_ARM64_SVE regs must be used instead of
-+	 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
-+	 * SVE-enabled vcpus:
-+	 */
-+	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
-+		return -EINVAL;
-+
-+	return size;
-+}
-+
-+static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	u64 off = core_reg_offset_from_id(reg->id);
-+	int size = core_reg_size_from_offset(vcpu, off);
-+
-+	if (size < 0)
-+		return NULL;
-+
-+	if (KVM_REG_SIZE(reg->id) != size)
-+		return NULL;
-+
-+	switch (off) {
-+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-+		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
-+		off /= 2;
-+		return &vcpu_gp_regs(vcpu)->regs[off];
-+
-+	case KVM_REG_ARM_CORE_REG(regs.sp):
-+		return &vcpu_gp_regs(vcpu)->sp;
-+
-+	case KVM_REG_ARM_CORE_REG(regs.pc):
-+		return vcpu_pc(vcpu);
-+
-+	case KVM_REG_ARM_CORE_REG(regs.pstate):
-+		return &vcpu_gp_regs(vcpu)->pstate;
-+
-+	case KVM_REG_ARM_CORE_REG(sp_el1):
-+		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
-+
-+	case KVM_REG_ARM_CORE_REG(elr_el1):
-+		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
-+		return __ctxt_sys_reg(&vcpu->arch.ctxt, SPSR_EL1);
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_ABT]):
-+		return &vcpu->arch.ctxt.spsr_abt;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_UND]):
-+		return &vcpu->arch.ctxt.spsr_und;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_IRQ]):
-+		return &vcpu->arch.ctxt.spsr_irq;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_FIQ]):
-+		return &vcpu->arch.ctxt.spsr_fiq;
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
-+		off -= KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]);
-+		off /= 4;
-+		return &vcpu->arch.ctxt.fp_regs.vregs[off];
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
-+		return &vcpu->arch.ctxt.fp_regs.fpsr;
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
-+		return &vcpu->arch.ctxt.fp_regs.fpcr;
-+
-+	default:
-+		return NULL;
-+	}
-+}
-+
-+int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	/*
-+	 * Because the kvm_regs structure is a mix of 32, 64 and
-+	 * 128bit fields, we index it as if it was a 32bit
-+	 * array. Hence below, nr_regs is the number of entries, and
-+	 * off the index in the "array".
-+	 */
-+	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
-+	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
-+	void *addr;
-+	u32 off;
-+
-+	/* Our ID is an index into the kvm_regs struct. */
-+	off = core_reg_offset_from_id(reg->id);
-+	if (off >= nr_regs ||
-+	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
-+		return -ENOENT;
-+
-+	addr = core_reg_addr(vcpu, reg);
-+	if (!addr)
-+		return -EINVAL;
-+
-+	if (copy_to_user(uaddr, addr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
-+	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
-+	__uint128_t tmp;
-+	void *valp = &tmp, *addr;
-+	u64 off;
-+	int err = 0;
-+
-+	/* Our ID is an index into the kvm_regs struct. */
-+	off = core_reg_offset_from_id(reg->id);
-+	if (off >= nr_regs ||
-+	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
-+		return -ENOENT;
-+
-+	addr = core_reg_addr(vcpu, reg);
-+	if (!addr)
-+		return -EINVAL;
-+
-+	if (KVM_REG_SIZE(reg->id) > sizeof(tmp))
-+		return -EINVAL;
-+
-+	if (copy_from_user(valp, uaddr, KVM_REG_SIZE(reg->id))) {
-+		err = -EFAULT;
-+		goto out;
-+	}
-+
-+	if (off == KVM_REG_ARM_CORE_REG(regs.pstate)) {
-+		u64 mode = (*(u64 *)valp) & PSR_AA32_MODE_MASK;
-+
-+		switch (mode) {
-+		case PSR_AA32_MODE_USR:
-+			if (!kvm_supports_32bit_el0())
-+				return -EINVAL;
-+			break;
-+		case PSR_AA32_MODE_FIQ:
-+		case PSR_AA32_MODE_IRQ:
-+		case PSR_AA32_MODE_SVC:
-+		case PSR_AA32_MODE_ABT:
-+		case PSR_AA32_MODE_UND:
-+		case PSR_AA32_MODE_SYS:
-+			if (!vcpu_el1_is_32bit(vcpu))
-+				return -EINVAL;
-+			break;
-+		case PSR_MODE_EL2h:
-+		case PSR_MODE_EL2t:
-+			if (!vcpu_has_nv(vcpu))
-+				return -EINVAL;
-+			fallthrough;
-+		case PSR_MODE_EL0t:
-+		case PSR_MODE_EL1t:
-+		case PSR_MODE_EL1h:
-+			if (vcpu_el1_is_32bit(vcpu))
-+				return -EINVAL;
-+			break;
-+		default:
-+			err = -EINVAL;
-+			goto out;
-+		}
-+	}
-+
-+	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
-+
-+	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
-+		int i, nr_reg;
-+
-+		switch (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK) {
-+		/*
-+		 * Either we are dealing with user mode, and only the
-+		 * first 15 registers (+ PC) must be narrowed to 32bit.
-+		 * AArch32 r0-r14 conveniently map to AArch64 x0-x14.
-+		 */
-+		case PSR_AA32_MODE_USR:
-+		case PSR_AA32_MODE_SYS:
-+			nr_reg = 15;
-+			break;
-+
-+		/*
-+		 * Otherwise, this is a privileged mode, and *all* the
-+		 * registers must be narrowed to 32bit.
-+		 */
-+		default:
-+			nr_reg = 31;
-+			break;
-+		}
-+
-+		for (i = 0; i < nr_reg; i++)
-+			vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
-+
-+		*vcpu_pc(vcpu) = (u32)*vcpu_pc(vcpu);
-+	}
-+out:
-+	return err;
-+}
-+
-+int copy_core_reg_indices(const struct kvm_vcpu *vcpu, u64 __user *uindices)
-+{
-+	unsigned int i;
-+	int n = 0;
-+
-+	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
-+		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
-+		int size = core_reg_size_from_offset(vcpu, i);
-+
-+		if (size < 0)
-+			continue;
-+
-+		switch (size) {
-+		case sizeof(__u32):
-+			reg |= KVM_REG_SIZE_U32;
-+			break;
-+
-+		case sizeof(__u64):
-+			reg |= KVM_REG_SIZE_U64;
-+			break;
-+
-+		case sizeof(__uint128_t):
-+			reg |= KVM_REG_SIZE_U128;
-+			break;
-+
-+		default:
-+			WARN_ON(1);
-+			continue;
-+		}
-+
-+		if (uindices) {
-+			if (put_user(reg, uindices))
-+				return -EFAULT;
-+			uindices++;
-+		}
-+
-+		n++;
-+	}
-+
-+	return n;
-+}
-+
-+unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
-+{
-+	return copy_core_reg_indices(vcpu, NULL);
-+}
-diff --git a/virt/kvm/arm64/handle_exit.c b/virt/kvm/arm64/handle_exit.c
-new file mode 100644
-index 000000000000..7c2eff026d08
---- /dev/null
-+++ b/virt/kvm/arm64/handle_exit.c
-@@ -0,0 +1,54 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/kvm_host.h>
-+
-+#include <asm/esr.h>
-+#include <asm/kvm_emulate.h>
-+
-+#include <kvm/arm64/handle_exit.h>
-+
-+int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
-+{
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+
-+	kvm_pr_unimpl("Unknown exception class: esr: %#016llx -- %s\n",
-+		      esr, esr_get_class_string(esr));
-+
-+	kvm_inject_undefined(vcpu);
-+	return 1;
-+}
-+
-+exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
-+{
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	u8 esr_ec = ESR_ELx_EC(esr);
-+
-+	return arm_exit_handlers[esr_ec];
-+}
-+
-+/*
-+ * We may be single-stepping an emulated instruction. If the emulation
-+ * has been completed in the kernel, we can return to userspace with a
-+ * KVM_EXIT_DEBUG, otherwise userspace needs to complete its
-+ * emulation first.
-+ */
-+int handle_trap_exceptions(struct kvm_vcpu *vcpu)
-+{
-+	int handled;
-+
-+	/*
-+	 * See ARM ARM B1.14.1: "Hyp traps on instructions
-+	 * that fail their condition code check"
-+	 */
-+	if (!kvm_condition_valid(vcpu)) {
-+		kvm_incr_pc(vcpu);
-+		handled = 1;
-+	} else {
-+		exit_handle_fn exit_handler;
-+
-+		exit_handler = kvm_get_exit_handler(vcpu);
-+		handled = exit_handler(vcpu);
-+	}
-+
-+	return handled;
-+}
-diff --git a/arch/arm64/kvm/mmio.c b/virt/kvm/arm64/mmio.c
-similarity index 99%
-rename from arch/arm64/kvm/mmio.c
-rename to virt/kvm/arm64/mmio.c
-index e2285ed8c91d..438a554ec1ed 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/virt/kvm/arm64/mmio.c
-@@ -8,6 +8,7 @@
- #include <asm/kvm_emulate.h>
- #include <trace/events/kvm.h>
+diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
+index 86860ab672dc..ffdabd3ff84a 100755
+--- a/arch/arm64/tools/gen-sysreg.awk
++++ b/arch/arm64/tools/gen-sysreg.awk
+@@ -107,8 +107,8 @@ function parse_bitdef(reg, field, bitdef, _bits)
+ }
  
-+#define CREATE_TRACE_POINTS
- #include "trace.h"
+ BEGIN {
+-	print "#ifndef __ASM_SYSREG_DEFS_H"
+-	print "#define __ASM_SYSREG_DEFS_H"
++	print "#ifndef __ASM_SYSREG_GEN_DEFS_H"
++	print "#define __ASM_SYSREG_GEN_DEFS_H"
+ 	print ""
+ 	print "/* Generated file - do not edit */"
+ 	print ""
+@@ -121,7 +121,7 @@ END {
+ 	if (__current_block_depth != 0)
+ 		fatal("Missing terminator for " block_current() " block")
  
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data)
-diff --git a/virt/kvm/arm64/trace.h b/virt/kvm/arm64/trace.h
-new file mode 100644
-index 000000000000..0814000b7749
---- /dev/null
-+++ b/virt/kvm/arm64/trace.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#if !defined(__KVM_ARM64_TRACE_H__) || defined(TRACE_HEADER_MULTI_READ)
-+#define __KVM_ARM64_TRACE_H__
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM kvm
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../virt/kvm/arm64
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace
-+
-+#include <linux/tracepoint.h>
-+
-+TRACE_EVENT(kvm_mmio_nisv,
-+	TP_PROTO(unsigned long vcpu_pc, unsigned long esr,
-+		 unsigned long far, unsigned long ipa),
-+	TP_ARGS(vcpu_pc, esr, far, ipa),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_pc		)
-+		__field(	unsigned long,	esr		)
-+		__field(	unsigned long,	far		)
-+		__field(	unsigned long,	ipa		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_pc		= vcpu_pc;
-+		__entry->esr			= esr;
-+		__entry->far			= far;
-+		__entry->ipa			= ipa;
-+	),
-+
-+	TP_printk("ipa %#016lx, esr %#016lx, far %#016lx, pc %#016lx",
-+		  __entry->ipa, __entry->esr,
-+		  __entry->far, __entry->vcpu_pc)
-+);
-+
-+#endif /* __KVM_ARM64_TRACE_H__ */
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
+-	print "#endif /* __ASM_SYSREG_DEFS_H */"
++	print "#endif /* __ASM_SYSREG_GEN_DEFS_H */"
+ }
+ 
+ # skip blank lines and comment lines
 -- 
 2.51.0
 
