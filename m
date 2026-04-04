@@ -1,249 +1,173 @@
-Received: from mx0b-00154904.pphosted.com (mx0b-00154904.pphosted.com [148.163.137.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAB634EF1B
-	for <kvmarm@lists.linux.dev>; Fri,  3 Apr 2026 03:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.137.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775186899; cv=fail; b=Em8jESvM8HVN7RnMpcY8IwibSf3wWNt4edDtCYOnac1BJtgJo2Dwkvvj1JMStfZSaJlWl+iU3wooh+mkpw+8mUiE9xjOvBqKpEBZN4h0f8sNA6cFMW1rrYN4ZN9WlnQgfjTHBxr5c9mBcJjiKtld7Ur5xxZSAFNDFhvWxcCkpqI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775186899; c=relaxed/simple;
-	bh=DZ4fFkvA4hIg9U8ks16DNuLlqJviuwaYTlgzTEPVR+w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GuH6Hp8BeBXTKPJuPDFLCpMJSa2J4esN2k4dyxp5NPIBsDfztNIP6a/upQH3yG9SA7Pe26ceL1D9omZYlU1H73t+GqgU1yTJP3tPicugtBOGCbK9akEPBLILJvhPatrnwuBrz3yi/XruKGMyPFUDOvnT2jlubHoYCitFxSlVvwc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com; spf=pass smtp.mailfrom=dell.com; dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b=XJ3appyk; arc=fail smtp.client-ip=148.163.137.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dell.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9912D7DC8
+	for <kvmarm@lists.linux.dev>; Sat,  4 Apr 2026 18:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775326416; cv=none; b=Uu6InqewMATKsktSPPdnLqbq/XKHuONHMlDcx6OM4pJIxrmX6VeOAORAWy/b1EGcaZmdUvDvLcYYhhj/hnC6sPNb6f2JWgxdtP+yYrtBcWDKy9aFy8aDP6DHA8ITod1coxjMtyWKaDgsqOKhQISZ8bviB1MiyVnXP/8WXyGUINk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775326416; c=relaxed/simple;
+	bh=wjBG2dDvNOcl73t5Dsrip8H0/qPbPfDx7nYSPfXnK9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UIwH7Y3dL+mCbfCjmm+Vx002Axr/e1KpuED0VPMN7OFtuEt3Mt+ZGQ8T21hQtq+hhmzHpBvkr2kA9FFp1qsbO1qrcgg6st8aQAWSaTS/fTbyMqQkMrAT/72TlOHNrKH9JfZ73tarYmQ73BK8bTg2rTt/SL8PyPVux71qYHsxa0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2pO4bdX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b="XJ3appyk"
-Received: from pps.filterd (m0170396.ppops.net [127.0.0.1])
-	by mx0b-00154904.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 632I3hg31434881;
-	Thu, 2 Apr 2026 19:38:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dell.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=smtpout1; bh=D
-	Z4fFkvA4hIg9U8ks16DNuLlqJviuwaYTlgzTEPVR+w=; b=XJ3appyksGgSWwWP7
-	tXuZjSgAoxI9bYY6nATCKPYynW65wilPthi54wAD/rBc+yLw4IujsYcbP+oete0L
-	EChSImJx+fo8Os+SNx8qDq8/zBq6vtN7KthcLant6q9ihvsHw38WGT0rWPdjwkvn
-	eLrEN8qcvJlLU1H7qRSp6Cj0HECGISyWs0MJc73EuAr2h0NoarnvUqMSVD2kjU03
-	zJCyh1O5ByoHYe3yXA4SIcpOS3ozK0IhQznHljvXwhSpq1oUK2qjF5M1N5NrFW/z
-	sb5459VyLuaLq45DqDXE2s1JvTw4wmG7S9NkdLOSqygaRWovIGxEIqdjumUIvLt+
-	j2mog==
-Received: from mx0b-00154901.pphosted.com (mx0b-00154901.pphosted.com [67.231.157.37])
-	by mx0b-00154904.pphosted.com (PPS) with ESMTPS id 4d6atu45mp-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 02 Apr 2026 19:38:26 -0400 (EDT)
-Received: from pps.filterd (m0393468.ppops.net [127.0.0.1])
-	by mx0a-00154901.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 632NXNH7919418;
-	Thu, 2 Apr 2026 19:38:26 -0400
-Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazon11013018.outbound.protection.outlook.com [40.93.201.18])
-	by mx0a-00154901.pphosted.com (PPS) with ESMTPS id 4da1s289ky-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 02 Apr 2026 19:38:26 -0400 (EDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=y3QOvb+9FbWpb+7nA1OS6h4FwGJt9dmBLq2CFSTxtdhVbWjPNdSDVZJZqjr/8egfSb/5IOrhzNbYfL9aR7blDoN3bsRvgrDG/c8DmrprZBXhF0MatBYvRmvVrOCMrN0wnE7BujGl/QXX5HtTPSRmUauHkMGSv+IG8YVg1DR9sfFbb6rp1Yfee86p9YHlRXYrkUkYu6akTfRuTPtTeiQ5rbRnTpyHmKgemA4dNCBz75Oa/lz15EEC/3rsI/acwUx6s7lBQ1+f3L29eFoamOZUMS+eTTD+cO1EkLxAfr0qU7tYR/Z5TMCstRw5fHNILIj3rD7BnusCXtUXFr4hWTZ2hA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DZ4fFkvA4hIg9U8ks16DNuLlqJviuwaYTlgzTEPVR+w=;
- b=jXv1+OATvTCntCTLiirYyOKn23nflK8/qxShEC0o4Z2SvMw/Yct+OR4cTpohi/UdTVSjRoCM22CsFBvmhr+Qeno+gEeAUARHyR5mte84j2M7R6dWywl6LDoFjDa8+GHlFtpLo/IehNkBs/dQ+YzmbULijlfFKLLfc77eVLNfzzzugCdWRABH6BF99cCxulx6AAEHuOhxCOHpVG2xv/CCQmjPQ9ZSvWthj27IYUUkvMl9pzfH3osFWB7+rn32Wp+/CaajAvHg8KmNRuzunCNaRVuhw7ZNEhfEFIzDQ9awE+ziwS1fgZ+qE4gayhTMNGIKwSftg4Q6wzkpcOaE7osZqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=dell.com; dmarc=pass action=none header.from=dell.com;
- dkim=pass header.d=dell.com; arc=none
-Received: from DS7PR19MB6351.namprd19.prod.outlook.com (2603:10b6:8:95::8) by
- PH7PR19MB8139.namprd19.prod.outlook.com (2603:10b6:510:1b6::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.17; Thu, 2 Apr 2026 23:38:18 +0000
-Received: from DS7PR19MB6351.namprd19.prod.outlook.com
- ([fe80::f45e:e7d6:d522:3d08]) by DS7PR19MB6351.namprd19.prod.outlook.com
- ([fe80::f45e:e7d6:d522:3d08%3]) with mapi id 15.20.9769.018; Thu, 2 Apr 2026
- 23:38:18 +0000
-From: "Rose, Charles" <Charles.Rose@dell.com>
-To: Ben Horgan <ben.horgan@arm.com>
-CC: "amitsinght@marvell.com" <amitsinght@marvell.com>,
-        "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
-        "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
-        "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
-        "dave.martin@arm.com" <dave.martin@arm.com>,
-        "david@kernel.org"
-	<david@kernel.org>,
-        "dfustini@baylibre.com" <dfustini@baylibre.com>,
-        "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
-        "gshan@redhat.com"
-	<gshan@redhat.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
-        "kobak@nvidia.com" <kobak@nvidia.com>,
-        "lcherian@marvell.com"
-	<lcherian@marvell.com>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "peternewman@google.com"
-	<peternewman@google.com>,
-        "punit.agrawal@oss.qualcomm.com"
-	<punit.agrawal@oss.qualcomm.com>,
-        "quic_jiles@quicinc.com"
-	<quic_jiles@quicinc.com>,
-        "reinette.chatre@intel.com"
-	<reinette.chatre@intel.com>,
-        "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
-        "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
-        "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
-        "tan.shaopeng@fujitsu.com"
-	<tan.shaopeng@fujitsu.com>,
-        "xhao@linux.alibaba.com"
-	<xhao@linux.alibaba.com>,
-        "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>,
-        "will@kernel.org" <will@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "oupton@kernel.org" <oupton@kernel.org>,
-        "joey.gouly@arm.com"
-	<joey.gouly@arm.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "zengheng4@huawei.com"
-	<zengheng4@huawei.com>,
-        "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>
-Subject: RE: [PATCH v6 00/40] arm_mpam: Add KVM/arm64 and resctrl glue code
-Thread-Topic: [PATCH v6 00/40] arm_mpam: Add KVM/arm64 and resctrl glue code
-Thread-Index: AQHcsviCWpaD3S4DS0+oknPXpOz+F7XMhTAA
-Date: Thu, 2 Apr 2026 23:38:18 +0000
-Message-ID:
- <DS7PR19MB6351DBDFED61A8C9A89DB391F351A@DS7PR19MB6351.namprd19.prod.outlook.com>
-References: <20260313144617.3420416-1-ben.horgan@arm.com>
-In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Enabled=True;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_SiteId=945c199a-83a2-4e80-9f8c-5a91be5752dd;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_SetDate=2026-04-02T23:08:06.0000000Z;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Name=No
- Protection (Label Only) - Internal
- Use;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_ContentBits=3;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Method=Standard
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS7PR19MB6351:EE_|PH7PR19MB8139:EE_
-x-ms-office365-filtering-correlation-id: 71f112c3-95a9-41c7-a266-08de9110eb00
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|786006|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- N/JMJbde6r9jXaFIUYR0OoQF40qp3I34Sqi3M5K7Q9Fptq7WL1X5vhJCGvTQgOpaLoGOkAoRg0DxQLxCRhw0+hi7v5dmKU9pKz1+kSMktEG78OIKqcnDTYCSvDDwCuTdjCzQ+R4tLTTD1hI6IryhXX2tHsnnyqjC+ckJveh2VuWrgQXC+UeshoXZoLDDBPkket/nSVqkD3fGOqZNAaT8yYCoRLoyvnuuPQHuw+nucOEmcU0ybJzCUVe38/6pb1kPMKRQJZNDdIA8UKHPHKZLIFzNvArZ6D43lEIAtzl7IDh0uPsMDKRVBfJun5NgwUx8Hc3xIVnayWGlQMTMcn+sY575tp5VC4PkPNgOz18qf+iFtI+Zggg+1+xM9pmiS6+S/+VV+PnWy1lRjt586buGZrm0+jig/d3TgznVnzzZ6bKk53q5ocVz7o8fLSryCB7BykXAPaWs5Q0kI+dBu1Bfn7klxqKOgWUYGox61/1v0v9wPYp2xt5mXhX6LlcDJAF4vW8Wh2viwnt569PQg5vpf6hOPU2t5XJ8MS0DwGFGGv8pxFgX+aAXxB6fCTOWOAHOeNzUA7SVy0+SodWZajybX7n9Jct96Csb065kZ1ZDEq1fbmA8HS4axjqzESXSd+mFWQOo7oSpIe4v13cU1s0itGTHZTXGTqCwtq9t+jiw8x60LGevg9VYYcMUvhwguM9SpbNqBUfoV2jHJ0v+P7tNVI6pv2sy2bZ5RHyF5xbjD6m7udoVLLM60MP5JnN5mKWHFqRZITO+h1KhZdEEErZTWYiYt6l0p78PZ6d7GyAtVhs=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR19MB6351.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(786006)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?8g1jb5baJUaz5dxv3WSJ7TdSaGIhg78+ovbXFosLvE0o6vl4qKjZX4+3Xa7h?=
- =?us-ascii?Q?I0aGm0N+TEoAD3PMY18EZ3KAm1qGUFudrCt63vtqp9y+AWdg8upmwFCoG6gW?=
- =?us-ascii?Q?jwUNxwh2bvcLa+ru/nMTSikE7M4NHfJpKzHtV19DtKMquHs35dC1PNegE/B6?=
- =?us-ascii?Q?bbvSbuROR8hC1bVuTZMfa6A6niarHdW/BfCVAA9VsvPUI1KGVg4mq3PqKLb9?=
- =?us-ascii?Q?3mXtXcnRw26WEy2qyp4Yo/Jp+IQyH8KLPf7IAXZUqEzT/NbOHDNYfplBpAeO?=
- =?us-ascii?Q?cmmLm3TQQj7T+G8pDezY7bxgp+3O/I8L05DgBep2g8UBJSlcZpfiPmeaSaSY?=
- =?us-ascii?Q?nhImgJDYLjpXY3W8yVsHhsccFlltxj4Gnb11SfM4a4WHs8Mnh9H5fs6feHBO?=
- =?us-ascii?Q?XPT+f5xVqjlZIdOItZ7GmeUBEltnYAsv4f6AxuGTsgnRWyKfb4hamd8E30uj?=
- =?us-ascii?Q?tqNG5EKZgpwZyTzZaS0oBT5wo6rnft7uHscQ/cy8AcnomDT+BDlx8ulbN51n?=
- =?us-ascii?Q?Xx4lks9JbDdsiIQzIzgteWWZxWHPh1R8CsKQkPlNnJsbfRMaWnMMqoI1DhN5?=
- =?us-ascii?Q?equ302nd5pLs1lMpDy4bdnOFC+GSVuvcCq+TrnHluU0TUzsEM89Dhihr33xp?=
- =?us-ascii?Q?OCl2fWd81lr9CiIhIlMg3P59zuNh2pt2Qi87cqfqCZN/SUFN1PTlpFyRZN/R?=
- =?us-ascii?Q?4bekmL071iUhRCnNn1FgPYOk/cVz0/fR+2JyokaWe7YpuZI1j4UqHLZx7i86?=
- =?us-ascii?Q?3mxovS67A+So6K8mLXiK9ZcifOinFLR8E4cf23d7kHTvp5BEQBNvgK82rBZB?=
- =?us-ascii?Q?vtmZDoxak+KIXVTBd0TgNrINwb8BNwMpKgr7gKEu28N3ujpuyh8GV6FkChVG?=
- =?us-ascii?Q?9Knk6MQ9MvZkJOwN+v2F6AosG42k84VTvM9WZfhDU5c/4TnMbuLHehz4yegy?=
- =?us-ascii?Q?fgkE4fZhF9qDpFv8WFmBWL/+i9rmd5QLHM/fM6AReYagORL8aA/IKIHmRAQg?=
- =?us-ascii?Q?T3sD04RUSQQv2if+LYxaZsnZycLJwLvN1ZNYZ2ZGJG0HePajkAJ7JdW6JeRS?=
- =?us-ascii?Q?a1rycbeZjUiYEb2XXwbgrz/gNRFEH78rRRtBC9C54l2Mm5ktNHB7fY1OA5VI?=
- =?us-ascii?Q?F0zLVV0uHFhu9bMxw2E6d5KXRCy/TBANFy7PJZ+oGjXfqySDDIbDaTRpNefc?=
- =?us-ascii?Q?kIZa94wZc2G5myVf9U0rwRJl+Tz8UTTU9HWarJbWIm18/0qwhkMjIyPqdTPs?=
- =?us-ascii?Q?y3CNN7FxmQWRnuoMe8J7vYHTmn1Ia7FPE73qJgK68aTJajtxx+ZVU4F1CURL?=
- =?us-ascii?Q?nzB4S7DlsAHX9Ykc5wzKE/P/hgW32T0sWO6rgbZS0t3TE8jMKPoisCbaxgvB?=
- =?us-ascii?Q?2eUNf/eAAAHQhil2W3mmurimbofQQ1jZjlwo5jIe9X05OKhSMRkatxTVF1/L?=
- =?us-ascii?Q?OcP1ReFWGcRA6L7TP2eN6p3FwwGMcky5IIyhDtgvb8nfWdSncQ2EcNI6sIrt?=
- =?us-ascii?Q?Fmf8lf11pRvJnV7GII2/Qzhzk5+tE80nwAgHKAejv57gF0lCIz8FXizO1xQU?=
- =?us-ascii?Q?bq7cN9L2/S7h7X35SVThmvaTuwsYdRqSv8Nbxh+wvz5SsBP1dxmZ1zWAJZTQ?=
- =?us-ascii?Q?e0wAp6iP24jZt/VOpwdyXlvaT29Ost8IR9/sxp6sqh02NLKBV/1zlaYRtdNz?=
- =?us-ascii?Q?mfsEHrIoi50LjQ6WaH0QeNZnpYdCgjfY5URhjazZTKnUgtT6gZ8rMwYY45Sp?=
- =?us-ascii?Q?ui5N4J0IiQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2pO4bdX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F32CC19424;
+	Sat,  4 Apr 2026 18:13:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775326416;
+	bh=wjBG2dDvNOcl73t5Dsrip8H0/qPbPfDx7nYSPfXnK9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b2pO4bdXXFL1yc84LWPwy/iQoPw+SE+ISHxp+wjlENH+6kkZcAGH7OWOaXKJVY+QS
+	 TMtj8hNKN9E/r/jOhU1ZRCwFGeC6xnxGAR80fbbJUUWI1JRMWSGlNJMaBsaW+bcdPk
+	 7q1WL3opiHRdmO8kKVQG5Fw3MsbXpxu79A2wNOcgaamUMOb1eM+nNq7EuBDj1SRBb1
+	 TS2ni3llMnn4kMlp4pgZKQcUC/jzbw8YsvtTSBTK7iRjCscWS/9VOtUOqnFUMsYl8X
+	 uwgEIo6k8mEpYIdphbHNKEPQHn4Urwq6oRrwjmzVfateMMrzrNkMSqU2dk9NvEtd+N
+	 evARPDS2MV6LA==
+Date: Sat, 4 Apr 2026 20:13:30 +0200
+From: Nathan Chancellor <nathan@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Advertise ID_AA64PFR2_EL1.GCIE
+Message-ID: <20260404181330.GA3987102@ax162>
+References: <20260401170017.369529-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	UacYLJJDpEOgq4QjIb9KnhzZbGr0R48u0RQUh9a+qD0DaBvTll05prO5ySkX7zsQjy8CxQU5UjTKfw3i9Bud7rMyaxligEp1HKwI1WQ7eKI7Z9DsLvAIFl8zU9xjPhFUKzXEvaKnsLGjdfoK+x28863aTSTX1wmcEpft43wFCXuEW2elQZQHdSP1MFuk/JNuY9noAmsZADlXQ6EwfY/EHEuZo7ICku9AwbQqG1egGOuJB8ZYPlhNSG8uTrzB3FNp5ubXZM0mQIzW2f9yxCQbw1Hgqpc/prVkyoXt4Hb3uJllRZbW1UsefHur+QEWxAndW7mv3oqpW3Za+dTT3NKjRw==
-X-OriginatorOrg: Dell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB6351.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71f112c3-95a9-41c7-a266-08de9110eb00
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2026 23:38:18.1189
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 945c199a-83a2-4e80-9f8c-5a91be5752dd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zGfWIeT+JCHt2+ZRtZwQ8AWhfdwPdpoOxPdlUWf28HppX2ZX2hH9LocVxv3ecxO3kOdaCsD7tpmeO9i9hsCKQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR19MB8139
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-02_04,2026-04-02_05,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 adultscore=0 priorityscore=1501 clxscore=1011 phishscore=0
- bulkscore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604020211
-X-Authority-Analysis: v=2.4 cv=Hp572kTS c=1 sm=1 tr=0 ts=69cefdf2 cx=c_pps
- a=Z2e5DKjA+8LiMDv5v6mwwA==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=6gNNCFAoQcIphELLPWWu:22
- a=fe1keu9KhAX5AoWrZvs2:22 a=iLNU1ar6AAAA:8 a=kaXEgJzuHZ3mdCDcgH8A:9
- a=CjuIK1q_8ugA:10 a=hlJyneSgMmFPbskH-t2w:22
-X-Proofpoint-GUID: efujn-L-7jlmUNdGDMiyrqGhtXT9Jpoe
-X-Proofpoint-ORIG-GUID: efujn-L-7jlmUNdGDMiyrqGhtXT9Jpoe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDIxMSBTYWx0ZWRfX7mYYtkr51OMb
- 5UYm8P111vcrC1FELFy0itCrF9kvnduAI3F6Clg4HML7WmPmEuMIdz99KUTSXp3DLF/fBl3V0fL
- zRvo/POWQ2JTH/Wk7/VRuGMZSZ02TF+GXaP5JoNl7PlCVxLpqZOLwczPjKKIW9azAXJDFZlA1Xm
- dW4uxCwV6rF3tKCMjgLIsNu/ITrcAU8uOdhf3l4gfbGy2CcucRPgj7a5tulgxvK6C3B0u1eDpJs
- QOObA09/MFPlC180uDyDrjrIBdFLF+BuQBjshV/EaJlyOLJkflLf4qPRRvW2cdzhwAWV18hsLIH
- zuFfny8Rt1/y6GuzktTS9IDkDkjWj0+Uf7OcQJAVljOzM175pJYkdQJ9ZSnygmNRHw1LFu+diKa
- YjI4+9tWNamTurE10v2euOPic+gT363iJu77mECrp6dYLlqZVBZP55AzBvRXAP1LYX2p2lPY2sj
- K7V2iy7RVOIwz7efvtw==
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 spamscore=0 phishscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1011 adultscore=0 bulkscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604020211
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260401170017.369529-1-maz@kernel.org>
 
-Hi Ben,
+Hi Marc,
 
-> This version of the mpam missing pieces series sees a couple of things
-> dropped or hidden. Memory bandwith utilization with free-running counters
-> is dropped in preference of just always using 'mbm_event' mode (ABMC
-> emulation) which simplifies the code and allows for, in the future,
-> filtering by read/write traffic. So, for the interim, there is no memory
-> bandwidth utilization support. CDP is hidden behind config expert as
-> remount of resctrl fs could potentially lead to out of range PARTIDs bein=
-g
-> used and the fix requires a change in fs/resctrl. The setting of MPAM2_EL=
-2
-> (for pkvm/nvhe) is dropped as too expensive a write for not much value.
->
-> There are a couple of 'fixes' at the start of the series which address
-> problems in the base driver but are only user visible due to this series.
->
+On Wed, Apr 01, 2026 at 06:00:17PM +0100, Marc Zyngier wrote:
+> As we are missing ID_AA64PFR2_EL1.GCIE from the kernel feature set,
+> userspace cannot write ID_AA64PFR2_EL1 with GCIE set, even if we are
+> on a GICv5 host.
+> 
+> Add the required field description.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 32c2dbcc0c641..5bca6e064ca72 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -327,6 +327,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr2[] = {
+>  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR2_EL1_FPMR_SHIFT, 4, 0),
+>  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR2_EL1_MTEFAR_SHIFT, 4, ID_AA64PFR2_EL1_MTEFAR_NI),
+>  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR2_EL1_MTESTOREONLY_SHIFT, 4, ID_AA64PFR2_EL1_MTESTOREONLY_NI),
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR2_EL1_GCIE_SHIFT, 4, ID_AA64PFR2_EL1_GCIE_NI),
+>  	ARM64_FTR_END,
+>  };
+>  
+> -- 
+> 2.47.3
+> 
 
-I tested cache occupancy and memory bandwidth allocation on a Dell PowerEdg=
-e XE8712 with NVIDIA Grace A02P. Both seem to work as expected.
+After this change in -next as commit 899ff451fcee ("KVM: arm64:
+Advertise ID_AA64PFR2_EL1.GCIE"), I am seeing a warning on boot in my
+simple QEMU boot tests.
 
-For the series:
+  $ make -skj"$(nproc)" ARCH=arm64 CROSS_COMPILE=aarch64-linux- mrproper virtconfig Image.gz
 
-Tested-by: Charles Rose <charles.rose@dell.com>
+  $ curl -LSs https://github.com/ClangBuiltLinux/boot-utils/releases/download/20241120-044434/arm64-rootfs.cpio.zst | zstd -d >rootfs.cpio
 
-Thanks,
-Charles
+  $ qemu-system-aarch64 \
+      -display none \
+      -nodefaults \
+      -machine virt,gic-version=max \
+      -append 'console=ttyAMA0 earlycon' \
+      -kernel arch/arm64/boot/Image.gz \
+      -initrd rootfs.cpio \
+      -cpu host \
+      -enable-kvm \
+      -m 1G \
+      -smp 8 \
+      -serial mon:stdio
+  [    0.000000] Booting Linux on physical CPU 0x0000000000 [0x413fd0c1]
+  [    0.000000] Linux version 7.0.0-rc4-00058-g899ff451fcee (nathan@aadp) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT Sat Apr  4 06:55:05 MST 2026
+  ...
+  [    0.000000] ------------[ cut here ]------------
+  [    0.000000] SYS_ID_AA64PFR2_EL1 has feature overlap at shift 12
+  [    0.000000] WARNING: arch/arm64/kernel/cpufeature.c:986 at init_cpu_features+0xbc/0x344, CPU#0: swapper/0
+  [    0.000000] Modules linked in:
+  [    0.000000] CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted 7.0.0-rc4-00058-g899ff451fcee #1 PREEMPT
+  [    0.000000] Hardware name: linux,dummy-virt (DT)
+  [    0.000000] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  [    0.000000] pc : init_cpu_features+0xbc/0x344
+  [    0.000000] lr : init_cpu_features+0xbc/0x344
+  [    0.000000] sp : ffffcd0982373db0
+  [    0.000000] x29: ffffcd0982373db0 x28: 0000000000000010 x27: ffffcd0981c63878
+  [    0.000000] x26: 0000000000000018 x25: ffffcd0982013f38 x24: ffffcd0981c69068
+  [    0.000000] x23: ffffcd0981c635f0 x22: ffffcd0982388640 x21: 0000000000000003
+  [    0.000000] x20: 0000000000000017 x19: ffffcd09824c9308 x18: 000000000000000a
+  [    0.000000] x17: 5d305b203837205d x16: 305b203737205d30 x15: 0000000000000000
+  [    0.000000] x14: 0000000000000000 x13: 3231207466696873 x12: 2074612070616c72
+  [    0.000000] x11: 0000000000000058 x10: 0000000000000018 x9 : ffffcd0982396598
+  [    0.000000] x8 : 0000000000057fa8 x7 : 000000000000002a x6 : ffffcd09823ee598
+  [    0.000000] x5 : ffffcd09823ee598 x4 : 0000000000000000 x3 : 0000000000000000
+  [    0.000000] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffffcd09823852c0
+  [    0.000000] Call trace:
+  [    0.000000]  init_cpu_features+0xbc/0x344 (P)
+  [    0.000000]  cpuinfo_store_boot_cpu+0x48/0x54
+  [    0.000000]  smp_prepare_boot_cpu+0x28/0x38
+  [    0.000000]  start_kernel+0x248/0x780
+  [    0.000000]  __primary_switched+0x88/0x90
+  [    0.000000] ---[ end trace 0000000000000000 ]---
+  ...
+  ```
 
-Internal Use - Confidential
+Is this expected? I assume not, hence the report. If there is any
+information I can provide or patches I can test, I am more than happy to
+do so.
+
+Cheers,
+Nathan
+
+# bad: [2febe6e6ee6e34c7754eff3c4d81aa7b0dcb7979] Add linux-next specific files for 20260403
+# good: [d8a9a4b11a137909e306e50346148fc5c3b63f9d] Merge tag 'v7.0-rc6-smb3-client-fix' of git://git.samba.org/sfrench/cifs-2.6
+git bisect start 'origin/master' 'origin/stable'
+# bad: [dc9c72702de7e46679f8c2ab2175ab7070baa3ee] Merge branch 'main' of https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+git bisect bad dc9c72702de7e46679f8c2ab2175ab7070baa3ee
+# bad: [d5ea83fae6558b2431b022781f6ccb74d241b2bb] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git
+git bisect bad d5ea83fae6558b2431b022781f6ccb74d241b2bb
+# bad: [d16ebd2d0dc90f1561d0a44a828db2c9148ad5f4] Merge branch 'for-next/perf' of https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git
+git bisect bad d16ebd2d0dc90f1561d0a44a828db2c9148ad5f4
+# bad: [768784742008ccebbf3e88a26a6e9e6aad76dc8e] Merge branch 'timekeeping-next' of https://github.com/Rust-for-Linux/linux.git
+git bisect bad 768784742008ccebbf3e88a26a6e9e6aad76dc8e
+# good: [b671065be2bef906bb3e0c1bc7be4055e84ea1d3] Merge branch 'at91-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/at91/linux.git
+git bisect good b671065be2bef906bb3e0c1bc7be4055e84ea1d3
+# bad: [bd1f7328e25426f08cafa8333293411788c7957b] Merge branch kvm-arm64/vgic-fixes-7.1 into kvmarm-master/next
+git bisect bad bd1f7328e25426f08cafa8333293411788c7957b
+# good: [1cd0bb0425594cea9baf862393a4ca9cc0c018a3] Merge branch kvm-arm64/pkvm-psci into kvmarm-master/next
+git bisect good 1cd0bb0425594cea9baf862393a4ca9cc0c018a3
+# good: [bc20692f528b2ac8226bafe5b1db9a1f8be96dbf] KVM: arm64: Don't hold 'vm_table_lock' across guest page reclaim
+git bisect good bc20692f528b2ac8226bafe5b1db9a1f8be96dbf
+# good: [adb70b3a8b31e9eb05f2ec3c76d85f9a7a8c8cbc] KVM: arm64: Directly expose mapping prot and kill kvm_s2_fault
+git bisect good adb70b3a8b31e9eb05f2ec3c76d85f9a7a8c8cbc
+# good: [be46a408f376df31762e8a9914dc6d082755e686] KVM: arm64: Correctly plumb ID_AA64PFR2_EL1 into pkvm idreg handling
+git bisect good be46a408f376df31762e8a9914dc6d082755e686
+# good: [33cdd7f8fa32c92317aa521bd6f407a3cba8474b] Merge branch kvm-arm64/spe-trbe-nvhe into kvmarm-master/next
+git bisect good 33cdd7f8fa32c92317aa521bd6f407a3cba8474b
+# good: [e54971a0468a8bc82b1976d5b010392d7cb689b9] Merge branch kvm-arm64/vgic-fixes-7.1 into kvmarm-master/next
+git bisect good e54971a0468a8bc82b1976d5b010392d7cb689b9
+# bad: [899ff451fcee1289f3f37d061da66c3e38748a69] KVM: arm64: Advertise ID_AA64PFR2_EL1.GCIE
+git bisect bad 899ff451fcee1289f3f37d061da66c3e38748a69
+# good: [9c1ac77ddfc90b6292ef63a4fa5ab6f9e4b29981] KVM: arm64: vgic-v5: Fold PPI state for all exposed PPIs
+git bisect good 9c1ac77ddfc90b6292ef63a4fa5ab6f9e4b29981
+# first bad commit: [899ff451fcee1289f3f37d061da66c3e38748a69] KVM: arm64: Advertise ID_AA64PFR2_EL1.GCIE
