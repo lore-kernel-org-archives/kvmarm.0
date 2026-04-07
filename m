@@ -1,139 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A562C175A9D;
-	Tue,  7 Apr 2026 14:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775572217; cv=none; b=s1Ws3zKSpjVMNHPQINsgGzG+LQdqSR0k8wos8PzjRwOkZf70dDsvws2f0/gMpgvj0D053kIfT+up9IXdAVK5Md6RszWrCmZbruy02ecv16k5lx36gHB4t9QWvB/sGwCr8lqTq5vaPJ39SEWMY+1HQRd2NsDHAgIuLDIUvVK7ZJc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775572217; c=relaxed/simple;
-	bh=S2a66R25M2ED9iApd77nQWSljUUEXLR9ndadmbDuSus=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=liaAb8883ipheFlD5mZm8pD4MReBLoLEr6aq9uomKTzWb6FyusRkkyycVwjJc6ggBAuU9nOsgtSIzh0fnT2o62bIoGIUJxjYM1qmuSBQWqLQ6cXuiQOVu+KKTs7PFc7eAxxjGInNc/aHU6BYsqAIr1wRyLdDMRAYxQxvSe08xzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtTCSSex; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29072135C5
+	for <kvmarm@lists.linux.dev>; Tue,  7 Apr 2026 18:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775585791; cv=pass; b=SFH1s8AF2PjnWZJ6FwVk4NJYB84bIjeMQ0B6CoR+jQYtvG08nNN8L6TuV2Uoz4PU6p/lwNPGv64v2kkXPWCknEX1fkRZ1Gr7fV1yMhZrdj+8WF/53UJZk1tDXpRtilA9QEL4bObBKy1fp1h4+dHGecSeretaFbYZ5h3izsYp2p0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775585791; c=relaxed/simple;
+	bh=W6jscBzEMJbJO/XmLXghl25PWfvdo5CVM/yBumOnlxs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SMU/HoxPF/iXTKH4Pz8t4m5FEv4bPg/55mI/28O6nEaw0Q1BNXEFWZ2Yk10XwXuSkhexJ8gZt3c+3VLIsDqrElC3awUm6IYPS23PnDNgkTLvYqC7Hs7xNveaCULhMLx4lJR7gX+sEKcSxp6iiSffPfG6a+OFf6y/CoJdsUEILTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TQd0cysx; arc=pass smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtTCSSex"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2794CC19424;
-	Tue,  7 Apr 2026 14:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775572217;
-	bh=S2a66R25M2ED9iApd77nQWSljUUEXLR9ndadmbDuSus=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=BtTCSSexqqOVxXwcQ414Ny61PUY9mAcMdzGtvv4DmvWPbKwDzO3QUKIOZawG4NDBb
-	 27cpDSCJqdFlxHkKlEEb0cm4OE+pvfqM2BcaTdmMwHXRkKx8p6x4Qds7OGnitTRCyL
-	 c+2q63xzYl2N+RWGeOg8aONVk+gRTVX21H96AF6if+3FyFs1a+/SnK89JNa4DDY+eN
-	 rJ6mB/4gyXQcScgfPE+ruhjydng5z5fWep7FOTW/8ffKw6QKM37R01tNh5/nzowm3t
-	 /FXODuhHIQ5sS6lu3xtkgOM4HHWlbiwvfOVoF9fAy9nG/u4qJDy5BVjsA6ltQ1ZN79
-	 +FTX5kl9dXb0A==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Tue, 07 Apr 2026 09:29:47 -0500
-Subject: [PATCH v4 5/6] arm64/boot: Enable EL2 requirements for
- FEAT_Debugv8p9
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TQd0cysx"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5a283c44478so5969470e87.3
+        for <kvmarm@lists.linux.dev>; Tue, 07 Apr 2026 11:16:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775585787; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lSEdO7Vj2iBd2a78nDyVnsxcLExxa7qYKNWihGrAsp3+CCk4yE3zULMskq/rIwx/Xv
+         q1/gxOaWSzn87Rkw0XDUuKMmC+F1LvC2i72tQUO04ullbiQHTXS9AUo1/rCGdlg+oVM0
+         2DyyOy5BGANxyf/U+IumkzCr3wHpztlbXEPkUAqzvQVb+n/bUgCi0N27V9dq4NcRlRPe
+         /0MA8lpUQW6jBs5KkFQ5cmjOMLapCZdhr3VSDRxoN1mUKXlsL8jVg05fjw8A5Nyw33cP
+         uFDMTQ6c8nm4JCfH70Ya0tqtk5+aYG/TZQEqMyEgaCyjG4eEoSwLi/AP9QzfjONdFCW1
+         tU7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yRsBgBmzp23y8ZAP8I/cBBmEnn+NnIzhpJUPzQOsQ6E=;
+        fh=TXYRTW2AdI1rI5ZVepnZ8Id4ihiEULDSnll39uXzYi8=;
+        b=GYfvvbbB2ggLudb3QrfUtPHr9b3BYUX5Oma+iUtTA7m7BzDs5uoL1XyHilBMG625WE
+         CGk+cStkclCyGNo9ViKU8aSxci7Z430yo2gcNNR2I5JHgGweXb70KlE4c2WpMtua5+GY
+         OTH3sEN4rbIEc/AFxaxA01EElvmQFpLGp7zKMdd/LB9Py9dvNWwytR8shB46/TWvn1wb
+         Meb+lYAMNZeKXXqnR9FdW8w5vfZ9x4925qhJatvDUnqIZpWmKwAHQy57otptAvHXh4aX
+         MYz02C4VIdblqJYe8tA4Gj3twUqfHdC1XY+5mq2ECE/wJYV5Ska9pBFhfgusrkaKyYOp
+         +T6A==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775585787; x=1776190587; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yRsBgBmzp23y8ZAP8I/cBBmEnn+NnIzhpJUPzQOsQ6E=;
+        b=TQd0cysxWUwRaO5hZTw+tlFYt1uwMiCf53ASPQdygWD+S1N38Ugya4uhb56pO6VYpr
+         L+AVoXNLMQLKLavS4xd0s3Rapb58l5vOast10cZ6lJ6WcQCPxBP9mcfddeLY4+sSMQ5W
+         1+0CmxcXLa8o//mKWvVoUN9ALea7Qkf3Op7N1JkVq/f41g5nxj+IZLmXe+L/2TMPPhWQ
+         fypUxI2g9MhNUL+hLmaMBTmHCwX3F6TL5ka70jhaFyfqkOZQb7nsHZjwklr2gdvjvUh+
+         VkCQthcWl5cvduzLdqm2VSQ5oMHt1hJKHktk8YYKtkJzYPXbDMZ7XMGnJjFqwcKCquc9
+         8kUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775585787; x=1776190587;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yRsBgBmzp23y8ZAP8I/cBBmEnn+NnIzhpJUPzQOsQ6E=;
+        b=Y7F7jehbOLSwKk2aoPnpel2gKgrgYJo77n3ESMqsHJT+y4V40haKUmyrt7ArZcb/X9
+         Vg3Pdxl6hM1rUa7CF1qZeyE9t4C6r2EHuKsPq7uCdcn+yfoCBOn2FnGNax5RNxlpMCFp
+         IGDbUBmhOvsBW55FBYJkRrsuLtA1E9pNjDqZDVet2OQuPndi+n2SGhvUU1ooaPMWRl9V
+         VvyBmJqSrRqD5n2kPAG/w/QlALhkGwkFqebr62JN75sjh/afqdP4yNvcjFOv3Kk9F5Da
+         XCRcoAG+qNeod+AWAVwooi26/Ri9WeHrc63yxWfHB0Prp2QQIaKulj6kQsY/nW81+a8V
+         FW3w==
+X-Forwarded-Encrypted: i=1; AJvYcCV0qemHaJelduZ8eOrx9VhjE0fhuRdg5GLl/lVPdL0rUTfq2WvxIdJ+WOuJpKV+UY/eAnrvMtU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwwHJq7izYfewfKlBTO5ZK5lhSXai1aq7UIAKOz3MyCZ71vYWNW
+	LTzAICnY9TmrFXFKkG68cSbJJYk09annvNRahTPI/Hx0EjiYd5MDbvZln3t21tOqkExIGCsAmCT
+	8Tmf9cB+eWODLHyGSh3dA7ljUD5mIGfWs6svqYJd3
+X-Gm-Gg: AeBDieuz424Q3GoS9Jw8bQNt12ih2ydhTom36LtsvlW6QlpnFiNdSSUzklAxNL1g4Kn
+	OUAplgi6kiYj9aXxSu1mDdodQ+jHI//FRg2uq6AP46mvgdblSL7zKkkZpsq3kTKUUbg8/5dAfdR
+	TPSagB63YR9WN9mQnVojbXpDVgPGDH1dI/a/UZmLXj+mxnSpJSn46sAbXKMp1XKg0S6HmNs8RXM
+	jv6F71oZ1qtnMbbarcsFLQyJ46m1di7F/Ez2SmZuRlIv0pPotxmDu16yru+HW/OhqlIPWIzu8Ag
+	DJq7WdPGSu/UbC8km6jzARhr/KXdZba9QK76h3i9
+X-Received: by 2002:a05:6512:110d:b0:5a1:2e0c:86f0 with SMTP id
+ 2adb3069b0e04-5a33758f31emr4771796e87.37.1775585786712; Tue, 07 Apr 2026
+ 11:16:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260407-arm-debug-8-9-v4-5-a4864e69b0ea@kernel.org>
-References: <20260407-arm-debug-8-9-v4-0-a4864e69b0ea@kernel.org>
-In-Reply-To: <20260407-arm-debug-8-9-v4-0-a4864e69b0ea@kernel.org>
-To: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>, 
- linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
- Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
- Oliver Upton <oupton@kernel.org>
-X-Mailer: b4 0.15-dev
+References: <20260316224349.2360482-1-jingzhangos@google.com> <20260324114312.GA438107@e124191.cambridge.arm.com>
+In-Reply-To: <20260324114312.GA438107@e124191.cambridge.arm.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 7 Apr 2026 11:16:15 -0700
+X-Gm-Features: AQROBzDArVOPc6ncoqbb__YZYRwX1sNbl8uVFaZ9pSAZu9OJrkYhbAp3gMqUG8o
+Message-ID: <CAAdAUtjeYJ5sOQVB-t7U=KJ9JuCCmO9b2dwJsas7mkzNLu8WqA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 0/3] arm64: Add Stage-2 MMU and Nested
+ Guest Framework
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	Marc Zyngier <maz@kernel.org>, Andrew Jones <andrew.jones@linux.dev>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Anshuman Khandual <anshuman.khandual@arm.com>
+On Tue, Mar 24, 2026 at 4:43=E2=80=AFAM Joey Gouly <joey.gouly@arm.com> wro=
+te:
+>
+> On Mon, Mar 16, 2026 at 03:43:46PM -0700, Jing Zhang wrote:
+> > This patch series introduces a lightweight infrastructure for managing =
+ARM64
+> > Stage-2 translation tables and executing nested guests. These component=
+s are
+> > essential for testing advanced virtualization features such as nested
+> > virtualization (NV) and GICv4 direct interrupt injection.
+> >
+> > The series provides a generic Stage-2 MMU library supporting multiple
+> > translation granules (4K, 16K, 64K) and dynamic page table management.
+> > Building on this, it adds a guest execution framework that handles gues=
+t
+> > lifecycle management, context switching and guest exit routing. A new t=
+est
+> > case for Stage-2 MMU demand paging to verify fault handling.
+> >
+> > Please note that this is a very preliminary implementation intended as =
+a
+> > startup baseline for future work in virtualization testing. Users shoul=
+d be
+> > aware that because this is an early-stage baseline, some portions of th=
+e code
+> > may just happen to work in its current state. There might be critical
+> > architectural elements or edge-case handling missing that will need to =
+be
+> > addressed as the framework matures.
+> >
+>
+> Hi,
+>
+> I'm interested in this, I had a much more barebones (aka no stage2) guest
+> framework thing that I sent out [1], but it seems more useful to try get =
+this
+> series merged.
+>
+> I will try get my tests working with this new framework, one thing missin=
+g for
+> me is support for executing at EL0.
+>
+> Thanks,
+> Joey
+>
+> [1] https://lore.kernel.org/kvmarm/20260306142656.2775185-1-joey.gouly@ar=
+m.com/#t
+>
 
-Fine grained trap control for MDSELR_EL1 register needs to be configured in
-HDFGRTR2_EL2, and HDFGWTR2_EL2 registers when kernel enters at EL1, but EL2
-is also present.
+Hi Joey,
 
-MDCR_EL2.EBWE needs to be enabled for additional (beyond 16) breakpoint and
-watchpoint exceptions when kernel enters at EL1, but EL2 is also present.
+Will you add support for executing at EL0?
 
-While here, also update booting.rst with MDCR_EL3 and SCR_EL3 requirements.
+Thanks,
+Jing
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
-v4:
- - Add that the requirements only apply when there are >16
-   breakpoints/watchpoints
- - Adapt to changes in v7.0-rc1
----
- Documentation/arch/arm64/booting.rst | 13 +++++++++++++
- arch/arm64/include/asm/el2_setup.h   | 14 ++++++++++++++
- 2 files changed, 27 insertions(+)
-
-diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-index 13ef311dace8..00ba91bbd278 100644
---- a/Documentation/arch/arm64/booting.rst
-+++ b/Documentation/arch/arm64/booting.rst
-@@ -369,6 +369,19 @@ Before jumping into the kernel, the following conditions must be met:
-     - ZCR_EL2.LEN must be initialised to the same value for all CPUs the
-       kernel will execute on.
- 
-+  For CPUs with FEAT_Debugv8p9 extension present and >16 breakpoints or
-+  watchpoints:
-+
-+  - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HDFGRTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
-+    - HDFGWTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
-+    - MDCR_EL2.EBWE (bit 43) must be initialized to 0b1
-+
-+  - If EL3 is present:
-+
-+    - MDCR_EL3.EBWE (bit 43) must be initialized to 0b1
-+
-   For CPUs with the Scalable Matrix Extension (FEAT_SME):
- 
-   - If EL3 is present:
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 85f4c1615472..b51a280c18c0 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -174,6 +174,13 @@
- 						// to own it.
- 
- .Lskip_trace_\@:
-+	mrs	x1, id_aa64dfr0_el1
-+	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
-+	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
-+	b.lt	.Lskip_dbg_v8p9_\@
-+
-+	orr	x2, x2, #MDCR_EL2_EBWE
-+.Lskip_dbg_v8p9_\@:
- 	msr	mdcr_el2, x2			// Configure debug traps
- .endm
- 
-@@ -438,6 +445,13 @@
- 	orr	x0, x0, #HDFGRTR2_EL2_nPMSDSFR_EL1
- 
- .Lskip_spefds_\@:
-+	mrs	x1, id_aa64dfr0_el1
-+	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
-+	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
-+	b.lt	.Lskip_dbg_v8p9_\@
-+
-+	mov_q   x0, HDFGWTR2_EL2_nMDSELR_EL1
-+.Lskip_dbg_v8p9_\@:
- 	msr_s   SYS_HDFGRTR2_EL2, x0
- 	msr_s   SYS_HDFGWTR2_EL2, x0
- 	msr_s   SYS_HFGRTR2_EL2, xzr
-
--- 
-2.53.0
-
+> > ---
+> >
+> > Jing Zhang (3):
+> >   lib: arm64: Add stage2 page table management library
+> >   lib: arm64: Add bare-metal guest execution framework
+> >   arm64: Add Stage-2 MMU demand paging test
+> >
+> >  arm/Makefile.arm64         |   4 +
+> >  arm/stage2-mmu-test.c      | 100 +++++++++
+> >  lib/arm64/asm/guest.h      | 156 ++++++++++++++
+> >  lib/arm64/asm/stage2_mmu.h |  74 +++++++
+> >  lib/arm64/guest.c          | 197 ++++++++++++++++++
+> >  lib/arm64/guest_arch.S     | 263 ++++++++++++++++++++++++
+> >  lib/arm64/stage2_mmu.c     | 402 +++++++++++++++++++++++++++++++++++++
+> >  7 files changed, 1196 insertions(+)
+> >  create mode 100644 arm/stage2-mmu-test.c
+> >  create mode 100644 lib/arm64/asm/guest.h
+> >  create mode 100644 lib/arm64/asm/stage2_mmu.h
+> >  create mode 100644 lib/arm64/guest.c
+> >  create mode 100644 lib/arm64/guest_arch.S
+> >  create mode 100644 lib/arm64/stage2_mmu.c
+> >
+> >
+> > base-commit: 86e53277ac80dabb04f4fa5fa6a6cc7649392bdc
+> > --
+> > 2.53.0.851.ga537e3e6e9-goog
+> >
