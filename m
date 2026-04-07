@@ -1,32 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D970397E9F
-	for <kvmarm@lists.linux.dev>; Tue,  7 Apr 2026 09:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6ECD3B38AF
+	for <kvmarm@lists.linux.dev>; Tue,  7 Apr 2026 13:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775554930; cv=none; b=Oext7BiaFt0v4EOSjOXf13299uCPtn4yckhZeZvABg2Xsc0xAcrTt8QL2QxPVWD28i0yzOjE/zy+2u+4k8/svUwr0OgWC4h/EdewMxEfxPYBvfziElB8GoHonv7/0SPPgd9nTr9MQoe476KMLuA5yajxjyid9tnVCknbytrDUWI=
+	t=1775569671; cv=none; b=toUdxG5DqqCR+4PahOP+2P4Q2m4HuXNTig+VdIdwYxGXCn/5foSbdJ0Xv3eDgHFTuAYRa2a1xqTP0a5eiYUS5eWouvjKgqXY4x6CRNEO3btSnUwHKLXaiGA3EHnyCtMU7I2tN8o3R7GBcQlQgqCrRwXk3irzQUDM8eEeDGmPfBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775554930; c=relaxed/simple;
-	bh=QVk2QexSDpe+HZEkpL5txOUhT8aKVmwKMv7KrU8GZYw=;
+	s=arc-20240116; t=1775569671; c=relaxed/simple;
+	bh=YCxm5IsUZWkOVmsnnCElZfL8KDjU6K9uk5Pr3gZX1nc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pt/43JURGy+Idihmgnt63BbhFqTqNjV6Z+K8Otgj6A82fxW2LcVkrBmIWV347uzaU7UQ1P0yVC4JnmRQ24Twy54JSoMe+P+L4i2t6m3dy9GPV2iGpzTTv0s0mDqkDFk7DYknrKK7pnNAwSyWI2YgYZgzK2jLT8EgjZItN+bh0pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Heitlxxq; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=mIjvkhKUe7XCEE0Z+5Nkp2lDvl68USy1XSyLI3Tl2wuWb0P8EjuKZT5Mk+BaxTwOigsS+LRdWLHEQeHFxuimp+t31nVBhWt9Toobicot7Qxz51kQr2I9MfxxOkUlzJ6udIj3tR+UNWAJMlUfS/XeSALNQEGZ4socHfYVxeCQgmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VVPYMBNy; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Heitlxxq"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VVPYMBNy"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2DCC1AED;
-	Tue,  7 Apr 2026 02:42:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44D8A16F2;
+	Tue,  7 Apr 2026 06:47:43 -0700 (PDT)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 343DD3F7D8;
-	Tue,  7 Apr 2026 02:42:07 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CEB003F7D8;
+	Tue,  7 Apr 2026 06:47:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1775554928; bh=QVk2QexSDpe+HZEkpL5txOUhT8aKVmwKMv7KrU8GZYw=;
+	t=1775569669; bh=YCxm5IsUZWkOVmsnnCElZfL8KDjU6K9uk5Pr3gZX1nc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HeitlxxqEEoi85H89/Tmtj+HglpzvFQbeg676fzYA2REer9MbUo2rw03SiyfWhKDG
-	 5lJlvZvIcBdZoAZfgEzfclew8VklDpARacR/KV5jdVPRUNUAZmanmXdQD32keuWyVn
-	 khMGOW4mOujv7+8+GoDRwxy5Yl7QutLWQ0sMktms=
-Date: Tue, 7 Apr 2026 10:42:00 +0100
+	b=VVPYMBNyFaH6onWlNAwGCgXqVZGQkTcoMTSFGWNL93JMN3nv3BLkZePnFnacj6De6
+	 jCgyNxQVNTeX+ACgzoSM21XwGim9Q6AvQrjUQfyJ5TKZm5oaT1z/rI/wZROF8uDTZy
+	 NzlrzHYBnkils0WuAfTTUSw1Dh9VbZRQ9Ut2ROTM=
+Date: Tue, 7 Apr 2026 14:47:45 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Linus Walleij <linusw@kernel.org>
 Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
@@ -35,7 +35,7 @@ Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Subject: Re: [PATCH] arm64: clear_page[s] using memset
-Message-ID: <adTRaKB4zqxEUkEE@arm.com>
+Message-ID: <adULAT2xus5z3HdQ@arm.com>
 References: <20260306-aarch64-clear-pages-c-v1-1-77c1bb0f1c21@kernel.org>
  <ac7YJPo4Np2zxxEp@arm.com>
  <CAD++jL=G81=ueo7djqUETToE459kpFGniWvBwnYbJtmXrm8MFw@mail.gmail.com>
@@ -45,41 +45,11 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <CAD++jL=G81=ueo7djqUETToE459kpFGniWvBwnYbJtmXrm8MFw@mail.gmail.com>
 
 On Tue, Apr 07, 2026 at 11:25:55AM +0200, Linus Walleij wrote:
-> On Thu, Apr 2, 2026 at 10:57 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Fri, Mar 06, 2026 at 09:57:50AM +0100, Linus Walleij wrote:
-> > > There is no need to try to second-guess the compiler when
-> > > clearing memory. Just call memset() like everyone else.
-> >
-> > Hmm, that "like everyone else" made me think - why not move this to
-> > generic code and only the 1-2 platforms that need their own should
-> > override it? Could we do the same with copy_page()?
-> >
-> > Sorry, more work all of a sudden ;).
-> 
-> I actually had that planned, I just wanted to know if this would
-> be fine for arm64 first so that there is a user.
-> 
-> It seems you are on board so I will send a 2-patch series
-> next.
-
-We might as well merge the arm64 patch first and do the cross-arch
-cleanup separately, queued via akpm's tree.
-
-> > > While at it, implement the shorthand for directly calling
-> > > the new prototype clear_pages() for larger page chunks.
-> > >
-> > > No performance regressions can be seen, the fastpath
-> > > benchmarks differences are in the noise.
-> >
-> > I assume the benchmarks ran on real hardware (had to ask, last time you
-> > mentioned qemu ;)).
-> 
 > Quoting my own commit message hehe:
 > 
 > > No performance regressions can be seen, the fastpath
@@ -87,9 +57,13 @@ cleanup separately, queued via akpm's tree.
 > 
 > This was tested on hardware with Ryan Robert's fastpath tool.
 
-It wasn't clear to me where the fastpath tool ran ;).
+BTW, have you tried the perf bench mmap test again with the new
+clear_page? Both with single page and multiple pages scenarios. And
+ideally on more than one platform.
 
-Thanks.
+Will pointed out (in a private chat) that current clear_page() uses
+non-temporal stores while memset() doesn't. It may not make any
+difference in practice but it would be good to have some numbers.
 
 -- 
 Catalin
