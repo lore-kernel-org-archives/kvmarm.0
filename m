@@ -1,263 +1,313 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365E635F5E9
-	for <kvmarm@lists.linux.dev>; Mon,  6 Apr 2026 16:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6275B244692;
+	Tue,  7 Apr 2026 07:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775494058; cv=none; b=oWUJ7m3I0rYybGCSXMFZ0e+yOOyELkjSmeFZ18EYzMs+Ox2Dq85kUHUr8igtTFGUT7lTTBRtQ9MNVfmnnmfwRcTtYdc0TlP1E4aZQkibBsaKotYN1I7FwrjlsBfnUM+GS8XsYXHVfZEOPOKdYo/W/RFn80faRpdh/U8zc056UTU=
+	t=1775546258; cv=none; b=BioJfgWXXUQc8x673LEcFGOg2npcq4+0Cgn9GeUmuopSMKM9MTTA7CXm2cPDKdPeFMSFBTLXRYo6v9qXVWqMZlUs4tKYosowLzXY3lM20I/1t8Mjk0Ew9AYzPOyt5VKmClK30t/NpHfWvVtPSkxpx5jRRPh9mxA2zYVvNZmg0fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775494058; c=relaxed/simple;
-	bh=+TkEll1g4GPMoDQnUJ+ojaCZea8pptFIoCXOi3JHR/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FCEeEOd1mpE2xhDGYsH1biyUQgVL0tIz1M4PakYjXMtActKewrx2WiDCtvgGUxl61A0ZpgtFzu+ocxZFCVbyO2VQhCf8nF72uFdxwMPOSLOLIgJxKogF+dDc52BqLPePuCUkBZ9UQX/8UyjCt1Mtpx74BVP4+2NKFf+ljQWgK+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pazcLLgE; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1775546258; c=relaxed/simple;
+	bh=DH4aQOykI0rpEHZrWRjW7Tiv09C9Qv6GTBvf35yHM2I=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hPuePA3I/m1/eEfZW6ylIF1imwCefUx/CpDfjk35EtYpGsJdkoO1PtvDlO3Mf9J4t0v+3hYvz6+2i5l+LO4f3iQ0cVxEVNAZf9LdRaYQUr58SUhEBuPA/k1XvQ5dec2B3dIFpnTYUMiezqsE/r5aeX7t1VTZJSZjif2uNmenaDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KID2eHR0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pazcLLgE"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC47016F3;
-	Mon,  6 Apr 2026 09:47:29 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 258A53F7D8;
-	Mon,  6 Apr 2026 09:47:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1775494055; bh=+TkEll1g4GPMoDQnUJ+ojaCZea8pptFIoCXOi3JHR/Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pazcLLgEY+txpooJQ2Q2dqL696hUl0qWATrOFtJeOxjQX5loFPlBhHscKu08qaw5c
-	 Akoxy7d0q1HRQtp0rag04febeM0q9IzTjCQ7O3wM0YjETgEL9M4L8MLiNhk6HnonkS
-	 eKRMN2BN1ydiRUqKtNXB1SWesVmL0db5zBFYbqlU=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KID2eHR0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA138C116C6;
+	Tue,  7 Apr 2026 07:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775546258;
+	bh=DH4aQOykI0rpEHZrWRjW7Tiv09C9Qv6GTBvf35yHM2I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KID2eHR0XJBaXmB1/Ca916XBQ2YYI/+8t9UhJS6CPrbwgGUWYf/arWOAaJ5VX7gDv
+	 LXHY91ndmx2UdFL3GtVVMDDNumM5+7eR8Ngy+Ab3O6NFC4ceywP4yD7YJnGtSjoxkw
+	 YygFXykrZ4JCsOEJZylx+rkX2o60hwQI5A0q24o5oc7xlSOEGEE85O1gp19V/9sbvq
+	 5Fa+/iF24iIdyK2z3C4gcPVprguGiZVKWrPdOS37B3dJofRkvMkicbCbDfWEKAieAi
+	 U+jKcg6f4hOhSTZvrWu2/oMUhIeirk3kuKUnj+BkYeUTwiqv9XXIMe8iTLlM9Ay2a8
+	 9nUGS74D9XcvA==
+Received: from cu01147a.smtpx.saremail.com ([195.16.150.122] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wA0gp-00000009QiT-2U6s;
+	Tue, 07 Apr 2026 07:17:35 +0000
+Date: Tue, 07 Apr 2026 08:17:29 +0100
+Message-ID: <87y0izb5o6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
+	linux-kernel@vger.kernel.org,
 	Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH 2/2] KVM: arm64: Fallback to a supported value for unsupported guest TGx
-Date: Mon,  6 Apr 2026 17:46:18 +0100
-Message-ID: <20260406164618.3312473-3-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260406164618.3312473-1-weilin.chang@arm.com>
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm64: Factor out TG0/1 decoding of VTCR and TCR
+In-Reply-To: <20260406164618.3312473-2-weilin.chang@arm.com>
 References: <20260406164618.3312473-1-weilin.chang@arm.com>
+	<20260406164618.3312473-2-weilin.chang@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 195.16.150.122
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When KVM derives the translation granule for emulated stage-1 and
-stage-2 walks, it decodes TCR/VTCR.TGx and treats the granule as-is.
-This is wrong when the guest programs a granule size that is not
-advertised in the guest's ID_AA64MMFR0_EL1.TGRAN* fields.
-Architecturally, such a value must be treated as an implemented granule
-size. Choose an available one while prioritizing PAGE_SIZE.
+On Mon, 06 Apr 2026 17:46:17 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> 
+> The current code decodes TCR.TG0/TG1 and VTCR.TG0 inline at several
+> places. Extract this logic into helpers so the granule size is derived
+> in one place. This enables us to alter the effective granule size in
+> the same place, which we will need in a later patch.
+> 
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> ---
+>  arch/arm64/kvm/at.c     | 73 +++++++++++++++++++++++++----------------
+>  arch/arm64/kvm/nested.c | 70 ++++++++++++++++++++++++---------------
+>  2 files changed, 89 insertions(+), 54 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index c5c5644b1878..ff8ba30e917b 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -135,14 +135,54 @@ static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+>  	wi->e0poe = (wi->regime != TR_EL2) && (val & TCR2_EL1_E0POE);
+>  }
+>  
+> +static unsigned int tg0_to_shift(u64 tg0)
+> +{
 
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/kvm/at.c     | 48 ++++++++++++++++++++++++++
- arch/arm64/kvm/nested.c | 75 +++++++++++++++++++++++++++++++----------
- 2 files changed, 105 insertions(+), 18 deletions(-)
+It'd be better to abstract these helpers a bit more by making them
+take the full TCR_ELx value, and to give them a slightly better name.
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index ff8ba30e917b..6dd883798f83 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -135,6 +135,30 @@ static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
- 	wi->e0poe = (wi->regime != TR_EL2) && (val & TCR2_EL1_E0POE);
- }
- 
-+#define _has_tgran(__r, __sz)					\
-+	({							\
-+		u64 _s1, _mmfr0 = __r;				\
-+								\
-+		_s1 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,		\
-+				    TGRAN##__sz, _mmfr0);	\
-+								\
-+		_s1 != ID_AA64MMFR0_EL1_TGRAN##__sz##_NI;	\
-+	})
-+
-+static bool has_tgran(u64 mmfr0, unsigned int shift)
-+{
-+	switch (shift) {
-+	case 12:
-+		return _has_tgran(mmfr0, 4);
-+	case 14:
-+		return _has_tgran(mmfr0, 16);
-+	case 16:
-+		return _has_tgran(mmfr0, 64);
-+	default:
-+		BUG();
-+	}
-+}
-+
- static unsigned int tg0_to_shift(u64 tg0)
- {
- 	switch (tg0) {
-@@ -161,8 +185,23 @@ static unsigned int tg1_to_shift(u64 tg1)
- 	}
- }
- 
-+static unsigned int fallback_tgran_shift(u64 mmfr0)
-+{
-+	if (has_tgran(mmfr0, PAGE_SHIFT))
-+		return PAGE_SHIFT;
-+	else if (has_tgran(mmfr0, 12))
-+		return 12;
-+	else if (has_tgran(mmfr0, 14))
-+		return 14;
-+	else if (has_tgran(mmfr0, 16))
-+		return 16;
-+	else
-+		return PAGE_SHIFT;
-+}
-+
- static u64 tcr_tg_shift(struct kvm *kvm, u64 tcr, bool upper_range)
- {
-+	u64 mmfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64MMFR0_EL1);
- 	unsigned int shift;
- 
- 	/* Someone was silly enough to encode TG0/TG1 differently */
-@@ -171,6 +210,15 @@ static u64 tcr_tg_shift(struct kvm *kvm, u64 tcr, bool upper_range)
- 	else
- 		shift = tg0_to_shift(FIELD_GET(TCR_EL1_TG0_MASK, tcr));
- 
-+	/*
-+	 * If TGx is programmed to an unimplemented value (not advertised in
-+	 * ID_AA64MMFR0_EL1), we should treat it as if an implemented value is
-+	 * written, as per the architecture. Choose an available one while
-+	 * prioritizing PAGE_SIZE.
-+	 */
-+	if (!has_tgran(mmfr0, shift))
-+		return fallback_tgran_shift(mmfr0);
-+
- 	return shift;
- }
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 2bfab3007cb3..64794ba4848d 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -378,6 +378,36 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
- 	return 0;
- }
- 
-+#define _has_tgran_2(__r, __sz)						\
-+	({								\
-+		u64 _s1, _s2, _mmfr0 = __r;				\
-+									\
-+		_s2 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,			\
-+				    TGRAN##__sz##_2, _mmfr0);		\
-+									\
-+		_s1 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,			\
-+				    TGRAN##__sz, _mmfr0);		\
-+									\
-+		((_s2 != ID_AA64MMFR0_EL1_TGRAN##__sz##_2_NI &&		\
-+		  _s2 != ID_AA64MMFR0_EL1_TGRAN##__sz##_2_TGRAN##__sz) || \
-+		 (_s2 == ID_AA64MMFR0_EL1_TGRAN##__sz##_2_TGRAN##__sz && \
-+		  _s1 != ID_AA64MMFR0_EL1_TGRAN##__sz##_NI));		\
-+	})
-+
-+static bool has_tgran_2(u64 mmfr0, unsigned int shift)
-+{
-+	switch (shift) {
-+	case 12:
-+		return _has_tgran_2(mmfr0, 4);
-+	case 14:
-+		return _has_tgran_2(mmfr0, 16);
-+	case 16:
-+		return _has_tgran_2(mmfr0, 64);
-+	default:
-+		BUG();
-+	}
-+}
-+
- static unsigned int tg0_to_shift(u64 tg0)
- {
- 	switch (tg0) {
-@@ -391,11 +421,35 @@ static unsigned int tg0_to_shift(u64 tg0)
- 	}
- }
- 
-+static unsigned int fallback_tgran2_shift(u64 mmfr0)
-+{
-+	if (has_tgran_2(mmfr0, PAGE_SHIFT))
-+		return PAGE_SHIFT;
-+	else if (has_tgran_2(mmfr0, 12))
-+		return 12;
-+	else if (has_tgran_2(mmfr0, 14))
-+		return 14;
-+	else if (has_tgran_2(mmfr0, 16))
-+		return 16;
-+	else
-+		return PAGE_SHIFT;
-+}
-+
- static u64 vtcr_tg0_shift(struct kvm *kvm, u64 vtcr)
- {
-+	u64 mmfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64MMFR0_EL1);
- 	u64 tg0 = FIELD_GET(VTCR_EL2_TG0_MASK, vtcr);
- 	unsigned int shift = tg0_to_shift(tg0);
- 
-+	/*
-+	 * If TGx is programmed to an unimplemented value (not advertised in
-+	 * ID_AA64MMFR0_EL1), we should treat it as if an implemented value is
-+	 * written, as per the architecture. Choose an available one while
-+	 * prioritizing PAGE_SIZE.
-+	 */
-+	if (!has_tgran_2(mmfr0, shift))
-+		return fallback_tgran2_shift(mmfr0);
-+
- 	return shift;
- }
- 
-@@ -1516,21 +1570,6 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--#define has_tgran_2(__r, __sz)						\
--	({								\
--		u64 _s1, _s2, _mmfr0 = __r;				\
--									\
--		_s2 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,			\
--				    TGRAN##__sz##_2, _mmfr0);		\
--									\
--		_s1 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,			\
--				    TGRAN##__sz, _mmfr0);		\
--									\
--		((_s2 != ID_AA64MMFR0_EL1_TGRAN##__sz##_2_NI &&		\
--		  _s2 != ID_AA64MMFR0_EL1_TGRAN##__sz##_2_TGRAN##__sz) || \
--		 (_s2 == ID_AA64MMFR0_EL1_TGRAN##__sz##_2_TGRAN##__sz && \
--		  _s1 != ID_AA64MMFR0_EL1_TGRAN##__sz##_NI));		\
--	})
- /*
-  * Our emulated CPU doesn't support all the possible features. For the
-  * sake of simplicity (and probably mental sanity), wipe out a number
-@@ -1617,15 +1656,15 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 		 */
- 		switch (PAGE_SIZE) {
- 		case SZ_4K:
--			if (has_tgran_2(orig_val, 4))
-+			if (_has_tgran_2(orig_val, 4))
- 				val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN4_2, IMP);
- 			fallthrough;
- 		case SZ_16K:
--			if (has_tgran_2(orig_val, 16))
-+			if (_has_tgran_2(orig_val, 16))
- 				val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN16_2, IMP);
- 			fallthrough;
- 		case SZ_64K:
--			if (has_tgran_2(orig_val, 64))
-+			if (_has_tgran_2(orig_val, 64))
- 				val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN64_2, IMP);
- 			break;
- 		}
+I'd suggest something like:
+
+static unsigned int tcr_to_tg0_pgshift(u64 tcr)
+{
+	u64 tg0 = tcr & TCR_TG0_MASK, tcr;
+
+which makes it clear that the result is a page shift, as required by
+wi->pgshift.
+
+> +	switch (tg0) {
+> +	case TCR_EL1_TG0_4K:
+> +		return 12;
+> +	case TCR_EL1_TG0_16K:
+> +		return 14;
+> +	case TCR_EL1_TG0_64K:
+
+Please don't mix the _EL1 definition and those without _EL1 in the
+same file. For a start, that's not always EL1. Also, this makes very
+hard to reason about what is shifted and what is not.
+
+> +	default:	/* IMPDEF: treat any other value as 64k */
+> +		return 16;
+> +	}
+> +}
+> +
+> +static unsigned int tg1_to_shift(u64 tg1)
+> +{
+> +	switch (tg1) {
+> +	case TCR_EL1_TG1_4K:
+> +		return 12;
+> +	case TCR_EL1_TG1_16K:
+> +		return 14;
+> +	case TCR_EL1_TG1_64K:
+> +	default:	/* IMPDEF: treat any other value as 64k */
+> +		return 16;
+> +	}
+> +}
+> +
+> +static u64 tcr_tg_shift(struct kvm *kvm, u64 tcr, bool upper_range)
+> +{
+> +	unsigned int shift;
+> +
+> +	/* Someone was silly enough to encode TG0/TG1 differently */
+> +	if (upper_range)
+> +		shift = tg1_to_shift(FIELD_GET(TCR_EL1_TG1_MASK, tcr));
+> +	else
+> +		shift = tg0_to_shift(FIELD_GET(TCR_EL1_TG0_MASK, tcr));
+> +
+> +	return shift;
+> +}
+> +
+>  static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  			 struct s1_walk_result *wr, u64 va)
+>  {
+> -	u64 hcr, sctlr, tcr, tg, ps, ia_bits, ttbr;
+> +	u64 hcr, sctlr, tcr, ps, ia_bits, ttbr;
+>  	unsigned int stride, x;
+> -	bool va55, tbi, lva;
+> +	bool va55, tbi, lva, upper_range;
+>  
+>  	va55 = va & BIT(55);
+> +	upper_range = va55 && wi->regime != TR_EL2;
+>  
+>  	if (vcpu_has_nv(vcpu)) {
+>  		hcr = __vcpu_sys_reg(vcpu, HCR_EL2);
+> @@ -173,35 +213,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  		BUG();
+>  	}
+>  
+> -	/* Someone was silly enough to encode TG0/TG1 differently */
+> -	if (va55 && wi->regime != TR_EL2) {
+> +	if (upper_range)
+>  		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
+> -		tg = FIELD_GET(TCR_TG1_MASK, tcr);
+> -
+> -		switch (tg << TCR_TG1_SHIFT) {
+> -		case TCR_TG1_4K:
+> -			wi->pgshift = 12;	 break;
+> -		case TCR_TG1_16K:
+> -			wi->pgshift = 14;	 break;
+> -		case TCR_TG1_64K:
+> -		default:	    /* IMPDEF: treat any other value as 64k */
+> -			wi->pgshift = 16;	 break;
+> -		}
+> -	} else {
+> +	else
+>  		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
+> -		tg = FIELD_GET(TCR_TG0_MASK, tcr);
+> -
+> -		switch (tg << TCR_TG0_SHIFT) {
+> -		case TCR_TG0_4K:
+> -			wi->pgshift = 12;	 break;
+> -		case TCR_TG0_16K:
+> -			wi->pgshift = 14;	 break;
+> -		case TCR_TG0_64K:
+> -		default:	    /* IMPDEF: treat any other value as 64k */
+> -			wi->pgshift = 16;	 break;
+> -		}
+> -	}
+>  
+> +	wi->pgshift = tcr_tg_shift(vcpu->kvm, tcr, upper_range);
+>  	wi->pa52bit = has_52bit_pa(vcpu, wi, tcr);
+>
+>  	ia_bits = get_ia_size(wi);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 883b6c1008fb..2bfab3007cb3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -378,20 +378,36 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+>  	return 0;
+>  }
+>  
+> -static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
+> +static unsigned int tg0_to_shift(u64 tg0)
+
+Same comments as above.
+
+> +{
+> +	switch (tg0) {
+> +	case VTCR_EL2_TG0_4K:
+> +		return 12;
+> +	case VTCR_EL2_TG0_16K:
+> +		return 14;
+> +	case VTCR_EL2_TG0_64K:
+> +	default:	/* IMPDEF: treat any other value as 64k */
+> +		return 16;
+> +	}
+> +}
+> +
+> +static u64 vtcr_tg0_shift(struct kvm *kvm, u64 vtcr)
+> +{
+> +	u64 tg0 = FIELD_GET(VTCR_EL2_TG0_MASK, vtcr);
+> +	unsigned int shift = tg0_to_shift(tg0);
+> +
+> +	return shift;
+
+shift is an unsigned int. Why is the return value a u64? Try and make
+sure that types are consistent, even if they cast nicely in C.
+
+> +}
+> +
+> +static size_t vtcr_tg0_size(struct kvm *kvm, u64 vtcr)
+> +{
+> +	return BIT(vtcr_tg0_shift(kvm, vtcr));
+> +}
+> +
+> +static void vtcr_to_walk_info(struct kvm *kvm, u64 vtcr, struct s2_walk_info *wi)
+
+This prototype reads bizarrely. vtcr is per CPU, the walk info is
+evidently per CPU, and yet you pass a kvm struct.
+
+Instead, rename this to:
+
+static void setup_s2_walk(struct kvm_vcpu *vcpu,
+			  struct s2_walk_info *wi)
+{
+	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+
+and call that directly. You can then extract vcpu->kvm as needed. It
+also aligns the naming on the s1 part, which isn't a bad thing to do.
+
+>  {
+>  	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
+> -
+> -	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
+> -	case VTCR_EL2_TG0_4K:
+> -		wi->pgshift = 12;	 break;
+> -	case VTCR_EL2_TG0_16K:
+> -		wi->pgshift = 14;	 break;
+> -	case VTCR_EL2_TG0_64K:
+> -	default:	    /* IMPDEF: treat any other value as 64k */
+> -		wi->pgshift = 16;	 break;
+> -	}
+> -
+> +	wi->pgshift = vtcr_tg0_shift(kvm, vtcr);
+>  	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+>  	/* Global limit for now, should eventually be per-VM */
+>  	wi->max_oa_bits = min(get_kvm_ipa_limit(),
+> @@ -414,7 +430,7 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+>  
+>  	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+>  
+> -	vtcr_to_walk_info(vtcr, &wi);
+> +	vtcr_to_walk_info(vcpu->kvm, vtcr, &wi);
+>  
+>  	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
+>  
+> @@ -515,17 +531,19 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
+>  	u64 tmp, sz = 0, vtcr = mmu->tlb_vtcr;
+>  	kvm_pte_t pte;
+>  	u8 ttl, level;
+> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> +	size_t tg0_size = vtcr_tg0_size(kvm, vtcr);
+>  
+> -	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+> -	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
+> -	case VTCR_EL2_TG0_4K:
+> +	switch (tg0_size) {
+> +	case SZ_4K:
+>  		ttl = (TLBI_TTL_TG_4K << 2);
+>  		break;
+> -	case VTCR_EL2_TG0_16K:
+> +	case SZ_16K:
+>  		ttl = (TLBI_TTL_TG_16K << 2);
+>  		break;
+> -	case VTCR_EL2_TG0_64K:
+> +	case SZ_64K:
+
+All these unit changes make the patch harder to read than it should
+be. Consider having a separate patch to do that.
+
+Thanks,
+
+	M.
+
 -- 
-2.43.0
-
+Jazz isn't dead. It just smells funny.
