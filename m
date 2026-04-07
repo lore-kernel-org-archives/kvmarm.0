@@ -1,313 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6275B244692;
-	Tue,  7 Apr 2026 07:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348653A3E8E
+	for <kvmarm@lists.linux.dev>; Tue,  7 Apr 2026 09:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775546258; cv=none; b=BioJfgWXXUQc8x673LEcFGOg2npcq4+0Cgn9GeUmuopSMKM9MTTA7CXm2cPDKdPeFMSFBTLXRYo6v9qXVWqMZlUs4tKYosowLzXY3lM20I/1t8Mjk0Ew9AYzPOyt5VKmClK30t/NpHfWvVtPSkxpx5jRRPh9mxA2zYVvNZmg0fY=
+	t=1775553967; cv=none; b=n08qQ7YaVLmUr4JoO/JszXLoB7Orqo/Q/1ESwQPUz21SxmCK4D2e0bi16Fzs5HDDKyjOq2SM+hNnBeN3MhSV1cjVrCsQXaFWRJ3I0psp5IXDAq+ENKsXdQgCfy7gPbH66LNvFv74UqPFKQu0vFE9Y7OrCmnZEPCsXgIjHiYGKAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775546258; c=relaxed/simple;
-	bh=DH4aQOykI0rpEHZrWRjW7Tiv09C9Qv6GTBvf35yHM2I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hPuePA3I/m1/eEfZW6ylIF1imwCefUx/CpDfjk35EtYpGsJdkoO1PtvDlO3Mf9J4t0v+3hYvz6+2i5l+LO4f3iQ0cVxEVNAZf9LdRaYQUr58SUhEBuPA/k1XvQ5dec2B3dIFpnTYUMiezqsE/r5aeX7t1VTZJSZjif2uNmenaDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KID2eHR0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775553967; c=relaxed/simple;
+	bh=35utQv1mJDn/+FVHA9rap7AYG4gs2p36qLIotZXtT0g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SN4y48VVgBaYbXZac1m/ySzkd6/tw/F6D3/zjdPNDGwKYTKoQ3OkiKP2SqRy++HHVncuaPiCfXoSpfkUpkl/wx+Md0EW+WoUnxzoh4trpPOw+Ju3JCw5SZcHniRZAuja8iZZreEIY13he6siQYVtbjnHXxTjEfgiUf5S+N0l2ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwPOA/g+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KID2eHR0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA138C116C6;
-	Tue,  7 Apr 2026 07:17:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwPOA/g+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3146C2BCB7
+	for <kvmarm@lists.linux.dev>; Tue,  7 Apr 2026 09:26:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775546258;
-	bh=DH4aQOykI0rpEHZrWRjW7Tiv09C9Qv6GTBvf35yHM2I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KID2eHR0XJBaXmB1/Ca916XBQ2YYI/+8t9UhJS6CPrbwgGUWYf/arWOAaJ5VX7gDv
-	 LXHY91ndmx2UdFL3GtVVMDDNumM5+7eR8Ngy+Ab3O6NFC4ceywP4yD7YJnGtSjoxkw
-	 YygFXykrZ4JCsOEJZylx+rkX2o60hwQI5A0q24o5oc7xlSOEGEE85O1gp19V/9sbvq
-	 5Fa+/iF24iIdyK2z3C4gcPVprguGiZVKWrPdOS37B3dJofRkvMkicbCbDfWEKAieAi
-	 U+jKcg6f4hOhSTZvrWu2/oMUhIeirk3kuKUnj+BkYeUTwiqv9XXIMe8iTLlM9Ay2a8
-	 9nUGS74D9XcvA==
-Received: from cu01147a.smtpx.saremail.com ([195.16.150.122] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wA0gp-00000009QiT-2U6s;
-	Tue, 07 Apr 2026 07:17:35 +0000
-Date: Tue, 07 Apr 2026 08:17:29 +0100
-Message-ID: <87y0izb5o6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm64: Factor out TG0/1 decoding of VTCR and TCR
-In-Reply-To: <20260406164618.3312473-2-weilin.chang@arm.com>
-References: <20260406164618.3312473-1-weilin.chang@arm.com>
-	<20260406164618.3312473-2-weilin.chang@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1775553966;
+	bh=35utQv1mJDn/+FVHA9rap7AYG4gs2p36qLIotZXtT0g=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=kwPOA/g+hTcTrDkQ3laEHU10cLlf8nRjTe2c/DeUoh57DV38a/+blLLBZSpSLjiVS
+	 r7ZKEzbXxarw4uZeLSCuq3iKW2smXGmJyRUz/OX+xJzybsU7w7No+QOqxGdAqk2kdB
+	 poe038axHQ+y8PtKbcWHg6z2iNz/SZM8SqvEQUD0g3nS0K6nWf6CfJKs3FtnuMYKED
+	 j/191VqiOgd7PKAk614SOJTgGSTBH5sL/RO9m3nQ9vyI+QIevdr9slunsImKLiVHKJ
+	 rbnA3ZuevAh8ecHFpTBGKwqSQH2eFXeoTiFzE3TfrysAvIfUV0dB8wxw4zyByijFfs
+	 33ZKgUcGHH6Hw==
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7927261a3acso40425607b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 07 Apr 2026 02:26:06 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXOhpdPTPSVnotQ7z9JE2VvzJ/5eGqFK+HN93NqGjKTXWCbYL8NtvAh2CX0Rg4hn9kUuuSvY68=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3BLJ20WlSD/DjaAQb5TNhGWbz4H5R/FgpvnRHz4AWAhHf/GtP
+	0PARfjIgqaQCPu9+gZeCrcgGrBY/6inj5/vJN7nk6l09fhz0pIM7/i2R/BupnUnVvyxr0cwcFUQ
+	sg+l+a7P205mIPA/fh0GMg6k3KcWdM6k=
+X-Received: by 2002:a05:690c:dc9:b0:79b:e346:980c with SMTP id
+ 00721157ae682-7a4d625504fmr162419117b3.12.1775553966242; Tue, 07 Apr 2026
+ 02:26:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 195.16.150.122
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260306-aarch64-clear-pages-c-v1-1-77c1bb0f1c21@kernel.org> <ac7YJPo4Np2zxxEp@arm.com>
+In-Reply-To: <ac7YJPo4Np2zxxEp@arm.com>
+From: Linus Walleij <linusw@kernel.org>
+Date: Tue, 7 Apr 2026 11:25:55 +0200
+X-Gmail-Original-Message-ID: <CAD++jL=G81=ueo7djqUETToE459kpFGniWvBwnYbJtmXrm8MFw@mail.gmail.com>
+X-Gm-Features: AQROBzCOCkncZm_JCfvTszNJbimlQJbAZxhLdXzaXBoMHZTRztuKC4ciORt69b8
+Message-ID: <CAD++jL=G81=ueo7djqUETToE459kpFGniWvBwnYbJtmXrm8MFw@mail.gmail.com>
+Subject: Re: [PATCH] arm64: clear_page[s] using memset
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 06 Apr 2026 17:46:17 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> 
-> The current code decodes TCR.TG0/TG1 and VTCR.TG0 inline at several
-> places. Extract this logic into helpers so the granule size is derived
-> in one place. This enables us to alter the effective granule size in
-> the same place, which we will need in a later patch.
-> 
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> ---
->  arch/arm64/kvm/at.c     | 73 +++++++++++++++++++++++++----------------
->  arch/arm64/kvm/nested.c | 70 ++++++++++++++++++++++++---------------
->  2 files changed, 89 insertions(+), 54 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index c5c5644b1878..ff8ba30e917b 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -135,14 +135,54 @@ static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
->  	wi->e0poe = (wi->regime != TR_EL2) && (val & TCR2_EL1_E0POE);
->  }
->  
-> +static unsigned int tg0_to_shift(u64 tg0)
-> +{
-
-It'd be better to abstract these helpers a bit more by making them
-take the full TCR_ELx value, and to give them a slightly better name.
-
-I'd suggest something like:
-
-static unsigned int tcr_to_tg0_pgshift(u64 tcr)
-{
-	u64 tg0 = tcr & TCR_TG0_MASK, tcr;
-
-which makes it clear that the result is a page shift, as required by
-wi->pgshift.
-
-> +	switch (tg0) {
-> +	case TCR_EL1_TG0_4K:
-> +		return 12;
-> +	case TCR_EL1_TG0_16K:
-> +		return 14;
-> +	case TCR_EL1_TG0_64K:
-
-Please don't mix the _EL1 definition and those without _EL1 in the
-same file. For a start, that's not always EL1. Also, this makes very
-hard to reason about what is shifted and what is not.
-
-> +	default:	/* IMPDEF: treat any other value as 64k */
-> +		return 16;
-> +	}
-> +}
-> +
-> +static unsigned int tg1_to_shift(u64 tg1)
-> +{
-> +	switch (tg1) {
-> +	case TCR_EL1_TG1_4K:
-> +		return 12;
-> +	case TCR_EL1_TG1_16K:
-> +		return 14;
-> +	case TCR_EL1_TG1_64K:
-> +	default:	/* IMPDEF: treat any other value as 64k */
-> +		return 16;
-> +	}
-> +}
-> +
-> +static u64 tcr_tg_shift(struct kvm *kvm, u64 tcr, bool upper_range)
-> +{
-> +	unsigned int shift;
-> +
-> +	/* Someone was silly enough to encode TG0/TG1 differently */
-> +	if (upper_range)
-> +		shift = tg1_to_shift(FIELD_GET(TCR_EL1_TG1_MASK, tcr));
-> +	else
-> +		shift = tg0_to_shift(FIELD_GET(TCR_EL1_TG0_MASK, tcr));
-> +
-> +	return shift;
-> +}
-> +
->  static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  			 struct s1_walk_result *wr, u64 va)
->  {
-> -	u64 hcr, sctlr, tcr, tg, ps, ia_bits, ttbr;
-> +	u64 hcr, sctlr, tcr, ps, ia_bits, ttbr;
->  	unsigned int stride, x;
-> -	bool va55, tbi, lva;
-> +	bool va55, tbi, lva, upper_range;
->  
->  	va55 = va & BIT(55);
-> +	upper_range = va55 && wi->regime != TR_EL2;
->  
->  	if (vcpu_has_nv(vcpu)) {
->  		hcr = __vcpu_sys_reg(vcpu, HCR_EL2);
-> @@ -173,35 +213,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  		BUG();
->  	}
->  
-> -	/* Someone was silly enough to encode TG0/TG1 differently */
-> -	if (va55 && wi->regime != TR_EL2) {
-> +	if (upper_range)
->  		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> -		tg = FIELD_GET(TCR_TG1_MASK, tcr);
-> -
-> -		switch (tg << TCR_TG1_SHIFT) {
-> -		case TCR_TG1_4K:
-> -			wi->pgshift = 12;	 break;
-> -		case TCR_TG1_16K:
-> -			wi->pgshift = 14;	 break;
-> -		case TCR_TG1_64K:
-> -		default:	    /* IMPDEF: treat any other value as 64k */
-> -			wi->pgshift = 16;	 break;
-> -		}
-> -	} else {
-> +	else
->  		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> -		tg = FIELD_GET(TCR_TG0_MASK, tcr);
-> -
-> -		switch (tg << TCR_TG0_SHIFT) {
-> -		case TCR_TG0_4K:
-> -			wi->pgshift = 12;	 break;
-> -		case TCR_TG0_16K:
-> -			wi->pgshift = 14;	 break;
-> -		case TCR_TG0_64K:
-> -		default:	    /* IMPDEF: treat any other value as 64k */
-> -			wi->pgshift = 16;	 break;
-> -		}
-> -	}
->  
-> +	wi->pgshift = tcr_tg_shift(vcpu->kvm, tcr, upper_range);
->  	wi->pa52bit = has_52bit_pa(vcpu, wi, tcr);
+On Thu, Apr 2, 2026 at 10:57=E2=80=AFPM Catalin Marinas <catalin.marinas@ar=
+m.com> wrote:
+> On Fri, Mar 06, 2026 at 09:57:50AM +0100, Linus Walleij wrote:
+> > There is no need to try to second-guess the compiler when
+> > clearing memory. Just call memset() like everyone else.
 >
->  	ia_bits = get_ia_size(wi);
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 883b6c1008fb..2bfab3007cb3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -378,20 +378,36 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
->  	return 0;
->  }
->  
-> -static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
-> +static unsigned int tg0_to_shift(u64 tg0)
+> Hmm, that "like everyone else" made me think - why not move this to
+> generic code and only the 1-2 platforms that need their own should
+> override it? Could we do the same with copy_page()?
+>
+> Sorry, more work all of a sudden ;).
 
-Same comments as above.
+I actually had that planned, I just wanted to know if this would
+be fine for arm64 first so that there is a user.
 
-> +{
-> +	switch (tg0) {
-> +	case VTCR_EL2_TG0_4K:
-> +		return 12;
-> +	case VTCR_EL2_TG0_16K:
-> +		return 14;
-> +	case VTCR_EL2_TG0_64K:
-> +	default:	/* IMPDEF: treat any other value as 64k */
-> +		return 16;
-> +	}
-> +}
-> +
-> +static u64 vtcr_tg0_shift(struct kvm *kvm, u64 vtcr)
-> +{
-> +	u64 tg0 = FIELD_GET(VTCR_EL2_TG0_MASK, vtcr);
-> +	unsigned int shift = tg0_to_shift(tg0);
-> +
-> +	return shift;
+It seems you are on board so I will send a 2-patch series
+next.
 
-shift is an unsigned int. Why is the return value a u64? Try and make
-sure that types are consistent, even if they cast nicely in C.
+> > Since memset() already has an architecture-local MOPS
+> > optimization, we do not need to do anything else to preserve
+> > the MOPS optimization.
+>
+> The custom clear_page() had the (very small) advantage that it can skip
+> the length/alignment checks as they are always page-size.
 
-> +}
-> +
-> +static size_t vtcr_tg0_size(struct kvm *kvm, u64 vtcr)
-> +{
-> +	return BIT(vtcr_tg0_shift(kvm, vtcr));
-> +}
-> +
-> +static void vtcr_to_walk_info(struct kvm *kvm, u64 vtcr, struct s2_walk_info *wi)
+Yeah, it seems that is so fast that it doesn't really matter.
 
-This prototype reads bizarrely. vtcr is per CPU, the walk info is
-evidently per CPU, and yet you pass a kvm struct.
+> > While at it, implement the shorthand for directly calling
+> > the new prototype clear_pages() for larger page chunks.
+> >
+> > No performance regressions can be seen, the fastpath
+> > benchmarks differences are in the noise.
+>
+> I assume the benchmarks ran on real hardware (had to ask, last time you
+> mentioned qemu ;)).
 
-Instead, rename this to:
+Quoting my own commit message hehe:
 
-static void setup_s2_walk(struct kvm_vcpu *vcpu,
-			  struct s2_walk_info *wi)
-{
-	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+> No performance regressions can be seen, the fastpath
+> benchmarks differences are in the noise.
 
-and call that directly. You can then extract vcpu->kvm as needed. It
-also aligns the naming on the s1 part, which isn't a bad thing to do.
+This was tested on hardware with Ryan Robert's fastpath tool.
 
->  {
->  	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
-> -
-> -	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
-> -	case VTCR_EL2_TG0_4K:
-> -		wi->pgshift = 12;	 break;
-> -	case VTCR_EL2_TG0_16K:
-> -		wi->pgshift = 14;	 break;
-> -	case VTCR_EL2_TG0_64K:
-> -	default:	    /* IMPDEF: treat any other value as 64k */
-> -		wi->pgshift = 16;	 break;
-> -	}
-> -
-> +	wi->pgshift = vtcr_tg0_shift(kvm, vtcr);
->  	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
->  	/* Global limit for now, should eventually be per-VM */
->  	wi->max_oa_bits = min(get_kvm_ipa_limit(),
-> @@ -414,7 +430,7 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
->  
->  	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
->  
-> -	vtcr_to_walk_info(vtcr, &wi);
-> +	vtcr_to_walk_info(vcpu->kvm, vtcr, &wi);
->  
->  	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
->  
-> @@ -515,17 +531,19 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
->  	u64 tmp, sz = 0, vtcr = mmu->tlb_vtcr;
->  	kvm_pte_t pte;
->  	u8 ttl, level;
-> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> +	size_t tg0_size = vtcr_tg0_size(kvm, vtcr);
->  
-> -	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
-> +	lockdep_assert_held_write(&kvm->mmu_lock);
->  
-> -	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
-> -	case VTCR_EL2_TG0_4K:
-> +	switch (tg0_size) {
-> +	case SZ_4K:
->  		ttl = (TLBI_TTL_TG_4K << 2);
->  		break;
-> -	case VTCR_EL2_TG0_16K:
-> +	case SZ_16K:
->  		ttl = (TLBI_TTL_TG_16K << 2);
->  		break;
-> -	case VTCR_EL2_TG0_64K:
-> +	case SZ_64K:
-
-All these unit changes make the patch harder to read than it should
-be. Consider having a separate patch to do that.
-
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+Yours,
+Linus Walleij
