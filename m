@@ -1,109 +1,253 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A78A21CA03
-	for <kvmarm@lists.linux.dev>; Wed,  8 Apr 2026 07:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8381930C61B;
+	Wed,  8 Apr 2026 07:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775634453; cv=none; b=OD6M0laR+hR3vjyu7zxXNFnkbxIfzwQ0FKCgD/9qxWtAaWmxM5jjR0NRk4ZFoB8V0vYw6/rTUhGpzG0h82KfjJkIuWh5+N6saG28qbe7rzY/NRNdtGybR2IS7lZxQBXWDVrNPJvXxSeGQ6OCdWDFCxHGvP8i5yeYODp5xmRb3ck=
+	t=1775634861; cv=none; b=euaC2Yqot96bRdT5Jxfg/bTbg8/JRzOV9bwQdhwcYD9u2zLFZ/QJy616Xzb0VlZTQbpulI+7EKGVNuBQfKsspH2OV5EIY/hWWALX8017IGW6e0gKhR/wOT7xlvZAsxumBhCwcC4s9/51Or9KmTCCNjf+374uV+3H29d8bsQyG7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775634453; c=relaxed/simple;
-	bh=6FGBj6R+3TxRy3lV+rTYpY2sUBGm3uINry4jtIg9hmo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WK8p9Y10IlCBF6fbCMmVn4/ZGFaRV5DZsSY3YErATbajYqlk6n/SAZFEICoanknwt0aSnEbc/UjfsH5ultpbzBxzcsTJkp1Zm/dY+xxaU0jiE7Pjzix1rY98USHO0aylQl00lBq+9H/5FfCSfUu6rl7zlpCOURi6GCoZ3gLKuYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXQ4q2UL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775634861; c=relaxed/simple;
+	bh=VBIGF5AN9ebmM6kyFi+XFeTVPotW9wSqJLoFDMY7mQQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Hq0wI12Z7vpLVfU5ZIZOAyO3s5mgOI88AeFgeOE0z86VN9aCvtqjpswhnfB69RBZinMUtRz6BN2xdj3qQN/eUbdcJvnxUSFuxYzNxnHhRk7BxAX9K/E5tWJ1gt7GiOIM3YKUlPvhIjCZ3oLSSGfeBTDdvYhp+1Ue/sKGt+Ghx9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YW+P323B; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXQ4q2UL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2578CC2BCB0
-	for <kvmarm@lists.linux.dev>; Wed,  8 Apr 2026 07:47:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YW+P323B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F6FC19424;
+	Wed,  8 Apr 2026 07:54:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775634453;
-	bh=6FGBj6R+3TxRy3lV+rTYpY2sUBGm3uINry4jtIg9hmo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=rXQ4q2ULZrTR194/yg/YQc05sJXt8dCgV0yeKGyulNkmqpXy+tCd2qNDRyg8WzBYc
-	 WVlQDBQauUo/4kcKlC4qaQJp+gXOzJubLk7Um48P/KR/vDL6+Zqp/T9UbqJuuQ7yS7
-	 GGlTUYB9hWjyS0ATsxb5q4lIglsc0/GYBjKSEzAS2ndsjDZmuV7Cqq3tITdzES4Ohf
-	 eEYavR2JHvowp7jmF7oM/mAECQ1LEVJaGUk7wxSaUGBfe0+nV9k0IR7GDylLbSN/Mz
-	 X1HlBf8CwDzwutz2jBtrv+90Oi0tUSEZ7XFBonRTGLVSAJPrxHzovMyJPTq+f9JB/8
-	 D1ZKOzhZrRYrg==
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-79885f4a8ffso55923327b3.3
-        for <kvmarm@lists.linux.dev>; Wed, 08 Apr 2026 00:47:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXYk+eHHdHPIcA/76I3ngtfO4H/WMh33Rn0mfbqSKu25tX+VYPIEr4VvY4YgECR5J0QIdhu3Ng=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw/pdXDdSeuJa+pGp3mX7DXTCMvz1zi7se1HS+4FZUKC8/R6JUF
-	OX580dWuQQfzMGhYdLjpMM7bn5UA4lpquO211VL6SxyzTcqWyxl293F/kuu2ahsulqieyzuIu8E
-	J4Y5xcJqmTn6njARHVPDTrBs5tqIXmVY=
-X-Received: by 2002:a05:690c:102:b0:79a:40fb:9346 with SMTP id
- 00721157ae682-7a4d6d26cf8mr204354257b3.20.1775634452513; Wed, 08 Apr 2026
- 00:47:32 -0700 (PDT)
+	s=k20201202; t=1775634861;
+	bh=VBIGF5AN9ebmM6kyFi+XFeTVPotW9wSqJLoFDMY7mQQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YW+P323Bi1dBRcDBdB+yn4AdVRrM0FFHP9wyEb4ajhbSCpJXYBHtUm78uhrSp9BD0
+	 qaOWDYMr+Yvj7UxnWQ4bJEpk1jHF6fUWgLWaKAEY9U7PttUQLzEKNbYfFHEq5bhPvs
+	 wIrqzs295oD9fp/XP6jEiP2FkQhZCzxVuZIGcFIx+A5GSmFDn97dJQmLe79dFXq3M0
+	 6l7FsCeEAOToZpiSSS/IUqWIng8seUXLWMIlzhWcate0KmaKd1SuGv4LYq8MmjYYrN
+	 0cgA45yPkn8BsNSDjuqSiW3JQXmuqdEZY1UpJxG4l7QC2k5RvWa+tUBB+yreTcQB6Q
+	 ubpXegf08jb4w==
+Received: from 82-132-239-13.dab.02.net ([82.132.239.13] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wANjr-00000009ohr-1WG1;
+	Wed, 08 Apr 2026 07:54:18 +0000
+Date: Wed, 08 Apr 2026 08:54:03 +0100
+Message-ID: <87wlyhc2g4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM: arm64: vgic: Allow userspace to set IIDR revision 1
+In-Reply-To: <20260407210949.2076251-3-dwmw2@infradead.org>
+References: <20260407210949.2076251-1-dwmw2@infradead.org>
+	<20260407210949.2076251-3-dwmw2@infradead.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260306-aarch64-clear-pages-c-v1-1-77c1bb0f1c21@kernel.org>
- <ac7YJPo4Np2zxxEp@arm.com> <CAD++jL=G81=ueo7djqUETToE459kpFGniWvBwnYbJtmXrm8MFw@mail.gmail.com>
- <adULAT2xus5z3HdQ@arm.com>
-In-Reply-To: <adULAT2xus5z3HdQ@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 8 Apr 2026 09:47:20 +0200
-X-Gmail-Original-Message-ID: <CAD++jLmMxj1C7sGz-Yt8Y+NC1CbrUTTSH4QvcZfYuJAcNoYYCQ@mail.gmail.com>
-X-Gm-Features: AQROBzCKD15vLZOPpJlr1WJAhz9pR_gLMWe3rxqqBD2IrNa8GJfdGMWD0iaN0Lk
-Message-ID: <CAD++jLmMxj1C7sGz-Yt8Y+NC1CbrUTTSH4QvcZfYuJAcNoYYCQ@mail.gmail.com>
-Subject: Re: [PATCH] arm64: clear_page[s] using memset
-To: Catalin Marinas <catalin.marinas@arm.com>, Ryan Roberts <ryan.roberts@arm.com>
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.239.13
+X-SA-Exim-Rcpt-To: dwmw2@infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, dwmw@amazon.co.uk, rananta@google.com, eric.auger@redhat.com, kees@kernel.org, arnd@arndb.de, nathan@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Apr 7, 2026 at 3:47=E2=80=AFPM Catalin Marinas <catalin.marinas@arm=
-.com> wrote:
-> On Tue, Apr 07, 2026 at 11:25:55AM +0200, Linus Walleij wrote:
-> > Quoting my own commit message hehe:
-> >
-> > > No performance regressions can be seen, the fastpath
-> > > benchmarks differences are in the noise.
-> >
-> > This was tested on hardware with Ryan Robert's fastpath tool.
->
-> BTW, have you tried the perf bench mmap test again with the new
-> clear_page? Both with single page and multiple pages scenarios. And
-> ideally on more than one platform.
->
-> Will pointed out (in a private chat) that current clear_page() uses
-> non-temporal stores while memset() doesn't. It may not make any
-> difference in practice but it would be good to have some numbers.
+On Tue, 07 Apr 2026 21:27:03 +0100,
+David Woodhouse <dwmw2@infradead.org> wrote:
+> 
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> Allow userspace to select GICD_IIDR revision 1, which restores the
+> original pre-d53c2c29ae0d ("KVM: arm/arm64: vgic: Allow configuration
+> of interrupt groups") behaviour where interrupt groups are not
+> guest-configurable.
 
-Hm interesting point, the perf bench mmap test isn't specifically
-in fastpath but since it tends to come up I guess we can add it?
+I'm a bit surprised by this.
 
-Ryan: is it easy to add this test to fastpath? Or easy for me to do
-myself? I looked at the instructions but they were a bit intimidating...
+Either your guest knows that the group registers are not writable and
+already deals with the buggy behaviour by not configuring the groups
+(or configuring them in a way that matches what the implementation
+does). Or it configures them differently and totally fails to handle
+the interrupts as they are delivered using the wrong exception type,
+if at all.
 
-The test is the following:
+I'd expect that your guests fall in the former category and not the
+latter, as we'd be discussing a very different problem. And my vague
+recollection of this issue is that we had established that as long as
+the reset values were unchanged, there was no harm in letting things
+rip.
 
-    We boot the kernel with cmdline like this:
-    "default_hugepagesz=3D1G hugepagesz=3D1G hugepages=3D32" to make sure
-    we have ample hugepages. This was then tested with the same
-    cmdline as the original series:
+So what is this *really* fixing?
 
-    perf bench mem mmap -p 1GB -f demand -s 32GB -l 5
+> 
+> When revision 1 is selected:
+>  - GICv2: IGROUPR reads as zero (group 0), writes are ignored
+>  - GICv3: IGROUPR reads as all-ones (group 1), writes are ignored
+>  - v2_groups_user_writable is not set
+> 
+> This is implemented by checking the implementation revision in
+> vgic_mmio_read_group() and vgic_mmio_write_group() and returning
+> the fixed values when the revision is below 2.
+> 
+> Fixes: d53c2c29ae0d ("KVM: arm/arm64: vgic: Allow configuration of interrupt groups")
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/arm64/kvm/vgic/vgic-mmio-v2.c |  5 +++++
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  4 ++++
+>  arch/arm64/kvm/vgic/vgic-mmio.c    | 15 +++++++++++++++
+>  include/kvm/arm_vgic.h             |  1 +
+>  4 files changed, 25 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> index 0643e333db35..14aa49f86f60 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> @@ -20,6 +20,8 @@
+>   * Revision 1: Report GICv2 interrupts as group 0 instead of group 1
+>   * Revision 2: Interrupt groups are guest-configurable and signaled using
+>   * 	       their configured groups.
+> + * Revision 3: GICv2 behaviour is unchanged from revision 2.
+> + * 	       (GICv3 gains GICR_CTLR.{IR,CES}; see vgic-mmio-v3.c)
 
-    The first run was discarded as the memory hierarchy is cold on
-    the first run. Then I ran the above command 5 times and averaged
-    the throughput
+nit: I don't think we need cross-version documentation, so just drop
+the second line.
 
-The x86 commit cb431accb36e51b64ce34b5cc4d5ed292895fd84
-also mentions this test:
+>   */
+>  
+>  static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+> @@ -93,6 +95,9 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+>  		 */
+>  		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, val);
+>  		switch (reg) {
+> +		case KVM_VGIC_IMP_REV_1:
+> +			dist->implementation_rev = reg;
+> +			return 0;
+>  		case KVM_VGIC_IMP_REV_2:
+>  		case KVM_VGIC_IMP_REV_3:
+>  			vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
 
-perf bench mem memset -k 1GB -f default -s 16GB
+nit: move the v1 handling down with a fallthrough in v2/v3 so that we
+don't duplicate the basic handling:
 
-I tried it on QEMU, no real benefits with either the previous or this
-patch, and no regressions either. (x86 passes -f x86-64-stosq
-which are some optimized memset instructions)
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+index 406845b3117cf..34f8b2b615fc5 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+@@ -96,6 +96,8 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+ 		case KVM_VGIC_IMP_REV_2:
+ 		case KVM_VGIC_IMP_REV_3:
+ 			vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
++			fallthrough;
++		case KVM_VGIC_IMP_REV_1:
+ 			dist->implementation_rev = reg;
+ 			return 0;
+ 		default:
 
-Yours,
-Linus Walleij
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> index 5913a20d8301..0130db71cfc9 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -74,8 +74,11 @@ bool vgic_supports_direct_sgis(struct kvm *kvm)
+>  /*
+>   * The Revision field in the IIDR have the following meanings:
+>   *
+> + * Revision 1: Interrupt groups are not guest-configurable.
+> + * 	       IGROUPR reads as all-ones (group 1), writes ignored.
+>   * Revision 2: Interrupt groups are guest-configurable and signaled using
+>   * 	       their configured groups.
+> + * Revision 3: GICR_CTLR.{IR,CES} are advertised.
+>   */
+>  
+>  static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+> @@ -196,6 +199,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+>  
+>  		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, val);
+>  		switch (reg) {
+> +		case KVM_VGIC_IMP_REV_1:
+>  		case KVM_VGIC_IMP_REV_2:
+>  		case KVM_VGIC_IMP_REV_3:
+>  			dist->implementation_rev = reg;
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+> index a573b1f0c6cb..9eb95f13b9b6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> @@ -48,6 +48,17 @@ unsigned long vgic_mmio_read_group(struct kvm_vcpu *vcpu,
+>  	u32 value = 0;
+>  	int i;
+>  
+> +	/*
+> +	 * Revision 1 and below: groups are not guest-configurable.
+> +	 * GICv2 reports all interrupts as group 0 (RAZ).
+> +	 * GICv3 reports all interrupts as group 1 (RAO).
+> +	 */
+> +	if (vgic_get_implementation_rev(vcpu) < KVM_VGIC_IMP_REV_2) {
+> +		if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> +			return -1UL;
+
+Hmmm... This can only be a 32bit access, so returning non-zero bits in
+the top half is weird. It will be narrowed down before hitting the
+guest, but still. Anyway, see below.
+
+> +		return 0;
+> +	}
+> +
+
+Why is this needed at all? The group reset values are already the
+expected ones for v1, and as long as we prevent writes, the reported
+group configuration will be as expected.
+
+>  	/* Loop over all IRQs affected by this read */
+>  	for (i = 0; i < len * 8; i++) {
+>  		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
+> @@ -73,6 +84,10 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
+>  	int i;
+>  	unsigned long flags;
+>  
+> +	/* Revision 1 and below: groups are not guest-configurable. */
+> +	if (vgic_get_implementation_rev(vcpu) < KVM_VGIC_IMP_REV_2)
+> +		return;
+> +
+>  	for (i = 0; i < len * 8; i++) {
+>  		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
+>  
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index f2eafc65bbf4..90fb6cd3c91c 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -248,6 +248,7 @@ struct vgic_dist {
+>  
+>  	/* Implementation revision as reported in the GICD_IIDR */
+>  	u32			implementation_rev;
+> +#define KVM_VGIC_IMP_REV_1	1 /* GICv2 interrupts as group 0 */
+>  #define KVM_VGIC_IMP_REV_2	2 /* GICv2 restorable groups */
+>  #define KVM_VGIC_IMP_REV_3	3 /* GICv3 GICR_CTLR.{IW,CES,RWP} */
+>  #define KVM_VGIC_IMP_REV_LATEST	KVM_VGIC_IMP_REV_3
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
