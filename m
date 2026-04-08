@@ -1,37 +1,37 @@
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86532391505;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667B439185E;
 	Wed,  8 Apr 2026 20:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775679976; cv=none; b=nZfiWgsRCHq6EkxfxvC2dCKP8WRpwBm22JGzV8ecD0NDJK6Ea/436RLOabGj1LoEfyTVJHrK1+IvJRh93yBTNqlK+rckdQGQpGIuwnHZx1kfNsK1KnpA/RL2azQOflVoYyOS/3AzAEvTAXEdIzgYjx/GiBAE6iAFrUl14XvTu1M=
+	t=1775679976; cv=none; b=Bh5wgjNlpG55zfca15xUl5Sr/MsBTxjSo2EfxX5AY7J8gC/CpO0ArcHsax3dm48Tgn7UGPLenTokYGQEkFm7Kd1J6zM/Elmv6CoIV0I2z4n5I2svnrbI0snuEAZkiYbG1WfG5mRt/Hpn8h/9aPzwv03quCPR5dmdFiq87zIDghY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775679976; c=relaxed/simple;
-	bh=jt95EpgQlwvn140i8uzvf32sS76tCpuf6c/S67u/ajQ=;
+	bh=bXbJGr21j8KIwFiiL1c7noDATobXMBaxoPNt/uKIZss=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UAZya7LHiqmcaQlePC8suTuy0ildDSljVVxaov6VomzX7LFCKWS2RF3ylSJAbi5whGxvJhLdlkYntouvsM2JwvpEQ2IrH1DDifiTP5gRkfBjPsQaKfBl6YJT2GrQiV3Lowm24iXg9yp2GrCYJcuS3mc9juMzwu4Ct/TXNwHP4zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EnW7yCGQ; arc=none smtp.client-ip=90.155.92.199
+	 MIME-Version; b=TwU49Dv4yNqA+n2zaCrnuE41mic0VuWE7e3+Eu10OxDkH3ETIiSHBLj1qw8v3/Ij91QABYZodx0d9defd0LDSwsNEvJpocSylq3yRpXkCqIMzzJPuEtYJJU0uZbNt3/4k/bA9Dy8q22R+GjtGHlJwDDvwCsGy7QcvNs0n03YrDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ss9zO2y8; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EnW7yCGQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ss9zO2y8"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
 	Cc:Content-Type:Content-ID:Content-Description;
-	bh=xT3HNXt0q205SHvVfxbeqCwBMz/Vdt7pmnVCLCDcy+k=; b=EnW7yCGQnOBfrXthwZ22O5s79+
-	rKKQibCVwjLY5k66FDxgDxYbpmR/O8hl+z+k9Mp+RsTVXile9JV0/MEW+uopybVNP4jfiVS5f1fkR
-	Oxp2Aia1lv+h/sOPHwT8cbKc/4CseX5A2AqM0PNToR1FEgy/p0oZtr98hwfD1fpz+6BiePKuQJBAl
-	tfdB11GZKWt4a5hTkRVj8xnzHvViW4L0NLD+dVHg/WNWBtAiJXKSqwM1MdrUTzsYl4vDzpL2LosXo
-	dPFkLeIV70Ksp2dJCzqqLR3wlj+Q3wbdDlQu3bOuCJO5UWfyRylLnhJdww1fs7d1Y7WVWQQ0udUm9
-	J119SUGA==;
+	bh=3Lvrg7160Z/M4I9yntFStuMcz07DFNixV35Czjmg9PY=; b=Ss9zO2y8itQqB5aAS2t5XVa9gf
+	NFByKDydRED4g2SIhty7U6tV4noYsN32/Xxc4T0Y1Z6H8PudH0+stXT9hiWu2mdlBp9fGZU85exWs
+	uQvNhmVg/BSDU+x9/gNpCtww5qYMIGLRZC/70oHlwyA4dQWG+JYQl5rSlBYpxYVsqvd8DEyxmeHrl
+	uDxHlYGeoX3gnSXWXbIa8kX/oRrckIg5W0kBRny6u4mK9HxGxT1Z3NGGcgnHReePl+9tllZaLA9bZ
+	vrViupqrA6/TorPZj4cckih1sU3daetVlt+gTi/hNBXFyg8MFVzy5AsxKhIarlasV9FNeGSsqktw7
+	9cgiGidg==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wAZTM-0000000AmLw-2H9h;
+	id 1wAZTM-0000000AmLv-2Gk8;
 	Wed, 08 Apr 2026 20:26:00 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wAZTL-00000008oxS-0geV;
+	id 1wAZTL-00000008oxO-0Ta1;
 	Wed, 08 Apr 2026 21:25:59 +0100
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
@@ -53,9 +53,9 @@ To: Paolo Bonzini <pbonzini@redhat.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH 2/2] KVM: arm64: selftests: Add KVM_CAP_ARM_DISABLE_EXITS UAPI test
-Date: Wed,  8 Apr 2026 21:23:48 +0100
-Message-ID: <20260408202557.2102476-3-dwmw2@infradead.org>
+Subject: [PATCH 1/2] KVM: arm64: Add KVM_CAP_ARM_DISABLE_EXITS for WFI/WFE passthrough
+Date: Wed,  8 Apr 2026 21:23:47 +0100
+Message-ID: <20260408202557.2102476-2-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260408202557.2102476-1-dwmw2@infradead.org>
 References: <20260408202557.2102476-1-dwmw2@infradead.org>
@@ -71,84 +71,160 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Test the KVM_CAP_ARM_DISABLE_EXITS capability interface:
- - KVM_CHECK_EXTENSION reports KVM_ARM_DISABLE_EXITS_WFI
- - KVM_ENABLE_CAP succeeds with valid flags (WFI, zero)
- - KVM_ENABLE_CAP fails with EINVAL for unknown flags
+Add a per-VM capability to allow userspace to disable WFI and/or WFE
+trapping, modelled after x86's KVM_CAP_X86_DISABLE_EXITS. When the
+corresponding flag is set, the trap is unconditionally cleared
+regardless of the global kvm-arm.wf{i,e}_trap_policy setting.
+
+The existing kernel command line parameters provide a system-wide
+override, but a per-VM capability allows the VMM to make the decision
+per guest.
+
+This is useful for hypervisors running a combination of dedicated
+pinned vCPUs which want to avoid the cost of trapping WFI/WFE, as
+well as overcommitted floating instances where it is necessary.
+
+As with the x86 equivalent, KVM_CHECK_EXTENSION returns the bitmask of
+supported exit disables.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../selftests/kvm/arm64/disable_exits.c       | 48 +++++++++++++++++++
- 2 files changed, 49 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/disable_exits.c
+ Documentation/virt/kvm/api.rst    | 28 ++++++++++++++++++++++++++++
+ arch/arm64/include/asm/kvm_host.h |  4 ++++
+ arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
+ include/uapi/linux/kvm.h          |  6 ++++++
+ 4 files changed, 58 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 878d7cb92555..d8e7ff122445 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -179,6 +179,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
- TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
- TEST_GEN_PROGS_arm64 += arm64/vgic_group_iidr
- TEST_GEN_PROGS_arm64 += arm64/vgic_group_v2
-+TEST_GEN_PROGS_arm64 += arm64/disable_exits
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
- TEST_GEN_PROGS_arm64 += arm64/idreg-idst
-diff --git a/tools/testing/selftests/kvm/arm64/disable_exits.c b/tools/testing/selftests/kvm/arm64/disable_exits.c
-new file mode 100644
-index 000000000000..27fe6c9297b2
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/disable_exits.c
-@@ -0,0 +1,48 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * disable_exits.c - Test KVM_CAP_ARM_DISABLE_EXITS UAPI
-+ *
-+ * Verify that KVM_CHECK_EXTENSION reports the valid exit disable mask
-+ * and that KVM_ENABLE_CAP accepts valid flags and rejects invalid ones.
-+ */
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 032516783e96..e3b3bd9edeec 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8902,6 +8902,34 @@ helpful if user space wants to emulate instructions which are not
+ This capability can be enabled dynamically even if VCPUs were already
+ created and are running.
+ 
++7.47 KVM_CAP_ARM_DISABLE_EXITS
++------------------------------
 +
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	int r;
++:Architecture: arm64
++:Target: VM
++:Parameters: args[0] is a bitmask of exits to disable
++:Returns: 0 on success, -EINVAL if unsupported bits are set.
 +
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_DISABLE_EXITS));
++Valid bits in args[0]:
 +
-+	r = kvm_check_cap(KVM_CAP_ARM_DISABLE_EXITS);
-+	TEST_ASSERT(r & KVM_ARM_DISABLE_EXITS_WFI,
-+		    "KVM_CHECK_EXTENSION should report WFI: got 0x%x", r);
-+	TEST_ASSERT(r & KVM_ARM_DISABLE_EXITS_WFE,
-+		    "KVM_CHECK_EXTENSION should report WFE: got 0x%x", r);
++ - ``KVM_ARM_DISABLE_EXITS_WFI``: Disable trapping of WFI (Wait For
++   Interrupt) instructions. The guest WFI will execute natively instead
++   of causing a VM exit.
 +
-+	vm = vm_create(1);
++ - ``KVM_ARM_DISABLE_EXITS_WFE``: Disable trapping of WFE (Wait For
++   Event) instructions. The guest WFE will execute natively instead of
++   causing a VM exit.
 +
-+	/* Valid: disable WFI trapping */
-+	vm_enable_cap(vm, KVM_CAP_ARM_DISABLE_EXITS, KVM_ARM_DISABLE_EXITS_WFI);
++When a bit is set, the corresponding trap is unconditionally cleared for
++all vCPUs in the VM, overriding the system-wide ``kvm-arm.wfi_trap_policy``
++and ``kvm-arm.wfe_trap_policy`` kernel parameters.
 +
-+	/* Valid: disable WFE trapping */
-+	vm_enable_cap(vm, KVM_CAP_ARM_DISABLE_EXITS, KVM_ARM_DISABLE_EXITS_WFE);
++Disabling exits is a one-way operation: once an exit type is disabled for
++a VM, it cannot be re-enabled. Calling this ioctl with args[0] = 0 is a
++no-op.
 +
-+	/* Valid: disable both */
-+	vm_enable_cap(vm, KVM_CAP_ARM_DISABLE_EXITS,
-+		      KVM_ARM_DISABLE_EXITS_WFI | KVM_ARM_DISABLE_EXITS_WFE);
++``KVM_CHECK_EXTENSION`` returns the bitmask of exits that can be disabled.
 +
-+	/* Valid: no exits disabled (no-op) */
-+	vm_enable_cap(vm, KVM_CAP_ARM_DISABLE_EXITS, 0);
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 70cb9cfd760a..a1bb025c641f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -312,6 +312,10 @@ struct kvm_arch {
+ 	size_t nested_mmus_size;
+ 	int nested_mmus_next;
+ 
++	/* Per-VM WFI trap override; set via KVM_CAP_ARM_DISABLE_EXITS */
++	bool wfi_in_guest;
++	bool wfe_in_guest;
 +
-+	/* Invalid: unknown bit set */
-+	r = __vm_enable_cap(vm, KVM_CAP_ARM_DISABLE_EXITS, 1ULL << 31);
-+	TEST_ASSERT(r == -1 && errno == EINVAL,
-+		    "Unknown flags should fail with EINVAL: got %d errno %d",
-+		    r, errno);
+ 	/* Interrupt controller */
+ 	struct vgic_dist	vgic;
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 410ffd41fd73..326a99fea753 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -178,6 +178,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
++	case KVM_CAP_ARM_DISABLE_EXITS:
++		if (cap->args[0] & ~KVM_ARM_DISABLE_VALID_EXITS) {
++			r = -EINVAL;
++			break;
++		}
++		if (cap->args[0] & KVM_ARM_DISABLE_EXITS_WFI)
++			kvm->arch.wfi_in_guest = true;
++		if (cap->args[0] & KVM_ARM_DISABLE_EXITS_WFE)
++			kvm->arch.wfe_in_guest = true;
++		r = 0;
++		break;
+ 	case KVM_CAP_ARM_SEA_TO_USER:
+ 		r = 0;
+ 		set_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags);
+@@ -379,6 +390,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_SEA_TO_USER:
+ 		r = 1;
+ 		break;
++	case KVM_CAP_ARM_DISABLE_EXITS:
++		r = KVM_ARM_DISABLE_VALID_EXITS;
++		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+ 		return KVM_GUESTDBG_VALID_MASK;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+@@ -610,6 +624,9 @@ static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
+ 
+ static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
+ {
++	if (vcpu->kvm->arch.wfi_in_guest)
++		return true;
 +
-+	kvm_vm_free(vm);
-+	return 0;
-+}
+ 	if (unlikely(kvm_wfi_trap_policy != KVM_WFX_NOTRAP_SINGLE_TASK))
+ 		return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
+ 
+@@ -621,6 +638,9 @@ static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
+ 
+ static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
+ {
++	if (vcpu->kvm->arch.wfe_in_guest)
++		return true;
++
+ 	if (unlikely(kvm_wfe_trap_policy != KVM_WFX_NOTRAP_SINGLE_TASK))
+ 		return kvm_wfe_trap_policy == KVM_WFX_NOTRAP;
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 80364d4dbebb..694cf699ed0a 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -669,6 +669,11 @@ struct kvm_ioeventfd {
+ #define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
+ #define KVM_X86_DISABLE_EXITS_APERFMPERF     (1 << 4)
+ 
++#define KVM_ARM_DISABLE_EXITS_WFI            (1 << 0)
++#define KVM_ARM_DISABLE_EXITS_WFE            (1 << 1)
++#define KVM_ARM_DISABLE_VALID_EXITS          (KVM_ARM_DISABLE_EXITS_WFI | \
++					      KVM_ARM_DISABLE_EXITS_WFE)
++
+ /* for KVM_ENABLE_CAP */
+ struct kvm_enable_cap {
+ 	/* in */
+@@ -989,6 +994,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_ARM_SEA_TO_USER 245
+ #define KVM_CAP_S390_USER_OPEREXEC 246
+ #define KVM_CAP_S390_KEYOP 247
++#define KVM_CAP_ARM_DISABLE_EXITS 248
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
 -- 
 2.51.0
 
