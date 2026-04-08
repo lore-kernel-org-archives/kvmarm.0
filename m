@@ -1,180 +1,114 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB3137F756;
-	Wed,  8 Apr 2026 11:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504991F4631
+	for <kvmarm@lists.linux.dev>; Wed,  8 Apr 2026 11:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775647992; cv=none; b=aqwK3NG4w85DR8g4qaOAOt5U2yk4WnHf0jimX88f5PhCKX2C1kbym0bsrAozmQd//KqdVAqpusAaf0PXcfVSDu1dPsbz6o3srGjHTm5cfh44CBSk6Cz5QOXMEpTnc8DdtYEwf0UJ2l0DnfgTj36PGvpd0OA87tQBIzAZdAZdkb4=
+	t=1775648484; cv=none; b=fEVIenz31MLGIzLJPWykpCdMBdDPXhyAFBNLs3DKm61ut/ywY0YT+BT3gXSsvKUx8sIhsBgimb00b7lrEn1+hEp84bmt51qujJGNBYUPXruJmeLPzkYJhkZP9WGbLoTLUG65ESw3oih4l4iPTPZkHtAwV+gwBvnNlS7kGMsnpjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775647992; c=relaxed/simple;
-	bh=UB7cLBYqceVznXKOfj0+CXRY3qoVhyFhBa9zIpOB3fA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ogF7MSuuT2ZocCTv4HBdIcRYDfv5DrnDzVuxp7ODCfcNlVvfIehZzAqf6Cf6rMddOTkbntvtdsW0IoeJEvknt71FvwkV8Ct+lJqFvqfTu4EEo7TcNnG+1OC9Wbl1FDDxUhj92HX7VazQe5bFJ4TBAvvMUZVOzvZEB13gp2eiPVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Uzlv0WHM; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+	s=arc-20240116; t=1775648484; c=relaxed/simple;
+	bh=wDN0o6SnYLRFaxiDTPa8nOZbqq7GIdl3+BY3KzI+85c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=A2OUpPCPofMm4U2IWe9+47vaS0Bdz4q4X9JfwH3pqNG7xViSAGTsvR3X7Q68AtQw75oEcqANFYW0i/xxyITrDInY8HgjzhwRoaT87Ce8yryaOPVrTAd+vaScifYQ7H2Af7+Y8paL486fVsY8gSWwXFJD9konJJlG0oN0Te3jeFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lO93YpYO; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Uzlv0WHM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
-	Cc:Content-Type:Content-ID:Content-Description;
-	bh=H3hFAFNcslxpDg/Ul/EXFDtViLZPEKgFNWJWexTFvTs=; b=Uzlv0WHMQeMPAolhX7GOLp61L8
-	tzrAwwklgCiomobfcC9Nm8i2lGEknMyZCNCe7KGOCNjxQkVocOQvdTC7cFA2PHA9gRjJm9JRu5A6t
-	MugVEeE6lD2hTlmTZhvhQubMTHqmPsPMXY07OO2CuH6YFrsburzebjfIX0sCpLlfEk28POsL++yNa
-	4iXgRaO7uEBx+0MwFoQgr0DWB8CUxW+Kx+jdYC/7XbnY2ff2dZ4QRpqs/ALbEQHxUAafQ/AWqsN30
-	EycDYQVvSFAwNLg3RpZSv5hOYp0vnmbhjyQ6XZqZD5lOJCFfQa9XvRhJX9ymxcQwxbEghSPaERpeJ
-	KGDoOcVA==;
-Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wAR9V-00000005Ieq-2izT;
-	Wed, 08 Apr 2026 11:32:57 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wAR9V-00000008nA3-1PDi;
-	Wed, 08 Apr 2026 12:32:57 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Kees Cook <kees@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 2/5] KVM: arm64: vgic: Allow userspace to set IIDR revision 1
-Date: Wed,  8 Apr 2026 12:30:33 +0100
-Message-ID: <20260408113256.2095505-3-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260408113256.2095505-1-dwmw2@infradead.org>
-References: <20260408113256.2095505-1-dwmw2@infradead.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lO93YpYO"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-43b9a86b9b0so7559058f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 08 Apr 2026 04:41:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775648482; x=1776253282; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cFVZM51ujgYl6062hVS6iRzVSZQWxsJgdzphCGIB/gw=;
+        b=lO93YpYOrx1E9hQvCQxkCilvFipM28FtjyicVa8KTB3+jMGUvcUXyujz5jEtxAhyO+
+         F03hBuT00FO0fOuwd8FulBuk2I4cuPAsrN5aLqSYOwy9NEljWP/MUDeB+fRNGEBEb2xy
+         /Zvv2ELde/I03RKsmCly08oxKUv2K8haGtut/oBsaDUFHSzTD9wzAAVAwJpvs6NLASU8
+         zF1zPWaGp0Cuh/eabR5nNgBq101ok1k1qi/tSx85D43pGZo+cRJ0TnBdqKI/NAPQSWXg
+         88J0hNIMyatxZD5Dq82zRt5MG8vpUeitk3sGfJUp7hDg8HRmHV+r0nOEPwBFwTQdXR/U
+         ixqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775648482; x=1776253282;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cFVZM51ujgYl6062hVS6iRzVSZQWxsJgdzphCGIB/gw=;
+        b=hXKn7wZOvdbdbFDTFMKzb3i7m2VpfxiTf1rE9Fzt93vRZKqCnG3GtGqLinm3Uow96m
+         wteyFf4WTpTS5Ue0SeLQ0LkOqRzrb1QqbUOZ1OIXarWS6hCRiuOEt9RymGkcHCEclcTm
+         FnXdOdqgJvy0EK1hzz10dS0+e3eVJiHUgXsLLej08usMmyMMdW0cOMl2nP6T5Uk+jWYF
+         HtO5XEZfV4+5SPBhpAK5WZMwNmfqlMA/SlSxjdtoHIlPF0Rou8mANx9ZtlcOaLXsSn1K
+         o7nK0QzZCDSWM/vNce45KpHqJba0V42KHsE2MPTvbxL1HWQpLj+pP0t8xWLJbq9I/hMp
+         P+9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUyk/Gxu+H5p+mYtIVwxtzSOoXQfAy5QXT47JS5cFKIUkVEeqE49Xa/fXXFmdMo/M817ZNBEnY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzGgxt7xzToAxru0XAwBC+kOnT6K0puQ+X2mgHBRwwrC+SgWnYo
+	vTi76sUsHa/4XucSzoxqs3V6RlJ/M3g2sagLSyFl6zcA31uq2SJ6KBeE1Z5fA+rQ6cHjB9Jy+Ju
+	vLpjaX+bRHNLBJfqFyBCYZsJD/pjt6w==
+X-Received: from wrbdf4.prod.google.com ([2002:a5d:5b84:0:b0:43b:4e28:2766])
+ (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:4ec7:b0:488:9439:880d with SMTP id 5b1f17b1804b1-488997eb933mr275574805e9.29.1775648481567;
+ Wed, 08 Apr 2026 04:41:21 -0700 (PDT)
+Date: Wed,  8 Apr 2026 11:41:18 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260408114118.422604-1-sebastianene@google.com>
+Subject: [PATCH v2] KVM: arm64: Reject non compliant SMCCC function calls in pKVM
+From: Sebastian Ene <sebastianene@google.com>
+To: catalin.marinas@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	android-kvm@google.com
+Cc: joey.gouly@arm.com, korneld@google.com, maz@kernel.org, 
+	mrigendra.chaubey@gmail.com, oupton@kernel.org, perlarsen@google.com, 
+	sebastianene@google.com, suzuki.poulose@arm.com, will@kernel.org, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+Prevent the propagation of a function-id that has the top bits set since
+this is not compliant with the SMCCC spec and can overlap with the
+already known function-id decoders. (eg. if we invoke an smc with
+0xffffffffc4000012 it will be decoded as a PSCI reset call). Instead,
+make it clear that we don't support it and return an error.
 
-Allow userspace to select GICD_IIDR revision 1, which restores the
-original pre-d53c2c29ae0d ("KVM: arm/arm64: vgic: Allow configuration
-of interrupt groups") behaviour where interrupt groups are not
-guest-configurable.
-
-When revision 1 is selected:
- - GICv2: IGROUPR reads as zero (group 0), writes are ignored
- - GICv3: IGROUPR reads as all-ones (group 1), writes are ignored
- - v2_groups_user_writable is not set
-
-This is implemented by checking the implementation revision in
-vgic_mmio_write_group() and suppressing writes when the revision is
-below 2. The read side needs no change since the per-IRQ group reset
-values already match the expected behaviour.
-
-Note that d53c2c29ae0d wired guest IGROUPR writes directly to
-vgic_mmio_write_group() without any revision check, while only gating
-the userspace write path via v2_groups_user_writable. This meant a
-guest could modify interrupt groups even at revision 1, which was
-never intended. The write_group revision check fixes both the guest
-and GICv3 userspace paths.
-
-Fixes: d53c2c29ae0d ("KVM: arm/arm64: vgic: Allow configuration of interrupt groups")
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-mmio-v2.c | 3 +++
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 4 ++++
- arch/arm64/kvm/vgic/vgic-mmio.c    | 4 ++++
- include/kvm/arm_vgic.h             | 1 +
- 4 files changed, 12 insertions(+)
+NOTE: This is based on linux-next, next-20260407 to avoid a minor
+conflict with a previously submitted patch (commit cf6348af645b).  
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index 0643e333db35..e5714f7fd2ec 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -20,6 +20,7 @@
-  * Revision 1: Report GICv2 interrupts as group 0 instead of group 1
-  * Revision 2: Interrupt groups are guest-configurable and signaled using
-  * 	       their configured groups.
-+ * Revision 3: GICv2 behaviour is unchanged from revision 2.
-  */
+Changelog:
+
+v1 -> v2:
+* dropped the changes to the function signature that were accepting
+  64-bit function-ids.
+* applied Mark's suggestion to make it clear that we don't accept non
+  standard SMCCC calls.
+* revised commit message & updated the title.
+
+Link to v1: 
+https://lore.kernel.org/all/20260401123201.389906-1-sebastianene@google.com/
+
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 73f2e0221e70..cca4b07c8d61 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -805,6 +805,10 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+ 	}
  
- static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
-@@ -96,6 +97,8 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
- 		case KVM_VGIC_IMP_REV_2:
- 		case KVM_VGIC_IMP_REV_3:
- 			vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
-+			fallthrough;
-+		case KVM_VGIC_IMP_REV_1:
- 			dist->implementation_rev = reg;
- 			return 0;
- 		default:
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 5913a20d8301..0130db71cfc9 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -74,8 +74,11 @@ bool vgic_supports_direct_sgis(struct kvm *kvm)
- /*
-  * The Revision field in the IIDR have the following meanings:
-  *
-+ * Revision 1: Interrupt groups are not guest-configurable.
-+ * 	       IGROUPR reads as all-ones (group 1), writes ignored.
-  * Revision 2: Interrupt groups are guest-configurable and signaled using
-  * 	       their configured groups.
-+ * Revision 3: GICR_CTLR.{IR,CES} are advertised.
-  */
+ 	func_id &= ~ARM_SMCCC_CALL_HINTS;
++	if (upper_32_bits(func_id)) {
++		cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
++		goto exit_skip_instr;
++	}
  
- static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
-@@ -196,6 +199,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
- 
- 		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, val);
- 		switch (reg) {
-+		case KVM_VGIC_IMP_REV_1:
- 		case KVM_VGIC_IMP_REV_2:
- 		case KVM_VGIC_IMP_REV_3:
- 			dist->implementation_rev = reg;
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index a573b1f0c6cb..4fbe0ad22adf 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -73,6 +73,10 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
- 	int i;
- 	unsigned long flags;
- 
-+	/* Revision 1 and below: groups are not guest-configurable. */
-+	if (vgic_get_implementation_rev(vcpu) < KVM_VGIC_IMP_REV_2)
-+		return;
-+
- 	for (i = 0; i < len * 8; i++) {
- 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index f2eafc65bbf4..90fb6cd3c91c 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -248,6 +248,7 @@ struct vgic_dist {
- 
- 	/* Implementation revision as reported in the GICD_IIDR */
- 	u32			implementation_rev;
-+#define KVM_VGIC_IMP_REV_1	1 /* GICv2 interrupts as group 0 */
- #define KVM_VGIC_IMP_REV_2	2 /* GICv2 restorable groups */
- #define KVM_VGIC_IMP_REV_3	3 /* GICv3 GICR_CTLR.{IW,CES,RWP} */
- #define KVM_VGIC_IMP_REV_LATEST	KVM_VGIC_IMP_REV_3
+ 	handled = kvm_host_psci_handler(host_ctxt, func_id);
+ 	if (!handled)
 -- 
-2.51.0
+2.53.0.1213.gd9a14994de-goog
 
