@@ -1,276 +1,239 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E8C3D1713
-	for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 16:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775839477; cv=pass; b=e1GrYaL6Z9iVFEVxORhTE7id12YllPw71yF+xtUvOpC7EbW8W3oz5Vd0Kc5UYdhQ0w9EKqLbKV2awsT2cBpifPd6PBvn21oe4kPsRYst7+R0MwSbIGerUKU+5lgfXiqb0h30AaKlv8bohYCLqWRna4FmV36qb01N1AYy7SB/Hi0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775839477; c=relaxed/simple;
-	bh=gnf5NPxuSAFSVzPdp7lnXic9XSxNa7id9N4QGb7x2ew=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBCB2F90C9
+	for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 19:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775850970; cv=none; b=W7dr0E9Xv7VoKyoYBA7MobDAqUEmVl9+fiA9Nj+2R6i6uEzzA+e2pbCzN5cyaKN1VvTFfS/pj05DWplDDeP2ftJr0qFN6HsJfGCKk6jYcu9/mt6JIJWVUFSn//ugIo48K6cTm2RV/34L/HqVdF7mxggGIYtXL36cppJhWmGXq54=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775850970; c=relaxed/simple;
+	bh=J0+sK84ErorCVePEnHFFFb37BgkU1ZRXvWCpuLHsgvM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SkgitdV9jJg36JP1AO/PJsAdgfqXE53DZIy748ju5iNL+uSpa6oIF9ViAh4JjOvHUmkT7d4Tpsd9NUHjxWakcfA3wmkDjzWfHX7J4e02d7/O5XF8kfeWY7QLduF42HeTpr/OPeBT02TJPu3xN9HOydldZYnuA/RAag4oU1GQ9m4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DRYPi2b3; arc=pass smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=H7KuJhNBZ+j58GH41LoAfo/pFADaAeIB1J5xPp4ZQARdvdVmksef1efprJ8U+VSHMJR36URQsYoAHg5FNVh+QcOXmA7/nI/WsV3Z8AII/cT8fhG+/Eg6sdzjf4BhStRRad53oxLeMCy54OHI5fWyrSnOLw0Uo4GWE3I/HwJStxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHo2CDvE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DRYPi2b3"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5a1307438ddso2298708e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 09:44:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775839474; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ICu/KmaukO+1TBBRt7xRxckKSlIk/2RBVmFfmbSaSSUQtriqgbBoTgLoSdj6q9Bvik
-         UvkhwHkIkFGmy+QvLFWol/r2ojjFc9N3KsVuiEoPQxradXCK+UtjqwpaOifNSCLPCsN+
-         tunWNQyPnkB8IRoiN9P1iI5bIsRCWCK01YfpC1K5U7xYZkLspMAz32tNu5A4DgQv2kiK
-         OxZfpCQ2QbZZvR0SlmKrodlicP5ZpRSSC+xnXCY6HARpNm8PfdF22VJIDvuPiL5sDbNX
-         dCK79Rcmtiui9OGeBxpA2nmm+cMHCZZqJhf42Rcenz1VcmgACyJiYcFi2/58mhjnKXUj
-         YWxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WcTLAwAR7HgTYbmWEjTt5Ig3K5spnM3eEDD+cYxVPDA=;
-        fh=xz68SuL5x10pPulTjZJsrfT19kvPqohRGSydAJz3d8I=;
-        b=llERbWSSGgxmLMZX/fT1/AJFmvUzBbi7FQhth1GYCnvpGpsRd78xynMT0gJL4q0d1B
-         AIr9khpXJkyT8ZSoHK+l3fOt1L3dJa2BT0hX7XLPM/9c83V7oyQgKv+BfhCkKWC57SY3
-         crrv1OqGaqdUHMOmXOZfnfLmpttNyEloDYReyP8y5ddDJO1Vtk+luRDOAOmlhqhm7ttE
-         WDqNo6tsohmDYS+fyKiwtdK6k2OAJNgrUbV/RNGfp/195bcPJGEMncO+zB+YR2o2JV9X
-         VynSSATy4o5ftwZTLq+ut95zNyVn+MVV1VPUSz2ot/fvWtbkRy8FkCG/yrZhY3Og3sOY
-         df6w==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775839474; x=1776444274; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WcTLAwAR7HgTYbmWEjTt5Ig3K5spnM3eEDD+cYxVPDA=;
-        b=DRYPi2b3QeqELua6HWIJ7Bd/Lje2DNpVbesEgL7wNFZo8Ug1remGRIio9x4JVgvSws
-         QIvMsyvjQ4YTDzXnd0N6T2ktTwZWpypzk8qJ9/NDf3KnJdlnx4ZkRx6G3GRahcQ/juzl
-         kvFaTIQ+uc/eCjV0pm9xWkDsISwFhA+YkCR4fIdoZ85C29XbEjcMRJoRgSnx5Q/A7mTu
-         I8iW8pLsX93jH+6WwQ5pWsPnOyBpJDJEGWO50cg5zh7Y16MjalHOmGw62sYIBKI4mBpL
-         wbwTEiuIdoLSLJfNaIx8dJZCSW70axh1wadV9uRoRaS0DlmwzhGA4F2rur/hyavTW8jS
-         OCLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775839474; x=1776444274;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WcTLAwAR7HgTYbmWEjTt5Ig3K5spnM3eEDD+cYxVPDA=;
-        b=r/xGWf7HopxmmVp6UewrVor6WjM/NNw2kojwyZunZshGpQLBg9bEYnlIKNSQfzTcku
-         ZW00Q/dYWm2qxhowYgiiGcjeIfFMRsFTxucO4VcsCROmdS3LcvqB8MLwPNVqFbIlNuJ5
-         gBtjE2RiHX+1AvFTSljLSXFa6igIlrl0trz0AB8vn4YR2dNkpAUsGso21CA7hHCRuvFW
-         CTJjSlrqhCjA2MpXd3mSiSbMtOibG5B7G9u5m6zlUnwrBzUmd+NULnUs1KeXNQkZjHFh
-         oq2NO6vw1V7Idw2CgVrseyCoxfYKgWPSqeJNvGkeswpHbnE+AXPG5i84yT26KblEzjrH
-         9iDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXlmyAW5ZkvXFhYn7w5TRw0/ztEMplVCUpV87gjMoBWUVakPkY3YRE/DHjrt3NnhSPAZLa+DII=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxXR2wzqwdGizGsEtSZIxFIw/KF6Bm/IG4xK2VlNephOiCrNdGe
-	ubKUoYoLarVV7l3H7aM6ZJmnUqq5tUZVhPY76Xbry89qY/rhCsj8H3JB895l8LTwhJZAuHy8fZl
-	nGBFD6h8E1r/TweJC0qX+8knZ3kvSO2vnCXwq32DK
-X-Gm-Gg: AeBDiet4i5rKi1pesqxxnOTaNf7QaYS9Ick2H+oy9cM2WtZf8atYCwlHSEOL/GxFweE
-	OKQIARwVZwqrXED+NKcjIamwM14+AaLF6Br2lsatD4a/hzeuoaL0huhDHIOOwe+fdJsLZKL+9z/
-	A6LuOUkOHFGxq9gKnHf9MF39WW4Zr2oz0vrcCiFllLqvFHzlX49m3vgF3DknD9DKMc7W2loCUUW
-	5xtOxQKrml8J/AbVkxiMvl28SxADwY6OUd16yImPQHFWfbYmvrIiGcD9+/i1SmKOvvvceQd6r69
-	ySFjSwq2pdTDI7QPD7vHfAeTOwVikYVBLA+dS8aadewXyfiONbQ=
-X-Received: by 2002:a05:6512:39c6:b0:5a3:cc81:efdb with SMTP id
- 2adb3069b0e04-5a3efb8ba02mr1104456e87.21.1775839473752; Fri, 10 Apr 2026
- 09:44:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHo2CDvE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF123C19424
+	for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 19:56:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775850969;
+	bh=J0+sK84ErorCVePEnHFFFb37BgkU1ZRXvWCpuLHsgvM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CHo2CDvEDJ9Wj2N1sKK31epsC08zCEBjdeXDTusPmXw1yl2botjxwYxIY8CRgYnD5
+	 9Q9PlEg+1n3yt7BrrQAirnlq59pbWIOzuFXzIT1jSAwMp63w+6GKoKBC3GWYx88Aap
+	 wzLxor8Wlcfw4QaZpqph87BeiNprI2NAJPP6/MHzYDksikWPjqaMsDTG1lfz8dbFWH
+	 51UfqKsd28sDcwTbti+aGsfcyUwiL49lLiHHwZx7dkdawLpZQZqkYqjGiTGUw5XRVu
+	 +Zzq3spa/ugvIlJChYsNApJSPGwCBr5HT72G+87X5iAnq9bPLZAecTd9J1l6cB1Y3s
+	 zytfYCiRp7RsQ==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-670af4fc2f1so1099705a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 12:56:09 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXy6FRBWuvl1IfkDpj+qIn2Qfw8gUb8aMw5H4M2z4VW2HSLM8z2BUJ5A7h03bfyvpW7cJZJlTc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzLNg4Dny2dcZlQ6AoQOtjStKzhKKRHEVw/OFZq8GsFtKuyRlss
+	TtPCN6hGsp+kadbAsJ5RGN97Ur2yWbGDvfldhRpemGV7c5EsdTc22WJZMu+Tmjmp0QXVaPnk41T
+	H6GbDtF2ZHQ2bZbxVZbO21RcLVoCSPg==
+X-Received: by 2002:a05:6402:a21b:10b0:670:8b30:a8a5 with SMTP id
+ 4fb4d7f45d1cf-6708b30a916mr1683630a12.17.1775850968328; Fri, 10 Apr 2026
+ 12:56:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260316224349.2360482-1-jingzhangos@google.com>
- <20260324114312.GA438107@e124191.cambridge.arm.com> <CAAdAUtjeYJ5sOQVB-t7U=KJ9JuCCmO9b2dwJsas7mkzNLu8WqA@mail.gmail.com>
- <20260408150345.GA2316230@e124191.cambridge.arm.com>
-In-Reply-To: <20260408150345.GA2316230@e124191.cambridge.arm.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 10 Apr 2026 09:44:21 -0700
-X-Gm-Features: AQROBzBLjpcQ1gxXXkYLmcBPLslK-9SLQukU2c2RIA94WmMI7RqyYdesMiWxLck
-Message-ID: <CAAdAUtgNEuuSJ7vwxC7DgL1VcstW+JVZx1HuqMWDxF=EGX+0BQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v1 0/3] arm64: Add Stage-2 MMU and Nested
- Guest Framework
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	Marc Zyngier <maz@kernel.org>, Andrew Jones <andrew.jones@linux.dev>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>
+References: <20241216040831.2448257-1-anshuman.khandual@arm.com>
+ <20241216040831.2448257-8-anshuman.khandual@arm.com> <Z2AH1SN5CipWkkE4@J2N7QTR9R3>
+ <20260331225800.GA2082670-robh@kernel.org> <ac5G8e4zWTdicDBs@J2N7QTR9R3>
+ <CAL_JsqLEBJ7Ok9TngWTqjaWY_LJCPtronv8=gnm=J0FymDKLCg@mail.gmail.com> <adeE4MD0RgapI8aL@J2N7QTR9R3>
+In-Reply-To: <adeE4MD0RgapI8aL@J2N7QTR9R3>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 10 Apr 2026 14:55:55 -0500
+X-Gmail-Original-Message-ID: <CAL_Jsq+=3CKrUDcdgSHFaSGgvnh9ZxTGEBTRLkwrYgzQ=frOdg@mail.gmail.com>
+X-Gm-Features: AQROBzA5KLZDDNcMFHPCHSCcvUxzxdbsbT_tKeErp7FMHwVLiJT0a7YPMt7UER0
+Message-ID: <CAL_Jsq+=3CKrUDcdgSHFaSGgvnh9ZxTGEBTRLkwrYgzQ=frOdg@mail.gmail.com>
+Subject: Re: [PATCH V3 7/7] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 8, 2026 at 8:03=E2=80=AFAM Joey Gouly <joey.gouly@arm.com> wrot=
-e:
+On Thu, Apr 9, 2026 at 5:52=E2=80=AFAM Mark Rutland <mark.rutland@arm.com> =
+wrote:
 >
-> On Tue, Apr 07, 2026 at 11:16:15AM -0700, Jing Zhang wrote:
-> > On Tue, Mar 24, 2026 at 4:43=E2=80=AFAM Joey Gouly <joey.gouly@arm.com>=
- wrote:
+> On Thu, Apr 02, 2026 at 12:46:56PM -0500, Rob Herring wrote:
+> > On Thu, Apr 2, 2026 at 5:37=E2=80=AFAM Mark Rutland <mark.rutland@arm.c=
+om> wrote:
 > > >
-> > > On Mon, Mar 16, 2026 at 03:43:46PM -0700, Jing Zhang wrote:
-> > > > This patch series introduces a lightweight infrastructure for manag=
-ing ARM64
-> > > > Stage-2 translation tables and executing nested guests. These compo=
-nents are
-> > > > essential for testing advanced virtualization features such as nest=
-ed
-> > > > virtualization (NV) and GICv4 direct interrupt injection.
-> > > >
-> > > > The series provides a generic Stage-2 MMU library supporting multip=
-le
-> > > > translation granules (4K, 16K, 64K) and dynamic page table manageme=
-nt.
-> > > > Building on this, it adds a guest execution framework that handles =
-guest
-> > > > lifecycle management, context switching and guest exit routing. A n=
-ew test
-> > > > case for Stage-2 MMU demand paging to verify fault handling.
-> > > >
-> > > > Please note that this is a very preliminary implementation intended=
- as a
-> > > > startup baseline for future work in virtualization testing. Users s=
-hould be
-> > > > aware that because this is an early-stage baseline, some portions o=
-f the code
-> > > > may just happen to work in its current state. There might be critic=
-al
-> > > > architectural elements or edge-case handling missing that will need=
- to be
-> > > > addressed as the framework matures.
-> > > >
-> > >
-> > > Hi,
-> > >
-> > > I'm interested in this, I had a much more barebones (aka no stage2) g=
-uest
-> > > framework thing that I sent out [1], but it seems more useful to try =
-get this
-> > > series merged.
-> > >
-> > > I will try get my tests working with this new framework, one thing mi=
-ssing for
-> > > me is support for executing at EL0.
-> > >
-> > > Thanks,
-> > > Joey
-> > >
-> > > [1] https://lore.kernel.org/kvmarm/20260306142656.2775185-1-joey.goul=
-y@arm.com/#t
-> > >
+> > > On Tue, Mar 31, 2026 at 05:58:00PM -0500, Rob Herring wrote:
+> > > > On Mon, Dec 16, 2024 at 10:58:29AM +0000, Mark Rutland wrote:
+> > > > > On Mon, Dec 16, 2024 at 09:38:31AM +0530, Anshuman Khandual wrote=
+:
+> > > That said, the use of 'bp_per_reg' looks suspect given their
+> > > arch_install_hw_breakpoint() and arch_uninstall_hw_breakpoint() modif=
+y
+> > > that non-atomically.
 > >
-> > Hi Joey,
+> > You don't believe the comment saying counter->ctx->lock is held?
 >
-> Hi Jing,
+> Sorry, my concern here was that hw_breakpoint_handler() (which cannot
+> hold the lock) consumes bp_per_reg[], and could race with the non-atomic
+> modification in arch_install_hw_breakpoint() or
+> arch_uninstall_hw_breakpoint().
 >
-> I had a bit of a play with the code and ended up with a few questions/tho=
-ughts
-> about the guest/EL1/EL0 model.
+> I've sent a more elaborate mail to x86 folk, with that and another issue
+> caused by taking a breakpoint under arch_uninstall_hw_breakpoint():
 >
-> Two major things EL1 needs are allocating memory and eventually page tabl=
-es.
+>   https://lore.kernel.org/lkml/adZWmPW8S9Y2pwkv@J2N7QTR9R3.cambridge.arm.=
+com/
 >
-> For EL1 isolation, I can see a few possible approaches (maybe there's oth=
-ers?):
-> 1. EL1 reuses the usual kvm-unit-tests infrastructure (allocators, helper=
-s, etc.).
-> 2. EL1 is treated more like a real guest/VM, and has to provide its own
->    allocators and other basic support.
-> 3. The host (EL2) provides all memory up front and can create EL1 page ta=
-bles,
->    like kselftest.
-> 4. A small hyp-service interface is provided for things like page donatio=
-n,
->    printing, etc.
+> I think we have a similar latent issue where we can take an breakpoint
+> or watchpoint ad infinitum, described in more detail at the end of this
+> mail.
 >
-> Option 1 feels like the best pragmatically, the tests will look like a no=
-rmal C
-> file, just that parts of it are run at different ELs. However sharing
-> functionality could be complex. For example, I tried calling printf() fro=
-m EL1
-> and then also from the EL2 abort handler, and hit a deadlock because both=
- paths
-> ended up taking the same spinlock.
+> [...]
 >
-> Option 2 feels the least hacky, but maybe has the most complexity since E=
-L1
-> needs its own alloactors and general support functionality. It's also not
-> obvious how to map in the EL1 code. Perhaps there would need to be a sepa=
-rate
-> test_foo_el1.c file that was built and bundled into test_foo.c
+> > > > > | What prevents a race with an exception handler? e.g.
+> > > > > |
+> > > > > | * Does the structure of the code prevent that somehow?
+> > > >
+> > > > If you can't set a breakpoint/watchpoint in NOKPROBE_SYMBOL() annot=
+ated
+> > > > code, you can't race.
+> > >
+> > > As above, I agree (with caveats), but I couldn't spot where this is
+> > > enforced.
+> > >
+> > > > However, there's no such annotation for data. It looks like the ker=
+nel
+> > > > policy is "don't do that" or disable all breakpoints/watchpoints.
+> > >
+> > > If we have to transiently disable watchpoints/breakpoints when
+> > > manipulating the relevant HW registers, that sounds fine to me.
+> >
+> > For wp/bp_on_reg, the ordering is 'data access, h/w accesses'. I think
+> > we just need a barrier to enforce that ordering so the data access
+> > (and then watchpoint) don't trigger in the middle of the h/w accesses.
 >
-> Option 3 looks to be the most simple, is quite flexible, but less dynamic=
-.
+> I assume that by 'h/w accesses' you mean MSRs to the system registers
+> controlling breakpoints/watchpoints. Ordering-wise, I don't believe
+> memory barriers are necessary here (explain in more detail below).
+> However, I also think there's a latent issue here that might bite us
+> with the new banking, described at the end of this mail.
 >
-> Option 4 might be quite simple to have a small hyp interface, a bit like =
-option
-> 3 but more dynamic.
+> Both breakpoint and watchpoint exceptions are synchronous, meanning that
+> they can only be taken from the specific instruction that triggered
+> them.  However, updates to the watchpoint control registers *do* need a
+> context synchronization event before they're guarnateed to take effect.
 >
-> > Will you add support for executing at EL0?
+> For a sequence:
 >
-> I tried to enter EL0 using `start_usr()` from the EL1 guest. I tried to
-> allocate a stack using alloc_page(). However this leads to some issues du=
-e to
-> the following code:
+>     // Initially:
+>     // - MDSCR, MDCR, DAIF.D permit debug exceptions at CurrentEL
+>     // - No watchpoints enabled
 >
->     phys_addr_t __virt_to_phys(unsigned long addr)
->     {
->             if (mmu_enabled()) {
->                     pgd_t *pgtable =3D current_thread_info()->pgtable;
->                     return virt_to_pte_phys(pgtable, (void *)addr);
+>     0x000:  LDR <val>, [<addr>]
+>     0x004:  MSR DBGWVR<n>_EL1, <addr>
+>     0x008:  MSR DBGWCR<n>_EL1, <configure_and_enable>
+>     0x010:  LDR <val>, [<addr>]
+>     0x014:  ISB
+>     0x018:  LDR <val>, [<addr>]
+>
+> ... we know:
+>
+>     (a) The LDR at 0x000 *cannot* trigger the watchpoint.
+
+Why not? Can't the LDR complete after the MSR? Is ordering ensured
+between those? Surely the watchpoint triggers on completion of the
+load and that wouldn't stall the PE from doing the MSR(s)?
+
+>     (b) The LDR at 0x010 *might* trigger the matchpoint.
+>     (c) The LDR at 0x018 *must* trigger the watchpoint.
+>
+> For C code, we can enforce this order with barrier(), e.g.
+>
+>         val =3D *addr;
+>         barrier();
+>         write_sysreg(addr, DBGWVR<n>_EL1);
+>         write_sysreg(configure_and_enable, DBGWCR<n>_EL1);
+>         isb();
+>
+> ... where the compiler cannot re-order the memory access (or
+> write_sysreg(), or isb()) across the barrier(), and as isb() has a
+> memory clobber, the same is true for isb().
+>
+> Likewise, for the inverse sequence:
+>
+>     // Initially:
+>     // - MDSCR, MDCR, DAIF.D permit debug exceptions at CurrentEL
+>     // - Watchpoint configured and enabled for <addr>
+>
+>     0x100:  LDR <val>, [<addr>]
+>     0x104:  MSR DBGWCR<n>_EL1, <disable>
+>     0x108:  LDR <val>, [<addr>]
+>     0x110:  ISB
+>     0x114:  LDR <val>, [<addr>]
+>
+> ... we know:
+>
+>     (a) The LDR at 0x100 *must* trigger the watchpoint.
+>     (b) The LDR at 0x108 *might* trigger the watchpoint.
+>     (c) The LDR at 0x114 *cannot* trigger the watchpoint.
+>
+> > Any guidance on the flavor of dsb here? (And is there any guarantee
+> > that the access is visible to the watchpoint h/w after a dsb
+> > completes?)
+>
+> Hopefully the above was sufficient?
+>
+> As mentioned above, I think we have a latent issue where we can take a
+> breakpoint or watchpoint under arch_uninstall_hw_breakpoint(), where we
+> have:
+>
+>     arch_uninstall_hw_breakpoint(bp) {
+>         ...
+>         hw_breakpoint_control(bp, HW_BREAKPOINT_UNINSTALL) {
+>             ...
+>             hw_breakpoint_slot_setup(slots, max_slots, bp, HW_BREAKPOINT_=
+UNINSTALL) {
+>                  ...
+>                  *slot =3D NULL;
+>                  ...
 >             }
->             return addr;
+>             ...
+>             write_wb_reg(ctrl_reg, i, 0) {
+>                 ...
+>                 write_sysreg(0, ...);
+>                 isb();
+>                 ...
+>             }
+>         }
 >     }
 >
-> In this series, EL1 is not set up as a "thread" (see new_thread() [1]), s=
-o
-> current_thread_info()->pgtable ends up being NULL.  That is what led me t=
-o
-> think about the options above.
+> The HW breakpoint/watchpoint associated with 'bp' could be triggered
+> between setting '*slot' to NULL and the ISB. If that happens, then
+> do_breakpoint() won't find 'bp', and will return *without* disabling the
+> HW breakpoint or attempting to step.
 >
-> Thanks,
-> Joey
+> If that first exception was taken *before* the MSR in write_sysreg(),
+> then nothing has changed, and the breakpoint/watchpoint will then be
+> taken again ad infinitum.
 >
-> [1] https://lore.kernel.org/kvmarm/20260306142656.2775185-5-joey.gouly@ar=
-m.com/
+> If that first exception was taken *after* the MSR in write_sysreg(), the
+> context synchronization provided by exception entry/return will prevent
+> it from being taken again.
 >
+> Building v6.19 and testing (with pseudo-NMI enabled):
+>
+> | #  grep write_wb_reg /proc/kallsyms
+> | ffff80008004b980 t write_wb_reg
+> | # ./perf-6.19 stat -a -C 1 -e 'mem:0xffff80008004b980/4:xk' true
 
-Hi Joey,
+I'll give it a try with v4, but that should be prevented with my
+changes to exclude kprobe regions.
 
-Thanks for looking into this. Your ideas for EL0 support and the guest
-execution model look solid. I=E2=80=99ll leave the infrastructure and EL0
-improvements to you for now, as I am currently working on adding GICv4
-support and vLPI tests.
-
-Thanks,
-Jing
-
-> >
-> > Thanks,
-> > Jing
-> >
-> > > > ---
-> > > >
-> > > > Jing Zhang (3):
-> > > >   lib: arm64: Add stage2 page table management library
-> > > >   lib: arm64: Add bare-metal guest execution framework
-> > > >   arm64: Add Stage-2 MMU demand paging test
-> > > >
-> > > >  arm/Makefile.arm64         |   4 +
-> > > >  arm/stage2-mmu-test.c      | 100 +++++++++
-> > > >  lib/arm64/asm/guest.h      | 156 ++++++++++++++
-> > > >  lib/arm64/asm/stage2_mmu.h |  74 +++++++
-> > > >  lib/arm64/guest.c          | 197 ++++++++++++++++++
-> > > >  lib/arm64/guest_arch.S     | 263 ++++++++++++++++++++++++
-> > > >  lib/arm64/stage2_mmu.c     | 402 +++++++++++++++++++++++++++++++++=
-++++
-> > > >  7 files changed, 1196 insertions(+)
-> > > >  create mode 100644 arm/stage2-mmu-test.c
-> > > >  create mode 100644 lib/arm64/asm/guest.h
-> > > >  create mode 100644 lib/arm64/asm/stage2_mmu.h
-> > > >  create mode 100644 lib/arm64/guest.c
-> > > >  create mode 100644 lib/arm64/guest_arch.S
-> > > >  create mode 100644 lib/arm64/stage2_mmu.c
-> > > >
-> > > >
-> > > > base-commit: 86e53277ac80dabb04f4fa5fa6a6cc7649392bdc
-> > > > --
-> > > > 2.53.0.851.ga537e3e6e9-goog
-> > > >
+Rob
