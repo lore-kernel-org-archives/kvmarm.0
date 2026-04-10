@@ -1,214 +1,478 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1082371071;
-	Thu,  9 Apr 2026 21:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01E53C8735
+	for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 13:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775769150; cv=none; b=JzFGwQIPdqUApflnGNxhmlTqEezYZAZT61gelBVJi/1cWVj9KKLCzv69h+VtPe1gndguz5sSHtPMsjIRvIXnEN6ehpEfwRhNMFQH6G0aVzpc01LmZuNKQJyb9fqo5Ce3rov32+s0VBz8VpcRLakAO4KDOS3m9xKmJGiq1yznltY=
+	t=1775829183; cv=none; b=f+ZIO2B7IiahcImxyzUGM0A1EpbTrseniL+v9pD+2CltrThjVja1mOL/X+BgN24Cw6yY2HfFt4RziHGrwFAut+vM/hzfaHC2yVn/qnfqTUpGVy7UVsMjY3qRbeTAgFU6qjDvsuGg337U2Dy0wJPeGz/3LozgZdN2dEVvbdiiMpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775769150; c=relaxed/simple;
-	bh=W+QVhhRcZ+wnz8UL9kN1R3TtbKrhNjSuImzbBc7OTyc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=I0cV0Fwfjh2EatMkmwGma244OSAF+mkO4H4fZNxZpLsl2VcOxfBzV838mcqr8O6xMuX8HOdAHyW34hVwcpydEWuRlwygNnSAEPDV92cszqlfjumzYAnI3VnQaXCjicZ10eLYcuPAvj9F+Bserzm3DS6ScKeHD9FF6TWBgOiG7pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WzZmKf6c; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+	s=arc-20240116; t=1775829183; c=relaxed/simple;
+	bh=QklhJRaACASXYYk1q9CfjamjbGUKZnkk66X9ZGZ5mRQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sEAQ49S1BZBx019Dq6071LJM82qqKGvPRwlTtA2Aq05XSA+hO1aYy0fHkMkXCf02IpguAyPEYAWJQi2iBwYEri8Rxi0bkzm9H6uoyMYXeeg1hmfzswX28nTyAPvpdyYpzfwUqDT01pDW8cD3z4AKp2ClYXh9KwR2chqT31ITk/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VsPFZi4F; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WzZmKf6c"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=W+QVhhRcZ+wnz8UL9kN1R3TtbKrhNjSuImzbBc7OTyc=; b=WzZmKf6cTDfScK1gk+1acnZhlr
-	G93RvaO6YUmLTxRxin5L8LZ2vp3pz9jHGvpTVk5E47nExzIAehMSGmWF4yAVB5M6I0KG0HVTC7I93
-	+tIFzTlJYrx4RBbtUqxfQdTCk5T2F8xu9fZu61c9SJLiEBniTZhRJ+UbBPPCjWNPxXxkO0hz0mErZ
-	bon9KwxkM46pfEdWd/kQUN4urdDsp67jRy84wnZdmmu/C8+FFM6Nt4kXbDsR/N7DSdXr4gT2NLpV0
-	q2CQgol/+K0gn2nYY3FLFKdlxC7OqpO41PkjsN1VwML4MsIqcbZ6q9/iXgwZBSmxgRj+dyxYv0TdH
-	45y8tHsw==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wAweG-0000000CPPo-0dZe;
-	Thu, 09 Apr 2026 21:11:34 +0000
-Message-ID: <65b108f99ff0bcc54609a37ef5c9ce07a72e4129.camel@infradead.org>
-Subject: Re: [PATCH] KVM: arm64: Add KVM_CAP_ARM_NATIVE_CACHE_CONFIG vcpu
- capability
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: "Gutierrez Cantu, Bernardo" <bercantu@amazon.de>, 
- alexandru.elisei@arm.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
- broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, 
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
- linux-kernel@vger.kernel.org, marcan@marcan.st, mathieu.poirier@linaro.org,
-  oliver.upton@linux.dev, suzuki.poulose@arm.com, sven@svenpeter.dev, 
- will@kernel.org
-Date: Thu, 09 Apr 2026 22:10:47 +0100
-In-Reply-To: <86qzoo2eba.wl-maz@kernel.org>
-References: <b71910e202ac4a56a87c0e34df13cce058d46a76.camel@infradead.org>
-	 <7fb7b823c68e04321eb532a5b8ae21a818d4926d.camel@infradead.org>
-	 <86se942hbv.wl-maz@kernel.org>
-	 <584931abfa8c6f6c9c8a1379d26ef6beb58db1cd.camel@infradead.org>
-	 <86qzoo2eba.wl-maz@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-AMcz7QLTiE7nyEtLfOUk"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VsPFZi4F"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488879dcbc3so270055e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 06:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775829180; x=1776433980; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uFTHSJoWbrwAI/sIqoC5vjF60iw/CEInfS3ou5ySm6g=;
+        b=VsPFZi4FzeGSlX5zFSmOiSCTSWctPwePBMSb5H3pmpHP1bomp2Kg4Q18xBharJp9r8
+         1ILKAP3awyvqzFPq/BlEA7/73E37uNPbIqRc5qhHcqXtxP/zDrF+HVqWfbIfQp2w0e74
+         u++aDeqXhh8Nc9bwU6vBQOcfIEMwovMcb6iTb+J+8j/eJ8u/nr3kuH1kz+WGS9CBTGTd
+         aZh4ZPJTKdWp/FYt77zGzsHBvvAvq/CHEgqKFROJ1KkgK52X8yVQQacJKV50Eg9TsrYs
+         cXXWAwT9OwLReMLYch3Qf5pVBwC7ZxrG9vdMAu0iiBCYWCr5uhgGE09ChZS7YbuBm6Aw
+         EI9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775829180; x=1776433980;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uFTHSJoWbrwAI/sIqoC5vjF60iw/CEInfS3ou5ySm6g=;
+        b=k/2+cAusDH1OjCgEP/5NjDo4DacpU+kBPM4+00hxuSoxpfXq+/7qbDP73drZdTM2R4
+         8q1rUHUlfhk7dvbHFyHDzH1NjO3e4Ahw5oAFHsBupaXZJrbCmjfR9oyr50FXzlto2WAY
+         XU9Dvokl2uP87UxAJhpekBHzLLZbuMBjGZCOc3Tv0BV5R1FKO0xT7ueCzrnMWsdnWspU
+         4rvgG8bRJNrBUfjcJ81i9FU0dKTwoEe8fvxkWZ5r9kZaSxafaSs3+ayI+M4iTOuir9Uc
+         3lTFWeZSGpFjRPYKHP01tBhuoGJqDr9JaoXshwNXTUzDEW1LB9wyAVW2NVGTJbt9gZ1z
+         5abg==
+X-Forwarded-Encrypted: i=1; AJvYcCVv7Thl2L6mpw9m2CvFs6KU9h38xDeQUy44HH9QjICY7v+evb7o+tiRhJYUhUs1ntAyk/eOrdU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwDlHegIeinT/WhSR19j9oeBJx6+giSEQ5isv5hDCEW8VSsyZ8I
+	rRDpDW+2KfHI2OJRoB5+plPPGAzPTeXsMd+shhY4Sp5jfKLni/hmbc1LSnsph3l1CA==
+X-Gm-Gg: AeBDietc6sTiTBUPQO++qnzeTNiNwU3wKFGhuVD2r+CtHI7v4SpkkgSD4aHn/a3RFYt
+	zCkUIP+UPUfmiCaoxEHKcRcQ8ccwU8EUi+Y7nc7LmlUxujDyAG/gPxP/Gva1X0DYd3uHEh+ZmGJ
+	EbtC6IooVqZdb7QMDDALCsNL640O6ydzXT1ehSu49C62BEg+sRc6blW5KC19kjMJKWq3E5bIQ1k
+	gtngIBey7YRItIdHCy36COe8wiXhxifNskbPyklOwey82E6I+KMKOtzvZEYwnevMsWMgkBeHKZ3
+	LqcmjdeokRMQp9CqAkD2+SrYW+s20YFMKsKYC68VVaclE0DsblQHfqfPXC+9+zrVmUu+igd7xNe
+	16UjGOdScZTJECagFVAcyUS5uonjZf7q136klw+ML2zqsSKVe0lmGAKldwNBuV+ISScKA7unmgX
+	QhW4WpmQBCY9JRrrpwd+H1+t6uKRKc6d8WwD/HTjbwiX5rlQUqMe0UreZxy5MppFfkgTyQYtU1e
+	Phj1L1c+mYGcMjm
+X-Received: by 2002:a05:600c:474b:b0:477:95a8:3803 with SMTP id 5b1f17b1804b1-488cf2ccc1dmr2385245e9.13.1775829179778;
+        Fri, 10 Apr 2026 06:52:59 -0700 (PDT)
+Received: from google.com (209.13.205.35.bc.googleusercontent.com. [35.205.13.209])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d538c03esm74889465e9.13.2026.04.10.06.52.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2026 06:52:58 -0700 (PDT)
+Date: Fri, 10 Apr 2026 13:52:54 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com,
+	kees@kernel.org, mark.rutland@arm.com, maz@kernel.org,
+	oupton@kernel.org, perlarsen@google.com, qperret@google.com,
+	rananta@google.com, smostafa@google.com, suzuki.poulose@arm.com,
+	tglx@kernel.org, vdonnefort@google.com, bgrzesik@google.com,
+	will@kernel.org, yuzenghui@huawei.com
+Subject: Re: [PATCH 07/14] KVM: arm64: Restrict host access to the ITS tables
+Message-ID: <adkAtvBiYDH3_xSA@google.com>
+References: <20260310124933.830025-1-sebastianene@google.com>
+ <20260310124933.830025-8-sebastianene@google.com>
+ <CA+EHjTxUbLBnyBGg58wsJQvTXPN0FTbj53H5r3sC9_TizpjvdQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxUbLBnyBGg58wsJQvTXPN0FTbj53H5r3sC9_TizpjvdQ@mail.gmail.com>
 
+On Mon, Mar 16, 2026 at 04:13:59PM +0000, Fuad Tabba wrote:
 
---=-AMcz7QLTiE7nyEtLfOUk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hello Fuad,
 
-On Thu, 2026-04-09 at 19:12 +0100, Marc Zyngier wrote:
->=20
-> That only means you are doing a pretty bad job at supporting
-> guests. And yes, this is an issue for anything that expects to see
-> something meaningful in CCSIDR[]. The fact that none of your guests
-> hit that problem only means you're lacking coverage.
+> Hi Sebastian,
+> 
+> On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
+> >
+> > Setup shadow structures for ITS indirect tables held in
+> > the GITS_BASER<n> registers.
+> > Make the last level of the Device Table and vPE Table
+> > inacessible to the host.
+> 
+> inacessible  -> inaccessible
 
-I think we just have a different idea of what it means to do a good job
-of supporting guests. For me, the most important thing is never to
-randomly change stuff underneath a running guest, even if it's a "bug
-fix".
+Applied fix, thanks.
 
-Even fixing an egregious and obvious bug, like fixing the reported
-serial port type from the legacy 16550 to ACPI_DBG2_16550_WITH_GAS
-turned out to break FreeBSD, to pick just one recent example.
+> > In a direct layout configuration, donate the table to
+> > the hypervisor since the software is not expected to
+> > program them directly.
+> 
+> This commit message is too brief and doesn't fully explain the
+> problem, the impact, and the mechanism of the solution. It also
+> appears to contradict the actual code changes.
+> 
+> For example, could you elaborate why must the last level of indirect
+> tables be inaccessible?
 
-Guest operating systems will often work with the environment they
-actually *had* already, regardless of the actual specifications or
-common sense. We don't have the luxury of just changing things
-underneath them and then saying "haha, well that should never have
-worked so screw you".
+For device table, a malicious host can write the ITT address that points
+to hyp memory and then use MAPTI to write over that memory.
 
-Moving to the fixed model is obviously the plan, but it has to be done
-carefully and starting with new launches and new instance types and a
-rollback plan, not just randomly inflicted as an unexpected side-effect
-of a kernel upgrade.
+> 
+> Can you also please explain the mechanism? You are parsing
+> GITS_BASER_INDIRECT to determine if a shadow Level 1 table must be
+> shared with the host, while unconditionally donating the original
+> physical tables. You also explicitly exclude Collection tables. The
+> msg should briefly justify why Collection tables are safe to leave
+> accessible to the host.
+> 
+> There is also a contradiction in the message. You state "In a direct
+> layout configuration, donate the table...". However, your code donates
+> the original hardware table unconditionally on every iteration of the
+> loop, regardless of whether GITS_BASER_INDIRECT is set. Please ensure
+> the commit log accurately reflects the code implementation.
+>
 
-> From what I can read, anything from Neoverse V1 is affected.
->=20
-> >=20
-> > This isn't about introducing *new* behaviour; it's about allowing the
-> > existing established behaviour to be maintained so that we can have a
-> > *managed* transition to the new model (for new launches) rather than an
-> > unconditional uncontrolled change as the kernel gets upgraded.
->=20
-> Then fully implement "show me the cache hierarchy", read it out, and
-> write it back with whatever level of brokenness you intend to inflict
-> on your guests.
+I see no contradition, I only need to shadow the first layer of the
+indirect tables. Shadowing implies donation and sharing:
+because we are donating the original tables from host -> hyp and we sharing the
+host view of the tables with the hypervisor (which is a copy).
 
-Again, *compatibility* is the point here, not brokenness.
+> Maybe you could say that the problem is Host DMA attacks via ITS table
+> manipulation. Whereas the mechanism is to unconditionally donate
 
-> But I'm not reintroducing this particular bug.
+This has nothing to do with Host DMA attacks, it is just the AP that can
+write to memory.
 
-Fair enough. It's not like the x86 zoo; there are only a certain number
-of existing CPUs that I care about, that I need to enumerate. I can
-just hard-code the values for all of those in the VMM =E2=80=94 the kernel =
-does
-let me override the errantly-changed defaults, as the commit message
-said.
+> hardware tables to EL2. For indirect Device/vPE tables, share a L1
+> shadow table with the host and strictly donate the L2 pages to prevent
+> the host from writing malicious L2 pointers.
+> 
+> >
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/its_emulate.c | 143 ++++++++++++++++++++++++++
+> >  1 file changed, 143 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> > index 4a3ccc90a1a9..865a5d6353ed 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> > @@ -141,6 +141,145 @@ static struct pkvm_protected_reg *get_region(phys_addr_t dev_addr)
+> >         return NULL;
+> >  }
+> >
+> > +static int pkvm_host_unmap_last_level(void *shadow, size_t num_pages, u32 psz)
+> > +{
+> > +       u64 *table = shadow;
+> > +       int ret, i, end = (num_pages << PAGE_SHIFT) / sizeof(table);
+> > +       phys_addr_t table_addr;
+> 
+> RCT, mixing initialized variables and uninitialized variables, plus
+> variables of conceptually different "types" in the same declaration.
+> 
+> Please use sizeof(*table): sizeof(table) evaluates to the size of the
+> pointer (8 bytes), NOT the size of the array element. In this case,
+> this happens to be the same, but it's still wrong.
+> 
+> Maybe the following is clearer:
+> +        int end = num_pages * (PAGE_SIZE / sizeof(*table));
+> 
+>
 
---=-AMcz7QLTiE7nyEtLfOUk
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Will use the suggestion and do the same for the
+pkvm_host_map_last_level.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDQwOTIxMTA0
-N1owLwYJKoZIhvcNAQkEMSIEIIabAoB/77HFbYsy8BXfgvl7jEYKS91ZTr3OoAkK4+4zMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIARbq5NH4l+1R/
-7xAQpU0qjccKxm329RPdfxZsbax4gu/tJ7IPQJV4A7w75OlCxhS/ji/wygwckzuaktzP4frycmbb
-3H+AqUZmwJ3laHTvd5uZW4n7LwyOJM5R/vHVbcoEyKqVsqTjXx091LTkTH/hPYzY39EnLyZDyv42
-JssznzsFrVI2Wjd33bxbwmYmkYf4EAILPywwNOLRywd9LRW4zmuCAzxcsjubCZc+0zNc+stLxZUe
-ZUZf5FsCTLN4S8vzWeqEYchUJAx2HWka2AOEYh/MOQGZt2n7LPz40g36vDxtkGb/ayYMLuW+P9IP
-Nm32mRly5t/7dllxecnmofWwvQzINPp1V6DgbHINVdCWNZNtHbG/VAiyG9qS7fycJr3aVgtIPMnk
-U2pOqczw8+eI+oaMR5O57zvKUhfxuCy+IXEPYc3REfmYxmABUrT0ZxorLrgjuK0C31DLtzWeCFzO
-4hGVK+1LOwUl2oBUk7zC8wBz7v7/GnOsoLdLMeYhyN+El3pTLqVTCJVgjDwXD6PEXqJoTBy7Ea+g
-2Zg+s5NNcPc4F767eXAoEsCDenijAkhmF2H30RWMOEEPZgr/u158evqUlU9w7wA/a31/v2bRyb/q
-V8ZocSV5RIhfX1F2b/wbwREmWqbRiLvopoK0IuQ2p+QBgzaZ7V5xcc4QEXOrKHEAAAAAAAA=
+> > +
+> > +       for (i = 0; i < end; i++) {
+> > +               if (!(table[i] & GITS_BASER_VALID))
+> > +                       continue;
+> > +
+> > +               table_addr = table[i] & PHYS_MASK;
+> > +               ret = __pkvm_host_donate_hyp(hyp_phys_to_pfn(table_addr), psz >> PAGE_SHIFT);
+> 
+> The ITS-configured page size and the host page size could be
+> different, but the number of pages to donate for Level 2 tables is
+> calculated based on psz (the ITS).
+> 
+> If the ITS hardware is configured for 4KB pages, but the host kernel
+> is using (e.g.,) 64KB pages, psz >> PAGE_SHIFT evaluates to 0.
 
+I need to revisit this, thanks for pointing out.
 
---=-AMcz7QLTiE7nyEtLfOUk--
+> 
+> You need to account for mismatched page sizes, perhaps by using
+> DIV_ROUND_UP(psz, PAGE_SIZE) (or something similar) to ensure the
+> containing host page is donated.
+> 
+> > +               if (ret)
+> > +                       goto err_donate;
+> > +       }
+> > +
+> > +       return 0;
+> > +err_donate:
+> > +       for (i = i - 1; i >= 0; i--) {
+> 
+> Please use the while (i--) idiom for rollback loops.
+> 
+> 
+> > +               if (!(table[i] & GITS_BASER_VALID))
+> > +                       continue;
+> > +
+> > +               table_addr = table[i] & PHYS_MASK;
+> > +               __pkvm_hyp_donate_host(hyp_phys_to_pfn(table_addr), psz >> PAGE_SHIFT);
+> 
+> Please wrap this in WARN_ON(...). If donating back to the host fails
+> during a rollback, we have a fatal page leak that needs to be loudly
+> flagged, similar to how you handle it in pkvm_unshare_shadow_table.
+> 
+> 
+> > +       }
+> > +       return ret;
+> > +}
+> > +
+> > +static int pkvm_share_shadow_table(void *shadow, u64 nr_pages)
+> > +{
+> > +       u64 i, ret, start_pfn = hyp_virt_to_pfn(shadow);
+> 
+> Same comment as before with RCT and the mixing of declarations.
+> 
+> 
+> > +
+> > +       for (i = 0; i < nr_pages; i++) {
+> > +               ret = __pkvm_host_share_hyp(start_pfn + i);
+> > +               if (ret)
+> > +                       goto unshare;
+> > +       }
+> > +
+> > +       ret = hyp_pin_shared_mem(shadow, shadow + (nr_pages << PAGE_SHIFT));
+> > +       if (ret)
+> > +               goto unshare;
+> > +
+> > +       return ret;
+> > +unshare:
+> 
+> Please use the while (i--) idiom for rollback loops.
+> 
+> Also, please use consistent naming conventions for the labels. Here
+> you call it unshare, and earlier it was err_donate.
+> 
+> 
+> > +       for (i = i - 1; i >= 0; i--)
+> > +               __pkvm_host_unshare_hyp(start_pfn + i);
+> > +       return ret;
+> > +}
+> > +
+> > +static void pkvm_unshare_shadow_table(void *shadow, u64 nr_pages)
+> > +{
+> > +       u64 i, start_pfn = hyp_virt_to_pfn(shadow);
+> > +
+> > +       hyp_unpin_shared_mem(shadow, shadow + (nr_pages << PAGE_SHIFT));
+> > +
+> > +       for (i = 0; i < nr_pages; i++)
+> > +               WARN_ON(__pkvm_host_unshare_hyp(start_pfn + i));
+> > +}
+> > +
+> > +static void pkvm_host_map_last_level(void *shadow, size_t num_pages, u32 psz)
+> > +{
+> > +       u64 *table;
+> 
+> RCT, and you forgot to initialize table:
+> +       u64 *table = shadow;
+
+Fixed this, thanks. I never ended up on this code path during testing,
+maybe I should create a test for it to trigger it.
+
+> 
+> > +       int i, end = (num_pages << PAGE_SHIFT) / sizeof(table);
+> 
+> Same sizeof(table) pointer-size bug as above.
+> 
+> 
+> > +       phys_addr_t table_addr;
+> > +
+> > +       for (i = 0; i < end; i++) {
+> > +               if (!(table[i] & GITS_BASER_VALID))
+> > +                       continue;
+> > +
+> > +               table_addr = table[i] & ~GITS_BASER_VALID;
+> 
+> Inconsistent masking logic, since in pkvm_host_unmap_last_level you
+> correctly used PHYS_MASK to extract the address, but here in the
+> rollback path you use ~GITS_BASER_VALID.
+> 
+> While both currently work because the upper bits and lower bits (below
+> the page size) are defined as RES0 in the GIC spec, ~GITS_BASER_VALID
+> is architecturally fragile. If a future hardware revision repurposes
+> the upper RES0 bits [62:52] for new attributes (e.g., memory
+> encryption flags), ~GITS_BASER_VALID will leak those attribute bits
+> into the physical address calculation.
+> 
+> Since PHYS_MASK correctly handles the address extraction across all
+> page sizes (relying on the lower bits being RES0) and safely masks off
+> future upper attribute bits, please standardize on using table_addr =
+> table[i] & PHYS_MASK; for both functions.
+> 
+>
+
+Fixed the inconsistency and used PHYS_MASK everywhere.
+
+> > +               WARN_ON(__pkvm_hyp_donate_host(hyp_phys_to_pfn(table_addr), psz >> PAGE_SHIFT));
+> > +       }
+> > +}
+> > +
+> > +static int pkvm_setup_its_shadow_baser(struct its_shadow_tables *shadow)
+> > +{
+> > +       int i, ret;
+> > +       u64 baser_val, num_pages, type;
+> > +       void *base, *host_base;
+> > +
+> > +       for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> > +               baser_val = shadow->tables[i].val;
+> > +               if (!(baser_val & GITS_BASER_VALID))
+> > +                       continue;
+> > +
+> > +               base = kern_hyp_va(shadow->tables[i].base);
+> > +               num_pages = (1 << shadow->tables[i].order);
+> > +
+> > +               ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn(base), num_pages);
+> > +               if (ret)
+> > +                       goto err_donate;
+> > +
+> > +               if (baser_val & GITS_BASER_INDIRECT) {
+> > +                       host_base = kern_hyp_va(shadow->tables[i].shadow);
+> > +                       ret = pkvm_share_shadow_table(host_base, num_pages);
+> > +                       if (ret)
+> > +                               goto err_with_donation;
+> > +
+> > +                       type = GITS_BASER_TYPE(baser_val);
+> > +                       if (type == GITS_BASER_TYPE_COLLECTION)
+> > +                               continue;
+> > +
+> > +                       ret = pkvm_host_unmap_last_level(base, num_pages,
+> > +                                                        shadow->tables[i].psz);
+> > +                       if (ret)
+> > +                               goto err_with_share;
+> > +               }
+> > +       }
+> > +
+> > +       return 0;
+> > +err_with_share:
+> > +       pkvm_unshare_shadow_table(host_base, num_pages);
+> > +err_with_donation:
+> > +       __pkvm_hyp_donate_host(hyp_virt_to_pfn(base), num_pages);
+> > +err_donate:
+> > +       for (i = i - 1; i >= 0; i--) {
+> 
+> Please use the while (i--) idiom for rollback loops.
+> 
+> 
+> > +               baser_val = shadow->tables[i].val;
+> > +               if (!(baser_val & GITS_BASER_VALID))
+> > +                       continue;
+> > +
+> > +               base = kern_hyp_va(shadow->tables[i].base);
+> > +               num_pages = (1 << shadow->tables[i].order);
+> > +
+> > +               WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(base), num_pages));
+> 
+> The sequence of rollback operations here creates a TOCTOU vulnerability.
+> 
+
+There is a different problem here related to functionality rather than
+this: donating the base to the host first and then iterating over it
+will make the hypervisor explode. I fixed this.
+
+> - First, you donate base (the Level 1 indirect table) back to the host.
+> - Then, you pass base into pkvm_host_map_last_level().
+> - Finally, pkvm_host_map_last_level() reads table[i] out of base to
+> determine which Level 2 pages to donate back to the host.
+>
+> Because the host regains ownership of base _first_, it can be running
+> concurrently on another CPU. A malicious host can overwrite the Level
+> 1 table with pointers to arbitrary hypervisor-owned memory. The
+> hypervisor will then read those malicious pointers and dutifully grant
+> the host access to its own secure memory.
+> 
+> The order of operations needs to be reversed: you must read base to
+> roll back the L2 pages, unshare the shadow table, and *only then*
+> donate base back to the host.
+> 
+> Also, num_pages = (1 << shadow->tables[i].order); calculates a 32-bit
+> signed integer because the literal 1 is a signed 32-bit int. If order
+> is 31, this evaluates to a negative number. If order is 32 or higher,
+> this is undefined behavior. Because num_pages is declared as a u64,
+> you should use the standard kernel macro BIT_ULL().
+> 
+> Here's my suggested fix (not tested). Reorder the operations to safely
+> rollback L2 before donating L1, use the standard `while (i--)` loop,
+> and fix the page calculation:
+> 
+> +    while (i--) {
+> +        baser_val = shadow->tables[i].val;
+> +        if (!(baser_val & GITS_BASER_VALID))
+> +                continue;
+> +
+> +        base = kern_hyp_va(shadow->tables[i].base);
+> +        num_pages = BIT_ULL(shadow->tables[i].order);
+> +
+> +        if (baser_val & GITS_BASER_INDIRECT) {
+> +                host_base = kern_hyp_va(shadow->tables[i].shadow);
+> +
+> +            type = GITS_BASER_TYPE(baser_val);
+> +            if (type != GITS_BASER_TYPE_COLLECTION)
+> +                    pkvm_host_map_last_level(base, num_pages,
+> +                                 shadow->tables[i].psz);
+> +
+> +            pkvm_unshare_shadow_table(host_base, num_pages);
+> +        }
+> +
+> +        WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(base), num_pages));
+> +    }
+> 
+> 
+> 
+> > +               if (baser_val & GITS_BASER_INDIRECT) {
+> > +                       host_base = kern_hyp_va(shadow->tables[i].shadow);
+> > +                       pkvm_unshare_shadow_table(host_base, num_pages);
+> > +
+> > +                       type = GITS_BASER_TYPE(baser_val);
+> > +                       if (type == GITS_BASER_TYPE_COLLECTION)
+> > +                               continue;
+> > +
+> > +                       pkvm_host_map_last_level(base, num_pages, shadow->tables[i].psz);
+> > +               }
+> > +       }
+> 
+> You have duplicated the entire table decoding logic (calculating base,
+> num_pages, checking INDIRECT...) down here in the rollback path.
+> Consider abstracting "setup one table" and "teardown one table" into
+> helper functions to make pkvm_setup_its_shadow_baser more readable and
+> less prone to copy-pasta errors.
+>
+> Cheers,
+> /fuad
+> 
+
+Thanks,
+Sebastian
+
+> 
+> > +
+> > +       return ret;
+> > +}
+> > +
+> >  static int pkvm_setup_its_shadow_cmdq(struct its_shadow_tables *shadow)
+> >  {
+> >         int ret, i, num_pages;
+> > @@ -205,6 +344,10 @@ int pkvm_init_gic_its_emulation(phys_addr_t dev_addr, void *host_priv_state,
+> >         if (ret)
+> >                 goto err_with_shadow;
+> >
+> > +       ret = pkvm_setup_its_shadow_baser(shadow);
+> > +       if (ret)
+> > +               goto err_with_shadow;
+> > +
+> >         its_reg->priv = priv_state;
+> >
+> >         hyp_spin_lock_init(&priv_state->its_lock);
+> > --
+> > 2.53.0.473.g4a7958ca14-goog
+> >
