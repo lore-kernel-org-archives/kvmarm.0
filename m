@@ -1,30 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DA01A6808
-	for <kvmarm@lists.linux.dev>; Sat, 11 Apr 2026 12:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F211A6808
+	for <kvmarm@lists.linux.dev>; Sat, 11 Apr 2026 12:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775911856; cv=none; b=bAKzlRiCPF4/qXgFfCUXhWXgxuX0xop+jVZGeh7OLM3K3c++B6ZavB13mkCek3mBX6IYvmhfAvsYjrVZ7Y/sm7MTci9DX2QVd9r9UvmCCbHQWBll6gpXqcnnZcRB5YtTM7a/5fzeXGA4FDtPBgNAtUuFz8ohlGMJJvMe/d7VVzA=
+	t=1775911863; cv=none; b=AWGqdrvtn8rSgHXQnqdFKzOP7SE8j6DNIuMSNZOAT8u+qr2uAcc52awYhj/ZbT/AOmDOHSV5+FxNdNe3QgMUcwpzMFa3QpLIeVphi3DSkMZlZmkCpMHyH0YQDF3cioJFB9MFLmzmO6CkXGnGh1W4LIpqltuWr3JSUiogY7zywaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775911856; c=relaxed/simple;
-	bh=PCUm7AJBwfv68VRHQn0akZBOL7JjGV0tbIGrCcwnybM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqURWRZSOqd5t7cWMDGcjg08cTJgAAs3QsEINPgLC9LnwKuFw+02pk5MFdVUk/lLk4Dbbn9VJNkkECg3S+oT1GOOLE0hWUYdX0EsPTgUQeW7EWT2wSG8uiw55NjYNlOJRmktqXCk9eAaLQeF16Kkl4ZyutLY+RrHTD0hzRCi2fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=C+l8LqWd; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1775911863; c=relaxed/simple;
+	bh=cHRqJyCqAndZiz///OUbNaz7hS7UcSXHwuGsO2oSjxg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MbzrnpW80J+y6SExwU/aDAYl0QIUGOpVmneERN6TFPzjSO+zyMhEwIeRJwgA6r0LjGKUiOKgtU2qg6wBoZ1ImbXyv2A2zJS1U56vFN3oNNHMs0GcriQWxeQsmN5ImF7VZSFnPvZZW/che/4f5crrWFFohzlfjY0pYsMd9qTZkdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=uHHWttYG; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="C+l8LqWd"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="uHHWttYG"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BAC502C46;
-	Sat, 11 Apr 2026 05:50:45 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5CD422D91;
+	Sat, 11 Apr 2026 05:50:53 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA5253F641;
-	Sat, 11 Apr 2026 05:50:48 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D54DF3F641;
+	Sat, 11 Apr 2026 05:50:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1775911851; bh=PCUm7AJBwfv68VRHQn0akZBOL7JjGV0tbIGrCcwnybM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=C+l8LqWd7CndiGGtpMNKlqHsvST33l2Sah2HTljSJ1uELhMV/Y6hBVNBeb86HdssJ
-	 y2i4C6gTV1lcthYso2WN4vPG9QPWHDB4r51CKbkc6C1oQytl0PPnJal4TSimvdD/Rx
-	 fqXwCC1yZA3p6pRYnbA6WhknHmmCHqoK4R7Qh94g=
+	t=1775911859; bh=cHRqJyCqAndZiz///OUbNaz7hS7UcSXHwuGsO2oSjxg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uHHWttYG/AH4gq0qU1gjcZFT9SU9RonO6ymAGtpIqbJEpwZDo9qBaL9RBid45quPS
+	 7uoSWjKXrQOtn5qBcyvnMrJASg5A9vKdUOpsVhiWcw7BZsyM6g1k93BBIle0WJbSkd
+	 SGFKjcyrd5len5nlAt/QYOzlYEAyPDNcdK3yxxcE=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -37,10 +38,12 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH 0/1] KVM: arm64: nv: Implement nested stage-2 reverse map
-Date: Sat, 11 Apr 2026 13:50:23 +0100
-Message-ID: <20260411125024.3735989-1-weilin.chang@arm.com>
+Subject: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
+Date: Sat, 11 Apr 2026 13:50:24 +0100
+Message-ID: <20260411125024.3735989-2-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260411125024.3735989-1-weilin.chang@arm.com>
+References: <20260411125024.3735989-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,75 +52,383 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Currently we are forced to fully unmap all shadow stage-2 for a VM when
+unmapping a page from the canonical stage-2, for example during an MMU
+notifier call. This is because we are not tracking what canonical IPA
+are mapped in the shadow stage-2 page tables hence there is no way to
+know what to unmap.
 
-This is v2 of optimizing the shadow s2 mmu unmapping during MMU
-notifiers. Thanks to Sashiko, who helped point out the many problems [1]
-in v1.
+Create a per kvm_s2_mmu maple tree to track canonical IPA range ->
+nested IPA range, so that it is possible to partially unmap shadow
+stage-2 when a canonical IPA range is unmapped. The algorithm is simple
+and conservative:
 
-* Changes from v1 [2]:
+At each shadow stage-2 map, insert the nested IPA range into the maple
+tree, with the canonical IPA range as the key. If the canonical IPA
+range doesn't overlap with existing ranges in the tree, insert as is,
+and a reverse mapping for this range is established. But if the
+canonical IPA range overlaps with any existing ranges in the tree,
+create a new range that spans all the overlapping ranges including the
+input range and replace those existing ranges. In the mean time, mark
+this new spanning canonical IPA range as "polluted" indicating we lost
+track of the nested IPA ranges that map to this canonical IPA range.
 
-  - Rebased on to a newer kvmarm/next, where user_mem_abort() underwent
-    a significant refactor.
+The maple tree's 64 bit entry is enough to store the nested IPA and
+polluted status (stored as a bit called UNKNOWN_IPA), therefore besides
+maple tree's internal operation, memory allocation is avoided.
 
-  - Added a flag VALID_ENTRY (bit 63) to each non-polluted reverse map
-    entry, so that if nested IPA == 0, we still insert a non-zero entry
-    to the maple tree.
+Example:
+|||| means existing range, ---- means empty range
 
-  - Added usage of the maple tree lock while using the tree. Previously
-    I though I could piggyback on kvm->mmu_lock, but this doesn't work
-    for 2 reasons:
-      1. The maple tree advanced API (mas_*) expects the maple tree lock
-         to be held.
-      2. At stage-2 fault time, kvm->mmu_lock is only taken for read.
-         Therefore even if 1. does not matter, parallel accesses to the
-         maple tree could still happen.
+input:            $$$$$$$$$$$$$$$$$$$$$$$$$$
+tree:  --||||-----|||||||---------||||||||||-----------
 
-  - Changed from using GFP_KERNEL_ACCOUNT to (GFP_NOWAIT | __GFP_ACCOUNT)
-    in maple tree operations. This is done because GFP_KERNEL_ACCOUNT
-    can sleep, and we are holding kvm->mmu_lock while doing the
-    operations.
+insert spanning range and replace overlapping ones:
+       --||||-----||||||||||||||||||||||||||-----------
+                  ^^^^^^^^polluted!^^^^^^^^^
 
-  - Made the code able to tolerate reverse map creation failure. In v1
-    if a maple tree operation fails, the error is reported back to the
-    caller which in the end fails the vCPU run. It shouldn't be this way
-    as the reverse map is an optimization and it shouldn't fail the
-    normal operation as we can fallback to a full unmap.
+With the reverse map created, when a canonical IPA range gets unmapped,
+look into each s2 mmu's maple tree and look for canonical IPA ranges
+affected, and base on their polluted status:
 
-  - Added a boolean nested_revmap_broken in struct kvm_s2_mmu. If
-    reverse map creation fails, the reverse map becomes unreliable. Keep
-    this failure information with nested_revmap_broken so that we can
-    fallback when we need to unmap.
+polluted -> fall back and fully invalidate the current shadow stage-2,
+            also clear the tree
+not polluted -> unmap the nested IPA range, and remove the reverse map
+                entry
 
-  - Removed patch 2,3,4 for now. After we start using the maple tree
-    lock, and keeping track of the reverse map failure state in
-    nested_revmap_broken, the s2 mmu look up acceleration in v1 patch 2
-    becomes very complicated, as the canonical maple tree used to speed
-    up s2 mmu look up can also encounter allocation failures which we
-    also need to keep track of and fallback. In the mean time the
-    consistency between the trees is not easy to reason about when
-    errors happen. Additionally, the extra lock of the canonical maple
-    tree also needs to be considered and care must be taken to not
-    introduce lock order inversion.
-    Given the above I believe it is best to leave the reverse map
-    improvements out for now, so as to not use too much time thinking
-    about optimization before the initial version of the reverse map is
-    even good.
-
-Thanks!
-
-[1]: https://sashiko.dev/#/patchset/20260330100633.2817076-1-weilin.chang%40arm.com
-[2]: https://lore.kernel.org/kvmarm/20260330100633.2817076-1-weilin.chang@arm.com/
-
-Wei-Lin Chang (1):
-  KVM: arm64: nv: Avoid full shadow s2 unmap
-
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+---
  arch/arm64/include/asm/kvm_host.h   |   4 +
  arch/arm64/include/asm/kvm_nested.h |   4 +
  arch/arm64/kvm/mmu.c                |  30 ++++--
  arch/arm64/kvm/nested.c             | 147 +++++++++++++++++++++++++++-
  4 files changed, 177 insertions(+), 8 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 851f6171751c..a97bd461c1e1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+ 	 */
+ 	bool	nested_stage2_enabled;
+ 
++	/* canonical IPA to nested IPA range lookup */
++	struct maple_tree nested_revmap_mt;
++	bool	nested_revmap_broken;
++
+ #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+ 	struct dentry *shadow_pt_debugfs_dentry;
+ #endif
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 091544e6af44..f039220e87a6 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -76,6 +76,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+ 				       const union tlbi_info *info,
+ 				       void (*)(struct kvm_s2_mmu *,
+ 						const union tlbi_info *));
++extern void kvm_record_nested_revmap(gpa_t gpa, struct kvm_s2_mmu *mmu,
++				    gpa_t fault_gpa, size_t map_size);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+ 
+@@ -164,6 +166,8 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ 				    struct kvm_s2_trans *trans);
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+ extern void kvm_nested_s2_wp(struct kvm *kvm);
++extern void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
++				       bool may_block);
+ extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
+ extern void kvm_nested_s2_flush(struct kvm *kvm);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index d089c107d9b7..4c9b9cf6dc43 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include <linux/acpi.h>
++#include <linux/maple_tree.h>
+ #include <linux/mman.h>
+ #include <linux/kvm_host.h>
+ #include <linux/io.h>
+@@ -1099,6 +1100,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+ 	struct kvm_pgtable *pgt = NULL;
++	struct maple_tree *mt = &mmu->nested_revmap_mt;
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 	pgt = mmu->pgt;
+@@ -1108,8 +1110,11 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 		free_percpu(mmu->last_vcpu_ran);
+ 	}
+ 
+-	if (kvm_is_nested_s2_mmu(kvm, mmu))
++	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
++		if (!mtree_empty(mt))
++			mtree_destroy(mt);
+ 		kvm_init_nested_s2_mmu(mmu);
++	}
+ 
+ 	write_unlock(&kvm->mmu_lock);
+ 
+@@ -1631,6 +1636,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 		goto out_unlock;
+ 	}
+ 
++	if (s2fd->nested)
++		kvm_record_nested_revmap(gfn << PAGE_SHIFT, pgt->mmu,
++					 s2fd->fault_ipa, PAGE_SIZE);
++
+ 	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+ 						 __pfn_to_phys(pfn), prot,
+ 						 memcache, flags);
+@@ -2031,6 +2040,13 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
+ 								 prot, flags);
+ 	} else {
++		if (s2fd->nested) {
++			phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
++
++			ipa &= ~(mapping_size - 1);
++			kvm_record_nested_revmap(ipa, pgt->mmu, gfn_to_gpa(gfn),
++						 mapping_size);
++		}
+ 		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
+ 							 __pfn_to_phys(pfn), prot,
+ 							 memcache, flags);
+@@ -2388,14 +2404,16 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
++	gpa_t gpa = range->start << PAGE_SHIFT;
++	size_t size = (range->end - range->start) << PAGE_SHIFT;
++	bool may_block = range->may_block;
++
+ 	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+ 		return false;
+ 
+-	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+-			     (range->end - range->start) << PAGE_SHIFT,
+-			     range->may_block);
++	__unmap_stage2_range(&kvm->arch.mmu, gpa, size, may_block);
++	kvm_unmap_gfn_range_nested(kvm, gpa, size, may_block);
+ 
+-	kvm_nested_s2_unmap(kvm, range->may_block);
+ 	return false;
+ }
+ 
+@@ -2673,7 +2691,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+-	kvm_nested_s2_unmap(kvm, true);
++	kvm_unmap_gfn_range_nested(kvm, gpa, size, true);
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 883b6c1008fb..c9ebe969b453 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -7,6 +7,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
++#include <linux/maple_tree.h>
+ 
+ #include <asm/fixmap.h>
+ #include <asm/kvm_arm.h>
+@@ -43,6 +44,19 @@ struct vncr_tlb {
+  */
+ #define S2_MMU_PER_VCPU		2
+ 
++/*
++ * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree payload
++ * layout:
++ *
++ * bit 63: valid, 1 for non-polluted entries, prevents the case where the
++ *         nested IPA is 0 and turns the whole value to 0
++ * bits 55-12: nested IPA bits 55-12
++ * bit 0: polluted, 1 for polluted, 0 for not
++ */
++#define VALID_ENTRY		BIT(63)
++#define NESTED_IPA_MASK		GENMASK_ULL(55, 12)
++#define UNKNOWN_IPA		BIT(0)
++
+ void kvm_init_nested(struct kvm *kvm)
+ {
+ 	kvm->arch.nested_mmus = NULL;
+@@ -769,12 +783,57 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 	return s2_mmu;
+ }
+ 
++void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
++			      gpa_t fault_ipa, size_t map_size)
++{
++	struct maple_tree *mt = &mmu->nested_revmap_mt;
++	gpa_t start = ipa;
++	gpa_t end = ipa + map_size - 1;
++	u64 entry, new_entry = 0;
++	MA_STATE(mas, mt, start, end);
++
++	if (mmu->nested_revmap_broken)
++		return;
++
++	mtree_lock(mt);
++	entry = (u64)mas_find_range(&mas, end);
++
++	if (entry) {
++		/* maybe just a perm update... */
++		if (!(entry & UNKNOWN_IPA) && mas.index == start &&
++		    mas.last == end &&
++		    fault_ipa == (entry & NESTED_IPA_MASK))
++			goto unlock;
++		/*
++		 * Create a "polluted" range that spans all the overlapping
++		 * ranges and store it.
++		 */
++		while (entry && mas.index <= end) {
++			start = min(mas.index, start);
++			end = max(mas.last, end);
++			entry = (u64)mas_find_range(&mas, end);
++		}
++		new_entry |= UNKNOWN_IPA;
++	} else {
++		new_entry |= fault_ipa;
++		new_entry |= VALID_ENTRY;
++	}
++
++	mas_set_range(&mas, start, end);
++	if (mas_store_gfp(&mas, (void *)new_entry, GFP_NOWAIT | __GFP_ACCOUNT))
++		mmu->nested_revmap_broken = true;
++unlock:
++	mtree_unlock(mt);
++}
++
+ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+ {
+ 	/* CnP being set denotes an invalid entry */
+ 	mmu->tlb_vttbr = VTTBR_CNP_BIT;
+ 	mmu->nested_stage2_enabled = false;
+ 	atomic_set(&mmu->refcnt, 0);
++	mt_init(&mmu->nested_revmap_mt);
++	mmu->nested_revmap_broken = false;
+ }
+ 
+ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+@@ -1150,6 +1209,90 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+ 	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+ }
+ 
++static void reset_revmap_and_unmap(struct kvm_s2_mmu *mmu, bool may_block)
++{
++	mtree_destroy(&mmu->nested_revmap_mt);
++	kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
++	mmu->nested_revmap_broken = false;
++}
++
++static void unmap_mmu_ipa_range(struct kvm_s2_mmu *mmu, gpa_t gpa,
++				  size_t unmap_size, bool may_block)
++{
++	struct maple_tree *mt = &mmu->nested_revmap_mt;
++	gpa_t start = gpa;
++	gpa_t end = gpa + unmap_size - 1;
++	u64 entry;
++	size_t entry_size;
++	bool unlock, fallback;
++	MA_STATE(mas, mt, gpa, end);
++
++	if (mmu->nested_revmap_broken) {
++		unlock = false;
++		fallback = true;
++		goto fin;
++	}
++
++	mtree_lock(mt);
++	entry = (u64)mas_find_range(&mas, end);
++
++	while (entry && mas.index <= end) {
++		start = mas.last + 1;
++		entry_size = mas.last - mas.index + 1;
++		/*
++		 * Give up and invalidate this s2 mmu if the unmap range
++		 * touches any polluted range.
++		 */
++		if (entry & UNKNOWN_IPA) {
++			unlock = true;
++			fallback = true;
++			goto fin;
++		}
++
++		/*
++		 * Ignore result, it is okay if a reverse mapping erase
++		 * fails.
++		 */
++		mas_store_gfp(&mas, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
++
++		mtree_unlock(mt);
++		kvm_stage2_unmap_range(mmu, entry & NESTED_IPA_MASK, entry_size,
++				       may_block);
++		mtree_lock(mt);
++		/*
++		 * Other maple tree operations during preemption could render
++		 * this ma_state invalid, so reset it.
++		 */
++		mas_set_range(&mas, start, end);
++		entry = (u64)mas_find_range(&mas, end);
++	}
++	unlock = true;
++	fallback = false;
++
++fin:
++	if (unlock)
++		mtree_unlock(mt);
++	if (fallback)
++		reset_revmap_and_unmap(mmu, may_block);
++}
++
++void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
++				bool may_block)
++{
++	int i;
++
++	if (!kvm->arch.nested_mmus_size)
++		return;
++
++	/* TODO: accelerate this using mt of canonical s2 mmu */
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			unmap_mmu_ipa_range(mmu, gpa, size, may_block);
++	}
++}
++
+ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+ {
+ 	int i;
+@@ -1163,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+ 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+ 
+ 		if (kvm_s2_mmu_valid(mmu))
+-			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
++			reset_revmap_and_unmap(mmu, may_block);
+ 	}
+ 
+ 	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+@@ -1848,7 +1991,7 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
+ 
+ 		write_lock(&vcpu->kvm->mmu_lock);
+ 		if (mmu->pending_unmap) {
+-			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
++			reset_revmap_and_unmap(mmu, true);
+ 			mmu->pending_unmap = false;
+ 		}
+ 		write_unlock(&vcpu->kvm->mmu_lock);
 -- 
 2.43.0
 
