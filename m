@@ -1,139 +1,112 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9128A30DD1F
-	for <kvmarm@lists.linux.dev>; Sat, 11 Apr 2026 05:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4278C253950
+	for <kvmarm@lists.linux.dev>; Sat, 11 Apr 2026 10:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775887185; cv=none; b=qhrLpHBoRTaMdlXwy0vYpnb8fdtBnQaDNb7xkAdAU8gJlkm0FnNpZPIK3P3/7enn1i9KLRGNkbtEWZaYatLSyxawq09Q7uj4CIMhXwYvsw8dkveUGCKib0eXctc79/fY1ScOoSv5XHBsp7LmKt5E97EbekyCRFdNF4/jFt+3CXM=
+	t=1775902904; cv=none; b=Mh51yYnIt7LhRHjuDDeGdlyOEkHcLtX+UOzut+joKyuXUMMsE6zn73srDX67Tk0ohU253utDtwas2WR0puPb4SnlSZMIu7aHfJQSsLEXHbaF/wCSMi2BAXVzB2+lVXEDjxXCCYg7bQ4B6wbfWqI/7BlsqVptDp7jloglkQXNeOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775887185; c=relaxed/simple;
-	bh=1+M/LxRWc86eWq4cNRHT0yrYfUE6yViWD9TbxaM0v0k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iWr4cR1cTpQY7CKRuT/avxsUAXW3igELu0h7VaTbIpsoSHOqboPz2t8DbbINAqVIocY5R78jhRN5Ug2xSvYzpYvboCR5PkuMN+q7Hx+dIWVxXzIYeuqhmTUs9V/qYhnV5yI23kzjPpvLCyEb3e8WXU+MGpiq4FX5bGxuAmnYjbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P78AcBkW; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1775902904; c=relaxed/simple;
+	bh=6pigEJb6MjU5WOzv3cHoV2MRbx3gnmposFMAjl091HA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=OBnL0rpFGk/2O3018c7ChPp7xidpj6fsgrWGMpqd0PBYAbkGGZxI41bQ6MEgJ+sNiGDF+D3Wa8VsbCxoris7Yo5ijjaOCQKF3U41Vu1GzjBNyyxjdHTo6/Qtad3//rFaufwTFcj/f4fUNMd4DVnRmwXuC/jv+nxr9fqWFpmykVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=c75er+X1 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P78AcBkW"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c74244dc0b3so1646993a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 10 Apr 2026 22:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775887184; x=1776491984; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2hKpQKRb1doRhCbODxXOkqcma9DZMRnM3wlvxT1Nafs=;
-        b=P78AcBkWyPnuRBGcARRuwSQM6c0Pi8dC8l8hZ+eTBpGoa88FKt5VLvWIs6mBFL5cNQ
-         a+S71TgRNMmOMSZ3Ue0jzCwwNbIqClnKmFMGVK8Ox44dw33GIiDZ2wNxn81qLvKDSxwH
-         sMZ9Lt9OtQT7UvDoYqiE9S2kqFRaRzvbjtw7hsCnAf0UBDNVvWgJqkrf6nlzgwgjaWkE
-         3hT4k9pL8vx1g1sOrBrc7PueHNneeyhLuNy5mZ3CgxGy8xh9W+wr3CdWsyvelblwbL2C
-         +kNw8pEHGNjAC1j7vc0GZ7CgoupCJEb7HSnos5cxktiAhv8f7fbNvd0vrHXmwfGwDfH8
-         V9/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775887184; x=1776491984;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2hKpQKRb1doRhCbODxXOkqcma9DZMRnM3wlvxT1Nafs=;
-        b=s2GPE2luDnRAlBwb8HJqrrN3fyVUd5/4DazQv2TuvlexV27b5Hcf8WkkawsbUd3gT2
-         AQE/Dw+c1zTSOxvn4quYnFeMjmKq1HIXueOQby5P7Yhz5kkRGWRv7h33ztjIa4ocW7s4
-         c1/4SoNBO/MjVcyVZrmOpeFKY2o06NP3MbQzBh5Af2ZLUzNNxv6uXMUktwIXrmhfiHxX
-         4uJPdRbs9+wPjpnHQppYaxn12ELTQ2kdiNlNEd+41zKhsmqIGIzspHuldDDI5nViKhTZ
-         kdgKPl8ozOdlwxQItdVP0s4V0hg7xnzsa3Rf6mWDxBmethOpg6Ek1aksFohvHqDa3kqD
-         qBYg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9E2jTgoPO/k51KJHRudjNMLDp+w+Ty9yk58+oRU2M8OeB5f+p0qRLOS2+2qRVJ8E9RMch/40=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyK9zgLuUsaq+u0ENXQiyvLUD9A0MMVPZ/xraggffnGDPhaKBZ4
-	cU0SPWjOa4DV0oVZ6l94Q/f/Ayc4kLZHAHDuUf9AeHWHcxMwFfgXmMc2
-X-Gm-Gg: AeBDiet4NOBCOmaQ38D9Jo0IiUi533VA1NXbgUKPV2ilHm8P3fSJJszeRYUUF1CEBg4
-	LHOzEm/1bZDcQNA40WmBkpgQ6xl95eCEDFQgjQC3jj7qkddaQArymxY4TnxCDRmyveLhkhEDl7N
-	aFvg2ykgMP1wZ7eiCkAbXYM1sUsX3XGWzTpCSiuo3BnhX3WeO5wZx5OXwaMrJzSWy5hnuDuQjFT
-	+rLB9TJza4t+KDHnfcb12e+Wq9lHoi1AdbhQMs2wiDTDTnkPBeg7KHhrDJG+wVB+sMshZxUaU9L
-	Y7YQpIy7IWp4QGZ6WEzcnIqL43ZvOjqqX+nlH9OKZuVTxXHZeGrOVwiHu5zSqJM95BoR4Kl/WE0
-	TGYicFTxCiiYhL7lJb+NfpFh6Whx8jdE5mID8ux9nsUl27kQikdyBeJpJyv8SoNFil2AXZMs+dn
-	BDGLAcXtF1iGvehdc3SqRY7Nb4+QVWuv4FFss68uqqXqDDMPwxntJ/9P6VUtx8Snt/Poc4/0coJ
-	1iTVp+QBaE0C+NdJg==
-X-Received: by 2002:a05:6a20:9155:b0:39f:5671:921 with SMTP id adf61e73a8af0-39fe3c9126bmr7033215637.3.1775887183785;
-        Fri, 10 Apr 2026 22:59:43 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:a7b4:1829:8943:c37a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c30ee3fsm4977702b3a.12.2026.04.10.22.59.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 22:59:43 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org
-Cc: drjones@redhat.com,
-	christoffer.dall@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Subject: [PATCH] arm64: KVM: Initialize vGIC before preempt-disabled section in kvm_reset_vcpu()
-Date: Sat, 11 Apr 2026 11:29:35 +0530
-Message-ID: <20260411055935.21692-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="c75er+X1"
+Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63BAKqRm021769
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 11 Apr 2026 19:20:54 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=Vpu164nWx4WQH4ej/oGZKppmfZaoPsbjbattGAiYgSg=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=From:Message-Id:To:Subject:Date;
+        s=rs20250326; t=1775902854; v=1;
+        b=c75er+X1PN0maGfvFJV0Xzne9R8sgCDVB0XeimikaL1sSEvbBwGutr8clOtXdlAw
+         TkMfT7vUMiCqIH4Ml2EPI7QtxHCI+kRWwfOM+wsS5flxsVEpEZ2u6gYzRq0LMoNT
+         NE9AK78FRA9d5xYYlX2MJRhFiS6MYFLizs31r2pFn843NybjsU5xFD8N6Oslw79v
+         OhPPndiX+4msj5LN/9Fj6Z+2xrleK4WTVn3zCF3hx0kN06MGA/yqas1ACAFW5gk8
+         d3OHYNBlRazm5mXALqW8P38m15oW2eyOzlQl0WtWKY6weehLBfxvNwdsngZu423P
+         6NPflQcOqaPRQ71k0aLzoA==
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Date: Sat, 11 Apr 2026 19:20:31 +0900
+Subject: [PATCH v5 1/4] KVM: arm64: PMU: Add kvm_pmu_enabled_counter_mask()
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260411-hybrid-v5-1-b043b4d9f49e@rsg.ci.i.u-tokyo.ac.jp>
+References: <20260411-hybrid-v5-0-b043b4d9f49e@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20260411-hybrid-v5-0-b043b4d9f49e@rsg.ci.i.u-tokyo.ac.jp>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+X-Mailer: b4 0.15-dev-5ab4c
 
-kvm_reset_vcpu() calls kvm_timer_vcpu_reset() inside a preempt-disabled
-section to avoid races with preempt notifiers that also call vcpu put/load.
+This function will be useful to enumerate enabled counters.
 
-However, kvm_timer_vcpu_reset() eventually calls kvm_vgic_inject_irq()
-which triggers vgic_lazy_init() if the vGIC has not been initialized yet.
-vgic_lazy_init() acquires a mutex and calls vgic_init() which invokes
-synchronize_srcu_expedited() -- both of which may sleep. Sleeping inside
-a preempt-disabled section is illegal and causes:
-
-  BUG: scheduling while atomic: syz.1.49/3699/0x00000002
-
-Fix this by calling vgic_lazy_init() before preempt_disable(). On the
-second call inside kvm_vgic_inject_irq(), vgic_initialized() will return
-true and vgic_lazy_init() will return immediately without sleeping.
-
-Fixes: e761a927bc9a ("KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded")
-Reported-by: syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=12b178b7c756664d2518
-Tested-by: syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
- arch/arm64/kvm/reset.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/kvm/pmu-emul.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b963fd975aac..4ee16b4a37b5 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -25,6 +25,7 @@
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
-+#include "vgic/vgic.h"
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_nested.h>
-@@ -198,6 +199,14 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	vcpu->arch.reset_state.reset = false;
- 	spin_unlock(&vcpu->arch.mp_state_lock);
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index b03dbda7f1ab..59ec96e09321 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -619,18 +619,24 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ 	}
+ }
  
+-static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
++static u64 kvm_pmu_enabled_counter_mask(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+-	unsigned int mdcr = __vcpu_sys_reg(vcpu, MDCR_EL2);
++	u64 mask = 0;
+ 
+-	if (!(__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx)))
+-		return false;
++	if (__vcpu_sys_reg(vcpu, MDCR_EL2) & MDCR_EL2_HPME)
++		mask |= kvm_pmu_hyp_counter_mask(vcpu);
+ 
+-	if (kvm_pmu_counter_is_hyp(vcpu, pmc->idx))
+-		return mdcr & MDCR_EL2_HPME;
++	if (kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)
++		mask |= ~kvm_pmu_hyp_counter_mask(vcpu);
 +
-+	/*
-+	 * Initialize vGIC before entering preempt-disabled section.
-+	 * vgic_lazy_init() may sleep via mutex_lock, which is illegal
-+	 * inside preempt_disable(). Second call inside kvm_vgic_inject_irq
-+	 * will find vGIC already initialized and return immediately.
-+	 */
-+	vgic_lazy_init(vcpu->kvm);
- 	preempt_disable();
- 	loaded = (vcpu->cpu != -1);
- 	if (loaded)
++	return __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
++}
++
++static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
++{
++	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+ 
+-	return kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E;
++	return kvm_pmu_enabled_counter_mask(vcpu) & BIT(pmc->idx);
+ }
+ 
+ static bool kvm_pmc_counts_at_el0(struct kvm_pmc *pmc)
+
 -- 
-2.43.0
+2.53.0
 
