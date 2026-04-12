@@ -1,131 +1,140 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F96721D00A
-	for <kvmarm@lists.linux.dev>; Sat, 11 Apr 2026 14:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53F02BD59C
+	for <kvmarm@lists.linux.dev>; Sun, 12 Apr 2026 08:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775916041; cv=none; b=boMgPRTQtLRzREd7Ss6i2FkBGhRHfBvflWMFeK68vE7mOCLmoVwOJ3kqUgPUJ+z7VUyNx03WJP4DNAN04d6eglwvjZmPzxqcvGcsRNMc/G4Z7sIcG5/6KDmQC9KO3n6gDag9ROR9yrAVb5/m8BDmSPcgbYcExvVqODB3A8nVh7M=
+	t=1775981090; cv=none; b=WA21Ne9G+FM/7yzEx1+nZre87b2p5pjyLDrR914abS03XuqMpUgLLpip5+s83iGFn57AjTAvKQbo4eeIjR8OKY1dUs+b62kVODGLVt0p5QLT81anm1z/bNYJZu+3EtVeZcKmafdxuPUMJBmFIh0eIU1shGxHZLDbQH4aFjcpjnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775916041; c=relaxed/simple;
-	bh=SXW3Q/MqNoCRHOMZlzD/EseY8OJA01AhSX2LP5F3J1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mg5jWLvWFalk/9pGjkA6cjw09Lz2cclDs4UFUJUR/2L1uMlH8VOakVpr+e0bMdUqHuu+I7s/l8usWlg7XElog8PXOLNrTGvf60Fkhg1Decsla8aSHUDqTKPi8OyShCPYjSJkpIenMEqlLKdyAWUzw4HAK3jei4kUqyZjbJ/kELE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=EAdIU7aI; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1775981090; c=relaxed/simple;
+	bh=1+M/LxRWc86eWq4cNRHT0yrYfUE6yViWD9TbxaM0v0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=beCZGTi+vt33bBkH/taC+t3HzkYlcMsjkMqHO26bfpMylJHjqUL9rDaVO4ZJuOmjVrc8A/f+RK6c5V0zOxM6L2M+8qVxQ83TjPydxKXkrjwuujOYJBvXI2EM59bkwrHB0nF6FAtQ1iSRrvevhfWzxNUkXdGUhlHwcOY4hiOQGc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUSzl6VG; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="EAdIU7aI"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B4B63542;
-	Sat, 11 Apr 2026 07:00:31 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1F8E3F632;
-	Sat, 11 Apr 2026 07:00:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1775916037; bh=SXW3Q/MqNoCRHOMZlzD/EseY8OJA01AhSX2LP5F3J1Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EAdIU7aILiap/xHxm4EoMkUNNKDkWaxUa6jXxZJmV8KMNI5I9aqYQ3HF+Z37IEgXh
-	 T8DgodG58z4FHc5oCBDm5drh2SX3OJY+86xZVm9Y27WJhufbN05d6GV+aLdFvnknx0
-	 VCpysyj6nalOjUZEYCCsdwb1dzegHZkNMGiGEJBw=
-Date: Sat, 11 Apr 2026 15:00:23 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 0/1] KVM: arm64: nv: Implement nested stage-2 reverse
- map
-Message-ID: <e2rdpxn6t3ygxi3qkausk5quroqy43p6jsqz5oennzaewz3uar@2w5cs57ndsvm>
-References: <20260411125024.3735989-1-weilin.chang@arm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUSzl6VG"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-82a655cfab5so3037712b3a.1
+        for <kvmarm@lists.linux.dev>; Sun, 12 Apr 2026 01:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775981087; x=1776585887; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2hKpQKRb1doRhCbODxXOkqcma9DZMRnM3wlvxT1Nafs=;
+        b=QUSzl6VGZ7Ak3TpLNhT9BCp7KU7B56WoJkJOwSiwqJUE6XXG70coW4BFG8L+S/KpBp
+         HFmOVPWq5TkPG/FY15ES4AxUXH02ZfO7LjjOjMsneaKod4EoCcgxDUHCicYuDebrCvb1
+         AVuy7zyhqx1ewaj7vj+RoDPDn7DxEcgFXoVBUv6BdSPpK29w7IIhejyxQEc9k/UuxeI9
+         IIKTXtUkQR5qXijfwpNwkuCOdxkKvLyPjeAhO9b8nActyLvEcm60mnccsVnSoobxMhdW
+         JISDG3VRw5Kbqq23o2BrR/1+X5axr0V3M6O2dJV7+GHSDULLm2ebR/Re+WA9b41RD5gq
+         ybig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775981087; x=1776585887;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2hKpQKRb1doRhCbODxXOkqcma9DZMRnM3wlvxT1Nafs=;
+        b=YopYuNWZQaM+x5Ut//of79SkI92pl4MsZ3UZKiD4XEboWEFiOF1G6QBFiGWuFpqOrg
+         iFbjAhM+eHzQsFSFATRTnSwSwi1XaiaCSSAhsXsdDeLwEDI/BY5kofFCzoDFNeINGFyh
+         zt9fSX07gphqsfrLAvz+wq/Elh/vJPAsKjkB9dvb76T3zN+mMDxH6aW40u74spNm4OSn
+         OrP6t4wq7Sj97jgWvv6L7IL84zHd8GFB68sNQaVmCk5JlTSd27uQyEHT09Y+Lu7mt0kY
+         /1Ff9gJU0S3Y060391n9zn9K9/1dw4/nt4oXK97A0yCb2Hk3PqapJyzc39oquOagfMf9
+         eJBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWK7AAxBO4NjshafGtYsKgty/aUWyJUfdQDKZmc+8ChNvv4LIAvAEit7CEAYHDRVNFOlUrK/ZI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwxGE/7uXjlMdcI2irPE7DQ7RQnJUFvNkXgjCptGo8OhzzFdViJ
+	CCLs6zkSS7Ovt84gHmAI9Jn4nyE2smq1zii97NSQjGiBBEim/goue9Sk
+X-Gm-Gg: AeBDieuxPXIUN3KTU0k+sUu/ZovlT4uYv6+jdL4NaGRsKAtbCHRgB1lc4KdmjblwSn3
+	/dFOKXzmdxRunN34eKd4RMQhw+msp3YfQxucs05X5GLE8Z+6ZNzhf3SMSTv0LkVQujDCnboJOQz
+	W0ILiYoA+5GwaloG0Z347JUQpvpTz2HGGi1syr1qT/35HMUD5MjhHbetTjXW+rqxUSsOxnoOTTN
+	Y4ndgdP/Obr0RIb3VAlBh8lb+Hu6azfOrVSoToQRdwDf7xt+BISLkxe5/inVyfbAsLHDvfcEAZr
+	HqVpy7MnGIAYZ4r6qKVxKgwlLUhbWTfqBeSEhSp+fbyg9SRruNaS5NQU7TMQYxld2ullzwM+wAt
+	no52pohsIh2Ku6c6nLvZl8jNylUL5eGBVM5gIvbEhVoSEq8MBJlo7fzGNuGuQ6x8F8T8JmT2SZo
+	7cBECBO8wUIB0yQMiT1NUq21kUfxjwYKOQKmdMAEIU/ntrFHF9uyDaLARMM3C7jRoCvgZisISU4
+	oLHwA==
+X-Received: by 2002:a05:6a00:1f03:b0:82c:9f73:a2f with SMTP id d2e1a72fcca58-82f0c2c8bfbmr10079288b3a.40.1775981087078;
+        Sun, 12 Apr 2026 01:04:47 -0700 (PDT)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:142c:c389:4a2:63cd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c33de57sm7389959b3a.21.2026.04.12.01.04.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Apr 2026 01:04:46 -0700 (PDT)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: maz@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Cc: drjones@redhat.com,
+	christoffer.dall@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
+Subject: [PATCH] arm64: KVM: Initialize vGIC before preempt-disabled section in kvm_reset_vcpu()
+Date: Sun, 12 Apr 2026 13:34:37 +0530
+Message-ID: <20260412080437.38782-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260411125024.3735989-1-weilin.chang@arm.com>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+kvm_reset_vcpu() calls kvm_timer_vcpu_reset() inside a preempt-disabled
+section to avoid races with preempt notifiers that also call vcpu put/load.
 
-Sorry, I missed changing the title to v2.
-I'll add this to my checklist before sending next time.
+However, kvm_timer_vcpu_reset() eventually calls kvm_vgic_inject_irq()
+which triggers vgic_lazy_init() if the vGIC has not been initialized yet.
+vgic_lazy_init() acquires a mutex and calls vgic_init() which invokes
+synchronize_srcu_expedited() -- both of which may sleep. Sleeping inside
+a preempt-disabled section is illegal and causes:
 
-Thanks,
-Wei-Lin Chang
+  BUG: scheduling while atomic: syz.1.49/3699/0x00000002
 
-On Sat, Apr 11, 2026 at 01:50:23PM +0100, Wei-Lin Chang wrote:
-> Hi,
-> 
-> This is v2 of optimizing the shadow s2 mmu unmapping during MMU
-> notifiers. Thanks to Sashiko, who helped point out the many problems [1]
-> in v1.
-> 
-> * Changes from v1 [2]:
-> 
->   - Rebased on to a newer kvmarm/next, where user_mem_abort() underwent
->     a significant refactor.
-> 
->   - Added a flag VALID_ENTRY (bit 63) to each non-polluted reverse map
->     entry, so that if nested IPA == 0, we still insert a non-zero entry
->     to the maple tree.
-> 
->   - Added usage of the maple tree lock while using the tree. Previously
->     I though I could piggyback on kvm->mmu_lock, but this doesn't work
->     for 2 reasons:
->       1. The maple tree advanced API (mas_*) expects the maple tree lock
->          to be held.
->       2. At stage-2 fault time, kvm->mmu_lock is only taken for read.
->          Therefore even if 1. does not matter, parallel accesses to the
->          maple tree could still happen.
-> 
->   - Changed from using GFP_KERNEL_ACCOUNT to (GFP_NOWAIT | __GFP_ACCOUNT)
->     in maple tree operations. This is done because GFP_KERNEL_ACCOUNT
->     can sleep, and we are holding kvm->mmu_lock while doing the
->     operations.
-> 
->   - Made the code able to tolerate reverse map creation failure. In v1
->     if a maple tree operation fails, the error is reported back to the
->     caller which in the end fails the vCPU run. It shouldn't be this way
->     as the reverse map is an optimization and it shouldn't fail the
->     normal operation as we can fallback to a full unmap.
-> 
->   - Added a boolean nested_revmap_broken in struct kvm_s2_mmu. If
->     reverse map creation fails, the reverse map becomes unreliable. Keep
->     this failure information with nested_revmap_broken so that we can
->     fallback when we need to unmap.
-> 
->   - Removed patch 2,3,4 for now. After we start using the maple tree
->     lock, and keeping track of the reverse map failure state in
->     nested_revmap_broken, the s2 mmu look up acceleration in v1 patch 2
->     becomes very complicated, as the canonical maple tree used to speed
->     up s2 mmu look up can also encounter allocation failures which we
->     also need to keep track of and fallback. In the mean time the
->     consistency between the trees is not easy to reason about when
->     errors happen. Additionally, the extra lock of the canonical maple
->     tree also needs to be considered and care must be taken to not
->     introduce lock order inversion.
->     Given the above I believe it is best to leave the reverse map
->     improvements out for now, so as to not use too much time thinking
->     about optimization before the initial version of the reverse map is
->     even good.
-> 
-> Thanks!
-> 
-> [1]: https://sashiko.dev/#/patchset/20260330100633.2817076-1-weilin.chang%40arm.com
-> [2]: https://lore.kernel.org/kvmarm/20260330100633.2817076-1-weilin.chang@arm.com/
-> 
-> Wei-Lin Chang (1):
->   KVM: arm64: nv: Avoid full shadow s2 unmap
-> 
->  arch/arm64/include/asm/kvm_host.h   |   4 +
->  arch/arm64/include/asm/kvm_nested.h |   4 +
->  arch/arm64/kvm/mmu.c                |  30 ++++--
->  arch/arm64/kvm/nested.c             | 147 +++++++++++++++++++++++++++-
->  4 files changed, 177 insertions(+), 8 deletions(-)
-> 
-> -- 
-> 2.43.0
-> 
+Fix this by calling vgic_lazy_init() before preempt_disable(). On the
+second call inside kvm_vgic_inject_irq(), vgic_initialized() will return
+true and vgic_lazy_init() will return immediately without sleeping.
+
+Fixes: e761a927bc9a ("KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded")
+Reported-by: syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=12b178b7c756664d2518
+Tested-by: syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
+Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+---
+ arch/arm64/kvm/reset.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b963fd975aac..4ee16b4a37b5 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -25,6 +25,7 @@
+ #include <asm/ptrace.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
++#include "vgic/vgic.h"
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_nested.h>
+@@ -198,6 +199,14 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.reset_state.reset = false;
+ 	spin_unlock(&vcpu->arch.mp_state_lock);
+ 
++
++	/*
++	 * Initialize vGIC before entering preempt-disabled section.
++	 * vgic_lazy_init() may sleep via mutex_lock, which is illegal
++	 * inside preempt_disable(). Second call inside kvm_vgic_inject_irq
++	 * will find vGIC already initialized and return immediately.
++	 */
++	vgic_lazy_init(vcpu->kvm);
+ 	preempt_disable();
+ 	loaded = (vcpu->cpu != -1);
+ 	if (loaded)
+-- 
+2.43.0
+
