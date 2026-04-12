@@ -1,81 +1,53 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53F02BD59C
-	for <kvmarm@lists.linux.dev>; Sun, 12 Apr 2026 08:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E54376BCD
+	for <kvmarm@lists.linux.dev>; Sun, 12 Apr 2026 14:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775981090; cv=none; b=WA21Ne9G+FM/7yzEx1+nZre87b2p5pjyLDrR914abS03XuqMpUgLLpip5+s83iGFn57AjTAvKQbo4eeIjR8OKY1dUs+b62kVODGLVt0p5QLT81anm1z/bNYJZu+3EtVeZcKmafdxuPUMJBmFIh0eIU1shGxHZLDbQH4aFjcpjnI=
+	t=1776003774; cv=none; b=Ak+2k8fC5w+VkKg4muQta3g/RLU12obybA8uuZGSU8y88KlM22ePFsV0I2Pxn2aRyw3ndJi4M+o38czeNARYDbkC0mdzytXGLdO3SZDjcXCrGGqv+fpa/hR7h1mzO7/2qgWen7QHDNMKbCQv/odc0cu7maPDWSfioKI3n1gRdi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775981090; c=relaxed/simple;
-	bh=1+M/LxRWc86eWq4cNRHT0yrYfUE6yViWD9TbxaM0v0k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=beCZGTi+vt33bBkH/taC+t3HzkYlcMsjkMqHO26bfpMylJHjqUL9rDaVO4ZJuOmjVrc8A/f+RK6c5V0zOxM6L2M+8qVxQ83TjPydxKXkrjwuujOYJBvXI2EM59bkwrHB0nF6FAtQ1iSRrvevhfWzxNUkXdGUhlHwcOY4hiOQGc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUSzl6VG; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776003774; c=relaxed/simple;
+	bh=0EDfWpsdxsjcAtIRZvKranYR1gx5ZSTX9J79iq1ThbA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=h2xWefd4TlD0X8L7WsAd6f90iFwcz89l27ug/J+x01NDfFt08HVPGoAcJM5M6yEno9c7ax7k568jIfKsnWbIAnoRIiNd8OzohEZ95ksllzoJcXcPdpOyY5HlATS0V/1vdqAtB+czSKYV6gg+9eo2mxHyl1Bi5ztG4Q/oDRdHhj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vgOJEwq1; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUSzl6VG"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-82a655cfab5so3037712b3a.1
-        for <kvmarm@lists.linux.dev>; Sun, 12 Apr 2026 01:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775981087; x=1776585887; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2hKpQKRb1doRhCbODxXOkqcma9DZMRnM3wlvxT1Nafs=;
-        b=QUSzl6VGZ7Ak3TpLNhT9BCp7KU7B56WoJkJOwSiwqJUE6XXG70coW4BFG8L+S/KpBp
-         HFmOVPWq5TkPG/FY15ES4AxUXH02ZfO7LjjOjMsneaKod4EoCcgxDUHCicYuDebrCvb1
-         AVuy7zyhqx1ewaj7vj+RoDPDn7DxEcgFXoVBUv6BdSPpK29w7IIhejyxQEc9k/UuxeI9
-         IIKTXtUkQR5qXijfwpNwkuCOdxkKvLyPjeAhO9b8nActyLvEcm60mnccsVnSoobxMhdW
-         JISDG3VRw5Kbqq23o2BrR/1+X5axr0V3M6O2dJV7+GHSDULLm2ebR/Re+WA9b41RD5gq
-         ybig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775981087; x=1776585887;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2hKpQKRb1doRhCbODxXOkqcma9DZMRnM3wlvxT1Nafs=;
-        b=YopYuNWZQaM+x5Ut//of79SkI92pl4MsZ3UZKiD4XEboWEFiOF1G6QBFiGWuFpqOrg
-         iFbjAhM+eHzQsFSFATRTnSwSwi1XaiaCSSAhsXsdDeLwEDI/BY5kofFCzoDFNeINGFyh
-         zt9fSX07gphqsfrLAvz+wq/Elh/vJPAsKjkB9dvb76T3zN+mMDxH6aW40u74spNm4OSn
-         OrP6t4wq7Sj97jgWvv6L7IL84zHd8GFB68sNQaVmCk5JlTSd27uQyEHT09Y+Lu7mt0kY
-         /1Ff9gJU0S3Y060391n9zn9K9/1dw4/nt4oXK97A0yCb2Hk3PqapJyzc39oquOagfMf9
-         eJBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWK7AAxBO4NjshafGtYsKgty/aUWyJUfdQDKZmc+8ChNvv4LIAvAEit7CEAYHDRVNFOlUrK/ZI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwxGE/7uXjlMdcI2irPE7DQ7RQnJUFvNkXgjCptGo8OhzzFdViJ
-	CCLs6zkSS7Ovt84gHmAI9Jn4nyE2smq1zii97NSQjGiBBEim/goue9Sk
-X-Gm-Gg: AeBDieuxPXIUN3KTU0k+sUu/ZovlT4uYv6+jdL4NaGRsKAtbCHRgB1lc4KdmjblwSn3
-	/dFOKXzmdxRunN34eKd4RMQhw+msp3YfQxucs05X5GLE8Z+6ZNzhf3SMSTv0LkVQujDCnboJOQz
-	W0ILiYoA+5GwaloG0Z347JUQpvpTz2HGGi1syr1qT/35HMUD5MjhHbetTjXW+rqxUSsOxnoOTTN
-	Y4ndgdP/Obr0RIb3VAlBh8lb+Hu6azfOrVSoToQRdwDf7xt+BISLkxe5/inVyfbAsLHDvfcEAZr
-	HqVpy7MnGIAYZ4r6qKVxKgwlLUhbWTfqBeSEhSp+fbyg9SRruNaS5NQU7TMQYxld2ullzwM+wAt
-	no52pohsIh2Ku6c6nLvZl8jNylUL5eGBVM5gIvbEhVoSEq8MBJlo7fzGNuGuQ6x8F8T8JmT2SZo
-	7cBECBO8wUIB0yQMiT1NUq21kUfxjwYKOQKmdMAEIU/ntrFHF9uyDaLARMM3C7jRoCvgZisISU4
-	oLHwA==
-X-Received: by 2002:a05:6a00:1f03:b0:82c:9f73:a2f with SMTP id d2e1a72fcca58-82f0c2c8bfbmr10079288b3a.40.1775981087078;
-        Sun, 12 Apr 2026 01:04:47 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:142c:c389:4a2:63cd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c33de57sm7389959b3a.21.2026.04.12.01.04.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Apr 2026 01:04:46 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org
-Cc: drjones@redhat.com,
-	christoffer.dall@arm.com,
-	linux-arm-kernel@lists.infradead.org,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vgOJEwq1"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F0114CE3;
+	Sun, 12 Apr 2026 07:22:47 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 909CD3F641;
+	Sun, 12 Apr 2026 07:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1776003772; bh=0EDfWpsdxsjcAtIRZvKranYR1gx5ZSTX9J79iq1ThbA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vgOJEwq15vuopE2NISS68i27oULnGZI5qAuOmpX6QefCKW2e1lnw98pbJrfFLRPPl
+	 HzYviLaS6/XWRXPLCfeL9Yw9TfOqDCbMI2m+q9aMDeLnkcFJdvzKIsHBja6EWMp0yL
+	 /qrlxa4RE5LPcAY0QElLGMAQSOLB3ZDtQBGdukQE=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Subject: [PATCH] arm64: KVM: Initialize vGIC before preempt-disabled section in kvm_reset_vcpu()
-Date: Sun, 12 Apr 2026 13:34:37 +0530
-Message-ID: <20260412080437.38782-1-kartikey406@gmail.com>
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v2 3/4] KVM: arm64: sefltests: Add basic NV selftest
+Date: Sun, 12 Apr 2026 15:22:15 +0100
+Message-ID: <20260412142216.3806482-4-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260412142216.3806482-1-weilin.chang@arm.com>
+References: <20260412142216.3806482-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,57 +56,138 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm_reset_vcpu() calls kvm_timer_vcpu_reset() inside a preempt-disabled
-section to avoid races with preempt notifiers that also call vcpu put/load.
+This selftest simply starts an L1, which starts its own guest (L2). L2
+runs without stage-1 and 2 translations, it calls an HVC to jump back
+to L1.
 
-However, kvm_timer_vcpu_reset() eventually calls kvm_vgic_inject_irq()
-which triggers vgic_lazy_init() if the vGIC has not been initialized yet.
-vgic_lazy_init() acquires a mutex and calls vgic_init() which invokes
-synchronize_srcu_expedited() -- both of which may sleep. Sleeping inside
-a preempt-disabled section is illegal and causes:
-
-  BUG: scheduling while atomic: syz.1.49/3699/0x00000002
-
-Fix this by calling vgic_lazy_init() before preempt_disable(). On the
-second call inside kvm_vgic_inject_irq(), vgic_initialized() will return
-true and vgic_lazy_init() will return immediately without sleeping.
-
-Fixes: e761a927bc9a ("KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded")
-Reported-by: syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=12b178b7c756664d2518
-Tested-by: syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/kvm/reset.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/hello_nested.c        | 103 ++++++++++++++++++
+ 2 files changed, 104 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/hello_nested.c
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b963fd975aac..4ee16b4a37b5 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -25,6 +25,7 @@
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
-+#include "vgic/vgic.h"
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_nested.h>
-@@ -198,6 +199,14 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	vcpu->arch.reset_state.reset = false;
- 	spin_unlock(&vcpu->arch.mp_state_lock);
- 
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 3dc3e39f7025..e8c108e0c487 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -168,6 +168,7 @@ TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
+ TEST_GEN_PROGS_arm64 += arm64/at
+ TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
+ TEST_GEN_PROGS_arm64 += arm64/hello_el2
++TEST_GEN_PROGS_arm64 += arm64/hello_nested
+ TEST_GEN_PROGS_arm64 += arm64/host_sve
+ TEST_GEN_PROGS_arm64 += arm64/hypercalls
+ TEST_GEN_PROGS_arm64 += arm64/external_aborts
+diff --git a/tools/testing/selftests/kvm/arm64/hello_nested.c b/tools/testing/selftests/kvm/arm64/hello_nested.c
+new file mode 100644
+index 000000000000..97387e4697b3
+--- /dev/null
++++ b/tools/testing/selftests/kvm/arm64/hello_nested.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * hello_nested - Go from vEL2 to EL1 then back
++ */
 +
-+	/*
-+	 * Initialize vGIC before entering preempt-disabled section.
-+	 * vgic_lazy_init() may sleep via mutex_lock, which is illegal
-+	 * inside preempt_disable(). Second call inside kvm_vgic_inject_irq
-+	 * will find vGIC already initialized and return immediately.
-+	 */
-+	vgic_lazy_init(vcpu->kvm);
- 	preempt_disable();
- 	loaded = (vcpu->cpu != -1);
- 	if (loaded)
++#include "nested.h"
++#include "processor.h"
++#include "test_util.h"
++#include "ucall.h"
++
++#define XLATE2GPA	(0xABCD)
++#define L2STACKSZ	(0x100)
++
++/*
++ * TPIDR_EL2 is used to store vcpu id, so save and restore it.
++ */
++static vm_paddr_t ucall_translate_to_gpa(void *gva)
++{
++	vm_paddr_t gpa;
++	u64 vcpu_id = read_sysreg(tpidr_el2);
++
++	GUEST_SYNC2(XLATE2GPA, gva);
++
++	/* get the result from userspace */
++	gpa = read_sysreg(tpidr_el2);
++
++	write_sysreg(vcpu_id, tpidr_el2);
++
++	return gpa;
++}
++
++static void l2_guest_code(void)
++{
++	do_hvc();
++}
++
++static void guest_code(void)
++{
++	struct vcpu vcpu;
++	struct hyp_data hyp_data;
++	int ret;
++	vm_paddr_t l2_pc, l2_stack_top;
++	/* force 16-byte alignment for the stack pointer */
++	u8 l2_stack[L2STACKSZ] __attribute__((aligned(16)));
++
++	GUEST_ASSERT_EQ(get_current_el(), 2);
++	GUEST_PRINTF("vEL2 entry\n");
++
++	l2_pc = ucall_translate_to_gpa(l2_guest_code);
++	l2_stack_top = ucall_translate_to_gpa(&l2_stack[L2STACKSZ]);
++
++	init_vcpu(&vcpu, l2_pc, l2_stack_top);
++	prepare_hyp();
++
++	ret = run_l2(&vcpu, &hyp_data);
++	GUEST_ASSERT_EQ(ret, ARM_EXCEPTION_TRAP);
++	GUEST_DONE();
++}
++
++int main(void)
++{
++	struct kvm_vcpu_init init;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	struct ucall uc;
++	vm_paddr_t gpa;
++
++	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
++	vm = vm_create(1);
++
++	kvm_get_default_vcpu_target(vm, &init);
++	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
++	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
++	kvm_arch_vm_finalize_vcpus(vm);
++
++	while (true) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			if (uc.args[0] == XLATE2GPA) {
++				gpa = addr_gva2gpa(vm, (vm_vaddr_t)uc.args[1]);
++				vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), gpa);
++			}
++			break;
++		case UCALL_PRINTF:
++			pr_info("%s", uc.buffer);
++			break;
++		case UCALL_DONE:
++			pr_info("DONE!\n");
++			goto end;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			fallthrough;
++		default:
++			TEST_FAIL("Unhandled ucall: %ld\n", uc.cmd);
++		}
++	}
++
++end:
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
 2.43.0
 
