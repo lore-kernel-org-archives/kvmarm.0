@@ -1,54 +1,54 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB5F3921DF
-	for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 20:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4782237E30D
+	for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 20:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776113201; cv=none; b=KXMSkYICvS39SrZ8w7F0FnAR44JqnBPif/tM0163t0WPV1wdLcNBAz/SGsvLjtwmop25Y20HAOB+op0MudLj3BCfBUHVI2Z6xz2sbB8Y73WEcP7pisXb4LvzDrJIjXjHCIFJDjWtnSKZsXOzxXMXhMl9nJzqoO01a2dO8CGa2P8=
+	t=1776113202; cv=none; b=uimk384zCHmqhYSViRWgq5wwaVJRin1LRXCBHmXklig4aNmGHhZCAgt+dgdED9KawqkF/jm7aO73i0rMQunQ33oULTJI7fcnS4LqWQx3dfs3Z6i/fnB0jmVdJag6UBbWWS88BYXa8ifBK7XF4IWXS98TMhpKEGB+sFQ27ZQdfPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776113201; c=relaxed/simple;
-	bh=ppikUFG9Hzais7xMS4QlMyIbHD6ZlLauMGYb8fV0ft0=;
+	s=arc-20240116; t=1776113202; c=relaxed/simple;
+	bh=dF8Pdh7fCGj7I5XOUTMFrg0tzRg/MLRCK+jmPyQdG/0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ow6xZkTiuQGk1UnPMQTPAX0wq0dgWyGQC0GZcfKq383UhqYNjM/kiarnQRsQH2Ki+MJPR688FfPd/1IWZ/KSYYXyVm5VnPBCRZJLA9dQx2F3ehSCRAUQOmQQ3ZDuksSxTk1nKMh8XISN0asS9bG/aG2Pp3X036lSthNvJcHQON8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ejRk6pXi; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=QEPQpkrA5V+CUq+87QYgARsAqWsssfeWy/2CBeI+7Kgrv9yt34USSVZ/JdZI+d6JFvG8sik0x2qT+RRQJfygLJf257cUHBdhgdeR9MILSKj7TIyjj+iV5LiTRhwDdx5yHbzPRkWcMBeIkCiTCSDjnQ81f4mM+jKOO1ZUpMFTB1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GWaU7E0E; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ejRk6pXi"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35845fcf0f5so5014157a91.0
-        for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 13:46:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GWaU7E0E"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b24a00d12cso49278045ad.1
+        for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 13:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776113199; x=1776717999; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1776113200; x=1776718000; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nB+HzEvk9VbVCSV5Ggd1re8A1eYiv0Tpte2WUmC2NiM=;
-        b=ejRk6pXi2fEl0nWwKbF3HEtTmDbph4nSqyfYZFEuLF6zZqy4FMAbnSRW5vy0rTTn9U
-         POcSD9opusJ8zBSo9M9WYRFe3ik+WY04tUJ5WiwmSeJDyhEltVSETVBitrNthjAk33i4
-         OyAYSK6KG+NQ+upF1zW1vb7NBD9/yOt76w5H5xz0abrKaeyRmbQ9ljPsuXjjXzkCJobv
-         HGBgESN5AZnI7hQ0Auj/n5qjcMOw5d0BhE53DXo1uQRJg+z7veD7ta6k5vvYG6kUndC9
-         lMSymbMd1xviKL+ShZrizIPrG6wB7OcEUnIAzn9NRKapClFpHZHjCmqWMxPI+La7Nxlz
-         huuA==
+        bh=PBSTda45yCwt3ewgfFRP1zgs9tSny1IPA4LGkYxKz3c=;
+        b=GWaU7E0EBS1xVjVZIgn32F36OktVUPleQt6ROsVxSyionR/ptlhwAmxiXHChoSaaWG
+         eJilSMT1Z1y1cl/IvZ01racSyTUjcDEH9CLAWm6wXzVE3wDlNc74iHHfR2k31wmP7uvI
+         1F40bsftoX1yBDOGanUAeYEWjF2S3sYIuRJXoOlsSSL9XtJF8r0S+bemZ3v9TLKz8sxD
+         PHhpmxG5bOGwqluJ7Xwcl2RBBVCQ3yg/KG9aoVngHj+WywGixgxO04AgAz7r+EpAbvRN
+         NyMk1bmXitJfG72xDlErxsBfd9ZEk06cwjedRryOqfNDNBKgfsdXvg1+ybOiq60221kU
+         LyMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776113199; x=1776717999;
+        d=1e100.net; s=20251104; t=1776113200; x=1776718000;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nB+HzEvk9VbVCSV5Ggd1re8A1eYiv0Tpte2WUmC2NiM=;
-        b=S4OOwmtj29n69zvAx4CurqAxY+mG8dL51+x2faxLiO9SSyO/n+n29HIW82YXfVg1Gn
-         9W1LK5Sx+AZHulSItsgphr6KsOLx7BTUmqwmLQ9LilpKn7m7mVPCVOtXdm6bWeHAyyVI
-         I0T5u7oZ8MbFqrAJy2UnH2MqBOuypihs08/cTJjlq1lH2n7rJr5QhR/Buw0isGFjQ31w
-         NfZWQyRzjgCU2vF9RtrkO4I3bA84OMkv+CjDk1hhID0Ect4NfUTJXGfhHBD9cPwjseAE
-         R9rebcoQtFtvg81OQ6xlGTxH2A1JUTCvmg0N3Xn1cu4muzTyezlill9cjK2Pow7sm97s
-         ebHw==
-X-Forwarded-Encrypted: i=1; AFNElJ+k8XRI8jV41D6WWYHV5l1Umh72GFhP71WxgH6E56yfjglct5vVyyzIKFf2Z+cKlGWt/VJFxpg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyYH7t3DyX/I6z7D59jfLzJass/wvdsP+SHFrRGStclJ8BEnSQy
-	88RzBXeNUbclqHmRGNQPaJkJQApaRMKd1TbckslBl/pF2niKfVf/fSBLi/+nQAzoE2i1ThPmNri
-	K3R0niwJfGVtyFPzBZ+lQDKBIhQ==
-X-Received: from pjhk63.prod.google.com ([2002:a17:90a:4cc5:b0:35f:c1cc:fee9])
+        bh=PBSTda45yCwt3ewgfFRP1zgs9tSny1IPA4LGkYxKz3c=;
+        b=lL9k4bqJUuk0QNTGHvrtmnvUzIzs1ecCRh07F3c8F3n7AEEyPG2HocaG4XhCL3xHqP
+         fsvDqpt1eoyWVMkRyJUi8MoChvAvdKuTmj9yfRjaksDsryE9MDbNXaAK1qDG+qlpsOX7
+         d13PRNkK3OArro2ssgPJr5dzhBe0IdSz3Pfh+hzR4exHw1cTUzZxgW1xJ9gOiy+ra97R
+         AK7DMg6gEP1YXgmPmTyo1tzOVl5vHiOq1cC6HKS/50UODBtd9ztPSSJj7MGFTEouwqZI
+         vC1uJ8TzGamid9cYyoDtR+ogS4EbGNU1z0z0v5u1k76G9lcLoACQgC5rOTpegCGRnVdE
+         7tYg==
+X-Forwarded-Encrypted: i=1; AFNElJ95q1DK76bEcheu1w7Nu82EPK4tHkKKPmiUQrKo53jXtoVYxyTaMfmHZeldEV5YDrVtQyRQ48k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyIASk8VVSVpMuQxiTaa37yI6ZWkBz24TLtXp1GGGHlyfKk7VqT
+	Wu+EL33awFrxnZlYv2QaC36nVqMCOGnC/ViRdc4Ctb1NFRak6tLQz6w5FqZrNUnRxi78WYPZWV0
+	47VIuLnQ4T+Wl32X3FBAO/Oi/cQ==
+X-Received: from plpf16.prod.google.com ([2002:a17:903:3c50:b0:2b2:3f89:e9d2])
  (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2692:b0:35f:b4c1:91ea with SMTP id 98e67ed59e1d1-35fb4c19506mr4083596a91.13.1776113198802;
- Mon, 13 Apr 2026 13:46:38 -0700 (PDT)
-Date: Mon, 13 Apr 2026 13:46:25 -0700
+ 2002:a17:902:ee94:b0:2ae:cb0e:fd59 with SMTP id d9443c01a7336-2b2d591d25amr105342905ad.8.1776113200357;
+ Mon, 13 Apr 2026 13:46:40 -0700 (PDT)
+Date: Mon, 13 Apr 2026 13:46:26 -0700
 In-Reply-To: <20260413204630.1149038-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260413204630.1149038-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.54.0.rc0.605.g598a273b03-goog
-Message-ID: <20260413204630.1149038-3-jingzhangos@google.com>
-Subject: [kvm-unit-tests PATCH v2 2/7] lib: arm64: Add stage2 page table
- management library
+Message-ID: <20260413204630.1149038-4-jingzhangos@google.com>
+Subject: [kvm-unit-tests PATCH v2 3/7] lib: arm64: Generalize exception vector
+ definitions for EL2 support
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -71,529 +71,278 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Andrew Jones <andrew.jones@linux.dev>
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Tests running at EL2 (hypervisor level) often require the ability to
-manage Stage 2 translation tables to control Guest Physical Address (IPA)
-to Host Physical Address (PA) translation.
-
-Add a generic Stage 2 MMU library that provides software management of
-ARM64 Stage 2 translation tables.
-
-The library features include:
-- Support for 4K, 16K, and 64K translation granules.
-- Dynamic page table allocation using the allocator.
-- Support for 2M block mappings where applicable.
-- APIs for mapping, unmapping, enabling, and disabling the Stage 2 MMU.
-- Basic fault info reporting (ESR, FAR, HPFAR).
-
-This infrastructure is necessary for upcoming virtualization and
-hypervisor-mode tests.
+Rename EL1-specific exception vector enumerations to ELx equivalents
+(e.g., EL1H to ELxH and EL0 to ELx_LOW) to make them level-agnostic.
+This allows these identifiers to be reused when running at other
+exception levels, such as EL2, supporting the upcoming guest
+management library.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arm/Makefile.arm64         |   1 +
- lib/arm64/asm/stage2_mmu.h |  70 +++++++
- lib/arm64/stage2_mmu.c     | 403 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 474 insertions(+)
- create mode 100644 lib/arm64/asm/stage2_mmu.h
- create mode 100644 lib/arm64/stage2_mmu.c
+ arm/debug.c               |  6 +++---
+ arm/gic.c                 |  2 +-
+ arm/micro-bench.c         |  4 ++--
+ arm/mte.c                 |  6 +++---
+ arm/pl031.c               |  2 +-
+ arm/pmu.c                 |  2 +-
+ arm/psci.c                |  2 +-
+ arm/selftest.c            |  6 +++---
+ arm/timer.c               |  6 +++---
+ lib/arm64/asm/processor.h | 32 ++++++++++++++++----------------
+ lib/arm64/processor.c     |  8 ++++----
+ 11 files changed, 38 insertions(+), 38 deletions(-)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index a40c830d..5e50f5ba 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -40,6 +40,7 @@ cflatobjs += lib/arm64/stack.o
- cflatobjs += lib/arm64/processor.o
- cflatobjs += lib/arm64/spinlock.o
- cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
-+cflatobjs += lib/arm64/stage2_mmu.o
+diff --git a/arm/debug.c b/arm/debug.c
+index 0299fd28..9ba93ac2 100644
+--- a/arm/debug.c
++++ b/arm/debug.c
+@@ -272,7 +272,7 @@ static noinline void test_hw_bp(bool migrate)
+ 		return;
+ 	}
  
- ifeq ($(CONFIG_EFI),y)
- cflatobjs += lib/acpi.o
-diff --git a/lib/arm64/asm/stage2_mmu.h b/lib/arm64/asm/stage2_mmu.h
-new file mode 100644
-index 00000000..a5324108
---- /dev/null
-+++ b/lib/arm64/asm/stage2_mmu.h
-@@ -0,0 +1,70 @@
-+/*
-+ * Copyright (C) 2026, Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+#ifndef _ASMARM64_STAGE2_MMU_H_
-+#define _ASMARM64_STAGE2_MMU_H_
-+
-+#include <libcflat.h>
-+#include <asm/page.h>
-+#include <asm/pgtable.h>
-+
-+#define pte_is_table(pte)	(pte_val(pte) & PTE_TABLE_BIT)
-+
-+/* Stage-2 Memory Attributes (MemAttr[3:0]) */
-+#define S2_MEMATTR_NORMAL	(0xFUL << 2) /* Normal Memory, Outer/Inner Write-Back */
-+#define S2_MEMATTR_DEVICE	(0x0UL << 2) /* Device-nGnRnE */
-+
-+/* Stage-2 Access Permissions (S2AP[1:0]) */
-+#define S2AP_NONE	(0UL << 6)
-+#define S2AP_RO		(1UL << 6) /* Read-only */
-+#define S2AP_WO		(2UL << 6) /* Write-only */
-+#define S2AP_RW		(3UL << 6) /* Read-Write */
-+
-+/* Flags for mapping */
-+#define S2_MAP_RW	(S2AP_RW | S2_MEMATTR_NORMAL | PTE_AF | PTE_SHARED)
-+#define S2_MAP_DEVICE	(S2AP_RW | S2_MEMATTR_DEVICE | PTE_AF)
-+
-+enum s2_granule {
-+	S2_PAGE_4K,
-+	S2_PAGE_16K,
-+	S2_PAGE_64K,
-+};
-+
-+/* Main Stage-2 MMU Structure */
-+struct s2_mmu {
-+	pgd_t *pgd;
-+	int vmid;
-+
-+	/* Configuration */
-+	enum s2_granule granule;
-+	bool allow_block_mappings;
-+
-+	/* Internal helpers calculated from granule & VA_BITS */
-+	unsigned int page_shift;
-+	unsigned int level_shift;
-+	int root_level; /* 0, 1, or 2 */
-+	unsigned long page_size;
-+	unsigned long block_size;
-+};
-+
-+/* API */
-+/* Initialize an s2_mmu struct with specific settings */
-+struct s2_mmu *s2mmu_init(int vmid, enum s2_granule granule, bool allow_block_mappings);
-+
-+/* Management */
-+void s2mmu_destroy(struct s2_mmu *mmu);
-+void s2mmu_map(struct s2_mmu *mmu, unsigned long ipa, unsigned long pa,
-+	       unsigned long size, unsigned long flags);
-+void s2mmu_unmap(struct s2_mmu *mmu, unsigned long ipa, unsigned long size);
-+
-+/* Activation */
-+void s2mmu_enable(struct s2_mmu *mmu);
-+void s2mmu_disable(struct s2_mmu *mmu);
-+
-+/* Debug */
-+void s2mmu_print_fault_info(void);
-+
-+#endif /* _ASMARM64_STAGE2_MMU_H_ */
-diff --git a/lib/arm64/stage2_mmu.c b/lib/arm64/stage2_mmu.c
-new file mode 100644
-index 00000000..cf419e28
---- /dev/null
-+++ b/lib/arm64/stage2_mmu.c
-@@ -0,0 +1,403 @@
-+/*
-+ * Copyright (C) 2026, Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+#include <libcflat.h>
-+#include <alloc.h>
-+#include <asm/stage2_mmu.h>
-+#include <asm/sysreg.h>
-+#include <asm/io.h>
-+#include <asm/barrier.h>
-+#include <alloc_page.h>
-+
-+/* VTCR_EL2 Definitions */
-+#define VTCR_SH0_INNER		(3UL << 12)
-+#define VTCR_ORGN0_WBWA		(1UL << 10)
-+#define VTCR_IRGN0_WBWA		(1UL << 8)
-+
-+/* TG0 Encodings */
-+#define VTCR_TG0_SHIFT		14
-+#define VTCR_TG0_4K		(0UL << VTCR_TG0_SHIFT)
-+#define VTCR_TG0_64K		(1UL << VTCR_TG0_SHIFT)
-+#define VTCR_TG0_16K		(2UL << VTCR_TG0_SHIFT)
-+
-+/* Physical Address Size (PS) - Derive from VA_BITS for simplicity or max */
-+#define VTCR_PS_SHIFT		16
-+#if VA_BITS > 40
-+#define VTCR_PS_VAL		(5UL << VTCR_PS_SHIFT) /* 48-bit PA */
-+#else
-+#define VTCR_PS_VAL		(2UL << VTCR_PS_SHIFT) /* 40-bit PA */
-+#endif
-+
-+struct s2_mmu *s2mmu_init(int vmid, enum s2_granule granule, bool allow_block_mappings)
-+{
-+	struct s2_mmu *mmu = calloc(1, sizeof(struct s2_mmu));
-+	int order = 0;
-+
-+	mmu->vmid = vmid;
-+	mmu->granule = granule;
-+	mmu->allow_block_mappings = allow_block_mappings;
-+
-+	/* Configure shifts based on granule */
-+	switch (granule) {
-+	case S2_PAGE_4K:
-+		mmu->page_shift = 12;
-+		mmu->level_shift = 9;
-+		/*
-+		 * Determine Root Level for 4K:
-+		 * VA_BITS > 39 (e.g. 48) -> Start L0
-+		 * VA_BITS <= 39 (e.g. 32, 36) -> Start L1
-+		 */
-+		mmu->root_level = (VA_BITS > 39) ? 0 : 1;
-+		break;
-+	case S2_PAGE_16K:
-+		mmu->page_shift = 14;
-+		mmu->level_shift = 11;
-+		/*
-+		 * 16K: L1 covers 47 bits. L0 not valid for 16K
-+		 * Start L1 for 47 bits. Start L2 for 36 bits.
-+		 */
-+		mmu->root_level = (VA_BITS > 36) ? 1 : 2;
-+		break;
-+	case S2_PAGE_64K:
-+		mmu->page_shift = 16;
-+		mmu->level_shift = 13;
-+		/* 64K: L1 covers 52 bits. L2 covers 42 bits. */
-+		mmu->root_level = (VA_BITS > 42) ? 1 : 2;
-+		break;
-+	}
-+
-+	mmu->page_size = 1UL << mmu->page_shift;
-+	mmu->block_size = 1UL << (mmu->page_shift + mmu->level_shift);
-+
-+	/* Alloc PGD. Use order for allocation size */
-+	if (mmu->page_size > PAGE_SIZE) {
-+		order = __builtin_ctz(mmu->page_size / PAGE_SIZE);
-+	}
-+	mmu->pgd = (pgd_t *)alloc_pages(order);
-+	if (mmu->pgd) {
-+		memset(mmu->pgd, 0, mmu->page_size);
-+	} else {
-+		free(mmu);
-+		return NULL;
-+	}
-+
-+	return mmu;
-+}
-+
-+static unsigned long s2mmu_get_addr_mask(struct s2_mmu *mmu)
-+{
-+	switch (mmu->granule) {
-+	case S2_PAGE_16K:
-+		return GENMASK_ULL(47, 14);
-+	case S2_PAGE_64K:
-+		return GENMASK_ULL(47, 16);
-+	default:
-+		return GENMASK_ULL(47, 12); /* 4K */
-+	}
-+}
-+
-+static void s2mmu_free_tables(struct s2_mmu *mmu, pte_t *table, int level)
-+{
-+	unsigned long entries = 1UL << mmu->level_shift;
-+	unsigned long mask = s2mmu_get_addr_mask(mmu);
-+	unsigned long i;
-+
-+	/*
-+	 * Recurse if not leaf level
-+	 * Level 3 is always leaf page. Levels 0-2 can be Table or Block.
-+	 */
-+	if (level < 3) {
-+		for (i = 0; i < entries; i++) {
-+			pte_t entry = table[i];
-+			if ((pte_valid(entry) && pte_is_table(entry))) {
-+				pte_t *next = (pte_t *)phys_to_virt(pte_val(entry) & mask);
-+				s2mmu_free_tables(mmu, next, level + 1);
-+			}
-+		}
-+	}
-+
-+	free_pages(table);
-+}
-+
-+void s2mmu_destroy(struct s2_mmu *mmu)
-+{
-+	if (mmu->pgd)
-+		s2mmu_free_tables(mmu, (pte_t *)mmu->pgd, mmu->root_level);
-+	free(mmu);
-+}
-+
-+void s2mmu_enable(struct s2_mmu *mmu)
-+{
-+	unsigned long vtcr = VTCR_PS_VAL | VTCR_SH0_INNER |
-+			     VTCR_ORGN0_WBWA | VTCR_IRGN0_WBWA;
-+	unsigned long t0sz = 64 - VA_BITS;
-+	unsigned long vttbr;
-+
-+	switch (mmu->granule) {
-+	case S2_PAGE_4K:
-+		vtcr |= VTCR_TG0_4K;
-+		/* SL0 Encodings for 4K: 0=L2, 1=L1, 2=L0 */
-+		if (mmu->root_level == 0)
-+			vtcr |= (2UL << 6); /* Start L0 */
-+		else if (mmu->root_level == 1)
-+			vtcr |= (1UL << 6); /* Start L1 */
-+		else
-+			vtcr |= (0UL << 6); /* Start L2 */
-+		break;
-+	case S2_PAGE_16K:
-+		vtcr |= VTCR_TG0_16K;
-+		/* SL0 Encodings for 16K: 0=L3(Res), 1=L2, 2=L1, 3=L0(Res) */
-+		if (mmu->root_level == 1)
-+			vtcr |= (2UL << 6); /* Start L1 */
-+		else
-+			vtcr |= (1UL << 6); /* Start L2 */
-+		break;
-+	case S2_PAGE_64K:
-+		vtcr |= VTCR_TG0_64K;
-+		/* SL0 Encodings for 64K: 0=L3(Res), 1=L2, 2=L1, 3=L0(Res) */
-+		if (mmu->root_level == 1)
-+			vtcr |= (2UL << 6); /* Start L1 */
-+		else
-+			vtcr |= (1UL << 6); /* Start L2 */
-+		break;
-+	}
-+
-+	vtcr |= t0sz;
-+
-+	write_sysreg(vtcr, vtcr_el2);
-+
-+	/* Setup VTTBR */
-+	vttbr = virt_to_phys(mmu->pgd);
-+	vttbr |= ((unsigned long)mmu->vmid << 48);
-+	write_sysreg(vttbr, vttbr_el2);
-+
-+	asm volatile("tlbi vmalls12e1is");
-+
-+	dsb(ish);
-+	isb();
-+}
-+
-+void s2mmu_disable(struct s2_mmu *mmu)
-+{
-+	write_sysreg(0, vttbr_el2);
-+	isb();
-+}
-+
-+static pte_t *get_pte(struct s2_mmu *mmu, pte_t *table, unsigned long idx, bool alloc)
-+{
-+	unsigned long mask = s2mmu_get_addr_mask(mmu);
-+	pte_t entry = table[idx];
-+	pte_t *next_table;
-+	int order = 0;
-+
-+	if (pte_valid(entry)) {
-+		if (pte_is_table(entry))
-+			return (pte_t *)phys_to_virt(pte_val(entry) & mask);
-+		/* Block Entry */
-+		return NULL;
-+	}
-+
-+	if (!alloc)
-+		return NULL;
-+
-+	/* Allocate table memory covering the Stage-2 Granule size */
-+	if (mmu->page_size > PAGE_SIZE)
-+		order = __builtin_ctz(mmu->page_size / PAGE_SIZE);
-+
-+	next_table = (pte_t *)alloc_pages(order);
-+	if (next_table)
-+		memset(next_table, 0, mmu->page_size);
-+
-+	pte_val(entry) = virt_to_phys(next_table) | PTE_TABLE_BIT | PTE_VALID;
-+	WRITE_ONCE(table[idx], entry);
-+
-+	return next_table;
-+}
-+
-+void s2mmu_map(struct s2_mmu *mmu, unsigned long ipa, unsigned long pa,
-+	       unsigned long size, unsigned long flags)
-+{
-+	unsigned long level_mask, level_shift, level_size, level;
-+	unsigned long start_ipa, end_ipa, idx;
-+	pte_t entry, *table, *next_table;
-+	bool is_block_level;
-+
-+	start_ipa = ipa;
-+	end_ipa = ipa + size;
-+	level_mask = (1UL << mmu->level_shift) - 1;
-+
-+	while (start_ipa < end_ipa) {
-+		table = (pte_t *)mmu->pgd;
-+
-+		/* Walk from Root to Leaf */
-+		for (level = mmu->root_level; level < 3; level++) {
-+			level_shift = mmu->page_shift + (3 - level) * mmu->level_shift;
-+			idx = (start_ipa >> level_shift) & level_mask;
-+			level_size = 1UL << level_shift;
-+
-+			/*
-+			 * Check for Block Mapping
-+			 * Valid Block Levels:
-+			 * 4K:  L1 (1G), L2 (2MB)
-+			 * 16K: L2 (32MB)
-+			 * 64K: L2 (512MB)
-+			 */
-+			is_block_level = (level == 2) ||
-+				(mmu->granule == S2_PAGE_4K && level == 1);
-+
-+			if (mmu->allow_block_mappings && is_block_level) {
-+				if ((start_ipa & (level_size - 1)) == 0 &&
-+				    (pa & (level_size - 1)) == 0 &&
-+				    (start_ipa + level_size) <= end_ipa) {
-+					/* Map Block */
-+					pte_val(entry) = (pa & ~(level_size - 1)) |
-+							 flags | PTE_VALID;
-+					WRITE_ONCE(table[idx], entry);
-+					start_ipa += level_size;
-+					pa += level_size;
-+					goto next_chunk; /* Continue outer loop */
-+				}
-+			}
-+
-+			/* Move to next level */
-+			next_table = get_pte(mmu, table, idx, true);
-+			if (!next_table) {
-+				printf("Error allocating or existing block conflict.\n");
-+				return;
-+			}
-+			table = next_table;
-+		}
-+
-+		/* Leaf Level (Level 3 PTE) */
-+		if (level == 3) {
-+			idx = (start_ipa >> mmu->page_shift) & level_mask;
-+			pte_val(entry) = (pa & ~(mmu->page_size - 1)) | flags | PTE_TYPE_PAGE;
-+			WRITE_ONCE(table[idx], entry);
-+			start_ipa += mmu->page_size;
-+			pa += mmu->page_size;
-+		}
-+
-+next_chunk:
-+		continue;
-+	}
-+
-+	asm volatile("tlbi vmalls12e1is");
-+	dsb(ish);
-+	isb();
-+}
-+
-+/*
-+ * Recursive helper to unmap a range within a specific table.
-+ * Returns true if the table at this level is now completely empty
-+ * and should be freed by the caller.
-+ */
-+static bool s2mmu_unmap_level(struct s2_mmu *mmu, pte_t *table,
-+			      unsigned long current_ipa, int level,
-+			      unsigned long start_ipa, unsigned long end_ipa,
-+			      unsigned long mask)
-+{
-+	unsigned long level_size, entry_ipa, entry_end;
-+	bool child_empty, table_empty = true;
-+	pte_t entry, *next_table;
-+	unsigned int level_shift;
-+	unsigned long i;
-+
-+	/* Calculate shift and size for this level */
-+	if (level == 3) {
-+		level_shift = mmu->page_shift;
-+	} else {
-+		level_shift = mmu->page_shift + (3 - level) * mmu->level_shift;
-+	}
-+	level_size = 1UL << level_shift;
-+
-+	/* Iterate over all entries in this table */
-+	for (i = 0; i < (1UL << mmu->level_shift); i++) {
-+		entry = table[i];
-+		entry_ipa = current_ipa + (i * level_size);
-+		entry_end = entry_ipa + level_size;
-+
-+		/* Skip entries completely outside our target range */
-+		if (entry_end <= start_ipa || entry_ipa >= end_ipa) {
-+			if (pte_valid(entry))
-+				table_empty = false;
-+			continue;
-+		}
-+
-+		/*
-+		 * If the entry is fully covered by the unmap range,
-+		 * we can clear it (leaf) or recurse and free (table).
-+		 */
-+		if (entry_ipa >= start_ipa && entry_end <= end_ipa) {
-+			if (pte_valid(entry)) {
-+				if (pte_is_table(entry) && level < 3) {
-+					/* Recurse to free children first */
-+					next_table = (pte_t *)phys_to_virt(pte_val(entry) & mask);
-+					s2mmu_free_tables(mmu, next_table, level + 1);
-+				}
-+				/* Invalidate the entry */
-+				WRITE_ONCE(table[i], __pte(0));
-+			}
-+			continue;
-+		}
-+
-+		/*
-+		 * Partial overlap: This must be a table (split required).
-+		 * If it's a Block, we can't split easily in this context
-+		 * without complex logic, so we generally skip or fail.
-+		 * Assuming standard breakdown: recurse into the table.
-+		 */
-+		if (pte_valid(entry) && pte_is_table(entry) && level < 3) {
-+			next_table = (pte_t *)phys_to_virt(pte_val(entry) & mask);
-+			child_empty = s2mmu_unmap_level(mmu, next_table, entry_ipa, level + 1,
-+							start_ipa, end_ipa, mask);
-+
-+			if (child_empty) {
-+				free_pages(next_table);
-+				WRITE_ONCE(table[i], __pte(0));
-+			} else {
-+				table_empty = false;
-+			}
-+		} else if (pte_valid(entry)) {
-+			/*
-+			 * Overlap on a leaf/block entry that extends
-+			 * beyond the unmap range. We cannot simply clear it.
-+			 */
-+			table_empty = false;
-+		}
-+	}
-+
-+	return table_empty;
-+}
-+
-+void s2mmu_unmap(struct s2_mmu *mmu, unsigned long ipa, unsigned long size)
-+{
-+	unsigned long end_ipa = ipa + size;
-+	unsigned long mask = s2mmu_get_addr_mask(mmu);
-+
-+	if (!mmu->pgd)
-+		return;
-+
-+	/*
-+	 * Start recursion from the root level.
-+	 * We rarely free the PGD itself unless destroying the MMU,
-+	 * so we ignore the return value here.
-+	 */
-+	s2mmu_unmap_level(mmu, (pte_t *)mmu->pgd, 0, mmu->root_level,
-+			  ipa, end_ipa, mask);
-+
-+	/* Ensure TLB invalidation occurs after page table updates */
-+	asm volatile("tlbi vmalls12e1is");
-+	dsb(ish);
-+	isb();
-+}
-+
-+void s2mmu_print_fault_info(void)
-+{
-+	unsigned long esr = read_sysreg(esr_el2);
-+	unsigned long far = read_sysreg(far_el2);
-+	unsigned long hpfar = read_sysreg(hpfar_el2);
-+	printf("Stage-2 Fault Info: ESR=0x%lx FAR=0x%lx HPFAR=0x%lx\n", esr, far, hpfar);
-+}
+-	install_exception_handler(EL1H_SYNC, ESR_EC_HW_BP_CURRENT, hw_bp_handler);
++	install_exception_handler(ELxH_SYNC, ESR_EC_HW_BP_CURRENT, hw_bp_handler);
+ 
+ 	reset_debug_state();
+ 
+@@ -324,7 +324,7 @@ static noinline void test_wp(bool migrate)
+ 		return;
+ 	}
+ 
+-	install_exception_handler(EL1H_SYNC, ESR_EC_WP_CURRENT, wp_handler);
++	install_exception_handler(ELxH_SYNC, ESR_EC_WP_CURRENT, wp_handler);
+ 
+ 	reset_debug_state();
+ 
+@@ -365,7 +365,7 @@ static noinline void test_ss(bool migrate)
+ 	extern unsigned char ss_start;
+ 	uint32_t mdscr;
+ 
+-	install_exception_handler(EL1H_SYNC, ESR_EC_SSTEP_CURRENT, ss_handler);
++	install_exception_handler(ELxH_SYNC, ESR_EC_SSTEP_CURRENT, ss_handler);
+ 
+ 	reset_debug_state();
+ 
+diff --git a/arm/gic.c b/arm/gic.c
+index 256dd80d..cccc5ae1 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -180,7 +180,7 @@ static void setup_irq(irq_handler_fn handler)
+ #ifdef __arm__
+ 	install_exception_handler(EXCPTN_IRQ, handler);
+ #else
+-	install_irq_handler(EL1H_IRQ, handler);
++	install_irq_handler(ELxH_IRQ, handler);
+ #endif
+ 	local_irq_enable();
+ }
+diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+index a6a78f20..6ca36c55 100644
+--- a/arm/micro-bench.c
++++ b/arm/micro-bench.c
+@@ -52,7 +52,7 @@ static void gic_irq_handler(struct pt_regs *regs)
+ 
+ static void gic_secondary_entry(void *data)
+ {
+-	install_irq_handler(EL1H_IRQ, gic_irq_handler);
++	install_irq_handler(ELxH_IRQ, gic_irq_handler);
+ 	gic_enable_defaults();
+ 	local_irq_enable();
+ 	irq_ready = true;
+@@ -212,7 +212,7 @@ static void lpi_exec(void)
+ static bool timer_prep(void)
+ {
+ 	gic_enable_defaults();
+-	install_irq_handler(EL1H_IRQ, gic_irq_handler);
++	install_irq_handler(ELxH_IRQ, gic_irq_handler);
+ 	local_irq_enable();
+ 
+ 	if (current_level() == CurrentEL_EL1)
+diff --git a/arm/mte.c b/arm/mte.c
+index a1bed8a7..38940d7e 100644
+--- a/arm/mte.c
++++ b/arm/mte.c
+@@ -192,7 +192,7 @@ static void mte_sync_test(void)
+ 
+ 	mte_exception = false;
+ 
+-	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
++	install_exception_handler(ELxH_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+ 
+ 	mem_read(tagged(mem, 2), &val);
+ 
+@@ -218,12 +218,12 @@ static void mte_asymm_test(void)
+ 	mte_set_tcf(MTE_TCF_ASYMM);
+ 	mte_exception = false;
+ 
+-	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
++	install_exception_handler(ELxH_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+ 
+ 	mem_read(tagged(mem, 3), &val);
+ 	report((val == 0) && mte_exception && (get_clear_tfsr() == 0), "read");
+ 
+-	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
++	install_exception_handler(ELxH_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
+ 
+ 	mem_write(tagged(mem, 4), 0xaaaaaaaa);
+ 	report((*mem == 0xaaaaaaaa) && (get_clear_tfsr() == TFSR_EL1_TF0), "write");
+diff --git a/arm/pl031.c b/arm/pl031.c
+index c56805e4..3c739d4d 100644
+--- a/arm/pl031.c
++++ b/arm/pl031.c
+@@ -162,7 +162,7 @@ static int check_rtc_irq(void)
+ 	writel(before + seconds_to_wait, &pl031->mr);
+ 
+ #ifdef __aarch64__
+-	install_irq_handler(EL1H_IRQ, irq_handler);
++	install_irq_handler(ELxH_IRQ, irq_handler);
+ #else
+ 	install_exception_handler(EXCPTN_IRQ, irq_handler);
+ #endif
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 2fcec71a..90878641 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -968,7 +968,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+ 		return;
+ 
+ 	gic_enable_defaults();
+-	install_irq_handler(EL1H_IRQ, irq_handler);
++	install_irq_handler(ELxH_IRQ, irq_handler);
+ 	local_irq_enable();
+ 	gic_enable_irq(23);
+ 
+diff --git a/arm/psci.c b/arm/psci.c
+index 55308c8f..a52a1701 100644
+--- a/arm/psci.c
++++ b/arm/psci.c
+@@ -36,7 +36,7 @@ static void install_invalid_function_handler(exception_fn handler)
+ #ifdef __arm__
+ 	install_exception_handler(EXCPTN_UND, handler);
+ #else
+-	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, handler);
++	install_exception_handler(ELxH_SYNC, ESR_EL1_EC_UNKNOWN, handler);
+ #endif
+ }
+ 
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 33f4cf42..7a626980 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -305,7 +305,7 @@ static enum vector check_vector_prep(void)
+ 	unsigned long daif;
+ 
+ 	if (is_user())
+-		return EL0_SYNC_64;
++		return ELx_LOW_SYNC_64;
+ 
+ 	asm volatile("mrs %0, daif" : "=r" (daif) ::);
+ 	expected_regs.pstate = daif;
+@@ -313,7 +313,7 @@ static enum vector check_vector_prep(void)
+ 		expected_regs.pstate |= PSR_MODE_EL1h;
+ 	else
+ 		expected_regs.pstate |= PSR_MODE_EL2h;
+-	return EL1H_SYNC;
++	return ELxH_SYNC;
+ }
+ 
+ static void unknown_handler(struct pt_regs *regs, unsigned int esr __unused)
+@@ -400,7 +400,7 @@ static void check_vectors(void *arg __unused)
+ #ifdef __arm__
+ 		install_exception_handler(EXCPTN_UND, user_psci_system_off);
+ #else
+-		install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN,
++		install_exception_handler(ELx_LOW_SYNC_64, ESR_EL1_EC_UNKNOWN,
+ 					  user_psci_system_off);
+ #endif
+ 	} else {
+diff --git a/arm/timer.c b/arm/timer.c
+index 43fb6d88..0f77f8d8 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -356,9 +356,9 @@ static void test_init(void)
+ 		vtimer_info.irq = TIMER_HVTIMER_IRQ;
+ 	}
+ 
+-	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
++	install_exception_handler(ELxH_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+ 	ptimer_info.read_ctl();
+-	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
++	install_exception_handler(ELxH_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
+ 
+ 	if (ptimer_unsupported && !ERRATA(7b6b46311a85)) {
+ 		report_skip("Skipping ptimer tests. Set ERRATA_7b6b46311a85=y to enable.");
+@@ -369,7 +369,7 @@ static void test_init(void)
+ 
+ 	gic_enable_defaults();
+ 
+-	install_irq_handler(EL1H_IRQ, irq_handler);
++	install_irq_handler(ELxH_IRQ, irq_handler);
+ 	set_timer_irq_enabled(&ptimer_info, true);
+ 	set_timer_irq_enabled(&vtimer_info, true);
+ 	local_irq_enable();
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 32ddc1b3..c20dd599 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -13,22 +13,22 @@
+ #include <asm/barrier.h>
+ 
+ enum vector {
+-	EL1T_SYNC,
+-	EL1T_IRQ,
+-	EL1T_FIQ,
+-	EL1T_ERROR,
+-	EL1H_SYNC,
+-	EL1H_IRQ,
+-	EL1H_FIQ,
+-	EL1H_ERROR,
+-	EL0_SYNC_64,
+-	EL0_IRQ_64,
+-	EL0_FIQ_64,
+-	EL0_ERROR_64,
+-	EL0_SYNC_32,
+-	EL0_IRQ_32,
+-	EL0_FIQ_32,
+-	EL0_ERROR_32,
++	ELxT_SYNC,
++	ELxT_IRQ,
++	ELxT_FIQ,
++	ELxT_ERROR,
++	ELxH_SYNC,
++	ELxH_IRQ,
++	ELxH_FIQ,
++	ELxH_ERROR,
++	ELx_LOW_SYNC_64,
++	ELx_LOW_IRQ_64,
++	ELx_LOW_FIQ_64,
++	ELx_LOW_ERROR_64,
++	ELx_LOW_SYNC_32,
++	ELx_LOW_IRQ_32,
++	ELx_LOW_FIQ_32,
++	ELx_LOW_ERROR_32,
+ 	VECTOR_MAX,
+ };
+ 
+diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+index bde3caa5..98e26912 100644
+--- a/lib/arm64/processor.c
++++ b/lib/arm64/processor.c
+@@ -198,10 +198,10 @@ void default_vector_irq_handler(enum vector v, struct pt_regs *regs,
+ 
+ void vector_handlers_default_init(vector_fn *handlers)
+ {
+-	handlers[EL1H_SYNC]	= default_vector_sync_handler;
+-	handlers[EL1H_IRQ]	= default_vector_irq_handler;
+-	handlers[EL0_SYNC_64]	= default_vector_sync_handler;
+-	handlers[EL0_IRQ_64]	= default_vector_irq_handler;
++	handlers[ELxH_SYNC]	= default_vector_sync_handler;
++	handlers[ELxH_IRQ]	= default_vector_irq_handler;
++	handlers[ELx_LOW_SYNC_64]	= default_vector_sync_handler;
++	handlers[ELx_LOW_IRQ_64]	= default_vector_irq_handler;
+ }
+ 
+ /* Needed to compile with -Wmissing-prototypes */
 -- 
 2.53.0.1213.gd9a14994de-goog
 
