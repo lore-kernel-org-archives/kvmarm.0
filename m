@@ -1,100 +1,143 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB38B34E770
-	for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 14:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB1A3542E5
+	for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 20:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776091327; cv=none; b=ggy7pasTmrB55jK2cqfJJacKdYadsbFaZ4UrUA1KYfrZIHv08KYltH+PlmitltDTM6xBF1f2MzQTLhULzstZetl1tfo2JlLcFOjJ40w/L2RGK8WmYSz4hAJG6zDQpMKYv5miNs+c73XeBVTDylFYmFS48XK3Nv1G+x528ZbbGWM=
+	t=1776113197; cv=none; b=TV+25WZpF0TunF7P0Dn27D4QS2ih9baPkVNw+B7PG0lMelpBBhGTUYGYZXeuBWRxWEplnNAFN1J0iE53fqzYsTg5COHsAr3FugjXGtWzzWmzTNnJnsvnu98sUc+R0ydKPPm4NghtgA0kaSnoUlVmL6B3VsHOzlfMjByhk4eBa/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776091327; c=relaxed/simple;
-	bh=Vnrz228eSk/mptycnXQRjUy58RSHNsaULpU2FASTdWU=;
-	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QbVRKxkb5Xe1xUjp8F6tAFQpa81Q/OhgbwyoqyOL3iZguQhOYzpZaTbivzbK431inSRpcEPhYu6BAAKu3jbtIu8LXceKwcJG/gtf7dBIFYJFX++708pGcSTjPIPbpVs5VCQzw7yBz8qoyCnUdMZGFUM6L/TLvbwlS2fJP+PfB5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Ox4XFWgT; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776113197; c=relaxed/simple;
+	bh=uprHKwXObO+AE6bDi/TNr7PFtVJVYS3qu7Pa4B009Uk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=a18R0nT/FVjgYmBEeRrGTTn7p3JbFRwAsOMt7pgzCN5Nn+0Sy10KhzcVNEzrPu2JCPd6GR9BHTrFg9V3eEpPYM2+R3SOT20O7hDk8pq0W9pJUD5U53wkmGmQnncFQuTIH11DxtVY2bAWsoxzK7iQqZ91p1m46yk4kiWmzOU14qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QTLjRnhN; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Ox4XFWgT"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72055357A;
-	Mon, 13 Apr 2026 07:41:59 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B13E63F641;
-	Mon, 13 Apr 2026 07:42:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776091325; bh=Vnrz228eSk/mptycnXQRjUy58RSHNsaULpU2FASTdWU=;
-	h=Date:Subject:Cc:References:From:In-Reply-To:From;
-	b=Ox4XFWgTjz8OIRvYE2TPsgObpjTSWquTbGbtfyBurAHNFusQmwooU6ij0WBXa7ssY
-	 GnGPNXrGAkuHQvNgAPIjjezUioQbP/LC8CiCugXqLSvDv2GCQUvKx5oWqo/z7e6M+5
-	 Fm8LZpzkjKkkAhAny3/DQ/+SL7TkOWMlVPTepHMQ=
-Message-ID: <fa463a9a-2dff-4f2b-931e-9e0a9ac3f9c9@arm.com>
-Date: Mon, 13 Apr 2026 15:41:59 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QTLjRnhN"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82f45dadbe6so1398427b3a.1
+        for <kvmarm@lists.linux.dev>; Mon, 13 Apr 2026 13:46:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776113196; x=1776717996; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=I7eiz8y/l7lCP2hNqNsnkSrKMhwpC7fnrESdccwzjeo=;
+        b=QTLjRnhNTkL5M4pMLbLcHh0UEXXML/xB0K2of6HBNQPNrKfTZP5xjbbTlnzcCLHETv
+         SLBwhqJ+4NJRfkrXYH3Tc2Q1mxozsrhdjlmn4gMTyFw0WiF6GjvCILwpvneStWkeJAWj
+         4YQujrwhw4PTfRRBMoTQ+9L/4oEV0YecTWL4JA7efK4eY4wUAcgDATebAtJTF7qxZ9BJ
+         pAugv5BwnG/UruepHD7DSup5ucrvciN7KRG1uzNMD6GDs810N+zvxUKewYbFfsveEShU
+         h5Um1KuXtESmWzSjpymyEGMXIL4DFAXFmpEy+7BGycpISrKEJrt2XkgbT0CIKoOBuLS3
+         /IOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776113196; x=1776717996;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I7eiz8y/l7lCP2hNqNsnkSrKMhwpC7fnrESdccwzjeo=;
+        b=kCPdor7Vcql68jWX265ZoTxjbCyjvGX68vp3dYCt3pPNPuuYxtr+knHJPEu5VuzElR
+         oOtaoNqhtRn9xHdJORY1fuQTHqf5kFfaJbFoZEixB4LD5L1jPfMVI7enLJiFJmA795K0
+         2L3hR90/ZlH1uLorEKnGTBIR34Ky/9LL/LkCF16PFpV4SKIJB2XRIwRnZJyc1mYPltfY
+         LhqRllIjraGYYVN2FRUiOLiNdOwH9fogWC8TbTtVtsmvRy5sHDgihQb0sXc3oPUE7Zle
+         q0NsuSv44z1Ai9ax6z/Kb5ZWMTcZpX3xpED6A0o8mviUJXiim5HahiJx/Ffp74Y/qBH6
+         +2ow==
+X-Forwarded-Encrypted: i=1; AFNElJ9dBHtZ0BkMMDaJC4L5ekUm2fWR1e6bqNx3cX1xA8fwhvz02kxCS1bK4Ukazc6YasGOVfPb9nk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwWrEi6ZS0Oz3IRHfuI24+/QWNcpPw2C9zGYvC2/kCMhP+yFZvM
+	o0LprjeSsh2/aRfGGt8YeEu9CeUHoKZE2mGsfQNmhLg2EMz211W+WpeIL0dpdF0/fW49wLXYLjE
+	X35BUd8f+K8AaUsGdm+rfoVUO4A==
+X-Received: from pfbfb22.prod.google.com ([2002:a05:6a00:2d96:b0:827:1713:6de8])
+ (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1a8e:b0:82f:3828:a00a with SMTP id d2e1a72fcca58-82f3828b18dmr6883092b3a.41.1776113195294;
+ Mon, 13 Apr 2026 13:46:35 -0700 (PDT)
+Date: Mon, 13 Apr 2026 13:46:23 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Thunderbird Daily
-Subject: Re: [PATCH v6 00/40] arm_mpam: Add KVM/arm64 and resctrl glue code
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org
-References: <20260313144617.3420416-1-ben.horgan@arm.com>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc0.605.g598a273b03-goog
+Message-ID: <20260413204630.1149038-1-jingzhangos@google.com>
+Subject: [kvm-unit-tests PATCH v2 0/7] arm64: Add Stage-2 MMU and Nested Guest Framework
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Andrew Jones <andrew.jones@linux.dev>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Mingwei Zhang <mizhang@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
+
+This patch series introduces a lightweight infrastructure for managing ARM64
+Stage-2 translation tables and executing nested guests. These components are
+essential for testing advanced virtualization features such as nested
+virtualization (NV) and GICv4 direct interrupt injection.
+
+The series provides a generic Stage-2 MMU library supporting multiple
+translation granules (4K, 16K, 64K) and dynamic page table management.
+Building on this, it adds a guest execution framework that handles guest
+lifecycle management, context switching and guest exit routing. A new test
+case for Stage-2 MMU demand paging to verify fault handling.
+
+Please note that this is a very preliminary implementation intended as a
+startup baseline for future work in virtualization testing. Users should be
+aware that because this is an early-stage baseline, some portions of the code
+may just happen to work in its current state. There might be critical
+architectural elements or edge-case handling missing that will need to be
+addressed as the framework matures.
+
+---
+
+* v1 -> v2
+  - Used generated `struct guest` offset instead of hardcoding.
+  - Cleaned up register definitions.
+  - Refined EL1/EL2 exception vector tables.
+  - Split monolithic patches into a series of granular commits.
+  - Addressed other review feedbacks.
+
+[1] https://lore.kernel.org/kvmarm/20260316224349.2360482-1-jingzhangos@google.com/
+
+---
+
+Jing Zhang (7):
+  lib: arm64: Generalize ESR exception class definitions for EL2 support
+  lib: arm64: Add stage2 page table management library
+  lib: arm64: Generalize exception vector definitions for EL2 support
+  lib: arm64: Add foundational guest execution framework
+  lib: arm64: Add support for guest exit exception handling
+  lib: arm64: Add guest-internal exception handling (EL1)
+  arm64: Add Stage-2 MMU demand paging test
+
+ arm/Makefile.arm64         |   4 +
+ arm/debug.c                |   6 +-
+ arm/gic.c                  |   2 +-
+ arm/micro-bench.c          |   4 +-
+ arm/mte.c                  |   6 +-
+ arm/pl031.c                |   2 +-
+ arm/pmu.c                  |   2 +-
+ arm/psci.c                 |   2 +-
+ arm/selftest.c             |   6 +-
+ arm/stage2-mmu-test.c      | 107 ++++++++++
+ arm/timer.c                |   6 +-
+ lib/arm64/asm-offsets.c    |  15 ++
+ lib/arm64/asm/esr.h        |   5 +-
+ lib/arm64/asm/guest.h      |  91 +++++++++
+ lib/arm64/asm/processor.h  |  32 +--
+ lib/arm64/asm/stage2_mmu.h |  70 +++++++
+ lib/arm64/asm/sysreg.h     |   7 +
+ lib/arm64/guest.c          | 158 +++++++++++++++
+ lib/arm64/guest_arch.S     | 248 +++++++++++++++++++++++
+ lib/arm64/processor.c      |  18 +-
+ lib/arm64/stage2_mmu.c     | 403 +++++++++++++++++++++++++++++++++++++
+ 21 files changed, 1149 insertions(+), 45 deletions(-)
+ create mode 100644 arm/stage2-mmu-test.c
+ create mode 100644 lib/arm64/asm/guest.h
+ create mode 100644 lib/arm64/asm/stage2_mmu.h
+ create mode 100644 lib/arm64/guest.c
+ create mode 100644 lib/arm64/guest_arch.S
+ create mode 100644 lib/arm64/stage2_mmu.c
 
 
+base-commit: 86e53277ac80dabb04f4fa5fa6a6cc7649392bdc
+-- 
+2.53.0.1213.gd9a14994de-goog
 
-On 3/13/26 14:45, Ben Horgan wrote:
-> This version of the mpam missing pieces series sees a couple of things
-> dropped or hidden. Memory bandwith utilization with free-running counters
-> is dropped in preference of just always using 'mbm_event' mode (ABMC
-> emulation) which simplifies the code and allows for, in the future,
-> filtering by read/write traffic. So, for the interim, there is no memory
-> bandwidth utilization support. CDP is hidden behind config expert as
-> remount of resctrl fs could potentially lead to out of range PARTIDs being
-> used and the fix requires a change in fs/resctrl. The setting of MPAM2_EL2
-> (for pkvm/nvhe) is dropped as too expensive a write for not much value.
-> 
-> There are a couple of 'fixes' at the start of the series which address
-> problems in the base driver but are only user visible due to this series.
-> 
-> Changelogs in patches
-> 
-> Thanks for all the reviewing and testing so far. Just a bit more to get this
-> over the line.
-> 
-> There is a small build conflict with the MPAM abmc precursors series [1], which
-> alters some of the resctrl arch hooks. I will shortly be posting a respin
-> of that too.
-> 
-> [1] https://lore.kernel.org/lkml/20260225201905.3568624-1-ben.horgan@arm.com/
-> 
-> From James' cover letter:
-> 
-> This is the missing piece to make MPAM usable resctrl in user-space. This has
-> shed its debugfs code and the read/write 'event configuration' for the monitors
-> to make the series smaller.
-> 
-Thanks for all the help testing and reviewing. James has now sent a pull request to Catalin and he has picked it up.
-
-Pull request:
-https://lore.kernel.org/linux-arm-kernel/01f76011-f3c2-4dcb-b3bc-37c7d4de342e@arm.com/
-
-branch in arm64:
-git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/mpam
-
-Ben
