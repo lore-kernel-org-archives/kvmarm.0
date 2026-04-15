@@ -1,235 +1,176 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCE11DDC37
-	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 09:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776247018; cv=pass; b=c+XV0KxME6AGaBFEFrauOSb9V7dRHqBzTH9F0TLW1n0eCy2/6tMuOIoaDp45wjThbUxO015piHNDU3N8t4wcJ+HPRotm1HYklIrum4ZNWH14+jHTmvH62nMncEfEkxsRqyVqmQfa6pFg6eZdTg255TH/o1E4ALLD71Qu0cbbEYM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776247018; c=relaxed/simple;
-	bh=DjQdq8iz173ZYvQkJltlMZPdvr0H9hjQIPqEqpBLC3g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H3ZwKob7hs0xpSiRvgxviUx/mQdPGq0IrGc0AzzOmUpv0KxIo40+oNroFcLAT7VS4HlI5GM9xvgC5mabi24Qv6/H1mmRGu3gfGWoZPgcF5LMQRWhfnIdYn0TLsObvcgBvNoQfbLvWXvWB8HvFHDn+P8xgy3CGelu07yq0/rMLeE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TjD9tzxN; arc=pass smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD122DA756;
+	Wed, 15 Apr 2026 11:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776250878; cv=none; b=QrdtqXyreFocOmaOuhKIwo2cDfNaJn7Js362eGwkNrFFl60wDnym19n/qEtybwFcFsP0JVq1Z4JuFALjIPg9KwsABXvgGxNU1XB6/nNdmODBoax1Uy5olHgftdTqhAghwJbmPi285t2tQKEeH2Aa00RTjaW94TiAQeE5mYHOnn4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776250878; c=relaxed/simple;
+	bh=NzEKcgytpfU97DicbGiWl3bAhmdduI6FBslfTibPQpA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t4n1xOb/SoGKyQEFveNn4KN+2nOuYT6zjm3q5lmEMwA3lv1gFGKPxCmf5vZLpsAcnw6M75g91yscFnEQMM62cooH5kH0Ewm5MI2I3EqfkUtvHaTIws9KVy5gE3sNsam/yje/T2hc3Wulm+IyXicfJlTxpoYQauHBVk7P9VzlAaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RQI2AU3/; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TjD9tzxN"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50d8c7a393fso4096681cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 02:56:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776247015; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Tlq+ehl9zsATz71Uz+Up0/uyetsLf7SShGZm4m3S8TqM958foKSqbZstPLZ36idcqh
-         ifHV0XRZ0gSo5cQxna5yt/+U0clQbUfiKEibcVxURqiqhV8vWkFcRRbGsOwEaQaTBiJS
-         X6v11CYW0UQhfYho/xYJFN/4Sx5b5Qy8krvIv3V5u6droaU/TAI/CjtGOMYEx8hgZwUM
-         DPBzHspSQpgGmUDJ0g8jIXy+UUmTI2Y/Rnca4uxL0FCBhk27cIWH+ZCmpHKn1nLVP+24
-         4ZFLK9zM9TP5Wg06G4fIkla9a9K2kKXsWJwtfHnoR/iBfP3BhY3QUI2z+olO7aMksy31
-         5JRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=/EbgCdLHRY+jKfmk+Esh0hv8FKnFSyVXrH0IPR8PlGk=;
-        fh=7o0KG5X7f5rl0d5WFwUh3QqhuoMCV1yoRq1gr2k/4mA=;
-        b=YQuxz/2uBphvfVCfCeIAgKB7lGymo4j1MV+d1Ghihpb9C87Sqv8uA0h15FpgkH8tmp
-         4Dh70ZRnelFDJ6k+lY6oiQeRYAnvRHMDw24S6tG5ZPY3+8QXoVuvMzAHIrry8G5Q9AHk
-         StYnUteJVrVs9S5eoTCtiAwmaciaNhSRZdLFz+hp2crv/rP+c0X1dv72Gpya2UYU6FqI
-         Zo9j9Xk50aJqE+/Qn3v877DArVbpGy3Rp52JInI5FIsYY0/szxwQCGSR7QEloIEMlhVp
-         u2uc6ZvJEyrWavQyHhZI7Yu4hlKP9BZ8U1vREpvIrcwvHWO7EXtRfhtk9C6XGO+IYmLq
-         9AjQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776247015; x=1776851815; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/EbgCdLHRY+jKfmk+Esh0hv8FKnFSyVXrH0IPR8PlGk=;
-        b=TjD9tzxNSzPFNZM75aMM58FhshRE7/RUJ2QdOJOCE7Ozd3hpdQRWZAFREKZ1UW1M0B
-         EcNa4ROMG3MtZM7c3aZFZdhOZA5zzr0U5+ZyYbSSHBJZc2nbHrzagyrQ3X7vvH7F/fri
-         zgrKkmd3GUxBFFBQw3K4ACXKIspj5R+jSleM9oqLqDT2CEm2cJv00gIj5ITr/OCp1hNe
-         b7HY73NA8jdLhuRbvwGrmiWfaOPI12a6hjFiTSAae3dwlIW/rHAFuLTwoquXiFR0K68H
-         zJxR2kqeVZL2RgVKYmyHJckVl6ngVYq4eBjbFUACp+A6zo3EwRPvHwDxl0BFfe661Z4G
-         Ph8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776247015; x=1776851815;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/EbgCdLHRY+jKfmk+Esh0hv8FKnFSyVXrH0IPR8PlGk=;
-        b=qKRWFD1fDFAb8rOZUDjzBv9+WY/Er9lqQ9mtzheM84Wm9VYmYD7/JaaXVjCcgtA7aM
-         TxyHewv/zNh7NWgTMCZ19yl4AStmn9gYXfYqg/zHkaudj6qal4Dw/l8jqPxp+Gprw5WK
-         yNvm3D8ODpvu0bmJrsZMExQUfeVdv7N67wN7fNjUolMBeLbCpKNG4fLRIXy5bKpL1x+L
-         Ygd4q/rIsVcWP8+nmgrMLuiHysci2gHwuYGub6FOzQGtcQ+X1gm2wkxvkFtHkZh/1tRx
-         LxT/vdGXPzu84wogKSU7rJ9Cw8fORvSGenBwDCDhnKRD6alWTUYwxz7LHl0Oo+1mOZnz
-         I+5g==
-X-Gm-Message-State: AOJu0YzFGdk/SykI+BIRerr19jf5qZ/hS3EV7iqDrUc2kluwWPpGVP1v
-	ZXsptiMJv1963jQkn55UNFzj7qbUEEucRlv/f9qudsMsblnyO14hOY4IzNxII6uxWh0KCDLBVMn
-	JTXyqrEqjxRtKVNLMbMO4loKLmoXpfd62mJY2fNCT
-X-Gm-Gg: AeBDietOiqMKUNMLhr9HL4Ox1/UGgVRb7Gk6dr4YVHXHRNvVssKvGD5Ihs3SDmLajj+
-	Wvu9ptMMWb+IB5CJT6UqNjzkiSEwR69jGR7Is6MOwSihL/lDTEMZrRUR4WjIemnZE5uuZ4o9Ckf
-	CQ0koJEsDprYQ5PkW1IoqkvwyQ+6qkUmefaYS7KXL1R4PvnAOgHD8n9QVV7Emushd6C/Pxv1uRC
-	/L58O8G1bFWLH9czkZX5WPPJ6syNkEzQ6n4x8ZDfPq1Dsp9dodDTf6N7rpL1Ef006oc8Epnd7hf
-	xabezQM0YuoOypi7qP2WQb0JHc4WVZvuQvBTLOhdVFqIC2cA5BA0UpeeMzw=
-X-Received: by 2002:a05:622a:47:b0:50d:edb1:6bd1 with SMTP id
- d75a77b69052e-50e19087b29mr8513401cf.13.1776247014409; Wed, 15 Apr 2026
- 02:56:54 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RQI2AU3/"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C28B44FD5;
+	Wed, 15 Apr 2026 04:01:09 -0700 (PDT)
+Received: from [10.57.61.136] (unknown [10.57.61.136])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB8F53F86F;
+	Wed, 15 Apr 2026 04:01:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1776250875; bh=NzEKcgytpfU97DicbGiWl3bAhmdduI6FBslfTibPQpA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RQI2AU3/9HJQ3DCygIxuFntue21kAtZGjYmq2oeYxB5funNDUWj27KuLS6+o8P6EW
+	 ywh6dckswaimSu/YRjs5FId01ljwKyU73eG067hQCEkQDWa8EO4hxfYl7SefgZQodi
+	 +mwRKU/aoeiFRzW7Ai3tgQj+Q0Q3fcGWbd8mYtY0=
+Message-ID: <d661a24c-6619-4734-96bd-075d3416e809@arm.com>
+Date: Wed, 15 Apr 2026 12:01:08 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260414160528.2218858-1-maz@kernel.org>
-In-Reply-To: <20260414160528.2218858-1-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 15 Apr 2026 10:56:17 +0100
-X-Gm-Features: AQROBzAI0VOPROkQCqyX7Dt9X2lg7F9YAmrA11FS7_WWuEvNdak5O-heggH5cq0
-Message-ID: <CA+EHjTxWAFKHqBUOCVkkqtzTKrMSU8HQDwoLMqD2HQPga7y_-w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: pkvm: Adopt MARKER() to define host hypercall ranges
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Will Deacon <will@kernel.org>, Vincent Donnefort <vdonnefort@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
+To: Alper Gun <alpergun@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com>
+ <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+On 14/04/2026 22:40, Alper Gun wrote:
+> On Wed, Mar 18, 2026 at 8:54 AM Steven Price <steven.price@arm.com> wrote:
+>>
+>> This series adds support for running protected VMs using KVM under the
+>> Arm Confidential Compute Architecture (CCA).
+>>
+>> New major version number! This now targets RMM v2.0-bet0[1]. And unlike
+>> for Linux this represents a significant change.
+>>
+>> RMM v2.0 brings with it the ability to configure the RMM to have the
+>> same page size as the host (so no more RMM_PAGE_SIZE and dealing with
+>> granules being different from host pages). It also introduces range
+>> based APIs for many operations which should be more efficient and
+>> simplifies the code in places.
+>>
+>> The handling of the GIC has changed, so the system registers are used to
+>> pass the GIC state rather than memory. This means fewer changes to the
+>> KVM code as it looks much like a normal VM in this respect.
+>>
+>> And of course the new uAPI introduced in the previous v12 posting is
+>> retained so that also remains simplified compared to earlier postings.
+>>
+>> The RMM support for v2.0 is still early and so this series includes a
+>> few hacks to ease the integration. Of note are that there are some RMM
+>> v1.0 SMCs added to paper over areas where the RMM implementation isn't
+>> quite ready for v2.0, and "SROs" (see below) are deferred to the final
+>> patch in the series.
+>>
+>> The PMU in RMM v2.0 requires more handling on the RMM-side (and
+>> therefore simplifies the implementation on Linux), but this isn't quite
+>> ready yet. The Linux side is implemented (but untested).
+>>
+>> PSCI still requires the VMM to provide the "target" REC for operations
+>> that affect another vCPU. This is likely to change in a future version
+>> of the specification. There's also a desire to force PSCI to be handled
+>> in the VMM for realm guests - this isn't implemented yet as I'm waiting
+>> for the dust to settle on the RMM interface first.
+>>
+>> Stateful RMI Operations
+>> -----------------------
+>>
+>> The RMM v2.0 spec brings a new concept of Stateful RMI Operations (SROs)
+>> which allow the RMM to complete an operation over several SMC calls and
+>> requesting/returning memory to the host. This has the benefit of
+>> allowing interrupts to be handled in the middle of an operation (by
+>> returning to the host to handle the interrupt without completing the
+>> operation) and enables the RMM to dynamically allocate memory for
+>> internal tracking purposes. One example of this is RMI_REC_CREATE no
+>> longer needs "auxiliary granules" provided upfront but can request the
+>> memory needed during the RMI_REC_CREATE operation.
+>>
+>> There are a fairly large number of operations that are defined as SROs
+>> in the specification, but current both Linux and RMM only have support
+>> for RMI_REC_CREATE and RMI_REC_DESTROY. There a number of TODOs/FIXMEs
+>> in the code where support is missing.
+>>
+>> Given the early stage support for this, the SRO handling is all confined
+>> to the final patch. This patch can be dropped to return to a pre-SRO
+>> state (albeit a mixture of RMM v1.0 and v2.0 APIs) for testing purposes.
+>>
+>> A future posting will reorder the series to move the generic SRO support
+>> to an early patch and will implement the proper support for this in all
+>> RMI SMCs.
+>>
+>> One aspect of SROs which is not yet well captured is that in some
+>> circumstances the Linux kernel will need to call an SRO call in a
+>> context where memory allocation is restricted (e.g. because a spinlock
+>> is held). In this case the intention is that the SRO will be cancelled,
+>> the spinlock dropped so the memory allocation can be completed, and then
+>> the SRO restarted (obviously after rechecking the state that the
+>> spinlock was protecting). For this reason the code stores the memory
+>> allocations within a struct rmi_sro_state object - see the final patch
+>> for more details.
+>>
+>> This series is based on v7.0-rc1. It is also available as a git
+>> repository:
+>>
+>> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
+>>
+>>
+> 
+> Hi Steven,
+> 
+> I have a question regarding host kexec and kdump scenarios, and
+> whether there is any plan to make them work in this initial series.
+> 
+> Intel TDX and AMD SEV-SNP both have a firmware shutdown command that
+> is invoked during the kexec or panic code paths to safely bypass
+> hardware memory protections and boot into the new kernel. As far as
+> I know, there is no similar global teardown command available for
+> the RMM.
 
-On Tue, 14 Apr 2026 at 17:05, Marc Zyngier <maz@kernel.org> wrote:
->
-> The EL2 code defines ranges of host hypercalls that are either
-> enabled at boot-time only, used by [nh]VHE KVM, or reserved to pKVM.
->
-> The way these ranges are delineated is error prone, as the enum symbols
-> defining the limits are expressed in terms of actual function symbols.
-> This means that should a new function be added, special care must be
-> taken to also update the limit symbol.
->
-> Improve this by reusing the mechanism introduced for the vcpu_sysreg
-> enum, which uses a MARKER() macro and some extra trickery to make
-> the limit symbol standalone. Crucially, the limit symbol has the
-> same value as the *following* symbol.
->
-> The handle_host_hcall() function is then updated to make use of
-> the new limit definitions and get rid of the brittle default
-> upper limit. This allows for some more strict checks at build
-> time, and the removal of an comparison at run time.
+Correct, the RMM specification as it stands doesn't provide a mechanism
+for the host to do this. The host would have to identify all the realm
+guests in the system: specifically the address of the RDs (Realm
+Descriptors) and RECs (Realm Execution Contexts). It needs this to tear
+down the guests and be able to undelegate the memory.
 
-This is pretty neat. There is still the issue of a hole, i.e., adding
-an enum in the middle but forgetting to add a function, but that is
-caught in handle_host_hcall(). I can't think of an easy way to catch
-that though (xarray that initializes both?)
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+It's an interesting point and I'll raise the idea of a "firmware
+shutdown command" to make this more possible.
 
-Tested-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
+> What is the roadmap for supporting both general kexec and
+> more specifically kdump (panic) scenarios with CCA?
 
-Cheers,
-/fuad
+I don't have a roadmap I'm afraid for these. kexec in theory would be
+possible with KVM gracefully terminating all realms. For kdump/panic
+that sort of graceful shutdown isn't really appropriate (or likely to
+succeed).
 
+There is also some RMM configuration which cannot be repeated (see
+RMI_RMM_CONFIG_SET) - which implies that the kexec kernel must be
+similar to the first kernel (i.e. same page size).
 
-> ---
->  arch/arm64/include/asm/kvm_asm.h   | 12 ++++++++++--
->  arch/arm64/include/asm/kvm_host.h  |  3 ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 +++++-----
->  3 files changed, 15 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 37414440cee7f..fa033be6141ad 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -50,6 +50,9 @@
->
->  #include <linux/mm.h>
->
-> +#define MARKER(m)                              \
-> +       m, __after_##m = m - 1
-> +
->  enum __kvm_host_smccc_func {
->         /* Hypercalls that are unavailable once pKVM has finalised. */
->         /* __KVM_HOST_SMCCC_FUNC___kvm_hyp_init */
-> @@ -59,8 +62,10 @@ enum __kvm_host_smccc_func {
->         __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
->         __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
->         __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
-> +
-> +       MARKER(__KVM_HOST_SMCCC_FUNC_MIN_PKVM),
-> +
->         __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
-> -       __KVM_HOST_SMCCC_FUNC_MIN_PKVM = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
->
->         /* Hypercalls that are always available and common to [nh]VHE/pKVM. */
->         __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
-> @@ -76,7 +81,8 @@ enum __kvm_host_smccc_func {
->         __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
->         __KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
->         __KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
-> -       __KVM_HOST_SMCCC_FUNC_MAX_NO_PKVM = __KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
-> +
-> +       MARKER(__KVM_HOST_SMCCC_FUNC_PKVM_ONLY),
->
->         /* Hypercalls that are available only when pKVM has finalised. */
->         __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
-> @@ -108,6 +114,8 @@ enum __kvm_host_smccc_func {
->         __KVM_HOST_SMCCC_FUNC___tracing_reset,
->         __KVM_HOST_SMCCC_FUNC___tracing_enable_event,
->         __KVM_HOST_SMCCC_FUNC___tracing_write_event,
-> +
-> +       MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
->  };
->
->  #define DECLARE_KVM_VHE_SYM(sym)       extern char sym[]
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 851f6171751c0..44211e86f5ebd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -450,9 +450,6 @@ struct kvm_vcpu_fault_info {
->         r = __VNCR_START__ + ((VNCR_ ## r) / 8),        \
->         __after_##r = __MAX__(__before_##r - 1, r)
->
-> -#define MARKER(m)                              \
-> -       m, __after_##m = m - 1
-> -
->  enum vcpu_sysreg {
->         __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
->         MPIDR_EL1,      /* MultiProcessor Affinity Register */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 73f2e0221e703..9e44c05cf780e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -748,9 +748,11 @@ static const hcall_t host_hcall[] = {
->  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->  {
->         DECLARE_REG(unsigned long, id, host_ctxt, 0);
-> -       unsigned long hcall_min = 0, hcall_max = -1;
-> +       unsigned long hcall_min = 0, hcall_max = __KVM_HOST_SMCCC_FUNC_MAX;
->         hcall_t hfn;
->
-> +       BUILD_BUG_ON(ARRAY_SIZE(host_hcall) != __KVM_HOST_SMCCC_FUNC_MAX);
-> +
->         /*
->          * If pKVM has been initialised then reject any calls to the
->          * early "privileged" hypercalls. Note that we cannot reject
-> @@ -763,16 +765,14 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->         if (static_branch_unlikely(&kvm_protected_mode_initialized)) {
->                 hcall_min = __KVM_HOST_SMCCC_FUNC_MIN_PKVM;
->         } else {
-> -               hcall_max = __KVM_HOST_SMCCC_FUNC_MAX_NO_PKVM;
-> +               hcall_max = __KVM_HOST_SMCCC_FUNC_PKVM_ONLY;
->         }
->
->         id &= ~ARM_SMCCC_CALL_HINTS;
->         id -= KVM_HOST_SMCCC_ID(0);
->
-> -       if (unlikely(id < hcall_min || id > hcall_max ||
-> -                    id >= ARRAY_SIZE(host_hcall))) {
-> +       if (unlikely(id < hcall_min || id >= hcall_max))
->                 goto inval;
-> -       }
->
->         hfn = host_hcall[id];
->         if (unlikely(!hfn))
-> --
-> 2.47.3
->
+Thanks,
+Steve
