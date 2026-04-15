@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4AC37BE8F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A1737CD4D
 	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 11:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776254183; cv=none; b=uK+f08QrIzzHXW+MvX2qRfP5L3w6xNzYZQBufuuAEtzrH9zUC7fBOXyjhgUUMEVw10z8QDA5q/IlbBkakkWEAWHeauxoEznSkXoZAaOv7cfPReFwRK7a0v7IVDIG5MpOUrl+n3fm8mOZl4uibXVtFvuycq7wKK0a28PSjNyH9aI=
+	t=1776254183; cv=none; b=pm76kqg5Bg/cMfNVB5/m2T+Y0OiWzKb9sV16cJEoEYzAmj+HADsyxC2WvyyIuJdlONnsqkeceXun5OpqsTxdFuAG2O72bOEeu8iKaXkJJ6Hv7P7QE++xcEepNcDFsMlCO67hyMLx+EfKl2bZhC/yrOBKMFRxwI8buwoagxYEe20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776254183; c=relaxed/simple;
-	bh=BZz1qnB2VX9ACDvWCNyOh7Vg0dUXghFKOcw3QAKYdvE=;
+	bh=IHhFWg6GA5Gm7coKQ9f6giTOQmr8ZuVLC0KO5AkOn0U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uRqGrfnYJHmTfUzSwiJHSUbMGn3VT2bIh/HxH7+JJOBZixwycNIkxWWS06ye+uACRsOiEqS1Lo59bX/8z7SgmJFGYTlBQXzO26amiQ4fyNWmoCQy+VduTLjh85pXWJ/mdiAaRt47KJrmjBX6Q3pYelzeo8vIG4JyUKVjrefFnuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lTYffitC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TQG9gZs4yiLKupBq6Y8waKXxbbAfbfCFO4zUJ4agViZpH1XVbCm8kl4ZU3zR/93NJMOYQkVsrnAn0CrncTcGKisdRg2TZyQX1c3g94M9z3Vovhq/ALzV3PuYcz5kNxKtmxktAi0UNByJW3oducE+67nxylewIqANTQWB7LaHSm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diDR/u42; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lTYffitC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463D0C2BCB7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diDR/u42"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40EA5C2BCB4;
 	Wed, 15 Apr 2026 11:56:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1776254183;
-	bh=BZz1qnB2VX9ACDvWCNyOh7Vg0dUXghFKOcw3QAKYdvE=;
+	bh=IHhFWg6GA5Gm7coKQ9f6giTOQmr8ZuVLC0KO5AkOn0U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lTYffitC3UFpsiCdds5vDJSft+agSYI1ZCIhgKYNf4shjKCojmzcQRnSBa/4rLjBh
-	 tJuup+uqU5TvPjdAbQ/NU45yI+UJPT6mFTLHeg2JcU13DjZl/GovFVJwnW3P0bbclt
-	 NMw9pmL0sILMZLOUBdkf9/jeB+j6P6Qdz2oexaqlkj/ggVmfG5VPOfOSKgx9FDW4QI
-	 g5aV8uqqkdH4x0/8a99HSlndrlGb3tlt8QqRceldnrmImFlBt+f/Wse3m/kktT2PWy
-	 0iWwgDNz8oH4pTKgTMQ7sECM9M8m42uHTJ5ygnjZxceRRRN/m9RD7Afvu0wvhrldZC
-	 RcX8VCdm2ALIA==
+	b=diDR/u42oANXLmDzPE7J8oQYS3aQXhwVCbIEvA3lC3clHEnmVtopEL7hrqBLIWyM6
+	 zRO2/E0+SM8jx3EW23m5Et2h1HrSjRdIqLeUiOmx48bw3kb5HdrpIHw01SesnAOMd9
+	 KYI3+nP+qU81Atg9Av0pn/St/aFeDvQr9LmZ7F1bwzI3JTTcWBj1V8VN09OcnOO/Kd
+	 3mOjyJpbjob7o+ECvS25Dm8vipk6Eagu5gVpIRJAUrF/vW6t2Zkot8ROkXGV2g3LT3
+	 AzYumGmeLBIPWTmmzwkJcn4x+8UgLHZc1h8jO6aYQ01aWxmRyocVqJjCxG9b58a55h
+	 miFh32fT1aQVA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wCyqz-0000000Bqsi-1NGV;
+	id 1wCyqz-0000000Bqsi-2GSi;
 	Wed, 15 Apr 2026 11:56:21 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH 11/18] KVM: arm64: vgic-v5: Atomically assign bits to PPI DVI bitmap
-Date: Wed, 15 Apr 2026 12:55:52 +0100
-Message-ID: <20260415115559.2227718-12-maz@kernel.org>
+Subject: [PATCH 12/18] KVM: arm64: selftests: Add missing GIC CDEN to no-vgic-v5 selftest
+Date: Wed, 15 Apr 2026 12:55:53 +0100
+Message-ID: <20260415115559.2227718-13-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260415115559.2227718-1-maz@kernel.org>
 References: <20260415115559.2227718-1-maz@kernel.org>
@@ -60,41 +60,29 @@ X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to 
 
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 
-For GICv5 guests we make use of the DVI mechanism for PPIs where
-possible.  When mapping a virtual irq to a physical one for a GICv5
-guest, the corresponding bit in the DVI bitmap is set. When unmapping,
-said bit is cleared again. The key user of this mechanism is the arch
-timer.
+The selftest mistakenly omitted the GIC CDEN instruction from the
+testing. Add it in.
 
-The existing code used the non-atomic __assign_bit() rather than doing
-the update atomically. This could technically result in losing state
-if a second PPI's DVI bit were being manipulated concurrently. Each
-individual bit within the DVI bitmap is guarded using
-vgic_irq->irq_lock, but there's no locking for the overall
-bitmap. Therefore, switch to using the atomic assign_bit() function
-instead.
-
-Fixes: 5a98d0e17e59 ("KVM: arm64: gic-v5: Implement direct injection of PPIs")
+Fixes: ce29261ec648 ("KVM: arm64: selftests: Add no-vgic-v5 selftest")
 Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v5.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/arm64/no-vgic.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 7916bd8d564ef..d4789ff3e7402 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -272,7 +272,7 @@ void vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, struct vgic_irq *irq, bool dvi)
- 	lockdep_assert_held(&irq->irq_lock);
- 
- 	ppi = vgic_v5_get_hwirq_id(irq->intid);
--	__assign_bit(ppi, cpu_if->vgic_ppi_dvir, dvi);
-+	assign_bit(ppi, cpu_if->vgic_ppi_dvir, dvi);
- }
- 
- static const struct irq_ops vgic_v5_ppi_irq_ops = {
+diff --git a/tools/testing/selftests/kvm/arm64/no-vgic.c b/tools/testing/selftests/kvm/arm64/no-vgic.c
+index b14686ef17d12..e09e3fac904f4 100644
+--- a/tools/testing/selftests/kvm/arm64/no-vgic.c
++++ b/tools/testing/selftests/kvm/arm64/no-vgic.c
+@@ -159,6 +159,7 @@ static void guest_code_gicv5(void)
+ 	check_gicv5_gic_op(CDAFF);
+ 	check_gicv5_gic_op(CDDI);
+ 	check_gicv5_gic_op(CDDIS);
++	check_gicv5_gic_op(CDEN);
+ 	check_gicv5_gic_op(CDEOI);
+ 	check_gicv5_gic_op(CDHM);
+ 	check_gicv5_gic_op(CDPEND);
 -- 
 2.47.3
 
