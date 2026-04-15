@@ -1,558 +1,265 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D16D3815CB
-	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 23:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776294354; cv=none; b=EEmuE4/QbhLCs0slViwJc0pG5W7XAH8yHSppu2BgviyVKq/PmQYAeckHKRUxAKLp6GExO8bXknB2lSlG1UGWbAf+kDQs+FSGeAFtftaYq541/g0UZYAfp9TA+4yqgxhtf+NIND6oG6+Rh4osR6MxDUgEsWENrNfYbX1zbGGmwes=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776294354; c=relaxed/simple;
-	bh=zp/tj0/D7dSZJ67oCxqEQA0wGITQUows+Ww+oXg49/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i1/lsJBtg+GJ6mhE2ftBF5W9yi4z3ESLGVqI3EeOpX1CMa9n7PYLSK6ZSVX5/s5DZZZXkaQ05qUPBiFdC6MkSKhfZZYxine8BBCztOJcDYOt0uu9kMBjwxFY7RYJOyWX58DfOYeBigzxmU/U+DcpyRJDzJ94o7JHR2fYCfvFlvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XVf/yyE6; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F363939A6
+	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 23:27:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776295644; cv=pass; b=Qorwn1WLpWloeCM/ePt8IWBxL1hA1+srq75E7Qske844omGMHa5YowwVrOPBnBpZ1ahEuHdgSbQ0PjccKpqIblYZg0FQOe8kYpclX88NacaH/04mXFWB/K1LYA52FsEKTY4ksnHu/fEdAbXW7QaArUdX9XcMn9SlOTYC5yNbrrM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776295644; c=relaxed/simple;
+	bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NMOHoS0dx6M54MY+3VpdjW8ST0yJdEmmTRDCKYHctwy2bExlVzIXnY4ha+JrQNdlxBBklrBrHwDgY8TMoNNmZEM38+OD5UsLKIdH+Gk/FEffL7YDRz6w1H3nZmFT7AHVqwLcDIknajb8QN6yb+HxW62cDrU/pdat1YLQnL/LC7A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WaSOiQTl; arc=pass smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XVf/yyE6"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B57BB28C7;
-	Wed, 15 Apr 2026 16:05:45 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 366E83F641;
-	Wed, 15 Apr 2026 16:05:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776294351; bh=zp/tj0/D7dSZJ67oCxqEQA0wGITQUows+Ww+oXg49/k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XVf/yyE64Y533FCOM7lax9oAz7HGFW8QnILhJCG6Mo0IOC0WW3d5VdTClHeLH+pM2
-	 lWvKUUTZ7+N5zgKIkzPckxSXopxvA1EULWbyJHeR/C/UBVuWXTF2/7IaDcDkT68TUO
-	 tYr+LvO/KY2cYUgbFCtoUQUxCSBVXfiY8L8FK6l0=
-Date: Thu, 16 Apr 2026 00:05:40 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
-Message-ID: <tozhyzmwfddgx5fgfejracv6tskgs7xhs4fs6yvmvff74m7gwy@eq3oh35tokj4>
-References: <20260411125024.3735989-1-weilin.chang@arm.com>
- <20260411125024.3735989-2-weilin.chang@arm.com>
- <86eckg39eo.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WaSOiQTl"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8a151012558so85943366d6.3
+        for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 16:27:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776295641; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lvyrXjsi+5Jxzp5MH5z2mB5LFdJtF/O3ELqWczNah9bgvfjZTXimacez2HH0a9Rjk8
+         n0mNfSJTgkxVHJ2QvJ5Njx0B9SIi/gJ/0yYLB+9/75JlOXw4JajS5TuN43s/JTKxshwK
+         OlGNfYT29oprfl6Ev9c8Wd7Ri8Muht4wyotYYZMn+YNTM771e9dduXA5MaoT3JnQLG8T
+         uv6OniLL+3JG8f/0Fo8MYeYTUye32n9GNwTN4ue2UhHT1ovzAujr+RqoG7OlH3+m7v21
+         Bld//1LA/CTSsDPEXUy2U7TlNHv+/qdz4LXbwWGbEz9YnNLMPyA0RiW2zp0w4+fb4j+4
+         64DQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
+        fh=0ZSVmAdxFdlPGCfb69G/ons1ws5J0Sv7n7SWC4k4u9I=;
+        b=GL/Q9Bdhe9D3K0xq8weeXhlfP7QhzwWOU2lRgDuXFDltPQGxke10BF1qjrIEQZz/iz
+         ol5LEYSzoAqz2LtuuFMHUjQkhOjEIoiFuHp0Tl1S88pxa/KGu1RDJCDouY/YIpSU6Yqz
+         VhUh9deAlBFgpM/yLRmNgeCLhdYFkWdFUKtlnNS3vlgCrdol7AczaiUaWA/7k91jifA0
+         HPJBfvxzFmOlG1ugCVX8nOfuzhdoyGB07CEl+qO03MUJmfUXBPpLKrdIW0O5/PDy1/uS
+         9DQYAEQgX1PBz6XhoaWHurfjq7uwHdrvSYbJaf210ZEJ3tJhWZU90EF9f8ifjILLoBPG
+         3tWw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776295641; x=1776900441; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
+        b=WaSOiQTl2gWozybJPf8Ak+z1qb4lOfpqnVhFi5p2Z72zeeHwV+ymJPRerr+QeqnAKq
+         rNHT1x3QSaTAbsVKjnnhYNwUayJc/bGJ3IgY7zDy+6bRaVu6oWcSuLIcEx8MObT60GWh
+         PoTAu8ukSMP0oQQoorRBtxckV6vK3ejqpSgleFzXdCnxATFGNjBx5+1ekcjWXdBBBDSS
+         2VS/XdJB7syBGqeIfegbsEB6TIrI9hPxHaENmLPGNQbY/dbSfGVqbOLtJDo29zLgkPNq
+         +3ve/YPTgrVL9QNF9CIl20O0ZZtZcJfSsG14aFjRSkzd2m4+5uTS/Yn+fZIk5o44haCd
+         Uubw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776295641; x=1776900441;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
+        b=P6/2mzhXDAKy15YKA1Ec6E4d9swL0OievX6KhxWNlTX6O5IzskmuNBwba5RqKLbaEK
+         wAzEv7NRmOfqoG9f0Khv77kjousVGcDEDqZunyKMvIrR3MKUzuIR1XgmFqa3/Z7b9alu
+         raXZQz2gD/badIKjTEUFkuSv7FEmgimYAT5RMRK7hZeo7SX2rrVF4GUqisu66ChtSo9a
+         wlfXdZp5JeomG+GPLYBF8G50zqDRe3v6BE1z7WPcGWOy1qYm3ZZ3Xhody+T3+BMIbg7V
+         +F3Om9z72EOTMLEw7ppmIoqiI3cxbokUVLx59veihsz8EWsjt0UVQl/mP0Nfr95XvTvk
+         DVKQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/xHwOLPXqZaQecD/ngEgzu5miBRO7MRZOmvflie9LXyl8Eh60LKehm9dBGTzRlxibaKHvET7k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyp9WceiORuz+WG5v+4naS+5sH49I7Ou+m6gjR0ERhLNxDbr057
+	2p8BPfZIN1nrrv1Mj+V6jwICN/onVtGfBhuIkn5fNxF8q1l+un4To6pQM+Ks8TvJAtRS23P0E3W
+	nRcrIrWszmxn6owTu8bLaSmlngal7zJt2x5CN9cLC
+X-Gm-Gg: AeBDies6gog/hgKhRcWCKvQiP3vXbgmQy9cCgaR2HYHW3cq5mvCNsJkgbxXyCziJdyx
+	Db1EnfOifnFktfWD9NEotwwio01EqIKKvEbgsJiKl0687h4a3fJr0ZxPUqI84nHrABZv9db/0l3
+	uw/d+4zXH9I2hH1Zvq7O2zc2Lpio/k3/mc2ge3qi7+w+Ygf13z1fSuKucpUNgAa8EbhhCGIl9N6
+	qodW8nzFp4G5cDxbEsbgK4CNqQiWe2xw7ht2noziiEKgTB9Y4+ChhtsbKRMENy5ITkFtEhU62f3
+	sZ/Fnyi8NBSX0bGMkUo3X0CVI6LyWQ9tlHJVtkdRSmqxlorsiBVr1Lzh30E=
+X-Received: by 2002:ad4:5baf:0:b0:8ac:ab13:8f15 with SMTP id
+ 6a1803df08f44-8acab1391c9mr232004096d6.7.1776295640870; Wed, 15 Apr 2026
+ 16:27:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86eckg39eo.wl-maz@kernel.org>
+References: <20260318155413.793430-1-steven.price@arm.com> <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
+ <d661a24c-6619-4734-96bd-075d3416e809@arm.com>
+In-Reply-To: <d661a24c-6619-4734-96bd-075d3416e809@arm.com>
+From: Alper Gun <alpergun@google.com>
+Date: Wed, 15 Apr 2026 16:27:08 -0700
+X-Gm-Features: AQROBzCS-xITaK7ztBjux37Usj-fD7VQebkqcRVamG9jxnrdFdKeF2d2D3KViso
+Message-ID: <CABpDEumAVf02uOS5Bj07EDyuU=z9FV-iocQU1j7gFM5z0BeV_w@mail.gmail.com>
+Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
+	Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 15, 2026 at 09:38:55AM +0100, Marc Zyngier wrote:
-> On Sat, 11 Apr 2026 13:50:24 +0100,
-> Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> > 
-> > Currently we are forced to fully unmap all shadow stage-2 for a VM when
-> > unmapping a page from the canonical stage-2, for example during an MMU
-> > notifier call. This is because we are not tracking what canonical IPA
-> > are mapped in the shadow stage-2 page tables hence there is no way to
-> > know what to unmap.
-> > 
-> > Create a per kvm_s2_mmu maple tree to track canonical IPA range ->
-> > nested IPA range, so that it is possible to partially unmap shadow
-> > stage-2 when a canonical IPA range is unmapped. The algorithm is simple
-> > and conservative:
-> > 
-> > At each shadow stage-2 map, insert the nested IPA range into the maple
-> > tree, with the canonical IPA range as the key. If the canonical IPA
-> > range doesn't overlap with existing ranges in the tree, insert as is,
-> > and a reverse mapping for this range is established. But if the
-> > canonical IPA range overlaps with any existing ranges in the tree,
-> > create a new range that spans all the overlapping ranges including the
-> > input range and replace those existing ranges. In the mean time, mark
-> > this new spanning canonical IPA range as "polluted" indicating we lost
-> > track of the nested IPA ranges that map to this canonical IPA range.
-> > 
-> > The maple tree's 64 bit entry is enough to store the nested IPA and
-> > polluted status (stored as a bit called UNKNOWN_IPA), therefore besides
-> > maple tree's internal operation, memory allocation is avoided.
-> > 
-> > Example:
-> > |||| means existing range, ---- means empty range
-> > 
-> > input:            $$$$$$$$$$$$$$$$$$$$$$$$$$
-> > tree:  --||||-----|||||||---------||||||||||-----------
-> > 
-> > insert spanning range and replace overlapping ones:
-> >        --||||-----||||||||||||||||||||||||||-----------
-> >                   ^^^^^^^^polluted!^^^^^^^^^
-> 
-> I think you should stick to a single terminology. It is either
-> "polluted", or "unknown IPA". My preference goes to the latter, as the
-> former is not very descriptive in this context.
+On Wed, Apr 15, 2026 at 4:01=E2=80=AFAM Steven Price <steven.price@arm.com>=
+ wrote:
+>
+> On 14/04/2026 22:40, Alper Gun wrote:
+> > On Wed, Mar 18, 2026 at 8:54=E2=80=AFAM Steven Price <steven.price@arm.=
+com> wrote:
+> >>
+> >> This series adds support for running protected VMs using KVM under the
+> >> Arm Confidential Compute Architecture (CCA).
+> >>
+> >> New major version number! This now targets RMM v2.0-bet0[1]. And unlik=
+e
+> >> for Linux this represents a significant change.
+> >>
+> >> RMM v2.0 brings with it the ability to configure the RMM to have the
+> >> same page size as the host (so no more RMM_PAGE_SIZE and dealing with
+> >> granules being different from host pages). It also introduces range
+> >> based APIs for many operations which should be more efficient and
+> >> simplifies the code in places.
+> >>
+> >> The handling of the GIC has changed, so the system registers are used =
+to
+> >> pass the GIC state rather than memory. This means fewer changes to the
+> >> KVM code as it looks much like a normal VM in this respect.
+> >>
+> >> And of course the new uAPI introduced in the previous v12 posting is
+> >> retained so that also remains simplified compared to earlier postings.
+> >>
+> >> The RMM support for v2.0 is still early and so this series includes a
+> >> few hacks to ease the integration. Of note are that there are some RMM
+> >> v1.0 SMCs added to paper over areas where the RMM implementation isn't
+> >> quite ready for v2.0, and "SROs" (see below) are deferred to the final
+> >> patch in the series.
+> >>
+> >> The PMU in RMM v2.0 requires more handling on the RMM-side (and
+> >> therefore simplifies the implementation on Linux), but this isn't quit=
+e
+> >> ready yet. The Linux side is implemented (but untested).
+> >>
+> >> PSCI still requires the VMM to provide the "target" REC for operations
+> >> that affect another vCPU. This is likely to change in a future version
+> >> of the specification. There's also a desire to force PSCI to be handle=
+d
+> >> in the VMM for realm guests - this isn't implemented yet as I'm waitin=
+g
+> >> for the dust to settle on the RMM interface first.
+> >>
+> >> Stateful RMI Operations
+> >> -----------------------
+> >>
+> >> The RMM v2.0 spec brings a new concept of Stateful RMI Operations (SRO=
+s)
+> >> which allow the RMM to complete an operation over several SMC calls an=
+d
+> >> requesting/returning memory to the host. This has the benefit of
+> >> allowing interrupts to be handled in the middle of an operation (by
+> >> returning to the host to handle the interrupt without completing the
+> >> operation) and enables the RMM to dynamically allocate memory for
+> >> internal tracking purposes. One example of this is RMI_REC_CREATE no
+> >> longer needs "auxiliary granules" provided upfront but can request the
+> >> memory needed during the RMI_REC_CREATE operation.
+> >>
+> >> There are a fairly large number of operations that are defined as SROs
+> >> in the specification, but current both Linux and RMM only have support
+> >> for RMI_REC_CREATE and RMI_REC_DESTROY. There a number of TODOs/FIXMEs
+> >> in the code where support is missing.
+> >>
+> >> Given the early stage support for this, the SRO handling is all confin=
+ed
+> >> to the final patch. This patch can be dropped to return to a pre-SRO
+> >> state (albeit a mixture of RMM v1.0 and v2.0 APIs) for testing purpose=
+s.
+> >>
+> >> A future posting will reorder the series to move the generic SRO suppo=
+rt
+> >> to an early patch and will implement the proper support for this in al=
+l
+> >> RMI SMCs.
+> >>
+> >> One aspect of SROs which is not yet well captured is that in some
+> >> circumstances the Linux kernel will need to call an SRO call in a
+> >> context where memory allocation is restricted (e.g. because a spinlock
+> >> is held). In this case the intention is that the SRO will be cancelled=
+,
+> >> the spinlock dropped so the memory allocation can be completed, and th=
+en
+> >> the SRO restarted (obviously after rechecking the state that the
+> >> spinlock was protecting). For this reason the code stores the memory
+> >> allocations within a struct rmi_sro_state object - see the final patch
+> >> for more details.
+> >>
+> >> This series is based on v7.0-rc1. It is also available as a git
+> >> repository:
+> >>
+> >> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
+> >>
+> >>
+> >
+> > Hi Steven,
+> >
+> > I have a question regarding host kexec and kdump scenarios, and
+> > whether there is any plan to make them work in this initial series.
+> >
+> > Intel TDX and AMD SEV-SNP both have a firmware shutdown command that
+> > is invoked during the kexec or panic code paths to safely bypass
+> > hardware memory protections and boot into the new kernel. As far as
+> > I know, there is no similar global teardown command available for
+> > the RMM.
+>
+> Correct, the RMM specification as it stands doesn't provide a mechanism
+> for the host to do this. The host would have to identify all the realm
+> guests in the system: specifically the address of the RDs (Realm
+> Descriptors) and RECs (Realm Execution Contexts). It needs this to tear
+> down the guests and be able to undelegate the memory.
+>
+> It's an interesting point and I'll raise the idea of a "firmware
+> shutdown command" to make this more possible.
+>
+> > What is the roadmap for supporting both general kexec and
+> > more specifically kdump (panic) scenarios with CCA?
+>
+> I don't have a roadmap I'm afraid for these. kexec in theory would be
+> possible with KVM gracefully terminating all realms. For kdump/panic
+> that sort of graceful shutdown isn't really appropriate (or likely to
+> succeed).
+>
 
-Sure, I agree.
+Thanks Steven for the clarification.
 
-> 
-> > 
-> > With the reverse map created, when a canonical IPA range gets unmapped,
-> > look into each s2 mmu's maple tree and look for canonical IPA ranges
-> > affected, and base on their polluted status:
-> > 
-> > polluted -> fall back and fully invalidate the current shadow stage-2,
-> >             also clear the tree
-> > not polluted -> unmap the nested IPA range, and remove the reverse map
-> >                 entry
-> > 
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h   |   4 +
-> >  arch/arm64/include/asm/kvm_nested.h |   4 +
-> >  arch/arm64/kvm/mmu.c                |  30 ++++--
-> >  arch/arm64/kvm/nested.c             | 147 +++++++++++++++++++++++++++-
-> >  4 files changed, 177 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 851f6171751c..a97bd461c1e1 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
-> >  	 */
-> >  	bool	nested_stage2_enabled;
-> >  
-> > +	/* canonical IPA to nested IPA range lookup */
-> > +	struct maple_tree nested_revmap_mt;
-> > +	bool	nested_revmap_broken;
-> > +
-> 
-> Consider moving this boolean next to the other ones so that you don't
-> create too many holes in the kvm_s2_mmu structure (use pahole to find out).
-> 
-> But I have some misgivings about the way things are structured
-> here. Only NV needs a revmap, yet this is present irrelevant of the
-> nature of the VM and bloats the data structure a bit.
-> 
-> My naive approach would have been to only keep a pointer to the
-> revmap, and make that pointer NULL when the tree is "broken", and
-> freed under RCU if the context isn't the correct one.
+For us, kdump is highly critical as it is our primary diagnostic tool
+for host crashes. Without it, monitoring and debugging at fleet scale
+would become unmanageable.
 
-Can you explain what you mean by "if the context isn't the correct one"?
-If this refers to when selecting a specific kvm_s2_mmu instance for
-another context, then IIUC refcnt would already be 0 and there would be
-no other user of the tree.
+To confirm my understanding of the current architecture: if a host
+panics while no Realms are actively running (and therefore no pages
+are currently in the delegated state), the standard kdump extraction
+should work perfectly fine without any modifications, correct?
 
-However I do see RCU can be used for parallel accesses to the tree from
-parallel s2 faults, and when one fault's revmap store fails RCU defers
-freeing the tree until the other fault finishes using it.
+Regarding the KVM tracking structures (RDs, RECs, RTTs, etc.) when VMs
+are running, perhaps we could use `vmcoreinfo` to export the physical
+addresses of these delegated pages. This would allow tools like
+`makedumpfile` to explicitly filter them out. I assume these pages must
+remain hardware-locked while the VMs are active.
 
-> 
-> This would have multiple benefits: no large-ish structure embedded in
-> the s2_mmu structure, no extra boolean to indicate an error condition,
-> memory reclaimed earlier.
+Long-term, having an architectural shutdown command - similar to the
+TDH.SYS.DISABLE command in Intel TDX - would be incredibly useful. It
+would allow the kdump kernel to safely bypass these hardware security
+checks, especially when extracting host-side KVM state.
 
-Yes I see.
+As for the protected realm memory, I assume that is an easier problem.
+We naturally want to exclude guest pages from a host dump regardless
+of whether they are Realm pages or not. However, accidental touches
+are still fatal.
 
-> 
-> >  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> >  	struct dentry *shadow_pt_debugfs_dentry;
-> >  #endif
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index 091544e6af44..f039220e87a6 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -76,6 +76,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
-> >  				       const union tlbi_info *info,
-> >  				       void (*)(struct kvm_s2_mmu *,
-> >  						const union tlbi_info *));
-> > +extern void kvm_record_nested_revmap(gpa_t gpa, struct kvm_s2_mmu *mmu,
-> > +				    gpa_t fault_gpa, size_t map_size);
-> >  extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
-> >  extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
-> >  
-> > @@ -164,6 +166,8 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
-> >  				    struct kvm_s2_trans *trans);
-> >  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
-> >  extern void kvm_nested_s2_wp(struct kvm *kvm);
-> > +extern void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
-> > +				       bool may_block);
-> >  extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
-> >  extern void kvm_nested_s2_flush(struct kvm *kvm);
-> >  
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index d089c107d9b7..4c9b9cf6dc43 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -5,6 +5,7 @@
-> >   */
-> >  
-> >  #include <linux/acpi.h>
-> > +#include <linux/maple_tree.h>
-> >  #include <linux/mman.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/io.h>
-> > @@ -1099,6 +1100,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
-> >  {
-> >  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> >  	struct kvm_pgtable *pgt = NULL;
-> > +	struct maple_tree *mt = &mmu->nested_revmap_mt;
-> >  
-> >  	write_lock(&kvm->mmu_lock);
-> >  	pgt = mmu->pgt;
-> > @@ -1108,8 +1110,11 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
-> >  		free_percpu(mmu->last_vcpu_ran);
-> >  	}
-> >  
-> > -	if (kvm_is_nested_s2_mmu(kvm, mmu))
-> > +	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
-> > +		if (!mtree_empty(mt))
-> > +			mtree_destroy(mt);
-> >  		kvm_init_nested_s2_mmu(mmu);
-> > +	}
-> >  
-> >  	write_unlock(&kvm->mmu_lock);
-> >  
-> > @@ -1631,6 +1636,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >  		goto out_unlock;
-> >  	}
-> >  
-> > +	if (s2fd->nested)
-> > +		kvm_record_nested_revmap(gfn << PAGE_SHIFT, pgt->mmu,
-> > +					 s2fd->fault_ipa, PAGE_SIZE);
-> > +
-> >  	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
-> >  						 __pfn_to_phys(pfn), prot,
-> >  						 memcache, flags);
-> > @@ -2031,6 +2040,13 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
-> >  		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
-> >  								 prot, flags);
-> >  	} else {
-> > +		if (s2fd->nested) {
-> > +			phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
-> > +
-> > +			ipa &= ~(mapping_size - 1);
-> 
-> I guess it'd be worth adding a helper for this instead of duplicating
-> the existing code.
-
-Ack.
-
-> 
-> > +			kvm_record_nested_revmap(ipa, pgt->mmu, gfn_to_gpa(gfn),
-> > +						 mapping_size);
-> 
-> This worries me a bit, see below.
-> 
-> > +		}
-> >  		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
-> >  							 __pfn_to_phys(pfn), prot,
-> >  							 memcache, flags);
-> > @@ -2388,14 +2404,16 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >  
-> >  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  {
-> > +	gpa_t gpa = range->start << PAGE_SHIFT;
-> > +	size_t size = (range->end - range->start) << PAGE_SHIFT;
-> > +	bool may_block = range->may_block;
-> > +
-> >  	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
-> >  		return false;
-> >  
-> > -	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
-> > -			     (range->end - range->start) << PAGE_SHIFT,
-> > -			     range->may_block);
-> > +	__unmap_stage2_range(&kvm->arch.mmu, gpa, size, may_block);
-> > +	kvm_unmap_gfn_range_nested(kvm, gpa, size, may_block);
-> >  
-> > -	kvm_nested_s2_unmap(kvm, range->may_block);
-> >  	return false;
-> >  }
-> >  
-> > @@ -2673,7 +2691,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
-> >  
-> >  	write_lock(&kvm->mmu_lock);
-> >  	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
-> > -	kvm_nested_s2_unmap(kvm, true);
-> > +	kvm_unmap_gfn_range_nested(kvm, gpa, size, true);
-> >  	write_unlock(&kvm->mmu_lock);
-> >  }
-> >  
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 883b6c1008fb..c9ebe969b453 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -7,6 +7,7 @@
-> >  #include <linux/bitfield.h>
-> >  #include <linux/kvm.h>
-> >  #include <linux/kvm_host.h>
-> > +#include <linux/maple_tree.h>
-> >  
-> >  #include <asm/fixmap.h>
-> >  #include <asm/kvm_arm.h>
-> > @@ -43,6 +44,19 @@ struct vncr_tlb {
-> >   */
-> >  #define S2_MMU_PER_VCPU		2
-> >  
-> > +/*
-> > + * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree payload
-> > + * layout:
-> > + *
-> > + * bit 63: valid, 1 for non-polluted entries, prevents the case where the
-> > + *         nested IPA is 0 and turns the whole value to 0
-> > + * bits 55-12: nested IPA bits 55-12
-> > + * bit 0: polluted, 1 for polluted, 0 for not
-> > + */
-> > +#define VALID_ENTRY		BIT(63)
-> > +#define NESTED_IPA_MASK		GENMASK_ULL(55, 12)
-> > +#define UNKNOWN_IPA		BIT(0)
-> > +
-> 
-> This only works because you are using the "advanced" API, right?
-> Otherwise, you'd be losing the high bit. It'd be good to add a comment
-> so that people keep that in mind.
-
-Sorry, I can't find any relationship between the advanced API and the
-top most bit of the maple tree value, what am I missing?
-
-> 
-> >  void kvm_init_nested(struct kvm *kvm)
-> >  {
-> >  	kvm->arch.nested_mmus = NULL;
-> > @@ -769,12 +783,57 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
-> >  	return s2_mmu;
-> >  }
-> >  
-> > +void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
-> > +			      gpa_t fault_ipa, size_t map_size)
-> > +{
-> > +	struct maple_tree *mt = &mmu->nested_revmap_mt;
-> > +	gpa_t start = ipa;
-> > +	gpa_t end = ipa + map_size - 1;
-> > +	u64 entry, new_entry = 0;
-> > +	MA_STATE(mas, mt, start, end);
-> > +
-> > +	if (mmu->nested_revmap_broken)
-> > +		return;
-> > +
-> > +	mtree_lock(mt);
-> > +	entry = (u64)mas_find_range(&mas, end);
-> > +
-> > +	if (entry) {
-> > +		/* maybe just a perm update... */
-> > +		if (!(entry & UNKNOWN_IPA) && mas.index == start &&
-> > +		    mas.last == end &&
-> > +		    fault_ipa == (entry & NESTED_IPA_MASK))
-> > +			goto unlock;
-> > +		/*
-> > +		 * Create a "polluted" range that spans all the overlapping
-> > +		 * ranges and store it.
-> > +		 */
-> > +		while (entry && mas.index <= end) {
-> > +			start = min(mas.index, start);
-> > +			end = max(mas.last, end);
-> > +			entry = (u64)mas_find_range(&mas, end);
-> > +		}
-> > +		new_entry |= UNKNOWN_IPA;
-> > +	} else {
-> > +		new_entry |= fault_ipa;
-> > +		new_entry |= VALID_ENTRY;
-> > +	}
-> > +
-> > +	mas_set_range(&mas, start, end);
-> > +	if (mas_store_gfp(&mas, (void *)new_entry, GFP_NOWAIT | __GFP_ACCOUNT))
-> > +		mmu->nested_revmap_broken = true;
-> 
-> Can we try and minimise the risk of allocation failure here?
-> 
-> user_mem_abort() tries very hard to pre-allocate pages for page
-> tables by maintaining an memcache. Can we have a similar approach for
-> the revmap?
-
-Unfortunately, as I understand the maple tree can only pre-allocate for
-a store when the range and the entry to be stored is given, but in this
-case we must inspect the tree to get that information after we hold the
-mmu and maple tree locks. It is possible to do a two pass approach:
-
-pre-allocate -> take MMU lock -> take maple tree lock -> revalidate what
-we pre-allocated is still usable (nobody changed the tree before we took
-the maple tree lock)
-
-But I am not fond of this extra complexity..
-
-> 
-> > +unlock:
-> > +	mtree_unlock(mt);
-> > +}
-> > +
-> >  void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
-> >  {
-> >  	/* CnP being set denotes an invalid entry */
-> >  	mmu->tlb_vttbr = VTTBR_CNP_BIT;
-> >  	mmu->nested_stage2_enabled = false;
-> >  	atomic_set(&mmu->refcnt, 0);
-> > +	mt_init(&mmu->nested_revmap_mt);
-> > +	mmu->nested_revmap_broken = false;
-> >  }
-> >  
-> >  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> > @@ -1150,6 +1209,90 @@ void kvm_nested_s2_wp(struct kvm *kvm)
-> >  	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> >  }
-> >  
-> > +static void reset_revmap_and_unmap(struct kvm_s2_mmu *mmu, bool may_block)
-> > +{
-> > +	mtree_destroy(&mmu->nested_revmap_mt);
-> > +	kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-> > +	mmu->nested_revmap_broken = false;
-> > +}
-> > +
-> > +static void unmap_mmu_ipa_range(struct kvm_s2_mmu *mmu, gpa_t gpa,
-> > +				  size_t unmap_size, bool may_block)
-> > +{
-> > +	struct maple_tree *mt = &mmu->nested_revmap_mt;
-> > +	gpa_t start = gpa;
-> > +	gpa_t end = gpa + unmap_size - 1;
-> > +	u64 entry;
-> > +	size_t entry_size;
-> > +	bool unlock, fallback;
-> > +	MA_STATE(mas, mt, gpa, end);
-> > +
-> > +	if (mmu->nested_revmap_broken) {
-> > +		unlock = false;
-> > +		fallback = true;
-> > +		goto fin;
-> > +	}
-> 
-> Using booleans to affect the control flow reads really badly. I'd
-> expect this to simply be:
-> 
-> 	if (...) {
-> 		reset_revmap_and_unmap(mmu, may_block);
-> 		return;
-> 	}
-> 
-> > +
-> > +	mtree_lock(mt);
-> > +	entry = (u64)mas_find_range(&mas, end);
-> > +
-> > +	while (entry && mas.index <= end) {
-> > +		start = mas.last + 1;
-> > +		entry_size = mas.last - mas.index + 1;
-> > +		/*
-> > +		 * Give up and invalidate this s2 mmu if the unmap range
-> > +		 * touches any polluted range.
-> > +		 */
-> > +		if (entry & UNKNOWN_IPA) {
-> > +			unlock = true;
-> > +			fallback = true;
-> > +			goto fin;
-> > +		}
-> 
-> and this to be:
-> 
-> 		if (entry & UNKNOWN_IPA) {
-> 			mtree_unlock(mt);
-> 			reset_revmap_and_unmap(mmu, may_block);
-> 			return;
-> 		}
-> 
-> > +
-> > +		/*
-> > +		 * Ignore result, it is okay if a reverse mapping erase
-> > +		 * fails.
-> > +		 */
-> > +		mas_store_gfp(&mas, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
-> > +
-> > +		mtree_unlock(mt);
-> > +		kvm_stage2_unmap_range(mmu, entry & NESTED_IPA_MASK, entry_size,
-> > +				       may_block);
-> > +		mtree_lock(mt);
-> > +		/*
-> > +		 * Other maple tree operations during preemption could render
-> > +		 * this ma_state invalid, so reset it.
-> > +		 */
-> > +		mas_set_range(&mas, start, end);
-> > +		entry = (u64)mas_find_range(&mas, end);
-> > +	}
-> > +	unlock = true;
-> > +	fallback = false;
-> > +
-> > +fin:
-> > +	if (unlock)
-> > +		mtree_unlock(mt);
-> > +	if (fallback)
-> > +		reset_revmap_and_unmap(mmu, may_block);
-> 
-> and this can eventually be greatly simplified.
-
-Sure, I agree.
-
-> 
-> > +}
-> > +
-> > +void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
-> > +				bool may_block)
-> > +{
-> > +	int i;
-> > +
-> > +	if (!kvm->arch.nested_mmus_size)
-> > +		return;
-> > +
-> > +	/* TODO: accelerate this using mt of canonical s2 mmu */
-> > +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> > +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> > +
-> > +		if (kvm_s2_mmu_valid(mmu))
-> > +			unmap_mmu_ipa_range(mmu, gpa, size, may_block);
-> > +	}
-> > +}
-> > +
-> >  void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-> >  {
-> >  	int i;
-> > @@ -1163,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-> >  		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> >  
-> >  		if (kvm_s2_mmu_valid(mmu))
-> > -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-> > +			reset_revmap_and_unmap(mmu, may_block);
-> >  	}
-> >  
-> >  	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> > @@ -1848,7 +1991,7 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
-> >  
-> >  		write_lock(&vcpu->kvm->mmu_lock);
-> >  		if (mmu->pending_unmap) {
-> > -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
-> > +			reset_revmap_and_unmap(mmu, true);
-> >  			mmu->pending_unmap = false;
-> >  		}
-> >  		write_unlock(&vcpu->kvm->mmu_lock);
-> 
-> My other concern here is related to TLB invalidation. As the guest
-> performs TLB invalidations that remove entries from the shadow S2,
-> there is no way to update the revmap to account for this.
-> 
-> This obviously means that the revmap becomes more and more inaccurate
-> over time, and that is likely to accumulate conflicting entries.
-> 
-> What is the plan to improve the situation on this front?
-
-Right now I think using a direct map which goes from nested IPA to
-canonical IPA could work while not generating too much complexity, if we
-keep the reverse map and direct map in lockstep (direct map keeping the
-same mappings as the reverse map but just in reverse).
-
-I'll try to do that and include it in the next iteration.
-
-Thanks,
-Wei-Lin Chang
-
-> 
+> There is also some RMM configuration which cannot be repeated (see
+> RMI_RMM_CONFIG_SET) - which implies that the kexec kernel must be
+> similar to the first kernel (i.e. same page size).
+>
 > Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> Steve
