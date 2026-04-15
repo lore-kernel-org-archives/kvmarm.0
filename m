@@ -1,176 +1,114 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD122DA756;
-	Wed, 15 Apr 2026 11:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C2032AAC5
+	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 11:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776250878; cv=none; b=QrdtqXyreFocOmaOuhKIwo2cDfNaJn7Js362eGwkNrFFl60wDnym19n/qEtybwFcFsP0JVq1Z4JuFALjIPg9KwsABXvgGxNU1XB6/nNdmODBoax1Uy5olHgftdTqhAghwJbmPi285t2tQKEeH2Aa00RTjaW94TiAQeE5mYHOnn4=
+	t=1776254181; cv=none; b=pFSNmMxvdJHyxhmIYQW6UmZ5CR+kpvdf2bR0oeVBIbs/KCIclcxBBKHwmoGCV9b1FcjG8nXzNAxF2E87e4Mz7kcCZt8+s+k8PKUEmrwWmTON/RnRNciXUFbJW4KF8dDKSyNEqpkI65cHjPzTw+cG52zG6s78fy1rJ4YFLO7Iy7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776250878; c=relaxed/simple;
-	bh=NzEKcgytpfU97DicbGiWl3bAhmdduI6FBslfTibPQpA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t4n1xOb/SoGKyQEFveNn4KN+2nOuYT6zjm3q5lmEMwA3lv1gFGKPxCmf5vZLpsAcnw6M75g91yscFnEQMM62cooH5kH0Ewm5MI2I3EqfkUtvHaTIws9KVy5gE3sNsam/yje/T2hc3Wulm+IyXicfJlTxpoYQauHBVk7P9VzlAaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RQI2AU3/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776254181; c=relaxed/simple;
+	bh=+qvw/cNR5lgyckmvSm1tTdqwHPtUgkC0Qv6B2PrVngs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BkXaZ+3lrMmmL5NwmnWVjQclu4xFvXJ8zm7vYGR/aywt2RyIjxAPe6ebC6zO9+1WlcoaAoUKA+E7z/4zp1/wBoixZAIMnVqUHJ4un8vSHta6sIVkPzVeBgrz5tVPzLnpjiNKtUTtGTb/l7IIoN3dBa5xTxq2tmJvZgWO5WWe+Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmC5eyMu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RQI2AU3/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C28B44FD5;
-	Wed, 15 Apr 2026 04:01:09 -0700 (PDT)
-Received: from [10.57.61.136] (unknown [10.57.61.136])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB8F53F86F;
-	Wed, 15 Apr 2026 04:01:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776250875; bh=NzEKcgytpfU97DicbGiWl3bAhmdduI6FBslfTibPQpA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RQI2AU3/9HJQ3DCygIxuFntue21kAtZGjYmq2oeYxB5funNDUWj27KuLS6+o8P6EW
-	 ywh6dckswaimSu/YRjs5FId01ljwKyU73eG067hQCEkQDWa8EO4hxfYl7SefgZQodi
-	 +mwRKU/aoeiFRzW7Ai3tgQj+Q0Q3fcGWbd8mYtY0=
-Message-ID: <d661a24c-6619-4734-96bd-075d3416e809@arm.com>
-Date: Wed, 15 Apr 2026 12:01:08 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmC5eyMu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DE07C19424;
+	Wed, 15 Apr 2026 11:56:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776254181;
+	bh=+qvw/cNR5lgyckmvSm1tTdqwHPtUgkC0Qv6B2PrVngs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KmC5eyMuR+XFPGaMlZqK3ijPc8id/M5/qf3x56MTWVXa2C1Mcmy9Si8onfRL+CedP
+	 fKUB+g3ixmH7QMkS0BVUN2GriVjqmFOHg8gfHCDqAQ77Zt2jzpVjd0PFuXFKEUVUjZ
+	 hi2a41QPnsYocHduW7YJykzs1Tcll3+9dt2XnJsn12bynMkI4m2O1OLgpP1Dh8WhXc
+	 ihFUiOaVSYAcCTdQM8ZpaayDQy3DH0oidRR+7IvdlUXiITpAVM3w5x9Iu7FwA4VqNx
+	 khtfX9wqQ3kUcYIsChcsYLAOtM2f+M1/XJZkwIPGt0sVfXxDYLyv0y53y6rGLDR49u
+	 Q7Ryr452diABQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wCyqx-0000000Bqsi-0aPT;
+	Wed, 15 Apr 2026 11:56:19 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Subject: [PATCH 00/18] KVM: arm64: Second batch of vgic fixes for 7.1
+Date: Wed, 15 Apr 2026 12:55:41 +0100
+Message-ID: <20260415115559.2227718-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
-To: Alper Gun <alpergun@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, sascha.bischoff@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 14/04/2026 22:40, Alper Gun wrote:
-> On Wed, Mar 18, 2026 at 8:54 AM Steven Price <steven.price@arm.com> wrote:
->>
->> This series adds support for running protected VMs using KVM under the
->> Arm Confidential Compute Architecture (CCA).
->>
->> New major version number! This now targets RMM v2.0-bet0[1]. And unlike
->> for Linux this represents a significant change.
->>
->> RMM v2.0 brings with it the ability to configure the RMM to have the
->> same page size as the host (so no more RMM_PAGE_SIZE and dealing with
->> granules being different from host pages). It also introduces range
->> based APIs for many operations which should be more efficient and
->> simplifies the code in places.
->>
->> The handling of the GIC has changed, so the system registers are used to
->> pass the GIC state rather than memory. This means fewer changes to the
->> KVM code as it looks much like a normal VM in this respect.
->>
->> And of course the new uAPI introduced in the previous v12 posting is
->> retained so that also remains simplified compared to earlier postings.
->>
->> The RMM support for v2.0 is still early and so this series includes a
->> few hacks to ease the integration. Of note are that there are some RMM
->> v1.0 SMCs added to paper over areas where the RMM implementation isn't
->> quite ready for v2.0, and "SROs" (see below) are deferred to the final
->> patch in the series.
->>
->> The PMU in RMM v2.0 requires more handling on the RMM-side (and
->> therefore simplifies the implementation on Linux), but this isn't quite
->> ready yet. The Linux side is implemented (but untested).
->>
->> PSCI still requires the VMM to provide the "target" REC for operations
->> that affect another vCPU. This is likely to change in a future version
->> of the specification. There's also a desire to force PSCI to be handled
->> in the VMM for realm guests - this isn't implemented yet as I'm waiting
->> for the dust to settle on the RMM interface first.
->>
->> Stateful RMI Operations
->> -----------------------
->>
->> The RMM v2.0 spec brings a new concept of Stateful RMI Operations (SROs)
->> which allow the RMM to complete an operation over several SMC calls and
->> requesting/returning memory to the host. This has the benefit of
->> allowing interrupts to be handled in the middle of an operation (by
->> returning to the host to handle the interrupt without completing the
->> operation) and enables the RMM to dynamically allocate memory for
->> internal tracking purposes. One example of this is RMI_REC_CREATE no
->> longer needs "auxiliary granules" provided upfront but can request the
->> memory needed during the RMI_REC_CREATE operation.
->>
->> There are a fairly large number of operations that are defined as SROs
->> in the specification, but current both Linux and RMM only have support
->> for RMI_REC_CREATE and RMI_REC_DESTROY. There a number of TODOs/FIXMEs
->> in the code where support is missing.
->>
->> Given the early stage support for this, the SRO handling is all confined
->> to the final patch. This patch can be dropped to return to a pre-SRO
->> state (albeit a mixture of RMM v1.0 and v2.0 APIs) for testing purposes.
->>
->> A future posting will reorder the series to move the generic SRO support
->> to an early patch and will implement the proper support for this in all
->> RMI SMCs.
->>
->> One aspect of SROs which is not yet well captured is that in some
->> circumstances the Linux kernel will need to call an SRO call in a
->> context where memory allocation is restricted (e.g. because a spinlock
->> is held). In this case the intention is that the SRO will be cancelled,
->> the spinlock dropped so the memory allocation can be completed, and then
->> the SRO restarted (obviously after rechecking the state that the
->> spinlock was protecting). For this reason the code stores the memory
->> allocations within a struct rmi_sro_state object - see the final patch
->> for more details.
->>
->> This series is based on v7.0-rc1. It is also available as a git
->> repository:
->>
->> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
->>
->>
-> 
-> Hi Steven,
-> 
-> I have a question regarding host kexec and kdump scenarios, and
-> whether there is any plan to make them work in this initial series.
-> 
-> Intel TDX and AMD SEV-SNP both have a firmware shutdown command that
-> is invoked during the kexec or panic code paths to safely bypass
-> hardware memory protections and boot into the new kernel. As far as
-> I know, there is no similar global teardown command available for
-> the RMM.
+With the GICv5 PPi support merged in, it has become obvious that a few
+things could be improved, both from the correctness and
+maintainability angles.
 
-Correct, the RMM specification as it stands doesn't provide a mechanism
-for the host to do this. The host would have to identify all the realm
-guests in the system: specifically the address of the RDs (Realm
-Descriptors) and RECs (Realm Execution Contexts). It needs this to tear
-down the guests and be able to undelegate the memory.
+Sascha and I have been working on this, and this series is the sum of
+our collective efforts.
 
-It's an interesting point and I'll raise the idea of a "firmware
-shutdown command" to make this more possible.
+The most important bits are related to the changes affecting the timer
+for v3-on V5, and the corresponding change in the GICv5 host driver,
+aligning it with its GICv3 counterpart.
 
-> What is the roadmap for supporting both general kexec and
-> more specifically kdump (panic) scenarios with CCA?
+Patches on top of kvmarm/next.
 
-I don't have a roadmap I'm afraid for these. kexec in theory would be
-possible with KVM gracefully terminating all realms. For kdump/panic
-that sort of graceful shutdown isn't really appropriate (or likely to
-succeed).
+Marc Zyngier (9):
+  KVM: arm64: vgic-v5: Add for_each_visible_v5_ppi() iterator
+  KVM: arm64: vgic-v5: Move PPI caps into kvm_vgic_global_state
+  KVM: arm64: vgic-v5: Remove use of __assign_bit() with a constant
+  KVM: arm64: vgic-v5: Drop pointless ARM64_HAS_GICV5_CPUIF check
+  KVM: arm64: vgic: Constify struct irq_ops usage
+  KVM: arm64: vgic: Consolidate vgic_allocate_private_irqs_locked()
+  KVM: arm64: vgic-v5: Drop defensive checks from
+    vgic_v5_ppi_queue_irq_unlock()
+  KVM: arm64: vgic: Rationalise per-CPU irq accessor
+  KVM: arm64: vgic-v5: Limit support to 64 PPIs
 
-There is also some RMM configuration which cannot be repeated (see
-RMI_RMM_CONFIG_SET) - which implies that the kexec kernel must be
-similar to the first kernel (i.e. same page size).
+Sascha Bischoff (9):
+  KVM: arm64: vgic-v5: Add missing trap handing for NV triage
+  KVM: arm64: vgic-v5: Atomically assign bits to PPI DVI bitmap
+  KVM: arm64: selftests: Add missing GIC CDEN to no-vgic-v5 selftest
+  KVM: arm64: selftests: Cleanup unused vars in GICv5 PPI selftest
+  KVM: arm64: selftests: Improve error handling for GICv5 PPI selftest
+  Documentation: KVM: Fix typos in VGICv5 documentation
+  Documentation: KVM: Clarify that PMU_V3_IRQ IntID requirements for
+    GICv5
+  irqchip/gic-v5: Immediately exec priority drop following activate
+  KVM: arm64: Fix arch timer interrupts for GICv3-on-GICv5 guests
 
-Thanks,
-Steve
+ .../virt/kvm/devices/arm-vgic-v5.rst          |  6 +-
+ Documentation/virt/kvm/devices/vcpu.rst       |  7 +-
+ arch/arm64/kvm/arch_timer.c                   | 31 +++----
+ arch/arm64/kvm/emulate-nested.c               |  8 ++
+ arch/arm64/kvm/hyp/vgic-v5-sr.c               | 82 ++++---------------
+ arch/arm64/kvm/sys_regs.c                     | 19 ++---
+ arch/arm64/kvm/vgic/vgic-init.c               | 45 ++++------
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |  9 +-
+ arch/arm64/kvm/vgic/vgic-v5.c                 | 51 ++++--------
+ arch/arm64/kvm/vgic/vgic.c                    | 27 +++---
+ arch/arm64/kvm/vgic/vgic.h                    |  3 +
+ drivers/irqchip/irq-gic-v5.c                  | 13 +--
+ include/kvm/arm_vgic.h                        | 19 +++--
+ tools/testing/selftests/kvm/arm64/no-vgic.c   |  1 +
+ tools/testing/selftests/kvm/arm64/vgic_v5.c   | 10 +--
+ 15 files changed, 132 insertions(+), 199 deletions(-)
+
+-- 
+2.47.3
+
