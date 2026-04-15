@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556D637C110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8285537D11F
 	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 11:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776254184; cv=none; b=SbVdNqUKHDeA9DeENF4zBTZJXugMw7jYb+C95F9HUN5JlU0OgLEtfYsLLkuX6pAUQQU8HNqeURcntQndVmifAdiEAcGoFUlp2GDBtStnFcgPvahpqDWhdXqB/SOJpeCwKreXV3/QgSeIZqyALMZcHvawwBwQqK8Php+JIOU+EhM=
+	t=1776254184; cv=none; b=cD3suxsU92DTaMWg/cXGN8ZcRQjzXMeDnTXxdW4T2zu8gT3+HBVnCEkz6WUqfgoOSJ/UheZTI3FjYKDs4Y7PEMF6fQzpN+LWVLxRSAiKtGajiulBnHBtUyFz4MfgDlAVNxe/3fA3I4Rz3ucvxHEb5tnQAJZWPX/+E2+IKEDmPl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776254184; c=relaxed/simple;
-	bh=rRhz56yIoRfzm5lLrNbTpKXQobUyeg4eP1h1LUt2eq4=;
+	bh=IXwtASoWr0Rh5sMg1W1zwBg/xgjbLHcI6sW2VMPX6cY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rntnN28bN3+Fnv7reUL3RbfRkjiNZfo3ug2yDxO/8s5GMFdwRXgmwtQIbGmUe14RVsl6/LhnN+noQLZaUeRJEywKYer9UJIZr7nRTa2ivZba8B2iTCCq2yvSsIWwUfoa483WPO3lCsdc5Fqj89+cA4lkkPLLlkl6OFqtfYYVA+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rywnk2Kp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=by6440DZNg1j00kxhW52BQfkse6T+4hZ9SRllr8BtJC5pwbJKazi0N7ittbNlKtJwlZnWfUGnYMOCwKPl7MX8ny+rKo8D0CfAhHLdZ/yoySVNsbRmD9ruEUC22qDHsVBMl3+Ec7mrSm9i78yjiIRNHxY+amohYEqeGUkcd3XGjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sHtPq55U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rywnk2Kp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 316DDC2BCB3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHtPq55U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60099C2BCB4;
 	Wed, 15 Apr 2026 11:56:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1776254184;
-	bh=rRhz56yIoRfzm5lLrNbTpKXQobUyeg4eP1h1LUt2eq4=;
+	bh=IXwtASoWr0Rh5sMg1W1zwBg/xgjbLHcI6sW2VMPX6cY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rywnk2Kp62odGRynhLhGFWi4bKCBQBgNwc3krmVwU5+fWGNbJFLU5L5e4+11oU66U
-	 VlzTDtfQZf5IcVXwdS2S+2Fw50gCToyrTUkrfZJAS5JxH0OpKFFRSCX+ARJF6c1AVU
-	 o8y7TL5YAoyQLpFWPvCrHays5DY4RozaQ4QqaEAWOTZ08cNpeio1xg+UmokRzpejjA
-	 vi0RaH/6FtZha3U9TPkpiPHSuz6fExWmnkreOxtUHB/fwrz+sPjVh2Mq5tVI/XW/BN
-	 9vULtXrPbOcRHmSNkHs0Lm52EBaNS9PZQabJgk4ngCJWErbfp/AYonSA/8uXkP7IIO
-	 JXeCvLvyaWAww==
+	b=sHtPq55UjzdF6ukDT91Gl8m0uRYcXOQ//O1LYM5YuFQPNhL21cES1CPkWqYLTpBo9
+	 QAQsvHGNLLF4XBl9IfRVuISbtgj3sK88o5I5KJCxUeD64Uj6A6gVUakkmYW01/uNW+
+	 a4/quDcRVrg4hzi8eADrnKRYfH0oAPtEv7hXGDIyFVe1tk/GvNV9UIOuR9Koo0U3pb
+	 d51RgsJsCAnVEOpH7R2qhHirtuLjZk+0ZLE1qsqBgb/VLkXCSgd1ITVtP3ATxemuXE
+	 9pKTob7V6keaiDdsty1I9AsM5U2j0r78hTxiP1NG/Qda8yt+0cVUVJJxktDaGGG5T0
+	 +3lZ8pP7k6kIg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wCyr0-0000000Bqsi-1ZS1;
+	id 1wCyr0-0000000Bqsi-2X3c;
 	Wed, 15 Apr 2026 11:56:22 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH 16/18] Documentation: KVM: Clarify that PMU_V3_IRQ IntID requirements for GICv5
-Date: Wed, 15 Apr 2026 12:55:57 +0100
-Message-ID: <20260415115559.2227718-17-maz@kernel.org>
+Subject: [PATCH 17/18] irqchip/gic-v5: Immediately exec priority drop following activate
+Date: Wed, 15 Apr 2026 12:55:58 +0100
+Message-ID: <20260415115559.2227718-18-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260415115559.2227718-1-maz@kernel.org>
 References: <20260415115559.2227718-1-maz@kernel.org>
@@ -60,41 +60,74 @@ X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to 
 
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 
-When running a GICv5-based guest, the PMU must use PPI 23. This,
-however, must be communicated via the
-KVM_ARM_VCPU_PMU_V3_CTRL->KVM_ARM_VCPU_PMU_V3_IRQ ioctl as a full
-GICv5-style Interrupt ID. That is, 0x20000017. Optionally, the whole
-ioctl can be skipped for GICv5.
+With GICv5 an interrupt of equal or lower priority cannot be signalled
+until there has been a priority drop. This is done via the GIC CDEOI
+system instruction. Once this has been executed, the hardware is able
+to signal the next interrupt if there is one.
 
-This was previously not clearly documented, so bump the documentation
-accordingly.
+As all interrupts are programmed to have the same priority, no new
+interrupts can be signalled until the priority drop has happened. This
+can cause issues when, for example, an interrupt remains active while
+a long running process takes place, such as when injecting a physical
+interrupt into a guest VM in software.
 
-Fixes: 7c31c06e2d2d ("KVM: arm64: gic-v5: Mandate architected PPI for PMU emulation on GICv5")
-Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
+The GICv5 driver has so far done the priority drop as part of
+irq_eoi(), i.e., at the same time as deactivating the interrupt. This
+means that any long running process (or VM) could block incoming
+interrupts, effectively causing a denial of service for all other
+interrupts.
+
+Rather than doing the EOI as part of irq_eoi() (which the name would
+suggest would be a good place for it), move it to happen immediately
+after acknowledging an interrupt in the main GICv5 interrupt
+handler. The deactivation of interrupts (GIC CDDI) remains implemented
+as part of irq_eoi(), which means that the same interrupt cannot be
+signalled a second time until deactivated by software.
+
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- Documentation/virt/kvm/devices/vcpu.rst | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v5.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index 5e38058200105..66e714f2fcfa7 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -37,8 +37,11 @@ Returns:
- A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
- number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
- type must be same for each vcpu. As a PPI, the interrupt number is the same for
--all vcpus, while as an SPI it must be a separate number per vcpu. For
--GICv5-based guests, the architected PPI (23) must be used.
-+all vcpus, while as an SPI it must be a separate number per vcpu.
-+
-+For GICv5-based guests, the architected PPI (23) must be used, and must be
-+communicated as the full GICv5-style Interrupt ID, i.e., 0x20000017. This ioctl
-+can be omitted altogether for a GICv5-based guest.
+diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+index 6b0903be8ebfd..58e457d4c1476 100644
+--- a/drivers/irqchip/irq-gic-v5.c
++++ b/drivers/irqchip/irq-gic-v5.c
+@@ -218,17 +218,13 @@ static void gicv5_hwirq_eoi(u32 hwirq_id, u8 hwirq_type)
+ 	       FIELD_PREP(GICV5_GIC_CDDI_TYPE_MASK, hwirq_type);
  
- 1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
- ---------------------------------------
+ 	gic_insn(cddi, CDDI);
+-
+-	gic_insn(0, CDEOI);
+ }
+ 
+ static void gicv5_ppi_irq_eoi(struct irq_data *d)
+ {
+ 	/* Skip deactivate for forwarded PPI interrupts */
+-	if (irqd_is_forwarded_to_vcpu(d)) {
+-		gic_insn(0, CDEOI);
++	if (irqd_is_forwarded_to_vcpu(d))
+ 		return;
+-	}
+ 
+ 	gicv5_hwirq_eoi(d->hwirq, GICV5_HWIRQ_TYPE_PPI);
+ }
+@@ -963,6 +959,13 @@ static void __exception_irq_entry gicv5_handle_irq(struct pt_regs *regs)
+ 	 */
+ 	isb();
+ 
++	/*
++	 * Ensure that we can receive the next interrupts in the event that we
++	 * have a long running handler or directly enter a guest by doing the
++	 * priority drop immediately.
++	 */
++	gic_insn(0, CDEOI);
++
+ 	hwirq = FIELD_GET(GICV5_HWIRQ_INTID, ia);
+ 
+ 	handle_irq_per_domain(hwirq);
 -- 
 2.47.3
 
