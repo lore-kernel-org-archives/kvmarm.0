@@ -1,221 +1,523 @@
-Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C58388E7A
-	for <kvmarm@lists.linux.dev>; Tue, 14 Apr 2026 22:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.253
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34803D47DC;
+	Wed, 15 Apr 2026 08:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776204898; cv=none; b=HkD8H8BmMiVqxnsrRmsusV/UGrq3yKpJF/88x+YHmVXjy71Bd0uj+Zx0i25nkjfEoilalWoGEU9f6vQnEZtxUAtQDVcbIsW/yF2Q7yxnCH09qbUoW+hC+LJOR2OcjcpEzEOAwDai+dLF5VxdHP9/6AIYz9VEX1RRR98l7fhcUSM=
+	t=1776242339; cv=none; b=cQVFkKkdM6D/HRl+njVi5oaud0O3ekPOXwhAOUneefsbnuBiBynDbNBKiYicgOsJnZQYOXAguES4NIx1rJ+mmn9nfqxJR+6DUUS+i8ux+73Oygdbv/67H08zWXaj3wU81dHsHVYhlQlPM8r8BWgmjXrsovnceduUOyxWw5uUauw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776204898; c=relaxed/simple;
-	bh=6ZIxJwnwdeV1eFOf4rMBuZ5xOv59qiRJZo+CxJ4Si4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t2PXDHm3jBWgjcEVKnLHvkk3/mn0NTw71/9tY6cfI5Zk85Pa1OGcUmugAjrSwvnj7NG5mTsjc0PLV/nDp7sKrBn28LfaDEQDB8paqawUqIMnZP2KL8uH4Oo9ZxUY4gdYol+0naY7sJ5JWUzxK4A6qJl6XbzSKepPEt4hkfHK/BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=EqW0tlIG; arc=none smtp.client-ip=139.138.61.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1776242339; c=relaxed/simple;
+	bh=1SEENklGY2OEpLaItYKrNdGcJ4xU4gbP37e/QpBWzfk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TiN/MdraimLVliHg5PCciRcY0d4O6+Xnv95ae+uIsrQSPha9A2OyfBKRp+Q1p6tlEDgHA2XtJws+XV0hpwqCDL2nWCiwiGdfs0xO8f2kxE4Lzpop80C15tkURL0ALTqcfyP3dv44BJlT5eSFLqpOIf2GxFJBHTRYshjsXnpWBjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7fLfHtF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="EqW0tlIG"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1776204896; x=1807740896;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6ZIxJwnwdeV1eFOf4rMBuZ5xOv59qiRJZo+CxJ4Si4Y=;
-  b=EqW0tlIG2Mn7uUqgX8LwL00b/cIRZCQgH42hsCFga0tow5M2oJhReEcN
-   hX9Xk/1YEfmIVZFNuqZMhSJrAwEpXjTwfz/qz0CiWiTyptZIA+dwcV2RU
-   zGvanUJ2sfiGG3zLBRP5pFJQX6agLZYaVcFhh8NZL9ngM0V5+Ydppf5yH
-   CfThV1pnJtXb1EYZxt8B1Cas8nH91Y/PWTwVRrt7ISsSFqNg+4SzW7/0y
-   Ar2iVfhjRBRRcTR7v6spFYf1xvLUjR3OdQaw0+ek+1TxpVam/97Ep0W+X
-   xknWzfuN0VF3UwLXMbOMv26hErMCvwymVENVTsgfcgdg91UBHojQK4A+0
-   w==;
-X-CSE-ConnectionGUID: IvqFAvMpSDuCY4u9OvGIQQ==
-X-CSE-MsgGUID: WTPa3y+7Q1OVyCp3XKRoXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="224875937"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770562800"; 
-   d="scan'208";a="224875937"
-Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
-  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 07:14:55 +0900
-Received: from az2nlsmgm2.o.css.fujitsu.com (unknown [10.150.26.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 564C9100035F
-	for <kvmarm@lists.linux.dev>; Tue, 14 Apr 2026 22:14:55 +0000 (UTC)
-Received: from az2uksmom3.o.css.fujitsu.com (az2uksmom3.o.css.fujitsu.com [10.151.22.205])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 055F41C1009B
-	for <kvmarm@lists.linux.dev>; Tue, 14 Apr 2026 22:14:55 +0000 (UTC)
-Received: from sm-arm-grace07 (sm-x86-stp01.soft.fujitsu.com [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmom3.o.css.fujitsu.com (Postfix) with ESMTPS id 698681000083;
-	Tue, 14 Apr 2026 22:14:49 +0000 (UTC)
-Date: Wed, 15 Apr 2026 07:14:46 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7fLfHtF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4090BC19424;
+	Wed, 15 Apr 2026 08:38:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776242338;
+	bh=1SEENklGY2OEpLaItYKrNdGcJ4xU4gbP37e/QpBWzfk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p7fLfHtFi3YMBHlYWd1tebG8VosBBbiKoHcNFEiXcU+Vyt4VheF4L9LGfBnUQEJ3V
+	 i25Pp0wS+dR6VFONosKOsK1I+odJ/Jdt7siTVzaJI5OWlcRBMgnWvT+yZ+tsJzLatY
+	 DNxCybQcvCDxoPNmzA9CM5DcDRii7MpxOJBuXulhLaDzl9Evq6sG0TLJNXU5U4GCHV
+	 gbSKye1X2JlHoaEl2jfIRvlh9yMpQeoTUdg9Grnxw1Kzo3AZPR3TvbKQq9YzS1KCfs
+	 adX68oJDh+sye4mWDPu3VyW/u/QRdvCDtdQoV5jrtJlVmDUKLy1A6hB6BLnTAO1/L+
+	 /KAcqfglTHbhg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wCvlw-0000000Bnpd-07Ek;
+	Wed, 15 Apr 2026 08:38:56 +0000
+Date: Wed, 15 Apr 2026 09:38:55 +0100
+Message-ID: <86eckg39eo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: sefltests: Add helpers for guest
- hypervisors
-Message-ID: <ad68VjnGQ3trs7AN@sm-arm-grace07>
-References: <20260412142216.3806482-1-weilin.chang@arm.com>
- <20260412142216.3806482-3-weilin.chang@arm.com>
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
+In-Reply-To: <20260411125024.3735989-2-weilin.chang@arm.com>
+References: <20260411125024.3735989-1-weilin.chang@arm.com>
+	<20260411125024.3735989-2-weilin.chang@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260412142216.3806482-3-weilin.chang@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Apr 12, 2026 at 03:22:14PM +0100, Wei-Lin Chang wrote:
-> Add helpers so that guest hypervisors can run nested guests. SP_EL1
-> save/restore is added to allow nested guests to use a stack.
+On Sat, 11 Apr 2026 13:50:24 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
+> Currently we are forced to fully unmap all shadow stage-2 for a VM when
+> unmapping a page from the canonical stage-2, for example during an MMU
+> notifier call. This is because we are not tracking what canonical IPA
+> are mapped in the shadow stage-2 page tables hence there is no way to
+> know what to unmap.
+> 
+> Create a per kvm_s2_mmu maple tree to track canonical IPA range ->
+> nested IPA range, so that it is possible to partially unmap shadow
+> stage-2 when a canonical IPA range is unmapped. The algorithm is simple
+> and conservative:
+> 
+> At each shadow stage-2 map, insert the nested IPA range into the maple
+> tree, with the canonical IPA range as the key. If the canonical IPA
+> range doesn't overlap with existing ranges in the tree, insert as is,
+> and a reverse mapping for this range is established. But if the
+> canonical IPA range overlaps with any existing ranges in the tree,
+> create a new range that spans all the overlapping ranges including the
+> input range and replace those existing ranges. In the mean time, mark
+> this new spanning canonical IPA range as "polluted" indicating we lost
+> track of the nested IPA ranges that map to this canonical IPA range.
+> 
+> The maple tree's 64 bit entry is enough to store the nested IPA and
+> polluted status (stored as a bit called UNKNOWN_IPA), therefore besides
+> maple tree's internal operation, memory allocation is avoided.
+> 
+> Example:
+> |||| means existing range, ---- means empty range
+> 
+> input:            $$$$$$$$$$$$$$$$$$$$$$$$$$
+> tree:  --||||-----|||||||---------||||||||||-----------
+> 
+> insert spanning range and replace overlapping ones:
+>        --||||-----||||||||||||||||||||||||||-----------
+>                   ^^^^^^^^polluted!^^^^^^^^^
+
+I think you should stick to a single terminology. It is either
+"polluted", or "unknown IPA". My preference goes to the latter, as the
+former is not very descriptive in this context.
+
+> 
+> With the reverse map created, when a canonical IPA range gets unmapped,
+> look into each s2 mmu's maple tree and look for canonical IPA ranges
+> affected, and base on their polluted status:
+> 
+> polluted -> fall back and fully invalidate the current shadow stage-2,
+>             also clear the tree
+> not polluted -> unmap the nested IPA range, and remove the reverse map
+>                 entry
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 > ---
->  .../selftests/kvm/include/arm64/nested.h      | 17 +++++++
->  tools/testing/selftests/kvm/lib/arm64/entry.S |  5 ++
->  .../testing/selftests/kvm/lib/arm64/nested.c  | 46 +++++++++++++++++++
->  3 files changed, 68 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h   |   4 +
+>  arch/arm64/include/asm/kvm_nested.h |   4 +
+>  arch/arm64/kvm/mmu.c                |  30 ++++--
+>  arch/arm64/kvm/nested.c             | 147 +++++++++++++++++++++++++++-
+>  4 files changed, 177 insertions(+), 8 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
-> index 86d931facacb..7928ef89494a 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/nested.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/nested.h
-> @@ -21,8 +21,17 @@
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 851f6171751c..a97bd461c1e1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+>  	 */
+>  	bool	nested_stage2_enabled;
 >  
->  extern char hyp_vectors[];
->  
-> +enum vcpu_sysreg {
-> +	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+> +	/* canonical IPA to nested IPA range lookup */
+> +	struct maple_tree nested_revmap_mt;
+> +	bool	nested_revmap_broken;
 > +
-> +	SP_EL1,
-> +
-> +	NR_SYS_REGS
-> +};
-> +
->  struct cpu_context {
->  	struct user_pt_regs regs;	/* sp = sp_el0 */
-> +	u64 sys_regs[NR_SYS_REGS];
->  };
->  
->  struct vcpu {
-> @@ -37,9 +46,17 @@ struct hyp_data {
->  	struct cpu_context hyp_context;
->  };
 
-I am not sure of these structs you introduced only for nested guest feature
-testing, as the KVM arm64 code they are quite complex and involved, 
-extracring part of those and add members as hello_nested or simliar
-tests evolve, then add test cases to me seems fragile. 
-But if you have strong reason to add these would you mind explaining a bit?
+Consider moving this boolean next to the other ones so that you don't
+create too many holes in the kvm_s2_mmu structure (use pahole to find out).
+
+But I have some misgivings about the way things are structured
+here. Only NV needs a revmap, yet this is present irrelevant of the
+nature of the VM and bloats the data structure a bit.
+
+My naive approach would have been to only keep a pointer to the
+revmap, and make that pointer NULL when the tree is "broken", and
+freed under RCU if the context isn't the correct one.
+
+This would have multiple benefits: no large-ish structure embedded in
+the s2_mmu structure, no extra boolean to indicate an error condition,
+memory reclaimed earlier.
+
+>  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+>  	struct dentry *shadow_pt_debugfs_dentry;
+>  #endif
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 091544e6af44..f039220e87a6 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -76,6 +76,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+>  				       const union tlbi_info *info,
+>  				       void (*)(struct kvm_s2_mmu *,
+>  						const union tlbi_info *));
+> +extern void kvm_record_nested_revmap(gpa_t gpa, struct kvm_s2_mmu *mmu,
+> +				    gpa_t fault_gpa, size_t map_size);
+>  extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+>  extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+>  
+> @@ -164,6 +166,8 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>  				    struct kvm_s2_trans *trans);
+>  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+>  extern void kvm_nested_s2_wp(struct kvm *kvm);
+> +extern void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
+> +				       bool may_block);
+>  extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
+>  extern void kvm_nested_s2_flush(struct kvm *kvm);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d089c107d9b7..4c9b9cf6dc43 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -5,6 +5,7 @@
+>   */
+>  
+>  #include <linux/acpi.h>
+> +#include <linux/maple_tree.h>
+>  #include <linux/mman.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/io.h>
+> @@ -1099,6 +1100,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>  {
+>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>  	struct kvm_pgtable *pgt = NULL;
+> +	struct maple_tree *mt = &mmu->nested_revmap_mt;
+>  
+>  	write_lock(&kvm->mmu_lock);
+>  	pgt = mmu->pgt;
+> @@ -1108,8 +1110,11 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>  		free_percpu(mmu->last_vcpu_ran);
+>  	}
+>  
+> -	if (kvm_is_nested_s2_mmu(kvm, mmu))
+> +	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
+> +		if (!mtree_empty(mt))
+> +			mtree_destroy(mt);
+>  		kvm_init_nested_s2_mmu(mmu);
+> +	}
+>  
+>  	write_unlock(&kvm->mmu_lock);
+>  
+> @@ -1631,6 +1636,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  		goto out_unlock;
+>  	}
+>  
+> +	if (s2fd->nested)
+> +		kvm_record_nested_revmap(gfn << PAGE_SHIFT, pgt->mmu,
+> +					 s2fd->fault_ipa, PAGE_SIZE);
+> +
+>  	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+>  						 __pfn_to_phys(pfn), prot,
+>  						 memcache, flags);
+> @@ -2031,6 +2040,13 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
+>  								 prot, flags);
+>  	} else {
+> +		if (s2fd->nested) {
+> +			phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
+> +
+> +			ipa &= ~(mapping_size - 1);
+
+I guess it'd be worth adding a helper for this instead of duplicating
+the existing code.
+
+> +			kvm_record_nested_revmap(ipa, pgt->mmu, gfn_to_gpa(gfn),
+> +						 mapping_size);
+
+This worries me a bit, see below.
+
+> +		}
+>  		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
+>  							 __pfn_to_phys(pfn), prot,
+>  							 memcache, flags);
+> @@ -2388,14 +2404,16 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  
+>  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+> +	gpa_t gpa = range->start << PAGE_SHIFT;
+> +	size_t size = (range->end - range->start) << PAGE_SHIFT;
+> +	bool may_block = range->may_block;
+> +
+>  	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+>  		return false;
+>  
+> -	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+> -			     (range->end - range->start) << PAGE_SHIFT,
+> -			     range->may_block);
+> +	__unmap_stage2_range(&kvm->arch.mmu, gpa, size, may_block);
+> +	kvm_unmap_gfn_range_nested(kvm, gpa, size, may_block);
+>  
+> -	kvm_nested_s2_unmap(kvm, range->may_block);
+>  	return false;
+>  }
+>  
+> @@ -2673,7 +2691,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>  
+>  	write_lock(&kvm->mmu_lock);
+>  	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+> -	kvm_nested_s2_unmap(kvm, true);
+> +	kvm_unmap_gfn_range_nested(kvm, gpa, size, true);
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 883b6c1008fb..c9ebe969b453 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/bitfield.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/maple_tree.h>
+>  
+>  #include <asm/fixmap.h>
+>  #include <asm/kvm_arm.h>
+> @@ -43,6 +44,19 @@ struct vncr_tlb {
+>   */
+>  #define S2_MMU_PER_VCPU		2
+>  
+> +/*
+> + * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree payload
+> + * layout:
+> + *
+> + * bit 63: valid, 1 for non-polluted entries, prevents the case where the
+> + *         nested IPA is 0 and turns the whole value to 0
+> + * bits 55-12: nested IPA bits 55-12
+> + * bit 0: polluted, 1 for polluted, 0 for not
+> + */
+> +#define VALID_ENTRY		BIT(63)
+> +#define NESTED_IPA_MASK		GENMASK_ULL(55, 12)
+> +#define UNKNOWN_IPA		BIT(0)
+> +
+
+This only works because you are using the "advanced" API, right?
+Otherwise, you'd be losing the high bit. It'd be good to add a comment
+so that people keep that in mind.
+
+>  void kvm_init_nested(struct kvm *kvm)
+>  {
+>  	kvm->arch.nested_mmus = NULL;
+> @@ -769,12 +783,57 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	return s2_mmu;
+>  }
+>  
+> +void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
+> +			      gpa_t fault_ipa, size_t map_size)
+> +{
+> +	struct maple_tree *mt = &mmu->nested_revmap_mt;
+> +	gpa_t start = ipa;
+> +	gpa_t end = ipa + map_size - 1;
+> +	u64 entry, new_entry = 0;
+> +	MA_STATE(mas, mt, start, end);
+> +
+> +	if (mmu->nested_revmap_broken)
+> +		return;
+> +
+> +	mtree_lock(mt);
+> +	entry = (u64)mas_find_range(&mas, end);
+> +
+> +	if (entry) {
+> +		/* maybe just a perm update... */
+> +		if (!(entry & UNKNOWN_IPA) && mas.index == start &&
+> +		    mas.last == end &&
+> +		    fault_ipa == (entry & NESTED_IPA_MASK))
+> +			goto unlock;
+> +		/*
+> +		 * Create a "polluted" range that spans all the overlapping
+> +		 * ranges and store it.
+> +		 */
+> +		while (entry && mas.index <= end) {
+> +			start = min(mas.index, start);
+> +			end = max(mas.last, end);
+> +			entry = (u64)mas_find_range(&mas, end);
+> +		}
+> +		new_entry |= UNKNOWN_IPA;
+> +	} else {
+> +		new_entry |= fault_ipa;
+> +		new_entry |= VALID_ENTRY;
+> +	}
+> +
+> +	mas_set_range(&mas, start, end);
+> +	if (mas_store_gfp(&mas, (void *)new_entry, GFP_NOWAIT | __GFP_ACCOUNT))
+> +		mmu->nested_revmap_broken = true;
+
+Can we try and minimise the risk of allocation failure here?
+
+user_mem_abort() tries very hard to pre-allocate pages for page
+tables by maintaining an memcache. Can we have a similar approach for
+the revmap?
+
+> +unlock:
+> +	mtree_unlock(mt);
+> +}
+> +
+>  void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+>  {
+>  	/* CnP being set denotes an invalid entry */
+>  	mmu->tlb_vttbr = VTTBR_CNP_BIT;
+>  	mmu->nested_stage2_enabled = false;
+>  	atomic_set(&mmu->refcnt, 0);
+> +	mt_init(&mmu->nested_revmap_mt);
+> +	mmu->nested_revmap_broken = false;
+>  }
+>  
+>  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> @@ -1150,6 +1209,90 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+>  	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+>  }
+>  
+> +static void reset_revmap_and_unmap(struct kvm_s2_mmu *mmu, bool may_block)
+> +{
+> +	mtree_destroy(&mmu->nested_revmap_mt);
+> +	kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> +	mmu->nested_revmap_broken = false;
+> +}
+> +
+> +static void unmap_mmu_ipa_range(struct kvm_s2_mmu *mmu, gpa_t gpa,
+> +				  size_t unmap_size, bool may_block)
+> +{
+> +	struct maple_tree *mt = &mmu->nested_revmap_mt;
+> +	gpa_t start = gpa;
+> +	gpa_t end = gpa + unmap_size - 1;
+> +	u64 entry;
+> +	size_t entry_size;
+> +	bool unlock, fallback;
+> +	MA_STATE(mas, mt, gpa, end);
+> +
+> +	if (mmu->nested_revmap_broken) {
+> +		unlock = false;
+> +		fallback = true;
+> +		goto fin;
+> +	}
+
+Using booleans to affect the control flow reads really badly. I'd
+expect this to simply be:
+
+	if (...) {
+		reset_revmap_and_unmap(mmu, may_block);
+		return;
+	}
+
+> +
+> +	mtree_lock(mt);
+> +	entry = (u64)mas_find_range(&mas, end);
+> +
+> +	while (entry && mas.index <= end) {
+> +		start = mas.last + 1;
+> +		entry_size = mas.last - mas.index + 1;
+> +		/*
+> +		 * Give up and invalidate this s2 mmu if the unmap range
+> +		 * touches any polluted range.
+> +		 */
+> +		if (entry & UNKNOWN_IPA) {
+> +			unlock = true;
+> +			fallback = true;
+> +			goto fin;
+> +		}
+
+and this to be:
+
+		if (entry & UNKNOWN_IPA) {
+			mtree_unlock(mt);
+			reset_revmap_and_unmap(mmu, may_block);
+			return;
+		}
+
+> +
+> +		/*
+> +		 * Ignore result, it is okay if a reverse mapping erase
+> +		 * fails.
+> +		 */
+> +		mas_store_gfp(&mas, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
+> +
+> +		mtree_unlock(mt);
+> +		kvm_stage2_unmap_range(mmu, entry & NESTED_IPA_MASK, entry_size,
+> +				       may_block);
+> +		mtree_lock(mt);
+> +		/*
+> +		 * Other maple tree operations during preemption could render
+> +		 * this ma_state invalid, so reset it.
+> +		 */
+> +		mas_set_range(&mas, start, end);
+> +		entry = (u64)mas_find_range(&mas, end);
+> +	}
+> +	unlock = true;
+> +	fallback = false;
+> +
+> +fin:
+> +	if (unlock)
+> +		mtree_unlock(mt);
+> +	if (fallback)
+> +		reset_revmap_and_unmap(mmu, may_block);
+
+and this can eventually be greatly simplified.
+
+> +}
+> +
+> +void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
+> +				bool may_block)
+> +{
+> +	int i;
+> +
+> +	if (!kvm->arch.nested_mmus_size)
+> +		return;
+> +
+> +	/* TODO: accelerate this using mt of canonical s2 mmu */
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			unmap_mmu_ipa_range(mmu, gpa, size, may_block);
+> +	}
+> +}
+> +
+>  void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>  {
+>  	int i;
+> @@ -1163,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>  		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>  
+>  		if (kvm_s2_mmu_valid(mmu))
+> -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> +			reset_revmap_and_unmap(mmu, may_block);
+>  	}
+>  
+>  	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> @@ -1848,7 +1991,7 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
+>  
+>  		write_lock(&vcpu->kvm->mmu_lock);
+>  		if (mmu->pending_unmap) {
+> -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
+> +			reset_revmap_and_unmap(mmu, true);
+>  			mmu->pending_unmap = false;
+>  		}
+>  		write_unlock(&vcpu->kvm->mmu_lock);
+
+My other concern here is related to TLB invalidation. As the guest
+performs TLB invalidations that remove entries from the shadow S2,
+there is no way to update the revmap to account for this.
+
+This obviously means that the revmap becomes more and more inaccurate
+over time, and that is likely to accumulate conflicting entries.
+
+What is the plan to improve the situation on this front?
 
 Thanks,
-Itaru.
 
->  
-> +void prepare_hyp(void);
-> +void init_vcpu(struct vcpu *vcpu, vm_paddr_t l2_pc, vm_paddr_t l2_stack_top);
-> +int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data);
-> +
-> +void do_hvc(void);
->  u64 __guest_enter(struct vcpu *vcpu, struct cpu_context *hyp_context);
->  void __hyp_exception(u64 type);
->  
-> +void __sysreg_save_el1_state(struct cpu_context *ctxt);
-> +void __sysreg_restore_el1_state(struct cpu_context *ctxt);
-> +
->  #endif /* !__ASSEMBLER__ */
->  
->  #endif /* SELFTEST_KVM_NESTED_H */
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/entry.S b/tools/testing/selftests/kvm/lib/arm64/entry.S
-> index 33bedf5e7fb2..df3af3463c6c 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/entry.S
-> +++ b/tools/testing/selftests/kvm/lib/arm64/entry.S
-> @@ -3,6 +3,11 @@
->   * adapted from arch/arm64/kvm/hyp/entry.S
->   */
->  
-> + .globl do_hvc
-> + do_hvc:
-> +	hvc	#0
-> +	ret
-> +
->  /*
->   * Manually define these for now
->   */
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
-> index 06ddaab2436f..b30d20b101c4 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/nested.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
-> @@ -4,7 +4,53 @@
->   */
->  
->  #include "nested.h"
-> +#include "processor.h"
->  #include "test_util.h"
-> +#include <asm/sysreg.h>
-> +
-> +void prepare_hyp(void)
-> +{
-> +	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW, hcr_el2);
-> +	write_sysreg(hyp_vectors, vbar_el2);
-> +	isb();
-> +}
-> +
-> +void init_vcpu(struct vcpu *vcpu, vm_paddr_t l2_pc, vm_paddr_t l2_stack_top)
-> +{
-> +	memset(vcpu, 0, sizeof(*vcpu));
-> +	vcpu->context.regs.pc = l2_pc;
-> +	vcpu->context.regs.pstate = PSR_MODE_EL1h | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
-> +	vcpu->context.sys_regs[SP_EL1] = l2_stack_top;
-> +}
-> +
-> +void __sysreg_save_el1_state(struct cpu_context *ctxt)
-> +{
-> +	ctxt->sys_regs[SP_EL1] = read_sysreg(sp_el1);
-> +}
-> +
-> +void __sysreg_restore_el1_state(struct cpu_context *ctxt)
-> +{
-> +	write_sysreg(ctxt->sys_regs[SP_EL1], sp_el1);
-> +}
-> +
-> +int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data)
-> +{
-> +	u64 ret;
-> +
-> +	__sysreg_restore_el1_state(&vcpu->context);
-> +
-> +	write_sysreg(vcpu->context.regs.pstate, spsr_el2);
-> +	write_sysreg(vcpu->context.regs.pc, elr_el2);
-> +
-> +	ret =  __guest_enter(vcpu, &hyp_data->hyp_context);
-> +
-> +	vcpu->context.regs.pc = read_sysreg(elr_el2);
-> +	vcpu->context.regs.pstate = read_sysreg(spsr_el2);
-> +
-> +	__sysreg_save_el1_state(&vcpu->context);
-> +
-> +	return ret;
-> +}
->  
->  void __hyp_exception(u64 type)
->  {
-> -- 
-> 2.43.0
-> 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
