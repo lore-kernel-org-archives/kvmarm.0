@@ -1,265 +1,260 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F363939A6
-	for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 23:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776295644; cv=pass; b=Qorwn1WLpWloeCM/ePt8IWBxL1hA1+srq75E7Qske844omGMHa5YowwVrOPBnBpZ1ahEuHdgSbQ0PjccKpqIblYZg0FQOe8kYpclX88NacaH/04mXFWB/K1LYA52FsEKTY4ksnHu/fEdAbXW7QaArUdX9XcMn9SlOTYC5yNbrrM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776295644; c=relaxed/simple;
-	bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NMOHoS0dx6M54MY+3VpdjW8ST0yJdEmmTRDCKYHctwy2bExlVzIXnY4ha+JrQNdlxBBklrBrHwDgY8TMoNNmZEM38+OD5UsLKIdH+Gk/FEffL7YDRz6w1H3nZmFT7AHVqwLcDIknajb8QN6yb+HxW62cDrU/pdat1YLQnL/LC7A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WaSOiQTl; arc=pass smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D68D3A6B61;
+	Thu, 16 Apr 2026 10:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776336641; cv=none; b=oOZMMHbvT8t+9BdOv6wtH2ejMtB8Grfzf06AMGdgKyx47DIvU1+6G3LUaVyQGQ7A+TtV1azVRbsiaZ786/94ZRN0xzJzX7Sfyeh84gOaZRxLaYjbIh1i0LmgFxR3lyRhCdtywj2HBMH2ny3nKuV+SVOPl4Ck5Hi+c/tB8LThzRw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776336641; c=relaxed/simple;
+	bh=L15S26xrdFa2h2DdyQPiDB+su+8bDUbpFsvk71cGpik=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cwpQd2oOu1hx5h96eDFZeR9DAkPaT78+zG8AdCjnhdKsdLvpJ5F1rsNYyWWAOH4hot2Z5NuEDY3LeSCr73OHuKZi+nsEY2tUU+lnAl5wQQXv/DIyh6dt/RZ95Jd7BVfJitCMv9E8INbv/1eBPeAUvLZP4oMZadm/NJU6u9eHmrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLfZZ8p1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WaSOiQTl"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8a151012558so85943366d6.3
-        for <kvmarm@lists.linux.dev>; Wed, 15 Apr 2026 16:27:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776295641; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lvyrXjsi+5Jxzp5MH5z2mB5LFdJtF/O3ELqWczNah9bgvfjZTXimacez2HH0a9Rjk8
-         n0mNfSJTgkxVHJ2QvJ5Njx0B9SIi/gJ/0yYLB+9/75JlOXw4JajS5TuN43s/JTKxshwK
-         OlGNfYT29oprfl6Ev9c8Wd7Ri8Muht4wyotYYZMn+YNTM771e9dduXA5MaoT3JnQLG8T
-         uv6OniLL+3JG8f/0Fo8MYeYTUye32n9GNwTN4ue2UhHT1ovzAujr+RqoG7OlH3+m7v21
-         Bld//1LA/CTSsDPEXUy2U7TlNHv+/qdz4LXbwWGbEz9YnNLMPyA0RiW2zp0w4+fb4j+4
-         64DQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
-        fh=0ZSVmAdxFdlPGCfb69G/ons1ws5J0Sv7n7SWC4k4u9I=;
-        b=GL/Q9Bdhe9D3K0xq8weeXhlfP7QhzwWOU2lRgDuXFDltPQGxke10BF1qjrIEQZz/iz
-         ol5LEYSzoAqz2LtuuFMHUjQkhOjEIoiFuHp0Tl1S88pxa/KGu1RDJCDouY/YIpSU6Yqz
-         VhUh9deAlBFgpM/yLRmNgeCLhdYFkWdFUKtlnNS3vlgCrdol7AczaiUaWA/7k91jifA0
-         HPJBfvxzFmOlG1ugCVX8nOfuzhdoyGB07CEl+qO03MUJmfUXBPpLKrdIW0O5/PDy1/uS
-         9DQYAEQgX1PBz6XhoaWHurfjq7uwHdrvSYbJaf210ZEJ3tJhWZU90EF9f8ifjILLoBPG
-         3tWw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776295641; x=1776900441; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
-        b=WaSOiQTl2gWozybJPf8Ak+z1qb4lOfpqnVhFi5p2Z72zeeHwV+ymJPRerr+QeqnAKq
-         rNHT1x3QSaTAbsVKjnnhYNwUayJc/bGJ3IgY7zDy+6bRaVu6oWcSuLIcEx8MObT60GWh
-         PoTAu8ukSMP0oQQoorRBtxckV6vK3ejqpSgleFzXdCnxATFGNjBx5+1ekcjWXdBBBDSS
-         2VS/XdJB7syBGqeIfegbsEB6TIrI9hPxHaENmLPGNQbY/dbSfGVqbOLtJDo29zLgkPNq
-         +3ve/YPTgrVL9QNF9CIl20O0ZZtZcJfSsG14aFjRSkzd2m4+5uTS/Yn+fZIk5o44haCd
-         Uubw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776295641; x=1776900441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=x+QG3xhCQwRR1qC6hXy7NcWy7080+KY3YK+kXqaECJ0=;
-        b=P6/2mzhXDAKy15YKA1Ec6E4d9swL0OievX6KhxWNlTX6O5IzskmuNBwba5RqKLbaEK
-         wAzEv7NRmOfqoG9f0Khv77kjousVGcDEDqZunyKMvIrR3MKUzuIR1XgmFqa3/Z7b9alu
-         raXZQz2gD/badIKjTEUFkuSv7FEmgimYAT5RMRK7hZeo7SX2rrVF4GUqisu66ChtSo9a
-         wlfXdZp5JeomG+GPLYBF8G50zqDRe3v6BE1z7WPcGWOy1qYm3ZZ3Xhody+T3+BMIbg7V
-         +F3Om9z72EOTMLEw7ppmIoqiI3cxbokUVLx59veihsz8EWsjt0UVQl/mP0Nfr95XvTvk
-         DVKQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/xHwOLPXqZaQecD/ngEgzu5miBRO7MRZOmvflie9LXyl8Eh60LKehm9dBGTzRlxibaKHvET7k=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyp9WceiORuz+WG5v+4naS+5sH49I7Ou+m6gjR0ERhLNxDbr057
-	2p8BPfZIN1nrrv1Mj+V6jwICN/onVtGfBhuIkn5fNxF8q1l+un4To6pQM+Ks8TvJAtRS23P0E3W
-	nRcrIrWszmxn6owTu8bLaSmlngal7zJt2x5CN9cLC
-X-Gm-Gg: AeBDies6gog/hgKhRcWCKvQiP3vXbgmQy9cCgaR2HYHW3cq5mvCNsJkgbxXyCziJdyx
-	Db1EnfOifnFktfWD9NEotwwio01EqIKKvEbgsJiKl0687h4a3fJr0ZxPUqI84nHrABZv9db/0l3
-	uw/d+4zXH9I2hH1Zvq7O2zc2Lpio/k3/mc2ge3qi7+w+Ygf13z1fSuKucpUNgAa8EbhhCGIl9N6
-	qodW8nzFp4G5cDxbEsbgK4CNqQiWe2xw7ht2noziiEKgTB9Y4+ChhtsbKRMENy5ITkFtEhU62f3
-	sZ/Fnyi8NBSX0bGMkUo3X0CVI6LyWQ9tlHJVtkdRSmqxlorsiBVr1Lzh30E=
-X-Received: by 2002:ad4:5baf:0:b0:8ac:ab13:8f15 with SMTP id
- 6a1803df08f44-8acab1391c9mr232004096d6.7.1776295640870; Wed, 15 Apr 2026
- 16:27:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLfZZ8p1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D38B5C2BCAF;
+	Thu, 16 Apr 2026 10:50:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776336641;
+	bh=L15S26xrdFa2h2DdyQPiDB+su+8bDUbpFsvk71cGpik=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DLfZZ8p1k8JcGemnaTdhhaa8qpw5hKyiZer/ftvpUCUCAgr7TmsDRoT99vXUwHJ1a
+	 0tlJQISIbmayCmCo0nEPkz0Iq/6uujur9QX9yVrIG4wrOpl69JAXuVRO9HIFnLYGuF
+	 d1PFhHfG1ZYTUnOFSX4nJwWDqfrtXQXa34dYC1lgwTAXT+kkIHF8nqVxRzSjKv0jIJ
+	 a5W/3jIKX9QDaYc9eTwp1N4mSPv/rO2QUApoYG90fjeTTIUSiY1b8mJNxfHN3Zam2Y
+	 IV9x4rNqeRLBdC3G+0pdioCJccrUlXrw2kAqIwnCwJanznKG7hZmQ5XZJ3u3rknjeP
+	 Gc/StuQ55p14Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wDKIw-0000000C7Bj-27sh;
+	Thu, 16 Apr 2026 10:50:38 +0000
+Date: Thu, 16 Apr 2026 11:50:38 +0100
+Message-ID: <867bq72n7l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
+In-Reply-To: <tozhyzmwfddgx5fgfejracv6tskgs7xhs4fs6yvmvff74m7gwy@eq3oh35tokj4>
+References: <20260411125024.3735989-1-weilin.chang@arm.com>
+	<20260411125024.3735989-2-weilin.chang@arm.com>
+	<86eckg39eo.wl-maz@kernel.org>
+	<tozhyzmwfddgx5fgfejracv6tskgs7xhs4fs6yvmvff74m7gwy@eq3oh35tokj4>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260318155413.793430-1-steven.price@arm.com> <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
- <d661a24c-6619-4734-96bd-075d3416e809@arm.com>
-In-Reply-To: <d661a24c-6619-4734-96bd-075d3416e809@arm.com>
-From: Alper Gun <alpergun@google.com>
-Date: Wed, 15 Apr 2026 16:27:08 -0700
-X-Gm-Features: AQROBzCS-xITaK7ztBjux37Usj-fD7VQebkqcRVamG9jxnrdFdKeF2d2D3KViso
-Message-ID: <CABpDEumAVf02uOS5Bj07EDyuU=z9FV-iocQU1j7gFM5z0BeV_w@mail.gmail.com>
-Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
-	Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Apr 15, 2026 at 4:01=E2=80=AFAM Steven Price <steven.price@arm.com>=
- wrote:
->
-> On 14/04/2026 22:40, Alper Gun wrote:
-> > On Wed, Mar 18, 2026 at 8:54=E2=80=AFAM Steven Price <steven.price@arm.=
-com> wrote:
-> >>
-> >> This series adds support for running protected VMs using KVM under the
-> >> Arm Confidential Compute Architecture (CCA).
-> >>
-> >> New major version number! This now targets RMM v2.0-bet0[1]. And unlik=
-e
-> >> for Linux this represents a significant change.
-> >>
-> >> RMM v2.0 brings with it the ability to configure the RMM to have the
-> >> same page size as the host (so no more RMM_PAGE_SIZE and dealing with
-> >> granules being different from host pages). It also introduces range
-> >> based APIs for many operations which should be more efficient and
-> >> simplifies the code in places.
-> >>
-> >> The handling of the GIC has changed, so the system registers are used =
-to
-> >> pass the GIC state rather than memory. This means fewer changes to the
-> >> KVM code as it looks much like a normal VM in this respect.
-> >>
-> >> And of course the new uAPI introduced in the previous v12 posting is
-> >> retained so that also remains simplified compared to earlier postings.
-> >>
-> >> The RMM support for v2.0 is still early and so this series includes a
-> >> few hacks to ease the integration. Of note are that there are some RMM
-> >> v1.0 SMCs added to paper over areas where the RMM implementation isn't
-> >> quite ready for v2.0, and "SROs" (see below) are deferred to the final
-> >> patch in the series.
-> >>
-> >> The PMU in RMM v2.0 requires more handling on the RMM-side (and
-> >> therefore simplifies the implementation on Linux), but this isn't quit=
-e
-> >> ready yet. The Linux side is implemented (but untested).
-> >>
-> >> PSCI still requires the VMM to provide the "target" REC for operations
-> >> that affect another vCPU. This is likely to change in a future version
-> >> of the specification. There's also a desire to force PSCI to be handle=
-d
-> >> in the VMM for realm guests - this isn't implemented yet as I'm waitin=
-g
-> >> for the dust to settle on the RMM interface first.
-> >>
-> >> Stateful RMI Operations
-> >> -----------------------
-> >>
-> >> The RMM v2.0 spec brings a new concept of Stateful RMI Operations (SRO=
-s)
-> >> which allow the RMM to complete an operation over several SMC calls an=
-d
-> >> requesting/returning memory to the host. This has the benefit of
-> >> allowing interrupts to be handled in the middle of an operation (by
-> >> returning to the host to handle the interrupt without completing the
-> >> operation) and enables the RMM to dynamically allocate memory for
-> >> internal tracking purposes. One example of this is RMI_REC_CREATE no
-> >> longer needs "auxiliary granules" provided upfront but can request the
-> >> memory needed during the RMI_REC_CREATE operation.
-> >>
-> >> There are a fairly large number of operations that are defined as SROs
-> >> in the specification, but current both Linux and RMM only have support
-> >> for RMI_REC_CREATE and RMI_REC_DESTROY. There a number of TODOs/FIXMEs
-> >> in the code where support is missing.
-> >>
-> >> Given the early stage support for this, the SRO handling is all confin=
-ed
-> >> to the final patch. This patch can be dropped to return to a pre-SRO
-> >> state (albeit a mixture of RMM v1.0 and v2.0 APIs) for testing purpose=
-s.
-> >>
-> >> A future posting will reorder the series to move the generic SRO suppo=
-rt
-> >> to an early patch and will implement the proper support for this in al=
-l
-> >> RMI SMCs.
-> >>
-> >> One aspect of SROs which is not yet well captured is that in some
-> >> circumstances the Linux kernel will need to call an SRO call in a
-> >> context where memory allocation is restricted (e.g. because a spinlock
-> >> is held). In this case the intention is that the SRO will be cancelled=
-,
-> >> the spinlock dropped so the memory allocation can be completed, and th=
-en
-> >> the SRO restarted (obviously after rechecking the state that the
-> >> spinlock was protecting). For this reason the code stores the memory
-> >> allocations within a struct rmi_sro_state object - see the final patch
-> >> for more details.
-> >>
-> >> This series is based on v7.0-rc1. It is also available as a git
-> >> repository:
-> >>
-> >> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
-> >>
-> >>
-> >
-> > Hi Steven,
-> >
-> > I have a question regarding host kexec and kdump scenarios, and
-> > whether there is any plan to make them work in this initial series.
-> >
-> > Intel TDX and AMD SEV-SNP both have a firmware shutdown command that
-> > is invoked during the kexec or panic code paths to safely bypass
-> > hardware memory protections and boot into the new kernel. As far as
-> > I know, there is no similar global teardown command available for
-> > the RMM.
->
-> Correct, the RMM specification as it stands doesn't provide a mechanism
-> for the host to do this. The host would have to identify all the realm
-> guests in the system: specifically the address of the RDs (Realm
-> Descriptors) and RECs (Realm Execution Contexts). It needs this to tear
-> down the guests and be able to undelegate the memory.
->
-> It's an interesting point and I'll raise the idea of a "firmware
-> shutdown command" to make this more possible.
->
-> > What is the roadmap for supporting both general kexec and
-> > more specifically kdump (panic) scenarios with CCA?
->
-> I don't have a roadmap I'm afraid for these. kexec in theory would be
-> possible with KVM gracefully terminating all realms. For kdump/panic
-> that sort of graceful shutdown isn't really appropriate (or likely to
-> succeed).
->
+On Thu, 16 Apr 2026 00:05:40 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
+>=20
+> On Wed, Apr 15, 2026 at 09:38:55AM +0100, Marc Zyngier wrote:
 
-Thanks Steven for the clarification.
+[...]
 
-For us, kdump is highly critical as it is our primary diagnostic tool
-for host crashes. Without it, monitoring and debugging at fleet scale
-would become unmanageable.
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
+sm/kvm_host.h
+> > > index 851f6171751c..a97bd461c1e1 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+> > >  	 */
+> > >  	bool	nested_stage2_enabled;
+> > > =20
+> > > +	/* canonical IPA to nested IPA range lookup */
+> > > +	struct maple_tree nested_revmap_mt;
+> > > +	bool	nested_revmap_broken;
+> > > +
+> >=20
+> > Consider moving this boolean next to the other ones so that you don't
+> > create too many holes in the kvm_s2_mmu structure (use pahole to find o=
+ut).
+> >=20
+> > But I have some misgivings about the way things are structured
+> > here. Only NV needs a revmap, yet this is present irrelevant of the
+> > nature of the VM and bloats the data structure a bit.
+> >=20
+> > My naive approach would have been to only keep a pointer to the
+> > revmap, and make that pointer NULL when the tree is "broken", and
+> > freed under RCU if the context isn't the correct one.
+>=20
+> Can you explain what you mean by "if the context isn't the correct one"?
+> If this refers to when selecting a specific kvm_s2_mmu instance for
+> another context, then IIUC refcnt would already be 0 and there would be
+> no other user of the tree.
 
-To confirm my understanding of the current architecture: if a host
-panics while no Realms are actively running (and therefore no pages
-are currently in the delegated state), the standard kdump extraction
-should work perfectly fine without any modifications, correct?
+Sorry, "context" is an overloaded word. I meant a situation in which
+you couldn't immediately free the maple-tree because you're holding
+locks and freeing (hypothetically) requires a sleeping "context". in
+this case, freeing under RCU, purely as a deferring mechanism, might
+be useful.
 
-Regarding the KVM tracking structures (RDs, RECs, RTTs, etc.) when VMs
-are running, perhaps we could use `vmcoreinfo` to export the physical
-addresses of these delegated pages. This would allow tools like
-`makedumpfile` to explicitly filter them out. I assume these pages must
-remain hardware-locked while the VMs are active.
+[...]
 
-Long-term, having an architectural shutdown command - similar to the
-TDH.SYS.DISABLE command in Intel TDX - would be incredibly useful. It
-would allow the kdump kernel to safely bypass these hardware security
-checks, especially when extracting host-side KVM state.
+> > > +/*
+> > > + * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree pa=
+yload
+> > > + * layout:
+> > > + *
+> > > + * bit 63: valid, 1 for non-polluted entries, prevents the case wher=
+e the
+> > > + *         nested IPA is 0 and turns the whole value to 0
+> > > + * bits 55-12: nested IPA bits 55-12
+> > > + * bit 0: polluted, 1 for polluted, 0 for not
+> > > + */
+> > > +#define VALID_ENTRY		BIT(63)
+> > > +#define NESTED_IPA_MASK		GENMASK_ULL(55, 12)
+> > > +#define UNKNOWN_IPA		BIT(0)
+> > > +
+> >=20
+> > This only works because you are using the "advanced" API, right?
+> > Otherwise, you'd be losing the high bit. It'd be good to add a comment
+> > so that people keep that in mind.
+>=20
+> Sorry, I can't find any relationship between the advanced API and the
+> top most bit of the maple tree value, what am I missing?
 
-As for the protected realm memory, I assume that is an easier problem.
-We naturally want to exclude guest pages from a host dump regardless
-of whether they are Realm pages or not. However, accidental touches
-are still fatal.
+=46rom Documentation/core-api/maple_tree.rst:
 
-> There is also some RMM configuration which cannot be repeated (see
-> RMI_RMM_CONFIG_SET) - which implies that the kexec kernel must be
-> similar to the first kernel (i.e. same page size).
->
-> Thanks,
-> Steve
+<quote>
+The Maple Tree can store values between ``0`` and ``ULONG_MAX``.  The Maple
+Tree reserves values with the bottom two bits set to '10' which are below 4=
+096
+(ie 2, 6, 10 .. 4094) for internal use.  If the entries may use reserved
+entries then the users can convert the entries using xa_mk_value() and conv=
+ert
+them back by calling xa_to_value().  If the user needs to use a reserved
+value, then the user can convert the value when using the
+:ref:`maple-tree-advanced-api`, but are blocked by the normal API.
+</quote>
+
+So depending how you read this, you can conclude that the bit patterns
+you encode in the MT may be considered as invalid. xa_mk_value() would
+make things always work, but that shifts the value left by one bit,
+hence you'd lose bit 63 (see how we use trap_config in
+emulate-nested.c to deal with this).
+
+I think you are lucky that bits [11:1] are always 0 here, but that
+looks extremely fragile to me, so you never hit the [1:0]=3D=3D10
+condition, but that's really fragile.
+
+>=20
+> >=20
+> > >  void kvm_init_nested(struct kvm *kvm)
+> > >  {
+> > >  	kvm->arch.nested_mmus =3D NULL;
+> > > @@ -769,12 +783,57 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(str=
+uct kvm_vcpu *vcpu)
+> > >  	return s2_mmu;
+> > >  }
+> > > =20
+> > > +void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
+> > > +			      gpa_t fault_ipa, size_t map_size)
+> > > +{
+> > > +	struct maple_tree *mt =3D &mmu->nested_revmap_mt;
+> > > +	gpa_t start =3D ipa;
+> > > +	gpa_t end =3D ipa + map_size - 1;
+> > > +	u64 entry, new_entry =3D 0;
+> > > +	MA_STATE(mas, mt, start, end);
+> > > +
+> > > +	if (mmu->nested_revmap_broken)
+> > > +		return;
+> > > +
+> > > +	mtree_lock(mt);
+> > > +	entry =3D (u64)mas_find_range(&mas, end);
+> > > +
+> > > +	if (entry) {
+> > > +		/* maybe just a perm update... */
+> > > +		if (!(entry & UNKNOWN_IPA) && mas.index =3D=3D start &&
+> > > +		    mas.last =3D=3D end &&
+> > > +		    fault_ipa =3D=3D (entry & NESTED_IPA_MASK))
+> > > +			goto unlock;
+> > > +		/*
+> > > +		 * Create a "polluted" range that spans all the overlapping
+> > > +		 * ranges and store it.
+> > > +		 */
+> > > +		while (entry && mas.index <=3D end) {
+> > > +			start =3D min(mas.index, start);
+> > > +			end =3D max(mas.last, end);
+> > > +			entry =3D (u64)mas_find_range(&mas, end);
+> > > +		}
+> > > +		new_entry |=3D UNKNOWN_IPA;
+> > > +	} else {
+> > > +		new_entry |=3D fault_ipa;
+> > > +		new_entry |=3D VALID_ENTRY;
+> > > +	}
+> > > +
+> > > +	mas_set_range(&mas, start, end);
+> > > +	if (mas_store_gfp(&mas, (void *)new_entry, GFP_NOWAIT | __GFP_ACCOU=
+NT))
+> > > +		mmu->nested_revmap_broken =3D true;
+> >=20
+> > Can we try and minimise the risk of allocation failure here?
+> >=20
+> > user_mem_abort() tries very hard to pre-allocate pages for page
+> > tables by maintaining an memcache. Can we have a similar approach for
+> > the revmap?
+>=20
+> Unfortunately, as I understand the maple tree can only pre-allocate for
+> a store when the range and the entry to be stored is given, but in this
+> case we must inspect the tree to get that information after we hold the
+> mmu and maple tree locks. It is possible to do a two pass approach:
+>=20
+> pre-allocate -> take MMU lock -> take maple tree lock -> revalidate what
+> we pre-allocated is still usable (nobody changed the tree before we took
+> the maple tree lock)
+>=20
+> But I am not fond of this extra complexity..
+
+Fair enough. It would at least be interesting to get a feel for how
+often this happens, because if we fail often, it won't help much.
+
+[...]
+
+> > My other concern here is related to TLB invalidation. As the guest
+> > performs TLB invalidations that remove entries from the shadow S2,
+> > there is no way to update the revmap to account for this.
+> >=20
+> > This obviously means that the revmap becomes more and more inaccurate
+> > over time, and that is likely to accumulate conflicting entries.
+> >=20
+> > What is the plan to improve the situation on this front?
+>=20
+> Right now I think using a direct map which goes from nested IPA to
+> canonical IPA could work while not generating too much complexity, if we
+> keep the reverse map and direct map in lockstep (direct map keeping the
+> same mappings as the reverse map but just in reverse).
+
+Right, so that'd effectively a mirror of the guest's page tables at
+the point of taking the fault.
+
+> I'll try to do that and include it in the next iteration.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
