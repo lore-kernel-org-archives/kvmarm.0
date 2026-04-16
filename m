@@ -1,403 +1,322 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BCD233723
-	for <kvmarm@lists.linux.dev>; Thu, 16 Apr 2026 16:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776356212; cv=none; b=dqfQwPO8kvKRSz66lbouHuFmeVyIjAraHFE0aJs7CYDDNJRq0Sr+GrhboBMlqydESJ9+GwPwYGYmGg0VdmpObAlZcWiHNYONT6jFJjWd6kZlviubXTo2iQEmIJnErIZQHZhYTj2dAMk7zap/95tcpfPVnLhN7Q4VQr682tL3LQs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776356212; c=relaxed/simple;
-	bh=yvhH8OxsHLUDaxARkg1XTfEfs4wPv5MxzlacM/ruBc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZlunDeFHl98I3FJZOP9eb4wmJ4Gbv1Gnx6/lQ48Rfhf0vjO5RELNJK2wu6helHWg4LGT/qWR9f8A9rz5AFrtmUBCl8ab8wO9Wy0kz2RzkDkWuJO4J1obogIXsjuBnloIKKiwfUjAHCGYyDVi9LNNCak4HduGHxMsziEmzFfZzaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BV0LL6CE; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAF2329E5A
+	for <kvmarm@lists.linux.dev>; Thu, 16 Apr 2026 17:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776361514; cv=pass; b=dprIguv44CaCjVw7G+vlTFs7/SBceIpY8UhDw8He9JvLFuPvLfDITkoJdpeijv7yIfHf5voNa64TvuUAaHg5FrjpRYEJp/FEdgteAUCQx51PLzDtled+/alul24aPejbM/fJNkPms809dwVOhtjUZ1qSrlSSeIQDbqqNuY+ZT5I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776361514; c=relaxed/simple;
+	bh=jzm6W1Z6bNw1R7/BddIGRoaarTGeMoKKc61rcr/dEKQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AwNdAPrvZBZ/IOmL7Lak373n5bZGH/L5HqMdbz7qRrvn7QWg8X5Z936bzYvx3A5tzIQyIbhM2GNTe0zex6MFabyU5fvH8KBM0hmFargQjJdtAJTATuCsnegi/8JL/CimPUKkJg/RzjzhK06oe4UiMd3CYcsJkUYwo73SiTCUsu8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rBL4NAH3; arc=pass smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BV0LL6CE"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A0CB165C;
-	Thu, 16 Apr 2026 09:16:43 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B592F3FAF5;
-	Thu, 16 Apr 2026 09:16:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776356208; bh=yvhH8OxsHLUDaxARkg1XTfEfs4wPv5MxzlacM/ruBc0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BV0LL6CEDS+DifX2QJhI4sHQ/iRbq5A6/EvIaVyKICqeHOEhdC0MbjStn1DswksZ2
-	 zOgUqL6lkqu4qNmeyQjioJbBsgPdTcjbN8ZTKPdWRAtIRp9UriyLJLXM+xjqnC/5Hb
-	 Cp7tC3K2kV5ok7cYVgk4bSWvO+Bm9hm9wKSq7RPc=
-Date: Thu, 16 Apr 2026 17:16:43 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Colton Lewis <coltonlewis@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib: arm64: Add foundational guest
- execution framework
-Message-ID: <20260416161643.GC3142999@e124191.cambridge.arm.com>
-References: <20260413204630.1149038-1-jingzhangos@google.com>
- <20260413204630.1149038-5-jingzhangos@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rBL4NAH3"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8a5800772f3so66034026d6.2
+        for <kvmarm@lists.linux.dev>; Thu, 16 Apr 2026 10:45:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776361512; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jx0UizCKRygMmXhbCXU+GGt7Jz22O/sHH7PzxvWdEU4IX+OeBaPpNDHOL7bxwnmUwq
+         5ElMf+G3PSpzKbgmAr3MwVa/o8Xzden3Nd9w9wFdOyE0u0pGNkorCkOtNNy+cgaQkKw0
+         AAhKKGkg+bckvhewaNH0nBhyPuX6vu63oSk8p443mWi0W4KmFVEo+PPrEUpFurbw3R0z
+         z0f99AiP9ZkwTJxgwUo/k0RtZpUYqiMcE0vQ15NXNEXPJmWrjzJT1o03oXzLSja1P2bW
+         TOQahncxke0ODLYOSjCR0p6bRmZ7TTlyCQt5HrbDUpPTosqQE6CWU6ZJt3JqyEybpgCD
+         TkQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=jzm6W1Z6bNw1R7/BddIGRoaarTGeMoKKc61rcr/dEKQ=;
+        fh=lb9Qjor4ERM2/p2iPIStu+7isd3ttyo+5FOJfDmaPgI=;
+        b=lBMYbF/PSuw4Ye/j1UjfBuj3CVLpeqVGThINIuPt3XEj9dCJn0RaC7z5ddkkdj0FRs
+         yEU/OzcPXK1tpzgObqM8qFQakJc73mrAWp4X5qDXKxv+idvPRZyKUokNy+Je3P2q+tGE
+         nXlNfWXs0i7JC7v9fy5QKW05APOQqU4sSexbIy0YsuZzRO1MDFvW8jWkYztC0Zr+EjeU
+         Mdu8jk3NXLnNRJNspfRCIpZYcw9C9whlaZGL2vSf+P1RgeBnELkAbW6c9QVFXWaGqT5F
+         W1kOsUW2qTxxww7nLTDHrqnkguSjWUtvwlFT+NUnM+t3RHRM5n5TltNcqWOzGicnr2N5
+         q7tA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776361512; x=1776966312; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jzm6W1Z6bNw1R7/BddIGRoaarTGeMoKKc61rcr/dEKQ=;
+        b=rBL4NAH3mxcczWVnsHfQuUhrJ4XedsG6xmXY4mj+3G3BYz4YSQFFvtyuEz7oVnWb0N
+         tTimDW0t9dsTbJhuYZqn5SnWN2nbAlnhPBLfQ0nnmvMirEUbT87LyMM45PCRVEXYB1GZ
+         5xCFdB7+Uglvk47PrTQ7kp+y1bEfzVBtDfR3Mh6xb356kjQL5ZZbSwgrwuzXMdZi8Zvq
+         uYU+cw2G0QtWAckDP1+r7216EYbYr5ygT0jMVg7UTfqxc2oykf+/OThz+cFDwG805NfQ
+         atdyUwNI2KVcJWjz1pZUrR9zTQUUMQZB2Lm8QEJ0Td/SbUCQE2IX/k8AEaNmxDoog+G9
+         KQ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776361512; x=1776966312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jzm6W1Z6bNw1R7/BddIGRoaarTGeMoKKc61rcr/dEKQ=;
+        b=WnfrTdh2/c5b5oVtcgv7TETJ8np7lXfQ0txPphRCcHwNwmUPTSCPObGCELpEWq5tEc
+         hrpaSEFAIQljS4uAuDGJ8T9O3bxdXYvYm0H965hT9TF6EubpE5MyeTM5I+tnDgdjFYHw
+         rj6HOJSBJxiKjVZikB6K/dXpzVIOLMNJ50UdbJB9ZsRgkHsioG62LqxGK1Af//gE8xhD
+         g5Ip0QjcaeMeZyyrkW3nT59bCusktlgxZdcraic9wBgrruiK/P5bugct1xbHnu+FSyyn
+         lPpuVHdwdJe0OC5sp9tssNma7mY+l1mlNS/wU0C1nSkBi5EFqCbjwk0kYM7GfM8GIhFc
+         pt6w==
+X-Forwarded-Encrypted: i=1; AFNElJ8l6eLBkc2NPTlG9X2Jqi3+VuXhY5+B6eqzZLfP0kma+EHInzOl7qkSQTwaUFRKSLRAqxiwjOU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzy1drOtUcIOBxcU1cwEjCv0+LZbIwMkRm/jAs2jlDqZ1utASW5
+	y/1K8mGy0ljaDQbctbmHDGm+FLtATKprYbpRvtbniTgT8dSxLtXFrgKxcpLI9NUPqm2d06a2Zek
+	kzBjDp48AdIh13u7jFG6A7ezOJzKzvTH22bfTZ05D
+X-Gm-Gg: AeBDietrw7+Ho23VGpaWk0Wd/EZoBj4uzqxGZGj1k5DXiqRBr3UlB2BEIB9+ewIYdEf
+	SAbLJbniPYX836MCN8ub7NdqJ7dcAxVwcSVPPs9E9NEekjMqlglg/rMx0MrR3K0f1lARf/adAe1
+	xRFTQ9D9o2HJj7U8OpqwZfw3da3v3TDV/6yXezCX2UJmzNDkSYRhpCbwbsFS+bDHEhbpSEzQLzi
+	1T1snzKGPTVQ6DXM33dgl/rt0hxalqk7T9i9c3mEZ9md7orwekUBnzddVeFiJbYpgIZMJVIu3Tp
+	hP/vm1Vq64h2HMTHo3xjsl4UNx17KfKg/NYB3DK9NhSXYQGaVXHEJZ/jhkY=
+X-Received: by 2002:a05:6214:4b0c:b0:8ac:a0b0:64d5 with SMTP id
+ 6a1803df08f44-8b025ec904dmr2618146d6.37.1776361511320; Thu, 16 Apr 2026
+ 10:45:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260413204630.1149038-5-jingzhangos@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com> <CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com>
+ <d661a24c-6619-4734-96bd-075d3416e809@arm.com> <CABpDEumAVf02uOS5Bj07EDyuU=z9FV-iocQU1j7gFM5z0BeV_w@mail.gmail.com>
+ <97d26e6e-b565-447f-95eb-2ece0755fe57@arm.com>
+In-Reply-To: <97d26e6e-b565-447f-95eb-2ece0755fe57@arm.com>
+From: Alper Gun <alpergun@google.com>
+Date: Thu, 16 Apr 2026 10:44:59 -0700
+X-Gm-Features: AQROBzAsj7mxI_HflVua65l9TneHSVQXwlFi8oSRcQgYzKeZgfQilvBV9R8pGsg
+Message-ID: <CABpDEu=vbo9cDL1PKh2h9JjWCHPP3M9-ueogkPc571c1OQPuhA@mail.gmail.com>
+Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
+	Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Thu, Apr 16, 2026 at 4:05=E2=80=AFAM Suzuki K Poulose <suzuki.poulose@ar=
+m.com> wrote:
+>
+> On 16/04/2026 00:27, Alper Gun wrote:
+> > On Wed, Apr 15, 2026 at 4:01=E2=80=AFAM Steven Price <steven.price@arm.=
+com> wrote:
+> >>
+> >> On 14/04/2026 22:40, Alper Gun wrote:
+> >>> On Wed, Mar 18, 2026 at 8:54=E2=80=AFAM Steven Price <steven.price@ar=
+m.com> wrote:
+> >>>>
+> >>>> This series adds support for running protected VMs using KVM under t=
+he
+> >>>> Arm Confidential Compute Architecture (CCA).
+> >>>>
+> >>>> New major version number! This now targets RMM v2.0-bet0[1]. And unl=
+ike
+> >>>> for Linux this represents a significant change.
+> >>>>
+> >>>> RMM v2.0 brings with it the ability to configure the RMM to have the
+> >>>> same page size as the host (so no more RMM_PAGE_SIZE and dealing wit=
+h
+> >>>> granules being different from host pages). It also introduces range
+> >>>> based APIs for many operations which should be more efficient and
+> >>>> simplifies the code in places.
+> >>>>
+> >>>> The handling of the GIC has changed, so the system registers are use=
+d to
+> >>>> pass the GIC state rather than memory. This means fewer changes to t=
+he
+> >>>> KVM code as it looks much like a normal VM in this respect.
+> >>>>
+> >>>> And of course the new uAPI introduced in the previous v12 posting is
+> >>>> retained so that also remains simplified compared to earlier posting=
+s.
+> >>>>
+> >>>> The RMM support for v2.0 is still early and so this series includes =
+a
+> >>>> few hacks to ease the integration. Of note are that there are some R=
+MM
+> >>>> v1.0 SMCs added to paper over areas where the RMM implementation isn=
+'t
+> >>>> quite ready for v2.0, and "SROs" (see below) are deferred to the fin=
+al
+> >>>> patch in the series.
+> >>>>
+> >>>> The PMU in RMM v2.0 requires more handling on the RMM-side (and
+> >>>> therefore simplifies the implementation on Linux), but this isn't qu=
+ite
+> >>>> ready yet. The Linux side is implemented (but untested).
+> >>>>
+> >>>> PSCI still requires the VMM to provide the "target" REC for operatio=
+ns
+> >>>> that affect another vCPU. This is likely to change in a future versi=
+on
+> >>>> of the specification. There's also a desire to force PSCI to be hand=
+led
+> >>>> in the VMM for realm guests - this isn't implemented yet as I'm wait=
+ing
+> >>>> for the dust to settle on the RMM interface first.
+> >>>>
+> >>>> Stateful RMI Operations
+> >>>> -----------------------
+> >>>>
+> >>>> The RMM v2.0 spec brings a new concept of Stateful RMI Operations (S=
+ROs)
+> >>>> which allow the RMM to complete an operation over several SMC calls =
+and
+> >>>> requesting/returning memory to the host. This has the benefit of
+> >>>> allowing interrupts to be handled in the middle of an operation (by
+> >>>> returning to the host to handle the interrupt without completing the
+> >>>> operation) and enables the RMM to dynamically allocate memory for
+> >>>> internal tracking purposes. One example of this is RMI_REC_CREATE no
+> >>>> longer needs "auxiliary granules" provided upfront but can request t=
+he
+> >>>> memory needed during the RMI_REC_CREATE operation.
+> >>>>
+> >>>> There are a fairly large number of operations that are defined as SR=
+Os
+> >>>> in the specification, but current both Linux and RMM only have suppo=
+rt
+> >>>> for RMI_REC_CREATE and RMI_REC_DESTROY. There a number of TODOs/FIXM=
+Es
+> >>>> in the code where support is missing.
+> >>>>
+> >>>> Given the early stage support for this, the SRO handling is all conf=
+ined
+> >>>> to the final patch. This patch can be dropped to return to a pre-SRO
+> >>>> state (albeit a mixture of RMM v1.0 and v2.0 APIs) for testing purpo=
+ses.
+> >>>>
+> >>>> A future posting will reorder the series to move the generic SRO sup=
+port
+> >>>> to an early patch and will implement the proper support for this in =
+all
+> >>>> RMI SMCs.
+> >>>>
+> >>>> One aspect of SROs which is not yet well captured is that in some
+> >>>> circumstances the Linux kernel will need to call an SRO call in a
+> >>>> context where memory allocation is restricted (e.g. because a spinlo=
+ck
+> >>>> is held). In this case the intention is that the SRO will be cancell=
+ed,
+> >>>> the spinlock dropped so the memory allocation can be completed, and =
+then
+> >>>> the SRO restarted (obviously after rechecking the state that the
+> >>>> spinlock was protecting). For this reason the code stores the memory
+> >>>> allocations within a struct rmi_sro_state object - see the final pat=
+ch
+> >>>> for more details.
+> >>>>
+> >>>> This series is based on v7.0-rc1. It is also available as a git
+> >>>> repository:
+> >>>>
+> >>>> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
+> >>>>
+> >>>>
+> >>>
+> >>> Hi Steven,
+> >>>
+> >>> I have a question regarding host kexec and kdump scenarios, and
+> >>> whether there is any plan to make them work in this initial series.
+> >>>
+> >>> Intel TDX and AMD SEV-SNP both have a firmware shutdown command that
+> >>> is invoked during the kexec or panic code paths to safely bypass
+> >>> hardware memory protections and boot into the new kernel. As far as
+> >>> I know, there is no similar global teardown command available for
+> >>> the RMM.
+> >>
+> >> Correct, the RMM specification as it stands doesn't provide a mechanis=
+m
+> >> for the host to do this. The host would have to identify all the realm
+> >> guests in the system: specifically the address of the RDs (Realm
+> >> Descriptors) and RECs (Realm Execution Contexts). It needs this to tea=
+r
+> >> down the guests and be able to undelegate the memory.
+> >>
+> >> It's an interesting point and I'll raise the idea of a "firmware
+> >> shutdown command" to make this more possible.
+> >>
+> >>> What is the roadmap for supporting both general kexec and
+> >>> more specifically kdump (panic) scenarios with CCA?
+> >>
+> >> I don't have a roadmap I'm afraid for these. kexec in theory would be
+> >> possible with KVM gracefully terminating all realms. For kdump/panic
+> >> that sort of graceful shutdown isn't really appropriate (or likely to
+> >> succeed).
+> >>
+> >
+> > Thanks Steven for the clarification.
+> >
+> > For us, kdump is highly critical as it is our primary diagnostic tool
+> > for host crashes. Without it, monitoring and debugging at fleet scale
+> > would become unmanageable.
+> >
+> > To confirm my understanding of the current architecture: if a host
+> > panics while no Realms are actively running (and therefore no pages
+> > are currently in the delegated state), the standard kdump extraction
+> > should work perfectly fine without any modifications, correct?
+>
+> This may not be true. We could have pages donated to RMM for GPT,
+> Tracking etc. So, unless Linux keeps track of them, it may be
+> unsafe for a crash kernel to access them.
+>
+> >
+> > Regarding the KVM tracking structures (RDs, RECs, RTTs, etc.) when VMs
+> > are running, perhaps we could use `vmcoreinfo` to export the physical
+> > addresses of these delegated pages. This would allow tools like
+>
+> Thinking of this, do we really need to ? We could access the pages from
+> "vmcore" read and handle the GPFs for such accesses and give out 0s
+> for the Granules. Anyways, we can't get access to the data on those
+> pages that are still in Realm PAS.
+>
 
-First-look comments below,
+I like the idea of handling the GPFs directly during vmcore reads for
+kdump case. That's much simpler\cleaner solution.
 
-On Mon, Apr 13, 2026 at 01:46:27PM -0700, Jing Zhang wrote:
-> Introduce the infrastructure to manage and execute guest when running
-> at EL2. This provides the basis for testing advanced features like
-> nested virtualization and GICv4 direct interrupt injection.
-> 
-> The framework includes:
-> - 'struct guest': Encapsulates vCPU state (GPRs, EL1/EL2 sysregs) and
->   Stage-2 MMU context.
-> - guest_create() / guest_destroy(): Handle lifecycle management and
->   Stage-2 MMU setup, including identity mappings for guest code,
->   stack, and UART.
-> - guest_run(): Assembly entry point that saves host callee-saved
->   registers, caches the guest context pointer in TPIDR_EL2, and
->   performs the exception return (ERET) to the guest.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arm/Makefile.arm64      |  2 +
->  lib/arm64/asm-offsets.c | 13 ++++++
->  lib/arm64/asm/guest.h   | 46 +++++++++++++++++++++
->  lib/arm64/asm/sysreg.h  |  6 +++
->  lib/arm64/guest.c       | 89 +++++++++++++++++++++++++++++++++++++++++
->  lib/arm64/guest_arch.S  | 59 +++++++++++++++++++++++++++
->  6 files changed, 215 insertions(+)
->  create mode 100644 lib/arm64/asm/guest.h
->  create mode 100644 lib/arm64/guest.c
->  create mode 100644 lib/arm64/guest_arch.S
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 5e50f5ba..9026fd71 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -41,6 +41,8 @@ cflatobjs += lib/arm64/processor.o
->  cflatobjs += lib/arm64/spinlock.o
->  cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
->  cflatobjs += lib/arm64/stage2_mmu.o
-> +cflatobjs += lib/arm64/guest.o
-> +cflatobjs += lib/arm64/guest_arch.o
->  
->  ifeq ($(CONFIG_EFI),y)
->  cflatobjs += lib/acpi.o
-> diff --git a/lib/arm64/asm-offsets.c b/lib/arm64/asm-offsets.c
-> index 80de023c..ceeecce5 100644
-> --- a/lib/arm64/asm-offsets.c
-> +++ b/lib/arm64/asm-offsets.c
-> @@ -8,6 +8,7 @@
->  #include <libcflat.h>
->  #include <kbuild.h>
->  #include <asm/ptrace.h>
-> +#include <asm/guest.h>
->  
->  int main(void)
->  {
-> @@ -30,5 +31,17 @@ int main(void)
->  	DEFINE(S_FP, sizeof(struct pt_regs));
->  	DEFINE(S_FRAME_SIZE, (sizeof(struct pt_regs) + 16));
->  
-> +	OFFSET(GUEST_X_OFFSET, guest, x);
-> +	OFFSET(GUEST_ELR_OFFSET, guest, elr_el2);
-> +	OFFSET(GUEST_SPSR_OFFSET, guest, spsr_el2);
-> +	OFFSET(GUEST_HCR_OFFSET, guest, hcr_el2);
-> +	OFFSET(GUEST_VTTBR_OFFSET, guest, vttbr_el2);
-> +	OFFSET(GUEST_SCTLR_OFFSET, guest, sctlr_el1);
-> +	OFFSET(GUEST_SP_EL1_OFFSET, guest, sp_el1);
-> +	OFFSET(GUEST_ESR_OFFSET, guest, esr_el2);
-> +	OFFSET(GUEST_FAR_OFFSET, guest, far_el2);
-> +	OFFSET(GUEST_HPFAR_OFFSET, guest, hpfar_el2);
-> +	OFFSET(GUEST_EXIT_CODE_OFFSET, guest, exit_code);
-> +
->  	return 0;
->  }
-> diff --git a/lib/arm64/asm/guest.h b/lib/arm64/asm/guest.h
-> new file mode 100644
-> index 00000000..826c44f8
-> --- /dev/null
-> +++ b/lib/arm64/asm/guest.h
-> @@ -0,0 +1,46 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#ifndef _ASMARM64_GUEST_H_
-> +#define _ASMARM64_GUEST_H_
-> +
-> +#include <libcflat.h>
-> +#include <asm/processor.h>
-> +#include <asm/stage2_mmu.h>
-> +
-> +#define HCR_GUEST_FLAGS (HCR_EL2_VM | HCR_EL2_FMO | HCR_EL2_IMO | \
-> +			 HCR_EL2_AMO | HCR_EL2_RW | HCR_EL2_E2H)
-> +/* Guest stack size */
-> +#define GUEST_STACK_SIZE		SZ_64K
-> +
-> +struct guest {
-> +	/* General Purpose Registers */
-> +	unsigned long x[31]; /* x0..x30 */
-> +
-> +	/* Execution State */
-> +	unsigned long elr_el2;
-> +	unsigned long spsr_el2;
-> +
-> +	/* Control Registers */
-> +	unsigned long hcr_el2;
-> +	unsigned long vttbr_el2;
-> +	unsigned long sctlr_el1;
-> +	unsigned long sp_el1;
-> +
-> +	/* Exit Information */
-> +	unsigned long esr_el2;
-> +	unsigned long far_el2;
-> +	unsigned long hpfar_el2;
-> +	unsigned long exit_code;
-> +
-> +	struct s2_mmu *s2mmu;
-> +};
-> +
-> +struct guest *guest_create(int vmid, void (*guest_func)(void), enum s2_granule granule);
-> +void guest_destroy(struct guest *guest);
-> +void guest_run(struct guest *guest);
-> +
-> +#endif /* _ASMARM64_GUEST_H_ */
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index f2d05018..857bee98 100644
-> --- a/lib/arm64/asm/sysreg.h
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -118,6 +118,10 @@ asm(
->  #define SCTLR_EL1_TCF0_SHIFT	38
->  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
->  
-> +#define HCR_EL2_VM		_BITULL(0)
-> +#define HCR_EL2_FMO		_BITULL(3)
-> +#define HCR_EL2_IMO		_BITULL(4)
-> +#define HCR_EL2_AMO		_BITULL(5)
->  #define HCR_EL2_TGE		_BITULL(27)
->  #define HCR_EL2_RW		_BITULL(31)
->  #define HCR_EL2_E2H		_BITULL(34)
-> @@ -132,6 +136,8 @@ asm(
->  #define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
->  #define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
->  
-> +#define SYS_SCTLR_EL1		sys_reg(3, 5, 1, 0, 0)
+> > `makedumpfile` to explicitly filter them out. I assume these pages must
+> > remain hardware-locked while the VMs are active.
+>
+>
+>
+> >
+> > Long-term, having an architectural shutdown command - similar to the
+> > TDH.SYS.DISABLE command in Intel TDX - would be incredibly useful. It
+> > would allow the kdump kernel to safely bypass these hardware security
+> > checks, especially when extracting host-side KVM state.
+>
 
-This isn't needed, the asm below can use `msr sctlr_el1` directly.
+> For kexec, may be we could do this. Alternatively we could try to
+> reclaim everything back, (GPTs, Tracking) before kexec-reboot.
+>
 
-> +
->  #define INIT_SCTLR_EL1_MMU_OFF	\
->  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
->  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
-> diff --git a/lib/arm64/guest.c b/lib/arm64/guest.c
-> new file mode 100644
-> index 00000000..68dd449d
-> --- /dev/null
-> +++ b/lib/arm64/guest.c
-> @@ -0,0 +1,89 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#include <libcflat.h>
-> +#include <asm/guest.h>
-> +#include <asm/io.h>
-> +#include <asm/sysreg.h>
-> +#include <asm/barrier.h>
-> +#include <alloc_page.h>
-> +#include <alloc.h>
-> +
-> +static struct guest *__guest_create(struct s2_mmu *s2_ctx, void *entry_point)
-> +{
-> +	struct guest *guest = calloc(1, sizeof(struct guest));
+Agreed. Reclaiming all delegated memory prior to the kexec reboot
+makes perfect sense.
 
-Missing check if `guest` is NULL.
-
-> +
-> +	guest->elr_el2 = (unsigned long)entry_point;
-> +	guest->spsr_el2 = 0x3C5; /* M=EL1h, DAIF=Masked */
-
-Check lib/arm64/asm/ptrace.h, we can build this with macros, PSR_MODE_EL1h etc.
-
-> +	guest->hcr_el2 = HCR_GUEST_FLAGS;
-> +
-> +	if (s2_ctx) {
-> +		guest->vttbr_el2 = virt_to_phys(s2_ctx->pgd);
-> +		guest->vttbr_el2 |= ((unsigned long)s2_ctx->vmid << 48);
-
-Maybe this should be extracted into a helper in stage2_mmu, to build vttbr.
-
-> +	} else {
-> +		printf("Stage 2 MMU context missing!");
-> +	}
-
-Can probably just assert(s2_ctx) instead of this conditional, don't think you
-can use the guest without one?
-
-> +
-> +	guest->sctlr_el1 = read_sysreg(sctlr_el1);
-> +	/* Disable guest stage 1 translation */
-> +	guest->sctlr_el1 &= ~(SCTLR_EL1_M | SCTLR_EL1_C);
-> +	guest->sctlr_el1 |= SCTLR_EL1_I;
-> +
-> +	guest->s2mmu = s2_ctx;
-> +
-> +	return guest;
-> +}
-> +
-> +struct guest *guest_create(int vmid, void (*guest_func)(void), enum s2_granule granule)
-> +{
-> +	unsigned long guest_pa, code_base, stack_pa;
-> +	unsigned long *stack_page;
-> +	struct guest *guest;
-> +	struct s2_mmu *ctx;
-> +
-> +	ctx = s2mmu_init(vmid, granule, true);
-> +	/*
-> +	 * Map the Host's code segment Identity Mapped (IPA=PA).
-> +	 * To be safe, we map a large chunk (e.g., 2MB) around the function
-> +	 * to capture any helper functions the compiler might generate calls to.
-> +	 */
-> +	guest_pa = virt_to_phys((void *)guest_func);
-> +	code_base = guest_pa & ~(SZ_2M - 1);
-> +	s2mmu_map(ctx, code_base, code_base, SZ_2M, S2_MAP_RW);
-> +
-> +	/*
-> +	 * Map Stack
-> +	 * Allocate 16 pages (64K) in Host, get its PA, and map it for Guest.
-
-It's not always 16 pages (depends on PAGE_SIZE), can just reword to say
-`Allocate pages in Host..`
-
-> +	 */
-> +	stack_page = alloc_pages(get_order(GUEST_STACK_SIZE >> PAGE_SHIFT));
-> +	stack_pa = virt_to_phys(stack_page);
-> +	/* Identity Map it (IPA = PA) */
-> +	s2mmu_map(ctx, stack_pa, stack_pa, GUEST_STACK_SIZE, S2_MAP_RW);
-> +
-> +	s2mmu_enable(ctx);
-> +
-> +	/* Create Guest */
-> +	/* Entry point is the PA of the function (Identity Mapped) */
-> +	guest = __guest_create(ctx, (void *)guest_pa);
-> +
-> +	/*
-> +	 * Setup Guest Stack Pointer
-> +	 * Must match where we mapped the stack + Offset
-> +	 */
-> +	guest->sp_el1 = stack_pa + GUEST_STACK_SIZE;
-> +
-> +	/* Map UART identity mapped, printf() available to guest */
-> +	s2mmu_map(ctx, 0x09000000, 0x09000000, PAGE_SIZE, S2_MAP_DEVICE);
-
-This is not portable.
-
-> +
-> +	return guest;
-> +}
-
-I'm actually not sure what I think of this function as a whole, maybe it does
-too much and the caller should be expected to map stuff in. Different types of
-tests could have different specific guest_create helpers.
-
-> +
-> +void guest_destroy(struct guest *guest)
-> +{
-> +	s2mmu_disable(guest->s2mmu);
-> +	s2mmu_destroy(guest->s2mmu);
-> +	free(guest);
-> +}
-> diff --git a/lib/arm64/guest_arch.S b/lib/arm64/guest_arch.S
-> new file mode 100644
-> index 00000000..70c19507
-> --- /dev/null
-> +++ b/lib/arm64/guest_arch.S
-> @@ -0,0 +1,59 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#define __ASSEMBLY__
-> +#include <asm/asm-offsets.h>
-> +#include <asm/sysreg.h>
-> +
-> +.global guest_run
-> +guest_run:
-> +	/* x0 = struct guest pointer */
-> +
-> +	/* Save Host Callee-Saved Regs */
-> +	stp	x29, x30, [sp, #-16]!
-> +	stp	x27, x28, [sp, #-16]!
-> +	stp	x25, x26, [sp, #-16]!
-> +	stp	x23, x24, [sp, #-16]!
-> +	stp	x21, x22, [sp, #-16]!
-> +	stp	x19, x20, [sp, #-16]!
-> +
-> +	/* Cache Guest Pointer in TPIDR_EL2 */
-> +	msr	tpidr_el2, x0
-> +
-> +	/* Load Guest System Registers */
-> +	ldr	x1, [x0, #GUEST_ELR_OFFSET]
-> +	msr	elr_el2, x1
-> +	ldr	x1, [x0, #GUEST_SPSR_OFFSET]
-> +	msr	spsr_el2, x1
-> +	ldr	x1, [x0, #GUEST_HCR_OFFSET]
-> +	msr	hcr_el2, x1
-> +	ldr	x1, [x0, #GUEST_VTTBR_OFFSET]
-> +	msr	vttbr_el2, x1
-> +	ldr	x1, [x0, #GUEST_SCTLR_OFFSET]
-> +	msr_s	SYS_SCTLR_EL1, x1
-
-This part, can use `msr sctlr_el1`.
-
-> +	ldr	x1, [x0, #GUEST_SP_EL1_OFFSET]
-> +	msr	sp_el1, x1
-> +
-> +	/* Load Guest GPRs */
-> +	ldp	x1, x2, [x0, #8]
-> +	ldp	x3, x4, [x0, #24]
-> +	ldp	x5, x6, [x0, #40]
-> +	ldp	x7, x8, [x0, #56]
-> +	ldp	x9, x10, [x0, #72]
-> +	ldp	x11, x12, [x0, #88]
-> +	ldp	x13, x14, [x0, #104]
-> +	ldp	x15, x16, [x0, #120]
-> +	ldp	x17, x18, [x0, #136]
-> +	ldp	x19, x20, [x0, #152]
-> +	ldp	x21, x22, [x0, #168]
-> +	ldp	x23, x24, [x0, #184]
-> +	ldp	x25, x26, [x0, #200]
-> +	ldp	x27, x28, [x0, #216]
-> +	ldp	x29, x30, [x0, #232]
-> +	ldr	x0, [x0, #0]
-> +
-> +	isb
-> +	eret
-> -- 
-> 2.53.0.1213.gd9a14994de-goog
-> 
-
-Thanks,
-Joey
+> >
+> > As for the protected realm memory, I assume that is an easier problem.
+> > We naturally want to exclude guest pages from a host dump regardless
+> > of whether they are Realm pages or not. However, accidental touches
+> > are still fatal.
+> >
+> >> There is also some RMM configuration which cannot be repeated (see
+> >> RMI_RMM_CONFIG_SET) - which implies that the kexec kernel must be
+> >> similar to the first kernel (i.e. same page size).
+>
+> That is true, the page sizes must match. RMM spec is updated to probe
+> the state of the RMM and detect if it can do the CONFIG_SET
+>
+> Suzuki
+>
+> >>
+> >> Thanks,
+> >> Steve
+>
