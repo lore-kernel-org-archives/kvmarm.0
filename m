@@ -1,97 +1,127 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFAE2882CD
-	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 15:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AAC2BE7AB
+	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 15:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776439778; cv=none; b=Stc2ujNIhN7TqEQKAkscxu8j4twvau/czB6K8Tmnk7cwZwwCcaMpwo0FxXXsgjt52iUPL54YDEb0tiNtq8m6BzmBwjLvadImT+/bYNPHMr2cuGIDJr8Y+4F0a/8MjldRDKaZgpUGGMZVZqUxGAF7XGTVU5yqcFHl4M1SQ8rNXaM=
+	t=1776441398; cv=none; b=LJYvceQs9V7iwh7LO63Yv5TyIZIQtvVQaqLtf7owXHim+fyynEujCzXTleY4heEc0imGALN14m6Fq0U9OltI5Mt4PsJopYv4rL9HwR+yBflPQxhsA3NpTPLaXF9aPkfeAWWjaTsXTyYdq7JKlHzYO8IPFG5U+drQ56h+4QFsRmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776439778; c=relaxed/simple;
-	bh=wcGMZozAsLV99EU8C+5KOdPZvcpUqDFWXQ1NY3TqZQE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CTg6EckdK4fjUqkSpyWc5ymgGBG5ODPoUwo0IEgfCIsnKdSaxkZJ9y5SQoalMNeCwOLMzXkS2ILVvpIwUmcaE6GXWFveZIo9KsZ37+hQsj6glySFTqTKvcGOZNka3ci9g6oxbIn0IPhPz22LjNTjHkXqTdudSCZccl3XFolx+Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cVkeV0iL; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776441398; c=relaxed/simple;
+	bh=UuOYKzE/8wT+JQcL27TBWDF+pp0p+Uyp5jd9nf2oEc0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fLfoykV/TZtTZoM0JTTuRWdRsiNzGuQQPkp8+nysQuRg2j2+O04m3mEhVomblTGKBcfPRu/EwfRkpTsfen5KHuMjUFEoKq4FJTHNFMRELlnntECYjAScWqWZGSIpBGyI0ltUpqxaDG1O8Y6gNOFxVKZk839zwPeBfqzIHo8HbLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXg4njw3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cVkeV0iL"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46F1C1C25;
-	Fri, 17 Apr 2026 08:29:30 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A4B83F7D8;
-	Fri, 17 Apr 2026 08:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776439775; bh=wcGMZozAsLV99EU8C+5KOdPZvcpUqDFWXQ1NY3TqZQE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cVkeV0iLONQ1/hrMFbrkQKa53f8amGrFR7rdEwPeNI7WmfoAQsZ9+4AZCq1xvwO71
-	 4Whf/irnYBxohsiJRawXc0MGDFWo/UL2oTNA71wewXAUeSDZY2kNU3T+TAeCvGb3/2
-	 YLJ+MoiCS9ob9LxtsVQue9erNzJwVbGyQHhcscU0=
-Date: Fri, 17 Apr 2026 16:29:31 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXg4njw3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC341C19425;
+	Fri, 17 Apr 2026 15:56:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776441397;
+	bh=UuOYKzE/8wT+JQcL27TBWDF+pp0p+Uyp5jd9nf2oEc0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PXg4njw3ITzOe8AlVtrIxBvczRdthN37a104aCliNFYD7qhEzNdbjPDx+bX4aPiuB
+	 Zf/9cC1CmTkAVSzv9R+Q+/+8LZus/Gqr8Yxc2Jixc1QlRdI9H+uNx7yU4ccZV2YGZf
+	 socVpmjY4Qpn+EiIzb45MgA/NXLvMUU6FgaGk/k3ijDfD5aBwko9yiKewJK9aUyjtv
+	 /CgEsVAWJSLJ91+KfgP3+z2GtUOKCtDemEE2JXmg31yTHkOhIkpyROjjgETnFwSgkq
+	 BF0Aal51xE+J5XXnx7Jkpo2FgtwWNQmklT3foj6DyYL85L3ujpfG4K/oVzfnOL3pCx
+	 axrvp4hs0T3JA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wDlYZ-0000000CV3h-2GJx;
+	Fri, 17 Apr 2026 15:56:35 +0000
+Date: Fri, 17 Apr 2026 16:56:35 +0100
+Message-ID: <86tst91sy4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Deepanshu Kartikey <kartikey406@gmail.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: Re: [PATCH 15/18] Documentation: KVM: Fix typos in VGICv5
- documentation
-Message-ID: <20260417152931.GB3311048@e124191.cambridge.arm.com>
-References: <20260415115559.2227718-1-maz@kernel.org>
- <20260415115559.2227718-16-maz@kernel.org>
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/4] KVM: arm64: timer: Kill the per-timer level cache
+In-Reply-To: <20260417124612.2770268-3-maz@kernel.org>
+References: <20260417124612.2770268-1-maz@kernel.org>
+	<20260417124612.2770268-3-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260415115559.2227718-16-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kartikey406@gmail.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Apr 15, 2026 at 12:55:56PM +0100, Marc Zyngier wrote:
-> From: Sascha Bischoff <sascha.bischoff@arm.com>
+On Fri, 17 Apr 2026 13:46:10 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Fix two typos in the VGICv5 documentation.
+> The timer code makes use of a per-timer irq level cache, which
+> looks like a very minor optimisation to avoid taking a lock upon
+> updating the GIC view of the interrupt when it is unchanged from
+> the previous state.
 > 
-> Fixes: d51c978b7d3e ("KVM: arm64: gic-v5: Communicate userspace-driveable PPIs via a UAPI")
-> Fixes: eb3c4d2c9a4d ("Documentation: KVM: Introduce documentation for VGICv5")
-> Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> This is coming in the way of more important correctness issues,
+> so get rid of the cache, which simplifies a couple of minor things.
+> 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  Documentation/virt/kvm/devices/arm-vgic-v5.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/arch_timer.c  | 18 +++++++++---------
+>  include/kvm/arm_arch_timer.h |  5 -----
+>  2 files changed, 9 insertions(+), 14 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> index 29335ea823fc5..1985b2d880322 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -12,8 +12,8 @@ Only one VGIC instance may be instantiated through this API.  The created VGIC
->  will act as the VM interrupt controller, requiring emulated user-space devices
->  to inject interrupts to the VGIC instead of directly to CPUs.
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index d6802fc87e085..fdc1afff06340 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -446,9 +446,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  {
+>  	kvm_timer_update_status(timer_ctx, new_level);
 >  
-> -Creating a guest GICv5 device requires a host GICv5 host.  The current VGICv5
-> -device only supports PPI interrupts.  These can either be injected from emulated
-> +Creating a guest GICv5 device requires a GICv5 host.  The current VGICv5 device
-> +only supports PPI interrupts.  These can either be injected from emulated
->  in-kernel devices (such as the Arch Timer, or PMU), or via the KVM_IRQ_LINE
->  ioctl.
+> -	timer_ctx->irq.level = new_level;
+>  	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_irq(timer_ctx),
+> -				   timer_ctx->irq.level);
+> +				   new_level);
 >  
-> @@ -25,7 +25,7 @@ Groups:
->        request the initialization of the VGIC, no additional parameter in
->        kvm_device_attr.addr. Must be called after all VCPUs have been created.
+>  	if (userspace_irqchip(vcpu->kvm))
+>  		return;
+> @@ -466,7 +465,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
 >  
-> -   KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> +   KVM_DEV_ARM_VGIC_USERPSPACE_PPIS
+>  	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+>  			    timer_irq(timer_ctx),
+> -			    timer_ctx->irq.level,
+> +			    new_level,
+>  			    timer_ctx);
+>  }
+>  
+> @@ -477,8 +476,7 @@ static void timer_emulate(struct arch_timer_context *ctx)
+>  
+>  	trace_kvm_timer_emulate(ctx, pending);
+>  
+> -	if (pending != ctx->irq.level)
+> -		kvm_timer_update_irq(timer_context_to_vcpu(ctx), pending, ctx);
+> +	kvm_timer_update_irq(timer_context_to_vcpu(ctx), pending, ctx);
+>  
+>  	kvm_timer_update_status(ctx, pending);
 
-This still has a typo! There's a P lurking between USER and SPACE!
+As my new best mate Sashiko pointed out, kvm_timer_update_status()
+here becomes redundant, as the unconditional call to
+kvm_timer_update_irq() already contains that.
 
->        request the mask of userspace-drivable PPIs. Only a subset of the PPIs can
->        be directly driven from userspace with GICv5, and the returned mask
->        informs userspace of which it is allowed to drive via KVM_IRQ_LINE.
-> -- 
-> 2.47.3
-> 
+I'll drop it from the patch when applying, unless there are more
+comments.
 
 Thanks,
-Joey
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
