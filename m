@@ -1,132 +1,323 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AC2311C2F
-	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 16:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776444427; cv=none; b=akA07CRKGW6tpRdJxA0HMRsubMKDOVwcw9uHL3jPnPdpwujcNx3EZeYrMCFqdSqq2TWzBmLJM36MHQ5smIoHHZp5aIVbhfQ39Gou7XJ3n8fLpq54QLA4Z9w6jOt9nikI0ARjAZnT2EC21Ox/BCWfiB057d0geSRURx+5PCHWzX4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776444427; c=relaxed/simple;
-	bh=BqkS1+8w7mYYuCnHKvtHMaYkbLA09Qinu7JMt5fNOGM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B7IDiFHReH5NVUYkFGeoOrHy8RVKhk3BIp/CiG8a4k8jqrUl2GQcGXunYGUc3P6eFGVN4G3WfUBmAG9ercFgL9M3WbCBx5dswQo6Hi0uClES/4bJ1DIoLZ4d93s4800if2P/PSU6dfAh8eL9vxSEf/xoNrCtL3+pZg0YIYUW354=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bryMiH+N; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F8D3A3822
+	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 17:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776446333; cv=pass; b=TuohT9J8EgM4ZzXO5m09Ysn6tyLDH++u5F7XqEg3d3lTCL7/ptI8i/sD5k2ot78W9gis57sdDXKRwISAkXCZrW8tVE+yl0cf+IrLXawxtlj/CkgGrG2sVw8B8xe7FkBiVxHL92jXOmgwyIkiSBR9mXUf9XU/wlvDzkxFEDnf7Sw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776446333; c=relaxed/simple;
+	bh=oqtrB1nDoWwh6mJFd306PSswiA0qyumTQ+FJTQjk/Jo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IsBc4e5HYlMkbEuX+E05O94FSJg+gx7ZJ4dj+zBaEmdx84xBQfcc/AFuiS4+mfVxniHcEtqn+RY9eAQT5G65Z/bl4KGQC2Xgt3YtmFQfxyAUG9BpXmWqBakOoQiDOVleeaUz82aQXa6/t16ccAi6KwBvczGN1+fwR/f1JNWtTns=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bPOVmiz/; arc=pass smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bryMiH+N"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b2ecc96a9aso9497675ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 09:47:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bPOVmiz/"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50e237ae754so26391cf.1
+        for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 10:18:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776446322; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BQ5b2jbxLb/ogYrLXHUfKbS+pWUlS0QLPfZ8gjaZigTy5MJTMxFITmGxMG1Vj7+POk
+         a6wZWuVAVrmg2gPxMVKYQR+qUXa/WQGCyHDD80KI69POy5P64XC1Be5cMQXS1muA8xHm
+         sO7lmToLAilNAgsCexOOzEhZJMFyZHbh25o0gadXSIyqVtaRCG5OfsXlKDwYhhQggIxS
+         mLEFYJ91xmkN/ZH1YeOkOyISemr1gGJJ6uDFtmeW2YdecZsRN+uufAu7cysRDxE4KQz6
+         aXilfync/dhOPQL8FP7aygecf58EvucoovkWGeR3BQ9k8+syhhkb4oo/fG0Z8ahtv2y+
+         8wsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=biaOA0d6mhik4+C4B1k5xj1AmZCR/Js0cBd8UJ64e+A=;
+        fh=dwUrJo5Il70xjn/LK//q7wqTiSkgi+98rUozyv/uNp8=;
+        b=kq+u1uePY64coMA7D7VzIOSqncgbrrFXM3Dlk3eEFwC/LYU6SrrwbvOWXp4L5YZy2X
+         4aLjdYx8n+EeUGF1+BwwFPCN3NvXIeWveWUt7wtR7IE0dS5ZVcCFcs2Zz4ean5RRMcL6
+         92F1uNzw6P9PDvt81u4EP4I7HzQVpWl3AGMXdJWn80JgYsi7e9F4cQ8Vgkz+2QUtg21d
+         K6035IVvjalZrl5cvUfUtlbcy/Lr+bgb38sknOpS0+cUOuzUwc+NV1MQkogvuf8WBVuF
+         Gg1kY0xOWk19Rq4Nuf+a0OhOVN0KN6z8c0+NMXx9KjV0fk2zuE/4hFb9L+MCir+f88Et
+         CphA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776444425; x=1777049225; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=THZKYqCh3zVO+So/kaXQTTcEeZfZWD5YDDISxc7lZyg=;
-        b=bryMiH+NwmOwJQlb3djxFYD9xoElRl8OUV6zbHnIaeqyqS8LybKkO+X4/iVLpucJ2u
-         vF/aLli6WgvtMz/qQM47mV8mxyDDYj+Q8vpkCZuWbKLFbjt9bIFZcDLu/f8oz4S4zrLk
-         +o0rOBOGfq7IPak4qU8eRnRAT6o20YBZHm4WUu2F5mrltYaut9AT0gYlq3ppJqt42JAv
-         SgW9ne/sQuHv1z+MIVCj3WmKa6NDq77yBiX8Lb3MRIU9uBHrGT4RcTUkw6R+D/zJ3wvC
-         YfGG68PbYurE9BZ9+mouYXAadolKxgW/7B+UzZGEY+Aa7aEiQbmaQ5sE3tnpdZiv6K2X
-         zdaQ==
+        d=google.com; s=20251104; t=1776446322; x=1777051122; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=biaOA0d6mhik4+C4B1k5xj1AmZCR/Js0cBd8UJ64e+A=;
+        b=bPOVmiz/HlER8cehSkYoEukyWrYndGQ5QOGO6k0UO+TcotGhcTIVNQkU6evrP2BVca
+         UfeWFkefYautu+z7MwmnGlA5IdjvH6cd9jB5V4gUXxuc1l1Eu52khaDvgQOCTD7JDh4O
+         dKavA8dqU/WWrMuYzF0UDikLVr/O26RY3Fz5y0EucaGBPjslb3YD6Z5rbBX5JCeTfTYA
+         lXLN9I7tK9i8DhQOh7nnH2atgGPFPt64BbTUtwXja0acGqmE9M8kMBQ47ufkKoceDXky
+         t34lnWJeoK66VNz+q9O7DnhtR7inKHCeInEs2am7RGBvMi7y7qYztEqXup499LRG2+Jk
+         nQnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776444425; x=1777049225;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=THZKYqCh3zVO+So/kaXQTTcEeZfZWD5YDDISxc7lZyg=;
-        b=hPoC8tnmigDrambKAd2Wv2zVk70pRb4DnjYKeam96VgsOmRbPl394WSIRVM9BL/7+A
-         mnoKobSJn0GasVJGge+3lvpQHeKCoOIhYWg9fXgwItbEOwQk4VCs9Ytdz3p1CQxU4i45
-         qv4Wx4jpjPS/lspZBvkDScY4HaPBPm9n9CcEn5jnDpnVr9q5ShwSmsheTHCpLhiPs71o
-         4zKJFaTBmECk979gVtrx8KU7+3mrqNzui0y99QkusSHtKPy5bTswiBgolFVLnICAsV//
-         vV8W4cWaVzjEJAx1EtGu1vWTjoJskxWoazEH5WqRjZaFts32yEoXRKlVBge86YB6Ui6E
-         TaoQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9madp2LZlDALM1AoOj3s8uoN/H5XhrO1QHagwDBIIDRjv4/8+DZPIxsksAdfYHn/4B8ZO4MK8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzTPpzeCrzDZztP9FrMMpzMb78qCWUIVlMI45fwQTAJ3qpNnU51
-	y4J/ryJI+K8MF4bwnqdAqjXRx+Vg4zdMVLSCDav26YAqGUmybPpc9d/NdlM0vYiNPjoEPTpMLH0
-	m5YAa0A==
-X-Received: from plbiw7.prod.google.com ([2002:a17:903:447:b0:2b2:46d7:4428])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1ac6:b0:2b2:5840:808e
- with SMTP id d9443c01a7336-2b5f9ee9487mr37665585ad.10.1776444425313; Fri, 17
- Apr 2026 09:47:05 -0700 (PDT)
-Date: Fri, 17 Apr 2026 09:47:04 -0700
-In-Reply-To: <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
+        d=1e100.net; s=20251104; t=1776446322; x=1777051122;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=biaOA0d6mhik4+C4B1k5xj1AmZCR/Js0cBd8UJ64e+A=;
+        b=Bj2ygWmAn/ZuFRx8sDC7AvubnrP/L7v8m/Mmh7MeUi7tE9TNB5VZZsXT1CSRTX0aDG
+         o+jyZFLj0PMy0ooTl+JiQy9hktx57yznWRyEXUUfa3d9FOjzciJZfy6O5crdRWsHJNkg
+         wkHlSKpSiqQorNs4+iE7ocXy/BZ/JLJ+MnS46fc8/DUI+sRLUbm5G32UzLJINvyQvSu2
+         Jx1nyr5DJnF9nwJ6jUz4GFoWS7PWpcFVBe9Ex5gl1rmUIRBVMmQPiPkOscYdCiFuLw6y
+         xCgUrPPhGU12pG7baaVZvXqD6dw/deV2uLRyoqlBa911C1SLkMQsdfr0BqCAd8nYpoB1
+         jQXg==
+X-Forwarded-Encrypted: i=1; AFNElJ8DX+QXfE7C2Zp560bEWKtpCj5ebnKr7f/DasuIkNl+czWeyJCwapGNWOok/ojavl2dARSGNQs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzbRdfJzE1IeyRiNFAYzXGDrT9fED4sxcTkniwskbRXKPANC2JN
+	aJaLm/4EcQIznB6+97+Bblct8uYVhTYzC9fygumOT/02AQIPw71V1P5AbQ2snjJdKngCxcMe0PG
+	1ocNDGbe3OdZTg+EUFw5loJvksCaSb6lOD5bfKx6G
+X-Gm-Gg: AeBDiesUpXspEGc+P0OA4Bgbo2OUD0NwcIwbtWO5aTxa5TNelHrixCGoeGOp6dR8Apw
+	Jp404H8amK5SADuarB55ioJTnSzh3jw90f0mWPTPdTdmwNoOeqhT1MlodQiqkNWdxwo4Cet1M+y
+	jhVql3uzCb1vR1kkwL9kb348MxJykHz1UuiRroIRDmuKESYfIMBSGZNHy0TMUlW9QYK8OBTLCXb
+	wbx3oNsvDtrQ+dn/Lf5QNVAKu9HnnwMWbwTiARjZ+HWddvVABlffblSs/Ts4zMbSjHFlq1qJhj5
+	t04w5OFDupeP9gNdirNk3KeUB2c1oK8EoUln78cHdIwgRHzcqVUDT024CqaB4w==
+X-Received: by 2002:ac8:7d47:0:b0:4ff:bfd9:dd31 with SMTP id
+ d75a77b69052e-50e42b292c2mr172191cf.5.1776446320593; Fri, 17 Apr 2026
+ 10:18:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-25-seanjc@google.com>
- <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
-Message-ID: <aeJkCGwsrRmuBikT@google.com>
-Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
- fault-in on !mmap()'d memory
-From: Sean Christopherson <seanjc@google.com>
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
-	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20260310124933.830025-1-sebastianene@google.com>
+ <20260310124933.830025-2-sebastianene@google.com> <acJpy7unwLbRahPL@google.com>
+In-Reply-To: <acJpy7unwLbRahPL@google.com>
+From: Mostafa Saleh <smostafa@google.com>
+Date: Fri, 17 Apr 2026 18:18:28 +0100
+X-Gm-Features: AQROBzCCTRSV62IVPx6y330qpXgmkId4e0KId71ugobNpu16Ggl0mg0GgHYUJBg
+Message-ID: <CAFgf54r3YmFXU+=btPtgtT2wUM0y0+qmPnJYvUX2ncdijHQCGw@mail.gmail.com>
+Subject: Re: [PATCH 01/14] KVM: arm64: Donate MMIO to the hypervisor
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Sebastian Ene <sebastianene@google.com>, alexandru.elisei@arm.com, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, android-kvm@google.com, catalin.marinas@arm.com, 
+	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org, 
+	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, perlarsen@google.com, 
+	qperret@google.com, rananta@google.com, suzuki.poulose@arm.com, 
+	tabba@google.com, tglx@kernel.org, bgrzesik@google.com, will@kernel.org, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 30, 2026, Zenghui Yu wrote:
-> On 7/30/25 6:54 AM, Sean Christopherson wrote:
-> > Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
-> > memory that supports mmap(), but that is not currently mapped into host
-> > userspace and/or has a userspace address (in the memslot) that points at
-> > something other than the target guest_memfd range.  Mapping guest_memfd
-> > memory into the guest is supposed to operate completely independently from
-> > any userspace mappings.
-> > +	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+On Tue, Mar 24, 2026 at 10:39=E2=80=AFAM Vincent Donnefort
+<vdonnefort@google.com> wrote:
+>
+> On Tue, Mar 10, 2026 at 12:49:20PM +0000, Sebastian Ene wrote:
+> > From: Mostafa Saleh <smostafa@google.com>
+> >
+> > Add a function to donate MMIO to the hypervisor so IOMMU hypervisor
+> > drivers can use that to protect the MMIO of IOMMU.
+> > The initial attempt to implement this was to have a new flag to
+> > "___pkvm_host_donate_hyp" to accept MMIO. However that had many problem=
+s,
+> > it was quite intrusive for host/hyp to check/set page state to make it
+> > aware of MMIO and to encode the state in the page table in that case.
+> > Which is called in paths that can be sensitive to performance (FFA, VMs=
+..)
+> >
+> > As donating MMIO is very rare, and we don=E2=80=99t need to encode the =
+full
+> > state, it=E2=80=99s reasonable to have a separate function to do this.
+> > It will init the host s2 page table with an invalid leaf with the owner=
+ ID
+> > to prevent the host from mapping the page on faults.
+>
+> I am not sure I agree here:
+>
+> * Differentiating between MMIO and Memory is just a fast binary search in=
+to the
+>   memory regions.
+>
+> * host_donate_hyp isn't a fast path even for memory regions anyway.
+>
+> * Having common functions for changing ownership is more and more helpful=
+ (see the
+>   SME dvmsync workaround).
+>
+> * There's nothing preventing from having a range here which is safely han=
+dled
+>   already by host_donate_hyp()
+>
+
+I am working on v6 now. I'm not convinced that's a good enough reason
+to have full-fledged MMIO state tracking, it will be unncessary
+complicated and quite intrusive.
+
+It might be useful when supporting device assignment where VMs can own
+MMIO, otherwise, I'd try to avoid it.
+
+Thanks,
+Mostafa
+
+
+> >
+> > Also, prevent kvm_pgtable_stage2_unmap() from removing owner ID from
+> > stage-2 PTEs, as this can be triggered from recycle logic under memory
+> > pressure. There is no code relying on this, as all ownership changes is
+> > done via kvm_pgtable_stage2_set_owner()
+> >
+> > For error path in IOMMU drivers, add a function to donate MMIO back
+> > from hyp to host.
+> >
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 90 +++++++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c                  |  9 +-
+> >  3 files changed, 94 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64=
+/kvm/hyp/include/nvhe/mem_protect.h
+> > index 5f9d56754e39..8b617e6fc0e0 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > @@ -31,6 +31,8 @@ enum pkvm_component_id {
+> >  };
+> >
+> >  extern unsigned long hyp_nr_cpus;
+> > +int __pkvm_host_donate_hyp_mmio(u64 pfn);
+> > +int __pkvm_hyp_donate_host_mmio(u64 pfn);
+> >
+> >  int __pkvm_prot_finalize(void);
+> >  int __pkvm_host_share_hyp(u64 pfn);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp=
+/nvhe/mem_protect.c
+> > index 38f66a56a766..0808367c52e5 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -784,6 +784,96 @@ int __pkvm_host_unshare_hyp(u64 pfn)
+> >       return ret;
+> >  }
+> >
+> > +int __pkvm_host_donate_hyp_mmio(u64 pfn)
+> > +{
+> > +     u64 phys =3D hyp_pfn_to_phys(pfn);
+> > +     void *virt =3D __hyp_va(phys);
+> > +     int ret;
+> > +     kvm_pte_t pte;
 > > +
-> > +	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
-> > +		    "Default VM type should always support guest_memfd mmap()");
+> > +     if (addr_is_memory(phys))
+> > +             return -EINVAL;
 > > +
-> > +	size = vm->page_size;
-> > +	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
-> 
-> This test fails on arm64 when vm->page_size is 4k and host's page_size
-> is 64k:
-> 
-> [root@localhost kvm]# ./guest_memfd_test
-> Random seed: 0x6b8b4567
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='660'
-> ==== Test Assertion Failure ====
->   include/kvm_util.h:683: fd >= 0
->   pid=889 tid=889 errno=22 - Invalid argument
->      1	0x000000000040262b: vm_create_guest_memfd at kvm_util.h:683
->      2	 (inlined by) test_guest_memfd_guest at guest_memfd_test.c:450
->      3	 (inlined by) main at guest_memfd_test.c:491
->      4	0x00007fff8f56af3b: ?? ??:0
->      5	0x00007fff8f56b007: ?? ??:0
->      6	0x0000000000402a2f: _start at ??:?
->   KVM_CREATE_GUEST_MEMFD failed, rc: -1 errno: 22 (Invalid argument)
-
-Does this fix things for you?  If so, I'll send a proper patch.
-
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index ec7644aae999..c682bda722f9 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -510,9 +510,15 @@ static void test_guest_memfd_guest(void)
-                    "Default VM type should support INIT_SHARED, supported flags = 0x%x",
-                    vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_FLAGS));
- 
-+       /*
-+        * Use the guest's page size for all accesses, e.g. to avoid having to
-+        * map multiple pages, but create the guest_memfd instance with the max
-+        * of the host or guest page size, as KVM requires gmem files to be
-+        * aligned to the host page size.
-+        */
-        size = vm->page_size;
--       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP |
--                                            GUEST_MEMFD_FLAG_INIT_SHARED);
-+       fd = vm_create_guest_memfd(vm, max(size, page_size), GUEST_MEMFD_FLAG_MMAP |
-+                                                            GUEST_MEMFD_FLAG_INIT_SHARED);
-        vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
- 
-        mem = kvm_mmap(size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+> > +     host_lock_component();
+> > +     hyp_lock_component();
+> > +
+> > +     ret =3D kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, NULL);
+> > +     if (ret)
+> > +             goto unlock;
+> > +
+> > +     if (pte && !kvm_pte_valid(pte)) {
+> > +             ret =3D -EPERM;
+> > +             goto unlock;
+> > +     }
+> > +
+> > +     ret =3D kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL=
+);
+> > +     if (ret)
+> > +             goto unlock;
+> > +     if (pte) {
+> > +             ret =3D -EBUSY;
+> > +             goto unlock;
+> > +     }
+> > +
+> gg> +   ret =3D pkvm_create_mappings_locked(virt, virt + PAGE_SIZE, PAGE_=
+HYP_DEVICE);
+> > gg+   if (ret)
+> > +             goto unlock;
+> > +     /*
+> > +      * We set HYP as the owner of the MMIO pages in the host stage-2,=
+ for:
+> > +      * - host aborts: host_stage2_adjust_range() would fail for inval=
+id non zero PTEs.
+> > +      * - recycle under memory pressure: host_stage2_unmap_dev_all() w=
+ould call
+> > +      *   kvm_pgtable_stage2_unmap() which will not clear non zero inv=
+alid ptes (counted).
+> > +      * - other MMIO donation: Would fail as we check that the PTE is =
+valid or empty.
+> > +      */
+> > +     WARN_ON(host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.p=
+gt, phys,
+> > +                             PAGE_SIZE, &host_s2_pool, PKVM_ID_HYP));
+> > +unlock:
+> > +     hyp_unlock_component();
+> > +     host_unlock_component();
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +int __pkvm_hyp_donate_host_mmio(u64 pfn)
+> > +{
+> > +     u64 phys =3D hyp_pfn_to_phys(pfn);
+> > +     u64 virt =3D (u64)__hyp_va(phys);
+> > +     size_t size =3D PAGE_SIZE;
+> > +     int ret;
+> > +     kvm_pte_t pte;
+> > +
+> > +     if (addr_is_memory(phys))
+> > +             return -EINVAL;
+> > +
+> > +     host_lock_component();
+> > +     hyp_lock_component();
+> > +
+> > +     ret =3D kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL=
+);
+> > +     if (ret)
+> > +             goto unlock;
+> > +     if (!kvm_pte_valid(pte)) {
+> > +             ret =3D -ENOENT;
+> > +             goto unlock;
+> > +     }
+> > +
+> > +     ret =3D kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, NULL);
+> > +     if (ret)
+> > +             goto unlock;
+> > +
+> > +     if (FIELD_GET(KVM_INVALID_PTE_OWNER_MASK, pte) !=3D PKVM_ID_HYP) =
+{
+> > +             ret =3D -EPERM;
+> > +             goto unlock;
+> > +     }
+> > +
+> > +     WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) !=3D siz=
+e);
+> > +     WARN_ON(host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.p=
+gt, phys,
+> > +                             PAGE_SIZE, &host_s2_pool, PKVM_ID_HOST));
+> > +unlock:
+> > +     hyp_unlock_component();
+> > +     host_unlock_component();
+> > +
+> > +     return ret;
+> > +}
+> > +
+> >  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+> >  {
+> >       u64 phys =3D hyp_pfn_to_phys(pfn);
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
+c
+> > index 9b480f947da2..d954058e63ff 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1152,13 +1152,8 @@ static int stage2_unmap_walker(const struct kvm_=
+pgtable_visit_ctx *ctx,
+> >       kvm_pte_t *childp =3D NULL;
+> >       bool need_flush =3D false;
+> >
+> > -     if (!kvm_pte_valid(ctx->old)) {
+> > -             if (stage2_pte_is_counted(ctx->old)) {
+> > -                     kvm_clear_pte(ctx->ptep);
+> > -                     mm_ops->put_page(ctx->ptep);
+> > -             }
+> > -             return 0;
+> > -     }
+> > +     if (!kvm_pte_valid(ctx->old))
+> > +             return stage2_pte_is_counted(ctx->old) ? -EPERM : 0;
+> >
+> >       if (kvm_pte_table(ctx->old, ctx->level)) {
+> >               childp =3D kvm_pte_follow(ctx->old, mm_ops);
+> > --
+> > 2.53.0.473.g4a7958ca14-goog
+> >
