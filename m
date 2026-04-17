@@ -1,253 +1,132 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DEB33F8B7
-	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 16:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AC2311C2F
+	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 16:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776442232; cv=none; b=A8HzU02M3fRGxzTh9XojbkLRGOFfpERdEhDMY8X59dhXA9zZYrzLzvkgfLyi5TbC/xfGVcjZiL5DVynfltTgSMsK/8vU8N6B+soumjQQDEx5HcivPGgYgQWXmlM/KdfEYyEA3+2yfp50w7lm7g7o1dg2w0ZVQGmEBFVwo0xXPC4=
+	t=1776444427; cv=none; b=akA07CRKGW6tpRdJxA0HMRsubMKDOVwcw9uHL3jPnPdpwujcNx3EZeYrMCFqdSqq2TWzBmLJM36MHQ5smIoHHZp5aIVbhfQ39Gou7XJ3n8fLpq54QLA4Z9w6jOt9nikI0ARjAZnT2EC21Ox/BCWfiB057d0geSRURx+5PCHWzX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776442232; c=relaxed/simple;
-	bh=XX5Jc5mwKcR3BHo7TPiJOgf4iAQTIKsLBFkjvK6rZPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BFiUDrSviBZDoiNpV33I4K6SvFbunBR9ZDMgPR01FJkmgyaCQDcqMGz+lZddPBfDwqs8BLHRhNslXOJtQbA+OaoeP+CUZkAUlNGNSQL1thsQgnVrS7CE7MXpvRDRVydpOS4vXuV2x0QnYcJHz4QUvmsQbMDw3fVwVlZNEeMQ+k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OmPMow/v; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776444427; c=relaxed/simple;
+	bh=BqkS1+8w7mYYuCnHKvtHMaYkbLA09Qinu7JMt5fNOGM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=B7IDiFHReH5NVUYkFGeoOrHy8RVKhk3BIp/CiG8a4k8jqrUl2GQcGXunYGUc3P6eFGVN4G3WfUBmAG9ercFgL9M3WbCBx5dswQo6Hi0uClES/4bJ1DIoLZ4d93s4800if2P/PSU6dfAh8eL9vxSEf/xoNrCtL3+pZg0YIYUW354=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bryMiH+N; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OmPMow/v"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 59A871DB5;
-	Fri, 17 Apr 2026 09:10:24 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D42973F641;
-	Fri, 17 Apr 2026 09:10:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776442230; bh=XX5Jc5mwKcR3BHo7TPiJOgf4iAQTIKsLBFkjvK6rZPM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OmPMow/vX8WYOIT1UZvNxYcV3rE+cDGzptJrJv//wnH/4t7JrUskipDkXBTQvwWvC
-	 SHD334VgWS2Zr5iDQ5mAhsTkGdXeDX4Ml94dUOUPrGb3bNkcmgJIXubWuH8gxmsopo
-	 VmQKtLOkLErgUnwB+X8igVawt8eezB79SU8IEj6o=
-Date: Fri, 17 Apr 2026 17:10:26 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: Re: [PATCH 09/18] KVM: arm64: vgic-v5: Limit support to 64 PPIs
-Message-ID: <20260417161026.GC3311048@e124191.cambridge.arm.com>
-References: <20260415115559.2227718-1-maz@kernel.org>
- <20260415115559.2227718-10-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bryMiH+N"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b2ecc96a9aso9497675ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 09:47:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776444425; x=1777049225; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=THZKYqCh3zVO+So/kaXQTTcEeZfZWD5YDDISxc7lZyg=;
+        b=bryMiH+NwmOwJQlb3djxFYD9xoElRl8OUV6zbHnIaeqyqS8LybKkO+X4/iVLpucJ2u
+         vF/aLli6WgvtMz/qQM47mV8mxyDDYj+Q8vpkCZuWbKLFbjt9bIFZcDLu/f8oz4S4zrLk
+         +o0rOBOGfq7IPak4qU8eRnRAT6o20YBZHm4WUu2F5mrltYaut9AT0gYlq3ppJqt42JAv
+         SgW9ne/sQuHv1z+MIVCj3WmKa6NDq77yBiX8Lb3MRIU9uBHrGT4RcTUkw6R+D/zJ3wvC
+         YfGG68PbYurE9BZ9+mouYXAadolKxgW/7B+UzZGEY+Aa7aEiQbmaQ5sE3tnpdZiv6K2X
+         zdaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776444425; x=1777049225;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=THZKYqCh3zVO+So/kaXQTTcEeZfZWD5YDDISxc7lZyg=;
+        b=hPoC8tnmigDrambKAd2Wv2zVk70pRb4DnjYKeam96VgsOmRbPl394WSIRVM9BL/7+A
+         mnoKobSJn0GasVJGge+3lvpQHeKCoOIhYWg9fXgwItbEOwQk4VCs9Ytdz3p1CQxU4i45
+         qv4Wx4jpjPS/lspZBvkDScY4HaPBPm9n9CcEn5jnDpnVr9q5ShwSmsheTHCpLhiPs71o
+         4zKJFaTBmECk979gVtrx8KU7+3mrqNzui0y99QkusSHtKPy5bTswiBgolFVLnICAsV//
+         vV8W4cWaVzjEJAx1EtGu1vWTjoJskxWoazEH5WqRjZaFts32yEoXRKlVBge86YB6Ui6E
+         TaoQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9madp2LZlDALM1AoOj3s8uoN/H5XhrO1QHagwDBIIDRjv4/8+DZPIxsksAdfYHn/4B8ZO4MK8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzTPpzeCrzDZztP9FrMMpzMb78qCWUIVlMI45fwQTAJ3qpNnU51
+	y4J/ryJI+K8MF4bwnqdAqjXRx+Vg4zdMVLSCDav26YAqGUmybPpc9d/NdlM0vYiNPjoEPTpMLH0
+	m5YAa0A==
+X-Received: from plbiw7.prod.google.com ([2002:a17:903:447:b0:2b2:46d7:4428])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1ac6:b0:2b2:5840:808e
+ with SMTP id d9443c01a7336-2b5f9ee9487mr37665585ad.10.1776444425313; Fri, 17
+ Apr 2026 09:47:05 -0700 (PDT)
+Date: Fri, 17 Apr 2026 09:47:04 -0700
+In-Reply-To: <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260415115559.2227718-10-maz@kernel.org>
+Mime-Version: 1.0
+References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-25-seanjc@google.com>
+ <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
+Message-ID: <aeJkCGwsrRmuBikT@google.com>
+Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
+ fault-in on !mmap()'d memory
+From: Sean Christopherson <seanjc@google.com>
+To: Zenghui Yu <zenghui.yu@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
+	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 15, 2026 at 12:55:50PM +0100, Marc Zyngier wrote:
-> Although we have some code supporting 128 PPIs, the only supported
-> configuration is 64 PPIs. There is no way to test the 128 PPI code,
-> so it is bound to bitrot very quickly.
+On Mon, Mar 30, 2026, Zenghui Yu wrote:
+> On 7/30/25 6:54 AM, Sean Christopherson wrote:
+> > Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
+> > memory that supports mmap(), but that is not currently mapped into host
+> > userspace and/or has a userspace address (in the memslot) that points at
+> > something other than the target guest_memfd range.  Mapping guest_memfd
+> > memory into the guest is supposed to operate completely independently from
+> > any userspace mappings.
+> > +	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+> > +
+> > +	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
+> > +		    "Default VM type should always support guest_memfd mmap()");
+> > +
+> > +	size = vm->page_size;
+> > +	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
 > 
-> Given that KVM/arm64's goal has always been to stick to non-IMPDEF
-> behaviours, drop the 128 PPI support. Someone motivated enough and
-> with very strong arguments can always bring it back -- it's all in
-> the git history.
+> This test fails on arm64 when vm->page_size is 4k and host's page_size
+> is 64k:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> [root@localhost kvm]# ./guest_memfd_test
+> Random seed: 0x6b8b4567
+> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='660'
+> ==== Test Assertion Failure ====
+>   include/kvm_util.h:683: fd >= 0
+>   pid=889 tid=889 errno=22 - Invalid argument
+>      1	0x000000000040262b: vm_create_guest_memfd at kvm_util.h:683
+>      2	 (inlined by) test_guest_memfd_guest at guest_memfd_test.c:450
+>      3	 (inlined by) main at guest_memfd_test.c:491
+>      4	0x00007fff8f56af3b: ?? ??:0
+>      5	0x00007fff8f56b007: ?? ??:0
+>      6	0x0000000000402a2f: _start at ??:?
+>   KVM_CREATE_GUEST_MEMFD failed, rc: -1 errno: 22 (Invalid argument)
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Does this fix things for you?  If so, I'll send a proper patch.
 
-> ---
->  arch/arm64/kvm/hyp/vgic-v5-sr.c       | 82 ++++++---------------------
->  arch/arm64/kvm/sys_regs.c             | 17 +++---
->  arch/arm64/kvm/vgic/vgic-kvm-device.c |  9 +--
->  3 files changed, 26 insertions(+), 82 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-> index 47e6bcd437029..6d69dfe89a96c 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-> @@ -30,10 +30,9 @@ void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if)
->  {
->  	/*
->  	 * The following code assumes that the bitmap storage that we have for
-> -	 * PPIs is either 64 (architected PPIs, only) or 128 bits (architected &
-> -	 * impdef PPIs).
-> +	 * PPIs is either 64 (architected PPIs, only).
->  	 */
-> -	BUILD_BUG_ON(VGIC_V5_NR_PRIVATE_IRQS % 64);
-> +	BUILD_BUG_ON(VGIC_V5_NR_PRIVATE_IRQS != 64);
->  
->  	bitmap_write(host_data_ptr(vgic_v5_ppi_state)->activer_exit,
->  		     read_sysreg_s(SYS_ICH_PPI_ACTIVER0_EL2), 0, 64);
-> @@ -49,22 +48,6 @@ void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if)
->  	cpu_if->vgic_ppi_priorityr[6] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR6_EL2);
->  	cpu_if->vgic_ppi_priorityr[7] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR7_EL2);
->  
-> -	if (VGIC_V5_NR_PRIVATE_IRQS == 128) {
-> -		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->activer_exit,
-> -			     read_sysreg_s(SYS_ICH_PPI_ACTIVER1_EL2), 64, 64);
-> -		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->pendr,
-> -			     read_sysreg_s(SYS_ICH_PPI_PENDR1_EL2), 64, 64);
-> -
-> -		cpu_if->vgic_ppi_priorityr[8] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR8_EL2);
-> -		cpu_if->vgic_ppi_priorityr[9] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR9_EL2);
-> -		cpu_if->vgic_ppi_priorityr[10] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR10_EL2);
-> -		cpu_if->vgic_ppi_priorityr[11] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR11_EL2);
-> -		cpu_if->vgic_ppi_priorityr[12] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR12_EL2);
-> -		cpu_if->vgic_ppi_priorityr[13] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR13_EL2);
-> -		cpu_if->vgic_ppi_priorityr[14] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR14_EL2);
-> -		cpu_if->vgic_ppi_priorityr[15] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR15_EL2);
-> -	}
-> -
->  	/* Now that we are done, disable DVI */
->  	write_sysreg_s(0, SYS_ICH_PPI_DVIR0_EL2);
->  	write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
-> @@ -74,9 +57,6 @@ void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if)
->  {
->  	DECLARE_BITMAP(pendr, VGIC_V5_NR_PRIVATE_IRQS);
->  
-> -	/* We assume 64 or 128 PPIs - see above comment */
-> -	BUILD_BUG_ON(VGIC_V5_NR_PRIVATE_IRQS % 64);
-> -
->  	/* Enable DVI so that the guest's interrupt config takes over */
->  	write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_dvir, 0, 64),
->  		       SYS_ICH_PPI_DVIR0_EL2);
-> @@ -108,50 +88,20 @@ void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if)
->  	write_sysreg_s(cpu_if->vgic_ppi_priorityr[7],
->  		       SYS_ICH_PPI_PRIORITYR7_EL2);
->  
-> -	if (VGIC_V5_NR_PRIVATE_IRQS == 128) {
-> -		/* Enable DVI so that the guest's interrupt config takes over */
-> -		write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_dvir, 64, 64),
-> -			       SYS_ICH_PPI_DVIR1_EL2);
-> -
-> -		write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_activer, 64, 64),
-> -			       SYS_ICH_PPI_ACTIVER1_EL2);
-> -		write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_enabler, 64, 64),
-> -			       SYS_ICH_PPI_ENABLER1_EL2);
-> -		write_sysreg_s(bitmap_read(pendr, 64, 64),
-> -			       SYS_ICH_PPI_PENDR1_EL2);
-> -
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[8],
-> -			       SYS_ICH_PPI_PRIORITYR8_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[9],
-> -			       SYS_ICH_PPI_PRIORITYR9_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[10],
-> -			       SYS_ICH_PPI_PRIORITYR10_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[11],
-> -			       SYS_ICH_PPI_PRIORITYR11_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[12],
-> -			       SYS_ICH_PPI_PRIORITYR12_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[13],
-> -			       SYS_ICH_PPI_PRIORITYR13_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[14],
-> -			       SYS_ICH_PPI_PRIORITYR14_EL2);
-> -		write_sysreg_s(cpu_if->vgic_ppi_priorityr[15],
-> -			       SYS_ICH_PPI_PRIORITYR15_EL2);
-> -	} else {
-> -		write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
-> -
-> -		write_sysreg_s(0, SYS_ICH_PPI_ACTIVER1_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_ENABLER1_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PENDR1_EL2);
-> -
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR8_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR9_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR10_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR11_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR12_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR13_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR14_EL2);
-> -		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR15_EL2);
-> -	}
-> +	write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
-> +
-> +	write_sysreg_s(0, SYS_ICH_PPI_ACTIVER1_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_ENABLER1_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PENDR1_EL2);
-> +
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR8_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR9_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR10_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR11_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR12_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR13_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR14_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR15_EL2);
->  }
->  
->  void __vgic_v5_save_state(struct vgic_v5_cpu_if *cpu_if)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 4ef13ac0703df..eba3ef793097d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -724,6 +724,7 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
->  {
->  	unsigned long *mask = vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask;
->  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	unsigned long reg = p->regval;
->  	int i;
->  
->  	/* We never expect to get here with a read! */
-> @@ -731,21 +732,17 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
->  		return undef_access(vcpu, p, r);
->  
->  	/*
-> -	 * If we're only handling architected PPIs and the guest writes to the
-> -	 * enable for the non-architected PPIs, we just return as there's
-> -	 * nothing to do at all. We don't even allocate the storage for them in
-> -	 * this case.
-> +	 * As we're only handling architected PPIs, the guest writes to the
-> +	 * enable for the non-architected PPIs just return as there's
-> +	 * nothing to do at all. We don't even allocate the storage for them.
->  	 */
-> -	if (VGIC_V5_NR_PRIVATE_IRQS == 64 && p->Op2 % 2)
-> +	if (p->Op2 % 2)
->  		return true;
->  
->  	/*
-> -	 * Merge the raw guest write into out bitmap at an offset of either 0 or
-> -	 * 64, then and it with our PPI mask.
-> +	 * Merge the raw guest write into out bitmap, anded with our PPI mask.
->  	 */
-> -	bitmap_write(cpu_if->vgic_ppi_enabler, p->regval, 64 * (p->Op2 % 2), 64);
-> -	bitmap_and(cpu_if->vgic_ppi_enabler, cpu_if->vgic_ppi_enabler, mask,
-> -		   VGIC_V5_NR_PRIVATE_IRQS);
-> +	bitmap_and(cpu_if->vgic_ppi_enabler, &reg, mask, VGIC_V5_NR_PRIVATE_IRQS);
->  
->  	/*
->  	 * Sync the change in enable states to the vgic_irqs. We consider all
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index a96c77dccf353..90be99443df3b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -730,18 +730,15 @@ static int vgic_v5_get_userspace_ppis(struct kvm_device *dev,
->  	guard(mutex)(&dev->kvm->arch.config_lock);
->  
->  	/*
-> -	 * We either support 64 or 128 PPIs. In the former case, we need to
-> -	 * return 0s for the second 64 bits as we have no storage backing those.
-> +	 * We only support 64 PPIs, so, we need to return 0s for the
-> +	 * second 64 bits as we have no storage backing those.
->  	 */
->  	ret = put_user(bitmap_read(gicv5_vm->userspace_ppis, 0, 64), uaddr);
->  	if (ret)
->  		return ret;
->  	uaddr++;
->  
-> -	if (VGIC_V5_NR_PRIVATE_IRQS == 128)
-> -		ret = put_user(bitmap_read(gicv5_vm->userspace_ppis, 64, 128), uaddr);
-> -	else
-> -		ret = put_user(0, uaddr);
-> +	ret = put_user(0, uaddr);
->  
->  	return ret;
->  }
-> -- 
-> 2.47.3
-> 
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index ec7644aae999..c682bda722f9 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -510,9 +510,15 @@ static void test_guest_memfd_guest(void)
+                    "Default VM type should support INIT_SHARED, supported flags = 0x%x",
+                    vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_FLAGS));
+ 
++       /*
++        * Use the guest's page size for all accesses, e.g. to avoid having to
++        * map multiple pages, but create the guest_memfd instance with the max
++        * of the host or guest page size, as KVM requires gmem files to be
++        * aligned to the host page size.
++        */
+        size = vm->page_size;
+-       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP |
+-                                            GUEST_MEMFD_FLAG_INIT_SHARED);
++       fd = vm_create_guest_memfd(vm, max(size, page_size), GUEST_MEMFD_FLAG_MMAP |
++                                                            GUEST_MEMFD_FLAG_INIT_SHARED);
+        vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
+ 
+        mem = kvm_mmap(size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
