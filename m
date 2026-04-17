@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2563239C013
-	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 12:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2545339BFE8
+	for <kvmarm@lists.linux.dev>; Fri, 17 Apr 2026 12:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776429979; cv=none; b=Z7XtdDS0wI/hEQ5Avbi40VvyvDdLqsGhMSDhYt2SupdfzGF6J/rFv3Au1SqO6sz95wCsaHlPJ7Ji0uRZgyyz/7UCazwhq/owvNLiA47evDjQ6DQ1YyVoSyf67j2Kg+1c8YC/Z2UFbywA8/uU4ZwA81r1JXWv+ibFreSkh/Mmog8=
+	t=1776429979; cv=none; b=pdqV46kocIOz6g9YY2MSTAqLNN2utpt8s9Gz79Zt72PiDzUq+FJU5G+qdvUBS1PNQ0duc3Yse0Wez2K7rIj12wEVvaGtOrr7x+KvdtZWA2HXYNm+gbatlfplD1QsxYqb6Ug2gpuYAEz20zBWQt8NoRZE+WhzcKnhI+1LDnHBj/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776429979; c=relaxed/simple;
-	bh=fcY9/bxgeTBj4WyEJ8FOGvH3mRT2+ql85biNbBG6aG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCeULCM6UV5Q/6LVfRznOM0P/jBkAjvrhvFeVp6SlXd+PmScHcIDemnXERKoX0xSnDjDTB6fupETobXhKIi108Fh2fGqdMr08E8uiKW+sl+eHGXrpolNnENHvmoZVFC8iPvL9sCaaKUQNrXbjqcFgYFxvteUlKk46G1e9bDQjqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sQOA1at0; arc=none smtp.client-ip=10.30.226.201
+	bh=nDVq5uxP1KAWX6hBUY8jiqpUC+dmduipcQvQoFbJMng=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DSFYw5y7nCoaFGiGspes84fjzX6Z8vsI64E0j4oB85oeA7yjhnVwfn54Adjy0yQ7FBhI58gTZ9wU0XDz14Fs9F822z92L0l/z5Amn4nWBZyZsr0JrB/f3LGKYrPhf9dfNd/DhCcUK9z1Wc3quD04A8aNCMbG4ODitoteM9K4JOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nx0dFhSr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQOA1at0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9F9CC2BCB4;
-	Fri, 17 Apr 2026 12:46:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nx0dFhSr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D50C2BCB6;
+	Fri, 17 Apr 2026 12:46:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776429978;
-	bh=fcY9/bxgeTBj4WyEJ8FOGvH3mRT2+ql85biNbBG6aG0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sQOA1at0E4Qyh0cqwrJbq3zj5N3ULS6hC9LY3WEbwL1O9sy2uEbniqp9Kk6bu/ojW
-	 nWye97QN8JeXv3f7ZTgRTlswS/J9lwL/Puvf+jzRzTIWBqxlkEKydao1w3nrINa/rQ
-	 qQ19sbnfolS+/sYJXbprbG/fU3P6kTXtv2tJXfLktbrKFxCcwbcPSk3mhuG+69u/Bf
-	 q06gu1KIHFRHTqD/RqTxh+X+xTPGjz0rghEuFwRE1bdCZ8L6oToFV1W6k9YcNOqLSp
-	 +7XtYutKxGM9HOdA9WKgcOvZnD4LRRlUNt5h5Mu41Y/RDs9tcXV59kVD+7z0bwJVpi
-	 66jcOtqF+Ew5Q==
+	s=k20201202; t=1776429979;
+	bh=nDVq5uxP1KAWX6hBUY8jiqpUC+dmduipcQvQoFbJMng=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nx0dFhSrT4gBZFmbWcGyBgmtjhHfGCbmaoCMWXpJOuviLnyTgFx58d2QiV+OALJ4n
+	 IVyGo00dVvIRPXXzBbuIavLAtSKjFG3SQOHYHQoeUWpjD11xWY2YT2MQP0nefGJ2nC
+	 nzHANJrLAOL3qbenGnY9WYuca43XFoivWWSN/kChKfwcoKbiQw6rOxEX2PqdLRRLll
+	 AyEO0rq512yJyXnA+RtDW4WC2JHaZacU6T99NcMcBZc0bYlheGhLhUCtktsl6iYOaG
+	 JjrWcQBqI+QnfD16/VgpXOjVL/mYgOyijZKOAyOa0W/6qcEu5QQqmTtb9A/2oTupKI
+	 FRXvWmv5dzQYg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wDiaO-0000000CRo5-2GOT;
-	Fri, 17 Apr 2026 12:46:16 +0000
+	id 1wDiaO-0000000CRo5-3qyd;
+	Fri, 17 Apr 2026 12:46:17 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -39,10 +40,12 @@ Cc: Deepanshu Kartikey <kartikey406@gmail.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 0/4] KVM: arm64: Don't perform vgic-v2 lazy init on timer injection
-Date: Fri, 17 Apr 2026 13:46:08 +0100
-Message-ID: <20260417124612.2770268-1-maz@kernel.org>
+Subject: [PATCH 2/4] KVM: arm64: timer: Kill the per-timer level cache
+Date: Fri, 17 Apr 2026 13:46:10 +0100
+Message-ID: <20260417124612.2770268-3-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260417124612.2770268-1-maz@kernel.org>
+References: <20260417124612.2770268-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,73 +58,119 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Syzkaller reported an interesting case [1] showing vgic-v2 being
-initialised via the lazy init path on injection from the timer reset
-path. Yes, that's convoluted. This resulted in a splat as we could
-end-up scheduling in an atomic context.
+The timer code makes use of a per-timer irq level cache, which
+looks like a very minor optimisation to avoid taking a lock upon
+updating the GIC view of the interrupt when it is unchanged from
+the previous state.
 
-Deepanshu proposed [2] a simple fix that unconditionally init'd the
-GIC on vcpu reset. While this would do the trick, this is only
-papering over the real issue.
+This is coming in the way of more important correctness issues,
+so get rid of the cache, which simplifies a couple of minor things.
 
-The situation is that we currently have three ways to lazily init the
-vgic:
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arch_timer.c  | 18 +++++++++---------
+ include/kvm/arm_arch_timer.h |  5 -----
+ 2 files changed, 9 insertions(+), 14 deletions(-)
 
-- on first run of any vcpu
-- on access from userspace injecting an interrupt
-- on access from the kernel injecting an interrupt
-
-The splat is caused by this last one, and it is interesting to drill
-into why we end-up with it.
-
-All guest interrupts generated by the kernel itself are level. Which
-means that they cannot be lost unless the generating device is being
-interacted with. So there shouldn't be any need to initialise the vgic
-for that reason, and we could defer it to the first run of a vcpu.
-
-However, the timers are extra special. Each one has its own little
-single bit cache that contains the last level set. And as long as the
-level doesn't change, the timer code doesn't call into the interrupt
-injection code, making it totally optimal.
-
-A side effect of this optimisation is that the level interrupt
-effectively becomes an edge (only the changes are reported). Which
-means that the interrupt must be recorded in the vgic, or it be
-forever lost. Hence the need to eagerly initialise the GIC at
-injection time.
-
-But frankly, there isn't much to gain by having this cache. All we
-avoid is a lookup, an uncontended lock, and an early return. The other
-interrupts generated by the kernel (PMU, vgic MI) don't have such
-cache, and nobody has complained yet.
-
-So let's drop this cache, and remove the vgic init from the kernel
-injection. If someone shouts about a loss of performance, then let's
-improve the interrupt injection itself, and not paper over it. Also
-use this opportunity to repaint kvm_timer_should_fire() as
-kvm_timer_pending(), something that is way less ambiguous.
-
-Patches on top of kvmarm-7.1. The reproducer didn't trigger on my
-boxes, and syzkaller is down at the moment. But nothing bad happened
-in my testing...
-
-[1] https://syzkaller.appspot.com/bug?extid=12b178b7c756664d2518
-[2] https://lore.kernel.org/r/20260412080437.38782-1-kartikey406@gmail.com
-
-Marc Zyngier (4):
-  KVM: arm64: timer: Repaint kvm_timer_should_fire() to
-    kvm_timer_pending()
-  KVM: arm64: timer: Kill the per-timer level cache
-  KVM: arm64: vgic-v2: Force vgic init on injection from userspace
-  KVM: arm64: vgic-v2: Don't init the vgic on in-kernel interrupt
-    injection
-
- arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++------------------
- arch/arm64/kvm/arm.c         |  7 ++++++
- arch/arm64/kvm/vgic/vgic.c   |  6 ++---
- include/kvm/arm_arch_timer.h |  5 ----
- 4 files changed, 31 insertions(+), 31 deletions(-)
-
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index d6802fc87e085..fdc1afff06340 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -446,9 +446,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ {
+ 	kvm_timer_update_status(timer_ctx, new_level);
+ 
+-	timer_ctx->irq.level = new_level;
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_irq(timer_ctx),
+-				   timer_ctx->irq.level);
++				   new_level);
+ 
+ 	if (userspace_irqchip(vcpu->kvm))
+ 		return;
+@@ -466,7 +465,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 
+ 	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+ 			    timer_irq(timer_ctx),
+-			    timer_ctx->irq.level,
++			    new_level,
+ 			    timer_ctx);
+ }
+ 
+@@ -477,8 +476,7 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 
+ 	trace_kvm_timer_emulate(ctx, pending);
+ 
+-	if (pending != ctx->irq.level)
+-		kvm_timer_update_irq(timer_context_to_vcpu(ctx), pending, ctx);
++	kvm_timer_update_irq(timer_context_to_vcpu(ctx), pending, ctx);
+ 
+ 	kvm_timer_update_status(ctx, pending);
+ 
+@@ -677,6 +675,7 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
+ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ {
+ 	struct kvm_vcpu *vcpu = timer_context_to_vcpu(ctx);
++	bool pending = kvm_timer_pending(ctx);
+ 	bool phys_active = false;
+ 
+ 	/*
+@@ -685,12 +684,12 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ 	 * this point and the register restoration, we'll take the
+ 	 * interrupt anyway.
+ 	 */
+-	kvm_timer_update_irq(vcpu, kvm_timer_pending(ctx), ctx);
++	kvm_timer_update_irq(vcpu, pending, ctx);
+ 
+ 	if (irqchip_in_kernel(vcpu->kvm))
+ 		phys_active = kvm_vgic_map_is_active(vcpu, timer_irq(ctx));
+ 
+-	phys_active |= ctx->irq.level;
++	phys_active |= pending;
+ 	phys_active |= vgic_is_v5(vcpu->kvm);
+ 
+ 	set_timer_irq_phys_active(ctx, phys_active);
+@@ -699,6 +698,7 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++	bool pending = kvm_timer_pending(vtimer);
+ 
+ 	/*
+ 	 * Update the timer output so that it is likely to match the
+@@ -706,7 +706,7 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+ 	 * this point and the register restoration, we'll take the
+ 	 * interrupt anyway.
+ 	 */
+-	kvm_timer_update_irq(vcpu, kvm_timer_pending(vtimer), vtimer);
++	kvm_timer_update_irq(vcpu, pending, vtimer);
+ 
+ 	/*
+ 	 * When using a userspace irqchip with the architected timers and a
+@@ -718,7 +718,7 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+ 	 * being de-asserted, we unmask the interrupt again so that we exit
+ 	 * from the guest when the timer fires.
+ 	 */
+-	if (vtimer->irq.level)
++	if (pending)
+ 		disable_percpu_irq(host_vtimer_irq);
+ 	else
+ 		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index bf8cc9589bd09..2c26d457c3510 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -66,11 +66,6 @@ struct arch_timer_context {
+ 	 */
+ 	bool				loaded;
+ 
+-	/* Output level of the timer IRQ */
+-	struct {
+-		bool			level;
+-	} irq;
+-
+ 	/* Who am I? */
+ 	enum kvm_arch_timers		timer_id;
+ 
 -- 
 2.47.3
 
