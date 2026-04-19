@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C831126A1AC;
-	Sun, 19 Apr 2026 14:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46137D12E;
+	Sun, 19 Apr 2026 14:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776608013; cv=none; b=AiwM8LiN+uNkuvjCWzqS8cn06Ti4kpUsVNgIfHjR91rjsUoOvEIii75VapOGV/KBj2nFwS2M/B6upq4wjJ+9jF83qH31shLAYeEooVrxJYIo7wp/vhUYbSqCoDXzKL+mguVYl58AgtMoP4Fl7jdDTymDzOLEyH0s0WwjCPBwClY=
+	t=1776609296; cv=none; b=pqRES3oC8IMXTy6pTB5dlYk/FwUeghCKKHXH7TcoKNtzCuCfIYajgrr5oHpWtclGBwYVS8RCh9Pgpix+RmCsfJyPuS7BobcUJEtfiXUgt9+XpkxZlg/i3ih8MK2sRWf4GaNF69ygpXsQq52TfUc75EUHjV3hrG4ei5U6fk23+JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776608013; c=relaxed/simple;
-	bh=J/e8EdFsJdLULkm3fAcZKJUFyqjPokX/d8LV5xp1w58=;
+	s=arc-20240116; t=1776609296; c=relaxed/simple;
+	bh=OPx8O9OYxVipA24HAer+gnhYq6XtrF4PKMKTsL1iRy0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sZIvAQXIv0oAlMTKKNJFIRs/2Jc07YYWhJiyQ2pKiudZ+uc6zg5tksgYjwSnC2iwJUcOx+ReO0P9xaTqyQrmOISm2VSn/S+WwO+sLP1zmUIBwNbMmeqEFwvMgpKYdEZqu/Tc4YieZINtOluOlax/amac2ob48JUlnzw0X3PzxTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dcrbFSeT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=l7NREmxGed28bKiFJavQXMFFb/5z73cMWjDFXNJtwVXIwvZKFqlP97iAOErDUDU5qYUrSEtqIXIDd6QGJxtOm9DcgNcwOHZy+Npc+ZfuRyFATtghKvbSrjRlmljkR2EGXSNv7+KvLKeozToSge6lf/LkhHe0eg3S9tilUBRL+6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLd5NYX0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dcrbFSeT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60CA5C2BCAF;
-	Sun, 19 Apr 2026 14:13:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLd5NYX0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6572C2BCAF;
+	Sun, 19 Apr 2026 14:34:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776608013;
-	bh=J/e8EdFsJdLULkm3fAcZKJUFyqjPokX/d8LV5xp1w58=;
+	s=k20201202; t=1776609295;
+	bh=OPx8O9OYxVipA24HAer+gnhYq6XtrF4PKMKTsL1iRy0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dcrbFSeToFcTNl+gLAFJPT+Ac/9pC7E3rANYHIaDFc+xDgsrX9v1JenvIozkGiMeI
-	 ZfHfWp4Sy585KEsbhCKuQXeT4Az5bkbEsiyNcuFNeIKTAjcwcu+IJICmjh3EaW9Lw3
-	 gZ3oNsGxHsI3DkPPF+AHx/U5mQKMj4EfFSz46CkDvoZrOAQZll3zt4oNgh5jIvef/s
-	 R/o4gO8StrAg8QrM+5TRoBUITO5zRtf0d28xuUkyF7MkNsw2enDsx6dfh4neuNeFUf
-	 qzb8mxlCEMcHV3BXf6sENDQXii/BcMx0/bwlBgxTWBYQO3EHtA7U4YlBSeYBynhiCe
-	 XHU1sNGU4ZLQQ==
+	b=aLd5NYX01/n8EbtB7Djb5saIze5EfciDiFDuH/LEdD6cwKVZmN1vFFCV2HNdgzomp
+	 KtQWGmVSJpSHpBEnHpr1Q2QZCkk5OYMYueK5IlZJN6fUxQ7QS0lgOVKo7t5y0aryjJ
+	 4XftYT8LHyK6vJhmHelm2hns2vFlgAPcu+z0kRFhK2pt/A3NHyCD6B4P79T5p4tY30
+	 G4RTIrb0Bm2N/kOBY9gJC2wbz9uIgMmnTUIJ2s4dFIisoHhCvb3rQSUSxXIkUlrU0o
+	 517Rm6iChYR1OEuD+oKPtS1BSJoXRRqdV7fMp3p314hI1TegwoxbiI0TEw8sahJToe
+	 LhER4l3ELHIcQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wEStu-0000000Cq78-36gR;
-	Sun, 19 Apr 2026 14:13:30 +0000
-Date: Sun, 19 Apr 2026 15:13:30 +0100
-Message-ID: <87o6jfavhx.wl-maz@kernel.org>
+	id 1wETEb-0000000CqLm-1aIO;
+	Sun, 19 Apr 2026 14:34:53 +0000
+Date: Sun, 19 Apr 2026 15:34:52 +0100
+Message-ID: <87mryzauib.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 Cc: Oliver Upton <oupton@kernel.org>,
@@ -55,10 +55,10 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v7 1/4] KVM: arm64: PMU: Add kvm_pmu_enabled_counter_mask()
-In-Reply-To: <20260418-hybrid-v7-1-2bf39ad009bf@rsg.ci.i.u-tokyo.ac.jp>
+Subject: Re: [PATCH v7 2/4] KVM: arm64: PMU: Protect the list of PMUs with RCU
+In-Reply-To: <20260418-hybrid-v7-2-2bf39ad009bf@rsg.ci.i.u-tokyo.ac.jp>
 References: <20260418-hybrid-v7-0-2bf39ad009bf@rsg.ci.i.u-tokyo.ac.jp>
-	<20260418-hybrid-v7-1-2bf39ad009bf@rsg.ci.i.u-tokyo.ac.jp>
+	<20260418-hybrid-v7-2-2bf39ad009bf@rsg.ci.i.u-tokyo.ac.jp>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,18 +74,42 @@ X-SA-Exim-Rcpt-To: odaki@rsg.ci.i.u-tokyo.ac.jp, oupton@kernel.org, joey.gouly@a
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 18 Apr 2026 09:14:23 +0100,
+On Sat, 18 Apr 2026 09:14:24 +0100,
 Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
 > 
-> This function will be useful to enumerate enabled counters.
+> Convert the list of PMUs to a RCU-protected list that has primitives to
+> avoid read-side contention.
+> 
+> Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 59ec96e09321..ef5140bbfe28 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -7,9 +7,9 @@
+>  #include <linux/cpu.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> -#include <linux/list.h>
+>  #include <linux/perf_event.h>
+>  #include <linux/perf/arm_pmu.h>
+> +#include <linux/rculist.h>
+>  #include <linux/uaccess.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+> @@ -26,7 +26,6 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc);
+>  
+>  bool kvm_supports_guest_pmuv3(void)
+>  {
+> -	guard(mutex)(&arm_pmus_lock);
+>  	return !list_empty(&arm_pmus);
 
-Consider expanding this commit message a bit. Something along the
-lines of:
-
-"Add kvm_pmu_enabled_counter_mask() as an accessor returning a 64bit
- mask of the counters enabled on a given vcpu.
-
- This will eventually be useful to iterate over the counters."
+Please read include/linux/rculist.h and the discussion about the
+interaction of list_empty() with RCU-protected lists. How about using
+list_first_or_null_rcu() for peace of mind?
 
 Thanks,
 
