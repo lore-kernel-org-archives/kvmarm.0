@@ -1,137 +1,131 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6CB2BFC85
-	for <kvmarm@lists.linux.dev>; Sat, 18 Apr 2026 10:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5727528002B;
+	Sun, 19 Apr 2026 10:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776508478; cv=none; b=kk7SdrJbPgtb1lnrpOX63ikVDnoP63y7y8gMOXMfPd08isaUTXrDgGc0LfMDwMYW43sC3W/qIcbX8OSl+w0pRu1hx6ITZcmhYNWJ1k4emC5Eq2zPjXZYh3cCtD8JxC+4C0EH7xwThTESXZLi5Ysf9HsRzjaMjMdkpeR4thxjXew=
+	t=1776595281; cv=none; b=YFzLvyjUEkVdSw4yMKJAOTgC4otMK7nD0eX7MaIMU+/MHrHkJUe2IeR+bsts9zF+v/V4iJSLRBwmig+mlF9jHgqQyALf6WCDcsmu3fUDN+lyXdC6SW5bop6y8bOOghGfoyKt9s20oHTSqo+LGPInUcv/TiUOuk4Xj9CPVu4Gdm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776508478; c=relaxed/simple;
-	bh=Ciycx8QqHb67sqchL+YA+/lrYPi38l87mnERhghqxMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BP85fCFjVorriVEb8d+Mpr/jEAROIu7v9vctCxmPCBGXQRlO444V5MW7X64GGdXQcACk6ASrMivVwb3XW2OPbtlL7Dk0G3T5HiEGfOwWNgVO7cFdDUjrMwVQUjkhHd7k9s9EczmABsT9PA1WNxaXoMRO6Qj5ff02WwmrAXBPfVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JKK5K+Om; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776595281; c=relaxed/simple;
+	bh=LAIQFEbnaUquFHk2b6GIMNU7b8Bu+5PRFwtbx+UqY0o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fHIcwm+LwpdGsE2EgEpsoTDWplsW97lAtB1MFAKJiiPFlkQehWZ1yoyKivPlk2AfMsozzeIdnxP8Ly2I267mEKgGGXyZZ5svxvwTb41aopRNVycbl7ss3sqi0VPw2DBRcpHd88W2lJL29sqMrcYgiI6Lq4soZNQst0N2sTYOE5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gB0CKlBy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JKK5K+Om"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5A601764;
-	Sat, 18 Apr 2026 03:34:29 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C27643F7D8;
-	Sat, 18 Apr 2026 03:34:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776508475; bh=Ciycx8QqHb67sqchL+YA+/lrYPi38l87mnERhghqxMs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JKK5K+OmEERf3Ey1f9imniEVj3Xa2H4WCBBD0cVwO/iRQ6G1M1uI03ZJaaDRNbCP2
-	 2QWiZECceul4y+JU1g5Jm+oLecljKqseZJpgPCKktH2oemMRsQWUFqaKqXnNEpzjBQ
-	 e8jdnRcY1c4a2J1f5NY2s5/CXyCqNGfk9zY9/IS4=
-Date: Sat, 18 Apr 2026 11:34:30 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gB0CKlBy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7CF6C2BCB7;
+	Sun, 19 Apr 2026 10:41:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776595280;
+	bh=LAIQFEbnaUquFHk2b6GIMNU7b8Bu+5PRFwtbx+UqY0o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gB0CKlByXWXs8jyP6JohfSBJudqFkFOMTl5zUyKA+qzXWnnJiWQ1bQJdiIFrtxGvL
+	 34bx74gukoDmNYcCm9NOUSGFjZo1mZUBAcNB3XGEpc4Xho2+e0ZMpDS8bYpskzNDCc
+	 00UBjh75dX6I1N2lOYCzAqZFaD3TFSEbd+geF5UyWADAnjRjqqQjuKSlKD7dIkO2sj
+	 1hhSWRO+FOyO38e8840rl/lHtGhixcUJYi/ehKfsSZfRDYHrD4R4dVT0uJQkT1XMgI
+	 eli3Nba4lqpuNzE40Cr8t3TdCjgcOytWiFQxE7cyKRgBQufFZdjgiOmL3epkRfyl3N
+	 TL6wsRl7bqC+w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wEPaY-0000000Cocy-0x2N;
+	Sun, 19 Apr 2026 10:41:18 +0000
+Date: Sun, 19 Apr 2026 11:41:17 +0100
+Message-ID: <87pl3vb5bm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
- initailise ffa driver
-Message-ID: <aeNeNjfO7i128TIP@e129823.arm.com>
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	zohar@linux.ibm.com,
+	roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com,
+	peterhuewe@gmx.de,
+	jarkko@kernel.org,
+	jgg@ziepe.ca,
+	sudeep.holla@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when initailise ffa driver
+In-Reply-To: <aeNeNjfO7i128TIP@e129823.arm.com>
 References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
- <20260417175759.3191279-5-yeoreum.yun@arm.com>
- <87se8sbozv.wl-maz@kernel.org>
+	<20260417175759.3191279-5-yeoreum.yun@arm.com>
+	<87se8sbozv.wl-maz@kernel.org>
+	<aeNeNjfO7i128TIP@e129823.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87se8sbozv.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+On Sat, 18 Apr 2026 11:34:30 +0100,
+Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+> 
+> > > @@ -2035,6 +2037,16 @@ static int __init ffa_init(void)
+> > >  	u32 buf_sz;
+> > >  	size_t rxtx_bufsz = SZ_4K;
+> > >
+> > > +	/*
+> > > +	 * When pKVM is enabled, the FF-A driver must be initialized
+> > > +	 * after pKVM initialization. Otherwise, pKVM cannot negotiate
+> > > +	 * the FF-A version or obtain RX/TX buffer information,
+> > > +	 * which leads to failures in FF-A calls.
+> > > +	 */
+> > > +	if (IS_ENABLED(CONFIG_KVM) && is_protected_kvm_enabled() &&
+> > > +	    !is_kvm_arm_initialised())
+> > > +		return -EPROBE_DEFER;
+> > > +
+> >
+> > That's still fundamentally wrong: pkvm is not ready until
+> > finalize_pkvm() has finished, and that's not indicated by
+> > is_kvm_arm_initialised().
+> 
+> Thanks. I miss the TSC bit set in here.
 
-> On Fri, 17 Apr 2026 18:57:59 +0100,
-> Yeoreum Yun <yeoreum.yun@arm.com> wrote:
-> >
-> > When pKVM is enabled, the FF-A driver must be initialized after pKVM.
-> > Otherwise, pKVM cannot negotiate the FF-A version or
-> > obtain RX/TX buffer information, leading to failures in FF-A calls.
-> >
-> > During FF-A driver initialization, check whether pKVM has been initialized.
-> > If not, defer probing of the FF-A driver.
-> >
-> > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> > ---
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  drivers/firmware/arm_ffa/driver.c | 12 ++++++++++++
-> >  2 files changed, 13 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 410ffd41fd73..0f517b1c05cd 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -119,6 +119,7 @@ bool is_kvm_arm_initialised(void)
-> >  {
-> >  	return kvm_arm_initialised;
-> >  }
-> > +EXPORT_SYMBOL(is_kvm_arm_initialised);
->
-> EXPORT_SYMBOL_GPL(), please.
+That's the least of the problems. None of the infrastructure is in
+place at this stage...
 
-Okay.
+> IMHO, I'd like to make an new state check function --
+> is_pkvm_arm_initialised() so that ff-a driver to know whether
+> pkvm is initialised.
 
->
-> >
-> >  int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
-> >  {
-> > diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
-> > index 02c76ac1570b..2647d6554afd 100644
-> > --- a/drivers/firmware/arm_ffa/driver.c
-> > +++ b/drivers/firmware/arm_ffa/driver.c
-> > @@ -42,6 +42,8 @@
-> >  #include <linux/uuid.h>
-> >  #include <linux/xarray.h>
-> >
-> > +#include <asm/virt.h>
-> > +
-> >  #include "common.h"
-> >
-> >  #define FFA_DRIVER_VERSION	FFA_VERSION_1_2
-> > @@ -2035,6 +2037,16 @@ static int __init ffa_init(void)
-> >  	u32 buf_sz;
-> >  	size_t rxtx_bufsz = SZ_4K;
-> >
-> > +	/*
-> > +	 * When pKVM is enabled, the FF-A driver must be initialized
-> > +	 * after pKVM initialization. Otherwise, pKVM cannot negotiate
-> > +	 * the FF-A version or obtain RX/TX buffer information,
-> > +	 * which leads to failures in FF-A calls.
-> > +	 */
-> > +	if (IS_ENABLED(CONFIG_KVM) && is_protected_kvm_enabled() &&
-> > +	    !is_kvm_arm_initialised())
-> > +		return -EPROBE_DEFER;
-> > +
->
-> That's still fundamentally wrong: pkvm is not ready until
-> finalize_pkvm() has finished, and that's not indicated by
-> is_kvm_arm_initialised().
+Doesn't sound great, TBH.
 
-Thanks. I miss the TSC bit set in here.
-IMHO, I'd like to make an new state check function --
-is_pkvm_arm_initialised() so that ff-a driver to know whether
-pkvm is initialised.
+> or any other suggestion?
 
-or any other suggestion?
+Instead of adding more esoteric predicates, I'd rather you build on an
+existing infrastructure. You have a dependency on KVM, use something
+that is designed to enforce dependencies. Device links spring to mind
+as something designed for that.
 
-Thanks.
+Can you look into enabling this for KVM? If that's possible, then it
+should be easy enough to delay the actual KVM registration after pKVM
+is finalised.
 
---
-Sincerely,
-Yeoreum Yun
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
