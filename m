@@ -1,138 +1,139 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1F437AA83
-	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 17:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7D23845D1
+	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 20:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776704662; cv=none; b=QHLbIOFVZwlScEa1uhC5D1hQYjNq13Sbn2F6u4DtOaeThw3CxytyBvxRThESlePar5JNEzhHZ3MRsPcrW11xwASSCk2f4SWHo7yX8fyA9oEjVBNHx929nQBMXeKdZmnp50S6pktnEi5E3HkbbcoHAioqL4CP7aCwrcf1Fb1Qo+U=
+	t=1776715585; cv=none; b=suc226LgGtIeb6Q9zdGz/Cro2epgWz2OiEkWuj31pzjZoEewNQMZTzkv9e6tDQRgV1bgQppIWcRMnL2UVbsZwjyi0+oCu8icJjCvFm6jySN4PWzvq42R7PWpINFPl72NIbXDf6cFS4ASfiq+bQ+N+7sElVIMNeFix2n+SQcmAco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776704662; c=relaxed/simple;
-	bh=yRc6tzbhIjqa28m1qmW4UX0qWCRaHh+34fkYVAyFgQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lW1mIIVi3snIufcIgcu1nxjtpEPotr3zSSV8zgy48alExUyT5jyTq5yQ6rTyrppphZQWsQPpiTdUl4OYD7IMMFsd5+2z40DQ6dmutwsH20XGdeNSeHqCmJqzGn1znmjg81HOUWRcFxvqtWdciRw+JwKji0msZmyOjM5ZQ6pmXMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Wacy9S/Z; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776715585; c=relaxed/simple;
+	bh=b89JOdWc2tHnz0JBm0XSYjGwA2IuoPpOvjwTZ1/Lux0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bkrXD82KPdILc8QX7TCP2uqm4QzkbUXEyMRPI388AClUIh6BFTzHBWONWaESkOBMf9tyqf+8BRK8AKijadTEXxRY29HjzwP/hKeBQdZr8bQkPh1wObWFXlMZmwQ1P7lkdBzdstfOe4OXUGw5P2tu5mnlMhMaVUkue8fE0kwe8uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YiOg2IZw; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Wacy9S/Z"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B54D01516;
-	Mon, 20 Apr 2026 10:04:13 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 50C183F915;
-	Mon, 20 Apr 2026 10:04:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776704659; bh=yRc6tzbhIjqa28m1qmW4UX0qWCRaHh+34fkYVAyFgQw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wacy9S/ZPt9Y7v/ct+Hb+QPydm3fjVRQplB9QxXGOsLTBekpTPqnsaMca0kamuoEW
-	 SGQ6QONwRmBlO8d/cVwMwpP6TU7OmYw273xBR7Zj7hU5thdu5jlLJAp8INH5VzhLz9
-	 ijzBSlASATvCse9gHcojqyT85ag+98biT096gBAc=
-Date: Mon, 20 Apr 2026 18:04:12 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Sudeep Holla <sudeep.holla@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com,
-	sebastianene@google.com
-Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
- initailise ffa driver
-Message-ID: <aeZcjPaIiCHYVwfd@e129823.arm.com>
-References: <20260417175759.3191279-5-yeoreum.yun@arm.com>
- <87se8sbozv.wl-maz@kernel.org>
- <aeNeNjfO7i128TIP@e129823.arm.com>
- <87pl3vb5bm.wl-maz@kernel.org>
- <aeS4rAeVQ0yJIPYw@e129823.arm.com>
- <aeXp7WSqpXNytNPG@willie-the-truck>
- <aeXxCe4hdizdQbFD@e129823.arm.com>
- <aeYDMEgWdt8F9jWb@willie-the-truck>
- <aeYGeojpqcYAN5++@e129823.arm.com>
- <20260420-olivine-cobra-of-brotherhood-bfd4bd@sudeepholla>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YiOg2IZw"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-358e425c261so3880671a91.3
+        for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 13:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776715583; x=1777320383; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TZxYUqD2nNuvPN56vUHQyfWGRkh1zwfXr7oE1wyS0SA=;
+        b=YiOg2IZwECi4JjZYtAuxAV14MYNvGcVz1aHoE8x+Za/ECgqn1EogsMh3Vtecw2M8FG
+         7jfWfAt2CclzIE0GZe7Il3Jpfg5WFlxqZVrDpsX2HqQFz1/+FsKU7mRFBOsnWsyh1A2U
+         /1Scf2m3+E9WaEMu73LNWrd0yO6CbW6gzX5f4h5uBBJVRqjFp7SqzdmTKyKCcn2YPwwi
+         iH4h7TEgvOGmebZgH92HGH7fVZK7IZbKpWtBQmGvA3yp5bMLs/px80BtGcQeIaIY2D6p
+         hKF86jsPMqLnkOWHXyaOh8CWP/FwFvmCDW7VBrV/4qpH97yEf12HvHVTwL3L5pASIHKD
+         HC9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776715583; x=1777320383;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TZxYUqD2nNuvPN56vUHQyfWGRkh1zwfXr7oE1wyS0SA=;
+        b=HYZQsvUfuUxZXp5DwghtmKe3ClUOOrS+sqUQ7gO5kcqqHqNYvCl2jdbwTMuPzHAeNw
+         C4EtjdVNFKSCD6nUhd3uQwFt/yPyf539GgqeYpgBIfXmBbIn0mmkfaknORZXGsdNh0Eo
+         YqBehXZgzQXjX7SO9OKmtFG6FeMn+amv9ZXCgrfN4RU2fyH5aWKHoP9iB3o+0JMm7uHm
+         7+WZmYeML7APmc1moMA2GvtvB/yV75lAfuCBUgF2t09xKvdF1a0ZJsh4q7V5UcuIfvSL
+         Fp2TdXJNee+z9/j0RmlpW1gabCVTuON7ojBkYh0VNrAN6yQZ4n17aiR3hwsbRg4MqMW6
+         ZWEA==
+X-Forwarded-Encrypted: i=1; AFNElJ/E6CZTrDGFqVDGOxP93jQFEBNPBcjnSSonf2Ms0147lcfrlkDZx8Y+Gs0IvbJ9/YAUISyG67k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz/8w/C56aw0FxMlBGimUYAgIXjC7uvuami2z+JNCyZ7tGK1eVn
+	KjxUJ0UHM7B+TJRhMCZ4+8gAWizcco4g6GBKCs8fDcHGl8Z8abzupFwk8BsKbycunDUpAZo3gE4
+	IbqB/HA==
+X-Received: from pjbkx16.prod.google.com ([2002:a17:90b:2290:b0:35f:c299:a451])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164a:b0:35b:96bb:47ba
+ with SMTP id 98e67ed59e1d1-361404c0ca8mr14786253a91.26.1776715583185; Mon, 20
+ Apr 2026 13:06:23 -0700 (PDT)
+Date: Mon, 20 Apr 2026 13:06:21 -0700
+In-Reply-To: <20260220004223.4168331-2-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260420-olivine-cobra-of-brotherhood-bfd4bd@sudeepholla>
+Mime-Version: 1.0
+References: <20260220004223.4168331-1-dmatlack@google.com> <20260220004223.4168331-2-dmatlack@google.com>
+Message-ID: <aeaHPYwzs0dhwX9-@google.com>
+Subject: Re: [PATCH v2 01/10] KVM: selftests: Use gva_t instead of vm_vaddr_t
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atish.patra@linux.dev>, Bibo Mao <maobibo@loongson.cn>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Colin Ian King <colin.i.king@gmail.com>, David Hildenbrand <david@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, James Houghton <jthoughton@google.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Lisa Wang <wyihan@google.com>, loongarch@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Nutty Liu <nutty.liu@hotmail.com>, 
+	Oliver Upton <oupton@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	"Pratik R. Sampat" <prsampat@amd.com>, Rahul Kumar <rk0006818@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Wu Fei <wu.fei9@sanechips.com.cn>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-> On Mon, Apr 20, 2026 at 11:56:58AM +0100, Yeoreum Yun wrote:
-> > Hi Will,
-> >
-> > > [+Seb for the pKVM FFA bits]
-> > >
-> > > Ah sorry, I mixed up the ordering of 'module_init' vs 'rootfs_initcall'
-> > > and thought you wanted to probe the version earlier. But then I'm still
-> > > confused because, prior to 0e0546eabcd6 ("firmware: arm_ffa: Change
-> > > initcall level of ffa_init() to rootfs_initcall"), ffa_init() was a
-> > > 'device_initcall' which is still called earlier than finalize_pkvm().
-> >
-> > Right, and this is what I missed when writing patch
-> > 0e0546eabcd6 ("firmware: arm_ffa: Change initcall level of ffa_init() to rootfs_initcall").
-> > and it still exists even if it's device call.
-> >
-> > However, rather than changing ffa_init to rootfs_initcall, moving ima_init
-> > to late_initcall_sync is a better approach, as it also addresses similar
-> > issues for TPM devices that do not use FF-A. For this reason,
-> > the FF-A-related changes were reverted.
-> >
-> > As a result, patch 4/4 addresses an issue that existed independently of
-> > 0e0546eabcd6, as you pointed out.
-> >
->
-> I was not fully convinced by commit 0e0546eabcd6 ("firmware: arm_ffa: Change
-> initcall level of ffa_init() to rootfs_initcall"), and I had raised this
-> concern at the time. However, in the absence of a better alternative, we
-> proceeded with merging it.
->
-> My concern remains essentially the same. That change moved the initcall one
-> stage earlier, and now, by introducing `late_initcall_sync()`, we are
-> effectively shifting the dependency issue one stage later instead of resolving
-> it in a more fundamental way. From my perspective, this still relies on
-> adjusting initcall ordering as the primary means of making the dependency
-> work.
->
-> I do not think that is a robust or sustainable approach. Tweaking initcall
-> levels tends to be inherently fragile because it addresses the symptom through
-> sequencing rather than establishing a clear and explicit dependency model.
->
-> I also recall that `finalise_pkvm()` is itself at `device_initcall` level. If
-> that is correct, would this not introduce another ordering issue or at least
-> leave us exposed to similar dependency problems? That is exactly why I remain
-> uneasy about solving this by continuing to move initcalls backward or forward.
->
-> More broadly, the fact that we are revisiting the same class of issue again
-> after such a short time reinforces my concern that this direction is not
-> sufficiently stable. We may revisit it soon after we merge this approach.
+On Fri, Feb 20, 2026, David Matlack wrote:
+> Replace all occurrences of vm_vaddr_t with gva_t to align with KVM code
+> and with the conversion helpers (e.g. addr_gva2hva()). Also replace
+> vm_vaddr in function names with gva to align with the new type name.
 
-I understand your concern about relying on initcall ordering.
+...
 
-However, I think there is an important difference in scope in this case.
-This change primarily affects the IMA subsystem, and the impact is
-largely confined to IMA (at least based on my current understanding).
+> @@ -716,22 +716,22 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+>  void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+>  struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
+>  void vm_populate_vaddr_bitmap(struct kvm_vm *vm);
+> -vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+> -vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+> -vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
+> -			    enum kvm_mem_region_type type);
+> -vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz,
+> -				 vm_vaddr_t vaddr_min,
+> -				 enum kvm_mem_region_type type);
+> -vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
+> -vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm,
+> -				 enum kvm_mem_region_type type);
+> -vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
+> +gva_t gva_unused_gap(struct kvm_vm *vm, size_t sz, gva_t vaddr_min);
+> +gva_t gva_alloc(struct kvm_vm *vm, size_t sz, gva_t vaddr_min);
+> +gva_t __gva_alloc(struct kvm_vm *vm, size_t sz, gva_t vaddr_min,
+> +		  enum kvm_mem_region_type type);
+> +gva_t gva_alloc_shared(struct kvm_vm *vm, size_t sz,
+> +		       gva_t vaddr_min,
+> +		       enum kvm_mem_region_type type);
+> +gva_t gva_alloc_pages(struct kvm_vm *vm, int nr_pages);
+> +gva_t __gva_alloc_page(struct kvm_vm *vm,
+> +		       enum kvm_mem_region_type type);
+> +gva_t gva_alloc_page(struct kvm_vm *vm);
 
-Also, this is not just about FF-A. The issue arises when TPM devices are
-deferred, and IMA does not handle such cases properly. From that
-perspective, moving ima_init() to a later stage is not simply about
-adjusting ordering, but about ensuring that IMA correctly handles its
-dependency on TPM devices.
+The existing vm_vaddr_alloc() and friends are pretty bad names.  gva_alloc() is
+far, far worse.  The APIs aren't just allocation a guest virtual address, they're
+allocating guest physical memory, finding a usable virtual address, and creating
+mappings.
 
-In other words, the goal here is not to align dependencies indirectly
-via initcall levels, but to ensure that IMA is initialized only after
-its required dependencies are ready.
+I don't see any reason to have vaddr or gva in the name.  E.g. malloc() isn't
+virt_malloc().  But I do think they need to be explicitly scoped to KVM, and to
+a VM.  I'll drop API renames from this patch, and rename them to vm_alloc() and
+friends in a separate patch.  Amusingly, that naming scheme will still work if
+"vm" is misconstrued as "virtual memory" instead of "virtual machine".
 
-Regarding pKVM, finalise_pkvm() runs at the device_initcall_sync level.
-Because of this, the FF-A driver needs a reliable way to determine when
-pKVM initialization has completed, rather than relying purely on
-initcall ordering.
+P.S. This is a great example of why I insist on one logical change per patch, with
+judicious exemptions for opportunistic cleanups/changes.  If this has been a
+separate patch, it would have taken me all of two seconds to unwind.  As it was,
+I spent a good 10-15 minutes dealing with this.  In large part because I kept
+making goofs, but that's the whole point: there was no reason to put me in a
+position to make goofs.
 
---
-Sincerely,
-Yeoreum Yun
+The other argument against these sorts of "Also do xyz" add-ons is that of a
+slippery slope.  Why rename these APIs in this patch, but not the myriad vaddr
+variables?  Then after a few "I'll just clean this up too" changes, there's an
+entire series in what is purportedly just a typedef rename.
