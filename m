@@ -1,70 +1,68 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234CD288C96
-	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 14:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38078359A99
+	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 15:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776696453; cv=none; b=AI5aGolgL1oHsKTLjpyVA+lbhfjJIvpGZnGzRzAVGY/NW0XTykbLEmOYkLGqwy+U2XfmkwcbvSBiVOl5dlou0Z97E2D7+kTJp4oiCR6SGvyxzLKdYayASk1HPaCY/YBDv/emVQNBDXo2xFXlR4i5kLg8Ez6xvhUTbAWKXfmxn2c=
+	t=1776697500; cv=none; b=JZM4Bn7Ki1KczyuO4eleoM+Gr7JFq4+2qeXyGnhxjq75icTtKvhFT4pNhk/lgKsxltYOUiZOWVCqS9lLfb9FTZdXhPhKf5AR8Zfhow6LGJ44e0tgePbK275h1j4GhRhsFV6hjfXlBE/1eH+P6bLFwVy8MU1LpBYyB7NgivPup8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776696453; c=relaxed/simple;
-	bh=O7ibaDjJseGlqangzveB9VynH2pKp+LSowkGObgjgio=;
+	s=arc-20240116; t=1776697500; c=relaxed/simple;
+	bh=I53+Jlg3kdlGg/Rj+8bJhpj0apdT2P0ZlMXr6W2UZ4E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nZOnfnpwyKh/WW0xDgR1Sd6+/1k/MC5jj+1Puxa24OR9bZKQ4OkHdwcEZ0f98mSoEhueJfmnxNe9KmETOKWPApispxTNh0/V8Gqtja2CHnMGmNNIGkizFe8Qmj5E5OV5mp7C9o4MT36X6S5q2lqPMMaZd1g1R3kPVWy8ZDs6sQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=L+B9r/qO; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=PVKoNNbWBJZ4lmE2EZlwSHAG+BWj7W4j2bwkoEuyZs0+uqioc87G9yUrOYEoKIgjzzbsE6dnsMeI1efGY6jSWiSvWDzP36U0Cc0DCRbqsLQRdPVXLb8VfPqY8X317N4SQJuEbk71dKW9v3tkNea7dIS8HK3TSzPdxzYtf4ckva4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BiT8otpw; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="L+B9r/qO"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BiT8otpw"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F11CF1516;
-	Mon, 20 Apr 2026 07:47:24 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 015FF16F2;
+	Mon, 20 Apr 2026 08:04:53 -0700 (PDT)
 Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1833F3F7B4;
-	Mon, 20 Apr 2026 07:47:26 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DDA93F915;
+	Mon, 20 Apr 2026 08:04:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776696450; bh=O7ibaDjJseGlqangzveB9VynH2pKp+LSowkGObgjgio=;
+	t=1776697498; bh=I53+Jlg3kdlGg/Rj+8bJhpj0apdT2P0ZlMXr6W2UZ4E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L+B9r/qOOHsKRGrLzuIhK2+5vpLf3w4qwXoOl9kCQvqnkOWQ5+Zow32TpfNVrDtPG
-	 860JlQ9vReiyPUZlJYDMzVQWo2F/FpENb8Gp7LCFkEeSAK4iMW59tInMBLR8WNvil6
-	 Yj7yn1g03HiLuPc/jYd1hNYsr0IXxSoqwG7QNhpI=
-Date: Mon, 20 Apr 2026 15:47:24 +0100
+	b=BiT8otpw/0GZmJVXuQDMx/xztcku9UYtGTjLlIS1HUYrELacmhj9huNRj0gz4l4Je
+	 CuFVeQ8NnZ1FDFu7n0gS7HszvrOGrnamm6HHA/Mi6oMRnWYXF3I6pixSugO2Qa1Yr9
+	 tZKmNoQt0x8S2BzUYHNR4G/NgdTMfbieI95nvFZg=
+Date: Mon, 20 Apr 2026 16:04:51 +0100
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: Sebastian Ene <sebastianene@google.com>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
+Cc: Marc Zyngier <maz@kernel.org>, linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
 	zohar@linux.ibm.com, roberto.sassu@huawei.com,
 	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
 	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	catalin.marinas@arm.com, will@kernel.org
 Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
  initailise ffa driver
-Message-ID: <aeY8fNhtuVzL2X9a@e129823.arm.com>
+Message-ID: <aeZAkzdUd+A99rbF@e129823.arm.com>
 References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
  <20260417175759.3191279-5-yeoreum.yun@arm.com>
  <aeYbdmshGZJ4GhXd@google.com>
- <aeYjiaPtAl7SMVkL@e129823.arm.com>
- <aeYypF4lv6LMH2ch@google.com>
+ <86mryx2408.wl-maz@kernel.org>
+ <aeY2M3v97c00JjFe@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aeYypF4lv6LMH2ch@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aeY2M3v97c00JjFe@google.com>
 
-Hi Sebastian,
-
-> On Mon, Apr 20, 2026 at 02:00:57PM +0100, Yeoreum Yun wrote:
->
-> Hi,
->
-> >
-> > Hi Sebastian,
+On Mon, Apr 20, 2026 at 02:20:35PM +0000, Sebastian Ene wrote:
+> On Mon, Apr 20, 2026 at 01:46:47PM +0100, Marc Zyngier wrote:
+> > On Mon, 20 Apr 2026 13:32:32 +0100,
+> > Sebastian Ene <sebastianene@google.com> wrote:
+> > >
 > > > On Fri, Apr 17, 2026 at 06:57:59PM +0100, Yeoreum Yun wrote:
 > > >
 > > > Hello Yeoreum,
@@ -77,8 +75,13 @@ Hi Sebastian,
 > > > At the moment this already happens after you move back ffa_init() to
 > > > device_initcall().
 > >
-> > How? the kvm_arm_init() is device_initcall() if both built as built-in.
+> > But relying on this sort of ordering is just making things more
+> > fragile.
 > >
+>
+> Thanks for letting me know. Since this is not a solid construct we will have
+> to change the driver init code to come after pKVM in this case.
+>
 > > >
 > > > >
 > > > > During FF-A driver initialization, check whether pKVM has been initialized.
@@ -90,42 +93,29 @@ Hi Sebastian,
 > > > do the proxy initialization. The ARM-FFA driver comes after it (since
 > > > pKVM is arch specific code). We don't have to call finalize_pkvm(..) to
 > > > be able to handle smc(FF-A) calls in the hyp-proxy.
-> > >
 > >
-> > As Marc said, the before finalised_pkvm(), smc wouldn't be trapped
-> > to pKVM. IOW, in case when both built as built-in,
->
-> They are, I tested before replying to this thread. The HCR_EL2 is
-> 0x480080000 so HCR_EL2 TSC bit is set so SMC/FF-A and trapping is enabled.
-
-Oh. I've missed cpu_init_hyp_mode() sets up HCR_EL2. So you're right.
-Thanks to correct me ;)
-
->
-> In __pkvm_prot_finalize it sets the HCR_VM bit which enables stage-2 and
-> then write the HCR_EL2 from params->hcr_el2. However I wasn't sure that
-> this is seen as a 'hack' and not expected to work.
->
-> > if ffa_init() is called before finalised_pkvm(),
-> > it couldn't proxy the FFA_VERSION, FFA_RXTX_MAP and FFA_PARTITION_INFO_GET
-> > called by ffa_init().
+> > You do. Without the finalisation, SMCs are not trapped by EL2.
 > >
-> > How can you gurantee hyp_ffa_init() which is called by kvm_arm_init()
-> > comes first even kvm_arm_init() and ffa_init() are on device_initcall?
+> > And even if it did, relying on such hack is just wrong.
 > >
 >
-> While they are both on device_initcall, the only difference is that
-> kvm_arm_init is arch code which appears before the driver/ code in the
-> linker. That's why Marc said it is not a solid construct to rely on
-> this.
+> That makes it an even stronger argument to move the driver init at a
+> later stage. I was relying on this to trap early ff-a when the
+> ARM FF-A driver was used.
 
-Then I think the origin one -- just check kvm_arm_initialised
-is enough to check in ffa_driver. since I misunderstood TSC bit
-is setup after finalised_pkvm().
 
-or Am I missing something?
+I don’t think moving the FF-A driver initialization to a later stage is
+a viable solution. For example, even if it is moved to device_initcall_sync,
+it still relies on fragile ordering.
 
-Thanks.
+Similarly, moving it to late_initcall is problematic.
+Since deferred_probe_initcall() runs at the same level, if it is invoked first,
+devices that depend on FF-A (e.g. tpm_ffa_crb) may not be probed correctly,
+leading to deferred devices not being handled properly.
+
+Therefore, the FF-A driver should be able to detect when pKVM has been
+initialized and perform its initialization accordingly otherwise,
+just relying on the trap after kvm_arm_initialised.
 
 --
 Sincerely,
