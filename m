@@ -1,159 +1,237 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97EE39A809
-	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 10:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08F438A733;
+	Mon, 20 Apr 2026 10:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776682629; cv=none; b=EQybMJudmgI6lFPBtE0vwhroeESfqKnMPmqfcOlbcjujVDHKg1b+n5ShM5WfTH7WSCKj2qd6+4nlNSt2joPew1Et+9dGwldbg9n8N4EGXeLPeVtUIl2615YfRZrOxMsmDAh3/Ta+aIFr2XjSZ8BX5NjnPjfoPUjVVlS7L+BKMdE=
+	t=1776682661; cv=none; b=mxUZoL4IOtuS5otIXfJHoEWRfAqTHfWxGxWtPEgt7oZVqT0RfphABcCYRMkcGM5e4sIIdIA8XT3Vz/0gaL9hygfQtnFsGHc54HRMDqfyHJqxQRpZdoPpntpO8K8JFc7FvkhSsEzcXTrv6eZ78KsqQlCMveEEDMGJH1+D4yGCEj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776682629; c=relaxed/simple;
-	bh=6spWy4cZ5LIkgxrKvT0wpryraTDPauWyjcaqW8EhKV8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rGJQ7mkfU7VOclW9r/+W1UTpLDcpRRuLdVUGkFXt5koIkTz3L2Jjbnd1iF1T2y1ICDLzvxItuwL5368oHo7PkxEkVZ+4vrvVV7E2Ludmj05ElIIm1OTezrRo4v6R6n6OpRNqNnaHrW30Zgh7P/vZgZXOwqDFLe0QieUgcWNDBbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hda34m4S; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776682661; c=relaxed/simple;
+	bh=RV6KLhKQJV9O10vjxbnO2mSqItoj7sx7NBlZB3v6Dsk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mj8JAt6S8X/tN59jGI3sqgpYYsmMAo0904nA+L3dmEEaHQrCkm9VSbplKztdUcRdlXmKcaX/2JnES4yKdsxg1zUTT9Zfu7xAlftQfBEvqsA1JlU0NOPnf7i5X0QiWzl7QZ5Ld5qyI39LXGJb+HmaUMIOWVSPt879x1ZIB+VSD34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNdNMpJO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hda34m4S"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D49C1516;
-	Mon, 20 Apr 2026 03:57:00 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B02B23F915;
-	Mon, 20 Apr 2026 03:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776682625; bh=6spWy4cZ5LIkgxrKvT0wpryraTDPauWyjcaqW8EhKV8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hda34m4SzJsVSkEKltIcJWEGLr3S4qW+w/s0SgWkRrut9wsjHniF2zX731bi9s0Vs
-	 rp2cYWorUS56cC+GYeEdb1C2omfhkFNujgWPCEcRBGIwusPT37nqQ+0vGsbQH7Aask
-	 5+/rs+cyn2Dpi07AFu0N62nv58+LBUIEVnVSeWJc=
-Date: Mon, 20 Apr 2026 11:56:58 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, sebastianene@google.com
-Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
- initailise ffa driver
-Message-ID: <aeYGeojpqcYAN5++@e129823.arm.com>
-References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
- <20260417175759.3191279-5-yeoreum.yun@arm.com>
- <87se8sbozv.wl-maz@kernel.org>
- <aeNeNjfO7i128TIP@e129823.arm.com>
- <87pl3vb5bm.wl-maz@kernel.org>
- <aeS4rAeVQ0yJIPYw@e129823.arm.com>
- <aeXp7WSqpXNytNPG@willie-the-truck>
- <aeXxCe4hdizdQbFD@e129823.arm.com>
- <aeYDMEgWdt8F9jWb@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNdNMpJO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5A1C2BCB0;
+	Mon, 20 Apr 2026 10:57:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776682661;
+	bh=RV6KLhKQJV9O10vjxbnO2mSqItoj7sx7NBlZB3v6Dsk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JNdNMpJOs/QU1EDyD5dKvXOmZv1rjh+NBsM6GcdHMLSL/OjW6/S1cLi+eTzoWkvlS
+	 kh+3j0VWnwZwUBAJaEt+MHqgkpOpd2jH8nsaJ8Ozm65otWB/3t5Rrz/rnL4tXlvvOM
+	 GAmEPAb3OJLBECf8AzyvUVxg0+4epkJ/KTW5ed0K9ZsnO1NgkG8mBKBDnH1RhcP+4P
+	 EvFV2PMNLd2iOSJ8tuYJk+x/xfonr7akIF4UPECxO/fFaRB49tzjFwxdzId4cezhZ/
+	 p1+tcPVtySt7bl5NQFMl5wO8jV5KGM/c1hjdXcdwh2Upoi8xPzeD187MKTu1nhKqIw
+	 fz09jetb3gqDw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wEmJu-0000000D2AQ-3mS1;
+	Mon, 20 Apr 2026 10:57:38 +0000
+Date: Mon, 20 Apr 2026 11:57:38 +0100
+Message-ID: <86o6jd2925.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Andreas Grapentin <Andreas.Grapentin@ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v1 00/27] KVM: s390: Introduce arm64 KVM
+In-Reply-To: <20260402042125.3948963-1-seiden@linux.ibm.com>
+References: <20260402042125.3948963-1-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeYDMEgWdt8F9jWb@willie-the-truck>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, Andreas.Grapentin@ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, ggala@linux.ibm.com, brueckner@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, Ulrich.Weigand@de.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Will,
+Hi Steffen, s390 folks,
 
-> [+Seb for the pKVM FFA bits]
->
-> On Mon, Apr 20, 2026 at 10:25:29AM +0100, Yeoreum Yun wrote:
-> > > On Sun, Apr 19, 2026 at 12:12:44PM +0100, Yeoreum Yun wrote:
-> > > > > On Sat, 18 Apr 2026 11:34:30 +0100,
-> > > > > Yeoreum Yun <yeoreum.yun@arm.com> wrote:
-> > > > > >
-> > > > > > > > @@ -2035,6 +2037,16 @@ static int __init ffa_init(void)
-> > > > > > > >  	u32 buf_sz;
-> > > > > > > >  	size_t rxtx_bufsz = SZ_4K;
-> > > > > > > >
-> > > > > > > > +	/*
-> > > > > > > > +	 * When pKVM is enabled, the FF-A driver must be initialized
-> > > > > > > > +	 * after pKVM initialization. Otherwise, pKVM cannot negotiate
-> > > > > > > > +	 * the FF-A version or obtain RX/TX buffer information,
-> > > > > > > > +	 * which leads to failures in FF-A calls.
-> > > > > > > > +	 */
-> > > > > > > > +	if (IS_ENABLED(CONFIG_KVM) && is_protected_kvm_enabled() &&
-> > > > > > > > +	    !is_kvm_arm_initialised())
-> > > > > > > > +		return -EPROBE_DEFER;
-> > > > > > > > +
-> > > > > > >
-> > > > > > > That's still fundamentally wrong: pkvm is not ready until
-> > > > > > > finalize_pkvm() has finished, and that's not indicated by
-> > > > > > > is_kvm_arm_initialised().
-> > > > > >
-> > > > > > Thanks. I miss the TSC bit set in here.
-> > > > >
-> > > > > That's the least of the problems. None of the infrastructure is in
-> > > > > place at this stage...
-> > > > >
-> > > > > > IMHO, I'd like to make an new state check function --
-> > > > > > is_pkvm_arm_initialised() so that ff-a driver to know whether
-> > > > > > pkvm is initialised.
-> > > > >
-> > > > > Doesn't sound great, TBH.
-> > > > >
-> > > > > > or any other suggestion?
-> > > > >
-> > > > > Instead of adding more esoteric predicates, I'd rather you build on an
-> > > > > existing infrastructure. You have a dependency on KVM, use something
-> > > > > that is designed to enforce dependencies. Device links spring to mind
-> > > > > as something designed for that.
-> > > > >
-> > > > > Can you look into enabling this for KVM? If that's possible, then it
-> > > > > should be easy enough to delay the actual KVM registration after pKVM
-> > > > > is finalised.
-> > > >
-> > > > or what about some event notifier? Just like:
-> > >
-> > > This seems a bit over-engineered to me. Why don't you just split the
-> > > FF-A initialisation into two steps: an early part which does the version
-> > > negotiation and then a later part which can fit in with whatever
-> > > dependencies you have on the TPM?
-> >
-> > Sorry, I may have misunderstood your suggestion and
-> > I might be in missing your point.
-> >
-> > But, The issue here is that FFA_VERSION, FFA_RXTX_MAP, and
-> > FFA_PARTITION_INFO_GET, which are invoked from ffa_init()
-> > as part of early initialisation, must be trapped by pKVM.
-> >
-> > In other words, even the early part of the initialization,
-> > including version negotiation, needs to happen after pKVM
-> > is initialized.
-> >
-> > Because of this dependency, simply splitting the FF-A
-> > initialization into two phases within the driver does not
-> > seem sufficient, as it still requires knowing when pKVM
-> > has been initialized.
-> >
-> > Am I missing something?
->
-> Ah sorry, I mixed up the ordering of 'module_init' vs 'rootfs_initcall'
-> and thought you wanted to probe the version earlier. But then I'm still
-> confused because, prior to 0e0546eabcd6 ("firmware: arm_ffa: Change
-> initcall level of ffa_init() to rootfs_initcall"), ffa_init() was a
-> 'device_initcall' which is still called earlier than finalize_pkvm().
+On Thu, 02 Apr 2026 05:20:56 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
+>=20
+> By introducing a novel virtualization acceleration for the ARM architectu=
+re on
+> s390 architecture, we aim to expand the platform's software ecosystem. Th=
+is
+> initial patch series lays the groundwork by enabling KVM-accelerated ARM =
+CPU
+> virtualization on s390. To achieve this, a common KVM layer between s390 =
+and
+> arm64 is introduced (see below for more details). Design considerations of
+> arm64 on the s390 Architecture The s390 virtualization architecture is ex=
+tended
+> with a set of new instructions dedicated to supporting=C2=A0ARM-based vir=
+tual
+> machines. The s390 KVM host acts as EL2 (hypervisor) for a EL1/EL0
+> (OS/application) arm64 guest. To achieve this, the new Start-Arm-Execution
+> (SAE) instruction enables accelerated execution of arm64 VMs.=C2=A0 Addit=
+ional new
+> s390 instructions are introduced to query available arm64 features, used =
+to
+> populate the arm64 ID register contents, as well as, new s390 instruction=
+s to
+> save/restore various arm64 registers in the VM context.
 
-Right, and this is what I missed when writing patch
-0e0546eabcd6 ("firmware: arm_ffa: Change initcall level of ffa_init() to rootfs_initcall").
-and it still exists even if it's device call.
+Apologises for the delay in responding to this, things got delayed a
+bit with the Easter break. Since then, Will and I have been discussing
+this series and what it means for the future of the arm64 port.
 
-However, rather than changing ffa_init to rootfs_initcall, moving ima_init
-to late_initcall_sync is a better approach, as it also addresses similar
-issues for TPM devices that do not use FF-A. For this reason,
-the FF-A-related changes were reverted.
+By way of opening the discussion, we want to be clear that we are
+supportive of the effort. Our comments here should be seen as areas of
+potential improvement and not as rejection of what you are trying to
+achieve.
 
-As a result, patch 4/4 addresses an issue that existed independently of
-0e0546eabcd6, as you pointed out.
+* Code movement:
 
---
-Sincerely,
-Yeoreum Yun
+  The patches you have posted demonstrate that it is possible to
+  expose a large amount of arm64-specific code and definition to s390,
+  and yet still manage to build both architectures without regression.
+  However, the result looks rather messy and may adversely affect
+  maintainability on the arm64 side.
+
+  The moving of files into shared locations is particularly painful,
+  and gets in the way of overall maintainability. Not only does it
+  break our comfortable habits, it makes the backporting of fixes
+  harder.  Importantly, these changes come with no benefit on the
+  arm64 side.
+
+  Would it be possible to try some other means of reaching the
+  arm64-specific files *in situ*, either by making use of relative
+  paths, or by using symbolic links? Even better, files that are
+  generated on arm64 (such as the sysreg definitions) should equally
+  be generated for s390, locally to the s390 part of the tree.
+
+  But that doesn't mean that we consider that the arm64 tree is
+  immutable and that we are not open to change, quite the opposite.
+  Most of the KVM/arm64 include files are an unholy mix of arch
+  definitions, data structures that have some arch relevance, but also
+  code and data that is strictly implementation specific. Splitting
+  these (as you already have for some include files) could both help
+  with sharing what is actually needed, keep the arm64-specific stuff
+  at bay, *and* benefit arm64's overall maintainability. We would need
+  some tooling to enforce the split and avoid regressing it, something
+  that could happen quickly given the level of activity on arm64. Yet
+  another way to achieve this could be to mechanically process the
+  arm64 files as part of the s390 build to extract the relevant
+  information, and we could help with this.
+
+  Looking a bit more into the distance, it is likely that KVM/arm64
+  will grow feature support quicker than s390 can absorb them, and
+  that some feature won't ever make any sense of s390 (pKVM, for
+  example).  We need to establish how these features can be built
+  without arm64 being hindered by s390. This is also true when adding
+  architectural support for features that don't exist in the s390 view
+  of arm64.
+
+* UAPI and guest API:
+
+  Obviously, one of our biggest concerns is the userspace API. We
+  appreciate that you want to reuse it as it is, warts and all, and
+  directly incorporate additional feature support as it becomes
+  available. This means that, should any divergence in UAPI appear,
+  the source of truth must be on the arm64 side. This has the
+  following consequences:
+
+    - s390 cannot add extensions to the UAPI
+
+    - s390 must be compatible with all future arm64 extensions
+
+  Similar concerns exist on the guest/hypervisor API, including:
+
+  - errata mitigation: this is unsurprisingly a hot topic, which keeps
+    causing us some massive headaches. We are particularly concerned
+    about errata that need to be disclosed to the guest and acted upon
+    via a hypercall. Should there be a need for those, how will we
+    coordinate the deployment of such hypercall?
+
+    The way it has been deployed so far is that PSCI has grown an
+    errata discovery mechanism. ARM assigns function numbers and
+    specifies what these hypercalls mitigate. KVM, in turn, takes part
+    in implementing the mitigation. We expect that s390 would follow
+    the same behaviour, including coordination with ARM for the
+    function numbering.
+
+  - device assignment: this is unknown territory for us, as we
+    commonly use vfio-pci (and more occasionally vfio-platform). How
+    would that look for an arm64 guest on s390?
+
+  - s390-specific ISA extension: although we obviously cannot control
+    how you will decide to expose features to your arm64 guests,
+    KVM/arm64 makes a point of forbidding any use of implementation
+    specific instruction or system registers. We expect the s390
+    implementation to uphold this.
+
+  - s390-specific hypercalls: aside from the errata handling
+    mentioned above, we would very much like to avoid anything that is
+    implementation specific, and keep the hypercall space as small as
+    possible. In other words, an unenlightened arm64 guest must work
+    and continue to work.
+
+* Overall maintenance
+
+  Unsurprisingly, we are not totally familiar with s390. To say that
+  there is a learning gap would only be an understatement. So how do
+  we make sure we don't break things out of pure ignorance? Is there
+  any documentation we can refer to when hacking on code that will
+  eventually run on your side of the computing universe?
+
+  We need to be able to build and test what we produce. How do we go
+  about that? We appreciate that you may not be in a position to help
+  with this right now, but at least having a plan would be reassuring.
+  This should include things like automatic testing of our CI branches.
+  We are happy to test build s390 as part of our maintenance flow, if
+  pointed to existing binary toolchains compiled for arm64 and x86,
+  together with a typical configuration.
+
+  What about debugging? We expect that you'd have to help, should an
+  arm64 change cause a regression on s390, as it is fairly unlikely
+  that we would be able to reproduce it.
+
+  Finally, we feel it would be beneficial for both projects to swap
+  prisoners and have cross-reviewers in MAINTAINERS, so that there is
+  an s390 reviewer added to KVM/arm64, and an arm64 reviewer added to
+  KVM/s390.
+
+It probably would be beneficial to work through some of these things
+face-to-face. Maybe around LPC or KVM Forum if you manage to get
+there? Or some other place/time?
+
+Thanks,
+
+	Marc and Will
+
+--=20
+Without deviation from the norm, progress is not possible.
