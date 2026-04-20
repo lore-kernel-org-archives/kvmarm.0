@@ -1,189 +1,159 @@
-Received: from the.earth.li (the.earth.li [93.93.131.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A093839A818
-	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 10:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.93.131.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97EE39A809
+	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 10:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776682270; cv=none; b=OWyliqVNftqcgEGbCGFnfABVQz+f72fS/cVD0QppsE1lbEE9U8f/vJBLt+RH/2SqCDQY5gbv5y6eij9DARLAe8RPZzxPpuCbQ+H6PuzI0bJlbLRTr7DCncVsBKVv7NvpwIWbc8zBrMdeOcq2dZFZaIAkiRtxsJOgCckpUvkTm2w=
+	t=1776682629; cv=none; b=EQybMJudmgI6lFPBtE0vwhroeESfqKnMPmqfcOlbcjujVDHKg1b+n5ShM5WfTH7WSCKj2qd6+4nlNSt2joPew1Et+9dGwldbg9n8N4EGXeLPeVtUIl2615YfRZrOxMsmDAh3/Ta+aIFr2XjSZ8BX5NjnPjfoPUjVVlS7L+BKMdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776682270; c=relaxed/simple;
-	bh=NwqoOHuPUUb5E/oPsvKJU0jzUq0093Wuhl3vd0QrYDE=;
+	s=arc-20240116; t=1776682629; c=relaxed/simple;
+	bh=6spWy4cZ5LIkgxrKvT0wpryraTDPauWyjcaqW8EhKV8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HwVkxMoATQnKjbNvfIE7417FE0qNqONtdi9MxWieFlOvml/mMj5qKbSm0+JURwogvGKcnAJnPokPEkh+D7K6Eg5TCVhRxEtHUirUGofVSRsTHyhriYgnvtBSm7W7ZqpQK5YHpYJWWlGOcnpF2gDM8QN0vALMmcqU2jNnjmxgcFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li; spf=pass smtp.mailfrom=earth.li; dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b=f1C8Kqc5; arc=none smtp.client-ip=93.93.131.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=earth.li
+	 Content-Type:Content-Disposition:In-Reply-To; b=rGJQ7mkfU7VOclW9r/+W1UTpLDcpRRuLdVUGkFXt5koIkTz3L2Jjbnd1iF1T2y1ICDLzvxItuwL5368oHo7PkxEkVZ+4vrvVV7E2Ludmj05ElIIm1OTezrRo4v6R6n6OpRNqNnaHrW30Zgh7P/vZgZXOwqDFLe0QieUgcWNDBbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hda34m4S; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b="f1C8Kqc5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
-	s=the; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=192fbMdGov5ra3CzttpWVsfsxwWZ2pH8LM+eCLO/yN4=; b=f1C8Kqc5RU5hnOVR3+GUpKke9a
-	fij2Gr/6dtPqzAUplechdSze22hseaiHPeOITqSHyxIK14zh4x0e9UUKZV3X9/A3u7PG8uR6PknnV
-	byys1CbYcn4rdkFiQdxCQMSkiHPzXyftqZGswLo6U6PNoNutChpIwe/S+XAEPjBM+NJZrFZuz/rAc
-	5U+t+jPmdbMDwAg7eXbylZKnQi7ggyOnmiFWPdCg32zTm4uG4OwYFcb4t+ZsPWF/+TDZZmPTn6hf7
-	xYcHWwApZ9EesabPH4NAiF7BsdamsqF2hgMQwalWm2iCbCwBfzQeRtAp5vnRuxNV37+kcTFpb4s1R
-	qbh9nHBQ==;
-Received: from noodles by the.earth.li with local (Exim 4.98.2)
-	(envelope-from <noodles@earth.li>)
-	id 1wElw0-0000000HLRV-2LBb;
-	Mon, 20 Apr 2026 11:32:56 +0100
-Date: Mon, 20 Apr 2026 11:32:56 +0100
-From: Jonathan McDowell <noodles@earth.li>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hda34m4S"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D49C1516;
+	Mon, 20 Apr 2026 03:57:00 -0700 (PDT)
+Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B02B23F915;
+	Mon, 20 Apr 2026 03:57:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1776682625; bh=6spWy4cZ5LIkgxrKvT0wpryraTDPauWyjcaqW8EhKV8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hda34m4SzJsVSkEKltIcJWEGLr3S4qW+w/s0SgWkRrut9wsjHniF2zX731bi9s0Vs
+	 rp2cYWorUS56cC+GYeEdb1C2omfhkFNujgWPCEcRBGIwusPT37nqQ+0vGsbQH7Aask
+	 5+/rs+cyn2Dpi07AFu0N62nv58+LBUIEVnVSeWJc=
+Date: Mon, 20 Apr 2026 11:56:58 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
 	zohar@linux.ibm.com, roberto.sassu@huawei.com,
 	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
 	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [RFC PATCH 1/4] security: ima: move ima_init into
- late_initcall_sync
-Message-ID: <aeYA2Jf7esHsfY4M@earth.li>
+	sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, sebastianene@google.com
+Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
+ initailise ffa driver
+Message-ID: <aeYGeojpqcYAN5++@e129823.arm.com>
 References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
- <20260417175759.3191279-2-yeoreum.yun@arm.com>
+ <20260417175759.3191279-5-yeoreum.yun@arm.com>
+ <87se8sbozv.wl-maz@kernel.org>
+ <aeNeNjfO7i128TIP@e129823.arm.com>
+ <87pl3vb5bm.wl-maz@kernel.org>
+ <aeS4rAeVQ0yJIPYw@e129823.arm.com>
+ <aeXp7WSqpXNytNPG@willie-the-truck>
+ <aeXxCe4hdizdQbFD@e129823.arm.com>
+ <aeYDMEgWdt8F9jWb@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260417175759.3191279-2-yeoreum.yun@arm.com>
+In-Reply-To: <aeYDMEgWdt8F9jWb@willie-the-truck>
 
-On Fri, Apr 17, 2026 at 06:57:56PM +0100, Yeoreum Yun wrote:
->To generate the boot_aggregate log in the IMA subsystem with TPM PCR values,
->the TPM driver must be built as built-in and
->must be probed before the IMA subsystem is initialized.
->
->However, when the TPM device operates over the FF-A protocol using
->the CRB interface, probing fails and returns -EPROBE_DEFER if
->the tpm_crb_ffa device — an FF-A device that provides the communication
->interface to the tpm_crb driver — has not yet been probed.
->
->To ensure the TPM device operating over the FF-A protocol with
->the CRB interface is probed before IMA initialization,
->the following conditions must be met:
->
->   1. The corresponding ffa_device must be registered,
->      which is done via ffa_init().
->
->   2. The tpm_crb_driver must successfully probe this device via
->      tpm_crb_ffa_init().
->
->   3. The tpm_crb driver using CRB over FF-A can then
->      be probed successfully. (See crb_acpi_add() and
->      tpm_crb_ffa_init() for reference.)
->
->Unfortunately, ffa_init(), tpm_crb_ffa_init(), and crb_acpi_driver_init() are
->all registered with device_initcall, which means crb_acpi_driver_init() may
->be invoked before ffa_init() and tpm_crb_ffa_init() are completed.
->
->When this occurs, probing the TPM device is deferred.
->However, the deferred probe can happen after the IMA subsystem
->has already been initialized, since IMA initialization is performed
->during late_initcall, and deferred_probe_initcall() is performed
->at the same level.
->
->To resolve this, move ima_init() into late_inicall_sync level
->so that let IMA not miss TPM PCR value when generating boot_aggregate
->log though TPM device presents in the system.
->
->Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Hi Will,
 
-Awesome. This fixes the problems I saw with an SPI TPM on an NVIDIA 
-GB200 system and reported in 
+> [+Seb for the pKVM FFA bits]
+>
+> On Mon, Apr 20, 2026 at 10:25:29AM +0100, Yeoreum Yun wrote:
+> > > On Sun, Apr 19, 2026 at 12:12:44PM +0100, Yeoreum Yun wrote:
+> > > > > On Sat, 18 Apr 2026 11:34:30 +0100,
+> > > > > Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+> > > > > >
+> > > > > > > > @@ -2035,6 +2037,16 @@ static int __init ffa_init(void)
+> > > > > > > >  	u32 buf_sz;
+> > > > > > > >  	size_t rxtx_bufsz = SZ_4K;
+> > > > > > > >
+> > > > > > > > +	/*
+> > > > > > > > +	 * When pKVM is enabled, the FF-A driver must be initialized
+> > > > > > > > +	 * after pKVM initialization. Otherwise, pKVM cannot negotiate
+> > > > > > > > +	 * the FF-A version or obtain RX/TX buffer information,
+> > > > > > > > +	 * which leads to failures in FF-A calls.
+> > > > > > > > +	 */
+> > > > > > > > +	if (IS_ENABLED(CONFIG_KVM) && is_protected_kvm_enabled() &&
+> > > > > > > > +	    !is_kvm_arm_initialised())
+> > > > > > > > +		return -EPROBE_DEFER;
+> > > > > > > > +
+> > > > > > >
+> > > > > > > That's still fundamentally wrong: pkvm is not ready until
+> > > > > > > finalize_pkvm() has finished, and that's not indicated by
+> > > > > > > is_kvm_arm_initialised().
+> > > > > >
+> > > > > > Thanks. I miss the TSC bit set in here.
+> > > > >
+> > > > > That's the least of the problems. None of the infrastructure is in
+> > > > > place at this stage...
+> > > > >
+> > > > > > IMHO, I'd like to make an new state check function --
+> > > > > > is_pkvm_arm_initialised() so that ff-a driver to know whether
+> > > > > > pkvm is initialised.
+> > > > >
+> > > > > Doesn't sound great, TBH.
+> > > > >
+> > > > > > or any other suggestion?
+> > > > >
+> > > > > Instead of adding more esoteric predicates, I'd rather you build on an
+> > > > > existing infrastructure. You have a dependency on KVM, use something
+> > > > > that is designed to enforce dependencies. Device links spring to mind
+> > > > > as something designed for that.
+> > > > >
+> > > > > Can you look into enabling this for KVM? If that's possible, then it
+> > > > > should be easy enough to delay the actual KVM registration after pKVM
+> > > > > is finalised.
+> > > >
+> > > > or what about some event notifier? Just like:
+> > >
+> > > This seems a bit over-engineered to me. Why don't you just split the
+> > > FF-A initialisation into two steps: an early part which does the version
+> > > negotiation and then a later part which can fit in with whatever
+> > > dependencies you have on the TPM?
+> >
+> > Sorry, I may have misunderstood your suggestion and
+> > I might be in missing your point.
+> >
+> > But, The issue here is that FFA_VERSION, FFA_RXTX_MAP, and
+> > FFA_PARTITION_INFO_GET, which are invoked from ffa_init()
+> > as part of early initialisation, must be trapped by pKVM.
+> >
+> > In other words, even the early part of the initialization,
+> > including version negotiation, needs to happen after pKVM
+> > is initialized.
+> >
+> > Because of this dependency, simply splitting the FF-A
+> > initialization into two phases within the driver does not
+> > seem sufficient, as it still requires knowing when pKVM
+> > has been initialized.
+> >
+> > Am I missing something?
+>
+> Ah sorry, I mixed up the ordering of 'module_init' vs 'rootfs_initcall'
+> and thought you wanted to probe the version earlier. But then I'm still
+> confused because, prior to 0e0546eabcd6 ("firmware: arm_ffa: Change
+> initcall level of ffa_init() to rootfs_initcall"), ffa_init() was a
+> 'device_initcall' which is still called earlier than finalize_pkvm().
 
-https://lore.kernel.org/linux-integrity/aYXEepLhUouN5f99@earth.li/
+Right, and this is what I missed when writing patch
+0e0546eabcd6 ("firmware: arm_ffa: Change initcall level of ffa_init() to rootfs_initcall").
+and it still exists even if it's device call.
 
-Reviewed-by: Jonathan McDowell <noodles@meta.com>
-Tested-by: Jonathan McDowell <noodles@meta.com>
+However, rather than changing ffa_init to rootfs_initcall, moving ima_init
+to late_initcall_sync is a better approach, as it also addresses similar
+issues for TPM devices that do not use FF-A. For this reason,
+the FF-A-related changes were reverted.
 
->---
-> include/linux/lsm_hooks.h         |  2 ++
-> security/integrity/ima/ima_main.c |  2 +-
-> security/lsm_init.c               | 13 +++++++++++--
-> 3 files changed, 14 insertions(+), 3 deletions(-)
->
->diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
->index d48bf0ad26f4..88fe105b7f00 100644
->--- a/include/linux/lsm_hooks.h
->+++ b/include/linux/lsm_hooks.h
->@@ -166,6 +166,7 @@ enum lsm_order {
->  * @initcall_fs: LSM callback for fs_initcall setup, optional
->  * @initcall_device: LSM callback for device_initcall() setup, optional
->  * @initcall_late: LSM callback for late_initcall() setup, optional
->+ * @initcall_late_sync: LSM callback for late_initcall_sync() setup, optional
->  */
-> struct lsm_info {
-> 	const struct lsm_id *id;
->@@ -181,6 +182,7 @@ struct lsm_info {
-> 	int (*initcall_fs)(void);
-> 	int (*initcall_device)(void);
-> 	int (*initcall_late)(void);
->+	int (*initcall_late_sync)(void);
-> };
->
-> #define DEFINE_LSM(lsm)							\
->diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
->index 1d6229b156fb..ace280fa3212 100644
->--- a/security/integrity/ima/ima_main.c
->+++ b/security/integrity/ima/ima_main.c
->@@ -1320,5 +1320,5 @@ DEFINE_LSM(ima) = {
-> 	.order = LSM_ORDER_LAST,
-> 	.blobs = &ima_blob_sizes,
-> 	/* Start IMA after the TPM is available */
->-	.initcall_late = init_ima,
->+	.initcall_late_sync = init_ima,
-> };
->diff --git a/security/lsm_init.c b/security/lsm_init.c
->index 573e2a7250c4..4e5c59beb82a 100644
->--- a/security/lsm_init.c
->+++ b/security/lsm_init.c
->@@ -547,13 +547,22 @@ device_initcall(security_initcall_device);
->  * security_initcall_late - Run the LSM late initcalls
->  */
-> static int __init security_initcall_late(void)
->+{
->+	return lsm_initcall(late);
->+}
->+late_initcall(security_initcall_late);
->+
->+/**
->+ * security_initcall_late_sync - Run the LSM late initcalls sync
->+ */
->+static int __init security_initcall_late_sync(void)
-> {
-> 	int rc;
->
->-	rc = lsm_initcall(late);
->+	rc = lsm_initcall(late_sync);
-> 	lsm_pr_dbg("all enabled LSMs fully activated\n");
-> 	call_blocking_lsm_notifier(LSM_STARTED_ALL, NULL);
->
-> 	return rc;
-> }
->-late_initcall(security_initcall_late);
->+late_initcall_sync(security_initcall_late_sync);
->--
->LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
->
->
+As a result, patch 4/4 addresses an issue that existed independently of
+0e0546eabcd6, as you pointed out.
 
-J.
-
--- 
-] https://www.earth.li/~noodles/ []  "Do I scare you?" "No." "Do you   [
-]  PGP/GPG Key @ the.earth.li    []   want me to?" -- Wayne's World.   [
-] via keyserver, web or email.   []                                    [
-] RSA: 4096/0x94FA372B2DA8B985   []                                    [
+--
+Sincerely,
+Yeoreum Yun
