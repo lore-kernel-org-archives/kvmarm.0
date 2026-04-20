@@ -1,56 +1,56 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2432B3D1701
-	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 21:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D253D090F
+	for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 21:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776720034; cv=none; b=tD+KIshwz04H9qkBWCjhw9Ad0rm44usLe1FJapmM368GIfuqjLXCWeju57DiDMqQNSy2UzZU26LhFOYavTnOhdzQIsySvYrEP7GCGqj03n/jPasTRIQSBDWjvjlQ6q8j1B7k1WWbwJPurEB7Gqhk5oL1mMbk/qfYOPd59ERSoEY=
+	t=1776720036; cv=none; b=C90kdfKm7KGkq0s7LIisd2wMU8hOKZgtFtnmv8rLb0AKz7+3B1yjkhVacaQ9gNPD9DfbJd5tJCDqSnPh3uFXt+yvyie9h91yjLap17b3NMKWj8pN/61++Eahec/1mi/t7P7q3Tw3QgMA7aXZ884PKO4l+vJZT64k9ZIR5HJR4LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776720034; c=relaxed/simple;
-	bh=yEgveHaBMKIIsW+doZiDb1nQpM20TwqcCTmsBmJmV/o=;
+	s=arc-20240116; t=1776720036; c=relaxed/simple;
+	bh=9g5xp+VSVzzv6BVD0W5JIfINJEacz+YIvlhMB3lgGVc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fdPxxgMV3hl4bbkm24qs0KF0JDTHM7Im3PxrWmQMneDrmVYEERdIaDD6xU/TpfrgSsyqWbGYKL7QFK2HhLr2ELTF85mmDUQB3yASnngTLxFxePD6iZL9u7Rq4o0L/6vMIhak4jYU34IIoI0ttPDznHpBUZwcswGJtIQz3hHoZvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=flfhOydU; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=mCoU489/LaKxKV6GN3zLtswhnqythlw9U85+ZZwVQ++Ydq3iZiQfrMcjRJAYcoJtRTu58VHKHGnXkFX6IF2VyxmlzCcuyD8V0maus/Z8lFPPNkhU5SwHxTo65+1H9TdAT/S8OR3XNr9+B+jBBTqplHyITrS7WWVRtH8nDbkq/s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uvX/s7FF; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="flfhOydU"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82f6a5b4f88so4688988b3a.2
-        for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 14:20:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uvX/s7FF"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b454cac322so32810145ad.2
+        for <kvmarm@lists.linux.dev>; Mon, 20 Apr 2026 14:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776720031; x=1777324831; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1776720033; x=1777324833; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jearMQMOM45vciFPdayTOFGaCCeoL5RElweUFZze4JY=;
-        b=flfhOydUnlLFP0eYdcx3Pw2Fgohfmfi6kMoDOmEqXVtXt8g1htlfKgt8t0AyzRUAOR
-         oer6aVOQlxFPR6KEsVIkado6bZXOpJSCenXAfAQqMTLytT3HxEdT9QrDVCPIp2b56F5N
-         5a8JExKLKt+2QaafqxhQm+dCFDAFRnsBKhWh+T853b6KaSxIto/2CFwC6RWbjfuC0gMh
-         XJ98+UFVii4RGs34mVcvhu3UEh9GekUsqwn3sr6tfZSlcpXpJfm7seuRpub2TEgT23UO
-         fxfe3HzMYdddyVr70lrhwtjFNsWTlxmbdsdxjbLzA0F+qHQT2fguEEexikGWdMproFIp
-         syuQ==
+        bh=nGTpsdZingcIJU13AR/rz9Q7jpP4FQBt7uSTt0uhGT8=;
+        b=uvX/s7FFe9sx8ovjJn9Jqlj3p0b0g/Yf5Y1aPFBYrKWsom6X2Ket4jmFC+0dLLXUCt
+         Ez3TKyFsn19i8Fj6IFgZXI3ljXoi3QOcCVGR6HuG3Ua8RNxqN9Fl4YJ9Q4P2wvjPkatZ
+         ZSCGGZX2AdPKa3HWsfYFhdMRq1XdFz0guGqmEuRg/2eEfXndq2nO9YrNHYjwCQ+4V1Ko
+         CrbIhTNmhp1bd6NAmr/KkwZBDEChjKlcZw/+7x7Bi2TVAiIRQLXzkK3VOFTNfgPM1RZk
+         Tk2PE0DlFEpUe+ro9LIGvYrpL/VddEzAoE30Guk4jgS+f/e7uofCtgFswL33dl61/qbW
+         kS6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776720031; x=1777324831;
+        d=1e100.net; s=20251104; t=1776720033; x=1777324833;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jearMQMOM45vciFPdayTOFGaCCeoL5RElweUFZze4JY=;
-        b=GMe8wWH9BwXMQyCvnAh+/vrk9Mw4904g6Zu5EHKz1JjqF/WDMpTAAjVfwtqYeFXGm9
-         NY0Iov3ZnAVanPZvR5yPsRu0xSK98XDLEQGPiJ83PbXEHqW922WJzzx9EtivMK57FI1S
-         Uv9w9xRFJnaYpK7cOuwmNy5xWp2iVNLeYnkNur5o5CBJKwoei70JEL+ocXc2JdHhxhUT
-         D8JaLICz1jZERMwA9mH6+2AzX7tNqULiv/ud7MfVLvM0sxo0Hoc6Gz+c8Vul7qa98J6D
-         xDfvmkdzPup0puRHFhrjKgmOEz8yqXnn1/OM+nDVNVGTgdP0ByFAXjv1wk3uwSdj61m4
-         sj+w==
-X-Forwarded-Encrypted: i=1; AFNElJ+wfJxNsehX/6l+LG6caRJIloLiCkhW56WuRFroddN/WFCLPADDlUfs8Q4D3T/Ufp9jg39ujGk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzWyANY662NsOy+rjQjXajLKL0zeB+RAUIp0hJ0DR+e+7yfrZBB
-	DuMfOZR5fuTDq0POQ9C1APJeC7BGNAk8jHUNoJJp6fP4EYD4OOeKruMWidcbsekIdgL3LLYnSRQ
-	betayMw==
-X-Received: from pfbhx21.prod.google.com ([2002:a05:6a00:8995:b0:82f:8b22:bc77])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:17a1:b0:82c:e83d:a9b0
- with SMTP id d2e1a72fcca58-82f8c850e93mr15532322b3a.21.1776720031083; Mon, 20
- Apr 2026 14:20:31 -0700 (PDT)
+        bh=nGTpsdZingcIJU13AR/rz9Q7jpP4FQBt7uSTt0uhGT8=;
+        b=dvU3TiciQ5opfrb+IJVe4w4rRTCuMQZbSv+yciwyVaJYxgUWsjK1iW8zh/zhP+YGFY
+         e8aajPLI1VEJxOvx6KmCgkl2i8G5DeJ50euu7C5yvzrrjk0I9mOiHvSxxZ9d+0hY83HU
+         9tkqkXlJlK1lXm7bxXpvoDFwbSD3xkI87d+XMIO9K4di6n/EJ0bryTLcU8Tq7zqaiUB5
+         pAtiikkfeArf4nRnANB5fYohsgk4cvDQzh5gyzeaAmnIy6kPqN4e9zLctGjjsU8QwnzV
+         0H9VrTCzXIagjO18RvxJg0mmdEEztFvBDqSCFBFVH0yCyjpPqkazLMLI7XerQRXuvmQ2
+         nESA==
+X-Forwarded-Encrypted: i=1; AFNElJ8ThBlkFuBGxZ2+6tMGryxYEtE7OrjD79lQeA1JD1+0dbaBwyyjSIEN/cPx9z5pUHxgN+jG2B4=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywz3KiuQ/WFqst/KH/kZnlyHBqvGxh6+m0gz32VstnAyAizNMzp
+	ZF68K3RvkRXafSmybBh6aSoiEfjVwyIKCBNjPDQM01XVf9Rke5OisdwL5eHtkMrJREV2de28w2m
+	8vtE8yg==
+X-Received: from pldt14.prod.google.com ([2002:a17:903:40ce:b0:2b4:5ded:6ecb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d58a:b0:2b0:ac1e:9737
+ with SMTP id d9443c01a7336-2b5f9ec5ea7mr159040275ad.12.1776720033096; Mon, 20
+ Apr 2026 14:20:33 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 20 Apr 2026 14:19:58 -0700
+Date: Mon, 20 Apr 2026 14:19:59 -0700
 In-Reply-To: <20260420212004.3938325-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260420212004.3938325-1-seanjc@google.com>
 X-Mailer: git-send-email 2.54.0.rc1.555.g9c883467ad-goog
-Message-ID: <20260420212004.3938325-14-seanjc@google.com>
-Subject: [PATCH v3 13/19] KVM: selftests: Rename vm_vaddr_populate_bitmap() => vm_populate_gva_bitmap()
+Message-ID: <20260420212004.3938325-15-seanjc@google.com>
+Subject: [PATCH v3 14/19] KVM: selftests: Rename translate_to_host_paddr() => translate_hva_to_hpa()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -76,73 +76,61 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that KVM selftests use gva_t instead of vm_vaddr_t, rename the helper
-for populating the initial GVA bitmap to drop the defunct terminology and
-use "vm" for the scope.
+Rename arm64's translate_to_host_paddr() to translate_hva_to_hpa() and
+update variable names to match, as using "vaddr" and "paddr" terminology
+is super confusing due to selftests using those exact names for *guest*
+addresses.
 
-Opportunistically fixup the declaration of the API, which has been broken
-since day 1.  The flaw went unnoticed because the sole caller is defined
-after the weak version, i.e. can see the prototype without a previous
-declaration.
+Opportunisitically drop superfluous local page_addr and paddr variables.
 
 No functional change intended.
 
-Fixes: e8b9a055fa04 ("KVM: arm64: selftests: Align VA space allocator with TTBR0")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util.h    | 2 +-
- tools/testing/selftests/kvm/lib/arm64/processor.c | 2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c        | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ tools/testing/selftests/kvm/arm64/sea_to_user.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 0239e89320e5..0fbfb2a28767 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -714,7 +714,7 @@ void vm_mem_region_reload(struct kvm_vm *vm, u32 slot);
- void vm_mem_region_move(struct kvm_vm *vm, u32 slot, u64 new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, u32 slot);
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, u32 vcpu_id);
--void vm_populate_vaddr_bitmap(struct kvm_vm *vm);
-+void vm_populate_gva_bitmap(struct kvm_vm *vm);
- gva_t vm_unused_gva_gap(struct kvm_vm *vm, size_t sz, gva_t vaddr_min);
- gva_t vm_alloc(struct kvm_vm *vm, size_t sz, gva_t vaddr_min);
- gva_t __vm_alloc(struct kvm_vm *vm, size_t sz, gva_t vaddr_min,
-diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-index c4f0e37f2907..384b6c80b1e7 100644
---- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-@@ -671,7 +671,7 @@ void kvm_selftest_arch_init(void)
- 	guest_modes_append_default();
+diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+index 7285eade4acf..fb06b9dcb3d9 100644
+--- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
++++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+@@ -56,13 +56,11 @@ static void *einj_hva;
+ static u64 einj_hpa;
+ static bool far_invalid;
+ 
+-static u64 translate_to_host_paddr(unsigned long vaddr)
++static u64 translate_hva_to_hpa(unsigned long hva)
+ {
+ 	u64 pinfo;
+-	s64 offset = vaddr / getpagesize() * sizeof(pinfo);
++	s64 offset = hva / getpagesize() * sizeof(pinfo);
+ 	int fd;
+-	u64 page_addr;
+-	u64 paddr;
+ 
+ 	fd = open("/proc/self/pagemap", O_RDONLY);
+ 	if (fd < 0)
+@@ -77,9 +75,8 @@ static u64 translate_to_host_paddr(unsigned long vaddr)
+ 	if ((pinfo & PAGE_PRESENT) == 0)
+ 		ksft_exit_fail_perror("Page not present");
+ 
+-	page_addr = (pinfo & PAGE_PHYSICAL) << MIN_PAGE_SHIFT;
+-	paddr = page_addr + (vaddr & (getpagesize() - 1));
+-	return paddr;
++	return ((pinfo & PAGE_PHYSICAL) << MIN_PAGE_SHIFT) +
++	       (hva & (getpagesize() - 1));
  }
  
--void vm_vaddr_populate_bitmap(struct kvm_vm *vm)
-+void vm_populate_gva_bitmap(struct kvm_vm *vm)
- {
- 	/*
- 	 * arm64 selftests use only TTBR0_EL1, meaning that the valid VA space
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 8c82b40a7448..1a1b41021cc7 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -267,7 +267,7 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
-  * based on the MSB of the VA. On architectures with this behavior
-  * the VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
-  */
--__weak void vm_vaddr_populate_bitmap(struct kvm_vm *vm)
-+__weak void vm_populate_gva_bitmap(struct kvm_vm *vm)
- {
- 	sparsebit_set_num(vm->vpages_valid,
- 		0, (1ULL << (vm->va_bits - 1)) >> vm->page_shift);
-@@ -385,7 +385,7 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+ static void write_einj_entry(const char *einj_path, u64 val)
+@@ -303,7 +300,7 @@ static void vm_inject_memory_uer(struct kvm_vm *vm)
+ 	ksft_print_msg("Before EINJect: data=%#lx\n",
+ 		guest_data);
  
- 	/* Limit to VA-bit canonical virtual addresses. */
- 	vm->vpages_valid = sparsebit_alloc();
--	vm_vaddr_populate_bitmap(vm);
-+	vm_populate_gva_bitmap(vm);
+-	einj_hpa = translate_to_host_paddr((unsigned long)einj_hva);
++	einj_hpa = translate_hva_to_hpa((unsigned long)einj_hva);
  
- 	/* Limit physical addresses to PA-bits. */
- 	vm->max_gfn = vm_compute_max_gfn(vm);
+ 	ksft_print_msg("EINJ_GVA=%#lx, einj_gpa=%#lx, einj_hva=%p, einj_hpa=%#lx\n",
+ 		       EINJ_GVA, einj_gpa, einj_hva, einj_hpa);
 -- 
 2.54.0.rc1.555.g9c883467ad-goog
 
