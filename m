@@ -1,162 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4FE3859CD;
-	Tue, 21 Apr 2026 07:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BFC397E91;
+	Tue, 21 Apr 2026 08:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776757381; cv=none; b=Fc0GjB83lW+nGChLcypKivAMa7PwRoKv88pUC3mRjLPjOkoqzBcjuFvm3NL121rcW7uc0qNlHpjpq4OrECGNSZrYIgqfe3l26vkxUwJVAh1m2YlNmEbQ/iYXJ0qcGQHczQ/ema0D/BMSkahYK1yDiTTXj0Ar5Ns+Q48F5XXAQ4U=
+	t=1776761466; cv=none; b=LTjqRaEy3C3BpZ3hpnijgLn/3gCpgLpj10MXuVdkRQyVgIeFM6Lkb6bj0S3z0UTEeiFGQFMHUS0Sq/zWj298mRVeGmR4RXIVWl+zCWmnxllr3FWwaXNplkWENXLweCcKul6BSAYCg/Dxx4IJ3/Z0s/hXVp+ass8aaGDHmdtD/J4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776757381; c=relaxed/simple;
-	bh=s7fVA6PF82ensDuWWJ/MMvmU6wMQangMaiwG9AjWg9g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mTq73JvOLEY01iDy0sCvsaiArvDYSF5TVlpuW+lgx8+qloieW5FCGBrdMDywF/QFFWMW4VnCAZiWpF6qIjhfmleC+PRQ1XPnyhbYOmFUj+3czkPUuqiNnfDYRRVDu4meWrFIWn/dMF/eXvr/7RYubaMN19DKTEbQ2KSUw5WncEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J2kUDW3o; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776761466; c=relaxed/simple;
+	bh=MEcfYsbBJrV5oQCJrkPYya9PsDdj0dGclYzGZ/NMaoQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pAYO/ixxRCMR/qpk1aGjbXWYK/h3Jyhghnj7/raXS4R5PDWEeNosbZ4VAw8Yi0tpiLnFOg7DtQgzSwXouZ41l0y8c/pjb2xn14seWRTT65Hj9PWrSKlu44c/PFdOn7Prc1MeURrSQ+qK8dd0HizOgPvgLiz2hBMEfrl/twws1lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv44PtdN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J2kUDW3o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92687C2BCB5;
-	Tue, 21 Apr 2026 07:43:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv44PtdN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599BDC2BCB0;
+	Tue, 21 Apr 2026 08:51:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776757380;
-	bh=s7fVA6PF82ensDuWWJ/MMvmU6wMQangMaiwG9AjWg9g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J2kUDW3oOuMGsgK/37Z1WijTgnRl19e78rmMEVIsDFff1EYvUQz+euUUIqwWnJLON
-	 ax8sKwD9mAgpmiBJTVBLj12ANMcr9Z8UmbLmB9uWt1RCZ/zyal6aRnGqKUFl0b9Wte
-	 gWWuZJwf8qDYBaOEEGkmHPgTuqusxFnG8S+RWZucGb5GJdhK5+rigWXBM9d/7BG9NR
-	 w3EQAHKnqBEAxawCJLdBoEyEIlUGoqfebbbUyFFtodWgHkDAaHIAK76YZZZHeqdxh7
-	 LXlUdUHG+KRKgifjkdbbbcVornb0hTgG58ktx+gLewiIteFsI7JrWfUzU1RkCKafhn
-	 yEOHRU+6w94PA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wF5l3-0000000DL3A-3tRI;
-	Tue, 21 Apr 2026 07:42:58 +0000
-Date: Tue, 21 Apr 2026 08:42:57 +0100
-Message-ID: <86jyu021z2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Deepanshu Kartikey <kartikey406@gmail.com>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	drjones@redhat.com,
-	christoffer.dall@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-Subject: Re: [PATCH] arm64: KVM: Initialize vGIC before preempt-disabled section in kvm_reset_vcpu()
-In-Reply-To: <CADhLXY4pL2BrPukVxr_kySzx48gMt7zFxOq8=eFSXqOB4at7aQ@mail.gmail.com>
-References: <20260412080437.38782-1-kartikey406@gmail.com>
-	<865x5r2dik.wl-maz@kernel.org>
-	<CADhLXY4pL2BrPukVxr_kySzx48gMt7zFxOq8=eFSXqOB4at7aQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1776761466;
+	bh=MEcfYsbBJrV5oQCJrkPYya9PsDdj0dGclYzGZ/NMaoQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rv44PtdNr22dtKoHbGMuLuFFdDw3bvbNc/DmRgWcVmzuLDomT92rSJwcxKDhGkp12
+	 uChD5+vAcrJkapF5msWb3hc0PiiVDwDmzlGoauk1Rp2hY32637iD1HS2jLeGWkvp+x
+	 edMAVyiQGC5RxPdppq0LUGkGu6K9qFCKeVben/2I3gES4JuF8UARLHj1qiTyCwPE/u
+	 m+NtImr7q56WBR4t+1HZKryZVgRkH7dBrpFJf5zKucpkHEBCOhpxF/pM8sKE3OdSmT
+	 W4UDnvSbmjKR5A1xIvcAbgjSGw5+Ln1he9pK+LXtZse27pu1GgMaEzU++/Z68J8qj0
+	 l7d6KLvBeommg==
+Date: Tue, 21 Apr 2026 09:51:00 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	zohar@linux.ibm.com, roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
+	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
+ initailise ffa driver
+Message-ID: <20260421-married-liberal-ammonite-dffda8@sudeepholla>
+References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
+ <20260417175759.3191279-5-yeoreum.yun@arm.com>
+ <87se8sbozv.wl-maz@kernel.org>
+ <aeNeNjfO7i128TIP@e129823.arm.com>
+ <87pl3vb5bm.wl-maz@kernel.org>
+ <aecf57rWloQwDh6v@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kartikey406@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, drjones@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aecf57rWloQwDh6v@e129823.arm.com>
 
-On Tue, 21 Apr 2026 02:48:02 +0100,
-Deepanshu Kartikey <kartikey406@gmail.com> wrote:
->=20
-> On Thu, Apr 16, 2026 at 7:50=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Sun, 12 Apr 2026 09:04:37 +0100,
-> > Deepanshu Kartikey <kartikey406@gmail.com> wrote:
-> > >
-> > > kvm_reset_vcpu() calls kvm_timer_vcpu_reset() inside a preempt-disabl=
-ed
-> > > section to avoid races with preempt notifiers that also call vcpu put=
-/load.
-> > >
-> > > However, kvm_timer_vcpu_reset() eventually calls kvm_vgic_inject_irq()
-> > > which triggers vgic_lazy_init() if the vGIC has not been initialized =
-yet.
-> > > vgic_lazy_init() acquires a mutex and calls vgic_init() which invokes
-> > > synchronize_srcu_expedited() -- both of which may sleep. Sleeping ins=
-ide
-> > > a preempt-disabled section is illegal and causes:
-> > >
-> > >   BUG: scheduling while atomic: syz.1.49/3699/0x00000002
-> > >
-> > > Fix this by calling vgic_lazy_init() before preempt_disable(). On the
-> > > second call inside kvm_vgic_inject_irq(), vgic_initialized() will ret=
-urn
-> > > true and vgic_lazy_init() will return immediately without sleeping.
-> > >
-> >
-> > I think this really goes in the wrong direction. Forcing the vgic (a
-> > global resource) to initialise when the vcpu's timer (a local
-> > resource) is reset feels at best bizarre. Now you are promoting it to
-> > be forced at vcpu reset. This makes things worse.
-> >
-> > You probably want to take a step back and look at *why* we end-up
-> > here. The core reason seems to be that the timer emulation caches the
-> > level in a per-timer structure, and tries hard not call into the vgic
-> > unless the level changes. Which means that unless the vgic is
-> > initialised and is able to latch that state, the initial pending state
-> > will not be propagated to the guest.
-> >
-> > But do we need this optimisation? I don't think so. Other emulated
-> > devices don't require it. We can let the vgic know the state of the
-> > timer at every vcpu entry, just like we do for other virtual
-> > interrupts that the kernel injects (PMU, vgic MI).
-> >
-> > Once you remove the this cache and the need for the vgic to buffer
-> > things outside of normal execution, you can also drop the magic init
-> > from the interrupt injection path, because the injection will happen
-> > on the run path, just like any other PPI.
-> >
-> > That'd be a much better approach IMO.
-> >
-> > Thanks,
-> >
-> >         M.
-> >
-> > --
-> > Without deviation from the norm, progress is not possible.
->=20
->=20
-> Hi Marc,
->=20
-> Thank you for the detailed feedback! I apologize for the delayed
-> response =E2=80=94 I was away on holiday.
+On Tue, Apr 21, 2026 at 07:57:43AM +0100, Yeoreum Yun wrote:
 
-No need to apologise. I hadn't spotted this report (syzkaller badly
-triaged it), so thanks for bring it to my attention.
+[...]
 
->=20
-> I understand your point. My fix addresses the symptom rather than the
-> root cause. Forcing vGIC (a global resource) to initialize during
-> timer (a local resource) reset is not the right approach.
->=20
-> I will take your suggestion and work on:
->=20
-> I will send a v2 once I have something ready.
+> 
+> Also, the FF-A initialization is not driven by a device probe, but rather
+> happens as part of the bus registration itself,
+> so it does not fit well with a device_link or probe deferral based approach.
+> 
+> Instead, perhaps we could go with the idea I mentioned previously:
+> either introduce a notifier, or create a pseudo ffa_device
+> once pKVM initialization has completed, and
+> then let the ffa driver perform the additional initialization from there.
+> 
+> Am I missing something?
+> 
 
-I've posted my own take on this at [1], for which you are on Cc. Feel
-free to review it if you have the time (I'll post a v2 anyway, as I
-have accumulated a couple of additional fixes).
+In order to handle/cleanup some ugliness in interrupt management in the
+FF-A driver, we may introduce DT node eventually. But it will take sometime.
 
-Cheers,
-
-	M.
-
-[1] https://lore.kernel.org/r/20260417124612.2770268-1-maz@kernel.org
-
---=20
-Without deviation from the norm, progress is not possible.
+-- 
+Regards,
+Sudeep
