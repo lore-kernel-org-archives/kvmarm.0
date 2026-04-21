@@ -1,34 +1,34 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BFC397E91;
-	Tue, 21 Apr 2026 08:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8533A168B
+	for <kvmarm@lists.linux.dev>; Tue, 21 Apr 2026 09:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776761466; cv=none; b=LTjqRaEy3C3BpZ3hpnijgLn/3gCpgLpj10MXuVdkRQyVgIeFM6Lkb6bj0S3z0UTEeiFGQFMHUS0Sq/zWj298mRVeGmR4RXIVWl+zCWmnxllr3FWwaXNplkWENXLweCcKul6BSAYCg/Dxx4IJ3/Z0s/hXVp+ass8aaGDHmdtD/J4=
+	t=1776762731; cv=none; b=J0+NANHAd6sSf1nvguYHWRE4ClD+8zGeDXWHO4lwo5G9+nWz1uQUVa/MCVcL1y37BrsXGmDearmWphfPSlRU6cz+aLQYOIK3pWZA9Ubmh6dhdnQU8GyuBlV9XyokuELIUuabHHKiVPie9Do+Dev6iCKmscraxWTXAkjzQvmf+Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776761466; c=relaxed/simple;
-	bh=MEcfYsbBJrV5oQCJrkPYya9PsDdj0dGclYzGZ/NMaoQ=;
+	s=arc-20240116; t=1776762731; c=relaxed/simple;
+	bh=bUki7691gF6PAdgoVdG4YA6Jl/b0UXzAgcjElizpR2c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pAYO/ixxRCMR/qpk1aGjbXWYK/h3Jyhghnj7/raXS4R5PDWEeNosbZ4VAw8Yi0tpiLnFOg7DtQgzSwXouZ41l0y8c/pjb2xn14seWRTT65Hj9PWrSKlu44c/PFdOn7Prc1MeURrSQ+qK8dd0HizOgPvgLiz2hBMEfrl/twws1lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv44PtdN; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vd5HkQPg5BXNyMs12RM1bwWZv3wvhdte/Aj/vrtvnZyUY1qKCUJ4e+Fi3dola9um0D3YIdAMxVBouxF7H3uZD1VlGGZpYp3j+gt8cndM3S2THbZLBtm8QuIpHDl9qwnSOts61BZE2CvVTeDBV44dnZe0j0doz5JqERORtApW0/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OGniPLsi; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv44PtdN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599BDC2BCB0;
-	Tue, 21 Apr 2026 08:51:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776761466;
-	bh=MEcfYsbBJrV5oQCJrkPYya9PsDdj0dGclYzGZ/NMaoQ=;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OGniPLsi"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB80625E0;
+	Tue, 21 Apr 2026 02:12:02 -0700 (PDT)
+Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF5C93F641;
+	Tue, 21 Apr 2026 02:12:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1776762728; bh=bUki7691gF6PAdgoVdG4YA6Jl/b0UXzAgcjElizpR2c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rv44PtdNr22dtKoHbGMuLuFFdDw3bvbNc/DmRgWcVmzuLDomT92rSJwcxKDhGkp12
-	 uChD5+vAcrJkapF5msWb3hc0PiiVDwDmzlGoauk1Rp2hY32637iD1HS2jLeGWkvp+x
-	 edMAVyiQGC5RxPdppq0LUGkGu6K9qFCKeVben/2I3gES4JuF8UARLHj1qiTyCwPE/u
-	 m+NtImr7q56WBR4t+1HZKryZVgRkH7dBrpFJf5zKucpkHEBCOhpxF/pM8sKE3OdSmT
-	 W4UDnvSbmjKR5A1xIvcAbgjSGw5+Ln1he9pK+LXtZse27pu1GgMaEzU++/Z68J8qj0
-	 l7d6KLvBeommg==
-Date: Tue, 21 Apr 2026 09:51:00 +0100
-From: Sudeep Holla <sudeep.holla@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
+	b=OGniPLsiAh0DSyvAQ5HMjlIYa15Nz9Y+R15H0PhXbZ+6i7lwFWMIo2fK1tBXZmc6c
+	 CJDGh1w13rrXBujXV81XH+KUHfoFW8C30GmjcKXD7XDvf6xppKXyTPQ8qpdwEnv14Z
+	 U33+LK267IvzFlZkJIbw7cpxCc+Ho2cIdtbjqz9o=
+Date: Tue, 21 Apr 2026 10:12:01 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Sudeep Holla <sudeep.holla@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
@@ -40,13 +40,14 @@ Cc: Marc Zyngier <maz@kernel.org>, linux-security-module@vger.kernel.org,
 	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
 Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
  initailise ffa driver
-Message-ID: <20260421-married-liberal-ammonite-dffda8@sudeepholla>
+Message-ID: <aec/YSxYO1bOhXhn@e129823.arm.com>
 References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
  <20260417175759.3191279-5-yeoreum.yun@arm.com>
  <87se8sbozv.wl-maz@kernel.org>
  <aeNeNjfO7i128TIP@e129823.arm.com>
  <87pl3vb5bm.wl-maz@kernel.org>
  <aecf57rWloQwDh6v@e129823.arm.com>
+ <20260421-married-liberal-ammonite-dffda8@sudeepholla>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,28 +56,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aecf57rWloQwDh6v@e129823.arm.com>
+In-Reply-To: <20260421-married-liberal-ammonite-dffda8@sudeepholla>
 
-On Tue, Apr 21, 2026 at 07:57:43AM +0100, Yeoreum Yun wrote:
+> On Tue, Apr 21, 2026 at 07:57:43AM +0100, Yeoreum Yun wrote:
+>
+> [...]
+>
+> >
+> > Also, the FF-A initialization is not driven by a device probe, but rather
+> > happens as part of the bus registration itself,
+> > so it does not fit well with a device_link or probe deferral based approach.
+> >
+> > Instead, perhaps we could go with the idea I mentioned previously:
+> > either introduce a notifier, or create a pseudo ffa_device
+> > once pKVM initialization has completed, and
+> > then let the ffa driver perform the additional initialization from there.
+> >
+> > Am I missing something?
+> >
+>
+> In order to handle/cleanup some ugliness in interrupt management in the
+> FF-A driver, we may introduce DT node eventually. But it will take sometime.
 
-[...]
+Unfortunately, I think this DT node wouldn't be helpful to solve
+this situation for dependency with the kvm misc device...
 
-> 
-> Also, the FF-A initialization is not driven by a device probe, but rather
-> happens as part of the bus registration itself,
-> so it does not fit well with a device_link or probe deferral based approach.
-> 
-> Instead, perhaps we could go with the idea I mentioned previously:
-> either introduce a notifier, or create a pseudo ffa_device
-> once pKVM initialization has completed, and
-> then let the ffa driver perform the additional initialization from there.
-> 
-> Am I missing something?
-> 
+IMHO, current situation, the notifier seems to good option. unless
+we make the initcall to recongise this dependency.
 
-In order to handle/cleanup some ugliness in interrupt management in the
-FF-A driver, we may introduce DT node eventually. But it will take sometime.
-
--- 
-Regards,
-Sudeep
+--
+Sincerely,
+Yeoreum Yun
