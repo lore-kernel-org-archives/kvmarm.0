@@ -1,125 +1,162 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACFD2853F3
-	for <kvmarm@lists.linux.dev>; Tue, 21 Apr 2026 06:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4FE3859CD;
+	Tue, 21 Apr 2026 07:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776754672; cv=none; b=nqUqKCZ73XoBdicklk3FzIUofv3Txrz+fqdD5bWou4t8P4D8LHyb8YQQpCmKTMi0gBRDtsAoTBrrCBIQbevA6Y1//bXCPWIQOYbCO/4q/fXg0dJYKbXfclFC5EjBNSaJnSKyE8ta9GlX/ayh6fevKmygXUtKhqmYTz/QvPz3oBs=
+	t=1776757381; cv=none; b=Fc0GjB83lW+nGChLcypKivAMa7PwRoKv88pUC3mRjLPjOkoqzBcjuFvm3NL121rcW7uc0qNlHpjpq4OrECGNSZrYIgqfe3l26vkxUwJVAh1m2YlNmEbQ/iYXJ0qcGQHczQ/ema0D/BMSkahYK1yDiTTXj0Ar5Ns+Q48F5XXAQ4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776754672; c=relaxed/simple;
-	bh=QSlJWj/ZlGmtGszuI1E4a2OjETy6Q0GCQCorMuB2AXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GwgXp82MwY8GrTLDITxTpxSyDasj/Z3z3g/jWKKeljSiBFOiI6DSXQKYiAUYem/F/nxYEr5pWrp1YKyWPoLyCtrM9JmStYPshNP7KU3Pd8xgEQZVHsx2C8lr5sj7qlapMmsKblaATlEzWt3ahmqaeSskmJ1r5Udc80pNLReNwDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Pt1psxwr; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1776757381; c=relaxed/simple;
+	bh=s7fVA6PF82ensDuWWJ/MMvmU6wMQangMaiwG9AjWg9g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mTq73JvOLEY01iDy0sCvsaiArvDYSF5TVlpuW+lgx8+qloieW5FCGBrdMDywF/QFFWMW4VnCAZiWpF6qIjhfmleC+PRQ1XPnyhbYOmFUj+3czkPUuqiNnfDYRRVDu4meWrFIWn/dMF/eXvr/7RYubaMN19DKTEbQ2KSUw5WncEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J2kUDW3o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Pt1psxwr"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9EAA02573;
-	Mon, 20 Apr 2026 23:57:43 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 13E2C3F915;
-	Mon, 20 Apr 2026 23:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1776754669; bh=QSlJWj/ZlGmtGszuI1E4a2OjETy6Q0GCQCorMuB2AXM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pt1psxwrIkpsDuFunhfbZr6dKT6D8qOQqYLotTMpPy0Bq9X70/1jgHJ8dYVsS2jHp
-	 zgJCeSn1zyMK6cIzVPpRKiODcxHa5pZV850tmFXeADvmwDhubwnQo58d9Y8P47F8Vy
-	 tyYxXc6QoreOaQt+3CkwM2btIckSac4AVcSR3hBI=
-Date: Tue, 21 Apr 2026 07:57:43 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
- initailise ffa driver
-Message-ID: <aecf57rWloQwDh6v@e129823.arm.com>
-References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
- <20260417175759.3191279-5-yeoreum.yun@arm.com>
- <87se8sbozv.wl-maz@kernel.org>
- <aeNeNjfO7i128TIP@e129823.arm.com>
- <87pl3vb5bm.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J2kUDW3o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92687C2BCB5;
+	Tue, 21 Apr 2026 07:43:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776757380;
+	bh=s7fVA6PF82ensDuWWJ/MMvmU6wMQangMaiwG9AjWg9g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=J2kUDW3oOuMGsgK/37Z1WijTgnRl19e78rmMEVIsDFff1EYvUQz+euUUIqwWnJLON
+	 ax8sKwD9mAgpmiBJTVBLj12ANMcr9Z8UmbLmB9uWt1RCZ/zyal6aRnGqKUFl0b9Wte
+	 gWWuZJwf8qDYBaOEEGkmHPgTuqusxFnG8S+RWZucGb5GJdhK5+rigWXBM9d/7BG9NR
+	 w3EQAHKnqBEAxawCJLdBoEyEIlUGoqfebbbUyFFtodWgHkDAaHIAK76YZZZHeqdxh7
+	 LXlUdUHG+KRKgifjkdbbbcVornb0hTgG58ktx+gLewiIteFsI7JrWfUzU1RkCKafhn
+	 yEOHRU+6w94PA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wF5l3-0000000DL3A-3tRI;
+	Tue, 21 Apr 2026 07:42:58 +0000
+Date: Tue, 21 Apr 2026 08:42:57 +0100
+Message-ID: <86jyu021z2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Deepanshu Kartikey <kartikey406@gmail.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	drjones@redhat.com,
+	christoffer.dall@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
+Subject: Re: [PATCH] arm64: KVM: Initialize vGIC before preempt-disabled section in kvm_reset_vcpu()
+In-Reply-To: <CADhLXY4pL2BrPukVxr_kySzx48gMt7zFxOq8=eFSXqOB4at7aQ@mail.gmail.com>
+References: <20260412080437.38782-1-kartikey406@gmail.com>
+	<865x5r2dik.wl-maz@kernel.org>
+	<CADhLXY4pL2BrPukVxr_kySzx48gMt7zFxOq8=eFSXqOB4at7aQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pl3vb5bm.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kartikey406@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, drjones@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, syzbot+12b178b7c756664d2518@syzkaller.appspotmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-> On Sat, 18 Apr 2026 11:34:30 +0100,
-> Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+On Tue, 21 Apr 2026 02:48:02 +0100,
+Deepanshu Kartikey <kartikey406@gmail.com> wrote:
+>=20
+> On Thu, Apr 16, 2026 at 7:50=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
+te:
 > >
-> > > > @@ -2035,6 +2037,16 @@ static int __init ffa_init(void)
-> > > >  	u32 buf_sz;
-> > > >  	size_t rxtx_bufsz = SZ_4K;
-> > > >
-> > > > +	/*
-> > > > +	 * When pKVM is enabled, the FF-A driver must be initialized
-> > > > +	 * after pKVM initialization. Otherwise, pKVM cannot negotiate
-> > > > +	 * the FF-A version or obtain RX/TX buffer information,
-> > > > +	 * which leads to failures in FF-A calls.
-> > > > +	 */
-> > > > +	if (IS_ENABLED(CONFIG_KVM) && is_protected_kvm_enabled() &&
-> > > > +	    !is_kvm_arm_initialised())
-> > > > +		return -EPROBE_DEFER;
-> > > > +
+> > On Sun, 12 Apr 2026 09:04:37 +0100,
+> > Deepanshu Kartikey <kartikey406@gmail.com> wrote:
 > > >
-> > > That's still fundamentally wrong: pkvm is not ready until
-> > > finalize_pkvm() has finished, and that's not indicated by
-> > > is_kvm_arm_initialised().
+> > > kvm_reset_vcpu() calls kvm_timer_vcpu_reset() inside a preempt-disabl=
+ed
+> > > section to avoid races with preempt notifiers that also call vcpu put=
+/load.
+> > >
+> > > However, kvm_timer_vcpu_reset() eventually calls kvm_vgic_inject_irq()
+> > > which triggers vgic_lazy_init() if the vGIC has not been initialized =
+yet.
+> > > vgic_lazy_init() acquires a mutex and calls vgic_init() which invokes
+> > > synchronize_srcu_expedited() -- both of which may sleep. Sleeping ins=
+ide
+> > > a preempt-disabled section is illegal and causes:
+> > >
+> > >   BUG: scheduling while atomic: syz.1.49/3699/0x00000002
+> > >
+> > > Fix this by calling vgic_lazy_init() before preempt_disable(). On the
+> > > second call inside kvm_vgic_inject_irq(), vgic_initialized() will ret=
+urn
+> > > true and vgic_lazy_init() will return immediately without sleeping.
+> > >
 > >
-> > Thanks. I miss the TSC bit set in here.
->
-> That's the least of the problems. None of the infrastructure is in
-> place at this stage...
->
-> > IMHO, I'd like to make an new state check function --
-> > is_pkvm_arm_initialised() so that ff-a driver to know whether
-> > pkvm is initialised.
->
-> Doesn't sound great, TBH.
->
-> > or any other suggestion?
->
-> Instead of adding more esoteric predicates, I'd rather you build on an
-> existing infrastructure. You have a dependency on KVM, use something
-> that is designed to enforce dependencies. Device links spring to mind
-> as something designed for that.
->
-> Can you look into enabling this for KVM? If that's possible, then it
-> should be easy enough to delay the actual KVM registration after pKVM
-> is finalised.
+> > I think this really goes in the wrong direction. Forcing the vgic (a
+> > global resource) to initialise when the vcpu's timer (a local
+> > resource) is reset feels at best bizarre. Now you are promoting it to
+> > be forced at vcpu reset. This makes things worse.
+> >
+> > You probably want to take a step back and look at *why* we end-up
+> > here. The core reason seems to be that the timer emulation caches the
+> > level in a per-timer structure, and tries hard not call into the vgic
+> > unless the level changes. Which means that unless the vgic is
+> > initialised and is able to latch that state, the initial pending state
+> > will not be propagated to the guest.
+> >
+> > But do we need this optimisation? I don't think so. Other emulated
+> > devices don't require it. We can let the vgic know the state of the
+> > timer at every vcpu entry, just like we do for other virtual
+> > interrupts that the kernel injects (PMU, vgic MI).
+> >
+> > Once you remove the this cache and the need for the vgic to buffer
+> > things outside of normal execution, you can also drop the magic init
+> > from the interrupt injection path, because the injection will happen
+> > on the run path, just like any other PPI.
+> >
+> > That'd be a much better approach IMO.
+> >
+> > Thanks,
+> >
+> >         M.
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
+>=20
+>=20
+> Hi Marc,
+>=20
+> Thank you for the detailed feedback! I apologize for the delayed
+> response =E2=80=94 I was away on holiday.
 
-Hmm, I also considered moving kvm_init() into finalised_pkvm() and
-then handling the remaining ffa_init() work after /dev/kvm is registered.
+No need to apologise. I hadn't spotted this report (syzkaller badly
+triaged it), so thanks for bring it to my attention.
 
-However, this approach seems awkward in practice,
-because misc has neither a bus nor a dedicated class notifier that we can hook into.
+>=20
+> I understand your point. My fix addresses the symptom rather than the
+> root cause. Forcing vGIC (a global resource) to initialize during
+> timer (a local resource) reset is not the right approach.
+>=20
+> I will take your suggestion and work on:
+>=20
+> I will send a v2 once I have something ready.
 
-Also, the FF-A initialization is not driven by a device probe, but rather
-happens as part of the bus registration itself,
-so it does not fit well with a device_link or probe deferral based approach.
+I've posted my own take on this at [1], for which you are on Cc. Feel
+free to review it if you have the time (I'll post a v2 anyway, as I
+have accumulated a couple of additional fixes).
 
-Instead, perhaps we could go with the idea I mentioned previously:
-either introduce a notifier, or create a pseudo ffa_device
-once pKVM initialization has completed, and
-then let the ffa driver perform the additional initialization from there.
+Cheers,
 
-Am I missing something?
+	M.
 
---
-Sincerely,
-Yeoreum Yun
+[1] https://lore.kernel.org/r/20260417124612.2770268-1-maz@kernel.org
+
+--=20
+Without deviation from the norm, progress is not possible.
