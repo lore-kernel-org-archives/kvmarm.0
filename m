@@ -1,146 +1,240 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885632C11D5;
-	Tue, 21 Apr 2026 09:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7C3382F19
+	for <kvmarm@lists.linux.dev>; Tue, 21 Apr 2026 12:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776765292; cv=none; b=jYwOVAd9ywYr5kIq/jgmEUIh0zo0ukE7tGK3K9HsltTQcUAU6fJy0xoPHF98i1MI6XnVPKm8E8xnMnTCkxA5rSYj0ULtV3sf5KZw4DTtyxETpJ8ZxOT8lVP0BSa2HGmsJJEmMfbHyEaeBPBwt7aDJ2xlOSrR5qJFhwxSxUqQRTk=
+	t=1776772849; cv=none; b=fssuIU78Cart3fGGG3/2rOHvqc5XMDhyS8oEU2GhJXJuGk3KlMtL4HHs9jVZizydCAvBZTZkewpmPHzk/r8l9zEQ37cQ5jcFIvBJRD4x0jojHcirpsck+9Mh/7peQChJjgR5ZjOXKLrlhnqAxCADcBwu5Er2RxPx8fPv9idj2X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776765292; c=relaxed/simple;
-	bh=005nSr9PcwcpWMrkMnnLw5KzGHpwsyQmbaNI4ETSzOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZuhPTsloM8CfR5p34LhDBnuWVv3fQRtpHo/ISwcpOz/J7sKESFkmDVF3H/LoKHqFy4dH6QACc0vJ8djJv5jxYyueLEnizRESUi6QgW0IckzueP56ahuZXT2V3Duom7mD7P5NMTg4S42cGPyTT+UyXh3cv/ni/JjtjwKtFKit1nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JlHQavFR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776772849; c=relaxed/simple;
+	bh=jdTMyVKl7mqgrtZHznfktqjdt89bUnvAEZbCRVLGz5o=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=qp8I5TKSQ2Rx1U1J9GFQx0Pf7/imVgwAcwRGHkSXw5sorAOqJyrqZ6tZa0MT8yWg3cHxWTN1X8rDfpACJVrfCuVwPYPJD7r7eqPv4RT19iOEllo8B7aKWh4dJFVm+vwh+JcnId77JQkJOlv/X6SjIEzldhTvhDO2ptMiDBxfe+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=r+kr/x/t; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JlHQavFR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32A36C2BCB0;
-	Tue, 21 Apr 2026 09:54:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776765292;
-	bh=005nSr9PcwcpWMrkMnnLw5KzGHpwsyQmbaNI4ETSzOI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JlHQavFR7vQNlGyJp7mtx9//PUxdrDZHk+LJOVN0FG8mlDMEqmeZP5cFRkyPcA0rt
-	 jE1HfcDyVsTc/zWGZdnpnjEyNjblvo3QUO09Xyfi3SoTj6zrIrOboukX+IYtPzjAoY
-	 Dcc0YSC5rSCvNVltb6VxhYFCEiZkpIGxOyOZ1qwipAlrAvJJWmvtW31n/Q1D/ydM67
-	 fHz1UKyOQ8Nte7Fihp5S5V9Yomdfyb526jt4lUV6p39A77uw5oc1+pQXcJ2BcES8UU
-	 WDjL4ZDvmsv6yLTCMtLjZ0KeVrCrFZLjx7d2j2SF4tIzYxiU/CqNpBYG4p7kJ4Aub/
-	 mQkZlHXxHACHg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wF7of-0000000DNJ6-3Sf8;
-	Tue, 21 Apr 2026 09:54:49 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] tracing: Make undefsyms_base.c a first-class citizen
-Date: Tue, 21 Apr 2026 10:54:46 +0100
-Message-ID: <20260421095446.2951646-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="r+kr/x/t"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63KJgcsg2328269;
+	Tue, 21 Apr 2026 12:00:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=/7V9HP
+	uIqnD85K2oDoEgBomydr4fK04ZND9W1sNTOgU=; b=r+kr/x/ti0V6c3IkKod/VB
+	d7eNY+/P6ZmaGYqTCpbndu0U1exnGOAnuR9I3Ots3K3F0GsnACDionm9kTyezu4A
+	jpt+WEQf0gd68pMpYy+36Y8gxHW50x6Nsrv0Ocgex+vp/BdF62yE4O6zK1mkqG7M
+	LvmiuYsHgLbcF3tIpiNQKRLFSGnrlwmDLJuZTa1Mjd8DCriVvIs+BXYgxv7R4i2y
+	3o2wHSZi2J6fmRWJvakd5mvvJJOJvAhRZEv7He+54DJ8sgx180v3RkOz21Aed0VC
+	93IiY4uxqRyFPRvVGUX4s8BhjSaN1MbUx9e6e7IHm2cG9WLbBqFPfCcifrwAYI/w
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dm2k0uc15-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Apr 2026 12:00:16 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63LBoIr6028465;
+	Tue, 21 Apr 2026 12:00:16 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dmn9k0hsh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Apr 2026 12:00:16 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63LC0FZJ24445552
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Apr 2026 12:00:15 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BB7CB58064;
+	Tue, 21 Apr 2026 12:00:15 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A1B8958062;
+	Tue, 21 Apr 2026 12:00:13 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.28.47])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Apr 2026 12:00:13 +0000 (GMT)
+Message-ID: <a6a0e15286c983d720de227c6827adbe976c5b9b.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH 1/4] security: ima: move ima_init into
+ late_initcall_sync
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, peterhuewe@gmx.de, jarkko@kernel.org,
+        jgg@ziepe.ca, sudeep.holla@kernel.org, maz@kernel.org,
+        oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+        yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+In-Reply-To: <20260417175759.3191279-2-yeoreum.yun@arm.com>
+References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
+	 <20260417175759.3191279-2-yeoreum.yun@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 Apr 2026 08:00:13 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, torvalds@linux-foundation.org, pbonzini@redhat.com, vdonnefort@google.com, nathan@kernel.org, rostedt@goodmis.org, arnd@arndb.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: lvh3OHjg1O_576NYFViCNKPWZGCSXB1N
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDExNyBTYWx0ZWRfX7+yITLJGcICe
+ Wy7Tl6qKVtdEs3wELScUUUtAg4HW3xSgBpBrBNg+HrHuWfxIGUqvc5dNfA7vZAJshlgqypmp9Ow
+ l4NNlQUq2Odi+vbwGJjfpev9rJbVuWFIRhJm6Lq9P+Q79FOIetUYMbgt/aOBsYoZAvt9V+XNodc
+ Yasn2zAY/i6QJGtaQAzrwWUtg4oUeNRJGLegroApJtZt6LA8yAsLiqr7Xap18QzMayV7bCBBLrQ
+ C+VknHo0fG8aXmXa2MEXzzbQrW/RU5UQXWfjkhKt9gZnUPVITwTjIiX/2h5/RobjNZikJxfErlH
+ DgLcgldsIDClsMJVV4TWIRTTanVtuVBMGyKXThvj2xRg5JT5CGjfP8v8Ckq5t/13DfeXcCHXj8o
+ SCHK4xCOKDdB5svZOUsyR9vO53c0R2QoeLJIT1v/wpagsB35oWPfaQx60TFk+6RPCy2LVk4Lxph
+ 1t/77m/3qhulw3V2Dmg==
+X-Authority-Analysis: v=2.4 cv=PtujqQM3 c=1 sm=1 tr=0 ts=69e766d1 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=7CQSdrXTAAAA:8
+ a=0cQYFyLwv25f5AwIjZYA:9 a=QEXdDO2ut3YA:10 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-GUID: idKqLRdvVn5SfRlMsXj151u3ESLzKcl5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-21_02,2026-04-20_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 clxscore=1011 spamscore=0 impostorscore=0
+ priorityscore=1501 bulkscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604210117
 
-Linus points out that dumping undefsyms_base.c form the Makefile
-is rather ugly, and that a much better course of action would be
-to have this file as a first-class citizen in the git tree.
+On Fri, 2026-04-17 at 18:57 +0100, Yeoreum Yun wrote:
+> To generate the boot_aggregate log in the IMA subsystem with TPM PCR valu=
+es,
+> the TPM driver must be built as built-in and
+> must be probed before the IMA subsystem is initialized.
+>=20
+> However, when the TPM device operates over the FF-A protocol using
+> the CRB interface, probing fails and returns -EPROBE_DEFER if
+> the tpm_crb_ffa device =E2=80=94 an FF-A device that provides the communi=
+cation
+> interface to the tpm_crb driver =E2=80=94 has not yet been probed.
+>=20
+> To ensure the TPM device operating over the FF-A protocol with
+> the CRB interface is probed before IMA initialization,
+> the following conditions must be met:
+>=20
+>    1. The corresponding ffa_device must be registered,
+>       which is done via ffa_init().
+>=20
+>    2. The tpm_crb_driver must successfully probe this device via
+>       tpm_crb_ffa_init().
+>=20
+>    3. The tpm_crb driver using CRB over FF-A can then
+>       be probed successfully. (See crb_acpi_add() and
+>       tpm_crb_ffa_init() for reference.)
+>=20
+> Unfortunately, ffa_init(), tpm_crb_ffa_init(), and crb_acpi_driver_init()=
+ are
+> all registered with device_initcall, which means crb_acpi_driver_init() m=
+ay
+> be invoked before ffa_init() and tpm_crb_ffa_init() are completed.
+>=20
+> When this occurs, probing the TPM device is deferred.
+> However, the deferred probe can happen after the IMA subsystem
+> has already been initialized, since IMA initialization is performed
+> during late_initcall, and deferred_probe_initcall() is performed
+> at the same level.
+>=20
+> To resolve this, move ima_init() into late_inicall_sync level
+> so that let IMA not miss TPM PCR value when generating boot_aggregate
+> log though TPM device presents in the system.
+>=20
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 
-This allows some extra cleanup in the Makefile, and the removal of
-the .gitignore file in kernel/trace.
+IMA should be initialized as early as possible. I'm really hesitant to defe=
+r
+ima_init() to late_initcall_sync() for systems that the TPM is currently
+initialized in time. For these systems, continue initializing IMA at
+late_initcall(). As a compromise for those systems that the TPM isn't prope=
+rly
+initialized in time, define and instantiate the late_initcall_sync().
 
-Link: https://lore.kernel.org/r/CAHk-=wieqGd_XKpu8UxDoyADZx8TDe8CF3RmkUXt5N_9t5Pf_w@mail.gmail.com
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
----
- kernel/trace/.gitignore       |  1 -
- kernel/trace/Makefile         | 23 -----------------------
- kernel/trace/undefsyms_base.c | 14 ++++++++++++++
- 3 files changed, 14 insertions(+), 24 deletions(-)
- delete mode 100644 kernel/trace/.gitignore
- create mode 100644 kernel/trace/undefsyms_base.c
+ima_init() would need to differentiate between the late_initcall and
+late_initcall_sync.  On late_initcall(), instead of saying "No TPM chip fou=
+nd,
+activating TPM-bypass!",  it should say "No TPM chip found, deferring to
+late_initcall_sync" or something similar.
 
-diff --git a/kernel/trace/.gitignore b/kernel/trace/.gitignore
-deleted file mode 100644
-index 6adbb09d6deb0..0000000000000
---- a/kernel/trace/.gitignore
-+++ /dev/null
-@@ -1 +0,0 @@
--/undefsyms_base.c
-diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index 4d4229e5eec4b..0b0b8f5b9d2bf 100644
---- a/kernel/trace/Makefile
-+++ b/kernel/trace/Makefile
-@@ -140,29 +140,6 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
- # undefsyms_base generates a set of compiler and tooling-generated symbols that can
- # safely be ignored for simple_ring_buffer.
- #
--filechk_undefsyms_base = \
--	echo '$(pound)include <linux/atomic.h>'; \
--	echo '$(pound)include <linux/string.h>'; \
--	echo '$(pound)include <asm/page.h>'; \
--	echo 'static char page[PAGE_SIZE] __aligned(PAGE_SIZE);'; \
--	echo 'void undefsyms_base(void *p, int n);'; \
--	echo 'void undefsyms_base(void *p, int n) {'; \
--	echo '	char buffer[256] = { 0 };'; \
--	echo '	u32 u = 0;'; \
--	echo '	memset((char * volatile)page, 8, PAGE_SIZE);'; \
--	echo '	memset((char * volatile)buffer, 8, sizeof(buffer));'; \
--	echo '	memcpy((void * volatile)p, buffer, sizeof(buffer));'; \
--	echo '	cmpxchg((u32 * volatile)&u, 0, 8);'; \
--	echo '	WARN_ON(n == 0xdeadbeef);'; \
--	echo '}'
--
--$(obj)/undefsyms_base.c: FORCE
--	$(call filechk,undefsyms_base)
--
--clean-files += undefsyms_base.c
--
--$(obj)/undefsyms_base.o: $(obj)/undefsyms_base.c
--
- targets += undefsyms_base.o
- 
- # Ensure KASAN is enabled to avoid logic that may disable FORTIFY_SOURCE when
-diff --git a/kernel/trace/undefsyms_base.c b/kernel/trace/undefsyms_base.c
-new file mode 100644
-index 0000000000000..3db5adf918cce
---- /dev/null
-+++ b/kernel/trace/undefsyms_base.c
-@@ -0,0 +1,14 @@
-+#include <linux/atomic.h>
-+#include <linux/string.h>
-+#include <asm/page.h>
-+static char page[PAGE_SIZE] __aligned(PAGE_SIZE);
-+void undefsyms_base(void *p, int n);
-+void undefsyms_base(void *p, int n) {
-+	char buffer[256] = { 0 };
-+	u32 u = 0;
-+	memset((char * volatile)page, 8, PAGE_SIZE);
-+	memset((char * volatile)buffer, 8, sizeof(buffer));
-+	memcpy((void * volatile)p, buffer, sizeof(buffer));
-+	cmpxchg((u32 * volatile)&u, 0, 8);
-+	WARN_ON(n == 0xdeadbeef);
-+}
--- 
-2.47.3
+thanks,
 
+Mimi
+
+> ---
+>  include/linux/lsm_hooks.h         |  2 ++
+>  security/integrity/ima/ima_main.c |  2 +-
+>  security/lsm_init.c               | 13 +++++++++++--
+>  3 files changed, 14 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+> index d48bf0ad26f4..88fe105b7f00 100644
+> --- a/include/linux/lsm_hooks.h
+> +++ b/include/linux/lsm_hooks.h
+> @@ -166,6 +166,7 @@ enum lsm_order {
+>   * @initcall_fs: LSM callback for fs_initcall setup, optional
+>   * @initcall_device: LSM callback for device_initcall() setup, optional
+>   * @initcall_late: LSM callback for late_initcall() setup, optional
+> + * @initcall_late_sync: LSM callback for late_initcall_sync() setup, opt=
+ional
+>   */
+>  struct lsm_info {
+>  	const struct lsm_id *id;
+> @@ -181,6 +182,7 @@ struct lsm_info {
+>  	int (*initcall_fs)(void);
+>  	int (*initcall_device)(void);
+>  	int (*initcall_late)(void);
+> +	int (*initcall_late_sync)(void);
+>  };
+>=20
+>  #define DEFINE_LSM(lsm)							\
+> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/i=
+ma_main.c
+> index 1d6229b156fb..ace280fa3212 100644
+> --- a/security/integrity/ima/ima_main.c
+> +++ b/security/integrity/ima/ima_main.c
+> @@ -1320,5 +1320,5 @@ DEFINE_LSM(ima) =3D {
+>  	.order =3D LSM_ORDER_LAST,
+>  	.blobs =3D &ima_blob_sizes,
+>  	/* Start IMA after the TPM is available */
+> -	.initcall_late =3D init_ima,
+> +	.initcall_late_sync =3D init_ima,
+>  };
+> diff --git a/security/lsm_init.c b/security/lsm_init.c
+> index 573e2a7250c4..4e5c59beb82a 100644
+> --- a/security/lsm_init.c
+> +++ b/security/lsm_init.c
+> @@ -547,13 +547,22 @@ device_initcall(security_initcall_device);
+>   * security_initcall_late - Run the LSM late initcalls
+>   */
+>  static int __init security_initcall_late(void)
+> +{
+> +	return lsm_initcall(late);
+> +}
+> +late_initcall(security_initcall_late);
+> +
+> +/**
+> + * security_initcall_late_sync - Run the LSM late initcalls sync
+> + */
+> +static int __init security_initcall_late_sync(void)
+>  {
+>  	int rc;
+>=20
+> -	rc =3D lsm_initcall(late);
+> +	rc =3D lsm_initcall(late_sync);
+>  	lsm_pr_dbg("all enabled LSMs fully activated\n");
+>  	call_blocking_lsm_notifier(LSM_STARTED_ALL, NULL);
+>=20
+>  	return rc;
+>  }
+> -late_initcall(security_initcall_late);
+> +late_initcall_sync(security_initcall_late_sync);
+> --
+> LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+>=20
