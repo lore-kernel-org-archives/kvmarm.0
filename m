@@ -1,143 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B69364E9A;
-	Thu, 23 Apr 2026 08:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C823DEFEC;
+	Thu, 23 Apr 2026 08:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776933289; cv=none; b=LBLQ7nWZzx55apvjyn+QWaUCImeV4/q1s2+MKlXzXggG6X3gmI7zZH3UHeXaABbacjlPleCLHmVQdHgSJWzZi6I5Lqm8x+zR3YQ4Q9o7brLXqGULCfiZd+6nqac3oCrIPwRhPpsqy7qJRMDpA4qNbsjcBcwKpstoLR1Ie8pZH8c=
+	t=1776934632; cv=none; b=WNcXiHK1KuceMtMvIEH8pWaXPXYoF/Djsd0qlP3uAnevd3I23ZpgVnMbtWBre+O/WikPS/C+o+nseePFNgUcQmVY/b4LrAoKdw5wzZRt9+WwHZK/XxNhSCCsG7CKglxQPo9ucFsVlLRwvTyrjmMFr+EetzmOk8SK2UHcv6X+w6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776933289; c=relaxed/simple;
-	bh=EIwk9piTyhbMoHWk4+ua2V2EAx6ZYOYGjp1O59PohmQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bYOzZJtpxC8AFLw2mvgozysMNRSaBDgureS2zWkcOzIbNSZsvE3Q6UbBSGUtOEtWTLu0Jc4hy0jC+YI8OKpto3vxLhx/ZRqCTmgr2FZZb49gHsG5lhNzAJL5uK6a8koAdxTFm+RDY/tVLEbGktsgjaqMa1h903fbnsEd7uhiS5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fWqOCSfV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776934632; c=relaxed/simple;
+	bh=5ntX/yXGaj6yZ4bq76PTKmMPNSGKbk0vd3cnMZFOzAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ovs6D7u8WWKbncoO7xvsedKwedBC3xavFVPemjObHpXYet8Kog8cZhELRJVao6gRNu56ehC8//ql2H6iZUsjf2FclmF8K9aAgrQ8wq0vrsBa7T/UOobHf/9OolFfAhw0l/7oiMK8ehtpiebULkXqXn87l4vcEcLhwzCCp+ASIOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oU9EzKHX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fWqOCSfV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBEA9C2BCAF;
-	Thu, 23 Apr 2026 08:34:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oU9EzKHX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAA1C2BCB2;
+	Thu, 23 Apr 2026 08:57:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776933289;
-	bh=EIwk9piTyhbMoHWk4+ua2V2EAx6ZYOYGjp1O59PohmQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fWqOCSfVY0KKuywuCOYjhjUq1FQq0D2yRg0a0bxNbIDQcWpK43dAvsbM5CVm5rtVP
-	 FkkdNPNcu2Q8gZmQcrn2fG82mJkhE7WmxNmd8CGZLmzLL3KK2rrP8jZNNb1PBBUsEE
-	 l6IX/djX/1Lx/JfzLxel4B/dtGGzrdR0k/SyEOkXnvWXRxwO9Z7O2k7YHdbib8GUsW
-	 x9zbYFL14/KIXxm3hscT5ftn/cVc++rWDbyFDrgeWUJgEiNEYSKOHDH/K32zom7gaU
-	 niPPRSyzh0rPGmMxokNJhdVLjwAp7/Ty/+3qtfHznixll+QQHVg0D+75/JxyHR4Udk
-	 c16xJIuw/fFpA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wFpWI-0000000Dyaq-2RhD;
-	Thu, 23 Apr 2026 08:34:46 +0000
-Date: Thu, 23 Apr 2026 09:34:46 +0100
-Message-ID: <865x5i13dl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=k20201202; t=1776934632;
+	bh=5ntX/yXGaj6yZ4bq76PTKmMPNSGKbk0vd3cnMZFOzAw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oU9EzKHXHhCS3oxdpn9a3sbRkYfo+xcSdzCVrOWCpxAHnCxEZFn8VCkBMCC9ttMCe
+	 ZmOsm7aR37y6TpWP9iOqO1H/bLl05euPdKdKDVIn3/EXaVdap542NsVQ9UpoR0zliK
+	 W6zZl5MdOk4F8lH3qgbKAxuLVaN5j4TTfmTc+wiILihAWlKlVUr52JybRvKy/vumPN
+	 Tq0SnBZRVPKcYGHZVZRwss0lJ1hghu9jNVM6T/jeMvbVTxW9KmGb3vs2IGq6D7+MgV
+	 JB7Rd/REPaGq3o+YDGY5Yoq8niGBRcf1irZf64DlB/VaqcQIjbHN+KnYdxpyR86sCH
+	 SHHagNPzmWlPA==
+Date: Thu, 23 Apr 2026 09:57:04 +0100
+From: Will Deacon <will@kernel.org>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+Cc: Sudeep Holla <sudeep.holla@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	paul@paul-moore.com,
-	jmorris@namei.org,
-	serge@hallyn.com,
-	zohar@linux.ibm.com,
-	roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com,
-	eric.snowberg@oracle.com,
-	jarkko@kernel.org,
-	jgg@ziepe.ca,
-	sudeep.holla@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	noodles@meta.com,
-	sebastianene@google.com
-Subject: Re: [RFC PATCH v2 4/4] firmware: arm_ffa: check pkvm initailised when initailise ffa driver
-In-Reply-To: <20260422162449.1814615-5-yeoreum.yun@arm.com>
-References: <20260422162449.1814615-1-yeoreum.yun@arm.com>
-	<20260422162449.1814615-5-yeoreum.yun@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, zohar@linux.ibm.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, jarkko@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, sebastianene@google.com
+Subject: Re: [RFC PATCH 4/4] firmware: arm_ffa: check pkvm initailised when
+ initailise ffa driver
+Message-ID: <aene4KFD5kbSbFRm@willie-the-truck>
+References: <20260417175759.3191279-1-yeoreum.yun@arm.com>
+ <20260417175759.3191279-5-yeoreum.yun@arm.com>
+ <87se8sbozv.wl-maz@kernel.org>
+ <aeNeNjfO7i128TIP@e129823.arm.com>
+ <87pl3vb5bm.wl-maz@kernel.org>
+ <aecf57rWloQwDh6v@e129823.arm.com>
+ <20260421-married-liberal-ammonite-dffda8@sudeepholla>
+ <aec/YSxYO1bOhXhn@e129823.arm.com>
+ <aejN52lwaqfoMuGJ@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca, sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, noodles@meta.com, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aejN52lwaqfoMuGJ@e129823.arm.com>
 
-On Wed, 22 Apr 2026 17:24:49 +0100,
-Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+On Wed, Apr 22, 2026 at 02:32:23PM +0100, Yeoreum Yun wrote:
+> Hi All,
 > 
-> When pKVM is enabled, the FF-A driver must be initialized after pKVM.
-> Otherwise, pKVM cannot negotiate the FF-A version or
-> obtain RX/TX buffer information, leading to failures in FF-A calls.
+> > > On Tue, Apr 21, 2026 at 07:57:43AM +0100, Yeoreum Yun wrote:
+> > >
+> > > [...]
+> > >
+> > > >
+> > > > Also, the FF-A initialization is not driven by a device probe, but rather
+> > > > happens as part of the bus registration itself,
+> > > > so it does not fit well with a device_link or probe deferral based approach.
+> > > >
+> > > > Instead, perhaps we could go with the idea I mentioned previously:
+> > > > either introduce a notifier, or create a pseudo ffa_device
+> > > > once pKVM initialization has completed, and
+> > > > then let the ffa driver perform the additional initialization from there.
+> > > >
+> > > > Am I missing something?
+> > > >
+> > >
+> > > In order to handle/cleanup some ugliness in interrupt management in the
+> > > FF-A driver, we may introduce DT node eventually. But it will take sometime.
+> >
+> > Unfortunately, I think this DT node wouldn't be helpful to solve
+> > this situation for dependency with the kvm misc device...
+> >
+> > IMHO, current situation, the notifier seems to good option. unless
+> > we make the initcall to recongise this dependency.
+> >
 > 
-> During FF-A driver initialization, check whether pKVM has been initialized.
-> If pKVM isn't initailised, register notifier and do initialisation
-> of FF-A driver when pKVM is initialized.
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> ---
->  arch/arm64/include/asm/virt.h     | 11 ++++++++++
->  arch/arm64/kvm/arm.c              | 21 ++++++++++++++++++
->  arch/arm64/kvm/pkvm.c             |  2 ++
->  drivers/firmware/arm_ffa/common.h |  4 ++--
->  drivers/firmware/arm_ffa/driver.c | 36 ++++++++++++++++++++++++++++++-
->  drivers/firmware/arm_ffa/smccc.c  |  2 +-
->  6 files changed, 72 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index b51ab6840f9c..ad038a3b8727 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -68,6 +68,8 @@
->  #include <asm/sysreg.h>
->  #include <asm/cpufeature.h>
-> 
-> +struct notifier_block;
-> +
->  /*
->   * __boot_cpu_mode records what mode CPUs were booted in.
->   * A correctly-implemented bootloader must start all CPUs in the same mode:
-> @@ -166,6 +168,15 @@ static inline bool is_hyp_nvhe(void)
->  	return is_hyp_mode_available() && !is_kernel_in_hyp_mode();
->  }
-> 
-> +enum kvm_arm_event {
-> +	PKVM_INITIALISED,
-> +	KVM_ARM_EVENT_MAX,
-> +};
+> I think the best approach for now is to introduce a notifier to handle this situation.
+> If there are no further suggestions, I’ll send a v2 based on:
+>   - https://lore.kernel.org/all/aeS4rAeVQ0yJIPYw@e129823.arm.com/
 
-Well, no.
+I can't say that I'm a huge fan of that :/
 
-You are adding a whole infrastructure for something that happens
-*once* in the lifetime of the system. What's next? D-Bus?
+The notifier will literally fire once, for a single listener. That's
+called a function call.
 
-We already have a dependency mechanism, which I pointed to you last
-time, and that you conveniently ignored. If that's not working for
-you, then consider improving it.
-
-If we had a whole set of in-kernel users depending on some global KVM
-state change, we could look into it. But they are none, and all KVM
-state changes are per-vcpu rather global.
-
-So I'm not entertaining this invasive infrastructure for something so
-limited.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
