@@ -1,82 +1,56 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7E2292B44
-	for <kvmarm@lists.linux.dev>; Thu, 23 Apr 2026 12:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E583C73D0
+	for <kvmarm@lists.linux.dev>; Thu, 23 Apr 2026 12:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776947176; cv=none; b=PIqKj+0biY15/gXA/39Ek5wfmY0EjUB1ZKwbxQn+lCsmw/yq5Z2z30LKuLHHyNZc9IB1jLpxK4hHXPStWEDkybREdWoDv8HoSl7A09UZ8eMpwGLU94sOhO67162Ah3QbDanWBgZdz9JbTmS/nhssKSmfx4bg6egj5nJSSKBzSZM=
+	t=1776947661; cv=none; b=kP9b0/Uc1OiGxDvfG5YyEEzuygDDTniJ3R29DR1MOGybg88y7dQ5RUsCPFP1ZrJ9PNsTozw9Z6jW5nkJA5trObH9bdJrdnRW6CL+QhQxw54mL/QRrohCI8gI5P0BkXhNfM3CKBxnaZiCuOYSHxA+UTM4xL0cY+M1UFwXzSVdW4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776947176; c=relaxed/simple;
-	bh=/Um/TRudrQAUQ3oqVng10HlOBulX1yUwOfAfxz9Jv+o=;
+	s=arc-20240116; t=1776947661; c=relaxed/simple;
+	bh=t0e31yEIkhaU89vXVYCz+XFvgY/e04Ky3PJz4ZIM2Ug=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/2XAA1jsOXr+PigvDDTK9COnnnbA2I5bfKVb6O9ubUFgiJrRlS6RCPLFwQY72oZReG6h9HdHxIlB/hiOEmLn/rB1PL53fGUnNwltHuSqcP2BTpj8N1UVV7yZIzRU8znjxjtyNSMSwEhPyjumDryuiSwLIMAVYPpT9cs1wsHqDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=koTLLeMM; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=phbI7YnZWyzmLT6ougZwacMHLEdtLMKTvBU/bT6SVbLQNU+urWflkyqNSSD4qTxHiPrsGEoAkZrNza7OgLAOG9iyGUes805p0so4pmfeVNCgPqt4zqxcDTRtlrw83m8tN3iSUQS/R8JHF6bJslIM01APswuE6/QN/ZbHP9WHGio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hpcyQWCe; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="koTLLeMM"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63N6BWVx3292235;
-	Thu, 23 Apr 2026 12:25:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aW9kFp
-	bYfmm+Pfdk+tU7J0hZ4IrRtXVJ9AFMZP5miZg=; b=koTLLeMMUt2SU6+20F3JTu
-	PQDlSp89U88qcIwq5vBjfYSKI/mj19KWA/VGwz5Ofq9p01talQjvKrIOOIrt+VXU
-	00VVgRkFb3MhowKs6Q0zp1T4vDJQgQxfk/FzxKXaOao3PdLfOp0WD4oypELMMn8s
-	p0kFAp4VwhPDmhWsdS2+TjEaVixBglmMZCpok79MMdPiF2YKxnw5R5OpJ4xR70sW
-	1ZLFlW2QoISUqGmNzHzAkCvEoQRDZY54H6fMbJ1FrTAtQxAEzH7DVwccsbIqb+E0
-	xyp7pkoDvj90IcfmS9IXgA9xNIR1eXHowunw3w/DdNxFnAm0RWfA9Q3sqWm3TlPg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dphfrfxrp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Apr 2026 12:25:55 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63NCKjT2004855;
-	Thu, 23 Apr 2026 12:25:54 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dpjky6ht7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Apr 2026 12:25:54 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63NCPpWN52822418
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Apr 2026 12:25:51 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4661A20040;
-	Thu, 23 Apr 2026 12:25:51 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E11882004D;
-	Thu, 23 Apr 2026 12:25:50 +0000 (GMT)
-Received: from osiris (unknown [9.52.216.133])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 23 Apr 2026 12:25:50 +0000 (GMT)
-Date: Thu, 23 Apr 2026 14:25:49 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Andreas Grapentin <Andreas.Grapentin@ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 00/27] KVM: s390: Introduce arm64 KVM
-Message-ID: <20260423122549.361343-A-seiden@linux.ibm.com>
-References: <20260402042125.3948963-1-seiden@linux.ibm.com>
- <86o6jd2925.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hpcyQWCe"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 081B11C25;
+	Thu, 23 Apr 2026 05:34:14 -0700 (PDT)
+Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49A233F7B4;
+	Thu, 23 Apr 2026 05:34:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1776947659; bh=t0e31yEIkhaU89vXVYCz+XFvgY/e04Ky3PJz4ZIM2Ug=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hpcyQWCektGSUKXAdaPwQCCsm/9tqnEPUuSkf2M3HHF4JdLsJw/A6VwW4SqeqkCQo
+	 H4SsKko+/C1paFJeuFvw2b6kED0VQfbIU+cibuRnBSxa/LmnpkvgfSXXCl29IGgGIj
+	 Q21eE7a3sRxhLtUBmq+enmuKpeWc2krXpr6f/NIg=
+Date: Thu, 23 Apr 2026 13:34:13 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+	sebastianene@google.com
+Subject: Re: [RFC PATCH v2 1/4] security: ima: call ima_init() again at
+ late_initcall_sync for defered TPM
+Message-ID: <aeoRxWPyOHGJd+Jh@e129823.arm.com>
+References: <20260422162449.1814615-1-yeoreum.yun@arm.com>
+ <20260422162449.1814615-2-yeoreum.yun@arm.com>
+ <6919248bdc85dac60277fa9d9c83d8bd258ca635.camel@linux.ibm.com>
+ <aekXaU52fzvNYaUF@e129823.arm.com>
+ <aekkVQwueKbFtG7C@e129823.arm.com>
+ <82803bb3b471898a77084c449b73c7f7b4eb2149.camel@linux.ibm.com>
+ <aem0SSQuE1e3pGOS@e129823.arm.com>
+ <56a8aab50a3b5ce0a345fc2079fb2abc7d0f1b23.camel@linux.ibm.com>
+ <aeoAlVEwzRUPrlVe@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,303 +60,124 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <86o6jd2925.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Zt3vVpbTZ3JZw269VpArRys1HjMYrHP_
-X-Proofpoint-ORIG-GUID: Zt3vVpbTZ3JZw269VpArRys1HjMYrHP_
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIzMDEyMiBTYWx0ZWRfX6YnftMIcDNxa
- wwFbAB0x9MfljTMrRWnKYkTVaPODu5cjtZ5FML8uAPElYQi+1tllK8iBD4CBGvgJgPu2hq1g2i5
- 90G8z2WezjZpCZjmyYJ58rv68j/gWD+crzxP3kRgPrYAvkIqAHY5RA+AGsm0SB32eONz/nBd/un
- y3rKxfhKyERqDNpldIi32mcvMjKcOcoFeooXXs6pQU3HEtAazYh6QoveAC7gVnd6k6PiBG+51GG
- GhS61h4MszQ2lr+taVtyK4nkDiTp1dOCVI9xRmtqTN49Bzils3WeKH3LoBaL7Mz+DU1k+voUDcO
- uU9kjYIiSbb92zPZm0DCHyk4BH95KUKXi6UIWqOSSLQDzxrtQl8s523Zcv1YNUJNQfFMZTTOLnI
- +/BOSycC/ggQqtfrlcYz3MmhNqDW624tOunmbUv0L4rxG91mPrKsmSAR15gb0YFbvbHTPLqlUXu
- EHF5zBhMPFmct29zq3w==
-X-Authority-Analysis: v=2.4 cv=SJxykuvH c=1 sm=1 tr=0 ts=69ea0fd3 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
- a=_hb7cby5UekIfOObm9QA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 malwarescore=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604230122
+In-Reply-To: <aeoAlVEwzRUPrlVe@e129823.arm.com>
 
-Hi Marc & Will,
-
-On Mon, Apr 20, 2026 at 11:57:38AM +0100, Marc Zyngier wrote:
-
-> Hi Steffen, s390 folks,
-> 
-> On Thu, 02 Apr 2026 05:20:56 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > By introducing a novel virtualization acceleration for the ARM architecture on
-> > s390 architecture, we aim to expand the platform's software ecosystem. This
-> > initial patch series lays the groundwork by enabling KVM-accelerated ARM CPU
-> > virtualization on s390. To achieve this, a common KVM layer between s390 and
-> > arm64 is introduced (see below for more details). Design considerations of
-> > arm64 on the s390 Architecture The s390 virtualization architecture is extended
-> > with a set of new instructions dedicated to supporting ARM-based virtual
-> > machines. The s390 KVM host acts as EL2 (hypervisor) for a EL1/EL0
-> > (OS/application) arm64 guest. To achieve this, the new Start-Arm-Execution
-> > (SAE) instruction enables accelerated execution of arm64 VMs.  Additional new
-> > s390 instructions aLre introduced to query available arm64 features, used to
-> > populate the arm64 ID register contents, as well as, new s390 instructions to
-> > save/restore various arm64 registers in the VM context.
-> 
-> Apologises for the delay in responding to this, things got delayed a
-> bit with the Easter break. Since then, Will and I have been discussing
-> this series and what it means for the future of the arm64 port.
-> 
-> By way of opening the discussion, we want to be clear that we are
-> supportive of the effort. Our comments here should be seen as areas of
-> potential improvement and not as rejection of what you are trying to
-> achieve.
+> > On Thu, 2026-04-23 at 06:55 +0100, Yeoreum Yun wrote:
+> > > > On Wed, 2026-04-22 at 20:41 +0100, Yeoreum Yun wrote:
+> > > > > > Hi Mimi,
+> > > > > >
+> > > > > > > On Wed, 2026-04-22 at 17:24 +0100, Yeoreum Yun wrote:
+> > > > > > > > To generate the boot_aggregate log in the IMA subsystem with TPM PCR values,
+> > > > > > > > the TPM driver must be built as built-in and
+> > > > > > > > must be probed before the IMA subsystem is initialized.
+> > > > > > > >
+> > > > > > > > However, when the TPM device operates over the FF-A protocol using
+> > > > > > > > the CRB interface, probing fails and returns -EPROBE_DEFER if
+> > > > > > > > the tpm_crb_ffa device — an FF-A device that provides the communication
+> > > > > > > > interface to the tpm_crb driver — has not yet been probed.
+> > > > > > > >
+> > > > > > > > To ensure the TPM device operating over the FF-A protocol with
+> > > > > > > > the CRB interface is probed before IMA initialization,
+> > > > > > > > the following conditions must be met:
+> > > > > > > >
+> > > > > > > >    1. The corresponding ffa_device must be registered,
+> > > > > > > >       which is done via ffa_init().
+> > > > > > > >
+> > > > > > > >    2. The tpm_crb_driver must successfully probe this device via
+> > > > > > > >       tpm_crb_ffa_init().
+> > > > > > > >
+> > > > > > > >    3. The tpm_crb driver using CRB over FF-A can then
+> > > > > > > >       be probed successfully. (See crb_acpi_add() and
+> > > > > > > >       tpm_crb_ffa_init() for reference.)
+> > > > > > > >
+> > > > > > > > Unfortunately, ffa_init(), tpm_crb_ffa_init(), and crb_acpi_driver_init() are
+> > > > > > > > all registered with device_initcall, which means crb_acpi_driver_init() may
+> > > > > > > > be invoked before ffa_init() and tpm_crb_ffa_init() are completed.
+> > > > > > > >
+> > > > > > > > When this occurs, probing the TPM device is deferred.
+> > > > > > > > However, the deferred probe can happen after the IMA subsystem
+> > > > > > > > has already been initialized, since IMA initialization is performed
+> > > > > > > > during late_initcall, and deferred_probe_initcall() is performed
+> > > > > > > > at the same level.
+> > > > > > > >
+> > > > > > > > To resolve this, call ima_init() again at late_inicall_sync level
+> > > > > > > > so that let IMA not miss TPM PCR value when generating boot_aggregate
+> > > > > > > > log though TPM device presents in the system.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> > > > > > >
+> > > > > > > A lot of change for just detecting whether ima_init() is being called on
+> > > > > > > late_initcall or late_initcall_sync(), without any explanation for all the other
+> > > > > > > changes (e.g. ima_init_core).
+> > > > > > >
+> > > > > > > Please just limit the change to just calling ima_init() twice.
+> > > > > >
+> > > > > > My concern is that ima_update_policy_flags() will be called
+> > > > > > when ima_init() is deferred -- not initialised anything.
+> > > > > > though functionally, it might be okay however,
+> > > > > > I think ima_update_policy_flags() and notifier should work after ima_init()
+> > > > > > works logically.
+> > > > > >
+> > > > > > This change I think not much quite a lot. just wrapper ima_init() with
+> > > > > > ima_init_core() with some error handling.
+> > > > > >
+> > > > > > Am I missing something?
+> > > > >
+> > > > > Also, if we handle in ima_init() only, but it failed with other reason,
+> > > > > we shouldn't call again ima_init() in the late_initcall_sync.
+> > > > >
+> > > > > To handle this, It wouldn't do in the ima_init() but we need to handle
+> > > > > it by caller of ima_init().
+> > > >
+> > > > Only tpm_default_chip() is being called to set the ima_tpm_chip.  On failure,
+> > > > instead of going into TPM-bypass mode, return immediately.  There are no calls
+> > > > to anything else.  Just call ima_init() a second time.
+> > >
+> > > I’m not fully convinced this is sufficient.
+> > >
+> > > What I meant is the case where ima_init() fails due to other
+> > > initialisation steps, not only tpm_default_chip() (e.g. ima_fs_init()).
+> >
+> > The purpose of THIS patch is to add late_initcall_sync, when the TPM is not
+> > available at late_initcall.  This would be classified as a bug fix and would be
+> > backported.  No other changes should be included in this patch.
 >
-Thank you for your answer. We are happy to hear that you support our
-efforts.
- 
-> * Code movement:
-> 
->   The patches you have posted demonstrate that it is possible to
->   expose a large amount of arm64-specific code and definition to s390,
->   and yet still manage to build both architectures without regression.
->   However, the result looks rather messy and may adversely affect
->   maintainability on the arm64 side.
-> 
->   The moving of files into shared locations is particularly painful,
->   and gets in the way of overall maintainability. Not only does it
->   break our comfortable habits, it makes the backporting of fixes
->   harder.  Importantly, these changes come with no benefit on the
->   arm64 side.
-> 
->   Would it be possible to try some other means of reaching the
->   arm64-specific files *in situ*, either by making use of relative
->   paths, or by using symbolic links? Even better, files that are
->   generated on arm64 (such as the sysreg definitions) should equally
->   be generated for s390, locally to the s390 part of the tree.
-> 
-Yes, we can do that. Our first iteration had an extensive use of symlinks for
-headers. We feared that this approach would gain no big support as it was
-quite messy and gave a lot of surface for future errors. So we moved to the
-current implementation. For the non-KVM headers I could see moving back to the
-symlink approach to reduce the backport & maintainability burden for you.
-Preferably, those headers are kept clean of any arm implementation specific
-things (e.g. sysreg vs sysreg-defs).
-
-For shared kvm headers and code, we think moving them to the proposed location
-helps reducing regression issues when someone changes a function as that
-location makes it 100% clear that this is shared code. Tagging a file 
-as __shared__ by other means (e.g. by a file name suffix) may 
-be OK for us as well if that reduces your maintenance burden.
-
-The generated (e.g. sysreg) definitions are already generated into the s390
-tree:
-{outdir}/arch/s390/include/generated/asm/sysreg-gen-defs.h
-We just reuse the makefile definitions from arm.
-
-As a side note: We tried to reuse as much arm code as possible - to not
-reinvent the wheel - while keeping the arm churn minimal. While going through
-the arm code, we tried to spot parts that could benefit from refactoring and
-did that. By moving especially the kvm code to another location we wanted to
-emphasize that this code is shared between arm and s390 and possibly other
-architectures in the future.
-
-We will prototype alternatives including using symlinks and post them soon here. 
-
->   But that doesn't mean that we consider that the arm64 tree is
->   immutable and that we are not open to change, quite the opposite.
->   Most of the KVM/arm64 include files are an unholy mix of arch
->   definitions, data structures that have some arch relevance, but also
->   code and data that is strictly implementation specific. Splitting
->   these (as you already have for some include files) could both help
->   with sharing what is actually needed, keep the arm64-specific stuff
->   at bay, *and* benefit arm64's overall maintainability. We would need
->   some tooling to enforce the split and avoid regressing it, something
->   that could happen quickly given the level of activity on arm64. Yet
->   another way to achieve this could be to mechanically process the
->   arm64 files as part of the s390 build to extract the relevant
->   information, and we could help with this.
-
-That is good to hear. We of course also wanted arm to improve with our changes.
-
-> 
->   Looking a bit more into the distance, it is likely that KVM/arm64
->   will grow feature support quicker than s390 can absorb them, and
->   that some feature won't ever make any sense of s390 (pKVM, for
->   example).  We need to establish how these features can be built
->   without arm64 being hindered by s390. This is also true when adding
->   architectural support for features that don't exist in the s390 view
->   of arm64.
-
-Yes, of course s390 should not hinder arm64 to progress. 120% agree! We will
-be available in case that happens. However, I do not think this is a big
-problem. By defining some arm feature macros to false we already did turn off
-few arm features for us at compile time. Compiler optimization is a very good
-friend here.
-
-> 
-> * UAPI and guest API:
-> 
->   Obviously, one of our biggest concerns is the userspace API. We
->   appreciate that you want to reuse it as it is, warts and all, and
->   directly incorporate additional feature support as it becomes
-
-Yes, implementing the arm64 kvm-UAPI was one of our primary goals so that we
-can reuse existing arm64 VMMs e.g. Qemu.
-
->   available. This means that, should any divergence in UAPI appear,
->   the source of truth must be on the arm64 side. This has the
->   following consequences:
-
-Yes, arm64 is the source of truth for us. That is the exact reason we did not
-copy the (UAPI) headers but moved & share them.
-
-> 
->     - s390 cannot add extensions to the UAPI
-> 
->     - s390 must be compatible with all future arm64 extensions
-yes
-> 
->   Similar concerns exist on the guest/hypervisor API, including:
-> 
->   - errata mitigation: this is unsurprisingly a hot topic, which keeps
->     causing us some massive headaches. We are particularly concerned
->     about errata that need to be disclosed to the guest and acted upon
->     via a hypercall. Should there be a need for those, how will we
->     coordinate the deployment of such hypercall?
-> 
->     The way it has been deployed so far is that PSCI has grown an
->     errata discovery mechanism. ARM assigns function numbers and
->     specifies what these hypercalls mitigate. KVM, in turn, takes part
->     in implementing the mitigation. We expect that s390 would follow
->     the same behaviour, including coordination with ARM for the
->     function numbering.
-
-Yes. s390 will follow those things. We are planning to reuse the complete 
-arm hypercall code including the current (and future) errata detection that
-comes with it.
-This change will come in one of the future series. 
-
-> 
->   - device assignment: this is unknown territory for us, as we
->     commonly use vfio-pci (and more occasionally vfio-platform). How
->     would that look for an arm64 guest on s390?
-> 
-We plan to work with virtio-pci and vfio-pci. No plans to assign ccw devices to
- arm guests.
-
->   - s390-specific ISA extension: although we obviously cannot control
->     how you will decide to expose features to your arm64 guests,
->     KVM/arm64 makes a point of forbidding any use of implementation
->     specific instruction or system registers. We expect the s390
->     implementation to uphold this.
+> Okay.
 >
-
-We have no plans of using private ISA extensions or deviations.
-
->   - s390-specific hypercalls: aside from the errata handling
->     mentioned above, we would very much like to avoid anything that is
->     implementation specific, and keep the hypercall space as small as
->     possible. In other words, an unenlightened arm64 guest must work
->     and continue to work.
-
-Of course an unenlightened arm64 guest must keep working and it should
-work with good performance and usability. This is another primary goal of
-this project.
-Given that we have some history of paravirtual optimizations on s390, we 
-might propose some hypercalls in the future. But this will then very likely to
-the benefit of all arm platforms and implemented on both host variants. 
-
-> 
-> * Overall maintenance
-> 
->   Unsurprisingly, we are not totally familiar with s390. To say that
->   there is a learning gap would only be an understatement. So how do
->   we make sure we don't break things out of pure ignorance? Is there
->   any documentation we can refer to when hacking on code that will
->   eventually run on your side of the computing universe?
-
-I am aware of the Kernel Documentation for s390.
-Also, for the z/Architecture in general:
-Principles of Operation might be a good start to learn about s390 architecture.
-
-Of course we will be available for answering s390 architecture questions. 
-
-> 
->   We need to be able to build and test what we produce. How do we go
->   about that? We appreciate that you may not be in a position to help
->   with this right now, but at least having a plan would be reassuring.
->   This should include things like automatic testing of our CI branches.
->   We are happy to test build s390 as part of our maintenance flow, if
->   pointed to existing binary toolchains compiled for arm64 and x86,
->   together with a typical configuration.
+> > >
+> > > I’d also like to ask again whether it is fine to call
+> > > ima_update_policy_flags() and keep the notifier registered in the
+> > > deferred TPM case. While this may be functionally acceptable, it seems
+> > > logically questionable to do so when ima_init() has not completed.
+> >
+> > Other than extending the TPM, IMA should behave exactly the same whether there
+> > is a TPM or goes into TPM-bypass mode.
+> >
+> > >
+> > > There is also a possibility that a deferred case ultimately fails (e.g.
+> > > deferred at late_initcall, but then failing at late_initcall_sync
+> > > for another reason, even while entering TPM bypass mode). In that case,
+> > > it seems more appropriate to handle this state in the caller of
+> > > ima_init(), rather than inside ima_init() itself.
+> >
+> > If the TPM isn't found at late_initcall_sync(), then IMA should go into TPM-
+> > bypass mode.  Please don't make any other changes to the existing IMA behavior
+> > and hide it here behind the late_initcall_sync change.
 >
+> Okay. you're talking called ima_update_policy_flags() at late_initcall
+> wouldn't be not a problem even in case of late_initcall_sync's ima_init()
+> get failed with "TPM-bypass mode".
+>
+> I see then, I'll make a patch simpler then.
 
-For your side:
-Cross compiling the kernel is a good starting point. GCC/Clang cross compile
-toolchains for s390 are available on all major distros. They are typically
-postfixed with ‘-s390x-linux-gnu‘, note the x after s390. defconfig has KVMARM
-in it - this should be suitable for testing you do not break s390 compilation.
+But I think in case of below situation:
+  - late_initcall's first ima_init() is deferred.
+  - late_initcall_sync try again but failed and try again with
+    CONFIG_IMA_DEFAULT_HASH.
 
-You can get access to s390 resources for doing native builds in the LinuxONE
-community cloud. Those are VMs itself -> run tests are not possible.
-https://community.ibm.com/zsystems/l1cc
-They also offer permanent access to OSS communities if necessary. We can help
-to connect you with those teams.
+I would like to sustain init_ima_core to reduce the same code repeat
+in late_initcall_sync.
 
-Another option would be to spin-up a s390 qemu-tcg guest to build the kernel
-'native'.
-
-For us:
-Yes we are planning to do regular tests to prevent breaking arm. Testing your
-CI branches seems to be a good starting point for this. Do you have a few
-pointers which are suited best?
-
->   What about debugging? We expect that you'd have to help, should an
->   arm64 change cause a regression on s390, as it is fairly unlikely
->   that we would be able to reproduce it.
-
-Positive, we will do whatever we can to support you in any way.
-
-> 
->   Finally, we feel it would be beneficial for both projects to swap
->   prisoners and have cross-reviewers in MAINTAINERS, so that there is
->   an s390 reviewer added to KVM/arm64, and an arm64 reviewer added to
->   KVM/s390.
-
-Great Idea and I like the wording :)
-We’ll start with the exchange. I (Steffen) would volunteer to be sent over to you.
-I will add myself as kvm/arm64 reviewer in v2 of this series if that is OK for
-you.
-
-For the other way we appreciate any volunteers and also will ask around for suitable
-people with arm and preferably also s390 knowledge. 
-
-> 
-> It probably would be beneficial to work through some of these things
-> face-to-face. Maybe around LPC or KVM Forum if you manage to get
-> there? Or some other place/time?
-
-Totally agree, although I would prefer an earlier date (probably virtual) to 
-get rid of any serious misunderstandings that may be there early. 
-Surely, we can meet at LPC and/or KVM-forum as well to discuss even more.
-
-Thank you very much for your openness and your constructive, honest
-feedback.
-
-	Steffen & the KVM/s390 team
-
-> 
-> Thanks,
-> 
-> 	Marc and Will
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-
+--
+Sincerely,
+Yeoreum Yun
