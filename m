@@ -1,61 +1,68 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387AB311963;
-	Thu, 23 Apr 2026 08:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B69364E9A;
+	Thu, 23 Apr 2026 08:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776931729; cv=none; b=DjT2BZmlKsbK1RZI3eVqenCQIGTW7uQsXFRZQ0Eoiu0KPRJkYfTOLkdoj5TafCClLK7uRN0mV6zRp04rcfBvW666X+Vg5+AP1KzHh636mO9VdwPiYiELxqXo1bZQPkGF7Ez1R2KDENT9Tmj6uIxIV/HQU9urhAdBEJ9h/dxGAuk=
+	t=1776933289; cv=none; b=LBLQ7nWZzx55apvjyn+QWaUCImeV4/q1s2+MKlXzXggG6X3gmI7zZH3UHeXaABbacjlPleCLHmVQdHgSJWzZi6I5Lqm8x+zR3YQ4Q9o7brLXqGULCfiZd+6nqac3oCrIPwRhPpsqy7qJRMDpA4qNbsjcBcwKpstoLR1Ie8pZH8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776931729; c=relaxed/simple;
-	bh=Yy/Tfq/9F8NbivnASS2KOxeiLK7q4WMxkOdk5fR99pI=;
+	s=arc-20240116; t=1776933289; c=relaxed/simple;
+	bh=EIwk9piTyhbMoHWk4+ua2V2EAx6ZYOYGjp1O59PohmQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JINQ/8B52FkzHUVGurzXEioefw/fdPQqAPYfoVcMEHX5pQqIpSQNDFr9OdqoNw8SLpINZ/rgHhRYFxR+ZxlO+6FE1ow2eZUtujigZDIM4TDkkv/zTu/wjJ3xzbdWGE4yWhvqehdI5w4xuTg62jE+77Bi1iGo/TciWr8GUQqmhA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N3BSPJ+J; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=bYOzZJtpxC8AFLw2mvgozysMNRSaBDgureS2zWkcOzIbNSZsvE3Q6UbBSGUtOEtWTLu0Jc4hy0jC+YI8OKpto3vxLhx/ZRqCTmgr2FZZb49gHsG5lhNzAJL5uK6a8koAdxTFm+RDY/tVLEbGktsgjaqMa1h903fbnsEd7uhiS5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fWqOCSfV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N3BSPJ+J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D71E8C2BCB2;
-	Thu, 23 Apr 2026 08:08:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fWqOCSfV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBEA9C2BCAF;
+	Thu, 23 Apr 2026 08:34:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776931728;
-	bh=Yy/Tfq/9F8NbivnASS2KOxeiLK7q4WMxkOdk5fR99pI=;
+	s=k20201202; t=1776933289;
+	bh=EIwk9piTyhbMoHWk4+ua2V2EAx6ZYOYGjp1O59PohmQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N3BSPJ+JUmCeDLYPRnJec2nJwSVaWKdxbDy6Idc8Ll/rx3aRuNiMv+R3GNQrGVRGF
-	 DsGv58QdWyGZ9vrOgEnNtyiImWPrHeDEj95Gc1kwcgvy6escuhqf/odwTog1CGS0+O
-	 4ro8EWWAFM42JhZiDfrimtjt6ueB3o6Hyi97dF9IjFSMlaSRdKKGs3TZMnnV4l3T/k
-	 A+MjrtP9zJRcBnw4b1fSrwM410KZfdVcfN3nE+0H9skBDJXXK3tBfe69y6+jJm/sPl
-	 0Gugrt/fpholSb+Wj5+kgml2oLFt7aGAKMr3x0ClZEI3wIMoUClHAgqMsJU40skP01
-	 Ug6cY5u7D193A==
+	b=fWqOCSfVY0KKuywuCOYjhjUq1FQq0D2yRg0a0bxNbIDQcWpK43dAvsbM5CVm5rtVP
+	 FkkdNPNcu2Q8gZmQcrn2fG82mJkhE7WmxNmd8CGZLmzLL3KK2rrP8jZNNb1PBBUsEE
+	 l6IX/djX/1Lx/JfzLxel4B/dtGGzrdR0k/SyEOkXnvWXRxwO9Z7O2k7YHdbib8GUsW
+	 x9zbYFL14/KIXxm3hscT5ftn/cVc++rWDbyFDrgeWUJgEiNEYSKOHDH/K32zom7gaU
+	 niPPRSyzh0rPGmMxokNJhdVLjwAp7/Ty/+3qtfHznixll+QQHVg0D+75/JxyHR4Udk
+	 c16xJIuw/fFpA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wFp78-0000000DyA0-2GNW;
-	Thu, 23 Apr 2026 08:08:46 +0000
-Date: Thu, 23 Apr 2026 09:08:46 +0100
-Message-ID: <867bpy14kx.wl-maz@kernel.org>
+	id 1wFpWI-0000000Dyaq-2RhD;
+	Thu, 23 Apr 2026 08:34:46 +0000
+Date: Thu, 23 Apr 2026 09:34:46 +0100
+Message-ID: <865x5i13dl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: oupton@kernel.org,
-	will@kernel.org,
-	ayrton@google.com,
-	catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	korneld@google.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	android-kvm@google.com,
-	mrigendra.chaubey@gmail.com,
-	perlarsen@google.com,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	zohar@linux.ibm.com,
+	roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com,
+	jarkko@kernel.org,
+	jgg@ziepe.ca,
+	sudeep.holla@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Validate the FF-A memory access descriptor placement
-In-Reply-To: <aejOu98q1lEZoFfW@google.com>
-References: <20260422102540.1433704-1-sebastianene@google.com>
-	<86bjfb18v1.wl-maz@kernel.org>
-	<aejOu98q1lEZoFfW@google.com>
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	noodles@meta.com,
+	sebastianene@google.com
+Subject: Re: [RFC PATCH v2 4/4] firmware: arm_ffa: check pkvm initailised when initailise ffa driver
+In-Reply-To: <20260422162449.1814615-5-yeoreum.yun@arm.com>
+References: <20260422162449.1814615-1-yeoreum.yun@arm.com>
+	<20260422162449.1814615-5-yeoreum.yun@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,79 +74,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, oupton@kernel.org, will@kernel.org, ayrton@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca, sudeep.holla@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, noodles@meta.com, sebastianene@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Apr 2026 14:35:55 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Wed, 22 Apr 2026 17:24:49 +0100,
+Yeoreum Yun <yeoreum.yun@arm.com> wrote:
 > 
-> On Wed, Apr 22, 2026 at 01:24:02PM +0100, Marc Zyngier wrote:
-> > On Wed, 22 Apr 2026 11:25:40 +0100,
-> > Sebastian Ene <sebastianene@google.com> wrote:
-> > > 
-> > > Prevent the pKVM hypervisor from making assumptions that the
-> > > endpoint memory access descriptor (EMAD) comes right after the
-> > > FF-A memory region header and enforce a strict placement for it
-> > > when validating an FF-A memory lend/share transaction.
+> When pKVM is enabled, the FF-A driver must be initialized after pKVM.
+> Otherwise, pKVM cannot negotiate the FF-A version or
+> obtain RX/TX buffer information, leading to failures in FF-A calls.
 > 
-> Hello Marc,
+> During FF-A driver initialization, check whether pKVM has been initialized.
+> If pKVM isn't initailised, register notifier and do initialisation
+> of FF-A driver when pKVM is initialized.
 > 
-> > 
-> > As I read this, you want to remove a bad assumption...
-> > 
-> > > 
-> > > Prior to FF-A version 1.1 the header of the memory region
-> > > didn't contain an offset to the endpoint memory access descriptor.
-> > > The layout of a memory transaction looks like this:
-> > > 
-> > >   Field name				| Offset
-> > > 					 -- 0
-> > > [ Header (ffa_mem_region)               |__ ep_mem_offset
-> > >   EMAD 1 (ffa_mem_region_attributes)	|
-> > > ]
-> > > 
-> > > Reject the host from specifying a memory access descriptor offset
-> > > that is different than the size of the memory region header.
-> > 
-> > And yet you decide that you want to enforce this assumption. I don't
-> > understand how you arrive to this conclusion.
-> > 
-> > Looking at the spec, it appears that the offset is *designed* to allow
-> > a gap between the header and the EMAD. Refusing to handle a it seems to be a
-> > violation of the spec.
-> > 
-> > What am I missing?
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/include/asm/virt.h     | 11 ++++++++++
+>  arch/arm64/kvm/arm.c              | 21 ++++++++++++++++++
+>  arch/arm64/kvm/pkvm.c             |  2 ++
+>  drivers/firmware/arm_ffa/common.h |  4 ++--
+>  drivers/firmware/arm_ffa/driver.c | 36 ++++++++++++++++++++++++++++++-
+>  drivers/firmware/arm_ffa/smccc.c  |  2 +-
+>  6 files changed, 72 insertions(+), 4 deletions(-)
 > 
-> While the spec allows the gap to be variable (since version 1.1), the
-> arm ff-a driver places it at a fixed position in:
-> ffa_mem_region_additional_setup() 
-> https://elixir.bootlin.com/linux/v7.0/source/drivers/firmware/arm_ffa/driver.c#L671
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index b51ab6840f9c..ad038a3b8727 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -68,6 +68,8 @@
+>  #include <asm/sysreg.h>
+>  #include <asm/cpufeature.h>
+> 
+> +struct notifier_block;
+> +
+>  /*
+>   * __boot_cpu_mode records what mode CPUs were booted in.
+>   * A correctly-implemented bootloader must start all CPUs in the same mode:
+> @@ -166,6 +168,15 @@ static inline bool is_hyp_nvhe(void)
+>  	return is_hyp_mode_available() && !is_kernel_in_hyp_mode();
+>  }
+> 
+> +enum kvm_arm_event {
+> +	PKVM_INITIALISED,
+> +	KVM_ARM_EVENT_MAX,
+> +};
 
-That's an implementation detail, and you shouldn't rely on this.
+Well, no.
 
-> and makes use of the same assumption in: ffa_mem_desc_offset().
-> https://elixir.bootlin.com/linux/v7.0/source/include/linux/arm_ffa.h#L448
-> The later one seems wrong IMO. because we should compute the offset
-> based on the value stored in ep_mem_offset and not adding it up with
-> sizeof(struct ffa_mem_region).
-> 
-> Maybe this should be the fix instead and not the one in pKVM ? What do
-> you think ?
+You are adding a whole infrastructure for something that happens
+*once* in the lifetime of the system. What's next? D-Bus?
 
-I think you should parse the buffers as the spec intends them, without
-assumptions or limitations.
+We already have a dependency mechanism, which I pointed to you last
+time, and that you conveniently ignored. If that's not working for
+you, then consider improving it.
 
-> 
-> The current implementation in pKVM makes use of the
-> ffa_mem_desc_offset() to validate the first EMAD. If a compromised host
-> places an EMAD at a different offset than sizeof(struct ffa_mem_region),
-> then pKVM will not validate that EMAD.
+If we had a whole set of in-kernel users depending on some global KVM
+state change, we could look into it. But they are none, and all KVM
+state changes are per-vcpu rather global.
 
-Why compromised? Isn't that a perfectly valid thing to do? What I
-understand is that the FFA 1.1 implementation in pKVM doesn't match
-the expectations of the spec. If that's indeed the case, pKVM should
-be fixed to accept these messages correctly, or stop using FFA 1.1.
+So I'm not entertaining this invasive infrastructure for something so
+limited.
 
 	M.
 
