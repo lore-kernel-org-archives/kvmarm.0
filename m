@@ -1,92 +1,235 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from the.earth.li (the.earth.li [93.93.131.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1710F37D137;
-	Thu, 23 Apr 2026 16:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEC936DA0B
+	for <kvmarm@lists.linux.dev>; Thu, 23 Apr 2026 17:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.93.131.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776962186; cv=none; b=t8FPzr5idMpd9fa5/uE8+gg4qJPnIiU53rCiiaFQGjtiQQbNh4mrj/CIIxDpu5KAAlKYEJ6mSfaWVPn01gSdLAm7TNY5Mrp4BgQZGhiOrmE/FC234ZFAjDcf9gy8R9VnqtX+B3Yx+fOUCn6BCHdVjYGX3Ed5JpJmAYsONWzEJAc=
+	t=1776963783; cv=none; b=Ws047VQWNtUbPz9lqf9ZLha9MeZSvZ4jPlttvm/2MEj5+HcYf0WIzSgM0oBVINqWxVReMSVuQiqcVbY7T53KwFOqweCXnCf6yxIycckrAHg+Q/1nWn71b0WkhxFd9nJZQHjoKpC79vyExx60a6BW+Id3SLbtnJ/y5CtNhC4ESnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776962186; c=relaxed/simple;
-	bh=+ds0NJEr0kE5UiInXg4j6EEFq+upi2AL/UPD2beEDHw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DOYGCknSoLFy7h1XAmfIJLBRbLiF2ko3aDt9ftE6RIyYxR+86hEhTHPUb6bz76TzExINd1gB59WAZElzgUa+PN0UPTEoJ+GUWm/wG+ZB0NOLQ9Te6koWFkPxryXYHa9emIlc59HIufqFop45kjwyclJ6MLqw2XK1D+SsiHdiJ2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MFxUlvEi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776963783; c=relaxed/simple;
+	bh=0HWbMIhjf0IMqfOIYqpJr8UhwRK25lhdxVQ/1SWrGqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FkY8siIaqY0LWHHFROfeTiEb34KekPljq7AbXAe3tIW3v4z7mPkvyEaOykRQmq6yEDvxkZJ1kFEsxMswY76jDq1LlG3nP+K0SoGrzG9D0sq5pXDgJsfqwA2z1jNPjbXIKxz8qCo3awKRcG0H8orcpF5n8mKZXAYC/oNNdlp5+1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li; spf=pass smtp.mailfrom=earth.li; dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b=TyOt5i9t; arc=none smtp.client-ip=93.93.131.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=earth.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFxUlvEi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6273C2BCAF;
-	Thu, 23 Apr 2026 16:36:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776962185;
-	bh=+ds0NJEr0kE5UiInXg4j6EEFq+upi2AL/UPD2beEDHw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MFxUlvEil3p0G4/+Srcn1Lcv8ULKuz5MdQjip3z4jyrMDZoevDjCng49TzOKH9Fv3
-	 dEk69l7bhwQeudKNavjKtkNShhpMJB/1SFTf3Pz2vMxn3cSNznEVSMojHW7Gik4F02
-	 02YCjdt2DFw4iJJZ7A663518tvdF2eITdNnqbyHexDiw4uFQ23Sfykof2EOXoXZUAI
-	 Q/x/5W1MH58mW9ZPe9bkpTVQg+Vs2cbcnGGOqgF0MGDgW4d+yqDaB75QXgCksYYFyM
-	 5hBzl2IILNqzK0InB6PGcPYQxnALhyALO7CYvHYN9YblK1EmxBZBODAJQjBnrGFjJq
-	 c69nqIqmrVWpQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wFx2N-0000000E7YO-0aR6;
-	Thu, 23 Apr 2026 16:36:23 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Wake-up from WFI when iqrchip is in userspace
-Date: Thu, 23 Apr 2026 17:36:07 +0100
-Message-ID: <20260423163607.486345-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b="TyOt5i9t"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
+	s=the; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=IkLoHCZH8VzAlYsRondojeIEhJMsI0qFpo2wtNvKgWI=; b=TyOt5i9tYthd4G0i8dKTDJi3Vb
+	PHcYR+ZbkNiRyxhIeVaov+eGq9F6VBp9q87xmDxR06u0R9kBM+RMcQh4+OcF1ck2cYB96EtJAccUa
+	8wFCT8V+yW+MCR9gIXkgV48PPdMtuvhC8/kxfe/wPFvLwGWUZ3HYl13tuRwIIdwmHUmesQBOjwLL4
+	AcWa94J7ZH0C2qjoshpv/oeiopSMAETDlKCTyC2EaKo5wA8EEwWbiHpo8UbJGoF4Tg+E65whq4rEF
+	KnnXZ5TuJ9mardaFWxy62xhM9N77HTb8Ml3fRKXZ9SnUdgVuToqO1pTphVgQQS0/rCNicG1Tgm186
+	eIX49kXg==;
+Received: from noodles by the.earth.li with local (Exim 4.98.2)
+	(envelope-from <noodles@earth.li>)
+	id 1wFxS5-00000003kgC-1z1T;
+	Thu, 23 Apr 2026 18:02:57 +0100
+Date: Thu, 23 Apr 2026 18:02:57 +0100
+From: Jonathan McDowell <noodles@earth.li>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Yeoreum Yun <yeoreum.yun@arm.com>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+	sebastianene@google.com
+Subject: Re: [RFC PATCH v2 1/4] security: ima: call ima_init() again at
+ late_initcall_sync for defered TPM
+Message-ID: <aepQwcY523aukAvw@earth.li>
+References: <82803bb3b471898a77084c449b73c7f7b4eb2149.camel@linux.ibm.com>
+ <aem0SSQuE1e3pGOS@e129823.arm.com>
+ <56a8aab50a3b5ce0a345fc2079fb2abc7d0f1b23.camel@linux.ibm.com>
+ <aeoAlVEwzRUPrlVe@e129823.arm.com>
+ <aeoRxWPyOHGJd+Jh@e129823.arm.com>
+ <aeoWO2Cwo04YYu2l@earth.li>
+ <bd908e28298d968740d03c97bc7e441de188b7b4.camel@linux.ibm.com>
+ <aeokwrC86WI7uT+K@e129823.arm.com>
+ <aeomlp3I0eVE5mce@earth.li>
+ <2866f7679fe6933de667ce74ae68bd4ea9198e2a.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <2866f7679fe6933de667ce74ae68bd4ea9198e2a.camel@linux.ibm.com>
 
-It appears that there is nothing in the wake-up path that
-evaluates whether the in-kernel interrupts are pending unless
-we have a vgic.
+On Thu, Apr 23, 2026 at 10:48:49AM -0400, Mimi Zohar wrote:
+>On Thu, 2026-04-23 at 15:03 +0100, Jonathan McDowell wrote:
+>> On Thu, Apr 23, 2026 at 02:55:14PM +0100, Yeoreum Yun wrote:
+>> > > On Thu, 2026-04-23 at 13:53 +0100, Jonathan McDowell wrote:
+>> > > > On Thu, Apr 23, 2026 at 01:34:13PM +0100, Yeoreum Yun wrote:
+>> > > > > > > On Thu, 2026-04-23 at 06:55 +0100, Yeoreum Yun wrote:
+>> > > > > > > > > On Wed, 2026-04-22 at 20:41 +0100, Yeoreum Yun wrote:
+>> > > > > > > > > > > Hi Mimi,
+>> > > > > > > > > > >
+>> > > > > > > > > > > > On Wed, 2026-04-22 at 17:24 +0100, Yeoreum Yun wrote:
+>> > > > > > > > > > > > > To generate the boot_aggregate log in the IMA subsystem with TPM PCR values,
+>> > > > > > > > > > > > > the TPM driver must be built as built-in and
+>> > > > > > > > > > > > > must be probed before the IMA subsystem is initialized.
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > > However, when the TPM device operates over the FF-A protocol using
+>> > > > > > > > > > > > > the CRB interface, probing fails and returns -EPROBE_DEFER if
+>> > > > > > > > > > > > > the tpm_crb_ffa device — an FF-A device that provides the communication
+>> > > > > > > > > > > > > interface to the tpm_crb driver — has not yet been probed.
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > > To ensure the TPM device operating over the FF-A protocol with
+>> > > > > > > > > > > > > the CRB interface is probed before IMA initialization,
+>> > > > > > > > > > > > > the following conditions must be met:
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > >    1. The corresponding ffa_device must be registered,
+>> > > > > > > > > > > > >       which is done via ffa_init().
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > >    2. The tpm_crb_driver must successfully probe this device via
+>> > > > > > > > > > > > >       tpm_crb_ffa_init().
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > >    3. The tpm_crb driver using CRB over FF-A can then
+>> > > > > > > > > > > > >       be probed successfully. (See crb_acpi_add() and
+>> > > > > > > > > > > > >       tpm_crb_ffa_init() for reference.)
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > > Unfortunately, ffa_init(), tpm_crb_ffa_init(), and crb_acpi_driver_init() are
+>> > > > > > > > > > > > > all registered with device_initcall, which means crb_acpi_driver_init() may
+>> > > > > > > > > > > > > be invoked before ffa_init() and tpm_crb_ffa_init() are completed.
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > > When this occurs, probing the TPM device is deferred.
+>> > > > > > > > > > > > > However, the deferred probe can happen after the IMA subsystem
+>> > > > > > > > > > > > > has already been initialized, since IMA initialization is performed
+>> > > > > > > > > > > > > during late_initcall, and deferred_probe_initcall() is performed
+>> > > > > > > > > > > > > at the same level.
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > > To resolve this, call ima_init() again at late_inicall_sync level
+>> > > > > > > > > > > > > so that let IMA not miss TPM PCR value when generating boot_aggregate
+>> > > > > > > > > > > > > log though TPM device presents in the system.
+>> > > > > > > > > > > > >
+>> > > > > > > > > > > > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+>> > > > > > > > > > > >
+>> > > > > > > > > > > > A lot of change for just detecting whether ima_init() is being called on
+>> > > > > > > > > > > > late_initcall or late_initcall_sync(), without any explanation for all the other
+>> > > > > > > > > > > > changes (e.g. ima_init_core).
+>> > > > > > > > > > > >
+>> > > > > > > > > > > > Please just limit the change to just calling ima_init() twice.
+>> > > > > > > > > > >
+>> > > > > > > > > > > My concern is that ima_update_policy_flags() will be called
+>> > > > > > > > > > > when ima_init() is deferred -- not initialised anything.
+>> > > > > > > > > > > though functionally, it might be okay however,
+>> > > > > > > > > > > I think ima_update_policy_flags() and notifier should work after ima_init()
+>> > > > > > > > > > > works logically.
+>> > > > > > > > > > >
+>> > > > > > > > > > > This change I think not much quite a lot. just wrapper ima_init() with
+>> > > > > > > > > > > ima_init_core() with some error handling.
+>> > > > > > > > > > >
+>> > > > > > > > > > > Am I missing something?
+>> > > > > > > > > >
+>> > > > > > > > > > Also, if we handle in ima_init() only, but it failed with other reason,
+>> > > > > > > > > > we shouldn't call again ima_init() in the late_initcall_sync.
+>> > > > > > > > > >
+>> > > > > > > > > > To handle this, It wouldn't do in the ima_init() but we need to handle
+>> > > > > > > > > > it by caller of ima_init().
+>> > > > > > > > >
+>> > > > > > > > > Only tpm_default_chip() is being called to set the ima_tpm_chip.  On failure,
+>> > > > > > > > > instead of going into TPM-bypass mode, return immediately.  There are no calls
+>> > > > > > > > > to anything else.  Just call ima_init() a second time.
+>> > > > > > > >
+>> > > > > > > > I’m not fully convinced this is sufficient.
+>> > > > > > > >
+>> > > > > > > > What I meant is the case where ima_init() fails due to other
+>> > > > > > > > initialisation steps, not only tpm_default_chip() (e.g. ima_fs_init()).
+>> > > > > > >
+>> > > > > > > The purpose of THIS patch is to add late_initcall_sync, when the TPM is not
+>> > > > > > > available at late_initcall.  This would be classified as a bug fix and would be
+>> > > > > > > backported.  No other changes should be included in this patch.
+>> > > > > >
+>> > > > > > Okay.
+>> > > > > >
+>> > > > > > > >
+>> > > > > > > > I’d also like to ask again whether it is fine to call
+>> > > > > > > > ima_update_policy_flags() and keep the notifier registered in the
+>> > > > > > > > deferred TPM case. While this may be functionally acceptable, it seems
+>> > > > > > > > logically questionable to do so when ima_init() has not completed.
+>> > > > > > >
+>> > > > > > > Other than extending the TPM, IMA should behave exactly the same whether there
+>> > > > > > > is a TPM or goes into TPM-bypass mode.
+>> > > > > > >
+>> > > > > > > >
+>> > > > > > > > There is also a possibility that a deferred case ultimately fails (e.g.
+>> > > > > > > > deferred at late_initcall, but then failing at late_initcall_sync
+>> > > > > > > > for another reason, even while entering TPM bypass mode). In that case,
+>> > > > > > > > it seems more appropriate to handle this state in the caller of
+>> > > > > > > > ima_init(), rather than inside ima_init() itself.
+>> > > > > > >
+>> > > > > > > If the TPM isn't found at late_initcall_sync(), then IMA should go into TPM-
+>> > > > > > > bypass mode.  Please don't make any other changes to the existing IMA behavior
+>> > > > > > > and hide it here behind the late_initcall_sync change.
+>> > > > > >
+>> > > > > > Okay. you're talking called ima_update_policy_flags() at late_initcall
+>> > > > > > wouldn't be not a problem even in case of late_initcall_sync's ima_init()
+>> > > > > > get failed with "TPM-bypass mode".
+>> > > > > >
+>> > > > > > I see then, I'll make a patch simpler then.
+>> > > > >
+>> > > > > But I think in case of below situation:
+>> > > > >  - late_initcall's first ima_init() is deferred.
+>> > > > >  - late_initcall_sync try again but failed and try again with
+>> > > > >    CONFIG_IMA_DEFAULT_HASH.
+>> > > > >
+>> > > > > I would like to sustain init_ima_core to reduce the same code repeat
+>> > > > > in late_initcall_sync.
+>> > > >
+>> > > > I think what Mimi's proposing is:
+>> > > >
+>> > > > If we're in late_initcall, and the TPM isn't available, return
+>> > > > immediately with an error (the EPROBE_DEFER?), don't do any init.
+>> > > >
+>> > > > If we're in late_initcall_sync, either we're already initialised, so do
+>> > > > return and nothing, or run through the entire flow, even if the TPM
+>> > > > isn't unavailable.
+>> > > >
+>> > > > So ima_init() just needs to know a) if it's in the sync or non-sync mode
+>> > > > and b) for the sync mode, if we've already done the init at
+>> > > > non-sync.
+>> > >
+>> > > Thanks, Jonathan.  That is exactly what I'm suggesting.  Any other changes
+>> > > should not be included in this patch.  Since Yeoreum is not hearing me, feel
+>> > > free to post a patch.
+>> >
+>> > I see. so what you need to is this only
+>> > If it looks good to you. I'll send it at v3.
+>>
+>> FWIW, I pulled the tpm_default_chip check out a level to account for the
+>> extra init you mentioned, and have the following (completely untested or
+>> compiled, but gives the approach):
+>
+>Thanks, Jonathan!  It looks good.  Similarly untested/compiled.
 
-This means that the userspace irqchip support has been broken for
-about four years, and nobody noticed. It was also broken before
-as we wouldn't wake-up on a PMU interrupt, but hey, who cares...
+FWIW, it does compile.
 
-It is probably time to remove the feature altogether, because it
-was a terrible idea 10 years ago, and it still is.
+>Emitting a message on failure to initialize IMA at late_initcall is good, but
+>the attestation service won't know.  Could you somehow differentiate between the
+>late_initcall and late_initcall_sync boot_aggregate records?
 
-Fixes: b57de4ffd7c6d ("KVM: arm64: Simplify kvm_cpu_has_pending_timer()")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Are you thinking "boot_aggregate" and "boot_aggregate_late" or similar 
+as the "filename" on the entries, just so it's clear when we did the 
+init in the log, or something else?
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 176cbe8baad30..8bb2c7422cc8b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -824,6 +824,10 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
- {
- 	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF | HCR_VSE);
- 
-+	irq_lines |= (!irqchip_in_kernel(v->kvm) &&
-+		      (kvm_timer_should_notify_user(v) ||
-+		       kvm_pmu_should_notify_user(v)));
-+
- 	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
- 		&& !kvm_arm_vcpu_stopped(v) && !v->arch.pause);
- }
+J.
+
 -- 
-2.47.3
-
+/-\                             | 101 things you can't have too much
+|@/  Debian GNU/Linux Developer |      of : 39 - silver bullets.
+\-                              |
