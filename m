@@ -1,124 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469C5345CD0;
-	Fri, 24 Apr 2026 07:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB6B3264FF
+	for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 08:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777015486; cv=none; b=eOrSzSGjNLcre9cD90w0LMfkfC23H7l1XCK6Nsekjf5ZQG1GSgTj4PFZKfHPbQAXN0CXHsRz5X05mTNKCB2zuiYshzA4+YtkIbsm66bOUPbvvKYoteNKrzYa22LNvhTs/UJqb2lz981HzVF6SP+iCW2A/Qg1a5+u7/Z+GpWOAaw=
+	t=1777020552; cv=none; b=KYGx3nm6zVe5f0xDb2Eq3wsU+il8+a5RFSQIIkCBnnFu3lYqYYK6jtlD3NclXCCxClYNgKFEG/gc3WUWnUvfaUZN5hXw03VEbD4fGDzu6GvXlv46JGlPrBVLTh51B18lauqf925NFyieYMtznUvjeP8g+YvodV77Mx/3vzk1HNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777015486; c=relaxed/simple;
-	bh=6mVWuteGVpQy8M878VFdWu6XkCt5gpyOdVPcDnaHa8s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pQqhVi90bgK5q8YfhkdP8/T6UJvDc4RyiUUsVSQ7zB8Hu2eTxSVy0qOS6Kifwlb+ok3R5GSo2cCEg6KCqW5Wxd/B1Q4rG68Dwtpb+pBLU4kZPoBzqL5wuC60doWjcMW76S3ye5DRVp+sbsgfnA8BGvUNQeCHRCABzUlQXzSqO80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfxfy4wt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777020552; c=relaxed/simple;
+	bh=mRLjagBdARb/RSTyBslw+tT7PGeiGRSx+fVrQ7vBgkY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N4gWOVnWV7jCdjaKCL1l+dmkyLRiy0a/1isvijbjHYdhB2RAere5J9zBLsjEnRJnlSkRBs72Wc+milr7USw7dDm6L+yBrRbUPTwA1O7RQQQrwATJW4wcx6W8R6uciYTOSm/vt5LUUywRNSo7UqJVuv4Op3jq7sFwcKyN1vx06aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q5MVeUTG; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfxfy4wt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207FFC19425;
-	Fri, 24 Apr 2026 07:24:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777015486;
-	bh=6mVWuteGVpQy8M878VFdWu6XkCt5gpyOdVPcDnaHa8s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sfxfy4wtCPyxDjviJPdNUMQ0DmV/qDZ05+48OVbM7hViSb6pq7JQkNHZHhS7T9YqN
-	 kYEvgoVakwXR0kwBU2v63u5Y04J9IWsmLukn3u6Su88OCwSTeLt7RzIv2EWaK6ImsT
-	 9423m0qMPrVJdbqqz6futIDiJWdQtOlQ6RZISFBzXdC6jdNMoZfw6WZcXPHR2jqP9+
-	 YZS0Zj49PmXVNv5/qdBbNw7kOSTU8ogLg+PDcvvK3+WOshPfCIqIDQSTszZL3fZDXv
-	 5wTxLDKNGhbuRaIRmkdowf/NuROQz4kidg19G4fbqn2iDxbmjvXgR97OnBFuhDbxFt
-	 f/MiYL6q75ONQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wGAu3-0000000EI9I-0fWL;
-	Fri, 24 Apr 2026 07:24:43 +0000
-Date: Fri, 24 Apr 2026 08:24:42 +0100
-Message-ID: <87jytwbz2d.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Wake-up from WFI when iqrchip is in userspace
-In-Reply-To: <uhqgyol622go4lm5btbk4jyieb3swhskpkyel4mnksfeki2mo2@ecnjvxwiqcfw>
-References: <20260423163607.486345-1-maz@kernel.org>
-	<uhqgyol622go4lm5btbk4jyieb3swhskpkyel4mnksfeki2mo2@ecnjvxwiqcfw>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q5MVeUTG"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-488c0120047so43981405e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 01:49:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777020550; x=1777625350; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aH/14ddBCo2kTCzx4ceCZMALAM1Tsur26jX4fxnDfAE=;
+        b=q5MVeUTGfAFDnW7xRIcMy0jLaqqiJpzcIJiOMd/x/AJ6k1wrPHTgIkz8B3VM0k4jaQ
+         qBi7ZXUIhCkRdSk54pRDJGTceSLxKsY27VZbyS1Q7Qy3gRqIJASv9y8rGoBA5BgweYAV
+         5RcvN2Zvvxg9Lln5SaXIT+u2QqNs6XCqH9hlBAwOU1Z9xYSS8XMZy9vMRJZ+wgDdU+pq
+         mBAs6tTOSHff4VGlCOaFEDgnEjom2PHz6bJCucks7Aw3kjexrD1q49bb4EGoCPh2eYCA
+         AOlfDuUqrLaURFjUAkvx0DmLatfyHj+0oAWmJc4hURhNXMgaeTDYPKvImJRGgNSDyd+Z
+         Fiqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777020550; x=1777625350;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aH/14ddBCo2kTCzx4ceCZMALAM1Tsur26jX4fxnDfAE=;
+        b=aQROjw7KslE3m9x3YALfYja9Bi5zYE/tPZagp7SxZMqXdV+reyn2JrS9HpjPHqE688
+         jwXI858UzQ1pL1HhGk+sk9xxHjNx0h5e5FQeX4TA5EsCMtN0pJfZf2ORPeVBF8BO9mxw
+         790RHQYSejeNKDKLq5/SrgkhrWP0DWgCfTzXG6h+i2BEeX0FBQcC62VyJK14dOtFYqrh
+         ZfTXcLLP5AMNbgIoeCLgJy22iDNEXHi6O7g8OH/l7xfkhui6Srf4/TPM3/XAtqE/Liov
+         +3789YDYl0oiSqN2OJzCeXaKw1E/42RvsYmZgNr9oos1ezWMz7FbtKmDrv3Eeg/5Ddwz
+         LFzQ==
+X-Gm-Message-State: AOJu0YzAttMwSB5lcStb1SOIzyMS3D+Kx46Fgwrsc2UaOnJS0npeuJLu
+	gVs5cSAhYbgVtsPDnat22rEiJ+Heyg7tnCGIi3owuLRobfUa/L++CjBNcCZInl/9pemxI5H3BQI
+	cJezmFVSCGma2f1O5p5YR4HRe9QG7UD3hE5nsUOwTI5JZ60NDAq2a1ZqCP2aRt1peP6QqbTX04g
+	IgLxI2p04JaxAO2eINxd/FZtiJ4cJAPKE=
+X-Received: from wrtj10.prod.google.com ([2002:a5d:604a:0:b0:43d:77d4:5f06])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4fc6:b0:48a:53ea:1408
+ with SMTP id 5b1f17b1804b1-48a53ea15a4mr231487385e9.8.1777020549668; Fri, 24
+ Apr 2026 01:49:09 -0700 (PDT)
+Date: Fri, 24 Apr 2026 09:49:02 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yaoyuan@linux.alibaba.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
+Message-ID: <20260424084908.370776-1-tabba@google.com>
+Subject: [PATCH 0/6] KVM: arm64: pKVM init and feature detection fixes
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Cc: tabba@google.com, catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
+	oupton@kernel.org, qperret@google.com, suzuki.poulose@arm.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 24 Apr 2026 07:33:02 +0100,
-Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
-> 
-> On Thu, Apr 23, 2026 at 05:36:07PM +0800, Marc Zyngier wrote:
-> > It appears that there is nothing in the wake-up path that
-> > evaluates whether the in-kernel interrupts are pending unless
-> > we have a vgic.
-> >
-> > This means that the userspace irqchip support has been broken for
-> > about four years, and nobody noticed. It was also broken before
-> > as we wouldn't wake-up on a PMU interrupt, but hey, who cares...
-> >
-> > It is probably time to remove the feature altogether, because it
-> > was a terrible idea 10 years ago, and it still is.
-> >
-> > Fixes: b57de4ffd7c6d ("KVM: arm64: Simplify kvm_cpu_has_pending_timer()")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/arm.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 176cbe8baad30..8bb2c7422cc8b 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -824,6 +824,10 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
-> >  {
-> >  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF | HCR_VSE);
-> >
-> 
-> Hi Marc,
-> 
-> > +	irq_lines |= (!irqchip_in_kernel(v->kvm) &&
-> > +		      (kvm_timer_should_notify_user(v) ||
-> > +		       kvm_pmu_should_notify_user(v)));
-> 
-> How about a new helper like 'kvm_should_notify_us_irqchip()' ?
-> We can replace the same part at beginning of kvm_vcpu_exit_request() and
-> here w/ unlikely().
+Hi folks,
 
-I'd rather not introduce a helper, for two reasons:
+These six patches are standalone correctness fixes I'd like to land
+before posting a follow-up to Will's pKVM infrastructure series [1]
+that moves vCPU state management to EL2. Sending them separately keeps
+the bigger series focused, but they are all valid fixes to have
+regardless.
 
-- this needs to be backported all the way to 5.19, because that's how
-  far it has been broken. So keeping it small and localised is far
-  better than introducing a helper that will make the backport less
-  obvious.
+The first patch fixes feature detection for FEAT_Debugv8p9: it was
+checking the wrong field in ID_AA64DFR0_EL1, causing KVM to treat
+certain EL2 control bits as RES0 on hardware that implements the
+feature.
 
-- I have patches to remove the other calls to kvm_*_notify_user() as a
-  simplification of this utterly stupid feature.
+The second patch is a trivial typo fix in comments.
 
-Finally, and while I agree that this could take an unlikely()
-qualifier, a much better course of action would be to have a separate
-patch that moves the qualifier to the predicate itself.
+The third patch fixes feature detection for FEAT_SPE_FnE, which was
+also checking the wrong field.
 
-Thanks,
+The last three fix bugs in the pKVM vCPU and hypervisor initialisation
+paths: a latent macro parameter bug, a pin-reference leak with a
+publication ordering issue in __pkvm_init_vcpu(), and a call-ordering
+hazard in __pkvm_init_finalise() that is benign today but becomes a
+crash once fix_host_ownership() is extended to operate on a non-empty
+page-table.
 
-	M.
+[1] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
+
+Cheers,
+/fuad
+
+Fuad Tabba (5):
+  KVM: arm64: Fix FEAT_Debugv8p9 to check DebugVer, not PMUVer
+  KVM: arm64: Fix typo in feature check comments
+  KVM: arm64: Fix FEAT_SPE_FnE to use PMSIDR_EL1.FnE, not PMSVer
+  KVM: arm64: Fix kvm_vcpu_initialized() macro parameter
+  KVM: arm64: Fix pin leak and publication ordering in
+    __pkvm_init_vcpu()
+
+Quentin Perret (1):
+  KVM: arm64: Fix initialisation order in __pkvm_init_finalise()
+
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kvm/config.c           | 23 +++++++++++++------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    | 38 ++++++++++++++++++++-----------
+ arch/arm64/kvm/hyp/nvhe/setup.c   |  8 +++----
+ 4 files changed, 46 insertions(+), 25 deletions(-)
 
 -- 
-Jazz isn't dead. It just smells funny.
+2.54.0.rc2.544.gc7ae2d5bb8-goog
+
