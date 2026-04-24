@@ -1,317 +1,269 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDEB330D24
-	for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 16:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886233EF64E
+	for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 19:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777049751; cv=none; b=hf2N1MUj5zLoYBWd7O3zYZ4+0Y4SMegJUuaPs5vUbIDbIZWOPPTdLHaHQgnjDu07dqWb1P8Om8qqDVMKv4r5gTb7oAnQK+8J0SN3pd4XK2ITmOfKGhKF2JPs3jICXAP1BaWmaX1ArutTqQwaq+qzVA8PJRu4FZTtBPXBp5tDaQc=
+	t=1777059966; cv=none; b=EnGpgIW8SdOOUtFDnFID9scM0Dlyk8iEcqIQZZDFfL2UD9C0UA64ybOT7C8RVQakw8paeikrzOkP0nLW4DeT+qTKvwnP4b85m/VuM+D+icVcrb7iU7ISyrkGPAIHTQBCXlIo7P6B/jr7mcUVStdFx/mcN8xxpXW8FkAegGLUR6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777049751; c=relaxed/simple;
-	bh=zEcxzMcgMn89IJk+qVytUJpH1pbaIV64uI2bPOhptqs=;
+	s=arc-20240116; t=1777059966; c=relaxed/simple;
+	bh=DR3if2UR7FufUkJliwuqWr5uN+vX36uZhp+XsoJ3Wgo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iThvj9ufuSvUCjPFUOCB/ycWIdqVtgID+QgtA8mYfv5pU2fD9HiAZXhd4OQjlrLOyef3+/RwnaPQiXJiFv+dKDTujcBqnkSlPc37PEyQNWp23w0VK4q6PbvrmJwLOV/wJ9IvvUlEqIKnNNVp0VwZvxBEpb33cqEh3g04WMupD9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=L7lsYPaG; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=jfGFN2SS7Qs+8N1OvvmKVgOeGOwFRVxTa4aHxreLj96scpdFG04FryZCJqYz0Ix4I6IcVcr3V1kStiOw3+1FYom+7D3rwqz+38Lr8AYeEPBRNJ8brF9mNdrfLkMGW46nr57Zvm3V4yhJIKqAVts6b7EUGeReT8Ng4X0fsc0y1Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bgxsRAhb; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="L7lsYPaG"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bgxsRAhb"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E29F91BB2;
-	Fri, 24 Apr 2026 09:55:42 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D68743FAA1;
-	Fri, 24 Apr 2026 09:55:44 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3FE98358A;
+	Fri, 24 Apr 2026 12:45:57 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 838A73F7B4;
+	Fri, 24 Apr 2026 12:46:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777049748; bh=zEcxzMcgMn89IJk+qVytUJpH1pbaIV64uI2bPOhptqs=;
+	t=1777059962; bh=DR3if2UR7FufUkJliwuqWr5uN+vX36uZhp+XsoJ3Wgo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L7lsYPaGt/MYLypilx7KBbCsSo/imoWFFxSZCoUYR90FA47PAoKT+rcMmpKYmRToH
-	 UFMlir8JyHOrgOlKNaE3TLVXUcEYmWzcDoApQJlkKsP/Urpvote7g8Vf7pWXw23mgy
-	 C3dkGS7rKLvV2CxIvzR7qd3mYStmE5lOVoWj8V20=
-Date: Fri, 24 Apr 2026 17:55:42 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	jarkko@kernel.org, jgg@ziepe.ca, sudeep.holla@kernel.org,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
-	sebastianene@google.com
-Subject: Re: [RFC PATCH v3 2/4] security: ima: call ima_init() again at
- late_initcall_sync for defered TPM
-Message-ID: <aeugjuJwhv6Dr3fm@e129823.arm.com>
-References: <cover.1777036497.git.noodles@meta.com>
- <5552c20c6d6d2ae3bbb6b35124af5d98d2f79163.1777036497.git.noodles@meta.com>
+	b=bgxsRAhbWt7rz/Q4OZd6QtGkqNjrUKxRbShq8GP/FllS73teLX1NfVSIjy2D1eBGf
+	 Eq4hqC91CXi0hKoSoP6kJLiTmSWz+9mzqZl4ymSaBDjF18Hjy2yWKyCMq9C6yyFIp0
+	 K54a/zsX4jg4D4+lh0LTjqLGlAlG4DnTRAgrnCzU=
+Date: Fri, 24 Apr 2026 20:45:24 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
+Message-ID: <n4v252jehdq4sn2ux26twudmvmfwjltxkvv6sa6rxtwbvqa2en@xp2oaodm7uqc>
+References: <20260411125024.3735989-1-weilin.chang@arm.com>
+ <20260411125024.3735989-2-weilin.chang@arm.com>
+ <86eckg39eo.wl-maz@kernel.org>
+ <tozhyzmwfddgx5fgfejracv6tskgs7xhs4fs6yvmvff74m7gwy@eq3oh35tokj4>
+ <867bq72n7l.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5552c20c6d6d2ae3bbb6b35124af5d98d2f79163.1777036497.git.noodles@meta.com>
+In-Reply-To: <867bq72n7l.wl-maz@kernel.org>
 
-> From: Jonathan McDowell <noodles@meta.com>
->
-> The Linux IMA (Integrity Measurement Architecture) subsystem used for
-> secure boot, file integrity, or remote attestation cannot be a loadable
-> module for few reasons listed below:
->
->  o Boot-Time Integrity: IMA’s main role is to measure and appraise files
->    before they are used. This includes measuring critical system files
->    during early boot (e.g., init, init scripts, login binaries). If IMA
->    were a module, it would be loaded too late to cover those.
->
->  o TPM Dependency: IMA integrates tightly with the TPM to record
->    measurements into PCRs. The TPM must be initialized early (ideally
->    before init_ima()), which aligns with IMA being built-in.
->
->  o Security Model: IMA is part of a Trusted Computing Base (TCB). Making
->    it a module would weaken the security model, as a potentially
->    compromised system could delay or tamper with its initialization.
->
-> IMA must be built-in to ensure it starts measuring from the earliest
-> possible point in boot which inturn implies TPM must be initialised and
-> ready to use before IMA.
->
-> Unfortunately some TPM drivers (such as Arm FF-A, or SPI attached TPM
-> devices) are not reliably available during the initcall_late stage,
-> resulting in a log error:
->
->   ima: No TPM chip found, activating TPM-bypass!
->
-> and no measurements into the TPM by IMA. We can avoid this by doing IMA
-> init in the initcall_late_sync stage, after the drivers have completed
-> their init + registration.
->
-> Rather than do this everywhere, and needlessly delay the initialisation
-> of IMA when there is no need to do so, we continue to try to initialise
-> at the earlier stage, only deferring to the later point if the TPM is
-> not available yet.
->
-> Signed-off-by: Jonathan McDowell <noodles@meta.com>
-> ---
->  security/integrity/ima/ima.h              |  3 +-
->  security/integrity/ima/ima_init.c         | 25 ++++++++-------
->  security/integrity/ima/ima_main.c         | 37 ++++++++++++++++++++---
->  security/integrity/ima/ima_template_lib.c |  3 +-
->  4 files changed, 50 insertions(+), 18 deletions(-)
->
-> diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-> index 89ebe98ffc5e..b3677b403a5a 100644
-> --- a/security/integrity/ima/ima.h
-> +++ b/security/integrity/ima/ima.h
-> @@ -65,6 +65,7 @@ extern struct ima_algo_desc *ima_algo_array __ro_after_init;
->  extern int ima_appraise;
->  extern struct tpm_chip *ima_tpm_chip;
->  extern const char boot_aggregate_name[];
-> +extern const char boot_aggregate_late_name[];
->
->  /* IMA event related data */
->  struct ima_event_data {
-> @@ -257,7 +258,7 @@ static inline void ima_measure_kexec_event(const char *event_name) {}
->  extern bool ima_canonical_fmt;
->
->  /* Internal IMA function definitions */
-> -int ima_init(void);
-> +int ima_init_core(bool late);
->  int ima_fs_init(void);
->  int ima_add_template_entry(struct ima_template_entry *entry, int violation,
->  			   const char *op, struct inode *inode,
-> diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
-> index a2f34f2d8ad7..5f335834a9bb 100644
-> --- a/security/integrity/ima/ima_init.c
-> +++ b/security/integrity/ima/ima_init.c
-> @@ -22,6 +22,7 @@
->
->  /* name for boot aggregate entry */
->  const char boot_aggregate_name[] = "boot_aggregate";
-> +const char boot_aggregate_late_name[] = "boot_aggregate_late";
->  struct tpm_chip *ima_tpm_chip;
->
->  /* Add the boot aggregate to the IMA measurement list and extend
-> @@ -39,17 +40,17 @@ struct tpm_chip *ima_tpm_chip;
->   * a different value.) Violations add a zero entry to the measurement
->   * list and extend the aggregate PCR value with ff...ff's.
->   */
-> -static int __init ima_add_boot_aggregate(void)
-> +static int __init ima_add_boot_aggregate(bool late)
->  {
->  	static const char op[] = "add_boot_aggregate";
->  	const char *audit_cause = "ENOMEM";
->  	struct ima_template_entry *entry;
->  	struct ima_iint_cache tmp_iint, *iint = &tmp_iint;
-> -	struct ima_event_data event_data = { .iint = iint,
-> -					     .filename = boot_aggregate_name };
-> +	struct ima_event_data event_data = { .iint = iint };
->  	struct ima_max_digest_data hash;
->  	struct ima_digest_data *hash_hdr = container_of(&hash.hdr,
->  						struct ima_digest_data, hdr);
-> +	const char *filename;
->  	int result = -ENOMEM;
->  	int violation = 0;
->
-> @@ -59,6 +60,12 @@ static int __init ima_add_boot_aggregate(void)
->  	iint->ima_hash->algo = ima_hash_algo;
->  	iint->ima_hash->length = hash_digest_size[ima_hash_algo];
->
-> +	if (late)
-> +		filename = boot_aggregate_late_name;
-> +	else
-> +		filename = boot_aggregate_name;
-> +	event_data.filename = filename;
-> +
->  	/*
->  	 * With TPM 2.0 hash agility, TPM chips could support multiple TPM
->  	 * PCR banks, allowing firmware to configure and enable different
-> @@ -86,7 +93,7 @@ static int __init ima_add_boot_aggregate(void)
->  	}
->
->  	result = ima_store_template(entry, violation, NULL,
-> -				    boot_aggregate_name,
-> +				    filename,
->  				    CONFIG_IMA_MEASURE_PCR_IDX);
->  	if (result < 0) {
->  		ima_free_template_entry(entry);
-> @@ -95,7 +102,7 @@ static int __init ima_add_boot_aggregate(void)
->  	}
->  	return 0;
->  err_out:
-> -	integrity_audit_msg(AUDIT_INTEGRITY_PCR, NULL, boot_aggregate_name, op,
-> +	integrity_audit_msg(AUDIT_INTEGRITY_PCR, NULL, filename, op,
->  			    audit_cause, result, 0);
->  	return result;
->  }
-> @@ -115,14 +122,10 @@ void __init ima_load_x509(void)
->  }
->  #endif
->
-> -int __init ima_init(void)
-> +int __init ima_init_core(bool late)
->  {
->  	int rc;
->
-> -	ima_tpm_chip = tpm_default_chip();
-> -	if (!ima_tpm_chip)
-> -		pr_info("No TPM chip found, activating TPM-bypass!\n");
-> -
->  	rc = integrity_init_keyring(INTEGRITY_KEYRING_IMA);
->  	if (rc)
->  		return rc;
-> @@ -140,7 +143,7 @@ int __init ima_init(void)
->  	rc = ima_init_digests();
->  	if (rc != 0)
->  		return rc;
-> -	rc = ima_add_boot_aggregate();	/* boot aggregate must be first entry */
-> +	rc = ima_add_boot_aggregate(late);	/* boot aggregate must be first entry */
->  	if (rc != 0)
->  		return rc;
->
-> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-> index 1d6229b156fb..0b93a286c0d3 100644
-> --- a/security/integrity/ima/ima_main.c
-> +++ b/security/integrity/ima/ima_main.c
-> @@ -1237,7 +1237,7 @@ static int ima_kernel_module_request(char *kmod_name)
->
->  #endif /* CONFIG_INTEGRITY_ASYMMETRIC_KEYS */
->
-> -static int __init init_ima(void)
-> +static int __init init_ima(bool late)
->  {
->  	int error;
->
-> @@ -1247,10 +1247,26 @@ static int __init init_ima(void)
->  		return 0;
->  	}
->
-> +	/*
-> +	 * If we found the TPM during our first attempt, or we know there's no
-> +	 * TPM, nothing further to do
-> +	 */
-> +	if (late && (ima_tpm_chip || !IS_ENABLED(CONFIG_TCG_TPM)))
-> +		return 0;
-> +
-> +	ima_tpm_chip = tpm_default_chip();
-> +	if (!ima_tpm_chip && !late && IS_ENABLED(CONFIG_TCG_TPM)) {
-> +		pr_debug("TPM not available, will try later\n");
-> +		return -EPROBE_DEFER;
-> +	}
-> +
-> +	if (!ima_tpm_chip)
-> +		pr_info("No TPM chip found, activating TPM-bypass!\n");
-> +
->  	ima_appraise_parse_cmdline();
->  	ima_init_template_list();
->  	hash_setup(CONFIG_IMA_DEFAULT_HASH);
-> -	error = ima_init();
-> +	error = ima_init_core(late);
->
->  	if (error && strcmp(hash_algo_name[ima_hash_algo],
->  			    CONFIG_IMA_DEFAULT_HASH) != 0) {
-> @@ -1258,7 +1274,7 @@ static int __init init_ima(void)
->  			hash_algo_name[ima_hash_algo], CONFIG_IMA_DEFAULT_HASH);
->  		hash_setup_done = 0;
->  		hash_setup(CONFIG_IMA_DEFAULT_HASH);
-> -		error = ima_init();
-> +		error = ima_init_core(late);
->  	}
->
->  	if (error)
-> @@ -1274,6 +1290,16 @@ static int __init init_ima(void)
->  	return error;
->  }
->
-> +static int __init init_ima_late(void)
-> +{
-> +	return init_ima(false);
-> +}
-> +
-> +static int __init init_ima_late_sync(void)
-> +{
-> +	return init_ima(true);
-> +}
-> +
->  static struct security_hook_list ima_hooks[] __ro_after_init = {
->  	LSM_HOOK_INIT(bprm_check_security, ima_bprm_check),
->  	LSM_HOOK_INIT(bprm_creds_for_exec, ima_bprm_creds_for_exec),
-> @@ -1319,6 +1345,7 @@ DEFINE_LSM(ima) = {
->  	.init = init_ima_lsm,
->  	.order = LSM_ORDER_LAST,
->  	.blobs = &ima_blob_sizes,
-> -	/* Start IMA after the TPM is available */
-> -	.initcall_late = init_ima,
-> +	/* Ensure we start IMA after the TPM is available */
-> +	.initcall_late = init_ima_late,
-> +	.initcall_late_sync = init_ima_late_sync,
->  };
-> diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
-> index 0e627eac9c33..8a89236f926c 100644
-> --- a/security/integrity/ima/ima_template_lib.c
-> +++ b/security/integrity/ima/ima_template_lib.c
-> @@ -363,7 +363,8 @@ int ima_eventdigest_init(struct ima_event_data *event_data,
->  		goto out;
->  	}
->
-> -	if ((const char *)event_data->filename == boot_aggregate_name) {
-> +	if ((const char *)event_data->filename == boot_aggregate_name ||
-> +	    (const char *)event_data->filename == boot_aggregate_late_name) {
->  		if (ima_tpm_chip) {
->  			hash.hdr.algo = HASH_ALGO_SHA1;
->  			result = ima_calc_boot_aggregate(hash_hdr);
-> --
-> 2.53.0
->
+On Thu, Apr 16, 2026 at 11:50:38AM +0100, Marc Zyngier wrote:
+> On Thu, 16 Apr 2026 00:05:40 +0100,
+> Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> > 
+> > On Wed, Apr 15, 2026 at 09:38:55AM +0100, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > > index 851f6171751c..a97bd461c1e1 100644
+> > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+> > > >  	 */
+> > > >  	bool	nested_stage2_enabled;
+> > > >  
+> > > > +	/* canonical IPA to nested IPA range lookup */
+> > > > +	struct maple_tree nested_revmap_mt;
+> > > > +	bool	nested_revmap_broken;
+> > > > +
+> > > 
+> > > Consider moving this boolean next to the other ones so that you don't
+> > > create too many holes in the kvm_s2_mmu structure (use pahole to find out).
+> > > 
+> > > But I have some misgivings about the way things are structured
+> > > here. Only NV needs a revmap, yet this is present irrelevant of the
+> > > nature of the VM and bloats the data structure a bit.
+> > > 
+> > > My naive approach would have been to only keep a pointer to the
+> > > revmap, and make that pointer NULL when the tree is "broken", and
+> > > freed under RCU if the context isn't the correct one.
+> > 
+> > Can you explain what you mean by "if the context isn't the correct one"?
+> > If this refers to when selecting a specific kvm_s2_mmu instance for
+> > another context, then IIUC refcnt would already be 0 and there would be
+> > no other user of the tree.
+> 
+> Sorry, "context" is an overloaded word. I meant a situation in which
+> you couldn't immediately free the maple-tree because you're holding
+> locks and freeing (hypothetically) requires a sleeping "context". in
+> this case, freeing under RCU, purely as a deferring mechanism, might
+> be useful.
 
-This looks good to me. Feel free to add:
-Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
+I experimented using RCU to free the tree as a deferring mechanism.
+Here are a few observations:
 
-Thanks!
+  - At reverse map record time, if maple tree store fails, we have to
+    change the maple tree pointer to a NULL, which is an RCU write
+    operation. Therefore we need to either take another lock, or use a
+    xchg(ptr, NULL) to avoid the lock.
 
---
-Sincerely,
-Yeoreum Yun
+  - Because we're holding the read-side mmu_lock, we shouldn't block
+    during reverse map record. Therefore we should use call_rcu()
+    instead of synchronize_rcu() to free the "broken" tree. This implies
+    a pointer to a maple tree in kvm_s2_mmu will not suffice, an
+    additional structure with both the maple tree and an rcu_head have
+    to be created.
+
+IMO looking at RCU calls mixed with mtree_{, un}lock(), and having a new
+wrapper struct to make this dynamic allocation scheme work is not very
+attractive to me.
+
+Instead, what do you think if I aggregate all strictly NV-related
+fields in kvm_s2_mmu i.e. tlb_vttbr, tlb_vtcr, nested_stage2_enabled,
+shadow_pt_debugfs_dentry, pending_unmap, into a struct maybe called
+kvm_s2_mmu_nested, add a maple tree in it, and have a pointer to this
+struct in kvm_s2_mmu? kvm_s2_mmu_nested can then be allocated only if we
+init a nested s2 mmu.
+
+Do you think this can work and is better than the current approaches?
+
+Thanks,
+Wei-Lin Chang
+
+> 
+> [...]
+> 
+> > > > +/*
+> > > > + * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree payload
+> > > > + * layout:
+> > > > + *
+> > > > + * bit 63: valid, 1 for non-polluted entries, prevents the case where the
+> > > > + *         nested IPA is 0 and turns the whole value to 0
+> > > > + * bits 55-12: nested IPA bits 55-12
+> > > > + * bit 0: polluted, 1 for polluted, 0 for not
+> > > > + */
+> > > > +#define VALID_ENTRY		BIT(63)
+> > > > +#define NESTED_IPA_MASK		GENMASK_ULL(55, 12)
+> > > > +#define UNKNOWN_IPA		BIT(0)
+> > > > +
+> > > 
+> > > This only works because you are using the "advanced" API, right?
+> > > Otherwise, you'd be losing the high bit. It'd be good to add a comment
+> > > so that people keep that in mind.
+> > 
+> > Sorry, I can't find any relationship between the advanced API and the
+> > top most bit of the maple tree value, what am I missing?
+> 
+> From Documentation/core-api/maple_tree.rst:
+> 
+> <quote>
+> The Maple Tree can store values between ``0`` and ``ULONG_MAX``.  The Maple
+> Tree reserves values with the bottom two bits set to '10' which are below 4096
+> (ie 2, 6, 10 .. 4094) for internal use.  If the entries may use reserved
+> entries then the users can convert the entries using xa_mk_value() and convert
+> them back by calling xa_to_value().  If the user needs to use a reserved
+> value, then the user can convert the value when using the
+> :ref:`maple-tree-advanced-api`, but are blocked by the normal API.
+> </quote>
+> 
+> So depending how you read this, you can conclude that the bit patterns
+> you encode in the MT may be considered as invalid. xa_mk_value() would
+> make things always work, but that shifts the value left by one bit,
+> hence you'd lose bit 63 (see how we use trap_config in
+> emulate-nested.c to deal with this).
+> 
+> I think you are lucky that bits [11:1] are always 0 here, but that
+> looks extremely fragile to me, so you never hit the [1:0]==10
+> condition, but that's really fragile.
+> 
+> > 
+> > > 
+> > > >  void kvm_init_nested(struct kvm *kvm)
+> > > >  {
+> > > >  	kvm->arch.nested_mmus = NULL;
+> > > > @@ -769,12 +783,57 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+> > > >  	return s2_mmu;
+> > > >  }
+> > > >  
+> > > > +void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
+> > > > +			      gpa_t fault_ipa, size_t map_size)
+> > > > +{
+> > > > +	struct maple_tree *mt = &mmu->nested_revmap_mt;
+> > > > +	gpa_t start = ipa;
+> > > > +	gpa_t end = ipa + map_size - 1;
+> > > > +	u64 entry, new_entry = 0;
+> > > > +	MA_STATE(mas, mt, start, end);
+> > > > +
+> > > > +	if (mmu->nested_revmap_broken)
+> > > > +		return;
+> > > > +
+> > > > +	mtree_lock(mt);
+> > > > +	entry = (u64)mas_find_range(&mas, end);
+> > > > +
+> > > > +	if (entry) {
+> > > > +		/* maybe just a perm update... */
+> > > > +		if (!(entry & UNKNOWN_IPA) && mas.index == start &&
+> > > > +		    mas.last == end &&
+> > > > +		    fault_ipa == (entry & NESTED_IPA_MASK))
+> > > > +			goto unlock;
+> > > > +		/*
+> > > > +		 * Create a "polluted" range that spans all the overlapping
+> > > > +		 * ranges and store it.
+> > > > +		 */
+> > > > +		while (entry && mas.index <= end) {
+> > > > +			start = min(mas.index, start);
+> > > > +			end = max(mas.last, end);
+> > > > +			entry = (u64)mas_find_range(&mas, end);
+> > > > +		}
+> > > > +		new_entry |= UNKNOWN_IPA;
+> > > > +	} else {
+> > > > +		new_entry |= fault_ipa;
+> > > > +		new_entry |= VALID_ENTRY;
+> > > > +	}
+> > > > +
+> > > > +	mas_set_range(&mas, start, end);
+> > > > +	if (mas_store_gfp(&mas, (void *)new_entry, GFP_NOWAIT | __GFP_ACCOUNT))
+> > > > +		mmu->nested_revmap_broken = true;
+> > > 
+> > > Can we try and minimise the risk of allocation failure here?
+> > > 
+> > > user_mem_abort() tries very hard to pre-allocate pages for page
+> > > tables by maintaining an memcache. Can we have a similar approach for
+> > > the revmap?
+> > 
+> > Unfortunately, as I understand the maple tree can only pre-allocate for
+> > a store when the range and the entry to be stored is given, but in this
+> > case we must inspect the tree to get that information after we hold the
+> > mmu and maple tree locks. It is possible to do a two pass approach:
+> > 
+> > pre-allocate -> take MMU lock -> take maple tree lock -> revalidate what
+> > we pre-allocated is still usable (nobody changed the tree before we took
+> > the maple tree lock)
+> > 
+> > But I am not fond of this extra complexity..
+> 
+> Fair enough. It would at least be interesting to get a feel for how
+> often this happens, because if we fail often, it won't help much.
+> 
+> [...]
+> 
+> > > My other concern here is related to TLB invalidation. As the guest
+> > > performs TLB invalidations that remove entries from the shadow S2,
+> > > there is no way to update the revmap to account for this.
+> > > 
+> > > This obviously means that the revmap becomes more and more inaccurate
+> > > over time, and that is likely to accumulate conflicting entries.
+> > > 
+> > > What is the plan to improve the situation on this front?
+> > 
+> > Right now I think using a direct map which goes from nested IPA to
+> > canonical IPA could work while not generating too much complexity, if we
+> > keep the reverse map and direct map in lockstep (direct map keeping the
+> > same mappings as the reverse map but just in reverse).
+> 
+> Right, so that'd effectively a mirror of the guest's page tables at
+> the point of taking the fault.
+> 
+> > I'll try to do that and include it in the next iteration.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
