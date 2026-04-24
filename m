@@ -1,105 +1,124 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB024282F3A
-	for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 06:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469C5345CD0;
+	Fri, 24 Apr 2026 07:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777013318; cv=none; b=GOIUmMricNqRZ3niV+tqqjHJNUdDzV0n/ZtJgY1anRZFE6ZhGKB2Gwn0oHQcNIU8GFXcdKD/F+6IxIKdcoEDjXsfIkQ8uPvQy5mxSfcpv0UdefsIRWcNtoCVhBlJs32aLUJcUQcJHIvN/QJR1xhU5JWDVJ4m8XjB8AvFoA+v7eI=
+	t=1777015486; cv=none; b=eOrSzSGjNLcre9cD90w0LMfkfC23H7l1XCK6Nsekjf5ZQG1GSgTj4PFZKfHPbQAXN0CXHsRz5X05mTNKCB2zuiYshzA4+YtkIbsm66bOUPbvvKYoteNKrzYa22LNvhTs/UJqb2lz981HzVF6SP+iCW2A/Qg1a5+u7/Z+GpWOAaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777013318; c=relaxed/simple;
-	bh=0wOOuJYHpYbOuEeycs12zNp1Rnfrdks0Fil+00MPKdM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=nvZt6VRMq2O9+FsmVbhg0+qZW2tjE3B3tbxKd+xwaANVzlZ2mv73fLChlf8f79XRnRxsd7zyr16rOUGsi2041EJOWgRNZf6oYbTHOIEVDauAPIUkLs3zdIpOxWPgF9KyfXTmPWvZpAw1pQZ7/iUEp5WzY1BcqNi1ymAKF0sfAOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=DPpgY3/S; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1777015486; c=relaxed/simple;
+	bh=6mVWuteGVpQy8M878VFdWu6XkCt5gpyOdVPcDnaHa8s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pQqhVi90bgK5q8YfhkdP8/T6UJvDc4RyiUUsVSQ7zB8Hu2eTxSVy0qOS6Kifwlb+ok3R5GSo2cCEg6KCqW5Wxd/B1Q4rG68Dwtpb+pBLU4kZPoBzqL5wuC60doWjcMW76S3ye5DRVp+sbsgfnA8BGvUNQeCHRCABzUlQXzSqO80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfxfy4wt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="DPpgY3/S"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=0wOOuJYHpYbOuEeycs12zNp1Rnfrdks0Fil+00MPKdM=;
-	b=DPpgY3/SfNnZvib1urs+Yfyun56s9Ml4uYUtkoTnCjHagEI862zCQ98Mm0uv7Kv5WMucEYxVE
-	/0N5//JNhot9mldmWAhp0DwClZd9KdKYDAhpr6g38pR7C5MCM8CtB68TQPGZpf1drJ7UHRIafJp
-	j5d1FwoAyQSHAjPU7KsNtrc=
-Received: from mail.maildlp.com (unknown [172.19.163.127])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4g23Kg1SZnznTVg;
-	Fri, 24 Apr 2026 14:42:15 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 08CAA402AB;
-	Fri, 24 Apr 2026 14:48:28 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 24 Apr 2026 14:48:27 +0800
-Message-ID: <0403d30d-e75e-4922-b8c1-8cae349f3dc2@huawei.com>
-Date: Fri, 24 Apr 2026 14:48:26 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfxfy4wt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207FFC19425;
+	Fri, 24 Apr 2026 07:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777015486;
+	bh=6mVWuteGVpQy8M878VFdWu6XkCt5gpyOdVPcDnaHa8s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sfxfy4wtCPyxDjviJPdNUMQ0DmV/qDZ05+48OVbM7hViSb6pq7JQkNHZHhS7T9YqN
+	 kYEvgoVakwXR0kwBU2v63u5Y04J9IWsmLukn3u6Su88OCwSTeLt7RzIv2EWaK6ImsT
+	 9423m0qMPrVJdbqqz6futIDiJWdQtOlQ6RZISFBzXdC6jdNMoZfw6WZcXPHR2jqP9+
+	 YZS0Zj49PmXVNv5/qdBbNw7kOSTU8ogLg+PDcvvK3+WOshPfCIqIDQSTszZL3fZDXv
+	 5wTxLDKNGhbuRaIRmkdowf/NuROQz4kidg19G4fbqn2iDxbmjvXgR97OnBFuhDbxFt
+	 f/MiYL6q75ONQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wGAu3-0000000EI9I-0fWL;
+	Fri, 24 Apr 2026 07:24:43 +0000
+Date: Fri, 24 Apr 2026 08:24:42 +0100
+Message-ID: <87jytwbz2d.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Wake-up from WFI when iqrchip is in userspace
+In-Reply-To: <uhqgyol622go4lm5btbk4jyieb3swhskpkyel4mnksfeki2mo2@ecnjvxwiqcfw>
+References: <20260423163607.486345-1-maz@kernel.org>
+	<uhqgyol622go4lm5btbk4jyieb3swhskpkyel4mnksfeki2mo2@ecnjvxwiqcfw>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF
- events
-To: Leonardo Bras <leo.bras@arm.com>
-CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
-	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <liuyonglong@huawei.com>,
-	<Jonathan.Cameron@huawei.com>, <yezhenyu2@huawei.com>, <linuxarm@huawei.com>,
-	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <skhan@linuxfoundation.org>,
-	<suzuki.poulose@arm.com>
-References: <20260225040421.2683931-1-zhengtian10@huawei.com>
- <20260225040421.2683931-5-zhengtian10@huawei.com>
- <acQj5grOdZT8LUGp@devkitleo>
- <e3253959-0340-4c13-a980-a599e090a6de@huawei.com>
- <acabezCO4B5BE40Q@devkitleo>
- <4e800c1e-25db-4aa2-b100-63434973de93@huawei.com>
- <acpfD3YjMpEdL5KZ@devkitleo> <aeeHNMqDx5Yipt_K@devkitleo>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <aeeHNMqDx5Yipt_K@devkitleo>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yaoyuan@linux.alibaba.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 24 Apr 2026 07:33:02 +0100,
+Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
+> 
+> On Thu, Apr 23, 2026 at 05:36:07PM +0800, Marc Zyngier wrote:
+> > It appears that there is nothing in the wake-up path that
+> > evaluates whether the in-kernel interrupts are pending unless
+> > we have a vgic.
+> >
+> > This means that the userspace irqchip support has been broken for
+> > about four years, and nobody noticed. It was also broken before
+> > as we wouldn't wake-up on a PMU interrupt, but hey, who cares...
+> >
+> > It is probably time to remove the feature altogether, because it
+> > was a terrible idea 10 years ago, and it still is.
+> >
+> > Fixes: b57de4ffd7c6d ("KVM: arm64: Simplify kvm_cpu_has_pending_timer()")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arm.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 176cbe8baad30..8bb2c7422cc8b 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -824,6 +824,10 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+> >  {
+> >  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF | HCR_VSE);
+> >
+> 
+> Hi Marc,
+> 
+> > +	irq_lines |= (!irqchip_in_kernel(v->kvm) &&
+> > +		      (kvm_timer_should_notify_user(v) ||
+> > +		       kvm_pmu_should_notify_user(v)));
+> 
+> How about a new helper like 'kvm_should_notify_us_irqchip()' ?
+> We can replace the same part at beginning of kvm_vcpu_exit_request() and
+> here w/ unlikely().
 
-On 4/21/2026 10:18 PM, Leonardo Bras wrote:
-> On Mon, Mar 30, 2026 at 12:31:28PM +0100, Leonardo Bras wrote:
->> On Sat, Mar 28, 2026 at 02:05:25PM +0800, Tian Zheng wrote:
->>> On 3/27/2026 11:00 PM, Leonardo Bras wrote:
->>>> On Fri, Mar 27, 2026 at 03:35:29PM +0800, Tian Zheng wrote:
->>>>> On 3/26/2026 2:05 AM, Leonardo Bras wrote:
->>>>>> Hello Tian,
->>>>>>
->>>>>> I am currently working on HACDBS enablement(which will be rebased on top of
->>>>>> this patchset) and due to the fact HACDBS and HDBSS are kind of
->>>>>> complementary I will sometimes come with some questions for issues I have
->>>>>> faced myself on that part. :)
->>>>>>
->>>>>> (see below)
->>>>> Of course! Happy to exchange ideas and learn together.
->>>> :)
-> Hello Tian,
->
-> On the above, HACDBS depends on HACDBSIRQ which can be announced by either
-> device-tree or ACPI.
->
-> Do you think it's ok for it to be ACPI only, for now?
->
-> Thanks!
-> Leo
+I'd rather not introduce a helper, for two reasons:
 
-Hi Leo,
+- this needs to be backported all the way to 5.19, because that's how
+  far it has been broken. So keeping it small and localised is far
+  better than introducing a helper that will make the backport less
+  obvious.
 
-No problem with ACPI-only for HACDBSIRQ for now.
+- I have patches to remove the other calls to kvm_*_notify_user() as a
+  simplification of this utterly stupid feature.
 
-Feel free to let me know if you have any questions while working
-on HACDBS on top of HDBSS.
+Finally, and while I agree that this could take an unlikely()
+qualifier, a much better course of action would be to have a separate
+patch that moves the qualifier to the predicate itself.
 
-Tian
+Thanks,
 
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
