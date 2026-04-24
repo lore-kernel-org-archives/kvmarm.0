@@ -1,175 +1,116 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D613264FF
-	for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 08:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5552A35F8B7
+	for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 10:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777020561; cv=none; b=ZEQUklrHm8eC7OrCGI6HZ4Yb+6XWNTEOo8+qcGL06QDILomui/m56R7aVQDwvkRCaMRf3wDv11EMxEWK+5XizdrC7ZjNqAq/5evFJ0k8w9hg48AGtYWrp+UUPrXiV4c90PhoY89tBq7+Wrq6g8zD3qHwGZek/k1R9urBDN6+OY0=
+	t=1777025316; cv=none; b=ERcKUblPsT47tA43zkJiBUewSeEogC8HTJGnr43MDcM5c5TZluDLhD3dCeTAUc4RUmzMLcrsFcKqg6Vx0elqO9G3cSl5HV6jh4a/1BuMAQupAcVODmvfUTetp8GCllXaXI97BJ7V6dk4xpA625TDJRPIC+ICct4uM8OoFv57k0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777020561; c=relaxed/simple;
-	bh=BZlWZl/8o8OWASVcp9+fdkbKr43zVFREwf1BJ/L7wFs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ahk7XWdl5+PHICp6w9MJdgUNtwop5BI8rX1l4FPkbk+/sYG6ryNYg2GwZ96j/Dy9w7IheCYL7w7VhJwoLMw6l9DMjbq91qqEDjoKDf21NvDsiaSs5ELbf/aFHsxNJlZ5k8KnY881QkH9Brk/hqfxvmnK/RGWs8E4k4pT00IONLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X2aekhkM; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1777025316; c=relaxed/simple;
+	bh=x20Ic161sKUwYRA6ryFZm4hIWfUOKk542S8QeGSaRlw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=YHWPhVB+S+M7gBmPYbvhPgb9syotMYmqCzup/JNqqqNW/gsog2UoPJRHtorU2yQFMMRsh6oLnNWdauNLXqDKRcfA+XZqzfSIyp5YStoVPgmJ6061ZMGUklIYOWc4ychgqitEP4yzhiNB9b0AuKvxmOTcXbTUVeZxJEr+up/bw28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RO/fAHz4; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X2aekhkM"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-48a55ecc249so29617985e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 24 Apr 2026 01:49:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777020555; x=1777625355; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YXnZx3UxHBTbHH5XMnk/ieS8KZZEW34YA9EEjoorokI=;
-        b=X2aekhkMou6UOGumRzDWx2WpXJJPuWpAcEwegEk1Blt/SLXgROvkdnFw5yrYLo+k1q
-         miu8Zy6nHKXzYNY18t7O2amPjx4EiZ/rnF1I217wMfRRYAfgsyEc5dxT4lGbOoaKOS2B
-         Og3O/n5p8bQp9oWVcfGGO19ocNxeWFY19eI7yyuYkE3lhDCd6Qv4qi6TCXFk/56/kgEc
-         ssgceGpnW/hHRZzoELOIJZTcV7O4wH7QZTsX93uonhFbMiURTQp1OQdzyF5fgZ28qewq
-         gsvdcQG7vPSCjZOnEyHyQG1pPWNwCKfPrrLrW47l+3kDpBbmwx9S8vQ33syW0/V3iz5x
-         KYlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777020555; x=1777625355;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YXnZx3UxHBTbHH5XMnk/ieS8KZZEW34YA9EEjoorokI=;
-        b=spz4zcXp6kcf7aV79jivOKAaxN6WhKYfz7ULEeVnwwzRGrr7OBqUS0EQZ6dG/tmYzK
-         j1FcgurOu/O8r40jWxMrWg10sWq37LdxMpPDJBTBt/ifCIhSwp0uk+UIJbxH8xU+ZnEH
-         Lzyp3gYx3I/VLjcIM4qxfQiSAe7P64nXPl7A2+vH0M0zW/7fO0Myzmq0/Yf9yrOciJys
-         hKjQhG6G/DsHx9+SefO0+dwrW+Zh2xML8Tig9BAd8Ai1vm1hc1Bs1PkVB7E6OgT7ksLQ
-         bseIxW60GVxybvB8XvVVgJexgld8PLqOfazvSTTNEWoQbVYzz38QEhTyDVR7aSVJi/WB
-         XCaA==
-X-Gm-Message-State: AOJu0Ywoba3bcIQk1XUTyyIpBSGCerKFiH1lWidSEuoiwx12UQqGxSMW
-	EjbyvOSYYWNsNVd3SHZHwigc5VD9rCxErP5fOIV2CNUD0LrsmfexOJbbY2YM2F4mDvEHIHPpYRt
-	MUHbNXkr1XouqKF/r+3F6WmcuhmZlxUzO3vmw62pOaFfT2MY2aezQtUsxtJS1mNMi0Jc1vYxCRK
-	03pxnNmvEhG/2WCXPBoy+YclwWtZZt0So=
-X-Received: from wmmu12.prod.google.com ([2002:a05:600c:cc:b0:489:1d25:1a63])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:c177:b0:486:fb0b:ad79
- with SMTP id 5b1f17b1804b1-488fb78129emr400550495e9.20.1777020554656; Fri, 24
- Apr 2026 01:49:14 -0700 (PDT)
-Date: Fri, 24 Apr 2026 09:49:07 +0100
-In-Reply-To: <20260424084908.370776-1-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RO/fAHz4"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 343E71BC0;
+	Fri, 24 Apr 2026 03:08:28 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 358933F641;
+	Fri, 24 Apr 2026 03:08:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1777025313; bh=x20Ic161sKUwYRA6ryFZm4hIWfUOKk542S8QeGSaRlw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RO/fAHz4w6tvV0tSr5IiP9uY7Vpvlt8ixeEw8Een+yh4bUys4r8C/Y9PL6dsRTgnI
+	 At4+HDGbiLUoAT3XFkrO0n7AEEritCUqh/AVLOwsAswJ9HEztUYiEhAtWKQpnMwLky
+	 g411WdNzZ6wH5t9Q5l/U80d9VZdfG9tUyFijm8jE=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	liuyonglong@huawei.com,
+	Jonathan.Cameron@huawei.com,
+	yezhenyu2@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF events
+Date: Fri, 24 Apr 2026 11:08:25 +0100
+Message-ID: <aetBGXkIbHaHm0L6@devkitleo>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <0403d30d-e75e-4922-b8c1-8cae349f3dc2@huawei.com>
+References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-5-zhengtian10@huawei.com> <acQj5grOdZT8LUGp@devkitleo> <e3253959-0340-4c13-a980-a599e090a6de@huawei.com> <acabezCO4B5BE40Q@devkitleo> <4e800c1e-25db-4aa2-b100-63434973de93@huawei.com> <acpfD3YjMpEdL5KZ@devkitleo> <aeeHNMqDx5Yipt_K@devkitleo> <0403d30d-e75e-4922-b8c1-8cae349f3dc2@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260424084908.370776-1-tabba@google.com>
-X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
-Message-ID: <20260424084908.370776-6-tabba@google.com>
-Subject: [PATCH 5/6] KVM: arm64: Fix pin leak and publication ordering in __pkvm_init_vcpu()
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Cc: tabba@google.com, catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	oupton@kernel.org, qperret@google.com, suzuki.poulose@arm.com, 
-	joey.gouly@arm.com, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Two bugs exist in the vCPU initialisation path:
+On Fri, Apr 24, 2026 at 02:48:26PM +0800, Tian Zheng wrote:
+> 
+> On 4/21/2026 10:18 PM, Leonardo Bras wrote:
+> > On Mon, Mar 30, 2026 at 12:31:28PM +0100, Leonardo Bras wrote:
+> > > On Sat, Mar 28, 2026 at 02:05:25PM +0800, Tian Zheng wrote:
+> > > > On 3/27/2026 11:00 PM, Leonardo Bras wrote:
+> > > > > On Fri, Mar 27, 2026 at 03:35:29PM +0800, Tian Zheng wrote:
+> > > > > > On 3/26/2026 2:05 AM, Leonardo Bras wrote:
+> > > > > > > Hello Tian,
+> > > > > > > 
+> > > > > > > I am currently working on HACDBS enablement(which will be rebased on top of
+> > > > > > > this patchset) and due to the fact HACDBS and HDBSS are kind of
+> > > > > > > complementary I will sometimes come with some questions for issues I have
+> > > > > > > faced myself on that part. :)
+> > > > > > > 
+> > > > > > > (see below)
+> > > > > > Of course! Happy to exchange ideas and learn together.
+> > > > > :)
+> > Hello Tian,
+> > 
+> > On the above, HACDBS depends on HACDBSIRQ which can be announced by either
+> > device-tree or ACPI.
+> > 
+> > Do you think it's ok for it to be ACPI only, for now?
+> > 
+> > Thanks!
+> > Leo
+> 
+> Hi Leo,
+> 
+> No problem with ACPI-only for HACDBSIRQ for now.
 
-1. If a check fails after hyp_pin_shared_mem() succeeds, the cleanup
-   path jumps to 'unlock' without calling unpin_host_vcpu() or
-   unpin_host_sve_state(), permanently leaking pin references on the
-   host vCPU and SVE state pages.
+Awesome!
+I got it all working on my side, so I will try to send a freestanding patch 
+with the required needs from HDBSS :)
 
-   Extract a register_hyp_vcpu() helper that performs the checks and
-   the store. When register_hyp_vcpu() returns an error, call
-   unpin_host_vcpu() and unpin_host_sve_state() inline before falling
-   through to the existing 'unlock' label.
+> 
+> Feel free to let me know if you have any questions while working
+> on HACDBS on top of HDBSS.
+> 
 
-2. register_hyp_vcpu() publishes the new vCPU pointer into
-   'hyp_vm->vcpus[]' with a bare store, allowing a concurrent caller
-   of pkvm_load_hyp_vcpu() to observe a partially initialised vCPU
-   object.
+Will do:)
 
-   Ensure the store uses smp_store_release() and the load uses
-   smp_load_acquire(). While 'vm_table_lock' currently serialises the
-   store and the load, these barriers ensure the reader sees the fully
-   initialised 'hyp_vcpu' object even if there were a lockless path or
-   if the lock's own ordering guarantees were insufficient for nested
-   object initialization.
+Thanks!
+Leo
 
-Fixes: 49af6ddb8e5c ("KVM: arm64: Add infrastructure to create and track pKVM instances at EL2")
-Reported-by: Ben Simner <ben.simner@cl.cam.ac.uk>
-Co-developed-by: Will Deacon <willdeacon@google.com>
-Signed-off-by: Will Deacon <willdeacon@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 38 ++++++++++++++++++++++------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 7ed96d64d611..e7496eb85628 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -266,7 +266,8 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
- 	if (hyp_vm->kvm.created_vcpus <= vcpu_idx)
- 		goto unlock;
- 
--	hyp_vcpu = hyp_vm->vcpus[vcpu_idx];
-+	/* Pairs with smp_store_release() in register_hyp_vcpu(). */
-+	hyp_vcpu = smp_load_acquire(&hyp_vm->vcpus[vcpu_idx]);
- 	if (!hyp_vcpu)
- 		goto unlock;
- 
-@@ -860,12 +861,30 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
-  *	     the page-aligned size of 'struct pkvm_hyp_vcpu'.
-  * Return 0 on success, negative error code on failure.
-  */
-+static int register_hyp_vcpu(struct pkvm_hyp_vm *hyp_vm,
-+			      struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	unsigned int idx = hyp_vcpu->vcpu.vcpu_idx;
-+
-+	if (idx >= hyp_vm->kvm.created_vcpus)
-+		return -EINVAL;
-+
-+	if (hyp_vm->vcpus[idx])
-+		return -EINVAL;
-+
-+	/*
-+	 * Ensure the hyp_vcpu is initialised before publishing it to
-+	 * the vCPU-load path via 'hyp_vm->vcpus[]'.
-+	 */
-+	smp_store_release(&hyp_vm->vcpus[idx], hyp_vcpu);
-+	return 0;
-+}
-+
- int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 		     unsigned long vcpu_hva)
- {
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 	struct pkvm_hyp_vm *hyp_vm;
--	unsigned int idx;
- 	int ret;
- 
- 	hyp_vcpu = map_donated_memory(vcpu_hva, sizeof(*hyp_vcpu));
-@@ -884,18 +903,11 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 	if (ret)
- 		goto unlock;
- 
--	idx = hyp_vcpu->vcpu.vcpu_idx;
--	if (idx >= hyp_vm->kvm.created_vcpus) {
--		ret = -EINVAL;
--		goto unlock;
-+	ret = register_hyp_vcpu(hyp_vm, hyp_vcpu);
-+	if (ret) {
-+		unpin_host_vcpu(host_vcpu);
-+		unpin_host_sve_state(hyp_vcpu);
- 	}
--
--	if (hyp_vm->vcpus[idx]) {
--		ret = -EINVAL;
--		goto unlock;
--	}
--
--	hyp_vm->vcpus[idx] = hyp_vcpu;
- unlock:
- 	hyp_spin_unlock(&vm_table_lock);
- 
--- 
-2.54.0.rc2.544.gc7ae2d5bb8-goog
-
+> Tian
+> 
