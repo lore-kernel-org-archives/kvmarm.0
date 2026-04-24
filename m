@@ -1,52 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D214B39B97F;
-	Fri, 24 Apr 2026 11:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB98739A7F8;
+	Fri, 24 Apr 2026 11:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777028887; cv=none; b=S6ulxh23bJN6r8E0PPWDrJ77AfDT8/0KAZm0BXgdLcvCTt8geksIoSpjR0GwGk7XF+vByAqOZLE3P4LZH7bhPVdCnVH565fYS/VYbqXkq6W6XUcaT9X6GDEKEAdMvkvhGaz5PwqMHxHc0F89h5ciTW8WmAObUD4hyR8343xe5Ig=
+	t=1777028890; cv=none; b=EcjnF/HGYzLIPIR3vfOqM/jvVx0RlxggqPrnaA5Jr+TB/+xKvMzfY6QZb3gYbU5KOE1gOseL+cpwrxbla7jG9vGpw3veCLVHUF0mQ7oZ+4giHME/fiS6ksiMRB1DP8aia/5yw7nSqGVV7DQzd4Ev+kibQVbMMSGN8/l+PZTKQdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777028887; c=relaxed/simple;
-	bh=Ea5gfF+HbRCMpht8ZAX8ej/HdIt06cHNLMmLRfWSvcA=;
+	s=arc-20240116; t=1777028890; c=relaxed/simple;
+	bh=cmSla55ceuCbLiK30aqfSAllXwLZ2tM2r3ifRj5DUwI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CIFX6dk/IoSsPxNA45Qxjprsq27cyf14Xf2tKXYnEGykR8jn7KZo+E0YYy+sJwr6+OV0S1lnOhq7CKqMYPV9IRRFhteU/0qo09adVte9CB8sFSZiRj4wAryDtaWhptkP4Zr6YZmIaXGAogoe1bgat19YkoApYgo09NJ+tQIqGqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9xOnyAg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=kswStqqz5xEwp4D0R7OFLGAoMsTWwwJXCbV78URmdbYTEqmznBdPoGvc0/xNfcoea0VPHNxuB5GJbjvB76ZI965pyOLL1sNrEp5a+tXa/lxcVCgw1jhkbqSEkgydHhKKjE9ur0bG7xcI0QRA23ypzZuBY6rzRjSTSxKrPNEtsdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBb/hNTA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9xOnyAg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A7DC2BCB4;
-	Fri, 24 Apr 2026 11:08:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBb/hNTA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA4DBC2BCB6;
+	Fri, 24 Apr 2026 11:08:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777028887;
-	bh=Ea5gfF+HbRCMpht8ZAX8ej/HdIt06cHNLMmLRfWSvcA=;
+	s=k20201202; t=1777028890;
+	bh=cmSla55ceuCbLiK30aqfSAllXwLZ2tM2r3ifRj5DUwI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y9xOnyAg7p/24KacJ858wX3cZoHMZCs1Pmxrx5QXUdmgF4CFM8pIUGaakyX2+4HDZ
-	 8blnIujUN1DTs7RzLn9giR5KdRZXzfFEAQHIxQk1wBColOQzNa4OE0qtfCoXZ9T8ym
-	 BUaSoJbW41Cm8uX6LCZ6lfHQdO9y9XPXSNaJyawATVqHsvFmDVH7V9HjBECL713nyq
-	 oL4U/OtJdur1rfbKZMSr4QmHK29hlhrb45JRO0qgf+hUgWZIlwoSUT97SlqeCU9sPQ
-	 cJiqnUjyh60W9opatnTSWuM+qnzuNjeTXDfwMdgRgEutISFicMryvVXu6XyETgSRl4
-	 kI2QM5hGL6I/A==
+	b=hBb/hNTAcd75sQn1Q24gofMGtsSOC2duEKWZgSdOuB8gWgI2gXbaQOc17YPe1fWlX
+	 6lbv0d7o1Q5rpU8W0H04GkZ1bTwtfJf+MXj8uLQwBTb+nN6kdTUP6tgoCf/R59irTL
+	 tzVNAxU7AwLJmRrKdd95N/wH1Z2GiVTFYObvCjVlSFK+uoQqNFfv7IjyIqTC9jXnbK
+	 r8B3a2dV/LyTHYnr9FKcZMZmyJ4eO7Lxf0G+lJmxw7m+KsnZxmOgOMugvzY3ihGNmZ
+	 x6pe2P3fhZcG2Pm8YPJTNcus3CDN+l7qQB2tFawDOp8UMlUGUxiFOnKjMD05xGchSC
+	 vagYo7CTAgnsA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wGEOD-0000000ELuS-1s94;
-	Fri, 24 Apr 2026 11:08:05 +0000
+	id 1wGEOG-0000000ELuX-251e;
+	Fri, 24 Apr 2026 11:08:08 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+To: catalin.marinas@arm.com,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Wake-up from WFI when iqrchip is in userspace
-Date: Fri, 24 Apr 2026 12:08:02 +0100
-Message-ID: <177702878146.537738.5575062424805224774.b4-ty@kernel.org>
+	linux-kernel@vger.kernel.org,
+	android-kvm@google.com,
+	Sebastian Ene <sebastianene@google.com>
+Cc: joey.gouly@arm.com,
+	korneld@google.com,
+	mrigendra.chaubey@gmail.com,
+	oupton@kernel.org,
+	perlarsen@google.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v2] KVM: arm64: Reject non compliant SMCCC function calls in pKVM
+Date: Fri, 24 Apr 2026 12:08:05 +0100
+Message-ID: <177702878144.537738.10946354960670336499.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260423163607.486345-1-maz@kernel.org>
-References: <20260423163607.486345-1-maz@kernel.org>
+In-Reply-To: <20260408114118.422604-1-sebastianene@google.com>
+References: <20260408114118.422604-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,25 +62,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, sebastianene@google.com, joey.gouly@arm.com, korneld@google.com, mrigendra.chaubey@gmail.com, oupton@kernel.org, perlarsen@google.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 23 Apr 2026 17:36:07 +0100, Marc Zyngier wrote:
-> It appears that there is nothing in the wake-up path that
-> evaluates whether the in-kernel interrupts are pending unless
-> we have a vgic.
+On Wed, 08 Apr 2026 11:41:18 +0000, Sebastian Ene wrote:
+> Prevent the propagation of a function-id that has the top bits set since
+> this is not compliant with the SMCCC spec and can overlap with the
+> already known function-id decoders. (eg. if we invoke an smc with
+> 0xffffffffc4000012 it will be decoded as a PSCI reset call). Instead,
+> make it clear that we don't support it and return an error.
 > 
-> This means that the userspace irqchip support has been broken for
-> about four years, and nobody noticed. It was also broken before
-> as we wouldn't wake-up on a PMU interrupt, but hey, who cares...
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/1] KVM: arm64: Wake-up from WFI when iqrchip is in userspace
-      commit: 4ce98bf0865c349e7026ad9c14f48da264920953
+[1/1] KVM: arm64: Reject non compliant SMCCC function calls in pKVM
+      commit: 480ea48cad873b49a1fabd07c0847c3cf1c32286
 
 Cheers,
 
