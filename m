@@ -1,91 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4977B5CDF1
-	for <kvmarm@lists.linux.dev>; Sat, 25 Apr 2026 04:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from the.earth.li (the.earth.li [93.93.131.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B6430499A
+	for <kvmarm@lists.linux.dev>; Sat, 25 Apr 2026 09:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.93.131.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777092810; cv=none; b=Us2ZyePlTvpvnSy/+tIw2AWdYcdoCa8za7Bj8X3Sxb2to8E2KsC9J6DJb4zhIW4fKKXa5HepoaoajUIAMGkjoVzZUHDsR1UrCt+6Dfj3dHAzbzE1I8FUzYNaeaIcmjYKw16cMKKDk2wiKDFoGT4p5mkZ2Fy3rP5A40pdZqssrMk=
+	t=1777108264; cv=none; b=hyaw3dLha6DWoG0wDOmeZsGRjqi/3iPpV3D0T+EU2YwX1X7dJ3tBGuqQopAki6/UVjoiUWZTBa2368gebnzVL7NF3Mmv65/iKV/nzYxHaB9wAYaE8mM+kRcWyl9WwblB3m25/0SzJrcoPY9zDSc7VgxjzK7oamYoFX1nB7TaPEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777092810; c=relaxed/simple;
-	bh=+9u7EK2Y/HhdgOEE30vcAjodDpWFlSP0b0+cZVFApXg=;
+	s=arc-20240116; t=1777108264; c=relaxed/simple;
+	bh=aoeFCb6TbdJA35mUaAHSKWFBhTGH2XvKgroRhl3uI08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q7VaLvZiy9ztzQeZ9MeoW18asfod8t+p+DaiYdJb9G6DqW2R/Vkss8dHkbuJZ05h1BE4tRgggBakxIvagSSEW9zybOHiDwhGvpEVyda3mnmc40kFLnyDPYONZuYBxTZl10GmEeaATkJHvNpuWhc0OOaPI9e16kX6hHtN6X58ujk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mpyx+TbM; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=raFyvPfas9RD23BS9o+J3I80mSj/2ozHYdKwc+78qtWnLw0kCWsjhK58g5psdJzeUwhu6UUNkFgP1vbZcIv6nbJHEngCIS0Ve2jwzklwrOQBbKkPGLdjMSVITL6CpCk9ZjgkfohUP/UH2bqGdPkOhRgTqCGJ1EroF0WZ/pnTR2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li; spf=pass smtp.mailfrom=earth.li; dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b=PFouws7o; arc=none smtp.client-ip=93.93.131.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=earth.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mpyx+TbM"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F16E335AB;
-	Fri, 24 Apr 2026 21:53:21 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 597DE3F62B;
-	Fri, 24 Apr 2026 21:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777092807; bh=+9u7EK2Y/HhdgOEE30vcAjodDpWFlSP0b0+cZVFApXg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mpyx+TbMIq+ior7LsPTIlyZk8u/VbsgXRov22WCh+KdsLt06ArcEHlBUHXOlw+5tP
-	 zoH8OS46iFTYFpYFWcrsJrw3oFSPduaM14w1BBFJd/fUg7AujO/atqUP3oPa8LMf2A
-	 NS6wirQcjTnwHLgYLDMgefazm5Gmke6C/JKNzV4w=
-Date: Sat, 25 Apr 2026 05:53:20 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
+	dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b="PFouws7o"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
+	s=the; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=j6rxqb2f278iGTGU/7sMH9FbEKwwMCCocICHWINsPdM=; b=PFouws7o5doLAYVrlIoXV/9ww5
+	d4iXXPdRwm17lO0bbEn5PHzf49HJBIdNDLUsugiKPZkJ5h5nSwbHUQ1Xq2+5ABLaJ07o8zATneKKF
+	w+UtT4JkUFt2KJkkfhcZ0nFa3Mqatf1iCNpJMiYXw2+7rbdwpoWMkemT2W/v4xZ5XZweXR2wG6icq
+	vNY729gWq41ni9koXEUoRD+hV1lsY+neB7jIdnofYL7YzbQ0iwxIBVZ8jvgkWg3dkYsni9qGV6wRC
+	pa+gbrXFIYlAcUqJw6/tPrrN5vfjA7qHE4sGi1aKYyGDEj+XAJQNrBCoow2mnGmFdsY6gE8534edj
+	HMC6xTeA==;
+Received: from noodles by the.earth.li with local (Exim 4.98.2)
+	(envelope-from <noodles@earth.li>)
+	id 1wGZ2O-00000006EIj-3k1D;
+	Sat, 25 Apr 2026 10:10:57 +0100
+Date: Sat, 25 Apr 2026 10:10:56 +0100
+From: Jonathan McDowell <noodles@earth.li>
 To: Mimi Zohar <zohar@linux.ibm.com>
-Cc: Paul Moore <paul@paul-moore.com>, roberto.sassu@huawei.com,
-	Jonathan McDowell <noodles@earth.li>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-integrity@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	jmorris@namei.org, serge@hallyn.com, dmitry.kasatkin@gmail.com,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
 	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
 	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
 	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
-	sebastianene@google.com
-Subject: Re: [RFC PATCH v2 1/4] security: ima: call ima_init() again at
+	sebastianene@google.com, Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: Re: [RFC PATCH v3 2/4] security: ima: call ima_init() again at
  late_initcall_sync for defered TPM
-Message-ID: <aexIwJpno3iPIdRD@e129823.arm.com>
-References: <bd908e28298d968740d03c97bc7e441de188b7b4.camel@linux.ibm.com>
- <aeokwrC86WI7uT+K@e129823.arm.com>
- <aeomlp3I0eVE5mce@earth.li>
- <aeotq8nPVu4wvEx5@e129823.arm.com>
- <e4e242ae5533d5762a3647186a178764881bf9ff.camel@linux.ibm.com>
- <aephL3MzYoqFGaT5@e129823.arm.com>
- <CAHC9VhRQWHEWQ5NzOPiu8jtYv6UsRm8WVS4fd74AbkOcAd4y_g@mail.gmail.com>
- <aesGU8a3mbVzvteH@e129823.arm.com>
- <CAHC9VhSaT_quKYnpFjAfqvL07JNbWMgM6c4pB9F46NHawX3DCA@mail.gmail.com>
- <014cf39aa8d6a0bcfa1a95c069675977ac67b843.camel@linux.ibm.com>
+Message-ID: <aeyFIP4Ph57LvPqe@earth.li>
+References: <cover.1777036497.git.noodles@meta.com>
+ <5552c20c6d6d2ae3bbb6b35124af5d98d2f79163.1777036497.git.noodles@meta.com>
+ <43ff6ca37df45ed53061dad46e9d31a5118e5714.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <014cf39aa8d6a0bcfa1a95c069675977ac67b843.camel@linux.ibm.com>
+In-Reply-To: <43ff6ca37df45ed53061dad46e9d31a5118e5714.camel@linux.ibm.com>
 
-[...]
-> > I understand the need to ensure that the TPM is available, but if it
-> > isn't safe to wait to initialize IMA at late_initcall_sync() then it
-> > would seem like this is a bad option and we need another mechanism to
-> > synchronize IMA with TPM devices.  If it is safe to initalize IMA in
-> > late_initcall_sync(), just do that and be done with it.
+On Fri, Apr 24, 2026 at 04:25:31PM -0400, Mimi Zohar wrote:
+>Thanks, Jonathan!
 >
-> Within the same initcall level there is no way of ordering the initialization.
-> Yeorum attempted to address the ordering issue in commit 0e0546eabcd6
-> ("firmware: arm_ffa: Change initcall level of ffa_init() to rootfs_initcall"),
-> which is being reverted in this patch set.
+>On Fri, 2026-04-24 at 14:24 +0100, Jonathan McDowell wrote:
+>> -static int __init init_ima(void)
+>> +static int __init init_ima(bool late)
+>>  {
+>>  	int error;
+>>  
+>> @@ -1247,10 +1247,26 @@ static int __init init_ima(void)
+>>  		return 0;
+>>  	}
+>>  
+>> +	/*
+>> +	 * If we found the TPM during our first attempt, or we know there's no
+>> +	 * TPM, nothing further to do
+>> +	 */
 >
-> Ordering within an initcall level needs to be fixed, but for now retrying at
-> late_initcall_sync works for some, hopefully most, cases.
+>Perhaps it's just me, but the comment wording is a bit off.  Could I change it
+>to: If we either found the TPM or knew there's no TPM during our first attempt,
+>nothing futher to do.
 
-Ordering within an initcall level is not good idea.
+No objections to that updated wording from me.
 
-Though it came to my mind first long ago,
-It also goes against existing mechanisms like deferred probe, and
-can cause the driver modelâ€™s dependency handling to harden
-in the wrong direction. So this I think it wouldn't be an option.
+>Otherwise the patch looks good.
+>
+>Mimi
+>
+>
+>> +	if (late && (ima_tpm_chip || !IS_ENABLED(CONFIG_TCG_TPM)))
+>> +		return 0;
+>> +
+>> +	ima_tpm_chip = tpm_default_chip();
+>> +	if (!ima_tpm_chip && !late && IS_ENABLED(CONFIG_TCG_TPM)) {
+>> +		pr_debug("TPM not available, will try later\n");
+>> +		return -EPROBE_DEFER;
+>> +	}
+>> +
+>> +	if (!ima_tpm_chip)
+>> +		pr_info("No TPM chip found, activating TPM-bypass!\n");
+>> +
 
---
-Sincerely,
-Yeoreum Yun
+J.
+
+-- 
+Revd Jonathan McDowell, ULC | Run like hell!
