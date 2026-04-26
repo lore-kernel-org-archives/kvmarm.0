@@ -1,94 +1,149 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771F9392C28;
-	Sat, 25 Apr 2026 14:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CA81397;
+	Sun, 26 Apr 2026 09:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777126765; cv=none; b=g54vdmRnOlWlYPGMdJHWwVYbw4BUFjxPT7eouE6/hL6nW3Uk2cDkLUgkZDKXfVwjgc88nW36yWQ96tKl2VpUBpe0sCelkO376MeIVtyYJ2XlI9WjjcFKWhe1U3kqlLQ3Hwb9OoUdOkm/xh0c1ajpZRzra+ZBPs5MOjL+m0ZzWc4=
+	t=1777194854; cv=none; b=JKYLUebQJHuVmT859glO+6y7YU8k67aotNVUutfsBc5KxKNtKeM3NwY49IUejLpKpRYuAPecXyGWNA7Cz9L16TI46n3LrHaZxF8XrOgIFY2lygTLqQd8WZcBcewIVCqw+WSLcunuweeOr3CBMjnKXTuq7f7t/BWfWJGRkwpVeFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777126765; c=relaxed/simple;
-	bh=ZmsK2POVH2Z4YyUaXKtECdBvyDUFXk5uggawnQxeVQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jkCJdX41C27fjE+7L6khKNawJp6zar/KIDglphwjjyyEFpDXr6CEoqcu/iKDeVEsmzCXK96y0vGdG1DwAXgDp0veegmaTDezXJbz3Y+imQcCQuqE/+77NBhKGyIzZIxS8UM0vcW91dXdClGQe5qXxd0gaeXrv/5XZUxBZevGAzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqaFM3DB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777194854; c=relaxed/simple;
+	bh=mIDtI2DvRmR2rKhKS/QpZYOxXcixSL38uwNQkFExpJY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VnJt4KUgZwI44EHt8RCS3yOLZBv4/EpFMudogdgLapH5r06A+8NREZXAavISbMUcEg2vFrQ8xykRwV8FylgJQ/4ZEa+grxTUxiLRg/UqXzWNyj/XVaFEhS8k5l3n2P30hxev8gH1+gTLp3MstR1+j3gWfrEg8d3uKDIF7usFC7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKiWiQjH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqaFM3DB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79F1FC2BCB0;
-	Sat, 25 Apr 2026 14:19:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKiWiQjH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EECDC2BCAF;
+	Sun, 26 Apr 2026 09:14:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777126765;
-	bh=ZmsK2POVH2Z4YyUaXKtECdBvyDUFXk5uggawnQxeVQU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DqaFM3DB8C2ytMYZMb6+p2eO6CaGG597R8Sg00ja0PzZg8Luxl5fdzHGkl88YEqyg
-	 Fu6mM8hP/Biv7Y7x8iGJ9BbRZpKGvBs4bBPUcTOr7xaFUS5OabJVGGJLu/OdHcfhGP
-	 5qdY/BWhPScC73EtTA1KRYufLM47XwG/zgxhCOVXhuoAsoeH5fVkdIE7Pa2ALYpMYY
-	 mibvG6F9/7bvZK5lix1eSetpkwF4d+L95aow4kkxbP6F5uy1sT33e7HLAIX9LvoPk5
-	 nXbMzt+VMCaGYgILGP5NZG+/knO+BJ88WDWYV8LxFG9zrxOwf4/Xnncv4FZWWeCGXp
-	 XWoSF8dlq4Y/Q==
-Date: Sat, 25 Apr 2026 17:19:21 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
-	sebastianene@google.com, Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: Re: [RFC PATCH v3 4/4] Revert "firmware: arm_ffa: Change initcall
- level of ffa_init() to rootfs_initcall"
-Message-ID: <aezNaZEcXlEklNoj@kernel.org>
-References: <cover.1777036497.git.noodles@meta.com>
- <2e7b4dc552b45ddf14cc43bc449cbebb4ade0027.1777036497.git.noodles@meta.com>
+	s=k20201202; t=1777194854;
+	bh=mIDtI2DvRmR2rKhKS/QpZYOxXcixSL38uwNQkFExpJY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sKiWiQjHfFPALfrhENoLfMQrcqClLCseJNaGBJlhSiIKV/HVCJLNeNJH0yA5F0wJl
+	 uDOLlNPKzqwTfmvWOZyu4BhSzTRr+e64lOVw5Qlz/U/La4Xe4IXrJTHRAp3m1hKe0O
+	 eGo4hI+2rsda6kMdHrpRYRstWmUiSyWJYffq4JXhHs7C+ynRQwYti1gxXLk7RDW7YL
+	 q2Ty/Z7nD44BnBAyp2L24hV7ZV7YXX++j8ERtT8ugq1VtT6ol4AmkavnX1oo6kbeaT
+	 /CIgLGoufUknVpBI35ZF8EPuHTn86aDaTf1LH/rVvfzG21CTD1voMqJaaPnRZcrijv
+	 mq+UTY6/DzDRA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wGvZ5-0000000EkyH-46jc;
+	Sun, 26 Apr 2026 09:14:12 +0000
+Date: Sun, 26 Apr 2026 10:14:11 +0100
+Message-ID: <861pg213to.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+Cc: Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Darren Hart <darren@os.amperecomputing.com>
+Subject: Re: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
+In-Reply-To: <e283e755-c348-43cf-b5fe-278c5eab742d@os.amperecomputing.com>
+References: <20251120172540.2267180-1-maz@kernel.org>
+	<20251120172540.2267180-36-maz@kernel.org>
+	<2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
+	<878qb9cxzr.wl-maz@kernel.org>
+	<1e050b67-2276-41ad-9265-796ba853dc7c@os.amperecomputing.com>
+	<86a4vo49ni.wl-maz@kernel.org>
+	<86eck71o1v.wl-maz@kernel.org>
+	<e283e755-c348-43cf-b5fe-278c5eab742d@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2e7b4dc552b45ddf14cc43bc449cbebb4ade0027.1777036497.git.noodles@meta.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vishnu@os.amperecomputing.com, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Apr 24, 2026 at 02:24:42PM +0100, Jonathan McDowell wrote:
-> From: Yeoreum Yun <yeoreum.yun@arm.com>
+On Wed, 22 Apr 2026 15:57:44 +0100,
+Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
 > 
-> This reverts commit 0e0546eabcd6c19765a8dbf5b5db3723e7b0ea75, which was
-> added to address ordering issues with the IMA LSM initialisation where
-> the TPM would not be fully ready by the time IMA wanted it. This has
-> been resolved within IMA by retrying setup during late_initcall_sync if
-> the TPM is not available at first.
+> Hi Marc,
 > 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> Signed-off-by: Jonathan McDowell <noodles@meta.com>
-> ---
->  drivers/firmware/arm_ffa/driver.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 22-04-2026 12:25, Marc Zyngier wrote:
+> >
+> > Have you made progress on this? I can't reproduce it at all despite my
+> > best effort. I'm perfectly happy to help, but you need to give me
+> > *something* to go on.
 > 
-> diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
-> index f2f94d4d533e..01547c5c0e38 100644
-> --- a/drivers/firmware/arm_ffa/driver.c
-> +++ b/drivers/firmware/arm_ffa/driver.c
-> @@ -2106,7 +2106,7 @@ static int __init ffa_init(void)
->  	kfree(drv_info);
->  	return ret;
->  }
-> -rootfs_initcall(ffa_init);
-> +module_init(ffa_init);
->  
->  static void __exit ffa_exit(void)
->  {
-> -- 
-> 2.53.0
 > 
+> Thanks for your support!!
+> 
+> The issue is triggered as soon as the timer interrupt (IRQ 27) is
+> deactivated. Preventing the deactivation of IRQ 27 during nested VGIC
+> state transitions prevents the failure from reproducing.
 
-LGTM (for both tpm patches).
+Which level of deactivation? From L2 to L1? Or L1 to L0? The former
+should just be a an update to the irq structure, while the latter is
+effectively a write to ICC_DIR_EL1, and *that* is a new behaviour
+introduced by this patch.
 
-However, I'll hold on any further comments/tags up until I've sorted 7.1 PRs
-(just so that I have full focus).
+I wonder if your implementation is such that ICC_DIR_EL1 is trapped by
+ICH_HCR_EL2.TDIR, which is allowed by the architecture, but that none
+of the two implementations I have actually enforce (the trap only
+applies to ICV_DIR_EL1). Can you try the hack below which disables the
+traps much earlier, and let me know if that helps?
 
-BR, Jarkko
+Even if that's the case, this should result in an EL2->EL2 exception,
+and that should be caught as an unhandled exception in entry-common.c,
+so something else is afoot.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 5c69fa615823c..ee415c1038b4e 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -280,6 +280,14 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 	struct shadow_if *shadow_if = get_shadow_if();
+ 	int i;
+ 
++	/* We need these to be synchronised to generate the MI */
++	__vcpu_assign_sys_reg(vcpu, ICH_VMCR_EL2, read_sysreg_s(SYS_ICH_VMCR_EL2));
++	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, &=, ~ICH_HCR_EL2_EOIcount);
++	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, |=, read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_EOIcount);
++
++	write_sysreg_s(0, SYS_ICH_HCR_EL2);
++	isb();
++
+ 	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
+ 		u64 val, host_lr, lr;
+ 
+@@ -309,14 +317,6 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 		vgic_v3_deactivate(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+ 	}
+ 
+-	/* We need these to be synchronised to generate the MI */
+-	__vcpu_assign_sys_reg(vcpu, ICH_VMCR_EL2, read_sysreg_s(SYS_ICH_VMCR_EL2));
+-	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, &=, ~ICH_HCR_EL2_EOIcount);
+-	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, |=, read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_EOIcount);
+-
+-	write_sysreg_s(0, SYS_ICH_HCR_EL2);
+-	isb();
+-
+ 	vgic_v3_nested_update_mi(vcpu);
+ }
+ 
+
+-- 
+Without deviation from the norm, progress is not possible.
