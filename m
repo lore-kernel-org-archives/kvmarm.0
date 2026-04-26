@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CA81397;
-	Sun, 26 Apr 2026 09:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7DF31F9A7;
+	Sun, 26 Apr 2026 14:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777194854; cv=none; b=JKYLUebQJHuVmT859glO+6y7YU8k67aotNVUutfsBc5KxKNtKeM3NwY49IUejLpKpRYuAPecXyGWNA7Cz9L16TI46n3LrHaZxF8XrOgIFY2lygTLqQd8WZcBcewIVCqw+WSLcunuweeOr3CBMjnKXTuq7f7t/BWfWJGRkwpVeFs=
+	t=1777212459; cv=none; b=nLG07ymWNvGIxWVQVaaQ/xmos+jKYUpmJbpjf0GCa2yK6sc3yarIOXcOf1hoelXOQkvvPBPWp0lzaO0PIOGMcjeiorHhli1miCtx+J4DqXTgWBf0zqirKsLM5UFz9eEBOcsZWkYxeM9rET1Cf41pm8Y7KujPFEsQG4zrXmUylXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777194854; c=relaxed/simple;
-	bh=mIDtI2DvRmR2rKhKS/QpZYOxXcixSL38uwNQkFExpJY=;
+	s=arc-20240116; t=1777212459; c=relaxed/simple;
+	bh=lDY502D0UwTlnUwqf8BtPahtm7twsTmu8HFtn+sm0IA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VnJt4KUgZwI44EHt8RCS3yOLZBv4/EpFMudogdgLapH5r06A+8NREZXAavISbMUcEg2vFrQ8xykRwV8FylgJQ/4ZEa+grxTUxiLRg/UqXzWNyj/XVaFEhS8k5l3n2P30hxev8gH1+gTLp3MstR1+j3gWfrEg8d3uKDIF7usFC7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKiWiQjH; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=dxM+bv0r8cdHflf5DKClX+cUu4qQriM5w1o7GfQ8F2/F6LE1VVzDwfvn8lh/HehdG+6Xw2O4kj11C+e6sO+qzjW0kgDn5662KqtEb+Cl0tLF55FatYzX7ZZfv4Gj79g0tHKGV1JlIebxIXu61UyiXzE8jcsF1L1YRN084VuXRws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tH7DMitl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKiWiQjH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EECDC2BCAF;
-	Sun, 26 Apr 2026 09:14:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tH7DMitl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9C2C2BCAF;
+	Sun, 26 Apr 2026 14:07:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777194854;
-	bh=mIDtI2DvRmR2rKhKS/QpZYOxXcixSL38uwNQkFExpJY=;
+	s=k20201202; t=1777212459;
+	bh=lDY502D0UwTlnUwqf8BtPahtm7twsTmu8HFtn+sm0IA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sKiWiQjHfFPALfrhENoLfMQrcqClLCseJNaGBJlhSiIKV/HVCJLNeNJH0yA5F0wJl
-	 uDOLlNPKzqwTfmvWOZyu4BhSzTRr+e64lOVw5Qlz/U/La4Xe4IXrJTHRAp3m1hKe0O
-	 eGo4hI+2rsda6kMdHrpRYRstWmUiSyWJYffq4JXhHs7C+ynRQwYti1gxXLk7RDW7YL
-	 q2Ty/Z7nD44BnBAyp2L24hV7ZV7YXX++j8ERtT8ugq1VtT6ol4AmkavnX1oo6kbeaT
-	 /CIgLGoufUknVpBI35ZF8EPuHTn86aDaTf1LH/rVvfzG21CTD1voMqJaaPnRZcrijv
-	 mq+UTY6/DzDRA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=tH7DMitlSokecV8h+r6UW83iqIZELeQsvftYXNCwbWJ4C1tGsegwbFrQwE8VRLIol
+	 pdOPTL5FUBTWxqfYLt3YWZOTmZ06lkNOZRAKdTSqbouqHoUEMyemuj1pbvXGPVse2u
+	 F/EYw15WAetJgngUM32zjvi9O6m9TA+Ww0qQG9A1qaB5LXBYujRuLmbvLwg/s46wmH
+	 XO/Oo18VWtjN1/TECD1FWniOIDDXuN5zmlWI7FaX+lsuxs5VirkvkLZ9axgQN2yLSk
+	 XR8Yh/ZDZt64YYJ9u0bBs9jhqEegHr5aFTjc2tTVqXuYVyRs/lSlBUGv7BFwWW+LcU
+	 Oew3uCGUnOUdQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wGvZ5-0000000EkyH-46jc;
-	Sun, 26 Apr 2026 09:14:12 +0000
-Date: Sun, 26 Apr 2026 10:14:11 +0100
-Message-ID: <861pg213to.wl-maz@kernel.org>
+	id 1wH092-0000000EnUE-3vU3;
+	Sun, 26 Apr 2026 14:07:37 +0000
+Date: Sun, 26 Apr 2026 15:07:36 +0100
+Message-ID: <87ik9dbys7.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
 Cc: Fuad Tabba <tabba@google.com>,
@@ -49,7 +49,7 @@ Cc: Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
 	Darren Hart <darren@os.amperecomputing.com>
 Subject: Re: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-In-Reply-To: <e283e755-c348-43cf-b5fe-278c5eab742d@os.amperecomputing.com>
+In-Reply-To: <861pg213to.wl-maz@kernel.org>
 References: <20251120172540.2267180-1-maz@kernel.org>
 	<20251120172540.2267180-36-maz@kernel.org>
 	<2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
@@ -58,6 +58,7 @@ References: <20251120172540.2267180-1-maz@kernel.org>
 	<86a4vo49ni.wl-maz@kernel.org>
 	<86eck71o1v.wl-maz@kernel.org>
 	<e283e755-c348-43cf-b5fe-278c5eab742d@os.amperecomputing.com>
+	<861pg213to.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -73,77 +74,52 @@ X-SA-Exim-Rcpt-To: vishnu@os.amperecomputing.com, tabba@google.com, joey.gouly@a
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Apr 2026 15:57:44 +0100,
-Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
+On Sun, 26 Apr 2026 10:14:11 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Hi Marc,
+> On Wed, 22 Apr 2026 15:57:44 +0100,
+> Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On 22-04-2026 12:25, Marc Zyngier wrote:
+> > >
+> > > Have you made progress on this? I can't reproduce it at all despite my
+> > > best effort. I'm perfectly happy to help, but you need to give me
+> > > *something* to go on.
+> > 
+> > 
+> > Thanks for your support!!
+> > 
+> > The issue is triggered as soon as the timer interrupt (IRQ 27) is
+> > deactivated. Preventing the deactivation of IRQ 27 during nested VGIC
+> > state transitions prevents the failure from reproducing.
 > 
-> On 22-04-2026 12:25, Marc Zyngier wrote:
-> >
-> > Have you made progress on this? I can't reproduce it at all despite my
-> > best effort. I'm perfectly happy to help, but you need to give me
-> > *something* to go on.
+> Which level of deactivation? From L2 to L1? Or L1 to L0? The former
+> should just be a an update to the irq structure, while the latter is
+> effectively a write to ICC_DIR_EL1, and *that* is a new behaviour
+> introduced by this patch.
 > 
+> I wonder if your implementation is such that ICC_DIR_EL1 is trapped by
+> ICH_HCR_EL2.TDIR, which is allowed by the architecture, but that none
+> of the two implementations I have actually enforce (the trap only
+> applies to ICV_DIR_EL1). Can you try the hack below which disables the
+> traps much earlier, and let me know if that helps?
 > 
-> Thanks for your support!!
-> 
-> The issue is triggered as soon as the timer interrupt (IRQ 27) is
-> deactivated. Preventing the deactivation of IRQ 27 during nested VGIC
-> state transitions prevents the failure from reproducing.
+> Even if that's the case, this should result in an EL2->EL2 exception,
+> and that should be caught as an unhandled exception in entry-common.c,
+> so something else is afoot.
 
-Which level of deactivation? From L2 to L1? Or L1 to L0? The former
-should just be a an update to the irq structure, while the latter is
-effectively a write to ICC_DIR_EL1, and *that* is a new behaviour
-introduced by this patch.
+Actually, this should never happen. ICH_HCR_EL2.TDIR is constructed
+like all the other GICv3 trap bits, in the sense that it only traps
+accesses from EL1, not EL2 (for sanity reasons, I'm not considering
+the possibility of a trap to EL3...).
 
-I wonder if your implementation is such that ICC_DIR_EL1 is trapped by
-ICH_HCR_EL2.TDIR, which is allowed by the architecture, but that none
-of the two implementations I have actually enforce (the trap only
-applies to ICV_DIR_EL1). Can you try the hack below which disables the
-traps much earlier, and let me know if that helps?
-
-Even if that's the case, this should result in an EL2->EL2 exception,
-and that should be caught as an unhandled exception in entry-common.c,
-so something else is afoot.
+Still, I'm interested in finding out if that hack helps at all.
 
 Thanks,
 
 	M.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index 5c69fa615823c..ee415c1038b4e 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -280,6 +280,14 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- 	struct shadow_if *shadow_if = get_shadow_if();
- 	int i;
- 
-+	/* We need these to be synchronised to generate the MI */
-+	__vcpu_assign_sys_reg(vcpu, ICH_VMCR_EL2, read_sysreg_s(SYS_ICH_VMCR_EL2));
-+	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, &=, ~ICH_HCR_EL2_EOIcount);
-+	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, |=, read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_EOIcount);
-+
-+	write_sysreg_s(0, SYS_ICH_HCR_EL2);
-+	isb();
-+
- 	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
- 		u64 val, host_lr, lr;
- 
-@@ -309,14 +317,6 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- 		vgic_v3_deactivate(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
- 	}
- 
--	/* We need these to be synchronised to generate the MI */
--	__vcpu_assign_sys_reg(vcpu, ICH_VMCR_EL2, read_sysreg_s(SYS_ICH_VMCR_EL2));
--	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, &=, ~ICH_HCR_EL2_EOIcount);
--	__vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, |=, read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_EOIcount);
--
--	write_sysreg_s(0, SYS_ICH_HCR_EL2);
--	isb();
--
- 	vgic_v3_nested_update_mi(vcpu);
- }
- 
-
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz isn't dead. It just smells funny.
