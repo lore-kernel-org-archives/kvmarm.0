@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816E1399375;
-	Mon, 27 Apr 2026 08:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20BF3976A7;
+	Mon, 27 Apr 2026 08:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777278525; cv=none; b=e7yJdAFxZIRSku8l5Ih42lmDfWfT7KdaCr3yp3ufxYRSecB2hSSlxrwuEtnWHYvS6QkiLg6pOhT8hyec0JrF0xTR8eObNCNDWsOr16452uhzFqA1aiheDo6TqVJiqpXXEZQ8xIdPlJKxjq3IlrWaG+DqcvL4cQoQeAIKyssm9a0=
+	t=1777278531; cv=none; b=GFT9pVstdNi+FFo6LVCoIt+1jR77IR1Tv5LgDMptVydCpc1vrKybivialkjsKx00O4i+coBM52ckU1/qZgMz0JAjdTQ7q6sgFWTK7FZiKT4RbZ6VY89U2cXKll58ziDumhQp/qpIo6VfRX6NchY1JJQ40MIwa4lboKP/H4LBQRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777278525; c=relaxed/simple;
-	bh=lETn6Kr3OyzzZutG3/vCFA7uINmnc95y+RJn66EJb2Q=;
+	s=arc-20240116; t=1777278531; c=relaxed/simple;
+	bh=jNp9qsUFxSqnqXy8TKaLW9c3z208YtDH/OH/IkVAaus=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kd2Fur6BHzSE+YIVtz3aacTkoP2CSa+Vme3LHYWinwA/byAglyCaIwpIjeQDg/SHYJDRfFeFgC6h1TFR6MRq036h7u84y3k0wDHQDEjFSdeOv983WOffMWq0sq3MOyZCIe6cwiSRXKLMNP/h2VfU0so/OP6kw5hut5gf+P2/zFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h243qLzF; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=dzb5QWpr5H5zZ3Q6xCj4JXVgiDRKDfYDBhkxn3f2KvOpthwLQnQzHWS71QHl0A9FVtU0oYm3XGNm2Q5w4L0CG6oE7bkTQ7bU3Zd0byB+ayjRnRkZYYy8Q1VbbBUem4x0S+gx4WYllZvDbjfBQ6wKWWQmxTGKjs4PDA6VosGtVoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFWMOqPw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h243qLzF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E03C19425;
-	Mon, 27 Apr 2026 08:28:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFWMOqPw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0599FC2BCB8;
+	Mon, 27 Apr 2026 08:28:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777278525;
-	bh=lETn6Kr3OyzzZutG3/vCFA7uINmnc95y+RJn66EJb2Q=;
+	s=k20201202; t=1777278530;
+	bh=jNp9qsUFxSqnqXy8TKaLW9c3z208YtDH/OH/IkVAaus=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h243qLzFJ5S339UPMeg3rROQnMZbIdibcNdwFIKHzxamct4S2+cC388t517yyZllG
-	 pqP1sSxWRaZDbWjozrsummi7AC1yluW5uxk9LF+4c+V88WvqNi8o8e4+gPD+HZVKDc
-	 X4hQfHj3yx2Cn5kwoJkvN4v2pNWlK9TilJXpbY3sL187+xwPRkJ/TFz3Hp22BtoFyP
-	 E7ZytP3oG9gxgP5kHgolNT9YQCSyqG46tW558h+BTTamwXhQ38MvgTS2T/odUHbI6L
-	 T6GzY57L51s1mDJ5Ah1a0eO8hHTnt5nCzr7wIHuSPb43En8r/z3tFAiyTT38YcJP7D
-	 BUlrifBNuRCnQ==
+	b=fFWMOqPwJi48SZarPWAHd4BJJEYN3M48EvZo/ZcW1uVch3BPU4TJTe7P4aXrMXsEa
+	 B/GLlZ+TFaS6lQl4SjDQazt2Zj2yYaYDZccxBx7onPzj+9Bsnn3XB4o0RTbGNfKBPA
+	 U53qyPu67sGXgYC9yzhY63cIAQcDgZRlwKXxbr+oRFQNsGfjjUQiXM0Dv9E736u8g+
+	 3O0fYf98eVcVaHruaj1jQxbXNzA5N5vHymnwJ5urDXOBGbKBJReAp71jgUh0LrO3a8
+	 xE+2Py6eLkY0t9J51OcqM53yGqnPAG0GeH5hRbvbfig0XdGU55wJtySce8KRQbwl2b
+	 Kkp9oaP3k5q+w==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: [RFC PATCH v4 06/11] coco: guest: arm64: Add measurement refresh via RHI_DA_VDEV_GET_MEASUREMENTS
-Date: Mon, 27 Apr 2026 13:58:00 +0530
-Message-ID: <20260427082805.931832-7-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v4 07/11] coco: guest: arm64: Add guest APIs to read host-cached DA objects
+Date: Mon, 27 Apr 2026 13:58:01 +0530
+Message-ID: <20260427082805.931832-8-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260427082805.931832-1-aneesh.kumar@kernel.org>
 References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
@@ -57,235 +57,155 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add guest support to request fresh device measurements using
-RHI_DA_VDEV_GET_MEASUREMENTS.
+Introduce guest-side helpers to read host-cached DA objects
+(certificate, VCA, interface report, and measurements).
 
-Define measurement request parameters (flags + nonce), request RAW
-measurements, and implement cookie-based continuation for incomplete DA
-operations. Extend cca_update_device_object_cache() to refresh both
-interface report and measurements.
+Add RHI_DA_OBJECT_SIZE and RHI_DA_OBJECT_READ definitions, then implement
+rhi_read_cached_object() that:
+- queries object size from host
+- validates size against MAX_CACHE_OBJ_SIZE
+- allocates a shared buffer
+- issues OBJECT_READ into shared memory
+- copies data into private memory and frees shared pages
 
-Because RHI buffers are shared with the host, add shared-page allocation
-helpers that convert pages to decrypted/shared memory before use and restore
-them to encrypted/private state on free.
+Export the helper for later evidence-collection and verification code.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- arch/arm64/include/asm/rhi.h              | 11 ++++
- drivers/virt/coco/arm-cca-guest/arm-cca.c |  1 +
- drivers/virt/coco/arm-cca-guest/rhi-da.c  | 78 +++++++++++++++++++++++
- drivers/virt/coco/arm-cca-guest/rhi-da.h  |  1 +
- drivers/virt/coco/arm-cca-guest/rsi-da.c  | 42 +++++++++++-
- drivers/virt/coco/arm-cca-guest/rsi-da.h  |  2 +
- 6 files changed, 134 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/rhi.h             |  8 +++
+ drivers/virt/coco/arm-cca-guest/rhi-da.c | 71 ++++++++++++++++++++++++
+ drivers/virt/coco/arm-cca-guest/rhi-da.h |  1 +
+ drivers/virt/coco/arm-cca-guest/rsi-da.h |  2 +
+ 4 files changed, 82 insertions(+)
 
 diff --git a/arch/arm64/include/asm/rhi.h b/arch/arm64/include/asm/rhi.h
-index 15946fe64484..2b56a7760904 100644
+index 2b56a7760904..dc7a57370945 100644
 --- a/arch/arm64/include/asm/rhi.h
 +++ b/arch/arm64/include/asm/rhi.h
-@@ -50,6 +50,17 @@ unsigned long rhi_get_ipa_change_alignment(void);
+@@ -48,6 +48,14 @@ unsigned long rhi_get_ipa_change_alignment(void);
+ 				 RHI_DA_FEATURE_VDEV_SET_TDI_STATE)
+ #define RHI_DA_FEATURES			SMC_RHI_CALL(0x004B)
  
++#define RHI_DA_OBJECT_VCA			0x0
++#define RHI_DA_OBJECT_CERTIFICATE		0x1
++#define RHI_DA_OBJECT_MEASUREMENT		0x2
++#define RHI_DA_OBJECT_INTERFACE_REPORT		0x3
++#define RHI_DA_OBJECT_EXTENSION_EVIDENCE	0x4
++#define RHI_DA_OBJECT_SIZE		SMC_RHI_CALL(0x004C)
++#define RHI_DA_OBJECT_READ		SMC_RHI_CALL(0x004D)
++
  #define RHI_DA_VDEV_CONTINUE		SMC_RHI_CALL(0x0051)
  
-+#define RHI_VDEV_MEASURE_HASH	0x0
-+#define RHI_VDEV_MEASURE_RAW	0x1
-+struct rhi_vdev_measurement_params {
-+	union {
-+		u64 flags;
-+		u8 padding0[0x100];
-+	};
-+	u8 nonce[32];
-+};
-+#define RHI_DA_VDEV_GET_MEASUREMENTS	SMC_RHI_CALL(0x0052)
-+
- #define RHI_DA_VDEV_GET_INTERFACE_REPORT SMC_RHI_CALL(0x0053)
- 
- enum rhi_tdi_state {
-diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-index 411cbbaa5d26..0f9cfb329a06 100644
---- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
-+++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-@@ -215,6 +215,7 @@ static struct pci_tsm *cca_tsm_lock(struct tsm_dev *tsm_dev, struct pci_dev *pde
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-+	/* collect evidence without nonce */
- 	ret = cca_update_device_object_cache(pdev, NULL);
- 	if (ret) {
- 		cca_device_unlock(pdev);
+ #define RHI_VDEV_MEASURE_HASH	0x0
 diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-index 5078136a4cc6..d0f5ae320f83 100644
+index d0f5ae320f83..73c599802a93 100644
 --- a/drivers/virt/coco/arm-cca-guest/rhi-da.c
 +++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-@@ -205,3 +205,81 @@ int rhi_update_vdev_interface_report_cache(struct pci_dev *pdev)
+@@ -3,6 +3,8 @@
+  * Copyright (C) 2026 ARM Ltd.
+  */
  
++#include <linux/string.h>
++
+ #include "rsi-da.h"
+ #include "rhi-da.h"
+ 
+@@ -283,3 +285,72 @@ int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce)
+ 		pci_err(pdev, "failed to get device measurement (%d)\n", ret);
  	return ret;
  }
 +
-+static inline int rhi_vdev_get_measurements(unsigned long vdev_id,
-+		phys_addr_t vdev_meas_phys, unsigned long *cookie)
++int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size)
 +{
-+	unsigned long ret;
++	int ret;
++	int data_size;
++	void *data_buf_shared;
++	struct page *shared_pages;
 +
-+	struct rsi_host_call *rhi_call __free(kfree) =
-+		kmalloc(sizeof(*rhi_call), GFP_KERNEL);
-+	if (!rhi_call)
++	*object_size = 0;
++	*object = NULL;
++
++	struct rsi_host_call *rhicall __free(kfree) =
++		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
++	if (!rhicall)
 +		return -ENOMEM;
 +
-+	rhi_call->imm = 0;
-+	rhi_call->gprs[0] = RHI_DA_VDEV_GET_MEASUREMENTS;
-+	rhi_call->gprs[1] = vdev_id;
-+	rhi_call->gprs[2] = vdev_meas_phys;
++	rhicall->imm = 0;
++	rhicall->gprs[0] = RHI_DA_OBJECT_SIZE;
++	rhicall->gprs[1] = vdev_id;
++	rhicall->gprs[2] = da_object_type;
 +
-+	ret = rsi_host_call(rhi_call);
++	ret = rsi_host_call(rhicall);
 +	if (ret != RSI_SUCCESS)
 +		return -EIO;
 +
-+	*cookie = rhi_call->gprs[1];
-+	return map_rhi_da_error(rhi_call->gprs[0]);
-+}
++	if (rhicall->gprs[0] != RHI_DA_SUCCESS)
++		return -EIO;
 +
-+static inline struct rhi_vdev_measurement_params *alloc_vdev_meas_params(void)
-+{
-+	struct page *pages;
++	/* validate against the max cache object size used on host. */
++	data_size = rhicall->gprs[1];
++	if (data_size > MAX_CACHE_OBJ_SIZE || data_size == 0)
++		return -EIO;
 +
-+	pages = alloc_shared_pages(NUMA_NO_NODE, GFP_KERNEL,
-+				   sizeof(struct rhi_vdev_measurement_params));
-+	if (!pages)
-+		return NULL;
-+	return page_address(pages);
-+}
-+
-+static inline void vdev_meas_params_free(struct rhi_vdev_measurement_params *params)
-+{
-+	struct page *pages = virt_to_page(params);
-+
-+	free_shared_pages(pages, sizeof(struct rhi_vdev_measurement_params));
-+}
-+
-+DEFINE_FREE(vdev_meas_params_free, struct rhi_vdev_measurement_params *, if (_T) vdev_meas_params_free(_T))
-+int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce)
-+{
-+	int ret;
-+	unsigned long cookie;
-+	int vdev_id = rsi_vdev_id(pdev);
-+	phys_addr_t vdev_meas_phys;
-+
-+	struct rhi_vdev_measurement_params *dev_meas __free(vdev_meas_params_free) =
-+		alloc_vdev_meas_params();
-+	if (!dev_meas)
++	shared_pages = alloc_shared_pages(NUMA_NO_NODE, GFP_KERNEL, data_size);
++	if (!shared_pages)
 +		return -ENOMEM;
 +
-+	vdev_meas_phys = virt_to_phys(dev_meas);
-+	/* request for raw bitstream */
-+	dev_meas->flags = RHI_VDEV_MEASURE_RAW;
-+	if (nonce)
-+		memcpy(dev_meas->nonce, nonce, 32);
++	data_buf_shared = page_address(shared_pages);
 +
-+	for (;;) {
-+		ret = rhi_vdev_get_measurements(vdev_id, vdev_meas_phys, &cookie);
-+		if (ret != -EBUSY)
-+			break;
-+		cond_resched();
++	rhicall->imm = 0;
++	rhicall->gprs[0] = RHI_DA_OBJECT_READ;
++	rhicall->gprs[1] = vdev_id;
++	rhicall->gprs[2] = da_object_type;
++	rhicall->gprs[3] = virt_to_phys(data_buf_shared);
++	rhicall->gprs[4] = data_size;
++	rhicall->gprs[5] = 0; /* offset to read from */
++	ret = rsi_host_call(rhicall);
++	if (ret != RSI_SUCCESS || rhicall->gprs[0] != RHI_DA_SUCCESS) {
++		free_shared_pages(shared_pages, data_size);
++		return -EIO;
 +	}
 +
-+	while (ret == RHI_DA_INCOMPLETE) {
-+		if (should_abort_rhi_call_loop(vdev_id))
-+			return -EINTR;
-+		ret = rhi_vdev_continue(vdev_id, cookie);
++	if (data_size != rhicall->gprs[1]) {
++		/* Short read */
++		free_shared_pages(shared_pages, data_size);
++		return -EIO;
 +	}
 +
-+	if (ret)
-+		pci_err(pdev, "failed to get device measurement (%d)\n", ret);
-+	return ret;
-+}
-diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.h b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-index 8b7faf4d1c8a..d32ccc48c0d0 100644
---- a/drivers/virt/coco/arm-cca-guest/rhi-da.h
-+++ b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-@@ -12,4 +12,5 @@ struct pci_dev;
- bool rhi_has_da_support(void);
- int rhi_vdev_set_tdi_state(struct pci_dev *pdev, enum rhi_tdi_state target_state);
- int rhi_update_vdev_interface_report_cache(struct pci_dev *pdev);
-+int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce);
- #endif
-diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-index 6c78f0e2f3a1..9f9e54174813 100644
---- a/drivers/virt/coco/arm-cca-guest/rsi-da.c
-+++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/pci.h>
-+#include <linux/mem_encrypt.h>
- #include <asm/rsi_cmds.h>
- 
- #include "rsi-da.h"
-@@ -33,6 +34,45 @@ int cca_device_unlock(struct pci_dev *pdev)
- 	return 0;
- }
- 
-+struct page *alloc_shared_pages(int nid, gfp_t gfp_mask, unsigned long min_size)
-+{
-+	int ret;
-+	struct page *page;
-+	/* We should normalize the size based on hypervisor page size */
-+	int page_order = get_order(min_size);
++	void *data_buf_private = kvmemdup(data_buf_shared,
++					  data_size, GFP_KERNEL);
++	/* free the shared pages irrespective of error condition */
++	free_shared_pages(shared_pages, data_size);
++	if (!data_buf_private)
++		return -ENOMEM;
 +
-+	page = alloc_pages_node(nid, gfp_mask | __GFP_ZERO, page_order);
-+	if (!page)
-+		return NULL;
-+
-+	ret = set_memory_decrypted((unsigned long)page_address(page),
-+				   1 << page_order);
-+	/*
-+	 * If set_memory_decrypted() fails then we don't know what state the
-+	 * page is in, so we can't free it. Instead we leak it.
-+	 * set_memory_decrypted() will already have WARNed.
-+	 */
-+	if (ret)
-+		return NULL;
-+
-+	return page;
-+}
-+
-+int free_shared_pages(struct page *page, unsigned long size)
-+{
-+	int ret;
-+	/* We should normalize the size based on hypervisor page size */
-+	int page_order = get_order(size);
-+
-+	ret = set_memory_encrypted((unsigned long)page_address(page), 1 << page_order);
-+	/* If we fail to mark it encrypted don't free it back */
-+	if (ret)
-+		return ret;
-+
-+	__free_pages(page, page_order);
++	*object = data_buf_private;
++	*object_size = data_size;
 +	return 0;
 +}
-+
- int cca_update_device_object_cache(struct pci_dev *pdev, const u8 *nonce)
- {
- 	int ret;
-@@ -43,5 +83,5 @@ int cca_update_device_object_cache(struct pci_dev *pdev, const u8 *nonce)
- 		return ret;
- 	}
- 
--	return 0;
-+	return rhi_update_vdev_measurements_cache(pdev, nonce);
- }
+diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.h b/drivers/virt/coco/arm-cca-guest/rhi-da.h
+index d32ccc48c0d0..f7655d7ecf18 100644
+--- a/drivers/virt/coco/arm-cca-guest/rhi-da.h
++++ b/drivers/virt/coco/arm-cca-guest/rhi-da.h
+@@ -13,4 +13,5 @@ bool rhi_has_da_support(void);
+ int rhi_vdev_set_tdi_state(struct pci_dev *pdev, enum rhi_tdi_state target_state);
+ int rhi_update_vdev_interface_report_cache(struct pci_dev *pdev);
+ int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce);
++int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size);
+ #endif
 diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-index dda8026a1c3f..297cb800edc0 100644
+index 297cb800edc0..88067d2230ab 100644
 --- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
 +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-@@ -35,5 +35,7 @@ static inline int rsi_vdev_id(struct pci_dev *pdev)
- int cca_device_lock(struct pci_dev *pdev);
- int cca_device_unlock(struct pci_dev *pdev);
- int cca_update_device_object_cache(struct pci_dev *pdev, const u8 *nonce);
-+struct page *alloc_shared_pages(int nid, gfp_t gfp_mask, unsigned long min_size);
-+int free_shared_pages(struct page *page, unsigned long min_size);
+@@ -10,6 +10,8 @@
+ #include <linux/pci-tsm.h>
+ #include <asm/rsi_smc.h>
  
- #endif
++#define MAX_CACHE_OBJ_SIZE	SZ_16M
++
+ struct cca_guest_dsc {
+ 	struct pci_tsm_devsec pci;
+ };
 -- 
 2.43.0
 
