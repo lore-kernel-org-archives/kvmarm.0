@@ -1,197 +1,165 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CFC39A807
-	for <kvmarm@lists.linux.dev>; Mon, 27 Apr 2026 08:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296B73976A7;
+	Mon, 27 Apr 2026 08:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777278321; cv=none; b=lTd9zKTpbgX7n7sqyI+9iLE3YZnS0NSUUVwJrN5641eJUQnpqXXSpIz815DoxUV57+qE4csfZEFOdVZOWHvF8O0hLplec+LgiHiic7Wq2AC1U0SOcVVH4x5dWoWkNV2nreHxTILc6piWw3Fo5cGQlNiLyfea606u9C4rUU2yZxk=
+	t=1777278494; cv=none; b=hXHh4W0VsoaKYRqgns0Mosgy/hLp8xmx1EMMqL7F0NgbIDB3Y6kZcT3RwtmylLWFZi26uq28/4N6bNZF7L0YCl61M/gco2pmVaJkQQVvd4Y9/uUnK7PK7WRxdYBRj6CCv8mAHyPdzCuO9UQPQTsxypLbrreNd8U73QsKsS9dKiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777278321; c=relaxed/simple;
-	bh=DP0xPFCiQhucJ/Dny2Ys1P7F6Dt30IATMKjguKpLelE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HQg7CrMowgnBV01lNNeRgTora57naail0Neb9WzWZ07PeMVxIAPKLqrpiAUENXUusVyyPvCYFFU8333Sy3m8eO1KY/mOKc0vjNFHd4F7GfQ/UdDbl08h6tQvAcjmKoVx4gxaKlkCYR7dQB7EFw92T9805RA6fbZE+v/mIaOzCtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WhJICaba; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1777278494; c=relaxed/simple;
+	bh=gWkVVxSq7S/AnFhRjhjyX3b4YhmSCwNgWZUHpsa5BLk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FwiX4RBW3JBslCQFBdqIb8f5FfkL4TuWvsGrufHAD3snIpta5jLAHmgiqrtaCxJ3vzfYl5AimGiaMfAKXb1QqYGl0Mi1INz/K69nWTQNITmKxVI2gLfmH0gKxL3BzB3DeEm9I7lJN9GCsRwFY01+mAND2n2jawtba3qzt7ibEWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QFYJ/60l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WhJICaba"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777278318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5xaAdwH/ZvqVlM3qFB/XtL+Aj8QOREix0lRLn2M7hBA=;
-	b=WhJICabarKVkFaH55TDW0G4KtCHrcoMoOus1ugNRjM9JbwH/NaUVajKkN6dqQNazFJUCJt
-	FMGOFiI6x27wMMvy+t2DxVyc+jMhrtbb9IWGyJq6V4+oY6TKhbk7bwT9/pf0AhyoLoVGzl
-	T+Xh85W0oBZ58v/Sg8R8KoHHZIp5WLo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-26-gO1nCCk8N72hnq9Gsu8mGQ-1; Mon, 27 Apr 2026 04:25:17 -0400
-X-MC-Unique: gO1nCCk8N72hnq9Gsu8mGQ-1
-X-Mimecast-MFC-AGG-ID: gO1nCCk8N72hnq9Gsu8mGQ_1777278316
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4362197d1easo8135913f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 27 Apr 2026 01:25:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777278316; x=1777883116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5xaAdwH/ZvqVlM3qFB/XtL+Aj8QOREix0lRLn2M7hBA=;
-        b=dUJbMgoHQR99x1Rm6hkQ78G4vBogdQHV06FKl8Wo3UWtfMNxAtQmSvXVtmnFnpFqLz
-         6tkC/Y9Q+nn3s+RGkRsLU37UrtsaG0PE3eWqu0Q2bCkjESfi+cZm/GmlSDnyBHNdJPEb
-         sFrwmKz/6RYOkfn2d7oFJJ2MW177NnbhDSfHfdFLya9vhyPbRevyNRtTNxTLdQREimSQ
-         7au51QIgNE7s8tV86zAzTDmJDtmHBssa57GG8VqItXR1J+iYOm4/p4Em1Cyh6dhuFauV
-         E/FHudYJG1sqJ4lyPunQKP9EfmDOaExqI9cO40EeEzDWne9tmG3JDCXpRbu73QViEa0f
-         ezGA==
-X-Forwarded-Encrypted: i=1; AFNElJ/7xnUB0Ee8MeKzJnSV8hJtv8miDsmmJpy2/tZPsIyNKtatHj1sSB6hYu9gq40Mjo6m9U0qgQE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzkIub2eHZO3pWnDgg/GdF5rP446reBlKBIQyRl1WyBkHwIWIGw
-	0GM/y+WbOhQRmr8Is5g25c00dXTk66bmKP8xtcz3U2Ymwy6xAc5BUhips6MfB2KMTfq5bUFzSSn
-	3K/2pYFKKOkiNipG2WAxN8m4S1k5vkCvnvMPAkgthT1ttDZi6QU/X/17fwF1Gh6FdsTpOJdgeMm
-	FwMoXotfaYlDlqX3ebWqw3hBzpdo38s+8y
-X-Gm-Gg: AeBDietHQWtihU3edFd4H2Q3Sm34WYTecE0S4E6osNny0KzwRxSiA0iXaKIsU4UFCIt
-	zjRQYGFhJmJMCt45VP6LV6mgJYYRTkiUPFsyRUG1LKGqBakeDdHFyc6o1+ZnGASGYfvtr2dexXC
-	0GBCt6DOct4ut+051DY4/boY7W3bkFlKj/YacUmzDUdAkn1lQAm6nBvOV2Vmyvv5XVFMIqypxfC
-	hecBGXqG0Tena9BjD8roDpmOCzC8j9aXO/L/RcPUG0BZ/MoycndzLrhdT4B4rFSWk1qcqtIE4sD
-	Lmkz8XUBGO8huGA=
-X-Received: by 2002:a5d:64c3:0:b0:43f:e266:4c9c with SMTP id ffacd0b85a97d-43fe3db2e62mr64527663f8f.3.1777278315534;
-        Mon, 27 Apr 2026 01:25:15 -0700 (PDT)
-X-Received: by 2002:a5d:64c3:0:b0:43f:e266:4c9c with SMTP id
- ffacd0b85a97d-43fe3db2e62mr64527575f8f.3.1777278314785; Mon, 27 Apr 2026
- 01:25:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QFYJ/60l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A4D8C19425;
+	Mon, 27 Apr 2026 08:28:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777278493;
+	bh=gWkVVxSq7S/AnFhRjhjyX3b4YhmSCwNgWZUHpsa5BLk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QFYJ/60lml/EF+AS1cuBMCTd+OGx7qntiObO9eSix7wWQPVNTyR1h0Il6kKbuKBfN
+	 rXfEU8BAPOarfboNzoqEJ2teq/TXeJfzZCSpRP80TjnkFPAfp7voeYD0qdGcGYz0+C
+	 5J4j/uyftxLSb1ol0w0cffY/KTVm0en2p7InEQTs+MOTO0+YEsWRaGrIDsjFnCC7Wm
+	 XEb4yboQMZazA0vZX49sFlalS5vSczzI0lUVA3xgS1YIwwHjkigboaWOT2OR215s5x
+	 TJY8IYF4zYA3F+ZL0uKlqqTZZA9REJgWxJ0l4JAbAhshl7AH0yfZWq8Sbkp/uUTFAr
+	 tU8pwxLNYP/4w==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: [RFC PATCH v4 00/11] coco/TSM: Arm CCA guest TDISP lock/accept flow with verification and DMA enable
+Date: Mon, 27 Apr 2026 13:57:54 +0530
+Message-ID: <20260427082805.931832-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260424151443.750077-1-maz@kernel.org>
-In-Reply-To: <20260424151443.750077-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 27 Apr 2026 10:25:03 +0200
-X-Gm-Features: AVHnY4LX4zIbvkokFvwRe85hWW9vU3Mi4qKP1vkFGw7_g8t-wfUHl7-fG7neYpg
-Message-ID: <CABgObfaBf8NMM_vNKy5gPamp1gbsT7CEv=SA2X9yQ10gekgMXA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.1, take #1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Ben Simner <ben.simner@cl.cam.ac.uk>, David Woodhouse <dwmw@amazon.co.uk>, 
-	Fuad Tabba <tabba@google.com>, Quentin Perret <qperret@google.com>, 
-	Sebastian Ene <sebastianene@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: gBwwOWrR9chRjjVD5bj2K52LCp4rlETMol6JssP6zmE_1777278316
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 24, 2026 at 5:15=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Paolo,
->
-> This is the first drop of KVM/arm64 fixes for 7.1. Nothing really
-> major so far, but a rather wide range of fixes for idreg handling,
-> long standing regressions, SMCCC compliance and more. Add a few
-> cleanups to the fix, and that's about it. As usual, gory details in
-> the tag below.
->
-> Please pull,
+This patch series implements the TSM ->lock(), ->unlock(), and ->accept()
+callbacks required for the TDISP setup with Arm CCA as per as per the RMM
+2.0bet1 specification [1].
 
-Pulled, thanks.
+The series adds the guest-side DA plumbing needed to transition a device
+through TDI LOCK and RUN states, verify host-provided evidence against
+RMM-provided digests, validate interface-report MMIO mappings, and enable
+DMA only after attestation succeeds.
 
-Paolo
+At a high level, the series includes:
+- guest TSM callback registration and lock/unlock/accept hooks
+- RHI DA helper support for TDI state transitions and object refresh
+- host-cached DA object fetch APIs in guest
+- RSI_VDEV_GET_INFO digest verification of certificate/VCA/report/measurement
+- mapping validation for interface-report ranges and teardown on unlock
+- DMA behavior updates for accepted devices (including swiotlb restrictions)
+- vdev DMA enable after successful attestation
 
->         M.
->
-> The following changes since commit 94b4ae79ebb42a8a6f2124b4d4b033b15a98e4=
-f9:
->
->   Merge branch kvm-arm64/misc-7.1 into kvmarm-master/next (2026-04-08 12:=
-26:11 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-7.1-1
->
-> for you to fetch changes up to 4ce98bf0865c349e7026ad9c14f48da264920953:
->
->   KVM: arm64: Wake-up from WFI when iqrchip is in userspace (2026-04-24 1=
-2:03:57 +0100)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 7.1, take #1
->
-> - Allow tracing for non-pKVM, which was accidentally disabled when
->   the series was merged
->
-> - Rationalise the way the pKVM hypercall ranges are defined by using
->   the same mechanism as already used for the vcpu_sysreg enum
->
-> - Enforce that SMCCC function numbers relayed by the pKVM proxy are
->   actually compliant with the specification
->
-> - Fix a couple of feature to idreg mappings which resulted in the
->   wrong sanitisation being applied
->
-> - Fix the GICD_IIDR revision number field that could never been
->   written correctly by userspace
->
-> - Make kvm_vcpu_initialized() correctly use its parameter instead
->   of relying on the surrounding context
->
-> - Enforce correct ordering in __pkvm_init_vcpu(), plugging a
->   potential pin leak at the same time
->
-> - Move __pkvm_init_finalise() to a less dangerous spot, avoiding
->   future problems
->
-> - Restore functional userspace irqchip support after a four year
->   breakage (last functional kernel was 5.18...). This is obviously
->   ripe for garbage collection.
->
-> - ... and the usual lot of spelling fixes
->
-> ----------------------------------------------------------------
-> David Woodhouse (1):
->       KVM: arm64: vgic: Fix IIDR revision field extracted from wrong valu=
-e
->
-> Fuad Tabba (5):
->       KVM: arm64: Fix FEAT_Debugv8p9 to check DebugVer, not PMUVer
->       KVM: arm64: Fix typo in feature check comments
->       KVM: arm64: Fix FEAT_SPE_FnE to use PMSIDR_EL1.FnE, not PMSVer
->       KVM: arm64: Fix kvm_vcpu_initialized() macro parameter
->       KVM: arm64: Fix pin leak and publication ordering in __pkvm_init_vc=
-pu()
->
-> Marc Zyngier (2):
->       KVM: arm64: pkvm: Adopt MARKER() to define host hypercall ranges
->       KVM: arm64: Wake-up from WFI when iqrchip is in userspace
->
-> Quentin Perret (1):
->       KVM: arm64: Fix initialisation order in __pkvm_init_finalise()
->
-> Sebastian Ene (1):
->       KVM: arm64: Reject non compliant SMCCC function calls in pKVM
->
-> Vincent Donnefort (1):
->       KVM: arm64: Re-allow hyp tracing HVCs for [nh]VHE
->
->  arch/arm64/include/asm/kvm_asm.h   | 28 ++++++++++++++++++----------
->  arch/arm64/include/asm/kvm_host.h  |  5 +----
->  arch/arm64/kvm/arm.c               |  4 ++++
->  arch/arm64/kvm/config.c            | 23 ++++++++++++++++-------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 30 +++++++++++++++++-------------
->  arch/arm64/kvm/hyp/nvhe/pkvm.c     | 38 +++++++++++++++++++++++++-------=
-------
->  arch/arm64/kvm/hyp/nvhe/setup.c    |  6 +++---
->  arch/arm64/kvm/vgic/vgic-mmio-v2.c |  2 +-
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
->  9 files changed, 86 insertions(+), 52 deletions(-)
->
+The series builds upon the TSM framework patches posted at [2]. A git repository
+containing all the related changes is available at [3].
+
+Testing / Usage
+
+echo ${DEVICE} > /sys/bus/pci/devices/${DEVICE}/driver/unbind
+
+To transition the device to TDISP LOCK state:
+echo tsm0 > /sys/bus/pci/devices/${DEVICE}/tsm/lock
+
+To transition the device to TDISP RUN state:
+echo 1 > /sys/bus/pci/devices/${DEVICE}/tsm/accept
+
+echo ${DEVICE} > /sys/bus/pci/drivers_probe
+
+Changes from v3:
+https://lore.kernel.org/all/20260312080442.3485633-1-aneesh.kumar@kernel.org
+* updated the patches to follow the RMM 2.0bet1 specification
+* updated the guest-side DA code to use the renamed identity/protocol digest
+  fields and id_index
+
+Changes from v2:
+rfc-v2: https://lore.kernel.org/all/20251117140007.122062-1-aneesh.kumar@kernel.org
+* rebase to latest kernel and core TSM changes
+* Address review feedback.
+* Interface report is now collected using core TSM framework
+* swiotlb is now considered shared-memory pool and is not allowed to be used by accepted devices.
+
+v1:
+rfc-v1: https://lore.kernel.org/all/20250728135216.48084-1-aneesh.kumar@kernel.org
+
+[1] https://developer.arm.com/documentation/den0137/2-0bet1/
+[2] https://lore.kernel.org/all/20260303000207.1836586-1-dan.j.williams@intel.com
+[3] https://gitlab.arm.com/linux-arm/linux-cca.git cca/topics/cca-tdisp-upstream-rfc-v4
+
+Cc: Alexey Kardashevskiy <aik@amd.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Jonathan Cameron <jic23@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Samuel Ortiz <sameo@rivosinc.com>
+Cc: Steven Price <steven.price@arm.com>
+Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>
+
+Aneesh Kumar K.V (Arm) (11):
+  coco: guest: arm64: Guest TSM callback and realm device lock support
+  coco: guest: arm64: Fix a typo in the ARM_CCA_GUEST Kconfig help
+    string ("and" -> "an").
+  coco: guest: arm64: Add Realm Host Interface and guest DA helper
+  coco: guest: arm64: Support guest-initiated TDI lock/unlock
+    transitions
+  coco: guest: arm64: Refresh interface-report cache during device lock
+  coco: guest: arm64: Add measurement refresh via
+    RHI_DA_VDEV_GET_MEASUREMENTS
+  coco: guest: arm64: Add guest APIs to read host-cached DA objects
+  coco: guest: arm64: Verify DA evidence with RSI_VDEV_GET_INFO digests
+  coco: guest: arm64: Hook TSM accept to Realm TDISP RUN transition
+  coco: arm64: dma: Update force_dma_unencrypted for accepted devices
+  coco: guest: arm64: Enable vdev DMA after attestation
+
+ arch/arm64/include/asm/mem_encrypt.h      |   6 +-
+ arch/arm64/include/asm/rhi.h              |  59 ++++
+ arch/arm64/include/asm/rsi.h              |   1 +
+ arch/arm64/include/asm/rsi_cmds.h         |  73 +++++
+ arch/arm64/include/asm/rsi_smc.h          |  63 ++++
+ arch/arm64/kernel/rsi.c                   |  10 +
+ arch/arm64/mm/mem_encrypt.c               |  10 +
+ drivers/virt/coco/Makefile                |   2 +-
+ drivers/virt/coco/arm-cca-guest/Kconfig   |   9 +-
+ drivers/virt/coco/arm-cca-guest/Makefile  |   1 +
+ drivers/virt/coco/arm-cca-guest/arm-cca.c | 358 +++++++++++++++++++++-
+ drivers/virt/coco/arm-cca-guest/rhi-da.c  | 356 +++++++++++++++++++++
+ drivers/virt/coco/arm-cca-guest/rhi-da.h  |  17 +
+ drivers/virt/coco/arm-cca-guest/rsi-da.c  | 289 +++++++++++++++++
+ drivers/virt/coco/arm-cca-guest/rsi-da.h  |  66 ++++
+ include/linux/swiotlb.h                   |   3 +
+ kernel/dma/direct.c                       |   8 +
+ kernel/dma/swiotlb.c                      |   3 +
+ 18 files changed, 1326 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rhi-da.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rhi-da.h
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rsi-da.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rsi-da.h
+
+-- 
+2.43.0
 
