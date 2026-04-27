@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8FB3264FA;
-	Mon, 27 Apr 2026 06:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B793264FA;
+	Mon, 27 Apr 2026 06:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777272762; cv=none; b=u2FYawRbaSW3myvvgTGanCEkCLPmwIN/RiF3FCeOsGNsR7LhhF+0jNqWunu0Py9ulmT+64XlTpqJXErA6Hi2BvM5ttxz8kfhHQ0tM4bm83bFBVVakAg7sU9WcIQxf8uUet8TB3wBl1ny06hMF/650mHndO0PIuKnRbkHoa5Hbhc=
+	t=1777272768; cv=none; b=HdIjSlW8+1REhp4h/shtGaFJSefZymS22I6rQQWQ2gXM6+QeeONjj/qQxTuJaTM1DW2ktdDCyvg03NnZHUTaLxXNJ/Jvr+q1V1YwDVbgNO7b4Fq0Psi7vqQ1PiT5IYcpo3nESpxzCfzXNOk+6XK6IxnhWQfs9b6Zp8mlTkS/S6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777272762; c=relaxed/simple;
-	bh=Lgmbk9xMIpHvR05nzEfVzoIynoOoPTPEvkqEGSPDfJo=;
+	s=arc-20240116; t=1777272768; c=relaxed/simple;
+	bh=437kH86jrTn4c1Epnw3resuWckEvIYjsHBmw7fIP+EI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cJmkRIyw6uhqvXY7nkEqUyfu5InSjsFQy8vcdhcNO0ORfc25sUAQqShSr6OV2EipxqSxgtSXu7Twi/gyy1v1eqHYAV3E6oL9dCHMuioJ9Z5vaway8MTb35CUZwhvFUrkUOiX8af/0KaqaoQId2Tr2dwtgX0zc/h5ehFpKhQ8xgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJHUouHR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=s5qRGNfPTTtWp7eZy4N0yFIls6wg1BqyoD7CtdkPz6OUgLjhha9W0vYCMV9UnjXKJBE9LhFFDg8sQxkJjWBMN0Fet1XlcB9cGM6y4U/zOAvjhVoGZhl+Zbk3GsZ3S/dcr/FT0XG66BqTlMoXFYvwwswo8yZqL29wiSTioQgakl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VsTz+yqz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJHUouHR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A31C19425;
-	Mon, 27 Apr 2026 06:52:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VsTz+yqz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05037C2BCC4;
+	Mon, 27 Apr 2026 06:52:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777272762;
-	bh=Lgmbk9xMIpHvR05nzEfVzoIynoOoPTPEvkqEGSPDfJo=;
+	s=k20201202; t=1777272767;
+	bh=437kH86jrTn4c1Epnw3resuWckEvIYjsHBmw7fIP+EI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BJHUouHRSkmYTywbg9zws+4kV6xqUuhelqXjP+HvFWKQTtaWZB3KY4x2DO0M8T3ch
-	 EBhGzDyiKKYgXnZLScnZ8eXFbi0WIkFZMcMOF4H6F7A4Cm54wExxYkdJEwiVa0ZjZ3
-	 PgKpu/nB3UTf2R5wTmqrvp0JUjbfj4hFzkbku5ABJTI4MlspkV98vV7jCDW2qThHeE
-	 yK7qBfI2NNwO+uhtU8kYkhHm62poGTRsLzD7c4N/ZOYqhzs8mltEvj/mN1dS10wKi0
-	 RI3N9JilK7PoxhGdA+AxzFFdMHMhg67xZw05lCdCfDF9WQDflK+tY45dJtz6ZnbNKB
-	 kd4vd263wK6Bw==
+	b=VsTz+yqzRX5JWFXZZf9VJOF0bKQiZOVuDoPji4g1OmLkdzebLsB7i4cbYXSfeRtx5
+	 OvMcZDNbo6zJY/e2lIT01+Bq+26mBgFksiGi8UW5EOedPKDFI91fFD7iaz4icdS5+G
+	 ZpcA79VuLeFLsJ38vg5yj29PUrrMYXmVYk8dQUqDt4UwvojIoCZT7Q+6pDc6w7n6wz
+	 v4STTOPn8lwri6ZSGF3vcDKCEaEYx2hg2GSCjn79CvQR7ueHMn9Ho7H86liZ0QGP9D
+	 aqz/pQ5iYC7EngUQpuaUrOpKeS7Wt417IWVlBkqqJATaz1pd0FTczxlP79EkIgqfZ2
+	 Uf6XsOqxcIqXg==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: [RFC PATCH v4 12/14] coco: host: arm64: Refcount root-port pdevs used by IDE streams
-Date: Mon, 27 Apr 2026 12:21:19 +0530
-Message-ID: <20260427065121.916615-13-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v4 13/14] PCI/TSM: Move CMA DOE mailbox discovery out of pci_tsm_pf0_constructor()
+Date: Mon, 27 Apr 2026 12:21:20 +0530
+Message-ID: <20260427065121.916615-14-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260427065121.916615-1-aneesh.kumar@kernel.org>
 References: <20260427065121.916615-1-aneesh.kumar@kernel.org>
@@ -57,117 +57,137 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Keep the root-port RMM pdev alive while endpoint IDE streams are attached
-to it.
+pci_tsm_pf0_constructor() currently looks up a CMA DOE mailbox and
+fails PF0 initialization when one is not present. That is too strict
+for all link TSM drivers.
 
-Add a kref to the root-port descriptor, take a reference when reusing an
-existing root-port pdev for stream setup, and drop it when the endpoint
-disconnects. Release the root-port pdev once the final reference is
-dropped, tearing down the RMM object and its communication buffers at that
-point.
+Move CMA DOE mailbox discovery into the low-level PF0 probe callbacks
+so each driver can decide whether a mailbox is mandatory.
+
+Keep SEV-TIO and TDX requiring a CMA mailbox, while allowing the
+arm-cca host path to proceed on PF0 devices that do not support IDE
+and therefore have no DOE-based SPDM path.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- drivers/virt/coco/arm-cca-host/arm-cca.c | 31 +++++++++++++++++++++---
- drivers/virt/coco/arm-cca-host/rmi-da.h  |  4 +++
- 2 files changed, 32 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/sev-dev-tsm.c         | 13 +++++++++++++
+ drivers/pci/tsm/core.c                   | 14 ++++++++------
+ drivers/virt/coco/arm-cca-host/arm-cca.c | 16 +++++++++++++---
+ drivers/virt/coco/tdx-host/tdx-host.c    | 13 +++++++++++++
+ 4 files changed, 47 insertions(+), 9 deletions(-)
 
+diff --git a/drivers/crypto/ccp/sev-dev-tsm.c b/drivers/crypto/ccp/sev-dev-tsm.c
+index b07ae529b591..a7506cbbe392 100644
+--- a/drivers/crypto/ccp/sev-dev-tsm.c
++++ b/drivers/crypto/ccp/sev-dev-tsm.c
+@@ -217,6 +217,19 @@ static struct pci_tsm *tio_pf0_probe(struct pci_dev *pdev, struct sev_device *se
+ 	if (rc)
+ 		return NULL;
+ 
++	/* if device have ide cap, setup doe mailbox */
++	if (pdev->ide_cap) {
++		struct pci_doe_mb *doe_mb;
++
++		doe_mb = pci_find_doe_mailbox(pdev, PCI_VENDOR_ID_PCI_SIG,
++					      PCI_DOE_FEATURE_CMA);
++		if (!doe_mb)
++			return NULL;
++		dsm->tsm.doe_mb = doe_mb;
++	} else {
++		return NULL;
++	}
++
+ 	pci_dbg(pdev, "TSM enabled\n");
+ 	dsm->sev = sev;
+ 	return &no_free_ptr(dsm)->tsm.base_tsm;
+diff --git a/drivers/pci/tsm/core.c b/drivers/pci/tsm/core.c
+index bb440135b8f7..900306a43161 100644
+--- a/drivers/pci/tsm/core.c
++++ b/drivers/pci/tsm/core.c
+@@ -1236,12 +1236,14 @@ int pci_tsm_pf0_constructor(struct pci_dev *pdev, struct pci_tsm_pf0 *tsm,
+ 			    struct tsm_dev *tsm_dev)
+ {
+ 	mutex_init(&tsm->lock);
+-	tsm->doe_mb = pci_find_doe_mailbox(pdev, PCI_VENDOR_ID_PCI_SIG,
+-					   PCI_DOE_FEATURE_CMA);
+-	if (!tsm->doe_mb) {
+-		pci_warn(pdev, "TSM init failure, no CMA mailbox\n");
+-		return -ENODEV;
+-	}
++
++	/*
++	 * Note, low-level TSM driver responsible for determining if it wants to
++	 * proceed with a device that has no DOE mailbox. TSM may have an
++	 * alternate method for coordinating TDISP.
++	 */
++	if (!tsm->doe_mb)
++		pci_dbg(pdev, "no CMA mailbox\n");
+ 
+ 	return pci_tsm_link_constructor(pdev, &tsm->base_tsm, tsm_dev);
+ }
 diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
-index de7a2e156549..0b1200f591ab 100644
+index 0b1200f591ab..265aa0cb612a 100644
 --- a/drivers/virt/coco/arm-cca-host/arm-cca.c
 +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
-@@ -134,6 +134,23 @@ static int alloc_stream_id(struct pci_host_bridge *hb)
- 	return stream_id;
- }
- 
-+static void cca_root_port_pdev_release(struct kref *kref)
-+{
-+	struct cca_host_rp_dsc *rp_dsc = container_of(kref, struct cca_host_rp_dsc,
-+						      tsm_ref);
-+	struct pci_dev *rp = rp_dsc->pci.pdev;
+@@ -11,6 +11,8 @@
+ #include <linux/tsm.h>
+ #include <linux/vmalloc.h>
+ #include <linux/cleanup.h>
++#include <linux/pci-doe.h>
 +
-+	cca_pdev_stop_and_destroy(rp);
-+	free_dev_communication_buffers(&rp_dsc->pdev.comm_data);
-+	rp->tsm = NULL;
-+	kfree(rp_dsc);
-+}
-+
-+static inline void cca_root_port_pdev_put(struct cca_host_rp_dsc *rp_dsc)
-+{
-+	kref_put(&rp_dsc->tsm_ref, cca_root_port_pdev_release);
-+}
-+
- static int cca_root_port_pdev_create(struct pci_dev *rp, struct tsm_dev *tsm_dev)
- {
- 	int ret;
-@@ -151,6 +168,7 @@ static int cca_root_port_pdev_create(struct pci_dev *rp, struct tsm_dev *tsm_dev
- 	rp->tsm->dsm_dev = rp;
- 	rp->tsm->pdev = rp;
- 	rp->tsm->tsm_dev = tsm_dev;
-+	kref_init(&rp_dsc->tsm_ref);
- 	mutex_init(&rp_dsc->pdev.object_lock);
  
- 	ret = init_dev_communication_buffers(rp, &rp_dsc->pdev.comm_data);
-@@ -222,12 +240,15 @@ static int cca_pdev_create_ncoh_stream(struct pci_dev *pdev, unsigned long strea
- 		/* Make sure they use the same TSM */
- 		if (rp->tsm->tsm_dev != pf0_ep_dsc->pci.base_tsm.tsm_dev)
- 			return -EINVAL;
--	}
+ #include "rmi-da.h"
  
-+		kref_get(&rp_dsc->tsm_ref);
-+	}
- 
- 	params = (struct rmi_pdev_stream_params *)get_zeroed_page(GFP_KERNEL);
--	if (!params)
-+	if (!params) {
-+		cca_root_port_pdev_put(rp_dsc);
- 		return -ENOMEM;
-+	}
- 
- 	params->flags = 0;
- 	params->type = RMI_PDEV_STREAM_NCOH;
-@@ -237,7 +258,9 @@ static int cca_pdev_create_ncoh_stream(struct pci_dev *pdev, unsigned long strea
- 	params->num_addr_range = pci_dev_addr_range(pdev, params->addr_range);
- 
- 	ret = cca_pdev_stream_connect(pdev, rp, params, &stream_handle);
--	if (!ret)
-+	if (ret)
-+		cca_root_port_pdev_put(rp_dsc);
-+	else
- 		pf0_ep_dsc->stream_handle = stream_handle;
- 
- 	free_page((unsigned long)params);
-@@ -375,6 +398,8 @@ static void cca_tsm_disconnect(struct pci_dev *pdev)
+@@ -35,14 +37,22 @@ static struct pci_tsm *cca_tsm_pci_probe(struct tsm_dev *tsm_dev, struct pci_dev
+ 		return &no_free_ptr(fn_dsc)->pci;
  	}
  
- 	cca_pdev_disconnect_stream(pdev, rp, pf0_ep_dsc->stream_handle);
-+	if (rp)
-+		cca_root_port_pdev_put(to_cca_rp_dsc(rp));
+-	if (!pdev->ide_cap)
+-		return NULL;
+-
+ 	struct cca_host_pf0_ep_dsc *pf0_ep_dsc __free(kfree) =
+ 		kzalloc(sizeof(*pf0_ep_dsc), GFP_KERNEL);
+ 	if (!pf0_ep_dsc)
+ 		return NULL;
  
- 	cca_pdev_stop_and_destroy(pdev);
- 	free_dev_communication_buffers(&pf0_ep_dsc->pdev.comm_data);
-diff --git a/drivers/virt/coco/arm-cca-host/rmi-da.h b/drivers/virt/coco/arm-cca-host/rmi-da.h
-index ea5f7df3541f..798a8ed7505f 100644
---- a/drivers/virt/coco/arm-cca-host/rmi-da.h
-+++ b/drivers/virt/coco/arm-cca-host/rmi-da.h
-@@ -10,6 +10,9 @@
- #include <linux/pci-ide.h>
- #include <linux/pci-tsm.h>
- #include <linux/sizes.h>
-+#include <linux/atomic.h>
-+#include <linux/kref.h>
-+#include <linux/wait.h>
- #include <asm/rmi_cmds.h>
- #include <asm/rmi_smc.h>
++	/* if device have ide cap, setup doe mailbox */
++	if (pdev->ide_cap) {
++		struct pci_doe_mb *doe_mb;
++
++		doe_mb = pci_find_doe_mailbox(pdev, PCI_VENDOR_ID_PCI_SIG,
++					      PCI_DOE_FEATURE_CMA);
++		if (!doe_mb)
++			return NULL;
++		pf0_ep_dsc->pci.doe_mb = doe_mb;
++	}
++
+ 	ret = pci_tsm_pf0_constructor(pdev, &pf0_ep_dsc->pci, tsm_dev);
+ 	if (ret)
+ 		return NULL;
+diff --git a/drivers/virt/coco/tdx-host/tdx-host.c b/drivers/virt/coco/tdx-host/tdx-host.c
+index ea7c2167660f..4947b9bc2359 100644
+--- a/drivers/virt/coco/tdx-host/tdx-host.c
++++ b/drivers/virt/coco/tdx-host/tdx-host.c
+@@ -634,6 +634,19 @@ static struct pci_tsm *tdx_link_pf0_probe(struct tsm_dev *tsm_dev,
+ 	spdm_conf->vmm_spdm_cap = SPDM_CAP_KEY_UPD;
+ 	spdm_conf->certificate_slot_mask = 0xff;
  
-@@ -104,6 +107,7 @@ struct cca_host_pf0_ep_dsc {
- struct cca_host_rp_dsc {
- 	struct pci_tsm pci;
- 	struct cca_host_pdev_dsc pdev;
-+	struct kref tsm_ref;
- };
- 
- struct cca_host_fn_dsc {
++	/* if device have ide cap, setup doe mailbox */
++	if (pdev->ide_cap) {
++		struct pci_doe_mb *doe_mb;
++
++		doe_mb = pci_find_doe_mailbox(pdev, PCI_VENDOR_ID_PCI_SIG,
++					      PCI_DOE_FEATURE_CMA);
++		if (!doe_mb)
++			return NULL;
++		tlink->pci.doe_mb = doe_mb;
++	} else {
++		return NULL;
++	}
++
+ 	tlink->in_msg = no_free_ptr(in_msg);
+ 	tlink->out_msg = no_free_ptr(out_msg);
+ 	tlink->spdm_conf = no_free_ptr(spdm_conf);
 -- 
 2.43.0
 
