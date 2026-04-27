@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B80386C12;
-	Mon, 27 Apr 2026 06:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22E93890F9;
+	Mon, 27 Apr 2026 06:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777272741; cv=none; b=uFUU7b9bqwGWiFp2KfW4yYqZaCUWSWXY0q4E+108GrvbEz2sLCEnLLEGE2WSG+PUXszU844pYlHDSEiBJlywlQ2drlPl2D14czL+qgChJaskqe6j8G9N+lsYzBP1ZA4zJHMB9mV2TdborCHHiS3Ltv0RGeUmHxb4Mj/9vzp5uEw=
+	t=1777272747; cv=none; b=fyVlHCK/FCQ1t713joXfpifXhFuZ4TxibZK67gKfXgLOMMu+MEMPZzm7xtYWc+Jgj5J6gmTrU+sZxS8hEkPNRqpBzUjaBBrf7+cw833ZAEhysjCEdOdi9bzJRFS6gr29JnsqeMRZjmtsJ4zBGSA/8nkaM47fO7brsKu8f7eV2fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777272741; c=relaxed/simple;
-	bh=8p8XrF54svUmqa/FbWkb2wAIIOl++3NsWo5wZGvA1c8=;
+	s=arc-20240116; t=1777272747; c=relaxed/simple;
+	bh=c/swTFYXP2qdXTxfLvAWfMN1SMlHP5XuNC+j5JT3jV4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=onRV8qEv5JgnyZaDqI1s8RKlZAEIjsUgFGJRKxT0E8Y1YSvTI8LOyMcjEUa2AgZrvftQayM/hFQ00iKvWSOZLTibJb5xlkK6kRh9g3sLd1vH19OkyowoeZ/bfxMera2sRYT+eRLFuav1zdtE1inx2qqoU8HQ/Ek5xJrz40utG+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sg37gUfh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=N4wpHk6YCrVv9sJVh1c7oWkJRP1Hq2NpdJC2+JzIBkeXY8q/sPBvamHd/nRqCFllJdzEtG4y1nOFsFE9HtWWnTx9n7QG/+muoymGUmbQdP8rWLZ05zQFyovHrLsSovYJl0fpDWBnJarifTESE2TDEddjRsaAe5RtcP5GWQ7x7yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FoKtPFr+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sg37gUfh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B232C2BCB8;
-	Mon, 27 Apr 2026 06:52:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FoKtPFr+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF739C19425;
+	Mon, 27 Apr 2026 06:52:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777272741;
-	bh=8p8XrF54svUmqa/FbWkb2wAIIOl++3NsWo5wZGvA1c8=;
+	s=k20201202; t=1777272746;
+	bh=c/swTFYXP2qdXTxfLvAWfMN1SMlHP5XuNC+j5JT3jV4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sg37gUfhb/ZDeXMT0+OWQwVpkDHoLz2Uv7klAyb01XOEDt3MjNZa/syXzY/+U5MXK
-	 hHCCxciBkznRX11dahJV4GoWClyQqAoQoknIR9IpetNxdHX1VSDHm2PqoDHEzSh5dt
-	 V8p/RnYMb5mPcesmqicUCU6wpwDbt6+X2BH6u2SrA4nNcSRZCMZtvg+nUQgn5kqCAo
-	 /rO8Swm6Y0NWZGvLM/zSP/Q2uM4JF1zCmrKb4arClzdIIg8NmXHLfXB3cXMmBFvPSi
-	 wr/WYlYix1GbF/VNqVa561+CJXn85pY2q5rwrtD9kdF13p6xGRwr9rh17bYSzjrf5b
-	 ftEXDXzzlaSpA==
+	b=FoKtPFr+3ScWKwc6SzA0v/siEGUsjOevvKFwVDKE1gQyi8VHELmD9aHvocV7Thplp
+	 XZ5iwO/wljdRJEqz+ZzpUi7i9xV+DhSKOf8UrFhv4ctVK/S4JiIWKPhb1+AX0losIK
+	 1tnkSXXrtwKzvK8KDNYOVPIXsAoPMRd7NqxGAbVEcsLZGMptGJ/0uUbhtkE2Rt2Y9K
+	 f2gchITpsR5HMzsB49XOel9wcX7i13tKHlB7EPzma4wIMpfyeS1ZjUFTzFSM4GI7ny
+	 TcUTzvUOLiX0KVmZC100zJRj+Hzrf878O+NJiKMmMPBOgEfrPHDb+NavuGaQ0G47PT
+	 UrXGR0+Q/8IAg==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: [RFC PATCH v4 08/14] coco: host: arm64: Register device public key with RMM
-Date: Mon, 27 Apr 2026 12:21:15 +0530
-Message-ID: <20260427065121.916615-9-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v4 09/14] coco: host: arm64: Initialize RMM pdev state for TDISP IDE connect
+Date: Mon, 27 Apr 2026 12:21:16 +0530
+Message-ID: <20260427065121.916615-10-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260427065121.916615-1-aneesh.kumar@kernel.org>
 References: <20260427065121.916615-1-aneesh.kumar@kernel.org>
@@ -55,279 +55,230 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-- Introduce the SMC_RMI_PDEV_SET_PUBKEY helper and the associated struct
-rmi_public_key_params so the host can hand the device’s public key to
-the RMM.
-
-- Parse the certificate chain cached during SPDM session setup, extract the
-final certificate’s public key, and recognise RSA-3072, ECDSA-P256, and
-ECDSA-P384 keys before calling into the RMM.
+Update connect() to:
+- allocate device-communication buffers,
+- create the RMM pdev object,
+- perform initial device communication to collect identity, and
+- set the device public key when the pdev enters NEEDS_KEY.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- arch/arm64/include/asm/rmi_cmds.h       |   9 ++
- arch/arm64/include/asm/rmi_smc.h        |  17 +++
- drivers/virt/coco/arm-cca-host/Kconfig  |   4 +
- drivers/virt/coco/arm-cca-host/rmi-da.c | 155 ++++++++++++++++++++++++
- drivers/virt/coco/arm-cca-host/rmi-da.h |   2 +
- 5 files changed, 187 insertions(+)
+ drivers/virt/coco/arm-cca-host/arm-cca.c | 43 +++++++++--
+ drivers/virt/coco/arm-cca-host/rmi-da.c  | 92 +++++++++++++++++++++++-
+ drivers/virt/coco/arm-cca-host/rmi-da.h  |  3 +
+ 3 files changed, 128 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-index 8024e9d89e55..00e0a08e17a6 100644
---- a/arch/arm64/include/asm/rmi_cmds.h
-+++ b/arch/arm64/include/asm/rmi_cmds.h
-@@ -765,4 +765,13 @@ static inline unsigned long rmi_pdev_stop(unsigned long pdev_phys)
- 	return res.a0;
+diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
+index 3c854aab95cc..f0aa4e46e96c 100644
+--- a/drivers/virt/coco/arm-cca-host/arm-cca.c
++++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
+@@ -66,7 +66,7 @@ static void cca_tsm_pci_remove(struct pci_tsm *tsm)
+ 	}
  }
  
-+static inline unsigned long rmi_pdev_set_pubkey(unsigned long pdev_phys, unsigned long key_phys)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RMI_PDEV_SET_PUBKEY, pdev_phys, key_phys, &res);
-+
-+	return res.a0;
-+}
-+
- #endif /* __ASM_RMI_CMDS_H */
-diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-index 9056a7639667..7a5d57a8be7a 100644
---- a/arch/arm64/include/asm/rmi_smc.h
-+++ b/arch/arm64/include/asm/rmi_smc.h
-@@ -538,4 +538,21 @@ struct rmi_dev_comm_data {
- 	};
- };
+-static __maybe_unused int init_dev_communication_buffers(struct pci_dev *pdev,
++static int init_dev_communication_buffers(struct pci_dev *pdev,
+ 		struct cca_host_comm_data *comm_data)
+ {
+ 	int ret = -ENOMEM;
+@@ -184,15 +184,40 @@ static int cca_tsm_connect(struct pci_dev *pdev)
+ 		ret = tsm_ide_stream_register(ide);
+ 		if (ret)
+ 			goto err_tsm;
++	}
  
-+#define RMI_SIG_RSASSA_3072	0
-+#define RMI_SIG_ECDSA_P256	1
-+#define RMI_SIG_ECDSA_P384	2
+-		/*
+-		 * Once ide is setup, enable the stream at the endpoint
+-		 * Root port will be done by RMM
+-		 */
+-		pci_ide_stream_enable(pdev, ide);
++	ret = init_dev_communication_buffers(pdev, &pf0_ep_dsc->pdev.comm_data);
++	if (ret)
++		goto err_comm_buff;
++	ret = cca_pdev_create(pdev);
++	if (ret)
++		goto err_pdev_create;
 +
-+struct rmi_public_key_params {
-+	union {
-+		struct {
-+			u8 public_key[1024];
-+			u8 metadata[1024];
-+			u64 public_key_len;
-+			u64 metadata_len;
-+			u8 rmi_signature_algorithm;
-+		};
-+		u8 padding[0x1000];
-+	};
-+};
++	ret = cca_pdev_collect_identity(pdev);
++	if (ret)
++		goto pdev_destroy;
 +
- #endif /* __ASM_RMI_SMC_H */
-diff --git a/drivers/virt/coco/arm-cca-host/Kconfig b/drivers/virt/coco/arm-cca-host/Kconfig
-index efe40d61d5d8..c5076e2b4eb5 100644
---- a/drivers/virt/coco/arm-cca-host/Kconfig
-+++ b/drivers/virt/coco/arm-cca-host/Kconfig
-@@ -8,7 +8,11 @@ config ARM_CCA_HOST
- 	depends on PCI
- 	depends on KVM
- 	select PCI_TSM
-+	select KEYS
-+	select X509_CERTIFICATE_PARSER
- 	select AUXILIARY_BUS
-+	select CRYPTO_ECDSA
-+	select CRYPTO_RSA
++	if (cca_pdev_needs_key(pdev)) {
++		ret = cca_pdev_set_public_key(pdev);
++		if (ret)
++			goto pdev_destroy;
+ 	}
++	/*
++	 * Once ide is setup, enable the stream at the endpoint
++	 * Root port will be done by RMM
++	 */
++	if (cca_pdev_need_sel_ide_streams(pdev))
++		pci_ide_stream_enable(pdev, ide);
++
+ 	return 0;
  
- 	help
- 	  ARM CCA RMM firmware is the trusted runtime that enforces memory
++pdev_destroy:
++	cca_pdev_stop_and_destroy(pdev);
++err_pdev_create:
++	free_dev_communication_buffers(&pf0_ep_dsc->pdev.comm_data);
++err_comm_buff:
++	if (cca_pdev_need_sel_ide_streams(pdev))
++		tsm_ide_stream_unregister(ide);
+ err_tsm:
+ 	if (cca_pdev_need_sel_ide_streams(pdev)) {
+ 		pci_ide_stream_teardown(rp, ide);
+@@ -222,12 +247,16 @@ static void cca_tsm_disconnect(struct pci_dev *pdev)
+ 	if (cca_pdev_need_sel_ide_streams(pdev)) {
+ 		ide = pf0_ep_dsc->sel_stream;
+ 		stream_id = ide->stream_id;
++	}
++
++	cca_pdev_stop_and_destroy(pdev);
++	free_dev_communication_buffers(&pf0_ep_dsc->pdev.comm_data);
+ 
++	if (cca_pdev_need_sel_ide_streams(pdev)) {
+ 		pci_ide_stream_release(ide);
+ 		pf0_ep_dsc->sel_stream = NULL;
+ 		clear_bit(stream_id, cca_stream_ids);
+ 	}
+-
+ }
+ 
+ static struct pci_tsm_ops cca_link_pci_ops = {
 diff --git a/drivers/virt/coco/arm-cca-host/rmi-da.c b/drivers/virt/coco/arm-cca-host/rmi-da.c
-index 8a43a1f1c036..996979dba709 100644
+index 996979dba709..cb654d1b2eb3 100644
 --- a/drivers/virt/coco/arm-cca-host/rmi-da.c
 +++ b/drivers/virt/coco/arm-cca-host/rmi-da.c
-@@ -8,6 +8,9 @@
- #include <linux/pci-doe.h>
- #include <linux/delay.h>
- #include <asm/rmi_cmds.h>
-+#include <crypto/internal/rsa.h>
-+#include <keys/asymmetric-type.h>
-+#include <keys/x509-parser.h>
- 
- #include "rmi-da.h"
- 
-@@ -383,6 +386,158 @@ static int wait_for_pdev_state(struct pci_tsm *tsm, enum rmi_pdev_state target_s
+@@ -386,7 +386,7 @@ static int wait_for_pdev_state(struct pci_tsm *tsm, enum rmi_pdev_state target_s
  	return wait_for_dev_state(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
  }
  
-+static int __maybe_unused parse_certificate_chain(struct pci_tsm *tsm)
+-static int __maybe_unused parse_certificate_chain(struct pci_tsm *tsm)
++static int parse_certificate_chain(struct pci_tsm *tsm)
+ {
+ 	struct cca_host_pf0_ep_dsc *pf0_ep_dsc;
+ 	unsigned int chain_size;
+@@ -484,7 +484,7 @@ static inline int copy_key_part(u8 *buf, const u8 *key_buf, size_t sz)
+ }
+ 
+ DEFINE_FREE(key_param_free, struct rmi_public_key_params *, if (_T) key_param_free(_T))
+-static int __maybe_unused pdev_set_public_key(struct pci_tsm *tsm)
++static int pdev_set_public_key(struct pci_tsm *tsm)
+ {
+ 	struct cca_host_pf0_ep_dsc *pf0_ep_dsc;
+ 
+@@ -581,8 +581,94 @@ static int submit_pdev_state_transition_work(struct pci_dev *pdev,
+ 	return 0;
+ }
+ 
++static void pdev_collect_identity_workfn(struct work_struct *work)
 +{
-+	struct cca_host_pf0_ep_dsc *pf0_ep_dsc;
-+	unsigned int chain_size;
-+	unsigned int offset = 0;
-+	u8 *chain_data;
++	struct pci_tsm *tsm;
++	struct dev_comm_work *setup_work;
++	struct cca_host_pdev_dsc *pdev_dsc;
 +
-+	pf0_ep_dsc = to_cca_pf0_ep_dsc(tsm->pdev);
++	setup_work = container_of(work, struct dev_comm_work, work);
++	tsm = setup_work->tsm;
++	pdev_dsc = to_cca_pdev_dsc(tsm->dsm_dev);
 +
-+	/* If device communication didn't results in certificate caching. */
-+	if (!pf0_ep_dsc->cert_chain.cache || !pf0_ep_dsc->cert_chain.cache->offset)
-+		return -EINVAL;
++	guard(mutex)(&pdev_dsc->object_lock);
 +
-+	chain_size = pf0_ep_dsc->cert_chain.cache->offset;
-+	chain_data = pf0_ep_dsc->cert_chain.cache->buf;
++	do_dev_communicate(PDEV_COMMUNICATE, tsm, RMI_PDEV_ERROR);
 +
-+	while (offset < chain_size) {
-+		ssize_t cert_len =
-+			x509_get_certificate_length(chain_data + offset,
-+						    chain_size - offset);
-+		if (cert_len < 0)
-+			return cert_len;
-+
-+		struct x509_certificate *cert __free(x509_free_certificate) =
-+			x509_cert_parse(chain_data + offset, cert_len);
-+
-+		if (IS_ERR(cert)) {
-+			pci_warn(tsm->pdev, "parsing of certificate chain not successful\n");
-+			return PTR_ERR(cert);
-+		}
-+
-+		/* The key in the last cert in the chain is used */
-+		if (offset + cert_len == chain_size) {
-+			void *public_key __free(kfree) =
-+				kzalloc(cert->pub->keylen, GFP_KERNEL);
-+
-+			if (!public_key)
-+				return -ENOMEM;
-+
-+			if (!strcmp("ecdsa-nist-p256", cert->pub->pkey_algo)) {
-+				pf0_ep_dsc->rmi_signature_algorithm = RMI_SIG_ECDSA_P256;
-+			} else if (!strcmp("ecdsa-nist-p384", cert->pub->pkey_algo)) {
-+				pf0_ep_dsc->rmi_signature_algorithm = RMI_SIG_ECDSA_P384;
-+			} else if (!strcmp("rsa", cert->pub->pkey_algo)) {
-+				struct rsa_key rsa_key = {0};
-+				size_t skip = 0;
-+				int ret;
-+
-+				ret = rsa_parse_pub_key(&rsa_key, cert->pub->key,
-+							cert->pub->keylen);
-+				if (ret)
-+					return ret;
-+
-+				while (skip < rsa_key.n_sz && !rsa_key.n[skip])
-+					skip++;
-+
-+				/* check we have 3072 bits len */
-+				if ((rsa_key.n_sz - skip) != (3072 >> 3))
-+					return -EINVAL;
-+
-+				pf0_ep_dsc->rmi_signature_algorithm = RMI_SIG_RSASSA_3072;
-+			} else {
-+				return -EINVAL;
-+			}
-+
-+			memcpy(public_key, cert->pub->key, cert->pub->keylen);
-+			pf0_ep_dsc->cert_chain.public_key = no_free_ptr(public_key);
-+			pf0_ep_dsc->cert_chain.public_key_size = cert->pub->keylen;
-+			pf0_ep_dsc->cert_chain.valid = true;
-+			return 0;
-+		}
-+
-+		offset += cert_len;
-+	}
-+
-+	/* something wrong with chain size and parsing. */
-+	return -EINVAL;
++	/*
++	 * Don't worry about communication error. The caller will look at
++	 * device state to find more about error
++	 */
 +}
 +
-+static inline void key_param_free(struct rmi_public_key_params *param)
++int cca_pdev_collect_identity(struct pci_dev *pdev)
 +{
-+	return free_page((unsigned long)param);
-+}
++	enum rmi_pdev_state state;
++	struct dev_comm_work comm_work;
++	struct cca_host_pdev_dsc *pdev_dsc = to_cca_pdev_dsc(pdev);
++	struct cca_host_comm_data *comm_data = to_cca_comm_data(pdev);
 +
-+static inline int copy_key_part(u8 *buf, const u8 *key_buf, size_t sz)
-+{
-+	int skip;
++	/*
++	 * Device identity is collected by doing a device communication
++	 * after a pdev_create
++	 */
++	INIT_WORK_ONSTACK(&comm_work.work, pdev_collect_identity_workfn);
++	comm_work.tsm = pdev->tsm;
 +
-+	/* skip leading zero in asn.1 */
-+	for (skip = 0; skip < sz; skip++)
-+		if (key_buf[skip])
-+			break;
++	queue_work(comm_data->work_queue, &comm_work.work);
 +
-+	memcpy(buf, key_buf + skip, sz - skip);
-+	return sz - skip;
-+}
++	flush_work(&comm_work.work);
++	destroy_work_on_stack(&comm_work.work);
 +
-+DEFINE_FREE(key_param_free, struct rmi_public_key_params *, if (_T) key_param_free(_T))
-+static int __maybe_unused pdev_set_public_key(struct pci_tsm *tsm)
-+{
-+	struct cca_host_pf0_ep_dsc *pf0_ep_dsc;
++	/* check for device communication error*/
++	if (rmi_pdev_get_state(virt_to_phys(pdev_dsc->rmm_pdev), &state))
++		return -EIO;
 +
-+	pf0_ep_dsc = to_cca_pf0_ep_dsc(tsm->pdev);
-+	/* Check that all the necessary information was captured from communication */
-+	if (!pf0_ep_dsc->cert_chain.valid)
-+		return -EINVAL;
++	if (state == RMI_PDEV_ERROR)
++		return -EPROTO;
 +
-+	struct rmi_public_key_params *key_params __free(key_param_free) =
-+		(struct rmi_public_key_params *)get_zeroed_page(GFP_KERNEL);
-+	if (!key_params)
-+		return -ENOMEM;
-+
-+	key_params->rmi_signature_algorithm = pf0_ep_dsc->rmi_signature_algorithm;
-+
-+	switch (key_params->rmi_signature_algorithm) {
-+	case RMI_SIG_ECDSA_P384:
-+	case RMI_SIG_ECDSA_P256:
-+	{
-+		key_params->public_key_len = pf0_ep_dsc->cert_chain.public_key_size;
-+		memcpy(key_params->public_key,
-+		       pf0_ep_dsc->cert_chain.public_key,
-+		       pf0_ep_dsc->cert_chain.public_key_size);
-+		key_params->metadata_len = 0;
-+		break;
-+	}
-+	case RMI_SIG_RSASSA_3072:
-+	{
-+		int ret;
-+		struct rsa_key rsa_key = {0};
-+
-+		ret = rsa_parse_pub_key(&rsa_key,
-+					pf0_ep_dsc->cert_chain.public_key,
-+					pf0_ep_dsc->cert_chain.public_key_size);
-+		if (ret)
-+			return ret;
-+
-+		key_params->public_key_len = copy_key_part(key_params->public_key,
-+							   rsa_key.n, rsa_key.n_sz);
-+		key_params->metadata_len = copy_key_part(key_params->metadata,
-+							 rsa_key.e, rsa_key.e_sz);
-+		break;
-+	}
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	if (rmi_pdev_set_pubkey(virt_to_phys(pf0_ep_dsc->pdev.rmm_pdev),
-+				virt_to_phys(key_params)))
-+		return -ENXIO;
 +	return 0;
 +}
 +
- static void pdev_state_transition_workfn(struct work_struct *work)
++bool cca_pdev_needs_key(struct pci_dev *pdev)
++{
++	enum rmi_pdev_state state;
++	struct cca_host_pdev_dsc *pdev_dsc = to_cca_pdev_dsc(pdev);
++
++	/*
++	 * Consider pdev_get_state failure as need key transition
++	 * and that will result in device communication failure, which
++	 * will handle this error.
++	 */
++	if (rmi_pdev_get_state(virt_to_phys(pdev_dsc->rmm_pdev), &state))
++		return true;
++
++	if (state == RMI_PDEV_NEEDS_KEY)
++		return true;
++	return false;
++}
++
++int cca_pdev_set_public_key(struct pci_dev *pdev)
++{
++	int ret;
++
++	/*
++	 * we now have certificate chain in dsm->cert_chain. Parse that and set
++	 * the pubkey.
++	 */
++	ret = parse_certificate_chain(pdev->tsm);
++	if (ret)
++		return ret;
++
++	ret = pdev_set_public_key(pdev->tsm);
++	if (ret)
++		return ret;
++
++	return submit_pdev_state_transition_work(pdev, RMI_PDEV_READY);
++}
++
+ static inline int rmi_pdev_destroy(unsigned long pdev_phys,
+-			   unsigned long *rmi_ret)
++		unsigned long *rmi_ret)
  {
- 	unsigned long state;
+ 	struct rmi_sro_state *sro __free(sro) =
+ 		rmi_sro_init(SMC_RMI_PDEV_DESTROY, pdev_phys);
 diff --git a/drivers/virt/coco/arm-cca-host/rmi-da.h b/drivers/virt/coco/arm-cca-host/rmi-da.h
-index 784eb1fff95d..7d38e548b659 100644
+index 7d38e548b659..240b2993ae53 100644
 --- a/drivers/virt/coco/arm-cca-host/rmi-da.h
 +++ b/drivers/virt/coco/arm-cca-host/rmi-da.h
-@@ -59,6 +59,7 @@ struct cca_host_pdev_dsc {
-  * @pci: Physical Function 0 TDISP link context
-  * @pdev: pdev communication context
-  * @sel_stream: Selective IDE Stream descriptor
-+ * @rmi_signature_algorithm: Signature algorithm used for public key
-  * @cert_chain: cetrificate chain
-  * @vca: SPDM's Version-Capabilities-Algorithms cache object
-  */
-@@ -67,6 +68,7 @@ struct cca_host_pf0_ep_dsc {
- 	struct cca_host_pdev_dsc pdev;
- 	struct pci_ide *sel_stream;
+@@ -135,6 +135,9 @@ static inline struct cca_host_comm_data *to_cca_comm_data(struct pci_dev *pdev)
+ }
  
-+	uint8_t rmi_signature_algorithm;
- 	struct {
- 		struct cache_object *cache;
+ int cca_pdev_create(struct pci_dev *pdev);
++int cca_pdev_collect_identity(struct pci_dev *pdev);
++bool cca_pdev_needs_key(struct pci_dev *pdev);
++int cca_pdev_set_public_key(struct pci_dev *pdev);
+ void cca_pdev_stop_and_destroy(struct pci_dev *pdev);
  
+ #endif
 -- 
 2.43.0
 
