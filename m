@@ -1,125 +1,137 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7DF31F9A7;
-	Sun, 26 Apr 2026 14:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A0F2773E5;
+	Mon, 27 Apr 2026 06:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777212459; cv=none; b=nLG07ymWNvGIxWVQVaaQ/xmos+jKYUpmJbpjf0GCa2yK6sc3yarIOXcOf1hoelXOQkvvPBPWp0lzaO0PIOGMcjeiorHhli1miCtx+J4DqXTgWBf0zqirKsLM5UFz9eEBOcsZWkYxeM9rET1Cf41pm8Y7KujPFEsQG4zrXmUylXQ=
+	t=1777271477; cv=none; b=XiE1v4jQG22bow2Yx4MWzZ66TdKjHccPuis7ZyP+Ykw1+/YyJ/3RTvK/m2gyLsvByBYJyITry4BlCYNHXp6JtBuJ7kEXiRjHnNT9PN/Ca4sneVj3rgT4Kmxw81BSgFFy3fIZ2QI51LPxAJ69XWbDGiCfJOxxwlxQeAWcSI+toN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777212459; c=relaxed/simple;
-	bh=lDY502D0UwTlnUwqf8BtPahtm7twsTmu8HFtn+sm0IA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dxM+bv0r8cdHflf5DKClX+cUu4qQriM5w1o7GfQ8F2/F6LE1VVzDwfvn8lh/HehdG+6Xw2O4kj11C+e6sO+qzjW0kgDn5662KqtEb+Cl0tLF55FatYzX7ZZfv4Gj79g0tHKGV1JlIebxIXu61UyiXzE8jcsF1L1YRN084VuXRws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tH7DMitl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777271477; c=relaxed/simple;
+	bh=TT3ZABo3gdbLCPLVCA/3gAb1IpW94r3+NRwJmZ4Vdas=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fPUJpCPo1o2Wtic4hKBBqXisH/4uJMXVm+xiPKYYvla/liWWSa4cCExUDtumv3IBlNw0FXLI+KMxEJ9xuxMVjDTJi+vtL8ZdBq1sPcLoGUeTewwC84cJvo2oJC6ok6szFRgPiDYOyBJ6CiO53m0vE/tiEmW7AztggQ9ytEI56+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r44Pt2ZR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tH7DMitl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9C2C2BCAF;
-	Sun, 26 Apr 2026 14:07:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r44Pt2ZR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9294DC19425;
+	Mon, 27 Apr 2026 06:31:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777212459;
-	bh=lDY502D0UwTlnUwqf8BtPahtm7twsTmu8HFtn+sm0IA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tH7DMitlSokecV8h+r6UW83iqIZELeQsvftYXNCwbWJ4C1tGsegwbFrQwE8VRLIol
-	 pdOPTL5FUBTWxqfYLt3YWZOTmZ06lkNOZRAKdTSqbouqHoUEMyemuj1pbvXGPVse2u
-	 F/EYw15WAetJgngUM32zjvi9O6m9TA+Ww0qQG9A1qaB5LXBYujRuLmbvLwg/s46wmH
-	 XO/Oo18VWtjN1/TECD1FWniOIDDXuN5zmlWI7FaX+lsuxs5VirkvkLZ9axgQN2yLSk
-	 XR8Yh/ZDZt64YYJ9u0bBs9jhqEegHr5aFTjc2tTVqXuYVyRs/lSlBUGv7BFwWW+LcU
-	 Oew3uCGUnOUdQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wH092-0000000EnUE-3vU3;
-	Sun, 26 Apr 2026 14:07:37 +0000
-Date: Sun, 26 Apr 2026 15:07:36 +0100
-Message-ID: <87ik9dbys7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown
- <broonie@kernel.org>,
-	kvm@vger.kernel.org,
+	s=k20201202; t=1777271476;
+	bh=TT3ZABo3gdbLCPLVCA/3gAb1IpW94r3+NRwJmZ4Vdas=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r44Pt2ZR8rT+xlusdriUwtEEiy0YDkqD78pNWIlbVj1zLLqmVZqNduCbhvByi5Gj1
+	 EY0vxn4WO9IibbXFwfukUBlRyxBywJQDBgAsApZqir9RmRIX4wWwnCKMPhd8rFvkW9
+	 rM+wvm9fdz+dI/adkMdR5TWdwGljh/eQxGjfEOCHvOC/iq7w1U9A9mVM3beYdOqvFY
+	 IeuXC0ThOAbGcl9mBXzDBj9DzSRRtv6lshW7bFFILIha/gOM3qsAL9O7TiP42nXf04
+	 x+kpAWvF/LB0JbnIZ1fqUqkSZ/YSEm8UajaIMvm3/AhI4Ps4rMbwvyp7YkLJyAIMi9
+	 igb4TCgupRd1A==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Darren Hart <darren@os.amperecomputing.com>
-Subject: Re: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-In-Reply-To: <861pg213to.wl-maz@kernel.org>
-References: <20251120172540.2267180-1-maz@kernel.org>
-	<20251120172540.2267180-36-maz@kernel.org>
-	<2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
-	<878qb9cxzr.wl-maz@kernel.org>
-	<1e050b67-2276-41ad-9265-796ba853dc7c@os.amperecomputing.com>
-	<86a4vo49ni.wl-maz@kernel.org>
-	<86eck71o1v.wl-maz@kernel.org>
-	<e283e755-c348-43cf-b5fe-278c5eab742d@os.amperecomputing.com>
-	<861pg213to.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvmarm@lists.linux.dev
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v4 0/3] Enforce host page-size alignment for shared buffers
+Date: Mon, 27 Apr 2026 12:01:05 +0530
+Message-ID: <20260427063108.909019-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vishnu@os.amperecomputing.com, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, darren@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, 26 Apr 2026 10:14:11 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Wed, 22 Apr 2026 15:57:44 +0100,
-> Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On 22-04-2026 12:25, Marc Zyngier wrote:
-> > >
-> > > Have you made progress on this? I can't reproduce it at all despite my
-> > > best effort. I'm perfectly happy to help, but you need to give me
-> > > *something* to go on.
-> > 
-> > 
-> > Thanks for your support!!
-> > 
-> > The issue is triggered as soon as the timer interrupt (IRQ 27) is
-> > deactivated. Preventing the deactivation of IRQ 27 during nested VGIC
-> > state transitions prevents the failure from reproducing.
-> 
-> Which level of deactivation? From L2 to L1? Or L1 to L0? The former
-> should just be a an update to the irq structure, while the latter is
-> effectively a write to ICC_DIR_EL1, and *that* is a new behaviour
-> introduced by this patch.
-> 
-> I wonder if your implementation is such that ICC_DIR_EL1 is trapped by
-> ICH_HCR_EL2.TDIR, which is allowed by the architecture, but that none
-> of the two implementations I have actually enforce (the trap only
-> applies to ICV_DIR_EL1). Can you try the hack below which disables the
-> traps much earlier, and let me know if that helps?
-> 
-> Even if that's the case, this should result in an EL2->EL2 exception,
-> and that should be caught as an unhandled exception in entry-common.c,
-> so something else is afoot.
+Hi all,
 
-Actually, this should never happen. ICH_HCR_EL2.TDIR is constructed
-like all the other GICv3 trap bits, in the sense that it only traps
-accesses from EL1, not EL2 (for sanity reasons, I'm not considering
-the possibility of a trap to EL3...).
+This patch series addresses alignment requirements for buffers shared between
+private-memory guests and the host.
 
-Still, I'm interested in finding out if that hack helps at all.
+When running private-memory guests, the guest kernel must apply additional
+constraints when allocating buffers that are shared with the hypervisor. These
+shared buffers are also accessed by the host kernel and therefore must be
+aligned to the host’s page size.
 
-Thanks,
+Architectures such as Arm can tolerate realm physical address space PFNs being
+mapped as shared memory, as incorrect accesses are detected and reported as GPC
+faults. However, relying on this mechanism alone is unsafe and can still lead to
+kernel crashes.
 
-	M.
+This is particularly likely when guest_memfd allocations are mmapped and
+accessed from userspace. Once exposed to userspace, it is not possible to
+guarantee that applications will only access the intended 4K shared region
+rather than the full 64K page mapped into their address space. Such userspace
+addresses may also be passed back into the kernel and accessed via the linear
+map, potentially resulting in a GPC fault and a kernel crash.
+
+To address this, the series introduces a new helpers,
+mem_decrypt_granule_size() and mem_decrypt_align(), which allows callers to
+enforce the required alignment for shared buffers.
+
+Changes from v3:
+https://lore.kernel.org/all/20260309102625.2315725-1-aneesh.kumar@kernel.org
+* Fix build error reported by kernel test robot <lkp@intel.com>
+
+Changes from v2:
+https://lore.kernel.org/all/20251221160920.297689-1-aneesh.kumar@kernel.org
+* Rebase to latest kernel
+* Consider swiotlb always decrypted and don't align when allocating from swiotlb.
+
+Changes from v1:
+* Rename the helper to mem_encrypt_align
+* Improve the commit message
+* Handle DMA allocations from contiguous memory
+* Handle DMA allocations from the pool
+* swiotlb is still considered unencrypted. Support for an encrypted swiotlb pool
+  is left as TODO and is independent of this series.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: Steven Price <steven.price@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+
+Aneesh Kumar K.V (Arm) (3):
+  dma-direct: swiotlb: handle swiotlb alloc/free outside
+    __dma_direct_alloc_pages
+  swiotlb: dma: its: Enforce host page-size alignment for shared buffers
+  coco: guest: arm64: Query host IPA-change alignment via RHI
+
+ arch/arm64/include/asm/mem_encrypt.h |  3 ++
+ arch/arm64/include/asm/rhi.h         | 24 ++++++++++++
+ arch/arm64/include/asm/rsi.h         |  2 +
+ arch/arm64/include/asm/rsi_cmds.h    | 10 +++++
+ arch/arm64/include/asm/rsi_smc.h     |  7 ++++
+ arch/arm64/kernel/Makefile           |  2 +-
+ arch/arm64/kernel/rhi.c              | 54 ++++++++++++++++++++++++++
+ arch/arm64/kernel/rsi.c              | 13 +++++++
+ arch/arm64/mm/mem_encrypt.c          | 27 +++++++++++--
+ drivers/irqchip/irq-gic-v3-its.c     | 20 ++++++----
+ include/linux/mem_encrypt.h          | 14 +++++++
+ kernel/dma/contiguous.c              | 10 +++++
+ kernel/dma/direct.c                  | 58 ++++++++++++++++++++++++----
+ kernel/dma/pool.c                    |  4 +-
+ kernel/dma/swiotlb.c                 | 21 ++++++----
+ 15 files changed, 240 insertions(+), 29 deletions(-)
+ create mode 100644 arch/arm64/include/asm/rhi.h
+ create mode 100644 arch/arm64/kernel/rhi.c
 
 -- 
-Jazz isn't dead. It just smells funny.
+2.43.0
+
