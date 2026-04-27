@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20BF3976A7;
-	Mon, 27 Apr 2026 08:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D2139B4BB;
+	Mon, 27 Apr 2026 08:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777278531; cv=none; b=GFT9pVstdNi+FFo6LVCoIt+1jR77IR1Tv5LgDMptVydCpc1vrKybivialkjsKx00O4i+coBM52ckU1/qZgMz0JAjdTQ7q6sgFWTK7FZiKT4RbZ6VY89U2cXKll58ziDumhQp/qpIo6VfRX6NchY1JJQ40MIwa4lboKP/H4LBQRg=
+	t=1777278536; cv=none; b=gc/VmdNkksdJCJAF7rCIxlJxieeze2eQ1/ENb6/Ypm19nbEAvU0x/NhthqwpRVXRMve5mmMjDGITCRz4hFbK+HzpFzQuEESogt+HLwFTK0lhVzAHWsVrSyJyVs7rqAUDqNdbsWZuipsJ9wg2him56JIt/FnPqnRKWDfOzeneuiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777278531; c=relaxed/simple;
-	bh=jNp9qsUFxSqnqXy8TKaLW9c3z208YtDH/OH/IkVAaus=;
+	s=arc-20240116; t=1777278536; c=relaxed/simple;
+	bh=wu76r3KqQHzB0XTeHOywZ8WdvI29/olctlHPyOL7BJw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dzb5QWpr5H5zZ3Q6xCj4JXVgiDRKDfYDBhkxn3f2KvOpthwLQnQzHWS71QHl0A9FVtU0oYm3XGNm2Q5w4L0CG6oE7bkTQ7bU3Zd0byB+ayjRnRkZYYy8Q1VbbBUem4x0S+gx4WYllZvDbjfBQ6wKWWQmxTGKjs4PDA6VosGtVoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFWMOqPw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=rtOlM84vx85YiF5BN5JzQaseC3DXA20dikDeMTvFzZ+rm9U9JV/dqxUckZS87XZT1rbfeZrTnQzhVfctKJrPyXI0+AdM5sj/HQHGxa5Y2Ll27osnPcsQWsaTczx5T+6Ccvk6WWpo4nR27I5uVFxNZYbmS+z3th9VmCdYjMMLVz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M6hyVm5I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFWMOqPw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0599FC2BCB8;
-	Mon, 27 Apr 2026 08:28:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M6hyVm5I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D577C2BCB4;
+	Mon, 27 Apr 2026 08:28:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777278530;
-	bh=jNp9qsUFxSqnqXy8TKaLW9c3z208YtDH/OH/IkVAaus=;
+	s=k20201202; t=1777278536;
+	bh=wu76r3KqQHzB0XTeHOywZ8WdvI29/olctlHPyOL7BJw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fFWMOqPwJi48SZarPWAHd4BJJEYN3M48EvZo/ZcW1uVch3BPU4TJTe7P4aXrMXsEa
-	 B/GLlZ+TFaS6lQl4SjDQazt2Zj2yYaYDZccxBx7onPzj+9Bsnn3XB4o0RTbGNfKBPA
-	 U53qyPu67sGXgYC9yzhY63cIAQcDgZRlwKXxbr+oRFQNsGfjjUQiXM0Dv9E736u8g+
-	 3O0fYf98eVcVaHruaj1jQxbXNzA5N5vHymnwJ5urDXOBGbKBJReAp71jgUh0LrO3a8
-	 xE+2Py6eLkY0t9J51OcqM53yGqnPAG0GeH5hRbvbfig0XdGU55wJtySce8KRQbwl2b
-	 Kkp9oaP3k5q+w==
+	b=M6hyVm5IUTngiLy+iyNTcGnimc+oyXKEMpR6JQhxWFARvWLacTSnaB9c4/Od3vXQH
+	 vp9GujBO6siEYCqoSq0OuM4htGN8ekkZgV6BUuQKWLq1c/n0engXJRgqwhzfTm9rRf
+	 FwZf4xHxiK8CyYtpZh4VnXtTuxwespBjmmAURBMFM2LUjjSicwIIyqz9e4wn9CdfFI
+	 r6JOQ4DTtUxe9Q4X70zC6H5/u0iklWF0ZcWb4kVnjuIXru+kRCTGE2NEih/yjW0htD
+	 FvkY7ttN3vT6dnOXzPzKVK7EXk4gK3kB1UV2VBhzKJd8Ly0aKMCG640WcT90I4oPZg
+	 6GPiuvR2vRubA==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: [RFC PATCH v4 07/11] coco: guest: arm64: Add guest APIs to read host-cached DA objects
-Date: Mon, 27 Apr 2026 13:58:01 +0530
-Message-ID: <20260427082805.931832-8-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v4 08/11] coco: guest: arm64: Verify DA evidence with RSI_VDEV_GET_INFO digests
+Date: Mon, 27 Apr 2026 13:58:02 +0530
+Message-ID: <20260427082805.931832-9-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260427082805.931832-1-aneesh.kumar@kernel.org>
 References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
@@ -57,155 +57,702 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce guest-side helpers to read host-cached DA objects
-(certificate, VCA, interface report, and measurements).
+Add guest-side evidence verification based on RSI_VDEV_GET_INFO and use the
+verified TDISP interface report to validate Realm MMIO mappings.
 
-Add RHI_DA_OBJECT_SIZE and RHI_DA_OBJECT_READ definitions, then implement
-rhi_read_cached_object() that:
-- queries object size from host
-- validates size against MAX_CACHE_OBJ_SIZE
-- allocates a shared buffer
-- issues OBJECT_READ into shared memory
-- copies data into private memory and frees shared pages
+During lock:
+- refresh host caches from device
+- read certificate/VCA/interface-report/measurement objects from host cache
+- fetch trusted digest metadata from RSI_VDEV_GET_INFO
+- verify host-provided objects against RSI digests
+- initialize and populate PCI TSM evidence objects
+- preserve lock/meas/report nonces and digests in guest state
 
-Export the helper for later evidence-collection and verification code.
+Add mapping helpers to walk MMIO entries from the TDISP report and perform
+RSI_VDEV_VALIDATE_MAPPING on map, or RIPAS destroy on unmap. Reject malformed
+range progress while validating.
+
+During unlock:
+- invalidate mappings derived from the evidence report
+- unlock the device and tear down MMIO bookkeeping
+
+This ensures host-cached DA objects are cryptographically verified before
+being trusted for mapping and attestation state transitions.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- arch/arm64/include/asm/rhi.h             |  8 +++
- drivers/virt/coco/arm-cca-guest/rhi-da.c | 71 ++++++++++++++++++++++++
- drivers/virt/coco/arm-cca-guest/rhi-da.h |  1 +
- drivers/virt/coco/arm-cca-guest/rsi-da.h |  2 +
- 4 files changed, 82 insertions(+)
+ arch/arm64/include/asm/rsi_cmds.h         |  40 +++
+ arch/arm64/include/asm/rsi_smc.h          |  60 +++++
+ drivers/virt/coco/arm-cca-guest/Kconfig   |   2 +
+ drivers/virt/coco/arm-cca-guest/arm-cca.c | 287 +++++++++++++++++++++-
+ drivers/virt/coco/arm-cca-guest/rsi-da.c  | 145 +++++++++++
+ drivers/virt/coco/arm-cca-guest/rsi-da.h  |  22 ++
+ 6 files changed, 545 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/rhi.h b/arch/arm64/include/asm/rhi.h
-index 2b56a7760904..dc7a57370945 100644
---- a/arch/arm64/include/asm/rhi.h
-+++ b/arch/arm64/include/asm/rhi.h
-@@ -48,6 +48,14 @@ unsigned long rhi_get_ipa_change_alignment(void);
- 				 RHI_DA_FEATURE_VDEV_SET_TDI_STATE)
- #define RHI_DA_FEATURES			SMC_RHI_CALL(0x004B)
- 
-+#define RHI_DA_OBJECT_VCA			0x0
-+#define RHI_DA_OBJECT_CERTIFICATE		0x1
-+#define RHI_DA_OBJECT_MEASUREMENT		0x2
-+#define RHI_DA_OBJECT_INTERFACE_REPORT		0x3
-+#define RHI_DA_OBJECT_EXTENSION_EVIDENCE	0x4
-+#define RHI_DA_OBJECT_SIZE		SMC_RHI_CALL(0x004C)
-+#define RHI_DA_OBJECT_READ		SMC_RHI_CALL(0x004D)
-+
- #define RHI_DA_VDEV_CONTINUE		SMC_RHI_CALL(0x0051)
- 
- #define RHI_VDEV_MEASURE_HASH	0x0
-diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-index d0f5ae320f83..73c599802a93 100644
---- a/drivers/virt/coco/arm-cca-guest/rhi-da.c
-+++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-@@ -3,6 +3,8 @@
-  * Copyright (C) 2026 ARM Ltd.
-  */
- 
-+#include <linux/string.h>
-+
- #include "rsi-da.h"
- #include "rhi-da.h"
- 
-@@ -283,3 +285,72 @@ int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce)
- 		pci_err(pdev, "failed to get device measurement (%d)\n", ret);
- 	return ret;
+diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
+index 596bdc356f1a..f72d8e0cd422 100644
+--- a/arch/arm64/include/asm/rsi_cmds.h
++++ b/arch/arm64/include/asm/rsi_cmds.h
+@@ -186,4 +186,44 @@ static inline unsigned long rsi_features(unsigned long index, u64 *out)
+ 	return res.a0;
  }
+ 
++static inline long
++rsi_vdev_validate_mapping(unsigned long vdev_id,
++			  phys_addr_t ipa_base, phys_addr_t ipa_top,
++			  phys_addr_t pa_base, phys_addr_t *next_ipa,
++			  unsigned long flags, unsigned long lock_nonce,
++			  unsigned long meas_nonce, unsigned long report_nonce)
++{
++	struct arm_smccc_1_2_regs res;
++	struct arm_smccc_1_2_regs regs = {
++		.a0 = SMC_RSI_VDEV_VALIDATE_MAPPING,
++		.a1 = vdev_id,
++		.a2 = ipa_base,
++		.a3 = ipa_top,
++		.a4 = pa_base,
++		.a5 = flags,
++		.a6 = lock_nonce,
++		.a7 = meas_nonce,
++		.a8 = report_nonce,
++	};
 +
-+int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size)
++	arm_smccc_1_2_invoke(&regs, &res);
++	*next_ipa = res.a1;
++
++	if (res.a2 != RSI_ACCEPT)
++		return -EPERM;
++
++	return res.a0;
++}
++
++static inline unsigned long rsi_vdev_get_info(unsigned long vdev_id,
++					      unsigned long digest_phys)
++{
++	struct arm_smccc_res res;
++
++	arm_smccc_1_1_invoke(SMC_RSI_VDEV_GET_INFO,
++			     vdev_id, digest_phys, &res);
++
++	return res.a0;
++}
++
+ #endif /* __ASM_RSI_CMDS_H */
+diff --git a/arch/arm64/include/asm/rsi_smc.h b/arch/arm64/include/asm/rsi_smc.h
+index 4af4638fdd49..99b34b37b693 100644
+--- a/arch/arm64/include/asm/rsi_smc.h
++++ b/arch/arm64/include/asm/rsi_smc.h
+@@ -125,6 +125,9 @@
+ 
+ #ifndef __ASSEMBLER__
+ 
++#define RSI_HASH_SHA_256 0
++#define RSI_HASH_SHA_512 1
++
+ struct realm_config {
+ 	union {
+ 		struct {
+@@ -183,6 +186,63 @@ struct realm_config {
+  */
+ #define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
+ 
++#define RSI_VDEV_REPORT_FORMAT_TDISP 0x1
++struct rsi_vdevice_info {
++	union {
++		struct {
++			u64 flags;
++			u64 id_index;
++			union {
++				u8 hash_algo;
++				u64 padding0;
++			};
++			u64 lock_nonce;
++			u64 meas_nonce;
++			u64 report_nonce;
++			union {
++				u8 format_type;
++				u64 padding1;
++			};
++			u64 format_version;
++			union {
++				u8 state;
++				u64 padding2;
++			};
++
++		};
++		u8 padding3[0x80];
++	};
++	union { /* 0x80  */
++		struct {
++			u8 protocol_data_digest[0x40];
++			u8 identity_digest[0x40];
++			u8 pubkey_digest[0x40];
++			u8 meas_digest[0x40];
++			u8 report_digest[0x40];
++		};
++		u8 padding4[0x1c0 - 0x80];
++	};
++	union { /* 0x1c0  */
++		struct {
++			u64 vsmmu_addr;
++			u64 vsmu_vsid;
++		};
++		u8 padding5[0x200 - 0x1c0];
++	};
++};
++
++/*
++ * Get information for a device.
++ * arg1 == Realm device identifier (vdev id)
++ * arg2 == IPA to which configuration data will be written
++ * ret0 == Status / error
++ */
++#define SMC_RSI_VDEV_GET_INFO			SMC_RSI_FID(0x19D)
++
++#define RSI_DEV_MEM_COHERENT		BIT(0)
++#define RSI_DEV_MEM_LIMITED_ORDER	BIT(1)
++#define SMC_RSI_VDEV_VALIDATE_MAPPING		SMC_RSI_FID(0x19F)
++
+ struct rsi_host_call {
+ 	union {
+ 		u16 imm;
+diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
+index d295146bd92a..8ed4b95df5e4 100644
+--- a/drivers/virt/coco/arm-cca-guest/Kconfig
++++ b/drivers/virt/coco/arm-cca-guest/Kconfig
+@@ -5,6 +5,8 @@ config ARM_CCA_GUEST
+ 	tristate "Arm CCA Guest driver"
+ 	depends on ARM64
+ 	select PCI_TSM if PCI
++	select CRYPTO_LIB_SHA256
++	select CRYPTO_LIB_SHA512
+ 	select TSM_REPORTS
+ 	select AUXILIARY_BUS
+ 	help
+diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
+index 0f9cfb329a06..320dd5aa7b9a 100644
+--- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
++++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
+@@ -198,39 +198,304 @@ static void unregister_cca_tsm_report(void *data)
+ }
+ 
+ #ifdef CONFIG_PCI_TSM
++
++static int __maybe_unused
++cca_update_dev_measurements(struct pci_dev *pdev, const u8 *nonce)
 +{
 +	int ret;
-+	int data_size;
-+	void *data_buf_shared;
-+	struct page *shared_pages;
++	void *measurements;
++	int measurements_size;
++	int vdev_id = rsi_vdev_id(pdev);
++	struct pci_tsm_evidence *evidence;
++	struct rsi_vdevice_info *dev_info;
++	struct pci_tsm_evidence_object *obj;
++	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
 +
-+	*object_size = 0;
-+	*object = NULL;
-+
-+	struct rsi_host_call *rhicall __free(kfree) =
-+		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
-+	if (!rhicall)
-+		return -ENOMEM;
-+
-+	rhicall->imm = 0;
-+	rhicall->gprs[0] = RHI_DA_OBJECT_SIZE;
-+	rhicall->gprs[1] = vdev_id;
-+	rhicall->gprs[2] = da_object_type;
-+
-+	ret = rsi_host_call(rhicall);
-+	if (ret != RSI_SUCCESS)
-+		return -EIO;
-+
-+	if (rhicall->gprs[0] != RHI_DA_SUCCESS)
-+		return -EIO;
-+
-+	/* validate against the max cache object size used on host. */
-+	data_size = rhicall->gprs[1];
-+	if (data_size > MAX_CACHE_OBJ_SIZE || data_size == 0)
-+		return -EIO;
-+
-+	shared_pages = alloc_shared_pages(NUMA_NO_NODE, GFP_KERNEL, data_size);
-+	if (!shared_pages)
-+		return -ENOMEM;
-+
-+	data_buf_shared = page_address(shared_pages);
-+
-+	rhicall->imm = 0;
-+	rhicall->gprs[0] = RHI_DA_OBJECT_READ;
-+	rhicall->gprs[1] = vdev_id;
-+	rhicall->gprs[2] = da_object_type;
-+	rhicall->gprs[3] = virt_to_phys(data_buf_shared);
-+	rhicall->gprs[4] = data_size;
-+	rhicall->gprs[5] = 0; /* offset to read from */
-+	ret = rsi_host_call(rhicall);
-+	if (ret != RSI_SUCCESS || rhicall->gprs[0] != RHI_DA_SUCCESS) {
-+		free_shared_pages(shared_pages, data_size);
-+		return -EIO;
++	/* Regenerate the measurement from the device */
++	ret = rhi_update_vdev_measurements_cache(pdev, nonce);
++	if (ret) {
++		pci_err(pdev, "failed to update device measurements from device (%d)\n", ret);
++		return ret;
 +	}
 +
-+	if (data_size != rhicall->gprs[1]) {
-+		/* Short read */
-+		free_shared_pages(shared_pages, data_size);
-+		return -EIO;
++	ret = rhi_read_cached_object(vdev_id, RHI_DA_OBJECT_MEASUREMENT,
++				     &measurements, &measurements_size);
++	if (ret) {
++		pci_err(pdev, "failed to get device measurements from the host (%d)\n", ret);
++		return ret;
 +	}
 +
-+	void *data_buf_private = kvmemdup(data_buf_shared,
-+					  data_size, GFP_KERNEL);
-+	/* free the shared pages irrespective of error condition */
-+	free_shared_pages(shared_pages, data_size);
-+	if (!data_buf_private)
-+		return -ENOMEM;
++	dev_info = kmalloc(sizeof(*dev_info), GFP_KERNEL);
++	if (!dev_info) {
++		ret = -ENOMEM;
++		goto free_measurements;
++	}
 +
-+	*object = data_buf_private;
-+	*object_size = data_size;
++	if (rsi_vdev_get_info(vdev_id, virt_to_phys(dev_info))) {
++		pci_err(pdev, "failed to get device digests (%d)\n", ret);
++		ret = -EIO;
++		goto free_dev_info;
++	}
++
++	/* Make sure no unexpected lock/unlock operation happened from guest */
++	if (dsc->dev_info.lock_nonce != dev_info->lock_nonce) {
++		pci_err(pdev, "Unexpected lock/unlock operation from host (%d)\n", ret);
++		ret = -EIO;
++		goto free_dev_info;
++	}
++
++	/*
++	 * Verify that the digests of the provided reports match with the
++	 * digests from RMM
++	 */
++	ret = cca_verify_digest(dev_info->hash_algo, measurements,
++				measurements_size, dev_info->meas_digest);
++	if (ret) {
++		pci_err(pdev, "RMM provided digest mismatch (%d)\n", ret);
++		goto free_dev_info;
++	}
++
++	/* fill evidence details */
++	evidence = &dsc->pci.base_tsm.evidence;
++
++	/* Now update the evidence under lock. */
++	down_write(&evidence->lock);
++	evidence->generation = dev_info->meas_nonce;
++
++	obj = &evidence->obj[PCI_TSM_EVIDENCE_TYPE_MEASUREMENTS];
++	if (obj->data)
++		kvfree(obj->data);
++	obj->data = measurements;
++	obj->len = measurements_size;
++
++	dsc->dev_info.meas_nonce    = dev_info->meas_nonce;
++	memcpy(dsc->dev_info.meas_digest, dev_info->meas_digest, SHA512_DIGEST_SIZE);
++	up_write(&evidence->lock);
++
++	kfree(dev_info);
++	return 0;
++
++free_dev_info:
++	kfree(dev_info);
++free_measurements:
++	kvfree(measurements);
++	return ret;
++}
++
++static int cca_collect_dev_evidence(struct pci_dev *pdev, struct cca_guest_dsc *dsc)
++{
++	int ret;
++	int vdev_id = rsi_vdev_id(pdev);
++	struct pci_tsm_evidence *evidence;
++	struct rsi_vdevice_info *dev_info;
++	struct pci_tsm_evidence_object *obj;
++	void *certificate, *vca, *interface_report, *measurements;
++	int certificate_size, vca_size, interface_report_size, measurements_size;
++
++	/* Regenerate interface report and measurement from the device */
++	ret = cca_update_device_object_cache(pdev, NULL);
++	if (ret) {
++		pci_err(pdev, "failed to update device objects from device (%d)\n", ret);
++		return ret;
++	}
++
++	ret = rhi_read_cached_object(vdev_id, RHI_DA_OBJECT_CERTIFICATE,
++				     &certificate, &certificate_size);
++	if (ret) {
++		pci_err(pdev, "failed to get device certificate from the host (%d)\n", ret);
++		return ret;
++	}
++
++	ret = rhi_read_cached_object(vdev_id, RHI_DA_OBJECT_VCA, &vca, &vca_size);
++	if (ret) {
++		pci_err(pdev, "failed to get device VCA from the host (%d)\n", ret);
++		goto free_certificate;
++	}
++
++	ret = rhi_read_cached_object(vdev_id, RHI_DA_OBJECT_INTERFACE_REPORT,
++				     &interface_report, &interface_report_size);
++	if (ret) {
++		pci_err(pdev, "failed to get interface report from the host (%d)\n", ret);
++		goto free_vca;
++	}
++
++	ret = rhi_read_cached_object(vdev_id, RHI_DA_OBJECT_MEASUREMENT,
++				     &measurements, &measurements_size);
++	if (ret) {
++		pci_err(pdev, "failed to get device certificate from the host (%d)\n", ret);
++		goto free_interface_report;
++	}
++
++	dev_info = kmalloc(sizeof(*dev_info), GFP_KERNEL);
++	if (!dev_info) {
++		ret = -ENOMEM;
++		goto free_measurements;
++	}
++
++	if (rsi_vdev_get_info(vdev_id, virt_to_phys(dev_info))) {
++		pci_err(pdev, "failed to get device digests (%d)\n", ret);
++		ret = -EIO;
++		goto free_dev_info;
++	}
++
++	/* Make sure no unexpected lock/unlock operation happened from guest */
++	if (dsc->dev_info.lock_nonce != dev_info->lock_nonce) {
++		pci_err(pdev, "Unexpected lock/unlock operation from host (%d)\n", ret);
++		ret = -EIO;
++		goto free_dev_info;
++	}
++
++	/*
++	 * Verify that the digests of the provided reports match with the
++	 * digests from RMM
++	 */
++	ret = cca_verify_digests(dev_info->hash_algo, certificate,
++				 certificate_size, vca, vca_size,
++				 interface_report, interface_report_size,
++				 measurements, measurements_size, dev_info);
++	if (ret) {
++		pci_err(pdev, "RMM provided digest mismatch (%d)\n", ret);
++		goto free_dev_info;
++	}
++
++	/* fill evidence details */
++	evidence = &dsc->pci.base_tsm.evidence;
++
++	/* Now update the evidence under lock. */
++	down_write(&evidence->lock);
++	evidence->generation = dev_info->meas_nonce;
++
++	/* we default to slot 0 in pdev_create */
++	obj = &evidence->obj[PCI_TSM_EVIDENCE_TYPE_CERT0];
++	WARN_ON(obj->data);
++	obj->data = certificate;
++	obj->len = certificate_size;
++
++	obj = &evidence->obj[PCI_TSM_EVIDENCE_TYPE_VCA];
++	WARN_ON(obj->data);
++	obj->data = vca;
++	obj->len = vca_size;
++
++	obj = &evidence->obj[PCI_TSM_EVIDENCE_TYPE_REPORT];
++	WARN_ON(obj->data);
++	obj->data = interface_report;
++	obj->len = interface_report_size;
++
++	obj = &evidence->obj[PCI_TSM_EVIDENCE_TYPE_MEASUREMENTS];
++	WARN_ON(obj->data);
++	obj->data = measurements;
++	obj->len = measurements_size;
++
++	dsc->dev_info.meas_nonce    = dev_info->meas_nonce;
++	dsc->dev_info.report_nonce  = dev_info->report_nonce;
++	memcpy(dsc->dev_info.cert_digest, dev_info->identity_digest, SHA512_DIGEST_SIZE);
++	memcpy(dsc->dev_info.vca_digest, dev_info->protocol_data_digest, SHA512_DIGEST_SIZE);
++	memcpy(dsc->dev_info.meas_digest, dev_info->meas_digest, SHA512_DIGEST_SIZE);
++	memcpy(dsc->dev_info.report_digest, dev_info->report_digest, SHA512_DIGEST_SIZE);
++	up_write(&evidence->lock);
++
++	kfree(dev_info);
++	return 0;
++
++free_dev_info:
++	kfree(dev_info);
++free_measurements:
++	kvfree(measurements);
++free_interface_report:
++	kvfree(interface_report);
++free_vca:
++	kvfree(vca);
++free_certificate:
++	kvfree(certificate);
++	return ret;
++}
++
+ static struct pci_tsm *cca_tsm_lock(struct tsm_dev *tsm_dev, struct pci_dev *pdev)
+ {
+ 	int ret;
++	enum hash_algo digest_algo;
++	struct cca_guest_dsc *cca_dsc;
++	int vdev_id = rsi_vdev_id(pdev);
++	struct rsi_vdevice_info *dev_info;
+ 
+-	struct cca_guest_dsc *cca_dsc __free(kfree) =
+-		kzalloc_obj(struct cca_guest_dsc);
++	cca_dsc = kzalloc_obj(struct cca_guest_dsc);
+ 	if (!cca_dsc)
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	ret = pci_tsm_devsec_constructor(pdev, &cca_dsc->pci, tsm_dev);
+ 	if (ret)
+-		return ERR_PTR(ret);
++		goto free_cca_dsc;
+ 
+ 	ret = cca_device_lock(pdev);
+ 	if (ret)
+-		return ERR_PTR(ret);
++		goto free_cca_dsc;
+ 
+-	/* collect evidence without nonce */
+-	ret = cca_update_device_object_cache(pdev, NULL);
+-	if (ret) {
+-		cca_device_unlock(pdev);
+-		return ERR_PTR(ret);
++	dev_info = kmalloc_obj(struct rsi_vdevice_info);
++	if (!dev_info) {
++		ret = -ENOMEM;
++		goto dev_unlock;
++	}
++
++	if (rsi_vdev_get_info(vdev_id, virt_to_phys(dev_info))) {
++		ret = -EIO;
++		goto free_dev_info;
++	}
++
++	/* collect the lock nonce */
++	cca_dsc->dev_info.lock_nonce = dev_info->lock_nonce;
++
++	switch (dev_info->hash_algo) {
++	case RSI_HASH_SHA_256:
++		digest_algo = HASH_ALGO_SHA256;
++		break;
++	case RSI_HASH_SHA_512:
++		digest_algo = HASH_ALGO_SHA512;
++		break;
++	default:
++		ret = -EIO;
++		goto free_dev_info;
+ 	}
++	pci_tsm_init_evidence(&cca_dsc->pci.base_tsm.evidence,
++			      dev_info->id_index, digest_algo);
+ 
+-	return &no_free_ptr(cca_dsc)->pci.base_tsm;
++	/* collect evidence without nonce */
++	ret = cca_collect_dev_evidence(pdev, cca_dsc);
++	if (ret)
++		goto free_dev_info;
++
++	kfree(dev_info);
++	return &cca_dsc->pci.base_tsm;
++
++free_dev_info:
++	kfree(dev_info);
++dev_unlock:
++	cca_device_unlock(pdev);
++free_cca_dsc:
++	kfree(cca_dsc);
++	return ERR_PTR(ret);
+ }
+ 
+ static void cca_tsm_unlock(struct pci_tsm *tsm)
+ {
+-	struct cca_guest_dsc *cca_dsc = to_cca_guest_dsc(tsm->pdev);
++	long ret;
++	struct pci_dev *pdev = tsm->pdev;
++	struct cca_guest_dsc *cca_dsc = to_cca_guest_dsc(pdev);
++
++	/* invalidate dev mapping based on interface report */
++	ret = cca_unmap_evidence_report_range(tsm->pdev);
++	if (ret) {
++		pci_err(tsm->pdev, "failed to invalidate the interface report\n");
++		goto err_out;
++	}
+ 
+ 	cca_device_unlock(tsm->pdev);
++	pci_tsm_mmio_teardown(cca_dsc->pci.mmio);
+ 
++err_out:
++	/*
++	 * No error handling from this function. Leave the device locked
++	 */
++	pci_tsm_mmio_free(tsm->pdev, cca_dsc->pci.mmio);
+ 	kfree(cca_dsc);
+ }
+ 
+diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
+index 9f9e54174813..039138768f8f 100644
+--- a/drivers/virt/coco/arm-cca-guest/rsi-da.c
++++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
+@@ -6,6 +6,7 @@
+ #include <linux/pci.h>
+ #include <linux/mem_encrypt.h>
+ #include <asm/rsi_cmds.h>
++#include <crypto/hash.h>
+ 
+ #include "rsi-da.h"
+ #include "rhi-da.h"
+@@ -85,3 +86,147 @@ int cca_update_device_object_cache(struct pci_dev *pdev, const u8 *nonce)
+ 
+ 	return rhi_update_vdev_measurements_cache(pdev, nonce);
+ }
++
++static inline int
++rsi_validate_dev_mapping(unsigned long vdev_id, phys_addr_t start_ipa,
++		phys_addr_t end_ipa, phys_addr_t io_pa,
++		unsigned long flags, unsigned long lock_nonce,
++		unsigned long meas_nonce, unsigned long report_nonce)
++{
++	unsigned long ret;
++	phys_addr_t next_ipa;
++
++	while (start_ipa < end_ipa) {
++		ret = rsi_vdev_validate_mapping(vdev_id, start_ipa, end_ipa,
++						io_pa, &next_ipa, flags,
++						lock_nonce, meas_nonce, report_nonce);
++		if (ret || next_ipa <= start_ipa || next_ipa > end_ipa)
++			return -EINVAL;
++		io_pa += next_ipa - start_ipa;
++		start_ipa = next_ipa;
++	}
 +	return 0;
 +}
-diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.h b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-index d32ccc48c0d0..f7655d7ecf18 100644
---- a/drivers/virt/coco/arm-cca-guest/rhi-da.h
-+++ b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-@@ -13,4 +13,5 @@ bool rhi_has_da_support(void);
- int rhi_vdev_set_tdi_state(struct pci_dev *pdev, enum rhi_tdi_state target_state);
- int rhi_update_vdev_interface_report_cache(struct pci_dev *pdev);
- int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce);
-+int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size);
- #endif
++
++static inline int rsi_invalidate_dev_mapping(phys_addr_t start_ipa, phys_addr_t end_ipa)
++{
++	return rsi_set_memory_range(start_ipa, end_ipa, RSI_RIPAS_EMPTY,
++				    RSI_CHANGE_DESTROYED);
++}
++
++static int cca_apply_evidence_report_range(struct pci_dev *pdev,
++		struct pci_tsm_mmio *mmio, bool map)
++{
++	int i, ret;
++	struct resource *res;
++	unsigned long mmio_flags = 0; /* non coherent, not limited order */
++	int vdev_id = rsi_vdev_id(pdev);
++	struct pci_tsm_mmio_entry *entry;
++	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
++
++	for (i = 0; i < mmio->nr; i++) {
++		entry = pci_tsm_mmio_entry(mmio, i);
++		res = &entry->res;
++
++		if (res->desc != IORES_DESC_ENCRYPTED)
++			continue;
++
++		if (map)
++			ret = rsi_validate_dev_mapping(vdev_id, res->start,
++						       res->end + 1, entry->tsm_offset,
++						       mmio_flags,
++						       dsc->dev_info.lock_nonce,
++						       dsc->dev_info.meas_nonce,
++						       dsc->dev_info.report_nonce);
++		else
++			ret = rsi_invalidate_dev_mapping(res->start, res->end + 1);
++		if (ret)
++			return ret;
++	}
++	return 0;
++}
++
++int cca_map_evidence_report_range(struct pci_dev *pdev, struct pci_tsm_mmio *mmio)
++{
++	return cca_apply_evidence_report_range(pdev, mmio, true);
++}
++
++int cca_unmap_evidence_report_range(struct pci_dev *pdev)
++{
++	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
++	struct pci_tsm_mmio *tsm_mmio = dsc->pci.mmio;
++
++	return cca_apply_evidence_report_range(pdev, tsm_mmio, false);
++}
++
++int cca_verify_digest(u64 hash_algo, uint8_t *report,
++		size_t report_size, uint8_t *report_digest)
++{
++	u8 digest[SHA512_DIGEST_SIZE];
++	size_t digest_size;
++	void (*digest_func)(const u8 *data, size_t len, u8 *out);
++
++	switch (hash_algo) {
++	case RSI_HASH_SHA_256:
++		digest_func = sha256;
++		digest_size = SHA256_DIGEST_SIZE;
++		break;
++	case RSI_HASH_SHA_512:
++		digest_func = sha512;
++		digest_size = SHA512_DIGEST_SIZE;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	digest_func(report, report_size, digest);
++	if (memcmp(report_digest, digest, digest_size))
++		return -EINVAL;
++
++	return 0;
++}
++
++int cca_verify_digests(u64 hash_algo,
++		uint8_t *certificate, size_t certificate_size,
++		uint8_t *vca, size_t vca_size,
++		uint8_t *interface_report, size_t interface_report_size,
++		uint8_t *measurements, size_t measurements_size,
++		struct rsi_vdevice_info *dev_info)
++{
++	int ret;
++	struct {
++		uint8_t *report;
++		size_t size;
++		uint8_t *digest;
++	} reports[] = {
++		{
++			certificate,
++			certificate_size,
++			dev_info->identity_digest
++		},
++		{
++			vca,
++			vca_size,
++			dev_info->protocol_data_digest
++		},
++		{
++			interface_report,
++			interface_report_size,
++			dev_info->report_digest
++		},
++		{
++			measurements,
++			measurements_size,
++			dev_info->meas_digest
++		}
++
++	};
++
++	for (int i = 0; i < ARRAY_SIZE(reports); i++) {
++		ret = cca_verify_digest(hash_algo, reports[i].report,
++					reports[i].size, reports[i].digest);
++		if (ret)
++			return ret;
++	}
++	return 0;
++}
 diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-index 297cb800edc0..88067d2230ab 100644
+index 88067d2230ab..07a044d3e335 100644
 --- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
 +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-@@ -10,6 +10,8 @@
+@@ -9,11 +9,23 @@
+ #include <linux/pci.h>
  #include <linux/pci-tsm.h>
  #include <asm/rsi_smc.h>
++#include <crypto/sha2.h>
  
-+#define MAX_CACHE_OBJ_SIZE	SZ_16M
+ #define MAX_CACHE_OBJ_SIZE	SZ_16M
+ 
++struct dsm_device_info {
++	u64 lock_nonce;
++	u64 meas_nonce;
++	u64 report_nonce;
++	u8 cert_digest[SHA512_DIGEST_SIZE];
++	u8 vca_digest[SHA512_DIGEST_SIZE];
++	u8 meas_digest[SHA512_DIGEST_SIZE];
++	u8 report_digest[SHA512_DIGEST_SIZE];
++};
 +
  struct cca_guest_dsc {
  	struct pci_tsm_devsec pci;
++	struct dsm_device_info dev_info;
  };
+ 
+ static inline struct cca_guest_dsc *to_cca_guest_dsc(struct pci_dev *pdev)
+@@ -39,5 +51,15 @@ int cca_device_unlock(struct pci_dev *pdev);
+ int cca_update_device_object_cache(struct pci_dev *pdev, const u8 *nonce);
+ struct page *alloc_shared_pages(int nid, gfp_t gfp_mask, unsigned long min_size);
+ int free_shared_pages(struct page *page, unsigned long min_size);
++int cca_map_evidence_report_range(struct pci_dev *pdev, struct pci_tsm_mmio *mmio);
++int cca_unmap_evidence_report_range(struct pci_dev *pdev);
++int cca_verify_digest(u64 hash_algo, uint8_t *report,
++		size_t report_size, uint8_t *report_digest);
++int cca_verify_digests(u64 hash_algo,
++		uint8_t *certificate, size_t certificate_size,
++		uint8_t *vca, size_t vca_size,
++		uint8_t *interface_report, size_t interface_report_size,
++		uint8_t *measurements, size_t measurements_size,
++		struct rsi_vdevice_info *dev_info);
+ 
+ #endif
 -- 
 2.43.0
 
