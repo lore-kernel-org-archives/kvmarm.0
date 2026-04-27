@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FD8314D26;
-	Mon, 27 Apr 2026 08:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB9939A804;
+	Mon, 27 Apr 2026 08:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777278510; cv=none; b=JTpRbyrETsyNjiAaN/Jrfq0OvUivdmoHiz6moxb7xZEz2MnmKOjN38ENUgxaBZ0HDY5t6f9AW39NI3jusGYzH/CH5QfaA9UBf03Nssx4T10UPH404iygSJmMMueHsCEwFYp5kSW2KXUdygVOVgt04mNXh0di8StmNvmREL25ksM=
+	t=1777278515; cv=none; b=DQPMKKPefbLIBDkprPBKrvCAPJNlUhKlesqR+b11XNFDzqF4HC67f/8lCvug1ADp6rnTI9yvViDhuF9n/ngl4H5ewVwnBlqJIsbcfXwF7ds+KojOS2fe8xqwmDBL6zY1xLZlLRsz/PhKjPd7AFQsikJ39Nn2Ff4uCA9ZJqjO3M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777278510; c=relaxed/simple;
-	bh=r0yVakx/gXEjh2q8rhYrMYY91oldXQK13RYw+6V38lY=;
+	s=arc-20240116; t=1777278515; c=relaxed/simple;
+	bh=jWDox4PMeXivGPI3967QCwIkfrrCveT4HT7lOBVxKvQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uMF8oo3YdPUCPaXMRaqb2dZQkEuvkthDKLOQPU8N1w5wI1voCS9PKOZXm/KQpUuAihmnSBG6LwyCLlbYqPOsZXUnaMPQ2pjcv38EXKGVM2pg4H+UEUciuXUhLb4Cny7iyKJvRs7uxmztBPb5aGuUiwMxrB4oDWou+Iv+T/B3hmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W4SLoYUP; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KI0p9n2itu051hEuVEX7ZiBzsxNpIq7E8Ay6Lefq5SNX4zYobG9Ak/x7rE72hlmFVZZ4LUdAehmHtzLyzrTphLXqc5SZZPTj7orFzv6DpDjD83VcZKCFqwKLObVy+9dd2REZ88yDrQMCvwwTlBspYx2hndA1m+IfFVZljWTFesw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyW/3dlO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W4SLoYUP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEC02C2BCC7;
-	Mon, 27 Apr 2026 08:28:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyW/3dlO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39541C2BCB4;
+	Mon, 27 Apr 2026 08:28:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777278509;
-	bh=r0yVakx/gXEjh2q8rhYrMYY91oldXQK13RYw+6V38lY=;
+	s=k20201202; t=1777278514;
+	bh=jWDox4PMeXivGPI3967QCwIkfrrCveT4HT7lOBVxKvQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W4SLoYUPkrX78aoqQueMVG4qt48cDh/l1gLoqOje9/kLSMMboLNEJwBcRhNEwsrld
-	 hbNuoi87qelcJO5BmqrW5f3eR7+6ixvCYm39grUwFj1TUEd3ThL2nobNif7GjVgwoe
-	 9rCvJn8SQBAvzYyPQawOnDt29dvwS9YhuqPFsocB/68tKFN115s3job6WT0dCa0Dqt
-	 2RoX4wFskuRro/ZPA4798IfKnESjN+UArIaWnHEkQFb2lAjz/fdHDf5aktpCI+PEgJ
-	 ByraFbTNc8wXAMeAIsBVV32m9qnue//vnH663zW2ogHL+u6W8j/wPnpp5vrumQXAeP
-	 vZVaG9dL7Z3Dw==
+	b=UyW/3dlOMlRwKnrOYnLbYnIDHNXE7tD9O4VWiIfBYUg35tWP0ARIVH1awxO2vHjin
+	 DqBizOBPL6vdSGnIEJvtkIVrKEftfehCRX1UhXBZhS6KH7KeRi677YK99/JyPzsFkr
+	 YLR1cWGLVX4zz+Msl2nq1rUCSr6c9s38+DGkNXKJTKMgK/waqwzMNVoyvkqyacom/k
+	 lT5gOAe+8NtlcPP4RMG+ZpueZI/3FJXf6+glp6YpK6kQkut5NtEJKj1Ckaj1b98Ert
+	 iCCWivn83c/f7ZKhPxswIbODnxApI9YoSHGxen3zgAho8kRw6aMF9WJt+VKZZOLsHS
+	 7LL7Wanik2fGQ==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: [RFC PATCH v4 03/11] coco: guest: arm64: Add Realm Host Interface and guest DA helper
-Date: Mon, 27 Apr 2026 13:57:57 +0530
-Message-ID: <20260427082805.931832-4-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v4 04/11] coco: guest: arm64: Support guest-initiated TDI lock/unlock transitions
+Date: Mon, 27 Apr 2026 13:57:58 +0530
+Message-ID: <20260427082805.931832-5-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260427082805.931832-1-aneesh.kumar@kernel.org>
 References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
@@ -57,288 +57,111 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-- Add  guest-side rhi-da helper that drives the vdev TDI state machine
-  via RHI host calls and translates the firmware status codes
+Add guest helpers to drive TDI state transitions through RHI:
+- cca_device_lock() -> RHI_DA_TDI_CONFIG_LOCKED
+- cca_device_unlock() -> RHI_DA_TDI_CONFIG_UNLOCKED
 
-This provides the basic RHI plumbing that later DA features rely on.
+Use these helpers in the PCI TSM lock/unlock callbacks so a successful
+lock path returns a live pci_tsm handle and unlock transitions the device
+back to unlocked state.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- arch/arm64/include/asm/rhi.h              |  38 +++++
- drivers/virt/coco/arm-cca-guest/Makefile  |   1 +
- drivers/virt/coco/arm-cca-guest/arm-cca.c |   3 +-
- drivers/virt/coco/arm-cca-guest/rhi-da.c  | 163 ++++++++++++++++++++++
- drivers/virt/coco/arm-cca-guest/rhi-da.h  |  14 ++
- 5 files changed, 218 insertions(+), 1 deletion(-)
- create mode 100644 drivers/virt/coco/arm-cca-guest/rhi-da.c
- create mode 100644 drivers/virt/coco/arm-cca-guest/rhi-da.h
+ drivers/virt/coco/arm-cca-guest/Makefile  |  2 +-
+ drivers/virt/coco/arm-cca-guest/arm-cca.c |  9 ++++--
+ drivers/virt/coco/arm-cca-guest/rsi-da.c  | 34 +++++++++++++++++++++++
+ drivers/virt/coco/arm-cca-guest/rsi-da.h  |  3 ++
+ 4 files changed, 45 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rsi-da.c
 
-diff --git a/arch/arm64/include/asm/rhi.h b/arch/arm64/include/asm/rhi.h
-index 0895dd92ea1d..88de2d9b34d1 100644
---- a/arch/arm64/include/asm/rhi.h
-+++ b/arch/arm64/include/asm/rhi.h
-@@ -21,4 +21,42 @@ unsigned long rhi_get_ipa_change_alignment(void);
- #define __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT BIT(0)
- #define RHI_HOSTCONF_FEATURES		SMC_RHI_CALL(0x004F)
- #define RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT	SMC_RHI_CALL(0x0050)
-+
-+#define RHI_DA_SUCCESS				0x0
-+#define RHI_DA_INCOMPLETE			0x1
-+#define RHI_DA_ERROR_DATA_NOT_AVAILABLE		0x2
-+#define RHI_DA_ERROR_INVALID_VDEV_ID		0x3
-+#define RHI_DA_ERROR_INVALID_OBJECT		0x4
-+#define RHI_DA_ERROR_INPUT			0x5
-+#define RHI_DA_ERROR_DEVICE			0x6
-+#define RHI_DA_ERROR_INVALID_OFFSET		0x7
-+#define RHI_DA_ERROR_ACCESS_FAILED		0x8
-+#define RHI_DA_ERROR_BUSY			0x9
-+#define RHI_DA_ABORTED_OPERATION_HAD_COMPLETED	0xA
-+
-+#define RHI_DA_FEATURE_OBJECT_SIZE		BIT(0)
-+#define RHI_DA_FEATURE_OBJECT_READ		BIT(1)
-+#define RHI_DA_FEATURE_VDEV_CONTINUE		BIT(2)
-+#define RHI_DA_FEATURE_VDEV_GET_MEASUREMENT	BIT(3)
-+#define RHI_DA_FEATURE_VDEV_GET_INTF_REPORT	BIT(4)
-+#define RHI_DA_FEATURE_VDEV_SET_TDI_STATE	BIT(5)
-+
-+#define RHI_DA_BASE_FEATURE	(RHI_DA_FEATURE_OBJECT_SIZE |		\
-+				 RHI_DA_FEATURE_OBJECT_READ |		\
-+				 RHI_DA_FEATURE_VDEV_GET_INTF_REPORT |	\
-+				 RHI_DA_FEATURE_VDEV_GET_MEASUREMENT |	\
-+				 RHI_DA_FEATURE_VDEV_SET_TDI_STATE)
-+#define RHI_DA_FEATURES			SMC_RHI_CALL(0x004B)
-+
-+#define RHI_DA_VDEV_CONTINUE		SMC_RHI_CALL(0x0051)
-+
-+enum rhi_tdi_state {
-+	RHI_DA_TDI_CONFIG_UNLOCKED,
-+	RHI_DA_TDI_CONFIG_LOCKED,
-+	RHI_DA_TDI_CONFIG_RUN,
-+};
-+#define RHI_DA_VDEV_SET_TDI_STATE	SMC_RHI_CALL(0x0054)
-+
-+#define RHI_DA_VDEV_ABORT		SMC_RHI_CALL(0x0056)
-+
- #endif
 diff --git a/drivers/virt/coco/arm-cca-guest/Makefile b/drivers/virt/coco/arm-cca-guest/Makefile
-index 75a120e24fda..65c4cc52c154 100644
+index 65c4cc52c154..11db7af095c9 100644
 --- a/drivers/virt/coco/arm-cca-guest/Makefile
 +++ b/drivers/virt/coco/arm-cca-guest/Makefile
-@@ -2,3 +2,4 @@
+@@ -2,4 +2,4 @@
  obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
  
  arm-cca-guest-y +=  arm-cca.o
-+arm-cca-guest-$(CONFIG_PCI_TSM) +=  rhi-da.o
+-arm-cca-guest-$(CONFIG_PCI_TSM) +=  rhi-da.o
++arm-cca-guest-$(CONFIG_PCI_TSM) +=  rhi-da.o rsi-da.o
 diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-index 6f13c54fab73..0c12aae85e6d 100644
+index 0c12aae85e6d..d4880ca59fc5 100644
 --- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
 +++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-@@ -17,6 +17,7 @@
+@@ -211,14 +211,19 @@ static struct pci_tsm *cca_tsm_lock(struct tsm_dev *tsm_dev, struct pci_dev *pde
+ 	if (ret)
+ 		return ERR_PTR(ret);
  
- #ifdef CONFIG_PCI_TSM
- #include "rsi-da.h"
-+#include "rhi-da.h"
- #endif
+-	/* For now always return an error */
+-	return ERR_PTR(-EIO);
++	ret = cca_device_lock(pdev);
++	if (ret)
++		return ERR_PTR(ret);
++
++	return &no_free_ptr(cca_dsc)->pci.base_tsm;
+ }
  
- /**
-@@ -265,7 +266,7 @@ static int cca_devsec_tsm_probe(struct auxiliary_device *adev,
+ static void cca_tsm_unlock(struct pci_tsm *tsm)
+ {
+ 	struct cca_guest_dsc *cca_dsc = to_cca_guest_dsc(tsm->pdev);
  
- #ifdef CONFIG_PCI_TSM
- 	/* Allow tsm report even if tsm_register fails */
--	if (rsi_has_da_feature())
-+	if (rsi_has_da_feature() && rhi_has_da_support())
- 		cca_devsec_tsm_register(adev);
- #endif
++	cca_device_unlock(tsm->pdev);
++
+ 	kfree(cca_dsc);
+ }
  
-diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
+diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
 new file mode 100644
-index 000000000000..5b48c8d6ebe3
+index 000000000000..2c3017933fb0
 --- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-@@ -0,0 +1,163 @@
++++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
+@@ -0,0 +1,34 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Copyright (C) 2026 ARM Ltd.
++ * Copyright (C) 2025 ARM Ltd.
 + */
++
++#include <linux/pci.h>
++#include <asm/rsi_cmds.h>
 +
 +#include "rsi-da.h"
 +#include "rhi-da.h"
 +
-+/**
-+ * map_rhi_da_error - Map an RHI DA status to Linux errno
-+ * @rhi_da_error: RHI DA status value to translate
-+ *
-+ * Return: 0 for %RHI_DA_SUCCESS, %RHI_DA_INCOMPLETE when the caller must
-+ * continue the operation with rhi_vdev_continue(), or a negative errno for
-+ * all other failures. Unknown status codes are mapped to -EIO.
-+ */
-+static inline int map_rhi_da_error(unsigned long rhi_da_error)
-+{
-+	switch (rhi_da_error) {
-+	case RHI_DA_SUCCESS:
-+		return 0;
-+	case RHI_DA_INCOMPLETE:
-+		return RHI_DA_INCOMPLETE;
-+	case RHI_DA_ERROR_BUSY:
-+		return -EBUSY;
-+	case RHI_DA_ERROR_INPUT:
-+	case RHI_DA_ERROR_INVALID_VDEV_ID:
-+		return -EINVAL;
-+	case RHI_DA_ERROR_ACCESS_FAILED:
-+		return -EFAULT;
-+	case RHI_DA_ERROR_DEVICE:
-+		return -EIO;
-+	case RHI_DA_ERROR_INVALID_OBJECT:
-+		return -EINVAL;
-+	default:
-+		return -EIO;
-+	}
-+}
-+
-+bool rhi_has_da_support(void)
++int cca_device_lock(struct pci_dev *pdev)
 +{
 +	int ret;
 +
-+	struct rsi_host_call *rhi_call __free(kfree) =
-+		kmalloc(sizeof(*rhi_call), GFP_KERNEL);
-+	if (!rhi_call)
-+		return -ENOMEM;
-+
-+	rhi_call->imm = 0;
-+	rhi_call->gprs[0] = RHI_DA_FEATURES;
-+
-+	ret = rsi_host_call(rhi_call);
-+	if (ret != RSI_SUCCESS || rhi_call->gprs[0] == SMCCC_RET_NOT_SUPPORTED)
-+		return false;
-+
-+	/* For base DA to work we need these to be supported */
-+	if ((rhi_call->gprs[0] & RHI_DA_BASE_FEATURE) == RHI_DA_BASE_FEATURE)
-+		return true;
-+
-+	return false;
-+}
-+
-+static inline int rhi_vdev_continue(unsigned long vdev_id, unsigned long cookie)
-+{
-+	unsigned long ret;
-+
-+	struct rsi_host_call *rhi_call __free(kfree) =
-+		kmalloc(sizeof(*rhi_call), GFP_KERNEL);
-+	if (!rhi_call)
-+		return -ENOMEM;
-+
-+	rhi_call->imm = 0;
-+	rhi_call->gprs[0] = RHI_DA_VDEV_CONTINUE;
-+	rhi_call->gprs[1] = vdev_id;
-+	rhi_call->gprs[2] = cookie;
-+
-+	ret = rsi_host_call(rhi_call);
-+	if (ret != RSI_SUCCESS)
-+		return -EIO;
-+
-+	return map_rhi_da_error(rhi_call->gprs[0]);
-+}
-+
-+static int __rhi_vdev_abort(unsigned long vdev_id, unsigned long *da_error)
-+{
-+	unsigned long ret;
-+	struct rsi_host_call *rhi_call __free(kfree) =
-+		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
-+	if (!rhi_call)
-+		return -ENOMEM;
-+
-+	rhi_call->imm = 0;
-+	rhi_call->gprs[0] = RHI_DA_VDEV_ABORT;
-+	rhi_call->gprs[1] = vdev_id;
-+
-+	ret = rsi_host_call(rhi_call);
-+	if (ret != RSI_SUCCESS)
-+		return -EIO;
-+
-+	*da_error = rhi_call->gprs[0];
++	ret = rhi_vdev_set_tdi_state(pdev, RHI_DA_TDI_CONFIG_LOCKED);
++	if (ret) {
++		pci_err(pdev, "failed to lock the device (%d)\n", ret);
++		return ret;
++	}
 +	return 0;
 +}
 +
-+static bool should_abort_rhi_call_loop(unsigned long vdev_id)
++int cca_device_unlock(struct pci_dev *pdev)
 +{
 +	int ret;
 +
-+	cond_resched();
-+	if (signal_pending(current)) {
-+		unsigned long da_error;
-+
-+		ret = __rhi_vdev_abort(vdev_id, &da_error);
-+		/* consider all kind of error as not aborted */
-+		if (!ret && (da_error == RHI_DA_SUCCESS))
-+			return true;
++	ret = rhi_vdev_set_tdi_state(pdev, RHI_DA_TDI_CONFIG_UNLOCKED);
++	if (ret) {
++		pci_err(pdev, "failed to unlock the device (%d)\n", ret);
++		return ret;
 +	}
-+	return false;
++	return 0;
 +}
+diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
+index 858bfdaf59c9..06fcea95d888 100644
+--- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
++++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
+@@ -32,4 +32,7 @@ static inline int rsi_vdev_id(struct pci_dev *pdev)
+ 	       PCI_DEVID(pdev->bus->number, pdev->devfn);
+ }
+ 
++int cca_device_lock(struct pci_dev *pdev);
++int cca_device_unlock(struct pci_dev *pdev);
 +
-+static int __rhi_vdev_set_tdi_state(unsigned long vdev_id,
-+		enum rhi_tdi_state target_state, unsigned long *cookie)
-+{
-+	unsigned long ret;
-+
-+	struct rsi_host_call *rhi_call __free(kfree) =
-+		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
-+	if (!rhi_call)
-+		return -ENOMEM;
-+
-+	rhi_call->imm = 0;
-+	rhi_call->gprs[0] = RHI_DA_VDEV_SET_TDI_STATE;
-+	rhi_call->gprs[1] = vdev_id;
-+	rhi_call->gprs[2] = target_state;
-+
-+	ret = rsi_host_call(rhi_call);
-+	if (ret != RSI_SUCCESS)
-+		return -EIO;
-+
-+	*cookie = rhi_call->gprs[1];
-+	return map_rhi_da_error(rhi_call->gprs[0]);
-+}
-+
-+int rhi_vdev_set_tdi_state(struct pci_dev *pdev, enum rhi_tdi_state target_state)
-+{
-+	int ret;
-+	unsigned long cookie;
-+	int vdev_id = rsi_vdev_id(pdev);
-+
-+	for (;;) {
-+		ret = __rhi_vdev_set_tdi_state(vdev_id, target_state, &cookie);
-+		if (ret != -EBUSY)
-+			break;
-+		cond_resched();
-+	}
-+
-+	while (ret == RHI_DA_INCOMPLETE) {
-+		if (should_abort_rhi_call_loop(vdev_id))
-+			return -EINTR;
-+		ret = rhi_vdev_continue(vdev_id, cookie);
-+	}
-+
-+	return ret;
-+}
-diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.h b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-new file mode 100644
-index 000000000000..43c1cda8738d
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2026 ARM Ltd.
-+ */
-+
-+#ifndef _VIRT_COCO_RHI_DA_H_
-+#define _VIRT_COCO_RHI_DA_H_
-+
-+#include <asm/rhi.h>
-+
-+struct pci_dev;
-+bool rhi_has_da_support(void);
-+int rhi_vdev_set_tdi_state(struct pci_dev *pdev, enum rhi_tdi_state target_state);
-+#endif
+ #endif
 -- 
 2.43.0
 
