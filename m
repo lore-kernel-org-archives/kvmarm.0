@@ -1,101 +1,241 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0653D28C5B1;
-	Mon, 27 Apr 2026 08:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBB636F42B;
+	Mon, 27 Apr 2026 09:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777280137; cv=none; b=VJeNBYOOVAZ4kuG7wKi6kZtb+eYR/2XPqdDQo1H5U6utqJZJNlD1Dy5Vg9h+l+u0Ji+qmpooxVBMZw6Si4o/pSNJ5xgo+XBKwWMjkAl93/cYVvBiAA86ILKX12rxbpiHrZtY6WBenefc9R0nE11jPo8EMiVz0/o2oBqtUSp+4MU=
+	t=1777282047; cv=none; b=LDRGoUrEXnKJA+jamIG4l2MBjNhcARFvM4d5TLjKM92evYDpnZKliKNuN/DaZe8RplSdCDTxUHQjnBdiGnY4fpYzryVUZfvBezsCsScdgYSd9swoaNU+LjQIeNlqDiE+/0h6hrSJ5fD1hrY9ug/xWpOL2t+TU3+5e79g2r+UwxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777280137; c=relaxed/simple;
-	bh=bOeW3wbvkkrlNUf/VIWIVhSCHUYQcXavZMh9tYHAPFg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dsdhIru7QjrlNkPQ4SKxgImGrjG6dOYSgus61D3wEJcTBxXw9tC6ku5Wv3DpXxn4TAO3sRo8KartCBuripOTvzW7TOQeMOx2xYNqTWZ+4oxLDad1vI4LbO4laUn8vCHzejOcSEfBHukHp354brRg7XIVREHowH/75/CBqVXJVAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=el4gRSMh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777282047; c=relaxed/simple;
+	bh=miQQMID1hHUD427jdBzC3EbawWKRdBwwrYduccnjev8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ofV9vXqPB49FT3hKCBz50X1wcVlbH72lxPrLBADbNEhbz70oncKp9x5AlQGp1td2ZXL56Nwa0lpDkTxOF8RWuz/DpV2zn8f1Zf7WHdFQZMvsa0QNpyUjKthx3WkAv0YS3wH50aVLA5qtwwGD9KaFV9cvJFflxZ+H/PBHClz3LSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTsgR9nT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="el4gRSMh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B750C19425;
-	Mon, 27 Apr 2026 08:55:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTsgR9nT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 710C4C19425;
+	Mon, 27 Apr 2026 09:27:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777280136;
-	bh=bOeW3wbvkkrlNUf/VIWIVhSCHUYQcXavZMh9tYHAPFg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=el4gRSMhKtyPa8PfIyrtLcnxhEU67PzIeRckrMU2d/sCX6uHEDbYVpT1z9/3kcR3m
-	 FhXZyRQefVv5RMhGqFZpoIrSX2eLxueKjxm5Lf745+Xx9Vl5vzvUI/QzJDmEk2bs6M
-	 dXoNySpemHjGRhOdJV+1CbZ5rR9AzeScSn5m4cS7SIGQrBk2Mc5uQz8EjORYM9AND6
-	 CzAruS+R8Ns3bdfknS3S6cZjM9LXRtUHF2jlw4BUIsA2kiqsD7xH8lvqLjESw0zc1O
-	 q++suWnwXeV9RZIQqBt57xDCY853fmmbJ40ncaS4CQZh283hJx2N3oSQ+0Xee2k4Nv
-	 BY3rWVUtKlVHA==
-From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-To: linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev,
+	s=k20201202; t=1777282046;
+	bh=miQQMID1hHUD427jdBzC3EbawWKRdBwwrYduccnjev8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XTsgR9nTr22cnm+4IRYfBtYS9TyOOd6018sOZaSBFrNsDqxKzgl5Q8hF3h8Fh21Fh
+	 plpUOMZdT8a5BLpL1mKOy6TK/BtEcTnwUwJR+KytNOImf4wVD6qyF+JiuGAO+OyQog
+	 tkz8n9mGoD56w41YnuBtTXzov9Tx5RoQb/69Cip/xPV6wDxQlf6CiWcAN/wQ06odFL
+	 sG2zhs+C9tUgTpGlHKaNreJiZoGOKODSu9ktJAQjBHl3co4HZ5TrSQ4zW0nP+Oqp8M
+	 q6H3kitKgsGeH0Ylr3MzCb1WayacMkW05qgrS+sS+XVDSVtctrVMWj6hNiR61qnEZZ
+	 RbDZq4xvGktcQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wHIFQ-0000000EzrO-081k;
+	Mon, 27 Apr 2026 09:27:24 +0000
+Date: Mon, 27 Apr 2026 10:27:23 +0100
+Message-ID: <86zf2ozrb8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	Alexey Kardashevskiy <aik@amd.com>,
+	kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Pranjal Shrivastava <praan@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
 	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: [RFC PATCH v4 16/16] KVM: arm64: CCA: enable DA in realm create parameters
-Date: Mon, 27 Apr 2026 14:23:44 +0530
-Message-ID: <20260427085344.941627-17-aneesh.kumar@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260427085344.941627-1-aneesh.kumar@kernel.org>
-References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 2/3] swiotlb: dma: its: Enforce host page-size alignment for shared buffers
+In-Reply-To: <20260427063108.909019-3-aneesh.kumar@kernel.org>
+References: <20260427063108.909019-1-aneesh.kumar@kernel.org>
+	<20260427063108.909019-3-aneesh.kumar@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, jgg@ziepe.ca, m.szyprowski@samsung.com, robin.murphy@arm.com, steven.price@arm.com, suzuki.poulose@arm.com, tglx@kernel.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we have all the required steps for DA in-place, enable
-DA while creating realm.
+On Mon, 27 Apr 2026 07:31:07 +0100,
+"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+>=20
+> When running private-memory guests, the guest kernel must apply additional
+> constraints when allocating buffers that are shared with the hypervisor.
+>=20
+> These shared buffers are also accessed by the host kernel and therefore
+> must be aligned to the host=E2=80=99s page size, and have a size that is =
+a multiple
+> of the host page size.
+>=20
+> On non-secure hosts, set_guest_memory_attributes() tracks memory at the
+> host PAGE_SIZE granularity. This creates a mismatch when the guest applies
+> attributes at 4K boundaries while the host uses 64K pages. In such cases,
+> set_guest_memory_attributes() call returns -EINVAL, preventing the
+> conversion of memory regions from private to shared.
+>=20
+> Architectures such as Arm can tolerate realm physical address space
+> (protected memory) PFNs being mapped as shared memory, as incorrect
+> accesses are detected and reported as GPC faults. However, relying on this
+> mechanism is unsafe and can still lead to kernel crashes.
+>=20
+> This is particularly likely when guest_memfd allocations are mmapped and
+> accessed from userspace. Once exposed to userspace, we cannot guarantee
+> that applications will only access the intended 4K shared region rather
+> than the full 64K page mapped into their address space. Such userspace
+> addresses may also be passed back into the kernel and accessed via the
+> linear map, resulting in a GPC fault and a kernel crash.
+>=20
+> With CCA, although Stage-2 mappings managed by the RMM still operate at a
+> 4K granularity, shared pages must nonetheless be aligned to the
+> host-managed page size and sized as whole host pages to avoid the issues
+> described above.
 
-Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
----
- arch/arm64/include/asm/rmi_smc.h | 1 +
- arch/arm64/kvm/rmi.c             | 3 +++
- 2 files changed, 4 insertions(+)
+I thought that was being fixed, and that there was now a strong
+guarantee that RMM and host are aligned on the page size. Even more,
+S2 is totally irrelevant here. The only thing that matters is the host
+page size vs the guest page size. Nothing else.
 
-diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-index f3ad545d68b7..c02e2f087b1c 100644
---- a/arch/arm64/include/asm/rmi_smc.h
-+++ b/arch/arm64/include/asm/rmi_smc.h
-@@ -268,6 +268,7 @@ struct rmm_config {
- #define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
- #define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
- #define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-+#define RMI_REALM_PARAM_FLAG_DA			BIT(3)
- 
- struct realm_params {
- 	union { /* 0x0 */
-diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index cc9e045dcae9..e041c4caee79 100644
---- a/arch/arm64/kvm/rmi.c
-+++ b/arch/arm64/kvm/rmi.c
-@@ -691,6 +691,9 @@ static int realm_create_rd(struct kvm *kvm)
- 	if (r)
- 		goto out_undelegate_tables;
- 
-+	/* For now default enable DA */
-+	if (rmm_has_reg2_feature(RMI_FEATURE_REGISTER_2_DA))
-+		params->flags |= RMI_REALM_PARAM_FLAG_DA;
- 	params_phys = virt_to_phys(params);
- 
- 	if (rmi_realm_create(rd_phys, params_phys)) {
--- 
-2.43.0
+>=20
+> Introduce a new helper, mem_decrypt_align(), to allow callers to enforce
+> the required alignment and size constraints for shared buffers.
+>=20
+> The architecture-specific implementation of mem_decrypt_align() will be
+> provided in a follow-up patch.
+>=20
+> Note on restricted-dma-pool:
+> rmem_swiotlb_device_init() uses reserved-memory regions described by
+> firmware. Those regions are not changed in-kernel to satisfy host granule
+> alignment. This is intentional: we do not expect restricted-dma-pool
+> allocations to be used with CCA. If restricted-dma-pool is intended for C=
+CA
+> shared use, firmware must provide base/size aligned to the host IPA-change
+> granule.
+>=20
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/mm/mem_encrypt.c      | 19 +++++++++++++++----
+>  drivers/irqchip/irq-gic-v3-its.c | 20 +++++++++++++-------
+>  include/linux/mem_encrypt.h      | 14 ++++++++++++++
+>  kernel/dma/contiguous.c          | 10 ++++++++++
+>  kernel/dma/direct.c              | 16 ++++++++++++++--
+>  kernel/dma/pool.c                |  4 +++-
+>  kernel/dma/swiotlb.c             | 21 +++++++++++++--------
+>  7 files changed, 82 insertions(+), 22 deletions(-)
+>=20
 
+[...]
+
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v=
+3-its.c
+> index 291d7668cc8d..239d7e3bc16f 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -213,16 +213,17 @@ static gfp_t gfp_flags_quirk;
+>  static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>  					 unsigned int order)
+>  {
+> +	unsigned int new_order;
+>  	struct page *page;
+>  	int ret =3D 0;
+> =20
+> -	page =3D alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+> -
+> +	new_order =3D get_order(mem_decrypt_align((PAGE_SIZE << order)));
+> +	page =3D alloc_pages_node(node, gfp | gfp_flags_quirk, new_order);
+>  	if (!page)
+>  		return NULL;
+> =20
+>  	ret =3D set_memory_decrypted((unsigned long)page_address(page),
+> -				   1 << order);
+> +				   1 << new_order);
+>  	/*
+>  	 * If set_memory_decrypted() fails then we don't know what state the
+>  	 * page is in, so we can't free it. Instead we leak it.
+> @@ -241,13 +242,16 @@ static struct page *its_alloc_pages(gfp_t gfp, unsi=
+gned int order)
+> =20
+>  static void its_free_pages(void *addr, unsigned int order)
+>  {
+> +	int new_order;
+> +
+> +	new_order =3D get_order(mem_decrypt_align((PAGE_SIZE << order)));
+>  	/*
+>  	 * If the memory cannot be encrypted again then we must leak the pages.
+>  	 * set_memory_encrypted() will already have WARNed.
+>  	 */
+> -	if (set_memory_encrypted((unsigned long)addr, 1 << order))
+> +	if (set_memory_encrypted((unsigned long)addr, 1 << new_order))
+>  		return;
+> -	free_pages((unsigned long)addr, order);
+> +	free_pages((unsigned long)addr, new_order);
+>  }
+>
+
+Here's the non-obfuscated version of the two hunks above (and let it
+be on the record that New Order is a terrible, overrated band):
+
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
+its.c
+index 291d7668cc8da..a4d555aaee241 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -216,6 +216,7 @@ static struct page *its_alloc_pages_node(int node, gfp_=
+t gfp,
+ 	struct page *page;
+ 	int ret =3D 0;
+=20
++	order =3D get_order(mem_decrypt_align(PAGE_SIZE << order));
+ 	page =3D alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+=20
+ 	if (!page)
+@@ -245,6 +246,7 @@ static void its_free_pages(void *addr, unsigned int ord=
+er)
+ 	 * If the memory cannot be encrypted again then we must leak the pages.
+ 	 * set_memory_encrypted() will already have WARNed.
+ 	 */
++	order =3D get_order(mem_decrypt_align(PAGE_SIZE << order));
+ 	if (set_memory_encrypted((unsigned long)addr, 1 << order))
+ 		return;
+ 	free_pages((unsigned long)addr, order);
+
+>  static struct gen_pool *itt_pool;
+> @@ -268,11 +272,13 @@ static void *itt_alloc_pool(int node, int size)
+>  		if (addr)
+>  			break;
+> =20
+> -		page =3D its_alloc_pages_node(node, GFP_KERNEL | __GFP_ZERO, 0);
+> +		page =3D its_alloc_pages_node(node, GFP_KERNEL | __GFP_ZERO,
+> +					    get_order(mem_decrypt_granule_size()));
+
+You already taught its_alloc_pages_node() about the decrypt granule
+size stuff. I don't think we need to see more of it (and you don't
+mess with the call that is just above it).
+
+>  		if (!page)
+>  			break;
+> =20
+> -		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE, n=
+ode);
+> +		gen_pool_add(itt_pool, (unsigned long)page_address(page),
+> +			     mem_decrypt_granule_size(), node);
+
+I'd rather see something like mem_decrypt_align(PAGE_SIZE), which
+keeps the intent clear.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
