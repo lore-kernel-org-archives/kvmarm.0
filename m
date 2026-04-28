@@ -1,63 +1,66 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E443ECBFB
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 10:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC0437419A
+	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 10:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777372212; cv=none; b=Z2Q6kCTUcbYFxSC8LL/wmH5ayzWeUxyuOUwjuMRxw4CSjkhC3wKt9YOOFYfSaJaAWiQzShXU0+vUWMedhOvM81r1LV/h98YLfpw+OmkRpww88fA36G5NF/qgSl7xspOPuY5ki7/lZYKHpILs4sgEh5/SyT17afC+kUWEyBptngU=
+	t=1777372214; cv=none; b=E1dHAy0TvcmU1Xlu7ISUvDjYVQxdaxtHcnEAU3HHK4Qa/ksi4UUkNJdhaOtkxCD16uG3sgkDyJY8j2KWZO2ZyKsu1jcTpiMFlMrVGhiTYot+/y3OCcbvGmOCD5NFUuUc7QQpi88JrV012j8Gzdo/7Nx0Z+v9YhG9siwAbWS2S1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777372212; c=relaxed/simple;
-	bh=Q1SQtMHy3aqsHkz2pqwBb00QPVJHhdgc6QUsbv3XMuk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hT3heevC75DUdIY2c7CQcRH0954DkqYpvX6Fqof8WeWykgVuX/Vx5D8o1DgoZYb7h3YlTow6yApbLmAHoNTKAXuwJ67IslyIeh7JqYpj4TE+ImdkOji1dbDVIGIaM9fZvIF/OLSKOYVzDsc6eH7ZlCAnlS9Xm9sayUNLCTL1ZaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KSzXv4tI; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1777372214; c=relaxed/simple;
+	bh=9Wt0iy5ayw0cQwuJpZ/wnzJmfEyzqf8hdthusy325Pw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=B1s1SE3jFPQmNbe++ccjJ6CTFspCAloIlOIEV8XlHuBdVWJ9S1w3DSjxwJys5uRvqie8oxqY3cl1nyVy3nZMPhSqpgn0bwwLQJULE7tW8mh/eIv53eqXDxpmtLa0IQ8waGBWxtOTZZz6Vy3conTII1uDfboQX13pSKUJ+PkhwZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OrgOAjkE; arc=none smtp.client-ip=209.85.208.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KSzXv4tI"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-488dcaf2f2fso101742065e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 03:30:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OrgOAjkE"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-671656523efso13560329a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 03:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777372209; x=1777977009; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ybPE6uBPAKDLSIVRQh3Dd/khXkWqQgT9nsbAgFbes8s=;
-        b=KSzXv4tITwgJY81SxGZ0mVrUqnt4nMnV5y3YSqpJ2G4dU8nD31QCOqY41p2se9laFa
-         pBJRpBrlsnsHoHSXQUwxc6h3Bo+/5PjkC24XCH1RaOMZ7RhR+e/B2afq4PmuFzuq21dt
-         SG/RoKQLGw8sEHtVM3bcpE9P8i38iPhNpXHWK7nefM3YNVApeqo1PF9lwSQbWlxB1pQx
-         zbEzN5WNyGjXKNy+tngIw9GxoJA51xFY2kJ0fQzouxHlPOnJPUHkusbcRESriodo25a/
-         zhFfSxpxAJRMu2jLV6b4+nnq1INo6fa+Nkt9FBBXyqtAGSLTI1g8Ce68OuT6L9zjTbl8
-         ZivQ==
+        d=google.com; s=20251104; t=1777372211; x=1777977011; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J7c867vhN0NJ0ysluuN7kPjni8MsLU+yiUrh20mCAzU=;
+        b=OrgOAjkEhiqomQ/3VDB/D9qNK3NGPjpuzgGPAPOW5dljm/LqrcrH8ncUBvC/q7/3/N
+         EDZ21tXFcOf7OAdPRy7R+X2Q6vpCvrOUl6+gDpo9DuSOF2Qh9I0X32BsyzCq6U8MSThI
+         jcqqAoBJFgOHF3+RB+pq7D4iaYpseYs2jJvCJPMpPSJTJPbm/MldrDTyQcxPCMxrWZLq
+         Q4q/nPwYFX+z0PdYPLkGo9hRtzE66G9w2A7QyD8VCELDPH6C75Ojy3qqlmMBX+wOLivO
+         2XgeUOPj2QIXRv5HmISZqpnxjDnd51O470n7j/NZYwEM6uGB4lcqYk4ktzODlTqR6Nzc
+         b9jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777372209; x=1777977009;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ybPE6uBPAKDLSIVRQh3Dd/khXkWqQgT9nsbAgFbes8s=;
-        b=M8fUF/pL9dLlY1lTN4zDwsz8UG2jXXccCJq3v/0Hs5G3DpjRh+CcEfvPbxSkDzgpUm
-         s1ILHi5DvaGZYc+nCC/vAlm5v74GaevzLJeczsX2S+9pIqKZ32L1MhjU1EHuKu6ou718
-         PDMvdPOvNI4bn3NofE0BZnB95KwcQqlS3TAdAJLYEfCBHSnL60WI9feotiLFHZScMMpQ
-         AvfCUrEXOffs3JeFtAOvq28qM2s2w2HSj658ZQzc9SXUr/ArKR6UlK/Givvt6b3l61H9
-         8dMPluQ0HUdsDfkDRkrluAHTqDh5llaR4Bn+H7uLNW33tvSUEXr3Gtz8ILG2qLqVMBH5
-         G41g==
-X-Forwarded-Encrypted: i=1; AFNElJ9MvZJX0ROwDAylTVkpQeOi4M0CVD/xDC3xo29VwTXN37SdKGGoHtwTAPnJYPxm6vaq62XT6CM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz8S5HgPD1dvV1ZgYxe0ul7OsF8iUIEuj8NyohEebpjSrvho7tH
-	qA0Kl/fIcIQIxAyZYmq5Z1nNPblRU2ceh5+KGHDrtUzOl4HBu4V7VWr35mcmhSgmkDsqgeWHUj/
-	lRw==
-X-Received: from wmby10.prod.google.com ([2002:a05:600c:c04a:b0:486:fca5:7a8d])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:a013:b0:48a:563c:c8e0
- with SMTP id 5b1f17b1804b1-48a77ad5a89mr41979925e9.1.1777372209349; Tue, 28
- Apr 2026 03:30:09 -0700 (PDT)
-Date: Tue, 28 Apr 2026 11:30:00 +0100
+        d=1e100.net; s=20251104; t=1777372211; x=1777977011;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J7c867vhN0NJ0ysluuN7kPjni8MsLU+yiUrh20mCAzU=;
+        b=JvDqRc2zkh3m837PNj+SzXMMOUQ6eia7vnqJKWklkOxN+05TQ5wVonFMprQ8CxvGC4
+         zkR9ybNFD3FjKKudGAu4m3L0xeBBv92skh+pAzPNVAB9KRMX+zs16a9aMEYr1DQv29MI
+         CORd2MLt4YDh2Mj2zcHXiAS5J9+06aLYq4dFgHkCp0+tBJms/CW23GAz3oxMi1C7cEIZ
+         LNzBhPMHVC+NHz3gRcqjayZBBY0L2iOS2OjRQxRWlhakp2Ua3Nqsy3JdmdkDvg/Gch7I
+         eiDonGN+npaFXq6VXz7JTypO2gWd5BXJJE8YY06R8CA86vufJbaozuzzGkJTQjIqaKKe
+         Ivig==
+X-Forwarded-Encrypted: i=1; AFNElJ+SCS7lF1kor9F0Ic7pArFrhEltUOTOfBcnOPRTedHpCdRXZQ6eLulJFY2R0dDRt23mpYcY9T4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxHo/ScH9n73YRTsG8MbsUlxUP7pz4+jRgRE45XGzr3e+T0Po9e
+	U+o5zPZF10e1ftQm7N1Up+0UHJFtPtgldm4WYTcMt5AnM9e4kLs3ffspBXXYj8Ft+ZW5POi0kCQ
+	H7Q==
+X-Received: from edru26.prod.google.com ([2002:aa7:d55a:0:b0:674:1e56:7dde])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:158d:b0:678:a553:bcf3
+ with SMTP id 4fb4d7f45d1cf-679bb0a125bmr1160027a12.21.1777372210503; Tue, 28
+ Apr 2026 03:30:10 -0700 (PDT)
+Date: Tue, 28 Apr 2026 11:30:01 +0100
+In-Reply-To: <20260428103008.696141-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260428103008.696141-1-tabba@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260428103008.696141-1-tabba@google.com>
-Subject: [PATCH 0/8] KVM: arm64: EL2 synchronisation and pKVM stage-2 error
- propagation fixes
+Message-ID: <20260428103008.696141-2-tabba@google.com>
+Subject: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
+ context-synchronization events
 From: Fuad Tabba <tabba@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev
 Cc: james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
@@ -67,85 +70,57 @@ Cc: james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi folks,
+SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
+exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
+0487 M.b, EIS is governed by D1.4.2 rule RBBSRF (p. D1-7205) and EOS
+by D1.4.4.1 rule RBWCFK (p. D1-7209). D24.2.175 (p. D24-9754):
 
-This is yet another series of fixes I'd like to land before posting a
-follow-up to Will's pKVM infrastructure series [1].
+  - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
+    a CSE.
+  - FEAT_ExS: the reset value is architecturally UNKNOWN; software
+    must set the bit to make the entry/exit a CSE.
 
-I found these while developing KVM and arm64 system guides for
-review-prompts [2], an open-source set of AI-assisted review prompts
-used by sashiko [3]. While writing the guides I tried to find cases
-that would be easy to miss or trip up an LLM, and stumbled on these
-bugs. A local run with the updated guides flagged all of them
-correctly (some of the commit messages incorporate feedback from that
-run, e.g., the impact of WARN_ON() in hyp). I plan to upstream the
-guides once they are complete.
+INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
+bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
+synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
+MSRs to context-switching system registers (HCR_EL2, HFGxTR_EL2,
+HCRX_EL2, ZCR_EL2, CPACR_EL1, CPTR_EL2, SCTLR_EL1, ptrauth keys,
+etc.); examples include the activate-traps path,
+ptrauth_switch_to_guest, and the FPSIMD trap re-enable in
+kvm_hyp_handle_fpsimd. On FEAT_ExS hardware those reliances are not
+architecturally backed unless EOS=1 (and, for entry, EIS=1), and
+whether they hold today depends on firmware initialisation outside
+the kernel's control.
 
-The patches fall into three groups:
+Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
+INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
+unconditionally CSEs regardless of whether FEAT_ExS is implemented.
+This matches the pairing in arch/arm64/kvm/config.c which treats EIS
+and EOS together as RES1 under !FEAT_ExS.
 
-EL2 context-synchronisation (patches 1-2):
+INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
+very early EL2 init and the EL2 MMU-off transition, neither of which
+relies on these bits in the same way.
 
-  Patch 1 sets SCTLR_EL2.EIS and SCTLR_EL2.EOS in
-  INIT_SCTLR_EL2_MMU_ON. On FEAT_ExS hardware these bits are
-  UNKNOWN at reset; without them EL2 exception entry and exit are
-  not architecturally guaranteed to be Context Synchronisation
-  Events. KVM/arm64 hot paths rely on that guarantee implicitly to
-  elide explicit ISBs after MSRs to context-switching sysregs.
+Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON")
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/include/asm/sysreg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  Patch 2 adds an explicit ISB after write_sysreg_hcr() on the
-  __deactivate_traps() path. The activate path is covered by the
-  ERET that follows (a CSE, guaranteed by patch 1); on the
-  deactivate path, subsequent EL2 sysreg accesses run before any
-  natural CSE.
-
-Minor fixes (patches 3-4):
-
-  Patch 3 fixes a parameter-name typo in __deactivate_fgt() that
-  causes it to silently capture a variable from the enclosing scope
-  rather than use its declared parameter.
-
-  Patch 4 guards the VHE hyp panic path against a NULL vcpu pointer;
-  the nVHE counterpart already has this guard.
-
-pKVM stage-2 error propagation (patches 5-8):
-
-  At EL2 in nVHE/pKVM, WARN_ON() is not warn-and-continue: it
-  expands to a BRK that enters the invalid-host-el2 vector and
-  branches to hyp_panic(), which is __noreturn.
-
-  Four pKVM memory-transition functions wrapped the return value of
-  kvm_pgtable_stage2_map() in WARN_ON() and discarded it. For the
-  share and donation paths the map can fail via -ENOMEM when the
-  vcpu memcache is exhausted, converting a recoverable hypercall
-  error into a fatal hyp panic. The four patches capture and
-  propagate the return value, with appropriate stage-2 unmap and
-  host-side rollback for the reachable failure cases.
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
-[2] https://github.com/masoncl/review-prompts
-[3] https://sashiko.dev/
-
-Fuad Tabba (8):
-  KVM: arm64: Make EL2 exception entry and exit context-synchronization
-    events
-  KVM: arm64: Synchronise HCR_EL2 writes on the guest exit path
-  KVM: arm64: Guard against NULL vcpu on VHE hyp panic path
-  KVM: arm64: Fix __deactivate_fgt macro parameter typo
-  KVM: arm64: Propagate stage-2 map failure on host->guest share
-  KVM: arm64: Propagate stage-2 map failure on host->guest donation
-  KVM: arm64: Propagate stage-2 map failure on guest->host share
-  KVM: arm64: Propagate stage-2 map failure on guest->host unshare
-
- arch/arm64/include/asm/sysreg.h         |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c   | 99 +++++++++++++++++++++----
- arch/arm64/kvm/hyp/nvhe/switch.c        | 11 +++
- arch/arm64/kvm/hyp/vhe/switch.c         | 14 +++-
- 5 files changed, 111 insertions(+), 17 deletions(-)
-
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 736561480f36..7aa08d59d494 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -844,7 +844,7 @@
+ #define INIT_SCTLR_EL2_MMU_ON						\
+ 	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
+ 	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
+-	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
++	 SCTLR_ELx_ITFSB | SCTLR_ELx_EIS | SCTLR_ELx_EOS | SCTLR_EL2_RES1)
+ 
+ #define INIT_SCTLR_EL2_MMU_OFF \
+ 	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
 -- 
 2.54.0.545.g6539524ca2-goog
 
