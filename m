@@ -1,359 +1,121 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C73B3F54CE;
-	Tue, 28 Apr 2026 13:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF86276028;
+	Tue, 28 Apr 2026 13:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777384171; cv=none; b=g2EuGYMvW14wYXdzLnrqgWewpbttPnMKSVfzr20dsTszUs1nucp64bcwQpU9KbcOC28zPOKOM2Fc2umhbUBcdqX6200aK1DG0yiQAsw4xzcsPQE5Oxcz53nAWICkoZYpFEbcqUhD6A+hq3sY2Ejs8Bh+02DQ8U01dOujiBgE1eM=
+	t=1777384229; cv=none; b=UGg2RwvTJgxlnZjSXHtJQhowYEvBCvvx0PdpcDOxzSbTYrT1IrZJ6XtI+MPRQ6wVSCiRLfHlF++TVhumkT+4UotSzRuYx31j5gZTYk9WiYFb8lEkaYQqvUWX6C/u9cjZ2Dw2sE8+6tMGe64q1stle0k7Z+oCbciTp3ucJD0kME4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777384171; c=relaxed/simple;
-	bh=T90qpzH+IxgMriE1r9J4sAT681SbwTg9c9z3A+z+O0M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AoB3WMj0jYdN6V+/MPxEn8JzDIqO9ZynGzPJxX8aXi6r9k/AYTyolhWZUxv2do1TumtPcMgN6kxL9eh4wPDpTSkjsOAEj/rqjN7KXvmRUeMIZAPWmCl7g21pPglMPJ6frHYWF0hNwBl2h/yjR743qZdLFOW624zVM8seH4hoXXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrvpvXp3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777384229; c=relaxed/simple;
+	bh=C5KSRh53zUUnHlfowXZ4LbxgWa/gXflfi32aQpqJdG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UF93VhZyV69+NXcyz92iL43THlUsNDJBtY9oZVEqEsrvfJGxTfiPP4sr7JCVumCRSnXVZhpVUaVyhmo56H1cPos6vx2z2tPuMNjBLcZhW20hqOVejeXehvoqRzbzuOpxSM7SLqY1j3YdSQa3VpV/xBu37XuWMs+0w16mdmAiP58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCBmAicR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrvpvXp3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E090DC2BCAF;
-	Tue, 28 Apr 2026 13:49:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCBmAicR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25837C2BCAF;
+	Tue, 28 Apr 2026 13:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777384171;
-	bh=T90qpzH+IxgMriE1r9J4sAT681SbwTg9c9z3A+z+O0M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JrvpvXp3i5liE8excVJzVvbrrAYuHH3dL37BGNF79PheXwvflHT8vYmelLE2Ekmys
-	 DHRdYkAC6aQ4eo234cWrlsG7pv3t8eajKkNaBNFtXhhMeB33vZ/KcfrXBxOys5t+nG
-	 ubh0pWL4wQi49x1hLG/DelkL8Ai1DaKPwu5lFlQCfYu//umXlal8xh2P2PnbSE/S+a
-	 O8Ez3wPxiWxD+77oHMdS5z8WxDY7gorew5rBezTFGVLBpKTiEAMXCQKUpSJCh2Yys1
-	 081mIah3IFGQWZ+/TXKPGGZuLCiXXDAjoFch+gXiY8TWJBWXI3pLACMN494n81gwfM
-	 tOhZ76c55/VbA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wHioa-0000000FWaB-2fQo;
-	Tue, 28 Apr 2026 13:49:28 +0000
-Date: Tue, 28 Apr 2026 14:49:28 +0100
-Message-ID: <86tssvyz2v.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-coco@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 3/3] coco: guest: arm64: Query host IPA-change alignment via RHI
-In-Reply-To: <yq5a4ikv1c7p.fsf@kernel.org>
-References: <20260427063108.909019-1-aneesh.kumar@kernel.org>
-	<20260427063108.909019-4-aneesh.kumar@kernel.org>
-	<86y0i8zo9f.wl-maz@kernel.org>
-	<yq5a4ikv1c7p.fsf@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1777384228;
+	bh=C5KSRh53zUUnHlfowXZ4LbxgWa/gXflfi32aQpqJdG8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VCBmAicRsBEGMMPKnS6mfeRIsjZM73pool8RdEf0m7TaJhDQrMg9QCfOXrqATsCKn
+	 44me2Coqd+8h7Yg0OG1VpbvysEn9YkkzxGVM/d5GOlTADW0io+Jrv7AAn86R5b4q4o
+	 7n1UCPxhTWKr0ZUNuAn6fKDM6e7OBRYBx2/GAv2IW804DZyXN81aEfbnYLZQRD068d
+	 fqnWuMsPuZx0jLLcErSl++pqobVk14f+edlUxYz32ybKhVmICFjxecWaMO9DFYAoFy
+	 Wkz0SyJkruKD17nDeJ7aYrPIe/KzidwX7/CNNX1LJlihv/AFGGhOnraH4dZlMu1F3V
+	 85cgj+ud9i79A==
+Date: Tue, 28 Apr 2026 14:50:23 +0100
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com,
+	vdonnefort@google.com, catalin.marinas@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 2/8] KVM: arm64: Synchronise HCR_EL2 writes on the guest
+ exit path
+Message-ID: <afC7H1fu4vFzTRTt@willie-the-truck>
+References: <20260428103008.696141-1-tabba@google.com>
+ <20260428103008.696141-3-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, jgg@ziepe.ca, m.szyprowski@samsung.com, robin.murphy@arm.com, steven.price@arm.com, suzuki.poulose@arm.com, tglx@kernel.org, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260428103008.696141-3-tabba@google.com>
 
-On Tue, 28 Apr 2026 13:49:46 +0100,
-Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
->=20
-> Marc Zyngier <maz@kernel.org> writes:
->=20
-> > On Mon, 27 Apr 2026 07:31:08 +0100,
-> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-> >>=20
-> >> Add the Realm Host Interface support needed to query host configuration
-> >> from a Realm guest. Define the RHI hostconf SMCs, add rsi_host_call(),=
- and
-> >> use them during Realm initialization to retrieve the host IPA-change
-> >> alignment size.
-> >
-> > I don't understand what "IPA-change" means. What you are after is the
-> > host's sharing granule size.
-> >
->=20
-> This is part of the RHI specification, and the call is named
-> RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT. The intent is to determine the
-> alignment requirements for changing IPA attributes (protected vs.
-> unprotected IPA
+On Tue, Apr 28, 2026 at 11:30:02AM +0100, Fuad Tabba wrote:
+> MSR HCR_EL2 is not self-synchronising. Per ARM DDI 0487 M.b K1.2.4
+> (p.K1-16823) and B2.6.1 (p.B2-297), a Context Synchronisation Event
+> is required between an HCR_EL2 write and any subsequent direct
+> register access at the same EL that depends on the new value being
+> in effect.
+> 
+> On the entry path, the HCR_EL2 write in __activate_traps is followed
+> by further EL2 sysreg work (MDCR_EL2, CPTR_EL2, VBAR_EL2, and on the
+> speculative-AT errata path SCTLR_EL1/TCR_EL1) before ERET into the
+> guest. None of those intervening accesses depend on the new HCR_EL2
+> value, and ERET is a CSE per ARM DDI 0487 M.b D1.4.4.1 rule RBWCFK
+> (p. D1-7209) conditional on SCTLR_EL2.EOS=1, which is set
+> unconditionally by INIT_SCTLR_EL2_MMU_ON (see the prerequisite patch
+> in this series). The requirement is therefore satisfied implicitly
+> on the activate path.
+> 
+> The deactivate path is different: after write_sysreg_hcr() in
+> __deactivate_traps() further EL2 sysreg work runs before any natural
+> CSE - on nVHE, __deactivate_cptr_traps and the VBAR_EL2 write; on
+> VHE, the timer context save which reads CNTP_CVAL_EL0 under the new
+> TGE/E2H, and the EL1 sysreg restore. Add an explicit isb() at each
+> of the two deactivate sites.
+> 
+> The practical impact today is bounded: HCR_EL2.E2H does not toggle
+> in either path, and the trap bits being changed primarily affect
+> EL1&0 behaviour. But the architectural rule should be honoured.
+> Note that write_sysreg_hcr() itself already issues isb() on the
+> Ampere errata path (sysreg.h), confirming the architectural
+> expectation; the fast path optimises that away.
+> 
+> The fix is at the call sites rather than inside write_sysreg_hcr()
+> because the macro has many users (e.g. the activate path, at.c,
+> hardirq.h, ptrauth alternatives) where the immediately-following
+> code either reaches ERET or has another CSE; making the macro emit
+> an unconditional ISB would impose unnecessary cost on those
+> well-formed users.
+> 
+> Fixes: 9404673293b0 ("KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/switch.c | 11 +++++++++++
+>  arch/arm64/kvm/hyp/vhe/switch.c  | 11 +++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 8d1df3d33595..9d7ead5a5503 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -105,6 +105,17 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  	__deactivate_traps_common(vcpu);
+>  
+>  	write_sysreg_hcr(this_cpu_ptr(&kvm_init_params)->hcr_el2);
+> +	/*
+> +	 * MSR HCR_EL2 is not self-synchronising. Per ARM ARM K1.2.4 p.K1-16823
+> +	 * and B2.6.1 p.B2-297, a Context Synchronisation Event is required
+> +	 * between an HCR_EL2 write and any subsequent direct register access at
+> +	 * the same EL that depends on the new value being in effect.
+> +	 * The activate_traps path falls through to ERET (a CSE), but the
+> +	 * deactivate path still executes further EL2 sysreg work (CPTR/VBAR
+> +	 * writes below) before any natural CSE, so make the synchronisation
+> +	 * explicit.
+> +	 */
+> +	isb();
 
-This really is a terrible name. Why the 'change' part? It doesn't
-change, it is a constant.
+Sorry, but I don't understand this. Please can you explain why you think
+that CPTR and VBAR have an ordering dependency on HCR_EL2? Preferably,
+the comment would talk about the specific fields that are relevant.
 
-Oh well...
-
-[...]
-
-> >> +static inline unsigned long rsi_host_call(struct rsi_host_call *rhi_c=
-all)
-> >> +{
-> >> +	phys_addr_t addr =3D virt_to_phys(rhi_call);
-> >> +	struct arm_smccc_res res;
-> >> +
-> >> +	arm_smccc_1_1_invoke(SMC_RSI_HOST_CALL, addr, &res);
-> >
-> > Errr... What guarantees that *rhi_call is *IPA contiguous*? This is
-> > incredibly fragile. You should at the very least check that this isn't
-> > vmalloc'd.
-> >
->=20
->=20
-> I didn=E2=80=99t quite follow that. We have other RSI calls (even RMI cal=
-ls)
-> that do similar things, and the caller understands that the address
-> should be IPA-contiguous.
-
-Does it? Where is it documented?  All you get is a pointer, so all
-bets are off.
-
-> Are you suggesting that all RSI calls should
-> add checks for this?. or are you suggesting to update the API to
->=20
-> unsigned long rsi_host_call(unsigned long rhi_call_phys) ?
-
-I'm suggesting that this API is subtly broken because it makes random
-assumption about the physical contiguity of the VA space. It does so
-without any check, without any documentation.
-
-Simply changing the parameter to phys_addr_t could at the very least
-capture some of the requirements, but I'd like something in big bold
-letters.
-
->
-> >> +
-> >> +	return res.a0;
-> >> +}
-> >> +
-> >>  #endif /* __ASM_RSI_CMDS_H */
-> >> diff --git a/arch/arm64/include/asm/rsi_smc.h b/arch/arm64/include/asm=
-/rsi_smc.h
-> >> index e19253f96c94..9ee8b5c7612e 100644
-> >> --- a/arch/arm64/include/asm/rsi_smc.h
-> >> +++ b/arch/arm64/include/asm/rsi_smc.h
-> >> @@ -182,6 +182,13 @@ struct realm_config {
-> >>   */
-> >>  #define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
-> >> =20
-> >> +struct rsi_host_call {
-> >> +	union {
-> >> +		u16 imm;
-> >> +		u64 padding0;
-> >> +	};
-> >> +	u64 gprs[31];
-> >> +} __aligned(0x100);
-> >>  /*
-> >>   * Make a Host call.
-> >>   *
-> >> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> >> index fe627100d199..3e72dd9584ed 100644
-> >> --- a/arch/arm64/kernel/Makefile
-> >> +++ b/arch/arm64/kernel/Makefile
-> >> @@ -34,7 +34,7 @@ obj-y			:=3D debug-monitors.o entry.o irq.o fpsimd.o=
-		\
-> >>  			   cpufeature.o alternative.o cacheinfo.o		\
-> >>  			   smp.o smp_spin_table.o topology.o smccc-call.o	\
-> >>  			   syscall.o proton-pack.o idle.o patching.o pi/	\
-> >> -			   rsi.o jump_label.o
-> >> +			   rsi.o jump_label.o rhi.o
-> >> =20
-> >>  obj-$(CONFIG_COMPAT)			+=3D sys32.o signal32.o			\
-> >>  					   sys_compat.o
-> >> diff --git a/arch/arm64/kernel/rhi.c b/arch/arm64/kernel/rhi.c
-> >> new file mode 100644
-> >> index 000000000000..7cd6c5102464
-> >> --- /dev/null
-> >> +++ b/arch/arm64/kernel/rhi.c
-> >> @@ -0,0 +1,54 @@
-> >> +// SPDX-License-Identifier: GPL-2.0-only
-> >> +/*
-> >> + * Copyright (C) 2026 ARM Ltd.
-> >> + */
-> >> +
-> >> +#include <linux/mm.h>
-> >> +#include <asm/rsi.h>
-> >> +#include <asm/rhi.h>
-> >> +
-> >> +/* we need an aligned rhicall for rsi_host_call. slab is not yet read=
-y */
-> >> +static struct rsi_host_call hyp_pagesize_rhicall;
-> >
-> > Why the "hyp_" prefix? This has absolutely nothing to with the
-> > hypervisor.
-> >
->=20
-> Sure will update "hyp_" reference to host.=20
->=20
->=20
-> >> +unsigned long rhi_get_ipa_change_alignment(void)
-> >> +{
-> >> +	long ret;
-> >> +	unsigned long ipa_change_align;
-> >> +
-> >> +	hyp_pagesize_rhicall.imm =3D 0;
-> >> +	hyp_pagesize_rhicall.gprs[0] =3D RHI_HOSTCONF_VERSION;
-> >> +	ret =3D rsi_host_call(lm_alias(&hyp_pagesize_rhicall));
-> >> +	if (ret !=3D RSI_SUCCESS)
-> >> +		goto err_out;
-> >> +
-> >> +	if (hyp_pagesize_rhicall.gprs[0] !=3D RHI_HOSTCONF_VER_1_0)
-> >> +		goto err_out;
-> >> +
-> >> +	hyp_pagesize_rhicall.imm =3D 0;
-> >> +	hyp_pagesize_rhicall.gprs[0] =3D RHI_HOSTCONF_FEATURES;
-> >> +	ret =3D rsi_host_call(lm_alias(&hyp_pagesize_rhicall));
-> >> +	if (ret !=3D RSI_SUCCESS)
-> >> +		goto err_out;
-> >> +
-> >> +	if (!(hyp_pagesize_rhicall.gprs[0] & __RHI_HOSTCONF_GET_IPA_CHANGE_A=
-LIGNMENT))
-> >> +		goto err_out;
-> >> +
-> >> +	hyp_pagesize_rhicall.imm =3D 0;
-> >> +	hyp_pagesize_rhicall.gprs[0] =3D RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNME=
-NT;
-> >> +	ret =3D rsi_host_call(lm_alias(&hyp_pagesize_rhicall));
-> >> +	if (ret !=3D RSI_SUCCESS)
-> >> +		goto err_out;
-> >> +
-> >> +	ipa_change_align =3D hyp_pagesize_rhicall.gprs[0];
-> >> +	/* This error needs special handling in the caller */
-> >> +	if (ipa_change_align & (SZ_4K - 1))
-> >> +		return 0;
-> >> +
-> >> +	return ipa_change_align;
-> >> +
-> >> +err_out:
-> >> +	/*
-> >> +	 * For failure condition assume host is built with 4K page size
-> >> +	 * and hence ipa change alignment can be guest PAGE_SIZE.
-> >> +	 */
-> >> +	return PAGE_SIZE;
-> >> +}
-> >
-> > Why can't this be part of rsi.c? This is an RSI call, and it should be
-> > part of the RSI initialisation.
-> >
->=20
-> This is an RHI call as per the specification, hence it has been added to
-> rhi.c.
-
-News flash: this is the Linux kernel, not an ARM spec. We organise
-things based on the logical use, not on the TLA associated with it.
-
-And RHI is implemented in terms of RSI. In rsi.c it goes. We don't
-need this pointless proliferation of helper files that only result in
-equally pointless global symbols.
-
->=20
-> >> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> >> index 9e846ce4ef9c..ff735c04e236 100644
-> >> --- a/arch/arm64/kernel/rsi.c
-> >> +++ b/arch/arm64/kernel/rsi.c
-> >> @@ -14,8 +14,10 @@
-> >>  #include <asm/mem_encrypt.h>
-> >>  #include <asm/pgtable.h>
-> >>  #include <asm/rsi.h>
-> >> +#include <asm/rhi.h>
-> >> =20
-> >>  static struct realm_config config;
-> >> +static unsigned long ipa_change_alignment =3D PAGE_SIZE;
-> >> =20
-> >>  unsigned long prot_ns_shared;
-> >>  EXPORT_SYMBOL(prot_ns_shared);
-> >> @@ -139,6 +141,11 @@ static int realm_ioremap_hook(phys_addr_t phys, s=
-ize_t size, pgprot_t *prot)
-> >>  	return 0;
-> >>  }
-> >> =20
-> >> +unsigned long realm_get_hyp_pagesize(void)
-> >> +{
-> >> +	return ipa_change_alignment;
-> >> +}
-> >
-> > Again, this has nothing to do with the hypervisor, but the host. And
-> > ipa_change_alignment is still a wording I can't wrap my small head
-> > around.
-> >
-> >> +
-> >>  void __init arm64_rsi_init(void)
-> >>  {
-> >>  	if (arm_smccc_1_1_get_conduit() !=3D SMCCC_CONDUIT_SMC)
-> >> @@ -147,6 +154,12 @@ void __init arm64_rsi_init(void)
-> >>  		return;
-> >>  	if (WARN_ON(rsi_get_realm_config(&config)))
-> >>  		return;
-> >> +
-> >> +	ipa_change_alignment =3D rhi_get_ipa_change_alignment();
-> >> +	/* If we don't get a correct alignment response, don't enable realm =
-*/
-> >> +	if (!ipa_change_alignment)
-> >> +		return;
-> >
-> > But at the same time, you override a global value with an error, and
-> > then paper over it in mem_decrypt_granule_size()...
-> >
->=20
->=20
-> I believe I received similar feedback on my previous version as well,
-> which I didn=E2=80=99t quite follow.
-
-And you didn't think of asking? Sometimes I wonder what these patch
-reviews are for... Just to waste some more electrons, I guess :-/.
-
->=20
-> rhi_get_ipa_change_alignment() only returns an error when the host
-> returns a size that is not 4K-aligned. Otherwise, it returns the
-> host-determined size, or defaults to guest PAGE_SIZE if the RHI call
-> itself is not supported.
-
-You encode the error as 0. You override ipa_change_alignment with 0.
-
-Then...
-
-> >> +size_t mem_decrypt_granule_size(void)
-> >> +{
-> >> +	if (is_realm_world())
-> >> +		return max(PAGE_SIZE, realm_get_hyp_pagesize());
-> >
-> > If you didn't mess with ipa_change_alignment above, you shouldn't need
-> > this max().
-> >
->=20
-> size_t mem_decrypt_granule_size(void)
-> {
-> 	if (is_realm_world())
-> 		return max(PAGE_SIZE, realm_get_hyp_pagesize());
-> 	return PAGE_SIZE;
-> }
->=20
-> That needs to use max(), because we should align to the guest PAGE_SIZE
-> if it is larger than the host-specified alignment value.
-
-... you need to correct that back to PAGE_SIZE because you have stored
-something smaller than PAGE_SIZE.
-
-Isn't the problem really obvious? ipa_change_alignment can *NEVER* go
-down. It should never be allowed to reduce, because that's exactly
-the property you are trying to enforce.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Will
