@@ -1,202 +1,241 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E284243901E
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 14:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777386160; cv=pass; b=exJYwqwCLISfuNcZZBKCa1xjra5FS/2YR06DFOOMMtW1gi2xEEag4b9bEdHKZCSGGCrQtgJRfYk5e+ld8GNzPvu4FnYe4chzGUhLUFmLg/XCAdgIt40NU6bCNk9YQ6e1/RnOY2bLwiHKe864hT/KT+kKNOLnjrjeqFfwrYsXCm0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777386160; c=relaxed/simple;
-	bh=Lhrvsxcq8dhyXHcIWCHjE9nElfckc1204ADXSFXxPGw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DQEKbH837QIjZgZKnheCvjLRuFsnyXB9FR846O3ibTD0pU/rEzPie+eHNM+dgvA0Yu20GZZfRpIZ/1VT7mRXJuDh358LEd1/tGKKgZ8UKssYupDbcE2N+SLOnEQJh7+AyJ3i0IzIMVu301W7Q8taBguNqEKtW2R9n1mibp0Xg68=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iJe/DPJi; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA0D44BCA5;
+	Tue, 28 Apr 2026 14:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777386501; cv=none; b=LGN7K7ua6y0sUGpTppIm7/UjKiA3FZ/MVMedlq7MhzF6MBaKkSmSkudfknug4c9E1ChaWnbioFhCb7Kjv10G4MqQACzwxKwIYCk31T2jjwlPn+wqOnCU1i21AO/6zJGgph9iCSs3T33pX0HNy5AnCBTHSBxzFjnouFwotjd4D1I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777386501; c=relaxed/simple;
+	bh=N3nXriKx5khER2Xv5VyWtRPDcydBXoio22I4HKHD20c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VBeRiRWUuk6+V7jDeBelY1G0pPSlKwPvK8S6GOXm6lGqFac+WE76rYdQjwSxK1Py56A011j8sqfwo/XqUgwjUT9E8qDa00uennq+7kt83+WkUTohQ1nPHTnPppU4hubiKSz2D87PsgLw5Lm7MsRCWfQMX+OOnjFwHKApP23atcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAfM+8T8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iJe/DPJi"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50d6b393d60so71871cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 07:22:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777386156; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TGnZ7j0mSyX2P/Whg615tnpIiSpeFshCUq03T/NwSYMXiBkSgw0oVOnmdfC2i8o7rp
-         4Tblq5E0cOXl7/p8UjHanrg1BVmMT1jH9xwv6O/HgBWFohzzF6+AU9MEo0U/Xhh9YwBX
-         +eefm8PGuUJuD52QOSbDpTD+gmmnqrSVM+1AhF4GnCbzP1wkGYMvADWmRophD2+QmkIn
-         VPkABHo/UwXVXWC5TGJJy+Aji9IiidkF5GZGTEe6ZN6jZ48HYC75aswGuvj9oo2I9csm
-         /bkG95O2NevwOAlkcGNrrVPKI+77Fe8RrgG+Hpe1SVlVHHz30ZSAdt0QcY+o2k+v0aIU
-         /iSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uXGQeShfh02U1wpxLV3lnM8sw0Cqx8U4IJOmflxKdf4=;
-        fh=4Di6zVVUaQ3AXNdTD0B83oybRKZCLiVfFTFLD8CWb64=;
-        b=T0xM5oEM9B6qHUGy0jRChHRlnIo+4IYUDXqFTTrBVBvIVABbVpVk/vD5ar5MNI/p4k
-         fuse5LYBszKltKzJvMCRn8r5h5zJQzbUdhOVjTPp3Hor4Nw+VvesV9HxnfRw6ahPh8Fv
-         TGipPpKJCorRc28qcx9k4KH8OnjuCNb8jhhKt4+8VvPnLEEKMJQ9Li/PyVfxFtZSIxt4
-         yf97REwXVZwCFA2TnwFAUrgnTp0xzQ276sFo8zJAeZ2/P1YmqbosUt6pfiH6530F6Mvu
-         kGrgwz0ye1y9Awc1mr/4BLOg6lHc4xAal3Hd3ROLtD8gRAXX/fLOENBfpFWujm4gQYfN
-         og2Q==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777386156; x=1777990956; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uXGQeShfh02U1wpxLV3lnM8sw0Cqx8U4IJOmflxKdf4=;
-        b=iJe/DPJiQVcqhcNr4II++MxIxpvA9Xug4QzMTcB7FONT+bwHpa4oknUVmhV1RH8yWZ
-         BjAKLfaB1QrUp88qPC5gUZ5A2+JmS5yzvm1fU4hNPblMZy7hZxC9oQGiivRN8myZCuVc
-         NQU1hNL7t8GrxBZbzISSCbtJ9907PpkfeEGwFAsMTkhRCwBnUBdhOWpshks1i6r12vdV
-         SHYnbXWFwCOpVAbqtCmedAotlopeAJ/Uqyg7qxtn37nJvJK7w4eBPKkGaL8qb6rsbl6a
-         kCYiyr4AigsrkK8jWMjllCbdAoUPbvymxWaVjYuuWuiLusPSj7W1A+ULUv2LetFcCqjf
-         JiwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777386156; x=1777990956;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uXGQeShfh02U1wpxLV3lnM8sw0Cqx8U4IJOmflxKdf4=;
-        b=CwR2zGBlLf3S7CnPlEN2zAa+K8PBNUdrmnsGBoePpseFaIEtox9VGEU6OM0BuVLjaL
-         bYJW6v9hEtcooMtCkGYqxITecJR602rGi6tCkNJUv63t5OfGvDzPVypFDPKFVp3k2kqA
-         T8S7IL5aI4PrqsYADW2xAMlYhOBg0xV/Vxrv8qofhPd2fadw1ViTZTnVCWaLeyru4QPm
-         pgjo/bUP0Bq+euoCYnVgqad+3H0acFlKwJD0Y+2uLhrEeRQXCwfBhmzNE6KFBLc6Z0eL
-         3nmGksBbt5gRsnZHPMX30A7ySw1qwIciKFGHv6YTcDtI9nEXt8A+Acu2oSqCA1byD5Og
-         KcKg==
-X-Forwarded-Encrypted: i=1; AFNElJ9MT/yLim9pz7P0fHJiVYsVOHn/5xsodZ2Q3F9VF6iIQp4L8F9DQFO6ZGlJb5bD55UvwkdqUkY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyxdHXTNrmmb0BO6XFplk3jOHNTZNZ5PILLROyXEajbypNDuMGA
-	UHSO8Ph1okQIBDKFVNpbTHQGP12i74PGPv07KHGUdk6GUjD3SrZN+KyVJ861xjNB5uoVjFDocDq
-	IOznbKEEWmfHpJ94yXopqeiZk78E1kMO1IiS1ElUE
-X-Gm-Gg: AeBDiet4eEWUDG/C3FZ3M+fN5+4lGleXP8ucIbgRtp2zCXuyWeLVWLOvXjBMPoDAPiZ
-	05GKrOZC14varyAqWjSPmoF0xTmZSTlKMrrXEBQCfBnfokP1gcnMnkpWlC7tZdOS9hMTpuxzdug
-	dLsBnBHYxhpGA9MLOO2T3O3erICs82D0o+LE7Vm0fOyXQk0blQc4Ve8w63jNdwWFvK8owIkzixk
-	Tkp5TSZUZmstaFCrzWSs4C2e8iXj39lYhKHs93xXaiol35X9IHLyfLowMScE7DH4EVrb/aen+nQ
-	HBcrF713pR4J7lI6p5Le/7/l0BzOguusSSii653VtBhmWKZFO1w0T7QIV67+sWo=
-X-Received: by 2002:a05:622a:14a:b0:50f:be7b:923a with SMTP id
- d75a77b69052e-5100dd824admr13692471cf.9.1777386155175; Tue, 28 Apr 2026
- 07:22:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAfM+8T8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE31C2BCAF;
+	Tue, 28 Apr 2026 14:28:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777386501;
+	bh=N3nXriKx5khER2Xv5VyWtRPDcydBXoio22I4HKHD20c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GAfM+8T8+2VJI0rHHswSdt1CdXDB3TJ30naZPaG1e1YudqyGXuzsI/01+NDWloZ0R
+	 inQxcS6gAbEX0+9edyZg5jcLQyFms/9Pn0XlV9Ux/QwY9zruQNxW0pYfcTFT3Oh410
+	 mhc18QtBXFqpNyfd8ZgMhtF4PCI4YWXHZLxwhIYV4T9rJ0oOjXgZXxTan46232eaJk
+	 eGn9dp2sgVvjv4Zj01higFm05t7oV7M9GleZGlNKG0fcPs3wmenyDUTmhbMPk6tOQv
+	 SWnjA3K1+eWthYOBkjFVybJurpikkyYcS1Ct/HyjjO+fSPN4RDNZK1UNV/ozT6ietn
+	 3ZZ28Vxk1bVFA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wHjQA-0000000FXVS-1nvU;
+	Tue, 28 Apr 2026 14:28:18 +0000
+Date: Tue, 28 Apr 2026 15:28:18 +0100
+Message-ID: <86se8fyxa5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 03/43] KVM: arm64: gic-v5: Add resident/non-resident hyp calls
+In-Reply-To: <20260427160547.3129448-4-sascha.bischoff@arm.com>
+References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
+	<20260427160547.3129448-4-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260428103008.696141-1-tabba@google.com> <20260428103008.696141-3-tabba@google.com>
- <afC7H1fu4vFzTRTt@willie-the-truck>
-In-Reply-To: <afC7H1fu4vFzTRTt@willie-the-truck>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 28 Apr 2026 15:21:58 +0100
-X-Gm-Features: AVHnY4IcRutI69cs69i--7xOx374S2gpBibzxSLDc-9Cnq9PVlW1EEta-ioTBlc
-Message-ID: <CA+EHjTy=xvvBN0UyK2bO6J-GuUZnHRwjjdrhkK8Vr+iridWCfg@mail.gmail.com>
-Subject: Re: [PATCH 2/8] KVM: arm64: Synchronise HCR_EL2 writes on the guest
- exit path
-To: Will Deacon <will@kernel.org>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
-	vdonnefort@google.com, catalin.marinas@arm.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Will,
+On Mon, 27 Apr 2026 17:07:03 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> So far the KVM GICv5 support has been limited to PPIs. These only go
+> as far out as the CPU interface, and have no interaction with the
+> host's IRS. Therefore, PPIs can be directly used for guests without
+> host IRS involvement. However, in order to support both SPIs and LPIs
+> IRS involvement is required.
 
-On Tue, 28 Apr 2026 at 14:50, Will Deacon <will@kernel.org> wrote:
->
-> On Tue, Apr 28, 2026 at 11:30:02AM +0100, Fuad Tabba wrote:
-> > MSR HCR_EL2 is not self-synchronising. Per ARM DDI 0487 M.b K1.2.4
-> > (p.K1-16823) and B2.6.1 (p.B2-297), a Context Synchronisation Event
-> > is required between an HCR_EL2 write and any subsequent direct
-> > register access at the same EL that depends on the new value being
-> > in effect.
-> >
-> > On the entry path, the HCR_EL2 write in __activate_traps is followed
-> > by further EL2 sysreg work (MDCR_EL2, CPTR_EL2, VBAR_EL2, and on the
-> > speculative-AT errata path SCTLR_EL1/TCR_EL1) before ERET into the
-> > guest. None of those intervening accesses depend on the new HCR_EL2
-> > value, and ERET is a CSE per ARM DDI 0487 M.b D1.4.4.1 rule RBWCFK
-> > (p. D1-7209) conditional on SCTLR_EL2.EOS=3D1, which is set
-> > unconditionally by INIT_SCTLR_EL2_MMU_ON (see the prerequisite patch
-> > in this series). The requirement is therefore satisfied implicitly
-> > on the activate path.
-> >
-> > The deactivate path is different: after write_sysreg_hcr() in
-> > __deactivate_traps() further EL2 sysreg work runs before any natural
-> > CSE - on nVHE, __deactivate_cptr_traps and the VBAR_EL2 write; on
-> > VHE, the timer context save which reads CNTP_CVAL_EL0 under the new
-> > TGE/E2H, and the EL1 sysreg restore. Add an explicit isb() at each
-> > of the two deactivate sites.
-> >
-> > The practical impact today is bounded: HCR_EL2.E2H does not toggle
-> > in either path, and the trap bits being changed primarily affect
-> > EL1&0 behaviour. But the architectural rule should be honoured.
-> > Note that write_sysreg_hcr() itself already issues isb() on the
-> > Ampere errata path (sysreg.h), confirming the architectural
-> > expectation; the fast path optimises that away.
-> >
-> > The fix is at the call sites rather than inside write_sysreg_hcr()
-> > because the macro has many users (e.g. the activate path, at.c,
-> > hardirq.h, ptrauth alternatives) where the immediately-following
-> > code either reaches ERET or has another CSE; making the macro emit
-> > an unconditional ISB would impose unnecessary cost on those
-> > well-formed users.
-> >
-> > Fixes: 9404673293b0 ("KVM: arm64: timers: Correctly handle TGE flip wit=
-h CNTPOFF_EL2")
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 11 +++++++++++
-> >  arch/arm64/kvm/hyp/vhe/switch.c  | 11 +++++++++++
-> >  2 files changed, 22 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe=
-/switch.c
-> > index 8d1df3d33595..9d7ead5a5503 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -105,6 +105,17 @@ static void __deactivate_traps(struct kvm_vcpu *vc=
-pu)
-> >       __deactivate_traps_common(vcpu);
-> >
-> >       write_sysreg_hcr(this_cpu_ptr(&kvm_init_params)->hcr_el2);
-> > +     /*
-> > +      * MSR HCR_EL2 is not self-synchronising. Per ARM ARM K1.2.4 p.K1=
--16823
-> > +      * and B2.6.1 p.B2-297, a Context Synchronisation Event is requir=
-ed
-> > +      * between an HCR_EL2 write and any subsequent direct register ac=
-cess at
-> > +      * the same EL that depends on the new value being in effect.
-> > +      * The activate_traps path falls through to ERET (a CSE), but the
-> > +      * deactivate path still executes further EL2 sysreg work (CPTR/V=
-BAR
-> > +      * writes below) before any natural CSE, so make the synchronisat=
-ion
-> > +      * explicit.
-> > +      */
-> > +     isb();
->
-> Sorry, but I don't understand this. Please can you explain why you think
-> that CPTR and VBAR have an ordering dependency on HCR_EL2? Preferably,
-> the comment would talk about the specific fields that are relevant.
+Please keep this in the cover letter. It isn't required to understand
+this patch.
 
-You're right, I misread the spec in my excitement to fix an issue
-raised by my new and improved prompts. I went back to the access
-pseudocode for the registers being written after write_sysreg_hcr():
+> 
+> GICv5 introduces the concept of VPE residency - a VPE can be either
+> resident or non-resident. When the VPE is resident, the IRS is allowed
+> to select interrupts that target that VPE (or the VM) as the HPPI
+> (Highest Priority Pending Interrupt). As the IRS handles both SPIs and
+> LPIs, these will only be picked as the IRS's HPPI when a VPE is
+> resident.
+> 
+> A GICv5 VPE is made resident by writing to the ICH_CONTEXTR_EL2 with a
+> valid VM and VPE ID, and marking it valid in the process. This informs
+> the IRS that a specific VPE is running, and that it can begin HPPI
+> selection for that VPE. Making a VPE non-resident (by making the
+> ICH_CONTEXTR_EL2 invalid) informs the IRS that the VPE is no longer
+> running, and it stops HPPI selection for it.
+> 
+> This change introduces two new hyp calls - one to make a VPE resident
+> and its counterpart to make a VPE non-resident. As part of making a
+> VPE resident, the ICH_CONTEXTR_EL2.F bit is checked in order to catch
+> faults, at which point the kernel will WARN. If everything is
+> configured correctly, this should not happen.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   |  2 ++
+>  arch/arm64/include/asm/kvm_hyp.h   |  2 ++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 15 +++++++++++++++
+>  arch/arm64/kvm/hyp/vgic-v5-sr.c    | 25 +++++++++++++++++++++++++
+>  include/kvm/arm_vgic.h             |  3 +++
+>  5 files changed, 47 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index fa033be6141ad..8c69f1f4de534 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -79,6 +79,8 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_make_resident,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_make_non_resident,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+>  
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 8d06b62e7188c..5f9184276b04e 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -88,6 +88,8 @@ void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
+>  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+>  
+>  /* GICv5 */
+> +void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if);
+>  void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if);
+>  void __vgic_v5_restore_vmcr_apr(struct vgic_v5_cpu_if *cpu_if);
+>  /* No hypercalls for the following */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 9e44c05cf780e..804a9ffdc8594 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -672,6 +672,19 @@ static void handle___tracing_write_event(struct kvm_cpu_context *host_ctxt)
+>  	trace_selftest(id);
+>  }
+>  
+> +static void handle___vgic_v5_make_resident(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+> +
+> +	__vgic_v5_make_resident(kern_hyp_va(cpu_if));
+> +}
+> +static void handle___vgic_v5_make_non_resident(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+> +
+> +	__vgic_v5_make_non_resident(kern_hyp_va(cpu_if));
+> +}
+> +
+>  static void handle___vgic_v5_save_apr(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+> @@ -711,6 +724,8 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+>  	HANDLE_FUNC(__vgic_v3_save_aprs),
+>  	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
+> +	HANDLE_FUNC(__vgic_v5_make_resident),
+> +	HANDLE_FUNC(__vgic_v5_make_non_resident),
+>  	HANDLE_FUNC(__vgic_v5_save_apr),
+>  	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+>  
+> diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5-sr.c
+> index 6d69dfe89a96c..04c5846b9abac 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
+> @@ -7,6 +7,31 @@
+>  
+>  #include <asm/kvm_hyp.h>
+>  
+> +void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if)
+> +{
+> +	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
+> +	isb();
+> +
+> +	/* Catch any faults */
+> +	cpu_if->vgic_contextr = read_sysreg_s(SYS_ICH_CONTEXTR_EL2);
+> +	if (WARN_ON(FIELD_GET(ICH_CONTEXTR_EL2_F, cpu_if->vgic_contextr)))
+> +		return;
 
-- CPTR_EL2/VBAR_EL2 (nVHE) are direct EL2-only registers; their write
-semantics at EL2 don't consult HCR_EL2.
-- CPACR_EL1/VBAR_EL1/CNTP_CVAL_EL0 (VHE) redirect to their EL2
-counterparts on ELIsInHost(EL2) =E2=80=94 i.e., HCR_EL2.E2H =E2=80=94 and E=
-2H doesn't
-toggle here. TGE isn't a condition for these EL2-level accesses.
+I don't think this is particularly useful here. With non-VHE, this
+results in a panic. If there is a problem, you need to fail the vcpu
+entry early, and let the caller find out.
 
-So the whole "depends on the new value being in effect" doesn't
-actually bite for any of the accesses I cited. I'll drop this patch.
-The natural CSEs cover whatever real synchronisation is needed.
+> +
+> +	cpu_if->gicv5_vpe.resident = true;
+> +}
+> +
+> +void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if)
+> +{
+> +	/*
+> +	 * Make as non-resident before actually making non-resident. Avoids race
+> +	 * with doorbell arriving.
+> +	 */
+> +	cpu_if->gicv5_vpe.resident = false;
 
-Cheers,
-/fuad
+Stores and sysreg accesses are not ordered without a DSB ST in between.
 
->
-> Will
+> +
+> +	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
+
+Is this really making anything non-resident? Who clears the V bit?
+
+> +	isb();
+> +}
+> +
+>  void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if)
+>  {
+>  	cpu_if->vgic_apr = read_sysreg_s(SYS_ICH_APR_EL2);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index fe49fb56dc3c9..d14cf4771d606 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -495,6 +495,9 @@ struct vgic_v5_cpu_if {
+>  	 */
+>  	u64	vgic_icsr;
+>  
+> +	/* The contextr used to make VPEs resident and non-resident */
+> +	u64	vgic_contextr;
+> +
+>  	struct gicv5_vpe gicv5_vpe;
+>  };
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
