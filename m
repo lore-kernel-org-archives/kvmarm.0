@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F06A44B674;
-	Tue, 28 Apr 2026 14:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C432DAFDE;
+	Tue, 28 Apr 2026 15:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777388214; cv=none; b=UU4dUDFnS/aHeIPhbX2s4TDeRivCF2lO9/PKNQzSZGTJXQTWqtyeyp0Nk/lvZjt9SQIpQALQBLGEBQuRxNPyJ3wjwAo+LwziIauu+giJ8zy0fPCD10XtyYS4H94FGBIXIzPavTLzc0LvM+RUoW/w9w3DK8TtO3Q7WQaUFDnD0pY=
+	t=1777389636; cv=none; b=Et2MCTY7KlmQP6hkJu6miCDqTKl5VtR9+IQbnNQeC1T/O0unUcpvHtA3e+G3DLnaDGJu7e0oAZNPmCWcAXi/nTFnwsOcgxs2wEjIHDZhulA8L8wBDkTVxDtiMC9zOCI/92URTRNnzztYCZNkqmtBpD17OUA6sdUBDzfHyk731bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777388214; c=relaxed/simple;
-	bh=YVMCAkCkVuCXxr4YLY8bi/zWdrSnhneLvdiGU/6OtME=;
+	s=arc-20240116; t=1777389636; c=relaxed/simple;
+	bh=Idtctt/kb/SmoiGHu5ljVhs/2lxRvfaLWYLp4lxeqbo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A4mafy3gMaxmRPb4UL3QchirC3VZf1uUgTxbXM44uKotIQTD+70R+J6OqIG4SGWKwHxqzHU3H5AsMQC9chRMqZ+YJOFmi5A092dn/NwgeC6nwNn7YFb/gVknLm+JdbhGOF0hHLJ0tujK4upv10S0WUC5sUwC5y36WVgihGzacDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkatepTC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=jAHlwdM27Ynq0jRe8DWnlKJ4EYERDITggWHTAH0hB/bKXPHgWfacgoorHpcU6MQmjXci85ks1XhSVkJ9qUdxKu5usIZPeGoVeZQwn1FxHtTy4g5RYUhDf78JeUanmKowX5x/DweJCD86exJpnVnSqSsGdIZ8YP+lFc6h23ahF0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvBcYKMC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkatepTC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 102A5C2BCB5;
-	Tue, 28 Apr 2026 14:56:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvBcYKMC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0804C2BCAF;
+	Tue, 28 Apr 2026 15:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777388213;
-	bh=YVMCAkCkVuCXxr4YLY8bi/zWdrSnhneLvdiGU/6OtME=;
+	s=k20201202; t=1777389635;
+	bh=Idtctt/kb/SmoiGHu5ljVhs/2lxRvfaLWYLp4lxeqbo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jkatepTCvLfkM2z9Z/V4asFQmL8vVMnOfFwT44HuOn2mjCfoRZEJmHvRWvvdB8fDp
-	 IW00paivTQzxzFt7YHulUtDiB3qNjGMvyTlz7Qrk0ic0RsPXrrslrpFMOvSwyC2Yr0
-	 JdR3y6HrqQ2d+M2kLePPAr02vI7TKjtUWiaXqfyfYegZ+syQK7+WLiCfcFXNXKsmZX
-	 2xkZTlJKYXHnXPwOhRXDb5VJ0b8SIDb8FFHa2IBdHYGA0X/KwuOo3YY5KNmgOejvvC
-	 OMMumI0tpQU/BGDsHvPbD81hfLPvN5Xwc7O40x2gk3yZcd558e1tXBkaLGpYNOWqiI
-	 8HIJ+csRUBVqg==
+	b=DvBcYKMCG6re7fgbFGsln5FXGziuiyoQxC1feSafGl9EQxtJLZf0q9Rx00qUdXPUD
+	 OeYusMPopskeKZvt0fIXKQzPoDnVc9IaiWtvkO6Qvp6b6af0vo+cySgrhNlI1d4ck6
+	 DMTv2W1296lNOpd6QX9pNyqJgwpBegzB/ifpdo5SmPIv8ToeLQaM+j8ccSvgho8bxr
+	 lBs2OpeDbVTUwgaBJjzZ8+5vv4RCB9Bct9tVAbsPkIko0LEuZCxdQtTG/NCv8s+VYZ
+	 f1te80WvDZ/zoBeDAu6sz6EVYotX+MbXZI/LgGqvIAFQ5/H9B+WOCIkSHUx0h8lDRU
+	 1kx0GQNYUhecg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wHjrm-0000000FYDW-1gtE;
-	Tue, 28 Apr 2026 14:56:50 +0000
-Date: Tue, 28 Apr 2026 15:56:50 +0100
-Message-ID: <86qznzyvyl.wl-maz@kernel.org>
+	id 1wHkEj-0000000FYlQ-1LxN;
+	Tue, 28 Apr 2026 15:20:33 +0000
+Date: Tue, 28 Apr 2026 16:20:32 +0100
+Message-ID: <86pl3jyuv3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -51,10 +51,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	<peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 04/43] irqchip/gic-v5: Provide IRS config frame attrs to KVM
-In-Reply-To: <20260427160547.3129448-5-sascha.bischoff@arm.com>
+Subject: Re: [PATCH 05/43] KVM: arm64: gic-v5: Extract host IRS caps from IRS config frame
+In-Reply-To: <20260427160547.3129448-6-sascha.bischoff@arm.com>
 References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
-	<20260427160547.3129448-5-sascha.bischoff@arm.com>
+	<20260427160547.3129448-6-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,92 +70,214 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 27 Apr 2026 17:07:24 +0100,
+On Mon, 27 Apr 2026 17:07:44 +0100,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> KVM needs to interact with the host IRS in order to, for example, make
-> VMs or VPEs valid. There are two potential approaches here. Either the
-> host irqchip driver can provide an interface, or KVM can interact
-> directly with the host IRS. The latter of these two is chosen as the
-> set of MMIO registers that KVM needs to interact with is orthogonal to
-> the set used by the host irqchip driver (with the exception of some of
-> the read-only IRS_IDRx registers).
+> The host irqchip driver provides KVM with a pointer to an IRS's config
+> frame, which allows KVM to directly interact with the host's IRS. The
+> MMIO registers in the config frame are used to configure VMs (in
+> addition to them being used by the host). The IRS's config frame also
+> includes a set of ID registers which describe the capabilities that
+> the IRS has.
 > 
-> Pass KVM a pointer to an IRS config frame - the config frame belonging
-> to ANY IRS is fine as long as one IRS's config frame is used
-> consistently - in struct gic_kvm_info. Additionally, include a flag
-> telling KVM whether the IRS is coherent or non-coherent in order to
-> make sure that KVM can do the correct cache state management, if
-> required.
+> Stash the pointer to the config frame, and extract the VM capabilities
+> (from IRS_IDR3 & IRS_IDR4), as well as the IST
+> capabilities/requirements (IRS_IDR2) from the IRS.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  drivers/irqchip/irq-gic-v5-irs.c      | 26 ++++++++++++++++++++++++++
->  drivers/irqchip/irq-gic-v5.c          |  3 +++
->  include/linux/irqchip/arm-gic-v5.h    |  2 ++
->  include/linux/irqchip/arm-vgic-info.h |  5 +++++
->  4 files changed, 36 insertions(+)
+>  arch/arm64/kvm/Makefile              |  2 +-
+>  arch/arm64/kvm/vgic/vgic-v5-tables.c |  8 +++++
+>  arch/arm64/kvm/vgic/vgic-v5-tables.h | 41 ++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic-v5.c        | 52 ++++++++++++++++++++++++++++
+>  include/linux/irqchip/arm-gic-v5.h   | 10 ++++++
+>  5 files changed, 112 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/vgic/vgic-v5-tables.c
+>  create mode 100644 arch/arm64/kvm/vgic/vgic-v5-tables.h
 > 
-> diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
-> index f3fce0b1e25d9..5dfa043cf9e34 100644
-> --- a/drivers/irqchip/irq-gic-v5-irs.c
-> +++ b/drivers/irqchip/irq-gic-v5-irs.c
-> @@ -50,6 +50,32 @@ static void irs_writeq_relaxed(struct gicv5_irs_chip_data *irs_data,
->  	writeq_relaxed(val, irs_data->irs_base + reg_offset);
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 59612d2f277c1..431de9b145ca1 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -24,7 +24,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+>  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+>  	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
+> -	 vgic/vgic-v5.o
+> +	 vgic/vgic-v5.o vgic/vgic-v5-tables.o
+>  
+>  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+>  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+> new file mode 100644
+> index 0000000000000..30e2b108b1aa3
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+> @@ -0,0 +1,8 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2025, 2026 Arm Ltd.
+> + */
+> +
+> +#include "vgic-v5-tables.h"
+> +
+> +struct vgic_v5_host_ist_caps gicv5_host_ist_caps;
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+> new file mode 100644
+> index 0000000000000..cf00a248eabd5
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+> @@ -0,0 +1,41 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2025, 2026 Arm Ltd.
+> + */
+> +
+> +#ifndef __KVM_ARM_VGICV5_TABLES_H__
+> +#define __KVM_ARM_VGICV5_TABLES_H__
+> +
+> +#include <linux/irqchip/arm-gic-v5.h>
+> +
+> +struct vgic_v5_host_ist_caps {
+> +	/* IST Capabilities */
+> +
+> +	/* Apply to LPIs and SPIs */
+> +	u8	ist_id_bits;
+> +	bool	ist_levels;
+> +	u8	ist_l2sz;
+> +	bool	istmd;
+> +	u8	istmd_sz;
+> +
+> +	/* LPI only */
+> +	u8	min_lpi_id_bits;
+> +
+> +	/* VM Table, VPE Table */
+> +	bool	two_level_vmt_support;
+> +	u32	max_vms;
+> +	u32	max_vpes;
+> +	u16	vmd_size;
+> +	u16	vped_size;
+> +
+> +	/* Is the IRS coherent with us, or not? */
+> +	bool	irs_non_coherent;
+> +};
+> +
+> +extern struct vgic_v5_host_ist_caps gicv5_host_ist_caps;
+> +static inline struct vgic_v5_host_ist_caps *vgic_v5_host_caps(void)
+> +{
+> +	return &gicv5_host_ist_caps;
+> +}
+
+Err. No. Make gicv5_host_ist_caps static, and move the helper as
+non-inline in vgic-v5-tables.c. It's not like this is anywhere near
+performance-critical stuff, is it?
+
+But also, if that's global information, we have kvm_vgic_global_state.
+Isn't that where these things should live? Then the introduction of
+vgic-v5-tables.[ch] can be moved to the point where it actually
+matters.
+
+> +
+> +#endif
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index d4789ff3e7402..fd3d6299a2baa 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/irqchip/arm-vgic-info.h>
+>  
+>  #include "vgic.h"
+> +#include "vgic-v5-tables.h"
+>  
+>  #define ppi_caps	kvm_vgic_global_state.vgic_v5_ppi_caps
+>  
+> @@ -34,6 +35,54 @@ static void vgic_v5_get_implemented_ppis(void)
+>  	__assign_bit(GICV5_ARCH_PPI_PMUIRQ, ppi_caps.impl_ppi_mask, system_supports_pmuv3());
 >  }
 >  
-> +void __iomem *gicv5_irs_get_config_frame_base(void)
+> +static void __iomem *irs_base;
+
+Global state?
+
+> +
+> +static u32 irs_readl_relaxed(const u32 reg_offset)
 > +{
-> +	struct gicv5_irs_chip_data *irs_data = per_cpu(per_cpu_irs_data,
-> +						       smp_processor_id());
-> +
-> +	if (!irs_data)
-> +		return NULL;
-> +
-> +	return irs_data->irs_base;
+> +	return readl_relaxed(irs_base + reg_offset);
 > +}
 > +
-> +bool gicv5_irs_is_non_coherent(void)
+> +static int gicv5_irs_extract_vm_caps(const struct gic_kvm_info *info)
 > +{
-> +	struct gicv5_irs_chip_data *irs_data = per_cpu(per_cpu_irs_data,
-> +						       smp_processor_id());
+> +	u64 idr;
 > +
-> +	if (!irs_data) {
-> +		pr_err("Failed to look up IRS for CPU %d\n",
-> +		       smp_processor_id());
-> +		return false;
+> +	irs_base = info->gicv5_irs.base;
+> +	if (!irs_base) {
+> +		kvm_info("No GICv5 MMIO IRS address; no GICv5 support\n");
+> +		return -ENODEV;
 > +	}
+
+Should you instead bail out early by not registering the gic_kvm_info
+when the IRS base is unknown, making this sort of checks irrelevant?
+
+Also, it's not like we can make it very far without an IRS...
+
 > +
-> +	return !!(irs_data->flags & IRS_FLAGS_NON_COHERENT);
+> +	vgic_v5_host_caps()->irs_non_coherent = info->gicv5_irs.non_coherent;
+> +
+> +	idr = irs_readl_relaxed(GICV5_IRS_IDR2);
+> +
+> +	/* We skip the LPI field as it only applies to physical LPIs */
+> +	vgic_v5_host_caps()->ist_id_bits = FIELD_GET(GICV5_IRS_IDR2_ID_BITS, idr);
+> +	vgic_v5_host_caps()->min_lpi_id_bits = FIELD_GET(GICV5_IRS_IDR2_MIN_LPI_ID_BITS, idr);
+> +	vgic_v5_host_caps()->ist_levels = !!FIELD_GET(GICV5_IRS_IDR2_IST_LEVELS, idr);
+> +	vgic_v5_host_caps()->ist_l2sz = FIELD_GET(GICV5_IRS_IDR2_IST_L2SZ, idr);
+> +	vgic_v5_host_caps()->istmd = !!FIELD_GET(GICV5_IRS_IDR2_ISTMD, idr);
+> +	vgic_v5_host_caps()->istmd_sz = FIELD_GET(GICV5_IRS_IDR2_ISTMD_SZ, idr);
+> +
+> +	idr = irs_readl_relaxed(GICV5_IRS_IDR3);
+> +
+> +	vgic_v5_host_caps()->max_vms = BIT(FIELD_GET(GICV5_IRS_IDR3_VM_ID_BITS, idr));
+> +	vgic_v5_host_caps()->two_level_vmt_support = !!FIELD_GET(GICV5_IRS_IDR3_VMT_LEVELS, idr);
+> +
+> +	if (FIELD_GET(GICV5_IRS_IDR3_VMD, idr))
+
+The constant (ab)use of FIELD_GET() for fields that are single bit
+wide is very hard to read. I'd like to see:
+
+	vgic_v5_host_caps()->ist_levels = (idr & GICV5_IRS_IDR2_IST_LEVELS);
+[...]
+	vgic_v5_host_caps()->istmd = (idr & GICV5_IRS_IDR2_ISTMD);
+[...]
+	if (idr & GICV5_IRS_IDR3_VMD)
+[...]
+
+which is infinitely more readable.
+
+> +		vgic_v5_host_caps()->vmd_size = BIT(FIELD_GET(GICV5_IRS_IDR3_VMD_SZ, idr));
+> +	else
+> +		vgic_v5_host_caps()->vmd_size = 0;
+> +
+> +	idr = irs_readl_relaxed(GICV5_IRS_IDR4);
+> +
+> +	vgic_v5_host_caps()->vped_size = BIT(FIELD_GET(GICV5_IRS_IDR4_VPED_SZ, idr));
+> +	/* Field stores VPE_ID_BITS - 1 */
+> +	vgic_v5_host_caps()->max_vpes = BIT(FIELD_GET(GICV5_IRS_IDR4_VPE_ID_BITS, idr) + 1);
+> +
+> +	return 0;
 > +}
-> +
-
-Frankly, we don't need these micro-helpers. Just add *one* that
-returns a pointer to the IRS data for CPU0, and do the information
-cherry-picking in the caller.
-
 > +
 >  /*
->   * The polling wait (in gicv5_wait_for_op_s_atomic()) on a GIC register
->   * provides the memory barriers (through MMIO accessors)
-> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
-> index 58e457d4c1476..3329019722360 100644
-> --- a/drivers/irqchip/irq-gic-v5.c
-> +++ b/drivers/irqchip/irq-gic-v5.c
-> @@ -1134,6 +1134,9 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
+>   */
+> @@ -61,6 +110,9 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  		goto skip_v5;
+>  	}
 >  
->  	gic_v5_kvm_info.type = GIC_V5;
->  
-> +	gic_v5_kvm_info.gicv5_irs.base = gicv5_irs_get_config_frame_base();
-> +	gic_v5_kvm_info.gicv5_irs.non_coherent = gicv5_irs_is_non_coherent();
+> +	if (gicv5_irs_extract_vm_caps(info))
+> +		goto skip_v5;
 > +
->  	/* GIC Virtual CPU interface maintenance interrupt */
->  	gic_v5_kvm_info.no_maint_irq_mask = false;
->  	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
 
-While you're at it, you may want to fix the check on the maintenance
-interrupt, which gives up registering with KVM if no MI is found, even
-in the absence of FEAT_GCIE_LEGACY.
+We shouldn't "skip_v5" anymore. If we can't initialise KVM with GICv5,
+we're done, and we should not even try to register v3.
 
 Thanks,
 
