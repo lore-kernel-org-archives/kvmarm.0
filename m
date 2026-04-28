@@ -1,133 +1,157 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC7033DED1
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 17:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777395832; cv=pass; b=SWETqyQrXcD3Esi3Kk5+qa7MgYHQ9OAmN0zti3DDIF524x+0waS2VyqsKudLo+zNci9lOtPyvBbTn1b1VVj8wdeUUH3iiC4H3E1sPGgpbpo34DtSWnYH6nBovPUDKgxFr1fxBemzlAAx78vQLkotXI1oXk/ZiTUNqPmlnla4xCE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777395832; c=relaxed/simple;
-	bh=1zJiD6uVVjfJZKq1rBMnu25vKAHnwzgWRAcpLmQwMq4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dQ1GVRcFGeOMddF6PjprXlxYUtYlkAyg02fiXJJxnX98hRSnPiuPG/X8miHGF1yqFnXE6PhwoYmxoQPds8hP/Cwjm2JHRWBxw/mTbRwzIeVRWRfVzgPV7CkqbGYglKJvamp9kUx1LnmszRjTgljAJSzswwIJ7K/cBZU6q07tNZY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X+ZN0Exc; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AA61547C0;
+	Tue, 28 Apr 2026 20:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777408678; cv=none; b=T+hTj47Fk1oREOOiM/Lde+0iDGtoFVIYKP89qa+EL9fw+XDa8hhF1KG30XZ07gepTuHaIzRmYx3X6pKAMQNnCE1A+wCINGM04XnEbtvITNo3oY5i44cf0ybAChoFaE2QL1o1NMYV2fpAVaQfJMegZQU8Huv/t65v5R47P5lTxZU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777408678; c=relaxed/simple;
+	bh=V7I0KV6GT9VUys+mlnRoHASgsmtf7Ej4OOFcxCQfZbo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mR7U9YxWEkhI8cszZ2xyzpiCjI3kgf99rOjL/KzjJLIftYDcIXgCTyzUBsYQnrcjo1dTZiXzeUBy8p5Vd6dDalrHnpee+vDhBDh2eQXzsa2Z9HbrW5zf8mWC1xNOr9ngs/2mqGswFsjIzH4ipDRyZqU2aoYkn3mbnx0VyHBzpDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iJ/MtLRu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X+ZN0Exc"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50d864c23bdso840131cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 10:03:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777395830; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hUh1QPoZpTKxsm5Xu2SwYfT38+fCq5NiCS3dUOe3FDnZmOserlxQ8OmO2gWTxV3RQ1
-         QIZIWjqokn8utaUdxZ+wyGVaQbrEqLlIExZPC+q53sBIyrGfCFIjuy/lTopcHE5aFobP
-         xdbTlnbpypJtWNa1ol70wT3mTH5C86ALAlAsIElBHTRbBes1GSMZh1XJqkKx1ghXOB7J
-         /hsxGG6dHKpBk1yfw2ZtcpmJY8GXyX3Lw54tSRTnN0a1bsbiP6pJaoDFp7vIDGWjFCkR
-         J/ls3NvLyCUMAYwdkwtgKQbcV/uwVPnqtRZYq8q7LZPl3cbgWqMQpIgxPnAVCqplrk+S
-         2zBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vRxyUyWR/bvwIckxaxOIFLoCtm5E8wIRuhM7yIvbG+w=;
-        fh=Do5IvBzM5TaoKQARJ0yY+hNNkS61dyRAoZnQDCKTT3A=;
-        b=LUfPHW0ujXTYzi5Gtor2kqXS/4HlLq7bRp/QNpOveF6/fIo4M0yWJxv/2tKWgWwwq/
-         2esUPqnQYSDmL1Ip3Vp5DONGXBWqhuNZvl2Px4rAR32/aRlC9k2+TtylVfm0EPHGQnHB
-         BLEzC7hqFkWElsBlyLcRbb9B+DuUYk931VKUdysog9Zbz20XA5SbvfCzgY3UswUz2lB4
-         ZiGTrqxXxoTudnc1BAPEbyZkQDTDpX9iDlKG8eKIudnmM5290/FYRUCTAg9SAQK0UC+a
-         jpRnt5lYrueIl0BHU04ZiwcMatHgQ8UDwB4tt+9hE0DUoT+TQts39djMO1sA+mHHLLTU
-         ANuQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777395830; x=1778000630; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vRxyUyWR/bvwIckxaxOIFLoCtm5E8wIRuhM7yIvbG+w=;
-        b=X+ZN0ExcUZe4TbuOHnIu0nxIZypTBVY5Qs/LEG5eJ7daoGDv8lwLef5CBFOjpXaUb7
-         91gpTXGnuX7IOjBfneLKvymG+EYYKOK2ZQ9ax5/6czLve8ffUJQwtgOrc95Hin8BaOnJ
-         cTcU9thmy4K7s6RCjSb5ulk5xd+76SS9akQKnINUwVHEdqSngfQ9bWeQCE2TKPARW9yK
-         3mvDwns68OWFoZlvs/gOoWiesot2cZsfRS11OQPC1SVRZ2bV1itBQubmaxevHoew+HLX
-         SgP48PstiZx/M7ERfE2jgrVFLB7qWjk9+px8Twas+EGniUT2wL8ECM1Mp1qEW1J+m1tH
-         nqdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777395830; x=1778000630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vRxyUyWR/bvwIckxaxOIFLoCtm5E8wIRuhM7yIvbG+w=;
-        b=mRvDKKl45hUDXb5Ndm0h/pQEiQX0ImD9MDOXQqJcMGC1vcEMjUhmQ9UVEo3nYM2BQr
-         3HSmpPnGwdyssYbUvSHNbxJnNSmpFa+N1lhNE7I8Uq/kpHDCR9gfiARz1rReQhgGpHV4
-         oCqiyeXPEeviHliQYWP6aDFwAPnOjDtaQpCqKg6b5GDicLjMh9hKOHXma+kMWNJjs06Y
-         LRqQMkd1Jf88wWtC11ZG2D7fmxejfD2xNoOBOi/jyGOooO0PUs7eghRtyJEgl4E2IGId
-         oe1nEYAWJI5oz/u3FONRH3inmb/JEayiX35a7IbPPiH31uR60sqjrARuPng4yuoFoS1I
-         1E/A==
-X-Forwarded-Encrypted: i=1; AFNElJ+EirJfQeqdu7CSSx402O/rCvRftq0tKxYOLmj4js+OsUg55xv7qzyRmyKj4j1u9871BqmjL9o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxZ6uR/Hn/vmJZ7gGbuYK3/y4esGGXmZLeacKfWiQNy7BDKengm
-	F6yTwyf45DcLM8c8cNbTNe3LMvQr53P1ZwN40rMWfOVoTnf2DMTGOw2d6okRBu10dkYtgbL0w3S
-	SClDdteFlmsqQAvjUwow0/1PyfAZXHz1zRv/OpNkI
-X-Gm-Gg: AeBDievI1FalDhSJYBZEDmGsDaw+uIBiQIaUwzmthxtlTntmdvPV0OT1k8L5b2Jqiq5
-	63C13ULFrturOC+MAnl+1BINLbDXgYg7zRQqyxTVDM7E1gm+rzoHKTKyW0nSRoQRhsxaC8YKrqb
-	7ZSar5HaP43SbWRrTxE74/kVbuHrl7PTXklyguxrqOaL7IZmXKRvS3IRtKXlHXX6T+Zv9OT38Mo
-	RLz/hPLXvcRecRAkq+NoddL5X+a6GsQg2l9KNDzZ0DhllcGkAQU0wGIZWYzBnI+ynf4zLyIoZX0
-	G06TDg9+0MzfSWAT2gRA1LK3OR/VAQrcFfxu0pSAe3Jus+5q7/LsZr8xjkt8Fr4=
-X-Received: by 2002:ac8:5dce:0:b0:508:fd42:fd05 with SMTP id
- d75a77b69052e-5100ddca71dmr16116641cf.15.1777395829071; Tue, 28 Apr 2026
- 10:03:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iJ/MtLRu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 426A5C2BCAF;
+	Tue, 28 Apr 2026 20:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777408678;
+	bh=V7I0KV6GT9VUys+mlnRoHASgsmtf7Ej4OOFcxCQfZbo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iJ/MtLRuFpFKLhtkCOWoD3zAzpvReiWjXMBOwIVsm17lzf9SW/Xgp7lTGph/unskd
+	 4rTv0Smhfaz3bw45E2MYkMKKmSnFe614l98lfUrdPqtvDgFNCtO160gw56DISDH2CJ
+	 o/D3bFAi/3LNG8UOErWmoIUg/avf7OUfppTtolBHW3RK/kTi2pq8wkAofOZN6BKCr1
+	 2lA97PXAj5glaEg9kI7lACoEUwOFCddCimE6V4fIZ1+FittfVRr8EftYm4156n8QUV
+	 iZCRXe0YzvrfKUZ+D9snG2v4ojjdBIsdKLRs3faGwTrVa+Zo2/7FugfzgNu9o5juAz
+	 f94RT4lu7n3XA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wHpBr-0000000FfsW-3wvY;
+	Tue, 28 Apr 2026 20:37:56 +0000
+Date: Tue, 28 Apr 2026 21:37:55 +0100
+Message-ID: <87ecjybz30.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+Cc: Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Darren Hart <darren@os.amperecomputing.com>
+Subject: Re: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
+In-Reply-To: <87ik9dbys7.wl-maz@kernel.org>
+References: <20251120172540.2267180-1-maz@kernel.org>
+	<20251120172540.2267180-36-maz@kernel.org>
+	<2e12c5c2-a1b6-47b7-b54c-7281a77bbe0a@os.amperecomputing.com>
+	<878qb9cxzr.wl-maz@kernel.org>
+	<1e050b67-2276-41ad-9265-796ba853dc7c@os.amperecomputing.com>
+	<86a4vo49ni.wl-maz@kernel.org>
+	<86eck71o1v.wl-maz@kernel.org>
+	<e283e755-c348-43cf-b5fe-278c5eab742d@os.amperecomputing.com>
+	<861pg213to.wl-maz@kernel.org>
+	<87ik9dbys7.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260428103008.696141-1-tabba@google.com> <20260428103008.696141-7-tabba@google.com>
- <afC5_jrTEVRfJ77x@willie-the-truck> <CA+EHjTyTy2qLm=CbOOYR6rmjg5tH38PifAV+qAhbZxidY5szxQ@mail.gmail.com>
- <afDnCiQNJrP7UI2m@willie-the-truck>
-In-Reply-To: <afDnCiQNJrP7UI2m@willie-the-truck>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 28 Apr 2026 18:03:11 +0100
-X-Gm-Features: AVHnY4Iz1X_G7zdc-Gxn4ezijbkjPSVmpE0EY2ldntjmUXB-MEgat-SQsLz5Onc
-Message-ID: <CA+EHjTzO1=LvBF0UFXu=ubO_-TezykxLap9c8CxxvuCT-=3SUQ@mail.gmail.com>
-Subject: Re: [PATCH 6/8] KVM: arm64: Propagate stage-2 map failure on
- host->guest donation
-To: Will Deacon <will@kernel.org>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
-	vdonnefort@google.com, catalin.marinas@arm.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vishnu@os.amperecomputing.com, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 28 Apr 2026 at 17:57, Will Deacon <will@kernel.org> wrote:
->
-> On Tue, Apr 28, 2026 at 03:36:43PM +0100, Fuad Tabba wrote:
-> > On Tue, 28 Apr 2026 at 14:45, Will Deacon <will@kernel.org> wrote:
-> > V2 will drop two patches (in addition to the HCR_EL2 one), and will be
-> > as follows:
-> >
-> > 1. host->guest share and host->guest donate (kept, rewritten): add a
-> >    memcache-sufficiency check during the existing pre-check pass
-> >    (option 1) and return -ENOMEM cleanly without touching any state.
-> >    Restore the WARN_ON() on the subsequent kvm_pgtable_stage2_map() =E2=
-=80=94
-> >    with the topup precheck it asserts an established invariant rather
-> >    than ignoring a reachable error.
-> >
-> >    For the single-page donate, "topped up" is
-> >    KVM_PGTABLE_LAST_LEVEL - vm->pgt.start_level (mirroring host EL1's
-> >    kvm_mmu_cache_min_pages). For multi-page share I plan to use the
-> >    conservative nr_pages * (LAST_LEVEL - start_level) bound and flag it
-> >    as conservative in the commit message; happy to compute a tighter
-> >    alignment-aware bound if you'd prefer.
->
-> For now, I think we should just check against kvm_mmu_cache_min_pages()
-> because that's what the host is using.
+On Sun, 26 Apr 2026 15:07:36 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Sun, 26 Apr 2026 10:14:11 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > On Wed, 22 Apr 2026 15:57:44 +0100,
+> > Vishnu Pajjuri <vishnu@os.amperecomputing.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On 22-04-2026 12:25, Marc Zyngier wrote:
+> > > >
+> > > > Have you made progress on this? I can't reproduce it at all despite my
+> > > > best effort. I'm perfectly happy to help, but you need to give me
+> > > > *something* to go on.
+> > > 
+> > > 
+> > > Thanks for your support!!
+> > > 
+> > > The issue is triggered as soon as the timer interrupt (IRQ 27) is
+> > > deactivated. Preventing the deactivation of IRQ 27 during nested VGIC
+> > > state transitions prevents the failure from reproducing.
+> > 
+> > Which level of deactivation? From L2 to L1? Or L1 to L0? The former
+> > should just be a an update to the irq structure, while the latter is
+> > effectively a write to ICC_DIR_EL1, and *that* is a new behaviour
+> > introduced by this patch.
+> > 
+> > I wonder if your implementation is such that ICC_DIR_EL1 is trapped by
+> > ICH_HCR_EL2.TDIR, which is allowed by the architecture, but that none
+> > of the two implementations I have actually enforce (the trap only
+> > applies to ICV_DIR_EL1). Can you try the hack below which disables the
+> > traps much earlier, and let me know if that helps?
+> > 
+> > Even if that's the case, this should result in an EL2->EL2 exception,
+> > and that should be caught as an unhandled exception in entry-common.c,
+> > so something else is afoot.
+> 
+> Actually, this should never happen. ICH_HCR_EL2.TDIR is constructed
+> like all the other GICv3 trap bits, in the sense that it only traps
+> accesses from EL1, not EL2 (for sanity reasons, I'm not considering
+> the possibility of a trap to EL3...).
+> 
+> Still, I'm interested in finding out if that hack helps at all.
 
-Ack,
-/fuad
->
-> Cheers,
->
-> Will
+Any update?
+
+I've been racking my brain on this one, and I may have another
+potential avenue to explore. Does your CPU implement SEIS
+(ICC_CTLR_EL1.SEIS == 1)?
+
+I think there is a corner case where we can end-up doing a double
+deactivation. On its own, that's a completely harmless thing to
+do. Except on an implementation with SEIS, which could deliver an
+SError and route that to EL3. Add quality firmware to the mix, and you
+could be in for a treat.
+
+Obviously, implementing SEIS is a terrible and pointless thing to do
+(it's been long deprecated), but in case someone felt adventurous in
+the RTL department, let me know what the following hack does for you.
+
+	M.
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 9e841e7afd4a7..c92ca6969e85f 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -275,7 +275,7 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
+ 		lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+ 	}
+ 
+-	if (lr & ICH_LR_HW)
++	if ((lr & ICH_LR_HW) && !vgic_state_is_nested(vcpu))
+ 		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+ 
+ 	vgic_v3_fold_lr(vcpu, lr);
+
+-- 
+Jazz isn't dead. It just smells funny.
