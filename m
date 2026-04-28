@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227633803D3
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 16:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1F744A739
+	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 16:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777392357; cv=none; b=VUYYoTOIYtASP/HW7YYAKMvjGmscJbYg4aeH3zz4VU0tycP7WV0uC7t1EUPvP+QV9K80tj/DTccc8Tg0LbSDTtXsJ6YfykxCLvnx9aJpLFrhEVfRP6rOZkYodEdTUNgEOteW3OML1OM1rJuBkX2+pm/mwx2hP/tMhVn8efePUQw=
+	t=1777392358; cv=none; b=nwLSr9mQoeBuCvlt+GHcoPgvTdJUcoAtNJ8DPx3qWYo5dj3690x1UqQfZHtaQXCoed/+a/wOcA+E6MVz2Z9BUdfiLUVaPRwOSdhB6VcPGsMG0RI8gofW7BWLq/ON8wuANAgC1+i9J064cXbIg2d+AV2jm7H+BGozfXmsbbYBHMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777392357; c=relaxed/simple;
-	bh=5ZP3GIU+wsS/iwYVQmnx7H2Icp+vMMSNkBAHpDwb3ag=;
+	s=arc-20240116; t=1777392358; c=relaxed/simple;
+	bh=Lg84P6WX7WikjKSmAWOSyc4s4+OgW0xFlJXZrRJro9Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LoukxLnkvpzTXYg7mR74FF63v4He6dUCsidZl0EVnAYxij/W+Nkj1fOSUTOqrQWap3FQWBB8akg7PtXQ4uPYzq94DIF7MO0QIHmf847fFqpKb1dao+ir+R9yuQhiqUuF/Yk5F9jfVZo6EhqPbiip4KmG5h7NZiAMM3T1W0nwx/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nYHFw2EC; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=Q2v/AQF/1uMND6EdEreuuFruktk3gfi/VA5zzAcrfaQzN9CKzuVqa1ANtAzYcuYGERJA7vV6OtHxg8/tfgnBlVMKbsNTRXm01M2SKt2InhWTQhkvE4ZeuIzquq/01C4p3GZ2+jcjcs9Lb3fOVEZpZml0tzxLc7NTYH9IghIcQdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lCWuA1DJ; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nYHFw2EC"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lCWuA1DJ"
 Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63S7Zbgj3293550;
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63S8J12g3499801;
 	Tue, 28 Apr 2026 16:05:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Vv5VkcPGd9NBrr+gL
-	dBGYiStBuFwr6CNbBMeBP5HZcA=; b=nYHFw2ECQZk7HalAH5/x0kfeBFN1Gy5qB
-	0BnIeEiIubGEgEKnHsYiZs97e+Up3mJBJbmgLUVTXhm28KDtXAm+pmPGvlL1CFAT
-	GJ74DpIPQnn+0uQrKPMqREGlc3R/23gCZt4uqjFA7TKrjduGegFnOhKa85kVNL1c
-	qZNUP3Ea16O5A/VwsE/Frw7okVrdYahdDcfssH21ScHYlzQr27f03dQUg/RaqXx7
-	RyIGOT5SI/LnMsX5PtbQedNW8wjEkugC0B9LARNRKUvUac3nUcPQxt5/3RMwzlsl
-	uLgTl7Y1IjKQBcoGYGObHOjzgE4hW09bHB/GTb/2UbmvW69gXu3ZQ==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drn44pgq6-1
+	:mime-version:references:subject:to; s=pp1; bh=bKdCZerzHV/o2sihq
+	acITT6K5c6M8fOM4XNG7XWjN1g=; b=lCWuA1DJSIIUrISWI5Hup1NoTmHslGHH0
+	ljj8XIBBN+BPhpOS4pPyZmgO4bLas0TcAmB95DnxFox7QrKV1ZFf4CzfnYhgfMml
+	5xH+wsNtgK4CIJTm4hPW0bayIEmElZxTFt0sbSKSxJ9QP60gRPuhY/F+a4yEN/eW
+	QE/9TyCMG0HzBS6osOaba84fFmm8qjPXyNcLic2DMm5ZqXvXOuBone+hQ2x8lVO3
+	UmdwLL2sZIf7YRP2cOVl66bI2N3fdeU67oU0XzBX8hwfO9ugxkCcMmJMLcCh2j8l
+	jY61DXg7LImGjs3J8oZO2YBMzYoCdEfFJGJBM5NZnabm2v0ZfTbJA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drn44pgq3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 16:05:37 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63SFrnQD002807;
-	Tue, 28 Apr 2026 16:05:36 GMT
+	Tue, 28 Apr 2026 16:05:36 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63SFrq7h015577;
+	Tue, 28 Apr 2026 16:05:35 GMT
 Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ds8xk2eed-1
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ds8avthcf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 28 Apr 2026 16:05:35 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63SG5Vx231588772
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63SG5Vjg31588766
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 28 Apr 2026 16:05:32 GMT
+	Tue, 28 Apr 2026 16:05:31 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CD40520040;
+	by IMSVA (Postfix) with ESMTP id 146CC20040;
 	Tue, 28 Apr 2026 16:05:31 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7B4B720043;
-	Tue, 28 Apr 2026 16:05:31 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id AE8942004B;
+	Tue, 28 Apr 2026 16:05:30 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 28 Apr 2026 16:05:31 +0000 (GMT)
+	Tue, 28 Apr 2026 16:05:30 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: [RFC PATCH v2 11/28] KVM: arm64: Access elements of vcpu_gp_regs individually
-Date: Tue, 28 Apr 2026 18:05:08 +0200
-Message-ID: <20260428160527.1378085-12-seiden@linux.ibm.com>
+Subject: [RFC PATCH v2 09/28] KVM: arm64: Share kvm_emulate definitions
+Date: Tue, 28 Apr 2026 18:05:06 +0200
+Message-ID: <20260428160527.1378085-10-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260428160527.1378085-1-seiden@linux.ibm.com>
 References: <20260428160527.1378085-1-seiden@linux.ibm.com>
@@ -84,20 +84,20 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 45spEKvAiyFbFXzxBp2VJBJOpURvC-Xw
-X-Authority-Analysis: v=2.4 cv=Ft81OWrq c=1 sm=1 tr=0 ts=69f0dad1 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Proofpoint-ORIG-GUID: PUX0MOpLOStnC33HNspU5RFXAUkWPejG
+X-Authority-Analysis: v=2.4 cv=Ft81OWrq c=1 sm=1 tr=0 ts=69f0dad0 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=MeYYmaBpUeygDV1_9ykA:9
-X-Proofpoint-GUID: 45spEKvAiyFbFXzxBp2VJBJOpURvC-Xw
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDE1MSBTYWx0ZWRfX7hHskTOLhBUT
- zaJ3GukgTNa8uTxgqiYyvSn3AmDBYPj/usieESE9TncT6OgioBTIJa2dEgbWeWVmbX367xyyNMv
- J+FYTuoeSrQCxjMJdxULfmFo/UdeCJw7ssk8tHMfP2bk01CXP9gufK6Kb0fPX7PRSgxcHqtp7Th
- Cg0k94tE1mikm8tIsR3xSgtn74AygM7Hi1oOLBlDipRAlY0NF4oBBIHbJOWP+brXnjtGNk9nmfn
- lvSHzGKi8gWfh/okts+dAj1VfGfAa3NvNfYnPskh60MheA5oYnZpKYk8lgFjT9myMIaCfnNOQKG
- xbTLqlk1odi25Qr/h0EfD/XewT2fiALEssMOlIpBz+5VD01DKKWcSyurBWNosAgtb4/8sJIMz0V
- VN11rn6ai6c7ybOZ7yxopGVKxC+AT8nXZJNsmcDsiJYR1XeSqK9PIWLXwznKcIitS9zYy0M9fye
- BezLMzEGpRw9jH2TSlA==
+ a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=HWX1mkjk11RNJ6LnsRgA:9
+X-Proofpoint-GUID: PUX0MOpLOStnC33HNspU5RFXAUkWPejG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDE1MSBTYWx0ZWRfX0GJTzmRqsexR
+ aOHKPHe8kQ+E+Xh7l7fWB4FZ8eKvr07AxIt2ipFgXlTzCjSpaJh0d3mr7sfzLevEf/00n8qvSV+
+ BCkEMz7tiTVJWrWF/9E+81l9yYwvUgTuPuf6iM1Qshd3AxTrHF7uSUTyo6BdbR8UhSycjiHOGRM
+ 1Xahnclb1Drbg7ixZDG6jziQrJk7fmVaqSUB6YU2hKF8YEQ4p286WNup71bUMvTEbWZqyW2w37G
+ Hfn2ypidUPH2YpwcrwIZPaykN09uFQ/di2opmLdAz9MZMN3DuZU3Y0CU2zVcFugiMItHNv8zJIW
+ AdAhdQBLsCU02xUSYO/72UnGmAYo9Ea5OsCFW2gPW1DNjt2hNGkKwKT7mVrqy6BhXfG6kzhWNEH
+ 5M05koa9Utw7fTdgLC8FUmWoHDpGG5fPxo3DDKP/AMPgyCtEu+KMxeu+utot8UXDyj6x6SdWQGK
+ //dgmUjV/hp4LGNHbzA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
@@ -107,209 +107,605 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604280151
 
-While for arm64 the members of vcpu_gp_regs are allocated continuous
-this is not necessarily true for other architectures implementing ARM.
-
-Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
-the vcpu context but the address of the gp-register array field in the
-user_pt_reg struct.
+Move functions and definitions useful for emulating arm64 instructions
+to include/kvm/arm64.
 
 Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h       | 9 +++++++--
- arch/arm64/include/asm/kvm_host.h          | 2 +-
- arch/arm64/kvm/hyp/exception.c             | 7 +++++--
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 4 ++--
- arch/arm64/kvm/hyp/include/hyp/switch.h    | 6 +++---
- arch/arm64/kvm/reset.c                     | 6 ++++--
- include/kvm/arm64/kvm_emulate.h            | 4 ++--
- virt/kvm/arm64/guest.c                     | 6 +++---
- 8 files changed, 27 insertions(+), 17 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h       | 235 +-----------------
+ arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  13 -
+ include/kvm/arm64/kvm_emulate.h            | 268 +++++++++++++++++++++
+ 3 files changed, 269 insertions(+), 247 deletions(-)
+ create mode 100644 include/kvm/arm64/kvm_emulate.h
 
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 39fa3a12730c..41eac2b5de14 100644
+index 822f6077b107..39fa3a12730c 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -95,12 +95,17 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+@@ -23,18 +23,7 @@
+ #include <asm/virt.h>
  
- static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->pc;
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.pc;
+ #include <kvm/arm64/kvm_arm.h>
+-
+-#define CURRENT_EL_SP_EL0_VECTOR	0x0
+-#define CURRENT_EL_SP_ELx_VECTOR	0x200
+-#define LOWER_EL_AArch64_VECTOR		0x400
+-#define LOWER_EL_AArch32_VECTOR		0x600
+-
+-enum exception_type {
+-	except_type_sync	= 0,
+-	except_type_irq		= 0x80,
+-	except_type_fiq		= 0x100,
+-	except_type_serror	= 0x180,
+-};
++#include <kvm/arm64/kvm_emulate.h>
+ 
+ #define kvm_exception_type_names		\
+ 	{ except_type_sync,	"SYNC"   },	\
+@@ -45,36 +34,8 @@ enum exception_type {
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+ 
+-void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr);
+-int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
+-int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+ int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr);
+-void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+-
+-static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
+-{
+-	return kvm_inject_sea(vcpu, false, addr);
+-}
+-
+-static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
+-{
+-	return kvm_inject_sea(vcpu, true, addr);
+-}
+-
+-static inline int kvm_inject_serror(struct kvm_vcpu *vcpu)
+-{
+-	/*
+-	 * ESR_ELx.ISV (later renamed to IDS) indicates whether or not
+-	 * ESR_ELx.ISS contains IMPLEMENTATION DEFINED syndrome information.
+-	 *
+-	 * Set the bit when injecting an SError w/o an ESR to indicate ISS
+-	 * does not follow the architected format.
+-	 */
+-	return kvm_inject_serror_esr(vcpu, ESR_ELx_ISV);
+-}
+-
+-void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+ 
+ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+ int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+@@ -160,24 +121,6 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+ 	*vcpu_cpsr(vcpu) |= PSR_AA32_T_BIT;
  }
  
- static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
+-/*
+- * vcpu_get_reg and vcpu_set_reg should always be passed a register number
+- * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
+- * AArch32 with banked registers.
+- */
+-static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
+-					 u8 reg_num)
+-{
+-	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
+-}
+-
+-static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+-				unsigned long val)
+-{
+-	if (reg_num != 31)
+-		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+-}
+-
+ static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
  {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->pstate;
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.pstate;
-+}
-+
-+static __always_inline unsigned long *vcpu_sp_el0(const struct kvm_vcpu *vcpu)
-+{
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.sp;
+ 	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
+@@ -361,82 +304,11 @@ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.disr_el1;
  }
  
- static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ae9e507f2c7c..7e473b895740 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1050,7 +1050,7 @@ struct kvm_vcpu_arch {
- #define vcpu_clear_on_unsupported_cpu(vcpu)				\
- 	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
- 
--#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
-+#define vcpu_gp_regs(v)		((v)->arch.ctxt.regs.regs)
- 
- /*
-  * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index bef40ddb16db..82611442a2d1 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -277,6 +277,9 @@ static const u8 return_offsets[8][2] = {
- 	[7] = { 4, 4 },		/* FIQ, unused */
- };
- 
-+#define OFFSETOF_PT_REG(__r) offsetof(struct user_pt_regs, __r)
-+#define COMPAT_IDX(__c) ((OFFSETOF_PT_REG(__c) - OFFSETOF_PT_REG(regs[0])) / sizeof(u64))
-+
- static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+-static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
+-}
+-
+-static __always_inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_ISV);
+-}
+-
+ static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
  {
- 	unsigned long spsr = *vcpu_cpsr(vcpu);
-@@ -292,12 +295,12 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 	switch(mode) {
- 	case PSR_AA32_MODE_ABT:
- 		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
--		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
-+		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_abt)] = return_address;
- 		break;
+ 	return kvm_vcpu_get_esr(vcpu) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
+ }
  
- 	case PSR_AA32_MODE_UND:
- 		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
--		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
-+		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_und)] = return_address;
- 		break;
+-static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SSE);
+-}
+-
+-static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SF);
+-}
+-
+-static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+-{
+-	return (kvm_vcpu_get_esr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+-}
+-
+-static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
+-}
+-
+-/* Always check for S1PTW *before* using this. */
+-static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
+-}
+-
+-static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_CM);
+-}
+-
+-static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
+-{
+-	return 1 << ((kvm_vcpu_get_esr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+-}
+-
+-/* This one is not specific to Data Abort */
+-static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_IL);
+-}
+-
+-static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+-{
+-	return ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+-}
+-
+-static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+-}
+-
+-static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
+-}
+-
+-static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
+-}
+ 
+ static inline
+ bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
+@@ -472,36 +344,6 @@ static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
  	}
+ }
  
+-static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+-{
+-	u64 esr = kvm_vcpu_get_esr(vcpu);
+-	return ESR_ELx_SYS64_ISS_RT(esr);
+-}
+-
+-static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+-{
+-	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+-		/*
+-		 * Only a permission fault on a S1PTW should be
+-		 * considered as a write. Otherwise, page tables baked
+-		 * in a read-only memslot will result in an exception
+-		 * being delivered in the guest.
+-		 *
+-		 * The drawback is that we end-up faulting twice if the
+-		 * guest is using any of HW AF/DB: a translation fault
+-		 * to map the page containing the PT (read only at
+-		 * first), then a permission fault to allow the flags
+-		 * to be set.
+-		 */
+-		return kvm_vcpu_trap_is_permission_fault(vcpu);
+-	}
+-
+-	if (kvm_vcpu_trap_is_iabt(vcpu))
+-		return false;
+-
+-	return kvm_vcpu_dabt_iswrite(vcpu);
+-}
+-
+ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ {
+ 	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+@@ -537,81 +379,6 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
+ 	return vcpu_read_sys_reg(vcpu, r) & bit;
+ }
+ 
+-static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
+-						    unsigned long data,
+-						    unsigned int len)
+-{
+-	if (kvm_vcpu_is_be(vcpu)) {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return be16_to_cpu(data & 0xffff);
+-		case 4:
+-			return be32_to_cpu(data & 0xffffffff);
+-		default:
+-			return be64_to_cpu(data);
+-		}
+-	} else {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return le16_to_cpu(data & 0xffff);
+-		case 4:
+-			return le32_to_cpu(data & 0xffffffff);
+-		default:
+-			return le64_to_cpu(data);
+-		}
+-	}
+-
+-	return data;		/* Leave LE untouched */
+-}
+-
+-static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+-						    unsigned long data,
+-						    unsigned int len)
+-{
+-	if (kvm_vcpu_is_be(vcpu)) {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return cpu_to_be16(data & 0xffff);
+-		case 4:
+-			return cpu_to_be32(data & 0xffffffff);
+-		default:
+-			return cpu_to_be64(data);
+-		}
+-	} else {
+-		switch (len) {
+-		case 1:
+-			return data & 0xff;
+-		case 2:
+-			return cpu_to_le16(data & 0xffff);
+-		case 4:
+-			return cpu_to_le32(data & 0xffffffff);
+-		default:
+-			return cpu_to_le64(data);
+-		}
+-	}
+-
+-	return data;		/* Leave LE untouched */
+-}
+-
+-static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+-{
+-	WARN_ON(vcpu_get_flag(vcpu, PENDING_EXCEPTION));
+-	vcpu_set_flag(vcpu, INCREMENT_PC);
+-}
+-
+-#define kvm_pend_exception(v, e)					\
+-	do {								\
+-		WARN_ON(vcpu_get_flag((v), INCREMENT_PC));		\
+-		vcpu_set_flag((v), PENDING_EXCEPTION);			\
+-		vcpu_set_flag((v), e);					\
+-	} while (0)
+-
+ /*
+  * Returns a 'sanitised' view of CPTR_EL2, translating from nVHE to the VHE
+  * format if E2H isn't set.
 diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-index 15e1e5db73e1..4e4cb67824c0 100644
+index 4fdfeabefeb4..15e1e5db73e1 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-@@ -20,11 +20,11 @@
- static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
-+	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+@@ -13,19 +13,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
  
- 	kvm_skip_instr(vcpu);
- 
--	write_sysreg_el2(vcpu_gp_regs(vcpu)->pstate, SYS_SPSR);
-+	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 2597e8bda867..6250b50e1841 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -416,7 +416,7 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
- static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	arm64_mops_reset_regs(vcpu_gp_regs(vcpu), vcpu->arch.fault.esr_el2);
-+	arm64_mops_reset_regs(&vcpu->arch.ctxt.regs, vcpu->arch.fault.esr_el2);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
- 
- 	/*
-@@ -857,7 +857,7 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu)
- 	/*
- 	 * Check for the conditions of Cortex-A510's #2077057. When these occur
- 	 * SPSR_EL2 can't be trusted, but isn't needed either as it is
--	 * unchanged from the value in vcpu_gp_regs(vcpu)->pstate.
-+	 * unchanged from the value in vcpu_cpsr(vcpu).
- 	 * Are we single-stepping the guest, and took a PAC exception from the
- 	 * active-not-pending state?
- 	 */
-@@ -867,7 +867,7 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu)
- 	    ESR_ELx_EC(read_sysreg_el2(SYS_ESR)) == ESR_ELx_EC_PAC)
- 		write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
- 
--	vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
-+	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
- }
- 
+-static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+-{
+-	if (vcpu_mode_is_32bit(vcpu)) {
+-		kvm_skip_instr32(vcpu);
+-	} else {
+-		*vcpu_pc(vcpu) += 4;
+-		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
+-	}
+-
+-	/* advance the singlestep state machine */
+-	*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+-}
+-
  /*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 036bf2dff976..e952dec01d74 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -218,13 +218,15 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		pstate = VCPU_RESET_PSTATE_EL1;
- 
- 	/* Reset core registers */
--	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
-+	memset(vcpu_gp_regs(vcpu), 0, sizeof(vcpu_gp_regs(vcpu)));
-+	*vcpu_pc(vcpu) = 0;
-+	*vcpu_sp_el0(vcpu) = 0;
- 	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
- 	vcpu->arch.ctxt.spsr_abt = 0;
- 	vcpu->arch.ctxt.spsr_und = 0;
- 	vcpu->arch.ctxt.spsr_irq = 0;
- 	vcpu->arch.ctxt.spsr_fiq = 0;
--	vcpu_gp_regs(vcpu)->pstate = pstate;
-+	*vcpu_cpsr(vcpu) = pstate;
- 
- 	/* Reset system registers */
- 	kvm_reset_sys_regs(vcpu);
+  * Skip an instruction which has been emulated at hyp while most guest sysregs
+  * are live.
 diff --git a/include/kvm/arm64/kvm_emulate.h b/include/kvm/arm64/kvm_emulate.h
-index 25322b95af21..0e16d18e53d2 100644
---- a/include/kvm/arm64/kvm_emulate.h
+new file mode 100644
+index 000000000000..25322b95af21
+--- /dev/null
 +++ b/include/kvm/arm64/kvm_emulate.h
-@@ -77,14 +77,14 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
- static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
- 						  u8 reg_num)
- {
--	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
-+	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)[reg_num];
- }
- 
- static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
- 					 unsigned long val)
- {
- 	if (reg_num != 31)
--		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
-+		vcpu_gp_regs(vcpu)[reg_num] = val;
- }
- 
- static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm64/guest.c b/virt/kvm/arm64/guest.c
-index 83e33e0143b9..e283a4456df8 100644
---- a/virt/kvm/arm64/guest.c
-+++ b/virt/kvm/arm64/guest.c
-@@ -81,16 +81,16 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
- 		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
- 		off /= 2;
--		return &vcpu_gp_regs(vcpu)->regs[off];
-+		return &vcpu_gp_regs(vcpu)[off];
- 
- 	case KVM_REG_ARM_CORE_REG(regs.sp):
--		return &vcpu_gp_regs(vcpu)->sp;
-+		return vcpu_sp_el0(vcpu);
- 
- 	case KVM_REG_ARM_CORE_REG(regs.pc):
- 		return vcpu_pc(vcpu);
- 
- 	case KVM_REG_ARM_CORE_REG(regs.pstate):
--		return &vcpu_gp_regs(vcpu)->pstate;
-+		return vcpu_cpsr(vcpu);
- 
- 	case KVM_REG_ARM_CORE_REG(sp_el1):
- 		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
+@@ -0,0 +1,268 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef KVM_ARM64_KVM_EMULATE_H
++#define KVM_ARM64_KVM_EMULATE_H
++
++#include <asm/esr.h>
++#include <asm/pstate.h>
++#include <asm/sysreg-defs.h>
++
++static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu);
++static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu);
++static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu);
++static inline bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu);
++static u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu);
++static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu);
++
++#define CURRENT_EL_SP_EL0_VECTOR	0x0
++#define CURRENT_EL_SP_ELx_VECTOR	0x200
++#define LOWER_EL_AArch64_VECTOR		0x400
++#define LOWER_EL_AArch32_VECTOR		0x600
++
++enum exception_type {
++	except_type_sync	= 0,
++	except_type_irq		= 0x80,
++	except_type_fiq		= 0x100,
++	except_type_serror	= 0x180,
++};
++
++void kvm_skip_instr32(struct kvm_vcpu *vcpu);
++
++void kvm_inject_undefined(struct kvm_vcpu *vcpu);
++int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
++int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
++void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
++
++static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
++{
++	return kvm_inject_sea(vcpu, false, addr);
++}
++
++static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
++{
++	return kvm_inject_sea(vcpu, true, addr);
++}
++
++static inline int kvm_inject_serror(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * ESR_ELx.ISV (later renamed to IDS) indicates whether or not
++	 * ESR_ELx.ISS contains IMPLEMENTATION DEFINED syndrome information.
++	 *
++	 * Set the bit when injecting an SError w/o an ESR to indicate ISS
++	 * does not follow the architected format.
++	 */
++	return kvm_inject_serror_esr(vcpu, ESR_ELx_ISV);
++}
++
++void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
++
++static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
++{
++	if (vcpu_mode_is_32bit(vcpu)) {
++		kvm_skip_instr32(vcpu);
++	} else {
++		*vcpu_pc(vcpu) += 4;
++		*vcpu_cpsr(vcpu) &= ~SPSR64_BTYPE_MASK;
++	}
++
++	/* advance the singlestep state machine */
++	*vcpu_cpsr(vcpu) &= ~SPSR_SS;
++}
++
++/*
++ * vcpu_get_reg and vcpu_set_reg should always be passed a register number
++ * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
++ * AArch32 with banked registers.
++ */
++static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
++						  u8 reg_num)
++{
++	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
++}
++
++static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
++					 unsigned long val)
++{
++	if (reg_num != 31)
++		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
++}
++
++static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
++}
++
++static __always_inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_ISV);
++}
++
++static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SSE);
++}
++
++static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SF);
++}
++
++static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
++{
++	return (kvm_vcpu_get_esr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
++}
++
++static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
++}
++
++/* Always check for S1PTW *before* using this. */
++static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
++}
++
++static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_CM);
++}
++
++static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
++{
++	return 1 << ((kvm_vcpu_get_esr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
++}
++
++/* This one is not specific to Data Abort */
++static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_IL);
++}
++
++static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
++{
++	return ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
++}
++
++static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
++}
++
++static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
++}
++
++static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
++{
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++
++	return ESR_ELx_SYS64_ISS_RT(esr);
++}
++
++static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
++}
++
++static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
++{
++	if (kvm_vcpu_abt_iss1tw(vcpu)) {
++		/*
++		 * Only a permission fault on a S1PTW should be
++		 * considered as a write. Otherwise, page tables baked
++		 * in a read-only memslot will result in an exception
++		 * being delivered in the guest.
++		 *
++		 * The drawback is that we end-up faulting twice if the
++		 * guest is using any of HW AF/DB: a translation fault
++		 * to map the page containing the PT (read only at
++		 * first), then a permission fault to allow the flags
++		 * to be set.
++		 */
++		return kvm_vcpu_trap_is_permission_fault(vcpu);
++	}
++
++	if (kvm_vcpu_trap_is_iabt(vcpu))
++		return false;
++
++	return kvm_vcpu_dabt_iswrite(vcpu);
++}
++
++static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
++						    unsigned long data,
++						    unsigned int len)
++{
++	if (kvm_vcpu_is_be(vcpu)) {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return be16_to_cpu(data & 0xffff);
++		case 4:
++			return be32_to_cpu(data & 0xffffffff);
++		default:
++			return be64_to_cpu(data);
++		}
++	} else {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return le16_to_cpu(data & 0xffff);
++		case 4:
++			return le32_to_cpu(data & 0xffffffff);
++		default:
++			return le64_to_cpu(data);
++		}
++	}
++
++	return data;		/* Leave LE untouched */
++}
++
++static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
++						    unsigned long data,
++						    unsigned int len)
++{
++	if (kvm_vcpu_is_be(vcpu)) {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return cpu_to_be16(data & 0xffff);
++		case 4:
++			return cpu_to_be32(data & 0xffffffff);
++		default:
++			return cpu_to_be64(data);
++		}
++	} else {
++		switch (len) {
++		case 1:
++			return data & 0xff;
++		case 2:
++			return cpu_to_le16(data & 0xffff);
++		case 4:
++			return cpu_to_le32(data & 0xffffffff);
++		default:
++			return cpu_to_le64(data);
++		}
++	}
++
++	return data;		/* Leave LE untouched */
++}
++
++static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
++{
++	WARN_ON(vcpu_get_flag(vcpu, PENDING_EXCEPTION));
++	vcpu_set_flag(vcpu, INCREMENT_PC);
++}
++
++#define kvm_pend_exception(v, e)					\
++	do {								\
++		WARN_ON(vcpu_get_flag((v), INCREMENT_PC));		\
++		vcpu_set_flag((v), PENDING_EXCEPTION);			\
++		vcpu_set_flag((v), e);					\
++	} while (0)
++
++#endif /* KVM_ARM64_KVM_EMULATE_H */
 -- 
 2.51.0
 
