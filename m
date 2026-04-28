@@ -1,135 +1,151 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0751A6816
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 01:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777339925; cv=pass; b=NQezG2S9Dm8DQ1N4SoR7G4Z5zN0ZTwOqDtrGfNgQAWMtWfxwBVhWof1TJOm5i5e3ppgjcb+156M7sQRjB5JZx7N8ntRTLLDxNpDVgD2NmHbcV8acSuIyebWv5Amzhf4bOTfhPZ7EqCgFbHxGkvHU2MIbOo8TtN7f2GOMov5NJhU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777339925; c=relaxed/simple;
-	bh=Lp0NVo10PoigQtDjm/3ukLN/BhlWLdcFx2DFRGXFAn8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cWhfo2oZRZ3Sa+L4j8lsobUjnQZ+vS8WehZsK+91CDZP0fah9ugmS+6+Y7eXC1YZrd6ec18NV6lXH6udLQpvanIi93zln8gQmfTge6eoNn5P2xjD5osRa8M9J4qiOR8OaX1fX/wYaQ6qMahAEHB4Jzgwgqqr+oJL900IQ7ymQ5g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=SjCaQCWe; arc=pass smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E443ECBFB
+	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 10:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777372212; cv=none; b=Z2Q6kCTUcbYFxSC8LL/wmH5ayzWeUxyuOUwjuMRxw4CSjkhC3wKt9YOOFYfSaJaAWiQzShXU0+vUWMedhOvM81r1LV/h98YLfpw+OmkRpww88fA36G5NF/qgSl7xspOPuY5ki7/lZYKHpILs4sgEh5/SyT17afC+kUWEyBptngU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777372212; c=relaxed/simple;
+	bh=Q1SQtMHy3aqsHkz2pqwBb00QPVJHhdgc6QUsbv3XMuk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hT3heevC75DUdIY2c7CQcRH0954DkqYpvX6Fqof8WeWykgVuX/Vx5D8o1DgoZYb7h3YlTow6yApbLmAHoNTKAXuwJ67IslyIeh7JqYpj4TE+ImdkOji1dbDVIGIaM9fZvIF/OLSKOYVzDsc6eH7ZlCAnlS9Xm9sayUNLCTL1ZaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KSzXv4tI; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="SjCaQCWe"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-362bb3260f1so5139573a91.2
-        for <kvmarm@lists.linux.dev>; Mon, 27 Apr 2026 18:32:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777339924; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FKvFWLa0y08eTB7Uptl9w6lwv/uxi0AR0dmcSITxecKaQMFHV5EhHfGmYvC3kYLciI
-         Bf4qhhKi8dDOAOnZzMkRy/FWSD6UfIVNHDDJ381rpcp86R8UXNwyjA8JuwXBcMAz1Pdd
-         If/vt0tg//OxUgewMFVghpG5bZoBsvWJAc5h4Q9Qep7sWIW72yb9lHfS0PDnlllau7CT
-         BWhTPu7+XqGXFYzGrEt5YSWCEyiuWkkxdRIjuj0+ySpS3gGk7zBiQfwmzAMDlCnvmmd+
-         YnmmQszEake7quKodp0quhwIc88NDGfqI4E4+7rZ8lhVtLSIgEvJgJ5VpVrc4t5rxW3q
-         8ajQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dkNNLielDoU+waGJTxz6K7Cs44v4hc05yCRBP0rYkY4=;
-        fh=9xcyLyFOxUhxhESwquqK4YjqtFyenfBIfxV9PpXGnaQ=;
-        b=doFq2liS9CY5ClrBmXz53JSPytxcZTB1fZbZeaOusH1qc8gBEMzd6t3s43+kIHBA/k
-         ocidgMlRyRzZ4xJdWe6ejdneQqno1AByOOFW24SoYLTbKkLiujuE01hoxPZdc6EXK+2s
-         pnlZ/OyOJhXG8dxKAJSiUoncuag5NUASNhgset+z0IDJG74HVo3mU4q8ihdPiTuF7OZv
-         u3LFAdFkqEFgkQ4EfQVIt54mU4J9Zi3FVcmAb74ZWWgQkdSujQn4SBBdM+LvSK9j/jbG
-         YclHu1NILcKgFRPPfYxGeng8W34wrjfvFLKHY3hg5M46APwzoF2oiO4NunhJAJOvxMww
-         Nt1w==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KSzXv4tI"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-488dcaf2f2fso101742065e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 03:30:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1777339924; x=1777944724; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dkNNLielDoU+waGJTxz6K7Cs44v4hc05yCRBP0rYkY4=;
-        b=SjCaQCWeCnn+6/RYH+E+UFgYuQh08x6Os2vyrKd3esJpiS5AbGDlLe12OPblZRnTMo
-         iOu4pvEow+C2g7d/A5kIIs12Q5pHUJ+LD62HNp0Q9CgMJtz3d3K+24EaiduDyH7HVIFU
-         L0tpBYC/AF4rQ9pne8mMzQ5kcZuBdRLSa4BfMPjvYS2mbFA5Y6pkmX/JqWci561uGETb
-         rRksZ5GsMKN2p/qoawvf1Pzp6lwGHZyZI6YEZo399d7KseDCair41aU8F0wNhwjlfIIY
-         Na1t7e3Ki+XpQTKu95hicRi+38+x6li9I5tcQ6ukpKwNckfPER2ztmHEnl3BH5Uqgyyy
-         +STQ==
+        d=google.com; s=20251104; t=1777372209; x=1777977009; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ybPE6uBPAKDLSIVRQh3Dd/khXkWqQgT9nsbAgFbes8s=;
+        b=KSzXv4tITwgJY81SxGZ0mVrUqnt4nMnV5y3YSqpJ2G4dU8nD31QCOqY41p2se9laFa
+         pBJRpBrlsnsHoHSXQUwxc6h3Bo+/5PjkC24XCH1RaOMZ7RhR+e/B2afq4PmuFzuq21dt
+         SG/RoKQLGw8sEHtVM3bcpE9P8i38iPhNpXHWK7nefM3YNVApeqo1PF9lwSQbWlxB1pQx
+         zbEzN5WNyGjXKNy+tngIw9GxoJA51xFY2kJ0fQzouxHlPOnJPUHkusbcRESriodo25a/
+         zhFfSxpxAJRMu2jLV6b4+nnq1INo6fa+Nkt9FBBXyqtAGSLTI1g8Ce68OuT6L9zjTbl8
+         ZivQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777339924; x=1777944724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dkNNLielDoU+waGJTxz6K7Cs44v4hc05yCRBP0rYkY4=;
-        b=d0asS457nmZNN26M1pzXBfP8BEdP5P6vbXjLPp9Od0DS/6TNIcRJihsMxMv2ONjLlP
-         2DUDhcLa/cNakE4llWFFP4eICPdAvpjA7geMKtFngVG6TzATQAO3EjtvbXwZY5QGf/Dv
-         4a66YqGznz1JkpZx5ikqFJq2imASFghxtpMVr/b9quk0JnDOLBgw7gQ28yXGcNQcXlS/
-         JX6S7wifO0Rv825hOi4q/s0TrQWNCrqQQHZRcTG6Af9jcOfLV4jU5qXvwnn5xaofeoDE
-         9lwc31jLbANJEkP/hpOsvqQSUBUTf8nL15/PjRVjBqc9wD0bx19E2Wi9HecPYLms4I9v
-         ubBQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+iJDzO7SPR9dbaap43Kfx87kM3wGWc42UVpyt+vgjjMk58I8CLYB4IyQNJngXEAHBWcAVQR6c=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVI5Yr3UMyHifQYjszT/yLMi3LZwN0Mnv2ttFbidNxlJkm26hY
-	EdTDR8ykf2P7K1E30Ayl1CsrDXBPsaNf3qDNWFNKnFO+vEnXDRFB09T8817Cd5qdtmwcjFBzFr0
-	oqevt6FM1veSkJNY6Yslkgd42OO+5V5Pf7nkKehJD
-X-Gm-Gg: AeBDietQy4WCvTTfNh/HHMzyR6ma3HZPtLQEp/YInm2fyIFEhy5m1HETuRyRZZDzgOX
-	hAqKztlMtnpqnhaG5U+OA6ouhEV5f0lV1CBpHpqgyMYkbR/6Wy4YxTkFyMzILqxYtfoio5x/870
-	6mZFZtcWh8Z2WQzm7BQgllgDxNFp5S8wtyw6MJScoUmxPFjA09+796wR0iVPugNq7qA6uXgmbln
-	UzJ0s85Rh22ChCSsQqz8JYmdMRouG9fLcSIGCllqknnfNINDIMzxhZf0xGlXmknfJbBbNWohSuJ
-	eistMoxaWGbUjLb+Nw==
-X-Received: by 2002:a17:90b:52cc:b0:35f:b714:e516 with SMTP id
- 98e67ed59e1d1-3649202f6b2mr1031930a91.16.1777339924049; Mon, 27 Apr 2026
- 18:32:04 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777372209; x=1777977009;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ybPE6uBPAKDLSIVRQh3Dd/khXkWqQgT9nsbAgFbes8s=;
+        b=M8fUF/pL9dLlY1lTN4zDwsz8UG2jXXccCJq3v/0Hs5G3DpjRh+CcEfvPbxSkDzgpUm
+         s1ILHi5DvaGZYc+nCC/vAlm5v74GaevzLJeczsX2S+9pIqKZ32L1MhjU1EHuKu6ou718
+         PDMvdPOvNI4bn3NofE0BZnB95KwcQqlS3TAdAJLYEfCBHSnL60WI9feotiLFHZScMMpQ
+         AvfCUrEXOffs3JeFtAOvq28qM2s2w2HSj658ZQzc9SXUr/ArKR6UlK/Givvt6b3l61H9
+         8dMPluQ0HUdsDfkDRkrluAHTqDh5llaR4Bn+H7uLNW33tvSUEXr3Gtz8ILG2qLqVMBH5
+         G41g==
+X-Forwarded-Encrypted: i=1; AFNElJ9MvZJX0ROwDAylTVkpQeOi4M0CVD/xDC3xo29VwTXN37SdKGGoHtwTAPnJYPxm6vaq62XT6CM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz8S5HgPD1dvV1ZgYxe0ul7OsF8iUIEuj8NyohEebpjSrvho7tH
+	qA0Kl/fIcIQIxAyZYmq5Z1nNPblRU2ceh5+KGHDrtUzOl4HBu4V7VWr35mcmhSgmkDsqgeWHUj/
+	lRw==
+X-Received: from wmby10.prod.google.com ([2002:a05:600c:c04a:b0:486:fca5:7a8d])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:a013:b0:48a:563c:c8e0
+ with SMTP id 5b1f17b1804b1-48a77ad5a89mr41979925e9.1.1777372209349; Tue, 28
+ Apr 2026 03:30:09 -0700 (PDT)
+Date: Tue, 28 Apr 2026 11:30:00 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <bd908e28298d968740d03c97bc7e441de188b7b4.camel@linux.ibm.com>
- <aeokwrC86WI7uT+K@e129823.arm.com> <aeomlp3I0eVE5mce@earth.li>
- <aeotq8nPVu4wvEx5@e129823.arm.com> <e4e242ae5533d5762a3647186a178764881bf9ff.camel@linux.ibm.com>
- <aephL3MzYoqFGaT5@e129823.arm.com> <CAHC9VhRQWHEWQ5NzOPiu8jtYv6UsRm8WVS4fd74AbkOcAd4y_g@mail.gmail.com>
- <aesGU8a3mbVzvteH@e129823.arm.com> <CAHC9VhSaT_quKYnpFjAfqvL07JNbWMgM6c4pB9F46NHawX3DCA@mail.gmail.com>
- <014cf39aa8d6a0bcfa1a95c069675977ac67b843.camel@linux.ibm.com> <aexIwJpno3iPIdRD@e129823.arm.com>
-In-Reply-To: <aexIwJpno3iPIdRD@e129823.arm.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 27 Apr 2026 21:31:51 -0400
-X-Gm-Features: AVHnY4JvmD_vpNd2uBimzy27N58OmiHGYAhJK_BGt8LuvH5xnPjA0AMhCSfE4Tk
-Message-ID: <CAHC9VhRT1v3mM9CFvz7Dh5Zrv_MF3vgBk+BZ=q8wOMkPB6O6Fw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 1/4] security: ima: call ima_init() again at
- late_initcall_sync for defered TPM
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: Mimi Zohar <zohar@linux.ibm.com>, roberto.sassu@huawei.com, 
-	Jonathan McDowell <noodles@earth.li>, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org, 
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260428103008.696141-1-tabba@google.com>
+Subject: [PATCH 0/8] KVM: arm64: EL2 synchronisation and pKVM stage-2 error
+ propagation fixes
+From: Fuad Tabba <tabba@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev
+Cc: james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	qperret@google.com, vdonnefort@google.com, tabba@google.com, 
+	catalin.marinas@arm.com, will@kernel.org, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	jmorris@namei.org, serge@hallyn.com, dmitry.kasatkin@gmail.com, 
-	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca, 
-	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com, 
-	sebastianene@google.com
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Apr 25, 2026 at 12:53=E2=80=AFAM Yeoreum Yun <yeoreum.yun@arm.com> =
-wrote:
-> > > I understand the need to ensure that the TPM is available, but if it
-> > > isn't safe to wait to initialize IMA at late_initcall_sync() then it
-> > > would seem like this is a bad option and we need another mechanism to
-> > > synchronize IMA with TPM devices.  If it is safe to initalize IMA in
-> > > late_initcall_sync(), just do that and be done with it.
-> >
-> > Within the same initcall level there is no way of ordering the initiali=
-zation.
-> > Yeorum attempted to address the ordering issue in commit 0e0546eabcd6
-> > ("firmware: arm_ffa: Change initcall level of ffa_init() to rootfs_init=
-call"),
-> > which is being reverted in this patch set.
-> >
-> > Ordering within an initcall level needs to be fixed, but for now retryi=
-ng at
-> > late_initcall_sync works for some, hopefully most, cases.
->
-> Ordering within an initcall level is not good idea.
+Hi folks,
 
-Agreed.  That's why we have the different initcall levels.
+This is yet another series of fixes I'd like to land before posting a
+follow-up to Will's pKVM infrastructure series [1].
 
---=20
-paul-moore.com
+I found these while developing KVM and arm64 system guides for
+review-prompts [2], an open-source set of AI-assisted review prompts
+used by sashiko [3]. While writing the guides I tried to find cases
+that would be easy to miss or trip up an LLM, and stumbled on these
+bugs. A local run with the updated guides flagged all of them
+correctly (some of the commit messages incorporate feedback from that
+run, e.g., the impact of WARN_ON() in hyp). I plan to upstream the
+guides once they are complete.
+
+The patches fall into three groups:
+
+EL2 context-synchronisation (patches 1-2):
+
+  Patch 1 sets SCTLR_EL2.EIS and SCTLR_EL2.EOS in
+  INIT_SCTLR_EL2_MMU_ON. On FEAT_ExS hardware these bits are
+  UNKNOWN at reset; without them EL2 exception entry and exit are
+  not architecturally guaranteed to be Context Synchronisation
+  Events. KVM/arm64 hot paths rely on that guarantee implicitly to
+  elide explicit ISBs after MSRs to context-switching sysregs.
+
+  Patch 2 adds an explicit ISB after write_sysreg_hcr() on the
+  __deactivate_traps() path. The activate path is covered by the
+  ERET that follows (a CSE, guaranteed by patch 1); on the
+  deactivate path, subsequent EL2 sysreg accesses run before any
+  natural CSE.
+
+Minor fixes (patches 3-4):
+
+  Patch 3 fixes a parameter-name typo in __deactivate_fgt() that
+  causes it to silently capture a variable from the enclosing scope
+  rather than use its declared parameter.
+
+  Patch 4 guards the VHE hyp panic path against a NULL vcpu pointer;
+  the nVHE counterpart already has this guard.
+
+pKVM stage-2 error propagation (patches 5-8):
+
+  At EL2 in nVHE/pKVM, WARN_ON() is not warn-and-continue: it
+  expands to a BRK that enters the invalid-host-el2 vector and
+  branches to hyp_panic(), which is __noreturn.
+
+  Four pKVM memory-transition functions wrapped the return value of
+  kvm_pgtable_stage2_map() in WARN_ON() and discarded it. For the
+  share and donation paths the map can fail via -ENOMEM when the
+  vcpu memcache is exhausted, converting a recoverable hypercall
+  error into a fatal hyp panic. The four patches capture and
+  propagate the return value, with appropriate stage-2 unmap and
+  host-side rollback for the reachable failure cases.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
+[2] https://github.com/masoncl/review-prompts
+[3] https://sashiko.dev/
+
+Fuad Tabba (8):
+  KVM: arm64: Make EL2 exception entry and exit context-synchronization
+    events
+  KVM: arm64: Synchronise HCR_EL2 writes on the guest exit path
+  KVM: arm64: Guard against NULL vcpu on VHE hyp panic path
+  KVM: arm64: Fix __deactivate_fgt macro parameter typo
+  KVM: arm64: Propagate stage-2 map failure on host->guest share
+  KVM: arm64: Propagate stage-2 map failure on host->guest donation
+  KVM: arm64: Propagate stage-2 map failure on guest->host share
+  KVM: arm64: Propagate stage-2 map failure on guest->host unshare
+
+ arch/arm64/include/asm/sysreg.h         |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c   | 99 +++++++++++++++++++++----
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 11 +++
+ arch/arm64/kvm/hyp/vhe/switch.c         | 14 +++-
+ 5 files changed, 111 insertions(+), 17 deletions(-)
+
+-- 
+2.54.0.545.g6539524ca2-goog
+
