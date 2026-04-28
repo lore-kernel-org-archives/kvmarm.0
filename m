@@ -1,54 +1,54 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC0437419A
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 10:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E1C372662
+	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 10:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777372214; cv=none; b=E1dHAy0TvcmU1Xlu7ISUvDjYVQxdaxtHcnEAU3HHK4Qa/ksi4UUkNJdhaOtkxCD16uG3sgkDyJY8j2KWZO2ZyKsu1jcTpiMFlMrVGhiTYot+/y3OCcbvGmOCD5NFUuUc7QQpi88JrV012j8Gzdo/7Nx0Z+v9YhG9siwAbWS2S1A=
+	t=1777372215; cv=none; b=YvENbsxmW9AEdDFl1nfui5OLTF/AslfUz081UX/G7GxMGNJucK6KM9shCE3r6mXeb4tjzpmJrkwk04kRRj/L6zLh7R4yu1+pGGbjIJc7KrhU+iHSMPFm23LAP8xApTJ2W4HSanWEtbqBiTCSjsaSpK6PpkRGmOaOKJKwUyr4oPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777372214; c=relaxed/simple;
-	bh=9Wt0iy5ayw0cQwuJpZ/wnzJmfEyzqf8hdthusy325Pw=;
+	s=arc-20240116; t=1777372215; c=relaxed/simple;
+	bh=dwxEJdIz8vYk/ufo4vzAXxS0t3GaEBIy02K4bnRRtU8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B1s1SE3jFPQmNbe++ccjJ6CTFspCAloIlOIEV8XlHuBdVWJ9S1w3DSjxwJys5uRvqie8oxqY3cl1nyVy3nZMPhSqpgn0bwwLQJULE7tW8mh/eIv53eqXDxpmtLa0IQ8waGBWxtOTZZz6Vy3conTII1uDfboQX13pSKUJ+PkhwZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OrgOAjkE; arc=none smtp.client-ip=209.85.208.74
+	 To:Cc:Content-Type; b=d1FXsSaLGDoK1HceTYVCSNQ4lmyaJUe97RO0GYnWbnO9Drh9NyrZiwAq+PfOz2JRc4yRbZXhn9RAm9XhnJO6abzZ2txQ0jdcW7HsZRmzyudW3qJVP5W7bYDcaIOEuTiTq13c4HbNGUtKfzzlP7Ol+H9h8mocLwSLDznioo9UQH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h0zGUdy0; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OrgOAjkE"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-671656523efso13560329a12.2
-        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 03:30:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h0zGUdy0"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b9ca1ef3403so977949666b.1
+        for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 03:30:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777372211; x=1777977011; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1777372212; x=1777977012; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J7c867vhN0NJ0ysluuN7kPjni8MsLU+yiUrh20mCAzU=;
-        b=OrgOAjkEhiqomQ/3VDB/D9qNK3NGPjpuzgGPAPOW5dljm/LqrcrH8ncUBvC/q7/3/N
-         EDZ21tXFcOf7OAdPRy7R+X2Q6vpCvrOUl6+gDpo9DuSOF2Qh9I0X32BsyzCq6U8MSThI
-         jcqqAoBJFgOHF3+RB+pq7D4iaYpseYs2jJvCJPMpPSJTJPbm/MldrDTyQcxPCMxrWZLq
-         Q4q/nPwYFX+z0PdYPLkGo9hRtzE66G9w2A7QyD8VCELDPH6C75Ojy3qqlmMBX+wOLivO
-         2XgeUOPj2QIXRv5HmISZqpnxjDnd51O470n7j/NZYwEM6uGB4lcqYk4ktzODlTqR6Nzc
-         b9jQ==
+        bh=xE/iPxwYzw+NNX7wEA81VsFDw/XB5o3T+Ctb9g0a1xk=;
+        b=h0zGUdy0hwEGEro5kI7vOaLHkv8JyHhZysXBNgG+4LmqFMgUZMSve3sDdO0gvF8Wix
+         utPPYTcIIo3UqfyqTphBM40Iq9l0R86ICF2JS60sx3YJAQ/q+0NxitA6yUX12BdLpwLq
+         y4nhPGGesab3hITCoUMnslY3s1NpA9UpIM0M+uKvFnUK6O/b4RjAoQ6YgBifuxUR+QrJ
+         9+tTs8qvKaBOrKTcLld2pJRxnGmj4M6h3JJqaWj5m7offG2jGsOuKUjchFR1FD96Ydu6
+         4B3a2EODc4v2EQ9r6ReKCpN3xaCgU71fp4xK51TLwCxksGpp7Wla+wVjkI1VzRgjQO2D
+         gEhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777372211; x=1777977011;
+        d=1e100.net; s=20251104; t=1777372212; x=1777977012;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J7c867vhN0NJ0ysluuN7kPjni8MsLU+yiUrh20mCAzU=;
-        b=JvDqRc2zkh3m837PNj+SzXMMOUQ6eia7vnqJKWklkOxN+05TQ5wVonFMprQ8CxvGC4
-         zkR9ybNFD3FjKKudGAu4m3L0xeBBv92skh+pAzPNVAB9KRMX+zs16a9aMEYr1DQv29MI
-         CORd2MLt4YDh2Mj2zcHXiAS5J9+06aLYq4dFgHkCp0+tBJms/CW23GAz3oxMi1C7cEIZ
-         LNzBhPMHVC+NHz3gRcqjayZBBY0L2iOS2OjRQxRWlhakp2Ua3Nqsy3JdmdkDvg/Gch7I
-         eiDonGN+npaFXq6VXz7JTypO2gWd5BXJJE8YY06R8CA86vufJbaozuzzGkJTQjIqaKKe
-         Ivig==
-X-Forwarded-Encrypted: i=1; AFNElJ+SCS7lF1kor9F0Ic7pArFrhEltUOTOfBcnOPRTedHpCdRXZQ6eLulJFY2R0dDRt23mpYcY9T4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxHo/ScH9n73YRTsG8MbsUlxUP7pz4+jRgRE45XGzr3e+T0Po9e
-	U+o5zPZF10e1ftQm7N1Up+0UHJFtPtgldm4WYTcMt5AnM9e4kLs3ffspBXXYj8Ft+ZW5POi0kCQ
-	H7Q==
-X-Received: from edru26.prod.google.com ([2002:aa7:d55a:0:b0:674:1e56:7dde])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:158d:b0:678:a553:bcf3
- with SMTP id 4fb4d7f45d1cf-679bb0a125bmr1160027a12.21.1777372210503; Tue, 28
- Apr 2026 03:30:10 -0700 (PDT)
-Date: Tue, 28 Apr 2026 11:30:01 +0100
+        bh=xE/iPxwYzw+NNX7wEA81VsFDw/XB5o3T+Ctb9g0a1xk=;
+        b=Ne8VYRhZQIY6Q42bIVcNqCQz4Um158LS70xydJFr5hOOFLeq14PX3U4Ah7i8cTXJWy
+         w5PmsQ4XRtRo5+ThaJOmn49E1LPTfWi93e2aUWqQjhuQnyZYhNYNV203eM+6EWZNG+Gz
+         F/a1Nq2Ik2GiJSYU/tSY9tdvtwoZwVxe59KvyGpKeVzaAlCcg6epOT5mQr8Zo3a87HZW
+         0dJT2E8zmEho5BEQbql3kmykigffZUJ4W3iKjX+QAhTX3rEtd/n++Yz0xFlVSGEvMAM+
+         urUF1aTLhdXQ8WIHJSyZPL/DYcYQn52J5zr9sRv1TGKI6pX6TzPSSsxdZKwcc5lHBXab
+         T1pw==
+X-Forwarded-Encrypted: i=1; AFNElJ9mCKO2U2ZgnmoIgws/cQ1C8Lv/ZzNE81m8x6MX5s3CY6asaITKiUNXC5kg4RQbEjylTmg8nDE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyvCuCq6tjNCa2/0J32OvXT2c4TP4Q81mndEmdIKPcYSc56azah
+	9gDFRiV2/6GsyotOb2I+iqyZhnILVa2UZPauFNDy4sMfx+euUmJoGMfPUuHR8aYbeIyg49f8Lzx
+	Wjw==
+X-Received: from ejchp42.prod.google.com ([2002:a17:907:3e2a:b0:b9e:2534:71c9])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:5194:20b0:bae:656b:2953
+ with SMTP id a640c23a62f3a-bb8022c28ebmr102260866b.11.1777372211619; Tue, 28
+ Apr 2026 03:30:11 -0700 (PDT)
+Date: Tue, 28 Apr 2026 11:30:02 +0100
 In-Reply-To: <20260428103008.696141-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,9 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260428103008.696141-1-tabba@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260428103008.696141-2-tabba@google.com>
-Subject: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
- context-synchronization events
+Message-ID: <20260428103008.696141-3-tabba@google.com>
+Subject: [PATCH 2/8] KVM: arm64: Synchronise HCR_EL2 writes on the guest exit path
 From: Fuad Tabba <tabba@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev
 Cc: james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
@@ -70,57 +69,94 @@ Cc: james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
-exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
-0487 M.b, EIS is governed by D1.4.2 rule RBBSRF (p. D1-7205) and EOS
-by D1.4.4.1 rule RBWCFK (p. D1-7209). D24.2.175 (p. D24-9754):
+MSR HCR_EL2 is not self-synchronising. Per ARM DDI 0487 M.b K1.2.4
+(p.K1-16823) and B2.6.1 (p.B2-297), a Context Synchronisation Event
+is required between an HCR_EL2 write and any subsequent direct
+register access at the same EL that depends on the new value being
+in effect.
 
-  - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
-    a CSE.
-  - FEAT_ExS: the reset value is architecturally UNKNOWN; software
-    must set the bit to make the entry/exit a CSE.
+On the entry path, the HCR_EL2 write in __activate_traps is followed
+by further EL2 sysreg work (MDCR_EL2, CPTR_EL2, VBAR_EL2, and on the
+speculative-AT errata path SCTLR_EL1/TCR_EL1) before ERET into the
+guest. None of those intervening accesses depend on the new HCR_EL2
+value, and ERET is a CSE per ARM DDI 0487 M.b D1.4.4.1 rule RBWCFK
+(p. D1-7209) conditional on SCTLR_EL2.EOS=1, which is set
+unconditionally by INIT_SCTLR_EL2_MMU_ON (see the prerequisite patch
+in this series). The requirement is therefore satisfied implicitly
+on the activate path.
 
-INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
-bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
-synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
-MSRs to context-switching system registers (HCR_EL2, HFGxTR_EL2,
-HCRX_EL2, ZCR_EL2, CPACR_EL1, CPTR_EL2, SCTLR_EL1, ptrauth keys,
-etc.); examples include the activate-traps path,
-ptrauth_switch_to_guest, and the FPSIMD trap re-enable in
-kvm_hyp_handle_fpsimd. On FEAT_ExS hardware those reliances are not
-architecturally backed unless EOS=1 (and, for entry, EIS=1), and
-whether they hold today depends on firmware initialisation outside
-the kernel's control.
+The deactivate path is different: after write_sysreg_hcr() in
+__deactivate_traps() further EL2 sysreg work runs before any natural
+CSE - on nVHE, __deactivate_cptr_traps and the VBAR_EL2 write; on
+VHE, the timer context save which reads CNTP_CVAL_EL0 under the new
+TGE/E2H, and the EL1 sysreg restore. Add an explicit isb() at each
+of the two deactivate sites.
 
-Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
-INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
-unconditionally CSEs regardless of whether FEAT_ExS is implemented.
-This matches the pairing in arch/arm64/kvm/config.c which treats EIS
-and EOS together as RES1 under !FEAT_ExS.
+The practical impact today is bounded: HCR_EL2.E2H does not toggle
+in either path, and the trap bits being changed primarily affect
+EL1&0 behaviour. But the architectural rule should be honoured.
+Note that write_sysreg_hcr() itself already issues isb() on the
+Ampere errata path (sysreg.h), confirming the architectural
+expectation; the fast path optimises that away.
 
-INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
-very early EL2 init and the EL2 MMU-off transition, neither of which
-relies on these bits in the same way.
+The fix is at the call sites rather than inside write_sysreg_hcr()
+because the macro has many users (e.g. the activate path, at.c,
+hardirq.h, ptrauth alternatives) where the immediately-following
+code either reaches ERET or has another CSE; making the macro emit
+an unconditional ISB would impose unnecessary cost on those
+well-formed users.
 
-Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON")
+Fixes: 9404673293b0 ("KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/sysreg.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 11 +++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c  | 11 +++++++++++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 736561480f36..7aa08d59d494 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -844,7 +844,7 @@
- #define INIT_SCTLR_EL2_MMU_ON						\
- 	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
- 	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
--	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
-+	 SCTLR_ELx_ITFSB | SCTLR_ELx_EIS | SCTLR_ELx_EOS | SCTLR_EL2_RES1)
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 8d1df3d33595..9d7ead5a5503 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -105,6 +105,17 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_common(vcpu);
  
- #define INIT_SCTLR_EL2_MMU_OFF \
- 	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+ 	write_sysreg_hcr(this_cpu_ptr(&kvm_init_params)->hcr_el2);
++	/*
++	 * MSR HCR_EL2 is not self-synchronising. Per ARM ARM K1.2.4 p.K1-16823
++	 * and B2.6.1 p.B2-297, a Context Synchronisation Event is required
++	 * between an HCR_EL2 write and any subsequent direct register access at
++	 * the same EL that depends on the new value being in effect.
++	 * The activate_traps path falls through to ERET (a CSE), but the
++	 * deactivate path still executes further EL2 sysreg work (CPTR/VBAR
++	 * writes below) before any natural CSE, so make the synchronisation
++	 * explicit.
++	 */
++	isb();
+ 
+ 	__deactivate_cptr_traps(vcpu);
+ 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 9db3f11a4754..140d3bcb5651 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -149,6 +149,17 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	___deactivate_traps(vcpu);
+ 
+ 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
++	/*
++	 * MSR HCR_EL2 is not self-synchronising. Per ARM ARM K1.2.4 p.K1-16823
++	 * and B2.6.1 p.B2-297, a Context Synchronisation Event is required
++	 * between an HCR_EL2 write and any subsequent direct register access at
++	 * the same EL that depends on the new value being in effect.
++	 * The activate_traps path falls through to ERET (a CSE), but the
++	 * deactivate path still executes further EL2 sysreg work (CPTR/VBAR
++	 * writes below) before any natural CSE, so make the synchronisation
++	 * explicit.
++	 */
++	isb();
+ 
+ 	if (has_cntpoff()) {
+ 		struct timer_map map;
 -- 
 2.54.0.545.g6539524ca2-goog
 
