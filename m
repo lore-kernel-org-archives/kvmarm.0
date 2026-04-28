@@ -1,57 +1,57 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8B544DB67
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 16:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B944534A5
+	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 16:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777392372; cv=none; b=CVhFiQVCtkSO5Rti64Bn/K+HAAo3jAVp3uU+qTRWV1K1QIxVKkpfZKe5OlidpCJC0rHvDTBBIyNmOwk244l3pOCCBZ/kPwVhb57EQh6Iwr0+bkRw70DDyqsPkfjYOawzxjQHk4BsEMoPuNGW0rB2DL4KjibbuEm84Sn5niYwHFA=
+	t=1777392372; cv=none; b=B5ImodbttI6ULJorZ0vWMMCaaemKI8RIak9BtZurQpqB8SMyoOvZk85xRHm8sA3IOJRy0/RnNkmqvFnebDL4yyy/nAPNdQH3S7CQ+ycYzVhEbygGovsfIMzGzGLvKeCSuepodS2mSnUVYg70XmjlvaSWd9CCCYvt7sjtAdBNUtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777392372; c=relaxed/simple;
-	bh=rXUJ7uQPyH7qLJ7mIYn6l1RY2zjaf9pnr1ZZ0OD2DXY=;
+	bh=3ApLBVjX6sU3g6TFoPt/JAe7K3vgGelCDSB0+/0cpNs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GYo//tORs0F1jZwsnyYhcIO3dgQ7RmcJw04pw/NgXCKdW13IvL6wes7e2fEqEuPtT8EtEWHYui25LmAthMY9dz3d0rAhgIGBtE5G62ufABWGTotdiDYhv5GWxNx5/NxivWx3t+q3+GRr10fpOrsdUC5H+Tn4KBPS0Ryap4M8Mjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OqdIisQu; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=d9PSs0vvlcyL3v9fSHCuUhZ9M8fFFg7a1Qi4mxeuwM7fXS39aixg5b2/cfLBN/AJr9uk47nxdhP5wPkOESy/3xm/xde++mVdqboim2MEACb/DiR7MQI7svzA27gLPVr2FMaQUFepspvf1b26FoSRwGFQy5aZNvumNiLylb8wcNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gejPVZB7; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OqdIisQu"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63SCmBoh1823949;
-	Tue, 28 Apr 2026 16:05:35 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gejPVZB7"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63SBvp66899091;
+	Tue, 28 Apr 2026 16:05:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Dohr8ZvBNz+/1orQ+
-	hRm1N8zhErlF4n75Fuse9ltVo4=; b=OqdIisQub2XrDPjr2IQYKN6S87mxgMjce
-	krCkhDd+z1104AA5ROnFyJbToz7x95fx93cxW6Oy/CdSJFOK7H8tlS/3ivo/MRXj
-	z9vIDz7jSE5y/6RHtHXKu9A/mNdsHzJlo5LnObpkBiIbnqxjzOqFobGg71DcFuoF
-	QvMPjHiFeiP62QoqJVxYsQlL7rFCOt/cAJ3WpfDm8rcSMmHui2wiNTIeVX5noTwK
-	scjakIF1YCcuStZyq0scod8NwkkQAdY/S48OFSQuEk/Yanu3Kft9kXB2mOcEMb9a
-	eRO13EBngYUna7XnPht5535WNYvdhKnzQJHyLeJ32kMIfxVju43JQ==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drm1dw955-1
+	:mime-version:references:subject:to; s=pp1; bh=+m6JZiatKFpFBFLKp
+	vk3K++1nuaoJKHmPHcm8L6odjM=; b=gejPVZB7Z2m37zHD6Cma5vnlV0mAvSkLd
+	dHWyGJMVf2a7RuDFSxGWYWUZL0Ykoz/tOvVha46V6dJ1Yn+Ol3jGj6qOq9h0iaJK
+	BE7UabosbAzjBduTnIv3iDTt3ClKfgKoAqZlC2/ARIz8nIErCEY3Z7yzC/TXfih8
+	xaMsDKqX4kZEqqHGc+M5yP/n4e4hVCthg2Vi/laNqHyKpMPAuI8HgtZY48n80ESH
+	dJI+Pf/mKCkQsreevQLp/HSzwUgdK2++ZxiXNpYl7zLQRD+KVly3WXQ02P6HAanQ
+	ndbRgwF3QNsQdQkW8m9LoNUNvRFoOOX9dfnSqKa5VAHyxtAOBARKA==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drnb56dq5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 16:05:35 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63SFrpA4027730;
-	Tue, 28 Apr 2026 16:05:34 GMT
+	Tue, 28 Apr 2026 16:05:42 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63SFrpaD032230;
+	Tue, 28 Apr 2026 16:05:41 GMT
 Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dsamya6ge-1
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ds9ehabbb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 16:05:34 +0000 (GMT)
+	Tue, 28 Apr 2026 16:05:41 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63SG5TLa26149584
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63SG5a5s31785630
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 28 Apr 2026 16:05:29 GMT
+	Tue, 28 Apr 2026 16:05:36 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 907B320040;
-	Tue, 28 Apr 2026 16:05:29 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id BDDC920040;
+	Tue, 28 Apr 2026 16:05:36 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 36B0720043;
-	Tue, 28 Apr 2026 16:05:29 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 6DA6420043;
+	Tue, 28 Apr 2026 16:05:36 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 28 Apr 2026 16:05:29 +0000 (GMT)
+	Tue, 28 Apr 2026 16:05:36 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: [RFC PATCH v2 05/28] arm64: Extract sysreg definitions
-Date: Tue, 28 Apr 2026 18:05:02 +0200
-Message-ID: <20260428160527.1378085-6-seiden@linux.ibm.com>
+Subject: [RFC PATCH v2 25/28] KVM: s390: arm64: Implement vm/vcpu create destroy.
+Date: Tue, 28 Apr 2026 18:05:22 +0200
+Message-ID: <20260428160527.1378085-26-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260428160527.1378085-1-seiden@linux.ibm.com>
 References: <20260428160527.1378085-1-seiden@linux.ibm.com>
@@ -84,1551 +84,319 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gxlX4Tf557PK-gv1pnSrvjf2pLJFy-2R
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDE1MSBTYWx0ZWRfX4Y6sKpGiJwU3
- tn7nf5NQ96i9DaB72KeE7eFfTm/XE6rKaQLz5SL4QIL9TlcFr1dEX7ZXkw4JlM2EP606oc6bDCJ
- pyWGBgFO2qPh6nOHuWFh+iukV8j6wEc4+/rajq3HGfMs0F5DdMER2xXIBabUC/tYvkFIhCjUYLJ
- IBZgzxr3F/WTuMKeY8ShVZ5oCqw5Ngwz4rLXgyS/lSQh0RctCKoXWUESniJ6S5uSxvbz12p33gG
- GYTOOSV6wiMRvTQnwjT5o1rUj/Ij197n8YIUPbKTFTi7jXQTmwGEcOPhobBarjaSc2ncFXJ4FFM
- o6Hqnl6xANSvIjE7ZvkoNxr659fcYF6BBD0W/D3wG8PsZL4is7oGzXcMgGRrrXub5X+0IldAQhS
- VXjLBv1DgwEWg2iAGHLgMGWJaVWLe7g/KvDd3hBHOxHw2SK9gI1o+yFNYKdcAiI4DVfQszou3aw
- 1XSTfjnedIDGxzIGd7Q==
-X-Authority-Analysis: v=2.4 cv=VZLH+lp9 c=1 sm=1 tr=0 ts=69f0dacf cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+X-Authority-Analysis: v=2.4 cv=AqDeGu9P c=1 sm=1 tr=0 ts=69f0dad6 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=7CQSdrXTAAAA:8
- a=xUyVTJg07XarrarMlngA:9 a=a-qgeE7W1pNrGK8U0ZQC:22
-X-Proofpoint-GUID: gxlX4Tf557PK-gv1pnSrvjf2pLJFy-2R
+ a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=RC2V8De_2s-pDU17uugA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDE1MSBTYWx0ZWRfX7m/GziYkC6Px
+ /HwM7nVO9+ZLwPN4Odsh8xsXOb/ZxMxVbQs8ca/FseM+2aikreb34LzmiGytMQ/LDPpXRrVsPkL
+ McXEs7crtB0B4+TEAsYjI/luAWu/j7KJ+3yEmTCbsO9SXfVDCoNURUBo2C1AHYq5wBmSvgxsDlL
+ AP7ndIIwGbk81Mx+JlRbU6p+JBkzWn5AA7wNCmr356ggriTw4Xbdl2DZ1tMvzY/eP1bnzqDSFLV
+ aDf37LbTnrQSa6cYmuB+3yMIijiDUM8FRnh7CQikiIKE1ulOzyx74xgjounVK6OBuuXMoun+bma
+ ketYgOlPznU8mcCPBaCjithOXcArBrMDheJZVkgp8te91EXBv3UCH98q3JQGxpCwaxycxHKz5Nn
+ dxp/prOJu2Fc6Tx4jtWvr9Fb7UKBWtD3jwv0atcL2dAxzzF2lx16Sa6/t0Ulh5CIqJarg3Kmcss
+ cFwxqQ9x+SOTJn4cQqQ==
+X-Proofpoint-GUID: f1dAk99UtIFR4zOwAENJF9aN64Nb4KxL
+X-Proofpoint-ORIG-GUID: f1dAk99UtIFR4zOwAENJF9aN64Nb4KxL
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
- spamscore=0 malwarescore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ adultscore=0 priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1015
+ lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604280151
 
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Implement init and destroy IOCTLS for vcpu and vm.
+Implement arch vm IOCTL. Use s390 gmap.
 
-Split all definitions that can be used by non-native architectures into
-a separate file sysreg-defs.h. The generated sysreg definitions are
-generated into sysreg-defs-gen.h. This allows other architectures using
-the sysreg definitions.
-
+Co-developed-by: Janosch Frank <frankja@linux.ibm.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/Kbuild                 |   2 +-
- .../include/asm/{sysreg.h => sysreg-defs.h}   | 309 +-----
- arch/arm64/include/asm/sysreg.h               | 960 +-----------------
- arch/arm64/tools/Makefile                     |  14 +-
- arch/arm64/tools/Makefile.sysreg              |  12 +
- arch/arm64/tools/gen-sysreg.awk               |   6 +-
- 6 files changed, 27 insertions(+), 1276 deletions(-)
- copy arch/arm64/include/asm/{sysreg.h => sysreg-defs.h} (79%)
- create mode 100644 arch/arm64/tools/Makefile.sysreg
+ arch/s390/kvm/arm64/arm.c | 161 ++++++++++++++++++++++++++++++++++++++
+ arch/s390/kvm/arm64/arm.h |  54 +++++++++++++
+ 2 files changed, 215 insertions(+)
 
-diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
-index d2ff8f6c3231..76f6cf2b952b 100644
---- a/arch/arm64/include/asm/Kbuild
-+++ b/arch/arm64/include/asm/Kbuild
-@@ -17,4 +17,4 @@ generic-y += parport.h
- generic-y += user.h
+diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+index 8f94eb8fe288..77bc4a8841df 100644
+--- a/arch/s390/kvm/arm64/arm.c
++++ b/arch/s390/kvm/arm64/arm.c
+@@ -8,7 +8,10 @@
+ #include <linux/kvm_types.h>
+ #include <linux/kvm_host.h>
  
- generated-y += cpucap-defs.h
--generated-y += sysreg-defs.h
-+generated-y += sysreg-gen-defs.h
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg-defs.h
-similarity index 79%
-copy from arch/arm64/include/asm/sysreg.h
-copy to arch/arm64/include/asm/sysreg-defs.h
-index f4436ecc630c..311f882a992b 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg-defs.h
-@@ -1,20 +1,9 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Macros for accessing system registers with older binutils.
-- *
-- * Copyright (C) 2014 ARM Ltd.
-- * Author: Catalin Marinas <catalin.marinas@arm.com>
-- */
- 
--#ifndef __ASM_SYSREG_H
--#define __ASM_SYSREG_H
-+#ifndef __ASM_SYSREG_DEFS_H
-+#define __ASM_SYSREG_DEFS_H
- 
- #include <linux/bits.h>
--#include <linux/stringify.h>
--#include <linux/kasan-tags.h>
--#include <linux/kconfig.h>
--
--#include <asm/gpr-num.h>
- 
- /*
-  * ARMv8 ARM reserves the following encoding for system registers:
-@@ -50,37 +39,8 @@
- #define sys_reg_CRm(id)	(((id) >> CRm_shift) & CRm_mask)
- #define sys_reg_Op2(id)	(((id) >> Op2_shift) & Op2_mask)
- 
--#ifndef CONFIG_BROKEN_GAS_INST
--
--#ifdef __ASSEMBLER__
--// The space separator is omitted so that __emit_inst(x) can be parsed as
--// either an assembler directive or an assembler macro argument.
--#define __emit_inst(x)			.inst(x)
--#else
--#define __emit_inst(x)			".inst " __stringify((x)) "\n\t"
--#endif
--
--#else  /* CONFIG_BROKEN_GAS_INST */
--
--#ifndef CONFIG_CPU_BIG_ENDIAN
--#define __INSTR_BSWAP(x)		(x)
--#else  /* CONFIG_CPU_BIG_ENDIAN */
--#define __INSTR_BSWAP(x)		((((x) << 24) & 0xff000000)	| \
--					 (((x) <<  8) & 0x00ff0000)	| \
--					 (((x) >>  8) & 0x0000ff00)	| \
--					 (((x) >> 24) & 0x000000ff))
--#endif	/* CONFIG_CPU_BIG_ENDIAN */
--
--#ifdef __ASSEMBLER__
--#define __emit_inst(x)			.long __INSTR_BSWAP(x)
--#else  /* __ASSEMBLER__ */
--#define __emit_inst(x)			".long " __stringify(__INSTR_BSWAP(x)) "\n\t"
--#endif	/* __ASSEMBLER__ */
--
--#endif	/* CONFIG_BROKEN_GAS_INST */
--
- /*
-- * Instructions for modifying PSTATE fields.
-+ * Definitions for modifying PSTATE fields.
-  * As per Arm ARM for v8-A, Section "C.5.1.3 op0 == 0b00, architectural hints,
-  * barriers and CLREX, and PSTATE access", ARM DDI 0487 C.a, system instructions
-  * for accessing PSTATE fields have the following encoding:
-@@ -91,8 +51,6 @@
-  */
- #define pstate_field(op1, op2)		((op1) << Op1_shift | (op2) << Op2_shift)
- #define PSTATE_Imm_shift		CRm_shift
--#define ENCODE_PSTATE(x, r)		(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
--#define SET_PSTATE(x, r)		__emit_inst(ENCODE_PSTATE(x, r))
- 
- #define PSTATE_PAN			pstate_field(0, 4)
- #define PSTATE_UAO			pstate_field(0, 3)
-@@ -100,29 +58,6 @@
- #define PSTATE_DIT			pstate_field(3, 2)
- #define PSTATE_TCO			pstate_field(3, 4)
- 
--#define SET_PSTATE_PAN(x)		SET_PSTATE((x), PAN)
--#define SET_PSTATE_UAO(x)		SET_PSTATE((x), UAO)
--#define SET_PSTATE_SSBS(x)		SET_PSTATE((x), SSBS)
--#define SET_PSTATE_DIT(x)		SET_PSTATE((x), DIT)
--#define SET_PSTATE_TCO(x)		SET_PSTATE((x), TCO)
--
--#define set_pstate_pan(x)		asm volatile(SET_PSTATE_PAN(x))
--#define set_pstate_uao(x)		asm volatile(SET_PSTATE_UAO(x))
--#define set_pstate_ssbs(x)		asm volatile(SET_PSTATE_SSBS(x))
--#define set_pstate_dit(x)		asm volatile(SET_PSTATE_DIT(x))
--
--/* Register-based PAN access, for save/restore purposes */
--#define SYS_PSTATE_PAN			sys_reg(3, 0, 4, 2, 3)
--
--#define __SYS_BARRIER_INSN(op0, op1, CRn, CRm, op2, Rt)			\
--	__emit_inst(0xd5000000					|	\
--		    sys_insn((op0), (op1), (CRn), (CRm), (op2))	|	\
--		    ((Rt) & 0x1f))
--
--#define SB_BARRIER_INSN			__SYS_BARRIER_INSN(0, 3, 3, 0, 7, 31)
--#define GSB_SYS_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 0, 31)
--#define GSB_ACK_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 1, 31)
--
- /* Data cache zero operations */
- #define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
- #define SYS_DC_IGSW			sys_insn(1, 0, 7, 6, 4)
-@@ -173,7 +108,7 @@
-  * come from here. The header relies on the definition of sys_reg()
-  * earlier in this file.
-  */
--#include "asm/sysreg-defs.h"
-+#include "asm/sysreg-gen-defs.h"
- 
- /*
-  * System registers, organised loosely by encoding but grouped together
-@@ -802,12 +737,6 @@
- #define OP_COSP_RCTX			sys_insn(1, 3, 7, 3, 6)
- #define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
- 
--/*
-- * BRBE Instructions
-- */
--#define BRB_IALL_INSN	__emit_inst(0xd5000000 | OP_BRB_IALL | (0x1f))
--#define BRB_INJ_INSN	__emit_inst(0xd5000000 | OP_BRB_INJ  | (0x1f))
--
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_ENTP2	(BIT(60))
- #define SCTLR_ELx_DSSBS	(BIT(44))
-@@ -835,40 +764,6 @@
- #define SCTLR_ELx_A	 (BIT(1))
- #define SCTLR_ELx_M	 (BIT(0))
- 
--#ifdef CONFIG_CPU_BIG_ENDIAN
--#define ENDIAN_SET_EL2		SCTLR_ELx_EE
--#else
--#define ENDIAN_SET_EL2		0
--#endif
--
--#define INIT_SCTLR_EL2_MMU_ON						\
--	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
--	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
--	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
--
--#define INIT_SCTLR_EL2_MMU_OFF \
--	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
--
--/* SCTLR_EL1 specific flags. */
--#ifdef CONFIG_CPU_BIG_ENDIAN
--#define ENDIAN_SET_EL1		(SCTLR_EL1_E0E | SCTLR_ELx_EE)
--#else
--#define ENDIAN_SET_EL1		0
--#endif
--
--#define INIT_SCTLR_EL1_MMU_OFF \
--	(ENDIAN_SET_EL1 | SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | \
--	 SCTLR_EL1_EIS  | SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
--
--#define INIT_SCTLR_EL1_MMU_ON \
--	(SCTLR_ELx_M      | SCTLR_ELx_C      | SCTLR_ELx_SA    | \
--	 SCTLR_EL1_SA0    | SCTLR_EL1_SED    | SCTLR_ELx_I     | \
--	 SCTLR_EL1_DZE    | SCTLR_EL1_UCT    | SCTLR_EL1_nTWE  | \
--	 SCTLR_ELx_IESB   | SCTLR_EL1_SPAN   | SCTLR_ELx_ITFSB | \
--	 ENDIAN_SET_EL1   | SCTLR_EL1_UCI    | SCTLR_EL1_EPAN  | \
--	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
--	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
--
- /* MAIR_ELx memory attributes (used by Linux) */
- #define MAIR_ATTR_DEVICE_nGnRnE		UL(0x00)
- #define MAIR_ATTR_DEVICE_nGnRE		UL(0x04)
-@@ -898,31 +793,6 @@
- #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2		0x3
- #define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MAX		0x7
- 
--#ifdef CONFIG_ARM64_PA_BITS_52
--#define ID_AA64MMFR0_EL1_PARANGE_MAX	ID_AA64MMFR0_EL1_PARANGE_52
--#else
--#define ID_AA64MMFR0_EL1_PARANGE_MAX	ID_AA64MMFR0_EL1_PARANGE_48
--#endif
--
--#if defined(CONFIG_ARM64_4K_PAGES)
--#define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN4_SHIFT
--#define ID_AA64MMFR0_EL1_TGRAN_LPA2		ID_AA64MMFR0_EL1_TGRAN4_52_BIT
--#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MIN
--#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MAX
--#define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN4_2_SHIFT
--#elif defined(CONFIG_ARM64_16K_PAGES)
--#define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN16_SHIFT
--#define ID_AA64MMFR0_EL1_TGRAN_LPA2		ID_AA64MMFR0_EL1_TGRAN16_52_BIT
--#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MIN
--#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MAX
--#define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN16_2_SHIFT
--#elif defined(CONFIG_ARM64_64K_PAGES)
--#define ID_AA64MMFR0_EL1_TGRAN_SHIFT		ID_AA64MMFR0_EL1_TGRAN64_SHIFT
--#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MIN
--#define ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX	ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MAX
--#define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN64_2_SHIFT
--#endif
--
- #define CPACR_EL1_FPEN_EL1EN	(BIT(20)) /* enable EL1 access */
- #define CPACR_EL1_FPEN_EL0EN	(BIT(21)) /* enable EL0 access, if EL1EN set */
- 
-@@ -936,21 +806,6 @@
- #define SYS_GCR_EL1_RRND	(BIT(16))
- #define SYS_GCR_EL1_EXCL_MASK	0xffffUL
- 
--#ifdef CONFIG_KASAN_HW_TAGS
--/*
-- * KASAN always uses a whole byte for its tags. With CONFIG_KASAN_HW_TAGS it
-- * only uses tags in the range 0xF0-0xFF, which we map to MTE tags 0x0-0xF.
-- */
--#define __MTE_TAG_MIN		(KASAN_TAG_MIN & 0xf)
--#define __MTE_TAG_MAX		(KASAN_TAG_MAX & 0xf)
--#define __MTE_TAG_INCL		GENMASK(__MTE_TAG_MAX, __MTE_TAG_MIN)
--#define KERNEL_GCR_EL1_EXCL	(SYS_GCR_EL1_EXCL_MASK & ~__MTE_TAG_INCL)
--#else
--#define KERNEL_GCR_EL1_EXCL	SYS_GCR_EL1_EXCL_MASK
--#endif
--
--#define KERNEL_GCR_EL1		(SYS_GCR_EL1_RRND | KERNEL_GCR_EL1_EXCL)
--
- /* RGSR_EL1 Definitions */
- #define SYS_RGSR_EL1_TAG_MASK	0xfUL
- #define SYS_RGSR_EL1_SEED_SHIFT	8
-@@ -1098,156 +953,8 @@
- #define GICV5_GIC_CDIA_TYPE_MASK	GENMASK_ULL(31, 29)
- #define GICV5_GIC_CDIA_ID_MASK		GENMASK_ULL(23, 0)
- 
--#define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
--#define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
--
--#ifdef __ASSEMBLER__
--
--	.macro	mrs_s, rt, sreg
--	 __emit_inst(0xd5200000|(\sreg)|(.L__gpr_num_\rt))
--	.endm
--
--	.macro	msr_s, sreg, rt
--	__emit_inst(0xd5000000|(\sreg)|(.L__gpr_num_\rt))
--	.endm
--
--	.macro	msr_hcr_el2, reg
--#if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
--	dsb	nsh
--	msr	hcr_el2, \reg
--	isb
--#else
--	msr	hcr_el2, \reg
--#endif
--	.endm
--#else
--
-+#ifndef __ASSEMBLER__
- #include <linux/bitfield.h>
--#include <linux/build_bug.h>
--#include <linux/types.h>
--#include <asm/alternative.h>
--
--#define DEFINE_MRS_S						\
--	__DEFINE_ASM_GPR_NUMS					\
--"	.macro	mrs_s, rt, sreg\n"				\
--	__emit_inst(0xd5200000|(\\sreg)|(.L__gpr_num_\\rt))	\
--"	.endm\n"
--
--#define DEFINE_MSR_S						\
--	__DEFINE_ASM_GPR_NUMS					\
--"	.macro	msr_s, sreg, rt\n"				\
--	__emit_inst(0xd5000000|(\\sreg)|(.L__gpr_num_\\rt))	\
--"	.endm\n"
--
--#define UNDEFINE_MRS_S						\
--"	.purgem	mrs_s\n"
--
--#define UNDEFINE_MSR_S						\
--"	.purgem	msr_s\n"
--
--#define __mrs_s(v, r)						\
--	DEFINE_MRS_S						\
--"	mrs_s " v ", " __stringify(r) "\n"			\
--	UNDEFINE_MRS_S
--
--#define __msr_s(r, v)						\
--	DEFINE_MSR_S						\
--"	msr_s " __stringify(r) ", " v "\n"			\
--	UNDEFINE_MSR_S
--
--/*
-- * Unlike read_cpuid, calls to read_sysreg are never expected to be
-- * optimized away or replaced with synthetic values.
-- */
--#define read_sysreg(r) ({					\
--	u64 __val;						\
--	asm volatile("mrs %0, " __stringify(r) : "=r" (__val));	\
--	__val;							\
--})
--
--/*
-- * The "Z" constraint normally means a zero immediate, but when combined with
-- * the "%x0" template means XZR.
-- */
--#define write_sysreg(v, r) do {					\
--	u64 __val = (u64)(v);					\
--	asm volatile("msr " __stringify(r) ", %x0"		\
--		     : : "rZ" (__val));				\
--} while (0)
--
--/*
-- * For registers without architectural names, or simply unsupported by
-- * GAS.
-- *
-- * __check_r forces warnings to be generated by the compiler when
-- * evaluating r which wouldn't normally happen due to being passed to
-- * the assembler via __stringify(r).
-- */
--#define read_sysreg_s(r) ({						\
--	u64 __val;							\
--	u32 __maybe_unused __check_r = (u32)(r);			\
--	asm volatile(__mrs_s("%0", r) : "=r" (__val));			\
--	__val;								\
--})
--
--/*
-- * The "Z" constraint combined with the "%x0" template should be enough
-- * to force XZR generation if (v) is a constant 0 value but LLVM does not
-- * yet understand that modifier/constraint combo so a conditional is required
-- * to nudge the compiler into using XZR as a source for a 0 constant value.
-- */
--#define write_sysreg_s(v, r) do {					\
--	u64 __val = (u64)(v);						\
--	u32 __maybe_unused __check_r = (u32)(r);			\
--	if (__builtin_constant_p(__val) && __val == 0)			\
--		asm volatile(__msr_s(r, "xzr"));			\
--	else								\
--		asm volatile(__msr_s(r, "%x0") : : "r" (__val));	\
--} while (0)
--
--/*
-- * Modify bits in a sysreg. Bits in the clear mask are zeroed, then bits in the
-- * set mask are set. Other bits are left as-is.
-- */
--#define sysreg_clear_set(sysreg, clear, set) do {			\
--	u64 __scs_val = read_sysreg(sysreg);				\
--	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
--	if (__scs_new != __scs_val)					\
--		write_sysreg(__scs_new, sysreg);			\
--} while (0)
--
--#define sysreg_clear_set_hcr(clear, set) do {				\
--	u64 __scs_val = read_sysreg(hcr_el2);				\
--	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
--	if (__scs_new != __scs_val)					\
--		write_sysreg_hcr(__scs_new);			\
--} while (0)
--
--#define sysreg_clear_set_s(sysreg, clear, set) do {			\
--	u64 __scs_val = read_sysreg_s(sysreg);				\
--	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
--	if (__scs_new != __scs_val)					\
--		write_sysreg_s(__scs_new, sysreg);			\
--} while (0)
--
--#define write_sysreg_hcr(__val) do {					\
--	if (IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23) &&		\
--	   (!system_capabilities_finalized() ||				\
--	    alternative_has_cap_unlikely(ARM64_WORKAROUND_AMPERE_AC04_CPU_23))) \
--		asm volatile("dsb nsh; msr hcr_el2, %x0; isb"		\
--			     : : "rZ" (__val));				\
--	else								\
--		asm volatile("msr hcr_el2, %x0"				\
--			     : : "rZ" (__val));				\
--} while (0)
--
--#define read_sysreg_par() ({						\
--	u64 par;							\
--	asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));	\
--	par = read_sysreg(par_el1);					\
--	asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));	\
--	par;								\
--})
- 
- #define SYS_FIELD_VALUE(reg, field, val)	reg##_##field##_##val
- 
-@@ -1260,7 +967,5 @@
- #define SYS_FIELD_PREP_ENUM(reg, field, val)		\
- 		 FIELD_PREP(reg##_##field##_MASK,	\
- 			    SYS_FIELD_VALUE(reg, field, val))
--
--#endif
--
--#endif	/* __ASM_SYSREG_H */
-+#endif /* __ASSEMBLER__ */
-+#endif	/* __ASM_SYSREG_DEFS_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index f4436ecc630c..f8059f5c507e 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -15,40 +15,7 @@
- #include <linux/kconfig.h>
- 
- #include <asm/gpr-num.h>
--
--/*
-- * ARMv8 ARM reserves the following encoding for system registers:
-- * (Ref: ARMv8 ARM, Section: "System instruction class encoding overview",
-- *  C5.2, version:ARM DDI 0487A.f)
-- *	[20-19] : Op0
-- *	[18-16] : Op1
-- *	[15-12] : CRn
-- *	[11-8]  : CRm
-- *	[7-5]   : Op2
-- */
--#define Op0_shift	19
--#define Op0_mask	0x3
--#define Op1_shift	16
--#define Op1_mask	0x7
--#define CRn_shift	12
--#define CRn_mask	0xf
--#define CRm_shift	8
--#define CRm_mask	0xf
--#define Op2_shift	5
--#define Op2_mask	0x7
--
--#define sys_reg(op0, op1, crn, crm, op2) \
--	(((op0) << Op0_shift) | ((op1) << Op1_shift) | \
--	 ((crn) << CRn_shift) | ((crm) << CRm_shift) | \
--	 ((op2) << Op2_shift))
--
--#define sys_insn	sys_reg
--
--#define sys_reg_Op0(id)	(((id) >> Op0_shift) & Op0_mask)
--#define sys_reg_Op1(id)	(((id) >> Op1_shift) & Op1_mask)
--#define sys_reg_CRn(id)	(((id) >> CRn_shift) & CRn_mask)
--#define sys_reg_CRm(id)	(((id) >> CRm_shift) & CRm_mask)
--#define sys_reg_Op2(id)	(((id) >> Op2_shift) & Op2_mask)
-+#include <asm/sysreg-defs.h>
- 
- #ifndef CONFIG_BROKEN_GAS_INST
- 
-@@ -79,27 +46,9 @@
- 
- #endif	/* CONFIG_BROKEN_GAS_INST */
- 
--/*
-- * Instructions for modifying PSTATE fields.
-- * As per Arm ARM for v8-A, Section "C.5.1.3 op0 == 0b00, architectural hints,
-- * barriers and CLREX, and PSTATE access", ARM DDI 0487 C.a, system instructions
-- * for accessing PSTATE fields have the following encoding:
-- *	Op0 = 0, CRn = 4
-- *	Op1, Op2 encodes the PSTATE field modified and defines the constraints.
-- *	CRm = Imm4 for the instruction.
-- *	Rt = 0x1f
-- */
--#define pstate_field(op1, op2)		((op1) << Op1_shift | (op2) << Op2_shift)
--#define PSTATE_Imm_shift		CRm_shift
- #define ENCODE_PSTATE(x, r)		(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
- #define SET_PSTATE(x, r)		__emit_inst(ENCODE_PSTATE(x, r))
- 
--#define PSTATE_PAN			pstate_field(0, 4)
--#define PSTATE_UAO			pstate_field(0, 3)
--#define PSTATE_SSBS			pstate_field(3, 1)
--#define PSTATE_DIT			pstate_field(3, 2)
--#define PSTATE_TCO			pstate_field(3, 4)
--
- #define SET_PSTATE_PAN(x)		SET_PSTATE((x), PAN)
- #define SET_PSTATE_UAO(x)		SET_PSTATE((x), UAO)
- #define SET_PSTATE_SSBS(x)		SET_PSTATE((x), SSBS)
-@@ -123,718 +72,12 @@
- #define GSB_SYS_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 0, 31)
- #define GSB_ACK_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 1, 31)
- 
--/* Data cache zero operations */
--#define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
--#define SYS_DC_IGSW			sys_insn(1, 0, 7, 6, 4)
--#define SYS_DC_IGDSW			sys_insn(1, 0, 7, 6, 6)
--#define SYS_DC_CSW			sys_insn(1, 0, 7, 10, 2)
--#define SYS_DC_CGSW			sys_insn(1, 0, 7, 10, 4)
--#define SYS_DC_CGDSW			sys_insn(1, 0, 7, 10, 6)
--#define SYS_DC_CISW			sys_insn(1, 0, 7, 14, 2)
--#define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
--#define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
--
--#define SYS_IC_IALLUIS			sys_insn(1, 0, 7, 1, 0)
--#define SYS_IC_IALLU			sys_insn(1, 0, 7, 5, 0)
--#define SYS_IC_IVAU			sys_insn(1, 3, 7, 5, 1)
--
--#define SYS_DC_IVAC			sys_insn(1, 0, 7, 6, 1)
--#define SYS_DC_IGVAC			sys_insn(1, 0, 7, 6, 3)
--#define SYS_DC_IGDVAC			sys_insn(1, 0, 7, 6, 5)
--
--#define SYS_DC_CVAC			sys_insn(1, 3, 7, 10, 1)
--#define SYS_DC_CGVAC			sys_insn(1, 3, 7, 10, 3)
--#define SYS_DC_CGDVAC			sys_insn(1, 3, 7, 10, 5)
--
--#define SYS_DC_CVAU			sys_insn(1, 3, 7, 11, 1)
--
--#define SYS_DC_CVAP			sys_insn(1, 3, 7, 12, 1)
--#define SYS_DC_CGVAP			sys_insn(1, 3, 7, 12, 3)
--#define SYS_DC_CGDVAP			sys_insn(1, 3, 7, 12, 5)
--
--#define SYS_DC_CVADP			sys_insn(1, 3, 7, 13, 1)
--#define SYS_DC_CGVADP			sys_insn(1, 3, 7, 13, 3)
--#define SYS_DC_CGDVADP			sys_insn(1, 3, 7, 13, 5)
--
--#define SYS_DC_CIVAC			sys_insn(1, 3, 7, 14, 1)
--#define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
--#define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
--
--#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
--#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
--#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
--
--#define SYS_DC_CIVAPS			sys_insn(1, 0, 7, 15, 1)
--#define SYS_DC_CIGDVAPS			sys_insn(1, 0, 7, 15, 5)
--
--/*
-- * Automatically generated definitions for system registers, the
-- * manual encodings below are in the process of being converted to
-- * come from here. The header relies on the definition of sys_reg()
-- * earlier in this file.
-- */
--#include "asm/sysreg-defs.h"
--
--/*
-- * System registers, organised loosely by encoding but grouped together
-- * where the architected name contains an index. e.g. ID_MMFR<n>_EL1.
-- */
--#define SYS_SVCR_SMSTOP_SM_EL0		sys_reg(0, 3, 4, 2, 3)
--#define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
--#define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
--
--#define SYS_DBGBVRn_EL1(n)		sys_reg(2, 0, 0, n, 4)
--#define SYS_DBGBCRn_EL1(n)		sys_reg(2, 0, 0, n, 5)
--#define SYS_DBGWVRn_EL1(n)		sys_reg(2, 0, 0, n, 6)
--#define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
--#define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
--
--#define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
--#define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
--#define OSLSR_EL1_OSLM_NI		0
--#define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
--#define OSLSR_EL1_OSLK			BIT(1)
--
--#define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
--#define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
--#define SYS_DBGCLAIMSET_EL1		sys_reg(2, 0, 7, 8, 6)
--#define SYS_DBGCLAIMCLR_EL1		sys_reg(2, 0, 7, 9, 6)
--#define SYS_DBGAUTHSTATUS_EL1		sys_reg(2, 0, 7, 14, 6)
--#define SYS_MDCCSR_EL0			sys_reg(2, 3, 0, 1, 0)
--#define SYS_DBGDTR_EL0			sys_reg(2, 3, 0, 4, 0)
--#define SYS_DBGDTRRX_EL0		sys_reg(2, 3, 0, 5, 0)
--#define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
--#define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
--
--#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
--#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
--#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
--
--#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
--#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
--#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))
--#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)
--#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)
--#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)
--#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)
--#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)
--#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)
--#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)
--#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)
--#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)
--#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)
--#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)
--#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)
--#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)
--#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)
--#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)
--#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)
--#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)
--#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)
--#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)
--#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)
--#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)
--#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)
--#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)
--#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)
--#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)
--#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)
--#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)
--#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)
--#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)
--#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)
--#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)
--#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)
--#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)
--#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
--#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)
--#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)
--#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)
--#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))
--#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)
--#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)
--#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)
--#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)
--#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)
--#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)
--#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)
--#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)
--#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)
--#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)
--#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)
--#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)
--#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)
--#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)
--#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)
--#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)
--#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)
--#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)
--#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)
--
--/* ETM */
--#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
--
--#define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
--#define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
--#define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
--
--#define SYS_ACTLR_EL1			sys_reg(3, 0, 1, 0, 1)
--#define SYS_RGSR_EL1			sys_reg(3, 0, 1, 0, 5)
--#define SYS_GCR_EL1			sys_reg(3, 0, 1, 0, 6)
--
--#define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
--#define SYS_APIAKEYHI_EL1		sys_reg(3, 0, 2, 1, 1)
--#define SYS_APIBKEYLO_EL1		sys_reg(3, 0, 2, 1, 2)
--#define SYS_APIBKEYHI_EL1		sys_reg(3, 0, 2, 1, 3)
--
--#define SYS_APDAKEYLO_EL1		sys_reg(3, 0, 2, 2, 0)
--#define SYS_APDAKEYHI_EL1		sys_reg(3, 0, 2, 2, 1)
--#define SYS_APDBKEYLO_EL1		sys_reg(3, 0, 2, 2, 2)
--#define SYS_APDBKEYHI_EL1		sys_reg(3, 0, 2, 2, 3)
--
--#define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
--#define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
--
--#define SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
--#define SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
--
--#define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
--
--#define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
--#define SYS_AFSR1_EL1			sys_reg(3, 0, 5, 1, 1)
--#define SYS_ESR_EL1			sys_reg(3, 0, 5, 2, 0)
--
--#define SYS_ERRIDR_EL1			sys_reg(3, 0, 5, 3, 0)
--#define SYS_ERRSELR_EL1			sys_reg(3, 0, 5, 3, 1)
--#define SYS_ERXFR_EL1			sys_reg(3, 0, 5, 4, 0)
--#define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
--#define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
--#define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
--#define SYS_ERXPFGF_EL1			sys_reg(3, 0, 5, 4, 4)
--#define SYS_ERXPFGCTL_EL1		sys_reg(3, 0, 5, 4, 5)
--#define SYS_ERXPFGCDN_EL1		sys_reg(3, 0, 5, 4, 6)
--#define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
--#define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
--#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
--#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
--#define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
--#define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
--
--#define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
--
--#define SYS_PAR_EL1_F			BIT(0)
--/* When PAR_EL1.F == 1 */
--#define SYS_PAR_EL1_FST			GENMASK(6, 1)
--#define SYS_PAR_EL1_PTW			BIT(8)
--#define SYS_PAR_EL1_S			BIT(9)
--#define SYS_PAR_EL1_AssuredOnly		BIT(12)
--#define SYS_PAR_EL1_TopLevel		BIT(13)
--#define SYS_PAR_EL1_Overlay		BIT(14)
--#define SYS_PAR_EL1_DirtyBit		BIT(15)
--#define SYS_PAR_EL1_F1_IMPDEF		GENMASK_ULL(63, 48)
--#define SYS_PAR_EL1_F1_RES0		(BIT(7) | BIT(10) | GENMASK_ULL(47, 16))
--#define SYS_PAR_EL1_RES1		BIT(11)
--/* When PAR_EL1.F == 0 */
--#define SYS_PAR_EL1_SH			GENMASK_ULL(8, 7)
--#define SYS_PAR_EL1_NS			BIT(9)
--#define SYS_PAR_EL1_F0_IMPDEF		BIT(10)
--#define SYS_PAR_EL1_NSE			BIT(11)
--#define SYS_PAR_EL1_PA			GENMASK_ULL(51, 12)
--#define SYS_PAR_EL1_ATTR		GENMASK_ULL(63, 56)
--#define SYS_PAR_EL1_F0_RES0		(GENMASK_ULL(6, 1) | GENMASK_ULL(55, 52))
--
--/* Buffer error reporting */
--#define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
--#define PMBSR_EL1_FAULT_FSC_MASK	PMBSR_EL1_MSS_MASK
--
--#define PMBSR_EL1_BUF_BSC_SHIFT		PMBSR_EL1_MSS_SHIFT
--#define PMBSR_EL1_BUF_BSC_MASK		PMBSR_EL1_MSS_MASK
--
--#define PMBSR_EL1_BUF_BSC_FULL		0x1UL
--
--/*** End of Statistical Profiling Extension ***/
--
--#define TRBSR_EL1_BSC_MASK		GENMASK(5, 0)
--#define TRBSR_EL1_BSC_SHIFT		0
--
--#define SYS_PMINTENSET_EL1		sys_reg(3, 0, 9, 14, 1)
--#define SYS_PMINTENCLR_EL1		sys_reg(3, 0, 9, 14, 2)
--
--#define SYS_PMMIR_EL1			sys_reg(3, 0, 9, 14, 6)
--
--#define SYS_MAIR_EL1			sys_reg(3, 0, 10, 2, 0)
--#define SYS_AMAIR_EL1			sys_reg(3, 0, 10, 3, 0)
--
--#define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
--#define SYS_DISR_EL1			sys_reg(3, 0, 12, 1, 1)
--
--#define SYS_ICC_IAR0_EL1		sys_reg(3, 0, 12, 8, 0)
--#define SYS_ICC_EOIR0_EL1		sys_reg(3, 0, 12, 8, 1)
--#define SYS_ICC_HPPIR0_EL1		sys_reg(3, 0, 12, 8, 2)
--#define SYS_ICC_BPR0_EL1		sys_reg(3, 0, 12, 8, 3)
--#define SYS_ICC_AP0Rn_EL1(n)		sys_reg(3, 0, 12, 8, 4 | n)
--#define SYS_ICC_AP0R0_EL1		SYS_ICC_AP0Rn_EL1(0)
--#define SYS_ICC_AP0R1_EL1		SYS_ICC_AP0Rn_EL1(1)
--#define SYS_ICC_AP0R2_EL1		SYS_ICC_AP0Rn_EL1(2)
--#define SYS_ICC_AP0R3_EL1		SYS_ICC_AP0Rn_EL1(3)
--#define SYS_ICC_AP1Rn_EL1(n)		sys_reg(3, 0, 12, 9, n)
--#define SYS_ICC_AP1R0_EL1		SYS_ICC_AP1Rn_EL1(0)
--#define SYS_ICC_AP1R1_EL1		SYS_ICC_AP1Rn_EL1(1)
--#define SYS_ICC_AP1R2_EL1		SYS_ICC_AP1Rn_EL1(2)
--#define SYS_ICC_AP1R3_EL1		SYS_ICC_AP1Rn_EL1(3)
--#define SYS_ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
--#define SYS_ICC_RPR_EL1			sys_reg(3, 0, 12, 11, 3)
--#define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
--#define SYS_ICC_ASGI1R_EL1		sys_reg(3, 0, 12, 11, 6)
--#define SYS_ICC_SGI0R_EL1		sys_reg(3, 0, 12, 11, 7)
--#define SYS_ICC_IAR1_EL1		sys_reg(3, 0, 12, 12, 0)
--#define SYS_ICC_EOIR1_EL1		sys_reg(3, 0, 12, 12, 1)
--#define SYS_ICC_HPPIR1_EL1		sys_reg(3, 0, 12, 12, 2)
--#define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
--#define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
--#define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
--#define SYS_ICC_IGRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
--#define SYS_ICC_IGRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
--
--#define SYS_ACCDATA_EL1			sys_reg(3, 0, 13, 0, 5)
--
--#define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
--
--#define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
--
--#define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
--#define SYS_RNDRRS_EL0			sys_reg(3, 3, 2, 4, 1)
--
--#define SYS_PMCR_EL0			sys_reg(3, 3, 9, 12, 0)
--#define SYS_PMCNTENSET_EL0		sys_reg(3, 3, 9, 12, 1)
--#define SYS_PMCNTENCLR_EL0		sys_reg(3, 3, 9, 12, 2)
--#define SYS_PMOVSCLR_EL0		sys_reg(3, 3, 9, 12, 3)
--#define SYS_PMSWINC_EL0			sys_reg(3, 3, 9, 12, 4)
--#define SYS_PMCEID0_EL0			sys_reg(3, 3, 9, 12, 6)
--#define SYS_PMCEID1_EL0			sys_reg(3, 3, 9, 12, 7)
--#define SYS_PMCCNTR_EL0			sys_reg(3, 3, 9, 13, 0)
--#define SYS_PMXEVTYPER_EL0		sys_reg(3, 3, 9, 13, 1)
--#define SYS_PMXEVCNTR_EL0		sys_reg(3, 3, 9, 13, 2)
--#define SYS_PMUSERENR_EL0		sys_reg(3, 3, 9, 14, 0)
--#define SYS_PMOVSSET_EL0		sys_reg(3, 3, 9, 14, 3)
--
--#define SYS_TPIDR_EL0			sys_reg(3, 3, 13, 0, 2)
--#define SYS_TPIDRRO_EL0			sys_reg(3, 3, 13, 0, 3)
--#define SYS_TPIDR2_EL0			sys_reg(3, 3, 13, 0, 5)
--
--#define SYS_SCXTNUM_EL0			sys_reg(3, 3, 13, 0, 7)
--
--/* Definitions for system register interface to AMU for ARMv8.4 onwards */
--#define SYS_AM_EL0(crm, op2)		sys_reg(3, 3, 13, (crm), (op2))
--#define SYS_AMCR_EL0			SYS_AM_EL0(2, 0)
--#define SYS_AMCFGR_EL0			SYS_AM_EL0(2, 1)
--#define SYS_AMCGCR_EL0			SYS_AM_EL0(2, 2)
--#define SYS_AMUSERENR_EL0		SYS_AM_EL0(2, 3)
--#define SYS_AMCNTENCLR0_EL0		SYS_AM_EL0(2, 4)
--#define SYS_AMCNTENSET0_EL0		SYS_AM_EL0(2, 5)
--#define SYS_AMCNTENCLR1_EL0		SYS_AM_EL0(3, 0)
--#define SYS_AMCNTENSET1_EL0		SYS_AM_EL0(3, 1)
--
--/*
-- * Group 0 of activity monitors (architected):
-- *                op0  op1  CRn   CRm       op2
-- * Counter:       11   011  1101  010:n<3>  n<2:0>
-- * Type:          11   011  1101  011:n<3>  n<2:0>
-- * n: 0-15
-- *
-- * Group 1 of activity monitors (auxiliary):
-- *                op0  op1  CRn   CRm       op2
-- * Counter:       11   011  1101  110:n<3>  n<2:0>
-- * Type:          11   011  1101  111:n<3>  n<2:0>
-- * n: 0-15
-- */
--
--#define SYS_AMEVCNTR0_EL0(n)		SYS_AM_EL0(4 + ((n) >> 3), (n) & 7)
--#define SYS_AMEVTYPER0_EL0(n)		SYS_AM_EL0(6 + ((n) >> 3), (n) & 7)
--#define SYS_AMEVCNTR1_EL0(n)		SYS_AM_EL0(12 + ((n) >> 3), (n) & 7)
--#define SYS_AMEVTYPER1_EL0(n)		SYS_AM_EL0(14 + ((n) >> 3), (n) & 7)
--
--/* AMU v1: Fixed (architecturally defined) activity monitors */
--#define SYS_AMEVCNTR0_CORE_EL0		SYS_AMEVCNTR0_EL0(0)
--#define SYS_AMEVCNTR0_CONST_EL0		SYS_AMEVCNTR0_EL0(1)
--#define SYS_AMEVCNTR0_INST_RET_EL0	SYS_AMEVCNTR0_EL0(2)
--#define SYS_AMEVCNTR0_MEM_STALL		SYS_AMEVCNTR0_EL0(3)
--
--#define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
--
--#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
--#define SYS_CNTVCT_EL0			sys_reg(3, 3, 14, 0, 2)
--#define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
--#define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
--
--#define SYS_CNTP_TVAL_EL0		sys_reg(3, 3, 14, 2, 0)
--#define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
--#define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
--
--#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
--#define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
--#define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
--
--#define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
--#define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
--#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
--#define SYS_AARCH32_CNTVCT		sys_reg(0, 1, 0, 14, 0)
--#define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
--#define SYS_AARCH32_CNTPCTSS		sys_reg(0, 8, 0, 14, 0)
--#define SYS_AARCH32_CNTVCTSS		sys_reg(0, 9, 0, 14, 0)
--
--#define __PMEV_op2(n)			((n) & 0x7)
--#define __CNTR_CRm(n)			(0x8 | (((n) >> 3) & 0x3))
--#define SYS_PMEVCNTSVRn_EL1(n)		sys_reg(2, 0, 14, __CNTR_CRm(n), __PMEV_op2(n))
--#define SYS_PMEVCNTRn_EL0(n)		sys_reg(3, 3, 14, __CNTR_CRm(n), __PMEV_op2(n))
--#define __TYPER_CRm(n)			(0xc | (((n) >> 3) & 0x3))
--#define SYS_PMEVTYPERn_EL0(n)		sys_reg(3, 3, 14, __TYPER_CRm(n), __PMEV_op2(n))
--
--#define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
--
--#define	SYS_SPMCGCRn_EL1(n)		sys_reg(2, 0, 9, 13, ((n) & 1))
--
--#define __SPMEV_op2(n)			((n) & 0x7)
--#define __SPMEV_crm(p, n)		((((p) & 7) << 1) | (((n) >> 3) & 1))
--#define SYS_SPMEVCNTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b000, n), __SPMEV_op2(n))
--#define	SYS_SPMEVFILT2Rn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b011, n), __SPMEV_op2(n))
--#define	SYS_SPMEVFILTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b010, n), __SPMEV_op2(n))
--#define	SYS_SPMEVTYPERn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b001, n), __SPMEV_op2(n))
--
--#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
--#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
--
--#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
--#define SYS_SCTLR2_EL2			sys_reg(3, 4, 1, 0, 3)
--#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
--#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
--#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
--#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
--#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
--
--#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
--#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
--#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
--#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
--
--#define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
--#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
--#define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
--#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
--#define SYS_SPSR_irq			sys_reg(3, 4, 4, 3, 0)
--#define SYS_SPSR_abt			sys_reg(3, 4, 4, 3, 1)
--#define SYS_SPSR_und			sys_reg(3, 4, 4, 3, 2)
--#define SYS_SPSR_fiq			sys_reg(3, 4, 4, 3, 3)
--#define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
--#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
--#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
--#define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
--#define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
--#define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
--#define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
--
--#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
--#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
--
--#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
--#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
--
--#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
--#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
--#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
--#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
--#define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
--#define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
--#define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
--#define SYS_ICH_AP0R2_EL2		__SYS__AP0Rx_EL2(2)
--#define SYS_ICH_AP0R3_EL2		__SYS__AP0Rx_EL2(3)
--
--#define __SYS__AP1Rx_EL2(x)		sys_reg(3, 4, 12, 9, x)
--#define SYS_ICH_AP1R0_EL2		__SYS__AP1Rx_EL2(0)
--#define SYS_ICH_AP1R1_EL2		__SYS__AP1Rx_EL2(1)
--#define SYS_ICH_AP1R2_EL2		__SYS__AP1Rx_EL2(2)
--#define SYS_ICH_AP1R3_EL2		__SYS__AP1Rx_EL2(3)
--
--#define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
--#define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
--#define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
--#define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
--
--#define __SYS__LR0_EL2(x)		sys_reg(3, 4, 12, 12, x)
--#define SYS_ICH_LR0_EL2			__SYS__LR0_EL2(0)
--#define SYS_ICH_LR1_EL2			__SYS__LR0_EL2(1)
--#define SYS_ICH_LR2_EL2			__SYS__LR0_EL2(2)
--#define SYS_ICH_LR3_EL2			__SYS__LR0_EL2(3)
--#define SYS_ICH_LR4_EL2			__SYS__LR0_EL2(4)
--#define SYS_ICH_LR5_EL2			__SYS__LR0_EL2(5)
--#define SYS_ICH_LR6_EL2			__SYS__LR0_EL2(6)
--#define SYS_ICH_LR7_EL2			__SYS__LR0_EL2(7)
--
--#define __SYS__LR8_EL2(x)		sys_reg(3, 4, 12, 13, x)
--#define SYS_ICH_LR8_EL2			__SYS__LR8_EL2(0)
--#define SYS_ICH_LR9_EL2			__SYS__LR8_EL2(1)
--#define SYS_ICH_LR10_EL2		__SYS__LR8_EL2(2)
--#define SYS_ICH_LR11_EL2		__SYS__LR8_EL2(3)
--#define SYS_ICH_LR12_EL2		__SYS__LR8_EL2(4)
--#define SYS_ICH_LR13_EL2		__SYS__LR8_EL2(5)
--#define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
--#define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
--
--#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
--#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
--#define SYS_SCXTNUM_EL2			sys_reg(3, 4, 13, 0, 7)
--
--#define __AMEV_op2(m)			(m & 0x7)
--#define __AMEV_CRm(n, m)		(n | ((m & 0x8) >> 3))
--#define __SYS__AMEVCNTVOFF0n_EL2(m)	sys_reg(3, 4, 13, __AMEV_CRm(0x8, m), __AMEV_op2(m))
--#define SYS_AMEVCNTVOFF0n_EL2(m)	__SYS__AMEVCNTVOFF0n_EL2(m)
--#define __SYS__AMEVCNTVOFF1n_EL2(m)	sys_reg(3, 4, 13, __AMEV_CRm(0xA, m), __AMEV_op2(m))
--#define SYS_AMEVCNTVOFF1n_EL2(m)	__SYS__AMEVCNTVOFF1n_EL2(m)
--
--#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
--#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
--#define SYS_CNTHP_TVAL_EL2		sys_reg(3, 4, 14, 2, 0)
--#define SYS_CNTHP_CTL_EL2		sys_reg(3, 4, 14, 2, 1)
--#define SYS_CNTHP_CVAL_EL2		sys_reg(3, 4, 14, 2, 2)
--#define SYS_CNTHV_TVAL_EL2		sys_reg(3, 4, 14, 3, 0)
--#define SYS_CNTHV_CTL_EL2		sys_reg(3, 4, 14, 3, 1)
--#define SYS_CNTHV_CVAL_EL2		sys_reg(3, 4, 14, 3, 2)
--
--/* VHE encodings for architectural EL0/1 system registers */
--#define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
--#define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
--#define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
--#define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
--#define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
--#define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
--#define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
--#define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
--#define SYS_TFSR_EL12			sys_reg(3, 5, 5, 6, 0)
--#define SYS_PMSCR_EL12			sys_reg(3, 5, 9, 9, 0)
--#define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
--#define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
--#define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
--#define SYS_SCXTNUM_EL12		sys_reg(3, 5, 13, 0, 7)
--#define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
--#define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
--#define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
--#define SYS_CNTP_CVAL_EL02		sys_reg(3, 5, 14, 2, 2)
--#define SYS_CNTV_TVAL_EL02		sys_reg(3, 5, 14, 3, 0)
--#define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
--#define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
--
--#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
--
--/* AT instructions */
--#define AT_Op0 1
--#define AT_CRn 7
--
--#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
--#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
--#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
--#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
--#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
--#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
--#define OP_AT_S1E1A	sys_insn(AT_Op0, 0, AT_CRn, 9, 2)
--#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
--#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
--#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
--#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
--#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
--#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
--#define OP_AT_S1E2A	sys_insn(AT_Op0, 4, AT_CRn, 9, 2)
--
--/* TLBI instructions */
--#define TLBI_Op0	1
--
--#define TLBI_Op1_EL1	0	/* Accessible from EL1 or higher */
--#define TLBI_Op1_EL2	4	/* Accessible from EL2 or higher */
--
--#define TLBI_CRn_XS	8	/* Extra Slow (the common one) */
--#define TLBI_CRn_nXS	9	/* not Extra Slow (which nobody uses)*/
--
--#define TLBI_CRm_IPAIS	0	/* S2 Inner-Shareable */
--#define TLBI_CRm_nROS	1	/* non-Range, Outer-Sharable */
--#define TLBI_CRm_RIS	2	/* Range, Inner-Sharable */
--#define TLBI_CRm_nRIS	3	/* non-Range, Inner-Sharable */
--#define TLBI_CRm_IPAONS	4	/* S2 Outer and Non-Shareable */
--#define TLBI_CRm_ROS	5	/* Range, Outer-Sharable */
--#define TLBI_CRm_RNS	6	/* Range, Non-Sharable */
--#define TLBI_CRm_nRNS	7	/* non-Range, Non-Sharable */
--
--#define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
--#define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
--#define OP_TLBI_ASIDE1OS		sys_insn(1, 0, 8, 1, 2)
--#define OP_TLBI_VAAE1OS			sys_insn(1, 0, 8, 1, 3)
--#define OP_TLBI_VALE1OS			sys_insn(1, 0, 8, 1, 5)
--#define OP_TLBI_VAALE1OS		sys_insn(1, 0, 8, 1, 7)
--#define OP_TLBI_RVAE1IS			sys_insn(1, 0, 8, 2, 1)
--#define OP_TLBI_RVAAE1IS		sys_insn(1, 0, 8, 2, 3)
--#define OP_TLBI_RVALE1IS		sys_insn(1, 0, 8, 2, 5)
--#define OP_TLBI_RVAALE1IS		sys_insn(1, 0, 8, 2, 7)
--#define OP_TLBI_VMALLE1IS		sys_insn(1, 0, 8, 3, 0)
--#define OP_TLBI_VAE1IS			sys_insn(1, 0, 8, 3, 1)
--#define OP_TLBI_ASIDE1IS		sys_insn(1, 0, 8, 3, 2)
--#define OP_TLBI_VAAE1IS			sys_insn(1, 0, 8, 3, 3)
--#define OP_TLBI_VALE1IS			sys_insn(1, 0, 8, 3, 5)
--#define OP_TLBI_VAALE1IS		sys_insn(1, 0, 8, 3, 7)
--#define OP_TLBI_RVAE1OS			sys_insn(1, 0, 8, 5, 1)
--#define OP_TLBI_RVAAE1OS		sys_insn(1, 0, 8, 5, 3)
--#define OP_TLBI_RVALE1OS		sys_insn(1, 0, 8, 5, 5)
--#define OP_TLBI_RVAALE1OS		sys_insn(1, 0, 8, 5, 7)
--#define OP_TLBI_RVAE1			sys_insn(1, 0, 8, 6, 1)
--#define OP_TLBI_RVAAE1			sys_insn(1, 0, 8, 6, 3)
--#define OP_TLBI_RVALE1			sys_insn(1, 0, 8, 6, 5)
--#define OP_TLBI_RVAALE1			sys_insn(1, 0, 8, 6, 7)
--#define OP_TLBI_VMALLE1			sys_insn(1, 0, 8, 7, 0)
--#define OP_TLBI_VAE1			sys_insn(1, 0, 8, 7, 1)
--#define OP_TLBI_ASIDE1			sys_insn(1, 0, 8, 7, 2)
--#define OP_TLBI_VAAE1			sys_insn(1, 0, 8, 7, 3)
--#define OP_TLBI_VALE1			sys_insn(1, 0, 8, 7, 5)
--#define OP_TLBI_VAALE1			sys_insn(1, 0, 8, 7, 7)
--#define OP_TLBI_VMALLE1OSNXS		sys_insn(1, 0, 9, 1, 0)
--#define OP_TLBI_VAE1OSNXS		sys_insn(1, 0, 9, 1, 1)
--#define OP_TLBI_ASIDE1OSNXS		sys_insn(1, 0, 9, 1, 2)
--#define OP_TLBI_VAAE1OSNXS		sys_insn(1, 0, 9, 1, 3)
--#define OP_TLBI_VALE1OSNXS		sys_insn(1, 0, 9, 1, 5)
--#define OP_TLBI_VAALE1OSNXS		sys_insn(1, 0, 9, 1, 7)
--#define OP_TLBI_RVAE1ISNXS		sys_insn(1, 0, 9, 2, 1)
--#define OP_TLBI_RVAAE1ISNXS		sys_insn(1, 0, 9, 2, 3)
--#define OP_TLBI_RVALE1ISNXS		sys_insn(1, 0, 9, 2, 5)
--#define OP_TLBI_RVAALE1ISNXS		sys_insn(1, 0, 9, 2, 7)
--#define OP_TLBI_VMALLE1ISNXS		sys_insn(1, 0, 9, 3, 0)
--#define OP_TLBI_VAE1ISNXS		sys_insn(1, 0, 9, 3, 1)
--#define OP_TLBI_ASIDE1ISNXS		sys_insn(1, 0, 9, 3, 2)
--#define OP_TLBI_VAAE1ISNXS		sys_insn(1, 0, 9, 3, 3)
--#define OP_TLBI_VALE1ISNXS		sys_insn(1, 0, 9, 3, 5)
--#define OP_TLBI_VAALE1ISNXS		sys_insn(1, 0, 9, 3, 7)
--#define OP_TLBI_RVAE1OSNXS		sys_insn(1, 0, 9, 5, 1)
--#define OP_TLBI_RVAAE1OSNXS		sys_insn(1, 0, 9, 5, 3)
--#define OP_TLBI_RVALE1OSNXS		sys_insn(1, 0, 9, 5, 5)
--#define OP_TLBI_RVAALE1OSNXS		sys_insn(1, 0, 9, 5, 7)
--#define OP_TLBI_RVAE1NXS		sys_insn(1, 0, 9, 6, 1)
--#define OP_TLBI_RVAAE1NXS		sys_insn(1, 0, 9, 6, 3)
--#define OP_TLBI_RVALE1NXS		sys_insn(1, 0, 9, 6, 5)
--#define OP_TLBI_RVAALE1NXS		sys_insn(1, 0, 9, 6, 7)
--#define OP_TLBI_VMALLE1NXS		sys_insn(1, 0, 9, 7, 0)
--#define OP_TLBI_VAE1NXS			sys_insn(1, 0, 9, 7, 1)
--#define OP_TLBI_ASIDE1NXS		sys_insn(1, 0, 9, 7, 2)
--#define OP_TLBI_VAAE1NXS		sys_insn(1, 0, 9, 7, 3)
--#define OP_TLBI_VALE1NXS		sys_insn(1, 0, 9, 7, 5)
--#define OP_TLBI_VAALE1NXS		sys_insn(1, 0, 9, 7, 7)
--#define OP_TLBI_IPAS2E1IS		sys_insn(1, 4, 8, 0, 1)
--#define OP_TLBI_RIPAS2E1IS		sys_insn(1, 4, 8, 0, 2)
--#define OP_TLBI_IPAS2LE1IS		sys_insn(1, 4, 8, 0, 5)
--#define OP_TLBI_RIPAS2LE1IS		sys_insn(1, 4, 8, 0, 6)
--#define OP_TLBI_ALLE2OS			sys_insn(1, 4, 8, 1, 0)
--#define OP_TLBI_VAE2OS			sys_insn(1, 4, 8, 1, 1)
--#define OP_TLBI_ALLE1OS			sys_insn(1, 4, 8, 1, 4)
--#define OP_TLBI_VALE2OS			sys_insn(1, 4, 8, 1, 5)
--#define OP_TLBI_VMALLS12E1OS		sys_insn(1, 4, 8, 1, 6)
--#define OP_TLBI_RVAE2IS			sys_insn(1, 4, 8, 2, 1)
--#define OP_TLBI_RVALE2IS		sys_insn(1, 4, 8, 2, 5)
--#define OP_TLBI_ALLE2IS			sys_insn(1, 4, 8, 3, 0)
--#define OP_TLBI_VAE2IS			sys_insn(1, 4, 8, 3, 1)
--#define OP_TLBI_ALLE1IS			sys_insn(1, 4, 8, 3, 4)
--#define OP_TLBI_VALE2IS			sys_insn(1, 4, 8, 3, 5)
--#define OP_TLBI_VMALLS12E1IS		sys_insn(1, 4, 8, 3, 6)
--#define OP_TLBI_IPAS2E1OS		sys_insn(1, 4, 8, 4, 0)
--#define OP_TLBI_IPAS2E1			sys_insn(1, 4, 8, 4, 1)
--#define OP_TLBI_RIPAS2E1		sys_insn(1, 4, 8, 4, 2)
--#define OP_TLBI_RIPAS2E1OS		sys_insn(1, 4, 8, 4, 3)
--#define OP_TLBI_IPAS2LE1OS		sys_insn(1, 4, 8, 4, 4)
--#define OP_TLBI_IPAS2LE1		sys_insn(1, 4, 8, 4, 5)
--#define OP_TLBI_RIPAS2LE1		sys_insn(1, 4, 8, 4, 6)
--#define OP_TLBI_RIPAS2LE1OS		sys_insn(1, 4, 8, 4, 7)
--#define OP_TLBI_RVAE2OS			sys_insn(1, 4, 8, 5, 1)
--#define OP_TLBI_RVALE2OS		sys_insn(1, 4, 8, 5, 5)
--#define OP_TLBI_RVAE2			sys_insn(1, 4, 8, 6, 1)
--#define OP_TLBI_RVALE2			sys_insn(1, 4, 8, 6, 5)
--#define OP_TLBI_ALLE2			sys_insn(1, 4, 8, 7, 0)
--#define OP_TLBI_VAE2			sys_insn(1, 4, 8, 7, 1)
--#define OP_TLBI_ALLE1			sys_insn(1, 4, 8, 7, 4)
--#define OP_TLBI_VALE2			sys_insn(1, 4, 8, 7, 5)
--#define OP_TLBI_VMALLS12E1		sys_insn(1, 4, 8, 7, 6)
--#define OP_TLBI_IPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 1)
--#define OP_TLBI_RIPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 2)
--#define OP_TLBI_IPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 5)
--#define OP_TLBI_RIPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 6)
--#define OP_TLBI_ALLE2OSNXS		sys_insn(1, 4, 9, 1, 0)
--#define OP_TLBI_VAE2OSNXS		sys_insn(1, 4, 9, 1, 1)
--#define OP_TLBI_ALLE1OSNXS		sys_insn(1, 4, 9, 1, 4)
--#define OP_TLBI_VALE2OSNXS		sys_insn(1, 4, 9, 1, 5)
--#define OP_TLBI_VMALLS12E1OSNXS		sys_insn(1, 4, 9, 1, 6)
--#define OP_TLBI_RVAE2ISNXS		sys_insn(1, 4, 9, 2, 1)
--#define OP_TLBI_RVALE2ISNXS		sys_insn(1, 4, 9, 2, 5)
--#define OP_TLBI_ALLE2ISNXS		sys_insn(1, 4, 9, 3, 0)
--#define OP_TLBI_VAE2ISNXS		sys_insn(1, 4, 9, 3, 1)
--#define OP_TLBI_ALLE1ISNXS		sys_insn(1, 4, 9, 3, 4)
--#define OP_TLBI_VALE2ISNXS		sys_insn(1, 4, 9, 3, 5)
--#define OP_TLBI_VMALLS12E1ISNXS		sys_insn(1, 4, 9, 3, 6)
--#define OP_TLBI_IPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 0)
--#define OP_TLBI_IPAS2E1NXS		sys_insn(1, 4, 9, 4, 1)
--#define OP_TLBI_RIPAS2E1NXS		sys_insn(1, 4, 9, 4, 2)
--#define OP_TLBI_RIPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 3)
--#define OP_TLBI_IPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 4)
--#define OP_TLBI_IPAS2LE1NXS		sys_insn(1, 4, 9, 4, 5)
--#define OP_TLBI_RIPAS2LE1NXS		sys_insn(1, 4, 9, 4, 6)
--#define OP_TLBI_RIPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 7)
--#define OP_TLBI_RVAE2OSNXS		sys_insn(1, 4, 9, 5, 1)
--#define OP_TLBI_RVALE2OSNXS		sys_insn(1, 4, 9, 5, 5)
--#define OP_TLBI_RVAE2NXS		sys_insn(1, 4, 9, 6, 1)
--#define OP_TLBI_RVALE2NXS		sys_insn(1, 4, 9, 6, 5)
--#define OP_TLBI_ALLE2NXS		sys_insn(1, 4, 9, 7, 0)
--#define OP_TLBI_VAE2NXS			sys_insn(1, 4, 9, 7, 1)
--#define OP_TLBI_ALLE1NXS		sys_insn(1, 4, 9, 7, 4)
--#define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
--#define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
--
--/* Misc instructions */
--#define OP_GCSPUSHX			sys_insn(1, 0, 7, 7, 4)
--#define OP_GCSPOPCX			sys_insn(1, 0, 7, 7, 5)
--#define OP_GCSPOPX			sys_insn(1, 0, 7, 7, 6)
--#define OP_GCSPUSHM			sys_insn(1, 3, 7, 7, 0)
--
--#define OP_BRB_IALL			sys_insn(1, 1, 7, 2, 4)
--#define OP_BRB_INJ			sys_insn(1, 1, 7, 2, 5)
--#define OP_CFP_RCTX			sys_insn(1, 3, 7, 3, 4)
--#define OP_DVP_RCTX			sys_insn(1, 3, 7, 3, 5)
--#define OP_COSP_RCTX			sys_insn(1, 3, 7, 3, 6)
--#define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
--
- /*
-  * BRBE Instructions
-  */
- #define BRB_IALL_INSN	__emit_inst(0xd5000000 | OP_BRB_IALL | (0x1f))
- #define BRB_INJ_INSN	__emit_inst(0xd5000000 | OP_BRB_INJ  | (0x1f))
- 
--/* Common SCTLR_ELx flags. */
--#define SCTLR_ELx_ENTP2	(BIT(60))
--#define SCTLR_ELx_DSSBS	(BIT(44))
--#define SCTLR_ELx_ATA	(BIT(43))
--
--#define SCTLR_ELx_EE_SHIFT	25
--#define SCTLR_ELx_ENIA_SHIFT	31
--
--#define SCTLR_ELx_ITFSB	 (BIT(37))
--#define SCTLR_ELx_ENIA	 (BIT(SCTLR_ELx_ENIA_SHIFT))
--#define SCTLR_ELx_ENIB	 (BIT(30))
--#define SCTLR_ELx_LSMAOE (BIT(29))
--#define SCTLR_ELx_nTLSMD (BIT(28))
--#define SCTLR_ELx_ENDA	 (BIT(27))
--#define SCTLR_ELx_EE     (BIT(SCTLR_ELx_EE_SHIFT))
--#define SCTLR_ELx_EIS	 (BIT(22))
--#define SCTLR_ELx_IESB	 (BIT(21))
--#define SCTLR_ELx_TSCXT	 (BIT(20))
--#define SCTLR_ELx_WXN	 (BIT(19))
--#define SCTLR_ELx_ENDB	 (BIT(13))
--#define SCTLR_ELx_I	 (BIT(12))
--#define SCTLR_ELx_EOS	 (BIT(11))
--#define SCTLR_ELx_SA	 (BIT(3))
--#define SCTLR_ELx_C	 (BIT(2))
--#define SCTLR_ELx_A	 (BIT(1))
--#define SCTLR_ELx_M	 (BIT(0))
--
- #ifdef CONFIG_CPU_BIG_ENDIAN
- #define ENDIAN_SET_EL2		SCTLR_ELx_EE
- #else
-@@ -869,35 +112,6 @@
- 	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
- 	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
- 
--/* MAIR_ELx memory attributes (used by Linux) */
--#define MAIR_ATTR_DEVICE_nGnRnE		UL(0x00)
--#define MAIR_ATTR_DEVICE_nGnRE		UL(0x04)
--#define MAIR_ATTR_NORMAL_NC		UL(0x44)
--#define MAIR_ATTR_NORMAL_TAGGED		UL(0xf0)
--#define MAIR_ATTR_NORMAL		UL(0xff)
--#define MAIR_ATTR_MASK			UL(0xff)
--
--/* Position the attr at the correct index */
--#define MAIR_ATTRIDX(attr, idx)		((attr) << ((idx) * 8))
--
--/* id_aa64mmfr0 */
--#define ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MIN	0x0
--#define ID_AA64MMFR0_EL1_TGRAN4_LPA2		ID_AA64MMFR0_EL1_TGRAN4_52_BIT
--#define ID_AA64MMFR0_EL1_TGRAN4_SUPPORTED_MAX	0x7
--#define ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MIN	0x0
--#define ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MAX	0x7
--#define ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MIN	0x1
--#define ID_AA64MMFR0_EL1_TGRAN16_LPA2		ID_AA64MMFR0_EL1_TGRAN16_52_BIT
--#define ID_AA64MMFR0_EL1_TGRAN16_SUPPORTED_MAX	0xf
--
--#define ARM64_MIN_PARANGE_BITS		32
--
--#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_DEFAULT	0x0
--#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_NONE		0x1
--#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MIN		0x2
--#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2		0x3
--#define ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_MAX		0x7
--
- #ifdef CONFIG_ARM64_PA_BITS_52
- #define ID_AA64MMFR0_EL1_PARANGE_MAX	ID_AA64MMFR0_EL1_PARANGE_52
- #else
-@@ -923,19 +137,6 @@
- #define ID_AA64MMFR0_EL1_TGRAN_2_SHIFT		ID_AA64MMFR0_EL1_TGRAN64_2_SHIFT
- #endif
- 
--#define CPACR_EL1_FPEN_EL1EN	(BIT(20)) /* enable EL1 access */
--#define CPACR_EL1_FPEN_EL0EN	(BIT(21)) /* enable EL0 access, if EL1EN set */
--
--#define CPACR_EL1_SMEN_EL1EN	(BIT(24)) /* enable EL1 access */
--#define CPACR_EL1_SMEN_EL0EN	(BIT(25)) /* enable EL0 access, if EL1EN set */
--
--#define CPACR_EL1_ZEN_EL1EN	(BIT(16)) /* enable EL1 access */
--#define CPACR_EL1_ZEN_EL0EN	(BIT(17)) /* enable EL0 access, if EL1EN set */
--
--/* GCR_EL1 Definitions */
--#define SYS_GCR_EL1_RRND	(BIT(16))
--#define SYS_GCR_EL1_EXCL_MASK	0xffffUL
--
- #ifdef CONFIG_KASAN_HW_TAGS
- /*
-  * KASAN always uses a whole byte for its tags. With CONFIG_KASAN_HW_TAGS it
-@@ -951,153 +152,6 @@
- 
- #define KERNEL_GCR_EL1		(SYS_GCR_EL1_RRND | KERNEL_GCR_EL1_EXCL)
- 
--/* RGSR_EL1 Definitions */
--#define SYS_RGSR_EL1_TAG_MASK	0xfUL
--#define SYS_RGSR_EL1_SEED_SHIFT	8
--#define SYS_RGSR_EL1_SEED_MASK	0xffffUL
--
--/* TFSR{,E0}_EL1 bit definitions */
--#define SYS_TFSR_EL1_TF0_SHIFT	0
--#define SYS_TFSR_EL1_TF1_SHIFT	1
--#define SYS_TFSR_EL1_TF0	(UL(1) << SYS_TFSR_EL1_TF0_SHIFT)
--#define SYS_TFSR_EL1_TF1	(UL(1) << SYS_TFSR_EL1_TF1_SHIFT)
--
--/* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
--#define SYS_MPIDR_SAFE_VAL	(BIT(31))
--
--/* GIC Hypervisor interface registers */
--/* ICH_LR*_EL2 bit definitions */
--#define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
--
--#define ICH_LR_EOI		(1ULL << 41)
--#define ICH_LR_GROUP		(1ULL << 60)
--#define ICH_LR_HW		(1ULL << 61)
--#define ICH_LR_STATE		(3ULL << 62)
--#define ICH_LR_PENDING_BIT	(1ULL << 62)
--#define ICH_LR_ACTIVE_BIT	(1ULL << 63)
--#define ICH_LR_PHYS_ID_SHIFT	32
--#define ICH_LR_PHYS_ID_MASK	(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
--#define ICH_LR_PRIORITY_SHIFT	48
--#define ICH_LR_PRIORITY_MASK	(0xffULL << ICH_LR_PRIORITY_SHIFT)
--
--/*
-- * Permission Indirection Extension (PIE) permission encodings.
-- * Encodings with the _O suffix, have overlays applied (Permission Overlay Extension).
-- */
--#define PIE_NONE_O	UL(0x0)
--#define PIE_R_O		UL(0x1)
--#define PIE_X_O		UL(0x2)
--#define PIE_RX_O	UL(0x3)
--#define PIE_RW_O	UL(0x5)
--#define PIE_RWnX_O	UL(0x6)
--#define PIE_RWX_O	UL(0x7)
--#define PIE_R		UL(0x8)
--#define PIE_GCS		UL(0x9)
--#define PIE_RX		UL(0xa)
--#define PIE_RW		UL(0xc)
--#define PIE_RWX		UL(0xe)
--#define PIE_MASK	UL(0xf)
--
--#define PIRx_ELx_BITS_PER_IDX		4
--#define PIRx_ELx_PERM_SHIFT(idx)	((idx) * PIRx_ELx_BITS_PER_IDX)
--#define PIRx_ELx_PERM_PREP(idx, perm)	(((perm) & PIE_MASK) << PIRx_ELx_PERM_SHIFT(idx))
--
--/*
-- * Permission Overlay Extension (POE) permission encodings.
-- */
--#define POE_NONE	UL(0x0)
--#define POE_R		UL(0x1)
--#define POE_X		UL(0x2)
--#define POE_RX		UL(0x3)
--#define POE_W		UL(0x4)
--#define POE_RW		UL(0x5)
--#define POE_WX		UL(0x6)
--#define POE_RWX		UL(0x7)
--#define POE_MASK	UL(0xf)
--
--#define POR_ELx_BITS_PER_IDX		4
--#define POR_ELx_PERM_SHIFT(idx)		((idx) * POR_ELx_BITS_PER_IDX)
--#define POR_ELx_PERM_GET(idx, reg)	(((reg) >> POR_ELx_PERM_SHIFT(idx)) & POE_MASK)
--#define POR_ELx_PERM_PREP(idx, perm)	(((perm) & POE_MASK) << POR_ELx_PERM_SHIFT(idx))
--
--/*
-- * Definitions for Guarded Control Stack
-- */
--
--#define GCS_CAP_ADDR_MASK		GENMASK(63, 12)
--#define GCS_CAP_ADDR_SHIFT		12
--#define GCS_CAP_ADDR_WIDTH		52
--#define GCS_CAP_ADDR(x)			FIELD_GET(GCS_CAP_ADDR_MASK, x)
--
--#define GCS_CAP_TOKEN_MASK		GENMASK(11, 0)
--#define GCS_CAP_TOKEN_SHIFT		0
--#define GCS_CAP_TOKEN_WIDTH		12
--#define GCS_CAP_TOKEN(x)		FIELD_GET(GCS_CAP_TOKEN_MASK, x)
--
--#define GCS_CAP_VALID_TOKEN		0x1
--#define GCS_CAP_IN_PROGRESS_TOKEN	0x5
--
--#define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
--					       GCS_CAP_VALID_TOKEN)
--/*
-- * Definitions for GICv5 instructions
-- */
--#define GICV5_OP_GIC_CDAFF		sys_insn(1, 0, 12, 1, 3)
--#define GICV5_OP_GIC_CDDI		sys_insn(1, 0, 12, 2, 0)
--#define GICV5_OP_GIC_CDDIS		sys_insn(1, 0, 12, 1, 0)
--#define GICV5_OP_GIC_CDHM		sys_insn(1, 0, 12, 2, 1)
--#define GICV5_OP_GIC_CDEN		sys_insn(1, 0, 12, 1, 1)
--#define GICV5_OP_GIC_CDEOI		sys_insn(1, 0, 12, 1, 7)
--#define GICV5_OP_GIC_CDPEND		sys_insn(1, 0, 12, 1, 4)
--#define GICV5_OP_GIC_CDPRI		sys_insn(1, 0, 12, 1, 2)
--#define GICV5_OP_GIC_CDRCFG		sys_insn(1, 0, 12, 1, 5)
--#define GICV5_OP_GICR_CDIA		sys_insn(1, 0, 12, 3, 0)
--
--/* Definitions for GIC CDAFF */
--#define GICV5_GIC_CDAFF_IAFFID_MASK	GENMASK_ULL(47, 32)
--#define GICV5_GIC_CDAFF_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDAFF_IRM_MASK	BIT_ULL(28)
--#define GICV5_GIC_CDAFF_ID_MASK		GENMASK_ULL(23, 0)
--
--/* Definitions for GIC CDDI */
--#define GICV5_GIC_CDDI_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDDI_ID_MASK		GENMASK_ULL(23, 0)
--
--/* Definitions for GIC CDDIS */
--#define GICV5_GIC_CDDIS_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDDIS_TYPE(r)		FIELD_GET(GICV5_GIC_CDDIS_TYPE_MASK, r)
--#define GICV5_GIC_CDDIS_ID_MASK		GENMASK_ULL(23, 0)
--#define GICV5_GIC_CDDIS_ID(r)		FIELD_GET(GICV5_GIC_CDDIS_ID_MASK, r)
--
--/* Definitions for GIC CDEN */
--#define GICV5_GIC_CDEN_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDEN_ID_MASK		GENMASK_ULL(23, 0)
--
--/* Definitions for GIC CDHM */
--#define GICV5_GIC_CDHM_HM_MASK		BIT_ULL(32)
--#define GICV5_GIC_CDHM_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDHM_ID_MASK		GENMASK_ULL(23, 0)
--
--/* Definitions for GIC CDPEND */
--#define GICV5_GIC_CDPEND_PENDING_MASK	BIT_ULL(32)
--#define GICV5_GIC_CDPEND_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDPEND_ID_MASK	GENMASK_ULL(23, 0)
--
--/* Definitions for GIC CDPRI */
--#define GICV5_GIC_CDPRI_PRIORITY_MASK	GENMASK_ULL(39, 35)
--#define GICV5_GIC_CDPRI_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDPRI_ID_MASK		GENMASK_ULL(23, 0)
--
--/* Definitions for GIC CDRCFG */
--#define GICV5_GIC_CDRCFG_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDRCFG_ID_MASK	GENMASK_ULL(23, 0)
--
--/* Definitions for GICR CDIA */
--#define GICV5_GIC_CDIA_VALID_MASK	BIT_ULL(32)
--#define GICV5_GICR_CDIA_VALID(r)	FIELD_GET(GICV5_GIC_CDIA_VALID_MASK, r)
--#define GICV5_GIC_CDIA_TYPE_MASK	GENMASK_ULL(31, 29)
--#define GICV5_GIC_CDIA_ID_MASK		GENMASK_ULL(23, 0)
--
- #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
- #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
- 
-@@ -1249,18 +303,6 @@
- 	par;								\
- })
- 
--#define SYS_FIELD_VALUE(reg, field, val)	reg##_##field##_##val
--
--#define SYS_FIELD_GET(reg, field, val)		\
--		 FIELD_GET(reg##_##field##_MASK, val)
--
--#define SYS_FIELD_PREP(reg, field, val)		\
--		 FIELD_PREP(reg##_##field##_MASK, val)
--
--#define SYS_FIELD_PREP_ENUM(reg, field, val)		\
--		 FIELD_PREP(reg##_##field##_MASK,	\
--			    SYS_FIELD_VALUE(reg, field, val))
--
- #endif
- 
- #endif	/* __ASM_SYSREG_H */
-diff --git a/arch/arm64/tools/Makefile b/arch/arm64/tools/Makefile
-index c2b34e761006..aee011abc2b9 100644
---- a/arch/arm64/tools/Makefile
-+++ b/arch/arm64/tools/Makefile
-@@ -3,26 +3,18 @@
- gen := arch/$(ARCH)/include/generated
- kapi := $(gen)/asm
- 
--kapisyshdr-y := cpucap-defs.h sysreg-defs.h
-+include $(srctree)/arch/arm64/tools/Makefile.sysreg
- 
--kapi-hdrs-y := $(addprefix $(kapi)/, $(kapisyshdr-y))
--
--targets += $(addprefix ../../../, $(kapi-hdrs-y))
-+targets += $(addprefix ../../../, $(kapi)/cpucap-defs.h)
- 
- PHONY += kapi
- 
- all: $(syscall64) kapi
- 
--kapi:   $(kapi-hdrs-y)
-+kapi:   $(kapi)/cpucap-defs.h
- 
- quiet_cmd_gen_cpucaps = GEN     $@
-       cmd_gen_cpucaps = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
- 
--quiet_cmd_gen_sysreg = GEN     $@
--      cmd_gen_sysreg = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
--
- $(kapi)/cpucap-defs.h: $(src)/gen-cpucaps.awk $(src)/cpucaps FORCE
- 	$(call if_changed,gen_cpucaps)
--
--$(kapi)/sysreg-defs.h: $(src)/gen-sysreg.awk $(src)/sysreg FORCE
--	$(call if_changed,gen_sysreg)
-diff --git a/arch/arm64/tools/Makefile.sysreg b/arch/arm64/tools/Makefile.sysreg
-new file mode 100644
-index 000000000000..1c2096208f14
---- /dev/null
-+++ b/arch/arm64/tools/Makefile.sysreg
-@@ -0,0 +1,12 @@
-+# SPDX-License-Identifier: GPL-2.0
++#include <gmap.h>
 +
-+targets += $(addprefix ../../../, $(kapi)/sysreg-gen-defs.h)
-+
-+kapi:   $(kapi)/sysreg-gen-defs.h
-+
-+quiet_cmd_gen_sysreg = GEN     $@
-+      cmd_gen_sysreg = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
-+
-+$(kapi)/sysreg-gen-defs.h: $(srctree)/arch/arm64/tools/gen-sysreg.awk $(srctree)/arch/arm64/tools/sysreg FORCE
-+	$(call if_changed,gen_sysreg)
-+
-diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-index 86860ab672dc..ffdabd3ff84a 100755
---- a/arch/arm64/tools/gen-sysreg.awk
-+++ b/arch/arm64/tools/gen-sysreg.awk
-@@ -107,8 +107,8 @@ function parse_bitdef(reg, field, bitdef, _bits)
+ #include "arm.h"
++#include "reset.h"
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+@@ -41,6 +44,61 @@ static u64 kvm_max_guest_address(void)
+ 	return ALIGN_DOWN(max_addr + 1, 1 << 30) - 1;
  }
  
- BEGIN {
--	print "#ifndef __ASM_SYSREG_DEFS_H"
--	print "#define __ASM_SYSREG_DEFS_H"
-+	print "#ifndef __ASM_SYSREG_GEN_DEFS_H"
-+	print "#define __ASM_SYSREG_GEN_DEFS_H"
- 	print ""
- 	print "/* Generated file - do not edit */"
- 	print ""
-@@ -121,7 +121,7 @@ END {
- 	if (__current_block_depth != 0)
- 		fatal("Missing terminator for " block_current() " block")
- 
--	print "#endif /* __ASM_SYSREG_DEFS_H */"
-+	print "#endif /* __ASM_SYSREG_GEN_DEFS_H */"
++static int kvm_gmap_init(struct kvm *kvm)
++{
++	struct crst_table *table;
++
++	kvm->arch.gmap = gmap_new(kvm, gpa_to_gfn(kvm->arch.guest_phys_size));
++
++	if (!kvm->arch.gmap)
++		return -ENOMEM;
++
++	/* arm64 (on s390) do not have pfault */
++	clear_bit(GMAP_FLAG_PFAULT_ENABLED, &kvm->arch.gmap->flags);
++	set_bit(GMAP_FLAG_ALLOW_HPAGE_1M, &kvm->arch.gmap->flags);
++
++	table = dereference_asce(kvm->arch.gmap->asce);
++	crst_table_init((void *)table, _CRSTE_HOLE(table->crstes[0].h.tt).val);
++
++	return 0;
++}
++
++int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
++{
++	char debug_name[32];
++	int ret;
++
++	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
++		return -EINVAL;
++
++	ret = kvm_vm_type_ipa_size_shift(type);
++	if (ret < 0)
++		return ret;
++	kvm->arch.guest_phys_size = 1UL << ret;
++
++	mutex_init(&kvm->arch.config_lock);
++	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
++
++	snprintf(debug_name, sizeof(debug_name), "kvm-arm64-%u", current->pid);
++	kvm->arch.dbf = debug_register(debug_name, 32, 1, 7 * sizeof(long));
++	if (!kvm->arch.dbf)
++		return -ENOMEM;
++	debug_register_view(kvm->arch.dbf, &debug_sprintf_view);
++
++	ret = kvm_gmap_init(kvm);
++	if (ret)
++		goto out_err;
++	kvm->arch.mem_limit = kvm_max_guest_address();
++
++	VM_EVENT(kvm, 3, "vm created with type %lu", type);
++	return 0;
++
++out_err:
++	debug_unregister(kvm->arch.dbf);
++
++	return ret;
++}
++
+ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ 	return VM_FAULT_SIGBUS;
+@@ -52,6 +110,13 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 	return -EINVAL;
  }
  
- # skip blank lines and comment lines
++void kvm_arch_destroy_vm(struct kvm *kvm)
++{
++	kvm_destroy_vcpus(kvm);
++	debug_unregister(kvm->arch.dbf);
++	kvm->arch.gmap = gmap_put(kvm->arch.gmap);
++}
++
+ u32 get_kvm_ipa_limit(void)
+ {
+ 	return fls64(kvm_max_guest_address() + 1) - 1;
+@@ -62,10 +127,39 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ 	return 0;
+ }
+ 
++int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
++{
++	struct kvm_sae_block *sae_block = &vcpu->arch.sae_block;
++
++	spin_lock_init(&vcpu->arch.mp_state_lock);
++
++	/* Force users to call KVM_ARM_VCPU_INIT */
++	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
++
++	vcpu->arch.mc = kvm_s390_new_mmu_cache();
++	if (!vcpu->arch.mc)
++		return -ENOMEM;
++
++	sae_block->hbasce = vcpu->kvm->arch.gmap->asce.val;
++	sae_block->mso = 0L;
++	sae_block->msl = kvm_max_guest_address();
++
++	VM_EVENT(vcpu->kvm, 3, "create cpu %d at 0x%p, sae block at 0x%p, satellite at 0x%p",
++		 vcpu->vcpu_id, vcpu, &vcpu->arch.sae_block, &vcpu->arch.save_area);
++	return 0;
++}
++
+ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ {
+ }
+ 
++void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
++{
++	kvm_s390_free_mmu_cache(vcpu->arch.mc);
++
++	VCPU_EVENT(vcpu, 3, "%s", "free cpu");
++}
++
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+ }
+@@ -103,6 +197,52 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 	return 0;
+ }
+ 
++int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
++			       struct kvm_dirty_log *log)
++{
++	return gmap_get_dirty_log(kvm, log);
++}
++
++bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	scoped_guard(read_lock, &kvm->mmu_lock)
++		return gmap_age_gfn(kvm->arch.gmap, range->start, range->end);
++}
++
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
++{
++	gfn_t last_gfn = memslot->base_gfn + memslot->npages;
++
++	scoped_guard(read_lock, &kvm->mmu_lock)
++		gmap_sync_dirty_log(kvm->arch.gmap, memslot->base_gfn, last_gfn);
++}
++
++int kvm_arch_prepare_memory_region(struct kvm *kvm,
++				   const struct kvm_memory_slot *old,
++				   struct kvm_memory_slot *new,
++				   enum kvm_mr_change change)
++{
++	return gmap_prepare_memory_region(kvm, old, new, change);
++}
++
++void kvm_arch_commit_memory_region(struct kvm *kvm,
++				   struct kvm_memory_slot *old,
++				   const struct kvm_memory_slot *new,
++				   enum kvm_mr_change change)
++{
++	gmap_commit_memory_region(kvm, old, new, change);
++}
++
++bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return gmap_unmap_gfn_range(kvm->arch.gmap, range->slot, range->start, range->end);
++}
++
++bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return gmap_test_age_gfn(kvm, range);
++}
++
+ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 					     struct kvm_memory_slot *slot,
+ 					     gfn_t gfn_offset,
+@@ -110,6 +250,27 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ {
+ }
+ 
++int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++
++	switch (ioctl) {
++	case KVM_ARM_PREFERRED_TARGET: {
++		struct kvm_vcpu_init init = {
++			.target = KVM_ARM_TARGET_GENERIC_V8,
++		};
++
++		if (copy_to_user(argp, &init, sizeof(init)))
++			return -EFAULT;
++
++		return 0;
++	}
++
++	default:
++		return -EINVAL;
++	}
++}
++
+ bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
+ {
+ 	return false;
+diff --git a/arch/s390/kvm/arm64/arm.h b/arch/s390/kvm/arm64/arm.h
+index a3db254462c0..df6a9099a864 100644
+--- a/arch/s390/kvm/arm64/arm.h
++++ b/arch/s390/kvm/arm64/arm.h
+@@ -4,4 +4,58 @@
+ 
+ #define KVM_DEV_NAME "kvm-arm64"
+ 
++#define VM_EVENT(d_kvm, d_loglevel, d_string, d_args...)\
++do { \
++	debug_sprintf_event((d_kvm)->arch.dbf, d_loglevel, KVM_DEV_NAME ": " d_string "\n", d_args); \
++} while (0)
++
++#define VCPU_EVENT(d_vcpu, d_loglevel, d_string, d_args...)			\
++	do {									\
++		debug_sprintf_event(						\
++			(d_vcpu)->kvm->arch.dbf, d_loglevel,			\
++			KVM_DEV_NAME " %02d[%016llx-%016llx]: " d_string "\n",	\
++			(d_vcpu)->vcpu_id, (d_vcpu)->arch.sae_block.pstate,	\
++			(d_vcpu)->arch.sae_block.pc, d_args);			\
++	} while (0)
++
++static __always_inline bool kvm_s390_is_in_sie(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
++static __always_inline int kvm_is_ucontrol(struct kvm *kvm)
++{
++	return 0;
++}
++
++static __always_inline int __kvm_s390_pv_destroy_page(struct page *page)
++{
++	return 0;
++}
++
++static __always_inline void kvm_s390_vsie_gmap_notifier(struct gmap *gmap, gpa_t start, gpa_t end)
++{
++}
++
++static __always_inline int kvm_s390_pv_get_handle(struct kvm *kvm)
++{
++	return 0;
++}
++
++static __always_inline int kvm_s390_is_migration_mode(struct kvm *kvm)
++{
++	return false;
++}
++
++static __always_inline bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
++/* should never be called */
++static __always_inline int kvm_s390_vm_stop_migration(struct kvm *kvm)
++{
++	return -EINVAL;
++}
++
+ #endif /* ARCH_S390_KVM_ARM64_H */
 -- 
 2.51.0
 
