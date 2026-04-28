@@ -1,292 +1,179 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F183344CF54
-	for <kvmarm@lists.linux.dev>; Tue, 28 Apr 2026 13:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E69846AF21;
+	Tue, 28 Apr 2026 13:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777382828; cv=none; b=kvPKx24atNWUIhRUae7qZepQRL0zqUSnxratq8KNJ1pzJAW4Kd6ISyKfTY49/DFuMoTsT30iiU3rXzyuYxw+d+DQIld3vNd7w5ubgvby4T8BjcHAbF72rx2D7/j/dBttwoe7A5dDuF40z+tr0SN+c1xBi7KdhidU6AwOAFgcqBI=
+	t=1777383077; cv=none; b=K8rpSq/kJMppmYIG5oKdtmZo4H30uUKZklDpUYQOxI63ADtJT0znVq/nv51WsJgHm+bby4JKYn+fjGkNVgDpiMwX7f7a5DHihr/tixLAVUnv/G4LwNi33uIvpMnNLeIjwXoCKRlqDieCjHIx0htBJqxNobQ+B3Dmsi2i71DGncg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777382828; c=relaxed/simple;
-	bh=IyapETfcrA5bdzogS0BMgrPXC9c/KLCTS2PzVSSlXMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R2d1OEnh4Ml2oHiLbHrKq7BONr357MW8/QeaVTR4mLgtMiMqZMM84q+b8kvMP6DT196x5zOsPrvuNsYYXrWsUpLvBNClHsVeAmVhMSfDswCBfAHQOdjOpqd1+mYnCd9dSeS/Hw7qfvuYXeZ39+DGQuh0l8xYPUWR3c6wNJRdciQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cMe7uZnX; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1777383077; c=relaxed/simple;
+	bh=Fqnn2hEQAqa2HmSkh6q7L5idMdiVy1lhIhJc0byAbe4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eUPuHcPTS23PwS42QzuElHYhILbxX6LHcnv88zdCJWQqwyVCE5BXkTom8a9RmsAL0zTUDcKeZdhAEKXStwcJy3xZv9KsFAVi2xZDomP39UI16CdKOQBHJAm8kAsr14sbHt+UJuyKANinik0ItaxF37rwbhwaiFOk0yvTP1hkVYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvgWZk/x; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cMe7uZnX"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E2C0B497;
-	Tue, 28 Apr 2026 06:27:00 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B23B3F62B;
-	Tue, 28 Apr 2026 06:27:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777382826; bh=IyapETfcrA5bdzogS0BMgrPXC9c/KLCTS2PzVSSlXMo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cMe7uZnXRS3E8eiaXBZbf/31/9iUxv+ImqQ6FjohOPE8MehQgU634Hpr6XSuDjIpo
-	 igQNg12C5u3+RpzYi2ngwf9eqHo5924XcBQ1KN36+NNo3TPokhBaVJEBqBumQzpe0i
-	 U/xwFwL5j/3UvcdUvyenH7P8iTzIyRS4oF2HdjvE=
-Date: Tue, 28 Apr 2026 14:26:57 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	"open list:ARM" <kvmarm@lists.linux.dev>,
-	"open list:Default mailing list" <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH] arm: add wfx test case
-Message-ID: <20260428132657.GA591628@e124191.cambridge.arm.com>
-References: <20260427130045.3669851-1-alex.bennee@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvgWZk/x"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AAD3C2BCAF;
+	Tue, 28 Apr 2026 13:31:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777383077;
+	bh=Fqnn2hEQAqa2HmSkh6q7L5idMdiVy1lhIhJc0byAbe4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mvgWZk/x3TCAQl1Prytst/0qUjN8xheWdIG0ydFt+g5hrZwF3pKK6x8vq0yyBWV3q
+	 5YHgiZGGYM/6NbkIBoHIhiTOOby2INGEMp3R1v/EGWZjubpfocvJ9rB3DfTP+K5PBp
+	 EU2E96R4Bo8m6cHs9XmYxUvaKFaCTYTivetZrp9ZixJkB209kU3Iz19jM2m8YnBlVm
+	 bFH+Dt9xtUJ/VpHo57zj4RhDCHJ2wZFevPDCV8xyqIPl4R2Y2NaoJqLh8oM0HVBAMW
+	 joPDjPCE7LTeB+H3NJrIoKiGjIOXxCQTqeDb5fTCnVHC1l0K9RoTe7I0xkSyPlWvoE
+	 92rXaJC6CGFbg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wHiWw-0000000FW07-3pws;
+	Tue, 28 Apr 2026 13:31:15 +0000
+Date: Tue, 28 Apr 2026 14:31:14 +0100
+Message-ID: <86v7dbyzx9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 2/3] swiotlb: dma: its: Enforce host page-size alignment for shared buffers
+In-Reply-To: <yq5aa4un1dju.fsf@kernel.org>
+References: <20260427063108.909019-1-aneesh.kumar@kernel.org>
+	<20260427063108.909019-3-aneesh.kumar@kernel.org>
+	<86zf2ozrb8.wl-maz@kernel.org>
+	<yq5aa4un1dju.fsf@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260427130045.3669851-1-alex.bennee@linaro.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, jgg@ziepe.ca, m.szyprowski@samsung.com, robin.murphy@arm.com, steven.price@arm.com, suzuki.poulose@arm.com, tglx@kernel.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
+On Tue, 28 Apr 2026 13:20:53 +0100,
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+>=20
+> Marc Zyngier <maz@kernel.org> writes:
+>=20
+> > On Mon, 27 Apr 2026 07:31:07 +0100,
+> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> >>=20
+> >> When running private-memory guests, the guest kernel must apply additi=
+onal
+> >> constraints when allocating buffers that are shared with the hyperviso=
+r.
+> >>=20
+> >> These shared buffers are also accessed by the host kernel and therefore
+> >> must be aligned to the host=E2=80=99s page size, and have a size that =
+is a multiple
+> >> of the host page size.
+> >>=20
+> >> On non-secure hosts, set_guest_memory_attributes() tracks memory at the
+> >> host PAGE_SIZE granularity. This creates a mismatch when the guest app=
+lies
+> >> attributes at 4K boundaries while the host uses 64K pages. In such cas=
+es,
+> >> set_guest_memory_attributes() call returns -EINVAL, preventing the
+> >> conversion of memory regions from private to shared.
+> >>=20
+> >> Architectures such as Arm can tolerate realm physical address space
+> >> (protected memory) PFNs being mapped as shared memory, as incorrect
+> >> accesses are detected and reported as GPC faults. However, relying on =
+this
+> >> mechanism is unsafe and can still lead to kernel crashes.
+> >>=20
+> >> This is particularly likely when guest_memfd allocations are mmapped a=
+nd
+> >> accessed from userspace. Once exposed to userspace, we cannot guarantee
+> >> that applications will only access the intended 4K shared region rather
+> >> than the full 64K page mapped into their address space. Such userspace
+> >> addresses may also be passed back into the kernel and accessed via the
+> >> linear map, resulting in a GPC fault and a kernel crash.
+> >>=20
+> >> With CCA, although Stage-2 mappings managed by the RMM still operate a=
+t a
+> >> 4K granularity, shared pages must nonetheless be aligned to the
+> >> host-managed page size and sized as whole host pages to avoid the issu=
+es
+> >> described above.
+> >
+> > I thought that was being fixed, and that there was now a strong
+> > guarantee that RMM and host are aligned on the page size. Even more,
+> > S2 is totally irrelevant here. The only thing that matters is the host
+> > page size vs the guest page size. Nothing else.
+> >
+>=20
+> Yes, the latest RMM update includes the ability to change the granule
+> size.
+>=20
+> The section above in the commit message was intended to explain that the
+> S2 mapping size is irrelevant. I agree it is not clear as written, so I
+> will reword it to improve clarity.
 
-Few small comments.
+Even better, remove it. Nothing CCA-specific should be in this patch.
 
-On Mon, Apr 27, 2026 at 02:00:45PM +0100, Alex Bennée wrote:
-> This is based on a similar test case I wrote for QEMU's tcg tests although
-> obviously able to take advantage of kvm-unit-tests additional plumbing for
-> dealing with the GIC and IRQs.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  arm/Makefile.arm64        |   1 +
->  lib/arm64/asm/processor.h |   7 ++
->  lib/arm64/asm/sysreg.h    |   3 +
->  arm/wfx.c                 | 137 ++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg         |   5 ++
->  5 files changed, 153 insertions(+)
->  create mode 100644 arm/wfx.c
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index a40c830d..52b3f35d 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -64,6 +64,7 @@ tests += $(TEST_DIR)/cache.$(exe)
->  tests += $(TEST_DIR)/debug.$(exe)
->  tests += $(TEST_DIR)/fpu.$(exe)
->  tests += $(TEST_DIR)/mte.$(exe)
-> +tests += $(TEST_DIR)/wfx.$(exe)
->  
->  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 32ddc1b3..2104036d 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -173,5 +173,12 @@ static inline bool system_supports_rndr(void)
->  	return ((id_aa64isar0_el1 >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf) != 0;
->  }
->  
-> +static inline bool system_supports_wfxt(void)
-> +{
-> +	u64 id_aa64isar2_el1 = read_sysreg_s(ID_AA64ISAR2_EL1);
-> +
-> +	return ((id_aa64isar2_el1 >> ID_AA64ISAR2_EL1_WFxT_SHIFT) & 0xf) != 0;
-> +}
-> +
->  #endif /* !__ASSEMBLER__ */
->  #endif /* _ASMARM64_PROCESSOR_H_ */
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index f2d05018..cb96a649 100644
-> --- a/lib/arm64/asm/sysreg.h
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -77,6 +77,9 @@ asm(
->  #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
->  #define ID_AA64PFR1_EL1_MTE_SHIFT	8
->  
-> +#define ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
-> +#define ID_AA64ISAR2_EL1_WFxT_SHIFT	0
-> +
->  #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
->  #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
->  
-> diff --git a/arm/wfx.c b/arm/wfx.c
-> new file mode 100644
-> index 00000000..912e50e6
-> --- /dev/null
-> +++ b/arm/wfx.c
-> @@ -0,0 +1,137 @@
-> +/*
-> + * WFX Instructions Test (WFI, WFE, WFIT, WFET)
-> + *
-> + * Copyright (c) 2026 Linaro Ltd
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/processor.h>
-> +#include <asm/gic.h>
-> +#include <asm/timer.h>
-> +#include <asm/io.h>
-> +
-> +#define TIMEOUT 200000
+[...]
 
-Instead of a hardcoded TIMEOUT, what about something similar to arm/timer.c:
+> >>  static struct gen_pool *itt_pool;
+> >> @@ -268,11 +272,13 @@ static void *itt_alloc_pool(int node, int size)
+> >>  		if (addr)
+> >>  			break;
+> >> =20
+> >> -		page =3D its_alloc_pages_node(node, GFP_KERNEL | __GFP_ZERO, 0);
+> >> +		page =3D its_alloc_pages_node(node, GFP_KERNEL | __GFP_ZERO,
+> >> +					    get_order(mem_decrypt_granule_size()));
+> >
+> > You already taught its_alloc_pages_node() about the decrypt granule
+> > size stuff. I don't think we need to see more of it (and you don't
+> > mess with the call that is just above it).
+> >
+> >>  		if (!page)
+> >>  			break;
+> >> =20
+> >> -		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE=
+, node);
+> >> +		gen_pool_add(itt_pool, (unsigned long)page_address(page),
+> >> +			     mem_decrypt_granule_size(), node);
+> >
+> > I'd rather see something like mem_decrypt_align(PAGE_SIZE), which
+> > keeps the intent clear.
+> >
+>=20
+> The helper was added based on feedback from a previous version. I assume
+> you are suggesting that only this caller should switch?
 
-	u64 time_10ms = read_sysreg(cntfrq_el0) / 100;
+I don't know what you mean by 'this'. What I'd like to see is this
+last hunk be changed to:
 
-> +
-> +#define sev() asm volatile("sev" : : : "memory")
-> +#define sevl() asm volatile("sevl" : : : "memory")
-> +#define wfi() asm volatile("wfi" : : : "memory")
-> +#define wfe() asm volatile("wfe" : : : "memory")
-> +
-> +#define wfit(reg) \
-> +	asm volatile(".arch armv8.7-a\n\twfit %0" : : "r" (reg) : "memory")
-> +#define wfet(reg) \
-> +	asm volatile(".arch armv8.7-a\n\twfet %0" : : "r" (reg) : "memory")
-> +
-> +static void timer_handler(struct pt_regs *regs)
-> +{
-> +	/* Disable timer to stop IRQ from re-firing */
-> +	write_sysreg(0, cntv_ctl_el0);
-> +}
-> +
-> +static bool check_elapsed(uint64_t start, uint64_t threshold, const char *test, bool more)
-> +{
-> +	uint64_t end = read_sysreg(cntvct_el0);
-> +	uint64_t elapsed = end - start;
-> +	bool pass = more ? elapsed >= threshold : elapsed <= threshold;
-> +
-> +	report(pass, "%s (%ld ticks)", test, elapsed);
-> +
-> +	if (!pass) {
-> +		report_info("%s %s", test, more ? "woke too early" : "slept despite SEV");
-> +	}
-> +	return pass;
-> +}
-> +
-> +static void test_wfi(void)
-> +{
-> +	uint64_t start;
-> +
-> +	report_info("Testing WFI...");
-> +
-> +	start = read_sysreg(cntvct_el0);
-> +	write_sysreg(TIMEOUT, cntv_tval_el0);
-> +	write_sysreg(1, cntv_ctl_el0); /* Enable timer, no mask */
-> +	isb();
-> +
-> +	local_irq_enable();
-> +	wfi();
-> +	local_irq_disable();
-> +
-> +	check_elapsed(start, TIMEOUT, "WFI", true);
-> +}
-> +
-> +static void test_wfe(void)
-> +{
-> +	uint64_t start;
-> +
+	gen_pool_add(itt_pool, (unsigned long)page_address(page),
+		     mem_decrypt_align(PAGE_SIZE), node);
 
-I think a comment here would be good, just to say it's testing that a wfe
-doesn't sleep for a 'long' period with no pending events, or something like
-that?
-
-> +	report_info("Testing WFE/SEV...");
-> +	sev();
-> +	start = read_sysreg(cntvct_el0);
-> +	wfe();
-> +	check_elapsed(start, TIMEOUT, "WFE/SEV", false);
-> +
-> +	report_info("Testing WFE/SEVL...");
-> +	sevl();
-> +	start = read_sysreg(cntvct_el0);
-> +	wfe();
-> +	check_elapsed(start, TIMEOUT, "WFE/SEVL", false);
-> +}
-> +
-> +static void test_wfit(void)
-> +{
-> +	uint64_t start, timeout;
-> +
-> +	report_info("Testing WFIT...");
-> +	start = read_sysreg(cntvct_el0);
-> +	timeout = start + TIMEOUT;
-> +	wfit(timeout);
-> +	check_elapsed(start, TIMEOUT, "WFIT", true);
-> +}
-> +
-> +static void test_wfet(void)
-> +{
-> +	uint64_t start, timeout;
-> +
-> +	report_info("Testing WFET...");
-> +	/* Ensure no pending events */
-> +	sev();
-
-Could this just be sevl here? Not that it really matters.
-
-> +	wfe();
-> +
-> +	start = read_sysreg(cntvct_el0);
-> +	timeout = start + TIMEOUT;
-> +	wfet(timeout);
-> +	check_elapsed(start, TIMEOUT, "WFET", true);
-> +}
-> +
-> +int main(void)
-> +{
-> +
-> +	if (gic_init() < 0) {
-> +		report_abort("GIC init failed");
-> +		return 1;
-> +	}
-> +
-> +	/* Install timer handler for WFI wake-up */
-> +	install_irq_handler(EL1H_IRQ, timer_handler);
-> +	gic_enable_defaults();
-> +
-> +	/* Enable Virtual Timer PPI */
-> +	gic_irq_set_clr_enable(27, true);
-
-Instead of hardcoding 27 here, you can use:
-
-	u32 irq = current_level() == CurrentEL_EL1 ? TIMER_VTIMER_IRQ : TIMER_HVTIMER_IRQ;                                                                     
-	gic_irq_set_clr_enable(irq, true);
-
-Which also allows the test to run at EL2.
-
-> +
-> +	report_prefix_push("WFx");
-> +	test_wfi();
-> +	test_wfe();
-> +	report_prefix_pop();
-> +
-> +	if (system_supports_wfxt()) {
-> +		report_prefix_push("WFxT");
-> +		test_wfit();
-> +		test_wfet();
-> +	} else {
-> +		report_skip("WFxT instructions not supported");
-> +	}
-> +
-> +	return report_summary();
-> +}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 12fc4468..7adf96f2 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -339,3 +339,8 @@ groups = mte
->  test_args = asymm
->  qemu_params = -machine mte=on
->  arch = arm64
-> +
-> +[wfx]
-> +file = wfx.flat
-> +groups = wfx
-> +arch = arm64
+and the previous hunk simply dropped.
 
 Thanks,
-Joey
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
