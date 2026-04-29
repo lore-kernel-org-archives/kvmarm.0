@@ -1,131 +1,142 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB0D3FF8BF
-	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 16:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F2040FDAD
+	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 16:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777479251; cv=none; b=EeM2WKgD7kES4iuf8SfDxWnx41R3NVgb4R1Gs/TYG/MBLSYJzDP7CKN61tqSvZGFZn4pM+JJnSUl119H69aKmSr3UUwMbd3b0JN6llW4E/QjMPHb/IdOKWxMtHO88pSq60AE0sPzX9hB1l11tSvOGWjm7TzYfEi8tk4+cwvijyA=
+	t=1777480333; cv=none; b=FUem1oLWpHwVsxO18t4C50lbQZhep7aSYoFp2ydZr48LpKLtCnXc0Yhzh1pyagY0uEcJEl1Op9y53cpvr55XcGrOOwgwPD+XIgEBEgOWp+vhp8em3q9hWVjK8UdAmX2ZdfJMXkglyyTB2RLpR1XHwAkWqSDwjo7dtrQhNJSHKXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777479251; c=relaxed/simple;
-	bh=QIUvdq75lFARum0k0kDOdaUv3IFA90teUppVmMvzJ/g=;
+	s=arc-20240116; t=1777480333; c=relaxed/simple;
+	bh=7gqu4PQqrn1R8ym/Xqh26xdxHzA5cS34NP+aRH2NwN8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ulcrFsCQVJ4wMTzG7H0qb/Ik8pcIaulHTGkwLR2M2TsjsgDwBO6ORNVc/iHjxdemAwKdvuGMEPjcyilDG8XcybQR4cQBGH0RS+NvAiOTq4Mt8foo3KCe+l3+NfftOQX5Nu5fRb8jqcY4pMFYKwo22z668TXuLt32NIfNTT0uyfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=JFxcEJnj; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXHAmVZcXrNUerl28KBFQQOgPJwer0wsJbQnyvM600x7UHqOs5zz8vpkGn7DS/fB9LyjNqF1KNJT3n6b4kNF9cwCB7LsNxCxls/ZebFdflfG60TXyEupDI0v+6h6W0kw8CC87P0mT+az5QfeQJR5BQXnhnuNVX0e7lWy/SF1mtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mu78sIiA; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="JFxcEJnj"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8ed4dd182efso678699285a.3
-        for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 09:14:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1777479238; x=1778084038; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JQwXlv6d4SrpAwunOCAy3T3SkF7dwQSFYcS5dAIRLRw=;
-        b=JFxcEJnjXgILTSLgLP6I63PR4JZwMgVS+q388jBybEJOG9MmACXQHKXmoXFUyg7tSn
-         ScBWurXJw0XwhWxxK5CnwBE0o7J6p2vyF3s1YUrLkOQIAGPJQ3iMJZDVP84uYBlzK/Qv
-         Ik4nofKEBOWGRSrdIelv92SBUWmj3VDJHDKtf5TZBR6pFdJhM/2ZDdlLfD4DDCBPC28q
-         OaZEhixkd9utbBOVi9G2XfeZDIoG11/deI0QnqY/+By+7WrT05dTeIQeIFJ7MXFO2QGE
-         MQDSPgIFaB8pEK1jO39C3SPih7O7B9b4yHO8WAMjsUoPdm7XC0jUEjyUWWlL+SH6orx7
-         OWmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777479238; x=1778084038;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JQwXlv6d4SrpAwunOCAy3T3SkF7dwQSFYcS5dAIRLRw=;
-        b=YU3FKOlSu2rz4y3KOCt65fNTcSc/4sY1RAoqvxYBag9WgxD/THIRwlwsFT0heJn3kN
-         +RYPLbgRTsNnjvSNeHuUpFkkA5KUQMrG/amhZbMsC1vv5rdglynCLLCLLC9z+8hRpxQF
-         e7AiL3F+HgmhFMOcnhCEbNF88c44iVPtSoG6fjvyFiPVMI6+er6R/sHoafoCLuRfKkPz
-         ufxu3UI7COfyTeHgU6wK83EiOCgltDpmWm1J7vQ9yO+N9835FyYsl1CV0S9wH7nwNpRu
-         3BK8e8k1fq9bQg0eT+NLqznmcRU9+D5vqd0MFhywsmno4D/d/h7WcqFXobg/logLy1hT
-         Qq3A==
-X-Forwarded-Encrypted: i=1; AFNElJ/mAzRU3gEa8PSpKFvzHpuvMR574OZrWm2ZDbGgB+UIjPrCwMaZrRb51MXaSxeSg+PeMDY7cio=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyvSk5l95vcmzv72f0wL5Y8pGZh1Ooekoc7lCrWJrz2A6eXYyvf
-	LlAVeavCs/3FlLfQ2QMs55ubeuT7z6W/wik/Mq4CWOs64hTJcmSpIWEhGB7mtbVptFs=
-X-Gm-Gg: AeBDiespODE9DZyKcOHX0y3VAEtgBGq24t3NTn5eUlS3buCnGQA9W2aS+/qjqAVaOr8
-	AycKVhzH+QOMCy/MvoIdHKhEXCM8nq6I+eAqK/QQyFZreUIBILqBcBOPNS4lsVwUmdyzJLjfcr6
-	tmIhaRjtqVmwq232eLNRPj1OFURQ6h2MpUHJCI0LAQHdGFQg7Y8EZo4EPEPdxuw5lROlv7Ecrau
-	6mg/Hh4bFqdsBfLrEDG/S/Lh47Jt0uPMyB5zQRDUH7DFVKlaKjWhK+a5LhJl/iTz0k38/2c4IA+
-	ngJ8nDqk6DIDLc7wwpytBEnCcRf7YatiB1gs2umOj/EtKedcXIEoxeJTMXR1Il0aSM0I25XOQSb
-	yzYdkiaENChrvDHbQK1imYI1sPPkMrMycqzPIdHgVK/cvpnx12mkL7NVYcQreIVqxdaFadCSjsp
-	aCSJl8goI7ljZyeUpqY8VIQQ0feaaiNjNiNuAJSrEjaH2QRD2p71tHqYjSvPNm7tidIIRAtHVg
-X-Received: by 2002:a05:620a:472b:b0:8cd:9033:172a with SMTP id af79cd13be357-8f8f3a204a5mr643580085a.3.1777479238360;
-        Wed, 29 Apr 2026 09:13:58 -0700 (PDT)
-Received: from plex ([71.181.43.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8f93f5826f7sm235640585a.30.2026.04.29.09.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 09:13:57 -0700 (PDT)
-Date: Wed, 29 Apr 2026 16:13:55 +0000
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Alexander Graf <graf@amazon.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, linux-kernel@vger.kernel.org, kexec@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, rppt@kernel.org, 
-	pratyush@kernel.org, pbonzini@redhat.com, seanjc@google.com, maz@kernel.org, 
-	oupton@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com, 
-	rientjes@google.com, Tycho.Andersen@amd.com, anthony.yznaga@oracle.com, 
-	baolu.lu@linux.intel.com, david@kernel.org, dmatlack@google.com, mheyne@amazon.de, 
-	jgowans@amazon.com, jgg@nvidia.com, pankaj.gupta.linux@gmail.com, 
-	kpraveen.lkml@gmail.com, vipinsh@google.com, vannapurve@google.com, corbet@lwn.net, 
-	loeser@linux.microsoft.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, roman.gushchin@linux.dev, 
-	akpm@linux-foundation.org, pjt@google.com, "Petrongonas, Evangelos" <epetron@amazon.de>, 
-	kpsingh@kernel.org, jackmanb@google.com
-Subject: Re: [RFC] proposal: KVM: Orphaned VMs: The Caretaker approach for
- Live Update
-Message-ID: <afIru_PE3W0hIsu7@plex>
-References: <afEwWZksU0Fw61oT@plex>
- <b52e7d0a-4275-48a0-850f-6ceccfd5204e@amazon.com>
- <cd0ae5795cf14a7b20c90840b0a3eba7db160e72.camel@infradead.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mu78sIiA"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCE6F1650;
+	Wed, 29 Apr 2026 09:32:02 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20EC43F62B;
+	Wed, 29 Apr 2026 09:32:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1777480328; bh=7gqu4PQqrn1R8ym/Xqh26xdxHzA5cS34NP+aRH2NwN8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mu78sIiAkW97lmiEfkR9ZCKhkxNbAXzEchGuyoL2kvFLavGBWoVPKFdf/i3cVERcQ
+	 QDP+dpEPcDhIUhlYoS/W3LXt9Yuw1J8ewLE3adt9m8YTEO9v5LgF2S1r6lrRlo+p5u
+	 C8iqSmm5BYzyxDqUMKxKw+Hgg0j6qww3darcFKd8=
+Date: Wed, 29 Apr 2026 17:31:57 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
+Message-ID: <eedvu6ejufv6hstymyh4atnfynjolfyabkxqtgffoudiz26nxy@rbhpc22apzei>
+References: <20260411125024.3735989-1-weilin.chang@arm.com>
+ <20260411125024.3735989-2-weilin.chang@arm.com>
+ <86eckg39eo.wl-maz@kernel.org>
+ <tozhyzmwfddgx5fgfejracv6tskgs7xhs4fs6yvmvff74m7gwy@eq3oh35tokj4>
+ <867bq72n7l.wl-maz@kernel.org>
+ <n4v252jehdq4sn2ux26twudmvmfwjltxkvv6sa6rxtwbvqa2en@xp2oaodm7uqc>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cd0ae5795cf14a7b20c90840b0a3eba7db160e72.camel@infradead.org>
+In-Reply-To: <n4v252jehdq4sn2ux26twudmvmfwjltxkvv6sa6rxtwbvqa2en@xp2oaodm7uqc>
 
-On 04-29 09:40, David Woodhouse wrote:
-> On Wed, 2026-04-29 at 10:13 +0200, Alexander Graf wrote:
-> > I would prefer we only attach the whole caretaker and all of its 
-> > specialties right around the point when live update happens. Why keep it 
-> > dangling and active forever? That way you can also late load the kernel 
-> > module that contains it, so you can be sure it's an up to date version.
+On Fri, Apr 24, 2026 at 08:45:24PM +0100, Wei-Lin Chang wrote:
+> On Thu, Apr 16, 2026 at 11:50:38AM +0100, Marc Zyngier wrote:
+> > On Thu, 16 Apr 2026 00:05:40 +0100,
+> > Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> > > 
+> > > On Wed, Apr 15, 2026 at 09:38:55AM +0100, Marc Zyngier wrote:
+> > 
+> > [...]
+> > 
+> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > > > index 851f6171751c..a97bd461c1e1 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+> > > > >  	 */
+> > > > >  	bool	nested_stage2_enabled;
+> > > > >  
+> > > > > +	/* canonical IPA to nested IPA range lookup */
+> > > > > +	struct maple_tree nested_revmap_mt;
+> > > > > +	bool	nested_revmap_broken;
+> > > > > +
+> > > > 
+> > > > Consider moving this boolean next to the other ones so that you don't
+> > > > create too many holes in the kvm_s2_mmu structure (use pahole to find out).
+> > > > 
+> > > > But I have some misgivings about the way things are structured
+> > > > here. Only NV needs a revmap, yet this is present irrelevant of the
+> > > > nature of the VM and bloats the data structure a bit.
+> > > > 
+> > > > My naive approach would have been to only keep a pointer to the
+> > > > revmap, and make that pointer NULL when the tree is "broken", and
+> > > > freed under RCU if the context isn't the correct one.
+> > > 
+> > > Can you explain what you mean by "if the context isn't the correct one"?
+> > > If this refers to when selecting a specific kvm_s2_mmu instance for
+> > > another context, then IIUC refcnt would already be 0 and there would be
+> > > no other user of the tree.
+> > 
+> > Sorry, "context" is an overloaded word. I meant a situation in which
+> > you couldn't immediately free the maple-tree because you're holding
+> > locks and freeing (hypothetically) requires a sleeping "context". in
+> > this case, freeing under RCU, purely as a deferring mechanism, might
+> > be useful.
 > 
-> "Why keep it dangling and active forever?"
+> I experimented using RCU to free the tree as a deferring mechanism.
+> Here are a few observations:
 > 
-> I've always wanted to tie this to address space isolation.
+>   - At reverse map record time, if maple tree store fails, we have to
+>     change the maple tree pointer to a NULL, which is an RCU write
+>     operation. Therefore we need to either take another lock, or use a
+>     xchg(ptr, NULL) to avoid the lock.
 > 
-> The only way to truly stay in front of the constant stream of new
-> speculation vulnerabilities has been to just make sure there's nothing
-> sensitive accessible in the address space at all. Hence all the work on
-> secret hiding, XPFO, proclocal, etc. — and hence the occasional
-> researcher finding their shiny new (5-year-old) vulnerability and being
-> confused when it doesn't leak anything *interesting* in certain
-> environments.
+>   - Because we're holding the read-side mmu_lock, we shouldn't block
+>     during reverse map record. Therefore we should use call_rcu()
+>     instead of synchronize_rcu() to free the "broken" tree. This implies
+>     a pointer to a maple tree in kvm_s2_mmu will not suffice, an
+>     additional structure with both the maple tree and an rcu_head have
+>     to be created.
 > 
-> I'd like to see the inner KVM_RUN loop switch to a completely separate
-> address space, in which there's a kind of caretaker which can handle
-> the bare minimum of interrupts and timers and the most common exits,
-> and which *relatively* rarely has to come back into the real Linux
-> address space.
+> IMO looking at RCU calls mixed with mtree_{, un}lock(), and having a new
+> wrapper struct to make this dynamic allocation scheme work is not very
+> attractive to me.
 > 
-> And once you have that caretaker running in its own address space...
-> why not just let it keep going while Linux does its kexec?
+> Instead, what do you think if I aggregate all strictly NV-related
+> fields in kvm_s2_mmu i.e. tlb_vttbr, tlb_vtcr, nested_stage2_enabled,
+> shadow_pt_debugfs_dentry, pending_unmap, into a struct maybe called
+> kvm_s2_mmu_nested, add a maple tree in it, and have a pointer to this
+> struct in kvm_s2_mmu? kvm_s2_mmu_nested can then be allocated only if we
+> init a nested s2 mmu.
+> 
+> Do you think this can work and is better than the current approaches?
 
-Yep, this captures one of the benefits of having a permanently attached
-Caretaker.
+After a discussion with Marc, we think making the maple tree a pointer
+generates too much complexity from the reasons given above. For the
+kvm_s2_mmu_nested idea, it creates churn and the same RCU problem
+persists if we want to dynamically allocate and free the structure. On
+the other hand, if we allocated kvm_s2_mmu_nested at init-time and reuse
+the struct, then it's not much difference than just placing the maple
+tree in kvm_s2_mmu, the only benefit will be keeping kvm_s2_mmu smaller
+for non nested MMUs.
 
-By establishing that isolated execution environment for the inner
-KVM_RUN loop to mitigate speculation vulnerabilities, we naturally get
-the hardware-enforced boundary required to survive the kexec gap. The
-Live Update capability is effectively a byproduct of achieving true
-Address Space Isolation.
+I'll stick with just adding the maple tree instance in kvm_s2_mmu for
+the next version.
 
-+CC KP and Brendan
+Thanks,
+Wei-Lin Chang
+
+[...]
