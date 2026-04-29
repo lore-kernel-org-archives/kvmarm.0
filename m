@@ -1,210 +1,508 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D3A2F7462
-	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 20:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777492910; cv=none; b=m3ES7R1ylMOoHO2Bc51xXS5OcyZE4KHoewNbGOOtDCMTViuxzyF0clUo/a1KgMPUnyokQ7Wtr24N5Wg7xqZ12uDaGmfEumuGoSWJLg9FlEdMyY5xtzqy7zZ1vsRRz37Vuaidcbk0r5JuJHU1mfz8k5VXPTSaDd6CIn+629dtgOM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777492910; c=relaxed/simple;
-	bh=fJSg5n+VTofLF+R3vGeT0B6uJwenTXr9SrOBn2KG+f8=;
-	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
-	 Date:MIME-Version; b=LeaT+h7m/jw0fltZc+Ntl7TuYuIVacq8/vXnRU6LcEDjN1pLj+i8NRsQqRohrqe6l/TFiXVHGKGbQchuiLgE28Gq7P0rHrybq3N7gLX5lKFbSPtKrBxO5tKYvOsrhk0wx7ovnxlNYN14ijfU0cIMZCAkKnsL+FEU4aWA8IKcbn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XN8bSfMy; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E2F35AC3B
+	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 22:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777503201; cv=pass; b=Gtsi/zoX6jyvhrM/HX/+5NP74E9WvQVVYmTZ9Jo0fjl5hhD8cKOSX0RVnmDjMa2eeS6dxIcXCV10SQbfuV0vditS9fwWtK2lrjuTYWrmTxNO5rPNQJmJiUBjPpXgHMk/Cg9T/OFCmt0v9w76qBL5Ny1LJv/nf2tBId/JowJkseE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777503201; c=relaxed/simple;
+	bh=Lj8LOXURCYndQNT/h+c2HKIGnJoMvCjUnhNkTBIm79Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YXmgqgnZuHrgVem9if0Acj4JraWJ5lgT6JtL6o0HXpnaS4HhQnksiuLwHT0F2uWCW1qvcz09YQ31I46qsHM9ZCiYytK5VmKeUgQ12E0/lZ76LP3ccktx0+RQEElraRk4b6qEirA+MAoCkl+UUhnOLV12/rKgXEFDTcgCHwkmVz4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u5HLCsHB; arc=pass smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XN8bSfMy"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63TFUqIl1317126;
-	Wed, 29 Apr 2026 20:01:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=R2x2PQ
-	rvORUdwNxHDcUtETRc8rS0gty21jpHed4L61s=; b=XN8bSfMyWP8gMr/AlEGpjg
-	I9o25iCplYG0leQKr/pZYRG7PLhl95Ed2+CYsJhH4qP+Lo4NYjDh/HzB9RUOTqL+
-	aPy3pnBcvVFfaCWE/ZIWOvitKBZ7cJmClG6R6SDSOAwG/NoIkemEPUsSAGJcuprL
-	JMlC3+ku0+VNHW4R3wqWMuI3lcENDx+3vIpxgmBTxPs4Kg0sZZN0Jr6tIKQo5Ue5
-	+0iKoIDgbNiIWR2wpr8MR39Y1Nap0sXOI5oXtK13NQiai4YmH/AMs7plpOWZY9xy
-	v9R+8j/nJvKvvhjIoJcpuGZCsaHDEe/Az/VoJDq5080NvHc5KXwwK83I9Dml+m0A
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drk1ju408-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Apr 2026 20:01:15 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63TJrroh010290;
-	Wed, 29 Apr 2026 20:01:14 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dsa5gfsjt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Apr 2026 20:01:14 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63TK1EAE30343876
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Apr 2026 20:01:14 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0D87958052;
-	Wed, 29 Apr 2026 20:01:14 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D9FA58065;
-	Wed, 29 Apr 2026 20:01:12 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.118.181])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 29 Apr 2026 20:01:12 +0000 (GMT)
-Message-ID: <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
-Subject: [PATCH] ima: debugging late_initcall_sync measurements
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Jonathan McDowell <noodles@earth.li>,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev
-Cc: paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
-        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
-        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
-        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
-        sebastianene@google.com, Yeoreum Yun <yeoreum.yun@arm.com>
-In-Reply-To: <cover.1777036497.git.noodles@meta.com>
-References: <cover.1777036497.git.noodles@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Apr 2026 16:01:12 -0400
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u5HLCsHB"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5a40b2d26a1so214585e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 15:53:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777503198; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OGtGdoT+ZbddAKqn8uQjFx794OGawy6t2/pO08cC9QitDL2QLVJr7yMJ20uBlM3j04
+         SqPq97GSmIo95DEiNmqus3OrFBvIQDQhcXNnE6+knuCZa0aLbBNZK7OkHkhZWn7F90NF
+         qazTP/2zN84L+Cx6guyAJ/wJQmxi6HsaBQUmF2rFqwn4fOGNcDRa4vVlzWutosOChDwy
+         I5Ajf7Ne1y1jJC7PDS1FhEziWvY6w4bgSDoByE8oha+odL5y6I1Qe9thZ6wGSCKAkfFE
+         y02wK09VgHmubhQa86vtHaOr383Rrb+wa4Fox5uUOMNuOeCgtPVVDSk9h7H7L/3k7oVi
+         lOGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vu88QnCcMw4zGWFEh8gTkrt2bkF3vQw7+Fn4qdJhZIw=;
+        fh=rZr2vPIozxCM/DAJn9nwwvIO4DRO3bzhzaTqjfGJwuM=;
+        b=YUF/3XmYufAFlcUP4zTQwl8QmiHdVgPatiQHjCRlIwOBeX7AvD7ZXc1wEGVpVSTKhU
+         cAtsRYEDJEuZChAE/wPvEWYSCMuDleaKTzLIBLEz0pRVXV60ebStwBeyMM21Fk1dpXKf
+         sogWT/Ytk2aoUV5PTP4/IonEEkEnJrUL1IZCobFElsPbW/pgKfPty/DcaA8hG0xnavz2
+         WXods1vONnSPrA8j2pUaykqffZK4iGUMtij/FIYq/6Ne6BIutor9lc4A8EKXp6tKlvu3
+         LzscPxnyvPmDDt6fd8t6vDjveSv5rh7X5ryLdflOyk9piNfQ26ekc8oM1SAF7hWWe/+g
+         S2pg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777503198; x=1778107998; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vu88QnCcMw4zGWFEh8gTkrt2bkF3vQw7+Fn4qdJhZIw=;
+        b=u5HLCsHBx5DQ1sU8+RDI84DtJj9M9E5xYw5hlZJFRZsnIstFdZ+f7xSIK6gIjtc3xi
+         gCaB5TstDE1DiUraHE5lBBAESz/U2WlW+29br2+Vehy7AsXhzlKynHqUqnpiOfzldpib
+         L77qAsdnCJhgF20QfT5MOpDL2unqsF6BJK6WHWCC4qhRO4C8cmSRTg5r29vBkmz0czwy
+         Qk2r9kL0eMmnLnlwh2QV0Js3jWXcPxzQbZnHZ9X3wJxBs5jwONC3omtU/qzW+WmSSPyJ
+         l9CjNK87IMaBwOR/503KnXCVtyLg/bPZpeDJGcgpiut2o/kJdkxfQmcvvOBW0JKeoqaI
+         Zx8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777503198; x=1778107998;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vu88QnCcMw4zGWFEh8gTkrt2bkF3vQw7+Fn4qdJhZIw=;
+        b=pIvCZcJWSvkRfRVmlenF/PDRuMYBiCB9W7iLqOuXuJ/0Vwz/gcuvK/QJpmzYnbj/Yx
+         kNh1U402D4QmU+HP2xxEMU3ZRjNLaksYkNx9qeIMEZhNFhQcRVU9F+4DEvGPiJRRAOnL
+         diw4p9s43KKK6ZDyEFh8L+7fwJ4bQHJzykHfyjgoVAot0tr5lomsUx2ukujwxzonnJnb
+         lIwxJuYgDosROCF1JI4hYgvENwcK8Go6yZeWef53/Emv9QxLnJ+2LKzlgfULBCzeeu7X
+         GYp/hiHVS+B/WbWRqctEF4tur5idXv24iIKnB9ih7w0iVfmcTmKZmDWuUj8b4hCa7RgP
+         1bJQ==
+X-Gm-Message-State: AOJu0YzMrgfdmmh5OADyzZQJdGxZE9PfSLEPyK6MhbOj0qRPdLnQxgsc
+	LmutsP9tnyRtUlMvGCGI0wGO3wyLNN4clabXldl7Su1DIjcahjHpKM8270IMDgk3ZqTxN3/mhuk
+	ITfnReywO0MA9EnlgRF1a59qfFo5O36SYIjOY3ho0
+X-Gm-Gg: AeBDievsShtolVbKwx/bqMcusEGwV7kO5GuRNCqXK8jilEmh9WKLE5GNama/lYOliH+
+	WoDlzB3R9QaJ49tb0bajlQ2fM7FeYb72NQvhHHpzqRZnF5ylSLGIWYnSpWaInJ32yYNlSFZqGg8
+	mBu4Ct9bZSetRMejXNw7T48Kstck0JcRuM/nWliB3ZNlyLjjV6NuhuzpnahDbBP4uRjzyff9b1A
+	94/96zFmkd//v7DG1oyHmZrCm5HH+qYxvmHnhfq+ApgPFWQ7ZuYNRaQ8ObDX2P7p36BFzJ60U3K
+	Su0H0OKCQ8vtp/0K9V/RaC6naig0rZzJHY9khnWiFOY0VljQcoV1kKS1BPKwLyxWXnBJnZdl
+X-Received: by 2002:a05:6512:b14:b0:5a3:f04a:67f3 with SMTP id
+ 2adb3069b0e04-5a8522dda63mr46505e87.25.1777503197508; Wed, 29 Apr 2026
+ 15:53:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDE5OCBTYWx0ZWRfX7FCsE6eIcPV0
- dRO44UnF0wfI9Fsdy2pzNYSqckElbnehPhzYgU59deAy09/NqVV5peRfk/XnbOaVW4WNoW3yIeh
- 5F+xYDm7ICIWl6PiWsn9iHAP1ul1MYT7KzCitUYIxkTTG19zx6c8QY6KuVi8oxcM9zdCQPY8ObM
- r9CMcB2a2GKNRKXO/IeLvVr2M4oKebO8S43cNheX553J3+3F+CUMfY8bMCnlJ8d9j7Ai4xxA0g0
- h+c8R0ktb+8HGBQfxSF+PRXxXejvuC6BsLbJf+Fu3oHQivQmbviOYnZP/e+oyKNzqrGn1CZmGWK
- WiLsM3Uq/RkPd0CFQziWQZ1FSxfcMvfGF0u+zsxxDD7Ya5RQYxWa8fK48enDGobj4cMyO3GfQqZ
- XEvi6l4hn5CYxmeDkErHfoJjX6+ewPe+gLpxlN/DGP1CJcwZrDob9FSjNkZbySgRy4so59IQp57
- iZ9BLkgkza1SODVqvrQ==
-X-Proofpoint-GUID: G4mI1EHlNTHJ2Sv4EmdWBE_u_oyWeRVx
-X-Proofpoint-ORIG-GUID: 6taI1q2EF8KzjwX9tVp-Ex5_1ZWFnHn4
-X-Authority-Analysis: v=2.4 cv=MohiLWae c=1 sm=1 tr=0 ts=69f2638c cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
- a=VabnemYjAAAA:8 a=fWDe5KWseGDh5RaNRN8A:9 a=QEXdDO2ut3YA:10
- a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-29_02,2026-04-28_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2604290198
+References: <20260422130820.4023122-1-joey.gouly@arm.com>
+In-Reply-To: <20260422130820.4023122-1-joey.gouly@arm.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Wed, 29 Apr 2026 15:53:05 -0700
+X-Gm-Features: AVHnY4LtmTexErFx94peOACvyHnQPMhsC0cXW_WWEjRSPQEjSnrbr1lkk6dqdyI
+Message-ID: <CAAdAUtgAk1=1trAX1nJK1pGhrJHCMgyfkGMiVZiT0oCrLg6v2A@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1] arm64: update ESR_ELx definitions to
+ match Linux kernel
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev, andrew.jones@linux.dev, alexandru.elisei@arm.com, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With this "[RFC PATCH v3 0/4] Fix IMA + TPM initialisation ordering
-issue" patch set, how many records would be missing if IMA
-initialization is deferred to late_initcall_sync [1]?
-
-[1]https://lore.kernel.org/linux-integrity/cover.1777036497.git.noodles@met=
-a.com/
----
-Jonathan, Yeoreum, others -
-
-By going into TPM-bypass mode, we can see how many measurements are actuall=
-y
-missing when deferring IMA initialization to late_initcall_sync. As this is
-system/TPM dependent, I'd appreciate your checking. Please use the boot com=
-mand
-line option "ima_policy=3Dtcb|critical_data".
-
-thanks, Mimi
-
- security/integrity/ima/ima.h      |  1 +
- security/integrity/ima/ima_init.c |  6 ++++++
- security/integrity/ima/ima_main.c | 19 +++++++++++++++++++
- 3 files changed, 26 insertions(+)
-
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 01aae19ed365..9a1117112fb2 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -286,6 +286,7 @@ extern bool ima_canonical_fmt;
-=20
- /* Internal IMA function definitions */
- int ima_init_core(bool late);
-+int ima_init_debug(bool late);
- int ima_fs_init(void);
- int ima_add_template_entry(struct ima_template_entry *entry, int violation=
+On Wed, Apr 22, 2026 at 6:08=E2=80=AFAM Joey Gouly <joey.gouly@arm.com> wro=
+te:
+>
+> kvm-unit-test supports EL2, so replace the ESR_EL1* names with ESR_ELx.
+>
+> This section was copied from arch/arm64/include/asm/esr.h, as was the pre=
+vious
+> contents of the file.
+>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Jing Zhang <jingzhangos@google.com>
+> ---
+>
+> Hi,
+>
+> This is a patch to help with the EL2 stage2 mmu series, replacing patch
+> 1 [1].
+>
+> Thanks,
+> Joey
+>
+> [1] https://lore.kernel.org/kvmarm/20260413204630.1149038-2-jingzhangos@g=
+oogle.com/
+>
+>  arm/mte.c             |   6 +--
+>  arm/psci.c            |   2 +-
+>  arm/selftest.c        |  16 +++----
+>  arm/timer.c           |   4 +-
+>  lib/arm64/asm/esr.h   | 100 ++++++++++++++++++++++++++----------------
+>  lib/arm64/processor.c |  82 +++++++++++++++++-----------------
+>  6 files changed, 117 insertions(+), 93 deletions(-)
+>
+> diff --git a/arm/mte.c b/arm/mte.c
+> index a1bed8a7..35707fc6 100644
+> --- a/arm/mte.c
+> +++ b/arm/mte.c
+> @@ -192,7 +192,7 @@ static void mte_sync_test(void)
+>
+>         mte_exception =3D false;
+>
+> -       install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fau=
+lt_handler);
+> +       install_exception_handler(EL1H_SYNC, ESR_ELx_EC_DABT_CUR, mte_fau=
+lt_handler);
+>
+>         mem_read(tagged(mem, 2), &val);
+>
+> @@ -218,12 +218,12 @@ static void mte_asymm_test(void)
+>         mte_set_tcf(MTE_TCF_ASYMM);
+>         mte_exception =3D false;
+>
+> -       install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fau=
+lt_handler);
+> +       install_exception_handler(EL1H_SYNC, ESR_ELx_EC_DABT_CUR, mte_fau=
+lt_handler);
+>
+>         mem_read(tagged(mem, 3), &val);
+>         report((val =3D=3D 0) && mte_exception && (get_clear_tfsr() =3D=
+=3D 0), "read");
+>
+> -       install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
+> +       install_exception_handler(EL1H_SYNC, ESR_ELx_EC_DABT_CUR, NULL);
+>
+>         mem_write(tagged(mem, 4), 0xaaaaaaaa);
+>         report((*mem =3D=3D 0xaaaaaaaa) && (get_clear_tfsr() =3D=3D TFSR_=
+EL1_TF0), "write");
+> diff --git a/arm/psci.c b/arm/psci.c
+> index 55308c8f..5800c0ac 100644
+> --- a/arm/psci.c
+> +++ b/arm/psci.c
+> @@ -36,7 +36,7 @@ static void install_invalid_function_handler(exception_=
+fn handler)
+>  #ifdef __arm__
+>         install_exception_handler(EXCPTN_UND, handler);
+>  #else
+> -       install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, handler)=
+;
+> +       install_exception_handler(EL1H_SYNC, ESR_ELx_EC_UNKNOWN, handler)=
+;
+>  #endif
+>  }
+>
+> diff --git a/arm/selftest.c b/arm/selftest.c
+> index 33f4cf42..0604e530 100644
+> --- a/arm/selftest.c
+> +++ b/arm/selftest.c
+> @@ -326,12 +326,12 @@ static bool check_und(void)
+>  {
+>         enum vector v =3D check_vector_prep();
+>
+> -       install_exception_handler(v, ESR_EL1_EC_UNKNOWN, unknown_handler)=
+;
+> +       install_exception_handler(v, ESR_ELx_EC_UNKNOWN, unknown_handler)=
+;
+>
+>         /* try to read an el3 sysreg from el0/1/2 */
+>         test_exception("", "mrs x0, sctlr_el3", "", "x0");
+>
+> -       install_exception_handler(v, ESR_EL1_EC_UNKNOWN, NULL);
+> +       install_exception_handler(v, ESR_ELx_EC_UNKNOWN, NULL);
+>
+>         return und_works;
+>  }
+> @@ -348,18 +348,18 @@ static bool check_svc(void)
+>  {
+>         enum vector v =3D check_vector_prep();
+>
+> -       install_exception_handler(v, ESR_EL1_EC_SVC64, svc_handler);
+> +       install_exception_handler(v, ESR_ELx_EC_SVC64, svc_handler);
+>
+>         test_exception("", "svc #123", "");
+>
+> -       install_exception_handler(v, ESR_EL1_EC_SVC64, NULL);
+> +       install_exception_handler(v, ESR_ELx_EC_SVC64, NULL);
+>
+>         return svc_works;
+>  }
+>
+>  static void pabt_handler(struct pt_regs *regs, unsigned int esr)
+>  {
+> -       bool is_extabt =3D (esr & ESR_EL1_FSC_MASK) =3D=3D ESR_EL1_FSC_EX=
+TABT;
+> +       bool is_extabt =3D (esr & ESR_ELx_FSC_MASK) =3D=3D ESR_ELx_FSC_EX=
+TABT;
+>
+>         expected_regs.regs[30] =3D expected_regs.pc + 4;
+>         expected_regs.pc =3D expected_regs.regs[9];
+> @@ -373,7 +373,7 @@ static bool check_pabt(void)
+>  {
+>         enum vector v =3D check_vector_prep();
+>
+> -       install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
+> +       install_exception_handler(v, ESR_ELx_EC_IABT_CUR, pabt_handler);
+>
+>         test_exception("adrp    x9, check_pabt_invalid_paddr\n"
+>                        "add     x9, x9, :lo12:check_pabt_invalid_paddr\n"
+> @@ -381,7 +381,7 @@ static bool check_pabt(void)
+>                        "blr     x9\n",
+>                        "", "x9", "x30");
+>
+> -       install_exception_handler(v, ESR_EL1_EC_IABT_EL1, NULL);
+> +       install_exception_handler(v, ESR_ELx_EC_IABT_CUR, NULL);
+>
+>         return pabt_works;
+>  }
+> @@ -400,7 +400,7 @@ static void check_vectors(void *arg __unused)
+>  #ifdef __arm__
+>                 install_exception_handler(EXCPTN_UND, user_psci_system_of=
+f);
+>  #else
+> -               install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN=
 ,
- 			   const char *op, struct inode *inode,
-diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima=
-_init.c
-index 5f335834a9bb..edd063b99685 100644
---- a/security/integrity/ima/ima_init.c
-+++ b/security/integrity/ima/ima_init.c
-@@ -122,6 +122,12 @@ void __init ima_load_x509(void)
- }
- #endif
-=20
-+int __init ima_init_debug(bool late)
-+{
-+	ima_add_boot_aggregate(late); /* just add an additional record */
-+	return 0;
-+}
-+
- int __init ima_init_core(bool late)
- {
- 	int rc;
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima=
-_main.c
-index 42099bfe7e43..23e669be54fc 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -1254,6 +1254,7 @@ static int ima_kernel_module_request(char *kmod_name)
-=20
- #endif /* CONFIG_INTEGRITY_ASYMMETRIC_KEYS */
-=20
-+#define TESTING 1
- static int __init init_ima(bool late)
- {
- 	int error;
-@@ -1264,6 +1265,23 @@ static int __init init_ima(bool late)
- 		return 0;
- 	}
-=20
-+#ifdef TESTING
-+	/*
-+	 * Initialize early, even if it means going into TPM-bypass mode,
-+	 * but add an additional boot_aggregrate message for the
-+	 * late_initcall_sync.
-+	 *
-+	 * If measurement list records exist between the boot_aggregate
-+	 * and the boot_aggregate_late records, these records would be
-+	 * missing when IMA initializion is deferred to late_initcall_sync.
-+	 */
-+	if (ima_tpm_chip) {
-+		ima_init_debug(late); /* Add an additional record */
-+		return 0;
-+	}
-+
-+	ima_tpm_chip =3D tpm_default_chip();
-+#elif
- 	/*
- 	 * If we found the TPM during our first attempt, or we know there's no
- 	 * TPM, nothing further to do
-@@ -1276,6 +1294,7 @@ static int __init init_ima(bool late)
- 		pr_debug("TPM not available, will try later\n");
- 		return -EPROBE_DEFER;
- 	}
-+#endif
-=20
- 	if (!ima_tpm_chip)
- 		pr_info("No TPM chip found, activating TPM-bypass!\n");
---=20
-2.53.0
+> +               install_exception_handler(EL0_SYNC_64, ESR_ELx_EC_UNKNOWN=
+,
+>                                           user_psci_system_off);
+>  #endif
+>         } else {
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 43fb6d88..898043f0 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -356,9 +356,9 @@ static void test_init(void)
+>                 vtimer_info.irq =3D TIMER_HVTIMER_IRQ;
+>         }
+>
+> -       install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_u=
+nsupported_handler);
+> +       install_exception_handler(EL1H_SYNC, ESR_ELx_EC_UNKNOWN, ptimer_u=
+nsupported_handler);
+>         ptimer_info.read_ctl();
+> -       install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
+> +       install_exception_handler(EL1H_SYNC, ESR_ELx_EC_UNKNOWN, NULL);
+>
+>         if (ptimer_unsupported && !ERRATA(7b6b46311a85)) {
+>                 report_skip("Skipping ptimer tests. Set ERRATA_7b6b46311a=
+85=3Dy to enable.");
+> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
+> index 335343c5..629e2e3c 100644
+> --- a/lib/arm64/asm/esr.h
+> +++ b/lib/arm64/asm/esr.h
+> @@ -8,44 +8,68 @@
+>  #ifndef _ASMARM64_ESR_H_
+>  #define _ASMARM64_ESR_H_
+>
+> -#define ESR_EL1_WRITE          (1 << 6)
+> -#define ESR_EL1_CM             (1 << 8)
+> -#define ESR_EL1_IL             (1 << 25)
+> +#define ESR_ELx_EC_SHIFT       (26)
+> +#define ESR_ELx_EC_UNKNOWN      UL(0x00)
+> +#define ESR_ELx_EC_WFx          UL(0x01)
+> +/* Unallocated EC: 0x02 */
+> +#define ESR_ELx_EC_CP15_32      UL(0x03)
+> +#define ESR_ELx_EC_CP15_64      UL(0x04)
+> +#define ESR_ELx_EC_CP14_MR      UL(0x05)
+> +#define ESR_ELx_EC_CP14_LS      UL(0x06)
+> +#define ESR_ELx_EC_FP_ASIMD     UL(0x07)
+> +#define ESR_ELx_EC_CP10_ID      UL(0x08)        /* EL2 only */
+> +#define ESR_ELx_EC_PAC          UL(0x09)        /* EL2 and above */
+> +#define ESR_ELx_EC_OTHER        UL(0x0A)
+> +/* Unallocated EC: 0x0B */
+> +#define ESR_ELx_EC_CP14_64      UL(0x0C)
+> +#define ESR_ELx_EC_BTI          UL(0x0D)
+> +#define ESR_ELx_EC_ILL          UL(0x0E)
+> +/* Unallocated EC: 0x0F - 0x10 */
+> +#define ESR_ELx_EC_SVC32        UL(0x11)
+> +#define ESR_ELx_EC_HVC32        UL(0x12)        /* EL2 only */
+> +#define ESR_ELx_EC_SMC32        UL(0x13)        /* EL2 and above */
+> +/* Unallocated EC: 0x14 */
+> +#define ESR_ELx_EC_SVC64        UL(0x15)
+> +#define ESR_ELx_EC_HVC64        UL(0x16)        /* EL2 and above */
+> +#define ESR_ELx_EC_SMC64        UL(0x17)        /* EL2 and above */
+> +#define ESR_ELx_EC_SYS64        UL(0x18)
+> +#define ESR_ELx_EC_SVE          UL(0x19)
+> +#define ESR_ELx_EC_ERET         UL(0x1a)        /* EL2 only */
+> +/* Unallocated EC: 0x1B */
+> +#define ESR_ELx_EC_FPAC         UL(0x1C)        /* EL1 and above */
+> +#define ESR_ELx_EC_SME          UL(0x1D)
+> +/* Unallocated EC: 0x1E */
+> +#define ESR_ELx_EC_IMP_DEF      UL(0x1f)        /* EL3 only */
+> +#define ESR_ELx_EC_IABT_LOW     UL(0x20)
+> +#define ESR_ELx_EC_IABT_CUR     UL(0x21)
+> +#define ESR_ELx_EC_PC_ALIGN     UL(0x22)
+> +/* Unallocated EC: 0x23 */
+> +#define ESR_ELx_EC_DABT_LOW     UL(0x24)
+> +#define ESR_ELx_EC_DABT_CUR     UL(0x25)
+> +#define ESR_ELx_EC_SP_ALIGN     UL(0x26)
+> +#define ESR_ELx_EC_MOPS         UL(0x27)
+> +#define ESR_ELx_EC_FP_EXC32     UL(0x28)
+> +/* Unallocated EC: 0x29 - 0x2B */
+> +#define ESR_ELx_EC_FP_EXC64     UL(0x2C)
+> +#define ESR_ELx_EC_GCS          UL(0x2D)
+> +/* Unallocated EC:  0x2E */
+> +#define ESR_ELx_EC_SERROR       UL(0x2F)
+> +#define ESR_ELx_EC_BREAKPT_LOW  UL(0x30)
+> +#define ESR_ELx_EC_BREAKPT_CUR  UL(0x31)
+> +#define ESR_ELx_EC_SOFTSTP_LOW  UL(0x32)
+> +#define ESR_ELx_EC_SOFTSTP_CUR  UL(0x33)
+> +#define ESR_ELx_EC_WATCHPT_LOW  UL(0x34)
+> +#define ESR_ELx_EC_WATCHPT_CUR  UL(0x35)
+> +/* Unallocated EC: 0x36 - 0x37 */
+> +#define ESR_ELx_EC_BKPT32       UL(0x38)
+> +/* Unallocated EC: 0x39 */
+> +#define ESR_ELx_EC_VECTOR32     UL(0x3A)        /* EL2 only */
+> +/* Unallocated EC: 0x3B */
+> +#define ESR_ELx_EC_BRK64        UL(0x3C)
+> +/* Unallocated EC: 0x3D - 0x3F */
+> +#define ESR_ELx_EC_MAX          UL(0x3F)
+>
+> -#define ESR_EL1_EC_SHIFT       (26)
+> -#define ESR_EL1_EC_UNKNOWN     (0x00)
+> -#define ESR_EL1_EC_WFI         (0x01)
+> -#define ESR_EL1_EC_CP15_32     (0x03)
+> -#define ESR_EL1_EC_CP15_64     (0x04)
+> -#define ESR_EL1_EC_CP14_MR     (0x05)
+> -#define ESR_EL1_EC_CP14_LS     (0x06)
+> -#define ESR_EL1_EC_FP_ASIMD    (0x07)
+> -#define ESR_EL1_EC_CP10_ID     (0x08)
+> -#define ESR_EL1_EC_CP14_64     (0x0C)
+> -#define ESR_EL1_EC_ILL_ISS     (0x0E)
+> -#define ESR_EL1_EC_SVC32       (0x11)
+> -#define ESR_EL1_EC_SVC64       (0x15)
+> -#define ESR_EL1_EC_SYS64       (0x18)
+> -#define ESR_EL1_EC_SVE         (0x19)
+> -#define ESR_EL1_EC_IABT_EL0    (0x20)
+> -#define ESR_EL1_EC_IABT_EL1    (0x21)
+> -#define ESR_EL1_EC_PC_ALIGN    (0x22)
+> -#define ESR_EL1_EC_DABT_EL0    (0x24)
+> -#define ESR_EL1_EC_DABT_EL1    (0x25)
+> -#define ESR_EL1_EC_SP_ALIGN    (0x26)
+> -#define ESR_EL1_EC_FP_EXC32    (0x28)
+> -#define ESR_EL1_EC_FP_EXC64    (0x2C)
+> -#define ESR_EL1_EC_SERROR      (0x2F)
+> -#define ESR_EL1_EC_BREAKPT_EL0 (0x30)
+> -#define ESR_EL1_EC_BREAKPT_EL1 (0x31)
+> -#define ESR_EL1_EC_SOFTSTP_EL0 (0x32)
+> -#define ESR_EL1_EC_SOFTSTP_EL1 (0x33)
+> -#define ESR_EL1_EC_WATCHPT_EL0 (0x34)
+> -#define ESR_EL1_EC_WATCHPT_EL1 (0x35)
+> -#define ESR_EL1_EC_BKPT32      (0x38)
+> -#define ESR_EL1_EC_BRK64       (0x3C)
+> -
+> -#define ESR_EL1_FSC_MASK       (0x3F)
+> -#define ESR_EL1_FSC_EXTABT     (0x10)
+> +#define ESR_ELx_FSC_MASK       (0x3F)
+> +#define ESR_ELx_FSC_EXTABT     (0x10)
+>
+>  #endif /* _ASMARM64_ESR_H_ */
+> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+> index f9fea519..86328c01 100644
+> --- a/lib/arm64/processor.c
+> +++ b/lib/arm64/processor.c
+> @@ -31,37 +31,37 @@ static const char *vector_names[] =3D {
+>  };
+>
+>  static const char *ec_names[EC_MAX] =3D {
+> -       [ESR_EL1_EC_UNKNOWN]            =3D "UNKNOWN",
+> -       [ESR_EL1_EC_WFI]                =3D "WFI",
+> -       [ESR_EL1_EC_CP15_32]            =3D "CP15_32",
+> -       [ESR_EL1_EC_CP15_64]            =3D "CP15_64",
+> -       [ESR_EL1_EC_CP14_MR]            =3D "CP14_MR",
+> -       [ESR_EL1_EC_CP14_LS]            =3D "CP14_LS",
+> -       [ESR_EL1_EC_FP_ASIMD]           =3D "FP_ASMID",
+> -       [ESR_EL1_EC_CP10_ID]            =3D "CP10_ID",
+> -       [ESR_EL1_EC_CP14_64]            =3D "CP14_64",
+> -       [ESR_EL1_EC_ILL_ISS]            =3D "ILL_ISS",
+> -       [ESR_EL1_EC_SVC32]              =3D "SVC32",
+> -       [ESR_EL1_EC_SVC64]              =3D "SVC64",
+> -       [ESR_EL1_EC_SYS64]              =3D "SYS64",
+> -       [ESR_EL1_EC_SVE]                =3D "SVE",
+> -       [ESR_EL1_EC_IABT_EL0]           =3D "IABT_EL0",
+> -       [ESR_EL1_EC_IABT_EL1]           =3D "IABT_EL1",
+> -       [ESR_EL1_EC_PC_ALIGN]           =3D "PC_ALIGN",
+> -       [ESR_EL1_EC_DABT_EL0]           =3D "DABT_EL0",
+> -       [ESR_EL1_EC_DABT_EL1]           =3D "DABT_EL1",
+> -       [ESR_EL1_EC_SP_ALIGN]           =3D "SP_ALIGN",
+> -       [ESR_EL1_EC_FP_EXC32]           =3D "FP_EXC32",
+> -       [ESR_EL1_EC_FP_EXC64]           =3D "FP_EXC64",
+> -       [ESR_EL1_EC_SERROR]             =3D "SERROR",
+> -       [ESR_EL1_EC_BREAKPT_EL0]        =3D "BREAKPT_EL0",
+> -       [ESR_EL1_EC_BREAKPT_EL1]        =3D "BREAKPT_EL1",
+> -       [ESR_EL1_EC_SOFTSTP_EL0]        =3D "SOFTSTP_EL0",
+> -       [ESR_EL1_EC_SOFTSTP_EL1]        =3D "SOFTSTP_EL1",
+> -       [ESR_EL1_EC_WATCHPT_EL0]        =3D "WATCHPT_EL0",
+> -       [ESR_EL1_EC_WATCHPT_EL1]        =3D "WATCHPT_EL1",
+> -       [ESR_EL1_EC_BKPT32]             =3D "BKPT32",
+> -       [ESR_EL1_EC_BRK64]              =3D "BRK64",
+> +       [ESR_ELx_EC_UNKNOWN]            =3D "UNKNOWN",
+> +       [ESR_ELx_EC_WFx]                =3D "WFx",
+> +       [ESR_ELx_EC_CP15_32]            =3D "CP15_32",
+> +       [ESR_ELx_EC_CP15_64]            =3D "CP15_64",
+> +       [ESR_ELx_EC_CP14_MR]            =3D "CP14_MR",
+> +       [ESR_ELx_EC_CP14_LS]            =3D "CP14_LS",
+> +       [ESR_ELx_EC_FP_ASIMD]           =3D "FP_ASMID",
+> +       [ESR_ELx_EC_CP10_ID]            =3D "CP10_ID",
+> +       [ESR_ELx_EC_CP14_64]            =3D "CP14_64",
+> +       [ESR_ELx_EC_ILL]                =3D "ILL",
+> +       [ESR_ELx_EC_SVC32]              =3D "SVC32",
+> +       [ESR_ELx_EC_SVC64]              =3D "SVC64",
+> +       [ESR_ELx_EC_SYS64]              =3D "SYS64",
+> +       [ESR_ELx_EC_SVE]                =3D "SVE",
+> +       [ESR_ELx_EC_IABT_LOW]           =3D "IABT_LOW",
+> +       [ESR_ELx_EC_IABT_CUR]           =3D "IABT_CUR",
+> +       [ESR_ELx_EC_PC_ALIGN]           =3D "PC_ALIGN",
+> +       [ESR_ELx_EC_DABT_LOW]           =3D "DABT_LOW",
+> +       [ESR_ELx_EC_DABT_CUR]           =3D "DABT_CUR",
+> +       [ESR_ELx_EC_SP_ALIGN]           =3D "SP_ALIGN",
+> +       [ESR_ELx_EC_FP_EXC32]           =3D "FP_EXC32",
+> +       [ESR_ELx_EC_FP_EXC64]           =3D "FP_EXC64",
+> +       [ESR_ELx_EC_SERROR]             =3D "SERROR",
+> +       [ESR_ELx_EC_BREAKPT_LOW]        =3D "BREAKPT_LOW",
+> +       [ESR_ELx_EC_BREAKPT_CUR]        =3D "BREAKPT_CUR",
+> +       [ESR_ELx_EC_SOFTSTP_LOW]        =3D "SOFTSTP_LOW",
+> +       [ESR_ELx_EC_SOFTSTP_CUR]        =3D "SOFTSTP_CUR",
+> +       [ESR_ELx_EC_WATCHPT_LOW]        =3D "WATCHPT_LOW",
+> +       [ESR_ELx_EC_WATCHPT_CUR]        =3D "WATCHPT_CUR",
+> +       [ESR_ELx_EC_BKPT32]             =3D "BKPT32",
+> +       [ESR_ELx_EC_BRK64]              =3D "BRK64",
+>  };
+>
+>  void show_regs(struct pt_regs *regs)
+> @@ -82,18 +82,18 @@ void show_regs(struct pt_regs *regs)
+>
+>  bool get_far(unsigned int esr, unsigned long *far)
+>  {
+> -       unsigned int ec =3D esr >> ESR_EL1_EC_SHIFT;
+> +       unsigned int ec =3D esr >> ESR_ELx_EC_SHIFT;
+>
+>         asm volatile("mrs %0, far_el1": "=3Dr" (*far));
+>
+>         switch (ec) {
+> -       case ESR_EL1_EC_IABT_EL0:
+> -       case ESR_EL1_EC_IABT_EL1:
+> -       case ESR_EL1_EC_PC_ALIGN:
+> -       case ESR_EL1_EC_DABT_EL0:
+> -       case ESR_EL1_EC_DABT_EL1:
+> -       case ESR_EL1_EC_WATCHPT_EL0:
+> -       case ESR_EL1_EC_WATCHPT_EL1:
+> +       case ESR_ELx_EC_IABT_LOW:
+> +       case ESR_ELx_EC_IABT_CUR:
+> +       case ESR_ELx_EC_PC_ALIGN:
+> +       case ESR_ELx_EC_DABT_LOW:
+> +       case ESR_ELx_EC_DABT_CUR:
+> +       case ESR_ELx_EC_WATCHPT_LOW:
+> +       case ESR_ELx_EC_WATCHPT_CUR:
+>                 if ((esr & 0x3f /* DFSC */) !=3D 0x10
+>                                 || !(esr & 0x400 /* FnV */))
+>                         return true;
+> @@ -108,7 +108,7 @@ static void bad_exception(enum vector v, struct pt_re=
+gs *regs,
+>  {
+>         unsigned long far;
+>         bool far_valid =3D get_far(esr, &far);
+> -       unsigned int ec =3D esr >> ESR_EL1_EC_SHIFT;
+> +       unsigned int ec =3D esr >> ESR_ELx_EC_SHIFT;
+>         uintptr_t text =3D (uintptr_t)&_text;
+>
+>         printf("Load address: %" PRIxPTR "\n", text);
+> @@ -158,7 +158,7 @@ void default_vector_sync_handler(enum vector v, struc=
+t pt_regs *regs,
+>                                  unsigned int esr)
+>  {
+>         struct thread_info *ti =3D thread_info_sp(regs->sp);
+> -       unsigned int ec =3D esr >> ESR_EL1_EC_SHIFT;
+> +       unsigned int ec =3D esr >> ESR_ELx_EC_SHIFT;
+>
+>         if (ti->flags & TIF_USER_MODE) {
+>                 if (ec < EC_MAX && ti->exception_handlers[v][ec]) {
+> --
+> 2.25.1
+>
+
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
