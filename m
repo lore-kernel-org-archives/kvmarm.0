@@ -1,142 +1,210 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F2040FDAD
-	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 16:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D3A2F7462
+	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 20:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777480333; cv=none; b=FUem1oLWpHwVsxO18t4C50lbQZhep7aSYoFp2ydZr48LpKLtCnXc0Yhzh1pyagY0uEcJEl1Op9y53cpvr55XcGrOOwgwPD+XIgEBEgOWp+vhp8em3q9hWVjK8UdAmX2ZdfJMXkglyyTB2RLpR1XHwAkWqSDwjo7dtrQhNJSHKXM=
+	t=1777492910; cv=none; b=m3ES7R1ylMOoHO2Bc51xXS5OcyZE4KHoewNbGOOtDCMTViuxzyF0clUo/a1KgMPUnyokQ7Wtr24N5Wg7xqZ12uDaGmfEumuGoSWJLg9FlEdMyY5xtzqy7zZ1vsRRz37Vuaidcbk0r5JuJHU1mfz8k5VXPTSaDd6CIn+629dtgOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777480333; c=relaxed/simple;
-	bh=7gqu4PQqrn1R8ym/Xqh26xdxHzA5cS34NP+aRH2NwN8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXHAmVZcXrNUerl28KBFQQOgPJwer0wsJbQnyvM600x7UHqOs5zz8vpkGn7DS/fB9LyjNqF1KNJT3n6b4kNF9cwCB7LsNxCxls/ZebFdflfG60TXyEupDI0v+6h6W0kw8CC87P0mT+az5QfeQJR5BQXnhnuNVX0e7lWy/SF1mtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mu78sIiA; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1777492910; c=relaxed/simple;
+	bh=fJSg5n+VTofLF+R3vGeT0B6uJwenTXr9SrOBn2KG+f8=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=LeaT+h7m/jw0fltZc+Ntl7TuYuIVacq8/vXnRU6LcEDjN1pLj+i8NRsQqRohrqe6l/TFiXVHGKGbQchuiLgE28Gq7P0rHrybq3N7gLX5lKFbSPtKrBxO5tKYvOsrhk0wx7ovnxlNYN14ijfU0cIMZCAkKnsL+FEU4aWA8IKcbn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XN8bSfMy; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mu78sIiA"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCE6F1650;
-	Wed, 29 Apr 2026 09:32:02 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20EC43F62B;
-	Wed, 29 Apr 2026 09:32:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777480328; bh=7gqu4PQqrn1R8ym/Xqh26xdxHzA5cS34NP+aRH2NwN8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mu78sIiAkW97lmiEfkR9ZCKhkxNbAXzEchGuyoL2kvFLavGBWoVPKFdf/i3cVERcQ
-	 QDP+dpEPcDhIUhlYoS/W3LXt9Yuw1J8ewLE3adt9m8YTEO9v5LgF2S1r6lrRlo+p5u
-	 C8iqSmm5BYzyxDqUMKxKw+Hgg0j6qww3darcFKd8=
-Date: Wed, 29 Apr 2026 17:31:57 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/1] KVM: arm64: nv: Avoid full shadow s2 unmap
-Message-ID: <eedvu6ejufv6hstymyh4atnfynjolfyabkxqtgffoudiz26nxy@rbhpc22apzei>
-References: <20260411125024.3735989-1-weilin.chang@arm.com>
- <20260411125024.3735989-2-weilin.chang@arm.com>
- <86eckg39eo.wl-maz@kernel.org>
- <tozhyzmwfddgx5fgfejracv6tskgs7xhs4fs6yvmvff74m7gwy@eq3oh35tokj4>
- <867bq72n7l.wl-maz@kernel.org>
- <n4v252jehdq4sn2ux26twudmvmfwjltxkvv6sa6rxtwbvqa2en@xp2oaodm7uqc>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XN8bSfMy"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63TFUqIl1317126;
+	Wed, 29 Apr 2026 20:01:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=R2x2PQ
+	rvORUdwNxHDcUtETRc8rS0gty21jpHed4L61s=; b=XN8bSfMyWP8gMr/AlEGpjg
+	I9o25iCplYG0leQKr/pZYRG7PLhl95Ed2+CYsJhH4qP+Lo4NYjDh/HzB9RUOTqL+
+	aPy3pnBcvVFfaCWE/ZIWOvitKBZ7cJmClG6R6SDSOAwG/NoIkemEPUsSAGJcuprL
+	JMlC3+ku0+VNHW4R3wqWMuI3lcENDx+3vIpxgmBTxPs4Kg0sZZN0Jr6tIKQo5Ue5
+	+0iKoIDgbNiIWR2wpr8MR39Y1Nap0sXOI5oXtK13NQiai4YmH/AMs7plpOWZY9xy
+	v9R+8j/nJvKvvhjIoJcpuGZCsaHDEe/Az/VoJDq5080NvHc5KXwwK83I9Dml+m0A
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drk1ju408-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Apr 2026 20:01:15 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63TJrroh010290;
+	Wed, 29 Apr 2026 20:01:14 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dsa5gfsjt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Apr 2026 20:01:14 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63TK1EAE30343876
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Apr 2026 20:01:14 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0D87958052;
+	Wed, 29 Apr 2026 20:01:14 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7D9FA58065;
+	Wed, 29 Apr 2026 20:01:12 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.118.181])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Apr 2026 20:01:12 +0000 (GMT)
+Message-ID: <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+Subject: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Jonathan McDowell <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev
+Cc: paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com, Yeoreum Yun <yeoreum.yun@arm.com>
+In-Reply-To: <cover.1777036497.git.noodles@meta.com>
+References: <cover.1777036497.git.noodles@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Apr 2026 16:01:12 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <n4v252jehdq4sn2ux26twudmvmfwjltxkvv6sa6rxtwbvqa2en@xp2oaodm7uqc>
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDE5OCBTYWx0ZWRfX7FCsE6eIcPV0
+ dRO44UnF0wfI9Fsdy2pzNYSqckElbnehPhzYgU59deAy09/NqVV5peRfk/XnbOaVW4WNoW3yIeh
+ 5F+xYDm7ICIWl6PiWsn9iHAP1ul1MYT7KzCitUYIxkTTG19zx6c8QY6KuVi8oxcM9zdCQPY8ObM
+ r9CMcB2a2GKNRKXO/IeLvVr2M4oKebO8S43cNheX553J3+3F+CUMfY8bMCnlJ8d9j7Ai4xxA0g0
+ h+c8R0ktb+8HGBQfxSF+PRXxXejvuC6BsLbJf+Fu3oHQivQmbviOYnZP/e+oyKNzqrGn1CZmGWK
+ WiLsM3Uq/RkPd0CFQziWQZ1FSxfcMvfGF0u+zsxxDD7Ya5RQYxWa8fK48enDGobj4cMyO3GfQqZ
+ XEvi6l4hn5CYxmeDkErHfoJjX6+ewPe+gLpxlN/DGP1CJcwZrDob9FSjNkZbySgRy4so59IQp57
+ iZ9BLkgkza1SODVqvrQ==
+X-Proofpoint-GUID: G4mI1EHlNTHJ2Sv4EmdWBE_u_oyWeRVx
+X-Proofpoint-ORIG-GUID: 6taI1q2EF8KzjwX9tVp-Ex5_1ZWFnHn4
+X-Authority-Analysis: v=2.4 cv=MohiLWae c=1 sm=1 tr=0 ts=69f2638c cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
+ a=VabnemYjAAAA:8 a=fWDe5KWseGDh5RaNRN8A:9 a=QEXdDO2ut3YA:10
+ a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-29_02,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2604290198
 
-On Fri, Apr 24, 2026 at 08:45:24PM +0100, Wei-Lin Chang wrote:
-> On Thu, Apr 16, 2026 at 11:50:38AM +0100, Marc Zyngier wrote:
-> > On Thu, 16 Apr 2026 00:05:40 +0100,
-> > Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> > > 
-> > > On Wed, Apr 15, 2026 at 09:38:55AM +0100, Marc Zyngier wrote:
-> > 
-> > [...]
-> > 
-> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > > > index 851f6171751c..a97bd461c1e1 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
-> > > > >  	 */
-> > > > >  	bool	nested_stage2_enabled;
-> > > > >  
-> > > > > +	/* canonical IPA to nested IPA range lookup */
-> > > > > +	struct maple_tree nested_revmap_mt;
-> > > > > +	bool	nested_revmap_broken;
-> > > > > +
-> > > > 
-> > > > Consider moving this boolean next to the other ones so that you don't
-> > > > create too many holes in the kvm_s2_mmu structure (use pahole to find out).
-> > > > 
-> > > > But I have some misgivings about the way things are structured
-> > > > here. Only NV needs a revmap, yet this is present irrelevant of the
-> > > > nature of the VM and bloats the data structure a bit.
-> > > > 
-> > > > My naive approach would have been to only keep a pointer to the
-> > > > revmap, and make that pointer NULL when the tree is "broken", and
-> > > > freed under RCU if the context isn't the correct one.
-> > > 
-> > > Can you explain what you mean by "if the context isn't the correct one"?
-> > > If this refers to when selecting a specific kvm_s2_mmu instance for
-> > > another context, then IIUC refcnt would already be 0 and there would be
-> > > no other user of the tree.
-> > 
-> > Sorry, "context" is an overloaded word. I meant a situation in which
-> > you couldn't immediately free the maple-tree because you're holding
-> > locks and freeing (hypothetically) requires a sleeping "context". in
-> > this case, freeing under RCU, purely as a deferring mechanism, might
-> > be useful.
-> 
-> I experimented using RCU to free the tree as a deferring mechanism.
-> Here are a few observations:
-> 
->   - At reverse map record time, if maple tree store fails, we have to
->     change the maple tree pointer to a NULL, which is an RCU write
->     operation. Therefore we need to either take another lock, or use a
->     xchg(ptr, NULL) to avoid the lock.
-> 
->   - Because we're holding the read-side mmu_lock, we shouldn't block
->     during reverse map record. Therefore we should use call_rcu()
->     instead of synchronize_rcu() to free the "broken" tree. This implies
->     a pointer to a maple tree in kvm_s2_mmu will not suffice, an
->     additional structure with both the maple tree and an rcu_head have
->     to be created.
-> 
-> IMO looking at RCU calls mixed with mtree_{, un}lock(), and having a new
-> wrapper struct to make this dynamic allocation scheme work is not very
-> attractive to me.
-> 
-> Instead, what do you think if I aggregate all strictly NV-related
-> fields in kvm_s2_mmu i.e. tlb_vttbr, tlb_vtcr, nested_stage2_enabled,
-> shadow_pt_debugfs_dentry, pending_unmap, into a struct maybe called
-> kvm_s2_mmu_nested, add a maple tree in it, and have a pointer to this
-> struct in kvm_s2_mmu? kvm_s2_mmu_nested can then be allocated only if we
-> init a nested s2 mmu.
-> 
-> Do you think this can work and is better than the current approaches?
+With this "[RFC PATCH v3 0/4] Fix IMA + TPM initialisation ordering
+issue" patch set, how many records would be missing if IMA
+initialization is deferred to late_initcall_sync [1]?
 
-After a discussion with Marc, we think making the maple tree a pointer
-generates too much complexity from the reasons given above. For the
-kvm_s2_mmu_nested idea, it creates churn and the same RCU problem
-persists if we want to dynamically allocate and free the structure. On
-the other hand, if we allocated kvm_s2_mmu_nested at init-time and reuse
-the struct, then it's not much difference than just placing the maple
-tree in kvm_s2_mmu, the only benefit will be keeping kvm_s2_mmu smaller
-for non nested MMUs.
+[1]https://lore.kernel.org/linux-integrity/cover.1777036497.git.noodles@met=
+a.com/
+---
+Jonathan, Yeoreum, others -
 
-I'll stick with just adding the maple tree instance in kvm_s2_mmu for
-the next version.
+By going into TPM-bypass mode, we can see how many measurements are actuall=
+y
+missing when deferring IMA initialization to late_initcall_sync. As this is
+system/TPM dependent, I'd appreciate your checking. Please use the boot com=
+mand
+line option "ima_policy=3Dtcb|critical_data".
 
-Thanks,
-Wei-Lin Chang
+thanks, Mimi
 
-[...]
+ security/integrity/ima/ima.h      |  1 +
+ security/integrity/ima/ima_init.c |  6 ++++++
+ security/integrity/ima/ima_main.c | 19 +++++++++++++++++++
+ 3 files changed, 26 insertions(+)
+
+diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
+index 01aae19ed365..9a1117112fb2 100644
+--- a/security/integrity/ima/ima.h
++++ b/security/integrity/ima/ima.h
+@@ -286,6 +286,7 @@ extern bool ima_canonical_fmt;
+=20
+ /* Internal IMA function definitions */
+ int ima_init_core(bool late);
++int ima_init_debug(bool late);
+ int ima_fs_init(void);
+ int ima_add_template_entry(struct ima_template_entry *entry, int violation=
+,
+ 			   const char *op, struct inode *inode,
+diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima=
+_init.c
+index 5f335834a9bb..edd063b99685 100644
+--- a/security/integrity/ima/ima_init.c
++++ b/security/integrity/ima/ima_init.c
+@@ -122,6 +122,12 @@ void __init ima_load_x509(void)
+ }
+ #endif
+=20
++int __init ima_init_debug(bool late)
++{
++	ima_add_boot_aggregate(late); /* just add an additional record */
++	return 0;
++}
++
+ int __init ima_init_core(bool late)
+ {
+ 	int rc;
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima=
+_main.c
+index 42099bfe7e43..23e669be54fc 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -1254,6 +1254,7 @@ static int ima_kernel_module_request(char *kmod_name)
+=20
+ #endif /* CONFIG_INTEGRITY_ASYMMETRIC_KEYS */
+=20
++#define TESTING 1
+ static int __init init_ima(bool late)
+ {
+ 	int error;
+@@ -1264,6 +1265,23 @@ static int __init init_ima(bool late)
+ 		return 0;
+ 	}
+=20
++#ifdef TESTING
++	/*
++	 * Initialize early, even if it means going into TPM-bypass mode,
++	 * but add an additional boot_aggregrate message for the
++	 * late_initcall_sync.
++	 *
++	 * If measurement list records exist between the boot_aggregate
++	 * and the boot_aggregate_late records, these records would be
++	 * missing when IMA initializion is deferred to late_initcall_sync.
++	 */
++	if (ima_tpm_chip) {
++		ima_init_debug(late); /* Add an additional record */
++		return 0;
++	}
++
++	ima_tpm_chip =3D tpm_default_chip();
++#elif
+ 	/*
+ 	 * If we found the TPM during our first attempt, or we know there's no
+ 	 * TPM, nothing further to do
+@@ -1276,6 +1294,7 @@ static int __init init_ima(bool late)
+ 		pr_debug("TPM not available, will try later\n");
+ 		return -EPROBE_DEFER;
+ 	}
++#endif
+=20
+ 	if (!ima_tpm_chip)
+ 		pr_info("No TPM chip found, activating TPM-bypass!\n");
+--=20
+2.53.0
