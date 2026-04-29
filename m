@@ -1,749 +1,215 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6FA1A0B15;
-	Wed, 29 Apr 2026 14:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D7123EAB7
+	for <kvmarm@lists.linux.dev>; Wed, 29 Apr 2026 14:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777472993; cv=none; b=l31aIMm8qXazqJeEDsOyHlE0y25VVU2LVTh/3lrTNPa15wq7JYyiqB4NT0aNL0+P0wF5+NpDHcnsHrasp/uEM4gwvb/1WtORKP1n8hTwgCVnku1kw4To2nvePj4GbIjkDORP8vvCxTAXGeQ15/tA8VP2ha1iPeyilc+XYg4P6gc=
+	t=1777474057; cv=none; b=SOSVD7EeYa4GaoLJoPMFTtMXXH5KG0Rb6jcVJ0rUGEY9/JaMVOieFXz42FkaMhi54Q0bFzK3yI7M/Fmay71YeSd6AiTsxfMwDpt+p8RqYXsiamb1kfaQJ9HhS94mIDUVeP+Ur8jfnmdHTIuSYP2g9U8rI/+hKa/97f7YNd2toxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777472993; c=relaxed/simple;
-	bh=6ocCy8TIV0+gPrcHIlPynkDbNoVfSvANd+w/fdhTFcw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G1kx7xsvj/h1Dn1W31kbuD7A7hpudxTQUsXQAmy5/6fwTRJ0o1apqOFiTN1BBXplXCAUxyVYU8RIYdegCr8XoWf8ZEDQFbl4JTjAdjyMjGNXMwBFTPf2Er5Lus2WTD/i1sX/HAXfqEQOy0xh5JQEUdNHOXFLCNtijuJ0a9rMkBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVeS4Apa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777474057; c=relaxed/simple;
+	bh=2in3eMiiZSrAVpz+caYg5ek9hYdKy1xEMKSOlwXlxGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tGBhICyi158ekjdpPunmF9LhYNHNr7mLm+scScSb6bQdKLO9s40E65bOoInyi2Wto3XG1sx5WiXWJ+1W1ETanz7XuBHz9qZOz3+QrNsSe2FVrQHywLOZH5HcNUXqElaqKvsUi3kQOskbASmdRyhat6iRgyZWQJfVKFf+S5IqB3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hVaZ6Kzd; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVeS4Apa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A2D1C19425;
-	Wed, 29 Apr 2026 14:29:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777472992;
-	bh=6ocCy8TIV0+gPrcHIlPynkDbNoVfSvANd+w/fdhTFcw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZVeS4Apa7crY9kO5ZzMCoL1/mqKAgr3eEqKYrawxtPUdtci24CEfQ9KIVPFQWSh58
-	 HQd21ZiYS3TvmK8iMZNTrZtT+0u0+5VhDJ2ZnsNh/f5eLA8okeASmdU0JPId7V1ZZY
-	 emMim9CB+a4kK6k4kIbDc8QdSoPrXzFv7+jv1DI2tG4gb+xelC5cEO44LfxGiP8blS
-	 TKEkeNRj4hFBkm+wPXwqLKsuhcRWWr6DBt7/BPqrRj89pZeX4e73g6EX6JNrDElSkE
-	 Uk6K4TGioMy5Hb6TiLJ2IWfxANSDftS2J+84pyFljXMjzjueuypwsN8G6igauO7Qv5
-	 iEsRwotBdKOSg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wI5vB-0000000Fvh4-3lma;
-	Wed, 29 Apr 2026 14:29:50 +0000
-Date: Wed, 29 Apr 2026 15:29:49 +0100
-Message-ID: <86lde5zvoi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 08/43] KVM: arm64: gic-v5: Introduce guest IST alloc and management
-In-Reply-To: <20260427160547.3129448-9-sascha.bischoff@arm.com>
-References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
-	<20260427160547.3129448-9-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hVaZ6Kzd"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6DD71596;
+	Wed, 29 Apr 2026 07:47:29 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31DAB3F62B;
+	Wed, 29 Apr 2026 07:47:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1777474055; bh=2in3eMiiZSrAVpz+caYg5ek9hYdKy1xEMKSOlwXlxGw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hVaZ6Kzd/kGLPBLVw+0LROWBbTXrmk6tl7YkVzOUysNEZu2l1mX7JmRlcFlHNiNdZ
+	 lqcSWYf6rU7rOuP7hccaH6bNuM4A0tJIFzZevxL7DnIKMUa+V46kcwprLhdSXgsm31
+	 yFkc80/QwkIlP7HOjiJdAjKAqbuBFL+cef0Yrhfo=
+Date: Wed, 29 Apr 2026 15:47:21 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>, 
+	KVMARM <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, 
+	Andrew Jones <andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Mingwei Zhang <mizhang@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 7/7] arm64: Add Stage-2 MMU demand
+ paging test
+Message-ID: <rzf7qwao73tdzu5xm47atmbul4j5qjll2patehuxgliync72vr@2trwlhhhvhn6>
+References: <20260413204630.1149038-1-jingzhangos@google.com>
+ <20260413204630.1149038-8-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260413204630.1149038-8-jingzhangos@google.com>
 
-On Mon, 27 Apr 2026 17:08:46 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Mon, Apr 13, 2026 at 01:46:30PM -0700, Jing Zhang wrote:
+> Introduce a new test case to validate Stage-2 MMU fault handling. The
+> test verifies that the hypervisor correctly identifies and handles
+> Stage-2 data aborts triggered by a guest accessing unmapped memory.
 > 
-> GICv5 guests use Interrupt State Tables (ISTs) to track and manage the
-> interrupt state for SPIs and LPIs. These ISTs are provided to the
-> host's IRS via the VMTE.
+> The test performs the following:
+> - Sets up a guest with Stage-1 disabled, using identity-mapped host
+>    code and shared data in the Stage-2 page tables.
+> - Triggers a Stage-2 data abort by accessing a specific unmapped IPA.
+> - Catches the exception in the host, verifies the fault address,
+>    and dynamically maps a new page to resolve the fault.
+> - Resumes the guest to confirm the memory access completes successfully
+>    and the fault handler functioned as expected.
 > 
-> On a host GICv5 system, SPIs do not require any up-front memory
-> allocation prior to their use, unlike LPIs which require the OS to
-> allocate an IST. For a GICv5 guest, the same holds from the guest's
-> point of view - the SPIs should require no explicit memory allocation
-> by the guest. This means that the hypervisor must provision the memory
-> which it passed to the IRS for managing a guest's SPI state.
-> 
-> In light of the above, the hypervisor allocates the SPI IST prior to
-> running the guest for the first time. As only a small number of SPIs
-> are expected, this is always allocated as a linear IST. The host is
-> responsible for freeing this memory on guest teardown.
-> 
-> For LPIs, the OS needs to provision memory for state tracking. This
-> applies to both hosts and guests, and so the guest will provision some
-> memory for the LPI IST. However, this is not directly used by
-> KVM. Instead, KVM allocates a shadow LPI IST which is passed to the
-> IRS (in the VMTE). Again, on guest teardown, the hypervisor must free
-> this memory again. The LPI IST is allocated as a two level structure,
-> as many more LPIs are expected than SPIs.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v5-tables.c | 531 +++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-v5-tables.h |  22 ++
->  include/linux/irqchip/arm-gic-v5.h   |   3 +
->  3 files changed, 556 insertions(+)
+>  arm/Makefile.arm64    |   1 +
+>  arm/stage2-mmu-test.c | 107 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 108 insertions(+)
+>  create mode 100644 arm/stage2-mmu-test.c
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> index 502d05d46cccf..de905f37b61a5 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> @@ -501,6 +501,25 @@ int vgic_v5_vmte_init(struct kvm *kvm)
->  	return ret;
->  }
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 9026fd71..e547f92d 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -67,6 +67,7 @@ tests += $(TEST_DIR)/cache.$(exe)
+>  tests += $(TEST_DIR)/debug.$(exe)
+>  tests += $(TEST_DIR)/fpu.$(exe)
+>  tests += $(TEST_DIR)/mte.$(exe)
+> +tests += $(TEST_DIR)/stage2-mmu-test.$(exe)
 >  
+>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+>  
+> diff --git a/arm/stage2-mmu-test.c b/arm/stage2-mmu-test.c
+> new file mode 100644
+> index 00000000..0df4704b
+> --- /dev/null
+> +++ b/arm/stage2-mmu-test.c
+> @@ -0,0 +1,107 @@
 > +/*
-> + * The following set of forward declarations makes the code layout a *little*
-> + * clearer as it lets us keep the IST-related code together.
+> + * ARM64 Stage-2 MMU Demand Paging Test
+> + *
+> + * This test validates stage-2 data abort handling by purposefully
+> + * accessing unmapped memory in the guest and verifying that the
+> + * host correctly handles the fault by mapping the page.
+> + *
+> + * Copyright (C) 2026 Google LLC.
+> + * Author: Jing Zhang <jingzhangos@google.com>
+> + *
+> + * SPDX-License-Identifier: LGPL-2.0-or-later
 > + */
-> +static int vgic_v5_alloc_linear_ist(struct kvm *kvm, bool spi_ist,
-> +				    unsigned int id_bits,
-> +				    unsigned int istsz);
-> +static int vgic_v5_alloc_l1_ist(struct kvm *kvm, unsigned int id_bits,
-> +				unsigned int istsz, unsigned int l2_split);
-> +static int vgic_v5_alloc_l2_ists(struct kvm *kvm, unsigned int id_bits,
-> +				 unsigned int istsz, unsigned int l2_split);
-> +static int vgic_v5_alloc_two_level_lpi_ist(struct kvm *kvm,
-> +					   unsigned int id_bits,
-> +					   unsigned int istsz,
-> +					   unsigned int l2_split);
-> +static int vgic_v5_linear_ist_free(struct kvm *kvm, bool spi);
-> +static int vgic_v5_two_level_ist_free(struct kvm *kvm, bool spi);
-> +static int vgic_v5_spi_ist_free(struct kvm *kvm);
+> +#include <libcflat.h>
+> +#include <alloc_page.h>
+> +#include <asm/io.h>
+> +#include <asm/smp.h>
+> +#include <asm/guest.h>
+> +#include <asm/stage2_mmu.h>
 > +
->  /*
->   * Release the VMT Entry, freeing up any allocated data structures before
->   * zeroing the VMTE.
-> @@ -531,6 +550,18 @@ int vgic_v5_vmte_release(struct kvm *kvm)
->  	kfree(vmi->vmd_base);
->  	kfree(vmi->vpet_base);
->  
-> +	/* If we have an LPI IST, free it */
-> +	if (vmi->h_lpi_ist)
-> +		ret = vgic_v5_lpi_ist_free(kvm);
-> +	if (ret)
-> +		return ret;
+> +#define TEST_PAGE_IPA		0x40000000UL
+> +#define FAULT_ADDR_IPA		0x50000000UL
+> +#define TEST_DATA		0xBEEFCAFEUL
 > +
-> +	/* If we have an SPI IST, free it */
-> +	if (vmi->h_spi_ist)
-> +		ret = vgic_v5_spi_ist_free(kvm);
-> +	if (ret)
-> +		return ret;
+> +static volatile bool handled = false;
 > +
->  	xa_erase(&vm_info, vm_id);
->  	kfree(vmi);
->  
-> @@ -634,3 +665,503 @@ int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu)
->  
->  	return 0;
->  }
-> +
-> +/*
-> + * Assign an already allocated IST to the VM by populating the fields in the
-> + * corresponding VMTE. We re-use this code for both an SPI IST and LPI IST, even
-> + * if the paths to reach it might be vastly different.
-> + */
-> +int vgic_v5_vmte_assign_ist(struct kvm *kvm, phys_addr_t ist_base,
-> +			    bool two_level, unsigned int id_bits,
-> +			    unsigned int l2sz, unsigned int istsz,
-> +			    bool spi_ist)
+> +static void guest_code(void)
 > +{
-> +	struct kvm_vcpu *vcpu0 = kvm_get_vcpu(kvm, 0);
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct gicv5_cmd_info cmd_info;
-> +	struct vmtl2_entry *vmte;
-> +	unsigned int section;
-> +	u64 tmp;
-> +	int ret;
+> +	volatile unsigned long *test_va = (void *)TEST_PAGE_IPA;
+> +	volatile unsigned long *fault_va = (void *)FAULT_ADDR_IPA;
 > +
-> +	section = spi_ist ? GICV5_VMTEL2_SPI_SECTION : GICV5_VMTEL2_LPI_SECTION;
-
-Section? What is a section? This needs documentation (11.2.2 in the
-EAC0 version of the spec) so that people can understand you are
-talking about the 64bit word number in the Level-2 VM Table Entry.
-
+> +	*fault_va = *test_va;
 > +
-> +	if (ist_base & ~GICV5_VMTEL2E_IST_ADDR) {
-> +		kvm_err("IST alignment issue! Address: 0x%llx, Mask 0x%llx\n",
-> +			ist_base, GICV5_VMTEL2E_IST_ADDR);
-> +		return -EINVAL;
+> +	if (*fault_va == *test_va)
+> +		handled = true;
+> +
+> +	asm("hvc #0");
+> +}
+> +
+> +static enum guest_handler_result guest_exception_handler(struct guest *guest)
+> +{
+> +	unsigned long far, ec;
+> +	unsigned long *fixup_page;
+> +
+> +	ec = guest->esr_el2 >> ESR_ELx_EC_SHIFT;
+> +
+> +	if (ec == ESR_ELx_EC_HVC64) {
+> +		report_info("CPU%d: Guest exited via HVC.", smp_processor_id());
+> +		return GUEST_ACTION_EXIT;
 > +	}
 > +
-> +	ret = vgic_v5_get_l2_vmte(vm_id, &vmte);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Bail if already allocated - something is broken! */
-> +	if (FIELD_GET(GICV5_VMTEL2E_IST_VALID, vmte->val[section])) {
-> +		vgic_v5_clean_inval(vmte, sizeof(*vmte), true, true);
-
-Still this odd construct. I'm starting to wonder whether I'm really
-missing something.
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	tmp = FIELD_PREP(GICV5_VMTEL2E_IST_L2SZ, l2sz);
-> +	tmp |= FIELD_PREP(GICV5_VMTEL2E_IST_ADDR,
-> +			ist_base >> GICV5_VMTEL2E_IST_ADDR_SHIFT);
-> +	tmp |= FIELD_PREP(GICV5_VMTEL2E_IST_ISTSZ, istsz);
-> +	tmp |= FIELD_PREP(GICV5_VMTEL2E_IST_ID_BITS, id_bits);
-> +	tmp |= FIELD_PREP(GICV5_VMTEL2E_IST_STRUCTURE, two_level);
-> +
-> +	WRITE_ONCE(vmte->val[section], cpu_to_le64(tmp));
-> +	vgic_v5_clean_inval(vmte, sizeof(*vmte), true, false);
-> +
-> +	/* Finally, mark the entry as valid */
-> +	cmd_info.cmd_type = spi_ist ? SPI_VIST_MAKE_VALID : LPI_VIST_MAKE_VALID;
-> +	ret = irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu0), &cmd_info);
-> +
-> +	/* Any cached entries we now have are stale! */
-> +	vgic_v5_clean_inval(vmte, sizeof(*vmte), false, true);
-
-Shouldn't the clean operation happen *before* you call into the IRQ
-stack? It feels dangerous to do so, even if the callback doesn't do
-much.
-
-> +
-> +	return ret;
-> +}
-> +
-> +/*
-> + * Helper to determine the correct l2sz to use based on the combination of
-> + * PAGE_SIZE and whatever hardware supports.
-> + */
-> +static unsigned int vgic_v5_ist_l2sz(void)
-> +{
-> +	switch (PAGE_SIZE) {
-> +	case SZ_64K:
-> +		if (gicv5_host_ist_caps.ist_l2sz & 0x4)
-
-Please had definitions for IRS_IDR2.IST_L2SZ.
-
-> +			return GICV5_IRS_IST_CFGR_L2SZ_64K;
-> +		fallthrough;
-> +	case SZ_4K:
-> +		if (gicv5_host_ist_caps.ist_l2sz & 0x1)
-> +			return GICV5_IRS_IST_CFGR_L2SZ_4K;
-> +		fallthrough;
-> +	case SZ_16K:
-> +		if (gicv5_host_ist_caps.ist_l2sz & 0x2)
-> +			return GICV5_IRS_IST_CFGR_L2SZ_16K;
-> +		break;
-> +	}
-> +
-> +	if (gicv5_host_ist_caps.ist_l2sz & 0x1)
-> +		return GICV5_IRS_IST_CFGR_L2SZ_4K;
-> +
-> +	return GICV5_IRS_IST_CFGR_L2SZ_64K;
-> +}
-> +
-> +/* Helper to determine ISTE size based on metadata requirements */
-> +static unsigned int vgic_v5_ist_istsz(unsigned int id_bits)
-> +{
-> +	if (!gicv5_host_ist_caps.istmd)
-> +		return GICV5_IRS_IST_CFGR_ISTSZ_4;
-> +
-> +	if (id_bits >= gicv5_host_ist_caps.istmd_sz)
-> +		return GICV5_IRS_IST_CFGR_ISTSZ_16;
-> +
-> +	return GICV5_IRS_IST_CFGR_ISTSZ_8;
-> +}
-> +
-> +/*
-> + * Allocate a Linear IST - always used for SPIs and potentially LPIs.
-> + *
-> + * The calculation for n has been taken from the GICv5 spec.
-
-Bonus points if you add a reference to the relevant part of the spec.
-
-> + *
-> + * NOTE: istsz is the FIELD used by GICv5, not the actual size (or log2() of the
-> + * size).
-> + */
-> +static int vgic_v5_alloc_linear_ist(struct kvm *kvm, bool spi_ist,
-> +				    unsigned int id_bits, unsigned int istsz)
-> +{
-> +	const size_t n = id_bits + 1 + istsz;
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	__le64 *ist;
-> +	u32 l1sz;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (WARN_ON_ONCE(!vmi))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Allocate the IST. We only have one level, so we just use the L2 ISTE.
-> +	 */
-> +	l1sz = BIT(n + 1);
-> +	ist = kzalloc(l1sz, GFP_KERNEL);
-> +	if (!ist)
-> +		return -ENOMEM;
-> +
-> +	if (spi_ist) {
-> +		vmi->h_spi_ist = ist;
-> +	} else {
-> +		vmi->h_lpi_ist_structure = false;
-> +		vmi->h_lpi_ist = ist;
-> +	}
-> +
-> +	vgic_v5_clean_inval(ist, l1sz, true, true);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Allocate the first level of a two-level IST - LPI, only.
-> + *
-> + * The calculations for n, l1_size have been taken from the GICv5 spec.
-> + *
-> + * NOTE: istsz and l2sz are the FIELDS used by GICv5, not the actual sizes (or
-> + * log2() of the sizes).
-> + */
-> +static int vgic_v5_alloc_l1_ist(struct kvm *kvm, unsigned int id_bits,
-> +				unsigned int istsz, unsigned int l2sz)
-> +{
-> +	const size_t n =  max(5, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1);
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	const u32 l1_size = BIT(n + 1);
-> +	struct vgic_v5_vm_info *vmi;
-> +	__le64 *ist;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (!vmi)
-> +		return -EINVAL;
-> +
-> +	ist = kzalloc(l1_size, GFP_KERNEL);
-> +	if (!ist)
-> +		return -ENOMEM;
-> +
-> +	vmi->h_lpi_ist_structure = true;
-> +	vmi->h_lpi_ist = ist;
-> +
-> +	vgic_v5_clean_inval(ist, l1_size, true, true);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Allocate ALL of the second level ISTs for a two-level IST - LPI, only.
-> + *
-> + * The calculations for n, l1_entries, l2_size have been taken from the GICv5
-> + * spec.
-> + *
-> + * NOTE: istsz and l2sz are the FIELDS used by GICv5, not the actual sizes (or
-> + * log2() of the sizes).
-> + */
-> +static int vgic_v5_alloc_l2_ists(struct kvm *kvm, unsigned int id_bits,
-> +				unsigned int istsz, unsigned int l2sz)
-> +{
-> +	const size_t n =  max(5, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1);
-> +	const int l1_entries = BIT(n + 1) / GICV5_IRS_ISTL1E_SIZE;
-> +	const size_t l2_size = BIT(11 + (2 * l2sz) + 1);
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	__le64 *l2ist;
-> +	__le64 *l1ist;
-> +	int index;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (WARN_ON_ONCE(!vmi))
-> +		return -EINVAL;
-> +
-> +	l1ist = vmi->h_lpi_ist;
-> +
-> +	/*
-> +	 * Allocate the storage for the pointers to the L2 ISTs (used when
-> +	 * freeing later).
-> +	 */
-> +	vmi->h_lpi_l2_ists = kzalloc_objs(*vmi->h_lpi_l2_ists, l1_entries,
-> +					  GFP_KERNEL);
-> +	if (!vmi->h_lpi_l2_ists)
-> +		return -ENOMEM;
-> +
-> +	/* Allocate the L2 IST for each L1 IST entry */
-> +	for (index = 0; index < l1_entries; ++index) {
-> +		l2ist = kzalloc(l2_size, GFP_KERNEL);
-> +		if (!l2ist) {
-> +			while (--index >= 0)
-> +				kfree(vmi->h_lpi_l2_ists[index]);
-> +
-> +			kfree(vmi->h_lpi_l2_ists);
-> +			vmi->h_lpi_l2_ists = NULL;
-> +
-> +			return -ENOMEM;
+> +	if (ec == ESR_ELx_EC_DABT_LOW) {
+> +		far = guest->far_el2;
+> +		if (far == FAULT_ADDR_IPA) {
+> +			fixup_page = alloc_page();
+> +			s2mmu_map(guest->s2mmu, FAULT_ADDR_IPA,
+> +				  virt_to_phys(fixup_page), PAGE_SIZE, S2_MAP_RW);
+> +			report(true, "Caught stage-2 fault at 0x%lx", far);
+> +		} else {
+> +			report(false, "Unexpected fault address: 0x%lx", far);
 > +		}
-> +
-> +		/*
-> +		 * We are not doing on-demand allocation of the L2 ISTs, and are
-> +		 * instead provisioning the whole IST up front. This means that
-> +		 * we are able to mark the L2 ISTs as valid in the L1 ISTEs as
-> +		 * the overall IST is not yet valid.
-> +		 */
-> +		l1ist[index] = cpu_to_le64(
-> +			virt_to_phys(l2ist) & GICV5_ISTL1E_L2_ADDR_MASK) |
-> +			GICV5_ISTL1E_VALID;
-> +
-> +		vmi->h_lpi_l2_ists[index] = l2ist;
-> +
-> +		vgic_v5_clean_inval(l2ist, l2_size, true, true);
-> +	}
-> +
-> +	/* Handle CMOs for the whole L1 IST in one go */
-> +	vgic_v5_clean_inval(l1ist, l1_entries * sizeof(*l1ist), true, false);
-> +
-> +	return 0;
-> +}
-> +
-> +/* Allocate a two-level IST - LPIs, only */
-> +static int vgic_v5_alloc_two_level_lpi_ist(struct kvm *kvm, unsigned int id_bits,
-> +					   unsigned int istsz, unsigned int l2sz)
-> +{
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	int ret;
-> +
-> +	/*
-> +	 * Allocate the L1 IST first, then all of the L2s. Everything
-> +	 * is preallocated and we do no on-demand IST allocation. This
-> +	 * is to avoid needing to track if and when the guest is doing
-> +	 * on-demand IST allocation.
-> +	 */
-> +	ret = vgic_v5_alloc_l1_ist(kvm, id_bits, istsz, l2sz);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = vgic_v5_alloc_l2_ists(kvm, id_bits, istsz, l2sz);
-> +	if (ret) {
-> +		/* Free the L1 IST again */
-> +		vmi = xa_load(&vm_info, vm_id);
-> +		kfree(vmi->h_lpi_ist);
-> +		vmi->h_lpi_ist = 0;
-> +
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void vgic_v5_free_allocated_lpi_ist(struct vgic_v5_vm_info *vmi,
-> +					   unsigned int id_bits,
-> +					   unsigned int istsz,
-> +					   unsigned int l2sz)
-> +{
-> +	if (!vmi->h_lpi_ist_structure) {
-> +		kfree(vmi->h_lpi_ist);
-> +		vmi->h_lpi_ist = NULL;
-> +		return;
-> +	}
-> +
-> +	if (vmi->h_lpi_l2_ists) {
-> +		const size_t n = max(2, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1);
-> +		const int l1_entries = BIT(n + 1) / GICV5_IRS_ISTL1E_SIZE;
-> +		int index;
-> +
-> +		for (index = 0; index < l1_entries; ++index)
-> +			kfree(vmi->h_lpi_l2_ists[index]);
-> +
-> +		kfree(vmi->h_lpi_l2_ists);
-> +		vmi->h_lpi_l2_ists = NULL;
-> +	}
-> +
-> +	kfree(vmi->h_lpi_ist);
-> +	vmi->h_lpi_ist = NULL;
-> +}
-> +
-> +void vgic_v5_free_allocated_spi_ist(struct kvm *kvm)
-> +{
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (WARN_ON_ONCE(!vmi))
-> +		return;
-> +
-> +	kfree(vmi->h_spi_ist);
-> +	vmi->h_spi_ist = NULL;
-> +}
-> +
-> +/*
-> + * Free a Linear IST. Can only happen once the VM is dead.
-> + */
-> +static int vgic_v5_linear_ist_free(struct kvm *kvm, bool spi)
-> +{
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vmtl2_entry *vmte;
-> +	struct vgic_v5_vm_info *vmi;
-> +	int section, ret;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (!vmi)
-> +		return -EINVAL;
-> +
-> +	ret = vgic_v5_get_l2_vmte(vm_id, &vmte);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (spi) {
-> +		section = GICV5_VMTEL2_SPI_SECTION;
-> +		vgic_v5_free_allocated_spi_ist(kvm);
 > +	} else {
-> +		section = GICV5_VMTEL2_LPI_SECTION;
-> +		vgic_v5_free_allocated_lpi_ist(vmi, 0, 0, 0);
+> +		report(false, "Unexpected exception class: 0x%lx", ec);
 > +	}
 > +
-> +	/* The VM should be dead here, so we can just zero the VMT section */
-> +	WRITE_ONCE(vmte->val[section], 0ULL);
-> +	vgic_v5_clean_inval(vmte, sizeof(*vmte), true, true);
-> +
-> +	return 0;
+> +	return GUEST_ACTION_RESUME;
 > +}
 > +
-> +/*
-> + * Free a Two-Level IST. Can only happen once the VM is dead.
-> + */
-> +static int vgic_v5_two_level_ist_free(struct kvm *kvm, bool spi)
+> +int main(int argc, char **argv)
 > +{
-> +	unsigned int id_bits, istsz, l2sz;
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	__le64 *l1ist, tmp;
-> +	struct vmtl2_entry *vmte;
-> +	int section, l1_entries;
-> +	size_t n;
-> +	int ret;
+> +	struct guest *guest;
+> +	unsigned long *test_page;
+> +	unsigned long code_va_base, code_pa_base, data_base;
 > +
-> +	/* We don't create two-level SPI ISTs, so freeing is a bad idea! */
-> +	if (spi)
-> +		return -EINVAL;
+> +	report_prefix_push("stage2-mmu");
 > +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (!vmi)
-> +		return -EINVAL;
-> +
-> +	section = GICV5_VMTEL2_LPI_SECTION;
-> +	l1ist = vmi->h_lpi_ist;
-> +
-> +	if (!vmi->h_lpi_ist_structure)
-> +		return -EINVAL;
-> +
-> +	ret = vgic_v5_get_l2_vmte(vm_id, &vmte);
-> +	if (ret)
-> +		return ret;
-> +
-> +	tmp = le64_to_cpu(READ_ONCE(vmte->val[section]));
-> +
-> +	id_bits = FIELD_GET(GICV5_VMTEL2E_IST_ID_BITS, tmp);
-> +	istsz = FIELD_GET(GICV5_VMTEL2E_IST_ISTSZ, tmp);
-> +	l2sz = FIELD_GET(GICV5_VMTEL2E_IST_L2SZ, tmp);
-> +
-> +	/* Calculation for n taken from the GICv5 specification */
-> +	n =  max(2, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1);
-> +	l1_entries = BIT(n + 1) / GICV5_IRS_ISTL1E_SIZE;
-> +
-> +	vgic_v5_free_allocated_lpi_ist(vmi, id_bits, istsz, l2sz);
-> +
-> +	/* The VM must be dead, so we can just zero the VMT section */
-> +	WRITE_ONCE(vmte->val[section], 0ULL);
-> +
-> +	vgic_v5_clean_inval(vmte, sizeof(*vmte), true, true);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Allocate an IST for SPIs.
-> + *
-> + * We don't anticipate a large number of SPIs being allocated. Therefore, we
-> + * always allocate a Linear IST for SPIs. This will need to be revisited should
-> + * that assumption no longer hold.
-> + */
-> +int vgic_v5_spi_ist_allocate(struct kvm *kvm, phys_addr_t *base_addr,
-> +			     unsigned int id_bits, unsigned int istsz)
-> +{
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	int ret;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (WARN_ON_ONCE(!vmi))
-> +		return -EINVAL;
-> +
-> +	ret = vgic_v5_alloc_linear_ist(kvm, true, id_bits, istsz);
-> +	if (ret)
-> +		return ret;
-> +
-> +	*base_addr = virt_to_phys(vmi->h_spi_ist);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Free the IST for SPIs. Should only happen once the VM is dead.
-> + */
-> +static int vgic_v5_spi_ist_free(struct kvm *kvm)
-> +{
-> +	return vgic_v5_linear_ist_free(kvm, true);
-> +}
-> +
-> +/*
-> + * Allocate an IST for LPIs.
-> + *
-> + * Unlike with SPIs, we anticipate that the guest will allocate a relatively
-> + * large number of LPIs. Therefore, while we support doing a linear LPI IST, it
-> + * is expected that LPI ISTs will be two-level.
-> + */
-> +int vgic_v5_lpi_ist_alloc(struct kvm *kvm, unsigned int id_bits)
-> +{
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	unsigned int istsz, l2sz;
-> +	phys_addr_t phys_addr;
-> +	bool two_level;
-> +	int ret;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (WARN_ON_ONCE(!vmi))
-> +		return -EINVAL;
-> +
-> +	istsz = vgic_v5_ist_istsz(id_bits);
-> +	l2sz = vgic_v5_ist_l2sz();
-> +
-> +	/*
-> +	 * Determine if we want to create a Linear or a Two-Level IST.
-> +	 *
-> +	 * If we require more than one page for the IST, create a Two-Level IST
-> +	 * (if the host supports it, which is likely).
-> +	 *
-> +	 * Note: GICv5's istsz is not the size of the ISTEs in log2(bytes). It
-> +	 * is 2 less, hence the +2 below.
-> +	 */
-> +	two_level = gicv5_host_ist_caps.ist_levels &&
-> +		id_bits > PAGE_SHIFT - (2 + istsz);
-> +
-> +	if (!two_level)
-> +		ret = vgic_v5_alloc_linear_ist(kvm, false /* LPIs, not SPIs */,
-> +					       id_bits, istsz);
-> +	else
-> +		ret = vgic_v5_alloc_two_level_lpi_ist(kvm, id_bits, istsz,
-> +						      l2sz);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	phys_addr = virt_to_phys(vmi->h_lpi_ist);
-> +	ret = vgic_v5_vmte_assign_ist(kvm, phys_addr, two_level, id_bits, l2sz,
-> +				      istsz, false);
-> +	if (ret)
-> +		vgic_v5_free_allocated_lpi_ist(vmi, id_bits, istsz, l2sz);
-> +
-> +	return ret;
-> +}
-> +
-> +/* Free the LPI IST again */
-> +int vgic_v5_lpi_ist_free(struct kvm *kvm)
-> +{
-> +	u16 vm_id = vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +
-> +	vmi = xa_load(&vm_info, vm_id);
-> +	if (!vmi)
-> +		return -ENXIO;
-> +
-> +	if (!vmi->h_lpi_ist_structure)
-> +		return vgic_v5_linear_ist_free(kvm, false);
-> +	else
-> +		return vgic_v5_two_level_ist_free(kvm, false);
-> +}
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgic-v5-tables.h
-> index 5501a44308362..37e220cda1987 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.h
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
-> @@ -54,6 +54,13 @@ struct vmtl2_entry {
->  #define GICV5_VMTEL2E_IST_STRUCTURE	BIT_ULL(58)
->  #define GICV5_VMTEL2E_IST_ID_BITS	GENMASK_ULL(63, 59)
->  
-> +/*
-> + * The LPI and SPI configuration is stored in the 2nd and 3rd 64-bit chunks of
-> + * the VMTE (0-based).
-> + */
-> +#define GICV5_VMTEL2_LPI_SECTION	2
-> +#define GICV5_VMTEL2_SPI_SECTION	3
-> +
->  /* Virtual PE Table Entry */
->  typedef __le64 vpe_entry;
->  #define GICV5_VPE_VALID			BIT_ULL(0)
-> @@ -66,6 +73,12 @@ struct vgic_v5_vm_info {
->  	vpe_entry __iomem	*vpet_base;
->  	void __iomem		**vped_ptrs;
->  	u8			vpe_id_bits;
-> +
-> +	/* Tracking for the hyp-owned ISTs */
-> +	bool			h_lpi_ist_structure;
-> +	__le64			*h_lpi_ist;
-> +	__le64			**h_lpi_l2_ists;
-> +	__le64			*h_spi_ist;
+> +	guest = guest_create(smp_processor_id(), guest_code, S2_PAGE_4K);
 
-Can you please document what these individual fields represent? I'm
-not sure what hyp-owned means here...
+As Marc pointed out ([1]), 4K is not guaranteed to work at stage-2, so
+we should check ID_AA64MMFR0_EL1.TGran*_2 before creating s2.
 
->  };
->  
->  struct vgic_v5_vmt {
-> @@ -146,4 +159,13 @@ int vgic_v5_vmte_release(struct kvm *kvm);
->  int vgic_v5_vmte_alloc_vpe(struct kvm_vcpu *vcpu);
->  int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu);
->  
-> +int vgic_v5_vmte_assign_ist(struct kvm *kvm, phys_addr_t ist_base,
-> +			    bool two_level, unsigned int id_bits,
-> +			    unsigned int l2sz, unsigned int istsz, bool spi_ist);
-> +int vgic_v5_spi_ist_allocate(struct kvm *kvm, phys_addr_t *base_addr,
-> +			     unsigned int id_bits, unsigned int istsz);
-> +void vgic_v5_free_allocated_spi_ist(struct kvm *kvm);
-> +int vgic_v5_lpi_ist_alloc(struct kvm *kvm, unsigned int id_bits);
-> +int vgic_v5_lpi_ist_free(struct kvm *kvm);
-> +
->  #endif
-> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
-> index 89579ee04f5d1..ccec0a045927c 100644
-> --- a/include/linux/irqchip/arm-gic-v5.h
-> +++ b/include/linux/irqchip/arm-gic-v5.h
-> @@ -450,6 +450,9 @@ enum gicv5_vcpu_info_cmd_type {
->  	VMT_L2_MAP,		/* Map in a L2 VMT - *may* happen on VM init */
->  	VMTE_MAKE_VALID,	/* Make the VMTE valid */
->  	VMTE_MAKE_INVALID,	/* Make the VMTE (et al.) invalid */
-> +	SPI_VIST_MAKE_VALID,	/* No corresponding invalid */
-> +	LPI_VIST_MAKE_VALID,	/* Triggered by a guest */
-> +	LPI_VIST_MAKE_INVALID,	/* Triggered by a guest */
->  };
->  
->  struct gicv5_cmd_info {
+On the same note, the minimum value of guest VTCR_EL2.T0SZ is bounded by
+the implemented PA size i.e. ID_AA64MMFR0_EL1.PARange. Therefore in
+s2mmu_enable() (patch 2) just doing 64 - VA_BITS can generate an
+unsupported T0SZ.
 
 Thanks,
+Wei-Lin Chang
 
-	M.
+[1]: https://lore.kernel.org/kvmarm/86mrzw468z.wl-maz@kernel.org/
 
--- 
-Without deviation from the norm, progress is not possible.
+> +
+> +	/* Map host code: IPA(VA) -> PA */
+> +	/* We use the host VA as the Guest IPA because guest stage 1 is disabled. */
+> +	code_va_base = (unsigned long)guest_code;
+> +	code_pa_base = virt_to_phys((void *)guest_code);
+> +
+> +	/* Align to 2MB to use block descriptors where possible */
+> +	code_va_base = code_va_base & ~(SZ_2M - 1);
+> +	code_pa_base = code_pa_base & ~(SZ_2M - 1);
+> +	s2mmu_map(guest->s2mmu, code_va_base, code_pa_base, SZ_2M, S2_MAP_RW);
+> +
+> +	/* Identity map the shared variable */
+> +	data_base = virt_to_phys((void *)&handled) & PAGE_MASK;
+> +	s2mmu_map(guest->s2mmu, data_base, data_base, PAGE_SIZE, S2_MAP_RW);
+> +
+> +	/* Map test data page */
+> +	test_page = alloc_page();
+> +	*test_page = TEST_DATA;
+> +	s2mmu_map(guest->s2mmu, TEST_PAGE_IPA, virt_to_phys(test_page), PAGE_SIZE, S2_MAP_RW);
+> +
+> +	guest_install_handler(guest, ELx_LOW_SYNC_64, guest_exception_handler);
+> +
+> +	report_info("CPU%d: entering guest...", smp_processor_id());
+> +
+> +	guest_run(guest);
+> +
+> +	report(handled, "Stage-2 fault handling test completed");
+> +	guest_destroy(guest);
+> +
+> +	return report_summary();
+> +}
+> -- 
+> 2.53.0.1213.gd9a14994de-goog
+> 
