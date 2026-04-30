@@ -1,102 +1,156 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5E0263F44;
-	Thu, 30 Apr 2026 09:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2161399015;
+	Thu, 30 Apr 2026 09:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777540084; cv=none; b=Qw1rj6ze7VSClMj4GlfyeKynS3J5xPMPtZbEy8188UayyTogCswhUlkGS4Tf3awpfLjJNyuQfOge6s/Q53/upP6YriiKlXs8CLf9nF8UH/QVvUYmcUCDjPaIp5Izu7uGC6IwHka9ydA+WnHAwS2yu/C83zsE9231xfQQNi8Zpm4=
+	t=1777541862; cv=none; b=TM1tDRf/NVjaK7FpRAhDU3w6rna4pC9XpO/B00LktpEBdDIuiOE0EcWtwb/rNM1mhjvjhVm+w5gZnrpiJQ4exnvqKbczgTb+6c4FvfsiqREtXON/8RSB8dx3UHDBs1QCnvmMsNSZFZH8FKLBeCrFJs+FxIkA+yquMyOmE2pAgsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777540084; c=relaxed/simple;
-	bh=ZFzSNODvz59u5BBj2IDcPy45PSPOnkHPbn9VjRLPFko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jAeO+1eSbEAy6NWPTkwcgVH+2ZYxxxSzihnHGpMl/KYs/BbFvjDv022ewn9r9vkwQx4MB8/NqNslYqFarNFD4vC5/0yfy4Z3UEDX3+CxIQnQNrb8qDPDsa1PfEYewYAOGf5iGSdab8yjUZvJMpTMlqUGjYpppUP9Asvi9AyrReY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tr+sv2mF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777541862; c=relaxed/simple;
+	bh=6Bd3LTWGzug0OoKGDGfveio/XMIp1TZgePH0TADdmbI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CYT4Cx7zKScP/p4sBa4CP13dqDj85SaEqlGvkZPIjA9e0bxV1rqA8n3GXrC9nFw6SQmCUGzMd1mspqy5+3EepcBO2B7b9TU93xMmeSSIaVJoSkeBFxutG+j24FgIyo5mSs4MLGkVV+NlXb8wnCWRacUb+5oG5JoSluud+ZybSjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oXKEwE9H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tr+sv2mF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F31C2BCB3;
-	Thu, 30 Apr 2026 09:08:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oXKEwE9H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F119C2BCB3;
+	Thu, 30 Apr 2026 09:37:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777540083;
-	bh=ZFzSNODvz59u5BBj2IDcPy45PSPOnkHPbn9VjRLPFko=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tr+sv2mFI9m4Ofy6Z0CStOodv0cPAChYeTf2a3fmIaFcBPf+N3J7PMUQ2IsSG5aKu
-	 Ws09EaXWOCdaKF/SE443itbM9VK4E6tn5zNtfAWEe8F1oVWjulubvyY+SDFIG8nGJb
-	 aWwDoCxGyVXwVXC9Fo/HEw+pFY5Br/2PfTvj2DMn+cBsBZsx93dLe+tf6r4zPvfsXb
-	 3KzcHrFPh+lw+7fU3SCr7XSFXlFjhgeGtTQy7ByyUK5bnWqLhPH0nxu0bphVd+9mvJ
-	 TzuqDp7DgriF5jFxU5E3CPNYB03GIMupks3LEdgHdC2+eFLWbj4/NOO1gDLJ5imF9V
-	 b4u8H3NfNszvQ==
-Date: Thu, 30 Apr 2026 10:07:58 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com,
-	vdonnefort@google.com, catalin.marinas@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
- context-synchronization events
-Message-ID: <afMb7uuPlUbLeu7k@willie-the-truck>
-References: <20260428103008.696141-1-tabba@google.com>
- <20260428103008.696141-2-tabba@google.com>
+	s=k20201202; t=1777541862;
+	bh=6Bd3LTWGzug0OoKGDGfveio/XMIp1TZgePH0TADdmbI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oXKEwE9HXcFAf/BZfk8TB4wj+R9p/+kpzUY7EVGyObgdN9XFn8jbkNfRCnYGPdVQ9
+	 IUdZeGqowYED3r3P6Z35zkD2hMx45/9SddA4vmKOD0t0NUCeDV9bQJEg+YMNYd1AF9
+	 +TzICE3KK69mfK0ZmayrTqWwmuFxXn69Qz4blH8Oz7eMXQfUrwEYq8/WeOIAk3muC8
+	 h8Pw4oAIIFZcXOsEyTbsOE3zTCRPYR85mrtsdS3bW6yfVNk8SQhzKNPbngPJxGhecW
+	 ra0MGwLgQCz4ePZHxuD94xsujNX+Vi37MpVITlk1Dc/Hqyd/FbXstZ+3FBtDRrFKBw
+	 MwEfd+gZXUjqQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wINpz-0000000GCPR-3hjx;
+	Thu, 30 Apr 2026 09:37:39 +0000
+Date: Thu, 30 Apr 2026 10:37:39 +0100
+Message-ID: <86h5oszt3w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 11/43] KVM: arm64: gic-v5: Make VPEs valid in vgic_v5_reset()
+In-Reply-To: <20260427160547.3129448-12-sascha.bischoff@arm.com>
+References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
+	<20260427160547.3129448-12-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428103008.696141-2-tabba@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Apr 28, 2026 at 11:30:01AM +0100, Fuad Tabba wrote:
-> SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
-> exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
-> 0487 M.b, EIS is governed by D1.4.2 rule RBBSRF (p. D1-7205) and EOS
-> by D1.4.4.1 rule RBWCFK (p. D1-7209). D24.2.175 (p. D24-9754):
+On Mon, 27 Apr 2026 17:09:47 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
->   - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
->     a CSE.
->   - FEAT_ExS: the reset value is architecturally UNKNOWN; software
->     must set the bit to make the entry/exit a CSE.
+> When resetting VPEs, also mark them as valid in the VM VPE Table. This
+> is required as it informs the IRS that a specific VPE may be made
+> resident, and without this the IRS will treat the VPE as invalid.
 > 
-> INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
-> bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
-> synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
-> MSRs to context-switching system registers (HCR_EL2, HFGxTR_EL2,
-> HCRX_EL2, ZCR_EL2, CPACR_EL1, CPTR_EL2, SCTLR_EL1, ptrauth keys,
-> etc.); examples include the activate-traps path,
-> ptrauth_switch_to_guest, and the FPSIMD trap re-enable in
-> kvm_hyp_handle_fpsimd. On FEAT_ExS hardware those reliances are not
-> architecturally backed unless EOS=1 (and, for entry, EIS=1), and
-> whether they hold today depends on firmware initialisation outside
-> the kernel's control.
+> As part of this change, we also introduce a wrapper around the VPE
+> doorbells - vgic_v5_send_command(). This takes a struct kvm_vcpu
+> pointer, and the command to run, and triggers the function bound to
+> the command via that vcpu's doorbell. This is a convenience function
+> to simplify the code.
 > 
-> Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
-> INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
-> unconditionally CSEs regardless of whether FEAT_ExS is implemented.
-> This matches the pairing in arch/arm64/kvm/config.c which treats EIS
-> and EOS together as RES1 under !FEAT_ExS.
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
-> very early EL2 init and the EL2 MMU-off transition, neither of which
-> relies on these bits in the same way.
-> 
-> Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON")
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 0649729f6b834..92bb63b6dd6bb 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -518,6 +518,18 @@ static int vgic_v5_irs_vpe_cr0_update(int vm_id, int vpe_id, u32 cr0)
+>  	return 0;
+>  }
+>  
+> +static int vgic_v5_send_command(struct kvm_vcpu *vcpu,
+> +				enum gicv5_vcpu_info_cmd_type type)
+> +{
+> +	struct gicv5_cmd_info cmd_info;
+> +
+> +	if (!vcpu)
+> +		return -EINVAL;
 
-I don't think this Fixes: tag is accurate:
+Drop this. If we must crash, let's crash early, in the most
+spectacular way, and leaving a backtrace. Trying to gracefully handle
+this stuff is making it harder to track and debug such problems.
 
-1. That commit doesn't do anything with EIS/EOS afaict.
-2. Back in 5.12 (when that thing landed), SCTLR_EL2_RES1 did actually
-   include EIS and EOS
+Also, if we made it that far, it is very likely that vcpu isn't NULL.
 
-so I think the issue here might be that the auto-generated sysreg file
-quietly changes the RES1 definitions as bits get allocated, but the
-macros using the RES1 definition don't get updated. That's a pretty
-horrible pit that it feels like we might keep falling into :/
+> +
+> +	cmd_info.cmd_type = type;
+> +	return irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd_info);
+> +}
+> +
+>  static int vgic_v5_db_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
+>  {
+>  	struct vgic_v5_vm *vm = data->domain->host_data;
+> @@ -691,6 +703,8 @@ static void vgic_v5_teardown_per_vm_domain(struct vgic_v5_vm *vm)
+>  
+>  void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  {
+> +	int rc;
+> +
+>  	/*
+>  	 * We always present 16-bits of ID space to the guest, irrespective of
+>  	 * the host allowing more.
+> @@ -702,6 +716,14 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  	 * CPUIF (but potentially fewer in the IRS).
+>  	 */
+>  	vcpu->arch.vgic_cpu.num_pri_bits = 5;
+> +
+> +	/* Make the VPE valid in the VPET */
+> +	rc = vgic_v5_send_command(vcpu, VPE_MAKE_VALID);
+> +	if (rc) {
 
-Looking at 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg
-infrastructure"), I think we ended up dropping a whole bunch of fields
-from the RES1 mask (which became 0!). Have you checked all of those?
+nit: rc serves no purpose here. Just write it as:
 
-Will
+	if (vgic_v5_send_command(...))
+
+> +		/* We can't continue, so mark the VM as dead */
+> +		kvm_vm_dead(vcpu->kvm);
+> +		return;
+
+But we probably should dump some traces here, rather than silently
+mark the VM as fsck'd. THis is the sign that something has gone very
+wrong.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
