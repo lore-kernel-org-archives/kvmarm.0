@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341A92772E;
-	Thu, 30 Apr 2026 10:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7B1373BE4;
+	Thu, 30 Apr 2026 10:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777544806; cv=none; b=MBAfokO2E83Bht25ItZY1/IkBDHEe3eHUQeZ0XOTFh6erf2sYYWtdvg+3RtrrKGYhVv+6neiVrl7T8cXnhxmZmF8tp/yAoNeEsYZ5x+8xzPVNt+oB3c+X2qY+5h9wOMYelMsOHgvvS9g+23YL70PCVwdax0JeSVo2LhxU36NYO0=
+	t=1777545432; cv=none; b=AWtDc7qP/PLBWFeUP2gO3II8mjkbKseCRnnTIqw0UiORtXaInMyKNC15zF/Z+g2GSLfN18blwinl+4+PdSj9V98Ygn++ilFc/Mer7WbdvJmQJbZa5nSn8aoEGB30HMQmmbhyO/5+fFZAw5SWJ9y7jbxq1VWxyHhWvGfaWszhbx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777544806; c=relaxed/simple;
-	bh=VJPNiMDYvBsCB/7oxqwxMyogFYbHDES9uh5YZFRlgU8=;
+	s=arc-20240116; t=1777545432; c=relaxed/simple;
+	bh=1NvrjGfoiqQQbhKpYby6bZ0eDOwXMUv9+GR0prZV2wU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iV3C7Y4D3WIf2Rloz78J+Njz+agHAkLJy5AM3t+J8p0ojBpadIUiFa0LpVNcVcSCHxtZtuDOk6Jw9l+cdqOUfHi33h2Z9fptP5EuIzc1IbBbFNcmk+Wwsjv4nY/ZB8zdH56artlQPWvcPJ4zpeOcmNWdaNXf2WsVvE8MH/jqdUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d049TYoY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=NbFJx66JTv6Kbw3av+O1mzyBFfbBXHgYzJDRrSFpohiEJCvYr70lA5mj1IyCkppyyD3JUehIwnqNhqI84v4LRfbSayKtmxr4TiYdzc45qnJxQK5WBtkTuuwVBgE4owPIn8QSOVHO+YoU7FcilTGiMih5d3ohoU3dkMxz9Nt2m7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ej48oWux; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d049TYoY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C88E9C2BCB3;
-	Thu, 30 Apr 2026 10:26:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ej48oWux"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78169C2BCB3;
+	Thu, 30 Apr 2026 10:37:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777544805;
-	bh=VJPNiMDYvBsCB/7oxqwxMyogFYbHDES9uh5YZFRlgU8=;
+	s=k20201202; t=1777545431;
+	bh=1NvrjGfoiqQQbhKpYby6bZ0eDOwXMUv9+GR0prZV2wU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d049TYoYD6cypkxj2aOqTj7ABN09jRktXxudV+CFRxbWp6mgki1t1f4+csu1NuiIt
-	 FdhfiGQEBVugjWEQygsZkOARbGIO2R0nQlCCS03+YQTrX2Y817TdfFFDKYlRGtNm6K
-	 ntjPKdSWOt+WZ0XnZQw0oXYs3RklCSQLRPC1zjVfQaTFrWXKv8xbnhYKbXe09q8hK5
-	 hT4rnrtR4eo7GORRvSiC/KoZfBmKwv3rbYNhFX9iboxLB7RmvW1KPLSFe78ITHAL5E
-	 oSw/FC0EFNMU0Yy+g31a1MMW/pcOi3wHMwRKmAgyybCa4r/dSE5sA3+KCQZmUCqxoB
-	 zpjsuQuVawZVg==
+	b=Ej48oWuxftmWidWm0SJN8vta3Pv+TG1Jf/29ag9BoIjKFRMPmMyg2pE6DinPnb46n
+	 tTOovZ/l+ENzryvcE3irvr9k5M4EFHjP10rB6pIj2DubPhKWvJlI9JA7Xmg6+18EH3
+	 Y2dE2YCCxEoEbYETzNjNBUT2Sb5gOkM+aTG4a6cLUKn4xoadkLMCXaitK56BNFr3i6
+	 hvcD+S3Gl98TjWNqxNuGSMtj4MhX47Ndm4ELfLBNgLSceNgapgK666WoGtPHuGHYEj
+	 80oJEujqaZ0iCqzfdmyqIQiDwhjCkw7P7OR6PaQrCUoSZpmaWawVQ1XxNMQjbxTZpu
+	 d7KQ130gRtkhA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wIObT-0000000GDd5-1Njb;
-	Thu, 30 Apr 2026 10:26:43 +0000
-Date: Thu, 30 Apr 2026 11:26:42 +0100
-Message-ID: <86fr4czqu5.wl-maz@kernel.org>
+	id 1wIOlY-0000000GDpb-3vRA;
+	Thu, 30 Apr 2026 10:37:09 +0000
+Date: Thu, 30 Apr 2026 11:37:08 +0100
+Message-ID: <86ecjwzqcr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -51,10 +51,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	<peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 13/43] KVM: arm64: gic-v5: Make VPEs (non-)resident in vgic_load/put
-In-Reply-To: <20260427160547.3129448-14-sascha.bischoff@arm.com>
+Subject: Re: [PATCH 14/43] KVM: arm64: gic-v5: Request VPE doorbells when going non-resident
+In-Reply-To: <20260427160547.3129448-15-sascha.bischoff@arm.com>
 References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
-	<20260427160547.3129448-14-sascha.bischoff@arm.com>
+	<20260427160547.3129448-15-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,60 +70,90 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 27 Apr 2026 17:10:28 +0100,
+On Mon, 27 Apr 2026 17:10:49 +0100,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Extend vgic_v5_load and vgic_v5_put to make the VPEs resident and
-> non-resident, respectively. This makes the IRS aware of which VPE is
-> currently resident, and therefore allows it to perform HPPI selection
-> for LPIs and SPIs, which would otherwise never be signalled to the
-> VPE.
+> When a VPE is made non-resident and is entering WFI, a doorbell should
+> be requested for the VPE. This allows the VPE to be easily woken once
+> an SPI/LPI interrupt is pending for it. This is tracked by the IRS,
+> which will signal the specific VPE doorbell for the VPE once such an
+> interrupt arrives.
+> 
+> Requesting a doorbell involves calculating the DBPM - DoorBell
+> Priority Mask - which ensures that the DB is only signalled by the
+> hardware if the pending interrupt is of sufficient priority. This
+> avoids waking a VPE that can't process the incoming interrupt.
+> 
+> Doorbells are NOT requested if a VPE is not entering WFI as we expect
+> to enter again imminently.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-v5.c | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 92bb63b6dd6bb..11a1a491b7e0a 100644
+> index 11a1a491b7e0a..2fc6fa4df034f 100644
 > --- a/arch/arm64/kvm/vgic/vgic-v5.c
 > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -1053,6 +1053,8 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
->  void vgic_v5_load(struct kvm_vcpu *vcpu)
+> @@ -1077,6 +1077,9 @@ void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  void vgic_v5_put(struct kvm_vcpu *vcpu)
 >  {
 >  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u16 vm = vgic_v5_vm_id(vcpu->kvm);
-> +	u16 vpe = vgic_v5_vpe_id(vcpu);
+> +	bool req_db = !!vcpu_get_flag(vcpu, IN_WFI);
+
+Drop the spurious variable and move the check in the if () statement.
+This is way more readable than declaring a variable.
+
+> +	u32 priority_mask;
+> +	int dbpm;
+
+Move these in the inner block.
+
 >  
 >  	/*
->  	 * On the WFI path, vgic_load is called a second time. The first is when
-> @@ -1065,7 +1067,11 @@ void vgic_v5_load(struct kvm_vcpu *vcpu)
->  
->  	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
->  
-> -	cpu_if->gicv5_vpe.resident = true;
-> +	cpu_if->vgic_contextr = FIELD_PREP(ICH_CONTEXTR_EL2_V, true) |
-> +				FIELD_PREP(ICH_CONTEXTR_EL2_VPE, vpe) |
-> +				FIELD_PREP(ICH_CONTEXTR_EL2_VM, vm);
-> +
-> +	kvm_call_hyp(__vgic_v5_make_resident, cpu_if);
->  }
->  
->  void vgic_v5_put(struct kvm_vcpu *vcpu)
-> @@ -1083,7 +1089,9 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
->  
+>  	 * Do nothing if we're not resident. This can happen in the WFI path
+> @@ -1090,6 +1093,31 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
 >  	kvm_call_hyp(__vgic_v5_save_apr, cpu_if);
 >  
-> -	cpu_if->gicv5_vpe.resident = false;
-> +	cpu_if->vgic_contextr = 0;
+>  	cpu_if->vgic_contextr = 0;
+> +	if (req_db) {
+> +		/*
+> +		 * Find the virtual running priority and use this to calculate
+> +		 * the doorbell priority mask. We combine the highest active
+> +		 * priority and the CPU's priority mask. The guest can't handle
+> +		 * interrupts with priorities less than or equal to the virtual
+> +		 * running priority, so there's literally no point in waking the
+> +		 * guest for these.
+> +		 *
+> +		 * The priority needs to be higher than the mask to signal, so
+> +		 * pick the next higher priority (subtract 1).
+> +		 */
+> +		priority_mask = vgic_v5_get_effective_priority_mask(vcpu);
 > +
-> +	kvm_call_hyp(__vgic_v5_make_non_resident, cpu_if);
->  
->  	/* The shadow priority is only updated on entering WFI */
->  	if (vcpu_get_flag(vcpu, IN_WFI))
+> +		/* Don't request a doorbell if the max priority is masked */
 
-Should this patch be folded in patch #3? They seem to overlap in major
-ways.
+This comment reads badly. I'd suggest something like "Request a
+doorbell *unless* the priority is 0, indicating that no interrupt can
+wake the vcpu up".
+
+> +		if (priority_mask) {
+> +			dbpm = priority_mask - 1;
+> +			cpu_if->vgic_contextr = FIELD_PREP(ICH_CONTEXTR_EL2_DB, 1) |
+> +						FIELD_PREP(ICH_CONTEXTR_EL2_DBPM, dbpm);
+> +		}
+> +
+> +		/* Make the doorbell affine to this CPU */
+> +		WARN_ON(irq_set_affinity(vgic_v5_vpe_db(vcpu),
+> +					 cpumask_of(smp_processor_id())));
+
+Repeatedly setting the affinity is likely to be costly. It may be
+worth comparing with the current affinity somehow.
+
+> +	}
+>  
+>  	kvm_call_hyp(__vgic_v5_make_non_resident, cpu_if);
+>  
 
 Thanks,
 
