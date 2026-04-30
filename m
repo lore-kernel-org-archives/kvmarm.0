@@ -1,186 +1,109 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345642E3B15;
-	Thu, 30 Apr 2026 15:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9647A472798
+	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 16:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777563361; cv=none; b=LkosrFUpHtrzqGQnOiV+7kw/8vTDNzebcXqb3srjZJDFsJKL0kuacDWS7UDLlkik5sDkbrISacv1jF0pEZ5rReKrp89YBv5bmWYXiJ5grHXV42n7pWODvyRnNPrFNuzWxH9BlBhrWYoIq2TkBtCttTu7MAH47c0LkXQa86nElRY=
+	t=1777564971; cv=none; b=HOLvX3cI6cWPZWuyZVCUIviX0KjP2sNojTqS6uukkUOHU+YfkhZD4OJdfBfFO5M+JIFoOcd/u13AB8D/jOsH1JBauWaWQY+SO1ptp6vJpAIV1CkHkzhIGlXmr1lsN67pTpxa2eoFnKXZxG0fiXo68bPhb3H3He0jC5c5KMuqWUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777563361; c=relaxed/simple;
-	bh=gzTlnjHw8z8mwv/xrWX3uCr8DWsCDpEaX9cnmlYIzL4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=n0mUb5mZkIKUZv2kZ9uElRLGuZjz7HfNzCecwIOgdVOTKOXa3/mtOVkHTg4CHlFyrkv8DNSFsUYN3VTsXKeC8l1YJlB8PZAlu0cXhOVqmqofgBxLAvHxEG/ODApcxb27AI70pVdt6/USw7DMR+Rzt/5nFyvpCuYpYUGlHPHrnzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rxVLEs6U; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1777564971; c=relaxed/simple;
+	bh=WVJLqy3r6bzkLBth79KRaspMMTHZDGP6okQuQEbTpG0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YYGNbFD6NP89mI3khkkWlQmJiEwpHZeC0uKLj3NxUfg4FlzBEX85xAE/b0Qq+trbSreQn/Vmlx89QjIiJrtl3PX6gvWRfDD1Ra2y/zK9vPfWYb2sMt/9u20vtXQH9HvNf8VG0czNEGwUsdhzWPIg/PqacZouuLIVMFKl9/TjIoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEYINFQ7; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rxVLEs6U"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D4A332D1;
-	Thu, 30 Apr 2026 08:35:54 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 212283F763;
-	Thu, 30 Apr 2026 08:35:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777563359; bh=gzTlnjHw8z8mwv/xrWX3uCr8DWsCDpEaX9cnmlYIzL4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rxVLEs6Uu9YtFHgDKWpqFThQucat2oz2BVkAKJuDquKK56IPfzpBNZYTsMFNEbVp1
-	 pemTxhelUalIb7Qi82U6Rxdc/+UMhQAMRDNwKfIkadkFtpiJHVDXyWH9iIQJcPlhY+
-	 k6wBIDO5CwXuT6qTDMLK+lOqFVOyJml4tIhzFcX0=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>,
-	Saket Dumbre <saket.dumbre@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Chengwen Feng <fengchengwen@huawei.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Yang Shi <yang@os.amperecomputing.com>,
-	Thomas Huth <thuth@redhat.com>,
-	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org,
-	acpica-devel@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v1 00/12] KVM Dirty-bit cleaning accelerator (HACDBS)
-Date: Thu, 30 Apr 2026 16:35:52 +0100
-Message-ID: <afN21w6J4Awg3gV3@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <86a4ukzel3.wl-maz@kernel.org>
-References: <20260430111424.3479613-2-leo.bras@arm.com> <86bjf0zj2p.wl-maz@kernel.org> <afNZQKIiKmHPD5My@devkitleo> <86a4ukzel3.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEYINFQ7"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-44a2a68f519so137039f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 09:02:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777564968; x=1778169768; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Mz8D/T3QxACqjwu+5huws7UhafLI3x5hmsgeMhwaaFA=;
+        b=KEYINFQ7kED5rmA5oRu39Rz1BS06Zx8RSBH4Xh28pHt05AQ9JUoDKZjirbd4YyTxmK
+         zmpR73cU7JtaXWttckABmoE5a43T7hfsak7CloGO2lV3A+XK1wqJkwqO3+z3AXGGgUsx
+         ixoo0GfCyT+ACXBnnfXVFKEUoeMRMoAZnXrX1EF6ig4SmuIQZBdHemw+IyqGgj5ULmIb
+         JvOafAfOFKPSfhsDhTWOO0Lm36KO23CHz+r0w0YskNnvaevmy189XB13NP2G8PAEyCTF
+         7rzRuNCjKqicxHYx3xVF8ONQXFPrMs9R9iF5QoK7FPXqTG/6WM+ZdqO0DN+QBJjTrx0+
+         3oPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777564968; x=1778169768;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Mz8D/T3QxACqjwu+5huws7UhafLI3x5hmsgeMhwaaFA=;
+        b=fXl40BuC+Rt2+y+e8W5jSKRgWRkBowDLe873q/CptSFbFWke/k/LkMbp/K+7Qn3Zai
+         8h0cTyvl7Z1XOfgKSqgKLgXMev7L2vQjR7Wo/R255fVk29tZ5WaF/c70NBvYJ8zboHjH
+         wMfpLCpxTLyLI9YFytQxVeIwCnm6UEFlS2vngHnl76GBUvep1LXT+AZxXucEJLVr+Rqe
+         sxjgOHBhobRx9s14yNszbPFsONNN+0ElV2lv06aH7Hikt8aqJ9Xo5KQtZdXqmJSZS/XZ
+         zid1GpoFD1qjjMn3EfivAD2QfK0LFFqoPm0lzmrdVLsg6fAfRKs6EfsGALOPrDK5HB6C
+         gGuw==
+X-Forwarded-Encrypted: i=1; AFNElJ9tl2VzTsNgOu/61l4lE+IwrHY7M//QtH6oSlJNWibg7tErY4PAWppAp63yZMVviGJCcBMI/VQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz9+TnyloSjmaYV+tBGa/VWgpRLVqCbTpykx236Xv6BI4YPV2Sk
+	tQ2YfYxOhtBxizMHAxDKM7FnuqSQD2TM8CgMzGWoFppoJch5fKAfu+JJ7ADiQ/zAvVg0qEeCRJt
+	6n45tqTAtoJ85ppeWI92IIgYYLzA4UA==
+X-Received: from wrqr3.prod.google.com ([2002:a5d:4983:0:b0:43d:6f5f:8c52])
+ (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:a40a:b0:480:1d0b:2d32 with SMTP id 5b1f17b1804b1-48a8444a342mr47560585e9.12.1777564967927;
+ Thu, 30 Apr 2026 09:02:47 -0700 (PDT)
+Date: Thu, 30 Apr 2026 16:02:39 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260430160241.1934777-1-sebastianene@google.com>
+Subject: [PATCH v2 0/2] arm_ffa, KVM: Fix FF-A emad offset calculations
+From: Sebastian Ene <sebastianene@google.com>
+To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
+	sudeep.holla@kernel.org, will@kernel.org
+Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, 
+	sebastianene@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 30, 2026 at 03:51:20PM +0100, Marc Zyngier wrote:
-> On Thu, 30 Apr 2026 14:29:37 +0100,
-> Leonardo Bras <leo.bras@arm.com> wrote:
-> > 
-> > On Thu, Apr 30, 2026 at 02:14:22PM +0100, Marc Zyngier wrote:
-> > > On Thu, 30 Apr 2026 12:14:04 +0100,
-> > > Leonardo Bras <leo.bras@arm.com> wrote:
-> > > 
-> > > > d - In __kvm_arch_dirty_log_clear() there is no way to predict how long
-> > > >     should be the buffer, so I used 1x PAGE_SIZE, and when it gets full
-> > > >     it's cleaned and reused. Should I let users configure that over a
-> > > >     parameter, or is it overthinking?
-> > > 
-> > > How long is a piece of string? We can't know that. A single page feels
-> > > very small in the 4kB case, and letting userspace define the size of
-> > > that buffer seems a likely requirement.
-> > > 
-> > 
-> > Ok, as a KVM parameter, or as a compile-time option?
-> 
-> Noticed the "userspace" word in there? It *has* to be controlled by
-> userspace one way or another. So not as a kernel parameter, and
-> *never* as a compile option.
+Hi all,
 
-Okay, I would suggest that a module parameter could be set by userspace, 
-but I remember now that it is usually built in the kernel instead. Also, it 
-could be bad having this set for the whole system, instead of per-VM.
+This series fixes the Endpoint Memory Access Descriptor (EMAD) offset calculations
+and adds the necessary bounds checks for both the core FF-A driver and the pKVM
+hypervisor.
 
-How do you suggest letting userspace control that?
-(All I could think was using an ioctl / API of any sorts, which would 
-require changing the VMMs as well.)
+Prior to FF-A version 1.1, the memory region header didn't specify an explicit offset
+for the EMADs, leading to the assumption that they immediately follow the header.
+However, from v1.1 onwards, the specification dictates using the `ep_mem_offset` field
+to determine the start of the memory access array.
 
-> 
-> > > > Kernel v7.0.0 + this patchset builds properly, passing both kvm selftests
-> > > > for dirty-bit tracking[2], on HW HACDBS enabled or disabled.
-> > > 
-> > > I have absolutely no trust in these tests.
-> > > 
-> > > Have you enabled a VMM to make use of these APIs, and actively
-> > > migrated running guests? That's the level of testing I'd like to see,
-> > > as the selftests are not what people run in production...
-> > > 
-> > 
-> > There is no enablement needed on VMM side.
-> > Yes, I have created a VM on upstream qemu with --enable-kvm and migrated it 
-> > on the same host. (Inside a model)
-> > 
-> > That was the first test I used, but then I found out that kvm selftests 
-> > stress up multiple scenarios in an easier way.
-> 
-> Except when they don't. In my experience, the selftests are only there
-> to give the CI people the fuzzy feeling that they are doing something
-> useful.
+The patches in this series address this by:
+1. Updating the core `arm_ffa` firmware driver to correctly calculate the descriptor
+   offset using `ep_mem_offset` rather than defaulting to `sizeof(struct ffa_mem_region)`.
+   It also introduces bounds checking against `max_fragsize`.
+2. Enhancing the pKVM hypervisor validation logic to no longer strictly enforce that
+   the descriptor strictly follows the header, aligning it with the driver behavior
+   and the FF-A specification, while also ensuring the offset falls within the mailbox
+   buffer bounds.
 
-LOL
+Changes since v1:
+- For pKVM, removed the strict placement enforcement for `ep_mem_offset` as it is not
+  compliant with the spec, and avoids making assumptions about the driver's memory
+  layout.
 
-> I have a collection of examples indicating that what these
-> things test is not representative of the bugs we have in KVM.
-> 
+Link to v1: https://lore.kernel.org/all/ae9KN9nkOgDYJcGP@google.com/T/#t
 
-Fair enough... it was tested in qemu live migration, and it works properly 
-(migrated from 2 instances of qemu in the same host, emulated by model).
+Sebastian Ene (2):
+  firmware: arm_ffa: Fix Endpoint Memory Access Descriptor offset
+    calculation
+  KVM: arm64: Validate the offset to the mem access descriptor
 
-> > Do you prefer me to test on any specific scenario, or does whatever qemu
-> > uses as a default parameter work well enough?
-> 
-> I want to hear about testing at a scale that make sense for production
-> VMs, including live migrating between hosts while under memory
-> pressure (swapping out).
+ arch/arm64/kvm/hyp/nvhe/ffa.c     | 24 ++++++++++++++++++------
+ drivers/firmware/arm_ffa/driver.c | 14 ++++++++++----
+ include/linux/arm_ffa.h           |  2 +-
+ 3 files changed, 29 insertions(+), 11 deletions(-)
 
-I agree that's a more interesting test.
-
-> 
-> I'm also interested in efficiency: how much better is HACDBS compared
-> to the current page faulting? 
-
-The terms are indeed confusing, but HACDBS is just the cleaning accelerator 
-for dirty-bit. It means it will only affect how long it takes to transverse 
-the page table making pages in the array writable-dirty -> writable-clean.
-
-That being said, it regards to efficiency:
-Well, as I only have the model to test that, I am limmited to those 
-results, which may not reflect reality.
-
-As an example, on dirty_log_perf_test, the cleaning process took much 
-longer (8x) compared to software cleaning, even when faced with no error, 
-and entries that fit the array (4k page above). If it took that long even 
-in this ideal scenario, it means the HACDBS mechanism implemented in the 
-model takes much longer than software, which is counter-intuitive.
-
-> Just having patches for a feature is not
-> enough to decide adoption of that feature. Show me the benefits in a
-> quantitative way (within the limits of the model, of course).
-
-Sure, I will try measuring migration between 2 instances of the model, and 
-see how qemu live migration time is affected, then post the results in this 
-thread for us to compare.
-
-Thanks!
-Leo
+--
+2.54.0.545.g6539524ca2-goog
 
