@@ -1,153 +1,231 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B1E423A81;
-	Thu, 30 Apr 2026 13:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777555790; cv=none; b=kS64K5aXBnem7Yz76jZ0htwcvZgoWHp5OWKUaCsI8c/aa8v6Qb5JC2dMJfQKXulqZ8eRH/a9g6hQVqAJC3HJ/ZsNvqio5E+iygwqU7jvxLJkvRbon2P2w+Cfnk4XqI14SS2CmPTbRfyBJCOGZ/f0Tcrlmi0eLpVafirY9iE0xLk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777555790; c=relaxed/simple;
-	bh=/W1GRuxZq0cC6A7wpquemE4YB2GQRO11YgKNzJgpAzE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=CJUgm2bCqU2MevY6xPmnzO7FqYNwcbg7H71WFvBueUFfZgzCnIZxKTXJmsbUxisqoYiJSFFAB7414cwGh04KrrzYLwSuIKS5u8UC2AwVr9WMfpNYjPRQey94ZcX7HRsW6u+rgO03p0ut+2hurLC4563VP6+izLgvQsdpV3M9Yrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MIV0wfnW; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFD3428851
+	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 14:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777560541; cv=pass; b=CbOh89v+uyKqEyOD3k+yPhf+8asv9eiLFZZR9s4VarsMU54sjJgrvXb/ce9gnQpQ2bmTct8gtM451lmXBYTmDi27zLIs02PbCgvqCsJJmZTqAIvHnaVRr6HQuiXPZ75WFXbo9WKaXnE2Y8LIpWsqi6Y+PphaWkhhgaQFhIk12Zs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777560541; c=relaxed/simple;
+	bh=RoAcOrIHVPRxFDCBIiYB6DsdX0Bha8J73vrrAeYRd0w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Me50416R7w+f5lqqZry21RCAoWnL8SvompYwwfou099Uo27AcZsCRBcVAJEBBeKJ/MbAI1nXZKJUC3eCVqpxgv4hOWhu+AUNiAir1ZeDb0heDV2MWGjWwnHexo6VltDO46MOo1944Y9yTY5lv9u+zT9huoVQ0LC/ZcUtLrV94B8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZSqbx92p; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MIV0wfnW"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBE341AED;
-	Thu, 30 Apr 2026 06:29:42 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D026C3F7B4;
-	Thu, 30 Apr 2026 06:29:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777555788; bh=/W1GRuxZq0cC6A7wpquemE4YB2GQRO11YgKNzJgpAzE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MIV0wfnWvMpN+DWDEs3DC7LO+ywU67ncAAqeBECPc/hmIVJgitsfq1OPtKUbFTwdg
-	 nvOWGEn5C1XToufUlAVzncZQtaq2SSb2kSiSyexB5Rb+sxsNKCvPTOvEJa/YsvsNmT
-	 E6Ci7q2Kk9ABl0De8i+eB010YSc/82PNfDsg8rYA=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>,
-	Saket Dumbre <saket.dumbre@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Chengwen Feng <fengchengwen@huawei.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Yang Shi <yang@os.amperecomputing.com>,
-	Thomas Huth <thuth@redhat.com>,
-	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org,
-	acpica-devel@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v1 00/12] KVM Dirty-bit cleaning accelerator (HACDBS)
-Date: Thu, 30 Apr 2026 14:29:37 +0100
-Message-ID: <afNZQKIiKmHPD5My@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <86bjf0zj2p.wl-maz@kernel.org>
-References: <20260430111424.3479613-2-leo.bras@arm.com> <86bjf0zj2p.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZSqbx92p"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50d836552daso616081cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 07:48:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777560539; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EJfhc8eikr6Y6jvBZzezmx+HbEEQoK+DgPjwqMILpQwufQ30xZ65Utj7UAVBmruRvk
+         sTXUSBzd+AolAKCZ/CLyYlpH6IlDHgiFeJyMzMimUXr3VrZ/cULz8QtkdsALfNVdy/Fr
+         dPt7tfQoyPkN6CcIx2rDT09FO8s914PuH+a/kMQiF/ZwiidKM2ihyAxzCuEo21U7ixY+
+         0U3volLXTcLhHKEkzp/DC1E3609dzophQRBisJ04R2cIyWhfy7NUYSv1hixgvOhcmxLV
+         hz7d5RUpyHoV5DW6VfUghESdo/2H47xV2Rf8aC+z5RadUc5b0mUq8EQoMQtuhR7BL4xh
+         K0Lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=YywTAYzjXFOYP3ncEM1wtVzQAWbVsUfph15jdqDNJS4=;
+        fh=217KzJZDUbEVauIDIUsffRrOYQ5tzvqT7o7Ld0ArmhU=;
+        b=dMEVq6BPi6wcHg4kqK+tVeQHOq4nanR3VqtUd8g251gXYoZL0nSex9tM/YqeE8REaQ
+         sTtk+JUQ5SOo6OthFS89vauXtsl2jCiZEHF9EZB3qEgURrttaWiXhFcDtprsMvBbaKlJ
+         UnnnDCJkiHBz54U9Qi3Y7iZWR8FvxF/nG876pMWYBZ3SzTj92T2TajuNwJcUxAeZa1Ge
+         1bmHaMZ684H6f0KwIT7286V1PU7W56pP3vlLidCMlKpjPw+WdWZU1oX0AEicFZBO5Upd
+         WYd+mlFVz5pHPRHOjMQY1AU3GbEmlc+XFAj/YukjHUM/1ud4TTE4PPhQmbAwQRkI0uqA
+         +J6g==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777560539; x=1778165339; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YywTAYzjXFOYP3ncEM1wtVzQAWbVsUfph15jdqDNJS4=;
+        b=ZSqbx92pBkuAOrhNCDA1LBfLXWBZziiiBJHRO/yFDs8Vd0SZxzlLOpUk14GnPqHVeD
+         NBuU2WVEbd1AnMVNOiTX8oGnxEmplvIfPOTYgs+cqqLa0qQ0uLaiAKQFJ6q7ANeNQtu3
+         vjaZYCJh7IWlvvMqnkFi9UeZM1dQwGV1DHPO3VLGIPg11TvT6WsuD+k8rQVYB3K+7jns
+         Um6TDOoCynY6SrodddIldJcmwFnDgEEexuRRY2lutDuiNIVC0GOmF4qDz0U0aijYboh7
+         jxSNnxv5eK0duywxuD5R1J95Y0Enben28osvZ5fIJrZ7Fp3WqWbWSrKGjxU7WJX3nQ1X
+         S0fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777560539; x=1778165339;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YywTAYzjXFOYP3ncEM1wtVzQAWbVsUfph15jdqDNJS4=;
+        b=Qkx7z+U0eGusjF+xh7QltgI2jqKbZ0v8YfrOZRp5gR0CHe1GWTE0AeqltLV+YiDg4G
+         vE0Y6JeqM0OrQETKhpT6HpaSTk4DX08/l/SnGrnc5x4UUE91XGAoE3l8LQXKUQUGHH8t
+         81xiAzBV72/7AxJrZHU1SlI0jVqBY5dEhiMEEy3xZI95hVb0zMZvDnrJleNUxS4WlBYe
+         bqSbVmKH3ZC7rv1e2Z/608RYmCAxRaxaP+kYqHntUIDbfPeibjlECBXXMC1zPj/MvRLu
+         Dl0uN65w10+XEPgS03KCSeA5ODObYqH4lnQbrkIO9dnb+yx4AtigTscpQVggeXNQbqpe
+         aqBQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9T/cwt2J1I8fWDJFpCO9trZqzCSg//Csa0AbhkZD+Jr2hovnly7EtIo7fgCxiK4karxDDDc8U=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwlVjXPQPiuCBm8qE5obPbO0oU/2hEoUgR/YGS56fyeky4KCwtx
+	UmQU3KeIGoYQuD62k3wHWIcIA3dakz/dkHzS3k32zShAnt5LDiINoIL/I9cLZkXPw6bjc9yp8H3
+	su72vUiAm4/NNeHXz/MpF4NBZ8F4Qns6L2A9NoMFz
+X-Gm-Gg: AeBDiev45LF3FTudCZZbAEEz4X0dFGXqUDYSag5NOCspQ2+UwjjaaHQkgqrC8lNGdHu
+	EW6VaKrB0nCJhNPsznSDUGhahfFGZGvpZCkkKTJtqKjM9Yxtb6aLavDWVZ/SD3VO47h/4mIHTPo
+	9bUtCg9EdasCnZdCv1d7aeQDhQnp+paDOOJIPdoY56/iPV5FLS/XLKv57LBSasbC76+CJlNBUSU
+	HEWveE9HAHpP+8Y59QqRaIKZq+o4+S1IsPzx/G/qwAJX5z32DCgKBOGTnLPJJoUSB16p81StKra
+	7L8IHbOyskseloOmi47EqBLYT/L0SBJEpqZCDDe/vUO1AAtRGufoZLVkIy8=
+X-Received: by 2002:ac8:59ca:0:b0:50e:5e19:587a with SMTP id
+ d75a77b69052e-5102a3d3061mr12769181cf.3.1777560537878; Thu, 30 Apr 2026
+ 07:48:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20260430132351.280766-1-alexandru.elisei@arm.com>
+In-Reply-To: <20260430132351.280766-1-alexandru.elisei@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 30 Apr 2026 15:48:21 +0100
+X-Gm-Features: AVHnY4JRtjA1RscP3600FnieC9wDru5uGeiEf45iBeDn0cWuzxNjfpWJrpgZjCk
+Message-ID: <CA+EHjTwZ=yFx_NEyw5YEiGqCjsfM=QotHgsCUVQmWDr6cNKLZw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Handle permission faults with guest_memfd
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	mark.rutland@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 30, 2026 at 02:14:22PM +0100, Marc Zyngier wrote:
-> On Thu, 30 Apr 2026 12:14:04 +0100,
-> Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> [...]
-> 
-> I haven't had a chance to look at any of this yet, but just on these
-> points:
-> 
-> > b - checkpatch.pl keeps bothering me to add an entry in MAINTAINERS file,
-> >     and I like the idea of maintaining this. Is there any rule or
-> >     common sense on this? Should I add this entry, or should I leave it
-> >     in the arch/arm64/kvm/ general rule?
-> 
-> No specific entry in MAINTAINERS required (or wanted). This falls into
-> the normal KVM/arm64 maintenance. And don't worry, we know where to
-> find you when it will come to fixing this stuff.
-> 
+Hi Alexandru,
 
-Got it
+On Thu, 30 Apr 2026 at 14:24, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> gmem_abort() calls kvm_pgtable_stage2_map() to make changes to stage 2. It
+> does this for both relaxing permissions on an existing mapping and to
+> install a missing mapping.
+>
+> kvm_pgtable_stage2_map() doesn't make changes to stage 2 if there is an
+> existing, valid entry and the new entry modifies only the permissions.
+> This is checked in:
+>
+> kvm_pgtable_stage2_map()
+>   stage2_map_walk_leaf()
+>      stage2_map_walker_try_leaf()
+>        stage2_pte_needs_update()
+>
+> and if only the permissions differ, kvm_pgtable_stage2_map() returns
+> -EAGAIN and KVM returns to the guest to replay the instruction. The
+> assumption is that a concurrent fault on a different VCPU already mapped
+> the faulting IPA, and replaying the instruction will either succeed, or
+> cause a permission fault, which should be handled with
+> kvm_pgtable_stage2_relax_perms().
+>
+> gmem_abort(), on a read or write fault on a system without DIC (instruction
+> cache invalidation required for data to instruction coherence), installs a
+> valid entry with read and write permissions, but without executable
+> permissions. On an execution fault on the same page, gmem_abort() attempts
+> to relax the permissions to allow execution, but calls
+> kvm_pgtable_stage2_map() to change the existing, valid, entry.
+> kvm_pgtable_stage2_map() returns -EAGAIN and KVM resumes execution from the
+> faulting instruction, which leads to an infinite loop of permission faults
+> on the same instruction.
+>
+> Allow the guest to make progress by using kvm_pgtable_stage2_relax_perms()
+> to relax permissions.
+>
+> Fixes: a7b57e099592 ("KVM: arm64: Handle guest_memfd-backed guest page faults")
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>
+> Lightly tested on an Orion O6 board, without pkvm, and without nested
+> virtualisation.
+>
+> Doesn't apply cleanly on top of a7b57e099592, I can send a patch for that if
+> needed.
+>
+>  arch/arm64/kvm/mmu.c | 24 +++++++++++++++++-------
+>  1 file changed, 17 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d089c107d9b7..dff58de7703b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1576,6 +1576,7 @@ struct kvm_s2_fault_desc {
+>  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  {
+>         bool write_fault, exec_fault;
+> +       bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+>         enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+>         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>         struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
+> @@ -1587,10 +1588,12 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>         gfn_t gfn;
+>         int ret;
+>
+> -       memcache = get_mmu_memcache(s2fd->vcpu);
+> -       ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+> -       if (ret)
+> -               return ret;
+> +       if (!perm_fault) {
+> +               memcache = get_mmu_memcache(s2fd->vcpu);
+> +               ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+> +               if (ret)
+> +                       return ret;
+> +       }
 
-> > c - There are some trace_prink() I have left in the code, as they could
-> >     be helpful to check when HACDBS is not performing as well as it
-> >     should. Should I introduce a tracepoint instead? or just ignore it?
-> >     (it's triggered on HACDBS error, but as it falls back to software in
-> >     that case, it should not impact correctness, only performance).
-> 
-> Debug infrastructure should be preferably *removed* altogether.
-> trace_printk() is definitely a big no-no.
-> 
+memcache is now uninitialized when perm_fault, and only read in the
+!perm_fault branch below. It's safe today, but initializing it to NULL
+would silence any defensive analyzer and keep things robust against
+future churn.
 
-Will remove it then
+>
+>         if (s2fd->nested)
+>                 gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
+> @@ -1631,9 +1634,16 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>                 goto out_unlock;
+>         }
+>
+> -       ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+> -                                                __pfn_to_phys(pfn), prot,
+> -                                                memcache, flags);
+> +       if (perm_fault) {
+> +               /* Preserve the software bits from the existing table entry. */
+> +               prot &= ~KVM_NV_GUEST_MAP_SZ;
 
-> > d - In __kvm_arch_dirty_log_clear() there is no way to predict how long
-> >     should be the buffer, so I used 1x PAGE_SIZE, and when it gets full
-> >     it's cleaned and reused. Should I let users configure that over a
-> >     parameter, or is it overthinking?
-> 
-> How long is a piece of string? We can't know that. A single page feels
-> very small in the 4kB case, and letting userspace define the size of
-> that buffer seems a likely requirement.
-> 
+Can you please phrase it the same way as the existing comment in
+user_mem_abort, as that phrasing more precisely describes the
+rationale? i.e.,
 
-Ok, as a KVM parameter, or as a compile-time option?
+   /*
+    * Drop the SW bits in favour of those stored in the
+    * PTE, which will be preserved.
+    */
 
-> > 
-> > Kernel v7.0.0 + this patchset builds properly, passing both kvm selftests
-> > for dirty-bit tracking[2], on HW HACDBS enabled or disabled.
-> 
-> I have absolutely no trust in these tests.
-> 
-> Have you enabled a VMM to make use of these APIs, and actively
-> migrated running guests? That's the level of testing I'd like to see,
-> as the selftests are not what people run in production...
-> 
+> +               ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms(pgt, s2fd->fault_ipa,
+> +                                                               prot, flags));
 
-There is no enablement needed on VMM side.
-Yes, I have created a VM on upstream qemu with --enable-kvm and migrated it 
-on the same host. (Inside a model)
+nit: args wrapped inside KVM_PGT_FN() is inconsistent with the rest of
+the file (and with the else-branch immediately below). Every other
+call site uses name-only inside the macro. Both expand the same way,
+but it's better to stick to the convention.
 
-That was the first test I used, but then I found out that kvm selftests 
-stress up multiple scenarios in an easier way.
+> +       } else {
+> +               ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+> +                                                        __pfn_to_phys(pfn), prot,
+> +                                                        memcache, flags);
+> +       }
+>
+>  out_unlock:
+>         kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
 
-Do you prefer me to test on any specific scenario, or does whatever qemu 
-uses as a default parameter work well enough?
+With these fixed:
 
-Thanks!
-Leo
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+>
+> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+
+> --
+> 2.54.0
+>
