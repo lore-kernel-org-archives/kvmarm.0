@@ -1,217 +1,331 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6C71C84A2
-	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 12:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777551568; cv=pass; b=kg+OGBLqqrfyXvHoKFApNHL5v6iJjp/7oic8f/GLbs3y/AF0SMe1sfJK5OWTAfPzPB+tdgvTig/C8wE0KtUwXDjhcKHaMhglMY209Ilb1qUFUyDmGtMl6apOddlIFBaIB6blX8ZzUhacxCS7VvsDmM0+OTWI9vqvZaVsx5WZ2PY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777551568; c=relaxed/simple;
-	bh=44cjooSElohMQFoXrm+AMIOG2x7f7KQkgD2E8+cShXo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Imfl8oR01rQGGFjZC7ueAXz4/0xlb/lzpy8FPOu7lx+EG75LauaJjREtIUSji8Nu7kwrrmEtBIrUxKocupfpanN+QJWIzci+uIkXMn/EjYrrGnjVzNaE5UjZELklDM0HE279ny2CLj49skjQZDYjjmsOQ5i7Ke/GvfPJSGOcU6A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IQ/8andZ; arc=pass smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274B034B1A7;
+	Thu, 30 Apr 2026 12:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777551816; cv=none; b=oN+kxA9wUsAMPZ4DaO4KuGoFv15DnLX/DeJxGc7+obEELXEXYFklnvqHS8ShhWQWNfd945K67f47OMinuT7L1xxusLYHbskphUc64g0FyQ8u/h3+1RCzrd0+gW2ci6wtg+uRqeSpoNvnyXDkDNii+yYfbrbiG4l8cocK2kJt+Z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777551816; c=relaxed/simple;
+	bh=AVgeA8sBc9eOp4iD/j14fMtAMEu72+Vkz0L7R4Cqg6g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iAgBqvMAigOp7YmONHALTOO5udohrAH3iRKugn6dkz5jYrRd1cbXBV2EssndG2gzwq8FKPK1If8vXIaPZCi3tt5vvwjl8gd4DLQuwtQCZpTmg9WMUQnNjfGTLhQMy3EL6xtYNnFnsG8rU+k3t/OMMAWMJjKX4Jytd3zPL3f25Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV0kEkwQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IQ/8andZ"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-50d836552daso534111cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 05:19:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777551566; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GuW5TUz85Aor3e+mHv0SA8lxnJ9YmP2NtvydRR9DIsLHQvfyoiGtnfddcD8qcEHLXQ
-         iHvnzojgdG/hEzTwYO3PQGyWHavWaf5xPd6NPOOVYN3/9wP5SLsGME3Epvnk3dRVGIQn
-         fbJFFgqiL6/ABqFZbASUFmiUvTq7Ez8XiuRko6uzWS6bgEb52q+KMn4BqiBGfngpLFTs
-         AcLYpZg8wvhA60TvobRwZus4hkUTZeezv2bYOTN92/gbY3J/vOCf6AhqBQeXTKws5Slb
-         lNjwSkoB3std3Wrvsrsjmq9uz9GHnJ3g4YmLc9gbeEHgvLuQfJCNO9AS5WsmPmyidgBE
-         6TNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wHRKEeAne5F8MKTBpMczt1Dq5nvrp7CkygWD8nWgp48=;
-        fh=6QHfQ0lUM9KtGWsa4Zo+Ms43bXwW9BWcHoHR3OGJOTU=;
-        b=iSdaQ+DJFxoHFgorTYkNrGP4ADW9EE//gveJ6bGCupqJmc8nSle/ZFq80Hj4jiHnZs
-         GeWGokFgS+Qy/l+XhtStaZTg5LBjUv/DQK9LpKp2hziM59ZbKLOOaflnq5eB9xzQWd7v
-         +D1G+fw37X4WVKCR1WrUkdyYGi/WyWkJbhjipuYj7a1L6+fGRTTXZLkpZdxVia2Widj2
-         79vJX4oQqp4iA0B8f+mrMX5Bu5UHA+xq1lMXxdztK8rzToMJgYHBevkoisy0ZYOm7pH6
-         yRtev6qwTVZQsD/rrdsSQUwUnkS+w7uQEcRgmY7hREyzYAIVzkvVcX20lXTIKGw4Xt+B
-         0V8A==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777551566; x=1778156366; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wHRKEeAne5F8MKTBpMczt1Dq5nvrp7CkygWD8nWgp48=;
-        b=IQ/8andZJlq1bG91sA/E2fOqhQQ+Lc2qn7YZavt8ZcfIE/QXiRtxqRcsl6KfrnKAoH
-         TqqCEJYc6S/RVuQgodCMUvWbpqhakYl/FgBJ00jtYGXMb3bDqNVzPMQlwPnlcmNSJkyi
-         WCb3UcwgfuOYFaJuSuCYenvZQkJoyI+amjJzGluqxFs0eeaaDekZrS7FfgO/DaUkAIjH
-         KQmF/ytiQM4gNvr59ezlZiXv4/Xpw8cA3riap0BpVLQ+ELoFnFGQsAYduxoq1R67wgwi
-         enS4VSG/WdKrbaYcb/EAnG4NTDs3U6Zx8mHTG/dfn6YS9EwaZeffXdUpnK4QAXeqJQ8k
-         c1Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777551566; x=1778156366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wHRKEeAne5F8MKTBpMczt1Dq5nvrp7CkygWD8nWgp48=;
-        b=jfaclwxxGymwDsFUWuoFYXmzG+2EfAa6ku1D+IPSCsOYzAbRbQClKU0ilGARndIQEe
-         0YL4Fnr7fw3QeVcmznD9kXbu73uPd9ljPE8TthVD00WKTR0GAHrYOLOZZHNtfmODzGeH
-         FJ9MqExLYCh3EJbOi+wROjnuQhekaqqARNjsO0Btctq8EuoHDH3GIeVF9XgVQDQzhMaV
-         XpG6WcmrysDt14BwcuqSTIENWqMq8xbgEih7wBby3D3xXo0xYxnhlAYOb9olCraUSRm8
-         F+qmnj7wba6c9aO1FC6j42smkD1BB/RJYUvQTmp6/TMdEYgYz4ebLnZfpKQYVCrohstO
-         RjTA==
-X-Forwarded-Encrypted: i=1; AFNElJ+x+ZTGVELoIezn+N9YEd37Fuv0ZnTaqkVfVwrKLAyazlhWEHsPpLYAYsVdoTa+SATM0eZjD8s=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw9cHpBrEzs+sthOVU13EdQwx5FjLfjthrwXT4w8oblCxGaw2Hn
-	Zc1V+ESL1dXKgMMJqzUP2W3c5XhNbx7TVF5DGYItGZLAMjIbG+bSxNZTF4MfViImP2mFcuc+Pxs
-	LqY5iADuQ83cVm5x4t7obQUBqP43RiDr+d48ZvCAy
-X-Gm-Gg: AeBDievu21HjmsWWL/Lq/hnhWw1mB/R3+RByS9HHlFl2nZm1/gF224QWmdodICRODk7
-	tAfjAF5Bpf9d0AQ97/wa5HAeCuckWkm8u0Vq/39jQkgnAd9e3NI97DsPfM/Smd9YQlM0Serw25P
-	vxZGAVjRajshWvv22nWu8emugfH/neP5uQVKcz6KXguvylcq/cnELbi37i8ePSS7WXU+JU1ovCN
-	0e1PvXHywq4A1riDfb44uRkagVyDsUixZ+w97NOHr0gLVkvqGLZ/ygeSYaNE87fO7VKHURwXwYD
-	y5h/hGcCSpbT+CLoQrqWfrJ8fYsRo9wd/fGhop98QXokE7/f7r10/9KCzfk=
-X-Received: by 2002:a05:622a:a6da:b0:4f3:5475:6b10 with SMTP id
- d75a77b69052e-5102830838amr13557601cf.8.1777551565713; Thu, 30 Apr 2026
- 05:19:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mV0kEkwQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A477C2BCB3;
+	Thu, 30 Apr 2026 12:23:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777551815;
+	bh=AVgeA8sBc9eOp4iD/j14fMtAMEu72+Vkz0L7R4Cqg6g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mV0kEkwQ0rPw+9zUmr5GT8+hrsdSA9tCIfGIOIRciTyfx+sN3O5epgqwp5Sg9/xKx
+	 dooTaJ7rFTlNRlFuV0tT8+xs+PP7UqE8WHXVul+fmDVXqsIUMHbjCXKx9AGZ94orpi
+	 RiCOVLZAZME6MIo6n9vrcPg56jAhS0Kmm7M4SetBCkbRfD6BLBHNlRrUMB0PlLte+G
+	 Er2XwmM4q1RsbTZpcL1lnqaXmn/FStt2eaQSKxNakfA7/BqVmRNqSOoV2HgRjME4js
+	 HitBiM1PMzxMlAaELaKqgda+odpRkM7xujUba3YmmDDLNJO8riRJGIiX5EXtNvgK3q
+	 ZZoepWksDJW/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wIQQW-0000000GGM6-3rQ7;
+	Thu, 30 Apr 2026 12:23:33 +0000
+Date: Thu, 30 Apr 2026 13:23:32 +0100
+Message-ID: <86cxzgzlff.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 16/43] KVM: arm64: gic-v5: Initialise and teardown VMTEs & doorbells
+In-Reply-To: <20260427160547.3129448-17-sascha.bischoff@arm.com>
+References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
+	<20260427160547.3129448-17-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260428103008.696141-1-tabba@google.com> <20260428103008.696141-2-tabba@google.com>
- <afMb7uuPlUbLeu7k@willie-the-truck>
-In-Reply-To: <afMb7uuPlUbLeu7k@willie-the-truck>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 30 Apr 2026 13:18:48 +0100
-X-Gm-Features: AVHnY4KrIAjURaGJR0bOqEe6FW-ppWuYCbxV1LsE0PqXIXBObjOjW2F6E4sgXIQ
-Message-ID: <CA+EHjTw6rx5rCVnR7Dfva3xmmgGjqUeUaT=3zDCEsN0J909Wsg@mail.gmail.com>
-Subject: Re: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
- context-synchronization events
-To: Will Deacon <will@kernel.org>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
-	vdonnefort@google.com, catalin.marinas@arm.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Will,
+On Mon, 27 Apr 2026 17:11:30 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> Each GICv5 VM requires a valid VM Table Entry (VMTE). The VM Table
+> itself is allocated during probe time, but a VM needs to provision a
+> VMTE before it is able to properly run (PPIs will work, but nothing
+> else will - and PPIs only are not useful!).
+> 
+> The correct time for setting up the VMTE is during VM
+> initialisation. For GICv5, this is vgic_v5_init(). Each VM needs a VM
+> ID - this is actually the index into the VM Table so it is how a
+> specific VMTE is selected too. As part of vgic_v5_init get a VM ID via
+> vgic_v5_allocate_vm_id(), which internally uses an IDA to select an
+> unused VM ID (and hence VMTE) within the range of allowed VM IDs.
+> 
+> Once the VM ID has been allocated, the doorbell domain for the VM is
+> allocated, and each of the doorbells itself is allocated and assigned
+> to a vcpu.
+> 
+> Assuming everything up until this point has succeeded, initialise the
+> VMTE. Internally this allocates the additional data structures
+> required by the hardware - the VM Descriptor, VPE Table, etc. This
+> VMTE is then made valid via the IRS's MMIO interface. Finally, all
+> VPEs are allocated within the VPET.
+> 
+> On teardown, this process is reversed again. The VMTE is made invalid,
+> the VPEs are freed, the doorbells are released and the domain torn
+> down, and finally the VM ID is released. The latter allows the VM ID
+> and VMTE to be reused for a future VM.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 146 +++++++++++++++++++++++++++++-----
+>  1 file changed, 128 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 2fc6fa4df034f..9347bc6895223 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -518,6 +518,18 @@ static int vgic_v5_irs_vpe_cr0_update(int vm_id, int vpe_id, u32 cr0)
+>  	return 0;
+>  }
+>  
+> +static irqreturn_t db_handler(int irq, void *data)
+> +{
+> +	struct kvm_vcpu *vcpu = data;
+> +
+> +	WRITE_ONCE(vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db_fired, true);
+> +
+> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> +	kvm_vcpu_kick(vcpu);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
 
+I think it'd make more sense if the doorbell
+handling/requesting/freeing was one patch, or at least a set of
+consecutive patches in the series.
 
-On Thu, 30 Apr 2026 at 10:08, Will Deacon <will@kernel.org> wrote:
+As it is now, it is very hard to keep track of things. You have part
+of it in the previous patch, the requesting and handling here, and
+probably the freeing in some other patch I haven't seen.
+
+>  static int vgic_v5_send_command(struct kvm_vcpu *vcpu,
+>  				enum gicv5_vcpu_info_cmd_type type)
+>  {
+> @@ -726,26 +738,46 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> -int vgic_v5_init(struct kvm *kvm)
+> +int vgic_v5_map_resources(struct kvm *kvm)
+>  {
+> -	struct kvm_vcpu *vcpu;
+> -	unsigned long idx;
+> -	int ret;
+> +	if (!vgic_initialized(kvm))
+> +		return -EBUSY;
+>  
+> -	if (vgic_initialized(kvm))
+> -		return 0;
+> +	return 0;
+> +}
+
+Pointless code movement?
+
 >
-> On Tue, Apr 28, 2026 at 11:30:01AM +0100, Fuad Tabba wrote:
-> > SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
-> > exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
-> > 0487 M.b, EIS is governed by D1.4.2 rule RBBSRF (p. D1-7205) and EOS
-> > by D1.4.4.1 rule RBWCFK (p. D1-7209). D24.2.175 (p. D24-9754):
-> >
-> >   - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
-> >     a CSE.
-> >   - FEAT_ExS: the reset value is architecturally UNKNOWN; software
-> >     must set the bit to make the entry/exit a CSE.
-> >
-> > INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
-> > bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
-> > synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
-> > MSRs to context-switching system registers (HCR_EL2, HFGxTR_EL2,
-> > HCRX_EL2, ZCR_EL2, CPACR_EL1, CPTR_EL2, SCTLR_EL1, ptrauth keys,
-> > etc.); examples include the activate-traps path,
-> > ptrauth_switch_to_guest, and the FPSIMD trap re-enable in
-> > kvm_hyp_handle_fpsimd. On FEAT_ExS hardware those reliances are not
-> > architecturally backed unless EOS=3D1 (and, for entry, EIS=3D1), and
-> > whether they hold today depends on firmware initialisation outside
-> > the kernel's control.
-> >
-> > Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
-> > INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
-> > unconditionally CSEs regardless of whether FEAT_ExS is implemented.
-> > This matches the pairing in arch/arm64/kvm/config.c which treats EIS
-> > and EOS together as RES1 under !FEAT_ExS.
-> >
-> > INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
-> > very early EL2 init and the EL2 MMU-off transition, neither of which
-> > relies on these bits in the same way.
-> >
-> > Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_=
-EL2_MMU_ON")
->
-> I don't think this Fixes: tag is accurate:
->
-> 1. That commit doesn't do anything with EIS/EOS afaict.
-> 2. Back in 5.12 (when that thing landed), SCTLR_EL2_RES1 did actually
->    include EIS and EOS
->
-> so I think the issue here might be that the auto-generated sysreg file
-> quietly changes the RES1 definitions as bits get allocated, but the
-> macros using the RES1 definition don't get updated. That's a pretty
-> horrible pit that it feels like we might keep falling into :/
->
-> Looking at 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg
-> infrastructure"), I think we ended up dropping a whole bunch of fields
-> from the RES1 mask (which became 0!). Have you checked all of those?
+> -	ret = vgic_v5_create_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+> -	if (ret)
+> -		return ret;
+> +/*
+> + * Claim and populate a VMTE (optionally making a new L2 VMT valid), create VPE
+> + * doorbells, allocate VPET and populate for each VPE. Finally, we also init the
+> + * vIRS, which means allocating and making the virtual SPI IST valid.
+> + *
+> + * Note: We do need to put the cart before the horse here. The VPE doorbells are
+> + * our conduit for communication with the IRS, which means we need to have those
+> + * before making the VMTE valid.
+> + *
+> + * On failure, we clean up in the teardown path (vgic_v5_teardown()).
+> + */
+> +int vgic_v5_init(struct kvm *kvm)
+> +{
+> +	int nr_vcpus, ret = 0;
+> +	struct kvm_vcpu *vcpu, *vcpu0;
+> +	unsigned long i;
+> +	struct irq_data *d;
+> +	unsigned int db_virq;
+> +
+> +	nr_vcpus = atomic_read(&kvm->online_vcpus);
+> +	if (nr_vcpus == 0)
+> +		return -ENODEV;
+>  
+> -	kvm_for_each_vcpu(idx, vcpu, kvm) {
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		if (vcpu_has_nv(vcpu)) {
+>  			kvm_err("Nested GICv5 VMs are currently unsupported\n");
+>  			return -EINVAL;
+>  		}
+>  	}
+>  
+> +	kvm->arch.vgic.gicv5_vm.nr_vpes = nr_vcpus;
 
-You're right, fe2c8d19189e didn't touch EIS/EOS: the SCTLR_EL2_RES1
-mask it pulled into INIT_SCTLR_EL2_MMU_ON already contained
-BIT(11)/BIT(22). Looking at it, I _think_ it's this one:
+Why do we need to track the number of vcpus separately from what KVM
+already does? GICv4 does it because a lot of the state is managed by
+the irqchip driver, but that's not the case here. I hope we can come
+up with a slightly simpler model with GICv5.
 
-  0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg infrastructure")
+> +
+>  	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
+>  	bitmap_zero(kvm->arch.vgic.gicv5_vm.userspace_ppis,
+>  		    VGIC_V5_NR_PRIVATE_IRQS);
+> @@ -754,20 +786,98 @@ int vgic_v5_init(struct kvm *kvm)
+>  		   kvm->arch.vgic.gicv5_vm.userspace_ppis,
+>  		   ppi_caps.impl_ppi_mask, VGIC_V5_NR_PRIVATE_IRQS);
+>  
+> -	return 0;
+> +	ret = vgic_v5_allocate_vm_id(kvm);
+> +	if (ret) {
+> +		kvm_err("Maximum number of GICv5 VMs reached!\n");
+> +		return ret;
+> +	}
 
-After that commit SCTLR_EL2_RES1 is auto-generated. Because the
-sysreg tooling can only model unconditional RES1, and EIS/EOS are
-RES1 only when !FEAT_ExS, the generated mask is UL(0). I'll fix the
-Fixes: tag in v2.
+I'd rather we don't scream on the console when running out of
+VMIDs. If we're at capacity, so be it. That's not an error worth
+spamming the console over.
 
-On the wider question of the other bits dropped from the old mask,
-I went through them against DDI 0487 M.b =C2=A7D24.2.175. The summary
-(SCTLR_EL2 with E2H=3D0):
+> +
+> +	ret = vgic_v5_create_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+> +	if (ret)
+> +		return ret;
 
-  bit  field    E2H=3D0 status                  kernel cares?
-  -------------------------------------------------------------
-   4   SA0      RES1 unconditionally          no
-   5   CP15BEN  RES1 unconditionally          no
-  11   EOS      RES1 iff !FEAT_ExS, else RW   yes (this fix)
-  16   nTWI     RES1 unconditionally          no
-  18   nTWE     RES1 unconditionally          no
-  22   EIS      RES1 iff !FEAT_ExS, else RW   yes (this fix)
-  23   SPAN     RES1 unconditionally          no
-  28   nTLSMD   RES1 unconditionally          no
-  29   LSMAOE   RES1 unconditionally          no
+Who is freeing the VMID?
 
-The seven non-EIS/EOS bits all fall under the "Otherwise: Reserved,
-RES1" clause for the E2H=3D0 layout, with no feature guard. Writing 0
-to them is a no-op, so dropping them from the mask should be harmless
-I think. EIS and EOS are the only positions where the bit
-becomes RW (with UNKNOWN reset) on FEAT_ExS hardware and the
-kernel actively relies on the value being 1, which is what this
-patch addresses.
+> +
+> +	/*
+> +	 * Allocate VPE doorbells first - these are our conduit for
+> +	 * communicating with the host irqchip driver.
+> +	 */
+> +	db_virq = irq_domain_alloc_irqs(kvm->arch.vgic.gicv5_vm.domain,
+> +					nr_vcpus, NUMA_NO_NODE,
+> +					&kvm->arch.vgic.gicv5_vm);
+> +	if (db_virq < 0) {
+> +		/* Simplify teardown by doing this early! */
+> +		vgic_v5_teardown_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+> +		return db_virq;
+> +	}
+> +
+> +	kvm->arch.vgic.gicv5_vm.vpe_db_base = db_virq;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		d = irq_domain_get_irq_data(kvm->arch.vgic.gicv5_vm.domain,
+> +					    db_virq + i);
+> +		irq_set_status_flags(db_virq + i, IRQ_NOAUTOEN);
+> +
+> +		ret = request_irq(db_virq + i, db_handler, 0, "vcpu", vcpu);
+> +		if (ret)
+> +			return ret;
+> +
+> +		/* Stash it with the VCPU for easy retrieval */
+> +		vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db = db_virq + i;
+> +	}
+> +
+> +	/* Populate VMTE (with VPET and VM descriptor) */
+> +	ret = vgic_v5_vmte_init(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* We pick the first vcpu to make the VMTE valid - any would do */
+> +	vcpu0 = kvm_get_vcpu(kvm, 0);
+> +	ret = vgic_v5_send_command(vcpu0, VMTE_MAKE_VALID);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Loop over all VPEs, allocate/populate their data structures */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		ret = vgic_v5_vmte_alloc_vpe(vcpu);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return ret;
 
-I agree the auto-generator silently zeroing previously hand-rolled
-RES1 masks is a real problem. Happy to look at either teaching the
-sysreg infrastructure to express conditional RES1 (so config.c's
-AS_RES1/FEAT_X facts can flow back into the header masks), or at
-least adding a build-time check that flags any auto-generated
-<REG>_RES1 that shrinks. After this series, though. Let me know if
-you'd like me to take a stab.
+I'm very worried about the error handling of that function. Who is
+responsible for cleaning up the mess when this fails?
 
-What plan to changechange in v2:
+>  }
+>  
+>  void vgic_v5_teardown(struct kvm *kvm)
+>  {
+> -	vgic_v5_teardown_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+> -}
+> +	struct kvm_vcpu *vcpu, *vcpu0;
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	unsigned long i;
+> +	int rc;
+>  
+> -int vgic_v5_map_resources(struct kvm *kvm)
+> -{
+> -	if (!vgic_initialized(kvm))
+> -		return -EBUSY;
+> +	/*
+> +	 * If the VM's ID isn't valid, then we failed init very early. Nothing
+> +	 * to do here.
+> +	 */
+> +	if (!kvm->arch.vgic.gicv5_vm.vm_id_valid)
+> +		return;
+>  
+> -	return 0;
+> +	if (kvm->arch.vgic.gicv5_vm.vmte_allocated) {
+> +		/* Make the VM invalid  */
+> +		vcpu0 = kvm_get_vcpu(kvm, 0);
+> +		rc = vgic_v5_send_command(vcpu0, VMTE_MAKE_INVALID);
+> +		if (rc)
+> +			kvm_err("could not make VMTE invalid\n");
+> +
+> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> +			if (vgic_v5_vmte_free_vpe(vcpu))
+> +				kvm_err("Failed to free VPE\n");
+> +		}
+> +
+> +		if (vgic_v5_vmte_release(kvm))
+> +			kvm_err("Failed to release VM 0x%x\n", dist->gicv5_vm.vm_id);
+> +	}
+> +
+> +	vgic_v5_teardown_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+> +
+> +	vgic_v5_release_vm_id(kvm);
+>  }
+>  
+>  int vgic_v5_finalize_ppi_state(struct kvm *kvm)
 
-1. Fixes: 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg infrastructure"=
-).
-2. Add one paragraph in the commit message explaining that the bug
-landed when SCTLR_EL2_RES1 was auto-generated to UL(0), with a
-one-line justification that the other seven dropped bits are
-unconditionally RES1 at E2H=3D0 and so harmless.
-3. Code diff unchanged (still just adding SCTLR_ELx_EIS |
-SCTLR_ELx_EOS to INIT_SCTLR_EL2_MMU_ON).
+Thanks,
 
-What do you think?
+	M.
 
-Cheers,
-/fuad
-
-> Will
+-- 
+Without deviation from the norm, progress is not possible.
