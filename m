@@ -1,97 +1,134 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663B73932C9
-	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 10:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9353FB7D3;
+	Thu, 30 Apr 2026 11:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777545455; cv=none; b=YOccJAfU19xLKX1rYEge9QYvfDnvzbKCyc5cK+8qBAIvwqM9ekr8yiFiv9J32w6RmnNmeqlTZPbsZTt8zzHYh7JdbbLV5lNv25TpjfrUqfy8cC3BapHzmoQENjjv0UgA+XsGBj4Gpn4qw8YDhnhNyR6nnKePsC50ilT5bvBYUi8=
+	t=1777547725; cv=none; b=kNkob2s+mnZxHDCPX54z88m0HMkCMQ4EvKIcaZAZYt0wgpM+Uca3/2hi4+r3/HVTJACGUpSPXSC0CL0EP/5rYwH7PC4kk8rU27RR3hCssEa0sWEbh4WU9Fl7xjcI/fWwUawR90+l3NNkvZ7wHOKDhIisBIJZZ/PHqC0vPucPf4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777545455; c=relaxed/simple;
-	bh=aBUqyz+8tZ7QS3WaHaFr3XJxACwh+4bujNo3pg9HJpg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Nlrwv1bzvGShKBD/oDu3/Ddptj+JSjHgx+5qE+AEnUsk07azDMxYaZoxOfVx6bHm4hsqg2t/cEeeIQoPQWEqirJ3t4jDtN106kUPbQf2bJTu3FJv9cf3JAJ6hLa2d8Le9L9DDjp+bTlMfcT2+D1Z+Mkg+j9vkh+lb7wnepZFRxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EB1U22Z/; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1777547725; c=relaxed/simple;
+	bh=BxOAhxaI3ep0pCLZHvFXFWhljUjYRpulIZeDdhTGMx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HuG6glUfnm78bjrg0s2Z+c0mCbWVRKO45+upOfriF4y2tCQvq5BZsoSR57ttvXaJ6kcVaW6k51U8yiYzfZp60jDG1s9/ZT06IjC6tatp+xE0MUZmuVE0y1ojF7UUcXuXC/rPmFHfyu69HbHNPmoUtsU92/Kp8hXshU72CtYR/8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tW6C+0X8; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EB1U22Z/"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-43ff19e54beso545133f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 03:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777545453; x=1778150253; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CE7ryhQPSrXB5CO15AITdkHOu/b63A3t1puDBO48YFY=;
-        b=EB1U22Z/yJ11FieE+Ifg4wMxLVj7jskhIuuEdjmwDmPykOjXuv1VCoyAb0vIAfeTth
-         3d6yPB9BZTJkBTeMHOPTOKKxlZ+sBt9VCrWtaF3/4FO5PuP6xc5f9+PiEUVM7dUHs6g/
-         zcJDA9gGDf3Pv8iPjEas9w6Xg8BiA9dIZ3YhzR6J6SFrQKYGngCcfRo3u35/bhOV4JrV
-         lOAuQR957wcXb9hfpfx5ZHwnKP5TRjsqAonjYal8Bb/ovE+mKyeI1strT9IWiZN5cBSP
-         8cIezbVJvdpyepXmS/2zVQ+KMNluFM1ktansrt5wRMCCeQjlmyBR49321bjxd1q+XuP2
-         ZnQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777545453; x=1778150253;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CE7ryhQPSrXB5CO15AITdkHOu/b63A3t1puDBO48YFY=;
-        b=WxP6Uv/iFDWBBGaoBygGtelIh7aDaIaRyJtCRe70WIbGsIHH6rdfcYySSS1dfP3E0w
-         C50jfu9BP+8KuAbWb1B2Q75hDCCB12l26NjpUat3AS84RGJCTT3yBe7w5GQkghooB4bn
-         eaYUS1U00s3/oL/yxBNKJ53GguRzeSyGJ1Iu56MqQBSkKjFe5vEsRGXeMAREPpmsiWSX
-         N7U6vweP6pgF/NMUUQ58Rp7PcHS1iqjf54GWMfyrfWu9K94o/KFqdUwSisEITLYcBVSp
-         Kgw/4B5xOAK+GcdFKHCJwQDeRqcuRrNjwDyrXC83GU2G+hZnBI2soq4cUMp4ar6o+Xpn
-         U4ZA==
-X-Forwarded-Encrypted: i=1; AFNElJ+GsjuguUsfZtjPnicibU5YHR9j26bmj5Ti2z4/oy+1NU2L222WM2HnHB85FElWO6priRLF/AM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyuowEYiS/w20p1F6EewByuFtQSuUTFO/xgPnXYeDHSI7cyWsS9
-	1/WYRmTOVOwawXV2rK3UK4lm3Jhbkq2XWumWadwFni6hu6IUwcGUIKi/a5QK9QQAYWrXu7QKJZC
-	F45PHNveFEUXxPA==
-X-Received: from wrbfm1.prod.google.com ([2002:a05:6000:2801:b0:43f:df99:cb43])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2906:b0:43d:613:4036 with SMTP id ffacd0b85a97d-4493eb6d792mr3587302f8f.37.1777545452617;
- Thu, 30 Apr 2026 03:37:32 -0700 (PDT)
-Date: Thu, 30 Apr 2026 10:37:24 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tW6C+0X8"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32AF13311;
+	Thu, 30 Apr 2026 04:15:18 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37C233F763;
+	Thu, 30 Apr 2026 04:15:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1777547723; bh=BxOAhxaI3ep0pCLZHvFXFWhljUjYRpulIZeDdhTGMx0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tW6C+0X8vWRpU3tueo+qCaEfYKtSSWq3qISrRQm4ow8VE9Xc/V868i7jDfltdB2Wa
+	 W4LAqThuXJkL6IDVuGj4WbH6zdbCygpLtMzu87JLzao4jj2Vh3q+EO/fhzFl/y7ncK
+	 LYWyKsSrgT7UthhHo3POxnaq9EpFRZiy1RBSCdHs=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>,
+	Saket Dumbre <saket.dumbre@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Chengwen Feng <fengchengwen@huawei.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	=?UTF-8?q?Miko=C5=82aj=20Lenczewski?= <miko.lenczewski@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Yang Shi <yang@os.amperecomputing.com>,
+	Thomas Huth <thuth@redhat.com>,
+	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-acpi@vger.kernel.org,
+	acpica-devel@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [PATCH v1 01/12] KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+Date: Thu, 30 Apr 2026 12:14:05 +0100
+Message-ID: <20260430111424.3479613-3-leo.bras@arm.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260430111424.3479613-2-leo.bras@arm.com>
+References: <20260430111424.3479613-2-leo.bras@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430103724.2151625-1-smostafa@google.com>
-Subject: [PATCH] KVM: arm64: Harden clock for nvhe/pKVM
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, vdonnefort@google.com, tabba@google.com, 
-	Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Sashiko(locally) reports possiblity of division by zero and
-out-of-bounds bitwise shift in trace_clock_update().
+FEAT_HDBSS speeds up guest memory dirty tracking by avoiding a page fault
+and saving the entry in a tracking structure.
 
-Although the clock update is untrusted, we should at least have some
-basic checks to avoid the clock value getting out of sync if the host
-is buggy.
+That may be a problem when we have guest memory backed by hugepages or
+transparent huge pages, as it's not possible to do on-demand hugepage
+splitting, relying only on eager hugepage splitting.
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
+So, at stage2 initialization, enable eager hugepage splitting with
+chunk = PAGE_SIZE if the system supports HDBSS.
+
+Signed-off-by: Leonardo Bras <leo.bras@arm.com>
 ---
- arch/arm64/kvm/hyp/nvhe/clock.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/mmu.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
-index 32fc4313fe43..a7fc61976fd0 100644
---- a/arch/arm64/kvm/hyp/nvhe/clock.c
-+++ b/arch/arm64/kvm/hyp/nvhe/clock.c
-@@ -35,6 +35,9 @@ void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
- 	struct clock_data *clock = &trace_clock_data;
- 	u64 bank = clock->cur ^ 1;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index d089c107d9b7..42c734423253 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -993,22 +993,26 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
  
-+	if (!mult || shift >= 64)
-+		return;
+ 	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
+ 	if (!mmu->last_vcpu_ran) {
+ 		err = -ENOMEM;
+ 		goto out_destroy_pgtable;
+ 	}
+ 
+ 	for_each_possible_cpu(cpu)
+ 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+ 
+-	 /* The eager page splitting is disabled by default */
+-	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
++	 /* The eager page splitting is disabled by default if system has no HDBSS */
++	if (system_supports_hacdbs())
++		mmu->split_page_chunk_size = PAGE_SIZE;
++	else
++		mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
 +
- 	clock->data[bank].mult			= mult;
- 	clock->data[bank].shift			= shift;
- 	clock->data[bank].epoch_ns		= epoch_ns;
+ 	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+ 
+ 	mmu->pgd_phys = __pa(pgt->pgd);
+ 
+ 	if (kvm_is_nested_s2_mmu(kvm, mmu))
+ 		kvm_init_nested_s2_mmu(mmu);
+ 
+ 	return 0;
+ 
+ out_destroy_pgtable:
 -- 
-2.54.0.545.g6539524ca2-goog
+2.54.0
 
