@@ -1,201 +1,186 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BD82C08AB;
-	Thu, 30 Apr 2026 15:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345642E3B15;
+	Thu, 30 Apr 2026 15:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777562842; cv=none; b=Haov1/rmEpXYStiR6Lm57BgAsqwYNx/JhB7SG3sn11IYxiiln2FkFdR8b0VFSqPYFdPXR0cmsd9TdY/1WjDrOoszVYy6yYe3lDre4Issec0JF6MpKcGiS0T6Ay/kq6B+udE7+gCzRxq902pWRqN8r5+cuRmn++dMbLZggIkV/4o=
+	t=1777563361; cv=none; b=LkosrFUpHtrzqGQnOiV+7kw/8vTDNzebcXqb3srjZJDFsJKL0kuacDWS7UDLlkik5sDkbrISacv1jF0pEZ5rReKrp89YBv5bmWYXiJ5grHXV42n7pWODvyRnNPrFNuzWxH9BlBhrWYoIq2TkBtCttTu7MAH47c0LkXQa86nElRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777562842; c=relaxed/simple;
-	bh=sDKVchGAfuEsVFE4fFgHRNwDGkrnG+CSsjl8sISxZNo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uvdUIEo3wQEbWjSPQ320/plo/pQ/ewewWQL+puTfvLN+KHB/AR0aPoxhlbbzOpO3rmtHoHICV7E0lbeX6zS72yFw0LnUchrLd/99pf4B+4b73UjWddN9+i51zCrJJcrrn4V6lnYyMZ22HBIY05E8Bgmm0XoM33xz509bsCjcyEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VqMUURJ/; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+	s=arc-20240116; t=1777563361; c=relaxed/simple;
+	bh=gzTlnjHw8z8mwv/xrWX3uCr8DWsCDpEaX9cnmlYIzL4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=n0mUb5mZkIKUZv2kZ9uElRLGuZjz7HfNzCecwIOgdVOTKOXa3/mtOVkHTg4CHlFyrkv8DNSFsUYN3VTsXKeC8l1YJlB8PZAlu0cXhOVqmqofgBxLAvHxEG/ODApcxb27AI70pVdt6/USw7DMR+Rzt/5nFyvpCuYpYUGlHPHrnzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rxVLEs6U; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VqMUURJ/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lGigii9T1gEAttAYkjY0LCxvxQwQ0NizWdRhtvGGHf0=; b=VqMUURJ/3wIXTvDuQIQ4cEFE6c
-	Ax5uHTc8jSj8p2xqqeyjK5in2X07Z2+ApIRnHVug6Tdad3dfm6gCmeZzPB6HSUjKW7r3Kxf7xhvXq
-	YqHUK7r/JIWuEpHHiEcp8VDUrrSzyUbVLfBK9nPFAtWu0et6KSq6kkMEiGqZqwroROnCijz0vGXPY
-	oLiK1VidbETT1wnDezcclvQiqzAYN4kOYlxLEJJgEqoSn1N5lPTHnZGEQ0IPkh3arvUyQtKS/HwQc
-	ZZGn9u0RrdrqdyA/xbZLg6SRHK2vZXJYSv5aZe6yvuHBgZd7cAIYxV6DItpowLQtQtr8mDU5cxb4E
-	KIUu6s7w==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wITIF-00000007eQC-3sAc;
-	Thu, 30 Apr 2026 15:27:12 +0000
-Message-ID: <c004f333ed4f7dedae1383f22d43b009cd83837e.camel@infradead.org>
-Subject: Re: [RFC] proposal: KVM: Orphaned VMs: The Caretaker approach for
- Live Update
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Pasha Tatashin
-	 <pasha.tatashin@soleen.com>, linux-kernel@vger.kernel.org, 
-	kexec@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev
-Cc: rppt@kernel.org, graf@amazon.com, pratyush@kernel.org,
- seanjc@google.com,  maz@kernel.org, oupton@kernel.org,
- alex.williamson@redhat.com,  kevin.tian@intel.com, rientjes@google.com,
- Tycho.Andersen@amd.com,  anthony.yznaga@oracle.com,
- baolu.lu@linux.intel.com, david@kernel.org,  dmatlack@google.com,
- mheyne@amazon.de, jgowans@amazon.com, jgg@nvidia.com, 
- pankaj.gupta.linux@gmail.com, kpraveen.lkml@gmail.com, vipinsh@google.com, 
- vannapurve@google.com, corbet@lwn.net, loeser@linux.microsoft.com,
- tglx@kernel.org,  mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org,  hpa@zytor.com,
- roman.gushchin@linux.dev, akpm@linux-foundation.org, pjt@google.com
-Date: Thu, 30 Apr 2026 16:27:11 +0100
-In-Reply-To: <0a71472c-b397-4699-a518-61faffcf4ab2@redhat.com>
-References: <afEwWZksU0Fw61oT@plex>
-	 <0a71472c-b397-4699-a518-61faffcf4ab2@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Q5uU99FSerI7+XMdGTFU"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rxVLEs6U"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D4A332D1;
+	Thu, 30 Apr 2026 08:35:54 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 212283F763;
+	Thu, 30 Apr 2026 08:35:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1777563359; bh=gzTlnjHw8z8mwv/xrWX3uCr8DWsCDpEaX9cnmlYIzL4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rxVLEs6Uu9YtFHgDKWpqFThQucat2oz2BVkAKJuDquKK56IPfzpBNZYTsMFNEbVp1
+	 pemTxhelUalIb7Qi82U6Rxdc/+UMhQAMRDNwKfIkadkFtpiJHVDXyWH9iIQJcPlhY+
+	 k6wBIDO5CwXuT6qTDMLK+lOqFVOyJml4tIhzFcX0=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>,
+	Saket Dumbre <saket.dumbre@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Chengwen Feng <fengchengwen@huawei.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Yang Shi <yang@os.amperecomputing.com>,
+	Thomas Huth <thuth@redhat.com>,
+	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-acpi@vger.kernel.org,
+	acpica-devel@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v1 00/12] KVM Dirty-bit cleaning accelerator (HACDBS)
+Date: Thu, 30 Apr 2026 16:35:52 +0100
+Message-ID: <afN21w6J4Awg3gV3@devkitleo>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <86a4ukzel3.wl-maz@kernel.org>
+References: <20260430111424.3479613-2-leo.bras@arm.com> <86bjf0zj2p.wl-maz@kernel.org> <afNZQKIiKmHPD5My@devkitleo> <86a4ukzel3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
+On Thu, Apr 30, 2026 at 03:51:20PM +0100, Marc Zyngier wrote:
+> On Thu, 30 Apr 2026 14:29:37 +0100,
+> Leonardo Bras <leo.bras@arm.com> wrote:
+> > 
+> > On Thu, Apr 30, 2026 at 02:14:22PM +0100, Marc Zyngier wrote:
+> > > On Thu, 30 Apr 2026 12:14:04 +0100,
+> > > Leonardo Bras <leo.bras@arm.com> wrote:
+> > > 
+> > > > d - In __kvm_arch_dirty_log_clear() there is no way to predict how long
+> > > >     should be the buffer, so I used 1x PAGE_SIZE, and when it gets full
+> > > >     it's cleaned and reused. Should I let users configure that over a
+> > > >     parameter, or is it overthinking?
+> > > 
+> > > How long is a piece of string? We can't know that. A single page feels
+> > > very small in the 4kB case, and letting userspace define the size of
+> > > that buffer seems a likely requirement.
+> > > 
+> > 
+> > Ok, as a KVM parameter, or as a compile-time option?
+> 
+> Noticed the "userspace" word in there? It *has* to be controlled by
+> userspace one way or another. So not as a kernel parameter, and
+> *never* as a compile option.
 
---=-Q5uU99FSerI7+XMdGTFU
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Okay, I would suggest that a module parameter could be set by userspace, 
+but I remember now that it is usually built in the kernel instead. Also, it 
+could be bad having this set for the whole system, instead of per-VM.
 
-On Thu, 2026-04-30 at 15:28 +0200, Paolo Bonzini wrote:
-> I even wonder if, for long term simplicity, the interface for=20
-> host->caretaker should be just for the caretaker to swallow the host=20
-> into non-root mode, again as in Arm nVHE.=C2=A0
+How do you suggest letting userspace control that?
+(All I could think was using an ioctl / API of any sorts, which would 
+require changing the VMMs as well.)
 
-There's a lot of merit in that approach.
+> 
+> > > > Kernel v7.0.0 + this patchset builds properly, passing both kvm selftests
+> > > > for dirty-bit tracking[2], on HW HACDBS enabled or disabled.
+> > > 
+> > > I have absolutely no trust in these tests.
+> > > 
+> > > Have you enabled a VMM to make use of these APIs, and actively
+> > > migrated running guests? That's the level of testing I'd like to see,
+> > > as the selftests are not what people run in production...
+> > > 
+> > 
+> > There is no enablement needed on VMM side.
+> > Yes, I have created a VM on upstream qemu with --enable-kvm and migrated it 
+> > on the same host. (Inside a model)
+> > 
+> > That was the first test I used, but then I found out that kvm selftests 
+> > stress up multiple scenarios in an easier way.
+> 
+> Except when they don't. In my experience, the selftests are only there
+> to give the CI people the fuzzy feeling that they are doing something
+> useful.
 
-I talked about wanting to use this 'caretaker' for secret hiding.  But
-why have *voluntary* secret hiding with the kernel hiding things from
-its own address space, when you have have *mandatory* secret hiding
-with something running in EL2, like pKVM. Or the Nitro Isolation Engine
-which adds formal proof of correctness on top and is designed to allow
-for live update of both itself *and* the kernel it hosts.
+LOL
 
-Honestly, I don't see the *caretaker* being much of an ABI at all,
-except from one kernel to the next.
+> I have a collection of examples indicating that what these
+> things test is not representative of the bugs we have in KVM.
+> 
 
-The *userspace* ABI considerations are all about how you make a vCPU
-that runs asynchronously (should it conceptually just be an async
-KVM_RUN call, which allows the vCPU to run in a kernel thread up to the
-point of kexec? Why is it fundamentally tied to kexec at all?).
+Fair enough... it was tested in qemu live migration, and it works properly 
+(migrated from 2 instances of qemu in the same host, emulated by model).
 
-I'd love to start without kexec in the picture at all. Just show me the
-KVM API for starting a *confidential* guest (pKVM, SEV-SNP, whatever),
-leaving it running, completely stopping the VMM and then starting a new
-VMM to pick up from where it left off.
+> > Do you prefer me to test on any specific scenario, or does whatever qemu
+> > uses as a default parameter work well enough?
+> 
+> I want to hear about testing at a scale that make sense for production
+> VMs, including live migrating between hosts while under memory
+> pressure (swapping out).
 
-Sometimes the vCPUs might all actually still be running. Sometimes they
-might have hit an exit that couldn't be handled.
+I agree that's a more interesting test.
 
-Doing kexec while the VMM is "hands-off" is then the *next* challenge.
+> 
+> I'm also interested in efficiency: how much better is HACDBS compared
+> to the current page faulting? 
 
+The terms are indeed confusing, but HACDBS is just the cleaning accelerator 
+for dirty-bit. It means it will only affect how long it takes to transverse 
+the page table making pages in the array writable-dirty -> writable-clean.
 
---=-Q5uU99FSerI7+XMdGTFU
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+That being said, it regards to efficiency:
+Well, as I only have the model to test that, I am limmited to those 
+results, which may not reflect reality.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDQzMDE1Mjcx
-MVowLwYJKoZIhvcNAQkEMSIEIAMMTSjDF/YzzlyOr9Cyrq9oj6P33gpYBUz/VXg3563QMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAbGTbtqlU6xYn
-aFU636O7DYd3LvVQ1+UlvFALEQlNg6mKhBXLJwJAq6l8J7LaGBECX2fjcNmna2zeAIHgb9cLz6qx
-+FCt2z/9Pn/zRWC2Ht2k3yePATUD78CYdYT6nORgUzB4Pi5ruFxZXHalnxd+tpROiYbQr5X31GZz
-U+0dHVzdD+HHrC/uxpjQSrI6bfln/Yy3aBfnEyPbbvoVmMJZiGNZzkUmSD3CRx4putCEb7iWsUTc
-wWG+6y7JyyOdUCgAqrtAXuLWIHs0XD2r4RcBHXtQf702JqSDauN+K26THZuga2JMaMuXeU5jjnov
-pyDwQqiCTvUmOpwpT9DMi8+8yAMV3cv1o0VdCMcYMYjewlRInOQhqi1fcLrmCv0dYg2WPvEVdqmT
-E5PIv1XntrVPggPUts3b48K19FUxl+Bma054jEONnSFbHYceZvaFcwk5y5DD9dn1fb/LkizTg/Zb
-j4IPK+gS2uBDJUzn0WRXdxgByQoe2wUVxroejaebPp5RQTTe0K2sEVY2wtU7imcBsvkXEuFotWyf
-LTbvdnzMoytH3KPyzd3x7uWfYbOZYoh3Potm5bLy4IaUp5WTLdBsnLZLVplWW6qh6l9UZlGVpb61
-MthSK1532OEOEWHxFcWGGgASKVKcyJrUNcfzJe1zYWTFcv305E7x9RCjYC4pHDwAAAAAAAA=
+As an example, on dirty_log_perf_test, the cleaning process took much 
+longer (8x) compared to software cleaning, even when faced with no error, 
+and entries that fit the array (4k page above). If it took that long even 
+in this ideal scenario, it means the HACDBS mechanism implemented in the 
+model takes much longer than software, which is counter-intuitive.
 
+> Just having patches for a feature is not
+> enough to decide adoption of that feature. Show me the benefits in a
+> quantitative way (within the limits of the model, of course).
 
---=-Q5uU99FSerI7+XMdGTFU--
+Sure, I will try measuring migration between 2 instances of the model, and 
+see how qemu live migration time is affected, then post the results in this 
+thread for us to compare.
+
+Thanks!
+Leo
+
