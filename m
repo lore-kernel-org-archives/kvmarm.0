@@ -1,112 +1,394 @@
-Received: from out199-12.us.a.mail.aliyun.com (out199-12.us.a.mail.aliyun.com [47.90.199.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BA3230264
-	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 02:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7243FE37B;
+	Thu, 30 Apr 2026 08:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777515747; cv=none; b=cK3Ojos7IaXzgmFQW8JFhhTvSKqpIjin6SVZPdLAcrQQVoMSBECgV21AkIsvOiEuAZwAQyAfr4U1rmXEEwHjR1a/SPGhYXl0TICPJjH2lpl5OQjDju7gl2DYQL4EAY0jNSImfSejkTEZncbo9fEjo56LbuHblb7Ivu8xyLnBGS8=
+	t=1777538781; cv=none; b=jqfUkWn2DPxpvxx2SOjFKKc+IhuB9VrL3I7iRP6RmO1LyxGFhHKM4A0HbIqrCPk1sqSzUdR+rkQ2ASr8r9zBMNGvHknPbgTENKSrqZhXZd0JDJ8moJPRRlmUM14YWZWAYNTuzBi6hLCJKfxI5tQwgViKoQK7FwWbVt70VYtPcu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777515747; c=relaxed/simple;
-	bh=kskXGl60052vWFg2uJaxvo0jP+mKoelIHMmuGjmHezA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=prJFC98gv88Abu7RYjsXr7ybISYUi+Z9exmSKZIBgNR3S4Ja/8YhBHqJYYvngFJCg1CDvwU5GQ94ZwMPJGUVLiNCQ3oxknAvR054u+r6bVpDrB1vnaxcwn+kFKedctofHuho+VtPUpyTVGwnBwSSbfuTloFcwXCGiKpNYqZlBIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lJ7cmyo1; arc=none smtp.client-ip=47.90.199.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1777538781; c=relaxed/simple;
+	bh=Hi80MVPwek2SD7+HknMpXPXec3jfYu6RuSg2vyl+NiQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ehQwD6Kz9psp277/NvNbbkaKcsla3bzN3UOca8dGjFDsvwaUe5seq3F/ervWdEllYWElbDhZzUM4JKf0bQ30UcxT03bKd9rWmh1hi3mwrfgfDIctVTre15PnskHBRwv86ZZdLTbYyeD/Dc4E7N5yBAslEGDM5EBdk6E1KzkEqAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXVQHuop; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lJ7cmyo1"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1777515728; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=H46ycR2cIdd55PmtPaTFZw2OcVc3hi3Ihdl6EegFnqI=;
-	b=lJ7cmyo1tUN1B8eGVCIvY1nnLRNPxZMKHVZiM4AE38UAZxzxsyRWn92/OeuMd77bK3YEOZwkWA2HJSUH+DAc4mee6C6OqaiaWHbG7uuKGUC/PVw1r3PZH3D8Z83pX43dXQdDvs1GFglTxU3GsrgVDyLYeDWbGVNUwgdcEEh42Jw=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R431e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X1za2vT_1777515727;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X1za2vT_1777515727 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 30 Apr 2026 10:22:08 +0800
-Date: Thu, 30 Apr 2026 10:22:07 +0800
-From: Yao Yuan <yaoyuan@linux.alibaba.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, vdonnefort@google.com, 
-	catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
- context-synchronization events
-Message-ID: <ygj3ik6y6kqggfnoyz72klhk3ttv72qv2ob4qferjdo7wvtxc7@zvhup2sqtc2p>
-References: <20260428103008.696141-1-tabba@google.com>
- <20260428103008.696141-2-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXVQHuop"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65022C2BCB3;
+	Thu, 30 Apr 2026 08:46:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777538780;
+	bh=Hi80MVPwek2SD7+HknMpXPXec3jfYu6RuSg2vyl+NiQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XXVQHuop4BJEFD8mQkNQOSpToGwhFRtscxB/04LjHh17C4qgVNUf0S6YHCKx4pmz6
+	 yIsiRk92t9GV+f5D4oH7ccsDjsllPWpt++1TKEKBzTiQ6tSsiMrDoRCafQ0TA+4Qr1
+	 X8gewKnYAo8srQP7UEw3og9kaNFekIMXgdT43IlZnDxEQPcPiRTekQojqfYhlmUneC
+	 HmjUDwwL+8PtfNt+YwLB4TZ8+Anl25mihSMDsdrNhxw+HXignd3gutoBYiWfD5pm6o
+	 QLfI7rQZ0I7SDxvlBpGgrRjzpsbHE/hoWQo/zX03dbdCUteC2E5BnnBaY3RMTeUJ9d
+	 j/PdlfVasQlIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wIN2H-0000000GBY6-3b3w;
+	Thu, 30 Apr 2026 08:46:18 +0000
+Date: Thu, 30 Apr 2026 09:46:17 +0100
+Message-ID: <86ik98zvhi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 10/43] KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
+In-Reply-To: <20260427160547.3129448-11-sascha.bischoff@arm.com>
+References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
+	<20260427160547.3129448-11-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428103008.696141-2-tabba@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Apr 28, 2026 at 11:30:01AM +0800, Fuad Tabba wrote:
-> SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
-> exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
-> 0487 M.b, EIS is governed by D1.4.2 rule RBBSRF (p. D1-7205) and EOS
-> by D1.4.4.1 rule RBWCFK (p. D1-7209). D24.2.175 (p. D24-9754):
->
->   - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
->     a CSE.
->   - FEAT_ExS: the reset value is architecturally UNKNOWN; software
->     must set the bit to make the entry/exit a CSE.
->
-> INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
-> bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
-> synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
-> MSRs to context-switching system registers (HCR_EL2, HFGxTR_EL2,
-> HCRX_EL2, ZCR_EL2, CPACR_EL1, CPTR_EL2, SCTLR_EL1, ptrauth keys,
-> etc.); examples include the activate-traps path,
-> ptrauth_switch_to_guest, and the FPSIMD trap re-enable in
-> kvm_hyp_handle_fpsimd. On FEAT_ExS hardware those reliances are not
-> architecturally backed unless EOS=1 (and, for entry, EIS=1), and
-> whether they hold today depends on firmware initialisation outside
-> the kernel's control.
->
-> Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
-> INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
-> unconditionally CSEs regardless of whether FEAT_ExS is implemented.
-> This matches the pairing in arch/arm64/kvm/config.c which treats EIS
-> and EOS together as RES1 under !FEAT_ExS.
->
-> INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
-> very early EL2 init and the EL2 MMU-off transition, neither of which
-> relies on these bits in the same way.
->
-> Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON")
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+On Mon, 27 Apr 2026 17:09:27 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> Introduce interfaces to make VPEs valid, and to configure them, via
+> the host's IRS. As with the other valid bits in the GICv5 VM tables,
+> VPEs cannot be made valid directly, and instead are made valid via an
+> IRS MMIO Op.
+> 
+> Additionally, some of the VPE configuration takes place via the IRS
+> MMIO interface too (via the IRS_VPE_CR0, IRS_VPE_DBR). VPE doorbells
+> are, for example, configured via this interface.
+> 
+> The existing VPE-doorbell-based commands are extended with:
+> 
+>         VPE_MAKE_VALID - Make the VPE valid in the VPET
+>         VPE_CR0_READ - Handle a guest read from IRS_PE_CR0
+>         VPE_CR0_WRITE - Handle a guest write to IRS_PE_CR0
+> 
+> Note: There is no VPE_MAKE_INVALID as VPEs are only made invalid on
+> teardown, at which point the whole VMTE is marked as invalid. Hence,
+> it is not required.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/include/asm/sysreg.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 736561480f36..7aa08d59d494 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -844,7 +844,7 @@
->  #define INIT_SCTLR_EL2_MMU_ON						\
->  	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
->  	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
+>  arch/arm64/kvm/vgic/vgic-v5.c      | 164 +++++++++++++++++++++++++++++
+>  include/linux/irqchip/arm-gic-v5.h |  27 +++++
+>  2 files changed, 191 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 49eb01ca07961..0649729f6b834 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -253,6 +253,25 @@ static int vgic_v5_irs_wait_for_vm_op(void)
+>  	return 0;
+>  }
+>  
+> +/* Wait for completion of an VPE_STATUSR change */
+> +static int vgic_v5_irs_wait_for_vpe_op(void)
+> +{
+> +	int ret;
+> +	u32 statusr;
+> +
+> +	ret = readl_relaxed_poll_timeout_atomic(
+> +		irs_base + GICV5_IRS_VPE_STATUSR, statusr,
+> +		FIELD_GET(GICV5_IRS_VPE_STATUSR_IDLE, statusr), 1,
+> +		USEC_PER_SEC);
 
-Hi Fuad,
+Formatting.
 
-> -	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
-> +	 SCTLR_ELx_ITFSB | SCTLR_ELx_EIS | SCTLR_ELx_EOS | SCTLR_EL2_RES1)
+> +
+> +	if (ret == -ETIMEDOUT) {
+> +		pr_err_ratelimited("Time out waiting for IRS VPE Op\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
 
-LGTM.
+You seem to have a number of these primitives. Consider having a
+generic helper that takes the required parameters, including a partial
+string in case of error.
 
-Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> +}
+> +
+>  static int vgic_v5_irs_assign_vmt(bool two_level, u8 vm_id_bits, phys_addr_t vmt_base)
+>  {
+>  	u64 vmt_baser;
+> @@ -369,10 +388,142 @@ static int vgic_v5_irs_set_vist_invalid(int vm_id, bool spi_ist)
+>  	return __vgic_v5_irs_update_vist_validity(vm_id, spi_ist, true);
+>  }
+>  
+> +static int vgic_v5_irs_set_up_vpe(int vm_id, int vpe_id, irq_hw_number_t db_hwirq)
+> +{
+> +	u64 vmap_vper, dbr, selr;
+> +	u32 statusr, cr0;
+> +	int ret;
+> +
+> +	guard(raw_spinlock)(&vm_config_lock);
+> +
+> +	/* Make sure that we are idle to begin with */
+> +	ret = vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Mark the VPE as valid */
+> +	vmap_vper = FIELD_PREP(GICV5_IRS_VMAP_VPER_VPE_ID, vpe_id) |
+> +		    FIELD_PREP(GICV5_IRS_VMAP_VPER_VM_ID, vm_id) |
+> +		    FIELD_PREP(GICV5_IRS_VMAP_VPER_M, true);
 
->
->  #define INIT_SCTLR_EL2_MMU_OFF \
->  	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
-> --
-> 2.54.0.545.g6539524ca2-goog
->
+That's another of these single bit mask used with FIELD_PREP. Consider
+rewriting it as:
+
+	vmap_vper = FIELD_PREP(GICV5_IRS_VMAP_VPER_VPE_ID, vpe_id) |
+		    FIELD_PREP(GICV5_IRS_VMAP_VPER_VM_ID, vm_id) |
+		    GICV5_IRS_VMAP_VPER_M;
+
+
+> +	irs_writeq_relaxed(vmap_vper, GICV5_IRS_VMAP_VPER);
+> +
+> +	/* Wait for the VPE to be marked valid in the VPET */
+> +	ret = vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	selr = FIELD_PREP(GICV5_IRS_VPE_SELR_VPE_ID, vpe_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_VM_ID, vm_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_S, true);
+> +	irs_writeq_relaxed(selr, GICV5_IRS_VPE_SELR);
+> +
+> +	ret = vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	statusr = irs_readl_relaxed(GICV5_IRS_VPE_STATUSR);
+> +	if (!FIELD_GET(GICV5_IRS_VPE_STATUSR_V, statusr))
+> +		return -EINVAL;
+> +
+> +	/* Set targeted only routing (disable 1ofN vPE selection) */
+> +	cr0 = FIELD_PREP(GICV5_IRS_VPE_CR0_DPS, true);
+> +	irs_writel_relaxed(cr0, GICV5_IRS_VPE_CR0);
+> +
+> +	ret = vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	statusr = irs_readl_relaxed(GICV5_IRS_VPE_STATUSR);
+> +	if (FIELD_GET(GICV5_IRS_VPE_STATUSR_F, statusr))
+> +		ret = -EINVAL;
+> +
+> +	/*
+> +	 * The VPE has not yet run. Therefore, make sure that all interrupts
+> +	 * will generate a doorbell.
+> +	 */
+> +	dbr = FIELD_PREP(GICV5_IRS_VPE_DBR_LPI_ID, db_hwirq) |
+> +	      FIELD_PREP(GICV5_IRS_VPE_DBR_DBPM, 0b11111) |
+> +	      FIELD_PREP(GICV5_IRS_VPE_DBR_REQ_DB, false) |
+
+And anything that set to false can be removed altogether.
+
+> +	      FIELD_PREP(GICV5_IRS_VPE_DBR_DBV, true);
+> +	irs_writeq_relaxed(dbr, GICV5_IRS_VPE_DBR);
+> +
+> +	ret = vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	statusr = irs_readl_relaxed(GICV5_IRS_VPE_STATUSR);
+> +	if (FIELD_GET(GICV5_IRS_VPE_STATUSR_F, statusr))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static int vgic_v5_irs_vpe_cr0_read(int vm_id, int vpe_id, u64 *cr0)
+> +{
+> +	u32 statusr;
+> +	u64 selr;
+> +	int ret;
+> +
+> +	guard(raw_spinlock)(&vm_config_lock);
+> +
+> +	selr = FIELD_PREP(GICV5_IRS_VPE_SELR_VPE_ID, vpe_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_VM_ID, vm_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_S, true);
+> +	irs_writeq_relaxed(selr, GICV5_IRS_VPE_SELR);
+> +
+> +	ret = vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	statusr = irs_readl_relaxed(GICV5_IRS_VPE_STATUSR);
+> +	if (!FIELD_GET(GICV5_IRS_VPE_STATUSR_V, statusr))
+> +		return -EINVAL;
+> +
+> +	*cr0 = irs_readl_relaxed(GICV5_IRS_VPE_CR0);
+> +
+> +	return 0;
+
+I'd rather this function returned the CR0 value directly, even if the
+IDLE bit isn't set. You can have a WARN_ONCE() if you want.
+
+> +}
+> +
+> +static int vgic_v5_irs_vpe_cr0_update(int vm_id, int vpe_id, u32 cr0)
+
+*_write() would be better than *_update() when you already have
+*_read(). Specially as a consequence of VPE_CR0_WRITE.
+
+> +{
+> +	u32 statusr;
+> +	u64 selr;
+> +	int ret;
+> +
+> +	guard(raw_spinlock)(&vm_config_lock);
+> +
+> +	selr = FIELD_PREP(GICV5_IRS_VPE_SELR_VPE_ID, vpe_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_VM_ID, vm_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_S, true);
+> +	irs_writeq_relaxed(selr, GICV5_IRS_VPE_SELR);
+> +
+> +	ret = vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	statusr = irs_readl_relaxed(GICV5_IRS_VPE_STATUSR);
+> +	if (!FIELD_GET(GICV5_IRS_VPE_STATUSR_V, statusr))
+> +		return ret;
+
+return 0?  But you have set SELR to something. Surely reading V==0
+here is an indication of a bug. So should you report the error? Warn?
+
+> +
+> +	irs_writel_relaxed(cr0, GICV5_IRS_VPE_CR0);
+> +
+> +	ret = vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	statusr = irs_readl_relaxed(GICV5_IRS_VPE_STATUSR);
+> +	if (FIELD_GET(GICV5_IRS_VPE_STATUSR_F, statusr))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>  static int vgic_v5_db_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
+>  {
+>  	struct vgic_v5_vm *vm = data->domain->host_data;
+>  	struct gicv5_cmd_info *cmd_info = vcpu_info;
+> +	/* Our VPE ID is the index within the doorbell domain */
+> +	u16 vpe_id = data->hwirq;
+>  
+>  	switch (cmd_info->cmd_type) {
+>  	case VMT_L2_MAP:
+> @@ -381,6 +532,19 @@ static int vgic_v5_db_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
+>  		return vgic_v5_irs_set_vm_valid(vm->vm_id);
+>  	case VMTE_MAKE_INVALID:
+>  		return vgic_v5_irs_set_vm_invalid(vm->vm_id);
+> +	case VPE_MAKE_VALID:
+> +		/*
+> +		 * We need the actual LPI ID which lives in the top-most parent
+> +		 * domain. This hwirq won't include the type (LPI) but that's
+> +		 * not required for the IRS_VPE_DBR.
+> +		 */
+> +		while (data->parent_data != NULL)
+> +			data = data->parent_data;
+> +		return vgic_v5_irs_set_up_vpe(vm->vm_id, vpe_id, data->hwirq);
+> +	case VPE_CR0_READ:
+> +		return vgic_v5_irs_vpe_cr0_read(vm->vm_id, vpe_id, &cmd_info->data);
+> +	case VPE_CR0_WRITE:
+> +		return vgic_v5_irs_vpe_cr0_update(vm->vm_id, vpe_id, cmd_info->data);
+>  	case SPI_VIST_MAKE_VALID:
+>  		return vgic_v5_irs_set_vist_valid(vm->vm_id, true);
+>  	case LPI_VIST_MAKE_VALID:
+> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
+> index ff5ad653252d2..54b573783cd75 100644
+> --- a/include/linux/irqchip/arm-gic-v5.h
+> +++ b/include/linux/irqchip/arm-gic-v5.h
+> @@ -90,9 +90,14 @@
+>  #define GICV5_IRS_VMT_BASER		0x0200
+>  #define GICV5_IRS_VMT_CFGR		0x0210
+>  #define GICV5_IRS_VMT_STATUSR		0x0214
+> +#define GICV5_IRS_VPE_SELR		0x0240
+> +#define GICV5_IRS_VPE_DBR		0x0248
+> +#define GICV5_IRS_VPE_CR0		0x0258
+> +#define GICV5_IRS_VPE_STATUSR		0x025c
+>  #define GICV5_IRS_VMAP_L2_VMTR		0x02c0
+>  #define GICV5_IRS_VMAP_VMR		0x02c8
+>  #define GICV5_IRS_VMAP_VISTR		0x02d0
+> +#define GICV5_IRS_VMAP_VPER		0x02e0
+>  
+>  #define GICV5_IRS_IDR0_VIRT		BIT(6)
+>  
+> @@ -199,6 +204,21 @@
+>  
+>  #define GICV5_IRS_VMT_STATUSR_IDLE	BIT(0)
+>  
+> +#define GICV5_IRS_VPE_SELR_S		BIT_ULL(63)
+> +#define GICV5_IRS_VPE_SELR_VPE_ID	GENMASK_ULL(47, 32)
+> +#define GICV5_IRS_VPE_SELR_VM_ID	GENMASK_ULL(15, 0)
+> +
+> +#define GICV5_IRS_VPE_DBR_DBV		BIT_ULL(63)
+> +#define GICV5_IRS_VPE_DBR_REQ_DB	BIT_ULL(62)
+> +#define GICV5_IRS_VPE_DBR_DBPM		GENMASK_ULL(36, 32)
+> +#define GICV5_IRS_VPE_DBR_LPI_ID	GENMASK_ULL(23, 0)
+> +
+> +#define GICV5_IRS_VPE_CR0_DPS		BIT(0)
+> +
+> +#define GICV5_IRS_VPE_STATUSR_F		BIT(2)
+> +#define GICV5_IRS_VPE_STATUSR_V		BIT(1)
+> +#define GICV5_IRS_VPE_STATUSR_IDLE	BIT(0)
+> +
+>  #define GICV5_IRS_VMAP_L2_VMTR_M	BIT_ULL(63)
+>  #define GICV5_IRS_VMAP_L2_VMTR_VM_ID	GENMASK_ULL(15, 0)
+>  
+> @@ -211,6 +231,10 @@
+>  #define GICV5_IRS_VMAP_VISTR_VM_ID	GENMASK_ULL(47, 32)
+>  #define GICV5_IRS_VMAP_VISTR_TYPE	GENMASK_ULL(31, 29)
+>  
+> +#define GICV5_IRS_VMAP_VPER_M		BIT_ULL(63)
+> +#define GICV5_IRS_VMAP_VPER_VM_ID	GENMASK_ULL(47, 32)
+> +#define GICV5_IRS_VMAP_VPER_VPE_ID	GENMASK_ULL(15, 0)
+> +
+>  #define GICV5_ISTL1E_VALID		BIT_ULL(0)
+>  #define GICV5_IRS_ISTL1E_SIZE		8UL
+>  
+> @@ -480,6 +504,9 @@ enum gicv5_vcpu_info_cmd_type {
+>  	VMT_L2_MAP,		/* Map in a L2 VMT - *may* happen on VM init */
+>  	VMTE_MAKE_VALID,	/* Make the VMTE valid */
+>  	VMTE_MAKE_INVALID,	/* Make the VMTE (et al.) invalid */
+> +	VPE_MAKE_VALID,		/* No corresponding invalid */
+> +	VPE_CR0_READ,		/* Read of VPE_CR0 (guest read from PE_CR0) */
+> +	VPE_CR0_WRITE,		/* Write to VPE_CR0 (guest write to PE_CR0) */
+>  	SPI_VIST_MAKE_VALID,	/* No corresponding invalid */
+>  	LPI_VIST_MAKE_VALID,	/* Triggered by a guest */
+>  	LPI_VIST_MAKE_INVALID,	/* Triggered by a guest */
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
