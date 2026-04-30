@@ -1,123 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A462406264
-	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 12:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37164218B2;
+	Thu, 30 Apr 2026 13:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777552671; cv=none; b=inPg/EHd2Tth8eEy/TxXVnapbH01vHeWzkgjGcEYw+EvYk95qblvZdVFi8buhBn+EChics2qbZTAtRjMSkIla8VvtooT3k3jx2KI0wXud0601tYkY2mBRQxnbpCoShKkGSbF83MqnJKFQkXvq36xyeHhLY8kwGPISVpyDx9JNyU=
+	t=1777554865; cv=none; b=Fl9eICEMmncYC6AYTCqUjTrzjKRbpuSm0NqdD5dLlXfm8FiFz2+FUrvIkkaqxdc/oGS1VDvIba4YUw/b1VDu0li69XHE4zYW+sv1QzOO/LP1lAq4rNJ03U6xNVSySOpQWM5tnBBvss0/ulw4vt91buJqbFLvbIM4DLu5cCOISV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777552671; c=relaxed/simple;
-	bh=7HPUcR8285oASPEPdQ3uCkZCcDoT78pU2f7CPixIm4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hwlYxIWgcTmKxZRvgBHxo+IIwYm9z2kBy07FAiqG8ixNb1P61PmNzQ7jCXwzMDEeot7Gt71PJ0KiQ62LaGuHrd9RKW9qgf2bqhi8/ZyC3gJpt5qMUBS1gZz9+apowZDsf+l8cUssPl2jdBQZ7cBBtsoJluWhcSpepCTZNwpM8pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ezRKIkMg; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1777554865; c=relaxed/simple;
+	bh=jifMlssP5+ngMhDOU+yedkwt8RjFB3XDKVz2cX4Z3Zs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KRMo+5rLGtlf4DOeL+tbGzvmLEnG3WWa7MgB+kShwYi1n09ZE/0bFMVXDZs3GfQrEcSHt82RR0qOg8yTe1oYxwJxQltqzXpljciPXXomcWxWJ0eBVoX7xF5ghwvEpU534BgH5qQdION6kNhGimWY34JXvYfvmbADhGYmfdI6tRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e0dgqLJE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ezRKIkMg"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F08B19F6;
-	Thu, 30 Apr 2026 05:37:44 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 464D43F7B4;
-	Thu, 30 Apr 2026 05:37:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777552669; bh=7HPUcR8285oASPEPdQ3uCkZCcDoT78pU2f7CPixIm4U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ezRKIkMgNpnf2rFG7bNWqgnB1U/ESgHDMInNeRwgf/Q0UB9pO0E+arQrNfdeVH0aC
-	 O0joOZ+gJtN1+m3MfJ9h8WF4Y8ODT04kdMcjG5A2aUcxKXVGZAhggg8LpQ6iEJDCY1
-	 wUI+AuCSaPhxbAdaub9eNaVRjmyez7/rxAxlzYnw=
-Date: Thu, 30 Apr 2026 13:37:42 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: Will Deacon <will@kernel.org>, maz@kernel.org, oliver.upton@linux.dev,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	qperret@google.com, vdonnefort@google.com, catalin.marinas@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
- context-synchronization events
-Message-ID: <afNNFtoZJk2IXwwU@J2N7QTR9R3>
-References: <20260428103008.696141-1-tabba@google.com>
- <20260428103008.696141-2-tabba@google.com>
- <afMb7uuPlUbLeu7k@willie-the-truck>
- <CA+EHjTw6rx5rCVnR7Dfva3xmmgGjqUeUaT=3zDCEsN0J909Wsg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e0dgqLJE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62606C2BCB3;
+	Thu, 30 Apr 2026 13:14:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777554865;
+	bh=jifMlssP5+ngMhDOU+yedkwt8RjFB3XDKVz2cX4Z3Zs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e0dgqLJEoMIzEHXFT4HqgpikyLxKMo8p8ZkYg8z2UAQSKn3ZH26iYJTczd6WOtzoD
+	 8WEkDCs9E33Y/ZJPKxJBzpdqm8eRWTj5JcB1CBFolQ32laxj/XOuFT7FCF8dNGbWpc
+	 z29CGKcR/P/Kmwq7fikgU8Bvz9jT6Z/JUnK2aF5onaRpVAAVJskSXFOSzYgfFTvRGM
+	 Lg1G3Y4jHvfgxYgtRhtFsvJht0gKKJQ4TluwLTxmpzKzIQHnfvrykZYujvZrkIBgH7
+	 NxxOFdSArj/Heni4c9evI+AJ1q+RzR+5HyD/0D6vMSeEKQyDZaD/wvPAw4BSN+6vOq
+	 cKs0F7d9Yz9zQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wIRDj-0000000GHED-09B6;
+	Thu, 30 Apr 2026 13:14:23 +0000
+Date: Thu, 30 Apr 2026 14:14:22 +0100
+Message-ID: <86bjf0zj2p.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,	Will Deacon
+ <will@kernel.org>,	Oliver Upton <oupton@kernel.org>,	Joey Gouly
+ <joey.gouly@arm.com>,	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
+ <yuzenghui@huawei.com>,	"Rafael J. Wysocki" <rafael@kernel.org>,	Len Brown
+ <lenb@kernel.org>,	Saket Dumbre <saket.dumbre@intel.com>,	Paolo Bonzini
+ <pbonzini@redhat.com>,	Chengwen Feng <fengchengwen@huawei.com>,	Jonathan
+ Cameron <jic23@kernel.org>,	Kees Cook <kees@kernel.org>,	=?UTF-8?B?TWlr?=
+ =?UTF-8?B?b8WCYWo=?= Lenczewski <miko.lenczewski@arm.com>,	Ryan Roberts
+ <ryan.roberts@arm.com>,	Yang Shi <yang@os.amperecomputing.com>,	Thomas Huth
+ <thuth@redhat.com>,	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,	Mark Brown <broonie@kernel.org>,	Kevin
+ Brodsky <kevin.brodsky@arm.com>,	James Clark <james.clark@linaro.org>,	Ard
+ Biesheuvel <ardb@kernel.org>,	Fuad Tabba <tabba@google.com>,	Raghavendra
+ Rao Ananta <rananta@google.com>,	Nathan Chancellor <nathan@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,	Lorenzo Pieralisi
+ <lpieralisi@kernel.org>,	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,	Tian Zheng
+ <zhengtian10@huawei.com>,	Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-kernel@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,	linux-acpi@vger.kernel.org,
+	acpica-devel@lists.linux.dev,	kvm@vger.kernel.org
+Subject: Re: [PATCH v1 00/12] KVM Dirty-bit cleaning accelerator (HACDBS)
+In-Reply-To: <20260430111424.3479613-2-leo.bras@arm.com>
+References: <20260430111424.3479613-2-leo.bras@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+EHjTw6rx5rCVnR7Dfva3xmmgGjqUeUaT=3zDCEsN0J909Wsg@mail.gmail.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: leo.bras@arm.com, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rafael@kernel.org, lenb@kernel.org, saket.dumbre@intel.com, pbonzini@redhat.com, fengchengwen@huawei.com, jic23@kernel.org, kees@kernel.org, miko.lenczewski@arm.com, ryan.roberts@arm.com, yang@os.amperecomputing.com, thuth@redhat.com, mrigendra.chaubey@gmail.com, yeoreum.yun@arm.com, broonie@kernel.org, kevin.brodsky@arm.com, james.clark@linaro.org, ardb@kernel.org, tabba@google.com, rananta@google.com, nathan@kernel.org, vdonnefort@google.com, lpieralisi@kernel.org, Sascha.Bischoff@arm.com, anshuman.khandual@arm.com, zhengtian10@huawei.com, weilin.chang@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org, acpica-devel@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Apr 30, 2026 at 01:18:48PM +0100, Fuad Tabba wrote:
-> On Thu, 30 Apr 2026 at 10:08, Will Deacon <will@kernel.org> wrote:
-> > On Tue, Apr 28, 2026 at 11:30:01AM +0100, Fuad Tabba wrote:
-> > > Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON")
-> >
-> > I don't think this Fixes: tag is accurate:
-> >
-> > 1. That commit doesn't do anything with EIS/EOS afaict.
-> > 2. Back in 5.12 (when that thing landed), SCTLR_EL2_RES1 did actually
-> >    include EIS and EOS
-> >
-> > so I think the issue here might be that the auto-generated sysreg file
-> > quietly changes the RES1 definitions as bits get allocated, but the
-> > macros using the RES1 definition don't get updated. That's a pretty
-> > horrible pit that it feels like we might keep falling into :/
+On Thu, 30 Apr 2026 12:14:04 +0100,
+Leonardo Bras <leo.bras@arm.com> wrote:
 
-I think that's a review failure, and people need to be careful when
-updating the sysreg file (e.g. looking at whether any new bits were
-previously RESx, and considering the impact). Regardless of tooling, we
-need people to conciosuly review that.
+[...]
 
-> > Looking at 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg
-> > infrastructure"), I think we ended up dropping a whole bunch of fields
-> > from the RES1 mask (which became 0!). Have you checked all of those?
+I haven't had a chance to look at any of this yet, but just on these
+points:
 
-> On the wider question of the other bits dropped from the old mask,
-> I went through them against DDI 0487 M.b §D24.2.175. The summary
-> (SCTLR_EL2 with E2H=0):
+> b - checkpatch.pl keeps bothering me to add an entry in MAINTAINERS file,
+>     and I like the idea of maintaining this. Is there any rule or
+>     common sense on this? Should I add this entry, or should I leave it
+>     in the arch/arm64/kvm/ general rule?
+
+No specific entry in MAINTAINERS required (or wanted). This falls into
+the normal KVM/arm64 maintenance. And don't worry, we know where to
+find you when it will come to fixing this stuff.
+
+> c - There are some trace_prink() I have left in the code, as they could
+>     be helpful to check when HACDBS is not performing as well as it
+>     should. Should I introduce a tracepoint instead? or just ignore it?
+>     (it's triggered on HACDBS error, but as it falls back to software in
+>     that case, it should not impact correctness, only performance).
+
+Debug infrastructure should be preferably *removed* altogether.
+trace_printk() is definitely a big no-no.
+
+> d - In __kvm_arch_dirty_log_clear() there is no way to predict how long
+>     should be the buffer, so I used 1x PAGE_SIZE, and when it gets full
+>     it's cleaned and reused. Should I let users configure that over a
+>     parameter, or is it overthinking?
+
+How long is a piece of string? We can't know that. A single page feels
+very small in the 4kB case, and letting userspace define the size of
+that buffer seems a likely requirement.
+
 > 
->   bit  field    E2H=0 status                  kernel cares?
->   -------------------------------------------------------------
->    4   SA0      RES1 unconditionally          no
->    5   CP15BEN  RES1 unconditionally          no
->   11   EOS      RES1 iff !FEAT_ExS, else RW   yes (this fix)
->   16   nTWI     RES1 unconditionally          no
->   18   nTWE     RES1 unconditionally          no
->   22   EIS      RES1 iff !FEAT_ExS, else RW   yes (this fix)
->   23   SPAN     RES1 unconditionally          no
->   28   nTLSMD   RES1 unconditionally          no
->   29   LSMAOE   RES1 unconditionally          no
-> 
-> The seven non-EIS/EOS bits all fall under the "Otherwise: Reserved,
-> RES1" clause for the E2H=0 layout, with no feature guard. Writing 0
-> to them is a no-op, so dropping them from the mask should be harmless
-> I think. EIS and EOS are the only positions where the bit
-> becomes RW (with UNKNOWN reset) on FEAT_ExS hardware and the
-> kernel actively relies on the value being 1, which is what this
-> patch addresses.
-> 
-> I agree the auto-generator silently zeroing previously hand-rolled
-> RES1 masks is a real problem. Happy to look at either teaching the
-> sysreg infrastructure to express conditional RES1 (so config.c's
-> AS_RES1/FEAT_X facts can flow back into the header masks), 
+> Kernel v7.0.0 + this patchset builds properly, passing both kvm selftests
+> for dirty-bit tracking[2], on HW HACDBS enabled or disabled.
 
-Please don't add that to the syreg code; that's deliberately *only* the
-architectural definitions, and overloading that is going to make things
-even more confusing, because "I want to treat this as RESx in this piece
-of code" isn't a global property.
+I have absolutely no trust in these tests.
 
-> or at least adding a build-time check that flags any auto-generated
-> <REG>_RES1 that shrinks. After this series, though. Let me know if
-> you'd like me to take a stab.
+Have you enabled a VMM to make use of these APIs, and actively
+migrated running guests? That's the level of testing I'd like to see,
+as the selftests are not what people run in production...
 
-FWIW, having tooling to compare before/after would be useful, but I
-don't think that can be a standard build-time check, given that this
-would depend on having the old and new sysreg files available for
-comparison.
+Thanks,
 
-Mark.
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
