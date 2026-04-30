@@ -1,159 +1,176 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677664779A8
-	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 16:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FB72D0617
+	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 21:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777564974; cv=none; b=dTIGDzxRzFrDaU8vq6AANE3yrrp8g8M/aEQkxJFFZsVmXiY1CLGneBJijCPg11Sf1kt4lnmRN6MCNQFsQ90kbaogPQDYJJCi7psMeyHiAS0Lmimcrx47KKhiovHBQ1PrX2MKts5A6QWDPQDiGvQO9RFOvk+kTLMtosPFyauvfHk=
+	t=1777585190; cv=none; b=aqEyliVsDm3xLt06hTA22C6wWA50Ic85qY8Ga9SrWZt85guNt7xbP6cagBxCAeZqdMNgCQuDcYHQ2bKhplGtYMWT8bnVTtsLi5RKnB3IVGO+xLkUATQelnc8JsGohYRlaCDfbBxqgRF/RYgOUeBnyH7vBW4PyJ4ZP6PBLx9i11s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777564974; c=relaxed/simple;
-	bh=nSYWLOgCg9cYKYP1SSRIy1jcqnUttFghlsW4Zh+PYH4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=o6GwjTvNZAh/JJyzaz74mxEAjQWIeSwnRU+sn5YuRK5rZB0pfK+r7YY5onsj0I1WFutuT46SrO+9J40nZttqb9toLKC3Q242iWrUmlyeeg2kBzVe+pGo4y3INuzTmff1GVCuBSTnhtouxuyLNxFVFsyuD9kIfYwgPztQTzFaXCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dAPk3Zdd; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1777585190; c=relaxed/simple;
+	bh=TLJKOEFsS13UCJrCvQpa8BYGG8rX5qDKiTrbs/bCqvE=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=n7wX/5yz7auf+T9R52GmRPHkLNVtob+IZIDH+qAskyyusUUakc5+cn15uTANN7HwA3KYrzf9IQtOB2y0wPJar0C1iha6PREG91kCJLphANltbNQZ40Fg5pkpOTz8aIKVepv/Lt11JU7c3x1c09kJScGJRD2ak+fJuhZK3KC5fms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oRjQHFqO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dAPk3Zdd"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48a5523fd53so5216535e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 09:02:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777564971; x=1778169771; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4coEQbrBUmFUrjDBw9QngC1TQrHyKn5HQ1tDIlRoapE=;
-        b=dAPk3Zdd80ULLWbb45m+IL76unVUz3B83smedhu7noY98ExoxNexeLB+pbCcwGhTha
-         Xr6OjLx1ozYjKdkxa6d3DHZNJoF+NBd41ohlmSyeWt3VjUv81uQZUpP7UoubuRS8B6gN
-         0u2NRMn4Fel3efiwEl7g45VjoX2DInszZnbeWEAN2rRR7hmXAmwcw+YNcXD2TuCp2eug
-         SGDuBbC5aMV1yCtAYDdQLQ+v2pslIAugAngtGwK5YhOwOz/fNTYxHb0yW0dsPUfPw4a8
-         pM7DrwZPbLQqrsjvyKUksrg2goF/a5mR+mRM7eubzorBmfiXHEZx2HIO1xNilZkYXIGX
-         0i2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777564971; x=1778169771;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4coEQbrBUmFUrjDBw9QngC1TQrHyKn5HQ1tDIlRoapE=;
-        b=KuiY6jAn3R/TVFvp97UtoSrQM1kUq538+RxuOmQJOlSHa7xQ9fRU8LdeLnY7ilzZRD
-         abx9Wu+zdINws6LAEw4T3ff7PAztq+43O3w1Uswz9GerBerSS4IG+sZKua+nhWjAGJJ8
-         ttxWkqkfrlkZkSwD0BXblJz8jEhCCPVopzHB84bIa1kFLoWuctypOEHiohRQBDf9wtay
-         vyxczqYL2p79rCOP9KY2ghgypbx9lpf+CskKzlIsG081oWsRFLoc0bMaIp0WspRocNPi
-         6/1P6bIpWZHADvUJ1isHAXRGvcwrAkgxbv7GhLW3U86XiJNshu+q1S5bkweopTVkZ61o
-         f+kw==
-X-Forwarded-Encrypted: i=1; AFNElJ/YfcG25LSKHeYhtuOpxO/WL1eaRZ0Aozjs4e1YQIXdElGv5k1oFz4iv9ZQYVZTAHKDDBhyWjY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxPfK5tiXXOHtnBkoG3dALpkMRk2fpJcWFvS8O0pWnWlmExFPMQ
-	lpYqvPwCAGPyAIDkNKbmwDeYgEk/zB++aB+m3oaFJNsV3toXWw6ouSbjwZyqPLIGyyeVzcp62kb
-	+hc1zsNtzwM/yAAwTrJQeeNo1OZ6YEg==
-X-Received: from wmjx19.prod.google.com ([2002:a05:600c:21d3:b0:487:2186:fcf7])
- (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:a14:b0:488:af7f:7707 with SMTP id 5b1f17b1804b1-48a84451bccmr53589865e9.18.1777564970647;
- Thu, 30 Apr 2026 09:02:50 -0700 (PDT)
-Date: Thu, 30 Apr 2026 16:02:41 +0000
-In-Reply-To: <20260430160241.1934777-1-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oRjQHFqO"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63UIajDr3450963;
+	Thu, 30 Apr 2026 21:39:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=kOIVI/
+	+QPMj+HcDRfkbB9Z0JXy5Jvv7wZtXW/0D7F14=; b=oRjQHFqOjgoh8bR44BKl9b
+	rRvXpyK/+UTyo8imSHCOv2sb0NPNfDRSJ46DNCHg7+OGytYAhSoVbJaaE2TZkcVH
+	gZQLCX2jaJSldz/w1sN52F1//jwnoSOOcN+ucSW6tT/2Tms7Ouo6K5ZHOKgR65s3
+	4IIs+HleWRwjdrkO/CpC1X2ZthQ0LkYFZJf1gAyWng2U/ABXq+HuHw8ZJ/8Y3egC
+	Oia2PWf3exlP9CSMRlrldI3S8fqrzBf8SZpimF5mcFj51qApn0wK2p9sMO91VFgg
+	Eii6QEzF+kbSLUIIW2tzUgBt3FrYI81pJE4ThMW+bXF2WVzVQLlicc5wF3+e/gsw
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4drnb5j2q5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Apr 2026 21:39:25 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63ULcqx0017093;
+	Thu, 30 Apr 2026 21:39:23 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ds8aw51ra-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Apr 2026 21:39:23 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63ULdN3E30016018
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 Apr 2026 21:39:23 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 194125805A;
+	Thu, 30 Apr 2026 21:39:23 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9D6F558051;
+	Thu, 30 Apr 2026 21:39:21 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.47.107])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 30 Apr 2026 21:39:21 +0000 (GMT)
+Message-ID: <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: Jonathan McDowell <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com
+In-Reply-To: <afMlgstqahnZg68h@e129823.arm.com>
+References: <cover.1777036497.git.noodles@meta.com>
+	 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+	 <afMlgstqahnZg68h@e129823.arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Apr 2026 17:39:21 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260430160241.1934777-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430160241.1934777-3-sebastianene@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: Validate the offset to the mem access descriptor
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
-	sudeep.holla@kernel.org, will@kernel.org
-Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, 
-	sebastianene@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=AqDeGu9P c=1 sm=1 tr=0 ts=69f3cc0d cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VwQbUJbxAAAA:8
+ a=7CQSdrXTAAAA:8 a=kfywWr5o1HTmsyUdr2YA:9 a=QEXdDO2ut3YA:10
+ a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDMwMDIyMCBTYWx0ZWRfX/y+c23+jpmeu
+ M3AYFTUdxehwWfGkJlDLCf1MS7bbT4l1GwAZ04l+V2oa6kzKxAUVeEGWoJgEDL2quUNdvYd/8ap
+ D8N2H3RUgwxO48BK/3OtRm6HA/2RIxz14cB+oOCXscn9JG1yAwihNdeQx+vLVVgr5l+HNv0zInW
+ 4Pokd6oTcgWCMmPy2shY0IUPrerH3e1aflyh6gwoRfiuSAT2rpdewJC0x5eM/MnE98AC7dR9N+2
+ vj+BvbwSZzQRN6rEFzF30YMD/5C2ncENz70GOAgYrulva+FKbLT9o62gS917iFEBjigaHBZ8ekc
+ sc03GBWBB2Uc/mPpPb4gJq08/DjspmF/bdQ8clkpOXTfPHRqNlgntJ+/t2mHikSeYqlqjNtIYBw
+ DD+NeTVY995nA/59OyvJ0cqR9PwGg34Hs/RI0aVP9p3RJZrU3p1hrTyXYj19oJnjvF7KBB3sE9Q
+ 8imcv3q0SfqXDv0QqDQ==
+X-Proofpoint-GUID: MBkBhuJvcbCVEra9xd0J21Vsh6VKtCRY
+X-Proofpoint-ORIG-GUID: QtCnuy_nwfyJU8UBcsSswD-9mCQeQJY8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-30_06,2026-04-30_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1015
+ lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604300220
 
-Prevent the pKVM hypervisor from making assumptions that the
-endpoint memory access descriptor (EMAD) comes right after the
-FF-A memory region header.
-Prior to FF-A version 1.1 the header of the memory region
-didn't contain an offset to the endpoint memory access descriptor.
-The layout of a memory transaction looks like this from 1.1 onward:
-Type | Field name | Offset
-[ Header | ffa_mem_region  | 0
-  EMAD 1 | ffa_mem_region_attributes) | ffa_mem_region.ep_mem_offset
-]
-Verify that the offset to the first endpoint memory access descriptor
-is within the mailbox buffer bounds.
+On Thu, 2026-04-30 at 10:48 +0100, Yeoreum Yun wrote:
+> With above change I confirmed there is no meaurement log
+> between boot_aggregate and boot_aggregate_late except "kernel_version"
+> But this is ignorable since this UTS measurement is done in
+> "ima_init_core() (old: ima_init())" and it is part of ima initialisation.
+>=20
+> 1. ima_policy=3Dtcb
+>=20
+>   # cat /sys/kernel/security/ima/ascii_runtime_measurements
+>   10 0adefe762c149c7cec19da62f0da1297fcfbffff ima-ng sha256:0000000000000=
+000000000000000000000000000000000000000000000000000 boot_aggregate
+>   10 4e5d73ebadfd8f850cb93ce4de755ba148a9a7d5 ima-ng sha256:0000000000000=
+000000000000000000000000000000000000000000000000000 boot_aggregate_late
+>   10 7c23cc970eceec906f7a41bc2fbde770d7092209 ima-ng sha256:72ade6ae3d35c=
+fe5ede7a77b1c0ed1d1782a899445fdcb219c0e994a084a70d5 /bin/busybox
+>   10 17ec669c65c401e5e85875cf2962eb7d8c47595f ima-ng sha256:dc6b013e9768d=
+9b13bcd6678470448090138ca831f4771a43ce3988d8e54ffce /lib/ld-linux-aarch64.s=
+o.1
+>   10 58679a66ac1de17f02595625a8fbeafa259a4c81 ima-ng sha256:494f62bcfb2fc=
+f1b427d5092fafa62c8df39a83b4a64402620b28846724f237f /usr/lib/libtirpc.so.3.=
+0.0
+>   10 42f74ee200434576e33be153830b3d55bbe6d2bf ima-ng sha256:a18856b4f6927=
+bc2b8dd4608c0768b8f98544a161b85bf4a64419131243ad300 /lib/libresolv.so.2
+>   10 626b4f7bd4f123d18d3a3d8719ed0ae19ee5f331 ima-ng sha256:b8d442de5d31c=
+3f9d1bbb98785f04d4a23dc53442b286d85d4b355927cbe9af4 /lib/libc.so.6
+>   10 655a200869696207646377a58cab417fd35b09d2 ima-ng sha256:ad46146b6dd32=
+b47213e5327f1bb2f962ef838a4b707ef7445fa2dbc9019b44f /etc/inittab
+>   10 81353202685e022fcd0069a3b2fc4eaa6b1db537 ima-ng sha256:74d698fe0a686=
+2050af29083aa591c960ec1f67be960047e96bb6be5fc2bc0c0 /bin/mount
+>   10 ae64184ee607ef8f3aa08ab52cb548318534fd4b ima-ng sha256:27846b57e8234=
+c6a9611b00351f581a54ad6f9a1920b9aa18ceb0ae28e4f7564 /lib/libmount.so.1.1.0
+>   10 5ea01f34e7705d1bdb936fd576e2aeb5fd78dab9 ima-ng sha256:3d2a414ec0355=
+fcf0910224fb4a3c53e13d98731a35241edfdf4fb911ed9b210 /lib/libblkid.so.1.1.0
+>   10 22c48b4853594a08a73ad4ae6dbe6f2c2bebc6c5 ima-ng sha256:e3b0c44298fc1=
+c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 /run/utmp
+>   10 3024ea5021f8a5d9fb4bd519d599bdca43b7fb93 ima-ng sha256:71ea9ffe2b30e=
+5a9bdceff78785cf281cc41544474db8dc4605a06a597ce1edc /etc/fstab
+>   10 2e7530a0f56420991ac7611734cea4774b92b9ef ima-ng sha256:df4697d699442=
+cfe73db7cc8b4c1b37e8a31e75e01f66a0d70134ac812fa683b /bin/mkdir
+>   10 3ad117a863aa1ed7b7c09e1d106f84abf7d2ae96 ima-ng sha256:c19a710989b43=
+222431b02399273dba409fe10ca8eefff88eaa936fa695f8324 /bin/ln
+>   10 4141c82cb516ac3c846e0b08abcd6abeee7efa1a ima-ng sha256:b75d7f28772f7=
+1715a941c77e07e3922815391dd9cc5718ad21f2231c2da09bb /etc/hostname
+>   10 dfcedd3c7dc3ed42e09219804504489ab264e2e3 ima-ng sha256:dc1615df9f201=
+2b20b81ffad8e07e16293039ba7fd897854ca3646d6cfea0c0f /etc/init.d/rcS
+>   ...
+>=20
+> 2. ima_policy=3Dcritical_data
+>=20
+>   # cat /sys/kernel/security/ima/ascii_runtime_measurements
+>   10 0adefe762c149c7cec19da62f0da1297fcfbffff ima-ng sha256:0000000000000=
+000000000000000000000000000000000000000000000000000 boot_aggregate
+>   10 49ab61dd97ea2f759edcb6c6a3387ac67f0aa576 ima-buf sha256:0c907aab3261=
+194f16b0c2a422a82f145bc9b9ecb8fdb633fa43e3e5379f0af2 kernel_version 372e312=
+e302d7263312b // Ignorable since it's generated by ima_init(_core)().
+>   10 4e5d73ebadfd8f850cb93ce4de755ba148a9a7d5 ima-ng sha256:0000000000000=
+000000000000000000000000000000000000000000000000000 boot_aggregate_late
+>=20
+> Therefore, init_ima() could move into late_initcall_sync like v1 did:
+>   - https://lore.kernel.org/all/20260417175759.3191279-2-yeoreum.yun@arm.=
+com/
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
+Thanks, Yeoreum.  It's a bit premature to claim it's "safe" to move the
+initcall.  Hopefully others will respond.
 
----
-v1 -> v2:
- * don't enforce a strict placement for the ep_mem_offset since this is
-   not compliant with the spec and we should not make assumptions about
-   the driver.
-
-Link to v1: https://lore.kernel.org/all/ae9KN9nkOgDYJcGP@google.com/T/#t
-
----
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 1af722771178..8e9017fc8e39 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -479,7 +479,7 @@ static void __do_ffa_mem_xfer(const u64 func_id,
- 	struct ffa_mem_region_attributes *ep_mem_access;
- 	struct ffa_composite_mem_region *reg;
- 	struct ffa_mem_region *buf;
--	u32 offset, nr_ranges, checked_offset;
-+	u32 offset, nr_ranges, checked_offset, em_mem_access_off;
- 	int ret = 0;
- 
- 	if (addr_mbz || npages_mbz || fraglen > len ||
-@@ -508,8 +508,14 @@ static void __do_ffa_mem_xfer(const u64 func_id,
- 	buf = hyp_buffers.tx;
- 	memcpy(buf, host_buffers.tx, fraglen);
- 
--	ep_mem_access = (void *)buf +
--			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-+	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-+	if (em_mem_access_off >
-+	    KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE - (struct ffa_mem_region_attributes)) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out_unlock;
-+	}
-+
-+	ep_mem_access = (void *)buf + em_mem_access_off;
- 	offset = ep_mem_access->composite_off;
- 	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -576,7 +582,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 	DECLARE_REG(u32, flags, ctxt, 3);
- 	struct ffa_mem_region_attributes *ep_mem_access;
- 	struct ffa_composite_mem_region *reg;
--	u32 offset, len, fraglen, fragoff;
-+	u32 offset, len, fraglen, fragoff, em_mem_access_off;
- 	struct ffa_mem_region *buf;
- 	int ret = 0;
- 	u64 handle;
-@@ -599,8 +605,14 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 	len = res->a1;
- 	fraglen = res->a2;
- 
--	ep_mem_access = (void *)buf +
--			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-+	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-+	if (em_mem_access_off >
-+	    KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE - (struct ffa_mem_region_attributes)) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out_unlock;
-+	}
-+
-+	ep_mem_access = (void *)buf + em_mem_access_off;
- 	offset = ep_mem_access->composite_off;
- 	/*
- 	 * We can trust the SPMD to get this right, but let's at least
--- 
-2.54.0.545.g6539524ca2-goog
-
+Mimi
