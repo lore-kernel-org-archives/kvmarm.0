@@ -1,215 +1,102 @@
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088043E1CF0
-	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 08:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777539442; cv=pass; b=M2sMy3q8ayrObUTafyqB9FWNINT4vfbW4d9hW7k+u7bJUsBIF9h6IjIsON8hwOW27eTY3rLS5HFz+IRb6djCF2mOoqyoNSRLVD6K9BIhFnmw3LNrj4f1mPPhT7olQgA9wKe6sdXVwTOD8ZhiSWM7RPyKKKKEH1JvUxdDcQZWBwc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777539442; c=relaxed/simple;
-	bh=wjFl6GDkmUJl+dKx1Cia494ZvHYp6ty44K36Qbt6DgA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rznOAXlFr+ZuuXMfgyAGDUNLUTxu7jwI81AH6HfwCJ6J/urcJY7++0AXozviESGRS16antDzrUTgXmnO637kPFwPSweFQ6TDOd3vfHdzeYuOdgI736hXEpf9NC9RFcpBFmUGgosVvgitPr3guv74944E8zSnIhMqkfUWnQAhwdw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DfKKQLqG; arc=pass smtp.client-ip=74.125.224.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5E0263F44;
+	Thu, 30 Apr 2026 09:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777540084; cv=none; b=Qw1rj6ze7VSClMj4GlfyeKynS3J5xPMPtZbEy8188UayyTogCswhUlkGS4Tf3awpfLjJNyuQfOge6s/Q53/upP6YriiKlXs8CLf9nF8UH/QVvUYmcUCDjPaIp5Izu7uGC6IwHka9ydA+WnHAwS2yu/C83zsE9231xfQQNi8Zpm4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777540084; c=relaxed/simple;
+	bh=ZFzSNODvz59u5BBj2IDcPy45PSPOnkHPbn9VjRLPFko=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jAeO+1eSbEAy6NWPTkwcgVH+2ZYxxxSzihnHGpMl/KYs/BbFvjDv022ewn9r9vkwQx4MB8/NqNslYqFarNFD4vC5/0yfy4Z3UEDX3+CxIQnQNrb8qDPDsa1PfEYewYAOGf5iGSdab8yjUZvJMpTMlqUGjYpppUP9Asvi9AyrReY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tr+sv2mF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DfKKQLqG"
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6501d242e2fso604924d50.3
-        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 01:57:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777539440; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EY6s7lyaDDF5Tpnvd2s3dS7hDJJMVzu8x8fYUolH1Lk1s3d5jTOmlU0QfN+j1JHpzL
-         6O6jKJ8jZl/Qte1y5Nf8jchl7WFzAhHt93fttu0O+0ni75fzYT/UpvEThhZC4Tzg7K+8
-         d403WQhhpeVsA1sgarNDR9+8PwN49fhyOgcmpRn4buAf2Ohcoem55eOcNsOZnxXJBida
-         DfMcuia8HncAkctp5/qfm+BoLQD/MMUWD6QYjoECK+nIVgTRSXYNYNoLm4EGAKzDuVB6
-         prhElXVOqY7wIs/WM5SfUHwhrMSFvf2Gta5DFAMkWn51CJHGKYU8BoxqBMZOqBsAnTft
-         yhcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=WHn7aNKe8Z0UpZANHbjAHiTC29hYbOiQjktEyz/Ro2M=;
-        fh=/LN/A1EwizDcfqVO1nhCJeUTr6WxZZi+ucuvuRFE2gQ=;
-        b=jRLC2KfXPg+Ny6wnmxh1s0uT/E0eOW1tpV9vAwdWMuVeoOHw8Mkid2pvk5J9ZVzhaq
-         ReWgxNQTbjGjQCkrETmejPy/aDdwt8BUIAF8m5ZfWzbmlPk7urGCVsum9N5wbcm2vhac
-         PFxe8lmAMv7+cTH2/sn0v8heTrh0BtlSHYYoiPnWsxRLpn9STQmDt3RR7SAboglHaHTc
-         QU/th0CwYRag9+QONVi4BjyFngZj9umHaIyf5w8SZc3k0P8I+RWc7LqCDVrQ9eQKcNmA
-         nvsTjiRAygYno4Tanf6f3RQYDOOSTh86XXf9mnhi2lNTB9DdltlSPTUfLcGe7dHOVO2U
-         terw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1777539440; x=1778144240; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WHn7aNKe8Z0UpZANHbjAHiTC29hYbOiQjktEyz/Ro2M=;
-        b=DfKKQLqGPw0ivQqeNPrU+ZGg4/3KXxnukaCbL9G2jg5wK2WG59wn3GQMn+gx0Pzoi3
-         5Vy5l1hS5W21gZ/k5Zpe5FgpW8TezsALXqRGqLVP5S3yKS6+i0Uy2pQjqha1AaGddY0g
-         GBs1S3PY093MfpuX9h6ahaV3VFnUmpzWzu+V7pGLGsJlpWygBK9MhBnEy4uvmpzJqliI
-         k+R5jz8C5wL9GvkdpVqDkLl73ni+24MsgB8MoZYWqVUK72sVOlmhFnd2I7ztVdmrit1j
-         muLiE0uSG2yC7VqqNbP8ymJ7mprSYrO6g8OfL6NpZ8ogkP2WAxe/aCeB1pCIjGrm6XaA
-         65BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777539440; x=1778144240;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WHn7aNKe8Z0UpZANHbjAHiTC29hYbOiQjktEyz/Ro2M=;
-        b=k27LZmzMLIrbWaC2IhZKmQi5wp0QaG0O5m0CsRAu2/fjnBtK44/lz4SZ4NYZEnc9qT
-         7JiIAfDIYNRzI/PRyc1JEoMLRqN+J4CoQzUwsHI5sP2FLKMNkpJ6lI3LlBlJmhLe95VZ
-         fhzW62+Zw5DkTbyn3Ox/Zd/TPGcxTJYXyxm/UGyouHrySehNXux1d1VAcky7gQT9duy3
-         9cV/uPitixn67Bvn5PzyuINgKL7s1KHWSfvjQd45+ZyMfmUUtKzxhPc/9aH+UPP+y8a+
-         kFTOhKvqH2WvGIXDpvGqOqWrirS9E4rdKxCemYzgzjZXwoPHAiiYgW11C/HKqySDEXn8
-         Z7Lg==
-X-Forwarded-Encrypted: i=1; AFNElJ/e6Zc8/nD/kgsbVPGuDJmUNp5g9P0dMUXzO/tN3Zh0LuCQGAeiLb9zI+GGKyrlMhh8tykZb2M=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz8U6YdBZjj6wiGGj26Ij3Hmsb+K4d+qPaI/TApSrbVKuGf1MMd
-	ZhWpKFvtE5agw8tAgx9ahbfgcs85pxQvvJkR+Yrg9VQuq2IeFCaA/qaZ7OcQKMtsP4PN7jB+1Tw
-	2UPvY5T7NHDXuHvaL8AoJ8w8d0ypnm1GYqn0xPetSlg==
-X-Gm-Gg: AeBDies4/M2K1jRHP6R5iRdYO4a2Vt9WPZI1A6HjOWrLGOPCenQAMs2LDzBYy1Xafpb
-	DcECK9S8f7n4yDAaMXsaOO6KiXDZb3TQjYGF+0GjWSG7gCBjjoM9FDDTD5OnK14jPkiy6B7QGB9
-	Jt+11gjnA2CiGINpyeGcCTLaf17MVUDkore8H2tdO97nMJEN30g59Dw8Ganl0xuYOHA3oR1Hy8N
-	kXtwkfd44pg5ebqlI4jFXFul32P94ox1Qb4ucNMzUAQipV1cYtbw/+1puf4LkMhCknWPhQ6Wn3f
-	mJb/uEh2+sfdb09ZO2nWMmhKCzQdyZv/S/f9mgslkf0iowlWbPChZyIlaQJ9MgXxSyHpeuVf2MW
-	tDg==
-X-Received: by 2002:a05:690e:1698:b0:651:c782:6a8 with SMTP id
- 956f58d0204a3-65c18b3e650mr1335368d50.15.1777539439953; Thu, 30 Apr 2026
- 01:57:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tr+sv2mF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F31C2BCB3;
+	Thu, 30 Apr 2026 09:08:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777540083;
+	bh=ZFzSNODvz59u5BBj2IDcPy45PSPOnkHPbn9VjRLPFko=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Tr+sv2mFI9m4Ofy6Z0CStOodv0cPAChYeTf2a3fmIaFcBPf+N3J7PMUQ2IsSG5aKu
+	 Ws09EaXWOCdaKF/SE443itbM9VK4E6tn5zNtfAWEe8F1oVWjulubvyY+SDFIG8nGJb
+	 aWwDoCxGyVXwVXC9Fo/HEw+pFY5Br/2PfTvj2DMn+cBsBZsx93dLe+tf6r4zPvfsXb
+	 3KzcHrFPh+lw+7fU3SCr7XSFXlFjhgeGtTQy7ByyUK5bnWqLhPH0nxu0bphVd+9mvJ
+	 TzuqDp7DgriF5jFxU5E3CPNYB03GIMupks3LEdgHdC2+eFLWbj4/NOO1gDLJ5imF9V
+	 b4u8H3NfNszvQ==
+Date: Thu, 30 Apr 2026 10:07:58 +0100
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com,
+	vdonnefort@google.com, catalin.marinas@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/8] KVM: arm64: Make EL2 exception entry and exit
+ context-synchronization events
+Message-ID: <afMb7uuPlUbLeu7k@willie-the-truck>
+References: <20260428103008.696141-1-tabba@google.com>
+ <20260428103008.696141-2-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260427160547.3129448-1-sascha.bischoff@arm.com> <20260427160547.3129448-44-sascha.bischoff@arm.com>
-In-Reply-To: <20260427160547.3129448-44-sascha.bischoff@arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Apr 2026 09:57:08 +0100
-X-Gm-Features: AVHnY4Jvy3n3XpKrxh1FlvrSB6Vt4VXuFhqD0yDhLAN5iHhEm91Tb3vWrZI7GfM
-Message-ID: <CAFEAcA8m1Y-8=+7RZjte1WBwycgnHEx_+yiU_ieriZr5DbQKsQ@mail.gmail.com>
-Subject: Re: [PATCH 43/43] Documentation: KVM: Add the VGICv5 IRS save/restore sequences
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, 
-	Suzuki Poulose <Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes <Timothy.Hayes@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260428103008.696141-2-tabba@google.com>
 
-On Mon, 27 Apr 2026 at 17:22, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
->
-> When saving/restoring the state of the GICv5 IRS, it is important that
-> it happens in the correct order. Failure to do so will almost
-> certainly result in failing to restore a guest that is capable of
-> handling interrupts correctly.
->
-> On a save, the ISTs must be saved prior to saving the guest's memory
-> as the guest's LPI IST is written to guest memory. Conversely, on
-> restore the guest's memory must be restored prior to restoring the
-> ISTs.
->
-> It is important to restore the IRS MMIO registers by first restoring
-> the IRS_IDx registers as they define the capabilities of the IRS, and
-> are used as part of creating and managing ISTs and SPIs.
->
-> In order to restore the ISTs themselves, the IRS_IST_CFGR must be
-> restored prior to the IRS_IST_BASER. This is because KVM extracts
-> fields from the CFGR to determine the size and structure of the IRS
-> created by the guest. The IST itself is created as part of the write
-> to the IRS_IST_BASER. At this stage the remaining MMIO registers can
-> be restored.
->
-> Once the LPI IST has been created (by the aforementioned write to the
-> IRS_IST_BASER), the IST state can be restored using
-> KVM_DEV_ARM_VGIC_GRP_IST. The SPI IST gets extracted from a userspace
-> provided buffer, and is transferred to the host-allocated SPI IST. The
-> LPI IST is extracted from guest memory, and is written to the
-> host-allocated LPI IST.
->
-> As a general rule, the IRS_*_STATUSR registers can be ignored on
-> restore. They are not userspace writable.
->
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  .../virt/kvm/devices/arm-vgic-v5.rst          | 63 +++++++++++++++++++
->  1 file changed, 63 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> index 38eef7cc63e3e..1c55f5040757d 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -201,3 +201,66 @@ Groups:
->        -ENOMEM      Restoring IST state failed while tracking pending interrupts
->        -ETIMEDOUT   An IRS save/VM operation timed out
->        ===========  ============================================================
-> +
-> +IRS Save Sequence:
-> +------------------
-> +
-> +The following ordering should be followed when saving the virtual GICv5 and
-> +IRS:
-> +
-> +a) Save the ISTs by issuing KVM_GET_DEVICE_ATTR on KVM_DEV_ARM_VGIC_GRP_IST.
-> +   This MUST happen before the guest's memory is serialised as the LPI IST is
-> +   stored directly to guest memory.
-> +
-> +b) Save the IRS MMIO register state in the following order by issuing
-> +   KVM_GET_DEVICE_ATTR on KVM_DEV_ARM_VGIC_GRP_IRS_REGS:
-> +
-> +     1. Save IRS_IDR0-2 and IRS_IDR5-7 registers.
-> +     2. Save IRS_IST_CFGR.
-> +     3. Save IRS_IST_BASER.
-> +     4. Save the remaining global IRS MMIO registers.
-> +     5. For each PE:
-> +        - write IRS_PE_SELR
-> +        - save IRS_PE_CR0
-> +     6. For each SPI:
-> +        - write IRS_SPI_SELR
-> +        - save IRS_SPI_CFGR
-> +
-> +IRS Restore Sequence:
-> +---------------------
-> +
-> +The following ordering must be followed when restoring the virtual GICv5 and
-> +IRS:
-> +
-> +a) restore all guest memory and create vcpus
-> +b) provide the IRS base address by issuing KVM_SET_DEVICE_ATTR on
-> +   KVM_DEV_ARM_VGIC_GRP_ADDR
-> +c) initialise the GIC - this sets up the default state and creates the SPI
-> +   IST - by issuing KVM_SET_DEVICE_ATTR on KVM_DEV_ARM_VGIC_GRP_CTRL with
-> +   KVM_DEV_ARM_VGIC_CTRL_INIT
+On Tue, Apr 28, 2026 at 11:30:01AM +0100, Fuad Tabba wrote:
+> SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
+> exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
+> 0487 M.b, EIS is governed by D1.4.2 rule RBBSRF (p. D1-7205) and EOS
+> by D1.4.4.1 rule RBWCFK (p. D1-7209). D24.2.175 (p. D24-9754):
+> 
+>   - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
+>     a CSE.
+>   - FEAT_ExS: the reset value is architecturally UNKNOWN; software
+>     must set the bit to make the entry/exit a CSE.
+> 
+> INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
+> bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
+> synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
+> MSRs to context-switching system registers (HCR_EL2, HFGxTR_EL2,
+> HCRX_EL2, ZCR_EL2, CPACR_EL1, CPTR_EL2, SCTLR_EL1, ptrauth keys,
+> etc.); examples include the activate-traps path,
+> ptrauth_switch_to_guest, and the FPSIMD trap re-enable in
+> kvm_hyp_handle_fpsimd. On FEAT_ExS hardware those reliances are not
+> architecturally backed unless EOS=1 (and, for entry, EIS=1), and
+> whether they hold today depends on firmware initialisation outside
+> the kernel's control.
+> 
+> Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
+> INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
+> unconditionally CSEs regardless of whether FEAT_ExS is implemented.
+> This matches the pairing in arch/arm64/kvm/config.c which treats EIS
+> and EOS together as RES1 under !FEAT_ExS.
+> 
+> INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
+> very early EL2 init and the EL2 MMU-off transition, neither of which
+> relies on these bits in the same way.
+> 
+> Fixes: fe2c8d19189e ("KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON")
 
-This isn't going to work for QEMU, if I understand it correctly.
-QEMU always creates the whole VM first, including creating the
-VCPUs and GIC, telling KVM what its base address is, initializing it,
-etc, before it starts an inbound migration. So the memory read
-is going to come in after step (c), not right at the start.
+I don't think this Fixes: tag is accurate:
 
-> +d) restore the IRS MMIO register state in the following order by issuing
-> +   KVM_SET_DEVICE_ATTR on KVM_DEV_ARM_VGIC_GRP_IRS_REGS:
-> +
-> +     1. Restore IRS_IDR0-2 and IRS_IDR5-7 registers.
-> +     2. Restore IRS_IST_CFGR.
-> +     3. Restore IRS_IST_BASER - this triggers KVM to create the LPI IST.
-> +
-> +e) restore the ISTs by issuing KVM_SET_DEVICE_ATTR on
-> +   KVM_DEV_ARM_VGIC_GRP_IST.
-> +f) restore the remaining IRS MMIO register state in the following order by
-> +   issuing KVM_SET_DEVICE_ATTR on KVM_DEV_ARM_VGIC_GRP_IRS_REGS:
-> +
-> +     1. Restore the remaining global IRS MMIO registers.
-> +     2. For each PE:
-> +        - write IRS_PE_SELR
-> +        - restore IRS_PE_CR0
-> +     3. For each SPI:
-> +        - write IRS_SPI_SELR
-> +        - restore IRS_SPI_CFGR
+1. That commit doesn't do anything with EIS/EOS afaict.
+2. Back in 5.12 (when that thing landed), SCTLR_EL2_RES1 did actually
+   include EIS and EOS
 
-More generally, if your API involves this much in the way
-of complicated ordering dependencies, it's going to be
-very bug prone.  From userspace's perspective, this is
-not a very helpful way to design the interface :-)
+so I think the issue here might be that the auto-generated sysreg file
+quietly changes the RES1 definitions as bits get allocated, but the
+macros using the RES1 definition don't get updated. That's a pretty
+horrible pit that it feels like we might keep falling into :/
 
-thanks
--- PMM
+Looking at 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg
+infrastructure"), I think we ended up dropping a whole bunch of fields
+from the RES1 mask (which became 0!). Have you checked all of those?
+
+Will
