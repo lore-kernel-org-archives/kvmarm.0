@@ -1,156 +1,204 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2161399015;
-	Thu, 30 Apr 2026 09:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4003AEF3B
+	for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 09:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777541862; cv=none; b=TM1tDRf/NVjaK7FpRAhDU3w6rna4pC9XpO/B00LktpEBdDIuiOE0EcWtwb/rNM1mhjvjhVm+w5gZnrpiJQ4exnvqKbczgTb+6c4FvfsiqREtXON/8RSB8dx3UHDBs1QCnvmMsNSZFZH8FKLBeCrFJs+FxIkA+yquMyOmE2pAgsg=
+	t=1777542539; cv=none; b=lWRRfhjLKlVg0ntzQhhyNzUsMJTz7BKh5XLJqPINSl/EsJLJ94HmVIhRrerA1EEgVw/BjSnTyNfRzaNcKAiFiqjzNui9aj1WFpknlv5aOGt4QLhAnXA5R/0hSTgWZmSTOaiYMt9xq7YHVseyUuv4l6YKD0Qj84xL12cSbMAZ0z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777541862; c=relaxed/simple;
-	bh=6Bd3LTWGzug0OoKGDGfveio/XMIp1TZgePH0TADdmbI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CYT4Cx7zKScP/p4sBa4CP13dqDj85SaEqlGvkZPIjA9e0bxV1rqA8n3GXrC9nFw6SQmCUGzMd1mspqy5+3EepcBO2B7b9TU93xMmeSSIaVJoSkeBFxutG+j24FgIyo5mSs4MLGkVV+NlXb8wnCWRacUb+5oG5JoSluud+ZybSjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oXKEwE9H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777542539; c=relaxed/simple;
+	bh=rzcIYj7NzzucogeiuQ/ByvTxcKuN8A1oBUxuhPjfH7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GVhDLYSQM21T6mIYGrsQjCWPgbPREi//KiORy4jQx0MqjjNFmsM2i/eXwEn/30K9DJY3TQ/fiB7MKdusNXoXXBUzZu16SMYuOEr85S/eFFpF+0duwFMbjQaKk18fBmSs8l3HpG4N+hrPWcsvcEH6o/rUAtYxT2ZG9Anyd7HTqiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=eFo/K5gM; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oXKEwE9H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F119C2BCB3;
-	Thu, 30 Apr 2026 09:37:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777541862;
-	bh=6Bd3LTWGzug0OoKGDGfveio/XMIp1TZgePH0TADdmbI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oXKEwE9HXcFAf/BZfk8TB4wj+R9p/+kpzUY7EVGyObgdN9XFn8jbkNfRCnYGPdVQ9
-	 IUdZeGqowYED3r3P6Z35zkD2hMx45/9SddA4vmKOD0t0NUCeDV9bQJEg+YMNYd1AF9
-	 +TzICE3KK69mfK0ZmayrTqWwmuFxXn69Qz4blH8Oz7eMXQfUrwEYq8/WeOIAk3muC8
-	 h8Pw4oAIIFZcXOsEyTbsOE3zTCRPYR85mrtsdS3bW6yfVNk8SQhzKNPbngPJxGhecW
-	 ra0MGwLgQCz4ePZHxuD94xsujNX+Vi37MpVITlk1Dc/Hqyd/FbXstZ+3FBtDRrFKBw
-	 MwEfd+gZXUjqQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wINpz-0000000GCPR-3hjx;
-	Thu, 30 Apr 2026 09:37:39 +0000
-Date: Thu, 30 Apr 2026 10:37:39 +0100
-Message-ID: <86h5oszt3w.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 11/43] KVM: arm64: gic-v5: Make VPEs valid in vgic_v5_reset()
-In-Reply-To: <20260427160547.3129448-12-sascha.bischoff@arm.com>
-References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
-	<20260427160547.3129448-12-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="eFo/K5gM"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62CA21A9A;
+	Thu, 30 Apr 2026 02:48:51 -0700 (PDT)
+Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46D953F7B4;
+	Thu, 30 Apr 2026 02:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1777542536; bh=rzcIYj7NzzucogeiuQ/ByvTxcKuN8A1oBUxuhPjfH7w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eFo/K5gMt2O/K0ixr+Iw6rFpXaEcpWJ2+qHc0kYzzPm3RfnEds4QfonFkGRBTdRUK
+	 OoLeIkr69ulpGR6jATyx4HSrGhATKhOjwOB3/hbIEsPdNqT7J0tLJCgyz/jMo4ohK5
+	 xJudtOZDygy6ZlDmbe0Yjhj8s/FiZ6ovsxkoVlds=
+Date: Thu, 30 Apr 2026 10:48:50 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Jonathan McDowell <noodles@earth.li>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+	sebastianene@google.com
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+Message-ID: <afMlgstqahnZg68h@e129823.arm.com>
+References: <cover.1777036497.git.noodles@meta.com>
+ <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
 
-On Mon, 27 Apr 2026 17:09:47 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> When resetting VPEs, also mark them as valid in the VM VPE Table. This
-> is required as it informs the IRS that a specific VPE may be made
-> resident, and without this the IRS will treat the VPE as invalid.
-> 
-> As part of this change, we also introduce a wrapper around the VPE
-> doorbells - vgic_v5_send_command(). This takes a struct kvm_vcpu
-> pointer, and the command to run, and triggers the function bound to
-> the command via that vcpu's doorbell. This is a convenience function
-> to simplify the code.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Hi Mimi,
+
+Thanks to share the testing code and please see the below:
+
+> With this "[RFC PATCH v3 0/4] Fix IMA + TPM initialisation ordering
+> issue" patch set, how many records would be missing if IMA
+> initialization is deferred to late_initcall_sync [1]?
+>
+> [1]https://lore.kernel.org/linux-integrity/cover.1777036497.git.noodles@meta.com/
 > ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 0649729f6b834..92bb63b6dd6bb 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -518,6 +518,18 @@ static int vgic_v5_irs_vpe_cr0_update(int vm_id, int vpe_id, u32 cr0)
->  	return 0;
+> Jonathan, Yeoreum, others -
+>
+> By going into TPM-bypass mode, we can see how many measurements are actually
+> missing when deferring IMA initialization to late_initcall_sync. As this is
+> system/TPM dependent, I'd appreciate your checking. Please use the boot command
+> line option "ima_policy=tcb|critical_data".
+>
+> thanks, Mimi
+>
+>  security/integrity/ima/ima.h      |  1 +
+>  security/integrity/ima/ima_init.c |  6 ++++++
+>  security/integrity/ima/ima_main.c | 19 +++++++++++++++++++
+>  3 files changed, 26 insertions(+)
+>
+> diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
+> index 01aae19ed365..9a1117112fb2 100644
+> --- a/security/integrity/ima/ima.h
+> +++ b/security/integrity/ima/ima.h
+> @@ -286,6 +286,7 @@ extern bool ima_canonical_fmt;
+>
+>  /* Internal IMA function definitions */
+>  int ima_init_core(bool late);
+> +int ima_init_debug(bool late);
+>  int ima_fs_init(void);
+>  int ima_add_template_entry(struct ima_template_entry *entry, int violation,
+>  			   const char *op, struct inode *inode,
+> diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
+> index 5f335834a9bb..edd063b99685 100644
+> --- a/security/integrity/ima/ima_init.c
+> +++ b/security/integrity/ima/ima_init.c
+> @@ -122,6 +122,12 @@ void __init ima_load_x509(void)
 >  }
->  
-> +static int vgic_v5_send_command(struct kvm_vcpu *vcpu,
-> +				enum gicv5_vcpu_info_cmd_type type)
+>  #endif
+>
+> +int __init ima_init_debug(bool late)
 > +{
-> +	struct gicv5_cmd_info cmd_info;
-> +
-> +	if (!vcpu)
-> +		return -EINVAL;
-
-Drop this. If we must crash, let's crash early, in the most
-spectacular way, and leaving a backtrace. Trying to gracefully handle
-this stuff is making it harder to track and debug such problems.
-
-Also, if we made it that far, it is very likely that vcpu isn't NULL.
-
-> +
-> +	cmd_info.cmd_type = type;
-> +	return irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd_info);
+> +	ima_add_boot_aggregate(late); /* just add an additional record */
+> +	return 0;
 > +}
 > +
->  static int vgic_v5_db_set_vcpu_affinity(struct irq_data *data, void *vcpu_info)
+>  int __init ima_init_core(bool late)
 >  {
->  	struct vgic_v5_vm *vm = data->domain->host_data;
-> @@ -691,6 +703,8 @@ static void vgic_v5_teardown_per_vm_domain(struct vgic_v5_vm *vm)
->  
->  void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  	int rc;
+> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+> index 42099bfe7e43..23e669be54fc 100644
+> --- a/security/integrity/ima/ima_main.c
+> +++ b/security/integrity/ima/ima_main.c
+> @@ -1254,6 +1254,7 @@ static int ima_kernel_module_request(char *kmod_name)
+>
+>  #endif /* CONFIG_INTEGRITY_ASYMMETRIC_KEYS */
+>
+> +#define TESTING 1
+>  static int __init init_ima(bool late)
 >  {
-> +	int rc;
+>  	int error;
+> @@ -1264,6 +1265,23 @@ static int __init init_ima(bool late)
+>  		return 0;
+>  	}
+>
+> +#ifdef TESTING
+> +	/*
+> +	 * Initialize early, even if it means going into TPM-bypass mode,
+> +	 * but add an additional boot_aggregrate message for the
+> +	 * late_initcall_sync.
+> +	 *
+> +	 * If measurement list records exist between the boot_aggregate
+> +	 * and the boot_aggregate_late records, these records would be
+> +	 * missing when IMA initializion is deferred to late_initcall_sync.
+> +	 */
+> +	if (ima_tpm_chip) {
+
+I believe this should be:
+  if (late) {
+     ...
+  }
+
+> +		ima_init_debug(late); /* Add an additional record */
+> +		return 0;
+> +	}
 > +
+> +	ima_tpm_chip = tpm_default_chip();
+> +#elif
 >  	/*
->  	 * We always present 16-bits of ID space to the guest, irrespective of
->  	 * the host allowing more.
-> @@ -702,6 +716,14 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
->  	 * CPUIF (but potentially fewer in the IRS).
->  	 */
->  	vcpu->arch.vgic_cpu.num_pri_bits = 5;
-> +
-> +	/* Make the VPE valid in the VPET */
-> +	rc = vgic_v5_send_command(vcpu, VPE_MAKE_VALID);
-> +	if (rc) {
+>  	 * If we found the TPM during our first attempt, or we know there's no
+>  	 * TPM, nothing further to do
+> @@ -1276,6 +1294,7 @@ static int __init init_ima(bool late)
+>  		pr_debug("TPM not available, will try later\n");
+>  		return -EPROBE_DEFER;
+>  	}
+> +#endif
+>
+>  	if (!ima_tpm_chip)
+>  		pr_info("No TPM chip found, activating TPM-bypass!\n");
+> --
+> 2.53.0
 
-nit: rc serves no purpose here. Just write it as:
+With above change I confirmed there is no meaurement log
+between boot_aggregate and boot_aggregate_late except "kernel_version"
+But this is ignorable since this UTS measurement is done in
+"ima_init_core() (old: ima_init())" and it is part of ima initialisation.
 
-	if (vgic_v5_send_command(...))
+1. ima_policy=tcb
 
-> +		/* We can't continue, so mark the VM as dead */
-> +		kvm_vm_dead(vcpu->kvm);
-> +		return;
+  # cat /sys/kernel/security/ima/ascii_runtime_measurements
+  10 0adefe762c149c7cec19da62f0da1297fcfbffff ima-ng sha256:0000000000000000000000000000000000000000000000000000000000000000 boot_aggregate
+  10 4e5d73ebadfd8f850cb93ce4de755ba148a9a7d5 ima-ng sha256:0000000000000000000000000000000000000000000000000000000000000000 boot_aggregate_late
+  10 7c23cc970eceec906f7a41bc2fbde770d7092209 ima-ng sha256:72ade6ae3d35cfe5ede7a77b1c0ed1d1782a899445fdcb219c0e994a084a70d5 /bin/busybox
+  10 17ec669c65c401e5e85875cf2962eb7d8c47595f ima-ng sha256:dc6b013e9768d9b13bcd6678470448090138ca831f4771a43ce3988d8e54ffce /lib/ld-linux-aarch64.so.1
+  10 58679a66ac1de17f02595625a8fbeafa259a4c81 ima-ng sha256:494f62bcfb2fcf1b427d5092fafa62c8df39a83b4a64402620b28846724f237f /usr/lib/libtirpc.so.3.0.0
+  10 42f74ee200434576e33be153830b3d55bbe6d2bf ima-ng sha256:a18856b4f6927bc2b8dd4608c0768b8f98544a161b85bf4a64419131243ad300 /lib/libresolv.so.2
+  10 626b4f7bd4f123d18d3a3d8719ed0ae19ee5f331 ima-ng sha256:b8d442de5d31c3f9d1bbb98785f04d4a23dc53442b286d85d4b355927cbe9af4 /lib/libc.so.6
+  10 655a200869696207646377a58cab417fd35b09d2 ima-ng sha256:ad46146b6dd32b47213e5327f1bb2f962ef838a4b707ef7445fa2dbc9019b44f /etc/inittab
+  10 81353202685e022fcd0069a3b2fc4eaa6b1db537 ima-ng sha256:74d698fe0a6862050af29083aa591c960ec1f67be960047e96bb6be5fc2bc0c0 /bin/mount
+  10 ae64184ee607ef8f3aa08ab52cb548318534fd4b ima-ng sha256:27846b57e8234c6a9611b00351f581a54ad6f9a1920b9aa18ceb0ae28e4f7564 /lib/libmount.so.1.1.0
+  10 5ea01f34e7705d1bdb936fd576e2aeb5fd78dab9 ima-ng sha256:3d2a414ec0355fcf0910224fb4a3c53e13d98731a35241edfdf4fb911ed9b210 /lib/libblkid.so.1.1.0
+  10 22c48b4853594a08a73ad4ae6dbe6f2c2bebc6c5 ima-ng sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 /run/utmp
+  10 3024ea5021f8a5d9fb4bd519d599bdca43b7fb93 ima-ng sha256:71ea9ffe2b30e5a9bdceff78785cf281cc41544474db8dc4605a06a597ce1edc /etc/fstab
+  10 2e7530a0f56420991ac7611734cea4774b92b9ef ima-ng sha256:df4697d699442cfe73db7cc8b4c1b37e8a31e75e01f66a0d70134ac812fa683b /bin/mkdir
+  10 3ad117a863aa1ed7b7c09e1d106f84abf7d2ae96 ima-ng sha256:c19a710989b43222431b02399273dba409fe10ca8eefff88eaa936fa695f8324 /bin/ln
+  10 4141c82cb516ac3c846e0b08abcd6abeee7efa1a ima-ng sha256:b75d7f28772f71715a941c77e07e3922815391dd9cc5718ad21f2231c2da09bb /etc/hostname
+  10 dfcedd3c7dc3ed42e09219804504489ab264e2e3 ima-ng sha256:dc1615df9f2012b20b81ffad8e07e16293039ba7fd897854ca3646d6cfea0c0f /etc/init.d/rcS
+  ...
 
-But we probably should dump some traces here, rather than silently
-mark the VM as fsck'd. THis is the sign that something has gone very
-wrong.
+2. ima_policy=critical_data
 
-Thanks,
+  # cat /sys/kernel/security/ima/ascii_runtime_measurements
+  10 0adefe762c149c7cec19da62f0da1297fcfbffff ima-ng sha256:0000000000000000000000000000000000000000000000000000000000000000 boot_aggregate
+  10 49ab61dd97ea2f759edcb6c6a3387ac67f0aa576 ima-buf sha256:0c907aab3261194f16b0c2a422a82f145bc9b9ecb8fdb633fa43e3e5379f0af2 kernel_version 372e312e302d7263312b // Ignorable since it's generated by ima_init(_core)().
+  10 4e5d73ebadfd8f850cb93ce4de755ba148a9a7d5 ima-ng sha256:0000000000000000000000000000000000000000000000000000000000000000 boot_aggregate_late
 
-	M.
+Therefore, init_ima() could move into late_initcall_sync like v1 did:
+  - https://lore.kernel.org/all/20260417175759.3191279-2-yeoreum.yun@arm.com/
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks.
+
+--
+Sincerely,
+Yeoreum Yun
