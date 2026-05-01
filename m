@@ -1,67 +1,49 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3777440DFBD
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 02:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33252223DFF
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 03:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777602651; cv=none; b=WXMpf9hM6zRgSOdjYJoLQUMPyhlQoDkB2SIYqQqKFYKP0CNys7XXOpU5b97zbZxxGNp7NtfllLdyTFF2ZxOtNsjp+hFIpl8WLWcwoCSnGcogC0n42KqekCya8++QOW8UlQfGVUsc36foS3FymHIYqQLzuvXZsSssavJdt8sNhCQ=
+	t=1777606359; cv=none; b=XvYWb9JRdxjssFr4WagnLPP4efB+8wcywprGXEAglAI6xM+G9B8tURYPTPz1j5AD+BwH+egsn+cnZRMfVh6EOA0JYONTqsyAW1AnehOZ45CqgWl/7ijA2oi84v514GcmB5b0ZHn+Bs97IReilCBibeRXCbENRtD4ZFd7ra4eh04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777602651; c=relaxed/simple;
-	bh=/IRFyLS/V26r1hRKe6NgfsO4ihu7Z+8H9cq2UsOyb+s=;
+	s=arc-20240116; t=1777606359; c=relaxed/simple;
+	bh=4j/gula7rF66aSX0/AyL1iWe/WjoemN8rnjRdMZNdSw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g+T1BWLAW6CK74133m8oc0PCS5KwyhLr3BY8bE/ezQkumoOg3sNNx1jVV5NzS3q5JHfXTJ9N/uPDufYQeddeuXhhOkFXvNvZt2gPj4hPfbSAqYxSHj44TU649f+K4WtvZoQ3AVVI9priA9l7q1QbdSZCAsdVSsjUp9bBiN9G+98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=immunant.com; spf=none smtp.mailfrom=immunant.com; dkim=pass (2048-bit key) header.d=immunant-com.20251104.gappssmtp.com header.i=@immunant-com.20251104.gappssmtp.com header.b=eLhKZj3W; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=immunant.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=immunant.com
+	 In-Reply-To:Content-Type; b=YwUinrtIHX14+Z0KIvUplAyLuRI6XKcheRH/kqhuumBdD4znESTE3ijOn743UhH7BFW32ZVpBzTS+zDRtddci7G9o4vQ36meTkMcrojDRDaJxShE2pDpl0/uOFDWmt1y/1IyHFoHANNs5+6jHqG3TvOlyuFiIIn2gG+kHsZ8ghw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AjRhNCeV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=immunant-com.20251104.gappssmtp.com header.i=@immunant-com.20251104.gappssmtp.com header.b="eLhKZj3W"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-79a46ebe2beso16296787b3.2
-        for <kvmarm@lists.linux.dev>; Thu, 30 Apr 2026 19:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=immunant-com.20251104.gappssmtp.com; s=20251104; t=1777602649; x=1778207449; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1ltJ1qk7ArZg0qL7brVsQZxHqLIMgRzChfwso+j23+0=;
-        b=eLhKZj3Wtp0+bWsCWhAVYTu6XuM2zvx3o/XhJhSsjlI+TUc1hVGeP9wK7AlAHl+V7I
-         QOTgMNHbksprKNDOO0MFfAd2P+xj0ZeAOiGSlXJhJD+1qp/GkWywqfCv0uAGW2jGxLHn
-         FFT0IcFZyOooILfye0t6axLvBpTEzLTndwUGxMWVVVcux+Zno0KJiunWR58Cw4qTF+eM
-         Zy8/r70E63zMHqSAnpTU4yEceEAJqQ9/7EHqj33hnh1P2wR5P9hg8tQ6qZSEzqth7zYV
-         IvwLsNl+Mqp+4HNMKqxw/kHnmu2Z/uyO7/FOII6PS+qMF1hPggPsth37jcywNuga5/zJ
-         cUKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777602649; x=1778207449;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1ltJ1qk7ArZg0qL7brVsQZxHqLIMgRzChfwso+j23+0=;
-        b=fYFtEYM7Sb3Ti9/ze4cl+hNkTV2nBggv8Le3qPcua5QpV6LHYAEPT25gSaYZXNdNOf
-         QREYkup6otCi+jokdxLVw1HmkUO1D0NnmwVFlW1NiMvl9bN8wRMb8fM0VsSrl7zlwe3v
-         tmMtcbfnnlqlqOLpsv+BB9qYgF6u4bVBib9HVENeOgydXJQupZ/aMWd/OHBjHPbUsmNm
-         oQPFE+CAEoWaJRKRncQfLy+4NdH0Ic3siSFrB49MVGoMWLeLIs5NZgMXvd97/Twqa5nX
-         5Wd1DLEoh1UElqkHdqDBHsjUVB2/YyR3tBuMts1/hMUZpFgxX+qsK15up+gcAX7lJ9nZ
-         OYvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8EvvGFF0LCY4kSCHgJTtX19vyKCVABlRvW4DUdRh0WHSbE80EnixyyWFvuhk9lV2BFf6VExwQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywx+d8VlSpnOts0nkULokEkGyoBEJBkdD5fEUCdr/BAvUHsjOD0
-	X6+/4oCAquYAWQhEtHAErUCMl5/NxyrH3HC1P4DuHySyp3TId3uWRsd1dQ5i1538LwU=
-X-Gm-Gg: AeBDietvxXdih0qnY7g/xzYOqz7R4BQ/h/o4Rcc1Em9GyqezQd+2zi40ql4woCK4PHh
-	tOBtrnm974E8wVPWzcja5W3XSW4QHnfpCup6ILdY/HBrSgS5UHa/LKZlDKh8RTFP1VryhuEctRk
-	17LwP8PbUJt31Hzs2iLAsbHjwPvbq0PDu/4LP7/pAmm+c4LjBCsvXVLUzMTS4Un9MALsSkoWJ6+
-	GxoKNuQborQlpp4Or6sJ4Zol1POvhWwiKZ05TbO8Oets0K7Ca6VUPBVX0o5iZt/gjaw1HYfUqe/
-	ihFEqAToLgdRztyYp9fDdoVZEBq+kJ2oAyTNyvWlUfJwSjzC5cynW5lcdRwPCi6km46wE5SPUoe
-	r115fbZEV1prCiJ5bNew0j3ZB6O2QMmKtbYWZva9t1yMyBcgWfgRR13SWkUYpqbQnQJN5e8ztdu
-	WdH17roRT+tb88WgkI2H5PlQeW/RCFweY1264Lj4jratVcKnUNGga+0FhPvSf54hBhetFcN4HkI
-	u4Q7zQ=
-X-Received: by 2002:a05:690c:e4ea:b0:7bd:696d:5125 with SMTP id 00721157ae682-7bd696d561cmr7221337b3.45.1777602648819;
-        Thu, 30 Apr 2026 19:30:48 -0700 (PDT)
-Received: from [10.87.48.52] ([12.15.201.178])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd6652dae3sm5424557b3.8.2026.04.30.19.30.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 19:30:48 -0700 (PDT)
-Message-ID: <e03a3c1f-4b1c-4431-80e2-62051c8d227f@immunant.com>
-Date: Thu, 30 Apr 2026 19:30:46 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AjRhNCeV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777606357;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=AGHQZIIr7JtLFpAcwzlVPtO345HWtqACErkZP29Clnw=;
+	b=AjRhNCeVya2hhO3tD9yDwGH52MO5K9TU0y4dsuuug82CTbj8sZsj1cwbHftrLqOmJuoxoh
+	uSS2VDqeFD4zxtsup1Z1bidq7kX6a0WWgbihY4tNv/T583KjkRp/RY8sv2AUScyfkOh4dH
+	1t4R1tnDmEHFmu35pZfOSr7l/QSYjlo=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-440-JLdQnSEhO5WXLV2G9iAbOQ-1; Thu,
+ 30 Apr 2026 23:32:33 -0400
+X-MC-Unique: JLdQnSEhO5WXLV2G9iAbOQ-1
+X-Mimecast-MFC-AGG-ID: JLdQnSEhO5WXLV2G9iAbOQ_1777606348
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C9CA1800347;
+	Fri,  1 May 2026 03:32:26 +0000 (UTC)
+Received: from [10.44.48.3] (unknown [10.44.48.3])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 06CE71955D84;
+	Fri,  1 May 2026 03:32:13 +0000 (UTC)
+Message-ID: <3ff53353-3842-4a63-80a1-90a60d09fe02@redhat.com>
+Date: Fri, 1 May 2026 05:32:11 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -69,96 +51,122 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/2] KVM: arm64: Support FF-A direct messaging
- interfaces
-To: Yeoreum Yun <yeoreum.yun@arm.com>, perlarsen@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Ben Horgan <ben.horgan@arm.com>,
- Oliver Upton <oupton@kernel.org>, Armelle Laine <armellel@google.com>,
- Sebastien Ene <sebastianene@google.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20260121-host-direct-messages-v5-0-2c1614c94e80@google.com>
- <afPMQ29x5fjHwtDo@e129823.arm.com>
+Subject: Re: [RFC] proposal: KVM: Orphaned VMs: The Caretaker approach for
+ Live Update
+To: David Woodhouse <dwmw2@infradead.org>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, linux-kernel@vger.kernel.org,
+ kexec@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev
+Cc: rppt@kernel.org, graf@amazon.com, pratyush@kernel.org, seanjc@google.com,
+ maz@kernel.org, oupton@kernel.org, alex.williamson@redhat.com,
+ kevin.tian@intel.com, rientjes@google.com, Tycho.Andersen@amd.com,
+ anthony.yznaga@oracle.com, baolu.lu@linux.intel.com, david@kernel.org,
+ dmatlack@google.com, mheyne@amazon.de, jgowans@amazon.com, jgg@nvidia.com,
+ pankaj.gupta.linux@gmail.com, kpraveen.lkml@gmail.com, vipinsh@google.com,
+ vannapurve@google.com, corbet@lwn.net, loeser@linux.microsoft.com,
+ tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ roman.gushchin@linux.dev, akpm@linux-foundation.org, pjt@google.com
+References: <afEwWZksU0Fw61oT@plex>
+ <0a71472c-b397-4699-a518-61faffcf4ab2@redhat.com>
+ <c004f333ed4f7dedae1383f22d43b009cd83837e.camel@infradead.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <c004f333ed4f7dedae1383f22d43b009cd83837e.camel@infradead.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Mimecast-MFC-PROC-ID: 8X39LFsQphEfJhm0nuwFEaIYJGrqOFAWbKLcT1PAx5U_1777606348
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-From: Per Larsen <perl@immunant.com>
-In-Reply-To: <afPMQ29x5fjHwtDo@e129823.arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Yeoreum,
+On 4/30/26 17:27, David Woodhouse wrote:
+> On Thu, 2026-04-30 at 15:28 +0200, Paolo Bonzini wrote:
+>> I even wonder if, for long term simplicity, the interface for
+>> host->caretaker should be just for the caretaker to swallow the host
+>> into non-root mode, again as in Arm nVHE.
+> 
+> There's a lot of merit in that approach.
+> 
+> I talked about wanting to use this 'caretaker' for secret hiding.  But
+> why have *voluntary* secret hiding with the kernel hiding things from
+> its own address space, when you have have *mandatory* secret hiding
+> with something running in EL2, like pKVM.
 
-Sorry to keep you waiting; I'm addressing v5 feedback now.
+Well, other than because it's a lot of work? :)
 
-Per
+> Honestly, I don't see the *caretaker* being much of an ABI at all,
+> except from one kernel to the next.
 
-On 4/30/26 2:40 PM, Yeoreum Yun wrote:
-> Hi Per,
-> 
-> May I ask how this patch is progressing?
-> 
-> Thanks!
-> 
->> Support FFA_MSG_SEND_DIRECT_REQ unconditionally.
->> Support FFA_MSG_SEND_DIRECT_REQ2 if hypervisor negotiated version 1.2+.
->>
->> Framework messages (FF-A control plane) are filtered out. For
->> FFA_MSG_SEND_DIRECT_REQ, we look at flags in w2. Messages using the REQ2
->> interface are always partition messages.
->>
->> The second patch was part of a previous patch set [0] but was dropped
->> since the use case was unclear. A clear use case has now appeared: use
->> TPM device with CRB over FF-A when kernel boots with pkvm [1].
->>
->> Tested by booting Android under QEMU.
->>
->> Best Regards,
->> Per
->>
->> [0]: https://lore.kernel.org/all/20250730-virtio-msg-ffa-v9-0-7f1b55c8d149@google.com/
->> [1]: https://lore.kernel.org/all/20251027191729.1704744-1-yeoreum.yun@arm.com/
->>   
->>
->> Signed-off-by: Per Larsen <perlarsen@google.com>
->> ---
->> Changes in v5:
->> - 1/2: do_ffa_direct_msg: validate that sender is HOST_FFA_ID.
->> - Link to v4: https://lore.kernel.org/r/20260109-host-direct-messages-v4-0-95da4221d186@google.com
->>
->> Changes in v4:
->> - 1/2: do_ffa_direct_msg: check that flag in w2 is zero; drop unused vm_handle parameter.
->> - 2/2: ffa_call_supported: simplify logic by reordering cases.
->> -      do_ffa_direct_msg: switch polarity of check and update comment.
->> - Link to v3: https://lore.kernel.org/r/20251119-host-direct-messages-v3-0-c74d04944b26@google.com
->>
->> Changes in v3:
->> - Filter out framework messages as suggested by Will Deacon. Update cover letter accordingly.
->> - Update trailers: Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
->> - Link to v2: https://lore.kernel.org/r/20251030-host-direct-messages-v2-0-9f27cef36730@google.com
->>
->> Changes in v2:
->> - 1/2: Drop support for FFA_ID_GET interface in host handler.
->> - Link to v1: https://lore.kernel.org/r/20251030-host-direct-messages-v1-0-463e57871c8f@google.com
->>
->> ---
->> Per Larsen (1):
->>        KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in host handler
->>
->> Sebastian Ene (1):
->>        KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in host handler
->>
->>   arch/arm64/kvm/hyp/nvhe/ffa.c | 39 ++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 38 insertions(+), 1 deletion(-)
->> ---
->> base-commit: 6c790212c588fddeb0d852f2790840753bb604b1
->> change-id: 20251029-host-direct-messages-5201d7f55abd
->>
->> Best regards,
->> -- 
->> Per Larsen <perlarsen@google.com>
->>
->>
-> 
+I agree.
+
+> The *userspace* ABI considerations are all about how you make a vCPU
+> that runs asynchronously (should it conceptually just be an async
+> KVM_RUN call, which allows the vCPU to run in a kernel thread up to the
+> point of kexec? Why is it fundamentally tied to kexec at all?).
+
+It's not tied to kexec.  kexec is just forcing a handoff + forcing an 
+update.
+
+The big difference is that:
+
+1) if you don't tie it to kexec, a detached vCPU thread is a struct 
+vhost_task and a blocking vmexit schedules out the thread; while during 
+kexec you have s/kthread/pCPU/ and halting the CPU instead of scheduling 
+it out.
+
+2) if you don't tie it to kexec, address space isolation is the only 
+real reason for the complication of treating the caretaker as a separate 
+bare metal program.  OTOH maybe that's a feature - you could do:
+
+- ioctl(KVM_RUN_ASYNC)
+
+- then vmfd/vcpufd handoff to a new mm on top
+
+- then address space isolation on top
+
+- then kexec (de)serialization on top
+
+> I'd love to start without kexec in the picture at all. Just show me the
+> KVM API for starting a *confidential* guest (pKVM, SEV-SNP, whatever),
+> leaving it running, completely stopping the VMM and then starting a new
+> VMM to pick up from where it left off.
+
+Why confidential?
+
+Paolo
 
