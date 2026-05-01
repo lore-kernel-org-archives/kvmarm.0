@@ -1,127 +1,190 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8812367DF
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 13:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6695C3C345B
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 14:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777643257; cv=none; b=srfWzn3VLHhqeklCYN/TxbNE9MSxR2XxQByb+MGAIU9hMC/On1UC/t6zwLMVolNMyzQjWeY9qH8bE96uF21dSMJGaSvib7atGaGB9gfG3WVaZAIbbSUiVKewk6djD9u0E4xsGUuINdKoBTr+efdPQUu3LPSUywinmBS/kg2dFaM=
+	t=1777645108; cv=none; b=COPz8/vSUmBtRpVl+xCxXZPFtjO5Z3V3EsV/JdRZq+X2XXJvyDxmjXuOKuEHtQ34J8s/4twolH+5wVoJpPjyEQAvNufo1lMQ0CQee5USPy4edMS/QYthXaVQjTv9xzzdFZqMSzucRwyXWqiYMIOuVapc1GO55OYgGey9NX9E4+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777643257; c=relaxed/simple;
-	bh=rwgXGr1STx/LEHE1ouffCIS69kHVohj7ROm+8Hh7vEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rGmU67TnAAHNU4zOBj20vFWzRwEt2E+JfRSHvWM4OqwUslMR6sPYx556HhxrCom/Ef40LCVsrCiOSsqvY2zR+JH0jOKh07aOypxzfh7zrpsyDUi6T6Ix2/CWETm/PavEOM/xhn5EtrIzDPl+SQ7/YjE2UFf3H2k9wUqXon3pLBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=b6X4zW3y; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1777645108; c=relaxed/simple;
+	bh=n4QKpHTlKIbKxoVyb8jomzE98FcpdhxCxXybOaeTddY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C12JrV5PIRQmQWbksmIE2Df0GG+9J//rj1Eix60qCXqrWT0HErfR6+bhbHvIYXAhZfZXb1w8qkn0dUMfsakPuLIE0EBZdHPbw+SHNmZa4mTctNY69DffXvsyLTbm/W+/rJOcOcAaI5bC5CA5jwBVwKRKrhmY/+EgXkVJKRjqjQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YhClDYmW; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="b6X4zW3y"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YhClDYmW"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4CD2C176A;
-	Fri,  1 May 2026 06:47:30 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0FB5E3F62B;
-	Fri,  1 May 2026 06:47:33 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AB672C1C;
+	Fri,  1 May 2026 07:18:20 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF50F3F7B4;
+	Fri,  1 May 2026 07:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777643255; bh=rwgXGr1STx/LEHE1ouffCIS69kHVohj7ROm+8Hh7vEg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=b6X4zW3yp5qT6RabLlXDQVO/FeL7tPN2xjUmAxUqOuHLBhfKm042NUohm2aji/+WR
-	 JXlvItA0VhST3veBOd24n4TpwRBypzfIiq0UjILPpKh+oQ7G2jDOi9Th/SzhmBj2wi
-	 Mp8ScD8Qpzo9B9QD9wBvCHhHiQzQuAJaeSRIIU/4=
-Message-ID: <a7e2ac96-b710-40e5-a159-b49555bcf518@arm.com>
-Date: Fri, 1 May 2026 14:47:27 +0100
+	t=1777645105; bh=n4QKpHTlKIbKxoVyb8jomzE98FcpdhxCxXybOaeTddY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YhClDYmWmp6O5MaEN5QwnO5JBVi0bDYByAXkKn7fiDuCzxz0ob/7DxW/wZ/xIYLCA
+	 gkfwAy+hNWKVA8+B1KyQrqGix+V7kPyXloob1Ckrt+kuUQUF9cqYRo97BQpFH4JqxS
+	 BESkBXabNRE0Q6XJjUxIEpPESEi0NcjJgVMHTsOU=
+Date: Fri, 1 May 2026 15:18:16 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	mark.rutland@arm.com
+Subject: Re: [PATCH] KVM: arm64: Handle permission faults with guest_memfd
+Message-ID: <afS2KDp6zEo3zSvP@raptor>
+References: <20260430132351.280766-1-alexandru.elisei@arm.com>
+ <CA+EHjTwZ=yFx_NEyw5YEiGqCjsfM=QotHgsCUVQmWDr6cNKLZw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Thunderbird Daily
-Subject: Re: [PATCH v2 1/6] KVM: arm64: Make EL2 exception entry and exit
- context-synchronization events
-To: Fuad Tabba <tabba@google.com>, maz@kernel.org, oliver.upton@linux.dev
-Cc: james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- qperret@google.com, vdonnefort@google.com, catalin.marinas@arm.com,
- will@kernel.org, yaoyuan@linux.alibaba.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260501112149.2824881-1-tabba@google.com>
- <20260501112149.2824881-2-tabba@google.com>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <20260501112149.2824881-2-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwZ=yFx_NEyw5YEiGqCjsfM=QotHgsCUVQmWDr6cNKLZw@mail.gmail.com>
 
 Hi Fuad,
 
-On 5/1/26 12:21, Fuad Tabba wrote:
-> SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
-> exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
-> 0487 M.b D24.2.175 (p. D24-9754):
+On Thu, Apr 30, 2026 at 03:48:21PM +0100, Fuad Tabba wrote:
+> Hi Alexandru,
 > 
->   - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
->     a CSE.
->   - FEAT_ExS: the reset value is architecturally UNKNOWN; software
->     must set the bit to make the entry/exit a CSE.
+> On Thu, 30 Apr 2026 at 14:24, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >
+> > gmem_abort() calls kvm_pgtable_stage2_map() to make changes to stage 2. It
+> > does this for both relaxing permissions on an existing mapping and to
+> > install a missing mapping.
+> >
+> > kvm_pgtable_stage2_map() doesn't make changes to stage 2 if there is an
+> > existing, valid entry and the new entry modifies only the permissions.
+> > This is checked in:
+> >
+> > kvm_pgtable_stage2_map()
+> >   stage2_map_walk_leaf()
+> >      stage2_map_walker_try_leaf()
+> >        stage2_pte_needs_update()
+> >
+> > and if only the permissions differ, kvm_pgtable_stage2_map() returns
+> > -EAGAIN and KVM returns to the guest to replay the instruction. The
+> > assumption is that a concurrent fault on a different VCPU already mapped
+> > the faulting IPA, and replaying the instruction will either succeed, or
+> > cause a permission fault, which should be handled with
+> > kvm_pgtable_stage2_relax_perms().
+> >
+> > gmem_abort(), on a read or write fault on a system without DIC (instruction
+> > cache invalidation required for data to instruction coherence), installs a
+> > valid entry with read and write permissions, but without executable
+> > permissions. On an execution fault on the same page, gmem_abort() attempts
+> > to relax the permissions to allow execution, but calls
+> > kvm_pgtable_stage2_map() to change the existing, valid, entry.
+> > kvm_pgtable_stage2_map() returns -EAGAIN and KVM resumes execution from the
+> > faulting instruction, which leads to an infinite loop of permission faults
+> > on the same instruction.
+> >
+> > Allow the guest to make progress by using kvm_pgtable_stage2_relax_perms()
+> > to relax permissions.
+> >
+> > Fixes: a7b57e099592 ("KVM: arm64: Handle guest_memfd-backed guest page faults")
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >
+> > Lightly tested on an Orion O6 board, without pkvm, and without nested
+> > virtualisation.
+> >
+> > Doesn't apply cleanly on top of a7b57e099592, I can send a patch for that if
+> > needed.
+> >
+> >  arch/arm64/kvm/mmu.c | 24 +++++++++++++++++-------
+> >  1 file changed, 17 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index d089c107d9b7..dff58de7703b 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1576,6 +1576,7 @@ struct kvm_s2_fault_desc {
+> >  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> >  {
+> >         bool write_fault, exec_fault;
+> > +       bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+> >         enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> >         struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
+> > @@ -1587,10 +1588,12 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> >         gfn_t gfn;
+> >         int ret;
+> >
+> > -       memcache = get_mmu_memcache(s2fd->vcpu);
+> > -       ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+> > -       if (ret)
+> > -               return ret;
+> > +       if (!perm_fault) {
+> > +               memcache = get_mmu_memcache(s2fd->vcpu);
+> > +               ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+> > +               if (ret)
+> > +                       return ret;
+> > +       }
 > 
-> INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
-> bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
-> synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
-> MSRs to context-switching system registers (HCR_EL2, ZCR_EL2,
-> ptrauth keys, etc.). On FEAT_ExS hardware those reliances are not
-> architecturally backed unless EOS=1 (and, for entry, EIS=1).
-> 
-> Until commit 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg
-> infrastructure"), SCTLR_EL2_RES1 was a hand-rolled mask that
-> included BIT(11) (EOS) and BIT(22) (EIS), so INIT_SCTLR_EL2_MMU_ON
-> was setting both unconditionally. The conversion made
-> SCTLR_EL2_RES1 auto-generated; because the sysreg tooling only
-> models unconditionally-RES1 fields and EIS/EOS are RES1 only when
-> FEAT_ExS is absent, the auto-generated mask is UL(0). The seven
-> other bits dropped from the old mask (positions 4, 5, 16, 18, 23,
-> 28, 29) are unconditionally RES1 in the E2H=0 SCTLR_EL2 layout per
-> DDI 0487 M.b D24.2.175, so dropping them is harmless. EIS and EOS
-> are the only bits whose semantics changed for FEAT_ExS hardware
-> and where the kernel relies on the value being 1.
-> 
-> Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
-> INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
-> unconditionally CSEs regardless of whether FEAT_ExS is implemented.
-> This matches the pairing in arch/arm64/kvm/config.c which treats EIS
-> and EOS together as RES1 under !FEAT_ExS.
+> memcache is now uninitialized when perm_fault, and only read in the
+> !perm_fault branch below. It's safe today, but initializing it to NULL
+> would silence any defensive analyzer and keep things robust against
+> future churn.
 
-In v1 you also had this sentence:
-
-"INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
-very early EL2 init and the EL2 MMU-off transition, neither of which
-relies on these bits in the same way."
-
-To me, it seems useful to keep that sentence as it makes it clear that INIT_SCTLR_EL2_MMU_OFF is purposely not changed.
-Or is there a reason why you dropped it? Perhaps it's just obvious to people more familiar with this code.
-
-Thanks,
-
-Ben
+Sure, I'll initialise memcache to NULL.
 
 > 
-> Fixes: 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg infrastructure")
-> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
-> Assisted-by: Gemini:gemini-3.1-pro review-prompts
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/sysreg.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> >         if (s2fd->nested)
+> >                 gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
+> > @@ -1631,9 +1634,16 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> >                 goto out_unlock;
+> >         }
+> >
+> > -       ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+> > -                                                __pfn_to_phys(pfn), prot,
+> > -                                                memcache, flags);
+> > +       if (perm_fault) {
+> > +               /* Preserve the software bits from the existing table entry. */
+> > +               prot &= ~KVM_NV_GUEST_MAP_SZ;
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 736561480f36..7aa08d59d494 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -844,7 +844,7 @@
->  #define INIT_SCTLR_EL2_MMU_ON						\
->  	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
->  	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
-> -	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
-> +	 SCTLR_ELx_ITFSB | SCTLR_ELx_EIS | SCTLR_ELx_EOS | SCTLR_EL2_RES1)
->  
->  #define INIT_SCTLR_EL2_MMU_OFF \
->  	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+> Can you please phrase it the same way as the existing comment in
+> user_mem_abort, as that phrasing more precisely describes the
+> rationale? i.e.,
 
+Of course.
+
+> 
+>    /*
+>     * Drop the SW bits in favour of those stored in the
+>     * PTE, which will be preserved.
+>     */
+> 
+> > +               ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms(pgt, s2fd->fault_ipa,
+> > +                                                               prot, flags));
+> 
+> nit: args wrapped inside KVM_PGT_FN() is inconsistent with the rest of
+> the file (and with the else-branch immediately below). Every other
+> call site uses name-only inside the macro. Both expand the same way,
+> but it's better to stick to the convention.
+
+This was a typo on my part, thanks for catching it.
+
+> 
+> > +       } else {
+> > +               ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+> > +                                                        __pfn_to_phys(pfn), prot,
+> > +                                                        memcache, flags);
+> > +       }
+> >
+> >  out_unlock:
+> >         kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
+> 
+> With these fixed:
+> 
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Thanks!
+
+Alex
