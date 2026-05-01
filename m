@@ -1,68 +1,68 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBED43A5455
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 12:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69AF124886A
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 13:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777639912; cv=none; b=ESsJzRlY9jdqvyrKH+bwkWtAI+/oTviJDQv91D3rhmTGBAb1B9eGC3TIXvrpyZuuQdj6464aV1cg2vi7ZrEM2gJcet2Ry+QeZfJyCpBbZvOmKWxrP639c2kF7YtY2MgGOqCIMw+HoptklutsShIuBJ/vHyiVHlSfMWK4mWf3qGo=
+	t=1777640411; cv=none; b=ectrjMuoQ+J3PR+s9Z6De7fZsQhIWcyFf6VDn/MG9W47P0CQdAGGRFSg1JlKzKDBNgWrXI4SVmAHpDos1KWpzZnkVpIzGnlZU6O0AFJXarEeLR0JchWNzCPy8dFjwnt+vwAzD9W3Z9bG6cXEEbMYHPTcaWR9u2LAuTKLCxSG5Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777639912; c=relaxed/simple;
-	bh=IwxVPwjsxBBZiuBupDhQYeG358F5s+BoySPudQUssGE=;
+	s=arc-20240116; t=1777640411; c=relaxed/simple;
+	bh=sLCEaWfAO7nUm59+syKMMoJB8EG0FMX2rc04JgPJ2aM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Za0cJxW7oNHh3QQdz0TdXeJ0HksIxdd/wCMxBy/MZanhz8msCK4lMjSbgXlNXVSFyaq+dwVKe45hZdUdzJTAZ/T+uV8rCwVXlyG5qQElTqxsB30+A1WdEPboq5J0yBAk2wbuVbHgJlupR1Q1B18fanQV6JUFS+Ou/0IsRbPi5EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=pOIvT8NN; arc=none smtp.client-ip=209.85.222.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=ExcFBfZX8ObB4t8AjbYFqwo99L2u/Y9yC70epRZm0l7dSR50i7ReoU94H9z4GuVHl+PJpPlybKxXKdKCXWR+gl0KS5/wm9zKzSzDb+Qe8qRjVLDXOU7Vjq7XT12dLOoWocAS5KOF8oNGufHB4/dGQh5tMOiT0eHpioTZJ4aewnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=j3wAtx+Y; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="pOIvT8NN"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8cb5c9ba82bso299830185a.2
-        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 05:51:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="j3wAtx+Y"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8a3b0242631so25547776d6.3
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 06:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1777639910; x=1778244710; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1777640408; x=1778245208; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BDMlaTUNGVqmc1jmP6u4TfGXv+GXsCG3iAN8BRJBeOs=;
-        b=pOIvT8NNuxhlNSZLxeH8VIk/Kxtld6924gqzCybvrRurcZL2qLmQBtY+1nE9nqeiea
-         1yP48aRqxzY2T7CJXoSf5RCJfXaJs7ind9iVminIFqNBisyBocV1A/SzymuKwAxAI15a
-         XOkEODp4z/TdU0S4YZLutaYXAr4ZbMlpIbroS/aTAlTVPgv2+eWzS8LZbaoLHsIf6znh
-         4vAbBSQ3r6f5X0XicyqCR0W7PuGMPCux1Q8xyYp3N4Xipe49MdFsjm7jA/lVFBIb/d2Q
-         bgzTAf5XJ2ZcHKbfVOFlkbAeGZ2yJ6xmVzfig6kidDsJkYjmUY9/CW5oAGRr4kWdjAhD
-         8UKQ==
+        bh=sLCEaWfAO7nUm59+syKMMoJB8EG0FMX2rc04JgPJ2aM=;
+        b=j3wAtx+YFTwOmatx0cFpv+P7ljSUO1J6xfptRJcK++p6KcfAYC3Cq5QSzXwBEz5/r3
+         Nwe0u9cR8KiI7SftBDbS+svIsVsOzkdXdP2TtFSmd66BlFWfIvIYgWHH206gas4xXYNY
+         5p/Hp9gtZLqAmm/RVpnmRUmJJxvJHOFLxv73rreiaKHUCUqt9IEnBgozAC1xNQQhWGY9
+         +V//Ig0PEH+pDzazeVotNR0dslDw5vyoS0P/xNrlUXXc2I3dA6GZkYj5DuvwDYl3iFKP
+         ZmseUXro5uLLQLLgSAaaujkFFPCxBWZmBYom75xZO7UoqbZBPa3wdJXyx5L76Q+PVRL7
+         f4kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777639910; x=1778244710;
+        d=1e100.net; s=20251104; t=1777640408; x=1778245208;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BDMlaTUNGVqmc1jmP6u4TfGXv+GXsCG3iAN8BRJBeOs=;
-        b=qvjjVKoh6pLe6GeDf8hcUVJIZQOmDnS3FUKFMWV3Kzt3rfdvk/3yxOCZBIy46k2lgN
-         hYVks5NqNklfapW4wmvGGrC6bod1ZzD6ioPy1qUHwQkieSfgODNckuhxM10uK7lf9ZP0
-         keTXNijustNsuLov+YnMrBSVPZ6jKaXCnugo04isVdd32LYmPIlNgLxdZBeiLZdj5R4u
-         PjaG5eoAA3tEQvCA3dJTwIeBRQIYPsDUOhOewLyFZ6IoOnZEvpZL949m9ZrQ0pKEhpoy
-         /tnrR9w16CScWs1caDXVn6l0PkBXe6h74v4S/aeTpCKpir0EfyvzCdh7qtirOIg7ZHBd
-         NdWw==
-X-Forwarded-Encrypted: i=1; AFNElJ9zt6RgqagrGJFyaSFuCYvtzcKCJDPO6arFQbj3A9x5W6CP0VqwyeFS3usT4s5SqdpZm2r2Cfk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxs/YAzoMbZRJL23Z/+Ngph/5f2Uv24ttyTiiXCp/NuQhdf3d/3
-	p+Ae5bnNjEgy7VqCQVeeJylUq4da5x7GOsSpTu6B9NqurrMIX9HXKpRM4VPQThSOPRk=
-X-Gm-Gg: AeBDietv4uTJynitsPFz0slfXLtW860n3koQd6Wjg0UxOx9VfaNY+Qe7OSDvB+9iNJp
-	WDMujD9ZFSFulzLShBRHH9WPdphNgWLeHx2T4lBrScDsH/ZobwkkEQAh9LzKbEz8BHFfH64tCel
-	MKWPPWMHXElQi4muSA6c9cVh3v0QFSoSJiXBU5ajd14LjRZTZUDsZvSQELfl3YI/9DWF8e77maQ
-	8PD/2dme0GBAZZ7TKStC/tMSy0anp40NehxSUoNxsdvB/cXHQbEFw7CyHfh8GryAjkVbo22n1JW
-	4RdqhUAWt+arIRr1kkJs9FqrwrjxnrJJVNMa1r+aYagCoILRhwFGHlWfvVo/u6GMuQr2q72CXOk
-	fNrSY2XoNCmgbv6LxMZUm5+PL+XUir0XwmhRCL0xVP1CS8F23JTUcc5gv3ihvZUxaPtDrTIEwgt
-	eQBOFEBThGgc6qFehKpUiXs9VSVcLd8U0KN3hR8xyI820eHhCE1kznx5rnIzbWcRzEfsHA9PBJj
-	XyMhdBvRshfb9Pi
-X-Received: by 2002:a05:620a:25d3:b0:8ed:d906:a8da with SMTP id af79cd13be357-8fa86fa6765mr1113897585a.18.1777639909805;
-        Fri, 01 May 2026 05:51:49 -0700 (PDT)
+        bh=sLCEaWfAO7nUm59+syKMMoJB8EG0FMX2rc04JgPJ2aM=;
+        b=Wihcp7SrXxLwZX66b2EthPBpX/faC+/g7omZpA77N5533sL1Ic+7tD6c8e7A++BEQm
+         4BFP/ZdzeZ0d8zeLFtoCMRK1FKBrGSKn6yLDDgnnaz2RxK9KuHrv5caYBNODJft3xKs4
+         uVEZ/aBGUuqGm3+VYwk6eqRm4LQr1cXRxL7noeYyvYTSTtamzrVIw7pDB3JAQuQBHAFT
+         hzVUfQEx7EDWo2/KRKwh7K2SggoP+b/hrgSZVdlZGz/k8qNORhYLdmUSxgtESxopGEaD
+         SJ1DRpSgc2MEiN9npLhrDaBSB/CTGi1q5MYV/hGoBX5TS7grcLUJxJmWLHP+psGOPb2e
+         egAQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/dU2beZouDWlkhc25xIWGc01HsW7LL/aZ/Op54RFJyyQD6+8R102WREd2yQiml2sX15m03Cmg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzHfuD5n5ZHwd5xn/B5eT0b33D9RBQq1tbnUA3uKUDcGsPtvVEk
+	r3egyY0fdfiMrDuK4djDO/CxXfD5692BMYwen3zeFWxLrW7rciTFptz9TWsD1XFVHPk=
+X-Gm-Gg: AeBDieuDcUT81d/clRpLUhZ20DXI6Ax23rOv1ptjIXVFxxvSJ1MdnskYiSJAR+YVtob
+	f4AbEXMsURAW1urT0ywMeJUDcXHjt9+MVmNVn+hSuE80PO0nda28XN/j9aom7sAINI7Y/LmQDXo
+	gnA4Hsy9kSjSPl/Z6fxbVNCcOnIokukg0HzzrtEbYIZR1gsl/M2CdMo5DPmm5+hHw8ry5nQNAMt
+	11UsiwVjg3zLKUtTc0ij+V6tNtqJ+a4c3kkVZ/ye+KoOnkxkKkWUF2T+WZmyvnvlp4T5dXXWwoK
+	FcDzijYoL1vnGun4katEx+TDjoXLuGNs6aknHIp2vgxDymwGb+zHa8g8jIh96G4lH+7XgalCBfa
+	OfVfY2A6rs+36bAmqjTkrGr+6Pf1QiAsxW6wjF5UeXqFXDYE6ZdjL/g4HS8E+Y2cpOQ14sOieJ1
+	yezVbr2zvcSEWPO4yXDvhzto4mYTZ5m6tnvSxcuQp457bAwdda2gmvFdARhhedX886m6H8MSpLn
+	thn0banIecyPo1j6+xHHTY/Ng0=
+X-Received: by 2002:a05:6214:3d85:b0:8b5:e126:e77d with SMTP id 6a1803df08f44-8b5e126e7b5mr18314046d6.8.1777640407970;
+        Fri, 01 May 2026 06:00:07 -0700 (PDT)
 Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2667d5cesm157094985a.0.2026.05.01.05.51.49
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c7accddsm23110796d6.36.2026.05.01.06.00.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 05:51:49 -0700 (PDT)
+        Fri, 01 May 2026 06:00:07 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1wInLQ-00000005BDs-2rAu;
-	Fri, 01 May 2026 09:51:48 -0300
-Date: Fri, 1 May 2026 09:51:48 -0300
+	id 1wInTS-00000005DWr-2vHb;
+	Fri, 01 May 2026 10:00:06 -0300
+Date: Fri, 1 May 2026 10:00:06 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Mostafa Saleh <smostafa@google.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -72,10 +72,11 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
 	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
 	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 13/25] iommu/arm-smmu-v3-kvm: Probe SMMU HW
-Message-ID: <20260501125148.GE6912@ziepe.ca>
+Subject: Re: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page
+ table
+Message-ID: <20260501130006.GF6912@ziepe.ca>
 References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-14-smostafa@google.com>
+ <20260501111928.259252-9-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,82 +85,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260501111928.259252-14-smostafa@google.com>
+In-Reply-To: <20260501111928.259252-9-smostafa@google.com>
 
-On Fri, May 01, 2026 at 11:19:15AM +0000, Mostafa Saleh wrote:
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 61e6ab364086..157acde0436d 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -4738,12 +4738,6 @@ static int arm_smmu_device_reset(struct arm_smmu_device *smmu)
->  	return 0;
->  }
->  
-> -#define IIDR_IMPLEMENTER_ARM		0x43b
-> -#define IIDR_PRODUCTID_ARM_MMU_600	0x483
-> -#define IIDR_PRODUCTID_ARM_MMU_700	0x487
-> -#define IIDR_PRODUCTID_ARM_MMU_L1	0x48a
-> -#define IIDR_PRODUCTID_ARM_MMU_S3	0x498
-> -
->  static void arm_smmu_device_iidr_probe(struct arm_smmu_device *smmu)
->  {
->  	u32 reg;
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> index 64618299d03a..f904f4d19609 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> @@ -84,6 +84,12 @@ struct arm_vsmmu;
->  #define IIDR_REVISION			GENMASK(15, 12)
->  #define IIDR_IMPLEMENTER		GENMASK(11, 0)
->  
-> +#define IIDR_IMPLEMENTER_ARM		0x43b
-> +#define IIDR_PRODUCTID_ARM_MMU_600	0x483
-> +#define IIDR_PRODUCTID_ARM_MMU_700	0x487
-> +#define IIDR_PRODUCTID_ARM_MMU_L1	0x48a
-> +#define IIDR_PRODUCTID_ARM_MMU_S3	0x498
-> +
->  #define ARM_SMMU_AIDR			0x1C
+On Fri, May 01, 2026 at 11:19:10AM +0000, Mostafa Saleh wrote:
+> Create a page-table for the IOMMU that shadows the host CPU stage-2
+> to establish DMA isolation.
 
-Lets put these hunks in some earlier patch to migrate out the
-functions/etc
+Is there a reason you can't just use the CPU S2 for the iommu?
 
-I think all these pkvm/arm-smmu-v3.c should just be building up the
-driver.
+ie the CCA RMM is doing that, it is how ARM imagined this stuff would
+work.
 
-> +static bool smmu_nesting_supported(struct hyp_arm_smmu_v3_device *smmu)
-> +{
-> +	unsigned int implementer, productid, variant, revision;
-> +	u32 reg;
-> +
-> +	if (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1) ||
-> +	    !(smmu->features & ARM_SMMU_FEAT_TRANS_S2))
-> +		return false;
-> +
-> +	reg = readl_relaxed(smmu->base + ARM_SMMU_IIDR);
-> +	implementer = FIELD_GET(IIDR_IMPLEMENTER, reg);
-> +	productid = FIELD_GET(IIDR_PRODUCTID, reg);
-> +	variant = FIELD_GET(IIDR_VARIANT, reg);
-> +	revision = FIELD_GET(IIDR_REVISION, reg);
-> +
-> +	if (implementer != IIDR_IMPLEMENTER_ARM)
-> +		return true;
-> +
-> +	if (productid == IIDR_PRODUCTID_ARM_MMU_600)
-> +		return variant >= 2;
-> +	else if (productid == IIDR_PRODUCTID_ARM_MMU_700)
-> +		return !(variant < 1 || revision < 1);
-> +
-> +	return true;
-> +}
+Once you start supporting DMA like this you have no choice but to keep
+a fully populated at all times S2 around, why not use that for the CPU
+too to avoid faults?
 
-Why not share all this errata stuff with the idr parsing code too?
+I guess there is a reason, but maybe explain in the commit message?
 
-We already have ARM_SMMU_FEAT_NESTING that has the above calculation.
-
-The two drivers use the same ARM_SMMU_FEAT system, I would expect one
-chunk of shared code to compute the FEATs, who cares if pkvm doesn't
-use all of them?
-
-Use the same errata logic and so on to get to the feat bitmap.
+It sure would be simpler, you wouldn't have to mess with iopgtable at
+all...
 
 Jason
