@@ -1,294 +1,184 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F143C9453
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 14:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777645284; cv=none; b=dRnFbzS4gBQ96Pda1UuZBbDefBb/QA90nICtbiU88nVBOBjpWODcH68v+Qhyi8gzz0oHJhLsz337IoInnkDCOnS0f7EONZq1YX89vpiR7z7WR4i+0VaR6NcSeHYvwx4cIy947Cca7FM63stsU2XAy0gavCu6B2/Z45ExnRFhyok=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777645284; c=relaxed/simple;
-	bh=qAtodJ9TKmiZz4msSUj9WtzN6/ujAzAtgV0rPu56XbU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=m3uQ5/AZ2zvMNeae5VdWgEqdrahxqyIT6ztdqVsLab9F7L1Ghq6jPVAVC3uaVAvSV3K7cMKrM91xp28l0DDfD0FUYMa96EXkFtpK6rdTE8mp6q/zCbkZc4GvUAVHobJDDZvDBjNA1OX7crtxSvfyQHFjp2oVVatDQA/6lXniwvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Aajq6OjV; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6503D3CE4BA
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 15:02:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777647724; cv=pass; b=XQ43FQiqAGDC68tlrqP7Zl1aE0+4FbWQdJtVPwPoHqBTAByzN1lewCYAUChJIcNYxQRYCJLuDKrCLrLOLXe1NgsmwwOSyjR6wNIti5CTtGxmD6xPacaX1/WYBPi6eSRyHZzXO4THsExaqOvpeaXbRx51YkmkujQbqMPFeEDbcWQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777647724; c=relaxed/simple;
+	bh=yiYhJUMfNo18oK0obMw1l0Xm1WbS0b2LK8MKLVxr1fA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gc2Aj7e4Mf6ILlQJP1UVbJsgChVuq+DPQhxtxoYKJ6acmckDQyqre/Ht5t/AKBQbyC1joQEg0LK0VZfUXIKK8105j+MqfYDO00neRcXrRd7e1ENoIHtnEJUhDVWrmD4pnSHduvIwcA6wCkNWdKYCe2tkyAvGXsbl0rW9NwAhsEc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CbHljRGn; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Aajq6OjV"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-43d7badbd7dso959820f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 07:21:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CbHljRGn"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-50d836552daso559481cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 08:02:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777647720; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VwR1fxYJlcBldmFfsAGHh66hgJI92MwQDVIDgkzvX4H7nLy1SAcdwSQMuMU3MczXLZ
+         wWNLCOW81hHmJ6ICpz3693xzE7X9pMxi4ZosJfDAfB46ci2Xoef+eXxzcd8ymnmEytF6
+         M6vUNvSwHrzrHaqSlWvEIhz1mmwuubmdKMX/UStHPz0JlnFAA48erBnI8o7N9n7/hMBk
+         FKUS0MjEOzXAmdbZuENAtYZ/DC6yfoB8SVWLY4zP5gMCaIIo8c05ZEagbfbrx2MYWamt
+         YO94E7ke1LxiY45K6WARMPhtqirthDNr4n/xLr7m+5s4lVaieqA0dPtb9quykro6Me2N
+         9clw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=zc/yqiuFI8zLs6WNwYRHDaX4KurA8TMA/7iu8L3wyVY=;
+        fh=S9jiarpfuJ7wLCrZQihv5Bde0R494eMaZ3R4EIHti6g=;
+        b=IcEh2qCMXp0GbmQl0nnBMXF/CYuBQKM9/8e5dKnRHivN6BhLYEZZadbqGfRL9t74WN
+         UbAKhPtN+UKftEPTD9v3Y1L8oOQWEHY9Sjiam1JzzTA8r12tGp3uOUBtSTtoaFTRSAf9
+         ATfzy+ygzgmYDosh8aEDGsJCBUuOjp3uplASxxgLQy3ZDgy2SFuX3y52eTaEHkaq6BeI
+         leb4fqDXULbnqrZS2bW146TVMEtUGCOivmT1QDtwj+GxIo7EUFTpOLasC6BmutOkYxrL
+         huZU/KLKS3wWM5Rl/5B7lA23yxU4RhO5dFEb0zXdAgbIUIKLgrtlt+4DvaQStgusHfMt
+         JiiA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1777645281; x=1778250081; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DBnnGCpYSonyRl/RZZsL4XC/Tyffyj/BGojejPAjpWk=;
-        b=Aajq6OjVCztJoBh70OQKO4f7GrKMK8UaAb8G25+6ugUuwDdFOe45m2lM5Wc1EIo08I
-         NLLmK3BFyN8sfOUwmw/uj6lobo9l1aoNJgVtbMCXXf4ewUNV0sg91tybSmXqreXD9hhC
-         2a9CJt0xsfBQdFJNgt2HQlTiUPNBnOyYxaVWXs7Oh/mKijRvQBEWstyKZdOWYkARoOUJ
-         9AUWf0u/vmOYCIjSdh4CBAVnqmUVneC/CEqcQ7qs87DP9vWAbm4NHaR3Ne/eZOPvuD2N
-         P5HtnKojAVHjhIkcUbL95zWN/wx9YmRKyjNrceZkToUmxJmdldWi+FU/Lnw/gurUbae8
-         0X+w==
+        d=google.com; s=20251104; t=1777647720; x=1778252520; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zc/yqiuFI8zLs6WNwYRHDaX4KurA8TMA/7iu8L3wyVY=;
+        b=CbHljRGnOY/1BdAbIeGh7p38mcvg50OagARZw3OIS6E6djHi695Mq2pl1Gpni81rTX
+         w+gS+O+CLlwLBYYvEtMerSQ3h9y6LmCYWkam5TNvIcYX9C98HmzK7FrIisaCmPIWeZhI
+         nwuCRivj3pTeUOTwLMEwaDXkdt48utVcufihl/vjOeA3UGbZr3aL0sbCvHI1L5F4tJoz
+         Noe0NFzLKHsMSzYDX6Td49huCvSOpqkuAQpEJSSUqjNNygA0oSsAx+oTvClZxzzeY1AM
+         ZlR3T6SShwVFlEb8lkfu5ubHHO8G9mqGyaNbaRKzACuPM9c19+AoiQRs2ITbNBFI1Yci
+         CW5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777645281; x=1778250081;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DBnnGCpYSonyRl/RZZsL4XC/Tyffyj/BGojejPAjpWk=;
-        b=atGPGqQayIfpQERrRf2npjP15iOUpXhCPR1VMnj1CG5pRjt4ZcMiYISXzYaVN+OGxC
-         qm+5+yYs6RiRjutriZnzcDXTIaEwzXzbNaQhpA1mTPqSQJcgbaKQ0VhkbvHi0w43jpDo
-         HoIHsZai5ESL+F2TZLVmd+QZ6VjI3HqCfDIGRft3rX6Cyj4qyGB1Kv6235QJI++OyrHA
-         diFqOUGLbIGPVqAnsDqx5cd38tBwzqDB+kG9IFoYnSYK768jcZFkH5hPDVrnvc1vClRU
-         Yvz6mrEchO0WbDZv3IAcK+PSthiw3bWFWbbphzNsqZdi5fr9sR/bn6iYweAURL0ItV2q
-         enAQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+liFvPwoOerYo+6UOK0gg8AFoemS3x4/Hotqclu24ULBiVNkGCQrG8B4SX5O5deIDKDILPNEE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyhUJCsdByuep4dovcIkN9eoCwctERVHOdOEDHqzjJRweX+HIH6
-	xsTXP37+k+NFg9E7vDfhkfIOWzQdLKvhBdXOM3XOlInqTEj/kaNA7eRxIkytUC3zbKo=
-X-Gm-Gg: AeBDietxlrdJcK6G/6lM2eHfhoOyvG3PR7ju7nWrkgOMvkm+J60i04Ek5fmtozaNi5Y
-	8DFTq2N2S1ddjyH2qnYMLXX8sasZ4sFUreBVUZZJhKJAgwReAwKsuelcAkB3hRpDYYoKkSIRzJl
-	Hpv80IjNcxDaijDQF7b79Tj3BW0jPJ8juI5arWqUhUyW69M65KHxIQdun/tAOFZC84gPOF3ZwGT
-	u8FFbZXPz2W06tAse7VDppdVL4ZJWdsq4F+NjCEK3L2mQRZpfuip0zGbZTmPlHLQrLIoWYhXUc/
-	laJ8GiAPn2qgDWsRIa6D07clvjA/lVddt28JPg0ptdxYYGrsqxSBHETNxB2ddRhqav4nYp2JzyN
-	ZbMH83UzhN7efsicwkVnEhWwoQIKgtYTKWaplVicTAYFvfVZY/gKRgX8hbsT0gf257EFZLbl/qK
-	Jh8lmTiCljg0vRYz7NZTkPLE8Dng09AG2rCQ==
-X-Received: by 2002:a5d:5d83:0:b0:43f:e413:f6fd with SMTP id ffacd0b85a97d-44a83318609mr5106522f8f.0.1777645281205;
-        Fri, 01 May 2026 07:21:21 -0700 (PDT)
-Received: from draig.lan ([185.124.0.195])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a986aa3a5sm5802041f8f.26.2026.05.01.07.21.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 07:21:20 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 8A2A75F8FC;
-	Fri, 01 May 2026 15:21:19 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: qemu-devel@nongnu.org,  Andrew Jones <andrew.jones@linux.dev>,  Eric
- Auger <eric.auger@redhat.com>,  "open list:ARM" <kvmarm@lists.linux.dev>,
-  "open list:Default mailing list" <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH] arm: add wfx test case
-In-Reply-To: <afSnVJLe7HrB6ISS@raptor> (Alexandru Elisei's message of "Fri, 1
-	May 2026 14:15:14 +0100")
-References: <20260427130045.3669851-1-alex.bennee@linaro.org>
-	<afSnVJLe7HrB6ISS@raptor>
-User-Agent: mu4e 1.14.1-pre3; emacs 30.1
-Date: Fri, 01 May 2026 15:21:19 +0100
-Message-ID: <87zf2jcisg.fsf@draig.linaro.org>
+        d=1e100.net; s=20251104; t=1777647720; x=1778252520;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zc/yqiuFI8zLs6WNwYRHDaX4KurA8TMA/7iu8L3wyVY=;
+        b=NbuaHOTL58WCz8LddyHl/GC3qY1g2jhrySjLhBYsQ1/isSkb+daid5rgg/rKelAknN
+         sIdqwmykwxGexkF64Om07ngUdDoUAc0/6vpeVTY9zZjfV/57kw+GlIQ988cTfGok2yAj
+         aJ9ciVvEGcQts7zAgdbm4mw7A3SEWMqIzc5DoNFknWRQeWbqrSd56QwgAlKPNRMHwJyB
+         /71z6o/w9iCOvP/QZf/oqpRWv5UBo91Kdh+e5Xr/7Qvd1bm1AO0MF88SoGgS324dMmos
+         dX90PnPOkFIe0O6p4gG4UgwOkRbZr2W7XDoqYRBuBhg/DOb3GVSCUhjrRbWwh4B0Idux
+         xxlg==
+X-Forwarded-Encrypted: i=1; AFNElJ+QmVqH2iBei0+g9Piit/uLcFkxZieoEClIGbncwmflkWuTMRlnZmfmKAi16K+4q0PU5UN4FHg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwaihrEFgwe2dAf40EGoKlRNs/JC1cC50OMOYL7sdq9G3hSlR89
+	+xitc/fBwVrvOHuZG2MtDugtW6gGxSKwnruc8HgZbLflCWI2Y/TgyHif+V4FwjCfaHRFmSUDCn9
+	p9Ko31Db4pYIeKQ+5L5HpCbXYJXQNh9heDbiUY2qv
+X-Gm-Gg: AeBDiet627ONOVjuGmezAHb5hluNjQOrQ/YJLSJdOvLnnX0AldJf8Sse4bC3Thp68tN
+	J3bDEYZgcF3SFR/mEjGTLuv6tFU12CmU3c2Uh/GBpsLRG8mdhMvDMHiH5PDDOFei2XOu4jIV0iy
+	NP/FJNhi+NjvzO964Zk2Dn0YO2BpfIP8pwawmFOjY9f3B9uoHsEl36eQlCaBSgf45iywZP+HYVD
+	Yxy0kphSl1wX2SVDPwIDWgDqKK5nslDMaWl0KTdVg0Mfu2XYZS/R51F7Ef79ySskdQgfdlcoeSt
+	Y1DUV3F1DhlBfD70OUCD1ssbgpF2Nl1mcttNWJPtn8mcrJbVmHE+YuqbXZGW5w==
+X-Received: by 2002:a05:622a:5e17:b0:510:fa1:73c5 with SMTP id
+ d75a77b69052e-5103da47567mr15438331cf.16.1777647719224; Fri, 01 May 2026
+ 08:01:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20260501112149.2824881-1-tabba@google.com> <20260501112149.2824881-2-tabba@google.com>
+ <a7e2ac96-b710-40e5-a159-b49555bcf518@arm.com>
+In-Reply-To: <a7e2ac96-b710-40e5-a159-b49555bcf518@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 1 May 2026 16:01:22 +0100
+X-Gm-Features: AVHnY4INmeFm8QA4K3bkZ03la2-U8rDh6s5g7fQg4Z1xuyOvTM6dsAqgNAaZVmc
+Message-ID: <CA+EHjTwgUF4AEw6WvxPiwMTtrTUEs1NjjuKso+VBChon2cdozQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Make EL2 exception entry and exit
+ context-synchronization events
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
+	vdonnefort@google.com, catalin.marinas@arm.com, will@kernel.org, 
+	yaoyuan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Alexandru Elisei <alexandru.elisei@arm.com> writes:
+Hi Ben,
 
-> Hi Alex,
+On Fri, 1 May 2026 at 14:47, Ben Horgan <ben.horgan@arm.com> wrote:
 >
-> On Mon, Apr 27, 2026 at 02:00:45PM +0100, Alex Benn=C3=A9e wrote:
->> This is based on a similar test case I wrote for QEMU's tcg tests althou=
-gh
->> obviously able to take advantage of kvm-unit-tests additional plumbing f=
-or
->> dealing with the GIC and IRQs.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  arm/Makefile.arm64        |   1 +
->>  lib/arm64/asm/processor.h |   7 ++
->>  lib/arm64/asm/sysreg.h    |   3 +
->>  arm/wfx.c                 | 137 ++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg         |   5 ++
->>  5 files changed, 153 insertions(+)
->>  create mode 100644 arm/wfx.c
->>=20
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index a40c830d..52b3f35d 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -64,6 +64,7 @@ tests +=3D $(TEST_DIR)/cache.$(exe)
->>  tests +=3D $(TEST_DIR)/debug.$(exe)
->>  tests +=3D $(TEST_DIR)/fpu.$(exe)
->>  tests +=3D $(TEST_DIR)/mte.$(exe)
->> +tests +=3D $(TEST_DIR)/wfx.$(exe)
->>=20=20
->>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->>=20=20
->> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
->> index 32ddc1b3..2104036d 100644
->> --- a/lib/arm64/asm/processor.h
->> +++ b/lib/arm64/asm/processor.h
->> @@ -173,5 +173,12 @@ static inline bool system_supports_rndr(void)
->>  	return ((id_aa64isar0_el1 >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf) !=3D =
-0;
->>  }
->>=20=20
->> +static inline bool system_supports_wfxt(void)
->> +{
->> +	u64 id_aa64isar2_el1 =3D read_sysreg_s(ID_AA64ISAR2_EL1);
->> +
->> +	return ((id_aa64isar2_el1 >> ID_AA64ISAR2_EL1_WFxT_SHIFT) & 0xf) !=3D =
-0;
->> +}
->> +
->>  #endif /* !__ASSEMBLER__ */
->>  #endif /* _ASMARM64_PROCESSOR_H_ */
->> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
->> index f2d05018..cb96a649 100644
->> --- a/lib/arm64/asm/sysreg.h
->> +++ b/lib/arm64/asm/sysreg.h
->> @@ -77,6 +77,9 @@ asm(
->>  #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
->>  #define ID_AA64PFR1_EL1_MTE_SHIFT	8
->>=20=20
->> +#define ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
->> +#define ID_AA64ISAR2_EL1_WFxT_SHIFT	0
->> +
->>  #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
->>  #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
->>=20=20
->> diff --git a/arm/wfx.c b/arm/wfx.c
->> new file mode 100644
->> index 00000000..912e50e6
->> --- /dev/null
->> +++ b/arm/wfx.c
->> @@ -0,0 +1,137 @@
->> +/*
->> + * WFX Instructions Test (WFI, WFE, WFIT, WFET)
->> + *
->> + * Copyright (c) 2026 Linaro Ltd
->> + *
->> + * SPDX-License-Identifier: GPL-2.0-or-later
->> + */
->> +
->> +#include <libcflat.h>
->> +#include <asm/processor.h>
->> +#include <asm/gic.h>
->> +#include <asm/timer.h>
->> +#include <asm/io.h>
->> +
->> +#define TIMEOUT 200000
->> +
->> +#define sev() asm volatile("sev" : : : "memory")
->> +#define sevl() asm volatile("sevl" : : : "memory")
->> +#define wfi() asm volatile("wfi" : : : "memory")
->> +#define wfe() asm volatile("wfe" : : : "memory")
->> +
->> +#define wfit(reg) \
->> +	asm volatile(".arch armv8.7-a\n\twfit %0" : : "r" (reg) : "memory")
->> +#define wfet(reg) \
->> +	asm volatile(".arch armv8.7-a\n\twfet %0" : : "r" (reg) : "memory")
->> +
->> +static void timer_handler(struct pt_regs *regs)
->> +{
->> +	/* Disable timer to stop IRQ from re-firing */
->> +	write_sysreg(0, cntv_ctl_el0);
->> +}
+> Hi Fuad,
 >
-> It is customary for the interrupt handler to ack the interrupt at the GIC=
- level.
+> On 5/1/26 12:21, Fuad Tabba wrote:
+> > SCTLR_EL2.EIS and SCTLR_EL2.EOS control whether exception entry and
+> > exit at EL2 are Context Synchronisation Events (CSEs). Per ARM DDI
+> > 0487 M.b D24.2.175 (p. D24-9754):
+> >
+> >   - !FEAT_ExS: the bit is RES1, so the entry/exit is unconditionally
+> >     a CSE.
+> >   - FEAT_ExS: the reset value is architecturally UNKNOWN; software
+> >     must set the bit to make the entry/exit a CSE.
+> >
+> > INIT_SCTLR_EL2_MMU_ON in arch/arm64/include/asm/sysreg.h sets neither
+> > bit. KVM/arm64 hot paths rely on ERET from EL2 being a CSE, and on
+> > synchronous EL1->EL2 entry being a CSE, to elide explicit ISBs after
+> > MSRs to context-switching system registers (HCR_EL2, ZCR_EL2,
+> > ptrauth keys, etc.). On FEAT_ExS hardware those reliances are not
+> > architecturally backed unless EOS=1 (and, for entry, EIS=1).
+> >
+> > Until commit 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg
+> > infrastructure"), SCTLR_EL2_RES1 was a hand-rolled mask that
+> > included BIT(11) (EOS) and BIT(22) (EIS), so INIT_SCTLR_EL2_MMU_ON
+> > was setting both unconditionally. The conversion made
+> > SCTLR_EL2_RES1 auto-generated; because the sysreg tooling only
+> > models unconditionally-RES1 fields and EIS/EOS are RES1 only when
+> > FEAT_ExS is absent, the auto-generated mask is UL(0). The seven
+> > other bits dropped from the old mask (positions 4, 5, 16, 18, 23,
+> > 28, 29) are unconditionally RES1 in the E2H=0 SCTLR_EL2 layout per
+> > DDI 0487 M.b D24.2.175, so dropping them is harmless. EIS and EOS
+> > are the only bits whose semantics changed for FEAT_ExS hardware
+> > and where the kernel relies on the value being 1.
+> >
+> > Make the guarantee explicit: include SCTLR_ELx_EIS | SCTLR_ELx_EOS in
+> > INIT_SCTLR_EL2_MMU_ON so that EL2 exception entry and exit are
+> > unconditionally CSEs regardless of whether FEAT_ExS is implemented.
+> > This matches the pairing in arch/arm64/kvm/config.c which treats EIS
+> > and EOS together as RES1 under !FEAT_ExS.
 >
->> +
->> +static bool check_elapsed(uint64_t start, uint64_t threshold, const cha=
-r *test, bool more)
->> +{
->> +	uint64_t end =3D read_sysreg(cntvct_el0);
->> +	uint64_t elapsed =3D end - start;
->> +	bool pass =3D more ? elapsed >=3D threshold : elapsed <=3D threshold;
->> +
->> +	report(pass, "%s (%ld ticks)", test, elapsed);
->> +
->> +	if (!pass) {
->> +		report_info("%s %s", test, more ? "woke too early" : "slept despite S=
-EV");
->> +	}
->> +	return pass;
->> +}
->> +
->> +static void test_wfi(void)
->> +{
->> +	uint64_t start;
->> +
->> +	report_info("Testing WFI...");
->> +
->> +	start =3D read_sysreg(cntvct_el0);
->> +	write_sysreg(TIMEOUT, cntv_tval_el0);
->> +	write_sysreg(1, cntv_ctl_el0); /* Enable timer, no mask */
->> +	isb();
->> +
->> +	local_irq_enable();
->> +	wfi();
+> In v1 you also had this sentence:
 >
-> Consider this scenario:
+> "INIT_SCTLR_EL2_MMU_OFF is left unchanged: that path is used during
+> very early EL2 init and the EL2 MMU-off transition, neither of which
+> relies on these bits in the same way."
 >
-> 	local_irq_enable();
-> 	// CPU takes the interrupt, handles it and returns.
-> 	wfi(); <- CPU now waits forever for an interrupt that will never come
->
-> The proper way to do it on baremetal would be:
->
-> 	local_irq_disable();
-> 	// Program timer to fire
-> 	wfi();
-> 	// Timer fires, GIC asserts the interrupt, WFI completes
-> 	local_irq_enable();
-> 	// CPU handles the interrupt
-> 	check_elapsed(..)
->
-> But this is not baremetal. KVM can decide not to trap WFI (look at
-> arch/arm64/kvm/arm.c::kvm_arch_vcpu_load() -> kvm_vpcu_should_clear_twi()=
-). In
-> that case, the WFI might complete due a host interrupt, and check_elapsed=
-() will
-> fail because the timer hasn't yet fired.
->
->> +	local_irq_disable();
->> +
->> +	check_elapsed(start, TIMEOUT, "WFI", true);
->> +}
->> +
->> +static void test_wfe(void)
->> +{
->> +	uint64_t start;
->> +
->> +	report_info("Testing WFE/SEV...");
->> +	sev();
->> +	start =3D read_sysreg(cntvct_el0);
->> +	wfe();
->> +	check_elapsed(start, TIMEOUT, "WFE/SEV", false);
->> +
->> +	report_info("Testing WFE/SEVL...");
->> +	sevl();
->> +	start =3D read_sysreg(cntvct_el0);
->> +	wfe();
->> +	check_elapsed(start, TIMEOUT, "WFE/SEVL", false);
->> +}
->
-> I haven't thought about this too much, but it looks to me like the same
-> situation with WFI can happen with WFE
->
-> Also, kvm-unit-tests() makes use of WFE and SEV for multithreading, and t=
-he fact
-> that multithreaded tests work at all might be taken as proof enough that =
-the two
-> instructions are correctly implemented.
+> To me, it seems useful to keep that sentence as it makes it clear that INIT_SCTLR_EL2_MMU_OFF is purposely not changed.
+> Or is there a reason why you dropped it? Perhaps it's just obvious to people more familiar with this code.
 
-So I'm using kvm-unit-test to exercise QEMU's TCG modelling of the
-instructions, see:
+To be honest, I thought the commit message was quite long, and I
+wanted to make it a bit more concise. I could re-introduce it if you
+think it's helpful.
 
-  Message-ID: <20260430104434.1482407-1-alex.bennee@linaro.org>
-  Date: Thu, 30 Apr 2026 11:44:27 +0100
-  Subject: [PATCH v4 0/7] target/arm: fully model WFxT instructions for A-p=
-rofile
+Cheers,
+/fuad
 
-So while I'm confident the current modelling doesn't cause issues
-(because we basically treat it as a NOP) I wanted to check the various
-modes behave as they should with the above patches.
-
-I can limit the test to TCG only if it is likely to fail under KVM.
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+> Thanks,
+>
+> Ben
+>
+> >
+> > Fixes: 0a35bd285f43 ("arm64: Convert SCTLR_EL2 to sysreg infrastructure")
+> > Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> > Assisted-by: Gemini:gemini-3.1-pro review-prompts
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 736561480f36..7aa08d59d494 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -844,7 +844,7 @@
+> >  #define INIT_SCTLR_EL2_MMU_ON                                                \
+> >       (SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |      \
+> >        SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |              \
+> > -      SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
+> > +      SCTLR_ELx_ITFSB | SCTLR_ELx_EIS | SCTLR_ELx_EOS | SCTLR_EL2_RES1)
+> >
+> >  #define INIT_SCTLR_EL2_MMU_OFF \
+> >       (SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+>
