@@ -1,277 +1,335 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F64436607D;
-	Fri,  1 May 2026 08:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B23939DBF9
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777625800; cv=none; b=TXYFO7Xc2cZUuHNweMi4bCDOa2WddXG2eOJ3KmInWiqyMrb8G8zuR9hDpmF4kyPuv4xOWEFTg+2ca6OVaCUnx4btb/2b1KOXHMdlHrN5x7sJ1NylmRL5qR17F+07SnJ0XpJpghBtrkti/o/LGDWdke/j5ujPSh1e52LUlChth6Q=
+	t=1777634387; cv=none; b=QEIfmzvUSSO7dunPdocSSHlY1dt2kfy1zGLIN1B+uHe0Q12E1dt+Hd/U8NmWyqrnZRhsbeO9BTD9cPy8c8uFacXoQAte6eiebElSRKFAyTeIHj1twafCNhRAMQvMhAVWqTuNRNT+uH4Gk85esae/o84nLhKKY01CoMoFwa97vHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777625800; c=relaxed/simple;
-	bh=ioCO1TCIHurAVCNV+U1Ag+1WEIpQzKhEiX18+eECsNw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bOj4/qnyNiVdyB1DwC1cFyc8s2mt+TWXCoVAnBA0HO+8fgG3Dmor9jCkUw33oPoWe8LNDOfTsqxb1GXDrr9GwReusQpvzFhfzsr3j8wa2ZQKWbfjQyBRdQw+IAXhuar79Z0qgFhHi2GhqzT0/0+lZi8ZqNsRvoxEXO1yLoljnAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kEhgMPPe; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+	s=arc-20240116; t=1777634387; c=relaxed/simple;
+	bh=a7l0tjjKDWFABSCDQFyGvRK9SXNivegcz+Anu6dErts=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ktOQPtg3Nzk6FPv+3etNe7jvxlqQYic7WpnH4f5jQqcKOkvw5OyLArSDHiCCBjuvDN+AbNTgIrlJfqb2L8hWBNPHGy/t4WRaxCOTCzoqKnZMPLpzZxBGj4o1nfoopYgD3vjDSBtcvk+cZCi2tpvONV+blBZ5ZYt47EL2KYI2s6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aiWICx/X; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kEhgMPPe"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ioCO1TCIHurAVCNV+U1Ag+1WEIpQzKhEiX18+eECsNw=; b=kEhgMPPeXBOexo7Y+5mwBiTznO
-	Q8LfN8HrciDeXvmhjnNOC7NZ4O77yFiEXhaIa7H+fzpr7dFyFOQM1oBqnBImnt4AOmkwNuyFzGAhU
-	luaczhU5EhmrvVSJlhq72yn7sIPQV9+yu5/C7ajWr9P1mGY+8v5KVJoxIaSrofCcg4oYe/vC0DFl3
-	CYBC2SCaNVIhLRVZdWZdw8HQn0Rvl/JsLe6R3MIGhHVfGi3om/twkQrRx5L9e1KhuqRB6LarnCNYH
-	2U+G4rb49MHXjE6s5NaQ/0YPztACIGkQkXFDNCNWvKkU/7tBu8z3CUGT0nxb8mbdJE1YQ1a17HRwK
-	wRb6GdwA==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.ant.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wIjfd-00000008kG2-0eQL;
-	Fri, 01 May 2026 08:56:26 +0000
-Message-ID: <718a82870c8f3c913791f12a993e11b2d26d08d9.camel@infradead.org>
-Subject: Re: [RFC] proposal: KVM: Orphaned VMs: The Caretaker approach for
- Live Update
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Pasha Tatashin
-	 <pasha.tatashin@soleen.com>, linux-kernel@vger.kernel.org, 
-	kexec@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev
-Cc: rppt@kernel.org, graf@amazon.com, pratyush@kernel.org,
- seanjc@google.com,  maz@kernel.org, oupton@kernel.org,
- alex.williamson@redhat.com,  kevin.tian@intel.com, rientjes@google.com,
- Tycho.Andersen@amd.com,  anthony.yznaga@oracle.com,
- baolu.lu@linux.intel.com, david@kernel.org,  dmatlack@google.com,
- mheyne@amazon.de, jgowans@amazon.com, jgg@nvidia.com, 
- pankaj.gupta.linux@gmail.com, kpraveen.lkml@gmail.com, vipinsh@google.com, 
- vannapurve@google.com, corbet@lwn.net, tglx@kernel.org, mingo@redhat.com, 
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
- roman.gushchin@linux.dev, akpm@linux-foundation.org, pjt@google.com
-Date: Fri, 01 May 2026 09:56:25 +0100
-In-Reply-To: <3ff53353-3842-4a63-80a1-90a60d09fe02@redhat.com>
-References: <afEwWZksU0Fw61oT@plex>
-	 <0a71472c-b397-4699-a518-61faffcf4ab2@redhat.com>
-	 <c004f333ed4f7dedae1383f22d43b009cd83837e.camel@infradead.org>
-	 <3ff53353-3842-4a63-80a1-90a60d09fe02@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-sFyvC01RhMyOh3+boK9j"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aiWICx/X"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b8ff07df5e4so156339766b.3
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:19:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777634384; x=1778239184; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=39s63gE+FaRnrwSJ1nF07Frvg2b04cpO6BVgy2OjLZw=;
+        b=aiWICx/XY+6Gf9uskqKMFJVfpCsPW/eNI7tkNl5cIgCSapOI8/TJhkkmnyWu8VucGt
+         m9ggYMbRlVyBkgPgGj5jNR7OR9JAbUgPJlczvC0oR5bA8bvUl6UaWnK4XS1xe6M/IIzq
+         lcN8e3ottibV7l/dvjXJW5BYPoVY1JdCBe4h5BkpIviFz+DYjs65ThUkqWCnfJLsYsEA
+         1iLao/KSdiTAZe/qRm4V+Ec7Ubyg2HJkXGwdc0XBTKLK+dlmijgPSrV5u99Zgsw+ycnM
+         q8Csxebub4SHWWZ7tdUedlFyiCCtB4aFAs+kq2Jze68ysXdiw1ATn+2HZGYiljTtV4L/
+         1l9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777634384; x=1778239184;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=39s63gE+FaRnrwSJ1nF07Frvg2b04cpO6BVgy2OjLZw=;
+        b=VfSeuoggSps/R96H9j8jhXtlpJOLTjsVZvdaN3fRX1DsS7fSo4hwSYPvP+rFDVC3qe
+         9YyZgZYDEu0S4ip3KhltE1XGJ/1K9oevRpFHgxSPrZ7kH5RHJwiTU6ngbCqwFI1RCKEB
+         q0LfOQ+A/wtQBqB7KWUCCV/OG9VobXnGOEJRwaJnXeK3HQJRb7k8aJ7v8vDH/JPSsn6r
+         eSMQw494i53ECR/agAKfkIn6/zGZElk6iL1nOy87aIn+WMjOz3sLGHz657CSKEE8apA6
+         UhuL9I8Jz/0Z3HoTrA7rD89BxCR4LQRYwNWExQabmcFzn+CNL7llqdR4ID/EWMfp2JeA
+         5+yQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8IdKJedbTr4WD3dULsIDgENyLW5YxDcQoKnQXe+Q2hoIukccQ6EFrkUxTu8HhgbOut6n2RtVg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxVpVt0WP+4wukF15zuJVpXcdjY2VCeAz+Os3ivWWl+tKLl75Is
+	+VB8/GKQe4Qu8eHzH0pq0dRhxRJFlS+o8iPXObDqxYk9iGLGocRnD7D6HDBu2KW4QnmAchlyhE0
+	5zjWSnsMWyGpFiA==
+X-Received: from ejcqw28.prod.google.com ([2002:a17:906:6a1c:b0:ba5:6ff2:e915])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:980d:b0:bab:ba5a:fcb8 with SMTP id a640c23a62f3a-bbac7e8405emr444971866b.32.1777634384133;
+ Fri, 01 May 2026 04:19:44 -0700 (PDT)
+Date: Fri,  1 May 2026 11:19:02 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-
-
---=-sFyvC01RhMyOh3+boK9j
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260501111928.259252-1-smostafa@google.com>
+Subject: [PATCH v6 00/25] KVM: arm64: SMMUv3 driver for pKVM (trap and emulate)
+From: Mostafa Saleh <smostafa@google.com>
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org, jgg@ziepe.ca, 
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com, 
+	vdonnefort@google.com, sebastianene@google.com, keirf@google.com, 
+	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2026-05-01 at 05:32 +0200, Paolo Bonzini wrote:
-> On 4/30/26 17:27, David Woodhouse wrote:
-> > On Thu, 2026-04-30 at 15:28 +0200, Paolo Bonzini wrote:
-> > > I even wonder if, for long term simplicity, the interface for
-> > > host->caretaker should be just for the caretaker to swallow the host
-> > > into non-root mode, again as in Arm nVHE.
-> >=20
-> > There's a lot of merit in that approach.
-> >=20
-> > I talked about wanting to use this 'caretaker' for secret hiding.=C2=A0=
- But
-> > why have *voluntary* secret hiding with the kernel hiding things from
-> > its own address space, when you have have *mandatory* secret hiding
-> > with something running in EL2, like pKVM.
->=20
-> Well, other than because it's a lot of work? :)
+This is v6 of pKVM SMMUv3 support with trap and emulate
 
-If we avoided those things then we've never have any fun!
+v1: Implements full fledged pv interface
+https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@linar=
+o.org/
 
-And in a week where there seems to be a new user-to-root exploit posted
-every day, the 'deprivilege the VMM and assume the guest has owned it'
-security model is looking rather scary. So the additional defence in
-depth of knowing that even *root* can't get the kernel to access other
-guests' memory might be the only thing that lets you sleep at night :)
+v2:  Implements full fledged pv interface (+ more features as evtq and s1)
+https://lore.kernel.org/kvmarm/20241212180423.1578358-1-smostafa@google.com=
+/
 
-Yes, it's a lot of work. But I think we've reached the point where
-mandatory secret hiding is... well... mandatory.
+v3: Only DMA isolation (using pv)
+https://lore.kernel.org/kvmarm/20250728175316.3706196-1-smostafa@google.com=
+/
 
-> > The *userspace* ABI considerations are all about how you make a vCPU
-> > that runs asynchronously (should it conceptually just be an async
-> > KVM_RUN call, which allows the vCPU to run in a kernel thread up to the
-> > point of kexec? Why is it fundamentally tied to kexec at all?).
->=20
-> It's not tied to kexec.=C2=A0 kexec is just forcing a handoff + forcing a=
+v4: Trap and emulate
+https://lore.kernel.org/all/20250819215156.2494305-1-smostafa@google.com/
+
+v5: Trap and emulate
+https://lore.kernel.org/all/20251117184815.1027271-1-smostafa@google.com/
+
+
+This series is based on the review feedback on v5 + improvements,
+most notably:
+- Rebase on ToT which includes the newly merged protected VM support!
+- Drop non-coherent support to make the patches smaller, this can be
+  added in a later series.
+- Re-work the io-pgtable-arm split to rely on iommu-pages [Jason]
+- Use the newly added clock for tracing instead of adding new
+  functions in the hypervisor.
+- Align nesting support with the upstream driver in terms of
+  supported IPs [Jason]
+- Keep STE hiltless updating when possible [Jason]
+- Move some of the refactored code to the c file [Jason]
+- Add support for evtq and priq tracking
+- Add extra hardening checks, handle failures and massively reduce the
+  amount of WARN_ONs and other cleanups.
+- Don=E2=80=99t enforce DMA isolation to not regress pKVM booting.
+
+Notes about Sashiko
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+I ran Sashiko locally and it was helpful in discovering problems in
+the series. However, it still shows large number of critical and high
+severity issues, I went through them and I believe they are false
+positive, mainly because (in the order of frequently reported):
+- It doesn=E2=80=99t understand de-privilege and which data is trusted that
+  the driver populated at boot (keeps complaining about missing checks
+  for zero mmio size..)
+- It doesn=E2=80=99t understand WARNs are fatal in the hypervisor.
+- It doesn=E2=80=99t understand that a malicious host can DoS the system an=
+d
+  pKVM doesn=E2=80=99t guarantee availability
+- It doesn=E2=80=99t understand the SMMUv3 spec and makes stuff up (eg.  ab=
+out
+  CMD_SYC CS field it makes up an non-existent encoding or wrong
+  semantics for the gbpa register)
+- It seems to look at one patch at a time and not the whole series, and
+  as the series is written in a way to be bisectable that confuses it.
+- Sometimes it complains about code which is not related to the change.
+
+Fuad is currently working on updating review prompts to make it work better
+with protected KVM [1]
+
+Design:
+=3D=3D=3D=3D=3D=3D=3D
+Assumptions:
+------------
+One of the important points, is that this doesn=E2=80=99t emulate the full
+SMMUv3 architecture, but only the parts used by Linux kernel,
+that=E2=80=99s why enablement of this (ARM_SMMU_V3_PKVM) depends on
+(ARM_SMMU_V3=3Dy) so we are sure of the driver behaviour.
+
+Any new change in the driver will likely trigger a WARN_ON ending up
+in panic, that will require to support also in the hypervisor.
+
+Most notable assumptions:
+- Changing of stream table format/size or l2 pointers is not allowed
+  after initialization.
+- leaf=3D0 CFGI is not allowed.
+- CFGI_ALL with any value but 31 is not allowed.
+- Some commands which are not used are not allowed.
+- Values set in ARM_SMMU_CR1 are hardcoded and don't change.
+
+Emulation logic mainly targets:
+
+1) Command Queue
+----------------
+At boot time, the hypervisor will allocate a shadow command queue
+(doesn=E2=80=99t need to match the host size) which then sets up in HW, the=
 n
-> update.
->=20
-> The big difference is that:
->=20
-> 1) if you don't tie it to kexec, a detached vCPU thread is a struct=20
-> vhost_task and a blocking vmexit schedules out the thread; while during=
-=20
-> kexec you have s/kthread/pCPU/ and halting the CPU instead of scheduling=
-=20
-> it out.
+it will trap access to
 
-For now maybe. But "how does the caretaker do scheduling" is on
-definitely the list of future problems, for any environment where a
-physical host with N pCPUs is hosting >=3D N vCPUs.
+i) ARM_SMMU_CMDQ_BASE
+That can only be written when the cmdq is disabled. Then on enable,
+the hypervisor will put the host command queue in a shared state to
+avoid transition into the hypervisor or VMs. It will be unshared with
+the cmdq is disabled
 
-(In the case of a true mandatory-secret-hiding caretaker at EL2, the
-scheduling part *could* be done by the residual purgatory-caretaker-
-thing at EL1 that all the secondary CPUs go to instead of being turned
-off. It would just be calling into EL2 to run the actual vCPUs. Thus
-leaving the EL2 code just to do its *one* job, which has the added
-benefit that the automated reasoning people put the knives down and no
-longer have that look in their eyes that they got when they thought you
-wanted to put a scheduler in their formally-proven EL2 code...)
+ii) ARM_SMMU_CMDQ_PROD
+Trigger emulation code, where the hypervisor will copy the commands
+between cons and prod, of the host queue and sanitise them (mostly
+WARNs if the host is malicious and issuing commands it shouldn=E2=80=99t)
+then eagerly consume them, updating the host cons.
 
-> 2) if you don't tie it to kexec, address space isolation is the only=20
-> real reason for the complication of treating the caretaker as a separate=
-=20
-> bare metal program.=C2=A0 OTOH maybe that's a feature - you could do:
->=20
-> - ioctl(KVM_RUN_ASYNC)
->=20
-> - then vmfd/vcpufd handoff to a new mm on top
+iii) ARM_SMMU_CMDQ_CONS
+No much logic, just return the emulated cons + error bits.
 
-This much gives you a seamless upgrade of the userspace VMM without
-having to play fd-handover tricks. The old VMM detaches, the new one
-attaches. If you're quick, and the guests aren't doing much "admin"
-work but only passing traffic through passthrough PCI devices, the
-guests might not experience any non-negligible steal time at all.
+2) Stream table
+---------------
+Similar to the command queue, the first level is allocated at boot
+with max possible size, then the hypervisor  will trap access to:
+i) ARM_SMMU_STRTAB_BASE/ARM_SMMU_STRTAB_BASE_CFG: Keep track of
+   the stream table to put it in a shared state.
 
-> - then address space isolation on top
+On CFGI_STE, the hypervisor will read the STE in scope from the host
+copy, shadow L2 pointers if needed and attach stage-2.
 
-Even voluntary secret hiding lets you sleep at night when the next
-Retbleed happens.
+3) GBPA
+-------
+The hypervisor will set GBPA to abort at boot, then any read from the
+host will return ABORT and writes are ignored.
+If the host tries to clear GBPA, it will look like GBPA is refusing
+to update and time out.
 
-> - then kexec (de)serialization on top
+4) EVTQ and PRIDQ
+No shadowing needed for those queues, but the hypervisor needs to keep
+track of them to put them in a shared state so they can=E2=80=99t be used b=
+y
+the host or the hypervisor.
 
-... and this one is the holy grail.
+Bisectibility:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+I wrote the patches where most of them are bisectable at run time (so
+we can run with a prefix of the series till MMIO emulation, cmdq
+emulation, STE or full nested) that was very helpful in debugging,
+and I kept it like this to make debugging easier.
 
-So yes, that's exactly the kind of thing I was thinking, rather than
-trying to boil the ocean. There are sensible milestones along the way
-which give practical benefits.
+Constraints:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1) Discovery:
+-------------
+Only device trees are supported at the moment.
+I don=E2=80=99t usually use ACPI, but I can look into adding that later.
+(not make this series bigger)
 
-But my point was *also* about understanding the actual userspace
-interface for this, even if we were to just focus on the live update
-and do it all in one amphetamine-and-tokens-fueled epic. What does it
-even look like, from the VMM point of view?=C2=A0How does the new VMM under
-the new kernel 'reattach' to the existing vCPUs?
+1) Shadow page table
+--------------------
+Uses page granularity (leaf) for memory, that=E2=80=99s because of the lack
+of split_block_unmap() logic. I am currently looking into the
+possibility of sharing page tables, if that turned complicated (as
+expected) it might be worth to re-add this logic
 
-I think we need the userspace API concepts for 'detach' and 'attach',
-including the permissions model for reattach, and we might as well
-implement and test them without the kexec in the middle to start with.
+Boot and Probe ordering:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The main SMMUv3 MUST be only bound/probed after KVM fully initialises
+so it can set up the MMIO emulation.
 
-> > I'd love to start without kexec in the picture at all. Just show me the
-> > KVM API for starting a *confidential* guest (pKVM, SEV-SNP, whatever),
-> > leaving it running, completely stopping the VMM and then starting a new
-> > VMM to pick up from where it left off.
->=20
-> Why confidential?
+The KVM SMMUv3 driver is loaded early before KVM init so it can
+register itself, during that point it will probe all the SMMUs from the
+platform bus and bind them to the driver.
 
-Mostly so that confidential VMs aren't an *afterthought*, and the
-design of the detach/attach userspace ABI gets them right from the
-start.
+Then at a later init call it will create an auxiliary device per SMMU,
+that the main driver will probe. The main driver still relies on this
+device(parent) for all driver activity. (Check comment in patch 14.
 
---=-sFyvC01RhMyOh3+boK9j
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Future work
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1) Sharing page tables will be an interesting optimization, but
+   requires dealing with stage-2 page faults (which are handled
+   by the kernel), BBM and possibly more complexity.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUwMTA4NTYy
-NVowLwYJKoZIhvcNAQkEMSIEII5NFTIwOYgMNBQlBlgPOzaWECUuLzzwItLBZqgfRq/AMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAVeROddN9z3Oy
-G3nmGGdyNd5AGy+uQmYUIxVsBmdByuQmk21ERmEU8akkOpBdHAQntRNo2CLLhc3XyqlF5+DJVOht
-wcW++lbsUkpJztgXcgurbSvpuNmvSmsK23wJ97BWqbw7DIb5CTEXwABq0bxA3bJNkAgT4ZhYsUR2
-QRo1fSqAfYmfQOhcu1LhZFhdS5nzXA0atjxPQiada4IJMU3ubTHpVH5Irm2i52V8gCS7QkDg8Ttz
-EhmVSLz6561Kb5cFe3tubEv4IMm5SuaovgWunMD0rZbFzsgtpjj125Am5i2XSBe5CsSHG2wjugK4
-XWyg4LZ1ZqWysUyY5ITldVR9a4RR9oSgQlPIN9B1Nh9pRWuCzkq87XnhN8HMWQ9aeTrZ5YtnMV67
-DDh/RAUXNOqUKXJYN+6GRvBiVUEgeh7eBOAUalTab6ihAGI6QjMnM9t3zeexssx+iGktjNbvb+20
-UQ1HubSiMBs/AjhD7bwpFmwzg/5pcQMKYsBdNSNQqSGIEauGMER1qFzhvV6OIsY4NtbSTD6xmvED
-gHZtQH91CTYSQ+gTz82Vozp2KOA622wdHCzDcfqHM9kwYBhehdZiEONrhCtQ8pgFUEwXU4gCsz+P
-FGq75I68qqPwK1ZdIExOrNOb7KiTJOGRxsdxQ1AmrTPEd9qPnYb40Eco/mR8K0wAAAAAAAA=
+2) There is currently ongoing work to enable RPM, that will possibly
+   enable/disable the SMMU frequently, we might need some optimizations
+   to avoid re-shadowing the CMDQ/STE unnecessarily.
+
+3) Add support for non-coherent SMMUs
+
+4) Optimizations (as using block mappings for memory)
+
+Patches overview
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The patches are split as follows:
+
+Patches 01-02: Core hypervisor: Dealing with MMIO and timers.
+Patches 04-06: Refactoring of io-pgtable-arm and SMMUv3 driver.
+Patches 07-10: Hypervisor IOMMU core: pagetable management, dabts.
+Patches 11-25: KVM SMMUv3 code.
+
+Tested on Lenovo IdeaCentre mini X and Qemu.
+
+A development branch can be found at [2]
+
+[1] https://github.com/ftabba/review-prompts/commits/local-arm64-kvm/
+[2] https://android-kvm.googlesource.com/linux/+/refs/heads/pkvm-smmu-v6
 
 
---=-sFyvC01RhMyOh3+boK9j--
+Jean-Philippe Brucker (1):
+  iommu/arm-smmu-v3-kvm: Add SMMUv3 driver
+
+Mostafa Saleh (24):
+  KVM: arm64: Generalize trace clock
+  KVM: arm64: Donate MMIO to the hypervisor
+  iommu/arm-smmu-v3: Split code with hyp
+  iommu/arm-smmu-v3: Move TLB range invalidation into common code
+  iommu/arm-smmu-v3: Move IDR parsing to common functions
+  iommu/io-pgtable-arm: Rework to use the iommu-pages API
+  KVM: arm64: iommu: Introduce IOMMU driver infrastructure
+  KVM: arm64: iommu: Shadow host stage-2 page table
+  KVM: arm64: iommu: Add memory pool
+  KVM: arm64: iommu: Support DABT for IOMMU
+  iommu/arm-smmu-v3-kvm: Add the kernel driver
+  iommu/arm-smmu-v3-kvm: Probe SMMU HW
+  iommu/arm-smmu-v3-kvm: Add MMIO emulation
+  iommu/arm-smmu-v3-kvm: Shadow the command queue
+  iommu/arm-smmu-v3-kvm: Add CMDQ functions
+  iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
+  iommu/arm-smmu-v3-kvm: Shadow stream table
+  iommu/arm-smmu-v3-kvm: Shadow STEs
+  iommu/arm-smmu-v3-kvm: Share other queues
+  iommu/arm-smmu-v3-kvm: Emulate GBPA
+  iommu/io-pgtable-arm: Support io-pgtable-arm in the hypervisor
+  iommu/arm-smmu-v3-kvm: Shadow the CPU stage-2 page table
+  iommu/arm-smmu-v3-kvm: Enable nesting
+  KVM: arm64: Add documentation for pKVM DMA isolation
+
+ .../admin-guide/kernel-parameters.txt         |    4 +
+ Documentation/virt/kvm/arm/pkvm.rst           |   19 +-
+ arch/arm64/include/asm/kvm_host.h             |    6 +
+ arch/arm64/kvm/Makefile                       |    2 +-
+ arch/arm64/kvm/hyp/include/nvhe/clock.h       |   11 +-
+ arch/arm64/kvm/hyp/include/nvhe/iommu.h       |   23 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |    4 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   13 +-
+ arch/arm64/kvm/hyp/nvhe/clock.c               |   44 +-
+ arch/arm64/kvm/hyp/nvhe/iommu/iommu.c         |  156 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  169 ++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   20 +
+ arch/arm64/kvm/hyp/nvhe/trace.c               |    4 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |    9 +-
+ arch/arm64/kvm/iommu.c                        |   57 +
+ arch/arm64/kvm/pkvm.c                         |    1 +
+ drivers/iommu/arm/Kconfig                     |    9 +
+ drivers/iommu/arm/arm-smmu-v3/Makefile        |    3 +-
+ .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  |  224 +++
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   |  232 +++
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  387 +----
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  150 ++
+ .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 1250 +++++++++++++++++
+ .../iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h  |   67 +
+ drivers/iommu/io-pgtable-arm.c                |   68 +-
+ drivers/iommu/io-pgtable-arm.h                |    6 +
+ drivers/iommu/iommu-pages.h                   |   99 ++
+ 27 files changed, 2668 insertions(+), 369 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/iommu.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+ create mode 100644 arch/arm64/kvm/iommu.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+
+--=20
+2.54.0.545.g6539524ca2-goog
+
