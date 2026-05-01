@@ -1,54 +1,54 @@
 Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1E039EF07
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099CE39EF15
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777634415; cv=none; b=D6Gn2oQqJ0+lqY+6bRxXR0qI8bEggmMx6c6JVvrOBi2FpUIDDlQgCPgWVJqyFn0kEa5hMcfVpFSrMVsKPlCT14K4HVMbp4vX08zMHrtFcAU8lS+37LYsSqQPU/8Juoyy94yacxHJNwLEmvsaffp0u221zq9N0Ba3jV0bIUE9ro4=
+	t=1777634419; cv=none; b=ahDP1YKl1t1g0jl7HM4/fF209pWAC5tyYC9Kvvg14UVLf1hkqS0xS+r2/+X/3jDc+X1If5DQEGCueKmNk6bDguNJa4NeksT4zXy9gp4box7wMlvVqat+tN3cm68RBotgGNMjavH7WX8X+ku1Z+WzjTCgcdpdCOljTz7CAXTzmM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777634415; c=relaxed/simple;
-	bh=4dvaQhefj/gLOS6fMysm6OEgJIPg+rENa3gunBbX4+k=;
+	s=arc-20240116; t=1777634419; c=relaxed/simple;
+	bh=OJF405qqToDaQYlnDrTfIPaZ3ERCsQQsEZlpDMFs1BM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VU0Z7I8D4pmTyDYFEqmjdsuFkNkSH6O6aDqlYDcJxV/sTlr8FcgqCWt+n7xCjIqr0ssph/y6RSk/GJaPpFx+zcFCXjdjSiYXg8OkaNCth+C/NQe+HESxBiMc2szCU9HT5j2F9O2SrvVU3m5MYOhM5ZRPxMQy+6v8CiVN16A/sZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ivh8PHUI; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=lXcKXox4egORXyWQEHZfEjwZRpw6vA1X5bfYyJgB1g6v1G1NT97EE0KUbSU1VB/8LUdyMXxTLA2h+1BTS2icN5skQ3gkxUFCnZGNp1asksHkY9jvc//+cgonQJjWJb/NLhz9ZyRj5nhryRUwOSvGzgPKuQreMo7w72KVHX8/TeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kcsv/4CI; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ivh8PHUI"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-4440c5944fbso1561414f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:20:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kcsv/4CI"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-449dcfe8005so1058876f8f.3
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777634409; x=1778239209; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1777634413; x=1778239213; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FN4paQwo2ROc1ZHKgUwjGYJd1quRshkryUW2WW7y3qE=;
-        b=Ivh8PHUIH5QlHC+20CDOXnYXXRwk59218WU6twhXtLR+mNhvY7uRWXw4DezPf71rvT
-         ZDhXYo1MpiBMoi2Ed6IaBSTDw7HWHHNSIVL470iJygnKMB8yk+oBtIvyAf5KZ3MYgVEi
-         QXGK9IkMhjS9Ba0ZttqRTAgpKIAzPUnYyjnX007u7umN2NJY2xxN7OXl8iGRTAO86iTD
-         ir/dbmTvsM1K7tXC+Dtfu/wz526/3elkskCEbRj+hrBO2X/5aBmSRy7pe7l/3abvNXcA
-         MV9P8b9rQREM56wkUI0f4C79Z5N6rKuNsBswtmqSFbw8SvwEL91T4uoJX7nJrKaKaFZ1
-         8ODQ==
+        bh=TzYlVYNpWMosnl9oou+4ebeG+lgxbNyORXDEfv3bAUM=;
+        b=kcsv/4CI1O2WrER83fK6IN2w5WMNL38BRBp4jhUUDkGUhJuDy3N5AA4VooL1kz0Ng+
+         3iepjgcLJ+gBS2SNLoiwatlALvFTlnB8gUw+6iVTspr29Sr72IYilddKpaKmswTVgvTu
+         c4xrUVDWOxeOTHtuMmKBa7IS/DMiMx6OlX/FnTtw6qrXEOCconPrNOK8frh+VPtmPYjZ
+         LIDYpR/f39rIX5dtbgajipbHYqdDTCZd28lHyUVVufG6Jj7PKMJr5fFT6TNa8tCEP93L
+         82G+WCRYts3Jn33Y7JeSn1sLxOlSGxs0uwdhBX+7UIZuVPHjnkQE1yhDi+DuIlk2g5jS
+         kXig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777634409; x=1778239209;
+        d=1e100.net; s=20251104; t=1777634413; x=1778239213;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FN4paQwo2ROc1ZHKgUwjGYJd1quRshkryUW2WW7y3qE=;
-        b=dQr9e91ie9mKsGk3ftaftgVWItW877nlxepexVPUuLGuI00hNDAsEtccz+nHH/kEGy
-         ioYAxcFoM+2TK2VHqkkcAbGZyowNx69F9I+cP4PfGbFizy0CIfBH6xO/4v9ODahnQz9J
-         EYI9me4lJUR+4WOCdkYrKnKTgsIClSdhiuYd7q3LcMqKOIok+XkBrrzxNhppjaM5aUnd
-         l18JL7/cfvd8jNLXAHiSV/5zNzoaRxWWLjtEQNQk4uUKfwQm7S7kMmDVhb7VZKiZOaYq
-         PBPfsPQCQz2C36m7q55NHnhY7fHnQiuRj8NVKPSWUN+/uy75fH4qnYarzk+wECdf6+3G
-         96+w==
-X-Forwarded-Encrypted: i=1; AFNElJ+l4wXBX79W4jWqfdz4UbPNTcxRplbWiUxk1tF1SgEyDVv8BjsLc07A/NxR0vDjLlgrqNuezOs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzyOfAPAERYPMboAYAVURfcXgmJR8ODXxOQCwXws0AibQNPfhUN
-	aVZsVnPFdEo8wdMc0PbnHhnzkhlWVB7OB05cBRK/gWTm/PUaAwXhIJPG69lvcNlwatobzpAhzev
-	6n1+8BclPKako6A==
-X-Received: from wmlc6.prod.google.com ([2002:a7b:c846:0:b0:48a:8963:49ee])
+        bh=TzYlVYNpWMosnl9oou+4ebeG+lgxbNyORXDEfv3bAUM=;
+        b=Yaqa2BWDKgaDLBdNWrGt3iYThr8M5n7AQw0WdKF3haYLEdriD6lU7/mQEbm2gR05my
+         yxoTjfLL7Ai6ExyxfrFnDXT1GnBQbNmtDaiYzjH/O+anzan+cgwk2s3vDjwmiKgR/Ev6
+         OJ47Rh+K1faDXxoYIkdcsHw84CaIWECpVUGVydmOjPbj3YhFE+q5NmvX+IlXbu7RQrTc
+         2oxJXNQRPDrsOmIqOmeM8SplhNlmT3LEww6se38aGOtx+1pHGEvgbtrLcqj6GG3sXU0I
+         eDKCGzz74q50cteyumhyNF5DENbOSK5XBSOM7hx1/4yUhCTMz3Iw9/MYp2rzE0/QFLxh
+         eZ1Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/1CMRx7Rat4G9XHDVPrgABj5PDnTulakFLbNmGRx71eMVrBYd4syN3tgr0XSEWOVl6B7U0L8I=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyffhSt6BBdaMKxTOzkxsTCT6YoQul/7zVhnYVB/5Viifre+d62
+	b/PQ5y7jm4HDrTt2VxMoo89ah/Wm5VU0OYUK0hDYG9pfkxmXhkJt1lULGjAlEfbcpkuOtxXTTKQ
+	hd7WbBbFtrqQLpQ==
+X-Received: from wrut11.prod.google.com ([2002:a5d:690b:0:b0:445:168d:28b6])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:818c:b0:48a:5c23:cab with SMTP id 5b1f17b1804b1-48a8eb985b1mr43676235e9.19.1777634408826;
- Fri, 01 May 2026 04:20:08 -0700 (PDT)
-Date: Fri,  1 May 2026 11:19:10 +0000
+ 2002:a05:600c:c10b:b0:488:8840:e5ae with SMTP id 5b1f17b1804b1-48a8445876dmr93780755e9.24.1777634413385;
+ Fri, 01 May 2026 04:20:13 -0700 (PDT)
+Date: Fri,  1 May 2026 11:19:13 +0000
 In-Reply-To: <20260501111928.259252-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260501111928.259252-1-smostafa@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260501111928.259252-9-smostafa@google.com>
-Subject: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page table
+Message-ID: <20260501111928.259252-12-smostafa@google.com>
+Subject: [PATCH v6 11/25] iommu/arm-smmu-v3-kvm: Add SMMUv3 driver
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -71,272 +71,186 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Create a page-table for the IOMMU that shadows the host CPU stage-2
-to establish DMA isolation.
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-An initial snapshot is created after the driver init, then
-on every permission change a callback would be called for
-the IOMMU driver to update the page table.
+Add the skeleton for an Arm SMMUv3 driver at EL2.
 
-There are 3 different ways to add the callback:
-1) In the high level memory transitions: (__pkvm_host_donate_hyp(),
-  __pkvm_host_donate_guest()...
+The driver rely on an array of SMMUv3s on the system, where at
+init it will donate the array and the resources of the SMMUv3s
+so they can't be changed by the host after de-privilege.
 
-2) In Lower level functions covering all transitions
-  - host_stage2_set_owner_metadata_locked() which covers:
-   - __pkvm_host_donate_hyp()
-   - __pkvm_host_donate_guest()
-   - __pkvm_host_donate_hyp()
-   - __pkvm_guest_unshare_host()
-  - host_stage2_set_owner_locked() only for ID_HOST which covers:
-   - __pkvm_hyp_donate_host()
-   - __pkvm_host_force_reclaim_page_guest()
-   - __pkvm_host_reclaim_page_guest()
-   - __pkvm_guest_share_host()
+This array will be populated in the next patch.
 
-3) In the lowest level function __host_update_page_state(), which
-   requires only one callback. However, in that case the page state
-   is not enough as we might need to know the old state also.
-
-Option #3 was implemented here.
-
-For some cases, an SMMUv3 may be able to share the same page-table
-used with the host CPU stage-2 directly.
-
-However, this is too strict and requires changes to the core hypervisor
-page-table code, plus it would require the hypervisor to handle IOMMU
-page-faults. This can be added later as an optimization for SMMUV3.
-
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/iommu.h       |   4 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
- arch/arm64/kvm/hyp/nvhe/iommu/iommu.c         | 108 +++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  35 ++++++
- 4 files changed, 146 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/Makefile              |  5 ++
+ drivers/iommu/arm/Kconfig                     |  9 ++
+ .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 87 +++++++++++++++++++
+ .../iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h  | 27 ++++++
+ 4 files changed, 128 insertions(+)
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/iommu.h b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
-index 1ac70cc28a9e..6277d845cdcf 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/iommu.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
-@@ -3,11 +3,15 @@
- #define __ARM64_KVM_NVHE_IOMMU_H__
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 606c0e1b7bd0..8a75739db947 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -33,6 +33,11 @@ hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+ hyp-obj-$(CONFIG_NVHE_EL2_TRACING) += trace.o events.o
+ hyp-obj-y += $(lib-objs)
  
- #include <asm/kvm_host.h>
-+#include <asm/kvm_pgtable.h>
- 
- struct kvm_iommu_ops {
- 	int (*init)(void);
-+	int (*host_stage2_idmap)(phys_addr_t start, phys_addr_t end, int prot);
- };
- 
- int kvm_iommu_init(void);
- 
-+int kvm_iommu_host_stage2_idmap(phys_addr_t start, phys_addr_t end,
-+				enum kvm_pgtable_prot prot);
- #endif /* __ARM64_KVM_NVHE_IOMMU_H__ */
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index ff440204d2c7..f7faecc3b70a 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -54,6 +54,8 @@ int __pkvm_host_test_clear_young_guest(u64 gfn, u64 nr_pages, bool mkold, struct
- int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu);
- 
- bool addr_is_memory(phys_addr_t phys);
-+u64 find_mem_range_from(u64 start, bool *is_memory);
++HYP_SMMU_V3_DRV_PATH = ../../../../../drivers/iommu/arm/arm-smmu-v3
 +
- int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
- int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
- int kvm_host_prepare_stage2(void *pgt_pool_base);
-diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-index 406c8fb9b3b9..1db52bd87c38 100644
---- a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-+++ b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-@@ -4,17 +4,119 @@
-  *
-  * Copyright (C) 2022 Linaro Ltd.
-  */
-+#include <linux/iommu.h>
++hyp-obj-$(CONFIG_ARM_SMMU_V3_PKVM) += $(HYP_SMMU_V3_DRV_PATH)/pkvm/arm-smmu-v3.o \
++	$(HYP_SMMU_V3_DRV_PATH)/arm-smmu-v3-common-lib.o
 +
- #include <nvhe/iommu.h>
+ # Path to simple_ring_buffer.c
+ CFLAGS_trace.nvhe.o += -I$(srctree)/kernel/trace/
+ 
+diff --git a/drivers/iommu/arm/Kconfig b/drivers/iommu/arm/Kconfig
+index 5fac08b89dee..916f4723238d 100644
+--- a/drivers/iommu/arm/Kconfig
++++ b/drivers/iommu/arm/Kconfig
+@@ -141,3 +141,12 @@ config QCOM_IOMMU
+ 	select ARM_DMA_USE_IOMMU
+ 	help
+ 	  Support for IOMMU on certain Qualcomm SoCs.
++
++config ARM_SMMU_V3_PKVM
++	bool "ARM SMMUv3 support for protected Virtual Machines"
++	depends on KVM && ARM64 && ARM_SMMU_V3=y
++	help
++	  Enable a SMMUv3 driver in the KVM hypervisor, to protect VMs against
++	  memory accesses from devices owned by the host.
++
++	  Say Y here if you intend to enable KVM in protected mode.
+diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+new file mode 100644
+index 000000000000..9afc314d0acc
+--- /dev/null
++++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+@@ -0,0 +1,87 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * pKVM hyp driver for the Arm SMMUv3
++ *
++ * Copyright (C) 2022 Linaro Ltd.
++ */
++#include <asm/kvm_hyp.h>
++
++#include <nvhe/iommu.h>
 +#include <nvhe/mem_protect.h>
-+#include <nvhe/spinlock.h>
- 
- /* Only one set of ops supported */
- struct kvm_iommu_ops *kvm_iommu_ops;
- 
-+/* Protected by host_mmu.lock */
-+static bool kvm_idmap_initialized;
 +
-+static inline int pkvm_to_iommu_prot(enum kvm_pgtable_prot prot)
++#include "arm_smmu_v3.h"
++
++size_t __ro_after_init kvm_hyp_arm_smmu_v3_count;
++struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
++
++#define for_each_smmu(smmu) \
++	for ((smmu) = kvm_hyp_arm_smmu_v3_smmus; \
++	     (smmu) != &kvm_hyp_arm_smmu_v3_smmus[kvm_hyp_arm_smmu_v3_count]; \
++	     (smmu)++)
++
++/* Put the device in a state that can be probed by the host driver. */
++static void smmu_deinit_device(struct hyp_arm_smmu_v3_device *smmu)
 +{
-+	int iommu_prot = 0;
-+
-+	if (prot & KVM_PGTABLE_PROT_R)
-+		iommu_prot |= IOMMU_READ;
-+	if (prot & KVM_PGTABLE_PROT_W)
-+		iommu_prot |= IOMMU_WRITE;
-+
-+	/* We don't understand that, might be dangerous. */
-+	WARN_ON(prot & ~PKVM_HOST_MEM_PROT);
-+	return iommu_prot;
++	WARN_ON(__pkvm_hyp_donate_host_mmio(smmu->mmio_addr, smmu->mmio_size));
++	smmu->base = NULL;
 +}
 +
-+static int __snapshot_host_stage2(const struct kvm_pgtable_visit_ctx *ctx,
-+				  enum kvm_pgtable_walk_flags visit)
++static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
 +{
-+	u64 start = ctx->addr;
-+	u64 end = start + kvm_granule_size(ctx->level);
-+	kvm_pte_t pte = *ctx->ptep;
-+	bool is_memory;
-+	u64 region_end;
-+	int prot;
++	unsigned long haddr;
 +	int ret;
 +
-+	/*
-+	 * Keep annotated PTEs unmapped, and map everything else even lazily
-+	 * mapped MMIO with pte == 0, as the IOMMU can't handle page faults.
-+	 * That maps the whole address space which can be large, but that doesn't
-+	 * use a lot of memory as it will be mostly large block (1 GB with 4kb pages)
-+	 */
-+	if (pte && !kvm_pte_valid(pte))
-+		return 0;
++	if (!PAGE_ALIGNED(smmu->mmio_addr | smmu->mmio_size))
++		return -EINVAL;
 +
-+	if (kvm_pte_valid(pte)) {
-+		prot = pkvm_to_iommu_prot(kvm_pgtable_stage2_pte_prot(pte));
-+		/* If the range is mapped in a single PTE, it must be the same type.*/
-+		if (!addr_is_memory(start))
-+			prot |= IOMMU_MMIO;
++	ret = __pkvm_host_donate_hyp_mmio(smmu->mmio_addr, smmu->mmio_size, &haddr);
++	if (ret)
++		return ret;
 +
-+		return kvm_iommu_ops->host_stage2_idmap(start, end, prot);
-+	}
-+
-+	/* In case of invalid PTE, we need to figure out which part of it is MMIO */
-+	do {
-+		prot = IOMMU_READ | IOMMU_WRITE;
-+		region_end = find_mem_range_from(start, &is_memory);
-+		region_end = min(end, region_end);
-+		if (!is_memory)
-+			prot |= IOMMU_MMIO;
-+
-+		ret = kvm_iommu_ops->host_stage2_idmap(start, region_end, prot);
-+		if (ret)
-+			return ret;
-+
-+		start = region_end;
-+	} while (start < end);
++	smmu->base = (void __iomem *)haddr;
 +
 +	return 0;
 +}
 +
-+static int kvm_iommu_snapshot_host_stage2(void)
++/* Called while is the host is still trusted. */
++static int smmu_init(void)
 +{
-+	int ret;
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= __snapshot_host_stage2,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
-+	};
-+	struct kvm_pgtable *pgt = &host_mmu.pgt;
-+
-+	hyp_spin_lock(&host_mmu.lock);
-+	ret = kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker);
-+	/* Start receiving calls to host_stage2_idmap. */
-+	kvm_idmap_initialized = !ret;
-+	hyp_spin_unlock(&host_mmu.lock);
-+
-+	return ret;
-+}
- 
- int kvm_iommu_init(void)
- {
--	/* Keep DMA isolation optional. */
--	if (!kvm_iommu_ops || !kvm_iommu_ops->init)
++	size_t smmu_arr_size = PAGE_ALIGN(sizeof(*kvm_hyp_arm_smmu_v3_smmus) *
++					  kvm_hyp_arm_smmu_v3_count);
++	struct hyp_arm_smmu_v3_device *smmu;
++	u64 pfn, nr_pages;
 +	int ret;
 +
-+	if (!kvm_iommu_ops || !kvm_iommu_ops->init ||
-+	    !kvm_iommu_ops->host_stage2_idmap)
-+		return 0;
++	kvm_hyp_arm_smmu_v3_smmus = kern_hyp_va(kvm_hyp_arm_smmu_v3_smmus);
++	pfn = hyp_virt_to_pfn(kvm_hyp_arm_smmu_v3_smmus);
++	nr_pages = smmu_arr_size >> PAGE_SHIFT;
 +
-+	ret = kvm_iommu_ops->init();
++	ret = __pkvm_host_donate_hyp(pfn, nr_pages);
 +	if (ret)
 +		return ret;
 +
-+	return kvm_iommu_snapshot_host_stage2();
++	for_each_smmu(smmu) {
++		ret = smmu_init_device(smmu);
++		if (ret)
++			goto out_reclaim_smmu;
++	}
++
++	return 0;
++
++out_reclaim_smmu:
++	while (smmu != kvm_hyp_arm_smmu_v3_smmus)
++		smmu_deinit_device(--smmu);
++	WARN_ON(__pkvm_hyp_donate_host(pfn, nr_pages));
++	return ret;
 +}
 +
-+int kvm_iommu_host_stage2_idmap(phys_addr_t start, phys_addr_t end,
-+				enum kvm_pgtable_prot prot)
++static int smmu_host_stage2_idmap(phys_addr_t start, phys_addr_t end, int prot)
 +{
-+	hyp_assert_lock_held(&host_mmu.lock);
-+
-+	if (!kvm_idmap_initialized)
- 		return 0;
- 
--	return kvm_iommu_ops->init();
-+	return kvm_iommu_ops->host_stage2_idmap(start, end, pkvm_to_iommu_prot(prot));
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 2fb20a63a417..b54cb72ed88c 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -15,6 +15,7 @@
- #include <hyp/fault.h>
- 
- #include <nvhe/gfp.h>
-+#include <nvhe/iommu.h>
- #include <nvhe/memory.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
-@@ -481,6 +482,14 @@ static int check_range_allowed_memory(u64 start, u64 end)
- 	return 0;
- }
- 
-+u64 find_mem_range_from(u64 start, bool *is_memory)
-+{
-+	struct kvm_mem_range r;
-+
-+	*is_memory = !!find_mem_range(start, &r);
-+	return r.end;
++	return 0;
 +}
 +
- static bool range_is_memory(u64 start, u64 end)
- {
- 	struct kvm_mem_range r;
-@@ -577,8 +586,34 @@ int host_stage2_idmap_locked(phys_addr_t addr, u64 size,
- 
- static void __host_update_page_state(phys_addr_t addr, u64 size, enum pkvm_page_state state)
- {
-+	enum pkvm_page_state old = get_host_state(hyp_phys_to_page(addr));
-+	enum kvm_pgtable_prot prot = 0;
++/* Shared with the kernel driver in EL1 */
++struct kvm_iommu_ops smmu_ops = {
++	.init				= smmu_init,
++	.host_stage2_idmap		= smmu_host_stage2_idmap,
++};
+diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+new file mode 100644
+index 000000000000..0d9e48b201f5
+--- /dev/null
++++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __KVM_ARM_SMMU_V3_H
++#define __KVM_ARM_SMMU_V3_H
 +
- 	for_each_hyp_page(page, addr, size)
- 		set_host_state(page, state);
++#include <asm/kvm_asm.h>
 +
-+	/*
-+	 * Any transition to PKVM_NOPAGE, unmaps the page from the host
-+	 * Any transition to PKVM_PAGE_SHARED_BORROWED, maps the page in the host
-+	 * Any transition to PKVM_PAGE_SHARED_OWNED is ignored as page is already mapped.
-+	 * Transitions to PKVM_PAGE_OWNED from anything but PKVM_NOPAGE are ignored.
-+	 * Transitions to PKVM_PAGE_OWNED from PKVM_NOPAGE will map the page.
-+	 */
-+	if ((state == PKVM_PAGE_SHARED_OWNED) ||
-+		((state == PKVM_PAGE_OWNED) && (old != PKVM_NOPAGE)))
-+		return;
++/*
++ * Parameters from the trusted host:
++ * @mmio_addr		base address of the SMMU registers
++ * @mmio_size		size of the registers resource
++ *
++ * Other members are filled and used at runtime by the SMMU driver.
++ * @base		Virtual address of SMMU registers
++ */
++struct hyp_arm_smmu_v3_device {
++	phys_addr_t		mmio_addr;
++	size_t			mmio_size;
++	void __iomem		*base;
++};
 +
-+	if ((state == PKVM_PAGE_SHARED_BORROWED) ||
-+		(state == PKVM_PAGE_OWNED))
-+		prot = PKVM_HOST_MEM_PROT;
++extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
++#define kvm_hyp_arm_smmu_v3_count kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count)
 +
-+	/*
-+	 * Only update the IOMMU from here, as MMIO can't transition after
-+	 * de-privilege, that will need to change when device assignment
-+	 * is supported.
-+	 * And WARN on failure as we can't unroll at this point.
-+	 */
-+	WARN_ON(kvm_iommu_host_stage2_idmap(addr, addr + size, prot));
- }
- 
- #define KVM_HOST_DONATION_PTE_OWNER_MASK	GENMASK(3, 1)
++extern struct hyp_arm_smmu_v3_device *kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_smmus);
++#define kvm_hyp_arm_smmu_v3_smmus kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_smmus)
++
++#endif /* __KVM_ARM_SMMU_V3_H */
 -- 
 2.54.0.545.g6539524ca2-goog
 
