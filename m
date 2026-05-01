@@ -1,190 +1,294 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6695C3C345B
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 14:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F143C9453
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 14:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777645108; cv=none; b=COPz8/vSUmBtRpVl+xCxXZPFtjO5Z3V3EsV/JdRZq+X2XXJvyDxmjXuOKuEHtQ34J8s/4twolH+5wVoJpPjyEQAvNufo1lMQ0CQee5USPy4edMS/QYthXaVQjTv9xzzdFZqMSzucRwyXWqiYMIOuVapc1GO55OYgGey9NX9E4+c=
+	t=1777645284; cv=none; b=dRnFbzS4gBQ96Pda1UuZBbDefBb/QA90nICtbiU88nVBOBjpWODcH68v+Qhyi8gzz0oHJhLsz337IoInnkDCOnS0f7EONZq1YX89vpiR7z7WR4i+0VaR6NcSeHYvwx4cIy947Cca7FM63stsU2XAy0gavCu6B2/Z45ExnRFhyok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777645108; c=relaxed/simple;
-	bh=n4QKpHTlKIbKxoVyb8jomzE98FcpdhxCxXybOaeTddY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C12JrV5PIRQmQWbksmIE2Df0GG+9J//rj1Eix60qCXqrWT0HErfR6+bhbHvIYXAhZfZXb1w8qkn0dUMfsakPuLIE0EBZdHPbw+SHNmZa4mTctNY69DffXvsyLTbm/W+/rJOcOcAaI5bC5CA5jwBVwKRKrhmY/+EgXkVJKRjqjQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YhClDYmW; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1777645284; c=relaxed/simple;
+	bh=qAtodJ9TKmiZz4msSUj9WtzN6/ujAzAtgV0rPu56XbU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=m3uQ5/AZ2zvMNeae5VdWgEqdrahxqyIT6ztdqVsLab9F7L1Ghq6jPVAVC3uaVAvSV3K7cMKrM91xp28l0DDfD0FUYMa96EXkFtpK6rdTE8mp6q/zCbkZc4GvUAVHobJDDZvDBjNA1OX7crtxSvfyQHFjp2oVVatDQA/6lXniwvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Aajq6OjV; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YhClDYmW"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AB672C1C;
-	Fri,  1 May 2026 07:18:20 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF50F3F7B4;
-	Fri,  1 May 2026 07:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777645105; bh=n4QKpHTlKIbKxoVyb8jomzE98FcpdhxCxXybOaeTddY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YhClDYmWmp6O5MaEN5QwnO5JBVi0bDYByAXkKn7fiDuCzxz0ob/7DxW/wZ/xIYLCA
-	 gkfwAy+hNWKVA8+B1KyQrqGix+V7kPyXloob1Ckrt+kuUQUF9cqYRo97BQpFH4JqxS
-	 BESkBXabNRE0Q6XJjUxIEpPESEi0NcjJgVMHTsOU=
-Date: Fri, 1 May 2026 15:18:16 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	mark.rutland@arm.com
-Subject: Re: [PATCH] KVM: arm64: Handle permission faults with guest_memfd
-Message-ID: <afS2KDp6zEo3zSvP@raptor>
-References: <20260430132351.280766-1-alexandru.elisei@arm.com>
- <CA+EHjTwZ=yFx_NEyw5YEiGqCjsfM=QotHgsCUVQmWDr6cNKLZw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Aajq6OjV"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-43d7badbd7dso959820f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 07:21:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1777645281; x=1778250081; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DBnnGCpYSonyRl/RZZsL4XC/Tyffyj/BGojejPAjpWk=;
+        b=Aajq6OjVCztJoBh70OQKO4f7GrKMK8UaAb8G25+6ugUuwDdFOe45m2lM5Wc1EIo08I
+         NLLmK3BFyN8sfOUwmw/uj6lobo9l1aoNJgVtbMCXXf4ewUNV0sg91tybSmXqreXD9hhC
+         2a9CJt0xsfBQdFJNgt2HQlTiUPNBnOyYxaVWXs7Oh/mKijRvQBEWstyKZdOWYkARoOUJ
+         9AUWf0u/vmOYCIjSdh4CBAVnqmUVneC/CEqcQ7qs87DP9vWAbm4NHaR3Ne/eZOPvuD2N
+         P5HtnKojAVHjhIkcUbL95zWN/wx9YmRKyjNrceZkToUmxJmdldWi+FU/Lnw/gurUbae8
+         0X+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777645281; x=1778250081;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DBnnGCpYSonyRl/RZZsL4XC/Tyffyj/BGojejPAjpWk=;
+        b=atGPGqQayIfpQERrRf2npjP15iOUpXhCPR1VMnj1CG5pRjt4ZcMiYISXzYaVN+OGxC
+         qm+5+yYs6RiRjutriZnzcDXTIaEwzXzbNaQhpA1mTPqSQJcgbaKQ0VhkbvHi0w43jpDo
+         HoIHsZai5ESL+F2TZLVmd+QZ6VjI3HqCfDIGRft3rX6Cyj4qyGB1Kv6235QJI++OyrHA
+         diFqOUGLbIGPVqAnsDqx5cd38tBwzqDB+kG9IFoYnSYK768jcZFkH5hPDVrnvc1vClRU
+         Yvz6mrEchO0WbDZv3IAcK+PSthiw3bWFWbbphzNsqZdi5fr9sR/bn6iYweAURL0ItV2q
+         enAQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+liFvPwoOerYo+6UOK0gg8AFoemS3x4/Hotqclu24ULBiVNkGCQrG8B4SX5O5deIDKDILPNEE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyhUJCsdByuep4dovcIkN9eoCwctERVHOdOEDHqzjJRweX+HIH6
+	xsTXP37+k+NFg9E7vDfhkfIOWzQdLKvhBdXOM3XOlInqTEj/kaNA7eRxIkytUC3zbKo=
+X-Gm-Gg: AeBDietxlrdJcK6G/6lM2eHfhoOyvG3PR7ju7nWrkgOMvkm+J60i04Ek5fmtozaNi5Y
+	8DFTq2N2S1ddjyH2qnYMLXX8sasZ4sFUreBVUZZJhKJAgwReAwKsuelcAkB3hRpDYYoKkSIRzJl
+	Hpv80IjNcxDaijDQF7b79Tj3BW0jPJ8juI5arWqUhUyW69M65KHxIQdun/tAOFZC84gPOF3ZwGT
+	u8FFbZXPz2W06tAse7VDppdVL4ZJWdsq4F+NjCEK3L2mQRZpfuip0zGbZTmPlHLQrLIoWYhXUc/
+	laJ8GiAPn2qgDWsRIa6D07clvjA/lVddt28JPg0ptdxYYGrsqxSBHETNxB2ddRhqav4nYp2JzyN
+	ZbMH83UzhN7efsicwkVnEhWwoQIKgtYTKWaplVicTAYFvfVZY/gKRgX8hbsT0gf257EFZLbl/qK
+	Jh8lmTiCljg0vRYz7NZTkPLE8Dng09AG2rCQ==
+X-Received: by 2002:a5d:5d83:0:b0:43f:e413:f6fd with SMTP id ffacd0b85a97d-44a83318609mr5106522f8f.0.1777645281205;
+        Fri, 01 May 2026 07:21:21 -0700 (PDT)
+Received: from draig.lan ([185.124.0.195])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a986aa3a5sm5802041f8f.26.2026.05.01.07.21.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2026 07:21:20 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 8A2A75F8FC;
+	Fri, 01 May 2026 15:21:19 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: qemu-devel@nongnu.org,  Andrew Jones <andrew.jones@linux.dev>,  Eric
+ Auger <eric.auger@redhat.com>,  "open list:ARM" <kvmarm@lists.linux.dev>,
+  "open list:Default mailing list" <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH] arm: add wfx test case
+In-Reply-To: <afSnVJLe7HrB6ISS@raptor> (Alexandru Elisei's message of "Fri, 1
+	May 2026 14:15:14 +0100")
+References: <20260427130045.3669851-1-alex.bennee@linaro.org>
+	<afSnVJLe7HrB6ISS@raptor>
+User-Agent: mu4e 1.14.1-pre3; emacs 30.1
+Date: Fri, 01 May 2026 15:21:19 +0100
+Message-ID: <87zf2jcisg.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTwZ=yFx_NEyw5YEiGqCjsfM=QotHgsCUVQmWDr6cNKLZw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Fuad,
+Alexandru Elisei <alexandru.elisei@arm.com> writes:
 
-On Thu, Apr 30, 2026 at 03:48:21PM +0100, Fuad Tabba wrote:
-> Hi Alexandru,
-> 
-> On Thu, 30 Apr 2026 at 14:24, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >
-> > gmem_abort() calls kvm_pgtable_stage2_map() to make changes to stage 2. It
-> > does this for both relaxing permissions on an existing mapping and to
-> > install a missing mapping.
-> >
-> > kvm_pgtable_stage2_map() doesn't make changes to stage 2 if there is an
-> > existing, valid entry and the new entry modifies only the permissions.
-> > This is checked in:
-> >
-> > kvm_pgtable_stage2_map()
-> >   stage2_map_walk_leaf()
-> >      stage2_map_walker_try_leaf()
-> >        stage2_pte_needs_update()
-> >
-> > and if only the permissions differ, kvm_pgtable_stage2_map() returns
-> > -EAGAIN and KVM returns to the guest to replay the instruction. The
-> > assumption is that a concurrent fault on a different VCPU already mapped
-> > the faulting IPA, and replaying the instruction will either succeed, or
-> > cause a permission fault, which should be handled with
-> > kvm_pgtable_stage2_relax_perms().
-> >
-> > gmem_abort(), on a read or write fault on a system without DIC (instruction
-> > cache invalidation required for data to instruction coherence), installs a
-> > valid entry with read and write permissions, but without executable
-> > permissions. On an execution fault on the same page, gmem_abort() attempts
-> > to relax the permissions to allow execution, but calls
-> > kvm_pgtable_stage2_map() to change the existing, valid, entry.
-> > kvm_pgtable_stage2_map() returns -EAGAIN and KVM resumes execution from the
-> > faulting instruction, which leads to an infinite loop of permission faults
-> > on the same instruction.
-> >
-> > Allow the guest to make progress by using kvm_pgtable_stage2_relax_perms()
-> > to relax permissions.
-> >
-> > Fixes: a7b57e099592 ("KVM: arm64: Handle guest_memfd-backed guest page faults")
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >
-> > Lightly tested on an Orion O6 board, without pkvm, and without nested
-> > virtualisation.
-> >
-> > Doesn't apply cleanly on top of a7b57e099592, I can send a patch for that if
-> > needed.
-> >
-> >  arch/arm64/kvm/mmu.c | 24 +++++++++++++++++-------
-> >  1 file changed, 17 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index d089c107d9b7..dff58de7703b 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1576,6 +1576,7 @@ struct kvm_s2_fault_desc {
-> >  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >  {
-> >         bool write_fault, exec_fault;
-> > +       bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
-> >         enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
-> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> >         struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
-> > @@ -1587,10 +1588,12 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >         gfn_t gfn;
-> >         int ret;
-> >
-> > -       memcache = get_mmu_memcache(s2fd->vcpu);
-> > -       ret = topup_mmu_memcache(s2fd->vcpu, memcache);
-> > -       if (ret)
-> > -               return ret;
-> > +       if (!perm_fault) {
-> > +               memcache = get_mmu_memcache(s2fd->vcpu);
-> > +               ret = topup_mmu_memcache(s2fd->vcpu, memcache);
-> > +               if (ret)
-> > +                       return ret;
-> > +       }
-> 
-> memcache is now uninitialized when perm_fault, and only read in the
-> !perm_fault branch below. It's safe today, but initializing it to NULL
-> would silence any defensive analyzer and keep things robust against
-> future churn.
+> Hi Alex,
+>
+> On Mon, Apr 27, 2026 at 02:00:45PM +0100, Alex Benn=C3=A9e wrote:
+>> This is based on a similar test case I wrote for QEMU's tcg tests althou=
+gh
+>> obviously able to take advantage of kvm-unit-tests additional plumbing f=
+or
+>> dealing with the GIC and IRQs.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  arm/Makefile.arm64        |   1 +
+>>  lib/arm64/asm/processor.h |   7 ++
+>>  lib/arm64/asm/sysreg.h    |   3 +
+>>  arm/wfx.c                 | 137 ++++++++++++++++++++++++++++++++++++++
+>>  arm/unittests.cfg         |   5 ++
+>>  5 files changed, 153 insertions(+)
+>>  create mode 100644 arm/wfx.c
+>>=20
+>> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+>> index a40c830d..52b3f35d 100644
+>> --- a/arm/Makefile.arm64
+>> +++ b/arm/Makefile.arm64
+>> @@ -64,6 +64,7 @@ tests +=3D $(TEST_DIR)/cache.$(exe)
+>>  tests +=3D $(TEST_DIR)/debug.$(exe)
+>>  tests +=3D $(TEST_DIR)/fpu.$(exe)
+>>  tests +=3D $(TEST_DIR)/mte.$(exe)
+>> +tests +=3D $(TEST_DIR)/wfx.$(exe)
+>>=20=20
+>>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+>>=20=20
+>> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+>> index 32ddc1b3..2104036d 100644
+>> --- a/lib/arm64/asm/processor.h
+>> +++ b/lib/arm64/asm/processor.h
+>> @@ -173,5 +173,12 @@ static inline bool system_supports_rndr(void)
+>>  	return ((id_aa64isar0_el1 >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf) !=3D =
+0;
+>>  }
+>>=20=20
+>> +static inline bool system_supports_wfxt(void)
+>> +{
+>> +	u64 id_aa64isar2_el1 =3D read_sysreg_s(ID_AA64ISAR2_EL1);
+>> +
+>> +	return ((id_aa64isar2_el1 >> ID_AA64ISAR2_EL1_WFxT_SHIFT) & 0xf) !=3D =
+0;
+>> +}
+>> +
+>>  #endif /* !__ASSEMBLER__ */
+>>  #endif /* _ASMARM64_PROCESSOR_H_ */
+>> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+>> index f2d05018..cb96a649 100644
+>> --- a/lib/arm64/asm/sysreg.h
+>> +++ b/lib/arm64/asm/sysreg.h
+>> @@ -77,6 +77,9 @@ asm(
+>>  #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
+>>  #define ID_AA64PFR1_EL1_MTE_SHIFT	8
+>>=20=20
+>> +#define ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
+>> +#define ID_AA64ISAR2_EL1_WFxT_SHIFT	0
+>> +
+>>  #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
+>>  #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
+>>=20=20
+>> diff --git a/arm/wfx.c b/arm/wfx.c
+>> new file mode 100644
+>> index 00000000..912e50e6
+>> --- /dev/null
+>> +++ b/arm/wfx.c
+>> @@ -0,0 +1,137 @@
+>> +/*
+>> + * WFX Instructions Test (WFI, WFE, WFIT, WFET)
+>> + *
+>> + * Copyright (c) 2026 Linaro Ltd
+>> + *
+>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>> + */
+>> +
+>> +#include <libcflat.h>
+>> +#include <asm/processor.h>
+>> +#include <asm/gic.h>
+>> +#include <asm/timer.h>
+>> +#include <asm/io.h>
+>> +
+>> +#define TIMEOUT 200000
+>> +
+>> +#define sev() asm volatile("sev" : : : "memory")
+>> +#define sevl() asm volatile("sevl" : : : "memory")
+>> +#define wfi() asm volatile("wfi" : : : "memory")
+>> +#define wfe() asm volatile("wfe" : : : "memory")
+>> +
+>> +#define wfit(reg) \
+>> +	asm volatile(".arch armv8.7-a\n\twfit %0" : : "r" (reg) : "memory")
+>> +#define wfet(reg) \
+>> +	asm volatile(".arch armv8.7-a\n\twfet %0" : : "r" (reg) : "memory")
+>> +
+>> +static void timer_handler(struct pt_regs *regs)
+>> +{
+>> +	/* Disable timer to stop IRQ from re-firing */
+>> +	write_sysreg(0, cntv_ctl_el0);
+>> +}
+>
+> It is customary for the interrupt handler to ack the interrupt at the GIC=
+ level.
+>
+>> +
+>> +static bool check_elapsed(uint64_t start, uint64_t threshold, const cha=
+r *test, bool more)
+>> +{
+>> +	uint64_t end =3D read_sysreg(cntvct_el0);
+>> +	uint64_t elapsed =3D end - start;
+>> +	bool pass =3D more ? elapsed >=3D threshold : elapsed <=3D threshold;
+>> +
+>> +	report(pass, "%s (%ld ticks)", test, elapsed);
+>> +
+>> +	if (!pass) {
+>> +		report_info("%s %s", test, more ? "woke too early" : "slept despite S=
+EV");
+>> +	}
+>> +	return pass;
+>> +}
+>> +
+>> +static void test_wfi(void)
+>> +{
+>> +	uint64_t start;
+>> +
+>> +	report_info("Testing WFI...");
+>> +
+>> +	start =3D read_sysreg(cntvct_el0);
+>> +	write_sysreg(TIMEOUT, cntv_tval_el0);
+>> +	write_sysreg(1, cntv_ctl_el0); /* Enable timer, no mask */
+>> +	isb();
+>> +
+>> +	local_irq_enable();
+>> +	wfi();
+>
+> Consider this scenario:
+>
+> 	local_irq_enable();
+> 	// CPU takes the interrupt, handles it and returns.
+> 	wfi(); <- CPU now waits forever for an interrupt that will never come
+>
+> The proper way to do it on baremetal would be:
+>
+> 	local_irq_disable();
+> 	// Program timer to fire
+> 	wfi();
+> 	// Timer fires, GIC asserts the interrupt, WFI completes
+> 	local_irq_enable();
+> 	// CPU handles the interrupt
+> 	check_elapsed(..)
+>
+> But this is not baremetal. KVM can decide not to trap WFI (look at
+> arch/arm64/kvm/arm.c::kvm_arch_vcpu_load() -> kvm_vpcu_should_clear_twi()=
+). In
+> that case, the WFI might complete due a host interrupt, and check_elapsed=
+() will
+> fail because the timer hasn't yet fired.
+>
+>> +	local_irq_disable();
+>> +
+>> +	check_elapsed(start, TIMEOUT, "WFI", true);
+>> +}
+>> +
+>> +static void test_wfe(void)
+>> +{
+>> +	uint64_t start;
+>> +
+>> +	report_info("Testing WFE/SEV...");
+>> +	sev();
+>> +	start =3D read_sysreg(cntvct_el0);
+>> +	wfe();
+>> +	check_elapsed(start, TIMEOUT, "WFE/SEV", false);
+>> +
+>> +	report_info("Testing WFE/SEVL...");
+>> +	sevl();
+>> +	start =3D read_sysreg(cntvct_el0);
+>> +	wfe();
+>> +	check_elapsed(start, TIMEOUT, "WFE/SEVL", false);
+>> +}
+>
+> I haven't thought about this too much, but it looks to me like the same
+> situation with WFI can happen with WFE
+>
+> Also, kvm-unit-tests() makes use of WFE and SEV for multithreading, and t=
+he fact
+> that multithreaded tests work at all might be taken as proof enough that =
+the two
+> instructions are correctly implemented.
 
-Sure, I'll initialise memcache to NULL.
+So I'm using kvm-unit-test to exercise QEMU's TCG modelling of the
+instructions, see:
 
-> 
-> >
-> >         if (s2fd->nested)
-> >                 gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
-> > @@ -1631,9 +1634,16 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >                 goto out_unlock;
-> >         }
-> >
-> > -       ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
-> > -                                                __pfn_to_phys(pfn), prot,
-> > -                                                memcache, flags);
-> > +       if (perm_fault) {
-> > +               /* Preserve the software bits from the existing table entry. */
-> > +               prot &= ~KVM_NV_GUEST_MAP_SZ;
-> 
-> Can you please phrase it the same way as the existing comment in
-> user_mem_abort, as that phrasing more precisely describes the
-> rationale? i.e.,
+  Message-ID: <20260430104434.1482407-1-alex.bennee@linaro.org>
+  Date: Thu, 30 Apr 2026 11:44:27 +0100
+  Subject: [PATCH v4 0/7] target/arm: fully model WFxT instructions for A-p=
+rofile
 
-Of course.
+So while I'm confident the current modelling doesn't cause issues
+(because we basically treat it as a NOP) I wanted to check the various
+modes behave as they should with the above patches.
 
-> 
->    /*
->     * Drop the SW bits in favour of those stored in the
->     * PTE, which will be preserved.
->     */
-> 
-> > +               ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms(pgt, s2fd->fault_ipa,
-> > +                                                               prot, flags));
-> 
-> nit: args wrapped inside KVM_PGT_FN() is inconsistent with the rest of
-> the file (and with the else-branch immediately below). Every other
-> call site uses name-only inside the macro. Both expand the same way,
-> but it's better to stick to the convention.
+I can limit the test to TCG only if it is likely to fail under KVM.
 
-This was a typo on my part, thanks for catching it.
-
-> 
-> > +       } else {
-> > +               ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
-> > +                                                        __pfn_to_phys(pfn), prot,
-> > +                                                        memcache, flags);
-> > +       }
-> >
-> >  out_unlock:
-> >         kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
-> 
-> With these fixed:
-> 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Thanks!
-
-Alex
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
