@@ -1,54 +1,54 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA7739E166
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A457639E19A
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777634401; cv=none; b=gYaPGkoQWMYr6Huq3C5wZihI7j4DpI4cJbZpOLM2lJ3XC23Pk8cqhyjp7+4nnPnHkMf7ZF3fF9dLXjUY1U7MkqdZKkChN5ieU+DjZXCnpApVrYhHOaVXPAUzLVQ6pVboh6CUfT586G5yR0yE9DA8hJz47iPhWHdLz4129EdcJlo=
+	t=1777634405; cv=none; b=hkk7p7nFuO0wM4D7ABCjyReINabE3EbaPbu1n5EcxgxOspoLnvR0DptvnnFfWmeMY4FncmjAjIIhqrqp7FKReh63IuS48IE3axYclDcMq3cWve7TJumraMVcMYhh3+Dedu5AoXAI2u4Rh9oiI1PUPZa9OU7kEDwRIdsocoI/K3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777634401; c=relaxed/simple;
-	bh=Mc9VSadrlG3HR8bgyHW9QCg2LJjHfIHy8yI4QUWjNlM=;
+	s=arc-20240116; t=1777634405; c=relaxed/simple;
+	bh=15+QeiFyLvHiPcCIubc5fSnh88MpTHwIauK/sgpB9Kk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h878dQ47+grtprVuEG+hBCQXt6Qqa0Q1jS7a/ZNHGVgHlrwqKwckme7xn/AxD4u9k2yv/0qi5LOuvrUiLeGKnCVjNh+47tCoh/tApiGVb4Vi6U2+Ksy2ocUnsLtdmQy3gUgcVswhXDiBdjNVsBje390iIhRbuyXpViFvcIXF0q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TZhthAJI; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=B2+B6mN+n/sNEghQI1d1gooMx4hjJxz5BmvVr7gUMhBZONsraNVeniR1gfwCzizb7jgcRXP37YuteePRlJOP5oUOhT2fm1UI7K+zyIA2SHG24P2Kgygr/5dWh8+1bPI+fAvRvGnvJBbByCBs5X6Uauj5OdSr1vrdB/+LQiHorag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jGlA7yGv; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TZhthAJI"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48a5adc12ffso11675155e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:19:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jGlA7yGv"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48a589c7879so21429645e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777634396; x=1778239196; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1777634402; x=1778239202; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O6kXYkgLH2ICtXbKKNbc9V/7v2AisF8lJzqevwz+DWw=;
-        b=TZhthAJImTpbNa2SL2YleYiXToMdUolMQ7ug2CUjQgcqflxB51LfPrz/oBRZANV+ND
-         a5URx+YFtJIA02H+IBb8AJeYaejbjTzuHtmjQMBF5EJXZ3WaISCCBZCQM58dtfxdYl/q
-         7ydqwBsjX7KH9IOtKT3u6oRQ3fSMbgZwDIegAs2//Mb7Lo5Ss98RFLP3d0Xlj461qsP1
-         BXPpptpMUp71UkqDAD/IcG7oGpJamL20ER10lwnpn7lhufDc66aGwt5uVejy6zD5WKTS
-         BoO/mdHzf9l8jGOxSOXHpCrItgRWifVRhyIIjxgUJctpmKplP7mIhcTKc8Q8s5sWCHDE
-         7/BQ==
+        bh=cn3lch7CcipEUf/hsRSFMjJhdn+CahR9BLaY3vu1ZIo=;
+        b=jGlA7yGv6hBAxKCT8vcGdx7HSZE/B/JuR78oav/zkZdFO+KfxIL4Zou8XU6+adKSBy
+         +lRSoro2P5BGhADZ/lOuDXh4X/Ol9B7VUH5waPbOPJc3HIiNwpLP6du4zhpxVNSP0pwf
+         WJyKOqPBvRN8dzQrF9Hs+WjE89oP84m5LBb8ZOrUHlOlhYkA3en31r9EcuqmNGmLZ6Yo
+         X4Sg5ymUErjs0JZZ+2HCdzX7LziIdGSYOPiSGAm3Ug0de9WIxYSh1q2D6JCIAZGnBAb7
+         bg0/BhISKDiOJoqflL67o7it7b2esUoVpMq7tCC91FChvcE3a8MFFrTno+NLyJvYB9tI
+         iKuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777634396; x=1778239196;
+        d=1e100.net; s=20251104; t=1777634402; x=1778239202;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O6kXYkgLH2ICtXbKKNbc9V/7v2AisF8lJzqevwz+DWw=;
-        b=OrstxA/108bdFqosJBK31+P2/IC9LntRTz9r6/sow6ByTyVgWSRxnlr+hxbc1KmAB0
-         2/AHWVLFUWlkHXoCbdEkCJAuY9NBLE1nZv/Ub+OKzoOwWzZ/zzwfox8LC9QhTPx1qika
-         zPt6ypU269jeFSCmZ9akRv9khUa6mErh5LJud32ZFhO78nTInicQ5IaqnZIw6ApDTb7f
-         pgAWyyAN01oRQKWhflq9RA+xAzM3SUsJcA8f3r1qAmw1/r973Zsm5E3m6wFV2dX6tfUI
-         dmsN4ksfwNWS5h2rjdz9OiV2ES2IUD8l6CP2uIgncF6DuvTazOACYY9/fJu/NVqJYCG+
-         GGDw==
-X-Forwarded-Encrypted: i=1; AFNElJ87F77Nl0cOOsmPoc/bC8/QXs8nPT4Vv6scjo4wb9/J8SeTEwKFDPaSSUbA5yg87QDUXEuRzW4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwJWKnfcgVQO6tjs19pfzxYBWS032FHTMkZwc9j3T8a89iisH65
-	1g/RxhC9TtmoaN3EWPoQPAs1Ki/QV7gkRc3AJwES9rTyUJEnFPs1rQsCQ2UZrRkJAKE52VercmF
-	3p3iLZRoymncbZQ==
-X-Received: from wmxb6-n2.prod.google.com ([2002:a05:600d:8446:20b0:488:7b85:acf0])
+        bh=cn3lch7CcipEUf/hsRSFMjJhdn+CahR9BLaY3vu1ZIo=;
+        b=ZPskG/GlSh2YKZx9rUy5H3DeLOSvsrTmf85W3IhBOxcML9EVnC0rB7YEJ6msyUBNaP
+         lfr3JyxJ7HblQc7HuKbXl9z/zY0/WTuzJgBEgmpBb0ciZ29F9gvcVF/XC/HM3bpf32WA
+         IYGJdebVN+TSWzlo+gma+h/djwiSJXM00so9mAE/fdntY97o7srn1r48T2EOBmU3qvvR
+         YsDTjW1NUHMmBlaV+N2ly55S9bQ48ULN41KJ7Wgi4865tvtB4faSV5XOISLnbs/nne+8
+         1YB2FcWlQpYNfN/0qyRqib9oKdQnDdTyXkULnwyGPJfkETXdRYNlcMeKP0fwu03gWi9F
+         GrRA==
+X-Forwarded-Encrypted: i=1; AFNElJ8nr2jwGxD+NfH2K1R5AbqlM2iFpR8U31oOw9p1fhLBdE1lGs8Pja1viUsxLGYPNZIVt3Kg7lI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxFOI+jeR7eclqueoBwBbjm2XwV3Dw5mzUQlZMXbazerwri0IQi
+	GMY5xZTtWuuizyIAbBpet1pAY2/SEDtdOXrt69vsL/zRhKKj5nXekbMwcnskiN1FgOzs6ZCuica
+	3WZq1kT/5VNAWZA==
+X-Received: from wrna11.prod.google.com ([2002:adf:e5cb:0:b0:449:2f8e:2b32])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4f09:b0:48a:525b:e148 with SMTP id 5b1f17b1804b1-48a844e4a91mr99363655e9.4.1777634395587;
- Fri, 01 May 2026 04:19:55 -0700 (PDT)
-Date: Fri,  1 May 2026 11:19:05 +0000
+ 2002:a05:600c:310e:b0:48a:5821:6006 with SMTP id 5b1f17b1804b1-48a93e9bb92mr17243045e9.4.1777634401907;
+ Fri, 01 May 2026 04:20:01 -0700 (PDT)
+Date: Fri,  1 May 2026 11:19:06 +0000
 In-Reply-To: <20260501111928.259252-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260501111928.259252-1-smostafa@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260501111928.259252-4-smostafa@google.com>
-Subject: [PATCH v6 03/25] iommu/arm-smmu-v3: Split code with hyp
+Message-ID: <20260501111928.259252-5-smostafa@google.com>
+Subject: [PATCH v6 04/25] iommu/arm-smmu-v3: Move TLB range invalidation into
+ common code
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -71,430 +72,188 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The KVM SMMUv3 driver would re-use some of the cmdq and ste code
-inside the hypervisor, move these functions to a new common C file that
-is shared between the host kernel and the hypervisor.
+Range TLB invalidation has a very specific algorithm. Instead of
+re-writing it for the hypervisor, move it to a function that can
+be re-used.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- drivers/iommu/arm/arm-smmu-v3/Makefile        |   2 +-
- .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  | 114 +++++++++++++
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 161 ------------------
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  61 +++++++
- 4 files changed, 176 insertions(+), 162 deletions(-)
- create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 65 ++++--------------
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 76 +++++++++++++++++++++
+ 2 files changed, 88 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/Makefile b/drivers/iommu/arm/arm-smmu-v3/Makefile
-index 493a659cc66b..c9ce392e6d31 100644
---- a/drivers/iommu/arm/arm-smmu-v3/Makefile
-+++ b/drivers/iommu/arm/arm-smmu-v3/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_ARM_SMMU_V3) += arm_smmu_v3.o
--arm_smmu_v3-y := arm-smmu-v3.o
-+arm_smmu_v3-y := arm-smmu-v3.o arm-smmu-v3-common-lib.o
- arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_IOMMUFD) += arm-smmu-v3-iommufd.o
- arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_SVA) += arm-smmu-v3-sva.o
- arm_smmu_v3-$(CONFIG_TEGRA241_CMDQV) += tegra241-cmdqv.o
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-new file mode 100644
-index 000000000000..62744c8548a8
---- /dev/null
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2015 ARM Limited
-+ *
-+ * Author: Will Deacon <will.deacon@arm.com>
-+ * Arm SMMUv3 driver functions shared with hypervisor.
-+ */
-+
-+#include "arm-smmu-v3.h"
-+#include <asm-generic/errno-base.h>
-+
-+#include <linux/string.h>
-+
-+int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent)
-+{
-+	memset(cmd, 0, 1 << CMDQ_ENT_SZ_SHIFT);
-+	cmd[0] |= FIELD_PREP(CMDQ_0_OP, ent->opcode);
-+
-+	switch (ent->opcode) {
-+	case CMDQ_OP_TLBI_EL2_ALL:
-+	case CMDQ_OP_TLBI_NSNH_ALL:
-+		break;
-+	case CMDQ_OP_PREFETCH_CFG:
-+		cmd[0] |= FIELD_PREP(CMDQ_PREFETCH_0_SID, ent->prefetch.sid);
-+		break;
-+	case CMDQ_OP_CFGI_CD:
-+		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SSID, ent->cfgi.ssid);
-+		fallthrough;
-+	case CMDQ_OP_CFGI_STE:
-+		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
-+		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_LEAF, ent->cfgi.leaf);
-+		break;
-+	case CMDQ_OP_CFGI_CD_ALL:
-+		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
-+		break;
-+	case CMDQ_OP_CFGI_ALL:
-+		/* Cover the entire SID range */
-+		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
-+		break;
-+	case CMDQ_OP_TLBI_NH_VA:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-+		fallthrough;
-+	case CMDQ_OP_TLBI_EL2_VA:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
-+		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
-+		break;
-+	case CMDQ_OP_TLBI_S2_IPA:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
-+		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_IPA_MASK;
-+		break;
-+	case CMDQ_OP_TLBI_NH_ASID:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-+		fallthrough;
-+	case CMDQ_OP_TLBI_NH_ALL:
-+	case CMDQ_OP_TLBI_S12_VMALL:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-+		break;
-+	case CMDQ_OP_TLBI_EL2_ASID:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-+		break;
-+	case CMDQ_OP_ATC_INV:
-+		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
-+		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_GLOBAL, ent->atc.global);
-+		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SSID, ent->atc.ssid);
-+		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SID, ent->atc.sid);
-+		cmd[1] |= FIELD_PREP(CMDQ_ATC_1_SIZE, ent->atc.size);
-+		cmd[1] |= ent->atc.addr & CMDQ_ATC_1_ADDR_MASK;
-+		break;
-+	case CMDQ_OP_PRI_RESP:
-+		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
-+		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SSID, ent->pri.ssid);
-+		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SID, ent->pri.sid);
-+		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_GRPID, ent->pri.grpid);
-+		switch (ent->pri.resp) {
-+		case PRI_RESP_DENY:
-+		case PRI_RESP_FAIL:
-+		case PRI_RESP_SUCC:
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_RESP, ent->pri.resp);
-+		break;
-+	case CMDQ_OP_RESUME:
-+		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_SID, ent->resume.sid);
-+		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_RESP, ent->resume.resp);
-+		cmd[1] |= FIELD_PREP(CMDQ_RESUME_1_STAG, ent->resume.stag);
-+		break;
-+	case CMDQ_OP_CMD_SYNC:
-+		if (ent->sync.msiaddr) {
-+			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_IRQ);
-+			cmd[1] |= ent->sync.msiaddr & CMDQ_SYNC_1_MSIADDR_MASK;
-+		} else {
-+			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_SEV);
-+		}
-+		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSH, ARM_SMMU_SH_ISH);
-+		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSIATTR, ARM_SMMU_MEMATTR_OIWB);
-+		break;
-+	default:
-+		return -ENOENT;
-+	}
-+
-+	return 0;
-+}
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index e8d7dbe495f0..cb64f88989f0 100644
+index cb64f88989f0..c22832d26495 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -125,33 +125,6 @@ static void parse_driver_options(struct arm_smmu_device *smmu)
+@@ -2362,68 +2362,27 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 	arm_smmu_domain_inv(smmu_domain);
  }
  
- /* Low-level queue manipulation functions */
--static bool queue_has_space(struct arm_smmu_ll_queue *q, u32 n)
--{
--	u32 space, prod, cons;
--
--	prod = Q_IDX(q, q->prod);
--	cons = Q_IDX(q, q->cons);
--
--	if (Q_WRP(q, q->prod) == Q_WRP(q, q->cons))
--		space = (1 << q->max_n_shift) - (prod - cons);
--	else
--		space = cons - prod;
--
--	return space >= n;
--}
--
--static bool queue_full(struct arm_smmu_ll_queue *q)
--{
--	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
--	       Q_WRP(q, q->prod) != Q_WRP(q, q->cons);
--}
--
--static bool queue_empty(struct arm_smmu_ll_queue *q)
--{
--	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
--	       Q_WRP(q, q->prod) == Q_WRP(q, q->cons);
--}
--
- static bool queue_consumed(struct arm_smmu_ll_queue *q, u32 prod)
++static void __arm_smmu_cmdq_batch_add(void *__opaque,
++				      struct arm_smmu_cmdq_batch *cmds,
++				      struct arm_smmu_cmdq_ent *cmd)
++{
++	struct arm_smmu_device *smmu = (struct arm_smmu_device *)__opaque;
++
++	arm_smmu_cmdq_batch_add(smmu, cmds, cmd);
++}
++
+ static void arm_smmu_cmdq_batch_add_range(struct arm_smmu_device *smmu,
+ 					  struct arm_smmu_cmdq_batch *cmds,
+ 					  struct arm_smmu_cmdq_ent *cmd,
+ 					  unsigned long iova, size_t size,
+ 					  size_t granule, size_t pgsize)
  {
- 	return ((Q_WRP(q, q->cons) == Q_WRP(q, prod)) &&
-@@ -170,12 +143,6 @@ static void queue_sync_cons_out(struct arm_smmu_queue *q)
- 	writel_relaxed(q->llq.cons, q->cons_reg);
- }
+-	unsigned long end = iova + size, num_pages = 0, tg = pgsize;
+-	size_t inv_range = granule;
+-
+ 	if (WARN_ON_ONCE(!size))
+ 		return;
  
--static void queue_inc_cons(struct arm_smmu_ll_queue *q)
--{
--	u32 cons = (Q_WRP(q, q->cons) | Q_IDX(q, q->cons)) + 1;
--	q->cons = Q_OVF(q->cons) | Q_WRP(q, cons) | Q_IDX(q, cons);
--}
+-	if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+-		num_pages = size >> tg;
 -
- static void queue_sync_cons_ovf(struct arm_smmu_queue *q)
- {
- 	struct arm_smmu_ll_queue *llq = &q->llq;
-@@ -207,12 +174,6 @@ static int queue_sync_prod_in(struct arm_smmu_queue *q)
- 	return ret;
- }
- 
--static u32 queue_inc_prod_n(struct arm_smmu_ll_queue *q, int n)
--{
--	u32 prod = (Q_WRP(q, q->prod) | Q_IDX(q, q->prod)) + n;
--	return Q_OVF(q->prod) | Q_WRP(q, prod) | Q_IDX(q, prod);
--}
+-		/* Convert page size of 12,14,16 (log2) to 1,2,3 */
+-		cmd->tlbi.tg = (tg - 10) / 2;
 -
- static void queue_poll_init(struct arm_smmu_device *smmu,
- 			    struct arm_smmu_queue_poll *qp)
- {
-@@ -240,14 +201,6 @@ static int queue_poll(struct arm_smmu_queue_poll *qp)
- 	return 0;
- }
- 
--static void queue_write(__le64 *dst, u64 *src, size_t n_dwords)
--{
--	int i;
--
--	for (i = 0; i < n_dwords; ++i)
--		*dst++ = cpu_to_le64(*src++);
--}
--
- static void queue_read(u64 *dst, __le64 *src, size_t n_dwords)
- {
- 	int i;
-@@ -268,108 +221,6 @@ static int queue_remove_raw(struct arm_smmu_queue *q, u64 *ent)
- }
- 
- /* High-level queue accessors */
--static int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent)
--{
--	memset(cmd, 0, 1 << CMDQ_ENT_SZ_SHIFT);
--	cmd[0] |= FIELD_PREP(CMDQ_0_OP, ent->opcode);
--
--	switch (ent->opcode) {
--	case CMDQ_OP_TLBI_EL2_ALL:
--	case CMDQ_OP_TLBI_NSNH_ALL:
--		break;
--	case CMDQ_OP_PREFETCH_CFG:
--		cmd[0] |= FIELD_PREP(CMDQ_PREFETCH_0_SID, ent->prefetch.sid);
--		break;
--	case CMDQ_OP_CFGI_CD:
--		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SSID, ent->cfgi.ssid);
--		fallthrough;
--	case CMDQ_OP_CFGI_STE:
--		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
--		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_LEAF, ent->cfgi.leaf);
--		break;
--	case CMDQ_OP_CFGI_CD_ALL:
--		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
--		break;
--	case CMDQ_OP_CFGI_ALL:
--		/* Cover the entire SID range */
--		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
--		break;
--	case CMDQ_OP_TLBI_NH_VA:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
--		fallthrough;
--	case CMDQ_OP_TLBI_EL2_VA:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
--		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
--		break;
--	case CMDQ_OP_TLBI_S2_IPA:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
--		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_IPA_MASK;
--		break;
--	case CMDQ_OP_TLBI_NH_ASID:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
--		fallthrough;
--	case CMDQ_OP_TLBI_NH_ALL:
--	case CMDQ_OP_TLBI_S12_VMALL:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
--		break;
--	case CMDQ_OP_TLBI_EL2_ASID:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
--		break;
--	case CMDQ_OP_ATC_INV:
--		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
--		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_GLOBAL, ent->atc.global);
--		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SSID, ent->atc.ssid);
--		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SID, ent->atc.sid);
--		cmd[1] |= FIELD_PREP(CMDQ_ATC_1_SIZE, ent->atc.size);
--		cmd[1] |= ent->atc.addr & CMDQ_ATC_1_ADDR_MASK;
--		break;
--	case CMDQ_OP_PRI_RESP:
--		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
--		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SSID, ent->pri.ssid);
--		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SID, ent->pri.sid);
--		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_GRPID, ent->pri.grpid);
--		switch (ent->pri.resp) {
--		case PRI_RESP_DENY:
--		case PRI_RESP_FAIL:
--		case PRI_RESP_SUCC:
--			break;
--		default:
--			return -EINVAL;
--		}
--		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_RESP, ent->pri.resp);
--		break;
--	case CMDQ_OP_RESUME:
--		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_SID, ent->resume.sid);
--		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_RESP, ent->resume.resp);
--		cmd[1] |= FIELD_PREP(CMDQ_RESUME_1_STAG, ent->resume.stag);
--		break;
--	case CMDQ_OP_CMD_SYNC:
--		if (ent->sync.msiaddr) {
--			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_IRQ);
--			cmd[1] |= ent->sync.msiaddr & CMDQ_SYNC_1_MSIADDR_MASK;
--		} else {
--			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_SEV);
--		}
--		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSH, ARM_SMMU_SH_ISH);
--		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSIATTR, ARM_SMMU_MEMATTR_OIWB);
--		break;
--	default:
--		return -ENOENT;
+-		/*
+-		 * Determine what level the granule is at. For non-leaf, both
+-		 * io-pgtable and SVA pass a nominal last-level granule because
+-		 * they don't know what level(s) actually apply, so ignore that
+-		 * and leave TTL=0. However for various errata reasons we still
+-		 * want to use a range command, so avoid the SVA corner case
+-		 * where both scale and num could be 0 as well.
+-		 */
+-		if (cmd->tlbi.leaf)
+-			cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
+-		else if ((num_pages & CMDQ_TLBI_RANGE_NUM_MAX) == 1)
+-			num_pages++;
 -	}
 -
--	return 0;
--}
+-	while (iova < end) {
+-		if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+-			/*
+-			 * On each iteration of the loop, the range is 5 bits
+-			 * worth of the aligned size remaining.
+-			 * The range in pages is:
+-			 *
+-			 * range = (num_pages & (0x1f << __ffs(num_pages)))
+-			 */
+-			unsigned long scale, num;
 -
- static struct arm_smmu_cmdq *arm_smmu_get_cmdq(struct arm_smmu_device *smmu,
- 					       struct arm_smmu_cmdq_ent *ent)
- {
-@@ -1827,18 +1678,6 @@ static void arm_smmu_free_cd_tables(struct arm_smmu_master *master)
+-			/* Determine the power of 2 multiple number of pages */
+-			scale = __ffs(num_pages);
+-			cmd->tlbi.scale = scale;
+-
+-			/* Determine how many chunks of 2^scale size we have */
+-			num = (num_pages >> scale) & CMDQ_TLBI_RANGE_NUM_MAX;
+-			cmd->tlbi.num = num - 1;
+-
+-			/* range is num * 2^scale * pgsize */
+-			inv_range = num << (scale + tg);
+-
+-			/* Clear out the lower order bits for the next iteration */
+-			num_pages -= num << scale;
+-		}
+-
+-		cmd->tlbi.addr = iova;
+-		arm_smmu_cmdq_batch_add(smmu, cmds, cmd);
+-		iova += inv_range;
+-	}
++	arm_smmu_tlb_inv_build(cmd, iova, size, granule,
++			       pgsize, smmu->features & ARM_SMMU_FEAT_RANGE_INV,
++			       smmu, __arm_smmu_cmdq_batch_add, cmds);
  }
  
- /* Stream table manipulation functions */
--static void arm_smmu_write_strtab_l1_desc(struct arm_smmu_strtab_l1 *dst,
--					  dma_addr_t l2ptr_dma)
--{
--	u64 val = 0;
--
--	val |= FIELD_PREP(STRTAB_L1_DESC_SPAN, STRTAB_SPLIT + 1);
--	val |= l2ptr_dma & STRTAB_L1_DESC_L2PTR_MASK;
--
--	/* The HW has 64 bit atomicity with stores to the L2 STE table */
--	WRITE_ONCE(dst->l2ptr, cpu_to_le64(val));
--}
--
- struct arm_smmu_ste_writer {
- 	struct arm_smmu_entry_writer writer;
- 	u32 sid;
+ static bool arm_smmu_inv_size_too_big(struct arm_smmu_device *smmu, size_t size,
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index ef42df4753ec..9b8c5fb7282b 100644
+index 9b8c5fb7282b..7be41dbe5aaa 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -1142,6 +1142,67 @@ void arm_smmu_install_ste_for_dev(struct arm_smmu_master *master,
- int arm_smmu_cmdq_issue_cmdlist(struct arm_smmu_device *smmu,
- 				struct arm_smmu_cmdq *cmdq, u64 *cmds, int n,
- 				bool sync);
-+int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent);
-+
-+/* Queue functions shared between kernel and hyp. */
-+static inline bool queue_has_space(struct arm_smmu_ll_queue *q, u32 n)
-+{
-+	u32 space, prod, cons;
-+
-+	prod = Q_IDX(q, q->prod);
-+	cons = Q_IDX(q, q->cons);
-+
-+	if (Q_WRP(q, q->prod) == Q_WRP(q, q->cons))
-+		space = (1 << q->max_n_shift) - (prod - cons);
-+	else
-+		space = cons - prod;
-+
-+	return space >= n;
-+}
-+
-+static inline bool queue_full(struct arm_smmu_ll_queue *q)
-+{
-+	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
-+	       Q_WRP(q, q->prod) != Q_WRP(q, q->cons);
-+}
-+
-+static inline bool queue_empty(struct arm_smmu_ll_queue *q)
-+{
-+	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
-+	       Q_WRP(q, q->prod) == Q_WRP(q, q->cons);
-+}
-+
-+static inline u32 queue_inc_prod_n(struct arm_smmu_ll_queue *q, int n)
-+{
-+	u32 prod = (Q_WRP(q, q->prod) | Q_IDX(q, q->prod)) + n;
-+	return Q_OVF(q->prod) | Q_WRP(q, prod) | Q_IDX(q, prod);
-+}
-+
-+static inline void queue_inc_cons(struct arm_smmu_ll_queue *q)
-+{
-+	u32 cons = (Q_WRP(q, q->cons) | Q_IDX(q, q->cons)) + 1;
-+	q->cons = Q_OVF(q->cons) | Q_WRP(q, cons) | Q_IDX(q, cons);
-+}
-+
-+static inline void queue_write(__le64 *dst, u64 *src, size_t n_dwords)
-+{
-+	int i;
-+
-+	for (i = 0; i < n_dwords; ++i)
-+		*dst++ = cpu_to_le64(*src++);
-+}
-+
-+static inline void arm_smmu_write_strtab_l1_desc(struct arm_smmu_strtab_l1 *dst,
-+						 dma_addr_t l2ptr_dma)
-+{
-+	u64 val = 0;
-+
-+	val |= FIELD_PREP(STRTAB_L1_DESC_SPAN, STRTAB_SPLIT + 1);
-+	val |= l2ptr_dma & STRTAB_L1_DESC_L2PTR_MASK;
-+
-+	/* The HW has 64 bit atomicity with stores to the L2 STE table */
-+	WRITE_ONCE(dst->l2ptr, cpu_to_le64(val));
-+}
+@@ -1204,6 +1204,82 @@ static inline void arm_smmu_write_strtab_l1_desc(struct arm_smmu_strtab_l1 *dst,
+ 	WRITE_ONCE(dst->l2ptr, cpu_to_le64(val));
+ }
  
++/**
++ * arm_smmu_tlb_inv_build - Create a range invalidation command
++ * @cmd: Base command initialized with OPCODE (S1, S2..), vmid and asid
++ * @iova: Start IOVA to invalidate
++ * @size: Size of range
++ * @granule: Granule of invalidation
++ * @pgsize: Page size of the invalidation
++ * @is_range: Use range invalidation commands
++ * @opaque: Pointer to pass to add_cmd
++ * @add_cmd: Function to send/batch the invalidation command
++ * @cmds: Incase of batching, it includes the pointer to the batch
++ */
++static inline void arm_smmu_tlb_inv_build(struct arm_smmu_cmdq_ent *cmd,
++					  unsigned long iova, size_t size,
++					  size_t granule, unsigned long pgsize,
++					  bool is_range, void *opaque,
++					  void (*add_cmd)(void *_opaque,
++							  struct arm_smmu_cmdq_batch *cmds,
++							  struct arm_smmu_cmdq_ent *cmd),
++					  struct arm_smmu_cmdq_batch *cmds)
++{
++	unsigned long end = iova + size, num_pages = 0, tg = pgsize;
++	size_t inv_range = granule;
++
++	if (is_range) {
++		num_pages = size >> tg;
++
++		/* Convert page size of 12,14,16 (log2) to 1,2,3 */
++		cmd->tlbi.tg = (tg - 10) / 2;
++
++		/*
++		 * Determine what level the granule is at. For non-leaf, both
++		 * io-pgtable and SVA pass a nominal last-level granule because
++		 * they don't know what level(s) actually apply, so ignore that
++		 * and leave TTL=0. However for various errata reasons we still
++		 * want to use a range command, so avoid the SVA corner case
++		 * where both scale and num could be 0 as well.
++		 */
++		if (cmd->tlbi.leaf)
++			cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
++		else if ((num_pages & CMDQ_TLBI_RANGE_NUM_MAX) == 1)
++			num_pages++;
++	}
++
++	while (iova < end) {
++		if (is_range) {
++			/*
++			 * On each iteration of the loop, the range is 5 bits
++			 * worth of the aligned size remaining.
++			 * The range in pages is:
++			 *
++			 * range = (num_pages & (0x1f << __ffs(num_pages)))
++			 */
++			unsigned long scale, num;
++
++			/* Determine the power of 2 multiple number of pages */
++			scale = __ffs(num_pages);
++			cmd->tlbi.scale = scale;
++
++			/* Determine how many chunks of 2^scale size we have */
++			num = (num_pages >> scale) & CMDQ_TLBI_RANGE_NUM_MAX;
++			cmd->tlbi.num = num - 1;
++
++			/* range is num * 2^scale * pgsize */
++			inv_range = num << (scale + tg);
++
++			/* Clear out the lower order bits for the next iteration */
++			num_pages -= num << scale;
++		}
++
++		cmd->tlbi.addr = iova;
++		add_cmd(opaque, cmds, cmd);
++		iova += inv_range;
++	}
++}
++
  #ifdef CONFIG_ARM_SMMU_V3_SVA
  bool arm_smmu_sva_supported(struct arm_smmu_device *smmu);
+ void arm_smmu_sva_notifier_synchronize(void);
 -- 
 2.54.0.545.g6539524ca2-goog
 
