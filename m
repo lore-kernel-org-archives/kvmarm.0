@@ -1,54 +1,54 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570E839EF07
-	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E105139EF0B
+	for <kvmarm@lists.linux.dev>; Fri,  1 May 2026 11:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777634407; cv=none; b=guhs/yyAVx0s8TIBir3vuMuhSrYCR7HaZ5DhnET6PjPGzbV5PTVl/Vd/xE3pb6VclYdTEsXPmtWoQyVF36OdDcFeZMiJ8ObzP6eX3X4BdvFrJDc96Sq9XJbHF8hJ1Oz+HamcLmv495h47F4+9vn/m6oKVDHRZ4NcYznpZjq/6lQ=
+	t=1777634409; cv=none; b=Z0WQzwIlYwQgVTyxasX5cwq0evkDhiwyB3K4yp3zyVmyy6aaSZ+vjY3+3Z4zTroo1u3yuPqEfeJSBpBEgP/ezva7x3OGV+lyl4s2BM90t2ls1BsMcX7JDxniycr666dUBL5QTdYvg6aP3zlSl9wPbt9dMJg00Pu3zYkrUGqSCnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777634407; c=relaxed/simple;
-	bh=MJpO/a/WnHz3UIfcZbr2Jxww3GoG5+ijB8pjliAreDw=;
+	s=arc-20240116; t=1777634409; c=relaxed/simple;
+	bh=s+i9FkVsDdqiDhtbenKjDnOOXgFPIjoZdSeFxYf+bdE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V4mQGsTEyavq3k6ev9cq9F8gkU4bhcj0IUiZ7tmI/BWK5lydneo38I+1g0/nYL0EQewdck+Ani+bge32mdIym4MT7P7T1e+RhmZkCGdD2Mvip1NjWjySNgmi4cRycFt73OS6a9SsfX6XZUrPS63dbFxUehcGZSIYbcVBb1Hg0O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b21CGixf; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=Jcy/8kP7pGR64w3pSyC7XSjnTdUykv4E4cSwo/pZVXiS+gTIORWNArBUgzpD6QnOJTM1tGPFRf02gCHdeH6kFKKnO4uGFksTkUkM8WgPHLCZbcgHZbrEO/02FCNJttLXAH0cce02EwrJGEWOCRw5Ce7veabOm/vXC9cGsThbono=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B0xBDAqS; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b21CGixf"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-43ff19e54beso1245307f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:20:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B0xBDAqS"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-4470d6d2a4fso2204024f8f.1
+        for <kvmarm@lists.linux.dev>; Fri, 01 May 2026 04:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777634404; x=1778239204; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1777634405; x=1778239205; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvUMSgIU3B3ilTsGpCNLEttDMrzsuBUntqQsjjdex/k=;
-        b=b21CGixfE8iR52sDC6ItJSsRoOqs7ZRWiYoA6EXlm9TFAkp7O6wQ08ZgCh0lc5f2GV
-         HrUZGbOSqVRiBfztxcL1sdcM9R4YVWyF0ZfHaGG1Ju1cU+6eHvXCw3WcpOgu+oA/dM+p
-         gST3cY9ZjxFeh6PDS8yY0qQ6t1tXk1ZZs+E1rK00XnOExP7FuaFlRObETMNlPoxyBZ3s
-         9nwZ66/JmeE5KjVfDW1Nhiwh5OyMT6Ij8oqP4VAjLFMpKByiJZZ5Vz4UNiApqApxBhFI
-         Qhm88tviY+BBO6f8OhHIhEjY66E+ST0gYiV493Hj8fukUfxIgzIMQSCjM68Z8wyFfN+l
-         HK0A==
+        bh=7C4551UfTUE9108SwsL7eQBuHqZOfGoFP6bfRW56kPQ=;
+        b=B0xBDAqS2cIe8HMh3vQrEeatlestFyzRXNYMKYP5sfnlOkrFf93iCFZsPDdKGrAyJK
+         4rEBUWQpi4qkwp2YCOFXbl/gZOWS88PRz6CgEj/gR/Gfb3ZJhHPk4rYNH/J9RZfkvKCa
+         /CckT3a+CcXxLFQ/dBY7580TFkpdCX4QlgZ2+GbXTsozmO4G/PkYAY4fanH4nUd1QjNT
+         TMqkWAM2UpQizm9WSnLCzI8K+U338SAlewIFzh5EsgRU1IKJSihLI9od/RpOqzLV/ltw
+         KDjlstvdQbNJk+xpvOpPclElaXY/v+wgPxwjg4868sQFfxcchKw+B1O8txbF2EDY0qDS
+         oiDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777634404; x=1778239204;
+        d=1e100.net; s=20251104; t=1777634405; x=1778239205;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvUMSgIU3B3ilTsGpCNLEttDMrzsuBUntqQsjjdex/k=;
-        b=rqJaOK2vr8kBxQwqqiK7M6Tpj+aMBX7tTuFC2fMD9RWtXiGfuR2ZmQL4+G4Ers30Px
-         VF7FsnKh2JEB+7XptsNrzSiXd7jLjW3A32y1UeZecNMXomSSSe13pSZsgik6lHqnlkvf
-         mVX8C10GvnVo9twAzaTU7E3BI5QFW8C3QDtio5wruVBg9/rAqMhQ64AhnVDN4WljebB6
-         D4MrkU9OW4Q3xx2kgo0PLA+5OCeT64p3pe2mwliep8llFd25XMPoiCva5crkkFR3Q6TZ
-         bnaVLIy1odVhJ33UluKNtbbOsWU9b9t51mvd9789V4RzYyALkO/pc2psIsYw7rY1Vhd6
-         zbhQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9C/k2vk7E0WSnt7HdfprcZRK37SqSMWvG0y1JYV6w3A6giqnqKg3gUHxtds2GQo/wMnFcD+Jk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyOpH5eFzzEW62kGhSMaaCY4iWVwxAQvhwl5KwDzuVw7YOkk9NW
-	olwk3Ldi3eEcJ4h/BoqOU7HBsd7czwEPwC6KWGAfsyXtiUvsopp7Go/tHrxg7xn2NJSW2+vB7Ob
-	N91LdOSxzRlkSYw==
-X-Received: from wmoo5.prod.google.com ([2002:a05:600d:105:b0:488:9c2a:aeba])
+        bh=7C4551UfTUE9108SwsL7eQBuHqZOfGoFP6bfRW56kPQ=;
+        b=k6JbOZlTXH+Rk9z1O5UI6YXr9sbOoI291OYv6b/FtGt9/1wWtBkITh5524VwkBFgIO
+         cpyLkvLn12yOT9IO7HeXPrFiIUfCACEg9jJWY/twCVfWj4JNkWv0T7qcsEbYyG5PXeqx
+         hY+nDXvGNGZIJLjJwPBOKJGQDwHchrdMhK8Q0Fp3H7fmeo2rvfluU6XOauHbHrGaTEQE
+         KQlrUvvrgQIUag5hJZA8cZ30w6n7ydFA2CchLkrhWpq7O903i8KH5pjLn87v04pjXPEb
+         9KDBpcqjLG1fSRDWGymrl0SRA7QKXjOZIdy8L5xAwM69IHlKMtRA+LPK0vRfT48fDXRi
+         d3Yg==
+X-Forwarded-Encrypted: i=1; AFNElJ8DFd5axHmEswbaTOIo7HhJKCpKTjA5jCZ1IEtQqgILeXFI7aGacj88+kI6gip/2QxBzfAUfLc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzxp4ilJZxadRBhLSXqT8TuIGrQxWcGp/B7XAf6xcptJbYf/ndW
+	yzNIouoRe60pS1BKU6MQFPZemMcA6q4OBYrXjqapUJ0nfs9NWXeQ3KkXvt47eOs5RGjZUP4SqSH
+	AzSTnbIGlcwJq6Q==
+X-Received: from wmro23.prod.google.com ([2002:a05:600c:3797:b0:485:2f8c:9478])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4e16:b0:48a:52ce:a4b1 with SMTP id 5b1f17b1804b1-48a8451cff6mr117057225e9.15.1777634403717;
- Fri, 01 May 2026 04:20:03 -0700 (PDT)
-Date: Fri,  1 May 2026 11:19:07 +0000
+ 2002:a05:600c:c0ca:b0:488:b14f:b8ed with SMTP id 5b1f17b1804b1-48a83d1a406mr82848235e9.0.1777634405297;
+ Fri, 01 May 2026 04:20:05 -0700 (PDT)
+Date: Fri,  1 May 2026 11:19:08 +0000
 In-Reply-To: <20260501111928.259252-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260501111928.259252-1-smostafa@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260501111928.259252-6-smostafa@google.com>
-Subject: [PATCH v6 05/25] iommu/arm-smmu-v3: Move IDR parsing to common functions
+Message-ID: <20260501111928.259252-7-smostafa@google.com>
+Subject: [PATCH v6 06/25] iommu/io-pgtable-arm: Rework to use the iommu-pages API
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -71,304 +71,233 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move parsing of IDRs to functions so that it can be re-used
-from the hypervisor.
+To prepare for supporting io-pgtable-arm in the pKVM hypervisor,
+we need to abstract away standard kernel allocations, frees, virt/phys
+conversions, and DMA API mapping.
+
+This patch introduces a set of generic wrappers in iommu-pages.h:
+- iommu_alloc_data
+- iommu_free_data
+- iommu_virt_to_phys
+- iommu_phys_to_virt
+- iommu_pages_dma_map
+- iommu_pages_dma_mapping_error
+- iommu_pages_dma_unmap
+
+The io-pgtable-arm.c code is updated to universally use these new
+wrappers instead of standard kernel kmalloc_obj, kfree, virt_to_phys,
+dma_map_single, etc. This abstraction makes it easy to replace them with
+hypervisor-specific implementations in a later patch.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  | 110 +++++++++++++++++
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 112 +++---------------
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   5 +
- 3 files changed, 130 insertions(+), 97 deletions(-)
+ drivers/iommu/io-pgtable-arm.c | 37 ++++++++++++++++------------------
+ drivers/iommu/iommu-pages.h    | 36 +++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-index 62744c8548a8..e6dd087e2999 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-@@ -112,3 +112,113 @@ int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent)
+diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+index 0208e5897c29..e765021308f9 100644
+--- a/drivers/iommu/io-pgtable-arm.c
++++ b/drivers/iommu/io-pgtable-arm.c
+@@ -15,7 +15,6 @@
+ #include <linux/sizes.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+-#include <linux/dma-mapping.h>
  
- 	return 0;
- }
-+
-+u32 smmu_idr0_features(u32 reg)
-+{
-+	u32 features = 0;
-+
-+	/* 2-level structures */
-+	if (FIELD_GET(IDR0_ST_LVL, reg) == IDR0_ST_LVL_2LVL)
-+		features |= ARM_SMMU_FEAT_2_LVL_STRTAB;
-+
-+	if (reg & IDR0_CD2L)
-+		features |= ARM_SMMU_FEAT_2_LVL_CDTAB;
-+
-+	/*
-+	 * Translation table endianness.
-+	 * We currently require the same endianness as the CPU, but this
-+	 * could be changed later by adding a new IO_PGTABLE_QUIRK.
-+	 */
-+	switch (FIELD_GET(IDR0_TTENDIAN, reg)) {
-+	case IDR0_TTENDIAN_MIXED:
-+		features |= ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE;
-+		break;
-+#ifdef __BIG_ENDIAN
-+	case IDR0_TTENDIAN_BE:
-+		features |= ARM_SMMU_FEAT_TT_BE;
-+		break;
-+#else
-+	case IDR0_TTENDIAN_LE:
-+		features |= ARM_SMMU_FEAT_TT_LE;
-+		break;
-+#endif
-+	}
-+
-+	/* Boolean feature flags */
-+	if (IS_ENABLED(CONFIG_PCI_PRI) && reg & IDR0_PRI)
-+		features |= ARM_SMMU_FEAT_PRI;
-+
-+	if (IS_ENABLED(CONFIG_PCI_ATS) && reg & IDR0_ATS)
-+		features |= ARM_SMMU_FEAT_ATS;
-+
-+	if (reg & IDR0_SEV)
-+		features |= ARM_SMMU_FEAT_SEV;
-+
-+	if (reg & IDR0_MSI)
-+		features |= ARM_SMMU_FEAT_MSI;
-+
-+	if (reg & IDR0_HYP)
-+		features |= ARM_SMMU_FEAT_HYP;
-+
-+	switch (FIELD_GET(IDR0_STALL_MODEL, reg)) {
-+	case IDR0_STALL_MODEL_FORCE:
-+		features |= ARM_SMMU_FEAT_STALL_FORCE;
-+		fallthrough;
-+	case IDR0_STALL_MODEL_STALL:
-+		features |= ARM_SMMU_FEAT_STALLS;
-+	}
-+
-+	if (reg & IDR0_S1P)
-+		features |= ARM_SMMU_FEAT_TRANS_S1;
-+
-+	if (reg & IDR0_S2P)
-+		features |= ARM_SMMU_FEAT_TRANS_S2;
-+
-+	return features;
-+}
-+
-+u32 smmu_idr3_features(u32 reg)
-+{
-+	u32 features = 0;
-+
-+	if (FIELD_GET(IDR3_RIL, reg))
-+		features |= ARM_SMMU_FEAT_RANGE_INV;
-+	if (FIELD_GET(IDR3_FWB, reg))
-+		features |= ARM_SMMU_FEAT_S2FWB;
-+
-+	return features;
-+}
-+
-+u32 smmu_idr5_to_oas(u32 reg)
-+{
-+	switch (FIELD_GET(IDR5_OAS, reg)) {
-+	case IDR5_OAS_32_BIT:
-+		return 32;
-+	case IDR5_OAS_36_BIT:
-+		return 36;
-+	case IDR5_OAS_40_BIT:
-+		return 40;
-+	case IDR5_OAS_42_BIT:
-+		return 42;
-+	case IDR5_OAS_44_BIT:
-+		return 44;
-+	case IDR5_OAS_48_BIT:
-+		return 48;
-+	case IDR5_OAS_52_BIT:
-+		return 52;
-+	}
-+	return 0;
-+}
-+
-+unsigned long smmu_idr5_to_pgsize(u32 reg)
-+{
-+	unsigned long pgsize_bitmap = 0;
-+
-+	if (reg & IDR5_GRAN64K)
-+		pgsize_bitmap |= SZ_64K | SZ_512M;
-+	if (reg & IDR5_GRAN16K)
-+		pgsize_bitmap |= SZ_16K | SZ_32M;
-+	if (reg & IDR5_GRAN4K)
-+		pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
-+	return pgsize_bitmap;
-+}
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index c22832d26495..96d5e7f80ce7 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -4815,57 +4815,17 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- 	/* IDR0 */
- 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
+ #include <asm/barrier.h>
  
--	/* 2-level structures */
--	if (FIELD_GET(IDR0_ST_LVL, reg) == IDR0_ST_LVL_2LVL)
--		smmu->features |= ARM_SMMU_FEAT_2_LVL_STRTAB;
--
--	if (reg & IDR0_CD2L)
--		smmu->features |= ARM_SMMU_FEAT_2_LVL_CDTAB;
--
--	/*
--	 * Translation table endianness.
--	 * We currently require the same endianness as the CPU, but this
--	 * could be changed later by adding a new IO_PGTABLE_QUIRK.
--	 */
--	switch (FIELD_GET(IDR0_TTENDIAN, reg)) {
--	case IDR0_TTENDIAN_MIXED:
--		smmu->features |= ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE;
--		break;
--#ifdef __BIG_ENDIAN
--	case IDR0_TTENDIAN_BE:
--		smmu->features |= ARM_SMMU_FEAT_TT_BE;
--		break;
--#else
--	case IDR0_TTENDIAN_LE:
--		smmu->features |= ARM_SMMU_FEAT_TT_LE;
--		break;
--#endif
--	default:
-+	smmu->features |= smmu_idr0_features(reg);
-+	if (!(smmu->features & (ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE))) {
- 		dev_err(smmu->dev, "unknown/unsupported TT endianness!\n");
- 		return -ENXIO;
- 	}
--
--	/* Boolean feature flags */
--	if (IS_ENABLED(CONFIG_PCI_PRI) && reg & IDR0_PRI)
--		smmu->features |= ARM_SMMU_FEAT_PRI;
--
--	if (IS_ENABLED(CONFIG_PCI_ATS) && reg & IDR0_ATS)
--		smmu->features |= ARM_SMMU_FEAT_ATS;
--
--	if (reg & IDR0_SEV)
--		smmu->features |= ARM_SMMU_FEAT_SEV;
--
--	if (reg & IDR0_MSI) {
--		smmu->features |= ARM_SMMU_FEAT_MSI;
--		if (coherent && !disable_msipolling)
--			smmu->options |= ARM_SMMU_OPT_MSIPOLL;
--	}
--
--	if (reg & IDR0_HYP) {
--		smmu->features |= ARM_SMMU_FEAT_HYP;
--		if (cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
--			smmu->features |= ARM_SMMU_FEAT_E2H;
--	}
-+	if (coherent && !disable_msipolling &&
-+	    smmu->features & ARM_SMMU_FEAT_MSI)
-+		smmu->options |= ARM_SMMU_OPT_MSIPOLL;
-+	if (smmu->features & ARM_SMMU_FEAT_HYP &&
-+	    cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
-+		smmu->features |= ARM_SMMU_FEAT_E2H;
+@@ -143,7 +142,7 @@
+ #define ARM_MALI_LPAE_MEMATTR_WRITE_ALLOC 0x8DULL
  
- 	arm_smmu_get_httu(smmu, reg);
+ /* IOPTE accessors */
+-#define iopte_deref(pte,d) __va(iopte_to_paddr(pte, d))
++#define iopte_deref(pte, d) iommu_phys_to_virt(iopte_to_paddr(pte, d))
  
-@@ -4877,21 +4837,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- 		dev_warn(smmu->dev, "IDR0.COHACC overridden by FW configuration (%s)\n",
- 			 str_true_false(coherent));
+ #define iopte_type(pte)					\
+ 	(((pte) >> ARM_LPAE_PTE_TYPE_SHIFT) & ARM_LPAE_PTE_TYPE_MASK)
+@@ -245,7 +244,7 @@ static inline bool arm_lpae_concat_mandatory(struct io_pgtable_cfg *cfg,
  
--	switch (FIELD_GET(IDR0_STALL_MODEL, reg)) {
--	case IDR0_STALL_MODEL_FORCE:
--		smmu->features |= ARM_SMMU_FEAT_STALL_FORCE;
--		fallthrough;
--	case IDR0_STALL_MODEL_STALL:
--		smmu->features |= ARM_SMMU_FEAT_STALLS;
--	}
--
--	if (reg & IDR0_S1P)
--		smmu->features |= ARM_SMMU_FEAT_TRANS_S1;
--
--	if (reg & IDR0_S2P)
--		smmu->features |= ARM_SMMU_FEAT_TRANS_S2;
--
--	if (!(reg & (IDR0_S1P | IDR0_S2P))) {
-+	if (!(smmu->features & (ARM_SMMU_FEAT_TRANS_S1 | ARM_SMMU_FEAT_TRANS_S2))) {
- 		dev_err(smmu->dev, "no translation support!\n");
- 		return -ENXIO;
- 	}
-@@ -4950,10 +4896,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- 
- 	/* IDR3 */
- 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
--	if (FIELD_GET(IDR3_RIL, reg))
--		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
--	if (FIELD_GET(IDR3_FWB, reg))
--		smmu->features |= ARM_SMMU_FEAT_S2FWB;
-+	smmu->features |= smmu_idr3_features(reg);
- 
- 	if (FIELD_GET(IDR3_BBM, reg) == 2)
- 		smmu->features |= ARM_SMMU_FEAT_BBML2;
-@@ -4965,43 +4908,18 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- 	smmu->evtq.max_stalls = FIELD_GET(IDR5_STALL_MAX, reg);
- 
- 	/* Page sizes */
--	if (reg & IDR5_GRAN64K)
--		smmu->pgsize_bitmap |= SZ_64K | SZ_512M;
--	if (reg & IDR5_GRAN16K)
--		smmu->pgsize_bitmap |= SZ_16K | SZ_32M;
--	if (reg & IDR5_GRAN4K)
--		smmu->pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
-+	smmu->pgsize_bitmap = smmu_idr5_to_pgsize(reg);
- 
- 	/* Input address size */
- 	if (FIELD_GET(IDR5_VAX, reg) == IDR5_VAX_52_BIT)
- 		smmu->features |= ARM_SMMU_FEAT_VAX;
- 
--	/* Output address size */
--	switch (FIELD_GET(IDR5_OAS, reg)) {
--	case IDR5_OAS_32_BIT:
--		smmu->oas = 32;
--		break;
--	case IDR5_OAS_36_BIT:
--		smmu->oas = 36;
--		break;
--	case IDR5_OAS_40_BIT:
--		smmu->oas = 40;
--		break;
--	case IDR5_OAS_42_BIT:
--		smmu->oas = 42;
--		break;
--	case IDR5_OAS_44_BIT:
--		smmu->oas = 44;
--		break;
--	case IDR5_OAS_52_BIT:
--		smmu->oas = 52;
-+	smmu->oas = smmu_idr5_to_oas(reg);
-+	if (smmu->oas == 52)
- 		smmu->pgsize_bitmap |= 1ULL << 42; /* 4TB */
--		break;
--	default:
-+	else if (!smmu->oas) {
- 		dev_info(smmu->dev,
--			"unknown output address size. Truncating to 48-bit\n");
--		fallthrough;
--	case IDR5_OAS_48_BIT:
-+			 "unknown output address size. Truncating to 48-bit\n");
- 		smmu->oas = 48;
- 	}
- 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index 7be41dbe5aaa..64618299d03a 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -1144,6 +1144,11 @@ int arm_smmu_cmdq_issue_cmdlist(struct arm_smmu_device *smmu,
- 				bool sync);
- int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent);
- 
-+u32 smmu_idr0_features(u32 reg);
-+u32 smmu_idr3_features(u32 reg);
-+u32 smmu_idr5_to_oas(u32 reg);
-+unsigned long smmu_idr5_to_pgsize(u32 reg);
-+
- /* Queue functions shared between kernel and hyp. */
- static inline bool queue_has_space(struct arm_smmu_ll_queue *q, u32 n)
+ static dma_addr_t __arm_lpae_dma_addr(void *pages)
  {
+-	return (dma_addr_t)virt_to_phys(pages);
++	return (dma_addr_t)iommu_virt_to_phys(pages);
+ }
+ 
+ static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
+@@ -272,15 +271,15 @@ static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
+ 		return NULL;
+ 
+ 	if (!cfg->coherent_walk) {
+-		dma = dma_map_single(dev, pages, size, DMA_TO_DEVICE);
+-		if (dma_mapping_error(dev, dma))
++		dma = iommu_pages_dma_map(dev, pages, size);
++		if (iommu_pages_dma_mapping_error(dev, dma))
+ 			goto out_free;
+ 		/*
+ 		 * We depend on the IOMMU being able to work with any physical
+ 		 * address directly, so if the DMA layer suggests otherwise by
+ 		 * translating or truncating them, that bodes very badly...
+ 		 */
+-		if (dma != virt_to_phys(pages))
++		if (dma != iommu_virt_to_phys(pages))
+ 			goto out_unmap;
+ 	}
+ 
+@@ -288,7 +287,7 @@ static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
+ 
+ out_unmap:
+ 	dev_err(dev, "Cannot accommodate DMA translation for IOMMU page tables\n");
+-	dma_unmap_single(dev, dma, size, DMA_TO_DEVICE);
++	iommu_pages_dma_unmap(dev, dma, size);
+ 
+ out_free:
+ 	if (cfg->free)
+@@ -304,8 +303,7 @@ static void __arm_lpae_free_pages(void *pages, size_t size,
+ 				  void *cookie)
+ {
+ 	if (!cfg->coherent_walk)
+-		dma_unmap_single(cfg->iommu_dev, __arm_lpae_dma_addr(pages),
+-				 size, DMA_TO_DEVICE);
++		iommu_pages_dma_unmap(cfg->iommu_dev, __arm_lpae_dma_addr(pages), size);
+ 
+ 	if (cfg->free)
+ 		cfg->free(cookie, pages, size);
+@@ -316,8 +314,7 @@ static void __arm_lpae_free_pages(void *pages, size_t size,
+ static void __arm_lpae_sync_pte(arm_lpae_iopte *ptep, int num_entries,
+ 				struct io_pgtable_cfg *cfg)
+ {
+-	dma_sync_single_for_device(cfg->iommu_dev, __arm_lpae_dma_addr(ptep),
+-				   sizeof(*ptep) * num_entries, DMA_TO_DEVICE);
++	iommu_pages_flush_incoherent(cfg->iommu_dev, ptep, 0, sizeof(*ptep) * num_entries);
+ }
+ 
+ static void __arm_lpae_clear_pte(arm_lpae_iopte *ptep, struct io_pgtable_cfg *cfg, int num_entries)
+@@ -395,7 +392,7 @@ static arm_lpae_iopte arm_lpae_install_table(arm_lpae_iopte *table,
+ 	arm_lpae_iopte old, new;
+ 	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+ 
+-	new = paddr_to_iopte(__pa(table), data) | ARM_LPAE_PTE_TYPE_TABLE;
++	new = paddr_to_iopte(iommu_virt_to_phys(table), data) | ARM_LPAE_PTE_TYPE_TABLE;
+ 	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_NS)
+ 		new |= ARM_LPAE_PTE_NSTABLE;
+ 
+@@ -616,7 +613,7 @@ static void arm_lpae_free_pgtable(struct io_pgtable *iop)
+ 	struct arm_lpae_io_pgtable *data = io_pgtable_to_data(iop);
+ 
+ 	__arm_lpae_free_pgtable(data, data->start_level, data->pgd);
+-	kfree(data);
++	iommu_free_data(data);
+ }
+ 
+ static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
+@@ -930,7 +927,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
+ 	if (cfg->oas > ARM_LPAE_MAX_ADDR_BITS)
+ 		return NULL;
+ 
+-	data = kmalloc_obj(*data);
++	data = iommu_alloc_data(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return NULL;
+ 
+@@ -1053,11 +1050,11 @@ arm_64_lpae_alloc_pgtable_s1(struct io_pgtable_cfg *cfg, void *cookie)
+ 	wmb();
+ 
+ 	/* TTBR */
+-	cfg->arm_lpae_s1_cfg.ttbr = virt_to_phys(data->pgd);
++	cfg->arm_lpae_s1_cfg.ttbr = iommu_virt_to_phys(data->pgd);
+ 	return &data->iop;
+ 
+ out_free_data:
+-	kfree(data);
++	iommu_free_data(data);
+ 	return NULL;
+ }
+ 
+@@ -1149,11 +1146,11 @@ arm_64_lpae_alloc_pgtable_s2(struct io_pgtable_cfg *cfg, void *cookie)
+ 	wmb();
+ 
+ 	/* VTTBR */
+-	cfg->arm_lpae_s2_cfg.vttbr = virt_to_phys(data->pgd);
++	cfg->arm_lpae_s2_cfg.vttbr = iommu_virt_to_phys(data->pgd);
+ 	return &data->iop;
+ 
+ out_free_data:
+-	kfree(data);
++	iommu_free_data(data);
+ 	return NULL;
+ }
+ 
+@@ -1223,7 +1220,7 @@ arm_mali_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg, void *cookie)
+ 	/* Ensure the empty pgd is visible before TRANSTAB can be written */
+ 	wmb();
+ 
+-	cfg->arm_mali_lpae_cfg.transtab = virt_to_phys(data->pgd) |
++	cfg->arm_mali_lpae_cfg.transtab = iommu_virt_to_phys(data->pgd) |
+ 					  ARM_MALI_LPAE_TTBR_READ_INNER |
+ 					  ARM_MALI_LPAE_TTBR_ADRMODE_TABLE;
+ 	if (cfg->coherent_walk)
+@@ -1232,7 +1229,7 @@ arm_mali_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg, void *cookie)
+ 	return &data->iop;
+ 
+ out_free_data:
+-	kfree(data);
++	iommu_free_data(data);
+ 	return NULL;
+ }
+ 
+diff --git a/drivers/iommu/iommu-pages.h b/drivers/iommu/iommu-pages.h
+index ae9da4f571f6..e1945193ad7f 100644
+--- a/drivers/iommu/iommu-pages.h
++++ b/drivers/iommu/iommu-pages.h
+@@ -7,6 +7,7 @@
+ #ifndef __IOMMU_PAGES_H
+ #define __IOMMU_PAGES_H
+ 
++#include <linux/dma-mapping.h>
+ #include <linux/iommu.h>
+ 
+ /**
+@@ -145,4 +146,39 @@ void iommu_pages_stop_incoherent_list(struct iommu_pages_list *list,
+ void iommu_pages_free_incoherent(void *virt, struct device *dma_dev);
+ #endif
+ 
++static inline void *iommu_alloc_data(size_t size, gfp_t gfp)
++{
++	return kmalloc(size, gfp);
++}
++
++static inline void iommu_free_data(void *p)
++{
++	kfree(p);
++}
++
++static inline phys_addr_t iommu_virt_to_phys(void *virt)
++{
++	return virt_to_phys(virt);
++}
++
++static inline void *iommu_phys_to_virt(phys_addr_t phys)
++{
++	return phys_to_virt(phys);
++}
++
++static inline dma_addr_t iommu_pages_dma_map(struct device *dev, void *virt, size_t size)
++{
++	return dma_map_single(dev, virt, size, DMA_TO_DEVICE);
++}
++
++static inline int iommu_pages_dma_mapping_error(struct device *dev, dma_addr_t dma)
++{
++	return dma_mapping_error(dev, dma);
++}
++
++static inline void iommu_pages_dma_unmap(struct device *dev, dma_addr_t dma, size_t size)
++{
++	dma_unmap_single(dev, dma, size, DMA_TO_DEVICE);
++}
++
+ #endif /* __IOMMU_PAGES_H */
 -- 
 2.54.0.545.g6539524ca2-goog
 
