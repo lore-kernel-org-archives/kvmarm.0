@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1FC2192F9
-	for <kvmarm@lists.linux.dev>; Sun,  3 May 2026 07:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707BB1A9B24
+	for <kvmarm@lists.linux.dev>; Sun,  3 May 2026 07:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777793784; cv=none; b=tVdOJmo5b8QibjEGEq93PyUsiR+DMzXINPHl/dolHKxDEgij5u+k8l34GGIO8AZmz4QWcIwI+d0N7Uq0gekg4QyPXAKhBdliAutqvazOHGpUt6B/kaufCTnjqzDBL8x4IJtcSjqohuCPicGwyQb/bDE2rxOFQGW3CBwW1AnrSpQ=
+	t=1777793789; cv=none; b=bc5n7rWVXBqdAvuWkuaEDiY0HowpxLXc29uGql3kfaM1NAv2wfjAfdDNyxTYIatgu91w1zhBztO9ic5rI8uEWk/M+vZkbpYOHW/QDYh3xOpCeFwyCpAZ90KfyYipTpa1OAMQin7pgUS5m2azGd6jIQRTPbOe6LI1x9XMvUHud8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777793784; c=relaxed/simple;
-	bh=DZOTdwJV9MvKi33AOPezheGWGQZHZrn7rmZ5HznDBRM=;
+	s=arc-20240116; t=1777793789; c=relaxed/simple;
+	bh=3H7fv26MEmewKv0W4ZWOaUSdcRMl4Xu6W+EsL2/wuV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=jsU73C/hhrBQ1wg1i21TUpHdMG+scZtCppN1UIbs2nthnUZyIjKorjmGOy0gJtib8k/zkUFLmPGhyNG1WJmJEFz27APJIMQtXLSGBbPrn2uTsKC16xY0+wu3aFFpK77Vvlpo/y8Ohi125FAkNiaTomPhbCXsRW3f4q/tXUE44bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VSuBHbxh; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:content-type; b=QK22y/jNt8v6zhbkJ91NvfBFZkKj+rotVMlIK9sQv9KLXGAA1t/s2Zf30eMY8Sk0OdZFXNqABfBcGjwPcYL+baTu7We/TpvdTtZLQe7RxDjqEiqoFNdSDieTvkHg1gxPV9qRsZOxGDvrfPL49y9zk0CJT/qvJzL5tXEmYIAstGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UNCrf60Y; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VSuBHbxh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNCrf60Y"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777793781;
+	s=mimecast20190719; t=1777793787;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qb3QW9P09q68kQSB3KrvBidDZUkt/y6oNpcfFLBp4WY=;
-	b=VSuBHbxhzIDV2IC/zF1+krFTBTCzcmzgTlYWcH4rwSIEgvSOYZr6EuTEaJ7dNacPSAGhFf
-	MvvQLU3uERc28aproGbpFHL6rTHMJDtXjogSUqhCTjbHqN8pP35VuqyrgD9geiTzSMba5g
-	STLLnv7fR9ZYEuW5tqPgnwN6yvxfa4o=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=2dgC0fflJ1IwtES7qZ7pmfKjjmQsGVnqh8/2aG4sPf8=;
+	b=UNCrf60YJvVUrlznsm5GxVurcWYe0J2GLfz6fooElr/Ainokv4XmJZjs2E66G51Dc9qRyG
+	B67W0uZnJzrYvntJamw1QaMmivjQT4OF4Q0AGSRMRQN93ZjaLZ4ASzGkt6LrH0nPtn/RFE
+	volwpqiOv9gDDX59h4EhCzSQRErccsc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-80-1tdrefN_OA6tJm76iHJILA-1; Sun,
- 03 May 2026 03:36:17 -0400
-X-MC-Unique: 1tdrefN_OA6tJm76iHJILA-1
-X-Mimecast-MFC-AGG-ID: 1tdrefN_OA6tJm76iHJILA_1777793776
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-543-wcgl63-8PqGzXPQgjseLgg-1; Sun,
+ 03 May 2026 03:36:23 -0400
+X-MC-Unique: wcgl63-8PqGzXPQgjseLgg-1
+X-Mimecast-MFC-AGG-ID: wcgl63-8PqGzXPQgjseLgg_1777793782
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFC4919560AA;
-	Sun,  3 May 2026 07:36:15 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1160418003FC;
+	Sun,  3 May 2026 07:36:22 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.44.48.25])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0F9C81800577;
-	Sun,  3 May 2026 07:36:10 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 708A61800345;
+	Sun,  3 May 2026 07:36:16 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -61,9 +61,9 @@ Cc: maz@kernel.org,
 	berrange@redhat.com,
 	abologna@redhat.com,
 	jdenemar@redhat.com
-Subject: [PATCH v4 04/17] arm/cpu: Add infra to handle generated ID register definitions
-Date: Sun,  3 May 2026 09:33:24 +0200
-Message-ID: <20260503073541.790215-5-eric.auger@redhat.com>
+Subject: [PATCH v4 05/17] scripts: Introduce scripts/aarch64_sysreg_helpers module
+Date: Sun,  3 May 2026 09:33:25 +0200
+Message-ID: <20260503073541.790215-6-eric.auger@redhat.com>
 In-Reply-To: <20260503073541.790215-1-eric.auger@redhat.com>
 References: <20260503073541.790215-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -73,168 +73,234 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Mimecast-MFC-PROC-ID: ZPdlKreJBEj1QIPntpRY7ycJ8xjkjTBrnXvduyXQhLI_1777793776
+X-Mimecast-MFC-PROC-ID: 7zczxwBM4LersJWqcji71VQsQmP9uWldxJirW0lFHfI_1777793782
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-The known ID regs are populated in a new initialization function
-named initialize_cpu_sysreg_properties(). That code will be
-automatically generated from AARCHMRS Registers.json. For the
-time being let's just describe a single id reg, CTR_EL0. In this
-description we only care about non RES/RAZ fields, ie. named fields.
+We plan to reuse get_opcode() and extract_idregs_from_registers_json()
+functions in another script. So let's move them into a module
 
-The registers are populated in an array indexed by ARMIDRegisterIdx
-and their fields are added in a sorted list.
+No functional change intended.
 
-[CH: adapted to reworked register storage]
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/arm/cpu-idregs.h            | 59 ++++++++++++++++++++++++++++++
- target/arm/cpu-sysreg-properties.c | 30 +++++++++++++++
- target/arm/cpu64.c                 |  3 ++
- target/arm/meson.build             |  3 +-
- 4 files changed, 94 insertions(+), 1 deletion(-)
- create mode 100644 target/arm/cpu-idregs.h
- create mode 100644 target/arm/cpu-sysreg-properties.c
+ scripts/aarch64_sysreg_helpers.py            | 109 +++++++++++++++++++
+ scripts/update-aarch64-cpu-sysregs-header.py |  85 +--------------
+ 2 files changed, 110 insertions(+), 84 deletions(-)
+ create mode 100644 scripts/aarch64_sysreg_helpers.py
 
-diff --git a/target/arm/cpu-idregs.h b/target/arm/cpu-idregs.h
+diff --git a/scripts/aarch64_sysreg_helpers.py b/scripts/aarch64_sysreg_helpers.py
 new file mode 100644
-index 0000000000..4a9034594d
+index 0000000000..dd5ec4bafa
 --- /dev/null
-+++ b/target/arm/cpu-idregs.h
-@@ -0,0 +1,59 @@
-+/*
-+ * handle ID registers and their fields
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#ifndef ARM_CPU_CUSTOM_H
-+#define ARM_CPU_CUSTOM_H
++++ b/scripts/aarch64_sysreg_helpers.py
+@@ -0,0 +1,109 @@
++#!/usr/bin/env python3
 +
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "cpu.h"
-+#include "cpu-sysregs.h"
++# Helpers used in aarch64 sysreg definition generation
++#
++# Copyright (C) 2026 Red Hat, Inc.
++#
++# Authors: Eric Auger <eric.auger@redhat.com>
++#
++# SPDX-License-Identifier: GPL-2.0-or-later
 +
-+typedef struct ARM64SysRegField {
-+    const char *name; /* name of the field, for instance CTR_EL0_IDC */
-+    ARMIDRegisterIdx index; /* parent register, e.g. CTR_EL0_IDX */
-+    int lower; /* lowest bit number of the field in the register */
-+    int upper; /* highest bit number */
-+} ARM64SysRegField;
 +
-+typedef struct ARM64SysReg {
-+    const char *name;   /* name of the sysreg, for instance CTR_EL0 */
-+    ARMSysRegs sysreg;
-+    ARMIDRegisterIdx index; /* register index, e.g. CTR_EL0_IDX */
-+    GList *fields; /* list of named fields, excluding RES* */
-+} ARM64SysReg;
++import json
++import os
 +
-+void initialize_cpu_sysreg_properties(void);
++# Some regs have op code values like 000x, 001x. Anyway we don't need
++# them. Besides some regs are undesired in the generated file such as
++# VMPIDR_EL2 and VPIDR_EL2 which are outside of the IDreg scope we
++# are interested in and are tricky to decode as their system accessor
++# refer to MPIDR_EL1/MIDR_EL1 respectively
 +
-+/*
-+ * List of exposed ID regs (automatically populated from AARCHMRS Registers.json)
-+ */
-+extern ARM64SysReg arm64_id_regs[NUM_ID_IDX];
++skiplist = ['ALLINT', 'PM', 'S1_', 'S3_', 'SVCR', \
++            'VMPIDR_EL2', 'VPIDR_EL2']
 +
-+/* Allocate a new field and insert it at the head of the @reg list */
-+static inline GList *arm64_sysreg_add_field(ARM64SysReg *reg, const char *name,
-+                                     uint8_t min, uint8_t max) {
++# returns the int value of a given @opcode for a reg @encoding
++def get_opcode(encoding, opcode):
++    fvalue = encoding.get(opcode)
++    if fvalue:
++        value = fvalue.get('value')
++        if isinstance(value, str):
++            value = value.strip("'")
++            value = int(value, 2)
++            return value
++    return -1
 +
-+     ARM64SysRegField *field = g_new0(ARM64SysRegField, 1);
++def extract_idregs_from_registers_json(filename):
++    """
++    Load a Registers.json file and extract all ID registers, decode their
++    opcode and dump the information in target/arm/cpu-sysregs.h.inc
 +
-+     field->name = name;
-+     field->lower = min;
-+     field->upper = max;
-+     field->index = reg->index;
++    Args:
++        filename (str): The path to the Registers.json
++    returns:
++        idregs: list of ID regs and their encoding
++    """
++    if not os.path.exists(filename):
++        print(f"Error: {filename} could not be found!")
++        return {}
 +
-+     reg->fields = g_list_append(reg->fields, field);
-+     return reg->fields;
-+}
++    try:
++        with open(filename, 'r') as f:
++            register_data = json.load(f)
 +
-+static inline ARM64SysReg *arm64_sysreg_get(ARMIDRegisterIdx index)
-+{
-+        ARM64SysReg *reg = &arm64_id_regs[index];
++    except json.JSONDecodeError:
++        print(f"Could not decode json from '{filename}'!")
++        return {}
++    except Exception as e:
++        print(f"Unexpected error while reading {filename}: {e}")
++        return {}
 +
-+        reg->index = index;
-+        reg->sysreg = id_register_sysreg[index];
-+        return reg;
-+}
++    registers = [r for r in register_data if isinstance(r, dict) and \
++                r.get('_type') == 'Register']
 +
-+#endif
-diff --git a/target/arm/cpu-sysreg-properties.c b/target/arm/cpu-sysreg-properties.c
-new file mode 100644
-index 0000000000..5cc06c8f24
---- /dev/null
-+++ b/target/arm/cpu-sysreg-properties.c
-@@ -0,0 +1,30 @@
-+/*
-+ * QEMU ARM CPU SYSREG PROPERTIES
-+ * will be automatically generated
-+ *
-+ * Copyright (c) Red Hat, Inc. 2026
-+ *
-+ */
++    idregs = {}
 +
-+ /* SPDX-License-Identifier: GPL-2.0-or-later */
++    # Some regs have op code values like 000x, 001x. Anyway we don't need
++    # them. Besides some regs are undesired in the generated file such as
++    # VMPIDR_EL2 and VPIDR_EL2 which are outside of the IDreg scope we
++    # are interested in and are tricky to decode as their system accessor
++    # refer to MPIDR_EL1/MIDR_EL1 respectively
 +
-+#include "cpu-idregs.h"
++    skiplist = ['ALLINT', 'PM', 'S1_', 'S3_', 'SVCR', \
++                'VMPIDR_EL2', 'VPIDR_EL2']
 +
-+ARM64SysReg arm64_id_regs[NUM_ID_IDX];
++    for register in registers:
++        reg_name = register.get('name')
 +
-+void initialize_cpu_sysreg_properties(void)
-+{
-+    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NUM_ID_IDX);
-+    /* CTR_EL0 */
-+    ARM64SysReg *CTR_EL0 = arm64_sysreg_get(CTR_EL0_IDX);
-+    CTR_EL0->name = "CTR_EL0";
-+    arm64_sysreg_add_field(CTR_EL0, "TminLine", 32, 37);
-+    arm64_sysreg_add_field(CTR_EL0, "DIC", 29, 29);
-+    arm64_sysreg_add_field(CTR_EL0, "IDC", 28, 28);
-+    arm64_sysreg_add_field(CTR_EL0, "CWG", 24, 27);
-+    arm64_sysreg_add_field(CTR_EL0, "ERG", 20, 23);
-+    arm64_sysreg_add_field(CTR_EL0, "DminLine", 16, 19);
-+    arm64_sysreg_add_field(CTR_EL0, "L1Ip", 14, 15);
-+    arm64_sysreg_add_field(CTR_EL0, "IminLine", 0, 3);
-+}
++        is_skipped = any(term in (reg_name or "").upper() for term in skiplist)
 +
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index a93ad2da5a..b940842d9e 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -37,6 +37,7 @@
- #include "hw/core/qdev-properties.h"
- #include "internals.h"
- #include "cpu-features.h"
-+#include "cpu-idregs.h"
++        if reg_name and not is_skipped:
++            accessors = register.get('accessors', [])
++
++            for accessor in accessors:
++                type = accessor.get('_type')
++                if type in ['Accessors.SystemAccessor']:
++                    encoding_list = accessor.get('encoding')
++
++                    if isinstance(encoding_list, list) and encoding_list and \
++                       isinstance(encoding_list[0], dict):
++                        encoding_wrapper = encoding_list[0]
++                        encoding_source = encoding_wrapper.get('encodings', \
++                                                               encoding_wrapper)
++
++                        if isinstance(encoding_source, dict):
++                                op0 = get_opcode(encoding_source, 'op0')
++                                op1 = get_opcode(encoding_source, 'op1')
++                                op2 = get_opcode(encoding_source, 'op2')
++                                crn = get_opcode(encoding_source, 'CRn')
++                                crm = get_opcode(encoding_source, 'CRm')
++                                encoding_str=f"{op0} {op1} {crn} {crm} {op2}"
++
++                # ID regs are assumed within this scope
++                if op0 == 3 and (op1 == 0 or op1 == 1 or op1 == 3) and \
++                   crn == 0 and (crm >= 0 and crm <= 7) and (op2 >= 0 and op2 <= 7):
++                    idregs[reg_name] = encoding_str
++
++    return idregs
++
++
++
+diff --git a/scripts/update-aarch64-cpu-sysregs-header.py b/scripts/update-aarch64-cpu-sysregs-header.py
+index 8c337147dd..43107264e9 100755
+--- a/scripts/update-aarch64-cpu-sysregs-header.py
++++ b/scripts/update-aarch64-cpu-sysregs-header.py
+@@ -17,90 +17,7 @@
+ import json
+ import os
+ import sys
+-
+-# Some regs have op code values like 000x, 001x. Anyway we don't need
+-# them. Besides some regs are undesired in the generated file such as
+-# VMPIDR_EL2 and VPIDR_EL2 which are outside of the IDreg scope we
+-# are interested in and are tricky to decode as their system accessor
+-# refer to MPIDR_EL1/MIDR_EL1 respectively
+-
+-skiplist = ['ALLINT', 'PM', 'S1_', 'S3_', 'SVCR', \
+-            'VMPIDR_EL2', 'VPIDR_EL2']
+-
+-# returns the int value of a given @opcode for a reg @encoding
+-def get_opcode(encoding, opcode):
+-    fvalue = encoding.get(opcode)
+-    if fvalue:
+-        value = fvalue.get('value')
+-        if isinstance(value, str):
+-            value = value.strip("'")
+-            value = int(value, 2)
+-            return value
+-    return -1
+-
+-def extract_idregs_from_registers_json(filename):
+-    """
+-    Load a Registers.json file and extract all ID registers, decode their
+-    opcode and dump the information in target/arm/cpu-sysregs.h.inc
+-
+-    Args:
+-        filename (str): The path to the Registers.json
+-    returns:
+-        idregs: list of ID regs and their encoding
+-    """
+-    if not os.path.exists(filename):
+-        print(f"Error: {filename} could not be found!")
+-        return {}
+-
+-    try:
+-        with open(filename, 'r') as f:
+-            register_data = json.load(f)
+-
+-    except json.JSONDecodeError:
+-        print(f"Could not decode json from '{filename}'!")
+-        return {}
+-    except Exception as e:
+-        print(f"Unexpected error while reading {filename}: {e}")
+-        return {}
+-
+-    registers = [r for r in register_data if isinstance(r, dict) and \
+-                r.get('_type') == 'Register']
+-
+-    idregs = {}
+-
+-    for register in registers:
+-        reg_name = register.get('name')
+-
+-        is_skipped = any(term in (reg_name or "").upper() for term in skiplist)
+-
+-        if reg_name and not is_skipped:
+-            accessors = register.get('accessors', [])
+-
+-            for accessor in accessors:
+-                type = accessor.get('_type')
+-                if type in ['Accessors.SystemAccessor']:
+-                    encoding_list = accessor.get('encoding')
+-
+-                    if isinstance(encoding_list, list) and encoding_list and \
+-                       isinstance(encoding_list[0], dict):
+-                        encoding_wrapper = encoding_list[0]
+-                        encoding_source = encoding_wrapper.get('encodings', \
+-                                                               encoding_wrapper)
+-
+-                        if isinstance(encoding_source, dict):
+-                                op0 = get_opcode(encoding_source, 'op0')
+-                                op1 = get_opcode(encoding_source, 'op1')
+-                                op2 = get_opcode(encoding_source, 'op2')
+-                                crn = get_opcode(encoding_source, 'CRn')
+-                                crm = get_opcode(encoding_source, 'CRm')
+-                                encoding_str=f"{op0} {op1} {crn} {crm} {op2}"
+-
+-                # ID regs are assumed within this scope
+-                if op0 == 3 and (op1 == 0 or op1 == 1 or op1 == 3) and \
+-                   crn == 0 and (crm >= 0 and crm <= 7) and (op2 >= 0 and op2 <= 7):
+-                    idregs[reg_name] = encoding_str
+-
+-    return idregs
++from aarch64_sysreg_helpers import extract_idregs_from_registers_json
  
- /* convert between <register>_IDX and SYS_<register> */
- #define DEF(NAME, OP0, OP1, CRN, CRM, OP2)      \
-@@ -906,6 +907,8 @@ static void aarch64_cpu_register_types(void)
- {
-     size_t i;
- 
-+    initialize_cpu_sysreg_properties();
-+
-     for (i = 0; i < ARRAY_SIZE(aarch64_cpus); ++i) {
-         arm_cpu_register(&aarch64_cpus[i]);
-     }
-diff --git a/target/arm/meson.build b/target/arm/meson.build
-index 192ac7c31e..e2f740e48f 100644
---- a/target/arm/meson.build
-+++ b/target/arm/meson.build
-@@ -9,7 +9,8 @@ arm_user_ss.add(files('gdbstub.c'))
- 
- arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
-   'cpu64.c',
--  'gdbstub64.c'
-+  'gdbstub64.c',
-+  'cpu-sysreg-properties.c',
- ))
- 
- arm_common_ss.add(files(
+ if __name__ == "__main__":
+     # Single arg expected: the path to the Registers.json file
 -- 
 2.53.0
 
