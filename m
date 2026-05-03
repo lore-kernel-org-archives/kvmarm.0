@@ -1,236 +1,172 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8742630E83A
-	for <kvmarm@lists.linux.dev>; Sun,  3 May 2026 07:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAE24414
+	for <kvmarm@lists.linux.dev>; Sun,  3 May 2026 11:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777793859; cv=none; b=cxl5dcTNt5DNEPdvQzv3rn+0/bM4xVPcmcOypRf2fKqj7VFjgmwZTTk7SWshGzD+fMVBmXJm3jgUZFz2UalXnUspY6f5tpac+2cpCbAktbAHn9zqAzzSWLZs+E6OAPpTxdjXMrEIGKROwypg5cbUNzB2CjNW4GGfMWW3Ts321g0=
+	t=1777808245; cv=none; b=ar3XPyUBF84q4CPcBflmJpVIDnHHk1AhRvwIAuBetR8HAbFaySTNAjXgzrDQyYMuxeVj5KTjbSsZijG7EDuL3gDxXZsiTLsIKkBLLtlxTLoPIcXYg3IO2J0gQHGzOlyoof/lQrGkiM56gcSDYkBTU0cUoJTUnjut3j2lYIa6in0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777793859; c=relaxed/simple;
-	bh=Z6RxajJybjqNzdBryHgOFru7dY2gMFWKhFUzsxBwt9c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=lwmYVEkWzYxAw4qqo6OsbbvOeIm9ldTslsOqkdAdlr3q3ab9fL6kygOOPFUi8HYrFvpovVDSK2RsSw0Bri4qRzsEBAk/spne2yrRBhJmsj/1Xs0SdkD05E2LCujSsnP+0hoynYglxNC/LiUUI5ZNGd+rnUKqTjC8/mUgUyRZiAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EJELqTFB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1777808245; c=relaxed/simple;
+	bh=FdLxzGDy7JZtBSiLYjxjsctpfnT11xkjS7XHOXVyR6M=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=V+jgiRRdGdt6tg16MKmBbMH2yBaz8fGv23I32izcg2dj7jAHU0ttB6t0s7nSqaBy4MnpG0DE1Re1+3Ffoh9MEIS7E8Z7dky1bF5vXzWXi3LJwQqgKUMBlmPIDZoMvRlLS+z/a9CoEr3vP2OHMD0yUPhiYz6/Uv0zSz/ue93LjLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gLU4/IMN; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EJELqTFB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777793856;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GV/kEiaZbeyeLmbz2zqvJvkinKvVn6H0CkxzmPwT7e4=;
-	b=EJELqTFB0aH0OEyWwqob/AlwyZEo+8PNAtzWw/YJaY9W0pjwhxUPp/ENslRhZCXa0+CSgG
-	MTN3xSWTGzY8wNpTPhZ7k4zrMEphDwvxSGy6B9cgf0CVm0owXa+75YaygJuagd6Wa+eS7k
-	UUvM9qY+AWHY1FwIPCHVfEerAIM/JV8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-358-W3fZhLoaPxy9bL9ZH6BPEA-1; Sun,
- 03 May 2026 03:37:31 -0400
-X-MC-Unique: W3fZhLoaPxy9bL9ZH6BPEA-1
-X-Mimecast-MFC-AGG-ID: W3fZhLoaPxy9bL9ZH6BPEA_1777793850
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E6D1918002C5;
-	Sun,  3 May 2026 07:37:29 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.44.48.25])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 109991800480;
-	Sun,  3 May 2026 07:37:24 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	cohuck@redhat.com,
-	sebott@redhat.com,
-	skolothumtho@nvidia.com,
-	philmd@linaro.org
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Subject: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
-Date: Sun,  3 May 2026 09:33:37 +0200
-Message-ID: <20260503073541.790215-18-eric.auger@redhat.com>
-In-Reply-To: <20260503073541.790215-1-eric.auger@redhat.com>
-References: <20260503073541.790215-1-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gLU4/IMN"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6435qZtq755481;
+	Sun, 3 May 2026 11:36:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=JeO9wp
+	JmE2rZ4RmHVIraoaQUKxeV+2cdGG9sRb8QKPk=; b=gLU4/IMNiuNZiXIdXT6BrU
+	JaO28btmajScC6x+90eRjEKWFv2bGhKX3ADZ9GXGTPJKAsJDuvrPdSkxCCXgRu65
+	cjonIBFxNrcutM9K/RbIls2TTkDN83Mp46AuSfMArtqDVxKNp4iVEhNsL/41nBHP
+	JJtC1V+L8F9cIb1x4LjCp3P7zjQWCTJ9x7PTYPHCpbdosNtRDX5cukyRIEjJM1RK
+	RWzXs+VXY8NprHV/MY3lSfQ3IYXzWYfg6m/0UJoYtzYqrH2VIERjP22Lo5i9Bl1j
+	CIwPTVLPm9VOlNTbbpTrA66nXRfV+dRW0nMrCEt8ssfND5HGDgnd8LLLQQvQMuAw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dw9y13js7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 May 2026 11:36:54 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 643BOhpg001570;
+	Sun, 3 May 2026 11:36:53 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dww3gs8pd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 May 2026 11:36:53 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 643BaqjJ29819590
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 3 May 2026 11:36:52 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 872DD58056;
+	Sun,  3 May 2026 11:36:52 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E458358052;
+	Sun,  3 May 2026 11:36:50 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.175.251])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Sun,  3 May 2026 11:36:50 +0000 (GMT)
+Message-ID: <202f90682fe47bb5fb9b08f8678ae00981b5290b.camel@linux.ibm.com>
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: David Safford <david.safford@gmail.com>
+Cc: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell
+ <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com
+In-Reply-To: <CAGWfHUW+AX0Hpuw5Vr5iTSaJKQJ+O_4nWWmU1UR8Z_3XFctHZg@mail.gmail.com>
+References: <cover.1777036497.git.noodles@meta.com>
+	 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+	 <afMlgstqahnZg68h@e129823.arm.com>
+	 <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
+	 <CAGWfHUW+AX0Hpuw5Vr5iTSaJKQJ+O_4nWWmU1UR8Z_3XFctHZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 03 May 2026 07:36:50 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Mimecast-MFC-PROC-ID: XdsPIr1gIQfKotBDmrcWivII5_oyPuEna6xDGvAEqds_1777793850
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: dQ6vNqDViTXOrTVmMehSPZgNp19xmol0
+X-Proofpoint-GUID: ZCj7tR0wUAnHWdtxqY_YPlVBcCiYYGZs
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTAzMDEyOCBTYWx0ZWRfXw4m7oZKWaAIF
+ ifiZrDuRr5g5w9OQ3dKqUPFxaE+PrQoh2Tl3K5l+inyzb57uROLOeSXWFScTmt8pwHy99iXXoDI
+ h+Ct4+sFVA64w7nz3TOelolobRZmAr5IPaRBaY9q536/7+wRqDFsNRpnjV9VfsJCHLVpG+7sDD2
+ Fn+ucRtSt8BY6vPP03HKt1z9x7YWQUyAbY5Oa3msTtAvqFg+I9h0M7dshE4g2OcyWxrx55RaBNO
+ VnHfk3UkqRFPMBc5FKj1Ic5d0Hwe0NcpIgga48JaeavaWD/6q4p7H5tQk2HvmU9u7wvEaCH4LDQ
+ G/LxM+/E6fvpnrLVwTaPwONudHvEgf5lPFBgCDob/bfZc48kVjiH9mtFajzpAb6DX9iZ4dvGe6L
+ ChVaABPYDW9BKWkCDTmvg1iEUR/lSAk5hw7C3/B/tdPWvEsh8VtFM4haHIC56XFWKCS4h3Aw5F1
+ w2m3p+ZAsJnwtOQho6A==
+X-Authority-Analysis: v=2.4 cv=UbFhjqSN c=1 sm=1 tr=0 ts=69f73357 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VwQbUJbxAAAA:8
+ a=7CQSdrXTAAAA:8 a=VnNF1IyMAAAA:8 a=wjnevlr4pEST-T4ujgEA:9 a=QEXdDO2ut3YA:10
+ a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-03_04,2026-04-30_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 spamscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605030128
 
-From: Cornelia Huck <cohuck@redhat.com>
+On Fri, 2026-05-01 at 12:52 -0400, David Safford wrote:
+> On Thu, Apr 30, 2026 at 5:43=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.com> =
+wrote:
+> >=20
+> > On Thu, 2026-04-30 at 10:48 +0100, Yeoreum Yun wrote:
+> > > With above change I confirmed there is no meaurement log
+> > > between boot_aggregate and boot_aggregate_late except "kernel_version=
+"
+> > > But this is ignorable since this UTS measurement is done in
+> > > "ima_init_core() (old: ima_init())" and it is part of ima initialisat=
+ion.
+> > >=20
+> > > 1. ima_policy=3Dtcb
+> > >=20
+> > >   # cat /sys/kernel/security/ima/ascii_runtime_measurements
+> > >   10 0adefe762c149c7cec19da62f0da1297fcfbffff ima-ng sha256:000000000=
+0000000000000000000000000000000000000000000000000000000 boot_aggregate
+> > >   10 4e5d73ebadfd8f850cb93ce4de755ba148a9a7d5 ima-ng sha256:000000000=
+0000000000000000000000000000000000000000000000000000000 boot_aggregate_late
+> > >   10 7c23cc970eceec906f7a41bc2fbde770d7092209 ima-ng sha256:72ade6ae3=
+d35cfe5ede7a77b1c0ed1d1782a899445fdcb219c0e994a084a70d5 /bin/busybox
+> snip
+> > >=20
+> > > 2. ima_policy=3Dcritical_data
+> > >=20
+> > >   # cat /sys/kernel/security/ima/ascii_runtime_measurements
+> > >   10 0adefe762c149c7cec19da62f0da1297fcfbffff ima-ng sha256:000000000=
+0000000000000000000000000000000000000000000000000000000 boot_aggregate
+> > >   10 49ab61dd97ea2f759edcb6c6a3387ac67f0aa576 ima-buf sha256:0c907aab=
+3261194f16b0c2a422a82f145bc9b9ecb8fdb633fa43e3e5379f0af2 kernel_version 372=
+e312e302d7263312b // Ignorable since it's generated by ima_init(_core)().
+> > >   10 4e5d73ebadfd8f850cb93ce4de755ba148a9a7d5 ima-ng sha256:000000000=
+0000000000000000000000000000000000000000000000000000000 boot_aggregate_late
+> > >=20
+> > > Therefore, init_ima() could move into late_initcall_sync like v1 did:
+> > >   - https://lore.kernel.org/all/20260417175759.3191279-2-yeoreum.yun@=
+arm.com/
+> >=20
+> > Thanks, Yeoreum.  It's a bit premature to claim it's "safe" to move the
+> > initcall.  Hopefully others will respond.
+> >=20
+> > Mimi
+>=20
+> I have also run with this patch on a number of bare metal and virtual mac=
+hines,
+> running everything from default Fedora 44 to a version with everything tu=
+rned on
+> (uefi secure boot, UKI with sdboot stub measurements, IMA measurement
+> and appraisal enabled,
+> all systemd measurements on, and systemd using the TPM for root
+> partition decryption.)
+> I too see only the kernel_version event between the normal and late
+> calls, if ima_policy=3Dcritical_data.
 
-Add some documentation for how individual ID registers can be
-configured with the host cpu model.
+Thanks, Dave!  Were all the systems you tested x86_64?  The next step would=
+ be
+to test on different arch's (e.g. Z, Power).
 
-[CH: adapt to removal of the 'custom' model, added some more
- explanations about using the ID register props]
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- docs/system/arm/cpu-features.rst | 104 ++++++++++++++++++++++++++++---
- 1 file changed, 96 insertions(+), 8 deletions(-)
-
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 10b0eff27e..22f671b15d 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -2,7 +2,10 @@ Arm CPU Features
- ================
- 
- CPU features are optional features that a CPU of supporting type may
--choose to implement or not.  In QEMU, optional CPU features have
-+choose to implement or not.  QEMU provides two different mechanisms
-+to configure those features:
-+
-+1. For most CPU models, optional CPU features may have
- corresponding boolean CPU proprieties that, when enabled, indicate
- that the feature is implemented, and, conversely, when disabled,
- indicate that it is not implemented. An example of an Arm CPU feature
-@@ -31,6 +34,16 @@ running guests in AArch32.
- CPU features that are inherently specific to KVM are
- prefixed with "kvm-" and are described in "KVM VCPU Features".
- 
-+2. Additionally, the ``host`` CPU model on KVM allows to configure optional
-+CPU features via the corresponding ID registers. The host kernel allows
-+to write a subset of ID register fields. The host model exposes
-+properties for each writable ID register field. Those options are named
-+SYSREG_<IDREG>_<FIELD>. IDREG and FIELD names are those used in the
-+ARM ARM Reference Manual. They can also be found in the Linux
-+arch/arm64/tool/sysreg file which is used to automatically generate the
-+description for those registers and fields. This currently only has been
-+implemented for KVM.
-+
- CPU Feature Probing
- ===================
- 
-@@ -126,13 +139,20 @@ A note about CPU models and KVM
- 
- Named CPU models generally do not work with KVM.  There are a few cases
- that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
--seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
--used.  This means the guest is provided all the same CPU features as the
--host CPU type has.  And, for this reason, the ``host`` CPU type should
--enable all CPU features that the host has by default.  Indeed it's even
--a bit strange to allow disabling CPU features that the host has when using
--the ``host`` CPU type, but in the absence of CPU models it's the best we can
--do if we want to launch guests without all the host's CPU features enabled.
-+seattle host, but mostly if KVM is enabled, the ``host`` CPU model must be
-+used.
-+
-+Using the ``host`` type means the guest is provided all the same CPU
-+features as the host CPU type has.  And, for this reason, the ``host``
-+CPU type should enable all CPU features that the host has by default.
-+
-+In case some features need to be hidden to the guest, and the host kernel
-+supports it, the ``host`` model can be instructed to disable individual
-+ID register values. This is especially useful for migration purposes.
-+However, this interface will not allow configuring an arbitrary set of
-+features; the ID registers must describe a subset of the host's features,
-+and all differences to the host's configuration must actually be supported
-+by the kernel to be deconfigured.
- 
- Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
- affect is not only limited to specific features, as pointed out in example
-@@ -169,6 +189,13 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
- 
-+Additionally, if supported by KVM on the host kernel, the ``host`` CPU model
-+may be configured via individual ID register field properties, for example::
-+
-+  $ qemu-system-aarch64 -M virt -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
-+
-+This forces ID_AA64ISAR0_EL1 DP field to 0.
-+
- KVM VCPU Features
- =================
- 
-@@ -495,3 +522,64 @@ Legal values for ``S`` are 30, 34, 36, and 39; the default is 30.
- 
- As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
- removed in some future QEMU release.
-+
-+Configuring CPU features via ID register fields
-+===============================================
-+
-+Note that this is currently only supported under KVM, and with the
-+``host`` CPU model.
-+
-+Querying available ID register fields
-+-------------------------------------
-+
-+QEMU will create properties for all ID register fields that are
-+reported as being writable by the kernel, and that are known to the
-+QEMU instance. Therefore, the same QEMU binary may expose different
-+properties when run under a different kernel.
-+
-+To find out all available writable ID register fields, use the
-+``query-cpu-model-expansion`` QMP command::
-+
-+  (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-+  {"return": {
-+   "model": {"name": "host", "props": {
-+   "SYSREG_ID_AA64PFR0_EL1_EL3": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
-+   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
-+   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
-+   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1, "SYSREG_ID_DFR0_EL1_PerfMon": 4,
-+   "SYSREG_ID_AA64PFR0_EL1_DIT": 0, "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
-+   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0, "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
-+   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
-+   }}}}
-+
-+If a certain field in an ID register does not show up in this list, it
-+is not writable with the specific host kernel.
-+
-+A note on compatibility
-+-----------------------
-+
-+A common use case for providing a defined set of ID register values is
-+to be able to present a fixed set of features to a guest, often referred
-+to as "stable guest ABI". This may take the form of ironing out differences
-+between two similar CPUs with the intention of being able to migrate
-+between machines with those CPUs, or providing the same CPU across Linux
-+kernel updates on the host.
-+
-+Over the course of time, the Linux kernel is changing the set of ID register
-+fields that are writable by userspace. Newly introduced writable ID
-+registers should be initialized to 0 to ensure compatibility. However, ID
-+registers that have already been introduced that undergo a change as to
-+which fields are writable may introduce incompatibities that need to be
-+addressed on a case-by-case basis for the systems that you wish to migrate
-+inbetween.
-+
-+A note on Arm CPU features (FEAT_xxx)
-+-------------------------------------
-+
-+Configuring CPUs is done on a feature level on other architectures, and this
-+would imply configuring FEAT_xxx values on Arm. However, differences between
-+CPUs may not map to FEAT_xxx, but to differences in other registers in the
-+ID register range; for example, differences in the cache architecture exposed
-+via ``CTR_EL0``. We therefore cannot rely on configuration via FEAT_xxx. A
-+feature-based interface more similar to other architectures may be implemented
-+on top of the ID register interface in the future.
--- 
-2.53.0
-
+Mimi
