@@ -1,301 +1,144 @@
-Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDD2346E59
-	for <kvmarm@lists.linux.dev>; Mon,  4 May 2026 21:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A64384253
+	for <kvmarm@lists.linux.dev>; Mon,  4 May 2026 22:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777929542; cv=none; b=JMCDDQ4CEANhsPwh1+XCm0TvNYIzhK/QkisAzMmm+WRB6yD4PX8YpljjqQoEJb8PAVCiW5LU/Fuprivo19Fc+lVsXQyNTVTDF+xHH5892pq46njtzwpl/nZWfwcWrwfIxdsDyFQaUIqWJc1VRWXcdRVANx2/l0PCtBxxwgin9+k=
+	t=1777934551; cv=none; b=mVCBkwc0SmapEoctb92f1Y6yrDVTXU34yYUsUWi2DY4HZCXh3LwZBmH5jF76Pzy5clefu8TrS9K6hQzRfYHRSOpRhVRxGUVCIUA/R8GZboa8Y8OGvfPnOcU7B9flnbE9FYBs+2vIwZ9ClsNBejFHKknf/XIpV4e41kbfBW7VMfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777929542; c=relaxed/simple;
-	bh=5F70qgzxp+5sKP5uTsCVeijSZjWYYQXTinyxMntx/dU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IXHdnHTng62ACUftf/IAjY+Pz1/my8wkihjsFgnBvKR2k2mVf6XZcad6e+3tzsMxEWTo5/mgmabZmqi8nTFBUlOXeFH0NCb4t723VviUyDy6Rmy1AgzHkslXtAsQipr77067RZ1lIkfhaMShllq3YbFpdRvBD+261gSrjPao/Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=abpguX29; arc=none smtp.client-ip=209.85.161.73
+	s=arc-20240116; t=1777934551; c=relaxed/simple;
+	bh=a6LAKe8ovUnasAZFDeUefPCWvqT60LXkBEdqdXAd5Mc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mkg+XGhMtCL8Ga5dqr+X5y0hSk72xm94ord0QYwTXukf66gTwD9gJpvxpH6haDuzZGo5tBCrkyqSUeswiOrgZTRT9vxhJTBGiaj7+o29SMOJpPMPT3y3H0JRM/lkgjVhHBUG31F6vExTfs7xmM1hqbfko9hxAWKv93/7txTPbG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ksdeilwo; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="abpguX29"
-Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-6963482e03dso5737875eaf.3
-        for <kvmarm@lists.linux.dev>; Mon, 04 May 2026 14:18:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ksdeilwo"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-835417ba8c8so810589b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 04 May 2026 15:42:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777929533; x=1778534333; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A1LC20y4taYV29x8hD4zY85wXN5CKP6Npg+wcjsGL1w=;
-        b=abpguX29fptPrNGkD4RI94tEMrX7DLyUHeXdc/46Gza7ljMKPxedn+7HJxBybeII9B
-         +1U4Yf4OIpZZcvznLeT5i8C2woz8mDdafJVmS0PBEoAc25QVBfu3b3DBfWT8pGwua1Hz
-         Y0vSLOa7YA+MfvYtgFtNlGWheGNhr+OU1nkJLWWbZ4cwl2A153hYIepMzfnSoO+MsaRr
-         DEVZh/2nD54XeQUUZhsHxavCklOJNhmKuDeGFMdNX2AUOWAADT7/T8XVQWQY6EmTFl4b
-         Xgir1uqdZTp1pkNpEujwFasqBEj70NT1AH0PmaW+Sjg16gNdc/6QPc5dTHx5grs6IulF
-         hw0g==
+        d=google.com; s=20251104; t=1777934549; x=1778539349; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GreUyu/PwGDkwAAEFHxYx5rSO95cp1lrcmL4UWkbrcg=;
+        b=Ksdeilwo7cv78EhIaBwBWS8c8eNJ/Jf6+621JiOxZVPZT3i4yoE+zw37UqCtwgChyi
+         breODgqsmDdVM9wm7lkGkG5OQGM6h0pCBTl231ogKF166cZdkyRLAV4c+q4AG9YLvooQ
+         XDCGD+N0hMSkiQ/SCaV9/icjonMw64Xa9jpQqHq8M4Fe1K940a0GBNmhCF+V3Dq0aV9v
+         eogo5UpZ5oDiI1IF5l/QHMCUHmZx+jCguPz3hHyV4mmhGOpLS/X364sXDgcBmwEoJzJd
+         aN+X1yALR7wYmg6qqBmXqDeRUwqxvwdUqUuDgy4H/3HGT2S9PG2i0nSI+qlE0nlrTSpg
+         IIRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777929533; x=1778534333;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A1LC20y4taYV29x8hD4zY85wXN5CKP6Npg+wcjsGL1w=;
-        b=YXGoK/PZB1HxBET0ptgYH/hLgTxlosxeg2lnhOVy8gbD3pnf2tqxhSG3LtIlJ+nquJ
-         Vy4CqQhcPkHwMcmsTdwRzWV0E0ndzKBmq1kRdZzjklXFvuzI319tAjSlO1YnVI4JMoJ8
-         Y1fVFqd2cXn+H4xdlmBGlQa5fstSgG21O6h6To2GZzIsuF3jRBmWpGxxuTXRHURzbUDD
-         8PLqRYhzUFaskupP0ulVJCcJ3xLbgJICZzdb+JNHbAx1YkkEbE9N/OWwShm4PZUVZqCv
-         YzX9q1x5ufnuNvGl/sHgnuEuxWC8owc5NqYUTqqm3EK2+nmHEPCsNtyhRFOITTvdqG9I
-         orLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/G0oYzusNJbR3ZF2qMTK4W06R3jNonuV29DG3ND1L2OfKuA/U7lRYVUWlHF0dSMI+T2fhE2F8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxtDi2oG317uYjpvIE+UghKeeeSqzXVDppjBbCe0p4LA7I1EZY4
-	wcRfLClkyEjV6elLGsSGnIi1wW+dZ/85aiKIvda/NtHKlED7z/2EKd73Uj0Outv4BX4MaxW/EfP
-	eXTi9XJxaUCeELXSnHj9LraD6tg==
-X-Received: from ilql7.prod.google.com ([2002:a92:d947:0:b0:4fe:69b2:404b])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:2014:b0:694:6e61:8de0 with SMTP id 006d021491bc7-6998d24837amr140937eaf.30.1777929533288;
- Mon, 04 May 2026 14:18:53 -0700 (PDT)
-Date: Mon,  4 May 2026 21:18:12 +0000
-In-Reply-To: <20260504211813.1804997-1-coltonlewis@google.com>
+        d=1e100.net; s=20251104; t=1777934549; x=1778539349;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GreUyu/PwGDkwAAEFHxYx5rSO95cp1lrcmL4UWkbrcg=;
+        b=rOzVnYG08nqtZvZuWIVituJ9gJYjI/ReJr4WhtlKXCtLgKsJg6BBC9WF1Qa7qVbK10
+         xDYW9EHn1ygWETJooi2QEQh3v5XGm07fvo5i3wFNHB+NnF7Ns05Eom8o9niYzawAOHVa
+         CwDtUVwfSaZWZ0aYjWU+gklwbnUpYMkmvmXEeIN0jaA5s7gD2a0M2IGCOWgp0XsihlA2
+         UszlzP9EwvgVnu5APXX/dV2e1YzDheKdqBacAsPDfP5+2hSvUaaDv/K/JH3SIPPMGgnN
+         L137Iq+oQTkGuu5/xxLpPbrKDeHN7HEgl+65mye1HHpQuLd7qAsBvhY981gdyenFrAhG
+         eVmw==
+X-Forwarded-Encrypted: i=1; AFNElJ/mdemsfCHMGWWqhH98PMYAkT4pTvmvUVrba1P+gC+1dBSa58Y8kNRs3N6XJRGb8A0pHEyfog8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywx926QaNTHbj2XkLj12ji6BYi2vWNnuxNcEBiLi0lmj9EucNBw
+	ieVEADUARFCSLhyde0dch4nSMG6PfW/pEla4b2U9yAKo2JxZ5O1/AimVpBFSi/FE6MUVDi+f8Y7
+	HD3qeUjCsXDI8yTVEJpv0Rw==
+X-Received: from pfbhm13.prod.google.com ([2002:a05:6a00:670d:b0:82f:7bc:70a9])
+ (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:4c96:b0:82c:ded1:261f with SMTP id d2e1a72fcca58-8352d22c289mr10958941b3a.27.1777934549232;
+ Mon, 04 May 2026 15:42:29 -0700 (PDT)
+Date: Mon,  4 May 2026 22:42:07 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20260504211813.1804997-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260504211813.1804997-20-coltonlewis@google.com>
-Subject: [PATCH v7 19/20] KVM: arm64: selftests: Add test case for Partitioned PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Shuah Khan <shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	James Clark <james.clark@linaro.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
+Message-ID: <20260504224213.1049426-1-jthoughton@google.com>
+Subject: [PATCH 0/5] KVM: Fix race conditions in kvm_arch_flush_shadow_all()
+From: James Houghton <jthoughton@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Sean Christopherson <seanjc@google.com>, Gavin Shan <gshan@redhat.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, James Hogan <jhogan@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rerun all tests for a Partitioned PMU in vpmu_counter_access.
+Hi Paolo,
 
-Create an enum specifying whether we are testing the emulated or
-Partitioned PMU and all the test functions are modified to take the
-implementation as an argument and make the difference in setup
-appropriately.
+syzbot running on Google production kernels ran into a double-free on
+KVM/arm64 in kvm_mmu_free_memory_cache(). It turns out that loongarch
+and mips also have a similar problem.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- .../selftests/kvm/arm64/vpmu_counter_access.c | 94 ++++++++++++++-----
- 1 file changed, 73 insertions(+), 21 deletions(-)
+kvm_arch_flush_shadow_all() can be called on the same memslot
+concurrently, leading to double-freeing in arm64 and mips. loongarch
+is also affected: it can at least underflow some counters; I'm not sure
+what else can break.
 
-diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-index ae36325c022fb..9702f1d43b832 100644
---- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-@@ -25,9 +25,20 @@
- /* The cycle counter bit position that's common among the PMU registers */
- #define ARMV8_PMU_CYCLE_IDX		31
- 
-+enum pmu_impl {
-+	EMULATED,
-+	PARTITIONED
-+};
-+
-+const char *pmu_impl_str[] = {
-+	"Emulated",
-+	"Partitioned"
-+};
-+
- struct vpmu_vm {
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
-+	bool pmu_partitioned;
- };
- 
- static struct vpmu_vm vpmu_vm;
-@@ -399,7 +410,7 @@ static void guest_code(uint64_t expected_pmcr_n)
- }
- 
- /* Create a VM that has one vCPU with PMUv3 configured. */
--static void create_vpmu_vm(void *guest_code)
-+static void create_vpmu_vm(void *guest_code, enum pmu_impl impl)
- {
- 	struct kvm_vcpu_init init;
- 	uint8_t pmuver, ec;
-@@ -409,6 +420,13 @@ static void create_vpmu_vm(void *guest_code)
- 		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
- 		.addr = (uint64_t)&irq,
- 	};
-+	bool partition = (impl == PARTITIONED);
-+	struct kvm_device_attr part_attr = {
-+		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+		.attr = KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION,
-+		.addr = (uint64_t)&partition
-+	};
-+	int ret;
- 
- 	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
- 	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-@@ -436,6 +454,15 @@ static void create_vpmu_vm(void *guest_code)
- 		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
- 
- 	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-+
-+	ret = __vcpu_has_device_attr(
-+		vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION);
-+	if (!ret) {
-+		vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &part_attr);
-+		vpmu_vm.pmu_partitioned = partition;
-+		pr_debug("Set PMU partitioning: %d\n", partition);
-+	}
-+
- }
- 
- static void destroy_vpmu_vm(void)
-@@ -461,13 +488,14 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
- 	}
- }
- 
--static void test_create_vpmu_vm_with_nr_counters(unsigned int nr_counters, bool expect_fail)
-+static void test_create_vpmu_vm_with_nr_counters(
-+	unsigned int nr_counters, enum pmu_impl impl, bool expect_fail)
- {
- 	struct kvm_vcpu *vcpu;
- 	unsigned int prev;
- 	int ret;
- 
--	create_vpmu_vm(guest_code);
-+	create_vpmu_vm(guest_code, impl);
- 	vcpu = vpmu_vm.vcpu;
- 
- 	prev = get_pmcr_n(vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0)));
-@@ -489,7 +517,7 @@ static void test_create_vpmu_vm_with_nr_counters(unsigned int nr_counters, bool
-  * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
-  * and run the test.
-  */
--static void run_access_test(uint64_t pmcr_n)
-+static void run_access_test(uint64_t pmcr_n, enum pmu_impl impl)
- {
- 	uint64_t sp;
- 	struct kvm_vcpu *vcpu;
-@@ -497,7 +525,7 @@ static void run_access_test(uint64_t pmcr_n)
- 
- 	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
- 
--	test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
-+	test_create_vpmu_vm_with_nr_counters(pmcr_n, impl, false);
- 	vcpu = vpmu_vm.vcpu;
- 
- 	/* Save the initial sp to restore them later to run the guest again */
-@@ -531,14 +559,14 @@ static struct pmreg_sets validity_check_reg_sets[] = {
-  * Create a VM, and check if KVM handles the userspace accesses of
-  * the PMU register sets in @validity_check_reg_sets[] correctly.
-  */
--static void run_pmregs_validity_test(uint64_t pmcr_n)
-+static void run_pmregs_validity_test(uint64_t pmcr_n, enum pmu_impl impl)
- {
- 	int i;
- 	struct kvm_vcpu *vcpu;
- 	uint64_t set_reg_id, clr_reg_id, reg_val;
- 	uint64_t valid_counters_mask, max_counters_mask;
- 
--	test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
-+	test_create_vpmu_vm_with_nr_counters(pmcr_n, impl, false);
- 	vcpu = vpmu_vm.vcpu;
- 
- 	valid_counters_mask = get_counters_mask(pmcr_n);
-@@ -588,11 +616,11 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
-  * the vCPU to @pmcr_n, which is larger than the host value.
-  * The attempt should fail as @pmcr_n is too big to set for the vCPU.
-  */
--static void run_error_test(uint64_t pmcr_n)
-+static void run_error_test(uint64_t pmcr_n, enum pmu_impl impl)
- {
--	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
-+	pr_debug("Error test with pmcr_n %lu (larger than the host allows)\n", pmcr_n);
- 
--	test_create_vpmu_vm_with_nr_counters(pmcr_n, true);
-+	test_create_vpmu_vm_with_nr_counters(pmcr_n, impl, true);
- 	destroy_vpmu_vm();
- }
- 
-@@ -600,11 +628,11 @@ static void run_error_test(uint64_t pmcr_n)
-  * Return the default number of implemented PMU event counters excluding
-  * the cycle counter (i.e. PMCR_EL0.N value) for the guest.
-  */
--static uint64_t get_pmcr_n_limit(void)
-+static uint64_t get_pmcr_n_limit(enum pmu_impl impl)
- {
- 	uint64_t pmcr;
- 
--	create_vpmu_vm(guest_code);
-+	create_vpmu_vm(guest_code, impl);
- 	pmcr = vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
- 	destroy_vpmu_vm();
- 	return get_pmcr_n(pmcr);
-@@ -614,7 +642,7 @@ static bool kvm_supports_nr_counters_attr(void)
- {
- 	bool supported;
- 
--	create_vpmu_vm(NULL);
-+	create_vpmu_vm(NULL, EMULATED);
- 	supported = !__vcpu_has_device_attr(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
- 					    KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS);
- 	destroy_vpmu_vm();
-@@ -622,22 +650,46 @@ static bool kvm_supports_nr_counters_attr(void)
- 	return supported;
- }
- 
--int main(void)
-+static bool kvm_supports_partition_attr(void)
-+{
-+	bool supported;
-+
-+	create_vpmu_vm(NULL, EMULATED);
-+	supported = !__vcpu_has_device_attr(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
-+					    KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION);
-+	destroy_vpmu_vm();
-+
-+	return supported;
-+}
-+
-+void test_pmu(enum pmu_impl impl)
- {
- 	uint64_t i, pmcr_n;
- 
--	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
--	TEST_REQUIRE(kvm_supports_vgic_v3());
--	TEST_REQUIRE(kvm_supports_nr_counters_attr());
-+	pr_info("Testing PMU: Implementation = %s\n", pmu_impl_str[impl]);
-+
-+	pmcr_n = get_pmcr_n_limit(impl);
-+	pr_debug("PMCR_EL0.N: Limit = %lu\n", pmcr_n);
- 
--	pmcr_n = get_pmcr_n_limit();
- 	for (i = 0; i <= pmcr_n; i++) {
--		run_access_test(i);
--		run_pmregs_validity_test(i);
-+		run_access_test(i, impl);
-+		run_pmregs_validity_test(i, impl);
- 	}
- 
- 	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
--		run_error_test(i);
-+		run_error_test(i, impl);
-+}
-+
-+int main(void)
-+{
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-+	TEST_REQUIRE(kvm_supports_vgic_v3());
-+	TEST_REQUIRE(kvm_supports_nr_counters_attr());
-+
-+	test_pmu(EMULATED);
-+
-+	if (kvm_supports_partition_attr())
-+		test_pmu(PARTITIONED);
- 
- 	return 0;
- }
+To get into this scenario, we need to have a process (P1) share an open
+VM with another process (P2). If P1 closes its VM to leave P2 holding
+the last reference, then there is a race between P1 exiting (exit_mm)
+and P2 dropping its last reference to the VM.
+
+exit_mm() and kvm_vm_release() both call kvm_mmu_notifier_release() on
+the same KVM, and the only locks held are the KVM srcu lock and the MMU
+notifier srcu lock.
+
+Please see the arm64 patch for another description of the same race with
+more context on the ensuing double-free in KVM/arm64.
+
+The first three patches fix each broken architecture; each of those
+patches have stable CCed with what I think are the appropriate Fixes.
+
+After patching the locking for the broken architectures, it seems better
+simply to have KVM take the MMU lock exclusively before calling
+kvm_arch_flush_shadow_all() so that architectures don't need to worry
+about it. Feel free to drop that patch, the fourth one, if you disagree
+with it.
+
+The fifth patch provides a repro (with a crude kernel patch to reliably
+demonstrate the double-free). Please do not merge this.
+
+The arm64 patch has been tested with the repro. The loongarch and mips
+patches have been compile-tested only.
+
+kvm_arch_guest_memory_reclaimed() is only implemented by one
+architecture: x86. Its implementation does not need the KVM MMU lock to
+be held.
+
+This series is based on 7.1-rc2.
+
+James Houghton (5):
+  KVM: arm64: Grab KVM MMU write lock in kvm_arch_flush_shadow_all()
+  KVM: loongarch: Grab MMU lock in kvm_arch_flush_shadow_all()
+  KVM: mips: Grab MMU lock in kvm_arch_flush_shadow_all()
+  KVM: Hold MMU lock exclusively when calling
+    kvm_arch_flush_shadow_all()
+  DO NOT MERGE: KVM: selftests: Reproducer for arm64 double-free
+
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_mmu.h              |   1 +
+ arch/arm64/kvm/mmu.c                          |  39 +++++-
+ arch/arm64/kvm/nested.c                       |   4 +-
+ arch/loongarch/kvm/mmu.c                      |   2 +
+ arch/mips/kvm/mips.c                          |   2 +
+ arch/mips/kvm/mmu.c                           |   2 +
+ arch/riscv/kvm/mmu.c                          |   4 +-
+ arch/riscv/kvm/vm.c                           |   2 +
+ arch/x86/kvm/mmu/mmu.c                        |   4 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/transfer_fd_test.c  | 129 ++++++++++++++++++
+ virt/kvm/kvm_main.c                           |   3 +
+ 13 files changed, 184 insertions(+), 10 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/transfer_fd_test.c
+
+base-commit: 6d35786de28116ecf78797a62b84e6bf3c45aa5a
 -- 
 2.54.0.545.g6539524ca2-goog
 
