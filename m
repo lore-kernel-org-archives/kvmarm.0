@@ -1,195 +1,133 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CDD37649B
-	for <kvmarm@lists.linux.dev>; Sun,  3 May 2026 16:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24739377575
+	for <kvmarm@lists.linux.dev>; Mon,  4 May 2026 12:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777827445; cv=none; b=o6c/YfUGUfOQPWN+6ml5SCvfytECuHl0g9IO5RgFi8bvpzq4J6tyAqr7Xaaf5FlWggXrlluoJc86ozF8Ne+VgSK1ZuZVacx9GlGpECyeBWfsqnBmuQcI0uyAntBl6udgnIM119cxp6DUi7/oxrcNvrjekyuitGhcKDo+N/JkvDg=
+	t=1777896198; cv=none; b=dSau3y4GgaTTxuhY/HeiGxp39MFUIXRi6Ohqb3VCBHXc5PujpQP9pRqFzUgYrKobMCC1/Ip/DX/UJg1nJUT0QFbWb6EX4i8hiqw5BQn2Gy7MVLMv48UqZDh/46d6F+0nFBF0LyKA/V3ymzGKOWrEjNgGO/yEsQyejlilIb8s3mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777827445; c=relaxed/simple;
-	bh=dxYvE74iVdKlUnabVeaymaom4WUqjZShmtH2aclRsVw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UKAW5m89mz3YPCADGuK3BDM+KtPY+aA/q83D0SJHlTD65afkD6cqh8HlCNmYX8ocQgbU9A4tDqNP08DP9+ehQYVQGFbVriedOXoEEmOJdDNx7YT+TgYfH+4qNSDEt+2tOBNMLu3s2f114eOyb2Eq36gyXag5CN9RXsgZp4Za/Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e4jInsue; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1777896198; c=relaxed/simple;
+	bh=/X6RS1Fqu7I3voeFmchwbuKmcgmlda7edLIPfQe8NzE=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=B+OdksVpHdOnYhQxn8rNkcYBCpiJPjohpl2fNInaarmMfRVi4dOjjYGbYqG3b0Ig45ngSparrPR47g27kGTR4r/ca2jt4jd303EJFI5JY6kw8dD84WRx3XJd8x1u5p1aCU1cLEJI8Lqr7uJ/4ocyVY9enBgG5ydpZ2BCbjtJu44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qMq4yCIV; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e4jInsue"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777827443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wZAX/3Dxul6ab0aa4nY+5/E1aKies+ngH//pLM2CQH8=;
-	b=e4jInsueDTA2DOhpsbZZ/qz22pGRX5yhg7wAl/IRQALB4ndmYX8Op5sBAbaUgtODVyamMn
-	LxqhsmLioZCtGLefUS5EDkH+J/JH1DhCm2Eg4rDFeTCk4b0QRLblj4lzl6TaWMt/MWUVrZ
-	v3Jq3uDRPMckAL09aRyRcy4euKLQobQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-97-EIVc4O4bMImLoefyIEvTtw-1; Sun, 03 May 2026 12:57:20 -0400
-X-MC-Unique: EIVc4O4bMImLoefyIEvTtw-1
-X-Mimecast-MFC-AGG-ID: EIVc4O4bMImLoefyIEvTtw_1777827439
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-488dcaf2f2fso24787725e9.0
-        for <kvmarm@lists.linux.dev>; Sun, 03 May 2026 09:57:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777827439; x=1778432239;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wZAX/3Dxul6ab0aa4nY+5/E1aKies+ngH//pLM2CQH8=;
-        b=X3dPafM9jQAqoNlJWzylifbUNFFd4La83SGZFoms8/YC1W//rHDSYcYPyDIQPuqN3Y
-         yxsT3ELw6EfxIATTPjdOZu53pCezU5q5AoDJCUxXBmfXR8bPNixEEwG/bP8qNu/S80Wj
-         +CprUrNBliD1v210vmuGmss79Fp+ONvqJCKxsMtal1iGU9a5hwcX6zJF53AxwnuX3KMo
-         XOodMgRLxgoQyQ6DwUka8RkFPQt0g0pERquaofEezQVhDlRMgHhn5eGOLU6YOPe8DCon
-         mlmrWBvjCc94UsvwfPrUXHI8gWpG4/Uq3PrEpbCbItkLTNVFeglrP6dBaNEXNGhnQE72
-         h3kA==
-X-Forwarded-Encrypted: i=1; AFNElJ+zbJbn+13es1f2f8z06+qf2QE4374OG3F7eQQcbLn1eV2zeORqfxZ131tSLqWBjf71Q5qIH+I=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxE9uklWYsQfAe/qmSkdDDodzbKeHGr6BE6K+iZn2eD38+ULdQk
-	OZuBOJyib1Q37QAjWqQEPUV3t9mU1SLUaDOBMYnZK7weIZRgrgh5cFeEF1qYutk1FKpEOTzNCL8
-	DRWNlt4SxKv5WLxnj1hlBWIKZToq0nAPziWwwhl6PUl8gkwjslIDjc3izouM3LiTYRpWuv43fln
-	M02WqOa8iTaGN9CIbVRxrRTVaADonUaBlf
-X-Gm-Gg: AeBDiesYDozLQRodg9W4pHC1j4OAy+PN85Si1UQ+aRzaHJkshKey17Ot3m5xccwEIqg
-	TKjhNu2ZC4IvVoloMYLLCJ6I3ZBUXrDZsWI7OHaPgdl2qrqIQ7QJXvIBQAdpuQ67YFkufyTYLn8
-	yaL05dY/692xh5U1OqU5xt6e/peYltNt7y2ImxMbZcwua9xzWe6f2/4iffGVCpPezbks5zc0UP3
-	6huySmFPmEOMzpuXVFU1WT8OqKAm2Z4CUPhjq62nB1vlWwbx0My8nFnYW8aoRh1xUmhtk1r61+a
-	voToRK+4oknEV0k=
-X-Received: by 2002:a05:600c:c0c5:b0:485:30d4:6b9e with SMTP id 5b1f17b1804b1-48a98662e71mr84651675e9.21.1777827438743;
-        Sun, 03 May 2026 09:57:18 -0700 (PDT)
-X-Received: by 2002:a05:600c:c0c5:b0:485:30d4:6b9e with SMTP id
- 5b1f17b1804b1-48a98662e71mr84651295e9.21.1777827438361; Sun, 03 May 2026
- 09:57:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qMq4yCIV"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6447sMqf852737;
+	Mon, 4 May 2026 12:02:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=l04vgr
+	hiUBVJ40ibTRxasIaQMDV+oR0MUnO977L5BNY=; b=qMq4yCIVP5pOXgmriDeS8z
+	2i5OoS7ezJBicI9G3O7lt8iJIu9r7mKgYDj2yQxvTP2o1rft0/gRpqU8MOEtUsl6
+	2dr6DI02Oty2Tf6Ku3m9SEbToQXjl/sBbrUECu1FoGPl0HBsuZql5Kb3f1LSQ5Wo
+	XNOf2cbppkKV9xWK/F080sNR/TopaV1cXQdpkZtM53lNPP85i91qajzSgrkMHYRI
+	ORBFNskXcwMddg825hCZ9rMVzwTrvz0lP0+0iT0dZrlOchC3V/tzuSli5KxHVKpC
+	SyGc6fLOtWfqiG9S2rPIvRLpBod6n7aKM5yxGxsT48UNGVDWaFJp2V6mGihbDoog
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dw9y4em46-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 May 2026 12:02:52 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 644BsXqP030860;
+	Mon, 4 May 2026 12:02:51 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dwx9y4q8a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 May 2026 12:02:51 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 644C2oI236962950
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 4 May 2026 12:02:50 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2F5E358056;
+	Mon,  4 May 2026 12:02:50 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8BD0C5803F;
+	Mon,  4 May 2026 12:02:48 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.125.169])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  4 May 2026 12:02:48 +0000 (GMT)
+Message-ID: <ff28c6dcb60c357c752724927addaa8c4fd3bf2c.camel@linux.ibm.com>
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell
+ <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com
+In-Reply-To: <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
+References: <cover.1777036497.git.noodles@meta.com>
+	 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+	 <afMlgstqahnZg68h@e129823.arm.com>
+	 <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
+	 <CAHC9VhRsnmPp2KmQAns5uq5qXX5EF2xQQzyfTgrPi4O9AXyPpg@mail.gmail.com>
+	 <ba4bf28314b679474a6a8da6298e548e54b3754c.camel@linux.ibm.com>
+	 <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 May 2026 08:02:48 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <afEwWZksU0Fw61oT@plex> <0a71472c-b397-4699-a518-61faffcf4ab2@redhat.com>
- <afUNlL_lRDP6olHE@plex>
-In-Reply-To: <afUNlL_lRDP6olHE@plex>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 3 May 2026 18:57:06 +0200
-X-Gm-Features: AVHnY4LZ9SLOVvMSSNVqrWN2ReqSfwRcQuKsaciqQRZIlDN_XSMAX0q55GthIJg
-Message-ID: <CABgObfaqZ8GGaLV_gp8o+nQSe+JfnBbZP0X9cDxdvEpyUZQRnQ@mail.gmail.com>
-Subject: Re: [RFC] proposal: KVM: Orphaned VMs: The Caretaker approach for
- Live Update
-To: Pasha Tatashin <pasha.tatashin@soleen.com>
-Cc: linux-kernel@vger.kernel.org, kexec@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
-	rppt@kernel.org, graf@amazon.com, pratyush@kernel.org, seanjc@google.com, 
-	maz@kernel.org, oupton@kernel.org, dwmw2@infradead.org, 
-	alex.williamson@redhat.com, kevin.tian@intel.com, rientjes@google.com, 
-	Tycho.Andersen@amd.com, anthony.yznaga@oracle.com, baolu.lu@linux.intel.com, 
-	david@kernel.org, dmatlack@google.com, mheyne@amazon.de, jgowans@amazon.com, 
-	jgg@nvidia.com, pankaj.gupta.linux@gmail.com, kpraveen.lkml@gmail.com, 
-	vipinsh@google.com, vannapurve@google.com, corbet@lwn.net, 
-	loeser@linux.microsoft.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	roman.gushchin@linux.dev, akpm@linux-foundation.org, pjt@google.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: h-2O1um6AlvZWcZZ0lp8G2MUX0vwRpKXv_8nIgZrRwo_1777827439
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA0MDEyMyBTYWx0ZWRfX3lMCQg2GdYj4
+ zb2CMGSv1FXRAseLkhlhbewvpipIcXqCuAAgkCPXN1KvrRXdayHGQOiX/xUxPm7WC7yvK3xuCpO
+ rYTn+YW2RUnrBzbtgMxhAmOrmjmqxSAvesI4dG+D7MAMezH+PAWholxiSC67tqx+CwgyG9rLVVu
+ UQq4MmEplwy2wpaOuAQHLdjLRZbjqtx4cs3/yAB2VphrYiReNq8YVBGKBA/kJ3oTG4xRNXgt2/b
+ xr+Zr0ru+u5buZEDsjzzmMeOxNOb+2GW+VFSUDN9fCyhAp0CjfaCJiH4vPej8PBBfikpWx5Aw5F
+ YRELIQ8yCl//aGuk7w3mErQdmaTerpRh7XN3BgH64nSx4M2x5tvJJS3zb/DBAEueK5CRDprMGx8
+ wJwhtBuxYaXPcQ1jh+kh9xHVxcDS+uDgovoOwv9tINNgr23a7PbmmIXOHrgBKzg6dKi5i5e44o0
+ lGF83L9CkswtGdJYtfA==
+X-Authority-Analysis: v=2.4 cv=J4GaKgnS c=1 sm=1 tr=0 ts=69f88aec cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=HoVq9zYKdZc2vep7obkA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: iXpw0SMeopALzrzjBD9UShBrcyb1LlDE
+X-Proofpoint-ORIG-GUID: 5uQlSXbiDIA3UYiMMFtdaLflhQcXZ96V
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-04_04,2026-04-30_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 malwarescore=0 bulkscore=0 suspectscore=0
+ priorityscore=1501 spamscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605040123
 
-On Fri, May 1, 2026 at 11:48=E2=80=AFPM Pasha Tatashin
-<pasha.tatashin@soleen.com> wrote:
-> The way I see it, vmfd and vcpufd need to support LUO preservation by
-> implementing the liveupdate_file_ops callbacks (.preserve, .restore).
->
-> When userspace preserves the vcpufd, the kernel isolates the assigned
-> pCPU (probably requiring the vCPU to be pinned to the CPU, and the CPU
-> to be in an isolated cpuset),
+On Sun, 2026-05-03 at 12:46 -0400, Paul Moore wrote:
+> Regardless, assuming you always want IMA to leverage a TPMs when they
+> exist, your reply suggests that using an initcall based IMA init
+> scheme, even a late-sync initcall, may not be sufficient because
+> deferred TPM initialization could happen later, yes?
 
-Generally speaking vCPUs do not care if they are pinned. Do we need a
-preparatory ioctl for this on the vcpufd side, even just a
-KVM_ENABLE_CAP or a new bit for
-KVM_ENABLE_CAP(KVM_CAP_X86_DISABLE_EXITS)?  If
-LIVEUPDATE_SESSION_PRESERVE_FD suddenly can start offlining pCPUs,
-that would require a capability check.
+Well yeah.  The TPM could be configured as a module, but that scenario is n=
+ot of
+interest.  That's way too late.  The case being addressed in this patch set=
+ is
+when the TPM driver tries to initialize at device_initcall, returns
+EPROBE_DEFER, and is retried at deferred_probe_initcall (late_initcall).  S=
+ince
+ordering within an initcall is not supported, this patch attempts to initia=
+lize
+IMA at late_initcall and similarly retries, in this case, at late_initcall_=
+sync.
 
-> Even for this simplest form, we still need a defined ABI between the
-> host kernel and the Caretaker. The host must send an IPI to
-> synchronously notify the Caretaker of attach and detach transitions.
-
-Yes, but it's unlikely to need stability unlike the KHO serialization.
-
-> This ABI must also handle Caretaker replacement during the adoption
-> phase: when the new kernel retrieves the vCPU, it requires a protocol to
-> notify the running Caretaker that the pCPU is being onlined. The
-> Caretaker must reach a known, state at that moment so the kernel can
-> seamlessly replace the previous kernel's Caretaker version with the
-> current one. Finally, the Caretaker still relies on the CCB to access
-> KVM routing pointers for forwarding VM exits back to the host during
-> normal operation.
-
-I'm not sure if routing pointers are needed, as opposed to just a
-call/ret (ignoring detachment and reattachment which are different
-anyway). In the end, the x86 caretaker is basically the
-non-preemptable part of vcpu_enter_guest(). Even once you add
-attach/detach, the body of code that runs in the caretaker is roughly
-the same and what changes is setting up the address space, the IDT,
-etc.
-
-> > This must be done atomically at the time Linux offlines/onlines a pCPU.=
- The
-> > interface from Linux to the caretaker must use some kind of IPI so that=
- the
-> > new kernel can force a VMEXIT (if needed) in the caretaker, ask it to
-> > serialize the vm state, and pass it down to the new kernel's caretaker.
->
-> Yes, agree.
-
-BTW, the same IPI is needed to force a VMEXIT even before kexec, if
-the old kernel does anything that breaks the running VM such as
-madvise(MADV_FREE).  Should not happen with properly behaving
-userspace, but it must be accounted for.
-
-> During the kexec gap (when the host kernel is completely offline), the
-> Caretaker acts purely as a producer, writing trace events directly to
-> this physical memory block and advancing the ring buffer pointers.
->
-> When the new kernel boots and re-adopts the orphaned vCPU, it retrieves
-> this memory from KHO and attaches it back to the tracing subsystem.
-
-Yes, this should work with remote trace buffers.
-
-> I agree regarding HLT: during the gap, the simplest approach is to just
-> skip the exit and return directly to the VM without attempting to handle
-> it.
-
-Or even disable intercepts for HLT/PAUSE/MONITOR/MWAIT.
-
-> I completely agree that the transition into and out of the gap must be
-> synchronous. As discussed above, using an IPI is the right approach. For
-> entry, the host kernel signals the Caretaker via IPI to ensure it
-> reaches a known state before the pCPU is offlined.
-
-And then does INIT/SIPI on the offlined pCPU to re-enter the caretaker
-in detached mode.
-
-> For exit, the new
-> kernel sends an IPI to the orphaned pCPU to force a VM exit, allowing
-> the new kernel to take control, update the Caretaker environment,
-> and complete the reattachment.
-
-> > Yeah, I think APIC emulation to some extent must be moved into the VMX/=
-SVM
-> > fastpaths.  The good news is that this can be done already as a PoC wit=
-hout
-> > needing the whole caretaker and LUO infrastructure.
->
-> Moving APIC emulation into the VMX/SVM fastpaths makes sense as a
-> standalone effort.
-
-Yup, that's nice to have.
-
-Thanks for the detailed reply, I limited mine to where I wanted your
-input as the author of LUO - especially with respect to privilege
-separation.
-
-Paolo
-
+Mimi
