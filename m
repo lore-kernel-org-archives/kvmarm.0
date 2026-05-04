@@ -1,65 +1,65 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774A12BE65B
-	for <kvmarm@lists.linux.dev>; Mon,  4 May 2026 12:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19579399369
+	for <kvmarm@lists.linux.dev>; Mon,  4 May 2026 12:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777897186; cv=none; b=KyAz13Y5psX3WLw7gaWyjIh3U0uT+iXKPcYxGmRcXlgGOOLcF+gWIBK51QRmItP21Fh1tq+3Ic7vpsdxNcTJN5AoxtYpYs2TedJ6aJ0PY0RYPqfdxnOfBa8T0rXm8b+0tl/2IkobSyoP5qc01GHwq5AVyY3mcPjitHGOinJwWQo=
+	t=1777897743; cv=none; b=nSMwI3OpRI7gjrDxBF9hz8V1yZ/FTUHF3mIA5BNdjjVH+9CFHEHTXvYugKn4acDikrW+scSKvnRtBl9uA1O2ULFZkJh2ohvoU+0ulGW8kLDhFHvOik2B2Kh6hEiuY3xERJpnF4G8ovgYElZnoTzifJ5+B8CF4O5A57dWg/mhOc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777897186; c=relaxed/simple;
-	bh=9ePXNcpJXNpBucWE7Um02jeLVCQaYHO77fP8l6NTbXU=;
+	s=arc-20240116; t=1777897743; c=relaxed/simple;
+	bh=jslPeDjmLXFjY8GLLQ1VcbPt/4kQhObWLw86ZETE8qA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TPqPM58elojIFCetCgpIfas2YLl0yr0tWlUWYqUAYacasN18+AxbDRtvMqeoAR1Cuthr763AKVfQQ3JD1s7KrpiA3o/iSSoqurdgxLaR3e5J5dUyfA+370HIW1Gxc4u8K3kegvw2gjNgglSeJIgeUebtE0X8yCtFmfLhW1VvSM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U94ZfjFB; arc=none smtp.client-ip=209.85.128.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=hCCUngAo16aH8WDcuBqwU3MigpOi/k8+PCsioA5+xbc/dyQ7UmHJ8PNje4CPdHCw6u/6HvYpHZBJNxcvUFU/YzUL78r9NTY9dUMsGi9t1tXRADMSwHmPK7t/XwgOK6rO/LIbVbIJBhfKCAX2L85kyYUR98745gqhGn95BNeO9Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LPi+ZmlU; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U94ZfjFB"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488940ccfa6so170835e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 04 May 2026 05:19:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LPi+ZmlU"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891ca4ce02so175825e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 04 May 2026 05:29:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777897183; x=1778501983; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1777897740; x=1778502540; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=PZFwKQCzFDeKBEEx0s8dTkXKr01dndAPiIRslPFEQHw=;
-        b=U94ZfjFBnY7AO3uOUXtDwORfczZ0YWYIl+hDFef1JvXoztd8eJYoeFNOYi/X4fC6fO
-         hIG9vkMSIfLnxEB8Yzrt1/nA7zig9RGEwTuWiLwIR+3q4LhyM8oX3SunVL5eVnaOqUQW
-         BzuFYbgtXlJHrKjwvB2JDEBmlbmWa5cN2U54k/MjyyXWv9s8HQOvotX7PmeIdF/2fwZg
-         EqJ8Zg6VDVyO8qaXkdBniiCBcpVSOzjtx+MZb65w9cSNpQLP649raKW+YWQwaaHXmULS
-         Eeap3+JWL16OKdziceZmA75SVLtDVD8ItQSeeAwxyJCR22AtIOyKBcm2U/gU9FCyWlbd
-         ly+A==
+        bh=814xa8seFs15bj3a4vxXUsxq6BSSUZsJ1eCZuSdGtu8=;
+        b=LPi+ZmlUy1uXOF++5rvQIO697t6Ilk9lAa9aJRqX+K5Qpj/3YA4SbQA7yib14f+1Bg
+         TZ5xv37/LoPQ8y5MGwnr+37ir2G2NIj6QC6eg+OkUKwqGVSBWTDODuWTbcSrdK9SdpFt
+         8l1/XmSTCSUhzN5xi3QYj5MzqM8e69LFYf8blEfp2D1/6f1s+x9vkpGsk6wXzY+BKdlz
+         ttT1u7AxWiQjtO6cUvYTeFS66mz5RYN8SQ2XsqFi7/+4Rqluds98txHM3VuFXKYFxFv4
+         eOceYBXK65dDPjIO+Ks9cDrIIgUxiBDc4/If72RshkO8F7Y4I0UgfCR+TEm4bXUBZLjt
+         fVbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777897183; x=1778501983;
+        d=1e100.net; s=20251104; t=1777897740; x=1778502540;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PZFwKQCzFDeKBEEx0s8dTkXKr01dndAPiIRslPFEQHw=;
-        b=HfY6wCdxYbcRO9g/xlCfj9gM5fewvrPNHFlbEZGuT8ayTlnn10N7RMZZigyjgd/iaV
-         cf/gZh/gQHbzjaCNjwshNtnhwxV0/8+n4zLOr1Xdaz1Fd3bAJGgr8dT4TEPRdTAq6PuY
-         Lt9BsS/gOCFqaXG5MJFg/VJXz+UlEZTXBpUItsXeQSCQ5WDhkgO3XPDs3U8JKncImask
-         a9AF9gTzlMNUBtUzWrNqQnjXkenbdpd09Oazv05SVp/Q+CHYAIDrY3tPJOL9d6GLmEst
-         m3Kj5zwmju9SB6N2Y7T6ACVgFKnlquLPczvDSmjAxuMCIDq4D9KdP0nF+U+wkUcsDI/g
-         +vOg==
-X-Forwarded-Encrypted: i=1; AFNElJ92yeiUTAjkaginaASIHx96wT9ugtCk2V5No4vvftvjsMqn6v9jxGwqUpg5o4TSrTaAEIgdG1g=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywflbg33tKOtIfdVeFukreF5I14pS1o3cdq0VmhMWn/28n/ZvC9
-	o/mz5W1/l2vIaeM38Cxnlhp5RxbZD8+qgxe3qnBZK7SF9eB5zAZqGtU0wPXQOKwN5g==
-X-Gm-Gg: AeBDievbDTvCiX9t4VYeCPtzYdWYDjSuxgFhSPm31yEBi6KOHeRvZlN2HPk5VsUdi8E
-	hXMUppG4QI9IAHHzRR2EpWIHfZgXNmc8wfhs97bmxjxELh4+5so32g5UolIQupmPDsV6UguIKAP
-	WybQOHKr4L0n6ZDACoI5Qr8Nw1gJa/iNYcpgitPIhG2IinTPDUdxNmHuw6ECq2bVYxilt1wa08d
-	nEcux967ryo2i4iK6q1QxObL3qdBJZWEC+P3tyruU+zzG4y06giTGp/bXuJ9mImLNr+Gyw17f0x
-	y+8am57p9NthmYu0K6UYJmJqeDahC6sZ+AXqPWQNOAaDaHDqZzbq1Mqd4pIxw0y7WSkhv6S9pDS
-	cW863GIvVFTxCSa/Z3+nNXGxPIe1WPjH13XX0PpT6hA+gGj1fvwT9x+w8tXL3dib9HFhvf+2tNk
-	Dacn5jidYpDf1TUya6jYcMa9KV9T8PAWvIhhDDwsZUC8C+y7wsnkGaXOgL90qANaJqvOoY6HNuN
-	n5lDw==
-X-Received: by 2002:a05:600c:6089:b0:488:960f:60b8 with SMTP id 5b1f17b1804b1-48a9852d054mr1083545e9.6.1777897182533;
-        Mon, 04 May 2026 05:19:42 -0700 (PDT)
+        bh=814xa8seFs15bj3a4vxXUsxq6BSSUZsJ1eCZuSdGtu8=;
+        b=rBvhA4ri9cSqexRBUMiG8URIvOl20p/ljzusYvNDhSJ7ZFLdRoSmkVGpp5oHf9tivH
+         o9G7TdjDzKCR8JCRUPMZLXQrL1NH6s8IMTMx7nRFKDpqdsfX0aUE/RTjIBlgfTrIWLFy
+         Hl0MV6ctQK2d0BwohztCsu60adC8gu6bRT54L2fFmLEvRghoZ+aE8RVOApioF7EbiAPR
+         TzSUEEu2MPwNZOM13h4GF8SOwRXQ7cscSOzORQ7HF8EkUfBdjRVzF444x2xYUZvKN+C/
+         BQt3vPeumdB+yPgmAOCAfNyrP6Wcwa35h2AH/uS8lBIJAP6BjF1C8Yu/BGWvBl8Icgqc
+         +dpQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/LFpwQHSjHZoAsj2PL5csoXLHDTIC77d6kFtDDtfop/AHhdADI3qRkqCVY9VZ/4DuIMUCPWr4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxPx398L14mNmJsZg9zCo7OHLdir8qpUVb/SsRxFsE0KGCWTG83
+	nfuVZYVJIUmiuX0/e7eHkgidQFLFDi3IFHgf3C1oDRmbnw9JltJ4oeaQZLfECZMsiQ==
+X-Gm-Gg: AeBDieuesjwrKE58P2qZretRCoZrYuindNmpABmyXUyJSzFStjpO5f9ohuGCwxwoC4j
+	/nVfEXWxVpSPgKfBtU1g1Ddsqlj9SgZ0x1L3JOpnPnRTqrEmqloCEbb0AbKS8FWqRmgNW2KI/55
+	/pZ4uZX1mIQr44N31vr4Jr+gblE8NCM+iXX1as45rL3jaRARmLC5E/79zEiuoKeFEEI6jEep4XO
+	W0LZMuhtJtmvSn01ubOzgC1OEk+qjiEmADx3wBNA2NQ/zuYlIpNBqss2x/mVamyu3n891RMmSSc
+	j9FN/yclsi0quULOKNaguHBOLQnIue1K2bjVEka2QNYv/1LrcmxQEV9dLpiymt6f1asIERgrlgj
+	LX6rmEq+SlP+wsEOnf/9LPks6yku3DkktXkGGtRfK2XwvObJF3gnPRojrpSKCuaWb6sgkqVwjMb
+	pp6+VqiRN+dMNnVCt+1k0x8rXRP/nY35ZACAvZs9JgHbo0WBaLSzfuWmGNFCIW7yzTMEsgZnFxr
+	WTlhg==
+X-Received: by 2002:a05:600c:8717:b0:475:d905:9f12 with SMTP id 5b1f17b1804b1-48a98102ba3mr3204765e9.4.1777897740070;
+        Mon, 04 May 2026 05:29:00 -0700 (PDT)
 Received: from google.com (8.181.38.34.bc.googleusercontent.com. [34.38.181.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8fea7de6sm78783785e9.12.2026.05.04.05.19.41
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44b638ac434sm21945298f8f.36.2026.05.04.05.28.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 05:19:41 -0700 (PDT)
-Date: Mon, 4 May 2026 12:19:37 +0000
+        Mon, 04 May 2026 05:28:59 -0700 (PDT)
+Date: Mon, 4 May 2026 12:28:55 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: Jason Gunthorpe <jgg@ziepe.ca>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -69,12 +69,12 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
 	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
 	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 06/25] iommu/io-pgtable-arm: Rework to use the
- iommu-pages API
-Message-ID: <afiO2WL4ILGfmUui@google.com>
+Subject: Re: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page
+ table
+Message-ID: <afiRB3e3o0G1oZvY@google.com>
 References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-7-smostafa@google.com>
- <20260501122424.GA6912@ziepe.ca>
+ <20260501111928.259252-9-smostafa@google.com>
+ <20260501130006.GF6912@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,174 +84,68 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260501122424.GA6912@ziepe.ca>
+In-Reply-To: <20260501130006.GF6912@ziepe.ca>
 
-On Fri, May 01, 2026 at 09:24:24AM -0300, Jason Gunthorpe wrote:
-> On Fri, May 01, 2026 at 11:19:08AM +0000, Mostafa Saleh wrote:
-> > To prepare for supporting io-pgtable-arm in the pKVM hypervisor,
-> > we need to abstract away standard kernel allocations, frees, virt/phys
-> > conversions, and DMA API mapping.
-> > 
-> > This patch introduces a set of generic wrappers in iommu-pages.h:
-> > - iommu_alloc_data
-> > - iommu_free_data
-> > - iommu_virt_to_phys
-> > - iommu_phys_to_virt
-> > - iommu_pages_dma_map
-> > - iommu_pages_dma_mapping_error
-> > - iommu_pages_dma_unmap
+On Fri, May 01, 2026 at 10:00:06AM -0300, Jason Gunthorpe wrote:
+> On Fri, May 01, 2026 at 11:19:10AM +0000, Mostafa Saleh wrote:
+> > Create a page-table for the IOMMU that shadows the host CPU stage-2
+> > to establish DMA isolation.
 > 
-> Wah? This has nothing to do with iommu pages? This just leaking
-> everything iommu pages abstracted out :(
+> Is there a reason you can't just use the CPU S2 for the iommu?
 > 
-> When I said to use iommu-pages, I meant to use the existing API, not a
-> completely different one.
+> ie the CCA RMM is doing that, it is how ARM imagined this stuff would
+> work.
 > 
-> From an iommu-pages perspective the issue is this code open codes
-> dma_map_single()/etc instead of using the API surface
-> iommu_pages_start_incoherent()
+> Once you start supporting DMA like this you have no choice but to keep
+> a fully populated at all times S2 around, why not use that for the CPU
+> too to avoid faults?
 > 
-> This is annoying to fix beacuse the external allocator messes it up,
-> but I think with some #ifdef you can probably fix it up.
+> I guess there is a reason, but maybe explain in the commit message?
 > 
-> So.. I suggest you update it to use the iommu_pages API, #ifdef out
-> the allocator so the pkvm pkvm doesn't need to deal with it. Then
-> compile a special iommu-pages for the pkvm side presenting the same
-> API.
+> It sure would be simpler, you wouldn't have to mess with iopgtable at
+> all...
 
-I see, we still need to leave the DMA-API calls for the custom config,
-as I am not sure if it can use pages not backed by the vmemmap, I
-pushed that into a separate function so it’s easily compiled out.
+Sharing the page table is tricky, this is something I have been thinking
+about and my plan was to work on it after this series as it has some
+constraints and would require core KVM changes.
 
-Without this patch, now it looks like:
+So far this is the list of requirements/changes needed share the
+stage-2 page table (besides the obvious: same page table format,
+granularity, endianness...)
 
-diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
-index 0208e5897c29..1583b9916b09 100644
---- a/drivers/iommu/io-pgtable-arm.c
-+++ b/drivers/iommu/io-pgtable-arm.c
-@@ -248,26 +248,15 @@ static dma_addr_t __arm_lpae_dma_addr(void *pages)
- 	return (dma_addr_t)virt_to_phys(pages);
- }
+1) HW BBM is not supported in the hypervisor page table, that’s
+   because it can generate TLB conflict aborts, which the hypervisor
+   can not handle because of the limited syndrome information.
+   We can rely on FEAT_BBML3 which was newly introduced to work
+   around that, it’s quite niche and not supported in KVM yet or
+   have an allow list similar to the kernel
+   (as in cpu_supports_bbml2_noabort()) which also limits the number
+   of CPUs that can run this.
 
--static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
--				    struct io_pgtable_cfg *cfg,
--				    void *cookie)
-+static void *__arm_lpae_cfg_alloc(size_t size, gfp_t gfp,
-+				  struct io_pgtable_cfg *cfg,
-+				  void *cookie)
- {
- 	struct device *dev = cfg->iommu_dev;
--	size_t alloc_size;
- 	dma_addr_t dma;
- 	void *pages;
+2) Handling page faults, devices must be able to stall and let the
+   hypervisor handle the page fault (which has to proxy through the
+   kernel as the hypervisor doesn’t handle interrupts), this includes
+   also IO page faults which are hard to get right from the HW which
+   and may lead to system stability issues or lockups.
+   Alternatively, we can pin the stage-2 pages, that would require some
+   hypercalls, hacks to the driver/IOMMU API and possibly new semantics
+   in the DMA-API for IDENTITY devices as they will still need to pin
+   the pages as they are actually in stage-2 translation and not bypass.
 
--	/*
--	 * For very small starting-level translation tables the HW requires a
--	 * minimum alignment of at least 64 to cover all cases.
--	 */
--	alloc_size = max(size, 64);
--	if (cfg->alloc)
--		pages = cfg->alloc(cookie, alloc_size, gfp);
--	else
--		pages = iommu_alloc_pages_node_sz(dev_to_node(dev), gfp,
--						  alloc_size);
--
-+	pages = cfg->alloc(cookie, size, gfp);
- 	if (!pages)
- 		return NULL;
+3) SMMUv3 must be coherent.
 
-@@ -289,26 +278,67 @@ static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
- out_unmap:
- 	dev_err(dev, "Cannot accommodate DMA translation for IOMMU page tables\n");
- 	dma_unmap_single(dev, dma, size, DMA_TO_DEVICE);
--
- out_free:
--	if (cfg->free)
--		cfg->free(cookie, pages, size);
--	else
--		iommu_free_pages(pages);
--
-+	cfg->free(cookie, pages, size);
- 	return NULL;
- }
+4) Support BTM/DVM for TLB invalidation, otherwise some hooks are
+   still required (although not io-pgtable-arm)
 
--static void __arm_lpae_free_pages(void *pages, size_t size,
--				  struct io_pgtable_cfg *cfg,
--				  void *cookie)
-+static void __arm_lpae_cfg_free(void *pages, size_t size,
-+				struct io_pgtable_cfg *cfg,
-+				void *cookie)
- {
- 	if (!cfg->coherent_walk)
- 		dma_unmap_single(cfg->iommu_dev, __arm_lpae_dma_addr(pages),
- 				 size, DMA_TO_DEVICE);
+This is not the complete list, I am sure I will run into more issues
+when prototyping this.
 
--	if (cfg->free)
--		cfg->free(cookie, pages, size);
-+	cfg->free(cookie, pages, size);
-+}
-+
-+static void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp,
-+				    struct io_pgtable_cfg *cfg,
-+				    void *cookie)
-+{
-+	struct device *dev = cfg->iommu_dev;
-+	size_t alloc_size;
-+	void *pages;
-+
-+	/*
-+	 * For very small starting-level translation tables the HW requires a
-+	 * minimum alignment of at least 64 to cover all cases.
-+	 */
-+	alloc_size = max(size, 64);
-+	if (cfg->alloc)
-+		return __arm_lpae_cfg_alloc(alloc_size, gfp, cfg, cookie);
-+
-+	pages = iommu_alloc_pages_node_sz(dev_to_node(dev), gfp, alloc_size);
-+	if (!pages)
-+		return NULL;
-+
-+	if (!cfg->coherent_walk) {
-+		int ret = iommu_pages_start_incoherent(pages, dev);
-+
-+		if (ret) {
-+			if (ret == -EOPNOTSUPP)
-+				dev_err(dev, "Cannot accommodate DMA translation for IOMMU page tables\n");
-+			iommu_free_pages(pages);
-+			return NULL;
-+		}
-+	}
-+
-+	return pages;
-+}
-+
-+static void __arm_lpae_free_pages(void *pages, size_t size,
-+				  struct io_pgtable_cfg *cfg,
-+				  void *cookie)
-+{
-+	if (cfg->free) {
-+		__arm_lpae_cfg_free(pages, size, cfg, cookie);
-+		return;
-+	}
-+
-+	if (!cfg->coherent_walk)
-+		iommu_pages_free_incoherent(pages, cfg->iommu_dev);
- 	else
- 		iommu_free_pages(pages);
- }
+IMO, 1, 2 are the most tricky parts. It's more work and runs on very
+limited systems, However, it can be implemented as an optimization)
+which is my plan.
 
-
-Thanks,
-Mostafa
-
-> 
-> You should have a pkvm shim header that provides
-> kmalloc/kfree/virt_to_phys in the normal way and just #include that in
-> io-pgtable when doing a pkvm build instead of hacking up all the code.
-
-Ok, I can do that in another change, but I believe it's better to
-change the usage in this file to arm_lpae_*(virt_to_phys...) so it's
-clear which parts are intended for that.
+I am not sure how CCA deals with that, I’d expect they have a lot of
+constraints on CPUs/SMMUs and DMA capable devices on those systems.
 
 Thanks,
 Mostafa
