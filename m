@@ -1,54 +1,54 @@
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CB840F8CE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC38410D29
 	for <kvmarm@lists.linux.dev>; Mon,  4 May 2026 21:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777929530; cv=none; b=N3W/ePF0266ohgm7kqD7uJkcNLIHXVUI1MqbMjyauZyAsxyvSfRJME0ZCMnHOIUbMYR10F36bkuREbec+mln3327WUn1uJZjRpmc1UxjFOt8EU9YI1jRPHn2n5P3ujD2DBEfq1g5D8gDajEUDOmPNXuNmlIkZ69xxTbxlQBQX8E=
+	t=1777929531; cv=none; b=ZiCfTz+cKwR9AbjEel9ZlSK/PuvOUCKqZd4wCWYEeqhlly5d9Zpalm9aJeP0jygFd+oywqIZGw8VJxFAD6f1cbggoXp08XJe9sSnv8rZwUXeSjG0eo1Ve8EM/sZ8OCyvyFZqAPtC/R4nCH2iLBnj9FYWz+PCAOT3Df8rrxqLFBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777929530; c=relaxed/simple;
-	bh=51x2qNUJZmu8VDSVPga7Ou82hKP9Y1fm/Wq0S6zmqPo=;
+	s=arc-20240116; t=1777929531; c=relaxed/simple;
+	bh=S0Rh88cIzrwPcgFazDDX9G1MacYZO4t4rc6Ti6y7iLw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZUc1QV1WTsTTNw5TxBqIxt29QuuO4l+zWqaojFfeQImRLXkj3tx9PELqNYFUqLIyQfPio6fkdPJihSWLjp2G/ve0/HSDoFN9vdWU4fc5Zd/pCKUL48EYFeGp6lf49d3MpbMgOqHb4UrNLqmH0aTIHyE7n4Nd0KK05US5t6eyxk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QjavVtkP; arc=none smtp.client-ip=209.85.167.202
+	 To:Cc:Content-Type; b=JC6jF83slmwei7XGI24DnT0egumPFNKo6/YZgktGsJN2uNJNqDjTduUqkr/chqsqGswo0bhO6yZL6r087VdLqYEjYm37732OUBI/tlqspaCyxEfpq43mMy2ss3CyAXvmZvTP434HchEHNwmt0sM7w26di8n386ZAOQhPXM6Tpg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AZa9d3Bm; arc=none smtp.client-ip=209.85.210.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QjavVtkP"
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-479d4437fd1so6889541b6e.1
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AZa9d3Bm"
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7de75c9be06so12517259a34.1
         for <kvmarm@lists.linux.dev>; Mon, 04 May 2026 14:18:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777929523; x=1778534323; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1777929524; x=1778534324; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ikJw7Yl21sbWiTQZxDvWwtZnXGp+jw2m9ITCB7brm+8=;
-        b=QjavVtkPW1fnx29jb50/oUvNLTYqWAuvi6cx/s7Ewn9CrTMWbgNO2AWzqjU3aKp1K7
-         zoRlBRA0rFz4w/e5lYHPM6b1eLvTBTC8wBLWt/z0o61MVhXbfeGLOUVSVN4tgn93LDaX
-         Vy559CjMkEDu8hWby1KLQPP46XjIZE9vd2Fd0Zq6gQa76hyWNxEy4/l/OHZ/0Sgndlnr
-         lnYWMaSVrRzJFNCJT/37bvRdXHbLnw3KYgsx7Umg5GkCS4FH8vsqqFtaHEraW9NXs7Sw
-         oMg8JzgSXT7lTW5eDE94BT1JU6cihteLkghQHFs8hjrCCjZ3vU0gYCaEflb2Qkdssxnh
-         4ujw==
+        bh=IHqwi47gLxulqjFwzyPWRWmJ21m3KfZnivqkYOWLGBw=;
+        b=AZa9d3BmyOfpJP7Ah9EQi3CFeyxtwtO+YDm5nUjckxXK69Z+91JzCEWyB9HIM6duH9
+         qcc2rOIZyeux1WMAtQ7V7VXsOXH7AA2p/22TTTKnU9CDZZwiEXoI6fQC2bFB/SYOe8QY
+         LPUIsTHwCocKBZ9NPoaZaMmkpKgd63D58yun3RMvpBpLRw13S9WF/taMq5HlpX9GH1Q4
+         B5axPNXHXujaXKeBvlXdu4Q/+J03oVW1RuWgUgYE1ELnPNEwkDTCmaRo9V8Y/tlBELIR
+         huBdIaemQEmBtpr9JrMOtU1TMYW0lOkh+l++ZqcApDf9k0QIDCroJCn3VKfzXMcPFOId
+         rf/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777929523; x=1778534323;
+        d=1e100.net; s=20251104; t=1777929524; x=1778534324;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ikJw7Yl21sbWiTQZxDvWwtZnXGp+jw2m9ITCB7brm+8=;
-        b=sgTvgFaJLmsWIEVJUOjSt6zcBwFnzaFX64zRP/QkeWtzM0FAUIta8huYh1msc0y8qv
-         wfHBW/AxdDLVARWgKZpN7shh/qfjhOq+1omsJpuu0qnmzgb9T3LFQkA4xbRlywWVyt2U
-         B9Pmlx/XArOycl39FSD4NgjC68b9u1PpdHmkx7icmLiks1r7bodElQcIfo3/1Q69sFtE
-         NKeTJ8nWXfdmPu+lKoHdc8vi66686O22P8FvNL74ZWfmCnUFYM+EC/fmRrvVvcKm/Xda
-         GHC4WtRVuXK6CAm/6Tex2/ufna5BQA+koSEWQTKLHNcsmT0FbKUqGstUDBX1Kpu9rjg7
-         cOOg==
-X-Forwarded-Encrypted: i=1; AFNElJ/KmnsNTw2T5JnVOwpbU1sgFRz+XRhU5S1zcHkS/eXsXqPLCftV2SjB2gtUEXzT9UCHCn/QuSQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyk6hRtTlLHlkPNJkNNGsbJIpU0ByQ+h6Ud8zS1GdXt3pEA25sv
-	RUgQPgurGK/86qt/h9jPfCU1H4xbhFmcPToJHcUa28FFoA/YqTfUPoT78WYC12PBF+jakeHi5/u
-	A60w2OjqsYjOqjqn6gKEGliKucw==
-X-Received: from ilaj29.prod.google.com ([2002:a05:6e02:219d:b0:4fd:6acc:4c7b])
+        bh=IHqwi47gLxulqjFwzyPWRWmJ21m3KfZnivqkYOWLGBw=;
+        b=n4baxXShpiDfZfJCs2ABxnY2ZMmXzHYvjsaHVbXzOoW8fvsQPuW48CRUIy3MMdj16j
+         upC7tK9UIvEQoMmlBOC5APMrd+krkFrlJ+26oaMajb+Him+xzZI6oAYlK0ifxibACFBU
+         J9SxCKPM35YEAJTPra7E7fKqzPQhC7eDX6fJk6zN9MhLcK/4m3ow1Fq42Eal00CdGHUW
+         MkRzzehV8M+xavCs8IBoHmfH0fMdmCD4d0zUx+SlsSS1SkqArHi3LRAxO3+vEn7C9eB3
+         BWTFQFZT1sraf3456zvjd//NUApIYwqFeU7OTuZFZKwLw/7mj2DIkF2m4WhqnCJmioKQ
+         lvig==
+X-Forwarded-Encrypted: i=1; AFNElJ8mYOiFLeN5JqBzCuCKq+3p7c0qSnNvy/yPHsWvOnssJe/3xUED7kD8LOXJLPMJjZgW6zMCxP4=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy7gxrJPjftu2HhFvjKEwYWJGyRTcGOMYIgZCNaazlgRdir9b+J
+	lRI0XuQ3eMQrRK2eiyfLC7EIG53JMFa8gTD1PB1l4buWz/vtL+aN3q6uwJ5iqxrpcZGzCrfpk7W
+	IBiTsedB0e7TfcXeDNTOdm+flpA==
+X-Received: from iods12.prod.google.com ([2002:a05:6602:324c:b0:96b:30a7:3dc9])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:2012:b0:696:1a85:586b with SMTP id 006d021491bc7-69697c3388cmr5842328eaf.35.1777929522601;
- Mon, 04 May 2026 14:18:42 -0700 (PDT)
-Date: Mon,  4 May 2026 21:18:04 +0000
+ 2002:a05:6820:211:b0:696:8278:c619 with SMTP id 006d021491bc7-696979ad7d2mr5858531eaf.6.1777929523888;
+ Mon, 04 May 2026 14:18:43 -0700 (PDT)
+Date: Mon,  4 May 2026 21:18:05 +0000
 In-Reply-To: <20260504211813.1804997-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260504211813.1804997-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260504211813.1804997-12-coltonlewis@google.com>
-Subject: [PATCH v7 11/20] KVM: arm64: Enforce PMU event filter at vcpu_load()
+Message-ID: <20260504211813.1804997-13-coltonlewis@google.com>
+Subject: [PATCH v7 12/20] perf: Add perf_pmu_resched_update()
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -75,89 +75,90 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The KVM API for event filtering says that counters do not count when
-blocked by the event filter. To enforce that, the event filter must be
-rechecked on every load since it might have changed since the last
-time the guest wrote a value. If the event is filtered, exclude
-counting at all exception levels before writing the hardware.
+To modify PMU guest counter reservations dynamically, we need to
+update the available counters safely.
+
+Introduce perf_pmu_resched_update() to allow updating the PMU struct
+in between scheduling perf events out and scheduling them back in
+again. It takes a callback operation to call in between schedule out
+and schedule in. This accomplishes the goal with minimal perf API
+expansion.
+
+Refactor ctx_resched call the callback in the right place.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/kvm/pmu-direct.c | 54 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ include/linux/perf_event.h |  3 +++
+ kernel/events/core.c       | 28 +++++++++++++++++++++++++---
+ 2 files changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-index 360d022d918d5..2252d3b905db9 100644
---- a/arch/arm64/kvm/pmu-direct.c
-+++ b/arch/arm64/kvm/pmu-direct.c
-@@ -138,6 +138,59 @@ u64 kvm_pmu_guest_counter_mask(struct arm_pmu *pmu)
- 	return 0;
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 48d851fbd8ea5..a08db3ee38b10 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -1242,6 +1242,9 @@ extern int perf_event_task_disable(void);
+ extern int perf_event_task_enable(void);
+ 
+ extern void perf_pmu_resched(struct pmu *pmu);
++extern void perf_pmu_resched_update(struct pmu *pmu,
++				    void (*update)(struct pmu *, void *),
++				    void *data);
+ 
+ extern int perf_event_refresh(struct perf_event *event, int refresh);
+ extern void perf_event_update_userpage(struct perf_event *event);
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 89b40e4397177..62fec73caabad 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -2983,9 +2983,10 @@ static void perf_event_sched_in(struct perf_cpu_context *cpuctx,
+  * event_type is a bit mask of the types of events involved. For CPU events,
+  * event_type is only either EVENT_PINNED or EVENT_FLEXIBLE.
+  */
+-static void ctx_resched(struct perf_cpu_context *cpuctx,
+-			struct perf_event_context *task_ctx,
+-			struct pmu *pmu, enum event_type_t event_type)
++static void __ctx_resched(struct perf_cpu_context *cpuctx,
++			  struct perf_event_context *task_ctx,
++			  struct pmu *pmu, enum event_type_t event_type,
++			  void (*update)(struct pmu *, void *), void *data)
+ {
+ 	bool cpu_event = !!(event_type & EVENT_CPU);
+ 	struct perf_event_pmu_context *epc;
+@@ -3021,6 +3022,9 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
+ 	else if (event_type & EVENT_PINNED)
+ 		ctx_sched_out(&cpuctx->ctx, pmu, EVENT_FLEXIBLE);
+ 
++	if (update)
++		update(pmu, data);
++
+ 	perf_event_sched_in(cpuctx, task_ctx, pmu, 0);
+ 
+ 	for_each_epc(epc, &cpuctx->ctx, pmu, 0)
+@@ -3032,6 +3036,24 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
+ 	}
  }
  
-+/**
-+ * kvm_pmu_apply_event_filter()
-+ * @vcpu: Pointer to vcpu struct
-+ *
-+ * To uphold the guarantee of the KVM PMU event filter, we must ensure
-+ * no counter counts if the event is filtered. Accomplish this by
-+ * filtering all exception levels if the event is filtered.
-+ */
-+static void kvm_pmu_apply_event_filter(struct kvm_vcpu *vcpu)
++static void ctx_resched(struct perf_cpu_context *cpuctx,
++			struct perf_event_context *task_ctx,
++			struct pmu *pmu, enum event_type_t event_type)
 +{
-+	struct arm_pmu *pmu = vcpu->kvm->arch.arm_pmu;
-+	unsigned long guest_counters;
-+	u64 evtyper_set = ARMV8_PMU_EXCLUDE_EL0 |
-+		ARMV8_PMU_EXCLUDE_EL1;
-+	u64 evtyper_clr = ARMV8_PMU_INCLUDE_EL2;
-+	bool guest_include_el2;
-+	u8 i;
-+	u64 val;
-+	u64 evsel;
-+
-+	if (!pmu)
-+		return;
-+
-+	guest_counters = kvm_pmu_guest_counter_mask(pmu);
-+
-+	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
-+		if (i == ARMV8_PMU_CYCLE_IDX) {
-+			val = __vcpu_sys_reg(vcpu, PMCCFILTR_EL0);
-+			evsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
-+		} else {
-+			val = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
-+			evsel = val & kvm_pmu_event_mask(vcpu->kvm);
-+		}
-+
-+		guest_include_el2 = (val & ARMV8_PMU_INCLUDE_EL2);
-+		val &= ~evtyper_clr;
-+
-+		if (unlikely(is_hyp_ctxt(vcpu)) && guest_include_el2)
-+			val &= ~ARMV8_PMU_EXCLUDE_EL1;
-+
-+		if (vcpu->kvm->arch.pmu_filter &&
-+		    !test_bit(evsel, vcpu->kvm->arch.pmu_filter))
-+			val |= evtyper_set;
-+
-+		if (i == ARMV8_PMU_CYCLE_IDX) {
-+			write_sysreg(val, pmccntr_el0);
-+		} else {
-+			write_sysreg(i, pmselr_el0);
-+			write_sysreg(val, pmxevtyper_el0);
-+		}
-+	}
++	__ctx_resched(cpuctx, task_ctx, pmu, event_type, NULL, NULL);
 +}
 +
- /**
-  * kvm_pmu_load() - Load untrapped PMU registers
-  * @vcpu: Pointer to struct kvm_vcpu
-@@ -165,6 +218,7 @@ void kvm_pmu_load(struct kvm_vcpu *vcpu)
- 
- 	pmu = vcpu->kvm->arch.arm_pmu;
- 	guest_counters = kvm_pmu_guest_counter_mask(pmu);
-+	kvm_pmu_apply_event_filter(vcpu);
- 
- 	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
- 		val = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i);
++void perf_pmu_resched_update(struct pmu *pmu, void (*update)(struct pmu *, void *), void *data)
++{
++	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
++	struct perf_event_context *task_ctx = cpuctx->task_ctx;
++
++	perf_ctx_lock(cpuctx, task_ctx);
++	__ctx_resched(cpuctx, task_ctx, pmu, EVENT_ALL|EVENT_CPU, update, data);
++	perf_ctx_unlock(cpuctx, task_ctx);
++}
++EXPORT_SYMBOL_GPL(perf_pmu_resched_update);
++
+ void perf_pmu_resched(struct pmu *pmu)
+ {
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
 -- 
 2.54.0.545.g6539524ca2-goog
 
