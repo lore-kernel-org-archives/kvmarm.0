@@ -1,132 +1,283 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E955A48C401
-	for <kvmarm@lists.linux.dev>; Tue,  5 May 2026 16:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9059948BD27;
+	Tue,  5 May 2026 16:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777998469; cv=none; b=igPWQE95EA//Hl58v1GODMmtWHmAKVVUDz12uM3e2DylOBF+LyPYWXeqKfNRtX65ExNnpvEB6eBfjtuGVwns0fyhcCsOjCs6T+OeEdwJ9p7Y0fuUSWnJnnh552qrSR/Zacoq9vnX8GlN4sAUvVX3PqZcLFNcyozevk/ZCHpyV08=
+	t=1777998741; cv=none; b=nxMXcBple84SfjQs6ERjch3g6B6l67YisrgVTsu6bNGfTUFjg+vCaYerm0TGamy5qdcSV13ucPlcl68xJApFweq/uFNFTn8butN4/X/rTzx9OLP5bt26vtZOZHRbB9EJu6QPv8+Hdho9dHVlM3nkt9q0EK/VIDScd2hKUKUhmqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777998469; c=relaxed/simple;
-	bh=ZnXDTKUdX5lnq5iIdjYvuqdBQPDY6gB1BWd6/IRhYGk=;
+	s=arc-20240116; t=1777998741; c=relaxed/simple;
+	bh=WyOQn3tBSFDpBAHnLk6bdPwqlgR7hHM6B3vxBY9JYM0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FKre4hnJDMod3CF9TUe1ELpL88i9Vbiukx+inFssOT/d50aBLvEgPwhxe/BkVwqNKS6FK4Ryx0F41dETCorE3UPnNbulWk+SpqK4b1Qk7Mnx1mSscRSRwbvWfIs8vKKUOL98UQ5tw5zZMlT0tTFCTWRhj96klo3HCtRxs2ap1tA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=l//dWF6F; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=ue/fNvxXFL5nDVoqWFxvtSBpletb/sQh2MiIq3OxLxzgZSeJXw/SYqSKhF/Ti+ADHG282KG2PsKQJHfzc+/6e8n93YqEKwgvEVb6rH0BBQhPoZ3bMrHFTgBjZC8ni1I2mTBgVRwiRaLuki5jhE0ejjzPwrRFaTLGlToVmVmnOtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6QaN7/6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="l//dWF6F"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48909558b3aso59729835e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 05 May 2026 09:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1777998466; x=1778603266; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=psW2zn2RKA7mDVnr8upNFQH0mArJi5iuTG1xm14kmUs=;
-        b=l//dWF6FaXROlsmFhJrP2Yes6Z3Zh2aaiIsUG7tTG+Pe15i699FWuX91LRX7s7HdFZ
-         g+YP8SoMu/bOFrdrUMdoDD3I9xpQuez0X9YX4zXmNM3ASi7Ygg10rb2lxvlIEX64Kovn
-         QQP1MEGuNEGaRyemPIjliJrTqiQzrss40vaS9EkEdFRV7Sf4mlCD8bDkSPMPr8NkBohi
-         Rz5uxzeBH7z3chEpCN7GwV769fAjyR84hjRRv1WjDOCtxcw7pUQoNCZfKYDUAc0f9wCK
-         oAmX6iPiPeNMkDypXoeIJWkt0J3ghlzoBZUOexW8FAfCC0Kz8TxWynsi0hfr0GNkXyp8
-         351A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777998466; x=1778603266;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=psW2zn2RKA7mDVnr8upNFQH0mArJi5iuTG1xm14kmUs=;
-        b=NvFd/X9BPWMGD+NIGOBPQNUGgxEZSqcgKbE8a9lktXJmlkSa4X4PA5BWewFF8HRc3W
-         hQ99YurykM8Sg55GgK+9egLwA95gFYXvGLe3LwKBcXQM951BSOrfFhW+mQW2w7lYFlT9
-         8xHpPs/z/I8Or/zYi2WrtJsiXCzkUipRQdX65Iiinu+YRKAg70NuUkYwukQIGO3ul9Zm
-         gB+QTT8jqA7gAKvrawSGCG1Hk48TCDhOHJ48diwtUB7CqypBuGD9oZP9gOE+H3XZhRht
-         Ku0/y04PTnVvrQhskCLIZ5WTg7q1bObMJtBcjQ0rYPF+6AkJ2mXE1l+GAaKA1D5iNEmT
-         km4w==
-X-Forwarded-Encrypted: i=1; AFNElJ86NEfOUOhTffXpYEL4C3pawJBYV9FHrbmYE1pY1bMR83WWm5Vrn9aZyjqYGgAcNGwSl7Pcl8A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxYgdUGqZ4WE3FG0wxPpEaik/RFbbtvEiQhn+ucTMTfWh6uYK+f
-	WU4H+n7YIylaWwiohlfciJhkHTgzT45w9BFsAbSyqGbYR3yShpztciyJI8LCZOSR48k=
-X-Gm-Gg: AeBDietu4d03va76UwvOvE2labGw0xqKfmEYAqQDGsV9QUd0u2Jk+bZXnORLExJ5Bz+
-	znUYrWFy7Ky7FHgXKlNqCIavTo0fidNP/dNrtAhsr3kB4AYAFufnmaFEiDXg5vjFSp3DUJqeBwi
-	uv2trjyA7DJY1sZjNjVm6eh0e0YdKxxv4/3vcXDUUUnxV8MhZwemJZz9WZ3D6zHFmb2e7iDY902
-	c6pEgrbyP2vIb4g5XhuggdgVpMfY7PkX0qsAahdd/GGZdLP90YKgfHNP9kcqeDu+R4OA8QQSuvo
-	bLaNoAJc5YOWPQzh0ZNY0mvGF1BFZDf6fSdVFDK3Saup9UmY68OLLu6muMbZhSEJsxi3wPs7wdh
-	FJ1ryvqk2tDbfikKaQ2tkaCVr1UvdwQXrJvbrAjP9OSz9Xqs8Abv2JvraOnBPwUTO/yqwlVKWvM
-	jIUzFmDUo=
-X-Received: by 2002:a05:600c:3544:b0:489:1d23:4524 with SMTP id 5b1f17b1804b1-48e51a6229fmr2708455e9.5.1777998466365;
-        Tue, 05 May 2026 09:27:46 -0700 (PDT)
-Received: from ziepe.ca ([213.147.98.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8ebb3dc1sm381506775e9.14.2026.05.05.09.27.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 09:27:45 -0700 (PDT)
-Received: from jgg by jggl with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1wKIcb-000AO7-2w;
-	Tue, 05 May 2026 13:27:45 -0300
-Date: Tue, 5 May 2026 13:27:45 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 05/25] iommu/arm-smmu-v3: Move IDR parsing to common
- functions
-Message-ID: <afoagb/wVBJD1IX+@ziepe.ca>
-References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-6-smostafa@google.com>
- <20260501124716.GD6912@ziepe.ca>
- <afiODW2sVMeOj3Ag@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6QaN7/6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96258C2BCC7;
+	Tue,  5 May 2026 16:32:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777998741;
+	bh=WyOQn3tBSFDpBAHnLk6bdPwqlgR7hHM6B3vxBY9JYM0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l6QaN7/6Ls6N62Omndx9ZkQPQPHh93G2jiFu5owUcRgmFTRLMg6ukJpHx5Edd4ziG
+	 LACt5k7L1bSoxw98UD7EqIFHLj+aq9rmSa40+t8E/aopCsGb4qLKgesvoRpp+BrxJN
+	 cbOtYibJBnq/+lcOealAHGJw8tuOq1ECTNSsgTOw3VK1769Kfxa7hB84DAXgqe9MlI
+	 HbTpWwMvQASxkZF6mQNiONGBOowFRPdjPlDKc2OLqp1JGQUOCuMFhTSxtawgcrIYKx
+	 h43Aa/8uEpfq2JJhGfifjxtuHVurPDS680I1drxkQiXzqKLb+4b8JsG5/ZGm9M4i/U
+	 0Fc5jT+9Sn3GA==
+Date: Tue, 5 May 2026 17:32:15 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	jarkko@kernel.org, zohar@linux.ibm.com, roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org
+Subject: Re: [RFC PATCH 2/3] firmware: arm_ffa: initialise ff-a after
+ finalising pKVM initialisation
+Message-ID: <20260505-adaptable-mussel-of-virtuosity-2751db@sudeepholla>
+References: <20260505095409.1948371-1-yeoreum.yun@arm.com>
+ <20260505095409.1948371-3-yeoreum.yun@arm.com>
+ <20260505-super-gecko-of-argument-655030@sudeepholla>
+ <afoHizU8NgFWzvYW@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <afiODW2sVMeOj3Ag@google.com>
+In-Reply-To: <afoHizU8NgFWzvYW@e129823.arm.com>
 
-On Mon, May 04, 2026 at 12:16:13PM +0000, Mostafa Saleh wrote:
-> On Fri, May 01, 2026 at 09:47:16AM -0300, Jason Gunthorpe wrote:
-> > On Fri, May 01, 2026 at 11:19:07AM +0000, Mostafa Saleh wrote:
-> > > Move parsing of IDRs to functions so that it can be re-used
-> > > +unsigned long smmu_idr5_to_pgsize(u32 reg)
-> > > +{
-> > > +	unsigned long pgsize_bitmap = 0;
-> > > +
-> > > +	if (reg & IDR5_GRAN64K)
-> > > +		pgsize_bitmap |= SZ_64K | SZ_512M;
-> > > +	if (reg & IDR5_GRAN16K)
-> > > +		pgsize_bitmap |= SZ_16K | SZ_32M;
-> > > +	if (reg & IDR5_GRAN4K)
-> > > +		pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
-> > > +	return pgsize_bitmap;
-> > > +}
-> > 
-> > I think this should include:
-> > 
-> > > +	smmu->oas = smmu_idr5_to_oas(reg);
-> > > +	if (smmu->oas == 52)
-> > >  		smmu->pgsize_bitmap |= 1ULL << 42; /* 4TB */
-> > > -		break;
-> > 
-> > ie it should return the supported page sizes by inspecting all the
-> > idrs and don't leave this tricky bit to be open coded..
+On Tue, May 05, 2026 at 04:06:51PM +0100, Yeoreum Yun wrote:
+> Hi Sudeep,
 > 
-> This way was easier as each function only returns one thing, otherwise
-> we have to pass stuff by address as we can’t pass the smmu struct as it
-> is not shared between the drivers.
-> But no strong opinion, I can change that.
+> > On Tue, May 05, 2026 at 10:54:08AM +0100, Yeoreum Yun wrote:
+> > > When pKVM is enabled, the FF-A driver must be initialised after pKVM.
+> > > Otherwise, pKVM cannot negotiate the FF-A version or obtain the RX/TX
+> > > buffer information, leading to failures in FF-A calls.
+> > > 
+> > > Currently, pKVM initialisation completes at device_initcall_sync,
+> > > while ffa_init() runs at the device_initcall level.
+> > > 
+> > > So far, linker deployes kvm_arm_init() before ffa_init(), and SMCs can
+> > > still be trapped even before finalise_pkvm() is invoked.
+> > > As a result, this issue has not been observed.
+> > > 
+> > > However, relying on above stuff is fragile.
+> > > Therefore, when pKVM is enabled, the FF-A infrastructure should be
+> > > initialised only after pKVM initialisation has been fully finalised.
+> > > 
+> > > To achieve this, introduce an ffa_root_dev ("arm-ffa") and
+> > > a corresponding driver to defer initialisation of the FF-A infrastructure
+> > > until pKVM initialisation is complete, and to defer probing of all FF-A devices until then
+> > > when pKVM is enabled.
+> > > 
+> > 
+> > I don't like this whole ffa root device design.
+> > Two question for now:
+> > 1. Can FF-A be a module on systems with pKVM which removes the need for all
+> >    this dance done here ?
+> 
+> But this means we reduce the other feature e.x) IMA with TPM over
+> FF-A and pKVM feature. Since IMA must be a built-in, we couldn't avoid
+> to build FF-A driver with built-in.
+> 
+> > 2. If it is a requirement to have this built-in, I prefer to add a probe
+> >    and defer it instead of this root ffa device.
+> 
+> But, How? anyway all of FF-A device & driver couldn't be probed unless
+> FF-A initialisation is finished and How can we trigger FF-A initailise
+> after pKVM finish its initialisation?
+> 
+> The problem is ff-a intiailisation happens before pKVM finish its
+> initailasation and to do defer probe, it should use dd-model and
+> As we discussed in other thread, notifier couldn't be a soluation.
+> 
+> Could you let me share other way I'm missing?
+> 
 
-Could you share the struct? With multi-compilation you do get two
-structs with the same name and different layout, it is OK?
+Will something like below work ? If we add DT bindings, then we can add
+of_match_table and drop the platform device creation. Also we can adjust
+the parent device the way you have done by a simple change(not done in
+this untested/not compiled change).
 
-That would give a cleaner setup too because you can just shove all
-this into a function and have it setup the same struct which is more a
-copy and paste than break up into little functions?
+Regards,
+Sudeep
 
-Jason
+-->8
+
+firmware: arm_ffa: Register core as a platform driver
+
+Move the FF-A core bring-up and teardown paths into platform driver
+probe and remove callbacks, and register a synthetic arm-ffa platform
+device to bind the driver.
+
+This makes the FF-A core lifetime follow the driver model while keeping
+the device creation internal to the FF-A core. The probe path can now
+return normal driver-model errors, including probe deferral when pKVM is
+enabled but not yet initialized.
+
+Since the transport selection now happens from the platform probe path,
+drop the __init annotation from ffa_transport_init().
+
+Signed-off-by: Sudeep Holla <sudeep.holla@kernel.org>
+---
+ drivers/firmware/arm_ffa/common.h |  4 +--
+ drivers/firmware/arm_ffa/driver.c | 55 +++++++++++++++++++++++++++----
+ drivers/firmware/arm_ffa/smccc.c  |  2 +-
+ 3 files changed, 52 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/firmware/arm_ffa/common.h b/drivers/firmware/arm_ffa/common.h
+index 9c6425a81d0d..5cdf4bd222c6 100644
+--- a/drivers/firmware/arm_ffa/common.h
++++ b/drivers/firmware/arm_ffa/common.h
+@@ -18,9 +18,9 @@ bool ffa_device_is_valid(struct ffa_device *ffa_dev);
+ void ffa_device_match_uuid(struct ffa_device *ffa_dev, const uuid_t *uuid);
+ 
+ #ifdef CONFIG_ARM_FFA_SMCCC
+-int __init ffa_transport_init(ffa_fn **invoke_ffa_fn);
++int ffa_transport_init(ffa_fn **invoke_ffa_fn);
+ #else
+-static inline int __init ffa_transport_init(ffa_fn **invoke_ffa_fn)
++static inline int ffa_transport_init(ffa_fn **invoke_ffa_fn)
+ {
+ 	return -EOPNOTSUPP;
+ }
+diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
+index eb2782848283..d000727889f4 100644
+--- a/drivers/firmware/arm_ffa/driver.c
++++ b/drivers/firmware/arm_ffa/driver.c
+@@ -36,6 +36,7 @@
+ #include <linux/mm.h>
+ #include <linux/mutex.h>
+ #include <linux/of_irq.h>
++#include <linux/platform_device.h>
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
+ #include <linux/smp.h>
+@@ -46,6 +47,7 @@
+ 
+ #define FFA_DRIVER_VERSION	FFA_VERSION_1_2
+ #define FFA_MIN_VERSION		FFA_VERSION_1_0
++#define FFA_PLATFORM_NAME	"arm-ffa"
+ 
+ #define SENDER_ID_MASK		GENMASK(31, 16)
+ #define RECEIVER_ID_MASK	GENMASK(15, 0)
+@@ -114,6 +116,7 @@ struct ffa_drv_info {
+ };
+ 
+ static struct ffa_drv_info *drv_info;
++static struct platform_device *ffa_pdev;
+ 
+ /*
+  * The driver must be able to support all the versions from the earliest
+@@ -2029,12 +2032,15 @@ static void ffa_notifications_setup(void)
+ 	ffa_notifications_cleanup();
+ }
+ 
+-static int __init ffa_init(void)
++static int ffa_probe(struct platform_device *pdev)
+ {
+ 	int ret;
+ 	u32 buf_sz;
+ 	size_t rxtx_bufsz = SZ_4K;
+ 
++	if (is_protected_kvm_enabled() && !is_pkvm_initialized())
++		return -EPROBE_DEFER;
++
+ 	ret = ffa_transport_init(&invoke_ffa_fn);
+ 	if (ret)
+ 		return ret;
+@@ -2042,6 +2048,7 @@ static int __init ffa_init(void)
+ 	drv_info = kzalloc_obj(*drv_info);
+ 	if (!drv_info)
+ 		return -ENOMEM;
++	platform_set_drvdata(pdev, drv_info);
+ 
+ 	ret = ffa_version_check(&drv_info->version);
+ 	if (ret)
+@@ -2103,19 +2110,55 @@ static int __init ffa_init(void)
+ 		free_pages_exact(drv_info->tx_buffer, rxtx_bufsz);
+ 	free_pages_exact(drv_info->rx_buffer, rxtx_bufsz);
+ free_drv_info:
++	platform_set_drvdata(pdev, NULL);
+ 	kfree(drv_info);
++	drv_info = NULL;
+ 	return ret;
+ }
+-rootfs_initcall(ffa_init);
+ 
+-static void __exit ffa_exit(void)
++static void ffa_remove(struct platform_device *pdev)
+ {
++	struct ffa_drv_info *info = platform_get_drvdata(pdev);
++
+ 	ffa_notifications_cleanup();
+ 	ffa_partitions_cleanup();
+ 	ffa_rxtx_unmap();
+-	free_pages_exact(drv_info->tx_buffer, drv_info->rxtx_bufsz);
+-	free_pages_exact(drv_info->rx_buffer, drv_info->rxtx_bufsz);
+-	kfree(drv_info);
++	free_pages_exact(info->tx_buffer, info->rxtx_bufsz);
++	free_pages_exact(info->rx_buffer, info->rxtx_bufsz);
++	kfree(info);
++	platform_set_drvdata(pdev, NULL);
++	drv_info = NULL;
++}
++
++static struct platform_driver ffa_driver = {
++	.remove = ffa_remove,
++	.driver = {
++		.name = FFA_PLATFORM_NAME,
++	},
++};
++
++static int __init ffa_init(void)
++{
++	int ret;
++
++	ffa_pdev = platform_device_register_simple(FFA_PLATFORM_NAME,
++						   PLATFORM_DEVID_NONE,
++						   NULL, 0);
++	if (IS_ERR(ffa_pdev))
++		return PTR_ERR(ffa_pdev);
++
++	ret = platform_driver_probe(&ffa_driver, ffa_probe);
++	if (ret)
++		platform_device_unregister(ffa_pdev);
++
++	return ret;
++}
++module_init(ffa_init);
++
++static void __exit ffa_exit(void)
++{
++	platform_device_unregister(ffa_pdev);
++	platform_driver_unregister(&ffa_driver);
+ }
+ module_exit(ffa_exit);
+ 
+diff --git a/drivers/firmware/arm_ffa/smccc.c b/drivers/firmware/arm_ffa/smccc.c
+index 4d85bfff0a4e..e6125dd9f58f 100644
+--- a/drivers/firmware/arm_ffa/smccc.c
++++ b/drivers/firmware/arm_ffa/smccc.c
+@@ -17,7 +17,7 @@ static void __arm_ffa_fn_hvc(ffa_value_t args, ffa_value_t *res)
+ 	arm_smccc_1_2_hvc(&args, res);
+ }
+ 
+-int __init ffa_transport_init(ffa_fn **invoke_ffa_fn)
++int ffa_transport_init(ffa_fn **invoke_ffa_fn)
+ {
+ 	enum arm_smccc_conduit conduit;
+ 
+-- 
+2.43.0
+
