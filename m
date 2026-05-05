@@ -1,163 +1,155 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050ED1F5847
-	for <kvmarm@lists.linux.dev>; Tue,  5 May 2026 20:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B8C48A2B1
+	for <kvmarm@lists.linux.dev>; Tue,  5 May 2026 21:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778012082; cv=none; b=tv8za/fnacxNE389IG28F2I0d4cDZZ/NDDa4UC3SAuueuzZ2ecG/Iv5+6HARZ5or/WDdo0rIoeYBtrohx/YBmq9zLwRc39pTECV1UGfxFMsXFBNQeQmNgbiMmZXK3NCpWbSI5kDnnDQeahaVaQVAcZ/h8INYK5Xs02yaeLnOjOo=
+	t=1778015105; cv=none; b=j6uESINjfY0N+e90EPoDj/OlhzrMRARGq/TEXFzXK5G6Kczq/nvQPrO1StxwHH/WCzIPaBb02TuJcYs2GwKWFEK2spJuVMgkILwM4JQquWw0PqM6+oUZw6OqofXCad4+Gp/WL5ioNeVh5+WwSHPr1JW4sp8MAmwGUVI9fwPsyOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778012082; c=relaxed/simple;
-	bh=fZNJP1E6FO2fjwXHd8ye8evSEUx0JyrqYT2u92kU9L8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OVHAEtgoPe/KLSjFZh763+KbxjwqHSJlhXmsNgaXW8onicNt0Vc5gRYV1RFFIuB051CKmRK8Z06vQwR3dNmQTfwlY4sGMc0NIZ4hiQVTKWex/h/ffA13Pz+R7PxhZKr3JNVYkVjSVBx+0y14oEcv769GeNobX0Sb8wiSw/5RFTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LmlGucw3; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1778015105; c=relaxed/simple;
+	bh=K6Uw5PEm/3EwFirnqIR9nGAX6pBzs0Fd+iGhIH+Nu7A=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=WC5UmUn3VjGXhg82UN1GXENggw9bq+kCAHOAKTEjSYoKZTf3ZPTRM8DBCSUEGHCQFQZLhQeyliXHKvISvOsZoC4lHFOmzuYjO5NQdhftIR1bSQeJgzywNQQ5w6k5FUQCFrmWWtjLdc95pJTOIImj5vnU3+ZLk2HoFPseCbXFW8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HCj5CcPK; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LmlGucw3"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ba6fe41283so4863305ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 05 May 2026 13:14:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778012080; x=1778616880; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FOAwuyt3rtVWRkmVcOSIKCDRqR2NsdJAT4GPMkewjlg=;
-        b=LmlGucw3rnod/jr9EndHoTivH/A+e4rgEpdx7SMicJOEaxPHQeEQZul8CZmY64nbzY
-         PMH2UJGIJ35L1FNk6Ix5wFy9DkGwAd2PQCVXDrF3CSoOd7STiMD+d2l1pTypAvjiZr1+
-         udCvX4uQaz9adwqKis+NRAG70TJ8+MREUm0x1ySGDlohGKS5VeWMjjIzIPduMMiBYPgM
-         EDuIaGB1W9K9C5UA3M2GX41NR22lw48TqZQT/X9skZ/mcXvig1SaVM/O7Ti4MoLj0bLz
-         Db4GZEZ7HjJMdCLK78NdzxhzrkrADhApKdUMJ7pGG385uj5yql9LTRlrWo1VBLHpl7VX
-         cmrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778012080; x=1778616880;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FOAwuyt3rtVWRkmVcOSIKCDRqR2NsdJAT4GPMkewjlg=;
-        b=h1nafHgfiMArhGQQQPUZqb7oQjI8eWK53xsTRA5FLSzcLTPrRt73as0m1Xd/iwf0VJ
-         Z5YvrNEZo0TVGVgE3RxakO5hulKmxcYK5BiZafqGDOztvWLWXQkcdv1wC1okSPbFmyyi
-         yD1SmMkjAz3X0e5xY2FvAs0kvBs9DQIcVeyhHZRELZQ8Ez/vahJXe8E9wcyqa5axJ4UK
-         nA0s/xMa9yTZKwPczlWCpjtDoUfH6j6Zj1htDZBd0AmUy/BO5LmkggYQluBv+efbQ97C
-         1MNimq2hxTsYnLrz/NOtEX9FDSiufMJ0Y/1bGOTbSrdffEBngLq5u2ssHYn+rCehNdGu
-         XdFA==
-X-Forwarded-Encrypted: i=1; AFNElJ/g5WoH2WD4JFlag+IQweVhudialQ2aq/Ru7mGICtNQoOjHLFl44k6ka+IngXLIkBy71Wsy/wU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwhK/DLRH1kWWRXdfB98RrrKoP3G2XkCzedvl9pDVJc5xGZpPPI
-	mBomvL0/123aMxbOZlpYe3gb8m1bIcJBlfjfkqgovbfWHclawVntJED/3rrIlC9KcHOfxhkWqRR
-	zXMFSkQ==
-X-Received: from pgmt3.prod.google.com ([2002:a63:2243:0:b0:c73:fc44:8bb5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7d9c:b0:39f:27ab:2454
- with SMTP id adf61e73a8af0-3aa5ab17b2bmr365628637.49.1778012080089; Tue, 05
- May 2026 13:14:40 -0700 (PDT)
-Date: Tue, 5 May 2026 13:14:39 -0700
-In-Reply-To: <afo0Er7R4MnMP0MB@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HCj5CcPK"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 645D7QTH2292989;
+	Tue, 5 May 2026 21:04:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=AUDjBR
+	Uu42d69Q7ZuzQ4M1Lgt5adZxichyo28UabSBU=; b=HCj5CcPKYikI4EXqLFSR32
+	RsCeyKYK4Ae9s5074Q4n81zDCeSOvl0+ryfg3AyxCOZmqOYSg6BuqB/BViaaKme3
+	0juCObvzEaB0TW4ONzAU80XdlZkHveFtr8AhuUgeTz0v4vyIdNOy8oGoctm47+oa
+	GaABYxL0I4pw+psOOyR1X6se4AXzElJrVaFkb1zYViaBaPUPgWuC+y3Yh6kTsz4B
+	Ln7f0ThwNK2eYTCNs7TMvuuTVWcIGI/ixNHA9/rLDlsbf7qkZPENB6DJSW4efcZh
+	uHr1Dx5WcmurhQdBMVUcxNMqYfeijAqqqv2AXZvBTi04nHPQyB1biICcpaJ90OLg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dw9v7dt8t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 May 2026 21:04:34 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 645KsWcn012426;
+	Tue, 5 May 2026 21:04:33 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dwwtgb9nk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 May 2026 21:04:33 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 645L4WDq26804876
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 5 May 2026 21:04:33 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 936445805C;
+	Tue,  5 May 2026 21:04:32 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 517DC58059;
+	Tue,  5 May 2026 21:04:30 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.111.233])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  5 May 2026 21:04:30 +0000 (GMT)
+Message-ID: <a9412fe10e70ce95dd70556ace19368bec5c188c.camel@linux.ibm.com>
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell
+ <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com
+In-Reply-To: <CAHC9VhQY2TMkTvQq9P8oZteQWQSr7qq2utOuH+pdVx+8jWLBCw@mail.gmail.com>
+References: <cover.1777036497.git.noodles@meta.com>
+	 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+	 <afMlgstqahnZg68h@e129823.arm.com>
+	 <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
+	 <CAHC9VhRsnmPp2KmQAns5uq5qXX5EF2xQQzyfTgrPi4O9AXyPpg@mail.gmail.com>
+	 <ba4bf28314b679474a6a8da6298e548e54b3754c.camel@linux.ibm.com>
+	 <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
+	 <ff28c6dcb60c357c752724927addaa8c4fd3bf2c.camel@linux.ibm.com>
+	 <CAHC9VhQY2TMkTvQq9P8oZteQWQSr7qq2utOuH+pdVx+8jWLBCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 May 2026 17:02:29 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260504224213.1049426-2-jthoughton@google.com>
- <20260504231048.1184273-1-jthoughton@google.com> <afohshVlK9YcBk-f@google.com>
- <CADrL8HX223b3YS8aHr7b=AZZ2J5ga+-SwLQX9Rs9Ep=rMM5wUA@mail.gmail.com> <afo0Er7R4MnMP0MB@google.com>
-Message-ID: <afpPr-a00an1v6mZ@google.com>
-Subject: Re: [PATCH 1/5] KVM: arm64: Grab KVM MMU write lock in kvm_arch_flush_shadow_all()
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: chenhuacai@kernel.org, gshan@redhat.com, jhogan@kernel.org, 
-	joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mips@vger.kernel.org, loongarch@lists.linux.dev, maobibo@loongson.cn, 
-	maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com, ricarkol@google.com, 
-	shahuang@redhat.com, stable@vger.kernel.org, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, zhaotianrui@loongson.cn
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA1MDIwMCBTYWx0ZWRfX/jmQTDjhSyUW
+ a6LYs6KgFw5yBnttZF55PGvDUHOVHG0/qGgWeitdnf84Bwm5tP1/EukNeStDDhrU+vnaff58Sdg
+ uLUHji8keO2Ye8bXIe6XY9J9yz4z9nJ+hazK/O+EwWgR8+pyrPF+I72Dti2jfJFpss/FpSStdte
+ f92YyKboWP4q9VNWxwkr3ntwRwWqd9nxbYkvejFSFh5Tgc/11KKCKB88XC/+F39BF2eZjXnieYs
+ KNqPjJGNi8UBHeLye2eMh+xYQE32ZKBN0M6Y9X64ZcUcx1gLw8xPhTyfHsT7Zp0ShWeA3U/hdWn
+ EB3j4DP82TCFb9t4txo5UFHx72aW74zAELoOjarM+8P/g5XrrVksOQcqHDLWKdH5OVWOViGlKPM
+ a8GSWAN+I/sxj8krZgpCp6eX0E8tT3phzuOaNjnz3QbpJjR67DdlQlT8c8IqmVlY0npaVypitKC
+ S1pb1mckg7MlFnKjKLw==
+X-Proofpoint-GUID: doRHrXqCZk_91sNo7rZqapY8EXxNdxoN
+X-Proofpoint-ORIG-GUID: uNiSJ9wA4y033nK2ypxCDn3HwXZEBPdK
+X-Authority-Analysis: v=2.4 cv=eu/vCIpX c=1 sm=1 tr=0 ts=69fa5b62 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=w4bfxRt4CrPX03RNmT0A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-05_02,2026-04-30_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 phishscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
+ suspectscore=0 malwarescore=0 bulkscore=0 impostorscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605050200
 
-On Tue, May 05, 2026, Sean Christopherson wrote:
-> On Tue, May 05, 2026, James Houghton wrote:
-> > On Tue, May 5, 2026 at 10:05=E2=80=AFAM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > > There are more issues.  kvm->arch.mmu.split_page_cache can be freed b=
-y
-> > > kvm_arch_commit_memory_region(), which holds slots_lock and slots_arc=
-h_lock,
-> > > but not mmu_lock.
+On Mon, 2026-05-04 at 16:51 -0400, Paul Moore wrote:
+> On Mon, May 4, 2026 at 8:03=E2=80=AFAM Mimi Zohar <zohar@linux.ibm.com> w=
+rote:
+> > On Sun, 2026-05-03 at 12:46 -0400, Paul Moore wrote:
+> > > Regardless, assuming you always want IMA to leverage a TPMs when they
+> > > exist, your reply suggests that using an initcall based IMA init
+> > > scheme, even a late-sync initcall, may not be sufficient because
+> > > deferred TPM initialization could happen later, yes?
 > >=20
-> > Thanks. I also noticed that kvm->arch.mmu.split_page_cache is
-> > documented as being protected by kvm->slots_lock; we should be holding
-> > it here. But we cannot take it here because we are already holding the
-> > KVM srcu lock.
-> >=20
-> > > IMO, the handling of kvm->arch.mmu.split_page_cache should be reworke=
-d.  I don't
-> > > entirely get the motivation for aggressively freeing the cache.  The =
-cache will
-> > > only be filled if KVM actually does eager page splitting, so it's not=
- like KVM is
-> > > burning pages for setups that will never use the cache.
-> > >
-> > > Maybe I'm underestimating how many pages arm64 needs in the worst cas=
-e scenario?
-> > > (I can't follow the math, too many macros).  But if KVM is configurin=
-g the cache
-> > > with a capacity that's _so_ high that the "wasted" memory is problema=
-tic, then we
-> > > probably should we revisit the capacity and algorithm.  E.g. if KVM i=
-s splitting
-> > > from 1GiB =3D> 4KiB in a single pass (I can't tell if KVM does this o=
-n arm64), then
-> > > we could break that into a 1GiB =3D> 2MiB =3D> 4KiB sequence.
-> >=20
-> > I'm not sure I've fully understood the point you're making, but I
-> > *think* we can just drop the
-> >     kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
-> > line from kvm_uninit_stage2_mmu(). It will get freed when the VM is
-> > destroyed anyway.
+> > Well yeah.  The TPM could be configured as a module, but that scenario =
+is not of
+> > interest.  That's way too late.  The case being addressed in this patch=
+ set is
+> > when the TPM driver tries to initialize at device_initcall, returns
+> > EPROBE_DEFER, and is retried at deferred_probe_initcall (late_initcall)=
+.  Since
+> > ordering within an initcall is not supported, this patch attempts to in=
+itialize
+> > IMA at late_initcall and similarly retries, in this case, at late_initc=
+all_sync.
 >=20
-> It's not that simple.  KVM arm64 allows userspace to reconfigure the capa=
-city of
-> the cache via KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.  kvm_vm_ioctl_enable_ca=
-p()
-> currently allows userspace to do that so long as there are no memslots.
-> __kvm_mmu_topup_memory_cache() will (rightly) yell and fail if it's calle=
-d with
-> the "wrong" capacity, so we'd need to sort that out.
->=20
-> The other issue is that it's not clear to me what happens for large "chun=
-k" sizes.
-> If KVM is splitting from 1GiB (or whatever huge-hugepage sizes are suppor=
-ted on
-> arm64) all the way to 4KiB, e.g. to optimize against break-before-make, t=
-hen the
-> capacity of the cache could be significant, e.g. MiB of memory or worse. =
- My read
-> of things is that purging the cache when dirty logging is disabled is a g=
-uard
-> against consuming too much memory when the chunk size is large.
+> Okay, so from a TPM initialization perspective you are satisfied with
+> a late-sync IMA initialization, yes?
 
-If we go down the "let's simplify things" path, one way to simplify the han=
-dling
-of KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE would be to disallow changing the chu=
-nk size
-once the cache has been used.  That would allow deferring teardown of the c=
-ache
-until VM destruction.
+No. On some architectures moving IMA initialization from the late_initcall =
+to
+late_initcall_sync does not miss any measurement records. However, as previ=
+ously
+mentioned, Linux running in a PowerVM LPAR the move would drop ~30 measurem=
+ent
+records[1].  So no, only if the TPM is not initialized by late_initcall, sh=
+ould
+IMA retry at late_initcall_sync.
 
-diff --git arch/arm64/kvm/arm.c arch/arm64/kvm/arm.c
-index 176cbe8baad3..671f7ac5e31d 100644
---- arch/arm64/kvm/arm.c
-+++ arch/arm64/kvm/arm.c
-@@ -165,7 +165,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-                 * To keep things simple, allow changing the chunk
-                 * size only when no memory slots have been created.
-                 */
--               if (kvm_are_all_memslots_empty(kvm)) {
-+               if (kvm_are_all_memslots_empty(kvm) &&
-+                   !kvm->arch.mmu.split_page_cache.capacity) {
-                        u64 new_cap =3D cap->args[0];
-=20
-                        if (!new_cap || kvm_is_block_size_supported(new_cap=
-)) {
+Mimi
 
+[1]
+https://lore.kernel.org/linux-integrity/201b9172ac47c6766443c1f2343cab3548f=
+33c29.camel@linux.ibm.com/
