@@ -1,111 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F82175A87
-	for <kvmarm@lists.linux.dev>; Tue,  5 May 2026 15:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D2348B36F
+	for <kvmarm@lists.linux.dev>; Tue,  5 May 2026 16:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777993620; cv=none; b=jg9eJupvNd2xNYORMSzbavfYw9+9oDgwi403fsAG6omAEr9l5hLRUXyL/HWmm6MFKyibfwInyp9QOtR+hnBLL2CSFDr3SMsrlU2wN+C4u9B0a+PeKiL+3SnY71h0dQvCke53oJqXBMAjRrLe6s8rtMExzw8u9II0Zx/cttgfW5k=
+	t=1777997837; cv=none; b=tziEVP/qMk8czQn/8yDcm/MnkleAlQ9iCcIftlO6+AGAcRrRskR7sQh2kGvADha0tx8OmNt9mkiGQVJtn7n5fEqSTabqdyky5w+XPe30ofv6Wi4ZTjuvTm2gLXZsmE5F+VIHFXAO5/SWOITtjjcpy5/F3vSQ2SZO1hinE0YsN4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777993620; c=relaxed/simple;
-	bh=BeYuC+U+TvY87kCGVgh7iHS9dj+g7bI/fKs9BPIiGBk=;
+	s=arc-20240116; t=1777997837; c=relaxed/simple;
+	bh=RNrRjG8F7y7vIp8q5Xm5bg/bZGzosl29uygoNMwlHPY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mUOi7i0KwTDqCqCaZ5RW7jMN1v5HmoZ+s5XX/rxGIlPgPetfEimW4ObjXoaJkOEwl0WHtOjeItAQLQILN/ENy259OYt4fY5Aw6HDxWeXMz46cuP/m2s7xiwjqtW3mdVfledIZ9s1cRMVg3N3wB4+tWcKIOSfLJDYUNPhrtMB8CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=f+iBoUGk; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=I5GV8jeEzIwKLg7MyfcHL1CtsMdt5CJT4L/xqpkSRIFY9kUo+Zr21zrGT7wL/qd6Zze6hgQ3J/o+T27uJToWkIvVcWF6853Q/ojEor05F4k7mWZTjLNmpRX2+ZUXgpO4LtXIKVeISb1Pfr+5XnqyI/sC9+c/zUTaG1mVtUoOiCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=bdBujji7; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="f+iBoUGk"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C9BB165C;
-	Tue,  5 May 2026 08:06:52 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E02F83F836;
-	Tue,  5 May 2026 08:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1777993617; bh=BeYuC+U+TvY87kCGVgh7iHS9dj+g7bI/fKs9BPIiGBk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f+iBoUGk8BmoZc0I83YuzJUwdRjjsapp0YmhbwVraS05rC5e8/lAxTo6QaBJzO/uz
-	 XxwMCmGis1kvV3x3mcD/LXf1oAs+ephfkejwE3zO0tuJLrO6BlpAgIdVC8KOKKS1z0
-	 5hKCdG2Glgkt/8ZNFa4lo3kv0SNaawo/o2/95uAI=
-Date: Tue, 5 May 2026 16:06:51 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Sudeep Holla <sudeep.holla@kernel.org>
-Cc: linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	jarkko@kernel.org, zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [RFC PATCH 2/3] firmware: arm_ffa: initialise ff-a after
- finalising pKVM initialisation
-Message-ID: <afoHizU8NgFWzvYW@e129823.arm.com>
-References: <20260505095409.1948371-1-yeoreum.yun@arm.com>
- <20260505095409.1948371-3-yeoreum.yun@arm.com>
- <20260505-super-gecko-of-argument-655030@sudeepholla>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="bdBujji7"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488b0e1b870so86138185e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 May 2026 09:17:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1777997832; x=1778602632; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RNrRjG8F7y7vIp8q5Xm5bg/bZGzosl29uygoNMwlHPY=;
+        b=bdBujji7MgLiTwOlBRKnU49SpFjMW41TKaQBTe86cZY+0uinViGp2rEaBhLs7VYx7i
+         jKCITy7yfreFbfgs3UhKRt2pMnPbZMpTrYtXzMIg3RuNaVYjCnYauYYB7oaHewfpuIm2
+         8aej4Rjg0zrV9vneDANTBs8RNlWQWVzulgr9JzGP/C1wz0tHx3Y+Z0e04SE7OMh6CeTD
+         DZWfqZaqJp9oR+HBA31LuoBYyWI9ogWRK0todMiJ7+agJ5Bs321+KhDneszuG1OSg0xc
+         RkyRhp9VyD4LKQuWk1ReAhUNPMQcei8RD0P1xRSz2s7TU1Lk8ptuxvKysGVJLzshIJKU
+         mjWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777997832; x=1778602632;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RNrRjG8F7y7vIp8q5Xm5bg/bZGzosl29uygoNMwlHPY=;
+        b=l38FSxwRycZJRAGt3NqZrxt9sXwZbNixe0+q2ZhiRCCZiOW31xwCnZt7A9bdG/X9jS
+         vXe+H6bJZ8LyiJl2NFZ/PSrw0WZDGjZd43cw2PSIOMCaDjezH7qOuH8kLaRb23rFnuyT
+         1eiXwR55HSurE6mYKbNvNtex70DXCv+zckUTWPr9Cu6qeDo1FXHV0P9iuBr5L+r3yl1z
+         +hA5ePuKD4f25yACo220YzqjXYYXareshMMbFgUy6tC6g+/ZgU+/g2Gt/Jnf9Vq2vZ5S
+         KhcXeHmY9giOGbfrpLLxE0PBM8jfhj58qjFW/EnqR/v34x2FfS+jw6fQSXfTrKVazz/E
+         R2Tw==
+X-Forwarded-Encrypted: i=1; AFNElJ/cmWc9yGzBtOO3/GW0vZgcN2xMZ+RNGW7LjU69/eVxhyAIOSAKnvJ3wDXAakWt2WNUl3+MW8A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxCbG0BxvgWDhm5vmG45UxNukwFDc5Dawzgp9aLLLAVNl2HJ7HA
+	MzSpUMn1JBsqnWttXQTTdBH06DEp+I8tsEpIeTpUSUFRbkV67kxngR1Lw6deTffNY94=
+X-Gm-Gg: AeBDiesgiHBjnSpeTjxzoVBaqDC4H+GvYEQt0p27IIRGslJZaad4uK7HEYNf7y210Q0
+	MQA5A/aR9QsrXU+6GxqJ86Qn+Y2iC/3FHLaWmOfpZec31T49qtgJ2G5nDcEzCa2JughQBpCf8xo
+	tzUmR050/5MykbnaLC42roMNdacwVMcyDroHSHdlEHRtqlZUdktt9jffRGrE3fkTSsNIGrvTdFP
+	vCFUIji/t4Muut9pw/DEfuaA0PbEJLiU+AQQZd/XbIpr973lsjYx+JjV3fqOMXCYEZtErulAf7I
+	RnMpW7HUVM+KUITQhApG2faVMdAlBWQACRaZepZinUYjq9xwofsCRIHW5ckMxzvo6qU8jQgaR3a
+	FYSsbIjzUJe705qPsUNfHWA9/UOsxwEr54AWLhG8QUrZbCfN7J/ib68tmVBmwEv2Rw5Z7xtT+hm
+	FvPJMyTVg=
+X-Received: by 2002:a05:600c:64c5:b0:48a:5574:3a48 with SMTP id 5b1f17b1804b1-48e51c6ade9mr1520075e9.16.1777997831520;
+        Tue, 05 May 2026 09:17:11 -0700 (PDT)
+Received: from ziepe.ca ([213.147.98.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82307f28sm692460135e9.13.2026.05.05.09.17.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 09:17:10 -0700 (PDT)
+Received: from jgg by jggl with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wKISL-000AN3-Vc;
+	Tue, 05 May 2026 13:17:09 -0300
+Date: Tue, 5 May 2026 13:17:09 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 04/25] iommu/arm-smmu-v3: Move TLB range invalidation
+ into common code
+Message-ID: <afoYBYIJOTClsdLS@ziepe.ca>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-5-smostafa@google.com>
+ <20260501124143.GB6912@ziepe.ca>
+ <afiN1UwS9q6F6A_v@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260505-super-gecko-of-argument-655030@sudeepholla>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afiN1UwS9q6F6A_v@google.com>
 
-Hi Sudeep,
+On Mon, May 04, 2026 at 12:15:17PM +0000, Mostafa Saleh wrote:
 
-> On Tue, May 05, 2026 at 10:54:08AM +0100, Yeoreum Yun wrote:
-> > When pKVM is enabled, the FF-A driver must be initialised after pKVM.
-> > Otherwise, pKVM cannot negotiate the FF-A version or obtain the RX/TX
-> > buffer information, leading to failures in FF-A calls.
-> > 
-> > Currently, pKVM initialisation completes at device_initcall_sync,
-> > while ffa_init() runs at the device_initcall level.
-> > 
-> > So far, linker deployes kvm_arm_init() before ffa_init(), and SMCs can
-> > still be trapped even before finalise_pkvm() is invoked.
-> > As a result, this issue has not been observed.
-> > 
-> > However, relying on above stuff is fragile.
-> > Therefore, when pKVM is enabled, the FF-A infrastructure should be
-> > initialised only after pKVM initialisation has been fully finalised.
-> > 
-> > To achieve this, introduce an ffa_root_dev ("arm-ffa") and
-> > a corresponding driver to defer initialisation of the FF-A infrastructure
-> > until pKVM initialisation is complete, and to defer probing of all FF-A devices until then
-> > when pKVM is enabled.
-> > 
-> 
-> I don't like this whole ffa root device design.
-> Two question for now:
-> 1. Can FF-A be a module on systems with pKVM which removes the need for all
->    this dance done here ?
+> I am not sure if it’s worth it, the hypervisor is much simpler, there
+> is a single page table, it’s locked (also identity mapped), it’s
+> updated on VM boot/teardown only, we don’t even use iotlb_gather at
+> the moment, although possible but I wanted to keep this series as
+> simple as I can then we can add more features later.
+> So this patch is the least intrusive change, as whatever the main SMMUv3
+> driver does, the range tlb invalidation logic is the same.
+> But I am happy to experiment with that when posted.
 
-But this means we reduce the other feature e.x) IMA with TPM over
-FF-A and pKVM feature. Since IMA must be a built-in, we couldn't avoid
-to build FF-A driver with built-in.
+Okay, then maybe just always push a full invalidation?
 
-> 2. If it is a requirement to have this built-in, I prefer to add a probe
->    and defer it instead of this root ffa device.
+I didn't like seeing the range invalidation lifted out, especially how
+ugly that will turn into after my next series. So, don't use range or
+use the proper full gather flow seem like the right two options.
 
-But, How? anyway all of FF-A device & driver couldn't be probed unless
-FF-A initialisation is finished and How can we trigger FF-A initailise
-after pKVM finish its initialisation?
+I'm not so interested in minimal change, but maximum forward
+maintainability. It is much easier to manage if you double compile
+more of the driver exactly the same, and call functions in a fairly
+normal way vs make special cases and special functions..
 
-The problem is ff-a intiailisation happens before pKVM finish its
-initailasation and to do defer probe, it should use dd-model and
-As we discussed in other thread, notifier couldn't be a soluation.
-
-Could you let me share other way I'm missing?
-
-Thanks!
-
-> -- 
-> Regards,
-> Sudeep
-
--- 
-Sincerely,
-Yeoreum Yun
+Jason
