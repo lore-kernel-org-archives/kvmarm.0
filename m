@@ -1,142 +1,221 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE5026ED3D
-	for <kvmarm@lists.linux.dev>; Wed,  6 May 2026 02:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7B32010EE;
+	Wed,  6 May 2026 02:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778033509; cv=none; b=uZqMoG6W/zWKzDu3RrOK5QJlIAjuv8uJb/5Em2NWLgYsshfL2g1H5UOjtw7fFloqEi5CbIzKKoxq4JS7Y3IVa1Ln5OpT9XULof6MEgBptTp5ZebaCRRWpgYQdklNd8TtqgaGAgFKegLxZ/fI6ZY8mlLXWPUsNwGNZGSK1DyjuXo=
+	t=1778034646; cv=none; b=YjRDKIKWlCiyhx614OqXcWGWgaaufIuQKoN8J4U4KtgiyEk6S2INhxFMZBYz6Jp3jU0pw3o6t8GwMQNdhrGKKNp8ryledX93DnSgMKbWsRpqWCfGO3C+1/igHT+9mdGbZOYxIfIP97P3QLgQRQ3GNpM+5ZpDOctSpSdGdg46H80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778033509; c=relaxed/simple;
-	bh=jr0C3ws9gN/dCpRosmQxsI5jdCjT1h5T1Ng7TbjVcBY=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=ZaAAzTl9/aHZvQ0yiHLQxhySAZvt4KRvxXi4bBDeaqzqcAqKKkb5ygw7H5XYO6mDeElZVYl2BdrOimez/mDCoQKUXErS2V+i3c/3Yu2DAkGLtR3KVBg1jeVHtg7y0EfWSsqtbm9IxVXiqAnoS/4icX+m/1QiIA+s6ahv6RyRDkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=FYyneWe6; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="FYyneWe6"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8c70b5594f4so56466485a.1
-        for <kvmarm@lists.linux.dev>; Tue, 05 May 2026 19:11:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1778033506; x=1778638306; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yrGezS/XNq9+psZQ70L22Z8q+JOJb1NZlusetExcJPM=;
-        b=FYyneWe6EzYtXESTChYBmy/Ix45r5n9u8wknQVF1avJ8X3eonx3bFcCXlbEzdMMNFW
-         HZWAgDbJa/p/o4r3PUCo2kbRk4h6sTLnHmKNE8P+M3l9QTw9/2ye6X/crzartbhipMeV
-         b9oag/QP4FSxNuFMKyhIlJos1eHGcmyi4GvYxpNuaL5tp+OMT14hLvyCbVx4L/VIJJyy
-         RFPXjre71z7IzVllAfOurHMfZ/D6h0OBUDWAKliuQqKR9+cwkjXQ9BYFTCMPGSuN8gUL
-         1OOJsdV96wysWOAlpV2dsyyDbS8W4b0z3VDMeA62BUSsCe45f3Rmyjsu7fjSmQNHo+Cs
-         I5nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778033506; x=1778638306;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yrGezS/XNq9+psZQ70L22Z8q+JOJb1NZlusetExcJPM=;
-        b=MktQHp/kG47do3iGX3jLSQuys/MIJo0Z8f7lgzpQDf1xgsTYAXRdDx/4pyARrHpqIA
-         wr5M68QmYkvcfZU1QoNac1nhCMoLeQ7yKypMyPbj/reZET8kdg3DHcZoQNl1/Dq8lGlj
-         TfLX64XfBmitH5O7cuIS3mmClJGXWOMliA1Y9jKZTJH2UFGndO9dXigTw/Tad4E0xeK4
-         EnAtuwzC0+bQ/eZZS14HCsZLegg50WBzahJljQUIBVjf9BLcrbfGhH2MX49dAD2l+q75
-         FEF+ajKoWXwf/fr7IVWnQH1xSogR0qJQn95sScepI5YehMQPCzAFOco2689c6X/Dtclb
-         S6NA==
-X-Forwarded-Encrypted: i=1; AFNElJ95/tm4JfvPg43qVT5wwhviGNlDd9txhETo2BPiOpBqXHkaGt+P6VnlhfXLoENZlfs12KB7eQM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw4lor23NDNEEQAC2lr58uRo5H1XGihDVMvewRtKYQySQLv1Gpm
-	IYd05m5N6Lf+HY5rgQwoRHXMpkcATUi00H2D1r0S+Ez+Xe2QQdmkzt/zwjqdlwMKmA==
-X-Gm-Gg: AeBDiesRD6gS1rlBPLKvike4K7uG3o+PEwRQ96ii3qvZ4/GMcUs7Zt+BJgO8xpqJ3dK
-	MAIAt8EJsGV4koB3Gx7s6MDjbKFuRzxjwoWpJHa4bJS8Fep0TBqLEtscW9CobHdRqn6UWCN5KQX
-	fC/L8wCYIdJD4EUy+SeZ/hm9BszJIOzqNQWCNIi8Razf/QRv6l2B127oTxW0UCfPt4Mim8tJY3t
-	5gOMfwIgfe5H3DggWGnjeSpETUwZ4z+yxWUmstWcBc5emzqz+4WRUVCR6G6CT97nZOMhZN7Mq7x
-	Hed+6HomXgtF6xh8o0R3F8clu7BiBJK6fZmPE2mFRC8xoImwS/qF7n5Va06lT8vgUx5PaUvRWqF
-	025nNnT85KCQFqTdDiitqNF8VrmBFe09NtbZDyhq0/TimI6Z84JNw7MrYHNlIjNy0Twk63EuP+W
-	eugUFjShZrrIdKS2UZAuS3jBo4KMUU/x38NdGk8BzJlrqvdwp5ElCGtkFA4jcgsbaDkeoXLzXe+
-	jzYrWOoF2EA9sUiQDEI6A==
-X-Received: by 2002:a05:620a:318e:b0:8ee:fc5e:e2e9 with SMTP id af79cd13be357-902e298aa9cmr923174085a.13.1778033506563;
-        Tue, 05 May 2026 19:11:46 -0700 (PDT)
-Received: from [192.168.7.16] (pool-71-126-255-178.bstnma.fios.verizon.net. [71.126.255.178])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c91e11fsm1471690385a.40.2026.05.05.19.11.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2026 19:11:45 -0700 (PDT)
-From: Paul Moore <paul@paul-moore.com>
-To: Mimi Zohar <zohar@linux.ibm.com>
-CC: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell <noodles@earth.li>, <linux-security-module@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <linux-integrity@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, <jmorris@namei.org>, <serge@hallyn.com>, <roberto.sassu@huawei.com>, <dmitry.kasatkin@gmail.com>, <eric.snowberg@oracle.com>, <jarkko@kernel.org>, <jgg@ziepe.ca>, <sudeep.holla@kernel.org>, <maz@kernel.org>, <oupton@kernel.org>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>, <noodles@meta.com>, <sebastianene@google.com>
-Date: Tue, 05 May 2026 22:11:42 -0400
-Message-ID: <19dfb0e2730.2843.85c95baa4474aabc7814e68940a78392@paul-moore.com>
-In-Reply-To: <5debff82dc758d9c91223e4f1f5b9e39a3fcd4f5.camel@linux.ibm.com>
-References: <cover.1777036497.git.noodles@meta.com>
- <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
- <afMlgstqahnZg68h@e129823.arm.com>
- <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
- <CAHC9VhRsnmPp2KmQAns5uq5qXX5EF2xQQzyfTgrPi4O9AXyPpg@mail.gmail.com>
- <ba4bf28314b679474a6a8da6298e548e54b3754c.camel@linux.ibm.com>
- <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
- <ff28c6dcb60c357c752724927addaa8c4fd3bf2c.camel@linux.ibm.com>
- <CAHC9VhQY2TMkTvQq9P8oZteQWQSr7qq2utOuH+pdVx+8jWLBCw@mail.gmail.com>
- <a9412fe10e70ce95dd70556ace19368bec5c188c.camel@linux.ibm.com>
- <CAHC9VhRUgNA=Sj=jhD=zOt8R80Q+FQj+H0nYSy-FAujTL3EKPA@mail.gmail.com>
- <5debff82dc758d9c91223e4f1f5b9e39a3fcd4f5.camel@linux.ibm.com>
-User-Agent: AquaMail/1.58.1 (build: 105801620)
-Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+	s=arc-20240116; t=1778034646; c=relaxed/simple;
+	bh=S4/VXvdku8KrRO7E02/awFvdGYjK7r5TqE4xFnD51jM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=exyVoPfryv+PVFOzRL6wuQabDQMncIzx9gsRqwrPmnz7NFf9la35zGD7/2DY4w1XYer0jz4ycuEIez9cWA4vaSxjN1NsmKUNDEXT/wTCi+slJsyg/MaL/ldvTi09ddFeKpNV9VsqHlIST+YGTgavFXfCN5RpXGulV2kYCvK3ix8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8CxHurCp_ppMPoGAA--.22112S3;
+	Wed, 06 May 2026 10:30:26 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxB8G1p_ppz2Z7AA--.24349S3;
+	Wed, 06 May 2026 10:30:15 +0800 (CST)
+Subject: Re: [PATCH 1/5] KVM: arm64: Grab KVM MMU write lock in
+ kvm_arch_flush_shadow_all()
+To: James Houghton <jthoughton@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
+ Gavin Shan <gshan@redhat.com>, Shaoqin Huang <shahuang@redhat.com>,
+ Ricardo Koller <ricarkol@google.com>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ James Hogan <jhogan@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260504224213.1049426-1-jthoughton@google.com>
+ <20260504224213.1049426-2-jthoughton@google.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <25838e74-01dd-d085-395b-676266dc9a9a@loongson.cn>
+Date: Wed, 6 May 2026 10:27:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
+In-Reply-To: <20260504224213.1049426-2-jthoughton@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-
-On May 5, 2026 9:57:23 PM Mimi Zohar <zohar@linux.ibm.com> wrote:
-> On Tue, 2026-05-05 at 18:55 -0400, Paul Moore wrote:
->> On Tue, May 5, 2026 at 5:05 PM Mimi Zohar <zohar@linux.ibm.com> wrote:
->>> On Mon, 2026-05-04 at 16:51 -0400, Paul Moore wrote:
->>>> On Mon, May 4, 2026 at 8:03 AM Mimi Zohar <zohar@linux.ibm.com> wrote:
->>>>> On Sun, 2026-05-03 at 12:46 -0400, Paul Moore wrote:
->>>>>> Regardless, assuming you always want IMA to leverage a TPMs when they
->>>>>> exist, your reply suggests that using an initcall based IMA init
->>>>>> scheme, even a late-sync initcall, may not be sufficient because
->>>>>> deferred TPM initialization could happen later, yes?
->>>>>
->>>>> Well yeah.  The TPM could be configured as a module, but that scenario is 
->>>>> not of
->>>>> interest.  That's way too late.  The case being addressed in this patch set is
->>>>> when the TPM driver tries to initialize at device_initcall, returns
->>>>> EPROBE_DEFER, and is retried at deferred_probe_initcall (late_initcall).  Since
->>>>> ordering within an initcall is not supported, this patch attempts to initialize
->>>>> IMA at late_initcall and similarly retries, in this case, at 
->>>>> late_initcall_sync.
->>>>
->>>> Okay, so from a TPM initialization perspective you are satisfied with
->>>> a late-sync IMA initialization, yes?
->>>
->>> No. On some architectures moving IMA initialization from the late_initcall to
->>> late_initcall_sync does not miss any measurement records. However, as 
->>> previously
->>> mentioned, Linux running in a PowerVM LPAR the move would drop ~30 measurement
->>> records[1].  So no, only if the TPM is not initialized by late_initcall, should
->>> IMA retry at late_initcall_sync.
->>
->> What do you do in the PowerVM LPAR when the TPM is not avaiable at
->> late initcall and you have to defer IMA initialization until
->> late-sync?
->
-> Your question is hypothetical ...
-
-<heavy eye roll>
-
-> ... as the TPM isn't deferred, so IMA doesn't go into
-> TPM-bypass mode.  Testing on a PowerVM LPAR demonstrated that it skips ~30
-> measurement list records.  So moving the initcall to late_initcall_sync would
-> cause a regression.
-
-Let me rephrase to make the question clear - how do you plan to handle a 
-system where you lose measurements by waiting until late-sync, but the TPM 
-is not available at the late initcall.
-
---
-paul-moore.com
+X-CM-TRANSID:qMiowJDxB8G1p_ppz2Z7AA--.24349S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxWryxWry7uF4rWrWDXFy7Jwc_yoWrKFW7pF
+	WDCa4DGr45Gr1Y9343Jw1DZw1F9ws5KF1fGFy5XayrtFyYv3s8K3WvyF1xAFW5JrZ7WFZa
+	vF15Krn8A3yvywbCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8svtJUUUU
+	U==
 
 
+
+On 2026/5/5 上午6:42, James Houghton wrote:
+> kvm_arch_flush_shadow_all() may sometimes be called on the same `kvm`
+> concurrently in the event that the KVM's `mm` is __mmput() at the
+> same time that last reference to the KVM is being dropped.
+> 
+> T1              T2
+> KVM_CREATE_VM
+>                  Get VM file from T1
+> close VM
+> exit_mm()       close VM
+> 
+> T1: exit_mm() -> kvm_mmu_notifier_release() -> kvm_flush_shadow_all(),
+>      with only the KVM srcu read lock held.
+> 
+> T2: kvm_vm_release() ---> mmu_notifier_unregister() ->
+>      kvm_mmu_notifier_release() -> kvm_flush_shadow_all(),
+>      again, with only the KVM srcu read lock held.
+By looking through the code, kvm_arch_destroy_vm() will free PGD page 
+only, page table walking is executing in deleting memslot or exit_mm().
+
+With normal code, life cycle of VM is something like this:
+   KVM_CREATE_VM
+     Create_VCPUs
+     Create memslots
+     Destroy_VCPUs
+     Destroy memslots
+   close VM
+   exit_mm()
+
+And there is kvm_get_kvm()/kvm_put_kvm() function call with 
+creating/destroy vCPUs, however no such operations with memslot 
+operation. Is it possible that VM is destroyed without removing 
+memslots, such as the following operation.
+   KVM_CREATE_VM
+     Create memslots
+   close VM
+   exit_mm()
+
+Regards
+Bibo Mao
+
+> 
+> This leads to a potential double-free of
+> kvm->arch.kvm_mmu_free_memory_cache and now with NV
+> kvm->arch.nested_mmus.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: e7bf7a490c68 ("KVM: arm64: Split huge pages when dirty logging is enabled")
+> Signed-off-by: James Houghton <jthoughton@google.com>
+> ---
+>   arch/arm64/include/asm/kvm_mmu.h |  1 +
+>   arch/arm64/kvm/mmu.c             | 23 +++++++++++++++++++----
+>   arch/arm64/kvm/nested.c          |  4 +++-
+>   3 files changed, 23 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 01e9c72d6aa7..30d5c24fcebb 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -178,6 +178,7 @@ void stage2_unmap_vm(struct kvm *kvm);
+>   int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
+>   void kvm_uninit_stage2_mmu(struct kvm *kvm);
+>   void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+> +void kvm_free_stage2_pgd_locked(struct kvm_s2_mmu *mmu);
+>   int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>   			  phys_addr_t pa, unsigned long size, bool writable);
+>   
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d089c107d9b7..4bab407d43bb 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1021,7 +1021,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   
+>   void kvm_uninit_stage2_mmu(struct kvm *kvm)
+>   {
+> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +	kvm_free_stage2_pgd_locked(&kvm->arch.mmu);
+>   	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+>   }
+>   
+> @@ -1095,12 +1097,14 @@ void stage2_unmap_vm(struct kvm *kvm)
+>   	srcu_read_unlock(&kvm->srcu, idx);
+>   }
+>   
+> -void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+> +static void __kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu, bool locked)
+>   {
+>   	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>   	struct kvm_pgtable *pgt = NULL;
+>   
+> -	write_lock(&kvm->mmu_lock);
+> +	if (!locked)
+> +		write_lock(&kvm->mmu_lock);
+> +
+>   	pgt = mmu->pgt;
+>   	if (pgt) {
+>   		mmu->pgd_phys = 0;
+> @@ -1111,7 +1115,8 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   	if (kvm_is_nested_s2_mmu(kvm, mmu))
+>   		kvm_init_nested_s2_mmu(mmu);
+>   
+> -	write_unlock(&kvm->mmu_lock);
+> +	if (!locked)
+> +		write_unlock(&kvm->mmu_lock);
+>   
+>   	if (pgt) {
+>   		kvm_stage2_destroy(pgt);
+> @@ -1119,6 +1124,16 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   	}
+>   }
+>   
+> +void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+> +{
+> +	__kvm_free_stage2_pgd(mmu, false);
+> +}
+> +
+> +void kvm_free_stage2_pgd_locked(struct kvm_s2_mmu *mmu)
+> +{
+> +	__kvm_free_stage2_pgd(mmu, true);
+> +}
+> +
+>   static void hyp_mc_free_fn(void *addr, void *mc)
+>   {
+>   	struct kvm_hyp_memcache *memcache = mc;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 883b6c1008fb..977598bff5e6 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1190,11 +1190,13 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>   {
+>   	int i;
+>   
+> +	guard(write_lock)(&kvm->mmu_lock);
+> +
+>   	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>   		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>   
+>   		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+> -			kvm_free_stage2_pgd(mmu);
+> +			kvm_free_stage2_pgd_locked(mmu);
+>   	}
+>   	kvfree(kvm->arch.nested_mmus);
+>   	kvm->arch.nested_mmus = NULL;
+> 
 
