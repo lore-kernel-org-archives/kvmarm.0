@@ -1,116 +1,159 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A3A3F23B2
-	for <kvmarm@lists.linux.dev>; Wed,  6 May 2026 15:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF38248B368;
+	Wed,  6 May 2026 15:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778079831; cv=none; b=q66TMb85UQFeqLyG+HasxDeK/LQns/FL8kKKpjuk/9FW4lMZPg6ahbr/bbIS+wknlHCHG/nor6ICk+ueg6cVUcqBlHSD6QnOKaShv7jiyVAbbcK5NLB+0Tryqxj+YETf/wvjg2uh/+Pv81mhvmzNloplxM1EIl6GitAUZyZwSP4=
+	t=1778079835; cv=none; b=SFlnkra1FIP5Bz98Lm1rM15C/Lrmzx/5Wj9CnXdVegIYq4Nnv2x0FQ1xNkbSKmUsY/n1RG5DGfqTAkZebfIIwiDqAlwzymQL63D4HpiAsmjBV/Ovz6d9ddEXC/Y/YWTJujdyYukXVP2ZvyDcpxxGnVZuMgmM5ULmElgDgXJWR6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778079831; c=relaxed/simple;
-	bh=Ct1xfBRKSQ/KPsXPmmNT+q/a4D3C9TqoNeH2NmQsQFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QscldVTfppznewK6iyjCrVarL4sYI9yILCSyFH0YyMjmqJsbQzN4/JFtCW7WGMJnLI+f40JbveZoyyozDtB2fJeOFxn1zMulcT7APJSqVK+/O3AxZP/YQihJGbv5uJveQqxcUIQDohF/Q97HLiF2uADarkyGcUyytrl/p2eKcG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CVZ++cml; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1778079835; c=relaxed/simple;
+	bh=9wYxQMmVtBz3DEPWlbfvcyKeSl2P2HX1/nFCNbnRXls=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NY59RNhTisbpgGLE8Br1GHz+U0m7LYcY3rb12iPUh0KZTj6VrH461el32Gh1hWTForJ+o+wGzJT8d9Ct2XlajY+43kha2NZg4FZXqLJWxuR90RYLwlObQAg1H39UTLgM/3GQCxPzkDVgGRG4f1kW18/KDXlPWzRAIoJKP+oH4GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFpwT+nC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CVZ++cml"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48e56c1bf5dso3809155e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 06 May 2026 08:03:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778079828; x=1778684628; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6lCUuXDcwuMuvkw++7nOHtFX8FGwzsSx+p3o4zIoa/I=;
-        b=CVZ++cmlKKWAV7srhTIgN0AV/IrM3Jn44xATKptQ5ITzNZd03dqkYPMBVRmjahLXxp
-         eo8Fj8330OqFCoKfexD0G+O3dYtOP4eBxcOcw1/k6KPznwbqliudDfyHdQmSRZTXouGj
-         R6VtY0V/rqrdS168iqLe5JFGysJpAgEigiardEn+GbDayj9ZcL+vFM3/6Gz87j025VUQ
-         NEyG8GhxVYrGTqO1BhEJ72/Q11R87u5ea1O9tRQSCWfxbbBqre13n6my5aOFX8pwAUMu
-         NNWZa3es3giFxcAxkGF+oGtaw7ltkFB0vvcH4Mw2HPQAum73Nu7SopWtD3ZNWRx8iBX4
-         pHNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778079828; x=1778684628;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6lCUuXDcwuMuvkw++7nOHtFX8FGwzsSx+p3o4zIoa/I=;
-        b=Q2/WlMjqrPw4QvmVCWYYgatySneP5DjkBfP2hUijw7NfEewrPqpUT9qcHLC+/+qemc
-         +GDxN9NIg1DMspJgUNFgOtYa9FV0OsnUfH7VjCeN9MYmnh02bb6gUYAt5/a0hn2ANKyG
-         K4qLJu+R1JaWMIS2SVF5IMAzXYDro+RND4wEFtBBrT7o7bh9BQgq9YhXTbxjiK7vYTgx
-         ILVacZ1lA4a/fxAE8gNZa9jT86GjQCF3VPMdxSWC6SEoFsqA2bGx5P30jfkeAG46Ktqc
-         Zko58vdwFNGYNJv6AQ7kD4eKknK60/Mkk/J/0M2DXs4fOZL7GKQC6enSkKttNK1ayCku
-         cWAA==
-X-Forwarded-Encrypted: i=1; AFNElJ80UwHk+5si6lA5WssAnSNOJQIFKnoez4M2a9LJxhw41DbS6h8B+iRcwwhjh+yBMnXXcFAq5YY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyau3okb2X4Ip2nN1sUQ6JEI5kqramDuFmhY4DDeGVTAUWrVtKt
-	kMTtGlvFxWSDICk1uhHRrYuTetdZLMOvNQ0zxdhThZN43xcJj3iAs/slGEUu1RswXA==
-X-Gm-Gg: AeBDieuY57eEkAnHDA92lrQ7vS+iTDYia/TzJb4ZtfRKQlG4wClpYMxaIYtrznmzBAB
-	/R2LIIPU5n02sPMqUT1+E1f3EuknFcWlYg3pXjFkXgNtfmrQBSZTCH4UX2gUTSvUwkus54/0Q5w
-	LnCPokwbY0pnDjwPj5X5TEUCHK2ZXyYPSVnAs7/nniqgm0bDvpFQWbP9auxO6HfjR8jSezGhTo1
-	kKIHv7YwSkqz8FbY2pHxCFigCVRmX6yfA/C3wz4IR0HgFOccvGyYIClG98r5/QKdF4hFHtYQVi2
-	Kh2POWN43axHmgaOgC7MwUCJ4QbiVt7eVcRq+Lh89BgwjjtBoIW5nR7Fy86JI0GxuAVgcXldJfX
-	+ltDtDCLFrItgOeIMWdC3s7x32eADA7zOQ8RmY+jLQaSQ24Ow/trK7pZi5dq0WJ6x6V7DpVWyXi
-	X7xVgbZGvANUuXqmcWHBeH7wwmR8YSDekkAA6R/ItPvITM/nbyXSN+pLgvFsYsbSQJ2ZsAxl34Z
-	kHT0KOAdE2zzxSP
-X-Received: by 2002:a05:600c:3e8d:b0:48a:6268:18a9 with SMTP id 5b1f17b1804b1-48e51f32797mr69446495e9.13.1778079827439;
-        Wed, 06 May 2026 08:03:47 -0700 (PDT)
-Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-450524834eesm12653531f8f.4.2026.05.06.08.03.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 08:03:46 -0700 (PDT)
-Date: Wed, 6 May 2026 16:03:43 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, tabba@google.com
-Subject: Re: [PATCH] KVM: arm64: Harden clock for nvhe/pKVM
-Message-ID: <aftYT7BY_9ZdGxmA@google.com>
-References: <20260430103724.2151625-1-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFpwT+nC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DBDFC2BCB8;
+	Wed,  6 May 2026 15:03:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778079835;
+	bh=9wYxQMmVtBz3DEPWlbfvcyKeSl2P2HX1/nFCNbnRXls=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RFpwT+nC2ToI8BxTZFN8/5u1tm+3XR/8IolTmSTdxDuUH4ga2bcXbIEO5MD+izzJ4
+	 dbZ/i5b1gy9lmmy/B3/OvVn5WFeVb8oRgO3nD2f3hpUWDMZTZgotkRhXa3/atRqhAz
+	 r7EByGrr6h3BSOu4SOb9aaWOBYi8a1yaSQvIk6YV8Z/h6kzODBHBtAwKYrR3UPxN2I
+	 WOSZ4Qzk7mfCa9D7KSpaBqIKltq0ag0Cxgvwjsz5OSTkGI0WDX1RFBbDewjzTN/yBM
+	 iYQklEifxgdd1uI4wJxFNFsKsfHXGzW0u7qtRyIjEYbrxsovlw+74J9LsIXq49Zb4D
+	 mEGWB5UqF3I6w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wKdmz-00000000KcH-1ZnQ;
+	Wed, 06 May 2026 15:03:53 +0000
+Date: Wed, 06 May 2026 16:03:53 +0100
+Message-ID: <861pfozijq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 17/43] KVM: arm64: gic-v5: Enable VPE DBs on VPE reset and disable on teardown
+In-Reply-To: <20260427160547.3129448-18-sascha.bischoff@arm.com>
+References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
+	<20260427160547.3129448-18-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260430103724.2151625-1-smostafa@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Apr 30, 2026 at 10:37:24AM +0000, Mostafa Saleh wrote:
-> Sashiko(locally) reports possiblity of division by zero and
-> out-of-bounds bitwise shift in trace_clock_update().
+On Mon, 27 Apr 2026 17:11:50 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Although the clock update is untrusted, we should at least have some
-> basic checks to avoid the clock value getting out of sync if the host
-> is buggy.
-
-I am not sure about the gain here. The host can still write values that will
-make it out of sync anyway.
-
-The timestamp is ultimately fed and read by the host.
-
+> Ensure that each VPE doorbell is enabled on the host prior to running
+> the guest by enabling it as part of vgic_v5_reset(). Add a function to
+> disable it again as part of VM teardown, vgic_v5_disable_vcpu(), which
+> also frees the IRQ again.
 > 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/clock.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/arm64/kvm/vgic/vgic-v5.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
-> index 32fc4313fe43..a7fc61976fd0 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/clock.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
-> @@ -35,6 +35,9 @@ void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
->  	struct clock_data *clock = &trace_clock_data;
->  	u64 bank = clock->cur ^ 1;
->  
-> +	if (!mult || shift >= 64)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 9347bc6895223..48ffcb2494db3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -736,6 +736,31 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  		kvm_vm_dead(vcpu->kvm);
+>  		return;
+>  	}
+> +
+> +	enable_irq(vgic_v5_vpe_db(vcpu));
+
+Odd. Why do you need to manage the enabling of the doorbell? I see
+from the previous patch that you set it as IRQ_NOAUTOEN, but this
+seems to be cargo-culted from GICv4 (which really needs it).
+
+My expectations that since the doorbell is controlled from KVM and is
+only one-shot, we should be OK. This is the flow that v4.1 adopts,
+without a need to baby-sit the interrupt state.
+
+> +}
+> +
+> +static void vgic_v5_disable_vcpu(struct kvm_vcpu *vcpu)
+> +{
+> +	int virq = vgic_v5_vpe_db(vcpu);
+> +
+> +	if (!vcpu->kvm->arch.vgic.gicv5_vm.domain)
 > +		return;
 > +
->  	clock->data[bank].mult			= mult;
->  	clock->data[bank].shift			= shift;
->  	clock->data[bank].epoch_ns		= epoch_ns;
-> -- 
-> 2.54.0.545.g6539524ca2-goog
-> 
+> +	if (!virq)
+> +		return;
+> +
+> +	/*
+> +	 * We are called in the vgic_v5_teardown path. We no longer need the
+> +	 * doorbell virqs.
+> +	 */
+> +	disable_irq(virq);
+
+And then this can go as well.
+
+> +
+> +	/* Free the doorbell irq (counter-part to request_irq)*/
+> +	free_irq(virq, vcpu);
+> +
+> +	/* Remove the irq from the domain too */
+> +	irq_domain_free_irqs(virq, 1);
+
+Surely you remove the domain at some point. That should cover the
+freeing of all the doorbells.
+
+>  }
+>  
+>  int vgic_v5_map_resources(struct kvm *kvm)
+> @@ -875,6 +900,10 @@ void vgic_v5_teardown(struct kvm *kvm)
+>  			kvm_err("Failed to release VM 0x%x\n", dist->gicv5_vm.vm_id);
+>  	}
+>  
+> +	/* Goodbye doorbells */
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		vgic_v5_disable_vcpu(vcpu);
+> +
+>  	vgic_v5_teardown_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+>  
+>  	vgic_v5_release_vm_id(kvm);
+
+I reckon this patch would be better folded into the previous one, so
+that we can see both the requesting and freeing of the doorbell
+interrupt in the same patch.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
