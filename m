@@ -1,86 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBF13EF662;
-	Wed,  6 May 2026 16:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FEA33ED5AF;
+	Wed,  6 May 2026 16:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778084087; cv=none; b=Kr62wfHusJCY5/FLrxbjTqACYxUh3nOtOxGcCstUz9rSD0cZqz43rED3LpnRsaIXNMledUcSmvyv0I9oUcnyaGWXsoBavPbamKdty1C76Kb9nP3m94YuQ8oLxuAtjAo64dzncJszdMGVyExWF7rAFpb8lwB/pV91IK7rPAbVuOM=
+	t=1778084965; cv=none; b=FaHDXk1N4xlgf7xDJbHA5mQKnGHkWMsw2zcFVbuoEphADFQ4wPKTGQwQofamIgVXUs9ZpROruzC4PUfvWkH89G8ho8RJOWlHQrODa7XbE2fxE5z7xceYSMytryyeiqCD/ZN3QRuxx7On7BBEeawJ5CDOTNmgNtCptCqHQfzF3Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778084087; c=relaxed/simple;
-	bh=7EoFpIqU2CY22TlcKHX1E+bFT6rvufgU5nKroWLs2cw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QKxWYvNAouGjX16RdfNHGMcl/vaGFFM7Qe3Gqp9RRFH6aSpB4vYDZFh1hwPs3NBLOWF5++wAt6DAj7J1+i6dP9Z051JA1eQr2y70hJRkqB2IpzjfO9xYec0zbPbtjhvjnUBkOTUyMDFxp7WMc4HPWVLV7ASFytaRHLEypziTZ+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIxHMony; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778084965; c=relaxed/simple;
+	bh=iuL3nrNUpIFswmEAJvcUHVw3y4jPIILSMZZbYjEmKGA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C0r9sPdTGg0uS5d0sk0CTcTrDXbxuDwuKNfwRqEK1TvWKHdCp+3xSEBJ8d9yHWhgaVDkxRwbxWMY9m8f5VprRSpKU/zY53PNeP8HBdY+kTCsn8A/J6T5YEoBrbEnTcnluLAF6ue7Vj4jMtIUIJJXMDugvucrKBAvaAkWYAvq5zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUvY0G1I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIxHMony"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76FE9C2BCF4;
-	Wed,  6 May 2026 16:14:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUvY0G1I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 108F9C2BCB0;
+	Wed,  6 May 2026 16:29:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778084086;
-	bh=7EoFpIqU2CY22TlcKHX1E+bFT6rvufgU5nKroWLs2cw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kIxHMonyq1fOO8k8K595ytjPY6L/xMoNUXFblzwYg9ZXf8fL5h5ikvvZX/Idh75Hf
-	 3xP71VnX9wjjd0DxpTinrY2E3ofkxR89hX6OKJtVaivwfEVXXNQDknZlNZ4Hy3UTDd
-	 h5YoWID5TNljH6LbVY4azh+utumI7Tfa+XmWyAO0uDBWlOVttzjQYEoAkT/mfHQxca
-	 UInn+oRUNEuEFKTNIFFdyCkUqnBYm/zd9OXQ5sw5sIi0S3YP7YP9Lc9PLMt45QwxHI
-	 tPnvY4KAS5hrrP68b63LJkiQSPnwaiHQJbAiEC9J0S3A5v0UiIq2irkn/AgN74jjK8
-	 +MI81HQtOVmNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1778084965;
+	bh=iuL3nrNUpIFswmEAJvcUHVw3y4jPIILSMZZbYjEmKGA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HUvY0G1I2p4IHGfYvVDBCzkDsw9a2PsmdZxcN6TWohbnz9AfKTMZxW/AaBQmlIZlS
+	 5mMhG+7qgZDhY5vTgKyLgAI6/cYlLelntQHhZuj/JIJbIdyWDm0VKe6uH6sxZl9rSW
+	 ri4ku4ekY1Uvnk+8WLkbiUl+AxZM9bNrLh/pP3ty/TJyUFqnq6zHhsU4q0QiSIAFG0
+	 lmfEIFAXaEiit73qaBo27FX3wsPX+kgGT9q3db8cxYZ8Eg0hUt5dPxbzcUcEBRy3/E
+	 r4csgkpMrf24rD+YAPDyqWBmqwhWrlaLE0pTsh7f98zlB3tPM+SIcvJowCTRXep1AE
+	 hZ4LpfOG1gVCw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wKetY-00000000MId-2aiV;
-	Wed, 06 May 2026 16:14:44 +0000
+	id 1wKf7i-00000000MZe-3k1X;
+	Wed, 06 May 2026 16:29:23 +0000
+Date: Wed, 06 May 2026 17:29:22 +0100
+Message-ID: <86wlxgy00t.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com,
+	oupton@kernel.org,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	korneld@google.com,
 	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Consider the DS bit when translating TCR_EL2
-Date: Wed,  6 May 2026 17:14:42 +0100
-Message-ID: <177808404890.2712489.4128021964001358070.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260505144735.1496530-1-weilin.chang@arm.com>
-References: <20260505144735.1496530-1-weilin.chang@arm.com>
+	android-kvm@google.com,
+	mrigendra.chaubey@gmail.com,
+	perlarsen@google.com,
+	suzuki.poulose@arm.com,
+	vdonnefort@google.com,
+	yuzenghui@huawei.com, Sudeep Holla <sudeep.holla@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
+In-Reply-To: <20260501114447.2389222-2-sebastianene@google.com>
+References: <20260501114447.2389222-2-sebastianene@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, weilin.chang@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, oupton@kernel.org, will@kernel.org, joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com, sudeep.holla@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 05 May 2026 15:47:35 +0100, Wei-Lin Chang wrote:
-> When running an nVHE L1, TCR_EL2 is mapped to TCR_EL1. Writes to the
-> register are trapped and written to TCR_EL1 after a translation.
-> Booting an nVHE L1 with 52-bit VA isn't working because the translation
-> was ignoring the DS bit set by the guest, hence causing repeating level
-> 0 faults. Add it in the translation function.
+[+ Sudeep]
+
+On Fri, 01 May 2026 12:44:48 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
+> Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
+> FF-A proxy. This restriction was preventing the use of asynchronous
+> signaling mechanisms defined by the Arm FF-A specification to
+> communicate with the secure services.
+> While these calls are markes as optional, there is no reason why the
+> hypervisor proxy would block them because:
 > 
-> [...]
+> 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
+>    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
 
-Applied to fixes, thanks!
+Where is this enforced?
 
-[1/1] KVM: arm64: nv: Consider the DS bit when translating TCR_EL2
-      commit: 8d9b9d985ad3a81c751a6b97edaf1d3c0780af7c
+>    Because all forwarded notifications are inherently attributed to
+>    the Host by the SPMC, there is no risk of VM ID spoofing
+>    originating from the Normal World.
 
-Cheers,
+I don't understand: either the host is always using VM ID 0, and we
+have ways to check and enforce this (how?), or the simple fact that
+the request comes from NS is a guarantee that the SPMC will treat the
+VM ID as 0.
+
+Which one is it?
+
+> 
+> 2. No Memory Pointers or Addresses: The FFA_NOTIFICATION_* ABIs
+>    operate strictly via register-based parameters, passing only
+>    VM IDs, VCPU IDs, flags, and bitmaps. Because these calls do
+>    not contain memory addresses, offsets, or pointers, forwarding
+>    them doesn't pose a risk of memory-based confused deputy attack
+>    (e.g., tricking the SPMC into overwriting protected memory).
+>
+> While the pKVM proxy behaves as a relayer, it doesn't currently have its
+> own FF-A ID(only the host has the ID 0). The behavior of the setup
+> flow is covered by the spec in the: '10.9 Notification support without
+> a Hypervisor'.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 8 --------
+>  1 file changed, 8 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 1af722771178..a82d0cd22a17 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -675,14 +675,6 @@ static bool ffa_call_supported(u64 func_id)
+>  	case FFA_RXTX_MAP:
+>  	case FFA_MEM_DONATE:
+>  	case FFA_MEM_RETRIEVE_REQ:
+> -       /* Optional notification interfaces added in FF-A 1.1 */
+> -	case FFA_NOTIFICATION_BITMAP_CREATE:
+> -	case FFA_NOTIFICATION_BITMAP_DESTROY:
+> -	case FFA_NOTIFICATION_BIND:
+> -	case FFA_NOTIFICATION_UNBIND:
+> -	case FFA_NOTIFICATION_SET:
+> -	case FFA_NOTIFICATION_GET:
+> -	case FFA_NOTIFICATION_INFO_GET:
+>  	/* Optional interfaces added in FF-A 1.2 */
+>  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
+>  	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
+
+Shouldn't these be sanitised in a way? A bunch of registers are SBZ in
+the spec, and I'd expect this to be enforced.
+
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
