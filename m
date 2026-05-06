@@ -1,76 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82121375ABE
-	for <kvmarm@lists.linux.dev>; Wed,  6 May 2026 15:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8F13E4C95
+	for <kvmarm@lists.linux.dev>; Wed,  6 May 2026 16:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778082525; cv=none; b=aZ7fa2IkwxuGtllhk+z3EmYScyTwyvomZLMnf4h6IikWYpTGYerTflYdT4UtDTizBkM4fEQFq2XuXP4c6xeBw+FkK9lHgo+t0ctQptOYsKMe7UPFEAP63NvCPmnusVgma9UCSMT4uKSZoDkBvrY7Wl6WnOXISFXRipGUbrp4GHM=
+	t=1778083619; cv=none; b=ucRbtjE+qbuYMlU/A3qhK2MseX3mRZlOcuyvrZZaDDpNkFv1zlCQ/wSVVLs1gjueQyNbHLCXxoONmiiS8c4RNKzUogjAHMKzu5+DxQ9lkUUYXcXecDDLWpxGF5A0QkJ1cfcuGFZ4b7bdkumZFuBv52IMF8Amvkvr4qnjR9sE/Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778082525; c=relaxed/simple;
-	bh=z7XUoCN/77R+J+QP2gklKMVr4SeXdVKCWZXVt6dBS9M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jhb06E9GvdF8LJS3dsoTw+bg/ZQlbLtGbqRs+3JrkLy24f5RU3kkYhPQfM9cO2U3nWtR1HHn4p35jeKtiLrmqNcGmWfPV5IoqqGyuSdfultPs7uaoBqCVAcvR6qmIjHndDfpo1ovijd+xZ6625u/MUXKKQ67iBPWZEiNbgBZogs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nOnds1c+; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1778083619; c=relaxed/simple;
+	bh=p1HSZhk3xZr7JtjEv3xBoO2014jkOSMUATxVPDTI3No=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sNKdEAzs2R4yWLGTydVy20xLckNEgtBAAYmgdB5aAkL7BQi8SwrAMAtSnGWXkWJTvkzNtIGmH6ojl1v29h1Aw40f6oSQMeRYsZEOD3nLdHBC8OVE6vPVJkBQ7unCo1TAUnDv/XlNx58RyhEt068TeUA5LWooLsxl+K5BaIWCMqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5e4XPrh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nOnds1c+"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97CB51A00;
-	Wed,  6 May 2026 08:48:38 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DBAB3F7B4;
-	Wed,  6 May 2026 08:48:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778082523; bh=z7XUoCN/77R+J+QP2gklKMVr4SeXdVKCWZXVt6dBS9M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nOnds1c+76H2RtQ05VhAVwQicupDz443xHj4DD4QSJMLNui8EHScbuAZSCewr+lbh
-	 MXZ00EgTRq43LNOlxA+spYfCdaBa+PaHwxymfUVycmQhXSSEulmFaPGCFksE02d/4c
-	 nEq6QZYVZJJcB9BtgAb1AOdzdZsYerZdykJFqlSA=
-Date: Wed, 6 May 2026 16:48:39 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5e4XPrh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 991FBC2BCB8;
+	Wed,  6 May 2026 16:06:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778083618;
+	bh=p1HSZhk3xZr7JtjEv3xBoO2014jkOSMUATxVPDTI3No=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n5e4XPrhHrhHVJr7uGcgtPtHPW2SDW+A2JwGpABnw7Fx2XoZdSLWQZOC9OB+lXjNb
+	 +Ebrorl4Gku68OWN94QgSu52ym9nGlQYR6dDY6YCt4aL4omu1l/HU1CDUcOP2gHhPe
+	 oBU6/lzn2NIhWWvB39+z4gciSCEcuTNIhQupCHNIKt7G6n3Kzcfer3aVVAjYExdgA/
+	 i3DMSScco00mkKK9baFm8PKVF/2RmcazBkJ3P5Pd3i6NK870GrAzjEM/cHlbA0rxvU
+	 onvGhslJPNHjSyZXoN29oFVJlF4Ef0syCgW0WCbO3CTgHf4soOT9IubGrC/HetA/2r
+	 H4La0Qck9DpEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wKem0-00000000M8k-2oCw;
+	Wed, 06 May 2026 16:06:56 +0000
+Date: Wed, 06 May 2026 17:06:56 +0100
+Message-ID: <86y0hwy127.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	Sudeep Holla <sudeep.holla@kernel.org>
-Subject: Re: [PATCH v2] KVM: arm64: Work around C1-Pro erratum 4193714 for
- protected guests
-Message-ID: <afti13dXA6DjGXR3@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Work around C1-Pro erratum 4193714 for protected guests
+In-Reply-To: <afti13dXA6DjGXR3@arm.com>
 References: <20260505165205.2690919-1-catalin.marinas@arm.com>
- <aftEJffxGZ_XSk2E@google.com>
+	<aftEJffxGZ_XSk2E@google.com>
+	<afti13dXA6DjGXR3@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aftEJffxGZ_XSk2E@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, vdonnefort@google.com, will@kernel.org, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, mark.rutland@arm.com, oupton@kernel.org, lpieralisi@kernel.org, sudeep.holla@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, May 06, 2026 at 02:37:41PM +0100, Vincent Donnefort wrote:
-> On Tue, May 05, 2026 at 05:52:03PM +0100, Catalin Marinas wrote:
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 28a471d1927c..7d59faa99fee 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -5,6 +5,8 @@
-> >   */
-> >  
-> >  #include <linux/kvm_host.h>
-> > +#include <linux/arm-smccc.h>
-> > +
+On Wed, 06 May 2026 16:48:39 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> nit: probably not necessary with the nvhe/arm-smccc.h include below.
+> On Wed, May 06, 2026 at 02:37:41PM +0100, Vincent Donnefort wrote:
+> > On Tue, May 05, 2026 at 05:52:03PM +0100, Catalin Marinas wrote:
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > index 28a471d1927c..7d59faa99fee 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > @@ -5,6 +5,8 @@
+> > >   */
+> > >  
+> > >  #include <linux/kvm_host.h>
+> > > +#include <linux/arm-smccc.h>
+> > > +
+> > 
+> > nit: probably not necessary with the nvhe/arm-smccc.h include below.
+> 
+> Ah, yes. Some left-over from before I changed it to use hyp_smccc_* and
+> had to include nvhe/arm-smccc.h.
+> 
+> Marc, do you want me to respin or you can drop this include when
+> applying.
 
-Ah, yes. Some left-over from before I changed it to use hyp_smccc_* and
-had to include nvhe/arm-smccc.h.
+I'll fix it locally, no need to resend.
 
-Marc, do you want me to respin or you can drop this include when
-applying.
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
