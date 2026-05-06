@@ -1,151 +1,143 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0822D63F8
-	for <kvmarm@lists.linux.dev>; Wed,  6 May 2026 15:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778080234; cv=pass; b=fvF9dSKWuadJtL+61qnEa2vCYVZ9B5Gs3LsDiFovwDnvxVCPUjmJLpdPj7qmg9u3BDEVpkBziWhoOKlecKEsjx4nGifQuv82QZe428X42eF8tHL3N5vWcknt5AU9C9maKk8b5rXwF2vJdz+yaLQHG1o9zzLTpFFjZ9WKsqC7D5A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778080234; c=relaxed/simple;
-	bh=b8yIQw5Mlbi0bJTVOLMfnQWl/7vG7NcNJ4k3bfS23ZU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sg2PbTkEOuyOAdRWEwi8MtPddVvvprZZKGRsylfikT5XUyPFsvLyCMKIIvdSOWewjFfwbAT9JrRKh4OIOnVq6foWgtDNp4XKsnoWQBLnq4Kz2D1XKdyLhm9XnfVG+E4eq7Ef6An0v3WZRlLS2Oe1fN99u6tfqgHJwjKkgfJiiC8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hQ2STkxV; arc=pass smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47D448AE0C
+	for <kvmarm@lists.linux.dev>; Wed,  6 May 2026 15:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778081016; cv=none; b=eJbp9zpi4BSomB6w3PyD6EjUw+jq3lmYredB63tsWs0wTlVHvBgBF/bqfZ8YH6Ql4mBxntZSmAu8qTu6bapjfurvO2hgdVK3jonUnoif3KmNhAjjDAgLcSWg0U4ie7dGVZ8E0RYpKXrJZgM4dCFOrjPpS6wWFmcy83+JaDPSC+o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778081016; c=relaxed/simple;
+	bh=VG2/sxvDjWN0rZSNS6U6OvyRizkEs6ISsawgP8gZVvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AEji2c3bYyuQAPi4XiZSvyWqnSa8hkIo5stmwm0CqN8i9PubUrhV5ejHPZjzEb1i0LrBCoZ4gWeEv6J2VPW41Y3F2DaooqaQogC6HXA6njrTd8RSaIggMugxHCRztY/gqB4bfkPjHIPRKxulFKN/bDpVhroIasKS+4IBhT/JSfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wfyd8C8J; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hQ2STkxV"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50d864c23bdso679131cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 06 May 2026 08:10:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778080232; cv=none;
-        d=google.com; s=arc-20240605;
-        b=P8CGn0s9z9cAx3BrMi+25HjDsj+wKRZd/EJA0jUifL8elBPfH2gvSYNuv0WiES6NWf
-         xIow2Itjq3c7hXTYw1EtBrtmbE0OZQ36MIdEBarmqyTtD64EESqlFdJFX03qyZ577ECW
-         z2Ey/jtOWEOzxCDe3U8BXJ4FzFe5DPG8BjGNHoypzEB+q9zgb4zDZPJw4k5FGqcliGwv
-         utxhLj+I0oOfib4gH/ilFowcAFTcmXRiz9GpW72SNc7W0v5/cErwcHCZ407+bu7OUIeu
-         Gwp/F11AieAOUH5CojwipJYlcV8/IqY27o5gvg3liYvY8tyhO4xZ6WYPm22FafquFQ+l
-         Bkxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uc97my+cmQsKhLzxdnWEgFr7kOoH51/4k3Hl8Nt8XNU=;
-        fh=CA37Axgzky5fG221Orj0v6ESIpMj/826xhR2EYy+gss=;
-        b=SS4+6g0PwuAdPTrqPRfr63kqf53R5jOCKjIdS0OjuFAwFTG9uyaDEhxex4sqpCK45+
-         NnRk4X9h/ebOL6N2YaqkdXk9udA+dgGPGwdD2X1qG3PkVQEeEz7JStAaxomGO+5k1ya3
-         kGWbJq8Gb5H4j0Ji8q0zo8N5WNt/gvvY6u5mk0tHuVEmo2grbMyCIKuH7EO1AijvDIKL
-         MmUT3MT+wlEB3TPkTJ1TALwYwVU4sVQvLK38VmirXaWqhhr61tg69tRH6q+SHbhDCF1Q
-         EsocUfWMr6qzPoXXouXIhXN5vdzvSCAxfELBmTZ/Be6x5y/lLPUibJbUTRGifGBSdbCd
-         DH5A==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wfyd8C8J"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488af9fdaa7so34960565e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 May 2026 08:23:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778080232; x=1778685032; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uc97my+cmQsKhLzxdnWEgFr7kOoH51/4k3Hl8Nt8XNU=;
-        b=hQ2STkxVeoQIAluBD89Be7p8Ommy8llnq1XLbz06ik218CZkeOfI4W86Kq9qWn55GJ
-         JCkL0gJmrirG7T+ck6DxH1MvcxztGJjS+q5Gor33/pugbj2Xp0xjM5Yu/aAnKeG2qJ/3
-         Spb9qMqHJSGxHk4eKPlAOXNP3Q41DTqeTuF35m2WFFoECkDFPeWiXhBB/EXNXA1LYkrg
-         HAOhmReO9qq4aG2/v6S74nzkCHJlb+JzqhURNAFgPRCluGrsNGFZUn+USMWoir7pbWLX
-         UXcbTuY4AQ2z2N+n1N+xVtZ/VJiio5LhcnLvlCkHEeYg1H/J/WeiFfwUcM2/xtxS5fCV
-         LhZA==
+        d=google.com; s=20251104; t=1778081010; x=1778685810; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cTseNJ/2nD6TjREZvOS9tCHIBcGxqDugB7fH5uhKP20=;
+        b=wfyd8C8J4611kGkq5yJFTeEKhX55PaUW4fD1LQYYWIN6m/2QGO1VDZlwwRPkZWRdGy
+         EvJaeqj6DH3CN8R38s6xnPlsGLVqjfco8srBjIXAigacjO+ApScohFJGs/+tR6b0FuNt
+         HCmI7QG9TpJpZLEjj3BzwJxF9n/tLiMpWmtN7brhzgGWKhDDz3gMfhlRsSqTU4P9pqgj
+         PsEPzbeIl2F/xrXViwEiOf2sRdYZA6JN2Ns6VrE3gtkozjlJZV6EUVPm2N+NIj/liutT
+         K9xwzXCBzUyXIA5OzuLqftkTnRX6HbzKKrCgTraq+D/SyJp9QiC3YhpKDkdxHHbtN3ns
+         51ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778080232; x=1778685032;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uc97my+cmQsKhLzxdnWEgFr7kOoH51/4k3Hl8Nt8XNU=;
-        b=ABQwZXSDsUCtTMucL/H6AC7MoNCBkMbtqHv9qWZxXxbLr/CYBkQmcXH4jcKkFTmYHW
-         WOD6miLnvz1F+Ux1apgZRerPI7Iw0XrT+UmHaPY79lofAJAeoi4GZnhW94INmsMT+SIS
-         Hela4V8wuE8OxvyckwQlw87iC/2zQ4Nu14Z0yt1lJkTGvwq48psCe8bEuhnNeH6caPW6
-         ixZ+oLzN6ovGizzH+3yfcx3lUxCN+eh68uehjxRvnEl6G2jUs0V5/zuYiov3WMA2hJVo
-         7NQN49gIWnIZQF2S9pNcOvlmg9KfN0zuvrY19hwTXl7dUsvp2cRr5ayjQ/RONLOeRZlV
-         6C/w==
-X-Forwarded-Encrypted: i=1; AFNElJ/qMmqWau4J9P4WcvPO6n02ePXaaDxyWEBs6tw8+jD8bDx0iRmnDiTAxFoJVchUXpfK0X+rcZk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzCvPHs8paT05BaBvQlaP7smmqSp6+xiYm3DUlUZiCl8q7C7BPA
-	MSVKukrUiDadLRNMPV84VGxUTl6+vsGR/bEhJwb3ZiydNOeukZv9z5HiMVjOHx/B9nIupKt/Jp0
-	nKIIlELDqZRxFuQQYq0JaPaEZjrfKAnUSW5ffslkav0NRJvQbBOHboDfj4pc=
-X-Gm-Gg: AeBDievXlNBXODXnaonwrb+FaH1bSDjLckoOC+zp6w67NAGsCt2YD08Shdc2ENbQTTb
-	ljcHbq8aMXjm2/l47hazaQKEQ+i/XC9vcfgmjPwT6igZtfsTYhPdGeKSfhjqux7VoX/D6M6lgI7
-	LKqSYkgwRPy84/2I7B2JezU6dMg+1zXpPdT0g6n3vp1+WqlsFay6VKOV9E/wounZnuuhKLeYqap
-	tdTNJiD/1LD17lRNiLaeQsDoTxl6RqPEmDerYa/wqBcYUskAacURnJGLniQlRazU6TFJNNySjE3
-	7hfg8PM+Ee0aAAIyC6WIudA3Ni95jwRL+KAcSF9aoyEmuNQugAXJOrUneFY=
-X-Received: by 2002:a05:622a:8d0b:b0:50e:5eba:cadd with SMTP id
- d75a77b69052e-51460609360mr18117251cf.2.1778080231852; Wed, 06 May 2026
- 08:10:31 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778081010; x=1778685810;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cTseNJ/2nD6TjREZvOS9tCHIBcGxqDugB7fH5uhKP20=;
+        b=VqGvKI0fvT3RxUlrwHcluk9dvBMy8H76+4/xFqXscXElmkCc09UlBLsE5BgSjpI3Yj
+         SeJFu2tYt6RmdCEnZSERx9d1h6R1WAfv+w/Nqg/rSBmkw6ryd/jevDPlPUREnmrE2KaL
+         JsEohcPjAc2hXV0zFAWOzpR+X4xHQ38kqbx/6SftNR/XwEQzR4VmWhROZNUd24wSXLex
+         oD90TXKdztSp8ckPoP+7o3hqFrvQWwBUiOpsFfORe/uCgcIoNy5c65IiUXwkicbzC6RJ
+         LxJXNkTak9bY8BnbjPYr2/3XSMg3EJ+WjeFE3AP52td9bJBmXouaXt1XB8u/h2z2lkxZ
+         fx0A==
+X-Forwarded-Encrypted: i=1; AFNElJ9AAGypXm7+kQVtwHk81gfRmXDSF18mz9esAogJrNmo0wAkIvtUYYpXMT0HSlvK+gvIF3EiDq4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwsYSKotf/Y8WzAL0aS3l/ahDHyhNos/Sfr77vZxh8QPw69cS0J
+	tZBoXe1m01zdkv4iGJ08QMwROuaiiJojNXhvStx5rpMT41yP6t33lXwaVTbPYxEp1A==
+X-Gm-Gg: AeBDietwhi1e1w/9sjrZuBaER5+5MrjWfjzy8kTiRvCO0hNT/ADRsOgGNvyDpAkxE2t
+	hpCv1ilsuqwMXsdqebT1RbFaeohPHVRMfDmW7WRYPEI3pk4lot3Tf14Dt1yTAYuTy0q6+qwumA4
+	w/PXr8YRqeETuaLeSvnXAA3jjNdXRILY0lYjp24Gw5U2B7hNLwKcG9nj2WLJcyG3PXke5vkAi2C
+	zwzNdZH8ki0yroJFgCarRPOwC2L/NbFJ3FIArk+3GgzxDLuCQUFtWL9GLwzuYTsHjoLVeZmhx2V
+	rOrijO6i8Q2UkuOB04RqthunfeiY+kUEvf9PvOBLnzLfLzok+3swXPRS4i1JJpJs5Uy5YsEEHoJ
+	vtXN4z9tJVzvljt/2FOqSgNUQSBusDTOCWbchKvkTiqShKkTbAIf4Usi8QgUajgb0nrUF32Ywi5
+	nifAogvvuuz7YC+1p0oRH7P9SQpi1CUQmP+nHozzxqz1ZVkKJsN6BleiAIJCuDkTpndECJyfpFd
+	NMYzL1+AP4HqMA1
+X-Received: by 2002:a05:600d:10:b0:489:a4:e555 with SMTP id 5b1f17b1804b1-48e51f36fc6mr55916045e9.21.1778081009725;
+        Wed, 06 May 2026 08:23:29 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e538acf23sm52766815e9.8.2026.05.06.08.23.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2026 08:23:29 -0700 (PDT)
+Date: Wed, 6 May 2026 16:23:26 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, tabba@google.com
+Subject: Re: [PATCH] KVM: arm64: Harden clock for nvhe/pKVM
+Message-ID: <aftc7n_-43ozFFbl@google.com>
+References: <20260430103724.2151625-1-smostafa@google.com>
+ <aftYT7BY_9ZdGxmA@google.com>
+ <CAFgf54o7pGrtBY1mHuptnCNrRSGVPU=WHW=Qf5v+wGL6Gum-Dg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260430103724.2151625-1-smostafa@google.com> <aftYT7BY_9ZdGxmA@google.com>
-In-Reply-To: <aftYT7BY_9ZdGxmA@google.com>
-From: Mostafa Saleh <smostafa@google.com>
-Date: Wed, 6 May 2026 16:10:20 +0100
-X-Gm-Features: AVHnY4JvfF-Rm5qhU_8GJTR4Tqjlts8HwSwhfutueSCgDZO7opguuERjCEmtOYs
-Message-ID: <CAFgf54o7pGrtBY1mHuptnCNrRSGVPU=WHW=Qf5v+wGL6Gum-Dg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Harden clock for nvhe/pKVM
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFgf54o7pGrtBY1mHuptnCNrRSGVPU=WHW=Qf5v+wGL6Gum-Dg@mail.gmail.com>
 
-On Wed, May 6, 2026 at 4:03=E2=80=AFPM Vincent Donnefort <vdonnefort@google=
-.com> wrote:
->
-> On Thu, Apr 30, 2026 at 10:37:24AM +0000, Mostafa Saleh wrote:
-> > Sashiko(locally) reports possiblity of division by zero and
-> > out-of-bounds bitwise shift in trace_clock_update().
+On Wed, May 06, 2026 at 04:10:20PM +0100, Mostafa Saleh wrote:
+> On Wed, May 6, 2026 at 4:03 PM Vincent Donnefort <vdonnefort@google.com> wrote:
 > >
-> > Although the clock update is untrusted, we should at least have some
-> > basic checks to avoid the clock value getting out of sync if the host
-> > is buggy.
->
-> I am not sure about the gain here. The host can still write values that w=
-ill
-> make it out of sync anyway.
->
-> The timestamp is ultimately fed and read by the host.
->
-
-This is not about having the clock in sync, but to avoid executing
-undefined behavior, such as division by zero or large shifts in cases
-if the host is buggy and not malicious.
-That was reported by Sashiko
-https://sashiko.dev/#/patchset/20260501111928.259252-1-smostafa%40google.co=
-m
-
-Thanks,
-Mostafa
+> > On Thu, Apr 30, 2026 at 10:37:24AM +0000, Mostafa Saleh wrote:
+> > > Sashiko(locally) reports possiblity of division by zero and
+> > > out-of-bounds bitwise shift in trace_clock_update().
+> > >
+> > > Although the clock update is untrusted, we should at least have some
+> > > basic checks to avoid the clock value getting out of sync if the host
+> > > is buggy.
 
 > >
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/clock.c | 3 +++
-> >  1 file changed, 3 insertions(+)
+> > I am not sure about the gain here. The host can still write values that will
+> > make it out of sync anyway.
 > >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/=
-clock.c
-> > index 32fc4313fe43..a7fc61976fd0 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/clock.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
-> > @@ -35,6 +35,9 @@ void trace_clock_update(u32 mult, u32 shift, u64 epoc=
-h_ns, u64 epoch_cyc)
-> >       struct clock_data *clock =3D &trace_clock_data;
-> >       u64 bank =3D clock->cur ^ 1;
+> > The timestamp is ultimately fed and read by the host.
 > >
-> > +     if (!mult || shift >=3D 64)
-> > +             return;
-> > +
-> >       clock->data[bank].mult                  =3D mult;
-> >       clock->data[bank].shift                 =3D shift;
-> >       clock->data[bank].epoch_ns              =3D epoch_ns;
-> > --
-> > 2.54.0.545.g6539524ca2-goog
-> >
+> 
+> This is not about having the clock in sync, but to avoid executing
+> undefined behavior, such as division by zero or large shifts in cases
+> if the host is buggy and not malicious.
+> That was reported by Sashiko
+> https://sashiko.dev/#/patchset/20260501111928.259252-1-smostafa%40google.com
+> 
+> Thanks,
+> Mostafa
+
+I would then reword that to make it clear it just prevents the host triggering
+UB on the hypervisor. It doesn't really harden much, which is fine because that
+data isn't relevant for the hypervisor.
+
+Other than that:
+
+Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+
+> 
+> > >
+> > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/clock.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
+> > > index 32fc4313fe43..a7fc61976fd0 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/clock.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+> > > @@ -35,6 +35,9 @@ void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
+> > >       struct clock_data *clock = &trace_clock_data;
+> > >       u64 bank = clock->cur ^ 1;
+> > >
+> > > +     if (!mult || shift >= 64)
+> > > +             return;
+> > > +
+> > >       clock->data[bank].mult                  = mult;
+> > >       clock->data[bank].shift                 = shift;
+> > >       clock->data[bank].epoch_ns              = epoch_ns;
+> > > --
+> > > 2.54.0.545.g6539524ca2-goog
+> > >
