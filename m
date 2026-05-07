@@ -1,124 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5474423E320;
-	Thu,  7 May 2026 15:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36ABF41B344;
+	Thu,  7 May 2026 15:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778166615; cv=none; b=sDJRM2jCALsIkWfTyvyKmtYlRxrn1jUFPRF2ZQtv1AZJDu/Rhf1QiMBkreNQ0ZCR0X1qxCANEoJ4eERHkYSdsNJChrvKYMCeUTdRCTvW1eJ8xP+7X5EEWXBCyW5PJ6vmNNRooIS1Sh6pg2YDQ+1+shGPxKs+3sW6AIn5sJAlmz8=
+	t=1778168559; cv=none; b=CGVZiFrKzDjJQlIqteT1NnMUj5eEPTgE3sdzjA6OeH9R24+xDB44Ms3GBw7nrYf/puFqr/aTO6rH4uz/omIq0LxLa8fNHvpGtiKdbf/kTckZdA3Y6utO6IGnq36AQ/h0rUHBROgklzUcRPzk1U7gPhpa3rmYjAAjga8X4ftfHHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778166615; c=relaxed/simple;
-	bh=qjoWczYkpEGi1bFg7PmCnsiouljmhUzJ/ZwyhYEXkYY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A2iM9j9HqHRltnRZS8vrGtjfuVt1SzuqXD5dX8trIuv6ZCSvcpMgPdN8/j7H+7kK1Q+6oigiaVhliq+bTJEgKqeCcJ2kVE/sCUfbAlngj5mFwif80lUFvQ4cgeCwuTNGgTiOQgEJ/Du87vbavRsiVkmEk/+I6QyJmRgTuKRJkMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmL5WDil; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778168559; c=relaxed/simple;
+	bh=l1ZPnnUQo3LA7hrPEfFbmz90OUYfRkfGIapw7V4O47Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hi6lHDOaLiUz1hYfxUEXyf4rMuh4666hnEDO1WotFwihBDUjuSN2o+xVA0mVTKNTgg+MMt8FqNn8D/CXEjzrGqfVWrAy+FJb1jL4xvaGiSsUqVv8eiwijUqtbAxg1MyMBO8YGyDj+i9o7h50XyrTjgQZwTH+ASpBUw4vZZwgCks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyOMHArE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmL5WDil"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0005C2BCB2;
-	Thu,  7 May 2026 15:10:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyOMHArE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACAEDC2BCB2;
+	Thu,  7 May 2026 15:42:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778166615;
-	bh=qjoWczYkpEGi1bFg7PmCnsiouljmhUzJ/ZwyhYEXkYY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SmL5WDilQvcnpmSI6bCNdwj+YAeQazhWgc/Y5+iEZKs/LyxqVx1UIhzjOBeFhoUhN
-	 mMNUYiDUa3/FvlFbHvXRdQQJrZMOOF8wOfxZAg1GI8GQ43mMZc8MKaOqgQL2Hjtnot
-	 ABu0aUeSM4duQgx7FuKZvhSEDFGkIOD+I907TjjP1PPnlBOYRtyi6Tuk8d4RyohXnh
-	 03BncqrBnn4OG4XqSUUryu3W6Dnwcuo8N9mey24ayMhFJPX3azXKfb0Apqxde/9kGy
-	 uNXxk2SXsXoX9unSSxc21PnGbMbrp3EB/AebasFbtFChjfThCNcmprWhlpDbHJVvjP
-	 0GvsnGTM4Yjow==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1778168558;
+	bh=l1ZPnnUQo3LA7hrPEfFbmz90OUYfRkfGIapw7V4O47Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IyOMHArEmgi0Q5vGh1Du3NDsI2BpGYwYQjALrYGiVjrX+0vCKu09jJ0vFfepHcjo/
+	 xDn90EmBuObaJoFsF9RF/vvl0RY+jG97lmNVMaU+XM56t8NzM4UEa6Y+tg/Epr+Tif
+	 0qyBNhy8eKUSpu26ge9xIi/GlL7fESAHcWZekUS1Q/SrXtKgy+Y7IAlaXqpZfudix0
+	 avkfhEESCpbR6+BNj5UswHve3fUXzMSu+At1soFld57tG8iNa2gq3jJ7wAE5iwufU8
+	 KGlR1ALBLD/o5RvphbioZvPjmuZLsvN3gLvOwIrkY2cq8Fm1Pnq1C6wI396s/Vw6Ps
+	 IKsOcUDc29bXQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wL0Me-0000000014M-3HYw;
-	Thu, 07 May 2026 15:10:12 +0000
-Date: Thu, 07 May 2026 16:10:11 +0100
-Message-ID: <86pl37xnl8.wl-maz@kernel.org>
+	id 1wL0s0-000000001gn-216s;
+	Thu, 07 May 2026 15:42:36 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 18/43] KVM: arm64: gic-v5: Define remaining IRS MMIO registers
-In-Reply-To: <20260427160547.3129448-19-sascha.bischoff@arm.com>
-References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
-	<20260427160547.3129448-19-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	James Morse <james.morse@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Sebastian Ott <sebott@redhat.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 7.1, take #2
+Date: Thu,  7 May 2026 16:42:21 +0100
+Message-ID: <20260507154221.2905554-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, tabba@google.com, james.morse@arm.com, lpieralisi@kernel.org, mark.rutland@arm.com, smostafa@google.com, oupton@kernel.org, sebott@redhat.com, seiden@linux.ibm.com, sudeep.holla@kernel.org, vdonnefort@google.com, weilin.chang@arm.com, will@kernel.org, yaoyuan@linux.alibaba.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 27 Apr 2026 17:12:11 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> Complete the set of defined IRS MMIO registers in the GICv5 header
-> file. Up until now, the set of defined IRS MMIO registers has been
-> driven by code requirements. However, in order to properly emulate the
-> IRS MMIO interface in KVM, the complete set of IRS MMIO registers
-> needs to be added.
+Paolo,
 
-I really think you need to pick a register update "style". Either you
-add all the definitions in one go, or you add them with the patch that
-start making use of it.
+Here's the second set of KVM/arm64 fixes for 7.1. Nothing too horrible
+this time, aside from an ARM erratum workaround that has little impact
+on KVM, but relies on some firmware dealing with the problem. Bleh.
 
-My preference goes with the former.
+The rest is a small collection of bug fixes, mostly affecting the MMU
+(permission fault handling with guest_memfd, 52bit VA with NV), and a
+small set of AI-enhanced fixes from Fuad. I guess I'll have to get
+used to that.
 
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  include/linux/irqchip/arm-gic-v5.h | 105 ++++++++++++++++++++++++++---
->  1 file changed, 96 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
-> index 54b573783cd75..9ea3674a6613b 100644
-> --- a/include/linux/irqchip/arm-gic-v5.h
-> +++ b/include/linux/irqchip/arm-gic-v5.h
-> @@ -62,6 +62,14 @@
->  #define GICV5_OUTER_SHARE		0b10
->  #define GICV5_INNER_SHARE		0b11
->  
-> +#define GICV5_AIDR_COMPONENT_IRS	0b00
-> +#define GICV5_AIDR_COMPONENT_ITS	0b01
-> +#define GICV5_AIDR_COMPONENT_IWB	0b10
-> +
-> +#define GICV5_AIDR_ARCH_MAJ_REV_V5	0
-> +#define GICV5_AIDR_ARCH_MIN_REV_V0	0
-> +#define GICV5_IIDR_IMPLEMENTER_ARM	0x43b
-> +
+And last but not least, Steffen joins the merry band of KVM/arm64
+reviewers in preparation of s390 and arm64 being joined at the hip...
 
-I'm in two minds about this. We used the same hack (advertising this
-as an ARM implementation) for GICv2/v3, but that's really not one.
-
-And in any case, the ARM encoding should not leave in this file -- it
-is only used for the KVM implementation, and everything else should be
-implementation agnostic (until we need to implement a workaround, of
-course...).
-
-Thanks,
+Please pull,
 
 	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+The following changes since commit 7fd2df204f342fc17d1a0bfcd474b24232fb0f32:
+
+  Linux 7.1-rc2 (2026-05-03 14:21:25 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvmarm-fixes-7.1-2
+
+for you to fetch changes up to effc0a39b8e0f30670fe24f51e44329d4324e566:
+
+  KVM: arm64: Pre-check vcpu memcache for host->guest donate (2026-05-07 14:12:42 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 7.1, take #2
+
+- Add the pKVM side of the workaround for ARM's erratum 4193714, provided
+  that the EL3 firmware does its part of the job. KVM will refuse to
+  initialise otherwise.
+
+- Correctly handle 52bit VAs for guest EL2 stage-1 translations when
+  running under NV with E2H==0.
+
+- Correctly deal with permission faults in guest_memfd memslots.
+
+- Fix the steal-time selftest after the infrastructure was reworked.
+
+- Make sure the host cannot pass a non-sensical clock update to the
+  EL2 tracing infrastructure.
+
+- Appoint Steffen Eiden as a reviewer in anticipation of the KVM/s390
+  ability to run arm64 guests, which will inevitably lead to arm64
+  code being directly used on s390.
+
+- Make sure that EL2 is configured with both exception entry and exit
+  being Context Synchronization Events.
+
+- Handle the current vcpu being NULL on EL2 panic.
+
+- Fix the selftest_vcpu memcache being empty at the point of donation or
+  sharing.
+
+- Check that the memcache has enough capacity before engaging on the
+  share/donate path.
+
+- Fix __deactivate_fgt() to use its parameter rather than a variable
+  in the macro context.
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: Handle permission faults with guest_memfd
+
+Fuad Tabba (6):
+      KVM: arm64: Make EL2 exception entry and exit context-synchronization events
+      KVM: arm64: Guard against NULL vcpu on VHE hyp panic path
+      KVM: arm64: Fix __deactivate_fgt macro parameter typo
+      KVM: arm64: Seed pkvm_ownership_selftest vcpu memcache
+      KVM: arm64: Pre-check vcpu memcache for host->guest share
+      KVM: arm64: Pre-check vcpu memcache for host->guest donate
+
+James Morse (1):
+      KVM: arm64: Work around C1-Pro erratum 4193714 for protected guests
+
+Mostafa Saleh (1):
+      KVM: arm64: Remove potential UB on nvhe tracing clock update
+
+Sebastian Ott (1):
+      KVM: selftests: arm64: Fix steal_time test after UAPI refactoring
+
+Steffen Eiden (1):
+      MAINTAINERS: Add Steffen as reviewer for KVM/arm64
+
+Wei-Lin Chang (1):
+      KVM: arm64: nv: Consider the DS bit when translating TCR_EL2
+
+ MAINTAINERS                              |  1 +
+ arch/arm64/include/asm/kvm_nested.h      |  1 +
+ arch/arm64/include/asm/sysreg.h          |  2 +-
+ arch/arm64/kvm/arm.c                     | 21 ++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h  |  2 +-
+ arch/arm64/kvm/hyp/nvhe/clock.c          |  3 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 47 +++++++++++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c           | 16 ++++++++++-
+ arch/arm64/kvm/hyp/vhe/switch.c          |  3 +-
+ arch/arm64/kvm/mmu.c                     | 29 ++++++++++++++------
+ include/linux/arm-smccc.h                |  6 ++++
+ tools/testing/selftests/kvm/steal_time.c |  2 ++
+ 12 files changed, 120 insertions(+), 13 deletions(-)
