@@ -1,95 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC16B2459DC;
-	Wed,  6 May 2026 16:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944464502F;
+	Thu,  7 May 2026 01:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778085393; cv=none; b=HsUwldmjYV6gAM2erHr4sLOz88q2Q0gHgMBVqzti8kkhwJDbmE0V2d5V+3Go87qYYHOz1qIixWlswmPkwLM3JsMF/9P1T8UIODu3MCobQDTBrZdJSTTr8OzSa8HTv9iqdWcmxQe1uE3h6xhya58E8gDgH6Xc+9ghEdM0NvjLQCw=
+	t=1778118197; cv=none; b=mg2BbZjAQRwCIhcCc6HpM6KPWhO2A217yZn0R5N2NDQtGwDZfh3oNbaZcyip4tmeCsvVv5dK8do49K+tyy386jVB8eay3uE7oRyD7lAaThKAz3r+8KYPROSBwsI+FiLn5q8OvLbfKUFbENUQoAq0hreZkRlJyaKozLi0QqU00HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778085393; c=relaxed/simple;
-	bh=Ue44NioV5E914YTc64YG9A64MJOnrp/V9kJitJ+ZR1M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ap109R+Cvbs7lrK/W+OVUNC+T+Wz/6R4qLHhyfXaw93uwBQgwoWBqzXG/dP65Hi1DIuvhb6mox7afXuPbFnSWLGJP4GvQNBYf2rmcBKGUGMZkdZIIqNTEi2pk6h9kOrnpPapjOUS9Z9v2zYur02eI/0NG4Sez4shlcJZ8HasQUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwMSCULq; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwMSCULq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E75DC2BCB0;
-	Wed,  6 May 2026 16:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778085392;
-	bh=Ue44NioV5E914YTc64YG9A64MJOnrp/V9kJitJ+ZR1M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dwMSCULqoAB0A/5JTewt2Py2FDxKt/KpeUbUtdB9Od7aGMOK91jD6hDPSEV3HREVk
-	 fOQoJkOXU/83y82fDcNHwgBpEnhmrbtNfijMBzsyqKYVoPxGz8a4dHOl8YEd2ShK87
-	 FIYY7wABv9F0NuAnwrBri2d2VIXR1XWuus+PFQKP7f5hrtG7Fan0QbvkoY0lEtjNwl
-	 ANP6Ke+w/MqqsS6gvxjHUovkCsZqYFAL76pLPSgc/hg2THpqIIK1kQ65M0zrZ9jrL5
-	 5IvBcsQskwSr/2HHMZvScskz178NB/uJzkO9voMaK5sDXpeMTzW9BH9lUSiKBc/jRO
-	 3U9Eyr9cVcg8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wKfEc-00000000Mhn-1co5;
-	Wed, 06 May 2026 16:36:30 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Steffen Eiden <seiden@linux.ibm.com>
-Cc: Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: (subset) [RFC PATCH v2 15/28] MAINTAINERS: Add Steffen as reviewer for KVM/arm64
-Date: Wed,  6 May 2026 17:36:25 +0100
-Message-ID: <177808536524.2712923.10633817226066107271.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260428160527.1378085-16-seiden@linux.ibm.com>
-References: <20260428160527.1378085-1-seiden@linux.ibm.com> <20260428160527.1378085-16-seiden@linux.ibm.com>
+	s=arc-20240116; t=1778118197; c=relaxed/simple;
+	bh=wfkzn5vEOdAO4CItueKY05cY1KoUngcW2ziIYm3VPMY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=RLNSmp2Nh1l0MQkKigGHxg8QWnei6PzW2LjVakV0grH2uDsLg4kiaHy22LT/sfjY7LGhIFUorKayY445do69QSubocATAq/a/dfRiPAMWmFoVZ69lIvPdXm69lj4g+XG1ddvfl532g0pXTUgbVaFm+k2Oln31Y97guWvYR3EqO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Bx0eov7vtpGVUHAA--.24061S3;
+	Thu, 07 May 2026 09:43:11 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJBxacEo7vtpjfx7AA--.25500S3;
+	Thu, 07 May 2026 09:43:05 +0800 (CST)
+Subject: Re: [PATCH 1/5] KVM: arm64: Grab KVM MMU write lock in
+ kvm_arch_flush_shadow_all()
+To: Sean Christopherson <seanjc@google.com>
+Cc: James Houghton <jthoughton@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Gavin Shan <gshan@redhat.com>,
+ Shaoqin Huang <shahuang@redhat.com>, Ricardo Koller <ricarkol@google.com>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ James Hogan <jhogan@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260504224213.1049426-1-jthoughton@google.com>
+ <20260504224213.1049426-2-jthoughton@google.com>
+ <25838e74-01dd-d085-395b-676266dc9a9a@loongson.cn>
+ <aftIbW9G4RfoTuXh@google.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <833b7f62-5e9f-26e7-f60d-2ac1dd24c031@loongson.cn>
+Date: Thu, 7 May 2026 09:40:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <aftIbW9G4RfoTuXh@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, seiden@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, ggala@linux.ibm.com, brueckner@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, Ulrich.Weigand@de.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-CM-TRANSID:qMiowJBxacEo7vtpjfx7AA--.25500S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZr1rJF1DJFWxtw1UKw43twc_yoW5GFyxpF
+	WUC3WqgrWDA340kw4kZ3WkWw1FyaykGr4UJw1Ygry5urs8Gwn3KF4SyFy0kFZ7ZrZ7GFWq
+	qF45tr95Zas8ZrXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU2-VyUUUUU
 
-On Tue, 28 Apr 2026 18:05:12 +0200, Steffen Eiden wrote:
-> KVM/arm64 and KVM/s390 now share some code.Add me as a cross-reviewer
-> from the s390 team to arm64 to help to keep both architectures in sync.
+
+
+On 2026/5/6 下午9:55, Sean Christopherson wrote:
+> On Wed, May 06, 2026, Bibo Mao wrote:
+>> On 2026/5/5 上午6:42, James Houghton wrote:
+>>> kvm_arch_flush_shadow_all() may sometimes be called on the same `kvm`
+>>> concurrently in the event that the KVM's `mm` is __mmput() at the
+>>> same time that last reference to the KVM is being dropped.
+>>>
+>>> T1              T2
+>>> KVM_CREATE_VM
+>>>                   Get VM file from T1
+>>> close VM
+>>> exit_mm()       close VM
+>>>
+>>> T1: exit_mm() -> kvm_mmu_notifier_release() -> kvm_flush_shadow_all(),
+>>>       with only the KVM srcu read lock held.
+>>>
+>>> T2: kvm_vm_release() ---> mmu_notifier_unregister() ->
+>>>       kvm_mmu_notifier_release() -> kvm_flush_shadow_all(),
+>>>       again, with only the KVM srcu read lock held.
+>> By looking through the code, kvm_arch_destroy_vm() will free PGD page only,
+>> page table walking is executing in deleting memslot or exit_mm().
+>>
+>> With normal code, life cycle of VM is something like this:
 > 
+> Not necessarily.  Abruptly closing the VM, as described below, is also "normal"
+> (though likely uncommon).
 > 
+>>    KVM_CREATE_VM
+>>      Create_VCPUs
+>>      Create memslots
+>>      Destroy_VCPUs
+> 
+> This is incorrect.  KVM doesn't provide any way for userspace to destroy vCPUs.
+> Userspace can fully release every vCPU fd, but the vCPU object within KVM stays
+> alive (and indirectly reachable) until the VM is destroyed.
+yes, that is so. For users, there is vCPU fd release interface. As for 
+vCPU object release, it is kind of internal implementation in KVM.
+> 
+>>      Destroy memslots
+>>    close VM
+>>    exit_mm()
+> 
+> Note, exit_mm() may or may not be called.  E.g. there are VMMs that will destroy
+> a VM and start a new one (perhaps even the same conceptual virtual machine) in
+> the same process / mm_struct / address space.
+> 
+>> And there is kvm_get_kvm()/kvm_put_kvm() function call with creating/destroy
+>> vCPUs, however no such operations with memslot operation. Is it possible
+>> that VM is destroyed without removing memslots, such as the following
+>> operation.
+>>    KVM_CREATE_VM
+>>      Create memslots
+>>    close VM
+>>    exit_mm()
+> 
+> Yep.  KVM cannot make any assumptions when it comes to userspace-initiated
+> operations.  Even a VMM that super strictly follows the first approach may exit
+> abruptly, without destroying memslots, e.g. if it's OOM-killed.
+oh, I see. If so, the implementation about kvm_arch_destroy_vm() on 
+Loongarch is problematic, it needs consider this kind of abnormal VM 
+destroy, take page table walk and free page tables. I had thought that 
+memslots create/destroy should call kvm_get_kvm()/kvm_put_kvm() :(
 
-Applied to fixes, thanks!
-
-[15/28] MAINTAINERS: Add Steffen as reviewer for KVM/arm64
-        commit: 54ea22273eef67196f238263bc79f27da04d2114
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+Regards
+Bibo Mao
 
