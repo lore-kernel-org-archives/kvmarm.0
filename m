@@ -1,141 +1,203 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944464502F;
-	Thu,  7 May 2026 01:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8FD62809
+	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 02:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778118197; cv=none; b=mg2BbZjAQRwCIhcCc6HpM6KPWhO2A217yZn0R5N2NDQtGwDZfh3oNbaZcyip4tmeCsvVv5dK8do49K+tyy386jVB8eay3uE7oRyD7lAaThKAz3r+8KYPROSBwsI+FiLn5q8OvLbfKUFbENUQoAq0hreZkRlJyaKozLi0QqU00HU=
+	t=1778120790; cv=none; b=tFri3EefT9EjE2ei2UdexDfkWpPYPqPXExvf6jdowIDbxi4VuXSGahMu+ca4gm12b+Wp+H+6v5HXVpyK3w2Aj+lCrxJDZRobs4RBtG8b6iHEY5eQpssHwINQkS5dgQLHsEyWxvYgLTvlOWTsD0EMwSX583gaf8o04516LT7fJzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778118197; c=relaxed/simple;
-	bh=wfkzn5vEOdAO4CItueKY05cY1KoUngcW2ziIYm3VPMY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=RLNSmp2Nh1l0MQkKigGHxg8QWnei6PzW2LjVakV0grH2uDsLg4kiaHy22LT/sfjY7LGhIFUorKayY445do69QSubocATAq/a/dfRiPAMWmFoVZ69lIvPdXm69lj4g+XG1ddvfl532g0pXTUgbVaFm+k2Oln31Y97guWvYR3EqO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Bx0eov7vtpGVUHAA--.24061S3;
-	Thu, 07 May 2026 09:43:11 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJBxacEo7vtpjfx7AA--.25500S3;
-	Thu, 07 May 2026 09:43:05 +0800 (CST)
-Subject: Re: [PATCH 1/5] KVM: arm64: Grab KVM MMU write lock in
- kvm_arch_flush_shadow_all()
-To: Sean Christopherson <seanjc@google.com>
-Cc: James Houghton <jthoughton@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Gavin Shan <gshan@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Ricardo Koller <ricarkol@google.com>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- James Hogan <jhogan@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
- linux-mips@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260504224213.1049426-1-jthoughton@google.com>
- <20260504224213.1049426-2-jthoughton@google.com>
- <25838e74-01dd-d085-395b-676266dc9a9a@loongson.cn>
- <aftIbW9G4RfoTuXh@google.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <833b7f62-5e9f-26e7-f60d-2ac1dd24c031@loongson.cn>
-Date: Thu, 7 May 2026 09:40:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1778120790; c=relaxed/simple;
+	bh=okhG2EVPEEDPfn7Jo0TsWTzz2U0mvQGQZJTddc93OIo=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=PWRmh+DaERNcqu0U6epx8KLvHaPBRXC5F7p6ybGk/INpARajGqVeRIAk7K7Cm4Zw3HnEVEZiOX65PgDaP8EypO7DuA07uFKhlcRE8NU7h3in9oaXuBl5ULuF+lAX4/d4XWvIOnaEKhr0GbxhTkD2C8wQ5ERVJoqTUPu2xBLOOec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gqtbc8f7; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gqtbc8f7"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 646Ik7vu1531488;
+	Thu, 7 May 2026 02:25:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=rQxzSD
+	yf9Fj6A4ZENc/ca8mockOKJ3GHbUZjTEAcPwI=; b=gqtbc8f76VQMLM9MVEKnSx
+	WBsPN5ldYdwr0g2+kLf/VnsVRBPWafnJfzQJX4mHG3A8FgvHM3Jls4qjXE+dCmmo
+	DLfKhjOiylnGG3P3+GCsogdbq9MwF1MDbkNEuX93Ah+x518L3MzlpGIHkJKzQ3P1
+	Kuzq36sF8gprkrO3V0Y3b07XgL49P91hFb13fmBpoWXh/PefMYVLtP2blKSBWx+u
+	eRTyJNfosWoy7dAAXrLbkytyb5lO2WyQS9bUgy075Hv+bJcNcfu8y91bvW5g94Hg
+	esmbCdTpsAtWO7mGL3o+RfOmR7O3PM/bfFdE0OahwxlNmC8tmwonwokM3idbC3uw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dw9x4ursj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 May 2026 02:25:58 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6472OfTX013583;
+	Thu, 7 May 2026 02:25:57 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dwukqha2x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 May 2026 02:25:57 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6472PuqM53871096
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 May 2026 02:25:56 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BCE365805C;
+	Thu,  7 May 2026 02:25:56 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8287E5805A;
+	Thu,  7 May 2026 02:25:54 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.185.101])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 May 2026 02:25:54 +0000 (GMT)
+Message-ID: <461ec995935e2b42a8414f6f87063ff2557bbfb4.camel@linux.ibm.com>
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell
+ <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com
+In-Reply-To: <19dfb0e2730.2843.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+References: <cover.1777036497.git.noodles@meta.com>
+	 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+	 <afMlgstqahnZg68h@e129823.arm.com>
+	 <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
+	 <CAHC9VhRsnmPp2KmQAns5uq5qXX5EF2xQQzyfTgrPi4O9AXyPpg@mail.gmail.com>
+	 <ba4bf28314b679474a6a8da6298e548e54b3754c.camel@linux.ibm.com>
+	 <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
+	 <ff28c6dcb60c357c752724927addaa8c4fd3bf2c.camel@linux.ibm.com>
+	 <CAHC9VhQY2TMkTvQq9P8oZteQWQSr7qq2utOuH+pdVx+8jWLBCw@mail.gmail.com>
+	 <a9412fe10e70ce95dd70556ace19368bec5c188c.camel@linux.ibm.com>
+	 <CAHC9VhRUgNA=Sj=jhD=zOt8R80Q+FQj+H0nYSy-FAujTL3EKPA@mail.gmail.com>
+	 <5debff82dc758d9c91223e4f1f5b9e39a3fcd4f5.camel@linux.ibm.com>
+	 <19dfb0e2730.2843.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 06 May 2026 22:25:54 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <aftIbW9G4RfoTuXh@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxacEo7vtpjfx7AA--.25500S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxZr1rJF1DJFWxtw1UKw43twc_yoW5GFyxpF
-	WUC3WqgrWDA340kw4kZ3WkWw1FyaykGr4UJw1Ygry5urs8Gwn3KF4SyFy0kFZ7ZrZ7GFWq
-	qF45tr95Zas8ZrXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
-	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l
-	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU2-VyUUUUU
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDAxOSBTYWx0ZWRfXznX1S+sn/9ll
+ +ZDtGoPGjMHt1C52ETaGJiR87dSppgUqbTeQ5kM8saz3fOvWSKFElBgefGfZN0uth+5dO9QObYr
+ wWJcR+RvLTnH2bvFzY7fyHruQhhkgijL1w9gI7fdYWzlwf90hd4vo7ta835xG/B7r+gAOUrbLzk
+ Im0kk5Vh0+gYv6BuCkouHaTV4DJnzzmWeGlcOlGAg4lThkM0IYZu1a6fcs/sq1zcIvVEQz2wgeX
+ yMXwi+OT1rJklihGuP8Dz3IOUv7287TYbQ32hted2YyHkX4hHoWacBjQ4Ca5zs/7IoJ73EBGQx6
+ HoJwfgR1JGH814cKRrDqlwngwhNag3+UkePRvjwYBqiIeVpyy1lhiqnU18j1toLN+b6TmFsqkCW
+ FaOwmSJdU7/xsP2oufP2abA3YWld2PD/laBOW8mDgPOGtasjCYhH2ZqOHl1NSylQCQKORF9fFRZ
+ i0va2bRZhRNtJAcWHSA==
+X-Proofpoint-ORIG-GUID: IVuvrxwTYJaZAGiHieI9ElLz5NfcZcOI
+X-Proofpoint-GUID: dFBLB4dzcWwnvHt3QZOfaoUD7XzIN8YQ
+X-Authority-Analysis: v=2.4 cv=W7UIkxWk c=1 sm=1 tr=0 ts=69fbf837 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=Hs2b41jZhdh1vBShbzsA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-06_02,2026-05-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 spamscore=0 clxscore=1015 phishscore=0 bulkscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2605070019
 
+On Tue, 2026-05-05 at 22:11 -0400, Paul Moore wrote:
+> On May 5, 2026 9:57:23 PM Mimi Zohar <zohar@linux.ibm.com> wrote:
+> > On Tue, 2026-05-05 at 18:55 -0400, Paul Moore wrote:
+> > > On Tue, May 5, 2026 at 5:05=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.co=
+m> wrote:
+> > > > On Mon, 2026-05-04 at 16:51 -0400, Paul Moore wrote:
+> > > > > On Mon, May 4, 2026 at 8:03=E2=80=AFAM Mimi Zohar <zohar@linux.ib=
+m.com> wrote:
+> > > > > > On Sun, 2026-05-03 at 12:46 -0400, Paul Moore wrote:
+> > > > > > > Regardless, assuming you always want IMA to leverage a TPMs w=
+hen they
+> > > > > > > exist, your reply suggests that using an initcall based IMA i=
+nit
+> > > > > > > scheme, even a late-sync initcall, may not be sufficient beca=
+use
+> > > > > > > deferred TPM initialization could happen later, yes?
+> > > > > >=20
+> > > > > > Well yeah.  The TPM could be configured as a module, but that s=
+cenario is=20
+> > > > > > not of
+> > > > > > interest.  That's way too late.  The case being addressed in th=
+is patch set is
+> > > > > > when the TPM driver tries to initialize at device_initcall, ret=
+urns
+> > > > > > EPROBE_DEFER, and is retried at deferred_probe_initcall (late_i=
+nitcall).  Since
+> > > > > > ordering within an initcall is not supported, this patch attemp=
+ts to initialize
+> > > > > > IMA at late_initcall and similarly retries, in this case, at=
+=20
+> > > > > > late_initcall_sync.
+> > > > >=20
+> > > > > Okay, so from a TPM initialization perspective you are satisfied =
+with
+> > > > > a late-sync IMA initialization, yes?
+> > > >=20
+> > > > No. On some architectures moving IMA initialization from the late_i=
+nitcall to
+> > > > late_initcall_sync does not miss any measurement records. However, =
+as=20
+> > > > previously
+> > > > mentioned, Linux running in a PowerVM LPAR the move would drop ~30 =
+measurement
+> > > > records[1].  So no, only if the TPM is not initialized by late_init=
+call, should
+> > > > IMA retry at late_initcall_sync.
+> > >=20
+> > > What do you do in the PowerVM LPAR when the TPM is not avaiable at
+> > > late initcall and you have to defer IMA initialization until
+> > > late-sync?
+> >=20
+> > Your question is hypothetical ...
+>=20
+> <heavy eye roll>
+>=20
+> > ... as the TPM isn't deferred, so IMA doesn't go into
+> > TPM-bypass mode.  Testing on a PowerVM LPAR demonstrated that it skips =
+~30
+> > measurement list records.  So moving the initcall to late_initcall_sync=
+ would
+> > cause a regression.
+>=20
+> Let me rephrase to make the question clear - how do you plan to handle a=
+=20
+> system where you lose measurements by waiting until late-sync, but the TP=
+M=20
+> is not available at the late initcall.
 
+There have been suggestions to queue the IMA measurements, but that goes ag=
+ainst
+the "measure before use" principle. The solution is not to defer IMA
+initialization for all systems, but to differentiate the boot_aggregate rec=
+ord
+(boot_aggregate vs. boot_aggregate_late) based on when the TPM becomes avai=
+lable
+relative to IMA's initcall.  IMA's job is simply to collect and provide the
+measurement list.  Based on the attestation service policy, the attestation
+service will decide whether a measurement list containing boot_aggregate_la=
+te is
+acceptable.
 
-On 2026/5/6 下午9:55, Sean Christopherson wrote:
-> On Wed, May 06, 2026, Bibo Mao wrote:
->> On 2026/5/5 上午6:42, James Houghton wrote:
->>> kvm_arch_flush_shadow_all() may sometimes be called on the same `kvm`
->>> concurrently in the event that the KVM's `mm` is __mmput() at the
->>> same time that last reference to the KVM is being dropped.
->>>
->>> T1              T2
->>> KVM_CREATE_VM
->>>                   Get VM file from T1
->>> close VM
->>> exit_mm()       close VM
->>>
->>> T1: exit_mm() -> kvm_mmu_notifier_release() -> kvm_flush_shadow_all(),
->>>       with only the KVM srcu read lock held.
->>>
->>> T2: kvm_vm_release() ---> mmu_notifier_unregister() ->
->>>       kvm_mmu_notifier_release() -> kvm_flush_shadow_all(),
->>>       again, with only the KVM srcu read lock held.
->> By looking through the code, kvm_arch_destroy_vm() will free PGD page only,
->> page table walking is executing in deleting memslot or exit_mm().
->>
->> With normal code, life cycle of VM is something like this:
-> 
-> Not necessarily.  Abruptly closing the VM, as described below, is also "normal"
-> (though likely uncommon).
-> 
->>    KVM_CREATE_VM
->>      Create_VCPUs
->>      Create memslots
->>      Destroy_VCPUs
-> 
-> This is incorrect.  KVM doesn't provide any way for userspace to destroy vCPUs.
-> Userspace can fully release every vCPU fd, but the vCPU object within KVM stays
-> alive (and indirectly reachable) until the VM is destroyed.
-yes, that is so. For users, there is vCPU fd release interface. As for 
-vCPU object release, it is kind of internal implementation in KVM.
-> 
->>      Destroy memslots
->>    close VM
->>    exit_mm()
-> 
-> Note, exit_mm() may or may not be called.  E.g. there are VMMs that will destroy
-> a VM and start a new one (perhaps even the same conceptual virtual machine) in
-> the same process / mm_struct / address space.
-> 
->> And there is kvm_get_kvm()/kvm_put_kvm() function call with creating/destroy
->> vCPUs, however no such operations with memslot operation. Is it possible
->> that VM is destroyed without removing memslots, such as the following
->> operation.
->>    KVM_CREATE_VM
->>      Create memslots
->>    close VM
->>    exit_mm()
-> 
-> Yep.  KVM cannot make any assumptions when it comes to userspace-initiated
-> operations.  Even a VMM that super strictly follows the first approach may exit
-> abruptly, without destroying memslots, e.g. if it's OOM-killed.
-oh, I see. If so, the implementation about kvm_arch_destroy_vm() on 
-Loongarch is problematic, it needs consider this kind of abnormal VM 
-destroy, take page table walk and free page tables. I had thought that 
-memslots create/destroy should call kvm_get_kvm()/kvm_put_kvm() :(
-
-Regards
-Bibo Mao
-
+Mimi
