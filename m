@@ -1,357 +1,248 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012011.outbound.protection.outlook.com [40.93.195.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD7135CB7F
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 19:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778183083; cv=fail; b=kHNo3o+zCk2XQN3lxXpmV3TGn6cpQUSXf7MB508T0SIJ+JibyNRih4BZDJhGYGgaEzs/XjIXvULpW59nyOzhs0/5Jo9RqcZ7OvqBDJWW3U7XxuHoBIKor3YZXFrE2PGPyE89EaWnAcbtrn2J7mxUjh0aH+VGD/qrPobeKr4e1aI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778183083; c=relaxed/simple;
-	bh=LOSQQ3A5btFfMkscswR77YnTY9SmmN3KW/FSYL92V54=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Oe5ljPG7PRP4xX9Tl+9lBzwh7ssT172O4vWdD6HAqGYBx5WY6hNeDPSxAYPilrNYl5qoMYMmRD2oNZpDCV6mccXPnZqS1Ggmkfx13R01WEh1yXHAyF4zSXOJf0NV6OlwzfHiNZ3ALJBscjN5sY/DztjmB9uyi8Kzmm8E1re9pTk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uCqGq7H8; arc=fail smtp.client-ip=40.93.195.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C230F3563F6
+	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 20:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778184238; cv=none; b=r2G/xEBzrtI9t5q0mcvpshfMo3xIiQ23UilyMokFXmFbFT90Hj05VV8WtNHXBKcZRfulzp7g9XpRA6sSZMzKbWqXaKpk8Ah6rKAtu80vrcuNGRLvlev92qbr6cxRGnitv0QEvDa3k4CB2hzxNHYouWGLp1ue6HtWyOIh7qVuXcg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778184238; c=relaxed/simple;
+	bh=S+AFX8c4a8gMxGqbMas7Vl/9KMYsCAXxKzNJAQHSVm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LP/4F5n4xJ1bjYtwSpEn5cc8n+HKYyBfigku09VZlFqzIStxlTNXDHHgrdMoPwPFt7rcPWBuHzd2i0jXsf60SsDoTShANbIuZzD0VIQtfCAV+oSjqAnXyxkH+Pk3mE8w754lwMsJi2m2FLoE50KzWoihDZoxOzFO1PAwQ1/uofA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BxI5QqQA; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uCqGq7H8"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mkk5JM168C4N83rzO7tNh+rIMevsjiHlGeIOiet7G32NjwHorOfSNGVz/t+TTNFHWaIvCll67F4PAR5SVSmNtZzMhoUeZxgu7kDBnyak1640Desk/1rBcoNXg1j7Eb3/bfbgH0hhfQo6e4QV3ddBdXEVwZp9sMjTiDqrZSI+wxzCyun8SDQ3+mhj428eYCSF3WSZtZYbTq8AkLN57tELKu17SKP0hrAiJYVdZ69V9JxFu+5oUJWBc1BdoJTIl+vgNp6XWRHKD7C+He5sVlChxaOnC7K7vRX+FioGD+2lmAD7ziSjL+tB9Dr/x86MrEaA6edSGVa/dtc1jTmDV+uV3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eJcexBkkj0+o0lFC5i6hujne5xoo81Sxct9ZMJyQU88=;
- b=sTYoxPhNkWmI7DzMACbel5SWI+LsJ7/kT+APQZhRj5OI+nvj6dKe2rzNle4SV5ZDd8sD0c/Z3GbJL3K/idmIssIEzboktR+QMRy1C0eAHx2katK7Xvundcdl2yXa9IIPSW74HgcdusHKufBjupOO22kHojmAcQhNR56ZOWaNvAijAGfWUeITC1kou32PDN3mcdfbBrFifLqy21ynvUQdKjB7Ni0AIBDzQ+yC1ySoDZKNqzXFHz700TytDYV8QNgmkNI3xo6JeHOvhvvYkjk0bKcjKdiy+voF94CSbLV0VCdZb4YZ98FIV7g799YEoQ4I0oh4vsNzpfGXDW4vf6zHLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eJcexBkkj0+o0lFC5i6hujne5xoo81Sxct9ZMJyQU88=;
- b=uCqGq7H8hs990xVv5tTu3cRqvc0tX4QKq/AKUEimgnLdANTjyd8CxPNoDGRwlCecqtQnMpSH35ufkLP6UjnYg35IwhB+uSY+MTV+JRvTCBkEH3ptHabbMYIIKH/TvlEetYaNWGpBg3VJn6TE8UxeuHRv2lydx5YfHZDC9a9vc8S3C9oprjIIL4hsBEjFdae5maGFFcro1ef+rfrQU+VdCok6C2nm+lE9nI9EXwPDWkdHtDj7fzthtu4fBdw/VyhUlo1QWaU4rbI171wIJnVu2vv3B0aUfhc/7jZ+kBYKCPKGNdZfA5bsmajRUq2VHHiMIlOqik0BJfWHlARwXNSEQw==
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by CYYPR12MB8939.namprd12.prod.outlook.com (2603:10b6:930:b8::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Thu, 7 May
- 2026 19:44:36 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.20.9891.017; Thu, 7 May 2026
- 19:44:36 +0000
-From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
-To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
-	<eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>, "richard.henderson@linaro.org"
-	<richard.henderson@linaro.org>, "cohuck@redhat.com" <cohuck@redhat.com>,
-	"sebott@redhat.com" <sebott@redhat.com>, "philmd@linaro.org"
-	<philmd@linaro.org>
-CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com"
-	<berrange@redhat.com>, "abologna@redhat.com" <abologna@redhat.com>,
-	"jdenemar@redhat.com" <jdenemar@redhat.com>
-Subject: RE: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
-Thread-Topic: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
-Thread-Index: AQHc2s+53rPwsDHdIkCu5+H94U9RRLYC+KUA
-Date: Thu, 7 May 2026 19:44:35 +0000
-Message-ID:
- <CH3PR12MB7548322D7A29C8EC3EA0E49BAB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
-References: <20260503073541.790215-1-eric.auger@redhat.com>
- <20260503073541.790215-18-eric.auger@redhat.com>
-In-Reply-To: <20260503073541.790215-18-eric.auger@redhat.com>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|CYYPR12MB8939:EE_
-x-ms-office365-filtering-correlation-id: 751622ad-9474-46cf-b2ba-08deac7111a4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|1800799024|376014|921020|38070700021|22082099003|56012099003|18002099003;
-x-microsoft-antispam-message-info:
- sacEGfh6HSKs75gDGw+4JcM+hod3FsSl9Khw7bWbHDOABcBZSAxY56s4VB5n4yJgIx2OQNkr8HCoUCHv9JNMx+5ba7yvZGoniL8ghpKaRxG/SqVHbWmNzfjklVhl4uEO4ZMX3rvsqzdhNXQCmTzEd2MiO07OQpiSK0jbITz+9RWWWfuvd8ZTqMXSVP02Jq3T6IlnACILbB6h2OaB4L0A1LJPcos5OmqEzbSFVr48P7LrwK51MhncVzapwS9LOn0Tdx0ItQs9x4FZcNl4Y7NlYcYUoQKzHuunZscgRnhVfdElq2FQhCJBVOMfa3xmU093cm7dDVNuzgawLdFbLc04bh8XoriYZGaGt1bvrHTwdFZCxo+nwusL8BydLEA9LhFvRuoV0OJiSaWu70yj1CI2YnRIL/7kc15NSblc+tI2Mxoe0t4rvgLzCpPpFOnnRrbISVbOQ78K02Z8H/RwjT0aXJKuHyone6zPGxoO7J+WhJL0wA7e8mq7s6yfHRYW9pQrmNWkeuYqqManKqXcfcMYGZ78TRLavdsOmKJkAD/kzKOf34ypo6G+xv2NpkPjwPR7buNRsgPbTDZmSOTuZXB0HphkzPhKPuy3FBuee+iTO9vsVvzeDRpGKKlD9ed4XlRVDoYkSd+gbrCb1ChTJ9q4sUn8X8ujUOyPk2sPsexEsSLDT4SVadCgCLhPlTH3wPyo4Dc+U/hbd9GJEDi8l925aj2kv9XLLwbKjEkuB8xlM4u76IHVWwe1FLs7UIhfqrCPenKRycMPMX3BgjjeuwBg3w==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(921020)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?h3ErZIzs6Sfl/DZBJy591lG/A0oNnFyQvR1Yqxz8AuNjXtC6Scfejpiy5bgK?=
- =?us-ascii?Q?yyfmWZKmO5Pc5FtaSawyiDid7j5d6OAqyr5QuKuy/ap8upet6cbwBleB8SVr?=
- =?us-ascii?Q?3tUNYS4YCd0RruWJR0uKTwQ/LnhHFF23hpWmGRHLwKcWTh+GntCE/V58xJdz?=
- =?us-ascii?Q?c9E9TA3C5K0lL2zGtjZbSgY+H11QA296oUCpRo6sav+0SIen4wgr4Bgl92sX?=
- =?us-ascii?Q?t2mf6fDRmIS8nBbqoEPjkhZm4IQpdvLdSP+AE9f/UtqmIYO/kE6glYav/vQo?=
- =?us-ascii?Q?m9EwrLvm1yvCjoONhxF+LxcbnzuacjQc3SZMJqefbpjEDbohFO11WuJ6TQcc?=
- =?us-ascii?Q?S0trDHHI05DUT/shKSb5d25yp5agCr5Fe4GoYqkM78bLzejhYo4Zdt4QlFVz?=
- =?us-ascii?Q?tK9NTnqXSFoLtK1qp3xLHzyeFbTo+HlkMK6MdfXE+fEpojv3t3DM4Ap3MHc9?=
- =?us-ascii?Q?ILdqjE5VXzM1m/h3a1CRnEdiCSuZ20LmjfBo9RdBRKAz+Idy2OUnzMr/B8Ra?=
- =?us-ascii?Q?Z+GQukdlwZU061fmFSUVEUPXE5jLTN9hLiiVcsAbIOiLkqXM275Ba1PWHByg?=
- =?us-ascii?Q?YQrjnd4lRikQvS+z0AmWeEfuWcAr/tK3j8UEBq3ldosfQFQnrgNcPjZCqrAV?=
- =?us-ascii?Q?E7osy6CITYlgRtVKHKanKTlqa+5gueslgRUrh+hvDzukS61Nk2E/oRSHL2V5?=
- =?us-ascii?Q?YiS6Ec0J/wwYenXg/CCw11YkPBA+gY5ytigOoAJ1+loH3xzlGLG8kW2F9eXB?=
- =?us-ascii?Q?8W+JbQ0VkpZg6ly2ODuklYe0kUCNSi5gxvBzxFA9MhAJRaA8iClyrC8bETXf?=
- =?us-ascii?Q?0sSChuMxZ3bQw42iT3dWilvJ5ty+lpeszjpUjEPnnC1lYF5TwmHFFGuGbfhl?=
- =?us-ascii?Q?OhEUGHXFHmLN82SClAZQVu0/KG9WxYiyzTbR/1JI7VAxY+dm6/kt0CXpoS+w?=
- =?us-ascii?Q?JU9UWVGa1kI+h7P4RNF/k6nu2Jg+W+4k3AP3hNts74fSTR9ylVvBqQW78A8z?=
- =?us-ascii?Q?0itDR1gneyIWICINHwZvqEHyPRReKgh55wjHfz/Mglo8hwAVuhSXokKd3gvJ?=
- =?us-ascii?Q?V3iUP7/Hn4li2A+q3RaQpcjlk3vocZ24UD0JeYwpQ19R3r6EQxTNQLIrNH+d?=
- =?us-ascii?Q?xniBNZvajCUHdd2Mq6lnuKxXQSf+MOxUi7RLXJURXmiAY3JAt5u8dCwMiyJp?=
- =?us-ascii?Q?6ZHLmkpcBoksltuBRQeoT1R529zgEMIOdB+6fIVTKTDcBeYAYQZZ3yU3vskL?=
- =?us-ascii?Q?mqpE7+lfM2YkNejvFMM85IzSBYQp+/r2T6DD7/hG9GfJeiVJ3uONC/4bSq2E?=
- =?us-ascii?Q?d81z95nuDnZpg0rmaH4FM2tnpcgGtfh/ZvMCNsV46DkVc7GWiLJrEGxouoEg?=
- =?us-ascii?Q?NPj/TJ+BCbvyQV4jqXDPBF00DRF+aDiVzH1QWBRc1COWsQGh0+m0gwIHF87s?=
- =?us-ascii?Q?Kj2oGJYTZIvLfS+9mCKC48JnCkYrUQBKvsqlx4AOG4VHE+P/u3/dbmkZsRIR?=
- =?us-ascii?Q?VJLNB8X70kM5f6jGotb1cPVp96DqOJnLnrvGIfEgEso6NIsRz1z5DdmF2Lg8?=
- =?us-ascii?Q?T3tDQGrO+1fPpXqd5kO88a2kMys3FkYbnK05hj/F6/3GMoCqiTg4/kA43qII?=
- =?us-ascii?Q?7kO9mz3oMswlSCe1KAoQ853X9LmaZW/S/Hw3bIhWjda2F4nL4d5qe+WxASgl?=
- =?us-ascii?Q?DjwpqZ/4a65RwWiNAOPUXzTTYMpGvdykCOlxmJ6zNsYe2nxkHXgmF/6CDaPR?=
- =?us-ascii?Q?OjqtCw+ZSA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BxI5QqQA"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB3D41FC7;
+	Thu,  7 May 2026 13:03:50 -0700 (PDT)
+Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C98D3F763;
+	Thu,  7 May 2026 13:03:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1778184236; bh=S+AFX8c4a8gMxGqbMas7Vl/9KMYsCAXxKzNJAQHSVm0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BxI5QqQAhjaZwV7HPZXkR614hbOoHlpz+eHol5/C8HDi09gQ94sZf47KxJZQp4U3q
+	 hV2ZEBxnYf2tyFs1VLaBI3+T8hXLtVJ0upTw4XijYNp1Axt0jadlhOsMLzpGXgg3pK
+	 tqi5wLSSL70Giz9UFdiafBZsnWHKSuYjnURZr7NM=
+Date: Thu, 7 May 2026 21:03:50 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: David Safford <david.safford@gmail.com>,
+	Jonathan McDowell <noodles@earth.li>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+	sebastianene@google.com
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+Message-ID: <afzwJn+5r15jFxrB@e129823.arm.com>
+References: <CAGWfHUW+AX0Hpuw5Vr5iTSaJKQJ+O_4nWWmU1UR8Z_3XFctHZg@mail.gmail.com>
+ <202f90682fe47bb5fb9b08f8678ae00981b5290b.camel@linux.ibm.com>
+ <201b9172ac47c6766443c1f2343cab3548f33c29.camel@linux.ibm.com>
+ <afrXmRiq7XvSe6yN@e129823.arm.com>
+ <9ff4853a8e9932b3a1424f2a6c3347f1723fb5f4.camel@linux.ibm.com>
+ <aftIuPwNeuzc9nY1@e129823.arm.com>
+ <9d1af933ef218b159762884357d127e3644dfe2c.camel@linux.ibm.com>
+ <afwoDgaJxmKwOhXp@e129823.arm.com>
+ <f19081f1eda19d6d1ae133d8ec93e779ab1a25e5.camel@linux.ibm.com>
+ <afyIbW5cljh5ZvTL@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 751622ad-9474-46cf-b2ba-08deac7111a4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 19:44:35.9953
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: naedk5zbE0xaL5oHeovN7nxOY1ewow+7OhvdLz9BioB85cycznxOK3HuHnot0DHPE9B1QdfoUwnuZ8cSKlYFUQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8939
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afyIbW5cljh5ZvTL@e129823.arm.com>
 
+Hi Mimi,
 
+> 
+> > On Thu, 2026-05-07 at 06:50 +0100, Yeoreum Yun wrote:
+> > > Hi Mimi,
+> > > 
+> > > > On Wed, 2026-05-06 at 14:57 +0100, Yeoreum Yun wrote:
+> > > > > > > > On both Z and PowerVM, there are ~30 measurements between boot_aggregate and
+> > > > > > > > boot_aggregate_late.  For example, on PowerVM:
+> > > > > > > > 
+> > > > > > > > # grep -n boot_aggregate
+> > > > > > > > /sys/kernel/security/integrity/ima/ascii_runtime_measurements
+> > > > > > > > 
+> > > > > > > > 1:10 f60a05d7354fb34aabc02965216abd3428ea52bb ima-sig
+> > > > > > > > sha256:9887dd089ee19a6517bca10580b02c1bb9aa6cd86c157b6ead8a1c0403f348d5
+> > > > > > > > boot_aggregate 
+> > > > > > > > 31:10 e2592b0d61da6300d3db447b143897a9792231ea ima-sig
+> > > > > > > > sha256:9887dd089ee19a6517bca10580b02c1bb9aa6cd86c157b6ead8a1c0403f348d5
+> > > > > > > > boot_aggregate_late
+> > > > > > > > 
+> > > > > > > > It would be interesting to the results from a Raspberry Pi 5 as well,
+> > > > > > > > with/without a TPM.
+> > > > > > > 
+> > > > > > > Honestly, I find this result hard to accept.
+> > > > > > > 
+> > > > > > > This effectively means that there is code invoking IMA measurement during late_initcall().
+> > > > > > > It also implies that if, in the future, a late_initcall is added that performs
+> > > > > > > an IMA measurement before IMA initialization has occurred accoding to order by linker,
+> > > > > > > that measurement could be missed.
+> > > > > > 
+> > > > > > Exactly.  The results are simply from booting with the builtin "tcb" and
+> > > > > > "critical_data" policies.
+> > > > > > 
+> > > > > > $ sudo grubby --args="ima_policy=\"tcb|critical_data\"" --update-kernel
+> > > > > > /boot/vmlinuz-${SUFFIX}
+> > > > > 
+> > > > > Thanks. but I still wonder what meaasurements there are between
+> > > > > boot_aggregate and boot_aggregate_late.
+> > > > > Might be there would be key measurements if it takes more than
+> > > > > 5 mins before generating boot_aggregate_late but this seems rare.
+> > > > > 
+> > > > > If you don't mind, would you share the contents of the log between
+> > > > > boot_aggregate and boot_aggregate_late?
+> > > > > since I only get a kernel_version in my environment.
+> > > > 
+> > > >      1	10 f60a05d7354fb34aabc02965216abd3428ea52bb ima-sig
+> > > > sha256:9887dd089ee19a6517bca10580b02c1bb9aa6cd86c157b6ead8a1c0403f348d5
+> > > > boot_aggregate 
+> > > >      2	10 49ab61dd97ea2f759edcb6c6a3387ac67f0aa576 ima-buf
+> > > > sha256:0c907aab3261194f16b0c2a422a82f145bc9b9ecb8fdb633fa43e3e5379f0af2
+> > > > kernel_version 372e312e302d7263312b
+> > > >      3	10 92c40bfd65512d5224cddb9fb64fef0d72e1c182 ima-sig
+> > > > sha256:412bae0d0e85a99971d6eda198dd2fed3c2959715e8a17a4caddc7bc605bdeeb
+> > > > /usr/bin/kmod 
+> > > >      4	10 a18f997e1e82d0ef416f93683966d7dda875d71c ima-sig
+> > > > sha256:0050fcc672e03cfdc3a50c771ca9f5219478e5538980a26fd4484620712d8163
+> > > > /usr/lib64/ld64.so.2 
+> > > >      5	10 88f343618caeeed92ed8281d627f4565b0499d66 ima-sig
+> > > > sha256:a0e83c084d8c227f1150a8cd94eece61f62bc1da30f98d1cf57ca7db241a9c45
+> > > > /etc/ld.so.cache 
+> > > >      6	10 e047868f01908eb95aa180693291decab82bb6be ima-sig
+> > > > sha256:42ebf9cc684419de4d8a1d624102716d88fbcf957f47e50a9a08e38b338023ac
+> > > > /usr/lib64/libzstd.so.1.5.5 
+> > > >      7	10 da069bc6a44d454510a76c69d3a54c3b238ae27e ima-sig
+> > > > sha256:9b7c788e75c16c8827062016cf15826e43661c4b5b56813ea07ff2635bea2710
+> > > > /usr/lib64/liblzma.so.5.6.2 
+> > > >      8	10 7ade414e736e7b449cda5ec5e0277b99548e89c6 ima-sig
+> > > > sha256:d899452e8e6369e436ba1a565833d6dcf0d09c35e40ffc0979cf4de2bdb8f421
+> > > > /usr/lib64/libz.so.1.3.1.zlib-ng 
+> > > >      9	10 9a9da8326f36237a47d6ed21bdffd0e1ff855e2a ima-sig
+> > > > sha256:a848f396db7ad135f851b5e9aeb32f4a3ef1439c7913b9b95ab1cda69251f6ad
+> > > > /usr/lib64/libcrypto.so.3.5.1 
+> > > >     10	10 3201d27cd4028f02fc9088ec33e2d0ceb72d2c5b ima-sig
+> > > > sha256:e52dcd1850555c08d60fefe56694c1179b4eaa5796db0907606552ece8e1bab1
+> > > > /usr/lib64/libgcc_s-14-20250617.so.1 
+> > > >     11	10 3b4c6f13e52ca060b290709f737b1ff66564226f ima-sig
+> > > > sha256:f2a900a5b980b289dc028dd3caab16b1b0ad037f2e875546bb3197d23ff241f0
+> > > > /usr/lib64/glibc-hwcaps/power10/libc.so.6 
+> > > >     12	10 b23b616cbd3c9dc4c5743d121c1c5a702b461a9c ima-sig
+> > > > sha256:5a682022beeea9ee7f36a70f0465942bf32e9675d3f45355088e148787e02175
+> > > > /usr/lib/modprobe.d/dist-alsa.conf 
+> > > >     13	10 aec07fad18697f295d7e06796fc8dfd3b472f9c3 ima-sig
+> > > > sha256:067d949bab3bb085d0936031881ff73b2ab39f34b9a90cbd01396d1987ff6658
+> > > > /usr/lib/modprobe.d/dist-blacklist.conf 
+> > > >     14	10 c402c56b66e65914148efd6e3cf0b1d616daabe6 ima-sig
+> > > > sha256:120a02e9b88ba74949224eca7385825e39880f5687f739ade07d94ee22ffe325
+> > > > /etc/modprobe.d/firewalld-sysctls.conf 
+> > > >     15	10 e358ca12bd58e1ce4845e299e1aea8b81edf86f9 ima-sig
+> > > > sha256:fa27abcd357a16ee1254ba38d1225b7f0724036c07ce3d0e83b29eb72d97c419
+> > > > /etc/modprobe.d/l2tp_eth-blacklist.conf 
+> > > >     16	10 4b036d41435d7df3a72b38880f5fe231904b7b66 ima-sig
+> > > > sha256:ecf5f948bfbfb726879a910b3174d139c8af6b1745c88dcc1e4a1cf532c02299
+> > > > /etc/modprobe.d/l2tp_ip-blacklist.conf 
+> > > >     17	10 9c53a7a48c1b5218417c4f25c4a34c09a9f39830 ima-sig
+> > > > sha256:f76c4ac232d5e96c57961a9f10194703b4df6d119530046f0b23eee70bfcb089
+> > > > /etc/modprobe.d/l2tp_ip6-blacklist.conf 
+> > > >     18	10 6c41d7b7d251c400b7e0ba76f7b386a746e8f4ec ima-sig
+> > > > sha256:5cbc958f893a599ef19437014696dd7b112cf9af6a4348830177f8a8f78aa1b3
+> > > > /etc/modprobe.d/l2tp_netlink-blacklist.conf 
+> > > >     19	10 f37ef48faef5bc51e29d47531726af0bd0654655 ima-sig
+> > > > sha256:7a3d63acb49e4a69b482f26624761b5778fbd6b77be8a3f36926b379b5f965ed
+> > > > /etc/modprobe.d/l2tp_ppp-blacklist.conf 
+> > > >     20	10 82ef59779acdfd6e9b35521bfa09e6ba86fd6174 ima-sig
+> > > > sha256:6a8f2009d87deba7a2de46e3d0c46b114fe388d188b00b9a382fc2156aabb676
+> > > > /usr/lib/modules/7.1.0-rc1+/modules.softdep 
+> > > >     21	10 6ae994e33a6313ab4535da90f5cb6c3beaec7b86 ima-sig
+> > > > sha256:268695dbf23bd0170ec9a95b10e8d596205fd7436617d10101907171bf004b7c
+> > > > /etc/modprobe.d/sctp-blacklist.conf 
+> > > >     22	10 b2c238ae66b03f56191d9955a5ad0f3110bb7e2b ima-sig
+> > > > sha256:64a8ebb0a1fd712a9aeb7aa0f0ad0b72d3277034c8bfa3b66ab063e201d6527e
+> > > > /etc/modprobe.d/sctp_diag-blacklist.conf 
+> > > >     23	10 c0443f2d3c078959ae86276df23abe172234a55d ima-sig
+> > > > sha256:e5a3958cbd3684b63f3cada6604469cc56f727b106d5524daf5aefa6935a48ce
+> > > > /usr/lib/modprobe.d/systemd.conf 
+> > > >     24	10 5c46e012bc7fffc3256b166282a7eaa4bea5fa33 ima-sig
+> > > > sha256:6560abcdd2cdb41e1d0fe73052298d612920d5bccb4a3a7c82bc73895128e760
+> > > > /etc/modprobe.d/tipc_diag-blacklist.conf 
+> > > >     25	10 d5fb1836364732fbc4f87aa7d2c984cf30bdbfd3 ima-sig
+> > > > sha256:358703c09ac2d2c653e11bbc7c65d378c8496e87ca47307f86c36b0b29640598
+> > > > /etc/modprobe.d/tuned.conf 
+> > > >     26	10 a85107163729f696f316d46c0bf3f65f713ba972 ima-sig
+> > > > sha256:7410bb4cec56892e8b0010c5c8b72be532784ccf0240aa0677c5be085a530f65
+> > > > /usr/lib/modules/7.1.0-rc1+/modules.dep.bin 
+> > > >     27	10 80eb261ffb2cc3528d90c33b1c624f657a045867 ima-sig
+> > > > sha256:856e0f083226f8b4fb7d1d71447fb841dae18ea9a50ea6d8505a206167288e1d
+> > > > /usr/lib/modules/7.1.0-rc1+/modules.alias.bin 
+> > > >     28	10 6af2d661da470d7a1c9909ddbc074d3d265eb1d7 ima-sig
+> > > > sha256:4853ca200598c52970c380fda99484068e7db4961a4f94faac6abcfbbd52d150
+> > > > /usr/lib/modules/7.1.0-rc1+/modules.symbols.bin 
+> > > >     29	10 6f9cd405bd57d925baae6ae66c273c61c90b3bc8 ima-sig
+> > > > sha256:193d1e1004848f7d391877507b69a7953e1f94ddbe70eb0e2cf6dc45fce7cd6a
+> > > > /usr/lib/modules/7.1.0-rc1+/modules.builtin.alias.bin 
+> > > >     30	10 4e20b980bf3a825a866be0c46033ed654df4aeba ima-sig
+> > > > sha256:3a0e3c56d51ba98258ff13f93f82c837de22f4b707d24678f82893babf4d77ea
+> > > > /usr/lib/modules/7.1.0-rc1+/modules.builtin.bin 
+> > > >     31	10 e2592b0d61da6300d3db447b143897a9792231ea ima-sig
+> > > > sha256:9887dd089ee19a6517bca10580b02c1bb9aa6cd86c157b6ead8a1c0403f348d5
+> > > > boot_aggregate_late 
+> > > >     32	10 81830cd3d799e006698258dc1b11fe29a56eeef5 ima-sig
+> > > > sha256:d1651dc50bb5b92c1badcab9aa4dbbca40cb704cdc707d1c536b41d7b1aa465e
+> > > > /usr/lib/systemd/systemd 
+> > > 
+> > > Hmm... Theses measurements seems to happen while populating
+> > > initramfs which triggers file_post_open as async
+> > > (and I see the RAMFS seems not part of DONT_MEASURE in IMA).
+> > > 
+> > > If you don't mind, Could you check whether this measurements still
+> > > happen with initramfs_async=0?
+> > > 
+> > > If this measurements aren't generated with above option,
+> > > there is a question whether let IMA measure initramfs which can be
+> > > measured or not depending on boot option or timing (some file measurements
+> > > could be lost all when do_populate_rootfs() executes concurrently while
+> > > running late_initcall).
+> > 
+> > There's no difference when adding the "initramfs_async=0" boot command line
+> > argument. The measurement list between boot_aggregate and boot_aggregate_late is
+> > exactly the same.
+> >
+> 
+> That's quite interesting. This means there're some file operation
+> between late_initcall and late_initcall_sync
+> even before run_init_process() except initramfs population.
+> 
+> Since initramfs population flush all fputs() it generates and
+> boot_aggregate_late is generated before init process is loaded,
+> I honestly have no idea who triggers above file operations.
+> 
+> And it seems a little bit weird that it opens the /usr/bin/kmod
+> and its configuration from kernel not by init_process or other user
+> process...
+> 
 
-> -----Original Message-----
-> From: Eric Auger <eric.auger@redhat.com>
-> Sent: 03 May 2026 08:34
-> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
-> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
-> peter.maydell@linaro.org; richard.henderson@linaro.org;
-> cohuck@redhat.com; sebott@redhat.com; Shameer Kolothum Thodi
-> <skolothumtho@nvidia.com>; philmd@linaro.org
-> Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
-> armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
-> jdenemar@redhat.com
-> Subject: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
->=20
-> External email: Use caution opening links or attachments
->=20
->=20
-> From: Cornelia Huck <cohuck@redhat.com>
->=20
-> Add some documentation for how individual ID registers can be
-> configured with the host cpu model.
->=20
-> [CH: adapt to removal of the 'custom' model, added some more
->  explanations about using the ID register props]
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  docs/system/arm/cpu-features.rst | 104
-> ++++++++++++++++++++++++++++---
->  1 file changed, 96 insertions(+), 8 deletions(-)
->=20
-> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-
-> features.rst
-> index 10b0eff27e..22f671b15d 100644
-> --- a/docs/system/arm/cpu-features.rst
-> +++ b/docs/system/arm/cpu-features.rst
-> @@ -2,7 +2,10 @@ Arm CPU Features
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
->  CPU features are optional features that a CPU of supporting type may
-> -choose to implement or not.  In QEMU, optional CPU features have
-> +choose to implement or not.  QEMU provides two different mechanisms
-> +to configure those features:
-> +
-> +1. For most CPU models, optional CPU features may have
->  corresponding boolean CPU proprieties that, when enabled, indicate
->  that the feature is implemented, and, conversely, when disabled,
->  indicate that it is not implemented. An example of an Arm CPU feature
-> @@ -31,6 +34,16 @@ running guests in AArch32.
->  CPU features that are inherently specific to KVM are
->  prefixed with "kvm-" and are described in "KVM VCPU Features".
->=20
-> +2. Additionally, the ``host`` CPU model on KVM allows to configure optio=
-nal
-> +CPU features via the corresponding ID registers. The host kernel allows
-> +to write a subset of ID register fields. The host model exposes
-> +properties for each writable ID register field. Those options are named
-> +SYSREG_<IDREG>_<FIELD>. IDREG and FIELD names are those used in the
-> +ARM ARM Reference Manual. They can also be found in the Linux
-> +arch/arm64/tool/sysreg file which is used to automatically generate the
+If you don't mind, Could i get some stacktrace for one of file measurement log
+between boot_aggregate and boot_aggreate_late?
 
-arch/arm64/tools/sysreg
+Though I try to produce like you, I've gotten failure to reproduce.
+Sorry to bother you. but it would be helpful to understand where they
+came from.
 
-Anyway, I think this needs update as the scripts now uses Registers.json
-from AARCHMRS, right?
-
-> +description for those registers and fields. This currently only has been
-> +implemented for KVM.
-> +
->  CPU Feature Probing
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> @@ -126,13 +139,20 @@ A note about CPU models and KVM
->=20
->  Named CPU models generally do not work with KVM.  There are a few cases
->  that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on =
-a
-> -seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
-> -used.  This means the guest is provided all the same CPU features as the
-> -host CPU type has.  And, for this reason, the ``host`` CPU type should
-> -enable all CPU features that the host has by default.  Indeed it's even
-> -a bit strange to allow disabling CPU features that the host has when usi=
-ng
-> -the ``host`` CPU type, but in the absence of CPU models it's the best we=
- can
-> -do if we want to launch guests without all the host's CPU features enabl=
-ed.
-> +seattle host, but mostly if KVM is enabled, the ``host`` CPU model must =
-be
-> +used.
-> +
-> +Using the ``host`` type means the guest is provided all the same CPU
-> +features as the host CPU type has.  And, for this reason, the ``host``
-> +CPU type should enable all CPU features that the host has by default.
-> +
-> +In case some features need to be hidden to the guest, and the host kerne=
-l
-
-s/hidden to the guest/hidden from the guest/
-
-> +supports it, the ``host`` model can be instructed to disable individual
-> +ID register values. This is especially useful for migration purposes.
-> +However, this interface will not allow configuring an arbitrary set of
-> +features; the ID registers must describe a subset of the host's features=
-,
-> +and all differences to the host's configuration must actually be support=
-ed
-> +by the kernel to be deconfigured.
->=20
->  Enabling KVM also affects the ``query-cpu-model-expansion`` QMP
-> command.  The
->  affect is not only limited to specific features, as pointed out in examp=
-le
-> @@ -169,6 +189,13 @@ disabling many SVE vector lengths would be quite
-> verbose, the ``sve<N>`` CPU
->  properties have special semantics (see "SVE CPU Property Parsing
->  Semantics").
->=20
-> +Additionally, if supported by KVM on the host kernel, the ``host`` CPU m=
-odel
-> +may be configured via individual ID register field properties, for examp=
-le::
-> +
-> +  $ qemu-system-aarch64 -M virt -cpu
-> host,SYSREG_ID_AA64ISAR0_EL1_DP=3D0x0
-> +
-> +This forces ID_AA64ISAR0_EL1 DP field to 0.
-> +
->  KVM VCPU Features
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> @@ -495,3 +522,64 @@ Legal values for ``S`` are 30, 34, 36, and 39; the
-> default is 30.
->=20
->  As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
->  removed in some future QEMU release.
-> +
-> +Configuring CPU features via ID register fields
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Note that this is currently only supported under KVM, and with the
-> +``host`` CPU model.
-> +
-> +Querying available ID register fields
-> +-------------------------------------
-> +
-> +QEMU will create properties for all ID register fields that are
-> +reported as being writable by the kernel, and that are known to the
-> +QEMU instance. Therefore, the same QEMU binary may expose different
-> +properties when run under a different kernel.
-> +
-> +To find out all available writable ID register fields, use the
-> +``query-cpu-model-expansion`` QMP command::
-> +
-> +  (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"host"}
-> +  {"return": {
-> +   "model": {"name": "host", "props": {
-> +   "SYSREG_ID_AA64PFR0_EL1_EL3": 1,
-> "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
-> +   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
-> +   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1,
-> "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
-> +   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1,
-> "SYSREG_ID_DFR0_EL1_PerfMon": 4,
-> +   "SYSREG_ID_AA64PFR0_EL1_DIT": 0,
-> "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
-> +   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0,
-> "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
-> +   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
-> +   }}}}
-> +
-> +If a certain field in an ID register does not show up in this list, it
-> +is not writable with the specific host kernel.
-> +
-> +A note on compatibility
-> +-----------------------
-> +
-> +A common use case for providing a defined set of ID register values is
-> +to be able to present a fixed set of features to a guest, often referred
-> +to as "stable guest ABI". This may take the form of ironing out differen=
-ces
-> +between two similar CPUs with the intention of being able to migrate
-> +between machines with those CPUs, or providing the same CPU across Linux
-> +kernel updates on the host.
-> +
-> +Over the course of time, the Linux kernel is changing the set of ID regi=
-ster
-> +fields that are writable by userspace. Newly introduced writable ID
-> +registers should be initialized to 0 to ensure compatibility. However, I=
-D
-> +registers that have already been introduced that undergo a change as to
-> +which fields are writable may introduce incompatibities that need to be
-
-s/incompatibities/incompatibilities/
-
-Thanks,
-Shameer
-
-> +addressed on a case-by-case basis for the systems that you wish to migra=
-te
-> +inbetween.
-> +
-> +A note on Arm CPU features (FEAT_xxx)
-> +-------------------------------------
-> +
-> +Configuring CPUs is done on a feature level on other architectures, and =
-this
-> +would imply configuring FEAT_xxx values on Arm. However, differences
-> between
-> +CPUs may not map to FEAT_xxx, but to differences in other registers in t=
-he
-> +ID register range; for example, differences in the cache architecture ex=
-posed
-> +via ``CTR_EL0``. We therefore cannot rely on configuration via FEAT_xxx.=
- A
-> +feature-based interface more similar to other architectures may be
-> implemented
-> +on top of the ID register interface in the future.
-> --
-> 2.53.0
-
+-- 
+Sincerely,
+Yeoreum Yun
