@@ -1,63 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA38C395DBE;
-	Thu,  7 May 2026 14:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5474423E320;
+	Thu,  7 May 2026 15:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778163710; cv=none; b=rYnC2feeJOc486zGtbzg0FpyoCzI0JxWXho2IpTvvy3Soq5huzaB2D/4omULDLshpc4lMX2ImGQmRTbqOaqU/qTBhxw0Q7M+grZF94g1ItckowFLqNto7vZAeUUqimMK1nAE7yLxE9CCmeAbF3+El97m7kKLqFloUtJZXR6PazQ=
+	t=1778166615; cv=none; b=sDJRM2jCALsIkWfTyvyKmtYlRxrn1jUFPRF2ZQtv1AZJDu/Rhf1QiMBkreNQ0ZCR0X1qxCANEoJ4eERHkYSdsNJChrvKYMCeUTdRCTvW1eJ8xP+7X5EEWXBCyW5PJ6vmNNRooIS1Sh6pg2YDQ+1+shGPxKs+3sW6AIn5sJAlmz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778163710; c=relaxed/simple;
-	bh=P0H9eJ90fUMEkkCV+29Z8bd2rVGB3vlQyBvoTWdLWZ4=;
+	s=arc-20240116; t=1778166615; c=relaxed/simple;
+	bh=qjoWczYkpEGi1bFg7PmCnsiouljmhUzJ/ZwyhYEXkYY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=maBIA55wb4Olr95kIKpCuIcvut7my1axpnRWusqglIotPGA6rkFLhUuZOkmuA0Ptpd/rpWPp76NfSQ7UTUMBTul2xwNgZ51fKPjVoJhtd1DldVRRHQQZxGWlWUE5YSqH+8vzfZVohMNszZfPU8qYF+xIQlRJvgotXcvsAZLXxS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOB+l9s6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=A2iM9j9HqHRltnRZS8vrGtjfuVt1SzuqXD5dX8trIuv6ZCSvcpMgPdN8/j7H+7kK1Q+6oigiaVhliq+bTJEgKqeCcJ2kVE/sCUfbAlngj5mFwif80lUFvQ4cgeCwuTNGgTiOQgEJ/Du87vbavRsiVkmEk/+I6QyJmRgTuKRJkMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmL5WDil; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOB+l9s6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A0CFC2BCB2;
-	Thu,  7 May 2026 14:21:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmL5WDil"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0005C2BCB2;
+	Thu,  7 May 2026 15:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778163709;
-	bh=P0H9eJ90fUMEkkCV+29Z8bd2rVGB3vlQyBvoTWdLWZ4=;
+	s=k20201202; t=1778166615;
+	bh=qjoWczYkpEGi1bFg7PmCnsiouljmhUzJ/ZwyhYEXkYY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZOB+l9s6sC5WOBnDpfFqN4dootjuZeqjR9JCFU7wMCVSN0nvnc7CqcPY6Ys8MLSGC
-	 dMmjJubMLmg/7ZDLsI//iZO01QeX8V5PzcnoaihE+ABpDyvT3MTBfIoeFHbiPoapWO
-	 Be+Loz6rurZ+QSrbC/pRTY5Tzuq8xSYeC4+drn6bO0zAcCEaaq0mYl+wgbU3OnRqtd
-	 A/5C+UW5XyKCLij7BdQ5PxDWxF3n4ln9QGdG078PMzMF+raZOnOmWGj5qP/56rnh10
-	 HMFsgTcyLMTMGOEY5NqmZsbVc5vBsWTIiTFYOIsHNMafS3ccI8eZEIuvgjiy0H6Tx0
-	 07hV2+ZxiXGaQ==
+	b=SmL5WDilQvcnpmSI6bCNdwj+YAeQazhWgc/Y5+iEZKs/LyxqVx1UIhzjOBeFhoUhN
+	 mMNUYiDUa3/FvlFbHvXRdQQJrZMOOF8wOfxZAg1GI8GQ43mMZc8MKaOqgQL2Hjtnot
+	 ABu0aUeSM4duQgx7FuKZvhSEDFGkIOD+I907TjjP1PPnlBOYRtyi6Tuk8d4RyohXnh
+	 03BncqrBnn4OG4XqSUUryu3W6Dnwcuo8N9mey24ayMhFJPX3azXKfb0Apqxde/9kGy
+	 uNXxk2SXsXoX9unSSxc21PnGbMbrp3EB/AebasFbtFChjfThCNcmprWhlpDbHJVvjP
+	 0GvsnGTM4Yjow==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wKzbn-00000000fCH-07vS;
-	Thu, 07 May 2026 14:21:47 +0000
-Date: Thu, 07 May 2026 15:21:46 +0100
-Message-ID: <86qznnxptx.wl-maz@kernel.org>
+	id 1wL0Me-0000000014M-3HYw;
+	Thu, 07 May 2026 15:10:12 +0000
+Date: Thu, 07 May 2026 16:10:11 +0100
+Message-ID: <86pl37xnl8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com,
-	oupton@kernel.org,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	korneld@google.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	android-kvm@google.com,
-	mrigendra.chaubey@gmail.com,
-	perlarsen@google.com,
-	suzuki.poulose@arm.com,
-	vdonnefort@google.com,
-	yuzenghui@huawei.com,
-	Sudeep Holla <sudeep.holla@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
-In-Reply-To: <afyd8u85L5XIl6dh@google.com>
-References: <20260501114447.2389222-2-sebastianene@google.com>
-	<86wlxgy00t.wl-maz@kernel.org>
-	<afxuDpecPCVA56cL@google.com>
-	<86se83xrwx.wl-maz@kernel.org>
-	<afyd8u85L5XIl6dh@google.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 18/43] KVM: arm64: gic-v5: Define remaining IRS MMIO registers
+In-Reply-To: <20260427160547.3129448-19-sascha.bischoff@arm.com>
+References: <20260427160547.3129448-1-sascha.bischoff@arm.com>
+	<20260427160547.3129448-19-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,116 +66,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, oupton@kernel.org, will@kernel.org, joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com, sudeep.holla@kernel.org
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 07 May 2026 15:13:06 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Mon, 27 Apr 2026 17:12:11 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> On Thu, May 07, 2026 at 02:36:46PM +0100, Marc Zyngier wrote:
-> > On Thu, 07 May 2026 11:48:46 +0100,
-> > Sebastian Ene <sebastianene@google.com> wrote:
-> > > 
-> > > On Wed, May 06, 2026 at 05:29:22PM +0100, Marc Zyngier wrote:
-> > > 
-> > > Hello Marc,
-> > > 
-> > > > [+ Sudeep]
-> > > > 
-> > > > On Fri, 01 May 2026 12:44:48 +0100,
-> > > > Sebastian Ene <sebastianene@google.com> wrote:
-> > > > > 
-> > > > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
-> > > > > FF-A proxy. This restriction was preventing the use of asynchronous
-> > > > > signaling mechanisms defined by the Arm FF-A specification to
-> > > > > communicate with the secure services.
-> > > > > While these calls are markes as optional, there is no reason why the
-> > > > > hypervisor proxy would block them because:
-> > > > > 
-> > > > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
-> > > > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
-> > > > 
-> > > > Where is this enforced?
-> > > > 
-> > > 
-> > > There is no enforcement in place in the hypervisor since we don't proxy
-> > > FF-A from guest VMs, there is only one non-secure user of this which is the host.
-> > 
-> > And again: what makes that VM ID 0? Why can't the host pick VM ID 32
-> > and use that?
-> > 
-> 
-> The host discovers its id through the FFA_ID_GET and TZ returns 0 in
+> Complete the set of defined IRS MMIO registers in the GICv5 header
+> file. Up until now, the set of defined IRS MMIO registers has been
+> driven by code requirements. However, in order to properly emulate the
+> IRS MMIO interface in KVM, the complete set of IRS MMIO registers
+> needs to be added.
 
-Does it? How do you verify this?
+I really think you need to pick a register update "style". Either you
+add all the definitions in one go, or you add them with the patch that
+start making use of it.
 
-> this case. However if it wants to use VM ID 32 in any other call it
-> absolutely can but what would it be the attack here, what is your
-> concern ?
-
-Let's be clear: I don't give a damn about a potential attack vector.
-The moment you add Secure to the mix, security is gone (funny, isn't
-it?). I care about being strict about the spec, and not letting
-through things that will eventually break.
+My preference goes with the former.
 
 > 
-> > > > >    Because all forwarded notifications are inherently attributed to
-> > > > >    the Host by the SPMC, there is no risk of VM ID spoofing
-> > > > >    originating from the Normal World.
-> > > > 
-> > > > I don't understand: either the host is always using VM ID 0, and we
-> > > > have ways to check and enforce this (how?), or the simple fact that
-> > > > the request comes from NS is a guarantee that the SPMC will treat the
-> > > > VM ID as 0.
-> > > > 
-> > > > Which one is it?
-> > > 
-> > > My understanding is that when the hypervisor doesn't handle the allocation of
-> > > the non-secure IDs (through FFA_ID_GET), everything that comes from non-secure
-> > > is treated as having the VM ID 0 by the SPMC.
-> > 
-> > This looks terribly fragile. I'd rather you *enforce* these things
-> > rather than allowing any random stuff from the host and relying on
-> > the EL3 firmware to get it right (odds are that it won't).
-> > 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  include/linux/irqchip/arm-gic-v5.h | 105 ++++++++++++++++++++++++++---
+>  1 file changed, 96 insertions(+), 9 deletions(-)
 > 
-> I can verify the vmid is 0 for the notification calls that I enable.
+> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
+> index 54b573783cd75..9ea3674a6613b 100644
+> --- a/include/linux/irqchip/arm-gic-v5.h
+> +++ b/include/linux/irqchip/arm-gic-v5.h
+> @@ -62,6 +62,14 @@
+>  #define GICV5_OUTER_SHARE		0b10
+>  #define GICV5_INNER_SHARE		0b11
+>  
+> +#define GICV5_AIDR_COMPONENT_IRS	0b00
+> +#define GICV5_AIDR_COMPONENT_ITS	0b01
+> +#define GICV5_AIDR_COMPONENT_IWB	0b10
+> +
+> +#define GICV5_AIDR_ARCH_MAJ_REV_V5	0
+> +#define GICV5_AIDR_ARCH_MIN_REV_V0	0
+> +#define GICV5_IIDR_IMPLEMENTER_ARM	0x43b
+> +
 
-Yes, please.
+I'm in two minds about this. We used the same hack (advertising this
+as an ARM implementation) for GICv2/v3, but that's really not one.
 
-> 
-> > This also ties into this:
-> > 
-> > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > > > index 1af722771178..a82d0cd22a17 100644
-> > > > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > > > @@ -675,14 +675,6 @@ static bool ffa_call_supported(u64 func_id)
-> > > > >  	case FFA_RXTX_MAP:
-> > > > >  	case FFA_MEM_DONATE:
-> > > > >  	case FFA_MEM_RETRIEVE_REQ:
-> > > > > -       /* Optional notification interfaces added in FF-A 1.1 */
-> > > > > -	case FFA_NOTIFICATION_BITMAP_CREATE:
-> > > > > -	case FFA_NOTIFICATION_BITMAP_DESTROY:
-> > > > > -	case FFA_NOTIFICATION_BIND:
-> > > > > -	case FFA_NOTIFICATION_UNBIND:
-> > > > > -	case FFA_NOTIFICATION_SET:
-> > > > > -	case FFA_NOTIFICATION_GET:
-> > > > > -	case FFA_NOTIFICATION_INFO_GET:
-> > > > >  	/* Optional interfaces added in FF-A 1.2 */
-> > > > >  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
-> > > > >  	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
-> > > > 
-> > > > Shouldn't these be sanitised in a way? A bunch of registers are SBZ in
-> > > > the spec, and I'd expect this to be enforced.
-> > 
-> > which still remains unanswered.
-> 
-> Missed this sorry. We can reject them in the hyp proxy if the caller
-> uses non zero values in those registers.
+And in any case, the ARM encoding should not leave in this file -- it
+is only used for the KVM implementation, and everything else should be
+implementation agnostic (until we need to implement a workaround, of
+course...).
 
-I think we need that indeed.
+Thanks,
 
 	M.
 
