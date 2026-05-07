@@ -1,45 +1,45 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010024.outbound.protection.outlook.com [52.101.85.24])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012011.outbound.protection.outlook.com [40.93.195.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31B047CC80
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 19:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD7135CB7F
+	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 19:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778181765; cv=fail; b=bLdvkYYEhDOFrVeVyDyJazD3mCmyfy98lX77iHg+CFz194TX/gcpxRATVV29YsIJ60ODylaHkVk0cX9dN6yJkbyr6O5ojd9MSVSqrgc4q6NQwgdXDvIHf7UcZ/2H/kfr+CrccrkZ1PuB2tWTsJI7DxI2CnPiXhMw4sNcW5gthcQ=
+	t=1778183083; cv=fail; b=kHNo3o+zCk2XQN3lxXpmV3TGn6cpQUSXf7MB508T0SIJ+JibyNRih4BZDJhGYGgaEzs/XjIXvULpW59nyOzhs0/5Jo9RqcZ7OvqBDJWW3U7XxuHoBIKor3YZXFrE2PGPyE89EaWnAcbtrn2J7mxUjh0aH+VGD/qrPobeKr4e1aI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778181765; c=relaxed/simple;
-	bh=vvn/AjbLWqhusHDnz9hd2VfzSkoEeX+pbAJ+ox32nic=;
+	s=arc-20240116; t=1778183083; c=relaxed/simple;
+	bh=LOSQQ3A5btFfMkscswR77YnTY9SmmN3KW/FSYL92V54=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YyuWWx+oDSaetCqHtKMCjnqf5WZbA1cxIOIar8U4p9VVIL9yxBlZUOhpKEjx4o+TP94a4UUPueXtQqdK1Xs7AtNh8c97cc0du+O4kM8lBFhIq02Ttfnc0et9SHFaJr5uC5vxW8wiwSNWXoHyq3fuAmeCq8bfMzRMEf9MWBrKpAI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=S3EAKQRc; arc=fail smtp.client-ip=52.101.85.24
+	 Content-Type:MIME-Version; b=Oe5ljPG7PRP4xX9Tl+9lBzwh7ssT172O4vWdD6HAqGYBx5WY6hNeDPSxAYPilrNYl5qoMYMmRD2oNZpDCV6mccXPnZqS1Ggmkfx13R01WEh1yXHAyF4zSXOJf0NV6OlwzfHiNZ3ALJBscjN5sY/DztjmB9uyi8Kzmm8E1re9pTk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uCqGq7H8; arc=fail smtp.client-ip=40.93.195.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="S3EAKQRc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uCqGq7H8"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G5sUqAZoX7GFpjA2OM4H2IAc5sgFvpAlRFG8GDXwsojku7ScAlPXAfo7/aH1XYz9czFrVs3aGR9CZKPP+8SVZOhslv2sbCo9+2Z5HHD5PSHcrj7Bi6pa6zERRsQv7fQxsOYuE6uK4KxNPiHJt0DMiMhtsZxxaPqRhXOdPSbC6UXUj8QcKNhJ82IUgNNBKyYCLpuuomm1n2RmhHuFS8Gkp5PxiROepPI6873+5L81UBS7kQzzxG9HlUFqwd+N/3ULODxocrKDThzAAHcUK00f5mp6jxC+VEPyxhbLMBkrc49A1w4DX12KB4TCo8D2Kugbgcd657epsDRnnyf4Azf7eA==
+ b=mkk5JM168C4N83rzO7tNh+rIMevsjiHlGeIOiet7G32NjwHorOfSNGVz/t+TTNFHWaIvCll67F4PAR5SVSmNtZzMhoUeZxgu7kDBnyak1640Desk/1rBcoNXg1j7Eb3/bfbgH0hhfQo6e4QV3ddBdXEVwZp9sMjTiDqrZSI+wxzCyun8SDQ3+mhj428eYCSF3WSZtZYbTq8AkLN57tELKu17SKP0hrAiJYVdZ69V9JxFu+5oUJWBc1BdoJTIl+vgNp6XWRHKD7C+He5sVlChxaOnC7K7vRX+FioGD+2lmAD7ziSjL+tB9Dr/x86MrEaA6edSGVa/dtc1jTmDV+uV3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r2ja+3thqGD97Qd3otyKP4QhVcbUPBeOa37BJ3xXJQE=;
- b=Vgwlcx6V1kr5InPjP34+nyoBvCVpBtvfUV6OxCC1EGYXp1x5ozePcS6/WbLb36SVoacsAbKm5aaoivMn8wJ5YFI277MJVmw2dMeZ6IbQb9hdCP18fStTPkVuix+1afaZdB+ekQMtWlT0XqodFY1zL8L15i1hAtqWxyeqzfEt7KLlbNcgorulgEXwRUcER7vUuOeSnZnMT7xohyLOQ7znMtJyC4Hg/jnm+1Mwi48Uk3K5/6l4gZItpz7ofGOvittYF8Znp2vDbI9he7qyd2D/0sguTiSWNXKxFtWsGPakQEubfSqpLyMF9Rq+PUSd831KiRm01CaGntlNQ0T66UkJcQ==
+ bh=eJcexBkkj0+o0lFC5i6hujne5xoo81Sxct9ZMJyQU88=;
+ b=sTYoxPhNkWmI7DzMACbel5SWI+LsJ7/kT+APQZhRj5OI+nvj6dKe2rzNle4SV5ZDd8sD0c/Z3GbJL3K/idmIssIEzboktR+QMRy1C0eAHx2katK7Xvundcdl2yXa9IIPSW74HgcdusHKufBjupOO22kHojmAcQhNR56ZOWaNvAijAGfWUeITC1kou32PDN3mcdfbBrFifLqy21ynvUQdKjB7Ni0AIBDzQ+yC1ySoDZKNqzXFHz700TytDYV8QNgmkNI3xo6JeHOvhvvYkjk0bKcjKdiy+voF94CSbLV0VCdZb4YZ98FIV7g799YEoQ4I0oh4vsNzpfGXDW4vf6zHLA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r2ja+3thqGD97Qd3otyKP4QhVcbUPBeOa37BJ3xXJQE=;
- b=S3EAKQRcPbBqYFI49CDcxz9d9d345FXae9twog6hP5CCsHDp/hiw2CCn2WF0vZkwcBq3dXe1TvABMlPpmKRW3s4Zor3AedrpuAtsoY6FQCGTuqB4ld40CsT4YZuOHJXjZ4mYBuJG3iWH4IibWU4yHngDQGbfZDIH6zyNHIaVoeiCRSwak2cEr4YrxgBeiZh3vw1sDJfAFfmvfEYmbZ0nR2//FI9vFvfqC1lHpGVvRbJarKYdN7oCEi6WDZLzEkud8scBAouAaip47Om1d+DcN2gz//vpaoJWMDbNVpVPHhBdZm2VfuxJ+XpE/at4JQj2s1Fy+jYxf+YUaonOcjnqlw==
+ bh=eJcexBkkj0+o0lFC5i6hujne5xoo81Sxct9ZMJyQU88=;
+ b=uCqGq7H8hs990xVv5tTu3cRqvc0tX4QKq/AKUEimgnLdANTjyd8CxPNoDGRwlCecqtQnMpSH35ufkLP6UjnYg35IwhB+uSY+MTV+JRvTCBkEH3ptHabbMYIIKH/TvlEetYaNWGpBg3VJn6TE8UxeuHRv2lydx5YfHZDC9a9vc8S3C9oprjIIL4hsBEjFdae5maGFFcro1ef+rfrQU+VdCok6C2nm+lE9nI9EXwPDWkdHtDj7fzthtu4fBdw/VyhUlo1QWaU4rbI171wIJnVu2vv3B0aUfhc/7jZ+kBYKCPKGNdZfA5bsmajRUq2VHHiMIlOqik0BJfWHlARwXNSEQw==
 Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by LV8PR12MB9452.namprd12.prod.outlook.com (2603:10b6:408:200::8) with
+ by CYYPR12MB8939.namprd12.prod.outlook.com (2603:10b6:930:b8::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
- 2026 19:22:38 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Thu, 7 May
+ 2026 19:44:36 +0000
 Received: from CH3PR12MB7548.namprd12.prod.outlook.com
  ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
  ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.20.9891.017; Thu, 7 May 2026
- 19:22:37 +0000
+ 19:44:36 +0000
 From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
 To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
 	<eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
@@ -54,17 +54,15 @@ CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
 	"armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com"
 	<berrange@redhat.com>, "abologna@redhat.com" <abologna@redhat.com>,
 	"jdenemar@redhat.com" <jdenemar@redhat.com>
-Subject: RE: [PATCH v4 15/17] arm/cpu: Expose writable ID reg field properties
- on the kvm host vcpu model
-Thread-Topic: [PATCH v4 15/17] arm/cpu: Expose writable ID reg field
- properties on the kvm host vcpu model
-Thread-Index: AQHc2s+xRZw+5L8EoUSk70vndHElRLYC9owg
-Date: Thu, 7 May 2026 19:22:36 +0000
+Subject: RE: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
+Thread-Topic: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
+Thread-Index: AQHc2s+53rPwsDHdIkCu5+H94U9RRLYC+KUA
+Date: Thu, 7 May 2026 19:44:35 +0000
 Message-ID:
- <CH3PR12MB7548D4829306C3B8E9612FD9AB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
+ <CH3PR12MB7548322D7A29C8EC3EA0E49BAB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
 References: <20260503073541.790215-1-eric.auger@redhat.com>
- <20260503073541.790215-16-eric.auger@redhat.com>
-In-Reply-To: <20260503073541.790215-16-eric.auger@redhat.com>
+ <20260503073541.790215-18-eric.auger@redhat.com>
+In-Reply-To: <20260503073541.790215-18-eric.auger@redhat.com>
 Accept-Language: en-US, en-GB
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -72,48 +70,48 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|LV8PR12MB9452:EE_
-x-ms-office365-filtering-correlation-id: e1b7a877-dd4a-4a11-24ac-08deac6dff6f
+x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|CYYPR12MB8939:EE_
+x-ms-office365-filtering-correlation-id: 751622ad-9474-46cf-b2ba-08deac7111a4
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|921020|22082099003|18002099003|56012099003;
+ BCL:0;ARA:13230040|366016|7416014|1800799024|376014|921020|38070700021|22082099003|56012099003|18002099003;
 x-microsoft-antispam-message-info:
- 6mN/s8ppjF3ZiKZh2aoRBjuAZHaSwHT0c2T9zpS4t3Tj8ALE0TsyxGnt5YKlqrDtYbrccbyPziR8v2Qizf1TxbnyAX27lD1gSLocCeNrPMFymHfQHCAAXHbH1FFDFSYobQFBaH7uRH1+oDQc0mbHbaAHl68W443jM/B5D842oYvkvMzmvE2N9c40DEznLJxDdSJZun4FqO8WYz5mggNxdoo8wTOg4GaWq1kdouwASx3QjSK6rb8593dyRD+vZsK9ifDyMtIwx0WoPwxnlaRRe/HlrqC43bc/AdMH8u5gQ1x7vAlqN4N5QiKeX7uBBXuZoI9B/9e8VPAnaidZOPJzjanRrac+YejYQW0gi1II0mnOwN1uQ+8DJ/Ik3jRYqPIbayFokeVdfpC6qosCb7kPOTLRpSfxJPj7xtGPCoN+/RiI30KGdIk8nMMM76pBzqDQQsANBnaL64f1okcnCwPUh4GZVjCJ4+xqCw/WsfILKQU8yTJSTPvydmxUtLcnJST93+Z9CRaUc9xLckPjK/D4zkk+YHKGIbSM1zI/eEVPtvQy/poDs5J5/fWHQmFPUlBIrg76rW5/++34Xaq2G0A0Gf3yMcYAq3fjSIlOS1e6zbmeDiOOjYoSRZF8T+3nBU7LmsQUJORiG3ev/ETKoEJDV5pRSLy8tIDo58Cnze5RIgZ6eqTPFJchrN9x2PdXxYIg4ja5OlTxEtWOj45k+1WP00PHcw8v1UfXTgHa69mrv0LmT8Kaurtwt0IfMKqRlpzOXaKsAjIZm5Ebg9sarlcFVQ==
+ sacEGfh6HSKs75gDGw+4JcM+hod3FsSl9Khw7bWbHDOABcBZSAxY56s4VB5n4yJgIx2OQNkr8HCoUCHv9JNMx+5ba7yvZGoniL8ghpKaRxG/SqVHbWmNzfjklVhl4uEO4ZMX3rvsqzdhNXQCmTzEd2MiO07OQpiSK0jbITz+9RWWWfuvd8ZTqMXSVP02Jq3T6IlnACILbB6h2OaB4L0A1LJPcos5OmqEzbSFVr48P7LrwK51MhncVzapwS9LOn0Tdx0ItQs9x4FZcNl4Y7NlYcYUoQKzHuunZscgRnhVfdElq2FQhCJBVOMfa3xmU093cm7dDVNuzgawLdFbLc04bh8XoriYZGaGt1bvrHTwdFZCxo+nwusL8BydLEA9LhFvRuoV0OJiSaWu70yj1CI2YnRIL/7kc15NSblc+tI2Mxoe0t4rvgLzCpPpFOnnRrbISVbOQ78K02Z8H/RwjT0aXJKuHyone6zPGxoO7J+WhJL0wA7e8mq7s6yfHRYW9pQrmNWkeuYqqManKqXcfcMYGZ78TRLavdsOmKJkAD/kzKOf34ypo6G+xv2NpkPjwPR7buNRsgPbTDZmSOTuZXB0HphkzPhKPuy3FBuee+iTO9vsVvzeDRpGKKlD9ed4XlRVDoYkSd+gbrCb1ChTJ9q4sUn8X8ujUOyPk2sPsexEsSLDT4SVadCgCLhPlTH3wPyo4Dc+U/hbd9GJEDi8l925aj2kv9XLLwbKjEkuB8xlM4u76IHVWwe1FLs7UIhfqrCPenKRycMPMX3BgjjeuwBg3w==
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(921020)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(921020)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?zHMzaVQsFebvM1Pyjvq8VnTfbvtbmAHbmm3h48cGxZdl63hHctTDubtIQoRj?=
- =?us-ascii?Q?L/48EsuF8dfpSf6BIVZX+WBqZHNzZcZEHApE5FvxP4gS2fYYXh7+0hW7PeQO?=
- =?us-ascii?Q?MN7JJSJ8I/FDXEJRtTePBtr5K550DTIn4vdKGrrVaCydagrechpUqDDSG/62?=
- =?us-ascii?Q?g+AL4B/IOswPj6BVgo0iMNVET4RP/gIKfe1ptvRkN91+OpzhTMTcb82FwY9z?=
- =?us-ascii?Q?xXmE41LLU2wSk013W34gbRTHPk7YSrn2vgGb1xrg0vk+wepvq2sEB7TvpX/K?=
- =?us-ascii?Q?hs6s2KWSdvjaNIclsmojgqWBuujraumkfkKI5nbLqiA66lhgCbdPFFUb7vEO?=
- =?us-ascii?Q?QBLBAzI2o90EeDdwjObRoY3V0iYVIwXJWZXE5S3nPBPb4ARypH1NwQxy49Xa?=
- =?us-ascii?Q?hdDWoCzPIFHVGvNe25JqQHTXkgpg/2b+3LMKEaBA6w568f5CDV+3QuIDbLoS?=
- =?us-ascii?Q?CrMRRxkdX9jLp44nvf7kviPj3XaNivoNkTnAUsBuKNAUN/pMQArpSlHp7wKM?=
- =?us-ascii?Q?3N69bj+ZxPNAfPCUvf24AlI0AMPTCHVCDVlRDNeC6YP05M47vI8s3mE0dHXv?=
- =?us-ascii?Q?UnD3gYHQIEIZNM7lLpKn1++EWMkKhXz08VUbbfmYtV16KesFjr5+hBA44l5G?=
- =?us-ascii?Q?BMaPwq+ODsCpsDM9W1VT/H3AdZ+t8VOjnbPuu0V4lqTwmmyb2s6V+v15cVg4?=
- =?us-ascii?Q?I+s7jrnqeJpEDNDrn8xgCHhoF4EGEdMdj6BdtVIb50tYRhyo4+q/z8KNWbHL?=
- =?us-ascii?Q?hCEMnEOMpi8lWvA9Nqv5lFy6rVKJg24i6U8N7Pnez7w/fR2An9Da2EGlLQ7r?=
- =?us-ascii?Q?/IQgPOuVru///ZQgsYwQGk3jojdXYpZH3fMBnl4hKqB4onnxZE8Q7TonPEQz?=
- =?us-ascii?Q?CilPOIQ3WvtD2ACE1b5CBE6/WDd2ra2Aa75sNKkMJ8nV2CoreJaGGLVAeWCU?=
- =?us-ascii?Q?NcXXbroLfJNuADimRdmvgBrpd65azADC5Td16nQskNd04mjhd9OR2bM4KMGs?=
- =?us-ascii?Q?MWPZtFbE1VRsXwxeLqH+mcVAL8x09lNP2kjPUPdwashgdqlrV/cT0Jp8/qvW?=
- =?us-ascii?Q?8FGjIHQFprt3Oi+etQkQuoDHBw09AzSAmzY0Ik/kN2W4SmD0LKqSIl/xSHnZ?=
- =?us-ascii?Q?YEQuV8D3zhCYiEY9WoWAkX952G9Z2DA+VhJolkby17F99NPO/6YhAoBgLFZI?=
- =?us-ascii?Q?UZ+BfCrOBY8u8RdVNKzYEnyqG11Tu+2cWM0XKGtcNiBZEso1v8Kr0pLmsZLk?=
- =?us-ascii?Q?T3WjoXkJMg46Wi2xug194ak5SUC2gLVN/F6DFZXNWPnZblm4AcOffPTgK7qF?=
- =?us-ascii?Q?+UtGQm7W1WaSqF3nsAc73etQMqeOcRSuz9UZEMsXkAF5cTYjy2DjLUn1G/9e?=
- =?us-ascii?Q?pA2m0BVQqtfQH3oXCOUU+Dm3fBsiIY+Kf7mT9Y1LmisbGSd4z3Fy8YmomX2W?=
- =?us-ascii?Q?OCyQ0ZrjCKBPgcLpN4KpoMsaJcYD8mY5EJWCHas5ULPPaC4bsd3WFCnUaPw1?=
- =?us-ascii?Q?v+YcbqiBeJYS1boAmKrx866f5wMKB9O76hwRPeH1QTIAOwMF8OqPF+x7vEMu?=
- =?us-ascii?Q?IMkVO6dh2uIoxMtHNRf4v6Q/iiQenKpLXebmV5de1T4gEUqWLBCeX84KgA+I?=
- =?us-ascii?Q?OkuVR+eteL4uqPzXq9MPJO/0UGcPO6pD98Bfkj23aCW+ptM//wZ0KX4kxFmX?=
- =?us-ascii?Q?hU+usRdMftrmZW1bS10lUozuWmW++0P5Rutb5OfH0mxJ7LU+SBResO8UUeun?=
- =?us-ascii?Q?mphfz+2fUw=3D=3D?=
+ =?us-ascii?Q?h3ErZIzs6Sfl/DZBJy591lG/A0oNnFyQvR1Yqxz8AuNjXtC6Scfejpiy5bgK?=
+ =?us-ascii?Q?yyfmWZKmO5Pc5FtaSawyiDid7j5d6OAqyr5QuKuy/ap8upet6cbwBleB8SVr?=
+ =?us-ascii?Q?3tUNYS4YCd0RruWJR0uKTwQ/LnhHFF23hpWmGRHLwKcWTh+GntCE/V58xJdz?=
+ =?us-ascii?Q?c9E9TA3C5K0lL2zGtjZbSgY+H11QA296oUCpRo6sav+0SIen4wgr4Bgl92sX?=
+ =?us-ascii?Q?t2mf6fDRmIS8nBbqoEPjkhZm4IQpdvLdSP+AE9f/UtqmIYO/kE6glYav/vQo?=
+ =?us-ascii?Q?m9EwrLvm1yvCjoONhxF+LxcbnzuacjQc3SZMJqefbpjEDbohFO11WuJ6TQcc?=
+ =?us-ascii?Q?S0trDHHI05DUT/shKSb5d25yp5agCr5Fe4GoYqkM78bLzejhYo4Zdt4QlFVz?=
+ =?us-ascii?Q?tK9NTnqXSFoLtK1qp3xLHzyeFbTo+HlkMK6MdfXE+fEpojv3t3DM4Ap3MHc9?=
+ =?us-ascii?Q?ILdqjE5VXzM1m/h3a1CRnEdiCSuZ20LmjfBo9RdBRKAz+Idy2OUnzMr/B8Ra?=
+ =?us-ascii?Q?Z+GQukdlwZU061fmFSUVEUPXE5jLTN9hLiiVcsAbIOiLkqXM275Ba1PWHByg?=
+ =?us-ascii?Q?YQrjnd4lRikQvS+z0AmWeEfuWcAr/tK3j8UEBq3ldosfQFQnrgNcPjZCqrAV?=
+ =?us-ascii?Q?E7osy6CITYlgRtVKHKanKTlqa+5gueslgRUrh+hvDzukS61Nk2E/oRSHL2V5?=
+ =?us-ascii?Q?YiS6Ec0J/wwYenXg/CCw11YkPBA+gY5ytigOoAJ1+loH3xzlGLG8kW2F9eXB?=
+ =?us-ascii?Q?8W+JbQ0VkpZg6ly2ODuklYe0kUCNSi5gxvBzxFA9MhAJRaA8iClyrC8bETXf?=
+ =?us-ascii?Q?0sSChuMxZ3bQw42iT3dWilvJ5ty+lpeszjpUjEPnnC1lYF5TwmHFFGuGbfhl?=
+ =?us-ascii?Q?OhEUGHXFHmLN82SClAZQVu0/KG9WxYiyzTbR/1JI7VAxY+dm6/kt0CXpoS+w?=
+ =?us-ascii?Q?JU9UWVGa1kI+h7P4RNF/k6nu2Jg+W+4k3AP3hNts74fSTR9ylVvBqQW78A8z?=
+ =?us-ascii?Q?0itDR1gneyIWICINHwZvqEHyPRReKgh55wjHfz/Mglo8hwAVuhSXokKd3gvJ?=
+ =?us-ascii?Q?V3iUP7/Hn4li2A+q3RaQpcjlk3vocZ24UD0JeYwpQ19R3r6EQxTNQLIrNH+d?=
+ =?us-ascii?Q?xniBNZvajCUHdd2Mq6lnuKxXQSf+MOxUi7RLXJURXmiAY3JAt5u8dCwMiyJp?=
+ =?us-ascii?Q?6ZHLmkpcBoksltuBRQeoT1R529zgEMIOdB+6fIVTKTDcBeYAYQZZ3yU3vskL?=
+ =?us-ascii?Q?mqpE7+lfM2YkNejvFMM85IzSBYQp+/r2T6DD7/hG9GfJeiVJ3uONC/4bSq2E?=
+ =?us-ascii?Q?d81z95nuDnZpg0rmaH4FM2tnpcgGtfh/ZvMCNsV46DkVc7GWiLJrEGxouoEg?=
+ =?us-ascii?Q?NPj/TJ+BCbvyQV4jqXDPBF00DRF+aDiVzH1QWBRc1COWsQGh0+m0gwIHF87s?=
+ =?us-ascii?Q?Kj2oGJYTZIvLfS+9mCKC48JnCkYrUQBKvsqlx4AOG4VHE+P/u3/dbmkZsRIR?=
+ =?us-ascii?Q?VJLNB8X70kM5f6jGotb1cPVp96DqOJnLnrvGIfEgEso6NIsRz1z5DdmF2Lg8?=
+ =?us-ascii?Q?T3tDQGrO+1fPpXqd5kO88a2kMys3FkYbnK05hj/F6/3GMoCqiTg4/kA43qII?=
+ =?us-ascii?Q?7kO9mz3oMswlSCe1KAoQ853X9LmaZW/S/Hw3bIhWjda2F4nL4d5qe+WxASgl?=
+ =?us-ascii?Q?DjwpqZ/4a65RwWiNAOPUXzTTYMpGvdykCOlxmJ6zNsYe2nxkHXgmF/6CDaPR?=
+ =?us-ascii?Q?OjqtCw+ZSA=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -125,14 +123,14 @@ MIME-Version: 1.0
 X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1b7a877-dd4a-4a11-24ac-08deac6dff6f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 19:22:36.9823
+X-MS-Exchange-CrossTenant-Network-Message-Id: 751622ad-9474-46cf-b2ba-08deac7111a4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 19:44:35.9953
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +NraaEZYXrAA9F4YEKS4skFVIp3wv0GtgrO9qjf4H/0I+4HbE9Gmv6iglw97fp1LZkoTtgFoAEg14hzPso8GCQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9452
+X-MS-Exchange-CrossTenant-userprincipalname: naedk5zbE0xaL5oHeovN7nxOY1ewow+7OhvdLz9BioB85cycznxOK3HuHnot0DHPE9B1QdfoUwnuZ8cSKlYFUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8939
 
 
 
@@ -147,122 +145,213 @@ X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9452
 > Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
 > armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
 > jdenemar@redhat.com
-> Subject: [PATCH v4 15/17] arm/cpu: Expose writable ID reg field propertie=
-s on
-> the kvm host vcpu model
+> Subject: [PATCH v4 17/17] arm/cpu-features: document ID reg properties
 >=20
 > External email: Use caution opening links or attachments
 >=20
 >=20
-> If the host supports KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES and
-> KVM_ARM_GET_REG_WRITABLE_MASKS ioctl successfully retrieved the mask
-> of writable fields for all ID regs, expose uint64 SYSREG properties
-> for all the writable ID reg fields exposed by the host kernel which
-> can be matched in target/arm/cpu-sysreg-properties.c.
+> From: Cornelia Huck <cohuck@redhat.com>
 >=20
-> Properties are named  SYSREG_<REG>_<FIELD> with REG and FIELD
-> being those used in linux arch/arm64/tools/sysreg or in the AARCHMRS
-> Registers.json.
+> Add some documentation for how individual ID registers can be
+> configured with the host cpu model.
 >=20
-> This is achieved by matching the writable fields retrieved from the
-> host kernel against the generated description of ID regs and their
-> fields in target/arm/cpu-sysreg-properties.c.
->=20
-> An example of invocation is:
-> -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=3D0x0
-> which sets DP field of ID_AA64ISAR0_EL1 to 0.
->=20
-> [CH: add properties to the host model instead of introducing a new
-> "custom" model]
+> [CH: adapt to removal of the 'custom' model, added some more
+>  explanations about using the ID register props]
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  target/arm/cpu.c   | 12 ++++++++++++
->  target/arm/cpu64.c | 23 ++++++++++++++++++++++-
->  2 files changed, 34 insertions(+), 1 deletion(-)
+>  docs/system/arm/cpu-features.rst | 104
+> ++++++++++++++++++++++++++++---
+>  1 file changed, 96 insertions(+), 8 deletions(-)
 >=20
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 10feb639c4..10ce4eb0cb 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1824,6 +1824,18 @@ static void arm_cpu_realizefn(DeviceState *dev,
-> Error **errp)
->          return;
->      }
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-
+> features.rst
+> index 10b0eff27e..22f671b15d 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -2,7 +2,10 @@ Arm CPU Features
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 >=20
-> +    /*
-> +     * If we failed to retrieve the set of writable ID registers for the=
- "host"
-> +     * CPU model, report it here. No error if the interface for discover=
-ing
-> +     * writable ID registers is not available.
-> +     * In case we did get the set of writable ID registers, set the feat=
-ures to
-> +     * the configured values here and perform some sanity checks.
-> +     */
-> +    if (cpu->writable_id_regs_status =3D=3D WRITABLE_ID_REGS_FAILED) {
-> +        error_setg(errp, "Failed to discover writable id registers");
-> +        return;
-> +    }
+>  CPU features are optional features that a CPU of supporting type may
+> -choose to implement or not.  In QEMU, optional CPU features have
+> +choose to implement or not.  QEMU provides two different mechanisms
+> +to configure those features:
 > +
->      if (!cpu->gt_cntfrq_hz) {
->          /*
->           * 0 means "the board didn't set a value, use the default". (We =
-also
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 1b3d3fb245..d66cb00a21 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -852,6 +852,8 @@ static void
-> kvm_arm_set_cpreg_mig_tolerances(ARMCPU *cpu)
->  static void aarch64_host_initfn(Object *obj)
->  {
->      ARMCPU *cpu =3D ARM_CPU(obj);
-> +    bool expose_id_regs =3D true;
-> +    int ret;
-
-The above will be unused for non KVM builds.
-
+> +1. For most CPU models, optional CPU features may have
+>  corresponding boolean CPU proprieties that, when enabled, indicate
+>  that the feature is implemented, and, conversely, when disabled,
+>  indicate that it is not implemented. An example of an Arm CPU feature
+> @@ -31,6 +34,16 @@ running guests in AArch32.
+>  CPU features that are inherently specific to KVM are
+>  prefixed with "kvm-" and are described in "KVM VCPU Features".
 >=20
->  #if defined(CONFIG_NITRO)
->      if (nitro_enabled()) {
-> @@ -862,8 +864,27 @@ static void aarch64_host_initfn(Object *obj)
->=20
->  #if defined(CONFIG_KVM)
->      kvm_arm_set_cpreg_mig_tolerances(cpu);
-> -    kvm_arm_set_cpu_features_from_host(cpu, false);
+> +2. Additionally, the ``host`` CPU model on KVM allows to configure optio=
+nal
+> +CPU features via the corresponding ID registers. The host kernel allows
+> +to write a subset of ID register fields. The host model exposes
+> +properties for each writable ID register field. Those options are named
+> +SYSREG_<IDREG>_<FIELD>. IDREG and FIELD names are those used in the
+> +ARM ARM Reference Manual. They can also be found in the Linux
+> +arch/arm64/tool/sysreg file which is used to automatically generate the
+
+arch/arm64/tools/sysreg
+
+Anyway, I think this needs update as the scripts now uses Registers.json
+from AARCHMRS, right?
+
+> +description for those registers and fields. This currently only has been
+> +implemented for KVM.
 > +
-> +    cpu->writable_map =3D g_malloc(sizeof(IdRegMap));
+>  CPU Feature Probing
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> @@ -126,13 +139,20 @@ A note about CPU models and KVM
+>=20
+>  Named CPU models generally do not work with KVM.  There are a few cases
+>  that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on =
+a
+> -seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
+> -used.  This means the guest is provided all the same CPU features as the
+> -host CPU type has.  And, for this reason, the ``host`` CPU type should
+> -enable all CPU features that the host has by default.  Indeed it's even
+> -a bit strange to allow disabling CPU features that the host has when usi=
+ng
+> -the ``host`` CPU type, but in the absence of CPU models it's the best we=
+ can
+> -do if we want to launch guests without all the host's CPU features enabl=
+ed.
+> +seattle host, but mostly if KVM is enabled, the ``host`` CPU model must =
+be
+> +used.
+> +
+> +Using the ``host`` type means the guest is provided all the same CPU
+> +features as the host CPU type has.  And, for this reason, the ``host``
+> +CPU type should enable all CPU features that the host has by default.
+> +
+> +In case some features need to be hidden to the guest, and the host kerne=
+l
 
-Does kernel clear the buffer before setting writable mask?
+s/hidden to the guest/hidden from the guest/
 
-> +    /* discover via KVM_ARM_GET_REG_WRITABLE_MASKS */
-> +    ret =3D kvm_arm_get_writable_id_regs(cpu, cpu->writable_map);
-> +    if (ret =3D=3D -ENOSYS) {
-> +        /* legacy: continue without writable id regs */
-> +        expose_id_regs =3D false;
-> +    } else if (ret) {
-> +        /* function will have marked an error */
-> +        return;
-> +    }
+> +supports it, the ``host`` model can be instructed to disable individual
+> +ID register values. This is especially useful for migration purposes.
+> +However, this interface will not allow configuring an arbitrary set of
+> +features; the ID registers must describe a subset of the host's features=
+,
+> +and all differences to the host's configuration must actually be support=
+ed
+> +by the kernel to be deconfigured.
+>=20
+>  Enabling KVM also affects the ``query-cpu-model-expansion`` QMP
+> command.  The
+>  affect is not only limited to specific features, as pointed out in examp=
+le
+> @@ -169,6 +189,13 @@ disabling many SVE vector lengths would be quite
+> verbose, the ``sve<N>`` CPU
+>  properties have special semantics (see "SVE CPU Property Parsing
+>  Semantics").
+>=20
+> +Additionally, if supported by KVM on the host kernel, the ``host`` CPU m=
+odel
+> +may be configured via individual ID register field properties, for examp=
+le::
+> +
+> +  $ qemu-system-aarch64 -M virt -cpu
+> host,SYSREG_ID_AA64ISAR0_EL1_DP=3D0x0
+> +
+> +This forces ID_AA64ISAR0_EL1 DP field to 0.
+> +
+>  KVM VCPU Features
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> @@ -495,3 +522,64 @@ Legal values for ``S`` are 30, 34, 36, and 39; the
+> default is 30.
+>=20
+>  As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
+>  removed in some future QEMU release.
+> +
+> +Configuring CPU features via ID register fields
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Note that this is currently only supported under KVM, and with the
+> +``host`` CPU model.
+> +
+> +Querying available ID register fields
+> +-------------------------------------
+> +
+> +QEMU will create properties for all ID register fields that are
+> +reported as being writable by the kernel, and that are known to the
+> +QEMU instance. Therefore, the same QEMU binary may expose different
+> +properties when run under a different kernel.
+> +
+> +To find out all available writable ID register fields, use the
+> +``query-cpu-model-expansion`` QMP command::
+> +
+> +  (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"host"}
+> +  {"return": {
+> +   "model": {"name": "host", "props": {
+> +   "SYSREG_ID_AA64PFR0_EL1_EL3": 1,
+> "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
+> +   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
+> +   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1,
+> "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
+> +   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1,
+> "SYSREG_ID_DFR0_EL1_PerfMon": 4,
+> +   "SYSREG_ID_AA64PFR0_EL1_DIT": 0,
+> "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
+> +   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0,
+> "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
+> +   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
+> +   }}}}
+> +
+> +If a certain field in an ID register does not show up in this list, it
+> +is not writable with the specific host kernel.
+> +
+> +A note on compatibility
+> +-----------------------
+> +
+> +A common use case for providing a defined set of ID register values is
+> +to be able to present a fixed set of features to a guest, often referred
+> +to as "stable guest ABI". This may take the form of ironing out differen=
+ces
+> +between two similar CPUs with the intention of being able to migrate
+> +between machines with those CPUs, or providing the same CPU across Linux
+> +kernel updates on the host.
+> +
+> +Over the course of time, the Linux kernel is changing the set of ID regi=
+ster
+> +fields that are writable by userspace. Newly introduced writable ID
+> +registers should be initialized to 0 to ensure compatibility. However, I=
+D
+> +registers that have already been introduced that undergo a change as to
+> +which fields are writable may introduce incompatibities that need to be
 
-Should free and NULL writable_map for both error paths above.
+s/incompatibities/incompatibilities/
 
 Thanks,
 Shameer
 
+> +addressed on a case-by-case basis for the systems that you wish to migra=
+te
+> +inbetween.
 > +
-> +    kvm_arm_set_cpu_features_from_host(cpu, expose_id_regs);
->      aarch64_add_sve_properties(obj);
+> +A note on Arm CPU features (FEAT_xxx)
+> +-------------------------------------
 > +
-> +    if (expose_id_regs) {
-> +        /* generate SYSREG properties according to writable masks */
-> +        kvm_arm_expose_idreg_properties(cpu, arm64_id_regs);
-> +    }
-> +
->  #elif defined(CONFIG_HVF)
->      hvf_arm_set_cpu_features_from_host(cpu);
->  #elif defined(CONFIG_WHPX)
+> +Configuring CPUs is done on a feature level on other architectures, and =
+this
+> +would imply configuring FEAT_xxx values on Arm. However, differences
+> between
+> +CPUs may not map to FEAT_xxx, but to differences in other registers in t=
+he
+> +ID register range; for example, differences in the cache architecture ex=
+posed
+> +via ``CTR_EL0``. We therefore cannot rely on configuration via FEAT_xxx.=
+ A
+> +feature-based interface more similar to other architectures may be
+> implemented
+> +on top of the ID register interface in the future.
 > --
 > 2.53.0
 
