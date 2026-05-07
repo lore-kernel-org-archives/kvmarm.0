@@ -1,157 +1,154 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1443AF672
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 13:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36C73A9D8F;
+	Thu,  7 May 2026 13:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778160792; cv=none; b=Ok6vlOyCSFM8ho67j0FWZjFyN9FAeKQmm3cqs5gRo7IXaAH2kxshlFhoBHV/Jv3ajq5QxP0Ae47lsqJhby4ViwAbo6PUAPp/tmrA/U++xJcYRCuzC3Ncpf6Y2+Qxq4JoYOdjoPDhpQkZuk7Qf28l3pEQKF0wXZ5DK6ZEbfcWXyA=
+	t=1778161009; cv=none; b=fBOTOiGsxWCbwQKFv9yCkfOWogK/YA0wgni5jrl2JberPxSog0sBNWfTwC9iZOsID7aujCvZyLR/P7l2WiG7vZIcAbDOwA2AC35pJQhsrG1o1Aq8vCc7G0R6BB1amabcpViNCgl1dvKf/NxRokEv+gP3tEQnK4Pb+Qq4mURxHVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778160792; c=relaxed/simple;
-	bh=M+1Z5REvYdFiksjsEk2h6OHeRbUmh7UMafjJOefnKoU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qfbujFWyQTy6YErRzg3/m1s7OfYSkT/161ES6bNAjbS2gXGbHLpqD70QeogeCx3ahVJof0DaFkiOJSRveQuYML4PC2Qmv7abkI34eAVtIh6Ue9mS0UuKdtGNJ4vU1QGocxuOO3SiqaPBO7GbyfuVJK5sAi6o+xSJc4/E66+em8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CcBKTuGc; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1778161009; c=relaxed/simple;
+	bh=swhnCX4GiPiWbOLZwXEXT66bu8Nfxrf73Z5yu5LKyFk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jLzXtY2am7Z5ReYkRmRxZmbv5iWiE75yq4fr/6Q4p4Uy6Tuz9MrlWQjo0/W0PcsR/78Au+gu7hJ+W26scBLGHjZhdW7/vLEZbthGgOF+x5iLbBx4uogGwzWqLnTdZXnoOKUJZXheHnu8WW9hJuIcflDrhjeHjq6Vw0TKdaSBIPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lVkX5AbG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CcBKTuGc"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ba054e0304so14288635ad.0
-        for <kvmarm@lists.linux.dev>; Thu, 07 May 2026 06:33:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778160787; x=1778765587; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lAslfbD1ot428d19C5gk7U0ODS9evh/h4+t//ujFJsg=;
-        b=CcBKTuGczE5zeq2siVNweiiMP4vMhzaGUU3oS1Xv+OQuZVny6ieBeWCOlhoIjMUYt8
-         aX5XTr3FeQ14JwMbsgn9lXcZrQZpkMmPQEMpSHO0VSuailsoUZIeMw/zuUkAPgxq33ME
-         GpvTA6Y3VKn1deXDKvR+5h/48xu/NuAbtmhAUJXOY2iAmx5E9AW1PTM5Z90dpB1F7T0y
-         zZMMg98+W3Jxteikx7rxaIhSRmSewzgIfaHTChskPgpQ04S/uiEA5mosc1/ebmBS0VJe
-         GlwTBABitAB80F94uGRSOFcwMEHz1Y4DDUxvlKN7dzxNy6EDgJWlTYUMwvt+pU+UbNPh
-         sqFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778160787; x=1778765587;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lAslfbD1ot428d19C5gk7U0ODS9evh/h4+t//ujFJsg=;
-        b=o2XCHGeVvmIHI4jKzhhbhckrVJSYwCsX5BRVuERipS/JhDTVJEFHuzbS6kJeEdo/Uj
-         Y0cfU0dEnRXsJZ88MKZI51iBVzJJvS0qebtCMQkc+r597qpZz+WiV6c45aHKE6nrfYyn
-         wHloP43MTAbwcN2wpkMIJsz+gisrUYUEAFBQPtvk7GKqojQEvw6lieaU1Kueuu7TQg8v
-         MnipdOY+12rW9d7Q3Zbigw4wZQ2B1Qkn66sOL9vj6tc7XumCrk0fZTz3YJ5dfiYWfIJn
-         5ZYbtywClTuZ8LJZFsiP56lK1AnWjeu+BYVIk/RSwz2oHWI9YdfykxpVDJP55eH0HwP5
-         gmgg==
-X-Forwarded-Encrypted: i=1; AFNElJ8PRtOZP6PU8PEqFjlYHjKJomVzzgH15kDscanrpjFmVzsbFCtGDvrYwGb2EjbcDcrtdVEIOtM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwAiQHIxBoQzcVYme+dX8BfB93VV0nMmWs2qOTYiZveFbE3RAva
-	+EDgxUe9cQX5Cxq6Vsa0xrB6xtibTuuiA2PFYjX7fiIBZpUeXy0JdW1UyAQLMq+14s9vQpNVxJ9
-	aQ60gEQ==
-X-Received: from pluo3.prod.google.com ([2002:a17:903:4b03:b0:2b4:62bc:c2a9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2ad0:b0:2ba:b6a:41bf
- with SMTP id d9443c01a7336-2babc858e7fmr28026925ad.3.1778160786506; Thu, 07
- May 2026 06:33:06 -0700 (PDT)
-Date: Thu, 7 May 2026 06:33:05 -0700
-In-Reply-To: <afxROjBUVzeQQNfg@raptor>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lVkX5AbG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C50DC2BCB2;
+	Thu,  7 May 2026 13:36:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778161008;
+	bh=swhnCX4GiPiWbOLZwXEXT66bu8Nfxrf73Z5yu5LKyFk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lVkX5AbGoxy30ZDoT1jcNTFgQizQg3K3gX8hgIjib6w/RRAbItwlJGP3Gj9Gg7W7j
+	 a4aNd5PvDOqQpS3ZrTVNTWEu7xaYZ7uJPm0flbirclC4rY/YKylBUzW8aqbd2IjEbW
+	 DR+Y08VlBW+9J1KiTeNDBD5Fr40cWrGtLJtXOoAse2vNVc4pZ4JDx0JGXZrsv0mnxu
+	 4vskrAwsJpJvgTX6BfWPQwe4XqqDcfrCohWnvCZ5JF42Ic3PKIXnK5l3KA8BUJZVM7
+	 EY+Zkmkg0KD9f+1IFEAG+LqbBz+2lru5Ge2aM0NhybJLuOypPym9Xj9vhc/BFIfBjs
+	 OU8a2MgsnqCyg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wKyuE-00000000eBg-2hUx;
+	Thu, 07 May 2026 13:36:46 +0000
+Date: Thu, 07 May 2026 14:36:46 +0100
+Message-ID: <86se83xrwx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com,
+	oupton@kernel.org,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	korneld@google.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	android-kvm@google.com,
+	mrigendra.chaubey@gmail.com,
+	perlarsen@google.com,
+	suzuki.poulose@arm.com,
+	vdonnefort@google.com,
+	yuzenghui@huawei.com,
+	Sudeep Holla <sudeep.holla@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
+In-Reply-To: <afxuDpecPCVA56cL@google.com>
+References: <20260501114447.2389222-2-sebastianene@google.com>
+	<86wlxgy00t.wl-maz@kernel.org>
+	<afxuDpecPCVA56cL@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260506105053.107404-1-alexandru.elisei@arm.com>
- <afs3wp7xBUf2jYK4@google.com> <afxROjBUVzeQQNfg@raptor>
-Message-ID: <afyUkaQ1wtivyH8W@google.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Align KVM_EXIT_MEMORY_FAULT error codes
- with documentation
-From: Sean Christopherson <seanjc@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	tabba@google.com, David.Hildenbrand@arm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, oupton@kernel.org, will@kernel.org, joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com, sudeep.holla@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, May 07, 2026, Alexandru Elisei wrote:
-> Hi Sean,
+On Thu, 07 May 2026 11:48:46 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
-> (Resending this because I managed to mess up the headers, sorry for the
-> duplicate).
+> On Wed, May 06, 2026 at 05:29:22PM +0100, Marc Zyngier wrote:
 > 
-> Thanks for the explanations!
+> Hello Marc,
 > 
-> On Wed, May 06, 2026 at 05:44:50AM -0700, Sean Christopherson wrote:
-> > On Wed, May 06, 2026, Alexandru Elisei wrote:
-> > > The documentation for KVM_EXIT_MEMORY_FAULT states:
-> > > 
-> > > 'Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in that
-> > > it accompanies a return code of '-1', not '0'!  errno will always be set to
-> > > EFAULT or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT, userspace
-> > > should assume kvm_run.exit_reason is stale/undefined for all other error
-> > > numbers'.
-> > > 
-> > > where a return code of '-1' is special because according to man 2 ioctl:
-> > > 
-> > > 'On error, -1 is returned, and errno is set to indicate the error'.
-> > > 
-> > > Putting the two together means that the ioctl KVM_RUN must 1) complete with
-> > > an error and 2) that error must must be either EFAULT or EHWPOISON for
-> > > userspace to detect a KVM_EXIT_MEMORY_FAULT VCPU exit.
+> > [+ Sudeep]
 > > 
-> > Yes and no.  The key escape valve we (very deliberately) gave ourselves is this:
+> > On Fri, 01 May 2026 12:44:48 +0100,
+> > Sebastian Ene <sebastianene@google.com> wrote:
+> > > 
+> > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
+> > > FF-A proxy. This restriction was preventing the use of asynchronous
+> > > signaling mechanisms defined by the Arm FF-A specification to
+> > > communicate with the secure services.
+> > > While these calls are markes as optional, there is no reason why the
+> > > hypervisor proxy would block them because:
+> > > 
+> > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
+> > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
 > > 
-> >   userspace should assume kvm_run.exit_reason is stale/undefined for all other
-> >   error numbers.
+> > Where is this enforced?
 > > 
-> > As arm64 already does, that clause allows KVM to "speculatively" set exit_reason
-> > to KVM_EXIT_MEMORY_FAULT.  Which is by design.  The userspace flow is intended
-> > to be "if KVM_RUN returns EFAULT or EHWPOISON, then check for KVM_EXIT_MEMORY_FAULT
-> > to see if KVM provided more information about why the EFAULT/EHWPOISON error was
-> > returned".
 > 
-> Hm... In general, "speculatively" populating exit_reason with
-> KVM_EXIT_MEMORY_FAULT when userspace is not intended to use that information
-> looks a bit dubious to me.
+> There is no enforcement in place in the hypervisor since we don't proxy
+> FF-A from guest VMs, there is only one non-secure user of this which is the host.
 
-Oh, for sure, it's not exactly ideal.
+And again: what makes that VM ID 0? Why can't the host pick VM ID 32
+and use that?
 
-> Why do the work if userspace is not supposed to use the information?
+> > >    Because all forwarded notifications are inherently attributed to
+> > >    the Host by the SPMC, there is no risk of VM ID spoofing
+> > >    originating from the Normal World.
+> > 
+> > I don't understand: either the host is always using VM ID 0, and we
+> > have ways to check and enforce this (how?), or the simple fact that
+> > the request comes from NS is a guarantee that the SPMC will treat the
+> > VM ID as 0.
+> > 
+> > Which one is it?
+> 
+> My understanding is that when the hypervisor doesn't handle the allocation of
+> the non-secure IDs (through FFA_ID_GET), everything that comes from non-secure
+> is treated as having the VM ID 0 by the SPMC.
 
-Because not filling kvm_run when KVM is supposed to (per KVM's contract with
-userspace) would be a bug, whereas unnecessarily filling kvm_run is "just" wasted
-cycles (and not very many of them).  x86 also has multiple flows where it fills
-kvm_run "speculatively", e.g. in low(ish) level helpers where it's not known if
-KVM will actually exit to userspace.
+This looks terribly fragile. I'd rather you *enforce* these things
+rather than allowing any random stuff from the host and relying on
+the EL3 firmware to get it right (odds are that it won't).
 
-Overall, for code like this, IMO it's also yields less complex KVM code, though
-I suppose it can also end up being more confusing for readers.
+This also ties into this:
 
-> Regarding gmem_abort(). As I see it, if today someone writes userspace that
-> relies on any of the undocumented error codes propagated from kvm_gmem_get_pfn()
-> to handle KVM_EXIT_MEMORY_FAULT, that means that KVM can never use those error
-> codes for any other exit_reason in the future, because that userspace will
-> break.
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > index 1af722771178..a82d0cd22a17 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > @@ -675,14 +675,6 @@ static bool ffa_call_supported(u64 func_id)
+> > >  	case FFA_RXTX_MAP:
+> > >  	case FFA_MEM_DONATE:
+> > >  	case FFA_MEM_RETRIEVE_REQ:
+> > > -       /* Optional notification interfaces added in FF-A 1.1 */
+> > > -	case FFA_NOTIFICATION_BITMAP_CREATE:
+> > > -	case FFA_NOTIFICATION_BITMAP_DESTROY:
+> > > -	case FFA_NOTIFICATION_BIND:
+> > > -	case FFA_NOTIFICATION_UNBIND:
+> > > -	case FFA_NOTIFICATION_SET:
+> > > -	case FFA_NOTIFICATION_GET:
+> > > -	case FFA_NOTIFICATION_INFO_GET:
+> > >  	/* Optional interfaces added in FF-A 1.2 */
+> > >  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
+> > >  	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
+> > 
+> > Shouldn't these be sanitised in a way? A bunch of registers are SBZ in
+> > the spec, and I'd expect this to be enforced.
 
-Hmm, if we wanted to defend against that, we could scribble kvm_run.exit_reason
-on the way out of KVM_RUN, e.g.
+which still remains unanswered.
 
-diff --git virt/kvm/kvm_main.c virt/kvm/kvm_main.c
-index 89489996fbc1..76801d103dd9 100644
---- virt/kvm/kvm_main.c
-+++ virt/kvm/kvm_main.c
-@@ -4475,6 +4475,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
-                 */
-                rseq_virt_userspace_exit();
- 
-+               if (vcpu->run->exit_reason == KVM_EXIT_MEMORY_FAULT &&
-+                   r && r != -EFAULT && r != EHWPOISON)
-+                       vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
-+
-                trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
-                break;
-        }
+	M.
 
-I don't know that I'm convinced that level of paranoia is worth it though.
-
-> I'm sure this was all carefully considered when designing the interface, I was
-> just curious how this particular problem has been solved.
-
-Heh, I like to think we carefully considered the interface, but thinking of every
-possible way userspace can be silly is hard :-)
+-- 
+Without deviation from the norm, progress is not possible.
