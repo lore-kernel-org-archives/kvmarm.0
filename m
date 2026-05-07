@@ -1,218 +1,133 @@
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011049.outbound.protection.outlook.com [52.101.62.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A582D9EC4
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 08:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778143551; cv=fail; b=Dic0vgrXoFSmv1/g16keC9AEag9vTUEZKT4+fdRhrtp4b9N1DRMXDRakiJvhSxzPI/U1tuoXkDKZhA0V1mL+9vjMKv4stNMrgpmJ2OchcZiwh9/KZ/1ASa7A0fNN68VRUmC0SvLEk8y6qagcQDetAbay5TnyVXFS6ODDByGOHo0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778143551; c=relaxed/simple;
-	bh=uO6snAbPLReUUGsNyeIHlqIzgTSyeHeeCcXsK6LN5D8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KKu4BbVDSJMhf5pHYugwcu8Gtm5PYP7XBo+EGTyjuMVQ8uZOAIdWWL8Mudo032hkgTbhEzz4jLz302bz+ZPXUOLXzcf61a6iVvFZxnO3losUT5VT0fudSnt/NO33kZ6cQ6UhFNCNe8cEl2zy2IpuRNIQuUzjNjTiNc3Lu4k3vGg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Aw/m/02T; arc=fail smtp.client-ip=52.101.62.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B677B366542
+	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 08:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778143562; cv=none; b=d7t0bmif2/+bqx7BcspI7NB+RAh/TiYRtvUmfCtNBDNEvObm8RVGyEz/KyZFlEkFj2wfpPuOlCc6qjQMCzoDsbqUh7POgLKChUyLuLQDpX2uwD+A9J44us7pYxw543T6m+bTzSbIp3OlX4Ai1djbJf97mT90t83fvL5Bp+aA6Po=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778143562; c=relaxed/simple;
+	bh=OOppSG08L/KO4ewNhuiOGUn8DWyo80ypF6cLMLTTsYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p377iCnlMrvI2HW0KVPaZxaCj1WHyujhXz3mhbJsllwWfyi9NF05k7SCpCaWBNFsaJHQQ8WyMsLaE6GQJMr05ic+EwYnZTzjYsApKyULDB5NFhDLlP7dK8LBtOWkAzFeFjX4Szh38nF5/edyS1rjZEYBycAt1lrV0ggVv2xyinE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ufrmHspj; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Aw/m/02T"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hwz1mzHGE1OoPsjS2SUMKP70onGDUw/EySoidSGBWLdRpXRflP1TW0tba+2gZ4UeWpOUcTXq7M+El9tVPA3eqbn24ovniZTWDjHtI6Xy73POnO2g+9NKmJ+Qha9fLpy/pUPkVRcmu7EBazRzroOntEkuqZS8r0K5o7LuvTYNyxWz2lDehRWo7P9szs4z0Y83DJFDYYhtaEli7gs3OBk8qLvOUfdLdPbBJfLm/0Udk+XvvkqOC6Ex+KnlopNcXqokcbmPUjd1/J2HKET5OMdYebECuj1BgTzSun206YuNfz+tlO/PVOSF0MtaFtZObdupXWY9qhdmGkW2XsN5Ztp2Vw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C65F4yEOBpTzTS2xE5EtGl3GpKchtCQzsPCq98pyfUc=;
- b=fd6wD0NzD2QbLdNulHgTvhpcDIa0lSEosjmQdS4RdDFXGkWu39eZlsOKWua9XpvLFD6mFF9Z/5zIUx+61CVWq5AOAL/4qfdEKKAKclRnoT9Bdt/zVbP/kQM4lmBQXrZszk9LyAencqUZcAP4mJUFDyB+mXfP1N+20RiXulnwVMYk1882BqVxgJXIz9A3znhWE51FW4XpOjK/mmpYWU4tkJiUtYOO0S5xzQVypb+GtFRKXPP3ubJlDK53LZniMpEHccIdNToC+Ca0G8lJCR2LSxS+xM1RNkqu3DG14KSo9t5wLQ1py6fit7nPt6GepuyEAO2aiZIVywU1+Rs/N/BqfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C65F4yEOBpTzTS2xE5EtGl3GpKchtCQzsPCq98pyfUc=;
- b=Aw/m/02T50ZXeSccyy/G2Z4Tq+57DEh/MY46k7SEPVwqir0LA/zNGKOE1IMMEf06gKXVVOrxCb0mz3hVThBA2JKiXk6a4d9g3hxrkGEpp9LjN7JDMk0lPl+KC06IPDorsCBUDnhxzDkS0S1p5L1khHPaaLKoHiD1Lc1RxrSbEi4VOn66XYUlQvXFR9+GMYVJdo6JqdbNHTSuGcWX8fMk3qpeWV2qaSHcxqJfQhMV4xlSOe9Z8OXPXMOsc/jWgvoX9Z9I0X3VLuykYGOYPkGNcODIT3Y1/QYNDVkCjQG0tOxGj0uSkv53QE5QtKhZyinD4oByBUJ19XJKys2FwdpdFg==
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by SA1PR12MB6749.namprd12.prod.outlook.com (2603:10b6:806:255::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
- 2026 08:45:39 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.20.9891.017; Thu, 7 May 2026
- 08:45:38 +0000
-From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
-To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
-	<eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>, "richard.henderson@linaro.org"
-	<richard.henderson@linaro.org>, "cohuck@redhat.com" <cohuck@redhat.com>,
-	"sebott@redhat.com" <sebott@redhat.com>, "philmd@linaro.org"
-	<philmd@linaro.org>
-CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com"
-	<berrange@redhat.com>, "abologna@redhat.com" <abologna@redhat.com>,
-	"jdenemar@redhat.com" <jdenemar@redhat.com>
-Subject: RE: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
- automatic generation
-Thread-Topic: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
- automatic generation
-Thread-Index: AQHc2s+ISBxURh23/U6mjL5mBISdArYCRMOQ
-Date: Thu, 7 May 2026 08:45:38 +0000
-Message-ID:
- <CH3PR12MB7548C2AB4989FEF96C247D47AB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
-References: <20260503073541.790215-1-eric.auger@redhat.com>
- <20260503073541.790215-4-eric.auger@redhat.com>
-In-Reply-To: <20260503073541.790215-4-eric.auger@redhat.com>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|SA1PR12MB6749:EE_
-x-ms-office365-filtering-correlation-id: e26d35c4-26e8-453b-ad95-08deac150391
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|56012099003|38070700021|22082099003|921020|18002099003;
-x-microsoft-antispam-message-info:
- GH0as6MrgV9Nm7cw7ZUJn6LQDXyXM/kVnnpoHMnRGLq9S7U0CBWAsXXJbSCByUTsW5wEoxZW5Cvs1p7MdaseoH3lLVU5AMXRfI9J9VtHk3WMBGxLgR2g9YJbmdgEXauC5/pndpApq/VNQW/n2Pbmy5lnTRfm+uSJFwgTEUe9tYATIeSh90TX29c5eh6stl4W32ElECBehbcFKqCDc99YvO9PN3827UpBEZqMrf5DR3/lW4GWv6YKF3J+bkBeP6t5reGM+Vyvso/uSPYqxGTX7uNs8JgbeZ4UhtXfOiCTROWMRYLoG3WwvxjWz/BcbvxnawwvRa8nG2chcP5gCOhLDe2AiZRd1AGPWn5W7LNGc1LBAvRt52zm6GY6/hHTKz4TRSai5z+56PCEFKgiY6ovd0f9cyuYWAj0toLWI3AeHJ62eiTwgClDQyybguNA/sZIdNaGMN7R5ZdLsoclqeLofojq2Mw8079w4504kO/0mvObupPEfu2HFZXa8oc1HAqb7kkj1IRsYJ5GtdOr9wAJtOQ0YND95Nf61/YJphOEFEzcIRD4VKaCb3XUeFuowsZIU7wpAZIlaaQGd++mQo4WFVcp68/3pk2rznPr82+oqJYsil3NoPbgCm9CmhEyzFZ7Cgcs0zrxqU2UEFHDsuBN8GV13zpndo6nfjSNR7XIGgjeW2oshXQ06xwf7/R5Bq9BVBvSVn7c0NneoMbBBn4U9Wv374zebIlLiq4Sqs6e/6zeLDw1RBZjxeOngjn/W/0PAZsVkRVtItW+GS6W1Fw26g==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(56012099003)(38070700021)(22082099003)(921020)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?d+a8XPIG2fkL2akgiy94bzLVL001hUwKW3F6e32QYDXx8TXUp0kbbRzXLFsA?=
- =?us-ascii?Q?8VI6gP7k3raoJ1uoWA8hcwpVc34e5k14jTn4d7XfcbHGvsfRrBtFZl7l03Pm?=
- =?us-ascii?Q?Ao8uTdl7JEd69riZU+fxXCUTTt+GZPBlLihvLLJnRmoetJ/nR5ylRQKNDnNU?=
- =?us-ascii?Q?6jsc3Yw40YrQ9mmwM00p6tV0/nDMqwPpcu8CajL620Z2P1gERxmpdhFczjua?=
- =?us-ascii?Q?6t7mGAUJYiniTFs+vzBDxR21mZJ/UfaO98fwXe47VPmCNwr58Wwb3IanVukf?=
- =?us-ascii?Q?X8BBGiW6kFAJGhYwP0FCAhjUOt5LxjD38yOle8l4xX6Pq8CGuW0Y+VaMQPQs?=
- =?us-ascii?Q?+hkFdzP12MrPCdKCU6mYVvLUvKdRIWIAOEMTuM0CPHiiIVVJJY4kqEunyEPb?=
- =?us-ascii?Q?QnUsrQoZu2NHF+IRH97p+pG+BZp2IpPtUmtMnt/e4MiF1W3c7mCk9vG/fNi5?=
- =?us-ascii?Q?h6IkqHBMxDxJVikMLg9k6lEoQlIvHxN7pMD1Y7qw2qGYN5NbseV4tOAANt2l?=
- =?us-ascii?Q?JEYWRmJbkwIr5Z33Z+EYCqXUbwXO2y3j+5EO2nBqDCGYEVpAxb3bvKsvnb32?=
- =?us-ascii?Q?neTRwIqB4pL5i0JrhlBs8z9EGt4onPT+eEGytFm8yXJ2MQVl5tPya4V/CR8b?=
- =?us-ascii?Q?Yz7Y3DOgv1Axy9uDgUiFo3Zo78NfShVUyX7Rq08FWoa2Pc6evnuq0P1GEuc9?=
- =?us-ascii?Q?zeqFfeUEoQMUydqoswau8OMgepqc648gP/1ka1wgt4mEKhAoQkUwjxfh8LDQ?=
- =?us-ascii?Q?NSwxn7aQvQ2qu0S6jWL5ekrKCn7LHyeIvSQIkJm+059nRgrR0HDWvyW7EJa1?=
- =?us-ascii?Q?yUYciVgODLW2MCs+QPryDGtsD/2fcQ1XDvUeFbh0/dSmtYfNOk57tBSXKWKM?=
- =?us-ascii?Q?A1GeesdWHupY7A1CP0C178PijNkCtimMuM0xaoeMIbxD7EXLW+WiJ7myEWf+?=
- =?us-ascii?Q?Rd1DbGlKR8vumWRQsPSY6IXlfwYJdF9KSY+FtQIUd2Xc2RhK1Jg4boSCaOPu?=
- =?us-ascii?Q?gMh+0Ap/P9DOM7QJvNOrm4UsyUliDyFCXagD07Z2HbBRMd7nOoq3qAF9MkOR?=
- =?us-ascii?Q?wxNgYe1HS3PC/QY6yMrDfi/PLSFTS2U2TorV8ZkZhaK+nfSVIZAXjmPL+lgu?=
- =?us-ascii?Q?yA1eX1RzmOnqYiz8mAlAhvonSESFkwaclS81osK5kgu3MdLLtx1TPDJYUiNN?=
- =?us-ascii?Q?ZRNX3IQHS9Ef13hqP71nAXv7HLUrlI09v/bLKoZQ2jwFv+rCS0hcCH6KDydz?=
- =?us-ascii?Q?2uv4qxbKfooTfXMcoCEc16TkwMmHvYOtIvh1mz9SAEYt7oYt1NZUSJjWUGfT?=
- =?us-ascii?Q?Bruz7jC3RKeKmsYuk5Yw/U500DuRTyJ9WP7NTcVm0fX88Eusj0vV+FmMqQdp?=
- =?us-ascii?Q?TfPLNtwGmctsbbZz3t0wRJ65sMB/EH0gwfCarxVjpEUoF7CG9RzVKzm0Sh1m?=
- =?us-ascii?Q?csspWuQlKJDdqlVXk3Krln8QRj/cK5RnZqm6w+jm9J72h0fGxYaZ1DU1jwiH?=
- =?us-ascii?Q?U7L4guyacQBI/qoGd80jlQ9eergRceV0JoFldfkYd5P2Zb97Z6EMs4P6I07i?=
- =?us-ascii?Q?wruoNqTCxfyi1kEGFDy9/JuydQ+DwX6g1CrhMFaOhsZ37bW4NCFvmNktRfat?=
- =?us-ascii?Q?zEyAWOpIQjTz9HWZ4AnEagUG2aQmX4WAQB+I7IOQpgocDHUKpsxKApzZCVh6?=
- =?us-ascii?Q?DqbJ+2V6IcefgwGBnHkqp7Y/p9Exn7iN8Z/GwHTDlhu3nC08Rs6v8byEqnTo?=
- =?us-ascii?Q?4AHywRbxVA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ufrmHspj"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C24422F8;
+	Thu,  7 May 2026 01:45:48 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DC2D3F836;
+	Thu,  7 May 2026 01:45:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1778143553; bh=OOppSG08L/KO4ewNhuiOGUn8DWyo80ypF6cLMLTTsYE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ufrmHspjVCl4Wzf0NQBsG9zpogPjmvRIN1w+ESiaSlDExzghg2rqd8dhdsCqAR69g
+	 8hZG8qjjFi6QLj+2oPUa2khfsO2MREpvN3a0jiv3RWVVv/UzdDsvHNrl+0TdcjdGQg
+	 wyLfzq6PWCP3Ivvzk4azYH5V3T7Jw1ERbkYc1EVw=
+Date: Thu, 7 May 2026 09:45:46 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	tabba@google.com, David.Hildenbrand@arm.com
+Subject: Re: [RFC PATCH] KVM: arm64: Align KVM_EXIT_MEMORY_FAULT error codes
+ with documentation
+Message-ID: <afxROjBUVzeQQNfg@raptor>
+References: <20260506105053.107404-1-alexandru.elisei@arm.com>
+ <afs3wp7xBUf2jYK4@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e26d35c4-26e8-453b-ad95-08deac150391
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 08:45:38.7295
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IJ7Qvv52MzrBI4c2bgmOckX2aD3Wa6FuB5GZSOOEJvRI9PSxo+EKiyJT5Xx2JFzQunooLwE2kmgwkeiJ4jJP1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6749
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afs3wp7xBUf2jYK4@google.com>
 
+Hi Sean,
 
+(Resending this because I managed to mess up the headers, sorry for the
+duplicate).
 
-> -----Original Message-----
-> From: Eric Auger <eric.auger@redhat.com>
-> Sent: 03 May 2026 08:33
-> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
-> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
-> peter.maydell@linaro.org; richard.henderson@linaro.org;
-> cohuck@redhat.com; sebott@redhat.com; Shameer Kolothum Thodi
-> <skolothumtho@nvidia.com>; philmd@linaro.org
-> Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
-> armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
-> jdenemar@redhat.com
-> Subject: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
-> automatic generation
->=20
-> External email: Use caution opening links or attachments
->=20
->=20
-> Generated definitions with scripts/update-aarch64-cpu-sysregs-header.py
-> based on "AARCHMRS containing the JSON files for Arm A-profile
-> architecture (2026-03)" Registers.json file.
->=20
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> Message-ID: <20251208163751.611186-4-eric.auger@redhat.com>
-> ---
->  target/arm/cpu-sysregs.h.inc | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->=20
-> diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
-> index d61f0d0a19..2188cd7be0 100644
-> --- a/target/arm/cpu-sysregs.h.inc
-> +++ b/target/arm/cpu-sysregs.h.inc
-> @@ -1,15 +1,25 @@
->  /* SPDX-License-Identifier: GPL-2.0-or-later */
-> +
-> +/* This file is autogenerated by scripts/update-aarch64-cpu-sysregs-
-> header.py */
-> +/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */
-> +
-> +DEF(AIDR_EL1, 3, 1, 0, 0, 7)
-> +DEF(CCSIDR2_EL1, 3, 1, 0, 0, 2)
->  DEF(CCSIDR_EL1, 3, 1, 0, 0, 0)
->  DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
->  DEF(CTR_EL0, 3, 3, 0, 0, 1)
->  DEF(DCZID_EL0, 3, 3, 0, 0, 7)
-> +DEF(GMID_EL1, 3, 1, 0, 0, 4)
->  DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
->  DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
->  DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
->  DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
-> +DEF(ID_AA64DFR2_EL1, 3, 0, 0, 5, 2)
-> +DEF(ID_AA64FPFR0_EL1, 3, 0, 0, 4, 7)
->  DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
->  DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
->  DEF(ID_AA64ISAR2_EL1, 3, 0, 0, 6, 2)
-> +DEF(ID_AA64ISAR3_EL1, 3, 0, 0, 6, 3)
->  DEF(ID_AA64MMFR0_EL1, 3, 0, 0, 7, 0)
->  DEF(ID_AA64MMFR1_EL1, 3, 0, 0, 7, 1)
->  DEF(ID_AA64MMFR2_EL1, 3, 0, 0, 7, 2)
-> @@ -39,6 +49,10 @@ DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
->  DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
->  DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
->  DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
-> +DEF(MIDR_EL1, 3, 0, 0, 0, 0)
-> +DEF(MPIDR_EL1, 3, 0, 0, 0, 5)
+Thanks for the explanations!
 
-Do we need MPIDR_EL1 as well? Is this considered as a feature ID
-register and is writable? I don't think so.
+On Wed, May 06, 2026 at 05:44:50AM -0700, Sean Christopherson wrote:
+> On Wed, May 06, 2026, Alexandru Elisei wrote:
+> > The documentation for KVM_EXIT_MEMORY_FAULT states:
+> > 
+> > 'Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in that
+> > it accompanies a return code of '-1', not '0'!  errno will always be set to
+> > EFAULT or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT, userspace
+> > should assume kvm_run.exit_reason is stale/undefined for all other error
+> > numbers'.
+> > 
+> > where a return code of '-1' is special because according to man 2 ioctl:
+> > 
+> > 'On error, -1 is returned, and errno is set to indicate the error'.
+> > 
+> > Putting the two together means that the ioctl KVM_RUN must 1) complete with
+> > an error and 2) that error must must be either EFAULT or EHWPOISON for
+> > userspace to detect a KVM_EXIT_MEMORY_FAULT VCPU exit.
+> 
+> Yes and no.  The key escape valve we (very deliberately) gave ourselves is this:
+> 
+>   userspace should assume kvm_run.exit_reason is stale/undefined for all other
+>   error numbers.
+> 
+> As arm64 already does, that clause allows KVM to "speculatively" set exit_reason
+> to KVM_EXIT_MEMORY_FAULT.  Which is by design.  The userspace flow is intended
+> to be "if KVM_RUN returns EFAULT or EHWPOISON, then check for KVM_EXIT_MEMORY_FAULT
+> to see if KVM provided more information about why the EFAULT/EHWPOISON error was
+> returned".
+
+Hm... In general, "speculatively" populating exit_reason with
+KVM_EXIT_MEMORY_FAULT when userspace is not intended to use that information
+looks a bit dubious to me. Why do the work if userspace is not supposed to use
+the information?
+
+Regarding gmem_abort(). As I see it, if today someone writes userspace that
+relies on any of the undocumented error codes propagated from kvm_gmem_get_pfn()
+to handle KVM_EXIT_MEMORY_FAULT, that means that KVM can never use those error
+codes for any other exit_reason in the future, because that userspace will
+break.
+
+I'm sure this was all carefully considered when designing the interface, I was
+just curious how this particular problem has been solved.
+
+> 
+> > On a kvm_gmem_get_pfn() error, gmem_abort() prepares the
+> > KVM_EXIT_MEMORY_FAULT exit_reason and propagates the error back to
+> > userspace. kvm_gmem_get_pfn() does not massage the error code, and if the
+> > error is not -EFAULT or -EHWPOISON, userspace implementing the ABI fails to
+> > detect the memory fault exit.
+> > 
+> > Things get more complicated with kvm_handle_vncr_abort().
+> > kvm_translate_vncr(), similar to gmem_abort(), prepares the VCPU to exit
+> > with KVM_EXIT_MEMORY_FAULT and propagates the error code from
+> > kvm_gmem_get_pfn(). Then kvm_handle_vncr_abort() does a number of things
+> > based on this specific error code:
+> > 
+> > - If it's -EAGAIN, KVM resumes the guest. Note that KVM, when handling a
+> >   *host* fault on a guest_memfd backed VMA, retries the fault handling if
+> >   kvm_gmem_get_pfn() returns -EAGAIN.
+> 
+> Totally fine.
+> 
+> > - If it's -ENOMEM, -EFAULT, -EIO or -EHWPOISON, it returns to userspace
+> >   with 0 (success), meaning that, according to the documentation, userspace
+> >   will not detect the memory fault exit.
+> 
+> Also totally fine, and working as intended.  KVM_EXIT_MEMORY_FAULT is provided
+> for scenarios where (a) the issue is likely related to the GPA and (b) userspace
+> can remedy the underlying issue using the information provided in kvm_run.memory_fault.
+
+If KVM_RUN always returns 0 when exit_reason = KVM_EXIT_MEMORY_FAULT, which is what
+kvm_handle_vncr_abort() does, how will userspace ever be able to handle the
+fault?
 
 Thanks,
-Shameer
-
->  DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
->  DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
->  DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
-> +DEF(REVIDR_EL1, 3, 0, 0, 0, 6)
-> +DEF(SMIDR_EL1, 3, 1, 0, 0, 6)
-> --
-> 2.53.0
-
+Alex
