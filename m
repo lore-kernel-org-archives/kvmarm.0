@@ -1,154 +1,228 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36C73A9D8F;
-	Thu,  7 May 2026 13:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C86B3FA5CD
+	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 14:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778161009; cv=none; b=fBOTOiGsxWCbwQKFv9yCkfOWogK/YA0wgni5jrl2JberPxSog0sBNWfTwC9iZOsID7aujCvZyLR/P7l2WiG7vZIcAbDOwA2AC35pJQhsrG1o1Aq8vCc7G0R6BB1amabcpViNCgl1dvKf/NxRokEv+gP3tEQnK4Pb+Qq4mURxHVY=
+	t=1778162487; cv=none; b=cp8k77YasmD1EtskWQaQEcCw/q1oGd4HZM/+5WDxJANJKgI9jm1RqFIFzo26k2Rq5B+gFCrkIAsGoeIh7yskQEmf4OgfAiqOTviwwHllu47W9BRnJXoiC5l19xIpaJLtvqIQ9Pvp2q3nucTacnxdTFdG3GBq/ctHsgjBIX0ccTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778161009; c=relaxed/simple;
-	bh=swhnCX4GiPiWbOLZwXEXT66bu8Nfxrf73Z5yu5LKyFk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jLzXtY2am7Z5ReYkRmRxZmbv5iWiE75yq4fr/6Q4p4Uy6Tuz9MrlWQjo0/W0PcsR/78Au+gu7hJ+W26scBLGHjZhdW7/vLEZbthGgOF+x5iLbBx4uogGwzWqLnTdZXnoOKUJZXheHnu8WW9hJuIcflDrhjeHjq6Vw0TKdaSBIPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lVkX5AbG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778162487; c=relaxed/simple;
+	bh=QlgeF9pQz9DhiBq008/l2KPV+NgTf5Ys4pRNpYb2aeE=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=Q7Kl7fX+pyFr4SyP7G0u1uxLnClydZ+bewRNihNxeMxFvd25M00Dr0cm1Xxz9PD8M/q7C/8bg1uvno38xSZtr2gyZCxlKwKphiowoo/b+8wBw8F/BrNOwGmDqM2phhXNuKk++47X9KvpmaRXKLAm48Na3YRASn5/hNEAKN1+3Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rWIIQGqO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lVkX5AbG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C50DC2BCB2;
-	Thu,  7 May 2026 13:36:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778161008;
-	bh=swhnCX4GiPiWbOLZwXEXT66bu8Nfxrf73Z5yu5LKyFk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lVkX5AbGoxy30ZDoT1jcNTFgQizQg3K3gX8hgIjib6w/RRAbItwlJGP3Gj9Gg7W7j
-	 a4aNd5PvDOqQpS3ZrTVNTWEu7xaYZ7uJPm0flbirclC4rY/YKylBUzW8aqbd2IjEbW
-	 DR+Y08VlBW+9J1KiTeNDBD5Fr40cWrGtLJtXOoAse2vNVc4pZ4JDx0JGXZrsv0mnxu
-	 4vskrAwsJpJvgTX6BfWPQwe4XqqDcfrCohWnvCZ5JF42Ic3PKIXnK5l3KA8BUJZVM7
-	 EY+Zkmkg0KD9f+1IFEAG+LqbBz+2lru5Ge2aM0NhybJLuOypPym9Xj9vhc/BFIfBjs
-	 OU8a2MgsnqCyg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wKyuE-00000000eBg-2hUx;
-	Thu, 07 May 2026 13:36:46 +0000
-Date: Thu, 07 May 2026 14:36:46 +0100
-Message-ID: <86se83xrwx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com,
-	oupton@kernel.org,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	korneld@google.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	android-kvm@google.com,
-	mrigendra.chaubey@gmail.com,
-	perlarsen@google.com,
-	suzuki.poulose@arm.com,
-	vdonnefort@google.com,
-	yuzenghui@huawei.com,
-	Sudeep Holla <sudeep.holla@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
-In-Reply-To: <afxuDpecPCVA56cL@google.com>
-References: <20260501114447.2389222-2-sebastianene@google.com>
-	<86wlxgy00t.wl-maz@kernel.org>
-	<afxuDpecPCVA56cL@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rWIIQGqO"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 647BJdhk2510470;
+	Thu, 7 May 2026 14:01:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=oWtZDR
+	H0XY4nauxzG4LAo3FtS1diyaJai6sOkl7fPQs=; b=rWIIQGqO5ieaq2jgp0h46T
+	4fkuwRSNebflUT/BhuDUB6kpY6AintAlvo2zEvDOdVfqd6boVkNyAs6meD4A/FFQ
+	KFr4tK7B6j3yRiWpd2J8rmgXoHJBgKXWaDUXEYbDFFTY1VX/VMe2LeHoiLsdOmhL
+	1HbkTq0gdlRtHmizJnotlGIQxkwUkWrdnOjOoDAjG5DuwzyFwr5VwP7lYcNXIbmk
+	DDQwML4lkooRevRkN8ftspbYJffqpZ/d4cNTA90J0CU2/woiAuzqM5X9wVmVYxi5
+	hJVTkci3lIGaZrGg0Y9DioUdZUTIDOp73jUquvbtfifvrIjI5GtH2LOS89aOHpcg
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dw9x4xub3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 May 2026 14:00:59 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 647DsTLf030229;
+	Thu, 7 May 2026 14:00:57 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dwuywbyfd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 May 2026 14:00:57 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 647E0T5a31523562
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 May 2026 14:00:29 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3305A5805A;
+	Thu,  7 May 2026 14:00:57 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8868B58052;
+	Thu,  7 May 2026 14:00:55 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.30.146])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 May 2026 14:00:55 +0000 (GMT)
+Message-ID: <adbf47af6a52b3da7a1e502037fdcac92ed63089.camel@linux.ibm.com>
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Roberto Sassu <roberto.sassu@huaweicloud.com>,
+        Paul Moore
+	 <paul@paul-moore.com>
+Cc: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell
+ <noodles@earth.li>,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+        sebastianene@google.com
+In-Reply-To: <8c99263d8e63100e0b5e6c8cf739f7f6e7e79f6b.camel@huaweicloud.com>
+References: <cover.1777036497.git.noodles@meta.com>
+		 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
+		 <afMlgstqahnZg68h@e129823.arm.com>
+		 <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
+		 <CAHC9VhRsnmPp2KmQAns5uq5qXX5EF2xQQzyfTgrPi4O9AXyPpg@mail.gmail.com>
+		 <ba4bf28314b679474a6a8da6298e548e54b3754c.camel@linux.ibm.com>
+		 <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
+		 <ff28c6dcb60c357c752724927addaa8c4fd3bf2c.camel@linux.ibm.com>
+		 <CAHC9VhQY2TMkTvQq9P8oZteQWQSr7qq2utOuH+pdVx+8jWLBCw@mail.gmail.com>
+		 <a9412fe10e70ce95dd70556ace19368bec5c188c.camel@linux.ibm.com>
+		 <CAHC9VhRUgNA=Sj=jhD=zOt8R80Q+FQj+H0nYSy-FAujTL3EKPA@mail.gmail.com>
+		 <5debff82dc758d9c91223e4f1f5b9e39a3fcd4f5.camel@linux.ibm.com>
+		 <19dfb0e2730.2843.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+		 <461ec995935e2b42a8414f6f87063ff2557bbfb4.camel@linux.ibm.com>
+	 <8c99263d8e63100e0b5e6c8cf739f7f6e7e79f6b.camel@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 May 2026 10:00:55 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, oupton@kernel.org, will@kernel.org, joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com, sudeep.holla@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDEzNiBTYWx0ZWRfXxfALLztlGl7O
+ tSbUOVQ3WbBM1bCCw1QNc8e46+M02jlRVTzWpNfWqV4U4JYHyDBSb2F2Vj00SQKW1n/4sA6Cuge
+ RLHY0vuM/M1XTJDJnGzrrF5HF0oLVqqXgzvkR7Ruexa1itwjH9dJZ/xyEiP4xo/6fF447binzzB
+ 75wqfSNI7nok9TxDlUiRhfFQxu7TIM+X7JNVVY6I3bFW411fYwah3kBn8xu4wFlY5f8WkFtIF8G
+ GHzgTjorO//v02HL0BQwnEv6Ywtq72RMr7rc1qXN6z/TwqniSLS/2Zy02CYKg1hrnxXdyfeaBkR
+ IDalQF57kTg7knAnD3MdOB3f+orldz3xGdFCvxkl8QSHPPr8xdomE8Hgo1IGEAmMhO0hRfJhWVu
+ 2+sU/An7SAhWiG+aHD8pW4yWeLMghEWvpGPxH5Y350JV7VRJRatU5ue+ERXEVT17nyQW0V5CQvD
+ ltTOzRTGcHdMiptRffg==
+X-Proofpoint-ORIG-GUID: 4Ev7-NHEpeuk_LfgDJ-Qhn0RMmKkW_iI
+X-Proofpoint-GUID: IvDOIm6WvmeJI_VGRy5Jq49N0vizzzck
+X-Authority-Analysis: v=2.4 cv=W7UIkxWk c=1 sm=1 tr=0 ts=69fc9b1b cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=eeChVw4XoIuzKrOC7zMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-07_01,2026-05-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 spamscore=0 clxscore=1015 phishscore=0 bulkscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2605070136
 
-On Thu, 07 May 2026 11:48:46 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
-> 
-> On Wed, May 06, 2026 at 05:29:22PM +0100, Marc Zyngier wrote:
-> 
-> Hello Marc,
-> 
-> > [+ Sudeep]
-> > 
-> > On Fri, 01 May 2026 12:44:48 +0100,
-> > Sebastian Ene <sebastianene@google.com> wrote:
-> > > 
-> > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
-> > > FF-A proxy. This restriction was preventing the use of asynchronous
-> > > signaling mechanisms defined by the Arm FF-A specification to
-> > > communicate with the secure services.
-> > > While these calls are markes as optional, there is no reason why the
-> > > hypervisor proxy would block them because:
-> > > 
-> > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
-> > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
-> > 
-> > Where is this enforced?
-> > 
-> 
-> There is no enforcement in place in the hypervisor since we don't proxy
-> FF-A from guest VMs, there is only one non-secure user of this which is the host.
+On Thu, 2026-05-07 at 10:10 +0200, Roberto Sassu wrote:
+> On Wed, 2026-05-06 at 22:25 -0400, Mimi Zohar wrote:
+> > On Tue, 2026-05-05 at 22:11 -0400, Paul Moore wrote:
+> > > On May 5, 2026 9:57:23 PM Mimi Zohar <zohar@linux.ibm.com> wrote:
+> > > > On Tue, 2026-05-05 at 18:55 -0400, Paul Moore wrote:
+> > > > > On Tue, May 5, 2026 at 5:05=E2=80=AFPM Mimi Zohar <zohar@linux.ib=
+m.com> wrote:
+> > > > > > On Mon, 2026-05-04 at 16:51 -0400, Paul Moore wrote:
+> > > > > > > On Mon, May 4, 2026 at 8:03=E2=80=AFAM Mimi Zohar <zohar@linu=
+x.ibm.com> wrote:
+> > > > > > > > On Sun, 2026-05-03 at 12:46 -0400, Paul Moore wrote:
+> > > > > > > > > Regardless, assuming you always want IMA to leverage a TP=
+Ms when they
+> > > > > > > > > exist, your reply suggests that using an initcall based I=
+MA init
+> > > > > > > > > scheme, even a late-sync initcall, may not be sufficient =
+because
+> > > > > > > > > deferred TPM initialization could happen later, yes?
+> > > > > > > >=20
+> > > > > > > > Well yeah.  The TPM could be configured as a module, but th=
+at scenario is=20
+> > > > > > > > not of
+> > > > > > > > interest.  That's way too late.  The case being addressed i=
+n this patch set is
+> > > > > > > > when the TPM driver tries to initialize at device_initcall,=
+ returns
+> > > > > > > > EPROBE_DEFER, and is retried at deferred_probe_initcall (la=
+te_initcall).  Since
+> > > > > > > > ordering within an initcall is not supported, this patch at=
+tempts to initialize
+> > > > > > > > IMA at late_initcall and similarly retries, in this case, a=
+t=20
+> > > > > > > > late_initcall_sync.
+> > > > > > >=20
+> > > > > > > Okay, so from a TPM initialization perspective you are satisf=
+ied with
+> > > > > > > a late-sync IMA initialization, yes?
+> > > > > >=20
+> > > > > > No. On some architectures moving IMA initialization from the la=
+te_initcall to
+> > > > > > late_initcall_sync does not miss any measurement records. Howev=
+er, as=20
+> > > > > > previously
+> > > > > > mentioned, Linux running in a PowerVM LPAR the move would drop =
+~30 measurement
+> > > > > > records[1].  So no, only if the TPM is not initialized by late_=
+initcall, should
+> > > > > > IMA retry at late_initcall_sync.
+> > > > >=20
+> > > > > What do you do in the PowerVM LPAR when the TPM is not avaiable a=
+t
+> > > > > late initcall and you have to defer IMA initialization until
+> > > > > late-sync?
+> > > >=20
+> > > > Your question is hypothetical ...
+> > >=20
+> > > <heavy eye roll>
+> > >=20
+> > > > ... as the TPM isn't deferred, so IMA doesn't go into
+> > > > TPM-bypass mode.  Testing on a PowerVM LPAR demonstrated that it sk=
+ips ~30
+> > > > measurement list records.  So moving the initcall to late_initcall_=
+sync would
+> > > > cause a regression.
+> > >=20
+> > > Let me rephrase to make the question clear - how do you plan to handl=
+e a=20
+> > > system where you lose measurements by waiting until late-sync, but th=
+e TPM=20
+> > > is not available at the late initcall.
+> >=20
+> > There have been suggestions to queue the IMA measurements, but that goe=
+s against
+> > the "measure before use" principle. The solution is not to defer IMA
+> > initialization for all systems, but to differentiate the boot_aggregate=
+ record
+> > (boot_aggregate vs. boot_aggregate_late) based on when the TPM becomes =
+available
+> > relative to IMA's initcall.  IMA's job is simply to collect and provide=
+ the
+> > measurement list.  Based on the attestation service policy, the attesta=
+tion
+> > service will decide whether a measurement list containing boot_aggregat=
+e_late is
+> > acceptable.
+>=20
+> Agreed on no violation of the measure and load principle.
+>=20
+> But also the two boot_aggregate solution does not work. If there are
+> measurements before boot_aggregate_late, they can corrupt the system
+> without noticing, and the corrupted system would emit the
+> boot_aggregate measurement (non-late) to pass verification.
 
-And again: what makes that VM ID 0? Why can't the host pick VM ID 32
-and use that?
+This is a risk management issue. The conservative option is to continue
+initializing IMA only at late_initcall, as we have been doing, and accept t=
+he
+late TPM initialization limitation. The alternative is to also allow IMA to
+initialize at late_initcall_sync, controlled by a Kconfig option, so that
+existing systems are unaffected while systems with late TPM initialization =
+can
+opt in to boot_aggregate_late support.
 
-> > >    Because all forwarded notifications are inherently attributed to
-> > >    the Host by the SPMC, there is no risk of VM ID spoofing
-> > >    originating from the Normal World.
-> > 
-> > I don't understand: either the host is always using VM ID 0, and we
-> > have ways to check and enforce this (how?), or the simple fact that
-> > the request comes from NS is a guarantee that the SPMC will treat the
-> > VM ID as 0.
-> > 
-> > Which one is it?
-> 
-> My understanding is that when the hypervisor doesn't handle the allocation of
-> the non-secure IDs (through FFA_ID_GET), everything that comes from non-secure
-> is treated as having the VM ID 0 by the SPMC.
-
-This looks terribly fragile. I'd rather you *enforce* these things
-rather than allowing any random stuff from the host and relying on
-the EL3 firmware to get it right (odds are that it won't).
-
-This also ties into this:
-
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > index 1af722771178..a82d0cd22a17 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > @@ -675,14 +675,6 @@ static bool ffa_call_supported(u64 func_id)
-> > >  	case FFA_RXTX_MAP:
-> > >  	case FFA_MEM_DONATE:
-> > >  	case FFA_MEM_RETRIEVE_REQ:
-> > > -       /* Optional notification interfaces added in FF-A 1.1 */
-> > > -	case FFA_NOTIFICATION_BITMAP_CREATE:
-> > > -	case FFA_NOTIFICATION_BITMAP_DESTROY:
-> > > -	case FFA_NOTIFICATION_BIND:
-> > > -	case FFA_NOTIFICATION_UNBIND:
-> > > -	case FFA_NOTIFICATION_SET:
-> > > -	case FFA_NOTIFICATION_GET:
-> > > -	case FFA_NOTIFICATION_INFO_GET:
-> > >  	/* Optional interfaces added in FF-A 1.2 */
-> > >  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
-> > >  	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
-> > 
-> > Shouldn't these be sanitised in a way? A bunch of registers are SBZ in
-> > the spec, and I'd expect this to be enforced.
-
-which still remains unanswered.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Mimi
