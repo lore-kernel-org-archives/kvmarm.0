@@ -1,176 +1,218 @@
-Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011049.outbound.protection.outlook.com [52.101.62.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA4F38BF6A
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 08:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.154
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778142609; cv=none; b=k02/TwKPdHFBScKcMaDCjn0A55/NLJWlkE1hbVpnAfQnbm+xgKtNxBSLOHXi6gDVJZ8HoB7i5Z8XVmuiKbnGP/jcZO+ZVj8UauuCUJLB27oC+U4V7tKZeA2g+4DE4wAgrZ9D8ghJ88kuQ2GBIl+UzirOjJz2Kdq0uzuUmUzFZ+c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778142609; c=relaxed/simple;
-	bh=9JH+JKtOUYC88OvLe5TjJNgR65xA2MidNnhXMXVbBdg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fxDC7W5yihLCZA4Wa6RwZ0/TSHJuWqupVXoyuf14XYZ9W8LkhhtJKIO8f2U6Tc9O+7dj7WdeyDGT9l/sedwwx4Vml15SHIIIzhh00Rmns+rED/MoaJgMfsJufv0eSNTLHkIKe8alloa0oq+IJLF9brYwfGfMf3/tZ04iJpoTHCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.18.224.235])
-	by frasgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gB4b96JRQzvZcf
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 16:06:45 +0800 (CST)
-Received: from mail02.huawei.com (unknown [7.182.16.47])
-	by mail.maildlp.com (Postfix) with ESMTP id AAA214056F
-	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 16:11:10 +0800 (CST)
-Received: from [10.204.63.22] (unknown [10.204.63.22])
-	by APP1 (Coremail) with SMTP id LxC2BwDXiKIPSfxptCa3AA--.10670S2;
-	Thu, 07 May 2026 09:11:10 +0100 (CET)
-Message-ID: <8c99263d8e63100e0b5e6c8cf739f7f6e7e79f6b.camel@huaweicloud.com>
-Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
-From: Roberto Sassu <roberto.sassu@huaweicloud.com>
-To: Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>
-Cc: Yeoreum Yun <yeoreum.yun@arm.com>, Jonathan McDowell <noodles@earth.li>,
-  linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, jmorris@namei.org, serge@hallyn.com, 
- roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
- eric.snowberg@oracle.com,  jarkko@kernel.org, jgg@ziepe.ca,
- sudeep.holla@kernel.org, maz@kernel.org,  oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com,  yuzenghui@huawei.com,
- catalin.marinas@arm.com, will@kernel.org, noodles@meta.com, 
- sebastianene@google.com
-Date: Thu, 07 May 2026 10:10:52 +0200
-In-Reply-To: <461ec995935e2b42a8414f6f87063ff2557bbfb4.camel@linux.ibm.com>
-References: <cover.1777036497.git.noodles@meta.com>
-	 <7734099f5e7fda5480bca016a9e6707983325fbd.camel@linux.ibm.com>
-	 <afMlgstqahnZg68h@e129823.arm.com>
-	 <9f188536f09a2db30877d6bfbb84aeaf2565cccf.camel@linux.ibm.com>
-	 <CAHC9VhRsnmPp2KmQAns5uq5qXX5EF2xQQzyfTgrPi4O9AXyPpg@mail.gmail.com>
-	 <ba4bf28314b679474a6a8da6298e548e54b3754c.camel@linux.ibm.com>
-	 <CAHC9VhRE2kRr1fdDf6xgQgpSrtvqtP8Vy9LVGJhDZFUbzLKGmQ@mail.gmail.com>
-	 <ff28c6dcb60c357c752724927addaa8c4fd3bf2c.camel@linux.ibm.com>
-	 <CAHC9VhQY2TMkTvQq9P8oZteQWQSr7qq2utOuH+pdVx+8jWLBCw@mail.gmail.com>
-	 <a9412fe10e70ce95dd70556ace19368bec5c188c.camel@linux.ibm.com>
-	 <CAHC9VhRUgNA=Sj=jhD=zOt8R80Q+FQj+H0nYSy-FAujTL3EKPA@mail.gmail.com>
-	 <5debff82dc758d9c91223e4f1f5b9e39a3fcd4f5.camel@linux.ibm.com>
-	 <19dfb0e2730.2843.85c95baa4474aabc7814e68940a78392@paul-moore.com>
-	 <461ec995935e2b42a8414f6f87063ff2557bbfb4.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A582D9EC4
+	for <kvmarm@lists.linux.dev>; Thu,  7 May 2026 08:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778143551; cv=fail; b=Dic0vgrXoFSmv1/g16keC9AEag9vTUEZKT4+fdRhrtp4b9N1DRMXDRakiJvhSxzPI/U1tuoXkDKZhA0V1mL+9vjMKv4stNMrgpmJ2OchcZiwh9/KZ/1ASa7A0fNN68VRUmC0SvLEk8y6qagcQDetAbay5TnyVXFS6ODDByGOHo0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778143551; c=relaxed/simple;
+	bh=uO6snAbPLReUUGsNyeIHlqIzgTSyeHeeCcXsK6LN5D8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KKu4BbVDSJMhf5pHYugwcu8Gtm5PYP7XBo+EGTyjuMVQ8uZOAIdWWL8Mudo032hkgTbhEzz4jLz302bz+ZPXUOLXzcf61a6iVvFZxnO3losUT5VT0fudSnt/NO33kZ6cQ6UhFNCNe8cEl2zy2IpuRNIQuUzjNjTiNc3Lu4k3vGg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Aw/m/02T; arc=fail smtp.client-ip=52.101.62.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Aw/m/02T"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hwz1mzHGE1OoPsjS2SUMKP70onGDUw/EySoidSGBWLdRpXRflP1TW0tba+2gZ4UeWpOUcTXq7M+El9tVPA3eqbn24ovniZTWDjHtI6Xy73POnO2g+9NKmJ+Qha9fLpy/pUPkVRcmu7EBazRzroOntEkuqZS8r0K5o7LuvTYNyxWz2lDehRWo7P9szs4z0Y83DJFDYYhtaEli7gs3OBk8qLvOUfdLdPbBJfLm/0Udk+XvvkqOC6Ex+KnlopNcXqokcbmPUjd1/J2HKET5OMdYebECuj1BgTzSun206YuNfz+tlO/PVOSF0MtaFtZObdupXWY9qhdmGkW2XsN5Ztp2Vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C65F4yEOBpTzTS2xE5EtGl3GpKchtCQzsPCq98pyfUc=;
+ b=fd6wD0NzD2QbLdNulHgTvhpcDIa0lSEosjmQdS4RdDFXGkWu39eZlsOKWua9XpvLFD6mFF9Z/5zIUx+61CVWq5AOAL/4qfdEKKAKclRnoT9Bdt/zVbP/kQM4lmBQXrZszk9LyAencqUZcAP4mJUFDyB+mXfP1N+20RiXulnwVMYk1882BqVxgJXIz9A3znhWE51FW4XpOjK/mmpYWU4tkJiUtYOO0S5xzQVypb+GtFRKXPP3ubJlDK53LZniMpEHccIdNToC+Ca0G8lJCR2LSxS+xM1RNkqu3DG14KSo9t5wLQ1py6fit7nPt6GepuyEAO2aiZIVywU1+Rs/N/BqfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C65F4yEOBpTzTS2xE5EtGl3GpKchtCQzsPCq98pyfUc=;
+ b=Aw/m/02T50ZXeSccyy/G2Z4Tq+57DEh/MY46k7SEPVwqir0LA/zNGKOE1IMMEf06gKXVVOrxCb0mz3hVThBA2JKiXk6a4d9g3hxrkGEpp9LjN7JDMk0lPl+KC06IPDorsCBUDnhxzDkS0S1p5L1khHPaaLKoHiD1Lc1RxrSbEi4VOn66XYUlQvXFR9+GMYVJdo6JqdbNHTSuGcWX8fMk3qpeWV2qaSHcxqJfQhMV4xlSOe9Z8OXPXMOsc/jWgvoX9Z9I0X3VLuykYGOYPkGNcODIT3Y1/QYNDVkCjQG0tOxGj0uSkv53QE5QtKhZyinD4oByBUJ19XJKys2FwdpdFg==
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by SA1PR12MB6749.namprd12.prod.outlook.com (2603:10b6:806:255::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
+ 2026 08:45:39 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.20.9891.017; Thu, 7 May 2026
+ 08:45:38 +0000
+From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+	<eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>, "richard.henderson@linaro.org"
+	<richard.henderson@linaro.org>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"sebott@redhat.com" <sebott@redhat.com>, "philmd@linaro.org"
+	<philmd@linaro.org>
+CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com"
+	<berrange@redhat.com>, "abologna@redhat.com" <abologna@redhat.com>,
+	"jdenemar@redhat.com" <jdenemar@redhat.com>
+Subject: RE: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
+ automatic generation
+Thread-Topic: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
+ automatic generation
+Thread-Index: AQHc2s+ISBxURh23/U6mjL5mBISdArYCRMOQ
+Date: Thu, 7 May 2026 08:45:38 +0000
+Message-ID:
+ <CH3PR12MB7548C2AB4989FEF96C247D47AB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
+References: <20260503073541.790215-1-eric.auger@redhat.com>
+ <20260503073541.790215-4-eric.auger@redhat.com>
+In-Reply-To: <20260503073541.790215-4-eric.auger@redhat.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|SA1PR12MB6749:EE_
+x-ms-office365-filtering-correlation-id: e26d35c4-26e8-453b-ad95-08deac150391
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|56012099003|38070700021|22082099003|921020|18002099003;
+x-microsoft-antispam-message-info:
+ GH0as6MrgV9Nm7cw7ZUJn6LQDXyXM/kVnnpoHMnRGLq9S7U0CBWAsXXJbSCByUTsW5wEoxZW5Cvs1p7MdaseoH3lLVU5AMXRfI9J9VtHk3WMBGxLgR2g9YJbmdgEXauC5/pndpApq/VNQW/n2Pbmy5lnTRfm+uSJFwgTEUe9tYATIeSh90TX29c5eh6stl4W32ElECBehbcFKqCDc99YvO9PN3827UpBEZqMrf5DR3/lW4GWv6YKF3J+bkBeP6t5reGM+Vyvso/uSPYqxGTX7uNs8JgbeZ4UhtXfOiCTROWMRYLoG3WwvxjWz/BcbvxnawwvRa8nG2chcP5gCOhLDe2AiZRd1AGPWn5W7LNGc1LBAvRt52zm6GY6/hHTKz4TRSai5z+56PCEFKgiY6ovd0f9cyuYWAj0toLWI3AeHJ62eiTwgClDQyybguNA/sZIdNaGMN7R5ZdLsoclqeLofojq2Mw8079w4504kO/0mvObupPEfu2HFZXa8oc1HAqb7kkj1IRsYJ5GtdOr9wAJtOQ0YND95Nf61/YJphOEFEzcIRD4VKaCb3XUeFuowsZIU7wpAZIlaaQGd++mQo4WFVcp68/3pk2rznPr82+oqJYsil3NoPbgCm9CmhEyzFZ7Cgcs0zrxqU2UEFHDsuBN8GV13zpndo6nfjSNR7XIGgjeW2oshXQ06xwf7/R5Bq9BVBvSVn7c0NneoMbBBn4U9Wv374zebIlLiq4Sqs6e/6zeLDw1RBZjxeOngjn/W/0PAZsVkRVtItW+GS6W1Fw26g==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(56012099003)(38070700021)(22082099003)(921020)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?d+a8XPIG2fkL2akgiy94bzLVL001hUwKW3F6e32QYDXx8TXUp0kbbRzXLFsA?=
+ =?us-ascii?Q?8VI6gP7k3raoJ1uoWA8hcwpVc34e5k14jTn4d7XfcbHGvsfRrBtFZl7l03Pm?=
+ =?us-ascii?Q?Ao8uTdl7JEd69riZU+fxXCUTTt+GZPBlLihvLLJnRmoetJ/nR5ylRQKNDnNU?=
+ =?us-ascii?Q?6jsc3Yw40YrQ9mmwM00p6tV0/nDMqwPpcu8CajL620Z2P1gERxmpdhFczjua?=
+ =?us-ascii?Q?6t7mGAUJYiniTFs+vzBDxR21mZJ/UfaO98fwXe47VPmCNwr58Wwb3IanVukf?=
+ =?us-ascii?Q?X8BBGiW6kFAJGhYwP0FCAhjUOt5LxjD38yOle8l4xX6Pq8CGuW0Y+VaMQPQs?=
+ =?us-ascii?Q?+hkFdzP12MrPCdKCU6mYVvLUvKdRIWIAOEMTuM0CPHiiIVVJJY4kqEunyEPb?=
+ =?us-ascii?Q?QnUsrQoZu2NHF+IRH97p+pG+BZp2IpPtUmtMnt/e4MiF1W3c7mCk9vG/fNi5?=
+ =?us-ascii?Q?h6IkqHBMxDxJVikMLg9k6lEoQlIvHxN7pMD1Y7qw2qGYN5NbseV4tOAANt2l?=
+ =?us-ascii?Q?JEYWRmJbkwIr5Z33Z+EYCqXUbwXO2y3j+5EO2nBqDCGYEVpAxb3bvKsvnb32?=
+ =?us-ascii?Q?neTRwIqB4pL5i0JrhlBs8z9EGt4onPT+eEGytFm8yXJ2MQVl5tPya4V/CR8b?=
+ =?us-ascii?Q?Yz7Y3DOgv1Axy9uDgUiFo3Zo78NfShVUyX7Rq08FWoa2Pc6evnuq0P1GEuc9?=
+ =?us-ascii?Q?zeqFfeUEoQMUydqoswau8OMgepqc648gP/1ka1wgt4mEKhAoQkUwjxfh8LDQ?=
+ =?us-ascii?Q?NSwxn7aQvQ2qu0S6jWL5ekrKCn7LHyeIvSQIkJm+059nRgrR0HDWvyW7EJa1?=
+ =?us-ascii?Q?yUYciVgODLW2MCs+QPryDGtsD/2fcQ1XDvUeFbh0/dSmtYfNOk57tBSXKWKM?=
+ =?us-ascii?Q?A1GeesdWHupY7A1CP0C178PijNkCtimMuM0xaoeMIbxD7EXLW+WiJ7myEWf+?=
+ =?us-ascii?Q?Rd1DbGlKR8vumWRQsPSY6IXlfwYJdF9KSY+FtQIUd2Xc2RhK1Jg4boSCaOPu?=
+ =?us-ascii?Q?gMh+0Ap/P9DOM7QJvNOrm4UsyUliDyFCXagD07Z2HbBRMd7nOoq3qAF9MkOR?=
+ =?us-ascii?Q?wxNgYe1HS3PC/QY6yMrDfi/PLSFTS2U2TorV8ZkZhaK+nfSVIZAXjmPL+lgu?=
+ =?us-ascii?Q?yA1eX1RzmOnqYiz8mAlAhvonSESFkwaclS81osK5kgu3MdLLtx1TPDJYUiNN?=
+ =?us-ascii?Q?ZRNX3IQHS9Ef13hqP71nAXv7HLUrlI09v/bLKoZQ2jwFv+rCS0hcCH6KDydz?=
+ =?us-ascii?Q?2uv4qxbKfooTfXMcoCEc16TkwMmHvYOtIvh1mz9SAEYt7oYt1NZUSJjWUGfT?=
+ =?us-ascii?Q?Bruz7jC3RKeKmsYuk5Yw/U500DuRTyJ9WP7NTcVm0fX88Eusj0vV+FmMqQdp?=
+ =?us-ascii?Q?TfPLNtwGmctsbbZz3t0wRJ65sMB/EH0gwfCarxVjpEUoF7CG9RzVKzm0Sh1m?=
+ =?us-ascii?Q?csspWuQlKJDdqlVXk3Krln8QRj/cK5RnZqm6w+jm9J72h0fGxYaZ1DU1jwiH?=
+ =?us-ascii?Q?U7L4guyacQBI/qoGd80jlQ9eergRceV0JoFldfkYd5P2Zb97Z6EMs4P6I07i?=
+ =?us-ascii?Q?wruoNqTCxfyi1kEGFDy9/JuydQ+DwX6g1CrhMFaOhsZ37bW4NCFvmNktRfat?=
+ =?us-ascii?Q?zEyAWOpIQjTz9HWZ4AnEagUG2aQmX4WAQB+I7IOQpgocDHUKpsxKApzZCVh6?=
+ =?us-ascii?Q?DqbJ+2V6IcefgwGBnHkqp7Y/p9Exn7iN8Z/GwHTDlhu3nC08Rs6v8byEqnTo?=
+ =?us-ascii?Q?4AHywRbxVA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CM-TRANSID:LxC2BwDXiKIPSfxptCa3AA--.10670S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF18Kw4kArWDAr17tFy8AFb_yoW5tFWfpa
-	y7W3WIkrWktFW8Aws2qw18WryIy3s3GayUXr15Kry5ArnYkr9Y9FsxtrWFka97C3ykt3WY
-	qF1jqay2kw1DAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIF
-	4iUUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgAGBGn7JLIKAwAAsN
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e26d35c4-26e8-453b-ad95-08deac150391
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 08:45:38.7295
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IJ7Qvv52MzrBI4c2bgmOckX2aD3Wa6FuB5GZSOOEJvRI9PSxo+EKiyJT5Xx2JFzQunooLwE2kmgwkeiJ4jJP1w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6749
 
-On Wed, 2026-05-06 at 22:25 -0400, Mimi Zohar wrote:
-> On Tue, 2026-05-05 at 22:11 -0400, Paul Moore wrote:
-> > On May 5, 2026 9:57:23 PM Mimi Zohar <zohar@linux.ibm.com> wrote:
-> > > On Tue, 2026-05-05 at 18:55 -0400, Paul Moore wrote:
-> > > > On Tue, May 5, 2026 at 5:05=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.=
-com> wrote:
-> > > > > On Mon, 2026-05-04 at 16:51 -0400, Paul Moore wrote:
-> > > > > > On Mon, May 4, 2026 at 8:03=E2=80=AFAM Mimi Zohar <zohar@linux.=
-ibm.com> wrote:
-> > > > > > > On Sun, 2026-05-03 at 12:46 -0400, Paul Moore wrote:
-> > > > > > > > Regardless, assuming you always want IMA to leverage a TPMs=
- when they
-> > > > > > > > exist, your reply suggests that using an initcall based IMA=
- init
-> > > > > > > > scheme, even a late-sync initcall, may not be sufficient be=
-cause
-> > > > > > > > deferred TPM initialization could happen later, yes?
-> > > > > > >=20
-> > > > > > > Well yeah.  The TPM could be configured as a module, but that=
- scenario is=20
-> > > > > > > not of
-> > > > > > > interest.  That's way too late.  The case being addressed in =
-this patch set is
-> > > > > > > when the TPM driver tries to initialize at device_initcall, r=
-eturns
-> > > > > > > EPROBE_DEFER, and is retried at deferred_probe_initcall (late=
-_initcall).  Since
-> > > > > > > ordering within an initcall is not supported, this patch atte=
-mpts to initialize
-> > > > > > > IMA at late_initcall and similarly retries, in this case, at=
-=20
-> > > > > > > late_initcall_sync.
-> > > > > >=20
-> > > > > > Okay, so from a TPM initialization perspective you are satisfie=
-d with
-> > > > > > a late-sync IMA initialization, yes?
-> > > > >=20
-> > > > > No. On some architectures moving IMA initialization from the late=
-_initcall to
-> > > > > late_initcall_sync does not miss any measurement records. However=
-, as=20
-> > > > > previously
-> > > > > mentioned, Linux running in a PowerVM LPAR the move would drop ~3=
-0 measurement
-> > > > > records[1].  So no, only if the TPM is not initialized by late_in=
-itcall, should
-> > > > > IMA retry at late_initcall_sync.
-> > > >=20
-> > > > What do you do in the PowerVM LPAR when the TPM is not avaiable at
-> > > > late initcall and you have to defer IMA initialization until
-> > > > late-sync?
-> > >=20
-> > > Your question is hypothetical ...
-> >=20
-> > <heavy eye roll>
-> >=20
-> > > ... as the TPM isn't deferred, so IMA doesn't go into
-> > > TPM-bypass mode.  Testing on a PowerVM LPAR demonstrated that it skip=
-s ~30
-> > > measurement list records.  So moving the initcall to late_initcall_sy=
-nc would
-> > > cause a regression.
-> >=20
-> > Let me rephrase to make the question clear - how do you plan to handle =
-a=20
-> > system where you lose measurements by waiting until late-sync, but the =
-TPM=20
-> > is not available at the late initcall.
+
+
+> -----Original Message-----
+> From: Eric Auger <eric.auger@redhat.com>
+> Sent: 03 May 2026 08:33
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
+> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
+> peter.maydell@linaro.org; richard.henderson@linaro.org;
+> cohuck@redhat.com; sebott@redhat.com; Shameer Kolothum Thodi
+> <skolothumtho@nvidia.com>; philmd@linaro.org
+> Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
+> armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
+> jdenemar@redhat.com
+> Subject: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
+> automatic generation
 >=20
-> There have been suggestions to queue the IMA measurements, but that goes =
-against
-> the "measure before use" principle. The solution is not to defer IMA
-> initialization for all systems, but to differentiate the boot_aggregate r=
-ecord
-> (boot_aggregate vs. boot_aggregate_late) based on when the TPM becomes av=
-ailable
-> relative to IMA's initcall.  IMA's job is simply to collect and provide t=
-he
-> measurement list.  Based on the attestation service policy, the attestati=
-on
-> service will decide whether a measurement list containing boot_aggregate_=
-late is
-> acceptable.
+> External email: Use caution opening links or attachments
+>=20
+>=20
+> Generated definitions with scripts/update-aarch64-cpu-sysregs-header.py
+> based on "AARCHMRS containing the JSON files for Arm A-profile
+> architecture (2026-03)" Registers.json file.
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Message-ID: <20251208163751.611186-4-eric.auger@redhat.com>
+> ---
+>  target/arm/cpu-sysregs.h.inc | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>=20
+> diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
+> index d61f0d0a19..2188cd7be0 100644
+> --- a/target/arm/cpu-sysregs.h.inc
+> +++ b/target/arm/cpu-sysregs.h.inc
+> @@ -1,15 +1,25 @@
+>  /* SPDX-License-Identifier: GPL-2.0-or-later */
+> +
+> +/* This file is autogenerated by scripts/update-aarch64-cpu-sysregs-
+> header.py */
+> +/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */
+> +
+> +DEF(AIDR_EL1, 3, 1, 0, 0, 7)
+> +DEF(CCSIDR2_EL1, 3, 1, 0, 0, 2)
+>  DEF(CCSIDR_EL1, 3, 1, 0, 0, 0)
+>  DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
+>  DEF(CTR_EL0, 3, 3, 0, 0, 1)
+>  DEF(DCZID_EL0, 3, 3, 0, 0, 7)
+> +DEF(GMID_EL1, 3, 1, 0, 0, 4)
+>  DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
+>  DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
+>  DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
+>  DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
+> +DEF(ID_AA64DFR2_EL1, 3, 0, 0, 5, 2)
+> +DEF(ID_AA64FPFR0_EL1, 3, 0, 0, 4, 7)
+>  DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
+>  DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
+>  DEF(ID_AA64ISAR2_EL1, 3, 0, 0, 6, 2)
+> +DEF(ID_AA64ISAR3_EL1, 3, 0, 0, 6, 3)
+>  DEF(ID_AA64MMFR0_EL1, 3, 0, 0, 7, 0)
+>  DEF(ID_AA64MMFR1_EL1, 3, 0, 0, 7, 1)
+>  DEF(ID_AA64MMFR2_EL1, 3, 0, 0, 7, 2)
+> @@ -39,6 +49,10 @@ DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
+>  DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
+>  DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
+>  DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
+> +DEF(MIDR_EL1, 3, 0, 0, 0, 0)
+> +DEF(MPIDR_EL1, 3, 0, 0, 0, 5)
 
-Agreed on no violation of the measure and load principle.
+Do we need MPIDR_EL1 as well? Is this considered as a feature ID
+register and is writable? I don't think so.
 
-But also the two boot_aggregate solution does not work. If there are
-measurements before boot_aggregate_late, they can corrupt the system
-without noticing, and the corrupted system would emit the
-boot_aggregate measurement (non-late) to pass verification.
+Thanks,
+Shameer
 
-Roberto
+>  DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
+>  DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
+>  DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
+> +DEF(REVIDR_EL1, 3, 0, 0, 0, 6)
+> +DEF(SMIDR_EL1, 3, 1, 0, 0, 6)
+> --
+> 2.53.0
 
