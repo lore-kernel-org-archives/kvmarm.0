@@ -1,206 +1,267 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011031.outbound.protection.outlook.com [40.93.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9EB3B18A
-	for <kvmarm@lists.linux.dev>; Fri,  8 May 2026 12:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778244980; cv=none; b=NJa7X4uQaHEZg1biGXm4vpxq5T05H+eX5VmGOoMQfePPaDPh18SOtXuteG9ReAjKxQN6KzXK1BHhoKfC5RUaidwV/BrWSHuA1sBfHWMD9yrkouVtGmqztGKzndvXJ+P/6WxIt+jP81Hs9CcGANxRsUntETAPAgbEqxN36rYyXaI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778244980; c=relaxed/simple;
-	bh=tA4Snu529quXZC37xhx99jFBAqJZX4GN4vW1VlzVJkY=;
-	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
-	 Date:MIME-Version; b=d3Zx7bvGd1bO35qXRUbrNf1qISkJg+az6xhny3MvafCD5M3IFpH19j688eeuVwMqmgr4//Q4zgIGm1GbVhdBu7M49tF8VNgkquWcTIKpggk2WHHGEKctu4GWAkicGOKnaxSo8JMIvjszCfxHZ5JUsqW9/iMWlzSN4tRI6CehZFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qAlkhycX; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0069E33D511
+	for <kvmarm@lists.linux.dev>; Fri,  8 May 2026 13:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778245402; cv=fail; b=efwzGNIOeexRReQrmNkyMzmsd5mzfntkkzJ+Q43iBeV1kILQw7KsL3EpGO/dwhMSr2nDPc0WsMDoRqwbFCU6SYknuK3kvqD22oyUDb6xs0XhPeqttu+HAiPWmkUl0x1c2XLzwoAAPZ+SJ04Bxm7qBc/+VBC6EvSI96PtYkLYYI4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778245402; c=relaxed/simple;
+	bh=Vt//aCbOklmsD1he274YeRtPDic7A/lkenD5kT6dCwQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WCzkKcgjT4p5NyGG+I5cS/WbDTJ5KZR8gBE2BqPOCfd2Q+R+HTs0Q3aUNkdl1QjzK3Fz/YZmuehU2rgPviHQX+8mzZgY24Cu4tjoNhO3JIOk6BWcCYZ2vjIeMCBCpeEgZoQAGAT9h7L4mg7xBptFZ9UNB2s3X3kNgtOzCwP45sg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=r3+nCFTd; arc=fail smtp.client-ip=40.93.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qAlkhycX"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 647MdOX82752196;
-	Fri, 8 May 2026 12:55:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=CNT8qK
-	90tO4DRCBa6Q1VeOcJ+2/2PVh6nuYm8vkCehA=; b=qAlkhycXw4gtpTG5+LJ5po
-	PDVZo4vzWxnyxrQaoUzBiIsXIsMNix5CIEDobA/ATdlrcmXwMhD1qYTatiIBpqAv
-	lqb3/Awy6xerfM7kQbzUJmxlW+IxdOXOCD+of1TSgBLYmlJbf3lybKkxlOiuhevS
-	MQkvG8iuM4eZUHuU18k7SBJrGO5JX1DZ8oca16zVvCqo8jZIiWAmfWByFXh5CcrK
-	jhYt0L0yUSpCAM0ryVCcTyX1L6iHKZJJXgYkCPOkO05O6SwA4RNRKQgTyyXRrPz3
-	czD15LJUqzUQFWBNLYBJfNiTQafMKDk7mTHJm4616FXcWJWpYOAmk5UX6XrgBOvg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dw9x53rqn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 May 2026 12:55:45 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 648CdfU6020024;
-	Fri, 8 May 2026 12:55:43 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dwuywga2y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 May 2026 12:55:43 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 648CthT133358464
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 May 2026 12:55:43 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A3C65806B;
-	Fri,  8 May 2026 12:55:43 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 25CE15806F;
-	Fri,  8 May 2026 12:55:41 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.52.128])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  8 May 2026 12:55:41 +0000 (GMT)
-Message-ID: <2b3782398cc17ce9d355490a0c42ebce9120a9ae.camel@linux.ibm.com>
-Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: David Safford <david.safford@gmail.com>,
-        Jonathan McDowell	
- <noodles@earth.li>,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
-        eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
-        sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
-        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
-        sebastianene@google.com
-In-Reply-To: <af2nhZyyNaP7LM3w@e129823.arm.com>
-References: <201b9172ac47c6766443c1f2343cab3548f33c29.camel@linux.ibm.com>
-	 <afrXmRiq7XvSe6yN@e129823.arm.com>
-	 <9ff4853a8e9932b3a1424f2a6c3347f1723fb5f4.camel@linux.ibm.com>
-	 <aftIuPwNeuzc9nY1@e129823.arm.com>
-	 <9d1af933ef218b159762884357d127e3644dfe2c.camel@linux.ibm.com>
-	 <afwoDgaJxmKwOhXp@e129823.arm.com>
-	 <f19081f1eda19d6d1ae133d8ec93e779ab1a25e5.camel@linux.ibm.com>
-	 <afyIbW5cljh5ZvTL@e129823.arm.com> <afzwJn+5r15jFxrB@e129823.arm.com>
-	 <77ad49cca1acf707f4152ed3e2066b2f24c90c16.camel@linux.ibm.com>
-	 <af2nhZyyNaP7LM3w@e129823.arm.com>
-Content-Type: text/plain; charset="UTF-8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="r3+nCFTd"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SgwXfBslH96y9mdBRfq6hWasJv8t+u0//pUISBnQdM2ub8ILD41LhI1LB7avTMc6hkqlJtZ0hJ0sHSkkSHNxePf50VuIki8J5GS+MyvNGchTlPgPubCwCRbT+Upn/gmBOiVY6UiQDyrCdsN1Cgsag06Vb9sYPlvo91+F4qO28UDo9386MDFhgySpVGUK3DaNrkGDnJ69p3vlnfqDuSJFlSCGbydYh4CLDyFqHHr81zq1mUfN9fjv4gcZk534IqztjYfJ38IaCmKGadQdD1zsGFJNlSxLDDIOoM+pwiJb6A+uB2y+92n7lMUJR7ZVnDHUv3JU0Xz/vm7RZLTpiAB+Sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L+a09WvV058PeBkYIQIpy83CLVkuzrH21/sVLfqV4o8=;
+ b=EWIG7sJ+a6cXPQ7Aie+JQiZP67qfVRKZVNwb11zlbGR+2NCnwoE0GLdaXjd/ISfy0mokCge0NMzmRVsT9oo+6U0IX90i4GVeOflyx5FyZ8CuKLIyxlIrEEpFIFV3pcergdpbfmPhJh/RVRyFKrAw+60Aj043oyHevHme5L3P4mPZa63kDAxC8vIc7h9Eze7DHpkeU72F/eRrl13p8PabQWWYfw9b5gM/zIvjNzWy1gG1+zbov62tnyx8h4FWfiElOpb9DxD4gSMw3deeSRm1mJRs4Jq7oEuX2MSgLoD4Ne5721YSVIbAdoQ3gF1SNnVcQqWPHGhNfI+FljPcLgU6Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L+a09WvV058PeBkYIQIpy83CLVkuzrH21/sVLfqV4o8=;
+ b=r3+nCFTduAS4SQ7bUiPg61gcCcaRxddVMS3XCgNR0o5JcCrnnp7+ePAzZSZ48a1I8WyLu1qUIbO9qC/I6pSQF757NHfeBApBH2S9wzgJwmo39TzTCQFqACNKVVWbEx8WNA5u1kUf/8nzIzt3EIBQCEMo7El25HqKXi5C2pX+oJ9LK3XyRV4qOX9dWXzgip0Hsi99cBaJmKnShCs4IkUtnij7bjX5ju9sfw83v565swXmckskXzCyOOQ+DmgXlK1NZb4UKvB4WX8OyDnp90voTuwsXDCIjSeOJ8eRtpkprVAPdc8QUoTllQFssoUt0i4NPjBFbVFSRSn53HD+Tzr4Qw==
+Received: from IA0PR12MB7555.namprd12.prod.outlook.com (2603:10b6:208:43d::5)
+ by CY5PR12MB6622.namprd12.prod.outlook.com (2603:10b6:930:42::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.20; Fri, 8 May
+ 2026 13:03:09 +0000
+Received: from IA0PR12MB7555.namprd12.prod.outlook.com
+ ([fe80::5a27:a8d9:43b7:3b8d]) by IA0PR12MB7555.namprd12.prod.outlook.com
+ ([fe80::5a27:a8d9:43b7:3b8d%3]) with mapi id 15.20.9891.019; Fri, 8 May 2026
+ 13:03:09 +0000
+From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+	<eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>, "richard.henderson@linaro.org"
+	<richard.henderson@linaro.org>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"sebott@redhat.com" <sebott@redhat.com>, "philmd@linaro.org"
+	<philmd@linaro.org>
+CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com"
+	<berrange@redhat.com>, "abologna@redhat.com" <abologna@redhat.com>,
+	"jdenemar@redhat.com" <jdenemar@redhat.com>
+Subject: RE: [PATCH v4 11/17] arm/kvm: write back modified ID regs to KVM
+Thread-Topic: [PATCH v4 11/17] arm/kvm: write back modified ID regs to KVM
+Thread-Index: AQHc2s+lMbTKReJJn0uN5USSIMu6fbYEH0BQ
+Date: Fri, 8 May 2026 13:03:08 +0000
+Message-ID:
+ <IA0PR12MB75555B2C69AC473011333C72AB3D2@IA0PR12MB7555.namprd12.prod.outlook.com>
+References: <20260503073541.790215-1-eric.auger@redhat.com>
+ <20260503073541.790215-12-eric.auger@redhat.com>
+In-Reply-To: <20260503073541.790215-12-eric.auger@redhat.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA0PR12MB7555:EE_|CY5PR12MB6622:EE_
+x-ms-office365-filtering-correlation-id: 97a50f21-5299-49f9-9d5c-08dead022712
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020|38070700021|18002099003|56012099003|22082099003|3023799003;
+x-microsoft-antispam-message-info:
+ 5/XBqmFVnc1z+Fo0kCWTgxa3F1E5fbJ4wyIkQVWHOiry25oF+AQIglxRzVNhM1zf5jQa6hWhDj1AqzC6KsX9Ze4IkIxyRtmAkzq+5zFzmLzsXgm7lyf4wn9vxzD7QEbtjSNzJFIWV0vZxaoO0ouUc75ClqzCi/wXIRbASipI79EaNqGarrtEmR6HTAT/e/2W9vyLj49MNWo0rLP2+Lq0Q9LJM6E4rMszPcGzs2kX/+4yV8iPRcLp7ZpYbovgcj2/Ud5DSlddyvcGXYII6q771cZCKmjWJeMzkELxowFBj25uFnagm3gpsFsMAO7EbPK0QyrzNRK+jvKgAgxrCI1LH5MqCuw7CkRpBmez96ZHjZ2a5zELTdTldvtG0l7BgbVMWktWi4x9mpG34/f+Q+OtbY7EIftds/xvwutZUmC+saX1JmuYM6++uWH99DJx2WmCiYUnLNBvD/326SJV7q7INYyVvcLnurO7tH1d54RLZakxNh4Zr+CxqNX0jBkCIavVHdLR/gBY+LiWl4ufGST58pQrNYbDZmAaSR/QOJ7nLETMC7lYHK20J++VlyIt5f0yjUzRmkkn7NBZ7Z2zNhd2vGakw1XCRuDc/bb0PgXrZkUsSKxEYef6jXQUquG3di7KgfkVtZ06JjbBiy+S8tNL7F+SNdHp/pKRHVCAEVJH0j0/LJjSk7hTGWAZUnyU9yqjIDU3TqmWpBS0iThjbLKNG55fRTM+44TQnx+taEKuLFhgptRDyXlWQwDvjXBJd/6QUb2meopb4Y+h7RUeMpbQsQ==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB7555.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020)(38070700021)(18002099003)(56012099003)(22082099003)(3023799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?M4nfSrF4wEafROtEQoHgFtnElR0fGo+SZc2XMaiwfUEwz9FAoqWr97saZdOj?=
+ =?us-ascii?Q?D5y+yzoDctag/IRGGw6VPEvTWgwbTsQVePGSsSbXCrg9atV0Uhr0v1KjhxVi?=
+ =?us-ascii?Q?PsRRSpObbDzLkNn0wPN3X6cUzYV0GUkomTRNSDsmrXXorZG1n0kt0MWwZZ6s?=
+ =?us-ascii?Q?N7IDuwmc6zs1Lo5kXq0QbSUMu1T1LaWINY0mF9Yfkz0RDSYeB4wKnl2XyEJw?=
+ =?us-ascii?Q?qp7v+nfouNvgtGiH2eOM6lZ6kIJ3Z3oG1hIWanaEQlOFeO0//rsTO4BkocxM?=
+ =?us-ascii?Q?1Z4zYIe2yluGLhy923kuo3ts+kJA5mngOAL+B+RB2e7bTDXN8YrdrPrNv66L?=
+ =?us-ascii?Q?jMlT6khrf9QDIcILhKBBNrXtqnHJbE0wrAt8M2iTTq4BydPUXt6uwZdLI1kE?=
+ =?us-ascii?Q?dtjq/mAeiS6Nl4lCYprxWdz27E0vr/FBOvVnNOPbVBjmqZWtb/ZK0obQnYch?=
+ =?us-ascii?Q?HPXG+9zWasVrXHagJePs72XhhWt8W7cD7CShCkXLpN6YnAdjzyOv7SCEJIPu?=
+ =?us-ascii?Q?KbPwi7VoNJZ2RpQMzj5KDgEITExhfWKEt9Evkzgw/C4k3yfbnpXHWHzQ09i6?=
+ =?us-ascii?Q?v7nAUPPNrLOavGtIFYvs7Ms3M6ZEebIi3L0woI6MQRGCFnw+gf5wu02/FTF2?=
+ =?us-ascii?Q?gR5gNZWFHXe2pEdM4D4eDfdspisahB1gf4YMf2Vka53oT9QMdjWgtXh6/pc1?=
+ =?us-ascii?Q?v3TzDCiUtmHnGhVO6q5CW0VQ6yAKBUEDOMTpdpcWL0sOspPLbm068i/vmeFs?=
+ =?us-ascii?Q?Y50UlrNyjQHONOOq6gBdyeGEotqpvYtLSCX4TIWhyc6VgXejJ8Q8GlWmNSiv?=
+ =?us-ascii?Q?FlgipaeM+gmJXFveyeMRz9UJClymrMm1TPbfBcG3EhH3IF8n2I/vErAtjNJy?=
+ =?us-ascii?Q?aZxWBMFJN+YM5WZaSQjRIYLDOnAeXvf42NU7716F52wg7jUyQPtDlAMpE3yx?=
+ =?us-ascii?Q?T95kBlS3Jsxi8XtW68OVwE55m4gVbTCltARjxRLsvtIdKyPXbgaW3ZRjNePw?=
+ =?us-ascii?Q?jw/G1gyALe9UpEra7jN7BbtCXNqAWXtzudJRQrDFoDyQNbqRlEE53AUQ/q7q?=
+ =?us-ascii?Q?MLxPNepp72kNikx8bGmAGeNt43s1zRJ8k4LHTfwEvvMxNE3quc11ozg0+CbM?=
+ =?us-ascii?Q?m6qXvlwrPLiZ/HKMknvlLoapVmjOnFF2u8DzcfdBmEtn6fSwAowYILbgPZAc?=
+ =?us-ascii?Q?p23eaV3l7s7t+Un2R1qinI3rykHNWS2FEUpatRmbykaloOZpSwhU2nm/h5St?=
+ =?us-ascii?Q?bvZPaFZ1+Y8pfmt7/375UMxeHfs5Ot+8/acczbyaW8UavetNCXPaOYymdX/L?=
+ =?us-ascii?Q?XOu19nVZQsERurCz6oomldbc4eZ0E2qRnvoL1Ntw5ZxKMmoc2f9Hk2VrH2vw?=
+ =?us-ascii?Q?2rLHBv868R0CpLmPckC3X3cFIMDv53Y/N8sJcShYLoqSP6cYJKzFwInp2nX8?=
+ =?us-ascii?Q?ZKndE0b+YUuqNxCYJGJS4E3aWRj3eAOH5LzfpqVrd5pWkXPFB6zFrfwUGgSa?=
+ =?us-ascii?Q?xUL7Hvlqpsbz0stgmysEHsxvcNpB4SS+SbMDGuYzzluRgnVxgyLSIzLfJFkx?=
+ =?us-ascii?Q?49pHJ3ZD+qvYGPJtI1NBajEakTfkiqYy6YhvlyTo/0oHN5m3jTO2HlCD1zhW?=
+ =?us-ascii?Q?PDchFSwhMAB8waLgIjVq0lhODQojOKVcXWWFYO4BGF8+cYNddRnSBE1P9Bbl?=
+ =?us-ascii?Q?NetWG9Tp3A51KHzvCvX0CG75cyVzKhnzmcR3Tgdl7SGAr/yRtTP/U4aEsnDZ?=
+ =?us-ascii?Q?dN/H2D7zWw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 May 2026 08:55:40 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDEzMSBTYWx0ZWRfX0GEHvismOr/n
- yL3KnjqVPl3k3o5t4By0xsuVICtLo4mcf2LhMsMA7D8UtFoAk/kD6YiWYgHyq+wz4p//8yQGRF/
- yrLxJ1RBz3LvkUtlsB5sSapQ4lEMuatN7zIFALpVLfaChy+BYG53J8xK815TxzQ+wPwdIhTMyiT
- FtdSxlz+hckgfS1c2tJd/ggZh4KhYZZaHAjIstlJ6A3prqSlczq+T3vYhPcT7qr727p3hBdAEH+
- 0UTiFJc3eEkAtS5jf7NXNekOdHwmJ7LeJBm7Kd8/t4bmC/6W9lskHXHaeCMmJsnUK2FnzGr+zcW
- JAgFEuWYdLedfhuE1LAkLJSFuH+IXt+3QeL1/YgfPF+AlYFK7UsfP0gvxmOfyanJ++T8hEzBnFC
- ucT8TXRTykJLWhKbRum9ZwKl+7qj9pq9V9YxF/IOiTuf/wup7a8D8A2wlab9vD/fHnuTb5laOxo
- MSW9S0ZC/gxY3rAVbXw==
-X-Proofpoint-ORIG-GUID: 2l_3ko0Exadu_5ZF5KPsMugHlnC-OGcV
-X-Proofpoint-GUID: kB6MJOa0lJ5Hl5Uuk4_weLGs3pN_k0Vo
-X-Authority-Analysis: v=2.4 cv=W7UIkxWk c=1 sm=1 tr=0 ts=69fddd51 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=jeveBUE32ww0wtG-KO0A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-07_02,2026-05-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 malwarescore=0
- suspectscore=0 spamscore=0 clxscore=1015 phishscore=0 bulkscore=0
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2605080131
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB7555.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97a50f21-5299-49f9-9d5c-08dead022712
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 May 2026 13:03:09.0224
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hKHPGW+Pr7J5EzXyS8BXAOjTT4YMjcofWM7qyVBmWFKZIXwNeXZqbQyDfuZV4euBfRtsHxZ6TbA2xze5l/OoeA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6622
 
-On Fri, 2026-05-08 at 10:06 +0100, Yeoreum Yun wrote:
+Hi Eric,
 
-> > The kernel selftests caused the measurements between late_initcall and
-> > late_initcall_sync.  After disabling all of the kernel selftests, there=
- weren't
-> > any measurements. Re-enabling the FIPS selftests on PowerVM LPAR result=
-ed in
-> > measurements.  (I didn't try re-enabling any of the other selftests.)
-> >=20
-> > CONFIG_FIPS_SIGNATURE_SELFTEST=3Dy
-> > CONFIG_FIPS_SIGNATURE_SELFTEST_RSA=3Dy
-> > CONFIG_FIPS_SIGNATURE_SELFTEST_ECDSA=3Dy
+> -----Original Message-----
+> From: Eric Auger <eric.auger@redhat.com>
+> Sent: 03 May 2026 08:34
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
+> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
+> peter.maydell@linaro.org; richard.henderson@linaro.org;
+> cohuck@redhat.com; sebott@redhat.com; Shameer Kolothum Thodi
+> <skolothumtho@nvidia.com>; philmd@linaro.org
+> Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
+> armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
+> jdenemar@redhat.com
+> Subject: [PATCH v4 11/17] arm/kvm: write back modified ID regs to KVM
 >=20
-> Thanks for shraring this ;)
+> External email: Use caution opening links or attachments
 >=20
-> I found the reason for those mesaurements. Those come from the
-> request_module() and usermode-thread generates them while handling module
-> loading request for crypto-x962(ecdsa-nist-p256).
-> Since it's not a real kernel module,
-> I confirmed file measurements between late_initcall and
-> late_initcall_sync are gone for modeprobe with below change:
 >=20
-> @@ -1246,9 +1250,14 @@ EXPORT_SYMBOL_GPL(ima_measure_critical_data);
->   */
->  static int ima_kernel_module_request(char *kmod_name)
->  {
->         if (strncmp(kmod_name, "crypto-pkcs1(rsa,", 17) =3D=3D 0)
->                 return -EINVAL;
+> We want to give a chance to override the value of host ID regs.
+> In a previous patch we made sure all their values could be fetched
+> through kvm_get_one_reg() calls before their modification. After
+> their potential modification we need to make sure we write back
+> the values through kvm_set_one_reg() calls.
 >=20
-> +       if (IS_BUILTIN(CONFIG_CRYPTO_ECDSA) &&
-> +           (strncmp(kmod_name, "crypto-x962(ecdsa", 17) =3D=3D 0))
-> +               return -EINVAL;
-> +
->         return 0;
+> Make sure the cpreg_list is modified with updated values and
+> transfer those values back to kvm.
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  target/arm/kvm.c        | 59
+> ++++++++++++++++++++++++++++++++++++++++-
+>  target/arm/trace-events |  1 +
+>  2 files changed, 59 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 1a9b91bf8a..ca9a7d9439 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -275,6 +275,21 @@ static uint32_t kvm_arm_sve_get_vls(int fd)
+>      return vls[0] & MAKE_64BIT_MASK(0, ARM_MAX_VQ);
 >  }
 >=20
->  Though this is the only request_module() call between
->  late_initcall and late_initcall_sync, but I also confirmed there're
->  request_modules() call before ima initalisation before "late_initcall":
+> +static int kvm_feature_idx_to_idregs_idx(int kidx)
+> +{
+> +    int op1, crm, op2;
+> +    ARMSysRegs sysreg;
+> +
+> +    op1 =3D kidx / 64;
+> +    if (op1 =3D=3D 2) {
+> +        op1 =3D 3;
+> +    }
+> +    crm =3D (kidx % 64) / 8;
+> +    op2 =3D kidx % 8;
+> +    sysreg =3D ENCODE_ID_REG(3, op1, 0, crm, op2);
+> +    return get_sysreg_idx(sysreg);
+> +}
+> +
+>  static int idregs_idx_to_kvm_feature_idx(ARMIDRegisterIdx idx)
+>  {
+>      ARMSysRegs sysreg =3D id_register_sysreg[idx];
+> @@ -1197,6 +1212,39 @@ bool kvm_arm_cpu_post_load(ARMCPU *cpu)
+>      return true;
+>  }
 >=20
-> /*
->  * NOTE: kmod_name is printed on ima_kernel_module_request()
->  */
+> +static void kvm_arm_writable_idregs_to_cpreg_list(ARMCPU *cpu)
+> +{
+> +    if (!cpu->writable_map) {
+> +        return;
+> +    }
+> +    for (int i =3D 0; i < NR_ID_REG_MASKS; i++) {
+> +        uint64_t writable_mask =3D cpu->writable_map->regs[i];
+> +        uint64_t *cpreg;
+> +
+> +        if (writable_mask) {
+> +            uint64_t previous, new;
+> +            int idx =3D kvm_feature_idx_to_idregs_idx(i);
+> +            ARM64SysReg *sysregdesc;
+> +            uint32_t sysreg;
+> +
+> +            if (idx =3D=3D -1) {
+> +                /* sysreg writable, but we don't know it */
+> +                continue;
+> +            }
+> +            sysregdesc =3D &arm64_id_regs[idx];
+> +            sysreg =3D sysregdesc->sysreg;
+> +            cpreg =3D kvm_arm_get_cpreg_ptr(cpu,
+> idregs_sysreg_to_kvm_reg(sysreg));
+> +            previous =3D *cpreg;
+> +            new =3D cpu->isar.idregs[idx];
+> +            if (previous !=3D new) {
+> +                *cpreg =3D new;
+> +                trace_kvm_arm_writable_idregs_to_cpreg_list(sysregdesc->=
+name,
+> +                                                            previous, ne=
+w);
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  void kvm_arm_reset_vcpu(ARMCPU *cpu)
+>  {
+>      int ret;
+> @@ -2148,7 +2196,16 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      }
+>      cpu->mp_affinity =3D mpidr & ARM64_AFFINITY_MASK;
 >=20
-> // This is called from module_init(stm_core_init) -> device_initcall()
-> // which is in driver/hwtracing/stm/core.c (built-in)
-> [    1.421986] ima: kmod_name: stm_p_basic
-> ...
-> [    1.444900] ima: kmod_name: crypto-pkcs1(rsa,sha512)
-> [    1.444903] ima: kmod_name: crypto-pkcs1(rsa,sha512)-all
-> ...
-> [    1.452029] ima: kmod_name: crypto-cbc(aes)
-> [    1.465321] ima: kmod_name: crypto-cbc(aes)-all
-> ...
-> [    1.467845] Key type encrypted registered
-> [    1.467848] AppArmor: AppArmor sha256 policy hashing enabled
->=20
->  // IMA is initailised at late_initcall level.
-> [    1.467850] ima: [init_ima_late:1336]
->=20
-> If IMA should care request_module() from kernel before IMA init,
-> I think there is no way to solve except queuing those events
-> (kernel_load_data/kernel_load_post_data and open for module binary etc.)
-> though it breaks "measure before use" principle since IMA couldn't
-> measure at that time.
->=20
-> But if you don't care about those things -- some events happend before
-> IMA init, I think your suggestion -- controlling the init time of ima_ini=
-t()
-> via a Kconfig option is good and ignoring some usermodehelper request
-> including request_module() before IMA initialisation upto user by that op=
-tion.
+> -    return kvm_arm_init_cpreg_list(cpu);
+> +    ret =3D kvm_arm_init_cpreg_list(cpu);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    /* overwrite writable ID regs with their updated property values */
+> +    kvm_arm_writable_idregs_to_cpreg_list(cpu);
+> +
+> +    write_list_to_kvmstate(cpu, KVM_PUT_FULL_STATE);
 
-Thank you for the complete analysis.  The early measurements before the TPM=
- is
-initialized is a problem that needs to be addressed.  As to whether the sol=
-ution
-will require queueing is yet to be determined. (Roberto has some thoughts o=
-n
-addressing it.) This discussion makes it clear that simply delaying IMA
-initialization by moving it from late_initcall to late_initcall_sync could =
-miss
-measurements.  That said, exposing it as an opt-in Kconfig for those who ac=
-cept
-the risk is a sensible pragmatic compromise.
+KVM may hide registers based on ID register fields when features
+are disabled. Updating writable ID registers after KVM_GET_REG_LIST
+can result in a mismatched register list and failures when setting
+registers.
 
-Mimi
+This was reported on v3:
+https://lore.kernel.org/qemu-devel/ae3f4d26-7a1a-418c-b303-2ed1d9ced4ba@hua=
+wei.com/
+
+Is this fixed someway in this series? I am not sure. I have faced the
+same issue on NV platforms as well.
+
+Thanks,
+Shameer
+
