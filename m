@@ -1,47 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548CD3DA7D3;
-	Fri,  8 May 2026 17:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8B2325727;
+	Fri,  8 May 2026 18:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778263178; cv=none; b=FwIuD1DK2imLFMYjZTPwo9ZR9cL7cAz2Q/EmOJ+xXTIOhVuzPntSHM8B8cwHnCROn5srShK2VJn54BzGe3PzHHWU8b/OGB20G+tD4oz58KnpW8r8W/YgDxKDgezjmfY+stDjxDmCiNz7ab2A+4OXb7cB/ur/igaiqYeuOY+9hl8=
+	t=1778263407; cv=none; b=NhROp8NtrFIs2qq3ugx5BYEQSzZncyfChv1KcoT2kXF9gFtkzLlMRrwWsXJdRTe+MmSTkHplJNNiRxetkvELCIi6kcgx+79+i/vgTJE8isOt7aUlz4XMZTBxUb4WFgWhAw+TAMXXQOLSHzE39yOgt1ayycAu2MHh3O7UItlCFAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778263178; c=relaxed/simple;
-	bh=f+C6+Is1XDoPUTJlfzjwfJtrygH27kCkd9+va+Q5+wQ=;
+	s=arc-20240116; t=1778263407; c=relaxed/simple;
+	bh=gRptDwEx5Olggysp2cl05eC94pvp5bXMa6WQd1kwThw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R3M12kNAD9gI0lnJkYF54CoLDppsktUJAYlba5kuO+AwJtq54KiepBdsoGK2BzYlin7YSxeUClMKZh7AFElaIYA035ZyDYi+h7THF0tn7CCkojU58JJkTpwn4ONEfniyZoPCzKlVcqkOaDAW10wSrNMO29spB3XFFfJOWYZha18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWAWPDvG; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=r8H06ML1jdqWZKLhP+zsffYWNeGA6mIrwwAAcFdguoP1e6Ez/dtfjSSXWSGUqdpMnMmErslFHQn3xN2W5HlZNCfMI/DuxDmo0t/P6ZWpcKIDYkt9PzRy1cfp27FIOgLvUGD6Fl5Ja51n2bu5nh0C0t6mSEd1PKPWnFBBxgRJZpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGtIvjj6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWAWPDvG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58D32C2BCB0;
-	Fri,  8 May 2026 17:59:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGtIvjj6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C58C2BCB0;
+	Fri,  8 May 2026 18:03:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778263178;
-	bh=f+C6+Is1XDoPUTJlfzjwfJtrygH27kCkd9+va+Q5+wQ=;
+	s=k20201202; t=1778263406;
+	bh=gRptDwEx5Olggysp2cl05eC94pvp5bXMa6WQd1kwThw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JWAWPDvGtq97KDoBUrMNVn9jGLtr0S6yU0SmNcoAoyE2s2EAXBMnXtXMka60FpLeN
-	 TOFqpirW5UGbw7mPrCRrkHf7mSHljwAahNBB4PpxRGUlk0zsQ3JGvXACFJ5JagLcJa
-	 4aKx4OzboqGUMVOH29tprYlLnrAKRc9M0h6jp8Xu8JsIc4Uaf4/vQHPH4DD7ofsEMj
-	 jZdY4bHynb3dvCv3fYpWYT3cG0WJTIIb1kWp1Cv5pqgdvE3ayQNdJh6xbZnAynDj73
-	 8QhrF5OUcnvkDluYPJUNvNH+/1hLDYGVcoY+ThxaAG4VaOG/iLDTGcoig4HtjCMQZY
-	 tIoUF86YTBl3A==
-Date: Fri, 8 May 2026 18:59:32 +0100
+	b=fGtIvjj6zgHryWrC2ks3Lhkbk4+4wiCSpEnJK2UiEuxERypT5ko9HdKjUQUgCW4vi
+	 DBylH6WdUDGcD+oQygQG/RPKwg1O5exe35O0NeU7t+pT1p0CuqUvYTfwX7XfR9SMJk
+	 3UsXtM/c8SNA7heOzR7s5oJkJOSQHroLN3DM4Zoa00zaxsMceEz/5ie0S3EghR7LDf
+	 LZS5MCLEKf06jgvRxbBNc1455jDbWbucYAZ/KE5IAPAK+OknRZ7+ItgXg2JvIRFLeH
+	 f2aGSUAABO8cE+coElw5mGoKN5gKbOVhQOPBXT+S+LQckVDlkiLWddTfKKnW6cQBa2
+	 O/cT9ISfBIqzQ==
+Date: Fri, 8 May 2026 19:03:20 +0100
 From: Sudeep Holla <sudeep.holla@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+To: Jonathan McDowell <noodles@earth.li>
+Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
 	Sudeep Holla <sudeep.holla@kernel.org>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	jarkko@kernel.org, zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
 	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [RFC PATCH 0/3] initalise ff-a after finalising pKVM
-Message-ID: <20260508-ubiquitous-sexy-robin-b1ca51@sudeepholla>
-References: <20260505095409.1948371-1-yeoreum.yun@arm.com>
+	zohar@linux.ibm.com, roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+	jarkko@kernel.org, jgg@ziepe.ca, maz@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+	sebastianene@google.com, Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: Re: [RFC PATCH v3 4/4] Revert "firmware: arm_ffa: Change initcall
+ level of ffa_init() to rootfs_initcall"
+Message-ID: <20260508-elite-macaw-of-success-efba21@sudeepholla>
+References: <cover.1777036497.git.noodles@meta.com>
+ <2e7b4dc552b45ddf14cc43bc449cbebb4ade0027.1777036497.git.noodles@meta.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,39 +53,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260505095409.1948371-1-yeoreum.yun@arm.com>
+In-Reply-To: <2e7b4dc552b45ddf14cc43bc449cbebb4ade0027.1777036497.git.noodles@meta.com>
 
-On Tue, May 05, 2026 at 10:54:06AM +0100, Yeoreum Yun wrote:
-> This patch is split out from the patchset [0] --
-> fix FF-A call failure with pKVM when the FF-A driver is built-in,
-> specifically the IMA-related part.
+On Fri, Apr 24, 2026 at 02:24:42PM +0100, Jonathan McDowell wrote:
+> From: Yeoreum Yun <yeoreum.yun@arm.com>
 > 
-> When pKVM is enabled, the FF-A driver must be initialised after pKVM.
-> Otherwise, pKVM cannot negotiate the FF-A version or obtain the RX/TX
-> buffer information, leading to failures in FF-A calls.
+> This reverts commit 0e0546eabcd6c19765a8dbf5b5db3723e7b0ea75, which was
+> added to address ordering issues with the IMA LSM initialisation where
+> the TPM would not be fully ready by the time IMA wanted it. This has
+> been resolved within IMA by retrying setup during late_initcall_sync if
+> the TPM is not available at first.
 > 
-> Currently, pKVM initialisation completes at device_initcall_sync,
-> while ffa_init() runs at the device_initcall level.
-> 
-> So far, linker deployes kvm_arm_init() before ffa_init(), and SMCs can
-> still be trapped even before finalise_pkvm() is invoked.
-> As a result, this issue has not been observed.
-> 
-> However, relying on above stuff is fragile.
-> Therefore, when pKVM is enabled, the FF-A infrastructure should be
-> initialised only after pKVM initialisation has been fully finalised.
-> 
-> To achieve this, introduce an ffa_root_dev ("arm-ffa") and
-> a corresponding driver to defer initialisation of the FF-A infrastructure
-> until pKVM initialisation is complete, and to defer probing of all FF-A devices until then
-> when pKVM is enabled.
->
 
-I have posted an alternative based on all the discussion in this thread
-@[1]. I have not cc-ed all the people as the changes are contained in
-FF-A driver and not sure if all the cc-ed here are much interested.
-All the lists are included I assume and one can always provide feedback
-referring to the link.
+I have made this part of [1] and intend to take it via arm-soc. I don't
+see a strict dependency on 3/4 here and one can test the -next integration
+branch. I don't believe IMA/TPM is in arm64 defconfig, so anyone testing
+must be aware of all the details.
+
+Please shout if you disagree. TPM revert can go independently IMO.
 
 -- 
 Regards,
