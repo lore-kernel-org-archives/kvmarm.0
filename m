@@ -1,58 +1,50 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737B43DDDDB
-	for <kvmarm@lists.linux.dev>; Fri,  8 May 2026 13:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFBF2EC54A;
+	Fri,  8 May 2026 16:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778247710; cv=none; b=nq8L6E0Th05PGCyX23ny2meZKGwW1WkUx4ULSstT9YnhT9ycKXjkg/0J8a8tulZQK5f+QORNdnvFxOLhdimj9kJyl6XpFbssPXERq01Iu5YUP6W4Y9Rj0pnFFc9jCP3gg85terKfafLyYB9QWS4Wvzaw/9lJ4izITvKMOaGRJQo=
+	t=1778259452; cv=none; b=JtdbNg/hnJyDTmBP1ZBScwQf6cuxpQxuPon5iIMfd4FlTHxtVUTUAnNx+sGfdkU+bhh7cpGn8Bf4jsfi0tUjS+Pg5YMOR+rP3rRPPXEbqWbrWvDM9kDTtUbB1l26sqXNXbOuB0B5WRQTF2fDVuDMzfILDZMqwPCiupsID5SOw5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778247710; c=relaxed/simple;
-	bh=QmNsu1x3udImOIG51/QbUgV1i4PuYkqOa/OqRyu9jYE=;
+	s=arc-20240116; t=1778259452; c=relaxed/simple;
+	bh=HhzF7Y4usesMvKmsaK0V1Ngy3fy45+8vuFUEdZrFH90=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ll09TmYA8pAswK5/BiujgQCB/cE3duyGr0HKjsTDU0BbC5UvpKAQXZkfYe7nFPHX/Tn9QGosIFmXRaApAFJC0KkaXHewjUgL3TTrWpF3IupxaY4+VJGrdWIpvJ9o/qlAFTJ2d0RGPMuLu4MAJF5OO1g5IlmFS7yusID/DPMOuDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YtuBmpKr; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=FHlbC3nQxmRWR6f0UuuQIkAADu5xl16BMLzhzzml7RhUiekz+b95DpEbYzt/eAJzey4dI37IxwWx3uGXntXcKLh3R3uqGBdAjDVN7ufjiIc/bJQSLQEWWIRygzyIV3WSbscw6XQX6VUiBILQw9nHqUZm1h5AFx8sw/4FrESBRNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFO0Hsj6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YtuBmpKr"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 268E326BC;
-	Fri,  8 May 2026 06:41:42 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC9193F836;
-	Fri,  8 May 2026 06:41:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778247707; bh=QmNsu1x3udImOIG51/QbUgV1i4PuYkqOa/OqRyu9jYE=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFO0Hsj6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23C7DC2BCC7;
+	Fri,  8 May 2026 16:57:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778259452;
+	bh=HhzF7Y4usesMvKmsaK0V1Ngy3fy45+8vuFUEdZrFH90=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YtuBmpKr0TZuvK4M6mGLVWsPHJyGPvari/WZL9N7a5iN6M6C+22Wv5070OxoiTENO
-	 rqLOSz8K4YTk/Lw8UQnNbvLfijqmt6BezYbkduh1KFqGpIRr0BvfM5GB4Zbef6OXiP
-	 DBig3E/RZyG5BLnpb9HHb9UZJ7vvP/6jpGmNMLTs=
-Date: Fri, 8 May 2026 14:41:41 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Mimi Zohar <zohar@linux.ibm.com>
-Cc: David Safford <david.safford@gmail.com>,
-	Jonathan McDowell <noodles@earth.li>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
-	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
-	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
-	sebastianene@google.com
-Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
-Message-ID: <af3oFfdSMUglZVHa@e129823.arm.com>
-References: <9ff4853a8e9932b3a1424f2a6c3347f1723fb5f4.camel@linux.ibm.com>
- <aftIuPwNeuzc9nY1@e129823.arm.com>
- <9d1af933ef218b159762884357d127e3644dfe2c.camel@linux.ibm.com>
- <afwoDgaJxmKwOhXp@e129823.arm.com>
- <f19081f1eda19d6d1ae133d8ec93e779ab1a25e5.camel@linux.ibm.com>
- <afyIbW5cljh5ZvTL@e129823.arm.com>
- <afzwJn+5r15jFxrB@e129823.arm.com>
- <77ad49cca1acf707f4152ed3e2066b2f24c90c16.camel@linux.ibm.com>
- <af2nhZyyNaP7LM3w@e129823.arm.com>
- <2b3782398cc17ce9d355490a0c42ebce9120a9ae.camel@linux.ibm.com>
+	b=jFO0Hsj6gAmt8pTNQyaG+4aj9mEqQKEUiAk3HY3KaciG5/Y+uGR1sqgGnETAwDxo6
+	 Ps0YuwWur6gRsO0dmxVtgzoAhfNSoYnL9Ot9mf71wSQV7Uac0DkpjBr59AJXXxcYci
+	 tMBNi8MsZL6w9Qt8GswG6+Wk0Dl9bU+E24l6CA8TyABZqeosdUwzegPQuiJhsPwDdS
+	 jSORFznJjVQI5ce/ILfZXGOToBq0y/pEGO7jLyBt63vTS2SevvynGsgKAZKexMBCpO
+	 Pv037UE2AXpzOvL9sCCvsS2i0e/G58k8PBBzmt5GWIt4/efdeMbR4VtazTziKgJTL3
+	 v8twujL/UVGdA==
+Date: Fri, 8 May 2026 17:57:26 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, catalin.marinas@arm.com,
+	oupton@kernel.org, will@kernel.org, joey.gouly@arm.com,
+	Sudeep Holla <sudeep.holla@kernel.org>, korneld@google.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, android-kvm@google.com,
+	mrigendra.chaubey@gmail.com, perlarsen@google.com,
+	suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com
+Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
+Message-ID: <20260508-spicy-alligator-of-reading-7678bb@sudeepholla>
+References: <20260501114447.2389222-2-sebastianene@google.com>
+ <86wlxgy00t.wl-maz@kernel.org>
+ <afxuDpecPCVA56cL@google.com>
+ <86se83xrwx.wl-maz@kernel.org>
+ <afyd8u85L5XIl6dh@google.com>
+ <86qznnxptx.wl-maz@kernel.org>
+ <af3fW468-f1KXCrC@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,93 +53,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2b3782398cc17ce9d355490a0c42ebce9120a9ae.camel@linux.ibm.com>
+In-Reply-To: <af3fW468-f1KXCrC@google.com>
 
-> On Fri, 2026-05-08 at 10:06 +0100, Yeoreum Yun wrote:
-> 
-> > > The kernel selftests caused the measurements between late_initcall and
-> > > late_initcall_sync.  After disabling all of the kernel selftests, there weren't
-> > > any measurements. Re-enabling the FIPS selftests on PowerVM LPAR resulted in
-> > > measurements.  (I didn't try re-enabling any of the other selftests.)
+On Fri, May 08, 2026 at 01:04:27PM +0000, Sebastian Ene wrote:
+> On Thu, May 07, 2026 at 03:21:46PM +0100, Marc Zyngier wrote:
+> > On Thu, 07 May 2026 15:13:06 +0100,
+> > Sebastian Ene <sebastianene@google.com> wrote:
 > > > 
-> > > CONFIG_FIPS_SIGNATURE_SELFTEST=y
-> > > CONFIG_FIPS_SIGNATURE_SELFTEST_RSA=y
-> > > CONFIG_FIPS_SIGNATURE_SELFTEST_ECDSA=y
+> > > On Thu, May 07, 2026 at 02:36:46PM +0100, Marc Zyngier wrote:
+> > > > On Thu, 07 May 2026 11:48:46 +0100,
+> > > > Sebastian Ene <sebastianene@google.com> wrote:
+> > > > > 
+> > > > > On Wed, May 06, 2026 at 05:29:22PM +0100, Marc Zyngier wrote:
+> > > > > 
+> > > > > Hello Marc,
+> > > > > 
+> > > > > > [+ Sudeep]
+> > > > > > 
+> > > > > > On Fri, 01 May 2026 12:44:48 +0100,
+> > > > > > Sebastian Ene <sebastianene@google.com> wrote:
+> > > > > > > 
+> > > > > > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
+> > > > > > > FF-A proxy. This restriction was preventing the use of asynchronous
+> > > > > > > signaling mechanisms defined by the Arm FF-A specification to
+> > > > > > > communicate with the secure services.
+> > > > > > > While these calls are markes as optional, there is no reason why the
+> > > > > > > hypervisor proxy would block them because:
+> > > > > > > 
+> > > > > > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
+> > > > > > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
+> > > > > > 
+> > > > > > Where is this enforced?
+> > > > > > 
+> > > > > 
+> > > > > There is no enforcement in place in the hypervisor since we don't proxy
+> > > > > FF-A from guest VMs, there is only one non-secure user of this which is the host.
+> > > > 
+> > > > And again: what makes that VM ID 0? Why can't the host pick VM ID 32
+> > > > and use that?
+> > > > 
+> > > 
+> > > The host discovers its id through the FFA_ID_GET and TZ returns 0 in
 > > 
-> > Thanks for shraring this ;)
+> > Does it? How do you verify this?
 > > 
-> > I found the reason for those mesaurements. Those come from the
-> > request_module() and usermode-thread generates them while handling module
-> > loading request for crypto-x962(ecdsa-nist-p256).
-> > Since it's not a real kernel module,
-> > I confirmed file measurements between late_initcall and
-> > late_initcall_sync are gone for modeprobe with below change:
-> > 
-> > @@ -1246,9 +1250,14 @@ EXPORT_SYMBOL_GPL(ima_measure_critical_data);
-> >   */
-> >  static int ima_kernel_module_request(char *kmod_name)
-> >  {
-> >         if (strncmp(kmod_name, "crypto-pkcs1(rsa,", 17) == 0)
-> >                 return -EINVAL;
-> > 
-> > +       if (IS_BUILTIN(CONFIG_CRYPTO_ECDSA) &&
-> > +           (strncmp(kmod_name, "crypto-x962(ecdsa", 17) == 0))
-> > +               return -EINVAL;
-> > +
-> >         return 0;
-> >  }
-> > 
-> >  Though this is the only request_module() call between
-> >  late_initcall and late_initcall_sync, but I also confirmed there're
-> >  request_modules() call before ima initalisation before "late_initcall":
-> > 
-> > /*
-> >  * NOTE: kmod_name is printed on ima_kernel_module_request()
-> >  */
-> > 
-> > // This is called from module_init(stm_core_init) -> device_initcall()
-> > // which is in driver/hwtracing/stm/core.c (built-in)
-> > [    1.421986] ima: kmod_name: stm_p_basic
-> > ...
-> > [    1.444900] ima: kmod_name: crypto-pkcs1(rsa,sha512)
-> > [    1.444903] ima: kmod_name: crypto-pkcs1(rsa,sha512)-all
-> > ...
-> > [    1.452029] ima: kmod_name: crypto-cbc(aes)
-> > [    1.465321] ima: kmod_name: crypto-cbc(aes)-all
-> > ...
-> > [    1.467845] Key type encrypted registered
-> > [    1.467848] AppArmor: AppArmor sha256 policy hashing enabled
-> > 
-> >  // IMA is initailised at late_initcall level.
-> > [    1.467850] ima: [init_ima_late:1336]
-> > 
-> > If IMA should care request_module() from kernel before IMA init,
-> > I think there is no way to solve except queuing those events
-> > (kernel_load_data/kernel_load_post_data and open for module binary etc.)
-> > though it breaks "measure before use" principle since IMA couldn't
-> > measure at that time.
-> > 
-> > But if you don't care about those things -- some events happend before
-> > IMA init, I think your suggestion -- controlling the init time of ima_init()
-> > via a Kconfig option is good and ignoring some usermodehelper request
-> > including request_module() before IMA initialisation upto user by that option.
-> 
-> Thank you for the complete analysis.  The early measurements before the TPM is
-> initialized is a problem that needs to be addressed.  As to whether the solution
-> will require queueing is yet to be determined. (Roberto has some thoughts on
-> addressing it.) This discussion makes it clear that simply delaying IMA
-> initialization by moving it from late_initcall to late_initcall_sync could miss
-> measurements.  That said, exposing it as an opt-in Kconfig for those who accept
-> the risk is a sensible pragmatic compromise.
+>  
+> It is written in the spec under 13.10 FFA_ID_GET ("ID value 0 must be
+> returned at the Non-secure physical FF-A instance").
 
-I think once we address ealry measurements before intialising TPM,
-It doesn't matter when IMA is initialissed since they're considered as
-ealry measurements anyway.
-
-BTW, I'm not sure whether we should take pragmatic compromise first to
-support deferred TPM initialisation or solving it together via solution
-of ealry measurements (whatever it is) in now.
+Sorry for chiming in late on this thread. Yes the spec states the above.
+However, I am not sure how the host FF-A driver instance with pKVM FF-A
+proxy needs to be categorised. I assume it plays a role of Non-secure physical
+FF-A instance.
 
 -- 
-Sincerely,
-Yeoreum Yun
+Regards,
+Sudeep
