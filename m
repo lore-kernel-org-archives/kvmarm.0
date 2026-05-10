@@ -1,426 +1,203 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445C439FCC4
-	for <kvmarm@lists.linux.dev>; Sun, 10 May 2026 14:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F0A33DEE9;
+	Sun, 10 May 2026 21:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778424868; cv=none; b=DbqsTXH4Dc8C5LBIdf35QFzufvtDkW2lhAAso6r51OYShMaLDYpfr5tFhLdqMYmk8xQ6i8ShcC1+nr7Dke/TSodOW7yO5FpE6NpFJzkYkI07h5uQUcRV6h3AgCjPORFGW/ZTMwQfKLqSBq6/rR/ABbNxGa1913Hx8T7UDyaIMFI=
+	t=1778448541; cv=none; b=f7w8u1RjL4jkCdjg9/t+OEsJ85E0aUhFEfD48rc0HwoUb0YVo7ece1q7ef5SJSIre84yaR4uvJN8I9253jn2fkHUEsJ1VcFlsMf7uGRPnWSLegOYWOGpy1P0CNKpNz7idMC+Zw9yj0YbUNVTd1QNlutAEMy90dzlgsmwHqYqcFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778424868; c=relaxed/simple;
-	bh=JbecycsRsO7GsuiD2qYQWCKe8z/108r6RfeoZgR8gSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lcdg9e76x9WqjmYIxJ1zKF7I6oEAOBT9tCXTk1sBAOSG1CoctedNA43/LjhT8vn9gWPZpVHPd3WfoXNw3Iyf68hW/VIqDXtk0iY9m62+fPrGFCph0TWqyD8xlH7seWBBS+4e3dmiKDhbOyXbGmcIouprKqPx3U6J4rlA+Hk/qs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vI1bL0GV; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1778448541; c=relaxed/simple;
+	bh=SCXS2qavV7b8E9Tk/KxVTm6QT8zvEIuv4twtPdOYGp0=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=LfvcQRkQwe3gqaYFjz7sMK0nwWuRQOiJ+Yf8ZfwegtFRL5GF0HEL1EKfoOXLSBTuiENdFU+z0x8+JMsXzJmVypp9gU6lTkdxvuY/vPGRgyNcv/gVk1ToVfIrlAM2KvZDj0rsbM5XVYWr+HLoo3KLyB6eAXncaNrc9stLqbQ7pEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YmskQ2Aw; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vI1bL0GV"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05D002936;
-	Sun, 10 May 2026 07:54:15 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C46DE3F836;
-	Sun, 10 May 2026 07:54:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778424860; bh=JbecycsRsO7GsuiD2qYQWCKe8z/108r6RfeoZgR8gSY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vI1bL0GVk/XuBFOApt/EmeQuwANWzrnLhZQRdYc0gV3Qrb7o2xcxVSF1DQ8t90hH0
-	 Za6kAWtSmkAuk8L10TcjDAQ3BLq1dTlHeHAwbbmobpXi6dyg6nAy4yRsAagaGbpQns
-	 z7tYaKBXJo/7uBsZJkEQyvvWtLAuJsdY+YdSRP6g=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 3/5] KVM: arm64: nv: Avoid full shadow s2 unmap
-Date: Sun, 10 May 2026 15:53:36 +0100
-Message-ID: <20260510145338.322962-4-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260510145338.322962-1-weilin.chang@arm.com>
-References: <20260510145338.322962-1-weilin.chang@arm.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YmskQ2Aw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=SCXS2qavV7b8E9Tk/KxVTm6QT8zvEIuv4twtPdOYGp0=; b=YmskQ2AwrdmMVKoMOSC6Jfe+Nq
+	YYf1usVqPcs28YCjZ+ZAR0a2oSV0IMaJeVOQZIMdCBufVDnj11ecJU/EURn/YtVH3YCrwdLAYdofy
+	+/Bk8u0b7bMlThqnDvoSv+D/unNgnRLhfusQi/v5EZKHDiws9OWChI7hNqakllQfQXqZrsN3jq4d2
+	d/fNHeWmIn3h3Og7Cl2taPajCn2UwHHgMbo9gTflaDPkfNG3dwXAz3tdu3udpv42iLUmXabHBSw77
+	8XJIR/EEQ+qSyyHc+r7i5vDdZ4xaeLRlg9eD3+MZKUulfRekOAJomR+gPIGBW2TrItBUgio81WfR2
+	/p/eXSfA==;
+Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wMBhj-00000007Hs2-1eWD;
+	Sun, 10 May 2026 21:28:52 +0000
+Message-ID: <f17a2d66e47fd15fc738d9f4ad89123a31d86eb3.camel@infradead.org>
+Subject: Re: (subset) [PATCH 1/3] KVM: arm64: vgic: Fix IIDR revision field
+ extracted from wrong value
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey
+ Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Raghavendra Rao
+ Ananta <rananta@google.com>, Eric Auger <eric.auger@redhat.com>, Kees Cook
+ <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor
+ <nathan@kernel.org>,  linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev,  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+  linux-kselftest@vger.kernel.org
+Date: Sun, 10 May 2026 22:28:50 +0100
+In-Reply-To: <106addd3f78918a9a584c43c181a9609aef1ceca.camel@infradead.org>
+References: <20260407210949.2076251-1-dwmw2@infradead.org>
+	 <20260407210949.2076251-2-dwmw2@infradead.org>
+	 <177702878141.537738.13460155220731277452.b4-ty@kernel.org>
+	 <106addd3f78918a9a584c43c181a9609aef1ceca.camel@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-rrdXIzARangiCs7aJ2pU"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-Currently we are forced to fully unmap all shadow stage-2 for a VM when
-unmapping a page from the canonical stage-2, for example during an MMU
-notifier call. This is because we are not tracking what canonical IPA
-are mapped in the shadow stage-2 page tables hence there is no way to
-know what to unmap.
 
-Create a per kvm_s2_mmu maple tree to track canonical IPA range ->
-nested IPA range, so that it is possible to partially unmap shadow
-stage-2 when a canonical IPA range is unmapped. The algorithm is simple
-and conservative:
+--=-rrdXIzARangiCs7aJ2pU
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-At each shadow stage-2 map, insert the nested IPA range into the maple
-tree, with the canonical IPA range as the key. If the canonical IPA
-range doesn't overlap with existing ranges in the tree, insert as is,
-and a reverse mapping for this range is established. But if the
-canonical IPA range overlaps with any existing ranges in the tree,
-create a new range that spans all the overlapping ranges including the
-input range and replace those existing ranges. In the mean time, mark
-this new spanning canonical IPA range with an "UNKNOWN_IPA" bit,
-indicating we give up tracking the nested IPA ranges that map to this
-canonical IPA range.
+On Fri, 2026-04-24 at 13:24 +0100, David Woodhouse wrote:
+> On Fri, 2026-04-24 at 12:07 +0100, Marc Zyngier wrote:
+> > On Tue, 07 Apr 2026 21:27:02 +0100, David Woodhouse wrote:
+> > > The uaccess write handlers for GICD_IIDR in both GICv2 and GICv3
+> > > extract the revision field from 'reg' (the current IIDR value read ba=
+ck
+> > > from the emulated distributor) instead of 'val' (the value userspace =
+is
+> > > trying to write). This means userspace can never actually change the
+> > > implementation revision =E2=80=94 the extracted value is always the c=
+urrent one.
+> > >=20
+> > > Fix the FIELD_GET to use 'val' so that userspace can select a differe=
+nt
+> > > revision for migration compatibility.
+> > >=20
+> > > [...]
+> >=20
+> > Applied to fixes, thanks!
+> >=20
+> > [1/3] KVM: arm64: vgic: Fix IIDR revision field extracted from wrong va=
+lue
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 commit: a0e6ae45af17e8b27958830595799c70=
+2ffbab8d
+>=20
+> There was a v2 of this series which also cleaned up the weird
+> inconsistency of the IIDR value with the actual behaviour, and which
+> fixed the fact that it's currently not possible to maintain guest
+> compatibility when upgrading from a pre-d53c2c29ae0d kernel to a new
+> one =E2=80=94 despite the fact that that kind of compatibility is *precis=
+ely*
+> what the revision field in the IIDR is designed for.
+>=20
+> https://lore.kernel.org/all/20260408113256.2095505-1-dwmw2@infradead.org/
 
-The maple tree's 64 bit entry is enough to store the nested IPA and
-the UNKNOWN_IPA status, therefore besides maple tree's internal
-operation, memory allocation is avoided.
+Is there a reason the rest of these fixes didn't make 7.1?
 
-Example:
-|||| means existing range, ---- means empty range
 
-input:            $$$$$$$$$$$$$$$$$$$$$$$$$$
-tree:  --||||-----|||||||---------||||||||||-----------
+--=-rrdXIzARangiCs7aJ2pU
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-insert spanning range and replace overlapping ones:
-       --||||-----||||||||||||||||||||||||||-----------
-                  ^^^^marked UNKNOWN_IPA^^^^
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUxMDIxMjg1
+MFowLwYJKoZIhvcNAQkEMSIEICknLijaWQ3mMwQlLp7cPY/vZgA61XYBoUTsOPo3BCLIMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAwiHyDz8i8eX8
+pNmqoN7LGfX3dlDXUylE9uhwRzZ7B30cfHP+Z5sFxfxO/fjaZwTQYfaIK1MGfpoo0lzOQ15U+UIg
+HfUfjEI/krrgqP6DaNQnVi/0Xt7TLUn/+ZeKJjO+miiiGE3lvRsfAuQQT+SlVLvHtvcXYS+Z7BEE
+kokDn5AoORS83mL43ZuXeMzjK+g7e6oklZOkY3kjdPFRe7SiEZ/gyLla2uOKFfYyf7No0fzw5d5A
+b4bV67mgiAGLlIBVS98dpzdPhCzMOqiyFVyaGDwx/QSqj8unIwELKKp/EVL/By0PUsiqKSfyewDy
+xxkgog6R7vZFB4HPkIl5LPOYqtyKNO+ddfftr4AIpxqFdqnI0aQCNDbYZJEEQXl3nCfAUGyevlMj
+JSWnR09NShOr1BRio6GBQfRKUL8B9k02UtaLIH8+bFGTqbIhPkDKmv7ZNp1PLca7NmvL9s6u0149
+z2uQXsvjfpDQzzSJ8/xACVP/u3Os6tpPXKDPiiQTG31WJgJOg/MdKD4FnyJbz0dyfK0F43/iDQ6V
+fVFvZXFaDQpXy0KyVqalJEkInPXyTMegKIHBBiURe54itpi6li/3CdnV6QRV+jfrOV4ENuu6N+LF
+dVlFNj7P6Af5U2ZjngLDPLCAWUF9LgwhFLCKf56zp5F5ptU9/W0C60U2RW7nCaIAAAAAAAA=
 
-With the reverse map created, when a canonical IPA range gets unmapped,
-look into each s2 mmu's maple tree and look for canonical IPA ranges
-affected, and base on their UNKNOWN_IPA status:
 
-UNKNOWN_IPA     -> fall back and fully unmap the current shadow
-                   stage-2, also clear the tree
-
-not UNKNOWN_IPA -> unmap the nested IPA range, and remove the reverse
-                   map entry
-
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/include/asm/kvm_host.h   |   4 +
- arch/arm64/include/asm/kvm_nested.h |   4 +
- arch/arm64/kvm/mmu.c                |  27 ++++--
- arch/arm64/kvm/nested.c             | 140 +++++++++++++++++++++++++++-
- 4 files changed, 167 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1a56d137df10..dc4c0bce1bbb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -223,6 +223,10 @@ struct kvm_s2_mmu {
- 	 */
- 	bool	pending_unmap;
- 
-+	bool	nested_revmap_broken;
-+	/* canonical IPA to nested IPA range lookup */
-+	struct maple_tree nested_revmap_mt;
-+
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- 	struct dentry *shadow_pt_debugfs_dentry;
- #endif
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 091544e6af44..5cbf78dfc685 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -76,6 +76,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
- 				       const union tlbi_info *info,
- 				       void (*)(struct kvm_s2_mmu *,
- 						const union tlbi_info *));
-+extern void kvm_record_nested_revmap(gpa_t gpa, struct kvm_s2_mmu *mmu,
-+				     gpa_t fault_ipa, size_t map_size);
- extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
- extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
- 
-@@ -164,6 +166,8 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
- 				    struct kvm_s2_trans *trans);
- extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
- extern void kvm_nested_s2_wp(struct kvm *kvm);
-+extern void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
-+				       bool may_block);
- extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
- extern void kvm_nested_s2_flush(struct kvm *kvm);
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index e4becd5cdf36..ce0bd88cd3c1 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -5,6 +5,7 @@
-  */
- 
- #include <linux/acpi.h>
-+#include <linux/maple_tree.h>
- #include <linux/mman.h>
- #include <linux/kvm_host.h>
- #include <linux/io.h>
-@@ -1099,6 +1100,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_pgtable *pgt = NULL;
-+	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
- 
- 	write_lock(&kvm->mmu_lock);
- 	pgt = mmu->pgt;
-@@ -1108,8 +1110,11 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 		free_percpu(mmu->last_vcpu_ran);
- 	}
- 
--	if (kvm_is_nested_s2_mmu(kvm, mmu))
-+	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
-+		if (!mtree_empty(revmap_mt))
-+			mtree_destroy(revmap_mt);
- 		kvm_init_nested_s2_mmu(mmu);
-+	}
- 
- 	write_unlock(&kvm->mmu_lock);
- 
-@@ -1631,6 +1636,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- 		goto out_unlock;
- 	}
- 
-+	if (s2fd->nested)
-+		kvm_record_nested_revmap(gfn << PAGE_SHIFT, pgt->mmu,
-+					 s2fd->fault_ipa, PAGE_SIZE);
-+
- 	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
- 						 __pfn_to_phys(pfn), prot,
- 						 memcache, flags);
-@@ -2034,6 +2043,10 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
- 								 prot, flags);
- 	} else {
-+		if (s2fd->nested)
-+			kvm_record_nested_revmap(canonical_gpa, pgt->mmu,
-+						 gfn_to_gpa(gfn), mapping_size);
-+
- 		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
- 							 __pfn_to_phys(pfn), prot,
- 							 memcache, flags);
-@@ -2389,14 +2402,16 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
-+	gpa_t gpa = range->start << PAGE_SHIFT;
-+	size_t size = (range->end - range->start) << PAGE_SHIFT;
-+	bool may_block = range->may_block;
-+
- 	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
- 		return false;
- 
--	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
--			     (range->end - range->start) << PAGE_SHIFT,
--			     range->may_block);
-+	__unmap_stage2_range(&kvm->arch.mmu, gpa, size, may_block);
-+	kvm_unmap_gfn_range_nested(kvm, gpa, size, may_block);
- 
--	kvm_nested_s2_unmap(kvm, range->may_block);
- 	return false;
- }
- 
-@@ -2674,7 +2689,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 
- 	write_lock(&kvm->mmu_lock);
- 	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
--	kvm_nested_s2_unmap(kvm, true);
-+	kvm_unmap_gfn_range_nested(kvm, gpa, size, true);
- 	write_unlock(&kvm->mmu_lock);
- }
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 883b6c1008fb..35b5d5f21a23 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -7,6 +7,7 @@
- #include <linux/bitfield.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+#include <linux/maple_tree.h>
- 
- #include <asm/fixmap.h>
- #include <asm/kvm_arm.h>
-@@ -43,6 +44,20 @@ struct vncr_tlb {
-  */
- #define S2_MMU_PER_VCPU		2
- 
-+/*
-+ * Per shadow S2 reverse map (IPA -> nested IPA range) maple tree payload
-+ * layout:
-+ *
-+ * bit  62:     valid, prevents the case where the nested IPA is 0 and turning
-+ *              the whole value to 0
-+ * bits 55-12:  nested IPA bits 55-12
-+ * bit  0:      UNKNOWN_IPA bit, 1 indicates we give up on tracking what nested
-+ *              IPA maps to this canonical IPA in the shadow stage-2
-+ */
-+#define VALID_ENTRY		BIT(62)
-+#define ADDR_MASK		GENMASK_ULL(55, 12)
-+#define UNKNOWN_IPA		BIT(0)
-+
- void kvm_init_nested(struct kvm *kvm)
- {
- 	kvm->arch.nested_mmus = NULL;
-@@ -769,12 +784,57 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	return s2_mmu;
- }
- 
-+void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
-+			      gpa_t fault_ipa, size_t map_size)
-+{
-+	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
-+	gpa_t ipa_end = ipa + map_size - 1;
-+	u64 entry, new_entry = 0;
-+	MA_STATE(mas_rev, revmap_mt, ipa, ipa_end);
-+
-+	if (mmu->nested_revmap_broken)
-+		return;
-+
-+	mtree_lock(revmap_mt);
-+	entry = xa_to_value(mas_find_range(&mas_rev, ipa_end));
-+
-+	if (entry) {
-+		/* maybe just a perm update... */
-+		if (!(entry & UNKNOWN_IPA) && mas_rev.index == ipa &&
-+		    mas_rev.last == ipa_end &&
-+		    fault_ipa == (entry & ADDR_MASK))
-+			goto unlock;
-+		/*
-+		 * Create a "UNKNOWN_IPA" range that spans all the overlapping
-+		 * ranges and store it.
-+		 */
-+		while (entry && mas_rev.index <= ipa_end) {
-+			ipa = min(mas_rev.index, ipa);
-+			ipa_end = max(mas_rev.last, ipa_end);
-+			entry = xa_to_value(mas_find_range(&mas_rev, ipa_end));
-+		}
-+		new_entry |= UNKNOWN_IPA;
-+	} else {
-+		new_entry |= fault_ipa;
-+		new_entry |= VALID_ENTRY;
-+	}
-+
-+	mas_set_range(&mas_rev, ipa, ipa_end);
-+	if (mas_store_gfp(&mas_rev, xa_mk_value(new_entry),
-+			  GFP_NOWAIT | __GFP_ACCOUNT))
-+		mmu->nested_revmap_broken = true;
-+unlock:
-+	mtree_unlock(revmap_mt);
-+}
-+
- void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
- {
- 	/* CnP being set denotes an invalid entry */
- 	mmu->tlb_vttbr = VTTBR_CNP_BIT;
- 	mmu->nested_stage2_enabled = false;
- 	atomic_set(&mmu->refcnt, 0);
-+	mt_init(&mmu->nested_revmap_mt);
-+	mmu->nested_revmap_broken = false;
- }
- 
- void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-@@ -1150,6 +1210,82 @@ void kvm_nested_s2_wp(struct kvm *kvm)
- 	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
- }
- 
-+static void reset_revmap_and_unmap(struct kvm_s2_mmu *mmu, bool may_block)
-+{
-+	mtree_destroy(&mmu->nested_revmap_mt);
-+	mmu->nested_revmap_broken = false;
-+	kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-+}
-+
-+static void unmap_mmu_ipa_range(struct kvm_s2_mmu *mmu, gpa_t gpa,
-+				  size_t unmap_size, bool may_block)
-+{
-+	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
-+	gpa_t ipa = gpa;
-+	gpa_t ipa_end = gpa + unmap_size - 1;
-+	u64 entry;
-+	size_t entry_size;
-+	MA_STATE(mas_rev, revmap_mt, gpa, ipa_end);
-+
-+	if (mmu->nested_revmap_broken) {
-+		reset_revmap_and_unmap(mmu, may_block);
-+		return;
-+	}
-+
-+	mtree_lock(revmap_mt);
-+	entry = xa_to_value(mas_find_range(&mas_rev, ipa_end));
-+
-+	while (entry && mas_rev.index <= ipa_end) {
-+		ipa = mas_rev.last + 1;
-+		entry_size = mas_rev.last - mas_rev.index + 1;
-+		/*
-+		 * Give up and invalidate this s2 mmu if the unmap range
-+		 * touches any UNKNOWN_IPA range.
-+		 */
-+		if (entry & UNKNOWN_IPA) {
-+			mtree_unlock(revmap_mt);
-+			reset_revmap_and_unmap(mmu, may_block);
-+			return;
-+		}
-+
-+		/*
-+		 * Ignore result, it is okay if a reverse mapping erase
-+		 * fails.
-+		 */
-+		mas_store_gfp(&mas_rev, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
-+
-+		mtree_unlock(revmap_mt);
-+		kvm_stage2_unmap_range(mmu, entry & ADDR_MASK, entry_size,
-+				       may_block);
-+		mtree_lock(revmap_mt);
-+		/*
-+		 * Other maple tree operations during preemption could render
-+		 * this ma_state invalid, so reset it.
-+		 */
-+		mas_set_range(&mas_rev, ipa, ipa_end);
-+		entry = xa_to_value(mas_find_range(&mas_rev, ipa_end));
-+	}
-+	mtree_unlock(revmap_mt);
-+}
-+
-+void kvm_unmap_gfn_range_nested(struct kvm *kvm, gpa_t gpa, size_t size,
-+				bool may_block)
-+{
-+	int i;
-+
-+	if (!kvm->arch.nested_mmus_size)
-+		return;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			unmap_mmu_ipa_range(mmu, gpa, size, may_block);
-+	}
-+
-+	kvm_invalidate_vncr_ipa(kvm, gpa, gpa + size);
-+}
-+
- void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
- {
- 	int i;
-@@ -1163,7 +1299,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
- 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
- 
- 		if (kvm_s2_mmu_valid(mmu))
--			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-+			reset_revmap_and_unmap(mmu, may_block);
- 	}
- 
- 	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-@@ -1848,7 +1984,7 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
- 
- 		write_lock(&vcpu->kvm->mmu_lock);
- 		if (mmu->pending_unmap) {
--			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
-+			reset_revmap_and_unmap(mmu, true);
- 			mmu->pending_unmap = false;
- 		}
- 		write_unlock(&vcpu->kvm->mmu_lock);
--- 
-2.43.0
-
+--=-rrdXIzARangiCs7aJ2pU--
