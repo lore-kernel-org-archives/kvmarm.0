@@ -1,57 +1,50 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F0A33DEE9;
-	Sun, 10 May 2026 21:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE226242D6A;
+	Sun, 10 May 2026 22:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778448541; cv=none; b=f7w8u1RjL4jkCdjg9/t+OEsJ85E0aUhFEfD48rc0HwoUb0YVo7ece1q7ef5SJSIre84yaR4uvJN8I9253jn2fkHUEsJ1VcFlsMf7uGRPnWSLegOYWOGpy1P0CNKpNz7idMC+Zw9yj0YbUNVTd1QNlutAEMy90dzlgsmwHqYqcFI=
+	t=1778451120; cv=none; b=uY+wtrm1zfpxCjIGfRXrdOPeH9QBoadIpWaZvsq+URXiWcResPGJy7//GJhFJHGSvhP9VvTTXWWgRAxMGyjjb11Quzuvmq1EWynPptdeBGtgrT5VfCknD/Z2G6kf1D5LXFAzIGS8neFwPkuOprCb/cNFsH/c402glZXGmwZBqMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778448541; c=relaxed/simple;
-	bh=SCXS2qavV7b8E9Tk/KxVTm6QT8zvEIuv4twtPdOYGp0=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LfvcQRkQwe3gqaYFjz7sMK0nwWuRQOiJ+Yf8ZfwegtFRL5GF0HEL1EKfoOXLSBTuiENdFU+z0x8+JMsXzJmVypp9gU6lTkdxvuY/vPGRgyNcv/gVk1ToVfIrlAM2KvZDj0rsbM5XVYWr+HLoo3KLyB6eAXncaNrc9stLqbQ7pEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YmskQ2Aw; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1778451120; c=relaxed/simple;
+	bh=KAA6p2i7xNhE3MaKjO9sLKs/euAXtqyygZHVTtczz7A=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=hGpAh1hWQFZDnS/kgSi//Z69BUXitNnoq6gPg0XOrllD03Fe/B4YG5BUUjuo303tm13zc3+rXYm/l0zjEs9YjTRZWCoj2QrnwpPKZFxKAwpXHh2c861030d0H9Z0Jyw5BdpOIBEokUMy0qcfAEu12EW7uJ82zKRjpUR5BGlT7KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aFL9uz7T; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YmskQ2Aw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aFL9uz7T"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SCXS2qavV7b8E9Tk/KxVTm6QT8zvEIuv4twtPdOYGp0=; b=YmskQ2AwrdmMVKoMOSC6Jfe+Nq
-	YYf1usVqPcs28YCjZ+ZAR0a2oSV0IMaJeVOQZIMdCBufVDnj11ecJU/EURn/YtVH3YCrwdLAYdofy
-	+/Bk8u0b7bMlThqnDvoSv+D/unNgnRLhfusQi/v5EZKHDiws9OWChI7hNqakllQfQXqZrsN3jq4d2
-	d/fNHeWmIn3h3Og7Cl2taPajCn2UwHHgMbo9gTflaDPkfNG3dwXAz3tdu3udpv42iLUmXabHBSw77
-	8XJIR/EEQ+qSyyHc+r7i5vDdZ4xaeLRlg9eD3+MZKUulfRekOAJomR+gPIGBW2TrItBUgio81WfR2
-	/p/eXSfA==;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:To:From:
+	Subject:Message-ID:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=77Zg783VrPv87K9sXBqm8YiYCgmGnFlFS5aCfEu+93k=; b=aFL9uz7TmFvha+HSwKHFofi3GS
+	0kFjeVSc4UE3MqaEqC4ykQiLtwA7BWXxCGxMU9nbKqsh5nAvLXyl6K4BL5fSu2ZwJQb4lkHomcZMk
+	FJXXMqbstGNQHUhoAqhLtG8O/vcdjdD6Z3VmjW43UYsBIf81wh+jDF4VzftpRsrMm5AfXbCyhzV9j
+	hiFkIorSHZDLKkB040Svr4xp5sa0f0FGNxByJ6fmZ2EhKnaSL4CPGnXmKvQUDrcsw2BLxSsMbEpgn
+	LUwvo2Zhsk6hAtHaeuup86QM681mLxCcE81xXMIcPyYPGRRSFHaJYHeRNVf6865DOoBU+ctSyH8VE
+	udeZaQww==;
 Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u09cd745991455d.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wMBhj-00000007Hs2-1eWD;
-	Sun, 10 May 2026 21:28:52 +0000
-Message-ID: <f17a2d66e47fd15fc738d9f4ad89123a31d86eb3.camel@infradead.org>
-Subject: Re: (subset) [PATCH 1/3] KVM: arm64: vgic: Fix IIDR revision field
- extracted from wrong value
+	id 1wMCNE-00000007Jnj-2e0u;
+	Sun, 10 May 2026 22:11:45 +0000
+Message-ID: <6564c8b967948e30a8d3f35b6ef5de79dd5feeb7.camel@infradead.org>
+Subject: [RFC PATCH] KVM: arm64: vgic: Skip vCPU trylock for pre-init
+ register access
 From: David Woodhouse <dwmw2@infradead.org>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey
  Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
  Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Raghavendra Rao
- Ananta <rananta@google.com>, Eric Auger <eric.auger@redhat.com>, Kees Cook
- <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor
- <nathan@kernel.org>,  linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev,  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-  linux-kselftest@vger.kernel.org
-Date: Sun, 10 May 2026 22:28:50 +0100
-In-Reply-To: <106addd3f78918a9a584c43c181a9609aef1ceca.camel@infradead.org>
-References: <20260407210949.2076251-1-dwmw2@infradead.org>
-	 <20260407210949.2076251-2-dwmw2@infradead.org>
-	 <177702878141.537738.13460155220731277452.b4-ty@kernel.org>
-	 <106addd3f78918a9a584c43c181a9609aef1ceca.camel@infradead.org>
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Sascha Bischoff
+ <Sascha.Bischoff@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan
+ Cameron <jic23@kernel.org>, Eric Auger <eric.auger@redhat.com>, Raghavendra
+ Rao Ananta <rananta@google.com>, David Woodhouse <dwmw@amazon.co.uk>, Maxim
+ Levitsky <mlevitsk@redhat.com>,  linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev,  kvm@vger.kernel.org
+Date: Sun, 10 May 2026 23:11:43 +0100
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-rrdXIzARangiCs7aJ2pU"
+	boundary="=-Ro5SzoKkXs6S8pUv+ypN"
 User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -62,49 +55,124 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-rrdXIzARangiCs7aJ2pU
+--=-Ro5SzoKkXs6S8pUv+ypN
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2026-04-24 at 13:24 +0100, David Woodhouse wrote:
-> On Fri, 2026-04-24 at 12:07 +0100, Marc Zyngier wrote:
-> > On Tue, 07 Apr 2026 21:27:02 +0100, David Woodhouse wrote:
-> > > The uaccess write handlers for GICD_IIDR in both GICv2 and GICv3
-> > > extract the revision field from 'reg' (the current IIDR value read ba=
-ck
-> > > from the emulated distributor) instead of 'val' (the value userspace =
-is
-> > > trying to write). This means userspace can never actually change the
-> > > implementation revision =E2=80=94 the extracted value is always the c=
-urrent one.
-> > >=20
-> > > Fix the FIELD_GET to use 'val' so that userspace can select a differe=
-nt
-> > > revision for migration compatibility.
-> > >=20
-> > > [...]
-> >=20
-> > Applied to fixes, thanks!
-> >=20
-> > [1/3] KVM: arm64: vgic: Fix IIDR revision field extracted from wrong va=
-lue
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 commit: a0e6ae45af17e8b27958830595799c70=
-2ffbab8d
->=20
-> There was a v2 of this series which also cleaned up the weird
-> inconsistency of the IIDR value with the actual behaviour, and which
-> fixed the fact that it's currently not possible to maintain guest
-> compatibility when upgrading from a pre-d53c2c29ae0d kernel to a new
-> one =E2=80=94 despite the fact that that kind of compatibility is *precis=
-ely*
-> what the revision field in the IIDR is designed for.
->=20
-> https://lore.kernel.org/all/20260408113256.2095505-1-dwmw2@infradead.org/
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Is there a reason the rest of these fixes didn't make 7.1?
+When creating a VM, userspace sets pre-init distributor registers such
+as GICD_IIDR before the VGIC is initialized.
+
+Strictly speaking there's no reason this couldn't be done at VM creation
+time before any vCPUs exist at all, but the design of the userspace API
+does require vCPU0 to have been created, as the system-wide registers
+are effectively accessed via vCPU0.
+
+So a VMM can't just set the IIDR at startup before spawning vCPU threads;
+it has to be done once the vCPUs are being created.
+
+However, kvm_trylock_all_vcpus() makes it unreliable by causing spurious
+-EBUSY failures if any vCPU cannot be locked. So userspace is forced to
+create the vCPUs (well, at least vCPU0), and is then forced to have a
+full synchronization point and quiesce them all in order to reliably set
+the IIDR.
+
+To slightly reduce the pain of all this, skip the trylock when the VGIC
+is not yet initialized. There is no need to lock the vCPUs if they can't
+be accessing it anyway.
+
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+Other options would include making it possible to set the IIDR before
+creating any vCPUs, either by creating a new device-level attribute or
+special-casing it not to require vCPU0 for DIST_REGS that aren't really
+associated to a vCPU.
+
+Deprecating kvm_trylock_all_vcpus() and killing every user of it with
+fire would also be a good option, perhaps... :)
+
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 38 ++++++++++++++++++++-------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vg=
+ic-kvm-device.c
+index a96c77dccf35..e17ea9f07f5f 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -540,7 +540,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *=
+dev,
+ 	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+ 	struct kvm_vcpu *vcpu;
+-	bool uaccess;
++	bool uaccess, vcpus_locked =3D false;
+ 	u32 val;
+ 	int ret;
+=20
+@@ -566,18 +566,37 @@ static int vgic_v3_attr_regs_access(struct kvm_device=
+ *dev,
+ 			return -EFAULT;
+ 	}
+=20
++	if (!vgic_initialized(dev->kvm) && !reg_allowed_pre_init(attr))
++		return -EBUSY;
++
+ 	mutex_lock(&dev->kvm->lock);
+=20
+-	if (kvm_trylock_all_vcpus(dev->kvm)) {
+-		mutex_unlock(&dev->kvm->lock);
+-		return -EBUSY;
++	/*
++	 * Pre-init registers (e.g. GICD_IIDR) don't need vCPU quiescence
++	 * since the VGIC isn't live yet.  Skip the trylock to avoid spurious
++	 * -EBUSY when vCPU threads happen to be running.
++	 */
++	if (vgic_initialized(dev->kvm)) {
++		if (kvm_trylock_all_vcpus(dev->kvm)) {
++			mutex_unlock(&dev->kvm->lock);
++			return -EBUSY;
++		}
++		vcpus_locked =3D true;
+ 	}
+-
+ 	mutex_lock(&dev->kvm->arch.config_lock);
+=20
+-	if (!(vgic_initialized(dev->kvm) || reg_allowed_pre_init(attr))) {
+-		ret =3D -EBUSY;
+-		goto out;
++	/*
++	 * If the VGIC becomes initialized between the above check and taking
++	 * config_lock, drop config_lock to lock the VCPUS.
++	 */
++	if (vgic_initialized(dev->kvm) && !vcpus_locked) {
++		mutex_unlock(&dev->kvm->arch.config_lock);
++		if (kvm_trylock_all_vcpus(dev->kvm)) {
++			mutex_unlock(&dev->kvm->lock);
++			return -EBUSY;
++		}
++		mutex_lock(&dev->kvm->arch.config_lock);
++		vcpus_locked =3D true;
+ 	}
+=20
+ 	switch (attr->group) {
+@@ -612,7 +631,8 @@ static int vgic_v3_attr_regs_access(struct kvm_device *=
+dev,
+=20
+ out:
+ 	mutex_unlock(&dev->kvm->arch.config_lock);
+-	kvm_unlock_all_vcpus(dev->kvm);
++	if (vcpus_locked)
++		kvm_unlock_all_vcpus(dev->kvm);
+ 	mutex_unlock(&dev->kvm->lock);
+=20
+ 	if (!ret && uaccess && !is_write) {
+--=20
+2.43.0
 
 
---=-rrdXIzARangiCs7aJ2pU
+
+--=-Ro5SzoKkXs6S8pUv+ypN
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -183,21 +251,21 @@ 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
-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
+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
-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
+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
 
 
---=-rrdXIzARangiCs7aJ2pU--
+--=-Ro5SzoKkXs6S8pUv+ypN--
