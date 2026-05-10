@@ -1,138 +1,158 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BB132D0D8
-	for <kvmarm@lists.linux.dev>; Sat,  9 May 2026 23:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B86339B951
+	for <kvmarm@lists.linux.dev>; Sun, 10 May 2026 14:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778369688; cv=none; b=jZYrzlrV9vBEvkGV+fhVtL9dtZ50h60e3b0TwhmyqngIMiKUkzN0xejgVLPQq436GOzfEociAo4JA6/VkGgIxytBR7eIydTh20tuR+iqpPuhc4LMk4J79OPLsNlpK8KFrI/sS3vY7bXUFq/N6V/P3rwWA1yMSwPr0kx59mM0jo4=
+	t=1778424864; cv=none; b=Jdsm6Adj9moJAm6AcoFOydIADFV5t5SWcNgJ6AdEotfgI/TpjB95DXVLIDAD9xdALRm7TsDvU2A3x2j+DSq9FcZnbzVL2fkLf8DTnDlTjkpecgQ6zwYrE6RwF50+NYp6UqWCiL2HWI6/IT9csXtnqkwMm3p4KbOSFox/lA5mH70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778369688; c=relaxed/simple;
-	bh=viE2tZT/M+fmeTU3fRuSrMwCvMP+jn8S3W++VN5Bl0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tjRBj1RAthrRbmOjfON7UmzzTChT68IQRGmEv9FfEreMpyc43eaxN+qhhoa+TMOGphgo6ptgjxSp5uiF/ZahEEwmq/j5K3qa78HIjTU6cJ8gJMewG03QX1a54US968xX3CPqo0qkVsQKXeSxFCoyiR5KBWmjk8uoO4nOkARDgk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R4XcU/RY; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1778424864; c=relaxed/simple;
+	bh=htsQJlRBS06zME+hYGhGVA/iLnzz79Qd5j+6CmUrf6s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sZa+iZGg1kfkRlVpCe9LpVoRd0fNFBNMZwAH5s9oBQYm4owuufSuXlQPden4pZQhJ2tXPcXELyt6F0BMz7VGP3+xFVFNXeXjudkCFO0NQbXlDvlRl2ZVd+5poSWrZ5/m0lQ3M7vn2xlFSojDzyh7ynlGKc5ttIK6Le0uslA3PrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=imSHh8YE; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R4XcU/RY"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-514ae601df2so1331431cf.0
-        for <kvmarm@lists.linux.dev>; Sat, 09 May 2026 16:34:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1778369686; x=1778974486; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=t6tLt4US09DyLso/mhdji9Hp8lkbi3csRWs2bmEy9sU=;
-        b=R4XcU/RYKFBXFTaONdVKP4n+LPB81y9dWQ32Wr2E+uFGBfCEYZyQt+lRGAvpn8rRtf
-         VkU3Pl9OzlgfJWx1FUHVTMUZLN52tJajiVPHmOBK2mTMIH0NLVZfAw3j43ITJfsgkqh+
-         xFy9SPg3tyOcoK4UR7bruur+aMDwKnr59I8el9xDc9ykYpwYty0wDt3VCctsr6M9rVwP
-         3H/wt/XshOqT6YQe5KLDQ7rYsfjAgHo5bI2Y2/6v7ZQHuwxaxdjij34x5iiFL2y/Ya9Y
-         /2oNI8+ByzevTZbCnN19465pDbaKTgASdipYbq7o5jGHwp+M6toGbH9c7kn/LZRAzERO
-         YElQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778369686; x=1778974486;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t6tLt4US09DyLso/mhdji9Hp8lkbi3csRWs2bmEy9sU=;
-        b=kaTweNtu/JnyU4Lt4rfeJ/JhfXHsxqmuIsGR1Q5Oy0rLHUu01CDT2eISQ5y9fYhQfX
-         vHF88xGqZ8N46BnBirbuKUWKBebjPjwDSzGs06jySTCiD4f33HKA5r0A4K/RSWqfZudE
-         j+1wRDqyDZ2IwNNyGEScl+EgG5LGDSO8LFwSElyiBMZS4Txabpa3opmUw2MBrGN2oFco
-         A3IA2TPvwNb4tDYbQ0zSUEuf4G/ANZ20w+GoPy5sbSFuO28LVwperxwvZcxm+JDS3onC
-         yvIdvgxoMfvCYk5lfnkpC4mIbva1CNGaP4kalYdy4NmbNBQA15nOgbo24Z2ke2XkpVo5
-         9GlQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+FBao18iiRtPMF/JCOWwKwG1pqzwypTDOyOwd0bKDCmklb7hynJRu8G+Lw0rwiJpSGa8okFmg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxOGfzL+ZGsjRXVtHb78JZ5vhAD3mDIzcbL/hTNJPw14dbXqjVg
-	Sv4iV39HoRiyFWvSqaXzRvz3Ak2OyuAewl9NDjqNyEjpC+WnwUxLHFgudhWAooQsaYc=
-X-Gm-Gg: Acq92OHqeXzOxmFU7O4TZNqVNlAH8dAY/hEhW7HEAIIOsiwOUyQdt14TjQUEVVTOcsA
-	49lD06n+YuHSl5R/hr5E6Grp6zGA9tY/3/knrY7335zFa2pivFhBJ0aY9/QVl/4USq53+fGuCov
-	NMR2/RgJqx+tLn4AxcJ+YdnVolVNmrNYuPv+SE+4V8VE0Q9cdE4Jxz2SkOK5YPNm/mw+iKl1r7P
-	Z6djxPlM7VACKukLnIj5AiTggvWrPRaE1XSOv/Q1M2iwkJ2MlA178peSSturFe4vcsf+xleW06x
-	0jwxcHlG4BX3cmnujJ/fjjhGLec6IlhKv7KhnxHaPHR/Lly8ioj2zBhstYFNq5ED7ybhGCEJLEy
-	kP50xIDJStNvhyaCKVmsNPhFhuCjyoNd9a3eE31gtNQqiiWIZ4J4mqAfkkx35O4bb4y9IhS4WG5
-	X2j074JxqB1DRQHLKJuMOTnpQX3WLzr5ClpCRslkJ3o8IupKlFCwgnbqMtP0LttntkDU85JBsWY
-	Q9ngC3ZUi22A16E
-X-Received: by 2002:a05:622a:5a9b:b0:50e:6139:492b with SMTP id d75a77b69052e-51461c3620dmr247096161cf.23.1778369685834;
-        Sat, 09 May 2026 16:34:45 -0700 (PDT)
-Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5148e7e3d90sm51028881cf.20.2026.05.09.16.34.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 16:34:44 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1wLrBz-00000002ONN-38VG;
-	Sat, 09 May 2026 20:34:43 -0300
-Date: Sat, 9 May 2026 20:34:43 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 05/25] iommu/arm-smmu-v3: Move IDR parsing to common
- functions
-Message-ID: <20260509233443.GK9285@ziepe.ca>
-References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-6-smostafa@google.com>
- <20260501124716.GD6912@ziepe.ca>
- <afiODW2sVMeOj3Ag@google.com>
- <afoagb/wVBJD1IX+@ziepe.ca>
- <afofSPQbepd_fpom@google.com>
- <afsQTwO3eW+Ks2fe@ziepe.ca>
- <afxlufh3t3hRe4-G@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="imSHh8YE"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A22872938;
+	Sun, 10 May 2026 07:54:16 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 915863F836;
+	Sun, 10 May 2026 07:54:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1778424861; bh=htsQJlRBS06zME+hYGhGVA/iLnzz79Qd5j+6CmUrf6s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=imSHh8YEQCrEqL+SqwMuw0wVtDp2VlrsfY+XNmLoTkFMi1XHjAWHuX6F0GqixrUY+
+	 xgghmVmEGCIYpzcwpg056PdqPnBNBIMn1+UD0BDxk7WM1Tt9u3O9olYQ8xBNbF08iZ
+	 Jk2nAdsFe2i5UYnj8bfi+MxwMR8aE8G6zjEtuYmM=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v3 4/5] KVM: arm64: nv: Remove reverse map entries during TLBI handling
+Date: Sun, 10 May 2026 15:53:37 +0100
+Message-ID: <20260510145338.322962-5-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260510145338.322962-1-weilin.chang@arm.com>
+References: <20260510145338.322962-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <afxlufh3t3hRe4-G@google.com>
 
-On Thu, May 07, 2026 at 10:13:13AM +0000, Mostafa Saleh wrote:
-> > I was thinking more like
-> > 
-> > #define arm_smmu arm_pkvm_smmu
-> > 
-> > Before the pkvm compile of the shared code. 
-> 
-> Oh, so we rely on arm_pkvm_smmu and arm_smmu having the same field
-> names and types?
+When a guest hypervisor issues a TLBI for a specific IPA range, KVM
+unmaps that range from all the effected shadow stage-2s. During this we
+get the opportunity to remove the reverse map, and lower the probability
+of creating UNKNOWN_IPA reverse map ranges at subsequent stage-2 faults.
 
-Just for the shared code, yes.
+However, the TLBI ranges are specified in nested IPA, so in order to
+locate the affected ranges in the reverse map maple tree, which is a
+mapping from canonical IPA to nested IPA, we can only iterate through
+the entire tree and check each entry.
 
-For instance this patch would require the features field be present in
-both, and then all you do is directly copy all the smmu->features
-logic into the shared file and that's it.
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+---
+ arch/arm64/include/asm/kvm_nested.h |  2 ++
+ arch/arm64/kvm/nested.c             | 38 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           |  3 +++
+ 3 files changed, 43 insertions(+)
 
-> I don’t think that’s better for maintainability, I can look into it
-> if Robin and Will are OK with that.
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 5cbf78dfc685..b11925826b25 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -76,6 +76,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+ 				       const union tlbi_info *info,
+ 				       void (*)(struct kvm_s2_mmu *,
+ 						const union tlbi_info *));
++extern void kvm_remove_nested_revmap(struct kvm_s2_mmu *mmu, u64 nested_ipa,
++				     size_t size);
+ extern void kvm_record_nested_revmap(gpa_t gpa, struct kvm_s2_mmu *mmu,
+ 				     gpa_t fault_ipa, size_t map_size);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 35b5d5f21a23..96b88d9c0c2a 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -784,6 +784,44 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 	return s2_mmu;
+ }
+ 
++void kvm_remove_nested_revmap(struct kvm_s2_mmu *mmu, u64 nested_ipa, size_t size)
++{
++	/*
++	 * Iterate through the mt of this mmu, remove all canonical ipa ranges
++	 * with !UNKNOWN_IPA that maps to ranges that are strictly within
++	 * [addr, addr + size).
++	 */
++	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
++	void *entry;
++	u64 entry_val, nested_ipa_end = nested_ipa + size;
++	u64 this_nested_ipa, this_nested_ipa_end;
++	size_t revmap_size;
++
++	MA_STATE(mas_rev, revmap_mt, 0, ULONG_MAX);
++
++	mtree_lock(revmap_mt);
++	mas_for_each(&mas_rev, entry, ULONG_MAX) {
++		entry_val = xa_to_value(entry);
++		if (entry_val & UNKNOWN_IPA)
++			continue;
++
++		revmap_size = mas_rev.last - mas_rev.index + 1;
++		this_nested_ipa = entry_val & ADDR_MASK;
++		this_nested_ipa_end = this_nested_ipa + revmap_size;
++
++		if (this_nested_ipa >= nested_ipa &&
++		    this_nested_ipa_end <= nested_ipa_end) {
++			/*
++			 * As the shadow stage-2 is about to be unmapped
++			 * after this function, it doesn't matter whether the
++			 * removal of the reverse map failed or not.
++			 */
++			mas_store_gfp(&mas_rev, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
++		}
++	}
++	mtree_unlock(revmap_mt);
++}
++
+ void kvm_record_nested_revmap(gpa_t ipa, struct kvm_s2_mmu *mmu,
+ 			      gpa_t fault_ipa, size_t map_size)
+ {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 6a96cb7ba9a3..a97304680cee 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4006,6 +4006,7 @@ union tlbi_info {
+ static void s2_mmu_unmap_range(struct kvm_s2_mmu *mmu,
+ 			       const union tlbi_info *info)
+ {
++	kvm_remove_nested_revmap(mmu, info->range.start, info->range.size);
+ 	/*
+ 	 * The unmap operation is allowed to drop the MMU lock and block, which
+ 	 * means that @mmu could be used for a different context than the one
+@@ -4104,6 +4105,8 @@ static void s2_mmu_unmap_ipa(struct kvm_s2_mmu *mmu,
+ 	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
+ 	base_addr &= ~(max_size - 1);
+ 
++	kvm_remove_nested_revmap(mmu, base_addr, max_size);
++
+ 	/*
+ 	 * See comment in s2_mmu_unmap_range() for why this is allowed to
+ 	 * reschedule.
+-- 
+2.43.0
 
-I think maintainability here means pkvm minimizes how much it changes
-the code of the main driver.
-
-Copying a bunch of functions into a shared .c file exactly as it is,
-then compiling the shared file with some #ifdef'ery at is going to be
-long term better than trying to mangle the whole thing to avoid using
-any of the core types and not directly share the code, IMHO.
-
-Like my tlbi point for instance, it is not a good idea to rip out a
-little bit of the invalidation logic then open code a pkvm
-version. Use the exact driver code. But to do this you need to pass an
-arm_smmu through to to the pkvm specific queue management functions.
-
-> > How does pkvm compilation work anyhow? Is it all rolled into a unique
-> > link, or do you have to worry about symbol conflicts with the main
-> > kernel?
-> 
-> All pkvm symbols are prefixed with __kvm_nvhe_ in the main kernel.
-
-So automatically with objcopy or something like that during the build?
-
-Jason
