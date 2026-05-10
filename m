@@ -1,31 +1,30 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FEA139D6EC
-	for <kvmarm@lists.linux.dev>; Sun, 10 May 2026 14:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B98388E72
+	for <kvmarm@lists.linux.dev>; Sun, 10 May 2026 14:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778424864; cv=none; b=TlU/6YDE6jG45ZeAZ70981mOsUhF+WGN4RuaO5SfmbdIjij017TUxpI9tNQaKyzD1gETCHh71RaX+jHJbIFR2Orxk1pi/bG2eV0U8eYX5TVxwjLnx9mOc3pL+syd3gLr8G7lNpMUTSIZXy1FK4amALr3ryrJwZ0V/5PRg4fiLww=
+	t=1778424865; cv=none; b=sMBAOjoNF7qtyTqa1Bpz9bIDaA7Q4Vn15+EKPKQGzPQWLxiZGCJXdKQr6v+cjTdC51+mnJiEMH1VSur37Bt9DznurSmDawEhLMq06t6Bfin7yf6KlrH0JG13M+p/g0BVjcgDjvbwGJQViCLtZH+JM8e/NCleG4LvAeY0c2ol7vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778424864; c=relaxed/simple;
-	bh=lwnpRiOgHSXv6Wdc+Q1IaXvZ4XNXi6T0Q1XkzBl0AqM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AkS5xt1JZ1qAg50TOLB3qsV/iFmfX5tmQwqBShNe+YUHHVR3CLw3wT5rCDgyD3TDO7UfmgNrnZY+Fmffp+B2KYTPoZwA23N5nuK6baZfqUyv/EnPSMN7orWJY5hUgh1G4X9lQ6eg/c/UUiMbZG1TAggJ6dbIRaGcqLSkrib7qKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=n+eSL8vZ; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1778424865; c=relaxed/simple;
+	bh=VYxBiY24h03tiLKCKU1MSqB/0xqzgQWJIyjoe5z/fSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bLlVCjHYA6A1egZGMUaXGUgQiPjiHtV+8K1FUbSrTtJsxwqSTgS+6QiB5WTRxOiZe8RqWlO1H807VP5jL3hksQaBM+mV1/xC4Z3TJVj31bPAskDQpCLXH1XJrQk/zZ8XhqNpKT0Eb+Yt0ggl8B94HM64YCHn1zQcO96poOY0r1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Rka61JTu; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="n+eSL8vZ"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Rka61JTu"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CE5627B5;
-	Sun, 10 May 2026 07:54:11 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E135F1D13;
+	Sun, 10 May 2026 07:54:09 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74EA23F836;
-	Sun, 10 May 2026 07:54:15 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C80E23F836;
+	Sun, 10 May 2026 07:54:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778424856; bh=lwnpRiOgHSXv6Wdc+Q1IaXvZ4XNXi6T0Q1XkzBl0AqM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=n+eSL8vZC3Yo8PcRWxnD55+5D0P+TgPrOL/fco4Em4zvoDbZin1x1JPbfJHL4/BuY
-	 NYhbP8b1fhny6BbLMVVcMzYnJp1kuzrB5Bmu/8Pj6o5C0s7jx5JvA01oGaerU5zO25
-	 sGMj7p7jy9Rt6cESpP6/92tuylxEIv+NKa7jxYXA=
+	t=1778424855; bh=VYxBiY24h03tiLKCKU1MSqB/0xqzgQWJIyjoe5z/fSg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Rka61JTu1CsueQ86DnzZVem2PUA3yQTxo1jUnXzPgfs4eezOnsefjvySxeydpwHSq
+	 4aTW8AOA+15xe3RLfifA8WoYpIwwMsr3fZvJXH2dnkQmECVFpQcIFoEza6ABOT2dx4
+	 VTcO2j8J3EfBQR3uCZtLiZ5S0GL1oaYiUKeFHwgM=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -38,12 +37,10 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 1/5] KVM: arm64: Use a variable for the canonical GPA in kvm_s2_fault_map()
-Date: Sun, 10 May 2026 15:53:34 +0100
-Message-ID: <20260510145338.322962-2-weilin.chang@arm.com>
+Subject: [PATCH v3 0/5] KVM: arm64: nv: Implement nested stage-2 reverse map
+Date: Sun, 10 May 2026 15:53:33 +0100
+Message-ID: <20260510145338.322962-1-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260510145338.322962-1-weilin.chang@arm.com>
-References: <20260510145338.322962-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,58 +49,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a variable to store the canonical GPA, instead of calculating it
-when needed. This will be useful when we need to use the canonical GPA
-for the nested reverse map later.
+Hi,
 
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/kvm/mmu.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+This is v3 of optimizing the shadow s2 mmu unmapping during MMU
+notifiers.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d089c107d9b7..e4becd5cdf36 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1981,6 +1981,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 	long mapping_size;
- 	kvm_pfn_t pfn;
- 	gfn_t gfn;
-+	phys_addr_t canonical_gpa;
- 	int ret;
- 
- 	kvm_fault_lock(kvm);
-@@ -1994,6 +1995,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 	mapping_size = s2vi->vma_pagesize;
- 	pfn = s2vi->pfn;
- 	gfn = s2vi->gfn;
-+	canonical_gpa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
- 
- 	/*
- 	 * If we are not forced to use page mapping, check if we are
-@@ -2012,6 +2014,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 				goto out_unlock;
- 			}
- 		}
-+		canonical_gpa = ALIGN_DOWN(canonical_gpa, mapping_size);
- 	}
- 
- 	if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
-@@ -2045,11 +2048,9 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 	 * making sure we adjust the canonical IPA if the mapping size has
- 	 * been updated (via a THP upgrade, for example).
- 	 */
--	if (writable && !ret) {
--		phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
--		ipa &= ~(mapping_size - 1);
--		mark_page_dirty_in_slot(kvm, s2fd->memslot, gpa_to_gfn(ipa));
--	}
-+	if (writable && !ret)
-+		mark_page_dirty_in_slot(kvm, s2fd->memslot,
-+					gpa_to_gfn(canonical_gpa));
- 
- 	if (ret != -EAGAIN)
- 		return ret;
+Two new preparatory patches are added, one reduces a hole in kvm_s2_mmu
+and another refactors the code a bit during s2 faults. Other changes are
+listed below.
+
+* Changes from v2 [1]:
+
+  - Removed "polluted" teminology.
+
+  - Use xa_{mk, to}_value() when storing and retriving values from maple
+    trees.
+
+  - Avoid using the 63rd bit in maple tree values so that xa_{mk, to}_value()
+    does not lose us a bit.
+
+  - Added reverse map removal during TLBI handling.
+
+  - Other suggested refactorings.
+
+Thanks!
+
+[1]: https://lore.kernel.org/kvmarm/20260411125024.3735989-1-weilin.chang@arm.com/
+
+Wei-Lin Chang (5):
+  KVM: arm64: Use a variable for the canonical GPA in kvm_s2_fault_map()
+  KVM: arm64: Move shadow_pt_debugfs_dentry to reduce holes in
+    kvm_s2_mmu
+  KVM: arm64: nv: Avoid full shadow s2 unmap
+  KVM: arm64: nv: Remove reverse map entries during TLBI handling
+  KVM: arm64: nv: Create nested IPA direct map to speed up reverse map
+    removal
+
+ arch/arm64/include/asm/kvm_host.h   |  17 +-
+ arch/arm64/include/asm/kvm_nested.h |   6 +
+ arch/arm64/kvm/mmu.c                |  43 +++--
+ arch/arm64/kvm/nested.c             | 238 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/sys_regs.c           |   3 +
+ 5 files changed, 290 insertions(+), 17 deletions(-)
+
 -- 
 2.43.0
 
