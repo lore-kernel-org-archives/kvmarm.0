@@ -1,170 +1,135 @@
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F05E27442
-	for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 11:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF9B36D9EA
+	for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 11:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778497412; cv=none; b=GIRoOK15Qage0OChco2+oNAaC3ArrYE5nfXZTpCA2lf/p/ELyAhvLGjnS/cn5Jo8BOK/JFxtSnR0XzQHJq748s1Bia92Va3xE7b3AxWN215Ldhravh382RDbMpq3M3WEwFckmwsJ/4TbQ04rK+MkOwrQP9HOc4fDe22DE5yTfLY=
+	t=1778498214; cv=none; b=TzXS8iL+DJHl4I/n8bfku73XzN9SvVt8Nz4DjkJ4ZO9I1fF3ajtJuK7KOEXsBjSsiZGfu8ju+V6I1kWwJf0Ec7Ve/sLBrF65erGCp7slteixz6kSism7aXyjuv3czyP3N9Xv/TDx8jVA++Juww6oS/bWEWg8DVozkHiH/+wrqmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778497412; c=relaxed/simple;
-	bh=FYqnlFCwpb8xs6n1vwK8VK227l3P1BAeHI69gKZCA54=;
+	s=arc-20240116; t=1778498214; c=relaxed/simple;
+	bh=aWrmuPCEUpNW6pyyMCyT3Ev0vO66QbU8APlpujnwPUQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFNkjRhTgGTIiI7sYdcBcecm/aeeydycaLJ8NkHdZs/2hmgkxL2Zs7aFuQkqDXxlEXsgEenRGWIvcr1ahNeIxkqOmCNiGFF299bLBKuBbBDuxKu41Ghk7T0A4S7uJApF4BKK5s6sbivXZYxtNg8y9FhPOuhS8CFfY8LD1S2N6nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Hftlqm7p; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=PyECEdV57cPn2UjqgBlvdr8EcRccQtUY0LrfgFzxTvps410IWEC9OKSSP8fT9vy7RLeaQThnenfLVcZ/tF562M6Es3VBC9XpitgepmrCgCIlAZuYyype7XhS6ByTKHJmAwIB/iGZkdp5IUgfYGlufvEkuF0hhFQiSpXKslarqxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQznqZCi; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Hftlqm7p"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1778497406; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=aa3sqwAfHWDJfAzPcUpQ5Gk/NxgBvpG/vZ758TZknkk=;
-	b=Hftlqm7pHI74nu3am2itjXSOKa8Ewev8BdcO0FDr/LSaBt2V7lFrcVepyryI0hKXPsG2RkRY5RoqexnOKA6zNoCKvmlQ43z2uiinY2yxGe92G974GRy2HuQ3g7SsnRgqpIe0gMvDM8Q1fENuyRjfFmqSjpRQtvbPH7tzNYnzPyM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R451e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X2iOJIK_1778497405;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X2iOJIK_1778497405 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 11 May 2026 19:03:26 +0800
-Date: Mon, 11 May 2026 19:03:25 +0800
-From: Yao Yuan <yaoyuan@linux.alibaba.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Sascha Bischoff <Sascha.Bischoff@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Cameron <jic23@kernel.org>, 
-	Eric Auger <eric.auger@redhat.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH] KVM: arm64: vgic: Skip vCPU trylock for pre-init
- register access
-Message-ID: <3ijnoudux4iyddpd25yr53s2zqrslplixjqfod225ix43y4z4a@heoklijpq45f>
-References: <6564c8b967948e30a8d3f35b6ef5de79dd5feeb7.camel@infradead.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQznqZCi"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488940ccfa6so305e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 04:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778498211; x=1779103011; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mjFxAsYJ767LfglQAiic8pmf/v4fVUq2j4oVrXIto5c=;
+        b=SQznqZCi8mv+rE6qlz33SVquPCr58Znloijir/WGQKn3ZjhLL3+wPQseXtvqDndBNI
+         WoHutkhimaz9TayCb+Xjwrwc0L4ZNsPkFkmievdJ2m+dNmmd7gvb3khTces1/bIAbmak
+         7F/+Y07lZqXr6NlwJNJAhjUMyJMKXIplHu52GQEb3mz8w2/+S1jutU22mccQsCC8XmBg
+         jlLc5mheZCp249taZ8dNdXvEZuyaxraDHqjcA0ET3vcjhATYM+t2Lf1ih9Jck24pdQ+L
+         I9lZukb2FS/T1B/gRUuk13/HiYfeUEcG2W2zhcdVlpvxaEwiN2Gqb7c1DS8qOBZxKh/C
+         +c7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778498211; x=1779103011;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mjFxAsYJ767LfglQAiic8pmf/v4fVUq2j4oVrXIto5c=;
+        b=EdAXp5igjZVkqmNT0Y19QH7pBaYWL9UkqK1iK2MS8hGLlUqgyXS+nDYtPcphdqteiJ
+         1Qnx6vEWZHaszg/k4nIGYo355r5l7hw3N67BpgCUUwJ2b0rQPiM+qj9x8ooSPpa3qZMz
+         UdxhaxFvar4iBUR+VDjUTjGPw0cQCXmgy8LJpkPd7vbk++Dt4bUYm7yOENLc6KPJvjmO
+         2Ns7eth1SoL/v/KTHaaxRMGXFsVMA7+9FxPdwNoh9FBccMiyXgQeForAV35+kSNDaD/w
+         tHUKc+BUOwOUlsfgGNJja3SemmnzHmYmMk/I8SiZ5cXCnuhdVkIhHKTc6R/NfXRUvCH2
+         87zg==
+X-Forwarded-Encrypted: i=1; AFNElJ+AU0BbXOwXx4tGCe+bGw6Cvz0TM0/rhzbYo3LQdde44/15c5Iytkzxym+qQVGpcjkuP4ChBaU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz6qzXdwgXnNgkTUBUtQx7vcpvAwJ6Xqt84dnkcwkKg56Tt2klo
+	nIwzRm5g+lGustpgpWi3hsAchpMtlm4BAxyEjMh3vCYV2HMBlU7E06xvBPNRNblFQw==
+X-Gm-Gg: Acq92OEPIAjNxUn/SxQ2elvVBSY++2c1138nC5qill6YkUTgo/6cgrQy9grVUgJJF6E
+	feHPH+JM4gwQnJ0tJn0aLCcD7dTGiwsEBI7TQpuKe8/KWoHbFU1doqIvAEWBYvLfq6192WHiXaM
+	Yv3bk/omjh4t0rbFh2Shpt9LcgeUWyM6LGJzTo/A0nWb1hWS+TKT35vyUeWr9aEPTV1kiQSwGig
+	oaM3kNHKos7K0g75FkaD+X3f2DZ0lTt+yJvP/7CLEXTRpXRBBbXiZbXv+4blDaW+jiuT7vDJLyz
+	y+AeBX4uxc3p5acCb7xIhhDixirWZl7xy9K0gSvzr8vilrZLwLerqgZVRiIt0Yql33sQp4MS1TK
+	utsfBXtCq8+wOgkt3V5+VEVLyWb+hTav/034qD1L+eGILVvEzqAufLH0kAXB5wUsWhHgMj00rrh
+	4oiK4+bbWo8FbZs7vVVO8tD4EWzA/JoqOd8BbXBNQ3hHQEg1A4UQBht3ZrIul6RxJCOYk=
+X-Received: by 2002:a05:600c:c3db:10b0:48a:5d55:c194 with SMTP id 5b1f17b1804b1-48e6f507bc1mr1377065e9.7.1778498211122;
+        Mon, 11 May 2026 04:16:51 -0700 (PDT)
+Received: from google.com (8.181.38.34.bc.googleusercontent.com. [34.38.181.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548eb75c29sm24522316f8f.9.2026.05.11.04.16.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 04:16:50 -0700 (PDT)
+Date: Mon, 11 May 2026 11:16:47 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 06/25] iommu/io-pgtable-arm: Rework to use the
+ iommu-pages API
+Message-ID: <agG6n4CeuIMD57G1@google.com>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-7-smostafa@google.com>
+ <20260501122424.GA6912@ziepe.ca>
+ <afiO2WL4ILGfmUui@google.com>
+ <20260509232155.GH9285@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6564c8b967948e30a8d3f35b6ef5de79dd5feeb7.camel@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260509232155.GH9285@ziepe.ca>
 
-On Sun, May 10, 2026 at 11:11:43PM +0800, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
->
-> When creating a VM, userspace sets pre-init distributor registers such
-> as GICD_IIDR before the VGIC is initialized.
->
-> Strictly speaking there's no reason this couldn't be done at VM creation
-> time before any vCPUs exist at all, but the design of the userspace API
-> does require vCPU0 to have been created, as the system-wide registers
-> are effectively accessed via vCPU0.
->
-> So a VMM can't just set the IIDR at startup before spawning vCPU threads;
-> it has to be done once the vCPUs are being created.
->
-> However, kvm_trylock_all_vcpus() makes it unreliable by causing spurious
-> -EBUSY failures if any vCPU cannot be locked. So userspace is forced to
-> create the vCPUs (well, at least vCPU0), and is then forced to have a
-> full synchronization point and quiesce them all in order to reliably set
-> the IIDR.
->
-> To slightly reduce the pain of all this, skip the trylock when the VGIC
-> is not yet initialized. There is no need to lock the vCPUs if they can't
-> be accessing it anyway.
->
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
-> Other options would include making it possible to set the IIDR before
-> creating any vCPUs, either by creating a new device-level attribute or
-> special-casing it not to require vCPU0 for DIST_REGS that aren't really
-> associated to a vCPU.
->
-> Deprecating kvm_trylock_all_vcpus() and killing every user of it with
-> fire would also be a good option, perhaps... :)
->
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 38 ++++++++++++++++++++-------
->  1 file changed, 29 insertions(+), 9 deletions(-)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index a96c77dccf35..e17ea9f07f5f 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -540,7 +540,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
->  	struct vgic_reg_attr reg_attr;
->  	gpa_t addr;
->  	struct kvm_vcpu *vcpu;
-> -	bool uaccess;
-> +	bool uaccess, vcpus_locked = false;
->  	u32 val;
->  	int ret;
->
-> @@ -566,18 +566,37 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
->  			return -EFAULT;
->  	}
->
-> +	if (!vgic_initialized(dev->kvm) && !reg_allowed_pre_init(attr))
-> +		return -EBUSY;
-> +
->  	mutex_lock(&dev->kvm->lock);
->
-> -	if (kvm_trylock_all_vcpus(dev->kvm)) {
-> -		mutex_unlock(&dev->kvm->lock);
-> -		return -EBUSY;
-> +	/*
-> +	 * Pre-init registers (e.g. GICD_IIDR) don't need vCPU quiescence
-> +	 * since the VGIC isn't live yet.  Skip the trylock to avoid spurious
-> +	 * -EBUSY when vCPU threads happen to be running.
-> +	 */
-> +	if (vgic_initialized(dev->kvm)) {
-> +		if (kvm_trylock_all_vcpus(dev->kvm)) {
-> +			mutex_unlock(&dev->kvm->lock);
-> +			return -EBUSY;
-> +		}
-> +		vcpus_locked = true;
->  	}
-> -
->  	mutex_lock(&dev->kvm->arch.config_lock);
->
-> -	if (!(vgic_initialized(dev->kvm) || reg_allowed_pre_init(attr))) {
-> -		ret = -EBUSY;
-> -		goto out;
+On Sat, May 09, 2026 at 08:21:55PM -0300, Jason Gunthorpe wrote:
+> On Mon, May 04, 2026 at 12:19:37PM +0000, Mostafa Saleh wrote:
+> > > So.. I suggest you update it to use the iommu_pages API, #ifdef out
+> > > the allocator so the pkvm pkvm doesn't need to deal with it. Then
+> > > compile a special iommu-pages for the pkvm side presenting the same
+> > > API.
+> > 
+> > I see, we still need to leave the DMA-API calls for the custom config,
+> > as I am not sure if it can use pages not backed by the vmemmap, I
+> > pushed that into a separate function so it’s easily compiled out.
+> 
+> Yeah..
+> 
+> > Without this patch, now it looks like:
+> 
+> Seems reasonable, and then i'd probably just put something like
+>    #define dma_map(...)
+>    #define dma_umap(...)
+> 
+> To effectively take it out of the pkvm build
+> 
+> Then have a pkvm compile of iommu-pages to provide the functions in a
+> pkvm compatible way. I guess you can't actually fully do this, but
+> can do enough to support this file at least.
+> 
+> > > You should have a pkvm shim header that provides
+> > > kmalloc/kfree/virt_to_phys in the normal way and just #include that in
+> > > io-pgtable when doing a pkvm build instead of hacking up all the code.
+> > 
+> > Ok, I can do that in another change, but I believe it's better to
+> > change the usage in this file to arm_lpae_*(virt_to_phys...) so it's
+> > clear which parts are intended for that.
+> 
+> IDK, why? virt_to_phys() is part of the iommu-pages API, I'd just
+> leave it.. If you want to narrow it then #define it for pkvm when
+> compiling this file..
 
-Hi David,
+It is not going to be part of the iommu-pages API, I meant in
+io-pgtable-arm, we will use something arm_lpae_virt_to_phys()...
+which is then implemented differently for pkvm.
 
-> +	/*
-> +	 * If the VGIC becomes initialized between the above check and taking
-> +	 * config_lock, drop config_lock to lock the VCPUS.
-> +	 */
-> +	if (vgic_initialized(dev->kvm) && !vcpus_locked) {
-> +		mutex_unlock(&dev->kvm->arch.config_lock);
-> +		if (kvm_trylock_all_vcpus(dev->kvm)) {
-> +			mutex_unlock(&dev->kvm->lock);
-> +			return -EBUSY;
-> +		}
-> +		mutex_lock(&dev->kvm->arch.config_lock);
-> +		vcpus_locked = true;
+Thanks,
+Mostafa
 
-Question: Why not do vgic_initialized(dev->kvm) and
-reg_allowed_pre_init(attr) checking after take config_lock,
-and depends on the checking result to decide trylocak all
-vcpus or not ?
-
->  	}
->
->  	switch (attr->group) {
-> @@ -612,7 +631,8 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
->
->  out:
->  	mutex_unlock(&dev->kvm->arch.config_lock);
-> -	kvm_unlock_all_vcpus(dev->kvm);
-> +	if (vcpus_locked)
-> +		kvm_unlock_all_vcpus(dev->kvm);
->  	mutex_unlock(&dev->kvm->lock);
->
->  	if (!ret && uaccess && !is_write) {
-> --
-> 2.43.0
->
->
+> 
+> Jason
