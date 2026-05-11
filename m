@@ -1,66 +1,49 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA377401A3C
-	for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 14:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD23E30F526
+	for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 15:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778511438; cv=none; b=Q4qPkkK1aFbijJrinRm8eFjeI5zVFJkvPlVfbUfgIbBdQExMUUT2OWAELu/jR+Fc8e+G++/+E4CxuLcnB3DkMka9aOGPrI3tJKy66rkNF2yTVDP7jaWSE+dMG/9wUZm+Dv3qn4GovINVM57mwpSadbbK81rCdMmSEC75YH4cqrI=
+	t=1778512503; cv=none; b=t8ufFG4dkSqQlt5/kRRYs3xHykuP6hB/Ppn/2KVxv/hx2z0EuBynym02Kq3/qA7+Zltv/KXU5QFdvqRndaH2DLysQL+axBKGvU9XutOm5WwMkKuK5tAt7uAP2LLDk4Dj55b6MFwoRpl6jsUBhX/RUi3rPf4DH06tI1ojkFgu700=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778511438; c=relaxed/simple;
-	bh=c0RkyRD1+LsDGq+lgiZuLPBDy9Zez13veFxZm7K1y9w=;
+	s=arc-20240116; t=1778512503; c=relaxed/simple;
+	bh=hzDHO2geL5UT1GbX8y8vqoSOsjXy+ECCYRicoP1YYUk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OWpUpE8yconPuP9AGhTSHDAP4xIRAKEglwxG/jxzJ8Bq1b417zj1M4HdtE9Nl36LlocStRxewMN9Jc5wsR+8R+xVm4qEGhXXU+azH5MYCqcN3UYyMaYeplqEIBIn4KXS5DB9WM8VugSxEilXQGmRv13oKJPamE86x44yy25DZ2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xfzrZxUJ; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 In-Reply-To:Content-Type; b=iYyf6mLqiaA35cxOLn5sW8k/8FvFUcfsgWlItTwx6+6Yus93ZSxk86Dr0x1ygJQHc5swgULKh0bWDn2UYZFrS1O84mpLlPyIOkFV5Xw0WCFxH2DJvj7asKEaCs0GNiKyZecCUGbKw1IvQ/nTOkgtCTztr/u5/eOKFxpJEdQYf+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T512F1mh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xfzrZxUJ"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43fe3e22e33so2611669f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 07:57:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1778511435; x=1779116235; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QyL9i2Ps9ihe0zv6AT1n4AgSwB0/Wr45TQsgHUUycf0=;
-        b=xfzrZxUJHljtbX9eOESnNwMrHHSgzdMJ4gtL8STt+MvAP5dAJo3Jz9c1MrVrYjTd7o
-         CdMW9fS9gAAhgkkFCg7gs6HpzPEo5kr2l0mmVw/7ybE5EyWNVvkS6X6EETYVDv9A1LFw
-         buLJ9oQKq6G/uO3fgLZgehQ/rzKM0SAwrN6m0+zBWlqHbMB/fpVvltAdYxXSML6b9Qay
-         LjWET1Thdftt9Q6eCgFRSlsz0UArkbtaFv5XUtMrA1ixXZHGiy7jEjQCdMZd4l2ajcOy
-         v04464slvgZLKp/Of8fa0uiahhI6ImGR/Im1a4GaTLLHsNs1oxv3gRKv7Nsfnx3M8aCd
-         mxdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778511435; x=1779116235;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QyL9i2Ps9ihe0zv6AT1n4AgSwB0/Wr45TQsgHUUycf0=;
-        b=LbBXboDELBSp8h7FdlHzxkJuEp4bZ5iiSXqyP54ySO5lSQzsXOcI3KCsk+qw05pes/
-         x43F/aqzzi+pqKt/TYty9/N3/6EhFjxFb9qhtacH/Aw7pZMny0PNBNv7ANR9I3huHkg2
-         yOjJ2UjopEW1tdLT397IWU3HXDRPYQZwfEeypY6+25mKltkCXAmPTtWN0fDf/nzL66gh
-         S8J/Ymuc53XDnUjITnqwEKNUUo4HbRH0ZQCj0oniLHaH+2cuUu90L6k6kke1rN7wgKKd
-         SE4RPtBxJr7mMAMl+xykS8uNt3fMFGvElIRHgC3U2G/Z+vMv9DgQ5NvKe3y3RVevuwDe
-         XFNw==
-X-Forwarded-Encrypted: i=1; AFNElJ+FXDiiAi9Hpnk7PsMLfuGDr9mmRqGWbNWXnEMB0jZthFXRoB12Rt/BBir/xyf319XmD52W1g8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwcHbS/C5m7B/hOoZozprQwoImET5Qb8YITCoiKlV+dUmpF02Ve
-	7s5MSTAN8zn5nBwZKcAPi45u7oT5Nrh55hpuLf9q1C9Su/1bAF3HWEUdeN1CoQyOph8=
-X-Gm-Gg: Acq92OGgb1PE8YzQx2IwcLsIbqQS0+49vhshBhLsP+G5t8cgXsOMCgR57RGB79OVGz3
-	w5dOpMWwOSxlF+TInsuXasTOLY62v4+JL8KR+qwGRsJXA8I84FeboZH7lz/yQ+fmz1DcD1t4bbG
-	HT2Rrrr6D6nSWM+7VVXD2UuYo4i7AbUe8H4GTN0j6WoxlNQ74PVWa5qPJyS9dU/NV1iWL/VLbkG
-	70xWVUwqw7JNhan282vyLHCqhAgxkTvuSvrLTzCYaoSGTQHaHm6lTyS5CC/pu4KSnde9jVWSkzc
-	eanYOmNnTLfckitUDVdyXgJVENBeowStXJ4VDyn0czcTGhdFgbQqIEdn4W+hT8r7YKvWcVWRWer
-	LzH7ukeTk2G8EyaJcVKbMeURKYhWNKQ3sP0SG2IZiUg/p4TIpp0JTfxu1cM+PyK1lUnqlapreCU
-	wxuN3N4PLDXT1m3A9mNf0z5qzANFxMSRY4l6uaJvE=
-X-Received: by 2002:a5d:64e8:0:b0:449:9aee:4573 with SMTP id ffacd0b85a97d-4515ad768e3mr41131274f8f.18.1778511435091;
-        Mon, 11 May 2026 07:57:15 -0700 (PDT)
-Received: from [192.168.1.3] ([185.48.77.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45491f8d4c3sm25577709f8f.34.2026.05.11.07.57.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2026 07:57:14 -0700 (PDT)
-Message-ID: <18d747ea-660a-4ae6-b8b8-365d745352ce@linaro.org>
-Date: Mon, 11 May 2026 15:57:13 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T512F1mh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778512501;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bHbDw2kQDVt9bJG46JUREywkjRHfZCqW19vv3OS9bjw=;
+	b=T512F1mhtyjNzYLIl5msvqb1Fat1cYJYou0wiKkJNi93uNniihquQPTEBPrYYAo7DR1lNR
+	VRu98JhvrD5ix2/XEyLpNbdG5UP/hf7oJcUvJMatb/KbY/gJlfA/ZkzsOyzQvj/TH9/FUs
+	9/1J+2d8SSnBTp4NvymIIDPaDLH1OU8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-689-AdPGODgCPFCfv-AnQdUCAw-1; Mon,
+ 11 May 2026 11:14:56 -0400
+X-MC-Unique: AdPGODgCPFCfv-AnQdUCAw-1
+X-Mimecast-MFC-AGG-ID: AdPGODgCPFCfv-AnQdUCAw_1778512493
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE1291955EB1;
+	Mon, 11 May 2026 15:14:51 +0000 (UTC)
+Received: from [10.44.34.38] (unknown [10.44.34.38])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 50A331800286;
+	Mon, 11 May 2026 15:14:43 +0000 (UTC)
+Message-ID: <6afc4b95-3c15-4d71-877d-19b84e91ce05@redhat.com>
+Date: Mon, 11 May 2026 17:14:42 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,171 +51,170 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/20] ARM64 PMU Partitioning
-To: Colton Lewis <coltonlewis@google.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>,
- Shuah Khan <shuah@kernel.org>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+Subject: Re: [PATCH] Documentation: KVM: Document guest-visible compatibility
+ expectations
+To: David Woodhouse <dwmw2@infradead.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, kvm@vger.kernel.org,
  linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Jim Mattson <jmattson@google.com>
+Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>,
+ Eric Auger <eric.auger@redhat.com>, Kees Cook <kees@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260504211813.1804997-1-coltonlewis@google.com>
+ linux-kselftest@vger.kernel.org
+References: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Mimecast-MFC-PROC-ID: 8WENLj03PTvHE5MYpNCjCVaXptkerhNV_RwcWaIyn00_1778512493
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <20260504211813.1804997-1-coltonlewis@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 5/11/26 10:57, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> Document the expectation that KVM maintains guest-visible compatibility
+> across host kernel upgrades and rollbacks.  Specifically:
+> 
+>   - State saved/restored via KVM ioctls must be sufficient for live
+>     migration (and live update) between kernel versions.
+> 
+>   - Where a new kernel introduces a guest-visible change, it provides a
+>     mechanism for userspace to select the previous behaviour.
+> 
+>   - This allows both forward migration (upgrade) and backward migration
+>     (rollback) of guests.
+> 
+> These expectations have been implicitly required on x86 but were not
+> explicitly documented. Harmonise the expectations across all of KVM.
 
+One big part of achieving this on x86 is the handling of CPUID.  Despite 
+all the mess that KVM_SET_CPUID2 is (and sometimes the underlying 
+architecture too, as Jim Mattson would certainly agree), KVM is 
+generally able to provide a consistent view of its configuration to the 
+guest.  This doesn't quite extend to compatibility across vendors, but 
+it does work across processor generations from either Intel or AMD.
 
-On 04/05/2026 10:17 pm, Colton Lewis wrote:
-> This series creates a new PMU scheme on ARM, a partitioned PMU that
-> allows reserving a subset of counters for more direct guest access,
-> significantly reducing overhead. More details, including performance
-> benchmarks, can be read in the v1 cover letter linked below.
-> 
-> An overview of what this series accomplishes was presented at KVM
-> Forum 2025. Slides [1] and video [2] are linked below.
-> 
-> After a few false starts, meeting with Will Deacon and Mark Rutland to
-> discuss implementation ideas, and a few more false starts, I finally
-> have an implementation of dynamic counter reservation that works
-> without disrupting host perf too much. Now the host only loses access
-> to the guest counters when a vCPU resides on the CPU.
-> 
-> The key was creating perf_pmu_resched_update, which behaves exactly
-> like perf_pmu_resched except it takes a callback to call in between
-> when the perf events are scheduled out and when they are scheduled
-> back in. That allows us to update the PMU's available counters when we
-> know they are not currently in use without needing to expose private
-> perf core functions and triple check they are not being called in a
-> way that violates existing assumptions.
-> 
-> Because this introduces a possibility of perf reschedule during vCPU
-> load, I've optimized to only do that operation if there are host
-> events occupying the intended guest counters at the time of the load.
-> 
-> The kernel command line parameter for the driver still exists, but now
-> only defines an upper limit of counters the guest might use rather
-> than taking those counters from the host permanently.
-> 
-> v7:
-> 
-> * Implement dynamic counter reservation as described above. One side
->    effect is the PMUv3 driver now needs much fewer changes to enforce
->    the boundary.
-> 
-> * Move register accesses out of fast path for non-FGT hardware. The
->    performance impact was negligible and this moves bloat out of the
->    fast path and allows a more reliable design with more code sharing.
-> 
-> * Make PMCCNTR a special case in the context swap again because trying
->    to access it with PMXEVCNTR is undefined.
-> 
-> * Fix a bug where kvm_pmu_guest_counter_mask was using & instead of |.
-> 
-> * Re-expose the dedicated instruction counter to the host since it was
->    decided the guest will not own it.
-> 
-> * Change the global armv8pmu_reserved_host_counters to
->    armv8pmu_is_partitoned because it was only used in boolean checks.
-> 
-> * Fix typo in vcpu attribute commit so the spelling of the flag in the
->    commit message matches the code.
-> 
-> * Rebase to v7.0-rc7
-> 
-> v6:
-> https://lore.kernel.org/kvmarm/20260209221414.2169465-1-coltonlewis@google.com/
-> 
-> v5:
-> https://lore.kernel.org/kvmarm/20251209205121.1871534-1-coltonlewis@google.com/
-> 
-> v4:
-> https://lore.kernel.org/kvmarm/20250714225917.1396543-1-coltonlewis@google.com/
-> 
-> v3:
-> https://lore.kernel.org/kvm/20250626200459.1153955-1-coltonlewis@google.com/
-> 
-> v2:
-> https://lore.kernel.org/kvm/20250620221326.1261128-1-coltonlewis@google.com/
-> 
-> v1:
-> https://lore.kernel.org/kvm/20250602192702.2125115-1-coltonlewis@google.com/
-> 
-> [1] https://gitlab.com/qemu-project/kvm-forum/-/raw/main/_attachments/2025/Optimizing__itvHkhc.pdf
-> [2] https://www.youtube.com/watch?v=YRzZ8jMIA6M&list=PLW3ep1uCIRfxwmllXTOA2txfDWN6vUOHp&index=9
-> 
-> Colton Lewis (19):
->    arm64: cpufeature: Add cpucap for HPMN0
->    KVM: arm64: Reorganize PMU functions
->    perf: arm_pmuv3: Generalize counter bitmasks
->    perf: arm_pmuv3: Check cntr_mask before using pmccntr
->    perf: arm_pmuv3: Add method to partition the PMU
->    KVM: arm64: Set up FGT for Partitioned PMU
->    KVM: arm64: Add Partitioned PMU register trap handlers
->    KVM: arm64: Set up MDCR_EL2 to handle a Partitioned PMU
->    KVM: arm64: Context swap Partitioned PMU guest registers
->    KVM: arm64: Enforce PMU event filter at vcpu_load()
->    perf: Add perf_pmu_resched_update()
->    KVM: arm64: Apply dynamic guest counter reservations
->    KVM: arm64: Implement lazy PMU context swaps
->    perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
->    KVM: arm64: Detect overflows for the Partitioned PMU
->    KVM: arm64: Add vCPU device attr to partition the PMU
->    KVM: selftests: Add find_bit to KVM library
->    KVM: arm64: selftests: Add test case for Partitioned PMU
->    KVM: arm64: selftests: Relax testing for exceptions when partitioned
-> 
-> Marc Zyngier (1):
->    KVM: arm64: Reorganize PMU includes
-> 
->   arch/arm/include/asm/arm_pmuv3.h              |  18 +
->   arch/arm64/include/asm/arm_pmuv3.h            |  12 +-
->   arch/arm64/include/asm/kvm_host.h             |  17 +-
->   arch/arm64/include/asm/kvm_types.h            |   6 +-
->   arch/arm64/include/uapi/asm/kvm.h             |   2 +
->   arch/arm64/kernel/cpufeature.c                |   8 +
->   arch/arm64/kvm/Makefile                       |   2 +-
->   arch/arm64/kvm/arm.c                          |   2 +
->   arch/arm64/kvm/config.c                       |  41 +-
->   arch/arm64/kvm/debug.c                        |  31 +-
->   arch/arm64/kvm/pmu-direct.c                   | 494 ++++++++++++
->   arch/arm64/kvm/pmu-emul.c                     | 674 +----------------
->   arch/arm64/kvm/pmu.c                          | 701 ++++++++++++++++++
->   arch/arm64/kvm/sys_regs.c                     | 250 ++++++-
->   arch/arm64/tools/cpucaps                      |   1 +
->   arch/arm64/tools/sysreg                       |   6 +-
->   drivers/perf/arm_pmuv3.c                      | 111 ++-
->   include/kvm/arm_pmu.h                         | 110 +++
->   include/linux/perf/arm_pmu.h                  |   3 +
->   include/linux/perf/arm_pmuv3.h                |  14 +-
->   include/linux/perf_event.h                    |   3 +
->   kernel/events/core.c                          |  28 +-
->   tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->   .../selftests/kvm/arm64/vpmu_counter_access.c | 112 ++-
->   tools/testing/selftests/kvm/lib/find_bit.c    |   1 +
->   25 files changed, 1861 insertions(+), 787 deletions(-)
->   create mode 100644 arch/arm64/kvm/pmu-direct.c
->   create mode 100644 tools/testing/selftests/kvm/lib/find_bit.c
-> 
-> 
-> base-commit: 591cd656a1bf5ea94a222af5ef2ee76df029c1d2
-> --
-> 2.54.0.545.g6539524ca2-goog
+I understand that Arm traditionally had much more trouble than x86 with 
+vendor-specified behavior that goes beyond the set of architectural 
+features, so we may need to tune the expectations.  However, I agree 
+with David that this is needed at least as long as the host CPU does not 
+change.
 
-I tested it a bit and ran the kselftests and it all seems to be working 
-ok. Some of the critical sashiko comments look like they are worth 
-looking into though: 
-https://sashiko.dev/#/patchset/20260504211813.1804997-1-coltonlewis%40google.com
+Thanks,
 
-For example writing to PMCR_EL0.P from EL2 resets the host's counters, 
-even if it's KVM doing it after trapping a write from the guest.
+Paolo
+
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>   Documentation/virt/kvm/api.rst              | 14 ++++++++++++++
+>   Documentation/virt/kvm/review-checklist.rst | 20 ++++++++++++++------
+>   2 files changed, 28 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 269970221797..864f3daa7acb 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -97,6 +97,20 @@ Instead, kvm defines extension identifiers and a facility to query
+>   whether a particular extension identifier is available.  If it is, a
+>   set of ioctls is available for application use.
+>   
+> +KVM will ensure that the state that can be saved and restored via the
+> +KVM ioctls is sufficient to allow migration of a running guest between
+> +host kernels while maintaining full compatibility of the guest-visible
+> +device model.  This includes migration to newer kernels (upgrade) and
+> +to older kernels (rollback), provided that the older kernel supports
+> +the set of features exposed to the guest.  Where a new kernel version
+> +introduces a guest-visible change, it will provide a mechanism (such
+> +as a capability or a device attribute) that allows userspace to select
+> +the previous behaviour.  This serves two purposes: guests migrated
+> +from an older kernel can continue to run with their original
+> +observable environment, and new guests launched on the newer kernel
+> +can be configured to match the feature set of the older kernel, so
+> +that they remain migratable to the older kernel in case of rollback.
+> +
+>   
+>   4. API description
+>   ==================
+> diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/virt/kvm/review-checklist.rst
+> index 053f00c50d66..f0fbe1577a90 100644
+> --- a/Documentation/virt/kvm/review-checklist.rst
+> +++ b/Documentation/virt/kvm/review-checklist.rst
+> @@ -18,22 +18,30 @@ Review checklist for kvm patches
+>   5.  New features must default to off (userspace should explicitly request them).
+>       Performance improvements can and should default to on.
+>   
+> -6.  New cpu features should be exposed via KVM_GET_SUPPORTED_CPUID2,
+> +6.  Guest-visible changes must not break migration compatibility.  A guest
+> +    migrated from an older kernel must be able to run with its original
+> +    observable environment, and a guest launched on a newer kernel must be
+> +    configurable to match the older kernel's feature set for rollback.
+> +    Where a change alters guest-visible behaviour, provide a mechanism
+> +    (capability, device attribute, etc.) for userspace to select the
+> +    previous behaviour.
+> +
+> +7.  New cpu features should be exposed via KVM_GET_SUPPORTED_CPUID2,
+>       or its equivalent for non-x86 architectures
+>   
+> -7.  The feature should be testable (see below).
+> +8.  The feature should be testable (see below).
+>   
+> -8.  Changes should be vendor neutral when possible.  Changes to common code
+> +9.  Changes should be vendor neutral when possible.  Changes to common code
+>       are better than duplicating changes to vendor code.
+>   
+> -9.  Similarly, prefer changes to arch independent code than to arch dependent
+> +10. Similarly, prefer changes to arch independent code than to arch dependent
+>       code.
+>   
+> -10. User/kernel interfaces and guest/host interfaces must be 64-bit clean
+> +11. User/kernel interfaces and guest/host interfaces must be 64-bit clean
+>       (all variables and sizes naturally aligned on 64-bit; use specific types
+>       only - u64 rather than ulong).
+>   
+> -11. New guest visible features must either be documented in a hardware manual
+> +12. New guest visible features must either be documented in a hardware manual
+>       or be accompanied by documentation.
+>   
+>   Testing of KVM code
 
