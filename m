@@ -1,171 +1,194 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE79370D7C
-	for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 11:24:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B885371049;
+	Mon, 11 May 2026 11:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778498661; cv=none; b=RUIDJQqij961i679KA6e08MnOH4NQ89atHIFS0/pESupk9cUAIyoTTIzL+WU8MVPmCdpyzENn1JUjZrXQktAAAhtSJUbssE+OL2IrgK2EYd4yq13p/iTFWURw8PC8buxNrKoeHZPkEBy/OXkpF9U7Z9vCEJntwyCZZktYqDJvTs=
+	t=1778499372; cv=none; b=UqXoemlRIcWqEh5qB/PGb/x8ILNXh+2Eo83/P0supaXi13JaEo2NfYHcsOaRWf3m5BcCvNph+Rf4sjNgUMI6NSdmLr6WreQ1/7C8jWEX/5mH6k41IezNcB1R1sgSD+ZAqCl8ZxiJ/ThaRX2TUfIEwowe+z4HfRkv4bhExHKHd8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778498661; c=relaxed/simple;
-	bh=jbkPxkd9BN13vEMhJ++fpHhlXgRluMJRb8/wkrIt/Tc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tfQoj9+C8j9Kh6xd+kxr4kdXigIkfUWsXyl/2BEiIJ+wBZIEzRCqbDTLkSWz4iWCU2vrfbhsWBgjGZCf/mygpNvUBkr2fcJMJKreatkhX3I1rIAEx1d9CQ1HRIx8EmKX6PgBEMLz33IcL4Jdq0xaeVBw4CeOZmKeVwRzzMXdvHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BfKbkyOt; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1778499372; c=relaxed/simple;
+	bh=hGENPvvDT4+p9bZ6Shwbk2ymjYMAcQmI4kduKlzqRMU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=apK6oaYrfaAu/TwCXCGQ4IuOeQCVCF70xhrTkGjGDnnFtzW5uQsSV+HlfpexplduCxTC0cdDty286C0u03z5HpfwgRHfXj83I6Ac7d2owS3aUAcaQM2LZARyg6zpgPM3kpl/vFRFIWzSvU4Als5izGSQQWBP7K8w2b/hkty0P/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hbQtBPhs; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BfKbkyOt"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-48d1c670255so235e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 04:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778498659; x=1779103459; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TPN0GnVnAV+QTqwTIgV1cCo5LbQpemV7wVfcXMSy54o=;
-        b=BfKbkyOtcH5JHHHz52qXVXC2Mv8PLVwLHIxB9ZkYa5OYHsOzWlpEQYeKYeOxS436oW
-         oBU/FzM5Nz7SIK0wjovrjXOram/2kJ7dPkLz1kXRjX0rWjUbe7a0syKtustqcBV43Vjc
-         yH3ycJxgqtEJUUq5kGIwX7X+5VmTdAnKAx0SWakiHOWutyUBmBKCjA7DN5KMBGoYdA49
-         EDjJDsJCyeSxkWOlDpNWhi7IOUySmPCgxqJ8jabUcOW6ZTZ7XTCnPrqLEXChGe9kM1JZ
-         TJNuHvICr9GZ8b/RQ8qafcQYBXuo0iJQ/MjN102irpicIh0L7pqYUdJOIX2IDI4fHbyA
-         yitw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778498659; x=1779103459;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TPN0GnVnAV+QTqwTIgV1cCo5LbQpemV7wVfcXMSy54o=;
-        b=MRbIYlg/B1MIP7F1+pcIOfiNsN0wi8+GgI2PoVpMZmJySVVoCg8EMus4xiyM2kCkA6
-         HqwYKLJMAQSC5bOGpk0bu+w77k1kksi5/pxu+4Q8fx/5jQColpIdqGxBrwcWRhNo5M7p
-         RFjAi19zVAqqWfF7+1zxx/tbHmHlORZfKeL/jOGhxesR//q3LlJQ4m5kXfz/1qYVJ11m
-         MkQAh5j4N230Yx5AxTCzvPYFXd7hkEm8FW820+B1D6ihDIw3Q1gGMp99m0s1V9ZcB7aD
-         6Fxea69QCTYNzGzYLx/gHpwisAAvFXvP5/juHVzT2XKT0PKuSw5ZSbbudz38CJFj5ECE
-         uspg==
-X-Forwarded-Encrypted: i=1; AFNElJ//1qAF83+RWG+6DcfdIA75eKFefSXI4GD1EUjGEWzBPWgA0+zD6DEhfTsjWr7SW0atP0crDD4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwGtidLsesri6cM7BL95dwS2xU9KJRObsyiJtTUxgmGTIo6KVTV
-	Q2/m0ccLAHIDwVwNsS8lZZ7vgdnaXSXGAvYngdyAVytow/oioXWGDspOSwIbrOE1Cw==
-X-Gm-Gg: Acq92OHRFSW5mhfQs6mn9HGyz+fP0SFv+j4o4SewMf+4JvpdNFgqTx59PEaDU41rt4X
-	GZ9lRYivH4Ja5SZYHYxWG5Qcy54bD6SeqdtQevTCTRJJ7RfMIZ3SA/vP0U6o2Gou6yK0d4bCF9+
-	j+WHkXqACDDrPHmyGPdN4TZMTCKD+sQ7WAOsExkkz3QDT7Ezk/JawUzwXz7CIUuWo7wMTFWKK3J
-	vJ0dtie0Wf5D8+FsNSJYa8X7AxQhlsWwG17HziBA2C51Y4r0WWXEq9z5trXrkK63ElITVmSJ20g
-	lf5GvtstjBGvnzSqFPb5WdrcptnONXvoYpFAsj9XaNRdMmAvAL20JKtZhWHQ6BgrLTDFzYwQAQH
-	P9U1CVm3Z93YR5UtgPu6t9uWmpJbpT8eYFtA1cuMzj8wq0Ko9vbKsJZ63Ryv1VfXq7JwFtWnqsE
-	n+sOIUKvWHQBnprqGKIWBIdx0ASJp9dA/affp+F+CUbcgtNMtujnELnAOaEb+doWCqIXE=
-X-Received: by 2002:a05:600c:638f:b0:45f:2940:d194 with SMTP id 5b1f17b1804b1-48e6e954525mr2966735e9.2.1778498658476;
-        Mon, 11 May 2026 04:24:18 -0700 (PDT)
-Received: from google.com (8.181.38.34.bc.googleusercontent.com. [34.38.181.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45491da03a7sm25337059f8f.33.2026.05.11.04.24.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 04:24:17 -0700 (PDT)
-Date: Mon, 11 May 2026 11:24:14 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page
- table
-Message-ID: <agG8XtrHUfWGy-kd@google.com>
-References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-9-smostafa@google.com>
- <20260501130006.GF6912@ziepe.ca>
- <afiRB3e3o0G1oZvY@google.com>
- <20260509232714.GI9285@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hbQtBPhs"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
+	To:From:Reply-To:Content-ID:Content-Description;
+	bh=cNnAeMZ88hnaK7C3Z3PFUiVty5ocHdzHNWe9HEpa28s=; b=hbQtBPhsZntnThgsYYdL0xrLen
+	vju5LUmavfaplo0j/zEoZ+SGkX/bUsBLlUuGUqCXGkBuLLPtmkQEzIhNo7+bQbFEl/ZbyAb1Q7pCP
+	w+qVXFun5OOTEWY4FXsoWe7MkCPZ/Pw52VJi3plUv34lcyxc9dX0UVgOdFPhYQiJxZlqLl7hJsvGT
+	xHXmYHm34qKsy6YCYeC99qikD76dcGxiZ4XS5ndbSmRJ8vwYJ6vyia2S/7BalXLxf1/hnKY07Yg6g
+	ybX2+qohIDUm4pcl92ANKpSABUjNqabVtXsn3/ywNGSyTH+IlWzP3Nin5SuVadnHiJiMcFNJ1rN00
+	ISBzYh7Q==;
+Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wMOvY-000000084dK-1iwz;
+	Mon, 11 May 2026 11:36:00 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wMOvY-0000000Dx0U-0ZVa;
+	Mon, 11 May 2026 12:36:00 +0100
+From: David Woodhouse <dwmw2@infradead.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Kees Cook <kees@kernel.org>,
+	Timothy Hayes <timothy.hayes@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v3 1/4] KVM: arm64: vgic: Allow userspace to set IIDR revision 1
+Date: Mon, 11 May 2026 12:30:43 +0100
+Message-ID: <20260511113558.3325004-2-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260511113558.3325004-1-dwmw2@infradead.org>
+References: <20260511113558.3325004-1-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260509232714.GI9285@ziepe.ca>
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sat, May 09, 2026 at 08:27:14PM -0300, Jason Gunthorpe wrote:
-> On Mon, May 04, 2026 at 12:28:55PM +0000, Mostafa Saleh wrote:
-> > So far this is the list of requirements/changes needed share the
-> > stage-2 page table (besides the obvious: same page table format,
-> > granularity, endianness...)
-> > 
-> > 1) HW BBM is not supported in the hypervisor page table, that’s
-> >    because it can generate TLB conflict aborts, which the hypervisor
-> >    can not handle because of the limited syndrome information.
-> >    We can rely on FEAT_BBML3 which was newly introduced to work
-> >    around that, it’s quite niche and not supported in KVM yet or
-> >    have an allow list similar to the kernel
-> >    (as in cpu_supports_bbml2_noabort()) which also limits the number
-> >    of CPUs that can run this.
-> 
-> Do you think pkvm will need BBM? Hitless replace of a PTE is already a
-> pretty advanced feature and the SMMU has its own support matrix there
-> too. Is it for shared/private conversion?
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Yes, we can break block on memory donation which is transfer of
-ownership to the hypervisor or a guest.
+In order to preserve guest compatibility across kernel upgrades, allow
+userspace to select GICD_IIDR revision 1. This allows compatibility with
+the original behaviour from before commit d53c2c29ae0d ("KVM: arm/arm64:
+vgic: Allow configuration of interrupt groups") where interrupt groups
+are not guest-configurable.
 
-> 
-> > 2) Handling page faults, devices must be able to stall and let the
-> >    hypervisor handle the page fault (which has to proxy through the
-> >    kernel as the hypervisor doesn’t handle interrupts), this includes
-> >    also IO page faults which are hard to get right from the HW which
-> >    and may lead to system stability issues or lockups.
-> 
-> No.. once you turn on IO like this you don't have page faults
-> anymore. Everything must be permantently mapped into the SMMU view, it
-> can never be made non-present and you must run without page
-> faults. That's what you have in the io-pgtable constructed table,
-> right?
+When revision 1 is selected:
+ - GICv2: IGROUPR reads as zero (group 0), writes are ignored
+ - GICv3: IGROUPR reads as all-ones (group 1), writes are ignored
+ - v2_groups_user_writable is not set
 
-Exactly, but the CPU page table doesn’t guarantee that, so we either
-have to handle page faults in the IOMMU, or completely change how KVM
-deals with stage-2 if we want to share the page table with the CPU.
+This is implemented by checking the implementation revision in
+vgic_mmio_write_group() and suppressing writes when the revision is
+below 2. The read side needs no change since the per-IRQ group reset
+values already match the expected behaviour.
 
-> 
-> >    Alternatively, we can pin the stage-2 pages, that would require some
-> >    hypercalls, hacks to the driver/IOMMU API and possibly new semantics
-> >    in the DMA-API for IDENTITY devices as they will still need to pin
-> >    the pages as they are actually in stage-2 translation and not bypass.
-> 
-> ?? Then how does this series work?
+For GICv2, commit 32f8777ed92d7 ("KVM: arm/arm64: vgic: Let userspace
+opt-in to writable v2 IGROUPR") introduced a confusing model where
+IGROUPR registers were not writable from userspace by default until the
+IIDR was written — even if it was written to the *same* as its default
+value (which, in fact, was the only thing that userspace *could* set it
+to before commit a0e6ae45af17 fixed the IIDR write path). Furthermore,
+even when the v2_groups_user_writable flag wasn't set, the *guest*
+could still actually write to the registers... but userspace couldn't
+save/restore them. That default behaviour for GICv2 remains unchanged;
+it can be fixed in a future commit.
 
-This series works fine as it shadows the page table and doesn't share it
-with the CPU, so it fully populates the address space.
+Fixes: d53c2c29ae0d ("KVM: arm/arm64: vgic: Allow configuration of interrupt groups")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c | 3 +++
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 4 ++++
+ arch/arm64/kvm/vgic/vgic-mmio.c    | 4 ++++
+ include/kvm/arm_vgic.h             | 1 +
+ 4 files changed, 12 insertions(+)
 
-> 
-> > 3) SMMUv3 must be coherent.
-> 
-> Yes for sure.
-> 
-> > 4) Support BTM/DVM for TLB invalidation, otherwise some hooks are
-> >    still required (although not io-pgtable-arm)
-> 
-> SW needs to forward invalidations, BTM is rare..
-> 
-> > IMO, 1, 2 are the most tricky parts. It's more work and runs on very
-> > limited systems, However, it can be implemented as an optimization)
-> > which is my plan.
-> 
-> I think unless you can do it without these HW features (excluding 3)
-> don't bother.
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+index 0643e333db35..e5714f7fd2ec 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+@@ -20,6 +20,7 @@
+  * Revision 1: Report GICv2 interrupts as group 0 instead of group 1
+  * Revision 2: Interrupt groups are guest-configurable and signaled using
+  * 	       their configured groups.
++ * Revision 3: GICv2 behaviour is unchanged from revision 2.
+  */
+ 
+ static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+@@ -96,6 +97,8 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+ 		case KVM_VGIC_IMP_REV_2:
+ 		case KVM_VGIC_IMP_REV_3:
+ 			vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
++			fallthrough;
++		case KVM_VGIC_IMP_REV_1:
+ 			dist->implementation_rev = reg;
+ 			return 0;
+ 		default:
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 5913a20d8301..0130db71cfc9 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -74,8 +74,11 @@ bool vgic_supports_direct_sgis(struct kvm *kvm)
+ /*
+  * The Revision field in the IIDR have the following meanings:
+  *
++ * Revision 1: Interrupt groups are not guest-configurable.
++ * 	       IGROUPR reads as all-ones (group 1), writes ignored.
+  * Revision 2: Interrupt groups are guest-configurable and signaled using
+  * 	       their configured groups.
++ * Revision 3: GICR_CTLR.{IR,CES} are advertised.
+  */
+ 
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+@@ -196,6 +199,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+ 
+ 		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, val);
+ 		switch (reg) {
++		case KVM_VGIC_IMP_REV_1:
+ 		case KVM_VGIC_IMP_REV_2:
+ 		case KVM_VGIC_IMP_REV_3:
+ 			dist->implementation_rev = reg;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index 74d76dec9730..1b662744ec5b 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -73,6 +73,10 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
+ 	int i;
+ 	unsigned long flags;
+ 
++	/* Revision 1 and below: groups are not guest-configurable. */
++	if (vgic_get_implementation_rev(vcpu) < KVM_VGIC_IMP_REV_2)
++		return;
++
+ 	for (i = 0; i < len * 8; i++) {
+ 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
+ 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 1388dc6028a9..16811ec03d54 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -372,6 +372,7 @@ struct vgic_dist {
+ 
+ 	/* Implementation revision as reported in the GICD_IIDR */
+ 	u32			implementation_rev;
++#define KVM_VGIC_IMP_REV_1	1 /* GICv2 interrupts as group 0 */
+ #define KVM_VGIC_IMP_REV_2	2 /* GICv2 restorable groups */
+ #define KVM_VGIC_IMP_REV_3	3 /* GICv3 GICR_CTLR.{IW,CES,RWP} */
+ #define KVM_VGIC_IMP_REV_LATEST	KVM_VGIC_IMP_REV_3
+-- 
+2.51.0
 
-I am looking into this now, but as I mentioned that will be a separate
-RFC following this one as an optimization for advanced HW.
-
-Thanks,
-Mostafa
-
-> 
-> > I am not sure how CCA deals with that, I’d expect they have a lot of
-> > constraints on CPUs/SMMUs and DMA capable devices on those systems.
-> 
-> 3 is not supported. The entire S2 is permanently mapped and doesn't
-> really change alot at runtime. No page faults, not sure if the RMM
-> private/shard conversion would require BMM..
-> 
-> Jason
