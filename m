@@ -1,60 +1,52 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AEE3B637A;
-	Mon, 11 May 2026 08:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9353A3B9D9F;
+	Mon, 11 May 2026 08:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778487267; cv=none; b=DFEb7VfChXOjYGH55KzQ26Sonq/Zx0ppEqBMidpHcS/MhGA9ljLkRQ3LkRQgcCCO0sskWY+2Iq2oX1gCbNsKD+u6BuKomq8bgxLRObvYPQ/04WOGNoonSWQPv4Fmx4MYfKYmHcP1ZkrohtMEuXp1c4GOTQwU9Nx0KEYFVJiC+go=
+	t=1778489857; cv=none; b=bzMs+dzsPF5L3AiNrgxbd+DcVtPxOJsLuzkVKFoIyjcmwiix3igHNEkb9aU01JCIfKqOyps/A5s7IY3hKkvIdIcdqaHS7VF7Q7MY8LWz4F22FPSJZrRBw5DY6BQSMkZA5joKelw89jDlCmWM4+KYTT4eFKHYl7JWAtqf8LJFYZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778487267; c=relaxed/simple;
-	bh=+f3NDp3JJnewBzZFvRTIpC5dH2ncWgD8NrNLO0oyfjc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tZtRX3Ome4O9DR9gpyDDOUyKpmpKEO7ONJGFzSse8MjBCzCgC/MVENWl93mNII+5yRrxcsF7FzFKjV+/t65Qm4vdvS4muutPTriPNqTlUUWnqanHAG9WtMSisbBI3oQsDCsSMDdeiRIoq92iV5Gqj8949Z8j1x31/hylTswGeys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RpaYWWTz; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1778489857; c=relaxed/simple;
+	bh=yG1ZQpDp59m7GIi0rClPuRqEcexWJ1Je7cyz4dCBFJo=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=PkA69LxsItkabxug6wseisrdCSq2t6vQRK+u/DZryDZIN74lxG8EUiVjD4QxttVqrn4q6gzYqO/+i84aLvQ2AF1/ut9ExBOYeRcV8zzflwdykGuFwh080LDgCuIDgnWuN8MKPUNi4ivuYYdpFiE7qdH5b2QxlfK84gZs/uPO9ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZkLujkeH; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RpaYWWTz"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZkLujkeH"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+f3NDp3JJnewBzZFvRTIpC5dH2ncWgD8NrNLO0oyfjc=; b=RpaYWWTz2QtPb599pSzE4kcVfl
-	Q7cUOtLjR5nmZJdIfHBXa5Bh4j4aLPr2uQHBuJfmU9atDj43rJYP68jl6ccafd96EOYj5H4aTbhS1
-	G51mCWt5Z8JThG1/DJz9XKojqLYyOJykVaEtJaSHn7DmbJ/umjz6vI370/9tAYC+TgK7fww8IHm1X
-	V8saGxc2ycZBV/cYJFhKVqUps5tD0pzZw3PXYsyxwcKb6g6MFPaBpVUSfGONEMxwTB3dZMqo9p4Ks
-	VXMJHRni0loDfvUlslXIsZpKBTcJ6P7GNoGwvvAD9eYxySq0njARLMXRR2XG4t0hkSIFHA+XNXINA
-	2AAgXDMA==;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
+	From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=zhkE8m1bTkpWiqGtlhKzD3LU8FaLp3DU7tLfKoKSNzw=; b=ZkLujkeHAdzl6TVM1LqDRAlsd1
+	ycTRG8fgZlvV/cz+lwdyC1d9MmhT92AvmtvwPDkCSmX/jRcBy8TjWvGuZgpGCSp5rDNl4MtGRfns1
+	rBw/mLxHqnvs7PniVjpXMC/jZQ1GTGxiXrQUWhWpakZpCaSJDJy5xdSeHp0rDDBSvvQLdh7UqAP5Y
+	/BtGilO/fCFyw7GjFxbNWaJlEGjbknfad66mrQ6og6tB5TJsXqe/L4cZTHLpEb5lmW5juzcxW37rB
+	shtNWc8IL2gVJIfKMTRVP+px06FVIJUHDPcZ+c0mOqRsH9d3qXHBcvzeyfOVQsi8Mdy4R5J7FsJZm
+	5FvfZwoA==;
 Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u09cd745991455d.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wMLm2-00000007pvS-3cpz;
-	Mon, 11 May 2026 08:13:59 +0000
-Message-ID: <f17cbc37a3d9856495449ade920f49bda713c7fe.camel@infradead.org>
-Subject: Re: (subset) [PATCH 1/3] KVM: arm64: vgic: Fix IIDR revision field
- extracted from wrong value
+	id 1wMMS8-00000007t91-1uZE;
+	Mon, 11 May 2026 08:57:29 +0000
+Message-ID: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
+Subject: [PATCH] Documentation: KVM: Document guest-visible compatibility
+ expectations
 From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org
 Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
  <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, Eric Auger
- <eric.auger@redhat.com>, Kees Cook <kees@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>,
- linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ Deacon <will@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, Eric
+ Auger <eric.auger@redhat.com>, Kees Cook <kees@kernel.org>,  Arnd Bergmann
+ <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
  linux-kselftest@vger.kernel.org
-Date: Mon, 11 May 2026 09:13:57 +0100
-In-Reply-To: <86ik8uxtue.wl-maz@kernel.org>
-References: <20260407210949.2076251-1-dwmw2@infradead.org>
-	 <20260407210949.2076251-2-dwmw2@infradead.org>
-	 <177702878141.537738.13460155220731277452.b4-ty@kernel.org>
-	 <106addd3f78918a9a584c43c181a9609aef1ceca.camel@infradead.org>
-	 <f17a2d66e47fd15fc738d9f4ad89123a31d86eb3.camel@infradead.org>
-	 <86ik8uxtue.wl-maz@kernel.org>
+Date: Mon, 11 May 2026 09:57:27 +0100
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-oOragWL9efoIITVL6FW7"
+	boundary="=-G9nCGITdCY7OEi2eGNSc"
 User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -65,86 +57,116 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-oOragWL9efoIITVL6FW7
+--=-G9nCGITdCY7OEi2eGNSc
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2026-05-11 at 08:56 +0100, Marc Zyngier wrote:
-> On Sun, 10 May 2026 22:28:50 +0100,
-> David Woodhouse <dwmw2@infradead.org> wrote:
-> >=20
-> > [1=C2=A0 <text/plain; UTF-8 (quoted-printable)>]
-> > On Fri, 2026-04-24 at 13:24 +0100, David Woodhouse wrote:
-> > > On Fri, 2026-04-24 at 12:07 +0100, Marc Zyngier wrote:
-> > > > On Tue, 07 Apr 2026 21:27:02 +0100, David Woodhouse wrote:
-> > > > > The uaccess write handlers for GICD_IIDR in both GICv2 and GICv3
-> > > > > extract the revision field from 'reg' (the current IIDR value rea=
-d back
-> > > > > from the emulated distributor) instead of 'val' (the value usersp=
-ace is
-> > > > > trying to write). This means userspace can never actually change =
-the
-> > > > > implementation revision =E2=80=94 the extracted value is always t=
-he current one.
-> > > > >=20
-> > > > > Fix the FIELD_GET to use 'val' so that userspace can select a dif=
-ferent
-> > > > > revision for migration compatibility.
-> > > > >=20
-> > > > > [...]
-> > > >=20
-> > > > Applied to fixes, thanks!
-> > > >=20
-> > > > [1/3] KVM: arm64: vgic: Fix IIDR revision field extracted from wron=
-g value
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 commit: a0e6ae45af17e8b2795883059579=
-9c702ffbab8d
-> > >=20
-> > > There was a v2 of this series which also cleaned up the weird
-> > > inconsistency of the IIDR value with the actual behaviour, and which
-> > > fixed the fact that it's currently not possible to maintain guest
-> > > compatibility when upgrading from a pre-d53c2c29ae0d kernel to a new
-> > > one =E2=80=94 despite the fact that that kind of compatibility is *pr=
-ecisely*
-> > > what the revision field in the IIDR is designed for.
-> > >=20
-> > > https://lore.kernel.org/all/20260408113256.2095505-1-dwmw2@infradead.=
-org/
-> >=20
-> > Is there a reason the rest of these fixes didn't make 7.1?
->=20
-> I already explained why these changes are neither necessary (a guest
-> that used to run still runs) nor desirable (reintroducing bugs we have
-> fixed is a bad idea).
->=20
-> I have therefore only taken the fix for the bug affecting userspace,
-> as that was definitely something worth fixing.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-You claimed that KVM/arm64 does not support migrating guests to older
-(or even newer!!) kernels while maintaining compatibility.
+Document the expectation that KVM maintains guest-visible compatibility
+across host kernel upgrades and rollbacks.  Specifically:
 
-That just *isn't* a cogent argument. I responded to it, in
-https://lore.kernel.org/all/8cca18f332ea4bfb0c9f9d6775b2c1284816dd5f.camel@=
-infradead.org/
+ - State saved/restored via KVM ioctls must be sufficient for live
+   migration (and live update) between kernel versions.
 
-KVM absolutely does need to support upgrading the kernel without
-changing the environment that guests see. And sometimes it is sadly
-also necessary to roll back an upgrade =E2=80=94 which means that guests
-launched on the new kernel should not see anything new until the fleet
-is past the point where a rollback might happen.
+ - Where a new kernel introduces a guest-visible change, it provides a
+   mechanism for userspace to select the previous behaviour.
 
-Guest-visible changes need to be optional, in the case of the vGIC that
-is exactly what the IIDR is *for*. There's not much point in my patch
-that allows it to be *set*, if we don't allow it to be set *to* the
-previous versions that are needed.
+ - This allows both forward migration (upgrade) and backward migration
+   (rollback) of guests.
 
-This isn't exactly rocket science, and I don't know why you claim not
-to understand it.
+These expectations have been implicitly required on x86 but were not
+explicitly documented. Harmonise the expectations across all of KVM.
 
-What's going on, Marc? This behaviour isn't OK.
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ Documentation/virt/kvm/api.rst              | 14 ++++++++++++++
+ Documentation/virt/kvm/review-checklist.rst | 20 ++++++++++++++------
+ 2 files changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rs=
+t
+index 269970221797..864f3daa7acb 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -97,6 +97,20 @@ Instead, kvm defines extension identifiers and a facilit=
+y to query
+ whether a particular extension identifier is available.  If it is, a
+ set of ioctls is available for application use.
+=20
++KVM will ensure that the state that can be saved and restored via the
++KVM ioctls is sufficient to allow migration of a running guest between
++host kernels while maintaining full compatibility of the guest-visible
++device model.  This includes migration to newer kernels (upgrade) and
++to older kernels (rollback), provided that the older kernel supports
++the set of features exposed to the guest.  Where a new kernel version
++introduces a guest-visible change, it will provide a mechanism (such
++as a capability or a device attribute) that allows userspace to select
++the previous behaviour.  This serves two purposes: guests migrated
++from an older kernel can continue to run with their original
++observable environment, and new guests launched on the newer kernel
++can be configured to match the feature set of the older kernel, so
++that they remain migratable to the older kernel in case of rollback.
++
+=20
+ 4. API description
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/vi=
+rt/kvm/review-checklist.rst
+index 053f00c50d66..f0fbe1577a90 100644
+--- a/Documentation/virt/kvm/review-checklist.rst
++++ b/Documentation/virt/kvm/review-checklist.rst
+@@ -18,22 +18,30 @@ Review checklist for kvm patches
+ 5.  New features must default to off (userspace should explicitly request =
+them).
+     Performance improvements can and should default to on.
+=20
+-6.  New cpu features should be exposed via KVM_GET_SUPPORTED_CPUID2,
++6.  Guest-visible changes must not break migration compatibility.  A guest
++    migrated from an older kernel must be able to run with its original
++    observable environment, and a guest launched on a newer kernel must be
++    configurable to match the older kernel's feature set for rollback.
++    Where a change alters guest-visible behaviour, provide a mechanism
++    (capability, device attribute, etc.) for userspace to select the
++    previous behaviour.
++
++7.  New cpu features should be exposed via KVM_GET_SUPPORTED_CPUID2,
+     or its equivalent for non-x86 architectures
+=20
+-7.  The feature should be testable (see below).
++8.  The feature should be testable (see below).
+=20
+-8.  Changes should be vendor neutral when possible.  Changes to common cod=
+e
++9.  Changes should be vendor neutral when possible.  Changes to common cod=
+e
+     are better than duplicating changes to vendor code.
+=20
+-9.  Similarly, prefer changes to arch independent code than to arch depend=
+ent
++10. Similarly, prefer changes to arch independent code than to arch depend=
+ent
+     code.
+=20
+-10. User/kernel interfaces and guest/host interfaces must be 64-bit clean
++11. User/kernel interfaces and guest/host interfaces must be 64-bit clean
+     (all variables and sizes naturally aligned on 64-bit; use specific typ=
+es
+     only - u64 rather than ulong).
+=20
+-11. New guest visible features must either be documented in a hardware man=
+ual
++12. New guest visible features must either be documented in a hardware man=
+ual
+     or be accompanied by documentation.
+=20
+ Testing of KVM code
+--=20
+2.43.0
 
 
---=-oOragWL9efoIITVL6FW7
+
+--=-G9nCGITdCY7OEi2eGNSc
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -223,21 +245,21 @@ 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
-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
+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
-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
+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
 
 
---=-oOragWL9efoIITVL6FW7--
+--=-G9nCGITdCY7OEi2eGNSc--
