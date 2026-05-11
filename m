@@ -1,168 +1,127 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D89B2DB789
-	for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 11:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778500430; cv=pass; b=jyyl5WTUHI2xe+BhwsDqUxJQfi/AarpEv6IutfM26D0+ZaGFM8yDI0WNO+NHxv7BcCAbGxKLHqUU6F4KdfMvNI6csx8TlzJIq/F5QzQqBY5YZApclvMfY/cWh4Bv+6kmEbDQ8RqAkoxKldS4ztb3w1L6IfbVubIERXHFNJQ1yaA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778500430; c=relaxed/simple;
-	bh=EyEdGT/UwThY07rJVuH5QIYg5WfjYK/VMng0MYb/gWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AQ1pxDJCgDGWievzXn92E+Jj4V4vL7/PZBnMEBEJo/SXWS9yzo0O1rTeswQdWBMSB5fxscUnqHdwCp3J96+LS7nXELo04FASyYT/bP9QhHNiYf+0IqyrhFzuKutggfFDkZCrvZrG1fOjBjQcXN8AEn+MlkIrY9Yod+w1ifYeRvQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C/gMUyFo; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AD83EF66D;
+	Mon, 11 May 2026 12:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778502669; cv=none; b=j0xJqcL9EhOVs1Nt0J6vFFil77+k8LRE1ZiJo0ycv+L2R1KKbYvX+pJzunsmjIntWQq3YsjO6Mrg4equr++QZGFy03cVeAAtEhLOEG9KGvVXRjbtcC+7DICXSSYUrnvI9ieUSTfk6f2AOeC2Rwl0qo+zjsoEgpDqBJ3Zd6f8U9A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778502669; c=relaxed/simple;
+	bh=4cj4AFpxR7VfRzsb4XVcpSOKHntygkHpeH2TRzpG76A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BaP9h9acv2ENAUrKbX9Xh0wBkp//vd3tlosqBR7fhM4tKxVVDZRcnlNjAKlePWsS6Mudzeuo7W0HWhPVU28W0flfJnDJdOg6qIcxiffMfFmQ0JqglyXg/lhZ7LMWQKuUM4+MTPFr1mvXa6WeKRDUxW8EjTVbehNm24rLQ1u2/IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ik+Jsoeg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C/gMUyFo"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50d864c23bdso7631cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 04:53:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778500428; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cJqBNZFUIeuKGjtOlrOaAUppHlP2j9DWg15a6s2ai/4uTwYfO4eyJ4ZVRfG7AejZ0B
-         bx5UinBWY2k4TBOMLRXSzabTCEhdoZKxx3ljrhN05JPGUPe5lUjeBJEHZIesXR3SXwLv
-         jB7ey8jj1SUjqvoZxkSUAXJ/hd4HrYs8kaTekP6avwFSCW8cWoUtwBLDouhpApkjUkrC
-         bgrhrh2XvuvesLRRfEd4bHqP4rLM7Gw+S0GX0H+8y1CE6TWRjw7dLK9olHsVOZkOWF7D
-         7hrwbR96gns9f7cnPL0NYILss2/cbg0FEj2MDLmhGZT32UOE2GNaiikh1cB6fcHk9cYa
-         pZ8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=EyEdGT/UwThY07rJVuH5QIYg5WfjYK/VMng0MYb/gWQ=;
-        fh=00y9qRIPHJrOByFqpPcq2MqCVRr745LyukDhhdK4g8c=;
-        b=EOLplpwdyQtnGy31gxu95dYeMgdf04+QXl8h5/My1nO9xPcJ+NssH/Jd5GEbr1TIas
-         fU9VZlvJMLoMISdbLGgZqpYSH070qoS0UZVt+GILPeTJNUGr3XdjAl+4HMsPPikqpXny
-         vFo4IA3zJviADoaK6V4DEV0sKI8tmAqU+7EK4+DLvUE6ULx5jNhPGfDl/ekzwfskvce+
-         m41GAD2cpuHWbPLj7jXW10NDA/zP0mhrApgoYSOYdm95HKoLYLzYtkcGOU2iDlAkYjiq
-         Nx9FDWto0gQmmlaqZ+7VYOWaqASexTCY/ACHmHsejOpMFAkUaPKStBauWL64vEYOfMJ3
-         g1Rw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778500428; x=1779105228; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EyEdGT/UwThY07rJVuH5QIYg5WfjYK/VMng0MYb/gWQ=;
-        b=C/gMUyFoCZOy89KAY9pOCMsw0hd09Lunov2FrgaSZMAcJnlZDEvy0AVkB97pkzuz3Q
-         INwm10gxdhcVyzVoc0tG3YN//o5tKnN0SuU0LQRJk7WeuE5SZQBnJPXhzdXqkppx8raK
-         bl1zl7bWhdAeZKm4y73CFkDcv1/ADGPIFadHsTjGSqUmYeAExtloCkssLo8cI2mRlmy0
-         qOhJsbhVdW4DxYCcHBGxTkvCwdd8BvXirorjS65icg61hfDNrljwFNvDHXxOiQ0oRGsA
-         6wUx38ymtG1UaLA8WDeVZl16V4i0axSlkhzd98t1xWB4l/ZDgm9m9fDA7ArDFBCiQCt6
-         rJVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778500428; x=1779105228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EyEdGT/UwThY07rJVuH5QIYg5WfjYK/VMng0MYb/gWQ=;
-        b=YJiLEd3QFhfFrU7t3FCQO9oMX42/UVSdhvv8kBxlIP6VVjgU2WDczQtVnWvnp1s4Ng
-         TDNpP7HPXF1CCr9pgPnKFZigZOhOhh8NuBiAxF46YqC8NPiq2EAwYUVStS3gWgldY2E7
-         Ike8ld7NDaJKGFBwJ0UIqNhGGiwBij4lrLaM/TwO/aUDyi3MAc7S0/BOikg0A2jpcMiK
-         /ybS6FeLtQ0FGfvNWelXpX2LGKcF7S0HIgu6PlHAxAD6JYpTG65xncbr0Mabdm0mb9Iw
-         ZOUQtqnXYMK8ntUbFg2mwtEycYj4mg0PV9+yD3Lwe9pPNeUw2entjXR7vOO3cs9XXumx
-         ALlw==
-X-Forwarded-Encrypted: i=1; AFNElJ9KBnr1k50dNfpZhxMU5gFTLbZARdXgDHx+Pjc4C3H36/8+wVnfOL5CVXQkSfeivYcblunzkJM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUHBBwlULjlbcRoKpmjFsps0InN0z19f8UwQYQgQF2iEUOfR+r
-	Us8XycuxDxvd8xjKAS6de4F9C1gwSPYX9LVAtTlX7E4HKRyE9kDPxO0bD6Nhg/HTG1oDeE8d7R1
-	icZ0taN2nkUIhkzQyGCx2FqWvAo9kFYjq/mM3ppGW
-X-Gm-Gg: Acq92OG2Wtln9WSNwHXIoGz22E9WCbSEoPCZ9ehug3BjJgiI0bWg6VGjakGddgLC2ND
-	Hx29QvfAbRgtWszg6uTxiadWHLV1CTtglbW9kEhAPno/baTgDhq8gkLvBQWnwazaFWwhWqPLmje
-	5fkcLbUCKEt6Jo1IuDuDekTv3hyeMD3x/tKr3ey64ElalqK4ZPW4fmVrLRQCTWvv84yUIFkZg2H
-	9L1lzjcEewve4brLXSl9TTxWH0XVLnnWiC/FwfV4538YuP+pNZMZ6deMl28eL7u2pBZj1v3fR/Z
-	jU4dwtd3h4wdGUiguj56aECGpaLXN7AWbYM43OzGTk97qKncRKrLMA9x9xVuxQ==
-X-Received: by 2002:a05:622a:8d12:b0:50e:5c9d:49c7 with SMTP id
- d75a77b69052e-514a046fbc9mr19494131cf.7.1778500427992; Mon, 11 May 2026
- 04:53:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ik+Jsoeg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37C90C2BCB0;
+	Mon, 11 May 2026 12:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778502669;
+	bh=4cj4AFpxR7VfRzsb4XVcpSOKHntygkHpeH2TRzpG76A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ik+Jsoeg6Q3DJuanPHz1lpNamzmd17Yr5QPCV8lyzZTR8FB/LKe+SXBQRARyF3Q6E
+	 ugGWVkLSx7xQOY2BOpClEh36pzqyfKnvC/6lBvcZNDtCRocKIM4VnXlk2Jk4QSDHY6
+	 fIhnWYrcmxdyarFsFke6+3jj7kE38dPsZIsTKtGv43mZcGCF0tH37wnju55G8vayL1
+	 l5Uj4B7pK9w4MJR2hHx6sIJg37t4GoDh7lquM0WSg6eHo3uGZWmY2DNGWjuA1YB3Pl
+	 5batzUW6ViddTwtV6B7gw53TbJHoAuZBsxoahpSezLjrNCGGgBz6IMl7VUfifq6jz+
+	 o/fVhTzgqoYeA==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id 1B24E1AC58A9; Mon, 11 May 2026 13:31:07 +0100 (BST)
+Date: Mon, 11 May 2026 21:31:07 +0900
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v10 01/30] arm64/sysreg: Update SMIDR_EL1 to DDI0601
+ 2025-06
+Message-ID: <agHMCyu12-q9qSyI@sirena.co.uk>
+References: <20260306-kvm-arm64-sme-v10-0-43f7683a0fb7@kernel.org>
+ <20260306-kvm-arm64-sme-v10-1-43f7683a0fb7@kernel.org>
+ <af4ZYVFsbYlEfdOu@J2N7QTR9R3>
+ <af6DH_j7pyEm4HyI@sirena.co.uk>
+ <agGyAvutI1GOCQkI@J2N7QTR9R3.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260501111928.259252-1-smostafa@google.com> <20260501111928.259252-6-smostafa@google.com>
- <20260501124716.GD6912@ziepe.ca> <afiODW2sVMeOj3Ag@google.com>
- <afoagb/wVBJD1IX+@ziepe.ca> <afofSPQbepd_fpom@google.com> <afsQTwO3eW+Ks2fe@ziepe.ca>
- <afxlufh3t3hRe4-G@google.com> <20260509233443.GK9285@ziepe.ca>
-In-Reply-To: <20260509233443.GK9285@ziepe.ca>
-From: Mostafa Saleh <smostafa@google.com>
-Date: Mon, 11 May 2026 12:53:36 +0100
-X-Gm-Features: AVHnY4Iy01SZKx6-ZKVz0uRzPgk9VsXyMheNVJnPIgQawwYuBaPqoPjvouiwCBk
-Message-ID: <CAFgf54rJqq_bJONpx85p+uB68i1oVAGZW40aZA1ufid_5fqwQw@mail.gmail.com>
-Subject: Re: [PATCH v6 05/25] iommu/arm-smmu-v3: Move IDR parsing to common functions
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev, catalin.marinas@arm.com, 
-	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, joro@8bytes.org, 
-	jean-philippe@linaro.org, mark.rutland@arm.com, qperret@google.com, 
-	tabba@google.com, vdonnefort@google.com, sebastianene@google.com, 
-	keirf@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pfCVkcJhE9mTQmhr"
+Content-Disposition: inline
+In-Reply-To: <agGyAvutI1GOCQkI@J2N7QTR9R3.cambridge.arm.com>
+X-Cookie: Truckers welcome.
 
-On Sun, May 10, 2026 at 12:34=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wro=
-te:
->
-> On Thu, May 07, 2026 at 10:13:13AM +0000, Mostafa Saleh wrote:
-> > > I was thinking more like
-> > >
-> > > #define arm_smmu arm_pkvm_smmu
-> > >
-> > > Before the pkvm compile of the shared code.
-> >
-> > Oh, so we rely on arm_pkvm_smmu and arm_smmu having the same field
-> > names and types?
->
-> Just for the shared code, yes.
->
-> For instance this patch would require the features field be present in
-> both, and then all you do is directly copy all the smmu->features
-> logic into the shared file and that's it.
->
-> > I don=E2=80=99t think that=E2=80=99s better for maintainability, I can =
-look into it
-> > if Robin and Will are OK with that.
->
-> I think maintainability here means pkvm minimizes how much it changes
-> the code of the main driver.
->
-> Copying a bunch of functions into a shared .c file exactly as it is,
-> then compiling the shared file with some #ifdef'ery at is going to be
-> long term better than trying to mangle the whole thing to avoid using
-> any of the core types and not directly share the code, IMHO.
->
 
-There isn't #ifdef'ery at the moment, that's what I was trying to
-avoid by introducing shared code.
-I believe that can be treated as a library as most of the shared code
-is about HW description (commands, invalidation, IDR probing...)
+--pfCVkcJhE9mTQmhr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Like my tlbi point for instance, it is not a good idea to rip out a
-> little bit of the invalidation logic then open code a pkvm
-> version. Use the exact driver code. But to do this you need to pass an
-> arm_smmu through to to the pkvm specific queue management functions.
->
+On Mon, May 11, 2026 at 11:40:02AM +0100, Mark Rutland wrote:
+> On Sat, May 09, 2026 at 09:43:11AM +0900, Mark Brown wrote:
 
-What concerns me is how fragile that is, any change in the main struct
-can easily break the hypervisor, unlike if we have a clear shared code
-and defined API that is used by 2 entities.
-I will think more about this before v7 and see how intrusive it is.
+> > We're exposing the affinity fields so there's a build time issue.
 
-> > > How does pkvm compilation work anyhow? Is it all rolled into a unique
-> > > link, or do you have to worry about symbol conflicts with the main
-> > > kernel?
-> >
-> > All pkvm symbols are prefixed with __kvm_nvhe_ in the main kernel.
->
-> So automatically with objcopy or something like that during the build?
->
+> What I'm asking is what is the rationale for updating these definitions?
+> e.g.
 
-Exactly: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
-/tree/arch/arm64/kvm/hyp/nvhe/Makefile#n96
+> * Are we planning to use any of the fields in a specific way in the
+>   *host*?
 
-Thanks,
-Mostafa
+> * Are we planning to use any of the fields in a specific way in the
+>   *guest*?
 
-> Jason
+> * Is this updated just out of habit?
+
+> Knowing the rationale would help with review, even if that rationale is
+> just "it seemed nice to use the latest".
+
+The immediate motivation for including this in the current series is the
+above.
+
+> Which people are aware?
+
+Probably a conversation best taken off list.
+
+> > > Do we expect to expose that to VMs, or just hide priorities entirely? I
+> > > suspect we probably want to require that the guest sees
+> > > SMIDR_EL1.SMPS==0, and not care about any of that.
+
+> > Currently we're not exposing priority support to guests so we don't need
+> > to worry about it yet.
+
+> Do we plan to in future?
+
+The plan to evaluate the priority support that hardware implements in
+the context of practical systems and consider if and how to expose it
+for either hosts or guests, we need to ensure we've got a good
+understanding of the system impacts and user needs.  Architecturally the
+priority support is all very implementation defined.
+
+--pfCVkcJhE9mTQmhr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoBzAoACgkQJNaLcl1U
+h9DPQAf/SInPpjUAtj1bRvp1YePRMRh2qdaVto7ygoI98Dhsvq+5UWD7dCYSDKJt
+2aAm55eLL3hSs4fkLK4HPUnXDsBez6ZxoGQPvFtcuM74FRKPBHuKQ9GvWB6ueO08
+owAzkEPBUqaDWkHup7eQwXwlXtksLw2WaTniQaAaKLprrLIDAr97U30kaLowRMbm
+/1HPUx42NG+yEZs7O0KfEPKzl6WdApz2zxBxRgLYzgs3QHKJDiQZ9g9z1NryLgSK
++QHdfRFhN/iRUaHqgHY50zCrysR8LUXjYSjS/VbSk3c4O1m2AF0GV84j3uwAunYy
+4Y6zZmylTgiqhjTcKPAYWPsp8DKdiQ==
+=Gq3j
+-----END PGP SIGNATURE-----
+
+--pfCVkcJhE9mTQmhr--
