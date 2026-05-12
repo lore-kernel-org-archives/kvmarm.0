@@ -1,144 +1,116 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD143911DB
-	for <kvmarm@lists.linux.dev>; Tue, 12 May 2026 12:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46813A7D77;
+	Tue, 12 May 2026 14:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778589894; cv=none; b=FaZ8qJ1m6dmjMttBJPs1cdatip3Uky3EmhlEKE/NGbSMBbx4q3sCPSk6+aRlP8pspRIMS9gQlbeA89zuSAicIEShqR3AneW55KKTXz2gF9a81knxg1x4WXJ9n6nEISbtxMOoNvslXu8nQiYqTnZ11/mbFpc/7L28+1gPBym01qU=
+	t=1778594884; cv=none; b=HqylZn+0I4MdDLL16odDCL6NyALwZrNo1pvCwhfve8O8TCbbGGVHKxR/VmCrUvYwFqF/8elt8aUtiZ9D+D0JZetm+iOmnae3gck2brVdDrl+akRfjZaCtJNiP+WXZof1rhnktuH31zQwBs7J55HvAbka83vkJ0BIqxcmjdd3CIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778589894; c=relaxed/simple;
-	bh=fc0BwgY/sxg9lBbZXx+RPQE1eC2p+OonaIf/G8VokH4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kp4NgG3h27mO+FTjJarE4TqBxgTyn4iJvmnQmZv7JbUDtxADQpimXikIsuEhGV6pKz6BBYbeFCM3n+AIhK/ZwtBZQZt4rnbDOgmfi7nUfJVCTqcAX8qOJLyZzf5Cw2kQAHnMrY5Hn6z3Qf0dYSF5hCDAP645NkqpAYbOOP7oi10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vHeSdU4g; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1778594884; c=relaxed/simple;
+	bh=dd7f49n2CrdKm/TzWKQya8Il4PnSU0oNmHb+Bd1Oj/k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oiwV9k/ZWjbI1wSc84ObDagPh69//JeBH+cob2D1aVMLd9GTjkMonyGZ+wm4jaRg4GEVpsHVOBo28Avt5u8zu+FdGIyj3XAhfBggoWR8aaeCFtPxMCBluaperkN+XAfqO7WYZ+YoxTADKjCgtaxpSwHcYATfMWl47w8o5+Vyh2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rp0iIc0v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vHeSdU4g"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48eb0da933fso2680765e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 12 May 2026 05:44:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778589885; x=1779194685; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d24wrYQaXGsSCPSg2rGnw1RTPAIojJGcxLwZrJaJw28=;
-        b=vHeSdU4gDT+P/lqk/1/1aLz4Ys3iaQLE8hrk9STQg7hdfNtAYEmkIUtTDj1HvnI5O6
-         SIYL8OMrMpdzIz1bYoB6YLqunx0E4hkJClCboVjeza5v53YrN9tVA632hFA2VVFdbYXi
-         JRQLN4KuYPkvOejXHlCZZMpLIfrkEOSE08UAgICJPAFyk+guIFlL6AvSNPJzQI5mkXTQ
-         D47vmcojv8iK9qX3ioyX9+gkmONM6q48onmIyOl8J4XeZch+nGVI5mBr3zEGVc6HPrYG
-         hnsb/RnOOM7v5tRBA421NqFSeY1FQNl25ur1zV9ZtIIoivPVBKU5Hzv7EN85XPrE8mPH
-         +OSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778589885; x=1779194685;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d24wrYQaXGsSCPSg2rGnw1RTPAIojJGcxLwZrJaJw28=;
-        b=Ll2U1rtTR56UwHgmg0GSZPDBHyjcbMBmp/+nvaxTN8PQUt0xSgtuXiYW4hMx2jwhfn
-         zi6RIxhSxiwAEsDz4G2VOYgFFXM6D/XHfb1cOocuJ80Ou3ZeKle7y3qQZjpKNpaH65yN
-         NPzvtn0GeksfTWPCzXTsZKkS6e9Dcu14JWMtVJK8YXtt82QMcOqCKYsUPf5JWUmfGdcq
-         lINGSo4fKLSiSJgRXUzWPdPJvzIbhVz3jfDztZMqx5q52gRy7uVwo+vv8P/NBFTCHMMX
-         lTWLGqSk92wKbMFnL7jQ0D1yJiQ+8yR/uMbXJYZCmJgQn6RMGlrC4sRD5YGHR8EFpydx
-         2oJQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/bFeNea1jECUCIk5fzWOZpZVHSzHrJEaizhH7ao6aBTUG/OEd+e1OIzyjOz3DCBb5x3XySLJY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyMvwgwEuXoVsLJ1SmnvLM92LG9iiTnaIDYYCTJ4DzlEysBYu5G
-	eqfgnM8qc1Jl722NElwjNJK6P5AiTPPZudN40IRvjBbbx1RE1MvS6Rhs9UUwCBy+Lf1zfo859Nw
-	s9gvNFNVh0UkkRMyAmz3ZASPYDnrjwA==
-X-Received: from wma11.prod.google.com ([2002:a05:600c:890b:b0:48a:5547:c79e])
- (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:2b01:b0:48e:978f:c45a with SMTP id 5b1f17b1804b1-48e978fc469mr17151565e9.19.1778589885365;
- Tue, 12 May 2026 05:44:45 -0700 (PDT)
-Date: Tue, 12 May 2026 12:44:41 +0000
-In-Reply-To: <20260512124442.1899107-1-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rp0iIc0v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 810BAC2BCB0;
+	Tue, 12 May 2026 14:08:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778594884;
+	bh=dd7f49n2CrdKm/TzWKQya8Il4PnSU0oNmHb+Bd1Oj/k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rp0iIc0vbaZYGiuK/U8xzISaEaxxI8Tg1FrSEygBhe0adHjrNsWj2JyYFQWGLS4cG
+	 +AiibQcXotwOSY0sYokVyqWjHqZGMmdu85Zz0TtS0nokHMYDrWDGcQ+k0+QPK+ZU5m
+	 YxQ3NXlx9FqkIMGBGZd6eZNJqrHFh+/ZaU9wy2UtBfVMbbnKumG4ILKj/TtQecA4vt
+	 xjJ/1TUgs5+AoC0IjmqzEq3/2IvROzr0qXxyrUhKBTyPYQdJtnlO/EO2RSEsWdpZah
+	 Lil4or1GrJxJe+uyHsP2A3AO64Zm3LThBFUJxKxOUXOoY4TGRP28tM+m0AyBSkI336
+	 0kxWvPnRP1xiQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wMnmE-00000001Zsc-1sqQ;
+	Tue, 12 May 2026 14:08:02 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH 1/2] KVM: arm64: nv: Track L2 to L1 exception emulation
+Date: Tue, 12 May 2026 15:07:54 +0100
+Message-ID: <20260512140755.3676306-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260512140755.3676306-1-maz@kernel.org>
+References: <20260512140755.3676306-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260512124442.1899107-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260512124442.1899107-2-sebastianene@google.com>
-Subject: [PATCH v3 1/2] firmware: arm_ffa: Fix Endpoint Memory Access
- Descriptor offset calculation
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
-	sudeep.holla@kernel.org, will@kernel.org
-Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, 
-	sebastianene@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, mark.rutland@arm.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Use the descriptor's `ep_mem_offset` to calculate the start of the endpoint
-memory access array and to comply with the FF-A spec instead of defaulting
-to `sizeof(struct ffa_mem_region)`.
-This requires moving `ffa_mem_region_additional_setup()` earlier in the setup
-flow.
-Also, add sanity checks to ensure the calculated descriptor offsets do not
-exceed `max_fragsize`.
+While we currently track that we are emulating a nested ERET from
+L1 to L2, we currently don't track the reverse direction (an exception
+going from L2 to L1).
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
+Add a new vcpu state flag for this purpose, which will see some
+use shortly.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/firmware/arm_ffa/driver.c | 14 ++++++++++----
- include/linux/arm_ffa.h           |  2 +-
- 2 files changed, 11 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 3 ++-
+ arch/arm64/kvm/emulate-nested.c   | 4 ++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
-index eb2782848283..56b166290b24 100644
---- a/drivers/firmware/arm_ffa/driver.c
-+++ b/drivers/firmware/arm_ffa/driver.c
-@@ -685,18 +685,25 @@ ffa_setup_and_transmit(u32 func_id, void *buffer, u32 max_fragsize,
- 	struct ffa_composite_mem_region *composite;
- 	struct ffa_mem_region_addr_range *constituents;
- 	struct ffa_mem_region_attributes *ep_mem_access;
--	u32 idx, frag_len, length, buf_sz = 0, num_entries = sg_nents(args->sg);
-+	u32 idx, frag_len, length, buf_sz = 0, num_entries = sg_nents(args->sg), ep_offset;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 65eead8362e0b..c79747d5f4dd1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1112,7 +1112,8 @@ struct kvm_vcpu_arch {
+ #define IN_NESTED_ERET		__vcpu_single_flag(sflags, BIT(7))
+ /* SError pending for nested guest */
+ #define NESTED_SERROR_PENDING	__vcpu_single_flag(sflags, BIT(8))
+-
++/* KVM is currently emulating an L2 to L1 exception */
++#define IN_NESTED_EXCEPTION	__vcpu_single_flag(sflags, BIT(9))
  
- 	mem_region->tag = args->tag;
- 	mem_region->flags = args->flags;
- 	mem_region->sender_id = drv_info->vm_id;
- 	mem_region->attributes = ffa_memory_attributes_get(func_id);
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+ #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index dba7ced74ca5e..15c691a6266d5 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2862,6 +2862,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 
+ 	preempt_disable();
+ 
++	vcpu_set_flag(vcpu, IN_NESTED_EXCEPTION);
 +
-+	ffa_mem_region_additional_setup(drv_info->version, mem_region);
- 	composite_offset = ffa_mem_desc_offset(buffer, args->nattrs,
- 					       drv_info->version);
-+	if (composite_offset > max_fragsize - sizeof(struct ffa_composite_mem_region))
-+		return -ENXIO;
+ 	/*
+ 	 * We may have an exception or PC update in the EL0/EL1 context.
+ 	 * Commit it before entering EL2.
+@@ -2884,6 +2886,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	__kvm_adjust_pc(vcpu);
  
- 	for (idx = 0; idx < args->nattrs; idx++) {
--		ep_mem_access = buffer +
--			ffa_mem_desc_offset(buffer, idx, drv_info->version);
-+		ep_offset = ffa_mem_desc_offset(buffer, idx, drv_info->version);
-+		if (ep_offset > max_fragsize - sizeof(struct ffa_mem_region_attributes))
-+			return -ENXIO;
+ 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
++	vcpu_clear_flag(vcpu, IN_NESTED_EXCEPTION);
 +
-+		ep_mem_access = buffer + ep_offset;
- 		ep_mem_access->receiver = args->attrs[idx].receiver;
- 		ep_mem_access->attrs = args->attrs[idx].attrs;
- 		ep_mem_access->composite_off = composite_offset;
-@@ -708,7 +715,6 @@ ffa_setup_and_transmit(u32 func_id, void *buffer, u32 max_fragsize,
- 	}
- 	mem_region->handle = 0;
- 	mem_region->ep_count = args->nattrs;
--	ffa_mem_region_additional_setup(drv_info->version, mem_region);
+ 	preempt_enable();
  
- 	composite = buffer + composite_offset;
- 	composite->total_pg_cnt = ffa_get_num_pages_sg(args->sg);
-diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-index 81e603839c4a..62d67dae8b70 100644
---- a/include/linux/arm_ffa.h
-+++ b/include/linux/arm_ffa.h
-@@ -445,7 +445,7 @@ ffa_mem_desc_offset(struct ffa_mem_region *buf, int count, u32 ffa_version)
- 	if (!FFA_MEM_REGION_HAS_EP_MEM_OFFSET(ffa_version))
- 		offset += offsetof(struct ffa_mem_region, ep_mem_offset);
- 	else
--		offset += sizeof(struct ffa_mem_region);
-+		offset += buf->ep_mem_offset;
- 
- 	return offset;
- }
+ 	if (kvm_vcpu_has_pmu(vcpu))
 -- 
-2.54.0.563.g4f69b47b94-goog
+2.47.3
 
