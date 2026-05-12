@@ -1,36 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47073A83A8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEB53A986D;
 	Tue, 12 May 2026 14:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778594884; cv=none; b=B9Dqd7M4boE/ql6whrYmRDe+xlnPRlL2VM1w2Lt90P2ekJwmG4mzc8AM6r+vzCH93jn3yLCTmbU6XVfrqA6HKE6EC58dWLjcNWZVpBy2CWr87hh5rcwhzWOKrFjbIPcWEUYnRu7aUIgIDslzapJdH9HNie6QimgSM7z6OjC6gT0=
+	t=1778594885; cv=none; b=ZEf7PKZ+HFLb3CmoKeTI+BMaCtRHJcIH0RABDIQeKICm8QJTFkCjSJ6BJQF9hjJAguCSDoUlb7GyPe0WsxoGh+3x0A/xXE4T5TFwf/hMfAsw2KZ+7e1xMHoFsqSY8LOTac0HvfF3CYmH3wuoTDTRdi43yDi+iaZyT0wMoKSeaqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778594884; c=relaxed/simple;
-	bh=e4PfbEx8jOhpSA8r+WhznHgdIOWa2m/L358uEzzJ8tA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SEfo25HAc2pzc95vDfSzaP2p+89238RbvnSEUtj3y64yzzd5q2cOMsZps+YXKTWloIPkSuHyqWN2E91/lImMYrdBYZ5YSMU5WcwwO/B01x8dJygaM0PGCdUdA6l0lBT7tOyIqYmMIG+Rzx+ttdJ/7+XhyCChGRqHTRAQoAVyvCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HoRUSFBU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778594885; c=relaxed/simple;
+	bh=2z0QUbRfd7RQy2VdTzINQY27ivTVVpTJV9yTHwNGfXQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FKOhTchMlJkyiSMp8QbqHCGgGa6J3UfGCt2k8U9tEblf7CiJnTJ60ebERwLSiqcqUGJyuzwLhNDDp+3poXT8PBtvrYk9pQKiNgfeX0PVtdGJQBfYHlpVunpA/ALJP2ocq/y+Tfrom6/i1u0YM+7X3SOcs5OzNEkwP+p+1ccfK+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZZxpbcZb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HoRUSFBU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E50AC2BCF5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZZxpbcZb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90B27C4AF0B;
 	Tue, 12 May 2026 14:08:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1778594884;
-	bh=e4PfbEx8jOhpSA8r+WhznHgdIOWa2m/L358uEzzJ8tA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HoRUSFBUtJ49xk/SlHh6YvAELuufx8PqujoTufwIGwdAAAgX1BDIlk5oKXkQMrJeT
-	 VoaEqMx3Efv2/9hPIi3wNQhVJKmUVZdkKcBRFC1JnEw7G0p7DO2bXsWlHOa5dwLPGb
-	 wPj4N2x8uwFLq4ZbWCAHwrgucTIw6IsqLs6ebUc60laebpZH+vmevaPI6Yewl5KALV
-	 E6DCEEhi8WkfkfhjDwV4VCXZtcdT2KvzNF2vWBGK/yncJ3/FMay1ihYLAn6VANImVi
-	 JQYjByPrLZEf7OcmKbHTGYOLWvAjQ4Uxt279v64k/ARt6KnEOKWawi+BzN6ZZfwOz9
-	 prT/hoO1HAjiA==
+	bh=2z0QUbRfd7RQy2VdTzINQY27ivTVVpTJV9yTHwNGfXQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ZZxpbcZbuxxboPRxAOcWEUUjyEggALZMoAkjgheNjXj3ATYmpjl55r6kScF4HCLYh
+	 lhbkpBkLbRuVsgQZ1FOnoy4dy7++6VqebjJql+nLaf5rOI9hEvgi02H6/67rSmIiyz
+	 kHpnoOrtPg2ZbXnUgToqjNqYdsb1NwwzUZOc6K5KmlvxD9Ias3mo4ocN0cHvOC84WA
+	 I9ySauTnCuxU6fIDA4HmG7K1s7NyUW1bQoSQv8VVNsX/U/L2EmPpHaokMUs/mOvamg
+	 48lZQkhRLvDFbuoJW3eBarqzctog8hLhTFNaGfwh0jzb4GAcDq1mOfUjrcUAgjpwio
+	 dA/D/4rWNiKqg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wMnmE-00000001Zsc-2qlf;
+	id 1wMnmE-00000001Zsc-0q45;
 	Tue, 12 May 2026 14:08:02 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,12 +43,10 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 2/2] KVM: arm64: nv: Don't save/restore FP register during a nested ERET or exception
-Date: Tue, 12 May 2026 15:07:55 +0100
-Message-ID: <20260512140755.3676306-3-maz@kernel.org>
+Subject: [PATCH 0/2] KVM: arm64: nv: Reduce FP/SVE overhead on exception/exception return
+Date: Tue, 12 May 2026 15:07:53 +0100
+Message-ID: <20260512140755.3676306-1-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260512140755.3676306-1-maz@kernel.org>
-References: <20260512140755.3676306-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,72 +59,56 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When switching between L1 and L2, we diligently use a non-preemptible
-put/load sequence in order to make sure that the old state is saved,
-while the new state is brought in. Crucially, this includes the FP
-registers.
+Staring at NV traces has shown that there is a substantial amount of
+overhead being triggered when a guest switches between EL1 and EL2 (or
+the reverse). This is caused by the naive put/load mechanism we use to
+multiplex EL1 and EL2 onto EL1 only, and the FP handling appears as a
+prime candidate for optimisation. More precisely, there are two
+distinct sources of overhead here:
 
-However, this is a bit silly. The FP registers are completely shared
-between the various ELs (just like the GPRs, really), and eagerly
-save/restoring those in a non-preemptible section is just overhead.
-Not to mention that the next access will end-up trapping, something
-that becomes exponentially expensive as we nest deeper.
+- the FP/SVE registers are saved, and potentially the host userspace
+  state restored when doing put()
 
-The temptation is therefore to completely drop this save/restore thing.
-Why is it valid to do so? By analogy, the hypervisor doesn't try to
-poloce things between EL1 and EL0, or between EL2 and EL0. Why should
-it do so between EL2 and EL1 (or EL2 and L2 EL0)?
+- the FP traps are reinstated as part of load(), as the state is now
+  the host's
 
-Once you admit that the FP (and by extension SVE) registers are EL-agnostic,
-the things that matter are:
+These two things mean that we end-up with a lot of work during this
+switch, and that we are 100% guaranteed to get a FP/SVE trap very
+quickly, as the guest keeps using the FP registers. These traps
+themselves result in some horrible trap amplification in even moderate
+levels of nesting, which we could trivially avoid. A bit of thinking
+indicates that it should be entirely valid to elide this stuff in the
+context of a nested exception/exception return.
 
-- the trap controls: the effective values are recomputed on each entry
-  into the guest to take the EL into account and merge the L0 and L1
-  configuration if in a nested context, or directly use the L0 configuration
-  in non-nested context (see __activate_traps()).
+The first patch in this small series just add a new vcpu state flag
+indicating that put() and load() are done in the context of a nested
+exception from L2 to L1. This is the exact pendent of IN_NESTED_ERET,
+which tracks an ERET from L1 to L2.
 
-- the VL settings: the effective values are are also recomputed on each
-  entry into the guest (see fpsimd_lazy_switch_to_guest()).
+The second patch uses these two flags to abruptly elide FP/SVE
+save/restore when any of them is set, sidestepping the overhead
+entirely.
 
-Since we appear to cover all bases, use the vcpu flags indicating the
-handling of a nested ERET or exception delivery to avoid the whole FP
-save/restore shenanigans.
+Performance-wise, this is rather impressive. I get a 10%-20%
+improvement on running the Debian installed as an L3 on my QC
+platform. Combined with the use of the EL2 virtual timer, it almost
+makes L3 usable.
 
-For an EL1 L3 guest where L1 and L2 have this optimisation, this
-results in at least a 10% wall clock reduction when running an I/O
-heavy workload, generating a high rate of nested exceptions.
+But of course, nothing is simple with this stuff, which is why I'm
+cc'ing Mark here, as he's done a lot of work tracking funny bugs in
+our FP handling. Hopefully I haven't subtly broken anything, but let's
+see!
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/fpsimd.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Marc Zyngier (2):
+  KVM: arm64: nv: Track L2 to L1 exception emulation
+  KVM: arm64: nv: Don't save/restore FP register during a nested ERET or
+    exception
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 15e17aca1dec0..73eda0f46b127 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -28,6 +28,10 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	if (!system_supports_fpsimd())
- 		return;
- 
-+	if (vcpu_get_flag(vcpu, IN_NESTED_ERET) ||
-+	    vcpu_get_flag(vcpu, IN_NESTED_EXCEPTION))
-+		return;
-+
- 	/*
- 	 * Ensure that any host FPSIMD/SVE/SME state is saved and unbound such
- 	 * that the host kernel is responsible for restoring this state upon
-@@ -102,6 +106,10 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- {
- 	unsigned long flags;
- 
-+	if (vcpu_get_flag(vcpu, IN_NESTED_ERET) ||
-+	    vcpu_get_flag(vcpu, IN_NESTED_EXCEPTION))
-+		return;
-+
- 	local_irq_save(flags);
- 
- 	if (guest_owns_fp_regs()) {
+ arch/arm64/include/asm/kvm_host.h | 3 ++-
+ arch/arm64/kvm/emulate-nested.c   | 4 ++++
+ arch/arm64/kvm/fpsimd.c           | 8 ++++++++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
+
 -- 
 2.47.3
 
