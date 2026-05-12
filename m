@@ -1,204 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0583672BC
-	for <kvmarm@lists.linux.dev>; Tue, 12 May 2026 06:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DC92D7398
+	for <kvmarm@lists.linux.dev>; Tue, 12 May 2026 07:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778567960; cv=none; b=of0aHo+L/aRtAuLX9aUvVjKl8fE/NrtgjC875v/5WoOXJ2MsQDeuROv5sLv97EqshpFonAw8WTY+bAKb6G0zPnFB5jAuXhe9F0mrKqc3hGWsuxZ0dIp9jNDUZ+05qzdPzUnAFAze+sOlOhoHImFosp8SGNPD3phtFueZa/hVgzk=
+	t=1778570909; cv=none; b=OVPC0B3GWaOjoBNO9jHZ/RoxsZnvtMQ0k6gK+z3oIy9nGPu9AyMtZCPgg4uLWlfLusyXx9bbLbqRJiAMDa5YtS8iaJjtYMbzJZFEtnQq/So6enrGnGzEcs024n3c6hN32AhKM4e/IApYqLahOViYFFWNyAVKytSZ+3QDhl7vwjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778567960; c=relaxed/simple;
-	bh=AaF7Pg49ZtOu/qWrq8MAFB6/VISZqWhNUbuQ8l0sY4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UfEpcU05wBkasa3J4D3p/XVyWCirfbvbBC/hKowD33lHEGBc2aLUBNiIDm7EabA7URhIKNC5EWxdFnVkLXuiG06OcztOU+kP8j/g78cY2ukteeesjDp60qN9Pe9kN+4hQt8kqoxqFlttCkrFb8m09pKWCpPy3qWS+1OJJKon7B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cLYwxtUP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778570909; c=relaxed/simple;
+	bh=BF1h7d3QFH3gs3GCJRmEVg8aCTgCY+D4Jfh7Gj1jblo=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Da2xqiTMeaP2Fzyxw7PUCR2Q3YlYfyT6S3atIlJVkRrwwMZJhWa7eE9LLNW7tq2FI8+Xph0txGAaHMDzpfl6ZnC0Stwt+gcMEYmE+zAML+wcYwVCUNx+tGJ1mXoPnFmuAmrIjv26gMe3+9uX6/GOR0GEM0sMBgcpTFDTeHSZLg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jDz5xt+7; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLYwxtUP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778567944;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NoVJ+c/uz80TrOdip6QXqOUN43LCIvcXnIK/rRMfnkc=;
-	b=cLYwxtUP/ZfIsM6IyKDBHYiUNg0vS4M19qMqzaLPwNSWL7Lh79DZvHf0FCxMXditTwPB8s
-	DR4qNR5FKCK9Nobb8U0z+JDoTo5R2wKwz82Ilk3eV0dnRgbGaW5bsBVeRQEjXu4dF5NnrM
-	DDZJHMoEZTITli39ZH++95yuHH4h6hs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-55-OcN-N_LFMGiKn0ObpW95yA-1; Tue, 12 May 2026 02:39:03 -0400
-X-MC-Unique: OcN-N_LFMGiKn0ObpW95yA-1
-X-Mimecast-MFC-AGG-ID: OcN-N_LFMGiKn0ObpW95yA_1778567941
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4518f777225so3244022f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 11 May 2026 23:39:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778567941; x=1779172741;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NoVJ+c/uz80TrOdip6QXqOUN43LCIvcXnIK/rRMfnkc=;
-        b=S42H7lB7HBqpqf7wQXxE+3R6BIz79WaN7kCFAHPBfy2U/Q/pqKbd4vdNdaXDAOlMiK
-         J/r5fh+SV/TM9JKD1LA+ZQ+HU4pTXhgCQtfSxpb9mvAwtZ0LTWrrLjDRSFlbdvsxVERC
-         S29aNiv+SwNnIiGEviXkMHHHBtAewL8o0fl0u1UJ36keWjxS9Odwe6cDahJb4Yy/Xt5F
-         Vg9w+LDmCVjr+tsDsh/nPiGNNv/Vt9zlbURTM5jw0SVbfLy6jJe8iYD52OvbYU6u574H
-         2KyRI9QptdMPGwCZ3FdPsk2tsX6V/v0JDCHvBpa6RbSPQPDH0xDiLFB6Qb81ZOYPulMA
-         JO3g==
-X-Forwarded-Encrypted: i=1; AFNElJ/CFuTiAa2l89GczdiV8DYQDrURtLKs4lJgRHLe/lVoW/fck/Cyot3rqpK0UO5QvzaNJTGAaak=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxPH39TSSprGqOa7+bq/u6pMYpH8k8rXMq828qkR2Ie4q5KkOKV
-	SiSXJ38v4IM/FJ+S75ydtPQp1+VWzTWji60kBQp/qDthhdFQk7jWlnJSy7qkKTzflfr5Rp/Elqv
-	EBrXI2ORho7cNb/ymdLtNZBbkj3WdHPy53vPWBAQqrA1w9M6anj+ErqjQNg==
-X-Gm-Gg: Acq92OECFJJbMC6rSYSfP4Z2mg23DquWaDYnG7SdR4DlMVN/yk93GlEaGgVrqLXszzc
-	TEXpTWxrSa/QkS5pB4Cml6FoZqXB6g/5JAxp5U+8JyNMbGtoifC79MWDBIK9VxYNFBux3hMLfe1
-	voR1/P56xum/s50Cgc+VJ1Mx/luB32yFwffFXsCmYmcEf7tJLnR8p+tZ8zldk96rtljyqsLn6xD
-	lz5N1vm4T/AUj8DTN0pPSRYN8xTJCnHe83ro7s0qtS15L0xEZJNWxR6Fr+eRTVmSssw1PuYtWIr
-	Gh7XM0Mz7ZxpKeuoqqKwQFib1+zN4Po3EeNrA00yyMUsyHNz5KAK3coy2q1m8mLRna9kalr+K+P
-	Ll0ObwR7x08gZk9/n3xkZn7E3ZMpcN7oZfGFgNCwLYug3reg1UONq199LGhiyOlUsABtNSw==
-X-Received: by 2002:a05:600c:c058:b0:48e:6db3:ff33 with SMTP id 5b1f17b1804b1-48e6db40058mr168505705e9.14.1778567941134;
-        Mon, 11 May 2026 23:39:01 -0700 (PDT)
-X-Received: by 2002:a05:600c:c058:b0:48e:6db3:ff33 with SMTP id 5b1f17b1804b1-48e6db40058mr168505275e9.14.1778567940725;
-        Mon, 11 May 2026 23:39:00 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548e6a5b65sm31614561f8f.8.2026.05.11.23.38.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2026 23:39:00 -0700 (PDT)
-Message-ID: <c7bfd8f7-3e3f-49fe-a8f4-ac0212a1762b@redhat.com>
-Date: Tue, 12 May 2026 08:38:58 +0200
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jDz5xt+7"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=0nYwTUDHswJFeRsm/3KU6Cy6V8aaaXNHXn0IsdxK2KM=;
+	b=jDz5xt+7E9Lxfqur4EwzYh7d4J68ycyVgDFhfjX+3kufj3THHFvpmx0rAgUJs7I3IvBvS/xhN
+	kRmNigPk/3bor01beAWpkIif/AtEHZ2SkATpOewgHbf9yewe0lajQKkW0+LLDeh9Udesbzl1aZw
+	0kHXJRz4zkGulG4lwkrqlWc=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gF7Kk28hxz1K96d;
+	Tue, 12 May 2026 15:20:42 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5A6B34056E;
+	Tue, 12 May 2026 15:28:17 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 12 May 2026 15:28:16 +0800
+Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
+ fault-in on !mmap()'d memory
+To: Sean Christopherson <seanjc@google.com>
+CC: Zenghui Yu <zenghui.yu@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>, Ira Weiny
+	<ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>, Shivank Garg
+	<shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, Xiaoyao Li
+	<xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba
+	<tabba@google.com>, Ackerley Tng <ackerleytng@google.com>, Tao Chan
+	<chentao@kylinos.cn>, James Houghton <jthoughton@google.com>
+References: <20250729225455.670324-1-seanjc@google.com>
+ <20250729225455.670324-25-seanjc@google.com>
+ <0064952b-048c-455d-ad89-e27e5cb82591@linux.dev>
+ <aeJkCGwsrRmuBikT@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <c17d864a-42fc-afbe-345e-c728e2735d0c@huawei.com>
+Date: Tue, 12 May 2026 15:28:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
- automatic generation
-To: Shameer Kolothum Thodi <skolothumtho@nvidia.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "philmd@linaro.org" <philmd@linaro.org>
-Cc: "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260503073541.790215-1-eric.auger@redhat.com>
- <20260503073541.790215-4-eric.auger@redhat.com>
- <CH3PR12MB7548C2AB4989FEF96C247D47AB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <CH3PR12MB7548C2AB4989FEF96C247D47AB3C2@CH3PR12MB7548.namprd12.prod.outlook.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 5L4RgsKQX00GJc0MEUl6RxLNx1nkx4yf5SsnQ769Fus_1778567941
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <aeJkCGwsrRmuBikT@google.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-Hi Shameer,
+Hi Sean,
 
-On 5/7/26 10:45 AM, Shameer Kolothum Thodi wrote:
->
->> -----Original Message-----
->> From: Eric Auger <eric.auger@redhat.com>
->> Sent: 03 May 2026 08:33
->> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
->> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
->> peter.maydell@linaro.org; richard.henderson@linaro.org;
->> cohuck@redhat.com; sebott@redhat.com; Shameer Kolothum Thodi
->> <skolothumtho@nvidia.com>; philmd@linaro.org
->> Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
->> armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
->> jdenemar@redhat.com
->> Subject: [PATCH v4 03/17] target/arm/cpu-sysregs.h.inc: Update with
->> automatic generation
->>
->> External email: Use caution opening links or attachments
->>
->>
->> Generated definitions with scripts/update-aarch64-cpu-sysregs-header.py
->> based on "AARCHMRS containing the JSON files for Arm A-profile
->> architecture (2026-03)" Registers.json file.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> Message-ID: <20251208163751.611186-4-eric.auger@redhat.com>
->> ---
->>  target/arm/cpu-sysregs.h.inc | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
->> index d61f0d0a19..2188cd7be0 100644
->> --- a/target/arm/cpu-sysregs.h.inc
->> +++ b/target/arm/cpu-sysregs.h.inc
->> @@ -1,15 +1,25 @@
->>  /* SPDX-License-Identifier: GPL-2.0-or-later */
->> +
->> +/* This file is autogenerated by scripts/update-aarch64-cpu-sysregs-
->> header.py */
->> +/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */
->> +
->> +DEF(AIDR_EL1, 3, 1, 0, 0, 7)
->> +DEF(CCSIDR2_EL1, 3, 1, 0, 0, 2)
->>  DEF(CCSIDR_EL1, 3, 1, 0, 0, 0)
->>  DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
->>  DEF(CTR_EL0, 3, 3, 0, 0, 1)
->>  DEF(DCZID_EL0, 3, 3, 0, 0, 7)
->> +DEF(GMID_EL1, 3, 1, 0, 0, 4)
->>  DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
->>  DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
->>  DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
->>  DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
->> +DEF(ID_AA64DFR2_EL1, 3, 0, 0, 5, 2)
->> +DEF(ID_AA64FPFR0_EL1, 3, 0, 0, 4, 7)
->>  DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
->>  DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
->>  DEF(ID_AA64ISAR2_EL1, 3, 0, 0, 6, 2)
->> +DEF(ID_AA64ISAR3_EL1, 3, 0, 0, 6, 3)
->>  DEF(ID_AA64MMFR0_EL1, 3, 0, 0, 7, 0)
->>  DEF(ID_AA64MMFR1_EL1, 3, 0, 0, 7, 1)
->>  DEF(ID_AA64MMFR2_EL1, 3, 0, 0, 7, 2)
->> @@ -39,6 +49,10 @@ DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
->>  DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
->>  DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
->>  DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
->> +DEF(MIDR_EL1, 3, 0, 0, 0, 0)
->> +DEF(MPIDR_EL1, 3, 0, 0, 0, 5)
-> Do we need MPIDR_EL1 as well? Is this considered as a feature ID
-> register and is writable? I don't think so.
-MPIDR_EL1 is part of the ID regs range defined in the kernel doc
+On 2026/4/18 0:47, Sean Christopherson wrote:
+> 
+> Does this fix things for you?  If so, I'll send a proper patch.
+> 
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index ec7644aae999..c682bda722f9 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -510,9 +510,15 @@ static void test_guest_memfd_guest(void)
+>                     "Default VM type should support INIT_SHARED, supported flags = 0x%x",
+>                     vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_FLAGS));
+>  
+> +       /*
+> +        * Use the guest's page size for all accesses, e.g. to avoid having to
+> +        * map multiple pages, but create the guest_memfd instance with the max
+> +        * of the host or guest page size, as KVM requires gmem files to be
+> +        * aligned to the host page size.
+> +        */
+>         size = vm->page_size;
+> -       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP |
+> -                                            GUEST_MEMFD_FLAG_INIT_SHARED);
+> +       fd = vm_create_guest_memfd(vm, max(size, page_size), GUEST_MEMFD_FLAG_MMAP |
+> +                                                            GUEST_MEMFD_FLAG_INIT_SHARED);
+>         vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
+>  
+>         mem = kvm_mmap(size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
 
-op0 = 3, op1 = {0,1,3}, crn = 0, crm within [0, 7], op2 within [0, 7]
+This results in another failure at
 
-That's why the python script extracts it. Effectively it is not writable yet.
+|	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size,
+NULL, fd, 0);
 
-I can exclude it from the automatic generation but do we really need to? Any specific reason?
+# ./guest_memfd_test
+Random seed: 0x6b8b4567
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+==== Test Assertion Failure ====
+  lib/kvm_util.c:974: !ret
+  pid=284539 tid=284539 errno=22 - Invalid argument
+     1	0x00000000004008fb: test_guest_memfd_guest at guest_memfd_test.c:522
+     2	 (inlined by) main at guest_memfd_test.c:561
+     3	0x0000000000417623: __libc_start_call_main at libc-start.o:?
+     4	0x000000000041796b: __libc_start_main_impl at ??:?
+     5	0x0000000000400cef: _start at ??:?
+  KVM_SET_USER_MEMORY_REGION2 failed, errno = 22 (Invalid argument)
 
-Thanks
-
-Eric
-
-
-> Thanks,
-> Shameer
->
->>  DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
->>  DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
->>  DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
->> +DEF(REVIDR_EL1, 3, 0, 0, 0, 6)
->> +DEF(SMIDR_EL1, 3, 1, 0, 0, 6)
->> --
->> 2.53.0
-
+Thanks,
+Zenghui
