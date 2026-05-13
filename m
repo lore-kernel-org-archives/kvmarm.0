@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4142328DB49;
-	Wed, 13 May 2026 13:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C2E423A6D;
+	Wed, 13 May 2026 13:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778678358; cv=none; b=pyYm0xJ9rXP/TDzTpCr4FKmhnKsB/8ndsIU2mNcXUmrJ0NY4n4Uzy8i1T5OeOQo/zbhfY61TP6s8U+2aWO3qAH8K+EWmhx1th/5nP7/sYCuXJUTwk8dxJKgKnu1hpZWMKZ/gKFKYN7d2RZvVzKgL1jQcwq8iiycIHk5twnft+eo=
+	t=1778678363; cv=none; b=XLewHTAzIvCdvwk5iBxRxHKFjzx8/gPAkH2Ry09byauuGanl0eNLlcZ/l5H0uL/Qt6iqbj/BP8Gt362VEmqizxhiwtNwHjE1gB70V1b04l0Tn+4I5TOPktgaV6RUbb9sm/pIwxsFPtXdGkKtmRHxtzQw/MNiY0q9JdniQZbWaqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778678358; c=relaxed/simple;
-	bh=PFU0BZ+AZscXG8bDrVMdiBJ0f78Lx1czn0Wcm3IN0Wk=;
+	s=arc-20240116; t=1778678363; c=relaxed/simple;
+	bh=ln64F1hLLRYARnpXaTByx+3uUv5w5vovu0mG8WoHuw0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pzt0pUXv45OYzh9TTmIKEAYPP9zfcLCqdtnfkZablIhFF4x85KAQ7vYbPLom+BxyuLlIzOhm+6uKgqtPzR3n7g5eK2YLGlX2FCgEv60oM+R3s53EWJ/ASSdddPK8PkP+ubzQhhuGQfnNW9+PC/8mGJqLnIRuJYIhUR8cfKFfPNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=uv0dlWZf; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=Bs3o5zp41yRtfWaxCUz2hm1eNpEt7surgXWQ1xjuQCVGMASNI14mjpmRve2fyEdaDBQYtfNtijqhMrmM0tQ1F21DNXoFb7VTb5qcOTNl+VEnCkOR6rroTPTvGWae8zFIzrkdLA0diNgMNA1HvxHGTEms2LnbCeSGm4K02wiv0Ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mY4efkr0; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="uv0dlWZf"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mY4efkr0"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D7972381;
-	Wed, 13 May 2026 06:19:10 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06D7A2403;
+	Wed, 13 May 2026 06:19:16 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.68.187])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ACD3C3F836;
-	Wed, 13 May 2026 06:19:10 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2A6333F836;
+	Wed, 13 May 2026 06:19:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778678355; bh=PFU0BZ+AZscXG8bDrVMdiBJ0f78Lx1czn0Wcm3IN0Wk=;
+	t=1778678361; bh=ln64F1hLLRYARnpXaTByx+3uUv5w5vovu0mG8WoHuw0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uv0dlWZfKrFQ/JwOey7DHqH5aowM/8lT/EylQItukdcZpUAi3W2LfT6PzeCNBvI74
-	 49OQGVU1rJzNelsKs6Ygnn9TZrvrDDDJqh8AvoggMnDxPxodefVu8KP1LJZQ9QSFCc
-	 dVmwzyDBjkvUZMnG0/CwB2Dtiqbd2W7lgAWUFmtw=
+	b=mY4efkr0CH+hx/SDNBHeU1XtXYdAvX2fvkN6fWbOsZjYoBzzpcPgAlbLQy3gDbyfg
+	 NwZ3uY+CrxrnG/M0I7r0SlgfYM3qfHK2fvUpbtL0tXsiGwCCkkBTq4vVcjFCP8y8NL
+	 fDR7jEW5hlgQaQi6WLRaGNJbD7oI3uSWle51NiF4=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo.Pieralisi2@arm.com
-Subject: [PATCH v14 10/44] arm64: RMI: Add support for SRO
-Date: Wed, 13 May 2026 14:17:18 +0100
-Message-ID: <20260513131757.116630-11-steven.price@arm.com>
+Subject: [PATCH v14 11/44] arm64: RMI: Check for RMI support at KVM init
+Date: Wed, 13 May 2026 14:17:19 +0100
+Message-ID: <20260513131757.116630-12-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260513131757.116630-1-steven.price@arm.com>
 References: <20260513131757.116630-1-steven.price@arm.com>
@@ -67,417 +67,174 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
-means that an SMC can return with an operation still in progress. The
-host is excepted to continue the operation until is reaches a conclusion
-(either success or failure). During this process the RMM can request
-additional memory ('donate') or hand memory back to the host
-('reclaim'). The host can request an in progress operation is cancelled,
-but still continue the operation until it has completed (otherwise the
-incomplete operation may cause future RMM operations to fail).
-
-The SRO is tracked using a struct rmi_sro_state object which keeps track
-of any memory which has been allocated but not yet consumed by the RMM
-or reclaimed from the RMM. This allows the memory to be reused in a
-future request within the same operation. It will also permit an
-operation to be done in a context where memory allocation may be
-difficult (e.g. atomic context) with the option to abort the operation
-and retry the memory allocation outside of the atomic context. The
-memory stored in the struct rmi_sro_state object can then be reused on
-the subsequent attempt.
+Check if the RMI support is sufficient for using in KVM. Specifically we
+currently only support KVM in VHE mode when for creating realm VMs.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-v14:
- * SRO support has improved although is still not fully complete. The
-   infrastructure has been moved out of KVM.
+Changes since v13:
+ * Most of the init has been moved out of the 'kvm' directory so this is
+   much more basic now.
+Changes since v12:
+ * Drop check for 4k page size.
+Changes since v11:
+ * Reword slightly the comments on the realm states.
+Changes since v10:
+ * kvm_is_realm() no longer has a NULL check.
+ * Rename from "rme" to "rmi" when referring to the RMM interface.
+ * Check for RME (hardware) support before probing for RMI support.
+Changes since v8:
+ * No need to guard kvm_init_rme() behind 'in_hyp_mode'.
+Changes since v6:
+ * Improved message for an unsupported RMI ABI version.
+Changes since v5:
+ * Reword "unsupported" message from "host supports" to "we want" to
+   clarify that 'we' are the 'host'.
+Changes since v2:
+ * Drop return value from kvm_init_rme(), it was always 0.
+ * Rely on the RMM return value to identify whether the RSI ABI is
+   compatible.
 ---
- arch/arm64/include/asm/rmi_cmds.h |   1 +
- arch/arm64/kernel/rmi.c           | 359 ++++++++++++++++++++++++++++++
- 2 files changed, 360 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  4 ++++
+ arch/arm64/include/asm/kvm_rmi.h  | 17 +++++++++++++++++
+ arch/arm64/include/asm/virt.h     |  1 +
+ arch/arm64/kvm/Makefile           |  2 +-
+ arch/arm64/kvm/arm.c              |  5 +++++
+ arch/arm64/kvm/rmi.c              | 24 ++++++++++++++++++++++++
+ 6 files changed, 52 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/kvm/rmi.c
 
-diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-index eb213c8e6f26..1a7b0c8f1e38 100644
---- a/arch/arm64/include/asm/rmi_cmds.h
-+++ b/arch/arm64/include/asm/rmi_cmds.h
-@@ -35,6 +35,7 @@ struct rmi_sro_state {
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 851f6171751c..3512696ed506 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -27,6 +27,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
++#include <asm/kvm_rmi.h>
+ #include <asm/vncr_mapping.h>
  
- int rmi_delegate_range(phys_addr_t phys, unsigned long size);
- int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
-+int free_delegated_page(phys_addr_t phys);
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -424,6 +425,9 @@ struct kvm_arch {
+ 	/* Nested virtualization info */
+ 	struct dentry *debugfs_nv_dentry;
+ #endif
++
++	bool is_realm;
++	struct realm realm;
+ };
  
- static inline int rmi_delegate_page(phys_addr_t phys)
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+new file mode 100644
+index 000000000000..4936007947fd
+--- /dev/null
++++ b/arch/arm64/include/asm/kvm_rmi.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2023-2025 ARM Ltd.
++ */
++
++#ifndef __ASM_KVM_RMI_H
++#define __ASM_KVM_RMI_H
++
++/**
++ * struct realm - Additional per VM data for a Realm
++ */
++struct realm {
++};
++
++void kvm_init_rmi(void);
++
++#endif /* __ASM_KVM_RMI_H */
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index b546703c3ab9..92cec42952f4 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -87,6 +87,7 @@ void __hyp_reset_vectors(void);
+ bool is_kvm_arm_initialised(void);
+ 
+ DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
++DECLARE_STATIC_KEY_FALSE(kvm_rmi_is_available);
+ 
+ static inline bool is_pkvm_initialized(void)
  {
-diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
-index 08cef54acadb..a8107ca9bb6d 100644
---- a/arch/arm64/kernel/rmi.c
-+++ b/arch/arm64/kernel/rmi.c
-@@ -48,6 +48,365 @@ int rmi_undelegate_range(phys_addr_t phys, unsigned long size)
- 	return ret;
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 59612d2f277c..ed3cf30eb06e 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
+ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+ 	 inject_fault.o va_layout.o handle_exit.o config.o \
+ 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+-	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
++	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
+ 	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 176cbe8baad3..247e03b33035 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -41,6 +41,7 @@
+ #include <asm/kvm_nested.h>
+ #include <asm/kvm_pkvm.h>
+ #include <asm/kvm_ptrauth.h>
++#include <asm/kvm_rmi.h>
+ #include <asm/sections.h>
+ #include <asm/stacktrace/nvhe.h>
+ 
+@@ -109,6 +110,8 @@ long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext)
+ 	return -EINVAL;
  }
  
-+static unsigned long donate_req_to_size(unsigned long donatereq)
++DEFINE_STATIC_KEY_FALSE(kvm_rmi_is_available);
++
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+ DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
+@@ -2975,6 +2978,8 @@ static __init int kvm_arm_init(void)
+ 
+ 	in_hyp_mode = is_kernel_in_hyp_mode();
+ 
++	kvm_init_rmi();
++
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+ 	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+ 		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+new file mode 100644
+index 000000000000..1acc972a4b92
+--- /dev/null
++++ b/arch/arm64/kvm/rmi.c
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2023-2025 ARM Ltd.
++ */
++
++#include <linux/kvm_host.h>
++
++#include <asm/rmi_cmds.h>
++#include <asm/virt.h>
++
++void kvm_init_rmi(void)
 +{
-+	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
++	/*
++	 * TODO: Support Realm guests in nVHE mode, this will require adding
++	 * EL2 stub(s) for REC entry and possibly other things.
++	 */
++	if (!is_kernel_in_hyp_mode())
++		return;
 +
-+	switch (unit_size) {
-+	case 0:
-+		return PAGE_SIZE;
-+	case 1:
-+		return PMD_SIZE;
-+	case 2:
-+		return PUD_SIZE;
-+	case 3:
-+		return P4D_SIZE;
-+	}
-+	unreachable();
++	if (!rmi_is_available())
++		return;
++
++	/* Future patch will enable static branch kvm_rmi_is_available */
 +}
-+
-+static void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs_in,
-+			     struct arm_smccc_1_2_regs *regs_out)
-+{
-+	struct arm_smccc_1_2_regs regs = *regs_in;
-+	unsigned long status;
-+
-+	do {
-+		arm_smccc_1_2_invoke(&regs, regs_out);
-+		status = RMI_RETURN_STATUS(regs_out->a0);
-+	} while (status == RMI_BUSY || status == RMI_BLOCKED);
-+}
-+
-+int free_delegated_page(phys_addr_t phys)
-+{
-+	if (WARN_ON(rmi_undelegate_page(phys))) {
-+		/* Undelegate failed: leak the page */
-+		return -EBUSY;
-+	}
-+
-+	free_page((unsigned long)phys_to_virt(phys));
-+
-+	return 0;
-+}
-+
-+static int rmi_sro_ensure_capacity(struct rmi_sro_state *sro,
-+				   unsigned long count)
-+{
-+	if (WARN_ON_ONCE(sro->addr_count > RMI_MAX_ADDR_LIST))
-+		return -EOVERFLOW;
-+
-+	if (count > RMI_MAX_ADDR_LIST - sro->addr_count)
-+		return -ENOSPC;
-+
-+	return 0;
-+}
-+
-+static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
-+				 unsigned long sro_handle,
-+				 unsigned long donatereq,
-+				 struct arm_smccc_1_2_regs *out_regs,
-+				 gfp_t gfp)
-+{
-+	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
-+	unsigned long unit_size_bytes = donate_req_to_size(donatereq);
-+	unsigned long count = RMI_DONATE_COUNT(donatereq);
-+	unsigned long state = RMI_DONATE_STATE(donatereq);
-+	unsigned long size = unit_size_bytes * count;
-+	unsigned long addr_range;
-+	int ret;
-+	void *virt;
-+	phys_addr_t phys;
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_OP_MEM_DONATE,
-+		sro_handle
-+	};
-+
-+	for (int i = 0; i < sro->addr_count; i++) {
-+		unsigned long entry = sro->addr_list[i];
-+
-+		if (RMI_ADDR_RANGE_SIZE(entry) == unit_size &&
-+		    RMI_ADDR_RANGE_COUNT(entry) == count &&
-+		    RMI_ADDR_RANGE_STATE(entry) == state) {
-+			sro->addr_count--;
-+			swap(sro->addr_list[sro->addr_count],
-+			     sro->addr_list[i]);
-+
-+			goto out;
-+		}
-+	}
-+
-+	ret = rmi_sro_ensure_capacity(sro, 1);
-+	if (ret)
-+		return ret;
-+
-+	virt = alloc_pages_exact(size, gfp);
-+	if (!virt)
-+		return -ENOMEM;
-+	phys = virt_to_phys(virt);
-+
-+	if (state == RMI_OP_MEM_DELEGATED) {
-+		if (rmi_delegate_range(phys, size)) {
-+			free_pages_exact(virt, size);
-+			return -ENXIO;
-+		}
-+	}
-+
-+	addr_range = phys & RMI_ADDR_RANGE_ADDR_MASK;
-+	FIELD_MODIFY(RMI_ADDR_RANGE_SIZE_MASK, &addr_range, unit_size);
-+	FIELD_MODIFY(RMI_ADDR_RANGE_COUNT_MASK, &addr_range, count);
-+	FIELD_MODIFY(RMI_ADDR_RANGE_STATE_MASK, &addr_range, state);
-+
-+	sro->addr_list[sro->addr_count] = addr_range;
-+
-+out:
-+	regs.a2 = virt_to_phys(&sro->addr_list[sro->addr_count]);
-+	regs.a3 = 1;
-+	rmi_smccc_invoke(&regs, out_regs);
-+
-+	unsigned long donated_granules = out_regs->a1;
-+	unsigned long donated_size = donated_granules << PAGE_SHIFT;
-+
-+	if (donated_granules == 0) {
-+		/* No pages used by the RMM */
-+		sro->addr_count++;
-+	} else if (donated_size < size) {
-+		phys = sro->addr_list[sro->addr_count] & RMI_ADDR_RANGE_ADDR_MASK;
-+
-+		/* Not all granules used by the RMM, free the remaining pages */
-+		for (long i = donated_size; i < size; i += PAGE_SIZE) {
-+			if (state == RMI_OP_MEM_DELEGATED)
-+				free_delegated_page(phys + i);
-+			else
-+				__free_page(phys_to_page(phys + i));
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
-+				    unsigned long sro_handle,
-+				    unsigned long donatereq,
-+				    struct arm_smccc_1_2_regs *out_regs,
-+				    gfp_t gfp)
-+{
-+	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
-+	unsigned long unit_size_bytes = donate_req_to_size(donatereq);
-+	unsigned long count = RMI_DONATE_COUNT(donatereq);
-+	unsigned long state = RMI_DONATE_STATE(donatereq);
-+	unsigned long found = 0;
-+	unsigned long addr_list_start = sro->addr_count;
-+	int ret;
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_OP_MEM_DONATE,
-+		sro_handle
-+	};
-+
-+	for (int i = 0; i < addr_list_start && found < count; i++) {
-+		unsigned long entry = sro->addr_list[i];
-+
-+		if (RMI_ADDR_RANGE_SIZE(entry) == unit_size &&
-+		    RMI_ADDR_RANGE_COUNT(entry) == 1 &&
-+		    RMI_ADDR_RANGE_STATE(entry) == state) {
-+			addr_list_start--;
-+			swap(sro->addr_list[addr_list_start],
-+			     sro->addr_list[i]);
-+			found++;
-+			i--;
-+		}
-+	}
-+
-+	ret = rmi_sro_ensure_capacity(sro, count - found);
-+	if (ret)
-+		return ret;
-+
-+	while (found < count) {
-+		unsigned long addr_range;
-+		void *virt = alloc_pages_exact(unit_size_bytes, gfp);
-+		phys_addr_t phys;
-+
-+		if (!virt)
-+			return -ENOMEM;
-+
-+		phys = virt_to_phys(virt);
-+
-+		if (state == RMI_OP_MEM_DELEGATED) {
-+			if (rmi_delegate_range(phys, unit_size_bytes)) {
-+				free_pages_exact(virt, unit_size_bytes);
-+				return -ENXIO;
-+			}
-+		}
-+
-+		addr_range = phys & RMI_ADDR_RANGE_ADDR_MASK;
-+		FIELD_MODIFY(RMI_ADDR_RANGE_SIZE_MASK, &addr_range, unit_size);
-+		FIELD_MODIFY(RMI_ADDR_RANGE_COUNT_MASK, &addr_range, 1);
-+		FIELD_MODIFY(RMI_ADDR_RANGE_STATE_MASK, &addr_range, state);
-+
-+		sro->addr_list[sro->addr_count++] = addr_range;
-+		found++;
-+	}
-+
-+	regs.a2 = virt_to_phys(&sro->addr_list[addr_list_start]);
-+	regs.a3 = found;
-+	rmi_smccc_invoke(&regs, out_regs);
-+
-+	unsigned long donated_granules = out_regs->a1;
-+
-+	if (WARN_ON(donated_granules & ((unit_size_bytes >> PAGE_SHIFT) - 1))) {
-+		/*
-+		 * FIXME: RMM has only consumed part of a huge page, this leaks
-+		 * the rest of the huge page
-+		 */
-+		donated_granules = ALIGN(donated_granules,
-+					 (unit_size_bytes >> PAGE_SHIFT));
-+	}
-+	unsigned long donated_blocks = donated_granules / (unit_size_bytes >> PAGE_SHIFT);
-+
-+	if (WARN_ON(donated_blocks > found))
-+		donated_blocks = found;
-+
-+	unsigned long undonated_blocks = found - donated_blocks;
-+
-+	while (donated_blocks && undonated_blocks) {
-+		sro->addr_count--;
-+		swap(sro->addr_list[addr_list_start],
-+		     sro->addr_list[sro->addr_count]);
-+		addr_list_start++;
-+
-+		donated_blocks--;
-+		undonated_blocks--;
-+	}
-+	sro->addr_count -= donated_blocks;
-+
-+	return 0;
-+}
-+
-+static int rmi_sro_donate(struct rmi_sro_state *sro,
-+			  unsigned long sro_handle,
-+			  unsigned long donatereq,
-+			  struct arm_smccc_1_2_regs *regs,
-+			  gfp_t gfp)
-+{
-+	unsigned long count = RMI_DONATE_COUNT(donatereq);
-+
-+	if (WARN_ON(!count))
-+		return 0;
-+
-+	if (RMI_DONATE_CONTIG(donatereq)) {
-+		return rmi_sro_donate_contig(sro, sro_handle, donatereq,
-+					     regs, gfp);
-+	} else {
-+		return rmi_sro_donate_noncontig(sro, sro_handle, donatereq,
-+						regs, gfp);
-+	}
-+}
-+
-+static int rmi_sro_reclaim(struct rmi_sro_state *sro,
-+			   unsigned long sro_handle,
-+			   struct arm_smccc_1_2_regs *out_regs)
-+{
-+	unsigned long capacity;
-+	struct arm_smccc_1_2_regs regs;
-+	int ret;
-+
-+	ret = rmi_sro_ensure_capacity(sro, 1);
-+	if (ret)
-+		rmi_sro_free(sro);
-+
-+	capacity = RMI_MAX_ADDR_LIST - sro->addr_count;
-+
-+	regs = (struct arm_smccc_1_2_regs){
-+		SMC_RMI_OP_MEM_RECLAIM,
-+		sro_handle,
-+		virt_to_phys(&sro->addr_list[sro->addr_count]),
-+		capacity
-+	};
-+	rmi_smccc_invoke(&regs, out_regs);
-+
-+	if (WARN_ON_ONCE(out_regs->a1 > capacity))
-+		out_regs->a1 = capacity;
-+
-+	sro->addr_count += out_regs->a1;
-+
-+	return 0;
-+}
-+
-+void rmi_sro_free(struct rmi_sro_state *sro)
-+{
-+	for (int i = 0; i < sro->addr_count; i++) {
-+		unsigned long entry = sro->addr_list[i];
-+		unsigned long addr = RMI_ADDR_RANGE_ADDR(entry);
-+		unsigned long unit_size = RMI_ADDR_RANGE_SIZE(entry);
-+		unsigned long count = RMI_ADDR_RANGE_COUNT(entry);
-+		unsigned long state = RMI_ADDR_RANGE_STATE(entry);
-+		unsigned long size = donate_req_to_size(unit_size) * count;
-+
-+		if (state == RMI_OP_MEM_DELEGATED) {
-+			if (WARN_ON(rmi_undelegate_range(addr, size))) {
-+				/* Leak the pages */
-+				continue;
-+			}
-+		}
-+		free_pages_exact(phys_to_virt(addr), size);
-+	}
-+
-+	sro->addr_count = 0;
-+}
-+
-+unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp)
-+{
-+	unsigned long sro_handle;
-+	struct arm_smccc_1_2_regs regs;
-+	struct arm_smccc_1_2_regs *regs_in = &sro->regs;
-+
-+	rmi_smccc_invoke(regs_in, &regs);
-+
-+	sro_handle = regs.a1;
-+
-+	while (RMI_RETURN_STATUS(regs.a0) == RMI_INCOMPLETE) {
-+		bool can_cancel = RMI_RETURN_CAN_CANCEL(regs.a0);
-+		int ret;
-+
-+		switch (RMI_RETURN_MEMREQ(regs.a0)) {
-+		case RMI_OP_MEM_REQ_NONE:
-+			regs = (struct arm_smccc_1_2_regs){
-+				SMC_RMI_OP_CONTINUE, sro_handle, 0
-+			};
-+			rmi_smccc_invoke(&regs, &regs);
-+			break;
-+		case RMI_OP_MEM_REQ_DONATE:
-+			ret = rmi_sro_donate(sro, sro_handle, regs.a2, &regs,
-+					     gfp);
-+			break;
-+		case RMI_OP_MEM_REQ_RECLAIM:
-+			ret = rmi_sro_reclaim(sro, sro_handle, &regs);
-+			break;
-+		default:
-+			ret = WARN_ON(1);
-+			break;
-+		}
-+
-+		if (ret) {
-+			if (can_cancel) {
-+				/*
-+				 * FIXME: Handle cancelling properly!
-+				 *
-+				 * If the operation has failed due to memory
-+				 * allocation failure then the information on
-+				 * the memory allocation should be saved, so
-+				 * that the allocation can be repeated outside
-+				 * of any context which prevented the
-+				 * allocation.
-+				 */
-+			}
-+			if (WARN_ON(ret))
-+				return ret;
-+		}
-+	}
-+
-+	return regs.a0;
-+}
-+
- static int rmi_check_version(void)
- {
- 	struct arm_smccc_res res;
 -- 
 2.43.0
 
