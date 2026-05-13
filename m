@@ -1,218 +1,224 @@
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB45388885
-	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 16:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778690760; cv=none; b=S8LZP6TXjgw425XMGYHMNejJ5qDvShfS5F7iOZ1ND6eZQQfjQ8G6C9IQZamiQRKW/DBsiaP4Q/JFYxmik3POpRfbNWDvvi6j73oqYx6Wm4O/SaRKkOBSnNVcKqcyhs6EYMmb6MR8ihAdyNcGyni4O2zITKsmSYsQdeitpBLhTXk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778690760; c=relaxed/simple;
-	bh=DlqmTumaylv3bvg7/UQlSYJC7l+houNcv4Gm+3/w3ps=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=ogctPHZ+CyQlcQPyBtbQfWOu2ijYAvZjXXrjKU4WqA/Qz+OAeOPgvRXjP95MkTwW4WDqT7GxVVxnPNHx+5iPwItC3LarpDEjhFnFvd2ezo4cfPcogi76cVahUMxIA183RGMZcOjkCyRBmok13BXYhs1IMffmZmeoJBNi8s/dnAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tPsPdbGS; arc=none smtp.client-ip=209.85.210.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881FC4DBD79
+	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 16:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778691045; cv=fail; b=oLIX6/wl0Ilki90U0hhOopSagHZQvX4lFPnPMGe0gLlrajfFvxDQUHCLH4HB9zmG20W9OENbqBE2iACtyU2t2Q0wjABRlO+GV+NNTK3Kg80B0Q1RwYG24gsJzEh13LV/tg5QFoKBxsqVS7Ca6AXdTp653bRs40eaJo1Tc/yBd3U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778691045; c=relaxed/simple;
+	bh=4f+xN4xqI5YLSdAw2eTq1NtpZn3uqz9K3DcP5lq6FN8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lDkkWHjBLUvsXzMB+s6Evxpfdc6NynLOlRsrrm+s62Z8h0PqdpLHyivsGA3cT4Yoe5CVlMVfVx7USE3uu4AYo7+oFo9+gTEFexyJDQkrtWoPlK9m8zCN1KSvR+3yy/NQDUflgXfI0XyRTgKaA/dRNb+jAeFfxmuliGrvTMAl3fI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=Rxt0kW6b; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=H2CQtvV8; arc=fail smtp.client-ip=148.163.155.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tPsPdbGS"
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7deb9de359bso11890654a34.3
-        for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 09:45:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778690758; x=1779295558; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aW/nYEiFxMS2z4I6C0K281BV66W1OxrZ+NF6ey1g5Rg=;
-        b=tPsPdbGS+CHniegKJ2oBi+otO15fprIL51JgKES6MSv/jH9y4o2/P6Z7LV1CScVX0K
-         Z/Ddl/HTj8KTA2990gmBT2hPdCq9Y4FBp3QkCNVznPMdX1ChFREcjqgeUG/9jP072H1p
-         CtaXXnkQvaR4l0PCghWuYyQl2+1EEg6/wWNIoKwJkoIDj+77KsiLo/+bEyVPqUGc6HRd
-         a+P+aEwRjQ/CgsMjshpMfcDPuf2oRP+1TX6SSJlxWNpdFaXbdYggyGD3l2fTH3foDfzz
-         jTr+LNi7HBc0Q8nnJmk0hBGtcKblua+v13ui4quv1qEg97pCHSJogBMaIys7nRjUk1L3
-         VATA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778690758; x=1779295558;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aW/nYEiFxMS2z4I6C0K281BV66W1OxrZ+NF6ey1g5Rg=;
-        b=mOdbBobBkyKua2Z3ijJ0YLxG7RXUyoYb5pDqRZsQZErthe3QcP1E9tHp5kCmpc5JbD
-         AZePyMHaVe46QdTi09w074Ljs1bbnB1tY20FxYEdjgolNg9/vE+i0e/Apqj6NMLp152y
-         qJbdc4Wggc6AqtXEIcP5xc3P1gGVFTNGxfaJSURX7c4VznBAJyw6qMj42A9ANUDcZuH2
-         WUGzOXpwOSqzgtVL8cYNYIFSPIRSwsaQaOe8FTB2uYi6/6Dzhup0URXHFo5lz3+sJJn4
-         VDORYC70h592Jn/8e27dtt4Ae7IkjLz0+ko8qVMVg3xqLiaJkzXLAm5i1+vrfla8tcve
-         Bumw==
-X-Forwarded-Encrypted: i=1; AFNElJ+BfwG1EyjFSXzZJaj99RGEOx2AhJoq8MyCQfn4NdjMesuVhHJ8CiOcosqHIvmG/LbZatJB9P8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyL+TSJbdOhIqd+bYGoYxjZgSHh2kUXA7Z99U8YcE6OlFAJ2hOW
-	EOgome6XQtDcVlTKhaODLI+V6mwy1PDdin40rfhfLrjwOLx3ohiG2p0VmUF5fOe8am42qKOZ8al
-	lVspDZV6RFJd/V9fmwKsDkHrGxg==
-X-Received: from jabfq5.prod.google.com ([2002:a05:6638:6505:b0:5de:63f7:b7f9])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:2113:b0:696:6440:9e2a with SMTP id 006d021491bc7-69b78dd2cf7mr2147234eaf.29.1778690757861;
- Wed, 13 May 2026 09:45:57 -0700 (PDT)
-Date: Wed, 13 May 2026 16:45:57 +0000
-In-Reply-To: <e2a7679d-e61a-43ac-a1d7-72f7e815c400@linaro.org> (message from
- James Clark on Mon, 11 May 2026 15:47:54 +0100)
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Rxt0kW6b";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="H2CQtvV8"
+Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64DGLC5S2443715;
+	Wed, 13 May 2026 09:34:11 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	proofpoint20171006; bh=Qehw87LqGTidFltWgkPrhahfky/iAtDR2qfeAuhVG
+	ik=; b=Rxt0kW6bZGZgVmIDbM+uYE01xdmvi22Eah5L9ByL1DkesaI0tZhoHWqzE
+	x65VUpc7LQPWjs5MZIVVbHtL5w1by4bArsBSZvi+6RjEoztQTGSXRK5+0/mQgmJs
+	5gh//hvADoa3YFdCrIXUnSmnFpRAG3PBXKnwZyhPTJ5VH5pBmdvoRPA18JqgNAuz
+	KOLGzQpLeVZyKDqYcbLiekR6OyN6VdDhdKQrTJfHXzpJg2exwKRbgfUCm4ZsyrZQ
+	JIubLBaE5lbne/SLzefXY25hGwfFvMj6k2BcBl8JcWjg7ZBNa5lvBjpkzNkY7XnX
+	besmj5CM4mYpxJnEVj2Ed1wchtl4Q==
+Received: from ch1pr05cu001.outbound.protection.outlook.com (mail-northcentralusazon11020138.outbound.protection.outlook.com [52.101.193.138])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4e3nv6x8ym-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 13 May 2026 09:34:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XGinTcRvggJPqTFJrqnxyGWMXMNzRQIaT0qNc6DLSL58wLcPvGQ0zR4L7bzo632CHVgqIAyMrSEjKjahRrykvN6afZGy6qto7+TMs3B34tKbvD0yC2vZYDsN2E4OvM0pN/dwFFXpIMoJ5bRmMp4rrvc0uGLY48Zx+YajZATzOSGY8aCVfTZem23Z2pD0V61ekKd9f4dH5s0DF5He9xv3xBBrxLZwIGQRy3xMPx1fhhCUhYT/VJGzzNeBj1kT3wPTY7elZom/tWUJ8TKDdFYhP15C8Hs1RJcPuGpdrTpAYMFE8MphTkx8TiZ2NoJCFvN2+FsGB+6cin10RmOXvgEejg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qehw87LqGTidFltWgkPrhahfky/iAtDR2qfeAuhVGik=;
+ b=U4MjRQMKJdzMrcPobkOExW/CHehaG8Xw3m/fVY0P4AZqAXxTibXe93LlHL4MaB9Otu3BuFswbfiRdSc/ndK3WJ7d6Vmp6RBE4q9LuFUXFydP9q5WHXIrYpwIzamH5nUCAuDhkat6b32Hykk+DsDYzEml7kqkqpyoh3YdFDhyD9HYKXWWKCfV+JYf3POcmNaCa7zuld0Pzdn0bNE91UmLXaC1EX4bk0+Cmx/dbr7kgygzwbo8bHSY1zi55lVh/YoZyy90tVR5l9yK4tjXFdYx1IVeGIluEGz5/QOGcaDzvKlN5htCvhxfY686BYOfdXu4Dgim2CN0sGBobPrje0ScjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qehw87LqGTidFltWgkPrhahfky/iAtDR2qfeAuhVGik=;
+ b=H2CQtvV8WjypxK5ZICCsD/Z4r4Gj9+qffG/Hgas9e0Vpajrrc7kGLPCKLFt4R4fiOpNE3XXzMoBrHny5F8Xw4gseyyy8/qdIdX9FAzAHYVV1je5pJE0kJxQPGHqI5zWiomUqzcCMikdoTLnxjsiuQGHbdIWIO7HH3rz9phwigYe0YE/zGzK8zYpymM9itzGkxZP4xnshtFgnRkRZk9LWhKyJVBHiIWja1Gv7r25gaCPpZU1OjZwOMFTfEI9MllRF2b6o67/cnQJ4VyJd0j0DaaY3UMHw6MOW9lQPVqaqkZ6CBAtCnGLk4uBZu3jCxzZMIlPsW1OVUQmE/NEN7y6THA==
+Received: from PH7PR02MB10160.namprd02.prod.outlook.com
+ (2603:10b6:510:2e7::19) by CH3PR02MB9564.namprd02.prod.outlook.com
+ (2603:10b6:610:120::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Wed, 13 May
+ 2026 16:34:08 +0000
+Received: from PH7PR02MB10160.namprd02.prod.outlook.com
+ ([fe80::4ed7:5c74:48e0:ff23]) by PH7PR02MB10160.namprd02.prod.outlook.com
+ ([fe80::4ed7:5c74:48e0:ff23%7]) with mapi id 15.20.9891.021; Wed, 13 May 2026
+ 16:34:08 +0000
+From: Shaju Abraham <shaju.abraham@nutanix.com>
+To: eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+        kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+        richard.henderson@linaro.org, cohuck@redhat.com, sebott@redhat.com,
+        skolothumtho@nvidia.com, philmd@linaro.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
+        prerna.saxena@nutanix.com, jon@nutanix.com, jond@nutanix.com,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Khushit Shah <khushit.shah@nutanix.com>
+Subject: [RFC PATCH v1 01/13] target/arm: named_cpu_model: define containers for ID registers and fields
+Date: Wed, 13 May 2026 16:33:44 +0000
+Message-ID: <20260513163356.3033159-2-shaju.abraham@nutanix.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
+References: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CY5PR10CA0003.namprd10.prod.outlook.com
+ (2603:10b6:930:1c::30) To PH7PR02MB10160.namprd02.prod.outlook.com
+ (2603:10b6:510:2e7::19)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntzf23b6m2.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v7 13/20] KVM: arm64: Apply dynamic guest counter reservations
-From: Colton Lewis <coltonlewis@google.com>
-To: James Clark <james.clark@linaro.org>
-Cc: alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR02MB10160:EE_|CH3PR02MB9564:EE_
+X-MS-Office365-Filtering-Correlation-Id: bf32e7d2-7c7f-4a77-a379-08deb10d7455
+x-proofpoint-crosstenant: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|18002099003|22082099003|921020|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	hVzzHM/sayyFhpyXaP04FRyFSlmpl/kNYdcXVHi+OnqxlECe2CtSMQRT347gIqqluQOVtNAz4GkJTtsd8pMov5XxzNAPLuxAtYr6EI1/xskeKFtskAEc/YEdX45ibyGxkIfhoO6W7FZITMUqmu/d2RfMo5Ez3rZsQFwIp5Sd2Kc7GWcYQToQKcEQ/5xG6AJYgmW6pHf5BsFLPJ4EucjQwRnHMHubuSWxmbaLw6e5v1HYH9YyaBEV1XP70UW0OTiD+2BA5tDwrYNlwMm3yfbEi/qCxpDXQNin0R0csyaTITFJG10yor3V+tZ3OfPSpbHm0oVNfc63v9MCmmP/pZn3JbLsgY+h3tn9fz53ZZ/bAH6n8us5+MygMvXb60bhvmvGUC6z4qAEkxPbcag2vc67GjstXxQDCX0dJTKxEu5TZYUjip11HOCpOHlQ/rrYr3wC5Lggzpqv8P9a+lI4RiEIBCqe9eEaN599J5nkwU9mA4AuC6+A0Ry8g06s1it4lFvNo85TjcX0eOxoa+80Nryn0zpP74CiLkI5lbcisWfvCrornStpj54wAZ1SMkOa6w9JQaL5jDvUXzy1vNFOBrFfU5IsiW8+u9kwYuUklGlvHoeq8ZvapqKVB8WubFZUz/XDAXumNc/tM184dVDns90CGUGxFgeA74wM+zj7kvL07w3xaCqKWpz/WgO8VvP5LCO/PFcYDWL4yNI3hEfIpxnqV3ElQP2AG3cAqJXH41uCBVc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR02MB10160.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(18002099003)(22082099003)(921020)(56012099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9oy0oFDFhOnoF8Aiq2eTpHQPZizBpgHH6tQjPYPOKSM6xP089vSdTEG8Yxoi?=
+ =?us-ascii?Q?pMbri8s57Ji+b6Mrtw7CMdhlQ6c0e4cnA/lMY8+KYoDauVBCSnFbCG/yjBgi?=
+ =?us-ascii?Q?wo5YquBB0eShLW9oN5U2jhhbDReYhZGZKBEeaxyfW32WVP1GClBt1n7exxN2?=
+ =?us-ascii?Q?cxae99v3hG4JT1jJZSbBIGaW83pimv2bO/bRzu3e2C98TNxC5KZxN1nVf55B?=
+ =?us-ascii?Q?6QDZ1D61zViDQn8O8rany67e/eEAPgmM2LJQfpM9O6Z4MrkqaT9Of34uuPT1?=
+ =?us-ascii?Q?czmaF3gev5ZO1eCNdiR/ZS1FL1Efo3T2/dmoPTqjTBpOlpxX/Oir9xmqZi0h?=
+ =?us-ascii?Q?XnjDVznYbaeAapww0ai/G7PEZEHx9umfRNxcKlWMxuuvoV6BE8mM04eap3/M?=
+ =?us-ascii?Q?eeZXXhLmO/g/rzPsf3SOuh9xrmquu45HGwRfdKecggp6k4rjQMbVgIiB/nbQ?=
+ =?us-ascii?Q?zYAGeDZ3fYquIxm/CtFK7bCBgSPac1zCZoouzOz45C6zkDUkehUr7uQxpmHo?=
+ =?us-ascii?Q?84ZQCGJ+JG3WQXW7/1L994uhBwfl6igdjsbb3kABdi8O9nSFXEHScRsdcXIE?=
+ =?us-ascii?Q?T4KmLStnRcPuNciTHM1SJV/qc+0adxthma2FkJzl8BUw2lBg1bLjSe7ylh33?=
+ =?us-ascii?Q?B8ENnGXyvYbUPMGZEuLJjP6FzOobpT1XoEk9XSSE6kuhABU8BvNUYviU2zKJ?=
+ =?us-ascii?Q?WwXVmU86PxuMSb1KvJ0N1r6R3u+7b4wgf3VA3iCJ+ckr2d3y4tbpqfRz/Ny3?=
+ =?us-ascii?Q?mYqZqAyQgpXO8ZoWq8udaKrk9HTOLULA7riV6Z/jgY+1kisNdZKkAZ1+MG2S?=
+ =?us-ascii?Q?WhE9ZTAYTe95KYgFjwok2S09d3z9H0GqqsskIak8D4hW5RTZniI37/heM1Pc?=
+ =?us-ascii?Q?wCi1Z9hwuZ5t3rEjiN8YGwA1kbtlK7IKsjYhDKmeSqtra7hX59s8AYXVeqbq?=
+ =?us-ascii?Q?wU4uEg6NhpdjqGYH/Y4fLtRR8rCBmoAOeNmFoD2Zx6Ulm+1Kb81jY+n5ZCfJ?=
+ =?us-ascii?Q?AhSh+Nj7841mZautAFkcpFLysLJK1T+cyPjwAM47wDjDlWub5YSiUqLpRFWo?=
+ =?us-ascii?Q?4DpvmHWqvh6YTEZQiZPbbZFlfpLcelqSG0g4vZmmzgslrZLFjzb/ArXeGxlb?=
+ =?us-ascii?Q?/KHbT5mq1gnhbUIWg4gwU7V9yE+BUuify9eXJBbwyPbB0BvZawCn4YnL1/xD?=
+ =?us-ascii?Q?R8nUmyShgeUT7ZbxtfHlGTeX+2fPCWeGhEtJQZVW1GcdhRGLgjSxRDaWQkh7?=
+ =?us-ascii?Q?bHN4iQB1MXhINI4IxVzV+0IFxOcEuztrUG+XgQB/QAR/vZW7IhgEyRsfH0Pt?=
+ =?us-ascii?Q?M/sekdfNLIEOld1VhDBlem9k5GW6UvMhcDeqqdqFXtsX5BGX2MPFA2qDehtV?=
+ =?us-ascii?Q?KI/BDKa5YsU6+6PLi/mgPQibEoloNOTmzDcXsSDv5+Wje0+d0raKbWrPnzjP?=
+ =?us-ascii?Q?cTpwIfncM7B7btpGVDAZbQjPZ/ypFuAF/NKqeV5pIxlIXHsBatWSzaKYUz2O?=
+ =?us-ascii?Q?Iirf4h+Qmd4Pmva8Xnt4Rb5MoLWFzoR1y+A3A8C6kVefkm5U2lnSM2lDAQtI?=
+ =?us-ascii?Q?PK0WuNk+yFkCvwoBr0PaIt1thic3wmnEPIKpyGkmaNqPUwvUgzCMO98iwpgI?=
+ =?us-ascii?Q?Y3VzfMfmhr7l9SyLqs/jfx1F7hwDPNXdHf7UyrTRSBdM+AcTYDjzxaxRUqJD?=
+ =?us-ascii?Q?L4fjjM8Z8pQvnTxcHh9Cyp/VwJ/sjIdSSJB40LzRLbvx/UmPG3+nBdl90Z2z?=
+ =?us-ascii?Q?622cpEbEaqDh62cHetwGoE/oQQJcKjI=3D?=
+X-Exchange-RoutingPolicyChecked:
+	P18ncruISGsx9TnI2ABlkM6tOeyTF0fALuLYcIUFx6Buu6I/Baa9gNRzAdVRyRG7TcBEaZVGUtUXlBZ4VT+sT8P1g4HzI+CAHA9flWLW0Udtg/7FZfGu1xfVmlX4TMJcREVxU12H9rht49X7+SNnSbS/i4XYeQ9/ZBS9euwryOSc4BjRLM8BWOSpd2HXt3HG+sWmp68bXB6qtaMR5gwjoTwYpbo97ub9bBuXzhCcg/i7sGKpXuUbbl4Y94jScY7hdNm9gWvBooy0VHtu6GiXH+LlJu+XwyWYx36ELXjCjib6pXDr040xoyVXfbtnfkiwHiZQ7EniGDyP1Kse7DosVQ==
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf32e7d2-7c7f-4a77-a379-08deb10d7455
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR02MB10160.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 16:34:07.9287
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GbgNYKgMqjUL2nbQCqGm5OzydReUWXIjRoNx/gqtEE2Nnyi6MeOL7dAGqf/p5EEtxN4heVGzY8UdFsi7Tqw6ydTc7EzjD8SlkdHqFgq8Qaw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR02MB9564
+X-Proofpoint-ORIG-GUID: LQlOHEOEweKRbfIAZpJ6RVyAXbvCkB6i
+X-Authority-Analysis: v=2.4 cv=P7QKQCAu c=1 sm=1 tr=0 ts=6a04a803 cx=c_pps
+ a=wpg3e3TFAlO0qOiIlNsFBg==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=NGcC8JguVDcA:10 a=0kUYKlekyDsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VofLwUrZ8Iiv6rRUPXIb:22 a=VUi8bpU7OL1Oj2-RSIOF:22
+ a=64Cc0HZtAAAA:8 a=yZbjWOkPDpPANDiVIK4A:9
+X-Proofpoint-GUID: LQlOHEOEweKRbfIAZpJ6RVyAXbvCkB6i
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTEzMDE2OCBTYWx0ZWRfX6U7FwoAd58q+
+ juXK+uEryr5LpJSHAngDCfZMlmOnDErlbHWQLPOj/b0xitTsvnCL0ZYMcW65l+KYlNYafQIPh+e
+ mlQCsCixiVtLQRceNbtx1sLqXHmUQyfdwgfXdN8zBGaiECDLMOsTl0sRcQ7LxWCz0976tvW92cb
+ Phe9e5qiQEfJJs/U/F34JQO2ELRtMPOHo1svoI/4P/xCa+SZjxN3GkEOsThG1U7LsfCm7Yvg6Xb
+ jGnQ0NOZU2QK5AJX5dS66BDJYUHu2fqRAOQ2SRHWva18SW9nh1EWcCjg5MpJV2rpKEEpsGvpjDL
+ mNYY8LKugIbpgge/nvdGBdCn/gQLcpSVkJnIkyGa6ND5cxZ4OMyVWnSTRKVKiRO9/1/Bet8uCJQ
+ J/tAhLpV66w+PrfdIOrZE5KD0nAc5gp8LOn3p96GEq3rQ594KD4Mw7Afq4pEcsneMvADhBunduX
+ P3Q9GDBepx+oOzSOkTQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-13_01,2026-05-13_01,2025-10-01_01
+X-Proofpoint-Spam-Reason: safe
 
-James Clark <james.clark@linaro.org> writes:
+Define data structures for mapping the ARM ID registers and ID register
+fields.
 
-> On 04/05/2026 10:18 pm, Colton Lewis wrote:
->> Apply dynamic guest counter reservations by checking if the requested
->> guest mask collides with any events the host has scheduled and calling
->> pmu_perf_resched_update() with a hook that updates the mask of
->> available counters in between schedule out and schedule in.
+Co-authored-by: Khushit Shah <khushit.shah@nutanix.com>
+Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
+---
+ target/arm/cpu-idregs.h | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+ create mode 100644 target/arm/cpu-idregs.h
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>    arch/arm64/kvm/pmu-direct.c  | 69 ++++++++++++++++++++++++++++++++++++
->>    include/linux/perf/arm_pmu.h |  1 +
->>    2 files changed, 70 insertions(+)
+diff --git a/target/arm/cpu-idregs.h b/target/arm/cpu-idregs.h
+new file mode 100644
+index 0000000000..403190cbd7
+--- /dev/null
++++ b/target/arm/cpu-idregs.h
+@@ -0,0 +1,41 @@
++/*
++ *   ARM ID register field table -- shared declarations.
++ *
++ *   SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef CPU_IDREGS_H
++#define CPU_IDREGS_H
++
++typedef enum ArmIdRegSafeRule {
++    IDREG_SAFE_LOWER,
++    IDREG_SAFE_HIGHER,
++    IDREG_SAFE_HIGHER_OR_ZERO,
++    IDREG_SAFE_SIGNED_LOWER,
++    IDREG_SAFE_EXACT,
++    IDREG_SAFE_ANY,
++} ArmIdRegSafeRule;
++
++typedef struct ArmIdRegArchVal {
++    uint64_t value;
++    const char *name;
++} ArmIdRegArchVal;
++
++typedef struct ArmIdRegField {
++    const char *name;
++    uint32_t shift;
++    uint32_t length;
++    ArmIdRegSafeRule safe_rule;
++    uint64_t default_val;
++    ArmIdRegArchVal *arch_vals;
++    uint32_t arch_vals_count;
++} ArmIdRegField;
++
++typedef struct ArmIdReg {
++    const char *name;
++    struct ArmIdRegField *fields;
++    uint32_t fields_count;
++} ArmIdReg;
++
++
++#endif /* CPU_IDREGS_H */
+-- 
+2.52.0
 
->> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
->> index 2252d3b905db9..14cc419dbafad 100644
->> --- a/arch/arm64/kvm/pmu-direct.c
->> +++ b/arch/arm64/kvm/pmu-direct.c
->> @@ -100,6 +100,73 @@ u8 kvm_pmu_hpmn(struct kvm_vcpu *vcpu)
->>    	return *host_data_ptr(nr_event_counters);
->>    }
-
->> +/* Callback to update counter mask between perf scheduling */
->> +static void kvm_pmu_update_mask(struct pmu *pmu, void *data)
->> +{
->> +	struct arm_pmu *arm_pmu = to_arm_pmu(pmu);
->> +	unsigned long *new_mask = data;
->> +
->> +	bitmap_copy(arm_pmu->cntr_mask, new_mask, ARMPMU_MAX_HWEVENTS);
->> +}
->> +
->> +/**
->> + * kvm_pmu_set_guest_counters() - Handle dynamic counter reservations
->> + * @cpu_pmu: struct arm_pmu to potentially modify
->> + * @guest_mask: new guest mask for the pmu
->> + *
->> + * Check if guest counters will interfere with current host events and
->> + * call into perf_pmu_resched_update if a reschedule is required.
->> + */
->> +static void kvm_pmu_set_guest_counters(struct arm_pmu *cpu_pmu, u64  
->> guest_mask)
->> +{
->> +	struct pmu_hw_events *cpuc = this_cpu_ptr(cpu_pmu->hw_events);
->> +	DECLARE_BITMAP(guest_bitmap, ARMPMU_MAX_HWEVENTS);
->> +	DECLARE_BITMAP(new_mask, ARMPMU_MAX_HWEVENTS);
->> +	bool need_resched = false;
->> +
->> +	bitmap_from_arr64(guest_bitmap, &guest_mask, ARMPMU_MAX_HWEVENTS);
->> +	bitmap_copy(new_mask, cpu_pmu->hw_cntr_mask, ARMPMU_MAX_HWEVENTS);
->> +
->> +	if (guest_mask) {
->> +		/* Subtract guest counters from available host mask */
->> +		bitmap_andnot(new_mask, new_mask, guest_bitmap, ARMPMU_MAX_HWEVENTS);
->> +
->> +		/* Did we collide with an active host event? */
->> +		if (bitmap_intersects(cpuc->used_mask, guest_bitmap,  
->> ARMPMU_MAX_HWEVENTS)) {
->> +			int idx;
->> +
->> +			need_resched = true;
->> +			cpuc->host_squeezed = true;
->> +
->> +			/* Look for pinned events that are about to be preempted */
->> +			for_each_set_bit(idx, guest_bitmap, ARMPMU_MAX_HWEVENTS) {
->> +				if (test_bit(idx, cpuc->used_mask) && cpuc->events[idx] &&
->> +				    cpuc->events[idx]->attr.pinned) {
->> +					pr_warn_ratelimited("perf: Pinned host event squeezed out by KVM  
->> guest PMU partition\n");
-
-> Hi Colton,
-
-> I get "perf: Pinned host event squeezed out by KVM guest PMU partition"
-> even with arm_pmuv3.reserved_host_counters=3 for example. I would have
-> expected any non zero value to stop the warning.
-
-> I think armv8pmu_get_single_idx() needs to be changed to allocate from
-> the high end host counters first. A more complicated option would be
-> checking to see if there are any non-pinned counters in the host
-> reserved half when a new pinned counter is opened, then swapping the
-> places of the new pinned and existing non-pinned counters so pinned
-> always prefer being put into the host half. But it's probably not worth
-> doing that.
-
-> James
-
-
-I agree it makes the most sense to allocate from the top, but I'm happy
-the basic idea works.
-
->> +					break;
->> +				}
->> +			}
->> +		}
->> +	} else {
->> +		/*
->> +		 * Restoring to hw_cntr_mask.
->> +		 * Only resched if we previously squeezed an event.
->> +		 */
->> +		if (cpuc->host_squeezed) {
->> +			need_resched = true;
->> +			cpuc->host_squeezed = false;
->> +		}
->> +	}
->> +
->> +	if (need_resched) {
->> +		/* Collision: run full perf reschedule */
->> +		perf_pmu_resched_update(&cpu_pmu->pmu, kvm_pmu_update_mask, new_mask);
->> +	} else {
->> +		/* Host was never using guest counters anyway */
->> +		bitmap_copy(cpu_pmu->cntr_mask, new_mask, ARMPMU_MAX_HWEVENTS);
->> +	}
->> +}
->> +
->>    /**
->>     * kvm_pmu_host_counter_mask() - Compute bitmask of host-reserved  
->> counters
->>     * @pmu: Pointer to arm_pmu struct
->> @@ -218,6 +285,7 @@ void kvm_pmu_load(struct kvm_vcpu *vcpu)
-
->>    	pmu = vcpu->kvm->arch.arm_pmu;
->>    	guest_counters = kvm_pmu_guest_counter_mask(pmu);
->> +	kvm_pmu_set_guest_counters(pmu, guest_counters);
->>    	kvm_pmu_apply_event_filter(vcpu);
-
->>    	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
->> @@ -319,5 +387,6 @@ void kvm_pmu_put(struct kvm_vcpu *vcpu)
->>    	val = read_sysreg(pmintenset_el1);
->>    	__vcpu_assign_sys_reg(vcpu, PMINTENSET_EL1, val & mask);
-
->> +	kvm_pmu_set_guest_counters(pmu, 0);
->>    	preempt_enable();
->>    }
->> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
->> index f7b000bb3eca8..63f88fec5e80f 100644
->> --- a/include/linux/perf/arm_pmu.h
->> +++ b/include/linux/perf/arm_pmu.h
->> @@ -75,6 +75,7 @@ struct pmu_hw_events {
-
->>    	/* Active events requesting branch records */
->>    	unsigned int		branch_users;
->> +	bool host_squeezed;
->>    };
-
->>    enum armpmu_attr_groups {
