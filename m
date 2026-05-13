@@ -1,120 +1,121 @@
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2723A9DA4
-	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 21:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8591A3C9895
+	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 21:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778706989; cv=none; b=jPF6CSn5OoyMxH1LU+6im/WWwclwI6nL6lhlz9dq4eIXilfOQw1+ZuCdjQwJabAZE3N8Z0uLblLaVJ2+krXRDbDVOulz1+Wy6oqPAe/vysA7NNcrp4k3ivsLsG5/eLieWzECK8HT/mnQnxMBTG3OBzoiXK4mrdVoyD5HXyx16/o=
+	t=1778709304; cv=none; b=ujPBVU2HenG2NBM9zVeNn0PfP/Rz0/484JRTXp699ymon7tp33hsr+wxEciS6xDvs2mYfRiRB6nfB5EyZ9tBGJ1NQQ1zPDvfKKQZRhABcEauTKkfWEUAJpxeo7sFwTae1HmLlvJucFDgP5SVWn7nKLB80QvgsXmInj+DBqnRubk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778706989; c=relaxed/simple;
-	bh=jKQ8iuhXGvRDVAnzj1gC6DLK91R18lf4SB4H8czhV5A=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mi0mGc35FmsOr1jlgy7u09uKc0aZ1McxVG/2kETdE1qLWaw69PqAObfTHojHIDxMzk4116M8D6XKkjBAEBLi8/j2kKaTwlPflWbaPNwilGd2+88x4OtFFJD31rGcZVb7Bsc6gDcJANDIzKb5YbhabWTwYC3Ht1JyzLm2oK21TOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jwbfI5Gc; arc=none smtp.client-ip=209.85.161.74
+	s=arc-20240116; t=1778709304; c=relaxed/simple;
+	bh=33ib9KkcLLrn3VhTTtFpwjAuQ5li1GsPjQBsArINN90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gs4DGuNmF6KGuCCsNvUVQQRBA4yblsZ9zH7U+k5zMY/DCQmKQhSC26WV1YAzXtPB9tOf/O6hjp/PF24j/nMV3LdFVrwS/JpaPd++XNh7xu3R4KkZ7dJLgFkfVCRPE8sXQs4eYqE0f6HlApatUVsxcyb4wRVFCP8eHUpfwTj2fD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z4FvhiXS; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jwbfI5Gc"
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-69b4c167215so8676702eaf.0
-        for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 14:16:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z4FvhiXS"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48d1c670255so17645e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 14:55:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778706985; x=1779311785; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6JXnGk6v8vsVrC7dHkuW3HoXav5Obr9bfPUm82eBukk=;
-        b=jwbfI5GctJkxuBRSd1Ge3TLGHTJmnwReyWHwHG1KvmaLl+KU1FogjibQ3mSwF24dNJ
-         zxsHiq5LXmrNeZY0/0RQU4HXMziV99PIYpvbxeckOp7LrcUmmNeD1T6aqyOIdcPOlfNb
-         UZcH+G4IsQmYnaH8hE+esEa0031wtJw91GRtC8cRcyHy/N32ocfC71HKV8hPP/CXqdw1
-         /kGFqwEWAMjY6JmXLFhkZljbk/tc736O+Xf7LyI7N04XN8To0LWJ1i1MJMxW74sNWmb4
-         TyV719Ec4UXx0esOrGKj+H+g+oNSKddZigcJy/ops99KzTJFzQ86HW8cUwykt3J/Voii
-         7C9Q==
+        d=google.com; s=20251104; t=1778709301; x=1779314101; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ezXQwA1bTr4JmObmofRNYrBy4UfsX59CPxxan0BrTBM=;
+        b=Z4FvhiXSN6pnjemQpGNtN6SzaDIINiv9WVJnTpAPgTbGIHyCI56fDgL6uRkT5w3Nk9
+         weIc3FnKFXQgqlE3O94NiqpLAMS5B/gHl0/rs8F9JAyI0mj+DjHIng+OVeKjv0NfTI/o
+         IG1YWFX3/yVYEZp/5oTnDv7DrQmbW3mnUtiiT8B8f4/a4RQQkrmvqJKEM61LlJP+nRBS
+         ByPSkkx1tWLLnBSJqg2pmMBiQ0Zsq0PxRReRRACEhdnj0+kS0pPCQEHMqVMCFb4KTse7
+         xbL/hi4/n9mPz5IxHQodGC3gJB5OGNc9G1++Fi4RwXKRXFXYIbdUpZKVa5fjoEfRdcTM
+         Cojw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778706985; x=1779311785;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6JXnGk6v8vsVrC7dHkuW3HoXav5Obr9bfPUm82eBukk=;
-        b=A7OVsCOa+GFflcdEHpNtXjRnxzThmFD32nI+0kBb+840SqGjauDM665tWvI6S4pT2R
-         RQmNB55dWjvwRsQTbUguHa9ngrnJSjeIK2ZmWLvmu1im4NR/WJ4RcCj4l/okLa+x/VM8
-         837VNxPOBdkuVoXgrpkY1Pg/E438TtYbkMAkVPT24Muab5lu5kNe0a89GdFzuQXBR7MG
-         i7U+vAcHG+bQuXFZtybDfgPusm4u0xDL2hdW16dQU858d1edq8EjIP/cmIoteu41MuQz
-         E4AdtoOJc3173lQrB1zjFSd7fOchNZe0WrqroHtyu8Y7xWgyu1JA3vaeydtny87i+gRs
-         Fh4g==
-X-Forwarded-Encrypted: i=1; AFNElJ9BoM5gwm0DSTRUb0dI6kuJ82inH5Tz/E9vhQnBpy5PoeYR+r3savv2597+ISqtxVl93fpNEf8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxm6HBmM5Ww8L8pVgnbrPVnaIpbL6JbXRCum9gXzVMtdv0cVmjI
-	TYpw+8BJPqj3sJZ0QAFcryi7CxDq+xET1c+qXigzzMxJr1LS1y6tTWwc3ZWN7TtFGzNuqMV3n73
-	yPIBd/Fb+JEMpCRnYFb74hXoIFQ==
-X-Received: from iln3.prod.google.com ([2002:a92:d03:0:b0:4fb:4caf:c442])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a4a:da01:0:b0:694:95ae:c546 with SMTP id 006d021491bc7-69b87d2fec1mr592304eaf.2.1778706985183;
- Wed, 13 May 2026 14:16:25 -0700 (PDT)
-Date: Wed, 13 May 2026 21:16:24 +0000
+        d=1e100.net; s=20251104; t=1778709301; x=1779314101;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ezXQwA1bTr4JmObmofRNYrBy4UfsX59CPxxan0BrTBM=;
+        b=JacEdu9yjfMAzzrRJVH9PuqaZgbaRCLL5lViShX/My+2GGsxu9al9FIt0ytBARTCJE
+         WPbXYylZZdGshwLai+fCAzrJb0jBMV/ZMUfzhmRtpJ8cGF61c8W+dhHFuyCVpKhiMTDo
+         0lI5o5qBtEkpVNCqm2sSMIxw6yrtZzRzz2D/OMeeCyDHeV8TaOhwT2HkZUiFj7nuNvEl
+         vGyl8x9opFJvuRg/+x/RQX29z54JglFIJ5SdE1jZjOKkwk5tTVExN2CcHvHQ1kRLJ+Sf
+         k+ETYyFNRAJQCWsAB4Q8UJmcGt+4lE0HMU191FjLISP5c+QGnaL+6ClDW8FSNCrcQVSO
+         46tw==
+X-Forwarded-Encrypted: i=1; AFNElJ9kJwCf72VL4uG+il8XVi4YeuQr+k4RYG8MVeUJDm1fWaMdWxHXVbXIMZJzJnVxqd1dHIiym4I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywot3DJGR2AveH1Ycla4ZhJIgEqjlh87AmpMO03G1/8tS31g0LD
+	tMIIxE+lSJYSqd/gxgpW97sILDFFy+Cba3GSCRkLiKbmThmWyEUQxTx4sdPViUT0og==
+X-Gm-Gg: Acq92OE4aBNYHrvqMEEDfebvAFkhpBWmG4YynFeIzwRTGA/SN1VMaAL4MDewvxfNrJO
+	4/y02Jcr0yu5qGSqgEYzGz6yjWi5th0G78VEvIMY9AWT+6JoFZNMj4uddSjJUzF7qygFRX+oXur
+	KZt36Km8Mx7N0gTBH8nWo+fU0fqeU6TwFzGeTs/7o/X1p+uJORRPdltoe5Vd5hcYmozucTKFst5
+	wBaYUQ2fghzYrllHpy6gdLeL9HayNgLGq5vjnMzUOG/M0BTaEYmNXb5bTly0DtvybPw6p3jOsPO
+	l2afYLl1Op73O9c9NSF1umLFbXavMS1N1fZJRHepjOU+SolhE+gL8z8+vTRXQ8R4o9CuaH0x0A2
+	+mR1oj9vJmJxvUWkXgY9WtJ2VxOkqOUX4U2yqddRLKfuxNHM4QlO4nOg1Tnl/GB73Unlsb0xxM3
+	L3lv25ehJkrqkrJpSEHYX8rxszz0H3X+UH3yQyXGS0qwEvM6gCJDkoDA31Xw9FVi89Br4=
+X-Received: by 2002:a05:600c:a404:b0:483:6a76:11a6 with SMTP id 5b1f17b1804b1-48fdafcf030mr95235e9.5.1778709300573;
+        Wed, 13 May 2026 14:55:00 -0700 (PDT)
+Received: from google.com (8.181.38.34.bc.googleusercontent.com. [34.38.181.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a19b1dsm1499641f8f.17.2026.05.13.14.54.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 14:54:59 -0700 (PDT)
+Date: Wed, 13 May 2026 21:54:46 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 06/25] iommu/io-pgtable-arm: Rework to use the
+ iommu-pages API
+Message-ID: <agTzJuKQoBqfQkq7@google.com>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-7-smostafa@google.com>
+ <20260501122424.GA6912@ziepe.ca>
+ <afiO2WL4ILGfmUui@google.com>
+ <20260509232155.GH9285@ziepe.ca>
+ <agG6n4CeuIMD57G1@google.com>
+ <20260511141849.GO9285@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260513211624.2416284-1-coltonlewis@google.com>
-Subject: [kvm-unit-tests PATCH] arm: io: Set is_pl011_uart flag in ACPI initialization
-From: Colton Lewis <coltonlewis@google.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260511141849.GO9285@ziepe.ca>
 
-When booting via ACPI on ARM64, the SPCR table is parsed to initialize
-the console UART. However, the code was neglecting to set the
-is_pl011_uart flag. This caused __getchar() to fall back to treating
-the UART as a 16550A device, which fails on systems with a PL011.
+On Mon, May 11, 2026 at 11:18:49AM -0300, Jason Gunthorpe wrote:
+> On Mon, May 11, 2026 at 11:16:47AM +0000, Mostafa Saleh wrote:
+> > > IDK, why? virt_to_phys() is part of the iommu-pages API, I'd just
+> > > leave it.. If you want to narrow it then #define it for pkvm when
+> > > compiling this file..
+> > 
+> > It is not going to be part of the iommu-pages API, I meant in
+> > io-pgtable-arm, we will use something arm_lpae_virt_to_phys()...
+> > which is then implemented differently for pkvm.
+> 
+> Again why? I think the main goal should be to not mess up the normal
+> code. 
+> 
+>   #define virt_to_phys pkvm_virt_to_phys
+> 
+> Does that, we should be leaning into this pattern I think, not adding
+> unnecessary churn...
+> 
+> If anything is needed then it should be an iommu_pages function to
+> wrapper virt_to_phys() for use by iommu_pages uses but I'd rather
+> not..
+> 
 
-Tests that wait for serial input (like its-migration) would hang
-indefinitely because __getchar() would always return -1.
+Sure, no strong opinion, I did post this patch along with cleanups
+separately in:
+https://lore.kernel.org/linux-iommu/20260513215203.3852661-1-smostafa@google.com/
 
-Update uart0_init_acpi() to inspect the SPCR interface_type and set
-is_pl011_uart accordingly. Also define macros for the first four SPCR
-interface types in lib/acpi.h based on the Microsoft specification.
+Thanks,
+Mostafa
 
-Link: https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/acpi-debug-port-table#table-3-debug-port-types-and-subtypes
-Assisted-by: Gemini:gemini-3.1-pro
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- lib/acpi.h   | 6 ++++++
- lib/arm/io.c | 3 +++
- 2 files changed, 9 insertions(+)
 
-diff --git a/lib/acpi.h b/lib/acpi.h
-index 66e3062d..29b3edd5 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -251,6 +251,12 @@ enum acpi_madt_type {
- /* MADT Local APIC flags */
- #define ACPI_MADT_ENABLED		(1)	/* 00: Processor is usable if set */
- 
-+/* Values for interface_type field in struct spcr_descriptor */
-+#define ACPI_SPCR_INTERFACE_TYPE_16550		0x0000
-+#define ACPI_SPCR_INTERFACE_TYPE_16450		0x0001
-+#define ACPI_SPCR_INTERFACE_TYPE_16550_32BIT	0x0002
-+#define ACPI_SPCR_INTERFACE_TYPE_ARM_PL011	0x0003
-+
- struct spcr_descriptor {
- 	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
- 	u8 interface_type;	/* 0=full 16550, 1=subset of 16550 */
-diff --git a/lib/arm/io.c b/lib/arm/io.c
-index 836fa854..55102bd7 100644
---- a/lib/arm/io.c
-+++ b/lib/arm/io.c
-@@ -81,6 +81,9 @@ static void uart0_init_acpi(void)
- 
- 	assert_msg(spcr, "Unable to find ACPI SPCR");
- 	uart0_base = ioremap(spcr->serial_port.address, spcr->serial_port.bit_width);
-+
-+	if (spcr->interface_type == ACPI_SPCR_INTERFACE_TYPE_ARM_PL011)
-+		is_pl011_uart = true;
- }
- #else
- 
--- 
-2.54.0.563.g4f69b47b94-goog
-
+> Jason
