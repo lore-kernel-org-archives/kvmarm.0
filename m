@@ -1,217 +1,257 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04217274FE3
-	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 13:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8456331E830;
+	Wed, 13 May 2026 13:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778677407; cv=none; b=p/wiul1iRC9f00gUB/A1fe87rmqG7n1i/Mk0AOPYkc2Gn0hI5yrHtiT2ah1cOcRuxQ+RFC9LDvVI4/BIYSn7pmlEdujocDEuoL1+fL5blq8WjTzOpk9+V3e5sUKs9rRsRt8a7C9rnjZVAT+0U7tzHTKZEU78PiWdxzHP3l6uA6Y=
+	t=1778678303; cv=none; b=CrL15z5fHoLliLDSgyJtMN3lQvb3YLQsLBhoJuzUtFAD9TpvXt2GtRD+f4kmiSsOgL0BSdppWVB2NEAMwYJFl+IaDVWdHOXkX6QntwjAKKYFn25PThzK9HFr0ysMG6c7bxc/pzHaeOAAuFnj7UGgTEzz12JNAHKmDSRZC3Rs78A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778677407; c=relaxed/simple;
-	bh=47RwooVING59/ooQWdA7SNr7Zs32TKeNO1snt4GymBg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=isgLppsCbOwoudC2cnFoOYFO2lD1hgNxtV/omI0yOgDeiz8J/A6U/6W6I47/EiiDQ4RB7nQslHG4Z4Bi3aTqVKil35w0CQ1mz6TIayyWv43tq6SGs+iqT2xZ/iMYiE4OFw8ONcyP9+GpahIBrdUp4cRvVfIxPViIkN2taKih/g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sh+jvyOV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778678303; c=relaxed/simple;
+	bh=mPzCcDED60bjX6A2Gwx//sNfCouiSOsEZUW1a9b8vxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SNuPF6kmppUN+aww3qkBzb/YZ8tSPiW4URqZyIpGW5aZsKC/F+yaHsBE5EfhZMM829eQa/nfI112D7FCu/9QLeEvSx0S60iEPKe/qQpObUwFpHmaaHzM7HNVwshPuiJvwHT77eHCmJ2ZuGb7xZSGqtpitomSmKGNSNuuIvrL8ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=L0vxWiwp; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sh+jvyOV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778677405;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=47RwooVING59/ooQWdA7SNr7Zs32TKeNO1snt4GymBg=;
-	b=Sh+jvyOV6L/5Zzneg8gthRT3BPLvAe5HBY7Vt9iFnqP2rM2HQLZ5sXRF1lKAhKwKqKJiTH
-	gqb3oZQ9PHuqZ0JYnD1Wzh5AHs08lnG8MS9OXX9hNScsIS7JzVk2jVXnQ0rUGc3WQkwTC4
-	h21AFncJDuLTmjk7pnlMc780cJ44LXg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-NbmLJ-a_NLWoTHF1Cbo43A-1; Wed, 13 May 2026 09:03:21 -0400
-X-MC-Unique: NbmLJ-a_NLWoTHF1Cbo43A-1
-X-Mimecast-MFC-AGG-ID: NbmLJ-a_NLWoTHF1Cbo43A_1778677401
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48fd0f1ef7dso4648465e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 06:03:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778677400; x=1779282200;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=47RwooVING59/ooQWdA7SNr7Zs32TKeNO1snt4GymBg=;
-        b=EMdu7DYOa/odJqjIZGGTYTL5cS59cRiyeDxISzHhcQ5yF8Us047NoZghJMBfQc1jF0
-         XkHqN+9TsB9RCWN2TX2LnXouS79sBXRDg4A1Di+GTUCfkuApEb59LBrw5quZsvBsRpu1
-         /WZHPcJcGV7PMK9vBNdYaXe5jwFUfnVIRx2w0qq+8rlVfPbq/xv2a0HiqY9w62lmVii6
-         sXbKp2LeQG8YRLhqqed8wnH+v0b7y1GWYts5PRwhtXERy3hGItRrzdJ5+2Apni128VwW
-         8jZTZ5IS2WWlwM0OvriV75d+ATkyZjMpycWPDvOD1t1rdpMsMWhiC/DPedPtu1ZYFwzG
-         Muew==
-X-Forwarded-Encrypted: i=1; AFNElJ9G+yV3xlGONb7sZY8WNfhJNVgBxxe1CzwMER9RwP2SInEWocWzTLLG/LxwoFPwLgBu7LIhRbA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxr1xEifPEq3OwPjJ8hqjBAYvJw3hPoO6meA9JN97RimqUohiR3
-	QMAYF9FbjubXfWJgzMWFxrpoLR7ctUeWjwQjXrHoZ5LjtFMHp7lh3RwXNpS7GdATVCBEPdRA149
-	ezfUq5bZ1T+W0SaAABpuGVm1Q3vy+hfDGl5xRc7RQCvI08FXqSCdVSjP/4g==
-X-Gm-Gg: Acq92OE5VuQudweRJLNHlvjmoo3TVx5CneltN17GRv62zwNwrnyZeBO1suuKuasUIzD
-	ajgsubnrEXGXs9qXX7uVz15BY5Agvx/ef/ZegnM78Uq2a9oap6zMuk7Emor4PfuyV9oOqXKMta+
-	iljQy2+mJDOiGsKtcngfbst4dHwp4iBuLWUsR9f3SHG9/b8+7Us95VVMpSuRrSKuoyvIPjwopan
-	0V48FgqLG90TSuZtoz7+n7N/NYIZuKh5HmFotyN2IoJfYYc7+vvSK4OT5fewWWglKpb6/xWPOA/
-	xr/Y5N2yzKJlpYAGoVvsAmT8Q2SUUoHhnOLG404SsENKP3zxzW3F1KQZnYljAagjXvkvFJTpDJ6
-	RLqCUVf81VoDRZvtvwaM/zuWwRMcN8o60MS/qH+6F3H91Pz68BfkStCYu6gywhmg3yAMVVg==
-X-Received: by 2002:a05:600c:19cd:b0:48f:be94:d82c with SMTP id 5b1f17b1804b1-48fce9e1a34mr42450515e9.19.1778677400537;
-        Wed, 13 May 2026 06:03:20 -0700 (PDT)
-X-Received: by 2002:a05:600c:19cd:b0:48f:be94:d82c with SMTP id 5b1f17b1804b1-48fce9e1a34mr42449655e9.19.1778677399778;
-        Wed, 13 May 2026 06:03:19 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4549120f1f9sm41638565f8f.24.2026.05.13.06.03.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2026 06:03:19 -0700 (PDT)
-Message-ID: <c3848d24-f924-497b-b5e7-3ef3a07c3a6b@redhat.com>
-Date: Wed, 13 May 2026 15:03:16 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="L0vxWiwp"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BDAD1C14;
+	Wed, 13 May 2026 06:18:14 -0700 (PDT)
+Received: from e122027.arm.com (unknown [10.57.68.187])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C4CE13F836;
+	Wed, 13 May 2026 06:18:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1778678299; bh=mPzCcDED60bjX6A2Gwx//sNfCouiSOsEZUW1a9b8vxY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=L0vxWiwpUToB4RBVYmCN7+mrMNQwwq+zoXksV9iqAHHWX8lJyscPEbEXuzsc3Fq1p
+	 wCFm4oUALrTsFIAy77GTSfeK6Tk+Uj84gmjq+NDKj88TfEocgwoItQc9CA0pS/fxJ4
+	 rJx5jml5cyHNk9YhVUC/CBkY8CmH5lTjkfDiW6Bo=
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo.Pieralisi2@arm.com
+Subject: [PATCH v14 00/44] arm64: Support for Arm CCA in KVM
+Date: Wed, 13 May 2026 14:17:08 +0100
+Message-ID: <20260513131757.116630-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH] Documentation: KVM: Document guest-visible compatibility
- expectations
-To: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse
- <dwmw2@infradead.org>, Marc Zyngier <maz@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
- Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Raghavendra Rao Ananta <rananta@google.com>, Kees Cook <kees@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kselftest@vger.kernel.org
-References: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
- <6afc4b95-3c15-4d71-877d-19b84e91ce05@redhat.com>
- <57bc082f4824d6114d3156744c25986effc29aca.camel@infradead.org>
- <baff82ca-6321-4b16-aa61-b2d6d60b6535@redhat.com>
- <86h5obya2r.wl-maz@kernel.org>
- <48b06e5655d56ff6eda30e563b34894fa0eb2f07.camel@infradead.org>
- <ba08dfe9-932b-40c3-9fdf-fc891d52e1d8@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ba08dfe9-932b-40c3-9fdf-fc891d52e1d8@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: buSO9AuoMY0sil29oPF5k261gu0q4Nwc2i26FAuPz-0_1778677401
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-On 5/13/26 2:43 PM, Paolo Bonzini wrote:
-> On 5/13/26 11:24, David Woodhouse wrote:
->> On Wed, 2026-05-13 at 09:42 +0100, Marc Zyngier wrote:
->>> If userspace is not a total joke, it will read all the ID registers,
->>> and configure what it wants to see, assuming it is a feature that can
->>> be configured (not everything can, because the architecture itself is
->>> not fully backward compatible).
->>>
->>> Yes, this is buggy at times, because the combinatorial explosion of
->>> CPU capabilities and supported features makes it pretty hard to test
->>> (and really nobody actually does). But overall, it works, and QEMU is
->>> growing an infrastructure to manage it in a "user friendly" way.
->>
->> Yes, that is precisely what I'm asking for. I'm prepared to deal with
->> the fact that KVM/Arm64 is not a stable and mature platform like x86
->> is, and that userspace has to find all the random changes from one
->> version to the next, and explicitly pin things down to be compatible.
->>
->> All I'm asking for is that KVM makes it *possible* to pin things down
->> to the behaviour of previously released Linux/KVM kernels.
->>
->>> But really, this isn't what David is asking. He's demanding "bug for
->>> bug" compatibility. For that, we have two possible cases:
->>
->> No, I am not asking you to meet that bar. I merely observed that x86
->> does and that it would be nice. But we are a *long* way from that.
->
-> x86 doesn't do bug-for-bug compatibility, thankfully - we have quirks
-> but only 11 of them, or about one per year since we started adding
-> them.  We only add quirks, generally speaking, when 1) we change the
-> way file descriptors are initialized, 2) guests in the wild were
-> relying on it, or 3) it prevends restoring state saved from an old
-> kernel.  Is there anything else?
->
-> So you're asking something not really far from this:
->
->>> - this is a behaviour that is not allowed by the architecture: we fix
->>>    it for good. We do that on every release. Some minor, some much more
->>>    visible. And there is no way we will add this sort of "bring the
->>>    bugs back" type of behaviours. Specially when it is really obvious
->>>    that no SW can make any reasonable use of the defect. We allow
->>>    userspace to keep behaving as before, but the guest will not see a
->>>    non-compliant behaviour.
->
-> ... where for example
-> https://lore.kernel.org/kvm/e03f092dfbb7d391a6bf2797ba01e122ba080bcd.camel@infradead.org/
-> is an example of a bug that "no SW can make any reasonable use of".
->
->> Marc, this is complete nonsense and you should know better.
->> Once a behaviour is present in a released version of Linux/KVM, we
->> can't just declare it "wrong" and unilaterally impose a change in
->> guest-visible behaviour on *running* guests as a side-effect of a
->> kernel upgrade.
->>
->> The criterion for *KVM* to remain compatible is "once it has been in a
->> released version of the kernel". Not "once it is in the architecture".
->
-> That is *also* obviously nonsense though, isn't it (see example
-> above)? The truth is in the middle, "once it is in the architecture"
-> is likely too narrow but "once it is in a Linux release" is way too
-> broad.  And besides, both miss the point of *configurability* which is
-> the basis of it all.
->
-> The main difference between x86 and Arm is the default state at
-> creation; x86 defaults to a blank slate, mostly; and when we didn't do
-> that, we regretted it later (cue the STUFF_FEATURE_MSRS quirk).  It's
-> too late to change the behavior for Arm, but I think we can agree that
-> patches such as
-> https://lore.kernel.org/kvm/20260511113558.3325004-2-dwmw2@infradead.org/
-> ("KVM: arm64: vgic: Allow userspace to set IIDR revision 1") are what
-> the letter and spirit of this proposal is about.
->
-> Marc did not mention having to deal with guests in the wild.  Let's
-> ignore it for now because even defining "guests in the wild" is hard;
-> and anyway it's not related to the patch that triggered the discussion.
->
-> So we have the third case, "restoring state saved from an old kernel".
-> If this case arises, I do believe that Arm will have to deal with it
-> and introduce quirks or KVM_GET/SET_REG hacks.  Maybe it hasn't
-> happened yet, lucky you. 
+This is rebased on v7.1-rc1, but still targets RMM v2.0-bet1[1].
 
-for info, this qemu series was merged laterly.
+The major updates from v13 remain but have been more fully implemented:
+the RMM uses the host's page size, range based RMI APIs mean we don't
+have to break everything down to base page sizes, the GIC state is
+passed via system registers, and the uAPI has been simplified.
 
-[PATCH v10 0/7] Mitigation of "failed to load
-cpu:cpreg_vmstate_array_len" migration failures <https://lore.kernel.org/all/20260420140552.104369-1-eric.auger@redhat.com/#r>
-https://lore.kernel.org/all/20260420140552.104369-1-eric.auger@redhat.com/#r
+The main changes since v13 are:
 
-It brings an infrastructure to mitigate some migration failures accross different kernel versions.
+ * The RMI definitions and wrappers have been fully updated for RMM
+   v2.0-bet1. In particular the temporary RMM v1.0 SMC compatibility
+   patch has been dropped.
 
-Also there is [PATCH v4 00/17] kvm/arm: Introduce a customizable aarch64 KVM host model, under review
-https://lore.kernel.org/all/20260503073541.790215-1-eric.auger@redhat.com/
+ * The PSCI completion ioctl has been removed. RMM v2.0-bet1 still
+   requires the host to provide the target REC for PSCI calls which
+   name another vCPU, but KVM now performs the RMI PSCI completion
+   automatically before entering the REC again. Userspace no longer
+   needs to issue KVM_ARM_VCPU_RMI_PSCI_COMPLETE. A future spec should
+   remove the need for the host to provide the MPIDR mapping.
 
-This series aims at beeing able to offer the capacity to set writable ID regs on the host passthrough vcpu model.
+ * The generic RMI init, RMM configuration, GPT setup,
+   delegate/undelegate helpers and SRO infrastructure have moved out of
+   KVM into arch/arm64/kernel/rmi.c. RMI is expected to be used by
+   features outside KVM, so this code should be available even when KVM
+   is not built.
 
-Thanks
+ * RMI_GRANULE_TRACKING_GET has been updated to work on a range, this
+   allows it to work when the region is not aligned to the tracking
+   size. Solves the problem reported by Mathieu[2].
 
-Eric
+ * SRO support has been moved earlier in the series and improved. It
+   provides a cleaner way for the host to provide the RMM with the extra
+   memory it requires. However support is still incomplete where the
+   TF-RMM code does not yet implement it. This is noted by FIXMEs in the
+   code.
 
+ * The ARM VM type encoding has been reworked to coexist with the
+   upstream pKVM KVM_VM_TYPE_ARM_PROTECTED bit.
 
->
-> Overall, even if we may disagree about the details, are we really on
-> terribly distant grounds, or are we not?
->
-> Paolo
->
+ * The private-memory documentation now notes that arm64 uses
+   KVM_CAP_MEMORY_ATTRIBUTES.
+
+ * PMU support is dropped for now. It will be added later in a separate
+   series. Similarly for selecting the hash algorithm and RPV.
+
+There are also the usual rebase updates and smaller fixes, including
+changes to the RMM v2.0-bet1 range APIs, removal of REC auxiliary
+granule handling, fixes to the address range descriptor encoding, and
+cleanups around realm stage-2 teardown.
+
+Stateful RMI Operations
+-----------------------
+
+The RMM v2.0 spec introduces Stateful RMI Operations (SROs), which allow
+the RMM to complete an operation over several SMC calls while requesting
+or returning memory to the host. This allows interrupts to be handled in
+the middle of an operation and lets the RMM dynamically allocate memory
+for internal tracking purposes. For example, RMI_REC_CREATE no longer
+needs auxiliary granules to be provided up front, and can instead
+request memory during the operation.
+
+This series includes the generic SRO infrastructure in
+arch/arm64/kernel/rmi.c and uses it for REC create/destroy. The other
+cases are not yet used by TF-RMM and a future revision will be needed to
+finish those paths in Linux.
+
+This series is based on v7.1-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v14
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v12
+
+The TF-RMM has not yet merged the RMM v2.0 support, so you will need to
+use a branch with RMM v2.0-bet1 support. At the time of writing the
+following branch is being used:
+
+https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc_2
+(tested on commit 3340667a291a)
+
+There is a kvm-unit-test branch which has been updated to support the
+attestation used in RMMv2.0 available here:
+
+https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v4
+
+[1] https://developer.arm.com/documentation/den0137/2-0bet1/
+[2] https://lore.kernel.org/all/acrj-cKphy4hJsEG@p14s/
+
+Jean-Philippe Brucker (6):
+  arm64: RMI: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RMI: Set breakpoint parameters through SET_ONE_REG
+  arm64: RMI: Propagate max SVE vector length from RMM
+  arm64: RMI: Configure max SVE vector length for a Realm
+  arm64: RMI: Provide register list for unfinalized RMI RECs
+  arm64: RMI: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: RMI: allow userspace to inject aborts
+  arm64: RMI: support RSI_HOST_CALL
+
+Steven Price (33):
+  kvm: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RMI: Add SMC definitions for calling the RMM
+  arm64: RMI: Add wrappers for RMI calls
+  arm64: RMI: Check for RMI support at init
+  arm64: RMI: Configure the RMM with the host's page size
+  arm64: RMI: Ensure that the RMM has GPT entries for memory
+  arm64: RMI: Provide functions to delegate/undelegate ranges of memory
+  arm64: RMI: Add support for SRO
+  arm64: RMI: Check for RMI support at KVM init
+  arm64: RMI: Check for LPA2 support
+  arm64: RMI: Define the user ABI
+  arm64: RMI: Basic infrastructure for creating a realm.
+  KVM: arm64: Allow passing machine type in KVM creation
+  arm64: RMI: RTT tear down
+  arm64: RMI: Activate realm on first VCPU run
+  arm64: RMI: Allocate/free RECs to match vCPUs
+  arm64: RMI: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RMI: Handle realm enter/exit
+  arm64: RMI: Handle RMI_EXIT_RIPAS_CHANGE
+  KVM: arm64: Handle realm MMIO emulation
+  KVM: arm64: Expose support for private memory
+  arm64: RMI: Allow populating initial contents
+  arm64: RMI: Set RIPAS of initial memslots
+  arm64: RMI: Create the realm descriptor
+  arm64: RMI: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: RMI: Prevent Device mappings for Realms
+  arm64: RMI: Enable realms to be created
+
+Suzuki K Poulose (3):
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Don't expose unsupported capabilities for realm guests
+  arm64: RMI: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |   62 +-
+ arch/arm64/include/asm/kvm_emulate.h |   37 +
+ arch/arm64/include/asm/kvm_host.h    |   13 +-
+ arch/arm64/include/asm/kvm_pgtable.h |    5 +-
+ arch/arm64/include/asm/kvm_pkvm.h    |    2 +-
+ arch/arm64/include/asm/kvm_rmi.h     |  127 +++
+ arch/arm64/include/asm/rmi_cmds.h    |  680 +++++++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  448 ++++++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/kernel/Makefile           |    2 +-
+ arch/arm64/kernel/cpufeature.c       |    1 +
+ arch/arm64/kernel/rmi.c              |  605 +++++++++++
+ arch/arm64/kvm/Kconfig               |    2 +
+ arch/arm64/kvm/Makefile              |    2 +-
+ arch/arm64/kvm/arch_timer.c          |   28 +-
+ arch/arm64/kvm/arm.c                 |  140 ++-
+ arch/arm64/kvm/guest.c               |   93 +-
+ arch/arm64/kvm/hyp/pgtable.c         |    1 +
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    5 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  197 +++-
+ arch/arm64/kvm/psci.c                |   15 +-
+ arch/arm64/kvm/reset.c               |   13 +-
+ arch/arm64/kvm/rmi-exit.c            |  215 ++++
+ arch/arm64/kvm/rmi.c                 | 1401 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   47 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/mm/fault.c                |   28 +-
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_psci.h               |    2 +
+ include/uapi/linux/kvm.h             |   20 +-
+ 32 files changed, 4122 insertions(+), 94 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kernel/rmi.c
+ create mode 100644 arch/arm64/kvm/rmi-exit.c
+ create mode 100644 arch/arm64/kvm/rmi.c
+
+-- 
+2.43.0
 
