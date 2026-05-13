@@ -1,164 +1,155 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2828E3D7D7B;
-	Wed, 13 May 2026 07:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D473D88F2;
+	Wed, 13 May 2026 08:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778659065; cv=none; b=iM4CsKxinSt0kMKdlQG81yRxBgFUv3bqvsaWX6cxT3c+gqJe17tT1dlTMRDaOtIUhlpfBlZaJtSfkgNERDqr3Vh9ICV7DYZ7fdJykmcG6uB3HIRt3WCkw3R6Cr0aqp+9XjxBCZnKd7NAIFhUn4LMGmBMzS87/8tciXkoUT8PFzc=
+	t=1778661761; cv=none; b=N2Ij63777qvXLBJjN0VCNLY6zVeAJQez72KQ4PSEmKDQDoj6uaVaUa51rlTkKs5e1YRNOpKTQhC81oyMpBpwy/NLWF7G5oAMjBaoQ0rbXuhIgJSWSnPvf54U9rUQ2PvJPKVmnQQWEhkPqrMt5HfWQdlbTOptmUhjFjXWPjISvzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778659065; c=relaxed/simple;
-	bh=bR1i92frDxooM1/4hRznpgGK1PwGwO8I8wpOQKsxaig=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C+vO9UbNPwAuNHeJSv/JQeQEkiPE2+vn+z0IFFyspa20PJGigqnWkTOmn6Wkj8Gb2VP5f5gvT118Qb2apbGc1tgpaguu7eVJWYjOeVn0LJrYf1briCWYyJiW/Yo8VP8QCnOZXSywa8L0KqnmQaRzqaGCWDZzCaP/6TTVbeAm1lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=orykS+qr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778661761; c=relaxed/simple;
+	bh=wFcKZ8r+riP6MbTu1qKedhOQzdDog9eWtDtPnYzMQ3M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f23OkHI8J4/OGbFtunfG2XFa9RjZXNjUFgvFP/Ob6imDdWEMdjQAYPz9ADyYwwvmmOIM8UPl7QRwbQwOVc5nwodxDI3uY6oQ3sG6ULsFmmoORCN+Ped1VkoJA4GXkCzi/epVPP0oEag13+9Wnm256SWk49TV2PfjJ7XrRLwXZEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dL+mOThU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="orykS+qr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D17CC2BCC7;
-	Wed, 13 May 2026 07:57:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dL+mOThU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84068C2BCB7;
+	Wed, 13 May 2026 08:42:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778659064;
-	bh=bR1i92frDxooM1/4hRznpgGK1PwGwO8I8wpOQKsxaig=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=orykS+qrrrRNFxk7x/UmKrWLdvYQkQowPXI0p076mIuKFeymoBdbMkuIrhPF7xc1o
-	 aVTVCBoGbkyvc48jQn598HmxZ9Ar+o/yssqekrG3bWfzyXG5A5A+Zfcswc7eY/pjMg
-	 fT6a2+VyuOvcLb/vM8Hn2wK5zFC4yN2BLQTLNgrE0mXArVrIS3qNlmuAZ7q70TFYxR
-	 bDEMt1EpMfDA/37IbfOnPT/dcluEhOvlwGEcl4ZArCPY1PaYqgmnCeAANHks7QtDBv
-	 uMAoPxGcaERtzu4+rI623u1q+YlsWgG/fXhqcgzfnXIHC9OXl9EUnAlQfY9oRRp6Dv
-	 19/arP+5NHgzw==
-Date: Wed, 13 May 2026 00:57:42 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	s=k20201202; t=1778661759;
+	bh=wFcKZ8r+riP6MbTu1qKedhOQzdDog9eWtDtPnYzMQ3M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dL+mOThUrXXyro0zysDBR2vEzgp8njYPG1rem/bvEEarfzI4iharQP8kiFEIKGWaO
+	 BHC2NCndirUymlaSj6KAce8B5EZxGXgzcfRa+OZ31J5WQ/9sdMZj04KRg8N/0hViDM
+	 BiYRDaGtS7PSjr/2AZSYl1pbysNuRImlxZmCLm/iJygUT75bszXrPh40/kbhpG2xVg
+	 W/4pZTcI3aTR2oNvh9IMHpKk8dcE9XaDVTHHiiEzHR/szG1HNqvxTIUKl8GRm38PrK
+	 vhLQTJINE+wstMdsHbuNTyEGAUSqg+6yLOHCDFGOo/AKESMMycUcs2RijMsMGULODX
+	 nIVCQR0pSPbpg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wN5Ar-00000001tMH-0Xjc;
+	Wed, 13 May 2026 08:42:37 +0000
+Date: Wed, 13 May 2026 09:42:36 +0100
+Message-ID: <86h5obya2r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Woodhouse <dwmw2@infradead.org>,
 	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Jim Mattson <jmattson@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	James Clark <james.clark@linaro.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v7 09/20] KVM: arm64: Set up MDCR_EL2 to handle a
- Partitioned PMU
-Message-ID: <agQu9kLnbHjSni-C@kernel.org>
-References: <20260504211813.1804997-1-coltonlewis@google.com>
- <20260504211813.1804997-10-coltonlewis@google.com>
+Subject: Re: [PATCH] Documentation: KVM: Document guest-visible compatibility expectations
+In-Reply-To: <baff82ca-6321-4b16-aa61-b2d6d60b6535@redhat.com>
+References: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
+	<6afc4b95-3c15-4d71-877d-19b84e91ce05@redhat.com>
+	<57bc082f4824d6114d3156744c25986effc29aca.camel@infradead.org>
+	<baff82ca-6321-4b16-aa61-b2d6d60b6535@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260504211813.1804997-10-coltonlewis@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dwmw2@infradead.org, corbet@lwn.net, skhan@linuxfoundation.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, seanjc@google.com, jmattson@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, rananta@google.com, eric.auger@redhat.com, kees@kernel.org, arnd@arndb.de, nathan@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, May 04, 2026 at 09:18:02PM +0000, Colton Lewis wrote:
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 3ad6b7c6e4ba7..0ab89c91e19cb 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -36,20 +36,43 @@ static int cpu_has_spe(u64 dfr0)
->   */
->  static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->  {
-> +	int hpmn = kvm_pmu_hpmn(vcpu);
-> +
->  	preempt_disable();
->  
->  	/*
->  	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
->  	 * to disable guest access to the profiling and trace buffers
->  	 */
-> -	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> -					 *host_data_ptr(nr_event_counters));
-> +
-> +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, hpmn);
->  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
->  				MDCR_EL2_TPMS |
->  				MDCR_EL2_TTRF |
->  				MDCR_EL2_TPMCR |
->  				MDCR_EL2_TDRA |
-> -				MDCR_EL2_TDOSA);
-> +				MDCR_EL2_TDOSA |
-> +				MDCR_EL2_HPME);
-> +
-> +	if (kvm_vcpu_pmu_is_partitioned(vcpu)) {
-> +		/*
-> +		 * Filtering these should be redundant because we trap
-> +		 * all the TYPER and FILTR registers anyway and ensure
-> +		 * they filter EL2, but set the bits if they are here.
-> +		 */
-> +		if (is_pmuv3p1(read_pmuver()))
-> +			vcpu->arch.mdcr_el2 |= MDCR_EL2_HPMD;
-> +		if (is_pmuv3p5(read_pmuver()))
-> +			vcpu->arch.mdcr_el2 |= MDCR_EL2_HCCD;
+On Mon, 11 May 2026 17:56:15 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 5/11/26 18:38, David Woodhouse wrote:
+> > Not *everything* is in CPUID; one recent exception that comes to mind
+> > is the SUPPRESS_EOI_BROADCAST quirk. But on x86 we preserve the
+> > existing behaviour of older kernels =E2=80=94 even when that behaviour =
+doesn't
+> > make much sense, as with SUPPRESS_EOI_BROADCAST where older KVM would
+> > *advertise* the feature, but not actually *implement* it. Nevertheless,
+> > that remains the default behaviour of future kernels unless userspace
+> > explicitly opts in to fully enable (or disable) the feature.
+> >=20
+> > But this documentation update isn't even asking for that compatible-by-
+> > default behaviour, even though that is the right thing to do. It's only
+> > asking that it be *possible* to reinstate the old behaviour, for
+> > userspace that *knows* about the change and explicitly wants to go back
+> > to the old way to remain compatible.
+>=20
+> Yep, these are the "quirks"---if it's too early for Arm to commit to
+> that, I guess it's fine.
 
-Neither of these controls are of any consequence on unsupported
-hardware (RES0). Set them unconditionally?
+Compatible by default means nothing, because userspace needs to
+discover the combined capabilities of the host and KVM. This is not a
+"CPU model" architecture.
 
-> +		/*
-> +		 * Take out the coarse grain traps if we are using
-> +		 * fine grain traps.
-> +		 */
-> +		if (kvm_vcpu_pmu_use_fgt(vcpu))
+If userspace is not a total joke, it will read all the ID registers,
+and configure what it wants to see, assuming it is a feature that can
+be configured (not everything can, because the architecture itself is
+not fully backward compatible).
 
-I think open coding the check here would actually improve readability.
+Yes, this is buggy at times, because the combinatorial explosion of
+CPU capabilities and supported features makes it pretty hard to test
+(and really nobody actually does). But overall, it works, and QEMU is
+growing an infrastructure to manage it in a "user friendly" way.
 
-		if (cpus_have_final_cap(ARM64_HAS_FGT) &&
-		    (cpus_have_final_cap(ARM64_HAS_HPMN0) ||
-		     vcpu->kvm->arch.nr_pmu_counters != 0))
-			vcpu->arch.mdcr_el2 &= ~(MDCR_EL2_TPM | MDCR_EL2_TPMCR);
-> +
-> +/**
-> + * kvm_pmu_hpmn() - Calculate HPMN field value
-> + * @vcpu: Pointer to struct kvm_vcpu
-> + *
-> + * Calculate the appropriate value to set for MDCR_EL2.HPMN. If
-> + * partitioned, this is the number of counters set for the guest if
-> + * supported, falling back to max_guest_counters if needed. If we are not
-> + * partitioned or can't set the implied HPMN value, fall back to the
-> + * host value.
-> + *
-> + * Return: A valid HPMN value
-> + */
-> +u8 kvm_pmu_hpmn(struct kvm_vcpu *vcpu)
-> +{
-> +	u8 nr_guest_cntr = vcpu->kvm->arch.nr_pmu_counters;
-> +
-> +	if (kvm_vcpu_pmu_is_partitioned(vcpu)
-> +	    && !vcpu_on_unsupported_cpu(vcpu)
-> +	    && (cpus_have_final_cap(ARM64_HAS_HPMN0) || nr_guest_cntr > 0))
-> +		return nr_guest_cntr;
-> +
-> +	return *host_data_ptr(nr_event_counters);
-> +}
+But really, this isn't what David is asking. He's demanding "bug for
+bug" compatibility. For that, we have two possible cases:
 
-This helper isn't helpful. Just open code it in the place where we are
-computing MDCR_EL2.
+- this is a behaviour that, while undesirable, is allowed by the
+  architecture: fine, we preserve the behaviour and add another way to
+  expose the one we really want. it is ugly, but we manage.
 
-> @@ -542,6 +542,13 @@ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS))
->  		return 1;
->  
-> +	/*
-> +	 * If partitioned then we are limited by the max counters in
-> +	 * the guest partition.
-> +	 */
-> +	if (kvm_pmu_is_partitioned(arm_pmu))
-> +		return arm_pmu->max_guest_counters;
-> +
+- this is a behaviour that is not allowed by the architecture: we fix
+  it for good. We do that on every release. Some minor, some much more
+  visible. And there is no way we will add this sort of "bring the
+  bugs back" type of behaviours. Specially when it is really obvious
+  that no SW can make any reasonable use of the defect. We allow
+  userspace to keep behaving as before, but the guest will not see a
+  non-compliant behaviour.
 
-Ok, this is exactly what I was getting at earlier. What about a VM with
-an emulated PMU? It should use cntr_mask calculation, not the guest
-range.
+That being said, there is a way out of that: convince people in charge
+of the architecture that the non-compliant KVM behaviour is actually
+valuable, and deserves to be tolerated. This has happened before (VHE
+only and NV2 only, just to name two recent changes).
+
+Other terrible hacks (such as GICv3's GICD_TYPER.num_LPIs which KVM
+doesn't support) were added at the request of cloud vendors that David
+might be familiar with, so it isn't like it is a brand new process.
+
+And once it is in the architecture, it becomes a behaviour that is
+allowed to be exposed to a guest, for better or worse.
+
+These are the rules we have followed since we started KVM/arm, and I
+intend to stick to them.
 
 Thanks,
-Oliver
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
