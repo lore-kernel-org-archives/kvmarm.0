@@ -1,63 +1,64 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58A03F4108
-	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 13:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286B5253359
+	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 13:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778679294; cv=none; b=FFs/XWUX9AbHp46/PljYFaxkob0vt6FlwJp3pdcst4wltZfIC6SegmTbi/Ay8e6dJdlAOTFWgGUTRgq3JB7x4Fu/kLbL1ZwnlNY0rkz3VuDWxebzDx9ldfFkVBC6bgMcNoNcyMl/o80b19AVWuaLd78ykhZ2le6n5TnMj9hs41U=
+	t=1778680417; cv=none; b=LCvolfpilsJZdOXErjwURu4QOOcStIhNaI7Z+wM2lVmHPANoHol6SKEzoFepfM/W01qpJkAZ3CUqnodvEQY+UZq6jH2uNcbwqg1+fbxH5nze7zHadXRvKlTflMQfxpNDLA8KtSpGoqdnfEM3MStQ2eNld064p7eUkXSqq7fkEXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778679294; c=relaxed/simple;
-	bh=xSGiGUyd7WdFFROHx3hnAyd4nrUNDZMnp1UdOVJOs5Q=;
+	s=arc-20240116; t=1778680417; c=relaxed/simple;
+	bh=ofdHaHFEMpVkg7dUSVUdr40lziYvJsc5aRLaxKiysAY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=APNnMNTtEZvQP00IaADY35vCTO+LI6dNz7qE7Qcwo1q1Qmg52+NN4VMNKy/BpQzx23Rk26b8+RefCNb7NPkd3hzIb95kEQJ0x24Hso1OcZ1XU1HzHgRQHDkWZhkVHon0x7FzrwHxhyZ9Pnjz5YM9KvuJMssnZwUSQfG4E4tbH0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mikHqKsA; arc=none smtp.client-ip=209.85.128.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=ptyUADk4C6TVfxs8hAnuAGPmYMjg3QM78YPBp4Wv1HhVgqtCJ8hlp24W8R+k5jdX6zTowqSb0FxirrI8KAD0bc9bDsRckdcdqKB+UZqTkBDiRLnPiz5wDjk9YiqIot9ZaRKVveE6FkHdvN62qU5NLvcs/O8DblkpFmoVzJMytzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oXIlV6Pq; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mikHqKsA"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4891ca4ce02so1535e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 06:34:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oXIlV6Pq"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50d864c23bdso12731cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 06:53:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778679291; x=1779284091; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1778680415; x=1779285215; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jGeQr4vZaey6OdXuMe/F8YfUkluAsGc9AieNXA6tGdE=;
-        b=mikHqKsAdY5r/tskYRp9F85MSd4Lnog8nGYipLcQa+QvRbBnYhdwQoHUkHG1gcxTmm
-         j6rzNtY/B/OdeJLBHbO3HRBlQDfcivORqkDSzr3Wm+o/w0ViDK2KSaTD4HpmRuT+x0K/
-         z/Pv0u7n0DTqwd8dH8MUtWBRg5/lgNNJyI+b6DjeJ+LjQrkUwq0YFRzPfeoSZqwBd8iv
-         I2jBJARjtF3nfgZXBjr0NblbaXYP8Id9E34611kcJ+BVv8L8BH/zrKPxVwMzqzvCaiUb
-         OA91M6q96w1htjNe5aJ93Fg69iPF7pvI24rrM+maTu0aFSCKvjbJaimb0zs07W9lefD4
-         VX+g==
+        bh=8J6GRvshR84cVDL8+yqDVLhfMFpXsrxiE9ecLJtpmYg=;
+        b=oXIlV6PqM1vMbRjhMbY2zSjoeYVA3Y45VNE+g4HSojZa9MV4XGOSYOYNvpGPMlz+Ds
+         IJBqBgBvabByND7yq4QiX6FogL7eZf4QCrooSdNDJm6wFix1lyLJC2MfTpUyu7FjSa7D
+         jf8lDq/BT59lJwdzL2GGO04nITfLaScpYoZ31f0B+iV1/+OlOyldug5jaBIGPqW8qbVZ
+         seCUf19NbOi8pUlprcYw58k6F/nbNM5gUNk//+qXn0aY2ggMeE5IHEftXA1Wmb+MKIOI
+         U4RgXJy9tjNj2FeoAp/RiwQLlvRBWCHynZTgVtyDlECEZEk5RLyAmM2ChQe64qnmEg1D
+         hXFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778679291; x=1779284091;
+        d=1e100.net; s=20251104; t=1778680415; x=1779285215;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jGeQr4vZaey6OdXuMe/F8YfUkluAsGc9AieNXA6tGdE=;
-        b=DZLQtanxZHt78V8GHLuDpgZ1wmVO6n/OwzKFehVnMXfz2e6PvGTw05pFH5Qxi9ZJqs
-         2UCG8ZfngmOc7vGgRUzCA8fnkhlIc8V8l/NSnmH6Vhy3pEWKoXsqH0l/vAZLNAePox8M
-         ch83p7TL8E3LOHAgBx4kHC+1UR7YvANt2GzfmGCAplm9uD29tX+vTeyhFg7Ou74Op2BS
-         mfOeaH6ZcoW6Pzv2P0brCDnNXzrUq8iimVC/g7dEcmuGzIf10KRyTKPEKycJr64+3jy+
-         LiH5MBHg+ABDzpiNyvFWj7h2EQoPunvi0quyidbpA+MPQtaqxgwFe5opB/EgIVUIv2Y8
-         EpLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/ywrQjHC6DSA49seYB7wfWmkrV8ECgHOOYqK8EMuqB7SbY5WtWYnsXqW4Re5fVS5u9PHFpaGA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw5HMDPvaFP9Qm67QNDvloW2Jb+yfQILACJUmcROInn1QQpV9/A
-	1RGvgPfmYVjierF3DvcDHGHDXZ+H6G1SEQZeUVHcvKYrbX6kUlqc1tQAHKMU2nT5Gw==
-X-Gm-Gg: Acq92OGT6IcTEbPp3f8zz57CvNpJUzsnEPzMKFdtVIowihwyRQ3sXeyOHBm+PsAYnFs
-	HFZ4oob5vF7Vx2PMnq5WEvo7YI4hWZiX1ytQQbyNlgvoN/wqRd68ezYT7xHo4AiJi4sLYeOSWC6
-	gGgXbkglpON6jbQ/wa9bEp7irTI8c+bjSXs5wAh4YvkXdZF0qMdhd0hzhowrNSTssi7dUmpx19m
-	ogV/b3buiAabKeTZBEi0yRLfw+9zQ2zBjwl3+zrMzzj63EL3x/g99TAf8ufyw/ztAYUoovst0Ey
-	smXSJo3Tt95CZbTHxfVvYsvIiM7bqv5qm2/2k+bny6ADIe0ZhF5Mh+ocKD/65FnqdCsx8deEfH3
-	8XT2RiHoYaMELG/p6qm5LXa8OC2x391PP1fq+b9rt/9NzXxVk9JzufFn4JNWrjsbXV6DOkBJacP
-	FYlsAI1Ylj6ausVvXoselmWsm2OUBcwJodTeSg8C733YKG4BJqpbJgV2ZZy6e1kEPOvgE=
-X-Received: by 2002:a7b:c455:0:b0:48a:5d95:d33e with SMTP id 5b1f17b1804b1-48fc9148926mr763185e9.6.1778679290836;
-        Wed, 13 May 2026 06:34:50 -0700 (PDT)
+        bh=8J6GRvshR84cVDL8+yqDVLhfMFpXsrxiE9ecLJtpmYg=;
+        b=Z/B1xjFlhT3WAJ8YKiCcJcMcRZbKRVyTkw6vy41jJenLxwbj2Lp67LjzPyx8dzCXe8
+         raVIqCP7SHaBPdOGl96YElMXCaj80BUcJ7hMBUznNM5g/6iwr8n7eYYv8Yp1egFvHlFI
+         aYSYyhygyWueh237uyriHWTX0P6+zSstRMTo2pFPx+nyvaFAGQFlb3/kTtl0JEfrcf0w
+         W1QCqNIDSaXRARByrKznmgRFrRTAB3n9LK3fzmVW+4s4IjMiF72DMM3mbZLsPOd8lAFZ
+         BS/3+JP3jq+S3B5REokVNbB+lbUTG5IyEecEpbOt77pbtfbTXkso2k9VewO1jRfIQ/YY
+         0gyg==
+X-Forwarded-Encrypted: i=1; AFNElJ9mXNCtfNgIIW91BrBK+O2Z91/gSsfYSquoAFbxqBdcySyyp9Cpj4QcTAipM0PSQYdDAE+N4fY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzRCc8cBcPMBIQa4nj7GP0yAwU5JgG7vaeaJGxI2OKhafPtfTLw
+	lOr4LVDLRb1Xg53hP1NpRrUeg9B6PlmWTNIzK/WU2dHniyUfHx7MK93cKciDR2Drng==
+X-Gm-Gg: Acq92OHitpcYWj+xHJJijZN9vaUdfQp4U4nDkPcpjlThF2gBIUIRQlIRLM6MiRnow1J
+	dvj7W4wdcOecLFvruIDHNL8AbkvjV/J91DFy4TYhbgm9oZ+oBGdUm1dk/1boIHvxReARnm44mxb
+	c6B+jkEImJD1KeYaZq0Z8WANlzja0WJxp9RAd9INzR2BXqS47okQaIzp/UfNRQ9A8Zm5icgiiQh
+	gCJl3wLJYUqbEL7WF0qOGr9v05LKeKDjPWZAVT+R3lb0UppMOzIs6kog6zMGeK2Gkiro/QDdh+w
+	FLZJed+IJFyJLuE4xUeLd0Dr7MrhUzQrBhH/teGUhFBgFAG0eZWTrF0XIQqaBg78H8vSRHTdMr4
+	o7PGXKN7CcDEY02IKtNvvkPnN0cXaU99k/Rpsir//CO4rejDfFisgT5nBpkm3inko8PGKlh/cMc
+	3ybI6dltynyN5H8oaFm9IKQzHtZvWmySPYDRNjvQCCVYKmkLRRDYY/zc5fSAM1IzKZfycPoSF1P
+	EWgmj0=
+X-Received: by 2002:ac8:5c86:0:b0:510:fa1:73c5 with SMTP id d75a77b69052e-5162b16988amr18374031cf.16.1778680414453;
+        Wed, 13 May 2026 06:53:34 -0700 (PDT)
 Received: from google.com (8.181.38.34.bc.googleusercontent.com. [34.38.181.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fce065732sm43837465e9.6.2026.05.13.06.34.48
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65db6dd6ca8sm6202887d50.4.2026.05.13.06.53.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 06:34:48 -0700 (PDT)
-Date: Wed, 13 May 2026 13:34:42 +0000
+        Wed, 13 May 2026 06:53:33 -0700 (PDT)
+Date: Wed, 13 May 2026 13:53:24 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: Sebastian Ene <sebastianene@google.com>
 Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
@@ -67,11 +68,11 @@ Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
 	android-kvm@google.com, mrigendra.chaubey@gmail.com,
 	perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v3 1/2] firmware: arm_ffa: Fix Endpoint Memory Access
- Descriptor offset calculation
-Message-ID: <agR98uWCHQBHuGNg@google.com>
+Subject: Re: [PATCH v3 2/2] KVM: arm64: Validate the offset to the mem access
+ descriptor
+Message-ID: <agSCVMykWHY4pzlm@google.com>
 References: <20260512124442.1899107-1-sebastianene@google.com>
- <20260512124442.1899107-2-sebastianene@google.com>
+ <20260512124442.1899107-3-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -80,90 +81,89 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260512124442.1899107-2-sebastianene@google.com>
+In-Reply-To: <20260512124442.1899107-3-sebastianene@google.com>
 
-On Tue, May 12, 2026 at 12:44:41PM +0000, Sebastian Ene wrote:
-> Use the descriptor's `ep_mem_offset` to calculate the start of the endpoint
-> memory access array and to comply with the FF-A spec instead of defaulting
-> to `sizeof(struct ffa_mem_region)`.
-> This requires moving `ffa_mem_region_additional_setup()` earlier in the setup
-> flow.
-> Also, add sanity checks to ensure the calculated descriptor offsets do not
-> exceed `max_fragsize`.
+On Tue, May 12, 2026 at 12:44:42PM +0000, Sebastian Ene wrote:
+> Prevent the pKVM hypervisor from making assumptions that the
+> endpoint memory access descriptor (EMAD) comes right after the
+> FF-A memory region header.
+> Prior to FF-A version 1.1 the header of the memory region
+> didn't contain an offset to the endpoint memory access descriptor.
+> The layout of a memory transaction looks like this from 1.1 onward:
+> Type | Field name | Offset
+> [ Header | ffa_mem_region  | 0
+>   EMAD 1 | ffa_mem_region_attributes) | ffa_mem_region.ep_mem_offset
+> ]
+> Verify that the offset to the first endpoint memory access descriptor
+> is within the mailbox buffer bounds.
 > 
 > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  drivers/firmware/arm_ffa/driver.c | 14 ++++++++++----
->  include/linux/arm_ffa.h           |  2 +-
->  2 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
-> index eb2782848283..56b166290b24 100644
-> --- a/drivers/firmware/arm_ffa/driver.c
-> +++ b/drivers/firmware/arm_ffa/driver.c
-> @@ -685,18 +685,25 @@ ffa_setup_and_transmit(u32 func_id, void *buffer, u32 max_fragsize,
->  	struct ffa_composite_mem_region *composite;
->  	struct ffa_mem_region_addr_range *constituents;
->  	struct ffa_mem_region_attributes *ep_mem_access;
-> -	u32 idx, frag_len, length, buf_sz = 0, num_entries = sg_nents(args->sg);
-> +	u32 idx, frag_len, length, buf_sz = 0, num_entries = sg_nents(args->sg), ep_offset;
->  
->  	mem_region->tag = args->tag;
->  	mem_region->flags = args->flags;
->  	mem_region->sender_id = drv_info->vm_id;
->  	mem_region->attributes = ffa_memory_attributes_get(func_id);
-> +
-> +	ffa_mem_region_additional_setup(drv_info->version, mem_region);
->  	composite_offset = ffa_mem_desc_offset(buffer, args->nattrs,
->  					       drv_info->version);
-> +	if (composite_offset > max_fragsize - sizeof(struct ffa_composite_mem_region))
-> +		return -ENXIO;
 
-nit: This driver seems to use sizeof() with variable name rather than
-type (except for one place) so it may be good to keep that.
-
->  
->  	for (idx = 0; idx < args->nattrs; idx++) {
-> -		ep_mem_access = buffer +
-> -			ffa_mem_desc_offset(buffer, idx, drv_info->version);
-> +		ep_offset = ffa_mem_desc_offset(buffer, idx, drv_info->version);
-> +		if (ep_offset > max_fragsize - sizeof(struct ffa_mem_region_attributes))
-> +			return -ENXIO;
-> +
-> +		ep_mem_access = buffer + ep_offset;
->  		ep_mem_access->receiver = args->attrs[idx].receiver;
->  		ep_mem_access->attrs = args->attrs[idx].attrs;
->  		ep_mem_access->composite_off = composite_offset;
-> @@ -708,7 +715,6 @@ ffa_setup_and_transmit(u32 func_id, void *buffer, u32 max_fragsize,
->  	}
->  	mem_region->handle = 0;
->  	mem_region->ep_count = args->nattrs;
-> -	ffa_mem_region_additional_setup(drv_info->version, mem_region);
->  
->  	composite = buffer + composite_offset;
->  	composite->total_pg_cnt = ffa_get_num_pages_sg(args->sg);
-> diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-> index 81e603839c4a..62d67dae8b70 100644
-> --- a/include/linux/arm_ffa.h
-> +++ b/include/linux/arm_ffa.h
-> @@ -445,7 +445,7 @@ ffa_mem_desc_offset(struct ffa_mem_region *buf, int count, u32 ffa_version)
->  	if (!FFA_MEM_REGION_HAS_EP_MEM_OFFSET(ffa_version))
->  		offset += offsetof(struct ffa_mem_region, ep_mem_offset);
->  	else
-> -		offset += sizeof(struct ffa_mem_region);
-> +		offset += buf->ep_mem_offset;
-
-Does it make sense to also set buf->ep_mem_offset for the other
-case in ffa_mem_region_additional_setup() and then add this
-unconditionally here?
+Reviewed-by: Mostafa Saleh <smostafa@google.com>
 
 Thanks,
 Mostafa
 
-
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 1af722771178..34927bc1239b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -479,7 +479,7 @@ static void __do_ffa_mem_xfer(const u64 func_id,
+>  	struct ffa_mem_region_attributes *ep_mem_access;
+>  	struct ffa_composite_mem_region *reg;
+>  	struct ffa_mem_region *buf;
+> -	u32 offset, nr_ranges, checked_offset;
+> +	u32 offset, nr_ranges, checked_offset, em_mem_access_off;
+>  	int ret = 0;
 >  
->  	return offset;
->  }
+>  	if (addr_mbz || npages_mbz || fraglen > len ||
+> @@ -508,8 +508,14 @@ static void __do_ffa_mem_xfer(const u64 func_id,
+>  	buf = hyp_buffers.tx;
+>  	memcpy(buf, host_buffers.tx, fraglen);
+>  
+> -	ep_mem_access = (void *)buf +
+> -			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
+> +	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
+> +	if (em_mem_access_off >
+> +	    KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE - sizeof(struct ffa_mem_region_attributes)) {
+> +		ret = FFA_RET_INVALID_PARAMETERS;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ep_mem_access = (void *)buf + em_mem_access_off;
+>  	offset = ep_mem_access->composite_off;
+>  	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
+>  		ret = FFA_RET_INVALID_PARAMETERS;
+> @@ -576,7 +582,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
+>  	DECLARE_REG(u32, flags, ctxt, 3);
+>  	struct ffa_mem_region_attributes *ep_mem_access;
+>  	struct ffa_composite_mem_region *reg;
+> -	u32 offset, len, fraglen, fragoff;
+> +	u32 offset, len, fraglen, fragoff, em_mem_access_off;
+>  	struct ffa_mem_region *buf;
+>  	int ret = 0;
+>  	u64 handle;
+> @@ -599,8 +605,14 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
+>  	len = res->a1;
+>  	fraglen = res->a2;
+>  
+> -	ep_mem_access = (void *)buf +
+> -			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
+> +	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
+> +	if (em_mem_access_off >
+> +	    KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE - sizeof(struct ffa_mem_region_attributes)) {
+> +		ret = FFA_RET_INVALID_PARAMETERS;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ep_mem_access = (void *)buf + em_mem_access_off;
+>  	offset = ep_mem_access->composite_off;
+>  	/*
+>  	 * We can trust the SPMD to get this right, but let's at least
 > -- 
 > 2.54.0.563.g4f69b47b94-goog
 > 
