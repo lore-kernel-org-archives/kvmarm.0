@@ -1,63 +1,61 @@
-Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359724C9577
-	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 16:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0E54C9576
+	for <kvmarm@lists.linux.dev>; Wed, 13 May 2026 16:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778690086; cv=fail; b=e3q6IMK5ZsvKmM3e8wE+A+37u/aYq5rgepENGKlq1AE47aXJS1BGUkB2rQGamm1rfE5iGPx9kuLneIGnwo8Rg1fuBe35bf9YRXYc7vjunWsvBw8T5ReUssWpbn+t5hN4eW2ykpgKwo8RT0+VUi22aZE2OgazdNAz4Imy1QkEFx4=
+	t=1778690093; cv=fail; b=uRiNkqLd2pDS5Vj6lWSKbYMS4J/VWx7di2Kns+ln2hy2TV/ErIi3yOKNi9nE0iKJXJNzuV+wn/96N9jIq1JkfUlUd2dHOAgN1npNCqYDUXusWhD4vSD8chHGI4SSFEPHhGf8fQZmkyopYszAOJtxMu/4cCwXqu4rPxS0DeYXzCo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778690086; c=relaxed/simple;
-	bh=ANhBK52SULtfpiMqPqDxl8RdJB7NHVNbH8K2tq1otiM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iaFxe2YzO7bimFjnOZcd3eIon4WBraNIebERY71gPc8E0YNkh1e8SB0tQDJ//NT7/asKUzGhpOUPB6gDzR5ARphddWL8X9Ke2SJECgjP4+O8bRUBw7qXAsqobt4AXCtCYyfZ6bkJU3Zx9cIz6qflp2u5zDDYKKKaBKGgkD2F+SI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=OARFURDk; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=y98vnMZj; arc=fail smtp.client-ip=148.163.151.68
+	s=arc-20240116; t=1778690093; c=relaxed/simple;
+	bh=fEdtSB5sx3w+au1jhbeBjQKcL/nXW3Pl4HxQ3ivb/wQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=DuCNm6H5ltrdqI9RL+I0rfO5JTDhH6/5MlUABt5Nf2uEGFqqQXbNGjGzLs7ThecqNDvk9LBdlczb+/EvcQiZN3SWUiW1sY+xANfBTHpa8g/tHHggcHDMwG9VRjv0YGDYohA3z68dkmz9EWfMnu+3ZDeCe7zqYLEmwzRcy4hRSWU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=prXIhkw/; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=TZc041Tl; arc=fail smtp.client-ip=148.163.155.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="OARFURDk";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="y98vnMZj"
-Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
-	by mx0a-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64DGKXdo1855187;
-	Wed, 13 May 2026 09:34:30 -0700
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="prXIhkw/";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="TZc041Tl"
+Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64DGKvem2443069;
+	Wed, 13 May 2026 09:34:08 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	proofpoint20171006; bh=90/K6T/F6An7yz81jap0t445Ld1IqL33IR5l1tThA
-	fY=; b=OARFURDkgFUq8MAGIBDLp2wqnh6wwKacbnJDDTw0UR+GgTV+bJ0pYbgqA
-	peW4DQZ02R0Y5OwbBnP68To85zD4bgqWZTtH/tc3aCPS9dIENT+FkTkDGWpEML8X
-	w+gjVdmDjL0aZMdolW0fYFdg5wOhqAnz5HzM2BYwD8/69gQFzrZVJoICpHKo/Z2A
-	0+xDP6NGMNdLXZGNLtcLiinOV5zfBqHKrWnbjbcXT0IFzfhYhT2ic9gxd4Ryluel
-	KcV0hgxvOd0Ud09NlzOhQk8+2VN7mp3IvJz+B+oaMWljFQXGUbBJFl0mmzcjB328
-	mxfFSwbY+KnsY42hUto1k9Io2hEBg==
-Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11021116.outbound.protection.outlook.com [40.93.194.116])
-	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 4e3nvke98r-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint20171006; bh=yYRoHBgTKlzLw
+	yduYLvJ7rzsLRR7sR8DTkLfZSHzcgo=; b=prXIhkw/0d3+VAv5BMgjBYx8+jVuB
+	i3zT+4D1EZcBfmJeb5/+UkQQ1k5ejpVq+co+LCjk7fP8tL+PKQ0FPOxGEFAQyo+Y
+	JSdM/iPfP0y5bUtuYb9xofi5iz04E85mcd29q3yMu0b2vYBLdm6MTeLBwFv6Cibp
+	UYbjCNcwojToJpEF4fgPPUOcyT8TChnIiJ1v0fsbdKPdtMViaRRDrytPZSyjXBHY
+	WnGGysQWnYUgwuXPl0ZnEed/Yn/JGxokvcNt5cMivloEfgXs+Pc1PeWxwmHymn19
+	+8dJf93B9qMhOUf4tkQmAQEDgXS3LcNPTGWMsGWc85eE9P87/kDT0Gnsg==
+Received: from ch1pr05cu001.outbound.protection.outlook.com (mail-northcentralusazon11020081.outbound.protection.outlook.com [52.101.193.81])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4e3nv6x8yf-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 13 May 2026 09:34:30 -0700 (PDT)
+	Wed, 13 May 2026 09:34:08 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NSm5RQDdLECsJiKQ/zBt45QWwsFWvlJueCfug/prdrh2DGKIlDkXwon34YynbP4MP+mo5eG4sR47OAyjt9B75DCCqIXd4R5aC/V10KhlnQe/6wWqQaG2NVzWQlCIADD769P/UJ0rJMk18leCqEuiBTaiOrmupcCsmHf9YTbj9U+FJRcwDRx3k3xBdl3GCakUPCVM3Ya0REeM8GLa+BvcLIiJcNWd6bWyJ0yf+qctQtKviBfWDIIJRtylrBLGvU+C+oqdxx4lr+KNaoYQlk1enoBPmPxILW1VVR+Pc8ShzKSCQU7NUTPwEeWYIUBxuN59Gesln25/s37qQWKZT2xN1w==
+ b=nO3+JMb/Tb5odOKBFqLrmJVf8p/rcAbl/NGeVuOknkec1luQfYdOu2IUhzEdwvePK7eq+gOeno2Vd89nCnhxXNLbXpmaBpGDHM+FXlg+aaBdgH9dHuljbbqfhnjJqYGXXxYXpvwtCJOfGtgt4B6dl13lzF33q+/D8QMmqR0W8NVFtyoJ/rDN8ipvFm9CTQpIXAE1y/MTApHs34woi0ev+Hd0TGIWPptohgM8GeHd7BHnD+HuvqB43boSlNDrmIzbNKaLZcJQFfaRVHAGGRMG9Np9lTg/G08SriTZqRwDcOfYJr2kKXdDg2uLwzv2QDseECEN9hzEaLmDtUfdQHeqqg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=90/K6T/F6An7yz81jap0t445Ld1IqL33IR5l1tThAfY=;
- b=aIwQDX+NxW56geQp3O88ikmljGYwM8M3VCERjvIzAvCY03NiIFcBllRk8Dp5LxX8XBdr89scxAV46pQPyDKvXlF8YVp8sZlp6vk9kg5/JlmAYhUF1ig1K/VrUFKUcXoPY4qn2CvJ+Sx6Yaid8ru2uQ6kQksJ7JKDdGtwsiWTPHXqAwHzhBsp3GGSCKJ129uS/UOaY1yLp0r/cfioRwmjEoEj4GaOVn0w/zNWmeKzeSL5ajxhShV/OQWDPr9r9AvMctjo0mgU9uS/1exj0Phh7WuO/1A9WhcwDww/cR/77Kqh90gaMJojbPlEoyp/WKyBoXW4QrPsmaI4m1bOAsHAug==
+ bh=yYRoHBgTKlzLwyduYLvJ7rzsLRR7sR8DTkLfZSHzcgo=;
+ b=dXiJBXruweEmoZCuQOiwnNCvoqk5eKZBPF9LNdxA6SPzVuOBfGBJDiRvABYfP9Schsrn5NXX3P4S7iWTS09F2OP26skIrHf2/HIjhQ9nrIL04ol3Ri3CYska4XyN4YzruYr/08/rB88+1YGP3hY1r9Lfse6zY6eVs/z5Y7daI0hwk4D4TvL7+MJj0sI9klpDGdPNBwx/g8ysUTrXAlPinNejpr8OjkmJRFOzoiOGviWbsXb8qzBu3SCugxmNnyLgsfD7sIsePeZFySOB6M3YHeZhPwF8ujD8cNObAF3k2OYDhq4aRyLw66mBuxkjc9cQG5E40fC3EO2mx7hpKhwiOg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
  dkim=pass header.d=nutanix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=90/K6T/F6An7yz81jap0t445Ld1IqL33IR5l1tThAfY=;
- b=y98vnMZjepndOw/y+cqjWYmqMnBGlTkhmdy+qpmsPLwS8CoiF+HTQGTVQvEi+r56ODgm5b/kO16ORAjcpgqllbSOFjUwffQDo4Z7YdwEqX3kHb6seyLebT1pVNxYteBFaNCk8EnVQhp8G5JHOPnwolImzHI4tBi+yNMXqqd1qqwHQJc9nAjanC5/CvxSaQ+29WVN+4cogwI3hL5o2l5jop0O0FIBl6YfBI/TOoHOX67K5iQCDAxoFV/pIf9l5nVH5I6ZLLcyeRYK24KpKyewYSMF8r5SKkKu7U/K7voJh28VzJOGijW1lAfooFvqXCzJMojPsKf+TmogFlXVnA4bnQ==
+ bh=yYRoHBgTKlzLwyduYLvJ7rzsLRR7sR8DTkLfZSHzcgo=;
+ b=TZc041TlOegXaEgXPhcweB9KGomSSaXoYalzgUyWqn5A/A7QQmm3SqqlXuq23gxZ3rCbQuNdhXUguGICHFk7Z4owjIsgWzo1Pe/cBEqGaYbVbTmnk4sHiJFBM/immW5JukaIx56octn1U7nqVoBQlcMLLqMQR3dJogn1GmEFJrWFppf7Gtw2ZjGmKlo0eSEp1Wy9jHLE+NrsxRAx0y6xHosjUqw03U8y//I72+Sb6e8E3kdAca3IklLB5h8sQItdYpe7W8MNaCVD4eHFF7LTBoON7iAbXY9er0U6dDeUXty/cK9eKrwTvXPJVfLvqXdFJP5xvG1fUjgs23l6PAN1gA==
 Received: from PH7PR02MB10160.namprd02.prod.outlook.com
- (2603:10b6:510:2e7::19) by SJ0PR02MB8813.namprd02.prod.outlook.com
- (2603:10b6:a03:3d6::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Wed, 13 May
- 2026 16:34:28 +0000
+ (2603:10b6:510:2e7::19) by CH3PR02MB9564.namprd02.prod.outlook.com
+ (2603:10b6:610:120::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Wed, 13 May
+ 2026 16:34:06 +0000
 Received: from PH7PR02MB10160.namprd02.prod.outlook.com
  ([fe80::4ed7:5c74:48e0:ff23]) by PH7PR02MB10160.namprd02.prod.outlook.com
  ([fe80::4ed7:5c74:48e0:ff23%7]) with mapi id 15.20.9891.021; Wed, 13 May 2026
- 16:34:28 +0000
+ 16:34:06 +0000
 From: Shaju Abraham <shaju.abraham@nutanix.com>
 To: eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
         kvmarm@lists.linux.dev, peter.maydell@linaro.org,
@@ -65,14 +63,11 @@ To: eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
         skolothumtho@nvidia.com, philmd@linaro.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
         prerna.saxena@nutanix.com, jon@nutanix.com, jond@nutanix.com,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Khushit Shah <khushit.shah@nutanix.com>
-Subject: [RFC PATCH v1 11/13] target/arm: named_cpu_model: introduce named CPU models for selected CPUs
-Date: Wed, 13 May 2026 16:33:54 +0000
-Message-ID: <20260513163356.3033159-12-shaju.abraham@nutanix.com>
+        Shaju Abraham <shaju.abraham@nutanix.com>
+Subject: [RFC PATCH v1 00/13] named CPU models for ARM64 on KVM
+Date: Wed, 13 May 2026 16:33:43 +0000
+Message-ID: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
-References: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: CY5PR10CA0003.namprd10.prod.outlook.com
@@ -85,711 +80,455 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR02MB10160:EE_|SJ0PR02MB8813:EE_
-X-MS-Office365-Filtering-Correlation-Id: 094a4113-2449-4b99-2729-08deb10d804b
+X-MS-TrafficTypeDiagnostic: PH7PR02MB10160:EE_|CH3PR02MB9564:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f9e65ac-ee69-44d8-5818-08deb10d7348
 x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|921020|18002099003|22082099003|56012099003|3023799003;
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|18002099003|921020|56012099003|3023799003;
 X-Microsoft-Antispam-Message-Info:
-	1L1xxN1VLvPgu31wQ11sIcf5ikRmwxidwrCAhig7x3BxnLufBYZmz/OpIYkpjCkQPtYbctpVLP8QAL/LOYOUdPpWg4VsLAKdBeKuYrHWfLn5amE+KNfCbV3+Z+GtoBCFzuOYVJOPM6HLJdxV5v9heFC5YWQbRp53p0/+auHXaPGU4rElV/pwFO5bVI4b6mtnaP1x52j3J94XB4hW69/tmE3Eg00gLkWRYlTteu7FGDK56eLJzQO1Z3QrH7s6U6e9/uEAoUtQswvEY/p+JMGl8g3mfjOWTcTe7gLAgU72+6P8R9XorIEdrKFkn1D0abXQE9DfFvI5KYmJ2ctAVRO3JgtUGI22wKMepFs+zXjsJzF/yBNMwKvkXm+YLO5agkEWrlzJ5/CRsQrDaNtoNzRKxK9yalv/2Ku7LaPsVVsvms3Wzb49zjdXnls+yvENAkjvp/j46yBKGTYyR/pj3IXI3JfDdvMIexvBvVPcl/ULsUzRxCaxBcJ1zTROzk2+34U1dHYvjHgGILN1q7YQPDzXaDIy7HqioF4MFwPHXzW1cKkj5w7qGvgwMM8PvgT96OSYgCggfrMcNCPl6LstIQj0K4D7cPAaxrPwIkLouq+n1LAq98OgDCnhwA0CQiQmIQBK5vLhqnhJ2GY12VjmP5vyvRVTJVS4W+5hQPSUzDfgimJzYVgdIdq30/05ptLqvBbqUhf0M5qhmzP6J1oXt8enFJ7XqL+mfHVffKjg/i3U57k=
+	wOxLR2DRRSyWSXESIUAKgcaUfLWOVSYvAyIEsXrrfSO+xs/q37eAOCKKBDiIDhGmP0J2nshkb022hadV/o+a2yJLGYVGlTNw7cfW8wJqrKVESi2TVyKRJg+Gp+4jRo24f2OuGsu5b6jg+IuA7SToQ17JnvJ3M3NmoLxXJscl2/wRBm2hUDhKJkSmFI23w/wQNuTpnTR8MutPCfRxBN1VQKxxIFkaKYNeB9LYiTRG+q/b8U01OG7tk5Rvu7A4O+Zm7Fs7x8XPWjNx9T5BwZBe1RgD7ySfeI6+XC2Qlxjr6+/6GVnHuemiwrD9ogea6bM4s9gtHo/1mth6dWeJSzoByDC/Oisv/Qz02RyV5uyPb5zNCkv/1K0cwVnZ0VLVvVuFaeYNF/8DZDcdwC8vQkYOCHktbgPhNPhIPgE2HQgNQ2Ii+yZE2msiD1i0Z+5oRGNNhUjbPbTViJINowKf/HqD73m1PtzLSouJDMJNefJB1Csmp7cmMDYBWUcAfPlwF0bBHe390u6mWKOjQKb3LRZRWN79FHBxWRCwQKtgpr+cdFeFMZO9TaH5wkVa1IN/XFvFymQKT2J0EJmqxrwW7S8xt0LVzBMDTJU6ZjYE5Zm5QmJYot19JGds2YPQaEx/82ywLNDFhHJgJ+K4I63x2sV+f8XVykQ8mgYAchIM1H/bHbHyzdM+XMkbt6nGWqIQ20OPmvSv0jcnr5O6xW1MWDl1jEfKV+PVwFxpDWjFH2OZdV2Ea2ADwQ0QaBW8xI6+O2+4
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR02MB10160.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(921020)(18002099003)(22082099003)(56012099003)(3023799003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR02MB10160.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(18002099003)(921020)(56012099003)(3023799003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AOs/nMMldNW7FzO506vbrPT+nP/TN9dYMlQoy/B5aVzVlQeXsabDl1bDEGiS?=
- =?us-ascii?Q?GZ4bkyMHJmOnrlVtKtE1u/GU55XTgo1DcPnAKBsGJgjNexhTMesDYRF6CTvW?=
- =?us-ascii?Q?sKM+Lu25gb3/8mK4BolGUXLPQZXcHN6dLJ1xbjFMo/0p8Bp1un6k/+QqGemw?=
- =?us-ascii?Q?W221zGidwjs2+YHkAdJwdlEhz1vutFnLxkahdmZT2axvJFGY4CTle5OGl7bE?=
- =?us-ascii?Q?NYFKMj3pzPcmEbhb+EWOZ+Fy4DztYeY/190zjc07c3ErcrTBDJzusRt6p9bl?=
- =?us-ascii?Q?9wNiwQzbSrdZumZXzhscO+HswyWMMhQovJn6OQn8tgwBTU9XWuIGvVl0yIkv?=
- =?us-ascii?Q?t4/2A/FqJJJJumXJRYjXG5yrI1KPslNts+4TOfO22vedWMwSCf5W/krBqHbd?=
- =?us-ascii?Q?12PZMHdGaRo87OijQncfYOiI1WEI/iFmHfIurIGQ78rre4DvIwGBjBnOhx9F?=
- =?us-ascii?Q?OYQ4A7hr/PF31vqfVKBWDn3DWMtfv/4W8fHkg0isnd824TAa+sIDPtUc577I?=
- =?us-ascii?Q?kllkG4T+cs9T7F0RPQmaN9EpbEqpz//M5ENw+jSxfUUESti0Run9pOmBeJ17?=
- =?us-ascii?Q?MvkVGkMan7jJw8N2TtgtNV+A2bpuHTouGW9akcpVxP9oWVrDmJweoP/7eRVo?=
- =?us-ascii?Q?dX7xdlm/Kkduca3Vm2k1cTQ6MdFPk9A41PZddsodDBFZENsBr2oPg9WD1oNJ?=
- =?us-ascii?Q?XR5toDegLdVS/m2dP0uDpz0uGwsHx9a09sd9Yjuo5O5+p1ilvQIeFKyqpaE/?=
- =?us-ascii?Q?kGpYGDnN463tWe9rnoZLQ43aOzJ4xIiNCO3/VvmejJXD9XaEa1ckOh25Vja0?=
- =?us-ascii?Q?D99gj4nSKlZ2hVVTlY/lwy6LXFUnoEC3tkVX/tTeB6U7v+yLDTwyv7g8JjE6?=
- =?us-ascii?Q?JSfB6Jbej6kMVDHrk8EPFyA5kzqjpJomwdadhJ/xS4ib+4mwML1LyN9PeWAr?=
- =?us-ascii?Q?NqO9tWBz8hzVQHQqPtX26pDh2cmBuX4/avYYfAT24C728ZUxmKUDCSaDq3jb?=
- =?us-ascii?Q?2We6EayObA96UP3XVeZtjxUraN6gO6Ow51Zjlx1ggqzRjKMRGoefVOKO3+sO?=
- =?us-ascii?Q?zzf85GyeDb7LYK4Ejqg2jyzE/dOHt3uE/lMOro3ypmOAQCJonau1X8dJbHib?=
- =?us-ascii?Q?Lc99Lmw0EbzvZepuCoCuYADB1p7BoRhVuTzA7luVSH7FiZAI4P6YG2UAYeJU?=
- =?us-ascii?Q?hevAy/l2myNY1njwU/YBwBH1m6Ut6O+91N4bKrJJzR3Ny0RFHqGXCsVD/6h2?=
- =?us-ascii?Q?w+L2LL43pdO8xYog26ynTgFz9j8KsELI7iHENqsiYXKN9vqgx4hmW2V+F9//?=
- =?us-ascii?Q?3fRP0hFtytewK1ylH1bdMdinXrPJDf4I4irxjXlqsByG4IoN65yzy2KxRvYF?=
- =?us-ascii?Q?WiL0n2o1mReGb6DWpV+ivaHnxof1gquz3cF0Ys2h2wXRC/0Hx1Os6larPfIp?=
- =?us-ascii?Q?14UDRn9GObgIZ5PS4QgRN6XghrhrLVPY/fR08mAhGJ9lsYCA6bx84XDHsvAU?=
- =?us-ascii?Q?dgZW+BJDc5G+CXVMv6Nk5soAfJJ4+9SoqXGx8SZE8p7NmJEucDw5kVf4aG/p?=
- =?us-ascii?Q?F0qIt9GOT1fOJC+YjxARxbdZ/tnE15IpxeYRYUTG1lMRG6qhoBbZQrl3GXgJ?=
- =?us-ascii?Q?JKIJacLW1oiCmZtQoaKTTF/AVRN4OXT+4+jyszlmukB6Oz3QNrcEsUdShp2g?=
- =?us-ascii?Q?pUec0CpIYguQdno4vPXNKsClcKU44vDheaDmFKkKCVsiTg8rMXmBa/EDmT86?=
- =?us-ascii?Q?mEmq4lIyK65RTmByz2uT0efhpOBX6bg=3D?=
+	=?us-ascii?Q?96VCwLnewk1Ypy1qTd1ifREdXicF4c81fpLmc4DudAUavYJ+f11pY3ZzG/sm?=
+ =?us-ascii?Q?tDm99X9QqU2BQ5XTWkFu7+GgVVUI3hKL1H0y/oqJpNIesYb2ehLKA0aDrzNd?=
+ =?us-ascii?Q?7L3pOopiRmXQ382ImOPCNHTLjxWcUM9hzZ+cp6l2fAaySGW4XZV4K9Lcxf9k?=
+ =?us-ascii?Q?1uOn/fLuad7FmpIgzCggricFPQ/e2nCueuvHd4XkjRMSIRn75zoipg8yKkY+?=
+ =?us-ascii?Q?y/JgUXQ1Oqu0TycrgeqXkIOEqLPFyHFtQKmLoqzL1HZeLXXuUtR3hVqlqUaj?=
+ =?us-ascii?Q?f4ZSEGMemlppjnMv//qO/RCsqn2T6V0qGyLnnF4JN1XK6xqSWogoOSCkJMcX?=
+ =?us-ascii?Q?o0Pjo0G7HwIMbUX1z2VW0VokJKfvWm10ZsYjDYY/Gy9jMTUCLlx7SLgiNHpS?=
+ =?us-ascii?Q?Vbw0A+rin+7WrO3fVp1L/hztSOl83b5GHAx/lc1t5FNeI6e4DJiI6q/bMRYX?=
+ =?us-ascii?Q?IDEbb33zOUgcOeUrMzYHHLCjnojTgpTwX9BnHKa/SRGftfSK4CVcAoWO3vkH?=
+ =?us-ascii?Q?LFuKP6U7Z5thFblAD/10W+0T+mkiUWBB6aE9xg2NVftgWhz+qEs7vIkPNbBB?=
+ =?us-ascii?Q?+7h5xgSnOWe5F5xBeeKDxC1VgwWaAQrrPq1vlZ/2kF+zs9ywvto5FrR6S4LJ?=
+ =?us-ascii?Q?EDkJNAHZ/kyBt+MtJ7I8Mjn2XVDXT0wgfXSbYrjiz4Kz7oQ2M5QgFY+MIyJC?=
+ =?us-ascii?Q?t+Kh8gaY8Uc4dsmomYlw9vU55VsUGeqDudK46k7KOiDOyACCBZERXptZzyFZ?=
+ =?us-ascii?Q?OGjEhTFNHjHuQTRm+ABx3wvV8B6nKWB2uEDoNJVdqn9mxVeV0ikEfkoFZTU4?=
+ =?us-ascii?Q?FCJavlGEGB3DfIA/gTsASh9zwOycjnLHrhG59AmqjOV9ttj2h7dz3w2Zyp2U?=
+ =?us-ascii?Q?ZU2L7azrKNjyf8Oh8lMA+N1gbmj83nQ3igOCTaVscw0muZUf/d/m11y4bBWu?=
+ =?us-ascii?Q?47ztKzL1BGIj5zxtx4uRSvPzvMUiAC/zrHKBGLxlG4u8DQBHtt5uvgXNnldx?=
+ =?us-ascii?Q?rt1jh55pT6pnyeAPg445lFUGpDNNLO6LERKwmN+8X8RfSG/CezJs1uwhZZOU?=
+ =?us-ascii?Q?n3lbAlT2v/j8vWMFBinN8o79JDm0dZCmJmWYJK1n7WyqmVm3XwF6oZZImw1n?=
+ =?us-ascii?Q?CIGVueeqJyWg+NdPLgZYg5W7tvZbnDH4RitFfsONZxg3bmTpjuhfmk1hVh3T?=
+ =?us-ascii?Q?u7AjzFG9Keyl9+n8urvbcAhEH7W35AESpvdyTnOoG/P1W9Z5dQ4DlYafVHru?=
+ =?us-ascii?Q?VDgWv0kOHhgDfH7YLgV3D+FBYvf8oY4mPGzuanwLCKkosjZZdtL9djY/5jHE?=
+ =?us-ascii?Q?qqqeQWnAHkmRUvxCtu11ltDf6smavhhccXHtTrFITN+sKa37tgAxQIesrz6S?=
+ =?us-ascii?Q?fEypygdaL1y7VOGP7NMzvuOZkVKTW1W7ZWEXBeqV6p6KSnXipe2zCYH0Mbdv?=
+ =?us-ascii?Q?WDC7N9r+INPXp1DLjkVBRxrD6LpDwnGlahPQoHuzr+wu2Yu/hQnYHi7RDFKA?=
+ =?us-ascii?Q?Nybx+XdILdCqhEnMKEt+gO8RKs/X/HhM6j59TDyrr4GO1tEvzlaFgiTV9RgX?=
+ =?us-ascii?Q?7QaIXnkTGpGY13rhAGCRtJpCMdRj7yuNHm0B3pVJzSPfeZBaTXutISJpOCJx?=
+ =?us-ascii?Q?z62ZA9lotfQAZXVfPVsk2NzbBh2E3WAN1AkgsGzPT0Lekl3L31lAXRVmY8Fl?=
+ =?us-ascii?Q?TOj+k8xeRjrNiJmDchvoTIOHdAm+O9l+S3kY0a01yh29fl7iYOruNSdNa5dD?=
+ =?us-ascii?Q?C2ZCseIWWHlgCGmuBt5opVbFApMTufw=3D?=
 X-Exchange-RoutingPolicyChecked:
-	o3U8IvQNyIyI9NPZ84y36WMplj/vYO75EAJk1pqRrNbDgjNCGTAeQBvf1OEVO16SuhWTtebCNP026G3TtfZwNRZjKqBP0oThJmn8YgFma82GeoFfCgQID8TY3fgxkclz+ePD3cKTXp8aTNPa1HNOHvkounbYkiySvaRJHT8wg+dLlOIH6/XwajAHnw9E/UJy2ObfLnWJExRFzGWUverDbrBjplZM2/LRFvlSuOZHlCiRDeIEKCxfBEwxJZginCebfRJDFbnFVYZqb8L7UrmWWF+2Nd99nlQtetVTSrY7SrKcgJELe8CcGnbnHvfEXDN7r519YklNgjpe92Ql/Q9Q1w==
+	hm5YSNQm9XU6viLcWyJsRYuOyG5BpsatLU9l4QLGSOj+3EzMLzKN/T9c5mXvJmlSysToVuGhiylMcjIxdTrE6HK1zXbpa97zj27T+jEjlpMlLLkKSbGRpciTVwQc8+rwWOV1asJvUxRdls1J+F9ZFID9yH4T+6SYDwDR93XmkLFCvYuUz3LIkKQsZ3APTeh9Z2PIwfjMlpBi5BpDH0uoapwYATseQA4m3ge18zZwe+RSdJ0b8SI/bYBu08EkX0ORYBg/E2055zzri233lEkhgSCvrsEm7fnZGl2Df95ZLaiFky2jfE91nZx0C0E3vHaONzqCa0EBoMwdx8U1TwZHLw==
 X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 094a4113-2449-4b99-2729-08deb10d804b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f9e65ac-ee69-44d8-5818-08deb10d7348
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR02MB10160.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 16:34:28.0550
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 16:34:06.1557
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gr4MenAUqbXIQRnovQeENqttviHJbNSWg2hniFprf4qO76jwQTBVRMd/9ylIGfXGilK+RN7VuM3rKssJL4umt4dl2IGRZNo/EYumMvLpJZE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB8813
-X-Proofpoint-GUID: HZ35R1swqmrLdcPCv5gfFH70FizbdPvV
-X-Authority-Analysis: v=2.4 cv=WcU8rUhX c=1 sm=1 tr=0 ts=6a04a816 cx=c_pps
- a=U/cWNT7cGANcmDM7K3LxiQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+X-MS-Exchange-CrossTenant-UserPrincipalName: F/FRi/dJcqLWTMOe9oHpGmKBXcnbhyaQVLRmLIvmDRHcxeTuGalouRJovCpattA/b53+DbialjLfqi/bvcaXpIXQslukurWfSMJWnjg8LiI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR02MB9564
+X-Proofpoint-ORIG-GUID: OAc2w5S-ur-iUOv7Xd44cZOIqXp7jyjw
+X-Authority-Analysis: v=2.4 cv=P7QKQCAu c=1 sm=1 tr=0 ts=6a04a800 cx=c_pps
+ a=6CsdduS81u+lxnadr1BEog==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
  a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
  a=xqWC_Br6kY4A:10 a=NGcC8JguVDcA:10 a=0kUYKlekyDsA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VofLwUrZ8Iiv6rRUPXIb:22 a=1L6crL_YRTbalZ11mEUO:22
- a=64Cc0HZtAAAA:8 a=JU90o9GPsxMSsgw1v4MA:9
-X-Proofpoint-ORIG-GUID: HZ35R1swqmrLdcPCv5gfFH70FizbdPvV
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTEzMDE2OCBTYWx0ZWRfX5efM/KQKlJWl
- AfxSSdiZetx8lhBghPuTVf8sdFuXlrZAQkmooTmHMeju9tONX8bH1LkKmf23CKSmR/awkdntepY
- aYn//Okz1cBohiywxhNSAZEQ28Dg7mVav1iQlXsUfhEyR86on91E0Mad6gl0nT0Q/Xr4xxG9suY
- GA2AUIxuODZ1WKjAe2OY3psMyJUKQsD9ER5RW+T20+dAJAQU+oKpDAbueigaznJ/z74aptDtKfY
- ekm6zbetcf2K1aHaRCV4BpLlrwNRg2RcTpIeOwJF5N1cDdU6Kb5/sYO4a/ekyAjprGgL3MYDwfu
- i0+odlNbZ8bkNt6/WLcwtd1jUV0xEOCCI3vzvDE3qG3fJEJOkNIZ23d6q9yXQMURw2/Db4GYk3f
- /J/Q+BdbhDViL0/kDado3eGDFSNIKmruLlKQRiwU8B1HSVHiHPox/tBqkmrGuTF6aACgEFK+6uz
- vJTFE8U8rFpYDedd9CA==
+ a=VkNPw1HP01LnGYTKEx00:22 a=VofLwUrZ8Iiv6rRUPXIb:22 a=VUi8bpU7OL1Oj2-RSIOF:22
+ a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=CtIQ0sTlcfwyWDQDvTIA:9
+X-Proofpoint-GUID: OAc2w5S-ur-iUOv7Xd44cZOIqXp7jyjw
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTEzMDE2OCBTYWx0ZWRfX5u0GRSU/dWrE
+ /JjuScJ1RDXV+fHtTGwEDkrcMl6TfrSFH0vhB0OSLWezPSjhGzh8lBFhxu6nhgh3kDZ1n4/47Lv
+ QPLq61+Bz5zyHWiKwtlmOyaBVYFLouWG21fDI5tYDc5VQPqTaqT/JasAZ/4ctiTNFqJpbQPjfQz
+ 7KKDjuVnwjoPNWuxUDfGaew+O6KRgh2pJ5sgSCYMJHg/PdYfrclNVys/F2sQdFtD3llZSgJWwTd
+ 9Ee+0CwSx0MLuJ4SXdBrqOGt75gCXtzuhfBfF0V1eBtjQYL004UnkSJzbjqlYUjeyb/fdRKZEua
+ uqbff1aLBGCK8mD4o5ouoE/687JiTpMZD3yjnWqiAkDoZRNrNBg9KSsf47Oc6ZN8Xv3QNwUZt51
+ 2mNI8N1YVz9/KG99e+t93ADOP2josQxFjirjQQRpuzhegeek0Ft793AS7iB6HYj6a4WZ8Ce03iD
+ OyzTRWpSx0/4pgcTvZA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-13_01,2026-05-13_01,2025-10-01_01
 X-Proofpoint-Spam-Reason: safe
 
-Introduce a small named-CPU-model layer on top of the field-backed property
-infrastructure. Each model is a flat table of (name, value) overrides and a
-parent pointer. At instance-init, the parent chain is walked root-first and
-every level's properties are applied via QOM, so a child entry overrides
-its ancestors for the same name.
+Hi All,
 
-For example, the grace-v1 named model hierarchy is:
-kvm-base-v1     KVM-imposed quirks (chain root)
-arm-v8_4-a-v1   ARMv8.4-A architectural mandate
-arm-v9_0-a-v1   ARMv9.0-A architectural deltas
-neoverse-v2-v1  Neoverse V2
-grace-v1        NVIDIA Grace
+This RFC introduces "named" CPU models for ARM64 KVM guests. This
+is foundational for cross-host live migration and management-stack
+control over individual CPU features exposed to the guest.
 
-arm-v8_4-a-v1, arm-v9_0-a-v1:
-Only features mandated by the corresponding ARM ARM
-revision. No optional features.
+TL;DR Examples:
+  # Boot with Grace CPU model
+  qemu-system-aarch64 -cpu grace-v1 -machine virt,accel=kvm ...
 
-neoverse-v[12]-v1:
-Referrence manual derived feature values for the reference core. Values
-differ from reference core values based on what was exposed to the guest
-with -cpu host.
+  # Grace with a feature disabled
+  qemu-system-aarch64 -cpu grace-v1,feat_SHA1=off ...
 
-grace-v1:
-SoC integration choices (crypto pin, cache hints,
-PAuth alg).
+  # Host passthrough with individual feature control
+  qemu-system-aarch64 -cpu host,feat_AES=aes ...
 
-model realization logic:
-1. arm_idregs_reset_to_defaults(cpu): Reset cpu->isar.idregs[] to the
-   default values.
-2. Add all properties to the CPU Object
-3. arm_realize_model_chain(obj, model, &error_abort): Walk the parent chain
-   from root first and apply all the properties.
+  # Neoverse v2 on Grace.
+  qemu-system-aarch64 -cpu neoverse-v2-v1
 
-Co-authored-by: Khushit Shah <khushit.shah@nutanix.com>
-Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
----
- hw/arm/virt.c                   |   8 ++
- target/arm/arm-cpu-models.c     | 214 ++++++++++++++++++++++++++++++++
- target/arm/arm-cpu-models.h     |  43 +++++++
- target/arm/arm-v8_4-a-v1.inc.h  |  22 ++++
- target/arm/arm-v9_0-a-v1.inc.h  |  28 +++++
- target/arm/grace-v1.inc.h       |  17 +++
- target/arm/graviton3-v1.inc.h   |  16 +++
- target/arm/kvm-base-v1.inc.h    |  13 ++
- target/arm/meson.build          |   5 +-
- target/arm/neoverse-v1-v1.inc.h |  64 ++++++++++
- target/arm/neoverse-v2-v1.inc.h |  64 ++++++++++
- 11 files changed, 493 insertions(+), 1 deletion(-)
+  # Migration from Grace to Graviton3 (TBD)
+  qemu-system-aarch64 -cpu neoverse-v1-v1 ...
+
+Relationship with Auger/Huck's customizable host model [1]:
+We have been working on this series in parallel with [1]. Eric Auger and
+Cornelia Huck's series [1] exposes raw SYSREG_<REG>_<FIELD> uint64
+properties on -cpu host, providing the essential low-level knobs for ID
+register customization. This RFC builds on the same KVM capability
+and can be layered on top of [1]:
+  - Human-readable property names: feat_AES=pmull instead of
+    SYSREG_ID_AA64ISAR0_EL1_AES=2, with arch-defined named values
+    validated at set time.
+  - Default values and forward compatibility: CPU models start from a
+    known-zero baseline rather than the host view, so new fields/registers
+    introduced in future kernels do not silently leak into existing models.
+  - Named CPU models with hierarchical inheritance: grace-v1,
+    neoverse-v2-v1, etc.
+
+The two series can coexist; this series can be rebased on top of [1].
+
+[1] https://lore.kernel.org/qemu-devel/20260503073541.790215-1-eric.auger@redhat.com/
+
+Problems with defining "named" CPU models for ARM64 KVM guests:
+  * Features are not single CPUID bits. They are mostly multi-bit fields
+    encoding version/level instead of just presence. A single field encodes
+	multiple ARM ARM defined features (FEAT_s) at different thresholds.
+  * KVM does not allow all registers and fields to be modified for a guest.
+    Some fields KVM does not virtualise at all (SME) or only support host
+	values (BRPs, CWG, etc.). This is evolving and differs between kernel
+	versions.
+  * ARM does not have a single natural granularity for CPU models unlike
+    x86. ARM has architecture, reference core and SoC levels each becoming
+	more granular.
+  * ARM has dozens of vendors and it will be tricky to maintain models for
+    all of them.
+  * Previous designs started from the host values and then subtracted
+    undesirable features. This is not forward-compatible; the design
+    should work when a new ID register or field is introduced.
+
+With the above problems in mind, the design has 3 layers:
+
+1. ARM ID Register Field Table:
+   - This layer maintains all architecturally defined ID registers and
+     ID register fields. It includes:
+		* Field name
+		* Field shift
+		* Field length
+		* Safe-value tag: LOWER, HIGHER, HIGHER_OR_ZERO, SIGNED_LOWER,
+						  EXACT, ANY
+			This will be used to validate user-provided values during
+			CPU realization time against the host's value. I.e., if the
+			host only supports "aes", a CPU model that sets "pmull"
+			should be rejected.
+		* Default value: The value to which the field is reset. This gives
+			CPU models a clean cpu.isar.idregs[] baseline instead of the
+			host view provided by the kernel, as in previous designs.
+			This also complements the forward-compatibility story. Given
+			the "default" values, higher levels need not worry about new
+			fields/registers being introduced.
+		* Architecturally defined named values like "off", "aes", "pmull",
+			etc.
+		* These values are derived from the kernel's ftr_bits array and
+		  tools/sysreg file.
+    E.g:
+
+     IDREG_START(ID_AA64ISAR0)
+     IDREG_FIELD_START(ID_AA64ISAR0, AES, 4, 4, LOWER, 0)
+     IDREG_FIELD_ARCH_VAL(0b0000, "off")
+     IDREG_FIELD_ARCH_VAL(0b0001, "aes")
+     IDREG_FIELD_ARCH_VAL(0b0010, "pmull")
+     IDREG_FIELD_END(ID_AA64ISAR0, AES)
+	 ....
+	 IDREG_END(ID_AA64ISAR0)
+
+   - This layer is the single source of truth for ARM64 ID registers.
+     The default values and safe-value tags are manually derived from the
+	 kernel's ftr_bits array. Other boilerplate and arch-defined values are
+	 script-generated.
+
+   - AArch32 ID registers are added with a single field so they can be
+     zeroed out on hosts that support AArch32.
+
+   - This layer also defines helpers for higher layers to extract and
+     manipulate ID register fields.
+       * arm_idregs_reset_to_defaults(): Reset all ID registers to their
+	     default values.
+	   * arm_idreg_field_read/write(): Read the value of an ID register
+	     field.
+	   * arm_arch_val_name/from_name(): Look up the arch-defined name for
+	     a numeric field value.
+	   * ...
+
+	- This layer creates the following tables using X-macro expansion:
+	   * arm_idregs[]: Array of ID register descriptors.
+	   * arm_field_locs[]: Array of field location descriptors.
+	        (fieldIDx -> registerIndex, fieldIndex)
+	   * ...
+
+    - The ArmIdReg struct also includes a writable_mask to track which
+      bits are writable by KVM. This is populated at runtime during
+      scratch VM creation, and is further used to validate that only
+      the writable bits are modified by the CPU model.
+
+2. ARM Properties Layer:
+   A small property layer on top of the ID Register Field table is defined.
+   This series defines two types of properties with plans for one more
+   in the future:
+      - Single field properties: These represent ARM FEAT_X features
+	    that correspond to a single ID register field. Example: feat_AES,
+	    feat_SHA2, etc.
+
+		The property name is set as "feat_<FieldName>" and possible values
+		are the arch-defined named values. This can be further categorized
+		into:
+			* STRING: multi-bit fields (>=2 bits) with arch-defined named
+			          values, example: feat_AES, feat_SHA2, etc.
+			* BOOLEAN: 1-bit fields only (true/false)
+			          example: hw_prop_IDC, hw_prop_DIC, etc.
+			* NUMERIC: IDREG_ANY fields with no named values (raw integer)
+			          example: hw_prop_BS, hw_prop_DZP, etc.
+
+		String property values are validated against the arch-defined named
+		values.
+
+		ID register fields that are not covered by single field properties
+		are also exposed as a property named hw_prop_FieldName. These are
+		usually implementation-defined values like cache geometry, debug
+		counter widths, etc. (CTR_EL0.*, DCZID_EL0.*, etc.)
+		Example: hw_prop_BS, hw_prop_DZP, etc.
+
+		Single field properties are defined as:
+
+		ARM_PROP("prop_name", type, reg, field)
+		Example:
+		ARM_PROP("feat_AES", STRING, ID_AA64ISAR0, AES)
+
+		* Validation based on safe-value tags is yet to be implemented.
+
+     - Fractional properties: These represent ARM FEAT_X features that
+	    use two fields (base + frac) across registers. Example: feat_CSV2,
+	    feat_MPAM, etc.
+
+		The property name is set as "feat_<BaseFieldName>" and possible
+		values are the arch-defined string values like "0.0", "1.0", "1.1",
+		etc.
+
+		Fractional properties are defined as:
+		ARM_FRACTIONAL_PROP("prop_name", base_reg, base_field, frac_reg, frac_field)
+		Example:
+		ARM_FRACTIONAL_PROP("feat_CSV2", ID_AA64PFR0, CSV2, ID_AA64PFR1, CSV2_FRAC)
+
+
+		When a fractional property is set, both the base field and frac
+		field values are set to the corresponding values.
+		E.g: feat_CSV2=1.1 will set ID_AA64PFR0.CSV2=1 and ID_AA64PFR1.CSV2_FRAC=1.
+
+	- Composite properties (planned for v2):
+	   These will act as master boolean switches that control a list of
+	   fields. Example: pauth, sve, etc. Setting sve=on with a named model
+	   will set all the SVE-related fields (ID_AA64ZFR0_EL1.*) along with
+	   sveNNN vector-length. Similarly, setting pauth=on will set APA, GPA,
+	   API, GPA3, GPI, GPA3 fields based on the named model.
+
+	- cpu_revision, cpu_partnum, etc. properties are introduced to expose
+	  MIDR, REVIDR, AIDR fields.
+
+	Exceptions to the property naming are made for ID_AA64PFR0_EL1.ELx
+	fields, which are named elx_mode.
+
+	This series defines over 130 single field properties plus 4
+	fractional properties. All properties work with -cpu host also.
+
+	All properties change the cpu.isar.idregs[] values which are later
+	written back to KVM at the end of kvm_arch_init_vcpu().
+
+	* The arch-defined named values and property names can be iterated
+	  until they make sense.
+
+3. ARM CPU Model Hierarchy:
+
+A small named model layer is defined on top of the properties. An ARM named
+CPU model defines a list of property values and a parent model. A child
+model naturally inherits all the properties from its parent and can
+override them when needed.
+
+The initial model hierarchy shipped here is:
+    kvm-base-v1                  KVM-imposed quirks
+      arm-v8_4-a-v1              ARMv8.4-A architectural mandate
+          neoverse-v1-v1         Neoverse V1
+		    graviton3-v1         AWS Graviton3
+		arm-v9_0-a-v1            ARMv9.0-A architectural deltas on top of ARM-v8_4-a-v1
+          neoverse-v2-v1         Neoverse V2
+            grace-v1             NVIDIA Grace
+
+(kvm-base-v1 and arm-vX are not meant to be realizable unless the
+ user provides values for implementation-defined fields)
+
+So for example, grace-v1 defines Crypto fields and CTR_EL0.IDC/DIC on top
+of neoverse-v2-v1, which leaves those fields vendor-configurable.
+
+The hierarchy reflects a deliberate trade-off:
+  - Architecture-level models (arm-v8_4-a-v1) maximize migration
+    compatibility but lack implementation-defined values.
+  - Reference-core models (neoverse-v2-v1) enable migration across
+    SoCs sharing the same core design.
+  - SoC models (grace-v1) expose the full hardware feature set but
+    limit migration to hosts with the same SoC.
+
+At model realization time,
+    1. a clean slate of cpu.isar.idregs[] is created using
+	   arm_idregs_reset_to_defaults().
+	2. Then, a model's full parent-chain is walked and all properties are
+	   applied in order from parent to child.
+	3. Finally, kvm_arm_writeback_idregs() compares the model's desired
+	   ID-register values against the host-provided cpreg snapshot and
+	   writes back the writable bits, warning on any non-writable difference.
+
+Models will follow a monotonic versioning convention (grace-v1, grace-v2,
+...) mirroring x86's scheme.
+
+* Please take the CPU model property values with a grain of salt.
+  They are added based on what the guest-visible values are with "host"
+  model on available hardware.
+
+Benefits of this design:
+	- General benefits that come with properties and named CPU models,
+	  like cross-host live migration, management-stack control over
+	  feature exposure, etc.
+	- Forward compatibility: when a new ID register or field is
+	  introduced, CPU models need not change; during realization they
+	  will be populated with the default values. Only ID register/field
+	  information needs to be added to the field table.
+	- As CPU models are hierarchical, defining a new model is much easier.
+	- The property names and values are self-documenting.
+
+NOTE: ~2200 of the ~3300 added lines are declarative (field table,
+model definitions, properties, etc.)
+
+Tested with KVM on an NVIDIA Grace host.
+
+Relationship with existing code base:
+ - It does not change any TCG-based code paths.
+ - For KVM host passthrough it just adds property support.
+ - Does not change any existing properties or other code paths.
+ - Can layer on top of the SYSREG_ property series [1].
+
+Planned Follow-ups:
+    - Composite properties with handling of sve, pauth for named models.
+    - CLIDR_EL1 and CCSIDR_EL1 handling.
+	- Safe-value based validation logic.
+	- QMP commands like query-cpu-model-expansion are not hooked yet.
+	  Blockers and supported values (calculated using safe-value tags
+	  and runtime KVM writable masks) will be reported through them.
+	  E.g. libvirt could report:
+	    <property name='feat_AES' type='string' value='pmull'
+	              supports='off,aes,pmull'/>
+	  and:
+	    <cpu type='kvm' name='nvidia-grace-v1'
+			typename='arm-nvidia-grace-v1-arm-cpu' usable='no'>
+	      <blocker name='feat_AES'/>
+	    </cpu>
+
+	- DCZID_EL0 handling.
+
+Out of Scope:
+	- Inter-feature dependencies like FP <--> AdvSIMD, SM3 <--> SM4, etc.
+
+Appendix: KVM Non-writable fields (kernel 6.18):
+
+These fields pass the host value through to the guest unmodified on
+6.18; trying to override them get a warning from kvm_arm_writeback_idregs()
+and the slot retains the host value:
+
+   #   Field                       #   Field
+  ---  -----------------------    ---  -----------------------
+   1   ID_AA64PFR0.FP              10  ID_AA64MMFR2.NV
+   2   ID_AA64PFR0.AdvSIMD         11  ID_AA64MMFR2.CCIDX
+   3   ID_AA64MMFR0.ASIDBITS       12  ID_AA64MMFR4.E2H0
+   4   ID_AA64MMFR1.XNX            13  ID_AA64DFR0.CTX_CMPs
+   5   ID_AA64MMFR1.VH             14  ID_AA64DFR0.BRPs
+   6   ID_AA64MMFR1.VMIDBits       15  CTR_EL0.CWG
+   7   ID_AA64MMFR2.EVT            16  CTR_EL0.ERG
+   8   ID_AA64MMFR2.FWB            17  DCZID_EL0.*
+   9   ID_AA64MMFR2.IDS
+
+This list shifts with the kernel version. The runtime probe via
+KVM_ARM_GET_REG_WRITABLE_MASKS is authoritative.
+
+Warm Regards,
+ Shaju, Khushit
+
+Khushit Shah (1):
+  target/arm/kvm: enable writable implementation ID registers
+
+Shaju Abraham (12):
+  target/arm: named_cpu_model: define containers for ID registers and
+    fields
+  target/arm: named_cpu_model: Add ID Register Fields
+  target/arm: named_cpu_model: initialise additional sysregs
+  target/arm: named_cpu_model: generate tables for Arm64 ID registers
+    and fields
+  target/arm: named_cpu_model: replace FIELD macro with IDREG_FIELD
+  target/arm: named_cpu_model: data-structures required for the ARM
+    property layer.
+  target/arm: named_cpu_model: define ARM properties
+  target/arm: named_cpu_model: generate arm_cpu_props[] table
+  target/arm: named_cpu_model: Add ID register field helper functions
+  target/arm: named_cpu_model: Register Arm64 properties for host model
+  target/arm: named_cpu_model: introduce named CPU models for selected
+    CPUs
+  target/arm: named_cpu_model: writeback modified ID registers to KVM
+
+ hw/arm/virt.c                   |    8 +
+ target/arm/arm-cpu-frac.inc.h   |   34 +
+ target/arm/arm-cpu-models.c     |  214 ++++
+ target/arm/arm-cpu-models.h     |   43 +
+ target/arm/arm-cpu-props.c      |  259 +++++
+ target/arm/arm-cpu-props.h      |   36 +
+ target/arm/arm-cpu-props.inc.h  |  180 ++++
+ target/arm/arm-v8_4-a-v1.inc.h  |   22 +
+ target/arm/arm-v9_0-a-v1.inc.h  |   28 +
+ target/arm/cpu-features.h       |  232 +----
+ target/arm/cpu-idregs.c         |  232 +++++
+ target/arm/cpu-idregs.h         |  132 +++
+ target/arm/cpu-idregs.h.inc     | 1724 +++++++++++++++++++++++++++++++
+ target/arm/cpu-sysregs.h.inc    |    5 +
+ target/arm/cpu64.c              |    3 +-
+ target/arm/grace-v1.inc.h       |   17 +
+ target/arm/graviton3-v1.inc.h   |   16 +
+ target/arm/kvm-base-v1.inc.h    |   13 +
+ target/arm/kvm.c                |  167 ++-
+ target/arm/meson.build          |    7 +-
+ target/arm/neoverse-v1-v1.inc.h |   64 ++
+ target/arm/neoverse-v2-v1.inc.h |   64 ++
+ target/arm/trace-events         |    1 +
+ 23 files changed, 3284 insertions(+), 217 deletions(-)
+ create mode 100644 target/arm/arm-cpu-frac.inc.h
  create mode 100644 target/arm/arm-cpu-models.c
  create mode 100644 target/arm/arm-cpu-models.h
+ create mode 100644 target/arm/arm-cpu-props.c
+ create mode 100644 target/arm/arm-cpu-props.h
+ create mode 100644 target/arm/arm-cpu-props.inc.h
  create mode 100644 target/arm/arm-v8_4-a-v1.inc.h
  create mode 100644 target/arm/arm-v9_0-a-v1.inc.h
+ create mode 100644 target/arm/cpu-idregs.c
+ create mode 100644 target/arm/cpu-idregs.h
+ create mode 100644 target/arm/cpu-idregs.h.inc
  create mode 100644 target/arm/grace-v1.inc.h
  create mode 100644 target/arm/graviton3-v1.inc.h
  create mode 100644 target/arm/kvm-base-v1.inc.h
  create mode 100644 target/arm/neoverse-v1-v1.inc.h
  create mode 100644 target/arm/neoverse-v2-v1.inc.h
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 10b1954382..bbb5f0a241 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -4069,6 +4069,14 @@ static GPtrArray *virt_get_valid_cpu_types(const MachineState *ms)
-             g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("host")));
-         }
-     }
-+    if (kvm_enabled() && target_aarch64()) {
-+        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("arm-v8_4-a-v1")));
-+        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("arm-v9_0-a-v1")));
-+        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("neoverse-v1-v1")));
-+        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("neoverse-v2-v1")));
-+        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("grace-v1")));
-+        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("graviton3-v1")));
-+    }
-     g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("max")));
- 
-     return vct;
-diff --git a/target/arm/arm-cpu-models.c b/target/arm/arm-cpu-models.c
-new file mode 100644
-index 0000000000..fff7522a64
---- /dev/null
-+++ b/target/arm/arm-cpu-models.c
-@@ -0,0 +1,214 @@
-+/*
-+ * ARM named CPU model definitions.
-+ *
-+ * Each model is defined in its own .inc.h file using the ARM_PROP()
-+ * macro, listing only the properties that DIFFER from the parent
-+ * model.  At realisation the parent chain is walked root-first and
-+ * every level's props are applied via QOM, so the leaf's values
-+ * naturally override its ancestors.
-+ *
-+ * Hierarchy (single-parent inheritance):
-+ *
-+ *   kvm-base-v1                    KVM-imposed quirks (chain root)
-+ *     arm-v8_4-a-v1                ARMv8.4-A architectural mandate
-+ *       arm-v9_0-a-v1              ARMv9.0-A architectural deltas
-+ *         neoverse-v2-v1           Neoverse V2 (TRM 102375)
-+ *           grace-v1               NVIDIA Grace
-+ *       neoverse-v1-v1             Neoverse V1 (TRM 102649)
-+ *         graviton3-v1             AWS Graviton3
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "system/kvm.h"
-+#include "cpu.h"
-+#include "internals.h"
-+#include "kvm_arm.h"
-+#include "arm-cpu-models.h"
-+#include "arm-cpu-props.h"
-+#include "cpu-idregs.h"
-+
-+static const ArmModelPropValue kvm_base_v1_props[] = {
-+#include "kvm-base-v1.inc.h"
-+};
-+
-+static const ArmModelPropValue armv8_4_a_v1_props[] = {
-+#include "arm-v8_4-a-v1.inc.h"
-+};
-+
-+static const ArmModelPropValue armv9_0_a_v1_props[] = {
-+#include "arm-v9_0-a-v1.inc.h"
-+};
-+
-+static const ArmModelPropValue neoverse_v1_v1_props[] = {
-+#include "neoverse-v1-v1.inc.h"
-+};
-+
-+static const ArmModelPropValue neoverse_v2_v1_props[] = {
-+#include "neoverse-v2-v1.inc.h"
-+};
-+
-+static const ArmModelPropValue grace_v1_props[] = {
-+#include "grace-v1.inc.h"
-+};
-+
-+static const ArmModelPropValue graviton3_v1_props[] = {
-+#include "graviton3-v1.inc.h"
-+};
-+
-+static const ArmNamedCpuModel arm_cpu_models[] = {
-+    {
-+        .name   = "kvm-base-v1",
-+        .parent = NULL,
-+        .props  = kvm_base_v1_props,
-+    },
-+    {
-+        .name   = "arm-v8_4-a-v1",
-+        .parent = "kvm-base-v1",
-+        .props  = armv8_4_a_v1_props,
-+    },
-+    {
-+        .name   = "neoverse-v1-v1",
-+        .parent = "arm-v8_4-a-v1",
-+        .props  = neoverse_v1_v1_props,
-+    },
-+    {
-+        .name   = "graviton3-v1",
-+        .parent = "neoverse-v1-v1",
-+        .props  = graviton3_v1_props,
-+    },
-+    {
-+        .name   = "arm-v9_0-a-v1",
-+        .parent = "arm-v8_4-a-v1",
-+        .props  = armv9_0_a_v1_props,
-+    },
-+    {
-+        .name   = "neoverse-v2-v1",
-+        .parent = "arm-v9_0-a-v1",
-+        .props  = neoverse_v2_v1_props,
-+    },
-+    {
-+        .name   = "grace-v1",
-+        .parent = "neoverse-v2-v1",
-+        .props  = grace_v1_props,
-+    },
-+};
-+
-+static ARMCPUInfo arm_named_cpu_infos[ARRAY_SIZE(arm_cpu_models)];
-+static const ArmNamedCpuModel *arm_find_model(const char *name)
-+{
-+    size_t i;
-+    for (i = 0; i < ARRAY_SIZE(arm_cpu_models); i++) {
-+        if (g_str_equal(arm_cpu_models[i].name, name)) {
-+            return &arm_cpu_models[i];
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void arm_apply_model_props(Object *obj, const ArmModelPropValue *props,
-+                                  Error **errp)
-+{
-+    const ArmModelPropValue *pv;
-+    ERRP_GUARD();
-+
-+    for (pv = props; pv->name; pv++) {
-+        switch (pv->type) {
-+        case ARM_MODEL_PROP_STR:
-+            object_property_set_str(obj, pv->name, pv->str, errp);
-+            break;
-+        case ARM_MODEL_PROP_BOOL:
-+            object_property_set_bool(obj, pv->name, pv->b, errp);
-+            break;
-+        case ARM_MODEL_PROP_NUM:
-+            object_property_set_uint(obj, pv->name, pv->num, errp);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+        if (*errp) {
-+            error_prepend(errp, "property '%s': ", pv->name);
-+            return;
-+        }
-+    }
-+}
-+
-+static void arm_realize_model_chain(Object *obj, const ArmNamedCpuModel *model,
-+                                    Error **errp)
-+{
-+    const ArmNamedCpuModel *cur, *parent;
-+    const ArmNamedCpuModel *chain[ARRAY_SIZE(arm_cpu_models)];
-+    size_t depth = 0;
-+    for (cur = model; cur; ) {
-+        if (depth >= ARRAY_SIZE(chain)) {
-+            error_setg(errp, "model '%s': parent chain too deep "
-+                       "(possible cycle)", model->name);
-+            return;
-+        }
-+        chain[depth++] = cur;
-+
-+        if (!cur->parent) {
-+            break;
-+        }
-+        parent = arm_find_model(cur->parent);
-+        if (!parent) {
-+            error_setg(errp, "model '%s': unknown parent '%s'",
-+                       cur->name, cur->parent);
-+            return;
-+        }
-+        cur = parent;
-+    }
-+
-+    while (depth--) {
-+        arm_apply_model_props(obj, chain[depth]->props, errp);
-+        if (*errp) {
-+            return;
-+        }
-+    }
-+}
-+
-+static void arm_named_cpu_initfn(Object *obj)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    ARMCPUClass *acc = ARM_CPU_GET_CLASS(obj);
-+    const ArmNamedCpuModel *model = arm_find_model(acc->info->name);
-+    if (!model) {
-+        error_report("'%s' CPU model entry not found)",
-+                     acc->info->name);
-+        return;
-+    }
-+
-+    if (!kvm_enabled()) {
-+        error_report("'%s' CPU model requires KVM (-accel kvm)",
-+                     acc->info->name);
-+        return;
-+    }
-+
-+    kvm_arm_set_cpu_features_from_host(cpu);
-+    if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-+        return;
-+    }
-+
-+    arm_idregs_reset_to_defaults(cpu);
-+
-+    aarch64_add_sve_properties(obj);
-+    aarch64_add_pauth_properties(obj);
-+    arm_add_cpu_props(obj);
-+
-+    arm_realize_model_chain(obj, model, &error_abort);
-+}
-+
-+void arm_register_named_cpu_models(void)
-+{
-+    size_t i;
-+    for (i = 0; i < ARRAY_SIZE(arm_cpu_models); i++) {
-+        arm_named_cpu_infos[i].name = arm_cpu_models[i].name;
-+        arm_named_cpu_infos[i].initfn = arm_named_cpu_initfn;
-+        arm_cpu_register(&arm_named_cpu_infos[i]);
-+    }
-+}
-+
-+type_init(arm_register_named_cpu_models)
-diff --git a/target/arm/arm-cpu-models.h b/target/arm/arm-cpu-models.h
-new file mode 100644
-index 0000000000..830a9bdc4a
---- /dev/null
-+++ b/target/arm/arm-cpu-models.h
-@@ -0,0 +1,43 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * ARM named CPU model definitions - public API.
-+ */
-+#ifndef ARM_CPU_MODELS_H
-+#define ARM_CPU_MODELS_H
-+
-+#include "qapi/error.h"
-+#include "qom/object.h"
-+
-+typedef enum ArmModelPropType {
-+    ARM_MODEL_PROP_STR,
-+    ARM_MODEL_PROP_BOOL,
-+    ARM_MODEL_PROP_NUM,
-+} ArmModelPropType;
-+
-+typedef struct ArmModelPropValue {
-+    const char     *name;
-+    ArmModelPropType type;
-+    bool            b;
-+    uint64_t        num;
-+    const char     *str;
-+} ArmModelPropValue;
-+
-+typedef struct ArmNamedCpuModel {
-+    const char              *name;
-+    const char              *parent;
-+    const ArmModelPropValue *props;
-+} ArmNamedCpuModel;
-+
-+#define ARM_PROP_FIELD_STR  str
-+#define ARM_PROP_FIELD_BOOL b
-+#define ARM_PROP_FIELD_NUM  num
-+
-+#define ARM_PROP(_name, _type, _value) \
-+    { .name = (_name), .type = ARM_MODEL_PROP_##_type, \
-+      .ARM_PROP_FIELD_##_type = (_value) }
-+
-+#define ARM_PROP_END  { .name = NULL }
-+
-+void arm_register_named_cpu_models(void);
-+
-+#endif /* ARM_CPU_MODELS_H */
-diff --git a/target/arm/arm-v8_4-a-v1.inc.h b/target/arm/arm-v8_4-a-v1.inc.h
-new file mode 100644
-index 0000000000..1bad59ba2d
---- /dev/null
-+++ b/target/arm/arm-v8_4-a-v1.inc.h
-@@ -0,0 +1,22 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("feat_CRC32", STR,  "on"),
-+ARM_PROP("feat_ATOMIC", STR,  "on"),
-+ARM_PROP("feat_HPDS", STR,  "on"),
-+ARM_PROP("feat_LO", STR,  "on"),
-+
-+ARM_PROP("feat_DPB", STR,  "on"),
-+ARM_PROP("feat_RAS", STR,  "1.0"),
-+ARM_PROP("feat_PAN", STR,  "pan2"),
-+ARM_PROP("feat_UAO", STR,  "on"),
-+ARM_PROP("feat_CNP", STR,  "on"),
-+ARM_PROP("feat_IESB", STR,  "on"),
-+
-+ARM_PROP("feat_DIT", STR,  "on"),
-+ARM_PROP("feat_DBG", STR,  "v8p4"),
-+ARM_PROP("feat_PMU", STR,  "v3p4"),
-+ARM_PROP("feat_TS", STR,  "flagm"),
-+ARM_PROP("feat_LRCPC", STR,  "lrcpc2"),
-+ARM_PROP("feat_AT", STR,  "on"),
-+ARM_PROP("hw_prop_IDS", STR,  "0x18"),
-+
-+ARM_PROP_END,
-diff --git a/target/arm/arm-v9_0-a-v1.inc.h b/target/arm/arm-v9_0-a-v1.inc.h
-new file mode 100644
-index 0000000000..5ebe728133
---- /dev/null
-+++ b/target/arm/arm-v9_0-a-v1.inc.h
-@@ -0,0 +1,28 @@
-+
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("feat_BT", STR, "on"),
-+ARM_PROP("feat_CSV2", STR, "1.0"),
-+ARM_PROP("feat_CSV3", STR, "on"),
-+ARM_PROP("feat_DPB", STR, "dpb2"),
-+ARM_PROP("feat_E0PD", STR, "on"),
-+ARM_PROP("feat_SB", STR, "on"),
-+ARM_PROP("feat_SPECRES", STR, "on"),
-+ARM_PROP("feat_SSBS", STR, "ssbs2"),
-+
-+ARM_PROP("feat_DoubleLock", STR, "off"),
-+ARM_PROP("feat_FP", STR, "on"),
-+ARM_PROP("feat_AdvSIMD", STR, "on"),
-+ARM_PROP("feat_TS", STR, "flagm2"),
-+ARM_PROP("feat_FRINTTS", STR, "on"),
-+ARM_PROP("feat_RDM", STR, "on"),
-+ARM_PROP("feat_DP", STR, "on"),
-+ARM_PROP("feat_FHM", STR, "on"),
-+ARM_PROP("feat_FCMA", STR, "on"),
-+ARM_PROP("feat_JSCVT", STR, "on"),
-+
-+ARM_PROP("feat_SVE", STR, "on"),
-+ARM_PROP("feat_SEL2", STR, "on"),
-+ARM_PROP("feat_VH", STR, "on"),
-+ARM_PROP("feat_XNX", STR, "on"),
-+
-+ARM_PROP_END,
-diff --git a/target/arm/grace-v1.inc.h b/target/arm/grace-v1.inc.h
-new file mode 100644
-index 0000000000..048ebb993d
---- /dev/null
-+++ b/target/arm/grace-v1.inc.h
-@@ -0,0 +1,17 @@
-+
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("cpu_revision", NUM, 0x0),
-+
-+ARM_PROP("feat_AES", STR, "pmull"),
-+ARM_PROP("feat_SHA1", STR, "on"),
-+ARM_PROP("feat_SHA2", STR, "sha512"),
-+ARM_PROP("feat_SHA3", STR, "on"),
-+ARM_PROP("feat_SM3", STR, "on"),
-+ARM_PROP("feat_SM4", STR, "on"),
-+
-+ARM_PROP("hw_prop_IDC", BOOL, true),
-+ARM_PROP("hw_prop_DIC", BOOL, true),
-+
-+ARM_PROP("cpu_revidr", NUM, 1),
-+
-+ARM_PROP_END,
-diff --git a/target/arm/graviton3-v1.inc.h b/target/arm/graviton3-v1.inc.h
-new file mode 100644
-index 0000000000..9538c3e539
---- /dev/null
-+++ b/target/arm/graviton3-v1.inc.h
-@@ -0,0 +1,16 @@
-+
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("feat_AES", STR, "pmull"),
-+ARM_PROP("feat_SHA1", STR, "on"),
-+ARM_PROP("feat_SHA2", STR, "sha512"),
-+ARM_PROP("feat_SHA3", STR, "on"),
-+ARM_PROP("feat_SM3", STR, "on"),
-+ARM_PROP("feat_SM4", STR, "on"),
-+ARM_PROP("feat_RNDR", STR, "on"),
-+
-+ARM_PROP("hw_prop_IDC", BOOL, true),
-+ARM_PROP("hw_prop_DIC", BOOL, true),
-+
-+ARM_PROP("cpu_revidr", NUM, 1),
-+
-+ARM_PROP_END,
-diff --git a/target/arm/kvm-base-v1.inc.h b/target/arm/kvm-base-v1.inc.h
-new file mode 100644
-index 0000000000..e0bae90629
---- /dev/null
-+++ b/target/arm/kvm-base-v1.inc.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("el0_mode", STR, "aarch64"),
-+ARM_PROP("el1_mode", STR, "aarch64"),
-+ARM_PROP("el2_mode", STR, "off"),
-+ARM_PROP("el3_mode", STR, "off"),
-+ARM_PROP("feat_GIC", STR, "on"),
-+ARM_PROP("feat_AMU", STR, "off"),
-+ARM_PROP("feat_MPAM", STR, "0.0"),
-+ARM_PROP("feat_NV", STR, "0.0"),
-+ARM_PROP("feat_MTE_FRAC", STR, "async"),
-+ARM_PROP("hw_prop_CCIDX", STR, "32"),
-+
-+ARM_PROP_END,
-diff --git a/target/arm/meson.build b/target/arm/meson.build
-index 01b1e91a1c..79a22eec3f 100644
---- a/target/arm/meson.build
-+++ b/target/arm/meson.build
-@@ -22,7 +22,10 @@ arm_common_system_ss.add(files(
-   'arm-qmp-cmds.c',
-   'cpu-idregs.c',
- ))
--arm_system_ss.add(when: 'CONFIG_KVM', if_true: files('hyp_gdbstub.c', 'kvm.c'))
-+arm_system_ss.add(when: 'CONFIG_KVM',
-+                  if_true: files('arm-cpu-models.c',
-+                                 'hyp_gdbstub.c',
-+                                 'kvm.c'))
- arm_system_ss.add(when: 'CONFIG_HVF', if_true: files('hyp_gdbstub.c'))
- 
- arm_user_ss.add(files('cpu.c'))
-diff --git a/target/arm/neoverse-v1-v1.inc.h b/target/arm/neoverse-v1-v1.inc.h
-new file mode 100644
-index 0000000000..5ded208a5e
---- /dev/null
-+++ b/target/arm/neoverse-v1-v1.inc.h
-@@ -0,0 +1,64 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("cpu_implementer", NUM, 0x41),
-+ARM_PROP("cpu_variant", NUM, 0x1),
-+ARM_PROP("cpu_architecture", NUM, 0xF),
-+ARM_PROP("cpu_partnum", NUM, 0xD40),
-+ARM_PROP("cpu_revision", NUM, 0x1),
-+
-+ARM_PROP("hw_prop_BRPS", NUM, 0x5),
-+ARM_PROP("hw_prop_WRPs", NUM, 0x3),
-+ARM_PROP("hw_prop_CTX_CMPs", NUM, 0x1),
-+ARM_PROP("feat_DoubleLock", STR, "off"),
-+
-+ARM_PROP("feat_RDM", STR, "on"),
-+ARM_PROP("feat_DP", STR, "on"),
-+ARM_PROP("feat_FHM", STR, "on"),
-+
-+ARM_PROP("feat_DPB", STR, "dpb2"),
-+ARM_PROP("feat_JSCVT", STR, "on"),
-+ARM_PROP("feat_FCMA", STR, "on"),
-+ARM_PROP("feat_BF16", STR, "on"),
-+ARM_PROP("feat_DGH", STR, "on"),
-+ARM_PROP("feat_I8MM", STR, "on"),
-+
-+ARM_PROP("feat_FP", STR, "fp16"),
-+ARM_PROP("feat_AdvSIMD", STR, "fp16"),
-+ARM_PROP("feat_RAS", STR, "1.1_base"),
-+ARM_PROP("feat_CSV2", STR, "1.0"),
-+ARM_PROP("feat_CSV3", STR, "on"),
-+
-+ARM_PROP("feat_SSBS", STR, "ssbs2"),
-+
-+ARM_PROP("hw_prop_PARANGE", STR, "48"),
-+ARM_PROP("hw_prop_ASIDBITS", STR, "16"),
-+ARM_PROP("feat_BIGEND", STR, "on"),
-+ARM_PROP("feat_SNSMEM", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN4", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN16", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN64", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN4_2", STR, "tgran4"),
-+ARM_PROP("hw_prop_TGRAN16_2", STR, "tgran16"),
-+ARM_PROP("hw_prop_TGRAN64_2", STR, "tgran64"),
-+
-+ARM_PROP("feat_HAFDBS", STR, "dbm"),
-+ARM_PROP("hw_prop_VMIDBITS", STR, "16"),
-+ARM_PROP("feat_VH", STR, "on"),
-+ARM_PROP("feat_HPDS", STR, "hpds2"),
-+ARM_PROP("feat_XNX", STR, "on"),
-+ARM_PROP("feat_SpecSEI", STR, "off"),
-+
-+ARM_PROP("hw_prop_FWB", STR, "on"),
-+ARM_PROP("feat_BBM", STR, "2"),
-+ARM_PROP("feat_EVT", STR, "ttlbxs"),
-+
-+ARM_PROP("feat_E2H0", STR, "on"),
-+
-+ARM_PROP("hw_prop_IMInline", NUM, 4),
-+ARM_PROP("hw_prop_L1IP", STR, "pipt"),
-+ARM_PROP("hw_prop_DMInline", NUM, 4),
-+ARM_PROP("hw_prop_ERG", NUM, 4),
-+ARM_PROP("hw_prop_CWG", NUM, 4),
-+
-+ARM_PROP("hw_prop_BS", NUM, 0x4),
-+
-+ARM_PROP_END,
-diff --git a/target/arm/neoverse-v2-v1.inc.h b/target/arm/neoverse-v2-v1.inc.h
-new file mode 100644
-index 0000000000..a32f80cd55
---- /dev/null
-+++ b/target/arm/neoverse-v2-v1.inc.h
-@@ -0,0 +1,64 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+ARM_PROP("cpu_implementer", NUM, 0x41),
-+ARM_PROP("cpu_variant", NUM, 0x0),
-+ARM_PROP("cpu_architecture", NUM, 0xF),
-+ARM_PROP("cpu_partnum", NUM, 0xD4F),
-+ARM_PROP("cpu_revision", NUM, 0x2),
-+
-+ARM_PROP("hw_prop_BRPS", NUM, 0x5),
-+ARM_PROP("hw_prop_WRPs", NUM, 0x3),
-+ARM_PROP("hw_prop_CTX_CMPs", NUM, 0x1),
-+ARM_PROP("feat_PMU", STR, "v3p5"),
-+
-+ARM_PROP("feat_TLB", STR, "range"),
-+
-+ARM_PROP("feat_BF16", STR, "on"),
-+ARM_PROP("feat_DGH", STR, "on"),
-+ARM_PROP("feat_I8MM", STR, "on"),
-+
-+ARM_PROP("feat_FP", STR, "fp16"),
-+ARM_PROP("feat_AdvSIMD", STR, "fp16"),
-+ARM_PROP("feat_RAS", STR, "1.1_base"),
-+
-+/*
-+ * V2 silicon may report CSV2=2 (FEAT_CSV2_2) per TRM page 392, but
-+ * KVM clamps the guest-visible limit to 1.
-+ */
-+ARM_PROP("feat_CSV2", STR, "1.0"),
-+
-+
-+ARM_PROP("hw_prop_PARANGE", STR, "48"),
-+ARM_PROP("hw_prop_ASIDBITS", STR, "16"),
-+ARM_PROP("feat_BIGEND", STR, "on"),
-+ARM_PROP("feat_SNSMEM", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN16", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN64", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN4", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN16_2", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN64_2", STR, "on"),
-+ARM_PROP("hw_prop_TGRAN4_2", STR, "on"),
-+
-+ARM_PROP("feat_HAFDBS", STR, "dbm"),
-+ARM_PROP("hw_prop_VMIDBITS", STR, "16"),
-+ARM_PROP("feat_HPDS", STR, "hpds2"),
-+ARM_PROP("feat_PAN", STR, "pan3"),
-+ARM_PROP("feat_ECBHB", STR, "off"),
-+ARM_PROP("feat_SpecSEI", STR, "off"),
-+
-+ARM_PROP("hw_prop_FWB", STR, "on"),
-+ARM_PROP("hw_prop_ST", STR, "48_47"),
-+ARM_PROP("feat_TTL", STR, "on"),
-+ARM_PROP("feat_BBM", STR, "2"),
-+ARM_PROP("feat_EVT", STR, "ttlbxs"),
-+ARM_PROP("feat_E2H0", STR, "on"),
-+
-+
-+ARM_PROP("hw_prop_IMInline", NUM, 4),
-+ARM_PROP("hw_prop_L1IP", STR, "pipt"),
-+ARM_PROP("hw_prop_DMInline", NUM, 4),
-+ARM_PROP("hw_prop_ERG", NUM, 4),
-+ARM_PROP("hw_prop_CWG", NUM, 4),
-+
-+ARM_PROP("hw_prop_BS", NUM, 0x4),
-+
-+ARM_PROP_END,
--- 
+--
 2.52.0
 
