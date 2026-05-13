@@ -1,155 +1,144 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D473D88F2;
-	Wed, 13 May 2026 08:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823C63C276F;
+	Wed, 13 May 2026 09:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778661761; cv=none; b=N2Ij63777qvXLBJjN0VCNLY6zVeAJQez72KQ4PSEmKDQDoj6uaVaUa51rlTkKs5e1YRNOpKTQhC81oyMpBpwy/NLWF7G5oAMjBaoQ0rbXuhIgJSWSnPvf54U9rUQ2PvJPKVmnQQWEhkPqrMt5HfWQdlbTOptmUhjFjXWPjISvzs=
+	t=1778663888; cv=none; b=KwDtgy9OB2Ta2EoxELBslMPeQ68ydh8wUgjp9sfZKgyeXKdViopXihL2zIlHBr37AOugQCAuKMbgH5XvTlIbJxfuUD5qpjYL2naSQ5PhRF00UWDUQj78CD/YvhG2xGO+AGsRQ2XOikOj16qH5Iq9ZAAjfluX0j9T3whO+4u9WlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778661761; c=relaxed/simple;
-	bh=wFcKZ8r+riP6MbTu1qKedhOQzdDog9eWtDtPnYzMQ3M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f23OkHI8J4/OGbFtunfG2XFa9RjZXNjUFgvFP/Ob6imDdWEMdjQAYPz9ADyYwwvmmOIM8UPl7QRwbQwOVc5nwodxDI3uY6oQ3sG6ULsFmmoORCN+Ped1VkoJA4GXkCzi/epVPP0oEag13+9Wnm256SWk49TV2PfjJ7XrRLwXZEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dL+mOThU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778663888; c=relaxed/simple;
+	bh=tK30HCaThkEdQqkifcwhGwd2vRsand6ahOgGAzNGZsk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RW9q1p3l2eCMEy8nCBRfvgtu4pPCNFAevIPW+KdL5i2U1ucSP6+Ir6ApK+oPkM2OAc4RSMlpAxx7nIlUS7oj5R3enZ7Ln2SMIOb7qnLe7mmR1CC/2joFMt+V/JwODy/HmOEVTcI3BSP4VBGEMTJ7L01Y3ezE1gp1BOkNpqhsb+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E32QtEsJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dL+mOThU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84068C2BCB7;
-	Wed, 13 May 2026 08:42:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E32QtEsJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCA97C2BCB7;
+	Wed, 13 May 2026 09:18:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778661759;
-	bh=wFcKZ8r+riP6MbTu1qKedhOQzdDog9eWtDtPnYzMQ3M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dL+mOThUrXXyro0zysDBR2vEzgp8njYPG1rem/bvEEarfzI4iharQP8kiFEIKGWaO
-	 BHC2NCndirUymlaSj6KAce8B5EZxGXgzcfRa+OZ31J5WQ/9sdMZj04KRg8N/0hViDM
-	 BiYRDaGtS7PSjr/2AZSYl1pbysNuRImlxZmCLm/iJygUT75bszXrPh40/kbhpG2xVg
-	 W/4pZTcI3aTR2oNvh9IMHpKk8dcE9XaDVTHHiiEzHR/szG1HNqvxTIUKl8GRm38PrK
-	 vhLQTJINE+wstMdsHbuNTyEGAUSqg+6yLOHCDFGOo/AKESMMycUcs2RijMsMGULODX
-	 nIVCQR0pSPbpg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wN5Ar-00000001tMH-0Xjc;
-	Wed, 13 May 2026 08:42:37 +0000
-Date: Wed, 13 May 2026 09:42:36 +0100
-Message-ID: <86h5obya2r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Woodhouse <dwmw2@infradead.org>,
+	s=k20201202; t=1778663888;
+	bh=tK30HCaThkEdQqkifcwhGwd2vRsand6ahOgGAzNGZsk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E32QtEsJ0lDRBSHnWJPUJHAeQ/WB4fwv2ObrZbpQs6suTi2LH2OvMZAvetLDjeT8Y
+	 uI+UqkwPnQlmCI51uG8zoJdreaUqda5hR2v6tMtUhlX8dPKF3+QmuMq5afa8vWScXv
+	 PHwrZ85CYCJTY363j7w5o5d4TPEqeLDs7YoLsoV0lwIiwS7TvuGo0r99p4iC8c2pH9
+	 c3s0xhCNDco03N7MGmRnY0/NpC0PXPtxfGjvDVE0qK2O6uNCsqBh+sO1x6OzT0IMTe
+	 y7kFrwgRKtDlOHW1w/s81n9+Ry8lLR2nmu8mc2PK1yEuogWAXtcQP79SgvnT1Q0Qel
+	 riO6VF9SH9ZUQ==
+Date: Wed, 13 May 2026 02:18:06 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Jim Mattson <jmattson@google.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Kees Cook <kees@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	James Clark <james.clark@linaro.org>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] Documentation: KVM: Document guest-visible compatibility expectations
-In-Reply-To: <baff82ca-6321-4b16-aa61-b2d6d60b6535@redhat.com>
-References: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
-	<6afc4b95-3c15-4d71-877d-19b84e91ce05@redhat.com>
-	<57bc082f4824d6114d3156744c25986effc29aca.camel@infradead.org>
-	<baff82ca-6321-4b16-aa61-b2d6d60b6535@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [PATCH v7 10/20] KVM: arm64: Context swap Partitioned PMU guest
+ registers
+Message-ID: <agRBzkVcR-qZZdx2@kernel.org>
+References: <20260504211813.1804997-1-coltonlewis@google.com>
+ <20260504211813.1804997-11-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dwmw2@infradead.org, corbet@lwn.net, skhan@linuxfoundation.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, seanjc@google.com, jmattson@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, rananta@google.com, eric.auger@redhat.com, kees@kernel.org, arnd@arndb.de, nathan@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260504211813.1804997-11-coltonlewis@google.com>
 
-On Mon, 11 May 2026 17:56:15 +0100,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 5/11/26 18:38, David Woodhouse wrote:
-> > Not *everything* is in CPUID; one recent exception that comes to mind
-> > is the SUPPRESS_EOI_BROADCAST quirk. But on x86 we preserve the
-> > existing behaviour of older kernels =E2=80=94 even when that behaviour =
-doesn't
-> > make much sense, as with SUPPRESS_EOI_BROADCAST where older KVM would
-> > *advertise* the feature, but not actually *implement* it. Nevertheless,
-> > that remains the default behaviour of future kernels unless userspace
-> > explicitly opts in to fully enable (or disable) the feature.
-> >=20
-> > But this documentation update isn't even asking for that compatible-by-
-> > default behaviour, even though that is the right thing to do. It's only
-> > asking that it be *possible* to reinstate the old behaviour, for
-> > userspace that *knows* about the change and explicitly wants to go back
-> > to the old way to remain compatible.
->=20
-> Yep, these are the "quirks"---if it's too early for Arm to commit to
-> that, I guess it's fine.
+On Mon, May 04, 2026 at 09:18:03PM +0000, Colton Lewis wrote:
+> +
+> +/**
+> + * kvm_pmu_host_counter_mask() - Compute bitmask of host-reserved counters
+> + * @pmu: Pointer to arm_pmu struct
+> + *
+> + * Compute the bitmask that selects the host-reserved counters in the
+> + * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers. These are the counters
+> + * in HPMN..N
+> + *
+> + * Return: Bitmask
+> + */
+> +u64 kvm_pmu_host_counter_mask(struct arm_pmu *pmu)
+> +{
+> +	u8 nr_counters = *host_data_ptr(nr_event_counters);
+> +
+> +	if (kvm_pmu_is_partitioned(pmu))
+> +		return GENMASK(nr_counters - 1, pmu->max_guest_counters);
+> +
+> +	return ARMV8_PMU_CNT_MASK_ALL;
+> +}
+> +
+> +/**
+> + * kvm_pmu_guest_counter_mask() - Compute bitmask of guest-reserved counters
+> + * @pmu: Pointer to arm_pmu struct
+> + *
+> + * Compute the bitmask that selects the guest-reserved counters in the
+> + * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers. These are the counters
+> + * in 0..HPMN and the cycle and instruction counters.
+> + *
+> + * Return: Bitmask
+> + */
+> +u64 kvm_pmu_guest_counter_mask(struct arm_pmu *pmu)
+> +{
+> +	if (kvm_pmu_is_partitioned(pmu))
+> +		return ARMV8_PMU_CNT_MASK_C | GENMASK(pmu->max_guest_counters - 1, 0);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * kvm_pmu_load() - Load untrapped PMU registers
+> + * @vcpu: Pointer to struct kvm_vcpu
+> + *
+> + * Load all untrapped PMU registers from the VCPU into the PCPU. Mask
+> + * to only bits belonging to guest-reserved counters and leave
+> + * host-reserved counters alone in bitmask registers.
+> + */
+> +void kvm_pmu_load(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arm_pmu *pmu;
+> +	unsigned long guest_counters;
+> +	u64 mask;
+> +	u8 i;
+> +	u64 val;
+> +
+> +	/*
+> +	 * If we aren't guest-owned then we know the guest isn't using
+> +	 * the PMU anyway, so no need to bother with the swap.
+> +	 */
+> +	if (!kvm_vcpu_pmu_is_partitioned(vcpu))
+> +		return;
+> +
+> +	preempt_disable();
+> +
+> +	pmu = vcpu->kvm->arch.arm_pmu;
+> +	guest_counters = kvm_pmu_guest_counter_mask(pmu);
+> +
+> +	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
+> +		val = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i);
+> +
+> +		if (i == ARMV8_PMU_CYCLE_IDX) {
+> +			write_sysreg(val, pmccntr_el0);
+> +		} else {
+> +			write_sysreg(i, pmselr_el0);
+> +			write_sysreg(val, pmxevcntr_el0);
 
-Compatible by default means nothing, because userspace needs to
-discover the combined capabilities of the host and KVM. This is not a
-"CPU model" architecture.
-
-If userspace is not a total joke, it will read all the ID registers,
-and configure what it wants to see, assuming it is a feature that can
-be configured (not everything can, because the architecture itself is
-not fully backward compatible).
-
-Yes, this is buggy at times, because the combinatorial explosion of
-CPU capabilities and supported features makes it pretty hard to test
-(and really nobody actually does). But overall, it works, and QEMU is
-growing an infrastructure to manage it in a "user friendly" way.
-
-But really, this isn't what David is asking. He's demanding "bug for
-bug" compatibility. For that, we have two possible cases:
-
-- this is a behaviour that, while undesirable, is allowed by the
-  architecture: fine, we preserve the behaviour and add another way to
-  expose the one we really want. it is ugly, but we manage.
-
-- this is a behaviour that is not allowed by the architecture: we fix
-  it for good. We do that on every release. Some minor, some much more
-  visible. And there is no way we will add this sort of "bring the
-  bugs back" type of behaviours. Specially when it is really obvious
-  that no SW can make any reasonable use of the defect. We allow
-  userspace to keep behaving as before, but the guest will not see a
-  non-compliant behaviour.
-
-That being said, there is a way out of that: convince people in charge
-of the architecture that the non-compliant KVM behaviour is actually
-valuable, and deserves to be tolerated. This has happened before (VHE
-only and NV2 only, just to name two recent changes).
-
-Other terrible hacks (such as GICv3's GICD_TYPER.num_LPIs which KVM
-doesn't support) were added at the request of cloud vendors that David
-might be familiar with, so it isn't like it is a brand new process.
-
-And once it is in the architecture, it becomes a behaviour that is
-allowed to be exposed to a guest, for better or worse.
-
-These are the rules we have followed since we started KVM/arm, and I
-intend to stick to them.
+This is wrong, you would need an intervening ISB. It'd be better to
+avoid the ISB altogether and just use {read,write}_pmevcntrn().
 
 Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Oliver
