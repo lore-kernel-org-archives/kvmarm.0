@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BA83D1A8A;
-	Wed, 13 May 2026 07:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D9223EA89;
+	Wed, 13 May 2026 07:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778657649; cv=none; b=hvLNIEe1Xhc6YCwPxB2Q1PV6WYCOxqgyfaXRrj1Pu6TFHDzk+MgqDpEemlkS2WVz6n76lHmGnWACS+LTPcVGekck4Bg85YukUQ1iLevDZOCSN3yrpYhNDXawASflzB6itJussAjD13PKk9usG3YNZmoqFkVQJKBI+FDJDJT/G2U=
+	t=1778658357; cv=none; b=sgoxXXmGYcuy3S1SeHGuyDRMveivpA964IUzb9Zg5tYqnxxV7muvCVEL8jeo5dOjK0y4bIwy9qX5XZ20Tzetd+4I/u5lxicWOOejpHVjnCqEI5xnTJ8kMDWke2ycmQ0tpCNx8frKA54JDcgKbaS9PdZmdGIUxt6fwZGw5CPoRE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778657649; c=relaxed/simple;
-	bh=i70caX1Yr5xAdjGQu0SXobJw2EJJdoR0JSUg6QLPi5A=;
+	s=arc-20240116; t=1778658357; c=relaxed/simple;
+	bh=4LEL2I02ZNcYBvdRSq6ZKXzxViElK+3D8okdJW4tWaU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mLeUp4Ehh4GovC1Q+xc3xo1YD/5gCRYpYrFlCYWnz/eHxpHOmi7M8yGrrYoidOSqKEMjbN0a8tLUPclv3nYrXAiz7Iu/DalSbDcr7HZykArE32nCpeRj1fKQmvKTvk0DmHmiZfief8INDQYtRNkkPJoJqu8ZlO7uYb+7ceQ1V6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XmwXSozt; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CDZEMErrMy9bZkLoQrXs1m2PZqgELBVvYB6fRz8mfmotP9KHvuY92+egjQsDHuy42cX7Z4gCUeDoS8dA3GXQToqlzktIznW5erSGbaHBIPP6Xf5jh6DutFj1xiFDDssIKmpR13Apwdc3x+xoHFfpMRlLiZcmj1GJGuj7mBYYWJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JcmzwXJo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmwXSozt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AB0AC2BCB7;
-	Wed, 13 May 2026 07:34:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JcmzwXJo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8E23C2BCB7;
+	Wed, 13 May 2026 07:45:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778657648;
-	bh=i70caX1Yr5xAdjGQu0SXobJw2EJJdoR0JSUg6QLPi5A=;
+	s=k20201202; t=1778658357;
+	bh=4LEL2I02ZNcYBvdRSq6ZKXzxViElK+3D8okdJW4tWaU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XmwXSoztVYi0JmtDTF/XDCIcWyHqle3fQy8GbLdpa7GwP7KTGVNBfb3T8L+pqoKdT
-	 Jseo6mKI2e0vaGaMiw01h9ZdhNcgpKbB+2yFWnBnMlZ9mgujkMCkgSVrggkSTMZGrQ
-	 ZpHTMWWa607c+IJAEvbirha6JAHVkIiSf10SoJ77c60Nw/AUFI8MkXdDKZ5Epx4uLJ
-	 +ng7sEf14h+pQUidmmgiVXyql3Nqi1xKaPOSqIwRjpWnR7MUA0RwSG2BPMtlmGLeD/
-	 sYZlKWzHE78JsgTUbxsz5yYPlOhD38S6iZlh480kqGJ8XKNBrw4DWHJlH2KDeQ/Sre
-	 Tksnt5laoe59g==
-Date: Wed, 13 May 2026 00:34:06 -0700
+	b=JcmzwXJoOLz0s9/QXfUAL87bTvpMBs+SpVCsKRsXEsJPMUgjJ+74KkiMp315a4v4u
+	 N8HSvEa/jlN8MMNHG4YgW4hGjEC2CZykvVEBTh7PSfzwLybzsJYdPrBbit2g2e3j1Q
+	 Q1Y4a8+8LZKppLGWhI6TAf/e3SPIhpFcY7ZxdhsBv3tcSPVKb6orlxt8Gn83IuftPd
+	 XJIXUnazS71GUEOT0jtvA+IpCEG5zwk8AIqSxYjla909ZkQ3RJRhFTSah/HHutKGfy
+	 Fr/OPxJvx76L5Lic6jk1UoSQThATSTwac24yXFynsEF2/00LZyrw5sg8b/9t13lIec
+	 URFGDSi9SzN4A==
+Date: Wed, 13 May 2026 00:45:55 -0700
 From: Oliver Upton <oupton@kernel.org>
 To: Colton Lewis <coltonlewis@google.com>
 Cc: kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -45,10 +45,11 @@ Cc: kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v7 07/20] KVM: arm64: Set up FGT for Partitioned PMU
-Message-ID: <agQpbiD8Fi6fzomf@kernel.org>
+Subject: Re: [PATCH v7 08/20] KVM: arm64: Add Partitioned PMU register trap
+ handlers
+Message-ID: <agQsM7XFsbxbFRLO@kernel.org>
 References: <20260504211813.1804997-1-coltonlewis@google.com>
- <20260504211813.1804997-8-coltonlewis@google.com>
+ <20260504211813.1804997-9-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,90 +58,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260504211813.1804997-8-coltonlewis@google.com>
+In-Reply-To: <20260504211813.1804997-9-coltonlewis@google.com>
 
-On Mon, May 04, 2026 at 09:18:00PM +0000, Colton Lewis wrote:
-> +static void __compute_hdfgrtr(struct kvm_vcpu *vcpu)
-> +{
-> +	__compute_fgt(vcpu, HDFGRTR_EL2);
-> +
-> +	*vcpu_fgt(vcpu, HDFGRTR_EL2) |=
-> +		HDFGRTR_EL2_PMOVS
-> +		| HDFGRTR_EL2_PMCCFILTR_EL0
-> +		| HDFGRTR_EL2_PMEVTYPERn_EL0
-> +		| HDFGRTR_EL2_PMCEIDn_EL0
-> +		| HDFGRTR_EL2_PMMIR_EL1;
-> +}
-> +
+On Mon, May 04, 2026 at 09:18:01PM +0000, Colton Lewis wrote:
+> We may want a partitioned PMU but not have FEAT_FGT to untrap the
+> specific registers that would normally be untrapped. Add handling for
+> those trapped register accesses that does the right thing if the PMU
+> is partitioned.
+> 
+> For registers that shouldn't be written to hardware because they
+> require special handling (PMEVTYPER and PMOVS), write to the virtual
+> register. A later patch will ensure these are handled correctly at
+> vcpu_load time.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-I've given this feedback at least twice already...
+I'd prefer an approach that provides a single accessor helper that takes
+a vcpu_sysreg enum as an argument and internally handles the dispatch
+between partitioned and emulated PMUs. That goes for all of the PMU
+sysregs.
 
-Operators go on the preceding line in the case of line continuations.
+This will help you reuse some of the PMU emuation code that you'll still
+need for things like nested...
 
-> +
-> +/**
-> + * kvm_pmu_is_partitioned() - Determine if given PMU is partitioned
-> + * @pmu: Pointer to arm_pmu struct
-> + *
-> + * Determine if given PMU is partitioned by looking at hpmn field. The
-> + * PMU is partitioned if this field is less than the number of
-> + * counters in the system.
-> + *
-> + * Return: True if the PMU is partitioned, false otherwise
-> + */
-> +bool kvm_pmu_is_partitioned(struct arm_pmu *pmu)
-> +{
-> +	if (!pmu)
-> +		return false;
-> +
-> +	return pmu->max_guest_counters >= 0 &&
-> +		pmu->max_guest_counters <= *host_data_ptr(nr_event_counters);
-> +}
-> +
-> +/**
-> + * kvm_vcpu_pmu_is_partitioned() - Determine if given VCPU has a partitioned PMU
-> + * @vcpu: Pointer to kvm_vcpu struct
-> + *
-> + * Determine if given VCPU has a partitioned PMU by extracting that
-> + * field and passing it to :c:func:`kvm_pmu_is_partitioned`
-> + *
-> + * Return: True if the VCPU PMU is partitioned, false otherwise
-> + */
-> +bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_pmu_is_partitioned(vcpu->kvm->arch.arm_pmu) &&
-> +		false;
-> +}
-
-Ok, I'm thoroughly confused about these predicates.
-
-Whether or not a vCPU is using a partitioned PMU is a per-VM property.
-This is separate from whether or not the backing arm_pmu has a range of
-available counters for the guest to use.
-
-It is entirely possible that a VM *isn't* using the partitioned PMU
-feature (i.e. backed with perf events) yet the supporting arm_pmu has a
-guest counter range.
-
- 
-> +#if !defined(__KVM_NVHE_HYPERVISOR__)
-> +bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu);
-> +bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu);
-> +#else
-> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
-
-Don't use ifdeffery for this. Aim to have a single definition and rely
-on has_vhe() to do the rest of the work.
- 
 Thanks,
 Oliver
