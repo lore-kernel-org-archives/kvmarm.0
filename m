@@ -1,185 +1,187 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BC43A383B;
-	Thu, 14 May 2026 09:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B77D3AE193
+	for <kvmarm@lists.linux.dev>; Thu, 14 May 2026 12:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778751224; cv=none; b=Xkw1ZkmHa4aOJULaGnWR/gZ9IA7yMBjh61T3PtJwfuH3wFyqu6a1X0DuEoQhCVeuUDkXfkg79vm4v470HyfzvSNstIvv5Pu33kzH06N/5JKNTmkEei4CyajXwsjDHNcZ6/i16uUHHifm8AEc6xoEkqjrSfCODp8GgCGlgOA0pKo=
+	t=1778762570; cv=none; b=U7IaQ9bSvs1xp1ue2VB0NJaawys0FdOi5iv2dDNzgyfVwwLN0EDz2C3FYQPXUZBHHl6fP21QUmZNnHa/xZL2UxlPcw+YJyO2hdvWZLYMMZv4ElGiAgp9xqm4aX074YYSXIpLFjsYmdasc5qJoDuTFnIIZmJ0uZVFrfmM9LF4LDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778751224; c=relaxed/simple;
-	bh=15IYn3iLfZXckiqY4v2WG/U+nBEKAauifaebzvl2v8U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aKIvAjDPlg5CCjSaV43EK4WkFVkvbtfU2jlO0F1T6c/GqqYb2Tnj26Oqh29gCCD6eDkaravqeQfxQOoQc5/wDI4YmsmEkhcYQTHvhtjpIAxg+LLWVlFsR+djMFpsyulp/Oewhj66mvtJ1G1cb6chbYTUgwRMsAAY3/+dVtTINuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TrJFW2FE; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1778762570; c=relaxed/simple;
+	bh=CSZGuhEMgcVv+yjLSc1VRGD3BlRDfXMIcohRaOGnXhU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTjrF8vF5VYdLtupXiyOJohTqDZnnr8TBtJRz56IKX5Mc7PUfS5Zje5jl3dshQbMZc9ovXEbkvl74kPNdtpGRCZhvv4zKplDj2dTMTL6ZCvrtAb2MjEMelpc7r5VzqVv/LmSOf/Bb2yVlu+YrkaiAYdJqTiUDOcOJzZ+5WYVKwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YLD8FxWG; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TrJFW2FE"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YLD8FxWG"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A7C03502;
-	Thu, 14 May 2026 02:33:37 -0700 (PDT)
-Received: from [10.1.37.28] (e122027.cambridge.arm.com [10.1.37.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C0D2F3F85F;
-	Thu, 14 May 2026 02:33:37 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78EB8244B;
+	Thu, 14 May 2026 05:42:42 -0700 (PDT)
+Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A1A283F7B4;
+	Thu, 14 May 2026 05:42:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778751222; bh=15IYn3iLfZXckiqY4v2WG/U+nBEKAauifaebzvl2v8U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TrJFW2FE7DK1dKESIWBDe4IoPEqOi52Xs5k+YIeEW8bac5xeRkCBiGICFhWFFd8uv
-	 vCK4kCAoGx/O73KOo79kmau7br4yf19Ge4m7WFcUWYEVgAwX6liLi0xrV3L5aDHlrk
-	 MQ8oFeuLm/txVMFOmUezID+d4euoxwT3zcB89z54=
-Message-ID: <cc21ea56-827f-4077-b6f7-3ef00c0b9408@arm.com>
-Date: Thu, 14 May 2026 10:33:35 +0100
+	t=1778762567; bh=CSZGuhEMgcVv+yjLSc1VRGD3BlRDfXMIcohRaOGnXhU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YLD8FxWG6lmZaF+56qA4ExHRj6gmec4W4Jy6zLkG6oqEGkL02iZdRMKmMRRZjCR0U
+	 xVNyfG7Hlzpevqw0I2XS7WY265pckgOkpMzxKPGXjvD5U9THwi517swXo7gmN3Lc01
+	 lO/Kf4a3JDrJykgmj9Ar3XiURm1HGddmuTvrsPkk=
+Date: Thu, 14 May 2026 13:42:42 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: David Safford <david.safford@gmail.com>,
+	Jonathan McDowell <noodles@earth.li>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, jarkko@kernel.org, jgg@ziepe.ca,
+	sudeep.holla@kernel.org, maz@kernel.org, oupton@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, noodles@meta.com,
+	sebastianene@google.com
+Subject: Re: [PATCH] ima: debugging late_initcall_sync measurements
+Message-ID: <agXDQhREKIpN7mKX@e129823.arm.com>
+References: <aftIuPwNeuzc9nY1@e129823.arm.com>
+ <9d1af933ef218b159762884357d127e3644dfe2c.camel@linux.ibm.com>
+ <afwoDgaJxmKwOhXp@e129823.arm.com>
+ <f19081f1eda19d6d1ae133d8ec93e779ab1a25e5.camel@linux.ibm.com>
+ <afyIbW5cljh5ZvTL@e129823.arm.com>
+ <afzwJn+5r15jFxrB@e129823.arm.com>
+ <77ad49cca1acf707f4152ed3e2066b2f24c90c16.camel@linux.ibm.com>
+ <af2nhZyyNaP7LM3w@e129823.arm.com>
+ <2b3782398cc17ce9d355490a0c42ebce9120a9ae.camel@linux.ibm.com>
+ <af3oFfdSMUglZVHa@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 10/44] arm64: RMI: Add support for SRO
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-11-steven.price@arm.com> <yq5a8q9ma08r.fsf@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <yq5a8q9ma08r.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af3oFfdSMUglZVHa@e129823.arm.com>
 
-On 14/05/2026 09:01, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
+Hi Mimi,
+> > On Fri, 2026-05-08 at 10:06 +0100, Yeoreum Yun wrote:
+> > 
+> > > > The kernel selftests caused the measurements between late_initcall and
+> > > > late_initcall_sync.  After disabling all of the kernel selftests, there weren't
+> > > > any measurements. Re-enabling the FIPS selftests on PowerVM LPAR resulted in
+> > > > measurements.  (I didn't try re-enabling any of the other selftests.)
+> > > > 
+> > > > CONFIG_FIPS_SIGNATURE_SELFTEST=y
+> > > > CONFIG_FIPS_SIGNATURE_SELFTEST_RSA=y
+> > > > CONFIG_FIPS_SIGNATURE_SELFTEST_ECDSA=y
+> > > 
+> > > Thanks for shraring this ;)
+> > > 
+> > > I found the reason for those mesaurements. Those come from the
+> > > request_module() and usermode-thread generates them while handling module
+> > > loading request for crypto-x962(ecdsa-nist-p256).
+> > > Since it's not a real kernel module,
+> > > I confirmed file measurements between late_initcall and
+> > > late_initcall_sync are gone for modeprobe with below change:
+> > > 
+> > > @@ -1246,9 +1250,14 @@ EXPORT_SYMBOL_GPL(ima_measure_critical_data);
+> > >   */
+> > >  static int ima_kernel_module_request(char *kmod_name)
+> > >  {
+> > >         if (strncmp(kmod_name, "crypto-pkcs1(rsa,", 17) == 0)
+> > >                 return -EINVAL;
+> > > 
+> > > +       if (IS_BUILTIN(CONFIG_CRYPTO_ECDSA) &&
+> > > +           (strncmp(kmod_name, "crypto-x962(ecdsa", 17) == 0))
+> > > +               return -EINVAL;
+> > > +
+> > >         return 0;
+> > >  }
+> > > 
+> > >  Though this is the only request_module() call between
+> > >  late_initcall and late_initcall_sync, but I also confirmed there're
+> > >  request_modules() call before ima initalisation before "late_initcall":
+> > > 
+> > > /*
+> > >  * NOTE: kmod_name is printed on ima_kernel_module_request()
+> > >  */
+> > > 
+> > > // This is called from module_init(stm_core_init) -> device_initcall()
+> > > // which is in driver/hwtracing/stm/core.c (built-in)
+> > > [    1.421986] ima: kmod_name: stm_p_basic
+> > > ...
+> > > [    1.444900] ima: kmod_name: crypto-pkcs1(rsa,sha512)
+> > > [    1.444903] ima: kmod_name: crypto-pkcs1(rsa,sha512)-all
+> > > ...
+> > > [    1.452029] ima: kmod_name: crypto-cbc(aes)
+> > > [    1.465321] ima: kmod_name: crypto-cbc(aes)-all
+> > > ...
+> > > [    1.467845] Key type encrypted registered
+> > > [    1.467848] AppArmor: AppArmor sha256 policy hashing enabled
+> > > 
+> > >  // IMA is initailised at late_initcall level.
+> > > [    1.467850] ima: [init_ima_late:1336]
+> > > 
+> > > If IMA should care request_module() from kernel before IMA init,
+> > > I think there is no way to solve except queuing those events
+> > > (kernel_load_data/kernel_load_post_data and open for module binary etc.)
+> > > though it breaks "measure before use" principle since IMA couldn't
+> > > measure at that time.
+> > > 
+> > > But if you don't care about those things -- some events happend before
+> > > IMA init, I think your suggestion -- controlling the init time of ima_init()
+> > > via a Kconfig option is good and ignoring some usermodehelper request
+> > > including request_module() before IMA initialisation upto user by that option.
+> > 
+> > Thank you for the complete analysis.  The early measurements before the TPM is
+> > initialized is a problem that needs to be addressed.  As to whether the solution
+> > will require queueing is yet to be determined. (Roberto has some thoughts on
+> > addressing it.) This discussion makes it clear that simply delaying IMA
+> > initialization by moving it from late_initcall to late_initcall_sync could miss
+> > measurements.  That said, exposing it as an opt-in Kconfig for those who accept
+> > the risk is a sensible pragmatic compromise.
 > 
->> +unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp)
->> +{
->> +	unsigned long sro_handle;
->> +	struct arm_smccc_1_2_regs regs;
->> +	struct arm_smccc_1_2_regs *regs_in = &sro->regs;
->> +
->> +	rmi_smccc_invoke(regs_in, &regs);
->> +
->> +	sro_handle = regs.a1;
->> +
->> +	while (RMI_RETURN_STATUS(regs.a0) == RMI_INCOMPLETE) {
->> +		bool can_cancel = RMI_RETURN_CAN_CANCEL(regs.a0);
->> +		int ret;
->> +
->> +		switch (RMI_RETURN_MEMREQ(regs.a0)) {
->> +		case RMI_OP_MEM_REQ_NONE:
->> +			regs = (struct arm_smccc_1_2_regs){
->> +				SMC_RMI_OP_CONTINUE, sro_handle, 0
->> +			};
->> +			rmi_smccc_invoke(&regs, &regs);
->> +			break;
->> +		case RMI_OP_MEM_REQ_DONATE:
->> +			ret = rmi_sro_donate(sro, sro_handle, regs.a2, &regs,
->> +					     gfp);
->> +			break;
->> +		case RMI_OP_MEM_REQ_RECLAIM:
->> +			ret = rmi_sro_reclaim(sro, sro_handle, &regs);
->> +			break;
->> +		default:
->> +			ret = WARN_ON(1);
->> +			break;
->> +		}
->> +
->> +		if (ret) {
->> +			if (can_cancel) {
->> +				/*
->> +				 * FIXME: Handle cancelling properly!
->> +				 *
->> +				 * If the operation has failed due to memory
->> +				 * allocation failure then the information on
->> +				 * the memory allocation should be saved, so
->> +				 * that the allocation can be repeated outside
->> +				 * of any context which prevented the
->> +				 * allocation.
->> +				 */
->> +			}
->> +			if (WARN_ON(ret))
->> +				return ret;
->> +		}
->> +	}
->> +
->> +	return regs.a0;
->> +}
+> I think once we address ealry measurements before intialising TPM,
+> It doesn't matter when IMA is initialissed since they're considered as
+> ealry measurements anyway.
 > 
-> Can you also add support to return x1,x2 etc
+> BTW, I'm not sure whether we should take pragmatic compromise first to
+> support deferred TPM initialisation or solving it together via solution
+> of ealry measurements (whatever it is) in now.
 
-Indeed that's going to be needed. Looking at this function again I don't 
-think we actually need the on-stack 'regs' any more. So the below (very 
-lightly tested) diff would use the regs from sro which also means they 
-will be there for the caller if it needs them.
+I wonder what's going on for discussion to resolve these problem:
+  1) measurement event (via file operation)  before IMA initialisation.
+  2) deferred TPM device initailisation and IMA.
 
-Thanks,
-Steve
+Might someone could think it wouldn't be a problem since initrd is
+measuared in PCR9 by boot loader (e.x) grub, but it still has a problem
+for the case uses root= boot option where it doesn't use initrd
+but use specified block dev with a filesystem.
 
----8<---
-diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
-index a8107ca9bb6d..58a0216be409 100644
---- a/arch/arm64/kernel/rmi.c
-+++ b/arch/arm64/kernel/rmi.c
-@@ -356,30 +356,29 @@ void rmi_sro_free(struct rmi_sro_state *sro)
- unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp)
- {
- 	unsigned long sro_handle;
--	struct arm_smccc_1_2_regs regs;
--	struct arm_smccc_1_2_regs *regs_in = &sro->regs;
-+	struct arm_smccc_1_2_regs *regs = &sro->regs;
- 
--	rmi_smccc_invoke(regs_in, &regs);
-+	rmi_smccc_invoke(regs, regs);
- 
--	sro_handle = regs.a1;
-+	sro_handle = regs->a1;
- 
--	while (RMI_RETURN_STATUS(regs.a0) == RMI_INCOMPLETE) {
--		bool can_cancel = RMI_RETURN_CAN_CANCEL(regs.a0);
-+	while (RMI_RETURN_STATUS(regs->a0) == RMI_INCOMPLETE) {
-+		bool can_cancel = RMI_RETURN_CAN_CANCEL(regs->a0);
- 		int ret;
- 
--		switch (RMI_RETURN_MEMREQ(regs.a0)) {
-+		switch (RMI_RETURN_MEMREQ(regs->a0)) {
- 		case RMI_OP_MEM_REQ_NONE:
--			regs = (struct arm_smccc_1_2_regs){
-+			*regs = (struct arm_smccc_1_2_regs){
- 				SMC_RMI_OP_CONTINUE, sro_handle, 0
- 			};
--			rmi_smccc_invoke(&regs, &regs);
-+			rmi_smccc_invoke(regs, regs);
- 			break;
- 		case RMI_OP_MEM_REQ_DONATE:
--			ret = rmi_sro_donate(sro, sro_handle, regs.a2, &regs,
-+			ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
- 					     gfp);
- 			break;
- 		case RMI_OP_MEM_REQ_RECLAIM:
--			ret = rmi_sro_reclaim(sro, sro_handle, &regs);
-+			ret = rmi_sro_reclaim(sro, sro_handle, regs);
- 			break;
- 		default:
- 			ret = WARN_ON(1);
-@@ -404,7 +403,7 @@ unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp)
- 		}
- 	}
- 
--	return regs.a0;
-+	return regs->a0;
- }
- 
- static int rmi_check_version(void)
+I think soluation would be determined whether IMA neglects the
+measurement event before its initialisation or not in current state:
 
+  a) Case for neglecting measurement event before IMA initailisation.
+
+    In this case, As you suggeested, IMA initialisation should be
+    determined by build config whether it initialises at late_initcall
+    or late_initcall_sync so that make user can choice upto their
+    platform.
+
+  b) Case for considering measurement event event before IMA
+     initialisation.
+
+    I couldn't image any other solution except queuing those event
+    and extend them after generating boot_aggregate log and if those
+    event can be queued, it wouldn't a problem to move IMA initialisation
+    to late_initcall_sync.
+
+But you mention there are some thoughts from Roberto, might there was
+some discussion with him. If you don't mind, would you let me know
+how the discussion is going on and your thought to fix this all?
+
+Thanks!
+
+-- 
+Sincerely,
+Yeoreum Yun
