@@ -1,196 +1,543 @@
-Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa9.hc1455-7.c3s2.iphmx.com (esa9.hc1455-7.c3s2.iphmx.com [139.138.36.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6081939FCB9
-	for <kvmarm@lists.linux.dev>; Thu, 14 May 2026 19:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9184B237180
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 01:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778785551; cv=none; b=Ebc15+88qXumogXVk/TMEmS2ihIJ0ZjzF3shwc91vyEPMnIAYuMogOe6w04ImQoFCIay92E0dmCaNjs6J16jTkkMEdbGIS85fGz1NN9dncCEpks/9gVrhpx8g0F6d0ivW+HVbrQ4uVkJ4YFfoAdnjJKKFFWSoSt0VWeUpNl4XvY=
+	t=1778809772; cv=none; b=Y7xhJVx8NlglIgzgDNu+JM3cuv4dyuaKOMvqsaRMEs9l+kPflle79tXHfBphkT1Zciw11nZv1J/27fQcFsvPxA/3tbHaU2ZmtwVbITy/5nAaXDhi3cHdqUe4UNm69Szsd+sNlPAy54dMWd5z+qHwBaI1z7n9BKxYjJkP+Jhw/IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778785551; c=relaxed/simple;
-	bh=sQcHMqWClhWoLs/AGdSMEcZmnhEkmnp9dBbRrLle6qk=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=pwzPmRTmCYRktm+5pcKtUbHPEPfQsOkstqnynxvzG6IuECfJ1M+BEnUvvW7tolqARGOCnjQexCxZShr1FooYw25v7TTz29a12CF9Mp2VlQ7GDCxrOC9Xhv1AMj587hPc8SFpuEEK89LOynvy+TKvRWM0h26mREMfebbXQ5W6DPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WXC/8hqh; arc=none smtp.client-ip=209.85.160.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1778809772; c=relaxed/simple;
+	bh=j0dgi6mqkVZNV7ocMNHlFqrMjp1EX9ypNbxVmKH1VvM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YvMXI+29g7s2htbPONTEYKA8n/eBrNn9FhkVAo5Vrep+KBMO3BpBmNvp9cBPeEHjZPzAP2qtI/IWUNzH43PLXqZPTnig7bti8p3eFwBiIlMTx/aB91ZQsKeEsgBqr++UhmEng5qyuI9bqs6+0OKaiXS5GbOVAa2wy0L7RTWGv8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=oPv3Ea5h; arc=none smtp.client-ip=139.138.36.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WXC/8hqh"
-Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-4398773e510so5244200fac.3
-        for <kvmarm@lists.linux.dev>; Thu, 14 May 2026 12:05:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778785548; x=1779390348; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sQcHMqWClhWoLs/AGdSMEcZmnhEkmnp9dBbRrLle6qk=;
-        b=WXC/8hqh9++5CRn02m+XXcV82H+g68pN0vXx/S1J7tix2/+ojlf4iOCzZyrnhtmztX
-         0hxyZNXbat1Eehu6Kl6pnaDWtUKFKbDrWPLygd7y7RYNBMw7fjiPSZfuVL3Q2OO8wqbr
-         tCFWAKMZrPRzN7kBkW7KEes9cArEx1Z+LPACKnSTWoCLUwPt9RWK5/gXP5FhEySUfHMM
-         Fd926DrCsd1gUW7Z8ecV/8ZAJ22ntCk8+wvOpdXTiszd/XZt0YfCXCH8rA0fu/1SoI+5
-         G7MArPZ8z8VWvPTJn6O0+V9KhNc+5mHJ3h4IoOHfFWcagQgZ9bxOzCXRSuj4ovW6gGAw
-         /Ldw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778785548; x=1779390348;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sQcHMqWClhWoLs/AGdSMEcZmnhEkmnp9dBbRrLle6qk=;
-        b=aHjJM5FMIlnmJK8hmzyl2mBS+AZ5axTcsjKWYjvw/mJvgWhoWsKDT6JpchwvdPlYNv
-         uQPLDGxYe9WQqz4nRHaM+jNmW1CIzq7Le9C1Bi3FQcKcHP6sD3l8GCyoh9XjrFVvX2Fa
-         kYiQxlt9IUmUWZgl+K60+CLh8ZeuGDBaqQDVSNY4lb/FNH2r0dg/W3PFAHedhPEHICv/
-         wwwtdipI7boJGRPsu+wvcy3JY9+5Ll0dxvPdHH4xKaGhZGCCZz+e2ZSSvFw+ijJvIiH3
-         9j09vDvls2O9QVHTQkqvSYkQrMFxmtigtCoRIB7w7tioSvYRvy8DMzfWG3PGOWaRio/1
-         18Rg==
-X-Forwarded-Encrypted: i=1; AFNElJ8DqWL4mCE4F68+LnQKrkAAh/7hRkJvCYgDnCX6VPccPWr/oGIT+rIFVJ62Uf/UYht1yst3QOk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywz9gNkGDwLIcmwY4zzcatT8MYEu1n5UyvzOcRMyluduwA0KKja
-	3yYXSBxvYaUOK48ossj9/puadRQ4cWmnAtyZhMa1W5afoKjVLHvrLJiAQTQWYOAxptyCKytjVqA
-	qXOLXArJk3DZaQyWtDOOBimm2zw==
-X-Received: from iohl17.prod.google.com ([2002:a6b:7511:0:b0:96b:8e45:e183])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:f023:b0:696:77e2:a78 with SMTP id 006d021491bc7-69c94301c1emr515355eaf.23.1778785547975;
- Thu, 14 May 2026 12:05:47 -0700 (PDT)
-Date: Thu, 14 May 2026 19:05:47 +0000
-In-Reply-To: <66797cb2-18f7-4782-9370-68d0c10c35f4@linaro.org> (message from
- James Clark on Thu, 14 May 2026 10:10:02 +0100)
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="oPv3Ea5h"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1778809770; x=1810345770;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=j0dgi6mqkVZNV7ocMNHlFqrMjp1EX9ypNbxVmKH1VvM=;
+  b=oPv3Ea5hhOzRZC5IL61TSnxl1JUmZC1bfAl4lh1ZvDbgeAlYCkt86oF/
+   BokGJftLblykHEkHgkeKAlnsulxEZg+PmbeOiLDz3hvClGinFoBTha90u
+   se35wCK3yqY9D8AndBmqT+d6IYZQjYnyAJCQmMw1xyf3zj2e3rp5L1Blo
+   Tao1vGN7m4piKpaRXNT/YrmCKat1nuh+mC6w7Wh6bx0zMGb+QQKB6b/pU
+   TOLLGNT7ukeSUZVDIFw4csoiw9IBlPYxtMC1JQDt8cAx495a9pIWg4U5L
+   9h2nj+VPwQ9B0zcACAGOqlCobGmx+te3T/Pv6xEJeWRRRi1k4F1RKaSqX
+   A==;
+X-CSE-ConnectionGUID: bWLGk9etSNafa5L3h2E+uA==
+X-CSE-MsgGUID: kAavQ1B4SAO7pojDWcEoiA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11786"; a="227970617"
+X-IronPort-AV: E=Sophos;i="6.23,235,1770562800"; 
+   d="scan'208";a="227970617"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa9.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2026 10:48:19 +0900
+Received: from az2uksmgm3.o.css.fujitsu.com (unknown [10.151.22.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id A512F1C01690
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 01:48:19 +0000 (UTC)
+Received: from az2nlsmom1.o.css.fujitsu.com (az2nlsmom1.o.css.fujitsu.com [10.150.26.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm3.o.css.fujitsu.com (Postfix) with ESMTPS id 58A06C07360
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 01:48:19 +0000 (UTC)
+Received: from [127.0.1.1] (sm-x86-stp01.soft.fujitsu.com [10.124.178.20])
+	by az2nlsmom1.o.css.fujitsu.com (Postfix) with ESMTP id E611082DDC6;
+	Fri, 15 May 2026 01:48:13 +0000 (UTC)
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Date: Fri, 15 May 2026 10:48:05 +0900
+Subject: [PATCH] Enable stage 2 translation in L2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntlddlbylw.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v7 13/20] KVM: arm64: Apply dynamic guest counter reservations
-From: Colton Lewis <coltonlewis@google.com>
-To: James Clark <james.clark@linaro.org>
-Cc: alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260515-enable-s2-hello_nested-v1-1-41f3faca1a08@fujitsu.com>
+X-B4-Tracking: v=1; b=H4sIAFR7BmoC/x3MQQqDMBBG4avIrDsQI2rrVUqRRH91IETJFBHEu
+ xtcfov3TlIkgVJXnJSwi8oaM8pXQcPi4gyWMZussY2py5oRnQ9gtbwghLWP0D9G9lVjnMXH+3d
+ LOd4SJjme8fd3XTf65LLxaAAAAA==
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>
+X-Mailer: b4 0.13.0
 
-SmFtZXMgQ2xhcmsgPGphbWVzLmNsYXJrQGxpbmFyby5vcmc+IHdyaXRlczoNCg0KPiBPbiAxMy8w
-NS8yMDI2IDU6NDUgcG0sIENvbHRvbiBMZXdpcyB3cm90ZToNCj4+IEphbWVzIENsYXJrIDxqYW1l
-cy5jbGFya0BsaW5hcm8ub3JnPiB3cml0ZXM6DQoNCj4+PiBPbiAwNC8wNS8yMDI2IDEwOjE4IHBt
-LCBDb2x0b24gTGV3aXMgd3JvdGU6DQo+Pj4+IEFwcGx5IGR5bmFtaWMgZ3Vlc3QgY291bnRlciBy
-ZXNlcnZhdGlvbnMgYnkgY2hlY2tpbmcgaWYgdGhlIHJlcXVlc3RlZA0KPj4+PiBndWVzdCBtYXNr
-IGNvbGxpZGVzIHdpdGggYW55IGV2ZW50cyB0aGUgaG9zdCBoYXMgc2NoZWR1bGVkIGFuZCBjYWxs
-aW5nDQo+Pj4+IHBtdV9wZXJmX3Jlc2NoZWRfdXBkYXRlKCkgd2l0aCBhIGhvb2sgdGhhdCB1cGRh
-dGVzIHRoZSBtYXNrIG9mDQo+Pj4+IGF2YWlsYWJsZSBjb3VudGVycyBpbiBiZXR3ZWVuIHNjaGVk
-dWxlIG91dCBhbmQgc2NoZWR1bGUgaW4uDQoNCj4+Pj4gU2lnbmVkLW9mZi1ieTogQ29sdG9uIExl
-d2lzIDxjb2x0b25sZXdpc0Bnb29nbGUuY29tPg0KPj4+PiAtLS0NCj4+Pj4gwqDCoCBhcmNoL2Fy
-bTY0L2t2bS9wbXUtZGlyZWN0LmPCoCB8IDY5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrDQo+Pj4+ICsrKysNCj4+Pj4gwqDCoCBpbmNsdWRlL2xpbnV4L3BlcmYvYXJtX3BtdS5oIHzC
-oCAxICsNCj4+Pj4gwqDCoCAyIGZpbGVzIGNoYW5nZWQsIDcwIGluc2VydGlvbnMoKykNCg0KPj4+
-PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vcG11LWRpcmVjdC5jIGIvYXJjaC9hcm02NC9r
-dm0vcG11LWRpcmVjdC5jDQo+Pj4+IGluZGV4IDIyNTJkM2I5MDVkYjkuLjE0Y2M0MTlkYmFmYWQg
-MTAwNjQ0DQo+Pj4+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL3BtdS1kaXJlY3QuYw0KPj4+PiArKysg
-Yi9hcmNoL2FybTY0L2t2bS9wbXUtZGlyZWN0LmMNCj4+Pj4gQEAgLTEwMCw2ICsxMDAsNzMgQEAg
-dTgga3ZtX3BtdV9ocG1uKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4+Pj4gwqDCoMKgwqDCoMKg
-IHJldHVybiAqaG9zdF9kYXRhX3B0cihucl9ldmVudF9jb3VudGVycyk7DQo+Pj4+IMKgwqAgfQ0K
-DQo+Pj4+ICsvKiBDYWxsYmFjayB0byB1cGRhdGUgY291bnRlciBtYXNrIGJldHdlZW4gcGVyZiBz
-Y2hlZHVsaW5nICovDQo+Pj4+ICtzdGF0aWMgdm9pZCBrdm1fcG11X3VwZGF0ZV9tYXNrKHN0cnVj
-dCBwbXUgKnBtdSwgdm9pZCAqZGF0YSkNCj4+Pj4gK3sNCj4+Pj4gK8KgwqDCoCBzdHJ1Y3QgYXJt
-X3BtdSAqYXJtX3BtdSA9IHRvX2FybV9wbXUocG11KTsNCj4+Pj4gK8KgwqDCoCB1bnNpZ25lZCBs
-b25nICpuZXdfbWFzayA9IGRhdGE7DQo+Pj4+ICsNCj4+Pj4gK8KgwqDCoCBiaXRtYXBfY29weShh
-cm1fcG11LT5jbnRyX21hc2ssIG5ld19tYXNrLCBBUk1QTVVfTUFYX0hXRVZFTlRTKTsNCj4+Pj4g
-K30NCj4+Pj4gKw0KPj4+PiArLyoqDQo+Pj4+ICsgKiBrdm1fcG11X3NldF9ndWVzdF9jb3VudGVy
-cygpIC0gSGFuZGxlIGR5bmFtaWMgY291bnRlciByZXNlcnZhdGlvbnMNCj4+Pj4gKyAqIEBjcHVf
-cG11OiBzdHJ1Y3QgYXJtX3BtdSB0byBwb3RlbnRpYWxseSBtb2RpZnkNCj4+Pj4gKyAqIEBndWVz
-dF9tYXNrOiBuZXcgZ3Vlc3QgbWFzayBmb3IgdGhlIHBtdQ0KPj4+PiArICoNCj4+Pj4gKyAqIENo
-ZWNrIGlmIGd1ZXN0IGNvdW50ZXJzIHdpbGwgaW50ZXJmZXJlIHdpdGggY3VycmVudCBob3N0IGV2
-ZW50cyBhbmQNCj4+Pj4gKyAqIGNhbGwgaW50byBwZXJmX3BtdV9yZXNjaGVkX3VwZGF0ZSBpZiBh
-IHJlc2NoZWR1bGUgaXMgcmVxdWlyZWQuDQo+Pj4+ICsgKi8NCj4+Pj4gK3N0YXRpYyB2b2lkIGt2
-bV9wbXVfc2V0X2d1ZXN0X2NvdW50ZXJzKHN0cnVjdCBhcm1fcG11ICpjcHVfcG11LCB1NjQNCj4+
-Pj4gZ3Vlc3RfbWFzaykNCj4+Pj4gK3sNCj4+Pj4gK8KgwqDCoCBzdHJ1Y3QgcG11X2h3X2V2ZW50
-cyAqY3B1YyA9IHRoaXNfY3B1X3B0cihjcHVfcG11LT5od19ldmVudHMpOw0KPj4+PiArwqDCoMKg
-IERFQ0xBUkVfQklUTUFQKGd1ZXN0X2JpdG1hcCwgQVJNUE1VX01BWF9IV0VWRU5UUyk7DQo+Pj4+
-ICvCoMKgwqAgREVDTEFSRV9CSVRNQVAobmV3X21hc2ssIEFSTVBNVV9NQVhfSFdFVkVOVFMpOw0K
-Pj4+PiArwqDCoMKgIGJvb2wgbmVlZF9yZXNjaGVkID0gZmFsc2U7DQo+Pj4+ICsNCj4+Pj4gK8Kg
-wqDCoCBiaXRtYXBfZnJvbV9hcnI2NChndWVzdF9iaXRtYXAsICZndWVzdF9tYXNrLCBBUk1QTVVf
-TUFYX0hXRVZFTlRTKTsNCj4+Pj4gK8KgwqDCoCBiaXRtYXBfY29weShuZXdfbWFzaywgY3B1X3Bt
-dS0+aHdfY250cl9tYXNrLCBBUk1QTVVfTUFYX0hXRVZFTlRTKTsNCj4+Pj4gKw0KPj4+PiArwqDC
-oMKgIGlmIChndWVzdF9tYXNrKSB7DQo+Pj4+ICvCoMKgwqDCoMKgwqDCoCAvKiBTdWJ0cmFjdCBn
-dWVzdCBjb3VudGVycyBmcm9tIGF2YWlsYWJsZSBob3N0IG1hc2sgKi8NCj4+Pj4gK8KgwqDCoMKg
-wqDCoMKgIGJpdG1hcF9hbmRub3QobmV3X21hc2ssIG5ld19tYXNrLCBndWVzdF9iaXRtYXAsDQo+
-Pj4+IEFSTVBNVV9NQVhfSFdFVkVOVFMpOw0KPj4+PiArDQo+Pj4+ICvCoMKgwqDCoMKgwqDCoCAv
-KiBEaWQgd2UgY29sbGlkZSB3aXRoIGFuIGFjdGl2ZSBob3N0IGV2ZW50PyAqLw0KPj4+PiArwqDC
-oMKgwqDCoMKgwqAgaWYgKGJpdG1hcF9pbnRlcnNlY3RzKGNwdWMtPnVzZWRfbWFzaywgZ3Vlc3Rf
-Yml0bWFwLA0KPj4+PiBBUk1QTVVfTUFYX0hXRVZFTlRTKSkgew0KPj4+PiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBpbnQgaWR4Ow0KPj4+PiArDQo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IG5lZWRfcmVzY2hlZCA9IHRydWU7DQo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdWMt
-Pmhvc3Rfc3F1ZWV6ZWQgPSB0cnVlOw0KPj4+PiArDQo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIC8qIExvb2sgZm9yIHBpbm5lZCBldmVudHMgdGhhdCBhcmUgYWJvdXQgdG8gYmUgcHJlZW1w
-dGVkICANCj4+Pj4gKi8NCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZm9yX2VhY2hfc2V0
-X2JpdChpZHgsIGd1ZXN0X2JpdG1hcCwgQVJNUE1VX01BWF9IV0VWRU5UUykgew0KPj4+PiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmICh0ZXN0X2JpdChpZHgsIGNwdWMtPnVzZWRf
-bWFzaykgJiYgY3B1Yy0NCj4+Pj4gPmV2ZW50c1tpZHhdICYmDQo+Pj4+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjcHVjLT5ldmVudHNbaWR4XS0+YXR0ci5waW5uZWQp
-IHsNCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByX3dhcm5f
-cmF0ZWxpbWl0ZWQoInBlcmY6IFBpbm5lZCBob3N0IGV2ZW50DQo+Pj4+IHNxdWVlemVkIG91dCBi
-eSBLVk0gZ3Vlc3QgUE1VIHBhcnRpdGlvblxuIik7DQoNCj4+PiBIaSBDb2x0b24sDQoNCj4+PiBJ
-IGdldCAicGVyZjogUGlubmVkIGhvc3QgZXZlbnQgc3F1ZWV6ZWQgb3V0IGJ5IEtWTSBndWVzdCBQ
-TVUgcGFydGl0aW9uIg0KPj4+IGV2ZW4gd2l0aCBhcm1fcG11djMucmVzZXJ2ZWRfaG9zdF9jb3Vu
-dGVycz0zIGZvciBleGFtcGxlLiBJIHdvdWxkIGhhdmUNCj4+PiBleHBlY3RlZCBhbnkgbm9uIHpl
-cm8gdmFsdWUgdG8gc3RvcCB0aGUgd2FybmluZy4NCg0KPj4+IEkgdGhpbmsgYXJtdjhwbXVfZ2V0
-X3NpbmdsZV9pZHgoKSBuZWVkcyB0byBiZSBjaGFuZ2VkIHRvIGFsbG9jYXRlIGZyb20NCj4+PiB0
-aGUgaGlnaCBlbmQgaG9zdCBjb3VudGVycyBmaXJzdC4gQSBtb3JlIGNvbXBsaWNhdGVkIG9wdGlv
-biB3b3VsZCBiZQ0KPj4+IGNoZWNraW5nIHRvIHNlZSBpZiB0aGVyZSBhcmUgYW55IG5vbi1waW5u
-ZWQgY291bnRlcnMgaW4gdGhlIGhvc3QNCj4+PiByZXNlcnZlZCBoYWxmIHdoZW4gYSBuZXcgcGlu
-bmVkIGNvdW50ZXIgaXMgb3BlbmVkLCB0aGVuIHN3YXBwaW5nIHRoZQ0KPj4+IHBsYWNlcyBvZiB0
-aGUgbmV3IHBpbm5lZCBhbmQgZXhpc3Rpbmcgbm9uLXBpbm5lZCBjb3VudGVycyBzbyBwaW5uZWQN
-Cj4+PiBhbHdheXMgcHJlZmVyIGJlaW5nIHB1dCBpbnRvIHRoZSBob3N0IGhhbGYuIEJ1dCBpdCdz
-IHByb2JhYmx5IG5vdCB3b3J0aA0KPj4+IGRvaW5nIHRoYXQuDQoNCj4+PiBKYW1lcw0KDQoNCj4+
-IEkgYWdyZWUgaXQgbWFrZXMgdGhlIG1vc3Qgc2Vuc2UgdG8gYWxsb2NhdGUgZnJvbSB0aGUgdG9w
-LCBidXQgSSdtIGhhcHB5DQo+PiB0aGUgYmFzaWMgaWRlYSB3b3Jrcy4NCg0KDQo+IEFub3RoZXIg
-dGhpbmcgSSBmb3Jnb3QgdG8gbWVudGlvbiBpcyB0aGF0IGV2ZW4gd2l0aCB0aGUgcmF0ZWxpbWl0
-ZWQNCj4gd2FybmluZywgdGhpcyBzcGFtcyB0aGUgbG9ncyBhbnkgdGltZSB0aGUgaG9zdCBhbmQg
-Z3Vlc3QgYXJlIGJvdGggdXNpbmcNCj4gdGhlIFBNVSBhbmQgSSdtIG5vdCBzdXJlIGhvdyB1c2Vm
-dWwgdGhhdCBpcy4NCg0KSSdtIHN1cmUgaXQgZG9lcy4gSSdsbCBkZWxldGUgaXQuDQoNCj4+Pj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPj4+PiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgfQ0KPj4+PiArwqDCoMKgwqDCoMKgwqAgfQ0KPj4+PiArwqDCoMKgIH0gZWxzZSB7DQo+Pj4+
-ICvCoMKgwqDCoMKgwqDCoCAvKg0KPj4+PiArwqDCoMKgwqDCoMKgwqDCoCAqIFJlc3RvcmluZyB0
-byBod19jbnRyX21hc2suDQo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogT25seSByZXNjaGVkIGlm
-IHdlIHByZXZpb3VzbHkgc3F1ZWV6ZWQgYW4gZXZlbnQuDQo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKg
-ICovDQo+Pj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAoY3B1Yy0+aG9zdF9zcXVlZXplZCkgew0KPj4+
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBuZWVkX3Jlc2NoZWQgPSB0cnVlOw0KPj4+PiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBjcHVjLT5ob3N0X3NxdWVlemVkID0gZmFsc2U7DQo+Pj4+ICvC
-oMKgwqDCoMKgwqDCoCB9DQo+Pj4+ICvCoMKgwqAgfQ0KPj4+PiArDQo+Pj4+ICvCoMKgwqAgaWYg
-KG5lZWRfcmVzY2hlZCkgew0KPj4+PiArwqDCoMKgwqDCoMKgwqAgLyogQ29sbGlzaW9uOiBydW4g
-ZnVsbCBwZXJmIHJlc2NoZWR1bGUgKi8NCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcmZfcG11X3Jl
-c2NoZWRfdXBkYXRlKCZjcHVfcG11LT5wbXUsIGt2bV9wbXVfdXBkYXRlX21hc2ssDQo+Pj4+IG5l
-d19tYXNrKTsNCj4+Pj4gK8KgwqDCoCB9IGVsc2Ugew0KPj4+PiArwqDCoMKgwqDCoMKgwqAgLyog
-SG9zdCB3YXMgbmV2ZXIgdXNpbmcgZ3Vlc3QgY291bnRlcnMgYW55d2F5ICovDQo+Pj4+ICvCoMKg
-wqDCoMKgwqDCoCBiaXRtYXBfY29weShjcHVfcG11LT5jbnRyX21hc2ssIG5ld19tYXNrLCAgDQo+
-Pj4+IEFSTVBNVV9NQVhfSFdFVkVOVFMpOw0KPj4+PiArwqDCoMKgIH0NCj4+Pj4gK30NCj4+Pj4g
-Kw0KPj4+PiDCoMKgIC8qKg0KPj4+PiDCoMKgwqAgKiBrdm1fcG11X2hvc3RfY291bnRlcl9tYXNr
-KCkgLSBDb21wdXRlIGJpdG1hc2sgb2YgaG9zdC1yZXNlcnZlZA0KPj4+PiBjb3VudGVycw0KPj4+
-PiDCoMKgwqAgKiBAcG11OiBQb2ludGVyIHRvIGFybV9wbXUgc3RydWN0DQo+Pj4+IEBAIC0yMTgs
-NiArMjg1LDcgQEAgdm9pZCBrdm1fcG11X2xvYWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KDQo+
-Pj4+IMKgwqDCoMKgwqDCoCBwbXUgPSB2Y3B1LT5rdm0tPmFyY2guYXJtX3BtdTsNCj4+Pj4gwqDC
-oMKgwqDCoMKgIGd1ZXN0X2NvdW50ZXJzID0ga3ZtX3BtdV9ndWVzdF9jb3VudGVyX21hc2socG11
-KTsNCj4+Pj4gK8KgwqDCoCBrdm1fcG11X3NldF9ndWVzdF9jb3VudGVycyhwbXUsIGd1ZXN0X2Nv
-dW50ZXJzKTsNCj4+Pj4gwqDCoMKgwqDCoMKgIGt2bV9wbXVfYXBwbHlfZXZlbnRfZmlsdGVyKHZj
-cHUpOw0KDQo+Pj4+IMKgwqDCoMKgwqDCoCBmb3JfZWFjaF9zZXRfYml0KGksICZndWVzdF9jb3Vu
-dGVycywgQVJNUE1VX01BWF9IV0VWRU5UUykgew0KPj4+PiBAQCAtMzE5LDUgKzM4Nyw2IEBAIHZv
-aWQga3ZtX3BtdV9wdXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPj4+PiDCoMKgwqDCoMKgwqAg
-dmFsID0gcmVhZF9zeXNyZWcocG1pbnRlbnNldF9lbDEpOw0KPj4+PiDCoMKgwqDCoMKgwqAgX192
-Y3B1X2Fzc2lnbl9zeXNfcmVnKHZjcHUsIFBNSU5URU5TRVRfRUwxLCB2YWwgJiBtYXNrKTsNCg0K
-Pj4+PiArwqDCoMKgIGt2bV9wbXVfc2V0X2d1ZXN0X2NvdW50ZXJzKHBtdSwgMCk7DQo+Pj4+IMKg
-wqDCoMKgwqDCoCBwcmVlbXB0X2VuYWJsZSgpOw0KPj4+PiDCoMKgIH0NCj4+Pj4gZGlmZiAtLWdp
-dCBhL2luY2x1ZGUvbGludXgvcGVyZi9hcm1fcG11LmggIA0KPj4+PiBiL2luY2x1ZGUvbGludXgv
-cGVyZi9hcm1fcG11LmgNCj4+Pj4gaW5kZXggZjdiMDAwYmIzZWNhOC4uNjNmODhmZWM1ZTgwZiAx
-MDA2NDQNCj4+Pj4gLS0tIGEvaW5jbHVkZS9saW51eC9wZXJmL2FybV9wbXUuaA0KPj4+PiArKysg
-Yi9pbmNsdWRlL2xpbnV4L3BlcmYvYXJtX3BtdS5oDQo+Pj4+IEBAIC03NSw2ICs3NSw3IEBAIHN0
-cnVjdCBwbXVfaHdfZXZlbnRzIHsNCg0KPj4+PiDCoMKgwqDCoMKgwqAgLyogQWN0aXZlIGV2ZW50
-cyByZXF1ZXN0aW5nIGJyYW5jaCByZWNvcmRzICovDQo+Pj4+IMKgwqDCoMKgwqDCoCB1bnNpZ25l
-ZCBpbnTCoMKgwqDCoMKgwqDCoCBicmFuY2hfdXNlcnM7DQo+Pj4+ICvCoMKgwqAgYm9vbCBob3N0
-X3NxdWVlemVkOw0KPj4+PiDCoMKgIH07DQoNCj4+Pj4gwqDCoCBlbnVtIGFybXBtdV9hdHRyX2dy
-b3VwcyB7DQo=
+IPA size and start level are configurable at build time.
+
+Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+---
+Enable stage 2 translation in L2, but keep stage 1 remain off
+as Wei Lin prefers. Types are changed accordingly due to the
+recent selftest-wide changes.
+---
+ tools/testing/selftests/kvm/arm64/hello_nested.c   |  11 +-
+ tools/testing/selftests/kvm/include/arm64/nested.h |  38 ++-
+ tools/testing/selftests/kvm/lib/arm64/hyp-entry.S  |   5 +
+ tools/testing/selftests/kvm/lib/arm64/nested.c     | 279 ++++++++++++++++++++-
+ 4 files changed, 322 insertions(+), 11 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/arm64/hello_nested.c b/tools/testing/selftests/kvm/arm64/hello_nested.c
+index 69f4d8e750e2..1ac045894b89 100644
+--- a/tools/testing/selftests/kvm/arm64/hello_nested.c
++++ b/tools/testing/selftests/kvm/arm64/hello_nested.c
+@@ -18,9 +18,9 @@
+ /*
+  * TPIDR_EL2 is used to store vcpu id, so save and restore it.
+  */
+-static vm_paddr_t ucall_translate_to_gpa(void *gva)
++static gpa_t ucall_translate_to_gpa(void *gva)
+ {
+-	vm_paddr_t gpa;
++	gpa_t gpa;
+ 	u64 vcpu_id = read_sysreg(tpidr_el2);
+ 
+ 	GUEST_SYNC2(XLATE2GPA, gva);
+@@ -50,7 +50,7 @@ static void guest_code(void)
+ 	struct vcpu vcpu;
+ 	struct hyp_data hyp_data;
+ 	int ret;
+-	vm_paddr_t l2_pc, l2_stack_top;
++	gpa_t l2_pc, l2_stack_top;
+ 	/* force 16-byte alignment for the stack pointer */
+ 	u8 l2_stack[L2STACKSZ] __attribute__((aligned(16)));
+ 	u64 arg1, arg2;
+@@ -92,7 +92,7 @@ int main(void)
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+ 	struct ucall uc;
+-	vm_paddr_t gpa;
++	gpa_t gpa;
+ 
+ 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+ 	vm = vm_create(1);
+@@ -102,13 +102,14 @@ int main(void)
+ 	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+ 	kvm_arch_vm_finalize_vcpus(vm);
+ 
++	prepare_hyp_state(vm, vcpu);
+ 	while (true) {
+ 		vcpu_run(vcpu);
+ 
+ 		switch (get_ucall(vcpu, &uc)) {
+ 		case UCALL_SYNC:
+ 			if (uc.args[0] == XLATE2GPA) {
+-				gpa = addr_gva2gpa(vm, (vm_vaddr_t)uc.args[1]);
++				gpa = addr_gva2gpa(vm, (gva_t)uc.args[1]);
+ 				vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), gpa);
+ 			}
+ 			break;
+diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
+index b16a72488858..b4ccca3593db 100644
+--- a/tools/testing/selftests/kvm/include/arm64/nested.h
++++ b/tools/testing/selftests/kvm/include/arm64/nested.h
+@@ -18,14 +18,44 @@
+ 
+ #include <asm/ptrace.h>
+ #include "kvm_util.h"
++#include "processor.h"
+ 
+ extern char hyp_vectors[];
+ 
++#ifdef CONFIG_ARM64_64K_PAGES
++
++#define VTCR_EL2_TGRAN                  64K
++#define VTCR_EL2_TGRAN_SL0_BASE         3UL
++
++#elif defined(CONFIG_ARM64_16K_PAGES)
++
++#define VTCR_EL2_TGRAN                  16K
++#define VTCR_EL2_TGRAN_SL0_BASE         3UL
++
++#else   /* 4K */
++
++#define VTCR_EL2_TGRAN                  4K
++#define VTCR_EL2_TGRAN_SL0_BASE         2UL
++
++#endif
++
++struct s2_config {
++	u64 granule;
++	u8 ia_bits;
++	u8 oa_bits;
++	u8 start_level;
++};
++
++u64 get_l1_vtcr(const struct s2_config *cfg);
++
++void nested_map(struct kvm_vm *vm, const struct s2_config *cfg, gpa_t guest_pgd, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
++void nested_map_memslot(struct kvm_vm *vm, const struct s2_config *cfg, gpa_t guest_pgd, u32 memslot);
++
+ enum vcpu_sysreg {
+ 	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+ 
+ 	SP_EL1,
+-
++	ESR_EL2,
+ 	NR_SYS_REGS
+ };
+ 
+@@ -47,12 +77,14 @@ struct hyp_data {
+ };
+ 
+ void prepare_hyp(void);
+-void init_vcpu(struct vcpu *vcpu, vm_paddr_t l2_pc, vm_paddr_t l2_stack_top);
++void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top);
+ int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data);
+ 
+ u64 do_hvc(u64 action, u64 arg1, u64 arg2);
++u64 vcpu_get_esr_el2(struct vcpu *vcpu);
++
+ u64 __guest_enter(struct vcpu *vcpu, struct cpu_context *hyp_context);
+-void __hyp_exception(u64 type);
++void __hyp_exception(u64 type, u64 esr, u64 elr, u64 far, u64 hpfar, u64 spsr);
+ 
+ void __sysreg_save_el1_state(struct cpu_context *ctxt);
+ void __sysreg_restore_el1_state(struct cpu_context *ctxt);
+diff --git a/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S b/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
+index 6341f6e05c90..fcf7bb303b77 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
++++ b/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
+@@ -30,6 +30,11 @@ el1_error:
+ 	b	__guest_exit
+ 
+ el2_sync:
++	mrs	x1, esr_el2
++	mrs	x2, elr_el2
++	mrs	x3, far_el2
++	mrs	x4, hpfar_el2
++	mrs	x5, spsr_el2
+ 	mov	x0, #ARM_EXCEPTION_EL2_TRAP
+ 	b	__hyp_exception
+ 
+diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
+index b30d20b101c4..104c98d29eb9 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/nested.c
++++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
+@@ -7,15 +7,269 @@
+ #include "processor.h"
+ #include "test_util.h"
+ #include <asm/sysreg.h>
++#include <linux/sizes.h>
++
++static const struct s2_config default_s2_cfg = {
++        .granule        = SZ_4K,
++        .ia_bits        = 40,
++        .oa_bits        = 40,
++        .start_level    = 0,
++};
++
++static u64 s2_alloc_page_table(struct kvm_vm *vm, const struct s2_config *cfg)
++{
++        u64 nr_pages = cfg->granule >> vm->page_shift;
++
++        TEST_ASSERT(!(cfg->granule & (vm->page_size - 1)),
++                    "S2 granule 0x%lx smaller/not aligned to VM page size 0x%x",
++                    cfg->granule, vm->page_size);
++
++        return vm_phy_pages_alloc(vm, nr_pages,
++                                  KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++                                  vm->memslots[MEM_REGION_PT]);
++}
+ 
+ void prepare_hyp(void)
+ {
+-	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW, hcr_el2);
++	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW | HCR_EL2_VM, hcr_el2);
+ 	write_sysreg(hyp_vectors, vbar_el2);
+ 	isb();
+ }
+ 
+-void init_vcpu(struct vcpu *vcpu, vm_paddr_t l2_pc, vm_paddr_t l2_stack_top)
++static unsigned int s2_granule_shift(const struct s2_config *cfg)
++{
++	switch (cfg->granule) {
++	case SZ_4K:
++		return 12;
++	case SZ_16K:
++		return 14;
++	case SZ_64K:
++		return 16;
++	default:
++		TEST_FAIL("Unsupported stage-2 granule %u", cfg->granule);
++	}
++}
++
++static unsigned int s2_level_stride(const struct s2_config *cfg)
++{
++	return s2_granule_shift(cfg) - 3;
++}
++
++static unsigned int s2_ptrs_per_table(const struct s2_config *cfg)
++{
++	return 1U << s2_level_stride(cfg);
++}
++
++static u64 s2_index_mask(const struct s2_config *cfg)
++{
++	return s2_ptrs_per_table(cfg) - 1;
++}
++
++static unsigned int s2_last_level(const struct s2_config *cfg)
++{
++	return 3;
++}
++
++static unsigned int s2_level_shift(const struct s2_config *cfg,
++				   unsigned int level)
++{
++	return s2_granule_shift(cfg) +
++	       (s2_last_level(cfg) - level) * s2_level_stride(cfg);
++}
++
++static u64 s2_table_mask(const struct s2_config *cfg)
++{
++	return GENMASK_ULL(cfg->ia_bits - 1, s2_granule_shift(cfg));
++}
++
++static u64 s2_output_mask(const struct s2_config *cfg)
++{
++	return GENMASK_ULL(cfg->oa_bits - 1, s2_granule_shift(cfg));
++}
++
++static u64 s2_desc_table(u64 paddr, const struct s2_config *cfg)
++{
++	return (paddr & s2_table_mask(cfg)) | 0x3;
++}
++
++#define S2_MEMATTR_NORMAL_WB		0xfUL
++#define S2_MEMATTR_SHIFT		2
++
++#define S2_S2AP_R			BIT(6)
++#define S2_S2AP_W			BIT(7)
++
++#define S2_SH_INNER			(3UL << 8)
++
++
++static u64 s2_desc_page(u64 paddr, u64 flags, const struct s2_config *cfg)
++{
++	u64 desc;
++
++	desc = paddr & s2_output_mask(cfg);
++
++	/* Stage-2 lower attrs */
++	desc |= S2_MEMATTR_NORMAL_WB << S2_MEMATTR_SHIFT;
++	desc |= S2_S2AP_R | S2_S2AP_W;
++	desc |= S2_SH_INNER;
++	desc |= PTE_AF;
++
++	/* L3 page descriptor: bits[1:0] = 0b11 */
++	desc |= PTE_TYPE_PAGE;
++	desc |= PTE_VALID;
++
++	return desc;
++}
++
++static inline int ipa_bits_to_ps(unsigned int ipa_bits)
++{
++	switch (ipa_bits) {
++	case 32:
++		return 0b000;
++	case 36:
++		return 0b001;
++	case 40:
++		return 0b010;
++	case 42:
++		return 0b011;
++	case 44:
++		return 0b100;
++	case 48:
++		return 0b101;
++	case 52:
++		return 0b110;
++	default:
++		return -EINVAL;
++	}
++}
++
++u64 get_l1_vtcr(const struct s2_config *cfg)
++{
++	if (!cfg)
++		cfg = &default_s2_cfg;
++
++	return  FIELD_PREP(VTCR_EL2_PS, ipa_bits_to_ps(cfg->ia_bits)) |
++		FIELD_PREP(VTCR_EL2_TG0, VTCR_EL2_TG0_4K) |
++		FIELD_PREP(VTCR_EL2_ORGN0_MASK, VTCR_EL2_ORGN0_WBWA) |
++		FIELD_PREP(VTCR_EL2_IRGN0_MASK, VTCR_EL2_IRGN0_WBWA) |
++		FIELD_PREP(VTCR_EL2_SH0_MASK, VTCR_EL2_SH0_INNER) |
++		FIELD_PREP(VTCR_EL2_SL0, VTCR_EL2_TGRAN_SL0_BASE - cfg->start_level) |
++		FIELD_PREP(VTCR_EL2_T0SZ_MASK, 64 - cfg->ia_bits);
++}
++
++void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++        const struct s2_config *cfg = &default_s2_cfg;
++        u64 guest_pgd;
++
++        vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTCR_EL2), get_l1_vtcr(cfg));
++
++        guest_pgd = s2_alloc_page_table(vm, cfg);
++        nested_map_memslot(vm, cfg, guest_pgd, 0);
++
++	pr_debug("cfg=%p ia_bits=%u oa_bits=%u granule=%u\n",
++	cfg, cfg->ia_bits, cfg->oa_bits, cfg->granule);
++
++        vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2), guest_pgd);
++}
++
++static void __nested_pg_map(struct kvm_vm *vm,
++			    const struct s2_config *cfg,
++			    u64 guest_pgd,
++			    u64 nested_paddr,
++			    u64 paddr,
++			    u64 flags)
++{
++	u64 granule = 1ULL << s2_granule_shift(cfg);
++	u64 *ptep;
++	unsigned int level;
++
++	TEST_ASSERT(!(nested_paddr & (granule - 1)),
++		    "L2 IPA not granule aligned: 0x%lx granule 0x%lx",
++		    nested_paddr, granule);
++
++	TEST_ASSERT(!(paddr & (granule - 1)),
++		    "PA not granule aligned: 0x%lx granule 0x%lx",
++		    paddr, granule);
++
++	ptep = addr_gpa2hva(vm, guest_pgd);
++
++	for (level = cfg->start_level; level < s2_last_level(cfg); level++) {
++		u64 idx;
++		u64 desc;
++
++		idx = (nested_paddr >> s2_level_shift(cfg, level)) &
++		      s2_index_mask(cfg);
++
++		ptep += idx;
++		desc = *ptep;
++
++		if (!desc) {
++			u64 table = s2_alloc_page_table(vm, cfg);
++
++			desc = s2_desc_table(table, cfg);
++			*ptep = desc;
++		}
++
++		ptep = addr_gpa2hva(vm, desc & s2_table_mask(cfg));
++	}
++
++	ptep += (nested_paddr >> s2_granule_shift(cfg)) & s2_index_mask(cfg);
++	*ptep = s2_desc_page(paddr, flags, cfg);
++}
++
++void nested_map(struct kvm_vm *vm,
++		const struct s2_config *cfg,
++		gpa_t guest_pgd,
++		u64 nested_paddr,
++		u64 paddr,
++		u64 size)
++{
++	u64 granule;
++	size_t npages;
++
++	if (!cfg)
++		cfg = &default_s2_cfg;
++
++	granule = 1ULL << s2_granule_shift(cfg);
++
++	TEST_ASSERT(!(size & (granule - 1)),
++		    "Mapping size 0x%lx not aligned to granule 0x%lx",
++		    size, granule);
++
++	TEST_ASSERT(nested_paddr + size > nested_paddr, "IPA overflow");
++	TEST_ASSERT(paddr + size > paddr, "PA overflow");
++
++	npages = size / granule;
++
++	while (npages--) {
++		__nested_pg_map(vm, cfg, guest_pgd, nested_paddr, paddr,
++				MT_NORMAL);
++
++		nested_paddr += granule;
++		paddr += granule;
++	}
++}
++
++void nested_map_memslot(struct kvm_vm *vm,
++			const struct s2_config *cfg,
++			gpa_t guest_pgd,
++			u32 memslot)
++{
++	struct userspace_mem_region *region;
++	u64 gpa, end;
++
++	region = memslot2region(vm, memslot);
++
++	gpa = region->region.guest_phys_addr;
++	end = gpa + region->region.memory_size;
++
++	pr_debug("nested S2 map slot %u: GPA %#lx-%#lx\n", memslot, gpa, end);
++
++	for (; gpa < end; gpa += cfg->granule)
++		nested_map(vm, cfg, guest_pgd, gpa, gpa, cfg->granule);
++}
++
++void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top)
+ {
+ 	memset(vcpu, 0, sizeof(*vcpu));
+ 	vcpu->context.regs.pc = l2_pc;
+@@ -46,13 +300,32 @@ int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data)
+ 
+ 	vcpu->context.regs.pc = read_sysreg(elr_el2);
+ 	vcpu->context.regs.pstate = read_sysreg(spsr_el2);
++	vcpu->context.sys_regs[ESR_EL2] = read_sysreg(esr_el2);
+ 
+ 	__sysreg_save_el1_state(&vcpu->context);
+ 
+ 	return ret;
+ }
+ 
+-void __hyp_exception(u64 type)
++u64 vcpu_get_esr_el2(struct vcpu *vcpu)
+ {
++	return vcpu->context.sys_regs[ESR_EL2];
++
++}
++
++void __hyp_exception(u64 type, u64 esr, u64 elr, u64 far, u64 hpfar, u64 spsr)
++{
++	u64 ec = esr >> 26;
++	u64 iss = esr & GENMASK_ULL(24, 0);
++	u64 ipa = ((hpfar & GENMASK_ULL(39, 4)) << 8) |
++		  (far & GENMASK_ULL(11, 0));
++
++	GUEST_FAIL("Unexpected hyp exception: type=%lu "
++		   "ESR_EL2=%#lx EC=%#lx ISS=%#lx "
++		   "ELR_EL2=%#lx FAR_EL2=%#lx HPFAR_EL2=%#lx IPA=%#lx "
++		   "SPSR_EL2=%#lx",
++		   type, esr, ec, iss, elr, far, hpfar, ipa, spsr);
+ 	GUEST_FAIL("Unexpected hyp exception! type: %lx\n", type);
++
++
+ }
+
+---
+base-commit: eb656a0272c639d43be7a9bdd1c5f31eff3afe86
+change-id: 20260515-enable-s2-hello_nested-b360a2e9bb87
+
+Best regards,
+-- 
+Itaru Kitayama <itaru.kitayama@fujitsu.com>
+
