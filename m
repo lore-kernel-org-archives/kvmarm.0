@@ -1,61 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D96428834
-	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 09:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BF03AE1B9
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 10:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778835683; cv=none; b=qGnmDAEFiPjqMhOWurrvbmpf/mu0J8TP1NMCaICL7QM35dIrUyilTianwaXiFIfmpcNsB7wb4236FyAbIdLch+jSEEE5dW4jn85pS2eX1/iXnRtkU4BQ6hpbC2ulW/m9cpzabusmJyDY1teQQIxSOM37xDFsd32n83rp0luBjXI=
+	t=1778840478; cv=none; b=qWkEC7vKcHwsZYo/jjd9codtsN6tqSpgWSLMiq4vhMdAo1ONZvA/n6qbinHsZDDu9YZXCmT0fWLFUfOmIY4Ki6QhAhzI4QjNcCWVXxf6ZW7DfO+vfIrH6DclLHVHszbLphrWCpI9gdAaY0h4oHHOIVBsFWy8v0WLrZkfu5mffBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778835683; c=relaxed/simple;
-	bh=9xOweBXwXD5D7n8pVevm11ncIFPTLaDmqBWL8PaxB64=;
+	s=arc-20240116; t=1778840478; c=relaxed/simple;
+	bh=axThhzIei62WMqZ0/cwTAYunJ77KwZqp+AkX3EkBR4Y=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SMK4SzPrNcJ+6qI6E9NpYEyfdXtJWL1yh8yVDFMZ8g4WI+TvV2lTFIn2g/L3ce43d9m4fVzVAHUzv63U5AHGIDvV88LhpbYr+/Niey3oKgZtZguwBmUrnTFljxkaINzER7qqiNtCIGfD6/g1GOixpgoIRps3OVKauPVi5doLkSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1cJ0HwR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=nallDdd5EhAbzMxnzV8lVWPmgVCvhuZ7Gc4l2PL1i7yvUl5yiD1ZA8FYEIWzwSIwJHbl+8aDk4xYWZ+E9H1ZM/94XnPmgn73ecWn5zDgM1EvSsNF0Gq2iYnTd2+jWTK0LoIK0RXNvhk4LIH+r9v4Bszw2WxnxVhAu+oChKQyJY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URrClAU9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1cJ0HwR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FAD4C2BCB0;
-	Fri, 15 May 2026 09:01:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URrClAU9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A20C2BCB0;
+	Fri, 15 May 2026 10:21:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778835683;
-	bh=9xOweBXwXD5D7n8pVevm11ncIFPTLaDmqBWL8PaxB64=;
+	s=k20201202; t=1778840478;
+	bh=axThhzIei62WMqZ0/cwTAYunJ77KwZqp+AkX3EkBR4Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P1cJ0HwRsOHBLiRyyLE6IzJ2h2t3/Q4pM7XRZ1XepKcDY1RJnBXV/YBS91b7BRbil
-	 DwFwcKAFgLocJFpvQwZZLyZ6eQOw8IDvsRwApxk7gKwppe2oH6Agxyzd37JKHjiHdi
-	 abNAkm7lu7HJikn0p+iBJJcTCXdFjG6iG8LP1SdiS+opfAfwQLIRyNZE8H0snX8lU5
-	 +y3PDw6tUqn0F6JhFymO6eHpZo5o/pOWrWwkVSQwcDSWGCr3cjEV40Xtm4mylacRqk
-	 gmHSdrgynN5jcRovdXs1OcoWzXcmsarWxXSDXt+BLpfaH8yKi9j7DHe0KtgiOulka/
-	 PuVlVa8izYQvg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	b=URrClAU9bqMbk/ZOtAuQWvjWADo+TWA3p7Re2tvPiPnjRU0vruoZR4TlZwDAiv6M8
+	 2VXnwIsJQlJEz9HNXmhaYGuxU9YriWfj9PHCVU66SPw/Zydb04fZuYbFtWfwQK9Q8u
+	 NOfFQaBTTP1J9Na9kr+y6mSFIz48trt7bAhgEWjHP8GqYcAvZ9GAj0DoNC31gXp5DG
+	 4qEgqbDeBEcH0IdyAcoGGxHIy5KLHcNBnDz1n9nVDE6pJJyqlhidtPklYXiEfyj1j9
+	 RiJ1NT89BlrTMzmmVHaZ0w2Vc42OTErl+5UWLf+E4zZDXdNnJb1vNZ+/ITRJmwiSV0
+	 K9x7JxkImtxNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wNoQ4-00000002ckw-3YKV;
-	Fri, 15 May 2026 09:01:20 +0000
-Date: Fri, 15 May 2026 10:04:35 +0100
-Message-ID: <87pl2x9h7g.wl-maz@kernel.org>
+	id 1wNpfQ-00000002eRs-08N4;
+	Fri, 15 May 2026 10:21:16 +0000
+Date: Fri, 15 May 2026 11:21:15 +0100
+Message-ID: <867bp5x9b8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>,
-	eric.auger.pro@gmail.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	richard.henderson@linaro.org,
-	cohuck@redhat.com,
-	sebott@redhat.com,
-	skolothumtho@nvidia.com,
-	philmd@linaro.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Subject: Re: [PATCH v4 00/17] kvm/arm: Introduce a customizable aarch64 KVM host model
-In-Reply-To: <CAFEAcA-TE-8cj6fGOYJaChRVB5GE7E8ys87cxPP4Yw1kgjh9Dg@mail.gmail.com>
-References: <20260503073541.790215-1-eric.auger@redhat.com>
-	<CAFEAcA-TE-8cj6fGOYJaChRVB5GE7E8ys87cxPP4Yw1kgjh9Dg@mail.gmail.com>
+	kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Fix nVHE/pKVM hyp tracing error on invalid desc
+In-Reply-To: <20260514162624.3477857-1-vdonnefort@google.com>
+References: <20260514162624.3477857-1-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,31 +59,26 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, eric.auger@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, cohuck@redhat.com, sebott@redhat.com, skolothumtho@nvidia.com, philmd@linaro.org, oliver.upton@linux.dev, pbonzini@redhat.com, armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 15 May 2026 09:31:19 +0100,
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Thu, 14 May 2026 17:26:24 +0100,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> So if the user asks to set ID registers to an architecturally
-> invalid combination (e.g. one that reports FEAT_X but not
-> FEAT_Y even though FEAT_X is supposed to imply FEAT_Y, or
-> one where one ID register says we have FEAT_X but a different
-> ID register says we don't have FEAT_X), what happens ?
-> Do we catch and reject that? Does the kernel reject that?
-> Or do we just report to the guest what the user asked for,
-> and if they asked for something broken they can keep both
-> pieces ?
+> pKVM must validate the host-provided tracing buffer descriptor.
+> However, if an error is found, the hypervisor would just return 0 to the
+> host. Fix the return value on validation failure.
+> 
+> While at it, rename the function to hyp_trace_desc_is_valid() and skip
+> validation for the nVHE mode as we trust host-provided data in that
+> case.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-I fully expect the latter. Neither the kernel nor QEMU can enforce
-this short of encoding all the various dependencies, which have the
-horrible habit of changing over time. The only thing we can
-realistically reason about is a single idreg at a time.
-
-Thanks,
+Fixes: tag? Should it be considered as a Cc: to stable?
 
 	M.
 
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
