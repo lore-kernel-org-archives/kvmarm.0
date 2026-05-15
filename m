@@ -1,73 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1162FFF8D
-	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 14:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C093B9DBC
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 15:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778855775; cv=none; b=kSxjJGEVFeKulz8+F87Rxsjxpst+bLhwFZZF9pVKflzYXI8CbiNRUWtFOYTwO84iyZU2mRpywpNRvgFCRzZxb2WjhQrIfwdWOFKSSXt/vU8a1u8MsTe1BCfje7QOYmRGXCrb1dcE1eYO09AtKZYm9GRIxRwhpC0lmvx14ad1ctE=
+	t=1778858750; cv=none; b=QwjSUwBdDI5QhokcfpTxs2MriR7GXpIq2YTBSA3YiN5hYbr+3cFn72J0cCZdXZAvifxpmsMgaBfUoIzSOwfKZIhQdgd+EHeUQe11kkGcJ00LzkngeOjXrd3it3ymPLzaFGm5RAAJ3enMZ5bkuzGZxZnfIBIkCtBtA3Zaskn3DnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778855775; c=relaxed/simple;
-	bh=1N/iQvsxJ4LcjWlFme4TYlnFyw/ZlRbnMpU/nS/+rac=;
+	s=arc-20240116; t=1778858750; c=relaxed/simple;
+	bh=8upZG8j3Tm+7aloXkS0Ivkys4q2p4I2iONXGVpetvCM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ed4Ht9c1ygtP1tHpDEHWwDMpBlY35pAN0PG5r6yf4TXc85wusarP8iO4vfYs5pGCNUDEhiHqhLfVdsrL4HAz/gtoSPxCtYPxIyn77v8Z7826XCXSzSgfS+/SPoYMn5AJ6GrMHSXnJcZfnwkTlLvTi1K+W5C2TGz5NwHQRRrXmhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g3gz56s8; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=i/syOClGhtMnr6NtfkBD7N4PmzbN7EQ/ou1gMCwLp8Rsh7jDKxgFOwrSsdEkC6/berdfbqu04aoDMpR6iX8+VXDJqpCaInVh3PHakmT8d2gsCM/SBzPxxWRytNZdEcqVO/n4yRvwzcqkiYlZLaHjU+ZIuqhCxWWaxquXcY/z2Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IqkcCUB/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g3gz56s8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IqkcCUB/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778855771;
+	s=mimecast20190719; t=1778858745;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LGqgMSSVSUI59e2Ws18T5eihRNQogNmfYhim+xCR/x8=;
-	b=g3gz56s8xVd2zTf2GIntkJZLyO+pzTdlk0xckrEq5hGuv4wGh44B+6GgiBrZNZV96jrmbr
-	VCLjKeKDUiRrTdc5WIHc9BOq64NGMCPrkMw/l5hzhG82yN3uwkQoLB++kXtNYLEV/t3wnl
-	UGrWj+xF/6ya9HQN36iYE+sJ6FxHNNY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jRsnFsbR98j2F25uEINqqz2pRaV9pTeoQOh67gxmDUQ=;
+	b=IqkcCUB/ThACinn6K0m6B0iMAAl+wVvvDkYVzTemj1mvW9C4cIBixMIIdQYzIkE4AkV35W
+	Sw0Y5rxXW1uvsLKPUc/Y16L1bdBay6Kcd363JG3rpoXkj9z2eZxEyxJwPMA+Gh1/ZTX3YX
+	DzgAO6KkJqTGEz0BhVcZB44ybbsl1uQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-343-2ceiRetuPNOzD9GLV-C-Tg-1; Fri, 15 May 2026 10:36:07 -0400
-X-MC-Unique: 2ceiRetuPNOzD9GLV-C-Tg-1
-X-Mimecast-MFC-AGG-ID: 2ceiRetuPNOzD9GLV-C-Tg_1778855767
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48fd396daedso13955075e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 07:36:07 -0700 (PDT)
+ us-mta-606-tQmawn5tMfy2mB681SX9Yg-1; Fri, 15 May 2026 11:25:44 -0400
+X-MC-Unique: tQmawn5tMfy2mB681SX9Yg-1
+X-Mimecast-MFC-AGG-ID: tQmawn5tMfy2mB681SX9Yg_1778858743
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4411a69f565so8148866f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 08:25:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778855766; x=1779460566;
+        d=1e100.net; s=20251104; t=1778858743; x=1779463543;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LGqgMSSVSUI59e2Ws18T5eihRNQogNmfYhim+xCR/x8=;
-        b=pgvfxZ7aKO2l3fmLeHRutUDV42koMvM7j4Bgdh9iZlIYaQ8e0Fm0nESxibWnijELKe
-         49NzIHlOhiDIEZB/hYaNEhWflzxEGLuwNXI9b6fmp9fD2BIFiTKBL0OYs1qByFaO+sxe
-         WR219+OAY7X+MduqVkzBygLMgQDwn0MTZtPopJNGS4L8QZ3Qcgtxmp2AiwQr9SQDg7tX
-         rPYZj9F0A3fhiwChaXlXmQ7Lxnx/rN0T2c/nc3eSJAOveAX/KyBv48FoYvX9IxVNRsOn
-         /TAHZqm3rnfnTu1Ehkpq/zBE6/75GyAruvTNpbzzBHdGlEwIzbLMOr581AXDCfQQpZdd
-         KuAw==
-X-Forwarded-Encrypted: i=1; AFNElJ9M39i+WMuckfUWMe8sUOE5I9rGv+7g4WLfgUkBG3XbS4c0nN+MoRfFKyoXwvaVhtJcy9oJp+Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyToj8s/hc9aFeHV9UrkfWA0eSBK2F56+ntEVXRmKZa02yHSeEs
-	nKTfGWE3cT8kB/B/nk8Z36AJntbhg+NHzHmccwILr1wmVA42g/2MDY/lASxTk8XMj0iOBAlLd0e
-	icVKUatkidUeISoFNOUBSWIzhCs9mFa2k9wpQT2qsXu8wr3dKtg2JcpVvrg==
-X-Gm-Gg: Acq92OGVQdVCNALMOMcG5bLOvkwHiWoWz3hRhVmgNMyymRNDM/2luI/Lwg3WWl8sk+J
-	knxOv676hO80Y1SII8qStxX0vKYx7aQSTw03j6rJjrgW8Aj+wqf2s6epT1vjlPad4YRz3XzBg3d
-	IgbbkKohcXYy+k2ag3T4p+coQlxa1rhAqISHX5GaTwDUxJTMHqXco1zYKhl8EWauMIXZMhiWHtB
-	B9m22zijSW4IIPnY0RE7Y+tkUThPdn4840rgFSqnHC6wAUsa3W4f1NCrI4xdCRMoGZONVNUVGFA
-	igCobN2SjCec2uovNdP/MtQvhYxOSzxLA8yWD7mJRXhN951saa3RCArPa9dl9CoFRxNyRemmnPx
-	EVrXSwdSw664teZnLNL7aB3eWiaZQJrLXWqPNWHgI/M5eCKyIrD/sTAHklvqRqeEPI88rEA==
-X-Received: by 2002:a05:600c:3e11:b0:48f:e230:c3fb with SMTP id 5b1f17b1804b1-48fe6626a8emr67323305e9.33.1778855766036;
-        Fri, 15 May 2026 07:36:06 -0700 (PDT)
-X-Received: by 2002:a05:600c:3e11:b0:48f:e230:c3fb with SMTP id 5b1f17b1804b1-48fe6626a8emr67322285e9.33.1778855765336;
-        Fri, 15 May 2026 07:36:05 -0700 (PDT)
+        bh=jRsnFsbR98j2F25uEINqqz2pRaV9pTeoQOh67gxmDUQ=;
+        b=pIIOuKjSQ7/N4Uts1Ka8RK2dBUp4nQe/pWBRJy7OHmQR7zcN3PdwOF2BurNA0ujHuA
+         bbbYcKb0/rZktJIFz8slh6KuiKJPpydpKZVFcMHC3yVEckvsDc0U+G1ZRDe5/0EWNd4O
+         8D9hr1xRULwLGW3hy3tWiMelJjRCnduJOidm48GVOtFW0Spqys0vt5tczCCIk5ozpa7y
+         1VVU1IooEsMLKNu5g0pbLLUXVyFXoEe+rFLGJfDSo1HFrKq3kVt6aK4d3F3uuJsRGjMf
+         Ynjmt+e86wJUXGkuY/pfjBwUjG72gF7crG/PzL5EAX9UPkMRf8UztSZqbiJMzT7Eb6CJ
+         sB2g==
+X-Forwarded-Encrypted: i=1; AFNElJ+CBwzBaeKewM+xOSr80gLPEU9Nx6fCwuvYGmu2jSBMHaLUy7FUOZvcVWeR44de8F7sktYAbq0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyBVY44egHxIR/7OdHuWy3SGgatWiYw+tZsp1ODCEFau2raEW9q
+	TldVzPJUk1COu02G/UGZ543nS5p3X1Lw/VrzRkCPNAo8499lX2kwGfbvt1aYF2BhT7B583LmFSD
+	QXbOofOkgzr3TdUWBwzwgrDRetmjMrtGS3jPMryOT5yu1dFsxsMChc17Weg==
+X-Gm-Gg: Acq92OGpoETov7loxjpYEJmlyWfkhIyy6PW+dz7WsY57ArcP8Nl2JlCXP9mHIwsHCBK
+	C4sK0dA3i8w9IE2gW04BQvATkxvUd7qpFAbDiAm/KtmeZ80poDLHwN37FxjhQ1w01R4ZfqDvjKM
+	Yg7jiw+tX/tWqpGUjl1At1vUk1inKxlM/lHCr006mvrPnwa9sLCAURyOOBDEIHd7dh+RaYBvGPD
+	hjXwYrDp7MZUgHnIEJx0vIlJFt3lqr3UNeoChpAGxXach8Rjp6uuKBKSGnWUVHKexRWgihGKazn
+	OFk9xi90z+7Uby/fU4O1Qj4O6m6a+6lBubgQ1+AQVHHhxDJrjgC0a6433TJVt/5DNZ1QEQqsmow
+	tm2RrRCZqdpubQD/qV3K2CNenAGws2136cqopbdczX9eeR2+O07y2ChGw/vU8vlZGM6aSJMGDw4
+	oXOamj
+X-Received: by 2002:a05:600c:34c3:b0:48f:d0f7:78f1 with SMTP id 5b1f17b1804b1-48fe60e4e27mr67168895e9.4.1778858742610;
+        Fri, 15 May 2026 08:25:42 -0700 (PDT)
+X-Received: by 2002:a05:600c:34c3:b0:48f:d0f7:78f1 with SMTP id 5b1f17b1804b1-48fe60e4e27mr67167915e9.4.1778858741756;
+        Fri, 15 May 2026 08:25:41 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe537ccf5sm67516295e9.14.2026.05.15.07.36.03
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c8344asm113116585e9.1.2026.05.15.08.25.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2026 07:36:04 -0700 (PDT)
-Message-ID: <0a0c7020-c697-4be9-aa1f-84ec1f14175f@redhat.com>
-Date: Fri, 15 May 2026 16:36:02 +0200
+        Fri, 15 May 2026 08:25:41 -0700 (PDT)
+Message-ID: <2c4741a4-e37e-48bc-8fe5-cab2b9e67793@redhat.com>
+Date: Fri, 15 May 2026 17:25:39 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -90,11 +91,11 @@ References: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
 From: Eric Auger <eric.auger@redhat.com>
 In-Reply-To: <20260513163356.3033159-3-shaju.abraham@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: h2jIlKGEk1zpSUw7XA9uYAJwgJ-uEkdJZ11HCWbGHC8_1778855767
+X-Mimecast-MFC-PROC-ID: kvPStah0gfCGTRqJejMIQ--IZFZyQV60nS1sLn0Jjmw_1778858743
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
@@ -116,16 +117,6 @@ On 5/13/26 6:33 PM, Shaju Abraham wrote:
 > IDREG_FIELD_END(REG, FIELD)
 > ...
 > IDREG_END(REG)
-Overall I prefer this representation to the one laid out in 
-
-target/arm/cpu-sysreg-properties.c ([PATCH v4 07/17] target/arm/cpu-sysreg-properties.c: Generate code with new script)
-all the more so it allows the replace FIELD descriptions in cpu-features.h (what you do in [RFC PATCH v1 05/13] target/arm: named_cpu_model: replace FIELD macro with IDREG_FIELD)
-
-Thanks
-
-Eric
-
-
 >
 > Co-authored-by: Khushit Shah <khushit.shah@nutanix.com>
 > Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
@@ -1864,4 +1855,105 @@ Eric
 > +IDREG_FIELD_END(MVFR2, VAL)
 > +
 > +IDREG_END(MVFR2_EL1)
+
+I don't see CLIDR_EL1 for instance while some fields are writable.
+
+As a record here is the list of writable fields I can collect on a
+Grace-Hopper machine.
+
+(QEMU) query-cpu-model-expansion type=full model={"name":"host"}
+{"return": {"model": {"name": "host", "props":
+{"SYSREG_ID_AA64PFR0_EL1_EL3": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
+"SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_MIDR_EL1_PartNum": 3407,
+"SYSREG_CTR_EL0_DminLine": 4, "SYSREG_ID_AA64MMFR0_EL1_PARange": 5,
+"SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0, "SYSREG_ID_AA64MMFR2_EL1_CnP": 1,
+"SYSREG_ID_AA64PFR1_EL1_DF2": 0, "SYSREG_ID_AA64PFR0_EL1_DIT": 1,
+"SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2, "SYSREG_ID_AA64ISAR0_EL1_FHM": 1,
+"SYSREG_ID_AA64ISAR2_EL1_CSSC": 0, "SYSREG_ID_AA64ISAR0_EL1_DP": 1,
+"sve768": false, "sve128": true, "SYSREG_ID_AA64FPFR0_EL1_F8E4M3": 0,
+"SYSREG_ID_AA64MMFR3_EL1_TCRX": 0,
+"SYSREG_ID_AA64ISAR2_EL1_SYSINSTR_128": 0,
+"SYSREG_ID_AA64MMFR1_EL1_AFP": 0, "SYSREG_CLIDR_EL1_ICB": 0,
+"SYSREG_CLIDR_EL1_LoC": 0, "SYSREG_ID_AA64MMFR0_EL1_TGran64": 0,
+"sve1024": false, "SYSREG_ID_AA64ISAR1_EL1_DPB": 2,
+"SYSREG_ID_AA64MMFR0_EL1_SNSMem": 1, "sve1280": false,
+"SYSREG_ID_AA64MMFR2_EL1_IESB": 1, "SYSREG_ID_AA64ISAR3_EL1_FAMINMAX":
+0, "SYSREG_ID_AA64ZFR0_EL1_EltPerm": 0,
+"SYSREG_ID_AA64ISAR2_EL1_PRFMSLC": 0, "SYSREG_ID_AA64ZFR0_EL1_F32MM": 0,
+"SYSREG_ID_AA64ZFR0_EL1_F64MM": 0, "SYSREG_ID_AA64ISAR2_EL1_RPRFM": 0,
+"SYSREG_ID_AA64ISAR2_EL1_RPRES": 0, "SYSREG_ID_AA64ISAR0_EL1_SM4": 1,
+"SYSREG_ID_AA64ISAR0_EL1_SM3": 1, "SYSREG_ID_AA64PFR2_EL1_MTESTOREONLY":
+0, "sve896": false, "sve256": false, "SYSREG_ID_AA64DFR0_EL1_WRPs": 3,
+"SYSREG_ID_AA64PFR2_EL1_MTEFAR": 0, "SYSREG_ID_AA64MMFR1_EL1_SpecSEI":
+0, "SYSREG_ID_AA64ISAR2_EL1_LUT": 0,
+"SYSREG_ID_AA64MMFR0_EL1_TGran64_2": 2,
+"SYSREG_ID_AA64ISAR2_EL1_SYSREG_128": 0,
+"SYSREG_ID_AA64MMFR2_EL1_VARange": 0, "SYSREG_ID_AA64PFR0_EL1_EL2": 1,
+"sve1536": false, "SYSREG_ID_AA64ISAR2_EL1_WFxT": 0,
+"SYSREG_ID_AA64ISAR1_EL1_XS": 0, "sve1792": false,
+"SYSREG_ID_AA64MMFR0_EL1_ExS": 0, "SYSREG_ID_AA64ISAR1_EL1_LRCPC": 2,
+"SYSREG_ID_AA64MMFR2_EL1_LSM": 0, "SYSREG_ID_AA64PFR0_EL1_GIC": 1,
+"SYSREG_CLIDR_EL1_LoUIS": 0, "SYSREG_CTR_EL0_IminLine": 4,
+"SYSREG_MIDR_EL1_Implementer": 65, "SYSREG_ID_AA64MMFR0_EL1_BigEnd": 1,
+"sve384": false, "SYSREG_ID_AA64ISAR2_EL1_MOPS": 0,
+"SYSREG_ID_AA64ISAR2_EL1_ATS1A": 0, "SYSREG_CLIDR_EL1_LoUU": 0,
+"SYSREG_ID_AA64MMFR1_EL1_CMOW": 0, "SYSREG_ID_AA64ZFR0_EL1_BF16": 1,
+"SYSREG_CTR_EL0_IDC": 1, "SYSREG_ID_AA64MMFR2_EL1_ST": 1, "sve": true,
+"SYSREG_ID_AA64ISAR0_EL1_CRC32": 1, "SYSREG_ID_AA64ISAR1_EL1_FRINTTS":
+1, "sve2048": false, "SYSREG_ID_AA64ISAR0_EL1_TS": 2,
+"SYSREG_ID_AA64MMFR0_EL1_BigEndEL0": 0,
+"SYSREG_ID_AA64MMFR0_EL1_TGran4_2": 2, "SYSREG_ID_AA64MMFR1_EL1_HCX": 0,
+"SYSREG_ID_AA64ZFR0_EL1_AES": 2, "SYSREG_ID_AA64PFR1_EL1_BT": 1,
+"SYSREG_ID_AA64MMFR1_EL1_HPDS": 2, "SYSREG_ID_AA64MMFR1_EL1_LO": 1,
+"SYSREG_ID_AA64MMFR1_EL1_nTLBPA": 0, "SYSREG_ID_AA64ISAR1_EL1_SPECRES":
+1, "pauth": true, "SYSREG_ID_AA64ZFR0_EL1_F16MM": 0,
+"SYSREG_MIDR_EL1_Variant": 0, "kvm-no-adjvtime": false,
+"SYSREG_ID_AA64PFR0_EL1_RME": 0, "SYSREG_ID_AA64DFR0_EL1_DoubleLock":
+15, "SYSREG_CTR_EL0_DIC": 1, "sve512": false,
+"SYSREG_ID_AA64MMFR2_EL1_BBM": 2, "SYSREG_ID_AA64MMFR1_EL1_ETS": 0,
+"SYSREG_ID_AA64ZFR0_EL1_BitPerm": 1, "SYSREG_ID_AA64PFR0_EL1_CSV3": 1,
+"SYSREG_ID_AA64PFR0_EL1_CSV2": 1, "SYSREG_ID_AA64MMFR3_EL1_S1PIE": 0,
+"SYSREG_ID_AA64MMFR3_EL1_S1POE": 0, "SYSREG_ID_AA64ISAR1_EL1_SB": 1,
+"SYSREG_ID_AA64PFR0_EL1_EL1": 1, "SYSREG_ID_AA64ISAR1_EL1_JSCVT": 1,
+"aarch64": true, "SYSREG_ID_AA64ZFR0_EL1_B16B16": 0, "pmu": true,
+"sve1920": false, "sve1152": false, "kvm-steal-time": true,
+"SYSREG_ID_AA64ZFR0_EL1_SVEver": 1, "SYSREG_ID_AA64FPFR0_EL1_F8E5M2": 0,
+"SYSREG_ID_AA64MMFR2_EL1_AT": 1, "SYSREG_ID_AA64PFR0_EL1_RAS": 2,
+"SYSREG_ID_AA64FPFR0_EL1_F8DP4": 0, "SYSREG_ID_AA64FPFR0_EL1_F8DP2": 0,
+"SYSREG_ID_AA64FPFR0_EL1_F8FMA": 0, "SYSREG_ID_AA64FPFR0_EL1_F8MM8": 0,
+"SYSREG_ID_AA64FPFR0_EL1_F8CVT": 0, "SYSREG_ID_AA64FPFR0_EL1_F8MM4": 0,
+"SYSREG_ID_AA64ISAR1_EL1_FCMA": 1, "SYSREG_ID_AA64MMFR2_EL1_TTL": 1,
+"SYSREG_ID_AA64PFR1_EL1_RAS_frac": 0, "SYSREG_ID_AA64ISAR2_EL1_BC": 0,
+"SYSREG_ID_AA64MMFR0_EL1_TGran4": 0, "SYSREG_ID_AA64ISAR2_EL1_PAC_frac":
+0, "sve640": false, "SYSREG_ID_AA64ISAR0_EL1_TLB": 2,
+"SYSREG_ID_AA64ZFR0_EL1_I8MM": 1, "SYSREG_ID_AA64ISAR1_EL1_I8MM": 1,
+"SYSREG_ID_AA64PFR2_EL1_FPMR": 0, "SYSREG_ID_AA64ISAR0_EL1_RNDR": 0,
+"SYSREG_ID_AA64PFR0_EL1_SEL2": 1, "SYSREG_ID_AA64DFR0_EL1_PMUVer": 6,
+"SYSREG_ID_AA64MMFR4_EL1_NV_frac": 0, "SYSREG_ID_AA64MMFR0_EL1_TGran16":
+1, "SYSREG_MIDR_EL1_Revision": 0, "sve1408": false,
+"SYSREG_ID_AA64MMFR1_EL1_PAN": 3, "SYSREG_ID_AA64MMFR3_EL1_SCTLRX": 0,
+"sve1664": false, "SYSREG_ID_AA64ISAR0_EL1_RDM": 1,
+"SYSREG_ID_AA64PFR1_EL1_SSBS": 2, "SYSREG_MIDR_EL1_Architecture": 15,
+"SYSREG_ID_AA64ISAR2_EL1_PCDPHINT": 0, "SYSREG_CLIDR_EL1_Ctype5": 0,
+"SYSREG_CLIDR_EL1_Ctype7": 0, "SYSREG_ID_AA64ZFR0_EL1_SHA3": 1,
+"SYSREG_CLIDR_EL1_Ctype6": 0, "SYSREG_CLIDR_EL1_Ctype3": 0,
+"SYSREG_CLIDR_EL1_Ctype4": 0, "SYSREG_CLIDR_EL1_Ctype2": 0,
+"SYSREG_CLIDR_EL1_Ctype1": 0, "SYSREG_CLIDR_EL1_Ttype4": 0,
+"SYSREG_CLIDR_EL1_Ttype7": 0, "SYSREG_CLIDR_EL1_Ttype6": 0,
+"SYSREG_CLIDR_EL1_Ttype5": 0, "SYSREG_CLIDR_EL1_Ttype3": 0,
+"SYSREG_CLIDR_EL1_Ttype2": 0, "SYSREG_CLIDR_EL1_Ttype1": 0,
+"SYSREG_ID_AA64MMFR1_EL1_TWED": 0, "SYSREG_ID_AA64DFR0_EL1_DebugVer": 9,
+"SYSREG_ID_AA64MMFR1_EL1_TIDCP1": 0, "SYSREG_ID_AA64MMFR0_EL1_FGT": 0,
+"SYSREG_ID_AA64ISAR0_EL1_SHA3": 1, "SYSREG_ID_AA64ISAR0_EL1_SHA2": 2,
+"SYSREG_ID_AA64ISAR0_EL1_SHA1": 1, "SYSREG_ID_AA64MMFR2_EL1_UAO": 1,
+"SYSREG_ID_AA64ISAR0_EL1_Atomic": 2, "SYSREG_ID_AA64ZFR0_EL1_SM4": 1,
+"SYSREG_ID_AA64MMFR0_EL1_ECV": 0, "SYSREG_ID_AA64ISAR3_EL1_FPRCVT": 0,
+"SYSREG_ID_AA64MMFR2_EL1_E0PD": 1, "SYSREG_ID_AA64PFR0_EL1_EL0": 1,
+"SYSREG_ID_AA64ISAR1_EL1_BF16": 1, "SYSREG_ID_AA64MMFR0_EL1_TGran16_2":
+2, "SYSREG_ID_AA64ISAR1_EL1_LS64": 0, "SYSREG_ID_AA64ISAR3_EL1_LSFE": 0,
+"SYSREG_ID_AA64ISAR0_EL1_AES": 2, "SYSREG_ID_AA64ISAR1_EL1_DGH": 1,
+"SYSREG_ID_AA64PFR1_EL1_CSV2_frac": 0}}}}
+
+Eric
+
 
