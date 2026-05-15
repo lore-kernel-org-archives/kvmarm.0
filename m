@@ -1,131 +1,135 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0543D0C1D
-	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 16:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC3136F8F9
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 19:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778863291; cv=none; b=rcUXzgg+SZBlVb0idGYrziZau80HSSVvx2cGYKSIxcsylFeNSMglSGwHkfy3e3pSLRcfe7BahBzWi5RsnC7qMQ3HW/FCgWGCvBojMWlfO8xEqkfmoL2J4nrsxV3T1MXP23Vkf8bmojrjJGnLaiFmgDaJiGmwlPRUdoamitYsmWo=
+	t=1778875158; cv=none; b=bdn3j0AsFCUfpjH33VmM8LIVamMJi2S3odMBA1IPDoK2LNx0b7WZrJu5Y8R/pqWcaeRiBXd6URhMSQITSLD9KZu353raoDSNaolAjFanZWtlS5tSm5lBYc3LFX8Z0/8bujkLOAFm8ydiSmIlrK35XC4WhzjKwiNf35uwfXWVSNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778863291; c=relaxed/simple;
-	bh=krJbL0Sdi/hkL6W5Ea1NnbxGpV0CvhepfqMLFkhgVrU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Oy0lVEZw0pQB4FxsvDGluWxHJddHlJai5od0/RmSUTtJn3fth/6jS4U05K47QTlj3CwQ7ktUsuxNmzC1T3qwubCvRCjafyp9KCrIalvW8YWFPBu4786bVJvpG6gA8FRLoXFJxv7KPW6b/uLl6UoeE8ItDo+WFsABgiuH651dhHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VEqgwTLn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778875158; c=relaxed/simple;
+	bh=QcLi9nOXGdtsBW9OJfP749hIUAI4GeEa0oT0K7mFMZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ak9qoCLN6ej2QVNkSqNx7Hu0Guo6AhG2s7rMSMCyD8CKZy4eyn6F+qtB76p4F4XeOG2tns3hGZjUy0xh0YGj5XRHvNzZFBnN+ES7MlpJs7HT8C6lYinybmF5h/orZ8CaxtvEhItVctm6vqhiaHnDtmsnwW7A52tWCxwZUKsPGBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lQ+zvmr2; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VEqgwTLn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778863287;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bjBZPMHg7/xD5odH5O5oe5BuoaLaAXni0yjS+VAtUvM=;
-	b=VEqgwTLnpfO2m6dVD5OsJdKVB+u/y4iEob85U39H98N45dW/HNmbHneM+oKJVfO0lLURhT
-	oqoiW0Ay9ead3MtC5su/lFKomdqpYeqxRzlQPq28Z8K8haN5UHGG2ViVITIPOCPJXYXGxG
-	e/0k8ZcEpoeDnK5SXXvWgKtBtuEYPrU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-Zjwt5VKIN7eJ-Dh8sa_Naw-1; Fri, 15 May 2026 12:41:26 -0400
-X-MC-Unique: Zjwt5VKIN7eJ-Dh8sa_Naw-1
-X-Mimecast-MFC-AGG-ID: Zjwt5VKIN7eJ-Dh8sa_Naw_1778863285
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43d7730e9e3so5905420f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 09:41:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778863285; x=1779468085;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bjBZPMHg7/xD5odH5O5oe5BuoaLaAXni0yjS+VAtUvM=;
-        b=VCQZLvumJrbJ/WXzKWOYPfnjTkmPVhZZ4mq9B4zPlWSy6v4iJrmmXGLQA7pUYlWZSd
-         lJb/S/IZ6QR0vLmQO5qXxx5EKm6v0f1c1GjJAj8bACZ2p9srcsUuen4oJfVZgRdimAhU
-         rfh5SWLwrTqWILroth9fVhZF/jHe/vsyaXcUTEZBTarHQzOpZfuUn03cS0ozMOUoMLJd
-         uTN9+tzHXrgyydh179FV3EMeKPrSJuewVOwC4berk0564Hyd5L72HoKk+xnt+0vHBL6I
-         bPHzp8TDeZEbNQDrWFglh+R17z2fgLT3erYLpUHHnlk72knoozbvUatvGmGBkYEYftq4
-         JfGw==
-X-Forwarded-Encrypted: i=1; AFNElJ/yTHsvww/IKs0927qld13zXnreHygMFE2wFyWROM6fOSS+h1E1wDP2KQds+Iow31zQCk1mPxI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy0mNFfO3orSKyi10LINSTM/r3rQDpxJ5zVUrb+jTuD1CQ8vdSu
-	xjzo2vFFz+oFH7wZHa7v3m0g3PKmMJyNANY7QuHpdtiXwG07UzkDc7ftM8T2hcvjYlvbGy6TLvA
-	HqzHI5i+/+cQD59/Er7HFq924bBq0AW9LZhZ6h7i0nl8Jr6iAnePN59nqGg==
-X-Gm-Gg: Acq92OGMFu+NLePKo6CHYGYNE5EcGe95dAVyh0+gOTYFr0d4ZRla/mGm5sRYFOzOgIQ
-	fEj7DN6auSYbyLKG7vWuS7LzOJBw6HrX6ujR8s+2pbemxfRWGm4U+WQLKtrlmR+XJRg2p3LZL8M
-	Lutt3EFpwETpMCtjV6aIf32OgRjGcawiDzBeebzpGBzJZLE7Oj79Lo7mbxrdZl8SuC5AjXTToVm
-	jAI/hqBUveVsTG2730dq0PExqfB9hDj5TKLGHXET9hSwcDGRBYGIoy01BzAxnHq4XFHRkyI0a7S
-	TM7+mrm1uWw0+y6cnlml0q0eMIRG6edw6vDTq4Pa9NCG83lLc62XTyOTcYKpEDc8zsg7JkQI9ml
-	r53bYZ6vjDz7/YKuo0ZfvKVp4XF6TeH8OB6clfjdqdo5CIEDtXjyMlHHlEFybKnHvIFDmhg==
-X-Received: by 2002:a5d:5f42:0:b0:44a:fa76:5193 with SMTP id ffacd0b85a97d-45e5c5af4f8mr7076727f8f.12.1778863284352;
-        Fri, 15 May 2026 09:41:24 -0700 (PDT)
-X-Received: by 2002:a5d:5f42:0:b0:44a:fa76:5193 with SMTP id ffacd0b85a97d-45e5c5af4f8mr7076636f8f.12.1778863283546;
-        Fri, 15 May 2026 09:41:23 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a19c2dsm15815025f8f.21.2026.05.15.09.41.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2026 09:41:22 -0700 (PDT)
-Message-ID: <ee91fb33-1a9f-46f7-985d-b84ba15ad0cc@redhat.com>
-Date: Fri, 15 May 2026 18:41:20 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lQ+zvmr2"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7D3C1BF7;
+	Fri, 15 May 2026 12:59:09 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00CEB3F85F;
+	Fri, 15 May 2026 12:59:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1778875154; bh=QcLi9nOXGdtsBW9OJfP749hIUAI4GeEa0oT0K7mFMZA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=lQ+zvmr22w6KmGzdHqs9ITHCZKbFHbxFFNE8X+yyyhTFOhwHpxgCe6Q/+BsLcfMK0
+	 jln7sf+/ssx8j7SC2l2hwzC8zZ98+rl2cR6l7THK6RMNo9dTSp9R35z2JWemn0wWP6
+	 IGips3ebbW4FHZPtci4vjAfTCmppZZWy47+blKV8=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/2] Optimize S2 page splitting
+Date: Fri, 15 May 2026 20:59:01 +0100
+Message-ID: <20260515195904.2466381-1-leo.bras@arm.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v4 00/17] kvm/arm: Introduce a customizable aarch64 KVM
- host model
-To: Marc Zyngier <maz@kernel.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, richard.henderson@linaro.org, cohuck@redhat.com,
- sebott@redhat.com, skolothumtho@nvidia.com, philmd@linaro.org,
- oliver.upton@linux.dev, pbonzini@redhat.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
-References: <20260503073541.790215-1-eric.auger@redhat.com>
- <CAFEAcA-TE-8cj6fGOYJaChRVB5GE7E8ys87cxPP4Yw1kgjh9Dg@mail.gmail.com>
- <87pl2x9h7g.wl-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <87pl2x9h7g.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: tkF4QiqqGI-RqMJAG6SR9NeP3dVYFZjJxnX1o9jm8Io_1778863285
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2955; i=leo.bras@arm.com; h=from:subject; bh=QcLi9nOXGdtsBW9OJfP749hIUAI4GeEa0oT0K7mFMZA=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLLYq1lEZh1Z7DdJ3q3C69CLVoWtTt4xyjo18jLbOo982 j1jRtK5jlIWBjEuBlkxRRbZR/NX8XyfknHkyo8FMHNYmUCGMHBxCsBErjAyMvTPXLCP4Yqt5YJA KbvtWYK/D/2bIRbCYsB7hztb9NL/6Q6MDM3/hJz/C0m7BPHxf5+6fu/fNwHWx71Ffum7yTebGvi K8gIA
+X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
 Content-Transfer-Encoding: 8bit
 
-Hi Peter, Marc,
+While playing with dirty-bit tracking, I decided to take a look on how page
+splitting works. Found out all entries are walked, even though we can infer,
+for instance that:
+- If a level-3 entry is walked, it means the parent level-2 entry is split
+- If a split just succeeded in an table entry, it means all children nodes
+  are already split
 
-On 5/15/26 11:04 AM, Marc Zyngier wrote:
-> On Fri, 15 May 2026 09:31:19 +0100,
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->> So if the user asks to set ID registers to an architecturally
->> invalid combination (e.g. one that reports FEAT_X but not
->> FEAT_Y even though FEAT_X is supposed to imply FEAT_Y, or
->> one where one ID register says we have FEAT_X but a different
->> ID register says we don't have FEAT_X), what happens ?
->> Do we catch and reject that? Does the kernel reject that?
->> Or do we just report to the guest what the user asked for,
->> and if they asked for something broken they can keep both
->> pieces ?
-> I fully expect the latter. Neither the kernel nor QEMU can enforce
-> this short of encoding all the various dependencies, which have the
-> horrible habit of changing over time. The only thing we can
-> realistically reason about is a single idreg at a time.
+So I tried to optimize it in a way that it does not break other users.
 
-Effectively at the moment the series does not implement any consistency
-check at qemu level (neither on the individual value nor any cross check
-with other ID reg field values). For individual setting we fully rely on
-KVM check.  
+My main idea is to introduce positive return values that hint to the
+pagetable walking mechanism that either siblings or children can be 
+skipped. That should be contained to the visitor function, that returns
+zero if no error was detected.
 
-Thanks
+Numbers on above optimization are promising:
+A 1GB VM, running on the model, splitting all at the beginning 
+(no manual protect):
+- Memory was already split (4k pages): 	-97.33% runtime (-172ms) - 20 runs
+- THP backed memory: 			-19.82% runtime (-153ms) - 10 runs
+- 1x1GB hugetlb memory:			-20.65% runtime (-150ms) - 10 runs
 
-Eric
->
-> Thanks,
->
-> 	M.
->
+This is measured with this snippet[1].
+I ran at least 10 times on different 1GB VMs, to make sure the numbers are 
+consistent.
+
+Ideas I considered:
+- Using a negative return value, using kvm_pgtable_walk_continue to 
+  filter it as a non-error, but decided that is kind of counter-intuitive
+- Using the introduced return values to hint the split walker to not 
+  splitting level-2 blocks (or level-1), if by adding a new parameter in
+  kvm_pgtable_stage2_split() and carrying it over to the walker using 
+  ctx->arg. (Splitting only up to given hugepage size)
+- Looking at other walkers, and trying to think on scenarios to
+  optimize them using the new return values.
+
+Do you think it is worth doing this?
+Please provide feedback!
+
+Thanks!
+Leo
+
+
+[1]:
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index d089c107d9b7..6424e833b7be 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1272,22 +1273,26 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
+        phys_addr_t start, end;
+ 
+        lockdep_assert_held(&kvm->slots_lock);
+ 
+        slots = kvm_memslots(kvm);
+        memslot = id_to_memslot(slots, slot);
+ 
+        start = memslot->base_gfn << PAGE_SHIFT;
+        end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+ 
++
+        write_lock(&kvm->mmu_lock);
++       u64 sw = ktime_get_real_ns();
+        kvm_mmu_split_huge_pages(kvm, start, end);
++       sw = ktime_get_real_ns() - sw;
++       printk("split from %llx to %llx took %llu ns\n", start, end, sw);
+        write_unlock(&kvm->mmu_lock);
+ }
+ 
+
+Leonardo Bras (2):
+  KVM: arm64: Introduce S2 walker SKIP return options
+  KVM: arm64: Improve splitting performance by using SKIP return values
+
+ arch/arm64/kvm/hyp/pgtable.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
+
+
+base-commit: 5d6919055dec134de3c40167a490f33c74c12581
+-- 
+2.54.0
 
