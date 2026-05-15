@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69633FF1BE
-	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 15:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355963FF1DE
+	for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 15:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778860501; cv=none; b=hn3DsQRG8wV1BJ9VbUI8d69sg9urCZ1dfFCKdHPZNHUu4GkUyMfUGLef5ueh9nuLguGGdscx6XuzWY49A9+1rtXwfwssCRf3hi9lZi/GGhiLCKiAOLfF5jQ/CoTVZxWOZDKtbLB5qA14L0opQNRYgo97ibsrkNvj+9yRsOAB4F0=
+	t=1778860781; cv=none; b=d1E0gNYV/arOxxqv46XTTgWkvcKdIsq7DRkr/ZAOCxL5oYDN+28TMgTiUecxob2yiEgHsPMqCAkAcUeUpoZwBSX4GuhgJDYUX75qYhePOqf8yq86/8GkJPW+p8VKCJZgaWLgUDpMUEZOCu1CufqDzgjT8RLn09youUIq2kZXBhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778860501; c=relaxed/simple;
-	bh=00sEO2i94r5Y6gzqYVUF4Qa8xCq8C+CyHg+E67WOLPk=;
+	s=arc-20240116; t=1778860781; c=relaxed/simple;
+	bh=JaUlt5b1vX2pHIWlYNxG6k1fvcKQdAne/3fvLwksa8g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VKOAo4iCMJj48sv2lbUJDk20nVbZQjBVS9NCiEXa3zkKfmu8E59rot7XLAklKondpjSNZNt9ZR2pjQHviZYL9GrV89NG/GqKfjAkogcWCiisU/NZYuEvD8Ogse29JF1BoYAQCZfL7TjsPl40dGxs9PGhQtkGWsv8AzLCqGpk2FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NS2hX1Ba; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=uDHtB7gb+FL/nTButAZ0uWfpjjR/3X7m7R1wHFuiU72t4aIlwx3W6yTjobQm0gxwM2FC/j7GuQdMwuvdo4fQDUdyCWigndHAY735LAO1kHhsz1UzFHSSPH3CyCkYjnNwEdkRyS34ndpV+pXPo9O5QQLqZUGxLp9+7MLg8JpCqs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SykSkq0x; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NS2hX1Ba"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SykSkq0x"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778860499;
+	s=mimecast20190719; t=1778860778;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A97hbXYKzUL1GQXcULFqEomdMtwQ7TyYIOUUyECdXM8=;
-	b=NS2hX1Ba79JzrP+fffepBxNaZDSPKFj6gpilMcTZ9WLK1LwWtvcgvAwWYkkazLITKgCG84
-	XL7O5/nqD2kJOcv0FZI9IDJNsPMLStchunw6c/ux8TfLxgy5WhkvLcMDmb0Nhg431ItvDw
-	EZaCkEE22v0ct6n7DB/dQtNNY4oOp2s=
+	bh=FC3oLSmnu8UdvlNQM2aun6fDBDKWRYloibSa7BMlBRo=;
+	b=SykSkq0x0lrG1U2U1VJr22//eJh4e2qyy7n9NLRt8+usxu0wbYUfLomB51nU8TuzUGUtg1
+	YyBjxWWBNDl5CNLViOaA5YYiCcvqGS/c8FCNBBkGieDFX+xgMK5OSpZrq0kQH2x9ph0rj1
+	2XPgQqhXBwbPmPgjnHD8S/Ffk0dLEA4=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-352-Av3ZViiEMjqCoOC9IgQmMg-1; Fri, 15 May 2026 11:54:57 -0400
-X-MC-Unique: Av3ZViiEMjqCoOC9IgQmMg-1
-X-Mimecast-MFC-AGG-ID: Av3ZViiEMjqCoOC9IgQmMg_1778860496
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48fdacff6d2so16188355e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 08:54:57 -0700 (PDT)
+ us-mta-226-9Cy0a_K3PxaQMfVQdIKrlQ-1; Fri, 15 May 2026 11:59:37 -0400
+X-MC-Unique: 9Cy0a_K3PxaQMfVQdIKrlQ-1
+X-Mimecast-MFC-AGG-ID: 9Cy0a_K3PxaQMfVQdIKrlQ_1778860776
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48fdad6cce4so5480305e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 15 May 2026 08:59:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778860496; x=1779465296;
+        d=1e100.net; s=20251104; t=1778860776; x=1779465576;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A97hbXYKzUL1GQXcULFqEomdMtwQ7TyYIOUUyECdXM8=;
-        b=ne2FNvUz4guX/cFWXm7u3jgSceq7KtndCYJfSXcHG6U3hgPldTwycA5ccB15WSBEEx
-         lEq9R6acxScQiUVNE2YgbmXULl2+Q1s4Btg7JYnVmz4InTOunlowGLImILzjfgE1yBGA
-         x4We3Laa4cFcW5uhcg9Bg2rNlTCx4ccoZk2hiKQD4zcbt1F+aqFw/v/Iev9Iq7qOqP1w
-         8Ea0jLfhNt/B5k0vCN3/HNNEStuI2BMLi/TgfkVx/F7X2nWJGyO/xcsWDKUQ524kLfBn
-         KpzcuS+RaYOySYreaAVPd0rlHU/Bln228JqAkp1GWYtK9habMYl7XDaCwskNNKuYhD05
-         ia0w==
-X-Forwarded-Encrypted: i=1; AFNElJ+Jd+L4Ppm2kNP1VbA7H0SSOOi1qO0h99eYP1gFVGKJEStEY65jwLqLd3rryO6ilbB4EsMNiS0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwQGJF6Gp2ZniAQrpbfPdeehVdavcycbLCW9EmpZMg7rZ26hpyD
-	cNBfm1YgzMazYi99p5gEeoIH9GRbfSQaLbsRyNGsi6J/PcbgKgvHLcZ/7wPx3VNBodC7OljX1zo
-	tDmGmDqFvSukYIsjL3xQVgo3oGtr3hCL19vi5Jd1FFmyWfFIAJHwFYa1xow==
-X-Gm-Gg: Acq92OEy5lYiALOnKyE8SrjZmwU/Tc7drlLa7NWykWUQoUTR7q6l+q2DePbcnO8jQBp
-	QVIvYQDvtXdDQUlpRGGJb408LaUL4d3GObDPnbbZqu7rsdDvZbhOPfr9A3X/7aY0cXolUWKEcpb
-	/TjapdeZHtUIf0JzbEGRquQlh81cQRQmW4dKzJThq1LIHBJLp8lNZZGSjgztyAU4/qf3aL4zI1J
-	UhWv3305UeAi7zIY0cegT/42/AYmPFevQ+GRahc5s0zO/b1BaR+XQ7wSRVRTs1ifa6m3ilDsQd2
-	g9X34iiskWFKAM+OrdhWLCh4gjBRFWywrzv5MYf+yL1Atwy4ZEZiJpWW5W8O36aJIRYUoOP4ics
-	MquTwt/tn3+omSkD5kKrGiyergbBPACIXUHJMOfDBAe50gk3FXPK/sbAoT9y6xPLKjnhURA==
-X-Received: by 2002:a05:600c:4692:b0:48a:592c:e632 with SMTP id 5b1f17b1804b1-48fe6325f18mr69509115e9.16.1778860496312;
-        Fri, 15 May 2026 08:54:56 -0700 (PDT)
-X-Received: by 2002:a05:600c:4692:b0:48a:592c:e632 with SMTP id 5b1f17b1804b1-48fe6325f18mr69508315e9.16.1778860495789;
-        Fri, 15 May 2026 08:54:55 -0700 (PDT)
+        bh=FC3oLSmnu8UdvlNQM2aun6fDBDKWRYloibSa7BMlBRo=;
+        b=Zn6vyXoFN8pLC+aoUONeyax2Tp91WAoH3CmMvY2tj8tLPk1FU2dGoYMroPkgf1odbT
+         9mhF9sGFZgFnJ29B3Fi7ri4PYQS4U/x74+okiQ6BUAzb1PM9/Wovq4W3pXxd6iHuDbB/
+         joXbCNEpPOkO6r2wyWucSw6bb2pQkAGMWwn9FhXqJ0mkzRtQjyKlW5JHFD1rWZ2FqjeC
+         9Uvz04r3G+8ZvBhEUzH3NgbYh0EDdBJbxcrE3RoNqtI2i7SkbWd9qNoTMK7sBFEfHUN9
+         q8BsqrHpGL/8aNAJ/uGShKtWRB9wj9iCHKB4sUHIHhDdd0TvcDOwBnVg5sqQZb5twq/t
+         GuZw==
+X-Forwarded-Encrypted: i=1; AFNElJ/o1k/qkXevqlNPTsafBHHIw2XeWJy+gPcFZzsf3L15g62UtdASI5/a5RqdkgWZS2PZDH39jA4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwdHoi6coSHnGfVGA/+vRCdhpejhXws0wtbyQEn3Hrq3T45oUip
+	fjIb3gHdDLXJCiQqtiBAiIOJp2d1OsMGolwttkRkC6QiDC4+JGtnNkFuWY+QuFpboIQyypUCbyY
+	A4U/cZRZB1O/aiPoU0+cSO49iDCeYq4d1KsUGzlm3tcEOGwsGqRNJaJO3NQ==
+X-Gm-Gg: Acq92OEc44iYek48m0LVobtTxWdirwBoZ4+ZOycEscWSoHnP85af8VutmhqYQb/6V7m
+	fIKswbOUhFdO1RQzo4PtWC/Al697WMu5ZByKrQWIhcNgM9ZBAjHngDbU/6Rq2hPEpGF6ByTrlka
+	aa+zSEw7xouWHKUpPNRn3H2MjP8jaawuXjhDd2pJdMf3UFGfK63FARQhsQfXOEzCif/cZDjbeNw
+	1wAfMpYAcn7H14YBvd8USJRnuwXmM/9Z9CN6iFRQZFnf1PqyQkXqc0SEo2d7XDN6jgMH/Wysr2r
+	swv8SOJ89CjsVfsFSKHCbhR9mIlod9MqY9Svyk4DyXB06cUvq26UkBs0d2w3+sjku2FzVl0xsH/
+	bRE+XXUDlEVcdqN406ozxmo8xp51nsSL+HM46eCr3ZI0ly3if4uEEX0seh8tdEyPPNZF9Hw==
+X-Received: by 2002:a05:600c:609b:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48fe4cadfeemr70353445e9.2.1778860775654;
+        Fri, 15 May 2026 08:59:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:609b:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48fe4cadfeemr70353085e9.2.1778860775243;
+        Fri, 15 May 2026 08:59:35 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a1a22csm14852814f8f.19.2026.05.15.08.54.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe6b60csm24134215e9.6.2026.05.15.08.59.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2026 08:54:55 -0700 (PDT)
-Message-ID: <1d4360a0-0611-4b3d-a7a6-3815d57a1d6d@redhat.com>
-Date: Fri, 15 May 2026 17:54:53 +0200
+        Fri, 15 May 2026 08:59:34 -0700 (PDT)
+Message-ID: <a73c5f14-ed64-4322-8315-482e5b621add@redhat.com>
+Date: Fri, 15 May 2026 17:59:32 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,31 +76,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v1 02/13] target/arm: named_cpu_model: Add ID Register
- Fields
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: Shaju Abraham <shaju.abraham@nutanix.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@linaro.org" <philmd@linaro.org>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Prerna Saxena <prerna.saxena@nutanix.com>, Jon Kohler <jon@nutanix.com>,
- Jonathan Davies <jond@nutanix.com>
+Subject: Re: [RFC PATCH v1 06/13] target/arm: named_cpu_model: data-structures
+ required for the ARM property layer.
+To: Shaju Abraham <shaju.abraham@nutanix.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, cohuck@redhat.com, sebott@redhat.com,
+ skolothumtho@nvidia.com, philmd@linaro.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
+ prerna.saxena@nutanix.com, jon@nutanix.com, jond@nutanix.com,
+ Khushit Shah <khushit.shah@nutanix.com>
 References: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
- <20260513163356.3033159-3-shaju.abraham@nutanix.com>
- <0b9d0320-96ab-4ccd-9440-0c0494af5aaa@redhat.com>
- <189B12F2-68DF-4442-8657-D5F295F710DC@nutanix.com>
+ <20260513163356.3033159-7-shaju.abraham@nutanix.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <189B12F2-68DF-4442-8657-D5F295F710DC@nutanix.com>
+In-Reply-To: <20260513163356.3033159-7-shaju.abraham@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: g5e-3k9H3zNgLnw0sWczZzKSJepvrjmT0oEytszdQa0_1778860496
+X-Mimecast-MFC-PROC-ID: QdKhfH4MTArvTgV45lmlvcZP4K_Spo_gMzcm44nzw4o_1778860776
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -108,72 +98,108 @@ Content-Transfer-Encoding: 8bit
 
 
 
-On 5/15/26 5:27 PM, Khushit Shah wrote:
->> On 5/13/26 6:33 PM, Shaju Abraham wrote:
->>> Add a declarative description of every architecturally defined field in the
->>> Arm64 ID registers in cpu-idregs.h.inc file. This file will be included
->>> multiple times with different definitions to build the per-field arch values,
->>> per-register field descriptor arrays, arm-idregs table etc. The architecturely
->>> defined values for each ID register field is extracted from kernel's
->>> arch/arm64/tools/sysreg file. The safe-value tags and default values are
->> In the past we were rather advised to use AARCHMRS instead of sysreg.
->> This is what is currently done in [PATCH v4 00/17] kvm/arm: Introduce a
->> customizable aarch64 KVM host model.
-> I am not sure if we can get safe rules from AARCHMRS. Otherwise it’s fine.
-I don't think it is there.
->
->>> derived from the kernel's ftr_bits array. Aarch32 ID registers are added
->>> with dummy field so they can be defaulted to 0 by later commits.
->>>
->>> X-macro structure:
->>> IDREG_START(REG)
->>> IDREG_FIELD_START(REG, FIELD, SHIFT, LENGTH, SAFE_RULE, DEFAULT_VAL)
->> Why do you need SAFE_RULE/DEFAULT_VAL? As far as I understand this is
->> used when we have different flavours of CPUS in SMP and we face
->> mismatches between CPU features. Why do we care here?
->>
->> I don't see safe_rule used anywhere.
->> I see arm_idregs_reset_to_defaults() uses the default value though.
->> Should we use the Registers.json reset value instead?
-> Kernel uses safe_rules to show a common denominator of cpu features in SMP and same rules are
-> used by KVM to verify if certain field value is valid to show to guest on the given host.
-> KVM_SET_ONE_REG validates the writable fields with the SAFE_RULE defined in ftr_bits table.
-OK so you plan to duplicate the logic at both qemu and KVM level. Can't
-we simply rely on KVM which already implements that logic. Also if the
-check is against a given host, is it relevant here? I need to look again
-at the kernel logic though.
->
-> So, SAFE_RULE will be used in v2 to validate idregs even before we writeback to the KVM, and to
-> pass supported field values for a property on a given host to management stack (libvirt). Something like
-> feat_AES supports (off, aes, pmull) on this host.
->
-> Registers.json can probably be used for default_vals, but I will need to check further on this.
-Registers.json gives the reset value and not the safe value, as far as I
-know.
+On 5/13/26 6:33 PM, Shaju Abraham wrote:
+> Introduce data-structures required for the ARM property layer. There are
+> four classes of properties:
+>     STRING: Multi-bit fields with arch-defined named values, such as
+>             ("off", "aes", "pmull", ...).
+when you say "arch defined named values", if we take for instance SHA2
+field of ID_AA64ISAR0
 
-Manual import of those values from the kernel looks tedious and error
-prone to me.
++IDREG_FIELD_START(ID_AA64ISAR0, SHA2,    12,  4, LOWER,  0)
++IDREG_FIELD_ARCH_VAL(0b0000, "off")
++IDREG_FIELD_ARCH_VAL(0b0001, "sha256")
++IDREG_FIELD_ARCH_VAL(0b0010, "sha512")
++IDREG_FIELD_END(ID_AA64ISAR0, SHA2)
+
+
+I don't see such string value in the ARM ARM:
+
+0b0000 No SHA2 instructions implemented.
+0b0001 Implements instructions: SHA256H, SHA256H2, SHA256SU0, and SHA256SU1.
+0b0010 Implements instructions: • SHA256H, SHA256H2, SHA256SU0, and
+SHA256SU1. • SHA512H, SHA512H2, SHA512SU0, and SHA512SU1.
+
+Where did you get those arch defined strings? The only source I can see
+is linux sysreg and I am not sure this can be used as a reference.
+
+Looking at  target/arm/cpu-idregs.h.inc
+
++IDREG_FIELD_START(ID_AA64ISAR0, TLB,     56,  4, LOWER,  0)
++IDREG_FIELD_ARCH_VAL(0b0000, "off")
++IDREG_FIELD_ARCH_VAL(0b0001, "os")
++IDREG_FIELD_ARCH_VAL(0b0010, "range")
++IDREG_FIELD_END(ID_AA64ISAR0, TLB)
+
+it looks not straightforward to link with ARM ARM 
+
+TLB, bits [59:56] Indicates support for Outer Shareable and TLB range
+maintenance instructions. The value of this field is an IMPLEMENTATION
+DEFINED choice of: 0b0000 Outer Shareable and TLB range maintenance
+instructions are not implemented. 0b0001 Outer Shareable TLB maintenance
+instructions are implemented. 0b0010 Outer Shareable and TLB range
+maintenance instructions are implemented. All other values are reserved.
+FEAT_TLBIOS implements the functionality identified by the values 0b0001
+and 0b0010. FEAT_TLBIRANGE implements the functionality identified by
+the value 0b0010. From Armv8.4, the only permitted value is 0b0010.
+Access to this field is RO
+
+
+Thanks
 
 Eric
-
-
+>     BOOLEAN: 1-bit fields.
+>     NUMERIC: Numeric values like cache geometry, debug counter widths, etc.
+>     FRACTIONAL: Paired (base, frac) fields exposed as a single "M.F" string
+>           (e.g., CSV2/CSV2_FRAC, MPAM/MPAM_FRAC, RAS/RAS_FRAC, NV/NV_FRAC).
 >
-> In short: default_vals -> show no feature.
->                safe_rule -> valid values for guest given host values.
+> Co-authored-by: Khushit Shah <khushit.shah@nutanix.com>
+> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> ---
+>  target/arm/arm-cpu-props.h | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+>  create mode 100644 target/arm/arm-cpu-props.h
 >
->> taking FHM field if I compare with sysreg I have:
->> UnsignedEnum    51:48   FHM
->>         0b0000  NI
->>         0b0001  IMP
->>         0b0010  F16F32DOT
->>         0b0011  F16F32MM
->> So why do we miss some values?
-> The table was created based on sysreg file in 6.18.
-> A script added the arch values. Register, Fields, safe values and default values are
-> maintained manually.
->
-> Warm Regards,
-> Khushit
->
->
+> diff --git a/target/arm/arm-cpu-props.h b/target/arm/arm-cpu-props.h
+> new file mode 100644
+> index 0000000000..1dc3786ea9
+> --- /dev/null
+> +++ b/target/arm/arm-cpu-props.h
+> @@ -0,0 +1,36 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later
+> + *
+> + * ARM CPU feature properties.
+> + *
+> + * User-facing QOM properties that map to fields of the AArch64 ID
+> + * registers described in cpu-idregs.inc.h.
+> + *
+> + */
+> +
+> +#ifndef ARM_CPU_PROPS_H
+> +#define ARM_CPU_PROPS_H
+> +
+> +#include "cpu-idregs.h"
+> +
+> +typedef enum ArmCpuPropType {
+> +    ARM_PROP_STRING,
+> +    ARM_PROP_BOOLEAN,
+> +    ARM_PROP_NUMERIC,
+> +    ARM_PROP_FRACTIONAL,
+> +} ArmCpuPropType;
+> +
+> +typedef struct ArmFracVal {
+> +    const char *name;
+> +    uint64_t base_val;
+> +    uint64_t frac_val;
+> +} ArmFracVal;
+> +
+> +typedef struct ArmCpuPropDesc {
+> +    const char *name;
+> +    ArmCpuPropType type;
+> +    ArmFieldIdx base_field;
+> +    ArmFieldIdx frac_field;
+> +    const ArmFracVal *vals;
+> +} ArmCpuPropDesc;
+> +
+> +#endif
 
