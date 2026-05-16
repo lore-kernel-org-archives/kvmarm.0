@@ -1,303 +1,554 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121FF343D7B
-	for <kvmarm@lists.linux.dev>; Sat, 16 May 2026 18:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5355330C156
+	for <kvmarm@lists.linux.dev>; Sat, 16 May 2026 19:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778956283; cv=none; b=L86WEX+UjijV3qtyEVBqTm+kND96ciN/5lGMIU737TPSrRI/x1xgOih/SCna5vsyHuh4549+jONfx9ytrz0YCfKoMgVsD0UEzldQMnPLPATzR7VL7eT904S4jXqgWq++OILuS1bIS1L95juuOZ6A7+CHXZe+tftJIn9f0hUA/Es=
+	t=1778958204; cv=none; b=tO4rqIbcTxa7ntWSCWEZQ9/qfpoNXnpcrBT6es9lINz5m95JHY/Kh6jcKme54IBTMb4YIZEzvcf3jvuIxtAC3bfRsl0tyZ28e0xppNnswgfccQiTbZHDJdC5SZarn7bUbBYXjMTdVwBVtiku+3v4J9uDgL/efY6SMII4XgKal2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778956283; c=relaxed/simple;
-	bh=fwVDg016m7eeWy4bYy16DTCCBEBDMvvZImnp5Carqqo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CCk9RRgaYm1SUOYQuA7Sa+bMalU6ZX5anbovslYvB5DO9aH3XMJ1RNz+AQx2qVTYEglCMSzCr74/lLv859LuJ8zlbxssP3Uv1fo34vMNpK2qAst0OWs9vTqNkN6v8D/sRo70GUJ/4urbw9KqnIXqWTMc6fOZB09xIcbo1iCIWyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=LN2kdcYC; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1778958204; c=relaxed/simple;
+	bh=gB3J/Pwl7OFwPGscVPQK4fMkVyeyBjpwMv4fFHoJYrU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kgr4ZxLhXLBWXwvVt8yRZhbQVsuBxx7hSsSlRad1EeDuArurYhphIZE0/7uSpvwbZ/TeK4n+R9ncoYGoJ9hEUSbD6MP8TDwGDZBub04VHMtFe9P3+HKcSxsmv9DowWr+m4iemuQ7KwTBxmN3gKkXdQJ496fsX69UK5/J1BfTgJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TPeOxhBQ; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="LN2kdcYC"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TPeOxhBQ"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BBF41CDD;
-	Sat, 16 May 2026 11:31:07 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A8C53F85F;
-	Sat, 16 May 2026 11:31:09 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 852A71BF3;
+	Sat, 16 May 2026 12:03:16 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5BAD3F836;
+	Sat, 16 May 2026 12:03:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778956272; bh=fwVDg016m7eeWy4bYy16DTCCBEBDMvvZImnp5Carqqo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LN2kdcYCpJYQSQAIS40HNiC08siLiOrQMYbk5r3oYmosomJZmIEPjxJgCzmKmE4pg
-	 +ljrjPYwPbeXyZCI9SOjfEfg45magdrdOyI6LQwM6o0Z/JmHC6CEcGWUfXiyZgCC5f
-	 aGetGu8f9AwluRkR//12eMufmZeaKGfSNGazQHHE=
+	t=1778958201; bh=gB3J/Pwl7OFwPGscVPQK4fMkVyeyBjpwMv4fFHoJYrU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TPeOxhBQlu+nr2mRSHd0tao0teVAcEZJd0M1VJxdqsNGZ1onIBMLLYe+tcBPcdyLM
+	 ttVa1CC5ezesqsCQ1EXEQZCKjO9N2vPCX1w5esJRu57UOecex04gynBEPkpLHOt869
+	 18aCl+zSB68jOLwUJa79fHLfYeclRCP9pAORhSN4=
+Date: Sat, 16 May 2026 20:03:10 +0100
 From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 8/9] KVM: arm64: selftests: Add infrastructure for using stage-2 in guest
-Date: Sat, 16 May 2026 19:30:02 +0100
-Message-ID: <20260516183003.799058-9-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260516183003.799058-1-weilin.chang@arm.com>
-References: <20260516183003.799058-1-weilin.chang@arm.com>
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Enable stage 2 translation in L2
+Message-ID: <y4klyr6p2gt7acnxxl2jlyv5euvcyxcibrekz7zr23v6nmxhqx@y7yh3qibz276>
+References: <20260515-enable-s2-hello_nested-v1-1-41f3faca1a08@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260515-enable-s2-hello_nested-v1-1-41f3faca1a08@fujitsu.com>
 
-Add a stage-2 page table generator, the s2_mmu structure, and vEL2
-stage-2 preparation code for a guest hypervisor to turn on stage-2
-translation for its nested guest.
+On Fri, May 15, 2026 at 10:48:05AM +0900, Itaru Kitayama wrote:
+> IPA size and start level are configurable at build time.
 
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- .../selftests/kvm/arm64/hello_nested.c        |   2 +-
- .../selftests/kvm/arm64/shadow_stage2.c       |   2 +-
- .../selftests/kvm/include/arm64/nested.h      |  15 +-
- .../testing/selftests/kvm/lib/arm64/nested.c  | 145 +++++++++++++++++-
- 4 files changed, 160 insertions(+), 4 deletions(-)
+Hi Itaru,
 
-diff --git a/tools/testing/selftests/kvm/arm64/hello_nested.c b/tools/testing/selftests/kvm/arm64/hello_nested.c
-index 9ed5285f5f2d..b57e41c73214 100644
---- a/tools/testing/selftests/kvm/arm64/hello_nested.c
-+++ b/tools/testing/selftests/kvm/arm64/hello_nested.c
-@@ -62,7 +62,7 @@ static void guest_code(void)
- 	l2_stack_top = ucall_translate_to_gpa(&l2_stack[L2STACKSZ]);
- 
- 	init_vcpu(&vcpu, l2_pc, l2_stack_top);
--	prepare_hyp();
-+	prepare_hyp_no_s2();
- 
- 	ret = run_l2(&vcpu, &hyp_data);
- 	GUEST_ASSERT_EQ(ret, ARM_EXCEPTION_TRAP);
-diff --git a/tools/testing/selftests/kvm/arm64/shadow_stage2.c b/tools/testing/selftests/kvm/arm64/shadow_stage2.c
-index c5332b8b5683..2b274b810dcf 100644
---- a/tools/testing/selftests/kvm/arm64/shadow_stage2.c
-+++ b/tools/testing/selftests/kvm/arm64/shadow_stage2.c
-@@ -72,7 +72,7 @@ static void guest_code(void)
- 	l2_pc = ucall_translate_to_gpa(l2_guest_code);
- 
- 	init_vcpu(&vcpu, l2_pc, l2_stack_top);
--	prepare_hyp();
-+	prepare_hyp_no_s2();
- 
- 	while (true) {
- 		GUEST_PRINTF("L2 enter\n");
-diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
-index fc59fabff12d..1bcbb31b8d67 100644
---- a/tools/testing/selftests/kvm/include/arm64/nested.h
-+++ b/tools/testing/selftests/kvm/include/arm64/nested.h
-@@ -38,6 +38,14 @@ struct vcpu {
- 	struct cpu_context context;
- };
- 
-+struct s2_mmu {
-+	gpa_t pgd;
-+	unsigned int vmid;
-+	unsigned int page_size_shift;
-+	u64 vtcr;
-+	u64 ipa_bits;
-+};
-+
- /*
-  * KVM has host_data and hyp_context, combine them because we're only doing
-  * hyp context.
-@@ -56,8 +64,13 @@ struct page_pool {
- size_t get_page_size(void);
- gpa_t alloc_page(struct page_pool *pp);
- bool has_tgran_2(u64 mmfr0, size_t size);
--void prepare_hyp(void);
-+void prepare_hyp_no_s2(void);
-+void prepare_hyp(struct s2_mmu *mmu);
- void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top);
-+void create_s2_mapping(struct s2_mmu *mmu, u64 ipa, u64 pa, size_t size,
-+		       struct page_pool *pp);
-+void init_s2_mmu(struct s2_mmu *mmu, unsigned int vmid, gpa_t pgd,
-+		 size_t page_size, u64 ipa_bits);
- int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data);
- 
- u64 do_hvc(u64 action, u64 arg1, u64 arg2);
-diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
-index cda41f355263..9848d607ef64 100644
---- a/tools/testing/selftests/kvm/lib/arm64/nested.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
-@@ -71,13 +71,22 @@ gpa_t alloc_page(struct page_pool *pp)
- 	}
- }
- 
--void prepare_hyp(void)
-+void prepare_hyp_no_s2(void)
- {
- 	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW, hcr_el2);
- 	write_sysreg(hyp_vectors, vbar_el2);
- 	isb();
- }
- 
-+void prepare_hyp(struct s2_mmu *mmu)
-+{
-+	write_sysreg(mmu->vtcr, vtcr_el2);
-+	write_sysreg(mmu->pgd | ((u64)mmu->vmid << 48), vttbr_el2);
-+	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW | HCR_EL2_VM, hcr_el2);
-+	write_sysreg(hyp_vectors, vbar_el2);
-+	isb();
-+}
-+
- void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top)
- {
- 	memset(vcpu, 0, sizeof(*vcpu));
-@@ -86,6 +95,140 @@ void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top)
- 	vcpu->context.sys_regs[SP_EL1] = l2_stack_top;
- }
- 
-+static int stage2_levels(unsigned int page_size_shift, u64 ipa_bits)
-+{
-+	/* taken from ARM64_HW_PGTABLE_LEVELS(ipa) in KVM */
-+	return (ipa_bits - 4) / (page_size_shift - 3);
-+}
-+
-+static u64 get_index(struct s2_mmu *mmu, u64 ipa, int level)
-+{
-+	int width = mmu->page_size_shift - 3;
-+	int shift_amount = mmu->page_size_shift + (3 - level) * width;
-+
-+	return (ipa >> shift_amount) & GENMASK_ULL(width - 1, 0);
-+}
-+
-+static u64 pte_gpa_to_gva(u64 gpa)
-+{
-+	/*
-+	 * This depends on how the memory used for s2pt is mapped in GVA,
-+	 * currently it is assumed they are idmapped.
-+	 */
-+	return gpa;
-+}
-+
-+static u64 pte_to_pt_base(u64 pte)
-+{
-+	return pte & GENMASK_ULL(47, 12);
-+}
-+
-+#define S2_PTE_AF		(1ULL << 10)
-+#define S2_PTE_SH_INNER		(3ULL << 8)
-+#define S2_PTE_S2AP_RW		(3ULL << 6)
-+#define S2_PTE_ATTR_NORMAL_WB	(0xfULL << 2)
-+#define S2_PTE_TYPE_TABLE	(1ULL << 1)
-+#define S2_PTE_TYPE_PAGE	(1ULL << 1)
-+#define S2_PTE_VALID		1ULL
-+
-+/* No block mappings for now. */
-+static void create_one_s2_mapping(struct s2_mmu *mmu, u64 ipa, u64 pa,
-+				  struct page_pool *pp)
-+{
-+	int levels = stage2_levels(mmu->page_size_shift, mmu->ipa_bits);
-+	u64 index, pte, pte_new, table_attr, page_attr;
-+	gpa_t pte_addr, pt_base = mmu->pgd;
-+
-+	table_attr = S2_PTE_TYPE_TABLE | S2_PTE_VALID;
-+	page_attr = S2_PTE_AF | S2_PTE_SH_INNER | S2_PTE_S2AP_RW |
-+		    S2_PTE_ATTR_NORMAL_WB | S2_PTE_TYPE_PAGE | S2_PTE_VALID;
-+
-+	for (int level = 4 - levels; level <= 3; level++) {
-+		index = get_index(mmu, ipa, level);
-+		pte_addr = pt_base + index * 8;
-+		pte = *((u64 *)pte_gpa_to_gva(pte_addr));
-+
-+		if (level == 3) {
-+			/* Last level, install leaf entry. */
-+			pte_new = pa & ~GENMASK_ULL(mmu->page_size_shift - 1, 0);
-+			pte_new |= page_attr;
-+			*((u64 *)pte_gpa_to_gva(pte_addr)) = pte_new;
-+		} else if (!(pte & S2_PTE_VALID)) {
-+			/* Empty next level table, allocate and install. */
-+			pte_new = alloc_page(pp);
-+			pte_new |= table_attr;
-+			*((u64 *)pte_gpa_to_gva(pte_addr)) = pte_new;
-+			pt_base = pte_to_pt_base(pte_new);
-+		} else {
-+			/* Next level table found, descend into it. */
-+			pt_base = pte_to_pt_base(pte);
-+		}
-+	}
-+}
-+
-+void create_s2_mapping(struct s2_mmu *mmu, u64 ipa, u64 pa, size_t size,
-+		       struct page_pool *pp)
-+{
-+	u64 ipa_end;
-+	u64 mask = pp->page_size - 1;
-+
-+	ipa_end = (ipa + size + mask) & ~mask;
-+	ipa &= ~mask;
-+	pa &= ~mask;
-+
-+	while (ipa < ipa_end) {
-+		create_one_s2_mapping(mmu, ipa, pa, pp);
-+		pa += pp->page_size;
-+		ipa += pp->page_size;
-+	}
-+	dsb(ishst);
-+}
-+
-+void init_s2_mmu(struct s2_mmu *mmu, unsigned int vmid, gpa_t pgd,
-+		 size_t page_size, u64 ipa_bits)
-+{
-+	u64 ps, tg0, sl0_base, mmfr0 = read_sysreg(id_aa64mmfr0_el1);
-+	int levels;
-+
-+	mmu->vmid = vmid;
-+	mmu->pgd = pgd;
-+	mmu->ipa_bits = ipa_bits;
-+	mmu->vtcr = 0;
-+
-+	switch (page_size) {
-+	case SZ_4K:
-+		tg0 = VTCR_EL2_TG0_4K;
-+		mmu->page_size_shift = 12;
-+		sl0_base = 2;
-+		break;
-+	case SZ_16K:
-+		tg0 = VTCR_EL2_TG0_16K;
-+		mmu->page_size_shift = 14;
-+		sl0_base = 3;
-+		break;
-+	case SZ_64K:
-+	default:
-+		tg0 = VTCR_EL2_TG0_64K;
-+		mmu->page_size_shift = 16;
-+		sl0_base = 3;
-+		break;
-+	}
-+
-+	levels = stage2_levels(mmu->page_size_shift, mmu->ipa_bits);
-+	mmu->vtcr |= FIELD_PREP(VTCR_EL2_SL0, (sl0_base - (4 - levels)));
-+
-+	ps = SYS_FIELD_GET(ID_AA64MMFR0_EL1, PARANGE, mmfr0);
-+	/* cap ps to 48-bit */
-+	ps = ps > 0b0101 ? 0b0101 : ps;
-+	mmu->vtcr |= VTCR_EL2_RES1 | SYS_FIELD_PREP(VTCR_EL2, PS, ps)           |
-+				    SYS_FIELD_PREP(VTCR_EL2, TG0, tg0)         |
-+				    SYS_FIELD_PREP_ENUM(VTCR_EL2, SH0, INNER)  |
-+				    SYS_FIELD_PREP_ENUM(VTCR_EL2, ORGN0, WBWA) |
-+				    SYS_FIELD_PREP_ENUM(VTCR_EL2, IRGN0, WBWA);
-+
-+	mmu->vtcr |= FIELD_PREP(VTCR_EL2_T0SZ, 64 - ipa_bits);
-+}
-+
- void __sysreg_save_el1_state(struct cpu_context *ctxt)
- {
- 	ctxt->sys_regs[SP_EL1] = read_sysreg(sp_el1);
--- 
-2.43.0
+Thanks for the effort, and sorry for not making the next version for so
+long.
 
+There are a few issues with this. Firstly, my patches aren't accepted
+yet, therefore your code which builds on top of that shouldn't be posted
+independently. Second, the commit message is giving too little
+information about the change, which is non-trivial.
+
+In terms of the changes themselves, see below.
+
+> 
+> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> ---
+> Enable stage 2 translation in L2, but keep stage 1 remain off
+> as Wei Lin prefers. Types are changed accordingly due to the
+> recent selftest-wide changes.
+> ---
+>  tools/testing/selftests/kvm/arm64/hello_nested.c   |  11 +-
+>  tools/testing/selftests/kvm/include/arm64/nested.h |  38 ++-
+>  tools/testing/selftests/kvm/lib/arm64/hyp-entry.S  |   5 +
+>  tools/testing/selftests/kvm/lib/arm64/nested.c     | 279 ++++++++++++++++++++-
+>  4 files changed, 322 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/hello_nested.c b/tools/testing/selftests/kvm/arm64/hello_nested.c
+> index 69f4d8e750e2..1ac045894b89 100644
+> --- a/tools/testing/selftests/kvm/arm64/hello_nested.c
+> +++ b/tools/testing/selftests/kvm/arm64/hello_nested.c
+> @@ -18,9 +18,9 @@
+>  /*
+>   * TPIDR_EL2 is used to store vcpu id, so save and restore it.
+>   */
+> -static vm_paddr_t ucall_translate_to_gpa(void *gva)
+> +static gpa_t ucall_translate_to_gpa(void *gva)
+>  {
+> -	vm_paddr_t gpa;
+> +	gpa_t gpa;
+>  	u64 vcpu_id = read_sysreg(tpidr_el2);
+>  
+>  	GUEST_SYNC2(XLATE2GPA, gva);
+> @@ -50,7 +50,7 @@ static void guest_code(void)
+>  	struct vcpu vcpu;
+>  	struct hyp_data hyp_data;
+>  	int ret;
+> -	vm_paddr_t l2_pc, l2_stack_top;
+> +	gpa_t l2_pc, l2_stack_top;
+>  	/* force 16-byte alignment for the stack pointer */
+>  	u8 l2_stack[L2STACKSZ] __attribute__((aligned(16)));
+>  	u64 arg1, arg2;
+> @@ -92,7 +92,7 @@ int main(void)
+>  	struct kvm_vcpu *vcpu;
+>  	struct kvm_vm *vm;
+>  	struct ucall uc;
+> -	vm_paddr_t gpa;
+> +	gpa_t gpa;
+>  
+>  	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+>  	vm = vm_create(1);
+> @@ -102,13 +102,14 @@ int main(void)
+>  	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+>  	kvm_arch_vm_finalize_vcpus(vm);
+>  
+> +	prepare_hyp_state(vm, vcpu);
+>  	while (true) {
+>  		vcpu_run(vcpu);
+>  
+>  		switch (get_ucall(vcpu, &uc)) {
+>  		case UCALL_SYNC:
+>  			if (uc.args[0] == XLATE2GPA) {
+> -				gpa = addr_gva2gpa(vm, (vm_vaddr_t)uc.args[1]);
+> +				gpa = addr_gva2gpa(vm, (gva_t)uc.args[1]);
+>  				vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), gpa);
+>  			}
+>  			break;
+> diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
+> index b16a72488858..b4ccca3593db 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/nested.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/nested.h
+> @@ -18,14 +18,44 @@
+>  
+>  #include <asm/ptrace.h>
+>  #include "kvm_util.h"
+> +#include "processor.h"
+>  
+>  extern char hyp_vectors[];
+>  
+> +#ifdef CONFIG_ARM64_64K_PAGES
+> +
+> +#define VTCR_EL2_TGRAN                  64K
+> +#define VTCR_EL2_TGRAN_SL0_BASE         3UL
+> +
+> +#elif defined(CONFIG_ARM64_16K_PAGES)
+> +
+> +#define VTCR_EL2_TGRAN                  16K
+> +#define VTCR_EL2_TGRAN_SL0_BASE         3UL
+> +
+> +#else   /* 4K */
+> +
+> +#define VTCR_EL2_TGRAN                  4K
+> +#define VTCR_EL2_TGRAN_SL0_BASE         2UL
+> +
+> +#endif
+> +
+> +struct s2_config {
+> +	u64 granule;
+> +	u8 ia_bits;
+> +	u8 oa_bits;
+> +	u8 start_level;
+> +};
+> +
+> +u64 get_l1_vtcr(const struct s2_config *cfg);
+> +
+> +void nested_map(struct kvm_vm *vm, const struct s2_config *cfg, gpa_t guest_pgd, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
+> +void nested_map_memslot(struct kvm_vm *vm, const struct s2_config *cfg, gpa_t guest_pgd, u32 memslot);
+> +
+>  enum vcpu_sysreg {
+>  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>  
+>  	SP_EL1,
+> -
+> +	ESR_EL2,
+>  	NR_SYS_REGS
+>  };
+>  
+> @@ -47,12 +77,14 @@ struct hyp_data {
+>  };
+>  
+>  void prepare_hyp(void);
+> -void init_vcpu(struct vcpu *vcpu, vm_paddr_t l2_pc, vm_paddr_t l2_stack_top);
+> +void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top);
+>  int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data);
+>  
+>  u64 do_hvc(u64 action, u64 arg1, u64 arg2);
+> +u64 vcpu_get_esr_el2(struct vcpu *vcpu);
+> +
+>  u64 __guest_enter(struct vcpu *vcpu, struct cpu_context *hyp_context);
+> -void __hyp_exception(u64 type);
+> +void __hyp_exception(u64 type, u64 esr, u64 elr, u64 far, u64 hpfar, u64 spsr);
+>  
+>  void __sysreg_save_el1_state(struct cpu_context *ctxt);
+>  void __sysreg_restore_el1_state(struct cpu_context *ctxt);
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S b/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
+> index 6341f6e05c90..fcf7bb303b77 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
+> +++ b/tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
+> @@ -30,6 +30,11 @@ el1_error:
+>  	b	__guest_exit
+>  
+>  el2_sync:
+> +	mrs	x1, esr_el2
+> +	mrs	x2, elr_el2
+> +	mrs	x3, far_el2
+> +	mrs	x4, hpfar_el2
+> +	mrs	x5, spsr_el2
+>  	mov	x0, #ARM_EXCEPTION_EL2_TRAP
+>  	b	__hyp_exception
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
+> index b30d20b101c4..104c98d29eb9 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/nested.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
+> @@ -7,15 +7,269 @@
+>  #include "processor.h"
+>  #include "test_util.h"
+>  #include <asm/sysreg.h>
+> +#include <linux/sizes.h>
+> +
+> +static const struct s2_config default_s2_cfg = {
+> +        .granule        = SZ_4K,
+> +        .ia_bits        = 40,
+> +        .oa_bits        = 40,
+> +        .start_level    = 0,
+> +};
+
+4K is not guaranteed at stage-2, you will need to check
+ID_AA64MMFR0_EL1.TGRAN2_* . oa_bits as 40 is also not guaranteed, you
+will need to check ID_AA64MMFR0_EL1.PARange for the limit.
+
+> +
+> +static u64 s2_alloc_page_table(struct kvm_vm *vm, const struct s2_config *cfg)
+> +{
+> +        u64 nr_pages = cfg->granule >> vm->page_shift;
+> +
+> +        TEST_ASSERT(!(cfg->granule & (vm->page_size - 1)),
+> +                    "S2 granule 0x%lx smaller/not aligned to VM page size 0x%x",
+> +                    cfg->granule, vm->page_size);
+> +
+> +        return vm_phy_pages_alloc(vm, nr_pages,
+> +                                  KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> +                                  vm->memslots[MEM_REGION_PT]);
+> +}
+
+This part is using spaces instead of tabs to indent the code.
+
+>  
+>  void prepare_hyp(void)
+>  {
+> -	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW, hcr_el2);
+> +	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW | HCR_EL2_VM, hcr_el2);
+>  	write_sysreg(hyp_vectors, vbar_el2);
+>  	isb();
+>  }
+>  
+> -void init_vcpu(struct vcpu *vcpu, vm_paddr_t l2_pc, vm_paddr_t l2_stack_top)
+> +static unsigned int s2_granule_shift(const struct s2_config *cfg)
+> +{
+> +	switch (cfg->granule) {
+> +	case SZ_4K:
+> +		return 12;
+> +	case SZ_16K:
+> +		return 14;
+> +	case SZ_64K:
+> +		return 16;
+> +	default:
+> +		TEST_FAIL("Unsupported stage-2 granule %u", cfg->granule);
+> +	}
+> +}
+> +
+> +static unsigned int s2_level_stride(const struct s2_config *cfg)
+> +{
+> +	return s2_granule_shift(cfg) - 3;
+> +}
+> +
+> +static unsigned int s2_ptrs_per_table(const struct s2_config *cfg)
+> +{
+> +	return 1U << s2_level_stride(cfg);
+> +}
+> +
+> +static u64 s2_index_mask(const struct s2_config *cfg)
+> +{
+> +	return s2_ptrs_per_table(cfg) - 1;
+> +}
+> +
+> +static unsigned int s2_last_level(const struct s2_config *cfg)
+> +{
+> +	return 3;
+> +}
+> +
+> +static unsigned int s2_level_shift(const struct s2_config *cfg,
+> +				   unsigned int level)
+> +{
+> +	return s2_granule_shift(cfg) +
+> +	       (s2_last_level(cfg) - level) * s2_level_stride(cfg);
+> +}
+> +
+> +static u64 s2_table_mask(const struct s2_config *cfg)
+> +{
+> +	return GENMASK_ULL(cfg->ia_bits - 1, s2_granule_shift(cfg));
+> +}
+> +
+> +static u64 s2_output_mask(const struct s2_config *cfg)
+> +{
+> +	return GENMASK_ULL(cfg->oa_bits - 1, s2_granule_shift(cfg));
+> +}
+> +
+> +static u64 s2_desc_table(u64 paddr, const struct s2_config *cfg)
+> +{
+> +	return (paddr & s2_table_mask(cfg)) | 0x3;
+> +}
+> +
+> +#define S2_MEMATTR_NORMAL_WB		0xfUL
+> +#define S2_MEMATTR_SHIFT		2
+> +
+> +#define S2_S2AP_R			BIT(6)
+> +#define S2_S2AP_W			BIT(7)
+> +
+> +#define S2_SH_INNER			(3UL << 8)
+> +
+> +
+> +static u64 s2_desc_page(u64 paddr, u64 flags, const struct s2_config *cfg)
+> +{
+> +	u64 desc;
+> +
+> +	desc = paddr & s2_output_mask(cfg);
+> +
+> +	/* Stage-2 lower attrs */
+> +	desc |= S2_MEMATTR_NORMAL_WB << S2_MEMATTR_SHIFT;
+> +	desc |= S2_S2AP_R | S2_S2AP_W;
+> +	desc |= S2_SH_INNER;
+> +	desc |= PTE_AF;
+> +
+> +	/* L3 page descriptor: bits[1:0] = 0b11 */
+> +	desc |= PTE_TYPE_PAGE;
+> +	desc |= PTE_VALID;
+> +
+> +	return desc;
+> +}
+> +
+> +static inline int ipa_bits_to_ps(unsigned int ipa_bits)
+> +{
+> +	switch (ipa_bits) {
+> +	case 32:
+> +		return 0b000;
+> +	case 36:
+> +		return 0b001;
+> +	case 40:
+> +		return 0b010;
+> +	case 42:
+> +		return 0b011;
+> +	case 44:
+> +		return 0b100;
+> +	case 48:
+> +		return 0b101;
+> +	case 52:
+> +		return 0b110;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+> +u64 get_l1_vtcr(const struct s2_config *cfg)
+> +{
+> +	if (!cfg)
+> +		cfg = &default_s2_cfg;
+> +
+> +	return  FIELD_PREP(VTCR_EL2_PS, ipa_bits_to_ps(cfg->ia_bits)) |
+
+oa_bits here?
+
+> +		FIELD_PREP(VTCR_EL2_TG0, VTCR_EL2_TG0_4K) |
+> +		FIELD_PREP(VTCR_EL2_ORGN0_MASK, VTCR_EL2_ORGN0_WBWA) |
+> +		FIELD_PREP(VTCR_EL2_IRGN0_MASK, VTCR_EL2_IRGN0_WBWA) |
+> +		FIELD_PREP(VTCR_EL2_SH0_MASK, VTCR_EL2_SH0_INNER) |
+> +		FIELD_PREP(VTCR_EL2_SL0, VTCR_EL2_TGRAN_SL0_BASE - cfg->start_level) |
+> +		FIELD_PREP(VTCR_EL2_T0SZ_MASK, 64 - cfg->ia_bits);
+> +}
+> +
+> +void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+> +{
+> +        const struct s2_config *cfg = &default_s2_cfg;
+> +        u64 guest_pgd;
+> +
+> +        vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTCR_EL2), get_l1_vtcr(cfg));
+> +
+> +        guest_pgd = s2_alloc_page_table(vm, cfg);
+> +        nested_map_memslot(vm, cfg, guest_pgd, 0);
+> +
+> +	pr_debug("cfg=%p ia_bits=%u oa_bits=%u granule=%u\n",
+> +	cfg, cfg->ia_bits, cfg->oa_bits, cfg->granule);
+> +
+> +        vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2), guest_pgd);
+> +}
+
+Same here about the spaces.
+
+If you are interested, I just posted v3 with stage-2 enabled for the
+nested guest. Different from your approach, in my version all stage-2
+setup is done by the guest hypervisor itself. You can check it out at
+[1]. Feedback is welcome.
+
+Thanks,
+Wei-Lin Chang
+
+[1]: https://lore.kernel.org/kvmarm/20260516183003.799058-1-weilin.chang@arm.com/
+
+> +
+> +static void __nested_pg_map(struct kvm_vm *vm,
+> +			    const struct s2_config *cfg,
+> +			    u64 guest_pgd,
+> +			    u64 nested_paddr,
+> +			    u64 paddr,
+> +			    u64 flags)
+> +{
+> +	u64 granule = 1ULL << s2_granule_shift(cfg);
+> +	u64 *ptep;
+> +	unsigned int level;
+> +
+> +	TEST_ASSERT(!(nested_paddr & (granule - 1)),
+> +		    "L2 IPA not granule aligned: 0x%lx granule 0x%lx",
+> +		    nested_paddr, granule);
+> +
+> +	TEST_ASSERT(!(paddr & (granule - 1)),
+> +		    "PA not granule aligned: 0x%lx granule 0x%lx",
+> +		    paddr, granule);
+> +
+> +	ptep = addr_gpa2hva(vm, guest_pgd);
+> +
+> +	for (level = cfg->start_level; level < s2_last_level(cfg); level++) {
+> +		u64 idx;
+> +		u64 desc;
+> +
+> +		idx = (nested_paddr >> s2_level_shift(cfg, level)) &
+> +		      s2_index_mask(cfg);
+> +
+> +		ptep += idx;
+> +		desc = *ptep;
+> +
+> +		if (!desc) {
+> +			u64 table = s2_alloc_page_table(vm, cfg);
+> +
+> +			desc = s2_desc_table(table, cfg);
+> +			*ptep = desc;
+> +		}
+> +
+> +		ptep = addr_gpa2hva(vm, desc & s2_table_mask(cfg));
+> +	}
+> +
+> +	ptep += (nested_paddr >> s2_granule_shift(cfg)) & s2_index_mask(cfg);
+> +	*ptep = s2_desc_page(paddr, flags, cfg);
+> +}
+> +
+> +void nested_map(struct kvm_vm *vm,
+> +		const struct s2_config *cfg,
+> +		gpa_t guest_pgd,
+> +		u64 nested_paddr,
+> +		u64 paddr,
+> +		u64 size)
+> +{
+> +	u64 granule;
+> +	size_t npages;
+> +
+> +	if (!cfg)
+> +		cfg = &default_s2_cfg;
+> +
+> +	granule = 1ULL << s2_granule_shift(cfg);
+> +
+> +	TEST_ASSERT(!(size & (granule - 1)),
+> +		    "Mapping size 0x%lx not aligned to granule 0x%lx",
+> +		    size, granule);
+> +
+> +	TEST_ASSERT(nested_paddr + size > nested_paddr, "IPA overflow");
+> +	TEST_ASSERT(paddr + size > paddr, "PA overflow");
+> +
+> +	npages = size / granule;
+> +
+> +	while (npages--) {
+> +		__nested_pg_map(vm, cfg, guest_pgd, nested_paddr, paddr,
+> +				MT_NORMAL);
+> +
+> +		nested_paddr += granule;
+> +		paddr += granule;
+> +	}
+> +}
+> +
+> +void nested_map_memslot(struct kvm_vm *vm,
+> +			const struct s2_config *cfg,
+> +			gpa_t guest_pgd,
+> +			u32 memslot)
+> +{
+> +	struct userspace_mem_region *region;
+> +	u64 gpa, end;
+> +
+> +	region = memslot2region(vm, memslot);
+> +
+> +	gpa = region->region.guest_phys_addr;
+> +	end = gpa + region->region.memory_size;
+> +
+> +	pr_debug("nested S2 map slot %u: GPA %#lx-%#lx\n", memslot, gpa, end);
+> +
+> +	for (; gpa < end; gpa += cfg->granule)
+> +		nested_map(vm, cfg, guest_pgd, gpa, gpa, cfg->granule);
+> +}
+> +
+> +void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top)
+>  {
+>  	memset(vcpu, 0, sizeof(*vcpu));
+>  	vcpu->context.regs.pc = l2_pc;
+> @@ -46,13 +300,32 @@ int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data)
+>  
+>  	vcpu->context.regs.pc = read_sysreg(elr_el2);
+>  	vcpu->context.regs.pstate = read_sysreg(spsr_el2);
+> +	vcpu->context.sys_regs[ESR_EL2] = read_sysreg(esr_el2);
+>  
+>  	__sysreg_save_el1_state(&vcpu->context);
+>  
+>  	return ret;
+>  }
+>  
+> -void __hyp_exception(u64 type)
+> +u64 vcpu_get_esr_el2(struct vcpu *vcpu)
+>  {
+> +	return vcpu->context.sys_regs[ESR_EL2];
+> +
+> +}
+> +
+> +void __hyp_exception(u64 type, u64 esr, u64 elr, u64 far, u64 hpfar, u64 spsr)
+> +{
+> +	u64 ec = esr >> 26;
+> +	u64 iss = esr & GENMASK_ULL(24, 0);
+> +	u64 ipa = ((hpfar & GENMASK_ULL(39, 4)) << 8) |
+> +		  (far & GENMASK_ULL(11, 0));
+> +
+> +	GUEST_FAIL("Unexpected hyp exception: type=%lu "
+> +		   "ESR_EL2=%#lx EC=%#lx ISS=%#lx "
+> +		   "ELR_EL2=%#lx FAR_EL2=%#lx HPFAR_EL2=%#lx IPA=%#lx "
+> +		   "SPSR_EL2=%#lx",
+> +		   type, esr, ec, iss, elr, far, hpfar, ipa, spsr);
+>  	GUEST_FAIL("Unexpected hyp exception! type: %lx\n", type);
+> +
+> +
+>  }
+> 
+> ---
+> base-commit: eb656a0272c639d43be7a9bdd1c5f31eff3afe86
+> change-id: 20260515-enable-s2-hello_nested-b360a2e9bb87
+> 
+> Best regards,
+> -- 
+> Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> 
