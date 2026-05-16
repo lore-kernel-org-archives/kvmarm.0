@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3648533D501
-	for <kvmarm@lists.linux.dev>; Sat, 16 May 2026 18:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3704933FE33
+	for <kvmarm@lists.linux.dev>; Sat, 16 May 2026 18:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778956257; cv=none; b=CKhoeQ7Q8Fmc8/3sdPqobaH2hGPuySfB1GBv+dz5mGUiCydHoPECbsZfvgmsmOMZDRU76w4GV/e0kOPkd/Nl31FzBSBNnWej4D25vdnfMzzJMxGwf9ONK0Zuw6ucWhYnGiIajXoYM2lcf0+4fTZwaMggrWhwMDfVJQYudF96uMs=
+	t=1778956260; cv=none; b=eIQ92j+jfG+7EzhJE8VS927fhriKYan03XHskm7IWYG4CFsuxOcuO09pgr3iZrfxk1jTs9vVWMNeUp2U0loogMIK36+jjyyLOc5y35gQse7ZPi88oc0gnLLmKZ6Id6aNaHhcAIJdHuAzDkDr/QWOo5qKZNE94XPN+1byAFJs50o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778956257; c=relaxed/simple;
-	bh=oes1Zq1kjZJVeEfVMd7tTaCf/godZJPRNpOF8x60M7Y=;
+	s=arc-20240116; t=1778956260; c=relaxed/simple;
+	bh=5dITwd1Xwtsf0FSmhxiGWNKsuOsFRRNYwaEcdnmG+YA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y2x79sTENu55FACEcu4jOGeOn9KXeZqZ52Yt+8mTuQu9v8284oAX7nHVqsq+mLiA9lsfZHJg88JgYCTCnACMOK9LrbXHoS8FkncRtFjVNnz66iYaIRmfsaR1lL6gYiJ0RhEM4mdZ6ycI04EQMPApysXHu/UxNkqi+uFDGF0FKyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZzMsjZUe; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=LMgK+5+hXszoOo5/5jSpHMKMSj5kXC1++y6ErDcHYyA7VHGXjJ+9wrIdcQ8KOTm5LQ9RCRLz0n5YqxDgBr7F3loTI6eNB4U/FwVnAb5wnmz9fF4lUrNM4qTMr39pow3wu5nsEOMklMLE0QmpfmJ9CT3N5gr5OMM/EOawKCmN9RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FOwnjdBj; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZzMsjZUe"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FOwnjdBj"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 76D272D91;
-	Sat, 16 May 2026 11:30:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 790171BF3;
+	Sat, 16 May 2026 11:30:52 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09DDD3F85F;
-	Sat, 16 May 2026 11:30:51 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C0533F85F;
+	Sat, 16 May 2026 11:30:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778956254; bh=oes1Zq1kjZJVeEfVMd7tTaCf/godZJPRNpOF8x60M7Y=;
+	t=1778956257; bh=5dITwd1Xwtsf0FSmhxiGWNKsuOsFRRNYwaEcdnmG+YA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZzMsjZUeF9Y1iEIsRLrVrIagU7XwyK43VIstkh2KG+3ABw923pUruQwifyGeFF/t6
-	 TPz2TgwwMQhlZarcQX1ZPQKx06U0z2DfxbsU3zRlN0JuKCgLv3puU0HV5t/SrG3N1S
-	 B7xc0tXkNsiRhhppG7HQHZMxVCOEByclbF2+kUZc=
+	b=FOwnjdBjlESEb170DESQ3X5e+PRe5gxDF0rQ8ZGbNG3VlEnEQV7v8SaQ01z9chRVZ
+	 ZmtIiYTmO2di+dG8IwawubT6mzxEY4TnHTS3QygNZ5nPcZmVy4P8b3pcrUiEqHuvpa
+	 0VtpkA7y3SZE/j9Ddv9qDdEeclKdJ5Z55LFh8G1Q=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Will Deacon <will@kernel.org>,
 	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 2/9] KVM: arm64: selftests: Add helpers for guest hypervisors
-Date: Sat, 16 May 2026 19:29:56 +0100
-Message-ID: <20260516183003.799058-3-weilin.chang@arm.com>
+Subject: [PATCH v3 3/9] KVM: arm64: selftests: Add hello_nested basic NV selftest
+Date: Sat, 16 May 2026 19:29:57 +0100
+Message-ID: <20260516183003.799058-4-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260516183003.799058-1-weilin.chang@arm.com>
 References: <20260516183003.799058-1-weilin.chang@arm.com>
@@ -57,130 +57,139 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add helpers so that guest hypervisors can run nested guests. SP_EL1
-save/restore is added to allow nested guests to use a stack.
+This selftest simply starts an L1, which starts its own guest (L2). L2
+runs without stage-1 and 2 translations, it calls an HVC to jump back
+to L1.
 
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- .../selftests/kvm/include/arm64/nested.h      | 17 +++++++
- tools/testing/selftests/kvm/lib/arm64/entry.S |  5 ++
- .../testing/selftests/kvm/lib/arm64/nested.c  | 46 +++++++++++++++++++
- 3 files changed, 68 insertions(+)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/hello_nested.c        | 104 ++++++++++++++++++
+ 2 files changed, 105 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/hello_nested.c
 
-diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
-index 86d931facacb..30e626e427da 100644
---- a/tools/testing/selftests/kvm/include/arm64/nested.h
-+++ b/tools/testing/selftests/kvm/include/arm64/nested.h
-@@ -21,8 +21,17 @@
- 
- extern char hyp_vectors[];
- 
-+enum vcpu_sysreg {
-+	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 3dc3e39f7025..e8c108e0c487 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -168,6 +168,7 @@ TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
+ TEST_GEN_PROGS_arm64 += arm64/at
+ TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
+ TEST_GEN_PROGS_arm64 += arm64/hello_el2
++TEST_GEN_PROGS_arm64 += arm64/hello_nested
+ TEST_GEN_PROGS_arm64 += arm64/host_sve
+ TEST_GEN_PROGS_arm64 += arm64/hypercalls
+ TEST_GEN_PROGS_arm64 += arm64/external_aborts
+diff --git a/tools/testing/selftests/kvm/arm64/hello_nested.c b/tools/testing/selftests/kvm/arm64/hello_nested.c
+new file mode 100644
+index 000000000000..1cab56e4597b
+--- /dev/null
++++ b/tools/testing/selftests/kvm/arm64/hello_nested.c
+@@ -0,0 +1,104 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * hello_nested - Go from vEL2 to EL1 then back
++ */
 +
-+	SP_EL1,
-+
-+	NR_SYS_REGS
-+};
-+
- struct cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
-+	u64 sys_regs[NR_SYS_REGS];
- };
- 
- struct vcpu {
-@@ -37,9 +46,17 @@ struct hyp_data {
- 	struct cpu_context hyp_context;
- };
- 
-+void prepare_hyp(void);
-+void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top);
-+int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data);
-+
-+void do_hvc(void);
- u64 __guest_enter(struct vcpu *vcpu, struct cpu_context *hyp_context);
- void __hyp_exception(u64 type);
- 
-+void __sysreg_save_el1_state(struct cpu_context *ctxt);
-+void __sysreg_restore_el1_state(struct cpu_context *ctxt);
-+
- #endif /* !__ASSEMBLER__ */
- 
- #endif /* SELFTEST_KVM_NESTED_H */
-diff --git a/tools/testing/selftests/kvm/lib/arm64/entry.S b/tools/testing/selftests/kvm/lib/arm64/entry.S
-index 33bedf5e7fb2..df3af3463c6c 100644
---- a/tools/testing/selftests/kvm/lib/arm64/entry.S
-+++ b/tools/testing/selftests/kvm/lib/arm64/entry.S
-@@ -3,6 +3,11 @@
-  * adapted from arch/arm64/kvm/hyp/entry.S
-  */
- 
-+ .globl do_hvc
-+ do_hvc:
-+	hvc	#0
-+	ret
-+
- /*
-  * Manually define these for now
-  */
-diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
-index 06ddaab2436f..f6c24beb01d0 100644
---- a/tools/testing/selftests/kvm/lib/arm64/nested.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
-@@ -4,7 +4,53 @@
-  */
- 
- #include "nested.h"
++#include "nested.h"
 +#include "processor.h"
- #include "test_util.h"
-+#include <asm/sysreg.h>
++#include "test_util.h"
++#include "ucall.h"
 +
-+void prepare_hyp(void)
++#define XLATE2GPA	(0xABCD)
++#define L2STACKSZ	(0x100)
++
++/*
++ * TPIDR_EL2 is used to store vcpu id, so save and restore it.
++ */
++static gpa_t ucall_translate_to_gpa(void *gva)
 +{
-+	write_sysreg(HCR_EL2_E2H | HCR_EL2_RW, hcr_el2);
-+	write_sysreg(hyp_vectors, vbar_el2);
-+	isb();
++	gpa_t gpa;
++	u64 vcpu_id = read_sysreg(tpidr_el2);
++
++	GUEST_SYNC2(XLATE2GPA, gva);
++
++	/* get the result from userspace */
++	gpa = read_sysreg(tpidr_el2);
++
++	write_sysreg(vcpu_id, tpidr_el2);
++
++	return gpa;
 +}
 +
-+void init_vcpu(struct vcpu *vcpu, gpa_t l2_pc, gpa_t l2_stack_top)
++static void l2_guest_code(void)
 +{
-+	memset(vcpu, 0, sizeof(*vcpu));
-+	vcpu->context.regs.pc = l2_pc;
-+	vcpu->context.regs.pstate = PSR_MODE_EL1h | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
-+	vcpu->context.sys_regs[SP_EL1] = l2_stack_top;
++	do_hvc();
 +}
 +
-+void __sysreg_save_el1_state(struct cpu_context *ctxt)
++static void guest_code(void)
 +{
-+	ctxt->sys_regs[SP_EL1] = read_sysreg(sp_el1);
++	struct vcpu vcpu;
++	struct hyp_data hyp_data;
++	int ret;
++	gpa_t l2_pc, l2_stack_top;
++	/* force 16-byte alignment for the stack pointer */
++	u8 l2_stack[L2STACKSZ] __attribute__((aligned(16)));
++
++	GUEST_ASSERT_EQ(get_current_el(), 2);
++	GUEST_PRINTF("vEL2 entry\n");
++
++	l2_pc = ucall_translate_to_gpa(l2_guest_code);
++	l2_stack_top = ucall_translate_to_gpa(&l2_stack[L2STACKSZ]);
++
++	init_vcpu(&vcpu, l2_pc, l2_stack_top);
++	prepare_hyp();
++
++	ret = run_l2(&vcpu, &hyp_data);
++	GUEST_ASSERT_EQ(ret, ARM_EXCEPTION_TRAP);
++	GUEST_ASSERT_EQ(ESR_ELx_EC(read_sysreg(esr_el2)), ESR_ELx_EC_HVC64);
++	GUEST_DONE();
 +}
 +
-+void __sysreg_restore_el1_state(struct cpu_context *ctxt)
++int main(void)
 +{
-+	write_sysreg(ctxt->sys_regs[SP_EL1], sp_el1);
++	struct kvm_vcpu_init init;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	struct ucall uc;
++	gpa_t gpa;
++
++	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
++	vm = vm_create(1);
++
++	kvm_get_default_vcpu_target(vm, &init);
++	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
++	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
++	kvm_arch_vm_finalize_vcpus(vm);
++
++	while (true) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			if (uc.args[0] == XLATE2GPA) {
++				gpa = addr_gva2gpa(vm, (gva_t)uc.args[1]);
++				vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), gpa);
++			}
++			break;
++		case UCALL_PRINTF:
++			pr_info("%s", uc.buffer);
++			break;
++		case UCALL_DONE:
++			pr_info("DONE!\n");
++			goto end;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			fallthrough;
++		default:
++			TEST_FAIL("Unhandled ucall: %ld\n", uc.cmd);
++		}
++	}
++
++end:
++	kvm_vm_free(vm);
++	return 0;
 +}
-+
-+int run_l2(struct vcpu *vcpu, struct hyp_data *hyp_data)
-+{
-+	u64 ret;
-+
-+	__sysreg_restore_el1_state(&vcpu->context);
-+
-+	write_sysreg(vcpu->context.regs.pstate, spsr_el2);
-+	write_sysreg(vcpu->context.regs.pc, elr_el2);
-+
-+	ret = __guest_enter(vcpu, &hyp_data->hyp_context);
-+
-+	vcpu->context.regs.pc = read_sysreg(elr_el2);
-+	vcpu->context.regs.pstate = read_sysreg(spsr_el2);
-+
-+	__sysreg_save_el1_state(&vcpu->context);
-+
-+	return ret;
-+}
- 
- void __hyp_exception(u64 type)
- {
 -- 
 2.43.0
 
