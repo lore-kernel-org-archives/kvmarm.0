@@ -1,111 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA97335AC13;
-	Sat, 16 May 2026 09:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363F933D4E2
+	for <kvmarm@lists.linux.dev>; Sat, 16 May 2026 18:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778922744; cv=none; b=oPCfgUnVFJ1gL1KgCILQux7tco1901D3g7Easnj4yaBHmujHc19qWqYAmxotIHh3vP+7JqoAYVSkLa5VH9hx7EGAiy4Po6vyURtR1kW9L+OWSLSPYwKZWSxrz6WrHDyuu6fQw/Ik+97anpjeedGCeXjajhuK0bXP/l4dyh8PFWg=
+	t=1778956257; cv=none; b=JLU2jzFCnUu3tF2VvOplnfXgSHTLHnWOwpjanzfy1GqEzify+toYJWzIZ5viWNQrY6hTkZiywc7e27Lzy7dfUFid28TEKFuWAdw7BiI4FkOtp0TLbd0AQoqEZSwKzr78eV3PnZEdTYLY5cljvFYNBg9zY7XtyKixpMROSeBuyZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778922744; c=relaxed/simple;
-	bh=LL/S8GnS0b1/dCWxejuLJBEUJ6lauWpm0bwiV4rKpLg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l1CfBRp/0dzUux7gXM98mhxri6ePyczKMEuzHtaY7qMQcxbjBC+MuFGeIKs31sox04DuKHtrwYQcugvWNUYXepooZU80cZ4zHwba5W9OyQsWaU3e2PDDo/FtLu1A1oAGepJiBYGNhTXgJswEiGam3Y9wIRRCY0SuOvzhfZ8Sx34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a5pOYwIN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778956257; c=relaxed/simple;
+	bh=NPq7c3O7m9YoMQfFgefKlCXS40W630c66ivNjwX7VnY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A+jG3ggVlVoszuWCg1xrRir2y4wm1szepuZ3pSukPkWzRop9VJNQKmfi9G4xdgm6zoeb7iDCzjmcA6kW5/g67VXr3CVduGx7Wk5OowmpRcchIskl0ddvs01tfvDnG7A7UVMITX3WNAYzrkT4DzvkNu7klgPwKo8kbLg/jBCXmjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=X3AVoYMi; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a5pOYwIN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70015C19425;
-	Sat, 16 May 2026 09:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778922744;
-	bh=LL/S8GnS0b1/dCWxejuLJBEUJ6lauWpm0bwiV4rKpLg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a5pOYwINvYqAl5OspBjpye/1VsuInGuPHtwMdtgKAy9sVNjuaTTYWYKZQ0K5svlLC
-	 PQF5OXTUcKMM5w76tnoj96E0nsfZPrCErhPjx6bnUC8sXBUTP1Q7cxp6SbFfYwhYOR
-	 VaJ2tzWLLUaDRcvIkk4Lei0RurttnH3Nzs2hu+mezRlP1Q8OXoQ1C/1YVki0Jyl5Wm
-	 aXVUDrB/Qqb495t+4qvPgF+lzL/VCKRgA/MM419MeVDojCw/ZGsQ0Zq6X4fO1btvaC
-	 hcVGPUw6sJq9J+iZ2MXh8/O2qONnxLX8YrznPM66yQGd6F4cqNllVxRoVlOLcFGkVg
-	 o9Fnegvl5s3Lg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wOB4I-00000002xtC-0blF;
-	Sat, 16 May 2026 09:12:22 +0000
-Date: Sat, 16 May 2026 10:15:36 +0100
-Message-ID: <87o6ifaf5z.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="X3AVoYMi"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E9861BF3;
+	Sat, 16 May 2026 11:30:43 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 023AD3F85F;
+	Sat, 16 May 2026 11:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1778956248; bh=NPq7c3O7m9YoMQfFgefKlCXS40W630c66ivNjwX7VnY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=X3AVoYMic76EhjPA5QnkayYsO/uqgN8aSmHiHRkVLmdd4+gKne8/4SxtqHitV5VIx
+	 dR79teEEA0ZcD5I9q2lArcEV20ly23EVs3HPgOHZ+4qtsomrkBjl7lvv3Q00yg1i4R
+	 60pEIp5GvT2zSy+ff9ZHmAN7EC8SaBkbkzOjSYNo=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/2] Optimize S2 page splitting
-In-Reply-To: <20260515195904.2466381-1-leo.bras@arm.com>
-References: <20260515195904.2466381-1-leo.bras@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v3 0/9] KVM: arm64: selftests: Basic nested guest support
+Date: Sat, 16 May 2026 19:29:54 +0100
+Message-ID: <20260516183003.799058-1-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, 15 May 2026 20:59:01 +0100,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> While playing with dirty-bit tracking, I decided to take a look on how page
-> splitting works. Found out all entries are walked, even though we can infer,
-> for instance that:
-> - If a level-3 entry is walked, it means the parent level-2 entry is split
-> - If a split just succeeded in an table entry, it means all children nodes
->   are already split
-> 
-> So I tried to optimize it in a way that it does not break other users.
-> 
-> My main idea is to introduce positive return values that hint to the
-> pagetable walking mechanism that either siblings or children can be 
-> skipped. That should be contained to the visitor function, that returns
-> zero if no error was detected.
-> 
-> Numbers on above optimization are promising:
-> A 1GB VM, running on the model, splitting all at the beginning 
-> (no manual protect):
-> - Memory was already split (4k pages): 	-97.33% runtime (-172ms) - 20 runs
-> - THP backed memory: 			-19.82% runtime (-153ms) - 10 runs
-> - 1x1GB hugetlb memory:			-20.65% runtime (-150ms) - 10 runs
->
+Hi,
 
-I haven't looked at the changes in details, but the methodology is
-quite flawed. For a start, measuring anything on a software model
-(QEMU or FVP) doesn't mean anything performance-wise. The trade-offs
-are completely different from a HW implementation, and even the notion
-of time is pretty inconsistent.
+This is v3 of adding basic support for running nested guests (L2) in
+kselftest. This time a framework for enabling stage-2 in the guest is
+added, including the s2_mmu struct, s2 translation control setup, and
+a stage-2 page table generator. Similar to L2 vCPU management, all
+stage-2 work is done in the guest instead of userspace.
 
-Please run this on actual HW. I'm sure your employer can give you
-access to one of these mythical arm64 toys. Measure things from
-userspace, not from the kernel, so that you have all the overheads.
-Don't add console output, because that will make things far worse.
+An additional shadow_stage2 test is added which leverages the framework
+to run L2 with stage-2 enabled.
 
-I'm sure you can hack one of the selftests for this purpose.
+* Changes from v2 [1]:
 
-Thanks,
+  - Update vm_paddr_t to gpa_t, vm_vaddr_t to gva_t.
 
-	M.
+  - Added framework for enabling stage-2 in the guest.
+
+  - Added shadow_stage2 test.
+
+Thanks!
+
+[1]: https://lore.kernel.org/kvmarm/20260412142216.3806482-1-weilin.chang@arm.com/
+
+Wei-Lin Chang (9):
+  KVM: arm64: selftests: Add GPR save/restore functions for NV
+  KVM: arm64: selftests: Add helpers for guest hypervisors
+  KVM: arm64: selftests: Add hello_nested basic NV selftest
+  KVM: arm64: selftests: Enhance hello_nested test
+  KVM: arm64: selftests: Add shadow_stage2 test
+  KVM: arm64: selftests: shadow_stage2: Allocate L2 stack from dedicated
+    pool
+  KVM: arm64: selftests: shadow_stage2: Check supported stage-2 granule
+    size
+  KVM: arm64: selftests: Add infrastructure for using stage-2 in guest
+  KVM: arm64: selftests: shadow_stage2: Turn on stage-2 translation for
+    the nested guest
+
+ tools/testing/selftests/kvm/Makefile.kvm      |   5 +
+ .../selftests/kvm/arm64/hello_nested.c        | 134 +++++++++
+ .../selftests/kvm/arm64/shadow_stage2.c       | 165 +++++++++++
+ .../selftests/kvm/include/arm64/nested.h      |  85 ++++++
+ tools/testing/selftests/kvm/lib/arm64/entry.S | 137 +++++++++
+ .../selftests/kvm/lib/arm64/hyp-entry.S       |  77 +++++
+ .../testing/selftests/kvm/lib/arm64/nested.c  | 264 ++++++++++++++++++
+ 7 files changed, 867 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/hello_nested.c
+ create mode 100644 tools/testing/selftests/kvm/arm64/shadow_stage2.c
+ create mode 100644 tools/testing/selftests/kvm/include/arm64/nested.h
+ create mode 100644 tools/testing/selftests/kvm/lib/arm64/entry.S
+ create mode 100644 tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
+ create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested.c
 
 -- 
-Jazz isn't dead. It just smells funny.
+2.43.0
+
