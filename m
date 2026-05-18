@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5363E2AD8;
-	Mon, 18 May 2026 08:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC0B22D7A1;
+	Mon, 18 May 2026 08:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092592; cv=none; b=dGR4VvZotWScDxg2fdezeX0K61WvS3knWUiwtbdTPqHKoYQE276raJL/Bw0aUj/0ehIeh9/KiuSe/expsVLxA4dqnN9PDE5nFBredH9UKbhcZbBIMZ6PbbspU05AfKl71xt//SdazIqDin81T3uptfnvLk35kwwrxY+jTDhUdo8=
+	t=1779093222; cv=none; b=JbUbBvR+xQeJ0oG8I5Yg3Y61QyGKQUFc+Vcy2JX55uSx1aJHNpb6oADD9sx8kwQEcrsHi0GAwNHZF04u7rXuzAx1DIL1HaHfz9KwRDUPMuVqNCTtI62hqoNhoNMIFZVEf/QPqqwLikdbtqiVzU3/bQgOQi7OD7oZtqoZfRb74HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092592; c=relaxed/simple;
-	bh=uCF5CmaE3lUrpp7famdHrfOeL35ydPnxtwZzBI+wrJM=;
+	s=arc-20240116; t=1779093222; c=relaxed/simple;
+	bh=/yn5AaMzJ9BgnhIOhBP334j/TdcMsLgg4RzjCIiAFaQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PaR0G5UtcHJF9HMXPpBVo36vOY4In4oq4fkhdn8MNZAZd6vMFA51qLALK2jir5iO6kGpwx+EOnzDLu7PoqtZg7AMH4JTIjDA7z9lCe5Lwv0itKQJSD6AjInmSKtVP+iWE44xRmMk5uVJGBmQiIkygq/Z/W6Kr6PzjWLBRlnc1TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i4S+iSbT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=KpoKb2Wblc/GG0r1q2v5XC64oZopcng1TrOBFuMhOWGWCibgvv2SAl4HZ9yv25+5ki/sSO6Rf+wf+suNoQfz7Y3q8QEW3JEfpNN5jsp3+7A542gBN5bQbKypuy2wkdVB5kdBXNO/+lShpj5JsOlEVWvDLoTYmWvMx0Le8MtXDxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NnF2XX+f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i4S+iSbT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 774E3C2BCC6;
-	Mon, 18 May 2026 08:23:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NnF2XX+f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33BBC2BCB7;
+	Mon, 18 May 2026 08:33:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779092591;
-	bh=uCF5CmaE3lUrpp7famdHrfOeL35ydPnxtwZzBI+wrJM=;
+	s=k20201202; t=1779093222;
+	bh=/yn5AaMzJ9BgnhIOhBP334j/TdcMsLgg4RzjCIiAFaQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i4S+iSbTguhWa8638BrXdyRk2TSkTPMpfZvgYOXhiXO32erYFjY8Jg13vCLWrXy3W
-	 1AZLCm5w5JKEZiSyVxrGcOPLu7QdVTzotGdxVBvn7W+lvTw/Ihe+m7vQMRHpfTHEek
-	 LlIhvbS6A1e5pZ1XCeZ26oVwq9YsX1vYh0kf8x+qq3EjH0z/qK2qWbJsymAsl33yY7
-	 Am1PAbgTI+YT3QEYueCcz0JNx/uMGQxPlRac13G08GCbrr8B6wYelMxi4iTGGxfmyt
-	 rz3S8qotiqrV2TEbKmpX5OJUt7xpUe20G53+bgUpsZP5tgq0H4Kbh+alUXjcmdCjCD
-	 WugC/fSOmksIQ==
+	b=NnF2XX+foXJmxANzHYbYc2oOmrtQJsbxRDRdUAV9Tdw5gVh7TsGQBI7+Fh85hnbiW
+	 4YXWuZyV1l7DTbPwwUsR2/MxHJIshAM71lg4mb+T9IaCsBCyK9azfrZe0vSC9tQFoM
+	 XgTH0HjNsenfFlbYM346k103qA5QUN9zHq9lKlFgl3CvzQIYXxjvSUuht+JSKw93EB
+	 pWTDSv46QEYD2c0L/OyXT7wkU0qZTWjSdLaGG5P9697ldOF/Ez/zOesysxN561/KA5
+	 1ON7gL1i8aOKwwlLOto6l5swfmaQ5tILXYN+R2op/gRdP3DICH7FkEA4UpsEVk7dIe
+	 iGqXsaBXgJlZg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wOtFl-00000003QB2-0Cwg;
-	Mon, 18 May 2026 08:23:09 +0000
-Date: Mon, 18 May 2026 09:23:08 +0100
-Message-ID: <8633zpxh1v.wl-maz@kernel.org>
+	id 1wOtPv-00000003QcE-2skF;
+	Mon, 18 May 2026 08:33:39 +0000
+Date: Mon, 18 May 2026 09:33:39 +0100
+Message-ID: <861pf9xgkc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: Michael Bommarito <michael.bommarito@gmail.com>,
-	Oliver Upton <oupton@kernel.org>,
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
@@ -47,9 +46,8 @@ Cc: Michael Bommarito <michael.bommarito@gmail.com>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] KVM: arm64: vgic-its: reject restored DTE with out-of-range num_eventid_bits
-In-Reply-To: <w6zdprlry2y37wtkirv4zhiy5awau3stbkjohmvfwkswgoaafe@ul53z6xwyuhw>
+In-Reply-To: <20260517174955.273004-1-michael.bommarito@gmail.com>
 References: <20260517174955.273004-1-michael.bommarito@gmail.com>
-	<w6zdprlry2y37wtkirv4zhiy5awau3stbkjohmvfwkswgoaafe@ul53z6xwyuhw>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,57 +59,110 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yaoyuan@linux.alibaba.com, michael.bommarito@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: michael.bommarito@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 18 May 2026 07:05:13 +0100,
-Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
+On Sun, 17 May 2026 18:49:55 +0100,
+Michael Bommarito <michael.bommarito@gmail.com> wrote:
 > 
-> On Sun, May 17, 2026 at 01:49:55PM +0800, Michael Bommarito wrote:
-
-[...]
-
-> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> > index 2ea9f1c7ebcd0..a5dcf9a6a2854 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > @@ -2307,6 +2307,15 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
-> >  	/* dte entry is valid */
-> >  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
-> >
-> > +	/*
-> > +	 * The MAPD command rejects this case; mirror the cap here so a
-> > +	 * restored DTE cannot install an out-of-range num_eventid_bits
-> > +	 * that vgic_its_restore_itt() would then convert into a
-> > +	 * sign-extended scan_its_table() length.
-> > +	 */
-> > +	if (num_eventid_bits > VITS_TYPER_IDBITS)
-> > +		return -EINVAL;
+> Userspace can trigger a host-side denial of service via
+> KVM_DEV_ARM_ITS_RESTORE_TABLES. A Device Table Entry whose Size
+> field encodes num_eventid_bits > VITS_TYPER_IDBITS reaches
+> scan_its_table() with a sign-extended ~18 EiB length, where the
+> loop holds the per-ITS mutex and never calls cond_resched(),
+> pinning a host CPU for a time linear in registered guest memslot
+> size. The accessor is any process that can open /dev/kvm and
+> create a VM. The same out-of-range value also disables a
+> subsequent live bounds check on EventID, as described below.
 > 
-> Hi,
+> The MAPD command handler already rejects this case in the live
+> path:
 > 
-> IIUC, the same issue is still there when VITS_TYPER_IDBITS
-> change to >=28, I know it's limited to 16 in GITS_TYPER's
-> definition. I mean the issue is still there w/o really be
-> fixed.
+>   if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+>           return E_ITS_MAPD_ITTSIZE_OOR;
+> 
+> vgic_its_restore_dte() reconstructs num_eventid_bits from the DTE
+> Size field but does not apply the same cap, so userspace can
+> install device state that the live MAPD path is documented to
+> reject. The restored value is stored in dev->num_eventid_bits and
+> is then used by vgic_its_restore_itt():
+> 
+>   size_t max_size = BIT_ULL(dev->num_eventid_bits) * ite_esz;
+>   ret = scan_its_table(its, base, max_size, ite_esz, ...);
+> 
+> scan_its_table() takes the size as int and assigns it to
+> unsigned long in the callee:
+> 
+>   static int scan_its_table(struct vgic_its *its, gpa_t base,
+>                             int size, u32 esz, ...)
+>   {
+>           unsigned long len = size;
+> 
+> For num_eventid_bits = 28 the size_t value 0x80000000 truncates to
+> INT_MIN as int and sign-extends to ~18 EiB as unsigned long. The
+> scan loop then walks the registered guest memslot one ite_esz at
+> a time with the per-ITS mutex held and no cond_resched(). In a
+> QEMU TCG arm64 guest at EL2 on v7.1-rc1, with an empty ITT, the
+> ioctl returned -EFAULT after about 14 seconds with a 256 MiB
+> memslot and about 56 seconds with a 1 GiB memslot (linear in
+> memslot size). The per-iteration cost on native arm64 KVM
+> hardware will differ; the loop shape, and so the linear scaling,
+> will not.
+> 
+> The same out-of-range num_eventid_bits also disables the live
+> vgic_its_check_event_id() bounds check, because event_id is u32
+> and BIT_ULL(32) is unreachable in that comparison, leaving
+> subsequent MAPI/MAPTI handling without an effective EventID cap.
+> 
+> Mirror the MAPD cap in vgic_its_restore_dte() before allocating
+> the device, so out-of-range restored DTEs are rejected with
+> -EINVAL up front rather than triggering the int-truncated scan or
+> installing a device whose num_eventid_bits silently disables the
+> live bounds check. Sizes within [1, VITS_TYPER_IDBITS] are
+> unaffected.
 
-Change how? This is a hard-coded limit that reflect a practical use of
-the ITS (and is already 32 times larger than what PCIe allows).
-
-Are you suggesting a possibility of making this userspace
-configurable?
+This commit message is way too verbose, and really looks like a copy
+paste from an LLM analysis. This needs trimming (the initial paragraph
+has most of it...).
 
 > 
-> Change the scan_its_table() and other related code path to
-> avoid such date conversion issue is more reasonable
-> fixing to me, please also wait others' input yet.
+> Fixes: 57a9a117154c ("KVM: arm64: vgic-its: Device table save/restore")
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 2ea9f1c7ebcd0..a5dcf9a6a2854 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2307,6 +2307,15 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>  	/* dte entry is valid */
+>  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+>  
+> +	/*
+> +	 * The MAPD command rejects this case; mirror the cap here so a
+> +	 * restored DTE cannot install an out-of-range num_eventid_bits
+> +	 * that vgic_its_restore_itt() would then convert into a
+> +	 * sign-extended scan_its_table() length.
+> +	 */
 
-I don't think this is a reasonable course of action. scan_its_table()
-is generic (it doesn't know about any table in particular), and
-assumes that the scan parameters are validated upfront.
+Same here. Something like:
 
-Thanks,
+	/* Mimic the MAPD behaviour and reject invalid EID bits */
+
+would be enough.
+
+> +	if (num_eventid_bits > VITS_TYPER_IDBITS)
+> +		return -EINVAL;
+> +
+>  	if (!vgic_its_check_id(its, baser, id, NULL))
+>  		return -EINVAL;
+>  
+
+Otherwise looks good.
 
 	M.
 
