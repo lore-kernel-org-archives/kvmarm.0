@@ -1,83 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7633D25BC;
-	Mon, 18 May 2026 07:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5363E2AD8;
+	Mon, 18 May 2026 08:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779088969; cv=none; b=b+lF/Cx/JLsbMtRvilcKf4BR5Nnz7/caCjM/U+c8IDmPvzw2w1drzlz7d6h1WU0xAgXLeBWQ54mtkfRDPYafUZ85sadLO8r/LIbqtXvsrbAhkgriGckwOCZ5GYWbsDKux6p9QuiWbdz7zlJ/WYpBCG5mevjC/M3uOWjRf4Wnb0g=
+	t=1779092592; cv=none; b=dGR4VvZotWScDxg2fdezeX0K61WvS3knWUiwtbdTPqHKoYQE276raJL/Bw0aUj/0ehIeh9/KiuSe/expsVLxA4dqnN9PDE5nFBredH9UKbhcZbBIMZ6PbbspU05AfKl71xt//SdazIqDin81T3uptfnvLk35kwwrxY+jTDhUdo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779088969; c=relaxed/simple;
-	bh=Z1TZfPHrDTb3oUBwxbXx/41cJWGTkTmFko8g9704EBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WA9H2u6mw2Dlx5BMPH7EtGnrVsz67sXRHGUVEG5qy2CzVwR8fB1i89QISNbpxWmbGVZcCwYmpgYFoG8FehsLOY563UaFC58KMJaxQr6WXZOD5yXjsib8ClB8hAtW+qg8ZF3Ng/LajuuC5YJTDw+rvWP3uivGsGUfc3bGlctI+bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1KHRrlr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779092592; c=relaxed/simple;
+	bh=uCF5CmaE3lUrpp7famdHrfOeL35ydPnxtwZzBI+wrJM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PaR0G5UtcHJF9HMXPpBVo36vOY4In4oq4fkhdn8MNZAZd6vMFA51qLALK2jir5iO6kGpwx+EOnzDLu7PoqtZg7AMH4JTIjDA7z9lCe5Lwv0itKQJSD6AjInmSKtVP+iWE44xRmMk5uVJGBmQiIkygq/Z/W6Kr6PzjWLBRlnc1TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i4S+iSbT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1KHRrlr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A97CC2BCB7;
-	Mon, 18 May 2026 07:22:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i4S+iSbT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 774E3C2BCC6;
+	Mon, 18 May 2026 08:23:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779088968;
-	bh=Z1TZfPHrDTb3oUBwxbXx/41cJWGTkTmFko8g9704EBE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K1KHRrlrcm2vGcAvcFUJ/5hZ0ZeT4kWLeTXE0SbhmH+mDiq5l3SN03XaEMlJmdRV/
-	 y2jX8w8kMeFzZs+D+4eMLi1A8hgra49FQT4qOoJ7sI1g9szvBmVC/p03fUgbDhhXEv
-	 X3HLRkwLPCSo3MafhnHbv3xCZc323igQCktjCNVFvfIhhxTUvZncrwUc43mv896FpU
-	 nGT+LDT5FucTLTx/8dLXE843qrQlHvjQD3g4cGVDlgUefeBkGSN7TerqMHYfF795uS
-	 2N9cWZeG7n6IkNFuAHqKXA0WGbHy+H4vu/tdg+YnQs0DHHyY9eusXtNiXCLccp1jDO
-	 l74jenB7UEcXQ==
-Date: Mon, 18 May 2026 00:22:47 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1779092591;
+	bh=uCF5CmaE3lUrpp7famdHrfOeL35ydPnxtwZzBI+wrJM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i4S+iSbTguhWa8638BrXdyRk2TSkTPMpfZvgYOXhiXO32erYFjY8Jg13vCLWrXy3W
+	 1AZLCm5w5JKEZiSyVxrGcOPLu7QdVTzotGdxVBvn7W+lvTw/Ihe+m7vQMRHpfTHEek
+	 LlIhvbS6A1e5pZ1XCeZ26oVwq9YsX1vYh0kf8x+qq3EjH0z/qK2qWbJsymAsl33yY7
+	 Am1PAbgTI+YT3QEYueCcz0JNx/uMGQxPlRac13G08GCbrr8B6wYelMxi4iTGGxfmyt
+	 rz3S8qotiqrV2TEbKmpX5OJUt7xpUe20G53+bgUpsZP5tgq0H4Kbh+alUXjcmdCjCD
+	 WugC/fSOmksIQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wOtFl-00000003QB2-0Cwg;
+	Mon, 18 May 2026 08:23:09 +0000
+Date: Mon, 18 May 2026 09:23:08 +0100
+Message-ID: <8633zpxh1v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Michael Bommarito <michael.bommarito@gmail.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return
- options
-Message-ID: <agq-RyKhBy4CIThm@kernel.org>
-References: <20260515195904.2466381-1-leo.bras@arm.com>
- <20260515195904.2466381-2-leo.bras@arm.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-its: reject restored DTE with out-of-range num_eventid_bits
+In-Reply-To: <w6zdprlry2y37wtkirv4zhiy5awau3stbkjohmvfwkswgoaafe@ul53z6xwyuhw>
+References: <20260517174955.273004-1-michael.bommarito@gmail.com>
+	<w6zdprlry2y37wtkirv4zhiy5awau3stbkjohmvfwkswgoaafe@ul53z6xwyuhw>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260515195904.2466381-2-leo.bras@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yaoyuan@linux.alibaba.com, michael.bommarito@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Leo,
-
-Thanks for having a look at this.
-
-On Fri, May 15, 2026 at 08:59:02PM +0100, Leonardo Bras wrote:
-> Introduce S2 walker return values:
-> - SKIP_CHILDREN: skip walking the children of the current node
-> - SKIP_SIBLINGS: skip waling the siblings of the current node
+On Mon, 18 May 2026 07:05:13 +0100,
+Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
 > 
-> Also, modify __kvm_pgtable_visit() to fulfil the hing on above return
-> values. Current walkers should not be impacted
+> On Sun, May 17, 2026 at 01:49:55PM +0800, Michael Bommarito wrote:
 
-I'd rather see something based around new walk flags than introducing an
-entirely new mechanic around return values.
+[...]
 
-e.g. you could split the LEAF flag into separate flags for blocks v.
-pages:
+> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> > index 2ea9f1c7ebcd0..a5dcf9a6a2854 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > @@ -2307,6 +2307,15 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+> >  	/* dte entry is valid */
+> >  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+> >
+> > +	/*
+> > +	 * The MAPD command rejects this case; mirror the cap here so a
+> > +	 * restored DTE cannot install an out-of-range num_eventid_bits
+> > +	 * that vgic_its_restore_itt() would then convert into a
+> > +	 * sign-extended scan_its_table() length.
+> > +	 */
+> > +	if (num_eventid_bits > VITS_TYPER_IDBITS)
+> > +		return -EINVAL;
+> 
+> Hi,
+> 
+> IIUC, the same issue is still there when VITS_TYPER_IDBITS
+> change to >=28, I know it's limited to 16 in GITS_TYPER's
+> definition. I mean the issue is still there w/o really be
+> fixed.
 
-	KVM_PGTABLE_WALK_PAGE,
-	KVM_PGTABLE_WALK_BLOCK,
-	KVM_PGTABLE_WALK_LEAF	= KVM_PGTABLE_WALK_PAGE |
-				  KVM_PGTABLE_WALK_BLOCK,
+Change how? This is a hard-coded limit that reflect a practical use of
+the ITS (and is already 32 times larger than what PCIe allows).
 
-and then let __kvm_pgtable_visit() decide how to steer the walk. You may
-need some special handling to get the address arithmetic right when
-skipping over a table of page descriptors.
+Are you suggesting a possibility of making this userspace
+configurable?
+
+> 
+> Change the scan_its_table() and other related code path to
+> avoid such date conversion issue is more reasonable
+> fixing to me, please also wait others' input yet.
+
+I don't think this is a reasonable course of action. scan_its_table()
+is generic (it doesn't know about any table in particular), and
+assumes that the scan parameters are validated upfront.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
