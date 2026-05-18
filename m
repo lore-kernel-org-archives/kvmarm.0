@@ -1,31 +1,31 @@
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76EB3ACEF3
-	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 05:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C123DD847
+	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 06:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779082300; cv=none; b=KvzJzNlaR7QyXF1SDO10q7LICuh3hvq/l2NpMMZwhIIEmq8CwyZDQ9u06FNjlzFQVTWxImd41eD33LPGBH3Azy/Mxky4D3l5I7nK6BCIlL1FRGDwW5OJMlQRRXHqQfo0apbvayFnAGRsUsMXoFC81AlnQmbvgQ6m0jtE5Anxe7o=
+	t=1779084322; cv=none; b=NrbDc7QxJiksA0JjNSu5cmxq/4u9mBv5/UgL7bvPyk1E7pwKLkYRZ4WYUfOxaEHME8q+qHY6mUKj063fycVPGNSodtoLLeji2Yoyj4/YAaubAXVkbYucdQGQQ7rTJpUxFN27XRcFuBwb8KOZoW35VaEOvGFSkAGSGilBnphjL70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779082300; c=relaxed/simple;
-	bh=YKkbLhpMMKOiuLk1L+mYJo8bn3/WiUGW6Hsaq81kyvg=;
+	s=arc-20240116; t=1779084322; c=relaxed/simple;
+	bh=pKC1G6pUlZ+zn+dB9l5JMTbv6ZGTT3NyvmHGZEdViQk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kSfrEA7uWs/R0TPjDMbYXsu2LRAzXrtMKJQHbKGm0ILujhkPqGGjn01hMz4ndxJUBkwJm8DPCtVXDkbXjhqscgGyyk8KGJ1FvetcSR7R7rMKAujp4er5V9O1IjnkpZL4OrIdUqxZuEuznjyu1XSpuD1dOE+uXVY4ECCDG9P/nN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jhIghPOe; arc=none smtp.client-ip=115.124.30.98
+	 Content-Type:Content-Disposition:In-Reply-To; b=cjEjcs1REKbJYWjSK2fcBwMM+/SfTqYM4QL7jwdUZTys50wsTBxRJaRn+e4+vyCNBvETycQ+ZU5ECsclL4/qeeN5YamLQNbV3z4gdS4sSl0fGV9NBjRvqw5JVeAv+bzZoH5FQKMq5deXiIDV/8XsZNw3MrORAc0Fxyb1VFPMcLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=U6RcwSU7; arc=none smtp.client-ip=115.124.30.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jhIghPOe"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="U6RcwSU7"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1779082279; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=xI7YGaASUFBfo7xs9LL5npLLizBowvFLaid3gr8COMc=;
-	b=jhIghPOefmMagZZ44llsovoMUJNK5DUE/ySWz9JjJ5Dc4StNU8K6/gmZPm70Od4YVGZnzI/yJ0CunDeDea58ZcXs1WSKnTGct6tgo2mzNf4ZqatqZ9YWhiUUaZSomgs6RTZ/bggSDqisdwYswP8/xjxF94srXWZ2UbHYSJALwaE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0X33TiMq_1779082277;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X33TiMq_1779082277 cluster:ay36)
+	t=1779084315; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=PwP076I/SbrBnwh9hhmLpYzId0geiVgIKLZ2AElPwTQ=;
+	b=U6RcwSU7G7hRSt7F2+Ku9VlkHQzwFO9CgfVTgjKmrMWmPqaWoJMfzIIEK4WmRLGhQRYTBfvNdlMAbTXPL0Ob2HfY4n+EN80qtZB+ONyMRjNdFFWV3dzmO9zSuPSYsj4DOVxVRxpI58nzzkPBn1IIJ1dyqF2AF0zCGMWMyZZ+cOk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0X33TsTD_1779084313;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X33TsTD_1779084313 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Mon, 18 May 2026 13:31:18 +0800
-Date: Mon, 18 May 2026 13:31:17 +0800
+          Mon, 18 May 2026 14:05:14 +0800
+Date: Mon, 18 May 2026 14:05:13 +0800
 From: Yao Yuan <yaoyuan@linux.alibaba.com>
 To: Michael Bommarito <michael.bommarito@gmail.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
@@ -33,10 +33,10 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
 	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic: free private_irqs when init fails
- after allocation
-Message-ID: <outz3fxn7c5tkfz3adoilikhtyjbii7qwxmknh2l4pdf4kv5bj@54lpduy2fuj4>
-References: <20260517181331.367676-1-michael.bommarito@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-its: reject restored DTE with
+ out-of-range num_eventid_bits
+Message-ID: <w6zdprlry2y37wtkirv4zhiy5awau3stbkjohmvfwkswgoaafe@ul53z6xwyuhw>
+References: <20260517174955.273004-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,83 +45,104 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260517181331.367676-1-michael.bommarito@gmail.com>
+In-Reply-To: <20260517174955.273004-1-michael.bommarito@gmail.com>
 
-On Sun, May 17, 2026 at 02:13:31PM +0800, Michael Bommarito wrote:
-> Companion to commit 250f25367b58 ("KVM: arm64: Tear down vGIC on failed
-> vCPU creation"), which added the missing kvm_vgic_vcpu_destroy() call
-> to the kvm_share_hyp() failure path in kvm_arch_vcpu_create().  The
-> kvm_vgic_vcpu_init() failure path immediately above it has the same
-> shape and still needs the same cleanup.
+On Sun, May 17, 2026 at 01:49:55PM +0800, Michael Bommarito wrote:
+> Userspace can trigger a host-side denial of service via
+> KVM_DEV_ARM_ITS_RESTORE_TABLES. A Device Table Entry whose Size
+> field encodes num_eventid_bits > VITS_TYPER_IDBITS reaches
+> scan_its_table() with a sign-extended ~18 EiB length, where the
+> loop holds the per-ITS mutex and never calls cond_resched(),
+> pinning a host CPU for a time linear in registered guest memslot
+> size. The accessor is any process that can open /dev/kvm and
+> create a VM. The same out-of-range value also disables a
+> subsequent live bounds check on EventID, as described below.
 >
-> If kvm_vgic_vcpu_init() allocates per-vCPU private IRQs via
-> vgic_allocate_private_irqs_locked() and then vgic_register_redist_iodev()
-> fails (for example when kvm_io_bus_register_dev() runs out of MMIO-bus
-> slots, or vgic_v3_check_base() rejects the configuration), the function
-> returns the error without freeing the private-IRQ allocation.
+> The MAPD command handler already rejects this case in the live
+> path:
 >
-> The caller kvm_arch_vcpu_create() returns this error directly, and
-> kvm_vm_ioctl_create_vcpu() jumps to vcpu_free_run_page on
-> kvm_arch_vcpu_create() failure, which does not invoke
-> kvm_arch_vcpu_destroy().  The vCPU struct is then released via
-> kmem_cache_free(kvm_vcpu_cache, ...), dropping the only reference to
-> the leaked allocation.
+>   if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+>           return E_ITS_MAPD_ITTSIZE_OOR;
 >
-> The comment block above __kvm_vgic_vcpu_destroy() explicitly anticipates
-> this case ("vCPUs that failed creation are torn down outside of the
-> kvm->arch.config_lock ... it is both safe and necessary to do so
-> here"), but the caller never actually invokes the destroy primitive on
-> the kvm_vgic_vcpu_init() error path.  Call it now, mirroring the shape
-> of the kvm_share_hyp() cleanup added by 250f25367b58.
+> vgic_its_restore_dte() reconstructs num_eventid_bits from the DTE
+> Size field but does not apply the same cap, so userspace can
+> install device state that the live MAPD path is documented to
+> reject. The restored value is stored in dev->num_eventid_bits and
+> is then used by vgic_its_restore_itt():
 >
-> Per-failure leak is VGIC_NR_PRIVATE_IRQS * sizeof(struct vgic_irq),
-> roughly 3.8 KiB rounded up to 4 KiB by the kmalloc-cg-4k slab.  On
-> systems whose /dev/kvm policy lets unprivileged users open the device
-> this is reachable to any local user; reach is policy-dependent and
-> varies by distro and packager.
+>   size_t max_size = BIT_ULL(dev->num_eventid_bits) * ite_esz;
+>   ret = scan_its_table(its, base, max_size, ite_esz, ...);
 >
-> Confirmed with kmemleak on v7.1-rc1+: 50 failed KVM_CREATE_VCPU
-> attempts (run with the per-VM MMIO bus pre-filled to NR_IOBUS_DEVS so
-> vgic_register_redist_iodev() returns -ENOSPC) leave 49 unreferenced
-> 4096-byte blocks whose allocation backtrace is
+> scan_its_table() takes the size as int and assigns it to
+> unsigned long in the callee:
 >
->   __kmalloc_noprof+0x390/0x4d0
->   vgic_allocate_private_irqs_locked+0x68/0x1c8
->   kvm_vgic_vcpu_init+0x78/0xd8
+>   static int scan_its_table(struct vgic_its *its, gpa_t base,
+>                             int size, u32 esz, ...)
+>   {
+>           unsigned long len = size;
 >
-> With this patch applied to the same tree, kmemleak reports zero
-> unreferenced objects under the identical workload.
+> For num_eventid_bits = 28 the size_t value 0x80000000 truncates to
+> INT_MIN as int and sign-extends to ~18 EiB as unsigned long. The
+> scan loop then walks the registered guest memslot one ite_esz at
+> a time with the per-ITS mutex held and no cond_resched(). In a
+> QEMU TCG arm64 guest at EL2 on v7.1-rc1, with an empty ITT, the
+> ioctl returned -EFAULT after about 14 seconds with a 256 MiB
+> memslot and about 56 seconds with a 1 GiB memslot (linear in
+> memslot size). The per-iteration cost on native arm64 KVM
+> hardware will differ; the loop shape, and so the linear scaling,
+> will not.
 >
-
-Ah. One thing I forgot to say:
-
-Do we need a fixes: tag here ?
-
-> Cc: stable@vger.kernel.org
-> Cc: Will Deacon <will@kernel.org>
+> The same out-of-range num_eventid_bits also disables the live
+> vgic_its_check_event_id() bounds check, because event_id is u32
+> and BIT_ULL(32) is unreachable in that comparison, leaving
+> subsequent MAPI/MAPTI handling without an effective EventID cap.
+>
+> Mirror the MAPD cap in vgic_its_restore_dte() before allocating
+> the device, so out-of-range restored DTEs are rejected with
+> -EINVAL up front rather than triggering the int-truncated scan or
+> installing a device whose num_eventid_bits silently disables the
+> live bounds check. Sizes within [1, VITS_TYPER_IDBITS] are
+> unaffected.
+>
+> Fixes: 57a9a117154c ("KVM: arm64: vgic-its: Device table save/restore")
 > Assisted-by: Claude:claude-opus-4-7
->
 > Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 > ---
->  arch/arm64/kvm/arm.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/vgic/vgic-its.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 176cbe8baad30..5d5e2f81b9c94 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -554,8 +554,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	kvm_destroy_mpidr_data(vcpu->kvm);
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 2ea9f1c7ebcd0..a5dcf9a6a2854 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2307,6 +2307,15 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>  	/* dte entry is valid */
+>  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
 >
->  	err = kvm_vgic_vcpu_init(vcpu);
-> -	if (err)
-> +	if (err) {
-> +		kvm_vgic_vcpu_destroy(vcpu);
->  		return err;
-> +	}
+> +	/*
+> +	 * The MAPD command rejects this case; mirror the cap here so a
+> +	 * restored DTE cannot install an out-of-range num_eventid_bits
+> +	 * that vgic_its_restore_itt() would then convert into a
+> +	 * sign-extended scan_its_table() length.
+> +	 */
+> +	if (num_eventid_bits > VITS_TYPER_IDBITS)
+> +		return -EINVAL;
+
+Hi,
+
+IIUC, the same issue is still there when VITS_TYPER_IDBITS
+change to >=28, I know it's limited to 16 in GITS_TYPER's
+definition. I mean the issue is still there w/o really be
+fixed.
+
+Change the scan_its_table() and other related code path to
+avoid such date conversion issue is more reasonable
+fixing to me, please also wait others' input yet.
+
+> +
+>  	if (!vgic_its_check_id(its, baser, id, NULL))
+>  		return -EINVAL;
 >
->  	err = kvm_share_hyp(vcpu, vcpu + 1);
->  	if (err)
 > --
 > 2.53.0
 >
