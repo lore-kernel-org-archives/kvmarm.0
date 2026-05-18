@@ -1,633 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326BB3A1693
-	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 07:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7633D25BC;
+	Mon, 18 May 2026 07:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779088149; cv=none; b=swxHtubtmvVujUBFZ2+30vHpY00bes9lCxl07F5vFBmJpEJgKWpPsZYDfNxNh9VCl8EvupvvnKtQbAclVCY5gDgxe3AeE0OVtja6KsMsxhuZYzYSCT0mUNFeOpucppy6x+8qFpZdPiQGqZpF3uDthd3dkIDQOO8lnfVPCr+e4K0=
+	t=1779088969; cv=none; b=b+lF/Cx/JLsbMtRvilcKf4BR5Nnz7/caCjM/U+c8IDmPvzw2w1drzlz7d6h1WU0xAgXLeBWQ54mtkfRDPYafUZ85sadLO8r/LIbqtXvsrbAhkgriGckwOCZ5GYWbsDKux6p9QuiWbdz7zlJ/WYpBCG5mevjC/M3uOWjRf4Wnb0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779088149; c=relaxed/simple;
-	bh=u2+Q20TS2XFOBaXtlXNa1ING8dayH9LWtgsJlQKeFQg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NQApOskc9HeOb4vmiRtMdoHqCqwJeDf8LcArK9PnwEj+y+4aV1j6wi+IsPCQcNQ3BfATrnh4o4o5ts+xGsTM3Il2PEjo5yyGOg+UfFTNCAyuZpj0NGO2nOfen5KKkzOUXnV+v3tw4K9Ogqm/zt+2x5mcdA5F+qvDb7HDWaxOSK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bl4KtYAS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1779088969; c=relaxed/simple;
+	bh=Z1TZfPHrDTb3oUBwxbXx/41cJWGTkTmFko8g9704EBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WA9H2u6mw2Dlx5BMPH7EtGnrVsz67sXRHGUVEG5qy2CzVwR8fB1i89QISNbpxWmbGVZcCwYmpgYFoG8FehsLOY563UaFC58KMJaxQr6WXZOD5yXjsib8ClB8hAtW+qg8ZF3Ng/LajuuC5YJTDw+rvWP3uivGsGUfc3bGlctI+bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1KHRrlr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bl4KtYAS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779088146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fwKWwaXhdhqcyoFjb6CDaUf6TMT9pha1s6wJsA7kpIM=;
-	b=Bl4KtYAS7htjEDb9Hr8k3JzEdMFs5aoiA9AfNY4C1rAFbrKWUG05/vjwFzJZkStxwoaXIx
-	gX9RTf9tlnjpAIEoQYYIhSy6X86mhHqisry3k+xo9yFsXfMsnYzh8M44KC6rm+bzO6AX+h
-	mY+B6mSzv66B4kilI9BIP57pdGIFFbg=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-SMTyBqE9Oeee_e0anrOjKw-1; Mon, 18 May 2026 03:09:04 -0400
-X-MC-Unique: SMTyBqE9Oeee_e0anrOjKw-1
-X-Mimecast-MFC-AGG-ID: SMTyBqE9Oeee_e0anrOjKw_1779088143
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c8024fc7032so1098544a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 00:09:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779088143; x=1779692943;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fwKWwaXhdhqcyoFjb6CDaUf6TMT9pha1s6wJsA7kpIM=;
-        b=ViLp1Pk03fu1tu8iNRvZdPx4aNmsMgW20b3HZwBI8wVdij/F3EP64OGmwqwrb7AH2M
-         phmNm0uaMDvRhv+tCEFfyxVXIcRQsaKlPg+WkmNEZyJGRzSiQYVvuOzeuKq6XdN/n666
-         OZrffc/4oUUKfuwMLx7iZXsZAKPwSC41VfdIcdaxjzBdW+JL7WaY76BsIN2PgyeE33nA
-         0jkH0SWYOcm7izM/EaiLnoQRlvF61PWtuTJMiaedBjNhsoEUzcDkA3FKGuylaiaeP8DZ
-         uQ/pzz4XG7v/pZ/S3oowYE/eMgTRIypp2ehs3TxgciWWLdwsquO6QH7v49KWhlAoIrmG
-         btpA==
-X-Forwarded-Encrypted: i=1; AFNElJ8CDlXwdVV4x6JMGuTF1BVeu8P1TY+zr7YQ8tZgTpTugpsSgtA8h7Yp4kaKaf9u8IX3Zl6asIk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyYr9sT3UU5H2uzJ/VUT5CwFhQ+KzVDnyV5qFUuf0JzH/kSrcqk
-	ih5+0uu6FUF2D4Y+jY54R20Q4IYKZk+5ENXsi+81rUZuzVyiAK0HhsnHJRY88Eh6OHa1verInJf
-	Scm8V0r79QAx9SY5rLVdGHs+AIi+2sVmIgJPBw4SlJVwjEsC2MR83PUEhPg==
-X-Gm-Gg: Acq92OF6EKZJEYx3PQgyZNqczUe+wktLfhEEeQ9QtD6DwycSEfAWqS22a5DnDHmPOM3
-	qr3coL0hfVj15wvFbh9Vwkb9Q5hUCHYLrmczfZ5Zg+vHYi6Nuq95gP6ufN8KbZBx8VG7TUnBbVo
-	CDNX8g8UFyXS2/0sUYhcglC6XsfjpciDRIYOxIPSOzHNHzgdNnPNxpUWsrYbW+wmlpADCKgwzES
-	0WlEjNUEjX3WLN76qpkel+dQqkEJIf3MilinJeXVvx4dlPBUXuYBg2gDZO6kXsiMW9VifIoftio
-	5xQ+WF1V2IO1mJEs9O5d5kBleOXFM+Os+q5sv1LPA2+brHIJWMZ/MJNc175nTVPT76ejx4HPjNc
-	XYJbjHEq8AVQlN4Yil7iluoZCPJI1VZlUnZBqu1nBkgH5FPqY0wHxSRapTZP9dmW+
-X-Received: by 2002:a05:6a00:9502:b0:834:e092:2631 with SMTP id d2e1a72fcca58-83f33c3710dmr13517014b3a.8.1779088143252;
-        Mon, 18 May 2026 00:09:03 -0700 (PDT)
-X-Received: by 2002:a05:6a00:9502:b0:834:e092:2631 with SMTP id d2e1a72fcca58-83f33c3710dmr13516953b3a.8.1779088142596;
-        Mon, 18 May 2026 00:09:02 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f19775c97sm13891119b3a.15.2026.05.18.00.08.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 00:09:01 -0700 (PDT)
-Message-ID: <2f33cc4e-a51e-44d4-8333-b90470c8a399@redhat.com>
-Date: Mon, 18 May 2026 17:08:50 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1KHRrlr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A97CC2BCB7;
+	Mon, 18 May 2026 07:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779088968;
+	bh=Z1TZfPHrDTb3oUBwxbXx/41cJWGTkTmFko8g9704EBE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K1KHRrlrcm2vGcAvcFUJ/5hZ0ZeT4kWLeTXE0SbhmH+mDiq5l3SN03XaEMlJmdRV/
+	 y2jX8w8kMeFzZs+D+4eMLi1A8hgra49FQT4qOoJ7sI1g9szvBmVC/p03fUgbDhhXEv
+	 X3HLRkwLPCSo3MafhnHbv3xCZc323igQCktjCNVFvfIhhxTUvZncrwUc43mv896FpU
+	 nGT+LDT5FucTLTx/8dLXE843qrQlHvjQD3g4cGVDlgUefeBkGSN7TerqMHYfF795uS
+	 2N9cWZeG7n6IkNFuAHqKXA0WGbHy+H4vu/tdg+YnQs0DHHyY9eusXtNiXCLccp1jDO
+	 l74jenB7UEcXQ==
+Date: Mon, 18 May 2026 00:22:47 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return
+ options
+Message-ID: <agq-RyKhBy4CIThm@kernel.org>
+References: <20260515195904.2466381-1-leo.bras@arm.com>
+ <20260515195904.2466381-2-leo.bras@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 04/44] arm64: RMI: Add SMC definitions for calling the
- RMM
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-5-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260513131757.116630-5-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 8zNFMxxFYSjzbL_AgJSyRsKW29wwqw3RAu8VCZHMGC0_1779088143
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260515195904.2466381-2-leo.bras@arm.com>
 
-Hi Steven,
+Hi Leo,
 
-On 5/13/26 11:17 PM, Steven Price wrote:
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
+Thanks for having a look at this.
+
+On Fri, May 15, 2026 at 08:59:02PM +0100, Leonardo Bras wrote:
+> Introduce S2 walker return values:
+> - SKIP_CHILDREN: skip walking the children of the current node
+> - SKIP_SIBLINGS: skip waling the siblings of the current node
 > 
-> The SMC definitions are based on DEN0137[1] version 2.0-bet1
-> 
-> [1] https://developer.arm.com/documentation/den0137/2-0bet1/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v13:
->   * Updated to RMM spec v2.0-bet1
-> Changes since v12:
->   * Updated to RMM spec v2.0-bet0
-> Changes since v9:
->   * Corrected size of 'ripas_value' in struct rec_exit. The spec states
->     this is an 8-bit type with padding afterwards (rather than a u64).
-> Changes since v8:
->   * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
->     permits to be modified.
-> Changes since v6:
->   * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
->     these are flag values.
-> Changes since v5:
->   * Sorted the SMC #defines by value.
->   * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
->     RMI calls.
->   * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
->     number of available list registers could be lower.
->   * Provided a define for the reserved fields of FeatureRegister0.
->   * Fix inconsistent names for padding fields.
-> Changes since v4:
->   * Update to point to final released RMM spec.
->   * Minor rearrangements.
-> Changes since v3:
->   * Update to match RMM spec v1.0-rel0-rc1.
-> Changes since v2:
->   * Fix specification link.
->   * Rename rec_entry->rec_enter to match spec.
->   * Fix size of pmu_ovf_status to match spec.
-> ---
->   arch/arm64/include/asm/rmi_smc.h | 448 +++++++++++++++++++++++++++++++
->   1 file changed, 448 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rmi_smc.h
-> 
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> new file mode 100644
-> index 000000000000..a09b7a631fef
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_smc.h
-> @@ -0,0 +1,448 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023-2026 ARM Ltd.
-> + *
-> + * The values and structures in this file are from the Realm Management Monitor
-> + * specification (DEN0137) version 2.0-bet1:
-> + * https://developer.arm.com/documentation/den0137/2-0bet1/
-> + */
-> +
-> +#ifndef __ASM_RMI_SMC_H
-> +#define __ASM_RMI_SMC_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#define SMC_RMI_CALL(func)				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
-> +			   ARM_SMCCC_SMC_64,		\
-> +			   ARM_SMCCC_OWNER_STANDARD,	\
-> +			   (func))
-> +
-> +#define SMC_RMI_VERSION				SMC_RMI_CALL(0x0150)
-> +
-> +#define SMC_RMI_RTT_DATA_MAP_INIT		SMC_RMI_CALL(0x0153)
-> +
-> +#define SMC_RMI_REALM_ACTIVATE			SMC_RMI_CALL(0x0157)
-> +#define SMC_RMI_REALM_CREATE			SMC_RMI_CALL(0x0158)
-> +#define SMC_RMI_REALM_DESTROY			SMC_RMI_CALL(0x0159)
-> +#define SMC_RMI_REC_CREATE			SMC_RMI_CALL(0x015a)
-> +#define SMC_RMI_REC_DESTROY			SMC_RMI_CALL(0x015b)
-> +#define SMC_RMI_REC_ENTER			SMC_RMI_CALL(0x015c)
-> +#define SMC_RMI_RTT_CREATE			SMC_RMI_CALL(0x015d)
-> +#define SMC_RMI_RTT_DESTROY			SMC_RMI_CALL(0x015e)
-> +
-> +#define SMC_RMI_RTT_READ_ENTRY			SMC_RMI_CALL(0x0161)
-> +
-> +#define SMC_RMI_RTT_DEV_VALIDATE		SMC_RMI_CALL(0x0163)
-> +#define SMC_RMI_PSCI_COMPLETE			SMC_RMI_CALL(0x0164)
-> +#define SMC_RMI_FEATURES			SMC_RMI_CALL(0x0165)
-> +#define SMC_RMI_RTT_FOLD			SMC_RMI_CALL(0x0166)
-> +
-> +#define SMC_RMI_RTT_INIT_RIPAS			SMC_RMI_CALL(0x0168)
-> +#define SMC_RMI_RTT_SET_RIPAS			SMC_RMI_CALL(0x0169)
-> +#define SMC_RMI_VSMMU_CREATE			SMC_RMI_CALL(0x016a)
-> +#define SMC_RMI_VSMMU_DESTROY			SMC_RMI_CALL(0x016b)
-> +#define SMC_RMI_RMM_CONFIG_SET			SMC_RMI_CALL(0x016e)
-> +#define SMC_RMI_PSMMU_IRQ_NOTIFY		SMC_RMI_CALL(0x016f)
-> +
-> +#define SMC_RMI_PDEV_ABORT			SMC_RMI_CALL(0x0174)
-> +#define SMC_RMI_PDEV_COMMUNICATE		SMC_RMI_CALL(0x0175)
-> +#define SMC_RMI_PDEV_CREATE			SMC_RMI_CALL(0x0176)
-> +#define SMC_RMI_PDEV_DESTROY			SMC_RMI_CALL(0x0177)
-> +#define SMC_RMI_PDEV_GET_STATE			SMC_RMI_CALL(0x0178)
-> +
-> +#define SMC_RMI_PDEV_STREAM_KEY_REFRESH		SMC_RMI_CALL(0x017a)
-> +#define SMC_RMI_PDEV_SET_PUBKEY			SMC_RMI_CALL(0x017b)
-> +#define SMC_RMI_PDEV_STOP			SMC_RMI_CALL(0x017c)
-> +#define SMC_RMI_RTT_AUX_CREATE			SMC_RMI_CALL(0x017d)
-> +#define SMC_RMI_RTT_AUX_DESTROY			SMC_RMI_CALL(0x017e)
-> +#define SMC_RMI_RTT_AUX_FOLD			SMC_RMI_CALL(0x017f)
-> +
-> +#define SMC_RMI_VDEV_ABORT			SMC_RMI_CALL(0x0185)
-> +#define SMC_RMI_VDEV_COMMUNICATE		SMC_RMI_CALL(0x0186)
-> +#define SMC_RMI_VDEV_CREATE			SMC_RMI_CALL(0x0187)
-> +#define SMC_RMI_VDEV_DESTROY			SMC_RMI_CALL(0x0188)
-> +#define SMC_RMI_VDEV_GET_STATE			SMC_RMI_CALL(0x0189)
-> +#define SMC_RMI_VDEV_UNLOCK			SMC_RMI_CALL(0x018a)
-> +#define SMC_RMI_RTT_SET_S2AP			SMC_RMI_CALL(0x018b)
-> +#define SMC_RMI_VDEV_COMPLETE			SMC_RMI_CALL(0x018e)
-> +
-> +#define SMC_RMI_VDEV_GET_INTERFACE_REPORT	SMC_RMI_CALL(0x01d0)
-> +#define SMC_RMI_VDEV_GET_MEASUREMENTS		SMC_RMI_CALL(0x01d1)
-> +#define SMC_RMI_VDEV_LOCK			SMC_RMI_CALL(0x01d2)
-> +#define SMC_RMI_VDEV_START			SMC_RMI_CALL(0x01d3)
-> +
-> +#define SMC_RMI_VSMMU_EVENT_NOTIFY		SMC_RMI_CALL(0x01d6)
-> +#define SMC_RMI_PSMMU_ACTIVATE			SMC_RMI_CALL(0x01d7)
-> +#define SMC_RMI_PSMMU_DEACTIVATE		SMC_RMI_CALL(0x01d8)
-> +
-> +#define SMC_RMI_PSMMU_ST_L2_CREATE		SMC_RMI_CALL(0x01db)
-> +#define SMC_RMI_PSMMU_ST_L2_DESTROY		SMC_RMI_CALL(0x01dc)
-> +#define SMC_RMI_DPT_L0_CREATE			SMC_RMI_CALL(0x01dd)
-> +#define SMC_RMI_DPT_L0_DESTROY			SMC_RMI_CALL(0x01de)
-> +#define SMC_RMI_DPT_L1_CREATE			SMC_RMI_CALL(0x01df)
-> +#define SMC_RMI_DPT_L1_DESTROY			SMC_RMI_CALL(0x01e0)
-> +#define SMC_RMI_GRANULE_TRACKING_GET		SMC_RMI_CALL(0x01e1)
-> +
-> +#define SMC_RMI_GRANULE_TRACKING_SET		SMC_RMI_CALL(0x01e3)
-> +
-> +#define SMC_RMI_RMM_CONFIG_GET			SMC_RMI_CALL(0x01ec)
-> +
-> +#define SMC_RMI_RMM_STATE_GET			SMC_RMI_CALL(0x01ee)
-> +
-> +#define SMC_RMI_PSMMU_EVENT_CONSUME		SMC_RMI_CALL(0x01f0)
-> +#define SMC_RMI_GRANULE_RANGE_DELEGATE		SMC_RMI_CALL(0x01f1)
-> +#define SMC_RMI_GRANULE_RANGE_UNDELEGATE	SMC_RMI_CALL(0x01f2)
-> +#define SMC_RMI_GPT_L1_CREATE			SMC_RMI_CALL(0x01f3)
-> +#define SMC_RMI_GPT_L1_DESTROY			SMC_RMI_CALL(0x01f4)
-> +#define SMC_RMI_RTT_DATA_MAP			SMC_RMI_CALL(0x01f5)
-> +#define SMC_RMI_RTT_DATA_UNMAP			SMC_RMI_CALL(0x01f6)
-> +#define SMC_RMI_RTT_DEV_MAP			SMC_RMI_CALL(0x01f7)
-> +#define SMC_RMI_RTT_DEV_UNMAP			SMC_RMI_CALL(0x01f8)
-> +#define SMC_RMI_RTT_ARCH_DEV_MAP		SMC_RMI_CALL(0x01f9)
-> +#define SMC_RMI_RTT_ARCH_DEV_UNMAP		SMC_RMI_CALL(0x01fa)
-> +#define SMC_RMI_RTT_UNPROT_MAP			SMC_RMI_CALL(0x01fb)
-> +#define SMC_RMI_RTT_UNPROT_UNMAP		SMC_RMI_CALL(0x01fc)
-> +#define SMC_RMI_RTT_AUX_PROT_MAP		SMC_RMI_CALL(0x01fd)
-> +#define SMC_RMI_RTT_AUX_PROT_UNMAP		SMC_RMI_CALL(0x01fe)
-> +#define SMC_RMI_RTT_AUX_UNPROT_MAP		SMC_RMI_CALL(0x01ff)
-> +#define SMC_RMI_RTT_AUX_UNPROT_UNMAP		SMC_RMI_CALL(0x0200)
-> +#define SMC_RMI_REALM_TERMINATE			SMC_RMI_CALL(0x0201)
-> +#define SMC_RMI_RMM_ACTIVATE			SMC_RMI_CALL(0x0202)
-> +#define SMC_RMI_OP_CONTINUE			SMC_RMI_CALL(0x0203)
-> +#define SMC_RMI_PDEV_STREAM_CONNECT		SMC_RMI_CALL(0x0204)
-> +#define SMC_RMI_PDEV_STREAM_DISCONNECT		SMC_RMI_CALL(0x0205)
-> +#define SMC_RMI_PDEV_STREAM_COMPLETE		SMC_RMI_CALL(0x0206)
-> +#define SMC_RMI_PDEV_STREAM_KEY_PURGE		SMC_RMI_CALL(0x0207)
-> +#define SMC_RMI_OP_MEM_DONATE			SMC_RMI_CALL(0x0208)
-> +#define SMC_RMI_OP_MEM_RECLAIM			SMC_RMI_CALL(0x0209)
-> +#define SMC_RMI_OP_CANCEL			SMC_RMI_CALL(0x020a)
-> +#define SMC_RMI_VSMMU_FEATURES			SMC_RMI_CALL(0x020b)
-> +#define SMC_RMI_VSMMU_CMD_GET			SMC_RMI_CALL(0x020c)
-> +#define SMC_RMI_VSMMU_CMD_COMPLETE		SMC_RMI_CALL(0x020d)
-> +#define SMC_RMI_PSMMU_INFO			SMC_RMI_CALL(0x020e)
-> +
-> +#define RMI_ABI_MAJOR_VERSION	2
-> +#define RMI_ABI_MINOR_VERSION	0
-> +
-> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
-> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
-> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
-> +
-> +#define RMI_UNASSIGNED			0
-> +#define RMI_ASSIGNED			1
-> +#define RMI_TABLE			2
-> +
+> Also, modify __kvm_pgtable_visit() to fulfil the hing on above return
+> values. Current walkers should not be impacted
 
-Those definations are inconsistent to those defined in tf-rmm/lib/smc/include/smc-rmi.h
-where their size are 64-bits. Also, other two definations are missed here and perhaps
-worthy to be added here.
+I'd rather see something based around new walk flags than introducing an
+entirely new mechanic around return values.
 
-#define RMI_ASSIGNED_DEV        UL(3)
-#define RMI_AUX_DESTROYED       UL(5)
+e.g. you could split the LEAF flag into separate flags for blocks v.
+pages:
 
+	KVM_PGTABLE_WALK_PAGE,
+	KVM_PGTABLE_WALK_BLOCK,
+	KVM_PGTABLE_WALK_LEAF	= KVM_PGTABLE_WALK_PAGE |
+				  KVM_PGTABLE_WALK_BLOCK,
 
-> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
-> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
-> +#define RMI_RETURN_MEMREQ(ret)		(((ret) >> 8) & 0x3)
-> +#define RMI_RETURN_CAN_CANCEL(ret)	(((ret) >> 10) & 0x1)
-> +
-> +#define RMI_SUCCESS			0
-> +#define RMI_ERROR_INPUT			1
-> +#define RMI_ERROR_REALM			2
-> +#define RMI_ERROR_REC			3
-> +#define RMI_ERROR_RTT			4
-> +#define RMI_ERROR_NOT_SUPPORTED		5
-> +#define RMI_ERROR_DEVICE		6
-> +#define RMI_ERROR_RTT_AUX		7
-> +#define RMI_ERROR_PSMMU_ST		8
-> +#define RMI_ERROR_DPT			9
-> +#define RMI_BUSY			10
-> +#define RMI_ERROR_GLOBAL		11
-> +#define RMI_ERROR_TRACKING		12
-> +#define RMI_INCOMPLETE			13
-> +#define RMI_BLOCKED			14
-> +#define RMI_ERROR_GPT			15
-> +#define RMI_ERROR_GRANULE		16
-> +
-> +#define RMI_OP_MEM_REQ_NONE		0
-> +#define RMI_OP_MEM_REQ_DONATE		1
-> +#define RMI_OP_MEM_REQ_RECLAIM		2
-> +
-
-The size of those definations are 32-bits, different to that of them defined
-in tf-rmm/lib/smc/include/smc-rmi.h
-
-#define RMI_OP_MEM_REQ_NONE             (0UL)
-#define RMI_OP_MEM_REQ_DONATE           (1UL)
-#define RMI_OP_MEM_REQ_RECLAIM          (2UL)
-
-> +#define RMI_DONATE_SIZE(req)		((req) & 0x3)
-> +#define RMI_DONATE_COUNT_MASK		GENMASK(15, 2)
-> +#define RMI_DONATE_COUNT(req)		(((req) & RMI_DONATE_COUNT_MASK) >> 2)
-> +#define RMI_DONATE_CONTIG(req)		(!!((req) & BIT(16)))
-> +#define RMI_DONATE_STATE(req)		(!!((req) & BIT(17)))
-> +
-> +#define RMI_OP_MEM_DELEGATED		0
-> +#define RMI_OP_MEM_UNDELEGATED		1
-> +
-
-As above, inconsistent size to those definations in tf-rmm/lib/smc/include/smc-rmi.h
-
-> +#define RMI_ADDR_TYPE_NONE		0
-> +#define RMI_ADDR_TYPE_SINGLE		1
-> +#define RMI_ADDR_TYPE_LIST		2
-> +
-
-As above, inconsistent size to those definations in tf-rmm/lib/smc/include/smc-rmi.h
-
-> +#define RMI_ADDR_RANGE_SIZE_MASK	GENMASK(1, 0)
-> +#define RMI_ADDR_RANGE_COUNT_MASK	GENMASK(PAGE_SHIFT - 1, 2)
-> +#define RMI_ADDR_RANGE_ADDR_MASK	(PAGE_MASK & GENMASK(51, 0))
-> +#define RMI_ADDR_RANGE_STATE_MASK	BIT(63)
-> +
-> +#define RMI_ADDR_RANGE_SIZE(ar)		(FIELD_GET(RMI_ADDR_RANGE_SIZE_MASK, \
-> +						   (ar)))
-> +#define RMI_ADDR_RANGE_COUNT(ar)	(FIELD_GET(RMI_ADDR_RANGE_COUNT_MASK, \
-> +						   (ar)))
-> +#define RMI_ADDR_RANGE_ADDR(ar)		((ar) & RMI_ADDR_RANGE_ADDR_MASK)
-> +#define RMI_ADDR_RANGE_STATE(ar)	(FIELD_GET(RMI_ADDR_RANGE_STATE_MASK, \
-> +						   (ar)))
-> +
-> +enum rmi_ripas {
-> +	RMI_EMPTY = 0,
-> +	RMI_RAM = 1,
-> +	RMI_DESTROYED = 2,
-> +	RMI_DEV = 3,
-> +};
-> +
-> +#define RMI_NO_MEASURE_CONTENT	0
-> +#define RMI_MEASURE_CONTENT	1
-> +
-> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
-> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
-> +#define RMI_FEATURE_REGISTER_0_SVE		BIT(9)
-> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
-> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
-> +#define RMI_FEATURE_REGISTER_0_PMU		BIT(26)
-> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
-> +
-> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB	BIT(0)
-> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB	BIT(1)
-> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB	BIT(2)
-> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_256	BIT(3)
-> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_384	BIT(4)
-> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_512	BIT(5)
-> +#define RMI_FEATURE_REGISTER_1_MAX_RECS_ORDER	GENMASK(9, 6)
-> +#define RMI_FEATURE_REGISTER_1_L0GPTSZ		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_1_PPS		GENMASK(16, 14)
-> +
-> +#define RMI_FEATURE_REGISTER_2_DA		BIT(0)
-> +#define RMI_FEATURE_REGISTER_2_DA_COH		BIT(1)
-> +#define RMI_FEATURE_REGISTER_2_VSMMU		BIT(2)
-> +#define RMI_FEATURE_REGISTER_2_ATS		BIT(3)
-> +#define RMI_FEATURE_REGISTER_2_MAX_VDEVS_ORDER	GENMASK(7, 4)
-> +#define RMI_FEATURE_REGISTER_2_VDEV_KROU	BIT(8)
-> +#define RMI_FEATURE_REGISTER_2_NON_TEE_STREAM	BIT(9)
-> +
-> +#define RMI_FEATURE_REGISTER_3_MAX_NUM_AUX_PLANES	GENMASK(3, 0)
-> +#define RMI_FEATURE_REGISTER_3_RTT_PLAN			GENMASK(5, 4)
-> +#define RMI_FEATURE_REGISTER_3_RTT_S2AP_INDIRECT	BIT(6)
-> +
-> +#define RMI_FEATURE_REGISTER_4_MEC_COUNT		GENMASK(63, 0)
-> +
-> +#define RMI_MEM_CATEGORY_CONVENTIONAL		0
-> +#define RMI_MEM_CATEGORY_DEV_NCOH		1
-> +#define RMI_MEM_CATEGORY_DEV_COH		2
-> +
-> +#define RMI_TRACKING_RESERVED			0
-> +#define RMI_TRACKING_NONE			1
-> +#define RMI_TRACKING_FINE			2
-> +#define RMI_TRACKING_COARSE			3
-> +
-> +#define RMI_GRANULE_SIZE_4KB	0
-> +#define RMI_GRANULE_SIZE_16KB	1
-> +#define RMI_GRANULE_SIZE_64KB	2
-> +
-> +/*
-> + * Note many of these fields are smaller than u64 but all fields have u64
-> + * alignment, so use u64 to ensure correct alignment.
-> + */
-> +struct rmm_config {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 tracking_region_size;
-> +			u64 rmi_granule_size;
-> +		};
-> +		u8 sizer[0x1000];
-> +	};
-> +};
-> +
-> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
-> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
-> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-> +
-> +struct realm_params {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 flags;
-> +			u64 s2sz;
-> +			u64 sve_vl;
-> +			u64 num_bps;
-> +			u64 num_wps;
-> +			u64 pmu_num_ctrs;
-> +			u64 hash_algo;
-> +			u64 num_aux_planes;
-> +		};
-> +		u8 padding0[0x400];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u8 rpv[64];
-> +			u64 ats_plane;
-> +		};
-> +		u8 padding1[0x400];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 padding;
-> +			u64 rtt_base;
-> +			s64 rtt_level_start;
-> +			u64 rtt_num_start;
-> +			u64 flags1;
-> +			u64 aux_rtt_base[3];
-> +		};
-> +		u8 padding2[0x800];
-> +	};
-> +};
-> +
-> +/*
-> + * The number of GPRs (starting from X0) that are
-> + * configured by the host when a REC is created.
-> + */
-> +#define REC_CREATE_NR_GPRS		8
-> +
-> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
-> +
-> +struct rec_params {
-> +	union { /* 0x0 */
-> +		u64 flags;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		u64 mpidr;
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 pc;
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u64 gprs[REC_CREATE_NR_GPRS];
-> +		u8 padding3[0xd00];
-> +	};
-> +};
-> +
-> +#define REC_ENTER_FLAG_EMULATED_MMIO	BIT(0)
-> +#define REC_ENTER_FLAG_INJECT_SEA	BIT(1)
-> +#define REC_ENTER_FLAG_TRAP_WFI		BIT(2)
-> +#define REC_ENTER_FLAG_TRAP_WFE		BIT(3)
-> +#define REC_ENTER_FLAG_RIPAS_RESPONSE	BIT(4)
-> +#define REC_ENTER_FLAG_S2AP_RESPONSE	BIT(5)
-> +#define REC_ENTER_FLAG_DEV_MEM_RESPONSE	BIT(6)
-> +#define REC_ENTER_FLAG_FORCE_P0		BIT(7)
-> +
-> +#define REC_RUN_GPRS			31
-> +#define REC_MAX_GIC_NUM_LRS		16
-> +
-> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
-> +					 ICH_HCR_EL2_LRENPIE |		\
-> +					 ICH_HCR_EL2_NPIE |		\
-> +					 ICH_HCR_EL2_VGrp0EIE |		\
-> +					 ICH_HCR_EL2_VGrp0DIE |		\
-> +					 ICH_HCR_EL2_VGrp1EIE |		\
-> +					 ICH_HCR_EL2_VGrp1DIE |		\
-> +					 ICH_HCR_EL2_TDIR)
-> +
-> +struct rec_enter {
-> +	union { /* 0x000 */
-> +		u64 flags;
-> +		u8 padding0[0x200];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding1[0x100];
-> +	};
-> +	u8 padding3[0x500];
-> +};
-> +
-> +#define RMI_EXIT_SYNC			0x00
-> +#define RMI_EXIT_IRQ			0x01
-> +#define RMI_EXIT_FIQ			0x02
-> +#define RMI_EXIT_PSCI			0x03
-> +#define RMI_EXIT_RIPAS_CHANGE		0x04
-> +#define RMI_EXIT_HOST_CALL		0x05
-> +#define RMI_EXIT_SERROR			0x06
-> +#define RMI_EXIT_S2AP_CHANGE		0x07
-> +#define RMI_EXIT_VDEV_REQUEST		0x08
-> +#define RMI_EXIT_VDEV_VALIDATE_MAPPING	0x09
-> +#define RMI_EXIT_VSMMU_COMMAND		0x0a
-> +
-> +struct rec_exit {
-> +	union { /* 0x000 */
-> +		u8 exit_reason;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		struct {
-> +			u64 esr;
-> +			u64 far;
-> +			u64 hpfar;
-> +			u64 rtt_tree;
-> +		};
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u64 cntp_ctl;
-> +			u64 cntp_cval;
-> +			u64 cntv_ctl;
-> +			u64 cntv_cval;
-> +		};
-> +		u8 padding4[0x100];
-> +	};
-> +	union { /* 0x500 */
-> +		struct {
-> +			u64 ripas_base;
-> +			u64 ripas_top;
-> +			u8 ripas_value;
-> +			u8 padding8[15];
-> +			u64 s2ap_base;
-> +			u64 s2ap_top;
-> +			u64 vdev_id_1;
-> +			u64 vdev_id_2;
-> +			u64 dev_mem_base;
-> +			u64 dev_mem_top;
-> +			u64 dev_mem_pa;
-> +		};
-> +		u8 padding5[0x100];
-> +	};
-> +	union { /* 0x600 */
-> +		struct {
-> +			u16 imm;
-> +			u16 padding9;
-> +			u64 plane;
-> +		};
-> +		u8 padding6[0x100];
-> +	};
-> +	union { /* 0x700 */
-> +		struct {
-> +			u8 pmu_ovf_status;
-> +			u8 padding10[15];
-> +			u64 vsmmu;
-> +		};
-> +		u8 padding7[0x100];
-> +	};
-> +};
-> +
-> +struct rec_run {
-> +	struct rec_enter enter;
-> +	struct rec_exit exit;
-> +};
-> +
-> +/* RMI_RTT_UNPROT_MAP_FLAGS definitions */
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_OADDR_TYPE	GENMASK(1, 0)
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_LIST_COUNT	GENMASK(15, 2)
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_MEMATTR	GENMASK(18, 16)
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_S2AP		GENMASK(22, 19)
-> +
-> +/* S2AP Direct Encodings, used in RMI_RTT_UNPROT_MAP_FLAGS_S2AP */
-> +#define RMI_S2AP_DIRECT_WRITE			BIT(0)
-> +#define RMI_S2AP_DIRECT_READ			BIT(1)
-> +
-> +#endif /* __ASM_RMI_SMC_H */
+and then let __kvm_pgtable_visit() decide how to steer the walk. You may
+need some special handling to get the address arithmetic right when
+skipping over a table of page descriptors.
 
 Thanks,
-Gavin
-
+Oliver
