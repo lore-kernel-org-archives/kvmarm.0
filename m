@@ -1,107 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABD83F99FE
-	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 15:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D637236EAB9;
+	Mon, 18 May 2026 15:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779118878; cv=none; b=MuplWDTIYmre8c3CK2eFSv/OmQtl4SbmZjo46Yzg/+/KTuOFev9DmHQnC8rB3cCC6LWA0hlqpP4ekX+qGDMnK62Xnx9n/VcnoEHO1jyXZM1rkbTqqoFPzMsdcNU33+ecUJewF9w8/Yb5wHC9TVFEF8olN0PjGZ/9fRN79lVj+6k=
+	t=1779119608; cv=none; b=jG+CyhqXDSzKR+ayCiF5HEEQXp27mwys1olEI3RVFo2g1x1MpmaNY/i5GpECsHxVS+ICkN6zGys01R7K8zxwv156ToqwdE7XjGzlF9zhYITtdmyd5xKDfFhFzrW3iH5VeygQHGKa9itlxhRSzG/us6yI0jNIqMtel9TmiTJDI8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779118878; c=relaxed/simple;
-	bh=nGkDdu+N3KWlaQu2LHbVRzFeeLezZZ4e4A5lnJ7m/HY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SalHnswCfkFdUDGxIdNWYn+X4IQ7o2RizXbi1nMFRVBmNg2wCD9NfMtZFFVrpQXftlOJmF+/2LeHhgV9r1UdwOQC0+XgHf/dDJyjYrsaz53qrQk1rrVvmzngXSoirhmRlvSziyveQmQwlmxZJ4GLjsbJZlO3Bx5eNAVipzh1vNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d11xgqlt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779119608; c=relaxed/simple;
+	bh=p0DF+qEvuD5y1yPwFRfJEGsH1ocDFXtPcWXGL8v+pd0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=YlV8dmdfEOtPL9CGiQG22FVXrOBEbFh0vwQv4GmhQFvmLr4xo9rYSMxyXQCZzOkZUA4KBldGYVjKIes9CZkhPVUIn+uw7/X41CU1ofUgWGSyyUiLpY2Fgzw5pXq1klSPEBm84JiwaqZPxahmqJ84Qq/pc6wKj3bMa+3unbdrSDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ulj5R3E8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d11xgqlt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5CA8C2BCB8;
-	Mon, 18 May 2026 15:41:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulj5R3E8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53E22C2BCB7;
+	Mon, 18 May 2026 15:53:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779118878;
-	bh=nGkDdu+N3KWlaQu2LHbVRzFeeLezZZ4e4A5lnJ7m/HY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d11xgqltA+Lt/KKwH30UiTSccND+/f5Aa8LecxQGfbVbkuAX1MYkuYeg33udL8Fxy
-	 jpNEgIsfEgIBmzkx3Vnuj9O6qFTHT31nZ7Gb/zKEmgdUjslCvW0Ew0hE9Re2En7yDM
-	 85MoCCxtbJXwPqsbKxD8Cs+0MF6i+ASkhLY3OyBQiz1MKZC2W2KQEFfXuhXpFL+FT1
-	 5quqEkXeQtv5WCNxt2k2XPlcuIXMieXtOKopKXhjPghNKlVxMuXVCx43Ac10C1I+Ea
-	 DWDct1vwu539+M5GnqnLxswv2dzror/DM0Z7hFKJd6LtMaC7yPevb1YE4vuNCR7dBh
-	 zcfG4KP1X7v9A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wP05j-00000003aaE-3rHO;
-	Mon, 18 May 2026 15:41:16 +0000
-Date: Mon, 18 May 2026 16:41:15 +0100
-Message-ID: <86wlx0wwro.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=k20201202; t=1779119607;
+	bh=p0DF+qEvuD5y1yPwFRfJEGsH1ocDFXtPcWXGL8v+pd0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ulj5R3E8Rv8y6EmWoyV1jR6yWCoMpkqpHQszi1rcK2/qlwRJHt0u6MroEEnHNLBUR
+	 pN/m0AaSkXN7mkCgr+5Et2WQkND/EzH5MAoCBk4uXKkHU+B2NS6pR/80OeAdaxb0MJ
+	 /GlaoOyND3f1Uc6tscxCBhqnQherydXZsWnMwZSFDdfGCHf/hIivhAmarwP5i6MPVV
+	 CKRQr6WiXlw0fJx4hOuZSuaYTRLRLbB8Fbqbj29OGBebTY6cWF+Gt/+pbcirTnGvqn
+	 sd66jOcafF6fg8ww6lpeZcZN9yelMf7sgSqGTZL3UE7/J87+tERAy9oooSyzODdQuN
+	 APe2kmfaYLDVQ==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
 To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev,
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2] KVM: arm64: Don't populate TPIDR_EL2 in finalise_el2()
-In-Reply-To: <86y0hgwwul.wl-maz@kernel.org>
-References: <20260518153127.6078-1-will@kernel.org>
-	<86y0hgwwul.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Dan Williams <dan.j.williams@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 00/14] coco/TSM: Host-side Arm CCA IDE setup via
+ connect/disconnect callbacks
+In-Reply-To: <agsNO9cc7H-b0H8L@willie-the-truck>
+References: <20260427065121.916615-1-aneesh.kumar@kernel.org>
+ <agsNO9cc7H-b0H8L@willie-the-truck>
+Date: Mon, 18 May 2026 21:23:18 +0530
+Message-ID: <yq5aecj8yas1.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, 18 May 2026 16:39:30 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Mon, 18 May 2026 16:31:26 +0100,
-> Will Deacon <will@kernel.org> wrote:
-> > 
-> > Currently, it is not necessary for __finalise_el2() to configure
-> > TPIDR_EL2:
-> > 
-> > * The hyp stub code does not consume the value of TPIDR_EL2.
-> > 
-> > * On the boot cpu, TPIDR_EL1 is used for the percpu offset until the
-> >   ARM64_HAS_VIRT_HOST_EXTN cpucap is detected and boot alternatives
-> >   are patched. Before boot alternatives are patched,
-> >   cpu_copy_el2regs() will copy TPIDR_EL1 into TPIDR_EL2. It is not
-> >   necessary for __finalise_el2() to initialise TPIDR_EL2 before this.
-> > 
-> > * Secondary CPUs are brought up after boot alternatives have been
-> >   patched, and __secondary_switched() will initialize TPIDR_EL2 in
-> >   'init_cpu_task', after finalise_el2() calls __finalise_el2()
-> > 
-> > * KVM hyp code which may consume TPIDR_EL2 is brought up after all
-> >   secondaries have been booted, once TPIDR_El2 has been configured on
-> >   all CPUs.
-> > 
-> > Remove the redundant initialisation from __finalise_el2().
-> > 
-> > Cc: Oliver Upton <oupton@kernel.org>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> 
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
+Will Deacon <will@kernel.org> writes:
 
-Ah, realised too late you intended for this to go via the KVM tree.
+> On Mon, Apr 27, 2026 at 12:21:07PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>>  arch/arm64/include/asm/rmi_cmds.h         |  85 +++
+>>  arch/arm64/include/asm/rmi_smc.h          | 168 +++++
+>
+> Curious, but why does this stuff have to live in the arch code? Wouldn't
+> it be better off somewhere like drivers/firmware/ or
+> include/linux/arm-rmi.h?
+>
 
-I'll queue that for 7.2.
+Those headers are used to collect all RMI-related helpers and #defines.
+They were introduced by the Realm KVM/host support patch series, and I
+am continuing to use the same headers to add more helpers.
 
-Thanks,
+We can consider moving the RMI helpers used by virt/coco/arm-caa-guest/,
+virt/coco/arm-cca-host/, and
+drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-realm.c into a more generic
+header such as include/linux/arm-rmi.h. However, that would either
+require moving all the helpers currently used by KVM there as well,
+otherwise we would end up with two separate headers carrying RMI
+helpers.
 
-	M.
+Additionally, there are also arch/arm64/include/asm/rsi_cmds.h and
+arch/arm64/include/asm/rsi_smc.h to consider.
 
--- 
-Without deviation from the norm, progress is not possible.
+-aneesh
