@@ -1,170 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC0B22D7A1;
-	Mon, 18 May 2026 08:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8093E16AD;
+	Mon, 18 May 2026 08:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779093222; cv=none; b=JbUbBvR+xQeJ0oG8I5Yg3Y61QyGKQUFc+Vcy2JX55uSx1aJHNpb6oADD9sx8kwQEcrsHi0GAwNHZF04u7rXuzAx1DIL1HaHfz9KwRDUPMuVqNCTtI62hqoNhoNMIFZVEf/QPqqwLikdbtqiVzU3/bQgOQi7OD7oZtqoZfRb74HM=
+	t=1779094343; cv=none; b=Lq85pMFexOqwd0S5uko1PcWtbQ2YyCz+SMpgjnIcA3G5pjW0Uci8GZtAYW2S4N8CGpvs7sIrgW0GAzortQG0uT8NJnkkoviIV4jOW4uDm5cpgWxpB17FlcLswRejqQ4TeICsuWajZttmH0AB2GtK6NVU3W5y1KpIZkK419u9R/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779093222; c=relaxed/simple;
-	bh=/yn5AaMzJ9BgnhIOhBP334j/TdcMsLgg4RzjCIiAFaQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KpoKb2Wblc/GG0r1q2v5XC64oZopcng1TrOBFuMhOWGWCibgvv2SAl4HZ9yv25+5ki/sSO6Rf+wf+suNoQfz7Y3q8QEW3JEfpNN5jsp3+7A542gBN5bQbKypuy2wkdVB5kdBXNO/+lShpj5JsOlEVWvDLoTYmWvMx0Le8MtXDxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NnF2XX+f; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779094343; c=relaxed/simple;
+	bh=EICJi/aaT88j8x8W/lvgeuwIQy7Ne1BVx13M96VG7Ms=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p/IKYy0WTO8PylR1//lNtTN40Q3zQfpFLJLn1leU+mqPxpgfoxXl+PuNea20VKrPCxdU2/FC5w1qkScfZL6NjX+cVIc901Unhhbu+fpvJyokcGdRa2spTx8ECzivUC9Ig4v7NtW4Sb/L2tf14bD7Z3we8YFkMT4OUQH5JiA2NPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lPrnimec; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NnF2XX+f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33BBC2BCB7;
-	Mon, 18 May 2026 08:33:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lPrnimec"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D594C2BCB7;
+	Mon, 18 May 2026 08:52:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779093222;
-	bh=/yn5AaMzJ9BgnhIOhBP334j/TdcMsLgg4RzjCIiAFaQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NnF2XX+foXJmxANzHYbYc2oOmrtQJsbxRDRdUAV9Tdw5gVh7TsGQBI7+Fh85hnbiW
-	 4YXWuZyV1l7DTbPwwUsR2/MxHJIshAM71lg4mb+T9IaCsBCyK9azfrZe0vSC9tQFoM
-	 XgTH0HjNsenfFlbYM346k103qA5QUN9zHq9lKlFgl3CvzQIYXxjvSUuht+JSKw93EB
-	 pWTDSv46QEYD2c0L/OyXT7wkU0qZTWjSdLaGG5P9697ldOF/Ez/zOesysxN561/KA5
-	 1ON7gL1i8aOKwwlLOto6l5swfmaQ5tILXYN+R2op/gRdP3DICH7FkEA4UpsEVk7dIe
-	 iGqXsaBXgJlZg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wOtPv-00000003QcE-2skF;
-	Mon, 18 May 2026 08:33:39 +0000
-Date: Mon, 18 May 2026 09:33:39 +0100
-Message-ID: <861pf9xgkc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+	s=k20201202; t=1779094342;
+	bh=EICJi/aaT88j8x8W/lvgeuwIQy7Ne1BVx13M96VG7Ms=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lPrnimecxFQILkNqI4FqV1PHtkcjPiTdr3K5Vg34uVYhioVLvTl5/hHempssR7oaV
+	 VlqFIWG/vHomjU+jGHMbx4SWlrwEDnmqARe06BCkDuyXRECVVSgCC5NI7R9xAhFpny
+	 lbfWcDjkiOSLqUO4JFuW6hnV0xZYUGa7NbaqntRKMZ+Knalg/gSzeVkjY7BOqJdV1b
+	 UvvTr3hHtVxIaBjDpPY+oKwUDbB3rWYAwJfEoqC9XSR5xdv8sapTXK//2TBFtrXRJk
+	 Hyo49HId1R8SZ57h61cV/6LsaYbac5y08N2d3xMLYlI8olS0EGZI8x7BYRuX8iFq3p
+	 m4PJdH5LxnEng==
+Date: Mon, 18 May 2026 09:52:16 +0100
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic-its: reject restored DTE with out-of-range num_eventid_bits
-In-Reply-To: <20260517174955.273004-1-michael.bommarito@gmail.com>
-References: <20260517174955.273004-1-michael.bommarito@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return
+ options
+Message-ID: <agrTQMw4QJX6HGrm@willie-the-truck>
+References: <20260515195904.2466381-1-leo.bras@arm.com>
+ <20260515195904.2466381-2-leo.bras@arm.com>
+ <agq-RyKhBy4CIThm@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: michael.bommarito@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <agq-RyKhBy4CIThm@kernel.org>
 
-On Sun, 17 May 2026 18:49:55 +0100,
-Michael Bommarito <michael.bommarito@gmail.com> wrote:
+On Mon, May 18, 2026 at 12:22:47AM -0700, Oliver Upton wrote:
+> On Fri, May 15, 2026 at 08:59:02PM +0100, Leonardo Bras wrote:
+> > Introduce S2 walker return values:
+> > - SKIP_CHILDREN: skip walking the children of the current node
+> > - SKIP_SIBLINGS: skip waling the siblings of the current node
+> > 
+> > Also, modify __kvm_pgtable_visit() to fulfil the hing on above return
+> > values. Current walkers should not be impacted
 > 
-> Userspace can trigger a host-side denial of service via
-> KVM_DEV_ARM_ITS_RESTORE_TABLES. A Device Table Entry whose Size
-> field encodes num_eventid_bits > VITS_TYPER_IDBITS reaches
-> scan_its_table() with a sign-extended ~18 EiB length, where the
-> loop holds the per-ITS mutex and never calls cond_resched(),
-> pinning a host CPU for a time linear in registered guest memslot
-> size. The accessor is any process that can open /dev/kvm and
-> create a VM. The same out-of-range value also disables a
-> subsequent live bounds check on EventID, as described below.
+> I'd rather see something based around new walk flags than introducing an
+> entirely new mechanic around return values.
 > 
-> The MAPD command handler already rejects this case in the live
-> path:
+> e.g. you could split the LEAF flag into separate flags for blocks v.
+> pages:
 > 
->   if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
->           return E_ITS_MAPD_ITTSIZE_OOR;
+> 	KVM_PGTABLE_WALK_PAGE,
+> 	KVM_PGTABLE_WALK_BLOCK,
+> 	KVM_PGTABLE_WALK_LEAF	= KVM_PGTABLE_WALK_PAGE |
+> 				  KVM_PGTABLE_WALK_BLOCK,
 > 
-> vgic_its_restore_dte() reconstructs num_eventid_bits from the DTE
-> Size field but does not apply the same cap, so userspace can
-> install device state that the live MAPD path is documented to
-> reject. The restored value is stored in dev->num_eventid_bits and
-> is then used by vgic_its_restore_itt():
-> 
->   size_t max_size = BIT_ULL(dev->num_eventid_bits) * ite_esz;
->   ret = scan_its_table(its, base, max_size, ite_esz, ...);
-> 
-> scan_its_table() takes the size as int and assigns it to
-> unsigned long in the callee:
-> 
->   static int scan_its_table(struct vgic_its *its, gpa_t base,
->                             int size, u32 esz, ...)
->   {
->           unsigned long len = size;
-> 
-> For num_eventid_bits = 28 the size_t value 0x80000000 truncates to
-> INT_MIN as int and sign-extends to ~18 EiB as unsigned long. The
-> scan loop then walks the registered guest memslot one ite_esz at
-> a time with the per-ITS mutex held and no cond_resched(). In a
-> QEMU TCG arm64 guest at EL2 on v7.1-rc1, with an empty ITT, the
-> ioctl returned -EFAULT after about 14 seconds with a 256 MiB
-> memslot and about 56 seconds with a 1 GiB memslot (linear in
-> memslot size). The per-iteration cost on native arm64 KVM
-> hardware will differ; the loop shape, and so the linear scaling,
-> will not.
-> 
-> The same out-of-range num_eventid_bits also disables the live
-> vgic_its_check_event_id() bounds check, because event_id is u32
-> and BIT_ULL(32) is unreachable in that comparison, leaving
-> subsequent MAPI/MAPTI handling without an effective EventID cap.
-> 
-> Mirror the MAPD cap in vgic_its_restore_dte() before allocating
-> the device, so out-of-range restored DTEs are rejected with
-> -EINVAL up front rather than triggering the int-truncated scan or
-> installing a device whose num_eventid_bits silently disables the
-> live bounds check. Sizes within [1, VITS_TYPER_IDBITS] are
-> unaffected.
+> and then let __kvm_pgtable_visit() decide how to steer the walk. You may
+> need some special handling to get the address arithmetic right when
+> skipping over a table of page descriptors.
 
-This commit message is way too verbose, and really looks like a copy
-paste from an LLM analysis. This needs trimming (the initial paragraph
-has most of it...).
+I was wondering along similar lines, but maybe it would be useful just
+to pass a maximum level to the walker logic? That feels like the most
+general case without complicating the existing logic.
 
-> 
-> Fixes: 57a9a117154c ("KVM: arm64: vgic-its: Device table save/restore")
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 2ea9f1c7ebcd0..a5dcf9a6a2854 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -2307,6 +2307,15 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
->  	/* dte entry is valid */
->  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
->  
-> +	/*
-> +	 * The MAPD command rejects this case; mirror the cap here so a
-> +	 * restored DTE cannot install an out-of-range num_eventid_bits
-> +	 * that vgic_its_restore_itt() would then convert into a
-> +	 * sign-extended scan_its_table() length.
-> +	 */
-
-Same here. Something like:
-
-	/* Mimic the MAPD behaviour and reject invalid EID bits */
-
-would be enough.
-
-> +	if (num_eventid_bits > VITS_TYPER_IDBITS)
-> +		return -EINVAL;
-> +
->  	if (!vgic_its_check_id(its, baser, id, NULL))
->  		return -EINVAL;
->  
-
-Otherwise looks good.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
