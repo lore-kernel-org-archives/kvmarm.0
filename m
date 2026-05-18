@@ -1,125 +1,187 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2040481FCB
-	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 13:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBC348A2C5;
+	Mon, 18 May 2026 13:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779111973; cv=none; b=pbCgS5Auzp4lQPenpFgwdAhj+uvuE5ipiLT933+W5L3JmOl5syC+qCAvx9dRbwautP54TcaBmoUnCQyPan5pQvThHlG9Z7c9T8iGLiXlnx9tO3WIycQid5pdLlR8yDkUbrfp3Mrw14dr/87NfqnkVt/jpm4jFZpATLCqo5Aa7O8=
+	t=1779112592; cv=none; b=tGVP19iSywH2O1whK8YuSHeIWsUA21kK4BYr8MjZjo5ksxPh2iL2F1t06cnX4nBuVmonWvOvNBTLjLVs+nqiLIQWxjK/EzdNp40guxkvx3AqlmPjZjoGzcTqtJwYfiq8wCDAI/EWW8C+XkVIvC3oSabX+94D6Q9JHqtx5pUsGjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779111973; c=relaxed/simple;
-	bh=fhdGtklIFTyvTEj9H05WIHW2CNgFWJkbGWF6iw7PZzE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=b8F5RwcYQXKl708aHxlf5+LXF42/sbzwa1Pd0kUz6ojziYJPNtVz3lqFMw+DFJUmsuCJCAjHEsRIpnWj2ubfGx1xPE07Ji4JtuYRcWVkw0s/om3BxM1txbz4UHT+lBQzjCJG948ccwZ+j4NxYkV3qbnxEIZ8d32CxdzkPyxe7vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=beTSK4+W; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779112592; c=relaxed/simple;
+	bh=M1hJb0hoxcKkSmY+3IhEMGFrd0EBvNP2uyHwSKG6WPk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ukBlEq63HCKfY0PaABaBwjOTq10YMMxsI9oI8NP+rp86VOvRBaNgvmr0ddfepJW5XNpHjyOo5YlF+W4MboWqupocN/HmhVwbnHMWWzFcMPfgHqLuDkgSwOohrwEV+i3jyEzSqhsYqgGnq8XELe3Du5fsk+RbFKu8PY1pv4kmgiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ILPUfjCQ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="beTSK4+W"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E9711C14;
-	Mon, 18 May 2026 06:46:03 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4EE3F3F7B4;
-	Mon, 18 May 2026 06:46:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779111968; bh=fhdGtklIFTyvTEj9H05WIHW2CNgFWJkbGWF6iw7PZzE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=beTSK4+WHg0cuF6W9ehQ1y809SqkXFak9EQbi6G8zWnRsR/8ytwO07ZgN//Hv7643
-	 k+CJRIzOwfYsYD4592NwkXss+qG3ninaFAf/Dz04n9BHZr3c0L4ehe0lmU8hG24QSb
-	 9jeD793DfqECw3hAjWyw+Y896oRD5BmF6wzwQ0yI=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return options
-Date: Mon, 18 May 2026 14:45:59 +0100
-Message-ID: <agsYF-Dav2bpxWK4@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <agrTQMw4QJX6HGrm@willie-the-truck>
-References: <20260515195904.2466381-1-leo.bras@arm.com> <20260515195904.2466381-2-leo.bras@arm.com> <agq-RyKhBy4CIThm@kernel.org> <agrTQMw4QJX6HGrm@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ILPUfjCQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M1hJb0hoxcKkSmY+3IhEMGFrd0EBvNP2uyHwSKG6WPk=; b=ILPUfjCQYenNwqo9nmnty8T+JP
+	XFB7C9Z5Coj5DPZYvFaC+rllHVtl3AuXYRXqyFZQ+I729tIs90HEIOsjikVAFwvYpInrbCge/7hNl
+	1zqL/+TJf/x76qZa9Uy7BoU7UDnC2/XvSM4NXMlYt99WuREVcWuLpvqE7dH+OLybrplAqVo/YD0We
+	J/RWNAMzuy0zf+s4ravtJ8WR2G9y75DNhF/4flqSFZyHsd/fKXl0dPj3acJ5cHjagKoEY8v1JhjPL
+	8W5ImBd2mTNyvAfxrbok5D9kX5u8AI1XXrPT4wLn08Pqg4Ookg7BDMOWoft10Aj3vUOVdOR0bNjo8
+	V1FtNFoQ==;
+Received: from 54-240-197-225.amazon.com ([54.240.197.225] helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wOyS7-00000004pP2-1g7Z;
+	Mon, 18 May 2026 13:56:15 +0000
+Message-ID: <7be2151d420954e02577312f6985018fc848ee4c.camel@infradead.org>
+Subject: Re: [PATCH v3 0/4] KVM: arm64: vgic: Fix IGROUPR writability and
+ IIDR revision control
+From: David Woodhouse <dwmw2@infradead.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>,  Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Jonathan
+ Cameron <jic23@kernel.org>, Sascha Bischoff <Sascha.Bischoff@arm.com>, Eric
+ Auger <eric.auger@redhat.com>, Raghavendra Rao Ananta <rananta@google.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Kees Cook <kees@kernel.org>, Timothy
+ Hayes <timothy.hayes@arm.com>,  Arnd Bergmann <arnd@arndb.de>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, Peter Maydell
+ <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Date: Mon, 18 May 2026 14:56:13 +0100
+In-Reply-To: <20260511113558.3325004-1-dwmw2@infradead.org>
+References: <20260511113558.3325004-1-dwmw2@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Hkc7djUBzr1SPdOeRBFL"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-Hello Oliver, Will,
-Thanks for reviewing!
 
-On Mon, May 18, 2026 at 09:52:16AM +0100, Will Deacon wrote:
-> On Mon, May 18, 2026 at 12:22:47AM -0700, Oliver Upton wrote:
-> > On Fri, May 15, 2026 at 08:59:02PM +0100, Leonardo Bras wrote:
-> > > Introduce S2 walker return values:
-> > > - SKIP_CHILDREN: skip walking the children of the current node
-> > > - SKIP_SIBLINGS: skip waling the siblings of the current node
-> > > 
-> > > Also, modify __kvm_pgtable_visit() to fulfil the hing on above return
-> > > values. Current walkers should not be impacted
-> > 
-> > I'd rather see something based around new walk flags than introducing an
-> > entirely new mechanic around return values.
-> > 
-> > e.g. you could split the LEAF flag into separate flags for blocks v.
-> > pages:
-> > 
-> > 	KVM_PGTABLE_WALK_PAGE,
-> > 	KVM_PGTABLE_WALK_BLOCK,
-> > 	KVM_PGTABLE_WALK_LEAF	= KVM_PGTABLE_WALK_PAGE |
-> > 				  KVM_PGTABLE_WALK_BLOCK,
-> > 
-> > and then let __kvm_pgtable_visit() decide how to steer the walk. You may
-> > need some special handling to get the address arithmetic right when
-> > skipping over a table of page descriptors.
+--=-Hkc7djUBzr1SPdOeRBFL
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I am probably not getting the whole inner workings of this solution, but 
-IIUC the idea would be to walk the blocks, but not the pages, right?
+On Mon, 2026-05-11 at 12:30 +0100, David Woodhouse wrote:
+> Maintaining precise guest compatibility across host kernel upgrades =E2=
+=80=94
+> and even downgrades, since rollback is sometimes necessary =E2=80=94 is n=
+ot=20
+> optional. That *shouldn't* need saying, but maybe it does:
+> https://lore.kernel.org/all/6856b269d2af706eae397e0cf9c1231f89d9a932.came=
+l@infradead.org/
+>=20
+> This series fixes the GICv2/v3 IGROUPR writability model to be
+> consistently controlled by the GICD_IIDR implementation revision,
+> replacing the ad-hoc v2_groups_user_writable flag.
 
-Blocks meaning level2- and pages being level3?
- 
-> I was wondering along similar lines, but maybe it would be useful just
-> to pass a maximum level to the walker logic? That feels like the most
-> general case without complicating the existing logic.
+The more generic question of whether KVM should actually maintain guest
+compatibility from one version of the host kernel to another is being
+discussed in that other thread.
 
-This proposal seems simpler for me to understand, and indeed looks like a 
-better solution than what I have proposed, taking care of  the 
-'already split' case with better performance, as it don't even walk a 
-single level-3 entry. 
+Setting that aside, is there any *technical* feedback on this series? I
+believe I've dealt with all of Marc's feedback on v1 (thanks).
 
-On the 'splitting' case, it also works flawlessly if the memory is given in 
-level-2 blocks. There is only one case that I would like to address here:
 
-- Memory given in level-1 blocks (say 1GB)
-- Walker flag says 'walk down to level-2 only'
-- Split Walker on level-1 will break page down to (up to) level-3 entries.
-- Walker will continue to be called on level-2 entries, even though it's 
-  not necessary.
+--=-Hkc7djUBzr1SPdOeRBFL
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-To solve this, I would like to suggest a new flag, that skips a table 
-that has just been created. This could be easily implemented in 
-__kvm_page_visit() on top of the max level flags suggested.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUxODEzNTYx
+M1owLwYJKoZIhvcNAQkEMSIEICqt//RAX/pWu9cXB++MsOe2WMY0oz8fhUmPi6jxt8lSMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAJdF11gRQu5b0
+WHvhiZWx/Uhmg3FKvzegxqEDSGe3fRVfyKIbNr5nYVSTqp8iRbyR3GK+lD2pE9mUhJmxvl2mwf6I
+09XZCAQL75U6KoyeND4KtQfLHuyRA5JUTLDR/ZtGXqdIBMGSsuVHKjtEjEW0Ko2wytJFwHpDSUF5
+kAbY9ZeLcCkb5xpGm9GAEOhKWpKqYjcIP4hXtvQeUxa92yXdwWjaQyLaWztqDc645+ggkNEMQO+K
+ozdUDKBV0okeI+CBrySgMZRbr7DuqTxxgzB3jVosOCyla8ke4LAwkBBjjrm+uH3VHDz6n25SXsrq
+JFc6zCnHyNqN0AWL/ocbJZvL9PpHuEslDvQOj6u9AvAcsNd/5MzPD5k7XxWj0PZgiA9+O94ZM2Fe
+n15VBs1ZD3K2Bs92l8/s0fjjZo31m3jqHkTcQCURcfTWWOffCKmq15f7j3J7719dqkdLqM9MuFxd
+hfBg9XxHs4WVwg7714ACs/4CPNZnzfxtI4s7B43fPhj1tbUb30ZQDNCTzwXeJoTmlXt3/q3HfKKG
+olegD9kqVgQa9H4L43BsRK+3UqCfRr6oK42wgMAB/7yRwsllAxBSgkFiZ8NWb2WUYPf3KqAe+d2Q
+E4IuZ49d7l0190FczUqMzxjnk+E4gOlt3vVS/Ql2b1Y+Pic5GrMDu0OxcVHHQzMAAAAAAAA=
 
-enum kvm_pgtable_walk_flags {
-[...]
-	KVM_PGTABLE_WALK_SKIP_LEVEL3		= BIT(7),
-	KVM_PGTABLE_WALK_SKIP_LEVEL2		= BIT(8),
-	KVM_PGTABLE_WALK_SKIP_LEVEL1		= BIT(9),
-	KVM_PGTABLE_WALK_SKIP_NEW_TABLE		= BIT(10),
-};
 
-How does that sound?
-
-Thanks!
-Leo
+--=-Hkc7djUBzr1SPdOeRBFL--
