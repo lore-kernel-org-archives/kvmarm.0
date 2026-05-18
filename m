@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFF6428489
-	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 12:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D199C428482
+	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 12:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779108368; cv=none; b=syRipk/R8oqwd9+sZndtBJ4wdwo+dE2Sv7NTetr6uoGAWFuLsamD1zxcOUeia7qLjEi0WkB4Eec6KaMVveiIahUe9gNabNQi1VF+93GBTIo3lgujcc4k1w/+hpABi4nH9Yox5Gl2EfvJ58G7OwSsqyvRvDNcIziwmLfA9RSt/AQ=
+	t=1779108370; cv=none; b=KTR6L4XAR/AQ2nlKBnZULe7Pf/W01BwmaPvuWC0K7yYm1wkXOrE5tY9Lz12KgCSt2YcalP0FTJI8PEDGZfYUoarIoLSQur61RV2+jsY0eICpl/INBCO+/YK0OfogZAMFUB4MPv+5DGBZuweL9YSKPU0m+k0zxnV25o8WzmiloJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779108368; c=relaxed/simple;
-	bh=jryiddMefK3JGfoGoYlcLCo3yCpxfx7x4bM6iI49iyM=;
+	s=arc-20240116; t=1779108370; c=relaxed/simple;
+	bh=b4+NV6vTh1gEhqympMV6tS0C8lKKHhHLEfJZnFACIDM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u7pzz8Bpypo2vmbEiQ5qdGQUS8VaDrj81xuluFlBVlUY5VdOST5YN6hPN3C6SSFzu/4WDjkk1IpNMFRvl9gRJ7KuEE0sMv5WzpzpxR4k3T0AUYjzSnNqBrM3CH1qt89jBLFIYNndglSI+wOIpvkRokC0Qq4a7MVk823f9c4647I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=aRaRINmW; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=XWdX39ckFmW3ctYJe4irPBLwoO10XckThWesseCINZy7jxvfCRVNV0JNar1w93t72SwkcpwQWOKf5OiGhFh3JKlB+kJwrwVm3GhZTGxk8y5AVKdn7rE1dXp3m5QpOwGYwLFvfYCs4DeQGhgVj4tjNZiLOFRcsafTRmzxxvu7Kyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=txiJ9OTm; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="aRaRINmW"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="txiJ9OTm"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50EFE45BF;
-	Mon, 18 May 2026 05:46:01 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FB574668;
+	Mon, 18 May 2026 05:46:03 -0700 (PDT)
 Received: from e142021.fritz.box (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C8593F632;
-	Mon, 18 May 2026 05:46:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D13593F632;
+	Mon, 18 May 2026 05:46:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779108366; bh=jryiddMefK3JGfoGoYlcLCo3yCpxfx7x4bM6iI49iyM=;
+	t=1779108368; bh=b4+NV6vTh1gEhqympMV6tS0C8lKKHhHLEfJZnFACIDM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aRaRINmWjzpnl3P0YYiICZYZz5r5ZAmQDfXdRRDzl1W1IsjcnxQyC/V6mal0o21SG
-	 OH5xLb6V/TwZ00kFqMxManUwQnijRRWZxX9XnaAEz0VtDUxsq4TLUeua4b9Gmr0Vz1
-	 oC9CzJjJFi1WczMx4SXpC/jMfFYdq5KQcJ4FwGzk=
+	b=txiJ9OTmbNVD1rBv7INJopYD807Yuid2212qOamXwIw+j7GmvPxs46PK091ogCGjN
+	 YC87C8c0kdybDjYB/spx7Tm+ebAiQujaAPkHkGl97b9Xl71aowFMhGTmw8khPulQl5
+	 565YwYTYrYbkdJIeHNyJhIzlqqlD8Jy4oq/Yux9Q=
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v8 2/6] arm64: nested: Add support for setting maintenance IRQ
-Date: Mon, 18 May 2026 14:45:52 +0200
-Message-ID: <20260518124556.164739-3-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v8 3/6] arm64: Add counter offset control
+Date: Mon, 18 May 2026 14:45:53 +0200
+Message-ID: <20260518124556.164739-4-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260518124556.164739-1-andre.przywara@arm.com>
 References: <20260518124556.164739-1-andre.przywara@arm.com>
@@ -48,126 +48,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Uses the new VGIC KVM device attribute to set the maintenance IRQ.
-This is fixed to use PPI 9, as a platform decision made by kvmtool,
-matching the SBSA recommendation.
-Use the opportunity to pass the kvm pointer to gic__generate_fdt_nodes(),
-as this simplifies the call and allows us access to the nested_virt
-config variable on the way.
+From: Marc Zyngier <maz@kernel.org>
 
+KVM allows the offsetting of the global counter in order to help with
+migration of a VM. This offset applies cumulatively with the offsets
+provided by the architecture.
+
+Although kvmtool doesn't provide a way to migrate a VM, controlling
+this offset is useful to test the timer subsystem.
+
+Add the command line option --counter-offset to allow setting this value
+when creating a VM.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/arm-cpu.c         |  2 +-
- arm64/gic.c             | 29 +++++++++++++++++++++++++++--
- arm64/include/kvm/gic.h |  2 +-
- 3 files changed, 29 insertions(+), 4 deletions(-)
+ arm64/include/kvm/kvm-config-arch.h |  3 +++
+ arm64/kvm.c                         | 17 +++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-index 69bb2cb2..0843ac05 100644
---- a/arm64/arm-cpu.c
-+++ b/arm64/arm-cpu.c
-@@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	int timer_interrupts[4] = {13, 14, 11, 10};
+diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+index ff78d539..7398bf67 100644
+--- a/arm64/include/kvm/kvm-config-arch.h
++++ b/arm64/include/kvm/kvm-config-arch.h
+@@ -14,6 +14,7 @@ struct kvm_config_arch {
+ 	u64		kaslr_seed;
+ 	enum irqchip_type irqchip;
+ 	u64		fw_addr;
++	u64		counter_offset;
+ 	unsigned int	sve_max_vq;
+ 	bool		no_pvtime;
+ 	bool		psci;
+@@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+ 	OPT_BOOLEAN('\0', "psci", &(cfg)->psci,					\
+ 			"Request userspace handling of PSCI, instead of"	\
+ 			" relying on the in-kernel implementation"),		\
++	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
++		"Specify the counter offset, defaulting to 0"),			\
+ 	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
+ 		    "Start VCPUs in EL2 (for nested virt)"),
  
--	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
-+	gic__generate_fdt_nodes(fdt, kvm);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- 	pmu__generate_fdt_nodes(fdt, kvm);
+diff --git a/arm64/kvm.c b/arm64/kvm.c
+index 56e4f149..d0dfa74a 100644
+--- a/arm64/kvm.c
++++ b/arm64/kvm.c
+@@ -122,6 +122,22 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
+ 	pr_debug("MTE capability enabled");
  }
-diff --git a/arm64/gic.c b/arm64/gic.c
-index b0d3a1ab..b0be9e57 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -11,6 +11,8 @@
  
- #define IRQCHIP_GIC 0
- 
-+#define GIC_MAINT_IRQ	9
-+
- static int gic_fd = -1;
- static u64 gic_redists_base;
- static u64 gic_redists_size;
-@@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
- 
- 	int lines = irq__get_nr_allocated_lines();
- 	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
-+	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
- 	struct kvm_device_attr nr_irqs_attr = {
- 		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
- 		.addr	= (u64)(unsigned long)&nr_irqs,
- 	};
-+	struct kvm_device_attr maint_irq_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
-+		.addr	= (u64)(unsigned long)&maint_irq,
++static void kvm__arch_set_counter_offset(struct kvm *kvm)
++{
++	struct kvm_arm_counter_offset offset = {
++		.counter_offset = kvm->cfg.arch.counter_offset,
 +	};
- 	struct kvm_device_attr vgic_init_attr = {
- 		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
- 		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-@@ -325,6 +332,16 @@ static int gic__init_gic(struct kvm *kvm)
- 			return ret;
- 	}
- 
-+	if (kvm->cfg.arch.nested_virt) {
-+		ret = ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr);
-+		if (!ret)
-+			ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &maint_irq_attr);
-+		if (ret) {
-+			pr_err("could not set maintenance IRQ\n");
-+			return ret;
-+		}
-+	}
 +
- 	irq__routing_init(kvm);
- 
- 	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
-@@ -342,7 +359,7 @@ static int gic__init_gic(struct kvm *kvm)
- }
- late_init(gic__init_gic)
- 
--void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
-+void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
++	if (!kvm->cfg.arch.counter_offset)
++		return;
++
++	if (!kvm__supports_extension(kvm, KVM_CAP_COUNTER_OFFSET))
++		die("No support for global counter offset");
++
++	if (ioctl(kvm->vm_fd, KVM_ARM_SET_COUNTER_OFFSET, &offset))
++		die_perror("KVM_ARM_SET_COUNTER_OFFSET");
++}
++
+ void kvm__arch_init(struct kvm *kvm)
  {
- 	const char *compatible, *msi_compatible = NULL;
- 	u64 msi_prop[2];
-@@ -350,8 +367,12 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- 		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
- 		0, 0,				/* to be filled */
- 	};
-+	u32 maint_irq[] = {
-+		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI), cpu_to_fdt32(GIC_MAINT_IRQ),
-+		cpu_to_fdt32(gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH)
-+	};
+ 	/* Create the virtual GIC. */
+@@ -130,6 +146,7 @@ void kvm__arch_init(struct kvm *kvm)
  
--	switch (type) {
-+	switch (kvm->cfg.arch.irqchip) {
- 	case IRQCHIP_GICV2M:
- 		msi_compatible = "arm,gic-v2m-frame";
- 		/* fall-through */
-@@ -377,6 +398,10 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
- 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
- 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
-+	if (kvm->cfg.arch.nested_virt) {
-+		_FDT(fdt_property(fdt, "interrupts", maint_irq,
-+				  sizeof(maint_irq)));
-+	}
- 	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
- 	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
- 	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
-diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
-index ad8bcbf2..8490cca6 100644
---- a/arm64/include/kvm/gic.h
-+++ b/arm64/include/kvm/gic.h
-@@ -36,7 +36,7 @@ struct kvm;
- int gic__alloc_irqnum(void);
- int gic__create(struct kvm *kvm, enum irqchip_type type);
- int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
--void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
-+void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm);
- u32 gic__get_fdt_irq_cpumask(struct kvm *kvm);
+ 	kvm__arch_enable_mte(kvm);
+ 	kvm__setup_smccc(kvm);
++	kvm__arch_set_counter_offset(kvm);
+ }
  
- int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
+ 
 -- 
 2.43.0
 
