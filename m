@@ -1,31 +1,31 @@
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEC53A1A55
-	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 05:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76EB3ACEF3
+	for <kvmarm@lists.linux.dev>; Mon, 18 May 2026 05:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779082140; cv=none; b=pIsx3RGUAJW2KsrIgtkSBBeVAYxV/ezAw9BVngmlE+3FB4Z40jrkXwNvMgx/orfEzpekhhQFhuXwWtlYG3Y4EOivucUBwv5nvsdF8CtS97e6WYNlkeptnksQGujeQ9cPLBTm7luZLT8HlDesWTUqFJMS6dKTzJzH5qmne5ucWCM=
+	t=1779082300; cv=none; b=KvzJzNlaR7QyXF1SDO10q7LICuh3hvq/l2NpMMZwhIIEmq8CwyZDQ9u06FNjlzFQVTWxImd41eD33LPGBH3Azy/Mxky4D3l5I7nK6BCIlL1FRGDwW5OJMlQRRXHqQfo0apbvayFnAGRsUsMXoFC81AlnQmbvgQ6m0jtE5Anxe7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779082140; c=relaxed/simple;
-	bh=FK2K66MCI7resBsXnsOn2I85kP9MbXda+1D4Mx3OmQo=;
+	s=arc-20240116; t=1779082300; c=relaxed/simple;
+	bh=YKkbLhpMMKOiuLk1L+mYJo8bn3/WiUGW6Hsaq81kyvg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KbkYgTpfMmV+q1DH8dcs/uM++xPF3L9D0Qix7/DK3/UrNVFUadZjaYGLSdQrGsL1Lzw7eogGFB5ieV6p8Sq91PBEu6au3Jj5gkHSwDRcQf+eKc1ukPaCHrLBXU5yZtVUGwTw50x34KTv4j3i7+mzg0upLVc2hHTzkylhAEFOFgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KnQsjtxH; arc=none smtp.client-ip=115.124.30.119
+	 Content-Type:Content-Disposition:In-Reply-To; b=kSfrEA7uWs/R0TPjDMbYXsu2LRAzXrtMKJQHbKGm0ILujhkPqGGjn01hMz4ndxJUBkwJm8DPCtVXDkbXjhqscgGyyk8KGJ1FvetcSR7R7rMKAujp4er5V9O1IjnkpZL4OrIdUqxZuEuznjyu1XSpuD1dOE+uXVY4ECCDG9P/nN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jhIghPOe; arc=none smtp.client-ip=115.124.30.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KnQsjtxH"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jhIghPOe"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1779082130; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=Yi0yqBmj4Fj5pS8XdrreLBwJA8eRheXQa5NGK+5zq7M=;
-	b=KnQsjtxH282HsluHszysBYdpGHXO/FHD7J0k59/4V4l4ubTfX+MFJ7eSTsU3mV+TWzQW8sj9KHvSC0Hbz+ZFGWdZun2sl5qo7fGDRSYhE3wNQt4FMYamgGhSDBKlGURb0V/n6L8MHlb2dXml+kGL5rRHkHL/5L/7fEKQdxTCt3o=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0X33jdht_1779082129;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X33jdht_1779082129 cluster:ay36)
+	t=1779082279; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=xI7YGaASUFBfo7xs9LL5npLLizBowvFLaid3gr8COMc=;
+	b=jhIghPOefmMagZZ44llsovoMUJNK5DUE/ySWz9JjJ5Dc4StNU8K6/gmZPm70Od4YVGZnzI/yJ0CunDeDea58ZcXs1WSKnTGct6tgo2mzNf4ZqatqZ9YWhiUUaZSomgs6RTZ/bggSDqisdwYswP8/xjxF94srXWZ2UbHYSJALwaE=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0X33TiMq_1779082277;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X33TiMq_1779082277 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Mon, 18 May 2026 13:28:49 +0800
-Date: Mon, 18 May 2026 13:28:48 +0800
+          Mon, 18 May 2026 13:31:18 +0800
+Date: Mon, 18 May 2026 13:31:17 +0800
 From: Yao Yuan <yaoyuan@linux.alibaba.com>
 To: Michael Bommarito <michael.bommarito@gmail.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
@@ -35,7 +35,7 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] KVM: arm64: vgic: free private_irqs when init fails
  after allocation
-Message-ID: <rkjsbismtxb6lijsju7o3udrltqfmydafybfvngodf3rsigg3f@hahisxrsjc4x>
+Message-ID: <outz3fxn7c5tkfz3adoilikhtyjbii7qwxmknh2l4pdf4kv5bj@54lpduy2fuj4>
 References: <20260517181331.367676-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -92,6 +92,11 @@ On Sun, May 17, 2026 at 02:13:31PM +0800, Michael Bommarito wrote:
 > With this patch applied to the same tree, kmemleak reports zero
 > unreferenced objects under the identical workload.
 >
+
+Ah. One thing I forgot to say:
+
+Do we need a fixes: tag here ?
+
 > Cc: stable@vger.kernel.org
 > Cc: Will Deacon <will@kernel.org>
 > Assisted-by: Claude:claude-opus-4-7
@@ -109,15 +114,9 @@ On Sun, May 17, 2026 at 02:13:31PM +0800, Michael Bommarito wrote:
 >  	kvm_destroy_mpidr_data(vcpu->kvm);
 >
 >  	err = kvm_vgic_vcpu_init(vcpu);
-Hi Michael,
 > -	if (err)
 > +	if (err) {
 > +		kvm_vgic_vcpu_destroy(vcpu);
-
-This LGTM.
-
-Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
-
 >  		return err;
 > +	}
 >
