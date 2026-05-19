@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAE640962E
-	for <kvmarm@lists.linux.dev>; Tue, 19 May 2026 13:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC98C409634
+	for <kvmarm@lists.linux.dev>; Tue, 19 May 2026 13:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779197371; cv=none; b=Jg6VKXcssU3JShtEsNhw+/mQe6Qs/t1wmZMHimlH3tART+nt14El/FPUXh33dkne8izes1KMoJ6TW0rqeeDQFBIKxowAhaUTyfFg/sSYX5b68VoDAKBAEB8uz8+/quMbSfCgcyswsU97J2lxQ1b+yefMpQEIN/QtwpXM4qVZE34=
+	t=1779197378; cv=none; b=fPw048r735b3vpsHBvVrgnrn8WTblXdVoTm4AUe2acjGgkz+80SyYkjZgHSrPRvO5+hERb2KcuIplnVnBDAAs+z3K7Xz1/0m8dYvcTKb4MVv36mbKaIKhAe/gILqXAukik66twvBVyRsSMe9fh7xPefmpu25bD9py+IldyRiTu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779197371; c=relaxed/simple;
-	bh=JhpycrLYRpDotBH3zip73ByH+VtnIXCW8yyF4+ExZOc=;
+	s=arc-20240116; t=1779197378; c=relaxed/simple;
+	bh=iwWqL4rYAiUIFn9QF2b6b+XPPWoavC+GMvQPgc+9HJU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=L6blKb0Zqn/fc7ESlozVtDYUY7EhUbYRpfzLjQEvcdQ5zxDMnREZ+WB7sFlb5C5PS7yym8LEypjSc0FhZ4lZUA6VeYcUKtGwuipms099+PXxZxeoVC0jF0F/1qcAkVq7DO4od0FZrI3z0rRlw1hPWKDDQjwSjvIzeTXoQmeg2Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQ62MSux; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:content-type; b=G+vMgUpkANiC3tFSXtM87TChe0xS3NmWBGclKw+HOd7uQvHMmHNQ2g4/5mtmP3WI+gojAsi5bcSiy4rI4yHRsvJYeLvjTi7MbaOW4T6fQ6sNa4OBw5E/y7tiv/Gpul0VCl8BXfJVXkC55+tNJJuWXEXI2k+MYguiHx9rKvTgggg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hO/tK/BJ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ62MSux"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hO/tK/BJ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779197368;
+	s=mimecast20190719; t=1779197375;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=F71HBHl1W+M/uo5lCzlKVd+GPVdXLXIc1bRDPajNYkk=;
-	b=PQ62MSux2SxOY5mAZ5XvpA5l7BBbwyOBLbKTqjAXrbJ1Db9vhCOWe4Rm9tKK3HUlsbb43L
-	ga4pWYQvvDXHiZK5HAVFm0gXprCj4Jzkqm2zqqNNgmv19JxAiyF0omR1NMkbzwS2fciDSQ
-	IIx4Qog8e25npLX/B2LRjqG1oqz+/70=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=Hf+3kiEe0IH9c2nDgWT2MpE72/lkYGGaXKwgE6gWqfo=;
+	b=hO/tK/BJjBQFzzYn+TzAOvJ2RYo6HOVXUBsmDhYPiR/CI+ioIHqbAyIgPDjFq7m7pGBBDX
+	KNT21B6XSh4y2bO8q0qOy5kgig7sxNF/9ejlJc2IY1UGNbbhY6ex5w7CofYPt8QcNULfP2
+	QgpTtaAc9BprQ/t3aN79ZV9EmJMbP2U=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-546-bt1-8tJIPlShTWHHNXs0pQ-1; Tue,
- 19 May 2026 09:29:25 -0400
-X-MC-Unique: bt1-8tJIPlShTWHHNXs0pQ-1
-X-Mimecast-MFC-AGG-ID: bt1-8tJIPlShTWHHNXs0pQ_1779197363
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-Ob3yOT-zPWyVgpwba_tXdA-1; Tue,
+ 19 May 2026 09:29:32 -0400
+X-MC-Unique: Ob3yOT-zPWyVgpwba_tXdA-1
+X-Mimecast-MFC-AGG-ID: Ob3yOT-zPWyVgpwba_tXdA_1779197370
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 44888180061A;
-	Tue, 19 May 2026 13:29:23 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E09E195608B;
+	Tue, 19 May 2026 13:29:30 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.44.49.207])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 64DCE180034E;
-	Tue, 19 May 2026 13:29:17 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BB5AA1800352;
+	Tue, 19 May 2026 13:29:23 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -64,9 +64,9 @@ Cc: maz@kernel.org,
 	berrange@redhat.com,
 	abologna@redhat.com,
 	jdenemar@redhat.com
-Subject: [PATCH v5 01/18] scripts: introduce scripts/update-aarch64-cpu-sysregs-header.py
-Date: Tue, 19 May 2026 15:27:15 +0200
-Message-ID: <20260519132905.145643-2-eric.auger@redhat.com>
+Subject: [PATCH v5 02/18] target/arm/cpu-sysregs.h.inc: Sort by name alphabetical order
+Date: Tue, 19 May 2026 15:27:16 +0200
+Message-ID: <20260519132905.145643-3-eric.auger@redhat.com>
 In-Reply-To: <20260519132905.145643-1-eric.auger@redhat.com>
 References: <20260519132905.145643-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -76,170 +76,95 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Mimecast-MFC-PROC-ID: vozwmpOidGyic1UHfSF4JjQ8cdyUqw5LOh7t0mNVX-o_1779197363
+X-Mimecast-MFC-PROC-ID: Cht4pJGGRMsC3YczzulEDX7j-AX3cVXn0n1lcVobvYA_1779197370
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-Introduce a script that takes as input the Registers.json file
-delivered in the AARCHMRS Features Model downloadable from the
-Arm Developer A-Profile Architecture Exploration Tools page:
-https://developer.arm.com/Architectures/A-Profile%20Architecture#Downloads
-and outputs the list of ID regs in target/arm/cpu-sysregs.h.inc
-under the form of DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>).
+Sort by register name alphabetical order. This will allow to
+easily diff with the future content, automatically generated.
 
-We only care about IDregs with opcodes satisfying:
-op0 = 3, op1 = {0,1,3}, crn = 0, crm within [0, 7], op2 within [0, 7]
+No functional change intended.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-[CH: note correct op1 range, don't skip CCSIDR]
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20251208163751.611186-2-eric.auger@redhat.com>
----
- scripts/update-aarch64-cpu-sysregs-header.py | 134 +++++++++++++++++++
- 1 file changed, 134 insertions(+)
- create mode 100755 scripts/update-aarch64-cpu-sysregs-header.py
 
-diff --git a/scripts/update-aarch64-cpu-sysregs-header.py b/scripts/update-aarch64-cpu-sysregs-header.py
-new file mode 100755
-index 0000000000..8c337147dd
---- /dev/null
-+++ b/scripts/update-aarch64-cpu-sysregs-header.py
-@@ -0,0 +1,134 @@
-+#!/usr/bin/env python3
-+
-+# This script takes as input the Registers.json file delivered in
-+# the AARCHMRS Features Model downloadable from the Arm Developer
-+# A-Profile Architecture Exploration Tools page:
-+# https://developer.arm.com/Architectures/A-Profile%20Architecture#Downloads
-+# and outputs the list of ID regs in target/arm/cpu-sysregs.h.inc
-+# under the form of DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>)
-+#
-+# Copyright (C) 2026 Red Hat, Inc.
-+#
-+# Authors: Eric Auger <eric.auger@redhat.com>
-+#
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+
-+
-+import json
-+import os
-+import sys
-+
-+# Some regs have op code values like 000x, 001x. Anyway we don't need
-+# them. Besides some regs are undesired in the generated file such as
-+# VMPIDR_EL2 and VPIDR_EL2 which are outside of the IDreg scope we
-+# are interested in and are tricky to decode as their system accessor
-+# refer to MPIDR_EL1/MIDR_EL1 respectively
-+
-+skiplist = ['ALLINT', 'PM', 'S1_', 'S3_', 'SVCR', \
-+            'VMPIDR_EL2', 'VPIDR_EL2']
-+
-+# returns the int value of a given @opcode for a reg @encoding
-+def get_opcode(encoding, opcode):
-+    fvalue = encoding.get(opcode)
-+    if fvalue:
-+        value = fvalue.get('value')
-+        if isinstance(value, str):
-+            value = value.strip("'")
-+            value = int(value, 2)
-+            return value
-+    return -1
-+
-+def extract_idregs_from_registers_json(filename):
-+    """
-+    Load a Registers.json file and extract all ID registers, decode their
-+    opcode and dump the information in target/arm/cpu-sysregs.h.inc
-+
-+    Args:
-+        filename (str): The path to the Registers.json
-+    returns:
-+        idregs: list of ID regs and their encoding
-+    """
-+    if not os.path.exists(filename):
-+        print(f"Error: {filename} could not be found!")
-+        return {}
-+
-+    try:
-+        with open(filename, 'r') as f:
-+            register_data = json.load(f)
-+
-+    except json.JSONDecodeError:
-+        print(f"Could not decode json from '{filename}'!")
-+        return {}
-+    except Exception as e:
-+        print(f"Unexpected error while reading {filename}: {e}")
-+        return {}
-+
-+    registers = [r for r in register_data if isinstance(r, dict) and \
-+                r.get('_type') == 'Register']
-+
-+    idregs = {}
-+
-+    for register in registers:
-+        reg_name = register.get('name')
-+
-+        is_skipped = any(term in (reg_name or "").upper() for term in skiplist)
-+
-+        if reg_name and not is_skipped:
-+            accessors = register.get('accessors', [])
-+
-+            for accessor in accessors:
-+                type = accessor.get('_type')
-+                if type in ['Accessors.SystemAccessor']:
-+                    encoding_list = accessor.get('encoding')
-+
-+                    if isinstance(encoding_list, list) and encoding_list and \
-+                       isinstance(encoding_list[0], dict):
-+                        encoding_wrapper = encoding_list[0]
-+                        encoding_source = encoding_wrapper.get('encodings', \
-+                                                               encoding_wrapper)
-+
-+                        if isinstance(encoding_source, dict):
-+                                op0 = get_opcode(encoding_source, 'op0')
-+                                op1 = get_opcode(encoding_source, 'op1')
-+                                op2 = get_opcode(encoding_source, 'op2')
-+                                crn = get_opcode(encoding_source, 'CRn')
-+                                crm = get_opcode(encoding_source, 'CRm')
-+                                encoding_str=f"{op0} {op1} {crn} {crm} {op2}"
-+
-+                # ID regs are assumed within this scope
-+                if op0 == 3 and (op1 == 0 or op1 == 1 or op1 == 3) and \
-+                   crn == 0 and (crm >= 0 and crm <= 7) and (op2 >= 0 and op2 <= 7):
-+                    idregs[reg_name] = encoding_str
-+
-+    return idregs
-+
-+if __name__ == "__main__":
-+    # Single arg expected: the path to the Registers.json file
-+    if len(sys.argv) < 2:
-+        print("Usage: python scripts/update-aarch64-cpu-sysregs-header.py "
-+              "<path_to_registers_json>")
-+        sys.exit(1)
-+    else:
-+        json_file_path = sys.argv[1]
-+
-+    extracted_registers = extract_idregs_from_registers_json(json_file_path)
-+
-+    if extracted_registers:
-+        output_list = extracted_registers.items()
-+
-+        # Sort by register name
-+        sorted_output = sorted(output_list, key=lambda item: item[0])
-+
-+        # format lines as DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>)
-+        final_output = ""
-+        for reg_name, encoding in sorted_output:
-+            reformatted_encoding = encoding.replace(" ", ", ")
-+            final_output += f"DEF({reg_name}, {reformatted_encoding})\n"
-+
-+        with open("target/arm/cpu-sysregs.h.inc", 'w') as f:
-+            f.write("/* SPDX-License-Identifier: GPL-2.0-or-later */\n\n")
-+            f.write("/* This file is autogenerated by ")
-+            f.write("scripts/update-aarch64-cpu-sysregs-header.py */\n")
-+            f.write("/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */\n\n")
-+            f.write(final_output)
-+        print("updated target/arm/cpu-sysregs.h.inc")
+---
+
+v4 -> v5:
+- remove spurious CCSIDR definition
+---
+ target/arm/cpu-sysregs.h.inc | 42 ++++++++++++++++++------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
+index 3d1ed40f04..a044596135 100644
+--- a/target/arm/cpu-sysregs.h.inc
++++ b/target/arm/cpu-sysregs.h.inc
+@@ -1,12 +1,11 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+-DEF(ID_AA64PFR0_EL1, 3, 0, 0, 4, 0)
+-DEF(ID_AA64PFR1_EL1, 3, 0, 0, 4, 1)
+-DEF(ID_AA64PFR2_EL1, 3, 0, 0, 4, 2)
+-DEF(ID_AA64SMFR0_EL1, 3, 0, 0, 4, 5)
+-DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
+-DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
++DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
++DEF(CTR_EL0, 3, 3, 0, 0, 1)
++DEF(DCZID_EL0, 3, 3, 0, 0, 7)
+ DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
+ DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
++DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
++DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
+ DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
+ DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
+ DEF(ID_AA64ISAR2_EL1, 3, 0, 0, 6, 2)
+@@ -15,29 +14,30 @@ DEF(ID_AA64MMFR1_EL1, 3, 0, 0, 7, 1)
+ DEF(ID_AA64MMFR2_EL1, 3, 0, 0, 7, 2)
+ DEF(ID_AA64MMFR3_EL1, 3, 0, 0, 7, 3)
+ DEF(ID_AA64MMFR4_EL1, 3, 0, 0, 7, 4)
+-DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
+-DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
+-DEF(ID_DFR0_EL1, 3, 0, 0, 1, 2)
++DEF(ID_AA64PFR0_EL1, 3, 0, 0, 4, 0)
++DEF(ID_AA64PFR1_EL1, 3, 0, 0, 4, 1)
++DEF(ID_AA64PFR2_EL1, 3, 0, 0, 4, 2)
++DEF(ID_AA64SMFR0_EL1, 3, 0, 0, 4, 5)
++DEF(ID_AA64ZFR0_EL1, 3, 0, 0, 4, 4)
+ DEF(ID_AFR0_EL1, 3, 0, 0, 1, 3)
+-DEF(ID_MMFR0_EL1, 3, 0, 0, 1, 4)
+-DEF(ID_MMFR1_EL1, 3, 0, 0, 1, 5)
+-DEF(ID_MMFR2_EL1, 3, 0, 0, 1, 6)
+-DEF(ID_MMFR3_EL1, 3, 0, 0, 1, 7)
++DEF(ID_DFR0_EL1, 3, 0, 0, 1, 2)
++DEF(ID_DFR1_EL1, 3, 0, 0, 3, 5)
+ DEF(ID_ISAR0_EL1, 3, 0, 0, 2, 0)
+ DEF(ID_ISAR1_EL1, 3, 0, 0, 2, 1)
+ DEF(ID_ISAR2_EL1, 3, 0, 0, 2, 2)
+ DEF(ID_ISAR3_EL1, 3, 0, 0, 2, 3)
+ DEF(ID_ISAR4_EL1, 3, 0, 0, 2, 4)
+ DEF(ID_ISAR5_EL1, 3, 0, 0, 2, 5)
+-DEF(ID_MMFR4_EL1, 3, 0, 0, 2, 6)
+ DEF(ID_ISAR6_EL1, 3, 0, 0, 2, 7)
++DEF(ID_MMFR0_EL1, 3, 0, 0, 1, 4)
++DEF(ID_MMFR1_EL1, 3, 0, 0, 1, 5)
++DEF(ID_MMFR2_EL1, 3, 0, 0, 1, 6)
++DEF(ID_MMFR3_EL1, 3, 0, 0, 1, 7)
++DEF(ID_MMFR4_EL1, 3, 0, 0, 2, 6)
++DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
++DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
++DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
++DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
+ DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
+ DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
+ DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
+-DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
+-DEF(ID_DFR1_EL1, 3, 0, 0, 3, 5)
+-DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
+-DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
+-DEF(ID_AA64ZFR0_EL1, 3, 0, 0, 4, 4)
+-DEF(CTR_EL0, 3, 3, 0, 0, 1)
+-DEF(DCZID_EL0, 3, 3, 0, 0, 7)
 -- 
 2.53.0
 
