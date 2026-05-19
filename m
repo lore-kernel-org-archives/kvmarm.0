@@ -1,40 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A5134E760;
-	Tue, 19 May 2026 15:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601A124679C
+	for <kvmarm@lists.linux.dev>; Tue, 19 May 2026 15:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779204275; cv=none; b=b9+1uHpx/Na542kIPkRhyeKHSW+bOMiuFsFrV3f77FmjzpyYHlnGjvtz0QZSACZAVuWR7W0wCv34iogNLdFVxNcR/oVbJgVAX/PqrQC5R0D+mT9uZBoQvOeCmILA5g/8jx1QE/CYTdajhK7tOR9THNKy5Rx+3PwCPNHrzmum65I=
+	t=1779204961; cv=none; b=Va+DQCwAm7r7/64xSZ/s6ZbxwF9RL/yTdXX0ktbrHiOFIJUZUd3HwfvPifKLLoe4brsTB/uXVFIITSk6VCyrkBhEf9cBOoCK1ZDPnP3EdHe67mNQvoywsFCxOMBtOo8XamoRh/5FsleNV6dRoFvGzn+z3D6tOu9TnYxpLjVv+bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779204275; c=relaxed/simple;
-	bh=nd/SFqFEnjKhIh8jdIA2Y3hV+o5FYf2nfi5Ar2FriVk=;
+	s=arc-20240116; t=1779204961; c=relaxed/simple;
+	bh=ZkRz0E7rghIRIQ6Vas5WZriK1yQc+rUOKfruBiITXEI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LlRisk8H+ZhiDOueTtkMCEa7430viPcFGPiRhJmSwm28U3N/qLXk41KAoCRKhY+FuG4sEFtl/9tLp6zUD0XL4kY/tLtuX1E7MhK92NZUvUlWmp1Etk+EPP/UcCmwIqnZo30EoKF5Z7Dj0mQvOZKD7keJCG1fr8VgrN63UEjDnAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SZU/9Nk1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type:Content-Disposition; b=F6Pin+4BeKLGQncWgzZqx9tNKLw29gv/WZkRAzXBCZsde8wyXuVipKI1xpNTjm8erkvuaGbetMJIFvEfpOzxFAHj3hWuEuj2ZIkrjaRDD/I5Rpowysn0mLPPFejS23hcK9hRtKrC/FbjFQKT/OWRA2PVCsIclgGz+HhAFnixKj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Tr5Iy+eF; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZU/9Nk1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C400C2BCB8;
-	Tue, 19 May 2026 15:24:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779204274;
-	bh=nd/SFqFEnjKhIh8jdIA2Y3hV+o5FYf2nfi5Ar2FriVk=;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Tr5Iy+eF"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46E243528;
+	Tue, 19 May 2026 08:35:52 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06D2F3F632;
+	Tue, 19 May 2026 08:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779204957; bh=ZkRz0E7rghIRIQ6Vas5WZriK1yQc+rUOKfruBiITXEI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SZU/9Nk1isibwbe/goA8rb23RTRh+TDHdGVHiJweVgoFLIlaLyRzOrwS1BowvouWW
-	 XenrcwvtqzcvxlAqhITZdQf9hYUeMs+gI2MdgR92uUqwQP2LBIU7SPyp6qGx6gbBOP
-	 qxVOY1l0Hhwe8JHeBzuxD0evaj0x7W+y+oLW5c93HbazWiqi0GAG4wuiOMzW6R2yeg
-	 XIaC4t8teRvWrIo4Xqyc3S70Nmw+ZV4CAGKYlxRrWTX3qixRRusoMKSBvtbM/0FjOK
-	 HSgKDcNXau/2MnWzfrD69KOkQ2gsuE0586E8+C/3t8eS87g67RVVwLnhTwzTobrB2m
-	 fWdtpV9EPdYoQ==
-From: Will Deacon <will@kernel.org>
-To: maz@kernel.org,
+	b=Tr5Iy+eFwtAYt3ObIw+VJv4hqD8NnNXrVImS/KaM3B7UPx2teDebcJMl0o/sqAvrd
+	 eVGCpt/7KscfUVWRWqRTlVXYKxM8aygDha8hQMG0DXl0eAjjoV6H0iM0KGW2GzQFrT
+	 S5BU9CCBk23N6+39Bw8htB9d60IxSCooMRuRfvlI=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
 	oupton@kernel.org,
 	catalin.marinas@arm.com,
 	corbet@lwn.net,
 	pbonzini@redhat.com,
-	Tian Zheng <zhengtian10@huawei.com>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	kernel-team@android.com,
 	yuzenghui@huawei.com,
 	wangzhou1@hisilicon.com,
 	liuyonglong@huawei.com,
@@ -48,45 +49,50 @@ Cc: kernel-team@android.com,
 	linux-kernel@vger.kernel.org,
 	skhan@linuxfoundation.org,
 	suzuki.poulose@arm.com,
-	leo.bras@arm.com,
 	Jonathan Cameron <jic23@kernel.org>
 Subject: Re: [PATCH v3 0/5] Support the FEAT_HDBSS introduced in Armv9.5
-Date: Tue, 19 May 2026 16:23:12 +0100
-Message-ID: <177918656142.736362.17906576792384645789.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260225040421.2683931-1-zhengtian10@huawei.com>
-References: <20260225040421.2683931-1-zhengtian10@huawei.com>
+Date: Tue, 19 May 2026 16:35:47 +0100
+Message-ID: <agyDU3ujE-OJWTiC@devkitleo>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <177918656142.736362.17906576792384645789.b4-ty@kernel.org>
+References: <20260225040421.2683931-1-zhengtian10@huawei.com> <177918656142.736362.17906576792384645789.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Wed, 25 Feb 2026 12:04:16 +0800, Tian Zheng wrote:
-> This series of patches add support to the Hardware Dirty state tracking
-> Structure(HDBSS) feature, which is introduced by the ARM architecture
-> in the DDI0601(ID121123) version.
+On Tue, May 19, 2026 at 04:23:12PM +0100, Will Deacon wrote:
+> On Wed, 25 Feb 2026 12:04:16 +0800, Tian Zheng wrote:
+> > This series of patches add support to the Hardware Dirty state tracking
+> > Structure(HDBSS) feature, which is introduced by the ARM architecture
+> > in the DDI0601(ID121123) version.
+> > 
+> > The HDBSS feature is an extension to the architecture that enhances
+> > tracking translation table descriptors' dirty state, identified as
+> > FEAT_HDBSS. This feature utilizes hardware assistance to achieve dirty
+> > page tracking, aiming to significantly reduce the overhead of scanning
+> > for dirty pages.
+> > 
+> > [...]
 > 
-> The HDBSS feature is an extension to the architecture that enhances
-> tracking translation table descriptors' dirty state, identified as
-> FEAT_HDBSS. This feature utilizes hardware assistance to achieve dirty
-> page tracking, aiming to significantly reduce the overhead of scanning
-> for dirty pages.
+> Applied sysreg definitions to arm64 (for-next/sysregs), thanks!
 > 
-> [...]
+> [1/5] arm64/sysreg: Add HDBSS related register information
+>       https://git.kernel.org/arm64/c/72f7be0c2e30
+> 
 
-Applied sysreg definitions to arm64 (for-next/sysregs), thanks!
+Thanks!
+Leo
 
-[1/5] arm64/sysreg: Add HDBSS related register information
-      https://git.kernel.org/arm64/c/72f7be0c2e30
-
-Cheers,
--- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+> Cheers,
+> -- 
+> Will
+> 
+> https://fixes.arm64.dev
+> https://next.arm64.dev
+> https://will.arm64.dev
