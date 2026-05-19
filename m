@@ -1,92 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE263016E0;
-	Tue, 19 May 2026 06:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB9B3DDDCD;
+	Tue, 19 May 2026 07:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779173676; cv=none; b=Lt9ger3Rhj7bliswCLLm9P4O+1I3S4mnPx4EErqDQb07GSXe9HEeYGrBcmHot97fN1FUePFqqz3RIcE/xgSaq2qUDewpKdbdbfta1Bdq02/cIjDzOcEWuqPhOVxlLyzgCyWtzBnKEeWKYKnTDzVccnccMNfolrdnQQ3rWfj0o2o=
+	t=1779177240; cv=none; b=SI8Fxy02EAyifDYl4s0v/D9Wtrrvka5GfRed7Tc8s7+9gXaX6yb+lNYMbum8oQGAsw/W5zE5G/TdDFe0e8airn6Hssmg9wFHkZWHMmyNQZZ4yTPPm3lnNL82zqNimneCmLq3OxZpqdVL4ob6q5CUqkca8ab2Js9vVVcFufedrC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779173676; c=relaxed/simple;
-	bh=WTulWk0fdJsYN4VDWBS3LAugunVY3PrhUqz2mvZt/Fw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kD/Dux202GRg2yOWZcXoChReWvW3PwrJUicLh7Y9VlNAJPI9izN+KWlp4alqFe4RsBrq2t/5KeL/wIVFzpHbyn8ueajxWmT+R+sCh1lROReEaMrZtM9+JlBnlDwfrEIKw03FHME1BgWy4ffzSyKAHq2HdbO/u6KUIHPcwINtvVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSxdtMhT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779177240; c=relaxed/simple;
+	bh=dE1+5CTzbd3ruwSwP8Km4ilvTVIBMQhESJGdZiggQi4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iyITeLEuBxrEYsE/5fEqD0ZmM7kYYE/MTnZ+mgsuQ35ay0VbqILvXmbYKdUsdLG8xiSDS80Sp4rYLrH3AF1C6C2ox5EXG/yecaxld6vz++4jo4mz5W9EhHYG29swTbD4fNOfAUYzMNT97KXtnq4q0Mog5IwEIB2iAB4Bx2Uq0bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y0ENtzoe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSxdtMhT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB720C2BCB3;
-	Tue, 19 May 2026 06:54:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0ENtzoe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F2AC2BCB3;
+	Tue, 19 May 2026 07:53:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779173676;
-	bh=WTulWk0fdJsYN4VDWBS3LAugunVY3PrhUqz2mvZt/Fw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=uSxdtMhTYbo8vA/rS1evCTJW7BFfc4cZ9/tQPleeIUwcXo8myxlf78qlAuxCzWtkD
-	 tBmy+pTVVxODiJBiq+9FY3caN9vYALV+porHWp7dOLbCJjY5UEDay1YYCDJ4MQbYn/
-	 G/8RbcTGCJJOFWMqQItxyghbiZnq96UF4EtzAlX/zCJw08HF0nVw8f5dRAzFZGYq33
-	 2p0Q9V1/0Gccpqoczx/1RxlVbo3hsU9rpmPz86x/IQgTUqiDp7ahzb9jKSgSLbMV3R
-	 94v7n1MO5uWG0MYhQHkZfWJTpmaEKBUb60y46Nwb1JIGCszsqEbE8jQRv/QExHo0p5
-	 GfjyRqyPPl4Aw==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1779177239;
+	bh=dE1+5CTzbd3ruwSwP8Km4ilvTVIBMQhESJGdZiggQi4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Y0ENtzoe4SvmuJQ3CilFHTbmlNa15I5+Oaw3k9Ddjw+Fq+CmhOi8EDHe5vhUFzjzu
+	 4nGyHfS2QdvcVf81R5I13sTkIwdcQdpX3TNrJXZN9XmuoVQlfrXphttBN4475DnR4W
+	 JUw0biK/q5Cfuf4CNx9g5O6CGnI88qiRSavRAGw9FjKhpyL4boRYNL0h2Xm9a4smaK
+	 potBWRIs/y7qDvjfpRdTllIp22ovZTEs9cpkYqwSuBusk0f8KsH9lznSgQMj8OdLZ3
+	 W1yGjIFWbzZRcZGH86Aa6WqDQ9nKDXFPI4efgB5FXzirK2i0SUTbDkwwJYsYltblcz
+	 hnuq04ZQCeFOw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wPFH3-00000003poq-0yUd;
+	Tue, 19 May 2026 07:53:57 +0000
+Date: Tue, 19 May 2026 08:53:56 +0100
+Message-ID: <86tss3x2az.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Yao Yuan <yaoyuan@linux.alibaba.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 17/44] arm64: RMI: RTT tear down
-In-Reply-To: <20260513131757.116630-18-steven.price@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-18-steven.price@arm.com>
-Date: Tue, 19 May 2026 12:24:26 +0530
-Message-ID: <yq5a1pf7ubx9.fsf@kernel.org>
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: vgic: free private_irqs when init fails after allocation
+In-Reply-To: <CAJJ9bXyHRVqnL_n6wwyAXDK=1GmaKgDy41tjMRhXjTObbft7gg@mail.gmail.com>
+References: <20260517181331.367676-1-michael.bommarito@gmail.com>
+	<outz3fxn7c5tkfz3adoilikhtyjbii7qwxmknh2l4pdf4kv5bj@54lpduy2fuj4>
+	<CAJJ9bXyHRVqnL_n6wwyAXDK=1GmaKgDy41tjMRhXjTObbft7gg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: michael.bommarito@gmail.com, yaoyuan@linux.alibaba.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Steven Price <steven.price@arm.com> writes:
-> +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
-> +{
-> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> +	struct realm *realm = &kvm->arch.realm;
-> +
-> +	if (kvm_realm_state(kvm) != REALM_STATE_ACTIVE)
-> +		return;
-> +
-> +	write_lock(&kvm->mmu_lock);
-> +	kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), true);
-> +	write_unlock(&kvm->mmu_lock);
-> +	kvm_realm_destroy_rtts(kvm);
-> +}
-> +
+On Tue, 19 May 2026 01:26:58 +0100,
+Michael Bommarito <michael.bommarito@gmail.com> wrote:
+>=20
+> On Mon, May 18, 2026 at 1:31=E2=80=AFAM Yao Yuan <yaoyuan@linux.alibaba.c=
+om> wrote:
+> > Ah. One thing I forgot to say:
+> >
+> > Do we need a fixes: tag here ?
+>=20
+> I struggled with that a bit.  Will's sister commit in 250f25367b58
+> didn't have a Fixes: tag, but if I had to pick, it would probably be
+> this:
+> Fixes: 03b3d00a70b5 ("KVM: arm64: vgic: Allocate private interrupts on de=
+mand")
+>=20
+> If you agree, I can send v2 with that added
 
-We also call kvm_stage2_unmap_range in kvm_destroy_realm()
+Seems correct to me. Please send v2 at your earliest convenience with
+a trimmed commit message (potentially limited to the first paragraph).
 
-void kvm_destroy_realm(struct kvm *kvm)
-{
-...
-	write_lock(&kvm->mmu_lock);
-	kvm_stage2_unmap_range(&kvm->arch.mmu, 0,
-			       BIT(realm->ia_bits - 1), true);
-	write_unlock(&kvm->mmu_lock);
-        
--aneesh
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
