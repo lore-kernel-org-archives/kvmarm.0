@@ -1,132 +1,88 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CDC348C69
-	for <kvmarm@lists.linux.dev>; Tue, 19 May 2026 14:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AF031B833;
+	Tue, 19 May 2026 15:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779201330; cv=none; b=bisq/Vr6zkuJsuugJ/z/mWh7uPxcUbyRmiZIt/9Y2a9/dEo9pV8y6BWmS5ln1KfXtYJWaCtseF2bhosA5MvpiyeCqnGyX/NQn9+H2rgh7p90SaJ036EvhzLLYQAmoJeAKsH/iYQLTX4gnHdgMTHJf3isQ0Gz64gD0+NmAf+Mut8=
+	t=1779204210; cv=none; b=etzdSeA5LvfEqKA7pw0Y2u6if6ZFjq+8pxMZ3oJdft+jayJWVytK5cp3eZU/lV7RlRwzZ1M2XKE5f1TChexe8As44Wn3D5udPs/BclqqR44dnT8pwmS3lHv05wWIzDkZzq9k4EqpTPC7XPDYqvExJ0l4goftwwWTUye+TfPhmNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779201330; c=relaxed/simple;
-	bh=Emx8XM8LjkQqO6xEIc3bZVmsae4EqUtaplU0iD/vhTE=;
+	s=arc-20240116; t=1779204210; c=relaxed/simple;
+	bh=RW7D8ZLEfralQAVgdgCnYlUdObMNdbDPf8t4NO+5ZKA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=JGMEnEItd3CKaRCnT7bvCALB6pzNUudkW0ahNpkyWtaLjDEQcBGwyhJ3aE1ikmIxUP8eFg2sCYx31PmfvsZSy4VRZHLrkvWyaBaWjQx5qK5PBu8tz+mTxqGl5U/PfchNjswYVS+DvThG9mlx81t5oiJGQx0b9qm6KXQ+nOOz76o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hXojF65M; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 MIME-Version:Content-Type; b=NQ/Y+8oADwYhXETrZzjD8t0sdTZ6CceH28rVzb2RiXVKb9zBjs2EZqP6GD+Ds2Q4ja7asvnCDWE1xedo8klST9kaeYPtxuyJ8HPIKknFdR03uJUd/UeC+IXZx+l2zxsVhndXrV8BmDRtIUKuOGAKq5fkhdWuDTlXHJmJmL6FKy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZkQ1pvE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hXojF65M"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 615291F37;
-	Tue, 19 May 2026 07:35:22 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 297D73F7B4;
-	Tue, 19 May 2026 07:35:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779201327; bh=Emx8XM8LjkQqO6xEIc3bZVmsae4EqUtaplU0iD/vhTE=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZkQ1pvE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B22FCC2BCB3;
+	Tue, 19 May 2026 15:23:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779204209;
+	bh=RW7D8ZLEfralQAVgdgCnYlUdObMNdbDPf8t4NO+5ZKA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hXojF65MeqCpiYD47pDwJizwwukRXtMNoBTi9Jjgf/eP4IcF3q7fq6HyPamI0ZRZ4
-	 JNWku/v6gL3rQifYakYlugB+sxhd2uLxidEqlFPva1m+OZI2K4V6HO9kpYefnmIMNS
-	 rQ+GjXeaoQ7iRYQpiNFR4L5mre5TkHf6spvlfrss=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
+	b=oZkQ1pvE+K4eJaqVM44Ja56YcmI03uDDQxwzeAA3i2nrjI2u6as51sKr19VOycrAW
+	 pom+OmFJXBX6IpnaMKLrtGPSKfNvE9OR4IUEGczk9EFa1yOo/HzHCxLe8zCbyqGZsK
+	 gIRI9nBre4n8pgfoTutRHzqYN4N+1110cTOvUgLSSWP/n5je0pvETx/Oj1aD5Sc71R
+	 AdvlR1eQxy38bhOj4K4VgJldlcHfibwfJKe7ZSZq1OL/TEj6IqZzwQx6ooDJcQpdJI
+	 eFwW23ivDv4fmUJQRfNbgoIzNY26yvhgND9TyFMq7mKPKyhtuR2ATLpav3gSHfmDlg
+	 dX5jJacHo3/lg==
+From: Will Deacon <will@kernel.org>
+To: Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Andre Przywara <andre.przywara@arm.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
 	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return options
-Date: Tue, 19 May 2026 15:35:19 +0100
-Message-ID: <agx1J1tQFn0cdtBf@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <agxifbKzGcYQivBz@willie-the-truck>
-References: <20260515195904.2466381-1-leo.bras@arm.com> <20260515195904.2466381-2-leo.bras@arm.com> <agq-RyKhBy4CIThm@kernel.org> <agrTQMw4QJX6HGrm@willie-the-truck> <agsYF-Dav2bpxWK4@devkitleo> <agxa-TydN1PoKsYn@willie-the-truck> <agxeEA14cP3yMV1m@devkitleo> <agxifbKzGcYQivBz@willie-the-truck>
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v8 0/6] arm64: Nested virtualization support
+Date: Tue, 19 May 2026 16:22:51 +0100
+Message-ID: <177919534202.841805.3550054062593794368.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260518124556.164739-1-andre.przywara@arm.com>
+References: <20260518124556.164739-1-andre.przywara@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Tue, May 19, 2026 at 02:15:41PM +0100, Will Deacon wrote:
-> On Tue, May 19, 2026 at 01:56:48PM +0100, Leonardo Bras wrote:
-> > On Tue, May 19, 2026 at 01:43:37PM +0100, Will Deacon wrote:
-> > > > > I was wondering along similar lines, but maybe it would be useful just
-> > > > > to pass a maximum level to the walker logic? That feels like the most
-> > > > > general case without complicating the existing logic.
-> > > > 
-> > > > This proposal seems simpler for me to understand, and indeed looks like a 
-> > > > better solution than what I have proposed, taking care of  the 
-> > > > 'already split' case with better performance, as it don't even walk a 
-> > > > single level-3 entry. 
-> > > > 
-> > > > On the 'splitting' case, it also works flawlessly if the memory is given in 
-> > > > level-2 blocks. There is only one case that I would like to address here:
-> > > > 
-> > > > - Memory given in level-1 blocks (say 1GB)
-> > > > - Walker flag says 'walk down to level-2 only'
-> > > > - Split Walker on level-1 will break page down to (up to) level-3 entries.
-> > > > - Walker will continue to be called on level-2 entries, even though it's 
-> > > >   not necessary.
-> > > 
-> > > If you're only visiting leaves, why would it be called on the level-2
-> > > table entries?
-> > > 
-> > 
-> > Because once the leaf is turned into a table by the splitting walker, it 
-> > gets reloaded and walked. This is an excerpt of __kvm_pgtable_visit():
+On Mon, 18 May 2026 14:45:50 +0200, Andre Przywara wrote:
+> v8 of the nested virt support series is just rebasing on top of current
+> master, to accommodate the meanwhile merged userland PSCI series.
+> Changelog below.
+> ========================================================
 > 
-> Sorry, I was musing about the semantics after adding something to limit
-> the maximum level. I don't dispute what the current code would do.
+> Thanks to the imperturbable efforts from Marc, arm64 support for nested
+> virtualization has now reached the mainline kernel, which means the
+> respective kvmtool support should now be ready as well.
 > 
-> > Example:
-> > - Split this level-1 leave:
-> >   - Walker creates the whole structure up to given level (currently 3)
-> >   - Walker returns, gets reloaded, table detected, go down on that one
-> >   - Level 2 entries walked (which is unnecessary)
-> > 
-> > Please let me know if I am misunderstanding something.
-> 
-> I just don't grok why this would happen if we limited the maximum level
-> to '2' _and_ said we only wanted to visit the leaf entries. In that
-> case, I wouldn't expect to descend into any of the L2 table entries
-> (because that would imply going beyond level 2) and I wouldn't expect to
-> be called for the table entries either (because we're only interested in
-> leaves).
+> [...]
 
-Agree, if we specify to skip level-3 entries, it would only walk up to 
-level-2 entries, but take above example in detail:
-- Split these level-1 leaves, up to level-3 leaves (regular)
-  - INFO: kvm_pgtable_walk will call walker:
-    - only up to level-2 entries (skip level-3)
-    - only on leaf entries
-  - Walk first level-1 leaf, calls walker
-    - walker will split the level-1 leaf in level-3 leaves
-    - walker return from that first level-1 leaf
-  - level-1 leaf is reloaded as a table
-    - level-2 entries of that table are also walked (unnecessary)
-    - on each of the level-2 table entries, level-3 entries are skipped
+Applied to kvmtool (master), thanks!
 
-To avoid the unecessary walk of the level-2 entries above, we would need to 
-specify 'skip level-2' that could be an issue if we have a mix of level-1 
-and level-2 leaves, as the level-2 leaves in that case would not be split.
+[1/6] arm64: Initial nested virt support
+      https://git.kernel.org/will/kvmtool/c/7e43347c0114
+[2/6] arm64: nested: Add support for setting maintenance IRQ
+      https://git.kernel.org/will/kvmtool/c/fe4c35a8dcce
+[3/6] arm64: Add counter offset control
+      https://git.kernel.org/will/kvmtool/c/1b44d7a4b99b
+[4/6] arm64: Add FEAT_E2H0 support
+      https://git.kernel.org/will/kvmtool/c/ab9ae1411622
+[5/6] arm64: Generate HYP timer interrupt specifiers
+      https://git.kernel.org/will/kvmtool/c/e9456310e1af
+[6/6] arm64: Handle virtio endianness reset when running nested
+      https://git.kernel.org/will/kvmtool/c/6c2de8d9531c
 
-That's why I suggest something like "skip recently created table" as a flag 
-as well, so we can guarantee no newly created table gets walked 
-unecessarily.
+Cheers,
+-- 
+Will
 
-Please help me if I am missing something important.
-
-Thanks!
-Leo
-
-
-
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
