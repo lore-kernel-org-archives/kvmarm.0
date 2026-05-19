@@ -1,176 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06DF3DCD94;
-	Tue, 19 May 2026 21:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853E93E7BA0;
+	Tue, 19 May 2026 21:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779225053; cv=none; b=oi0oAz1EemAi9ZcVg+qCexUW62zfyXWEs5Z7k4i/TTQ0K2VUDd+GcSH3A0bAl2Ds6y9hA4Fh1mMRKLUNnx8hX7nwdaSGRGgYg8shUnEwyjzPF4TaBnhrZTgJ4rrOmo+y6vsFeb5LB72KdPc/vYUe9PrvJpnIrMG4pcRswvQUSck=
+	t=1779225704; cv=none; b=Jb1PZ630A1XyHAv6cuulR6wdH1a5X1ivPzFYa54/095JYn84KMjllM5lmB5bjWNjBJWZI/gsMmWGgqNQ+tBsII3GgWdykIUXfKp/jxMy6i/SsKtM2/pQcZ2nb+GrC9bK4iwN+mpAOhBYCv1ZtC/+xGlEWvEZ0TNVaxBMUgQtbic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779225053; c=relaxed/simple;
-	bh=PMBbCkriMIJCPtnxEiVilsP0qVT+oqDX7B6s76Q9GBo=;
+	s=arc-20240116; t=1779225704; c=relaxed/simple;
+	bh=djCpecXEj3zHCmYe7VgFQ9Oql5NDiSL/b7rvo9CsIhY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iJEFVZDiCId7/Q3yyr+qmlxPllXL8D+rth97uKok1WZv6EVqfT+ShzpwgcgaRUTIPharOxsvfxvkVypPwWIXFos4jesk5ERk6YCT2QZf5qtfTXci4Z1b07aRPBpsukyxUfNNz/g4yjpiJaVSHVFK+gsRo+Pm1YDzjb2V+EJJxoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PpF+/Qs+; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=bfJvvokKzyrUYSH+3iYjtoWIMjmelh5b7/FaxdhfdWWq5kh6JtmiBOv/1/LF5m9LoWty+N/TROi0/v1zDMo730FQc7GN0447OtgGnAeubcGZYEk/dupCNqkY5AGC6evB3Q7ybFMIbW+gAOT8zB4a66ud9U67YfUIUnURw/vESAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mSi5Oi8w; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PpF+/Qs+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C9C41F000E9;
-	Tue, 19 May 2026 21:10:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mSi5Oi8w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC15F1F000E9;
+	Tue, 19 May 2026 21:21:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779225052;
-	bh=/J21S+Ld/hEhF27pPKSQ3l92mo4qOAr3o1Wi79JUnPo=;
+	s=k20260515; t=1779225703;
+	bh=ri+sVbVtaQpLD9jTrxV8FY3zeDim8GxNujn5Xy/XOv8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PpF+/Qs+ycT4A8rWHJ/2DlTEDC2i0j/k3x9lrVRnSVvoqOOYYCaH5oDvCXXHRfgAW
-	 y1nzP4QlnoFKEjFtRVrSTHhl7gLvWebJ2lt1VrAbGbVEEEWhCzSXhkfe3kwZ+Tv91F
-	 WIkkGeNJsBlHxHEj9qdnVRmc3v6Jgi2dzvhHcT+JAmrlnsGeguE3WlCTEuB1tRZTud
-	 3bLAPhSMMQzLOaGYixd4SPKTsWHWm1bSqOWWUln6tiYSNTjaGkrRWYybGHryRNNsO7
-	 7lv/z7sGNzkLVvCxn2RZVMzjfDjStBmvCbEDlS5i7BNE0sCXMW1h+YsUFTlGgTtycQ
-	 bzBCjf8IrvBDg==
-Date: Tue, 19 May 2026 14:10:50 -0700
+	b=mSi5Oi8wWxJxTPYwM0kIZ5Swu9IrlsWBaYQoTzOy1yE2VKsWFWcnvzEfZldVLh0kL
+	 Pho+U7EOqfr9pBhWNX20W9s6V91TFGkCWrk8weyXzHQjmcfCEOrtxEX44VVqn7AMA4
+	 +nEqj8gWNOF052trRl7XMXLj1JC9ByhHkdLOfX0oHijWeoGmHeHl38hq2SE5uHn4Zz
+	 28Uzvk+ur6n6vs5d3Ds3v8ar/TEix9MALf0X8Hb9ToyXqJI2VyWqWNGl+T0yZs7zeY
+	 xWEXIZn4wKGNsMAXwClhdHgMwjEuv5HTGAURBzdpZPVZ1ny5uHgNb4BISTKlOK18uc
+	 97pwhdgCkGNUA==
+Date: Tue, 19 May 2026 14:21:41 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, kvm <kvm@vger.kernel.org>,
-	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Jim Mattson <jmattson@google.com>, Joey Gouly <joey.gouly@arm.com>,
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <tabba@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>, Kees Cook <kees@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	kvmarm@lists.linux.dev,
-	linux-kselftest <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH] Documentation: KVM: Document guest-visible compatibility
- expectations
-Message-ID: <agzR2kaJsNa8X9lF@kernel.org>
-References: <d9d4471a7f5ec1e297b3ca07f42a59090aa91e15.camel@infradead.org>
- <CABgObfaM-JtNn2MuYXaiadQnLfAhTEaoHAcTG9=J6LkMcQCJ3A@mail.gmail.com>
- <3f9d731c3d26b0367600f1069e6425099bc34eac.camel@infradead.org>
- <agxFbniU_6eQ98t2@willie-the-truck>
- <cf429f2082e863571595f74d1d3dedc3e6a82964.camel@infradead.org>
- <CABgObfacAYexR25SMi1kSZMRnHx3EDGj8=E84V1DumER66ibnQ@mail.gmail.com>
- <86qzn7wp3y.wl-maz@kernel.org>
- <593a782c50f3c8656e13b36dfb975a67d43a908e.camel@infradead.org>
- <CABgObfbS-z3OphDna5W_JQPvw+OK=yXJurVMHp1ANZ5uGEgVhQ@mail.gmail.com>
- <9d0429ddbe4d8c6993e74237c4395697f80092d6.camel@infradead.org>
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return
+ options
+Message-ID: <agzUZS1l-uHQoodG@kernel.org>
+References: <20260515195904.2466381-1-leo.bras@arm.com>
+ <20260515195904.2466381-2-leo.bras@arm.com>
+ <agq-RyKhBy4CIThm@kernel.org>
+ <agrTQMw4QJX6HGrm@willie-the-truck>
+ <agsYF-Dav2bpxWK4@devkitleo>
+ <agxa-TydN1PoKsYn@willie-the-truck>
+ <agxeEA14cP3yMV1m@devkitleo>
+ <agxifbKzGcYQivBz@willie-the-truck>
+ <agx1J1tQFn0cdtBf@devkitleo>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9d0429ddbe4d8c6993e74237c4395697f80092d6.camel@infradead.org>
+In-Reply-To: <agx1J1tQFn0cdtBf@devkitleo>
 
-On Tue, May 19, 2026 at 03:13:30PM +0100, David Woodhouse wrote:
-> On Tue, 2026-05-19 at 15:53 +0200, Paolo Bonzini wrote:
-> > On Tue, May 19, 2026 at 3:00 PM David Woodhouse <dwmw2@infradead.org> wrote:
-> > > Or some guest configurations which have only ever been tested under KVM
-> > > could have a bug where they *rely* on the registers not being writable,
-> > > and write values which are inconsistent with the rest of their
-> > > configuration. Which breaks the moment those registers become writable.
+On Tue, May 19, 2026 at 03:35:19PM +0100, Leonardo Bras wrote:
+> On Tue, May 19, 2026 at 02:15:41PM +0100, Will Deacon wrote:
+> > On Tue, May 19, 2026 at 01:56:48PM +0100, Leonardo Bras wrote:
+> > > On Tue, May 19, 2026 at 01:43:37PM +0100, Will Deacon wrote:
+> > > > > > I was wondering along similar lines, but maybe it would be useful just
+> > > > > > to pass a maximum level to the walker logic? That feels like the most
+> > > > > > general case without complicating the existing logic.
+
+FWIW, I had considered this too but decided that it requires a bit more
+churn since we cannot rely on zero initialization in the existing
+callsites (level 0 is a valid level).
+
+But that's extremely minor.
+
+> > > > > This proposal seems simpler for me to understand, and indeed looks like a 
+> > > > > better solution than what I have proposed, taking care of  the 
+> > > > > 'already split' case with better performance, as it don't even walk a 
+> > > > > single level-3 entry. 
+> > > > > 
+> > > > > On the 'splitting' case, it also works flawlessly if the memory is given in 
+> > > > > level-2 blocks. There is only one case that I would like to address here:
+> > > > > 
+> > > > > - Memory given in level-1 blocks (say 1GB)
+> > > > > - Walker flag says 'walk down to level-2 only'
+> > > > > - Split Walker on level-1 will break page down to (up to) level-3 entries.
+> > > > > - Walker will continue to be called on level-2 entries, even though it's 
+> > > > >   not necessary.
+> > > > 
+> > > > If you're only visiting leaves, why would it be called on the level-2
+> > > > table entries?
+> > > > 
+> > > 
+> > > Because once the leaf is turned into a table by the splitting walker, it 
+> > > gets reloaded and walked. This is an excerpt of __kvm_pgtable_visit():
 > > 
-> > Yeah, just having guests that worked by utter chance - but you still
-> > don't want to break them - is the case that is most likely. Crappy
-> > code that runs only under emulation/virtualization appears with
-> > probability 1 over time.
+> > Sorry, I was musing about the semantics after adding something to limit
+> > the maximum level. I don't dispute what the current code would do.
 > > 
-> > Is this likely in this specific case---probably not, honestly.
-> > Christoffer's patch dates back to 2018 (commit d53c2c29ae0d); *back
-> > then* KVM/Arm was a lot less mature, and people developing for Arm on
-> > vanilla upstream kernels have moved on from Linux 4.19.
+> > > Example:
+> > > - Split this level-1 leave:
+> > >   - Walker creates the whole structure up to given level (currently 3)
+> > >   - Walker returns, gets reloaded, table detected, go down on that one
+> > >   - Level 2 entries walked (which is unnecessary)
+> > > 
+> > > Please let me know if I am misunderstanding something.
+> > 
+> > I just don't grok why this would happen if we limited the maximum level
+> > to '2' _and_ said we only wanted to visit the leaf entries. In that
+> > case, I wouldn't expect to descend into any of the L2 table entries
+> > (because that would imply going beyond level 2) and I wouldn't expect to
+> > be called for the table entries either (because we're only interested in
+> > leaves).
 > 
-> It's not really 2018 though. EC2 is still running kernels with that
-> older commit reverted because of the breaking change that it
-> introduced.
+> Agree, if we specify to skip level-3 entries, it would only walk up to 
+> level-2 entries, but take above example in detail:
+> - Split these level-1 leaves, up to level-3 leaves (regular)
+>   - INFO: kvm_pgtable_walk will call walker:
+>     - only up to level-2 entries (skip level-3)
+>     - only on leaf entries
+>   - Walk first level-1 leaf, calls walker
+>     - walker will split the level-1 leaf in level-3 leaves
+>     - walker return from that first level-1 leaf
+>   - level-1 leaf is reloaded as a table
+>     - level-2 entries of that table are also walked (unnecessary)
+>     - on each of the level-2 table entries, level-3 entries are skipped
 > 
-> So the behaviour corresponding to GICD_IIDR.implementation_rev=1 is
-> still current for *millions* of guests.
+> To avoid the unecessary walk of the level-2 entries above, we would need to 
+> specify 'skip level-2' that could be an issue if we have a mix of level-1 
+> and level-2 leaves, as the level-2 leaves in that case would not be split.
 > 
-> I'm now finding that revert in our tree during a *later* kernel upgrade
-> and trying to eliminate it. 
-
-Still, as far as upstream is concerned this is damn near a decade old.
-Decisions that you or your peers made in the downstream doesn't change
-that.
-
-> And sure, I have given the engineers responsible for that a very hard
-> stare and suggested that they should have fixed it 'properly' in the
-> first place with a patch like the one we're discussing right now.
+> That's why I suggest something like "skip recently created table" as a flag 
+> as well, so we can guarantee no newly created table gets walked 
+> unecessarily.
 > 
-> And they're looking at this thread and saying "haha no, if fixing
-> things properly for Arm is this hard then we'll stick with the crappy
-> approach".
+> Please help me if I am missing something important.
 
-The appropriate time to ask for accomodation was a *very* long time ago.
-
-And in the absence of clear evidence of a guest depending on the broken
-IGROUPR behavior, I don't see how the guest-side changes of Christoffer's
-series are any different from the multitude of bug fixes that we take
-every single release cycle. It is an unfortunate bug and I concur with
-Marc that it doesn't seem like the sort of thing a guest could rely
-upon.
-
-Because it is very much a bug fix, it should've happened without a
-change to the revision number.
-
-Now, the handling of GICD_IIDR itself is a separate issue. By my count,
-the series broke UAPI on three separate occasions. Before b489edc36169
-IIDR was RAZ/WI from userspace. And of course dd6251e463d3 and d53c2c29ae0d
-changed the revision with no way of restoring the old value.
-
-And really, IIDR should've *never* been used as a buy in for new UAPI
-because it unnecessarily becomes guest visible. 49a1a2c70a7f ("KVM: arm64:
-vgic-v3: Advertise GICR_CTLR.{IR, CES} as a new GICD_IIDR revision") is
-a much better example for IIDR going forward as it gates *guest-side*
-behavior.
-
-> I do not want them to be right. I don't think any of us want that.
-> 
-> > I would still lean towards accepting the code considering the limited
-> > complexity of the addition (in fact I like it more now that it uses
-> > IIDR instead of v2_groups_user_writable, but that's taste). 
-> 
-> I'm absolutely prepared to have a separate technical discussion about
-> the v2_groups_user_writable thing for GICv2, which is the second part
-> of that series.
-> 
-> It seems like the right thing to do, and as far as I can tell, this
-> code *never* worked with QEMU. But I'm not sure who even cares about
-> GICv2 any more. I couldn't find hardware and I had to test the whole
-> thing inside qemu-tcg.
-> 
-> But the 'IIDR defaults to 3 but the *behaviour* doesn't match until you
-> explicitly *set* it to 3' thing seemed so *egregiously* wrong to me,
-> that I fixed it anyway.
-
-Wrong or not, this behavior is documented unambiguously. From the VGICv2
-UAPI documentation:
-
-"""
-Userspace should set GICD_IIDR before setting any other registers (both
-KVM_DEV_ARM_VGIC_GRP_DIST_REGS and KVM_DEV_ARM_VGIC_GRP_CPU_REGS) to ensure
-the expected behavior. Unless GICD_IIDR has been set from userspace, writes
-to the interrupt group registers (GICD_IGROUPR) are ignored.
-"""
-
-I'm not inclined to change that. As a way out of this whole mess, can we
-instead:
-
- - Allow userspace to set IIDR.Revision to 1
-
- - Drop any bug emulation from the handling of IGROUPR registers
-
- - Special-case the stupid GICv2 UAPI where IGROUPR are only writable if
-   the VMM has written to IIDR and the revision >= 2
+I'm not sure the added complexity of handling this case perfectly results
+in a measurable performance improvement. Just avoiding the level 3
+tables would be an exponential reduction (~ 512-8192x) in the number of
+walk steps.
 
 Thanks,
 Oliver
