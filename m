@@ -1,95 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB9B3DDDCD;
-	Tue, 19 May 2026 07:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8731F3E0C56;
+	Tue, 19 May 2026 08:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779177240; cv=none; b=SI8Fxy02EAyifDYl4s0v/D9Wtrrvka5GfRed7Tc8s7+9gXaX6yb+lNYMbum8oQGAsw/W5zE5G/TdDFe0e8airn6Hssmg9wFHkZWHMmyNQZZ4yTPPm3lnNL82zqNimneCmLq3OxZpqdVL4ob6q5CUqkca8ab2Js9vVVcFufedrC4=
+	t=1779179054; cv=none; b=J/D/FqLZ7DdtxtfvEEDJEUiOOe0AR+Dt0eHxRAoEzzTtU+OncRmG+LtuAM9+x6LSYSeVyGPxuVSdNG315eQ6o0hbn9rkMWhUg620t4PuuEAxL4M/9z3u62XOrlaza7UJMnoPQuRaWUtyJqxXwAiT/lNUGYWVKWYLE6rXN6el28A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779177240; c=relaxed/simple;
-	bh=dE1+5CTzbd3ruwSwP8Km4ilvTVIBMQhESJGdZiggQi4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iyITeLEuBxrEYsE/5fEqD0ZmM7kYYE/MTnZ+mgsuQ35ay0VbqILvXmbYKdUsdLG8xiSDS80Sp4rYLrH3AF1C6C2ox5EXG/yecaxld6vz++4jo4mz5W9EhHYG29swTbD4fNOfAUYzMNT97KXtnq4q0Mog5IwEIB2iAB4Bx2Uq0bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y0ENtzoe; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779179054; c=relaxed/simple;
+	bh=Y/ur6kXaqyutmulE6ALqWLW6OIukPW3L6JklRGunmRk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HC8ksItoVrbqisjnmvferUPEegN304iFRB2X4CYb4brSBV4QhDU2pcUChiH0R7DYlWWQCe9hPRT9BVs1Qa08Fjvztlvh3WxCENdrPYzig5UvkSwRxadzIROZRT2DKNdIHwNve7+nvcsMiDKMPifwl3ytpXOMo4eYVTFnANp0CKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mZG8aox/; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0ENtzoe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F2AC2BCB3;
-	Tue, 19 May 2026 07:53:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779177239;
-	bh=dE1+5CTzbd3ruwSwP8Km4ilvTVIBMQhESJGdZiggQi4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y0ENtzoe4SvmuJQ3CilFHTbmlNa15I5+Oaw3k9Ddjw+Fq+CmhOi8EDHe5vhUFzjzu
-	 4nGyHfS2QdvcVf81R5I13sTkIwdcQdpX3TNrJXZN9XmuoVQlfrXphttBN4475DnR4W
-	 JUw0biK/q5Cfuf4CNx9g5O6CGnI88qiRSavRAGw9FjKhpyL4boRYNL0h2Xm9a4smaK
-	 potBWRIs/y7qDvjfpRdTllIp22ovZTEs9cpkYqwSuBusk0f8KsH9lznSgQMj8OdLZ3
-	 W1yGjIFWbzZRcZGH86Aa6WqDQ9nKDXFPI4efgB5FXzirK2i0SUTbDkwwJYsYltblcz
-	 hnuq04ZQCeFOw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wPFH3-00000003poq-0yUd;
-	Tue, 19 May 2026 07:53:57 +0000
-Date: Tue, 19 May 2026 08:53:56 +0100
-Message-ID: <86tss3x2az.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic: free private_irqs when init fails after allocation
-In-Reply-To: <CAJJ9bXyHRVqnL_n6wwyAXDK=1GmaKgDy41tjMRhXjTObbft7gg@mail.gmail.com>
-References: <20260517181331.367676-1-michael.bommarito@gmail.com>
-	<outz3fxn7c5tkfz3adoilikhtyjbii7qwxmknh2l4pdf4kv5bj@54lpduy2fuj4>
-	<CAJJ9bXyHRVqnL_n6wwyAXDK=1GmaKgDy41tjMRhXjTObbft7gg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mZG8aox/"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA7D91CE0;
+	Tue, 19 May 2026 01:24:06 -0700 (PDT)
+Received: from [10.57.21.217] (unknown [10.57.21.217])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 675043F85F;
+	Tue, 19 May 2026 01:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779179051; bh=Y/ur6kXaqyutmulE6ALqWLW6OIukPW3L6JklRGunmRk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mZG8aox/W/e6xzhn5RiTNydJTpx7flfHa/abZ3kd8KTqJJ71HHucb3bQGFflvCn0W
+	 HgL59EE2AyG3IVbJqMMEyB0L/E7CCEYcO65lQY1jxB14er0PuDC3w9ukYW34JH66fw
+	 YBFFE8XCuROPCyHeY83FCo4XfqVvlp+m8Qn9tncc=
+Message-ID: <afca6cdd-f9e3-4b5f-9f70-940c8dbb7a80@arm.com>
+Date: Tue, 19 May 2026 09:24:07 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: michael.bommarito@gmail.com, yaoyuan@linux.alibaba.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 00/14] coco/TSM: Host-side Arm CCA IDE setup via
+ connect/disconnect callbacks
+Content-Language: en-GB
+To: Will Deacon <will@kernel.org>,
+ "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexey Kardashevskiy <aik@amd.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron <jic23@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Samuel Ortiz <sameo@rivosinc.com>,
+ Steven Price <steven.price@arm.com>, Xu Yilun <yilun.xu@linux.intel.com>
+References: <20260427065121.916615-1-aneesh.kumar@kernel.org>
+ <agsNO9cc7H-b0H8L@willie-the-truck>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <agsNO9cc7H-b0H8L@willie-the-truck>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 19 May 2026 01:26:58 +0100,
-Michael Bommarito <michael.bommarito@gmail.com> wrote:
->=20
-> On Mon, May 18, 2026 at 1:31=E2=80=AFAM Yao Yuan <yaoyuan@linux.alibaba.c=
-om> wrote:
-> > Ah. One thing I forgot to say:
-> >
-> > Do we need a fixes: tag here ?
->=20
-> I struggled with that a bit.  Will's sister commit in 250f25367b58
-> didn't have a Fixes: tag, but if I had to pick, it would probably be
-> this:
-> Fixes: 03b3d00a70b5 ("KVM: arm64: vgic: Allocate private interrupts on de=
-mand")
->=20
-> If you agree, I can send v2 with that added
+On 18/05/2026 13:59, Will Deacon wrote:
+> On Mon, Apr 27, 2026 at 12:21:07PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>>   arch/arm64/include/asm/rmi_cmds.h         |  85 +++
+>>   arch/arm64/include/asm/rmi_smc.h          | 168 +++++
+> 
+> Curious, but why does this stuff have to live in the arch code? Wouldn't
+> it be better off somewhere like drivers/firmware/ or
+> include/linux/arm-rmi.h?
 
-Seems correct to me. Please send v2 at your earliest convenience with
-a trimmed commit message (potentially limited to the first paragraph).
+Good point. RMI interface is only available for arm64 (not in Arm32). 
+That said, it is indeed a firmware ! ;-) interface. The APIs are closely
+integrated with the KVM Realm management. If the general consensus is
+to move them under drivers/firmware (like PSCI), we could take that
+approach.
 
-Thanks,
+Suzuki
 
-	M.
+> 
+> Will
 
---=20
-Without deviation from the norm, progress is not possible.
