@@ -1,137 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0928D4968F0;
-	Tue, 19 May 2026 10:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A304BCAB9;
+	Tue, 19 May 2026 10:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779185648; cv=none; b=CM4F9+JPjHLrFXMpWh8yHuLuDk2KJBqsrR4rHuyQ2LPSXm/W0tkITeviDw9MwHhGcY8klc/yDldWDFZ5if8PVbI6a5wJwwuiSSoawD3bMPG2ntHgbXyulU+pbtFKsMFMfpbDjEVUpLCfBC4QZwzb3zDPxxuv/plnXwIGIqq6GdU=
+	t=1779186349; cv=none; b=Ptmw44+yAhdf/lysXMoyWL3JsiafJdxrFsyJo/Jhe81UsxuynzUUAATyj1+S8sOPlxvs9/d0UQE2bjS+Dt5uyQ5G2OZV+VCqOQRij81BAnS/4aM6MQ8D3srP2X/oT24tPUrdn4zPEXhi5u8R3slDHFDvzYc6LTBi2FL9Amr0Z1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779185648; c=relaxed/simple;
-	bh=ShfBiW+vq91XcTgWSa/la50XGXIbPtfnzFO4ifOfID4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rnkLuKRAoSR9Pmbf7lGAsO9jJBDLjKkWzKzoUNtW1BdsqazDEUZxVxhPnFe8fW3BH6AxjCrAD3T0APvVuustufewp7CSW9uMcAvMw6t7wiKrAzZpt7+Xn0Wz10T1ewgqv+drb7wzddTm5SCa805YRAdaEeStTVagCO4xrRuix2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WCodZuKB; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779186349; c=relaxed/simple;
+	bh=P5YfddLVQL7aZ5v/LZq0e1k59RJIWRdeUlHDtWhzr4c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pZgVR0+lsLKKqrzCdC96qjc1g4jQGtb8DJrsGNq97RRL0UpXf3BNL22su/n6Fg/2wA/RTkN/3BEC7dpaKFAz/OcaaMOLUSHS/Bd57tfiSO2zookC34tKsEdEYENLF+oOqjAd2+NxKCzUjXMHGb0QM7KKssul0DCwemjXAUhuvQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FNkvBKPk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WCodZuKB"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 115AF2008;
-	Tue, 19 May 2026 03:13:56 -0700 (PDT)
-Received: from [10.57.21.217] (unknown [10.57.21.217])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 97A693F85F;
-	Tue, 19 May 2026 03:13:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779185641; bh=ShfBiW+vq91XcTgWSa/la50XGXIbPtfnzFO4ifOfID4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WCodZuKBHSvv0Lw3fiVNW9WTrXE9xTWRcDndU3xAfxrCnmh1baSZ9JZ66xgPSc+qB
-	 TCRqox8LoUDgWZQ3zD+MpXFsov7Di1fQzBYbxn0svpwebaQ2WTmTuAaIsjVlRToUJS
-	 GGa82phRLTPjd17dP+cJV0/D72gpzEOxokO9qGfU=
-Message-ID: <6681f10b-0966-42e2-ae04-4e1aef47ec4d@arm.com>
-Date: Tue, 19 May 2026 11:13:55 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FNkvBKPk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5D69C2BCC9;
+	Tue, 19 May 2026 10:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779186349;
+	bh=P5YfddLVQL7aZ5v/LZq0e1k59RJIWRdeUlHDtWhzr4c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=FNkvBKPkbg7II0DvIuHKCqEJeTFm94iqnAJRMhA5FvZZh6jBd8ZlciRMQQfHH7rNm
+	 O2gl8A3loKWcFmGK2B+tRaHPQ20f+lEVk0N6gLw+M4P7ly5oH41fpPhycawVND830T
+	 0JlRGRjih8LfcZk1dRdBN5Q3uLFtWxU5Tm6G+5mCOrQehKaGtNuIgWGJ02u1Yz/o3f
+	 XrHY6ghrqRVP50TtSAS3/eDoJXX/XxMOFLqiiifkxVbvU3Ev0Jk0qqXvGq3FuIBHyZ
+	 irWqD7vYWxKX+ZA/0nE3JFOJIsnWAskrtWZYs664Wn2IxmWIwh4VIDtOoCkI6IKVuD
+	 ZMiponcYh/GXA==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+	Lorenzo.Pieralisi2@arm.com
+Subject: Re: [PATCH v14 37/44] arm64: RMI: Prevent Device mappings for Realms
+In-Reply-To: <20260513131757.116630-38-steven.price@arm.com>
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <20260513131757.116630-38-steven.price@arm.com>
+Date: Tue, 19 May 2026 15:55:37 +0530
+Message-ID: <yq5ase7nsnku.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 27/44] arm64: RMI: Set RIPAS of initial memslots
-Content-Language: en-GB
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-28-steven.price@arm.com> <yq5av7cjsonr.fsf@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <yq5av7cjsonr.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 19/05/2026 11:02, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
->> The memory which the realm guest accesses must be set to RIPAS_RAM.
->> Iterate over the memslots and set all gmem memslots to RIPAS_RAM.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->   
->   ...
->   
->> +static int set_ripas_of_protected_regions(struct kvm *kvm)
->> +{
->> +	struct kvm_memslots *slots;
->> +	struct kvm_memory_slot *memslot;
->> +	int idx, bkt;
->> +	int ret = 0;
->> +
->> +	idx = srcu_read_lock(&kvm->srcu);
->> +
->> +	slots = kvm_memslots(kvm);
->> +	kvm_for_each_memslot(memslot, bkt, slots) {
->> +		if (!kvm_slot_has_gmem(memslot))
->> +			continue;
->> +
->> +		ret = realm_init_ipa_state(kvm, memslot->base_gfn,
->> +					   memslot->npages);
->> +		if (ret)
->> +			break;
->> +	}
->> +	srcu_read_unlock(&kvm->srcu, idx);
->> +
->> +	return ret;
->> +}
->> +
->>   int kvm_arm_rmi_populate(struct kvm *kvm,
->>   			 struct kvm_arm_rmi_populate *args)
->>   {
->> @@ -890,6 +922,10 @@ int kvm_activate_realm(struct kvm *kvm)
->>   			return ret;
->>   	}
->>   
->> +	ret = set_ripas_of_protected_regions(kvm);
->> +	if (ret)
->> +		return ret;
->> +
->>   	ret = rmi_realm_activate(virt_to_phys(realm->rd));
->>   	if (ret)
->>   		return -ENXIO;
-> 
-> relam guest already does.
-> 	for_each_mem_range(i, &start, &end) {
-> 		if (rsi_set_memory_range_protected_safe(start, end)) {
-> 			panic("Failed to set memory range to protected: %pa-%pa",
-> 			      &start, &end);
-> 		}
-> 	}
-> 
-> if so why is host required to do this ?
+Steven Price <steven.price@arm.com> writes:
 
-Ideally this should be a call from the VMM (i.e., user). Irrespective of
-what the guest does (which the host has no knowledge about), the VMM/
-user is better aware of what to do for a given guest. We have done this
-implicitly in the KVM as a start, to keep the initial implementation
-simple. This could be moved out to the VMM as UABI, if there is
-sufficient demand for it.
+> Physical device assignment is not yet supported. RMM v2.0 does add the
+> relevant APIs, but device assignment is a big topic so will be handled
+> in a future patch series. For now prevent device mappings when the guest
+> is a realm.
+>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes from v6:
+>  * Fix the check in user_mem_abort() to prevent all pages that are not
+>    guest_memfd() from being mapped into the protected half of the IPA.
+> Changes from v5:
+>  * Also prevent accesses in user_mem_abort()
+> ---
+>  arch/arm64/kvm/mmu.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 776ffe56d17e..7678226ffd38 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1230,6 +1230,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  	if (is_protected_kvm_enabled())
+>  		return -EPERM;
+>  
+> +	/* We don't support mapping special pages into a Realm */
+> +	if (kvm_is_realm(kvm))
+> +		return -EPERM;
+> +
+>  	size += offset_in_page(guest_ipa);
+>  	guest_ipa &= PAGE_MASK;
+>  
 
-TL,DR: This should be a host/deployer decision, not the Guest. There
-may other guest OS, which do not do RIPAS_RAM early enough.
+The commit message suggests that this will need to be updated to support
+Device Assignment, but that is not true. IIUC, this is only used by
+GICv2?. Can we update the commit message?
 
-Suzuki
-
-
-
-
-
+-aneesh
