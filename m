@@ -1,147 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C4126299;
-	Tue, 19 May 2026 12:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398D44963B7;
+	Tue, 19 May 2026 12:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779195363; cv=none; b=fN0Egw4qUIEZeHbhnms37N/2azIGsE9ONlzyQyKv42N93FR01WrfNOVtZ6iN2ag3iAS06sK9IBb4Zl7iEi+49OykOOJOartchIwmtN6HwwBk7kWwWpCbMSy3U7rTPiu8nidaMuPiDpEsfYwQ0qukb3Zq6Wcf53Yx2GfmETdeIwE=
+	t=1779195389; cv=none; b=jcQjqgYAJx26x/lmRwjGlvMAhjE4RC1pZ7Ch4Duro9WYeGyAQggviFrFaMwF0W2dTOE9DXDda+Y5GFh72Q11A0S6ZmhgIZPdCgKikvTZba2fFMXO5rksPEgWCTTy/Vxfz1JrrraXb8hiw3bnmig+efYdbdQ69fp65j0n5YOSe1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779195363; c=relaxed/simple;
-	bh=Xfxs9VwhdJKne3gTf8HJ94QxvyAL3Oe1auKr7Ait+AI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hauSdXWNgeIixL9NpH1Hr7aQKd2r0iRZdJfwsvlS7nOMdrhXBPZGtfL0wTw08ZtoEDZdoYX+nfzBfuyP89GQGlX5ccUsEqhelhy/LQiYvDIH4PC329F7O2ugKYWkude/XB1rDqtx6SaBEGkXfnmgLgNrORcUQqSXeGQUXFLHm3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFYn2EQI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779195389; c=relaxed/simple;
+	bh=swiLRF5viUP9Bya8Dp7YZueJwlHQOjHir4JEE0vhuWA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q/eYVtjiLgbMt6txJFVi8RPy5Wyas4AgD84f7v3LuvTzCueTvOLdpXyiregpIN+0iW4h8w0JC4BpNpnWgnMC8NNGhg48K9MrIuRvTulzlOLbcjwXZvMl0z1CW63MuGumrhYBKMojy6KP4Pd4uCr/22bXwby9PKQwQKQ7qCq97CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=onCKr4Fe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFYn2EQI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9A4C2BCB3;
-	Tue, 19 May 2026 12:55:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="onCKr4Fe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C78B7C2BCB3;
+	Tue, 19 May 2026 12:56:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779195362;
-	bh=Xfxs9VwhdJKne3gTf8HJ94QxvyAL3Oe1auKr7Ait+AI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=PFYn2EQI6o67e3QXj1DmucFzY5eMUMVymfs8SWHXncySGE4NzDUggvInLFr6ixsxt
-	 qYg0twpu4rJ6zwcv2EkrCHFLnYMtZXbPyPGyQp7J8y6uStLkA66YZkf9TMjMAtB0R7
-	 gwC3eSMHnmV+sx9T9KrsuVPkn2Peyno2mWDGmAhKcSD1ZXmBVlfxMa6QQVn42RIznn
-	 3OIPR8CO0/7k0gkobMUa7ZtA/zloHi04HmIUPdroRaX/R0/MQws3I14tk74bCHstbG
-	 fo2NHacy3VzbZSO2K5OYkAyPm4uD8SVAWH28rdJeyJFPUhYvBk77tTXkmsWtJMuJ1E
-	 51FQMMQt4xrcw==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1779195388;
+	bh=swiLRF5viUP9Bya8Dp7YZueJwlHQOjHir4JEE0vhuWA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=onCKr4FekH7xM2LVd2O8ZpVN+C9BcX2DiYfqmoUuV4SMKcB+Q1w11YKXTHrUZzkIV
+	 G3VAnCJ+nvfKPMdQGwyaV2ryg4bSurZAHT87CiQKtHPANc7qEm9IkWYNBWJMSQ7j3u
+	 lM5FVi+MS0LYxjAE7hInPG7JUzwqRJIfiMEY/hsBxjEQD92QaoaVT6NZGzPpWCKcHJ
+	 xOknyTHnF6tvmlPfhwPC0y1g4U8VyK7hbACcjCriLoJQRIY5AnY5XCdJ+QT3hPRJpV
+	 Bg8PNLF7W7YiSYMqEbb0TrBTd7lX2t6p03dei5jlv/GTOY4cnif6wb/VbHFtMhgJRc
+	 7mTGJdsH1PoOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wPJzm-00000003xSA-1yzQ;
+	Tue, 19 May 2026 12:56:26 +0000
+Date: Tue, 19 May 2026 13:56:26 +0100
+Message-ID: <86pl2rwoat.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	kvm <kvm@vger.kernel.org>,
+	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Jim Mattson <jmattson@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 27/44] arm64: RMI: Set RIPAS of initial memslots
-In-Reply-To: <6681f10b-0966-42e2-ae04-4e1aef47ec4d@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-28-steven.price@arm.com>
- <yq5av7cjsonr.fsf@kernel.org>
- <6681f10b-0966-42e2-ae04-4e1aef47ec4d@arm.com>
-Date: Tue, 19 May 2026 18:25:52 +0530
-Message-ID: <yq5ajyszsgmf.fsf@kernel.org>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	kvmarm@lists.linux.dev,
+	linux-kselftest <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH] Documentation: KVM: Document guest-visible compatibility expectations
+In-Reply-To: <86qzn7wp3y.wl-maz@kernel.org>
+References: <6856b269d2af706eae397e0cf9c1231f89d9a932.camel@infradead.org>
+	<6afc4b95-3c15-4d71-877d-19b84e91ce05@redhat.com>
+	<57bc082f4824d6114d3156744c25986effc29aca.camel@infradead.org>
+	<baff82ca-6321-4b16-aa61-b2d6d60b6535@redhat.com>
+	<86h5obya2r.wl-maz@kernel.org>
+	<48b06e5655d56ff6eda30e563b34894fa0eb2f07.camel@infradead.org>
+	<ba08dfe9-932b-40c3-9fdf-fc891d52e1d8@redhat.com>
+	<d9d4471a7f5ec1e297b3ca07f42a59090aa91e15.camel@infradead.org>
+	<CABgObfaM-JtNn2MuYXaiadQnLfAhTEaoHAcTG9=J6LkMcQCJ3A@mail.gmail.com>
+	<3f9d731c3d26b0367600f1069e6425099bc34eac.camel@infradead.org>
+	<agxFbniU_6eQ98t2@willie-the-truck>
+	<cf429f2082e863571595f74d1d3dedc3e6a82964.camel@infradead.org>
+	<CABgObfacAYexR25SMi1kSZMRnHx3EDGj8=E84V1DumER66ibnQ@mail.gmail.com>
+	<86qzn7wp3y.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dwmw2@infradead.org, will@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, seanjc@google.com, jmattson@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, rananta@google.com, eric.auger@redhat.com, kees@kernel.org, arnd@arndb.de, nathan@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Suzuki K Poulose <suzuki.poulose@arm.com> writes:
+On Tue, 19 May 2026 13:38:57 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> As I said before, I'd be OK with something that would restore IIDR to
+> REV1. But not something that actively breaks the GIC emulation by
+> reintroducing a bug. That's, by construction, dead code that will only
+> bitrot, because there is no SW that can make use of this nonsense.
 
-> On 19/05/2026 11:02, Aneesh Kumar K.V wrote:
->> Steven Price <steven.price@arm.com> writes:
->> 
->>> The memory which the realm guest accesses must be set to RIPAS_RAM.
->>> Iterate over the memslots and set all gmem memslots to RIPAS_RAM.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>   
->>   ...
->>   
->>> +static int set_ripas_of_protected_regions(struct kvm *kvm)
->>> +{
->>> +	struct kvm_memslots *slots;
->>> +	struct kvm_memory_slot *memslot;
->>> +	int idx, bkt;
->>> +	int ret = 0;
->>> +
->>> +	idx = srcu_read_lock(&kvm->srcu);
->>> +
->>> +	slots = kvm_memslots(kvm);
->>> +	kvm_for_each_memslot(memslot, bkt, slots) {
->>> +		if (!kvm_slot_has_gmem(memslot))
->>> +			continue;
->>> +
->>> +		ret = realm_init_ipa_state(kvm, memslot->base_gfn,
->>> +					   memslot->npages);
->>> +		if (ret)
->>> +			break;
->>> +	}
->>> +	srcu_read_unlock(&kvm->srcu, idx);
->>> +
->>> +	return ret;
->>> +}
->>> +
->>>   int kvm_arm_rmi_populate(struct kvm *kvm,
->>>   			 struct kvm_arm_rmi_populate *args)
->>>   {
->>> @@ -890,6 +922,10 @@ int kvm_activate_realm(struct kvm *kvm)
->>>   			return ret;
->>>   	}
->>>   
->>> +	ret = set_ripas_of_protected_regions(kvm);
->>> +	if (ret)
->>> +		return ret;
->>> +
->>>   	ret = rmi_realm_activate(virt_to_phys(realm->rd));
->>>   	if (ret)
->>>   		return -ENXIO;
->> 
->> relam guest already does.
->> 	for_each_mem_range(i, &start, &end) {
->> 		if (rsi_set_memory_range_protected_safe(start, end)) {
->> 			panic("Failed to set memory range to protected: %pa-%pa",
->> 			      &start, &end);
->> 		}
->> 	}
->> 
->> if so why is host required to do this ?
->
-> Ideally this should be a call from the VMM (i.e., user). Irrespective of
-> what the guest does (which the host has no knowledge about), the VMM/
-> user is better aware of what to do for a given guest. We have done this
-> implicitly in the KVM as a start, to keep the initial implementation
-> simple. This could be moved out to the VMM as UABI, if there is
-> sufficient demand for it.
->
-> TL,DR: This should be a host/deployer decision, not the Guest. There
-> may other guest OS, which do not do RIPAS_RAM early enough.
->
+I will also add that if we make it a policy to preserve buggy
+behaviours that the guest cannot be relying on, then I question
+whether we should be fixing anything at all.
 
-Are we suggesting that when the guest is running out of DRAM initialized
-via rmi_rtt_data_map_init(), it may need to access memory outside that
-range before it gets a chance to set the RIPAS as RAM?
+For example, 6.19 fixed a totally buggy behaviour where a guest
+couldn't not have more than (on most HW) 4 interrupts in flight at any
+given time. This was obviously totally bogus, and this was fixed
+unconditionally, as legitimate guests could experience gold-platted
+lock-ups.
 
-Does that mean the guest now has to trust the host for that?
-rmi_rtt_init_ripas() is not added to the measurement details, right?
+Should we revert to the previous behaviour? In the affirmative, I will
+simply stop fixing things, and someone else can have fun retrofitting
+buggy crap.
 
--aneesh
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
