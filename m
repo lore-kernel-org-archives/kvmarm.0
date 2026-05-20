@@ -1,394 +1,170 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2649D3EFD14
-	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 15:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09363EDAB1
+	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 15:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779290266; cv=none; b=pS5mhQuR2KSKtwH32sVjFw0dLAXXYUqlpTwmcyDpUkaRnym+VLASNdyntVfvx1Swhfn8YEXKWOIF7kmLiXat6G1VRo2kBBaSiuOXU4qCsyB3gWx5Yfd8K3aRVwaEOGfmBmWEvKeWcArpNLz+8Anytwafezu+Q+R8lZ3hYIbjAbI=
+	t=1779290837; cv=none; b=tPxu7YfijMOfbwVQFIBtSHKUuumHuDs4Orlo686rbWNJLrSOsJjpDHc1ah1e4A9t6Ci1ajf7xvwcnxfYXZk2sILH2EUBcVMgfxyDklX89/dtxBK6EtCzZvylnvRE3ZDxtlgUSHL5GuLR6TzyJV2xBbp9nsbhxp+IOxWbsGKJOHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779290266; c=relaxed/simple;
-	bh=KnB8NUgb7OfvhyqvzlGK12v19j9DBbTZLGw4wflVk+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mDW4AdXPPsCQfcFYmuKsa/FxiJMbzgAgA9Xf7ZAYKgnPiERRsgV/mNujifaGkIpd0B7hGkhdkGbuPZp4gHPsh2+qPQERpF2CcPRp+AYIKM0D1Oxt4b6zaCaoHWgEmoQ5bxNttuN1WOG17iMB+yOdfIZS7uPP2+YvZYVotEc1L0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rY5TWU1K; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779290837; c=relaxed/simple;
+	bh=VXtfKW24MCTZuH7HGpHcszSfo316OnyUHrfUrNBWajg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EkPy9j3bHDyR0GMJ0RsHJElZwPGjLCDmdAEwIy4r5srqAtItMnrz6oqjkIqpcIQNe3fk/FQFTXNoCQthdLJQaNyc3er+s/HJIUKETS6VNWcnn/2uK13PllgcFA/bIJI+yotejIhr4b6xKD+W+Vypb0EbwWXfz/0seyCmZNtdwc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nhZ1Ejq4; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rY5TWU1K"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08E0F1655;
-	Wed, 20 May 2026 08:17:38 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D8FA3FAA1;
-	Wed, 20 May 2026 08:17:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779290263; bh=KnB8NUgb7OfvhyqvzlGK12v19j9DBbTZLGw4wflVk+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rY5TWU1KLZ+sC0o1uhblHewVrO9NZst8oNVvrTJe/E9mcurKsRhafWkZxTyoarjoc
-	 IRDc3fFCxKCe9kRMkTW4Yep2uxOJQDLU7aVSxNIqnDKRn61vQUyMm+nsUZ0aKh6ZYT
-	 J3srMD2OTCjVJ9anmpaQQJi/jy9cImiGXLZOnjDs=
-Date: Wed, 20 May 2026 16:17:38 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Colton Lewis <coltonlewis@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib: arm64: Add foundational guest
- execution framework
-Message-ID: <20260520151738.GB4037194@e124191.cambridge.arm.com>
-References: <20260413204630.1149038-1-jingzhangos@google.com>
- <20260413204630.1149038-5-jingzhangos@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nhZ1Ejq4"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48fe44ce385so40570795e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 08:27:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779290834; x=1779895634; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DYdgcm/vWN2I8yVr+k4yh1FcDS21+U9vfHPjdUVDhrc=;
+        b=nhZ1Ejq4VFIVUwSIsXXwnpHr9fh1l6iBnuFNECrucm+QHrH/e6Y8NQrDiXlrmEqQkf
+         zAw4lxWQ4+KvxddWdUHnM09JeppOaubMTrbrYQ2eZacheDUT5PuUyBwFwvR3guPboDNQ
+         3ltTmYcWeRY6iBLJ/NZlD+s+n9Ro/Q9Q6o0Mb3vdGLzKTQdOq0rn6tu6Q+bHqjLqJq8z
+         CoenmTEDxe0CPzkxvG/lZpmTz7uQP9S3Tn5up//FntjPcenIoG/TpM5FzoEW0xokNK3c
+         bOHzFacBHmxCjGFs0eXmVVoIU+NH5MKz3fmUjvqoUqjgf8TAl7K6Hpy053vFCKAJss1q
+         XPzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779290834; x=1779895634;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DYdgcm/vWN2I8yVr+k4yh1FcDS21+U9vfHPjdUVDhrc=;
+        b=emmzDsZRN0xPAi4M2Htd8/qeuLx73da6c22mlpA8cFh1tBWEqR4zFKDzBkxMJyjJBp
+         AFFyChoJ6VXYeS1L+d9eSBm43LTgTLA2q3QLnLHOsCUXWlpc/mVi597uIcH8l8eWrGXe
+         6D4Lt8juGGeVanlM0J++jU55IH90z5bMBapCFIZU0pNCKy74TJ6MelPWrMiANoKXI8Gz
+         tkmT3jsCFOgNYom6w4GAT2zngQe1+qo55P0ZJSn2thdpPyHHHxCCZKa2ertp97bvSgfG
+         e6/ZWPGrcDO5s7bEPrAcbF8NQJbSsXdRpKZzEPtEK+AevgQVJHgATWPioKPhfhB0s7wA
+         ygEQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8LxBxVv5evHmeiZS4DQCUONXGtlZ2TqV2w6uwJTxZsHdYfSOxiGIviJReQipDvVAhPsVujmEI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxgj7VxcmVPDE8RiaCjYnmRof0D+E6BOz6sKRs1FlQ0mDqSesuG
+	Xjdc/xNMAczPLGZ3SzLckvWKepk36LY+IXCpS6E26S+G5Z+mHrwgovneg1ag+OQqzl+ZXaFnEYZ
+	OUpVa6IVqQOsEdNR1AJnqWw==
+X-Received: from wmbjd23.prod.google.com ([2002:a05:600c:68d7:b0:48a:5e23:da86])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:885:b0:489:c57:7836 with SMTP id 5b1f17b1804b1-48fe6517fdfmr235377385e9.27.1779290833937;
+ Wed, 20 May 2026 08:27:13 -0700 (PDT)
+Date: Wed, 20 May 2026 16:26:33 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260413204630.1149038-5-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.631.ge1b05301d1-goog
+Message-ID: <20260520152650.4107895-1-vdonnefort@google.com>
+Subject: [PATCH 00/17] KVM: arm64: Introduce pKVM hypervisor heap allocator
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com, tabba@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 13, 2026 at 01:46:27PM -0700, Jing Zhang wrote:
-> Introduce the infrastructure to manage and execute guest when running
-> at EL2. This provides the basis for testing advanced features like
-> nested virtualization and GICv4 direct interrupt injection.
-> 
-> The framework includes:
-> - 'struct guest': Encapsulates vCPU state (GPRs, EL1/EL2 sysregs) and
->   Stage-2 MMU context.
-> - guest_create() / guest_destroy(): Handle lifecycle management and
->   Stage-2 MMU setup, including identity mappings for guest code,
->   stack, and UART.
-> - guest_run(): Assembly entry point that saves host callee-saved
->   registers, caches the guest context pointer in TPIDR_EL2, and
->   performs the exception return (ERET) to the guest.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arm/Makefile.arm64      |  2 +
->  lib/arm64/asm-offsets.c | 13 ++++++
->  lib/arm64/asm/guest.h   | 46 +++++++++++++++++++++
->  lib/arm64/asm/sysreg.h  |  6 +++
->  lib/arm64/guest.c       | 89 +++++++++++++++++++++++++++++++++++++++++
->  lib/arm64/guest_arch.S  | 59 +++++++++++++++++++++++++++
->  6 files changed, 215 insertions(+)
->  create mode 100644 lib/arm64/asm/guest.h
->  create mode 100644 lib/arm64/guest.c
->  create mode 100644 lib/arm64/guest_arch.S
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 5e50f5ba..9026fd71 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -41,6 +41,8 @@ cflatobjs += lib/arm64/processor.o
->  cflatobjs += lib/arm64/spinlock.o
->  cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
->  cflatobjs += lib/arm64/stage2_mmu.o
-> +cflatobjs += lib/arm64/guest.o
-> +cflatobjs += lib/arm64/guest_arch.o
->  
->  ifeq ($(CONFIG_EFI),y)
->  cflatobjs += lib/acpi.o
-> diff --git a/lib/arm64/asm-offsets.c b/lib/arm64/asm-offsets.c
-> index 80de023c..ceeecce5 100644
-> --- a/lib/arm64/asm-offsets.c
-> +++ b/lib/arm64/asm-offsets.c
-> @@ -8,6 +8,7 @@
->  #include <libcflat.h>
->  #include <kbuild.h>
->  #include <asm/ptrace.h>
-> +#include <asm/guest.h>
->  
->  int main(void)
->  {
-> @@ -30,5 +31,17 @@ int main(void)
->  	DEFINE(S_FP, sizeof(struct pt_regs));
->  	DEFINE(S_FRAME_SIZE, (sizeof(struct pt_regs) + 16));
->  
-> +	OFFSET(GUEST_X_OFFSET, guest, x);
-> +	OFFSET(GUEST_ELR_OFFSET, guest, elr_el2);
-> +	OFFSET(GUEST_SPSR_OFFSET, guest, spsr_el2);
-> +	OFFSET(GUEST_HCR_OFFSET, guest, hcr_el2);
-> +	OFFSET(GUEST_VTTBR_OFFSET, guest, vttbr_el2);
-> +	OFFSET(GUEST_SCTLR_OFFSET, guest, sctlr_el1);
-> +	OFFSET(GUEST_SP_EL1_OFFSET, guest, sp_el1);
-> +	OFFSET(GUEST_ESR_OFFSET, guest, esr_el2);
-> +	OFFSET(GUEST_FAR_OFFSET, guest, far_el2);
-> +	OFFSET(GUEST_HPFAR_OFFSET, guest, hpfar_el2);
-> +	OFFSET(GUEST_EXIT_CODE_OFFSET, guest, exit_code);
-> +
->  	return 0;
->  }
-> diff --git a/lib/arm64/asm/guest.h b/lib/arm64/asm/guest.h
-> new file mode 100644
-> index 00000000..826c44f8
-> --- /dev/null
-> +++ b/lib/arm64/asm/guest.h
-> @@ -0,0 +1,46 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#ifndef _ASMARM64_GUEST_H_
-> +#define _ASMARM64_GUEST_H_
-> +
-> +#include <libcflat.h>
-> +#include <asm/processor.h>
-> +#include <asm/stage2_mmu.h>
-> +
-> +#define HCR_GUEST_FLAGS (HCR_EL2_VM | HCR_EL2_FMO | HCR_EL2_IMO | \
-> +			 HCR_EL2_AMO | HCR_EL2_RW | HCR_EL2_E2H)
-> +/* Guest stack size */
-> +#define GUEST_STACK_SIZE		SZ_64K
-> +
-> +struct guest {
-> +	/* General Purpose Registers */
-> +	unsigned long x[31]; /* x0..x30 */
-> +
-> +	/* Execution State */
-> +	unsigned long elr_el2;
-> +	unsigned long spsr_el2;
-> +
-> +	/* Control Registers */
-> +	unsigned long hcr_el2;
-> +	unsigned long vttbr_el2;
-> +	unsigned long sctlr_el1;
-> +	unsigned long sp_el1;
-> +
-> +	/* Exit Information */
-> +	unsigned long esr_el2;
-> +	unsigned long far_el2;
-> +	unsigned long hpfar_el2;
-> +	unsigned long exit_code;
-> +
-> +	struct s2_mmu *s2mmu;
-> +};
-> +
-> +struct guest *guest_create(int vmid, void (*guest_func)(void), enum s2_granule granule);
-> +void guest_destroy(struct guest *guest);
-> +void guest_run(struct guest *guest);
-> +
-> +#endif /* _ASMARM64_GUEST_H_ */
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index f2d05018..857bee98 100644
-> --- a/lib/arm64/asm/sysreg.h
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -118,6 +118,10 @@ asm(
->  #define SCTLR_EL1_TCF0_SHIFT	38
->  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
->  
-> +#define HCR_EL2_VM		_BITULL(0)
-> +#define HCR_EL2_FMO		_BITULL(3)
-> +#define HCR_EL2_IMO		_BITULL(4)
-> +#define HCR_EL2_AMO		_BITULL(5)
->  #define HCR_EL2_TGE		_BITULL(27)
->  #define HCR_EL2_RW		_BITULL(31)
->  #define HCR_EL2_E2H		_BITULL(34)
-> @@ -132,6 +136,8 @@ asm(
->  #define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
->  #define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
->  
-> +#define SYS_SCTLR_EL1		sys_reg(3, 5, 1, 0, 0)
-> +
->  #define INIT_SCTLR_EL1_MMU_OFF	\
->  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
->  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
-> diff --git a/lib/arm64/guest.c b/lib/arm64/guest.c
-> new file mode 100644
-> index 00000000..68dd449d
-> --- /dev/null
-> +++ b/lib/arm64/guest.c
-> @@ -0,0 +1,89 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#include <libcflat.h>
-> +#include <asm/guest.h>
-> +#include <asm/io.h>
-> +#include <asm/sysreg.h>
-> +#include <asm/barrier.h>
-> +#include <alloc_page.h>
-> +#include <alloc.h>
-> +
-> +static struct guest *__guest_create(struct s2_mmu *s2_ctx, void *entry_point)
-> +{
-> +	struct guest *guest = calloc(1, sizeof(struct guest));
-> +
-> +	guest->elr_el2 = (unsigned long)entry_point;
-> +	guest->spsr_el2 = 0x3C5; /* M=EL1h, DAIF=Masked */
-> +	guest->hcr_el2 = HCR_GUEST_FLAGS;
-> +
-> +	if (s2_ctx) {
-> +		guest->vttbr_el2 = virt_to_phys(s2_ctx->pgd);
-> +		guest->vttbr_el2 |= ((unsigned long)s2_ctx->vmid << 48);
-> +	} else {
-> +		printf("Stage 2 MMU context missing!");
-> +	}
-> +
-> +	guest->sctlr_el1 = read_sysreg(sctlr_el1);
-> +	/* Disable guest stage 1 translation */
-> +	guest->sctlr_el1 &= ~(SCTLR_EL1_M | SCTLR_EL1_C);
-> +	guest->sctlr_el1 |= SCTLR_EL1_I;
-> +
-> +	guest->s2mmu = s2_ctx;
-> +
-> +	return guest;
-> +}
-> +
-> +struct guest *guest_create(int vmid, void (*guest_func)(void), enum s2_granule granule)
-> +{
-> +	unsigned long guest_pa, code_base, stack_pa;
-> +	unsigned long *stack_page;
-> +	struct guest *guest;
-> +	struct s2_mmu *ctx;
-> +
-> +	ctx = s2mmu_init(vmid, granule, true);
-> +	/*
-> +	 * Map the Host's code segment Identity Mapped (IPA=PA).
-> +	 * To be safe, we map a large chunk (e.g., 2MB) around the function
-> +	 * to capture any helper functions the compiler might generate calls to.
-> +	 */
-> +	guest_pa = virt_to_phys((void *)guest_func);
-> +	code_base = guest_pa & ~(SZ_2M - 1);
-> +	s2mmu_map(ctx, code_base, code_base, SZ_2M, S2_MAP_RW);
-> +
-> +	/*
-> +	 * Map Stack
-> +	 * Allocate 16 pages (64K) in Host, get its PA, and map it for Guest.
-> +	 */
-> +	stack_page = alloc_pages(get_order(GUEST_STACK_SIZE >> PAGE_SHIFT));
-> +	stack_pa = virt_to_phys(stack_page);
-> +	/* Identity Map it (IPA = PA) */
-> +	s2mmu_map(ctx, stack_pa, stack_pa, GUEST_STACK_SIZE, S2_MAP_RW);
-> +
-> +	s2mmu_enable(ctx);
-> +
-> +	/* Create Guest */
-> +	/* Entry point is the PA of the function (Identity Mapped) */
-> +	guest = __guest_create(ctx, (void *)guest_pa);
-> +
-> +	/*
-> +	 * Setup Guest Stack Pointer
-> +	 * Must match where we mapped the stack + Offset
-> +	 */
-> +	guest->sp_el1 = stack_pa + GUEST_STACK_SIZE;
-> +
-> +	/* Map UART identity mapped, printf() available to guest */
-> +	s2mmu_map(ctx, 0x09000000, 0x09000000, PAGE_SIZE, S2_MAP_DEVICE);
-> +
-> +	return guest;
-> +}
-> +
-> +void guest_destroy(struct guest *guest)
-> +{
-> +	s2mmu_disable(guest->s2mmu);
-> +	s2mmu_destroy(guest->s2mmu);
-> +	free(guest);
-> +}
-> diff --git a/lib/arm64/guest_arch.S b/lib/arm64/guest_arch.S
-> new file mode 100644
-> index 00000000..70c19507
-> --- /dev/null
-> +++ b/lib/arm64/guest_arch.S
-> @@ -0,0 +1,59 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#define __ASSEMBLY__
-> +#include <asm/asm-offsets.h>
-> +#include <asm/sysreg.h>
-> +
-> +.global guest_run
-> +guest_run:
-> +	/* x0 = struct guest pointer */
-> +
-> +	/* Save Host Callee-Saved Regs */
-> +	stp	x29, x30, [sp, #-16]!
-> +	stp	x27, x28, [sp, #-16]!
-> +	stp	x25, x26, [sp, #-16]!
-> +	stp	x23, x24, [sp, #-16]!
-> +	stp	x21, x22, [sp, #-16]!
-> +	stp	x19, x20, [sp, #-16]!
-> +
-> +	/* Cache Guest Pointer in TPIDR_EL2 */
-> +	msr	tpidr_el2, x0
-> +
-> +	/* Load Guest System Registers */
-> +	ldr	x1, [x0, #GUEST_ELR_OFFSET]
-> +	msr	elr_el2, x1
-> +	ldr	x1, [x0, #GUEST_SPSR_OFFSET]
-> +	msr	spsr_el2, x1
-> +	ldr	x1, [x0, #GUEST_HCR_OFFSET]
-> +	msr	hcr_el2, x1
+pKVM historically lacked a dynamic memory allocator: all hypervisor-side
+VM and VCPU structures had to be sized on the host, allocated as
+contiguous pages and donated to the hypervisor.
 
-Here we just override hcr_el2 with the guest's hcr_el2, but we don't
-save/restore the host's value anywhere.
+This design tightly coupled the hypervisor's memory footprint to
+host-side constraints, complicated memory reclaim, and severely
+restricted VM scalability.
 
-example:
+This patch series introduces a dynamically-mapped custom heap allocator
+(hyp_allocator) to the pKVM hypervisor. The initial users are the
+pkvm_hyp_vm and pkvm_hyp_vcpu structs, and the hypervisor tracing
+metadata.
 
-diff --git a/arm/stage2-mmu-test.c b/arm/stage2-mmu-test.c
-index 0df4704b..a8fcc697 100644
---- a/arm/stage2-mmu-test.c
-+++ b/arm/stage2-mmu-test.c
-@@ -98,7 +98,9 @@ int main(int argc, char **argv)
- 
-        report_info("CPU%d: entering guest...", smp_processor_id());
- 
-+       printf("HCR TGE: %d\n", read_sysreg(hcr_el2) & HCR_EL2_TGE);
-        guest_run(guest);
-+       printf("HCR TGE: %d\n", read_sysreg(hcr_el2) & HCR_EL2_TGE);
- 
-        report(handled, "Stage-2 fault handling test completed");
-        guest_destroy(guest);
+In the near future, this heap allocator is expected to be leveraged to
+support SVE in protected VMs and in the distant future, it will also
+support dynamic device assignment.
+
+By moving to a hypervisor-managed dynamic allocator, we also allow
+deduplicating the donation/reclaim path of EL2-private structures.
+
+The main building blocks for this series are:
+
+1. pkvm_hyp_req:
+----------------
+When the hypervisor heap allocator goes out of memory (-ENOMEM), it
+suspends the hypercall, embeds a PKVM_HYP_REQ_HYP_ALLOC top-up request
+into the SMCCC HVC return registers, and exits back to the host.
+
+This building block will also be useful for the future huge-mapping
+support in protected guests, allowing EL2 to raise requests such as
+block splitting back to the host.
+
+2. hyp_allocator:
+----------------
+This heap allocator manages a reserved VA space range, dynamically
+mapping and unmapping physical pages on-demand to minimise the pKVM
+hypervisor footprint. As memory is reclaimed and relinquished to the
+host, unmapped holes are introduced within the VA space. To prevent
+orphan mapped regions, neighboring unused chunks cannot be merged if
+they are separated by an unmapped region.
+
+The allocator chunk metadata is stored directly into the VA space range.
+To minimize metadata overhead, chunks only link to each other via a
+relative 32-bit offset.
+
+A simple hardening of the metadata is added via a simple 32-bit hash.
+
+3. shrinker:
+------------
+As the heap allocator isn't reclaimed actively on VM or tracing
+teardown, a shrinker is added to allow the host to reclaim unused memory
+from the hypervisor when the host is under heavy memory pressure.
+
+Vincent Donnefort (17):
+  KVM: arm64: Add __pkvm_private_range_pa
+  KVM: arm64: Add pkvm_remove_mappings
+  KVM: arm64: Add __hyp_allocator_map for the pKVM hyp
+  KVM: arm64: Add a heap allocator for the pKVM hyp
+  KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
+  KVM: arm64: Add topup interface for the pKVM heap allocator
+  KVM: arm64: Add pkvm_hyp_req infrastructure
+  KVM: arm64: Handle PKVM_HYP_REQ_HYP_ALLOC request
+  KVM: arm64: Add reclaim interface for the pKVM heap alloc
+  KVM: arm64: Add selftests for the pKVM heap allocator
+  KVM: arm64: Add a shrinker for pKVM
+  KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
+  KVM: arm64: Move hyp_vm refcount into the structure
+  KVM: arm64: Use noclear for PGD in __pkvm_init_vm error path
+  KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
+  KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+  KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
+
+ arch/arm64/include/asm/kvm_asm.h        |    4 +
+ arch/arm64/include/asm/kvm_host.h       |   14 +-
+ arch/arm64/include/asm/kvm_mmu.h        |    3 +
+ arch/arm64/include/asm/kvm_pkvm.h       |  104 ++
+ arch/arm64/kvm/arm.c                    |   24 +
+ arch/arm64/kvm/hyp/hyp-constants.c      |    2 -
+ arch/arm64/kvm/hyp/include/nvhe/alloc.h |   24 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h    |    3 +
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |   19 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |    2 +-
+ arch/arm64/kvm/hyp/nvhe/alloc.c         | 1233 +++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  123 ++-
+ arch/arm64/kvm/hyp/nvhe/mm.c            |   33 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  111 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c         |    5 +
+ arch/arm64/kvm/hyp/nvhe/trace.c         |   69 +-
+ arch/arm64/kvm/hyp_trace.c              |   16 +-
+ arch/arm64/kvm/mmu.c                    |    4 +-
+ arch/arm64/kvm/pkvm.c                   |  130 ++-
+ arch/arm64/kvm/trace_pkvm.h             |   37 +
+ 20 files changed, 1808 insertions(+), 152 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/alloc.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/alloc.c
+ create mode 100644 arch/arm64/kvm/trace_pkvm.h
 
 
-Not sure of the best way to solve it, could maybe add a host_state struct that
-stores registers/state (that can affect the host), and you can also embed one
-in `struct guest` and save/restore from there?
+base-commit: 5d6919055dec134de3c40167a490f33c74c12581
+-- 
+2.54.0.631.ge1b05301d1-goog
 
-Thanks,
-Joey
-
-> +	ldr	x1, [x0, #GUEST_VTTBR_OFFSET]
-> +	msr	vttbr_el2, x1
-> +	ldr	x1, [x0, #GUEST_SCTLR_OFFSET]
-> +	msr_s	SYS_SCTLR_EL1, x1
-> +	ldr	x1, [x0, #GUEST_SP_EL1_OFFSET]
-> +	msr	sp_el1, x1
-> +
-> +	/* Load Guest GPRs */
-> +	ldp	x1, x2, [x0, #8]
-> +	ldp	x3, x4, [x0, #24]
-> +	ldp	x5, x6, [x0, #40]
-> +	ldp	x7, x8, [x0, #56]
-> +	ldp	x9, x10, [x0, #72]
-> +	ldp	x11, x12, [x0, #88]
-> +	ldp	x13, x14, [x0, #104]
-> +	ldp	x15, x16, [x0, #120]
-> +	ldp	x17, x18, [x0, #136]
-> +	ldp	x19, x20, [x0, #152]
-> +	ldp	x21, x22, [x0, #168]
-> +	ldp	x23, x24, [x0, #184]
-> +	ldp	x25, x26, [x0, #200]
-> +	ldp	x27, x28, [x0, #216]
-> +	ldp	x29, x30, [x0, #232]
-> +	ldr	x0, [x0, #0]
-> +
-> +	isb
-> +	eret
-> -- 
-> 2.53.0.1213.gd9a14994de-goog
-> 
