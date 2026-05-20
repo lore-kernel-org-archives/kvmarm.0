@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612B03BED79
-	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 09:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED173BFAD3
+	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 09:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779268817; cv=none; b=M3v7Zo6eAfV4NbBH2qnnmnJRl96thQvVDBR6EH1+c7qDP2RCT/C3GJYK48BWRSwqkIGqgVnkNmy7zvsSabDT3X8Rme8JYgket+NMMw9TgdoBigSrrFBjlVtXtbegqjbUW5NCCYw6X08xE6uvsOLxNA7m+DqgKmBd8Gl9Jv+qchE=
+	t=1779268817; cv=none; b=TlzC+sq2RBZNrGP2sMS6IeoJWFHmcN65wdtFOYbE2lCHdTKSmPed2HfAL63yhO+bXRv0rH5wDFqYput6HZEbjIjk9S6/toTtST66vkpoksDELjO3yiyQMJHuQLwGKxJl0PQs9gCTMQ3WcQSaa/ibE86tjv95kaTQLL6EsA05zjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779268817; c=relaxed/simple;
-	bh=kvRfycaZDSggSPfdRhmD3S0u3GFFUyi419jgkqqwWpY=;
+	bh=bMNxwJJLbaeZTGpTvgbj+wuOkGjNEfCJ4WH4eIJ611c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YVsgukv959zpgZG/O9yNfL0Ss05PV4mX7nHqI5/VkubAdYz1oh7Qf/X7NsCto1eWY3Ij1g+cnuosgES4xSfJJKl95U2fFPjGh5nl0lpr82FpGBtJBlHGVqa8Ml4iByG0Kw+Awm/BdMPxjR4l9w+YSwVfFr0awQMWut5/yP4ndRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLV3pc9/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=rR6RPMDJIe13VVVxP3vx5tp7j1MTBbEYNrSe1D+O7An4PaEVa9CZ1y0ravTJWCwhQ5llzb6ITZ8V/uQ4bUSc2fuTZ3SyLaFqujDnp8ZqUOJUUOD41T+ctIr/HAkzmr88AZeaxq9ao3XhiL19L8qzpEV1OvLEeKzog7UeQG8Ed+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BH29QoBv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLV3pc9/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2984F1F00898;
-	Wed, 20 May 2026 09:20:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BH29QoBv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12CC51F008A0;
+	Wed, 20 May 2026 09:20:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779268813;
-	bh=1TIzKuY83q97U1U+0f8lUwk8XwQIwJ6OrTSRAlmEejI=;
+	s=k20260515; t=1779268815;
+	bh=kqQFClT82XrGpGP+eCWxLur1RYyxjshGCfc9InJnvnA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cLV3pc9/PX5HDAD/BE3FqjE0SYANog0dx37qTlsgIML1uUo11+E71W5YzJ9XnCPG1
-	 TgwBt95CzdT+hVKA/Tv0pbL1IMGMHu8Drxyzj9uPOArpi1W8az8LvkX+PAD5zYbbRP
-	 169iYbXYnc3pBqNBVQpj4GGO7/TNyDiMaMLAeNI8aKjeG+SfErvAW2WnDMcKuGWNk2
-	 o6QO/csRcuXIrb7B8v//rLRtI2KhfMAF15EagxYoJ6EFgmGflXDSZcRFy2HjZFIEnF
-	 r/hdLJcoZeF7A++kkc1X/+zba4o7l69zghrCUYhXVBVk9NpDpUFNPdgLNb5HVhRiSc
-	 LM5ighT0q3nqA==
+	b=BH29QoBv9xFqeEkJBUcWWt3/hRdJezMKmbKfI0NozczrqR+G+U0h5Fbjqpy+qcpvX
+	 P5Twe9gF9Mm2no2R0ZbR49lFawxwnBGVM3Yok6UM/kcn+HoorhN/dXVloKkTlcsqye
+	 iVpDBxnMMPNOT3Ey1+//xje49lFJ8aDH27LHourGpbmcGlQvz03dEhdGGk/yDvWy1S
+	 Vkydqap48mJacth4bM9LCpItyms6JYVhjFuSODEUqv7Y7qKEbT5JN/zH0IgJBYnTLW
+	 NIkGIvyekcCbbRa8+WIKmFcyJPznsw5ZqZfQwpHr9QSWXqz8Wg63ugi2ablrItgfln
+	 qlg085FJiIYnw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wPd63-00000004IaV-1nFT;
-	Wed, 20 May 2026 09:20:11 +0000
+	id 1wPd65-00000004IaV-1UPx;
+	Wed, 20 May 2026 09:20:13 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -41,9 +41,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH v2 06/18] KVM: arm64: vgic: Consolidate vgic_allocate_private_irqs_locked()
-Date: Wed, 20 May 2026 10:19:37 +0100
-Message-ID: <20260520091949.542365-7-maz@kernel.org>
+Subject: [PATCH v2 15/18] Documentation: KVM: Fix typos in VGICv5 documentation
+Date: Wed, 20 May 2026 10:19:46 +0100
+Message-ID: <20260520091949.542365-16-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260520091949.542365-1-maz@kernel.org>
 References: <20260520091949.542365-1-maz@kernel.org>
@@ -59,107 +59,43 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-vgic_allocate_private_irqs_locked() calls two helpers, oddly named
-vgic_{,v5_}allocate_private_irq().
+From: Sascha Bischoff <sascha.bischoff@arm.com>
 
-Not only these helpers don't allocate anything, but they also
-contain duplicate init code that would be better placed in the
-caller.
+Fix two typos in the VGICv5 documentation.
 
-Consolidate the common init code in the caller, rename the helpers
-to vgic_{,v5_}setup_private_irq(), and pass the irq pointer around
-instead of the index of the interrupt.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Fixes: d51c978b7d3e ("KVM: arm64: gic-v5: Communicate userspace-driveable PPIs via a UAPI")
+Fixes: eb3c4d2c9a4d ("Documentation: KVM: Introduce documentation for VGICv5")
+Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
+Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c | 45 +++++++++++++--------------------
- 1 file changed, 18 insertions(+), 27 deletions(-)
+ Documentation/virt/kvm/devices/arm-vgic-v5.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 933983bb20052..907057881b26a 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -271,18 +271,12 @@ int kvm_vgic_vcpu_nv_init(struct kvm_vcpu *vcpu)
- 	return ret;
- }
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+index 29335ea823fc5..70b9162755c7e 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+@@ -12,8 +12,8 @@ Only one VGIC instance may be instantiated through this API.  The created VGIC
+ will act as the VM interrupt controller, requiring emulated user-space devices
+ to inject interrupts to the VGIC instead of directly to CPUs.
  
--static void vgic_allocate_private_irq(struct kvm_vcpu *vcpu, int i, u32 type)
-+static void vgic_setup_private_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				   u32 type)
- {
--	struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
-+	irq->intid = irq - &vcpu->arch.vgic_cpu.private_irqs[0];
+-Creating a guest GICv5 device requires a host GICv5 host.  The current VGICv5
+-device only supports PPI interrupts.  These can either be injected from emulated
++Creating a guest GICv5 device requires a GICv5 host.  The current VGICv5 device
++only supports PPI interrupts.  These can either be injected from emulated
+ in-kernel devices (such as the Arch Timer, or PMU), or via the KVM_IRQ_LINE
+ ioctl.
  
--	INIT_LIST_HEAD(&irq->ap_list);
--	raw_spin_lock_init(&irq->irq_lock);
--	irq->vcpu = NULL;
--	irq->target_vcpu = vcpu;
--	refcount_set(&irq->refcount, 0);
--
--	irq->intid = i;
--	if (vgic_irq_is_sgi(i)) {
-+	if (vgic_irq_is_sgi(irq->intid)) {
- 		/* SGIs */
- 		irq->enabled = 1;
- 		irq->config = VGIC_CONFIG_EDGE;
-@@ -303,18 +297,11 @@ static void vgic_allocate_private_irq(struct kvm_vcpu *vcpu, int i, u32 type)
- 	}
- }
+@@ -25,7 +25,7 @@ Groups:
+       request the initialization of the VGIC, no additional parameter in
+       kvm_device_attr.addr. Must be called after all VCPUs have been created.
  
--static void vgic_v5_allocate_private_irq(struct kvm_vcpu *vcpu, int i, u32 type)
-+static void vgic_v5_setup_private_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
- {
--	struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
--	u32 intid = vgic_v5_make_ppi(i);
--
--	INIT_LIST_HEAD(&irq->ap_list);
--	raw_spin_lock_init(&irq->irq_lock);
--	irq->vcpu = NULL;
--	irq->target_vcpu = vcpu;
--	refcount_set(&irq->refcount, 0);
-+	int i = irq - &vcpu->arch.vgic_cpu.private_irqs[0];
- 
--	irq->intid = intid;
-+	irq->intid = vgic_v5_make_ppi(i);
- 
- 	/* The only Edge architected PPI is the SW_PPI */
- 	if (i == GICV5_ARCH_PPI_SW_PPI)
-@@ -323,7 +310,7 @@ static void vgic_v5_allocate_private_irq(struct kvm_vcpu *vcpu, int i, u32 type)
- 		irq->config = VGIC_CONFIG_LEVEL;
- 
- 	/* Register the GICv5-specific PPI ops */
--	vgic_v5_set_ppi_ops(vcpu, intid);
-+	vgic_v5_set_ppi_ops(vcpu, irq->intid);
- }
- 
- static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
-@@ -349,15 +336,19 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
- 	if (!vgic_cpu->private_irqs)
- 		return -ENOMEM;
- 
--	/*
--	 * Enable and configure all SGIs to be edge-triggered and
--	 * configure all PPIs as level-triggered.
--	 */
- 	for (i = 0; i < num_private_irqs; i++) {
-+		struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
-+
-+		INIT_LIST_HEAD(&irq->ap_list);
-+		raw_spin_lock_init(&irq->irq_lock);
-+		irq->vcpu = NULL;
-+		irq->target_vcpu = vcpu;
-+		refcount_set(&irq->refcount, 0);
-+
- 		if (vgic_is_v5(vcpu->kvm))
--			vgic_v5_allocate_private_irq(vcpu, i, type);
-+			vgic_v5_setup_private_irq(vcpu, irq);
- 		else
--			vgic_allocate_private_irq(vcpu, i, type);
-+			vgic_setup_private_irq(vcpu, irq, type);
- 	}
- 
- 	return 0;
+-   KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
++   KVM_DEV_ARM_VGIC_USERSPACE_PPIS
+       request the mask of userspace-drivable PPIs. Only a subset of the PPIs can
+       be directly driven from userspace with GICv5, and the returned mask
+       informs userspace of which it is allowed to drive via KVM_IRQ_LINE.
 -- 
 2.47.3
 
