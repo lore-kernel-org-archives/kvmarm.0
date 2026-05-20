@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A54F3BF67A
-	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 09:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D73BED7D
+	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 09:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779268817; cv=none; b=MKDjck0gFPVn3oBY1Oa4QR1FTnEPwPKugw1wWituF7usmaJORAf3T1xRBC5I42SyRspZ4YmcZnQMgQcHsLFmFPfHt5N+vOozISF1FYnGZg8ic1w5UbxjpjbUOKgxeILkWxCYeTAFPEZGJdTugcVez9OFm5UqVMxrOrMRHZRUP+0=
+	t=1779268817; cv=none; b=F/J34W2zzcrMIh+8r6hJxUrffqXDycr9MqUAiFikkWRcI/ZAtVWermYI3mmB/TyHlwzfYedHUHVgjeDqfUQLAOBnrDKlQlInDzpolaJwRH1ueTyTJddUbsN2w/8XGmjqUNmF1c2/KFPgQ+ZDePYHFQ0UcNdBAV4ZcC5BJguyZJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779268817; c=relaxed/simple;
-	bh=BZz1qnB2VX9ACDvWCNyOh7Vg0dUXghFKOcw3QAKYdvE=;
+	bh=4O2tjpioJqd//0KbFaz1sYAXnYomHj/ux0W5kwRiKFo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MqxXlpG2E2fBGI1UZhXUTwHstAADKRi8PY12QeaL8x70C6jBgeMR2V/iOhkZBN7fCCO1krjQTzfRuYJvDymXBdE+/1CeYZzqswWGEObEtR/mzZ944IEvUG720LoWSPwD3jK0iL+7GTaYHWMaeasDXkNJayvwYJvj8Nxo29ZxVpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdqPYev4; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=AXs5RwqOy0u88SGVCVQs1rnAv+dpq3fWwOEyXrZ+QXATRDVe/9mHIFQ6d5B5UWZxrOHhhpLp7EN5YDmqGGrG3RO9kl6rFACekoBxZVlc6R1ZXA9iKycVsSZgbP2vfg9M0E1nxxsdMUtRHowO+0LDVWCq4DitH2QgetxvKjkJdzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cR1OSIlT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdqPYev4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50AF61F00893;
-	Wed, 20 May 2026 09:20:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cR1OSIlT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 833871F0089E;
+	Wed, 20 May 2026 09:20:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779268814;
-	bh=Y73/712ucFBf0Y4l8UyabCLqbd4ZcvBJJwObvbr5Gwo=;
+	s=k20260515; t=1779268813;
+	bh=QRG2UUB+bvCAJewpeLGo2zr3hssMfYBAjZROWVUDPsE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=WdqPYev4RKpxkjPdnUoKTYgTJ6CCx5iyuXSvynvIT7xPJmh/igebYdS23I2FIw/Ld
-	 sboGJKLqQt5/8Oe51J7rkzngQio1M8MLOFaxVikK9fDAO9IT1/Vu6d20J+P9ABcwg6
-	 oogdRufGiU1NvydjJHWo7xsVgrItXQUVG70wzC4Dp5y99agDpt2wGO1kWNvmvR9PGg
-	 r2blA3+QvNsbvGaAI0uhK1w1q09dqFyrhfV+3g3MHXKDCFHy1FsQJPowZmSuwelKLD
-	 wZ/FRWbWlZJbX/Tx33B+7VtoiB9ZKovN/CGC3T0aIVvaJnw0TqwYJqapcOSUlruc+c
-	 ZOhclw1KbpEQQ==
+	b=cR1OSIlTlRJlCgyc0nterhjdN7TG11G+i3IDIwwOHMq1vdQoDsbX/IZHlpSKKrTkf
+	 W+WPw3P4eo8T3qaSf03yZGvApTawSW6+bkcmp80Z1qn3+vQzX4CR0r10o+3XO1a7jp
+	 5Vhec+oQQVuZv7F/mFDMMvoE+chLE5ZOTWcAVPYRuRr/yqSygTv59ujLj8Si3gKMB7
+	 vIqYTBH0DQu1o2zxx0LK8Sise+6yvdcI66DbyBNRC85EEm8CBhBaoV7M1lH6XHgSnR
+	 TLqJOf254Hi8MHhuHMgQGJKtbgU5XKr+VzVz1CYUWQ5Z4PEoRLgIYPVBI+e/cUWvLU
+	 ZpgRfwb3O7AWQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wPd64-00000004IaV-21VV;
-	Wed, 20 May 2026 09:20:12 +0000
+	id 1wPd63-00000004IaV-3WyX;
+	Wed, 20 May 2026 09:20:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -41,9 +41,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH v2 11/18] KVM: arm64: vgic-v5: Atomically assign bits to PPI DVI bitmap
-Date: Wed, 20 May 2026 10:19:42 +0100
-Message-ID: <20260520091949.542365-12-maz@kernel.org>
+Subject: [PATCH v2 08/18] KVM: arm64: vgic: Rationalise per-CPU irq accessor
+Date: Wed, 20 May 2026 10:19:39 +0100
+Message-ID: <20260520091949.542365-9-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260520091949.542365-1-maz@kernel.org>
 References: <20260520091949.542365-1-maz@kernel.org>
@@ -59,43 +59,61 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Sascha Bischoff <sascha.bischoff@arm.com>
+Despite adding the necessary infrastructure to identify irq types,
+vgic_get_vcpu_irq() treats GICv5 PPIs in a special way, which
+impairs the readability of the code.
 
-For GICv5 guests we make use of the DVI mechanism for PPIs where
-possible.  When mapping a virtual irq to a physical one for a GICv5
-guest, the corresponding bit in the DVI bitmap is set. When unmapping,
-said bit is cleared again. The key user of this mechanism is the arch
-timer.
+Use the existing irq classifiers to handle per-CPU irqs for all
+vgic types, and let the normal control flow reach global interrupt
+handling without any v5-specific path.
 
-The existing code used the non-atomic __assign_bit() rather than doing
-the update atomically. This could technically result in losing state
-if a second PPI's DVI bit were being manipulated concurrently. Each
-individual bit within the DVI bitmap is guarded using
-vgic_irq->irq_lock, but there's no locking for the overall
-bitmap. Therefore, switch to using the atomic assign_bit() function
-instead.
-
-Fixes: 5a98d0e17e59 ("KVM: arm64: gic-v5: Implement direct injection of PPIs")
-Link: https://sashiko.dev/#/patchset/20260319154937.3619520-1-sascha.bischoff%40arm.com
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v5.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 7916bd8d564ef..d4789ff3e7402 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -272,7 +272,7 @@ void vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, struct vgic_irq *irq, bool dvi)
- 	lockdep_assert_held(&irq->irq_lock);
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 3ac6d49bc4876..b697678d68b01 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -106,24 +106,23 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
  
- 	ppi = vgic_v5_get_hwirq_id(irq->intid);
--	__assign_bit(ppi, cpu_if->vgic_ppi_dvir, dvi);
-+	assign_bit(ppi, cpu_if->vgic_ppi_dvir, dvi);
- }
+ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
+ {
++	enum kvm_device_type type;
++
+ 	if (WARN_ON(!vcpu))
+ 		return NULL;
  
- static const struct irq_ops vgic_v5_ppi_irq_ops = {
+-	if (vgic_is_v5(vcpu->kvm)) {
+-		u32 int_num, hwirq_id;
+-
+-		if (!__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, intid))
+-			return NULL;
+-
+-		hwirq_id = FIELD_GET(GICV5_HWIRQ_ID, intid);
+-		int_num = array_index_nospec(hwirq_id, VGIC_V5_NR_PRIVATE_IRQS);
++	type = vcpu->kvm->arch.vgic.vgic_model;
+ 
+-		return &vcpu->arch.vgic_cpu.private_irqs[int_num];
+-	}
++	if (__irq_is_sgi(type, intid) || __irq_is_ppi(type, intid)) {
++		switch (type) {
++		case KVM_DEV_TYPE_ARM_VGIC_V5:
++			intid = vgic_v5_get_hwirq_id(intid);
++			intid = array_index_nospec(intid, VGIC_V5_NR_PRIVATE_IRQS);
++			break;
++		default:
++			intid = array_index_nospec(intid, VGIC_NR_PRIVATE_IRQS);
++		}
+ 
+-	/* SGIs and PPIs */
+-	if (intid < VGIC_NR_PRIVATE_IRQS) {
+-		intid = array_index_nospec(intid, VGIC_NR_PRIVATE_IRQS);
+ 		return &vcpu->arch.vgic_cpu.private_irqs[intid];
+ 	}
+ 
 -- 
 2.47.3
 
