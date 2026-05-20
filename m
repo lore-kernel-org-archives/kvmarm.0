@@ -1,51 +1,45 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC524502A
-	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 11:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE90244667
+	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 13:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779277824; cv=none; b=SrReRlzGVx6fxg3T3bIaMNlS7eQgPk45LUvTlFABbO21bH0of5R6prOvK7axGTXsGfC/y0noTN9AuLe2JyHAPttlAihFWISIobmidEP9GKyPnd5TvnRO9nSG65lKK1UQX+LL0ni+gzqRYL3ik7pbmBm1UDfz3J5XKfzZc1v08bI=
+	t=1779282148; cv=none; b=OGujtHvAUew8r6UzWP30ittJurAcAgpKTHd6COcj3TZFgD0iC4XqmJBi8ftB2e5hdcuJrKVokVI9qltlT/W9npx2T5AfkvZa2gTwIjpJuQeZoRMaHRheJExS2zyWxsikTTstvX7NmFHFFtKiVpw7db2LX1UVGHKHn/CtBX9fZZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779277824; c=relaxed/simple;
-	bh=hPKT3WzdkwMamGhokWO/Li0K/EjbItHBpVmy/rZjq6Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=oVMvqcSOArOir1TwLuN/M1KNahCSZNuC2AgvKWdiqBXMulhvjRk2PaoU8H9+ECIWi0D9OVMJmUAc6StU2a0tFfmwzs7IOfHJ4ckACx+SfBw/q7rMTF6y6isFqJOBhNOUYbuSoTx+2UP7ppb/d6YnH5t4pC0wjITPPKObcJXfghg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=u8V4vwUy; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1779282148; c=relaxed/simple;
+	bh=EouBC0yqkVKdLRVBmbSVOwjS0lsH3zO5YOwcji/96BI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sq5pzGfm+FE404GdN3FtzYUywFiNQsFIF5LQ8itK+KRj9lCMc6VkUp9U/xYcZNKF0fNOY16knyp44y4OWq22E7C3c/82uMT1R8PcaP5TZ6LeLSWcRJbTuakziJcnxPKXthN1/y9jCGLL7jPLm+mY9hBDCfzpgPJyVNNb+v7Bd3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SOF+eZMX; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="u8V4vwUy"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SOF+eZMX"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A70783597;
-	Wed, 20 May 2026 04:50:12 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B1433F632;
-	Wed, 20 May 2026 04:50:15 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62A691516;
+	Wed, 20 May 2026 06:02:20 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E18A3F85F;
+	Wed, 20 May 2026 06:02:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779277817; bh=hPKT3WzdkwMamGhokWO/Li0K/EjbItHBpVmy/rZjq6Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=u8V4vwUykvL5GS+hJov9hbaKLBze2jIIkaSFpdN/x3vZlkx7Ci/BQDyoP0lTp0vz6
-	 zXb33XaRUTNgUIsOOrUcLcDc96098hMKEIDhKFF3wS+5B91qJOVcitEcMFbCLbax7W
-	 dbutQ6rjU2xakgYSJ8KrErCxKpgEmR3Cmx7YF2y8=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
+	t=1779282145; bh=EouBC0yqkVKdLRVBmbSVOwjS0lsH3zO5YOwcji/96BI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SOF+eZMXF24B1OFynsRWIEETVfZ0f67BmjjkvJRHBGxpQrmojbkVsqClEWUipTkch
+	 t+BKe5MqCoHhbo6wv2ohysbnGpMe3aZPxCwR4fRh5SAzhvyWgo9pbK19+xcNFQhHcC
+	 X2zZhkc2C4d7z7D27aVI2NQ5p/qsqU/0+vWT3u/4=
+Date: Wed, 20 May 2026 14:02:08 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: Introduce S2 walker SKIP return options
-Date: Wed, 20 May 2026 12:49:56 +0100
-Message-ID: <ag2f5C3i3LBGSPS5@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <agzUZS1l-uHQoodG@kernel.org>
-References: <20260515195904.2466381-1-leo.bras@arm.com> <20260515195904.2466381-2-leo.bras@arm.com> <agq-RyKhBy4CIThm@kernel.org> <agrTQMw4QJX6HGrm@willie-the-truck> <agsYF-Dav2bpxWK4@devkitleo> <agxa-TydN1PoKsYn@willie-the-truck> <agxeEA14cP3yMV1m@devkitleo> <agxifbKzGcYQivBz@willie-the-truck> <agx1J1tQFn0cdtBf@devkitleo> <agzUZS1l-uHQoodG@kernel.org>
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Don't save/restore FP register
+ during a nested ERET or exception
+Message-ID: <ag2w0G34NycT2456@J2N7QTR9R3.cambridge.arm.com>
+References: <20260520085036.541666-1-maz@kernel.org>
+ <20260520085036.541666-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,107 +48,105 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260520085036.541666-3-maz@kernel.org>
 
-On Tue, May 19, 2026 at 02:21:41PM -0700, Oliver Upton wrote:
-> On Tue, May 19, 2026 at 03:35:19PM +0100, Leonardo Bras wrote:
-> > On Tue, May 19, 2026 at 02:15:41PM +0100, Will Deacon wrote:
-> > > On Tue, May 19, 2026 at 01:56:48PM +0100, Leonardo Bras wrote:
-> > > > On Tue, May 19, 2026 at 01:43:37PM +0100, Will Deacon wrote:
-> > > > > > > I was wondering along similar lines, but maybe it would be useful just
-> > > > > > > to pass a maximum level to the walker logic? That feels like the most
-> > > > > > > general case without complicating the existing logic.
+On Wed, May 20, 2026 at 09:50:36AM +0100, Marc Zyngier wrote:
+> When switching between L1 and L2, we save the old state using
+> kvm_arch_vcpu_put(), mutate the state in memory, then load the new
+> state using kvm_arch_vcpu_load(). Any live FPSIMD/SVE state is saved
+> and unbound, such that it can be lazily restored on a subsequent trap.
 > 
-> FWIW, I had considered this too but decided that it requires a bit more
-> churn since we cannot rely on zero initialization in the existing
-> callsites (level 0 is a valid level).
+> The FPSIMD/SVE state is shared by exception levels, and only a handful
+> of related control registers need to be changed when transitioning
+> between L1 and L2. The save/restore of the common state is needless
+> overhead, especially as trapping becomes exponentially more expensive
+> with nesting.
 > 
-> But that's extremely minor.
+> Avoid this overhead by leaving the common FPSIMD/SVE state live on the
+> CPU, and only switching the state that is distinct for L1 and L2:
 > 
-> > > > > > This proposal seems simpler for me to understand, and indeed looks like a 
-> > > > > > better solution than what I have proposed, taking care of  the 
-> > > > > > 'already split' case with better performance, as it don't even walk a 
-> > > > > > single level-3 entry. 
-> > > > > > 
-> > > > > > On the 'splitting' case, it also works flawlessly if the memory is given in 
-> > > > > > level-2 blocks. There is only one case that I would like to address here:
-> > > > > > 
-> > > > > > - Memory given in level-1 blocks (say 1GB)
-> > > > > > - Walker flag says 'walk down to level-2 only'
-> > > > > > - Split Walker on level-1 will break page down to (up to) level-3 entries.
-> > > > > > - Walker will continue to be called on level-2 entries, even though it's 
-> > > > > >   not necessary.
-> > > > > 
-> > > > > If you're only visiting leaves, why would it be called on the level-2
-> > > > > table entries?
-> > > > > 
-> > > > 
-> > > > Because once the leaf is turned into a table by the splitting walker, it 
-> > > > gets reloaded and walked. This is an excerpt of __kvm_pgtable_visit():
-> > > 
-> > > Sorry, I was musing about the semantics after adding something to limit
-> > > the maximum level. I don't dispute what the current code would do.
-> > > 
-> > > > Example:
-> > > > - Split this level-1 leave:
-> > > >   - Walker creates the whole structure up to given level (currently 3)
-> > > >   - Walker returns, gets reloaded, table detected, go down on that one
-> > > >   - Level 2 entries walked (which is unnecessary)
-> > > > 
-> > > > Please let me know if I am misunderstanding something.
-> > > 
-> > > I just don't grok why this would happen if we limited the maximum level
-> > > to '2' _and_ said we only wanted to visit the leaf entries. In that
-> > > case, I wouldn't expect to descend into any of the L2 table entries
-> > > (because that would imply going beyond level 2) and I wouldn't expect to
-> > > be called for the table entries either (because we're only interested in
-> > > leaves).
-> > 
-> > Agree, if we specify to skip level-3 entries, it would only walk up to 
-> > level-2 entries, but take above example in detail:
-> > - Split these level-1 leaves, up to level-3 leaves (regular)
-> >   - INFO: kvm_pgtable_walk will call walker:
-> >     - only up to level-2 entries (skip level-3)
-> >     - only on leaf entries
-> >   - Walk first level-1 leaf, calls walker
-> >     - walker will split the level-1 leaf in level-3 leaves
-> >     - walker return from that first level-1 leaf
-> >   - level-1 leaf is reloaded as a table
-> >     - level-2 entries of that table are also walked (unnecessary)
-> >     - on each of the level-2 table entries, level-3 entries are skipped
-> > 
-> > To avoid the unecessary walk of the level-2 entries above, we would need to 
-> > specify 'skip level-2' that could be an issue if we have a mix of level-1 
-> > and level-2 leaves, as the level-2 leaves in that case would not be split.
-> > 
-> > That's why I suggest something like "skip recently created table" as a flag 
-> > as well, so we can guarantee no newly created table gets walked 
-> > unecessarily.
-> > 
-> > Please help me if I am missing something important.
+> - the trap controls: the effective values are recomputed on each entry
+>   into the guest to take the EL into account and merge the L0 and L1
+>   configuration if in a nested context, or directly use the L0 configuration
+>   in non-nested context (see __activate_traps()).
 > 
-> I'm not sure the added complexity of handling this case perfectly results
-> in a measurable performance improvement. Just avoiding the level 3
-> tables would be an exponential reduction (~ 512-8192x) in the number of
-> walk steps.
+> - the VL settings: the effective values are are also recomputed on each
+>   entry into the guest (see fpsimd_lazy_switch_to_guest()).
+>
+> Since we appear to cover all bases, use the vcpu flags indicating the
+> handling of a nested ERET or exception delivery to avoid the whole FP
+> save/restore shenanigans. SME will have to be similarly dealt with when
+> it eventually gets supported.
 > 
+> For an EL1 L3 guest where L1 and L2 have this optimisation, this
+> results in at least a 10% wall clock reduction when running an I/O
+> heavy workload, generating a high rate of nested exceptions.
 
-Humm, I agree most of the improvement is due to skipping level-3 walks.
+There's on additional thing that's important, but I forgot to mention
+last time: in the window between kvm_arch_vcpu_put() and
+kvm_arch_vcpu_load(), it's possible to take an interrupt, and for a
+softirq handler to try to use kernel mode NEON.
 
-The added complexity would be, appart from a new flag, just a single line 
-change:
+Due to that, kvm_arch_vcpu_put() must leave the L1 guest's maximum VL
+configured in the host's ZCR_ELx, such that the guest's state can be
+saved.
 
----
-        if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
-                ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
--               reload = true;
-+               /* Do not reload if flagged to skip new table */
-+               reload = !(ctx.flags & KVM_PGTABLE_WALK_SKIP_NEW_TABLE);
-        }
---- 
+That value is configured by fpsimd_lazy_switch_to_host(), so we just
+need to make sure that kvm_arch_vcpu_put() doesn't clobber it. I *think*
+that's fine today, but maybe that warrants a comment somewhere.
 
-Even then, do you think it would not be worth having it?
+Other than that, this all looks good to me:
 
-Thanks!
-Leo
- 
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/fpsimd.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 15e17aca1dec0..aca98752a6e42 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -28,6 +28,20 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+>  	if (!system_supports_fpsimd())
+>  		return;
+>  
+> +	/*
+> +	 * Avoid needless save/restore of the guest's common
+> +	 * FPSIMD/SVE/SME regs during transitions between L1/L2.
+> +	 *
+> +	 * These transitions only happens in a non-preemptible context
+> +	 * where the host regs have already been saved and unbound. The
+> +	 * live registers are either free or owned by the guest.
+> +	 */
+> +	if (vcpu_get_flag(vcpu, IN_NESTED_ERET) ||
+> +	    vcpu_get_flag(vcpu, IN_NESTED_EXCEPTION)) {
+> +		WARN_ON_ONCE(host_owns_fp_regs());
+> +		return;
+> +	}
+> +
+>  	/*
+>  	 * Ensure that any host FPSIMD/SVE/SME state is saved and unbound such
+>  	 * that the host kernel is responsible for restoring this state upon
+> @@ -102,6 +116,15 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long flags;
+>  
+> +	/*
+> +	 * See comment in kvm_arch_vcpu_load_fp().
+> +	 */
+> +	if (vcpu_get_flag(vcpu, IN_NESTED_ERET) ||
+> +	    vcpu_get_flag(vcpu, IN_NESTED_EXCEPTION)) {
+> +		WARN_ON_ONCE(host_owns_fp_regs());
+> +		return;
+> +	}
+> +
+>  	local_irq_save(flags);
+>  
+>  	if (guest_owns_fp_regs()) {
+> -- 
+> 2.47.3
+> 
