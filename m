@@ -1,32 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2C93F54DD
-	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 14:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2649D3EFD14
+	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 15:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779288718; cv=none; b=JTK3DtBWCEiy8tRVujPJbCyNc+oKc6WSleyg1D0QUUQR8sFRrh6MyvCeZFY9Bpkiosw5yJPXZaYX3zKdFKRa260DhhsGkVi++n9dwWTXbuGyToONjWOvDRub3Ix7O08JggTPxTpQ24vPPH0h6TNpF5hrrE7BdY2IzubgjtwHnvk=
+	t=1779290266; cv=none; b=pS5mhQuR2KSKtwH32sVjFw0dLAXXYUqlpTwmcyDpUkaRnym+VLASNdyntVfvx1Swhfn8YEXKWOIF7kmLiXat6G1VRo2kBBaSiuOXU4qCsyB3gWx5Yfd8K3aRVwaEOGfmBmWEvKeWcArpNLz+8Anytwafezu+Q+R8lZ3hYIbjAbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779288718; c=relaxed/simple;
-	bh=6zYOthT1ybEaUy69JRMzLfF5XGzCBtUdPg9X5KNL+ps=;
+	s=arc-20240116; t=1779290266; c=relaxed/simple;
+	bh=KnB8NUgb7OfvhyqvzlGK12v19j9DBbTZLGw4wflVk+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gvaQpjaOHC51ZxtHoJ7eujMcU4+HinnqS4V2U9/ZIbthF+ZWzerWiz/du26RGELz461Q2sYoi/jhhWblCeQEbHdq8Y1syu3kn4dlhvgRudKcwq2/GRSBxoT5nFNqHpYBZ2CfND9YdESkqWm+8bi4Zq19kXbBUlIngFMqNuYeXm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=o+bcNZBk; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=mDW4AdXPPsCQfcFYmuKsa/FxiJMbzgAgA9Xf7ZAYKgnPiERRsgV/mNujifaGkIpd0B7hGkhdkGbuPZp4gHPsh2+qPQERpF2CcPRp+AYIKM0D1Oxt4b6zaCaoHWgEmoQ5bxNttuN1WOG17iMB+yOdfIZS7uPP2+YvZYVotEc1L0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rY5TWU1K; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="o+bcNZBk"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rY5TWU1K"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B3A62910;
-	Wed, 20 May 2026 07:51:50 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08E0F1655;
+	Wed, 20 May 2026 08:17:38 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8C0D13F85F;
-	Wed, 20 May 2026 07:51:53 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D8FA3FAA1;
+	Wed, 20 May 2026 08:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779288715; bh=6zYOthT1ybEaUy69JRMzLfF5XGzCBtUdPg9X5KNL+ps=;
+	t=1779290263; bh=KnB8NUgb7OfvhyqvzlGK12v19j9DBbTZLGw4wflVk+g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o+bcNZBkLcPpULa4g2MJB2Uo5FZ/MCKcllKd0dVkH786cDkftGrpgTQitAnpUYH0B
-	 +TszE6HS5refO9ltL6EnAeM/PIwVtaMt27W6EoVqpArQBR2TPD8x5vrtD17a2zAvn2
-	 ktEJDac0lzpsBbL2+1TsLCPMgA7a3tm1RDjdjm3Q=
-Date: Wed, 20 May 2026 15:51:46 +0100
+	b=rY5TWU1KLZ+sC0o1uhblHewVrO9NZst8oNVvrTJe/E9mcurKsRhafWkZxTyoarjoc
+	 IRDc3fFCxKCe9kRMkTW4Yep2uxOJQDLU7aVSxNIqnDKRn61vQUyMm+nsUZ0aKh6ZYT
+	 J3srMD2OTCjVJ9anmpaQQJi/jy9cImiGXLZOnjDs=
+Date: Wed, 20 May 2026 16:17:38 +0100
 From: Joey Gouly <joey.gouly@arm.com>
 To: Jing Zhang <jingzhangos@google.com>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
@@ -38,11 +38,11 @@ Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
 	Mingwei Zhang <mizhang@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Colton Lewis <coltonlewis@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2 6/7] lib: arm64: Add guest-internal
- exception handling (EL1)
-Message-ID: <20260520145146.GA4037194@e124191.cambridge.arm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib: arm64: Add foundational guest
+ execution framework
+Message-ID: <20260520151738.GB4037194@e124191.cambridge.arm.com>
 References: <20260413204630.1149038-1-jingzhangos@google.com>
- <20260413204630.1149038-7-jingzhangos@google.com>
+ <20260413204630.1149038-5-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,298 +51,344 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260413204630.1149038-7-jingzhangos@google.com>
+In-Reply-To: <20260413204630.1149038-5-jingzhangos@google.com>
 
-On Mon, Apr 13, 2026 at 01:46:29PM -0700, Jing Zhang wrote:
-> Implement the infrastructure for managed guests to handle their own
-> exceptions at EL1. This allows guests to manage internal traps
-> independently of the EL2 host.
+On Mon, Apr 13, 2026 at 01:46:27PM -0700, Jing Zhang wrote:
+> Introduce the infrastructure to manage and execute guest when running
+> at EL2. This provides the basis for testing advanced features like
+> nested virtualization and GICv4 direct interrupt injection.
 > 
-> Changes include:
-> - 'guest_el1_vectors': A dedicated EL1 vector table for guests,
->   supporting synchronous exceptions, IRQs, FIQs, and SErrors.
-> - 'guest_context': A per-guest metadata structure tracked via
->   TPIDR_EL1, containing a dispatch table for guest-internal handlers.
-> - 'guest_el1_c_handler': C-level dispatcher that executes registered
->   guest handlers or triggers an HVC trap back to the host for unhandled
->   exceptions.
-> - Integrated setup: guest_create() now allocates and maps the guest
->   context, while the context switch logic ensures VBAR_EL1 and
->   TPIDR_EL1 are correctly saved and restored.
+> The framework includes:
+> - 'struct guest': Encapsulates vCPU state (GPRs, EL1/EL2 sysregs) and
+>   Stage-2 MMU context.
+> - guest_create() / guest_destroy(): Handle lifecycle management and
+>   Stage-2 MMU setup, including identity mappings for guest code,
+>   stack, and UART.
+> - guest_run(): Assembly entry point that saves host callee-saved
+>   registers, caches the guest context pointer in TPIDR_EL2, and
+>   performs the exception return (ERET) to the guest.
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  lib/arm64/asm-offsets.c |  2 ++
->  lib/arm64/asm/guest.h   | 26 ++++++++++++++
->  lib/arm64/asm/sysreg.h  |  1 +
->  lib/arm64/guest.c       | 39 +++++++++++++++++++++
->  lib/arm64/guest_arch.S  | 78 +++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 146 insertions(+)
+>  arm/Makefile.arm64      |  2 +
+>  lib/arm64/asm-offsets.c | 13 ++++++
+>  lib/arm64/asm/guest.h   | 46 +++++++++++++++++++++
+>  lib/arm64/asm/sysreg.h  |  6 +++
+>  lib/arm64/guest.c       | 89 +++++++++++++++++++++++++++++++++++++++++
+>  lib/arm64/guest_arch.S  | 59 +++++++++++++++++++++++++++
+>  6 files changed, 215 insertions(+)
+>  create mode 100644 lib/arm64/asm/guest.h
+>  create mode 100644 lib/arm64/guest.c
+>  create mode 100644 lib/arm64/guest_arch.S
 > 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 5e50f5ba..9026fd71 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -41,6 +41,8 @@ cflatobjs += lib/arm64/processor.o
+>  cflatobjs += lib/arm64/spinlock.o
+>  cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
+>  cflatobjs += lib/arm64/stage2_mmu.o
+> +cflatobjs += lib/arm64/guest.o
+> +cflatobjs += lib/arm64/guest_arch.o
+>  
+>  ifeq ($(CONFIG_EFI),y)
+>  cflatobjs += lib/acpi.o
 > diff --git a/lib/arm64/asm-offsets.c b/lib/arm64/asm-offsets.c
-> index ceeecce5..fc9f28fb 100644
+> index 80de023c..ceeecce5 100644
 > --- a/lib/arm64/asm-offsets.c
 > +++ b/lib/arm64/asm-offsets.c
-> @@ -37,11 +37,13 @@ int main(void)
->  	OFFSET(GUEST_HCR_OFFSET, guest, hcr_el2);
->  	OFFSET(GUEST_VTTBR_OFFSET, guest, vttbr_el2);
->  	OFFSET(GUEST_SCTLR_OFFSET, guest, sctlr_el1);
-> +	OFFSET(GUEST_VBAR_OFFSET, guest, vbar_el1);
->  	OFFSET(GUEST_SP_EL1_OFFSET, guest, sp_el1);
->  	OFFSET(GUEST_ESR_OFFSET, guest, esr_el2);
->  	OFFSET(GUEST_FAR_OFFSET, guest, far_el2);
->  	OFFSET(GUEST_HPFAR_OFFSET, guest, hpfar_el2);
->  	OFFSET(GUEST_EXIT_CODE_OFFSET, guest, exit_code);
-> +	OFFSET(GUEST_TPIDR_EL1_OFFSET, guest, tpidr_el1);
+> @@ -8,6 +8,7 @@
+>  #include <libcflat.h>
+>  #include <kbuild.h>
+>  #include <asm/ptrace.h>
+> +#include <asm/guest.h>
 >  
+>  int main(void)
+>  {
+> @@ -30,5 +31,17 @@ int main(void)
+>  	DEFINE(S_FP, sizeof(struct pt_regs));
+>  	DEFINE(S_FRAME_SIZE, (sizeof(struct pt_regs) + 16));
+>  
+> +	OFFSET(GUEST_X_OFFSET, guest, x);
+> +	OFFSET(GUEST_ELR_OFFSET, guest, elr_el2);
+> +	OFFSET(GUEST_SPSR_OFFSET, guest, spsr_el2);
+> +	OFFSET(GUEST_HCR_OFFSET, guest, hcr_el2);
+> +	OFFSET(GUEST_VTTBR_OFFSET, guest, vttbr_el2);
+> +	OFFSET(GUEST_SCTLR_OFFSET, guest, sctlr_el1);
+> +	OFFSET(GUEST_SP_EL1_OFFSET, guest, sp_el1);
+> +	OFFSET(GUEST_ESR_OFFSET, guest, esr_el2);
+> +	OFFSET(GUEST_FAR_OFFSET, guest, far_el2);
+> +	OFFSET(GUEST_HPFAR_OFFSET, guest, hpfar_el2);
+> +	OFFSET(GUEST_EXIT_CODE_OFFSET, guest, exit_code);
+> +
 >  	return 0;
 >  }
 > diff --git a/lib/arm64/asm/guest.h b/lib/arm64/asm/guest.h
-> index b99641ef..8b40f3a5 100644
-> --- a/lib/arm64/asm/guest.h
+> new file mode 100644
+> index 00000000..826c44f8
+> --- /dev/null
 > +++ b/lib/arm64/asm/guest.h
-> @@ -29,6 +29,26 @@ enum guest_handler_result {
->  struct guest;
->  typedef enum guest_handler_result (*guest_handler_t)(struct guest *guest);
->  
+> @@ -0,0 +1,46 @@
 > +/*
-> + * Guest EL1 Exception Frame (pushed to guest stack by asm stub)
-> + * We use a simplified frame: x0-x30, elr, spsr. size = 33*8
+> + * Copyright (C) 2026, Google LLC.
+> + * Author: Jing Zhang <jingzhangos@google.com>
+> + *
+> + * SPDX-License-Identifier: LGPL-2.0-or-later
 > + */
-> +struct guest_el1_regs {
-> +	unsigned long regs[31];
-> +	unsigned long elr;
-> +	unsigned long spsr;
+> +#ifndef _ASMARM64_GUEST_H_
+> +#define _ASMARM64_GUEST_H_
+> +
+> +#include <libcflat.h>
+> +#include <asm/processor.h>
+> +#include <asm/stage2_mmu.h>
+> +
+> +#define HCR_GUEST_FLAGS (HCR_EL2_VM | HCR_EL2_FMO | HCR_EL2_IMO | \
+> +			 HCR_EL2_AMO | HCR_EL2_RW | HCR_EL2_E2H)
+> +/* Guest stack size */
+> +#define GUEST_STACK_SIZE		SZ_64K
+> +
+> +struct guest {
+> +	/* General Purpose Registers */
+> +	unsigned long x[31]; /* x0..x30 */
+> +
+> +	/* Execution State */
+> +	unsigned long elr_el2;
+> +	unsigned long spsr_el2;
+> +
+> +	/* Control Registers */
+> +	unsigned long hcr_el2;
+> +	unsigned long vttbr_el2;
+> +	unsigned long sctlr_el1;
+> +	unsigned long sp_el1;
+> +
+> +	/* Exit Information */
+> +	unsigned long esr_el2;
+> +	unsigned long far_el2;
+> +	unsigned long hpfar_el2;
+> +	unsigned long exit_code;
+> +
+> +	struct s2_mmu *s2mmu;
 > +};
 > +
-> +typedef void (*guest_el1_handler_t)(struct guest_el1_regs *regs, unsigned int esr);
+> +struct guest *guest_create(int vmid, void (*guest_func)(void), enum s2_granule granule);
+> +void guest_destroy(struct guest *guest);
+> +void guest_run(struct guest *guest);
 > +
-> +/*
-> + * Guest Context Structure
-> + * This will be pointed to by TPIDR_EL1 while the guest is running.
-> + */
-> +struct guest_context {
-> +	guest_el1_handler_t handlers[VECTOR_MAX];
-> +};
-> +
->  struct guest {
->  	/* General Purpose Registers */
->  	unsigned long x[31]; /* x0..x30 */
-> @@ -42,15 +62,18 @@ struct guest {
->  	unsigned long vttbr_el2;
->  	unsigned long sctlr_el1;
->  	unsigned long sp_el1;
-> +	unsigned long vbar_el1;
->  
->  	/* Exit Information */
->  	unsigned long esr_el2;
->  	unsigned long far_el2;
->  	unsigned long hpfar_el2;
->  	unsigned long exit_code;
-> +	unsigned long tpidr_el1;
->  
->  	/* Exception Handlers in EL2 */
->  	guest_handler_t handlers[VECTOR_MAX];
-> +	struct guest_context *guest_context;
->  
->  	struct s2_mmu *s2mmu;
->  };
-> @@ -62,4 +85,7 @@ void guest_run(struct guest *guest);
->  unsigned long guest_c_exception_handler(struct guest *guest, unsigned long vector_offset);
->  void guest_install_handler(struct guest *guest, enum vector v, guest_handler_t handler);
->  
-> +void guest_el1_c_handler(struct guest_el1_regs *regs, unsigned int vector);
-> +void guest_install_el1_handler(struct guest *guest, enum vector v, guest_el1_handler_t handler);
-> +
->  #endif /* _ASMARM64_GUEST_H_ */
+> +#endif /* _ASMARM64_GUEST_H_ */
 > diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index 857bee98..a298ceff 100644
+> index f2d05018..857bee98 100644
 > --- a/lib/arm64/asm/sysreg.h
 > +++ b/lib/arm64/asm/sysreg.h
-> @@ -137,6 +137,7 @@ asm(
+> @@ -118,6 +118,10 @@ asm(
+>  #define SCTLR_EL1_TCF0_SHIFT	38
+>  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+>  
+> +#define HCR_EL2_VM		_BITULL(0)
+> +#define HCR_EL2_FMO		_BITULL(3)
+> +#define HCR_EL2_IMO		_BITULL(4)
+> +#define HCR_EL2_AMO		_BITULL(5)
+>  #define HCR_EL2_TGE		_BITULL(27)
+>  #define HCR_EL2_RW		_BITULL(31)
+>  #define HCR_EL2_E2H		_BITULL(34)
+> @@ -132,6 +136,8 @@ asm(
+>  #define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
 >  #define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
 >  
->  #define SYS_SCTLR_EL1		sys_reg(3, 5, 1, 0, 0)
-> +#define SYS_VBAR_EL1		sys_reg(3, 5, 12, 0, 0)
-
-SYS_VBAR_EL12 as I mentioned in the other e-mail.
-
->  
+> +#define SYS_SCTLR_EL1		sys_reg(3, 5, 1, 0, 0)
+> +
 >  #define INIT_SCTLR_EL1_MMU_OFF	\
 >  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+>  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
 > diff --git a/lib/arm64/guest.c b/lib/arm64/guest.c
-> index dd42ccd6..54c8b429 100644
-> --- a/lib/arm64/guest.c
+> new file mode 100644
+> index 00000000..68dd449d
+> --- /dev/null
 > +++ b/lib/arm64/guest.c
-> @@ -36,9 +36,45 @@ unsigned long guest_c_exception_handler(struct guest *guest, unsigned long vecto
->  	return 1;
->  }
->  
-> +/* --- EL1 (Guest-Internal) Vector Handling --- */
+> @@ -0,0 +1,89 @@
+> +/*
+> + * Copyright (C) 2026, Google LLC.
+> + * Author: Jing Zhang <jingzhangos@google.com>
+> + *
+> + * SPDX-License-Identifier: LGPL-2.0-or-later
+> + */
+> +#include <libcflat.h>
+> +#include <asm/guest.h>
+> +#include <asm/io.h>
+> +#include <asm/sysreg.h>
+> +#include <asm/barrier.h>
+> +#include <alloc_page.h>
+> +#include <alloc.h>
 > +
-> +void guest_install_el1_handler(struct guest *guest, enum vector v, guest_el1_handler_t handler)
+> +static struct guest *__guest_create(struct s2_mmu *s2_ctx, void *entry_point)
 > +{
-> +	if (guest && guest->guest_context && v < VECTOR_MAX)
-> +		guest->guest_context->handlers[v] = handler;
-> +}
+> +	struct guest *guest = calloc(1, sizeof(struct guest));
 > +
-> +void guest_el1_c_handler(struct guest_el1_regs *regs, unsigned int vector)
-> +{
-> +	struct guest_context *ctx = (struct guest_context *)read_sysreg(tpidr_el1);
-> +	unsigned int esr = read_sysreg(esr_el1);
+> +	guest->elr_el2 = (unsigned long)entry_point;
+> +	guest->spsr_el2 = 0x3C5; /* M=EL1h, DAIF=Masked */
+> +	guest->hcr_el2 = HCR_GUEST_FLAGS;
 > +
-> +	if (ctx && vector < VECTOR_MAX && ctx->handlers[vector]) {
-> +		ctx->handlers[vector](regs, esr);
+> +	if (s2_ctx) {
+> +		guest->vttbr_el2 = virt_to_phys(s2_ctx->pgd);
+> +		guest->vttbr_el2 |= ((unsigned long)s2_ctx->vmid << 48);
 > +	} else {
-> +		printf("Guest: Unhandled Exception Vector %d, ESR=0x%x\n", vector, esr);
-> +		asm volatile("hvc #0xFFFF");
+> +		printf("Stage 2 MMU context missing!");
 > +	}
+> +
+> +	guest->sctlr_el1 = read_sysreg(sctlr_el1);
+> +	/* Disable guest stage 1 translation */
+> +	guest->sctlr_el1 &= ~(SCTLR_EL1_M | SCTLR_EL1_C);
+> +	guest->sctlr_el1 |= SCTLR_EL1_I;
+> +
+> +	guest->s2mmu = s2_ctx;
+> +
+> +	return guest;
 > +}
 > +
-> +extern void guest_el1_vectors(void);
+> +struct guest *guest_create(int vmid, void (*guest_func)(void), enum s2_granule granule)
+> +{
+> +	unsigned long guest_pa, code_base, stack_pa;
+> +	unsigned long *stack_page;
+> +	struct guest *guest;
+> +	struct s2_mmu *ctx;
 > +
->  static struct guest *__guest_create(struct s2_mmu *s2_ctx, void *entry_point)
->  {
->  	struct guest *guest = calloc(1, sizeof(struct guest));
-> +	struct guest_context *guest_ctx;
-> +	unsigned long guest_ctx_pa;
+> +	ctx = s2mmu_init(vmid, granule, true);
+> +	/*
+> +	 * Map the Host's code segment Identity Mapped (IPA=PA).
+> +	 * To be safe, we map a large chunk (e.g., 2MB) around the function
+> +	 * to capture any helper functions the compiler might generate calls to.
+> +	 */
+> +	guest_pa = virt_to_phys((void *)guest_func);
+> +	code_base = guest_pa & ~(SZ_2M - 1);
+> +	s2mmu_map(ctx, code_base, code_base, SZ_2M, S2_MAP_RW);
 > +
-> +	/* Allocate the internal context table */
-> +	guest_ctx = (void *)alloc_page();
-> +	memset(guest_ctx, 0, PAGE_SIZE);
-> +	guest->guest_context = guest_ctx;
+> +	/*
+> +	 * Map Stack
+> +	 * Allocate 16 pages (64K) in Host, get its PA, and map it for Guest.
+> +	 */
+> +	stack_page = alloc_pages(get_order(GUEST_STACK_SIZE >> PAGE_SHIFT));
+> +	stack_pa = virt_to_phys(stack_page);
+> +	/* Identity Map it (IPA = PA) */
+> +	s2mmu_map(ctx, stack_pa, stack_pa, GUEST_STACK_SIZE, S2_MAP_RW);
 > +
-> +	guest_ctx_pa = virt_to_phys(guest_ctx);
-> +	if (s2_ctx)
-> +		s2mmu_map(s2_ctx, guest_ctx_pa, guest_ctx_pa, PAGE_SIZE, S2_MAP_RW);
+> +	s2mmu_enable(ctx);
 > +
-> +	guest->tpidr_el1 = guest_ctx_pa;
->  
->  	guest->elr_el2 = (unsigned long)entry_point;
->  	guest->spsr_el2 = 0x3C5; /* M=EL1h, DAIF=Masked */
-> @@ -56,6 +92,7 @@ static struct guest *__guest_create(struct s2_mmu *s2_ctx, void *entry_point)
->  	guest->sctlr_el1 &= ~(SCTLR_EL1_M | SCTLR_EL1_C);
->  	guest->sctlr_el1 |= SCTLR_EL1_I;
->  
-> +	guest->vbar_el1 = (unsigned long)guest_el1_vectors;
->  	guest->s2mmu = s2_ctx;
->  
->  	return guest;
-> @@ -109,6 +146,8 @@ void guest_destroy(struct guest *guest)
->  {
->  	s2mmu_disable(guest->s2mmu);
->  	s2mmu_destroy(guest->s2mmu);
-> +	if (guest->guest_context)
-> +		free_page(guest->guest_context);
->  	free(guest);
->  }
->  
+> +	/* Create Guest */
+> +	/* Entry point is the PA of the function (Identity Mapped) */
+> +	guest = __guest_create(ctx, (void *)guest_pa);
+> +
+> +	/*
+> +	 * Setup Guest Stack Pointer
+> +	 * Must match where we mapped the stack + Offset
+> +	 */
+> +	guest->sp_el1 = stack_pa + GUEST_STACK_SIZE;
+> +
+> +	/* Map UART identity mapped, printf() available to guest */
+> +	s2mmu_map(ctx, 0x09000000, 0x09000000, PAGE_SIZE, S2_MAP_DEVICE);
+> +
+> +	return guest;
+> +}
+> +
+> +void guest_destroy(struct guest *guest)
+> +{
+> +	s2mmu_disable(guest->s2mmu);
+> +	s2mmu_destroy(guest->s2mmu);
+> +	free(guest);
+> +}
 > diff --git a/lib/arm64/guest_arch.S b/lib/arm64/guest_arch.S
-> index 81874fd0..32d640e6 100644
-> --- a/lib/arm64/guest_arch.S
+> new file mode 100644
+> index 00000000..70c19507
+> --- /dev/null
 > +++ b/lib/arm64/guest_arch.S
-> @@ -34,8 +34,12 @@ guest_run:
->  	msr	vttbr_el2, x1
->  	ldr	x1, [x0, #GUEST_SCTLR_OFFSET]
->  	msr_s	SYS_SCTLR_EL1, x1
-> +	ldr	x1, [x0, #GUEST_VBAR_OFFSET]
-> +	msr_s	SYS_VBAR_EL1, x1
->  	ldr	x1, [x0, #GUEST_SP_EL1_OFFSET]
->  	msr	sp_el1, x1
-> +	ldr	x1, [x0, #GUEST_TPIDR_EL1_OFFSET]
-> +	msr	tpidr_el1, x1
->  
->  	/* Load Guest GPRs */
->  	ldp	x1, x2, [x0, #8]
-> @@ -125,6 +129,8 @@ guest_common_exit:
->  	str	x1, [x0, #GUEST_HPFAR_OFFSET]
->  	mrs	x1, sp_el1
->  	str	x1, [x0, #GUEST_SP_EL1_OFFSET]
-> +	mrs_s	x1, SYS_VBAR_EL1
-> +	str	x1, [x0, #GUEST_VBAR_OFFSET]
->  
->  	/* x29 contains vector offset from entry */
->  	mov	x1, x29
-> @@ -168,3 +174,75 @@ guest_resume_guest:
->  	ldp	x29, x30, [x0, #232]
->  	ldr	x0, [x0, #0]
->  	eret
+> @@ -0,0 +1,59 @@
+> +/*
+> + * Copyright (C) 2026, Google LLC.
+> + * Author: Jing Zhang <jingzhangos@google.com>
+> + *
+> + * SPDX-License-Identifier: LGPL-2.0-or-later
+> + */
+> +#define __ASSEMBLY__
+> +#include <asm/asm-offsets.h>
+> +#include <asm/sysreg.h>
 > +
-> +/* EL1 Vector Table */
-> +.macro guest_el1_vector, vector_num
-> +	.align 7
-> +	stp     x29, x30, [sp, #-16]!
-> +	mov	x29, \vector_num
-> +	b       guest_el1_common
-> +.endm
+> +.global guest_run
+> +guest_run:
+> +	/* x0 = struct guest pointer */
 > +
-> +.align 11
-> +.global guest_el1_vectors
-> +guest_el1_vectors:
-> +	.skip 0x200
+> +	/* Save Host Callee-Saved Regs */
+> +	stp	x29, x30, [sp, #-16]!
+> +	stp	x27, x28, [sp, #-16]!
+> +	stp	x25, x26, [sp, #-16]!
+> +	stp	x23, x24, [sp, #-16]!
+> +	stp	x21, x22, [sp, #-16]!
+> +	stp	x19, x20, [sp, #-16]!
 > +
-> +	guest_el1_vector #4	/* Sync */
-> +	guest_el1_vector #5	/* IRQ */
-> +	guest_el1_vector #6	/* FIQ */
-> +	guest_el1_vector #7	/* SError */
+> +	/* Cache Guest Pointer in TPIDR_EL2 */
+> +	msr	tpidr_el2, x0
 > +
+> +	/* Load Guest System Registers */
+> +	ldr	x1, [x0, #GUEST_ELR_OFFSET]
+> +	msr	elr_el2, x1
+> +	ldr	x1, [x0, #GUEST_SPSR_OFFSET]
+> +	msr	spsr_el2, x1
+> +	ldr	x1, [x0, #GUEST_HCR_OFFSET]
+> +	msr	hcr_el2, x1
 
-While prototyping EL0 testing, I noticed this only handles EL1h exceptions, you
-should just cover the full range of 16 vectors.
+Here we just override hcr_el2 with the guest's hcr_el2, but we don't
+save/restore the host's value anywhere.
 
-> +	.align 11
-> +
-> +guest_el1_common:
-> +	sub	sp, sp, #264
-> +	stp	x0, x1, [sp, #0]
-> +	stp	x2, x3, [sp, #16]
-> +	stp	x4, x5, [sp, #32]
-> +	stp	x6, x7, [sp, #48]
-> +	stp	x8, x9, [sp, #64]
-> +	stp	x10, x11, [sp, #80]
-> +	stp	x12, x13, [sp, #96]
-> +	stp	x14, x15, [sp, #112]
-> +	stp	x16, x17, [sp, #128]
-> +	stp	x18, x19, [sp, #144]
-> +	stp	x20, x21, [sp, #160]
-> +	stp	x22, x23, [sp, #176]
-> +	stp	x24, x25, [sp, #192]
-> +	stp	x26, x27, [sp, #208]
-> +	stp	x28, x30, [sp, #224]
-> +
-> +	mrs	x0, elr_el1
-> +	str	x0, [sp, #248]
-> +	mrs	x0, spsr_el1
-> +	str	x0, [sp, #256]
-> +
-> +	mov	x0, sp
-> +	mov	x1, x29
-> +	bl	guest_el1_c_handler
-> +
-> +	ldr	x0, [sp, #248]
-> +	msr	elr_el1, x0
-> +	ldr	x0, [sp, #256]
-> +	msr	spsr_el1, x0
-> +
-> +	ldp	x0, x1, [sp, #0]
-> +	ldp	x2, x3, [sp, #16]
-> +	ldp	x4, x5, [sp, #32]
-> +	ldp	x6, x7, [sp, #48]
-> +	ldp	x8, x9, [sp, #64]
-> +	ldp	x10, x11, [sp, #80]
-> +	ldp	x12, x13, [sp, #96]
-> +	ldp	x14, x15, [sp, #112]
-> +	ldp	x16, x17, [sp, #128]
-> +	ldp	x18, x19, [sp, #144]
-> +	ldp	x20, x21, [sp, #160]
-> +	ldp	x22, x23, [sp, #176]
-> +	ldp	x24, x25, [sp, #192]
-> +	ldp	x26, x27, [sp, #208]
-> +	ldp	x28, x30, [sp, #224]
-> +
-> +	add	sp, sp, #264
-> +	ldp	x29, x30, [sp], #16
-> +	eret
+example:
+
+diff --git a/arm/stage2-mmu-test.c b/arm/stage2-mmu-test.c
+index 0df4704b..a8fcc697 100644
+--- a/arm/stage2-mmu-test.c
++++ b/arm/stage2-mmu-test.c
+@@ -98,7 +98,9 @@ int main(int argc, char **argv)
+ 
+        report_info("CPU%d: entering guest...", smp_processor_id());
+ 
++       printf("HCR TGE: %d\n", read_sysreg(hcr_el2) & HCR_EL2_TGE);
+        guest_run(guest);
++       printf("HCR TGE: %d\n", read_sysreg(hcr_el2) & HCR_EL2_TGE);
+ 
+        report(handled, "Stage-2 fault handling test completed");
+        guest_destroy(guest);
+
+
+Not sure of the best way to solve it, could maybe add a host_state struct that
+stores registers/state (that can affect the host), and you can also embed one
+in `struct guest` and save/restore from there?
 
 Thanks,
 Joey
+
+> +	ldr	x1, [x0, #GUEST_VTTBR_OFFSET]
+> +	msr	vttbr_el2, x1
+> +	ldr	x1, [x0, #GUEST_SCTLR_OFFSET]
+> +	msr_s	SYS_SCTLR_EL1, x1
+> +	ldr	x1, [x0, #GUEST_SP_EL1_OFFSET]
+> +	msr	sp_el1, x1
+> +
+> +	/* Load Guest GPRs */
+> +	ldp	x1, x2, [x0, #8]
+> +	ldp	x3, x4, [x0, #24]
+> +	ldp	x5, x6, [x0, #40]
+> +	ldp	x7, x8, [x0, #56]
+> +	ldp	x9, x10, [x0, #72]
+> +	ldp	x11, x12, [x0, #88]
+> +	ldp	x13, x14, [x0, #104]
+> +	ldp	x15, x16, [x0, #120]
+> +	ldp	x17, x18, [x0, #136]
+> +	ldp	x19, x20, [x0, #152]
+> +	ldp	x21, x22, [x0, #168]
+> +	ldp	x23, x24, [x0, #184]
+> +	ldp	x25, x26, [x0, #200]
+> +	ldp	x27, x28, [x0, #216]
+> +	ldp	x29, x30, [x0, #232]
+> +	ldr	x0, [x0, #0]
+> +
+> +	isb
+> +	eret
+> -- 
+> 2.53.0.1213.gd9a14994de-goog
+> 
