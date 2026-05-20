@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750F53BF666
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EB93BF665
 	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 09:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779268816; cv=none; b=jffduMtiJDPnmu5DSdWg129uz4su8PogQZ+EQKosub1s0He9AFQ5VgyQQe+vWnbBzwW5ZGM61/119cA0HS4SzIyIlUWAdpsuOSx2kPZTBpcJScwcTfUIKGS/hU2kfKYvHfDNLBLiogZz5Je3zRGLxaJ4kQen8j414is7n+ZO+m4=
+	t=1779268816; cv=none; b=UsBNgF9Dp+8Sjn0BVrj7jXZ44ssyMuaZBQvSVZo4p9F7jSq5BU4GMcOGUYrjhfxkFRGC50ECJILVvpyWFwLWTSyovDvl3MqWgh5QclcJeioIwRmba4ji1FN927Fen4qNXWUDgvIyzyeSgFITr4xj9lQNhTqYKG+RAMkSOqmrtTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779268816; c=relaxed/simple;
-	bh=Vcdpwhqa4oY8Q4qM0R7fO+FOw/PAi9tV3e+5XJgmua0=;
+	bh=yplioqIZjnWLEmaw5gvgfwTLT5yAMuYlbdnykrCs0j0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UOcCP6FFSGkXEJVbYCvsZZKVip7aX3xZC1DSMIA4FfQSonlN8qARjYHUNCiV0QP/9xxMEAGsQ7a/AUq5YOe00xeHoWJOND5Jngz2faDXUoMMwglMUwufqlaiCGcfpSnK0zSdXFS4qqfeATf3prmqQYH7hwfi/wfo4B4L91P6K14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iP1UpO/Q; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=stC8vVl4g5zwZtzcEGGZ6Cs6a9Ft0vou3kCbpQoLuAWCmJ15HCguVQbPcjxK9t+z4WwV5ocGJZ5y+6ka7FspQjt+T2xkl3ldkfA1dgy0LuSDx1WftSSKT/7gdimKIw22AiaofiITzI6b50uIFk5vImH2A6NLrZRSH6SpzG9fhiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SuqEbL0v; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iP1UpO/Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAED61F0089F;
-	Wed, 20 May 2026 09:20:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SuqEbL0v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC91E1F00899;
+	Wed, 20 May 2026 09:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1779268813;
-	bh=uJOCXBypnoYZLX0nT495VkYgI+JgtlLL6d4W8+xo904=;
+	bh=Dd/xKhw83nig8KcvWFPpSK+l67MudmyBRi03HKuCHrw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iP1UpO/Qgcu1uWIyYi3hIfLKzizWRHkNd8IpKVqEVQQg08BXrU55l0SYRvHBnlk+j
-	 tmKtXlT9/71OPdvHCSDf/TGzM9ZQv+J0PFSmOYMpNFZA4K38A3e+GRWJqdvFLjnvgR
-	 qpXRINbishbpSlxJ7ZlVTnsiQxhsVRLPCIxTc9RjAMMnZHreQESWIwurWRR4jpZKLK
-	 fbdQd1keBtoz8GzcTGMbA3PvyU99QDZTsrSaO+RbymHlUvuP/yIW6IDnZ8fG5tn6W8
-	 7/s5Z7Aw5eicmnSjX0Vy9jm9CcsRjinF2xV79h8AcvbnVU05kitVE+8ND8q/NvEeHS
-	 LMQXxMlzBeYYA==
+	b=SuqEbL0vxSPnDDvIc83dhC/hc3yuTiyXhZrdXYZCFT3iap9K+BneVDDK2Astg+/lQ
+	 a+IlpPJaVAVO429MUGy7QOtvJA7YBNXlDpkYXUNUPj7dfPd8KMqAuh/h4uxDq3GMrm
+	 4KbTfcxjOo9Q6MkVG0mHDtI7ybvgLD8nb1RZ/DfEUZ45Eb5ATOtudd8a3InG48FtPv
+	 MbxTA1CJfB66G7G8R9NfTtxvFpUMGpZww543vNVwgus+Zh8H/fnVOzKE0UsKjSRCPD
+	 o9jKu3Shj6+UsNokERXBLF4U/r6RoJi7aS+LXuLkg/xWqvhTpZixomcpsmnz0f7+Kt
+	 ZEHU9xmcS2zQQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wPd64-00000004IaV-09kS;
-	Wed, 20 May 2026 09:20:12 +0000
+	id 1wPd63-00000004IaV-0p3G;
+	Wed, 20 May 2026 09:20:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -41,9 +41,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH v2 09/18] KVM: arm64: vgic-v5: Limit support to 64 PPIs
-Date: Wed, 20 May 2026 10:19:40 +0100
-Message-ID: <20260520091949.542365-10-maz@kernel.org>
+Subject: [PATCH v2 05/18] KVM: arm64: vgic: Constify struct irq_ops usage
+Date: Wed, 20 May 2026 10:19:36 +0100
+Message-ID: <20260520091949.542365-6-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260520091949.542365-1-maz@kernel.org>
 References: <20260520091949.542365-1-maz@kernel.org>
@@ -59,204 +59,137 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although we have some code supporting 128 PPIs, the only supported
-configuration is 64 PPIs. There is no way to test the 128 PPI code,
-so it is bound to bitrot very quickly.
+vgic-v5 has introduced much more prevalent usage of the struct
+irq_ops mechanism.
 
-Given that KVM/arm64's goal has always been to stick to non-IMPDEF
-behaviours, drop the 128 PPI support. Someone motivated enough and
-with very strong arguments can always bring it back -- it's all in
-the git history.
+In the process, it becomes evident that suffers from two related
+problems:
+
+- it contains flags, rather than only callbacks
+- it is mutable, because we need to update the above flags
+
+Swap the flags for a helper retrieving the flags, and make all
+irq_ops const, something that is slightly satisfying.
 
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vgic-v5-sr.c       | 82 ++++++---------------------
- arch/arm64/kvm/sys_regs.c             | 17 +++---
- arch/arm64/kvm/vgic/vgic-kvm-device.c |  9 +--
- 3 files changed, 26 insertions(+), 82 deletions(-)
+ arch/arm64/kvm/arch_timer.c   | 14 +++++++++-----
+ arch/arm64/kvm/vgic/vgic-v5.c |  2 +-
+ arch/arm64/kvm/vgic/vgic.c    |  2 +-
+ include/kvm/arm_vgic.h        |  9 +++++----
+ 4 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-index 47e6bcd437029..6d69dfe89a96c 100644
---- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-@@ -30,10 +30,9 @@ void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if)
- {
- 	/*
- 	 * The following code assumes that the bitmap storage that we have for
--	 * PPIs is either 64 (architected PPIs, only) or 128 bits (architected &
--	 * impdef PPIs).
-+	 * PPIs is either 64 (architected PPIs, only).
- 	 */
--	BUILD_BUG_ON(VGIC_V5_NR_PRIVATE_IRQS % 64);
-+	BUILD_BUG_ON(VGIC_V5_NR_PRIVATE_IRQS != 64);
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index cbea4d9ee9552..f003df76fdda7 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -52,11 +52,17 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+ 			      enum kvm_arch_timer_regs treg);
+ static bool kvm_arch_timer_get_input_level(int vintid);
  
- 	bitmap_write(host_data_ptr(vgic_v5_ppi_state)->activer_exit,
- 		     read_sysreg_s(SYS_ICH_PPI_ACTIVER0_EL2), 0, 64);
-@@ -49,22 +48,6 @@ void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if)
- 	cpu_if->vgic_ppi_priorityr[6] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR6_EL2);
- 	cpu_if->vgic_ppi_priorityr[7] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR7_EL2);
- 
--	if (VGIC_V5_NR_PRIVATE_IRQS == 128) {
--		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->activer_exit,
--			     read_sysreg_s(SYS_ICH_PPI_ACTIVER1_EL2), 64, 64);
--		bitmap_write(host_data_ptr(vgic_v5_ppi_state)->pendr,
--			     read_sysreg_s(SYS_ICH_PPI_PENDR1_EL2), 64, 64);
--
--		cpu_if->vgic_ppi_priorityr[8] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR8_EL2);
--		cpu_if->vgic_ppi_priorityr[9] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR9_EL2);
--		cpu_if->vgic_ppi_priorityr[10] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR10_EL2);
--		cpu_if->vgic_ppi_priorityr[11] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR11_EL2);
--		cpu_if->vgic_ppi_priorityr[12] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR12_EL2);
--		cpu_if->vgic_ppi_priorityr[13] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR13_EL2);
--		cpu_if->vgic_ppi_priorityr[14] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR14_EL2);
--		cpu_if->vgic_ppi_priorityr[15] = read_sysreg_s(SYS_ICH_PPI_PRIORITYR15_EL2);
--	}
--
- 	/* Now that we are done, disable DVI */
- 	write_sysreg_s(0, SYS_ICH_PPI_DVIR0_EL2);
- 	write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
-@@ -74,9 +57,6 @@ void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if)
- {
- 	DECLARE_BITMAP(pendr, VGIC_V5_NR_PRIVATE_IRQS);
- 
--	/* We assume 64 or 128 PPIs - see above comment */
--	BUILD_BUG_ON(VGIC_V5_NR_PRIVATE_IRQS % 64);
--
- 	/* Enable DVI so that the guest's interrupt config takes over */
- 	write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_dvir, 0, 64),
- 		       SYS_ICH_PPI_DVIR0_EL2);
-@@ -108,50 +88,20 @@ void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if)
- 	write_sysreg_s(cpu_if->vgic_ppi_priorityr[7],
- 		       SYS_ICH_PPI_PRIORITYR7_EL2);
- 
--	if (VGIC_V5_NR_PRIVATE_IRQS == 128) {
--		/* Enable DVI so that the guest's interrupt config takes over */
--		write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_dvir, 64, 64),
--			       SYS_ICH_PPI_DVIR1_EL2);
--
--		write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_activer, 64, 64),
--			       SYS_ICH_PPI_ACTIVER1_EL2);
--		write_sysreg_s(bitmap_read(cpu_if->vgic_ppi_enabler, 64, 64),
--			       SYS_ICH_PPI_ENABLER1_EL2);
--		write_sysreg_s(bitmap_read(pendr, 64, 64),
--			       SYS_ICH_PPI_PENDR1_EL2);
--
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[8],
--			       SYS_ICH_PPI_PRIORITYR8_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[9],
--			       SYS_ICH_PPI_PRIORITYR9_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[10],
--			       SYS_ICH_PPI_PRIORITYR10_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[11],
--			       SYS_ICH_PPI_PRIORITYR11_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[12],
--			       SYS_ICH_PPI_PRIORITYR12_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[13],
--			       SYS_ICH_PPI_PRIORITYR13_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[14],
--			       SYS_ICH_PPI_PRIORITYR14_EL2);
--		write_sysreg_s(cpu_if->vgic_ppi_priorityr[15],
--			       SYS_ICH_PPI_PRIORITYR15_EL2);
--	} else {
--		write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
--
--		write_sysreg_s(0, SYS_ICH_PPI_ACTIVER1_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_ENABLER1_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PENDR1_EL2);
--
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR8_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR9_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR10_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR11_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR12_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR13_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR14_EL2);
--		write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR15_EL2);
--	}
-+	write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
+-static struct irq_ops arch_timer_irq_ops = {
++static unsigned long kvm_arch_timer_get_irq_flags(void)
++{
++	return kvm_vgic_global_state.no_hw_deactivation ? VGIC_IRQ_SW_RESAMPLE : 0;
++}
 +
-+	write_sysreg_s(0, SYS_ICH_PPI_ACTIVER1_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_ENABLER1_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PENDR1_EL2);
-+
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR8_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR9_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR10_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR11_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR12_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR13_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR14_EL2);
-+	write_sysreg_s(0, SYS_ICH_PPI_PRIORITYR15_EL2);
++static const struct irq_ops arch_timer_irq_ops = {
++	.get_flags	 = kvm_arch_timer_get_irq_flags,
+ 	.get_input_level = kvm_arch_timer_get_input_level,
+ };
+ 
+-static struct irq_ops arch_timer_irq_ops_vgic_v5 = {
++static const struct irq_ops arch_timer_irq_ops_vgic_v5 = {
+ 	.get_input_level = kvm_arch_timer_get_input_level,
+ 	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
+ 	.set_direct_injection = vgic_v5_set_ppi_dvi,
+@@ -1392,8 +1398,6 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
+ 			return -ENOMEM;
+ 		}
+ 
+-		if (kvm_vgic_global_state.no_hw_deactivation)
+-			arch_timer_irq_ops.flags |= VGIC_IRQ_SW_RESAMPLE;
+ 		WARN_ON(irq_domain_push_irq(domain, host_vtimer_irq,
+ 					    (void *)TIMER_VTIMER));
+ 	}
+@@ -1591,8 +1595,8 @@ static bool kvm_arch_timer_get_input_level(int vintid)
+ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
++	const struct irq_ops *ops;
+ 	struct timer_map map;
+-	struct irq_ops *ops;
+ 	int ret;
+ 
+ 	if (timer->enabled)
+diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+index 0101ec3f55283..757484d2493b2 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5.c
++++ b/arch/arm64/kvm/vgic/vgic-v5.c
+@@ -285,7 +285,7 @@ void vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, struct vgic_irq *irq, bool dvi)
+ 	__assign_bit(ppi, cpu_if->vgic_ppi_dvir, dvi);
  }
  
- void __vgic_v5_save_state(struct vgic_v5_cpu_if *cpu_if)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 513f5f1429b5f..6083a1b23dbf9 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -724,6 +724,7 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
- {
- 	unsigned long *mask = vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask;
- 	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-+	unsigned long reg = p->regval;
- 	int i;
- 
- 	/* We never expect to get here with a read! */
-@@ -731,21 +732,17 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
- 		return undef_access(vcpu, p, r);
- 
- 	/*
--	 * If we're only handling architected PPIs and the guest writes to the
--	 * enable for the non-architected PPIs, we just return as there's
--	 * nothing to do at all. We don't even allocate the storage for them in
--	 * this case.
-+	 * As we're only handling architected PPIs, the guest writes to the
-+	 * enable for the non-architected PPIs just return as there's
-+	 * nothing to do at all. We don't even allocate the storage for them.
- 	 */
--	if (VGIC_V5_NR_PRIVATE_IRQS == 64 && p->Op2 % 2)
-+	if (p->Op2 % 2)
- 		return true;
- 
- 	/*
--	 * Merge the raw guest write into out bitmap at an offset of either 0 or
--	 * 64, then and it with our PPI mask.
-+	 * Merge the raw guest write into out bitmap, anded with our PPI mask.
- 	 */
--	bitmap_write(cpu_if->vgic_ppi_enabler, p->regval, 64 * (p->Op2 % 2), 64);
--	bitmap_and(cpu_if->vgic_ppi_enabler, cpu_if->vgic_ppi_enabler, mask,
--		   VGIC_V5_NR_PRIVATE_IRQS);
-+	bitmap_and(cpu_if->vgic_ppi_enabler, &reg, mask, VGIC_V5_NR_PRIVATE_IRQS);
- 
- 	/*
- 	 * Sync the change in enable states to the vgic_irqs. We consider all
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index a96c77dccf353..90be99443df3b 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -730,18 +730,15 @@ static int vgic_v5_get_userspace_ppis(struct kvm_device *dev,
- 	guard(mutex)(&dev->kvm->arch.config_lock);
- 
- 	/*
--	 * We either support 64 or 128 PPIs. In the former case, we need to
--	 * return 0s for the second 64 bits as we have no storage backing those.
-+	 * We only support 64 PPIs, so, we need to return 0s for the
-+	 * second 64 bits as we have no storage backing those.
- 	 */
- 	ret = put_user(bitmap_read(gicv5_vm->userspace_ppis, 0, 64), uaddr);
- 	if (ret)
- 		return ret;
- 	uaddr++;
- 
--	if (VGIC_V5_NR_PRIVATE_IRQS == 128)
--		ret = put_user(bitmap_read(gicv5_vm->userspace_ppis, 64, 128), uaddr);
--	else
--		ret = put_user(0, uaddr);
-+	ret = put_user(0, uaddr);
- 
- 	return ret;
+-static struct irq_ops vgic_v5_ppi_irq_ops = {
++static const struct irq_ops vgic_v5_ppi_irq_ops = {
+ 	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
+ 	.set_direct_injection = vgic_v5_set_ppi_dvi,
+ };
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 1e9fe8764584d..3ac6d49bc4876 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -573,7 +573,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
  }
+ 
+ void kvm_vgic_set_irq_ops(struct kvm_vcpu *vcpu, u32 vintid,
+-			  struct irq_ops *ops)
++			  const struct irq_ops *ops)
+ {
+ 	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
+ 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index ea793479ab254..fe49fb56dc3c9 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -205,7 +205,7 @@ struct vgic_irq;
+  */
+ struct irq_ops {
+ 	/* Per interrupt flags for special-cased interrupts */
+-	unsigned long flags;
++	unsigned long (*get_flags)(void);
+ 
+ #define VGIC_IRQ_SW_RESAMPLE	BIT(0)	/* Clear the active state for resampling */
+ 
+@@ -271,7 +271,7 @@ struct vgic_irq {
+ 	u8 priority;
+ 	u8 group;			/* 0 == group 0, 1 == group 1 */
+ 
+-	struct irq_ops *ops;
++	const struct irq_ops *ops;
+ 
+ 	void *owner;			/* Opaque pointer to reserve an interrupt
+ 					   for in-kernel devices. */
+@@ -279,7 +279,8 @@ struct vgic_irq {
+ 
+ static inline bool vgic_irq_needs_resampling(struct vgic_irq *irq)
+ {
+-	return irq->ops && (irq->ops->flags & VGIC_IRQ_SW_RESAMPLE);
++	return irq->ops && irq->ops->get_flags &&
++	       (irq->ops->get_flags() & VGIC_IRQ_SW_RESAMPLE);
+ }
+ 
+ struct vgic_register_region;
+@@ -557,7 +558,7 @@ void kvm_vgic_init_cpu_hardware(void);
+ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			unsigned int intid, bool level, void *owner);
+ void kvm_vgic_set_irq_ops(struct kvm_vcpu *vcpu, u32 vintid,
+-			  struct irq_ops *ops);
++			  const struct irq_ops *ops);
+ void kvm_vgic_clear_irq_ops(struct kvm_vcpu *vcpu, u32 vintid);
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+ 			  u32 vintid);
 -- 
 2.47.3
 
