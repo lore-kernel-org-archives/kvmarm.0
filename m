@@ -1,36 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841BF3B6C0E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842523BED0C
 	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 09:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779268814; cv=none; b=cX2FbTZ7CsEviEZes3VXXWObEfwQUUylFZNA9uBqTRTyjrSI1IloOOQlIdPqywA245iveB2C/jbVAAQwI3TJ3lAHoW3YmqkNYtpwyJ88qLMHPOeRCqKy0Utbp+9GKPM6I1K+inBXpm5Fh55gtrydT2wWQjeCL7yL+dgF0Qi19+4=
+	t=1779268814; cv=none; b=d5XyGM0VokGoUKp/srRv2bwi2Mb09qT09/O+J18aWkrmxaxQIJ5YGrPPeotgH/yS3CE3l1+iDTsl0jqmgdy8VuT7pFDZhGZmkm1h6uxeAo889A7pSFMZWNTAp1MCS8AicKUNHZjFsQOssjORCMIzIEWQNBCrAnD72gSX2KbvTL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779268814; c=relaxed/simple;
-	bh=96VNcfcAOKx179M//vuW6V7jcQGc/LjE1T/SragukLg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t8h7B3oa/PYcDexhxf0KIVK4jbCQV7SVsr3xnvOlmP4D07yQucEBOOG08iFXRTMOOUfuBRemx4+XWkRUrTFStKLM/qCkuiNJ2MWi+YgHatmzgxNBfYEJP9QlZ1aeosI403yE/kgaqjRvOmbUvCS+9H8/ssC1KiiYw2PMehz4JvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b37zcHUI; arc=none smtp.client-ip=100.103.45.18
+	bh=TGJQmtbSiP9azTwUVdzt+kkZ8/nNplEeIqsmNrh7dKw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UzhHEeCPK/dOw28IvZcb0VDkztVmFL+Xu4Ke+6zU4aMQCW28+pRGZwLX85Hs7z2ed3rLyyITnvL7HrwWMi1aMDPpNwseUoLu/GjBbt3YKh47ZDWVEViqKZ3qaWfEvb+H/AEP1Z2yCmZ98iNimUhQeX451KKR86WIjUauS+t5pz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kiyUsquS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b37zcHUI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B601F00894;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kiyUsquS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE171F00893;
 	Wed, 20 May 2026 09:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1779268812;
-	bh=d/JlcUjNjLjulQ9vEDBIuWcS1+FjD6s/DiGmeKXzMZ8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=b37zcHUIMWJHRRwZePi1aAt3excKPi1uHm6003yNhOEg9bXCEfjpPkPVEPhZzVo2K
-	 xGpPkyn2zspgQdgoiiLQ9kQq9PsEmr0lMvMY1IBRYH/vS+VyAGQS4YbI5vvWX+Yx/4
-	 j0mYn3hDuJIbbc7YRCfa90vqS1224qjJSXchMS7MABr118a2bXp2AQB5dTZPYYE2H6
-	 33/yLsO36baeI25mYaA2760VVuJALaIRI2SvyrHQmz+pBNNahFvyp6AKwtoIaMNomd
-	 irQkiH5/uNCyUpaivHmHNhQh4tclIbjsduvVAT9NM/UEYoAqznZdjlcgyj4RCALinh
-	 RKDn9QNvos1xA==
+	bh=8+SRIXb2EC27fQJGeFQBobVsfJFKqxmSb21xBPCc05Y=;
+	h=From:To:Cc:Subject:Date;
+	b=kiyUsquSM9fLU8RCEgybaCgLkg2v5vmgL2OHEaTf9f/73v7YJ9Fkn0M6asfzp4mgJ
+	 59fCq+OAIjxTGJiYeVGL2MwSyWEqsvuORkCzH1E1s6HdqmXJhZcjjl94Bs4nHZ2m4W
+	 iIzK/Hx7QkMYkEQde3/eAaeL0AMwEFEXFTfXj511ozQTI8UXdV9AKbC/h0locHL4rq
+	 Ymyef2PoJHA0mKgvsKEycPmTjZedGzkI6aKwai20bHO9Hwd/5gg0i72E8EV2tp5lj3
+	 +UOd0t+xGSzPRKR46lcrES00wsDGV4fwv8uVh20HmMfewkshbE7LnnkfJMdumbeDaD
+	 MOeZT0YrRwHeA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wPd62-00000004IaV-1faw;
+	id 1wPd62-00000004IaV-0Xct;
 	Wed, 20 May 2026 09:20:10 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -41,12 +40,10 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH v2 01/18] KVM: arm64: vgic-v5: Add for_each_visible_v5_ppi() iterator
-Date: Wed, 20 May 2026 10:19:32 +0100
-Message-ID: <20260520091949.542365-2-maz@kernel.org>
+Subject: [PATCH v2 00/18] KVM: arm64: vgic-v5 fixes for 7.2
+Date: Wed, 20 May 2026 10:19:31 +0100
+Message-ID: <20260520091949.542365-1-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260520091949.542365-1-maz@kernel.org>
-References: <20260520091949.542365-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,88 +56,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We have multiple instances of iterators walking the vgic_ppi_mask
-mask, and the way it is written has a tendency to make one's eyes
-bleed.
+Having completely missed the 7.1 window, this is a repost of this
+series cleaning-up the vgic-v5 PPI support now targeting 7.2.
 
-Factor it as a helper and use that across the code base.
+Not a lot has changed since v1 [1], only the documentation typo
+spotted by our eagle-eyed Joey.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c     |  2 +-
- arch/arm64/kvm/vgic/vgic-v5.c | 10 ++++------
- arch/arm64/kvm/vgic/vgic.h    |  3 +++
- 3 files changed, 8 insertions(+), 7 deletions(-)
+[1] https://lore.kernel.org/r/20260415115559.2227718-1-maz@kernel.org
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 148fc3400ea81..513f5f1429b5f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -751,7 +751,7 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
- 	 * Sync the change in enable states to the vgic_irqs. We consider all
- 	 * PPIs as we don't expose many to the guest.
- 	 */
--	for_each_set_bit(i, mask, VGIC_V5_NR_PRIVATE_IRQS) {
-+	for_each_visible_v5_ppi(i, vcpu->kvm) {
- 		u32 intid = vgic_v5_make_ppi(i);
- 		struct vgic_irq *irq;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index fdd39ea7f83ec..c0d36658ffe74 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -316,7 +316,7 @@ static void vgic_v5_sync_ppi_priorities(struct kvm_vcpu *vcpu)
- 	 * those actually exposed to the guest by first iterating over the mask
- 	 * of exposed PPIs.
- 	 */
--	for_each_set_bit(i, vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask, VGIC_V5_NR_PRIVATE_IRQS) {
-+	for_each_visible_v5_ppi(i, vcpu->kvm) {
- 		u32 intid = vgic_v5_make_ppi(i);
- 		struct vgic_irq *irq;
- 		int pri_idx, pri_reg, pri_bit;
-@@ -358,7 +358,7 @@ bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
- 	if (!priority_mask)
- 		return false;
- 
--	for_each_set_bit(i, vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask, VGIC_V5_NR_PRIVATE_IRQS) {
-+	for_each_visible_v5_ppi(i, vcpu->kvm) {
- 		u32 intid = vgic_v5_make_ppi(i);
- 		bool has_pending = false;
- 		struct vgic_irq *irq;
-@@ -391,8 +391,7 @@ void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu)
- 	activer = host_data_ptr(vgic_v5_ppi_state)->activer_exit;
- 	pendr = host_data_ptr(vgic_v5_ppi_state)->pendr;
- 
--	for_each_set_bit(i, vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask,
--			 VGIC_V5_NR_PRIVATE_IRQS) {
-+	for_each_visible_v5_ppi(i, vcpu->kvm) {
- 		u32 intid = vgic_v5_make_ppi(i);
- 		struct vgic_irq *irq;
- 
-@@ -429,8 +428,7 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
- 	 * ICC_PPI_PENDRx_EL1, however.
- 	 */
- 	bitmap_zero(pendr, VGIC_V5_NR_PRIVATE_IRQS);
--	for_each_set_bit(i, vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask,
--			 VGIC_V5_NR_PRIVATE_IRQS) {
-+	for_each_visible_v5_ppi(i, vcpu->kvm) {
- 		u32 intid = vgic_v5_make_ppi(i);
- 		struct vgic_irq *irq;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 9d941241c8a2b..f45f7e3ec4d6e 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -378,6 +378,9 @@ void vgic_v5_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v5_restore_state(struct kvm_vcpu *vcpu);
- void vgic_v5_save_state(struct kvm_vcpu *vcpu);
- 
-+#define for_each_visible_v5_ppi(__i, __k)		\
-+	for_each_set_bit(__i, (__k)->arch.vgic.gicv5_vm.vgic_ppi_mask, VGIC_V5_NR_PRIVATE_IRQS)
-+
- static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
+Marc Zyngier (9):
+  KVM: arm64: vgic-v5: Add for_each_visible_v5_ppi() iterator
+  KVM: arm64: vgic-v5: Move PPI caps into kvm_vgic_global_state
+  KVM: arm64: vgic-v5: Remove use of __assign_bit() with a constant
+  KVM: arm64: vgic-v5: Drop pointless ARM64_HAS_GICV5_CPUIF check
+  KVM: arm64: vgic: Constify struct irq_ops usage
+  KVM: arm64: vgic: Consolidate vgic_allocate_private_irqs_locked()
+  KVM: arm64: vgic-v5: Drop defensive checks from
+    vgic_v5_ppi_queue_irq_unlock()
+  KVM: arm64: vgic: Rationalise per-CPU irq accessor
+  KVM: arm64: vgic-v5: Limit support to 64 PPIs
+
+Sascha Bischoff (9):
+  KVM: arm64: vgic-v5: Add missing trap handing for NV triage
+  KVM: arm64: vgic-v5: Atomically assign bits to PPI DVI bitmap
+  KVM: arm64: selftests: Add missing GIC CDEN to no-vgic-v5 selftest
+  KVM: arm64: selftests: Cleanup unused vars in GICv5 PPI selftest
+  KVM: arm64: selftests: Improve error handling for GICv5 PPI selftest
+  Documentation: KVM: Fix typos in VGICv5 documentation
+  Documentation: KVM: Clarify that PMU_V3_IRQ IntID requirements for
+    GICv5
+  irqchip/gic-v5: Immediately exec priority drop following activate
+  KVM: arm64: Fix arch timer interrupts for GICv3-on-GICv5 guests
+
+ .../virt/kvm/devices/arm-vgic-v5.rst          |  6 +-
+ Documentation/virt/kvm/devices/vcpu.rst       |  7 +-
+ arch/arm64/kvm/arch_timer.c                   | 31 +++----
+ arch/arm64/kvm/emulate-nested.c               |  8 ++
+ arch/arm64/kvm/hyp/vgic-v5-sr.c               | 82 ++++---------------
+ arch/arm64/kvm/sys_regs.c                     | 19 ++---
+ arch/arm64/kvm/vgic/vgic-init.c               | 45 ++++------
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |  9 +-
+ arch/arm64/kvm/vgic/vgic-v5.c                 | 51 ++++--------
+ arch/arm64/kvm/vgic/vgic.c                    | 27 +++---
+ arch/arm64/kvm/vgic/vgic.h                    |  3 +
+ drivers/irqchip/irq-gic-v5.c                  | 13 +--
+ include/kvm/arm_vgic.h                        | 19 +++--
+ tools/testing/selftests/kvm/arm64/no-vgic.c   |  1 +
+ tools/testing/selftests/kvm/arm64/vgic_v5.c   | 10 +--
+ 15 files changed, 132 insertions(+), 199 deletions(-)
+
 -- 
 2.47.3
 
