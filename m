@@ -1,139 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731213AD515
-	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 10:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0633A380A
+	for <kvmarm@lists.linux.dev>; Wed, 20 May 2026 11:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779271330; cv=none; b=ompgnXeNmDIuvN9o+ttAn/zBJ2xHHpwS4sOvHqtGhovxz1fdWO8fZ35QiUXk3Uh3T8pp0Fb3/25Xo+uuEtY4fFkpReFXheHJvHKsx4Xc1evDM1MpXcbHcZaEwvmceONOLHfCbRxkPvghESNTh3B1nyEJGIqs6iZh/tcoyF1yMmc=
+	t=1779274963; cv=none; b=Xzs1LbJDyApe7rgrxsEQGAWPPb3rVVrmFxtTberTEdKyEnu+xoHe4kAS07hkDRHtjFhm+DKU+NaDWKg8fsxybzBRlkfkM0fBld2xOf9vROZHQkPbnU+DwpHQlO738/+M6MrUTh7OKuwvWhxvEVjE1ZhnRNiwj962Uotc3COD6vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779271330; c=relaxed/simple;
-	bh=Oo0HFa7VNKhuT2pfUnEyb+aph9czAy2eK1wH3BZ+a1A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LXfJhSOETFsvM9YK7k8AlDM1Q5nilwtq9m6RvcxhC9kwZ7Gsf0eo0RB6SzVAXakggd6kgQrkNzm3RV3gwq/izetmstEewpHQVoNemTLgGlWWUnP2c+1EKhiaFl4PlOryjlAGsG7KRG7PqcFgnQS+yJwESKVkvizeNOzgEwxt5dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yr8IV7BI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779274963; c=relaxed/simple;
+	bh=+7+/q8LAlMzLlWk1znO+lD248Sp+weOvZS73ENKy0kk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oeiU0x7uZNlbTG0L+DA8f+OU6c+9fc2unHzUG041aO6xGnGTKethsTn+ttMOscKhvrQATOkV4Tqvw8bsXno02RnLCGGMvYX+/5UfnJTFbMfPdJ6RA0BTQWl3CJyzr6+BWW6/aD/x91nqANB4VXI32rhAVVObBzzq5blbEezPpY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=klKpCENe; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yr8IV7BI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46DDA1F00896;
-	Wed, 20 May 2026 10:02:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779271328;
-	bh=tB774sdEjGOsUuihk5n6/aTLO5S2y/yue2pNnYlb8Vw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Yr8IV7BIV0VSWdKaAC9t7xpdAB1Ht5L6qejJHwV+Pth6oVq0xpa+7QFREyHNT35Pa
-	 wLnEulZtONP1oKmxv7QOfuorXajsnVzxOF8YESO52M0PUm/5KpHM4SEc9VT0ChcdVs
-	 FoEy/eUahOD1YWP2iybcQqQtNGD+Azjc+BkCyWZpgzl7OPxBHtAg5UgNbgnhtVrkIr
-	 PoB/f/VnhBFK8hkgirdUymxBWEqKw16nxsejAPCKj9dLIuF/a5LsWSEiBlTm58hz9y
-	 tN2+A1NvZTlBB8wH4GovDcFsMWFcaESFoWP4wY5uDedTZDh1Zehe0Nh8/nYG3KzMti
-	 FdWERqpA26tNA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wPdkc-00000004Jio-212F;
-	Wed, 20 May 2026 10:02:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Deepanshu Kartikey <kartikey406@gmail.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="klKpCENe"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0DEE175A;
+	Wed, 20 May 2026 04:02:34 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CFCC3F85F;
+	Wed, 20 May 2026 04:02:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779274960; bh=+7+/q8LAlMzLlWk1znO+lD248Sp+weOvZS73ENKy0kk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=klKpCENeYWVeS8V9assoUHjXrxQPA4+oCwfz857IRdqVxqQLfPyvVl4yqxb4K/YcR
+	 fEAdP4ISyjfLCwKMIuGSjsfMn8k/s7nhn3wy486zgkUtepNstLit8PmKt82OUaqZZy
+	 R8egHGygvWRT9MV+aNt4Zpb9/HXcanyY8pZkV9n4=
+Date: Wed, 20 May 2026 12:02:31 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 5/6] KVM: arm64: vgic-v2: Force vgic init on injection outside the run loop
-Date: Wed, 20 May 2026 11:01:59 +0100
-Message-ID: <20260520100200.543845-6-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260520100200.543845-1-maz@kernel.org>
-References: <20260520100200.543845-1-maz@kernel.org>
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Don't save/restore FP register
+ during a nested ERET or exception
+Message-ID: <20260520110231.GA4005903@e124191.cambridge.arm.com>
+References: <20260520085036.541666-1-maz@kernel.org>
+ <20260520085036.541666-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kartikey406@gmail.com, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260520085036.541666-3-maz@kernel.org>
 
-Make sure that any attempt to inject an interrupt from userspace
-or an irqfd results in the GICv2 lazy init to take place.
+Hi Marc,
 
-This is not currently necessary as the init is also performed on
-*any* interrupt injection. But as we're about to remove that,
-let's introduce it here.
+On Wed, May 20, 2026 at 09:50:36AM +0100, Marc Zyngier wrote:
+> When switching between L1 and L2, we save the old state using
+> kvm_arch_vcpu_put(), mutate the state in memory, then load the new
+> state using kvm_arch_vcpu_load(). Any live FPSIMD/SVE state is saved
+> and unbound, such that it can be lazily restored on a subsequent trap.
+> 
+> The FPSIMD/SVE state is shared by exception levels, and only a handful
+> of related control registers need to be changed when transitioning
+> between L1 and L2. The save/restore of the common state is needless
+> overhead, especially as trapping becomes exponentially more expensive
+> with nesting.
+> 
+> Avoid this overhead by leaving the common FPSIMD/SVE state live on the
+> CPU, and only switching the state that is distinct for L1 and L2:
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c             | 15 +++++++++++++--
- arch/arm64/kvm/vgic/vgic-irqfd.c |  6 ++++++
- 2 files changed, 19 insertions(+), 2 deletions(-)
+To make sure I understand this part:
+	
+	L1 sets up L2's FP state live on the CPU 
+	L1 erets
+	eret traps to L0/host
+	preemption disabled
+	kvm_arch_vcpu_put()
+	    kvm_arch_vcpu_put_fp() <-- actually saves the state of the live registers
+	.. set elr etc ..
+	kvm_arch_vcpu_load()
+	    kvm_arch_vcpu_load_fp() <-- doesn't actually restore state, but ensures
+                                        the CPTR trap will be set
+        .. returns to L2 (traps on first use of FP and state will be restored)
+	
+So this patch is (effectively) removing the put_fp()/load_fp(), because the FP
+state is common/shared between L1 and L2, so whatever L1 put into that state
+before the eret, L2 was going to see.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6e6dc17f8b606..cfb7921fc7d75 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -51,6 +51,7 @@
- 
- #include <linux/irqchip/arm-gic-v5.h>
- 
-+#include "vgic/vgic.h"
- #include "sys_regs.h"
- 
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-@@ -1497,8 +1498,13 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 
- 		return vcpu_interrupt_line(vcpu, irq_num, level);
- 	case KVM_ARM_IRQ_TYPE_PPI:
--		if (!irqchip_in_kernel(kvm))
-+		if (irqchip_in_kernel(kvm)) {
-+			int ret = vgic_lazy_init(kvm);
-+			if (ret)
-+				return ret;
-+		} else {
- 			return -ENXIO;
-+		}
- 
- 		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
- 		if (!vcpu)
-@@ -1525,8 +1531,13 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 
- 		return kvm_vgic_inject_irq(kvm, vcpu, irq_num, level, NULL);
- 	case KVM_ARM_IRQ_TYPE_SPI:
--		if (!irqchip_in_kernel(kvm))
-+		if (irqchip_in_kernel(kvm)) {
-+			int ret = vgic_lazy_init(kvm);
-+			if (ret)
-+				return ret;
-+		} else {
- 			return -ENXIO;
-+		}
- 
- 		if (vgic_is_v5(kvm)) {
- 			/* Build a GICv5-style IntID here */
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index b9b86e3a6c862..19a1094536e6a 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -20,9 +20,15 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
- 			int level, bool line_status)
- {
- 	unsigned int spi_id = e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
-+	int ret;
- 
- 	if (!vgic_valid_spi(kvm, spi_id))
- 		return -EINVAL;
-+
-+	ret = vgic_lazy_init(kvm);
-+	if (ret)
-+		return ret;
-+
- 	return kvm_vgic_inject_irq(kvm, NULL, spi_id, level, NULL);
- }
- 
--- 
-2.47.3
+If my understanding is correct:
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
+Thanks,
+Joey
+
+> 
+> - the trap controls: the effective values are recomputed on each entry
+>   into the guest to take the EL into account and merge the L0 and L1
+>   configuration if in a nested context, or directly use the L0 configuration
+>   in non-nested context (see __activate_traps()).
+> 
+> - the VL settings: the effective values are are also recomputed on each
+>   entry into the guest (see fpsimd_lazy_switch_to_guest()).
+> 
+> Since we appear to cover all bases, use the vcpu flags indicating the
+> handling of a nested ERET or exception delivery to avoid the whole FP
+> save/restore shenanigans. SME will have to be similarly dealt with when
+> it eventually gets supported.
+> 
+> For an EL1 L3 guest where L1 and L2 have this optimisation, this
+> results in at least a 10% wall clock reduction when running an I/O
+> heavy workload, generating a high rate of nested exceptions.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/fpsimd.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 15e17aca1dec0..aca98752a6e42 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -28,6 +28,20 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+>  	if (!system_supports_fpsimd())
+>  		return;
+>  
+> +	/*
+> +	 * Avoid needless save/restore of the guest's common
+> +	 * FPSIMD/SVE/SME regs during transitions between L1/L2.
+> +	 *
+> +	 * These transitions only happens in a non-preemptible context
+> +	 * where the host regs have already been saved and unbound. The
+> +	 * live registers are either free or owned by the guest.
+> +	 */
+> +	if (vcpu_get_flag(vcpu, IN_NESTED_ERET) ||
+> +	    vcpu_get_flag(vcpu, IN_NESTED_EXCEPTION)) {
+> +		WARN_ON_ONCE(host_owns_fp_regs());
+> +		return;
+> +	}
+> +
+>  	/*
+>  	 * Ensure that any host FPSIMD/SVE/SME state is saved and unbound such
+>  	 * that the host kernel is responsible for restoring this state upon
+> @@ -102,6 +116,15 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long flags;
+>  
+> +	/*
+> +	 * See comment in kvm_arch_vcpu_load_fp().
+> +	 */
+> +	if (vcpu_get_flag(vcpu, IN_NESTED_ERET) ||
+> +	    vcpu_get_flag(vcpu, IN_NESTED_EXCEPTION)) {
+> +		WARN_ON_ONCE(host_owns_fp_regs());
+> +		return;
+> +	}
+> +
+>  	local_irq_save(flags);
+>  
+>  	if (guest_owns_fp_regs()) {
+> -- 
+> 2.47.3
+> 
