@@ -1,43 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E81233F5B5;
-	Wed, 20 May 2026 06:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B26A2C029D;
+	Wed, 20 May 2026 07:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779259794; cv=none; b=YVR7o9C2Gzpp3OArRaIBmUNiCmFvO9Wr2exx7KXdkAUwWDuj/7hbXlt7WlVzqzDkfMxgkquHwytVD4x87v+gRLdOQB8vDGQnGBkZpi+jzimWzG30MxVGjUt/+SfE8G3fdceEbxq9+N6jkSKU4R/uR8ZyGWIWQ3O/hhqvSXg8Kp4=
+	t=1779261241; cv=none; b=OHu66eU2fRaW1HITIQdjg7x22hF6/F5OKsgoErnmLCQKzmY0zZX5Osf1ApPfK+FpTggLl+JwVs6BHYj9K7whBwJikwK0eBb6SqWWbyjgDPhx6SUrRoj+QqJ2UEPwYKmrzC492M2SurEfPYlBWBx+ATmwkgLtZ8NPy3g9SbBQteY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779259794; c=relaxed/simple;
-	bh=zEh1oPzhKzOoSL5FG7JVzsIJzlLRDEcwcyUmtlTtYSo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=caYENfMN5WZpKudVHZnSX0jdr8osi7Y1ZfjpCVgXbS1dw17nF+4HLCC7so5bSrQlqjmLAQJG9+LldSasYTUfc89L7e1JZ0X6f/TogabAEdOe+kD6yfms4oQIfMl80c9Me4JCOFVj6qx8d4LT7OvrNnEeUcyMUI+H1PgTv5riwZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TzarIWMh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779261241; c=relaxed/simple;
+	bh=Omk1GK48uaQTvwQx3DRNcE9N40pY0spGM3LxtBqehIs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BUYan1QGTLJ8Ou5a8nu0xUsdexdR7U2eGiKpoRp7I92Y7FnO+OctHvFHHZB2eBq1K95FeOJiQyDecwn8nIh2ty2p2T2lPbUTx7XELDov4Y9GZvrzEEomf5k6uS+T7PjnPH0xJ3EPvbIIyX8Hg7cQFZGbwGcXVtj2sC+b0ZR4jZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=baOEhpPl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TzarIWMh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B51E1F00894;
-	Wed, 20 May 2026 06:49:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baOEhpPl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C52111F000E9;
+	Wed, 20 May 2026 07:13:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779259792;
-	bh=SYGoO+3vr+wCVS6zRiEdGY9MLJHWWaWiqDe/o0mDGzI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TzarIWMhkmz7SMufc86TM8YhhsuQ0r0YK/YsACMLXuPR8iZ/yobd3WtClK3szEgvT
-	 xpYLpdhGQAdpnizcPga1PxAdAzd1j8f4LQ17NOP+3eKonM6Zk2k/F3TNWSSg6xUeOA
-	 IRnwtto+REyB0zr5DKzwwZ00EQC7/qshn6m/ssweryX3pAWUk5boGpqwKWm3v7t582
-	 LdeDABgNCWBwS8YkUuW6DdGhST4rAAZSvUQg1oyk8eXuHZLsMYW63rCEGhVIPnHtCG
-	 SvqngTpnLcE8AtmLbxK7pVQERuclLfW3h41hnFOt7+84NFcXxKfg+3GYxqHWTgouEU
-	 qNgc5CEbK3j8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	s=k20260515; t=1779261239;
+	bh=PMvBUpEgXSeKRNncOVDBP9O0vPsscPTWuBykm2sSqXM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=baOEhpPlP87qch1i34tnXPikTwZ14iuIjurWtLg2BhEAknkpBqeLqLcvSJvQpGGuu
+	 g2Qz9J1zlkP3vSrG0jmXKSHIkXcPa41Ui1v/TDuTNUqYYeXtfYU9jgECrA+2LkwIpM
+	 nR+CAQZ9ryEnYdOIqYPfyfRSdO0Q3eA8j/5gW4PAxWWMs0ylUubPZbQtQ25thAyZhE
+	 SNPMYzmk/M+tbBR9JuGqTtEJsMOZJlP65RBV7RxKrvBGT5DJbnZ8ROONzc7myuuHtj
+	 l5gDaTAkWWX5z8+bnP+d7xMRgFdHsg2Occ84BR3zs1NEawb/qczW4hVaZ5n0+n5gBW
+	 SLCpAzAr8DygQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=localhost.localdomain)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wPakY-00000004Exw-0GXy;
-	Wed, 20 May 2026 06:49:50 +0000
-Date: Wed, 20 May 2026 07:52:58 +0100
-Message-ID: <87mrxua7xx.wl-maz@kernel.org>
+	id 1wPb7t-00000004FYd-3Ou3;
+	Wed, 20 May 2026 07:13:57 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: Michael Bommarito <michael.bommarito@gmail.com>,
-	Oliver Upton <oupton@kernel.org>,
+To: Oliver Upton <oupton@kernel.org>,
+	Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
@@ -46,74 +44,47 @@ Cc: Michael Bommarito <michael.bommarito@gmail.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic-its: reject restored DTE with out-of-range num_eventid_bits
-In-Reply-To: <4v4zv3y5yxwkfnouqcjxhrwxvnpd7c4oodevrcgivxu2aeaiyg@2b3arv4mmv7n>
-References: <20260517174955.273004-1-michael.bommarito@gmail.com>
-	<w6zdprlry2y37wtkirv4zhiy5awau3stbkjohmvfwkswgoaafe@ul53z6xwyuhw>
-	<8633zpxh1v.wl-maz@kernel.org>
-	<4v4zv3y5yxwkfnouqcjxhrwxvnpd7c4oodevrcgivxu2aeaiyg@2b3arv4mmv7n>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [PATCH v2] KVM: arm64: vgic-its: reject restored DTE with out-of-range num_eventid_bits
+Date: Wed, 20 May 2026 08:17:09 +0100
+Message-ID: <177926141814.52935.2813857161910568316.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260519132519.2142458-1-michael.bommarito@gmail.com>
+References: <20260517174955.273004-1-michael.bommarito@gmail.com> <20260519132519.2142458-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yaoyuan@linux.alibaba.com, michael.bommarito@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oupton@kernel.org, michael.bommarito@gmail.com, yaoyuan@linux.alibaba.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 May 2026 07:04:26 +0100,
-Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
+On Tue, 19 May 2026 09:25:19 -0400, Michael Bommarito wrote:
+> Userspace can restore an ITS Device Table Entry whose Size field encodes
+> more EventID bits than the virtual ITS supports.  The live MAPD path
+> rejects that state, but vgic_its_restore_dte() accepts it and stores the
+> out-of-range value in dev->num_eventid_bits.
 > 
-> On Mon, May 18, 2026 at 09:23:08AM +0800, Marc Zyngier wrote:
-> > On Mon, 18 May 2026 07:05:13 +0100,
-> > Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
-> > >
-> > > On Sun, May 17, 2026 at 01:49:55PM +0800, Michael Bommarito wrote:
-> >
-> > [...]
-> >
-> > > > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> > > > index 2ea9f1c7ebcd0..a5dcf9a6a2854 100644
-> > > > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > > > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > > > @@ -2307,6 +2307,15 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
-> > > >  	/* dte entry is valid */
-> > > >  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
-> > > >
-> > > > +	/*
-> > > > +	 * The MAPD command rejects this case; mirror the cap here so a
-> > > > +	 * restored DTE cannot install an out-of-range num_eventid_bits
-> > > > +	 * that vgic_its_restore_itt() would then convert into a
-> > > > +	 * sign-extended scan_its_table() length.
-> > > > +	 */
-> > > > +	if (num_eventid_bits > VITS_TYPER_IDBITS)
-> > > > +		return -EINVAL;
-> > >
-> > > Hi,
-> > >
-> > > IIUC, the same issue is still there when VITS_TYPER_IDBITS
-> > > change to >=28, I know it's limited to 16 in GITS_TYPER's
-> > > definition. I mean the issue is still there w/o really be
-> > > fixed.
-> >
-> > Change how? This is a hard-coded limit that reflect a practical use of
-> > the ITS (and is already 32 times larger than what PCIe allows).
-> >
-> > Are you suggesting a possibility of making this userspace
-> > configurable?
+> Reject restored DTEs with num_eventid_bits > VITS_TYPER_IDBITS before
+> allocating the device.  This mirrors the MAPD check and prevents the
+> restored state from reaching vgic_its_restore_itt(), where the unchecked
+> value can be converted into an oversized scan_its_table() range.
 > 
-> So far No, may until one day it has more than 16 definition :-)
+> [...]
 
-This is 16 *bits*. That 2^16 possible MSIs *per device*. Please show
-me a device that exceeds this requirement.
+Applied to fixes, thanks!
+
+[1/1] KVM: arm64: vgic-its: reject restored DTE with out-of-range num_eventid_bits
+      commit: 9ce754ed8e7ab4e3999767ce1505f85c449ccb07
+
+Cheers,
 
 	M.
-
 -- 
 Jazz isn't dead. It just smells funny.
+
+
