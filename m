@@ -1,238 +1,77 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4320B3EA94F;
-	Thu, 21 May 2026 12:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ABA220F2A;
+	Thu, 21 May 2026 12:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779367749; cv=none; b=TF9YOfpWGpyZthqZyItRrRpTtWu+kIiI9C4WoL8DEbFAghd50/0VmNVrUnb8Lp7KN5R0p+JvrDdJuMgMiglTm3/FoKLfg5YqyjK7sDmHoJR05ksT0frfS9CXc2krSk7/97I00caS6EoDybmWPgRZwrG8DDxlaVh6y9GWQh/2230=
+	t=1779367879; cv=none; b=hcmfV40P4wgNW/+hUlBupahoFnXhPqsqyONjkFjq0Lh6TmgmP8QjPgdznndmT/UqNjjmTWVreDdnrxnWaz2fN4VA+k50JNKXR/jacygY7PxANACrZ/IiyXqOFVPFA4GMtSVZCJOrzUNQINzPw/p/W6BiFpvUOkQpV8OcgnF/CAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779367749; c=relaxed/simple;
-	bh=saknLn5G0FrDxHkx/4sSQN5jqneqsuZMpyZigCfmvpo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=btkvZMNELI68mX1vsOKgpbauOSzT09LHS+Zr/APK07Eqc1CaAnTZYF3ZNkZfvoAjmPxmMoWXJd+3pi8l3kO94ObrU4wQuT4r/1PQh+OPeA6e2Yl+JOTswzGLHN+A2DZ1ToNhb6i2fXOq/TVc7YWJFXV7dWbJMaepkR6kjT4G1NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeWHKF6d; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779367879; c=relaxed/simple;
+	bh=7jzHvKRd/On+GRBlud+zh/apk/tg0aHT5tC2fNXMtRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u2C2th/xhQMDEDG5r7H7tk1tRbSsLmZsA3bwkQwGW5jGmwzzXaVR3uIhVgtKoaKH1VAVG8GpJ0oU5W6/K2JiH/dqnQrL7H3EFxxvERPDhp6yvLbf1wn9qDk13LoSsPB+VqnzTW5oh8uoQO6iT2RhEtWF88xyvYW8OxkEJFMxpNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BkToSujN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeWHKF6d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24F871F000E9;
-	Thu, 21 May 2026 12:49:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BkToSujN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 399F91F000E9;
+	Thu, 21 May 2026 12:51:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779367748;
-	bh=Gay789DqOuuDMBG6ufrA9+l88sHJCOMD+TgevxOlQlA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=FeWHKF6dczrLRkFyvNfnWdL1BEMe+IW2yMd3n9NlQlG+QX6QEUfx1sS2qFSQ2ahwA
-	 c6NjllYJ7bFNmt9unFLcTd2sSI+yFjIHB/F0vxVLWhnE3zutMMzS9DxcjGtdxsIWke
-	 QwC+8V8+lCFtyUs1dqYtVTDG9SGRj+MWvTWQjRY04MGIelzDgubivCRcvD8GtRqK9k
-	 xirAZ3WAESZF7xHFg7CcMx3qnWaZrbABdAriqpaTHOmTrZ3jENPU84xumwlGQTcSXo
-	 4szDbEBgiCb7ooQ0PVI7JxLRsMMQWFyxroqw6Up6hX8spQRINH9mYg24u715OWONiN
-	 JlVuqJSiLCpJg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wQ2pm-00000004owX-0kPM;
-	Thu, 21 May 2026 12:49:06 +0000
-Date: Thu, 21 May 2026 13:49:05 +0100
-Message-ID: <86cxypvsfy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 05/44] arm64: RMI: Add wrappers for RMI calls
-In-Reply-To: <20260513131757.116630-6-steven.price@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-6-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1779367877;
+	bh=53MBMVpYsah1G6NU1zmq3jtKdic1Gk+mrU5myoZHcTw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=BkToSujNclyXcE88OzhY40ufvQn2cBGui3KuvHUppU/C9uik42OSCjbIQqlUp0FIf
+	 01BFXGNtxBBf3a7CeCM8rndojcNt2MN8sA/1RQ2dVXcqPbR9TmXZXbD8RY7XQRqVuq
+	 vzMNbPTwmKMeuUjg4JGCRHdyGZkz/GkwGF4/E12viTb43aA+fqmDHYM2cedyi5ikYR
+	 ochACvQ3dea/2IQoJjm+7upgYdeJfdaaOItq8r+auwNgK3PZWxquM/lO3XeDuxEH7T
+	 xRvHLTIceWp0qqY40Cg6lcme/SuObotCdw1AP8VMP9uTfFKj2C5PgG+k8k8rGhLdBR
+	 BXz1IUF6qogcA==
+Date: Thu, 21 May 2026 13:51:12 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	catalin.marinas@arm.com, jens.wiklander@linaro.org,
+	sumit.garg@kernel.org, sebastianene@google.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v4 2/5] firmware: arm_ffa: Fix out-of-bound writes in
+ ffa_setup_and_transmit()
+Message-ID: <20260521-gleaming-shoebill-of-artistry-5d738c@sudeepholla>
+References: <20260520204948.2440882-1-smostafa@google.com>
+ <20260520204948.2440882-3-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260520204948.2440882-3-smostafa@google.com>
 
-On Wed, 13 May 2026 14:17:13 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On Wed, May 20, 2026 at 08:49:45PM +0000, Mostafa Saleh wrote:
+> Sashiko (locally) reports multiple out-of-bound issues in
+> ffa_setup_and_transmit:
+> 1) Writing ep_mem_access->reserved can write out of bounds for FFA
+>    versions < 1.2 as ffa_emad_size_get() returns 16 bytes in that case
+>    while reserved has an offset of 24.
+>    Instead of zeroing fields, memset the struct to zero first based on
+>    the FFA version.
 > 
-> The wrappers make the call sites easier to read and deal with the
-> boiler plate of handling the error codes from the RMM.
+
+Neat, I clearly missed taking this approach when I added zero-ing of
+member initially.
+
+> 2) Make sure there is enough size to write constituents.
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes from v13:
->  * Update to RMM v2.0-bet1 spec including some SRO support (there still
->    some FIXMEs where SRO support is incomplete).
-> Changes from v12:
->  * Update to RMM v2.0 specification
-> Changes from v8:
->  * Switch from arm_smccc_1_2_smc() to arm_smccc_1_2_invoke() in
->    rmi_rtt_read_entry() for consistency.
-> Changes from v7:
->  * Minor renaming of parameters and updated comments
-> Changes from v5:
->  * Further improve comments
-> Changes from v4:
->  * Improve comments
-> Changes from v2:
->  * Make output arguments optional.
->  * Mask RIPAS value rmi_rtt_read_entry()
->  * Drop unused rmi_rtt_get_phys()
-> ---
->  arch/arm64/include/asm/rmi_cmds.h | 661 ++++++++++++++++++++++++++++++
->  1 file changed, 661 insertions(+)
->  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+> While at it, convert the only sizeof() in the driver that uses a
+> type instead of variable.
 > 
-> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-> new file mode 100644
-> index 000000000000..04f7066894e9
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_cmds.h
-> @@ -0,0 +1,661 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RMI_CMDS_H
-> +#define __ASM_RMI_CMDS_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#include <asm/rmi_smc.h>
-> +
-> +struct rtt_entry {
-> +	unsigned long walk_level;
-> +	unsigned long desc;
-> +	int state;
-> +	int ripas;
-> +};
-> +
-> +#define RMI_MAX_ADDR_LIST	256
-> +
-> +struct rmi_sro_state {
-> +	struct arm_smccc_1_2_regs regs;
-> +	unsigned long addr_count;
-> +	unsigned long addr_list[RMI_MAX_ADDR_LIST];
-> +};
-> +
-> +#define rmi_smccc(...) do {						\
-> +	arm_smccc_1_1_invoke(__VA_ARGS__);				\
-> +} while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
-> +	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
-> +
-> +unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp);
-> +void rmi_sro_free(struct rmi_sro_state *sro);
-> +
-> +/**
-> + * rmi_rmm_config_set() - Configure the RMM
-> + * @cfg_ptr: PA of a struct rmm_config
-> + *
-> + * Sets configuration options on the RMM.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rmm_activate() - Activate the RMM
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rmm_activate(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_ACTIVATE, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_granule_tracking_get() - Get configuration of a Granule tracking region
-> + * @start: Base PA of the tracking region
-> + * @end: End of the PA region
-> + * @out_category: Memory category
-> + * @out_state: Tracking region state
-> + * @out_top: Top of the memory region
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_granule_tracking_get(unsigned long start,
-> +					   unsigned long end,
-> +					   unsigned long *out_category,
-> +					   unsigned long *out_state,
-> +					   unsigned long *out_top)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_TRACKING_GET, start, end, &res);
-> +
-> +	if (out_category)
-> +		*out_category = res.a1;
-> +	if (out_state)
-> +		*out_state = res.a2;
-> +	if (out_top)
-> +		*out_top = res.a3;
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_gpt_l1_create() - Create a Level 1 GPT
-> + * @addr: Base of physical address region described by the L1GPT
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_gpt_l1_create(unsigned long addr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GPT_L1_CREATE, addr, &res);
-> +
-> +	if (RMI_RETURN_STATUS(res.a0) == RMI_INCOMPLETE) {
-> +		/* FIXME */
 
-Is that part of the SRO stuff you're talking about in the notes?
-What is the ETA for fixing all these FIXMEs?
-
-Thanks,
-
-	M.
+Reviewed-by: Sudeep Holla <sudeep.holla@kernel.org>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Sudeep
