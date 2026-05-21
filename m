@@ -1,225 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D9B3CDBDF;
-	Thu, 21 May 2026 13:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779368572; cv=none; b=uwYKw/jvPzxr54tAMVGWnkV6W3haT8Tf6mHHQ8az3usujLjtpuUqQXPQLeAjEeopRfkPs+ZAvSjfyhcijX4aj5LeySAQ1oLYgDw7ElXVC6Xa7kQmlQn2AyoQBL9P2L2TthlBxM5AzpC7nvEPtFkel65idALr9MYs1C7JFNOYEec=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779368572; c=relaxed/simple;
-	bh=Vd1aeukU9SjU8pntW0fexxBds45hk8IK+hvmsFrzhP4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OjAO1uEuCyMjanpo1dTjw9DrL2o02kj7g6TatH94NsN00yagB+5cyv90t42WpT0fwQvFtDEB3CZSefT1Sj8BquJLZ+EjBJs5/to6yZIPDIL/9ERgyez8clx578rUJFcSClI/BWlbxmI0CwMP9SbiCqPTQyu5meAjnP9OevIHjNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J89Ukpcs; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0474C4014AA
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 13:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779368893; cv=pass; b=t4CBFq7djq3Uqvcxurx6COkeCdoyHgQ3wPbePcZtt+9M0D4EFGMDJCXIAQ3hMWOVyOu0bbYwEqW2nZ5bVr5Idi5vMWvRoQM2ufSHEaBmrQIGpLeDgs9cjQKvXbwxrj1RMcbqop9IG34Kq19t0nOXfI4KHCOTeJc2K1uDUDhi0+4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779368893; c=relaxed/simple;
+	bh=WbUuWW43d3lbl0IDVPwVVeJJQED8p1k3PaKRHx/+LX4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TrULZO429bX3V2NTrKzFMMHkyR3IE7mcdxLUFCPAw7HMKN0PKc+ThvqjrsslweqhkmGEhMfpVyVAxsikemqKkTbFhYfrgsVLrRi7bxEOZlkNyXqRhoBgAsVHhkyKHAjgnNGQhkv4jlH7CgwLEs3AjBd5PdRAhUqRKCSGoMbz5RI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XnUQziCe; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J89Ukpcs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A9EC1F000E9;
-	Thu, 21 May 2026 13:02:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779368571;
-	bh=KseMWYA9Jr+H+xyRY9PEDU6eP4OJzZ07RtFA0ZPZDpM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=J89UkpcsSbAQyKPZHklpnfU67IWP/NGR3yXsGOGIu+FCamaJh8yz4S2Bozimedpmc
-	 zyt1dv0k3dQhPoAbqrQwLHakE/ADclQ02ef80H1VXz3Epznh1U7uvm0byBb0ac9cvd
-	 S1emvq/rqsuYWFR2rWBQJ1yMaSc6f2ZErIbVlT7N+nmuoR1P4cKckB/HnUpaV4gpFa
-	 157kQzM8SRXA6sCPriIupaJsss3z1StTCzjcBTm/xQCnuo7nhcR9CGGaBkCS6lctpi
-	 ollLw+6vwZQCEhGHjm119odnglTItg/0F+a7m8GqXiKn3xUSDIPm0zoRs/bPJQ9JH4
-	 PAfp/+ahVUbkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wQ333-00000004pBR-0eto;
-	Thu, 21 May 2026 13:02:49 +0000
-Date: Thu, 21 May 2026 14:02:48 +0100
-Message-ID: <86bje8x6dj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 06/44] arm64: RMI: Check for RMI support at init
-In-Reply-To: <20260513131757.116630-7-steven.price@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-7-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XnUQziCe"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50d6b393d60so15341cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 06:08:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779368891; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Q2wPeC/nCqfF7Qzs6ULUDveGjpmiBQnOJeTd6pFb6H5koGxrV9d3PBTot0YVFOjZcZ
+         JbnIc2KV+Fy7o5sghVXe7yM+xhrg814+7shgifmBojrGQ1PHRtMUYLs/YPdKoxEEnOaJ
+         V3DvWmBprYZv9dmOphD8EFNOuMJdmVm1QbWXsXcrNvnSWky8AEmoWrMFrC0lcxfXfzwy
+         nCw93NeTjPqVAyWZyFfui3A2zgdKNldQGvt+pi2N2hifqaz93QZynt2ziNyUBsAD+5ZH
+         4FsJ9lWmG6vFbS9a/x1BLYg2QzuE/+nIcUMJygYkq2lvQPAg1RHtpuQdC9LMVU+ZEfYz
+         wGig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=5cR07XDjlS+wXZUNvs0UUZjGctg9E4/1xeGtGHmHDoY=;
+        fh=qf2/RxbHiViQhz56245m2R0UTb8kKAhpMpdZYpr350A=;
+        b=dP3kLexKs+ot9N/qEbLosQ5CVheHTZuE2wQM2Xv4Rj1I2q61OUID19S5UkZGD7g+4L
+         ki9wcQQ6vO+EnWiTzQe8vI1c3S6+HC2INehzcg5WzUY570lBW9gvVKyN98pcCOENMHnz
+         FNBN7K1l5YSwpJYeDej+gSX1mAtVyJQuYgPVNfUQQE7oPnAIfUic1kwQKUo0HdMmuyYB
+         ViTPuzOLYPjd/XHbKbiIx+fjHkAWvgOIG+0D2obcYBuJ5ttZoy+i62rtU6jI8yqgaF/d
+         DqQu0mnPocMP5I/z4x+hb+GBjKWfHcJ+pWcSwFwZBzTt8aWMxhZI3EsKWMxz3zYAdoeJ
+         KUdw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779368891; x=1779973691; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5cR07XDjlS+wXZUNvs0UUZjGctg9E4/1xeGtGHmHDoY=;
+        b=XnUQziCeKRXouxYpS/pww0GBgpEPneV6/7rpkPvQ2jBIZNaZJgxF+ebUmm1su+9Peg
+         voqrIMhOrfuAgwnRLVfi1ltJNPDb+zBQue1aIIW3ySfyQD6sEt7xeljBqEzQ3TZ7kHuZ
+         gTs2X6w8G93PVcqFbErO090dVohpGqzmRBj2lDOv4skrTDnOFI/DH/FWCmFKyj041Nmv
+         PNopXDY0yUyLC/dq4gD7uRxWL6lkirmy4vrm+6IEQNd1PQ+KNKe8EqFlBFqOLa/0CzZa
+         tgOPD3eGspa0ZLOE67n2qxQq81VheHbohwnPVschw27tBoSaDGI1pWusYgPnI7Nq/bzp
+         BSaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779368891; x=1779973691;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5cR07XDjlS+wXZUNvs0UUZjGctg9E4/1xeGtGHmHDoY=;
+        b=KmfiY20osKMpla7pb3gHHaE+wsSLgbt21fuUYsZ6bHRDUZF2oroif3ZqATXe8Rv4E5
+         ow/WSDSxAOOa+400d5utXCFkPPPj06EvQaKLsz0WozFzD9XsIqqABQrqOYMIpbtiArI0
+         8Xsidk25dmRqc7ebbqXQa11UpuATm/5dkjChlzJPPqMCHf5o+9uHGrSKycuN5ZmoF8ma
+         f8UL9qptBam7kbzp3haf1/pAV9/GmjyTwDJeuBMWrAehdiZ5duXJ0z+HBHs09UtrYas+
+         nYoBy+ZMvIWCC03kCoTJ5/whhhLfqyVVhBCFabehMbYI0cAjGKUuhml4RfUJ7GYLuJK6
+         ReDQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8OnUK11hAO14VqxDbmPI9+tagc/j3OXHxie/doSOi6AzK0KATrntWEnk05BiNDowJBqwoZgww=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx4jHe1lwoytb7ysPGULWfj6reJD58kprCl8CjyUroZJikJHNRc
+	SZdB4ImHdzOgylQJ3nhzmlfbRz1aySO7fBAhGFDFQ+znxj5J5e42oBTfbUfLk4e3qhI1td4OR7M
+	HxdjrQiH8W4Y9BuEiQN2X4h8pD80kMKJa2MzbzOq8
+X-Gm-Gg: Acq92OGyePB/VIYLjvBqu6EShc2fr8oLPdbNYYpKBfQOoo/0BT66jqLRKK/JTduCgiT
+	XQpvK0j0bxQrE8bX+QkY0jNaa0Gf2kJFzmtucSHP3QbVEFqHK8yxEL1N0A83/z9mctYUQUxieW/
+	imb68H7U7LH5pLw1K27/lJd2TgOb8Fy2zXGrWVeGIaLYvrsn2U/nuT8CMJBT2QROHZftlB5IQ76
+	7k4AszOirbidPpIsMTsX7MM7JTQG6q7+ljcdyq/x0OTKHH0QQEvNSrWwSG2e3F65X3C5FoEUwCZ
+	3ZQW83Kr8rGCTWIZH1E=
+X-Received: by 2002:a05:622a:5147:b0:509:15b6:f6a0 with SMTP id
+ d75a77b69052e-516c533a032mr9304301cf.6.1779368890494; Thu, 21 May 2026
+ 06:08:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260521102149.804874-1-vdonnefort@google.com>
+In-Reply-To: <20260521102149.804874-1-vdonnefort@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 21 May 2026 14:07:33 +0100
+X-Gm-Features: AVHnY4JIjf2uZYHmJ4dR6Y-DYOh1okfQ1cljWLx4X95PZ0crH8aSvwnk1-SFv8E
+Message-ID: <CA+EHjTxWp_NB3p+z-iVriSKq1iAd_CwpBVUprO30G36X2ZJfdg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] Fix __pkvm_init_vm error path
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 13 May 2026 14:17:14 +0100,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> Query the RMI version number and check if it is a compatible version.
-> The first two feature registers are read and exposed for future code to
-> use.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> v14:
->  * This moves the basic RMI setup into the 'kernel' directory. This is
->    because RMI will be used for some features outside of KVM so should
->    be available even if KVM isn't compiled in.
-> ---
->  arch/arm64/include/asm/rmi_cmds.h |  3 ++
->  arch/arm64/kernel/Makefile        |  2 +-
->  arch/arm64/kernel/cpufeature.c    |  1 +
->  arch/arm64/kernel/rmi.c           | 65 +++++++++++++++++++++++++++++++
->  4 files changed, 70 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kernel/rmi.c
-> 
-> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-> index 04f7066894e9..9179934925c5 100644
-> --- a/arch/arm64/include/asm/rmi_cmds.h
-> +++ b/arch/arm64/include/asm/rmi_cmds.h
-> @@ -10,6 +10,9 @@
->  
->  #include <asm/rmi_smc.h>
->  
-> +extern unsigned long rmm_feat_reg0;
-> +extern unsigned long rmm_feat_reg1;
-> +
->  struct rtt_entry {
->  	unsigned long walk_level;
->  	unsigned long desc;
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index 74b76bb70452..d68f351aae75 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -34,7 +34,7 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
->  			   cpufeature.o alternative.o cacheinfo.o		\
->  			   smp.o smp_spin_table.o topology.o smccc-call.o	\
->  			   syscall.o proton-pack.o idle.o patching.o pi/	\
-> -			   rsi.o jump_label.o
-> +			   rsi.o jump_label.o rmi.o
->  
->  obj-$(CONFIG_COMPAT)			+= sys32.o signal32.o			\
->  					   sys_compat.o
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 6d53bb15cf7b..8bdd95a8c2de 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -292,6 +292,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
->  static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
->  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV3_SHIFT, 4, 0),
->  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV2_SHIFT, 4, 0),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RME_SHIFT, 4, 0),
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_DIT_SHIFT, 4, 0),
->  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_AMU_SHIFT, 4, 0),
->  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
-> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
-> new file mode 100644
-> index 000000000000..99c1ccc35c11
-> --- /dev/null
-> +++ b/arch/arm64/kernel/rmi.c
-> @@ -0,0 +1,65 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023-2025 ARM Ltd.
-> + */
-> +
-> +#include <linux/memblock.h>
-> +
-> +#include <asm/rmi_cmds.h>
-> +
-> +unsigned long rmm_feat_reg0;
-> +unsigned long rmm_feat_reg1;
+On Thu, 21 May 2026 at 11:22, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> Sashiko reported a potential refcount leak in the unlikely case where
+> insert_vm_table_entry fails.
+>
+> While at it, I have added a fail-safe to __pkvm_hyp_donate_host to ensure this
+> function doesn't allow leaking refcounted pages.
+>
+> Changes since v2:
+>
+>   * Proactively init hyp_page order field in hyp_pool_init
+>
+> v1 (https://lore.kernel.org/all/20260521081250.655226-1-vdonnefort@google.com/)
+>
+> *** BLURB HERE ***
 
-What is the requirement for making those globally accessible? Can't
-they be made static and use an accessor that returns them? Can the
-variables be made __ro_after_init?
+nit: missing BLURB :)
 
-> +
-> +static int rmi_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	unsigned short version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +	unsigned long aa64pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> +
-> +	/* If RME isn't supported, then RMI can't be */
-> +	if (cpuid_feature_extract_unsigned_field(aa64pfr0, ID_AA64PFR0_EL1_RME_SHIFT) == 0)
-> +		return -ENXIO;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
-> +	if (res.a0 != RMI_SUCCESS) {
-> +		unsigned short high_version_major, high_version_minor;
-> +
-> +		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
-> +		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
-> +
-> +		pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
-> +		       version_major, version_minor,
-> +		       high_version_major, high_version_minor,
-> +		       RMI_ABI_MAJOR_VERSION,
-> +		       RMI_ABI_MINOR_VERSION);
-> +		return -ENXIO;
-> +	}
-> +
-> +	pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init arm64_init_rmi(void)
-> +{
-> +	/* Continue without realm support if we can't agree on a version */
-> +	if (rmi_check_version())
-> +		return 0;
-> +
-> +	if (WARN_ON(rmi_features(0, &rmm_feat_reg0)))
-> +		return 0;
-> +	if (WARN_ON(rmi_features(1, &rmm_feat_reg1)))
-> +		return 0;
-> +
-> +	return 0;
-> +}
-> +subsys_initcall(arm64_init_rmi);
+/fuad
 
-Is there any reliance on this being executed before or after KVM's own
-initialisation? If so, this should be captured.
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+/fuad
+
+>
+> Vincent Donnefort (3):
+>   KVM: arm64: Reset page order in pKVM hyp_pool_init
+>   KVM: arm64: Fix __pkvm_init_vm error path
+>   KVM: arm64: Add fail-safe for refcounted pages in
+>     __pkvm_hyp_donate_host
+>
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 34 ++++++++++++++-----
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  6 +++-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 ++-
+>  4 files changed, 34 insertions(+), 11 deletions(-)
+>
+>
+> base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
+> --
+> 2.54.0.746.g67dd491aae-goog
+>
