@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C60366067;
-	Thu, 21 May 2026 15:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B473367283;
+	Thu, 21 May 2026 16:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779378605; cv=none; b=XtNre9IDKFms8dif70AISRpafPUctdpHpruKrYjB48Yy4Y0qEH/1HtNp/YMQZXdzuri2JuRId3G27gfd/oOOAzVhiBWrAUYEtkz8olSSs8NGf3abLKp9tjQNY1r/sRDE423/wHMRzRSvfcL+ejyYug+JKFZ0bt/7qAHNFRKkI+Q=
+	t=1779379306; cv=none; b=eLt55jIZGh5W8oDmbWOmq0bJEmGrW/0mQCvhgBf/2rGWO73zChTJWh4E2yzOOmoURRUkBng5wJrDCvFaQvahnOOHG7jMlaAx6CQyzxywjBXpvem9oDclAHu0O3lzKbuvqLjOY18rzBMxnIisSTSswrEVy1jYzloVgOUlX6MQf90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779378605; c=relaxed/simple;
-	bh=mMghuHi21M3rXnjm/M0jpANdblyW2ZAdsbpFbgKLRXI=;
+	s=arc-20240116; t=1779379306; c=relaxed/simple;
+	bh=C2XTErJ4Ho5VJBYfNuKsd2pdN6y06CRfbrg4qfvDAz8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WkYo+qIjzl1XPhr3v8WD1glt9YBCQNThrzRRoRGbRJ+RRjN6Z4jRJFlwMs6NVzRMw1bNq1A4mUDd83AUZ9YoqCDz8Lfgi5KnJR8EK4NE+ZrJXh/1Fmsj/4y3upZlrDIadzH4OA1SHSS7KqWC28K6JQWOYus7phP7J09wR2vEHPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vTa59URD; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=BXYHbx4Anz7n6GpCh9LpZSxztPF2zXWK5qVdn5L0bR1VPn27/NPFJMjdR4ObLX8LmLyiJXFf2yWbJzgy34HWhG0MNDIK+dYfQdiTHLruFnJR5u8dNZK68EhSwIcEhHNfJSPjOVY1MiVk7Ll7Kgq9T3LcdiFJQEQfKYQy/hmxTrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=McqcDVXe; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vTa59URD"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="McqcDVXe"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8129F1C25;
-	Thu, 21 May 2026 08:49:58 -0700 (PDT)
-Received: from [10.1.32.22] (e122027.cambridge.arm.com [10.1.32.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E8AF03F632;
-	Thu, 21 May 2026 08:49:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A3C24A0B;
+	Thu, 21 May 2026 09:01:38 -0700 (PDT)
+Received: from [10.57.22.108] (unknown [10.57.22.108])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F5EE3F632;
+	Thu, 21 May 2026 09:01:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779378603; bh=mMghuHi21M3rXnjm/M0jpANdblyW2ZAdsbpFbgKLRXI=;
+	t=1779379303; bh=C2XTErJ4Ho5VJBYfNuKsd2pdN6y06CRfbrg4qfvDAz8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vTa59URD+6XdILapZywItbSczRW9VRRCTd016APcjuY/07ZdrQgHihhQStO6DB2Rw
-	 /aK6pONHDoWdWA9mM7r4FFOPwSpTjPPRniW7rVoko3lFJGYMMQDk6Jml1wvMGql3Py
-	 KMsfk8ppzYIRmjyaauqu3vl0H8+W/ZWG+njYFoCs=
-Message-ID: <78425c0d-86c5-457f-b171-a4c8dd3acb7d@arm.com>
-Date: Thu, 21 May 2026 16:49:56 +0100
+	b=McqcDVXe4IqzgUYd4mxIG/hYeLAE3i7TYhvxyEIollCwXRYESsG2LiwTNqbyaijA2
+	 KaH8ngphdfSCUdD6gmOOb7cw/upUDzgNlOu5NhKShrCTrapTXfvvcYpug7sDh9RDfw
+	 +wsaMVm9eJLG34qTaFiKmXEGweOC+75P3zDrLZSk=
+Message-ID: <a81c3688-30f1-43e4-8d57-1d08a6e563af@arm.com>
+Date: Thu, 21 May 2026 17:01:37 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,148 +35,140 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 06/44] arm64: RMI: Check for RMI support at init
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+Subject: Re: [PATCH v14 09/44] arm64: RMI: Provide functions to
+ delegate/undelegate ranges of memory
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo.Pieralisi2@arm.com
 References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-7-steven.price@arm.com>
- <ee494ecd-8979-40f2-896e-82137abbf440@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <ee494ecd-8979-40f2-896e-82137abbf440@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+ <20260513131757.116630-10-steven.price@arm.com>
+ <867bowx3qx.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <867bowx3qx.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 21/05/2026 01:39, Gavin Shan wrote:
-> Hi Steven,
-> 
-> On 5/13/26 11:17 PM, Steven Price wrote:
->> Query the RMI version number and check if it is a compatible version.
->> The first two feature registers are read and exposed for future code to
->> use.
+On 21/05/2026 14:59, Marc Zyngier wrote:
+> On Wed, 13 May 2026 14:17:17 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> The RMM requires memory is 'delegated' to it so that it can be used
+>> either for a realm guest or for various tracking purposes within the RMM
+>> (e.g. for metadata or page tables). Memory that has been delegated
+>> cannot be accessed by the host (it will result in a Granule Protection
+>> Fault).
+>>
+>> Undelegation may fail if the memory is still in use by the RMM. This
+>> shouldn't happen (Linux should ensure it has destroyed the RMM objects
+>> before attempting to undelegate). In the event that it does happen this
+>> points to a programming bug and the only reasonable approach is for the
+>> physical pages to be leaked - it is up to the caller of
+>> rmi_undelegate_range() to handle this.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
 >> v14:
->>   * This moves the basic RMI setup into the 'kernel' directory. This is
->>     because RMI will be used for some features outside of KVM so should
->>     be available even if KVM isn't compiled in.
+>>   * Split into separate patch and moved out of KVM
 >> ---
->>   arch/arm64/include/asm/rmi_cmds.h |  3 ++
->>   arch/arm64/kernel/Makefile        |  2 +-
->>   arch/arm64/kernel/cpufeature.c    |  1 +
->>   arch/arm64/kernel/rmi.c           | 65 +++++++++++++++++++++++++++++++
->>   4 files changed, 70 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/kernel/rmi.c
+>>   arch/arm64/include/asm/rmi_cmds.h | 13 +++++++++++
+>>   arch/arm64/kernel/rmi.c           | 36 +++++++++++++++++++++++++++++++
+>>   2 files changed, 49 insertions(+)
 >>
-> 
-> [...]
-> 
+>> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+>> index 9078a2920a7c..eb213c8e6f26 100644
+>> --- a/arch/arm64/include/asm/rmi_cmds.h
+>> +++ b/arch/arm64/include/asm/rmi_cmds.h
+>> @@ -33,6 +33,19 @@ struct rmi_sro_state {
+>>   } while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
+>>   	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
+>>   
+>> +int rmi_delegate_range(phys_addr_t phys, unsigned long size);
+>> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
+>> +
+>> +static inline int rmi_delegate_page(phys_addr_t phys)
+>> +{
+>> +	return rmi_delegate_range(phys, PAGE_SIZE);
+>> +}
+>> +
+>> +static inline int rmi_undelegate_page(phys_addr_t phys)
+>> +{
+>> +	return rmi_undelegate_range(phys, PAGE_SIZE);
+>> +}
+>> +
+>>   bool rmi_is_available(void);
+>>   
+>>   unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp);
 >> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
->> new file mode 100644
->> index 000000000000..99c1ccc35c11
->> --- /dev/null
+>> index 52a415e99500..08cef54acadb 100644
+>> --- a/arch/arm64/kernel/rmi.c
 >> +++ b/arch/arm64/kernel/rmi.c
->> @@ -0,0 +1,65 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (C) 2023-2025 ARM Ltd.
->> + */
->> +
->> +#include <linux/memblock.h>
->> +
->> +#include <asm/rmi_cmds.h>
->> +
->> +unsigned long rmm_feat_reg0;
->> +unsigned long rmm_feat_reg1;
->> +
->> +static int rmi_check_version(void)
+>> @@ -12,6 +12,42 @@ static bool arm64_rmi_is_available;
+>>   unsigned long rmm_feat_reg0;
+>>   unsigned long rmm_feat_reg1;
+>>   
+>> +int rmi_delegate_range(phys_addr_t phys, unsigned long size)
 >> +{
->> +    struct arm_smccc_res res;
->> +    unsigned short version_major, version_minor;
->> +    unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
->> +                             RMI_ABI_MINOR_VERSION);
->> +    unsigned long aa64pfr0 =
->> read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>> +	unsigned long ret = 0;
+>> +	unsigned long top = phys + size;
+>> +	unsigned long out_top;
 >> +
->> +    /* If RME isn't supported, then RMI can't be */
->> +    if (cpuid_feature_extract_unsigned_field(aa64pfr0,
->> ID_AA64PFR0_EL1_RME_SHIFT) == 0)
->> +        return -ENXIO;
+>> +	while (phys < top) {
+>> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
+>> +		if (ret == RMI_SUCCESS)
+>> +			phys = out_top;
+>> +		else if (ret != RMI_BUSY && ret != RMI_BLOCKED)
+>> +			return ret;
+>> +	}
 >> +
->> +    arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
->> +
->> +    if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
->> +        return -ENXIO;
->> +
->> +    version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
->> +    version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
->> +
->> +    if (res.a0 != RMI_SUCCESS) {
->> +        unsigned short high_version_major, high_version_minor;
->> +
->> +        high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
->> +        high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
->> +
->> +        pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
->> +               version_major, version_minor,
->> +               high_version_major, high_version_minor,
->> +               RMI_ABI_MAJOR_VERSION,
->> +               RMI_ABI_MINOR_VERSION);
->> +        return -ENXIO;
->> +    }
->> +
->> +    pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
->> +
->> +    return 0;
+>> +	return ret;
 >> +}
 >> +
->> +static int __init arm64_init_rmi(void)
+>> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size)
 >> +{
->> +    /* Continue without realm support if we can't agree on a version */
->> +    if (rmi_check_version())
->> +        return 0;
-> 
-> Is this still a valid point that we have to return zero on errors returned
-> from rmi_check_version() or other other function calls like rmi_features()?
-> arm64_init_rmi() is triggered by subsys_initcall() where the return value
-> needs to indicate success or failure. It's fine to return error code from
-> arm64_init_rmi() in the path.
-
-Hmm, I guess now this is moved to arm64 code this indeed doesn't need
-to. Within a module I believe an error return can fail the module loading.
-
-I'm not sure it really makes much difference though - if this
-initialisation fails then it's not really an error - it just means the
-feature is unavailable.
-
-Thanks,
-Steve
-
+>> +	unsigned long ret = 0;
+>> +	unsigned long top = phys + size;
+>> +	unsigned long out_top;
 >> +
->> +    if (WARN_ON(rmi_features(0, &rmm_feat_reg0)))
->> +        return 0;
->> +    if (WARN_ON(rmi_features(1, &rmm_feat_reg1)))
->> +        return 0;
->> +
->> +    return 0;
->> +}
->> +subsys_initcall(arm64_init_rmi);
+>> +	WARN_ON(size == 0);
 > 
-> Thanks,
-> Gavin
+> I find it odd to warn on size = 0. After all, free(NULL) is not an
+> error. But even then, you continue feeding this to the RMM.
+> 
+> You also don't seem to be bothered with that on the delegation side...
+> 
+>> +
+>> +	while (phys < top) {
+>> +		ret = rmi_granule_range_undelegate(phys, top, &out_top);
+>> +		if (ret == RMI_SUCCESS)
+>> +			phys = out_top;
+> 
+> and size==0 doesn't violate any of the failure conditions listed in
+> B4.5.18.2 (beta2). Will you end-up looping around forever?
+
+That is not true ? It triggers, top_bound error condition, for both.
+
+
+pre: UInt(top) <= UInt(base)
+post: result.status == RMI_ERROR_INPUT
+
+
+Suzuki
+> 
+> Same questions for the delegation, obviously.
+> 
+> 	M.
 > 
 
