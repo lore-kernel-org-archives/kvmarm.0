@@ -1,140 +1,170 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2610839EF33
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 10:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779359411; cv=none; b=duLadUyHZ7qhSp68DR/3wCREeEx6Zf51PG/0wZghbfAd5u9f+bk7gldklmRkywsRSGzFj42ubSHec8dmVTOH9iwNS4VU2BToO730fxBJNK5EFSy5vyIu4vCUEnj85/FcVd7HB+B3cr4y2O55p3sXSNWsVz9xvqWVvQA+2odVKe4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779359411; c=relaxed/simple;
-	bh=NmD9mUNzX/y6DlpDoXIS6qMuNwv/jfPgZo+xoA3y7wo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bKPtQ7edab5/a55kLRuwmivbIV8f0iIbFGjr8AZkzEfjCsnY4RTyzZna6UFJhIk7YAqTo5VAPyxmScJ8ojQc8bRlkWIk+C0YmqjgCdeV/udi7/cFze0y8shtGuv/XniuAGzfuVb6SmzpXEZPrijZn6MeM1oBv2QePGGI+UBBHEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S4L2WZA9; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742FF3A6411
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 10:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779360256; cv=pass; b=qpytkNEN1nt6pN0rx9V1mb7L1lHnuTrQ3KsvjX9QdtS30Kdd3w/nci3zGzpc042KOxm/f4UODxN+kxi42ObhC/AlEZKDeqsS7Of7U7RQsPx2EUjuocin7T9t009dm9s11S0uAFVVbFZl0C7gfh9C/Ox3yflnFfo03wEDLLRcxTw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779360256; c=relaxed/simple;
+	bh=NQ3Nusm6YkbFPT1vR/R2GlJCmX9emImzU3s5lu4qsk4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CKO50JNXjO8YdWPlfJgpULJx4ZbzNHJgi1d2Kqb2D5EZCx2duAXGSsT4sIVHzytcxDVXevKjV+Gyi19ZDOiYk77PtU9oDl+Kvy9+CJh1qH9spNOBJFasqJ1lRynAI0LVvg7/JdTite+QJVjOSYTM6SRRhbeMT/RsD4mV+KvSdX0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cR0ey0yG; arc=pass smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S4L2WZA9"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4891ca4ce02so4655e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 03:30:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cR0ey0yG"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-515548f390fso2871cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 03:44:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779360251; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Hd2wpJqCoxc675+3Vx2YXyVPEjKp1sBB+vnojQKaenWn4hFu/YaAurTDZGnqwbypnL
+         GqeKfurka3zk2sXB7G15zS47I4PWBZoSJnhpZ7SkFbag7YNDli/RKES934US1phetCDh
+         k43WavWbBJNBk2UWYq2T4DkXruJTffrQ6ZPyXVv5z9sA93+JIdcAzo+OfvCS3LT+Elk1
+         cprl1aNTXySmrv8bfh04suOkJ5nLGgHQvwfW9D6gyPSw/pEa/6szfg40wdQ7EUCVFBgG
+         ZwVb2KF2fbWRXkfpfNRAuEne3mg7HRxEcrj+cE6jYtwlokjnvfwz0EoAzyAfiR+2bdmk
+         40AA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=01uiUNMkWOnOyoQp4EjW7o/7679tfblvQE/eVZhbN1U=;
+        fh=Ms3tCFuJ1/Vzb8wuuACY3CxEfkv48lcIHGEN4jKLXSQ=;
+        b=g+HGJdcT0rI5fhBSoHWaOhX9brcJ+ro9hHpE69jVabet1OLz+TYcjwyUMWSF8OFtLM
+         Jwh+9xIQ4V88F/0lqrT9cFJ6GfaPEO/SJb9PnOkfs9snFRWflcmetm+B5h2tMr1utX1w
+         hgB31o8CJSLlFJfQkACSlrdyZBxFV9808l9RowYFIIuLoDuzdnmRW1gJeQHxvJh7B8qa
+         iUHI2LmQ6ZqTahZiy1AIh/8OU22cVBLgh8ElQPhsx2Kyz1gbhMRtlN314gBm0wZdf2cK
+         yN4lreGAHKz53MiNiqUCj2cWM+B1jOot4DxaXf5gl7jB3K3oPN8PKmEDfkpmDh8LUkVo
+         vhxg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779359408; x=1779964208; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOcR2ywmAIsHfMOA6/DbnreILk4QaSYQyzKUA6hoOMk=;
-        b=S4L2WZA9T4FOGurFFd4hfPIIuS6W6WwLX1YV8iQIluQ1+cAoD1T3IRnLKo+Fl58QGO
-         AN2BFylMmIfQ+HV/pTDK4qePH9STaug4kS+QfXtFlxjZ3lUfP3TBclFc1WFYh949oCpD
-         NRlX5ihNcZTdgARB94J1kDpA2865nSz45cRAIegZ1aQ+K5urHAMC+GykBXsUvTNNgzgB
-         UcYob4CLCtwzfc//8yuNB7j8JZIyL1km1YJgsaqaDDEEF+bYP0ZWUwiOo2+pXxMxnhIA
-         VUzNFx2jykKWo9mYqU9GIb/u30Gfx+j2kGJKzMwOUjNhufP0OtIGQbJ9/NCupZQWF4b8
-         MgiA==
+        d=google.com; s=20251104; t=1779360251; x=1779965051; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=01uiUNMkWOnOyoQp4EjW7o/7679tfblvQE/eVZhbN1U=;
+        b=cR0ey0yGM/vN4du0ji3vJzUewFaoJU4EPzRKMqvPfMvY7vIVc9mmouKz3UmtGV3T/O
+         oopIWzWsYzRlzgYqa8mFVgEQaU0bZq5UqKk0DoJ480iuFs4uAu73V4bP8WpgtFA+/YWS
+         GtYTvpRCGciZGOsxpD4RACgP1R7PbYmsEKTHqM+XBfLzuspIAfOvNrODzu5iXvmWSiwd
+         0ChGYRAKJGcEcBRMg0NBzvs9nBYcT+Jj3F2mKJ5mykPvqZU5X86Hywp7j4hhzlZ/YdLu
+         VCFPa7S8NYVbzi6OXmRO75Ee27XVOiYWfPESpcRr9BjA4Qs95F15SGw61mgjubGW8rrk
+         gVFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779359408; x=1779964208;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOcR2ywmAIsHfMOA6/DbnreILk4QaSYQyzKUA6hoOMk=;
-        b=JnTAGeCWcEDN+2nKKwGqI9r8P0uFFMMcjWGalJaYhEKpJPWC+ikO685z1NllGVFdnn
-         4N58BDa7YZby00YonIcxuHS1kFiSs4r9XhlerxXzTKy5JiXrBNrMJP6yY2nvl8A3rS+S
-         k3w1W+ayThFT531QEr662tydlV+ENIaVu4CYxbPhaPr+wpTM9wJrIh7HL211NxDfRo0+
-         GegQfmA2MOwA89iUpWUadmk+aBLBKOyZrbe1/IfGB24y40XMZeLoXW3Otuskqxk8G74R
-         sM3WHd4uB++a7uCXamcwBUJgp7tfwm838Ds1eu06Rwdb6UJ56HpOtWPGaBFST58xEZ0x
-         GrEg==
-X-Forwarded-Encrypted: i=1; AFNElJ/0Ufbe3rJuw/NL7PXjg2OKWncPLhP0ozlXDcMsLXze6TwdTDweEXd711GL1xBSq9NDT//EzUo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyWDCk96kgbnXeKqppgNSrDxcVV4iH2HVbHIsnZqzyFngI3oLxv
-	Vu1MxNLhqayBkO/dfBf5ppBpHNFGi7PfltkQtPSp4UPZ0FpZ6ZR46Fl9LDSnmSZ22Q==
-X-Gm-Gg: Acq92OHN+9KyVTuWlkjR5ESDSub22JWsjehp+c2koogHGqtKhzXFhhNEsMldmlTEm1x
-	97cP/GMMcG1XEnyxS0ohbsB016TAFlc6MHfOnwCVYCc4NkmQtyK0ohZYzrXbrJ5bjlP/+S5oeNe
-	ELxHSHBl6Oiv77q9NrI033FummrgN492L3uRP8h+HmG1HN87LVKALgCr94expSI1/DXVD/94uXG
-	1HoGxDdE6JX56r7TY39z81q/RAKhAYMmga9Nwvu26KI65Ny0tWKwYPABDXvIIqcvW9ZmAgrHJhQ
-	UHQ7xkAetWKN3AGe2/n8ganPotk2JJlhNcGaR3ES0P47epmEZwX1OaUPQZ2VDiV/hVXYxIVLRqt
-	9ljxHhJwqWzDli8YiBSN7p4mENvdN6cw+Hvo9XP0tBx6GeSAAsSx8uJ8cnq+KfNGyI6AJ+TU0te
-	D/TiQO0zQ+EZGr+QyG14XhKGDVTMrZ/61L2phjp9rQ8AoM0njJf6xOczX91TZdhixSzKfLVujFx
-	/g=
-X-Received: by 2002:a05:600c:1551:b0:489:1f6a:4ac0 with SMTP id 5b1f17b1804b1-49035c64bccmr990775e9.0.1779359407929;
-        Thu, 21 May 2026 03:30:07 -0700 (PDT)
-Received: from google.com (136.41.155.104.bc.googleusercontent.com. [104.155.41.136])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eaa7cf23bsm1764718f8f.5.2026.05.21.03.30.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 03:30:07 -0700 (PDT)
-Date: Thu, 21 May 2026 10:30:03 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	catalin.marinas@arm.com, jens.wiklander@linaro.org,
-	sumit.garg@kernel.org, sebastianene@google.com,
-	vdonnefort@google.com, sudeep.holla@kernel.org
-Subject: Re: [PATCH v4 4/5] KVM: arm64: Fix bounds checking in
- do_ffa_mem_reclaim()
-Message-ID: <ag7eq3bfBOxfaZ59@google.com>
-References: <20260520204948.2440882-1-smostafa@google.com>
- <20260520204948.2440882-5-smostafa@google.com>
- <86ldddw4ht.wl-maz@kernel.org>
+        d=1e100.net; s=20251104; t=1779360251; x=1779965051;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=01uiUNMkWOnOyoQp4EjW7o/7679tfblvQE/eVZhbN1U=;
+        b=oWIgJCejI8wAYnUWauy7mhc8CFUNy5gpFqYG2PgXUPhYWGz7FZ5BpNHEAcK+H1U8bw
+         l2gYbB69mfzIfqUf8KiLhLbSLHF+fVUvjosjb1Ma8NJYjJT780gCAdlIU00nEJLc7GGz
+         EgXkTHejeqF67S1Oo1eoUEo9tHwQqMKd+FiEOzaXBEbSRab/CwCLGc9xgukmueEOkfLU
+         jp0OtebNtf6Z4NG90Pgy/aEST7hD46J8tpP6VsFfPrKItFVX6A9qPwOdwU/QeEZ0scfD
+         LZidsTW/exPaGhibRolpFgT0FiVLZSM6HVu9Hqn586yWKqp7TqU1da3rg6r07Po9AYjW
+         55rQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8mbD6BD4GeCw0yUDgd2xFFPogoBIU7ptOeSw8IFKgHbp1You4adZLmqcOCbv+5prnxqaGqlQQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzhU65eRMC1O/Fo4J2E8639QsMIdbZFccWifQljB7rz/aWBVDKO
+	nvR7ArFwyIpeAiOyt6wfVB6O0QE7YB649XUN8B8iTv5tn0wV/38GVX2qh8A9iPVdMBk3HE2Vqus
+	gJc8vToTOYdUhtNg/5uw6c6CIC79TYzfFbYPRF4fw
+X-Gm-Gg: Acq92OEtN8YSpy2shK7GX3SRXmOshfYhXd+ez2TyYtOpbQ6Yj/F7EdHakE4DbvDa4QI
+	rfzfl67m38yL2enTdBqWSK0pBiWXI2rQF/DRkxUMaHUIy5zl45R1iL4oONc4NpwM1FCQR0kilE4
+	fEmdP68UYFp0XDPcOLn/yo+xucE7ddNJYFRqmmk5FGnZmJcrsN22uqrXhpNRRXDyLAQjljKyVY1
+	2CoP2rssEKz3mcNktVOG5qrFGiEJgnwy/9Vh6NoZ4m9seeQydxZTZmv67/Ndy5NMD1T6T/8lMQ4
+	itO34jxbgOZ4JH66U6NBRX9Zs5MS53MRBOrAOIRMLlT8c0KD2BzG
+X-Received: by 2002:a05:622a:1909:b0:516:4f62:85ee with SMTP id
+ d75a77b69052e-516c54daacemr7650001cf.19.1779360249995; Thu, 21 May 2026
+ 03:44:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ldddw4ht.wl-maz@kernel.org>
+References: <20260520204948.2440882-1-smostafa@google.com> <20260520204948.2440882-5-smostafa@google.com>
+ <86ldddw4ht.wl-maz@kernel.org> <ag7eq3bfBOxfaZ59@google.com>
+In-Reply-To: <ag7eq3bfBOxfaZ59@google.com>
+From: Mostafa Saleh <smostafa@google.com>
+Date: Thu, 21 May 2026 11:43:58 +0100
+X-Gm-Features: AVHnY4LZQTvaETc0PFZc4ErDn0OiwyQemmgBHI89H_ICLndAOva3c3G1YM9luGk
+Message-ID: <CAFgf54qpNVvzSiV89g12-4jWeacm=06LMjCooeU1Mt+3sqWDLQ@mail.gmail.com>
+Subject: Re: [PATCH v4 4/5] KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
+To: Marc Zyngier <maz@kernel.org>
+Cc: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	catalin.marinas@arm.com, jens.wiklander@linaro.org, sumit.garg@kernel.org, 
+	sebastianene@google.com, vdonnefort@google.com, sudeep.holla@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
-
-On Thu, May 21, 2026 at 09:28:46AM +0100, Marc Zyngier wrote:
-> On Wed, 20 May 2026 21:49:47 +0100,
-> Mostafa Saleh <smostafa@google.com> wrote:
-> > 
-> > Sashiko (locally) reports out of bound write possiblity if SPMD
-> > returns an invalid data.
-> > 
-> > While SPMD is considered trusted, pKVM does some basic checks,
-> > for offset to be less than or equal len.
-> > 
-> > However, that is incorrect as even if the offset is smaller than
-> > len pKVM can still access out of bound memory in the next
-> > ffa_host_unshare_ranges().
-> > 
-> > Split this check into 2:
-> > 1- Check that the fixed portion of the descriptor fits.
-> > 2- After getting reg, check the variable array size addr_range_cnt
-> >    fits.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 1af722771178..e6aa2bfa63b1 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -607,7 +607,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
-> >  	 * check that we end up with something that doesn't look _completely_
-> >  	 * bogus.
-> >  	 */
-> > -	if (WARN_ON(offset > len ||
-> > +	if (WARN_ON(offset + CONSTITUENTS_OFFSET(0) > len ||
-> >  		    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
-> 
-> Do you really want to keep this a WARN_ON(), given that this results
-> in a panic in most pKVM configurations?
-
-Which kind of configuration will that check fail on?
-Does that mean at the moment pKVM does out-of-bound access for
-the header?
+On Thu, May 21, 2026 at 11:30=E2=80=AFAM Mostafa Saleh <smostafa@google.com=
+> wrote:
+>
+> Hi Marc,
+>
+> On Thu, May 21, 2026 at 09:28:46AM +0100, Marc Zyngier wrote:
+> > On Wed, 20 May 2026 21:49:47 +0100,
+> > Mostafa Saleh <smostafa@google.com> wrote:
+> > >
+> > > Sashiko (locally) reports out of bound write possiblity if SPMD
+> > > returns an invalid data.
+> > >
+> > > While SPMD is considered trusted, pKVM does some basic checks,
+> > > for offset to be less than or equal len.
+> > >
+> > > However, that is incorrect as even if the offset is smaller than
+> > > len pKVM can still access out of bound memory in the next
+> > > ffa_host_unshare_ranges().
+> > >
+> > > Split this check into 2:
+> > > 1- Check that the fixed portion of the descriptor fits.
+> > > 2- After getting reg, check the variable array size addr_range_cnt
+> > >    fits.
+> > >
+> > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
+> > >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/=
+ffa.c
+> > > index 1af722771178..e6aa2bfa63b1 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > @@ -607,7 +607,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1=
+_2_regs *res,
+> > >      * check that we end up with something that doesn't look _complet=
+ely_
+> > >      * bogus.
+> > >      */
+> > > -   if (WARN_ON(offset > len ||
+> > > +   if (WARN_ON(offset + CONSTITUENTS_OFFSET(0) > len ||
+> > >                 fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
+> >
+> > Do you really want to keep this a WARN_ON(), given that this results
+> > in a panic in most pKVM configurations?
+>
+> Which kind of configuration will that check fail on?
+> Does that mean at the moment pKVM does out-of-bound access for
+> the header?
+>
+I might have misunderstood the point. I thought you meant the new
+change would cause a panic on most configurations, or were you
+suggesting just removing the WARN_ON?
+I can do that, I just updated the current faulty check and left the
+WARN_ON as is.
 
 Thanks,
 Mostafa
 
-> 
 > Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> Mostafa
+>
+> >
+> > Thanks,
+> >
+> >       M.
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
