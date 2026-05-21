@@ -1,138 +1,122 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A2037F8D5
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 10:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7540F37F009;
+	Thu, 21 May 2026 10:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779358931; cv=none; b=fRbnWA3CHLk/3ZjhoMQHNlzHHCUwRZflAnkY2CbIVGsG/0BFWqkXpYby5lxOjm0s7pp0yBVf+Z82EUPLwDag8v7CbACPYRcTH3n/eFTsTu43F5Kk5bFpuP+4OcrHMybO6h8yGWvBLEq9p8U0Y72hmrJkjb1IHXyBVNJSAtCsN9s=
+	t=1779359164; cv=none; b=ub/r9ZmKFU/D+naapJISjWyJchC6qMUopmd8R4IHMXh/XWfhMq73coNvGNcg6LZamrrDxVBpZ7FbEUzu2R+fCyqn1QNF7vElnFbAeE+aFh/i0rJ0t7g2TdlLgCZjM6Y7K/wBdINsdaoa8u7TtDfHcp5WcdNO/FYpWJi9MuXdGHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779358931; c=relaxed/simple;
-	bh=7s7GSg8yEIWRSNB1NEd77nkN5PphHXn4l2FgS+2CUHs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bW6vbe8sHJkMwEuggeRFS4rcajN7+tTDBsn4uwIt6o4m8Zc4ETOJeZbQoRgXWhMda3MsbqvYIP21FtpkekFba0FXr48rE37d7FabCLs5Dq29d4L1x+VfcMW7w1xuaiOhqOWCRH4NBF496B0DX1/T15WE9oEW0nGzSZdAc+wzYjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fPs5Vten; arc=none smtp.client-ip=209.85.208.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1779359164; c=relaxed/simple;
+	bh=rJTE3Myf/O4a/LtxpzVjpzB8Qoo9p7WSyNLMEPxmTg0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ilgY9ryz4OfReD74OJvrExjP0QIvJGDZACAYhD8sbmMYzY0w406mlHWbt/yuIwQ4EpQzfmU3lP47JZgd5fA9GB9jBGHbe46bsf3oYjUvM/2sfI8XI/bHIjdkY82NxaUP36To8MK84XhpbggjRHolUmTDN01Rj+CrOVyJmZ+sMRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/s7co8G; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fPs5Vten"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-67fd8b662ecso6182044a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 03:22:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779358928; x=1779963728; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nP4J9fw6WkwrBkWENfxjLXAdxOioe0P1zdEKW/zD1r8=;
-        b=fPs5VtenMLzYOpS6rKytz5uCgV+zPSOXmmSvARu08GsnFfGfyeenBfm6+00jrlXG0Q
-         86S1ZxaVMwa1ED82C0PovDH5gdAQ7tF8XkKdofS5TFILer5NmHx89/tkGm4hZ2weQ3Jg
-         t/3gKNsNrxBqsAlKanOye5Rh/1i9s5Hw2xbvRr+dsmsedQpH+bOoA3lvYt/HqfjoN3bL
-         tgSrIpmMED88bbJ+oUN4w9w1oXaoLB2aKU8Mfbenc6JhB+kTpsoBpdHctXrQCOW2J+GO
-         5MFxv34yXFcbMP2YQtmq2OrhO4SRGVt57asIBl7xWWk7XUabQjO4lXhxv21nHcb5knlq
-         iW7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779358928; x=1779963728;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nP4J9fw6WkwrBkWENfxjLXAdxOioe0P1zdEKW/zD1r8=;
-        b=h0tfn5kPKm3vn7lE6U8BCi21BcLOkiDI9XdXP+N6XhOVgJvF/D3gv9/ZGOSkhQSHoa
-         /ZkTwTf0QUZfg8mPN5245PEdyfJ4kkB4mBO0fKmBZNeSZAyJtJwQQsZLhtkGe9gAbxXm
-         RO0/5MykGjXE1j7tpN8oPccwdgeQ2SjANZPTndxsNEHjd/BXWNZUKCl10q/dP4n054Zd
-         STnSb/9wnZcjx4Bc2wUTSNv/FwJI6x471oiTAFzVbmSpUEgtrnU2v//pTG9fAdoRBmep
-         Bmvc49Rl29KtrXEX840g7H6t6eYHJc2k2BxntGRYprYLciXaXHPCvAkdnDWvkCDcjTDZ
-         ulbw==
-X-Forwarded-Encrypted: i=1; AFNElJ8rUsOkz8GD6/F3WuSaPckd6EwSVc716flKNGAV4JqKtG0xQtFW5cT933qMvxFFYonWilO1v2U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyP37smHVSUpJ3HK+SBw5skw+h0g9GiXk32LT9tQaxZ3OQPGLrt
-	abJbv79c2HCoeIxd6z4nq+FXZIA7aPGJ/DH3rHsBCsFp7JAE9DfMUg1NlI2w0IZHwyQ9yTt1eSX
-	TFRXQeqtSIhuffE5cRzLHdw==
-X-Received: from edrb20.prod.google.com ([2002:aa7:d494:0:b0:688:57d9:5a0c])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:3586:b0:670:8b38:5717 with SMTP id 4fb4d7f45d1cf-68836ecb198mr1175738a12.24.1779358928033;
- Thu, 21 May 2026 03:22:08 -0700 (PDT)
-Date: Thu, 21 May 2026 11:21:49 +0100
-In-Reply-To: <20260521102149.804874-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/s7co8G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A35F1F000E9;
+	Thu, 21 May 2026 10:26:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779359163;
+	bh=3HbjtSmSEhrB0oy9msErMnLEWNbLnEiCjT4dTyfzcqc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Y/s7co8Gxsey3Z3nyMyNKdDiYEe7Y7pUDbCLus85Ij7r/hz4UmD4JqJVSa6BunKOE
+	 2P+AvMI7fEu04f+J+boPadH4nm30saUKFclhsbY+BWeWk4GHGaVyzPHKtQVHO4VjMP
+	 A8f7HKEug3BT9cHNvlpDl8HVDOknkkjFd83x7Gbr5lcfwUgSTRoieSuGcsaXyhEx5b
+	 uec4rTQQ48ZhNrBrAUjTgfR2juMQtefdaWVBl1m2vx4SQR2CFf8MBRfpZAMLXwbSiZ
+	 6DZt02oPrD/7RQcu0L6qCHu1/ewc4ZS8LajHzmDVkbVYh6aXxcpmD7V0ogIODNgmKf
+	 vX+UHjnuwm30w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wQ0bI-00000004ls9-3s5I;
+	Thu, 21 May 2026 10:26:01 +0000
+Date: Thu, 21 May 2026 11:26:00 +0100
+Message-ID: <86ik8hvz2f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo.Pieralisi2@arm.com
+Subject: Re: [PATCH v14 02/44] kvm: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+In-Reply-To: <20260513131757.116630-3-steven.price@arm.com>
+References: <20260513131757.116630-1-steven.price@arm.com>
+	<20260513131757.116630-3-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260521102149.804874-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260521102149.804874-4-vdonnefort@google.com>
-Subject: [PATCH v2 3/3] KVM: arm64: Add fail-safe for refcounted pages in __pkvm_hyp_donate_host
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, qperret@google.com, tabba@google.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-A previous bug in __pkvm_init_vm error path showed that the hypervisor
-could leak refcounted pages, (i.e. losing access to a page while its
-refcount is still elevated). This poses a threat to the pKVM state
-machine.
+On Wed, 13 May 2026 14:17:10 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> To avoid future include cycles, drop the linux/kvm_host.h include in
+> kvm_pgtable.h and include two _types.h headers for the types that are
+> actually used. Additionally provide a forward declaration for struct
+> kvm_s2_mmu as it's only used as a pointer in this file.
+> 
+> Both pgtable.c and kvm_pkvm.h relied on the indirect inclusion of
+> kvm_host.h, so make that explicit.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> New patch in v13
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 5 ++++-
+>  arch/arm64/include/asm/kvm_pkvm.h    | 2 +-
+>  arch/arm64/kvm/hyp/pgtable.c         | 1 +
+>  3 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 41a8687938eb..e4770ce2ccf6 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -8,9 +8,12 @@
+>  #define __ARM64_KVM_PGTABLE_H__
+>  
+>  #include <linux/bits.h>
+> -#include <linux/kvm_host.h>
+> +#include <linux/kvm_types.h>
+> +#include <linux/rbtree_types.h>
 
-Address this by introducing a fail-safe in n __pkvm_hyp_donate_host.
-Transitions are not a hot path so added security is worth the extra
-check.
+I'm surprised by this. Where is the rbtree_type.h requirement coming
+from?
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+Thanks,
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 42b0b648f32f..bb97d05b9b25 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -855,6 +855,16 @@ static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_pa
- 	return 0;
- }
- 
-+static int __hyp_check_page_count_range(phys_addr_t phys, u64 size)
-+{
-+	for_each_hyp_page(page, phys, size) {
-+		if (page->refcount)
-+			return -EBUSY;
-+	}
-+
-+	return 0;
-+}
-+
- static bool guest_pte_is_poisoned(kvm_pte_t pte)
- {
- 	if (kvm_pte_valid(pte))
-@@ -1053,7 +1063,6 @@ int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
- int __pkvm_host_unshare_hyp(u64 pfn)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
--	u64 virt = (u64)__hyp_va(phys);
- 	u64 size = PAGE_SIZE;
- 	int ret;
- 
-@@ -1066,10 +1075,9 @@ int __pkvm_host_unshare_hyp(u64 pfn)
- 	ret = __hyp_check_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
- 	if (ret)
- 		goto unlock;
--	if (hyp_page_count((void *)virt)) {
--		ret = -EBUSY;
-+	ret = __hyp_check_page_count_range(phys, size);
-+	if (ret)
- 		goto unlock;
--	}
- 
- 	__hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
- 	WARN_ON(__host_set_page_state_range(phys, size, PKVM_PAGE_OWNED));
-@@ -1132,6 +1140,10 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- 	if (ret)
- 		goto unlock;
- 
-+	ret = __hyp_check_page_count_range(phys, size);
-+	if (ret)
-+		goto unlock;
-+
- 	__hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
- 	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) != size);
- 	WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HOST));
+	M.
+
 -- 
-2.54.0.746.g67dd491aae-goog
-
+Without deviation from the norm, progress is not possible.
