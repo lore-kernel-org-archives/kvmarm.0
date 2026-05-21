@@ -1,118 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F2C3806A3;
-	Thu, 21 May 2026 10:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C8D381B14
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 10:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779358745; cv=none; b=r15WbF3z7AulXl8wMUPCmovYsF1OXc6I/jMAHCM/1L+f+EsuQnr/O8JeyIC3ZKygdcFlKAWI9DN2IMFJFlIFTdLPCOzfNmaTVvPe/PiY4Gn4O/IzfZE5A7hDrMvXwb0ydGO+ych+0G72i9TVh5MelM2HXI/Twnp/8vGcZENcM00=
+	t=1779358928; cv=none; b=iacLbzKTVxs/9XoFptAz3NNaPrzAok3cnf/mbl6dqVvHetzmi7gT36nlYGzNgclC9kwHvpto7VD2Nn37jshFZOej+Iai7UjNR4CXhF5LKA+EGjimAL2jAionlaZT3IHP+2NoVN77V2nOrmEE+Z/NioIz5uTesYcYGMq26WgDWHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779358745; c=relaxed/simple;
-	bh=YiLyi6oIvvHU1tPc4gIss8TQOdQBqAr412XPlezh/So=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GiczCVNj21/BrARhoL1fyPbaeiU3iiYh9ph4slbadwS59/0G3j/A1N+lupFb/MpaFSHiGdnykvXhPsvbNWeAL1e2XTdQcbUUb8VqETWrRE/BdIr3re/zvhEY39+FdW5NuSuGE0/SNNW+JkNuNzcoM/bR9PYwW827MhzljAcGgDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlzMutfv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779358928; c=relaxed/simple;
+	bh=BEv9I76Q/6wEik0veYQX8ayGM5O9/YRU2aCoUAhEaWg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mF8Y2AKLeLLR+18XTHwzcrVAfcBTgFJWO+GBDiozJ9Jt/m/AIyuySJOW8kw2UfvUBmxdz9J9xI8wDNfYYbYJjExgQgzgocssqoykPPRSj/nCk2MH23+IsrYguLnZPzawaT98SzEz/34b3LvuN38ONAwvLo737hmfweg2rX+G+oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PIcRbDBI; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlzMutfv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97EA1F000E9;
-	Thu, 21 May 2026 10:19:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779358743;
-	bh=qfM82z3BHmVFU110xOhDnN73f2JicISYXk83H5AhObU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LlzMutfvy8MAr6JgeXqIIc7RUQZwsc04MN6EdMvWVRty5YTkiehbKFfqqw37+6iga
-	 gJoMLV5OWS4O2EwwOVt2hDqaJijKSfg/KrPA35M05IKt6CwQsrjWJSyg0gds0m9nFi
-	 fya7uX2xCr85GIG7VpStByHEXh8nQYUoazks2wd5HbDkUrKeEQkSSETALSSVG+KcyI
-	 ctcJVxRxPE12NzuFW0bqG5y5ZH62RRH/3yYv7f6ACq7lYn6Syoy981s+MCfEVEreKr
-	 kY7Jyif//GoEqyhigpXFA1hvMUGG9DNklgbwYJDFCTT/CSlGydS5VJe10w0c79aQax
-	 rbZPGuMoV3g/Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wQ0UX-00000004liO-2gGN;
-	Thu, 21 May 2026 10:19:01 +0000
-Date: Thu, 21 May 2026 11:19:01 +0100
-Message-ID: <86jysxvze2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 01/44] kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
-In-Reply-To: <20260513131757.116630-2-steven.price@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-2-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PIcRbDBI"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-43ff19e54beso3963220f8f.2
+        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 03:22:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779358925; x=1779963725; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dUBZuTft07Gz370Ru/23Ib/O5tsFjxExNVXyt5Ku5SY=;
+        b=PIcRbDBItPWkfIz1RYTvN0rTYoiBNsQEHrhrEBYsO0uetMYW4Yi8E/0Gx4vATXgYvm
+         KeTwbW0kWu/FlVg/d8QgKICvPMfwxvFuxGA8kCeOQi0K5FhmeYwQUImCHJKHWswv7Ym6
+         w6xxlJqiiBfD+zabD+cirq+xsYncW09s+Is0Zkch4+O+KJsq8jtt0cCfzyMGddYTsEM6
+         HYUBJ+BQaAXgxmNpkYfSCdoJQNQ3KT9PRk30a6GoV3HVVBioX0FtMo6Ul4o42akR0szm
+         GbM/sImDWhFSGcy0xqL0Jau/C5IEMK50WfNXo2F2JkJqdSLOyin8sdzWh56n0xpn5Wfg
+         8WOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779358925; x=1779963725;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dUBZuTft07Gz370Ru/23Ib/O5tsFjxExNVXyt5Ku5SY=;
+        b=mhrs/UL/oWC/K2PYbAVwW0/yRoWQCiXVDFMkIEKMWlpYw6VHDHzabuTyejVldz1V4a
+         O6oRelzbF6M7TGfI3tv8MtWn4PCkvHxD/FPmDlCaI9swXHr74D0rQfbt8Dmsu+DyLj6B
+         tRxRqZUeoZ1ZqADxWvylOcsgFoODWi/2bwZRwB5DySxLhCPmgO+PDc9v4rYvAteCPAwn
+         ZLzSR6G3uZdWv096k4q2tyAmSlVcymq/eCuwIF1qTPXSZBZtPj2w4ta+gfof36IRcIfL
+         7E0ZSk4hNp+GjjhErre8o+3GG4kKN8NUGi2MidW/WqQsm7E5Ybdm540q+wWc3tOKDQwB
+         oDdQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8x/cV5Ts+AqUnl+KGBPQ8IQzRQM5aYtGVitFn0ZEt87C7VCdezXZfsbyEJiWioaLS7WL5FsWE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxsR4zUbsVMov0lvRemt+izEy1fPvCoQtvB+uyZVqAKYOD2+GZ9
+	YYh1Y6cyHuPyzdQ1sJPFoySdcyv+vDQVOa7K8Cufo/Z0aPoHRLyw08ITOi1OhxnxHN8b+qBnJPP
+	391Ujs6mdjBLOcFLzjwFkBQ==
+X-Received: from wrup12.prod.google.com ([2002:a5d:638c:0:b0:43d:7c66:de1f])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:40e0:b0:44b:ad5a:cd33 with SMTP id ffacd0b85a97d-45ea4165a80mr3528391f8f.40.1779358924813;
+ Thu, 21 May 2026 03:22:04 -0700 (PDT)
+Date: Thu, 21 May 2026 11:21:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260521102149.804874-1-vdonnefort@google.com>
+Subject: [PATCH v2 0/3] Fix __pkvm_init_vm error path
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com, tabba@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 13 May 2026 14:17:09 +0100,
-Steven Price <steven.price@arm.com> wrote:
->=20
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->=20
-> Fix a potential build error (like below, when asm/kvm_emulate.h gets
-> included after the kvm/arm_psci.h) by including the missing header file
-> in kvm/arm_psci.h:
->=20
-> ./include/kvm/arm_psci.h: In function =E2=80=98kvm_psci_version=E2=80=99:
-> ./include/kvm/arm_psci.h:29:13: error: implicit declaration of function
->    =E2=80=98vcpu_has_feature=E2=80=99; did you mean =E2=80=98cpu_have_fea=
-ture=E2=80=99? [-Werror=3Dimplicit-function-declaration]
->    29 |         if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {
-> 	         |             ^~~~~~~~~~~~~~~~
-> 			       |             cpu_have_feature
->=20
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
+Sashiko reported a potential refcount leak in the unlikely case where
+insert_vm_table_entry fails.
 
-Unrelated to this patch, but really easy to fix: the standard prefix
-for patches targeting KVM/arm64 is:
+While at it, I have added a fail-safe to __pkvm_hyp_donate_host to ensure this
+function doesn't allow leaking refcounted pages.
 
-"KVM: arm64: [opt subsys:] Something starting with a capital letter"
+Changes since v2:
+  
+  * Proactively init hyp_page order field in hyp_pool_init  
 
-where "opt subsys" could be "CCA" where applicable.
+v1 (https://lore.kernel.org/all/20260521081250.655226-1-vdonnefort@google.com/)
 
-It'd be good to have some consistency.
+*** BLURB HERE ***
 
-Thanks,
+Vincent Donnefort (3):
+  KVM: arm64: Reset page order in pKVM hyp_pool_init
+  KVM: arm64: Fix __pkvm_init_vm error path
+  KVM: arm64: Add fail-safe for refcounted pages in
+    __pkvm_hyp_donate_host
 
-	M.
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 34 ++++++++++++++-----
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  6 +++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 ++-
+ 4 files changed, 34 insertions(+), 11 deletions(-)
 
---=20
-Without deviation from the norm, progress is not possible.
+
+base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
+-- 
+2.54.0.746.g67dd491aae-goog
+
