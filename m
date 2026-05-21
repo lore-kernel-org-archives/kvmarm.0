@@ -1,177 +1,185 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475613CBE69
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 13:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779368902; cv=pass; b=AU7L0SqjtnVwzGuq7eYfxoTcZWNqZFGO/SqVrpfCDdKLUjctnUuquulbKuZ6VwodGgNoeYze5PPSpZdMM0s19pP0MiHig+/bg6L5c9ls3muRdhCBcr0NYbWAP/nykISUSdN7SMKlvoaQI2dNuS3T6n0U23KGYNNNvxmK8qRqgms=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779368902; c=relaxed/simple;
-	bh=oFlolGhbxQdlCS5Cn07/fSyxCv2xQU6i+7GOwIjdwDI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nDauYpsXR9HPvirT0zftmPvru7jOFExyZ33CNR8ADo9BB2w7EIgSgw0ktHW5zF+FIEsDYlax+3b/IpQjFnOcM66TH+mT9xahIla/0fdL6i3f/d8EMzJqZVL+CnosfO9cNIPgRIQsLe17vvz6MGdlAbokiMEuxdTN8AJzHUZ+RWM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QOx23qxI; arc=pass smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795413E2755
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 13:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779369671; cv=none; b=nXI25iIWnwRzPN5vTHcLnNJBwAMh3DCp+8H0qvPTym3Hsloju8xAx5OPibfQN9CwPN7nQng28eM5m4jcVkhDu4Dby3jN6uToD6rvUYIdG9we66vNUj1bXzc6eRBS30DNYaMyiw3j4Yg++J01WszTtJFOKC/SGtu297UYyTuX4lY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779369671; c=relaxed/simple;
+	bh=n1K9FL3sSKh4ZL14DkfXMekeA+vBvgRQxpeU6VG9xSE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kroNfdIcCNw/XZ8QVvRN9srYX15/FVDnnjvX85g4g6pVVIqm6O+9HlxTQO5QzgL4kpAa105QNPgDXWNCq6f0wmH0B4tWAgSZJ3zrFIo6nMGp35vKGp03+PfBx2EygNbUsCYUdsCc+IU1SGHLmxXcYoqVtrgQ/JDDufadsz6Td6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dfJa52lf; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QOx23qxI"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-515548f390fso18331cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 06:08:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779368900; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DeKnmV9RZ+LRDOomISyKSKzBKrhgiyeye+U9sl439Q1rtyCsB9UsGzrfDNQXRa6J7D
-         ejhd4HbGzIOoVeDcES9xmGxTreaJE3RgX3jX28855L1JF0vAPJZmt0IHeebojjwJG5RP
-         Waj6Dg2O8Rs3SiGgzRepbtDhj0iYmCvG9rB6P9ajvkRYuXS7S5YZq1O7p28ahpm4IlvF
-         kg1xkBfriPp1f9+/TiXXtrwmDrrEgXZO60aZa+iV0rrJokEJiU2N2o9H9lFncpw9SwF6
-         3XR/uKWdCY8LAJDnY7Mea5zVg/1OJFyHRJGLn0FA3lLVO8UgW+wLensuC+A022SqimrU
-         +Rjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=18hrApFzZzgIN45e6vff/pwk8Jz+2gi48Q/A4BxGBa8=;
-        fh=+ZdJ3ygR18TPcvdmRyE4IfKASj3k3+4D6bmgwOLe2Fg=;
-        b=HIGPjlwRpyvqrHDf26lLPPTS3o3RIWUboBipnsbRnResKsStOWDYGFoEKOdmoijWHU
-         dU/F/GZk1Cw3XeRxBhupf0cQstX+24sczlN38I0eZKk2xBP4T04Z2/yplkS/OKLhJWyN
-         jh+9lr2eVZsI3TyEsFoCkcyq4F0gavkD2p/ptZxmCTZQUVYPY2n8KsUru5cCsoAZbr9h
-         99NflUEIeWfn26420wheAZ7UWHOQUP3ctGHQCPkaB1N9XPGBA4K5fAWHKYqlh025+urO
-         SU/z6QEgiwjdmukIEWnaxZJh/yEZBQMFsBFrEiG9drYkWzFBUlaYsmx2wWmsvLLmvQhA
-         11CA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dfJa52lf"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso55629555e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 06:21:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779368900; x=1779973700; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=18hrApFzZzgIN45e6vff/pwk8Jz+2gi48Q/A4BxGBa8=;
-        b=QOx23qxIVHi/bfnH2IFrzjXTh1FoF15xP8+6Eo0917VELvvAAHdftOhl9rDS1Kl5Pd
-         NlUBDeJVkddb1TJ5ePwMpxFVpWVGjtlD2Pb8uZdw6H/8fj6LdgoeuNIr/wT1cTZO99v1
-         rQFfuZIA+ZM30RnWO+Nz8OlLy6FcNkTRXhH9gBK2uNVAAWir6+nNRzqdYYVRp3bxc1R1
-         ypS2lF6G2XiEzYVp7fRliGytBVw42UL4IMezws+y9WEDTRffDU0cXU4cs+1x+SJj4Ix/
-         SR4da347fyOJ0UxwrQFEm5/2FZDKWCVtTK12631F8n0S3cI3nTqn558KZXesPTsMquTd
-         cyog==
+        d=google.com; s=20251104; t=1779369668; x=1779974468; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oaCe+0vBux/acxxxbAjd0sdUOKLj5KDIayotecJQPco=;
+        b=dfJa52lf+GJTAn+W1axV/kdhE1BdDvWxDZ2u7nluqVQyAZVOWav+XmgX5azBWc8/5b
+         HY3UCbrGzfVhDbumIam21o8+UGh6nUQ0T/02/UHmB5jwuhYqM5gBGn00ZEyjJFgIUIC3
+         q4WSVmZCW3Jg1qA9pNPU32OIujN/4+Zqk6N4Gg6NtP2Qqv1cnQYcjkWTLa+1sW7w5xXM
+         +WbOxLXwZq73CH5L6A2dnQD320O8PZw1OdBzJCK/EZ9XTEN+f1+k8Iz1Hq4ydhr5KJ+J
+         14YiLxdzUiu6cWbZ23HI0gw2FixhrGhtFMTodKgW43R+WcOeW91fr2tIuoKADBPCooMl
+         r5XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779368900; x=1779973700;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=18hrApFzZzgIN45e6vff/pwk8Jz+2gi48Q/A4BxGBa8=;
-        b=ZzpzARuOfJWIclJyweEWQeLJhSpxr8huwY4HaAeJnyJhpdRiBPKP2u3y9fz4/KrLno
-         EjWBFZOzmiDm9qzaORDVr41Xm8ehflJl0KeYbOzmJr08Jj0+lskoNfeUM+OQBl6Cuenj
-         hj6JA1G/8Z+SfaYHg4IvuR3hPyI5jZ7xsWyHKP2TkQYhxbyx7AFEuPOm3efKYeEy4Wzb
-         AlgbkuHWoCBlphE1Yb3xYng16Rm3bq4EV0nL0Ll49NGrGjuXnTuyn++0p+hticrtU873
-         pPCy5P4mHYZ/hvX4fLC6dKCw1We/fniBudtVGW1PhYvHoB8oX7SOnQHIls7F/L6Pe0cb
-         dY/A==
-X-Forwarded-Encrypted: i=1; AFNElJ+ziGVF7NsmJY0R/wgxbdxmEbeiROUsqa+yEpX4gaEkSuW6tNYnuqkobvIjYEE83lw4p0dekMM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw9fpfkpZFjAMIlB19DldCpQhbP6Ls4F3kUyU+c3R2Qp0kw8ZGu
-	cTW7XeoEz0qlRMRA1W2bTOCLpltnyN0bobVKwa3Nz+hEj/uRfEAAV+cojQnjJelJ9HfFh/R8560
-	rT6nhJF+WMbiISYKHbkS9D7QPZ63MGJjtHd7TLBxM
-X-Gm-Gg: Acq92OGnZXc8Khlbabos084hWbbAv4DkzI+g5UNt1VsoJOH/BFeD2RSX6WO12DrBcjw
-	uw4t9Odl9kjs8IRPuaXXREKv/diWNYM0xkKkbkcHcvHd4BBZgV/fhQDhUQtPVZPQy6Ef0SYbVgh
-	I8qwLwB5gi78Wb3wmwUvidSJQFMkLZh9VDP6LtTWkxQYU/YXVLXsPwgfbH8nFdusaTkuGT2z+G/
-	K41gFyMKLuVMt62tmyBfZ/YrNizIjyuiJDC4Sveopkz+xUlCXMNNcoREXv/qKAgf1resiK16kFB
-	GfUbwSVZhDbea7+hmz4=
-X-Received: by 2002:a05:622a:a94e:b0:516:4f62:85f1 with SMTP id
- d75a77b69052e-516c552fa38mr7271331cf.22.1779368899622; Thu, 21 May 2026
- 06:08:19 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779369668; x=1779974468;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oaCe+0vBux/acxxxbAjd0sdUOKLj5KDIayotecJQPco=;
+        b=sdeZVTxe/fK0zmITZrqfLVL/aIIj/tFfhPA7cxLYoGj8/cALKO8BLeQOpgaF98V9Mi
+         50WbicGmEYlTHlZY8DlmgxJG5rlwq4H4EbPMpTgi7eJoneEMHifdU2x7mdpmJkGwJzPM
+         Eu1WnYvLAf40b1cuuTJRCzJSpdi+O4JoSkzdB8yKNQECOFkh1B0MffFtgocLMn/ueTk2
+         ACBZz73c+hKD/Zqy1v9O0guXaa/4fZM+/6C3gfogdRS15K1bCWl+4Zly0eGT9ZDIpb4R
+         MZo+/r26i2vlVZcQfQAynv63aMFjp0gf9d1U7nWJY0dzq1nLel8Te5INGdtMI46Z0k+S
+         5zGw==
+X-Forwarded-Encrypted: i=1; AFNElJ9z4Ru/hNqkaKHD/SWSG9lFwWtYEF7Ii4RaLKINTyUTdMy3Vh1DWOSOFU4Ryy3H0VEwGZgGcOY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwuqsyxpNXQUIaVcfhg6oDAdfoAlnlxxrMiCxby3Nx51p1y4CWq
+	n0dTzxe/HNfqKTYY1wEjAkNLvmuVixHV2Pttm0Z+BSiGcHJE8MdY0Nz42q4FaYTXLA==
+X-Gm-Gg: Acq92OFvEPqWz40ZqQfexl39FMV76FZxPaFwbahiJGwevZjWMDDTFI6wTiMjd/eQo8L
+	BnNN6Y8AOuhbmlKYRI2XwwKHdLYEHTczE8Kf2d8iAjvLeXraTI+8zF2QPq+9xgw37F4MZSJ+cJn
+	v9UjjeUNRz2lEda5unIlb/PEikAOqtVCkWgohFORigVz9bHByqFh+tRi5O6znS2qAGiyCiKSDGL
+	+4Fv7CAYx3OOjRnKoZ5WLU5Lkk03exHq3TpiKEwu5mMjRhqTAZSd4nBRnT6FaZ5pJZIzlJWvY3p
+	r1alnm8x7dVCb+iDLwVHKSP5nVg5p2cPM5baEO7UCFbDkIe5A8OEtL+c7iaFqQCl+epI4zFQV7A
+	VcP6HGHGtlprvFv/jha5/yZeM7QzKcHTv2iLj8qJLXwFT7R/KvZUdT5IoyjJTusnQPHgqGVfYKm
+	261ypruA39H+J6zx9wkCCGhXmlLO5oJ4lGpVd7J1OHfdMg1+lVCcMTlRlQLVuCJt8KBsp/UGWb1
+	don1A==
+X-Received: by 2002:a05:600c:1f87:b0:490:3cf0:8d81 with SMTP id 5b1f17b1804b1-4903cf08f14mr15940795e9.13.1779369667306;
+        Thu, 21 May 2026 06:21:07 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49035c64beasm24039235e9.1.2026.05.21.06.21.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2026 06:21:06 -0700 (PDT)
+Date: Thu, 21 May 2026 14:21:02 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com, qperret@google.com,
+	Sashiko <sashiko-bot@kernel.org>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Reset page order in pKVM hyp_pool_init
+Message-ID: <ag8GvtAonB6LNB5m@google.com>
+References: <20260521102149.804874-1-vdonnefort@google.com>
+ <20260521102149.804874-2-vdonnefort@google.com>
+ <CA+EHjTxPoxjvMTZX5w+UyVgC=W3VUSDoOQ-tCDLfnae16SqoMQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260521102149.804874-1-vdonnefort@google.com> <20260521102149.804874-4-vdonnefort@google.com>
-In-Reply-To: <20260521102149.804874-4-vdonnefort@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 21 May 2026 14:07:40 +0100
-X-Gm-Features: AVHnY4JJsPwlriAMlvCiGKk44PSS2scCNoIlEjeGoEEyPmlqjyWtKmSwSdabchs
-Message-ID: <CA+EHjTwVF8k3EhTCqQNU-zcK1+1ctLE-cEBHCWzgNtudW1o2kA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Add fail-safe for refcounted pages in __pkvm_hyp_donate_host
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxPoxjvMTZX5w+UyVgC=W3VUSDoOQ-tCDLfnae16SqoMQ@mail.gmail.com>
 
-On Thu, 21 May 2026 at 11:22, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> A previous bug in __pkvm_init_vm error path showed that the hypervisor
-> could leak refcounted pages, (i.e. losing access to a page while its
-> refcount is still elevated). This poses a threat to the pKVM state
-> machine.
->
-> Address this by introducing a fail-safe in n __pkvm_hyp_donate_host.
+On Thu, May 21, 2026 at 02:07:36PM +0100, Fuad Tabba wrote:
+> On Thu, 21 May 2026 at 11:22, Vincent Donnefort <vdonnefort@google.com> wrote:
+> >
+> > When a VM fails to initialise after its stage-2 hyp_pool has been
+> > initialised, that stage-2 must be torn down entirely. This requires
+> > resetting both the refcount and the order of its pages back to 0.
+> >
+> > Currently, reclaim_pgtable_pages() implicitly resets the page order by
+> > allocating the entire pool with order-0 granularity. However, in the VM
+> > initialisation error path, the addresses of the donated memory (the PGD)
+> > are already known, making it unnecessary to iterate over all pages in
+> > the pool.
+> >
+> > Since the vmemmap page order is a hyp_pool-specific field, leaving a
+> > non-zero order on hyp_pool destruction is harmless until another pool
+> > attempts to admit the page. Instead of resetting this field during
+> > destruction, reset it during pool initialization in hyp_pool_init().
+> > Note that pages added to the pool outside of the initial pool range
+> > (e.g., via guest_s2_zalloc_page()) must still have their order managed
+> > manually.
+> >
+> > While at it, add a WARN_ON() in the hyp_pool attach path to catch
+> > unexpected page orders that exceed the pool's max_order.
+> >
+> > Fixes: 256b4668cd89 ("KVM: arm64: Introduce separate hypercalls for pKVM VM reservation and initialization")
+> > Reported-by: Sashiko <sashiko-bot@kernel.org>
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 25f04629014e..89eb20d4fee4 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -322,7 +322,6 @@ void reclaim_pgtable_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
+> >         while (addr) {
+> >                 page = hyp_virt_to_page(addr);
+> >                 page->refcount = 0;
+> > -               page->order = 0;
+> >                 push_hyp_memcache(mc, addr, hyp_virt_to_phys);
+> >                 WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(addr), 1));
+> >                 addr = hyp_alloc_pages(&vm->pool, 0);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> > index a1eb27a1a747..c3b3dc5a8ea7 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> > @@ -97,6 +97,8 @@ static void __hyp_attach_page(struct hyp_pool *pool,
+> >         u8 order = p->order;
+> >         struct hyp_page *buddy;
+> >
+> > +       WARN_ON(p->order > pool->max_order);
+> > +
+> 
+> Could you add a brief comment? It took me a minute to figure out what this
+> catches. IIUC it's not attach's own input, it's a stale p->order from way back
+> when an external page was popped from a memcache (today only via
+> guest_s2_zalloc_page()). Right?
 
-Stray n.
+I think it'd be self explanatory if that was next the page_add_to_list, but that
+wouldn't protect the memset (that's really best-effort though).
 
-> Transitions are not a hot path so added security is worth the extra
-> check.
->
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+How about?
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
+/* 
+ * A page with an order bigger than the pool's max is an 'external' page
+ * whose order hasn't been reset before being added to the pool.
+ */
 
-Cheers,
-/fuad
+But now I am thinking I can do way better: we can easily identify external
+pages, so I could just force the order to 0 in that case.
 
+WDYS?
 
-
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 42b0b648f32f..bb97d05b9b25 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -855,6 +855,16 @@ static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_pa
->         return 0;
->  }
->
-> +static int __hyp_check_page_count_range(phys_addr_t phys, u64 size)
-> +{
-> +       for_each_hyp_page(page, phys, size) {
-> +               if (page->refcount)
-> +                       return -EBUSY;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  static bool guest_pte_is_poisoned(kvm_pte_t pte)
->  {
->         if (kvm_pte_valid(pte))
-> @@ -1053,7 +1063,6 @@ int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
->  int __pkvm_host_unshare_hyp(u64 pfn)
->  {
->         u64 phys = hyp_pfn_to_phys(pfn);
-> -       u64 virt = (u64)__hyp_va(phys);
->         u64 size = PAGE_SIZE;
->         int ret;
->
-> @@ -1066,10 +1075,9 @@ int __pkvm_host_unshare_hyp(u64 pfn)
->         ret = __hyp_check_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
->         if (ret)
->                 goto unlock;
-> -       if (hyp_page_count((void *)virt)) {
-> -               ret = -EBUSY;
-> +       ret = __hyp_check_page_count_range(phys, size);
-> +       if (ret)
->                 goto unlock;
-> -       }
->
->         __hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
->         WARN_ON(__host_set_page_state_range(phys, size, PKVM_PAGE_OWNED));
-> @@ -1132,6 +1140,10 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
->         if (ret)
->                 goto unlock;
->
-> +       ret = __hyp_check_page_count_range(phys, size);
-> +       if (ret)
-> +               goto unlock;
-> +
->         __hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
->         WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) != size);
->         WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HOST));
-> --
-> 2.54.0.746.g67dd491aae-goog
->
+> 
+> With that.
+> 
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> 
+> Cheers,
+> /fuad
+> 
+> 
+> 
+> 
+> >         memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
+> >
+> >         /* Skip coalescing for 'external' pages being freed into the pool. */
+> > @@ -237,8 +239,10 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
+> >
+> >         /* Init the vmemmap portion */
+> >         p = hyp_phys_to_page(phys);
+> > -       for (i = 0; i < nr_pages; i++)
+> > +       for (i = 0; i < nr_pages; i++) {
+> >                 hyp_set_page_refcounted(&p[i]);
+> > +               p[i].order = 0;
+> > +       }
+> >
+> >         /* Attach the unused pages to the buddy tree */
+> >         for (i = reserved_pages; i < nr_pages; i++)
+> > --
+> > 2.54.0.746.g67dd491aae-goog
+> >
