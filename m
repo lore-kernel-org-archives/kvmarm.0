@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134D41F4634;
-	Thu, 21 May 2026 15:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C60366067;
+	Thu, 21 May 2026 15:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779378304; cv=none; b=hKNySolSlIoCj17rJWniKt47QCPAttAZ6mBZUAri7jZLSWouIsJQHkODxToQpbT5aGSkW2XHRoDH4XFhnFlgdn1wETY7CPQQuQZn+PU32lsAe71GrD7ogIktKONOF+QZE4NFUOty3YLRSu+NWq+wWqn5gYigpaXW/bb4Pj/4m3Q=
+	t=1779378605; cv=none; b=XtNre9IDKFms8dif70AISRpafPUctdpHpruKrYjB48Yy4Y0qEH/1HtNp/YMQZXdzuri2JuRId3G27gfd/oOOAzVhiBWrAUYEtkz8olSSs8NGf3abLKp9tjQNY1r/sRDE423/wHMRzRSvfcL+ejyYug+JKFZ0bt/7qAHNFRKkI+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779378304; c=relaxed/simple;
-	bh=QF68rTb5Q+J5M5tadzuOVbWRc8TvXFXjwcG27utu4As=;
+	s=arc-20240116; t=1779378605; c=relaxed/simple;
+	bh=mMghuHi21M3rXnjm/M0jpANdblyW2ZAdsbpFbgKLRXI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bqx/yZy2ZtPinw5qYskbjBweoQlgjFigZoY65No6wMa/UoX+PmskYQB3LP/M0dl2VC6n0/L6TOJdyYE8cYeZPJacVCBPIZIpLK3PdqJfgrApY+a6MeYpB1aY/pUJ5b+Vtbvo+RIRW6HL4BcT8fo3p4ga7Kccf5fVW/uSm3WUaIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nwnfIIi3; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=WkYo+qIjzl1XPhr3v8WD1glt9YBCQNThrzRRoRGbRJ+RRjN6Z4jRJFlwMs6NVzRMw1bNq1A4mUDd83AUZ9YoqCDz8Lfgi5KnJR8EK4NE+ZrJXh/1Fmsj/4y3upZlrDIadzH4OA1SHSS7KqWC28K6JQWOYus7phP7J09wR2vEHPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vTa59URD; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nwnfIIi3"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vTa59URD"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 297A43D42;
-	Thu, 21 May 2026 08:44:57 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8129F1C25;
+	Thu, 21 May 2026 08:49:58 -0700 (PDT)
 Received: from [10.1.32.22] (e122027.cambridge.arm.com [10.1.32.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A2D93F632;
-	Thu, 21 May 2026 08:44:54 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E8AF03F632;
+	Thu, 21 May 2026 08:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779378302; bh=QF68rTb5Q+J5M5tadzuOVbWRc8TvXFXjwcG27utu4As=;
+	t=1779378603; bh=mMghuHi21M3rXnjm/M0jpANdblyW2ZAdsbpFbgKLRXI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nwnfIIi38PHTdUkuOtqwyuB2KBFbfOgzNq+J/ZusfxI3GaJBwHsQZTOJE/kyJGXd4
-	 1WEsuJlB2bfkTFkAJpCRoLj0yhZO0jEDfzYgMHNHfjduUzsCHS5qQXJzWKA4ouj5y1
-	 SxI+y2k8OSePhhuZ5ZCDMeMccIfDdesc3sOzjZhE=
-Message-ID: <1b577c26-5a59-4786-9c3a-d72847cc0c86@arm.com>
-Date: Thu, 21 May 2026 16:44:44 +0100
+	b=vTa59URD+6XdILapZywItbSczRW9VRRCTd016APcjuY/07ZdrQgHihhQStO6DB2Rw
+	 /aK6pONHDoWdWA9mM7r4FFOPwSpTjPPRniW7rVoko3lFJGYMMQDk6Jml1wvMGql3Py
+	 KMsfk8ppzYIRmjyaauqu3vl0H8+W/ZWG+njYFoCs=
+Message-ID: <78425c0d-86c5-457f-b171-a4c8dd3acb7d@arm.com>
+Date: Thu, 21 May 2026 16:49:56 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,11 +35,11 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 05/44] arm64: RMI: Add wrappers for RMI calls
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+Subject: Re: [PATCH v14 06/44] arm64: RMI: Check for RMI support at init
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
  <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
@@ -47,182 +47,136 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
+ <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
 References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-6-steven.price@arm.com> <86cxypvsfy.wl-maz@kernel.org>
+ <20260513131757.116630-7-steven.price@arm.com>
+ <ee494ecd-8979-40f2-896e-82137abbf440@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <86cxypvsfy.wl-maz@kernel.org>
+In-Reply-To: <ee494ecd-8979-40f2-896e-82137abbf440@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 21/05/2026 13:49, Marc Zyngier wrote:
-> On Wed, 13 May 2026 14:17:13 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The wrappers make the call sites easier to read and deal with the
->> boiler plate of handling the error codes from the RMM.
+On 21/05/2026 01:39, Gavin Shan wrote:
+> Hi Steven,
+> 
+> On 5/13/26 11:17 PM, Steven Price wrote:
+>> Query the RMI version number and check if it is a compatible version.
+>> The first two feature registers are read and exposed for future code to
+>> use.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes from v13:
->>  * Update to RMM v2.0-bet1 spec including some SRO support (there still
->>    some FIXMEs where SRO support is incomplete).
->> Changes from v12:
->>  * Update to RMM v2.0 specification
->> Changes from v8:
->>  * Switch from arm_smccc_1_2_smc() to arm_smccc_1_2_invoke() in
->>    rmi_rtt_read_entry() for consistency.
->> Changes from v7:
->>  * Minor renaming of parameters and updated comments
->> Changes from v5:
->>  * Further improve comments
->> Changes from v4:
->>  * Improve comments
->> Changes from v2:
->>  * Make output arguments optional.
->>  * Mask RIPAS value rmi_rtt_read_entry()
->>  * Drop unused rmi_rtt_get_phys()
+>> v14:
+>>   * This moves the basic RMI setup into the 'kernel' directory. This is
+>>     because RMI will be used for some features outside of KVM so should
+>>     be available even if KVM isn't compiled in.
 >> ---
->>  arch/arm64/include/asm/rmi_cmds.h | 661 ++++++++++++++++++++++++++++++
->>  1 file changed, 661 insertions(+)
->>  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+>>   arch/arm64/include/asm/rmi_cmds.h |  3 ++
+>>   arch/arm64/kernel/Makefile        |  2 +-
+>>   arch/arm64/kernel/cpufeature.c    |  1 +
+>>   arch/arm64/kernel/rmi.c           | 65 +++++++++++++++++++++++++++++++
+>>   4 files changed, 70 insertions(+), 1 deletion(-)
+>>   create mode 100644 arch/arm64/kernel/rmi.c
 >>
->> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
->> new file mode 100644
->> index 000000000000..04f7066894e9
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rmi_cmds.h
->> @@ -0,0 +1,661 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RMI_CMDS_H
->> +#define __ASM_RMI_CMDS_H
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +#include <asm/rmi_smc.h>
->> +
->> +struct rtt_entry {
->> +	unsigned long walk_level;
->> +	unsigned long desc;
->> +	int state;
->> +	int ripas;
->> +};
->> +
->> +#define RMI_MAX_ADDR_LIST	256
->> +
->> +struct rmi_sro_state {
->> +	struct arm_smccc_1_2_regs regs;
->> +	unsigned long addr_count;
->> +	unsigned long addr_list[RMI_MAX_ADDR_LIST];
->> +};
->> +
->> +#define rmi_smccc(...) do {						\
->> +	arm_smccc_1_1_invoke(__VA_ARGS__);				\
->> +} while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
->> +	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
->> +
->> +unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp);
->> +void rmi_sro_free(struct rmi_sro_state *sro);
->> +
->> +/**
->> + * rmi_rmm_config_set() - Configure the RMM
->> + * @cfg_ptr: PA of a struct rmm_config
->> + *
->> + * Sets configuration options on the RMM.
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
->> +
->> +	return res.a0;
->> +}
->> +
->> +/**
->> + * rmi_rmm_activate() - Activate the RMM
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_rmm_activate(void)
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_ACTIVATE, &res);
->> +
->> +	return res.a0;
->> +}
->> +
->> +/**
->> + * rmi_granule_tracking_get() - Get configuration of a Granule tracking region
->> + * @start: Base PA of the tracking region
->> + * @end: End of the PA region
->> + * @out_category: Memory category
->> + * @out_state: Tracking region state
->> + * @out_top: Top of the memory region
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_granule_tracking_get(unsigned long start,
->> +					   unsigned long end,
->> +					   unsigned long *out_category,
->> +					   unsigned long *out_state,
->> +					   unsigned long *out_top)
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_TRACKING_GET, start, end, &res);
->> +
->> +	if (out_category)
->> +		*out_category = res.a1;
->> +	if (out_state)
->> +		*out_state = res.a2;
->> +	if (out_top)
->> +		*out_top = res.a3;
->> +
->> +	return res.a0;
->> +}
->> +
->> +/**
->> + * rmi_gpt_l1_create() - Create a Level 1 GPT
->> + * @addr: Base of physical address region described by the L1GPT
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_gpt_l1_create(unsigned long addr)
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	arm_smccc_1_1_invoke(SMC_RMI_GPT_L1_CREATE, addr, &res);
->> +
->> +	if (RMI_RETURN_STATUS(res.a0) == RMI_INCOMPLETE) {
->> +		/* FIXME */
 > 
-> Is that part of the SRO stuff you're talking about in the notes?
-> What is the ETA for fixing all these FIXMEs?
+> [...]
+> 
+>> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
+>> new file mode 100644
+>> index 000000000000..99c1ccc35c11
+>> --- /dev/null
+>> +++ b/arch/arm64/kernel/rmi.c
+>> @@ -0,0 +1,65 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2023-2025 ARM Ltd.
+>> + */
+>> +
+>> +#include <linux/memblock.h>
+>> +
+>> +#include <asm/rmi_cmds.h>
+>> +
+>> +unsigned long rmm_feat_reg0;
+>> +unsigned long rmm_feat_reg1;
+>> +
+>> +static int rmi_check_version(void)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +    unsigned short version_major, version_minor;
+>> +    unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
+>> +                             RMI_ABI_MINOR_VERSION);
+>> +    unsigned long aa64pfr0 =
+>> read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>> +
+>> +    /* If RME isn't supported, then RMI can't be */
+>> +    if (cpuid_feature_extract_unsigned_field(aa64pfr0,
+>> ID_AA64PFR0_EL1_RME_SHIFT) == 0)
+>> +        return -ENXIO;
+>> +
+>> +    arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
+>> +
+>> +    if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
+>> +        return -ENXIO;
+>> +
+>> +    version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
+>> +    version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
+>> +
+>> +    if (res.a0 != RMI_SUCCESS) {
+>> +        unsigned short high_version_major, high_version_minor;
+>> +
+>> +        high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
+>> +        high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
+>> +
+>> +        pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
+>> +               version_major, version_minor,
+>> +               high_version_major, high_version_minor,
+>> +               RMI_ABI_MAJOR_VERSION,
+>> +               RMI_ABI_MINOR_VERSION);
+>> +        return -ENXIO;
+>> +    }
+>> +
+>> +    pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static int __init arm64_init_rmi(void)
+>> +{
+>> +    /* Continue without realm support if we can't agree on a version */
+>> +    if (rmi_check_version())
+>> +        return 0;
+> 
+> Is this still a valid point that we have to return zero on errors returned
+> from rmi_check_version() or other other function calls like rmi_features()?
+> arm64_init_rmi() is triggered by subsys_initcall() where the return value
+> needs to indicate success or failure. It's fine to return error code from
+> arm64_init_rmi() in the path.
 
-Yes, RMI_INCOMPLETE is the return for SRO. Fixing all this up is on the
-plan for my next posting which I expect to be after 7.2-rc1 (so July).
-There were some changes in the beta 2 spec and the RMM doesn't implement
-most of this yet so I didn't want to rush out completely untested code
-which might change.
+Hmm, I guess now this is moved to arm64 code this indeed doesn't need
+to. Within a module I believe an error return can fail the module loading.
+
+I'm not sure it really makes much difference though - if this
+initialisation fails then it's not really an error - it just means the
+feature is unavailable.
 
 Thanks,
 Steve
 
-> Thanks,
+>> +
+>> +    if (WARN_ON(rmi_features(0, &rmm_feat_reg0)))
+>> +        return 0;
+>> +    if (WARN_ON(rmi_features(1, &rmm_feat_reg1)))
+>> +        return 0;
+>> +
+>> +    return 0;
+>> +}
+>> +subsys_initcall(arm64_init_rmi);
 > 
-> 	M.
+> Thanks,
+> Gavin
 > 
 
