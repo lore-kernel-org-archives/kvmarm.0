@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10EA3DB318
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 14:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2693631283E
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 14:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779374194; cv=none; b=jG1nCRJY/HW2sCaPiuPVexqfXf12NLLSJ2DMeZUZUgP9eOzwLSplUBntr5a22JgDSm1iclO9p6t0YleWuTBzGk2qKHaphKm7LiYRJ0WWrSllGOZK43cDmARr2ObTG1vnBW20wlMljHsgRu5GEdX7wNv8vFFzWwm2wLZsaDnjIwk=
+	t=1779374195; cv=none; b=Ap7VRt/aQjqj2T1lwZeh8zGdtmzd8LFrstV1s5v9UrKUye7zXbjHwzmOpBATPbcj/lPclp5IkxMJOrDkLj4cf/RXRNQhzKlCYxDsvvOxumsdssfIjGnBlq9vQD+ADy7rC2DgSSXA6bU3koGTeLCqblhQhjyDFBe1ORskkfA9MMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779374194; c=relaxed/simple;
-	bh=Hw+mRmK5UoBsRDHW8D7M2o2vjD46UN2hkws/mC0yMt0=;
+	s=arc-20240116; t=1779374195; c=relaxed/simple;
+	bh=iovLLELEPGAEeqrXqUuFgbMegsS0Ply5dAqKPJI6hLY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a3aniEDW92A14MS2AMtKBQqwBYym0P433xQmBy/5xLM/qQDATICjCJmT7FSULS/zyqC+vgoGniAJ8SiiGo0YcyTRRLtQmUXQVABzIqomao7vqJDypK3+NuS/Xt+/1J36udURbdBsjAXMofoSz5olatQ4EcUvtgntj5C0DaAn6v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F/s4kQ7H; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=XU4UjH09WYyvBJjbvIFk58tYILsXkmhF4FnR0zd1sEh3qTG/4Xdg/xrIOnyzkQzOEpVcNdtacxghFs2qZpPgE63cB+qcW3m11u/aCqvrc9puSh+X3OteaTAsd1L4ropsfTzLQ74wzaBIoyozCp+9kdj4MFcYkaEoRWLhZU9uZOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ASpQhgIy; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F/s4kQ7H"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48fe6894f3fso36647235e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 07:36:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ASpQhgIy"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-bd960997b8eso277346566b.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 07:36:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779374191; x=1779978991; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1779374192; x=1779978992; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5cUmhlK4FYcog/fUBeDAbFbwd3xA/tYCb3LFp8+JmDw=;
-        b=F/s4kQ7H3WaOQNYMomwPvcEKSdsHa5L+qcXbKUZLTc9kO/NXsDWl/bMpO8HiH+xhyL
-         qAVngo5HE7pcwySD0o+4THIWusWr688dm6fegofwHUMOp/U5nbXf4/aZbGsq/xEiwDdg
-         QRa36AWHs4/H1wuup6G4iARWLAlz7SXHDWcEwh+PDX2Jv2wp8Prf8wYx3cUBgsgXJivw
-         aFsgunsSec+4Ea1jZbpHHLOHlhf3fzXYWxQSLBOqlsXSLkiM5QOAGOoInAOYEcijwgDG
-         4kzZohaWAF60ezdbP3OhB7R5J96nZeUxrKrwtznn5L7xef7Qbr1+Y2Oq3Zlgi/coGFIm
-         sCZg==
+        bh=qcxdHOKzYSh28oVM+92+Sl2qXUwj5KIsOOEhTqQ5qbU=;
+        b=ASpQhgIyVatfKa9NCm7AMSW6HYk/VfNP60eo1lCRoWlPaFthLUFXZdjVFafTKtA+OR
+         Llbr4tt/0AE70AGxUXcUtSUwUvXAYo3FsyrgatoxIlkTr1uUSDNqvBYPRSHf21COfxak
+         PeDyWraS4ezg2Wa3qBDJ2AtHGazTsu6hHPWMWviJhT2FmAzljImprg5hQMF0i0ksyI0R
+         USNWn9my+9vuslQs3poLEsxJz3vQlhYoyx1BFG58xr6TRK2Qm1bwjd7luHxye+6ftaqs
+         BFabWb1eMBUEzKezyvHpm2a+IYAfaZswdL4ph69P7J/9YubKTyJ935oKW3yD//OCXwyp
+         U6oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779374191; x=1779978991;
+        d=1e100.net; s=20251104; t=1779374192; x=1779978992;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5cUmhlK4FYcog/fUBeDAbFbwd3xA/tYCb3LFp8+JmDw=;
-        b=WRBgtz0HJnsWCyZiHh468iE4fktXTQwMGn/YbhsnQoqphR5IT+E48FP2ur0dXWTb8l
-         w4R48IRIc/Q6Hcuu0OWoI0TY2t12nlR4NL/QqvTJhw5w+++KZh8swIfyWXO3+CwTt2Cv
-         jForuoEBrS+BptThYk+Vzlmzc6IhNW9xIgxzfmcDKCfZBdQMfZb9AaEKD/XlOG84MdA8
-         krNUual4Dokoqm9psAFnIQVdguh1dWLMbb89w/q3qPHAXhWG0Q6jX5QMnIqIEk/CnDLM
-         a27wtgF1/e0JWGuma9ih+eB6wAklidjz/fXH0S7QZz7qzyeHY7Xtya+ExoPtAYWbn7SW
-         itLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ93C/+EqgVPhfSY46Goj+qW5X9nNm+mmfzD0SzCFS2SNtgu3G/QijnAMqCuL29O800RdWSx5KY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzYdqgzia+h89lxv9NvL94/vO+n8qBXWwaIxtHq6IqT8MnVJeu1
-	O9/Cq0wg6NHQPFnsrIspBoV7bipXwZJKbleiiBO30LJa10JIgI/A7+SaOqpnILQ0raEmyE+LPeY
-	ycfGlrxL9IBw5Oz1HEnY39A==
-X-Received: from wmsl5.prod.google.com ([2002:a05:600c:1d05:b0:486:fca5:7a8d])
+        bh=qcxdHOKzYSh28oVM+92+Sl2qXUwj5KIsOOEhTqQ5qbU=;
+        b=ahkIZn0gFSC04cAOH5IZZ3OjOLmVBN68c8ERVMUX57ltDKP7mBz9AS/Em6eaJFf+tU
+         y2bwQQInvYJBlagnrAcQrotIBghu5sZF4rtYwnKT2womks1p1oLO2lEgjHn58X2jCFAw
+         m/4HiepSjRO5iWNDUFeEWwr/RtLYcazrg0EAHUD0bhpoCJpRhplpPccBcCCQ0N8y77C1
+         xTnd3mUi07KVMlt3EdXyoI2Dxl55we5eK2yC3opjAksHgRbOgknVUpefk5xRi8toQvZp
+         wOOd2MKxUOO0uL3y6dR2JaxjDwNbm2jC7pt02dr4oiZBGj/FRW4zKzlikweT+2jpvnlk
+         OlAg==
+X-Forwarded-Encrypted: i=1; AFNElJ+cYh6bBvweLoEGVqNG+qACcvUh4ZN59RqaSpmQVF6dNWxOei4pM3Xqosk00NTUMT0kHURZcYk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyQaol9cm4duYOpCKvyY9f8iXIFFzdV71byJa/ALtC7fvmn/19x
+	aKYeVco0bfYhy/BJc3UE1rxCrlunGkingh/hqJViPBSKIp5dQ+0G0I0J66KR2dXHR9XpUHK5ZTw
+	VBVXF0Q6644A14tSIezbrpA==
+X-Received: from edvr23.prod.google.com ([2002:a05:6402:197:b0:683:5306:a54f])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:620f:b0:485:3abe:ab86 with SMTP id 5b1f17b1804b1-4903604cc8dmr41280105e9.4.1779374191238;
- Thu, 21 May 2026 07:36:31 -0700 (PDT)
-Date: Thu, 21 May 2026 15:36:25 +0100
+ 2002:a05:6402:a28b:20b0:688:24dc:9152 with SMTP id 4fb4d7f45d1cf-688367d4eddmr1089728a12.16.1779374192287;
+ Thu, 21 May 2026 07:36:32 -0700 (PDT)
+Date: Thu, 21 May 2026 15:36:26 +0100
 In-Reply-To: <20260521143626.1005660-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,90 +58,83 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260521143626.1005660-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260521143626.1005660-3-vdonnefort@google.com>
-Subject: [RESEND v3 2/3] KVM: arm64: Fix __pkvm_init_vm error path
+Message-ID: <20260521143626.1005660-4-vdonnefort@google.com>
+Subject: [RESEND v3 3/3] KVM: arm64: Add fail-safe for refcounted pages in __pkvm_hyp_donate_host
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
 	will@kernel.org
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	kernel-team@android.com, qperret@google.com, tabba@google.com, 
-	Vincent Donnefort <vdonnefort@google.com>, Sashiko <sashiko-bot@kernel.org>
+	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-In the unlikely case where insert_vm_table_entry fails, __pkvm_init_vm
-release the memory donated by the host for the PGD, but as the stage-2
-is still set-up the hypervisor keeps a refcount on those pages,
-effectively leaking the references.
+A previous bug in __pkvm_init_vm error path showed that the hypervisor
+could leak refcounted pages, (i.e. losing access to a page while its
+refcount is still elevated). This poses a threat to the pKVM state
+machine.
 
-Fix the rollback with the newly added kvm_guest_destroy_stage2().
+Address this by introducing a fail-safe in __pkvm_hyp_donate_host.
+Transitions are not a hot path so added security is worth the extra
+check.
 
-Fixes: 256b4668cd89 ("KVM: arm64: Introduce separate hypercalls for pKVM VM reservation and initialization")
-Reported-by: Sashiko <sashiko-bot@kernel.org>
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Tested-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 3cbfae0e3dda..4f2b871199cb 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -56,6 +56,7 @@ int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot p
- int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
- int kvm_host_prepare_stage2(void *pgt_pool_base);
- int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd);
-+void kvm_guest_destroy_stage2(struct pkvm_hyp_vm *vm);
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
- 
- int hyp_pin_shared_mem(void *from, void *to);
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index fa447d400b71..986e0ac1f2d8 100644
+index 986e0ac1f2d8..fee55e49c132 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -305,16 +305,21 @@ int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
+@@ -854,6 +854,16 @@ static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_pa
  	return 0;
  }
  
-+void kvm_guest_destroy_stage2(struct pkvm_hyp_vm *vm)
++static int __hyp_check_page_count_range(phys_addr_t phys, u64 size)
 +{
-+	guest_lock_component(vm);
-+	kvm_pgtable_stage2_destroy(&vm->pgt);
-+	vm->kvm.arch.mmu.pgd_phys = 0ULL;
-+	guest_unlock_component(vm);
++	for_each_hyp_page(page, phys, size) {
++		if (page->refcount)
++			return -EBUSY;
++	}
++
++	return 0;
 +}
 +
- void reclaim_pgtable_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
+ static bool guest_pte_is_poisoned(kvm_pte_t pte)
  {
- 	struct hyp_page *page;
- 	void *addr;
+ 	if (kvm_pte_valid(pte))
+@@ -1052,7 +1062,6 @@ int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
+ int __pkvm_host_unshare_hyp(u64 pfn)
+ {
+ 	u64 phys = hyp_pfn_to_phys(pfn);
+-	u64 virt = (u64)__hyp_va(phys);
+ 	u64 size = PAGE_SIZE;
+ 	int ret;
  
- 	/* Dump all pgtable pages in the hyp_pool */
--	guest_lock_component(vm);
--	kvm_pgtable_stage2_destroy(&vm->pgt);
--	vm->kvm.arch.mmu.pgd_phys = 0ULL;
--	guest_unlock_component(vm);
-+	kvm_guest_destroy_stage2(vm);
- 
- 	/* Drain the hyp_pool into the memcache */
- 	addr = hyp_alloc_pages(&vm->pool, 0);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index eb1c10120f9f..3b2c4fbc34d8 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -853,10 +853,12 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- 	/* Must be called last since this publishes the VM. */
- 	ret = insert_vm_table_entry(handle, hyp_vm);
+@@ -1065,10 +1074,9 @@ int __pkvm_host_unshare_hyp(u64 pfn)
+ 	ret = __hyp_check_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
  	if (ret)
--		goto err_remove_mappings;
-+		goto err_destroy_stage2;
+ 		goto unlock;
+-	if (hyp_page_count((void *)virt)) {
+-		ret = -EBUSY;
++	ret = __hyp_check_page_count_range(phys, size);
++	if (ret)
+ 		goto unlock;
+-	}
  
- 	return 0;
+ 	__hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
+ 	WARN_ON(__host_set_page_state_range(phys, size, PKVM_PAGE_OWNED));
+@@ -1131,6 +1139,10 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
+ 	if (ret)
+ 		goto unlock;
  
-+err_destroy_stage2:
-+	kvm_guest_destroy_stage2(hyp_vm);
- err_remove_mappings:
- 	unmap_donated_memory(hyp_vm, vm_size);
- 	unmap_donated_memory(pgd, pgd_size);
++	ret = __hyp_check_page_count_range(phys, size);
++	if (ret)
++		goto unlock;
++
+ 	__hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
+ 	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) != size);
+ 	WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HOST));
 -- 
 2.54.0.746.g67dd491aae-goog
 
