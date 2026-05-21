@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE8C211A28
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 13:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10146211A28
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 13:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779369987; cv=none; b=bSXK2iwFOhzIgSW8MiWBBEwUift5hLZlh3TYFUofP3RJYl9V8AGXjjNbxpGaiZeQb7WKEDaojK5UaNrLdn5MEB+gaveulPDwCn54NFv6HhFq9q+RjUkjsGmSv8s/0yzBaE8YJsiiMyVCBSReutdI4uDkAYw31wWBK6oWSImXuJ0=
+	t=1779369989; cv=none; b=QDPvmeiyeqxdlLrzu2xApBYrttSsEr01AroR1pG0g2Rq1dUwoTD1EFhQQoKoOwrG8bpv7S49AL64GPN3kmHyFPBQ4fj9W8/K9P5/E3TqwapmHwieek59hX8GkuIiXeiI39y/KXBoxbARuOYgCmHxzhdp5zt0iawhcCeIz5KK/+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779369987; c=relaxed/simple;
-	bh=qIZr5ljPbLNWNuTkd5WQy/hMxtaJqp3POPsZmgXCn6w=;
+	s=arc-20240116; t=1779369989; c=relaxed/simple;
+	bh=4qNWyG9/rqhhK0Ngv0vgf96xD7URLLi+kRllF+9yecc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ow5FnOqAxaMbt/kQA8lSBgPItXciY2r10sZUwKrTeFmNDqmHSPctgfLgGAeLGsd0ejbBA+mtzFKq9LzBjYhocPSWZ4bVo+B6LOtVj7Gx50ULalIPcXmyWw7oKyZq8O9TsQFsowgqZioC7w+2xgRPSYSc201K9/jRYOTNeRkwmW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CtIJgnmD; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=m/ndYhy33nfU3AmaTH72G+XmvLv4PfSuzyKkGAkuZ157Cj+ZmyAVX+n71Me6ffPHcGFJtNHjT1huCL1TEk1d3foI01RstV7ieXGXtriLZ0jLPPixNkjoD1/4nQYjmJn+tYcqqCauENmZoZnOu9ZPiVLI5YgddoQzWgit4IED9x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=C1nmKM0n; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CtIJgnmD"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="C1nmKM0n"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44C9D1C00;
-	Thu, 21 May 2026 06:26:20 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 518D23585;
+	Thu, 21 May 2026 06:26:22 -0700 (PDT)
 Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2D8B53F7B4;
-	Thu, 21 May 2026 06:26:24 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 34F663F7B4;
+	Thu, 21 May 2026 06:26:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779369985; bh=qIZr5ljPbLNWNuTkd5WQy/hMxtaJqp3POPsZmgXCn6w=;
+	t=1779369987; bh=4qNWyG9/rqhhK0Ngv0vgf96xD7URLLi+kRllF+9yecc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CtIJgnmDWAteDtPEwvz66unfs626iUOdWLwfFndMb3yqzNeTHTjrZ+RHTb4CPQA+F
-	 C9nWYRjj9sQy+1mHAnIdYNr+u8hNta4w6cy9xoKXS+TxDv2YtRTAHoNvQs9vpl0WCS
-	 ou2FoDubJUEDgLChwlU61tx2Tcl5iYmr8Vla+GEo=
+	b=C1nmKM0nZ6FdsNb/pGKtxENYrQSpAd8KUAl1CKsARFayP2Q+qHmVucqMCXm3Dnv2I
+	 WRSEzR+8DkzhGzEG3uht17kYeK8p2vX2lyVO9zZp9PV6n+UfaWBcrOrOBNNnIAt6WI
+	 DzevceyRlRKWTU/Cd5kZZW4XAGTgFhUjbZdAH7cA=
 From: Mark Rutland <mark.rutland@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -37,9 +37,9 @@ Cc: broonie@kernel.org,
 	oupton@kernel.org,
 	tabba@google.com,
 	will@kernel.org
-Subject: [PATCH 09/18] arm64: fpsimd: Move sve_get_vl() and sme_get_vl() inline
-Date: Thu, 21 May 2026 14:25:47 +0100
-Message-Id: <20260521132556.584676-10-mark.rutland@arm.com>
+Subject: [PATCH 10/18] arm64: sysreg: Add FPCR and FPSR
+Date: Thu, 21 May 2026 14:25:48 +0100
+Message-Id: <20260521132556.584676-11-mark.rutland@arm.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20260521132556.584676-1-mark.rutland@arm.com>
 References: <20260521132556.584676-1-mark.rutland@arm.com>
@@ -51,16 +51,23 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The sve_get_vl() and sme_get_vl() functions are wrappers for the RDVL
-and RDSVL instructions respectively. There's no need for those to be
-out-of-line.
+Add sysreg definitions for FPCR and FPSR.
 
-Replace the out-of-line assembly functions with equivalent inline
-functions.
+Some versions of LLVM will refuse to assemble accesses to FPCR and FPSR
+unless the "fp" arch extension is enabled, which we don't currently do
+for read_sysreg() and write_sysreg(). In general, handling feature
+dependencies would complicate read_sysreg() and write_sysreg(), and it's
+simpler to use read_sysreg_s() and write_sysreg_s() instead, requiring
+sysreg definitions.
 
-The _sve_rdvl assembly macro is unused, and so it is removed. The
-_sme_rdsvl assembly macro is still used elsewhere, and so is kept for
-now.
+The values used can be found in ARM ARM issue M.b:
+
+  https://developer.arm.com/documentation/ddi0487/mb/
+
+... in sections:
+
+* C5.2.8 ("FPCR, Floating-point Control Register")
+* C5.2.10 ("FPSR, Floating-point Status Register")
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -71,117 +78,65 @@ Cc: Mark Brown <broonie@kernel.org>
 Cc: Oliver Upton <oupton@kernel.org>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/fpsimd.h       | 31 +++++++++++++++++++++++++--
- arch/arm64/include/asm/fpsimdmacros.h |  6 ------
- arch/arm64/kernel/entry-fpsimd.S      | 10 ---------
- 3 files changed, 29 insertions(+), 18 deletions(-)
+ arch/arm64/tools/sysreg | 45 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 8efa3c0402a7a..36cf528e64971 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -22,6 +22,9 @@
- #include <linux/stddef.h>
- #include <linux/types.h>
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 6c3ff14e561e6..fa155cd856a5b 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -3790,6 +3790,51 @@ Field	1	ZA
+ Field	0	SM
+ EndSysreg
  
-+#define __SVE_PREAMBLE		".arch_extension sve\n"
-+#define __SME_PREAMBLE		".arch_extension sme\n"
++Sysreg	FPCR	3	3	4	4	0
++Res0	63:27
++Field	26	AHP
++Field	25	DN
++Field	24	FZ
++Enum	23:22	RMode
++	0b00	RN
++	0b01	RP
++	0b10	RM
++	0b11	RZ
++EndEnum
++Field	21:20	Stride
++Field	19	FZ16
++Field	18:16	Len
++Field	15	IDE
++Res0	14
++Field	13	EBF
++Field	12	IXE
++Field	11	UFE
++Field	10	OFE
++Field	9	DZE
++Field	8	IOE
++Res0	7:3
++Field	2	NEP
++Field	1	AH
++Field	0	FIZ
++EndSysreg
 +
- /* Masks for extracting the FPSR and FPCR from the FPSCR */
- #define VFP_FPSCR_STAT_MASK	0xf800009f
- #define VFP_FPSCR_CTRL_MASK	0x07f79f00
-@@ -141,11 +144,23 @@ static inline void *thread_zt_state(struct thread_struct *thread)
- 	return thread->sme_state + ZA_SIG_REGS_SIZE(sme_vq);
- }
- 
-+static inline unsigned int sve_get_vl(void)
-+{
-+	unsigned int vl;
++Sysreg	FPSR	3	3	4	4	1
++Res0	63:32
++Field	31	N
++Field	30	Q
++Field	29	C
++Field	28	V
++Field	27	QC
++Res0	26:8
++Field	7	IDC
++Res0	6:5
++Field	4	IXC
++Field	3	UFC
++Field	2	OFC
++Field	1	DZC
++Field	0	IOC
++EndSysreg
 +
-+	asm volatile(
-+	__SVE_PREAMBLE
-+	"	rdvl %x[vl], #1\n"
-+	: [vl] "=r" (vl)
-+	);
-+
-+	return vl;
-+}
-+
- extern void sve_save_state(void *state, u32 *pfpsr, int save_ffr);
- extern void sve_load_state(void const *state, u32 const *pfpsr,
- 			   int restore_ffr);
- extern void sve_flush_live(bool flush_ffr, unsigned long vq_minus_1);
--extern unsigned int sve_get_vl(void);
- extern void sme_save_state(void *state, int zt);
- extern void sme_load_state(void const *state, int zt);
- 
-@@ -400,8 +415,20 @@ static inline int sme_max_virtualisable_vl(void)
- 	return vec_max_virtualisable_vl(ARM64_VEC_SME);
- }
- 
-+static inline unsigned int sme_get_vl(void)
-+{
-+	unsigned int vl;
-+
-+	asm volatile(
-+	__SME_PREAMBLE
-+	"	rdsvl %x[vl], #1\n"
-+	: [vl] "=r" (vl)
-+	);
-+
-+	return vl;
-+}
-+
- extern void sme_alloc(struct task_struct *task, bool flush);
--extern unsigned int sme_get_vl(void);
- extern int sme_set_current_vl(unsigned long arg);
- extern int sme_get_current_vl(void);
- extern void sme_suspend_exit(void);
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index d0bdbbf2d44ad..d75c9d4c9989b 100644
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -125,12 +125,6 @@
- 	ldr p\np, [x\nxbase, #\offset, MUL VL]
- .endm
- 
--/* RDVL X\nx, #\imm */
--.macro _sve_rdvl nx, imm
--	.arch_extension sve
--	rdvl x\nx, #\imm
--.endm
--
- /* RDFFR (unpredicated): RDFFR P\np.B */
- .macro _sve_rdffr np
- 	.arch_extension sve
-diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
-index 88c555745b584..7f2d31dff8c17 100644
---- a/arch/arm64/kernel/entry-fpsimd.S
-+++ b/arch/arm64/kernel/entry-fpsimd.S
-@@ -57,11 +57,6 @@ SYM_FUNC_START(sve_load_state)
- 	ret
- SYM_FUNC_END(sve_load_state)
- 
--SYM_FUNC_START(sve_get_vl)
--	_sve_rdvl	0, 1
--	ret
--SYM_FUNC_END(sve_get_vl)
--
- /*
-  * Zero all SVE registers but the first 128-bits of each vector
-  *
-@@ -84,11 +79,6 @@ SYM_FUNC_END(sve_flush_live)
- 
- #ifdef CONFIG_ARM64_SME
- 
--SYM_FUNC_START(sme_get_vl)
--	_sme_rdsvl	0, 1
--	ret
--SYM_FUNC_END(sme_get_vl)
--
- /*
-  * Save the ZA and ZT state
-  *
+ Sysreg	FPMR	3	3	4	4	2
+ Res0	63:38
+ Field	37:32	LSCALE2
 -- 
 2.30.2
 
