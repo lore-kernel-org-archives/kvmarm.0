@@ -1,61 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DD632D7C7;
-	Thu, 21 May 2026 12:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A403CF02E;
+	Thu, 21 May 2026 12:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779365576; cv=none; b=dz2r2IC9D25kgOlOTsMQH24ljjddounSZ6TrkjgKdZdC4khPMsG0/Bu1pmktKJKhKL0AHrOoiCuKpCvrgbgqyDvA8F+6u61duKpUWVmgkY1ZUPCYfep+QSvRVQIqmKzNMsGSROse296PWEPbcq4lU4hwgYHM5kQcxz4zWMynbbA=
+	t=1779366311; cv=none; b=AXsz1QONef3V41WXKKWhk0phFf24RqJn4x2XyuKYLIrq0XpH0yajGIhuqloFiwNpGuMcxwhnG0jK2IrsrA3vdu9MydVo9ptjut9byNXrExhoRCYEG4OnbKm6ChWfnsErhJf87QRTcmrkXbpurlNTqHC4Kn4p3qpI3JpaI7xnPcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779365576; c=relaxed/simple;
-	bh=Cf0gkJ/hqVpBhd7UkFOvMBJKVL30EatSj5Ex55m5CfE=;
+	s=arc-20240116; t=1779366311; c=relaxed/simple;
+	bh=KUjCzoopzTTEwHIzusx3oU4AqEOvMG0KszjI0HD/+KY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=spYvNJDnK/Pxup1ERILw5J02q9kEN76r4PckiFB3bUorVjbfYm8ahXetJF5WZe4cKkVaLsFs4VoHjR4UkBxMczpoIUAGZgKfITRqLi5HY8pxi2MkN05yF7W2s5q9FeWuIkyq02CN7HcfT31y2pUkJ3tlEPRH51QdMao2LyeSQpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cdqQBgdX; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=jz4uSP6Gm0k++jiXROzY/qM0FAn/fT9ys3FXvLWrPsbny6cak5x+UntDeye1TufZxG99NmPeF5Nd8O2tYyO0ziUrv9+qi589TIYoEu2iDoUvAM/6QEZrAREygWWQLR/CaSNmLqYap3/w5j39BGxrvSYdaCBD0OKlcMI/igT5elw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzPjrtOV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cdqQBgdX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D63C1F00A3B;
-	Thu, 21 May 2026 12:12:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzPjrtOV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE181F000E9;
+	Thu, 21 May 2026 12:25:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779365574;
-	bh=QXychn9L0mxdWwBTB7z2HXwk+PRqle39TGYH6NUQk0Y=;
+	s=k20260515; t=1779366303;
+	bh=ZScC40Tjduxa/5ReiIAjgbr4BdCwyUKFutprZ4pKc30=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cdqQBgdX4gUwX9OmhPoMjIGM/CW9yfN8zKNNFcfBWKNEQtv1iwpnD8xXmH+Ovdt6g
-	 Nb9QE/CeAVzuJ03zyLL92uN51RT04aSQl/xFznE6tRiHlf58QJaBsJWwrU0lje0k8w
-	 YnTKt8FQfFlOiPplGA9LmCV9emUvVMZQmScmiqmCFRwId/JxVtQOpE/FyU9Fe6QPIu
-	 dfj0QgZh8bgn0f2dB9uTTmSkp6hXfRzHMgh9Vo6s6BFgzw16Vf4QyyHsIXOQG7aQ4N
-	 65bYEZEcX95fQ4AkCJwsGS9EtUycxiIMj3VzkGIlvAs7zKOawjeHqzeCDfurqg0I+Z
-	 LKZiUfpBAQygQ==
+	b=ZzPjrtOVYWsAP3dtI2Qfv4W+HKL6glXzSn0vgLGLL96rcCNiW7vjtM6nBPMb3Ng8H
+	 G9dj1AjDw1bFUJ8whfPC4CFsPxPFCrEI3kLw9CoUVEWNET76qN7kpJ+etLKwIP+73f
+	 jtt5BHbwTpTYYZ6unbI5iADz3+2BLKthRgI+qhfY2BaU+B29T9Li8VoBox+JR1HhIq
+	 jsnPQWLR4aUek2kcURFSfQ45a7IZELZzfhA5pfaY0SGrIjuJNhMhwxkGPS12QAhH7E
+	 UlD/wHlZdXyBDz89jSKxk9qAg465mBXIKU5TGMPoV3CzD97N0B7q7qwoeCQsJyLjYy
+	 6VYcuIU70wL5A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wQ2Gi-00000004o66-1DzI;
-	Thu, 21 May 2026 12:12:52 +0000
-Date: Thu, 21 May 2026 13:12:51 +0100
-Message-ID: <86h5o1vu4c.wl-maz@kernel.org>
+	id 1wQ2ST-00000004oOX-1jAK;
+	Thu, 21 May 2026 12:25:01 +0000
+Date: Thu, 21 May 2026 13:25:00 +0100
+Message-ID: <86fr3lvtk3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: op-tee@lists.trustedfirmware.org,
-	linux-kernel@vger.kernel.org,
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	catalin.marinas@arm.com,
-	jens.wiklander@linaro.org,
-	sumit.garg@kernel.org,
-	sebastianene@google.com,
-	vdonnefort@google.com,
-	sudeep.holla@kernel.org
-Subject: Re: [PATCH v4 4/5] KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
-In-Reply-To: <CAFgf54qpNVvzSiV89g12-4jWeacm=06LMjCooeU1Mt+3sqWDLQ@mail.gmail.com>
-References: <20260520204948.2440882-1-smostafa@google.com>
-	<20260520204948.2440882-5-smostafa@google.com>
-	<86ldddw4ht.wl-maz@kernel.org>
-	<ag7eq3bfBOxfaZ59@google.com>
-	<CAFgf54qpNVvzSiV89g12-4jWeacm=06LMjCooeU1Mt+3sqWDLQ@mail.gmail.com>
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo.Pieralisi2@arm.com
+Subject: Re: [PATCH v14 03/44] arm64: RME: Handle Granule Protection Faults (GPFs)
+In-Reply-To: <20260513131757.116630-4-steven.price@arm.com>
+References: <20260513131757.116630-1-steven.price@arm.com>
+	<20260513131757.116630-4-steven.price@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,83 +73,95 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: smostafa@google.com, op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, jens.wiklander@linaro.org, sumit.garg@kernel.org, sebastianene@google.com, vdonnefort@google.com, sudeep.holla@kernel.org
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 21 May 2026 11:43:58 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
->=20
-> On Thu, May 21, 2026 at 11:30=E2=80=AFAM Mostafa Saleh <smostafa@google.c=
-om> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Thu, May 21, 2026 at 09:28:46AM +0100, Marc Zyngier wrote:
-> > > On Wed, 20 May 2026 21:49:47 +0100,
-> > > Mostafa Saleh <smostafa@google.com> wrote:
-> > > >
-> > > > Sashiko (locally) reports out of bound write possiblity if SPMD
-> > > > returns an invalid data.
-> > > >
-> > > > While SPMD is considered trusted, pKVM does some basic checks,
-> > > > for offset to be less than or equal len.
-> > > >
-> > > > However, that is incorrect as even if the offset is smaller than
-> > > > len pKVM can still access out of bound memory in the next
-> > > > ffa_host_unshare_ranges().
-> > > >
-> > > > Split this check into 2:
-> > > > 1- Check that the fixed portion of the descriptor fits.
-> > > > 2- After getting reg, check the variable array size addr_range_cnt
-> > > >    fits.
-> > > >
-> > > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
-> > > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvh=
-e/ffa.c
-> > > > index 1af722771178..e6aa2bfa63b1 100644
-> > > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > > @@ -607,7 +607,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc=
-_1_2_regs *res,
-> > > >      * check that we end up with something that doesn't look _compl=
-etely_
-> > > >      * bogus.
-> > > >      */
-> > > > -   if (WARN_ON(offset > len ||
-> > > > +   if (WARN_ON(offset + CONSTITUENTS_OFFSET(0) > len ||
-> > > >                 fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
-> > >
-> > > Do you really want to keep this a WARN_ON(), given that this results
-> > > in a panic in most pKVM configurations?
-> >
-> > Which kind of configuration will that check fail on?
-> > Does that mean at the moment pKVM does out-of-bound access for
-> > the header?
-> >
-> I might have misunderstood the point. I thought you meant the new
-> change would cause a panic on most configurations, or were you
-> suggesting just removing the WARN_ON?
+On Wed, 13 May 2026 14:17:11 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> If the host attempts to access granules that have been delegated for use
+> in a realm these accesses will be caught and will trigger a Granule
+> Protection Fault (GPF).
+> 
+> A fault during a page walk signals a bug in the kernel and is handled by
+> oopsing the kernel. A non-page walk fault could be caused by user space
+> having access to a page which has been delegated to the kernel and will
+> trigger a SIGBUS to allow debugging why user space is trying to access a
+> delegated page.
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v10:
+>  * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+> Changes since v2:
+>  * Include missing "Granule Protection Fault at level -1"
+> ---
+>  arch/arm64/mm/fault.c | 28 ++++++++++++++++++++++------
+>  1 file changed, 22 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index 0f3c5c7ca054..6358ea4787ba 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -905,6 +905,22 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+>  	return 0;
+>  }
+>  
+> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> +{
+> +	const struct fault_info *inf = esr_to_fault_info(esr);
+> +
+> +	die_kernel_fault(inf->name, far, esr, regs);
+> +	return 0;
+> +}
+> +
+> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> +{
+> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
+> +		return 0;
+> +
+> +	return 1;
+> +}
+> +
+>  static const struct fault_info fault_info[] = {
+>  	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
+>  	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
+> @@ -941,12 +957,12 @@ static const struct fault_info fault_info[] = {
+>  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 32"			},
+>  	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
+>  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level -1" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 0" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 1" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 2" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 3" },
+> +	{ do_gpf,		SIGBUS,  SI_KERNEL,	"Granule Protection Fault not on table walk" },
 
-Just dropping the WARN_ON(), because for most users, that means just
-killing the machine (only configurations with debug will give you a
-stack trace).
+It wouldn't hurt to align the textual description with what we have
+for other fault syndromes:
 
-> I can do that, I just updated the current faulty check and left the
-> WARN_ON as is.
+	"level X granule protection fault (translation table walk)"
 
-I'd be all for that.
+for the PTW-trigger faults, and
+
+	"granule protection fault"
+
+for the non PTW case.
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
