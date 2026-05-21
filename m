@@ -1,112 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6DF34CDD;
-	Thu, 21 May 2026 14:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A103CB2CF
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 14:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779373491; cv=none; b=izYGYHF53Lk02tGW6fYsfNYXKOynF6rXhd5QmoiSGagXZ7g1oN55k5+H7yW9GnFF5GyU0M99h/D49lAxr1fhWSgbkdWrLtTtneYdIE4VRL/EiYNZ8G9isKQy+PFzFIoGPHkyojvaaBZPl872yLKUhZ7MwaQKzTefOXFxlhz9QBI=
+	t=1779374004; cv=none; b=X/BW7TZJk+X7Y4ZM4HWpW5Z7MJr2Hu4p3v2yNCsTgh1Lhl+3QDzKY7U4BUINCNuC6hLRNlotdIPExgxwuBtOaBDnREW6iTOhsie3yvc8oyy7VEvcZokinyWxadDerqZmBXSj2cLBPTim3HftoqkaROD0HDBI2TgGcInIUq8hc+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779373491; c=relaxed/simple;
-	bh=vXZa8Ji/6KArR/oIKIGQNUIDvUJfmQOd2bIdFDnrRTw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NRmdRgsN74bBPv4bnUyrSZiRlI4V/wR3Gj6zZH51exh0SfxdXRjPQujUTvjA/utRwsTp3zksWDrrjfdPQpn0BGgDfCdJYHvaR9AwC992oU25Jm3bGPgns7bTRcf6btaamz1BvFhxfykuFWvmABb6kFtsPjuTYGDQfNBR0xIRDwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0Fz94HI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779374004; c=relaxed/simple;
+	bh=LV5hpR3wnVTOnpwr5blEOSQMuQ17TQTO55CG8gY7q5o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N4p0HBxJgMZA/AdGa46OdFn3geD/0j2UxKK+z5fLavWIFxJwdLLz+Pb1xc8HNyfqeMyqZE2AFVB2ekUDXwzFqw6T/XLmQWZjkbqQtVcinnwbHTOCQ4ZK2QIGnyUTx5ruYPbnkSrEZ6otu350KOvr5JXAuDi6y8K6nFGEySxLnqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RX+rPsRa; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0Fz94HI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B18C21F000E9;
-	Thu, 21 May 2026 14:24:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779373489;
-	bh=4yY0xLPIUePUsfft08eVBYhbYc5qg6P6+d9+9o4MEh0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=L0Fz94HId7nM2n3maEesRvPcRv33MSDQBBHbK6gKVdbWaWZo9I5zGOCXdawiZtc9O
-	 4+a25ntNE1afgzE5DRoDAitfZ4P6ha5UKZKeSRijxWH0E/UBx37rk5yb9xm/CSQF+F
-	 mqL/0EAQk4bug9vFmTNNAy08j/p3VA9MCOso/kAhYDrSm1cEAckwPkXVZEMgtYFoQ2
-	 uZVtuSmc+Q/PSBcGT4UdnJwWp4SUGdx339QNO4jU73mcA5jXczC7kiRjEqz/PNThVt
-	 +lKfYIagRozrqoN8ujsl5/Iffb/JgEPgzxutFlZ04Dvl4GHr+OS4nIGzSZcZPHjd3W
-	 2RzR8c5SBbw8Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wQ4KN-00000004ruq-3M92;
-	Thu, 21 May 2026 14:24:47 +0000
-Date: Thu, 21 May 2026 15:24:47 +0100
-Message-ID: <865x4gx2kw.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 08/44] arm64: RMI: Ensure that the RMM has GPT entries for memory
-In-Reply-To: <868q9cx4ac.wl-maz@kernel.org>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-9-steven.price@arm.com>
-	<868q9cx4ac.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RX+rPsRa"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-687157a1739so2501194a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 07:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779374001; x=1779978801; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=D6BscWoRfoF5G2iEIlMgQxNFZ2Pew7ZRjTmGHaq5Wuo=;
+        b=RX+rPsRaDJVCuoeTSfWmyVwC87Uo+Uc4gF9jVJujSyP/B3HcP+hY5app+BDLfS+R1U
+         VA7p84DJSvkJWoSBn8afV4uEGX6u+xs0T10Qvc4qEAm/Pb8A+DzBG5OPgEWpzousLdpp
+         uUYrJG/U1Wj8y0g2649+NN2j1zIG1mHp7/qVESEKmKzD/TAOaCypBYMeNQYGDmgWKwLq
+         UIB/nNl3nbRNCROi4lnABm9adCZ0ln0ch0mDTxwS8B4agALWDJXZmiDBQgvXBiS8689c
+         3heaGeCbOHWIyURV8uG36E514SDtuRK17DaFvM0sdDxUTrvR+UVRPxbNeu2ySM3SZxQL
+         yL4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779374001; x=1779978801;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D6BscWoRfoF5G2iEIlMgQxNFZ2Pew7ZRjTmGHaq5Wuo=;
+        b=Ly2bfykd0jk54Cw2zwu1jLWfIalmEy60uCZy/drPxnFcaT/5PIhMoeTijQjyq1wH5z
+         V/C6vTQJguHOWYlVNXNOzCB/fejQ4HlLAjK/3qr1X52INCuvocvs3uo5VgtFRD/QU4Tv
+         MIsJc1SK+FjR+DqZ0NY+w+wc5z5WYpz5K8clFRW+n1x6xK5e04LKMy+oGekA5+L/riwZ
+         LXNQHk9hIeKaytdoclYO2jT/Vkx99f1lpD4l2mSXX1om/7HJl7b/0W02PNPmTJZNmHX8
+         pFuz2Pd79AvkybIDaegiZX1pezDq2e8MGLi+gY8uVGOf0wA/rXZ1t/IdBIQYS7gsN1RV
+         eAGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+qIPkqM5qyDPuZqdgyDPF49Z/O5xm/1+SYyPJp+Q4V46JATCUo1P+3VXWCfE+F4hHsgWhRpmw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzhIRjHTa5sqiaV/n5X6jR1gvP2Swn73FPJlhJsn0RGCWe5teSc
+	GaaXfb8+Q4EKIMAnBY/UWNevTxaesDKaEjMCoWYRDMIQfiSgu0hhbemoYD5/Q9ucFEkG1rXLOf7
+	xEzGnnLGM+QYo34Azxrp/WQ==
+X-Received: from edyc13.prod.google.com ([2002:aa7:df0d:0:b0:67c:3c95:d0cf])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:2694:b0:687:cfde:ddb2 with SMTP id 4fb4d7f45d1cf-688361e0fc2mr1758793a12.11.1779374001206;
+ Thu, 21 May 2026 07:33:21 -0700 (PDT)
+Date: Thu, 21 May 2026 15:33:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260521143318.1002172-1-vdonnefort@google.com>
+Subject: [PATCH v3 0/3] Fix __pkvm_init_vm error path
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com, tabba@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 21 May 2026 14:47:55 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Wed, 13 May 2026 14:17:16 +0100,
-> Steven Price <steven.price@arm.com> wrote:
-> > 
-> > +/*
-> > + * For now we set the tracking_region_size to 0 for RMI_RMM_CONFIG_SET().
-> > + * TODO: Support other tracking sizes (via Kconfig option).
-> > + */
-> > +#ifdef CONFIG_PAGE_SIZE_4KB
-> > +#define RMM_GRANULE_TRACKING_SIZE	SZ_1G
-> > +#elif defined(CONFIG_PAGE_SIZE_16KB)
-> > +#define RMM_GRANULE_TRACKING_SIZE	SZ_32M
-> > +#elif defined(CONFIG_PAGE_SIZE_64KB)
-> > +#define RMM_GRANULE_TRACKING_SIZE	SZ_512M
-> > +#endif
-> 
-> Basically, a level 2 mapping. Which means this whole block really is:
-> 
-> #define RMM_GRANULE_TRAKING_SIZE	(2 * PAGE_SHIFT - 3)
+Sashiko reported a potential refcount leak in the unlikely case where
+insert_vm_table_entry fails.
 
-Obviously wrong:
+While at it, I have added a fail-safe to __pkvm_hyp_donate_host to ensure this
+function doesn't allow leaking refcounted pages.
 
-#define RMM_GRANULE_TRAKING_SIZE	BIT(2 * PAGE_SHIFT - 3)
+Changes since v3:
+ 
+  * Enforce order-0 for external pages, making the vmemmap ->order field
+    completely private to hyp_pool.
 
-	M.
+Changes since v2 (https://lore.kernel.org/all/20260521102149.804874-1-vdonnefort@google.com/):
+  
+  * Proactively init hyp_page order field in hyp_pool_init  
 
+v1 (https://lore.kernel.org/all/20260521081250.655226-1-vdonnefort@google.com/)
+
+Vincent Donnefort (3):
+  KVM: arm64: Reset page order in pKVM hyp_pool
+  KVM: arm64: Fix __pkvm_init_vm error path
+  KVM: arm64: Add fail-safe for refcounted pages in
+    __pkvm_hyp_donate_host
+
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 35 +++++++++++++------
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 21 ++++++++---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 ++-
+ 4 files changed, 45 insertions(+), 16 deletions(-)
+
+
+base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
 -- 
-Without deviation from the norm, progress is not possible.
+2.54.0.746.g67dd491aae-goog
+
