@@ -1,102 +1,284 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8231135504D
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 13:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82772F90C9;
+	Thu, 21 May 2026 13:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779371251; cv=none; b=t3SLF5ygMAUeO6ejT8dIVCrpRiSDlB0kYNP3hve276hIne+ro7lVqFBViuOSNA6h7Nk+z1ic8oihDg7oywN130EnLdKMj0j80CdbV0tjasQmsEvVErvFN00WKnGCKO+7eAcrrFwHSJIaQkgRZWl2OPTzKrl6lqRlg5OlWRbY2m4=
+	t=1779371279; cv=none; b=MEwZJD9jc9uvPWO+X8xGb10ndAilrs0Kam991qxAVl/evNrVp0xQcTS9Z/8q0XZuUDo1p6Tepl8cPaGfjSu7lXANY9J7sI83lh/NIw1ZcFRsPoJgtKkcEgxBVutwV/+1FZmsk7385qi2YGx/7ec33gC7QdYDss7kFSp+fKuvVxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779371251; c=relaxed/simple;
-	bh=8TEJxnfV5vd+BoURyhPm3NVl9yBTSRiCIgEdiyBq0ug=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=AmmC8T8XklqZoN8bi6jH2G27ym5g4QUgtcF6w5i513hPGqPME7lCAm2oFJmSe8OCYph0SznaKMlnDlzFEk+fJEUYPhyG5/dmBrPxvo4kr/uCY1FiEtV6LOmn6dxQZtUJaYiF+YHVk43bjP5iwjK3BEDL6Rr/Gu9b5GiNYdv7c2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AHDQIwn7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1779371279; c=relaxed/simple;
+	bh=BkOj3MFjhDwraBkwNSnXzlkV57yHQi0WdmuCnmnd3cY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LN4CYWJ42/YJvPjG1sV+q7pqknfrgLBAd5/hpUNjNDj0AF+sLqIoEComE1XLwe+SWg/H8B0uyDATxbBOMJtTrDhc/Ae81jNi4bEi+ITG/ECaU/za5F4WIYt1tOpiSKjni7g2QaoFnJab8lDaylmXFDY4sWvrzX9yM0TtkoF0NjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOGVPcae; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHDQIwn7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779371249;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8TEJxnfV5vd+BoURyhPm3NVl9yBTSRiCIgEdiyBq0ug=;
-	b=AHDQIwn7XcKc6Huy8ChMi1ymQMGDeife+tynoO2Sx7uLZKj6j17403cz/1RWlA0+IooLw9
-	ruTNqZjvEG7X14Rfgx4P1ycwVGDiiGMJyhTlcORtpUuF0U5Mp3YQH2CrHOhmjmms1uzW1q
-	l/x5bx2EWAShSoUUPv47A3C22M1pnVg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-203-66yrIkX2NO6k-eoKjuqi-Q-1; Thu, 21 May 2026 09:47:19 -0400
-X-MC-Unique: 66yrIkX2NO6k-eoKjuqi-Q-1
-X-Mimecast-MFC-AGG-ID: 66yrIkX2NO6k-eoKjuqi-Q_1779371239
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-44bf1ac8893so4854745f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 06:47:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779371238; x=1779976038;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8TEJxnfV5vd+BoURyhPm3NVl9yBTSRiCIgEdiyBq0ug=;
-        b=eOaqQ7J50CqUNqp37Ur10gBYx29KavOs7VKMNpQsYW1pp6YeebDrcAuFxHnPDZ5UrV
-         fRWLe6ZjHLPyblyl+mk8VxIJPj1x/ALJkmeZ1pU7FU8z7o7ZQAUOTSWLK5pwDs4Dv0Bh
-         YnqGfJA2jYKGX1u0/3Wh17wvRa8T0dhqQ6zKHArwJm14yMbhxuIBuNgKXMmtcCo0VSzl
-         G/w0Hw1BxRJS2GKRwvyaEOypuTqf429CjtmKGfgFHN/eVw0ahYwIY8PkyYUKZo0M+BbW
-         wx9NNJELo+bVe0oz3yjtip4VKByLr8QljN5jlOGYT+yxkIjJ4pkcxGH+Jb9qKL4AfF5r
-         L9pQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8aVJpYQc99BfqSFqlDCHCFIbh4cAGfmiEiVfax2mGr2S6ZfLX2a3+3trTDCqikv5emzCcgzvg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzKgrAOAWrVWgp2asGgGZVpQFiW50zvs19zfM7fkhSt3gksnGNu
-	0blVovHB7TTHtyMc4EP12+0+fk2b3WLQ5QM9mMWF9c3zzt/QpiPubFe1gXDDUT9dG2xSKQy9lm9
-	fDepTyqhwWYihXrMOT4Cauqc5YJHbiYt6DssvQGf7vufccqM+o8ltFa7LFQ==
-X-Gm-Gg: Acq92OEG3SyggaPCAeOIGElfFCXKgmaMGle3Ny15ZDxh2oo/2SlvXbl1eDENJVOo0ad
-	a+0/ssAR7uFYWTfzV6Hk5rx0xRBoXmdrDd06kCQxxEcYQ22HxeU9DuuEYxpSYBABlkpQhhr/lUs
-	GPgTvJQC6qvtIhABZi9bg8tLJ6HJf7Hww5uwq6O3f4zgy/+inRvxFTU47uYVw0xLvICerQPq2ZT
-	C0dSzIkFTnkReeQF5TWpm8/mJ4pGOaQQPdpqM7mgzyz/qEA/7sypVOrxEB1OQKz2YTMtbizG7wU
-	86zDMUEBJZDgvFGQM3+tDvFCL+xQ/BWrRbK2EbFnZfrFfovBYzQWs4K15XlfsvWPeFcdnPlw48R
-	yR1SHLtHeTl36My5Z/9b/pGKb1YWRksASzFPbXlK4vJ5wH89f1j0Co8cLOaLu51cVxjIXCPo=
-X-Received: by 2002:a5d:5f91:0:b0:45e:73b4:85cc with SMTP id ffacd0b85a97d-45ea40f36ddmr4620328f8f.35.1779371238628;
-        Thu, 21 May 2026 06:47:18 -0700 (PDT)
-X-Received: by 2002:a5d:5f91:0:b0:45e:73b4:85cc with SMTP id ffacd0b85a97d-45ea40f36ddmr4620285f8f.35.1779371238237;
-        Thu, 21 May 2026 06:47:18 -0700 (PDT)
-Received: from rh (p200300f6af2a6100f239e076bbd76784.dip0.t-ipconnect.de. [2003:f6:af2a:6100:f239:e076:bbd7:6784])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eaa7cd815sm4410866f8f.6.2026.05.21.06.47.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 06:47:17 -0700 (PDT)
-Date: Thu, 21 May 2026 15:47:16 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, 
-    kvmarm@lists.linux.dev, peter.maydell@linaro.org, 
-    shaju.abraham@nutanix.com, khushit.shah@nutanix.com, 
-    yangjinqian1@huawei.com, cohuck@redhat.com, richard.henderson@linaro.org, 
-    skolothumtho@nvidia.com, philmd@linaro.org, maz@kernel.org, 
-    oliver.upton@linux.dev, pbonzini@redhat.com, armbru@redhat.com, 
-    berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
-Subject: Re: [PATCH v5 10/18] target/arm/cpu64: Retrieve writable ID reg map
- in aarch64_host_initfn()
-In-Reply-To: <20260519132905.145643-11-eric.auger@redhat.com>
-Message-ID: <23dd2f71-d5d8-952e-c32c-cfb3537f89c0@redhat.com>
-References: <20260519132905.145643-1-eric.auger@redhat.com> <20260519132905.145643-11-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOGVPcae"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7A6D1F00A3B;
+	Thu, 21 May 2026 13:47:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779371277;
+	bh=4AUUfVdnAMIu1+nXAYd+KcsatPxg6clq+mof5vfIcTA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=UOGVPcae5hQbVFDj2e3I35YX66lTvphJQZOzzoLKjP43ePS84hdMEye5cu/0W5llX
+	 fRzHsXcAh9wK/CYAKZetHLR/Lq3YmUd9/TTlwjejsi7eNNO0QThR0Nay1fbgw0qXZD
+	 gG4ePzvbblT19K4ndvq120+k/06wpEYZ6om6lH0+767sFPwvFk7wEQELsOXRTy73RG
+	 edy0tT0lAU6MgUU5TnF2DpK5+dyNcxttJjwMbwNxhnL+ntsOophZT0EfNSi1lSAinZ
+	 KLrRXn9MQeaKaRl186ZawxgPD+bOxC8LI5tIFKy3/5gNE2gb5bOdnxYZYPcP62N2H6
+	 bBs2a+ISherEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wQ3kh-00000004qa8-31dB;
+	Thu, 21 May 2026 13:47:55 +0000
+Date: Thu, 21 May 2026 14:47:55 +0100
+Message-ID: <868q9cx4ac.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo.Pieralisi2@arm.com
+Subject: Re: [PATCH v14 08/44] arm64: RMI: Ensure that the RMM has GPT entries for memory
+In-Reply-To: <20260513131757.116630-9-steven.price@arm.com>
+References: <20260513131757.116630-1-steven.price@arm.com>
+	<20260513131757.116630-9-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 6S34VAbUd0sD9gfVEnl6BfX5nZPf1YIvZVjum8WGi1I_1779371239
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 19 May 2026, Eric Auger wrote:
+On Wed, 13 May 2026 14:17:16 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> The RMM maintains the state of all the granules in the system to make
+> sure that the host is abiding by the rules. This state can be maintained
+> at different granularity, per page (TRACKING_FINE) or per region
+> (TRACKING_COARSE). The region size depends on the underlying
+> "RMI_GRANULE_SIZE". For a "coarse" region all pages in the region must
+> be of the same state, this implies we need to have "fine" tracking for
+> DRAM, so that we can delegated individual pages.
+> 
+> For now we only support a statically carved out memory for tracking
+> granules for the "fine" regions. This can be extended in the future to
+> allow modifying the tracking granularity and remove the need for a
+> static allocation.
+> 
+> Similarly, the firmware may create L0 GPT entries describing the total
+> address space. But if we change the "PAS" (Physical Address Space) of a
+> granule then the firmware may need to create L1 tables to track the PAS
+> at a finer granularity.
+> 
+> Note: support is currently missing for SROs which means that if the RMM
+> needs memory donating this will fail (and render CCA unusable in Linux).
+> This effectively means that the L1 GPT tables must be created before
+> Linux starts.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v13:
+>  * Moved out of KVM
+> ---
+>  arch/arm64/include/asm/rmi_cmds.h |   2 +
+>  arch/arm64/kernel/rmi.c           | 103 ++++++++++++++++++++++++++++++
+>  2 files changed, 105 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+> index 9179934925c5..9078a2920a7c 100644
+> --- a/arch/arm64/include/asm/rmi_cmds.h
+> +++ b/arch/arm64/include/asm/rmi_cmds.h
+> @@ -33,6 +33,8 @@ struct rmi_sro_state {
+>  } while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
+>  	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
+>  
+> +bool rmi_is_available(void);
+> +
+>  unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp);
+>  void rmi_sro_free(struct rmi_sro_state *sro);
+>  
+> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
+> index a14ead5dedda..52a415e99500 100644
+> --- a/arch/arm64/kernel/rmi.c
+> +++ b/arch/arm64/kernel/rmi.c
+> @@ -7,6 +7,8 @@
+>  
+>  #include <asm/rmi_cmds.h>
+>  
+> +static bool arm64_rmi_is_available;
+> +
+>  unsigned long rmm_feat_reg0;
+>  unsigned long rmm_feat_reg1;
+>  
+> @@ -88,6 +90,102 @@ static int rmi_configure(void)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * For now we set the tracking_region_size to 0 for RMI_RMM_CONFIG_SET().
+> + * TODO: Support other tracking sizes (via Kconfig option).
+> + */
+> +#ifdef CONFIG_PAGE_SIZE_4KB
+> +#define RMM_GRANULE_TRACKING_SIZE	SZ_1G
+> +#elif defined(CONFIG_PAGE_SIZE_16KB)
+> +#define RMM_GRANULE_TRACKING_SIZE	SZ_32M
+> +#elif defined(CONFIG_PAGE_SIZE_64KB)
+> +#define RMM_GRANULE_TRACKING_SIZE	SZ_512M
+> +#endif
 
-> Store the writable_map array in the CPU state and populate it
-> in aarch64_host_initfn(). In case the retrieval fails we simply
-> free and null the pointer: this will indicate that the writable_map
-> is not usable in subsequent patches.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Basically, a level 2 mapping. Which means this whole block really is:
 
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
+#define RMM_GRANULE_TRAKING_SIZE	(2 * PAGE_SHIFT - 3)
 
+(adjust for D128 as needed).
+
+> +
+> +/*
+> + * Make sure the area is tracked by RMM at FINE granularity.
+> + * We do not support changing the tracking yet.
+> + */
+> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
+> +{
+> +	while (start < end) {
+> +		unsigned long ret, category, state, next;
+> +
+> +		ret = rmi_granule_tracking_get(start, end, &category, &state, &next);
+> +		if (ret != RMI_SUCCESS ||
+> +		    state != RMI_TRACKING_FINE ||
+> +		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
+> +			/* TODO: Set granule tracking in this case */
+> +			pr_err("Granule tracking for region isn't fine/conventional: %llx",
+> +			       start);
+> +			return -ENODEV;
+
+How is this triggered? Do we really need to spam the console with
+this? A PA doesn't mean much, and there is no context (stack trace).
+
+If that's not expected, turn this into a WARN_ONCE().
+
+> +		}
+> +		start = next;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static unsigned long rmi_l0gpt_size(void)
+> +{
+> +	return 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+> +				      rmm_feat_reg1));
+> +}
+> +
+> +static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
+> +{
+> +	unsigned long l0gpt_sz = rmi_l0gpt_size();
+> +
+> +	start = ALIGN_DOWN(start, l0gpt_sz);
+> +	end = ALIGN(end, l0gpt_sz);
+> +
+> +	while (start < end) {
+> +		int ret = rmi_gpt_l1_create(start);
+> +
+> +		/*
+> +		 * Make sure the L1 GPT tables are created for the region.
+> +		 * RMI_ERROR_GPT indicates the L1 table already exists.
+> +		 */
+> +		if (ret && ret != RMI_ERROR_GPT) {
+> +			/*
+> +			 * FIXME: Handle SRO so that memory can be donated for
+> +			 * the tables.
+> +			 */
+> +			pr_err("GPT Level1 table missing for %llx\n", start);
+> +			return -ENOMEM;
+
+If any of this fails, where is the cleanup done? Is that part of the
+missing SRO support that's indicated in the commit message?
+
+> +		}
+> +		start += l0gpt_sz;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int rmi_init_metadata(void)
+> +{
+> +	phys_addr_t start, end;
+> +	const struct memblock_region *r;
+> +
+> +	for_each_mem_region(r) {
+> +		int ret;
+> +
+> +		start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
+> +		end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
+> +		ret = rmi_verify_memory_tracking(start, end);
+> +		if (ret)
+> +			return ret;
+> +		ret = rmi_create_gpts(start, end);
+> +		if (ret)
+> +			return ret;
+> +	}
+
+How does this work with, say, memory hotplug?
+
+> +
+> +	return 0;
+> +}
+> +
+> +bool rmi_is_available(void)
+> +{
+> +	return arm64_rmi_is_available;
+> +}
+> +
+>  static int __init arm64_init_rmi(void)
+>  {
+>  	/* Continue without realm support if we can't agree on a version */
+> @@ -101,6 +199,11 @@ static int __init arm64_init_rmi(void)
+>  
+>  	if (rmi_configure())
+>  		return 0;
+> +	if (rmi_init_metadata())
+> +		return 0;
+> +
+> +	arm64_rmi_is_available = true;
+> +	pr_info("RMI configured");
+>  
+>  	return 0;
+>  }
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
