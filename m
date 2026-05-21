@@ -1,427 +1,275 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F47383308;
-	Thu, 21 May 2026 14:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779375058; cv=none; b=UfXP4sJxdU3IJt6yj2xlsAXc69SHNHIvgUBuLHYZDULWpXer6oaDwBz7Jo1gSNlaICctkQPzEIvumAs5waUc7eA0Z391H0UF4Lq3RcfcCM4ARkvjWsvOjhPJq/ai/8TfWNsjpFFz3J4EDEuRA7DtUaePv4q5xGWoZq/Ftsaeotw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779375058; c=relaxed/simple;
-	bh=zbLBSDI0lsPwpDFB8s+wQ0dK1LPqP9m6AhlcFigceWo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=koudqZ5u9Hu7JGADLG50VXW8jZFSY2dW9xW09zsM8MIzFYm/+9733kCSfBVx3yFl5hJmZCx9hsGIHCkBjEBINFgUgvr1IMT+jZCh6wxDLxq8Y/PEo9FDBBD8H72KX8uGD6elLuz/6e9b/yBSQ7BJpSiBiXuPY0Xbi/hbaTGQOx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=GQkuaPC8; arc=none smtp.client-ip=217.140.110.172
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010035.outbound.protection.outlook.com [52.101.84.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D57383996
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 14:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.35
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779375060; cv=fail; b=PKR8sP1OI/nCQh5Kjw48NcvjByUtjHYYNjBPQdDhJq2GBsXwza2ictGivR/qPaTI/WHBnsWNoLfC+phK3Za85piHlZRwt4cXUtGo8KyOM29LVDjg0EYa4jqndi4xPtG5UKr/5UkCyCJbQUHV8OGiySzLb8ZmcmP68fjaVDhyOk0=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779375060; c=relaxed/simple;
+	bh=eEKZ58LWDqVkQGUOK8T3FDS4kbPyzaLOWyT+ElRBm9k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=q3zuerML0Emkfj0/OlhVm+82fqy/GztcUnndH52l2Q4q11SbR8446e1YUWL13ME1Lq1qTZ7M2I8woJLK1SBTXE6Pdd9WGY4H5Br5p7DRajQPXPR90Ja7vGTWZOwdlGqFeFLsU84Bey8mplBUzyonm03R2CjNaYkIGxOm8SAslHs=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=aCXMZ+YN; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=aCXMZ+YN; arc=fail smtp.client-ip=52.101.84.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="GQkuaPC8"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 170B63585;
-	Thu, 21 May 2026 07:50:50 -0700 (PDT)
-Received: from [10.57.22.108] (unknown [10.57.22.108])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6CDBC3F85F;
-	Thu, 21 May 2026 07:50:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779375055; bh=zbLBSDI0lsPwpDFB8s+wQ0dK1LPqP9m6AhlcFigceWo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GQkuaPC8Zk+nr2QvPkBEC5O5FOPaugRDTwLB3AwGxl/RwWOQLzFjSqya4ftzv17uq
-	 6OKyCstgRuzND4+8vufbnacOp8lhYhbXTgPgpBzuT8txvwvz1ogT1qtfGjMu9hCFpV
-	 +0JhIRBwAq4oYSegsyDIcW7snBqomvQQjAUZgZSA=
-Message-ID: <5fa4d4df-dd56-4d12-b334-da4d1a4bd5b6@arm.com>
-Date: Thu, 21 May 2026 15:50:47 +0100
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="aCXMZ+YN";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="aCXMZ+YN"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=fail;
+ b=oXknyVOp5kq856ibXI3ZMHuNfKrxgv7TZgZ4XGNMXasWtxXUf5BOdzqkeD7vgpX8BanKYjIQsADhWgZ5dkkkYjF9c+h5QZSoLc2tMzpbLbXxSpsCrYow34w2ArRkpi+QQa/1Xtp90IMbYwVyih93iTLteJkcIPdGiOcsJ+Lr3Yaxn51p1by7NnedYdESd1xupRmhKEKwiQX0tpfN3/4lIVDQMnhLQpjVFWfELBIzlxjm9IiuQzaUPOxYHTNyumt5JWi77zgwLmLkB7WsmDiL/nwxBzQGtw2Vy6QWFLLJ09pgs+UHNiBkJj16tEOHERmItVjKHI8DhHzLNUWL5q1j9Q==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k46j4bhjG8hDUiDJpMwNflgdrnQ/RIRAGC/nr2tmKYQ=;
+ b=CY4/IVYAoi7sfa8FVmJHXPxASh1WfvX5RlA/WWdaharv5N5cS7XFeb5pJ1obE//UvRzld4SGgIz6ES6HZuvAj5dJtWkFqTxQ21VVrvJZh0RYMHlvOSs7zvMGBfUHB55YBH7IBo6CBetV292imx90foHGoWVbNWeP+Ln+P8EiCYpIhqh+V8BkkLsBdD4HlBtr9y+Sv1MsdyOrsZkkXwhuvKxVCjCKwye0S6uqiZUxj1RkwmcGxiYDmQKnXTKosiaKJzLPcXJUCAFRkNZU3Q3hAyav7m4wv45MQbIPedA6IUNZkVJszzQW80ihbttgCTOj/yZggcW7RCGEZ8C0H10I0Q==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=arm.com; arc=fail (48)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k46j4bhjG8hDUiDJpMwNflgdrnQ/RIRAGC/nr2tmKYQ=;
+ b=aCXMZ+YNYVPHUrUYtehy9g4KVONeJx0d9+69ktGKeSA3BHq6G8cTHXAFOKa8DxNkw2mHtr2riPAu49A9syvSwSEE+QVBpyEhuVs0yqyvd9lg7xH2dNUU/PRjRtiWcFD0TJb3UbTVb6mr6WfgZj+njEwPxLsXqIZIpy75FsNHrUM=
+Received: from DUZPR01CA0256.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b5::16) by AMDPR08MB11368.eurprd08.prod.outlook.com
+ (2603:10a6:20b:71c::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Thu, 21 May
+ 2026 14:50:52 +0000
+Received: from DU6PEPF0000A7E0.eurprd02.prod.outlook.com
+ (2603:10a6:10:4b5:cafe::3a) by DUZPR01CA0256.outlook.office365.com
+ (2603:10a6:10:4b5::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.17 via Frontend Transport; Thu, 21
+ May 2026 14:50:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ DU6PEPF0000A7E0.mail.protection.outlook.com (10.167.8.39) with Microsoft SMTP
+ Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.71.7 via
+ Frontend Transport; Thu, 21 May 2026 14:50:51 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kdWkD+nFjUtGigcA0JlOp4jKEu3xCGHoieecMBPWTqdlnYmMRe9jJK6r9uwTV1e6/5FXABSssFuFHyrYmTUMv+AFv3bCH6QBqDB3ZWd3H0IFmjlh2gq8oGHerDgsbsSL+/tkES/nYkxnmq8bd9edLkJjr2j6u1+jYhDASx+EK5IYqbbYirL9t/rNuhYpFa4Mfh8cb6UJhu3/lwNekw7YX7DXmWF17pm5JjQ93j8AFu+FaJQndpwlTME/ilnuUi1ljPJ6GZeGSKHqhztB7Jl1nP9yYBxbbtx24JQQdCWvvlq5tsFK3dkxIJMR3Nf2uedVaoIqnBsLANK+KUdReNQJyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k46j4bhjG8hDUiDJpMwNflgdrnQ/RIRAGC/nr2tmKYQ=;
+ b=N9pAIEhoxpy8BnoOrxhB53BFyJ2i5B2YRp94Cduc4TifQ25SEvfru6IHxmtYKd4ZZU9mX69wneIehSHnxSgysKiHLZwZ1J4/JrBzPXcBnlmNNEonLAcGtZ7W6WYaBU1p/i2bVL2Eb6s6lxFvcWWi+FNIpjfQEkOjuf/RgtyBl2Roo7PPbGNI0KtQOWTY6CfY5IZwWyiSAJ/AqeLswtofIhr8YlFoksg9x3p3d5p7jAS+jNoiTnoTlbyGtFjwL+YZV0KdRc+G8Txj4fzQbUZms9an1Xz7OzIGsv7Dy/w7Ne7XLczv+kG0s8b+Istu87JLc+SH1vxl/4YxWFJqhLRJEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k46j4bhjG8hDUiDJpMwNflgdrnQ/RIRAGC/nr2tmKYQ=;
+ b=aCXMZ+YNYVPHUrUYtehy9g4KVONeJx0d9+69ktGKeSA3BHq6G8cTHXAFOKa8DxNkw2mHtr2riPAu49A9syvSwSEE+QVBpyEhuVs0yqyvd9lg7xH2dNUU/PRjRtiWcFD0TJb3UbTVb6mr6WfgZj+njEwPxLsXqIZIpy75FsNHrUM=
+Received: from GV1PR08MB7315.eurprd08.prod.outlook.com (2603:10a6:150:1e::15)
+ by VE1PR08MB5856.eurprd08.prod.outlook.com (2603:10a6:800:1ab::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Thu, 21 May
+ 2026 14:49:48 +0000
+Received: from GV1PR08MB7315.eurprd08.prod.outlook.com
+ ([fe80::c249:1aed:a4c2:4193]) by GV1PR08MB7315.eurprd08.prod.outlook.com
+ ([fe80::c249:1aed:a4c2:4193%3]) with mapi id 15.21.0048.013; Thu, 21 May 2026
+ 14:49:48 +0000
+From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+To: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly
+	<Joey.Gouly@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: [PATCH v2 02/39] irqchip/gic-v5: Provide OF IRS config frame attrs to
+ KVM
+Thread-Topic: [PATCH v2 02/39] irqchip/gic-v5: Provide OF IRS config frame
+ attrs to KVM
+Thread-Index: AQHc6TESIsgjQ1qbnUaAfMlOMM8PRw==
+Date: Thu, 21 May 2026 14:49:48 +0000
+Message-ID: <20260521144846.1899475-3-sascha.bischoff@arm.com>
+References: <20260521144846.1899475-1-sascha.bischoff@arm.com>
+In-Reply-To: <20260521144846.1899475-1-sascha.bischoff@arm.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: git-send-email 2.34.1
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+x-ms-traffictypediagnostic:
+	GV1PR08MB7315:EE_|VE1PR08MB5856:EE_|DU6PEPF0000A7E0:EE_|AMDPR08MB11368:EE_
+X-MS-Office365-Filtering-Correlation-Id: 35051040-99b4-47f7-6097-08deb7485aa8
+x-checkrecipientrouted: true
+nodisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|56012099003|18002099003|22082099003|11063799006;
+X-Microsoft-Antispam-Message-Info-Original:
+ SHk0UvMIgp9ORMBiQYW9BjAqx03JuFCe+yXRYXRT5sdg1jcU0y6XxTKMOTTNKP2X0oc/1IehgGqZ3JO7mwCSSvqaQjt0NGt4LgYA/oah2UBSh7ASA04sdVdoL0+a0FeoXnVg4yURNXChsm+VY6Xh702zsXN2kgCJ8fnOgh0ULplHp/4CmTZ76ikKNJLrejJR39rP6m7rYnb0MoJ6X1quIrpfnP+WhJ0LfiIqNvLE2wn2q9gTIYlUXUx+WKcFT2MYd3EjwCS9gh3duLRlELAS/lroSl6BU9phYf85l6AaG+fTrvkZKC5OQ8MAnAP0iKDZA/YBgQwmt1iyWoeblV2+Ft6By8ky2+g5GoNQKyKv6zrOlE+bdyZqhQWc1h5m1WGz6fCIASBH+6bTshhcyLoNVrd/XUj1TdYzCcXU46V/ZcDX8kOina56sliqbKtJwNw8i64R7WlTOXIN8MpYgLx0MbQcrDi5nt7H1IHqMI3Wvy982j5Vs3LF/6r6aEDK0USzV8p9MYWVlm0Y1TGA3Fixk/iDuQdOIocrKK1YGVS1YW+vYuyE1TP0C3S6Zg7RpJWaBiKNAK1/uzFkTcgCslZ8CUEwBdgM2r+QUDLVASAZ7Bdhg7+enl9cNa/zCXAJKUTvktTBR24qlb6WDGqc87Q9Rt1SOwg+u0sHP5OuMV1IntRfFKqgeiFoOER0Pcym8BXgXJcgRZyOPcrgdcfefsX124DaA2A/A2fUJKtXfAZ+kDu4VuKjxImOljgmJuf2rs5a
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB7315.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(56012099003)(18002099003)(22082099003)(11063799006);DIR:OUT;SFP:1101;
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 04/44] arm64: RMI: Add SMC definitions for calling the
- RMM
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-5-steven.price@arm.com> <86ecj5vsu4.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86ecj5vsu4.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Exchange-RoutingPolicyChecked:
+ CYB92ybRmBEhLI9NEyerwB/rb9zSOaC0uvOpWcvNLdB7cX7mCbtbetrr7ew9T3kttKGST49lQH5bJkV/+ZPBn44CfyYhu//xs4BD2yWBgsPK9MVuxW/uV4Yb5GK1V3QulsJ1cj9b9iLwCXBVJW3h3qwuaDS/u2bhchVwsn+f3v5oXc9fyTrxAWemy8UnpiMxzYFc3At8PUhbpOhOeDl3EHiQmVnlXPhFv5XkafAu/aJZe8ziupAK2QKOtBIeNE4F8QzjtqECDTyg68HeRG7ZqMAnpN1CqhfOZ/no6CkSx8EB2arDWo61BwmN63e814GcXdIQj16zyxDYD9000sHKjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5856
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DU6PEPF0000A7E0.eurprd02.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	e59c037c-89da-4566-0708-08deb74834fe
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|14060799003|35042699022|36860700016|82310400026|376014|22082099003|18002099003|56012099003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	+x6s631Baqte9D2j3PhswJMJJYOdY4lCpzPHsoQum8AWuyrh8BMxfBoCjrP9c4cY2er/vvrfzFv1HkxXEGV8HZ9y1Dd5T9VbWIAw6/lYEuUyk29iNCs5vuEI7T2NXqPkufgnjbAquZxfM6GuOgdD+xYhPlKWn5pM8ASy1zEAxS8tz4N8Q9sHjsfmjvfaLfEFWWPz9oKkjcdM00yL55JTrOxdtH8v8tH6UatEKQou4ZIvs1nqG/deqUHUsfLN2vPbm49iQ9nhhH1P2QGYQx4CcNMzfgNnT+0ym+1YLkx1hksvZGDTRuhx2A+6tcaL/ygrx7DynaxFRQUyjnB9MlAqE291kxdNX0/1gomXtk2T8as4jua+0mWbzmdKTwAKfobY7Qw1BwdDv4vEoGrNr7eA01TQsSWTb4O+QlsHHxMaNcH4ggU0RshrhTKvdJhyng8zCKjaGbXT+jgChiSLCVFNR/cLcnQLAG69F5/ga/Ul2nPOSrrYxHKggymPmglaMrEbdzzhPEbwbegsUzS9Knd7wn4kkF0IODBDgS9uckR1TeO99x1jMmxFoovOWZ9grTlUvgIGlkalQrIYV29Nqca1gix+VLKpY0VgskdWzQSKOx22j2XQ6oIiLb+Nw9Gtrl+4dBqZE59SPxkiwlpoDQ9XtfU149Rw64fgK6qy+6keZNnEFiOVJy9Pun5thEpkLtfFo2NN9oxiBs9XzzRLPaDoSRV9FYmJNfdNBP29bTA+e/s=
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(14060799003)(35042699022)(36860700016)(82310400026)(376014)(22082099003)(18002099003)(56012099003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	agUEnL9fvAcLVSy7vKEJ5N72T8c423I/wrsan81IdGbkWZ5SOAan/4Alj6LeYjkH5p74ReIWqEaBsqYQvqTN4Vo2/NRKvDUSeWuwIiunU40ZheFwPidKuA0tgWhBGz+6AKvwH7ncLrY+AYbjPMUzCbiwS9PV61EztGpToh6ZuHB2dB8gxpu6FbM7Sv4o1gYbx5J1wzqmr01HAwcXB/vdZSKNHrc/1kVpUGNgKKrV+pKJyapgAISeKbnqmMW7vLbWRhLCD5HFfLPjsnDGbSiGaUTp3rbTknD98NbC6IxOG5cPzfBr4HEvkgWYLeFwiuQQ1ALsEP5W3hWAtQBJdWXLliVW3GPURVBgSfACsNo4N8/WSIic3Uv7vUDru/Zys/a9d400T9tTX8/uKBv+5RyEGcmGDsMbt5GW8rQ7B6gAU5aQ9cyPX6rp6LGHBv71hwM3
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 14:50:51.8605
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35051040-99b4-47f7-6097-08deb7485aa8
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU6PEPF0000A7E0.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMDPR08MB11368
 
-On 21/05/2026 13:40, Marc Zyngier wrote:
-> On Wed, 13 May 2026 14:17:12 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by SMC calls from the host.
->>
->> The SMC definitions are based on DEN0137[1] version 2.0-bet1
->>
->> [1] https://developer.arm.com/documentation/den0137/2-0bet1/
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v13:
->>   * Updated to RMM spec v2.0-bet1
->> Changes since v12:
->>   * Updated to RMM spec v2.0-bet0
->> Changes since v9:
->>   * Corrected size of 'ripas_value' in struct rec_exit. The spec states
->>     this is an 8-bit type with padding afterwards (rather than a u64).
->> Changes since v8:
->>   * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
->>     permits to be modified.
->> Changes since v6:
->>   * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
->>     these are flag values.
->> Changes since v5:
->>   * Sorted the SMC #defines by value.
->>   * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
->>     RMI calls.
->>   * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
->>     number of available list registers could be lower.
->>   * Provided a define for the reserved fields of FeatureRegister0.
->>   * Fix inconsistent names for padding fields.
->> Changes since v4:
->>   * Update to point to final released RMM spec.
->>   * Minor rearrangements.
->> Changes since v3:
->>   * Update to match RMM spec v1.0-rel0-rc1.
->> Changes since v2:
->>   * Fix specification link.
->>   * Rename rec_entry->rec_enter to match spec.
->>   * Fix size of pmu_ovf_status to match spec.
->> ---
->>   arch/arm64/include/asm/rmi_smc.h | 448 +++++++++++++++++++++++++++++++
->>   1 file changed, 448 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
->>
->> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
->> new file mode 100644
->> index 000000000000..a09b7a631fef
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rmi_smc.h
->> @@ -0,0 +1,448 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023-2026 ARM Ltd.
->> + *
->> + * The values and structures in this file are from the Realm Management Monitor
->> + * specification (DEN0137) version 2.0-bet1:
->> + * https://developer.arm.com/documentation/den0137/2-0bet1/
-> 
-> How long is this spec going to be available on the ARM web site, which
-> has a tendency of being reorganised every other week? And there is
-> already a beta2.
-> 
->> + */
->> +
->> +#ifndef __ASM_RMI_SMC_H
->> +#define __ASM_RMI_SMC_H
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +#define SMC_RMI_CALL(func)				\
->> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
->> +			   ARM_SMCCC_SMC_64,		\
->> +			   ARM_SMCCC_OWNER_STANDARD,	\
->> +			   (func))
->> +
->> +#define SMC_RMI_VERSION				SMC_RMI_CALL(0x0150)
->> +
->> +#define SMC_RMI_RTT_DATA_MAP_INIT		SMC_RMI_CALL(0x0153)
->> +
->> +#define SMC_RMI_REALM_ACTIVATE			SMC_RMI_CALL(0x0157)
->> +#define SMC_RMI_REALM_CREATE			SMC_RMI_CALL(0x0158)
->> +#define SMC_RMI_REALM_DESTROY			SMC_RMI_CALL(0x0159)
->> +#define SMC_RMI_REC_CREATE			SMC_RMI_CALL(0x015a)
->> +#define SMC_RMI_REC_DESTROY			SMC_RMI_CALL(0x015b)
->> +#define SMC_RMI_REC_ENTER			SMC_RMI_CALL(0x015c)
->> +#define SMC_RMI_RTT_CREATE			SMC_RMI_CALL(0x015d)
->> +#define SMC_RMI_RTT_DESTROY			SMC_RMI_CALL(0x015e)
->> +
->> +#define SMC_RMI_RTT_READ_ENTRY			SMC_RMI_CALL(0x0161)
->> +
->> +#define SMC_RMI_RTT_DEV_VALIDATE		SMC_RMI_CALL(0x0163)
->> +#define SMC_RMI_PSCI_COMPLETE			SMC_RMI_CALL(0x0164)
->> +#define SMC_RMI_FEATURES			SMC_RMI_CALL(0x0165)
->> +#define SMC_RMI_RTT_FOLD			SMC_RMI_CALL(0x0166)
->> +
->> +#define SMC_RMI_RTT_INIT_RIPAS			SMC_RMI_CALL(0x0168)
->> +#define SMC_RMI_RTT_SET_RIPAS			SMC_RMI_CALL(0x0169)
->> +#define SMC_RMI_VSMMU_CREATE			SMC_RMI_CALL(0x016a)
->> +#define SMC_RMI_VSMMU_DESTROY			SMC_RMI_CALL(0x016b)
->> +#define SMC_RMI_RMM_CONFIG_SET			SMC_RMI_CALL(0x016e)
->> +#define SMC_RMI_PSMMU_IRQ_NOTIFY		SMC_RMI_CALL(0x016f)
->> +
->> +#define SMC_RMI_PDEV_ABORT			SMC_RMI_CALL(0x0174)
->> +#define SMC_RMI_PDEV_COMMUNICATE		SMC_RMI_CALL(0x0175)
->> +#define SMC_RMI_PDEV_CREATE			SMC_RMI_CALL(0x0176)
->> +#define SMC_RMI_PDEV_DESTROY			SMC_RMI_CALL(0x0177)
->> +#define SMC_RMI_PDEV_GET_STATE			SMC_RMI_CALL(0x0178)
->> +
->> +#define SMC_RMI_PDEV_STREAM_KEY_REFRESH		SMC_RMI_CALL(0x017a)
->> +#define SMC_RMI_PDEV_SET_PUBKEY			SMC_RMI_CALL(0x017b)
->> +#define SMC_RMI_PDEV_STOP			SMC_RMI_CALL(0x017c)
->> +#define SMC_RMI_RTT_AUX_CREATE			SMC_RMI_CALL(0x017d)
->> +#define SMC_RMI_RTT_AUX_DESTROY			SMC_RMI_CALL(0x017e)
->> +#define SMC_RMI_RTT_AUX_FOLD			SMC_RMI_CALL(0x017f)
->> +
->> +#define SMC_RMI_VDEV_ABORT			SMC_RMI_CALL(0x0185)
->> +#define SMC_RMI_VDEV_COMMUNICATE		SMC_RMI_CALL(0x0186)
->> +#define SMC_RMI_VDEV_CREATE			SMC_RMI_CALL(0x0187)
->> +#define SMC_RMI_VDEV_DESTROY			SMC_RMI_CALL(0x0188)
->> +#define SMC_RMI_VDEV_GET_STATE			SMC_RMI_CALL(0x0189)
->> +#define SMC_RMI_VDEV_UNLOCK			SMC_RMI_CALL(0x018a)
->> +#define SMC_RMI_RTT_SET_S2AP			SMC_RMI_CALL(0x018b)
->> +#define SMC_RMI_VDEV_COMPLETE			SMC_RMI_CALL(0x018e)
->> +
->> +#define SMC_RMI_VDEV_GET_INTERFACE_REPORT	SMC_RMI_CALL(0x01d0)
->> +#define SMC_RMI_VDEV_GET_MEASUREMENTS		SMC_RMI_CALL(0x01d1)
->> +#define SMC_RMI_VDEV_LOCK			SMC_RMI_CALL(0x01d2)
->> +#define SMC_RMI_VDEV_START			SMC_RMI_CALL(0x01d3)
->> +
->> +#define SMC_RMI_VSMMU_EVENT_NOTIFY		SMC_RMI_CALL(0x01d6)
->> +#define SMC_RMI_PSMMU_ACTIVATE			SMC_RMI_CALL(0x01d7)
->> +#define SMC_RMI_PSMMU_DEACTIVATE		SMC_RMI_CALL(0x01d8)
->> +
->> +#define SMC_RMI_PSMMU_ST_L2_CREATE		SMC_RMI_CALL(0x01db)
->> +#define SMC_RMI_PSMMU_ST_L2_DESTROY		SMC_RMI_CALL(0x01dc)
->> +#define SMC_RMI_DPT_L0_CREATE			SMC_RMI_CALL(0x01dd)
->> +#define SMC_RMI_DPT_L0_DESTROY			SMC_RMI_CALL(0x01de)
->> +#define SMC_RMI_DPT_L1_CREATE			SMC_RMI_CALL(0x01df)
->> +#define SMC_RMI_DPT_L1_DESTROY			SMC_RMI_CALL(0x01e0)
->> +#define SMC_RMI_GRANULE_TRACKING_GET		SMC_RMI_CALL(0x01e1)
->> +
->> +#define SMC_RMI_GRANULE_TRACKING_SET		SMC_RMI_CALL(0x01e3)
->> +
->> +#define SMC_RMI_RMM_CONFIG_GET			SMC_RMI_CALL(0x01ec)
->> +
->> +#define SMC_RMI_RMM_STATE_GET			SMC_RMI_CALL(0x01ee)
->> +
->> +#define SMC_RMI_PSMMU_EVENT_CONSUME		SMC_RMI_CALL(0x01f0)
->> +#define SMC_RMI_GRANULE_RANGE_DELEGATE		SMC_RMI_CALL(0x01f1)
->> +#define SMC_RMI_GRANULE_RANGE_UNDELEGATE	SMC_RMI_CALL(0x01f2)
->> +#define SMC_RMI_GPT_L1_CREATE			SMC_RMI_CALL(0x01f3)
->> +#define SMC_RMI_GPT_L1_DESTROY			SMC_RMI_CALL(0x01f4)
->> +#define SMC_RMI_RTT_DATA_MAP			SMC_RMI_CALL(0x01f5)
->> +#define SMC_RMI_RTT_DATA_UNMAP			SMC_RMI_CALL(0x01f6)
->> +#define SMC_RMI_RTT_DEV_MAP			SMC_RMI_CALL(0x01f7)
->> +#define SMC_RMI_RTT_DEV_UNMAP			SMC_RMI_CALL(0x01f8)
->> +#define SMC_RMI_RTT_ARCH_DEV_MAP		SMC_RMI_CALL(0x01f9)
->> +#define SMC_RMI_RTT_ARCH_DEV_UNMAP		SMC_RMI_CALL(0x01fa)
->> +#define SMC_RMI_RTT_UNPROT_MAP			SMC_RMI_CALL(0x01fb)
->> +#define SMC_RMI_RTT_UNPROT_UNMAP		SMC_RMI_CALL(0x01fc)
->> +#define SMC_RMI_RTT_AUX_PROT_MAP		SMC_RMI_CALL(0x01fd)
->> +#define SMC_RMI_RTT_AUX_PROT_UNMAP		SMC_RMI_CALL(0x01fe)
->> +#define SMC_RMI_RTT_AUX_UNPROT_MAP		SMC_RMI_CALL(0x01ff)
->> +#define SMC_RMI_RTT_AUX_UNPROT_UNMAP		SMC_RMI_CALL(0x0200)
->> +#define SMC_RMI_REALM_TERMINATE			SMC_RMI_CALL(0x0201)
->> +#define SMC_RMI_RMM_ACTIVATE			SMC_RMI_CALL(0x0202)
->> +#define SMC_RMI_OP_CONTINUE			SMC_RMI_CALL(0x0203)
->> +#define SMC_RMI_PDEV_STREAM_CONNECT		SMC_RMI_CALL(0x0204)
->> +#define SMC_RMI_PDEV_STREAM_DISCONNECT		SMC_RMI_CALL(0x0205)
->> +#define SMC_RMI_PDEV_STREAM_COMPLETE		SMC_RMI_CALL(0x0206)
->> +#define SMC_RMI_PDEV_STREAM_KEY_PURGE		SMC_RMI_CALL(0x0207)
->> +#define SMC_RMI_OP_MEM_DONATE			SMC_RMI_CALL(0x0208)
->> +#define SMC_RMI_OP_MEM_RECLAIM			SMC_RMI_CALL(0x0209)
->> +#define SMC_RMI_OP_CANCEL			SMC_RMI_CALL(0x020a)
->> +#define SMC_RMI_VSMMU_FEATURES			SMC_RMI_CALL(0x020b)
->> +#define SMC_RMI_VSMMU_CMD_GET			SMC_RMI_CALL(0x020c)
->> +#define SMC_RMI_VSMMU_CMD_COMPLETE		SMC_RMI_CALL(0x020d)
->> +#define SMC_RMI_PSMMU_INFO			SMC_RMI_CALL(0x020e)
->> +
->> +#define RMI_ABI_MAJOR_VERSION	2
->> +#define RMI_ABI_MINOR_VERSION	0
->> +
->> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
->> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
->> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
->> +
->> +#define RMI_UNASSIGNED			0
->> +#define RMI_ASSIGNED			1
->> +#define RMI_TABLE			2
->> +
->> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
->> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
->> +#define RMI_RETURN_MEMREQ(ret)		(((ret) >> 8) & 0x3)
->> +#define RMI_RETURN_CAN_CANCEL(ret)	(((ret) >> 10) & 0x1)
-> 
-> Use FIELD_GET() and specify masks that define the actual fields.
-> 
->> +
->> +#define RMI_SUCCESS			0
->> +#define RMI_ERROR_INPUT			1
->> +#define RMI_ERROR_REALM			2
->> +#define RMI_ERROR_REC			3
->> +#define RMI_ERROR_RTT			4
->> +#define RMI_ERROR_NOT_SUPPORTED		5
->> +#define RMI_ERROR_DEVICE		6
->> +#define RMI_ERROR_RTT_AUX		7
->> +#define RMI_ERROR_PSMMU_ST		8
->> +#define RMI_ERROR_DPT			9
->> +#define RMI_BUSY			10
->> +#define RMI_ERROR_GLOBAL		11
->> +#define RMI_ERROR_TRACKING		12
->> +#define RMI_INCOMPLETE			13
->> +#define RMI_BLOCKED			14
->> +#define RMI_ERROR_GPT			15
->> +#define RMI_ERROR_GRANULE		16
->> +
->> +#define RMI_OP_MEM_REQ_NONE		0
->> +#define RMI_OP_MEM_REQ_DONATE		1
->> +#define RMI_OP_MEM_REQ_RECLAIM		2
->> +
->> +#define RMI_DONATE_SIZE(req)		((req) & 0x3)
->> +#define RMI_DONATE_COUNT_MASK		GENMASK(15, 2)
->> +#define RMI_DONATE_COUNT(req)		(((req) & RMI_DONATE_COUNT_MASK) >> 2)
->> +#define RMI_DONATE_CONTIG(req)		(!!((req) & BIT(16)))
->> +#define RMI_DONATE_STATE(req)		(!!((req) & BIT(17)))
-> 
-> FIELD_GET().
-> 
->> +
->> +#define RMI_OP_MEM_DELEGATED		0
->> +#define RMI_OP_MEM_UNDELEGATED		1
->> +
->> +#define RMI_ADDR_TYPE_NONE		0
->> +#define RMI_ADDR_TYPE_SINGLE		1
->> +#define RMI_ADDR_TYPE_LIST		2
->> +
->> +#define RMI_ADDR_RANGE_SIZE_MASK	GENMASK(1, 0)
->> +#define RMI_ADDR_RANGE_COUNT_MASK	GENMASK(PAGE_SHIFT - 1, 2)
->> +#define RMI_ADDR_RANGE_ADDR_MASK	(PAGE_MASK & GENMASK(51, 0))
->> +#define RMI_ADDR_RANGE_STATE_MASK	BIT(63)
->> +
->> +#define RMI_ADDR_RANGE_SIZE(ar)		(FIELD_GET(RMI_ADDR_RANGE_SIZE_MASK, \
->> +						   (ar)))
->> +#define RMI_ADDR_RANGE_COUNT(ar)	(FIELD_GET(RMI_ADDR_RANGE_COUNT_MASK, \
->> +						   (ar)))
->> +#define RMI_ADDR_RANGE_ADDR(ar)		((ar) & RMI_ADDR_RANGE_ADDR_MASK)
->> +#define RMI_ADDR_RANGE_STATE(ar)	(FIELD_GET(RMI_ADDR_RANGE_STATE_MASK, \
->> +						   (ar)))
->> +
->> +enum rmi_ripas {
->> +	RMI_EMPTY = 0,
->> +	RMI_RAM = 1,
->> +	RMI_DESTROYED = 2,
->> +	RMI_DEV = 3,
->> +};
->> +
->> +#define RMI_NO_MEASURE_CONTENT	0
->> +#define RMI_MEASURE_CONTENT	1
->> +
->> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
->> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
->> +#define RMI_FEATURE_REGISTER_0_SVE		BIT(9)
->> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
->> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
->> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
->> +#define RMI_FEATURE_REGISTER_0_PMU		BIT(26)
->> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
->> +
->> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB	BIT(0)
->> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB	BIT(1)
->> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB	BIT(2)
->> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_256	BIT(3)
->> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_384	BIT(4)
->> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_512	BIT(5)
->> +#define RMI_FEATURE_REGISTER_1_MAX_RECS_ORDER	GENMASK(9, 6)
->> +#define RMI_FEATURE_REGISTER_1_L0GPTSZ		GENMASK(13, 10)
->> +#define RMI_FEATURE_REGISTER_1_PPS		GENMASK(16, 14)
->> +
->> +#define RMI_FEATURE_REGISTER_2_DA		BIT(0)
->> +#define RMI_FEATURE_REGISTER_2_DA_COH		BIT(1)
->> +#define RMI_FEATURE_REGISTER_2_VSMMU		BIT(2)
->> +#define RMI_FEATURE_REGISTER_2_ATS		BIT(3)
->> +#define RMI_FEATURE_REGISTER_2_MAX_VDEVS_ORDER	GENMASK(7, 4)
->> +#define RMI_FEATURE_REGISTER_2_VDEV_KROU	BIT(8)
->> +#define RMI_FEATURE_REGISTER_2_NON_TEE_STREAM	BIT(9)
->> +
->> +#define RMI_FEATURE_REGISTER_3_MAX_NUM_AUX_PLANES	GENMASK(3, 0)
->> +#define RMI_FEATURE_REGISTER_3_RTT_PLAN			GENMASK(5, 4)
->> +#define RMI_FEATURE_REGISTER_3_RTT_S2AP_INDIRECT	BIT(6)
->> +
->> +#define RMI_FEATURE_REGISTER_4_MEC_COUNT		GENMASK(63, 0)
->> +
->> +#define RMI_MEM_CATEGORY_CONVENTIONAL		0
->> +#define RMI_MEM_CATEGORY_DEV_NCOH		1
->> +#define RMI_MEM_CATEGORY_DEV_COH		2
->> +
->> +#define RMI_TRACKING_RESERVED			0
->> +#define RMI_TRACKING_NONE			1
->> +#define RMI_TRACKING_FINE			2
->> +#define RMI_TRACKING_COARSE			3
->> +
->> +#define RMI_GRANULE_SIZE_4KB	0
->> +#define RMI_GRANULE_SIZE_16KB	1
->> +#define RMI_GRANULE_SIZE_64KB	2
->> +
->> +/*
->> + * Note many of these fields are smaller than u64 but all fields have u64
->> + * alignment, so use u64 to ensure correct alignment.
->> + */
->> +struct rmm_config {
->> +	union { /* 0x0 */
->> +		struct {
->> +			u64 tracking_region_size;
->> +			u64 rmi_granule_size;
->> +		};
->> +		u8 sizer[0x1000];
-> 
-> SZ_4K?
-> 
->> +	};
->> +};
->> +
->> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
->> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
->> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
->> +
->> +struct realm_params {
->> +	union { /* 0x0 */
->> +		struct {
->> +			u64 flags;
->> +			u64 s2sz;
->> +			u64 sve_vl;
->> +			u64 num_bps;
->> +			u64 num_wps;
->> +			u64 pmu_num_ctrs;
->> +			u64 hash_algo;
->> +			u64 num_aux_planes;
->> +		};
->> +		u8 padding0[0x400];
-> 
-> SZ_1K? And similarly all over the shop?
+KVM needs to interact with the host IRS in order to, for example, make
+VMs or VPEs valid. There are two potential approaches here. Either the
+host irqchip driver can provide an interface, or KVM can interact
+directly with the host IRS. The latter of these two is chosen as the
+set of MMIO registers that KVM needs to interact with is orthogonal to
+the set used by the host irqchip driver (with the exception of some of
+the read-only IRS_IDRx registers).
 
-Agreed to the comments above.
+Pass KVM a pointer to an IRS config frame - the config frame belonging
+to ANY IRS is fine as long as one IRS's config frame is used
+consistently - in struct gic_kvm_info. Additionally, include a flag
+telling KVM whether the IRS is coherent or non-coherent in order to
+make sure that KVM can do the correct cache state management, if
+required.
 
-> 
-> I haven't checked the details of the encodings (life is too short),
-> but I wonder how much of this exists as an MRS and could be
-> automatically generated?
+Only OF (Device Tree) is supported with this change. ACPI is not.
 
-Good point. This is something that we can check and get back to you.
+Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+---
+ drivers/irqchip/irq-gic-v5-irs.c      | 7 +++++--
+ drivers/irqchip/irq-gic-v5.c          | 5 +++++
+ include/linux/irqchip/arm-gic-v5.h    | 3 +++
+ include/linux/irqchip/arm-vgic-info.h | 5 +++++
+ 4 files changed, 18 insertions(+), 2 deletions(-)
 
-Thanks
-Suzuki
-
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-=
+irs.c
+index f3fce0b1e25d9..607e066821b52 100644
+--- a/drivers/irqchip/irq-gic-v5-irs.c
++++ b/drivers/irqchip/irq-gic-v5-irs.c
+@@ -21,8 +21,6 @@
+  */
+ #define LPI_ID_BITS_LINEAR		12
+=20
+-#define IRS_FLAGS_NON_COHERENT		BIT(0)
+-
+ static DEFINE_PER_CPU_READ_MOSTLY(struct gicv5_irs_chip_data *, per_cpu_ir=
+s_data);
+ static LIST_HEAD(irs_nodes);
+=20
+@@ -50,6 +48,11 @@ static void irs_writeq_relaxed(struct gicv5_irs_chip_dat=
+a *irs_data,
+ 	writeq_relaxed(val, irs_data->irs_base + reg_offset);
+ }
+=20
++struct gicv5_irs_chip_data *gicv5_irs_get_chip_data(void)
++{
++	return per_cpu(per_cpu_irs_data, 0);
++}
++
+ /*
+  * The polling wait (in gicv5_wait_for_op_s_atomic()) on a GIC register
+  * provides the memory barriers (through MMIO accessors)
+diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+index 600726b5c0a46..707deabbf2f63 100644
+--- a/drivers/irqchip/irq-gic-v5.c
++++ b/drivers/irqchip/irq-gic-v5.c
+@@ -1128,6 +1128,8 @@ static struct gic_kvm_info gic_v5_kvm_info __initdata=
+;
+=20
+ static void __init gic_of_setup_kvm_info(struct device_node *node)
+ {
++	struct gicv5_irs_chip_data *irs_data =3D gicv5_irs_get_chip_data();
++
+ 	/*
+ 	 * If we don't have native GICv5 virtualisation support, then
+ 	 * we also don't have FEAT_GCIE_LEGACY - the architecture
+@@ -1140,6 +1142,9 @@ static void __init gic_of_setup_kvm_info(struct devic=
+e_node *node)
+=20
+ 	gic_v5_kvm_info.type =3D GIC_V5;
+=20
++	gic_v5_kvm_info.gicv5_irs.base =3D irs_data->irs_base;
++	gic_v5_kvm_info.gicv5_irs.non_coherent =3D !!(irs_data->flags & IRS_FLAGS=
+_NON_COHERENT);
++
+ 	/* GIC Virtual CPU interface maintenance interrupt */
+ 	gic_v5_kvm_info.maint_irq =3D irq_of_parse_and_map(node, 0);
+=20
+diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm=
+-gic-v5.h
+index f78787e654f4c..681c5c51207d6 100644
+--- a/include/linux/irqchip/arm-gic-v5.h
++++ b/include/linux/irqchip/arm-gic-v5.h
+@@ -330,6 +330,8 @@ struct gicv5_irs_chip_data {
+ 	raw_spinlock_t		spi_config_lock;
+ };
+=20
++#define IRS_FLAGS_NON_COHERENT		BIT(0)
++
+ static inline int gicv5_wait_for_op_s_atomic(void __iomem *addr, u32 offse=
+t,
+ 					     const char *reg_s, u32 mask,
+ 					     u32 *val)
+@@ -377,6 +379,7 @@ void __init gicv5_free_lpi_domain(void);
+=20
+ int gicv5_irs_of_probe(struct device_node *parent);
+ int gicv5_irs_acpi_probe(void);
++struct gicv5_irs_chip_data *gicv5_irs_get_chip_data(void);
+ void gicv5_irs_remove(void);
+ int gicv5_irs_enable(void);
+ void gicv5_irs_its_probe(void);
+diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/=
+arm-vgic-info.h
+index 67d9d960273b9..f05370e2debf4 100644
+--- a/include/linux/irqchip/arm-vgic-info.h
++++ b/include/linux/irqchip/arm-vgic-info.h
+@@ -38,6 +38,11 @@ struct gic_kvm_info {
+ 	bool		has_v4_1;
+ 	/* Deactivation impared, subpar stuff */
+ 	bool		no_hw_deactivation;
++	/* GICv5 IRS base */
++	struct {
++		void __iomem	*base;
++		bool		non_coherent;
++	}		gicv5_irs;
+ };
+=20
+ #ifdef CONFIG_KVM
+--=20
+2.34.1
