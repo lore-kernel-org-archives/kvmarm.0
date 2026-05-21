@@ -1,47 +1,47 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011015.outbound.protection.outlook.com [40.107.130.15])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010050.outbound.protection.outlook.com [52.101.84.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4485E312831
-	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 14:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0C63537D2
+	for <kvmarm@lists.linux.dev>; Thu, 21 May 2026 14:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.50
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779375208; cv=fail; b=DUabOe64HkC5oCOsJNaXaEgCkh6QRC+vNz/JY6zIw0pd93DFLMh7ElSyiWf56fRAIiEiDfmEklfTltHs7ev+LAMISY3aT6WmEn0X1aO/qsRTQXzbR8iTAjCDKzYElI/jXiRMdGnw3l5JKGg+EnyQaBVu4HkvNZ66TvYCTD0e2LE=
+	t=1779375226; cv=fail; b=l5/EG2kuMaS5oAYcn2rB2L44nkPJvS4opmoRiLDFnfbMCaDgy13po/r6wbgnPMuiNKjYotsJnvGqBihWVjirXbm/bXFZqt88mAd/xtC471Xq+FpIllgP+mBbshl8eOhhd7oUJ/Um20YRqPNGvbMSl0MdOE2+40bsQffNT1gA52k=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779375208; c=relaxed/simple;
-	bh=pdOMKxxfaCDVqyD62Rrj2HTdIGlzrWQdZgaNce3Yl5M=;
+	s=arc-20240116; t=1779375226; c=relaxed/simple;
+	bh=CBEudaM1SDI3x51jduzmySkCdfW4kIXa5eJZGzDUNXE=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=N/shgl6ULFiUM2fllmPyHGXJZkuRj8yEXTBgvcwDS5CdWy1XinpQ+1DcCUmThtkdDbS8o6rYTDn6F+g45mo+SeCIzZP4Tmn32391FeJGzK3btH8qjBzWqOiQ3jhhoZX3Hg8mWZfkW4S1lm5XxHKRflc7WDAahwKyRRR/rNJHh28=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Fe3fMOjr; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Fe3fMOjr; arc=fail smtp.client-ip=40.107.130.15
+	 Content-Type:MIME-Version; b=GIsfjCzQmzZMAXCNnfdNp142jll/lXX7pZa8NIBchSNmFw6aHnGxkW8llc8nJIsUPBVtD6tO1fPi6zBH+QXsjRsjrkQhUoaQynGwr5ZJ+OyCOWseVVRhl+8TLk5FLuncNLD1fHUQ9ACspLHZXZf9LmkyBmJQzcd+0zGb1kTubYY=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZOs+77jy; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZOs+77jy; arc=fail smtp.client-ip=52.101.84.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Fe3fMOjr";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Fe3fMOjr"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZOs+77jy";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZOs+77jy"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=fail;
- b=Llu6nGJWFBrQm6QcDMqRXedDLBTGPT67YpG0cuxv/WtZ8K6YDoDVh1Fino2KBdz52NyiTsxt3wlp1741DHw0mOQ/+p+qn44fGS0koAV9tQX6qLUrq8lIcng13g3yrDJzNOfy3Lk65ChuzjZEL4HAdv4GLems7MFoCNnkZ2J9whtoGCvo+vx/X24MhW1j67++yOe8TwHDRctny1vtJzRkbMBZ59BHmzon4VDJxIXnMM+A9fep2L5BBMRAfCF9MhuqAtVzcufZUFFwiHrdSXFrZDlh6ogGsQjRdHCa+Y4SLRDsP7YREXVJtraBcG3kfk+xhSZVtFwG5SGtGVGChznZaw==
+ b=IV12AokjVxoZryRUiEN+/LO8BlJXU2nxw+KmXtpYzQetnm1t6y6C0U7yg+BKXsUlNvPzHBLzYU3tx7MY0WUSn27/+zwm95QXWBRhhne6Zej6aD7d64GMRfhhuxricvbD6rHg4FyjP4K/1ffZTQT6kMDbhT4iKcouMyAhFpsDZE0ZZuEu8AkDu/DdZcaSItezvtjTA4JRJ8q0v5syGaEGm0PbI0nnFlwCjHrmUTzLVH8LLCaYdTFTx9lLzP94T0i8dFbyPhUH6Rpxpk8oQ61uJFMcAB7wI353qIK5KrJF63n/eBhWSCw7I3Jb8kCwnQ1zHrWrPJKJnEWzUU/0Aw80/g==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HBN+og0r+3RJ3LMGlhEHRF6+YXlNS+QqlddQW44TPe8=;
- b=NUfkPbz1aVIIp9hkW1yG+gWo10yXuy5PcJXw/S6uCT6akIFp2cH0RNkd/w4zbeS5B2QmGObDc3B4HJYyz630Mu6qdn3nqTIr6WfpjrVr46aIvpkDaXtBvMFxrvZ8ELKpeWwqf6cVvTZLmrkLPw1/9m8M2WUYqE3vcyMK+TQ/j9eSQMqSJlMw/LDuDnUuSAQfyzxcuxHeurtKd+knBfnro7KK/gcAZnXYL4kkFZ5r7ZEs3odmylA9NNiAQlt/q3aq9h9DlTrpQbxUJbypJkulo9DX35fMLyfs+hAYhbYm8//7qws+FkF/rzcep3ZDVJkcrAWaigV7IHq3AyLpiqifrg==
+ bh=4bLMqK4YQXkTZNJY2KfxAW4BHU8oq3D+SE+2aDDX1pg=;
+ b=cllHYwB+H9ioHZbb9exfx15Cgeeg37fKx7ORdiP6J8dHDhLOkXFCaBcloi0QjQdzyE65/mKuRB3jckSJqdpqMA1wD7utcbr2gws/rMOLLjhScnN3mFiu5b6D+swKPgekPDsrF/lnTSV0FOX1t3RHDoYbu5tXcfLkDHioQr+gePr0tKc1op7vW/fxQpC+gysP/ZMppzcntzCxx/PHTALNM0tecUwUfZ1ClOi/DjR2aDLQWDyx9lkOpIhKdTIwis8tXrnewxHUY4beQ2ER9Gtdq25KHWCb55gzH0vfn4RqHm2zcAXdU/sG+up9bSiRGFKceX/P0D7rMTxKHgRSoMyZCA==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
  dkim=pass (signature was verified) header.d=arm.com; arc=fail (48)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HBN+og0r+3RJ3LMGlhEHRF6+YXlNS+QqlddQW44TPe8=;
- b=Fe3fMOjrg9eeU8V6vByuDpIpaGEa+l+IgQ3EbMtIwFjrWdgJiv5WJ3uRyTqk79lNPzVUQlMpGMmUZr2Db3jmDqC2uwoFdoag4v1AivztZ0Kve5P2UpYBzHisf/CadxO0p+oFcw/Fww8QretMdKb/9OOyhp7Xp/9UYM3/Cy1mKQA=
-Received: from DU7P189CA0010.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:552::12)
- by AM8PR08MB6467.eurprd08.prod.outlook.com (2603:10a6:20b:316::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Thu, 21 May
- 2026 14:53:18 +0000
-Received: from DB1PEPF000509F5.eurprd02.prod.outlook.com
- (2603:10a6:10:552:cafe::38) by DU7P189CA0010.outlook.office365.com
- (2603:10a6:10:552::12) with Microsoft SMTP Server (version=TLS1_3,
+ bh=4bLMqK4YQXkTZNJY2KfxAW4BHU8oq3D+SE+2aDDX1pg=;
+ b=ZOs+77jym6Ggi/WMBjLWuADnk7ByA7GPrUYeHGHiqEP2vwwwNyVwl6qEaXL0h6Rd2RQR1zJIeTocSc0r69GEVmu5bh6vlb+l7CFk+Gq7B9KNUo7ljaHm7UhHav+mVu79gS3qVkxLefWCb7OBXmwLHTynYkSUH1ZqO5nuFA1nScg=
+Received: from DUZPR01CA0254.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b5::26) by AS2PR08MB8925.eurprd08.prod.outlook.com
+ (2603:10a6:20b:5f8::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Thu, 21 May
+ 2026 14:53:36 +0000
+Received: from DU2PEPF0001E9C1.eurprd03.prod.outlook.com
+ (2603:10a6:10:4b5:cafe::73) by DUZPR01CA0254.outlook.office365.com
+ (2603:10a6:10:4b5::26) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.17 via Frontend Transport; Thu, 21
- May 2026 14:53:18 +0000
+ May 2026 14:53:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -49,32 +49,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509F5.mail.protection.outlook.com (10.167.242.151) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.71.7 via
- Frontend Transport; Thu, 21 May 2026 14:53:17 +0000
+ DU2PEPF0001E9C1.mail.protection.outlook.com (10.167.8.70) with Microsoft SMTP
+ Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.11 via
+ Frontend Transport; Thu, 21 May 2026 14:53:36 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q+9IdBT3U6RQHYNSXE47eVXS/TbUgoUpUuGg03WMvVIjVV3KsIAKutQWm9uG5mo5R94Ocx35zIorWnUbGFi0FILfH0UCkUh+bVt07xDWNy2O9imvcxPP9aV8FlhakDN6o+AShO51JztuBj6e4/Q+Y+DL4hO/iW50XydSRvStv/jKA7InU0eSHHZxWyWWx788NZXOsvohHvrlVHf5q3htkiQloxx3NS0LYWu9e+yJWChNjDtYDRstnjxxycI/Q6MZh7QG1NAyYsYkOOBjGKctWG6sEUKmOWK5G+cCZnPDOtWcmB2+afbFaFdHTeezEdfz9DiQVGWwpeLs5l6uxpH/ng==
+ b=fzh6Te13iWDw7b8ePX57L3wKMrFB6/F8zuP+CgXRKudZ5b2WzYy++gy6svKULAXdruduDR108rmZu7u+u5Un0/uqxxcoVk/II849hmSVnB6al5vNHJL+ogD/68yyFo+xaqvABmkUuHt8ycYCOToNTnbY4AYq9K+A2NnEsEVK5jVorX5yeqSApeX54QEF0m4AQzsVI5Ay0wsMJUY6MXhU5IM3C6p6DZXrUC24+7sYKc36avrUI29dfj7fsXTob3kkTGqlAZJld6I70XOo9dzHuFTW5puZsK4Iyv14KfJ7s4ZXw697nYo8PpFiqX6BFqTCLpr2+AKhx8jjXIkPAwCoDw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HBN+og0r+3RJ3LMGlhEHRF6+YXlNS+QqlddQW44TPe8=;
- b=iQScBaI8CiWagexDq9uMAuyh653wgjK6EFNlnSTe1sNW+ELHHhN6kFVIp0W+BYry3MBwskRlEbH2v+5n4r/GPHh4H+PkBx7wyclrME0n1vwYQAa2CVqRuszqDVNuj7aZl34+qogeq8nl+7CIjkfJoxWdDunqXgjuZHsh2d1ln682YFFCoCp86mR3E6V0vQKJtWG2xMN8b4iuw8FcCjExfTz4BqjXsWs286hq/4jXVsKbPYEEzaPlw47Tpaqs/BxlG2hqNQ23UDCfkHmiJ6A26IK1MijmYsFpcuP80cenqtyhcQVyc8BfhwyrYqIRzxpbMJ6/BPGC4FFd63ptcawGYQ==
+ bh=4bLMqK4YQXkTZNJY2KfxAW4BHU8oq3D+SE+2aDDX1pg=;
+ b=GOhwaMHoQyLVT3dF6+cltIv58F5ZPgIJU1C5A83SeqVEg6pJHPTvBGh0eJWpG5T5wlmdznzaZjhR+EvObClFrar6vdW8UIMnEt2v0PtPXyvA5Xz0+CauEVG2rGjJVH9BiXRpFIGgP0xOsAI6p1fk+OaAbT7yrRlZeRc7Ll21ZoAgptx7ezdVpZSWyD8oykdUHigIxZOl2vt/A02ztF0pNcKPhnYFUKWdSvRvxdFZv+tT5xhyZJ9JRs2jRfeEmH15G7PIv0QMStZx2jf502RbwJzrDNzlGZac9pTt3Zhged5mjdqTtkWCgmpGvfSfsbxstpW86RKKEW14mMelQfW/8g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HBN+og0r+3RJ3LMGlhEHRF6+YXlNS+QqlddQW44TPe8=;
- b=Fe3fMOjrg9eeU8V6vByuDpIpaGEa+l+IgQ3EbMtIwFjrWdgJiv5WJ3uRyTqk79lNPzVUQlMpGMmUZr2Db3jmDqC2uwoFdoag4v1AivztZ0Kve5P2UpYBzHisf/CadxO0p+oFcw/Fww8QretMdKb/9OOyhp7Xp/9UYM3/Cy1mKQA=
+ bh=4bLMqK4YQXkTZNJY2KfxAW4BHU8oq3D+SE+2aDDX1pg=;
+ b=ZOs+77jym6Ggi/WMBjLWuADnk7ByA7GPrUYeHGHiqEP2vwwwNyVwl6qEaXL0h6Rd2RQR1zJIeTocSc0r69GEVmu5bh6vlb+l7CFk+Gq7B9KNUo7ljaHm7UhHav+mVu79gS3qVkxLefWCb7OBXmwLHTynYkSUH1ZqO5nuFA1nScg=
 Received: from GV1PR08MB7315.eurprd08.prod.outlook.com (2603:10a6:150:1e::15)
  by VE1PR08MB5856.eurprd08.prod.outlook.com (2603:10a6:800:1ab::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Thu, 21 May
- 2026 14:52:14 +0000
+ 2026 14:52:33 +0000
 Received: from GV1PR08MB7315.eurprd08.prod.outlook.com
  ([fe80::c249:1aed:a4c2:4193]) by GV1PR08MB7315.eurprd08.prod.outlook.com
  ([fe80::c249:1aed:a4c2:4193%3]) with mapi id 15.21.0048.013; Thu, 21 May 2026
- 14:52:13 +0000
+ 14:52:33 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -85,13 +85,13 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "peter.maydell@linaro.org"
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: [PATCH v2 09/39] KVM: arm64: gic-v5: Create & manage VM and VPE
- tables
-Thread-Topic: [PATCH v2 09/39] KVM: arm64: gic-v5: Create & manage VM and VPE
- tables
-Thread-Index: AQHc6TFoHafAWaq8RUiEn3Ve9445Yw==
-Date: Thu, 21 May 2026 14:52:13 +0000
-Message-ID: <20260521144846.1899475-10-sascha.bischoff@arm.com>
+Subject: [PATCH v2 10/39] KVM: arm64: gic-v5: Introduce guest IST alloc and
+ management
+Thread-Topic: [PATCH v2 10/39] KVM: arm64: gic-v5: Introduce guest IST alloc
+ and management
+Thread-Index: AQHc6TF02IXwXC943UGwwAoUL7eRGA==
+Date: Thu, 21 May 2026 14:52:33 +0000
+Message-ID: <20260521144846.1899475-11-sascha.bischoff@arm.com>
 References: <20260521144846.1899475-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260521144846.1899475-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -102,18 +102,18 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	GV1PR08MB7315:EE_|VE1PR08MB5856:EE_|DB1PEPF000509F5:EE_|AM8PR08MB6467:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6293a744-e636-43b7-57e9-08deb748b17c
+	GV1PR08MB7315:EE_|VE1PR08MB5856:EE_|DU2PEPF0001E9C1:EE_|AS2PR08MB8925:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3310bafe-7311-4d6c-1526-08deb748bcb5
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|56012099003|18002099003|22082099003|11063799006|6133799003|3023799007|5023799004;
+ BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|56012099003|18002099003|22082099003|11063799006|6133799003|3023799007;
 X-Microsoft-Antispam-Message-Info-Original:
- atiQWYwTNoBv1G172+njF1ljuinx8qSnyOYMmZpBSJGgg4DErgbh+wvb1lQ/7veFmsTjFRxZ1oBQrA9vZeWaioUBKD/A7MBVMQySFR/sbai2idFFFKGsn5T55jeu0dyJqlRN9LxdZFecoZYiAiSzVTppLgS1/x4eog+TD/uMfCXCnqoL7MObkOqoYJvM38xodmxu+hWu4xO8OhSXTnOTPItDvJHuAVZLuFVnW4zu4DWj0bvwFnFQF7cpyiUs1DxGRyXRtQLhNeeB1AIfXv3sn+5e70d7d/5otwNOpUmVYP0/hOB+9ZW9vcWPDF0kpj4wEPZnjS90wLaq4f0Mf6iVWGlAjwp0E9b8pxJpWju/2VSavVUIxNfkEaWsq2S3D/HpYIsBc1a02wDYQ7aAI1ciPp1FJhXHaGYA2K7huWJElPJ76ZiWphaOKTOjHvc1xq1qYucKHq7RmsmyoDoY47maelsnJXlWafShLLQstocfgdLAEz9VA/5pbXWJIA7rPUQEmcYPR8jIChWHY25IWOo8Ja5qttGoyNs2Ean1cVyczz49YQTAXSVF/FAOGV0OASz8rW/0tfgvBbp5mxHMmtjNLdifMI1T1KgLHOzhjt5jiyD0tsbwxoSJ4BW2YJ8ZRfZjL9CPequBvpHx3IvdRpDXgn2kTrNDOB16XhavdWGMDb4/OWvVUhQGyahyvJb3t21WYh0vXFreGRqF9wEx71TrKUcfE7ecCcjLJzCUpIXp9HCJAysKhqHm9jacxJRHY6Qn
+ 9WCywEI+JfUW0bRWeL0btJ35QbG+MgOUddSFhf2cPw7X7LXsWoJKKfv2M0AkOsQ3UKfRG3+7toUO/68wXpHD8AAthr0m0sk2RJCdw2uKc1IQUbq/NyCSEe7qoq8+9rQ+Q/mr2F8Y/zIdPIQGFvoNiFav/0ccsloVaJnLevvPKmoqcoKxbXkzWRqp+R3oADpxf02KBq7rrZoMiTOaeN1+rs1grsqJE79XmH5pHYGyWTopte5cai4NYsDRJHgDAKKWN243KG8D5fr4IzIEiEiPm0yYF+PmCDkZfUrYUD+OXyb0ZMmO33jA32c4K4swIKllgENJQY1QJ2CU0vbH41h5a3eXo/0oUKTnum4nZ2ClJAi5GLB4P9BR+h5n+leI0uBInP2mItHvnNgCL3KINW4A/E7viM8YQLGHq3L9tvoSK92C4vSPMPa1hEgIPjrzaCqBq4TER3nGfZA1PFJHgoTCqsMq/YKFpeIQmP4TvP1zgiCaYrU0MD/vwVrijCiij7R0kfIRuNW0ZthsVbKfnSJn/nFpVi8TlyHROssULy9+ObXwXekXaDFsXL9PB2TWElGe0wbMbuITG4aS7Z0MVcDA9WhK81rXDuyRKWiEgB5GbIJVmdxAcERrkxMFuBPC6Qb/XFGxGqOB0V/4NeAFgXMla5bfdJzws2I9OpKD9ElpncJFA7k/Qdr7Nr2lRYFmM++kxySlm5XhCwtYI3i+lFHl98a15RR+GzF4qJJy/ljFdcmMhbzCixmrbogZ4SqYeQ3R
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB7315.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(56012099003)(18002099003)(22082099003)(11063799006)(6133799003)(3023799007)(5023799004);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB7315.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(56012099003)(18002099003)(22082099003)(11063799006)(6133799003)(3023799007);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -123,963 +123,735 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Exchange-RoutingPolicyChecked:
- q4iYQQZccb7LBhfa3tPRl6gutG2AvlkwhRBnB1uH4PR9rq1s65y1NbuFOa30cT5N/gaxaVmnIF4PrSg4wJMoQ59IEirO0Anu7CYaU65KTb/ttz32aFKxmC8SIxO/ojcLkgv+aR+A/OJXVo553Oa/jVdSJK3pm/wr5DNWJ/a9EUipRfJS2FRUh+cPUjqdvU4TUraACN334voK4F5zxSd9CRnYiYOi8spQTQUVywzeirWo03SptsEOkSyV47TSObBsY+45zdKM39RzCBHU9L/40eXbv2ipBiLPpK7x9VCtYXjy2AbFFgDjuy3m3oQ3ynGKwhC0mrG8JUA5qozkKAFNzA==
+ dppUxzmvoc+v7ybT7j8oOBnpAmlnMjuiYNKRAlA1sH5eSgHCdj8ydfL6dm/TFJ6l+M1atEV63K3V8MOQlXbOxF7DBw8MYR7UZyh5VG+l2XZFb4cjP10MIN60ohjmueaEuDnqH95+YXtS81/sgLHVyC63IRANYE3lKSSNlkRvQx9kPPurTbxMSYn1CJWyBo5f0qsZYNN+8luiKTfzOSavlSO6IcopUa8lD2kFfpmpnkPw6wIKeYKWoxJepIcR3igpExttC+L+uMP2I4K/YTxlt7eNUlOcn2ff/4O6FR+SMXTK6MIf91A/bpnTgUFKiA5+l0ZrCG94c4NiM3IkmZrC/A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5856
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509F5.eurprd02.prod.outlook.com
+ DU2PEPF0001E9C1.eurprd03.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	bbf43773-8ba6-43ae-5afb-08deb7488b0f
+	bd01de9a-9d75-407e-3e47-08deb7489760
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|14060799003|36860700016|1800799024|35042699022|82310400026|18002099003|22082099003|56012099003|11063799006|5023799004|3023799007|6133799003;
+	BCL:0;ARA:13230040|14060799003|1800799024|82310400026|376014|35042699022|36860700016|22082099003|18002099003|56012099003|3023799007|11063799006|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	ftnrp9p3uV/2PUug4tqosqicx2A/FKy9JMsyPBRUNp8MACmnLIIT/acDdvlZ92XVmo96Yhl7w/KXaZ7CmIQ0eB4cW0r7x3l0+37Vah4wiX8Iypxp+VNScKodo9TR54ZgT6JO7K2QTHUxjrovd9c6w1kHFnK+Bd0rBgQx66KVrBZoCNTvSTgsBNCNrhO3C9axa92697+yJrzQk3JGM5zY4bVbqR5YYgg2MCgDfBXWe3zOVF38rvJDlyEqK5VoCbdWVtrQonTPqIeWGEBXxS4Z6KY8tsEGuZ/khG/MDKwqwHDpvA/2f7NQPcHJzgnsoGLK2g4oqVIK1ubbmv8fMzGU9KcTuTS6neAIkJ8zD0ObIRav3zDEbqakvzgx8ezyKQiJdLyYyuV78KgtnRZVxmvtwO4Qga26QbxOYb1Hud8KM5pwG14juoBh/6jY/oWPWbojjJaWsgmzBMEtd1NQYSta9NBUoCq2Ux66+4ILWDAINOPUwjFQBoJlfHDCkIrh55W2QK8fmOZxOgxRYBuvIAP9k+Om1mGjYKhDzrk4fn3e1jMGi9LC0hxf9dggLyJen+dY5x3KLVN1HItJPF82OHkEIONRGR5QxTGv32ifi9d6YpQDKChAJzpgIvSzwHFLReDk+4vAqvycQ8sxI4Y3q1HHZ3Lo0DbQftCKxpsKwQOPkIG0JlN4iYExkHT2KaATyq7/go1ah53eUdexwy9/NNo0in82gDmkqW5vNWk/tMC+O2M=
+	9lqcHTat5JsJtjleNo9SwEMcC6avUngA/E2wnjbJLy5FF9bq3LL62GLw2Qqth6qfp8e3tlV9l0N1inBvXs6AH+ibxySf834S1Ku0zR2iV72hwtNEv0b8f2Rlxomte8gSkbAMba3HraWwpJaCc2sY3XQKNqBBbUwpmVvibcUciSMG0QZGEwnsR5HN8Imrjocv/bbs/zNaoArMeS2oUOW+gnM4WY/Ui9LjkzfwXQaWkRU2lqRtnV2hk6wuWQzZDTRjqj0dcVGeNaMZEzyyJF8XO9ljvVp1rcn2Oj8IOyGf55EPKqDIs3h/Fv9ivtUE/aCpNuUQXIslPuxfV0O6T2G/Zt9Pxd0TZH7k9bltGdYrAPRIV41nCZOSTLbOE+BlEOsk76vbSCaZqn6wxbYdBREzVWSo6ukMtpLSVTvYG5ZQ6FzgP86fiLSyLq2llXg6ZJMluSRTM153loq137Y53b/pHNMefS5ZvA7j3kS4dYfJH698y7syPoLmuTWQ6bqm2W0C7IMRc4ju0lhad/UKDX3BDaOmSI8xTCDXgJdcWBvnmrLBoX23ieKAACQtv6XmV+t4W1jV1AkqH0pcA+eZUl733MvltanQy5NOjxINkyRB22SRyh1q2gt263Y0LmNm0dbddXL7AooAIwjIKFkptFrrEqqFUxRbArhSrTYpvcFEJFQIL3LGI1E1CPv+8C239hxj4PIceKSc2r5PK49AIIEL1i5p1hqJJmSFLg/VRU2UUgE=
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(14060799003)(36860700016)(1800799024)(35042699022)(82310400026)(18002099003)(22082099003)(56012099003)(11063799006)(5023799004)(3023799007)(6133799003);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(1800799024)(82310400026)(376014)(35042699022)(36860700016)(22082099003)(18002099003)(56012099003)(3023799007)(11063799006)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	zHdVW9Zjed/HLttiqXByBeZE7f59UeSNtHM3aUpm1+mJY4SfwQ93PB6hPvy1/yqEdTYjS1tKSu/FnopWG3KtO8ULGPiBeCI8AMphEkUKJbINKW3x/Uzg1b1Fr23AuSeLK3ZUgmjJC+xMmWcUmFQZ3pFFUgBi9sd2h5LEM4OLIxQ2UNygosU4VVH7n6P7zEY/dpZFpKYoE8iyY3tKobsUpwZxuIZiH1YPDE24z6hP6UBxAMcGK/HkDtZzp2G5uBngUER+2mHx8hQxzh9mDbNLA7Mc3zU13bW/iuZ7hINjl+IP7Th1+5Ba2vEX1bEQNDVyG8v+HyJ423WCHSZytC59P3seE1GIC2RZzKN2sdD2iiJXeQNL+JkQgA9DdFKnrv5ugQvLp1C3adk1QN8WkGPHPq5n7SeoIfn2hXFWC6BVdyGngRZnY8wTjH4M0i0VFWda
+	JdpsOXQd8npajXP4t3gHp+1025tPhDuh7G0QoAOvk7PY/rHyZGX8Fn1RNrPJ9zNwU9GIoBX2sBnlc4MEYozdgkuZhuqLAvdiMyZcnPIVnh3XFNs1Ljc4fIzUlziYhPdAQtSqWL+IjS/Wfeza/ili/Nqap4i3C0e8s/firAnuHYd72do+Hhaft93hrBmZOfFf5llrFjGHb/pnMQWSkT66IbspmBi7hVwfInZRSZkMo3ugIYvgHzYQapg4hUQ69VwX6W9cE2dokVzVq6WOYpwjW/yCtS70/T4dh0SEhqHRBr2FR0TVGVqpHiI9GSl/8HxABt5W++L7RVQ2h2I9VJO/F36UkULejozWm+S6FU+WiGoKONBGs/UI6fui78Ihq8zw5rJMUI/M53d6n3g3tYkZJsL2MbdfLgJlRS5uOfvUdL/oCDRqfOD9eSAFY1eRstUk
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 14:53:17.5324
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 14:53:36.3590
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6293a744-e636-43b7-57e9-08deb748b17c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3310bafe-7311-4d6c-1526-08deb748bcb5
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509F5.eurprd02.prod.outlook.com
+	DU2PEPF0001E9C1.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB6467
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB8925
 
-GICv5 uses a set of in-memory tables to track and manage VM
-state. These must be allocated by the hypervisor, and provided to the
-IRS to use.
+GICv5 guests use Interrupt State Tables (ISTs) to track and manage the
+interrupt state for SPIs and LPIs. These ISTs are provided to the host's
+IRS via the VMTE.
 
-The VMT (Virtual Machine Table) is a linear or two level table
-comprising VMT Entries (VMTE). Each VMTE describes the state for a
-single VM. This state includes things such as the SPI and LPI IST
-configuration (coming in a future commit), an implementation-defined
-VM Descriptor, and a VPE Table (VPET).
+On a host GICv5 system, SPIs do not require any up-front memory
+allocation prior to their use, unlike LPIs which require the OS to
+allocate an IST. For a GICv5 guest, the same holds from the guest's
+point of view: SPIs should require no explicit memory allocation by the
+guest. This means that KVM must provision the memory passed to the IRS
+for managing a guest's SPI state.
 
-The VPET contains one entry per VPE belonging to a VM, and is used to
-mark a VPE as valid, as well as providing the address of an
-implementation-defined VPE Descriptor, which is used by the hardware
-to track and manage VPE state.
+Allocate the SPI IST before running the guest for the first time. As only
+a small number of SPIs are expected, this is always allocated as a linear
+IST. The host is responsible for freeing this memory on guest teardown.
 
-This commit adds support for allocating the VMT, and managing the
-VMTEs. The VMTEs can be initialised or released for re-use. Allocation
-and tracking of unused VMTEs is handled with an IDA.
+For LPIs, the guest provisions memory for its LPI IST. KVM does not pass
+that memory directly to the host IRS. Instead, allocate a shadow LPI IST
+and pass that to the IRS through the VMTE. The LPI IST may be allocated
+as a two-level structure when supported and required by the configured
+LPI ID space, as many more LPIs are expected than SPIs. The host frees
+this memory on guest teardown.
+
+This commit also extends the doorbell domain to allow the doorbells
+themselves to act as a conduit for issuing commands, similar to what
+exists for GICv4 support. Effectively, irq_set_vcpu_affinity() becomes
+an ioctl-like interface for issuing commands specific to either a VM or
+the particular VPE that the doorbell belongs to. Add support for:
+
+        VMT_L2_MAP - Make a second level VM table valid
+        VMTE_MAKE_VALID - Make a single VMTE, and hence VM, valid
+        VMTE_MAKE_INVALID - Make a single VMTE, and hence VM, invalid
+        SPI_VIST_MAKE_VALID - Make the SPI IST valid
+        LPI_VIST_MAKE_VALID - Make the LPI IST valid
+        LPI_VIST_MAKE_INVALID - Make the LPI IST invalid
+
+None of these commands are plumbed through to the host IRS at this
+stage.
+
+There is intentionally no SPI_VIST_MAKE_INVALID command. The SPI IST is
+allocated as part of VM creation and is not invalidated while the VM is
+live. It is freed when the VM is destroyed, after the VMTE has been made
+invalid. The LPI IST, on the other hand, is driven by the guest, which is
+free to invalidate and free its LPI IST at any point.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/vgic/vgic-init.c      |   2 +
- arch/arm64/kvm/vgic/vgic-v5-tables.c | 625 +++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v5-tables.h |  76 ++++
- arch/arm64/kvm/vgic/vgic-v5.c        |  15 +
- drivers/irqchip/irq-gic-v5-irs.c     |  12 +-
- include/kvm/arm_vgic.h               |   4 +
- include/linux/irqchip/arm-gic-v5.h   |  14 +-
- 8 files changed, 740 insertions(+), 10 deletions(-)
- create mode 100644 arch/arm64/kvm/vgic/vgic-v5-tables.c
- create mode 100644 arch/arm64/kvm/vgic/vgic-v5-tables.h
+ arch/arm64/kvm/vgic/vgic-v5-tables.c | 527 +++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v5-tables.h |  22 ++
+ arch/arm64/kvm/vgic/vgic-v5.c        |   3 +
+ include/linux/irqchip/arm-gic-v5.h   |   3 +
+ 4 files changed, 555 insertions(+)
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 59612d2f277c1..431de9b145ca1 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -24,7 +24,7 @@ kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.=
-o \
- 	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
- 	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
- 	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
--	 vgic/vgic-v5.o
-+	 vgic/vgic-v5.o vgic/vgic-v5-tables.o
-=20
- kvm-$(CONFIG_HW_PERF_EVENTS)  +=3D pmu-emul.o pmu.o
- kvm-$(CONFIG_ARM64_PTR_AUTH)  +=3D pauth.o
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-ini=
-t.c
-index 625d352756fcf..079a57c2b18f6 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -154,6 +154,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	case KVM_DEV_TYPE_ARM_VGIC_V3:
- 		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
- 		break;
-+	case KVM_DEV_TYPE_ARM_VGIC_V5:
-+		kvm->arch.vgic.gicv5_vm.vm_id =3D VGIC_V5_VM_ID_INVAL;
- 	}
-=20
- 	/*
 diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/vgi=
 c-v5-tables.c
-new file mode 100644
-index 0000000000000..e9b92893b4e1f
---- /dev/null
+index e9b92893b4e1f..a1d0f620b7913 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
 +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-@@ -0,0 +1,625 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -59,6 +59,14 @@ static DEFINE_XARRAY(vm_info);
+ #define GICV5_VPED_ADDR_SHIFT		3ULL
+ #define GICV5_VPED_ADDR			GENMASK_ULL(55, 3)
+=20
 +/*
-+ * Copyright (C) 2025, 2026 Arm Ltd.
++ * The LPI and SPI configuration is stored in the 2nd and 3rd 64-bit chunk=
+s of
++ * the VMTE (0-based). We call this a section here in an attempt to simpli=
+fy the
++ * code.
 + */
++#define GICV5_VMTEL2_LPI_SECTION	2
++#define GICV5_VMTEL2_SPI_SECTION	3
 +
-+#include <kvm/arm_vgic.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/mutex.h>
-+#include <linux/sizes.h>
-+#include <linux/slab.h>
-+#include <linux/xarray.h>
-+#include <asm/kvm_mmu.h>
-+
-+#include "vgic.h"
-+#include "vgic-v5-tables.h"
-+
-+#define irs_caps	kvm_vgic_global_state.vgic_v5_irs_caps
-+
-+static struct vgic_v5_vmt *vmt_info;
-+/* Serialises lazy installation of shared second-level VMTs. */
-+static DEFINE_MUTEX(vmt_l2_lock);
-+static DEFINE_XARRAY(vm_info);
-+
-+/* Level 1 Virtual Machine Table Entry */
-+#define GICV5_VMTEL1E_VALID		BIT_ULL(0)
-+/* Note that there is no shift for the address by design */
-+#define GICV5_VMTEL1E_L2_ADDR		GENMASK(51, 12)
-+
-+#define GICV5_VMTEL2E_SIZE		32ULL
-+/* An L2 table (two-level VMT) is ALWAYS 4kB! */
-+#define GICV5_VMT_L2_TABLE_SIZE		4096ULL
-+#define GICV5_VMT_L2_TABLE_ENTRIES	(GICV5_VMT_L2_TABLE_SIZE / GICV5_VMTEL2=
-E_SIZE)
-+
-+/*
-+ * As the L2 VMTE is a large data structure, we are splitting it into 4 pa=
-rts.
-+ * We only mask and shift WITHIN each part for simplicity.
-+ */
-+/* First 64-bit chunk */
-+#define GICV5_VMTEL2E_VALID		BIT_ULL(0)
-+#define GICV5_VMTEL2E_VMD_ADDR_SHIFT	3ULL
-+#define GICV5_VMTEL2E_VMD_ADDR		GENMASK_ULL(55, 3)
-+/* Second 64-bit chunk */
-+#define GICV5_VMTEL2E_VPET_ADDR_SHIFT	3ULL
-+#define GICV5_VMTEL2E_VPET_ADDR		GENMASK_ULL(55, 3)
-+#define GICV5_VMTEL2E_VPE_ID_BITS	GENMASK_ULL(63, 59)
-+/* Third & fourth 64-bit chunks (the encodings are the same for each) */
-+#define GICV5_VMTEL2E_IST_VALID		BIT_ULL(0)
-+#define GICV5_VMTEL2E_IST_L2SZ		GENMASK_ULL(2, 1)
-+#define GICV5_VMTEL2E_IST_ADDR_SHIFT	6ULL
-+#define GICV5_VMTEL2E_IST_ADDR		GENMASK_ULL(55, 6)
-+#define GICV5_VMTEL2E_IST_ISTSZ		GENMASK_ULL(57, 56)
-+#define GICV5_VMTEL2E_IST_STRUCTURE	BIT_ULL(58)
-+#define GICV5_VMTEL2E_IST_ID_BITS	GENMASK_ULL(63, 59)
-+
-+/* Virtual PE Table Entry */
-+#define GICV5_VPE_VALID			BIT_ULL(0)
-+/* Note that there is no shift for the address by design. */
-+#define GICV5_VPED_ADDR_SHIFT		3ULL
-+#define GICV5_VPED_ADDR			GENMASK_ULL(55, 3)
-+
-+/*
-+ * Our IRS might be coherent or non-coherent. If coherent, we can just emi=
+ /*
+  * Our IRS might be coherent or non-coherent. If coherent, we can just emi=
 t a
-+ * DSB to ensure that we're in sync. However, when non-coherent, we need t=
+  * DSB to ensure that we're in sync. However, when non-coherent, we need t=
 o
-+ * manage our cached data explicitly.
-+ *
-+ * This helper is used to handle both coherent and non-coherent IRSes, and
-+ * handles all combinations of cleaning and invalidating to the PoC.
-+ */
-+static void vgic_v5_clean_inval(void *va, size_t size)
-+{
-+	unsigned long base =3D (unsigned long)va;
-+
-+	dsb(ishst);
-+
-+	if (kvm_vgic_global_state.vgic_v5_irs_caps.non_coherent)
-+		dcache_clean_inval_poc(base, base + size);
-+}
-+
+@@ -489,6 +497,25 @@ int vgic_v5_vmte_init(struct kvm *kvm)
+ 	return ret;
+ }
+=20
 +/*
-+ * Create a linear VM Table. Directly using the number of entries supplied=
- as
-+ * the size of an L2 VMTE (32 bytes) guarantees that our allocation is ali=
-gned per
-+ * the GICv5 requirements for the IRS_VMT_BASER.
++ * The following set of forward declarations makes the code layout a *litt=
+le*
++ * clearer as it lets us keep the IST-related code together.
 + */
-+static int vgic_v5_alloc_vmt_linear(unsigned int num_entries)
-+{
-+	vmt_info->linear.vmt_base =3D kzalloc_objs(*vmt_info->linear.vmt_base,
-+						 num_entries);
-+	if (!vmt_info->linear.vmt_base)
-+		return -ENOMEM;
++static int vgic_v5_alloc_linear_ist(struct kvm *kvm, bool spi_ist,
++				    unsigned int id_bits,
++				    unsigned int istsz);
++static int vgic_v5_alloc_l1_ist(struct kvm *kvm, unsigned int id_bits,
++				unsigned int istsz, unsigned int l2_split);
++static int vgic_v5_alloc_l2_ists(struct kvm *kvm, unsigned int id_bits,
++				 unsigned int istsz, unsigned int l2_split);
++static int vgic_v5_alloc_two_level_lpi_ist(struct kvm *kvm,
++					   unsigned int id_bits,
++					   unsigned int istsz,
++					   unsigned int l2_split);
++static int vgic_v5_linear_ist_free(struct kvm *kvm, bool spi);
++static int vgic_v5_two_level_ist_free(struct kvm *kvm, bool spi);
++static int vgic_v5_spi_ist_free(struct kvm *kvm);
 +
-+	vgic_v5_clean_inval(vmt_info->linear.vmt_base,
-+			    num_entries * sizeof(struct vmtl2_entry));
-+
-+	return 0;
-+}
-+
-+/*
-+ * Allocate the first level of a two-level VM table. The second-level VM t=
-ables
-+ * are allocated on demand (by vgic_v5_alloc_l2_vmt()).
-+ */
-+static int vgic_v5_alloc_vmt_two_level(unsigned int num_entries)
-+{
-+	/*
-+	 * Each L2 VMT array is always 4k-sized (covering 128 VMs). This is
-+	 * mandated by the GICv5 specification (GICv5 EAC0 Specification rule
-+	 * D_LSPBK). Hence, round up the number of entries to be at least 128
-+	 * (or the next highest power of two as we give the HW the number of VM
-+	 * ID bits).
-+	 */
-+	if (num_entries < GICV5_VMT_L2_TABLE_ENTRIES)
-+		num_entries =3D GICV5_VMT_L2_TABLE_ENTRIES;
-+	num_entries =3D roundup_pow_of_two(num_entries);
-+
-+	vmt_info->l2.num_l1_ents =3D (num_entries / GICV5_VMT_L2_TABLE_ENTRIES);
-+	vmt_info->l2.vmt_base =3D kzalloc_objs(*vmt_info->l2.vmt_base,
-+					     vmt_info->l2.num_l1_ents);
-+	if (!vmt_info->l2.vmt_base)
-+		return -ENOMEM;
-+
-+	vmt_info->l2.l2ptrs =3D kzalloc_objs(*vmt_info->l2.l2ptrs,
-+					   vmt_info->l2.num_l1_ents,
-+					   GFP_KERNEL);
-+	if (!vmt_info->l2.l2ptrs) {
-+		kfree(vmt_info->l2.vmt_base);
-+		return -ENOMEM;
+ /*
+  * Release the VMT Entry, freeing up any allocated data structures before
+  * zeroing the VMTE.
+@@ -521,6 +548,20 @@ int vgic_v5_vmte_release(struct kvm *kvm)
+ 	kfree(vmi->vpet_base);
+ 	kfree(vmi->vmd_base);
+=20
++	/* If we have an LPI IST, free it */
++	if (vmi->h_lpi_ist) {
++		ret =3D vgic_v5_lpi_ist_free(kvm);
++		if (ret)
++			return ret;
 +	}
 +
-+	vgic_v5_clean_inval(vmt_info->l2.vmt_base,
-+			    vmt_info->l2.num_l1_ents * sizeof(vmtl1_entry));
++	/* If we have an SPI IST, free it */
++	if (vmi->h_spi_ist) {
++		ret =3D vgic_v5_spi_ist_free(kvm);
++		if (ret)
++			return ret;
++	}
 +
-+	return 0;
-+}
+ 	xa_erase(&vm_info, vm_id);
+ 	kfree(vmi);
+=20
+@@ -623,3 +664,489 @@ int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu)
+=20
+ 	return 0;
+ }
 +
 +/*
-+ * Allocate a second level VMT, if required. This can be called eagerly, a=
-nd
-+ * will only perform the allocation if required.
++ * Assign an already allocated IST to the VM by populating the fields in t=
+he
++ * corresponding VMTE. We re-use this code for both an SPI IST and LPI IST=
+, even
++ * if the paths to reach it might be vastly different.
 + */
-+static int vgic_v5_alloc_l2_vmt(struct kvm *kvm)
++static int vgic_v5_vmte_assign_ist(struct kvm *kvm, phys_addr_t ist_base,
++				   bool two_level, unsigned int id_bits,
++				   unsigned int l2sz, unsigned int istsz,
++				   bool spi_ist)
 +{
 +	struct kvm_vcpu *vcpu0 =3D kvm_get_vcpu(kvm, 0);
 +	u16 vm_id =3D vgic_v5_vm_id(kvm);
-+	enum gicv5_vcpu_cmd cmd =3D VMT_L2_MAP;
-+	struct vmtl2_entry *l2_table;
-+	unsigned int l1_index;
++	enum gicv5_vcpu_cmd cmd;
++	struct vmtl2_entry *vmte;
++	unsigned int section;
++	u64 tmp;
 +	int ret;
 +
-+	/* Nothing to do if we have linear tables! */
-+	if (!vmt_info->two_level)
-+		return 0;
-+
 +	/*
-+	 * We have 4k-sized L2 tables - this is mandated by the spec for
-+	 * two-level VMTs (GICv5 EAC0 Specification rule D_LSPBK). This means
-+	 * that we have 128 entries per L1 VMTE.
++	 * The L2 VMTE comprises four 64-bit "sections", where sections 2 & 3
++	 * describe the LPI and SPI ISTs, respectively. Both the LPI and SPI
++	 * sections have the same layout, and as we are either operating on SPIs
++	 * or LPIs we pick a section of the VMTE to modify up-front.
++	 *
++	 * See the GICv5 EAC0 Specification 11.2.2 for more details about the
++	 * VMTE layout.
 +	 */
-+	l1_index =3D vm_id / GICV5_VMT_L2_TABLE_ENTRIES;
++	section =3D spi_ist ? GICV5_VMTEL2_SPI_SECTION : GICV5_VMTEL2_LPI_SECTION=
+;
 +
-+	guard(mutex)(&vmt_l2_lock);
++	if (ist_base & ~GICV5_VMTEL2E_IST_ADDR) {
++		kvm_err("IST alignment issue! Address: 0x%llx, Mask 0x%llx\n",
++			ist_base, GICV5_VMTEL2E_IST_ADDR);
++		return -EINVAL;
++	}
 +
-+	/* Already valid? Great! */
-+	if (vmt_info->l2.l2ptrs[l1_index])
-+		return 0;
++	vmte =3D vgic_v5_get_l2_vmte(vm_id);
++	if (IS_ERR(vmte))
++		return PTR_ERR(vmte);
 +
-+	l2_table =3D kzalloc_objs(*l2_table, GICV5_VMT_L2_TABLE_ENTRIES);
-+	if (!l2_table)
-+		return -ENOMEM;
++	/* Bail if already allocated */
++	vgic_v5_clean_inval(vmte, sizeof(*vmte));
++	if (le64_to_cpu(READ_ONCE(vmte->val[section])) & GICV5_VMTEL2E_IST_VALID)
++		return -EINVAL;
 +
-+	vgic_v5_clean_inval(l2_table, GICV5_VMT_L2_TABLE_SIZE);
++	tmp =3D FIELD_PREP(GICV5_VMTEL2E_IST_L2SZ, l2sz);
++	tmp |=3D FIELD_PREP(GICV5_VMTEL2E_IST_ADDR,
++			ist_base >> GICV5_VMTEL2E_IST_ADDR_SHIFT);
++	tmp |=3D FIELD_PREP(GICV5_VMTEL2E_IST_ISTSZ, istsz);
++	tmp |=3D FIELD_PREP(GICV5_VMTEL2E_IST_ID_BITS, id_bits);
++	if (two_level)
++		tmp |=3D GICV5_VMTEL2E_IST_STRUCTURE;
 +
-+	vgic_v5_clean_inval(vmt_info->l2.vmt_base + l1_index,
-+			    sizeof(vmtl1_entry));
++	WRITE_ONCE(vmte->val[section], cpu_to_le64(tmp));
++	vgic_v5_clean_inval(vmte, sizeof(*vmte));
 +
-+	WRITE_ONCE(vmt_info->l2.vmt_base[l1_index],
-+		   cpu_to_le64(virt_to_phys(l2_table)));
-+
-+	vgic_v5_clean_inval(vmt_info->l2.vmt_base + l1_index,
-+			    sizeof(vmtl1_entry));
-+
-+	/*
-+	 * VMAP in the L2 VMT via the IRS. We use any of the VM's CPUs as a
-+	 * conduit for interacting with the host's IRS. In the current case,
-+	 * this lets us resolve the VM ID to pass to the hardware.
-+	 */
++	/* Finally, mark the entry as valid */
++	cmd =3D spi_ist ? SPI_VIST_MAKE_VALID : LPI_VIST_MAKE_VALID;
 +	ret =3D irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu0), &cmd);
 +
-+	/* We've failed to make the L2 VMT valid - things are very broken! */
-+	if (ret) {
-+		/* Remove the pointer from L1 table */
-+		WRITE_ONCE(vmt_info->l2.vmt_base[l1_index], 0);
-+
-+		vgic_v5_clean_inval(vmt_info->l2.vmt_base + l1_index,
-+				    sizeof(vmtl1_entry));
-+
-+		kfree(l2_table);
-+
-+		return ret;
-+	}
-+
-+	vmt_info->l2.l2ptrs[l1_index] =3D l2_table;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Allocate the top-level VMT. This can either be linear or two-level.
-+ */
-+int vgic_v5_vmt_allocate(unsigned int max_vpes)
-+{
-+	int ret;
-+
-+	/* Allocate the tracking structure */
-+	vmt_info =3D kzalloc_obj(*vmt_info, GFP_KERNEL);
-+	if (!vmt_info)
-+		return -ENOMEM;
-+
-+	ida_init(&vmt_info->vm_id_ida);
-+	vmt_info->max_vpes =3D max_vpes;
-+	vmt_info->vmd_size =3D irs_caps.vmd_size;
-+	vmt_info->vped_size =3D irs_caps.vped_size;
-+	vmt_info->two_level =3D irs_caps.two_level_vmt_support;
-+	vmt_info->num_entries =3D irs_caps.max_vms;
-+
-+	if (vmt_info->two_level)
-+		ret =3D vgic_v5_alloc_vmt_two_level(vmt_info->num_entries);
-+	else
-+		ret =3D vgic_v5_alloc_vmt_linear(vmt_info->num_entries);
-+
-+	/* If anything failed, free our tracking structure before returning */
-+	if (ret) {
-+		kfree(vmt_info);
-+		vmt_info =3D NULL;
-+	}
-+
 +	return ret;
 +}
 +
 +/*
-+ * Free the VMT and associated tracking structures. This isn't strictly ex=
-pected
-+ * to be called in general operation, but instead exists for completeness.
++ * Allocate a Linear IST - always used for SPIs and potentially LPIs.
++ *
++ * The calculation for n has been taken from section 11.2.2 of the GICv5 E=
+AC0
++ * spec.
++ *
++ * NOTE: istsz is the FIELD used by GICv5, not the actual size (or log2() =
+of the
++ * size).
 + */
-+int vgic_v5_vmt_free(void)
++static int vgic_v5_alloc_linear_ist(struct kvm *kvm, bool spi_ist,
++				    unsigned int id_bits, unsigned int istsz)
 +{
-+	if (!vmt_info)
-+		return 0;
++	const size_t n =3D id_bits + 1 + istsz;
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++	__le64 *ist;
++	u32 l1sz;
 +
-+	if (!vmt_info->two_level) {
-+		kfree(vmt_info->linear.vmt_base);
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (WARN_ON_ONCE(!vmi))
++		return -EINVAL;
++
++	/*
++	 * Allocate the IST. We only have one level, so we just use the L2 ISTE.
++	 */
++	l1sz =3D BIT(n + 1);
++	ist =3D kzalloc(l1sz, GFP_KERNEL);
++	if (!ist)
++		return -ENOMEM;
++
++	if (spi_ist) {
++		vmi->h_spi_ist =3D ist;
 +	} else {
-+		/* Free the L2 tables; kfree(NULL) is safe */
-+		for (int i =3D 0; i < vmt_info->l2.num_l1_ents; ++i)
-+			kfree(vmt_info->l2.l2ptrs[i]);
-+		kfree(vmt_info->l2.l2ptrs);
-+
-+		/* And now free the L1 table */
-+		kfree(vmt_info->l2.vmt_base);
++		vmi->h_lpi_ist_structure =3D false;
++		vmi->h_lpi_ist =3D ist;
 +	}
 +
-+	ida_destroy(&vmt_info->vm_id_ida);
-+	kfree(vmt_info);
-+	vmt_info =3D NULL;
++	vgic_v5_clean_inval(ist, l1sz);
 +
 +	return 0;
 +}
 +
 +/*
-+ * Look up a VMT Entry by VM ID.
-+ */
-+static struct vmtl2_entry *vgic_v5_get_l2_vmte(u16 vm_id)
-+{
-+	unsigned int l1_index, l2_index;
-+	struct vmtl2_entry *l2_table;
-+
-+	if (!vmt_info->two_level)
-+		return &vmt_info->linear.vmt_base[vm_id];
-+
-+	l1_index =3D vm_id / GICV5_VMT_L2_TABLE_ENTRIES;
-+	l2_index =3D vm_id % GICV5_VMT_L2_TABLE_ENTRIES;
-+
-+	if (l1_index >=3D vmt_info->l2.num_l1_ents)
-+		return ERR_PTR(-E2BIG);
-+
-+	if (!vmt_info->l2.l2ptrs[l1_index])
-+		return ERR_PTR(-EINVAL);
-+
-+	l2_table =3D vmt_info->l2.l2ptrs[l1_index];
-+	return &l2_table[l2_index];
-+}
-+
-+/*
-+ * Zero a VMT Entry, and flush & invalidate to the PoC, if required.
-+ */
-+static int vgic_v5_reset_vmte(struct kvm *kvm)
-+{
-+	u16 vm_id =3D vgic_v5_vm_id(kvm);
-+	struct vmtl2_entry *vmte;
-+
-+	vmte =3D vgic_v5_get_l2_vmte(vm_id);
-+	if (IS_ERR(vmte))
-+		return PTR_ERR(vmte);
-+
-+	/*
-+	 * The VMT is normal memory shared with the IRS. Invalidate before
-+	 * rewriting the entry so that cacheline-granular maintenance cannot
-+	 * later push stale data for neighbouring IRS-visible state back to
-+	 * memory.
-+	 */
-+	vgic_v5_clean_inval(vmte, sizeof(*vmte));
-+
-+	/*
-+	 * Prevent the compiler from eliding the individual VMTE
-+	 * stores. Ordering and visibility to the IRS are provided by the
-+	 * surrounding cache maintenance and command protocol, not by
-+	 * WRITE_ONCE().
-+	 *
-+	 * The same compiler-access constraint applies to READ_ONCE() users in
-+	 * this file: when inspecting IRS-visible table entries, read the field
-+	 * exactly once and prevent the compiler from reusing, merging or
-+	 * tearing the access. Coherency and freshness for non-coherent IRSes
-+	 * still come from the surrounding cache maintenance.
-+	 */
-+	WRITE_ONCE(vmte->val[0], cpu_to_le64(0ULL));
-+	WRITE_ONCE(vmte->val[1], cpu_to_le64(0ULL));
-+	WRITE_ONCE(vmte->val[2], cpu_to_le64(0ULL));
-+	WRITE_ONCE(vmte->val[3], cpu_to_le64(0ULL));
-+
-+	/* And make our write visible to the IRS (if non-coherent) */
-+	vgic_v5_clean_inval(vmte, sizeof(*vmte));
-+
-+	return 0;
-+}
-+
-+/*
-+ * Use the IDA to allocate a new VM ID, and track it in the gicv5_vm data
-+ * structure. If we're out of VM IDs, the IDA catches that, and we return =
-the
-+ * error (-ENOSPC). If we've previously allocated a VM ID, we catch that t=
-oo and
-+ * return -EBUSY.
-+ */
-+int vgic_v5_allocate_vm_id(struct kvm *kvm)
-+{
-+	int id;
-+
-+	if (kvm->arch.vgic.gicv5_vm.vm_id !=3D VGIC_V5_VM_ID_INVAL)
-+		return -EBUSY;
-+
-+	id =3D ida_alloc_max(&vmt_info->vm_id_ida, vmt_info->num_entries - 1u,
-+			   GFP_KERNEL);
-+	if (id < 0)
-+		return id;
-+
-+	kvm->arch.vgic.gicv5_vm.vm_id =3D id;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Release the VM ID to allow it to be reallocated in the future.
-+ */
-+void vgic_v5_release_vm_id(struct kvm *kvm)
-+{
-+	if (kvm->arch.vgic.gicv5_vm.vm_id =3D=3D VGIC_V5_VM_ID_INVAL)
-+		return;
-+
-+	ida_free(&vmt_info->vm_id_ida, kvm->arch.vgic.gicv5_vm.vm_id);
-+	kvm->arch.vgic.gicv5_vm.vm_id =3D VGIC_V5_VM_ID_INVAL;
-+}
-+
-+/*
-+ * Initialise an entry in the VMT based on the index of the VM.
++ * Allocate the first level of a two-level IST - LPI, only.
 + *
-+ * Note: We don't mark the VMTE as valid as this needs to be done by
-+ * the hardware.
-+ */
-+int vgic_v5_vmte_init(struct kvm *kvm)
-+{
-+	int nr_cpus =3D atomic_read(&kvm->online_vcpus);
-+	struct vgic_v5_vm_info *vmi =3D NULL;
-+	u16 vm_id =3D vgic_v5_vm_id(kvm);
-+	struct vmtl2_entry *vmte;
-+	void **vped_ptrs =3D NULL;
-+	vpe_entry *vpet =3D NULL;
-+	void *vmd =3D NULL;
-+	int ret;
-+	u64 tmp;
-+
-+	if (nr_cpus > vmt_info->max_vpes)
-+		return -E2BIG;
-+
-+	/*
-+	 * If we're using two-level VMTs, L2 is allocated on demand. For linear
-+	 * VMTs, this is a NOP.
-+	 */
-+	ret =3D vgic_v5_alloc_l2_vmt(kvm);
-+	if (ret)
-+		return ret;
-+
-+	vmte =3D vgic_v5_get_l2_vmte(vm_id);
-+	if (IS_ERR(vmte))
-+		return PTR_ERR(vmte);
-+
-+	/* If the entry is already valid, something went wrong */
-+	vgic_v5_clean_inval(vmte, sizeof(*vmte));
-+	if (le64_to_cpu(READ_ONCE(vmte->val[0])) & GICV5_VMTEL2E_VALID)
-+		return -EINVAL;
-+
-+	ret =3D vgic_v5_reset_vmte(kvm);
-+	if (ret)
-+		return ret;
-+
-+	vmi =3D kzalloc_obj(*vmi);
-+	if (!vmi) {
-+		ret =3D -ENOMEM;
-+		goto out_fail;
-+	}
-+
-+	ret =3D xa_insert(&vm_info, vm_id, vmi, GFP_KERNEL);
-+	if (ret)
-+		goto out_fail;
-+
-+	/* Allocate and assign the VM Descriptor, if required. */
-+	if (vmt_info->vmd_size !=3D 0) {
-+		vmd =3D kzalloc(vmt_info->vmd_size, GFP_KERNEL);
-+		if (!vmd) {
-+			ret =3D -ENOMEM;
-+			goto out_fail;
-+		}
-+
-+		/* Stash the VA so we can free it later */
-+		vmi->vmd_base =3D vmd;
-+
-+		tmp =3D FIELD_PREP(GICV5_VMTEL2E_VMD_ADDR,
-+				 virt_to_phys(vmd) >> GICV5_VMTEL2E_VMD_ADDR_SHIFT);
-+		WRITE_ONCE(vmte->val[0], cpu_to_le64(tmp));
-+	}
-+
-+	/*
-+	 * Allocate and assign the VPE Table. Round up the number of CPUs to a
-+	 * whole power of two as we cannot describe non-powers-of-two in the
-+	 * VMTE field as it conveys the number of ID bits used and not the
-+	 * number of vPEs.
-+	 *
-+	 * The IRS encodes the number of IAFFID bits as N - 1, so a VM with a
-+	 * single vCPU must still allocate two VPET entries and expose 1 bit.
-+	 */
-+	nr_cpus =3D max(2UL, roundup_pow_of_two(nr_cpus));
-+	vmi->vpe_id_bits =3D fls(nr_cpus) - 1;
-+
-+	vpet =3D kzalloc_objs(*vpet, nr_cpus);
-+	if (!vpet) {
-+		ret =3D -ENOMEM;
-+		goto out_fail;
-+	}
-+
-+	/* Stash the VA so we can free it later */
-+	vmi->vpet_base =3D vpet;
-+
-+	tmp =3D FIELD_PREP(GICV5_VMTEL2E_VPET_ADDR,
-+			 virt_to_phys(vpet) >> GICV5_VMTEL2E_VPET_ADDR_SHIFT);
-+	tmp |=3D FIELD_PREP(GICV5_VMTEL2E_VPE_ID_BITS, vmi->vpe_id_bits);
-+	WRITE_ONCE(vmte->val[1], cpu_to_le64(tmp));
-+
-+	vped_ptrs =3D kzalloc_objs(*vped_ptrs, nr_cpus, GFP_KERNEL);
-+	if (!vped_ptrs) {
-+		ret =3D -ENOMEM;
-+		goto out_fail;
-+	}
-+	vmi->vped_ptrs =3D vped_ptrs;
-+
-+	if (vmd)
-+		vgic_v5_clean_inval(vmd, vmt_info->vmd_size);
-+	vgic_v5_clean_inval(vpet, sizeof(*vpet) * nr_cpus);
-+	vgic_v5_clean_inval(vmte, sizeof(*vmte));
-+
-+	kvm->arch.vgic.gicv5_vm.vmte_allocated =3D true;
-+
-+	return 0;
-+
-+out_fail:
-+	/* kfree(NULL) is safe so we can just kfree() at leisure */
-+	kfree(vmd);
-+	kfree(vpet);
-+	kfree(vped_ptrs);
-+	if (vmi)
-+		xa_erase(&vm_info, vm_id);
-+	kfree(vmi);
-+
-+	vgic_v5_reset_vmte(kvm);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Release the VMT Entry, freeing up any allocated data structures before
-+ * zeroing the VMTE.
++ * The calculation for n has been taken from section 11.2.2 of the GICv5 E=
+AC0
++ * spec.
 + *
-+ * The VMTE must be marked as invalid before it is released.
++ * NOTE: istsz and l2sz are the FIELDS used by GICv5, not the actual sizes=
+ (or
++ * log2() of the sizes).
 + */
-+int vgic_v5_vmte_release(struct kvm *kvm)
++static int vgic_v5_alloc_l1_ist(struct kvm *kvm, unsigned int id_bits,
++				unsigned int istsz, unsigned int l2sz)
 +{
++	const size_t n =3D  max(5, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1)=
+;
 +	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	const u32 l1_size =3D BIT(n + 1);
 +	struct vgic_v5_vm_info *vmi;
-+	struct vmtl2_entry *vmte;
-+	int ret;
-+
-+	vmte =3D vgic_v5_get_l2_vmte(vm_id);
-+	if (IS_ERR(vmte))
-+		return PTR_ERR(vmte);
-+
-+	/* Reject if the VMTE has not been marked as invalid! */
-+	vgic_v5_clean_inval(vmte, sizeof(*vmte));
-+	if (le64_to_cpu(READ_ONCE(vmte->val[0])) & GICV5_VMTEL2E_VALID)
-+		return -EINVAL;
-+
-+	vmi =3D xa_load(&vm_info, vm_id);
-+	if (WARN_ON_ONCE(!vmi))
-+		goto no_vmi;
-+
-+	for (int i =3D 0; i < BIT(vmi->vpe_id_bits); i++)
-+		kfree(vmi->vped_ptrs[i]);
-+	kfree(vmi->vped_ptrs);
-+	kfree(vmi->vpet_base);
-+	kfree(vmi->vmd_base);
-+
-+	xa_erase(&vm_info, vm_id);
-+	kfree(vmi);
-+
-+no_vmi:
-+	/*
-+	 * If we didn't get far enough into allocating a VMTE to create the VM
-+	 * info structure, then we just zero the VMTE and move on. There's
-+	 * nothing else we can realistically do here.
-+	 */
-+	ret =3D vgic_v5_reset_vmte(kvm);
-+	if (ret)
-+		return ret;
-+
-+	kvm->arch.vgic.gicv5_vm.vmte_allocated =3D false;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Allocate a VPE descriptor and provide it to the hardware via the VPE Ta=
-ble.
-+ */
-+int vgic_v5_vmte_alloc_vpe(struct kvm_vcpu *vcpu)
-+{
-+	u16 vm_id =3D vgic_v5_vm_id(vcpu->kvm);
-+	u16 vpe_id =3D vgic_v5_vpe_id(vcpu);
-+	struct vgic_v5_vm_info *vmi;
-+	vpe_entry tmp, *vpet_base;
-+	void *vped;
-+
-+	/* Make sure we're not over what the hardware supports */
-+	if (vpe_id >=3D vmt_info->max_vpes)
-+		return -E2BIG;
-+
-+	vmi =3D xa_load(&vm_info, vm_id);
-+	if (WARN_ON_ONCE(!vmi))
-+		return -EINVAL;
-+
-+	if (vpe_id >=3D 1 << vmi->vpe_id_bits)
-+		return -E2BIG;
-+
-+	vpet_base =3D vmi->vpet_base;
-+
-+	/* If the VPETE for this CPU is already valid we've gone wrong */
-+	vgic_v5_clean_inval(&vpet_base[vpe_id], sizeof(*vpet_base));
-+	if (le64_to_cpu(READ_ONCE(vpet_base[vpe_id])) & GICV5_VPE_VALID)
-+		return -EBUSY;
-+
-+	/* Alloc VPE Descriptor. Only used by IRS. */
-+	vped =3D kzalloc(vmt_info->vped_size, GFP_KERNEL);
-+	if (!vped)
-+		return -ENOMEM;
-+
-+	vmi->vped_ptrs[vpe_id] =3D vped;
-+
-+	tmp =3D FIELD_PREP(GICV5_VPED_ADDR, virt_to_phys(vped) >> GICV5_VPED_ADDR=
-_SHIFT);
-+	WRITE_ONCE(vpet_base[vpe_id], cpu_to_le64(tmp));
-+
-+	vgic_v5_clean_inval(vped, vmt_info->vped_size);
-+	vgic_v5_clean_inval(vpet_base + vpe_id, sizeof(vpe_entry));
-+
-+	return 0;
-+}
-+
-+/*
-+ * Free the memory allocated for the VPE descriptor.
-+ */
-+int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu)
-+{
-+	u16 vm_id =3D vgic_v5_vm_id(vcpu->kvm);
-+	u16 vpe_id =3D vgic_v5_vpe_id(vcpu);
-+	struct vgic_v5_vm_info *vmi;
-+	struct vmtl2_entry *vmte;
-+	vpe_entry *vpet_base;
-+	void *vped;
-+
-+	vmte =3D vgic_v5_get_l2_vmte(vm_id);
-+	if (IS_ERR(vmte))
-+		return PTR_ERR(vmte);
-+
-+	vgic_v5_clean_inval(vmte, sizeof(*vmte));
-+	if (le64_to_cpu(READ_ONCE(vmte->val[0])) & GICV5_VMTEL2E_VALID)
-+		return -EBUSY;
++	__le64 *ist;
 +
 +	vmi =3D xa_load(&vm_info, vm_id);
 +	if (!vmi)
 +		return -EINVAL;
 +
-+	if (vpe_id >=3D 1 << vmi->vpe_id_bits)
-+		return -E2BIG;
++	ist =3D kzalloc(l1_size, GFP_KERNEL);
++	if (!ist)
++		return -ENOMEM;
 +
-+	vpet_base =3D vmi->vpet_base;
-+	WRITE_ONCE(vpet_base[vpe_id], 0ULL);
++	vmi->h_lpi_ist_structure =3D true;
++	vmi->h_lpi_ist =3D ist;
 +
-+	vgic_v5_clean_inval(vpet_base + vpe_id, sizeof(vpe_entry));
-+
-+	/* Free VPE Descriptor. Only used by IRS. */
-+	vped =3D vmi->vped_ptrs[vpe_id];
-+	vmi->vped_ptrs[vpe_id] =3D NULL;
-+	kfree(vped);
++	vgic_v5_clean_inval(ist, l1_size);
 +
 +	return 0;
 +}
++
++/*
++ * Allocate ALL of the second level ISTs for a two-level IST - LPI, only.
++ *
++ * The calculation for n has been taken from section 11.2.2 of the GICv5 E=
+AC0
++ * spec. The l2_size calculation is from section 11.2.3 of the same docume=
+nt.
++ *
++ * NOTE: istsz and l2sz are the FIELDS used by GICv5, not the actual sizes=
+ (or
++ * log2() of the sizes).
++ */
++static int vgic_v5_alloc_l2_ists(struct kvm *kvm, unsigned int id_bits,
++				 unsigned int istsz, unsigned int l2sz)
++{
++	const size_t n =3D  max(5, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1)=
+;
++	const int l1_entries =3D BIT(n + 1) / GICV5_IRS_ISTL1E_SIZE;
++	const size_t l2_size =3D BIT(11 + (2 * l2sz) + 1);
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++	__le64 *l2ist;
++	__le64 *l1ist;
++	int index;
++	u64 val;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (WARN_ON_ONCE(!vmi))
++		return -EINVAL;
++
++	l1ist =3D vmi->h_lpi_ist;
++
++	/*
++	 * Allocate the storage for the pointers to the L2 ISTs (used when
++	 * freeing later).
++	 */
++	vmi->h_lpi_l2_ists =3D kzalloc_objs(*vmi->h_lpi_l2_ists, l1_entries,
++					  GFP_KERNEL);
++	if (!vmi->h_lpi_l2_ists)
++		return -ENOMEM;
++
++	/* Allocate the L2 IST for each L1 IST entry */
++	for (index =3D 0; index < l1_entries; ++index) {
++		l2ist =3D kzalloc(l2_size, GFP_KERNEL);
++		if (!l2ist) {
++			while (--index >=3D 0)
++				kfree(vmi->h_lpi_l2_ists[index]);
++
++			kfree(vmi->h_lpi_l2_ists);
++			vmi->h_lpi_l2_ists =3D NULL;
++
++			return -ENOMEM;
++		}
++
++		/*
++		 * We are not doing on-demand allocation of the L2 ISTs, and are
++		 * instead provisioning the whole IST up front. This means that
++		 * we are able to mark the L2 ISTs as valid in the L1 ISTEs as
++		 * the overall IST is not yet valid.
++		 */
++		val =3D (virt_to_phys(l2ist) & GICV5_ISTL1E_L2_ADDR_MASK) |
++		      GICV5_ISTL1E_VALID;
++		l1ist[index] =3D cpu_to_le64(val);
++
++		vmi->h_lpi_l2_ists[index] =3D l2ist;
++
++		vgic_v5_clean_inval(l2ist, l2_size);
++	}
++
++	/* Handle CMOs for the whole L1 IST in one go */
++	vgic_v5_clean_inval(l1ist, l1_entries * sizeof(*l1ist));
++
++	return 0;
++}
++
++/* Allocate a two-level IST - LPIs, only */
++static int vgic_v5_alloc_two_level_lpi_ist(struct kvm *kvm, unsigned int i=
+d_bits,
++					   unsigned int istsz, unsigned int l2sz)
++{
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++	int ret;
++
++	/*
++	 * Allocate the L1 IST first, then all of the L2s. Everything
++	 * is preallocated and we do no on-demand IST allocation. This
++	 * is to avoid needing to track if and when the guest is doing
++	 * on-demand IST allocation.
++	 */
++	ret =3D vgic_v5_alloc_l1_ist(kvm, id_bits, istsz, l2sz);
++	if (ret)
++		return ret;
++
++	ret =3D vgic_v5_alloc_l2_ists(kvm, id_bits, istsz, l2sz);
++	if (ret) {
++		/* Free the L1 IST again */
++		vmi =3D xa_load(&vm_info, vm_id);
++		kfree(vmi->h_lpi_ist);
++		vmi->h_lpi_ist =3D 0;
++
++		return ret;
++	}
++
++	return 0;
++}
++
++static void vgic_v5_free_allocated_lpi_ist(struct vgic_v5_vm_info *vmi,
++					   unsigned int id_bits,
++					   unsigned int istsz,
++					   unsigned int l2sz)
++{
++	if (!vmi->h_lpi_ist_structure) {
++		kfree(vmi->h_lpi_ist);
++		vmi->h_lpi_ist =3D NULL;
++		return;
++	}
++
++	if (vmi->h_lpi_l2_ists) {
++		const size_t n =3D max(5, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1)=
+;
++		const int l1_entries =3D BIT(n + 1) / GICV5_IRS_ISTL1E_SIZE;
++		int index;
++
++		for (index =3D 0; index < l1_entries; ++index)
++			kfree(vmi->h_lpi_l2_ists[index]);
++
++		kfree(vmi->h_lpi_l2_ists);
++		vmi->h_lpi_l2_ists =3D NULL;
++	}
++
++	kfree(vmi->h_lpi_ist);
++	vmi->h_lpi_ist =3D NULL;
++}
++
++static void vgic_v5_free_allocated_spi_ist(struct kvm *kvm)
++{
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (WARN_ON_ONCE(!vmi))
++		return;
++
++	kfree(vmi->h_spi_ist);
++	vmi->h_spi_ist =3D NULL;
++}
++
++/*
++ * Free a Linear IST. Can only happen once the VM is dead.
++ */
++static int vgic_v5_linear_ist_free(struct kvm *kvm, bool spi)
++{
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vmtl2_entry *vmte;
++	struct vgic_v5_vm_info *vmi;
++	int section;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (!vmi)
++		return -EINVAL;
++
++	vmte =3D vgic_v5_get_l2_vmte(vm_id);
++	if (IS_ERR(vmte))
++		return PTR_ERR(vmte);
++
++	if (spi) {
++		section =3D GICV5_VMTEL2_SPI_SECTION;
++		vgic_v5_free_allocated_spi_ist(kvm);
++	} else {
++		section =3D GICV5_VMTEL2_LPI_SECTION;
++		vgic_v5_free_allocated_lpi_ist(vmi, 0, 0, 0);
++	}
++
++	/* The VM should be dead here, so we can just zero the VMT section */
++	vmte->val[section] =3D cpu_to_le64(0);
++	vgic_v5_clean_inval(vmte, sizeof(*vmte));
++
++	return 0;
++}
++
++/*
++ * Free a Two-Level IST. Can only happen once the VM is dead.
++ */
++static int vgic_v5_two_level_ist_free(struct kvm *kvm, bool spi)
++{
++	unsigned int id_bits, istsz, l2sz;
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++	struct vmtl2_entry *vmte;
++	__le64 tmp;
++	int section;
++
++	/* We don't create two-level SPI ISTs, so freeing is a bad idea! */
++	if (spi)
++		return -EINVAL;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (!vmi)
++		return -EINVAL;
++
++	section =3D GICV5_VMTEL2_LPI_SECTION;
++
++	if (!vmi->h_lpi_ist_structure)
++		return -EINVAL;
++
++	vmte =3D vgic_v5_get_l2_vmte(vm_id);
++	if (IS_ERR(vmte))
++		return PTR_ERR(vmte);
++
++	tmp =3D le64_to_cpu(READ_ONCE(vmte->val[section]));
++
++	id_bits =3D FIELD_GET(GICV5_VMTEL2E_IST_ID_BITS, tmp);
++	istsz =3D FIELD_GET(GICV5_VMTEL2E_IST_ISTSZ, tmp);
++	l2sz =3D FIELD_GET(GICV5_VMTEL2E_IST_L2SZ, tmp);
++
++	vgic_v5_free_allocated_lpi_ist(vmi, id_bits, istsz, l2sz);
++
++	/* The VM must be dead, so we can just zero the VMT section */
++	vmte->val[section] =3D cpu_to_le64(0);
++	vgic_v5_clean_inval(vmte, sizeof(*vmte));
++
++	return 0;
++}
++
++/* Helper to determine ISTE size based on metadata requirements */
++static unsigned int vgic_v5_ist_istsz(unsigned int id_bits)
++{
++	if (!irs_caps.istmd)
++		return GICV5_IRS_IST_CFGR_ISTSZ_4;
++
++	if (id_bits >=3D irs_caps.istmd_sz)
++		return GICV5_IRS_IST_CFGR_ISTSZ_16;
++
++	return GICV5_IRS_IST_CFGR_ISTSZ_8;
++}
++
++/*
++ * Allocate an IST for SPIs.
++ *
++ * We don't anticipate a large number of SPIs being allocated. Therefore, =
+we
++ * always allocate a Linear IST for SPIs. This will need to be revisited s=
+hould
++ * that assumption no longer hold.
++ */
++int vgic_v5_spi_ist_allocate(struct kvm *kvm, unsigned int id_bits)
++{
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++	phys_addr_t base_addr;
++	unsigned int istsz;
++	int ret;
++
++	istsz =3D vgic_v5_ist_istsz(id_bits);
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (WARN_ON_ONCE(!vmi))
++		return -EINVAL;
++
++	ret =3D vgic_v5_alloc_linear_ist(kvm, true, id_bits, istsz);
++	if (ret)
++		return ret;
++	base_addr =3D virt_to_phys(vmi->h_spi_ist);
++
++	ret =3D vgic_v5_vmte_assign_ist(kvm, base_addr, false, id_bits, 0, istsz,
++				      true);
++	if (ret) {
++		vgic_v5_free_allocated_spi_ist(kvm);
++		return ret;
++	}
++
++	return 0;
++}
++
++/*
++ * Free the IST for SPIs. Should only happen once the VM is dead.
++ */
++static int vgic_v5_spi_ist_free(struct kvm *kvm)
++{
++	return vgic_v5_linear_ist_free(kvm, true);
++}
++
++/*
++ * Allocate an IST for LPIs.
++ *
++ * Unlike with SPIs, we anticipate that the guest will allocate a relative=
+ly
++ * large number of LPIs. Therefore, while we support doing a linear LPI IS=
+T, it
++ * is expected that LPI ISTs will be two-level.
++ */
++int vgic_v5_lpi_ist_alloc(struct kvm *kvm, unsigned int id_bits)
++{
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++	unsigned int istsz, l2sz;
++	phys_addr_t phys_addr;
++	bool two_level;
++	int ret;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (WARN_ON_ONCE(!vmi))
++		return -EINVAL;
++
++	if (vmi->h_lpi_ist)
++		return -EBUSY;
++
++	istsz =3D vgic_v5_ist_istsz(id_bits);
++	l2sz =3D gicv5_irs_l2_sz(irs_caps.ist_l2sz);
++
++	/*
++	 * Determine if we want to create a Linear or a Two-Level IST.
++	 *
++	 * A two-level IST is only required when a single L2 IST cannot cover
++	 * the requested ID space. This depends on the L2 IST size selected for
++	 * the IRS, not PAGE_SIZE. Using PAGE_SIZE here would switch to
++	 * two-level too early when the selected L2 IST is larger than a page,
++	 * and the allocation sizing arithmetic would underflow.
++	 */
++	two_level =3D irs_caps.ist_levels &&
++		id_bits > ((10 - istsz) + (2 * l2sz));
++
++	if (!two_level)
++		ret =3D vgic_v5_alloc_linear_ist(kvm, false /* LPIs, not SPIs */,
++					       id_bits, istsz);
++	else
++		ret =3D vgic_v5_alloc_two_level_lpi_ist(kvm, id_bits, istsz,
++						      l2sz);
++
++	if (ret)
++		return ret;
++
++	phys_addr =3D virt_to_phys(vmi->h_lpi_ist);
++	ret =3D vgic_v5_vmte_assign_ist(kvm, phys_addr, two_level, id_bits, l2sz,
++				      istsz, false);
++	if (ret)
++		vgic_v5_free_allocated_lpi_ist(vmi, id_bits, istsz, l2sz);
++
++	return ret;
++}
++
++/* Free the LPI IST again */
++int vgic_v5_lpi_ist_free(struct kvm *kvm)
++{
++	u16 vm_id =3D vgic_v5_vm_id(kvm);
++	struct vgic_v5_vm_info *vmi;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (!vmi)
++		return -ENXIO;
++
++	if (!vmi->h_lpi_ist_structure)
++		return vgic_v5_linear_ist_free(kvm, false);
++	else
++		return vgic_v5_two_level_ist_free(kvm, false);
++}
 diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgi=
 c-v5-tables.h
-new file mode 100644
-index 0000000000000..3ca5bc7214fc9
---- /dev/null
+index 3ca5bc7214fc9..81fed6c5b1559 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5-tables.h
 +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
-@@ -0,0 +1,76 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2025, 2026 Arm Ltd.
-+ */
+@@ -25,6 +25,24 @@ struct vgic_v5_vm_info {
+ 	vpe_entry __iomem	*vpet_base;
+ 	void __iomem		**vped_ptrs;
+ 	u8			vpe_id_bits;
 +
-+#ifndef __KVM_ARM_VGICV5_TABLES_H__
-+#define __KVM_ARM_VGICV5_TABLES_H__
++	/*
++	 * Both the LPI and SPI ISTs are allocated by the hypervisor. While it
++	 * would be possible to track and access them by iterating over the ISTs
++	 * themselves, it makes more sense to store pointers to the ISTs.
++	 *
++	 * The LPI IST can either be two-level or linear. Hence, we keep track
++	 * of the structure. If it is two-level, we retain pointers to the L1
++	 * IST and to each L2 IST array. If it is linear, we just store the base
++	 * address of the IST array.
++	 *
++	 * The SPI IST is linear, and therefore we just store the base address
++	 * of the SPI IST array.
++	 */
++	bool			h_lpi_ist_structure;
++	__le64			*h_lpi_ist;
++	__le64			**h_lpi_l2_ists;
++	__le64			*h_spi_ist;
+ };
+=20
+ struct vgic_v5_vmt {
+@@ -73,4 +91,8 @@ int vgic_v5_vmte_release(struct kvm *kvm);
+ int vgic_v5_vmte_alloc_vpe(struct kvm_vcpu *vcpu);
+ int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu);
+=20
++int vgic_v5_spi_ist_allocate(struct kvm *kvm, unsigned int id_bits);
++int vgic_v5_lpi_ist_alloc(struct kvm *kvm, unsigned int id_bits);
++int vgic_v5_lpi_ist_free(struct kvm *kvm);
 +
-+#include <linux/idr.h>
-+#include <linux/irqchip/arm-gic-v5.h>
-+
-+/* Level 1 Virtual Machine Table Entry */
-+typedef __le64 vmtl1_entry;
-+
-+/* Level 2 Virtual Machine Table Entry */
-+struct vmtl2_entry {
-+	__le64 val[4];
-+};
-+
-+/* Virtual PE Table Entry */
-+typedef __le64 vpe_entry;
-+
-+struct vgic_v5_vm_info {
-+	void __iomem		*vmd_base;
-+	vpe_entry __iomem	*vpet_base;
-+	void __iomem		**vped_ptrs;
-+	u8			vpe_id_bits;
-+};
-+
-+struct vgic_v5_vmt {
-+	union {
-+		struct {
-+			struct vmtl2_entry *vmt_base;
-+			unsigned int num_ents;
-+		} linear;
-+		struct {
-+			vmtl1_entry *vmt_base;
-+			struct vmtl2_entry **l2ptrs;
-+			unsigned int num_l1_ents;
-+		} l2;
-+	};
-+	bool		two_level;
-+	unsigned int	num_entries;
-+	unsigned int	max_vpes;
-+	size_t		vmd_size;
-+	size_t		vped_size;
-+	struct ida	vm_id_ida;
-+};
-+
-+static inline u16 vgic_v5_vm_id(struct kvm *kvm)
-+{
-+	return kvm->arch.vgic.gicv5_vm.vm_id;
-+}
-+
-+static inline u16 vgic_v5_vpe_id(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->vcpu_id;
-+}
-+
-+static inline int vgic_v5_vpe_db(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db;
-+}
-+
-+int vgic_v5_vmt_allocate(unsigned int max_vpes);
-+int vgic_v5_vmt_free(void);
-+
-+int vgic_v5_allocate_vm_id(struct kvm *kvm);
-+void vgic_v5_release_vm_id(struct kvm *kvm);
-+
-+int vgic_v5_vmte_init(struct kvm *kvm);
-+int vgic_v5_vmte_release(struct kvm *kvm);
-+int vgic_v5_vmte_alloc_vpe(struct kvm_vcpu *vcpu);
-+int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu);
-+
-+#endif
+ #endif
 diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 52924408ca990..adfe0b207ef40 100644
+index adfe0b207ef40..120eadff9a128 100644
 --- a/arch/arm64/kvm/vgic/vgic-v5.c
 +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -153,6 +153,20 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
- 	return 0;
- }
-=20
-+static int vgic_v5_db_set_vcpu_affinity(struct irq_data *data, void *vcpu_=
-info)
-+{
-+	enum gicv5_vcpu_cmd *cmd =3D vcpu_info;
-+
-+	switch (*cmd) {
-+	case VMT_L2_MAP:
-+	case VMTE_MAKE_VALID:
-+	case VMTE_MAKE_INVALID:
-+		/* Not yet implemented */
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- /*
-  * This set of irq_chip functions is specific for doorbells.
-  */
-@@ -164,6 +178,7 @@ static const struct irq_chip vgic_v5_db_irq_chip =3D {
- 	.irq_set_affinity =3D irq_chip_set_affinity_parent,
- 	.irq_get_irqchip_state =3D irq_chip_get_parent_state,
- 	.irq_set_irqchip_state =3D irq_chip_set_parent_state,
-+	.irq_set_vcpu_affinity =3D vgic_v5_db_set_vcpu_affinity,
- 	.flags =3D IRQCHIP_SET_TYPE_MASKED | IRQCHIP_SKIP_SET_WAKE |
- 		 IRQCHIP_MASK_ON_SUSPEND,
- };
-diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-=
-irs.c
-index 607e066821b52..70502b07ec8d7 100644
---- a/drivers/irqchip/irq-gic-v5-irs.c
-+++ b/drivers/irqchip/irq-gic-v5-irs.c
-@@ -269,24 +269,24 @@ int gicv5_irs_iste_alloc(const u32 lpi)
-  * itself is not supported) again serves to make it easier to find physica=
-lly
-  * contiguous blocks of memory.
-  */
--static unsigned int gicv5_irs_l2_sz(u32 idr2)
-+unsigned int gicv5_irs_l2_sz(u32 l2sz)
- {
- 	switch (PAGE_SIZE) {
- 	case SZ_64K:
--		if (GICV5_IRS_IST_L2SZ_SUPPORT_64KB(idr2))
-+		if (GICV5_IRS_IST_L2SZ_SUPPORT_64KB(l2sz))
- 			return GICV5_IRS_IST_CFGR_L2SZ_64K;
- 		fallthrough;
- 	case SZ_4K:
--		if (GICV5_IRS_IST_L2SZ_SUPPORT_4KB(idr2))
-+		if (GICV5_IRS_IST_L2SZ_SUPPORT_4KB(l2sz))
- 			return GICV5_IRS_IST_CFGR_L2SZ_4K;
- 		fallthrough;
- 	case SZ_16K:
--		if (GICV5_IRS_IST_L2SZ_SUPPORT_16KB(idr2))
-+		if (GICV5_IRS_IST_L2SZ_SUPPORT_16KB(l2sz))
- 			return GICV5_IRS_IST_CFGR_L2SZ_16K;
- 		break;
- 	}
-=20
--	if (GICV5_IRS_IST_L2SZ_SUPPORT_4KB(idr2))
-+	if (GICV5_IRS_IST_L2SZ_SUPPORT_4KB(l2sz))
- 		return GICV5_IRS_IST_CFGR_L2SZ_4K;
-=20
- 	return GICV5_IRS_IST_CFGR_L2SZ_64K;
-@@ -334,7 +334,7 @@ static int __init gicv5_irs_init_ist(struct gicv5_irs_c=
-hip_data *irs_data)
- 	lpi_id_bits =3D min(lpi_id_bits, gicv5_global_data.cpuif_id_bits);
-=20
- 	if (two_levels)
--		l2sz =3D gicv5_irs_l2_sz(idr2);
-+		l2sz =3D gicv5_irs_l2_sz(FIELD_GET(GICV5_IRS_IDR2_IST_L2SZ, idr2));
-=20
- 	istmd =3D !!FIELD_GET(GICV5_IRS_IDR2_ISTMD, idr2);
-=20
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index bff2b7c896d55..ba32cd71fe0a7 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -374,6 +374,8 @@ struct vgic_redist_region {
- 	struct list_head list;
- };
-=20
-+#define VGIC_V5_VM_ID_INVAL		(-1)
-+
- struct vgic_v5_vm {
- 	/*
- 	 * We only expose a subset of PPIs to the guest. This subset is a
-@@ -396,6 +398,8 @@ struct vgic_v5_vm {
- 	struct fwnode_handle	*fwnode;
- 	struct irq_domain	*domain;
- 	int			vpe_db_base;
-+	u32			vm_id;
-+	bool			vmte_allocated;
- };
-=20
- struct vgic_dist {
+@@ -161,6 +161,9 @@ static int vgic_v5_db_set_vcpu_affinity(struct irq_data=
+ *data, void *vcpu_info)
+ 	case VMT_L2_MAP:
+ 	case VMTE_MAKE_VALID:
+ 	case VMTE_MAKE_INVALID:
++	case SPI_VIST_MAKE_VALID:
++	case LPI_VIST_MAKE_VALID:
++	case LPI_VIST_MAKE_INVALID:
+ 		/* Not yet implemented */
+ 	default:
+ 		return -EINVAL;
 diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm=
 -gic-v5.h
-index 1702b57527dee..64e31068d9d17 100644
+index 64e31068d9d17..ef649faeeb0ff 100644
 --- a/include/linux/irqchip/arm-gic-v5.h
 +++ b/include/linux/irqchip/arm-gic-v5.h
-@@ -159,9 +159,9 @@
- #define GICV5_IRS_IDR2_LPI		BIT(5)
- #define GICV5_IRS_IDR2_ID_BITS		GENMASK(4, 0)
+@@ -623,6 +623,9 @@ enum gicv5_vcpu_cmd {
+ 	VMT_L2_MAP,		/* Map in a L2 VMT - *may* happen on VM init */
+ 	VMTE_MAKE_VALID,	/* Make the VMTE valid */
+ 	VMTE_MAKE_INVALID,	/* Make the VMTE (et al.) invalid */
++	SPI_VIST_MAKE_VALID,	/* No corresponding invalid */
++	LPI_VIST_MAKE_VALID,	/* Triggered by a guest */
++	LPI_VIST_MAKE_INVALID,	/* Triggered by a guest */
+ };
 =20
--#define GICV5_IRS_IST_L2SZ_SUPPORT_4KB(r)	FIELD_GET(BIT(11), (r))
--#define GICV5_IRS_IST_L2SZ_SUPPORT_16KB(r)	FIELD_GET(BIT(12), (r))
--#define GICV5_IRS_IST_L2SZ_SUPPORT_64KB(r)	FIELD_GET(BIT(13), (r))
-+#define GICV5_IRS_IST_L2SZ_SUPPORT_4KB(r)	FIELD_GET(BIT(0), (r))
-+#define GICV5_IRS_IST_L2SZ_SUPPORT_16KB(r)	FIELD_GET(BIT(1), (r))
-+#define GICV5_IRS_IST_L2SZ_SUPPORT_64KB(r)	FIELD_GET(BIT(2), (r))
-=20
- #define GICV5_IRS_IDR3_VMT_LEVELS	BIT(10)
- #define GICV5_IRS_IDR3_VM_ID_BITS	GENMASK(9, 5)
-@@ -573,6 +573,7 @@ int gicv5_irs_cpu_to_iaffid(int cpu_id, u16 *iaffid);
- struct gicv5_irs_chip_data *gicv5_irs_lookup_by_spi_id(u32 spi_id);
- int gicv5_spi_irq_set_type(struct irq_data *d, unsigned int type);
- int gicv5_irs_iste_alloc(u32 lpi);
-+unsigned int gicv5_irs_l2_sz(u32 l2sz);
- void gicv5_irs_syncr(void);
-=20
- /* Embedded in kvm.arch */
-@@ -617,4 +618,11 @@ void gicv5_deinit_lpis(void);
-=20
- void __init gicv5_its_of_probe(struct device_node *parent);
- void __init gicv5_its_acpi_probe(void);
-+
-+enum gicv5_vcpu_cmd {
-+	VMT_L2_MAP,		/* Map in a L2 VMT - *may* happen on VM init */
-+	VMTE_MAKE_VALID,	/* Make the VMTE valid */
-+	VMTE_MAKE_INVALID,	/* Make the VMTE (et al.) invalid */
-+};
-+
  #endif
 --=20
 2.34.1
