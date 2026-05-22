@@ -1,194 +1,149 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC3C3BAD95;
-	Fri, 22 May 2026 09:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8FA328611;
+	Fri, 22 May 2026 18:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779443953; cv=none; b=YSVLO2O7fYke0xKNUMeUOGkuAnLNxTk6eYx0B/RPhy/5kizhM9xOKbdhPfh461oc4GZIp5sTkZyBTyZ68awscoOu3RIi7zKTmCR19RNBUSN1bwiRIkFGNVu+cwRrVvUCF05Fry09YSN4quKMJrOiQOQU8RBmNYb8E1y0QBbSPyw=
+	t=1779472822; cv=none; b=At1hNBPjKni4Ct8L3FpH5w9Sh32jEcfwiLkGGODiPyIa+cUEVbQt5sspB79ad+MwGZnyTXZHXnmQ/B1bKZsjl1a1VCrZhphyv3sCcb7dU0cAZQQ973BKMHGJi+nQZaUWVw1iBJJWUJpvoJrZagunsRHfzdJPDKiQP4PZlRilXA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779443953; c=relaxed/simple;
-	bh=yEYtEb4SmbesXXVSdXZGvvGFoQd7/PfTyCL1JseMGJc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fl7OMjB3BmZaaDf1kpZnsh5Pe4DLnxkYDtY2HEGkoZ/8U4+FHpw64NphdlgrKwL3sYs9AL2Z1DuK79BKeb7JHPjcnLBR8SLrFJv+oAwn6/fw/VIjcRbMueFLNEX4TQIJ39qn6LaGbFO1a4X058gIEwkH8RiMjTcBvr5r+4rDS1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+0BoIAN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779472822; c=relaxed/simple;
+	bh=NuFpAbhy7SIcpHNtP51CJ5XzabRJU55tghTXRronQQ8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=JNgr3aBkjGUTpdHYEhMPygNwwbAvlsAWwQg+W/7mAMm7FE92XSGYsXauNKdqCVl3fptbL5o/GblsJU1E9jbaXkV46Z+PH3iHk9Mgv3K2CHVG7G+cDkyZeq95l0UMWe+fen8LLVxzpmV6DYX9Ype6yZ1YK0vSU90N9lpwK5BORaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGC7snl+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+0BoIAN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE2461F000E9;
-	Fri, 22 May 2026 09:59:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGC7snl+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 083821F000E9;
+	Fri, 22 May 2026 18:00:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779443952;
-	bh=Lq6FzCC4KbteJ9kgvftpe86/zGobK0A72wn8P5God9Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=a+0BoIANfJoxAw5Ex6FiTjmcoAyM5OY+Tqu9spimOb+fiTeVzrfzisFmmBAZrQtBM
-	 a/xhzqo9ESOwirQxYbtIDkeGwoPZaYpSJUBDxGAGKZsC2P3wjyrTSkixc84M7AZEiG
-	 nki8LKsCzZ6iqZV4YBdzmDUH3Z3xZ9lbgv3oSCCpVjAviivm0PoYVKlAEcbCBQD/dg
-	 iYMzqyMLs1JCGdKrphV+SznVU9vSgN0d48e0fAFJJ0WdRo/3czCG5YMoFNgkD6qG5L
-	 bo3emt0Knfj1G+S7e57RVNZtzzWxj2tQXZ7uveEvtlP8DiJ1Tf1R0Ymht+2luf9RsL
-	 650k9hqWWXEBQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wQMer-00000005AhL-2LWF;
-	Fri, 22 May 2026 09:59:10 +0000
-Date: Fri, 22 May 2026 11:02:20 +0100
-Message-ID: <87ik8fahjn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 09/44] arm64: RMI: Provide functions to delegate/undelegate ranges of memory
-In-Reply-To: <a81c3688-30f1-43e4-8d57-1d08a6e563af@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-10-steven.price@arm.com>
-	<867bowx3qx.wl-maz@kernel.org>
-	<a81c3688-30f1-43e4-8d57-1d08a6e563af@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1779472820;
+	bh=zaYaOdDDdM4eMMiXs7oSYVChBLimpl06io6NldbGQpU=;
+	h=From:Date:Subject:To:Cc;
+	b=EGC7snl+DtLrdxQZPCIkUcxv3YPJXwjOW8fF87TPr7o7XCwgE1+QoRcJXu4UCF/KX
+	 paR7up5fOsGSAcdt4ZHT1YmAEsY9mT6keVmYwbKWufUe18ur6BfVLf2hAdFrunYgf0
+	 nSmcAFxZ7Wgj+B39rsTLdQAiiqgVWqOVPao70sex3tDa5Cr7WgWEwI1dw17//Xk/EC
+	 1iqSk+7xhklcX+8uusSpdTyfXMTmfv2mbrtbklrjH6jZVoTjwDdt2+Khy5tnnWLMvc
+	 oGx+Atyav1BCfdwsfeeGc67ff33oFc1+EirWZ3HWZ/SjPPyFgglXW/wvw7n5ewTF1R
+	 1IG25UhoK5Bmg==
+From: Mark Brown <broonie@kernel.org>
+Date: Fri, 22 May 2026 19:00:04 +0100
+Subject: [PATCH] KVM: arm64: Preserve all guest ZCR_EL2.LEN values
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAKOZEGoC/yXMUQrCMBCE4auUfXYhCdoSryI+pHFsV22UjQax9
+ O5G+/jBzD9Thgoy7ZuZFEWy3FOF3TQUx5AGsJyqyRnXmp31fC0TB53aLZ/lzZ+ofEPiVNjDo+s
+ DjHWB6v2hqIt/+nBcnV/9BfH569GyfAF5x4K4fAAAAA==
+X-Change-ID: 20260519-kvm-arm64-fix-zcr-len-nv-9e9e7bae012a
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3374; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=NuFpAbhy7SIcpHNtP51CJ5XzabRJU55tghTXRronQQ8=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqEJmw5sPUxxYu5BdKH7PXAjJE9yYbrnRA6tzAs
+ TCvvMaEwcqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCahCZsAAKCRAk1otyXVSH
+ 0FCWB/9fbZOC9HhqXlHPnU+iZ33L/WZnir6QyHwm+p8OOR2YEblEcEVeCWgahGXvRPfXf8SZW3q
+ 6NkPQ7H8Zc5yJW4dgCMNnd1MNmtGcrABBP4XLSPrhKcIsdn6OLWXokrLDU87o+mA4C7BhIBGD2J
+ CN/QmMPit7BgPp6AolUalC09jxvPD61cYRFHbw52+weygfFbo/LPA8IL/vsP1CKGq/mgoZRbX0/
+ M1AaO4/zIeU0qFSboxeLsBvl7JyKrnP7LIBUowLD4z/wNkcKFeLs16S1k68bBsqGP1PYBfKOpQq
+ uUL30hWrKTF6yKqhE1LQizAWoHaMpFEkhGfYEr1qUxpPELPJ
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Thu, 21 May 2026 17:01:37 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> 
-> On 21/05/2026 14:59, Marc Zyngier wrote:
-> > On Wed, 13 May 2026 14:17:17 +0100,
-> > Steven Price <steven.price@arm.com> wrote:
-> >> 
-> >> The RMM requires memory is 'delegated' to it so that it can be used
-> >> either for a realm guest or for various tracking purposes within the RMM
-> >> (e.g. for metadata or page tables). Memory that has been delegated
-> >> cannot be accessed by the host (it will result in a Granule Protection
-> >> Fault).
-> >> 
-> >> Undelegation may fail if the memory is still in use by the RMM. This
-> >> shouldn't happen (Linux should ensure it has destroyed the RMM objects
-> >> before attempting to undelegate). In the event that it does happen this
-> >> points to a programming bug and the only reasonable approach is for the
-> >> physical pages to be leaked - it is up to the caller of
-> >> rmi_undelegate_range() to handle this.
-> >> 
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >> v14:
-> >>   * Split into separate patch and moved out of KVM
-> >> ---
-> >>   arch/arm64/include/asm/rmi_cmds.h | 13 +++++++++++
-> >>   arch/arm64/kernel/rmi.c           | 36 +++++++++++++++++++++++++++++++
-> >>   2 files changed, 49 insertions(+)
-> >> 
-> >> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-> >> index 9078a2920a7c..eb213c8e6f26 100644
-> >> --- a/arch/arm64/include/asm/rmi_cmds.h
-> >> +++ b/arch/arm64/include/asm/rmi_cmds.h
-> >> @@ -33,6 +33,19 @@ struct rmi_sro_state {
-> >>   } while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
-> >>   	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
-> >>   +int rmi_delegate_range(phys_addr_t phys, unsigned long size);
-> >> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
-> >> +
-> >> +static inline int rmi_delegate_page(phys_addr_t phys)
-> >> +{
-> >> +	return rmi_delegate_range(phys, PAGE_SIZE);
-> >> +}
-> >> +
-> >> +static inline int rmi_undelegate_page(phys_addr_t phys)
-> >> +{
-> >> +	return rmi_undelegate_range(phys, PAGE_SIZE);
-> >> +}
-> >> +
-> >>   bool rmi_is_available(void);
-> >>     unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t
-> >> gfp);
-> >> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
-> >> index 52a415e99500..08cef54acadb 100644
-> >> --- a/arch/arm64/kernel/rmi.c
-> >> +++ b/arch/arm64/kernel/rmi.c
-> >> @@ -12,6 +12,42 @@ static bool arm64_rmi_is_available;
-> >>   unsigned long rmm_feat_reg0;
-> >>   unsigned long rmm_feat_reg1;
-> >>   +int rmi_delegate_range(phys_addr_t phys, unsigned long size)
-> >> +{
-> >> +	unsigned long ret = 0;
-> >> +	unsigned long top = phys + size;
-> >> +	unsigned long out_top;
-> >> +
-> >> +	while (phys < top) {
-> >> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
-> >> +		if (ret == RMI_SUCCESS)
-> >> +			phys = out_top;
-> >> +		else if (ret != RMI_BUSY && ret != RMI_BLOCKED)
-> >> +			return ret;
-> >> +	}
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size)
-> >> +{
-> >> +	unsigned long ret = 0;
-> >> +	unsigned long top = phys + size;
-> >> +	unsigned long out_top;
-> >> +
-> >> +	WARN_ON(size == 0);
-> > 
-> > I find it odd to warn on size = 0. After all, free(NULL) is not an
-> > error. But even then, you continue feeding this to the RMM.
-> > 
-> > You also don't seem to be bothered with that on the delegation side...
-> > 
-> >> +
-> >> +	while (phys < top) {
-> >> +		ret = rmi_granule_range_undelegate(phys, top, &out_top);
-> >> +		if (ret == RMI_SUCCESS)
-> >> +			phys = out_top;
-> > 
-> > and size==0 doesn't violate any of the failure conditions listed in
-> > B4.5.18.2 (beta2). Will you end-up looping around forever?
-> 
-> That is not true ? It triggers, top_bound error condition, for both.
-> 
-> 
-> pre: UInt(top) <= UInt(base)
-> post: result.status == RMI_ERROR_INPUT
+Since b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps") when guests
+write to ZCR_EL2 we have clamped the value of ZCR_EL2.LEN to be at most
+that configuring the maximum guest VL. This is not the behaviour the
+architecture documents for ZCR_EL2.LEN, the expectation is that all bits
+will be read as written. Further, writing values larger than the largest
+available vector length is part of the documented procedure for enumerating
+the supported vector lengths so we expect to see this happen in practice.
 
-News flash, I can't read. Ignore me.
+The reasoning for the current behaviour is not specifically articulated, my
+best guess is that it is intended to ensure that the guest can not see an
+effective VL greater than the maximum that has been configured. This can
+instead be achieved by configuring ZCR_EL2 when loading guest state:
 
-	M.
+ - When running at EL0 or EL1 configure ZCR_EL2.LEN to the minimum of the
+   guest ZCR_EL2.LEN and vcpu_sve_max_vq(vcpu)-1.
+ - When running at EL2 configure the maximum VL for the guest in
+   ZCR_EL2.LEN like we do for non-nested guests and load the guest
+   ZCR_EL2 into ZCR_EL1.
 
--- 
-Jazz isn't dead. It just smells funny.
+This will ensure that the guest sees both the ZCR_EL2.LEN value which it
+wrote and the effective VL that resulting from the values it has configured
+in ZCR_ELx.LEN.
+
+Currently all other bits in ZCR_EL2 are either RES0 or RAZ/WI, values
+written are sanitised based on this.
+
+Fixes: b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps")
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 8 ++++----
+ arch/arm64/kvm/sys_regs.c               | 6 +-----
+ 2 files changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index bf0eb5e43427..fd277cb70967 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -501,11 +501,11 @@ static inline void fpsimd_lazy_switch_to_guest(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	if (vcpu_has_sve(vcpu)) {
++		zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
++
+ 		/* A guest hypervisor may restrict the effective max VL. */
+-		if (is_nested_ctxt(vcpu))
+-			zcr_el2 = __vcpu_sys_reg(vcpu, ZCR_EL2);
+-		else
+-			zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
++		if (is_nested_ctxt(vcpu) && !is_hyp_ctxt(vcpu))
++			zcr_el2 = min(zcr_el2, __vcpu_sys_reg(vcpu, ZCR_EL2));
+ 
+ 		write_sysreg_el2(zcr_el2, SYS_ZCR);
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 148fc3400ea8..c4d3bbae2d14 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2862,8 +2862,6 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+ {
+-	unsigned int vq;
+-
+ 	if (guest_hyp_sve_traps_enabled(vcpu)) {
+ 		kvm_inject_nested_sve_trap(vcpu);
+ 		return false;
+@@ -2874,9 +2872,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ 		return true;
+ 	}
+ 
+-	vq = SYS_FIELD_GET(ZCR_ELx, LEN, p->regval) + 1;
+-	vq = min(vq, vcpu_sve_max_vq(vcpu));
+-	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, vq - 1);
++	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, p->regval & ZCR_ELx_LEN);
+ 	return true;
+ }
+ 
+
+---
+base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
+change-id: 20260519-kvm-arm64-fix-zcr-len-nv-9e9e7bae012a
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
