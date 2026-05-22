@@ -1,50 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AED53BB132;
-	Fri, 22 May 2026 09:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC3C3BAD95;
+	Fri, 22 May 2026 09:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779443751; cv=none; b=tUQ/gq8L5saVFw5C0+p0sCMANF2FAf2Rxeiwc0MoeUj0YgGkxriPpUZSerGeD/ULQi+/VpMISnepSTJgYoDgHNnpydusWG0a7QFVQAXjnb/oKGpsx2HCgZebpUhCSdD0lf0oI3UEUpHo/DBTmI1ghuDWB3XNh5cQIwty9v+aPxk=
+	t=1779443953; cv=none; b=YSVLO2O7fYke0xKNUMeUOGkuAnLNxTk6eYx0B/RPhy/5kizhM9xOKbdhPfh461oc4GZIp5sTkZyBTyZ68awscoOu3RIi7zKTmCR19RNBUSN1bwiRIkFGNVu+cwRrVvUCF05Fry09YSN4quKMJrOiQOQU8RBmNYb8E1y0QBbSPyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779443751; c=relaxed/simple;
-	bh=EFHlHMm27XjekJ+YmqGifcP1bo+19jO3UmkVjAAqnWA=;
+	s=arc-20240116; t=1779443953; c=relaxed/simple;
+	bh=yEYtEb4SmbesXXVSdXZGvvGFoQd7/PfTyCL1JseMGJc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t/VKZbILmxcJWLibFCtAFq8ZdmGRMnGVTaAf5JKopyh3EYzmJYnyXh2Bbrwc7X0JEUPEZYBECnytlc27/IOmPzLZH5i92RpOkfZdi/lHJO1aRx5lt+fCT5DFxtHI3OyepfJm2H22HR3o8Uj84PpkijqxpW2ICRoLfBHAVuf1130=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vm8X/Sot; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=fl7OMjB3BmZaaDf1kpZnsh5Pe4DLnxkYDtY2HEGkoZ/8U4+FHpw64NphdlgrKwL3sYs9AL2Z1DuK79BKeb7JHPjcnLBR8SLrFJv+oAwn6/fw/VIjcRbMueFLNEX4TQIJ39qn6LaGbFO1a4X058gIEwkH8RiMjTcBvr5r+4rDS1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+0BoIAN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vm8X/Sot"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B311F000E9;
-	Fri, 22 May 2026 09:55:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+0BoIAN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE2461F000E9;
+	Fri, 22 May 2026 09:59:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779443750;
-	bh=JRFSjJVMhkW1cVbO5EZHBHBVGeP4fldmDfewlQIeZHQ=;
+	s=k20260515; t=1779443952;
+	bh=Lq6FzCC4KbteJ9kgvftpe86/zGobK0A72wn8P5God9Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Vm8X/Sothl2Nn/zf0Bb0WEHP96x5dzotEE5P5IfPVfKP32zy7i+W8E27CQyufPErX
-	 UvnHByI5C/V2SpU5wFfnFkXB2vxCS/Mpw7JwI42eKTi3OT1Luad62k4ijTYLmBNaod
-	 S9izOaUpvj1e4VDRtbfgDbGfFlEuG+8lQDQZ4DMp5RiePq/OnPz/+dh0fiZWRjkGHG
-	 WFLKBYz8Sa49i4A1GZR6OqOkJx9P89uk7Iych/5dpSkvgpSZ7HOwPtRIqfM+H3tK/6
-	 JPIw5IQQf4u9OcbtrZlIiQg1LoEQNWV3eSDEHQlklsCp4ITfg+c8QflxnUAQDvwoHt
-	 IXjWf22m21x3w==
+	b=a+0BoIANfJoxAw5Ex6FiTjmcoAyM5OY+Tqu9spimOb+fiTeVzrfzisFmmBAZrQtBM
+	 a/xhzqo9ESOwirQxYbtIDkeGwoPZaYpSJUBDxGAGKZsC2P3wjyrTSkixc84M7AZEiG
+	 nki8LKsCzZ6iqZV4YBdzmDUH3Z3xZ9lbgv3oSCCpVjAviivm0PoYVKlAEcbCBQD/dg
+	 iYMzqyMLs1JCGdKrphV+SznVU9vSgN0d48e0fAFJJ0WdRo/3czCG5YMoFNgkD6qG5L
+	 bo3emt0Knfj1G+S7e57RVNZtzzWxj2tQXZ7uveEvtlP8DiJ1Tf1R0Ymht+2luf9RsL
+	 650k9hqWWXEBQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wQMba-00000005AaP-0q1s;
-	Fri, 22 May 2026 09:55:47 +0000
-Date: Fri, 22 May 2026 10:58:56 +0100
-Message-ID: <87jysvahpb.wl-maz@kernel.org>
+	id 1wQMer-00000005AhL-2LWF;
+	Fri, 22 May 2026 09:59:10 +0000
+Date: Fri, 22 May 2026 11:02:20 +0100
+Message-ID: <87ik8fahjn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>,
+	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -62,12 +61,12 @@ Cc: kvm@vger.kernel.org,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 04/44] arm64: RMI: Add SMC definitions for calling the RMM
-In-Reply-To: <3261b04f-1a0c-451d-8981-1e2bccc8a9ca@arm.com>
+Subject: Re: [PATCH v14 09/44] arm64: RMI: Provide functions to delegate/undelegate ranges of memory
+In-Reply-To: <a81c3688-30f1-43e4-8d57-1d08a6e563af@arm.com>
 References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-5-steven.price@arm.com>
-	<86ecj5vsu4.wl-maz@kernel.org>
-	<3261b04f-1a0c-451d-8981-1e2bccc8a9ca@arm.com>
+	<20260513131757.116630-10-steven.price@arm.com>
+	<867bowx3qx.wl-maz@kernel.org>
+	<a81c3688-30f1-43e4-8d57-1d08a6e563af@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,182 +78,115 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 21 May 2026 16:33:09 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On Thu, 21 May 2026 17:01:37 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> On 21/05/2026 13:40, Marc Zyngier wrote:
-> > On Wed, 13 May 2026 14:17:12 +0100,
+> On 21/05/2026 14:59, Marc Zyngier wrote:
+> > On Wed, 13 May 2026 14:17:17 +0100,
 > > Steven Price <steven.price@arm.com> wrote:
-> >>
-> >> The RMM (Realm Management Monitor) provides functionality that can be
-> >> accessed by SMC calls from the host.
-> >>
-> >> The SMC definitions are based on DEN0137[1] version 2.0-bet1
-> >>
-> >> [1] https://developer.arm.com/documentation/den0137/2-0bet1/
-> >>
+> >> 
+> >> The RMM requires memory is 'delegated' to it so that it can be used
+> >> either for a realm guest or for various tracking purposes within the RMM
+> >> (e.g. for metadata or page tables). Memory that has been delegated
+> >> cannot be accessed by the host (it will result in a Granule Protection
+> >> Fault).
+> >> 
+> >> Undelegation may fail if the memory is still in use by the RMM. This
+> >> shouldn't happen (Linux should ensure it has destroyed the RMM objects
+> >> before attempting to undelegate). In the event that it does happen this
+> >> points to a programming bug and the only reasonable approach is for the
+> >> physical pages to be leaked - it is up to the caller of
+> >> rmi_undelegate_range() to handle this.
+> >> 
 > >> Signed-off-by: Steven Price <steven.price@arm.com>
 > >> ---
-> >> Changes since v13:
-> >>  * Updated to RMM spec v2.0-bet1
-> >> Changes since v12:
-> >>  * Updated to RMM spec v2.0-bet0
-> >> Changes since v9:
-> >>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
-> >>    this is an 8-bit type with padding afterwards (rather than a u64).
-> >> Changes since v8:
-> >>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
-> >>    permits to be modified.
-> >> Changes since v6:
-> >>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
-> >>    these are flag values.
-> >> Changes since v5:
-> >>  * Sorted the SMC #defines by value.
-> >>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
-> >>    RMI calls.
-> >>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
-> >>    number of available list registers could be lower.
-> >>  * Provided a define for the reserved fields of FeatureRegister0.
-> >>  * Fix inconsistent names for padding fields.
-> >> Changes since v4:
-> >>  * Update to point to final released RMM spec.
-> >>  * Minor rearrangements.
-> >> Changes since v3:
-> >>  * Update to match RMM spec v1.0-rel0-rc1.
-> >> Changes since v2:
-> >>  * Fix specification link.
-> >>  * Rename rec_entry->rec_enter to match spec.
-> >>  * Fix size of pmu_ovf_status to match spec.
+> >> v14:
+> >>   * Split into separate patch and moved out of KVM
 > >> ---
-> >>  arch/arm64/include/asm/rmi_smc.h | 448 +++++++++++++++++++++++++++++++
-> >>  1 file changed, 448 insertions(+)
-> >>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
-> >>
-> >> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> >> new file mode 100644
-> >> index 000000000000..a09b7a631fef
-> >> --- /dev/null
-> >> +++ b/arch/arm64/include/asm/rmi_smc.h
-> >> @@ -0,0 +1,448 @@
-> >> +/* SPDX-License-Identifier: GPL-2.0 */
-> >> +/*
-> >> + * Copyright (C) 2023-2026 ARM Ltd.
-> >> + *
-> >> + * The values and structures in this file are from the Realm Management Monitor
-> >> + * specification (DEN0137) version 2.0-bet1:
-> >> + * https://developer.arm.com/documentation/den0137/2-0bet1/
+> >>   arch/arm64/include/asm/rmi_cmds.h | 13 +++++++++++
+> >>   arch/arm64/kernel/rmi.c           | 36 +++++++++++++++++++++++++++++++
+> >>   2 files changed, 49 insertions(+)
+> >> 
+> >> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+> >> index 9078a2920a7c..eb213c8e6f26 100644
+> >> --- a/arch/arm64/include/asm/rmi_cmds.h
+> >> +++ b/arch/arm64/include/asm/rmi_cmds.h
+> >> @@ -33,6 +33,19 @@ struct rmi_sro_state {
+> >>   } while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
+> >>   	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
+> >>   +int rmi_delegate_range(phys_addr_t phys, unsigned long size);
+> >> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
+> >> +
+> >> +static inline int rmi_delegate_page(phys_addr_t phys)
+> >> +{
+> >> +	return rmi_delegate_range(phys, PAGE_SIZE);
+> >> +}
+> >> +
+> >> +static inline int rmi_undelegate_page(phys_addr_t phys)
+> >> +{
+> >> +	return rmi_undelegate_range(phys, PAGE_SIZE);
+> >> +}
+> >> +
+> >>   bool rmi_is_available(void);
+> >>     unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t
+> >> gfp);
+> >> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
+> >> index 52a415e99500..08cef54acadb 100644
+> >> --- a/arch/arm64/kernel/rmi.c
+> >> +++ b/arch/arm64/kernel/rmi.c
+> >> @@ -12,6 +12,42 @@ static bool arm64_rmi_is_available;
+> >>   unsigned long rmm_feat_reg0;
+> >>   unsigned long rmm_feat_reg1;
+> >>   +int rmi_delegate_range(phys_addr_t phys, unsigned long size)
+> >> +{
+> >> +	unsigned long ret = 0;
+> >> +	unsigned long top = phys + size;
+> >> +	unsigned long out_top;
+> >> +
+> >> +	while (phys < top) {
+> >> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
+> >> +		if (ret == RMI_SUCCESS)
+> >> +			phys = out_top;
+> >> +		else if (ret != RMI_BUSY && ret != RMI_BLOCKED)
+> >> +			return ret;
+> >> +	}
+> >> +
+> >> +	return ret;
+> >> +}
+> >> +
+> >> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size)
+> >> +{
+> >> +	unsigned long ret = 0;
+> >> +	unsigned long top = phys + size;
+> >> +	unsigned long out_top;
+> >> +
+> >> +	WARN_ON(size == 0);
 > > 
-> > How long is this spec going to be available on the ARM web site, which
-> > has a tendency of being reorganised every other week? And there is
-> > already a beta2.
-> 
-> Obviously I can't predict the next reorganisation - but at least it's a
-> link that could be fed into archive.org or similar.
-
-I found that the PDF spec was less susceptible to creative nonsense,
-and people can download it for future reference, whereas ARM has
-happily *deleted* specs from the website over time (try to find PSCI
-0.1, for example...).
-
-[...]
-
-> >> +struct realm_params {
-> >> +	union { /* 0x0 */
-> >> +		struct {
-> >> +			u64 flags;
-> >> +			u64 s2sz;
-> >> +			u64 sve_vl;
-> >> +			u64 num_bps;
-> >> +			u64 num_wps;
-> >> +			u64 pmu_num_ctrs;
-> >> +			u64 hash_algo;
-> >> +			u64 num_aux_planes;
-> >> +		};
-> >> +		u8 padding0[0x400];
+> > I find it odd to warn on size = 0. After all, free(NULL) is not an
+> > error. But even then, you continue feeding this to the RMM.
 > > 
-> > SZ_1K? And similarly all over the shop?
+> > You also don't seem to be bothered with that on the delegation side...
+> > 
+> >> +
+> >> +	while (phys < top) {
+> >> +		ret = rmi_granule_range_undelegate(phys, top, &out_top);
+> >> +		if (ret == RMI_SUCCESS)
+> >> +			phys = out_top;
+> > 
+> > and size==0 doesn't violate any of the failure conditions listed in
+> > B4.5.18.2 (beta2). Will you end-up looping around forever?
 > 
-> I'm a bit less sure that makes the code more readable - these structures
-> are a bit of a pain because they are somewhat sparse. I've left a
-> comment where the beginning of each union is, and personally I find it
-> easier to see 0x0 + 0x400 == 0x400 rather than trying to work out what
-> SZ_1K is in hex. This is particularly the case in terms of:
+> That is not true ? It triggers, top_bound error condition, for both.
 > 
-> > struct rec_params {
-> > 	union { /* 0x0 */
-> > 		u64 flags;
-> > 		u8 padding0[0x100];
-> > 	};
-> > 	union { /* 0x100 */
-> > 		u64 mpidr;
-> > 		u8 padding1[0x100];
-> > 	};
-> > 	union { /* 0x200 */
-> > 		u64 pc;
-> > 		u8 padding2[0x100];
-> > 	};
-> > 	union { /* 0x300 */
-> > 		u64 gprs[REC_CREATE_NR_GPRS];
-> > 		u8 padding3[0xd00];
-> > 	};
-> > };
 > 
-> Where 0xd00 doesn't even have a correspoding SZ_ define.
+> pre: UInt(top) <= UInt(base)
+> post: result.status == RMI_ERROR_INPUT
 
-Indeed, but it is (SZ_4K - SZ_256 * 3). And a lot of these structures
-seem to be designed to form a 4kB blob. I'm sure we can make use of
-that information (BUILD_BUG_ON?).
-
-> 
-> The RMM deals with this with macro magic:
-> 
-> > struct rmi_rec_params {
-> >         /* Flags */
-> >         SET_MEMBER_RMI(unsigned long flags, 0, 0x100);  /* Offset 0 */
-> >         /* MPIDR of the REC */
-> >         SET_MEMBER_RMI(unsigned long mpidr, 0x100, 0x200);      /* 0x100 */
-> >         /* Program counter */
-> >         SET_MEMBER_RMI(unsigned long pc, 0x200, 0x300); /* 0x200 */
-> >         /* General-purpose registers */
-> >         SET_MEMBER_RMI(unsigned long gprs[REC_CREATE_NR_GPRS], 0x300, 0x1000); /* 0x300 */
-> > };
-> 
-> where the offsets are just directly encoded in the macro - but it's not
-> an especially robust macro and I'm not convinced it's more readable.
-
-I think this is just as horrible, but at least it seems to take the
-boundaries of the structure into account.
-
->
-> I'm happy to hear other suggestions on how to encode this neatly.
-
-Honestly, I wouldn't mind having the structures described in a more
-abstract way and then pre-processed to generate the include files. If
-the architectural MRS wasn't so huge, I would have added it to the
-kernel and used that directly for KVM.
-
->
-> > I haven't checked the details of the encodings (life is too short),
-> > but I wonder how much of this exists as an MRS and could be
-> > automatically generated?
-> 
-> Automatically generating this would be good - I'm not sure whether we
-> have a (public) source available to generate from at the moment. I have
-> tried to methodically work through the spec when updating this file, but
-> as Gavin has already pointed out there was at least one mistake (in
-> currently unused definitions) this time.
-
-I'm slightly baffled that even the RMM is written this way. Given the
-formalism used in the RMM spec, I was expecting that you'd have a
-bunch of JSON at hand and able to generate any output from that. Doing
-this stuff by hand is both incredibly dull work *and* extremely error
-prone.
-
-Thanks,
+News flash, I can't read. Ignore me.
 
 	M.
 
