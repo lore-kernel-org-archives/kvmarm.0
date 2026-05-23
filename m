@@ -1,149 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8FA328611;
-	Fri, 22 May 2026 18:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFA2EEBB;
+	Sat, 23 May 2026 00:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779472822; cv=none; b=At1hNBPjKni4Ct8L3FpH5w9Sh32jEcfwiLkGGODiPyIa+cUEVbQt5sspB79ad+MwGZnyTXZHXnmQ/B1bKZsjl1a1VCrZhphyv3sCcb7dU0cAZQQ973BKMHGJi+nQZaUWVw1iBJJWUJpvoJrZagunsRHfzdJPDKiQP4PZlRilXA8=
+	t=1779495114; cv=none; b=kCTOAKmw+1Rb+avNcLFitXVAn1grBmzbulAHyRj9HrtQR0obaCsgPiYhvu1Vxila0IQmPuYKQDZ64ToLy5S8qooOq5XstOtdBx1lPe9so35EheYBndsB36EBWH7kfdrfEo8LHbziV+h/ATPs55C1M3sNmDs/OUuLqjDQJkT901g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779472822; c=relaxed/simple;
-	bh=NuFpAbhy7SIcpHNtP51CJ5XzabRJU55tghTXRronQQ8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=JNgr3aBkjGUTpdHYEhMPygNwwbAvlsAWwQg+W/7mAMm7FE92XSGYsXauNKdqCVl3fptbL5o/GblsJU1E9jbaXkV46Z+PH3iHk9Mgv3K2CHVG7G+cDkyZeq95l0UMWe+fen8LLVxzpmV6DYX9Ype6yZ1YK0vSU90N9lpwK5BORaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGC7snl+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779495114; c=relaxed/simple;
+	bh=4gyir+4v/cozik3PIc8+RTGqZfUKwoEQ7fgVVJgADsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jFCj3u8FgrSpuw4u2fX/GIKEBIwaFxSuXziLZCRcLluxySI7GLQ0fvZy9s1zqEDXnt61XTUdYiCU39V8n4NRk57RqX4fRLUDVcUlD31ONw30CHNnkmVW82DtTTYhEqG0kOxjbJEqj/bMUVgZfdrLlNlyzjRApWSLO80ObDjBw2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QfQZM2qZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGC7snl+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 083821F000E9;
-	Fri, 22 May 2026 18:00:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QfQZM2qZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D45F1F000E9;
+	Sat, 23 May 2026 00:11:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779472820;
-	bh=zaYaOdDDdM4eMMiXs7oSYVChBLimpl06io6NldbGQpU=;
-	h=From:Date:Subject:To:Cc;
-	b=EGC7snl+DtLrdxQZPCIkUcxv3YPJXwjOW8fF87TPr7o7XCwgE1+QoRcJXu4UCF/KX
-	 paR7up5fOsGSAcdt4ZHT1YmAEsY9mT6keVmYwbKWufUe18ur6BfVLf2hAdFrunYgf0
-	 nSmcAFxZ7Wgj+B39rsTLdQAiiqgVWqOVPao70sex3tDa5Cr7WgWEwI1dw17//Xk/EC
-	 1iqSk+7xhklcX+8uusSpdTyfXMTmfv2mbrtbklrjH6jZVoTjwDdt2+Khy5tnnWLMvc
-	 oGx+Atyav1BCfdwsfeeGc67ff33oFc1+EirWZ3HWZ/SjPPyFgglXW/wvw7n5ewTF1R
-	 1IG25UhoK5Bmg==
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 22 May 2026 19:00:04 +0100
-Subject: [PATCH] KVM: arm64: Preserve all guest ZCR_EL2.LEN values
+	s=k20260515; t=1779495113;
+	bh=UOdjcdrieoIVhDjSmGmUc8dVnOKSpLVQHovlfDmXAb4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QfQZM2qZToodXI72EM2dRbFKuAXhioJ6ijpdSXMpkvZbzz8PQPYBYLax+Z8+Pn9H8
+	 B8LN5btyBUxe/KdCJZtqNnyccSPo8SXTGk7JhaiV7unVL9vO4pNsKGH9UQJYZm9MZv
+	 GNbJiWozXu3o+djzKrAa0nuO6ROYrHeGyn49ZxyYZhW9j67RCwr0HjD14c9TblisKT
+	 v++jtLxD4fuxf3NPQjUleVqlXUklC2odqo+kEi7mVQ0GtS7CtSO3vXXSkuYL0w6YMt
+	 7AZPriv2QJ6YfznX+yej7YTtSlB1u2T735aKrmNhnFk5d9YyLTvCM4Kkhf0HAo5h0p
+	 k0b2g5+g+t/Tw==
+Date: Fri, 22 May 2026 17:11:48 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Sudeep Holla <sudeep.holla@kernel.org>
+Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: Re: [PATCH 2/4] firmware: arm_ffa: Register core as a platform driver
+Message-ID: <20260523001148.GA1319283@ax162>
+References: <20260508-b4-ffa_plat_dev-v1-0-c5a30f8cf7b8@kernel.org>
+ <20260508-b4-ffa_plat_dev-v1-2-c5a30f8cf7b8@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKOZEGoC/yXMUQrCMBCE4auUfXYhCdoSryI+pHFsV22UjQax9
- O5G+/jBzD9Thgoy7ZuZFEWy3FOF3TQUx5AGsJyqyRnXmp31fC0TB53aLZ/lzZ+ofEPiVNjDo+s
- DjHWB6v2hqIt/+nBcnV/9BfH569GyfAF5x4K4fAAAAA==
-X-Change-ID: 20260519-kvm-arm64-fix-zcr-len-nv-9e9e7bae012a
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3374; i=broonie@kernel.org;
- h=from:subject:message-id; bh=NuFpAbhy7SIcpHNtP51CJ5XzabRJU55tghTXRronQQ8=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqEJmw5sPUxxYu5BdKH7PXAjJE9yYbrnRA6tzAs
- TCvvMaEwcqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCahCZsAAKCRAk1otyXVSH
- 0FCWB/9fbZOC9HhqXlHPnU+iZ33L/WZnir6QyHwm+p8OOR2YEblEcEVeCWgahGXvRPfXf8SZW3q
- 6NkPQ7H8Zc5yJW4dgCMNnd1MNmtGcrABBP4XLSPrhKcIsdn6OLWXokrLDU87o+mA4C7BhIBGD2J
- CN/QmMPit7BgPp6AolUalC09jxvPD61cYRFHbw52+weygfFbo/LPA8IL/vsP1CKGq/mgoZRbX0/
- M1AaO4/zIeU0qFSboxeLsBvl7JyKrnP7LIBUowLD4z/wNkcKFeLs16S1k68bBsqGP1PYBfKOpQq
- uUL30hWrKTF6yKqhE1LQizAWoHaMpFEkhGfYEr1qUxpPELPJ
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260508-b4-ffa_plat_dev-v1-2-c5a30f8cf7b8@kernel.org>
 
-Since b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps") when guests
-write to ZCR_EL2 we have clamped the value of ZCR_EL2.LEN to be at most
-that configuring the maximum guest VL. This is not the behaviour the
-architecture documents for ZCR_EL2.LEN, the expectation is that all bits
-will be read as written. Further, writing values larger than the largest
-available vector length is part of the documented procedure for enumerating
-the supported vector lengths so we expect to see this happen in practice.
+Hi Sudeep,
 
-The reasoning for the current behaviour is not specifically articulated, my
-best guess is that it is intended to ensure that the guest can not see an
-effective VL greater than the maximum that has been configured. This can
-instead be achieved by configuring ZCR_EL2 when loading guest state:
+On Fri, May 08, 2026 at 06:54:16PM +0100, Sudeep Holla wrote:
+> Move the FF-A core bring-up and teardown paths into platform driver
+> probe and remove callbacks, and register a synthetic arm-ffa platform
+> device to bind the driver.
+> 
+> This makes the FF-A core lifetime follow the driver model while keeping
+> the device creation internal to the FF-A core. Use normal platform driver
+> registration so the probe path has standard driver-core semantics.
+> 
+> The synthetic platform device is a temporary bridge until ACPI and
+> devicetree describe the FF-A core device or object. Once those firmware
+> description paths are defined, the internal platform device creation can
+> be dropped and the driver can bind to the firmware-described device
+> directly.
+> 
+> Since the transport selection now happens from the platform probe path,
+> drop the __init annotation from ffa_transport_init().
+> 
+> Signed-off-by: Sudeep Holla <sudeep.holla@kernel.org>
 
- - When running at EL0 or EL1 configure ZCR_EL2.LEN to the minimum of the
-   guest ZCR_EL2.LEN and vcpu_sve_max_vq(vcpu)-1.
- - When running at EL2 configure the maximum VL for the guest in
-   ZCR_EL2.LEN like we do for non-nested guests and load the guest
-   ZCR_EL2 into ZCR_EL1.
+I am seeing
 
-This will ensure that the guest sees both the ZCR_EL2.LEN value which it
-wrote and the effective VL that resulting from the values it has configured
-in ZCR_ELx.LEN.
+  arm-ffa arm-ffa: probe with driver arm-ffa failed with error -95
 
-Currently all other bits in ZCR_EL2 are either RES0 or RAZ/WI, values
-written are sanitised based on this.
+on my two arm64 test machines after this change landed in -next as
+commit e659fc8e537c ("firmware: arm_ffa: Register core as a platform
+driver"), is this expected? If so, perhaps it should be silenced?
 
-Fixes: b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 8 ++++----
- arch/arm64/kvm/sys_regs.c               | 6 +-----
- 2 files changed, 5 insertions(+), 9 deletions(-)
+Cheers,
+Nathan
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index bf0eb5e43427..fd277cb70967 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -501,11 +501,11 @@ static inline void fpsimd_lazy_switch_to_guest(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	if (vcpu_has_sve(vcpu)) {
-+		zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-+
- 		/* A guest hypervisor may restrict the effective max VL. */
--		if (is_nested_ctxt(vcpu))
--			zcr_el2 = __vcpu_sys_reg(vcpu, ZCR_EL2);
--		else
--			zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-+		if (is_nested_ctxt(vcpu) && !is_hyp_ctxt(vcpu))
-+			zcr_el2 = min(zcr_el2, __vcpu_sys_reg(vcpu, ZCR_EL2));
- 
- 		write_sysreg_el2(zcr_el2, SYS_ZCR);
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 148fc3400ea8..c4d3bbae2d14 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2862,8 +2862,6 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
--	unsigned int vq;
--
- 	if (guest_hyp_sve_traps_enabled(vcpu)) {
- 		kvm_inject_nested_sve_trap(vcpu);
- 		return false;
-@@ -2874,9 +2872,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
- 		return true;
- 	}
- 
--	vq = SYS_FIELD_GET(ZCR_ELx, LEN, p->regval) + 1;
--	vq = min(vq, vcpu_sve_max_vq(vcpu));
--	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, vq - 1);
-+	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, p->regval & ZCR_ELx_LEN);
- 	return true;
- }
- 
-
----
-base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
-change-id: 20260519-kvm-arm64-fix-zcr-len-nv-9e9e7bae012a
-
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
-
+# bad: [c1ecb239fa3456529a32255359fc78b69eb9d847] Add linux-next specific files for 20260522
+# good: [6779b50faa562e6cca1aa6a4649a4d764c6c7e28] Merge tag 'pci-v7.1-fixes-2' of git://git.kernel.org/pub/scm/linux/kernel/git/pci/pci
+git bisect start 'c1ecb239fa3456529a32255359fc78b69eb9d847' '6779b50faa562e6cca1aa6a4649a4d764c6c7e28'
+# bad: [c09bb0d7c56d56daed51e374409472c3fece9931] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/ath/ath.git
+git bisect bad c09bb0d7c56d56daed51e374409472c3fece9931
+# bad: [42b0664d6f7b3d04f961e0709811280e52d4d39c] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/geert/linux-m68k.git
+git bisect bad 42b0664d6f7b3d04f961e0709811280e52d4d39c
+# good: [63775c4b77cf7ac5863ae0e76f8626b80d217562] Merge branch 'mm-nonmm-unstable' of https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
+git bisect good 63775c4b77cf7ac5863ae0e76f8626b80d217562
+# good: [f437936af5c74fddfdfcd2388a5f1eec2f9a105b] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/khilman/linux-omap.git
+git bisect good f437936af5c74fddfdfcd2388a5f1eec2f9a105b
+# good: [01bf3f256f1ed15fa3884e4893e5a9d78fdfb2d6] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/mmind/linux-rockchip.git
+git bisect good 01bf3f256f1ed15fa3884e4893e5a9d78fdfb2d6
+# bad: [bee649097c8de82d9dccd3660c41163a6507e3d4] Merge branch 'next' of https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-tee.git
+git bisect bad bee649097c8de82d9dccd3660c41163a6507e3d4
+# bad: [82ccfdd8dd1e29229a3ed7c95a76578706fc4a1d] Merge branch 'for-next' of https://github.com/sophgo/linux.git
+git bisect bad 82ccfdd8dd1e29229a3ed7c95a76578706fc4a1d
+# good: [32bc5496b48174dbca1f187f710955ee4d9527a1] firmware: arm_scmi: Validate SENSOR_UPDATE payload size
+git bisect good 32bc5496b48174dbca1f187f710955ee4d9527a1
+# bad: [64251369d33884b431a52b89c60fabf466f3913c] Merge branches 'for-next/scmi/updates' and 'for-next/ffa/updates' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/sudeep.holla/linux into for-linux-next
+git bisect bad 64251369d33884b431a52b89c60fabf466f3913c
+# bad: [70492cfce2a4d41e87bf46989028a90f4bc6b38f] firmware: smccc: Fix Arm SMCCC SOC_ID name call
+git bisect bad 70492cfce2a4d41e87bf46989028a90f4bc6b38f
+# bad: [7fe2ec9fb8e9a78dad8d6b1e551cb4d126e36f1e] firmware: arm_ffa: Set the core device as FF-A device parent
+git bisect bad 7fe2ec9fb8e9a78dad8d6b1e551cb4d126e36f1e
+# bad: [e659fc8e537c7a21d5d693d6f30d8852f2fa8d91] firmware: arm_ffa: Register core as a platform driver
+git bisect bad e659fc8e537c7a21d5d693d6f30d8852f2fa8d91
+# good: [cc7e8f21b9f0c229d68cf19a837cba82b5ac2d87] Revert "firmware: arm_ffa: Change initcall level of ffa_init() to rootfs_initcall"
+git bisect good cc7e8f21b9f0c229d68cf19a837cba82b5ac2d87
+# first bad commit: [e659fc8e537c7a21d5d693d6f30d8852f2fa8d91] firmware: arm_ffa: Register core as a platform driver
