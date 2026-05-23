@@ -1,178 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F15233941;
-	Sat, 23 May 2026 08:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B93026D4DD;
+	Sat, 23 May 2026 14:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779525865; cv=none; b=UGduzEu6PFGM9EC7Qvj6ITVNFHEkcb8iCCs1Nde1A+9k93W/AjN0mGjH1HdEI0n2Il9Mmx2P5Cu5BnJJ79tsUoYKEmiLjYKmqVlW9uziqheyNkFlo7UQ1QOBJ8B4Sf5erk1DCLbnvaBa8uncCZikFKOcrBmGBbc3509Cce2n0DE=
+	t=1779547112; cv=none; b=t395PEiuw5Dm5v0Jt71iqF8O4MDS+KklwbaoTxxOq7B4NcsQbZTBQY5X6dQnYfiSuNIMyyEaaW2/usDL13PIwQLTvw10Th6TncvRq1tVFF5DYFwuYQzRTJl+awfTWQyNrKAodrIV8X+P3g0Y5jLyb9lqJUyDPvalQF34hx+zxDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779525865; c=relaxed/simple;
-	bh=80gmJzfafW5v0pD4rSYeqGkisuxd/UsImo1RzYeZcLo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cv/l+1JpywosXTBUCvtZYbPcLr6ut7AHfIRQwc3Y2QFRzuunM8kx9NgoXyCNZH9MlSJg4U4Agucdrtpnd/GfI9XDmVOledB0x7mQm46tSsVtXNnbIXmBLKHrAYUrPamCb9ejeP6DMfOSydLZ25uG1IGLF5X9hu5t1Ox2nJsZrzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5lJQaoX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779547112; c=relaxed/simple;
+	bh=023tlZF12dovue6J00qht1wkoW76tnUZMaZYDyRarQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NoO7ZykK32r8WCvioNWh3gQr7VrmIf4aJIc0abiQ3utLJwsyOj4xY2TgZWCgh2MgPXbA9T9QCNMpJyf8Chi4fiXAuw2LSH9MaInb4a+xzIl8rDzfglt8Z3Dw+05LKF+eLRvvtj6Kn/RIOWGgPDuXBLDhOKDY3kdxstjZmbKqeC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KcoMatwx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5lJQaoX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D40821F00A3A;
-	Sat, 23 May 2026 08:44:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KcoMatwx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20ABD1F000E9;
+	Sat, 23 May 2026 14:38:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779525863;
-	bh=Wjd5EPtpM354Dd7ZDs5Vo2HEh22G1p5pQw/m/3w/sQY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=h5lJQaoX6ktuOV9HMIQg+/BaKYiIGAlXy94RLLCWuZglA/2mPOJXIEBs+iMJXrJVd
-	 0/fGFGs4huMFIOh2mwzI/lKWng4pW6mqAH1UR0AF3kxXzJFzAtGqM1ZkgwGW5vTVQZ
-	 N9JGxX0Sb2mXb+y60ZfQJIgZzIBmK+/U9H5/cAgDRpntmBFUnlnNqZD54uZcQ+LgB1
-	 zTKkOPK1KM3cewEDhp6FhQ5+x/fgFYc/TUjLfbNGYJcfcM1s71jtpEyPTRXLbOkeSd
-	 BL7rWa3ubIkAKjNm9Tz0bk3VRXK0MpQ2F7Zi96gvGyah7w78zoZebbW6nXHe053Pq5
-	 CAp8Fy346D4dA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wQhy1-00000005VBn-2DfZ;
-	Sat, 23 May 2026 08:44:21 +0000
-Date: Sat, 23 May 2026 09:47:38 +0100
-Message-ID: <87h5nya4wl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=k20260515; t=1779547111;
+	bh=/+ubvDUlSsvQcamv6R6/8JNc1sEXNBLDKT0SjoQyXvM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KcoMatwxjKddir3IoKztxEj1GkTKlI9B5yeKq8fTprt/TMC7Dz7ZbiTzP6NKuRXML
+	 NpcfWdUBHoxrK2CNpmviC1IteTr1V8SCcGf65drd7glqzYhluE5NreS/CXC9MaS0hf
+	 jAr228hK1ElQnPhI9MHXrQg1Eo6SsWcF0NOho+MWcGEQ0qC/oTZZIbaBG1CTzu4uNM
+	 X5aGux7w36uixb7IMB47COOBphy1CcLRWZ48tYae4DIppHZnUuCilWEW57jOmBkCEN
+	 Eq7smvv9A4vTqofgtSMeA9PX2IbOkkJQsOX5NwcKarL2wNNJgAvGEog3vG/TV53hBx
+	 JG1PcXv6bwjyQ==
+Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
+	id 31D2A3036D4; Sat, 23 May 2026 15:38:28 +0100 (BST)
+Date: Sat, 23 May 2026 15:38:28 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] KVM: arm64: Preserve all guest ZCR_EL2.LEN values
-In-Reply-To: <20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org>
+Message-ID: <ahG75BY6yvaePj-B@sirena.org.uk>
 References: <20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <87h5nya4wl.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Fl2vJPm84SLt6fHJ"
+Content-Disposition: inline
+In-Reply-To: <87h5nya4wl.wl-maz@kernel.org>
+X-Cookie: Don't hit the keys so hard, it hurts.
 
-On Fri, 22 May 2026 19:00:04 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> Since b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps") when guests
-> write to ZCR_EL2 we have clamped the value of ZCR_EL2.LEN to be at most
-> that configuring the maximum guest VL.
 
-That's not strictly true. This is only clamped when accessed as
-ZCR_EL2. A VHE guest will happily use the ZCR_EL1 accessor for the
-same register, and not see the truncation. This has ripple effects
-down the line, where the full value will be used at load time.
+--Fl2vJPm84SLt6fHJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> This is not the behaviour the
-> architecture documents for ZCR_EL2.LEN, the expectation is that all bits
-> will be read as written. Further, writing values larger than the largest
-> available vector length is part of the documented procedure for enumerating
-> the supported vector lengths so we expect to see this happen in practice.
-> 
-> The reasoning for the current behaviour is not specifically articulated, my
-> best guess is that it is intended to ensure that the guest can not see an
-> effective VL greater than the maximum that has been configured. This can
-> instead be achieved by configuring ZCR_EL2 when loading guest state:
-> 
->  - When running at EL0 or EL1 configure ZCR_EL2.LEN to the minimum of the
->    guest ZCR_EL2.LEN and vcpu_sve_max_vq(vcpu)-1.
+On Sat, May 23, 2026 at 09:47:38AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-This is not EL0 or EL1. This is when in a nested context (i.e. running
-a L2 guest), as EL0 exists for L1 as well.
+> > The reasoning for the current behaviour is not specifically articulated, my
+> > best guess is that it is intended to ensure that the guest can not see an
+> > effective VL greater than the maximum that has been configured. This can
+> > instead be achieved by configuring ZCR_EL2 when loading guest state:
 
->  - When running at EL2 configure the maximum VL for the guest in
->    ZCR_EL2.LEN like we do for non-nested guests and load the guest
->    ZCR_EL2 into ZCR_EL1.
-> 
-> This will ensure that the guest sees both the ZCR_EL2.LEN value which it
-> wrote and the effective VL that resulting from the values it has configured
-> in ZCR_ELx.LEN.
-> 
-> Currently all other bits in ZCR_EL2 are either RES0 or RAZ/WI, values
-> written are sanitised based on this.
+> >  - When running at EL0 or EL1 configure ZCR_EL2.LEN to the minimum of the
+> >    guest ZCR_EL2.LEN and vcpu_sve_max_vq(vcpu)-1.
 
-Only for the direct writes to ZCR_EL2, as they are trapping. I don't
-see any sanitisation for writes using the ZCR_EL1 accessor, which is
-the common case. This needs fixing at the same time.
+> This is not EL0 or EL1. This is when in a nested context (i.e. running
+> a L2 guest), as EL0 exists for L1 as well.
 
-> 
-> Fixes: b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Sorry, this was intended to be specifically for a L2 guest but didn't
+actually say that.  I originally had more verbosity in the commit log
+that I cleaned up too much, making things unclear.  I will clarify.
 
-Given the nature of the bug, this needs a Cc: stable.
+> > Currently all other bits in ZCR_EL2 are either RES0 or RAZ/WI, values
+> > written are sanitised based on this.
 
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 8 ++++----
->  arch/arm64/kvm/sys_regs.c               | 6 +-----
->  2 files changed, 5 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index bf0eb5e43427..fd277cb70967 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -501,11 +501,11 @@ static inline void fpsimd_lazy_switch_to_guest(struct kvm_vcpu *vcpu)
->  		return;
->  
->  	if (vcpu_has_sve(vcpu)) {
-> +		zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-> +
->  		/* A guest hypervisor may restrict the effective max VL. */
-> -		if (is_nested_ctxt(vcpu))
-> -			zcr_el2 = __vcpu_sys_reg(vcpu, ZCR_EL2);
-> -		else
-> -			zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-> +		if (is_nested_ctxt(vcpu) && !is_hyp_ctxt(vcpu))
-> +			zcr_el2 = min(zcr_el2, __vcpu_sys_reg(vcpu, ZCR_EL2));
+> Only for the direct writes to ZCR_EL2, as they are trapping. I don't
+> see any sanitisation for writes using the ZCR_EL1 accessor, which is
+> the common case. This needs fixing at the same time.
 
-Why the change in the condition guarding this? Given the definition of
-is_nested_ctxt(), this seems unnecessary.
+OK, I'll convert ZCR_EL2 to a sanitised register.  As I mentioned I was
+a bit confused about why the existing code is the way it is and so
+followed it in only managing the direct writes.  I figured it was
+considered OK to rely on the hardware for the RES0 and WI behaviour for
+untrapped access.
 
->
->  		write_sysreg_el2(zcr_el2, SYS_ZCR);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 148fc3400ea8..c4d3bbae2d14 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2862,8 +2862,6 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
->  			   struct sys_reg_params *p,
->  			   const struct sys_reg_desc *r)
->  {
-> -	unsigned int vq;
-> -
->  	if (guest_hyp_sve_traps_enabled(vcpu)) {
->  		kvm_inject_nested_sve_trap(vcpu);
->  		return false;
-> @@ -2874,9 +2872,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
->  		return true;
->  	}
->  
-> -	vq = SYS_FIELD_GET(ZCR_ELx, LEN, p->regval) + 1;
-> -	vq = min(vq, vcpu_sve_max_vq(vcpu));
-> -	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, vq - 1);
-> +	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, p->regval & ZCR_ELx_LEN);
+> > -		if (is_nested_ctxt(vcpu)) -			zcr_el2
+> > = __vcpu_sys_reg(vcpu, ZCR_EL2); -		else -
+> > zcr_el2 = vcpu_sve_max_vq(vcpu) - 1; +		if
+> > (is_nested_ctxt(vcpu) && !is_hyp_ctxt(vcpu)) +
+> > zcr_el2 = min(zcr_el2, __vcpu_sys_reg(vcpu, ZCR_EL2));
 
-Once you have added the full ZCR_EL2 sanitisation, this masking can go.
+> Why the change in the condition guarding this? Given the definition of
+> is_nested_ctxt(), this seems unnecessary.
 
->  	return true;
->  }
+You're right, this change is not needed.  I had misremembered what
+is_nested_ctxt() was checking.
 
-Thanks,
+--Fl2vJPm84SLt6fHJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-	M.
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Jazz isn't dead. It just smells funny.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoRu9sACgkQJNaLcl1U
+h9C/VAf8CHZI6LDLsoBR45fz935sHLDY6GBcMRErBG6zSvckEaREGCpajYeVTdTK
+7GAi1UK0NMGWmS37NR6mIm745ua6rqg0Sxs+U0ZX83O38reW3XNtJWnnpXfk2nJ2
+WZbUH35PBd0uaOQrKsCY0WxkS1Kmau/4Dx7GcUhS8orQl5PbCz7EVP6i1+IDjzai
+yW6fCJk4o5TLrYJrgAzgvnup1U3tHEusmWQSo60pFOQ7lG+EPuwljWJ77ocXtlLT
+7MYzk8cs2trZxO8oWT7Atu1tomCgDSdpXU9bZC24r/zzP3X83187ymk0yc34WD6x
++Fh+zTBHHV5neQDlJre0nVfezhQI2w==
+=abUa
+-----END PGP SIGNATURE-----
+
+--Fl2vJPm84SLt6fHJ--
