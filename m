@@ -1,108 +1,150 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DB91F09A8
-	for <kvmarm@lists.linux.dev>; Sat, 23 May 2026 06:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066A45B1EB
+	for <kvmarm@lists.linux.dev>; Sat, 23 May 2026 08:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779517673; cv=none; b=Beql68mk1mpVTRmduFBncbGxU+D0N0gmC8lNUkxEnFYinwMTQLkTCNS6WgqO5qu7s4LaYTFfynVw8T8o9sIddE15ZvIdmcLFcuekDVmeV7yYyhGtvYEmgZPKo0H6kJhD5iiwrR9Vm6oaOuDiQCybqyQ4idKhuSee0My2eqrdssE=
+	t=1779523422; cv=none; b=Nob1DqpXjJBWCEOzXdiJr8RhwhroICSvqJfDsEZTQA1QWkb2m842KkPOu9yVEUHR2HRRh9a9mSua0LtmP6ZOJ+K1TjvLVN4nnWL4u9aK6oRAaV8OB05sfjZAIjG/pFY5a/TtfEax1abwh2fq2/DvRojKdKuO0tYIzIhRkO9Y5JQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779517673; c=relaxed/simple;
-	bh=JEVR6CkLj/c0gaMD1sZUS4SWLivaFbisW4FMLpwuuDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pbq/girzGJE5u0NofQRHDKwM55DQq8CWpJ0YgBhZ1jN6WOCi1bHBY/p59ewb8nWSW/vxY4m7qWrgz+FSactctYYWyx6DDfq5zcZgtTZCtBhCNBeOkcSlAKX0lrGWNbIJd3yTHoA/x34kbEsBWJJRCzfvfvDBDzuPllW2BRLxn28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=uIQJFM/c; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779523422; c=relaxed/simple;
+	bh=qz6D3f3YJ2k4+mQtE6g0uFyZLHw2nxe5jE72RTocq8g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LIRwJVvrm2lSwzOHTF4E1yeAz5vp677S+/w3g24ljf6jATqC0NuFhkrAJDJaA/z3cMQXBVgbknoC3lMXvLIDStedzelMR8BrqQVoeqTNnppDkTZuYEoas+3A5bp5bS7gkkVaDkJQSPtcw0UcPPcrbW/jMn+X+7lvDHF76gssqq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TmXWnTrE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="uIQJFM/c"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A2C21F02;
-	Fri, 22 May 2026 23:27:46 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 211CB3F7B4;
-	Fri, 22 May 2026 23:27:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779517671; bh=JEVR6CkLj/c0gaMD1sZUS4SWLivaFbisW4FMLpwuuDg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uIQJFM/cEmjlN4stENbpOIKjt/iyaSbTyh5hLaLGIXxF5+qBDVQp/OE3m2CxHVp/O
-	 sWtBL7579DfUCAmc8WHI8dr0MQGjw0iVJjBYEegAij/WaCFEgrX6P4bNO4EZyU8DAI
-	 8mOq6ipz1yrieS4cv9bsHmMFlxHkSofGAUYfjwE4=
-Date: Sat, 23 May 2026 07:27:47 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Sudeep Holla <sudeep.holla@kernel.org>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/4] firmware: arm_ffa: Register core as a platform driver
-Message-ID: <ahFI43hT9eoktFlU@e129823.arm.com>
-References: <20260508-b4-ffa_plat_dev-v1-0-c5a30f8cf7b8@kernel.org>
- <20260508-b4-ffa_plat_dev-v1-2-c5a30f8cf7b8@kernel.org>
- <20260523001148.GA1319283@ax162>
- <ahEyBrZGSVbdQxDJ@e129823.arm.com>
- <20260523050555.GA1121518@ax162>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TmXWnTrE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779523420;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8kCCPSR7eAbezRrY9EzmdTOQTokcL1TCE2C4CcBHkS8=;
+	b=TmXWnTrECwQicLVh2U4s1iZn4V5As7wyHW3noteoEkX+bBzylXKXYvV8j2NV17zR5GFixA
+	R46TrqMIz7KgFZIlbh22KnHmtbMjUHF6hvolvAT6JIVpjkgfhzBq3PQ2cDp12uFLFY5JKR
+	mRcbDE43QTbsExtGI1PtyWzSQJz0FI8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-155-MW4chs5tNBm3kFus5swd7g-1; Sat, 23 May 2026 04:03:38 -0400
+X-MC-Unique: MW4chs5tNBm3kFus5swd7g-1
+X-Mimecast-MFC-AGG-ID: MW4chs5tNBm3kFus5swd7g_1779523417
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48d127eb013so36906745e9.1
+        for <kvmarm@lists.linux.dev>; Sat, 23 May 2026 01:03:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779523417; x=1780128217;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8kCCPSR7eAbezRrY9EzmdTOQTokcL1TCE2C4CcBHkS8=;
+        b=UawZmUmXbc2jz+e4DvQxcPtYgOsF97JdVgMe/vJ2h0sUaf1TJAngrYWnXHQkkTKVLG
+         twH/AztOwZ9O6D4XAxb+LksQ7ZZ/KGL2lFfpUnXcC8b1KZD11/Eq/3kEv3sOfXLpxu5N
+         c+141j3WJyRNsC0T1lrjuPbzmCNftfGGtWgLgVd2r6rldfcmdAOirDxZsuXARLtCKVqr
+         SBx2T0Q3wuMPtr0LmPbss1UsDM/KEhUVWjRv/LCIJBJJNRgqe0LHdV/WbdfoESDp2CuH
+         EaYlJLeVXZJYE/DZBYL7a4ovphfJeaoM8aynVFv/mXVA1QWJ8BCNWU1emdJiTvfYnSgg
+         Rjgg==
+X-Forwarded-Encrypted: i=1; AFNElJ9yRXLK9rShwbihhjMZIFEwmK9lScUlsK9rAdnpUMdx/rv8jh9goXHq2vMoXdma3pI22a8/imA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YymHhMRkaIQ/qHP3ewSTrfNgOoPW8BLdR5aqsVbRi+Mt6Y4Ogsp
+	a5We1NfPunC3R50T85c08sTlxsy0wrmxX5pzKhWSzO/hXDj4nSf1uv5nxz9ZyzjwMTY6v1QJ9Ei
+	dNolYvN1gCj6b/hoi3VceMhuqNZeN7NU7DV/OCp6frlUWrsSbB/uZ7lPTWx0sZzQ3bQCTELE1Zn
+	Y8nWg0xK0bHvLRzSDVxgtyC6/SBeMhr8Qq
+X-Gm-Gg: Acq92OHRXtZg2wpsMSi826yNX7ICi2axrzhs39T2o1owsaIy3BKwAhnCDeYHJP5iSid
+	GaFtD/qaeNrWKvrYn3zc9Ej2qHRueqwP5ttbISJv15Tsmt7tq2PydlOGBTP4K7n7IiOJecsJZe4
+	rHlnGfZsbCAHig0z8LCj8mzYXPWaup7qwg2lc0YRfz/pEEbQzCY/fU1Q0V0wUv4NomBiWYPLFyo
+	UAKruD6wCBAArn1D4nR2C94lSqUP6+LhM05DXr6C/K9QciVHTlNGDDZ7NOxBHSvM+uZGICJq6Q+
+	MDArW30=
+X-Received: by 2002:a05:600c:5298:b0:48e:51f8:eb39 with SMTP id 5b1f17b1804b1-490428e0b24mr103916255e9.28.1779523417110;
+        Sat, 23 May 2026 01:03:37 -0700 (PDT)
+X-Received: by 2002:a05:600c:5298:b0:48e:51f8:eb39 with SMTP id
+ 5b1f17b1804b1-490428e0b24mr103915625e9.28.1779523416685; Sat, 23 May 2026
+ 01:03:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260523050555.GA1121518@ax162>
+References: <20260520072518.504865-1-maz@kernel.org>
+In-Reply-To: <20260520072518.504865-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 23 May 2026 10:03:24 +0200
+X-Gm-Features: AVHnY4JSA0Bs3_rwKjWLijly1xMqn0yNDirfiVv1I4mSWo8k1UBJzXBC_g_e__A
+Message-ID: <CABgObfb4UiufkpDOP6yyAYNjBYnSZvZpi6hfqXoEX7dqCPBk3g@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.1, take #3
+To: Marc Zyngier <maz@kernel.org>
+Cc: Michael Bommarito <michael.bommarito@gmail.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Will Deacon <will@kernel.org>, Yuan Yao <yaoyuan@linux.alibaba.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: F5LGcqmg6Nw_duhG9JpfMM1UZG6YvkDu01zw_72BNa0_1779523417
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 22, 2026 at 10:05:55PM -0700, Nathan Chancellor wrote:
-> On Sat, May 23, 2026 at 05:50:14AM +0100, Yeoreum Yun wrote:
-> > Hi Nathan,
-> > 
-> > > Hi Sudeep,
-> > > 
-> > > On Fri, May 08, 2026 at 06:54:16PM +0100, Sudeep Holla wrote:
-> > > > Move the FF-A core bring-up and teardown paths into platform driver
-> > > > probe and remove callbacks, and register a synthetic arm-ffa platform
-> > > > device to bind the driver.
-> > > > 
-> > > > This makes the FF-A core lifetime follow the driver model while keeping
-> > > > the device creation internal to the FF-A core. Use normal platform driver
-> > > > registration so the probe path has standard driver-core semantics.
-> > > > 
-> > > > The synthetic platform device is a temporary bridge until ACPI and
-> > > > devicetree describe the FF-A core device or object. Once those firmware
-> > > > description paths are defined, the internal platform device creation can
-> > > > be dropped and the driver can bind to the firmware-described device
-> > > > directly.
-> > > > 
-> > > > Since the transport selection now happens from the platform probe path,
-> > > > drop the __init annotation from ffa_transport_init().
-> > > > 
-> > > > Signed-off-by: Sudeep Holla <sudeep.holla@kernel.org>
-> > > 
-> > > I am seeing
-> > > 
-> > >   arm-ffa arm-ffa: probe with driver arm-ffa failed with error -95
-> > > 
-> > > on my two arm64 test machines after this change landed in -next as
-> > > commit e659fc8e537c ("firmware: arm_ffa: Register core as a platform
-> > > driver"), is this expected? If so, perhaps it should be silenced?
-> > 
-> > Could you share the .config file you used for this?
-> 
-> Sure thing! It is attached. If you need anything else, please let me
-> know.
+On Wed, May 20, 2026 at 9:25=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> Paolo,
+>
+> Here's the next set of KVM/arm64 fixes for 7.1. Continuing the trend,
+> we have two AI-fuelled fixes, both of which are stable candidates.
+> Additionally, a minor tidying-up of the hypervisor tracing descriptor
+> validation.
+>
+> Please pull,
+>
+>         M.
+>
+> The following changes since commit effc0a39b8e0f30670fe24f51e44329d4324e5=
+66:
+>
+>   KVM: arm64: Pre-check vcpu memcache for host->guest donate (2026-05-07 =
+14:12:42 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-7.1-3
+>
+> for you to fetch changes up to 1702da76e017ae0fbe1a92b07bc332972c293e89:
+>
+>   KVM: arm64: Fix nVHE/pKVM hyp tracing error on invalid desc (2026-05-20=
+ 08:08:37 +0100)
 
-Thanks! unless there was other error log from ff-a driver,
-I think this happens because your environment either doesn’t
-support FF-A or is using an SMCCC version earlier than 1.2 from
-ffa_version_check() or ffa_transport_init().
+Done, thanks.
 
-If that’s the case, You can ignore this log since this behavior is
-expected, and the dd core should print an error log.
-Before this patch, the error was not shown because all FF-A initialization
-was done during the initcall phase, and nothing was printed
-even when the initcall function returned an error from caller of initcall.
+Paolo
 
-[...]
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 7.1, take #3
+>
+> - Fix ITS EventID sanitisation when restoring an interrupt translation
+>   table.
+>
+> - Fix PPI memory leak when failing to initialise a vcpu.
+>
+> - Correctly return an error when the validation of a hypervisor trace
+>   descriptor fails, and limit this validation to protected mode only.
+>
+> ----------------------------------------------------------------
+> Michael Bommarito (2):
+>       KVM: arm64: vgic-its: Reject restored DTE with out-of-range num_eve=
+ntid_bits
+>       KVM: arm64: vgic: Free private_irqs when init fails after allocatio=
+n
+>
+> Vincent Donnefort (1):
+>       KVM: arm64: Fix nVHE/pKVM hyp tracing error on invalid desc
+>
+>  arch/arm64/kvm/arm.c            | 4 +++-
+>  arch/arm64/kvm/hyp/nvhe/trace.c | 9 +++++++--
+>  arch/arm64/kvm/vgic/vgic-its.c  | 4 ++++
+>  3 files changed, 14 insertions(+), 3 deletions(-)
+>
 
---
-Sincerely,
-Yeoreum Yun
