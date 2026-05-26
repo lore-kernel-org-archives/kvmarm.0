@@ -1,32 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98663C2B92;
-	Tue, 26 May 2026 22:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EBB3009CB;
+	Tue, 26 May 2026 22:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779833905; cv=none; b=LHWCwEpPHf0/Ljj/9shk2Dw57uHzcpdjbAOIgcV/NxtFVJPEYjI3P7D5auATalEKYmHF93urDt6y6obhyyGOMFFFhlsPPoWOOYce+7XbRmv/fQ7nmZNqpTdBmw2GfFujVdTvzEveEMxXYNEdZxz/PItAwQaCaG2/DnihqPyLZCY=
+	t=1779834468; cv=none; b=IjmRnQcuJF3Fb3RdCMZ6N4J5yt5Bf3B0LQpII6lEE+A+Vx16UTrHe90kn5WRgH/yge4vfS22UtUyHKdOiUMZd0BYb1iiBhQgM24kAotGtDxfQYKMK5bZvJMovenHT4On1dBjdX8arom1o+y5y9G1W/AYRx58qmY/MsXgppliUrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779833905; c=relaxed/simple;
-	bh=sH/4XRqKpSw7y9WtrAKJyLr5ctF2ndal2b+tpCBDx2Y=;
+	s=arc-20240116; t=1779834468; c=relaxed/simple;
+	bh=4mleRwxx/487qOWzenA0B4ktBvSH1skjy0g7+5i1jT4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NaFD9bnm0BiA427r76C+cMVwj/sl4MO8ejVYbU/QHFyXsJiwEp8ClTzAuVyHcckoo69dXw4Ms4Idxn22Gr+ul367Ywh3zbOQQwqP8wy3Av4USHKI++2g7SgZKs3AJrI9XR8OPcc50iyHV+F5IjkbNKy/I+fhpXnYw5H4+hCBxeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I2I6UptB; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=dG90b2QAsmAUmbH02OlcahpjaBIGEElea+T73ZO+SgyMUO7AimkZ274BTjFTEQQLgHU8Zb7RUNsTtS4T+sJH7XcwC2P+aPzeKxSsjf7h6X9An0QZpkyCRt8+xSZjFHa4sVhFFhQmKXDf2voEU50h4ZODCTK0zG7eO0YbEACpKAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UOeYDOoh; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I2I6UptB"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UOeYDOoh"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE9942BCD;
-	Tue, 26 May 2026 15:18:15 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFAC92BCD;
+	Tue, 26 May 2026 15:27:40 -0700 (PDT)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C76A43F7B4;
-	Tue, 26 May 2026 15:18:15 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 881D23F7B4;
+	Tue, 26 May 2026 15:27:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779833901; bh=sH/4XRqKpSw7y9WtrAKJyLr5ctF2ndal2b+tpCBDx2Y=;
+	t=1779834465; bh=4mleRwxx/487qOWzenA0B4ktBvSH1skjy0g7+5i1jT4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I2I6UptBQvI3XkyOR3Fre00ZRn+sjAS1IDaOvaixuEbI0maXbjM96bPw8nn4OPuJZ
-	 we05frOreqd2J9ktylS+TH8/sjxXuRCk6L4zD8hBTo7+vpfr771K9ykbLGXCKD7bHP
-	 iA6fiMLhr85im0jkhneql6hy0M2QfCkC5/4bHmwE=
-Date: Tue, 26 May 2026 23:17:54 +0100
+	b=UOeYDOohWEeBzw2bAt2AX18TjQdQbHOVZfrEHd4AIRBYF9jq4/i8HdB/ZGUVgVgsq
+	 dX/V72IFfHuj+6x9e0B+x3vDu5tinOc0nAyZwVrlPe58dRkjeknxe1Xm9h7ptBjjXn
+	 VqJtmIRizdJOT3MDwEQy52rX+mQcrkrsm715/pqY=
+Date: Tue, 26 May 2026 23:27:33 +0100
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -41,10 +41,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
 	Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 13/44] arm64: RMI: Define the user ABI
-Message-ID: <vixej2afqamvr7eaksoepr3wmpwzp73rtgrageeyuawa6azotw@payxzyhymwbt>
+Subject: Re: [PATCH v14 17/44] arm64: RMI: RTT tear down
+Message-ID: <7egwow26r6sbbtm53mujbhpwyts2utzv2ddth7554kqwbk7k7d@iptjpvvbsc2n>
 References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-14-steven.price@arm.com>
+ <20260513131757.116630-18-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,156 +53,125 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260513131757.116630-14-steven.price@arm.com>
+In-Reply-To: <20260513131757.116630-18-steven.price@arm.com>
 
-On Wed, May 13, 2026 at 02:17:21PM +0100, Steven Price wrote:
-> There is one CAP which identified the presence of CCA, and one ioctl.
-> The ioctl is used to populate memory during creation of the realm as
-> this requires the RMM to copy data from an unprotected address to the
-> protected memory - CCA does not support memory conversion where the
-> memory contents is preserved as this is incompatible with memory
-> encryption.
+Hi,
 
-Nit:
-I believe spelling out the CAP and ioctl names can improve the commit
-message. Also "memory conversion" is a little vague, maybe
-
-... CCA does not support shared <-> private memory conversion where ...
-
-would make this clearer?
-
-Thanks,
-Wei-Lin Chang
-
+On Wed, May 13, 2026 at 02:17:25PM +0100, Steven Price wrote:
+> The RMM owns the stage 2 page tables for a realm, and KVM must request
+> that the RMM creates/destroys entries as necessary. The physical pages
+> to store the page tables are delegated to the realm as required, and can
+> be undelegated when no longer used.
+> 
+> Creating new RTTs is the easy part, tearing down is a little more
+> tricky. The result of realm_rtt_destroy() can be used to effectively
+> walk the tree and destroy the entries (undelegating pages that were
+> given to the realm).
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
 > Changes since v13:
->  * KVM_ARM_VCPU_RMI_PSCI_COMPLETE removed.
->  * KVM_ARM_RMI_POPULATE documentation updated to reflect that the
->    structure is written by the kernel.
->  * CAP number bumped.
+>  * Avoid the double call of kvm_free_stage2_pgd() by splitting the work
+>    across that and a new function kvm_realm_uninit_stage2() which is
+>    only called for realm guests.
 > Changes since v12:
->  * Change KVM_ARM_RMI_POPULATE to update the structure with the amount
->    that has been progressed rather than return the number of bytes
->    populated.
->  * Describe the flag KVM_ARM_RMI_POPULATE_FLAGS_MEASURE.
->  * CAP number is bumped.
->  * NOTE: The PSCI ioctl may be removed in a future spec release.
+>  * Simplify some functions now we know RMM page size is the same as the
+>    host's.
 > Changes since v11:
->  * Completely reworked to be more implicit. Rather than having explicit
->    CAP operations to progress the realm construction these operations
->    are done when needed (on populating and on first vCPU run).
->  * Populate and PSCI complete are promoted to proper ioctls.
+>  * Moved some code from earlier in the series to this one so that it's
+>    added when it's first used.
 > Changes since v10:
->  * Rename symbols from RME to RMI.
+>  * RME->RMI rename.
+>  * Some code to handle freeing stage 2 PGD moved into this patch where
+>    it belongs.
 > Changes since v9:
->  * Improvements to documentation.
->  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+>  * Add a comment clarifying that root level RTTs are not destroyed until
+>    after the RD is destroyed.
 > Changes since v8:
->  * Minor improvements to documentation following review.
->  * Bump the magic numbers to avoid conflicts.
-> Changes since v7:
->  * Add documentation of new ioctls
->  * Bump the magic numbers to avoid conflicts
+>  * Introduce free_rtt() wrapper which calls free_delegated_granule()
+>    followed by kvm_account_pgtable_pages(). This makes it clear where an
+>    RTT is being freed rather than just a delegated granule.
 > Changes since v6:
->  * Rename some of the symbols to make their usage clearer and avoid
->    repetition.
-> Changes from v5:
->  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>  * Move rme_rtt_level_mapsize() and supporting defines from kvm_rme.h
+>    into rme.c as they are only used in that file.
+> Changes since v5:
+>  * Rename some RME_xxx defines to do with page sizes as RMM_xxx - they are
+>    a property of the RMM specification not the RME architecture.
+> Changes since v2:
+>  * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
+>    later patch when they are actually used.
+>  * Some simplifications now rmi_xxx() functions allow NULL as an output
+>    parameter.
+>  * Improved comments and code layout.
 > ---
->  Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h       | 13 +++++++++++
->  2 files changed, 53 insertions(+)
+>  arch/arm64/include/asm/kvm_rmi.h |   7 ++
+>  arch/arm64/kvm/mmu.c             |  21 ++++-
+>  arch/arm64/kvm/rmi.c             | 148 +++++++++++++++++++++++++++++++
+>  3 files changed, 174 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 52bbbb553ce1..ca68aae7faa2 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6553,6 +6553,37 @@ KVM_S390_KEYOP_SSKE
->    Sets the storage key for the guest address ``guest_addr`` to the key
->    specified in ``key``, returning the previous value in ``key``.
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 9de34983ee52..06ba0d4745c6 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -64,5 +64,12 @@ u32 kvm_realm_ipa_limit(void);
 >  
-> +4.145 KVM_ARM_RMI_POPULATE
-> +--------------------------
+>  int kvm_init_realm(struct kvm *kvm);
+>  void kvm_destroy_realm(struct kvm *kvm);
+> +void kvm_realm_destroy_rtts(struct kvm *kvm);
 > +
-> +:Capability: KVM_CAP_ARM_RMI
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_arm_rmi_populate (in/out)
-> +:Returns: 0 on success, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_arm_rmi_populate {
-> +	__u64 base;
-> +	__u64 size;
-> +	__u64 source_uaddr;
-> +	__u32 flags;
-> +	__u32 reserved;
-> +  };
-> +
-> +Populate a region of protected address space by copying the data from the
-> +(non-protected) user space pointer provided into a protected region (backed by
-> +guestmem_fd). It implicitly sets the destination region to RIPAS RAM. This is
-> +only valid before any VCPUs have been run. The ioctl might not populate the
-> +entire region and in this case the kernel updates the fields `base`, `size` and
-> +`source_uaddr`. User space may have to repeatedly call it until `size` is 0 to
-> +populate the entire region.
-> +
-> +`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
-> +populated data is hashed and added to the guest's Realm Initial Measurement
-> +(RIM).
-> +
->  .. _kvm_run:
+> +static inline bool kvm_realm_is_private_address(struct realm *realm,
+> +						unsigned long addr)
+> +{
+> +	return !(addr & BIT(realm->ia_bits - 1));
+> +}
 >  
->  5. The kvm_run structure
-> @@ -8904,6 +8935,15 @@ helpful if user space wants to emulate instructions which are not
->  This capability can be enabled dynamically even if VCPUs were already
->  created and are running.
+>  #endif /* __ASM_KVM_RMI_H */
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index ba8286472286..eb56d4e7f21a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1024,9 +1024,26 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>  	return err;
+>  }
 >  
-> +7.47 KVM_CAP_ARM_RMI
-> +--------------------
+> +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
+> +{
+> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> +	struct realm *realm = &kvm->arch.realm;
 > +
-> +:Architectures: arm64
-> +:Target: VM
-> +:Parameters: None
+> +	if (kvm_realm_state(kvm) != REALM_STATE_ACTIVE)
+> +		return;
 > +
-> +This capability indicates that support for CCA realms is available.
+> +	write_lock(&kvm->mmu_lock);
+> +	kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), true);
+> +	write_unlock(&kvm->mmu_lock);
+> +	kvm_realm_destroy_rtts(kvm);
+> +}
 > +
->  8. Other capabilities.
->  ======================
+>  void kvm_uninit_stage2_mmu(struct kvm *kvm)
+>  {
+> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +	if (kvm_is_realm(kvm))
+> +		kvm_realm_uninit_stage2(&kvm->arch.mmu);
+> +	else
+> +		kvm_free_stage2_pgd(&kvm->arch.mmu);
+>  	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+>  }
 >  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6c8afa2047bf..b8cff0938041 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -996,6 +996,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_S390_USER_OPEREXEC 246
->  #define KVM_CAP_S390_KEYOP 247
->  #define KVM_CAP_S390_VSIE_ESAMODE 248
-> +#define KVM_CAP_ARM_RMI 249
+> @@ -1103,7 +1120,7 @@ void stage2_unmap_vm(struct kvm *kvm)
+>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>  {
+>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> -	struct kvm_pgtable *pgt = NULL;
+> +	struct kvm_pgtable *pgt;
+
+Is this included by accident?
+
 >  
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> @@ -1669,4 +1670,16 @@ struct kvm_pre_fault_memory {
->  	__u64 padding[5];
->  };
->  
-> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM */
-> +#define KVM_ARM_RMI_POPULATE	_IOWR(KVMIO, 0xd7, struct kvm_arm_rmi_populate)
-> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE	(1 << 0)
-> +
-> +struct kvm_arm_rmi_populate {
-> +	__u64 base;
-> +	__u64 size;
-> +	__u64 source_uaddr;
-> +	__u32 flags;
-> +	__u32 reserved;
-> +};
-> +
->  #endif /* __LINUX_KVM_H */
-> -- 
-> 2.43.0
-> 
+>  	write_lock(&kvm->mmu_lock);
+>  	pgt = mmu->pgt;
+
+[...]
+
+Thanks,
+Wei-Lin Chang
