@@ -1,41 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C153B95E7
-	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 16:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6C43AFAE1
+	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 16:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779814398; cv=none; b=h7id+xH+7lpygHW7QegzUROshop86tFvaDkMkGSIcqMqknqekq9HtqZCFt09RLOfLgy08B8MhO5uII0Bs1tHIRF/kGhW+iDwq5g92dt9oS5wPwQaVqYz1QOlGOj+wFuQzzVmyK67zokJzqwzf++vbLY2FdVmwgRRkyvHbW+gpHs=
+	t=1779814450; cv=none; b=VvKsVflfV+2i3QG7hSODKgzaDyRQPvXviQ4O4gLpVS4ngrzgpFT7qMJDjH8hEBv0PZQIALGp7fLoQsf/efdtvY5Rky+0OSDGEeeDKivJ1kcyCYwhjEyBaSjTdNrl7e3QlO8hkkzIlANFwneiT9YSrmwQg1QAp/2T2TAAMu3CCpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779814398; c=relaxed/simple;
-	bh=jK9jcFq1vc07ukH7wHSulTaGgBefpAjVxgzyk1JHzbw=;
+	s=arc-20240116; t=1779814450; c=relaxed/simple;
+	bh=Um/Huw45Fb95EMWsThYxwZA99mym7pzLBXcKZEuyxZE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h8FIVSBb4qoeEdsjZkD+Gt/UDuAg01jCBuDRCUJ+KRNXv97UOmcP8EzHpRmhaQrp4XjTsvbsSOPrdLWgz2SYs3q0lo1LzlzT5l/6TERMXJkCJzgQk1sMIm/F/RMO0+ykgyxxv5DLnzeKwxss3T19JmiysM88Aee9Z8AyOkKUCpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6xB2+c7; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=oVioHGFocj9R5pZbrNtILoO6DptO1bNk6tEA7r4xtMuG3KnOABcQaxetPLDIF9JPMWAU4Xo48vihTGLAwiEonTV0hnHRBiqsbQfUD6HTLfyOC6OWKfEZJ/36hI5kgmQmReyitsv9/r3KSQl/7iFE+uenUAEq9E9QjKHnNRKaMrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C1/TG0ED; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6xB2+c7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7F71F000E9;
-	Tue, 26 May 2026 16:53:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C1/TG0ED"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 802721F000E9;
+	Tue, 26 May 2026 16:54:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779814396;
-	bh=jK9jcFq1vc07ukH7wHSulTaGgBefpAjVxgzyk1JHzbw=;
+	s=k20260515; t=1779814449;
+	bh=2IIlpLx0gVxMf1NX1FfVzjs2W/yK8aRs/Ll1LDgBL2k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=W6xB2+c7RYJyl40lpiS2IpzQY8q5QSb62k/MClm/j5R71ayZ1/45QmedNZeON1GtG
-	 TUXkU1mrZQrY6IyvDUeqC/vUW05ALiyAV8Xk7S4AzoiUKGwNDk0hy6pKbxWq4RunJ1
-	 C1bgGWkfNXgfMlql0YyjIPB6hYpitwMXZs448wlaZLNHDpVURg9qsqpufRruYs4ASS
-	 Giv6/68wVItfOIp6SZDUnoxoJaty77KrkE3g2WKSfLltKlt58RjPd0LJYcyN+VwnuD
-	 tx0wfspqBg/x3AUf8rAUtoskrq+pf8Vapjjhe/b0lPcqQ0CgF1TnyFGPtNWJ8Cq0PE
-	 W+UktFjGYAE+Q==
-Date: Tue, 26 May 2026 17:53:12 +0100
+	b=C1/TG0EDeggoAqtI2uQdIQ66PF4Rn5aFdPojqDn6eD1yqtrYN1Ou+8Zd3bLftyXbh
+	 88fNbWbnDfpyoN6WdL9yNiyB0VzqmtwY4uqpUIiqNMpjByeFkzBxgo50FQavPObmfU
+	 AuVycqk7LXr6aB1lw+MsEXbwjujjsRNBOfZ732STmtxjIaimXf9Z5HmnA5Gj5dlf2j
+	 cBQ9SlOVA6UGCWesn/FvaNbTGvFnmUN2wi+3NBeyPGnrSNwnyJxWZ3idMDZfZFJNi1
+	 7KRTCJwUzhOXjHCMU4GaH6R1xXyxXed5B+/BitTBRiU8AK3oBvyCo0DkJ794L1+mTM
+	 CANxyZiwlCvBA==
+Date: Tue, 26 May 2026 17:54:05 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Mark Rutland <mark.rutland@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org,
 	oupton@kernel.org, tabba@google.com, will@kernel.org
-Subject: Re: [PATCH 13/18] arm64: fpsimd: Use opaque type for SVE state
-Message-ID: <5040107f-dd52-4021-a93c-1440325fe033@sirena.org.uk>
+Subject: Re: [PATCH 10/18] arm64: sysreg: Add FPCR and FPSR
+Message-ID: <ab133439-fbe6-43aa-915b-3c86903dadfd@sirena.org.uk>
 References: <20260521132556.584676-1-mark.rutland@arm.com>
- <20260521132556.584676-14-mark.rutland@arm.com>
+ <20260521132556.584676-11-mark.rutland@arm.com>
+ <458fcb4c-46a9-49db-a179-9081d7d50dbf@sirena.org.uk>
+ <ahXPqSPB5CEUbRdz@J2N7QTR9R3>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,49 +45,41 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qLyeM/IcLOyxcZsW"
+	protocol="application/pgp-signature"; boundary="qOEWLsYDc6kbwQtt"
 Content-Disposition: inline
-In-Reply-To: <20260521132556.584676-14-mark.rutland@arm.com>
+In-Reply-To: <ahXPqSPB5CEUbRdz@J2N7QTR9R3>
 X-Cookie: You are fairminded, just and loving.
 
 
---qLyeM/IcLOyxcZsW
+--qOEWLsYDc6kbwQtt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Thu, May 21, 2026 at 02:25:51PM +0100, Mark Rutland wrote:
+On Tue, May 26, 2026 at 05:51:53PM +0100, Mark Rutland wrote:
+> On Tue, May 26, 2026 at 04:55:44PM +0100, Mark Brown wrote:
 
-> As the SVE state size can vary at runtime, we don't have a concrete type
-> for the in-memory SVE state, and pass this around using a pointer to
-> void. The functions which save/restore the SVE state have a very unusual
-> calling convention, expecting a pointer to the FFR *in the middle of*
-> the in-memory SVE state, which is also passed as a pointer to void.
-> Passing a pointer to the FFR also requires that callers find the live VL
-> and perform some arithmetic, which callers implement differently.
+> > > +Field	30	Q
 
-...
+> > DDI0487 M.b and DDI0601 2026-03 both call this field Z.
 
-> Improve this by adding an opaque 'struct sve_state', and consistently
-> passing a pointer to this, performing the necessary offsetting *within*
-> the save/restore functions.
+> Sorry about that; fixed locally now, and I've double-checked the rest.
 
-This is much more ergonomic:
+Yes, I'd also checked everything else - sorry, should've mentioned that
+it was only that field.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---qLyeM/IcLOyxcZsW
+--qOEWLsYDc6kbwQtt
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoVz/cACgkQJNaLcl1U
-h9D4tgf/XYMJ18LR7+UOUtuyLBF35gpK3kMYzRv8PyJ7gD/VV/VZpxES43FguMmz
-2oVFV2Kzdl2pUo6tvqe9OV71SC5I07Mek0ZZy3JG89GnEGZd/a1kCuXCvahz8WMc
-jx0bBCtqH3Y4rSTXyNtqtvHxghCxKcmyRpSQ2ohGsOcII1u2oq/m6GILNxuBl3Xh
-g22UUTV8grDSENv6cA3YU7meK7P0j2yQbg+9Me6wgmCzVNne4nUSNbvmYl3ImOel
-PoaUMhylg5+CjPP3vIShRYXPNMJVQ3/jRP2sHTTfcAHOy2CUe17EL32HX3LRg1yK
-jQZi9jwxgxrZox8rl4Kd9dYxuEPeOw==
-=vK/5
+iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoV0CwACgkQJNaLcl1U
+h9COlgf0CGry2Yvb0LukONvwzgnJ8onH91aYm0sqTr9N0i70Yj58xnyEoKc5CkZU
+4vRvoOYL+lVJSb5gGfSuBOkUjvH3ixcEZPr75PLo1vjsS6tNGnUBhVPwI4jc2J68
+1qbuP0UIhfk75E368Ydm0Zqn0tyBlqtrfORmlNCG2s1cL9xCpewf9ck1WhE4wLwx
+wy0+TQzSu8ZtrxY9IVZx5ARcgeHyYr4AQlPMHD3T3JaUxzgxvmfmGu6Yy+P7sf0v
+WiI1XeOWlYGZH5+emnwHMFq+0gdUuOIPl8nWYUD56pMrlOVevetZgLRu0E0N29wH
+zoDzFkwTTgHGcnHPBD+DgvZiUtFd
+=KwTI
 -----END PGP SIGNATURE-----
 
---qLyeM/IcLOyxcZsW--
+--qOEWLsYDc6kbwQtt--
