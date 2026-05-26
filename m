@@ -1,105 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0177E3CF699;
-	Tue, 26 May 2026 10:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4523DD851;
+	Tue, 26 May 2026 10:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779790785; cv=none; b=SYNecmCMNh90O35tfjTXOTkMjGXpx4m/AJ2P25ZHxlfI6mW3PPtGZJQdfhXnmWz/TeEpYXxvrnFGX+GE5Dp71kL6cKSEW9t4EvgOzyiiY2+00bJr4vKmw5nC6Dunzmo2UWkvr+VqsWegT5Ic5L0Yef2J1YaySi9MYGQt4ixSBLg=
+	t=1779791818; cv=none; b=KCYDZtfWfWxNzBM8mk4KA5YAb5TiVXFbACDH3OE5wRVd6hX6jdiULJ6BxizM0F6bY3z8nnIShhPmy8FpKL4RYH1az6RvFI/iQ7PMA/s3AuTCsO7/BB5yiSou+vUZ5k+HbZWJV6yVZhszeTLDZm9LfnYAZEP8CJUOtxsp7S5E97w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779790785; c=relaxed/simple;
-	bh=mEvmHRYpqK28C4lllXKLqjw2rOqYfTsUYY3YBCrWFY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YDn9STLpkzO4TTKJ++O19IGCHXDZpVgR0zpj+De9etuORP1P8iYOhIDbRLErsKgZ000/NfG/CbBmLLTphTQfx6m/jxG6jjRA6H4mqt1PqNwBja8vJxKbfPLBdH51x2wDN6NSdOeaFqjaitc2vOWM9nbglJFbd+D+h9O78KgZupE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VvOwFLah; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779791818; c=relaxed/simple;
+	bh=iLYxHGoL9muR/yNrgELFXRs76PtdndHLpVN0ekYuB6E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nDnCUxQL/mLE5rw8UfCGwPIGNSjY4+c1sF55wTRj8TdOs+hOvCajvuAGNSbOA9R6GfMvjTfCYeQwkm6v54TdJeZ+bg5ZT3jq0c9nWker7i4d38ANfny8kADqxRvVMviJwv6jtVvI1m2J8gq5HeIIAMXWOhX5XJNz3GGYeD4ESIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUBjDPw5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvOwFLah"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1831F000E9;
-	Tue, 26 May 2026 10:19:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUBjDPw5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B3ED1F000E9;
+	Tue, 26 May 2026 10:36:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779790783;
-	bh=EMxpQmTjCQ6YYHFflXj5KI5bPtCqrLFvEvMHOInAGjA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VvOwFLahmsKGzLreqDRyvIkSIuhcPMXsklNZ5PHm9NhzHTLYjwfn5E/uRYB+NZJeH
-	 T/Jk+mEYO8a0WZj/Np+770VbTN6QUgy/S3o8IkyKSwKxdOFQsarNsr2Ky/nDDRyY04
-	 HwHCYK+e+JWfErkdLRsfQFru6w5lUz0jeSo2WW9mOelHjCHco5CZAE6XuWRE1++RAb
-	 js3+2/8MjmCxanHWhzH/M+nng8pyZ8UCqgZ1SKybQO8tdkKdR/0VvQZzE8T3OtHp01
-	 5TX7lrUxCz6qA7MwJkOsPaLWXW7gao4NH+y/Rb/ntqTMK1DQKMUx15TUYoV5iDTlKP
-	 s98Idt/wW/Irw==
-Date: Tue, 26 May 2026 11:19:38 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Preserve all guest ZCR_EL2.LEN values
-Message-ID: <b4fdceb6-5fa7-4829-a60e-6f80f47f032a@sirena.org.uk>
-References: <20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org>
- <ahSWwl-uCv4ZW-nE@J2N7QTR9R3>
+	s=k20260515; t=1779791816;
+	bh=tLvcVcVxJiONQZDgxDbkVAM4VnMTie9/jbe9M/yDzTM=;
+	h=From:To:Cc:Subject:Date;
+	b=MUBjDPw5TOxBUqpUnCixRmAF1U/HFE4mTEUZc9PGnYUG4t4cv+f4kBO4mo37Zuz5b
+	 GlboD6KeBhq7WhpyvyT+lVZL13TO+SW1bCkbAB/uzs9GabJIL02LjZ+xac6+JEiKyZ
+	 RVnMdNO+EXzWoq/xV2AgRL4exG933i5JmdN0Fg6XPFkIJX2eVDDbDWFpaAsR1UqstY
+	 egoFTqjqX9DDT3UtoF5R0OkoDDVDPfyhqUNjyIC+GYqxFBkVlI4gfz5gj0WtI0fa3a
+	 N891nq38gcl7N6odS/4DLUx3Y1+kqHNIpDxBbpMBjYpWKhS5YJRsnK8cc6I/W6cMuE
+	 F/njRe1QBV1cA==
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Sudeep Holla <sudeep.holla@kernel.org>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH] firmware: arm_ffa: Treat missing FF-A feature on a platform as a probe miss
+Date: Tue, 26 May 2026 11:36:49 +0100
+Message-ID: <20260526103649.5684-1-sudeep.holla@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RL/ZeSeTiUvxwP7H"
-Content-Disposition: inline
-In-Reply-To: <ahSWwl-uCv4ZW-nE@J2N7QTR9R3>
-X-Cookie: You are fairminded, just and loving.
+Content-Transfer-Encoding: 8bit
 
+When FF-A initialisation is driven from a platform device probe, systems
+that do not implement FF-A can return -EOPNOTSUPP from the early transport
+or version discovery paths. Driver core treats that as a matched probe
+failure and prints:
 
---RL/ZeSeTiUvxwP7H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  |  arm-ffa arm-ffa: probe with driver arm-ffa failed with error -95
 
-On Mon, May 25, 2026 at 07:36:50PM +0100, Mark Rutland wrote:
-> On Fri, May 22, 2026 at 07:00:04PM +0100, Mark Brown wrote:
+That is noisy for a firmware interface that can be absent on otherwise
+valid systems. Driver core already treats -ENODEV and -ENXIO as quiet
+rejected matches, so translate only the early unsupported discovery cases
+to -ENODEV. Keep later setup failures unchanged so real FF-A
+initialisation problems are still reported as probe failures.
 
-> > Since b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps") when guests
-> > write to ZCR_EL2 we have clamped the value of ZCR_EL2.LEN to be at most
-> > that configuring the maximum guest VL. This is not the behaviour the
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Closes: https://lore.kernel.org/all/20260523001148.GA1319283@ax162
+Signed-off-by: Sudeep Holla <sudeep.holla@kernel.org>
+---
+ drivers/firmware/arm_ffa/driver.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-=2E..
+diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
+index 54984e1b9741..0f468362c288 100644
+--- a/drivers/firmware/arm_ffa/driver.c
++++ b/drivers/firmware/arm_ffa/driver.c
+@@ -2109,7 +2109,7 @@ static int ffa_probe(struct platform_device *pdev)
+ 
+ 	ret = ffa_transport_init(&invoke_ffa_fn);
+ 	if (ret)
+-		return ret;
++		return ret == -EOPNOTSUPP ? -ENODEV : ret;
+ 
+ 	drv_info = kzalloc_obj(*drv_info);
+ 	if (!drv_info)
+@@ -2117,8 +2117,11 @@ static int ffa_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, drv_info);
+ 
+ 	ret = ffa_version_check(&drv_info->version);
+-	if (ret)
++	if (ret) {
++		if (ret == -EOPNOTSUPP)
++			ret = -ENODEV;
+ 		goto free_drv_info;
++	}
+ 
+ 	if (ffa_id_get(&drv_info->vm_id)) {
+ 		pr_err("failed to obtain VM id for self\n");
+-- 
+2.43.0
 
-> Have we sought feedback from architects? While I said "*or* the
-> architcture requires a clarification", I think it should be clarified
-> more explicitly either way given that the pattern is unusual.
-
-> Given this is particularly subtle, please keep me in the loop when
-> speaking with architects about this.
-
-TBH it didn't strike me as subtle, I don't see anything in the
-architecture which would lead me to expect the current behaviour.  The
-psudocode all just has direct assignments for the write and there's
-language in the ARM (eg, in the ZCR_EL2 description) saying "for all
-purposes other than returning the result of a direct read of ZCR_EL2"
-which seems specifically intended to cover there being a divergence
-between the written and effective values, though I guess it doesn't
-explicitly mention writes in the text. =20
-
-When I saw the code it looked like something KVM was doing for some
-KVM reason that was obscure to me, the lack of clarity seemed like it
-was on the KVM side.
-
---RL/ZeSeTiUvxwP7H
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoVc7oACgkQJNaLcl1U
-h9C5hQf+Pn14856B4Py7Pz8HRV87FyRnoP8UMgUuC8d7Fz5BC0Xr+U6ugjlgZlry
-yjK7eZ3LusILO/1JnPbdZLPuMFDgfKkwaGyDw4tvX+6mw7FZOTZP2+dfow8G7gQs
-vE7CE0d8eBBL2mh6updIvf5IxImvyhC8ifSwxMEEt3xp5ROAxISABKA1V4eHJ6mT
-ReWoLIonclaNncyt4mJEKzM0zDfL3NrVSmi4XGKKuqOeVGF2xf5c923LZk0/RoRp
-nP3rQrOXpMTbikdif5N9SmMyzi2a0BoBN41+24axwLmcAeNeNtkhxy8s5ZlURz/1
-pwwqS2hV/zq7pPoXhfVohlIA0XHTkQ==
-=k37g
------END PGP SIGNATURE-----
-
---RL/ZeSeTiUvxwP7H--
