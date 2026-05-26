@@ -1,86 +1,124 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FA33FDC04
-	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 16:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E391402B99;
+	Tue, 26 May 2026 17:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779814587; cv=none; b=ePHNGHoMoyOkCtW3Vjzw55qUOUAUGn2hdzV4Lvd8bhsyaRAT+0KRmMOEXtC4oRay8NifVF8Q1Vob0gmOgLRxafe+f0odFmt4Wa1ptO36VH1gi21g3HnygpN59p9H4OzTh+pfohC//0ars/UJIBYsAKzUGlgf99KCOD70W91AvKw=
+	t=1779815617; cv=none; b=m/4/WuTYixawuyi82iorDuVSNcDgLesARXYaV7BikSHHwCezRcvfzIPGURW4wIzqIG+f/xdfZWIhI68h0BXmIh21/3+lFsiiNYLHLImIvt+UhMaIFNEx5WVfDznTp+0ZILinmjxYVB5qYs1ojwPKK+yf6nTmCC1tNL7w78BtxSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779814587; c=relaxed/simple;
-	bh=aE+R/u09j8qM6TPFTCpY//gr4sjjgMS3TYVXl/OxTJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=edkFWKzwR0p0mB46vLetkUnriGQLBJcDl1HJjavel7DkwYtPPZWEl9WpwuvScs6MPZXdIJr84KOJZZ3WBoUqwEd+xFK+d9/I6jBB0NgUgNNWb3YGAk79U+wYOozbzPQPcG8Qj3nafzqn4ju6EZHJOcWeObu4LOqlQ2ydYodORlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRCwgva0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779815617; c=relaxed/simple;
+	bh=T3aDw62QgaJPdgPM5fyZHuVaFNW6CtrC1JugliHQVUs=;
+	h=Date:Message-ID:From:To:Cc:Subject; b=HFSitilLK0njWQptKVkOmgc4GCdicqfhj/RZ00L0WLrRm1hYaofrHYg2C+oLGWja5Bv6lb+lbdNbVppFuabqF91ztvcFVMkbNa3Vt5sizZ1Crrk7D4m3zoaji87OB/RVUP3S20n9PUN/bB4CFOeH4g5lmsdzC0vPsh/6qBo/1Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TiWLiWZE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kRCwgva0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 815B91F00A3C;
-	Tue, 26 May 2026 16:56:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TiWLiWZE"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4B2B11F000E9;
+	Tue, 26 May 2026 17:13:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779814586;
-	bh=aE+R/u09j8qM6TPFTCpY//gr4sjjgMS3TYVXl/OxTJk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kRCwgva0cKHWRcWeDrk3mAlIH8Wcj/VmkNwQHUqODoirO01qihrywcJl1QmThtuW3
-	 agMpjHifJfRBYr0MeDE6bVrrXzZApgD9GLcaZ7Lgu0K5GOtbwnJA7EnuiF7KL3LswE
-	 KyVRGzagtdp55YXgeVhAwIEuBMgtZh7yKGxnJ61e5Ll1o2UcTggRAI+ig9g0yolYvX
-	 giPv44vfde7r7yshYJuW7th2tCgIu/bC+FUsj2umteS67UJAbulXe6c9m4WDuf5Nol
-	 suzAaTBG1h1Vhsbv+U6v4rs2H15HO42G8LZYEh6cw+iGbahEOy6qfKwpiXy47Jl6zJ
-	 WFP1DB06c7DCg==
-Date: Tue, 26 May 2026 17:56:21 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org,
-	oupton@kernel.org, tabba@google.com, will@kernel.org
-Subject: Re: [PATCH 14/18] arm64: fpsimd: Use opaque type for SME state
-Message-ID: <5374217b-c66f-413c-94a3-a17daf64297d@sirena.org.uk>
-References: <20260521132556.584676-1-mark.rutland@arm.com>
- <20260521132556.584676-15-mark.rutland@arm.com>
+	s=k20260515; t=1779815612;
+	bh=Uy0V1zhnjEjksxlqK8ls+jYCj1jGvamk9ZvvNPf1nY4=;
+	h=Date:From:To:Cc:Subject;
+	b=TiWLiWZE0n1A9A/fwtyZiNaNpQBWAAJ/UBJvVPCBqTE2D304Iz5VwpS2AF8RpdCp5
+	 qoy7pa44RDYgc0smqnZ26PP3Ty9o2Gp5u88IMsmAlfiJfEjFZtAJpuzhNsHJI+ZREE
+	 O0Sw+gLWIj/U8wOmdjYTgqE8ReyfcJiNqtfSMUNVmIUdO3qhQuhnlVyNLNf7tYQELt
+	 BlXx+3mNneoPULh81Wg3tUrg+4XrIp1dilB9E1XbM/XKDmrjOU/A0+iUWGRhYfQghi
+	 KSzrl4SIh1MoXTcZnck4++4+fCygZn8hi0t5JX3OOO1TFwFMVPoClzHpB1KRPWzJX0
+	 FHzHJLfhQUuig==
+Date: Tue, 26 May 2026 19:13:28 +0200
+Message-ID: <20260526165826.392227559@kernel.org>
+User-Agent: quilt/0.68
+From: Thomas Gleixner <tglx@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ John Stultz <jstultz@google.com>,
+ Stephen Boyd <sboyd@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ thomas.weissschuh@linutronix.de,
+ Arthur Kiyanovski <akiyano@amazon.com>,
+ Rodolfo Giometti <giometti@enneenne.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ kvmarm@lists.linux.dev,
+ Oliver Upton <oupton@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org,
+ Takashi Iwai <tiwai@suse.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ Peter Hilber <peter.hilber@oss.qualcomm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev,
+ linux-wireless@vger.kernel.org,
+ linux-sound@vger.kernel.org
+Subject: [patch 00/24] timekeeping/ptp: Expand snapshot functionality
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="k7dlkVAhEl2qN3Op"
-Content-Disposition: inline
-In-Reply-To: <20260521132556.584676-15-mark.rutland@arm.com>
-X-Cookie: You are fairminded, just and loving.
 
+Sorry for the large CC list, but changing the inner workings touches
+unfortunately a lot of places in one go.
 
---k7dlkVAhEl2qN3Op
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+PTP wants to grow new snapshot functionality, which provides not only the
+captured CLOCK* values, but also the underlying clocksource counter value.
 
-On Thu, May 21, 2026 at 02:25:52PM +0100, Mark Rutland wrote:
-> As the SME state size can vary at runtime, we don't have a concrete type
-> for the in-memory SME state, and pass this around using a pointer to
-> void.
->=20
-> Using pointer to void means that it's very easy to introduce errors that
-> cannot be caught by the compiler (e.g. as 'void **' can be assigned to
-> 'void *').
->=20
-> Improve this by adding an opaque 'struct sve_state', and consistently
-> passing a pointer to this.
+   https://lore.kernel.org/20260515164033.6403-1-akiyano@amazon.com
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+There was quite some discussion in seemingly related threads how to capture
+these values and how to provide core infrastructure so that driver writers
+have something to work with
 
---k7dlkVAhEl2qN3Op
-Content-Type: application/pgp-signature; name="signature.asc"
+   https://lore.kernel.org/20260514225842.110706-1-hramamurthy@google.com
+   https://lore.kernel.org/20260520135207.37826-1-dwmw2@infradead.org
 
------BEGIN PGP SIGNATURE-----
+This series implements the timekeeping related mechanisms to:
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoV0LUACgkQJNaLcl1U
-h9DQDAf+JGb0gcT8On/y7MnY+7JzDNUH1pP7oAg36SBjfXyTtn67iSOgfyO+BBJV
-8bpvKMwIgCrCsfpi+Xphp2Bu7WpJtqgheZG4bm3DrpMuvyf4aaSDb/sTLtsAka/l
-CALNrdL7aHk0BSCY7GC6mpw3sMJUZqidhY153exnOytVdqVK4C5mOCvIDN+E6xqa
-ITVY8g/Za8gDYAyyyWdLnUAFXBMBfJ6BB1orBdcx/gC+liPEwcj+HG1K36alIuvm
-PgZ/DTpNu0/UyS+fT18zKOgd2WFUkmzxRDWC/Ie6oA0O58pF9KnNlLO/WUTOwhA8
-O6b1LKf+Uht1imtKIGUJbWjQBesH9g==
-=cZ12
------END PGP SIGNATURE-----
+     1) Capture CLOCK values along with the clocksource counter value for
+     	non-hardware based sampling
 
---k7dlkVAhEl2qN3Op--
+     2) Expanding the hardware cross time stamp mechanism to hand back the
+     	clocksource counter value, which was captured by the device, along
+     	with the related CLOCK values
+
+     3) Adding AUX clock support to the hardware cross timestamping core
+
+It's based on v7.1-rc2 and also available from git:
+
+    git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timekeeping-ptp-extend-v1
+
+Thanks to David for rebasing his PTP/timekeeping work on top and providing
+feedback, fixes and testing.
+
+Thanks,
+
+	tglx
+---
+ arch/arm64/kvm/hyp_trace.c                          |    8 
+ arch/arm64/kvm/hypercalls.c                         |    6 
+ drivers/net/dsa/sja1105/sja1105_main.c              |    8 
+ drivers/net/ethernet/intel/ice/ice_ptp.c            |    5 
+ drivers/net/ethernet/intel/igc/igc.h                |    1 
+ drivers/net/ethernet/intel/igc/igc_ptp.c            |    4 
+ drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c |    4 
+ drivers/net/wireless/intel/iwlwifi/mld/ptp.c        |    5 
+ drivers/net/wireless/intel/iwlwifi/mvm/ptp.c        |    7 
+ drivers/pps/generators/pps_gen-dummy.c              |    6 
+ drivers/pps/generators/pps_gen_tio.c                |    6 
+ drivers/ptp/ptp_chardev.c                           |   18 +
+ drivers/ptp/ptp_ocp.c                               |   11 -
+ drivers/ptp/ptp_vmclock.c                           |   25 --
+ drivers/virtio/virtio_rtc_ptp.c                     |    2 
+ include/linux/pps_kernel.h                          |    8 
+ include/linux/ptp_clock_kernel.h                    |   15 -
+ include/linux/timekeeping.h                         |   54 ++---
+ kernel/time/timekeeping.c                           |  211 ++++++++++++--------
+ sound/hda/common/controller.c                       |    4 
+ 20 files changed, 236 insertions(+), 172 deletions(-)
