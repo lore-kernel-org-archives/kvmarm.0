@@ -1,85 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C08038D3F9
-	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 15:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB53F3B6C0E;
+	Tue, 26 May 2026 16:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779810949; cv=none; b=d3XECZ10p+3NMr1tMgzGyEF6LqlaM+23Pri+pFQyAeHZdgJ8XAutK+gN4dPdOJN2ixwhG4GoQCGmMxDtqn3UJi3RQ1yme9TsMUwD08RPxBZGgHzmSMH9QO978GISHh/FHryA18ZttsQxp8ja7HfiShE8RfE2cdLWk99G7fBZRB4=
+	t=1779812878; cv=none; b=gSvENQRsrnmu+ScIedX38lLwwjLuVN/MHavzN9v6vsV6zgCC2XLgtgRfDG9tLYmeysjPSv72kfg1BiHu333GNZW8JhK0L0YBevM0rArfjIe1pQ78oV2WRnvwUX2Ib136odM27NPh8nopuyna3oncaKFKYpvjQDccj4tDpbvUltA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779810949; c=relaxed/simple;
-	bh=EV4SvhejT2hQh0C5k5sKp9uFWYLIKDHLD8spzzDKdUc=;
+	s=arc-20240116; t=1779812878; c=relaxed/simple;
+	bh=uyHF9eg1fNPkQ8bTIFguWMYCPZbh4kpcbqHZpzfY8Kw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B41EQO31Bqa0NtNfaa9Zh15Z45ExLXBoWnWZvr8Jwdo6RUG+ZhkQwBQSSWfm1ayozeAZHNyXkzbcoadaKknRoICsr5XmYBwheIJX+G1ptBguhgvsX5pdSo9kgnFacRAxlAuhsJluwmKAOCudUDUbTqfAdEeFIVaSQvZtFbyckkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFvF0zJi; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=AziRrhsRir8YWeyz42HDuEP+8qUcuQZXagXkwHREyT6bphCInCt+boVrrY8r53bWLbD1giC89oRTsjRrwgzqDqSFPXtFcFAPTs4oXTj9qMhwpQ0vICtcd7j7bM+g+9M1BKQ25mi8XjytkgkI/ZUsnIRDNPUt9lvlQer72yt20cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCPBslFB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFvF0zJi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C2351F000E9;
-	Tue, 26 May 2026 15:55:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCPBslFB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 289D31F000E9;
+	Tue, 26 May 2026 16:27:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779810948;
-	bh=ZNg65F8o+4jumSNRPx/T2FFyZjl7IBIA2OxW5ATa7ao=;
+	s=k20260515; t=1779812875;
+	bh=uX6weQ63PycMa+NiIwkaE0lKXtL5D7cf5slQyEH4uVQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EFvF0zJica8h5ETJEnWESEi62COQQvAI8gG/6Mvn5TxmQvDlzj0GpwYIywEBnL8zF
-	 8TfdSm4FfwVJeAd7Zzq753jZw70BCRGyxh58QxI7uyGIDHsiuilw7mA56LlPqN1mu4
-	 15+v9mjgXon1yGukYoHIJ31Stz9ddJYYI6NoAD529w67Qh7i++5Q0C4lBSX6ptpUVV
-	 Bu+GgRQAhFr9JscQASUNAPStaxlz/ZtohuTghE0CdPTZZZR2rx8Q5McTT3U8SUVzyw
-	 qHw7ySp8qao5boWgIjpeeF7pwm7EZDDBq0o8b20OERZD6Oz7eefv0RE4LuuABgDFam
-	 gUKP1jOusXyGw==
-Date: Tue, 26 May 2026 16:55:44 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org,
-	oupton@kernel.org, tabba@google.com, will@kernel.org
-Subject: Re: [PATCH 10/18] arm64: sysreg: Add FPCR and FPSR
-Message-ID: <458fcb4c-46a9-49db-a179-9081d7d50dbf@sirena.org.uk>
-References: <20260521132556.584676-1-mark.rutland@arm.com>
- <20260521132556.584676-11-mark.rutland@arm.com>
+	b=WCPBslFBHlD18xXQc3r4cfXRi6NRqMWZgpFMn1cIbrapYoU4c4gRwNK1+7uVsqGAy
+	 60v2BCHvTRcdS1tVvGPbqfVfdwwcJp1FHFNfktx1fkX0Wbx1RZrVm0KBNermhINrKf
+	 T9lX4lpoqb8ZTQ988HCILQXzmPKZjen7JnhZ0OVSRmfeZwap0kKaSy4gg8etm5udnf
+	 udcU0Sgi7luz1Cc1OPvSW+2ubz9qCszQO2AwKg/qp69fZ72CdWGJzB5e9f6nHF0uBd
+	 ldc80qXMC/DUvHJCNvAW1ArbfI1EfmFu9YdmZYAerVhlmQZOEcNqDEor/Ir+l9+s8j
+	 e4sx9r+STyxUg==
+Date: Tue, 26 May 2026 17:27:52 +0100
+From: Lorenzo Stoakes <ljs@kernel.org>
+To: Takahiro Itazuri <itazur@amazon.com>
+Cc: seanjc@google.com, Liam.Howlett@oracle.com, ackerleytng@google.com, 
+	agordeev@linux.ibm.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	alex@ghiti.fr, andrii@kernel.org, aou@eecs.berkeley.edu, ast@kernel.org, 
+	baolu.lu@linux.intel.com, borntraeger@linux.ibm.com, bp@alien8.de, bpf@vger.kernel.org, 
+	catalin.marinas@arm.com, chenhuacai@kernel.org, corbet@lwn.net, coxu@redhat.com, 
+	daniel@iogearbox.net, dave.hansen@linux.intel.com, david@kernel.org, 
+	derekmn@amazon.com, dev.jain@arm.com, eddyz87@gmail.com, 
+	gerald.schaefer@linux.ibm.com, gor@linux.ibm.com, haoluo@google.com, hca@linux.ibm.com, 
+	hpa@zytor.com, itazur@amazon.co.uk, jackabt@amazon.co.uk, jackmanb@google.com, 
+	jannh@google.com, jgg@ziepe.ca, jgross@suse.com, jhubbard@nvidia.com, 
+	jiayuan.chen@shopee.com, jmattson@google.com, joey.gouly@arm.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, jthoughton@google.com, kalyazin@amazon.co.uk, 
+	kas@kernel.org, kernel@xen0n.name, kpsingh@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, lenb@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, linux-pm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, loongarch@lists.linux.dev, 
+	lorenzo.stoakes@oracle.com, luto@kernel.org, maobibo@loongson.cn, martin.lau@linux.dev, 
+	maz@kernel.org, mhocko@suse.com, mingo@redhat.com, mlevitsk@redhat.com, 
+	nikita.kalyazin@linux.dev, oupton@kernel.org, palmer@dabbelt.com, patrick.roy@linux.dev, 
+	pavel@kernel.org, pbonzini@redhat.com, peterx@redhat.com, peterz@infradead.org, 
+	pfalcato@suse.de, pjw@kernel.org, prsampat@amd.com, rafael@kernel.org, 
+	riel@surriel.com, rppt@kernel.org, ryan.roberts@arm.com, sdf@fomichev.me, 
+	shijie@os.amperecomputing.com, skhan@linuxfoundation.org, song@kernel.org, surenb@google.com, 
+	suzuki.poulose@arm.com, svens@linux.ibm.com, tabba@google.com, tglx@kernel.org, 
+	thuth@redhat.com, urezki@gmail.com, vannapurve@google.com, vbabka@kernel.org, 
+	will@kernel.org, willy@infradead.org, wu.fei9@sanechips.com.cn, x86@kernel.org, 
+	yang@os.amperecomputing.com, yangyicong@hisilicon.com, yonghong.song@linux.dev, 
+	yosry@kernel.org, yu-cheng.yu@intel.com, yuzenghui@huawei.com, 
+	zhengqi.arch@bytedance.com
+Subject: Re: [PATCH v12 00/16] Direct Map Removal Support for guest_memfd
+Message-ID: <ahXJoHNoeCcaupzN@lucifer>
+References: <aeennZlV60k81OBf@google.com>
+ <20260506080753.14517-1-itazur@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="G7fW5B6xakMhz0Gm"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260521132556.584676-11-mark.rutland@arm.com>
-X-Cookie: You are fairminded, just and loving.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260506080753.14517-1-itazur@amazon.com>
 
+On Wed, May 06, 2026 at 08:07:52AM +0000, Takahiro Itazuri wrote:
+> Hi Lorenzo and Sean,
+>
+> Apologies for the delayed reply — Nikita is leaving Amazon, and I'm
+> taking over this series going forward. Thanks for your patience.
 
---G7fW5B6xakMhz0Gm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hey,
 
-On Thu, May 21, 2026 at 02:25:48PM +0100, Mark Rutland wrote:
-> Add sysreg definitions for FPCR and FPSR.
+Thanks for letting us know! And thanks to Nikita for all his work, will
+keep an eye out for the respin!
 
-> +Sysreg	FPCR	3	3	4	4	0
+Cheers, Lorenzo
 
-This looks good.
-
-> +Sysreg	FPSR	3	3	4	4	1
-> +Res0	63:32
-> +Field	31	N
-> +Field	30	Q
-
-DDI0487 M.b and DDI0601 2026-03 both call this field Z.
-
---G7fW5B6xakMhz0Gm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoVwn8ACgkQJNaLcl1U
-h9BTRggAhNEDG+iEgC6Eic1xR0NKIc+l4w6x+B77WYe505Ojy6JMyp170pylXegX
-wSQxHgZ08gYCuIDngbxHVDVQxICBRKRgwHyPewpbA1r3fd3wNuco892mJQAttRtB
-F1I6DCPBFnd2U1qSLrhC0kRyKs4Wrh5nmElIS0TOTnLRy7xZA1H0cx1lidCV6nCO
-CNZY/WQ/VYwAYQlxWfEFh9Ende+LakujTqczdm3KDTihx6xDPoUIW92WaYqjQjcK
-AS3nB8VG/TTLREfKYiO2FPHJOF9S2eSRFfJQ+zss3rTuQHyANI7i5e+bo5qUBn3h
-q4A+Updj86SXLrO1tjHhrcoZXaH2Ow==
-=f89D
------END PGP SIGNATURE-----
-
---G7fW5B6xakMhz0Gm--
+>
+> On Tue, Apr 21, 2026 at 01:40:00PM +0000, Lorenzo Stoakes wrote:
+> > Hm, given this touches a fair bit of mm, I wonder if we shouldn't try to do this
+> > through the mm tree?
+>
+> On Tue, Apr 21, 2026 at 04:36:00PM +0000, Sean Christopherson wrote:
+> > Yeah, when the time comes, the mm pieces definitely need to go through the mm
+> > tree.  Ideally, I think this would be merged in two separate parts, with all mm
+> > changes going through the mm tree, and then the KVM changes through the KVM tree
+> > using a stable topic branch/tag from Andrew.
+>
+> Thanks for the guidance. The split makes sense to me; I'm planning to
+> follow this approach with patches 1-6 (mm) going through the mm tree
+> and patches 7-16 (KVM) through the KVM tree on top of a stable
+> branch/tag from mm. I'll confirm the exact boundary and coordination
+> details as I prepare the repost.
+>
+> On Tue, Apr 21, 2026 at 01:40:00PM +0000, Lorenzo Stoakes wrote:
+> > In any case, we definitely need a rebase on something not-next :) if not mm then
+> > Linus's tree at least maybe?
+> >
+> > I'm seeing a lot of conflicts against mm-unstable, it can't b4 shazam even patch
+> > 1 and in Linus's tree it's failing at an mm patch (mm: introduce
+> > AS_NO_DIRECT_MAP).
+>
+> I'll rebase onto v7.1-rc1 and resolve the conflicts as part of the split.
+>
+> Takahiro
+>
