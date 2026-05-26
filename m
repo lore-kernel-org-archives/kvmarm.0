@@ -1,54 +1,54 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0183030FF36
-	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 15:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607D231327F
+	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 15:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779808793; cv=none; b=pqrjj59XRckpdxv1NMYui1VUPEQ1CmFcBQRvtyVUrLWQWwI93by+tO8CEm4aJjuSJUotGWNOekM5DpMf7U7nW6BrWE3EEp/CZLYvkL4gx4P5T6/CJJ3tRHrikwT0AQRmhOIreYpHqH5da0sVkd16dy80HtLHI/xx7p7nhRNMqIA=
+	t=1779808795; cv=none; b=Oq2gwOAsOVDP5DOThhFpwhh6uTmeK7d2AFC7uj3URK90APwsDVv12k5HC8+rPPpsjDyQ2TpGCNUfZIeemLpTlkJB6eEgDq0ZI/n+UTJkp99VWjd+JBrUrkhRAfwvGFKZdr+fr2MqFIszNGyVVa9Mnfx8nom9QRe4JYEpl3BBNKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779808793; c=relaxed/simple;
-	bh=QF3GgHGmqxOc2ZiHSwTIFp/SPXOTLWdRiKhIV8Khm7E=;
+	s=arc-20240116; t=1779808795; c=relaxed/simple;
+	bh=cWAWGazl9y0NCQE6boUFtmipRD653SY/f3mBGb2AlJ8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dfOLUryUanrr+no5Ap0tlO8j3BZFu6/YIH5rck6BIMtoArrYjxmvchbDuymQxH31mTzRbXhlmcrZoCRRhX+AiUYk30ogMt57LJr12Hhc1zKa0VNe2fJ9LR2wnNrHUVFR4JuP33mR0b6cVWaXtTZ7rBYsQvrdRgW+j0uVvY8r44g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pm1XkyR/; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=BS7Zrdrc1lyDDX3lswRiHWItineEBCgmPc+tpQtzhx0dZxyKeTrIrfYXcY3JZgyvyk5m4l4uR2WBKP7/+4kQt7CpMkL+z1KYZX1mAUWKQ26A2xM8TOYm2vPjWiaGGevtyY1x7wdWzDULDcv3T06pMy3tVM+3le2TVPOAUllewr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fKnvs3t+; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pm1XkyR/"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-bdfb99d8af7so285112966b.2
-        for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 08:19:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fKnvs3t+"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-48fdad6cce4so51864695e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 08:19:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779808790; x=1780413590; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1779808792; x=1780413592; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UeoRdqb2W8o2rKYS6Num15n8gkt/ODkSyZpzjjpRQD8=;
-        b=Pm1XkyR/POxjSYaNZKdlir1N+wFarrMWvNP5ILhjxn+BWGyvGerty4N3dtL4Hds8n2
-         2Cp/fS5vAT3C79fwo0MWzJwD6+bqFznXJwP49sNfEp3o6jTudP+uYmpiRVHnOQwAfXrM
-         lU9zimOlwPoIMhGdn3V8ybs4jggdlAuJx0VsU5dBCc7BHATQRMQwmawr7w6WEDoSOW62
-         OHh+licMQ4fM/g/Yjzh771pXEjtv+EqZkIf6f8mrgp4/OJ4L54Mc9QEj9l8ivLVN9cVv
-         QopD01rCjy4NTlNFudgnbMDJJ58XeszBOXdSaDVLNPWBIGpyv8SUgNGjfZxkv3ODbyOo
-         Ce5g==
+        bh=e46ed4u5Cv0I3gq+GXl599KXwFIbkYlwQRCW4+ScRKU=;
+        b=fKnvs3t+NcJo4kfeTCw+2Xzd4pIpVdQNvVZgWpLX33WszQsIOD1DrxOpLdKsaoEAkM
+         y41775mjIoiqhaz7kXgfYBghmZhkv0SWMvfT6W7bEo+679rlcLVKbQjUIx2gUX93AHBs
+         FUuMvHEkoyBOxW9CIJ17ASQvRDoBtRlK4JIsX3CjiUiFMcggddyPOzfD/ss9JLRjHpj6
+         XQ1Lg6/wAyhl8vIZPUDZoHrs+i3lMVYa1ZekKQAYmhbbU+1eYL/Q3YuAjEJtYDhN2VTD
+         MTEwULjeUaQevRiYtapZ5ObjTUfS5eFphqCKOfoM8bl704Xjlb7T0/OtPnOFlWbK3JxH
+         8KjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779808790; x=1780413590;
+        d=1e100.net; s=20251104; t=1779808792; x=1780413592;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UeoRdqb2W8o2rKYS6Num15n8gkt/ODkSyZpzjjpRQD8=;
-        b=dDigIgIYVJ6ukt4NfACmW0IW0LeT78snKNuutBrRR8lt/fBeiWF0GQQc0Xu0LcHiwz
-         sc9Dz5EFFMcTmuvSAaL0e5NWh5kFIQLJPR4KrIYBW5xphUYptH7CAZZi7OffAK7/1+P2
-         gZ+ASvmWmWpp1VSnO/cBhzdLCkDyHq5HkgIEn2m59Wm/nCWefi2xxJ/coShK4YemU05l
-         DfB+0J48Jc6ysS1lc58W8/EYzeRGaSU48WaV/OyGNFbEGAu3NFyypdVyTkHj0BrHmXf9
-         3ilg8QYYBBNo49L0E5wfKcuzmKr8iRWtJPQMTr/U7CQua3/WDNvwEZg5G1oXoH4GSd04
-         utEA==
-X-Forwarded-Encrypted: i=1; AFNElJ/FgpSFZ5+n/aBkMBAVrnSl29ibCh9sFZ/x/HXf3iI7e6i3cgvlKz8OoNVpjKwGcPmwGNtANE8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzTgET5viRZvsDlQ7iq1byzxh9/OhMlqAhBTW5nsA+Ds+QSZpEQ
-	hPNqOq0srvwbwEYqmiAxqj9mdqpaYk6aVHe8qumRudkbO/aObuzAJlvxba2RZ2vt2gT3MqftdlY
-	sg4HOCJHV9eBXOQ==
-X-Received: from edbcr16.prod.google.com ([2002:a05:6402:2230:b0:687:17de:d8b5])
+        bh=e46ed4u5Cv0I3gq+GXl599KXwFIbkYlwQRCW4+ScRKU=;
+        b=Gf6sulrn87N4O9OYbXhr15E1UDzuohEjjBMDc6eYHckie7d3cbZnnqnBelmpEPL5Sg
+         AnjAq1M697zwB59DTvrT3XZ+kv+kgKSCq7g4qmNP2J/qEvXc5TWWCUKfOR2ntc/QyP7A
+         jn43RI+qtRUu22iOH5TI2T2mtOSgXgUn4Ei/ESYFrvzojoGHg3ZjPMDgiZacJp87cWZK
+         UfMEkGpeSLIoiIg4RxahopBF9RZWiaAJCLEywKVK2eMU3I+cyRddYxUYnuK3vZnMRJs6
+         nu3ylEP9DRQSvth4Iwh6q9jlMOmvn2IcZqrYjgJeViwYXKvWRTeXT0F6Y95J0OZsFYS7
+         jvmg==
+X-Forwarded-Encrypted: i=1; AFNElJ8pSzKSHjIII1i0ZLZBAhGAcDD6TJ8n0zw0pP8br/M5DDg/A1UPdatn1esGTvFVqVIT9IJpCeA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwqlAC5vxrxoyPd/0dnELkorlKZuhW25+UGrUc3iGqszwXWZjf0
+	LmyCFUB7ILdYwAk5xtzZOdTQ1RThCLJMRHIN5rLiXXonEARj2zcWr+ok9kh89D66EbNt5nCuueo
+	s03EhxedA1IxCgA==
+X-Received: from wrpj7.prod.google.com ([2002:adf:f547:0:b0:45e:75ad:a480])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:5107:b0:67e:96a8:40d0 with SMTP id 4fb4d7f45d1cf-6889cc429a0mr6652238a12.21.1779808790002;
- Tue, 26 May 2026 08:19:50 -0700 (PDT)
-Date: Tue, 26 May 2026 15:19:32 +0000
+ 2002:a05:600c:5681:b0:486:fcc7:6811 with SMTP id 5b1f17b1804b1-49035f53c64mr252846105e9.10.1779808791592;
+ Tue, 26 May 2026 08:19:51 -0700 (PDT)
+Date: Tue, 26 May 2026 15:19:33 +0000
 In-Reply-To: <20260526151934.3783707-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260526151934.3783707-1-smostafa@google.com>
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260526151934.3783707-5-smostafa@google.com>
-Subject: [PATCH v5 4/6] KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
+Message-ID: <20260526151934.3783707-6-smostafa@google.com>
+Subject: [PATCH v5 5/6] KVM: arm64: Validate the offset to the mem access descriptor
 From: Mostafa Saleh <smostafa@google.com>
 To: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
@@ -69,56 +69,97 @@ Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
 	sudeep.holla@kernel.org, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Sashiko (locally) reports out of bound write possiblity if SPMD
-returns an invalid data.
+From: Sebastian Ene <sebastianene@google.com>
 
-While SPMD is considered trusted, pKVM does some basic checks,
-for offset to be less than or equal len.
+Prevent the pKVM hypervisor from making assumptions that the
+endpoint memory access descriptor (EMAD) comes right after the
+FF-A memory region header.
+Prior to FF-A version 1.1 the header of the memory region
+didn't contain an offset to the endpoint memory access descriptor.
+The layout of a memory transaction looks like this from 1.1 onward:
+Type | Field name | Offset
+[ Header | ffa_mem_region  | 0
+  EMAD 1 | ffa_mem_region_attributes) | ffa_mem_region.ep_mem_offset
+]
+Verify that the offset to the first endpoint memory access descriptor
+is within the mailbox buffer bounds.
 
-However, that is incorrect as even if the offset is smaller than
-len pKVM can still access out of bound memory in the next
-ffa_host_unshare_ranges().
+Also, fix one hardcoded sizeof(struct ffa_mem_region_attributes) that
+should be replaced ffa_emad_size_get() for compatibility with FFA v1.0.
 
-Split this check into 2:
-1- Check that the fixed portion of the descriptor fits.
-2- After getting reg, check the variable array size addr_range_cnt
-   fits.
+[@Mostafa, Add missing call to ffa_rx_release() and use fraglen
+ as the max buffer size as it is the only intialised part]
 
-Also, drop the WARN_ONs as that will panic the kernel and in the
-next checks there are no WARNs, so that makes it consistent.
-
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 1af722771178..b6cf9ad82e12 100644
+index b6cf9ad82e12..79de358333e4 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -607,8 +607,8 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 	 * check that we end up with something that doesn't look _completely_
- 	 * bogus.
- 	 */
--	if (WARN_ON(offset > len ||
--		    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
-+	if (offset + CONSTITUENTS_OFFSET(0) > len ||
-+	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
- 		ret = FFA_RET_ABORTED;
- 		ffa_rx_release(res);
- 		goto out_unlock;
-@@ -641,6 +641,11 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 		goto out_unlock;
+@@ -479,7 +479,7 @@ static void __do_ffa_mem_xfer(const u64 func_id,
+ 	struct ffa_mem_region_attributes *ep_mem_access;
+ 	struct ffa_composite_mem_region *reg;
+ 	struct ffa_mem_region *buf;
+-	u32 offset, nr_ranges, checked_offset;
++	u32 offset, nr_ranges, checked_offset, em_mem_access_off;
+ 	int ret = 0;
  
- 	reg = (void *)buf + offset;
-+	if (offset + CONSTITUENTS_OFFSET(reg->addr_range_cnt) > len) {
-+		ret = FFA_RET_ABORTED;
+ 	if (addr_mbz || npages_mbz || fraglen > len ||
+@@ -489,7 +489,7 @@ static void __do_ffa_mem_xfer(const u64 func_id,
+ 	}
+ 
+ 	if (fraglen < sizeof(struct ffa_mem_region) +
+-		      sizeof(struct ffa_mem_region_attributes)) {
++		      ffa_emad_size_get(hyp_ffa_version)) {
+ 		ret = FFA_RET_INVALID_PARAMETERS;
+ 		goto out;
+ 	}
+@@ -508,8 +508,13 @@ static void __do_ffa_mem_xfer(const u64 func_id,
+ 	buf = hyp_buffers.tx;
+ 	memcpy(buf, host_buffers.tx, fraglen);
+ 
+-	ep_mem_access = (void *)buf +
+-			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
++	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
++	if ((u64)em_mem_access_off + ffa_emad_size_get(hyp_ffa_version) > fraglen) {
++		ret = FFA_RET_INVALID_PARAMETERS;
 +		goto out_unlock;
 +	}
 +
- 	/* If the SPMD was happy, then we should be too. */
- 	WARN_ON(ffa_host_unshare_ranges(reg->constituents,
- 					reg->addr_range_cnt));
++	ep_mem_access = (void *)buf + em_mem_access_off;
+ 	offset = ep_mem_access->composite_off;
+ 	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
+ 		ret = FFA_RET_INVALID_PARAMETERS;
+@@ -576,7 +581,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
+ 	DECLARE_REG(u32, flags, ctxt, 3);
+ 	struct ffa_mem_region_attributes *ep_mem_access;
+ 	struct ffa_composite_mem_region *reg;
+-	u32 offset, len, fraglen, fragoff;
++	u32 offset, len, fraglen, fragoff, em_mem_access_off;
+ 	struct ffa_mem_region *buf;
+ 	int ret = 0;
+ 	u64 handle;
+@@ -599,8 +604,14 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
+ 	len = res->a1;
+ 	fraglen = res->a2;
+ 
+-	ep_mem_access = (void *)buf +
+-			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
++	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
++	if ((u64)em_mem_access_off + ffa_emad_size_get(hyp_ffa_version) > fraglen) {
++		ret = FFA_RET_INVALID_PARAMETERS;
++		ffa_rx_release(res);
++		goto out_unlock;
++	}
++
++	ep_mem_access = (void *)buf + em_mem_access_off;
+ 	offset = ep_mem_access->composite_off;
+ 	/*
+ 	 * We can trust the SPMD to get this right, but let's at least
 -- 
 2.54.0.746.g67dd491aae-goog
 
