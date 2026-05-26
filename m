@@ -1,42 +1,46 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFEE3DD515
-	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 10:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1EA3F86F8
+	for <kvmarm@lists.linux.dev>; Tue, 26 May 2026 12:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779792687; cv=none; b=Paco1EIiZswocx+PH5vHsz4BN8gZwcsuaQYa1ZiZ9Yx76uUNz7ZscAZCS5cat2FDFft9hiFqZD8H/7HpdFZx/azghSvx9gT1F3FujXixmTy/QDHnTfFVWu+c/qHBnxshPZ3GWpFA4hPDlIgrwgaUVWV5VzZI0dU9GYoKsIOCH+g=
+	t=1779797014; cv=none; b=RB0D6NlhUwEOZ8UN1gH6esxsDO/QqczJgcj+3do9u1YiFZWBJ/+4ZUrWeah4EFv48bAhv+sdWV9UU4ZZXOpY1Fp44yoy+2LM/PsMKtjGeSMcC3JUTam5vfq8ZRTa3wb0bkjbTYrjXgleCRLJTsu9ucE+GPWJtwK+lbCfqgZoQjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779792687; c=relaxed/simple;
-	bh=ZxOUuceS2mxmDx2oNv6hCdsGaOdZS8PVj3M7iP62dbI=;
+	s=arc-20240116; t=1779797014; c=relaxed/simple;
+	bh=FlkpAY2X0Yf6Pfxqf2EFeAIJYm7FxKNht2VVBPprLyY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hdpuJPBV1Lu9APJgLygruS+SgmzkjHYn7pnxT2TxcBnUPmISEVveZ3y9gqKSlYLIOu9vKgGYGcXFSUFs3VuJgnyqCD6mR/iHSuP7I68LTXxcFnsyL1+FkyJCLT9kqklj8ZE+F5zUzCTWKvRfsLDVCytq9c+UMMmyt0fbTWRRp+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=k6YMIO2N; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=TYy6Q8Ayh+HSMDaYJHJtNJYUUOg3ZYyzYJSyuE222MaZQ4Sg/k1h1pSmREIQt0gaIREBBhM8iURGVQjUIUO/ObsAbFwOSYh/Jg5G3SficjUOtTlU+UEwpgokyaHaelX5UM+joDMg69mVj4gqltv2UTZjumwcKTgtk5+DkmESswg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JocWluzf; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="k6YMIO2N"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JocWluzf"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92FEF169C;
-	Tue, 26 May 2026 03:51:19 -0700 (PDT)
-Received: from e129823.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 82C123F7B4;
-	Tue, 26 May 2026 03:51:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5B89169C;
+	Tue, 26 May 2026 05:03:23 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF7E43F7B4;
+	Tue, 26 May 2026 05:03:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779792684; bh=ZxOUuceS2mxmDx2oNv6hCdsGaOdZS8PVj3M7iP62dbI=;
+	t=1779797008; bh=FlkpAY2X0Yf6Pfxqf2EFeAIJYm7FxKNht2VVBPprLyY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k6YMIO2N360Dwl1uu4plqdmpqgjBNP0wS6JklC5B/aLtkqSKVBxg+93v6VC+gfM9F
-	 83lPoSShTY2rg6E4cxYx0Jjm3O0crKYxqOAVmcFUpEdpkhILGxQWRTQmfjCmzhkyER
-	 WVd8dkNQ/SFUheW/uFNM62wiyfAfoakRFQhOrdhs=
-Date: Tue, 26 May 2026 11:51:21 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Sudeep Holla <sudeep.holla@kernel.org>
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH] firmware: arm_ffa: Treat missing FF-A feature on a
- platform as a probe miss
-Message-ID: <ahV7KVX2jPhGELwF@e129823.arm.com>
-References: <20260526103649.5684-1-sudeep.holla@kernel.org>
+	b=JocWluzfka/6ENtOHIR4dFPNqvNa8CNewaA4hKshW5Dw0uZjcQsvUUIhXmf4AIjaO
+	 0pGRR2jmTc0GcfqCJTAs9/uh/FJ1Evnjc8x+7gw5zRF5zyqTbGZZ8/7HJfVRkQyGXE
+	 XdHOXd086EHrfmvunqN2WcSHj0m9rz1IbmlbrMtg=
+Date: Tue, 26 May 2026 13:03:19 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Preserve all guest ZCR_EL2.LEN values
+Message-ID: <ahWMByoIme6_oECX@J2N7QTR9R3>
+References: <20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org>
+ <ahSWwl-uCv4ZW-nE@J2N7QTR9R3>
+ <b4fdceb6-5fa7-4829-a60e-6f80f47f032a@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,63 +49,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260526103649.5684-1-sudeep.holla@kernel.org>
+In-Reply-To: <b4fdceb6-5fa7-4829-a60e-6f80f47f032a@sirena.org.uk>
 
-LGTM.
+On Tue, May 26, 2026 at 11:19:38AM +0100, Mark Brown wrote:
+> On Mon, May 25, 2026 at 07:36:50PM +0100, Mark Rutland wrote:
+> > On Fri, May 22, 2026 at 07:00:04PM +0100, Mark Brown wrote:
+> 
+> > > Since b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps") when guests
+> > > write to ZCR_EL2 we have clamped the value of ZCR_EL2.LEN to be at most
+> > > that configuring the maximum guest VL. This is not the behaviour the
+> 
+> ...
+> 
+> > Have we sought feedback from architects? While I said "*or* the
+> > architcture requires a clarification", I think it should be clarified
+> > more explicitly either way given that the pattern is unusual.
 
-Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
+The part I asked for clarification on was:
 
-On Tue, May 26, 2026 at 11:36:49AM +0100, Sudeep Holla wrote:
-> When FF-A initialisation is driven from a platform device probe, systems
-> that do not implement FF-A can return -EOPNOTSUPP from the early transport
-> or version discovery paths. Driver core treats that as a matched probe
-> failure and prints:
-> 
->   |  arm-ffa arm-ffa: probe with driver arm-ffa failed with error -95
-> 
-> That is noisy for a firmware interface that can be absent on otherwise
-> valid systems. Driver core already treats -ENODEV and -ENXIO as quiet
-> rejected matches, so translate only the early unsupported discovery cases
-> to -ENODEV. Keep later setup failures unchanged so real FF-A
-> initialisation problems are still reported as probe failures.
-> 
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Closes: https://lore.kernel.org/all/20260523001148.GA1319283@ax162
-> Signed-off-by: Sudeep Holla <sudeep.holla@kernel.org>
-> ---
->  drivers/firmware/arm_ffa/driver.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
-> index 54984e1b9741..0f468362c288 100644
-> --- a/drivers/firmware/arm_ffa/driver.c
-> +++ b/drivers/firmware/arm_ffa/driver.c
-> @@ -2109,7 +2109,7 @@ static int ffa_probe(struct platform_device *pdev)
->  
->  	ret = ffa_transport_init(&invoke_ffa_fn);
->  	if (ret)
-> -		return ret;
-> +		return ret == -EOPNOTSUPP ? -ENODEV : ret;
->  
->  	drv_info = kzalloc_obj(*drv_info);
->  	if (!drv_info)
-> @@ -2117,8 +2117,11 @@ static int ffa_probe(struct platform_device *pdev)
->  	platform_set_drvdata(pdev, drv_info);
->  
->  	ret = ffa_version_check(&drv_info->version);
-> -	if (ret)
-> +	if (ret) {
-> +		if (ret == -EOPNOTSUPP)
-> +			ret = -ENODEV;
->  		goto free_drv_info;
-> +	}
->  
->  	if (ffa_id_get(&drv_info->vm_id)) {
->  		pr_err("failed to obtain VM id for self\n");
-> -- 
-> 2.43.0
-> 
+  AFAICT, none of the values for the SMCR_ELx.LEN and ZCR_ELx.LEN fields
+  are reserved or unallocated. Thus all the bits of those fields should
+  be stateful, and a read should observe the last value written,
+  regardless of the effective value of the field.
 
--- 
-Sincerely,
-Yeoreum Yun
+  [...]
+
+  Either what we're doing is wrong, or the architcture requires a
+  clarification to say that values corresponding to unimplmented vector
+  lengths are reserved.
+
+> > Given this is particularly subtle, please keep me in the loop when
+> > speaking with architects about this.
+> 
+> TBH it didn't strike me as subtle, I don't see anything in the
+> architecture which would lead me to expect the current behaviour. 
+
+The point I was trying to get across is that I don't think this is
+specified clearly enough, and I think we need to get this clarified.
+
+There's a general principle regarding reserved values. See K1.2.19
+("Reserved values in System and memory-mapped registers and translation
+table entries"), and specifically note "reserved values of fields".
+
+There's no explicit statement either way regarding the values for
+ZCR_ELx.LEN and SMCR_ELx.LEN. The statement regarding the selection of
+the effective vector length implies *some* constraints, but
+(explicitly!) doesn't specify the behaviour for direct reads.
+
+It's possible for a reader to come to one of the following conclusions:
+
+(a) Any value written to the LEN field must be preserved exactly. In all
+    cases a read must observe the last value written.
+
+(b) Some values written to the LEN field are reserved, and don't need to
+    be preserved exactly.
+
+    For example, since the only architecturally-defined VLs are
+    powers-of-two, the only "legitimate" values are: 0b0000, 0b0001,
+    0b0011, 0b0111, 0b1111. Hence any written value could be collapsed
+    to that set.
+
+(c) Some values written to the LEN field are reserved, and can be
+    replaced with *any* value.
+
+    See the statement at the end of K1.2.19 regarding subsequent reads
+    returning an UNKNOWN value.
+
+While one simple reading is that all values must be preserved exactly, I
+don't think this watertight, and I think while some people will take
+reading (a), others will take (b) or (c). I should have spelled that out
+more clearly in my initial mail, sorry.
+
+> The psudocode all just has direct assignments for the write
+
+The pseudocode doesn't capture the detail I've described above.
+
+> and there's language in the ARM (eg, in the ZCR_EL2 description)
+> saying "for all purposes other than returning the result of a direct
+> read of ZCR_EL2" which seems specifically intended to cover there
+> being a divergence between the written and effective values, though I
+> guess it doesn't explicitly mention writes in the text.  
+
+That permits a divergence, but does not define the boundary conditions
+for what a direct read can observe.
+
+Mark.
