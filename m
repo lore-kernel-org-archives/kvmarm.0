@@ -1,32 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EBB3009CB;
-	Tue, 26 May 2026 22:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B14218DB1A;
+	Tue, 26 May 2026 22:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779834468; cv=none; b=IjmRnQcuJF3Fb3RdCMZ6N4J5yt5Bf3B0LQpII6lEE+A+Vx16UTrHe90kn5WRgH/yge4vfS22UtUyHKdOiUMZd0BYb1iiBhQgM24kAotGtDxfQYKMK5bZvJMovenHT4On1dBjdX8arom1o+y5y9G1W/AYRx58qmY/MsXgppliUrI=
+	t=1779834762; cv=none; b=u/4vICQS9XsczWv373C8xhW0qRHJaI8fGNKBAk5+G1qoKmIbxTsGI7vwKi5z0eLNrspNbkI+wqlXQFTrCQ9eEzdwE71RKkW/8NQFY0e2mFt90zIAlCJEPgn7P/opuTc2TunUrVn1OrzgRZkcewyx6GoPrEbwuRa0ClBFFLzUgbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779834468; c=relaxed/simple;
-	bh=4mleRwxx/487qOWzenA0B4ktBvSH1skjy0g7+5i1jT4=;
+	s=arc-20240116; t=1779834762; c=relaxed/simple;
+	bh=CnTQg5Em7qbBD++2a2OXx4PHl2fVqQrbo8tj+7BfMfE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dG90b2QAsmAUmbH02OlcahpjaBIGEElea+T73ZO+SgyMUO7AimkZ274BTjFTEQQLgHU8Zb7RUNsTtS4T+sJH7XcwC2P+aPzeKxSsjf7h6X9An0QZpkyCRt8+xSZjFHa4sVhFFhQmKXDf2voEU50h4ZODCTK0zG7eO0YbEACpKAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UOeYDOoh; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=B13nAy7CY6Lo1flSeDyX72fRsftk7xMHg3UWhssO68vxET3o18dH1ZTYRBUGcE80pmbk1otvfUynN93EOE0m7X1snf7L3tLLTuJyCWC9gAXUNbB+F/5BVQCuBIqbNV+waBL7fOsa8DQ8epeFBjpjejQiDSuLhvPZzQQJa9kDx+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tjPO0vqv; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UOeYDOoh"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tjPO0vqv"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFAC92BCD;
-	Tue, 26 May 2026 15:27:40 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C32B31477;
+	Tue, 26 May 2026 15:32:34 -0700 (PDT)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 881D23F7B4;
-	Tue, 26 May 2026 15:27:40 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84A2F3F7B4;
+	Tue, 26 May 2026 15:32:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779834465; bh=4mleRwxx/487qOWzenA0B4ktBvSH1skjy0g7+5i1jT4=;
+	t=1779834759; bh=CnTQg5Em7qbBD++2a2OXx4PHl2fVqQrbo8tj+7BfMfE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UOeYDOohWEeBzw2bAt2AX18TjQdQbHOVZfrEHd4AIRBYF9jq4/i8HdB/ZGUVgVgsq
-	 dX/V72IFfHuj+6x9e0B+x3vDu5tinOc0nAyZwVrlPe58dRkjeknxe1Xm9h7ptBjjXn
-	 VqJtmIRizdJOT3MDwEQy52rX+mQcrkrsm715/pqY=
-Date: Tue, 26 May 2026 23:27:33 +0100
+	b=tjPO0vqvFaiqqgm2BzZR61freoSwDS6m3d5vKVc3BssrtXVrDDk0deeUcyaFJU3lb
+	 d18sTjnUlknydHfl3/deJeRP+vEMiR8ZprN3nTWc6ut3gP080bGKC5nkGEeGRn1zGz
+	 e7pNvwYOU5G9i2n4UltF+BZTABbIvNnbpcHhqv4Q=
+Date: Tue, 26 May 2026 23:32:28 +0100
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -42,7 +42,7 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
 	Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
 Subject: Re: [PATCH v14 17/44] arm64: RMI: RTT tear down
-Message-ID: <7egwow26r6sbbtm53mujbhpwyts2utzv2ddth7554kqwbk7k7d@iptjpvvbsc2n>
+Message-ID: <mpesc2j3czpunbg3pvgwbotvfn7vahaabvoiu77vd2g5uervho@255lwycekmxh>
 References: <20260513131757.116630-1-steven.price@arm.com>
  <20260513131757.116630-18-steven.price@arm.com>
 Precedence: bulk
@@ -164,12 +164,69 @@ On Wed, May 13, 2026 at 02:17:25PM +0100, Steven Price wrote:
 >  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
 > -	struct kvm_pgtable *pgt = NULL;
 > +	struct kvm_pgtable *pgt;
-
-Is this included by accident?
-
 >  
 >  	write_lock(&kvm->mmu_lock);
 >  	pgt = mmu->pgt;
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index f51ec667445e..5b00ccca4af3 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -11,6 +11,14 @@
+>  #include <asm/rmi_cmds.h>
+>  #include <asm/virt.h>
+>  
+> +static inline unsigned long rmi_rtt_level_mapsize(int level)
+> +{
+> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+> +		return PAGE_SIZE;
+> +
+> +	return (1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
+> +}
+> +
+>  static bool rmi_has_feature(unsigned long feature)
+>  {
+>  	return !!u64_get_bits(rmm_feat_reg0, feature);
+> @@ -21,6 +29,144 @@ u32 kvm_realm_ipa_limit(void)
+>  	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+>  }
+>  
+> +static int get_start_level(struct realm *realm)
+> +{
+> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
+> +}
+> +
+> +static void free_rtt(phys_addr_t phys)
+> +{
+> +	if (free_delegated_page(phys))
+> +		return;
+> +
+> +	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
+> +}
+> +
+> +/*
+> + * realm_rtt_destroy - Destroy an RTT at @level for @addr.
+> + *
+> + * Returns - Result of the RMI_RTT_DESTROY call, and:
+> + * @rtt_granule:	RTT granule, if the RTT was destroyed.
+> + * @next_addr:		IPA corresponding to the next possible valid entry we
+> + *			can target
+> + */
+> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
+> +			     int level, phys_addr_t *rtt_granule,
+> +			     unsigned long *next_addr)
+> +{
+> +	unsigned long out_rtt;
+> +	int ret;
+> +
+> +	ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
+> +			      &out_rtt, next_addr);
+> +
+> +	*rtt_granule = out_rtt;
+> +
+> +	return ret;
+> +}
+
+Looks like out_rtt can be simplified out.
 
 [...]
 
