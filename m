@@ -1,195 +1,196 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895AE3491E1;
-	Tue, 26 May 2026 22:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE2C211A14;
+	Tue, 26 May 2026 23:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779835659; cv=none; b=BIxgDHTxaIQT/1mfYdiujBx/R9Ahch9JJZyN5hu0fEDYPehnH6bVhGuMyomUsPKmuJuaVAbA+4zoOvy95yCvgO7QKd25tBTL9Xj+lTFwpsFcoVN9QZ/X+RiPzWHvEulpdEg2AdEgXBR1NYrBMKJh/MUvXChqK/QDIXiL1F1dVps=
+	t=1779838758; cv=none; b=cgE2OJi0dfBoPiNmuSVi8qVtw0PWyfea+LSFwJPPH/p2MB0+ZUpZrbnYpsQAWSdKqXhlmR1DWAykCijsHwZG4OotQNDjyAe6Qk4zMJ8/r+lupHWd55UK6bbvb4LNOXNK+d4QT9Pi72ByUdpJCoDEGZfP13ZxFAn2N0uGJLD01/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779835659; c=relaxed/simple;
-	bh=v0TjbesxR+ewebueTeBsTzE4hgzEHetSxrCATk8rz8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kkOpQqCtNTHK4XtWFsbxDIlUMiyeBg1JuquZcayFukGWQVLSz9EGtgDsxfWZQDWTju4kPJWNScQaSHQTP+Wpf67gZEKbuTfkXjwuwEEJvXAOo03NKjJcpvpCkCl3l8UnWGQePrTNtYjCabJJ6n3xY3+RNBojB4Mr9qEfHDBYCs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Kn24PYW0; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779838758; c=relaxed/simple;
+	bh=TCwTU/1zxquo1ICvQGvijvVx7xcBdUFAGIdJDxQciVY=;
+	h=Message-ID:Subject:From:To:Cc:Date:in-reply-to:Content-Type:
+	 MIME-Version; b=OyNKGA8uyZQ7JwgYIdHgZ+Rmk401/15C1e9sA/Is5QLB97xZGdQKCHHWeaGIW1jUJEY3UzBb9lgoA95j/bTKRwhZChiCXAeJZVeE6evaUq2bbH0006Pq79pQipSaru4IfnJI8BUNrc1dAyTPOp5ff17reKUcO1YOG0ynj3ZPkqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VAkzVLQH; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Kn24PYW0"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CAFD92F;
-	Tue, 26 May 2026 15:47:31 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7184F3F7B4;
-	Tue, 26 May 2026 15:47:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779835656; bh=v0TjbesxR+ewebueTeBsTzE4hgzEHetSxrCATk8rz8c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kn24PYW017ZV+xG4DGuE8eTax92R0+umH+xlnFse++Ka6RT2efOcQ1oseBxhV9OyK
-	 /8EVat3FnQTAImeDMytTpUCMbNIxQn/q4cAL2TN4Z9Y4Pe3x5c8k928dsuX+qzw95y
-	 1ZOvJaM3v8HdPYe4QsvGrVZu2aI/EXHBn9hDRw1c=
-Date: Tue, 26 May 2026 23:47:23 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 28/44] arm64: RMI: Create the realm descriptor
-Message-ID: <wshgh4i6uqytq65rh3j2risam2y2evjnfyztoee46soemp5i4x@qhzj4lcs33yj>
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-29-steven.price@arm.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VAkzVLQH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:in-reply-to:
+	Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:References;
+	bh=TCwTU/1zxquo1ICvQGvijvVx7xcBdUFAGIdJDxQciVY=; b=VAkzVLQHfSOmij0iyS2pOPykW+
+	Kg69pY0fdhrAlJKbSM1QyjhsL+lZ8ZvhOdUsdMsnepK2xbtXiVAQ7glMCv5+mIdUOGtvsjKLBQJWB
+	iCTsx4kHjYdKfC5abhHEFPYBEwoQTr8j9qi7bWBi6ddvLHPhCAZQDNim0oQCDMq+Apz4rjfOc0sLk
+	53KNDFhy29inYeE79xSKswc9R9li43pdI8Xd0W9Sk+mI4DSabxUmUVYXKuyWgiqyvKlsVM/XRzafa
+	kbBms3dENMjRg7FvY0pnMd0nj+cW1YXqZwTKbWUvYntYiXXo4mmkK5HKlynNq71KbyhpGOgiBPWIP
+	F/W6zdbg==;
+Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wS1Mb-00000001fO3-1YUa;
+	Tue, 26 May 2026 23:39:09 +0000
+Message-ID: <33a16a3c1d39147b659ebd4f6122461139159cc7.camel@infradead.org>
+Subject: Re: [patch 01/24] timekeeping: Provide ktime_get_snapshot_id()
+From: David Woodhouse <dwmw2@infradead.org>
+To: tglx@kernel.org
+Cc: akiyano@amazon.com, anna-maria@linutronix.de,
+ anthony.l.nguyen@intel.com,  dwmw2@infradead.org, frederic@kernel.org,
+ giometti@enneenne.com,  jacob.e.keller@intel.com, johannes.berg@intel.com,
+ jstultz@google.com,  kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ linux-sound@vger.kernel.org, linux-wireless@vger.kernel.org,
+ maz@kernel.org,  miriam.rachel.korenblit@intel.com, mlichvar@redhat.com,
+ mst@redhat.com,  netdev@vger.kernel.org, oliver.upton@linux.dev,
+ oupton@kernel.org,  peter.hilber@oss.qualcomm.com,
+ richardcochran@gmail.com, saeedm@nvidia.com,  sboyd@kernel.org,
+ thomas.weissschuh@linutronix.de, tiwai@suse.com,  vdonnefort@google.com,
+ virtualization@lists.linux.dev
+Date: Wed, 27 May 2026 00:39:07 +0100
+in-reply-to: <20260526171222.769770418@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-3rBkcF72l7XaUPBwCLw/"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260513131757.116630-29-steven.price@arm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi,
 
-On Wed, May 13, 2026 at 02:17:36PM +0100, Steven Price wrote:
-> Creating a realm involves first creating a realm descriptor (RD). This
-> involves passing the configuration information to the RMM. Do this as
-> part of realm_ensure_created() so that the realm is created when it is
-> first needed.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v13:
->  * The RMM no longer uses AUX granules, so no need to ask it how many it
->    needs.
->  * Adapted to other changes.
-> Changes since v12:
->  * Since RMM page size is now equal to the host's page size various
->    calculations are simplified.
->  * Switch to using range based APIs to delegate/undelegate.
->  * VMID handling is now handled entirely by the RMM.
-> ---
->  arch/arm64/kvm/rmi.c | 88 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 86 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index fb96bcaa73ed..cae29fd3353c 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -418,6 +418,77 @@ static void realm_unmap_shared_range(struct kvm *kvm,
->  			     start, end);
->  }
->  
-> +static int realm_create_rd(struct kvm *kvm)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_params *params = realm->params;
-> +	void *rd = NULL;
-> +	phys_addr_t rd_phys, params_phys;
-> +	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
-> +	int r;
-> +
-> +	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
-> +
-> +	if (WARN_ON(realm->rd || !realm->params))
-> +		return -EEXIST;
-> +
-> +	rd = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-> +	if (!rd)
-> +		return -ENOMEM;
-> +
-> +	rd_phys = virt_to_phys(rd);
-> +	if (rmi_delegate_page(rd_phys)) {
-> +		r = -ENXIO;
-> +		goto free_rd;
-> +	}
-> +
-> +	if (rmi_delegate_range(kvm->arch.mmu.pgd_phys, pgd_size)) {
-> +		r = -ENXIO;
-> +		goto out_undelegate_tables;
-> +	}
-> +
-> +	params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
-> +	params->rtt_level_start = get_start_level(realm);
-> +	params->rtt_num_start = pgd_size / PAGE_SIZE;
-> +	params->rtt_base = kvm->arch.mmu.pgd_phys;
-> +
-> +	if (kvm->arch.arm_pmu) {
-> +		params->pmu_num_ctrs = kvm->arch.nr_pmu_counters;
-> +		params->flags |= RMI_REALM_PARAM_FLAG_PMU;
-> +	}
-> +
-> +	if (kvm_lpa2_is_enabled())
-> +		params->flags |= RMI_REALM_PARAM_FLAG_LPA2;
-> +
-> +	params_phys = virt_to_phys(params);
-> +
-> +	if (rmi_realm_create(rd_phys, params_phys)) {
-> +		r = -ENXIO;
-> +		goto out_undelegate_tables;
-> +	}
-> +
-> +	realm->rd = rd;
-> +	kvm_set_realm_state(kvm, REALM_STATE_NEW);
-> +	/* The realm is up, free the parameters.  */
-> +	free_page((unsigned long)realm->params);
-> +	realm->params = NULL;
-> +
-> +	return 0;
-> +
-> +out_undelegate_tables:
-> +	if (WARN_ON(rmi_undelegate_range(kvm->arch.mmu.pgd_phys, pgd_size))) {
-> +		/* Leak the pages if they cannot be returned */
-> +		kvm->arch.mmu.pgt = NULL;
-> +	}
-> +	if (WARN_ON(rmi_undelegate_page(rd_phys))) {
-> +		/* Leak the page if it isn't returned */
-> +		return r;
-> +	}
-> +free_rd:
-> +	free_page((unsigned long)rd);
-> +	return r;
-> +}
-> +
->  static void realm_unmap_private_range(struct kvm *kvm,
->  				      unsigned long start,
->  				      unsigned long end,
-> @@ -647,8 +718,21 @@ static int realm_init_ipa_state(struct kvm *kvm,
->  
->  static int realm_ensure_created(struct kvm *kvm)
->  {
-> -	/* Provided in later patch */
-> -	return -ENXIO;
-> +	int ret;
-> +
-> +	switch (kvm_realm_state(kvm)) {
-> +	case REALM_STATE_NONE:
-> +		break;
-> +	case REALM_STATE_NEW:
-> +		return 0;
-> +	case REALM_STATE_DEAD:
-> +		return -ENXIO;
-> +	default:
-> +		return -EBUSY;
-> +	}
-> +
-> +	ret = realm_create_rd(kvm);
-> +	return ret;
->  }
+--=-3rBkcF72l7XaUPBwCLw/
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I think ret can be simplified out.
+On Tue, 26 May 2026 19:13:33 +0200, Thomas Gleixner wrote:
+> ktime_get_snapshot() provides a snapshot of the underlying clocksource
+> counter value and the corresponding CLOCK_MONOTONIC_RAW, CLOCK_REALTIME a=
+nd
+> CLOCK_BOOTTIME timestamps.
+>
+> There is no usage of CLOCK_REALTIME and CLOCK_BOOTTIME at the same time a=
+nd
+> CLOCK_BOOTTIME support was just added for the ARM64 KVM tracing mechanism=
+,
+> which needs CLOCK_BOOTTIME and the underlying clocksource counter value.
+>
+> ktime_get_snapshot() is also not suitable for usage with CLOCK_AUX, but
+> that's a prerequisite to support PTP hardware timestamping for CLOCK_AUX
+> steering.
+>
+> As a first step, rename ktime_get_snapshot() to ktime_get_snapshot_id(),
+> which now takes a clockid argument to select the clock which needs to be
+> captured. The result is stored in system_time_snapshot::sys, which will
+> replace the system_time_snapshot::real/boot members once all usage sites
+> have been converted.
+>
+> ktime_get_snapshot() is a simple wrapper which hands in CLOCK_REALTIME as
+> clockid argument for the conversion period. That means CLOCK_REALTIME is
+> now captured twice, but that redunancy is only temporary.
+>
+> No functional change vs. current users of ktime_get_snapshot()
+>
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
 
-Thanks,
-Wei-Lin Chang
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Tested-by: David Woodhouse <dwmw@amazon.co.uk>
 
->  
->  static int set_ripas_of_protected_regions(struct kvm *kvm)
-> -- 
-> 2.43.0
-> 
+
+--=-3rBkcF72l7XaUPBwCLw/
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUyNjIzMzkw
+N1owLwYJKoZIhvcNAQkEMSIEIJHos0HI+S32LV9a8u0fe2mx0JkdrJRp3L9+oFTczE0AMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAcZfoMXGQ1qsB
+J5iHDOahpi9JA5biPjrOYVk2NuQ/vdD7sAPOeQSpjud2PoTTvTLFj1eBwnOeV10TSEdtNDQXkB62
+TLWVKv23P6n9OmOWLIr/uSh4pWbSqVqTN4q0MwApA+kwVVQV9F0bIEWGvZOjAwTVzkOhatDqrLMW
+1LJCpEyNqLgM6WVRWpcQ7ZxSHBoXsmLThWWewMWJh0f5l1/SGA7ZkCEfsJXGh7g1MEryTWyRWprS
+1n5SbkN+5OYGc+wAE6MR5hIB5AiubupxQebqMctABOmUCFyWUBEKptLDHuNjxd/QLavXeg2gzuJg
+HgA2Y5qMY2t49VINPY1IknZdIY34dfBhbHAwEiFFE1ADrgHybhB/CfqhonV3PENCfA6SeV7TZaVi
+WYO5pUPjoFrqsrD/7/JYxQSr8CGZN1TCKOVG4LoYSS4qWWZtJfFx5Xolmzdq+tx9Y2aDV1qm+4eQ
+k5oNkEjUQylTiQ1qwbvXSc/iV3FxGKDNZ4oQbSU3M898NGqldtSm9CO8VTSK/r7pjw9mKTfH0TPK
+JXl6s4RHDUm9UwMPSe5XuguIJ293bC/2NYbigaJ5Zbhd0ntUQlBSDqO3hCW8EKYYv02UpcCdPcif
+0jgfF+ybz0czh48PGHBikalh0xSPhQw7hjDuyXbiBJKRqKYNFuM+24mvzgsKPQYAAAAAAAA=
+
+
+--=-3rBkcF72l7XaUPBwCLw/--
