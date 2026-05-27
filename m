@@ -1,233 +1,287 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EE03FC5DA;
-	Wed, 27 May 2026 15:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E2735F180
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 15:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779895299; cv=none; b=ikJbhBrSz8Lk1IdWhbyS9dsTXy2mBCbNoGhn9+dELXlRQjA8QpV7OgON+fZpg4QJDmXMKOdwPlBL7Rfgc6/ob1j7GEljs98UossO0HoCswmdW8HT32D4BEyOyIeLeRrw+/D9OrqZJDIotAghuqgSxn6WZJXqO3tQZhg7V0DpZGU=
+	t=1779895542; cv=none; b=fGiodAo9N4kLUawlxdsUTfn1azqjRQQB+ljqz/fFC5MSPA4kEn1PdihoTtgAaZEReVeP0/kblmyK89Ve5aWS+O+j1Zex4bnNaQUyP4sJVnSD8Rq69NeJf4LRbnlx46eEyCBBSVJ4qjO3N6cw+wofdht/pWUww1uM9bsPdkYlKaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779895299; c=relaxed/simple;
-	bh=tE2TU4DTN8usCHQHsX7JSxdcw9nunKjlogE83etYDEs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TgRGVqTLGeRZnMEANynJUdF2x1z/ZZGHjnb48I8jCU+Sk+YiW7XpFVqFY6W6YamJ+2UHnr2leLO4p8WwvSfOnCheon1PyatJxGuRaketsPxaG+ew0J+oNbDQpbzs06iMcZUKGCLED0t5iQdPkg3Lf6QVsVmge6fVd+3cGHaJR1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqKm/KIx; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779895542; c=relaxed/simple;
+	bh=frcJ/SbNqQ1l6vZKllwo8x15uocvpu1ggYuqoKCSr5g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CSZVGMcZ4TuJ53gTq5M9wZ0E8xsd6qQDJsYGEPS0WkgTg/jkDtAavRnya/hLIlOd0t7A3no4Q1UhvbMZ9iKhKpMNkcX7eHBRFzc8dTDkicWQXpJ0PQzjwfJiyF/Jhm9TQNvFKXFUApetizfrCU4KZySraUEcqA4WoYlNmSARYfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MlrVo3m+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqKm/KIx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C3C11F000E9;
-	Wed, 27 May 2026 15:21:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779895295;
-	bh=zfzKYqdLKqLou2xyyPcBQZmXad6Js16rghPX85JNlC8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bqKm/KIx9SZiNFvg+rRpM9FW+apfluy74behCm+gNm7zPh7TFNXNfkZcXFxlFkUXR
-	 75HJ325gNQJZ3eAVBm06XNdT8uXEB5lo5l2yZMiAJhfqKU9jiqvn1S2mECrepBDhHC
-	 QFdJee5SKkaZ6Htu401Go8q+AP0zROI8I94tc4MTUoD8brfWJrjzkVetrh52AHHaqS
-	 4e5uGQ5LFWCoFKYw7idtizfjriz5gVd2E/MVjBTFKsunebdNF0tWw7mbnDuzkWPAHn
-	 0cohXt53o9ybwk6hc0rS00bSwBp+8dMNOroAMfW1ENaVFhYu1QzSUb6Qbc2lVq0jB9
-	 /syB2Qilfkk1A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wSG4b-00000006jaR-1Cqt;
-	Wed, 27 May 2026 15:21:33 +0000
-Date: Wed, 27 May 2026 16:21:32 +0100
-Message-ID: <86jysovpxf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 13/44] arm64: RMI: Define the user ABI
-In-Reply-To: <20260513131757.116630-14-steven.price@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-14-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MlrVo3m+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779895539;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U1nI+GF+M4+fmcHYxJlm8wHF1Cjb5e40BGTagKIjuqU=;
+	b=MlrVo3m+51Vav+IYk2BvGsKSAKXNbyFd2jbZsN7t5EICYVat7c4EW6uNDsSevzOkHIagdH
+	pj8wMQjaRJIu6hwO3EW4wn83USeOpLaYF/w9e1EQO4EvBoDCmgKGzCLoX7zwfvaS3NH5S5
+	ZJOlB4cojHUpIBhWzFG9ruoQLE+QWbI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-RcnLe70RO6mzY4TWEVqNYA-1; Wed, 27 May 2026 11:25:38 -0400
+X-MC-Unique: RcnLe70RO6mzY4TWEVqNYA-1
+X-Mimecast-MFC-AGG-ID: RcnLe70RO6mzY4TWEVqNYA_1779895537
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-447f2ce5556so8729769f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 08:25:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779895537; x=1780500337;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U1nI+GF+M4+fmcHYxJlm8wHF1Cjb5e40BGTagKIjuqU=;
+        b=M0RBZldVErUcDnN/iMrDWwGuaU4nks4qn9Wo/qi5ThQLPFubXtGnxxG4pOTj5ReV0u
+         CzgNX/U4NOHPMgNhcPXHPNBZTw2Tx98mHOao3qJFwPE5YFLvgWymmmIzOoRA6SqALxFE
+         rX3v2jV6QfAv85DYbZ90zqMoy502PV5BLnMHsWka+tkMIGp7PFcVmiFHOIeaiuwbrQK6
+         wJUNHdgdu21IPK4BKuh/dkcrB3KX5qv7Vr1IavOFoDZBKji7i2DbT67fmrHPSN6XV6iH
+         U8UMpEHNHSD7tLbIgI4bJDF3O6y/YO6zIzb1aeCh6Kc5mWe23BfqGHsJPozIM90LsDsz
+         4iSw==
+X-Forwarded-Encrypted: i=1; AFNElJ9fUlLsk2dnH8qrJZyPMj9lrN/Tdgex17KcbpZCr4vZBm14tVRs/U9cbQWwkcEgesoFl4r9lfw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzDroa9WEq474e7lpx9A/vvLf9IWgip7opFIxxOuG+JxNsiGz4T
+	+4Dkg6Y4/JQzfTeM/fY9sQAjTaLPPtEWHBFNcumnADmbu966UwsJLfAN4801Ap4NEDVOyKxsJfq
+	+6spZxXyBwMjEC8qMRWWD4uWsvlrKBdlYwN/pAgempQuVP2+9UcjFd8m4jQ==
+X-Gm-Gg: Acq92OFXOK1dMLyvsp7BGCMQ8oy0v49Q1c4MmjUESUQVBDuN2cFUnkq6d4MbowRylVk
+	pFM5Hwac5ZbMsxlORY51AIIL5dk2265GGVnebdx0UVuPnPT+lEqPO/FOE08Pj47ktegKTYtaPf8
+	v55GFWHl9k3oYZw4We7IAZsKzEJK6gqrtWA/SQcdnMSTJd1RBEAvl8J6nIAR/rCf3Ty1YJCBifw
+	X7ndOI6517eSbQN57xQS6gk+vcnMYq4oR/scDI8/LVKmHmW/z23Bb575IWZyEbbMh1Xx725Fbxk
+	nYEinG61IeIQ9ztADNdDAvtVPMwfMD6wJ4glBLfrNUZLVOO2JUBf1SFl73v2qmXgKkoYEEPzbmN
+	JyNs5hgOcDl6yHZivHUQW/GHzebDPsmH5SvQiaauMFRA3DvR7HcE3uibCg1ASta3bZrelnA==
+X-Received: by 2002:a05:6000:98b:b0:44d:821:1a0b with SMTP id ffacd0b85a97d-45eb38a1692mr37288795f8f.29.1779895536867;
+        Wed, 27 May 2026 08:25:36 -0700 (PDT)
+X-Received: by 2002:a05:6000:98b:b0:44d:821:1a0b with SMTP id ffacd0b85a97d-45eb38a1692mr37288730f8f.29.1779895536309;
+        Wed, 27 May 2026 08:25:36 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5a281dsm6498794f8f.24.2026.05.27.08.25.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2026 08:25:35 -0700 (PDT)
+Message-ID: <eded7708-c2b5-4a0c-a871-69b01d3358bb@redhat.com>
+Date: Wed, 27 May 2026 17:25:34 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v5 11/18] arm/kvm: Initialize all writable ID registers
+ from host
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+ "philmd@linaro.org" <philmd@linaro.org>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260519132905.145643-1-eric.auger@redhat.com>
+ <20260519132905.145643-12-eric.auger@redhat.com>
+ <7CF06975-A0CB-43CD-9B3D-FF74DBF55AB9@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <7CF06975-A0CB-43CD-9B3D-FF74DBF55AB9@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: KyB7b02G3HQM0TJXJQ8027xvCA0GHnZIT-Z_vLT6Bzw_1779895537
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 13 May 2026 14:17:21 +0100,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> There is one CAP which identified the presence of CCA, and one ioctl.
-> The ioctl is used to populate memory during creation of the realm as
-> this requires the RMM to copy data from an unprotected address to the
-> protected memory - CCA does not support memory conversion where the
-> memory contents is preserved as this is incompatible with memory
-> encryption.
+
+
+On 5/27/26 5:02 PM, Khushit Shah wrote:
 >
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v13:
->  * KVM_ARM_VCPU_RMI_PSCI_COMPLETE removed.
->  * KVM_ARM_RMI_POPULATE documentation updated to reflect that the
->    structure is written by the kernel.
->  * CAP number bumped.
-> Changes since v12:
->  * Change KVM_ARM_RMI_POPULATE to update the structure with the amount
->    that has been progressed rather than return the number of bytes
->    populated.
->  * Describe the flag KVM_ARM_RMI_POPULATE_FLAGS_MEASURE.
->  * CAP number is bumped.
->  * NOTE: The PSCI ioctl may be removed in a future spec release.
-> Changes since v11:
->  * Completely reworked to be more implicit. Rather than having explicit
->    CAP operations to progress the realm construction these operations
->    are done when needed (on populating and on first vCPU run).
->  * Populate and PSCI complete are promoted to proper ioctls.
-> Changes since v10:
->  * Rename symbols from RME to RMI.
-> Changes since v9:
->  * Improvements to documentation.
->  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
-> Changes since v8:
->  * Minor improvements to documentation following review.
->  * Bump the magic numbers to avoid conflicts.
-> Changes since v7:
->  * Add documentation of new ioctls
->  * Bump the magic numbers to avoid conflicts
-> Changes since v6:
->  * Rename some of the symbols to make their usage clearer and avoid
->    repetition.
-> Changes from v5:
->  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
-> ---
->  Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h       | 13 +++++++++++
->  2 files changed, 53 insertions(+)
-
-$SUBJECT looks wrong. This is a KVM change, not an RMI change.
-
+>> On 19 May 2026, at 6:57 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
+>>
+>> |-------------------------------------------------------------------!
+>>
+>> We want to allow overwriting writable fields of some ID registers.
+>> However currently some of them are never touched, neither read nor
+>> w. Examples are CLIDR_EL1, CTR_EL0, REVIDR_EL1, MIDR_EL1.
+>>
+>> We want to initialize them from the host value, allow overwrite
+>> and write back for kvm afterwards. This patch implements the
+>> initialization.
+>>
+>> Introduce a new get_host_cpu_idregs() helper that gets the host
+>> values for all writable ID regs and store them in isar.idregs[].
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>
+>> ---
+>> ---
+>> target/arm/kvm.c        | 72 +++++++++++++++++++++++++++++++++++++++--
+>> target/arm/trace-events |  1 +
+>> 2 files changed, 71 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 4adfd20050..92219ee62e 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -42,6 +42,7 @@
+>> #include "hw/acpi/ghes.h"
+>> #include "target/arm/gtimer.h"
+>> #include "migration/blocker.h"
+>> +#include "cpu-idregs.h"
+>>
+>> const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+>>     KVM_CAP_INFO(DEVICE_CTRL),
+>> @@ -273,7 +274,62 @@ static uint32_t kvm_arm_sve_get_vls(int fd)
+>>     return vls[0] & MAKE_64BIT_MASK(0, ARM_MAX_VQ);
+>> }
+>>
+>> -static void kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>> +static int idregs_idx_to_kvm_feature_idx(ARMIDRegisterIdx idx)
+>> +{
+>> +    ARMSysRegs sysreg = id_register_sysreg[idx];
+>> +
+>> +    return KVM_ARM_FEATURE_ID_RANGE_IDX((sysreg & CP_REG_ARM64_SYSREG_OP0_MASK)
+>> +                                            >> CP_REG_ARM64_SYSREG_OP0_SHIFT,
+>> +                                        (sysreg & CP_REG_ARM64_SYSREG_OP1_MASK)
+>> +                                            >> CP_REG_ARM64_SYSREG_OP1_SHIFT,
+>> +                                        (sysreg & CP_REG_ARM64_SYSREG_CRN_MASK)
+>> +                                            >> CP_REG_ARM64_SYSREG_CRN_SHIFT,
+>> +                                        (sysreg & CP_REG_ARM64_SYSREG_CRM_MASK)
+>> +                                            >> CP_REG_ARM64_SYSREG_CRM_SHIFT,
+>> +                                        (sysreg & CP_REG_ARM64_SYSREG_OP2_MASK)
+>> +                                            >> CP_REG_ARM64_SYSREG_OP2_SHIFT);
+>> +}
+>> +
+>> +/*
+>> + * get_host_cpu_idregs: Read all the writable ID reg host values
+>> + *
+>> + * Need to be called once the writable mask has been populated
+>> + * Note we may want to read all the known id regs but some of them are not
+>> + * writable and return an error, hence the choice of reading only those which
+>> + * are writable. Those are also readable!
+>> + */
+>> +static int get_host_cpu_idregs(ARMCPU *cpu, int fd, ARMHostCPUFeatures *ahcf)
+>> +{
+>> +    int err = 0;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < NUM_ID_IDX; i++) {
+>> +        ARM64SysReg *sysregdesc = &arm64_id_regs[i];
+>> +        ARMSysRegs sysreg = id_register_sysreg[i];
+>> +        uint64_t writable_mask =
+>> +             cpu->writable_map[idregs_idx_to_kvm_feature_idx(i)];
+>> +        uint64_t *reg;
+>> +        int ret;
+>> +
+>> +        if (!writable_mask) {
+>> +            continue;
+>> +        }
+>> +
+>> +        reg = &ahcf->isar.idregs[i];
+>> +        ret = read_sys_reg64(fd, reg, idregs_sysreg_to_kvm_reg(sysreg));
+>> +        trace_get_host_cpu_idregs(sysregdesc->name, *reg);
+>> +        if (ret) {
+>> +            error_report("%s error reading value of host %s register (%m)",
+>> +                         __func__, sysregdesc->name);
+>> +
+>> +            err = ret;
+>> +        }
+>> +    }
+>> +    return err;
+>> +}
+>> +
+>> +static void
+>> +kvm_arm_get_host_cpu_features(ARMCPU *cpu, ARMHostCPUFeatures *ahcf)
+>> {
+>>     /* Identify the feature bits corresponding to the host CPU, and
+>>      * fill out the ARMHostCPUClass fields accordingly. To do this
+>> @@ -359,6 +415,18 @@ static void kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>>         SET_IDREG(&ahcf->isar, ID_AA64PFR0, 0x00000011); /* EL1&0, AArch64 only */
+>>         err = 0;
+>>     } else {
+>> +        /* Make sure all writable ID reg values are initialized */
+>> +        if (cpu->writable_map) {
+>> +            err |= get_host_cpu_idregs(cpu, fd, ahcf);
+>> +        }
+> Again, I do not like writable_map being in ARMCPU.
 >
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 52bbbb553ce1..ca68aae7faa2 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6553,6 +6553,37 @@ KVM_S390_KEYOP_SSKE
->    Sets the storage key for the guest address ``guest_addr`` to the key
->    specified in ``key``, returning the previous value in ``key``.
->  
-> +4.145 KVM_ARM_RMI_POPULATE
-> +--------------------------
-> +
-> +:Capability: KVM_CAP_ARM_RMI
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_arm_rmi_populate (in/out)
-> +:Returns: 0 on success, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_arm_rmi_populate {
-> +	__u64 base;
-> +	__u64 size;
-> +	__u64 source_uaddr;
-> +	__u32 flags;
-> +	__u32 reserved;
-> +  };
-> +
-> +Populate a region of protected address space by copying the data from the
-> +(non-protected) user space pointer provided into a protected region (backed by
-> +guestmem_fd). It implicitly sets the destination region to RIPAS RAM. This is
-> +only valid before any VCPUs have been run. The ioctl might not populate the
-> +entire region and in this case the kernel updates the fields `base`, `size` and
-> +`source_uaddr`. User space may have to repeatedly call it until `size` is 0 to
-> +populate the entire region.
-> +
-> +`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
-> +populated data is hashed and added to the guest's Realm Initial Measurement
-> +(RIM).
+> Why should kvm_arm_get_host_cpu_features care if writable
+> map is populated or not?
+the cpu->writable_map check can be moved to get_host_cpu_idregs or we
+use the copied bitmask in the idreg struct
 
-Where is that measurement stored? And retrieved? At least a pointer to
-that would help.
+Thanks
 
-> +
->  .. _kvm_run:
->  
->  5. The kvm_run structure
-> @@ -8904,6 +8935,15 @@ helpful if user space wants to emulate instructions which are not
->  This capability can be enabled dynamically even if VCPUs were already
->  created and are running.
->  
-> +7.47 KVM_CAP_ARM_RMI
-> +--------------------
-> +
-> +:Architectures: arm64
-> +:Target: VM
-> +:Parameters: None
-> +
-> +This capability indicates that support for CCA realms is available.
-> +
->  8. Other capabilities.
->  ======================
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6c8afa2047bf..b8cff0938041 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -996,6 +996,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_S390_USER_OPEREXEC 246
->  #define KVM_CAP_S390_KEYOP 247
->  #define KVM_CAP_S390_VSIE_ESAMODE 248
-> +#define KVM_CAP_ARM_RMI 249
->  
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> @@ -1669,4 +1670,16 @@ struct kvm_pre_fault_memory {
->  	__u64 padding[5];
->  };
->  
-> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM */
-> +#define KVM_ARM_RMI_POPULATE	_IOWR(KVMIO, 0xd7, struct kvm_arm_rmi_populate)
-> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE	(1 << 0)
-> +
-> +struct kvm_arm_rmi_populate {
-> +	__u64 base;
-> +	__u64 size;
-> +	__u64 source_uaddr;
-> +	__u32 flags;
-> +	__u32 reserved;
-> +};
-> +
->  #endif /* __LINUX_KVM_H */
+Eric
+>
+>> +        /*
+>> +         * temporarily override the CLIDR_EL1 value since some host values
+>> +         * trigger "Unified type is not implemented at level n" error in
+>> +         * fdt_add_cpu_nodes()
+>> +         */
+>> +        SET_IDREG(&ahcf->isar, CLIDR, 0x0);
+>> +
+> This is because by default KVM exposes a 1 level unified, 1 way 1 set simple
+> cache, to efficiently handle set/way based cache operations.
+>
+> TBH this is slightly ugly. Should make the virt machine code to not expose
+> cache fdt nodes if using KVM.
+>
+> For our v2 (WIP), we have handled this by a new property ‘expose-cache’ for
+> named cpu models which is used to set CLIDR and CCSIDR banks based
+> on values provided by the model and only creating fdt nodes if those
+> values are provided.
+>
+>>         err |= get_host_cpu_reg(fd, ahcf, ID_AA64PFR1_EL1_IDX);
+>>         err |= get_host_cpu_reg(fd, ahcf, ID_AA64PFR2_EL1_IDX);
+>>         err |= get_host_cpu_reg(fd, ahcf, ID_AA64SMFR0_EL1_IDX);
+>> @@ -485,7 +553,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>>     CPUARMState *env = &cpu->env;
+>>
+>>     if (!arm_host_cpu_features.dtb_compatible) {
+>> -        kvm_arm_get_host_cpu_features(&arm_host_cpu_features);
+>> +        kvm_arm_get_host_cpu_features(cpu, &arm_host_cpu_features);
+>>     }
+>>
+>>     cpu->kvm_target = arm_host_cpu_features.target;
+>> diff --git a/target/arm/trace-events b/target/arm/trace-events
+>> index 8502fb3265..8c7faf57c7 100644
+>> --- a/target/arm/trace-events
+>> +++ b/target/arm/trace-events
+>> @@ -13,6 +13,7 @@ arm_gt_update_irq(int timer, int irqstate) "gt_update_irq: timer %d irqstate %d"
+>>
+>> # kvm.c
+>> kvm_arm_fixup_msi_route(uint64_t iova, uint64_t gpa) "MSI iova = 0x%"PRIx64" is translated into 0x%"PRIx64
+>> +get_host_cpu_idregs(const char *name, uint64_t value) "scratch vcpu host value for %s is 0x%"PRIx64
+>>
+>> # cpu.c
+>> arm_cpu_reset(uint64_t mp_aff) "cpu %" PRIu64
+>> -- 
+>> 2.53.0
+>>
+>
+> Warm Regards,
+> Khushit
+>
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
