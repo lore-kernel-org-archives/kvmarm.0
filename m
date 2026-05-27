@@ -1,177 +1,361 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA993F20ED;
-	Wed, 27 May 2026 10:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A322641CA
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 11:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779879135; cv=none; b=pBaE6jnAnMmaNK2J4DR61LEMJ9oNQym7WaJH/h7DBzZe0ewoEQdKasPIijR+PAoEeeAPojwOqU54MsUo1mm2AhwvVIh4EgdeInWHb3P+R+s2Nr1qKEyRDkbIq2jY9pIYklJTe2E/H441DoKb1HuUPocUc+GnkwOTvn/JRNqjgL8=
+	t=1779880719; cv=none; b=H39oxpIuk5PUHyIuflHHnbZn+W22a3tgdvEEdMXfz9V01LOD/3sW06YjlFsNCpC+gr3WorPUcJRDosjLGin5/VOwUf7SiDyLoEAjf0BMwb7s5skIBKaKQWmSNpIrhc0xgaJWNCq/aKJJfLF1STZekbtnYd/J20QtsG2XarPA4sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779879135; c=relaxed/simple;
-	bh=bZ3q7NUxPu/Uy9EvozZtelgm2WWc+8VfFSdGGhRHG8k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s7JFxEMPegqk4okBSvV/SsS0KKJjAckQyrFP9UlsbYPfZZzZ+0GvV2S/QpHspMAi8XM19oqdvfdefp6Y+KyApA8pNMZxkfm7NnadENxTg8tSPhuBKvDXTYN4U2gDH0vjQjRQIwUJsFPbzSUfbp28Glw+znT7bGDsPaq+OmWjpRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YhTLnJvm; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779880719; c=relaxed/simple;
+	bh=fCILp+DohVOOIR+UUseLdprSQEaMH1NXcjDAJS0gm9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UP9sHxrRvb16KpnGvpQ4CwuR1KT7X1aF34B0Em7vMxCB+2+u46YdSuwUknPzeR2mrCXRHkHABNt50qKqo2IEYufMu9gUZahpWebTMolDyazxmOE5x7UsgUv2TSH9v42/qL0DQ9UVgF/786gzzCd+0iT3vh8YHIZ5l2851+w08UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BBtb0fSx; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YhTLnJvm"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AC482880;
-	Wed, 27 May 2026 03:52:08 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2048A3F7D8;
-	Wed, 27 May 2026 03:52:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779879133; bh=bZ3q7NUxPu/Uy9EvozZtelgm2WWc+8VfFSdGGhRHG8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YhTLnJvmmF65boUW+vmDho7GBx7AJLdCghw5GsyJl5KirHzsbS5ATMbP+WfAvvEuj
-	 b50xqYAeLis1xbDrNkn922M2Bgb4QPCrF2DhBY578LYskLJGNKO/3Sr0xUWdRWtWJb
-	 vVnOCfUDpygkhnVvzHXwnazTXPjHCweaHXIU38jU=
-Date: Wed, 27 May 2026 11:52:02 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 23/44] arm64: RMI: Handle RMI_EXIT_RIPAS_CHANGE
-Message-ID: <aly6g5gd27ceezehporuika5rvqu6kqnm5c5cbs36gh2gdrjws@y7gpy2lhtaaz>
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-24-steven.price@arm.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BBtb0fSx"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-44509921fbcso7456919f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 04:18:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1779880716; x=1780485516; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0QGieyo5gKzeqh6AipqQcO1qteBU8LLbZeI6OWN5t84=;
+        b=BBtb0fSxDWVNyMeLL0KmAARtaM/WhAYnsSnAB5HXwbHed+v+QXAKL+aeupq2OEBL2i
+         0kUlY/Oj+lJJZ+yYHMEhDOgrgUr1wxNTFsCWnT73kYEMpuNEXa3trkWPMx7nNXwphexg
+         Uu/RcanmL0SF81SIZJxf9//l0jBD0CoJxUBAEl12RHoISWbgF+EHK5s0g3gYWF3DcSE2
+         McHiyUzzReQw4TspezuuXbAANui2LI8kM1ja8a5xyc40jDgRIns2iZt4mCWtS+O9RX9X
+         Xa2rZfuGHiOfHOqOytzlJ25DIB3V9V/pwBZHmA7Tug/LMQTk2kJ688hawxSi+mLWSBHn
+         dH/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779880716; x=1780485516;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0QGieyo5gKzeqh6AipqQcO1qteBU8LLbZeI6OWN5t84=;
+        b=KP5wRfARhwACHHi4GxX/SZrbxP6lj/xJkn8gZ7V3CGUbuZLxVPN5iixM2sZUKXGIjT
+         zakire6+zwjFBPkCBT93L++NNGLipwiNQUsOlpDl9bVC9S8XuBWIOSQSBNvB8OMbSgww
+         74+CTavetKQq5uj+hqkHEgrdaGikJLI9Yewf0Rz/WI93ySAEKGAnPCIzkw0AZP+S6qr+
+         ze/QRkHONJcJn3jkMx0kf3BKPwJ1x5cktWb0DAvqgtKz8JcmAE50TMw4Z1ZsPJCS2ITL
+         ZgoclwU12aToS8/HcwcbIZIxtLcE+wgZ/c7WN0JfdgOeCkWkkOOP3xFwi4inqfo1dNif
+         +huA==
+X-Forwarded-Encrypted: i=1; AFNElJ93C+rz7vgs+2epA5YlqFeBaR2JjxtIuBRP5bdUXlXJn/sfW5FkW61NzDRWMeHR3jcvza6jCTk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwvqpPIcbRwOl5mi8FOfT+/XRQLADVd36ShAVSN5gtSN/Kvf853
+	g/wH2VAQSyCX4J4ty4NdZ7EPybu67/08fc2M1ewz+biZXhqokn2AZkiIL61qFfctuTY=
+X-Gm-Gg: Acq92OGYLPsfl4stXS7CSWzVL5BOu4eg+u+zHw5LC03zLzYJvkF3kr+2Oq5knSgF5rX
+	SqB6NP6P3wbKrDf93vGkSyg1dOBTkaZ/9gzsFllJgRipvfKlf1qOXUCoOaDWAI8sISZL+N9j5zl
+	PNos7lPgGsaaB7zzV7HA+dIKVjbwrLNB9F7+rEXm+nC/eDlo9t1dAsXRYn+AxZAp8PamvzzvbP+
+	5TMR1vdRwToBvVp4YCMvJUbm8cVY2ZgabTNijNIl4rEjuE3IheKZiQm4Y8L9+UrdQEMsx4uiWSh
+	QKTFyeH49AuiykI3EAnuKzFKoIPh3d6b2Bo1/aQMOfuJnbhl8iDNExlHF2Rfyf6UJwkfu6Fbetc
+	CEQKNpaWwIVLtTqGZeqk9qeh6eHeW8oEUp0UN3fyeB5zec2OArPaoIBC0uxGVM6rxqUYPUbwO0j
+	4k4WXiDPIq6NhooSS3ntVUNToAoRByNxoz2w==
+X-Received: by 2002:a05:6000:4606:b0:44a:b0a3:7c1a with SMTP id ffacd0b85a97d-45eb36b0126mr40044368f8f.24.1779880716257;
+        Wed, 27 May 2026 04:18:36 -0700 (PDT)
+Received: from draig.lan ([185.124.0.195])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5b28absm5398550f8f.27.2026.05.27.04.18.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 04:18:35 -0700 (PDT)
+Received: from draig.lan (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 9ECBF5F7F0;
+	Wed, 27 May 2026 12:18:34 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvmarm@lists.linux.dev (open list:ARM),
+	kvm@vger.kernel.org (open list:Default mailing list)
+Subject: [kvm-unit-tests PATCH v2] arm: add wfx test case
+Date: Wed, 27 May 2026 12:18:21 +0100
+Message-ID: <20260527111822.1563679-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260513131757.116630-24-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+This is based on a similar test case I wrote for QEMU's tcg tests although
+obviously able to take advantage of kvm-unit-tests additional plumbing for
+dealing with the GIC and IRQs.
 
-On Wed, May 13, 2026 at 02:17:31PM +0100, Steven Price wrote:
-> The guest can request that a region of it's protected address space is
-> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
-> RSI_IPA_STATE_SET. This causes a guest exit with the
-> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
-> protected region to unprotected (or back), exiting to the VMM to make
-> the necessary changes to the guest_memfd and memslot mappings. On the
-> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
-> calls.
-> 
-> The VMM may wish to reject the RIPAS change requested by the guest. For
-> now it can only do this by no longer scheduling the VCPU as we don't
-> currently have a usecase for returning that rejection to the guest, but
-> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
-> open for adding a new ioctl in the future for this purpose.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v13:
->  * Switch to the new RMI_RTT_UNPROT_UNMAP range-based API.
->  * Drop ugly hack for RMM bug which errored when the RIPAS was already
->    set to the desired value.
-> Changes since v12:
->  * Switch to the new RMM v2.0 RMI_RTT_DATA_UNMAP which can unmap an
->    address range.
-> Changes since v11:
->  * Combine the "Allow VMM to set RIPAS" patch into this one to avoid
->    adding functions before they are used.
->  * Drop the CAP for setting RIPAS and adapt to changes from previous
->    patches.
-> Changes since v10:
->  * Add comment explaining the assignment of rec->run->exit.ripas_base in
->    kvm_complete_ripas_change().
-> Changes since v8:
->  * Make use of ripas_change() from a previous patch to implement
->    realm_set_ipa_state().
->  * Update exit.ripas_base after a RIPAS change so that, if instead of
->    entering the guest we exit to user space, we don't attempt to repeat
->    the RIPAS change (triggering an error from the RMM).
-> Changes since v7:
->  * Rework the loop in realm_set_ipa_state() to make it clear when the
->    'next' output value of rmi_rtt_set_ripas() is used.
-> New patch for v7: The code was previously split awkwardly between two
-> other patches.
-> ---
->  arch/arm64/include/asm/kvm_rmi.h |   6 +
->  arch/arm64/kvm/mmu.c             |   8 +-
->  arch/arm64/kvm/rmi.c             | 439 +++++++++++++++++++++++++++++++
->  3 files changed, 450 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index feb534a6678e..007249a13dbc 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -88,6 +88,12 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
->  
-> +void kvm_realm_unmap_range(struct kvm *kvm,
-> +			   unsigned long ipa,
-> +			   unsigned long size,
-> +			   bool unmap_private,
-> +			   bool may_block);
-> +
->  static inline bool kvm_realm_is_private_address(struct realm *realm,
->  						unsigned long addr)
->  {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index eb56d4e7f21a..10ca9dbe40a0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -319,6 +319,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
->   * @may_block: Whether or not we are permitted to block
-> + * @only_shared: If true then protected mappings should not be unmapped
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Do you think it's better if we use enum kvm_gfn_range_filter for this?
-Pass KVM_FILTER_{PRIVATE, SHARED} to indicate what to unmap. This way we
-don't have the think about booleans. kvm_realm_unmap_range() in patch 23
-will have to change too though.
+---
+v2
+  - drop TIMEOUT in favour of computed 10ms timeout
+  - add comments for each test
+  - use sevl for local clearing
+  - set gic irc depending on CurrentEL
+  - EOI the GIC
+  - display elapsed ns (no float to do ms ;-)
+  - fix some style issues
+  - make test TCG only
+---
+ arm/Makefile.arm64        |   1 +
+ lib/arm64/asm/processor.h |   7 ++
+ lib/arm64/asm/sysreg.h    |   3 +
+ arm/wfx.c                 | 187 ++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg         |   7 ++
+ 5 files changed, 205 insertions(+)
+ create mode 100644 arm/wfx.c
 
->   *
->   * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
->   * be called while holding mmu_lock (unless for freeing the stage2 pgd before
-> @@ -326,7 +327,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
->   * with things behind our backs.
->   */
->  static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size,
-> -				 bool may_block)
-> +				 bool may_block, bool only_shared)
->  {
->  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->  	phys_addr_t end = start + size;
-> @@ -343,7 +344,7 @@ void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
->  	if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
->  		return;
->  
-> -	__unmap_stage2_range(mmu, start, size, may_block);
-> +	__unmap_stage2_range(mmu, start, size, may_block, false);
->  }
->  
->  void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
-> @@ -2418,7 +2419,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  
->  	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
->  			     (range->end - range->start) << PAGE_SHIFT,
-> -			     range->may_block);
-> +			     range->may_block,
-> +			     !(range->attr_filter & KVM_FILTER_PRIVATE));
->  
->  	kvm_nested_s2_unmap(kvm, range->may_block);
->  	return false;
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index a40c830d..52b3f35d 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -64,6 +64,7 @@ tests += $(TEST_DIR)/cache.$(exe)
+ tests += $(TEST_DIR)/debug.$(exe)
+ tests += $(TEST_DIR)/fpu.$(exe)
+ tests += $(TEST_DIR)/mte.$(exe)
++tests += $(TEST_DIR)/wfx.$(exe)
+ 
+ include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+ 
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 32ddc1b3..2104036d 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -173,5 +173,12 @@ static inline bool system_supports_rndr(void)
+ 	return ((id_aa64isar0_el1 >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf) != 0;
+ }
+ 
++static inline bool system_supports_wfxt(void)
++{
++	u64 id_aa64isar2_el1 = read_sysreg_s(ID_AA64ISAR2_EL1);
++
++	return ((id_aa64isar2_el1 >> ID_AA64ISAR2_EL1_WFxT_SHIFT) & 0xf) != 0;
++}
++
+ #endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM64_PROCESSOR_H_ */
+diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+index f2d05018..cb96a649 100644
+--- a/lib/arm64/asm/sysreg.h
++++ b/lib/arm64/asm/sysreg.h
+@@ -77,6 +77,9 @@ asm(
+ #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
+ #define ID_AA64PFR1_EL1_MTE_SHIFT	8
+ 
++#define ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
++#define ID_AA64ISAR2_EL1_WFxT_SHIFT	0
++
+ #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
+ #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
+ 
+diff --git a/arm/wfx.c b/arm/wfx.c
+new file mode 100644
+index 00000000..0825c5cb
+--- /dev/null
++++ b/arm/wfx.c
+@@ -0,0 +1,187 @@
++/*
++ * WFX Instructions Test (WFI, WFE, WFIT, WFET)
++ *
++ * Copyright (c) 2026 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include <libcflat.h>
++#include <asm/processor.h>
++#include <asm/gic.h>
++#include <asm/timer.h>
++#include <asm/io.h>
++
++#define sev() asm volatile("sev" : : : "memory")
++#define sevl() asm volatile("sevl" : : : "memory")
++#define wfi() asm volatile("wfi" : : : "memory")
++#define wfe() asm volatile("wfe" : : : "memory")
++
++#define wfit(reg) \
++	asm volatile(".arch armv8.7-a\n\twfit %0" : : "r" (reg) : "memory")
++#define wfet(reg) \
++	asm volatile(".arch armv8.7-a\n\twfet %0" : : "r" (reg) : "memory")
++
++uint64_t time_hz;
++uint64_t time_10ms;
++
++static void timer_handler(struct pt_regs *regs)
++{
++	u32 irqstat = gic_read_iar();
++	u32 irqnr = gic_iar_irqnr(irqstat);
++
++	/* Disable timer to stop IRQ from re-firing */
++	if (irqnr == TIMER_VTIMER_IRQ || irqnr == TIMER_HVTIMER_IRQ) {
++		write_sysreg(0, cntv_ctl_el0);
++		isb();
++	} else {
++		if (irqnr != GICC_INT_SPURIOUS)
++			gic_write_eoir(irqstat);
++		report_info("Unexpected interrupt: %d\n", irqnr);
++		return;
++	}
++
++	/* Also acknowledge EOI for the GIC */
++	gic_write_eoir(irqstat);
++}
++
++static bool check_elapsed(uint64_t start, uint64_t threshold, const char *test, bool more)
++{
++	uint64_t end = read_sysreg(cntvct_el0);
++	uint64_t elapsed = end - start;
++	bool pass = more ? elapsed >= threshold : elapsed <= threshold;
++
++	report(pass, "%s (%ld ticks / %ld ns)",
++	       test, elapsed, elapsed / (time_hz / 1000000));
++
++	if (!pass)
++		report_info("%s %s", test, more ? "woke too early" : "slept despite SEV");
++
++	return pass;
++}
++
++/*
++ * Test WFI with timer interrupt
++ *
++ * WFI should wake up when the interrupt is pending. We unmask
++ * interrupts here so they are taken and then check WFI actually
++ * did sleep rather than return straight away.
++ */
++static void test_wfi(void)
++{
++	uint64_t start;
++
++	report_info("Testing WFI...");
++
++	start = read_sysreg(cntvct_el0);
++	write_sysreg(time_10ms, cntv_tval_el0);
++	write_sysreg(1, cntv_ctl_el0); /* Enable timer, no mask */
++	isb();
++
++	local_irq_enable();
++	wfi();
++	local_irq_disable();
++
++	check_elapsed(start, time_10ms, "WFI", true);
++}
++
++/*
++ * Test WFE and SEV[L]
++ *
++ * There are two SEV instructions, the normal one is a broadcast
++ * from any PE on the system, the other is local only.
++ * Functionally they have the same effect (setting the event
++ * register) and should be immediately consumed by the WFE.
++ *
++ * As we want to detect an early exit the sense of the timeout
++ * check is reversed.
++ */
++static void test_wfe(void)
++{
++	uint64_t start;
++
++	report_info("Testing WFE/SEV...");
++	sev();
++	start = read_sysreg(cntvct_el0);
++	wfe();
++	check_elapsed(start, time_10ms, "WFE/SEV", false);
++
++	report_info("Testing WFE/SEVL...");
++	sevl();
++	start = read_sysreg(cntvct_el0);
++	wfe();
++	check_elapsed(start, time_10ms, "WFE/SEVL", false);
++}
++
++/*
++ * Test WFIT
++ *
++ * With the timer disabled and no other IRQ sources firing the
++ * WFIT instruction should timeout.
++ */
++static void test_wfit(void)
++{
++	uint64_t start, timeout;
++
++	report_info("Testing WFIT...");
++	start = read_sysreg(cntvct_el0);
++	timeout = start + time_10ms;
++	wfit(timeout);
++	check_elapsed(start, time_10ms, "WFIT", true);
++}
++
++/*
++ * Test WFET
++ *
++ * Much like WFIT there are no IRQs to wake us up. However the
++ * event_register is a latch so we must first consume the event
++ * register with a normal WFE before we do the timeout version.
++ */
++static void test_wfet(void)
++{
++	uint64_t start, timeout;
++
++	report_info("Testing WFET...");
++	/* Ensure no pending events */
++	sevl();
++	wfe();
++
++	start = read_sysreg(cntvct_el0);
++	timeout = start + time_10ms;
++	wfet(timeout);
++	check_elapsed(start, time_10ms, "WFET", true);
++}
++
++int main(void)
++{
++	uint32_t irq = current_level() == CurrentEL_EL1 ? TIMER_VTIMER_IRQ : TIMER_HVTIMER_IRQ;
++
++	if (gic_init() < 0) {
++		report_abort("GIC init failed");
++		return 1;
++	}
++
++	/* Install timer handler for WFI wake-up */
++	install_irq_handler(EL1H_IRQ, timer_handler);
++	gic_enable_defaults();
++	time_hz = read_sysreg(cntfrq_el0);
++	time_10ms = time_hz / 100;
++
++	/* Enable Virtual Timer PPI */
++	gic_irq_set_clr_enable(irq, true);
++
++	report_prefix_push("WFx");
++	test_wfi();
++	test_wfe();
++	report_prefix_pop();
++
++	if (system_supports_wfxt()) {
++		report_prefix_push("WFxT");
++		test_wfit();
++		test_wfet();
++	} else {
++		report_skip("WFxT instructions not supported");
++	}
++
++	return report_summary();
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 12fc4468..ae8b5534 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -339,3 +339,10 @@ groups = mte
+ test_args = asymm
+ qemu_params = -machine mte=on
+ arch = arm64
++
++[wfx]
++file = wfx.flat
++groups = wfx
++arch = arm64
++# This test exercise CPU emulation so limit to TCG to avoid confusion
++accel = tcg
+-- 
+2.47.3
 
-[...]
-
-Thanks,
-Wei-Lin Chang
