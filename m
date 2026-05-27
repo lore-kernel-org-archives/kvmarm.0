@@ -1,111 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B343CA490;
-	Wed, 27 May 2026 09:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CBE3E6DC1;
+	Wed, 27 May 2026 09:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779872598; cv=none; b=HWONJl9VUp2ngLNvFAxtK/+kuFoNlGxrdA7LTZ2bcvEItr9uk7z0B75WYa6DcUo2DY6p723BZNRHG79K9vQYEJPLWcE58UNdfeln+AJIr94o6yXwc01y7aJWathmSDa8BSpysGbwbemw8wYKgcAFTZNBPUO5rmbTeZt4Bh457aA=
+	t=1779872956; cv=none; b=Litb8gTQe2icWO/lslB6Sgf0cqT5V7ACX0ob4Hkav368Yj4DhczuNPIWY7hDVCs2nStmGC34JysaC6YfBv1sF+3yPLqKRSG3wLXZG0UbcAptIyvd+pBzVkRLJAlt+lgJgkv4f7xSmoUMizPaLqZpIgwfe2olbDCDHV92gjP39fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779872598; c=relaxed/simple;
-	bh=1QPGxVe2YVjIdUHB6ZQpNIFZJ/tNHjuloIjcC5WL6yk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K+h1sOIhVAW0vdBIQcaaaEJBGvUfTfXo7qDMxx7mkDfyfG59r2EBKeHKEszaAcAUB4udYq7cgs1w1WD9b+jt20+eKladFeSvHBVOf3LX4hYzFNTY3o/mmChwh6bD3soCBWhZ/XB7cEOoMgyX6WLv3WQlUc+NAt69qlN8ftd+5V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSmOoBi5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779872956; c=relaxed/simple;
+	bh=IrkYTetbvHCjYmyz5CgrghKor0NwdEQ8iDTGzXP7ziE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B/eWXOuQ7wyur05zgcYh1skOsOG1h0fj0pVkyMT8f5KXsAWYw5MKJrnMH15p31Af1q+Vd5NheTbXahiwzgvLjKBzrQhGdV2KhSby4qi/taQyw851D7icGfnb/6Ndlvi92+GEsEQt1SWuf4SHRPYwMyIF2m/Y2aiUxqQJDpRMPak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=izQF6lcV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSmOoBi5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78BE91F000E9;
-	Wed, 27 May 2026 09:03:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="izQF6lcV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78AB61F000E9;
+	Wed, 27 May 2026 09:09:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779872597;
-	bh=BLbsXnBlvM3iwIqe2tGZckughDYZqFaWG4pE/G8Jl5w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ZSmOoBi534c+Apdrr5BrPxD+73gSRd0jaT/awagOLp3NQC1vdv1yed9m7118mI8zW
-	 N40WhYoaFqbI/0ARxsfyAuno7PslZyegv5sBVoHcD7o5jBMUusY/wE0zWeN1U8oKBL
-	 T9wf0q2/4OrR1aBDayH8jsf8CwAeR9ozQx8Qoyjs2KEiTpAsUsNuf2w/Hcsv2F91zX
-	 T2Eb9ifBaCNZuTncW4sp44fcTY9YzI69o3BAR1tmddC3Z9zSyt26eVFsvo8J61yG/O
-	 s9EOf4W8b6kCQ3NL3qqqdCtXUuw4jf8IKfZRiCzelFdXkEf/W2/B8oy3HIPgbSjZST
-	 FGh6JaxjC8WQQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wSAAV-00000006bac-1rBt;
-	Wed, 27 May 2026 09:03:15 +0000
-Date: Wed, 27 May 2026 10:03:14 +0100
-Message-ID: <86pl2husvh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Miroslav Lichvar <mlichvar@redhat.com>,
-	John Stultz <jstultz@google.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	thomas.weissschuh@linutronix.de,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org,
-	Takashi Iwai <tiwai@suse.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Peter Hilber <peter.hilber@oss.qualcomm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	linux-wireless@vger.kernel.org,
-	linux-sound@vger.kernel.org
-Subject: Re: [patch 06/24] KVM: arm64: Use ktime_get_snapshot_id() to snapshot CLOCK_REALTIME
-In-Reply-To: <20260526171223.144327185@kernel.org>
-References: <20260526165826.392227559@kernel.org>
-	<20260526171223.144327185@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1779872954;
+	bh=7ksdgjc40jlzTwXE0aql93RpRNJfc1+mdFdSmhlsHOA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=izQF6lcVc37gS7ka19Joj79opGsd6eRPOfrXC41G8d1jrB5I0QZI/W7HHz+vuz9Dm
+	 hMsanxgxbP5JVlp+B7sqV08MPhPXNeHZWWqGFjJ71GMvc2wqthWhz7aOKWXHk+7Vdi
+	 yrh+2H9v4pNQu7NfNEI5ECSFWxpxVWp9P7hiIsll+MjzB3svk+tOdTxf1kWKc/HNqZ
+	 6VaQSQOzWduCt9T01SJCPJpqFaBWlGUH+cHeoYPU8+kh85Pcq/UFPEP0X2O3q77R+k
+	 dUwL9oG83iV7KOnPRNIyqosG4nIOTX7SNt5V3n2m9P7Cwj9PTV6YCY+jpyex7sLuE0
+	 OUG3pxnxgsE5A==
+Date: Wed, 27 May 2026 10:09:11 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	linux-integrity@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: Re: [PATCH] firmware: arm_ffa: Treat missing FF-A feature on a
+ platform as a probe miss
+Message-ID: <20260527-sparkling-sloppy-muskrat-c1e4ac@sudeepholla>
+References: <20260526103649.5684-1-sudeep.holla@kernel.org>
+ <20260526193543.GB2851089@ax162>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tglx@kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, mlichvar@redhat.com, jstultz@google.com, sboyd@kernel.org, anna-maria@linutronix.de, frederic@kernel.org, thomas.weissschuh@linutronix.de, akiyano@amazon.com, oupton@kernel.org, kvmarm@lists.linux.dev, giometti@enneenne.com, vdonnefort@google.com, oliver.upton@linux.dev, richardcochran@gmail.com, netdev@vger.kernel.org, tiwai@suse.com, miriam.rachel.korenblit@intel.com, johannes.berg@intel.com, jacob.e.keller@intel.com, anthony.l.nguyen@intel.com, saeedm@nvidia.com, peter.hilber@oss.qualcomm.com, mst@redhat.com, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260526193543.GB2851089@ax162>
 
-On Tue, 26 May 2026 18:13:58 +0100,
-Thomas Gleixner <tglx@kernel.org> wrote:
+On Tue, May 26, 2026 at 12:35:43PM -0700, Nathan Chancellor wrote:
+> On Tue, May 26, 2026 at 11:36:49AM +0100, Sudeep Holla wrote:
+> > When FF-A initialisation is driven from a platform device probe, systems
+> > that do not implement FF-A can return -EOPNOTSUPP from the early transport
+> > or version discovery paths. Driver core treats that as a matched probe
+> > failure and prints:
+> > 
+> >   |  arm-ffa arm-ffa: probe with driver arm-ffa failed with error -95
+> > 
+> > That is noisy for a firmware interface that can be absent on otherwise
+> > valid systems. Driver core already treats -ENODEV and -ENXIO as quiet
+> > rejected matches, so translate only the early unsupported discovery cases
+> > to -ENODEV. Keep later setup failures unchanged so real FF-A
+> > initialisation problems are still reported as probe failures.
+> > 
+> > Reported-by: Nathan Chancellor <nathan@kernel.org>
+> > Closes: https://lore.kernel.org/all/20260523001148.GA1319283@ax162
+> > Signed-off-by: Sudeep Holla <sudeep.holla@kernel.org>
 > 
-> ktime_get_snapshot() is replaced by ktime_get_snapshot_id() which allows to
-> request a particular CLOCK ID to be captured along with the clocksource
-> counter.
+> Appears to work for me.
 > 
-> Convert the usage in kvm_get_ptp_time() over and use the new
-> system_time_snapshot::sys field, which holds the system timestamp selected
-> by the CLOCK ID argument.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> ---
->  arch/arm64/kvm/hypercalls.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Tested-by: Nathan Chancellor <nathan@kernel.org>
+>
 
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-	M.
+Thanks for reporting and testing. Much appreciated!
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Sudeep
