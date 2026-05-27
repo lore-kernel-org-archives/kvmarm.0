@@ -1,74 +1,74 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257EF1DE4E0
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 15:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF0E37BE70
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 15:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779896757; cv=none; b=NMYrWfmfku+hv7+rvZ+ktQvXQwmUke9X/Id42MfV5Du0p42yMevR6G/7MsK2qcKxUqvWhljhEYeiljpRtKMo8MuPntwA39NNfMaq66fkJ/qEjMN/WYITLr0vuqFxSiyExpn/H/a4hhm1Jioqli5ZvTVhY6XSaV84eHGlkft1lf4=
+	t=1779897087; cv=none; b=A0Q/0BrKjxiGuv7Ha6XdvqkEEhjUpYP9JkSpVzYOer5oceAkCA3imPw3c9wQYw0tegsZDZE1hVmwtixbe1Oa5DYhtqlKjUdCyrc6F7ziiF8OAEx4H6uVNV3sScKpMqRPq8BE/DUva4ADBAUYivSxBwzp2m5JAJHwtO6JC4Ko1h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779896757; c=relaxed/simple;
-	bh=N9zlgaizSOK4Iyhms5CxqY0q1UwUbAgqHD++cle33KA=;
+	s=arc-20240116; t=1779897087; c=relaxed/simple;
+	bh=NpWeYvLTRKpoSKZrTZPRCDws+jOWqLVyytaA+mLihZc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RJ/f3/UnUdAkK+H61IGmaI1aOwe9dnC7T2Cuk4DHqFtJdnmB9k9aQX8v1byBTaxhNsElKAkQsCX6R1DPBVacWvPKA5nBFHUxp00rGEj7bs1zcufGi429IsaK0e1v3piV2mSq4Y1olIrKgwcJ26IAWxBhhbkU313vhB0nfFqy0JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FepeHiLH; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=PQxpR64TKQ8lcTZpi4IyXHheqQjfp0nzYaYJdD2CVv4iN2btTZJxk6T+L6K+VMdvEvHnW14I79lMgtkVJxthbtfW7fXaL1BpMNQyJOKt8TotDbiza1Sw07Z63yxgiOrVL8R4egy+chQzijY+A9g9rg1KZ2+psOyAKfcBbkoZWhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XiuwVA+F; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FepeHiLH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiuwVA+F"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779896755;
+	s=mimecast20190719; t=1779897084;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9muSlnmiwd2mhBLAgro+7z3m7qZ5WDxt0cKhMmUlN+E=;
-	b=FepeHiLH6+Tf+cLp68EeCLq+4ygE7LaA48TJd8oHiILz5W9qtPEcMtxze+RZU5IibXW46p
-	9GoEXlHhWFGJTBJSpPpP3blyc7X83pNlYGyC3slMnBeoqzAzs8puCKESKqYCDA+jDw13LE
-	YUe7u3aXkLsjcaoKzAkXUy/MtO4y2c0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=TNh1EiqEZh1MvxlmuCepdse4lX9bTcWUvyZGOXaCV84=;
+	b=XiuwVA+FiWJcB7v3Yq6FYlYoXni37nE1uFh+ReSuy5KvDoMF07pRokI1Aj3iax9pSEFeyJ
+	zm8kP3/vERhotnm/YP9dSZPyqLUcMy5yK9I0uNIX7HD9TVIM7Mbc4yDC8KLWfz158VxQD+
+	DYgsZORssMgO+C8rs6c144h9jx11uFM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-340-lgEey7lKMFmggC8RmxNm7w-1; Wed, 27 May 2026 11:45:53 -0400
-X-MC-Unique: lgEey7lKMFmggC8RmxNm7w-1
-X-Mimecast-MFC-AGG-ID: lgEey7lKMFmggC8RmxNm7w_1779896752
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4903dcb32f8so51869565e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 08:45:53 -0700 (PDT)
+ us-mta-16-DTYAYHMFM96id3_YNrGvAw-1; Wed, 27 May 2026 11:51:23 -0400
+X-MC-Unique: DTYAYHMFM96id3_YNrGvAw-1
+X-Mimecast-MFC-AGG-ID: DTYAYHMFM96id3_YNrGvAw_1779897082
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4904ee02e72so40307895e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 08:51:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779896752; x=1780501552;
+        d=1e100.net; s=20251104; t=1779897082; x=1780501882;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9muSlnmiwd2mhBLAgro+7z3m7qZ5WDxt0cKhMmUlN+E=;
-        b=ckPk/v6oNhm8f3PiN7hBYOOpJ8/gT8rqU5NRG98ltfDtD1IOoPX7QEjI1TIMaWikZp
-         5ufOW0hE+YYZ3iVpbXI9iRpJSq0MfS0PBeAORTsPZMvuAUKn7m4xN6sQhF93Q1UKn7o+
-         dPkuNyqmgB3JVBcOl2ivLVxscQMyq/prAAK+UXiR55HMw1Ll+3mr54lubDm1Usypp8Em
-         ogZOergsDk9jP8psK5hBOd0ztG26fYK5dHHRGo9pdTsM6oifrEnQPL7rgXq7onMN9X3J
-         LnEQxagfq09kqScHfsz5YfF5B4u+AwSlfkMTLAfvVRyu+ImI+gd67/hqw6fNBuJNO8CD
-         nXDQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8guEC9eem5uVTp54JhpCvKBUvcUlVDE1v2ect6cfDv38U56hOn0nin3wshedrCJiTEg53aF4I=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw5Gjs1TNKVA9O1Ahf7zOsC+8WQWXstfZADYKXLFqJAtDXiCaxe
-	WemXuNsc3zBevMaXuCnrn8sBEoGU06R617dTUAGcFX0xePqBR7X1EXg5JOB7rmc245vpW8Aiqlp
-	x9HY0e5PcVMd6s/CxMiM8wVSlgU8L2H8fUq8XfaK85UVtn1YoD5bmGcZuhw==
-X-Gm-Gg: Acq92OFOZPXKWVTExI09OlnNJ4kBVXeRsjZdMIjR/ONYbrUNH0UcntfDp48OSkqkhPf
-	X7Q9yEFxzjUNfsABEbZEe3o8Joq/5RO+1wFm2xPvoFnpp+Fi13dcLzvor1o37EacXH8TKB3G1Ez
-	0QkIUfs7moiInnjgqSI2h/CLjOaMsD1si2bewiKWg7XLbwsZi4ZQhh8RWFoOos4j/WO7iFE8hrh
-	VeTIpgV/i8SKiJqwAoYfg2MHyyNLR9qjCPNVb/y8oMiDUyWQsy49HCu6JiFqg7QCNm+RIvN2oMr
-	5Y4eHP1nblI4eOr9hrPnxMZEoNU3UvvljGySrTH1UcTrBF57LmyyWw6UyIccb/MwqvQ2/zyEFyV
-	/8Q4tT3VyVjNl2qVr4IeWgXEs2eru6ZPJGfyy4MWv9o5RlLvCqfxlRo0hLOrxybIkYItoGBG8hD
-	fkitqx
-X-Received: by 2002:a05:600c:4ecc:b0:488:aa33:dcbd with SMTP id 5b1f17b1804b1-490428db91cmr360447585e9.26.1779896752298;
-        Wed, 27 May 2026 08:45:52 -0700 (PDT)
-X-Received: by 2002:a05:600c:4ecc:b0:488:aa33:dcbd with SMTP id 5b1f17b1804b1-490428db91cmr360446945e9.26.1779896751891;
-        Wed, 27 May 2026 08:45:51 -0700 (PDT)
+        bh=TNh1EiqEZh1MvxlmuCepdse4lX9bTcWUvyZGOXaCV84=;
+        b=NttQpzZErm6bNKU1swORSOdT1Ky4ddXHM1j9gr02yU5/6DDVh/ixM3kZY6OhBkd2E9
+         3rSIhL1R3BRe8S/qRH4NnumOsnuLwwqk1YJqBzfq6LDxDjFhmQfbuP8VkhLVIKV9Tt5U
+         5A/PxKoCFe+rkEi+pnNiRWkHEp8CTCSG6t1JplQ8FtjJSM21Yw4pxcIZo8BFNRL7cMsu
+         06VgkVOovZaL1WRV+WKTttENwPe3L6UNqF5lBwTPyIq4owST3IW51j15yRKvkC6aKuiM
+         cqzeifjx683ac8EH3L22YD1NnMle6VYAghuq8hcfebdc7AoM1sHNIHVxILqY2Q7k6km7
+         r6jQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/eAYOh/pH3i8ZDCyDPpRDYuiClB+IBSv7kfNXP5fiB7hMF18C3cPxve4oPRemXPyBVonFHRO0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzbAqlqCyVP1JnKM5TvAUJqf4mK9s24c3JNYYyiurOPYkP8nl50
+	eD1eUMtm0BnYFa/a9mXwHjQWHvtDSuN4GcMIiLbDDvRZrwkUKfleXrGvkHDpVDBo10NXepX1JwR
+	XoDdIFHwJAhP+/yIzc3cS1C1W42C3JAOxPW2DXymbJXqoYjJFYPLTu7RtUg==
+X-Gm-Gg: Acq92OFjcQ1/H6elavV6n4HwuO8AzFhmKGzoKmpvUx2m2J0RumZ9nYGoLv6dYyI4Lko
+	MtN85HMhYuXDENZaF/sntqOZFQQDcD2tq17pM+Vv9kwQfKMXrglsGLc4L/MhARUDlkdZnIJvQQt
+	hOEkb7p8cdA/BJ8YJQ+yPN069TBfqj72Um59BM3SS1z/FRnZaG8T2w2cSFzoInP23leXAg0IMYI
+	uyTmKC3rovlSN44jCT/tql2SOybrp+KQqYjE8pkw3/m7yGaILL3zIbFnk+FOa/tu6e+6WQn9FFS
+	k/2/nkdjeGGDFcDehZEf+Ta2veYB4tcHZpm1pRNhUeDNV3TJUyGqJCUS/s+UQspkGgsmnsJQDMB
+	2a5W0gSv9PokMOqBiXCVjL8cMnjJa/luTityZp85bb9LfrtzFFipbH1cYrUATnUMk9uCo68v2Ul
+	8lGpJX
+X-Received: by 2002:a05:600c:35c8:b0:490:45bb:8dd9 with SMTP id 5b1f17b1804b1-49045bb8efdmr419559335e9.8.1779897081744;
+        Wed, 27 May 2026 08:51:21 -0700 (PDT)
+X-Received: by 2002:a05:600c:35c8:b0:490:45bb:8dd9 with SMTP id 5b1f17b1804b1-49045bb8efdmr419558785e9.8.1779897081304;
+        Wed, 27 May 2026 08:51:21 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4908097a320sm27674265e9.3.2026.05.27.08.45.50
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5a2a73sm6716947f8f.22.2026.05.27.08.51.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2026 08:45:51 -0700 (PDT)
-Message-ID: <80fa5157-2376-4010-88b2-deb6ab50f87f@redhat.com>
-Date: Wed, 27 May 2026 17:45:49 +0200
+        Wed, 27 May 2026 08:51:20 -0700 (PDT)
+Message-ID: <6c14a58a-60ab-419f-9395-ca3489f6cff8@redhat.com>
+Date: Wed, 27 May 2026 17:51:18 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,8 +77,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 15/18] target/arm/kvm: Ignore some writable bits that
- shouldn't be
+Subject: Re: [PATCH v5 16/18] target/arm/cpu: Expose writable ID reg field
+ properties on the kvm host vcpu model
 To: Khushit Shah <khushit.shah@nutanix.com>
 Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
@@ -99,12 +99,12 @@ Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
  "abologna@redhat.com" <abologna@redhat.com>,
  "jdenemar@redhat.com" <jdenemar@redhat.com>
 References: <20260519132905.145643-1-eric.auger@redhat.com>
- <20260519132905.145643-16-eric.auger@redhat.com>
- <E5402D74-AE00-4088-801C-C87A749E17C9@nutanix.com>
+ <20260519132905.145643-17-eric.auger@redhat.com>
+ <30F66A6A-E26B-486C-81D1-8E1B2CCB558A@nutanix.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <E5402D74-AE00-4088-801C-C87A749E17C9@nutanix.com>
+In-Reply-To: <30F66A6A-E26B-486C-81D1-8E1B2CCB558A@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 2RnY-061TJRfG53yOa93hN5ObF6tC2jsyKTCYcA9PLo_1779896752
+X-Mimecast-MFC-PROC-ID: 3g5J1G7s-sif1R5X4ovYSqAHoedN1igDLU2bkRDqc78_1779897082
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -112,84 +112,108 @@ Content-Transfer-Encoding: 8bit
 
 
 
-On 5/27/26 4:46 PM, Khushit Shah wrote:
+On 5/27/26 5:16 PM, Khushit Shah wrote:
 >
 >> On 19 May 2026, at 6:57 PM, Eric Auger <eric.auger@redhat.com> wrote:
 >>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
 >>
->> KVM currently reports some bits as writable whereas they are
->> RES0 or RAZ. This is detected because the code attempts to
->> match those bits against a named field and this later does not
->> exist in target/arm/cpu-idregs.h.inc.
+>> |-------------------------------------------------------------------!
 >>
->> Let's silence warnings until those bits get fixed in the kernel.
+>> If the host supports KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES and
+>> KVM_ARM_GET_REG_WRITABLE_MASKS ioctl successfully retrieved the mask
+>> of writable fields for all ID regs, expose uint64 SYSREG properties
+>> for all the writable ID reg fields exposed by the host kernel which
+>> can be matched in target/arm/cpu-idregs.h.inc.
 >>
->> This was observed with v7.1-rc4 kernel.
+>> Properties are named  SYSREG_<REG>_<FIELD> with REG and FIELD
+>> being those used ARCHMRS Registers.json.
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->> target/arm/kvm.c | 23 +++++++++++++++++++----
->> 1 file changed, 19 insertions(+), 4 deletions(-)
+>> When such properties are set, they override the default field value
+>> retrieved from the host and reinjected into KVM. Then the actual value
+>> being applied at KVM depends on the register, ie. it can be sanitized.
+>> In case the field value is rejected by KVM, the vpcu init fails.
 >>
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 6373a66bbd..1688cc2106 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -405,6 +405,19 @@ static void get_sysreg_prop(Object *obj, Visitor *v,
->>     trace_get_sysreg_prop(name, value);
->> }
+>> Anyway there is a first attempt to write back this value into KVM.
 >>
->> +static bool ignore_unnamed_writable_field(ARM64SysReg *reg, int i)
->> +{
->> +    if ((!strcmp(reg->name, "ID_ISAR0_EL1") && i >= 28 && i <= 31) || /* RES0 */
->> +        (!strcmp(reg->name, "ID_ISAR5_EL1") && i >= 20 && i <= 23) || /* RES0 */
->> +        (!strcmp(reg->name, "MVFR2_EL1") && i >= 8 && i <= 31) || /* RES0 */
->> +        (!strcmp(reg->name, "ID_PFR2_EL1") && i >= 12 && i <= 31) || /* RES0 */
->> +        (!strcmp(reg->name, "ID_MMFR5_EL1") && i >= 8 && i <= 31) || /* RES0 */
->> +        (!strcmp(reg->name, "ID_AA64FPFR0_EL1") && i >= 2 && i <= 7)) { /* RAZ */
->> +        return true;
->> +    }
->> +    return false;
->> +}
->> +
->> /*
->>  * decode_idreg_writemap: Generate props for writable fields
->>  *
->> @@ -426,10 +439,12 @@ decode_idreg_writemap(Object *obj, int index, uint64_t map, ARM64SysReg *reg)
->>         uint64_t mask;
->>
->>         if (!field) {
->> -            warn_report("%s bit %d of %s is writable but no named field "
->> -                        "in target/arm/cpu-idregs.h.inc",
->> -                        __func__, i, reg->name);
->> -            warn_report("%s is target/arm/cpu-idregs.h.inc?", __func__);
->> +            if (!ignore_unnamed_writable_field(reg, i)) {
->> +                warn_report("%s bit %d of %s is writable but no named field "
->> +                            "in target/arm/cpu-idregs.h.inc",
->> +                            __func__, i, reg->name);
->> +                warn_report("%s is target/arm/cpu-idregs.h.inc?", __func__);
->> +            }
->>             map =  map & ~BIT_ULL(i);
->>             i = ctz64(map);
->>             continue;
->> — 
-> This is why I feel the generated cpu-idregs.h.inc should also have information of
-> RES0/1 fields as in our RFC. These fields will obviously have only one architecturally
-> valid value, hence we will never allow user to write something else.
-The good thing is it allowed to detect that kind of kernel inconsistency ;-)
-
-RES fields are not defined either in target/arm/cpu-features.h and since
-they are not meant to be touched, it was not that obvious to add them.
-
-What would it change anyway, if we detect we have a writable field
-matching a RESx field, I guess we would continue raising a warning, no?
+>> Then legacy CPU options (virtualization, secure, ...) can still
+>> override the previous value. So low level IDREG field properties
+>> apply before the legacy ones.
+> No code to handle this right now right? Anyway I just think parse the
+> props in order they are specified in command line. 
+Actually I think it works that way already because we first override the
+values with ID reg field prop values and then apply the legacy composite
+props
+>
+> qmp cpu-model-expansion is a weird case, it defines an order in which
+> props are processed.
+Yeah that's effectively something that needs to be further tested
 
 Thanks
 
 Eric
-
- 
 >
+>> An example of invocation is:
+>> -cpu host,SYSREG_ID_AA64MMFR0_EL1_ECV=0x0
+>> which sets ECV field of ID_AA64MMFR0_EL1 to 0 (enhanced counter
+>> virtualization).
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>
+>> ---
+>> v4 -> v5:
+>> - get rid of ret local variable, dynamically allocate and free writable_map
+>>  here
+>> ---
+>> target/arm/cpu64.c | 11 ++++++++---
+>> 1 file changed, 8 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+>> index f2edbfc437..e0e1ff6cfb 100644
+>> --- a/target/arm/cpu64.c
+>> +++ b/target/arm/cpu64.c
+>> @@ -37,6 +37,7 @@
+>> #include "hw/core/qdev-properties.h"
+>> #include "internals.h"
+>> #include "cpu-features.h"
+>> +#include "cpu-idregs.h"
+>>
+>> /* convert between <register>_IDX and SYS_<register> */
+>> #define DEF(NAME, OP0, OP1, CRN, CRM, OP2)      \
+>> @@ -851,7 +852,6 @@ static void kvm_arm_set_cpreg_mig_tolerances(ARMCPU *cpu)
+>> static void aarch64_host_initfn(Object *obj)
+>> {
+>>     ARMCPU *cpu = ARM_CPU(obj);
+>> -    int ret;
+>>
+>> #if defined(CONFIG_NITRO)
+>>     if (nitro_enabled()) {
+>> @@ -865,13 +865,18 @@ static void aarch64_host_initfn(Object *obj)
+>>
+>>     cpu->writable_map = g_new(uint64_t, KVM_ARM_FEATURE_ID_RANGE_SIZE);
+>>
+>> -    ret = kvm_arm_get_writable_id_regs(cpu->writable_map);
+>> -    if (ret) {
+>> +    if (kvm_arm_get_writable_id_regs(cpu->writable_map)) {
+>>         g_free(cpu->writable_map);
+>>         cpu->writable_map = NULL;
+>>     }
+>>     kvm_arm_set_cpu_features_from_host(cpu);
+>>     aarch64_add_sve_properties(obj);
+>> +
+>> +    if (cpu->writable_map) {
+>> +        /* generate SYSREG properties according to writable masks */
+>> +        kvm_arm_expose_idreg_properties(cpu, arm64_id_regs);
+>> +    }
+>> +
+>> #elif defined(CONFIG_HVF)
+>>     hvf_arm_set_cpu_features_from_host(cpu);
+>> #elif defined(CONFIG_WHPX)
+>> -- 
+>> 2.53.0
+>>
 > Warm Regards,
 > Khushit
+>
 
