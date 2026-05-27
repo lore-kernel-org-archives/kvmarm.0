@@ -1,119 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA7931F993
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 14:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9874266AA
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 14:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779891189; cv=none; b=CYmlWuiYfyl8NdpHh1smaflRoOMOGLQHVZ6mcRv1W5JQzguqqXdKoY2HJKU8ivHYcJpNlbU1wMr51ixP092C0KDbhN3t99caRizH7DzHFvMo5eG8M83Iw56rtuLVNtDSpFz+JVJsWENNoflsyszW2yiX9at+toItCBs1+X822Ok=
+	t=1779892380; cv=none; b=ieBtMtaxgxl6WmmglZuOnOZY3lIEVTLX7KaDis1agxSGoPF6yKgkyyyGULE8BdBqWomMN5r++bpwsAYvtPaukfalwKBH27ATuPKWNVFepN5LCv/wZGwUzUeXy5oueSH6PDeseIhxgZSLRsRjzpzg8DYntqrfXGDRmvRcK0ULeWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779891189; c=relaxed/simple;
-	bh=8P58/1fx7l2cbwGSthKwlZlBDS+GHviw5jPTYaNJKAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rOZWcCJPTo+1PO24RtfR0CxfqdesW+wvyq0kxyVnTZfgtliLBJ1sg3es9TxIkUee2Psvh2PLqG7nZz7hYMtee4aHDbquuNvGb/PWdF1bJ/y8tzgp4s3Q55j/Jk8OzzMFSI48c3mI0hZbT2sEHcbscs49SIdfzw2wrhKoNXkjrw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aY21OfGr; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779892380; c=relaxed/simple;
+	bh=Xys9IY1uNyN2tawUvRlnf53qZlisPQnBFasZr39OO1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EF5tYIIT1r9BU8cSfSIPDZrxsuEhnvjPuinI7OGXwmZEvrqBQ0Jlht9HpJ2xBmeICVzpdc1WGY56sftun9pkfy8N7s4jpw0I2sZsn7m7PPwX0cnGCAwTUY+7hizV2L/V3NRHVhw7M66bQvRxo6326qeIZh2jJmQ9i9D44ScS0e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2EtctAw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aY21OfGr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 857B91F00A3D;
-	Wed, 27 May 2026 14:13:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2EtctAw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FDDE1F000E9;
+	Wed, 27 May 2026 14:32:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779891188;
-	bh=cJPJU4tbAYEX1ukh2P+hlLCnXB/TI8A9zswFtwRlV/Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aY21OfGrasXmEYj9vQYyvhDko6du7jdhVAjAr8Qo420sBhRgRDmU+HusuvFqczNMq
-	 xPGCr/TrC5G9KgZPdj9xgDtThoWBg6RFMJDERsJLgf+kO7ehYxtGtsJxM2ZWzMiVeq
-	 ebistdsym/hPqAerfJoZssQXZHSNOzvoqvTShYYNWz//p/4hjeQCb4N9RFAwKW5Fe1
-	 ZmFXUa9r78Y5g9vMy8T5bESjhm9uQlqow9jdJiLj+AEXylSF++SSD2QPjQI2Z52vA4
-	 yf1hhnNS/NkUYsCbnJrhchbEXBCSUTBATxfac+RHbhvEJ0dWtjaEcL0z/Wl8avz5xl
-	 lBu1CtRHhmBRw==
-Date: Wed, 27 May 2026 15:13:04 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org,
-	oupton@kernel.org, tabba@google.com, will@kernel.org
-Subject: Re: [PATCH 11/18] arm64: fpsimd: Split FPSR/FPCR from SVE
- save/restore
-Message-ID: <4bcf4ec4-6c82-4dc2-b96a-a3a76340ecfe@sirena.org.uk>
-References: <20260521132556.584676-1-mark.rutland@arm.com>
- <20260521132556.584676-12-mark.rutland@arm.com>
- <0b72df66-2914-4537-811e-2080e0a7ce6c@sirena.org.uk>
- <ahb20fXkdWI7SljE@J2N7QTR9R3.cambridge.arm.com>
+	s=k20260515; t=1779892378;
+	bh=CTIptt7XS14MsYfI5r7PxXNAc/CDaEraJlZvDtwwujE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=L2EtctAwbFGwBqyKO8MYKINqGVrUo633C9zq/bNzkWZ3GtdNX52VxNvkoYKQnYipd
+	 jBonxge68TkMJqZVteDxUQuaZF3F0Izje54wFy7Yj9xsEYsCN11rPFFgHD2lNZf6QB
+	 XJNxfKJmshxJIdHbRLWcboQWgXwIdHaSDvB/JjDq5ubcBPXDz0so9Qwe23oNyCTV9O
+	 D4kVfgXS0IvM+TWZCFGjgET3HaalRuY8bzorTQ2LOBlsORjtAEb2zZD9Bq43jeVSd/
+	 Fs9UXwibr25cw6RjxFocLiRGOMLo8jNcbqMRJQ/I+1AbgZh8sPp174RFWGV1C6skOs
+	 uvG3Wyd6Eyfww==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wSFJY-00000006iFU-1t0D;
+	Wed, 27 May 2026 14:32:56 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Don't populate TPIDR_EL2 in finalise_el2()
+Date: Wed, 27 May 2026 15:32:50 +0100
+Message-ID: <177989236079.1515680.15500441600167629178.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260518153127.6078-1-will@kernel.org>
+References: <20260518153127.6078-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="8ouGmEJHyeUZhv0D"
-Content-Disposition: inline
-In-Reply-To: <ahb20fXkdWI7SljE@J2N7QTR9R3.cambridge.arm.com>
-X-Cookie: You are fairminded, just and loving.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, will@kernel.org, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+
+On Mon, 18 May 2026 16:31:26 +0100, Will Deacon wrote:
+> Currently, it is not necessary for __finalise_el2() to configure
+> TPIDR_EL2:
+> 
+> * The hyp stub code does not consume the value of TPIDR_EL2.
+> 
+> * On the boot cpu, TPIDR_EL1 is used for the percpu offset until the
+>   ARM64_HAS_VIRT_HOST_EXTN cpucap is detected and boot alternatives
+>   are patched. Before boot alternatives are patched,
+>   cpu_copy_el2regs() will copy TPIDR_EL1 into TPIDR_EL2. It is not
+>   necessary for __finalise_el2() to initialise TPIDR_EL2 before this.
+> 
+> [...]
+
+Applied to next, thanks!
+
+[1/1] KVM: arm64: Don't populate TPIDR_EL2 in finalise_el2()
+      commit: 4cceeb8da363ac5127b147ee7345104743f53e9d
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
 
---8ouGmEJHyeUZhv0D
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, May 27, 2026 at 02:51:13PM +0100, Mark Rutland wrote:
-> On Tue, May 26, 2026 at 05:28:21PM +0100, Mark Brown wrote:
-> > On Thu, May 21, 2026 at 02:25:49PM +0100, Mark Rutland wrote:
-
-> > > ... so I've assumed that this doesn't actually matter in practice, and
-> > > implemented the C version matching the existing SVE assembly.
-
-> > There is a possibility that it only matters for older, FPSIMD only CPUs
-> > or just that nobody got round to benchmarking this on physical CPUs with
-> > SVE and in fact a similar optimisation is also useful there.
-
-> All of that might be true, but that doesn't change my assessment that
-> this doesn't seem to matter in practice, and given that the overall goal
-> of this series is to *simplify* things, I'd much rather err towards that
-> than hypothetical performance concerns.
-
-This could do with more clarification in the commit log, right now it
-just points to us not having done this for SVE but that's running on a
-rather shiner set of CPUs (and likely written without any physical
-implementation available) so that's a rather large jump.
-
-> > I'm a bit wary of dropping the optimisation without any verification
-> > of the performance impact, but equally I'm not aware of a specific
-> > benchmark that showed the impact or even if there was one in the first
-> > place.  The changelog sounds like the optimisation might've been
-> > written based on inspection alone, I don't know if anyone will
-> > remember more than a decade later.
-
-> From what I remember, the changes in commit 5959e25729a5 were made based
-> on intuition, inspired by a contemporary retrospective change to the
-> architecture that made FPCR self-synchronizing. Previously the
-> architecture required a context synchronization event for the write to
-> take effect, but implementations happened to be stronger.
-
-> The conditional write isn't necessarily a win, because the cost of
-> recovering from a branch mispredict can be much larger than the cost of
-> micro-architectural mechanisms to ensure that FPCR is
-> self-synchronizing.
-
-That seems likely from my read of the commit log there, it smells like
-something done from inspection rather than because there's an observed
-performance change.  It'd be good to put something like the above in the
-commit log since it's a much more relevant analysis than the comparison
-with the SVE path.
-
---8ouGmEJHyeUZhv0D
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoW++8ACgkQJNaLcl1U
-h9DgHwf/URmveagI56O1UH0OmT2rDV24+jtw1D49QQ/kZxghFUzyrJw9gM8j0zfo
-zj/LlzpJF8Xnuuyp7bh0BC3IieJn7L5etrlhVVsJfI52cYVF0YbU26EfUFEGmJzt
-kVogO+l3ZUPJrxr9KnY3PpGwmLl7+4ldzOZMTuuyqFicp39hw+57L/rrJl850XwE
-2C9lIafie6XpxoxwCFtDSrOIu7CVW6y8mWo4fPYMv77O1l5e+t5+PmBWBOzrPxnm
-95WnMKl5XrYXxdu5bBiv2dnJibYoumtOpnKVBRldTbVa3aAEAaf4Pugd+v6949F1
-ZGmuTVn7m0mnDdH87bdm9T6PdiBgLA==
-=2zVn
------END PGP SIGNATURE-----
-
---8ouGmEJHyeUZhv0D--
