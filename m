@@ -1,245 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAF1382377
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 16:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A340383C97
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 16:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779898789; cv=none; b=iycZoFejYZqJOf23zJYMcnz3Xgg8rT8d5LpGOuQy0xVRYC/ey8G7SUM/Uh1vTKzkWAbbKhpQYwebjjuzNoZk6zqxN90X2UmyvWO+rASouMbXsT73dwuUxa8wheO//4ortAa9qVcbvoCFIaTYGSK9+yPm03dC5EtPAR1unxDwsio=
+	t=1779899030; cv=none; b=jHhvpHIewdYfWwJ8DzWiwJMYM0sz+iXiPE67d2qIIT2Qyj0nt1UMwwHotKkXnvHa8ZU5gyRkYOm+hZAkCTrNtPhXWyqumx0I+gsvJTC34XJHJxRdqWlMwX5WAdp7VGy2/SyFUwol0vYb2v3gmb4tmNIl9jWuetWv0VhFt4F+A9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779898789; c=relaxed/simple;
-	bh=U4WM6xt5tbEm4HnjZ5FtCAEPKsvnOC7JFV44iN8S6aQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tX8N0PumYrDvZiJWplO12sn/u5ynOowOKyGeWQwc+26kk9fhEVYoqScLRguJ6TXNxMf6owOJLVeHSBDbvNv+IsygLh/D/rLsgwkPmN2SMqaLZA+QAFoMGAsHt8/luxCuKQ/d3YVswR3Nj8EYp2sjrkK3jf4iPaNG2l9zmbn882A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZP2dZIZE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1779899030; c=relaxed/simple;
+	bh=InqS0OB5sXHJnaWxKY98YA1/vqiX1EgRZ7YEPyZzGxc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JF+UKOtRSnpTMGr86Eg80tlyWQ3dgmNN9Rg+pSUL3noPJD5ftlmgfrFTabFGf8xnw/2TwHRyxNrwnoJfdOII5eRDDx+dO5xykjpgTDMUCnELsM3wXMwnsHkOgPVg7kmfUQ8P+aIt0Aqb3xVXlzHjpX29o1eHYoyGYl/YOIsw/ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=a5AGH8Pf; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZP2dZIZE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779898786;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EWehKC6VzlOi12pDotLZu0gXRvyJlSMzVrHQdPkljoo=;
-	b=ZP2dZIZEUCtEL7Ix1quDguWxPTP01GHqXxM5FLQRNb8MbjW/3N4evS/d/YaGllem7c9fWR
-	4zUTrulCQAxVOsZUC9M7EM2KWaH6ZvLCwO7mJPM+VSo0sva+KnBTmqbclt+cQwE3UEpLZe
-	GvhJwA9qc5XJJf79Zwo0YtzBTGWoFJQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-513-JP1GmjIRM4O5y6DBn3HxQg-1; Wed, 27 May 2026 12:19:45 -0400
-X-MC-Unique: JP1GmjIRM4O5y6DBn3HxQg-1
-X-Mimecast-MFC-AGG-ID: JP1GmjIRM4O5y6DBn3HxQg_1779898784
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49045243094so77036575e9.2
-        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 09:19:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779898784; x=1780503584;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EWehKC6VzlOi12pDotLZu0gXRvyJlSMzVrHQdPkljoo=;
-        b=Da7D7I1/tokh4LfeV5LYge4V87eak7Tu4S8FHUxrxnW3pmZjy7icLCuIaZgvvDdEex
-         WftMV3nprVnMzbjqqO5zMqMMikPZ7n9kBdP/yxSZPTYf63WaYIeOkr3j0c4Ri06U3lUH
-         9lgL6tyRFMSoVSfYN83z5msyuxB0RlnU69EQCAocYbXb5MMlL2H52IdSFgTs2mgxVd73
-         tQS8Xx1C87YVfKa0p25osrL8+DNc6+ACxPUj68G4lGwv6JHjUbnqfbfk7JkFXzj7aBNi
-         BGzPkdXEVIlEINtjX++fTXsN1vjU5kFtrpL8xrDT2jKQImwujtAggitcVyXfu/osXCaJ
-         WAKA==
-X-Forwarded-Encrypted: i=1; AFNElJ/5sQiRfVmSQObLZ6uR2t1uIHAmtjM19hl7kGxIGyqo4JyIz8LwT+vaISHjgINUg8A77e49i9o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzcPta8EEF89FV69EJ0vETjTnXgsskDzc4k7HQ+B9YwO4Y2nD12
-	miGkbIQt3pvjW8aEkf32XcE2s/l4oaxku8125qCT26a52REooRGrFLlGJiaCGu2sk5cxTddMjSs
-	WyajAJdQ99CAsidZWNOmWMZrIWP8BW/Cc9I/tpeIRhIw4HLZP/ygd/JfTXQ==
-X-Gm-Gg: Acq92OHRpsossfrYlEWXig2rUM6B9bcguHGVruarEXvYmgYbz8pCGM864gY/o3FAi6J
-	kyXGByyoSmx1G9vNEF0hcGjd6rMPgN3NKt8UCuXZ6h5MKmC7VQypyx0NZ0WUQtSh8aAefgkZ3r6
-	S0VdwfceSgGGTgQwC6t3p7Df4YkfTghmYpQmYZbJ/vTq5BrjdrTKKX4OuKYXnRnDIu2k7wW0nI8
-	uopDkjczzvaDggZuiVy6E0sZfvZhs8Ims4puZFLcGeHJVhN2abkbTgJoszEre4YJaQOS0H0WBYu
-	kHOyk2UexIqVX5/hGec8SIFasYDVvlWbLwisGW5aSY8sqD02aUfcsxsII4i48+GC/UyPX94QHZ0
-	cWRt+V90WXsSwHZuTQlUASUtRp1fEh7gH0bTkU880sH1wJ8W9jrF9TBkOmbwo+0sX+ZLGlVubfS
-	2g5L2W
-X-Received: by 2002:a05:600c:4746:b0:490:469c:556b with SMTP id 5b1f17b1804b1-490469c56d6mr377120195e9.12.1779898784031;
-        Wed, 27 May 2026 09:19:44 -0700 (PDT)
-X-Received: by 2002:a05:600c:4746:b0:490:469c:556b with SMTP id 5b1f17b1804b1-490469c56d6mr377119545e9.12.1779898783505;
-        Wed, 27 May 2026 09:19:43 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904561a198sm396774325e9.10.2026.05.27.09.19.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2026 09:19:43 -0700 (PDT)
-Message-ID: <63a8bd66-c324-4d2f-9d6b-1ea35e72db5b@redhat.com>
-Date: Wed, 27 May 2026 18:19:41 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="a5AGH8Pf"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F14B435B9;
+	Wed, 27 May 2026 09:23:37 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE3D63F905;
+	Wed, 27 May 2026 09:23:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779899022; bh=InqS0OB5sXHJnaWxKY98YA1/vqiX1EgRZ7YEPyZzGxc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a5AGH8PfHk7vb+yoJ0nscckmvGxnZGjktW9L9rRBYjdcN4FCfTyLGrS+yUO39DMMP
+	 p5H+P4Y5GnRAfsvjBYVmJTHQ/PZzrAHZJWgtgv93++KALizHl9h1ZByVCshMLHsnBk
+	 dy8zYvLS9BLaS3a3/HRhpHJpx3n1Eb0Q5l2hJMNE=
+Date: Wed, 27 May 2026 17:23:39 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org,
+	oupton@kernel.org, tabba@google.com, will@kernel.org
+Subject: Re: [PATCH 16/18] arm64: fpsimd: Move sve_flush_live() inline
+Message-ID: <ahcai1BV71rDmGLa@J2N7QTR9R3.cambridge.arm.com>
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+ <20260521132556.584676-17-mark.rutland@arm.com>
+ <0f34443d-222e-42d3-b6c2-d15bb656e1d2@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 13/18] target/arm/kvm: Introduce
- kvm_arm_expose_idreg_properties
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@linaro.org" <philmd@linaro.org>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260519132905.145643-1-eric.auger@redhat.com>
- <20260519132905.145643-14-eric.auger@redhat.com>
- <3344B74E-39B1-421D-8417-373A688DB372@nutanix.com>
- <c4a38526-a803-4e69-b6ca-f6bf0583198a@redhat.com>
- <F50EB764-5F22-42AD-89E2-677BF7DB453B@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <F50EB764-5F22-42AD-89E2-677BF7DB453B@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: iCQfSnqDu_ZRjcjYEEvfQASlIKVrTxVwOn7LQYwPWFc_1779898784
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0f34443d-222e-42d3-b6c2-d15bb656e1d2@sirena.org.uk>
 
+On Wed, May 27, 2026 at 01:54:42PM +0100, Mark Brown wrote:
+> On Thu, May 21, 2026 at 02:25:54PM +0100, Mark Rutland wrote:
+> > Currently sve_flush_live() is written in out-of-line assembly. It would
+> > be nice if we could move it inline such that control flow can be written
+> > more clearly in C, and to permit the removal of otherwise unused
+> > assembly macros.
+> 
+> > +static inline void sve_flush_live(void)
+> > +{
+> > +	unsigned long vl = sve_get_vl();
+> > +
+> > +	if (vl > sizeof(__uint128_t)) {
+> 
+> It feels odd to use sizeof(__unit128_t) here rather than u128.  Whatever
+> colour the bikeshed is:
 
+FWIW, that was just to match __fpsimd_to_sve(). If there was nothing
+else to be consistent with, I agree that using u128 woul2d be
+preferable.
 
-On 5/27/26 5:44 PM, Khushit Shah wrote:
->
->> On 27 May 2026, at 9:02 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> I replied separately to this on your series thread. I am inclined to do
->> so but this raises another problematic for the layered products to know
->> which mismatch can be fixed
->>
->> Thanks
->>
->> Eric
->>
->
-> Hence the safe-value tags :), sneak peek to v2 of RFC, with safe-value tags.
-> For each prop we can say:
->         ...
->         {
->             "name": "feat_RDM",
->             "supported-values": [
->                 "off",
->                 "on"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_ATOMIC",
->             "supported-values": [
->                 "off",
->                 "on"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_CRC32",
->             "supported-values": [
->                 "off",
->                 "on"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_SHA2",
->             "supported-values": [
->                 "off",
->                 "sha256",
->                 "sha512"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_SHA1",
->             "supported-values": [
->                 "off",
->                 "on"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_AES",
->             "supported-values": [
->                 "off",
->                 "aes",
->                 "pmull"
->             ],
->             "type": "string"
->         }
->         {
->             "name": "feat_NV",
->             "supported-values": [
->                 "0.0"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_RAS",
->             "supported-values": [
->                 "0.0",
->                 "1.0",
->                 "1.1_base"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_MPAM",
->             "supported-values": [
->                 "0.0"
->             ],
->             "type": "string"
->         },
->         {
->             "name": "feat_CSV2",
->             "supported-values": [
->                 "0.0",
->                 "1.0"
->             ],
->             "type": "string"
->         },
-I am not sure what the above represents
->         …
->
->
-> 	I am inclined to do so but this raises another problematic for the 	layered products to know which mismatch can be fixed
-> 	
-> I am tempted to make the same argument for writable fields: how will the
-> layered products know which values are safe (or effectively can be set?)?
->
-> I know right now we don’t agree on keeping safe-value tags or default values.
-> But, I hope the above inclines you towards keeping those :) 
+> Reviewed-by: Mark Brown <broonie@kernel.org>
 
-OK I think I now understand what you plan to do with safe_rule (which,
-as far as I understand is not currently implemented in your v1). With a
-"tool" like 
+Thanks!
 
-query-cpu-model-expansion you would be able to retrieve the host value. If it does not match your named model default value, you can use the safe_rule to see if it could be applied, without relying on any scratch vcpu instantiation. This makes sense in the context of providing ways for layered products to see which vcpu model can be used, assuming there is no other way like scratch vcpu instantiation.
-
-Is that a correct understanding?
-
-I think this implies that we need to return more information though query-cpu-model-expansion than what we currently do (at least in [1] we only return the value). We would need to return whether the prop value can apply on this host (its default value is same as host value or OK with regards to host value and safe rule and the ID reg field is writable). This most probably means we need to enhance the prop value to contain more fields.
-
-Thoughts?
-
-Eric
-
-
-
->
-> Warm Regards,
-> Khushit
-
+Mark.
