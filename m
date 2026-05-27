@@ -1,62 +1,65 @@
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF183C9ED8
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 15:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03956426EAA
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 15:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779894164; cv=none; b=o4+EOpe9RSpUQDeQtVp46OXlCnNERoSo156HGP5sZGDvEejYhxfSDg5nE1obCpkudk9mJ042/gxFK55D5TxNCLnIrpArhM3P7qarBgMy/2llVkyyWMj/I8hdRIdKj47wclZUsgxvlQnB/lMhEKTXzkz18gd6cVyTcT2NR3uFs8s=
+	t=1779894165; cv=none; b=NDSv3DvFag9jQlUZhOjjf5k/e/tEluIGMH/1hvyVcvWR56z98/8yGE6kZ20GDlyc4YcZRvCodU/RdGvbvLz3IdaaasQDdQFQ+f58nPlviIc0BzfBVvFQdRYalIl5Of99EIh3rcpIKgUmfmcUEzfm+zFArRq89iEZ5pG28nS+2X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779894164; c=relaxed/simple;
-	bh=ByxUlFkD9YwcgGZp3oksyBn5vqJvrUeByVIcogipJNQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kmMphasL8WTFes6mA+xQlFyGNGtcekJrcfXw3irvu/dq+qUUHO1D/ONOQML/meJinh1fP/KRQBzvfuJR3QPcyJ3GLjMzILydepyPnNVcoOfUqP4dHPEeiVp8YOne1rd/9iXX1z0++PhOFmqvQuR9jxeR1xb40V3c6aXKgXA91yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AS10OkgY; arc=none smtp.client-ip=209.85.208.73
+	s=arc-20240116; t=1779894165; c=relaxed/simple;
+	bh=SVvDiffb/nQ6NalN7qs94CnE2E+NZ1sLlPWERmt385M=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=t3cOHXw5iNOBxIaV48XOhFZtcq1WSQf8GMm/OlF86i1okb2TyL0haGahojpUwUo+ga44pprCvk8AU5UUjQixGeWLwugRbuGAbczI2nEZ3iIMcGMJrt5mXP8WmNO2NC21JL6SWWeycXHy2pxlh3hO0na8EPXjoaLF+Vbfq6W5Smw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F3kPsewF; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AS10OkgY"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-6852c63bd1aso3579659a12.0
-        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 08:02:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F3kPsewF"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-49050c44bcdso56486075e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 08:02:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779894160; x=1780498960; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=t0KYYgCqaB1EQ6tWG+L5HeJwzgQqF0UPRi4lIJbh6P8=;
-        b=AS10OkgY9wzGpK781IPkKa/ge/VUkrtKjNRsINWMjxTv6rUAyoA3+avBAAKtZswyrz
-         bDkByoE3H7aFbsWqh8BjdKk5gesaui2z4UlOsOfrJFiAdUTwrRE4yIgGqPj//86+TVPc
-         ppzQ/4fCqVzMpwMS7nnA44Om6zm5rqMDfw5puU5P8db15EA2AX5MfoouUHPsClko3Lrh
-         XueRQWe3KQEhijkNUpSnM7C5XMS95vxeNvAobBW0LInFOGdoyAJ9EshE8dq4GmTAhl3s
-         AlGseypAfKHonFLfFGpSkHkBuSozlQfxWU/zD3oJ7LNRYAY3a7jMZ//s+oWVDLIqLL6z
-         TFSA==
+        d=google.com; s=20251104; t=1779894161; x=1780498961; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q7J1ztb6Z4HCTvPSQ3KlFjIJDDk9HF6V81J85Mqd8VE=;
+        b=F3kPsewF8scudpa+qTWRLTeA0jqywhSHy/Zk5rWpWwxf/ZBBa7IeFR2epnv/ceFI4E
+         8LAwgwDcxeILuIELQohOUayt5DgePs44EJ1JGw5ElZpyHXE6YQSk/hgaQ2Er7h4Gh25D
+         IaE6/YeNJOuipmudB22jkctS4pR30mX3Ylh+yljmMC9A0YpdmBsoCzb3JZdKGM3fD6dw
+         Xoyfvl3LJrAwdzjkzlGj//jUkct67NdzpgMLpFO+r/8t30cSClq9t7SYZYyRrrAvGTKd
+         KzFHjtKJ3cQuae4K6NyRXA2c6V1gYqr88qp5CbRx6Hg8hrY5F6chc8ScojtsJNxcg/8r
+         h+1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779894160; x=1780498960;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t0KYYgCqaB1EQ6tWG+L5HeJwzgQqF0UPRi4lIJbh6P8=;
-        b=BfDooXB+W40drVaTg9bh82SVbIKk7k5+ATKG6qV7IvpnIffVoQ/KgAo1hZJ7q/Xzp3
-         ikYwpxBvcK35AGPliJLEBbDahGkCFx+2o4vjFoXAwT74D0asbXa9hGkCeGY2T9smUq1X
-         SnkVSFjJ26wwvgMX5foNcY+UfIcOlomjvgc5qK/9jnBxdQIFBdFOVT7Re/ey6YI7+ypT
-         /3N0+EGDbH/oEYgLJ6NqzUCsG0m8JESSUASFx4huaTCx/qfDIzOIUZuGRm8YW06khNAh
-         icdxjrczsK41QcFIA7CK5l15DxaNxp8KlN+OZZn+YXUmsGuJpeRGD7N7u4AWYIepcD5H
-         hZKg==
-X-Forwarded-Encrypted: i=1; AFNElJ81PDsXAfxOKjd3h64qNmAV8oyK49qXbTA4GTrTr+1UN/4TybvkNvuJ7+BsjhU4cKjvrwyK/yc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyyiMGPzL/Inm03Jc/suqqJZEZWjQiFgtL0pKpR1Rj0A04/k5fX
-	BLmGxouFJXNDgSvDIoSEDVN5G+ue0Pn/qBC+YK+2dxbEWyxr8MGK9nh2SFg8UdDuIRDMdsB+Bsm
-	mblPQmXdttz4Iow==
-X-Received: from edho11.prod.google.com ([2002:a50:c90b:0:b0:687:b8fd:7b67])
+        d=1e100.net; s=20251104; t=1779894161; x=1780498961;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q7J1ztb6Z4HCTvPSQ3KlFjIJDDk9HF6V81J85Mqd8VE=;
+        b=CtoleQg0u9bIIAC37oEdn7XEru9MtHPDxBrk8ECEhn9Z5hSSfAMNjSLrOk8np8OI2/
+         Ah0G3+uQ4u2M1xs6ZC3mPmqVprGzZ176Br6xmNGZGKR+YlxSsqx9ar/e88Zc9dhIK+Bf
+         4P3vcRRYVKlmJUGpLgtWUKaY62ORYM3nwZRGP8tREvURxUQ77mfAzoqbOYVCAlGlfPQ0
+         gEktAr8bNzlgiXu8xwMP8ao1xQejvysX/ojMkDLG5IQW08wjn1SPWwWIRKytR2bosZx0
+         sXw1RwbgW4FU3sxRx2fkB5XKyUckMXopmz6kycqLnI8nYqYYwG9kuYE3zReg4hSmRZwG
+         qT0g==
+X-Forwarded-Encrypted: i=1; AFNElJ/mma9h/fxfXPY4od3naX3LwYrUhsfSAZhrzeq++kd8s72zHGxG3Butqb2pnpobPjNN83qH48U=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywsc4N8L0C/ZQD9FVsUCeg6hid+HCyNmevj3LoM7/natlpAjgup
+	dj6BkKO3lcQHDLZCYmd4LJG+ZSyn+QjUTO5ml/ri8UQyEjH3iDqFGd5zmEVNCbdsD5HJ5aE8Bdy
+	z7IvT0a2FxPsv2Q==
+X-Received: from wrrj16.prod.google.com ([2002:adf:ff90:0:b0:43d:2d2:c03b])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:3249:20b0:68a:57f1:44e2 with SMTP id 4fb4d7f45d1cf-68a58107b1cmr2314665a12.7.1779894160042;
- Wed, 27 May 2026 08:02:40 -0700 (PDT)
-Date: Wed, 27 May 2026 15:02:30 +0000
+ 2002:a05:600c:530c:b0:490:5527:3be2 with SMTP id 5b1f17b1804b1-49055273be6mr302305885e9.32.1779894161027;
+ Wed, 27 May 2026 08:02:41 -0700 (PDT)
+Date: Wed, 27 May 2026 15:02:31 +0000
+In-Reply-To: <20260527150236.1978655-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260527150236.1978655-1-smostafa@google.com>
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260527150236.1978655-1-smostafa@google.com>
-Subject: [PATCH v6 0/6] arm_ffa, KVM: Fix FF-A emad offset calculations
+Message-ID: <20260527150236.1978655-2-smostafa@google.com>
+Subject: [PATCH v6 1/6] optee: ffa: Add NULL check in optee_ffa_lend_protmem
 From: Mostafa Saleh <smostafa@google.com>
 To: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
@@ -66,83 +69,31 @@ Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
 	sudeep.holla@kernel.org, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi all,
+Sashiko (locally) reports a possible null dereference under memory
+pressure due to the lack of validation of the allocated pointer.
 
-This series fixes the Endpoint Memory Access Descriptor (EMAD) offset
-calculations and adds the necessary bounds checks for both the core
-FF-A driver and the pKVM hypervisor.
+Fix that by adding the missing check.
 
-Prior to FF-A version 1.1, the memory region header didn't specify an
-explicit offset for the EMADs, leading to the assumption that they
-immediately follow the header.
-However, from v1.1 onwards, the specification dictates using the
-ep_mem_offset` field to determine the start of the memory access
-array.
+Fixes: 2b78d79cdf96 ("optee: FF-A: dynamic protected memory allocation")
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+---
+ drivers/tee/optee/ffa_abi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-The patches in this series address this by:
-1. Updating the core `arm_ffa` firmware driver to correctly calculate the descriptor
-   offset using `ep_mem_offset` rather than defaulting to `sizeof(struct ffa_mem_region)`.
-   It also introduces bounds checking against `max_fragsize`.
-2. Enhancing the pKVM hypervisor validation logic to no longer strictly enforce that
-   the descriptor strictly follows the header, aligning it with the driver behavior
-   and the FF-A specification, while also ensuring the offset falls within the mailbox
-   buffer bounds.
-
-While addressing these bugs, Sashiko uncovered other issues that were
-fixed in the same series.
-
-All the patches aside from the first one in optee are urgent fixes as
-they either impact the hypervisor security or kernel stability.
-
-Changelog
-#########
-v5->v6:
-- Add fixes tag
-- Small clean up make variable declaration reverse christmas tree.
-
-v4->v5:
-- Collect Sudeep Rbs
-- Add extra patch to check base address alignment.
-- Remove WARN_ONs in KVM code
-- Use ffa_emad_size_get() instead of hardcoded size in KVM code.
-
-v3 -> v4:
-- Address review comments and fix Sashiko bugs
-
-v2 -> v3:
-- Fixed typo in nvhe/ffa.c (missing sizeof)
-
-v1 -> v2:
-- For pKVM, removed the strict placement enforcement for `ep_mem_offset` as it is not
-  compliant with the spec, and avoids making assumptions about the driver's memory
-  layout.
-
-Link to:
-########
-v5: https://lore.kernel.org/all/20260526151934.3783707-1-smostafa@google.com/
-v4: https://lore.kernel.org/all/20260520204948.2440882-1-smostafa@google.com/
-v3: https://lore.kernel.org/all/20260512124442.1899107-1-sebastianene@google.com/
-v2: https://lore.kernel.org/all/20260430160241.1934777-1-sebastianene@google.com/
-v1: https://lore.kernel.org/all/ae9KN9nkOgDYJcGP@google.com/T/#t
-
-
-Mostafa Saleh (4):
-  optee: ffa: Add NULL check in optee_ffa_lend_protmem
-  firmware: arm_ffa: Fix out-of-bound writes in ffa_setup_and_transmit()
-  KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
-  KVM: arm64: Ensure FFA ranges are page aligned
-
-Sebastian Ene (2):
-  firmware: arm_ffa: Fix Endpoint Memory Access Descriptor offset
-    calculation
-  KVM: arm64: Validate the offset to the mem access descriptor
-
- arch/arm64/kvm/hyp/nvhe/ffa.c     | 38 ++++++++++++++++++++++---------
- drivers/firmware/arm_ffa/driver.c | 21 ++++++++++-------
- drivers/tee/optee/ffa_abi.c       |  3 +++
- include/linux/arm_ffa.h           |  2 +-
- 4 files changed, 44 insertions(+), 20 deletions(-)
-
+diff --git a/drivers/tee/optee/ffa_abi.c b/drivers/tee/optee/ffa_abi.c
+index b4372fa268d0..633715b98625 100644
+--- a/drivers/tee/optee/ffa_abi.c
++++ b/drivers/tee/optee/ffa_abi.c
+@@ -698,6 +698,9 @@ static int optee_ffa_lend_protmem(struct optee *optee, struct tee_shm *protmem,
+ 	int rc;
+ 
+ 	mem_attr = kzalloc_objs(*mem_attr, ma_count);
++	if (!mem_attr)
++		return -ENOMEM;
++
+ 	for (n = 0; n < ma_count; n++) {
+ 		mem_attr[n].receiver = mem_attrs[n] & U16_MAX;
+ 		mem_attr[n].attrs = mem_attrs[n] >> 16;
 -- 
 2.54.0.746.g67dd491aae-goog
 
