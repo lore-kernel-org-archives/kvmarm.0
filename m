@@ -1,90 +1,222 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692593EF0D3;
-	Wed, 27 May 2026 10:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD783ED124;
+	Wed, 27 May 2026 10:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779878128; cv=none; b=HgA/bJ7zahLNQejBbEemM0P09fT7Tyimj0QpVZKBNe8z9OD876IDoAYoLca370sxrz3yEcEYyu5SYnJzodX9MTNlvIAigLBFs3JrLI9LP9h93UE1mGJi4sqjPCyZgJokdTzL5IJE4GQR2BdoRPApn+WaCN3CRTpYLjZfLIYM6R8=
+	t=1779879117; cv=none; b=L24uBck4r/ZTgLjigbzeLxtqnXW/j0tjeQFZR38AmokkkMaNk3Z5S6/+J/Lam9N6Y0mpgq1RrLyGBpZOlgu7hXM7Ri8A6luadxUvEA8Hz4jmA2Q3Ov2pwmCsdXT2/WM4TY+5LjO782iHHxcF+5vwlkMrkZwnqgbQ1ZO3Gcva5eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779878128; c=relaxed/simple;
-	bh=8ctdxqLURgSQEye8h+eKl6nW7zwYHgLZYy4ZdlFLMck=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X5jTeHxtv92qVJXOA/hIm/nNxRRzZp+Gyweg61hlrE9769T3IbU+xTeAnNxO3r3UIxLQKmPyrjwsj/IfOO4st0uT8coDpc9ZsTofxGcBu1iJR27UpkZkdbpOK0DdnLJIu3+O2DoovsCFeQ3kfmuPxtVW1YNDHYhF5e9TdyqPa0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hd2/OuW9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779879117; c=relaxed/simple;
+	bh=CB78L5XoCP4RbTKJZWO2kCWlYmt5eE9Al4oCQiJ44gs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A/8dXL70iL81grVTvN57FJiaeC7wqpKuoieBM7M1BA6aXubI3iJ7xf6cw/4vSxXuSF5aqEXh/UpNsSH+HQT/d4Kv1qg+LXkBdcDWFVZephIjQU+yT0qm9kkhy2iIpXKyPZBq8XqCJtDdJCc3+QFm20rZLFJM/SSuDZRP6AM7aN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VuZl16Dh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hd2/OuW9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F5041F000E9;
-	Wed, 27 May 2026 10:35:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VuZl16Dh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 796531F000E9;
+	Wed, 27 May 2026 10:51:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779878127;
-	bh=wzP5QfQoOdOy0iLjAEoGKBb41erJPo8UxyCpX8lnfeA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Hd2/OuW9FWHDNLb0kiG5rFfN+zTD3JwtnJ5VVQbUAy5qSRQVVhxigTPlKav8yDIhw
-	 EhbsPjaJYdlTsbJsNQ3/qQiA+rrgabX65cWH8iTmaw5LD7KDylA73X2oSlHHiwIAnt
-	 1o4ica+elLzFJkhKIqelgpeSXsbnCK99wZeJGSZ26rKeuEHwRwArWDK/JZ2KIOCeUG
-	 dK1801LzPEUDSljDf5CjZyMrUBChI7Lxgsrx6cNG95eNM7sz6s2s0Ft5OvJH1tDDPG
-	 Lj80EAy3x57b6RFkIg2k4JnE1Q038obkAMLFol3lRKqZZb4yRU7Sas8w+R+uZ2sGsZ
-	 WSdsvH0pKsQmA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20260515; t=1779879115;
+	bh=4XE3jVKRLJiqOr507V6y6IObkBgPaGSpBZ4Jf9AwYyU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=VuZl16DhMrRvTzEXlDbYmB30nnzXbHxJEr9wgHJfAV54MODXeJtHyvOnxlfTCzNHh
+	 I+Znw4UR2Csu6hPkQ94IfX3sFW/3hja2r9YeCgr8bPdeOT5QCPyO7dTjH5327lo/AY
+	 9mzgZXNqX8LhHaoP4HWJb/fu3vLBLoxN01pkT5L2HCkB/+20wPveXcaFukzzqSjLVd
+	 i33wQxVnk6OY8RC8Acp7OVZyNi6l3B7FN/kUcf4KMS3pTPR7cLSCN6XXDyrY6/UfsR
+	 q8D9s1Q4a/Qf1qSjj7ycN0McjNLFKoB6EZgzaUbS1wOABED05E5pR3sNGKZsneUqWH
+	 k+T+n6uuMv0RA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wSBbh-00000006diM-16bo;
-	Wed, 27 May 2026 10:35:25 +0000
+	id 1wSBrd-00000006dx0-2PbV;
+	Wed, 27 May 2026 10:51:53 +0000
+Date: Wed, 27 May 2026 11:51:53 +0100
+Message-ID: <86mrxlunue.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	Qiang Ma <maqianga@uniontech.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: PMU: Preserve AArch32 counter low bits
-Date: Wed, 27 May 2026 11:35:22 +0100
-Message-ID: <177987810338.1512096.8015208676423389883.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260526074640.791991-1-maqianga@uniontech.com>
-References: <20260526074640.791991-1-maqianga@uniontech.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 03/39] irqchip/gic-v5: Setup gic_kvm_info on ACPI hosts
+In-Reply-To: <20260521144846.1899475-4-sascha.bischoff@arm.com>
+References: <20260521144846.1899475-1-sascha.bischoff@arm.com>
+	<20260521144846.1899475-4-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, maqianga@uniontech.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 26 May 2026 15:46:40 +0800, Qiang Ma wrote:
-> AArch32 writes to PMU event counters cannot update the top 32 bits,
-> even when PMUv3p5 makes the counters 64-bit. KVM therefore needs to
-> preserve the existing high half and only update the low half written by
-> the guest, unless the caller explicitly forces a full reset through
-> PMCR.P.
+On Thu, 21 May 2026 15:50:09 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> The current code masks @val down to the old high half before taking
-> lower_32_bits(val), which means the low half is always zero. As a
-> result, AArch32 writes to event counters discard the guest-provided low
-> 32 bits instead of storing them.
+> Device-tree based GICv5 probing already passes the IRS details and
+> maintenance interrupt to KVM, but the ACPI path only initialises the
+> irqchip and installs the ACPI IRQ model. As a result, KVM never sees
+> the GICv5 host information required to probe the vGIC on ACPI systems.
 > 
-> [...]
+> Add the ACPI equivalent of the DT KVM setup. Parse the MADT GICC
+> entries for the maintenance interrupt, require all relevant entries to
+> agree, register the interrupt as a GICv5 PPI-encoded GSI, and pass the
+> resulting IRQ together with the IRS base and coherency information to
+> KVM. Native GICv5 does not require a maintenance interrupt unless the
+> legacy GICv3-compatible CPU interface is present, so preserve the
+> existing no-maintenance-IRQ handling for that case.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  drivers/irqchip/irq-gic-v5.c | 103 +++++++++++++++++++++++++++++++++--
+>  1 file changed, 98 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> index 707deabbf2f63..ccd1ec69a6ab2 100644
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
+> @@ -1126,7 +1126,7 @@ static void gicv5_set_cpuif_idbits(void)
+>  #ifdef CONFIG_KVM
+>  static struct gic_kvm_info gic_v5_kvm_info __initdata;
+>  
+> -static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +static void __init gic_setup_kvm_info(unsigned int maint_irq)
+>  {
+>  	struct gicv5_irs_chip_data *irs_data = gicv5_irs_get_chip_data();
+>  
+> @@ -1140,13 +1140,14 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  		return;
+>  	}
+>  
+> -	gic_v5_kvm_info.type = GIC_V5;
+> +	if (WARN_ON(!irs_data))
+> +		return;
+>  
+> +	gic_v5_kvm_info.type = GIC_V5;
+>  	gic_v5_kvm_info.gicv5_irs.base = irs_data->irs_base;
+>  	gic_v5_kvm_info.gicv5_irs.non_coherent = !!(irs_data->flags & IRS_FLAGS_NON_COHERENT);
+> -
+> -	/* GIC Virtual CPU interface maintenance interrupt */
+> -	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
+> +	gic_v5_kvm_info.maint_irq = maint_irq;
+> +	gic_v5_kvm_info.no_maint_irq_mask = false;
 
-Applied to fixes, thanks!
 
-[1/1] KVM: arm64: PMU: Preserve AArch32 counter low bits
-      commit: 1750ad1388e03fb27068cd1f22c9c8b4590fe936
+You remove this last line from patch #1, and reintroduce it here. My
+gut feeling is that it should never be removed the first place.
 
-Cheers,
+>
+>  	/*
+>  	 * We require an MI if we have legacy support, but don't, otherwise.
+> @@ -1162,10 +1163,101 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  
+>  	vgic_set_kvm_info(&gic_v5_kvm_info);
+>  }
+> +
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +{
+> +	/* GIC Virtual CPU interface maintenance interrupt */
+> +	gic_setup_kvm_info(irq_of_parse_and_map(node, 0));
+> +}
+> +
+> +#ifdef CONFIG_ACPI
+> +struct gicv5_acpi_kvm_info {
+> +	u32 maint_irq;
+> +	int maint_irq_mode;
+> +};
+> +
+> +static struct gicv5_acpi_kvm_info acpi_v5_kvm_info __initdata;
+> +
+> +static int __init gic_acpi_parse_virt_madt_gicc(union acpi_subtable_headers *header,
+> +						const unsigned long end)
+> +{
+> +	struct acpi_madt_generic_interrupt *gicc =
+> +		(struct acpi_madt_generic_interrupt *)header;
+> +	static int first_madt = true;
+> +	int maint_irq_mode;
+> +
+> +	if (!(gicc->flags &
+> +	      (ACPI_MADT_ENABLED | ACPI_MADT_GICC_ONLINE_CAPABLE)))
+> +		return 0;
+> +
+> +	maint_irq_mode = (gicc->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
+> +			 ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
+> +
+> +	if (first_madt) {
+> +		first_madt = false;
+> +
+> +		acpi_v5_kvm_info.maint_irq = gicc->vgic_interrupt;
+> +		acpi_v5_kvm_info.maint_irq_mode = maint_irq_mode;
+> +		return 0;
+> +	}
+> +
+> +	/* The maintenance interrupt must be the same for every GICC entry. */
+> +	if (acpi_v5_kvm_info.maint_irq != gicc->vgic_interrupt ||
+> +	    acpi_v5_kvm_info.maint_irq_mode != maint_irq_mode)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static bool __init gic_acpi_collect_virt_info(void)
+> +{
+> +	int count;
+> +
+> +	acpi_v5_kvm_info.maint_irq = 0;
+> +	acpi_v5_kvm_info.maint_irq_mode = 0;
+> +
+> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
+> +				      gic_acpi_parse_virt_madt_gicc, 0);
+> +
+> +	return count > 0;
+> +}
+> +
+> +static void __init gic_acpi_setup_kvm_info(void)
+> +{
+> +	unsigned int maint_irq = 0;
+> +	int irq;
+> +
+> +	if (!gic_acpi_collect_virt_info()) {
+> +		pr_warn("Unable to get hardware information used for virtualization\n");
+> +		return;
+> +	}
+> +
+> +	if (acpi_v5_kvm_info.maint_irq) {
+> +		u32 gsi = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI) |
+> +			  FIELD_PREP(GICV5_HWIRQ_ID, acpi_v5_kvm_info.maint_irq);
+> +
+> +		irq = acpi_register_gsi(NULL, gsi,
+> +					acpi_v5_kvm_info.maint_irq_mode,
+> +					ACPI_ACTIVE_HIGH);
+> +		if (irq <= 0)
+> +			return;
+
+This probably deserves a bit of a warning. And maybe not completely
+fail the registration with KVM?
+
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
