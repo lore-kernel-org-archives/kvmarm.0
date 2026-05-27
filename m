@@ -1,361 +1,273 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A322641CA
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 11:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EA21E8320
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 11:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779880719; cv=none; b=H39oxpIuk5PUHyIuflHHnbZn+W22a3tgdvEEdMXfz9V01LOD/3sW06YjlFsNCpC+gr3WorPUcJRDosjLGin5/VOwUf7SiDyLoEAjf0BMwb7s5skIBKaKQWmSNpIrhc0xgaJWNCq/aKJJfLF1STZekbtnYd/J20QtsG2XarPA4sY=
+	t=1779883135; cv=none; b=G3ViKL1pbWP0dYWYdIFlRAhk0HPk3f+a5joQAyOTwmPhCW9Yzn0uUfrTd+LcLQXhkzBYlH/QDnv7rIffJ3Iakjlgu/yZqLOeuZPBQxCZ3llyxZvEqHnblQyujUmng8WHDOb6n3L+dueGN5jDTP750FChtZ1/n5wxyyMZXQSLVCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779880719; c=relaxed/simple;
-	bh=fCILp+DohVOOIR+UUseLdprSQEaMH1NXcjDAJS0gm9c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UP9sHxrRvb16KpnGvpQ4CwuR1KT7X1aF34B0Em7vMxCB+2+u46YdSuwUknPzeR2mrCXRHkHABNt50qKqo2IEYufMu9gUZahpWebTMolDyazxmOE5x7UsgUv2TSH9v42/qL0DQ9UVgF/786gzzCd+0iT3vh8YHIZ5l2851+w08UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BBtb0fSx; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1779883135; c=relaxed/simple;
+	bh=Y0iGt8nX98EteYMuQwR7CG3a8suiRX0lyjePV74OMpk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oHAOPmxHhvLAMfcbq7/KBDbl3tsMflyAOttq4DyXFL8vD+aZnF+X/KNTh/HXwslpw5dQSz1FfcevK3/PY8WNVLfmF4/BcbWKdq2QqvV6wetqHWIObHc/iQCPWOtHlfMk9VPORxIPvAZxR/fCxcZ3X1WJoOZAWn3qsV5w7gSfG0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nToVwidX; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BBtb0fSx"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-44509921fbcso7456919f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 04:18:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1779880716; x=1780485516; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0QGieyo5gKzeqh6AipqQcO1qteBU8LLbZeI6OWN5t84=;
-        b=BBtb0fSxDWVNyMeLL0KmAARtaM/WhAYnsSnAB5HXwbHed+v+QXAKL+aeupq2OEBL2i
-         0kUlY/Oj+lJJZ+yYHMEhDOgrgUr1wxNTFsCWnT73kYEMpuNEXa3trkWPMx7nNXwphexg
-         Uu/RcanmL0SF81SIZJxf9//l0jBD0CoJxUBAEl12RHoISWbgF+EHK5s0g3gYWF3DcSE2
-         McHiyUzzReQw4TspezuuXbAANui2LI8kM1ja8a5xyc40jDgRIns2iZt4mCWtS+O9RX9X
-         Xa2rZfuGHiOfHOqOytzlJ25DIB3V9V/pwBZHmA7Tug/LMQTk2kJ688hawxSi+mLWSBHn
-         dH/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779880716; x=1780485516;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0QGieyo5gKzeqh6AipqQcO1qteBU8LLbZeI6OWN5t84=;
-        b=KP5wRfARhwACHHi4GxX/SZrbxP6lj/xJkn8gZ7V3CGUbuZLxVPN5iixM2sZUKXGIjT
-         zakire6+zwjFBPkCBT93L++NNGLipwiNQUsOlpDl9bVC9S8XuBWIOSQSBNvB8OMbSgww
-         74+CTavetKQq5uj+hqkHEgrdaGikJLI9Yewf0Rz/WI93ySAEKGAnPCIzkw0AZP+S6qr+
-         ze/QRkHONJcJn3jkMx0kf3BKPwJ1x5cktWb0DAvqgtKz8JcmAE50TMw4Z1ZsPJCS2ITL
-         ZgoclwU12aToS8/HcwcbIZIxtLcE+wgZ/c7WN0JfdgOeCkWkkOOP3xFwi4inqfo1dNif
-         +huA==
-X-Forwarded-Encrypted: i=1; AFNElJ93C+rz7vgs+2epA5YlqFeBaR2JjxtIuBRP5bdUXlXJn/sfW5FkW61NzDRWMeHR3jcvza6jCTk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwvqpPIcbRwOl5mi8FOfT+/XRQLADVd36ShAVSN5gtSN/Kvf853
-	g/wH2VAQSyCX4J4ty4NdZ7EPybu67/08fc2M1ewz+biZXhqokn2AZkiIL61qFfctuTY=
-X-Gm-Gg: Acq92OGYLPsfl4stXS7CSWzVL5BOu4eg+u+zHw5LC03zLzYJvkF3kr+2Oq5knSgF5rX
-	SqB6NP6P3wbKrDf93vGkSyg1dOBTkaZ/9gzsFllJgRipvfKlf1qOXUCoOaDWAI8sISZL+N9j5zl
-	PNos7lPgGsaaB7zzV7HA+dIKVjbwrLNB9F7+rEXm+nC/eDlo9t1dAsXRYn+AxZAp8PamvzzvbP+
-	5TMR1vdRwToBvVp4YCMvJUbm8cVY2ZgabTNijNIl4rEjuE3IheKZiQm4Y8L9+UrdQEMsx4uiWSh
-	QKTFyeH49AuiykI3EAnuKzFKoIPh3d6b2Bo1/aQMOfuJnbhl8iDNExlHF2Rfyf6UJwkfu6Fbetc
-	CEQKNpaWwIVLtTqGZeqk9qeh6eHeW8oEUp0UN3fyeB5zec2OArPaoIBC0uxGVM6rxqUYPUbwO0j
-	4k4WXiDPIq6NhooSS3ntVUNToAoRByNxoz2w==
-X-Received: by 2002:a05:6000:4606:b0:44a:b0a3:7c1a with SMTP id ffacd0b85a97d-45eb36b0126mr40044368f8f.24.1779880716257;
-        Wed, 27 May 2026 04:18:36 -0700 (PDT)
-Received: from draig.lan ([185.124.0.195])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5b28absm5398550f8f.27.2026.05.27.04.18.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2026 04:18:35 -0700 (PDT)
-Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 9ECBF5F7F0;
-	Wed, 27 May 2026 12:18:34 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvmarm@lists.linux.dev (open list:ARM),
-	kvm@vger.kernel.org (open list:Default mailing list)
-Subject: [kvm-unit-tests PATCH v2] arm: add wfx test case
-Date: Wed, 27 May 2026 12:18:21 +0100
-Message-ID: <20260527111822.1563679-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nToVwidX"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B5922880;
+	Wed, 27 May 2026 04:58:46 -0700 (PDT)
+Received: from [10.1.38.169] (e121487-lin.cambridge.arm.com [10.1.38.169])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 674CD3F632;
+	Wed, 27 May 2026 04:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779883131; bh=Y0iGt8nX98EteYMuQwR7CG3a8suiRX0lyjePV74OMpk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nToVwidXYZWuN+9J/+WsmiLnrp1XBNnhRIv/2/tdqqlkKGRrmzVXG9IAADHcNvDQe
+	 4BAE373EzmpyxWRhwGYZGjR1D8XzX0iNQ5mEUTTIAPdgVxmz/veCl/bAVq/1dF/h4+
+	 AK2dSnz7+LO9FES/Xb0F4k7pAKI9M2fA4DM/R0wQ=
+Message-ID: <9670cf97-b844-4029-b77e-25ade600e024@arm.com>
+Date: Wed, 27 May 2026 12:58:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/18] KVM: arm64: pkvm: Remove struct cpu_sve_state
+To: Mark Rutland <mark.rutland@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ maz@kernel.org, oupton@kernel.org, tabba@google.com, will@kernel.org
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+ <20260521132556.584676-5-mark.rutland@arm.com>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <20260521132556.584676-5-mark.rutland@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-This is based on a similar test case I wrote for QEMU's tcg tests although
-obviously able to take advantage of kvm-unit-tests additional plumbing for
-dealing with the GIC and IRQs.
+Hi Mark,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On 5/21/26 14:25, Mark Rutland wrote:
+> There's no need for struct cpu_sve_state. Code would be simpler and more
+> robust without it, and removing it will simplify further cleanups (e.g.
+> adding an opaque type for the sve register state).
+> 
+> Protected KVM stores most of the host's system register state in
+> kvm_host_data::host_ctxt, which is an instance of struct
+> kvm_cpu_context. As kvm_cpu_context::sys_regs[] has a slot for ZCR_EL1,
+> we can store the host's ZCR_EL1 there.
+> 
+> While kvm_cpu_context::sys_regs doesn't have slots for FPSR and FPCR,
+> these are usually expected to be stored in struct user_fpsimd_state.
+> For historical reasons, __sve_save_state and __sve_restore_state()
+> expect a pointer to fpsr *within* struct user_fpsimd_state, assuming the
+> fpcr will immediately follow, as per the order within struct
+> user_fpsimd_state. We currently match this ordering in struct
+> cpu_sve_state, but it would be simpler and more robust to use struct
+> user_fpsimd_state directly.
+> 
+> After moving ZCR_EL1, FPSR, and FPCR out of struct cpu_sve_state, all
+> that's left is sve_regs, which can be represented as a pointer without
+> need for a container struct. This is kept as a pointer to u8 (matching
+> the array type), as this permits the compiler to catch unbalanced
+> referencing/dereferencing, which is not possible for pointers to void.
+> 
+> Apply the above changes, and remove cpu_sve_state.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h       | 18 ++----------------
+>  arch/arm64/include/asm/kvm_pkvm.h       |  3 +--
+>  arch/arm64/kvm/arm.c                    | 16 ++++++++--------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  9 +++++----
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  9 +++++----
+>  arch/arm64/kvm/hyp/nvhe/setup.c         |  4 ++--
+>  6 files changed, 23 insertions(+), 36 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 42b1c4764a4bf..ae24617380b8f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -732,20 +732,6 @@ struct kvm_cpu_context {
+>  	u64 *vncr_array;
+>  };
+>  
+> -struct cpu_sve_state {
+> -	__u64 zcr_el1;
+> -
+> -	/*
+> -	 * Ordering is important since __sve_save_state/__sve_restore_state
+> -	 * relies on it.
+> -	 */
+> -	__u32 fpsr;
+> -	__u32 fpcr;
+> -
+> -	/* Must be SVE_VQ_BYTES (128 bit) aligned. */
+> -	__u8 sve_regs[];
 
----
-v2
-  - drop TIMEOUT in favour of computed 10ms timeout
-  - add comments for each test
-  - use sevl for local clearing
-  - set gic irc depending on CurrentEL
-  - EOI the GIC
-  - display elapsed ns (no float to do ms ;-)
-  - fix some style issues
-  - make test TCG only
----
- arm/Makefile.arm64        |   1 +
- lib/arm64/asm/processor.h |   7 ++
- lib/arm64/asm/sysreg.h    |   3 +
- arm/wfx.c                 | 187 ++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg         |   7 ++
- 5 files changed, 205 insertions(+)
- create mode 100644 arm/wfx.c
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index a40c830d..52b3f35d 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -64,6 +64,7 @@ tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
- tests += $(TEST_DIR)/fpu.$(exe)
- tests += $(TEST_DIR)/mte.$(exe)
-+tests += $(TEST_DIR)/wfx.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 32ddc1b3..2104036d 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -173,5 +173,12 @@ static inline bool system_supports_rndr(void)
- 	return ((id_aa64isar0_el1 >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf) != 0;
- }
- 
-+static inline bool system_supports_wfxt(void)
-+{
-+	u64 id_aa64isar2_el1 = read_sysreg_s(ID_AA64ISAR2_EL1);
-+
-+	return ((id_aa64isar2_el1 >> ID_AA64ISAR2_EL1_WFxT_SHIFT) & 0xf) != 0;
-+}
-+
- #endif /* !__ASSEMBLER__ */
- #endif /* _ASMARM64_PROCESSOR_H_ */
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index f2d05018..cb96a649 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -77,6 +77,9 @@ asm(
- #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
- #define ID_AA64PFR1_EL1_MTE_SHIFT	8
- 
-+#define ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
-+#define ID_AA64ISAR2_EL1_WFxT_SHIFT	0
-+
- #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
- #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
- 
-diff --git a/arm/wfx.c b/arm/wfx.c
-new file mode 100644
-index 00000000..0825c5cb
---- /dev/null
-+++ b/arm/wfx.c
-@@ -0,0 +1,187 @@
-+/*
-+ * WFX Instructions Test (WFI, WFE, WFIT, WFET)
-+ *
-+ * Copyright (c) 2026 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/processor.h>
-+#include <asm/gic.h>
-+#include <asm/timer.h>
-+#include <asm/io.h>
-+
-+#define sev() asm volatile("sev" : : : "memory")
-+#define sevl() asm volatile("sevl" : : : "memory")
-+#define wfi() asm volatile("wfi" : : : "memory")
-+#define wfe() asm volatile("wfe" : : : "memory")
-+
-+#define wfit(reg) \
-+	asm volatile(".arch armv8.7-a\n\twfit %0" : : "r" (reg) : "memory")
-+#define wfet(reg) \
-+	asm volatile(".arch armv8.7-a\n\twfet %0" : : "r" (reg) : "memory")
-+
-+uint64_t time_hz;
-+uint64_t time_10ms;
-+
-+static void timer_handler(struct pt_regs *regs)
-+{
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	/* Disable timer to stop IRQ from re-firing */
-+	if (irqnr == TIMER_VTIMER_IRQ || irqnr == TIMER_HVTIMER_IRQ) {
-+		write_sysreg(0, cntv_ctl_el0);
-+		isb();
-+	} else {
-+		if (irqnr != GICC_INT_SPURIOUS)
-+			gic_write_eoir(irqstat);
-+		report_info("Unexpected interrupt: %d\n", irqnr);
-+		return;
-+	}
-+
-+	/* Also acknowledge EOI for the GIC */
-+	gic_write_eoir(irqstat);
-+}
-+
-+static bool check_elapsed(uint64_t start, uint64_t threshold, const char *test, bool more)
-+{
-+	uint64_t end = read_sysreg(cntvct_el0);
-+	uint64_t elapsed = end - start;
-+	bool pass = more ? elapsed >= threshold : elapsed <= threshold;
-+
-+	report(pass, "%s (%ld ticks / %ld ns)",
-+	       test, elapsed, elapsed / (time_hz / 1000000));
-+
-+	if (!pass)
-+		report_info("%s %s", test, more ? "woke too early" : "slept despite SEV");
-+
-+	return pass;
-+}
-+
-+/*
-+ * Test WFI with timer interrupt
-+ *
-+ * WFI should wake up when the interrupt is pending. We unmask
-+ * interrupts here so they are taken and then check WFI actually
-+ * did sleep rather than return straight away.
-+ */
-+static void test_wfi(void)
-+{
-+	uint64_t start;
-+
-+	report_info("Testing WFI...");
-+
-+	start = read_sysreg(cntvct_el0);
-+	write_sysreg(time_10ms, cntv_tval_el0);
-+	write_sysreg(1, cntv_ctl_el0); /* Enable timer, no mask */
-+	isb();
-+
-+	local_irq_enable();
-+	wfi();
-+	local_irq_disable();
-+
-+	check_elapsed(start, time_10ms, "WFI", true);
-+}
-+
-+/*
-+ * Test WFE and SEV[L]
-+ *
-+ * There are two SEV instructions, the normal one is a broadcast
-+ * from any PE on the system, the other is local only.
-+ * Functionally they have the same effect (setting the event
-+ * register) and should be immediately consumed by the WFE.
-+ *
-+ * As we want to detect an early exit the sense of the timeout
-+ * check is reversed.
-+ */
-+static void test_wfe(void)
-+{
-+	uint64_t start;
-+
-+	report_info("Testing WFE/SEV...");
-+	sev();
-+	start = read_sysreg(cntvct_el0);
-+	wfe();
-+	check_elapsed(start, time_10ms, "WFE/SEV", false);
-+
-+	report_info("Testing WFE/SEVL...");
-+	sevl();
-+	start = read_sysreg(cntvct_el0);
-+	wfe();
-+	check_elapsed(start, time_10ms, "WFE/SEVL", false);
-+}
-+
-+/*
-+ * Test WFIT
-+ *
-+ * With the timer disabled and no other IRQ sources firing the
-+ * WFIT instruction should timeout.
-+ */
-+static void test_wfit(void)
-+{
-+	uint64_t start, timeout;
-+
-+	report_info("Testing WFIT...");
-+	start = read_sysreg(cntvct_el0);
-+	timeout = start + time_10ms;
-+	wfit(timeout);
-+	check_elapsed(start, time_10ms, "WFIT", true);
-+}
-+
-+/*
-+ * Test WFET
-+ *
-+ * Much like WFIT there are no IRQs to wake us up. However the
-+ * event_register is a latch so we must first consume the event
-+ * register with a normal WFE before we do the timeout version.
-+ */
-+static void test_wfet(void)
-+{
-+	uint64_t start, timeout;
-+
-+	report_info("Testing WFET...");
-+	/* Ensure no pending events */
-+	sevl();
-+	wfe();
-+
-+	start = read_sysreg(cntvct_el0);
-+	timeout = start + time_10ms;
-+	wfet(timeout);
-+	check_elapsed(start, time_10ms, "WFET", true);
-+}
-+
-+int main(void)
-+{
-+	uint32_t irq = current_level() == CurrentEL_EL1 ? TIMER_VTIMER_IRQ : TIMER_HVTIMER_IRQ;
-+
-+	if (gic_init() < 0) {
-+		report_abort("GIC init failed");
-+		return 1;
-+	}
-+
-+	/* Install timer handler for WFI wake-up */
-+	install_irq_handler(EL1H_IRQ, timer_handler);
-+	gic_enable_defaults();
-+	time_hz = read_sysreg(cntfrq_el0);
-+	time_10ms = time_hz / 100;
-+
-+	/* Enable Virtual Timer PPI */
-+	gic_irq_set_clr_enable(irq, true);
-+
-+	report_prefix_push("WFx");
-+	test_wfi();
-+	test_wfe();
-+	report_prefix_pop();
-+
-+	if (system_supports_wfxt()) {
-+		report_prefix_push("WFxT");
-+		test_wfit();
-+		test_wfet();
-+	} else {
-+		report_skip("WFxT instructions not supported");
-+	}
-+
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 12fc4468..ae8b5534 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -339,3 +339,10 @@ groups = mte
- test_args = asymm
- qemu_params = -machine mte=on
- arch = arm64
-+
-+[wfx]
-+file = wfx.flat
-+groups = wfx
-+arch = arm64
-+# This test exercise CPU emulation so limit to TCG to avoid confusion
-+accel = tcg
--- 
-2.47.3
+It seems that the requirement (driven by SVE ldr/str) is
+satisfied with the new sve_regs pointing to the start of the
+page.
+
+I'm not sure whether we want to keep the comment (or perhaps
+enforce this with explicit checks) so that future refactoring
+doesn't lead to time spent debugging alignment faults...
+
+> -};
+> -
+>  /*
+>   * This structure is instantiated on a per-CPU basis, and contains
+>   * data that is:
+> @@ -771,9 +757,9 @@ struct kvm_host_data {
+>  
+>  	/*
+>  	 * Hyp VA.
+> -	 * sve_state is only used in pKVM and if system_supports_sve().
+> +	 * sve_regs is only used in pKVM and if system_supports_sve().
+>  	 */
+> -	struct cpu_sve_state *sve_state;
+> +	u8	*sve_regs;
+>  
+>  	/* Ownership of the FP regs */
+>  	enum {
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 2954b311128c7..74fedd9c5ff02 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -188,8 +188,7 @@ static inline size_t pkvm_host_sve_state_size(void)
+>  	if (!system_supports_sve())
+>  		return 0;
+>  
+> -	return size_add(sizeof(struct cpu_sve_state),
+> -			SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_max_vl)));
+> +	return SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_max_vl));
+>  }
+>  
+>  struct pkvm_mapping {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8bb2c7422cc8b..f9fc85a0344e1 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2499,10 +2499,10 @@ static void __init teardown_hyp_mode(void)
+>  			continue;
+>  
+>  		if (free_sve) {
+> -			struct cpu_sve_state *sve_state;
+> +			u8 *sve_regs;
+>  
+> -			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+> -			free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
+> +			sve_regs = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs;
+> +			free_pages((unsigned long) sve_regs, pkvm_host_sve_state_order());
+>  		}
+>  
+>  		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
+> @@ -2627,7 +2627,7 @@ static int init_pkvm_host_sve_state(void)
+>  		if (!page)
+>  			return -ENOMEM;
+>  
+> -		per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state = page_address(page);
+> +		per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs = page_address(page);
+>  	}
+>  
+>  	/*
+> @@ -2648,11 +2648,11 @@ static void finalize_init_hyp_mode(void)
+>  
+>  	if (system_supports_sve() && is_protected_kvm_enabled()) {
+>  		for_each_possible_cpu(cpu) {
+> -			struct cpu_sve_state *sve_state;
+> +			u8 *sve_regs;
+>  
+> -			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+> -			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state =
+> -				kern_hyp_va(sve_state);
+> +			sve_regs = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs;
+> +			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs =
+> +				kern_hyp_va(sve_regs);
+>  		}
+>  	}
+>  }
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index cc4d011a2b380..6512dd3f75ae4 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -484,12 +484,13 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+>  
+>  static inline void __hyp_sve_save_host(void)
+>  {
+> -	struct cpu_sve_state *sve_state = *host_data_ptr(sve_state);
+> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> +	u8 *sve_regs = *host_data_ptr(sve_regs);
+>  
+> -	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
+> +	ctxt_sys_reg(hctxt, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
+>  	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
+> -	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> -			 &sve_state->fpsr,
+> +	__sve_save_state(sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> +			 &hctxt->fp_regs.fpsr,
+>  			 true);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index db60f770060e5..04a6d2e0ea73f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -41,7 +41,8 @@ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
+>  
+>  static void __hyp_sve_restore_host(void)
+>  {
+> -	struct cpu_sve_state *sve_state = *host_data_ptr(sve_state);
+> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> +	u8 *sve_regs = *host_data_ptr(sve_regs);
+>  
+>  	/*
+>  	 * On saving/restoring host sve state, always use the maximum VL for
+> @@ -53,10 +54,10 @@ static void __hyp_sve_restore_host(void)
+>  	 * need to be revisited.
+>  	 */
+>  	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
+> -	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> -			    &sve_state->fpsr,
+> +	__sve_restore_state(sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> +			    &hctxt->fp_regs.fpsr,
+>  			    true);
+> -	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
+> +	write_sysreg_el1(ctxt_sys_reg(hctxt, ZCR_EL1), SYS_ZCR);
+>  }
+>  
+>  static void fpsimd_sve_flush(void)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index d461981616d90..cdaf53c833409 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -82,9 +82,9 @@ static int pkvm_create_host_sve_mappings(void)
+>  
+>  	for (i = 0; i < hyp_nr_cpus; i++) {
+>  		struct kvm_host_data *host_data = per_cpu_ptr(&kvm_host_data, i);
+> -		struct cpu_sve_state *sve_state = host_data->sve_state;
+> +		u8 *sve_regs = host_data->sve_regs;
+>  
+> -		start = kern_hyp_va(sve_state);
+> +		start = kern_hyp_va(sve_regs);
+>  		end = start + PAGE_ALIGN(pkvm_host_sve_state_size());
+>  		ret = pkvm_create_mappings(start, end, PAGE_HYP);
+>  		if (ret)
+> -- 2.30.2
+> 
+
+FWIW,
+
+Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 
