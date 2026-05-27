@@ -1,80 +1,92 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBB82BE621;
-	Wed, 27 May 2026 07:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92AF63CF69B
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 08:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779866703; cv=none; b=XtUhOZp7sSB2uccRsm1FqFQ46tKnU530KAh7kwpzb2dpGDMLuRmWZATu5oBChQ1KRsIk1BVMfGmKCRceUFG/DMQHWU1pp+fHtNysi+gCCNaxGxE2JR7ua9gQqjZ7IdOmGPHIJ+urBcZpMz8JZadf+Wqcq8/jT6FoUkWzoz5wokc=
+	t=1779869255; cv=none; b=fbWYfuwZwiddUzJe7wsosXcY0cWostStygFRtOxtzczhpMpReo7a0eU9ewJGkYHdCzxhccxxBIHWjSu6Uv/C1Vy5woc6Oy2A4V4SD6jlMmsnNvAVyN06DNHyhIlwTJWUV9Bc/OPPRU+GzOiX5Y1zZiWtjXUlVKKqpDVRempsb9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779866703; c=relaxed/simple;
-	bh=H286pH0XEVaTBl11NoF476tTyCrePsNa+hNCO4h58i8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sd44LyeStKyAviOE3fu+2V8O99FBJ+dIMzustA+ag4FBfktrEb+e0CYyhkkdys7zc8j6cwd1GkImU+pw1WlD7J0N/gtjR2IAm8X68WsnHKWGyqFL7WftSU7lgjh5Gj7w7KRolyMl6S2cbDv/DfcXHh771gA2SuC7Gz7IvzHJW9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yxICJRlV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SWxeWBwT; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1779869255; c=relaxed/simple;
+	bh=IaK4KdoC7sBQrh723Zmr6LghiWvQbWdM43wQISsHpEc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tsYc7Jf/X93gAYtsUCC5eZMWiMmd23QChCxuw6I/JsYT+wd60ih4gSRIa3tOAcSfJcYhyeMwHo74YIoorF4JtkuUlH9n1Vj6lGBjnOQuoH9lQasCkcXiJxz6jq/NWrhTJkVMY5EmH/nGg4kCaWdjKE5JqDnINwezaJ5n1rY4mH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOmvPc4k; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yxICJRlV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SWxeWBwT"
-Date: Wed, 27 May 2026 09:24:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1779866700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Wbgh1lph/Cw9cQ2P7yfOnakbfAXz1iVADCAMap9VS2s=;
-	b=yxICJRlVnrHFs7DxFJvW+0S+eTDuoFTKh6YKulHGTjwvy/voHWsGUCGCmM2ZhTZG+Ndcor
-	RdcmpLsSec38GmQ2YaTGdsz2w5LwBhJb4gMKodn8snCpxniL57+0pJluvJpHzA7MUL7VVo
-	kVh4Tyqw6jo4K3JO8WBjyCVePOW/pzxo5MKaIg4/NXj7A5qEOUDHm4V00aqkTeP/ZumqaM
-	lFoFI9XJ88pWL8jqoFkCmw4gy5CVZRx7Qi8MnE+tLY8k8lpCCuCXgE+5JtOnmWZaD9YGiy
-	JIivgwPtV24GGWDMhY+u5LNb3Nc5U+W95ZW9JGJkX/3jw2G6c2ViiYkNdB0rpQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1779866700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Wbgh1lph/Cw9cQ2P7yfOnakbfAXz1iVADCAMap9VS2s=;
-	b=SWxeWBwTBBmK1D3E1cPJ4Sod+C/sOqkqJA4Z5RxQ7r7sOrEyKlkQsh95tLQxrSeGcl1j0y
-	an/Z0sm1XLeeUkCg==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, 
-	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
-	Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, 
-	linux-sound@vger.kernel.org
-Subject: Re: [patch 23/24] timekeeping: Add support for AUX clock cross
- timestamping
-Message-ID: <20260527092439-18ac09b4-d62f-4215-bb20-fe3ad7b0e77b@linutronix.de>
-References: <20260526165826.392227559@kernel.org>
- <20260526171224.423155175@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOmvPc4k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FCC41F000E9;
+	Wed, 27 May 2026 08:07:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779869254;
+	bh=a0i09K6WFbfQ8IPhzmdc2zth7G+mRZdkUp7cG7m9chI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=VOmvPc4kwguCHgU7g1Nx9Z4I2UGpWgEnhEzBZlMTiHJ5JJ26tJ5J3D89oOwF7G65g
+	 HkTXx68Oxj4xWttbqwi9Qb1r5Q6OY/9PkUkCZ77tMtDWP9aHaghJsAwPdXeVz7I5im
+	 yFt44hBKV9y2lpiZ6TrHJhmQNzfJN3QuXSZTGeTvgLj0JQY6cqyco5vmhYwDEm0o5M
+	 xnl/F/Ug1yCWfCFautTrdYXVoA/0RCeWJ/l6MSlgwB9dM2vKquvdEZCZrcKro6GhD/
+	 jARuLvmnvZN6t+rkGp8CqMSj2Z7bES8XOSBZthXEHGv81b7YOeC1ar9JOR+8jM5oOQ
+	 iWzTFtE/eWFug==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wS9Ia-00000006aRG-0WjV;
+	Wed, 27 May 2026 08:07:32 +0000
+Date: Wed, 27 May 2026 09:07:31 +0100
+Message-ID: <86se7duvgc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	oupton@kernel.org,
+	tabba@google.com,
+	will@kernel.org
+Subject: Re: [PATCH 00/18] arm64+KVM: FPSIMD/SVE/SME cleanups
+In-Reply-To: <20260521132556.584676-1-mark.rutland@arm.com>
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260526171224.423155175@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, oupton@kernel.org, tabba@google.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, May 26, 2026 at 07:15:22PM +0200, Thomas Gleixner wrote:
-> Now that all prerequisites are in place add the final support for AUX
-> clocks in get_device_system_crosststamp(), which enables the PTP layer to
-> support hardware cross timestamps with a new IOTCL.
+On Thu, 21 May 2026 14:25:38 +0100,
+Mark Rutland <mark.rutland@arm.com> wrote:
 > 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Hi.
+> 
+> This series cleans up low-level FPSIMD/SVE/SME state management code,
+> making it easier to maintain and extend (e.g. adding SME support to
+> KVM), and enabling better debugging (e.g. by making SVE/SME save/restore
+> visible to KASAN and KCSAN).
+> 
+> This is purely cleanup, there are NO bugs addressed by this series.
 
-Reviewed-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+I had a look throughout, and couldn't see anything untoward other than
+the couple of nits that were already pointed out. Killing the horrible
+asm macros definitely brings a bit of fresh air to this code base.
+
+Given the sensitivity of the change, I'd like this to simmer in -next
+for a bit. How do you want this to be merged? I'm happy to take the
+whole thing in kvmarm, and share the branch with arm64.
+
+I assume you'll post a v2 anyway?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
