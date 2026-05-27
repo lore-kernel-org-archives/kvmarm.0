@@ -1,76 +1,84 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C613930E82B
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 10:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E0B75809
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 10:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779877967; cv=none; b=j2OuBIkwBM0HJ77O7z0oW6E8gBSZGVq2H3yTm+tQda3pQvFXb8Ra5xtqub8POyyPglFrMMDbdOgpMaCVwWN/a7dbuyZf+Y9ox63OOZIg4w/hUXOyjVhLH94R73NkyglmTc5Secmr2dtetDeni33iefOiHgDtkboDzV8zkk9JtlE=
+	t=1779878118; cv=none; b=Y3KC184bW7b6FIOR9MIrUvAxmUi79SNe7bm3vKjdqrDZCvqyL9lwFGbPHZR998/eSOdB/IBFXbOOQF2sT7Yf8RNUsZgcBwJeR1ajv3KqhWymOukhTWvfyumfTugteYG0QqqthNWKmCglcDoznmT6ATA1h3c/0wTjC0SI+X8a7W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779877967; c=relaxed/simple;
-	bh=0st74ItZiJDJHY//YKi9k3j5LAz4Sxki0o7s6Hb9c5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UjRkAWxDziWi5tkerGG/N029vKT53iqCVe8fYnm1nbZkdimMpeCeW5d1S1YJx7oSym2QYr5PdNhpsLW17TChUdR9i/kwcEnH5kwg3y6PFliu5X4VnBTh+wBzKCvHekq+Dh3zgNt1Hc/cYUINCboiz6EZcfg/MIkxnWhRsxInDfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JLiGXkxk; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779878118; c=relaxed/simple;
+	bh=GeDBK0JlY/sKI5arszBnlEWbhL/ulKPkZIdTnjYk/IA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hCHXE0QNcFYqj8x77nh2Ukt7jhXJJYpM/D2fRNK9NXxeLqxLvSZDFoqDdG2GwzoN2Ect1IdSNiZWsVMaffgzGqwTVtLEtXa2rcuK7IGTrS5QrtmUocPHFZE3T7tNxDC7+LXDIXGgHb3ys4LwdgGgip126rWvsp/HZFDJXp8Hfis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ljfIYvot; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JLiGXkxk"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27B751595;
-	Wed, 27 May 2026 03:32:40 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 98CEB3F7D8;
-	Wed, 27 May 2026 03:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779877965; bh=0st74ItZiJDJHY//YKi9k3j5LAz4Sxki0o7s6Hb9c5s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JLiGXkxk0Fgkp4N/V0D32PUPj34yCyi7teBulpO88R+mFWUqu6IeJUKwO8I6RMgg4
-	 olOb0D10ygJCmOyRBDlt+6nGQU+prgNtRjpdkLDBhFs6V8bLFC9fCYZgLfnMB+9i9m
-	 2NLTXZ/Cy1rh7UFF1i8yww+vOhjVDTJYgVz5b/kA=
-Date: Wed, 27 May 2026 11:32:37 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>, will@kernel.org, catalin.marinas@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	broonie@kernel.org, james.morse@arm.com, oupton@kernel.org,
-	tabba@google.com
-Subject: Re: [PATCH 00/18] arm64+KVM: FPSIMD/SVE/SME cleanups
-Message-ID: <ahbIRe0jR95elM2L@J2N7QTR9R3>
-References: <20260521132556.584676-1-mark.rutland@arm.com>
- <86se7duvgc.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ljfIYvot"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 184571F000E9;
+	Wed, 27 May 2026 10:35:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779878117;
+	bh=E5FwMpqgi5opvx3+Z4IrpRGnIWohL5+9jNaT6GKo168=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ljfIYvotYh64+qXVwcocQuGn6klVXrc3oa7e6uOZAp2jzAzV9AvaHB32u9ni+FOQu
+	 Hck9Z1I8vzei/H0Pee86Y4cQ6FKKCNEqrv4wXZpR4CuyESRcze3w/KaiCv5NszAH9Q
+	 47Jv8J22SagH6EPFl+j53Ih6l5/R1+FKVMqfB/F9O/YXTaS2N+h+4UmsUELNMLwtUN
+	 7SsvkIoz62f/oneE3YmEmpHei9t5GpUQo2DozHPgfhG8YUuhf2qh5po7mez1d5dlcm
+	 6bGMQ5teERiLFRQPp8fZSUmplt2PeUSCD+/+uGpn0H36LTukgKwT/I2LiiPbCvyJgS
+	 s1+B5P6FC7Maw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wSBbW-00000006dhm-3YCo;
+	Wed, 27 May 2026 10:35:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Fix CONFIG_PKVM_DISABLE_STAGE2_ON_PANIC
+Date: Wed, 27 May 2026 11:35:11 +0100
+Message-ID: <177987810336.1512096.911930782876644415.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260520220830.273289-1-vdonnefort@google.com>
+References: <20260520220830.273289-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86se7duvgc.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, May 27, 2026 at 09:07:31AM +0100, Marc Zyngier wrote:
-> On Thu, 21 May 2026 14:25:38 +0100,
-> Mark Rutland <mark.rutland@arm.com> wrote:
-> > This series cleans up low-level FPSIMD/SVE/SME state management code,
-> > making it easier to maintain and extend (e.g. adding SME support to
-> > KVM), and enabling better debugging (e.g. by making SVE/SME save/restore
-> > visible to KASAN and KCSAN).
-> > 
-> > This is purely cleanup, there are NO bugs addressed by this series.
+On Wed, 20 May 2026 23:08:30 +0100, Vincent Donnefort wrote:
+> A typo in the config guard in __hyp_do_panic broke the stage-2 disabling
+> and made backtraces for pKVM quite unreliable.
 > 
-> I had a look throughout, and couldn't see anything untoward other than
-> the couple of nits that were already pointed out. Killing the horrible
-> asm macros definitely brings a bit of fresh air to this code base.
+> Fix that typo.
 > 
-> Given the sensitivity of the change, I'd like this to simmer in -next
-> for a bit. How do you want this to be merged? I'm happy to take the
-> whole thing in kvmarm, and share the branch with arm64.
+> 
 
-That works for me.
+Applied to fixes, thanks!
 
-Catalin, Will, any preference?
+[1/1] KVM: arm64: Fix CONFIG_PKVM_DISABLE_STAGE2_ON_PANIC
+      commit: 373452ac0649846431ca0f88574a2fa6382d2045
 
-> I assume you'll post a v2 anyway?
+Cheers,
 
-Yep; given the bits that need fixups, I'll send a v2 by the end of this
-week unless something explodes.
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-Mark.
+
