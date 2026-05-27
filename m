@@ -1,72 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B211B3803D9;
-	Wed, 27 May 2026 16:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1592A1C84BC
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 16:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779897751; cv=none; b=CxF9t9+VhOxSxexiIvqW7mnF5/5cjf7lu76nuti91G69Opmpaex7hj9aZWjC9mS9GtEOqk3ltWpSzgp/dREj18UuXbbwz4p1Gdjkm13JuhCtU8smmof+0WpB7yCIC0cknea17uyx7EjLlu1d4cQlu7RBK039YmGESf8257ogXY8=
+	t=1779897783; cv=none; b=dtLOirBXhEpczYbODCQy95aq+5mY497TRKoGS+AVIGjM4BqYssi0IkAFL48QBoz2thO5drsvlCQvUhhGONBA+Wo18njMsuYAx54TG7kICHiI4id+L4aclfFzwMDP072KoTGnZpGQAAHidkswK8/n6Yqqflb+z4TMjqU2/meTIEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779897751; c=relaxed/simple;
-	bh=StSRKJn8icwOdQYtunCr9S/Hzkzk5f/ZDII2gnQ52Dc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lVYYiglsKY/NRuhgG02EC3cxUxIFeS7dQUXjkm/sJj9yvKTwFRyTLivToiczUyqHohD1UHGVdUDx4Iqi+ajQqYVcHOb+G66vtLlRqiWMwcDp+ZwDhwiYdre53vBaIATf1ZaTg42qTmK/v7v+sBEOYpo9advwFbggYhNx6ZrMacc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aQC0iN+D; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779897783; c=relaxed/simple;
+	bh=9aWYw2Ah14kwgPI8Hk+rKnAnhntsKh/W3j7keCQLUYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Keqt83bLEwolcWU06Wv49pNYSGuS7Ba5fyjIYXPXPfp0FOYH1r02TUtBh4ILJwyCcFu30rmYr0y0gqHbgRUhWEOC/FRWhqrGutVe1UxzJyLw3656QLeLzxv06bII4f3uT4XTb5IkDCt3YvquiKMwRgffS7CxUiJhptFIeyY32vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tbfTl/0P; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aQC0iN+D"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4BA611F000E9;
-	Wed, 27 May 2026 16:02:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779897750;
-	bh=0imBknv/pgewMByeR8YgZ6XE6TXEr/GjmohnuFC14K4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=aQC0iN+D6vf7IROpsytSNpQF+mRMbTIGjh1sg8CKEM1uD9Q0UNq6a4+IOkoN+Z/qw
-	 zx7cO28vimeYXrc6uitEUYCYaIVsXaKMxoSWOjQFvH751cr88gPR0QJCLqpnveUWB3
-	 xzr0iKzRWrauJ2nUhJ8YynmS+Mkq7/DC2jzI2z0r0w4ehsZMGwZXoNg9EgAnd13Ukd
-	 avCBn40cLRXTucfHFyH5S6sDWfNK/IsI/8IcgwW1IpjwLTWmW6Pyu1LNeCEj54KsXH
-	 tv55WNtlM3+a9A/Wu+vev7lgcXWVeF6QImSUKDSHMn4EyhacPf2o0nT8HRyQh2rMxq
-	 w4y0N+acxpExA==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
- <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
- Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
- <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
- Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
- <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- Johannes Berg <johannes.berg@intel.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
- <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
- linux-sound@vger.kernel.org
-Subject: Re: [patch 04/24] pps: Convert to ktime_get_snapshot_id()
-In-Reply-To: <20260527090114-359e2553-2c63-4ac2-a15a-776ba08b6eec@linutronix.de>
-References: <20260526165826.392227559@kernel.org>
- <20260526171222.995833811@kernel.org>
- <20260527090114-359e2553-2c63-4ac2-a15a-776ba08b6eec@linutronix.de>
-Date: Wed, 27 May 2026 18:02:26 +0200
-Message-ID: <87ik88lu25.ffs@tglx>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tbfTl/0P"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55FB635B9;
+	Wed, 27 May 2026 09:02:56 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ABBAE3F905;
+	Wed, 27 May 2026 09:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779897781; bh=9aWYw2Ah14kwgPI8Hk+rKnAnhntsKh/W3j7keCQLUYg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tbfTl/0P2ORJqDUfhfOk1zBM+esZIjrLwpPceD1IU4vaDdWwVfKOeNJnc5B4v64Rd
+	 FRZlkDPHlLisd+4DkhDCY7ed473Cbx+9HpFDTy5NcrPAtxkHXmwa6ShgxkOdHjeezs
+	 7avziFmaS1z4C+x6vEs2SdBAIP9oAN4kHe5YLOnM=
+Date: Wed, 27 May 2026 17:02:57 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+	maz@kernel.org, oupton@kernel.org, tabba@google.com,
+	will@kernel.org
+Subject: Re: [PATCH 04/18] KVM: arm64: pkvm: Remove struct cpu_sve_state
+Message-ID: <ahcVsVGPtOmF0nIC@J2N7QTR9R3.cambridge.arm.com>
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+ <20260521132556.584676-5-mark.rutland@arm.com>
+ <9670cf97-b844-4029-b77e-25ade600e024@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9670cf97-b844-4029-b77e-25ade600e024@arm.com>
 
-On Wed, May 27 2026 at 09:02, Thomas Wei=C3=9Fschuh wrote:
-> On Tue, May 26, 2026 at 07:13:48PM +0200, Thomas Gleixner wrote:
->>  static inline void pps_get_ts(struct pps_event_time *ts)
->>  {
->> +#ifdef CONFIG_NTP_PPS
->
-> IS_ENABLED()?
+On Wed, May 27, 2026 at 12:58:47PM +0100, Vladimir Murzin wrote:
+> On 5/21/26 14:25, Mark Rutland wrote:
+> > -struct cpu_sve_state {
+> > -	__u64 zcr_el1;
+> > -
+> > -	/*
+> > -	 * Ordering is important since __sve_save_state/__sve_restore_state
+> > -	 * relies on it.
+> > -	 */
+> > -	__u32 fpsr;
+> > -	__u32 fpcr;
+> > -
+> > -	/* Must be SVE_VQ_BYTES (128 bit) aligned. */
+> > -	__u8 sve_regs[];
+> 
+> 
+> It seems that the requirement (driven by SVE ldr/str) is
+> satisfied with the new sve_regs pointing to the start of the
+> page.
+> 
+> I'm not sure whether we want to keep the comment (or perhaps
+> enforce this with explicit checks) so that future refactoring
+> doesn't lead to time spent debugging alignment faults...
 
-ts->ts_raw is #ifdeffed out then, which would make the build fail :(
+AFAICT alignment has never been functionally necessary. The LDR (vector)
+and STR (vector) instructions only mandate alignment when the relevant
+SCTLR_ELx has SCTLR_ELx.A==1. For kernel and hyp code we configure
+SCTLR_ELx.A==0, so there's no alignment requirement.
 
+Per ARM DDI 0487 M.b, section C8.2.437 "LDR (vector)":
+
+  The load is performed as contiguous byte accesses, with no endian
+  conversion and no guarantee of single-copy atomicity larger than a
+  byte. However, *if alignment is checked*, then the base register must be
+  aligned to 16 bytes.
+
+Per ARM DDI 0487 M.b, section C8.2.777 "STR (vector)":
+
+  The store is performed as contiguous byte accesses, with no endian
+  conversion and no guarantee of single-copy atomicity larger than a
+  byte. However, *if alignment is checked*, then the base register must be
+  aligned to 16 bytes.
+
+... and in both cases the pseudocode shows that AlignmentEnforced()
+depends on the value of SCTLR_ELx.A.
+
+Given that, I don't think we need the comment.
+
+[...]
+
+> FWIW,
+> 
+> Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+
+Thanks!
+
+Mark.
