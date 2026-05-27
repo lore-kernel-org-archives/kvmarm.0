@@ -1,90 +1,119 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F9D3DE44D
-	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 16:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EA22FFFA4
+	for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 16:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779898243; cv=none; b=SEcrOkNcKgYl52cWWiZRR+eHVLyjB7jzvahghElqI8eLEJC7QHPYFa6SQ8g98Sk8tPHvAgtD/tHNMxeYIkIwmwsAFnDvCBb4IJZ0LV1TIPx187jkw1duka0rBVuAMw9WFyveY5yLeX2O//O4chUQoAumiYK5D4+Abr0VsqEpFZs=
+	t=1779898291; cv=none; b=jwZJY7WLnrtWZobg2edfS1U3oGnzsr+xHqWa2aF6CH3m3yg6IVTXebdXQO6tHqnSxcUUvE5V3j0otNnJQ2tZREUph2c2VWTeEBwCJsTHu7dK9KHZulQDXY2t/KaCtqbOgg9ZE5VfhPwjlvnpapCPJl9NVV9D/y5fP/pbyBEKlRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779898243; c=relaxed/simple;
-	bh=CRZjbl06fUz+NEERLDHhxVn2KAs7qXdskL38TVAJirw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kjfc2pWGmbceQEmDkvOpbWUM6GGwL6TnnRANWAbwOoSCrziR+RE40k3W+1bcrghyLjouSQzlYoQEEWVE7q84bgqvgoOMnYG2a/A4qSJZwtI8td82ULZLUKIt8Roq+kDa5yBUuuCdvvmnPMqr0Xzxb/Dt1Gc32tvNcWQTQpMcTC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PGZmsNrO; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1779898291; c=relaxed/simple;
+	bh=a/fVeno9Ozv19QNSha+ePKwWADScCuTg8j3BI1F5TYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jmft8+qUffnRqS1nKHMGpYbNmce8WH6KmD2InHA3jTKl2UbKV8RrnefUxx73rkI9GfpTyYb1m09Kc6FhJvV6vWWhHpr0gNLf9KBpaarwXlnBbhl50Xbmo0Ni0Qsb5SAOJB9oH9ogM/30F1i94J5biD1yyDFMWEZH2RaBKqNml8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WN03JOHq; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PGZmsNrO"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WN03JOHq"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4444F35B9;
-	Wed, 27 May 2026 09:10:36 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C90B3F905;
-	Wed, 27 May 2026 09:10:39 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3EDD35B9;
+	Wed, 27 May 2026 09:11:24 -0700 (PDT)
+Received: from [10.1.38.169] (e121487-lin.cambridge.arm.com [10.1.38.169])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D62393F905;
+	Wed, 27 May 2026 09:11:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779898241; bh=CRZjbl06fUz+NEERLDHhxVn2KAs7qXdskL38TVAJirw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PGZmsNrOA98FCZxR4M/Nfxq5JQKZUjFgUqgKWOBdjYTN+JCSVc3kJ37C/3BIwZl8i
-	 Z6ZtIxLysZX6bFhsMFGagWewz0gJUh5bNQl4OCGJMF15q8iH5G68vef/w9stOrq673
-	 wPutH8J/D6XWO5ZOwWD4Wcs+OQxaWP6XLGav0A8s=
-Date: Wed, 27 May 2026 17:10:37 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
-	maz@kernel.org, oupton@kernel.org, tabba@google.com,
-	will@kernel.org
-Subject: Re: [PATCH 07/18] arm64: fpsimd: Use assembler for SVE instructions
-Message-ID: <ahcXfSz7pNugiWjj@J2N7QTR9R3.cambridge.arm.com>
-References: <20260521132556.584676-1-mark.rutland@arm.com>
- <20260521132556.584676-8-mark.rutland@arm.com>
- <46c5ae49-e59c-4014-91d3-f00124897d20@arm.com>
+	t=1779898289; bh=a/fVeno9Ozv19QNSha+ePKwWADScCuTg8j3BI1F5TYM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WN03JOHqQrCwthcqRapVvzSX4NcN9IVw4NVxioLtjw316tB8yry+eN7m7jd7Dn2xB
+	 82d3gXzeAVS31swIaww2cIn2z4q4SjoLlLM2/f6GfU4GPiPFGnu3wiDQFkEewtZ9W1
+	 3QbFV8ZDkuPPqC/J2twXWgpOeE/DprJ/BL5VILUA=
+Message-ID: <4e15c17e-06c0-414f-ae9d-210c70d1757f@arm.com>
+Date: Wed, 27 May 2026 17:11:26 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <46c5ae49-e59c-4014-91d3-f00124897d20@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/18] KVM: arm64: pkvm: Remove struct cpu_sve_state
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ maz@kernel.org, oupton@kernel.org, tabba@google.com, will@kernel.org
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+ <20260521132556.584676-5-mark.rutland@arm.com>
+ <9670cf97-b844-4029-b77e-25ade600e024@arm.com>
+ <ahcVsVGPtOmF0nIC@J2N7QTR9R3.cambridge.arm.com>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <ahcVsVGPtOmF0nIC@J2N7QTR9R3.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 27, 2026 at 01:58:09PM +0100, Vladimir Murzin wrote:
-> On 5/21/26 14:25, Mark Rutland wrote:
-> >  /* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
+On 5/27/26 17:02, Mark Rutland wrote:
+> On Wed, May 27, 2026 at 12:58:47PM +0100, Vladimir Murzin wrote:
+>> On 5/21/26 14:25, Mark Rutland wrote:
+>>> -struct cpu_sve_state {
+>>> -	__u64 zcr_el1;
+>>> -
+>>> -	/*
+>>> -	 * Ordering is important since __sve_save_state/__sve_restore_state
+>>> -	 * relies on it.
+>>> -	 */
+>>> -	__u32 fpsr;
+>>> -	__u32 fpcr;
+>>> -
+>>> -	/* Must be SVE_VQ_BYTES (128 bit) aligned. */
+>>> -	__u8 sve_regs[];
+>>
+>> It seems that the requirement (driven by SVE ldr/str) is
+>> satisfied with the new sve_regs pointing to the start of the
+>> page.
+>>
+>> I'm not sure whether we want to keep the comment (or perhaps
+>> enforce this with explicit checks) so that future refactoring
+>> doesn't lead to time spent debugging alignment faults...
+> AFAICT alignment has never been functionally necessary. The LDR (vector)
+> and STR (vector) instructions only mandate alignment when the relevant
+> SCTLR_ELx has SCTLR_ELx.A==1. For kernel and hyp code we configure
+> SCTLR_ELx.A==0, so there's no alignment requirement.
 > 
-> Nitpick:
+> Per ARM DDI 0487 M.b, section C8.2.437 "LDR (vector)":
 > 
-> all these comments now redundant and just repeat the code... I know they are gone by
-> the end of the series :)
-
-Yep; if I weren't deleting them later I'd remove them here.
-
-> >  .macro _sve_str_v nz, nxbase, offset=0
-> > -	_sve_check_zreg \nz
-> > -	_check_general_reg \nxbase
-> > -	_check_num (\offset), -0x100, 0xff
-> > -	.inst	0xe5804000			\
-> > -		| (\nz)				\
-> > -		| ((\nxbase) << 5)		\
-> > -		| (((\offset) & 7) << 10)	\
-> > -		| (((\offset) & 0x1f8) << 13)
-> > +	.arch_extension sve
-> > +	str	z\nz, [X\nxbase, #\offset, MUL VL]
-> >  .endm
-
-[...]
-
-> >  /* WRFFR P\np.B */
-> >  .macro _sve_wrffr np
-> > -	_sve_check_preg \np
-> > -	.inst	0x25289000			\
-> > -		| ((\np) << 5)
+>   The load is performed as contiguous byte accesses, with no endian
+>   conversion and no guarantee of single-copy atomicity larger than a
+>   byte. However, *if alignment is checked*, then the base register must be
+>   aligned to 16 bytes.
 > 
-> Missing ".arch_extension sve"?
+> Per ARM DDI 0487 M.b, section C8.2.777 "STR (vector)":
 > 
-> > +	wrffr p\np\().b
-> >  .endm
+>   The store is performed as contiguous byte accesses, with no endian
+>   conversion and no guarantee of single-copy atomicity larger than a
+>   byte. However, *if alignment is checked*, then the base register must be
+>   aligned to 16 bytes.
+> 
+> ... and in both cases the pseudocode shows that AlignmentEnforced()
+> depends on the value of SCTLR_ELx.A.
+> 
+> Given that, I don't think we need the comment.
+> 
 
-Sorry about that; fixed now.
+Thanks for explanation! Maybe worth mentioning in commit message that it never was
+a requirement? 
 
-Mark.
+> [...]
+> 
+>> FWIW,
+>>
+>> Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> Thanks!
+> 
+
+You are welcome :)
+
+Vladimir
+
+
+> Mark.
+> 
+
