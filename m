@@ -1,435 +1,239 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E8F325483;
-	Thu, 28 May 2026 07:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FFE3403F5;
+	Thu, 28 May 2026 07:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779952212; cv=none; b=jN/xYtRH8cEK84WYGXq9yqh5iZw+YRpmFDatku/emO5qGYnpfVahj+nKz8skX1qDM1oF9E1UD40ZTVes3fPFywBk6DBCo4tUtmHv0ctfLPIYqA1YoLuOWsvgwcWKljQ9O8Kfhm1JYxI9VtpXhgJY/wn7kSN2oGPYgQ0Kb29Vm9M=
+	t=1779952496; cv=none; b=LlX1h7qH5tyh36ZONpHflseEq2wQRxRc1ErWLf8z4NtGUlCE5Wzj3AZXbJrEDO0Xkw6yPo56jkxtY4pPTKHpYssfRQanO+oLb8QAs+LKSRygz8Zb/nIU9wBLAwsixtJnd5/G57Fw5790ucmxl0GlWtHh184Lx7e459K4dnctmbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779952212; c=relaxed/simple;
-	bh=0Vnuap932bvaP0fDFhEX1jDP0NOopAR637HRsciFbmU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AxwXsfd8lOoUdOmqqpA85hlSHazA+09H8uunjALOLITW4KnWOnjwhgbfH/r/DAhKHEH1hbm2rGilPjNjNTDMTd1L7nCz8cHHbUcZLHPnTG0rhPgwt4zlJOTfTX+barcqAiRVf1hF4c7i1hgCY91Z9F5Xt/CF0Q2OhGxNZgZHMxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFUpqUxJ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779952496; c=relaxed/simple;
+	bh=ctXRYQDZZvrF5NrPVf5erGrFdRNlvTT5/miS6obbM70=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AO/FRW/VYOCEd33Q6xRBbyBM9JIC5BtTSzGj/BvIjzmbDj8/ab3fjI2TQgT1V9HhB4vhESvWVcoZA3iAE+wC4YdxO8sE4I04ZwTaBMOcxvHYTeQRUQO/FvLgcdHytIEXQDm/1WjU7KrhA4a9hX1llWmvJEUg2CgOTTLRXohE4uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dmjdaUFQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFUpqUxJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41CA61F000E9;
-	Thu, 28 May 2026 07:10:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dmjdaUFQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A219A1F000E9;
+	Thu, 28 May 2026 07:14:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779952210;
-	bh=SvXuriDeNbgZhPyvChSTkGY/sR1ke22dPfxwqkQBu2Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OFUpqUxJw/C8LA0dZLOacCklCNOXbKU/gPuuURxKq4cNQn/TFR9UzCh9myYcVEAJj
-	 RkOHxEjEg3SbMLTDRqLO5ZsaGHaxpOEeKwMCWF6x+g1w9JG5o+IU279AIrYuLioASa
-	 gf/9NjOL7xTdKiq1JyEcQUz94LRcFhmiF1TFqvuxJkQCopWatlJa/wlNamJlRoK8o/
-	 TyyWEke1FRsfvW2nyTTbj3a1gXTPCbNjWI8RdUDcGSojRPngyMLa8Uhrs6qnUObNd1
-	 3mc63Wej7xnwUgmNiEVMKZKZVtei9ZGVVWBJMYPjHRN/vuUYpcKxMWSUzw/7JG0ZN7
-	 ZDZXqHvxz5Mbg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wSUsZ-00000006vnj-3Nvk;
-	Thu, 28 May 2026 07:10:07 +0000
-Date: Thu, 28 May 2026 08:10:07 +0100
-Message-ID: <86ik88ui0g.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 14/44] arm64: RMI: Basic infrastructure for creating a realm.
-In-Reply-To: <20260513131757.116630-15-steven.price@arm.com>
-References: <20260513131757.116630-1-steven.price@arm.com>
-	<20260513131757.116630-15-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1779952494;
+	bh=lOF9/ftguGRGPekB6Y0hcSKN88e+EguDfHnvbC5AeRc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dmjdaUFQ3Ihij4frIvq9H2pYznMbnYOiLexWjmJd7ue1syyhkJf/OnE7943pVT9iq
+	 rxu0o1ra7VzRTVvcZlbKR9/5hS7mazLnGcNWJ9bBw+wKti4TiQe+GQCLDOfbjMEqNL
+	 KDa776lDZaHvl2RgwYTqX15lryValy+WSyhPAXD7VWg7rQBwBwKRsETIDvdqWk2O9x
+	 JOkzL6d57MxsfVYfCb9WoMNVbptfQ1IsVdY/y2e4A4Z1ZzBVdzzrL0lODlW+tmSxJV
+	 JoxlB+i4VS7fR7JTjJEM2aoF3rkuGq1tSCplq8LE0gQP4ZOk1vw+23E1Hb/Aov2jcx
+	 Fko1W1PDwQMrg==
+Date: Thu, 28 May 2026 09:14:48 +0200
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 03/39] irqchip/gic-v5: Setup gic_kvm_info on ACPI hosts
+Message-ID: <ahfraE2vVsZL2xcs@lpieralisi>
+References: <20260521144846.1899475-1-sascha.bischoff@arm.com>
+ <20260521144846.1899475-4-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260521144846.1899475-4-sascha.bischoff@arm.com>
 
-On Wed, 13 May 2026 14:17:22 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On Thu, May 21, 2026 at 02:50:09PM +0000, Sascha Bischoff wrote:
+> Device-tree based GICv5 probing already passes the IRS details and
+> maintenance interrupt to KVM, but the ACPI path only initialises the
+> irqchip and installs the ACPI IRQ model. As a result, KVM never sees
+> the GICv5 host information required to probe the vGIC on ACPI systems.
 > 
-> Introduce the skeleton functions for creating and destroying a realm.
-> The IPA size requested is checked against what the RMM supports.
+> Add the ACPI equivalent of the DT KVM setup. Parse the MADT GICC
+> entries for the maintenance interrupt, require all relevant entries to
+> agree, register the interrupt as a GICv5 PPI-encoded GSI, and pass the
+> resulting IRQ together with the IRS base and coherency information to
+> KVM. Native GICv5 does not require a maintenance interrupt unless the
+> legacy GICv3-compatible CPU interface is present, so preserve the
+> existing no-maintenance-IRQ handling for that case.
 > 
-> The actual work of constructing the realm will be added in future
-> patches.
-
-Again, $SUBJECT doesn't reflect that this is purely a KVM patch.
-
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
-> Changes since v13:
->  * Rebased and updated to RMM-v2.0-bet1.
->  * Auxiliary granules have been removed in RMM-v2.0-bet1
-> Changes since v12:
->  * Drop the RMM_PAGE_{SHIFT,SIZE} defines - the RMM is now configured to
->    be the same as the host's page size.
->  * Rework delegate/undelegate functions to use the new RMI range based
->    operations.
-> Changes since v11:
->  * Major rework to drop the realm configuration and make the
->    construction of realms implicit rather than driven by the VMM
->    directly.
->  * The code to create RDs, handle VMIDs etc is moved to later patches.
-> Changes since v10:
->  * Rename from RME to RMI.
->  * Move the stage2 cleanup to a later patch.
-> Changes since v9:
->  * Avoid walking the stage 2 page tables when destroying the realm -
->    the real ones are not accessible to the non-secure world, and the RMM
->    may leave junk in the physical pages when returning them.
->  * Fix an error path in realm_create_rd() to actually return an error value.
-> Changes since v8:
->  * Fix free_delegated_granule() to not call kvm_account_pgtable_pages();
->    a separate wrapper will be introduced in a later patch to deal with
->    RTTs.
->  * Minor code cleanups following review.
-> Changes since v7:
->  * Minor code cleanup following Gavin's review.
-> Changes since v6:
->  * Separate RMM RTT calculations from host PAGE_SIZE. This allows the
->    host page size to be larger than 4k while still communicating with an
->    RMM which uses 4k granules.
-> Changes since v5:
->  * Introduce free_delegated_granule() to replace many
->    undelegate/free_page() instances and centralise the comment on
->    leaking when the undelegate fails.
->  * Several other minor improvements suggested by reviews - thanks for
->    the feedback!
-> Changes since v2:
->  * Improved commit description.
->  * Improved return failures for rmi_check_version().
->  * Clear contents of PGD after it has been undelegated in case the RMM
->    left stale data.
->  * Minor changes to reflect changes in previous patches.
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 29 ++++++++++++++
->  arch/arm64/include/asm/kvm_rmi.h     | 51 +++++++++++++++++++++++++
->  arch/arm64/kvm/arm.c                 | 12 ++++++
->  arch/arm64/kvm/mmu.c                 | 12 +++++-
->  arch/arm64/kvm/rmi.c                 | 57 ++++++++++++++++++++++++++++
->  5 files changed, 159 insertions(+), 2 deletions(-)
+>  drivers/irqchip/irq-gic-v5.c | 103 +++++++++++++++++++++++++++++++++--
+>  1 file changed, 98 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5bf3d7e1d92c..82fd777bd9bb 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -688,4 +688,33 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
->  	}
->  }
-> +
-> +static inline bool kvm_is_realm(struct kvm *kvm)
-> +{
-> +	if (static_branch_unlikely(&kvm_rmi_is_available))
-> +		return kvm->arch.is_realm;
-> +	return false;
-> +}
-> +
-> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> +{
-> +	return READ_ONCE(kvm->arch.realm.state);
-> +}
-> +
-> +static inline void kvm_set_realm_state(struct kvm *kvm,
-> +				       enum realm_state new_state)
-> +{
-> +	WRITE_ONCE(kvm->arch.realm.state, new_state);
-> +}
-> +
-> +static inline bool kvm_realm_is_created(struct kvm *kvm)
-> +{
-> +	return kvm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
-> +}
-> +
-> +static inline bool vcpu_is_rec(const struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 4936007947fd..9de34983ee52 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -6,12 +6,63 @@
->  #ifndef __ASM_KVM_RMI_H
->  #define __ASM_KVM_RMI_H
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> index 707deabbf2f63..ccd1ec69a6ab2 100644
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
+> @@ -1126,7 +1126,7 @@ static void gicv5_set_cpuif_idbits(void)
+>  #ifdef CONFIG_KVM
+>  static struct gic_kvm_info gic_v5_kvm_info __initdata;
 >  
-> +#include <asm/rmi_smc.h>
-> +
-> +/**
-> + * enum realm_state - State of a Realm
-> + */
-> +enum realm_state {
-> +	/**
-> +	 * @REALM_STATE_NONE:
-> +	 *      Realm has not yet been created. rmi_realm_create() has not
-> +	 *      yet been called.
-> +	 */
-> +	REALM_STATE_NONE,
-> +	/**
-> +	 * @REALM_STATE_NEW:
-> +	 *      Realm is under construction, rmi_realm_create() has been
-> +	 *      called, but it is not yet activated. Pages may be populated.
-> +	 */
-> +	REALM_STATE_NEW,
-> +	/**
-> +	 * @REALM_STATE_ACTIVE:
-> +	 *      Realm has been created and is eligible for execution with
-> +	 *      rmi_rec_enter(). Pages may no longer be populated with
-> +	 *      rmi_data_create().
-> +	 */
-> +	REALM_STATE_ACTIVE,
-> +	/**
-> +	 * @REALM_STATE_DYING:
-> +	 *      Realm is in the process of being destroyed or has already been
-> +	 *      destroyed.
-> +	 */
-> +	REALM_STATE_DYING,
-> +	/**
-> +	 * @REALM_STATE_DEAD:
-> +	 *      Realm has been destroyed.
-> +	 */
-> +	REALM_STATE_DEAD
-> +};
-
-What is the ABI status of this state? Is it purely internal to KVM? Or
-is it something that the RMM actively tracks?
-
-> +
->  /**
->   * struct realm - Additional per VM data for a Realm
-> + *
-> + * @state: The lifetime state machine for the realm
-> + * @rd: Kernel mapping of the Realm Descriptor (RD)
-> + * @params: Parameters for the RMI_REALM_CREATE command
-> + * @ia_bits: Number of valid Input Address bits in the IPA
->   */
->  struct realm {
-> +	enum realm_state state;
-> +	void *rd;
-
-Why is this void? Doesn't it have a proper type?
-
-> +	struct realm_params *params;
-> +	unsigned int ia_bits;
-
-Consider reordering this structure to avoid holes.
-
->  };
->  
->  void kvm_init_rmi(void);
-> +u32 kvm_realm_ipa_limit(void);
-
-The use of 'realm' is confusing. This is not a per-realm property, but
-something global. I'd rather reserve the term 'realm' for CCA VMs (cue
-the two prototypes below).
-
-> +
-> +int kvm_init_realm(struct kvm *kvm);
-> +void kvm_destroy_realm(struct kvm *kvm);
->  
->  #endif /* __ASM_KVM_RMI_H */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 247e03b33035..18251e561524 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -264,6 +264,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  
->  	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
->  
-> +	/* Initialise the realm bits after the generic bits are enabled */
-> +	if (kvm_is_realm(kvm)) {
-> +		ret = kvm_init_realm(kvm);
-> +		if (ret)
-> +			goto err_uninit_mmu;
-> +	}
-> +
->  	return 0;
->  
->  err_uninit_mmu:
-> @@ -326,6 +333,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  	kvm_unshare_hyp(kvm, kvm + 1);
->  
->  	kvm_arm_teardown_hypercalls(kvm);
-> +	if (kvm_is_realm(kvm))
-> +		kvm_destroy_realm(kvm);
->  }
->  
->  static bool kvm_has_full_ptr_auth(void)
-> @@ -486,6 +495,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		else
->  			r = kvm_supports_cacheable_pfnmap();
->  		break;
-> +	case KVM_CAP_ARM_RMI:
-> +		r = static_key_enabled(&kvm_rmi_is_available);
-> +		break;
->  
->  	default:
->  		r = 0;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index d089c107d9b7..ba8286472286 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -877,10 +877,14 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->  
->  static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+> -static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +static void __init gic_setup_kvm_info(unsigned int maint_irq)
 >  {
-> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->  	u32 kvm_ipa_limit = get_kvm_ipa_limit();
->  	u64 mmfr0, mmfr1;
->  	u32 phys_shift;
+>  	struct gicv5_irs_chip_data *irs_data = gicv5_irs_get_chip_data();
 >  
-> +	if (kvm_is_realm(kvm))
-> +		kvm_ipa_limit = kvm_realm_ipa_limit();
-> +
->  	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
->  	if (is_protected_kvm_enabled()) {
->  		phys_shift = kvm_ipa_limit;
-> @@ -974,6 +978,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->  		return -EINVAL;
+> @@ -1140,13 +1140,14 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  		return;
 >  	}
 >  
-> +	mmu->arch = &kvm->arch;
+> -	gic_v5_kvm_info.type = GIC_V5;
+> +	if (WARN_ON(!irs_data))
+> +		return;
+>  
+> +	gic_v5_kvm_info.type = GIC_V5;
+>  	gic_v5_kvm_info.gicv5_irs.base = irs_data->irs_base;
+>  	gic_v5_kvm_info.gicv5_irs.non_coherent = !!(irs_data->flags & IRS_FLAGS_NON_COHERENT);
+> -
+> -	/* GIC Virtual CPU interface maintenance interrupt */
+> -	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
+> +	gic_v5_kvm_info.maint_irq = maint_irq;
+> +	gic_v5_kvm_info.no_maint_irq_mask = false;
+>  
+>  	/*
+>  	 * We require an MI if we have legacy support, but don't, otherwise.
+> @@ -1162,10 +1163,101 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  
+>  	vgic_set_kvm_info(&gic_v5_kvm_info);
+>  }
 > +
->  	err = kvm_init_ipa_range(mmu, type);
->  	if (err)
->  		return err;
-> @@ -982,7 +988,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->  	if (!pgt)
->  		return -ENOMEM;
->  
-> -	mmu->arch = &kvm->arch;
-
-Why moving this init?
-
->  	err = KVM_PGT_FN(kvm_pgtable_stage2_init)(pgt, mmu, &kvm_s2_mm_ops);
->  	if (err)
->  		goto out_free_pgtable;
-> @@ -1114,7 +1119,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->  	write_unlock(&kvm->mmu_lock);
->  
->  	if (pgt) {
-> -		kvm_stage2_destroy(pgt);
-> +		if (!kvm_is_realm(kvm))
-> +			kvm_stage2_destroy(pgt);
-> +		else
-> +			kvm_pgtable_stage2_destroy_pgd(pgt);
-
-Why can't you make kvm_stage2_destroy() do the right thing? Surely the
-PTs have to be reclaimed one way or another.
-
->  		kfree(pgt);
->  	}
->  }
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 6e28b669ded2..f51ec667445e 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -5,6 +5,8 @@
->  
->  #include <linux/kvm_host.h>
->  
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_mmu.h>
->  #include <asm/kvm_pgtable.h>
->  #include <asm/rmi_cmds.h>
->  #include <asm/virt.h>
-> @@ -14,6 +16,61 @@ static bool rmi_has_feature(unsigned long feature)
->  	return !!u64_get_bits(rmm_feat_reg0, feature);
->  }
->  
-> +u32 kvm_realm_ipa_limit(void)
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
 > +{
-> +	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+> +	/* GIC Virtual CPU interface maintenance interrupt */
+> +	gic_setup_kvm_info(irq_of_parse_and_map(node, 0));
 > +}
 > +
-> +void kvm_destroy_realm(struct kvm *kvm)
+> +#ifdef CONFIG_ACPI
+> +struct gicv5_acpi_kvm_info {
+> +	u32 maint_irq;
+> +	int maint_irq_mode;
+> +};
+> +
+> +static struct gicv5_acpi_kvm_info acpi_v5_kvm_info __initdata;
+> +
+> +static int __init gic_acpi_parse_virt_madt_gicc(union acpi_subtable_headers *header,
+> +						const unsigned long end)
 > +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
+> +	struct acpi_madt_generic_interrupt *gicc =
+> +		(struct acpi_madt_generic_interrupt *)header;
+> +	static int first_madt = true;
+> +	int maint_irq_mode;
 > +
-> +	if (realm->params) {
-> +		free_page((unsigned long)realm->params);
-> +		realm->params = NULL;
+> +	if (!(gicc->flags &
+> +	      (ACPI_MADT_ENABLED | ACPI_MADT_GICC_ONLINE_CAPABLE)))
+> +		return 0;
+> +
+> +	maint_irq_mode = (gicc->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
+> +			 ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
+> +
+> +	if (first_madt) {
+> +		first_madt = false;
+> +
+> +		acpi_v5_kvm_info.maint_irq = gicc->vgic_interrupt;
+> +		acpi_v5_kvm_info.maint_irq_mode = maint_irq_mode;
+> +		return 0;
 > +	}
 > +
-> +	if (!kvm_realm_is_created(kvm))
-> +		return;
+> +	/* The maintenance interrupt must be the same for every GICC entry. */
+> +	if (acpi_v5_kvm_info.maint_irq != gicc->vgic_interrupt ||
+> +	    acpi_v5_kvm_info.maint_irq_mode != maint_irq_mode)
+> +		return -EINVAL;
 > +
-> +	kvm_set_realm_state(kvm, REALM_STATE_DYING);
-> +
-> +	write_lock(&kvm->mmu_lock);
-> +	kvm_stage2_unmap_range(&kvm->arch.mmu, 0,
-> +			       BIT(realm->ia_bits - 1), true);
-> +	write_unlock(&kvm->mmu_lock);
-> +
-> +	if (realm->rd) {
-> +		phys_addr_t rd_phys = virt_to_phys(realm->rd);
-> +
-> +		if (WARN_ON(rmi_realm_terminate(rd_phys)))
-> +			return;
-> +
-> +		if (WARN_ON(rmi_realm_destroy(rd_phys)))
-> +			return;
-> +		free_delegated_page(rd_phys);
-> +		realm->rd = NULL;
-> +	}
-> +
-> +	if (WARN_ON(rmi_undelegate_range(kvm->arch.mmu.pgd_phys, pgd_size)))
-> +		return;
-> +
-> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
-> +
-> +	/* Now that the Realm is destroyed, free the entry level RTTs */
-> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +	return 0;
 > +}
+> +
+> +static bool __init gic_acpi_collect_virt_info(void)
+> +{
+> +	int count;
+> +
+> +	acpi_v5_kvm_info.maint_irq = 0;
+> +	acpi_v5_kvm_info.maint_irq_mode = 0;
 
-This really needs documentation: what happens at each stage? What
-memory is reclaimed when?
+Nit: there is no need to zero them.
 
-But even more importantly, why is this built in a completely parallel
-way, potentially deviating from the existing KVM S2 management?
+> +
+> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
+> +				      gic_acpi_parse_virt_madt_gicc, 0);
+> +
+> +	return count > 0;
+> +}
+> +
+> +static void __init gic_acpi_setup_kvm_info(void)
+> +{
+> +	unsigned int maint_irq = 0;
+> +	int irq;
+> +
+> +	if (!gic_acpi_collect_virt_info()) {
+> +		pr_warn("Unable to get hardware information used for virtualization\n");
+> +		return;
+> +	}
+> +
+> +	if (acpi_v5_kvm_info.maint_irq) {
+> +		u32 gsi = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI) |
+> +			  FIELD_PREP(GICV5_HWIRQ_ID, acpi_v5_kvm_info.maint_irq);
+
+What you get from the MADT table is the GSI already encoded.
+
+> +
+> +		irq = acpi_register_gsi(NULL, gsi,
+> +					acpi_v5_kvm_info.maint_irq_mode,
+> +					ACPI_ACTIVE_HIGH);
+> +		if (irq <= 0)
+> +			return;
+
+As we discussed offline, we are resolving the IRQ before knowing whether
+FEAT_GCIE_LEGACY is supported. I don't think it is specified what that
+GSI value in the GICC should be when !FEAT_GCIE_LEGACY, I will ask for
+a spec update on the matter.
+
+> +
+> +		maint_irq = irq;
+> +	}
+> +
+> +	gic_setup_kvm_info(maint_irq);
+> +}
+> +#endif
+>  #else
+>  static inline void __init gic_of_setup_kvm_info(struct device_node *node)
+>  {
+>  }
+> +
+> +#ifdef CONFIG_ACPI
+> +static inline void __init gic_acpi_setup_kvm_info(void)
+> +{
+> +}
+> +#endif
+>  #endif // CONFIG_KVM
+
+All of the above is almost identical to GICv3 code retrieving the maintenance
+IRQ, which is not surprising the only difference is where you store it.
+
+I think it is fine to leave this as is, writing a helper that we can reuse
+in v3 and v5 drivers seems overkill at present.
 
 Thanks,
+Lorenzo
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>  static int __init gicv5_init_common(struct fwnode_handle *parent_domain)
+> @@ -1264,6 +1356,7 @@ static int __init gic_acpi_init(union acpi_subtable_headers *header, const unsig
+>  		goto out_irs;
+>  
+>  	acpi_set_irq_model(ACPI_IRQ_MODEL_GIC_V5, gic_v5_get_gsi_domain_id);
+> +	gic_acpi_setup_kvm_info();
+>  
+>  	return 0;
+>  
+> -- 
+> 2.34.1
