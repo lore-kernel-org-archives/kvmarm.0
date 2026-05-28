@@ -1,79 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0043F2E7381
-	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 17:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EDC340405
+	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 22:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779991002; cv=none; b=CPiSYxCnkrOv+2mqSJ5t7s8E3qWGRphk5YwV+O2gQaIFBFICoGlOkT9vD8L05m+YVNcBfp0QI0POUwUIhBfjiCPuBZTUIKDfzrMKlK3RQd1Hx49l5PhpwiwYGTTjMmM61gB6XfLtuBQzgGAmcivmxMx2Phiyo2PmaVTmGqBNZeU=
+	t=1780006458; cv=none; b=UsEu5lZ7w4awvGFZU/5Ue28rOusGi6dRT8K71K6ZDgTKDS0rCk1BEsEavYm2WWItJIURU9NQJS7KiMJba1PM7twn9LEP4Tb+6tUeycc4dDG6RO2+WM+45nQrDkwS6cYa/UesbQjfTYwdJFFlmfgw3/7zeAG40w6y6bocAYnj9jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779991002; c=relaxed/simple;
-	bh=tifHFKIyGYCuqH14y9kKTgDVVPDyq56Hyt38uzz6E6k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RW4ELWzSL7C5bWtF2gbMBYqoNUTn0YrXrPstBxNkJ2huouoiStzWaSAACO/bw3WtRyJKueUXL8I26xfpszxOzUMb+z+8kb2K1SjBHY8fujDBwnvb7ZgSK2XLTY5LVtOH7kL1KPIiA2/hUwAJf9kl4b0Ls7XoCYhMLa8LibkXUYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P5G+Eix9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780006458; c=relaxed/simple;
+	bh=FWIBzXhLkf8QASpXt/e0kLaIXQ8j42MXyINrPuFKZF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E+5Y3mTPw1XmQYlE4xZfycXqr4zoNW5x9T9OgX8h5O5HEMqDGJZFfmRL33BEJw6mrqgKqdbI5Am57+wMsyEkmFWWA7otpuZ72aEP8mvQAJnvefM+sYxCKnqyAdqjs7pPyhO1jqGGcPiZL+FSihS7DQR5QUA7GtJkIw698ws0P5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=UbDmhZgv; arc=none smtp.client-ip=139.138.61.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P5G+Eix9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE021F000E9;
-	Thu, 28 May 2026 17:56:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779991001;
-	bh=Naf3wXJ2EyrFvHMdJcyKV7tDwmuIz0pC4n157xSFJ8g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=P5G+Eix9YABB7wMgZVO5Q+vMS6tFX7oY1PkD91PWXzwGDKrxzk8yq/hGqjlWft94I
-	 Rmvue2+hRRsCFPGEMjvOb3HNA1nNoYN08zMxhBXUVZ1GIiUVXZzXIq5Aa0p7FCNyjK
-	 PkcRwfotYhLN5g3i/K7wPhLU9WR61Z8kqlE+w479jk/FM62TEutBgN98GmVzH4s/jm
-	 aPZhid8JeLGhb5WKwaum52RyaaWbxDpJG0+dfgzfTtuvPpCUWFbkUQ/chFdnzYNW+K
-	 e/17gq/5sBjf7Z8lwMfwxqWoPDBPR5UVyFnaPuakGWFwjhzays9hs4LR+cwf8pG6d7
-	 dyd6mx1j0DuUQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wSeyF-000000078lE-1sfq;
-	Thu, 28 May 2026 17:56:39 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Zenghui Yu <zenghui.yu@linux.dev>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH] KVM: arm64: Remove @arch from __load_stage2()
-Date: Thu, 28 May 2026 18:56:36 +0100
-Message-ID: <177999096482.1739911.18058733022037753764.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260318144305.56831-1-zenghui.yu@linux.dev>
-References: <20260318144305.56831-1-zenghui.yu@linux.dev>
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="UbDmhZgv"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1780006457; x=1811542457;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FWIBzXhLkf8QASpXt/e0kLaIXQ8j42MXyINrPuFKZF0=;
+  b=UbDmhZgvL0O+JZB1wS+gBfvXh0pv41RQKw7qmlR0syFXz+EcuJQPmhzq
+   Kh5YYtyNF5c2nyrx74Kq08SpIcLq0SDkbUCi7HP0qo2VpD5svLGGdooLY
+   oMZWfjk9M+DQ2Tp61J6Auq27zIGulBCqCHGEiCY3t1qcxR+PvMiOPVZQu
+   g9I3WQaOmyC78trFvVY5RS3Ztz/XZRpSth8ROHqK317h7GGIK0lC3MENR
+   d4WW8gQLn6XhTIwMQNUrZIZohfaFQF3+0puKB8mBn5nyRNQqA1qVOK2h+
+   5xefAUrwU/zGsX/EAeFjQzDEylnVdpCw6uvxpNrunRSYu3j0hkwlvWI0d
+   Q==;
+X-CSE-ConnectionGUID: bgLZXs9hTsmi4yguOCuh2A==
+X-CSE-MsgGUID: w5T2LdCtS0O4CVSRYYa6uw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11800"; a="221102547"
+X-IronPort-AV: E=Sophos;i="6.24,174,1774278000"; 
+   d="scan'208";a="221102547"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2026 07:14:15 +0900
+Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 98E69100036E
+	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 22:14:15 +0000 (UTC)
+Received: from az2nlsmom1.o.css.fujitsu.com (unknown [10.150.26.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id 5229719DF684
+	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 22:14:15 +0000 (UTC)
+Received: from sm-arm-grace07 (unknown [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmom1.o.css.fujitsu.com (Postfix) with ESMTPS id 1348B82C235;
+	Thu, 28 May 2026 22:14:09 +0000 (UTC)
+Date: Fri, 29 May 2026 07:14:07 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
+	shuah@kernel.org, suzuki.poulose@arm.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH] KVM: selftest: arm64: Run shadow_stage2 varying guest
+ modes
+Message-ID: <ahi-L_HQXkxPuCYL@sm-arm-grace07>
+References: <20260516183003.799058-6-weilin.chang@arm.com>
+ <20260528045930.450339-1-itaru.kitayama@fujitsu.com>
+ <r2dui45c3mp2qzns6dplqj6pfima5tq7huhvbwus225xamuccn@aw753ihdimz5>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zenghui.yu@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <r2dui45c3mp2qzns6dplqj6pfima5tq7huhvbwus225xamuccn@aw753ihdimz5>
 
-On Wed, 18 Mar 2026 22:43:05 +0800, Zenghui Yu wrote:
-> Since commit fe49fd940e22 ("KVM: arm64: Move VTCR_EL2 into struct s2_mmu"),
-> @arch is no longer required to obtain the per-kvm_s2_mmu vtcr and can be
-> removed from __load_stage2().
+On Thu, May 28, 2026 at 05:02:30PM +0100, Wei-Lin Chang wrote:
+> Hi Itaru,
 > 
+> On Thu, May 28, 2026 at 01:59:30PM +0900, Itaru Kitayama wrote:
+> > Refactor main() to use for_each_guest_mode() helper to create
+> > a single VCPU VM with a guest mode ID.
+> > 
+> > Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> > ---
+> >  tools/testing/selftests/kvm/arm64/shadow_stage2.c | 9 +++++++--
+> >  1 file changed, 7 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/arm64/shadow_stage2.c b/tools/testing/selftests/kvm/arm64/shadow_stage2.c
+> > index 5bce55abdea7..05acca22eafe 100644
+> > --- a/tools/testing/selftests/kvm/arm64/shadow_stage2.c
+> > +++ b/tools/testing/selftests/kvm/arm64/shadow_stage2.c
+> > @@ -105,7 +105,7 @@ static void guest_code(void)
+> >  	GUEST_DONE();
+> >  }
+> >  
+> > -int main(void)
+> > +int run_test(enum vm_guest_mode mode, void *unused)
+> >  {
+> >  	struct kvm_vcpu_init init;
+> >  	struct kvm_vcpu *vcpu;
+> > @@ -114,7 +114,8 @@ int main(void)
+> >  	gpa_t gpa;
+> >  
+> >  	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+> > -	vm = vm_create(1);
+> > +	vm = __vm_create(VM_SHAPE(mode), 1, 0);
+> > +
+> >  
+> >  	kvm_get_default_vcpu_target(vm, &init);
+> >  	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
+> > @@ -163,3 +164,7 @@ int main(void)
+> >  	kvm_vm_free(vm);
+> >  	return 0;
+> >  }
+> > +
+> > +int main(void) {
+> > +	for_each_guest_mode(run_test, NULL);
+> > +}
+> > -- 
+> > 2.43.0
+> > 
 > 
+> Thanks! I think this is valuable.
+> I can add your patch into the next version if you don't mind?
 
-Applied to next, thanks!
+No, I would not, for the record your test rans with all the available guest
+modes without an issue (ie ended DONE!) on QEMU in tcg mode.
 
-[1/1] KVM: arm64: Remove @arch from __load_stage2()
-      commit: e72b425f617edebf6f374fa39f2c763c9b3696ec
+Thanks,
+Itaru.
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+> 
+> Thanks,
+> Wei-Lin Chang
