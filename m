@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9EF2E738D
-	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 16:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE96277007
+	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 16:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779987310; cv=none; b=FlGTyX7dSUGlirOKEn4jPCiX6z4ORJRED2/Wr31jqIhkSV1LtdUAfpLFBYmpPdZ15e6feCbamK9QjjIyLaqkS0I5bVGsUaylIjBjWPm2DOQ/Uz8Z/jdxvZTqVw0cNkHR7kMen0MmUFqcQ30Hkov5hmSEHoVyvSVpFVMPd2M3hEA=
+	t=1779987313; cv=none; b=uJaXRjRjtYm2JlZbk17QGnDH0U6sUnL6wnFsRe1yVySI0xRZPVTqcKnQjN8aBQvCM64MUr+Act7Ru3TZBLf1UlX8Y42+q2dWpKsDik4YDuh+uhONDMF0uHooRwHaQlZmJemgJim+F7thWKTbNVTbvA1GtRi7pKuu6iq9nYrPwTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779987310; c=relaxed/simple;
-	bh=tfNiCaPdt6lXy9Oj563avrybTGVNuAd0dPWiS+fz9tk=;
+	s=arc-20240116; t=1779987313; c=relaxed/simple;
+	bh=3GTuisC5/wPRWSF7U6TdrvkYUnHeQOc9vEfsl0hAgtk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F7wmYg/WUWW4E6cCE+WpdzcT5yntP65g8/ZjbeH5Qmcdn1rZDH1XtnOa/LMXYts2lwY78a9jD0894dcrWm3x/EJBd7XJpDRWJRQHM9O2GUe1ftVDCx9EkidYqxfChYZDdP6Wmjm4OTmcdRzFZtTJnqdwEuaqijusscDXfy6cYFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Riacqi8h; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=Fs4JDaobH8KT5SYA3V+GcH7tvTvCl9z2QJrTkxwYRnCNelRDqmqoh3dLa6qJqBXFnWWcE/cmWehOpPwgMrtyh4BetZ7B2T5dkoE6VE+pdFA+MtBpcVi0TqFJolDYmAowlQA/P9Au+jcwilbGFN6XGdOlt6/njt128ev7/3qXBTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=GyXyF14P; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Riacqi8h"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="GyXyF14P"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6BCEC45DD;
-	Thu, 28 May 2026 09:55:03 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1479822EE;
+	Thu, 28 May 2026 09:55:05 -0700 (PDT)
 Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1EDC23F905;
-	Thu, 28 May 2026 09:55:07 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B8EF93F905;
+	Thu, 28 May 2026 09:55:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779987308; bh=tfNiCaPdt6lXy9Oj563avrybTGVNuAd0dPWiS+fz9tk=;
+	t=1779987310; bh=3GTuisC5/wPRWSF7U6TdrvkYUnHeQOc9vEfsl0hAgtk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Riacqi8hKS72KUtwIsE6KD80CLcgW2y4/vQQHp+X1G2OZ7N3EbJuYjMx9h52qGR5C
-	 YDxekSobf0zL9UBEF/SyNjtwdM17imYsquxhwAWoMoFh7r1aWnkBAqehrqNwoip7HF
-	 +kO65L4oubgGHchSzAj20/u/PjCZhde5MahOKFhk=
+	b=GyXyF14PVJ1Pq4t6787gZB4qNxuDuNphBNlMCDa/XWEdQaiBax1AkFjcxp/2Xo7Tj
+	 2R8lzHargL5Kl5s/KcHodIAr3nJFdGHUmxS6cIkt6Nhk8i+4osH8lACAfG+VaNstDV
+	 9Zd6+CCzTJKQRJcQ6HnCyTa48hyQPDAUnKsvi43I=
 From: Mark Rutland <mark.rutland@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -38,9 +38,9 @@ Cc: broonie@kernel.org,
 	tabba@google.com,
 	vladimir.murzin@arm.com,
 	will@kernel.org
-Subject: [PATCH v2 06/18] arm64: fpsimd: Remove sve_set_vq() and sme_set_vq()
-Date: Thu, 28 May 2026 17:54:34 +0100
-Message-Id: <20260528165446.701944-7-mark.rutland@arm.com>
+Subject: [PATCH v2 07/18] arm64: fpsimd: Use assembler for SVE instructions
+Date: Thu, 28 May 2026 17:54:35 +0100
+Message-Id: <20260528165446.701944-8-mark.rutland@arm.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20260528165446.701944-1-mark.rutland@arm.com>
 References: <20260528165446.701944-1-mark.rutland@arm.com>
@@ -52,23 +52,23 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The sve_set_vq() and sme_set_vq() assembly functions (and the
-sve_load_vq and sme_load_vq macros they use) are open-coded forms of
-sysreg_clear_set*(). There's no need for these to be implemented
-out-of-line in assembly, and the 'vq_minus_1' argument is unusual and
-confusing.
+Historically we supported assemblers which could not assemble SVE
+instructions. We dropped support for such assemblers in commit:
 
-Use sysreg_clear_set_s() directly, where the necessary 'vq - 1' encoding
-is more obviously part of encoding the register value.
+  118c40b7b503 ("kbuild: require gcc-8 and binutils-2.30")
 
-For now, sve_flush_live() is left with the unusual vq_minus_1 argument.
-This will be addressed in subsequent patches.
+Since that commit, all supported assemblers (binutils and LLVM) are
+capable of assembling SVE instructions, and there's no need for us to
+manually encode SVE instructions.
+
+Rely on the assembler to encode SVE instructions, and remove the manual
+encoding. The various _sve_<insn> macros are kept for now, and will be
+cleaned up in subsequent patches.
 
 There should be no functional change as a result of this patch.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Reviewed-by: Mark Brown <broonie@kernel.org>
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Fuad Tabba <tabba@google.com>
 Cc: James Morse <james.morse@arm.com>
@@ -76,142 +76,116 @@ Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oupton@kernel.org>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/fpsimd.h       |  2 --
- arch/arm64/include/asm/fpsimdmacros.h | 22 ----------------------
- arch/arm64/kernel/entry-fpsimd.S      | 10 ----------
- arch/arm64/kernel/fpsimd.c            | 24 +++++++++++++-----------
- 4 files changed, 13 insertions(+), 45 deletions(-)
+ arch/arm64/include/asm/fpsimdmacros.h | 65 +++++++--------------------
+ 1 file changed, 17 insertions(+), 48 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index d9d00b45ab115..8efa3c0402a7a 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -146,8 +146,6 @@ extern void sve_load_state(void const *state, u32 const *pfpsr,
- 			   int restore_ffr);
- extern void sve_flush_live(bool flush_ffr, unsigned long vq_minus_1);
- extern unsigned int sve_get_vl(void);
--extern void sve_set_vq(unsigned long vq_minus_1);
--extern void sme_set_vq(unsigned long vq_minus_1);
- extern void sme_save_state(void *state, int zt);
- extern void sme_load_state(void const *state, int zt);
- 
 diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index cda81d009c9bd..adf33d2da40c3 100644
+index adf33d2da40c3..4ba23e493cb69 100644
 --- a/arch/arm64/include/asm/fpsimdmacros.h
 +++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -265,28 +265,6 @@
- 	.purgem _for__body
+@@ -99,85 +99,54 @@
+ 	.endif
  .endm
  
--/* Update ZCR_EL1.LEN with the new VQ */
--.macro sve_load_vq xvqminus1, xtmp, xtmp2
--		mrs_s		\xtmp, SYS_ZCR_EL1
--		bic		\xtmp2, \xtmp, ZCR_ELx_LEN_MASK
--		orr		\xtmp2, \xtmp2, \xvqminus1
--		cmp		\xtmp2, \xtmp
--		b.eq		921f
--		msr_s		SYS_ZCR_EL1, \xtmp2	//self-synchronising
--921:
--.endm
--
--/* Update SMCR_EL1.LEN with the new VQ */
--.macro sme_load_vq xvqminus1, xtmp, xtmp2
--		mrs_s		\xtmp, SYS_SMCR_EL1
--		bic		\xtmp2, \xtmp, SMCR_ELx_LEN_MASK
--		orr		\xtmp2, \xtmp2, \xvqminus1
--		cmp		\xtmp2, \xtmp
--		b.eq		921f
--		msr_s		SYS_SMCR_EL1, \xtmp2	//self-synchronising
--921:
--.endm
--
- /* Preserve the first 128-bits of Znz and zero the rest. */
- .macro _sve_flush_z nz
- 	_sve_check_zreg \nz
-diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
-index 6325db1a2179c..88c555745b584 100644
---- a/arch/arm64/kernel/entry-fpsimd.S
-+++ b/arch/arm64/kernel/entry-fpsimd.S
-@@ -62,11 +62,6 @@ SYM_FUNC_START(sve_get_vl)
- 	ret
- SYM_FUNC_END(sve_get_vl)
+-/* SVE instruction encodings for non-SVE-capable assemblers */
+-/* (pre binutils 2.28, all kernel capable clang versions support SVE) */
++/* Deprecated macros for SVE instructions */
  
--SYM_FUNC_START(sve_set_vq)
--	sve_load_vq x0, x1, x2
--	ret
--SYM_FUNC_END(sve_set_vq)
--
- /*
-  * Zero all SVE registers but the first 128-bits of each vector
-  *
-@@ -94,11 +89,6 @@ SYM_FUNC_START(sme_get_vl)
- 	ret
- SYM_FUNC_END(sme_get_vl)
+ /* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
+ .macro _sve_str_v nz, nxbase, offset=0
+-	_sve_check_zreg \nz
+-	_check_general_reg \nxbase
+-	_check_num (\offset), -0x100, 0xff
+-	.inst	0xe5804000			\
+-		| (\nz)				\
+-		| ((\nxbase) << 5)		\
+-		| (((\offset) & 7) << 10)	\
+-		| (((\offset) & 0x1f8) << 13)
++	.arch_extension sve
++	str	z\nz, [X\nxbase, #\offset, MUL VL]
+ .endm
  
--SYM_FUNC_START(sme_set_vq)
--	sme_load_vq x0, x1, x2
--	ret
--SYM_FUNC_END(sme_set_vq)
--
- /*
-  * Save the ZA and ZT state
-  *
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index a8395cb303344..2578c2372c89e 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -377,8 +377,10 @@ static void task_fpsimd_load(void)
- 			if (!thread_sm_enabled(&current->thread))
- 				WARN_ON_ONCE(!test_and_set_thread_flag(TIF_SVE));
+ /* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
+ .macro _sve_ldr_v nz, nxbase, offset=0
+-	_sve_check_zreg \nz
+-	_check_general_reg \nxbase
+-	_check_num (\offset), -0x100, 0xff
+-	.inst	0x85804000			\
+-		| (\nz)				\
+-		| ((\nxbase) << 5)		\
+-		| (((\offset) & 7) << 10)	\
+-		| (((\offset) & 0x1f8) << 13)
++	.arch_extension sve
++	ldr	z\nz, [X\nxbase, #\offset, MUL VL]
+ .endm
  
--			if (test_thread_flag(TIF_SVE))
--				sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
-+			if (test_thread_flag(TIF_SVE)) {
-+				unsigned long vq = sve_vq_from_vl(task_get_sve_vl(current));
-+				sysreg_clear_set_s(SYS_ZCR_EL1, ZCR_ELx_LEN, vq - 1);
-+			}
+ /* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
+ .macro _sve_str_p np, nxbase, offset=0
+-	_sve_check_preg \np
+-	_check_general_reg \nxbase
+-	_check_num (\offset), -0x100, 0xff
+-	.inst	0xe5800000			\
+-		| (\np)				\
+-		| ((\nxbase) << 5)		\
+-		| (((\offset) & 7) << 10)	\
+-		| (((\offset) & 0x1f8) << 13)
++	.arch_extension sve
++	str	p\np, [X\nxbase, #\offset, MUL VL]
+ .endm
  
- 			restore_sve_regs = true;
- 			restore_ffr = true;
-@@ -403,8 +405,10 @@ static void task_fpsimd_load(void)
- 		unsigned long sme_vl = task_get_sme_vl(current);
+ /* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
+ .macro _sve_ldr_p np, nxbase, offset=0
+-	_sve_check_preg \np
+-	_check_general_reg \nxbase
+-	_check_num (\offset), -0x100, 0xff
+-	.inst	0x85800000			\
+-		| (\np)				\
+-		| ((\nxbase) << 5)		\
+-		| (((\offset) & 7) << 10)	\
+-		| (((\offset) & 0x1f8) << 13)
++	.arch_extension sve
++	ldr p\np, [x\nxbase, #\offset, MUL VL]
+ .endm
  
- 		/* Ensure VL is set up for restoring data */
--		if (test_thread_flag(TIF_SME))
--			sme_set_vq(sve_vq_from_vl(sme_vl) - 1);
-+		if (test_thread_flag(TIF_SME)) {
-+			unsigned long vq = sve_vq_from_vl(sme_vl);
-+			sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
-+		}
+ /* RDVL X\nx, #\imm */
+ .macro _sve_rdvl nx, imm
+-	_check_general_reg \nx
+-	_check_num (\imm), -0x20, 0x1f
+-	.inst	0x04bf5000			\
+-		| (\nx)				\
+-		| (((\imm) & 0x3f) << 5)
++	.arch_extension sve
++	rdvl x\nx, #\imm
+ .endm
  
- 		write_sysreg_s(current->thread.svcr, SYS_SVCR);
+ /* RDFFR (unpredicated): RDFFR P\np.B */
+ .macro _sve_rdffr np
+-	_sve_check_preg \np
+-	.inst	0x2519f000			\
+-		| (\np)
++	.arch_extension sve
++	rdffr p\np\().b
+ .endm
  
-@@ -1332,10 +1336,9 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
- 	 * any effective streaming mode SVE state.
- 	 */
- 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
--		unsigned long vq_minus_one =
--			sve_vq_from_vl(task_get_sve_vl(current)) - 1;
--		sve_set_vq(vq_minus_one);
--		sve_flush_live(true, vq_minus_one);
-+		unsigned long vq = sve_vq_from_vl(task_get_sve_vl(current));
-+		sysreg_clear_set_s(SYS_ZCR_EL1, ZCR_ELx_LEN, vq - 1);
-+		sve_flush_live(true, vq - 1);
- 		fpsimd_bind_task_to_cpu();
- 	} else {
- 		fpsimd_to_sve(current);
-@@ -1465,9 +1468,8 @@ void do_sme_acc(unsigned long esr, struct pt_regs *regs)
- 		WARN_ON(1);
+ /* WRFFR P\np.B */
+ .macro _sve_wrffr np
+-	_sve_check_preg \np
+-	.inst	0x25289000			\
+-		| ((\np) << 5)
++	.arch_extension sve
++	wrffr p\np\().b
+ .endm
  
- 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
--		unsigned long vq_minus_one =
--			sve_vq_from_vl(task_get_sme_vl(current)) - 1;
--		sme_set_vq(vq_minus_one);
-+		unsigned long vq = sve_vq_from_vl(task_get_sme_vl(current));
-+		sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
+ /* PFALSE P\np.B */
+ .macro _sve_pfalse np
+-	_sve_check_preg \np
+-	.inst	0x2518e400			\
+-		| (\np)
++	.arch_extension sve
++	pfalse	p\np\().b
+ .endm
  
- 		fpsimd_bind_task_to_cpu();
- 	} else {
+ /* SME instruction encodings for non-SME-capable assemblers */
 -- 
 2.30.2
 
