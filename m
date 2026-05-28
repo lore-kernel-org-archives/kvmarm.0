@@ -1,74 +1,33 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C0F28D8DB
-	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 09:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB593B3C12
+	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 09:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779961032; cv=none; b=aJgk6PtFfALjeZ6sqjWWihZ1ndFdDgU8jPCoF+3kQAeG5z5eCyFElK6QNJ4V/vTOPDX/qTbjKJ6Z8sXgyY+YNM7HRCKKsNhj8fJpA9JOdllc6aOl/H2JU0fyHwm9wkiTMUWzHburBzyQ2u+BXd74g6Je1RbJPOZ6EOpeow726Ak=
+	t=1779961533; cv=none; b=a+vmbh9vKlSSvWJUjAXW3IxwNcqMAIfMw8SNG2M+mB5LanfzIdAxHc8R5KjGtWkZ79QJ7WPjQtEpmIG1cC6s5/sE6d+MZ0g2+rJMGU4FErnwQhmiRBe9/z0yryLlGx+ot7iDfzfoHhbS8ikLTIaypfqUY/E1MfCANhhMTIsguP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779961032; c=relaxed/simple;
-	bh=7XOs8lHHhSarBuVo95FYXNAtPF3Bl7w3yZUKrr9XkrQ=;
+	s=arc-20240116; t=1779961533; c=relaxed/simple;
+	bh=P8Q1n7++KYGn6KjmLs/J8YX5MBe/FzQnONG5vdUEhPw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DxFNIqb6nTt+gHUhyMZeehwoYwFWV6mkRdWU9l6xEsN6WYb8oCnQRj8NFOGzg8p4QH7GfFYhqbaXlqaea9gNdz/szdQMMmuV4ViBFOIgL+zk9bCUg3wbiIFxH3WTIgvClV+EHuzbLNahmyFZmZbwQNsSVBSkNg3nNu9tnWHp5fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TXaspS2M; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 In-Reply-To:Content-Type; b=a/gHyerEpt/zoZ+RZDy/pcNneHlOabKIpP5SWGFEv5v85IVcKskhs6dYHWfze8q5V2HGyobc3/m8XxnVJyS1h66IjMMfEUDvBEHgsJVXzsutf0/bNVnKzkpavxf2DiMjRZvIRwhs6SzNlB8KFKbUqgB7zWLuQQ/gYBy1byhdkyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=t5xshcoV; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TXaspS2M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779961022;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0JElt7fWcvsKUI0oGSoOJ6clgVqGYHrxozcrpgJvlM0=;
-	b=TXaspS2MSUBsu4MzdnAZPIwa/xTtZUd6LwPVxXHE7kgK/wtOob1VReeOKt7tFRpsHa5+FJ
-	1aJ+OVXc0Eo1MzUjMD3D7PAxs4XVYY3QmppH4D2ZFFl8UpOqvDMiEp2nkBaR3jTveCyX4P
-	a5U8KdUDKuuyFWkVzRXOUVd6Re2ZZB0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-1jsOQWL8NUeOrX5XxNG3kQ-1; Thu, 28 May 2026 05:36:59 -0400
-X-MC-Unique: 1jsOQWL8NUeOrX5XxNG3kQ-1
-X-Mimecast-MFC-AGG-ID: 1jsOQWL8NUeOrX5XxNG3kQ_1779961018
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-44f56d5523eso10856786f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 02:36:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779961018; x=1780565818;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0JElt7fWcvsKUI0oGSoOJ6clgVqGYHrxozcrpgJvlM0=;
-        b=jPSXWhQdRlhHbVGZF/LFGOQO9hRGPyKw6C6RkDpMfnD4JH0ap5aiwEaFgg5jlL85kA
-         aUxDQ0Yypk7DxCsKPysWLH1lIrjH9zTOrqhYtfwVHvLwea1Au8K+OvQBNHaTGytlPiAF
-         EeYMBBiHS2J+jVhV0No+foRmkca4aLQ1pnx2fx5mMpvFXhT3yUce+ygI4Zl3Ue6JmPQk
-         3bIt6fQM9OXOQIj6MgqxUHKorOKUwEfOCJuPVgVoUjRpx11rgHm3mXBsoQdCfrBkORSv
-         R1Qo/Dx+dopf54Kis5q8+NIK+5ONOoZ+nEEF5yvU0M9d1jTHPMytL1mNpd0yZJ3z1lks
-         sLvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8npG+H+eWut6/Tuh/e3Pzh+O7DM4ak+ZdBSf44DlpgT8VMH/YtIOypHPOw+7rkwNlsc+7ki5g=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyxN8Lyj8eXX5Ul2jGBETd/Ex9kh9qcNtLL7YO4Mum7vjPCfMtv
-	eJVMS/Po0Ptu6Q913E2rUE/qN5nyyeGn2JnNGNS5Z1CE1PScLOcy2h4I+wuDHzTOzpJx08/yFsA
-	aOL7AAM0KYg8L8awE5QYMhiEH2qnuR09PY1iWwnsMdttgSS2qR4YP+BNjtg==
-X-Gm-Gg: Acq92OHQCer8NVzrtG3QNjyQ3mhNN5G4iq4swuvZa+FvzrixvFcC8uisZsU0tDOKO+T
-	Uar4An60BqhVf8LfEU6H4VmSNq1E+kBgDr+OtGZHsovc+t7SoAU4UUtIrHfVf+Oj/CDu78GhOlm
-	SM0mVZHHfvKEj4mUgc7vS94QrD1HYdrPx7CY1sNiUKVu9VZfgjySTA0I4ITFrI6vMbV0qx/d8Mk
-	WIXpzjTfyT8p3mNOh2zEDyTs4/ZnYakHFudeoArLG/XyB6TxYWVfkMo38NzVk3kz4XeeFek1WRp
-	7Q1rS7klcJ8KBWYU+N6wMiAd4krEB7y3rDdA/mvAY0FJ/ESxqp1xmVvkdueN/QJqUkOLKT+W26q
-	xpIQVCgtDqE+kM91Z9LtU2/X1fnAgbSORSNBcbeVeKh4WvG4ujf9xlGGCF5LHV9wMa3z81tZXfe
-	WYBrRa
-X-Received: by 2002:a05:600c:3e88:b0:490:4ee0:82ff with SMTP id 5b1f17b1804b1-4904ee086a2mr352236325e9.27.1779961018147;
-        Thu, 28 May 2026 02:36:58 -0700 (PDT)
-X-Received: by 2002:a05:600c:3e88:b0:490:4ee0:82ff with SMTP id 5b1f17b1804b1-4904ee086a2mr352235915e9.27.1779961017529;
-        Thu, 28 May 2026 02:36:57 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909235d43esm48970855e9.1.2026.05.28.02.36.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2026 02:36:56 -0700 (PDT)
-Message-ID: <8b00e931-6636-46f8-8d8c-f67b8c46e989@redhat.com>
-Date: Thu, 28 May 2026 11:36:55 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="t5xshcoV"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2F0B4402;
+	Thu, 28 May 2026 02:45:24 -0700 (PDT)
+Received: from [10.1.28.164] (unknown [10.1.28.164])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6F9EC3F632;
+	Thu, 28 May 2026 02:45:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1779961529; bh=P8Q1n7++KYGn6KjmLs/J8YX5MBe/FzQnONG5vdUEhPw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t5xshcoVa1aNijEr9lCBlTqTh/gSFG1u88ttAYpJ1PYVIaT60k+HNg9XbSGk6AqAy
+	 1/I1vM8LkmB+FSx5yVmi9eGWKuegR7sU6W8pjvE6svTwcOZYzY9VMb9LgiALAKHQFT
+	 xi3g0/ZqOBvTOLBVxF4H0ea1uWBkgRRXGyZEjojA=
+Message-ID: <362fe07b-70d5-4933-96d3-6445242f9077@arm.com>
+Date: Thu, 28 May 2026 10:45:25 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,1356 +35,450 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v1 00/13] named CPU models for ARM64 on KVM
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@linaro.org" <philmd@linaro.org>,
- Andrea Bolognani <abologna@redhat.com>
-References: <20260513163356.3033159-1-shaju.abraham@nutanix.com>
- <dd4744c5-6f89-4377-b28a-24b2ebc23412@redhat.com>
- <A392F312-5956-4490-92FA-7C6E2211F37B@nutanix.com>
- <c4c3ee0c-7b27-4808-921a-5079095eedb0@redhat.com>
- <4660A09C-11BA-4706-A455-60DC536C018E@nutanix.com>
- <e5637cd7-8bfa-4e67-b34f-474e5d34e015@redhat.com>
- <C54DA45D-577E-4C2D-8D08-112585C32DDF@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <C54DA45D-577E-4C2D-8D08-112585C32DDF@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: Xct1K0sYjIUwM9ew_SxvQ8FsAjyGtuQro5d3tY6nkRs_1779961018
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+Subject: Re: [PATCH 13/18] arm64: fpsimd: Use opaque type for SVE state
+To: Mark Rutland <mark.rutland@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ maz@kernel.org, oupton@kernel.org, tabba@google.com, will@kernel.org
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+ <20260521132556.584676-14-mark.rutland@arm.com>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <20260521132556.584676-14-mark.rutland@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Khushit,
+On 5/21/26 14:25, Mark Rutland wrote:
+> As the SVE state size can vary at runtime, we don't have a concrete type
+> for the in-memory SVE state, and pass this around using a pointer to
+> void. The functions which save/restore the SVE state have a very unusual
+> calling convention, expecting a pointer to the FFR *in the middle of*
+> the in-memory SVE state, which is also passed as a pointer to void.
+> Passing a pointer to the FFR also requires that callers find the live VL
+> and perform some arithmetic, which callers implement differently.
+> 
+> Using pointer to void means that it's very easy to introduce errors that
+> cannot be caught by the compiler (e.g. as 'void **' can be assigned to
+> 'void *'). In general this is unnecessarily confusing and fragile.
+> 
+> Improve this by adding an opaque 'struct sve_state', and consistently
+> passing a pointer to this, performing the necessary offsetting *within*
+> the save/restore functions.
+> 
+> For the moment, the offsetting is performed in a new '_sve_pffr'
+> assembly macro, using the ADDVL and ADDPL instructions. These add a
+> multiple of the live vector length and predicate length respectively.
+> The ADDVL immediate range cannot encode 32, so this is split into two
+> increments of 16.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/fpsimd.h         | 24 +++---------------------
+>  arch/arm64/include/asm/fpsimdmacros.h   |  9 +++++++++
+>  arch/arm64/include/asm/kvm_host.h       |  8 ++------
+>  arch/arm64/include/asm/kvm_hyp.h        |  4 ++--
+>  arch/arm64/include/asm/processor.h      |  4 +++-
+>  arch/arm64/kernel/fpsimd.c              | 21 ++++++++++-----------
+>  arch/arm64/kvm/arm.c                    |  4 ++--
+>  arch/arm64/kvm/guest.c                  |  4 ++--
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  8 +++-----
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  7 +++----
+>  arch/arm64/kvm/hyp/nvhe/setup.c         |  2 +-
+>  11 files changed, 40 insertions(+), 55 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index 19b373ad0ebf7..19e670ae67598 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -162,7 +162,7 @@ extern void fpsimd_update_current_state(struct user_fpsimd_state const *state);
+>  
+>  struct cpu_fp_state {
+>  	struct user_fpsimd_state *st;
+> -	void *sve_state;
+> +	struct sve_state *sve_state;
+>  	void *sme_state;
+>  	u64 *svcr;
+>  	u64 *fpmr;
+> @@ -195,24 +195,6 @@ extern void task_smstop_sm(struct task_struct *task);
+>  /* Maximum VL that SVE/SME VL-agnostic software can transparently support */
+>  #define VL_ARCH_MAX 0x100
+>  
+> -/* Offset of FFR in the SVE register dump */
+> -static inline size_t sve_ffr_offset(int vl)
+> -{
+> -	return SVE_SIG_FFR_OFFSET(sve_vq_from_vl(vl)) - SVE_SIG_REGS_OFFSET;
+> -}
+> -
 
-On 5/28/26 8:19 AM, Khushit Shah wrote:
->
->> On 27 May 2026, at 6:48 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>
->> |-------------------------------------------------------------------!
->>
->> Hi Khushit,
->> On 5/22/26 9:59 AM, Khushit Shah wrote:
->>>> On 20 May 2026, at 8:57 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>>>
->>>> !-------------------------------------------------------------------|
->>>> CAUTION: External Email
->>>>
->>>> |-------------------------------------------------------------------!
->>>>
->>>> Hi Khushit,
->>>>
->>>> On 5/20/26 3:08 PM, Khushit Shah wrote:
->>>>>> On 19 May 2026, at 9:21 AM, Shaju Abraham <shaju.abraham@nutanix.com> wrote:
->>>>>>
->>>>>>
->>>>>>
->>>>>> Get Outlook for Mac 
->>>>>> From: Eric Auger <eric.auger@redhat.com>
->>>>>> Date: Monday, 18 May 2026 at 3:57 PM
->>>>>> To: Shaju Abraham <shaju.abraham@nutanix.com>, qemu-devel@nongnu.org <qemu-devel@nongnu.org>, qemu-arm@nongnu.org <qemu-arm@nongnu.org>, kvmarm@lists.linux.dev <kvmarm@lists.linux.dev>, peter.maydell@linaro.org <peter.maydell@linaro.org>, richard.henderson@linaro.org <richard.henderson@linaro.org>, cohuck@redhat.com <cohuck@redhat.com>, sebott@redhat.com <sebott@redhat.com>, skolothumtho@nvidia.com <skolothumtho@nvidia.com>, philmd@linaro.org <philmd@linaro.org>, Andrea Bolognani <abologna@redhat.com>
->>>>>> Subject: Re: [RFC PATCH v1 00/13] named CPU models for ARM64 on KVM
->>>>>>
->>>>>> !-------------------------------------------------------------------|
->>>>>> CAUTION: External Email
->>>>>>
->>>>>> |-------------------------------------------------------------------!
->>>>>>
->>>>>> Hi Shaju,˝
->>>>>>
->>>>>> On 5/13/26 6:33 PM, Shaju Abraham wrote:
->>>>>>> Hi All,
->>>>>>>
->>>>>>> This RFC introduces "named" CPU models for ARM64 KVM guests. This
->>>>>>> is foundational for cross-host live migration and management-stack
->>>>>>> control over individual CPU features exposed to the guest.
->>>>>>>
->>>>>>> TL;DR Examples:
->>>>>>> # Boot with Grace CPU model
->>>>>>> qemu-system-aarch64 -cpu grace-v1 -machine virt,accel=kvm ...
->>>>>>>
->>>>>>> # Grace with a feature disabled
->>>>>>> qemu-system-aarch64 -cpu grace-v1,feat_SHA1=off ...
->>>>>>>
->>>>>>> # Host passthrough with individual feature control
->>>>>>> qemu-system-aarch64 -cpu host,feat_AES=aes ...
->>>>>>>
->>>>>>> # Neoverse v2 on Grace.
->>>>>>> qemu-system-aarch64 -cpu neoverse-v2-v1
->>>>>>>
->>>>>>> # Migration from Grace to Graviton3 (TBD)
->>>>>>> qemu-system-aarch64 -cpu neoverse-v1-v1 ...
->>>>>>>
->>>>>>> Relationship with Auger/Huck's customizable host model [1]:
->>>>>>> We have been working on this series in parallel with [1]. Eric Auger and
->>>>>>> Cornelia Huck's series [1] exposes raw SYSREG_<REG>_<FIELD> uint64
->>>>>>> properties on -cpu host, providing the essential low-level knobs for ID
->>>>>>> register customization. This RFC builds on the same KVM capability
->>>>>> Please find some comments/questions below.
->>>>>>> and can be layered on top of [1]:
->>>>>>> - Human-readable property names: feat_AES=pmull instead of
->>>>>>>  SYSREG_ID_AA64ISAR0_EL1_AES=2, with arch-defined named values
->>>>>>>  validated at set time.
->>>>>> From what I understand what you call feature here refers to an
->>>>>> ARM64_FTR_BITS definition in kernel arch/arm64/kernel/cpufeatures.c.
->>>>>> Named string values, safe policy and safe value are all extracted from
->>>>>> the kernel implementation and do not stem from the ARM ARM itself.
->>>>> Correct, a  CPU feature (that we talk about) is not the same as ARM ARM
->>>>> defined FEAT_*. As you say below, they really are much more complex to
->>>>> model. But `sve`, `pauth` defined by QEMU, are also not an ARM ARM
->>>>> defined FEAT. Because of the complexities of ARM ARM FEAT_s, we decided
->>>>> to go with ID register field-based properties with abstractions like (fractional
->>>>> and composites) on top.
->>>>>
->>>>> Yes, value names, safe policy, and safe value are taken from the kernel. But
->>>>> in most cases, value names already correlate with ARM ARM.
->>>>>
->>>>> For example,ID_AA64ISAR1_EL1.LS64:
->>>>>
->>>>> ARM ARM says:
->>>>> FEAT_LS64 implements the functionality identified by 0b0001.
->>>>> FEAT_LS64_V implements the functionality identified by 0b0010.
->>>>> FEAT_LS64_ACCDATA implements the functionality identified by 0b0011.
->>>>> FEAT_LS64WB implements the functionality identified by 0b0100.
->>>>>
->>>>> Named values in cpu-idregs.h.inc:
->>>>> IDREG_FIELD_START(ID_AA64ISAR1, LS64, 60, 4, EXACT, 0)
->>>>> IDREG_FIELD_ARCH_VAL(0b0000, "off")
->>>>> IDREG_FIELD_ARCH_VAL(0b0001, "ls64")
->>>>> IDREG_FIELD_ARCH_VAL(0b0010, "ls64_v")
->>>>> IDREG_FIELD_ARCH_VAL(0b0011, "ls64_accdata")
->>>>> IDREG_FIELD_ARCH_VAL(0b0100, "ls64wb")
->>>>> IDREG_FIELD_END(ID_AA64ISAR1, LS64)
->>>>>
->>>>> Values names are: lowered feat names with FEAT_ removed.
->>>>>
->>>>> For “on”/“off” toggle features: for example (XS, just below LS64):
->>>>> We have:
->>>>> IDREG_FIELD_START(ID_AA64ISAR1, XS, 56, 4, LOWER, 0)
->>>>> IDREG_FIELD_ARCH_VAL(0b0000, "off")
->>>>> IDREG_FIELD_ARCH_VAL(0b0001, "on")
->>>>> IDREG_FIELD_END(ID_AA64ISAR1, XS)
->>>>>
->>>>> ARM ARM says:
->>>>> FEAT_XS implements the functionality identified by 0b0001.
->>>> I agree with you on the fact that in general the association is fine. I
->>>> am confident that developpers who wrote 
->>>>
->>>> arch/arm64/kernel/cpufeatures.c did it in a sensible way. Still the problem comes when the end user/layered products have to guess those string values which are documented/defined nowhere besides in cpufeatures.c. How will they come to know which string values are supported and how they map onto any valid ARM ARM ID reg value? You cannot point them to any reference doc. Refering to past comments, Marc said he would even prefer not using
->>> We can absolutely point them to a reference doc, like cpu-features.rst,
->>> where we can document, property names, supported values and their meaning. 
->>>
->>>> kernel sysreg as a root of trust (hence the choice of extracting info from AARCHMRS) so I anticipate using arch/arm64/kernel/cpufeatures.c as input may be frown upon. But I may be wrong.
->>> Okay, will wait for community to reply on this.
->>>
->>>> I guess the usage of string values really depends on how many props layered products or user will need to set explicitly. Assuming we expose named models and this will be the main use case, my assumption is quite a few props will remain to be overriden on top of named model hardcorded values. And since the prop granularity is very low level anyway, if the end user has to identify and set an ID reg field, it can also set the associated uint64 value directly.
->>>>
->>>> My point is that compared to the original series Connie and I have been pushing,
->>>> - you still use the same prop granularity (ID reg field), somehow abusively called feature
->>> Not all are prop granularity are field level, FRAC and COMPOSITES (like
->>> sve, pauth for named models, will be in v2) are higher level constructs.
->> Currently only FRAC prop abstraction differ.
-> Yes. Composites on the way.
->
->>>> - you add significant complexity related to the string values (which are not referenced anywhere in the spec)
->>>> - you also add significant complexity related to different kinds and name patterns of props (FRAC, STRING, BOOLEAN, NUMERIC) while we only used SYSREG_REG_FIELD uint64_t props.
->>>>
->>>> While I am really interested in layering up named models on top of ID reg field properties, or even a real feature upper level abstraction, I am not sure the above extra complexity is worth while keeping the original IDreg field granularity.
->>>>
->>> Ignoring the prop names and value names which seems to be your main
->>> concern, our named model realization are not tied to those. They can
->>> work on top of SYSREG_<REG>_<FIELD> props.
->> Well, there is also the need/usage of safe policy and default value, see
->> below.
->>>>> There may be a few value names that do not make sense right now, but
->>>>> that does not de-merit the idea that perfectly works for most fields.
->>>>>
->>>>> Regarding the safe-value tag, I feel that it is the one thing that must come
->>>>> from the kernel; in the end, KVM is gonna validate based on that. If the
->>>>> static file feels problematic, another option is to introduce a new KVM ioctl. 
->>>>> We are fine with both.
->>>> safe policy and value are kernel defined. To be honest I still fail to
->>>> understand why they are mandated for named vcpu models. Please could
->>>> elaborate again?
->>> Use of safe-policy tag in QEMU: 
->>> - validate the configuration generated by named model or -cpu host,
->>>  with modified props are valid and not over promising host capability.
->>>  (Which you say to just delegate to KVM, x86 also validates in:
->>>   x86_cpu_filter_features, and blocks realization in x86_cpu_realizefn
->>>   if `enforce` is passed.). 
->> where is the safe rule currently used in this series?
-> Scope of v2. As replied on your series, with safe rules QEMU can let layered
-> products know what values a property can be set to on the given host.
->
-> Like with a qmp command like query-props-info:
-That looks promising.
->        ...
->        {
->            "name": "feat_RDM",
->            "supported-values": [
->                "off",
->                "on"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_ATOMIC",
->            "supported-values": [
->                "off",
->                "on"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_CRC32",
->            "supported-values": [
->                "off",
->                "on"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_SHA2",
->            "supported-values": [
->                "off",
->                "sha256",
->                "sha512"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_SHA1",
->            "supported-values": [
->                "off",
->                "on"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_AES",
->            "supported-values": [
->                "off",
->                "aes",
->                "pmull"
->            ],
->            "type": "string"
->        }
->        {
->            "name": "feat_NV",
->            "supported-values": [
->                "0.0"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_RAS",
->            "supported-values": [
->                "0.0",
->                "1.0",
->                "1.1_base"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_MPAM",
->            "supported-values": [
->                "0.0"
->            ],
->            "type": "string"
->        },
->        {
->            "name": "feat_CSV2",
->            "supported-values": [
->                "0.0",
->                "1.0"
->            ],
->            "type": "string"
->        },
->        ...
->
-> We get values supported for a property on the given host.
-> For example MPAM is not writable by KVM, hence only one supported value “0.0”,
-I guess this 0.0 value is retrieved from the host and does not come from
-a default value, right?.
-> CSV2 on the host is only “1.0” (architecturally, 2.0 is also valid), hence only “0.0” and “1.0” in the supported values.
-OK so here you use the safe rule to determine what valid values are left.
->>
->>
->>> - Properly report blockers in query-cpu-definitions. Without safe-value
->>>  tag, it is not possible to report per ID reg field blockers in
->>>  query-cpu-defnitions.
->> How does query-cpu-definitions help today?
->> query-cpu-definitions does not seem to return that kind of info.
->> Filtering host cpu model it just returns:
->> {"name": "host", "typename": "host-arm-cpu", "static": false,
->> "deprecated": false}]]
-> With our v2 patches: qeury-cpu-definitions will return along the lines of:
->
-> (Notice the blockers for named models we define in v1)
-> (Collected on Graviton3 host; hence no blockers for neoverse-v1-v1 or graviton3-v1)
->
-> {
->     "execute": "query-cpu-definitions"
-> },
-> {
->     "return": [
->         {
->             "name": "neoverse-n2",
->             "typename": "neoverse-n2-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a15",
->             "typename": "cortex-a15-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-m4",
->             "typename": "cortex-m4-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a57",
->             "typename": "cortex-a57-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm1176",
->             "typename": "arm1176-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a7",
->             "typename": "cortex-a7-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a76",
->             "typename": "cortex-a76-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "a64fx",
->             "typename": "a64fx-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a8",
->             "typename": "cortex-a8-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "neoverse-v1",
->             "typename": "neoverse-v1-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "kvm-base-v1",
->             "typename": "kvm-base-v1-arm-cpu",
->             "unavailable-features": [
->                 "hw_prop_BS",
->                 "hw_prop_CWG",
->                 "hw_prop_ERG",
->                 "feat_E2H0",
->                 "feat_EVT",
->                 "hw_prop_FWB",
->                 "hw_prop_IDS",
->                 "feat_XNX",
->                 "feat_VH",
->                 "hw_prop_VMIDBITS",
->                 "hw_prop_ASIDBITS",
->                 "hw_prop_CTX_CMPs",
->                 "hw_prop_BRPS",
->                 "feat_AdvSIMD",
->                 "feat_FP"
-what are unavailable features? not writable? not settable because the
-host already supports the only value regarding the safe rule?
-This will need to be documented
->             ],
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-r5",
->             "typename": "cortex-r5-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "grace-v1",
->             "typename": "grace-v1-arm-cpu",
->             "unavailable-features": [
->                 "feat_E0PD",
->                 "feat_TTL",
->                 "hw_prop_ST",
->                 "feat_PAN",
->                 "hw_prop_TGRAN4_2",
->                 "hw_prop_TGRAN64_2",
->                 "hw_prop_TGRAN16_2",
->                 "feat_SPECRES",
->                 "feat_SB",
->                 "feat_FRINTTS",
->                 "hw_prop_APA",
->                 "feat_TLB",
->                 "feat_TS",
->                 "feat_PMU",
->                 "feat_BT",
->                 "feat_SEL2"
->             ],
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-r5f",
->             "typename": "cortex-r5f-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "ti925t",
->             "typename": "ti925t-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm1026",
->             "typename": "arm1026-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a9",
->             "typename": "cortex-a9-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-m7",
->             "typename": "cortex-m7-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "neoverse-v1-v1",
->             "typename": "neoverse-v1-v1-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "graviton3-v1",
->             "typename": "graviton3-v1-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a710",
->             "typename": "cortex-a710-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm-v9_0-a-v1",
->             "typename": "arm-v9_0-a-v1-arm-cpu",
->             "unavailable-features": [
->                 "hw_prop_BS",
->                 "hw_prop_CWG",
->                 "hw_prop_ERG",
->                 "feat_E2H0",
->                 "feat_E0PD",
->                 "feat_EVT",
->                 "hw_prop_FWB",
->                 "hw_prop_VMIDBITS",
->                 "hw_prop_ASIDBITS",
->                 "feat_SPECRES",
->                 "feat_SB",
->                 "feat_FRINTTS",
->                 "feat_TS",
->                 "hw_prop_CTX_CMPs",
->                 "hw_prop_BRPS",
->                 "feat_BT",
->                 "feat_SEL2",
->                 "feat_AdvSIMD",
->                 "feat_FP"
->             ],
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "neoverse-v2-v1",
->             "typename": "neoverse-v2-v1-arm-cpu",
->             "unavailable-features": [
->                 "feat_E0PD",
->                 "feat_TTL",
->                 "hw_prop_ST",
->                 "feat_PAN",
->                 "hw_prop_TGRAN4_2",
->                 "hw_prop_TGRAN64_2",
->                 "hw_prop_TGRAN16_2",
->                 "feat_SPECRES",
->                 "feat_SB",
->                 "feat_FRINTTS",
->                 "hw_prop_APA",
->                 "feat_TLB",
->                 "feat_TS",
->                 "feat_PMU",
->                 "feat_BT",
->                 "feat_SEL2"
->             ],
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-r52",
->             "typename": "cortex-r52-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "sa1110",
->             "typename": "sa1110-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "sa1100",
->             "typename": "sa1100-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "max",
->             "typename": "max-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-m0",
->             "typename": "cortex-m0-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a53",
->             "typename": "cortex-a53-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm-v8_4-a-v1",
->             "typename": "arm-v8_4-a-v1-arm-cpu",
->             "unavailable-features": [
->                 "hw_prop_BS",
->                 "hw_prop_CWG",
->                 "hw_prop_ERG",
->                 "feat_E2H0",
->                 "feat_EVT",
->                 "hw_prop_FWB",
->                 "feat_XNX",
->                 "feat_VH",
->                 "hw_prop_VMIDBITS",
->                 "hw_prop_ASIDBITS",
->                 "hw_prop_CTX_CMPs",
->                 "hw_prop_BRPS",
->                 "feat_AdvSIMD",
->                 "feat_FP"
->             ],
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-m33",
->             "typename": "cortex-m33-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a72",
->             "typename": "cortex-a72-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a78ae",
->             "typename": "cortex-a78ae-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm946",
->             "typename": "arm946-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a55",
->             "typename": "cortex-a55-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "host",
->             "typename": "host-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm11mpcore",
->             "typename": "arm11mpcore-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-m55",
->             "typename": "cortex-m55-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "neoverse-n1",
->             "typename": "neoverse-n1-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm926",
->             "typename": "arm926-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm1136",
->             "typename": "arm1136-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-a35",
->             "typename": "cortex-a35-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "arm1136-r2",
->             "typename": "arm1136-r2-arm-cpu",
->             "static": false,
->             "deprecated": false
->         },
->         {
->             "name": "cortex-m3",
->             "typename": "cortex-m3-arm-cpu",
->             "static": false,
->             "deprecated": false
->         }
->     ]
-> }
->
-> Now imagine a layered product which sets some properties values on top of named models
-> Like -cpu graviton3,feat_AES=aes, “feat_AES” might be a blocker for the graviton3 named
-> model (assume graviton3 named model sets feat_AES="pmull" and host only supports "aes”)
->
-> Then with the two json qmp outputs from above can be used by layered products to
-> infer that even tho graviton3 is blocked by feat_AES, It setting a valid value on top
-> so, The model + (feat_AES=aes) will be realisable on the given host.
+If my math is correct it would expand into 
 
-makes sense
->
->>>
->>>> Why can't you start from the host values and override them with the
->>>> named vcpu model settings? If the new value cannot be applied by KVM, it
->>>> will reject it and fail the vcpu init.
->>> I think you are mixing up two things. For safe-value tag argument, Yes,
->>> but then what about proper query-cpu-definitions integration?
->> See above, what do you mean?
->>> For named model we cannot start with host-values. As different KVM versions
->>> or host might expose different set of fields, or ARM ARM defining a new
->>> ID register or a new field in existing ID register.
->> I understand a named vcpu model shall be fully determined, ie. all ID
->> regs shall be set to a relevant value determined by the vcpu model.
->> To me those default values rather depend on the VCPU model. a v8 default
->> value may not be the same as a v9 value because a feature has become
->> mandated. So why aren't the default values set within the vcpu model
->> definition instead of intarget/arm/cpu-idregs.h.inc?
->>
->> Then you have 2 categories of fields: writable or not. If you want to
->> try and set all field values, effectively you may need to define props
->> for fields which are even not writable. This can easily evolve from the
->> original series [1].
-> What if a new id register is introduced? This is need all the already defined 
-> named models to have values for those also.
+  __SVE_ZREGS_OFFSET + __SVE_ZREG_SIZE(vq) * 32 + __SVE_PREG_SIZE(vq) * 16
 
-yes
->
->>> A model needs to be future compatible and provide exact set of ID register
->>> values on any host/kernel it runs on.
->> I am not really sure this is always feasible. Assuming there is a bug
->> fix in the kernel that changes the way an ID reg access is
->> sanitized/accepted/rejected, you may break the vcpu model. ie. a former
->> ID reg value may have been accepted and is not anymore or conversely.
->>
->> But on the principle I agree with you.
-> If a value cannot be shown to the guest, the model should not be realisable, 
-> simple right? For these cases we will have -v2, -v3, …. But v1 should never
-> Change the set of ID register values it shows to the guest.
+or, given __SVE_ZREGS_OFFSET is 0, just
 
-yes. version increment is requested in that case
->
->>> This is the exact reason why we have default values. Simply 0ing the whole
->>> idregs[] does not work because of SIGNED_LOWER features like FP (and more)
->>> or RES1 fields in CTR_EL0 etc; Something should say what the default value
->>> of a register should be.
->> yeah but still isn't it named model specific?
-> This also works if we know what happens when a new ID register is introduced.
-Somehow each ID reg should have an initialized state and we should make
-sure it gets a properly set value from the hierarchy of named models.
->
->>>> Moreover if one ID reg field that needs to be overriden is not writable
->>>> with that host kernel, the prop won't exist and the named model won't
->>>> work on that host either.
->>> Why only add prop for writable fields in [1]? There must be props for all
->>> fields. Anyway if non writable fields differ, it will be caught by KVM.
->> Up to now the goal of [1] was slighly different, ie. allowing to slighly
->> alter ID reg values compared to host passthrough values so that the
->> model becomes migratable between 2 machines. We had cases where only
->> altering one CTR_EL0 field made it migratable for instance. Also in [1]
->> there was not real point exposing a property for an ID reg field that
->> was not writable. However I agree on the fact that for named models
->> things need to be more determistic and you also need to try applying
->> values that are not writable and see if they are the same that host
->> default value.
->>> For example, a named model might be blocked because of a non-writable field
->>> is differing from host and the prop for the same is not present. (Let’s say
->>> model abc, wants field FP=fp16 (not writable by KVM), but the host has value
->>> FP=on).
->>>
->>> But user should be absolutely be able to make the model realisable by passing
->>> -cpu abc,FP=on.
->> agreed
->>> Even without named models, I assume end goal of customisable host models would
->>> be a way to see if on a cluster of slightly differing cpus can we have a common
->>> denominator of features to expose to enable migration between hosts. If we do
->>> not exposes non-writable fields, how will higher stack know what are the values
->>> of non-writable fields on a host? And if non-writable fields are ignored, we can
->>> not provide a strict migration contract.
->> At the moment it was more a trial and error process I acknowledge. You
->> try to migrate. You get what's wrong through traces on destination side.
->> Then you alter the ID reg fields that cause trouble in case they are
->> writable (ie. props are exposed). This is not production grade I agree.
->> But even with your current approach you still fail to provide tools for
->> layered products to understand what named model applies to this host and
->> can be migrated to another one, I think.
->>
-> we just sent v1 for comments, v2 as mentioned already takes care of all this cases.
-> It is WIP and needs some polishing. But main qmp reponses I have shared above.
->
->> Note that if we expose everything through props, you well get all the
->> values on src and dst that mismatch but you will fail to know which
->> mismatches are correctable (because you don't know whether fields are
->> writable) ;-) How can you eventually determine the mismatch is fixable?
->>
-> Some new qmp command like “query-props-info” I shared above.
-This is indeed needed to get the full picture. 
->
->>
->>>>> Regarding default values, I do not see any reset values populated in
->>>>> AARCHMRS_OPENSOURCE_A_profile_FAT-2026-03/Registers.json, I
->>>>> may be missing something here. Is there some other place where we can
->>>>> find ARM ARM defined reset values?
->>>>>
->>>>>> If the named vcpu models anyway use hardcoded values I wonder if it is
->>>>>> so important to have named string values whereas a comment would do the
->>>>>> job in the named vcpu model definition?
->>>>> While true, for a named model, numerical field values will suffice as well. It’s
->>>>> just a way of representation. But for end users, I will argue, named values
->>>>> are more user-friendly.
->>>> to me, again, it would be if those values were properly specified which
->>>> is not the case.
->>>>> On x86, the user does not modify a specific cpuid leaf to turn a feature on or off.
->>>>> They have assigned a name to each leaf in the spec.  Our value names in most
->>>> in the spec ;-) That's a big difference.
->>> As above mentioned example of LS64 (in most cases) ARM ARM does say FEAT_ABC for
->>> a value ‘y’. and our name for value 'y' is ‘abc’. We can keep the value names same
->>> as ARM ARM (i.e val y = “FEAT_ABC”) if that suits better.
->>>
->>>>> cases already make perfect sense, as mentioned above.
->>>>>
->>>>>> From a spec pov I had in mind that a defintion of a FEAT could be much
->>>>>> more complex that just 1 field (for instance could be a combination of
->>>>>> several of them)
->>>>> Agreed. Hence, the ID register field-based properties.
->>>>>
->>>>>> It is not clear to be if you allow the end-user to overwrite a property
->>>>>> on top of a named model setting.
->>>>> Yes, the end user can change the property on top of the named model as
->>>>> illustrated in the examples. 
->>>>>
->>>>>>> - Default values and forward compatibility: CPU models start from a
->>>>>>>  known-zero baseline rather than the host view, so new fields/registers
->>>>>> [1]
->>>>>>>  introduced in future kernels do not silently leak into existing models.
->>>>>>> - Named CPU models with hierarchical inheritance: grace-v1,
->>>>>>>  neoverse-v2-v1, etc.
->>>>>>>
->>>>>>> The two series can coexist; this series can be rebased on top of [1].
->>>>>>>
->>>>>>> [1] https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_qemu-2Ddevel_20260503073541.790215-2D1-2Deric.auger-40redhat.com_&d=DwIDaQ&c=s883GpUCOChKOHiocYtGcg&r=sY-XeNqcuy_ruBQ9T7A2LmG6ktyYXXSxRB1ljkxMepI&m=fpNKdg99IJhj_lpxANCw1YCGZfWRAyz1YWNycq_dH0Rdg8U46NwjIJ3BvFyYb-e7&s=xzjnJMwOvSYbQjuaej-yNezaOn0DWWfAJho6IG_AEto&e=
->>>>>>>
->>>>>>> Problems with defining "named" CPU models for ARM64 KVM guests:
->>>>>>> * Features are not single CPUID bits. They are mostly multi-bit fields
->>>>>>>  encoding version/level instead of just presence. A single field encodes
->>>>>>>     multiple ARM ARM defined features (FEAT_s) at different thresholds.
->>>>>> would be good to provide an example for each challenge. I remember
->>>>>> Connie provided some in the past though her KVM forum presentations.
->>>>> Acked. Will add in v2.
->>>>>
->>>>>>> * KVM does not allow all registers and fields to be modified for a guest.
->>>>>>>  Some fields KVM does not virtualise at all (SME) or only support host
->>>>>>>     values (BRPs, CWG, etc.). This is evolving and differs between kernel
->>>>>>>     versions.
->>>>>> this seems to be contradictory to [1]. Do you have a mix of host
->>>>>> inherited values and hardcoded value or do you only have hardcoded values?
->>>>> A named model will not be realizable on a given host if any of the above non-writable
->>>>> fields differ between the host and the named model. We realize the named model fully
->>>>> from a  zeroed-out cpu->isar.idregs[] (no host features) exposed. A model is also not
->>>> why is it mandated to start from zeroed cpu->isar.idregs[]? Why can't
->>>> you start with host initialized cpu->isar.idregs[] and overwrite
->>>> everything that characterizes the named vcpu model.
->>> As explained above, we leak host features. 
->> OK understood. cpu->isar.idregs[] needs to be fully determined. My
->> assumption was that you are not going to run any vcpu model on any host
->> and there was minimal adherence between both, hence my original statement.
->>>>> realizable on a host if it over-promises features that are not actually available on the
->>>>> host (the need for safe-value tags).
->>>>>
->>>>>>> * ARM does not have a single natural granularity for CPU models unlike
->>>>>>>  x86. ARM has architecture, reference core and SoC levels each becoming
->>>>>>>     more granular.
->>>>>>> * ARM has dozens of vendors and it will be tricky to maintain models for
->>>>>>>  all of them.
->>>>>>> * Previous designs started from the host values and then subtracted
->>>>>>>  undesirable features. This is not forward-compatible; the design
->>>>>>>  should work when a new ID register or field is introduced.
->>>>>>>
->>>>>>> With the above problems in mind, the design has 3 layers:
->>>>>>>
->>>>>>> 1. ARM ID Register Field Table:
->>>>>>> - This layer maintains all architecturally defined ID registers and
->>>>>>>   ID register fields. It includes:
->>>>>>>             * Field name
->>>>>>>             * Field shift
->>>>>>>             * Field length
->>>>>>>             * Safe-value tag: LOWER, HIGHER, HIGHER_OR_ZERO, SIGNED_LOWER,
->>>>>>>                                               EXACT, ANY
->>>>>>>                     This will be used to validate user-provided values during
->>>>>>>                     CPU realization time against the host's value. I.e., if the
->>>>>>>                     host only supports "aes", a CPU model that sets "pmull"
->>>>>>>                     should be rejected.
->>>>>> why isn't the kernel doing that job already. Setting a value not
->>>>>> compatible with the host shall be rejected by the kernel, no?
->>>>> KVM will reject. But how will management stack know which values are supported?
->>>>> x86 is simpler; a feature is a single-bit toggle. All management stacks infer that if the
->>>>> value of a property is true, false is supported. And, for -cpu host if the property value
->>>>> is false, the feature is not supported on the host.
->>>> Well I would imagine that a cloud vendor wants to migrate between
->>>> different hosts which call for a specific named model (so there is
->>>> minimal alignment between the vcpu model and the host cpu). In the worst
->>>> case it is always possible to instantiate scratch named model vcpus and
->>>> see if the vcpu init succeeds. We could even provide a qmp utility or
->>>> any other scheme that returns all valid vcpu models for that host.
->>>> Anyway I think this will be needed. or -cpu help may be enhanced to do
->>>> that, not simply returning the theoretical named models that are
->>>> available but the ones which actually apply on that kernel. I can help
->>>> you investigating that direction if it can come as an alternative.
->>> This is fine, we always want to know which model is realisable on host. But also
->>> want to know "why a model is not realizable?".
->> Practically what kind of tools do you bring to know that? which qmp
->> command to you plan to implement?
-> On v2, we have implemented:
-> -> cpu-model-expansion: for host and named models, return the property values.
-> -> cpu-definitions: returned named models, and also populate blockers list with
->                              the properties that makes a model not realisable on the give host.
-> -> a new qmp command props-info (name not fixed): return what property values can be set on the give host.
->
-> Output blurb of query-cpu-definitions and query-props-info are attached above.
-OK
->>>
->>>>> On ARM, we don’t have that luxury; the management stack does not know which
->>>>> values are valid for a property. Ambiguity is:
->>>>> 1. How will management stack even know that a property is writable/modifiable?
->>>> this is already available in the original series through 
->>>>
->>>> query-cpu-model-expansion
->>> Again as the example above, I feel all fields (nonetheless writable or
->>> non-writable) should have a SYSREG_REG_FIELD prop.
->>>
->>>>> 2. For a 4-bit nibble, are all 16 values valid if it is writable?
->>>>> a) Lower values than the host?
->>>>> b) Higher values than the host? etc.
->>>> try to apply it and the kernel will simply let you know. Why
->>>> reimplementing this in qemu as it is done on the kernel with the safe
->>>> policy/value infra. 
->>> qmp query-cpu-definitions, users maybe okay with giving up some blocker features
->>> for a named model to run on a host. 
->> I do not catch sorry. 
-> For example on a Grace host, neoverse-v1 model has the following blockers.
-> {
-> 	"name": "neoverse-v1-v1”,
-> 	"typename": "neoverse-v1-v1-arm-cpu”,
-> 	"unavailable-features": [
-> 		"hw_prop_TGRAN4_2”,
-> 		"hw_prop_TGRAN64_2”,
-> 		"hw_prop_TGRAN16_2”,
-> 		“hw_prop_APA"
-> 	],
-> 	"static": false,
-> 	"deprecated": false
-> },
->
-> I might be okay with giving up pauth (APA) and TGRAN*_2 (nested page sizes) to make
-> neoverse-v1 realizable. With query-props-info  I will know all 4 props supports
-> value “off” on the host. So, -cpu neoverse-v1-v1,hw_prop_TGRAN*_2=off,hw_prop_APA=off
-> is actually realizable.
->
->>>>> Having a safe value tag in QEMU allows us to provide useful information like
->>>>> named model ‘blockers’/‘unsupported-features’ and supported property values.
->>>> This can be achieved in a different way, relying on the kernel.
->>>> Instantiate a scratch vcpu model and see if it inits. Some scratch vcpu
->>>> inits are already in place in qemu.
->>> This is interesting, sadly it only gives us the faulting ID register and not the
->>> faulting field.
->>>
->>> For example on a non realizable named model, we just get:
->>> ```
->>> qemu-system-aarch64: Could not set register system register op0:3 op1:0 crn:0 crm:7 op2:4 to 100000 (is 0)
->>> ```
->>> We can find out the faulting register from this, but not the faulting field.
->> You have the host ID reg (0) and the value you try to apply. An xor can
->> easily give you the fields that differ but not necessarily the field
->> that caused the actual write issue if several of them differ.
->> But what are you proposing to improve that atm?
-> Safe rules.
+  __SVE_ZREG_SIZE(vq) * 32 + __SVE_PREG_SIZE(vq) * 16
 
-OK
->
->>> Without per-field information, libvirt cannot translate this into a
->>> <blocker name='feat_AES'/> element. It can only say 'something in
->>> ID_AA64ISAR0_EL1 is wrong'.
->>>
->>>>> I feel the above should also be present for the customizable host model series [1],
->>>>> providing valid values along with properties is much more useful for management
->>>>> stack.
->>>> you can already introspect which ID reg are writables. You cannot get
->>>> the values that are valid for that host but any attempt to write invalid
->>>> values already fail the vcpu init. I tested that with kernel ID_FILTERED
->>>> id regs.
->>> Again, I feel there should be properties for all fields not just the writable fields.
->>>
->>>>>>>             * Default value: The value to which the field is reset. This gives
->>>>>>>                     CPU models a clean cpu.isar.idregs[] baseline instead of the
->>>>>>>                     host view provided by the kernel, as in previous designs.
->>>>>>>                     This also complements the forward-compatibility story. Given
->>>>>>>                     the "default" values, higher levels need not worry about new
->>>>>>>                     fields/registers being introduced.
->>>>>>>             * Architecturally defined named values like "off", "aes", "pmull",
->>>>>>>                     etc.
->>>>>>>             * These values are derived from the kernel's ftr_bits array and
->>>>>>>               tools/sysreg file.
->>>>>>>  E.g:
->>>>>>>
->>>>>>>   IDREG_START(ID_AA64ISAR0)
->>>>>>>   IDREG_FIELD_START(ID_AA64ISAR0, AES, 4, 4, LOWER, 0)
->>>>>>>   IDREG_FIELD_ARCH_VAL(0b0000, "off")
->>>>>>>   IDREG_FIELD_ARCH_VAL(0b0001, "aes")
->>>>>>>   IDREG_FIELD_ARCH_VAL(0b0010, "pmull")
->>>>>>>   IDREG_FIELD_END(ID_AA64ISAR0, AES)
->>>>>>>      ....
->>>>>>>      IDREG_END(ID_AA64ISAR0)
->>>>>>>
->>>>>>> - This layer is the single source of truth for ARM64 ID registers.
->>>>>> single source of truth extracted from the kernel and not from the spec.
->>>>>> What if we discover a bug in ARM64_FTR_BITS chang default or safe value
->>>>>> for instance. How does the change propagate to qemu and existing models?
->>>>> Relaxation of safe value tag is safe, (EXACT -> LOWER -> ANY). Change in
->>>>> default value should not happen; instead, that should be handled with the
->>>>> “kvm-base” model, which is defined for KVM quirks. Same implications as
->>>>> ARM ARM changes the field’s semantics.
->>>>>
->>>>>>>   The default values and safe-value tags are manually derived from the
->>>>>> default value, if equal to reset value could be extracted from the spec
->>>>>> directly.
->>>>> Again, I checked AARCHMRS_OPENSOURCE_A_profile_FAT-2026-03/Registers.json,
->>>>> and the reset values were null. I may be missing something. Is there any
->>>>> other place  we can get ARM ARM defined reset values? We can modify
->>>>> the script in [1] to also have default values for named model infra.
->>>> I guess it is normal because those regs are ID regs. The minimum level
->>>> of support comes from the various revisions and reference core
->>> NI vals from kernel’s sysreg are very useful… I will let community decide on how we
->>> should maintain default values.
->> NI?
-> NI is sysreg file indicates the feature is not implemented. That values can be used
-> as the default id reg field value.
 
-OK
->
->>>> implementations. To me this is the huge job that needs to be done while
->>>> defining the various named models you drafted.
->>> That absolutely needs to be done if we don’t want to leak host features and provide
->>> strict migration contract.
->>>
->>>>>>>      kernel's ftr_bits array. Other boilerplate and arch-defined values are
->>>>>>>      script-generated.
->>>>>>>
->>>>>>> - AArch32 ID registers are added with a single field so they can be
->>>>>>>   zeroed out on hosts that support AArch32.
->>>>>>>
->>>>>>> - This layer also defines helpers for higher layers to extract and
->>>>>>>   manipulate ID register fields.
->>>>>>>     * arm_idregs_reset_to_defaults(): Reset all ID registers to their
->>>>>>>          default values.
->>>>>>>        * arm_idreg_field_read/write(): Read the value of an ID register
->>>>>>>          field.
->>>>>>>        * arm_arch_val_name/from_name(): Look up the arch-defined name for
->>>>>>>          a numeric field value.
->>>>>>>        * ...
->>>>>> this is a pity we have not exchanged on this earlier because that code
->>>>>> could have been shared instead of rewriting things and resetting all
->>>>>> credits.
->>>>> Let’s work together from now on :) 
->>>> yeah the problem is you reimplemented a different infrastructure for the
->>>> same prop granularity as you did not rely nor ever commented on the
->>>> original series. So the first thing is to converge on the base infra
->>>> (props) definition and then build layered named models on top of it. As
->>>> we do not agree for now, let's wait for other's comments...
->>>> I a bit frustrated you did not communicate with us before so that we
->>>> could have initiated cooperation before and even make the original
->>>> series evolve in the direction you needed for named vcpu models.
->>>>
->>> Our intention was not to reimplement the infrastructure, We first thought of
->>> implementing on top of v3 of [1], but that looked like not being actively
->>> worked on. For business deadlines we had to implement model realization.
->> You may have seen we did not get that many feedbacks either (including
->> yours) and some prerequisite series were needed ;-) I hope we will now
->> have more traction in the community.
->>> Our model realisation code can work on [1] if just default values/reset
->>> values are present.
->>>
->>> If complexities of safe-value tags and their advantage (as mentioned previously)
->>> are not acceptable by the community, we will rebase our model realization logic
->>> on top of [1] while also adding default values.
->>>> But anyway, my end goal is to get those named models in a decent
->>>> timeframe so I am obviously willing to cooperate, hence the time I spend
->>>> reviewing your alternative implementation ;-)  
->>> Thanks for the detailed review, I am certain we both can make progress.
->>>
->>>>>>>     - This layer creates the following tables using X-macro expansion:
->>>>>>>        * arm_idregs[]: Array of ID register descriptors.
->>>>>>>        * arm_field_locs[]: Array of field location descriptors.
->>>>>>>             (fieldIDx -> registerIndex, fieldIndex)
->>>>>>>        * ...
->>>>>>>
->>>>>>>  - The ArmIdReg struct also includes a writable_mask to track which
->>>>>>>    bits are writable by KVM. This is populated at runtime during
->>>>>>>    scratch VM creation, and is further used to validate that only
->>>>>>>    the writable bits are modified by the CPU model.
->>>>>> this is an interesting idea that could have been also used in previous
->>>>>> contributions.
->>>>> Acked.
->>>>>
->>>>>>> 2. ARM Properties Layer:
->>>>>>> A small property layer on top of the ID Register Field table is defined.
->>>>>>> This series defines two types of properties with plans for one more
->>>>>>> in the future:
->>>>>>>    - Single field properties: These represent ARM FEAT_X features
->>>>>>>         that correspond to a single ID register field. Example: feat_AES,
->>>>>>>         feat_SHA2, etc.
->>>>>>>
->>>>>>>             The property name is set as "feat_<FieldName>" and possible values
->>>>>>>             are the arch-defined named values. This can be further categorized
->>>>>>>             into:
->>>>>>>                     * STRING: multi-bit fields (>=2 bits) with arch-defined named
->>>>>>>                               values, example: feat_AES, feat_SHA2, etc.
->>>>>>>                     * BOOLEAN: 1-bit fields only (true/false)
->>>>>>>                               example: hw_prop_IDC, hw_prop_DIC, etc.
->>>>>>>                     * NUMERIC: IDREG_ANY fields with no named values (raw integer)
->>>>>>>                               example: hw_prop_BS, hw_prop_DZP, etc.
->>>>>> I just wonder if we need all that complexity if eventually we hardcode
->>>>>> values in named vcpu models
->>>>> Then we are just delegating the complexity to the management stack. For
->>>>> example, without fractional prop, the management stack must know CSV2,
->>>>> CSV2_Frac relation, and not all value combination of <CSV2>.<CSV2_Frac>
->>>>> are valid. Rather than having different management software solving the
->>>>> same problem, we can solve it once in QEMU.
->>>> well, named vcpu models hardcode 90% of the values, aren't they. Scratch
->>>> vcpu init attempts can let management layers know what named vcpu models
->>>> would work on that host I guess.
->>>>> We also have very active plans to hook up cpu-definitions, cpu-model-expansion,
->>>>> and more.
->>>>>>>             String property values are validated against the arch-defined named
->>>>>>>             values.
->>>>>>>
->>>>>>>             ID register fields that are not covered by single field properties
->>>>>>>             are also exposed as a property named hw_prop_FieldName. These are
->>>>>>>             usually implementation-defined values like cache geometry, debug
->>>>>>>             counter widths, etc. (CTR_EL0.*, DCZID_EL0.*, etc.)
->>>>>>>             Example: hw_prop_BS, hw_prop_DZP, etc.
->>>>>> how do you discriminate between those and field_ props? Again do we need
->>>>>> that complexity?
->>>>> Ummm, there is no special code for these props. They are just named differently
->>>>> as no ARM ARM FEAT_ relate to them.
->>>> Yes but I mean for the end user, this ends up with different prop names
->>>> which does not make their life easier to me, instead of SYS_REG_FIELD
->>>> pattern. also keep in mind that FEAT_ props are not, strictly speaking
->>>> what the spec call FEAT.
->>>>>>>             Single field properties are defined as:
->>>>>>>
->>>>>>>             ARM_PROP("prop_name", type, reg, field)
->>>>>>>             Example:
->>>>>>>             ARM_PROP("feat_AES", STRING, ID_AA64ISAR0, AES)
->>>>>>>
->>>>>>>             * Validation based on safe-value tags is yet to be implemented.
->>>>>>>
->>>>>>>   - Fractional properties: These represent ARM FEAT_X features that
->>>>>>>         use two fields (base + frac) across registers. Example: feat_CSV2,
->>>>>>>         feat_MPAM, etc.
->>>>>>>
->>>>>>>             The property name is set as "feat_<BaseFieldName>" and possible
->>>>>>>             values are the arch-defined string values like "0.0", "1.0", "1.1",
->>>>>>>             etc.
->>>>>>>
->>>>>>>             Fractional properties are defined as:
->>>>>>>             ARM_FRACTIONAL_PROP("prop_name", base_reg, base_field, frac_reg, frac_field)
->>>>>>>             Example:
->>>>>>>             ARM_FRACTIONAL_PROP("feat_CSV2", ID_AA64PFR0, CSV2, ID_AA64PFR1, CSV2_FRAC)
->>>>>>>
->>>>>>>
->>>>>>>             When a fractional property is set, both the base field and frac
->>>>>>>             field values are set to the corresponding values.
->>>>>>>             E.g: feat_CSV2=1.1 will set ID_AA64PFR0.CSV2=1 and ID_AA64PFR1.CSV2_FRAC=1.
->>>>>>>
->>>>>>>     - Composite properties (planned for v2):
->>>>>>>        These will act as master boolean switches that control a list of
->>>>>>>        fields. Example: pauth, sve, etc. Setting sve=on with a named model
->>>>>>>        will set all the SVE-related fields (ID_AA64ZFR0_EL1.*) along with
->>>>>>>        sveNNN vector-length. Similarly, setting pauth=on will set APA, GPA,
->>>>>>>        API, GPA3, GPI, GPA3 fields based on the named model.
->>>>>>>
->>>>>>>     - cpu_revision, cpu_partnum, etc. properties are introduced to expose
->>>>>>>       MIDR, REVIDR, AIDR fields.
->>>>>>>
->>>>>>>     Exceptions to the property naming are made for ID_AA64PFR0_EL1.ELx
->>>>>>>     fields, which are named elx_mode.
->>>>>> yet another naming exception. 
->>>>> A better name is always welcome! We can iterate over both the prop name and
->>>>> the value name.
->>>> yeah but is it making end user life easier?
->>> We believe so.
->>>
->>>>>>>     This series defines over 130 single field properties plus 4
->>>>>>>     fractional properties. All properties work with -cpu host also.
->>>>>> Similary as with the host "custom" series, one needs to address
->>>>>> collision between legacy cpu properties and low level ones too.
->>>>> Agreed, This needs more thoughts. It is not a part of this RFC.
->>>> I have further thought on this when respinning the original series into
->>>> v5. I believe the props can follow a hierarchy. ID reg field props are
->>>> the lowest level props and apply first. Then come the higher level
->>>> legacy options that are likely to override them. I am waiting for
->>>> comments on the series but this is proposal I would make.
->>> Interesting, will look through the v5 code.
->>>
->>>>>>>     All properties change the cpu.isar.idregs[] values which are later
->>>>>>>     written back to KVM at the end of kvm_arch_init_vcpu().
->>>>>>>
->>>>>>>     * The arch-defined named values and property names can be iterated
->>>>>>>       until they make sense.
->>>>>>>
->>>>>>> 3. ARM CPU Model Hierarchy:
->>>>>>>
->>>>>>> A small named model layer is defined on top of the properties. An ARM named
->>>>>>> CPU model defines a list of property values and a parent model. A child
->>>>>>> model naturally inherits all the properties from its parent and can
->>>>>>> override them when needed.
->>>>>>>
->>>>>>> The initial model hierarchy shipped here is:
->>>>>>>  kvm-base-v1                  KVM-imposed quirks
->>>>>>>    arm-v8_4-a-v1              ARMv8.4-A architectural mandate
->>>>>>>        neoverse-v1-v1         Neoverse V1
->>>>>>>                 graviton3-v1         AWS Graviton3
->>>>>>>             arm-v9_0-a-v1            ARMv9.0-A architectural deltas on top of ARM-v8_4-a-v1
->>>>>>>        neoverse-v2-v1         Neoverse V2
->>>>>>>          grace-v1             NVIDIA Grace
->>>>>> Do you have a strategy for named model validation, besides code review.
->>>>>> At least each vcpu named model shall be introduced in separate patch,
->>>>>> overrides clearly explained and links to the reference spec shall be
->>>>>> precisely given for review.
->>>>> Agreed, each model should be in a separate patch, with overrides and new
->>>>> introductions clearly mentioned/documented with supporting ID register dumps.
->>>> Yes I believe it is a huge work to assess the correctness of the
->>>> definition.
->>> I hope in long term vendors will chime in.
->>>
->>>>>>> (kvm-base-v1 and arm-vX are not meant to be realizable unless the
->>>>>>> user provides values for implementation-defined fields)
->>>>>>>
->>>>>>> So for example, grace-v1 defines Crypto fields and CTR_EL0.IDC/DIC on top
->>>>>>> of neoverse-v2-v1, which leaves those fields vendor-configurable.
->>>>>>>
->>>>>>> The hierarchy reflects a deliberate trade-off:
->>>>>>> - Architecture-level models (arm-v8_4-a-v1) maximize migration
->>>>>>>  compatibility but lack implementation-defined values.
->>>>>>> - Reference-core models (neoverse-v2-v1) enable migration across
->>>>>>>  SoCs sharing the same core design.
->>>>>>> - SoC models (grace-v1) expose the full hardware feature set but
->>>>>>>  limit migration to hosts with the same SoC.
->>>>>> What kind of migration did you exercise up to now?
->>>>> Successful same host migration with named models and migration
->>>>> from grace to graviton3 with neoverse-v1.
->>>>>
->>>>>>> At model realization time,
->>>>>>>  1. a clean slate of cpu.isar.idregs[] is created using
->>>>>>>        arm_idregs_reset_to_defaults().
->>>>>>>     2. Then, a model's full parent-chain is walked and all properties are
->>>>>>>        applied in order from parent to child.
->>>>>>>     3. Finally, kvm_arm_writeback_idregs() compares the model's desired
->>>>>>>        ID-register values against the host-provided cpreg snapshot and
->>>>>>>        writes back the writable bits, warning on any non-writable difference.
->>>>>>>
->>>>>>> Models will follow a monotonic versioning convention (grace-v1, grace-v2,
->>>>>>> ...) mirroring x86's scheme.
->>>>>>>
->>>>>>> * Please take the CPU model property values with a grain of salt.
->>>>>>> They are added based on what the guest-visible values are with "host"
->>>>>>> model on available hardware.
->>>>>> I don't catch the above statement.
->>>>> They don’t match the exact hardware specs. For example feat_CSV2 is capped
->>>>> at “1.0” by KVM regardless of what the hardware says. On Neoverse-v2, TRM
->>>>> says FEAT_CSV2_2 is implemented (i.e “2.0”)
->>>> OK. This is effectively an important aspect that, despite the value we
->>>> attempt to set on an ID reg field, KVM eventually does what he wants
->>>> with it according to its policy. I think it can ignore, sanitize, ...
->>>>>>> Benefits of this design:
->>>>>>>     - General benefits that come with properties and named CPU models,
->>>>>>>       like cross-host live migration, management-stack control over
->>>>>>>       feature exposure, etc.
->>>>>>>     - Forward compatibility: when a new ID register or field is
->>>>>>>       introduced, CPU models need not change; during realization they
->>>>>>>       will be populated with the default values. Only ID register/field
->>>>>>>       information needs to be added to the field table.
->>>>>>>     - As CPU models are hierarchical, defining a new model is much easier.
->>>>>> I like the hierarchical approach but to be honest, at the moment, I miss
->>>>>> knowledge on whether it safely applies. I agree that named vcpu models
->>>>>> are the end target goal while [1] is rather an intermediate step that
->>>>>> was paving the way for it. I rather saw [1] as a tool box for enhaving
->>>>>> the host model and understanding issues when migrating. I wish we could
->>>>>> share the foundations instead of having totally separate contributions. 
->>>>> Definitely, let’s build a common foundation. We need to agree on safe-value tags,
->>>>> default values, and value names. We can build our solution on top of [1], if at least
->>>>> safe-value tags and default values are present.
->>>> To me there are several aspects
->>>> 1) decide which ID reg properties are needed/better (unique uint64_t or
->>>> your various prop flavours)
->>> We will agree on whatever community agrees on. If our names are discouraged we
->>> will move to [1]’s prop names.
->>>
->>>> 2) usage of safe policy/value (is it really mandated). Why can't we use
->>>> scratch vcpus. Possibly if it is proven to be mandatory this is
->>>> independent on 1
->>> Default-values/reset-values are absolutely needed. safe-value tags are also a
->>> must have if we want parity with x86 QEMU’s qmp capabilities.
->>>
->>> Warm Regards,
->>> Khushit
->>>> 3) definition of named models
->>>>
->>>> Thanks
->>>>
->>>> Eric
->>>>>>>     - The property names and values are self-documenting.
->>>>>> not really sorry (because it does not match the spec). I don't think we
->>>>>> can ask the end-user to read the kernel code.
->>>>> Acked, We will add appropriate documentation in QEMU.
->>>>>
->>>>>>> NOTE: ~2200 of the ~3300 added lines are declarative (field table,
->>>>>>> model definitions, properties, etc.)
->>>>>>>
->>>>>>> Tested with KVM on an NVIDIA Grace host.
->>>>>>>
->>>>>>> Relationship with existing code base:
->>>>>>> - It does not change any TCG-based code paths.
->>>>>>> - For KVM host passthrough it just adds property support.
->>>>>> with hardcoded reset values, correct? Instead of host retrived values?
->>>>> Reset values are not used with the -cpu host. Only for the named model
->>>>> realization, reset values are used.
->>>>>
->>>>>>> - Does not change any existing properties or other code paths.
->>>>>> yes but if it words along with legacy options, you share our concern to
->>>>>> coexist with them
->>>>> Yes, it requires some more thoughts.
->>>>>
->>>>>>> - Can layer on top of the SYSREG_ property series [1].
->>>>>> but in that case why don't you simply reuse it to build the named vcpu
->>>>>> model. I don't say the previous properties are the ideal solution but I
->>>>>> am not sure the mix or heterogenously named ones introduced here + value
->>>>>> strings retrieved from the kernel are better. At least the SYSREG ones
->>>>>> matched the spec with raw values, which bring simplicity in the code.
->>>>>> And since the end user shall be so much involved in provided extra
->>>>>> SYSREG values himself on top of named vcpu models, ...
->>>>> We can build on [1] as long as we have default values and safe-value tags.
->>>>> They are required for the proper model realization and QMP integration.
->>>>>
->>>>>>> Planned Follow-ups:
->>>>>>>  - Composite properties with handling of sve, pauth for named models.
->>>>>> yes this is needed and I am currently working on this on [1]
->>>>>>>  - CLIDR_EL1 and CCSIDR_EL1 handling.
->>>>>>>     - Safe-value based validation logic.
->>>>>>>     - QMP commands like query-cpu-model-expansion are not hooked yet.
->>>>>>>       Blockers and supported values (calculated using safe-value tags
->>>>>>>       and runtime KVM writable masks) will be reported through them.
->>>>>>>       E.g. libvirt could report:
->>>>>>>         <property name='feat_AES' type='string' value='pmull'
->>>>>>>                   supports='off,aes,pmull'/>
->>>>>>>       and:
->>>>>>>         <cpu type='kvm' name='nvidia-grace-v1'
->>>>>>>                     typename='arm-nvidia-grace-v1-arm-cpu' usable='no'>
->>>>>>>           <blocker name='feat_AES'/>
->>>>>>>         </cpu>
->>>>>> adding Andrea for libvirt inputs
->>>>>>
->>>>>> Thanks
->>>>>>
->>>>>> Eric
->>>>> Warm Regards,
->>>>> Khushit
->> Thanks
->>
->> Eric
-> Warm Regards,
-> Khushit
->
->
+> -static inline void *sve_pffr(struct thread_struct *thread)
+> -{
+> -	unsigned int vl;
+> -
+> -	if (system_supports_sme() && thread_sm_enabled(thread))
+> -		vl = thread_get_sme_vl(thread);
+> -	else
+> -		vl = thread_get_sve_vl(thread);
+> -
+> -	return (char *)thread->sve_state + sve_ffr_offset(vl);
+> -}
+> -
+>  static inline void *thread_zt_state(struct thread_struct *thread)
+>  {
+>  	/* The ZT register state is stored immediately after the ZA state */
+> @@ -233,8 +215,8 @@ static inline unsigned int sve_get_vl(void)
+>  	return vl;
+>  }
+>  
+> -extern void sve_save_state(void *state, int save_ffr);
+> -extern void sve_load_state(void const *state, int restore_ffr);
+> +extern void sve_save_state(struct sve_state *state, int save_ffr);
+> +extern void sve_load_state(const struct sve_state *state, int restore_ffr);
+>  extern void sve_flush_live(bool flush_ffr, unsigned long vq_minus_1);
+>  extern void sme_save_state(void *state, int zt);
+>  extern void sme_load_state(void const *state, int zt);
+> diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+> index 01b5e6d51ba79..08f4863e67715 100644
+> --- a/arch/arm64/include/asm/fpsimdmacros.h
+> +++ b/arch/arm64/include/asm/fpsimdmacros.h
+> @@ -176,7 +176,15 @@
+>  		_sve_wrffr	0
+>  .endm
+>  
+> +.macro _sve_pffr ptr
+> +	.arch_extension sve
+> +	addvl	\ptr, \ptr, #16
+> +	addvl	\ptr, \ptr, #16
+> +	addpl	\ptr, \ptr, #16
+> +.endm
+> +
 
-Thanks
+This matches to the end result of sve_ffr_offset()
 
-Eric
+>  .macro sve_save nxbase, save_ffr
+> +		_sve_pffr	x\nxbase
+>   _for n, 0, 31,	_sve_str_v	\n, \nxbase, \n - 34
+>   _for n, 0, 15,	_sve_str_p	\n, \nxbase, \n - 16
+>  		cbz		\save_ffr, 921f
+> @@ -190,6 +198,7 @@
+>  .endm
+>  
+>  .macro sve_load nxbase, restore_ffr
+> +		_sve_pffr	x\nxbase
+>   _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
+>  		cbz		\restore_ffr, 921f
+>  		_sve_ldr_p	0, \nxbase
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ae24617380b8f..a366509c5944e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -759,7 +759,7 @@ struct kvm_host_data {
+>  	 * Hyp VA.
+>  	 * sve_regs is only used in pKVM and if system_supports_sve().
+>  	 */
+> -	u8	*sve_regs;
+> +	struct sve_state *sve_regs;
+>  
+>  	/* Ownership of the FP regs */
+>  	enum {
+> @@ -853,7 +853,7 @@ struct kvm_vcpu_arch {
+>  	 * floating point code saves the register state of a task it
+>  	 * records which view it saved in fp_type.
+>  	 */
+> -	void *sve_state;
+> +	struct sve_state *sve_state;
+>  	enum fp_type fp_type;
+>  	unsigned int sve_max_vl;
+>  
+> @@ -1097,10 +1097,6 @@ struct kvm_vcpu_arch {
+>  #define NESTED_SERROR_PENDING	__vcpu_single_flag(sflags, BIT(8))
+>  
+>  
+> -/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> -#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+> -			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
+> -
+>  #define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
+>  
+>  #define vcpu_sve_zcr_elx(vcpu)						\
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 8c4602c8f4356..38356eee592ad 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -121,8 +121,8 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu);
+>  void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
+>  #endif
+>  
+> -void __sve_save_state(void *sve, int save_ffr);
+> -void __sve_restore_state(void *sve, int restore_ffr);
+> +void __sve_save_state(struct sve_state *sve, int save_ffr);
+> +void __sve_restore_state(struct sve_state *sve, int restore_ffr);
+>  
+>  u64 __guest_enter(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index e30c4c8e3a7a7..1c2ffd063baa8 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -130,6 +130,8 @@ enum fp_type {
+>  	FP_STATE_SVE,
+>  };
+>  
+> +struct sve_state;		/* Opaque type */
+> +
+>  struct cpu_context {
+>  	unsigned long x19;
+>  	unsigned long x20;
+> @@ -164,7 +166,7 @@ struct thread_struct {
+>  
+>  	enum fp_type		fp_type;	/* registers FPSIMD or SVE? */
+>  	unsigned int		fpsimd_cpu;
+> -	void			*sve_state;	/* SVE registers, if any */
+> +	struct sve_state	*sve_state;	/* SVE registers, if any */
+>  	void			*sme_state;	/* ZA and ZT state, if any */
+>  	unsigned int		vl[ARM64_VEC_MAX];	/* vector length */
+>  	unsigned int		vl_onexec[ARM64_VEC_MAX]; /* vl after next exec */
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 9806fea8fea7c..66d880d081671 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -425,8 +425,7 @@ static void task_fpsimd_load(void)
+>  
+>  	if (restore_sve_regs) {
+>  		WARN_ON_ONCE(current->thread.fp_type != FP_STATE_SVE);
+> -		sve_load_state(sve_pffr(&current->thread),
+> -			       restore_ffr);
+> +		sve_load_state(current->thread.sve_state, restore_ffr);
+
+I do not know much about this code, I assume that live VL matches to current
+but having some logic to check that assumption would be handy...
+
+>  		fpsimd_load_common(&current->thread.uw.fpsimd_state);
+>  	} else {
+>  		WARN_ON_ONCE(current->thread.fp_type != FP_STATE_FPSIMD);
+> @@ -507,9 +506,7 @@ static void fpsimd_save_user_state(void)
+>  			return;
+>  		}
+>  
+> -		sve_save_state((char *)last->sve_state +
+> -					sve_ffr_offset(vl),
+> -			       save_ffr);
+> +		sve_save_state(last->sve_state, save_ffr);
+
+Few lines above we check that live VL matches our expectations 
+
+  WARN_ON(sve_get_vl() != vl)
+
+so we can rely on live VL value
+
+>  		fpsimd_save_common(last->st);
+>  		*last->fp_type = FP_STATE_SVE;
+>  	} else {
+> @@ -641,7 +638,8 @@ static __uint128_t arm64_cpu_to_le128(__uint128_t x)
+>  
+>  #define arm64_le128_to_cpu(x) arm64_cpu_to_le128(x)
+>  
+> -static void __fpsimd_to_sve(void *sst, struct user_fpsimd_state const *fst,
+> +static void __fpsimd_to_sve(struct sve_state *sst,
+> +			    struct user_fpsimd_state const *fst,
+>  			    unsigned int vq)
+>  {
+>  	unsigned int i;
+> @@ -668,7 +666,7 @@ static void __fpsimd_to_sve(void *sst, struct user_fpsimd_state const *fst,
+>  static inline void fpsimd_to_sve(struct task_struct *task)
+>  {
+>  	unsigned int vq;
+> -	void *sst = task->thread.sve_state;
+> +	struct sve_state *sst = task->thread.sve_state;
+>  	struct user_fpsimd_state const *fst = &task->thread.uw.fpsimd_state;
+>  
+>  	if (!system_supports_sve() && !system_supports_sme())
+> @@ -692,7 +690,7 @@ static inline void fpsimd_to_sve(struct task_struct *task)
+>  static inline void sve_to_fpsimd(struct task_struct *task)
+>  {
+>  	unsigned int vq, vl;
+> -	void const *sst = task->thread.sve_state;
+> +	const struct sve_state *sst = task->thread.sve_state;
+>  	struct user_fpsimd_state *fst = &task->thread.uw.fpsimd_state;
+>  	unsigned int i;
+>  	__uint128_t const *p;
+> @@ -791,7 +789,7 @@ void fpsimd_sync_from_effective_state(struct task_struct *task)
+>  void fpsimd_sync_to_effective_state_zeropad(struct task_struct *task)
+>  {
+>  	unsigned int vq;
+> -	void *sst = task->thread.sve_state;
+> +	struct sve_state *sst = task->thread.sve_state;
+>  	struct user_fpsimd_state const *fst = &task->thread.uw.fpsimd_state;
+>  
+>  	if (task->thread.fp_type != FP_STATE_SVE)
+> @@ -809,7 +807,8 @@ static int change_live_vector_length(struct task_struct *task,
+>  {
+>  	unsigned int sve_vl = task_get_sve_vl(task);
+>  	unsigned int sme_vl = task_get_sme_vl(task);
+> -	void *sve_state = NULL, *sme_state = NULL;
+> +	struct sve_state *sve_state = NULL;
+> +	void *sme_state = NULL;
+>  
+>  	if (type == ARM64_VEC_SME)
+>  		sme_vl = vl;
+> @@ -1645,7 +1644,7 @@ static void fpsimd_flush_thread_vl(enum vec_type type)
+>  
+>  void fpsimd_flush_thread(void)
+>  {
+> -	void *sve_state = NULL;
+> +	struct sve_state *sve_state = NULL;
+>  	void *sme_state = NULL;
+>  
+>  	if (!system_supports_fpsimd())
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f9fc85a0344e1..7a3db4d7dcdef 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2499,7 +2499,7 @@ static void __init teardown_hyp_mode(void)
+>  			continue;
+>  
+>  		if (free_sve) {
+> -			u8 *sve_regs;
+> +			struct sve_state *sve_regs;
+>  
+>  			sve_regs = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs;
+>  			free_pages((unsigned long) sve_regs, pkvm_host_sve_state_order());
+> @@ -2648,7 +2648,7 @@ static void finalize_init_hyp_mode(void)
+>  
+>  	if (system_supports_sve() && is_protected_kvm_enabled()) {
+>  		for_each_possible_cpu(cpu) {
+> -			u8 *sve_regs;
+> +			struct sve_state *sve_regs;
+>  
+>  			sve_regs = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs;
+>  			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_regs =
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 332c453b87cf8..b01d6622b8720 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -500,7 +500,7 @@ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	if (!kvm_arm_vcpu_sve_finalized(vcpu))
+>  		return -EPERM;
+>  
+> -	if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
+> +	if (copy_to_user(uptr, (void *)vcpu->arch.sve_state + region.koffset,
+>  			 region.klen) ||
+>  	    clear_user(uptr + region.klen, region.upad))
+>  		return -EFAULT;
+> @@ -526,7 +526,7 @@ static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	if (!kvm_arm_vcpu_sve_finalized(vcpu))
+>  		return -EPERM;
+>  
+> -	if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
+> +	if (copy_from_user((void *)vcpu->arch.sve_state + region.koffset, uptr,
+>  			   region.klen))
+>  		return -EFAULT;
+>  
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index aaa43554fd8e6..72e658255cda7 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -467,8 +467,7 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+>  	 * vCPU. Start off with the max VL so we can load the SVE state.
+>  	 */
+>  	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
+> -	__sve_restore_state(vcpu_sve_pffr(vcpu),
+> -			    true);
+> +	__sve_restore_state(kern_hyp_va(vcpu->arch.sve_state), true);
+
+We've just set live VL, so can rely on it
+
+>  	fpsimd_load_common(&vcpu->arch.ctxt.fp_regs);
+>  
+>  	/*
+> @@ -485,12 +484,11 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+>  static inline void __hyp_sve_save_host(void)
+>  {
+>  	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> -	u8 *sve_regs = *host_data_ptr(sve_regs);
+> +	struct sve_state *sve_regs = *host_data_ptr(sve_regs);
+>  
+>  	ctxt_sys_reg(hctxt, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
+>  	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
+> -	__sve_save_state(sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> -			 true);
+> +	__sve_save_state(sve_regs, true);
+
+We've just set live VL, so can rely on it
+
+>  	fpsimd_save_common(&hctxt->fp_regs);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 627762ed7327f..72d025b2178a7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -35,7 +35,7 @@ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
+>  	 * on the VL, so use a consistent (i.e., the maximum) guest VL.
+>  	 */
+>  	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
+> -	__sve_save_state(vcpu_sve_pffr(vcpu), true);
+> +	__sve_save_state(kern_hyp_va(vcpu->arch.sve_state), true);
+
+We've just set live VL, so can rely on it
+
+>  	fpsimd_save_common(&vcpu->arch.ctxt.fp_regs);
+>  	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
+>  }
+> @@ -43,7 +43,7 @@ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
+>  static void __hyp_sve_restore_host(void)
+>  {
+>  	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> -	u8 *sve_regs = *host_data_ptr(sve_regs);
+> +	struct sve_state *sve_regs = *host_data_ptr(sve_regs);
+>  
+>  	/*
+>  	 * On saving/restoring host sve state, always use the maximum VL for
+> @@ -55,8 +55,7 @@ static void __hyp_sve_restore_host(void)
+>  	 * need to be revisited.
+>  	 */
+>  	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
+> -	__sve_restore_state(sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> -			    true);
+> +	__sve_restore_state(sve_regs, true);
+
+We've just set live VL, so can rely on it
+
+>  	fpsimd_load_common(&hctxt->fp_regs);
+>  	write_sysreg_el1(ctxt_sys_reg(hctxt, ZCR_EL1), SYS_ZCR);
+>  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index cdaf53c833409..77dbcfed05486 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -82,7 +82,7 @@ static int pkvm_create_host_sve_mappings(void)
+>  
+>  	for (i = 0; i < hyp_nr_cpus; i++) {
+>  		struct kvm_host_data *host_data = per_cpu_ptr(&kvm_host_data, i);
+> -		u8 *sve_regs = host_data->sve_regs;
+> +		struct sve_state *sve_regs = host_data->sve_regs;
+>  
+>  		start = kern_hyp_va(sve_regs);
+>  		end = start + PAGE_ALIGN(pkvm_host_sve_state_size());
+> -- 2.30.2
+> 
+
+FWIW,
+
+Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 
