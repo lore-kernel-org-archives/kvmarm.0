@@ -1,84 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554AD3B4E80
-	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723391CFBA;
+	Thu, 28 May 2026 10:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779962147; cv=none; b=du9IFjiVwOzI/Gq88b9DjuTgt+eC9MKjHRqQsGNP1Ku7JzFs/i+JIguCwlZqM9jRkFhX1IlfdXVP4C0D2w49d9giLhY2TF3nfdjCZ7Tkq+eR4God5TKqQTF/Thp/ssNvnfnkJ4sXzvhJZkcgv2ewuNcrXEjt5ELeXiYddIu8j6Q=
+	t=1779963578; cv=none; b=d8LUe89PgW/dXLx2eRsBblQ/knQgbKfAqSwsP1ywjoRnRTd7VhFi9gUd4ygjf8jhTRu8iWJQOKeFtuizT44SAthcrSPhLP9WdTyMFvxOHtFpqPwbGE/iy5hCU8StCW/F8zt6taK7MFQPoerR6vFJBlYoqIVSbrxPw8VZl2zBQ1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779962147; c=relaxed/simple;
-	bh=+1wVAqRlhKf3c7sqkfh3JBpBe6PeJ2dRxvJY09h7QHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ex7oVpCzJWB1Iuo3u8Wbe8deOla2U9vggWTcRDjMPe0UPVgOLmYNuitnr/eJjTFltFjZqV00VLA33jjgzBE6f2ncVs82GdsCgCAQxofdJYyxTJF2PteDmRtMEFqHqxhOjUbssGNDf3744dElltoLbDLm8QzurfRAfDfL0V+uEH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TTlk7cJD; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1779963578; c=relaxed/simple;
+	bh=6uAFfW5Nwh2dC7wlTET1SOQKDqpnH7d0+cq/WR9a7zY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dhX287i3+1MbbI8WQjaRBtxeaajqHpK8N7zz9Llx3k90qPAQ+rVlOO8iH1BNQFC3bUgSunEeOmpb3Pwj1Tk5cJiIrVsRjZtS8qsrndB/D4NxemT/hC2tRwX9GTZ9z1sRuIpGADmMrf/fz8LLNEsNgBKKvqToqQ48wZGYJQZt+K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jM1qH2Lx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TTlk7cJD"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A7BE443F7;
-	Thu, 28 May 2026 02:55:40 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B76AA3F632;
-	Thu, 28 May 2026 02:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779962145; bh=+1wVAqRlhKf3c7sqkfh3JBpBe6PeJ2dRxvJY09h7QHQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TTlk7cJDqHd0sZQpXVRVYcD8hxsY6lBkBhBkA+r5F0517v337AbDj6Qob2Uun5d7/
-	 +BrBqlc5JPktWsiJejt+fw8ZV98X970/iuDUw9V69xjxreNfvu0kcmuzwTA/e06Py9
-	 TMROGBUZVEZn/yeCGvnszzxxS2oR0vLKbNfFjb9s=
-Date: Thu, 28 May 2026 10:55:32 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Handle unsupported guest translation
- granule sizes
-Message-ID: <iyfrjjhqej65nrfwmkws7kknpdcqr4uyzdtte3exlgf3ghfhux@pdi2wbnyyzcx>
-References: <20260414000334.3947257-1-weilin.chang@arm.com>
- <177996023466.1525303.2108207515102273832.b4-ty@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jM1qH2Lx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0531E1F000E9;
+	Thu, 28 May 2026 10:19:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779963577;
+	bh=hxafBVxBhxizzK5NE9P/7nJ1FC3CnetncTxpOBAxpdk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=jM1qH2LxjhJjFZwslPk2ueorJ3P7YzUQUam3KgDQJ9WOAreWExD56LRZkjxMrBaKV
+	 mzfACAfnlbZjRzs5CbYSayhPqMz/8V/g9mhYHSa/nyKpXfEj9bilfS60q4Bv3M+MdF
+	 FvE2DmdAngBZrEi/KiZ30DO1DlAjQeMxM/+WBK/oMfPtPhDE4KT1LFKuNR4AzO4Kw2
+	 ZpCH9fMy0LDrxZk54aw12EzIHFOjBqlss2u3nEUB8aJkusa7QghTmdQQKiXgqNXGV5
+	 KzaoWNhYRlMRnWdbrA/dH16742fdq7O6nqQlkfq4A+Yx7P/3cehoU3uEDzozgVmrO1
+	 Geh7iP1SoqhqQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wSXpu-0000000700q-3lTn;
+	Thu, 28 May 2026 10:19:35 +0000
+Date: Thu, 28 May 2026 11:19:34 +0100
+Message-ID: <86fr3bvnt5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 0/5] KVM: arm64: nv: Implement nested stage-2 reverse map
+In-Reply-To: <ag1jQB3dRX0RSqbR@sm-arm-grace07>
+References: <20260510145338.322962-1-weilin.chang@arm.com>
+	<ag1jQB3dRX0RSqbR@sm-arm-grace07>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <177996023466.1525303.2108207515102273832.b4-ty@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: itaru.kitayama@fujitsu.com, weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, May 28, 2026 at 10:24:01AM +0100, Marc Zyngier wrote:
-> On Tue, 14 Apr 2026 01:03:30 +0100, Wei-Lin Chang wrote:
-> > This is v2 of fixing the granule size selection for software stage-1
-> > and stage-2 walks. Thanks to Marc for the feedback on v1 ([1]).
+On Wed, 20 May 2026 08:31:12 +0100,
+Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+> 
+> Hi Wei Lin,
+> 
+> On Sun, May 10, 2026 at 03:53:33PM +0100, Wei-Lin Chang wrote:
+> > Hi,
 > > 
-> > * Changes from v1:
+> > This is v3 of optimizing the shadow s2 mmu unmapping during MMU
+> > notifiers.
 > > 
-> >   - Take the entire (v)tcr value for TGx decode helpers.
+> > Two new preparatory patches are added, one reduces a hole in kvm_s2_mmu
+> > and another refactors the code a bit during s2 faults. Other changes are
+> > listed below.
 > > 
-> > [...]
+> > * Changes from v2 [1]:
+> > 
+> >   - Removed "polluted" teminology.
+> > 
+> >   - Use xa_{mk, to}_value() when storing and retriving values from maple
+> >     trees.
+> > 
+> >   - Avoid using the 63rd bit in maple tree values so that xa_{mk, to}_value()
+> >     does not lose us a bit.
+> > 
+> >   - Added reverse map removal during TLBI handling.
+> > 
+> >   - Other suggested refactorings.
+> > 
+> > Thanks!
 > 
-> Applied to next, thanks!
-> 
-> [1/4] KVM: arm64: nv: Rename vtcr_to_walk_info() to setup_s2_walk()
->       commit: a878096e0e86b44e758aafc6b26af97e8f548673
-> [2/4] KVM: arm64: Factor out TG0/1 decoding of VTCR and TCR
->       commit: d7768b4f718503e79e7c626d29e9131b747148ee
-> [3/4] KVM: arm64: nv: Use literal granule size in TLBI range calculation
->       commit: b154da8288add1f6fb958797d0b3462800f9fc77
-> [4/4] KVM: arm64: Fallback to a supported value for unsupported guest TGx
->       commit: 8853566dfbab1a255ae72676ab5ec43e1631ddb7
+> With this series applied on the recent kvmarm/fixes (minor local modification), 
+> your v3 hello_nested runs fine on all three page granules; without this 16KB 
+> kernel can't handle stage 2 unmapping paths. I tested using the latest QEMU only 
+> so wonder how you're testing.
 
-Thanks for fixing the small issues!
+Can you clarify this statement?
 
-Wei-Lin Chang
+Are you saying that 16kB S2 unmap do not work with upstream? That
+seems odd, as it would mean NV wouldn't work on Apple HW, which
+represents two thirds of my development boxes...
 
-> 
-> Cheers,
-> 
-> 	M.
-> -- 
-> Without deviation from the norm, progress is not possible.
-> 
-> 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
