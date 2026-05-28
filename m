@@ -1,346 +1,348 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1CBEEA8
-	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 05:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252AB311959
+	for <kvmarm@lists.linux.dev>; Thu, 28 May 2026 05:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779946238; cv=none; b=FSZFDe2wyPtziMgIn65jbDKEtWxCdKR8RiNO5l+rXDUvBqdhYoJCmqM9bM61AOALoZppNTcKMfcicun1wji6ZEs4pzIuX9wWOlw9X8Rnl/5lwfVcqN01j03oo3O6pAr88mTCGOwAFjhbx/6v31FJ02AdUbZF6SZMGCyY2aR34nc=
+	t=1779947254; cv=none; b=DiKL4yNR8m+aN4/6yC48d5koNYplFNESBt8NEj9ULy4sB8s9enLqznNdH05ngj6/j6YLj8eJ9pt9DGsfEGZd9pR5Li0a51Ghvho0ZsXiDbiHNdtAd6X84f1hrzwt/nXXKwjdyTEYdutgr1ajS5v30ZdUTC5SCDqoEMriBK+BIyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779946238; c=relaxed/simple;
-	bh=DgWGKIje13k1TapEkr+MBgcoQR7z1LfAsyvCQ1fD20E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=APkgsXUbhqUvP4Qj7rBnxL/vXtTWqtgNRDWzQSDonoEZgRQPbPBOUiVtGXNf666PdN3a6UXyZdVSXCBRVOWwLD0tM0jD1M5uW5Lu5SDITcS3CaiJqhG8ys3dMN/hNpOsx/sqRLj8ZTGeJXJqMfvfHiHKqJPTrUcxVrr8JlpobaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qa6Gis8B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1779947254; c=relaxed/simple;
+	bh=lmWdNZbaObnmUVm75cZcwL9UP/kZ4ZTAnqFm1Ag82PM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=tUHz3wpjyLRB6n/FhtI5M1KLAItYrlH/jmpK13j39OXavS9NwrV9zQJyZC/+uS74UK1jc8JYDP9VUQ1QGkZ68VlAd9mixDBVDKgR2YEy9+cDBP6wikXYwbQqaM1wHkdCDeTNW7zACbnw7ZqQbxTmj5uLBocaMl881E5cldEpYk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BM0OLeP4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qa6Gis8B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779946234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q73WX9HWItM842HL8te6BLbm9UQjrRb26yA0hD3pI7M=;
-	b=Qa6Gis8BG1wUGDSH62+t+2Tlwjygubw1RSeXwSNm5LryKxXY0WB95vzYad0xD3s8fSqzRb
-	ghLLKYGzhlndFD/dE0XT5m+EaanMLlyJil0Z/Gt6XpHgLNl2QhIg/006MIQ8vhiZrMx4Fh
-	054RR9oi7fjT9RrI0m2ukVAFXWz6oXY=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-577-cHgx4tiXNda_CXOABiMl5w-1; Thu, 28 May 2026 01:30:33 -0400
-X-MC-Unique: cHgx4tiXNda_CXOABiMl5w-1
-X-Mimecast-MFC-AGG-ID: cHgx4tiXNda_CXOABiMl5w_1779946232
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2bf004bf8beso8049045ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 27 May 2026 22:30:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779946232; x=1780551032;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q73WX9HWItM842HL8te6BLbm9UQjrRb26yA0hD3pI7M=;
-        b=bGM8Gl3LmiGyzQfu5LkBxWsp6bl8EdCMaPsFDFViHdTG7i0/ld4GDS1oHHao0be+kW
-         texQOIrIjKYYZazY6Fuon7FaaLdXGxdepRYja5xYnqPiSXqrqFSgjV/U4VpNmwlh/J1Z
-         49htDdiKY55l9O6QvunSwWWrfK1+2ClRr/teKYWq5VoM2xt1ZObiKMVyuWtHqUmVEngj
-         eCjOyUXmgq2vKSfpcNYOkJYwWeaqiiTicIeObBCaU5SZDBm6q6YHX1aN3xzwZnXJrM/C
-         m7G2F7zBzOYhGg6euospjiOBuzIpUWyN6U6VCFHvPSbH1aLXaa3ODHx9qrcrOMZah1Cf
-         DZRQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+DxeWW9ChmpT2qYHrtERdyBuGrd32jCCA0toL2Tv6vQ94jutf4dzKcPjaNHKTRL5AUAjnPzmc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVXU+9QyIvnSYwChhKvSaOW7u88cdhfBxEzzkVfQh/wJciYcnM
-	gbOe8thkxhBpKz1e5kw8fGYOPEU87aJwkq7O2HXqNqbOTE2QtVNFxsPbRtsDknCIM1raM7UzVLE
-	PcdxVeAcg1/NCthk13Q1z8syct1X1Dxpfbaewf9zcCTzdtYN2Ybph48hOLQ==
-X-Gm-Gg: Acq92OGeLgFztaeZbr3YQPgBX8xQFv0xi7jTRQFh3dD2qcbvlMNSFCvcO9yWss0pEjN
-	KLZgX+r9IzAz1ejlocujFdnSyjJeKGom1lVq4Ix+B1BZ7+4SwSrcBa2tOaFIKL9JR81KfMB8mB/
-	iLvohtFZHZp1kz+wMl1PC5sMV5xxP+G2aLTl9MLgNIR+w0CtQ+bHYOmGBMT+Px8mgUx9CFdXjx1
-	LBO1O3r8qXkGWG3qDGvkp0DnadsMomfRY/DSwfWIrcFxhdzL0vNZbyEPHZYJcTUn1oYjiyZwDUO
-	PJr5hhRI8MQdpxf+CX2H8kdGzfptQTi5emQZBgBN77wicbfmPMO+O7KzXVnn+Dl8sRdJGbzVk8j
-	qPOEqg8v5OEuyBopp9jC9MTqCJBMZzA5gfQJt0apOSvVHC2IAb+M5TLeY7Cq5vEtlln9RGYyysw
-	E=
-X-Received: by 2002:a17:903:4b07:b0:2bd:5b20:a5b5 with SMTP id d9443c01a7336-2beb066cd73mr260282085ad.37.1779946232105;
-        Wed, 27 May 2026 22:30:32 -0700 (PDT)
-X-Received: by 2002:a17:903:4b07:b0:2bd:5b20:a5b5 with SMTP id d9443c01a7336-2beb066cd73mr260281545ad.37.1779946231485;
-        Wed, 27 May 2026 22:30:31 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56d2702sm173761155ad.31.2026.05.27.22.30.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2026 22:30:30 -0700 (PDT)
-Message-ID: <ea4be6c5-9506-4253-80c5-c76c9ac3b77d@redhat.com>
-Date: Thu, 28 May 2026 15:30:19 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BM0OLeP4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 877E31F00A3C;
+	Thu, 28 May 2026 05:47:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779947252;
+	bh=DK6yOv4xVJ9/sneezKNDMIziZQjzaXiJRFbqLkrGSqc=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=BM0OLeP4IqgBFjupjSqHpKqGZ0CI7GcreyYu6eF+5cG2e56PRt+bDgQuRxJU5XM3a
+	 yL7aepyQEwwJq7GSHNWP46Qm6kB2zZ7NlLGuWnFHS9CXmzQIjS7Z7eiMPNdH6xIgVv
+	 SoYHFeXl6UIrJIAcj8ileVYkyy0bXGHxLpJdEmMlA6rhP1pXx3T7V24T9bS2DnEnld
+	 TaEqPQlm3KCoWgi/Eipv68ow5pNNSNjW/ESTc+A9IKOGy18DBPywS2IDw34erfpogy
+	 4D7j8qrD0NM6HKTXsdgjFRST7GmaQvUgQdUW1PjpV538EaUYvG6A2SJuZWnYVgjutY
+	 9bVhlcyjO8BZg==
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfauth.phl.internal (Postfix) with ESMTP id A9096F4006C;
+	Thu, 28 May 2026 01:47:31 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Thu, 28 May 2026 01:47:31 -0400
+X-ME-Sender: <xms:89YXamHwIhO2-DK_eX2bOskcf21oK0bJwYhPB43mQPLpxuVB-cLQaw>
+    <xme:89YXajQ-iIrWPH87J7IF0CbG8KnhkBp0RR8zHnme_t_zQ2j8RKmj2pzIGo_jII5RM
+    kEzaUv1lV2l3iRZo9uBB30qE04HnWXpLpKp4aI_hWu1DCYgdiqhuPI>
+X-ME-Received: <xmr:89YXamTQtpaWnK5UCTLZ7-b9eYy8dkmgZzsEEp4TWfP2UfkWIRM3RnqhUjROM_tMqyqNZrCkJqg8ZYCwySgs3IMU9emCdPm3DPI>
+X-ME-Proxy-Cause: dmFkZTFmXmnPUHBlXPEK4FO4blsX5JSlZandmPSXAd6sisIa25T738qOMv8vIvRtp8+Gfi
+    kkf5MFJ/TlcuCSx6EbZublixxFqyZrQyhUsYzuuStoGOA0r55OFFemjxQCK7Vyj3RBs0tg
+    43Zsu1ApoTCk/fyNdxkqBok1DfImK8KzMGcBlVo4Eq56QJ8QpBgbEfR06tuNwxjV1IzyTs
+    bNgK9089KeZPQYq7QlLAAxnPqnoX+5IacmXXiQ3R7EV2whsTMmjlO316QnTmXmooip4XXc
+    k5Y1964dU+bdg8zThNP1aHBJAEXcc6aMIbc+9LNp+WikJx0Ye9P+fKqq0pfg0ESEorroOz
+    ymajd1CY8h9gOuU+4GoHA9X8re4ZOKTtm01mV+FgWU0SstdACkHYIk8OgKEDfXLslmj+gs
+    J1ios7bHGxhV8x/nKTHrOCxZKG+5YUVgIcophJTykeGdnFibXCyzs4lzXCNZjd8HPX16DE
+    O0RNwkBQshONJDsSc3yTkxPOqKcNSlEBzTN1bWrfZpZHeDA1mOweToYFoPWEMzWzGV2FTF
+    Gk8vGEfChl1pt/bPPiiKWaatIAHenqYb3X1+U1NAC3ge/jxJoCaShamQH4DPW/JpgIo0DE
+    mxukymeW0NMVElViFDBeayF6WjBVulDjSOm6o3RbJ50V6h1vMiphgGE+PAfA
+X-ME-Proxy: <xmx:89YXamdr5mG4v_h_Vb4izNDk9TUVmxpxdNKIBRM5wmrH6F_e3cMbeA>
+    <xmx:89YXaqf3TRVr2MjmhtDiUHFGtlB_-AYPvLgypAGFGAZcUKxFd7iZEA>
+    <xmx:89YXas8Xz9vpo5EgSYmp6RhUnhtK5XrjS8YcOEvBpVbDhdBWykw1ew>
+    <xmx:89YXaqM8BGbgkimRsvJVubk-we0T44jdadPoMfVRcghOgc3qG9EGPw>
+    <xmx:89YXaqXapuCpmqupvBRIQ0-s-NaFxX9PhKQmmkAahRyvsfKWaRnSsnxk>
+Feedback-ID: i67ae4b3e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 28 May 2026 01:47:30 -0400 (EDT)
+Date: Wed, 27 May 2026 22:47:29 -0700
+From: "Dan Williams (nvidia)" <djbw@kernel.org>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, 
+ linux-coco@lists.linux.dev, 
+ kvmarm@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, 
+ Alexey Kardashevskiy <aik@amd.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, 
+ Jonathan Cameron <jic23@kernel.org>, 
+ Marc Zyngier <maz@kernel.org>, 
+ Samuel Ortiz <sameo@rivosinc.com>, 
+ Steven Price <steven.price@arm.com>, 
+ Suzuki K Poulose <Suzuki.Poulose@arm.com>, 
+ Will Deacon <will@kernel.org>, 
+ Xu Yilun <yilun.xu@linux.intel.com>
+Message-ID: <6a17d6f1d6371_2b1fb710057@djbw-dev.notmuch>
+In-Reply-To: <20260427065121.916615-2-aneesh.kumar@kernel.org>
+References: <20260427065121.916615-1-aneesh.kumar@kernel.org>
+ <20260427065121.916615-2-aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v4 01/14] coco: host: arm64: Add host TSM callback and
+ IDE stream allocation support
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 26/44] arm64: RMI: Allow populating initial contents
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-27-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260513131757.116630-27-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: rJRInwJU6f1CY_M-LbgNryWjcBGSHLcvX93WCZJVKaQ_1779946232
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi Steve,
-
-On 5/13/26 11:17 PM, Steven Price wrote:
-> The VMM needs to populate the realm with some data before starting (e.g.
-> a kernel and initrd). This is measured by the RMM and used as part of
-> the attestation later on.
+Aneesh Kumar K.V (Arm) wrote:
+> Register the TSM callback when the DA feature is supported by KVM.
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v13:
->   * Rename realm_create_protected_data_page() to realm_data_map_init().
-> Changes since v12:
->   * The ioctl now updates the structure with the amount populated rather
->     than returning this through the ioctl return code.
->   * Use the new RMM v2.0 range based RMI calls.
->   * Adapt to upstream changes in kvm_gmem_populate().
-> Changes since v11:
->   * The multiplex CAP is gone and there's a new ioctl which makes use of
->     the generic kvm_gmem_populate() functionality.
-> Changes since v7:
->   * Improve the error codes.
->   * Other minor changes from review.
-> Changes since v6:
->   * Handle host potentially having a larger page size than the RMM
->     granule.
->   * Drop historic "par" (protected address range) from
->     populate_par_region() - it doesn't exist within the current
->     architecture.
->   * Add a cond_resched() call in kvm_populate_realm().
-> Changes since v5:
->   * Refactor to use PFNs rather than tracking struct page in
->     realm_create_protected_data_page().
->   * Pull changes from a later patch (in the v5 series) for accessing
->     pages from a guest memfd.
->   * Do the populate in chunks to avoid holding locks for too long and
->     triggering RCU stall warnings.
-> ---
->   arch/arm64/include/asm/kvm_rmi.h |   4 ++
->   arch/arm64/kvm/Kconfig           |   1 +
->   arch/arm64/kvm/arm.c             |  13 ++++
->   arch/arm64/kvm/rmi.c             | 106 +++++++++++++++++++++++++++++++
->   4 files changed, 124 insertions(+)
+> This driver handles IDE stream setup for both the root port and PCIe
+> endpoints. Root port IDE stream enablement itself is managed by RMM.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 007249a13dbc..a2b6bc412a22 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -88,6 +88,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->   int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->   int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
->   
-> +struct kvm_arm_rmi_populate;
-> +
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *arg);
->   void kvm_realm_unmap_range(struct kvm *kvm,
->   			   unsigned long ipa,
->   			   unsigned long size,
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 4e16719fda22..d0cd011cf672 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -38,6 +38,7 @@ menuconfig KVM
->   	select GUEST_PERF_EVENTS if PERF_EVENTS
->   	select KVM_GUEST_MEMFD
->   	select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	select HAVE_KVM_ARCH_GMEM_POPULATE
->   	help
->   	  Support hosting virtualized guest machines.
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index ed88a203b892..073ba9181da9 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2131,6 +2131,19 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->   			return -EFAULT;
->   		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
->   	}
-> +	case KVM_ARM_RMI_POPULATE: {
-> +		struct kvm_arm_rmi_populate req;
-> +		int ret;
-> +
-> +		if (!kvm_is_realm(kvm))
-> +			return -ENXIO;
-> +		if (copy_from_user(&req, argp, sizeof(req)))
-> +			return -EFAULT;
-> +		ret = kvm_arm_rmi_populate(kvm, &req);
-> +		if (copy_to_user(argp, &req, sizeof(req)))
-> +			return -EFAULT;
-> +		return ret;
-> +	}
+> In addition, the driver registers pci_tsm_ops with the TSM subsystem.
 
-s/return ret/return 0; The variable 'ret' can be dropped.
+Do you want to call out that this is an infrastructure / scaffolding
+patch that only handles the PCI-TSM skeleton. The CCA meat comes later,
+in particular IDE key management. Tell a bit more of the story 
 
->   	default:
->   		return -EINVAL;
->   	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index a89873a5eb77..209087bcf399 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -486,6 +486,75 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->   		realm_unmap_private_range(kvm, start, end, may_block);
->   }
->   
-> +static int realm_data_map_init(struct kvm *kvm, unsigned long ipa,
-> +			       kvm_pfn_t dst_pfn, kvm_pfn_t src_pfn,
-> +			       unsigned long flags)
+Otherwise, mostly looks good.
+
+Minor comments below...
+
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/include/asm/rmi_smc.h         |   2 +
+>  drivers/firmware/smccc/rmm.c             |  12 ++
+>  drivers/firmware/smccc/rmm.h             |   8 +
+>  drivers/firmware/smccc/smccc.c           |   1 +
+>  drivers/virt/coco/Kconfig                |   2 +
+>  drivers/virt/coco/Makefile               |   1 +
+>  drivers/virt/coco/arm-cca-host/Kconfig   |  19 ++
+>  drivers/virt/coco/arm-cca-host/Makefile  |   5 +
+>  drivers/virt/coco/arm-cca-host/arm-cca.c | 225 +++++++++++++++++++++++
+>  drivers/virt/coco/arm-cca-host/rmi-da.h  |  46 +++++
+>  10 files changed, 321 insertions(+)
+>  create mode 100644 drivers/virt/coco/arm-cca-host/Kconfig
+>  create mode 100644 drivers/virt/coco/arm-cca-host/Makefile
+>  create mode 100644 drivers/virt/coco/arm-cca-host/arm-cca.c
+>  create mode 100644 drivers/virt/coco/arm-cca-host/rmi-da.h
+> 
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> index fa23818e1b4c..109d6cc6ef37 100644
+> --- a/arch/arm64/include/asm/rmi_smc.h
+> +++ b/arch/arm64/include/asm/rmi_smc.h
+[..]
+> diff --git a/drivers/firmware/smccc/rmm.c b/drivers/firmware/smccc/rmm.c
+> index 2a6187df3285..7444cc3a588c 100644
+> --- a/drivers/firmware/smccc/rmm.c
+> +++ b/drivers/firmware/smccc/rmm.c
+[..]
+> diff --git a/drivers/firmware/smccc/rmm.h b/drivers/firmware/smccc/rmm.h
+> index a47a650d4f51..37d0d95a099e 100644
+> --- a/drivers/firmware/smccc/rmm.h
+> +++ b/drivers/firmware/smccc/rmm.h
+[..]
+> diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
+> index fc9b44b7c687..2bf2d59e686d 100644
+> --- a/drivers/firmware/smccc/smccc.c
+> +++ b/drivers/firmware/smccc/smccc.c
+> @@ -97,6 +97,7 @@ static int __init smccc_devices_init(void)
+>  		 * the required SMCCC function IDs at a supported revision.
+>  		 */
+>  		register_rsi_device(pdev);
+> +		register_rmi_device(pdev);
+>  	}
+
+Would splitting the above three hunks make this series stand on its own
+relative to the base CCA series? I assume likely not as soon as we get
+to patch2.
+
+Otherwise, just curious what your intended merge strategy is for this,
+tsm.git or arm.git, and what help this needs?
+
+[..]
+snip code that looks good.
+
+> diff --git a/drivers/virt/coco/arm-cca-host/Makefile b/drivers/virt/coco/arm-cca-host/Makefile
+> new file mode 100644
+> index 000000000000..c236827f002c
+> --- /dev/null
+> +++ b/drivers/virt/coco/arm-cca-host/Makefile
+> @@ -0,0 +1,5 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +#
+> +obj-$(CONFIG_ARM_CCA_HOST) += arm-cca-host.o
+> +
+> +arm-cca-host-y	+=  arm-cca.o
+> diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
+> new file mode 100644
+> index 000000000000..67f7e80106e8
+> --- /dev/null
+> +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
+> @@ -0,0 +1,225 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2026 ARM Ltd.
+> + */
+> +
+> +#include <linux/auxiliary_bus.h>
+> +#include <linux/pci-tsm.h>
+> +#include <linux/pci-ide.h>
+> +#include <linux/module.h>
+> +#include <linux/pci.h>
+> +#include <linux/tsm.h>
+> +#include <linux/vmalloc.h>
+> +#include <linux/cleanup.h>
+> +
+> +#include "rmi-da.h"
+> +
+> +/* Total number of stream id supported at root port level */
+> +#define MAX_STREAM_ID	256
+> +
+> +static struct pci_tsm *cca_tsm_pci_probe(struct tsm_dev *tsm_dev, struct pci_dev *pdev)
 > +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	phys_addr_t dst_phys, src_phys;
 > +	int ret;
 > +
-> +	dst_phys = __pfn_to_phys(dst_pfn);
-> +	src_phys = __pfn_to_phys(src_pfn);
-> +
-> +	if (rmi_delegate_page(dst_phys))
-> +		return -ENXIO;
-> +
-> +	ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
-> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +		/* Create missing RTTs and retry */
-> +		int level = RMI_RETURN_INDEX(ret);
-> +
-> +		KVM_BUG_ON(level == KVM_PGTABLE_LAST_LEVEL, kvm);
+> +	if (!is_pci_tsm_pf0(pdev)) {
+> +		struct cca_host_fn_dsc *fn_dsc __free(kfree) =
+> +			kzalloc(sizeof(*fn_dsc), GFP_KERNEL);
 
-		KVM_BUG_ON(level >= KVM_PGTABLE_LAST_LEVEL, kvm);> +
-> +		ret = realm_create_rtt_levels(realm, ipa, level,
-> +					      KVM_PGTABLE_LAST_LEVEL, NULL);
-> +		if (!ret) {
-> +			ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys,
-> +						    flags);
-> +		}
+kzalloc_obj(*fn_dsc)
+
+> +
+> +		if (!fn_dsc)
+> +			return NULL;
+> +
+> +		ret = pci_tsm_link_constructor(pdev, &fn_dsc->pci, tsm_dev);
+> +		if (ret)
+> +			return NULL;
+> +
+> +		return &no_free_ptr(fn_dsc)->pci;
 > +	}
 > +
-> +	if (ret) {
-> +		if (WARN_ON(rmi_undelegate_page(dst_phys))) {
-> +			/* Undelegate failed, so we leak the page */
-> +			get_page(pfn_to_page(dst_pfn));
-> +		}
-> +	}
-> +
+> +	if (!pdev->ide_cap)
+> +		return NULL;
 
-	if (ret && WARN_ON(rmi_undelegate_page(dst_phys)) {
-		/* Leak the page that fails to be undelegated */
-		get_page(pfn_to_page(dst_pfn));
-	}
+Bailing early?
 
-> +	return ret;
-> +}
-> +
-> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-> +			      struct page *src_page, void *opaque)
-> +{
-> +	unsigned long data_flags = *(unsigned long *)opaque;
-> +	phys_addr_t ipa = gfn_to_gpa(gfn);
-> +
-> +	if (!src_page)
-> +		return -EOPNOTSUPP;
-> +
-> +	return realm_data_map_init(kvm, ipa, pfn, page_to_pfn(src_page),
-> +				   data_flags);
-> +}
-> +
-> +static long populate_region(struct kvm *kvm,
-> +			    gfn_t base_gfn,
-> +			    unsigned long pages,
-> +			    u64 uaddr,
-> +			    unsigned long data_flags)
-> +{
-> +	long ret = 0;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
-> +				populate_region_cb, &data_flags);
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-> +
->   enum ripas_action {
->   	RIPAS_INIT,
->   	RIPAS_SET,
-> @@ -574,6 +643,43 @@ static int realm_ensure_created(struct kvm *kvm)
->   	return -ENXIO;
->   }
->   
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *args)
-> +{
-> +	unsigned long data_flags = 0;
-> +	unsigned long ipa_start = args->base;
-> +	unsigned long ipa_end = ipa_start + args->size;
-> +	long pages_populated;
-> +	int ret;
-> +
-> +	if (args->reserved ||
-> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
-> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(args->source_uaddr, PAGE_SIZE))
-> +		return -EINVAL;
-> +
+Maybe the RMM knows something about this device not needing IDE? I have
+a similar question in patch2 around trusted sources for whether a device
+is internal or not. 
 
-There are more conditions missed here:
-
-	args->size == 0, return 0;
-	args->base + args->size < args->base, return -EINVAL;  // wrapped range
-
-> +	ret = realm_ensure_created(kvm);
+> +
+> +	struct cca_host_pf0_ep_dsc *pf0_ep_dsc __free(kfree) =
+> +		kzalloc(sizeof(*pf0_ep_dsc), GFP_KERNEL);
+> +	if (!pf0_ep_dsc)
+> +		return NULL;
+> +
+> +	ret = pci_tsm_pf0_constructor(pdev, &pf0_ep_dsc->pci, tsm_dev);
 > +	if (ret)
-> +		return ret;
+> +		return NULL;
 > +
-> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
-> +		data_flags |= RMI_MEASURE_CONTENT;
-> +
-> +	pages_populated = populate_region(kvm, gpa_to_gfn(ipa_start),
-> +					  args->size >> PAGE_SHIFT,
-> +					  args->source_uaddr, data_flags);
-> +
-> +	if (pages_populated < 0)
-> +		return pages_populated;
-
-pages_populaged is 'unsigned long', this function returns a 'int' value.
-
-> +
-> +	args->size -= pages_populated << PAGE_SHIFT;
-> +	args->source_uaddr += pages_populated << PAGE_SHIFT;
-> +	args->base += pages_populated << PAGE_SHIFT;
-> +
-> +	return 0;
+> +	pci_dbg(pdev, "tsm enabled\n");
+> +	return &no_free_ptr(pf0_ep_dsc)->pci.base_tsm;
 > +}
 > +
->   static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm *kvm = vcpu->kvm;
+> +static void cca_tsm_pci_remove(struct pci_tsm *tsm)
+> +{
+> +	struct pci_dev *pdev = tsm->pdev;
+> +
+> +	if (is_pci_tsm_pf0(pdev)) {
+> +		struct cca_host_pf0_ep_dsc *pf0_ep_dsc = to_cca_pf0_ep_dsc(pdev);
+> +
+> +		pci_tsm_pf0_destructor(&pf0_ep_dsc->pci);
+> +		kfree(pf0_ep_dsc);
+> +	} else {
+> +		kfree(to_cca_fn_dsc(pdev));
+> +	}
+> +}
+> +
+> +/* For now global for simplicity. Protected by pci_tsm_rwsem */
+> +static DECLARE_BITMAP(cca_stream_ids, MAX_STREAM_ID);
+> +static int alloc_stream_id(struct pci_host_bridge *hb)
+> +{
+> +	int stream_id;
+> +
+> +redo_alloc:
+> +	stream_id = find_first_zero_bit(cca_stream_ids, MAX_STREAM_ID);
+> +	if (stream_id == MAX_STREAM_ID)
+> +		return stream_id;
+> +
+> +	if (ida_exists(&hb->ide_stream_ids_ida, stream_id)) {
+> +		/* mark the stream allocated in the global bitmap. */
+> +		set_bit(stream_id, cca_stream_ids);
+> +		goto redo_alloc;
+> +	}
+> +	return stream_id;
 
-Thanks,
-Gavin
+Is 256 total an RMM limit, and/or does it require globally unique
+stream-ids? If not you could do what SEV-TIO does and just set stream-id
+== stream-index.
 
+> +}
+> +
+> +static inline bool cca_pdev_need_sel_ide_streams(struct pci_dev *pdev)
+> +{
+> +	return pci_pcie_type(pdev) == PCI_EXP_TYPE_ENDPOINT;
+> +}
+> +
+> +static int cca_tsm_connect(struct pci_dev *pdev)
+> +{
+> +	struct pci_dev *rp = pcie_find_root_port(pdev);
+> +	struct cca_host_pf0_ep_dsc *pf0_ep_dsc;
+> +	struct pci_ide *ide;
+> +	int ret, stream_id = 0;
+> +
+> +	/* Only function 0 supports connect in host */
+> +	if (WARN_ON(!is_pci_tsm_pf0(pdev)))
+> +		return -EIO;
+> +
+> +	pf0_ep_dsc = to_cca_pf0_ep_dsc(pdev);
+> +	if (cca_pdev_need_sel_ide_streams(pdev)) {
+> +		/* Allocate stream id */
+> +		stream_id = alloc_stream_id(pci_find_host_bridge(pdev->bus));
+> +		if (stream_id == MAX_STREAM_ID)
+> +			return -EBUSY;
+> +		set_bit(stream_id, cca_stream_ids);
+> +
+> +		ide = pci_ide_stream_alloc(pdev);
+> +		if (!ide) {
+> +			ret = -ENOMEM;
+> +			goto err_stream_alloc;
+> +		}
+> +
+> +		pf0_ep_dsc->sel_stream = ide;
+> +		ide->stream_id = stream_id;
+> +		ret = pci_ide_stream_register(ide);
+> +		if (ret)
+> +			goto err_stream;
+> +		/*
+> +		 * Configure IDE capability for target device
+> +		 *
+> +		 * Some test devices work only with DEFAULT_STREAM enabled.
+> +		 * For simplicity, enable DEFAULT_STREAM for all devices. A
+> +		 * future decent solution may be to have a quirk table to
+> +		 * specify which devices need DEFAULT_STREAM.
+> +		 */
+> +		ide->partner[PCI_IDE_EP].default_stream = 1;
+> +		pci_ide_stream_setup(pdev, ide);
+> +		pci_ide_stream_setup(rp, ide);
+> +
+> +		ret = tsm_ide_stream_register(ide);
+> +		if (ret)
+> +			goto err_tsm;
+> +
+> +		/*
+> +		 * Once ide is setup, enable the stream at the endpoint
+> +		 * Root port will be done by RMM
+> +		 */
+> +		pci_ide_stream_enable(pdev, ide);
+
+The end point of these patches follows the spec recommendation of
+delaying enable until after key programming.
+
+> +	}
+> +	return 0;
+
+Should this be making security claims to userspace without taking any
+action for non-endpoint devices that happen to be passed in?
+
+Thinking about a bisection case this should either fail here, print a
+message that is removed in the final enabling patch, or do the
+__maybe_unused arrangement to land all the CCA bits first and then do
+this hookup. Up to you.
