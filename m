@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ED03FC5B9
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241D23FCB0B
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780070195; cv=none; b=lQO+rQcO14GFfzuaFzDWjZkjqQ5XNAcZQY8UYf1cbQQTmMm04NFxPguuoQ+FMf9EZQ5sxR4zpLA/pt2isxRpy7eP0ynJYij/CqhX0uWNMsx54YV//XGVWmsOPT59sh3TKTCs2wD8hqGJbS9HZiFvtVbXvz5Hxuf90U0EKe6By+E=
+	t=1780070196; cv=none; b=GiB0G5N8d5y+TJKiO4LtTqyMyzLQuawNbaoj9d64BiRDnepMifu6LcIgpECqf2IJ38qBoD/TgtFP1/OSSWRAlS3k2DzyHxBn2ApOoFUsyQg5Shx1ig7PPkL08BXXqw48mTI+23D8nZ0YUU0ClFnsloHZh6OhwYg80cmrWUsAso8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780070195; c=relaxed/simple;
-	bh=VdJ5D4pWhUMZiuLwpLwV45/dxvUbNQ3/d1sL6gUAPCo=;
+	s=arc-20240116; t=1780070196; c=relaxed/simple;
+	bh=2T0IcOBvlQduoOdEXyL/k5QW4zteu4afOmlAgQcmdMA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zj8Syazoh8qqQEHtRPBZyZCmIs839khU3/43CmFRmUrsL3pa+PKqB3gPCRqPskwt5k+WbwY2MdvkDLJLbv0e+gxUIDJHqgodld0hplbOIJix+hTD3nVee+u5DSbJN5BPWd7p6/95XSRcTFXWqzhK+RJo4TEziGb0OsMq+49J4Fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ahvt5PEK; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=EMUy1C5N9wT2BnUxQrtJ6tFtwHf7FW8I4JW0sH9nHF8br9KwxmN7i1OfZRVio8vSg0y+Kt1iL5lrHKNhshyreOHUO3bLm02YACiROs5LTqRmvACKOiKcJGFhuvin9hhBnopkVX3za9ZyNAIY3xL9XqWvO0QBDPl89ur/ffM+JAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VrIdGcOw; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ahvt5PEK"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFKGCK1685956;
-	Fri, 29 May 2026 15:56:17 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VrIdGcOw"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TF4tJ11467789;
+	Fri, 29 May 2026 15:56:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=OB54e0sJf0qPl31od
-	E4TOuJ++EZKctY7iEXbx4L5EuE=; b=ahvt5PEK3ue2LKPLeYZ0iiHkL/ub/q50A
-	xss/LlZNhg0Oclokhxgcab+IqqPYeYnkfi0VJtlmn8hUvz4A2xo5g2cyO5EDRt7c
-	Rv3qcSf6olqpanSAEsPiZ9s6g+egE1QtVmxtEYPq7bz8eG5vCrGoC1avcCdQrRbB
-	a4V19WHkkNHVGMRttXRnDAhGq11xAICMnfa2o4imN2w9Jep9zNfD/0605OmKkTbL
-	M96SV0ZtUrq/PPS535IygkfW5b/+qWjBZRsVXzz3cCDUaRBNdmgb1fiLzS02DQK1
-	+KwUBX92IfoDLobvr1G/z5tJ9TzoL6UL52ymzFeaemSG9WLxI42Xg==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884mh75-1
+	:mime-version:references:subject:to; s=pp1; bh=65ZPjGgfujvTG2FNZ
+	towcxEFcacc9WDSb9CSpbn8UaE=; b=VrIdGcOw2TW//fI640IuF96wP4YN7VLPU
+	9ljjCj5/SUMds5oxleVfMRfIr0nwC49/syiF4xtubaH3k9gpfRx7SjgkNg3c6Hiv
+	ErM0vIk+D2feXYFATvvFZ+wYjKG6lT7emiuycU1uBQANhRM/dQqjGOAAwaFXAAjK
+	1ClQoEq08GG4UwxWRm8brebvLikkrC8Uab5xfbVZIRrNQ194fu+GU8nsvhgMq9GP
+	LS751ORizJ3CmSK7RvAIC6ulWZ4OMCQNHaoNE/VgwA+oGnGHbwvrwVIdk1RZejzT
+	NtnfOkp9FW/SeB1AwNnHM6LkBZKvkroGLHhvWje97dcpstHvIASpQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee886mgjy-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:15 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs5GF003169;
-	Fri, 29 May 2026 15:56:14 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgm8v-1
+	Fri, 29 May 2026 15:56:19 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs7ar009677;
+	Fri, 29 May 2026 15:56:18 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgkwq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:14 +0000 (GMT)
+	Fri, 29 May 2026 15:56:18 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu6ac36700644
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFuCP549349006
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:56:06 GMT
+	Fri, 29 May 2026 15:56:12 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0617F20040;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 5051720040;
+	Fri, 29 May 2026 15:56:12 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ACE432004B;
-	Fri, 29 May 2026 15:56:05 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 023C12004B;
+	Fri, 29 May 2026 15:56:12 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:56:05 +0000 (GMT)
+	Fri, 29 May 2026 15:56:11 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 10/26] KVM: arm64: Fix set_oslsr_el1 to write to OSLAR_EL1
-Date: Fri, 29 May 2026 17:55:43 +0200
-Message-ID: <20260529155601.2927240-11-seiden@linux.ibm.com>
+Subject: [PATCH v1 26/26] KVM: s390: arm64: Finalize page fault handling
+Date: Fri, 29 May 2026 17:55:59 +0200
+Message-ID: <20260529155601.2927240-27-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155601.2927240-1-seiden@linux.ibm.com>
 References: <20260529155601.2927240-1-seiden@linux.ibm.com>
@@ -91,105 +91,153 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=fIYJG5ae c=1 sm=1 tr=0 ts=6a19b71f cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+X-Proofpoint-GUID: qdGqNpQsC3UYpGpvAk8HeorvrvLc47VH
+X-Authority-Analysis: v=2.4 cv=Z8Dc2nRA c=1 sm=1 tr=0 ts=6a19b723 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=5EGiLxFwAr7VIT5rVV0A:9
-X-Proofpoint-ORIG-GUID: Wgd_CA6F3seeTvf6_fbULAQn4h0wRnvg
-X-Proofpoint-GUID: Wgd_CA6F3seeTvf6_fbULAQn4h0wRnvg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX7ZbACSDx4jlO
- UQ8aei+lNfw7u4H6u/iIeB1Xy96QCrJaCbwREAu9McKDcUINIf2UmHhnI5TuAAiumMN8Y9/w1GX
- Hk/qtUUhPSeT9jfgzKJQtAfnoLpEsvsLLd+NBPP96SLXAcQ2jj+AhzNDaNNX293Lo8Tthn517BQ
- F8ZWheskkNTW7Q+Z95kYw2Y+5Nr+it4XHSoSiF33H/vMPe7vPY+1efXtvR+TEDxiYp94lO/yUEn
- ULyQ6JcxM6SfSfTg+kiieT00cw8rVAvCkR5CTo70JwqjEHmUpoyL+6/XnuPxBPaNbuK62tXj6JC
- bTZIAfV8hKU1jOCmsxcTbRZtdqKOOpmaWSH/3OavNWDMtp7K6Ow4raap6+9SGxG+V9E4gzZTl59
- f/fjIlkJxC599mmR8W1vXsEy5OiOiA1C3t3Qs14ahjvtPxsmBX8Kh+h36X745+1KZ0CmOqthDW9
- ErfRFOZ5KsbMvdeBpow==
+ a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=LtHRyupC2uTP9dkk8LUA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfXx3wbluWa3lB6
+ rnxFykGocU5+j9Wla02dXZFABY6qgxxpQtelKlJIA1zq/r+5dkk33gFCssPqPaqmn6mm5uIOquu
+ y0yEznA2FwBjT2S35mf5TMExYrEMLlCezCINd8Tk+DMPK9YhVI6SFCMDMt6aBDu3bPg3OinGneK
+ CBNSR9iTAWCWJFm3VhGwd+tj7YiycPZqoLsTzhIdtPJUPJKRlNKasI5EQsHFWRKrrmDXC6dGUch
+ 2Jqd7BTS0acQYinl2K27BMjQy77m7IOPvqooH4hxyFFi6BhPhmozLFO0ud7+zjIAJySreoBCNmi
+ ApGgsg1hZpBDsRwIsnTUDdzESnFIwwkEy87uUZ9mP0zp26ol8XhBhQD7PvR7NKl5ffIY2ijXsxm
+ xR7VvXmZHugNWOg66kXF5E1ep50oIl55lKHzaNn4wKE6W0UgQpiGQ6bzse6V5T/QIxel2nRDfRL
+ 3HK55T8PQmmdeKORCVQ==
+X-Proofpoint-ORIG-GUID: qdGqNpQsC3UYpGpvAk8HeorvrvLc47VH
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2605290156
+ clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 phishscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
 
-From: Andreas Grapentin <gra@linux.ibm.com>
+Complete the page fault handling implementation by replacing temporary
+error returns with proper ARM64 exception injection.
 
-The set_oslsr_el1() function was incorrectly writing directly to the
-OSLSR_EL1 register, which is architecturally a read-only status register
-that reflects the state of the OS Lock.
-
-Fix this by extracting the OSLK bit from the user-provided value and
-writing it to OSLAR_EL1 (OS Lock Access Register) instead, which is the
-proper control register for managing the OS Lock state. OSLSR_EL1 will
-then reflect this state when read.
-
-This ensures the implementation follows the ARM architecture
-specification where OSLAR_EL1 controls the lock and OSLSR_EL1 provides
-status information.
-
-Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_host.h    |  1 +
- arch/arm64/kvm/sys_regs.c            | 10 +++++++++-
- include/arch/arm64/asm/sysreg-defs.h |  1 +
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ arch/s390/kvm/arm64/mmu.c       | 62 ++++++++++++++++++++++-----------
+ include/kvm/arm64/kvm_feature.h |  3 ++
+ 2 files changed, 44 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a8efff6ea01d..5734e93cad57 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -408,6 +408,7 @@ enum vcpu_sysreg {
- 	PAR_EL1,	/* Physical Address Register */
- 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
- 	OSLSR_EL1,	/* OS Lock Status Register */
-+	OSLAR_EL1,	/* OS Lock Access Register */
- 	DISR_EL1,	/* Deferred Interrupt Status Register */
- 
- 	/* Performance Monitors Registers */
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 195ecdac7bd6..6522f9302967 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -822,6 +822,8 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
- static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 			 u64 val)
- {
-+	u64 oslk;
-+
- 	/*
- 	 * The only modifiable bit is the OSLK bit. Refuse the write if
- 	 * userspace attempts to change any other bit in the register.
-@@ -829,7 +831,13 @@ static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	if ((val ^ rd->val) & ~OSLSR_EL1_OSLK)
- 		return -EINVAL;
- 
--	__vcpu_assign_sys_reg(vcpu, rd->reg, val);
-+	/*
-+	 * Redirect the write to the proper control register.
-+	 * OSLSR is read-only
-+	 */
-+	oslk = SYS_FIELD_GET(OSLSR_EL1, OSLK, val);
-+	__vcpu_assign_sys_reg(vcpu, OSLAR_EL1,
-+			      SYS_FIELD_PREP(OSLAR_EL1, OSLK, oslk));
+diff --git a/arch/s390/kvm/arm64/mmu.c b/arch/s390/kvm/arm64/mmu.c
+index 8759cbafbaff..4224503276fb 100644
+--- a/arch/s390/kvm/arm64/mmu.c
++++ b/arch/s390/kvm/arm64/mmu.c
+@@ -31,12 +31,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, gpa_t fault_ipa,
+ 	ret = kvm_s390_faultin_gfn(vcpu, NULL, &f);
+ 	if (ret <= 0)
+ 		return ret;
+-	if (ret == PGM_ADDRESSING)
++	if (ret == PGM_ADDRESSING) {
+ 		/*
+-		 * Without the relevant sysregs we cannot do anything for now.
+-		 * Go back to userspace with an error. TODO sysreg handling
++		 * There is no page with the requested address. Inject size fault
++		 * which is the closest arm match to PGM-addressing
+ 		 */
+-		return -ENOEXEC;
++		kvm_inject_size_fault(vcpu);
++		return 1;
++	}
+ 	KVM_BUG_ON(ret, vcpu->kvm);
+ 	return -EINVAL;
+ }
+@@ -69,6 +71,27 @@ static int kvm_handle_pic(struct kvm_vcpu *vcpu, bool *translation)
  	return 0;
  }
  
-diff --git a/include/arch/arm64/asm/sysreg-defs.h b/include/arch/arm64/asm/sysreg-defs.h
-index 3e280d4156ce..c6bdb0f11e1b 100644
---- a/include/arch/arm64/asm/sysreg-defs.h
-+++ b/include/arch/arm64/asm/sysreg-defs.h
-@@ -129,6 +129,7 @@
- #define OSLSR_EL1_OSLM_NI		0
- #define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
- #define OSLSR_EL1_OSLK			BIT(1)
-+#define OSLSR_EL1_OSLK_MASK             BIT(1)
++static u32 kvm_get_pa_bits(struct kvm *kvm)
++{
++	u32 id_parange = get_idreg_field_enum(kvm, ID_AA64MMFR0_EL1, PARANGE);
++
++	switch (id_parange) {
++	case ID_AA64MMFR0_EL1_PARANGE_32: return 32;
++	case ID_AA64MMFR0_EL1_PARANGE_36: return 36;
++	case ID_AA64MMFR0_EL1_PARANGE_40: return 40;
++	case ID_AA64MMFR0_EL1_PARANGE_42: return 42;
++	case ID_AA64MMFR0_EL1_PARANGE_44: return 44;
++	case ID_AA64MMFR0_EL1_PARANGE_48: return 48;
++	case ID_AA64MMFR0_EL1_PARANGE_52: return 52;
++	case ID_AA64MMFR0_EL1_PARANGE_56: return 56;
++	}
++	/*
++	 * Future values must be higher than we know already.
++	 * See ARM DDI 0487C.a. Return a safe limit.
++	 */
++	return ID_AA64MMFR0_EL1_PARANGE_48;
++}
++
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_memory_slot *memslot;
+@@ -98,16 +121,17 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	}
  
- #define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
- #define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
+ 	if (translation) {
+-		/*
+-		 * For both cases:
+-		 * Without the relevant sysregs we cannot do anything for now.
+-		 * Go back to userspace with an error. TODO sysreg handling
+-		 */
+-		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit()))
+-			return -ENOEXEC;
++		/* Beyond sanitised PA range (which is the IPA limit) */
++		if (fault_ipa >= BIT_ULL(kvm_get_pa_bits(vcpu->kvm))) {
++			kvm_inject_size_fault(vcpu);
++			return 1;
++		}
+ 
+-		if (fault_ipa >= kvm_phys_size(vcpu->kvm))
+-			return -ENOEXEC;
++		/* Falls between the IPA range and the PA range? */
++		if (fault_ipa >= kvm_phys_size(vcpu->kvm)) {
++			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++			return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
++		}
+ 	}
+ 
+ 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+@@ -123,18 +147,14 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * The guest has put either its instructions or its page-tables
+ 		 * somewhere it shouldn't have. Userspace won't be able to do
+ 		 * anything about this (there's no syndrome for a start).
+-		 *
+-		 * Without the relevant sysregs we cannot do anything for now.
+-		 * Go back to userspace with an error. TODO sysreg handling
+ 		 */
+-		if (is_iabt)
++		if (is_iabt) {
++			ret = kvm_inject_sea_iabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+ 			goto out_unlock;
++		}
+ 
+ 		if (kvm_vcpu_abt_iss1tw(vcpu)) {
+-			/*
+-			 * Without the relevant sysregs we cannot do anything for now.
+-			 * Go back to userspace with an error. TODO sysreg handling
+-			 */
++			ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+ 			goto out_unlock;
+ 		}
+ 
+diff --git a/include/kvm/arm64/kvm_feature.h b/include/kvm/arm64/kvm_feature.h
+index 945abbbf1aa8..193c9ca7045f 100644
+--- a/include/kvm/arm64/kvm_feature.h
++++ b/include/kvm/arm64/kvm_feature.h
+@@ -47,6 +47,9 @@
+ 
+ #define kvm_has_feat_enum(kvm, ...) __kvm_has_feat_enum(kvm, __VA_ARGS__)
+ 
++#define get_idreg_field_enum(kvm, id, fld)				\
++	SYS_FIELD_GET(id, fld, kvm_read_vm_id_reg((kvm), SYS_##id))
++
+ /* Check for a given level of PAuth support */
+ #define kvm_has_pauth(k, l)						\
+ 	({								\
 -- 
 2.53.0
 
