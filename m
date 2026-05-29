@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F1E3F6C22
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885533F9293
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780070186; cv=none; b=g8Y8r7kvemPL6LljhBxb3DyHm6q9wgsOlL2za8oqV2GqO25COee2gRJlCWtZjZZMjl9RcVFKEHQdkwwPqoJpotQZt5l/CYQ2wwFYj8XDCe0VMPn7EMsQxu7ZA/zscdvrgV02HKZAu5ssacoxcmM4abEjtKYplL7Ji0m6tN76crY=
+	t=1780070190; cv=none; b=CKBzDiCJYTHsmiRCbeBrD2HUmerDG/XA7vRo3NtfkIw94Q2XZv+pLMGktz+q7PtZSsqLRrwwcYqoRbeDzhKuA+L7zC8s4aMgRohELltTvLo2uwpVS7pRUKJHh0wgq4oPWjKAwg+UOu9zQTrSxoQl0p2EKjXfiYUe3hBpfdky6GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780070186; c=relaxed/simple;
-	bh=86J4c4IDhkXcD+sXUJ3szi39ltTyhiRUK+PG6XXZDcc=;
+	s=arc-20240116; t=1780070190; c=relaxed/simple;
+	bh=08dDH/WQ5nCpUwhSaD4IpI4Ds/DHX915A/9pOS+YeJ0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R6qNaeZVQnWxSe67P+Qou8Kxecfy0pBarqLZy78KAjqiWlkFBm2liA/jT5tSa95bDw/rBC3Th/rktmqcdFgxJbHfAOKmyHfY3Rsxx82dKk0Jtr12qflQq+uzKli1U4XcbtxDDs9C6+3KSTq6GNIQU76wJk8B4duF3VFi1Pq+jI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V34lUfcp; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=CRF40JqAVR+Mvjx8taN0mm92/fJhDsUy9NL+M1klH8Ec+CErHZ76TLVlxXs3HslQdmfUS1cIaxIVC6BnkHHIMfWLVdsCFZU/0q2qgLY2oTsJtbzJ7TGCuXfd5QjmrpGU9E963aljYX/+MupOiTKe0kGpLV3zQDIND3VjNME0vgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mN6mvRaV; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V34lUfcp"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mN6mvRaV"
 Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFAXSC2419213;
-	Fri, 29 May 2026 15:56:12 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TF3exw2418298;
+	Fri, 29 May 2026 15:56:18 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=3/FkRX+SkHZmJLVfE
-	SRkOboCdzcmTpr5KGDuU5B1jY4=; b=V34lUfcpaRVZPqVpvVs+sLOJLgO7gfRJ+
-	kLjFvhE+ysG946P89jOQOn+qoddOadzUGpB3v3/IDkrYxGjGcSW3JbO8ZFRp7M1U
-	AbpK0G2b84n4SpJSGrkCioEo2Zi8hoQSuoLROclb7ft/mjNGDcqmWBWm1VH56nEz
-	4xQhC/YnXvSKQmMjjk7YwSeAtmDB4kYoPGJmN/edDOMCnrju08jfQa300PMKk3It
-	6hBxZbZ4g5tlOfXx0da5DWQdxVAI9xCwtPFyzxfR+wMlu5aS0pswlaE8z9mhEetX
-	SvJeJsX5AJUTEuXpl84JK4wlY4XDpIur99sLkht/KLCtQTFFhgwTQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884vknk-1
+	:mime-version:references:subject:to; s=pp1; bh=wFi3vpS98Cj8L/89G
+	xByeqkjSs7xfkPP7T3TglTvHvU=; b=mN6mvRaV/WU2ABvtdg9qy1lVex6VQvKCF
+	UctlLCEnILwDfr1GyNn9b/7miC5mIaVJWbeeT7kzGk3rtCU54290uUMrePWDfeOl
+	yIdE2YkzZjPqh4/4OmVRHhN+9lMiNofSrH1mRIuMqXVVYhS3PB+rzSnuvNG26v3q
+	KRwjrzRaZhZctmnFO8BElxqclp7mRQDcwLYLDCssE9saAW5M4wgl+Y23EChTqdlS
+	AtXGUXPjl14KLg1sJ+a2+22CoTJrUTiZOdNLr2XCMuA1VpStuqZUVfyKRoeo5cHF
+	8vBOBw5JRauwpSBu4fv8g1whff7kZEKk/Z0gP/t45laIom4xCUSFQ==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884vkrr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:12 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs814023079;
-	Fri, 29 May 2026 15:56:11 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc0k1r-1
+	Fri, 29 May 2026 15:56:17 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs5OA003161;
+	Fri, 29 May 2026 15:56:16 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgmae-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:11 +0000 (GMT)
+	Fri, 29 May 2026 15:56:16 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu4t616187700
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu9U450594192
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:56:05 GMT
+	Fri, 29 May 2026 15:56:09 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D1F6120040;
-	Fri, 29 May 2026 15:56:04 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 1348820040;
+	Fri, 29 May 2026 15:56:09 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 865482004D;
-	Fri, 29 May 2026 15:56:04 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id BA18D2004D;
+	Fri, 29 May 2026 15:56:08 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:56:04 +0000 (GMT)
+	Fri, 29 May 2026 15:56:08 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 07/26] KVM: arm64: Remove kvm_has_feat_range
-Date: Fri, 29 May 2026 17:55:40 +0200
-Message-ID: <20260529155601.2927240-8-seiden@linux.ibm.com>
+Subject: [PATCH v1 18/26] arm64: Extract cache definitions
+Date: Fri, 29 May 2026 17:55:51 +0200
+Message-ID: <20260529155601.2927240-19-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155601.2927240-1-seiden@linux.ibm.com>
 References: <20260529155601.2927240-1-seiden@linux.ibm.com>
@@ -91,20 +91,20 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=L4MtheT8 c=1 sm=1 tr=0 ts=6a19b71c cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+X-Authority-Analysis: v=2.4 cv=L4MtheT8 c=1 sm=1 tr=0 ts=6a19b721 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=3-yqm4NPzKxgNXSuSH0A:9
-X-Proofpoint-ORIG-GUID: iRKEu5XZGYdTQl1aubAOq9aFT057y5V6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX8mTz7O9VCZFE
- R0XL99rl7E3yEfO2jUkeFCw65+CjRp4OtiyuZQ1D5P2YKaZ5EPpZvFlCGZr+o/HVLxaELK6D7Ze
- M0AtUF8VESpOJGbVIVny3zPZGSxbHohy/2AWVERM3iaFZoKVPDad7OUka8DmDmbvwXrteTCsGyf
- MQOx0qVS16L7/aughYsjRWDyG658HCwKaMl/024pux99SZ3aZoTC7E7tQFMCKdvdHnbvqy4JCdg
- NtzHTu32KWRqIwB9lvmn6xo7XXgoLSBDInAdOHbivz2jvi6Mv2hOqkcZ55OAUERGvQGQqiYA+Nb
- a/cia20Md2aMzdbkM62zv9QzcFe3OOFHP3WjG+f4ClqvLCHvZt5qE2ldnWJpd4oOC6d/1RH+wJ8
- 3BczdDf9r4VraVSDORZon4KkHF3EPgCb5J1zZNGEKxQJl1sMH9iptxmZXjV1sD4k7XdcMsrS3d1
- swNwplc0CQkEp1ZfrCA==
-X-Proofpoint-GUID: iRKEu5XZGYdTQl1aubAOq9aFT057y5V6
+ a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=pRZW_VWv9im2awHLU-wA:9
+X-Proofpoint-ORIG-GUID: slVjF5f-oq9tzH_qacJlnFctQDu0_ACn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX8oPtDgaMF3m/
+ MK1rxSS24KimAM7XsXvGSzWrJUIQDlWN7vlqTJKBpq4YLq8slBqI21QltNLBxqL6sfhAYWDMkmn
+ jX/TbdHyjz1bfKFB6mWCYOCXysOCkf0GM+kfz9F1UvX6lZPWlP0kesce3iV3o9EA5dZ2ICfO9PF
+ lmHWj9khK3BOvHHKKJrens/l+KFqet1gMMLO0NKL9pnbMKOix2jizeCl48YESDv/pHUhCw/+C6L
+ dq++JTdd8ckUxpzBagTClP5VP/LHq+0RMIOhsvyiWr4u6RU2v+9aqEqgewnrpXvI/NFyN3uI8r1
+ TNBGtV1n63cM5DGg0XHURVH9I1jma47Yz3PNyuk7Xu8xSp2Au66orrd9iYGPMwIL1WKM1ONyU3/
+ h/nmLRaakTdUQNPh63BJBCUD0n342it//rYPKiJaAaia1dEfoy/EVQkP7Ereh3zkaVxf28ToZgQ
+ gFynb9FophKzvpV/E3w==
+X-Proofpoint-GUID: slVjF5f-oq9tzH_qacJlnFctQDu0_ACn
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
@@ -114,26 +114,78 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
 
-It is (and has been) unused.
+Move CPU type definitions from arch/arm64/include/asm/cache.h.h to
+include/arch/arm64/asm/cache-defs.h to prepare sharing with other
+architectures. No functional changes.
 
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_feature.h | 2 --
- 1 file changed, 2 deletions(-)
+ arch/arm64/include/asm/cache.h      | 19 ++-----------------
+ include/arch/arm64/asm/cache-defs.h | 22 ++++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 17 deletions(-)
+ create mode 100644 include/arch/arm64/asm/cache-defs.h
 
-diff --git a/arch/arm64/include/asm/kvm_feature.h b/arch/arm64/include/asm/kvm_feature.h
-index da9ba5041f44..27a472d2343e 100644
---- a/arch/arm64/include/asm/kvm_feature.h
-+++ b/arch/arm64/include/asm/kvm_feature.h
-@@ -46,8 +46,6 @@
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index 10a7ffadee3d..0f67fe470c29 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -5,26 +5,11 @@
+ #ifndef __ASM_CACHE_H
+ #define __ASM_CACHE_H
  
- #define kvm_has_feat_enum(kvm, ...) __kvm_has_feat_enum(kvm, __VA_ARGS__)
++#include <asm/cache-defs.h>
++
+ #define L1_CACHE_SHIFT		(6)
+ #define L1_CACHE_BYTES		(1 << L1_CACHE_SHIFT)
  
--#define kvm_has_feat_range(kvm, id, fld, min, max)			\
--	id_has_feat_range(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, min, max)
- 
- /* Check for a given level of PAuth support */
- #define kvm_has_pauth(k, l)						\
+-#define CLIDR_LOUU_SHIFT	27
+-#define CLIDR_LOC_SHIFT		24
+-#define CLIDR_LOUIS_SHIFT	21
+-
+-#define CLIDR_LOUU(clidr)	(((clidr) >> CLIDR_LOUU_SHIFT) & 0x7)
+-#define CLIDR_LOC(clidr)	(((clidr) >> CLIDR_LOC_SHIFT) & 0x7)
+-#define CLIDR_LOUIS(clidr)	(((clidr) >> CLIDR_LOUIS_SHIFT) & 0x7)
+-
+-/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
+-#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
+-#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
+-#define CLIDR_CTYPE(clidr, level)	\
+-	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+-
+-/* Ttypen, bits [2(n - 1) + 34 : 2(n - 1) + 33], for n = 1 to 7 */
+-#define CLIDR_TTYPE_SHIFT(level)	(2 * ((level) - 1) + CLIDR_EL1_Ttypen_SHIFT)
+-
+ /*
+  * Memory returned by kmalloc() may be used for DMA, so we must make
+  * sure that all such allocations are cache aligned. Otherwise,
+diff --git a/include/arch/arm64/asm/cache-defs.h b/include/arch/arm64/asm/cache-defs.h
+new file mode 100644
+index 000000000000..bb0ab69a9cd6
+--- /dev/null
++++ b/include/arch/arm64/asm/cache-defs.h
+@@ -0,0 +1,22 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __ASM_CACHE_DEFS_H
++#define __ASM_CACHE_DEFS_H
++
++#define CLIDR_LOUU_SHIFT	27
++#define CLIDR_LOC_SHIFT		24
++#define CLIDR_LOUIS_SHIFT	21
++
++#define CLIDR_LOUU(clidr)	(((clidr) >> CLIDR_LOUU_SHIFT) & 0x7)
++#define CLIDR_LOC(clidr)	(((clidr) >> CLIDR_LOC_SHIFT) & 0x7)
++#define CLIDR_LOUIS(clidr)	(((clidr) >> CLIDR_LOUIS_SHIFT) & 0x7)
++
++/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
++#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
++#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
++#define CLIDR_CTYPE(clidr, level)	\
++	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
++
++/* Ttypen, bits [2(n - 1) + 34 : 2(n - 1) + 33], for n = 1 to 7 */
++#define CLIDR_TTYPE_SHIFT(level)	(2 * ((level) - 1) + CLIDR_EL1_Ttypen_SHIFT)
++
++#endif /* __ASM_CACHE_DEFS_H */
 -- 
 2.53.0
 
