@@ -1,53 +1,53 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5A33FB7E7
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32063FB7DC
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780070194; cv=none; b=qigPiNbeO2CeRhqo219Bh9EiB+LcyREyl9niFzqFspZKyQCzdtV629aadSnsho+GvynFdXZETT7JB6whoB79fTjnqJWt3HFscAxr/C0qHkDZAS5P1dNKEo1C9leXoRrXRWBLE9RhjD0LIHvlR2y7OYVMA5yaKNyil7A6qZKznSQ=
+	t=1780070195; cv=none; b=u0pj+QBNCsJtFqHyIOlfWq/pSA7uYKL9OFkpkhZmdel7Hyq0eWEJ9KIw6h4XxD6HCivVn8qn2V8DC0FzX9OLKabkZjiWl5+MEwS8GU03YLXfeJIdpAEfyJ59/XROHDykNEHXJS2mq8HjutCnjShuRNj/IePvVsaCcZ7G4/qWZds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780070194; c=relaxed/simple;
-	bh=tDUPaKRpTyz68q1SoICI7EnRFiMWtlFnRYt/3QcOi/Y=;
+	s=arc-20240116; t=1780070195; c=relaxed/simple;
+	bh=HDAWQbPbqsKVts76IWz2G5ZvfWRnka9qLwysJOQbLQ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gdaG9s8SfsNAwkN0ohaFUSGmkysqNniGC+pT2AFFx7LDOCwwNG3uraqBsvrhpWHZjX9SesLzRmQVuzvDB54UP3IaiI76PxqcgMkhXP3ta+7CsmzEzFGhrHPxxHJnVAjy4hoOfxSXvtrZQ03X5zCdvZsjX6tV8OO4Cl2wTwHBjv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aBTU/fwY; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ts/eIZMH0Lv/9/UWTztzV7/I+0a+9g/x9102r1HVD+utwGEdcr6r5p++fmBouDhGtBZr1p2JUK8VhqhyTZWEdMWWxn2aRVRu3W2xqNxzY4iuzKjo/RPXEvHYAVISHBevhmvve4bGSO624G6Bv5Oi3MJl1lOtFFQOlKEmpPGjrLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UpzwAVFB; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aBTU/fwY"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFDvEC1684674;
-	Fri, 29 May 2026 15:56:12 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UpzwAVFB"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TF6ZrS2133949;
+	Fri, 29 May 2026 15:56:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=o53yR+CaUtzV3aGfV
-	+UvVE5sv2cSNRU3xdbCbsPiryg=; b=aBTU/fwYfHFuJOD9btnZkqgs2CiCERqAO
-	HC53TWBgkABRCRPjBuIkMQwijjNSuZGPef6WuebDm+o7NYPYlwhOgWe6THlxpUK8
-	swF7xL7ZeBxdYsteAInsFl7MtWF94QSrT2Za9kgq7xWcxPIB2V52c+g9Rh4VQP+2
-	tFSxSGfTKtinj7aW/1XVUiVu9POtEU2gIQdXIn/4UPfUfMPO+bHHCi/1LZrCOUg5
-	uzXM6+rd8SmK982SbVh5P1NV7IZBX3RNXAb4sl6+KRRpNoiONL/pw4vh2hdvu3Pl
-	o7e0BSYtYh2j2X3PxVJ0zpz4oNIK5jtVGqfNcbWvKet025amyZFlA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884mh52-1
+	:mime-version:references:subject:to; s=pp1; bh=ljBGB7KNBcV4js4AR
+	cAzKk20xu/gcYobP0fAzwBLxO4=; b=UpzwAVFBQLF+gdifZpeiTX/DHEiNgtZqo
+	kyqKhAwAxggW851r5n6xNQyE82hvmfM0NLx1TRsffeCO/JD7TyB9/wBmS0kSNaMA
+	KNODtAcHgMVzC9ZRxJNmKW9UsvYm6604U18KqSW/7op+Bln/aMWUzTgv78fimYge
+	UqVe0QQoY+jwrNm1p62zL6yMuOS73Wpq771rTFIOb1jqqgocBZxQmfC3+nSeBsMB
+	cJKaagda22ZAHMeY8Pj/X9MIf4lSbFfDQftkk+bNhr8e0s07tSpVMWzWO83f2spe
+	Vu2XuNLxquPHoee/3Aoh99tIaavIB9c5yr8FWLi/wQGpBu3DFMPBQ==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee887v3v6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:12 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs5HY016958;
-	Fri, 29 May 2026 15:56:11 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgjng-1
+	Fri, 29 May 2026 15:56:14 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs7n3023023;
+	Fri, 29 May 2026 15:56:14 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc0k29-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:11 +0000 (GMT)
+	Fri, 29 May 2026 15:56:14 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu3YE41877922
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu4qw16187694
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Fri, 29 May 2026 15:56:04 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C409C20040;
-	Fri, 29 May 2026 15:56:03 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 259A920040;
+	Fri, 29 May 2026 15:56:04 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 77A822004B;
+	by IMSVA (Postfix) with ESMTP id CE58D2004D;
 	Fri, 29 May 2026 15:56:03 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 04/26] KVM: arm64: Generalize kvm_cmp_feat_*()
-Date: Fri, 29 May 2026 17:55:37 +0200
-Message-ID: <20260529155601.2927240-5-seiden@linux.ibm.com>
+Subject: [PATCH v1 05/26] KVM: arm64: Generalize kvm_has_feat_*
+Date: Fri, 29 May 2026 17:55:38 +0200
+Message-ID: <20260529155601.2927240-6-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155601.2927240-1-seiden@linux.ibm.com>
 References: <20260529155601.2927240-1-seiden@linux.ibm.com>
@@ -91,29 +91,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=fIYJG5ae c=1 sm=1 tr=0 ts=6a19b71c cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Authority-Analysis: v=2.4 cv=QLJYgALL c=1 sm=1 tr=0 ts=6a19b71e cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=_j3w4fkP5V9tGIP_pu8A:9
-X-Proofpoint-ORIG-GUID: LwKL746gUuzqFOb_cvnxjsPLxtZNxuA6
-X-Proofpoint-GUID: LwKL746gUuzqFOb_cvnxjsPLxtZNxuA6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfXx7ll/KPOg9Zh
- qKwcPJ1vxRGBqw1V7I37q1tG2FZG8gbYHjnuMPcnybFBgttruvnxyEsvrccF5xa3gDCVEpzKDad
- 55gUaOlL65YNEL4ub+66bU1in1bNGLrYm7l/RczFcAd1vWyIbiuYHWTXwo5a5YKyhuv6qfH9TgV
- w3THlYphBhrh2fI56cPnquEZrG9LaGqeMDrumy6JuLZWdMH7pbdAqyVwDlPhrACnkeKUbhc4AKp
- XE+zQ8kWDJZrr6+poTo00g+mDG6NsDWwdeU2jQIbGyHSbdnjwCZcAV8cU4RImS/FzKYf6Wsn0Nr
- XTM1XFlnVPxpXIT+ayCRoTUVz6lXydeFi9lwnsiOmBZszVyz+lxUdyzoAWNpey6HX1AGJS4N7Ys
- ruW0A+B9k9Bmcygj305loQh7W0y4GTZvfsMmWmLTu9ZjKn4bwyil5fxeq32bhnwiUup2nC9xPD5
- UcXXS9n1Ps/YV0wzDSQ==
+ a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=_j3w4fkP5V9tGIP_pu8A:9
+X-Proofpoint-GUID: pjTP7KJw7SCX0_U55yppFHYCNLoNtDUQ
+X-Proofpoint-ORIG-GUID: pjTP7KJw7SCX0_U55yppFHYCNLoNtDUQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX6V5nzLMy5oqZ
+ givv/kpikfps64HDzkuYJMwm24WuhYZrue3RNXGoYhzBUU5Iyj9hR5SM3uOzxDf1V+rwIOEiv5b
+ EgVPvjOgEdWVMFy/bawWtKBfmXpjEYRZhhAshn080uNe3rb71JfAuXe4F/qgWdTK3xPxjUwYUJt
+ NbvBEfm0jhFYtZ9l9cyEhujKJEkAQHCuF40uilN7TOEehuStJ49rnx7pi/k/f3b+jHeRQZekGIn
+ 9zvCu2/Jo8X+m3gS/inHV3951jbha/CFy6boFTXzbyiqJshNRdbSpzEJybPBJ1K8QYRqoSKwNrm
+ v833snpklKzJtDu3NqEAKF1MwMelE0AdPvt8K+VFKHCBaDNVY0xgLUiD6VEP+LDTjeA7dpvIUr9
+ +pVJVvfpYuYrhFMnIWOST2OmDuh3bTSa7094eOP9oRgVzdDvO+f4DrBxAbhOZkZk/tLiMLDqXeV
+ SELU6JrsMU8t+s3YTJg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2605290156
+ spamscore=0 suspectscore=0 impostorscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
 
 Introduce an intermediate macro that extracts the value from a passed
 parameter instead of reading the VM's ID register. Allow using other
@@ -124,50 +123,52 @@ Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_feature.h | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_feature.h | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_feature.h b/arch/arm64/include/asm/kvm_feature.h
-index 067550d5b208..6dd7b4a4929c 100644
+index 6dd7b4a4929c..b627696ac648 100644
 --- a/arch/arm64/include/asm/kvm_feature.h
 +++ b/arch/arm64/include/asm/kvm_feature.h
-@@ -15,6 +15,17 @@
- 		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
- 	})
+@@ -26,6 +26,16 @@
+ 	 cmp_id_feat_signed(val, id, fld, op, limit) :			\
+ 	 cmp_id_feat_unsigned(val, id, fld, op, limit))
  
-+#define cmp_id_feat_signed(val, id, fld, op, limit)			\
-+	(extract_id_field_signed((val), id, fld) op S64_SYS_FIELD_VALUE(id, fld, limit))
++#define id_has_feat(val, id, fld, limit)				\
++	cmp_id_feat(val, id, fld, >=, limit)
 +
-+#define cmp_id_feat_unsigned(val, id, fld, op, limit)			\
-+	(extract_id_field_unsigned((val), id, fld) op (u64)SYS_FIELD_VALUE(id, fld, limit))
++#define id_has_feat_enum(val, id, fld, variant)				\
++	cmp_id_feat_unsigned(val, id, fld, ==, variant)
 +
-+#define cmp_id_feat(val, id, fld, op, limit)				\
-+	(id##_##fld##_SIGNED ?						\
-+	 cmp_id_feat_signed(val, id, fld, op, limit) :			\
-+	 cmp_id_feat_unsigned(val, id, fld, op, limit))
++#define id_has_feat_range(val, id, fld, min, max)			\
++	(cmp_id_feat(val, id, fld, >=, min) &&				\
++	cmp_id_feat(val, id, fld, <=, max))
 +
  #define get_idreg_field_unsigned(kvm, id, fld)				\
  	extract_id_field_unsigned(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld)
  
-@@ -25,15 +36,13 @@
- 	extract_id_field_unsigned(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld)
- 
- #define kvm_cmp_feat_signed(kvm, id, fld, op, limit)			\
--	(get_idreg_field_signed((kvm), id, fld) op S64_SYS_FIELD_VALUE(id, fld, limit))
-+	cmp_id_feat_signed(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, op, limit)
- 
- #define kvm_cmp_feat_unsigned(kvm, id, fld, op, limit)			\
--	(get_idreg_field_unsigned((kvm), id, fld) op (u64)SYS_FIELD_VALUE(id, fld, limit))
-+	cmp_id_feat_unsigned(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, op, limit)
- 
- #define kvm_cmp_feat(kvm, id, fld, op, limit)				\
--	(id##_##fld##_SIGNED ?						\
--	 kvm_cmp_feat_signed(kvm, id, fld, op, limit) :			\
--	 kvm_cmp_feat_unsigned(kvm, id, fld, op, limit))
-+	cmp_id_feat(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, op, limit)
+@@ -45,18 +55,17 @@
+ 	cmp_id_feat(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, op, limit)
  
  #define __kvm_has_feat(kvm, id, fld, limit)				\
- 	kvm_cmp_feat(kvm, id, fld, >=, limit)
+-	kvm_cmp_feat(kvm, id, fld, >=, limit)
++	id_has_feat(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, limit)
+ 
+ #define kvm_has_feat(kvm, ...) __kvm_has_feat(kvm, __VA_ARGS__)
+ 
+ #define __kvm_has_feat_enum(kvm, id, fld, val)				\
+-	kvm_cmp_feat_unsigned(kvm, id, fld, ==, val)
++	id_has_feat_enum(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, val)
+ 
+ #define kvm_has_feat_enum(kvm, ...) __kvm_has_feat_enum(kvm, __VA_ARGS__)
+ 
+ #define kvm_has_feat_range(kvm, id, fld, min, max)			\
+-	(kvm_cmp_feat(kvm, id, fld, >=, min) &&				\
+-	kvm_cmp_feat(kvm, id, fld, <=, max))
++	id_has_feat_range(kvm_read_vm_id_reg((kvm), SYS_##id), id, fld, min, max)
+ 
+ /* Check for a given level of PAuth support */
+ #define kvm_has_pauth(k, l)						\
 -- 
 2.53.0
 
