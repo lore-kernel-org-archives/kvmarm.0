@@ -1,57 +1,57 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212D53DA7D7
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA50F3DE434
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780069878; cv=none; b=FmWexpcaMEfSNuweUuu9Mi1AaRA4g7mO9SEopc2aGVzXCcLOtBwQ8U/qo2RRPJ4X2URo02mh5IQsVH6ubYhPjXKZzsSYtjo8qaTIHv1xQnd+B6AGqltXZf1DpCF4IWNDb9Jd/m3IenMMBqo+KfPiFZnhReWQE2uuLw6Di+bZeaY=
+	t=1780069879; cv=none; b=N/2Dkg41GG5AOOAgTyM+u5KMabtBmahZFbQAit1GfmfiNmNsODgcaW78vKshiOqHcwJ7g4IBdZdtK6qYFMkY5TZB0K1poBT/nRDFkT7AGjYEhg4bxq9Ks2NLDAkI/JTxwi36GIAx24of3Z9NfilHRqdp3BrY9cPrpZ+2xcVLphE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780069878; c=relaxed/simple;
-	bh=PL+B+hN/pv8YTuT+Wea/z3TUfiw++siu+8baG24NFPc=;
+	s=arc-20240116; t=1780069879; c=relaxed/simple;
+	bh=m1dfZQA5Dd70VW7R9UlUEtNADU+DSTpEuZ6CFhhOMGs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pUlbnSO2FqIv87y+vEJVx2onfTzSnUxVVE82C4JEhTqGdMcdjZQiqyUPcgJtero3yot9x0Ajlj6pHaH/dzdFfDYA5csv1dQ7ASTONiIiz9ESObfMvPOxXUrg7zY65NXj2WtKjrLWAvo51cAFm5ucBgb3H5XTN76DttZzDaSYALs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bSSCUgtN; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=alIBPfIn40cK1o1Vx+KhB/FVHx9Ds3KZ/2oZF5xVIQkOjeVK7MdirHfKe/2DFuOoP02PwHbgzwl6JLEJlHPdeejqN6QGmpOZu3Cv1OB5/1g7xObvtzdoEMEJE7bkOXLPeU9UzdL1RTfpTDYwZdWxZTGYNrxRWIqDbatoUQhMqSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=R1tKZ/D7; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bSSCUgtN"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TF7JZL1685714;
-	Fri, 29 May 2026 15:51:05 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="R1tKZ/D7"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFBpm62133330;
+	Fri, 29 May 2026 15:51:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=mVRWmWC6zwA+qbTs4
-	M5BSKYBAtiPHHnp+KUMtZogWBA=; b=bSSCUgtNI23On3RpMdAyFBUAxOIdKNUb+
-	apv5K9MnWWaNfxg5Ls7NkMCNUkcG9kePZYLclqg7+Mut454BVeyq6A55Ag/2bXpf
-	+EeKL30E5RG5AZRi7ocDuXMUxN8ohl7IA1RaQHd8Qqa0o9okd1n0C3twXrK7PuZx
-	Zesz7wukt+8DYpuF4UA6nuWTa6oj8Fcp/aI4Zso4Xj5MNcxQVYdb4CsVXVRDK2bm
-	6PFmABjjJ09BGL2BVdsXzFDCcwIX8jcq8Geo079XHAL1izi7SYEOyO+Cb/sEtDRg
-	Lvl88IvCr6M6WkTYwrzSKYrKmgIROWkNMrEaH/i1xt8GD0Bko9/4g==
+	:mime-version:references:subject:to; s=pp1; bh=LVdCA853kbF/5ti7W
+	0oIJc7JmhR6xTQgk8c1qFoC35k=; b=R1tKZ/D7MRUhafRPs1sc8ZKPIOWjiURwm
+	tH8kfHjnKvDmVOGOw/ZLuz3xNaDnwUsVru3c+b9QCUyXyMQQXF9q7hWFLFxl7nH6
+	935JnCnk/XPpZn7+Z1potJdgc81It519h40TA03GNYfV4BkE+gFn9kkFUHWug5kq
+	xLsdNNhXvxwgbNL1M/eogN+30CdZyBQ+3JtcGDHxqcNO3TsjkXMPAWViQzcNXltS
+	qXsZGWOQRqluJXLXJAzh5OEhWaSAWXrnGLOEMyyxk74w7KSqS9+jG+EXmR1hqlua
+	n9qJRJf/LU5CHLvXyHI84hfBJEsIpbaqCSN6aT0e9500y8lv/XvTg==
 Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884mbsf-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee887uxpb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:51:04 +0000 (GMT)
+	Fri, 29 May 2026 15:51:01 +0000 (GMT)
 Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFd6ck018480;
-	Fri, 29 May 2026 15:51:03 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc0fby-1
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFd6ce018480;
+	Fri, 29 May 2026 15:51:01 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc0faw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:51:03 +0000 (GMT)
+	Fri, 29 May 2026 15:51:01 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFoveq48431390
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFor1329950428
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:50:57 GMT
+	Fri, 29 May 2026 15:50:53 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2421F20043;
-	Fri, 29 May 2026 15:50:57 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C77342004F;
+	Fri, 29 May 2026 15:50:53 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C70062004F;
-	Fri, 29 May 2026 15:50:56 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 76A4C20065;
+	Fri, 29 May 2026 15:50:53 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:50:56 +0000 (GMT)
+	Fri, 29 May 2026 15:50:53 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 17/27] KVM: Remove KVM_MMIO as config option
-Date: Fri, 29 May 2026 17:50:31 +0200
-Message-ID: <20260529155050.2902245-18-seiden@linux.ibm.com>
+Subject: [PATCH v3 08/27] arm64: Extract pstate definitions from ptrace
+Date: Fri, 29 May 2026 17:50:22 +0200
+Message-ID: <20260529155050.2902245-9-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155050.2902245-1-seiden@linux.ibm.com>
 References: <20260529155050.2902245-1-seiden@linux.ibm.com>
@@ -91,350 +91,347 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=fIYJG5ae c=1 sm=1 tr=0 ts=6a19b5e9 cx=c_pps
+X-Authority-Analysis: v=2.4 cv=QLJYgALL c=1 sm=1 tr=0 ts=6a19b5e5 cx=c_pps
  a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=8UI0e4M0uH3UOGHAWE8A:9
- a=9IkURH4LAGRwoN1D:21
-X-Proofpoint-ORIG-GUID: lz6R7yHm8MM5A6uh5QOxJxAHm8RRqT6n
-X-Proofpoint-GUID: lz6R7yHm8MM5A6uh5QOxJxAHm8RRqT6n
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX+MuuAh5GyVir
- uzDYW941/4uBf9frvZfjbsQe9+rNj8MhGaddVbtMxco5sffOkAifgptdlwuic65qritg/Pwug8J
- 5a7eI/gzAyfTi1nSkf0CQbqSRN3t2GHIFLF3OM8mWOeE/KUc7iJXSY1E01J+Rt+ftnMKMdjofBa
- Iz6XwFAoQYMRvLrd0art+cveVgpY9PMu+pRe+u/EMGoEuYGfa2Rp+md3YNAkgI1A8/X3YHXl1sM
- NKgTEtMET5Dw1pZC2B1Cqu/xshAJMY2a7iMpC/TkcK00SE7Fa2b/JY1HcDfTuwJIbDdSUj5Qy/N
- 0AfH7bM3l7Q2H60N5JNmRhStkcgeYAuJMmRgDc6aTtmwnxaRftsAWc3pyimBOOAQ1KPX69Y6/bJ
- 0S2qEcA6ixmv+Bt99ti3nvFmBp+JeIkgAXjTCyjKHhk1PhLPo4rso3t7ndzGrIbdF2swvxDoUxY
- NHjJso08JKxmxeoALCA==
+ a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=i1ah5YvoNV5MJ1hGTMsA:9
+X-Proofpoint-GUID: k7iLlbha4RP5sQ5NhvwMiH7gx8HDYHuz
+X-Proofpoint-ORIG-GUID: k7iLlbha4RP5sQ5NhvwMiH7gx8HDYHuz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX8A2AaQgcgruw
+ FULirAMl+hFRAkpUlZAvHR54Xocl04rcqP8oPdtdOAC+wzixXlaaKUWMcT8QpRCzj+b8hMS+Dit
+ HwgU7YnIccpqGVQo6ifL6dTClD80GYRnbMWC2LfcQOOt9Q6sAVjd5KDF4c5tOyWy1kOF2rji3V9
+ 26Y38Bamy6qjFale3xScARf5P4ZHzHBYC1kgup5thtJ2iA+MdqThO/YqlM2gHb729Ln9jB3sXWW
+ W+JYo0vm01nHUskQUYnrEnmdYAq+YZ0HUPtEYHZn1+lfl3wjurcsf5hbpeFpnYkJjQABo8QCYLt
+ mfx0Vgeu8wdeREvpJOkc8E9ldpw/Nny2k92quQmwMcBIwFPgvrdz7YdI503wXTw7MpaLXNAZudX
+ wi9hyFnRMhfllIkrRpx8z+dLF+3JL1ZdDTtTTdf57zfyAWG6kfpaEfzCRE2UKZ/IvqQBVbyzkjF
+ JDbzzXYLWp0f3cghqEg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2605290156
+ spamscore=0 suspectscore=0 impostorscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
 
-Defining KVM_MMIO is not flexible enough for multi-KVM systems with
-different Kconfig options regarding KVM_MMIO. Therefore, remove KVM_MMIO
-from the config space and use the macro HAVE_KVM_MMIO instead.
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Suggested-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Split all definitions that can be used by non-native architectures into a
+separate file pstate.h. This allows other architectures using
+the pstate definitions. While at it refactor SPSR related definitions
+to use the BIT(n) macro and move them into sysreg-defs.h
+
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_host.h     | 2 ++
- arch/arm64/kvm/Kconfig                | 1 -
- arch/loongarch/include/asm/kvm_host.h | 2 ++
- arch/loongarch/kvm/Kconfig            | 1 -
- arch/mips/include/asm/kvm_host.h      | 2 ++
- arch/mips/kvm/Kconfig                 | 1 -
- arch/powerpc/include/asm/kvm_host.h   | 7 +++++++
- arch/powerpc/kvm/Kconfig              | 4 ----
- arch/riscv/include/asm/kvm_host.h     | 2 ++
- arch/riscv/kvm/Kconfig                | 1 -
- arch/x86/include/asm/kvm_host.h       | 2 ++
- arch/x86/kvm/Kconfig                  | 1 -
- include/linux/kvm_host.h              | 2 +-
- virt/kvm/Kconfig                      | 3 ---
- virt/kvm/Makefile.kvm                 | 3 +--
- virt/kvm/coalesced_mmio.c             | 3 +++
- virt/kvm/coalesced_mmio.h             | 2 +-
- virt/kvm/kvm_main.c                   | 8 ++++----
- 18 files changed, 27 insertions(+), 20 deletions(-)
+ arch/arm64/include/asm/ptrace.h      | 34 +-----------------
+ arch/arm64/include/uapi/asm/pstate.h | 53 ++++++++++++++++++++++++++++
+ arch/arm64/include/uapi/asm/ptrace.h | 49 +------------------------
+ include/arch/arm64/asm/pstate.h      | 46 ++++++++++++++++++++++++
+ include/arch/arm64/asm/sysreg-defs.h | 42 ++++++++++++++++++++++
+ include/uapi/arch/arm64/asm/Kbuild   |  1 +
+ 6 files changed, 144 insertions(+), 81 deletions(-)
+ create mode 100644 arch/arm64/include/uapi/asm/pstate.h
+ create mode 100644 include/arch/arm64/asm/pstate.h
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bcc30419e2de..2db51746b4d8 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -33,6 +33,8 @@
+diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
+index 39582511ad72..72ea0a8af960 100644
+--- a/arch/arm64/include/asm/ptrace.h
++++ b/arch/arm64/include/asm/ptrace.h
+@@ -9,6 +9,7 @@
+ #define __ASM_PTRACE_H
  
- #define KVM_HALT_POLL_NS_DEFAULT 500000
+ #include <asm/cpufeature.h>
++#include <asm/pstate.h>
  
-+#define HAVE_KVM_MMIO
-+
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
- #include <kvm/arm_pmu.h>
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 449154f9a485..dd138b730217 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -22,7 +22,6 @@ menuconfig KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
--	select KVM_MMIO
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select KVM_VFIO
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 776bc487a705..f4f52c71fdbb 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -27,6 +27,8 @@
+ #include <uapi/asm/ptrace.h>
  
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -28,10 +29,6 @@
  
-+#define HAVE_KVM_MMIO
-+
- /* Loongarch KVM register ids */
- #define KVM_GET_IOC_CSR_IDX(id)		((id & KVM_CSR_IDX_MASK) >> LOONGARCH_REG_SHIFT)
- #define KVM_GET_IOC_CPUCFG_IDX(id)	((id & KVM_CPUCFG_IDX_MASK) >> LOONGARCH_REG_SHIFT)
-diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-index 15da2d88c0c1..f03872ba0ba8 100644
---- a/arch/loongarch/kvm/Kconfig
-+++ b/arch/loongarch/kvm/Kconfig
-@@ -28,7 +28,6 @@ config KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_GENERIC_HARDWARE_ENABLING
--	select KVM_MMIO
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index c14b10821817..e3cb7c8c9461 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -26,6 +26,8 @@
+ #define GIC_PRIO_PSR_I_SET	GICV3_PRIO_PSR_I_SET
  
- #include <kvm/iodev.h>
- 
-+#define HAVE_KVM_MMIO
-+
- /* MIPS KVM register ids */
- #define MIPS_CP0_32(_R, _S)					\
- 	(KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
-diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-index b1b9a1d67758..c65596fdf54f 100644
---- a/arch/mips/kvm/Kconfig
-+++ b/arch/mips/kvm/Kconfig
-@@ -22,7 +22,6 @@ config KVM
- 	select EXPORT_UASM
- 	select KVM_COMMON
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
--	select KVM_MMIO
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select HAVE_KVM_READONLY_MEM
- 	help
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 2d139c807577..92d14438e31b 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -29,6 +29,13 @@
- 
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
-+#if defined(CONFIG_KVM_BOOK3S_32_HANDLER) || \
-+	defined(CONFIG_KVM_BOOK3S_PR_POSSIBLE) || \
-+	defined(CONFIG_KVM_E500V2) || \
-+	defined(CONFIG_KVM_E500MC)
-+#define HAVE_KVM_MMIO
-+#endif
-+
- #define KVM_MAX_VCPUS		NR_CPUS
- #define KVM_MAX_VCORES		NR_CPUS
- 
-diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index 9a0d1c1aca6c..d97a4a51ec55 100644
---- a/arch/powerpc/kvm/Kconfig
-+++ b/arch/powerpc/kvm/Kconfig
-@@ -29,7 +29,6 @@ config KVM_BOOK3S_HANDLER
- config KVM_BOOK3S_32_HANDLER
- 	bool
- 	select KVM_BOOK3S_HANDLER
--	select KVM_MMIO
- 
- config KVM_BOOK3S_64_HANDLER
- 	bool
-@@ -37,7 +36,6 @@ config KVM_BOOK3S_64_HANDLER
- 
- config KVM_BOOK3S_PR_POSSIBLE
- 	bool
--	select KVM_MMIO
- 
- config KVM_BOOK3S_HV_POSSIBLE
- 	bool
-@@ -200,7 +198,6 @@ config KVM_E500V2
- 	depends on PPC_E500 && !PPC_E500MC
- 	depends on !CONTEXT_TRACKING_USER
- 	select KVM
--	select KVM_MMIO
- 	help
- 	  Support running unmodified E500 guest kernels in virtual machines on
- 	  E500v2 host processors.
-@@ -215,7 +212,6 @@ config KVM_E500MC
- 	depends on PPC_E500MC
- 	depends on !CONTEXT_TRACKING_USER
- 	select KVM
--	select KVM_MMIO
- 	select KVM_BOOKE_HV
- 	help
- 	  Support running unmodified E500MC/E5500/E6500 guest kernels in
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 75b0a951c1bc..b004427c07a0 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -26,6 +26,8 @@
- #include <asm/kvm_vcpu_timer.h>
- #include <asm/kvm_vcpu_pmu.h>
- 
-+#define HAVE_KVM_MMIO
-+
- #define KVM_MAX_VCPUS			1024
- 
- #define KVM_HALT_POLL_NS_DEFAULT	500000
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index ec2cee0a39e0..3aea8d4939d2 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -28,7 +28,6 @@ config KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_GENERIC_HARDWARE_ENABLING
--	select KVM_MMIO
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c470e40a00aa..aa630838e039 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -46,6 +46,8 @@
- 
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
-+#define HAVE_KVM_MMIO
-+
- /*
-  * CONFIG_KVM_MAX_NR_VCPUS is defined iff CONFIG_KVM!=n, provide a dummy max if
-  * KVM is disabled (arbitrarily use the default from CONFIG_KVM_MAX_NR_VCPUS).
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 801bf9e520db..da5d9fa8a11c 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -32,7 +32,6 @@ config KVM_X86
- 	select VHOST_TASK
- 	select KVM_ASYNC_PF
- 	select USER_RETURN_NOTIFIER
--	select KVM_MMIO
- 	select SCHED_INFO
- 	select PERF_EVENTS
- 	select GUEST_PERF_EVENTS
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f44885fc6e6a..0fb194e3d950 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -834,7 +834,7 @@ struct kvm {
- 	struct list_head ioeventfds;
- 	struct kvm_vm_stat stat;
- 	struct kvm_arch arch;
--#ifdef CONFIG_KVM_MMIO
-+#ifdef HAVE_KVM_MMIO
- 	struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
- 	spinlock_t ring_lock;
- 	struct list_head coalesced_zones;
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 794976b88c6f..c4a983e41765 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -40,9 +40,6 @@ config NEED_KVM_DIRTY_RING_WITH_BITMAP
- 	bool
- 	depends on HAVE_KVM_DIRTY_RING
- 
--config KVM_MMIO
--       bool
+-/* Additional SPSR bits not exposed in the UABI */
+-#define PSR_MODE_THREAD_BIT	(1 << 0)
+-#define PSR_IL_BIT		(1 << 20)
 -
- config KVM_ASYNC_PF
-        bool
+ /* AArch32-specific ptrace requests */
+ #define COMPAT_PTRACE_GETREGS		12
+ #define COMPAT_PTRACE_SETREGS		13
+@@ -42,41 +39,12 @@
+ #define COMPAT_PTRACE_GETHBPREGS	29
+ #define COMPAT_PTRACE_SETHBPREGS	30
  
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index d047d4cf58c9..3c27c18b49a0 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -5,9 +5,8 @@
+-/* SPSR_ELx bits for exceptions taken from AArch32 */
+-#define PSR_AA32_MODE_MASK	0x0000001f
+-#define PSR_AA32_MODE_USR	0x00000010
+-#define PSR_AA32_MODE_FIQ	0x00000011
+-#define PSR_AA32_MODE_IRQ	0x00000012
+-#define PSR_AA32_MODE_SVC	0x00000013
+-#define PSR_AA32_MODE_ABT	0x00000017
+-#define PSR_AA32_MODE_HYP	0x0000001a
+-#define PSR_AA32_MODE_UND	0x0000001b
+-#define PSR_AA32_MODE_SYS	0x0000001f
+-#define PSR_AA32_T_BIT		0x00000020
+-#define PSR_AA32_F_BIT		0x00000040
+-#define PSR_AA32_I_BIT		0x00000080
+-#define PSR_AA32_A_BIT		0x00000100
+-#define PSR_AA32_E_BIT		0x00000200
+-#define PSR_AA32_PAN_BIT	0x00400000
+-#define PSR_AA32_SSBS_BIT	0x00800000
+-#define PSR_AA32_DIT_BIT	0x01000000
+-#define PSR_AA32_Q_BIT		0x08000000
+-#define PSR_AA32_V_BIT		0x10000000
+-#define PSR_AA32_C_BIT		0x20000000
+-#define PSR_AA32_Z_BIT		0x40000000
+-#define PSR_AA32_N_BIT		0x80000000
+-#define PSR_AA32_IT_MASK	0x0600fc00	/* If-Then execution state mask */
+-#define PSR_AA32_GE_MASK	0x000f0000
+-
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ #define PSR_AA32_ENDSTATE	PSR_AA32_E_BIT
+ #else
+ #define PSR_AA32_ENDSTATE	0
+ #endif
  
- KVM ?= ../../../virt/kvm
- 
--kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-+kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
--kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
- kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
- kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 6b1d90161099..070eba3c6534 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -12,6 +12,8 @@
- #include <kvm/iodev.h>
- 
- #include <linux/kvm_host.h>
+-/* AArch32 CPSR bits, as seen in AArch32 */
+-#define COMPAT_PSR_DIT_BIT	0x00200000
+-
+ /*
+  * These are 'magic' values for PTRACE_PEEKUSR that return info about where a
+  * process is located in memory.
+diff --git a/arch/arm64/include/uapi/asm/pstate.h b/arch/arm64/include/uapi/asm/pstate.h
+new file mode 100644
+index 000000000000..1fbbdb6e8a2b
+--- /dev/null
++++ b/arch/arm64/include/uapi/asm/pstate.h
+@@ -0,0 +1,53 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 +
-+#ifdef HAVE_KVM_MMIO
- #include <linux/slab.h>
- #include <linux/kvm.h>
++#ifndef _UAPI__ASM_PSTATE_SHARED_H
++#define _UAPI__ASM_PSTATE_SHARED_H
++
++/*
++ * PSR bits
++ */
++#define PSR_MODE_EL0t  0x00000000
++#define PSR_MODE_EL1t  0x00000004
++#define PSR_MODE_EL1h  0x00000005
++#define PSR_MODE_EL2t  0x00000008
++#define PSR_MODE_EL2h  0x00000009
++#define PSR_MODE_EL3t  0x0000000c
++#define PSR_MODE_EL3h  0x0000000d
++#define PSR_MODE_MASK  0x0000000f
++
++/* AArch32 CPSR bits */
++#define PSR_MODE32_BIT         0x00000010
++
++/* AArch64 SPSR bits */
++#define PSR_F_BIT      0x00000040
++#define PSR_I_BIT      0x00000080
++#define PSR_A_BIT      0x00000100
++#define PSR_D_BIT      0x00000200
++#define PSR_BTYPE_MASK 0x00000c00
++#define PSR_SSBS_BIT   0x00001000
++#define PSR_PAN_BIT    0x00400000
++#define PSR_UAO_BIT    0x00800000
++#define PSR_DIT_BIT    0x01000000
++#define PSR_TCO_BIT    0x02000000
++#define PSR_V_BIT      0x10000000
++#define PSR_C_BIT      0x20000000
++#define PSR_Z_BIT      0x40000000
++#define PSR_N_BIT      0x80000000
++
++#define PSR_BTYPE_SHIFT                10
++
++/*
++ * Groups of PSR bits
++ */
++#define PSR_f          0xff000000      /* Flags                */
++#define PSR_s          0x00ff0000      /* Status               */
++#define PSR_x          0x0000ff00      /* Extension            */
++#define PSR_c          0x000000ff      /* Control              */
++
++/* Convenience names for the values of PSTATE.BTYPE */
++#define PSR_BTYPE_NONE         (0b00 << PSR_BTYPE_SHIFT)
++#define PSR_BTYPE_JC           (0b01 << PSR_BTYPE_SHIFT)
++#define PSR_BTYPE_C            (0b10 << PSR_BTYPE_SHIFT)
++#define PSR_BTYPE_J            (0b11 << PSR_BTYPE_SHIFT)
++
++#endif /* _UAPI__ASM_PSTATE_SHARED_H */
+diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+index 6fed93fb2536..6e743eb021e8 100644
+--- a/arch/arm64/include/uapi/asm/ptrace.h
++++ b/arch/arm64/include/uapi/asm/ptrace.h
+@@ -24,54 +24,7 @@
  
-@@ -188,3 +190,4 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
- 	 */
- 	return 0;
- }
-+#endif /* ifdef HAVE_KVM_MMIO */
-diff --git a/virt/kvm/coalesced_mmio.h b/virt/kvm/coalesced_mmio.h
-index 36f84264ed25..a8430d41945b 100644
---- a/virt/kvm/coalesced_mmio.h
-+++ b/virt/kvm/coalesced_mmio.h
-@@ -11,7 +11,7 @@
-  *
-  */
+ #include <asm/hwcap.h>
+ #include <asm/sve_context.h>
+-
+-
+-/*
+- * PSR bits
+- */
+-#define PSR_MODE_EL0t	0x00000000
+-#define PSR_MODE_EL1t	0x00000004
+-#define PSR_MODE_EL1h	0x00000005
+-#define PSR_MODE_EL2t	0x00000008
+-#define PSR_MODE_EL2h	0x00000009
+-#define PSR_MODE_EL3t	0x0000000c
+-#define PSR_MODE_EL3h	0x0000000d
+-#define PSR_MODE_MASK	0x0000000f
+-
+-/* AArch32 CPSR bits */
+-#define PSR_MODE32_BIT		0x00000010
+-
+-/* AArch64 SPSR bits */
+-#define PSR_F_BIT	0x00000040
+-#define PSR_I_BIT	0x00000080
+-#define PSR_A_BIT	0x00000100
+-#define PSR_D_BIT	0x00000200
+-#define PSR_BTYPE_MASK	0x00000c00
+-#define PSR_SSBS_BIT	0x00001000
+-#define PSR_PAN_BIT	0x00400000
+-#define PSR_UAO_BIT	0x00800000
+-#define PSR_DIT_BIT	0x01000000
+-#define PSR_TCO_BIT	0x02000000
+-#define PSR_V_BIT	0x10000000
+-#define PSR_C_BIT	0x20000000
+-#define PSR_Z_BIT	0x40000000
+-#define PSR_N_BIT	0x80000000
+-
+-#define PSR_BTYPE_SHIFT		10
+-
+-/*
+- * Groups of PSR bits
+- */
+-#define PSR_f		0xff000000	/* Flags		*/
+-#define PSR_s		0x00ff0000	/* Status		*/
+-#define PSR_x		0x0000ff00	/* Extension		*/
+-#define PSR_c		0x000000ff	/* Control		*/
+-
+-/* Convenience names for the values of PSTATE.BTYPE */
+-#define PSR_BTYPE_NONE		(0b00 << PSR_BTYPE_SHIFT)
+-#define PSR_BTYPE_JC		(0b01 << PSR_BTYPE_SHIFT)
+-#define PSR_BTYPE_C		(0b10 << PSR_BTYPE_SHIFT)
+-#define PSR_BTYPE_J		(0b11 << PSR_BTYPE_SHIFT)
++#include <asm/pstate.h>
  
--#ifdef CONFIG_KVM_MMIO
-+#ifdef HAVE_KVM_MMIO
+ /* syscall emulation path in ptrace */
+ #define PTRACE_SYSEMU		  31
+diff --git a/include/arch/arm64/asm/pstate.h b/include/arch/arm64/asm/pstate.h
+new file mode 100644
+index 000000000000..5a576ad94064
+--- /dev/null
++++ b/include/arch/arm64/asm/pstate.h
+@@ -0,0 +1,46 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef __ARM64_ASM_PSTATE_H
++#define __ARM64_ASM_PSTATE_H
++
++#include <asm/sysreg-defs.h>
++#ifdef __aarch64__
++#include <uapi/asm/pstate.h>
++#else
++#include <uapi/arch/arm64/asm/pstate.h>
++#endif /* __aarch64__ */
++
++/* Additional SPSR bits not exposed in the UABI */
++#define PSR_MODE_THREAD_BIT	BIT(0)
++#define PSR_IL_BIT		SPSR_IL
++
++/* SPSR_ELx bits for exceptions taken from AArch32 */
++#define PSR_AA32_MODE_MASK	SPSR_MODE_MASK
++#define PSR_AA32_MODE_USR	(SPSR_MODE_32BIT | SPSR32_MODE_USR)
++#define PSR_AA32_MODE_FIQ	(SPSR_MODE_32BIT | SPSR32_MODE_FIQ)
++#define PSR_AA32_MODE_IRQ	(SPSR_MODE_32BIT | SPSR32_MODE_IRQ)
++#define PSR_AA32_MODE_SVC	(SPSR_MODE_32BIT | SPSR32_MODE_SVC)
++#define PSR_AA32_MODE_ABT	(SPSR_MODE_32BIT | SPSR32_MODE_ABT)
++#define PSR_AA32_MODE_HYP	(SPSR_MODE_32BIT | SPSR32_MODE_HYP)
++#define PSR_AA32_MODE_UND	(SPSR_MODE_32BIT | SPSR32_MODE_UND)
++#define PSR_AA32_MODE_SYS	(SPSR_MODE_32BIT | SPSR32_MODE_SYS)
++#define PSR_AA32_T_BIT		SPSR32_T
++#define PSR_AA32_F_BIT		SPSR_F
++#define PSR_AA32_I_BIT		SPSR_I
++#define PSR_AA32_A_BIT		SPSR_A
++#define PSR_AA32_E_BIT		SPSR32_E
++#define PSR_AA32_PAN_BIT	SPSR_PAN
++#define PSR_AA32_SSBS_BIT	SPSR32_SSBS
++#define PSR_AA32_DIT_BIT	SPSR_DIT
++#define PSR_AA32_Q_BIT		SPSR32_Q
++#define PSR_AA32_V_BIT		SPSR_V
++#define PSR_AA32_C_BIT		SPSR_C
++#define PSR_AA32_Z_BIT		SPSR_Z
++#define PSR_AA32_N_BIT		SPSR_N
++#define PSR_AA32_IT_MASK	SPSR32_IT_MASK	/* If-Then execution state mask */
++#define PSR_AA32_GE_MASK	SPSR32_GE_MASK
++
++/* AArch32 CPSR bits, as seen in AArch32 */
++#define COMPAT_PSR_DIT_BIT	0x00200000
++
++#endif /* __ARM64_ASM_PSTATE_H */
+diff --git a/include/arch/arm64/asm/sysreg-defs.h b/include/arch/arm64/asm/sysreg-defs.h
+index 58cb7eb0bf4e..27646c91e15c 100644
+--- a/include/arch/arm64/asm/sysreg-defs.h
++++ b/include/arch/arm64/asm/sysreg-defs.h
+@@ -468,6 +468,48 @@
+ #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+ #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
  
- #include <linux/list.h>
++#define SPSR_PPEND			BIT(33)
++#define SPSR_N				BIT(31)
++#define SPSR_Z				BIT(30)
++#define SPSR_C				BIT(29)
++#define SPSR_V				BIT(28)
++#define SPSR32_Q			BIT(27)
++#define SPSR32_IT_MASK			(GENMASK(26, 25) | GENMASK(15, 10))
++#define SPSR64_TCO			BIT(25)
++#define SPSR_DIT			BIT(24)
++#define SPSR64_UAO			BIT(23)
++#define SPSR32_SSBS			BIT(23)
++#define SPSR_PAN			BIT(22)
++#define SPSR_SS				BIT(21)
++#define SPSR_IL				BIT(20)
++#define SPSR32_GE_MASK			GENMASK(19, 16)
++#define SPSR64_SSBS			BIT(12)
++#define SPSR64_BTYPE_SHIFT		10
++#define SPSR64_BTYPE_MASK		(UL(3) << SPSR64_BTYPE_SHIFT)
++#define SPSR64_D			BIT(9)
++#define SPSR32_E			BIT(9)
++#define SPSR_A				BIT(8)
++#define SPSR_I				BIT(7)
++#define SPSR_F				BIT(6)
++#define SPSR32_T			BIT(5)
++#define SPSR_MODE_MASK			UL(0x1f)
++#define SPSR_MODE_32BIT			BIT(4)
++#define SPSR64_MODE_EL0			UL(0x0)
++#define SPSR64_MODE_EL1t		UL(0x4)
++#define SPSR64_MODE_EL1h		UL(0x5)
++#define SPSR64_MODE_EL2t		UL(0x8)
++#define SPSR64_MODE_EL2h		UL(0x9)
++#define SPSR64_MODE_EL3t		UL(0xc)
++#define SPSR64_MODE_EL3h		UL(0xd)
++#define SPSR32_MODE_USR			UL(0x0)
++#define SPSR32_MODE_FIQ			UL(0x1)
++#define SPSR32_MODE_IRQ			UL(0x2)
++#define SPSR32_MODE_SVC			UL(0x3)
++#define SPSR32_MODE_ABT			UL(0x7)
++#define SPSR32_MODE_HYP			UL(0xa)
++#define SPSR32_MODE_UND			UL(0xb)
++#define SPSR32_MODE_SYS			UL(0xf)
++
+ #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+ #define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 454d99b45fa0..38de0a19d17e 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4034,7 +4034,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
- 	else if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->arch.pio_data);
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifdef HAVE_KVM_MMIO
- 	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
- #endif
-@@ -4860,7 +4860,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_ENABLE_CAP_VM:
- 	case KVM_CAP_HALT_POLL:
- 		return 1;
--#ifdef CONFIG_KVM_MMIO
-+#ifdef HAVE_KVM_MMIO
- 	case KVM_CAP_COALESCED_MMIO:
- 		return KVM_COALESCED_MMIO_PAGE_OFFSET;
- 	case KVM_CAP_COALESCED_PIO:
-@@ -5201,7 +5201,7 @@ static long kvm_vm_ioctl(struct file *filp,
- 		break;
- 	}
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifdef HAVE_KVM_MMIO
- 	case KVM_REGISTER_COALESCED_MMIO: {
- 		struct kvm_coalesced_mmio_zone zone;
+diff --git a/include/uapi/arch/arm64/asm/Kbuild b/include/uapi/arch/arm64/asm/Kbuild
+index 73b69888ea28..f29b28d40e16 100644
+--- a/include/uapi/arch/arm64/asm/Kbuild
++++ b/include/uapi/arch/arm64/asm/Kbuild
+@@ -3,3 +3,4 @@ shared-uapi-src := arch/arm64/include/uapi/asm
  
-@@ -5523,7 +5523,7 @@ static long kvm_dev_ioctl(struct file *filp,
- #ifdef CONFIG_X86
- 		r += PAGE_SIZE;    /* pio data page */
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifdef HAVE_KVM_MMIO
- 		r += PAGE_SIZE;    /* coalesced mmio ring page */
- #endif
- 		break;
+ shared-uapi-y += kvm.h
+ shared-uapi-y += sve_context.h
++shared-uapi-y += pstate.h
 -- 
 2.53.0
 
