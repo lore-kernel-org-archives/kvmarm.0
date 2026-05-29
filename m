@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3E73EAC76
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A313F6C4A
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780070181; cv=none; b=M0zWmZk286DZj7jIBvLElAEtAJFLBubdrBu/zaNyuop1Cl6pJ29c7e+mo9mi7EFCBTL2g1JVG9WaZVP8FogB63pHDhAKYBvL83M0tNhAJDfvPobnc9TbuEmvG/mdauMsOtsA3QWxU7y1Np9igfcK2HALm10SgSAT9siDaMOegCU=
+	t=1780070184; cv=none; b=kghDeKhuaKTd+RvRgRLpWXKN5ZyMov4kt+/NmbiwG2eNqvev4Pc1bzU6LO9fY8AyGcfF+A9rbjNwzsIFlG1L4oZ21TDYzQAkqcEuj9r0LH6Jnz01fObXdxt32hfRNCm1oSaz6xf+PLR5iGEhsat7HgqqKMenJ2iI3VT7/apNAPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780070181; c=relaxed/simple;
-	bh=V9dDmcTZrFbO1AFx9bd9anPVnixWvwu/8ZEoTVMf4M8=;
+	s=arc-20240116; t=1780070184; c=relaxed/simple;
+	bh=tjuJSvy87A6cVWbudTYOVPxNt1QdD+XhxSPmslH9XQk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=utBBF/iQuKKuuP3YPPmhkJUNMU200vYV1bTAj1Qib7aoWoRbVqKmRTHtRpbwp//O8Ia+J0vRv+2mjWrIDFwglyc9XqunKaqkZcv5u7qUzRxfsNfplT3T4QZUJ/wqSjFT9hg2iWRFm7bKbr/pYfXmyFl8qWJguEsTynIFRP22z8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FHWP+mAI; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=dKXgyPPMLblyH0/dglN0bbJqgWwMsB1uQzqJPvaF1FQ8GRYgwErPMyMHmjqVRJYd6hQLaZADELjj759iCDlzjPbooZiXOyHIX7cCPCpq7FhQHydfATpqX7Mxu3C88sDdEvgdxBlQ2pO54uIXHExpJ9R0HD17icl61qix6AZz+5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AXNGdUch; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FHWP+mAI"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFGVBL2418177;
-	Fri, 29 May 2026 15:51:05 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AXNGdUch"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFZ5hW1684858;
+	Fri, 29 May 2026 15:56:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=r8qv0I8vvxpjvrNnb
-	+Rd4VaSRAFc/2VGBv0YYFUfb6Q=; b=FHWP+mAI+48JECvH3V5WAE/KTCF+w87d/
-	rRoWG7cFfMz5S9kdy/cECpUjzZefBDlnJzLwmSMiy4wuIsdzuOjes3fAhMLI4SP7
-	ledii2FrEBj0HNmiIY9r5tYbBYq8RFs6qP8jCl9bCrIrNR3o9WZMDmtbZRumtoZN
-	EyG+Cv0LMcz4wc4ky5hMtVmmNCropBKK3Y5oNeLQ+AWdNfyEq10tkJHiJF4RCuus
-	SdKi6/pCYKPXtzodw8uFg9DEv9l98AA/ZcyNsIZUUUsoxzrGYFRMu8JGwFHiObL3
-	tPWGC/x2s+xjMJvjMkTsfS85yJpSg5LSB5Kt1qyD4Zjye6nR6rR6w==
+	:mime-version:references:subject:to; s=pp1; bh=7WJoSNxNCqAD1yMb5
+	BggkCxNMBPVI9mELDSocM+HPU8=; b=AXNGdUchGt+EKII8ibBc0IXKzgVrMYHGu
+	15IpxwrKwCf73UDiZulwisrnJGqJEQ/+cocWakBSIScC6qHRvYKEND9H0v6odc0/
+	u4/Ax25rM0CkYYdx994iBFfG3r8vykVl3gneL7cTCq7dztU6gvrXtnn9NL3pm9Ku
+	lRhfXngAmVhhe9RxsWKMBPChiz6ggz9ue2IKplQzAl1KM30baWoLyOUYZaKoQjvk
+	InXRhsKdHimdbEHHveqAT/dkYSqt7gp1iaKvlVxQSDbjy1d5+c6tKSqJFuUHJuLd
+	v7mAfTWw5r1xwGhiMaSw6kchafITj1AecWmM5FImUVpjDTfT0cKOA==
 Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884ve37-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884mh3w-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:51:04 +0000 (GMT)
+	Fri, 29 May 2026 15:56:10 +0000 (GMT)
 Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFd76Y024390;
-	Fri, 29 May 2026 15:51:03 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgfsq-1
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs9LN029222;
+	Fri, 29 May 2026 15:56:09 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgkns-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:51:03 +0000 (GMT)
+	Fri, 29 May 2026 15:56:09 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFov3g48431392
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu3aN41877916
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:50:57 GMT
+	Fri, 29 May 2026 15:56:03 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 72FC82004F;
-	Fri, 29 May 2026 15:50:57 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 1577620040;
+	Fri, 29 May 2026 15:56:03 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2AC442004B;
-	Fri, 29 May 2026 15:50:57 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id BD2D42004B;
+	Fri, 29 May 2026 15:56:02 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:50:57 +0000 (GMT)
+	Fri, 29 May 2026 15:56:02 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,12 +77,12 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 18/27] KVM: s390: Prepare kvm-s390 for a second kvm module
-Date: Fri, 29 May 2026 17:50:32 +0200
-Message-ID: <20260529155050.2902245-19-seiden@linux.ibm.com>
+Subject: [PATCH v1 02/26] KVM: arm64: Remove __expand_field_sign_(un)signed
+Date: Fri, 29 May 2026 17:55:35 +0200
+Message-ID: <20260529155601.2927240-3-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260529155050.2902245-1-seiden@linux.ibm.com>
-References: <20260529155050.2902245-1-seiden@linux.ibm.com>
+In-Reply-To: <20260529155601.2927240-1-seiden@linux.ibm.com>
+References: <20260529155601.2927240-1-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -91,58 +91,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=L4MtheT8 c=1 sm=1 tr=0 ts=6a19b5e9 cx=c_pps
+X-Authority-Analysis: v=2.4 cv=fIYJG5ae c=1 sm=1 tr=0 ts=6a19b71a cx=c_pps
  a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=D2QCReHFeZxoMWIWDosA:9
-X-Proofpoint-ORIG-GUID: LXkxrC-Rn5pJk1pTcJtkgP9RCroIABMz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX3iV7Ki2qo8es
- 8WxpfGchgtRgVSK20MRwvoVkbH3MJ/fdha+N8ezkfrbj6ezkPMpovuVFC1V/3f7jd26eBk3X+sZ
- K6yFu/wf4zxic6zC9m1zwsfFy4EYXjt35wOQH0nzWTsMtce5HgFQgTpWEU1QHuYzsuzUHIGGO4y
- DY4UbC20W+AF0a34S86h0ZWYkWo/pmYQsN6GGmvXM6gnGrrANjy7fDOQzdAWds90cDnFmCCI0k2
- DvcBbq+ScLCvC8WawDxY490yCzzyrqR33fGQGbld7yD8WThI7W0Oxxm7NP/P2MdFHgOqNLhhcXD
- yySVxafk4hVuFWwVdppfqu2HUplaUxWs8Jz+yc/w0b4xlOtw3swYNY7q6r8xx15VjG4CGaFh8Na
- 7hAgWrl4E2LHo8GVmeW9kC/0qxvyE+nZKOASfG+npiWUdkDQXM5Fh77A80M5VMkNCTSo+qnqLOs
- gMHOVNru/hyXNt7lESw==
-X-Proofpoint-GUID: LXkxrC-Rn5pJk1pTcJtkgP9RCroIABMz
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=8GpaujLIwWfsa4wt0MAA:9
+X-Proofpoint-ORIG-GUID: 3I44r_DIBytvrXZTWkT_uTU1h5rmPzRk
+X-Proofpoint-GUID: 3I44r_DIBytvrXZTWkT_uTU1h5rmPzRk
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX1KhKBwY2gvl2
+ t/NYK0TgB5NS37wysRV+k4on33aX+pB9kji43Wr2RbAdV+dEY4lg8OVfgh5sqk34D5bmE/7eo68
+ ssrMD5nl0twm65zxGLHszNqeJbkaaqSQYcPL5k7HejuWlwXyG3zZ7VWNdzp2OLDsZhP9QZHYC52
+ LlS7c7Ap/6+BsoJkCd/ANZtIc4Sos3OvsffJGAw2GlTpchRWJGMGwqiIBCFCiFSH0ejKv+hcQcy
+ Kq3md6GF8P7vtn/MQLlqeN/IaaJV0dquFRGNzmiCbNiJwj24Ccpi5CWprxlr866Gw5w50wIY2XX
+ BGP2MQ1iNEKiyXaSlRbYcxS2LYH0Ao+cuJwlNNty/lTgGY4WscfyZyObXAfEyLAGdspfHTDInCS
+ rYpQluYFQuXbiM2XEgjK5SGvmzBjb9LWLvd9GfWoxrCckucTQyxIut3Lo1RKA9N4tFMyvCth9xP
+ Q0/bzea+peapDHh2IKg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- bulkscore=0 impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
+ phishscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
+ definitions=main-2605290156
 
-The second KVM module will have a different Kconfig set.
-When both modules are compiled the Kconfig sets get merged and
-the native s390 KVM needs to implement functionality required by
-the respective config options. Ensure that s390-KVM will still compile.
+__expand_field_sign_unsigned is a very small abstraction that makes it
+harder to see what's happening when looking at the caller. Just inline
+it. Create a macro S64_SYS_FIELD_VALUE that is a sign extended
+SYS_FIELD_VALUE. Then also get rid of __expand_field_sign_signed.
 
+Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/kvm/s390/s390.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/include/asm/kvm_feature.h | 13 ++-----------
+ include/arch/arm64/asm/sysreg-defs.h |  8 ++++++++
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/arch/s390/kvm/s390/s390.c b/arch/s390/kvm/s390/s390.c
-index c9dff21f823e..e9352864a492 100644
---- a/arch/s390/kvm/s390/s390.c
-+++ b/arch/s390/kvm/s390/s390.c
-@@ -5683,6 +5683,14 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 	return gmap_unmap_gfn_range(kvm->arch.gmap, range->slot, range->start, range->end);
- }
+diff --git a/arch/arm64/include/asm/kvm_feature.h b/arch/arm64/include/asm/kvm_feature.h
+index 8d0c65246aa0..d580f4ffab34 100644
+--- a/arch/arm64/include/asm/kvm_feature.h
++++ b/arch/arm64/include/asm/kvm_feature.h
+@@ -6,15 +6,6 @@
+ #include <linux/bitfield.h>
+ #include <asm/sysreg-defs.h>
  
-+#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
-+/* Make s390 compile if arm64-on-s390 is selected */
-+int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
+-#define __expand_field_sign_unsigned(id, fld, val)			\
+-	((u64)SYS_FIELD_VALUE(id, fld, val))
+-
+-#define __expand_field_sign_signed(id, fld, val)			\
+-	({								\
+-		u64 __val = SYS_FIELD_VALUE(id, fld, val);		\
+-		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
+-	})
+-
+ #define get_idreg_field_unsigned(kvm, id, fld)				\
+ 	({								\
+ 		u64 __val = kvm_read_vm_id_reg((kvm), SYS_##id);	\
+@@ -31,10 +22,10 @@
+ 	get_idreg_field_unsigned(kvm, id, fld)
+ 
+ #define kvm_cmp_feat_signed(kvm, id, fld, op, limit)			\
+-	(get_idreg_field_signed((kvm), id, fld) op __expand_field_sign_signed(id, fld, limit))
++	(get_idreg_field_signed((kvm), id, fld) op S64_SYS_FIELD_VALUE(id, fld, limit))
+ 
+ #define kvm_cmp_feat_unsigned(kvm, id, fld, op, limit)			\
+-	(get_idreg_field_unsigned((kvm), id, fld) op __expand_field_sign_unsigned(id, fld, limit))
++	(get_idreg_field_unsigned((kvm), id, fld) op (u64)SYS_FIELD_VALUE(id, fld, limit))
+ 
+ #define kvm_cmp_feat(kvm, id, fld, op, limit)				\
+ 	(id##_##fld##_SIGNED ?						\
+diff --git a/include/arch/arm64/asm/sysreg-defs.h b/include/arch/arm64/asm/sysreg-defs.h
+index 27646c91e15c..3e280d4156ce 100644
+--- a/include/arch/arm64/asm/sysreg-defs.h
++++ b/include/arch/arm64/asm/sysreg-defs.h
+@@ -998,9 +998,17 @@
+ 
+ #ifndef __ASSEMBLER__
+ #include <linux/bitfield.h>
++#include <linux/bitops.h>
++#include <linux/types.h>
+ 
+ #define SYS_FIELD_VALUE(reg, field, val)	reg##_##field##_##val
+ 
++#define S64_SYS_FIELD_VALUE(id, fld, val)				\
++	({								\
++		u64 __val = SYS_FIELD_VALUE(id, fld, val);		\
++		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
++	})
 +
- static inline unsigned long nonhyp_mask(int i)
- {
- 	unsigned int nonhyp_fai = (sclp.hmfai << i * 2) >> 30;
+ #define SYS_FIELD_GET(reg, field, val)		\
+ 		 FIELD_GET(reg##_##field##_MASK, val)
+ 
 -- 
 2.53.0
 
