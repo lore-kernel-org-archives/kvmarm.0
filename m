@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5753E3F1AAF
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 16:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71BD3F1673
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 16:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780070487; cv=none; b=tC8u4XbhCNNNIBQBe1bP7Q1wXarTPqG3Xp7ritdGVRrehjkbHzOTN04bHgmcd66Jlw9RIr06SDTZAFI8fEofo1Ay9ON2rD1MujYZMKCNKM/hQaMNn5rsHiq/WEIyn09sJ3n9PTLT7/H7JrbV6DB14gxKR5xPS98I+0qEV3hLbNs=
+	t=1780070491; cv=none; b=Mbg790Lzc+BEt5wp6BQhuwd1R5eT7Q07YbAz1PGaLSVKcAwTDeIZwLHI/X1duxb6zB0AocwaIK4TG/LIvkFy+MSfFpZFacz9fIrEOK7dthvWejLvXVJyyYJmqDXLKjvXdTDEhQiPNmIYaQDQ0rf1Jq5DIEVIekVcumE+9zhPwvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780070487; c=relaxed/simple;
-	bh=2DnL581tiMP0xz3bQis3dMPdfTPq2gIL8VpTvpHoZ7s=;
+	s=arc-20240116; t=1780070491; c=relaxed/simple;
+	bh=KlZQ4MSJqjnIvULwCaGerlpkjtfnusCPIghRGzijdGI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P1hu0CvA0/r+c46tT66+BVrq2+Jgq+SJdtXY63s/5+f2k4r7BNmIlh0snjZLthxG95F682LyBrdfN4+FM4vRM7b4c9UjFCgTMaRN/I74hHGHBnEyTKHqx3l9kplFIOHJRxkOULFpx6FuQUQdC1UDYbwAs8PMI0rTXONE/de3FRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kL1F6keG; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=QZjYtlhTMjVwDwiHj1EETwiX2qkwVsTgTlDv+yx094qz7Vy+RdYaz3PLyxbxPwxdo4UO/o4QdZB7/DVq8Rll0z8WVxE8VVYLqqvyHrDJsuJHRyf7p3XC+QYTww0YzLdNnRZlE1BnH0gj2Ivl0RsXSNoIAUMOwXR0EUC196bjd3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KjBCfBcD; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kL1F6keG"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KjBCfBcD"
 Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFDh9g1467773;
-	Fri, 29 May 2026 15:56:14 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFn8hn1467755;
+	Fri, 29 May 2026 15:56:20 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=J4lB+fU5DdjjQ/QpM
-	hV9CNZD0t3w/aRQR+zfaUlpeSE=; b=kL1F6keG/qqmfuhVM3ACxkRQ6/oAiceJA
-	usauQSDAeEvlYyJPXNOB9tq83YKMRAepuwx45XfYOHesOqkaduurvCnQ68Rm6p/o
-	Pmh4XrNhIr7prw8pkUaStUIP+PszaRgGorGNaaKz/yOAmXf1tYM3IiDp/veCKoWx
-	NDrOQAjC40HYlNKcqnojiRrI8CLR3wxFJV5cbn+/9nr38jcc2IL2r3xuRV42uv7x
-	B7f/Ii9I63US33AwVqNGbmNxgA7hpJhqIQflO+97uKcXzKlB2d/8qEqvyg/U7YA9
-	/deYZAC6GjNjYXnnQiixx8X4ttPoUI/8BtO+lTCwRnPOgiu2CStqw==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee886mgg0-1
+	:mime-version:references:subject:to; s=pp1; bh=+ZUv8cR1VqrVbTl3m
+	Hf0T1bCgGPWY+ZTuBptjqVPGvU=; b=KjBCfBcDQDSaiBO0bgNBLT02rP+uhMES5
+	PE6oUpDzmJbapm1dT7iRxJxinaU6UbcawKYy3pSH4oWeCvRVrkHJkb5hbr8LQgbL
+	fRRhM/t3MVRya13fFr7lBEBNuJkW2bhXGG9TYXCJ9iAoOrogpZz40aQkaN4OytJh
+	4q5uPmP/ldgr6fN56+quEzfANkmAmg0mMk87EwzVeGilYvw2GnUrx9hgNjEuiRS9
+	n+w6Ds8ztAlKLtcMk0dK/QN2wWMhe++ZLRa6iWVxlSPjC6YpAp09oSs7f27c5DGj
+	Nk0pTsqIpyXWvRlxyWSfFqSzL7BCIJgjNV+gsFxSTN0kUc7FX87EA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee886mgkk-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:13 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs7To027773;
-	Fri, 29 May 2026 15:56:12 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc8jmd-1
+	Fri, 29 May 2026 15:56:20 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs56d016943;
+	Fri, 29 May 2026 15:56:19 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgjrw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:12 +0000 (GMT)
+	Fri, 29 May 2026 15:56:19 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu6gp36700646
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFuAMr49414438
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:56:06 GMT
+	Fri, 29 May 2026 15:56:10 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5DBF120040;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id ACD8320040;
+	Fri, 29 May 2026 15:56:10 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 115E92004D;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 60B8E2004B;
+	Fri, 29 May 2026 15:56:10 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	Fri, 29 May 2026 15:56:10 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 11/26] KVM: arm64: Move definitions from sys_regs.c to sys_regs.h
-Date: Fri, 29 May 2026 17:55:44 +0200
-Message-ID: <20260529155601.2927240-12-seiden@linux.ibm.com>
+Subject: [PATCH v1 22/26] KVM: arm64: Refactor core reg handling
+Date: Fri, 29 May 2026 17:55:55 +0200
+Message-ID: <20260529155601.2927240-23-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155601.2927240-1-seiden@linux.ibm.com>
 References: <20260529155601.2927240-1-seiden@linux.ibm.com>
@@ -91,20 +91,20 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UC2v4yac9XJv9onHFWDc9OYBfj2NePhe
-X-Authority-Analysis: v=2.4 cv=Z8Dc2nRA c=1 sm=1 tr=0 ts=6a19b71d cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Proofpoint-GUID: 31vsPhmURQS40ov7PA3eSqLGauBwurqn
+X-Authority-Analysis: v=2.4 cv=Z8Dc2nRA c=1 sm=1 tr=0 ts=6a19b724 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=zJUOOSkNxElFdCtx_FUA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX8/oZd7tugLX4
- VT1BjfXkRoZiX97FWd9xENgoBEOimXfjRSHnS4ASmTMGMpGduJ/02jpXxbpeEFwee07o2moF7s/
- 72lctKgbrzKFtic0CA7WNwrweU9zW+jO8B8kX8expd9rO6WoAANeefTVv67e9M7MnYTS3h0VRsQ
- RQE+HcfA1XHoInM25N7I4WEtz3MwMX8xnUzVF2AtdDSXE29RGOiob5glD3ByDwGAPwc9c/Ci5KK
- sJcJegVKO6vPsppxdRK6lzdVcZ0wcXLGleifHxJUS1DnRFMTiwQf/nIHxcmQbjrITwVrhNdEJLv
- XGu923W7/zKh6xVsNwn6dAt18w8VSyKWakOjgRUt8hAghGrzlHg4GftQiyb12Rf/l101U5ISOhi
- NxbmGF+asOiPRKI9ZTU8n9+ahODDZpICEDMKcEih6N212FCAm+z3qY9mPdRVyd3BrHY96fUEblZ
- jnObIFztGgWVZjFwmIw==
-X-Proofpoint-ORIG-GUID: UC2v4yac9XJv9onHFWDc9OYBfj2NePhe
+ a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=zUXWKsC1zW_jSfsg-zQA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfXy/4faeW9qaEW
+ jHrAgLdULeegCw7f465TqGT2M//Q02j4eP+f1UPT34tgcBZyAGXhkJA35zCnXUQQ075gAW5WvKr
+ bdoEyvU3qt6QALFYzfu6Ou5pOduHPVHsKuGkC6DyQdSfAhqD8VU57Hc4BPVfxrQRwId9ujp57Z0
+ 1T+Od+20RwqJhNP25TcqC4kq2QYQExp+bZ9yd8HxkOAsabIw0X3DdljGY+QiLr6KYCVrdV6FNGT
+ PR5xCeNPCE0L4gVVJcW2SgfhxaKNVVTOSfDpzKsW6iDjYTpRu3hkFTv88PIDWIeAWtwrKxFhw87
+ IMd/aM7JMcYSnzZd5vmHj0Xe0OONeSv/hujVHoU6daTqI+wZCLwg1GDBe1JZj5m+i2/Y2YAZpcA
+ 5WfN7tgJyFxSxvs/rFTfyLTXqHuki8TVGpqgFvixSUzLiz54gMp7C8qnTNXHlMNH0QAJvGroBjs
+ jHp/i8NDAU+rUa70kpg==
+X-Proofpoint-ORIG-GUID: 31vsPhmURQS40ov7PA3eSqLGauBwurqn
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
@@ -114,165 +114,208 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
 
-Make kvm_sanitised_host_ftr_reg() and kvm_read_sanitised_id_reg()
-available to enable code sharing with s390. Move some helper and ID
-register macro definitions to the header file. No functional changes.
+Refactor sysreg core handling. Before this all core regs are identified
+with a memory address and reading/writing happened through accessing the
+data at this address. However, for arm64 on s390 not all core registers
+have a dedicated memory address.
 
+Refactor such that the address function does not return an address but
+actually does the read/write request. ELR_EL1 and SPSR_EL1 now use
+vcpu_read_sys_reg/vcpu_write_sys_reg accessor functions, allowing s390
+to provide custom implementations.
+
+Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 12 ++----
- arch/arm64/kvm/sys_regs.h | 87 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+), 9 deletions(-)
+ virt/kvm/arm64/guest.c | 100 ++++++++++++++++++++++++++---------------
+ 1 file changed, 64 insertions(+), 36 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6522f9302967..46b24529ec70 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1852,7 +1852,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
- /*
-  * Sanitise based on the host implementation.
-  */
--static u64 kvm_sanitised_host_ftr_reg(u32 id)
-+u64 kvm_sanitised_host_ftr_reg(u32 id)
+diff --git a/virt/kvm/arm64/guest.c b/virt/kvm/arm64/guest.c
+index 35ba03033b4c..11509382d594 100644
+--- a/virt/kvm/arm64/guest.c
++++ b/virt/kvm/arm64/guest.c
+@@ -65,69 +65,96 @@ static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
+ 	return size;
+ }
+ 
+-static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
++static int core_reg_rw(struct kvm_vcpu *vcpu, u64 reg_id, void *valp, bool read)
  {
- 	u64 val = read_sanitised_ftr_reg(id);
+-	u64 off = core_reg_offset_from_id(reg->id);
++	u64 off = core_reg_offset_from_id(reg_id);
+ 	int size = core_reg_size_from_offset(vcpu, off);
++	void *addr;
  
-@@ -2039,8 +2039,8 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 	return val;
- }
+-	if (size < 0)
+-		return NULL;
++	if (size < 0 || (KVM_REG_SIZE(reg_id) != size))
++		return -EINVAL;
  
--static u64 kvm_read_sanitised_id_reg(struct kvm_vcpu *vcpu,
--				     const struct sys_reg_desc *r)
-+u64 kvm_read_sanitised_id_reg(struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_desc *r)
- {
- 	return __kvm_read_sanitised_id_reg(vcpu, r);
- }
-@@ -2123,12 +2123,6 @@ static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
- 	return id_visibility(vcpu, r);
- }
+-	if (KVM_REG_SIZE(reg->id) != size)
+-		return NULL;
++	switch (off) {
++	case KVM_REG_ARM_CORE_REG(elr_el1):
++		if (read)
++			*(u64 *)valp = vcpu_read_sys_reg(vcpu, ELR_EL1);
++		else
++			vcpu_write_sys_reg(vcpu, *(u64 *)valp, ELR_EL1);
++		return 0;
++
++	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
++		if (read)
++			*(u64 *)valp = vcpu_read_sys_reg(vcpu, SPSR_EL1);
++		else
++			vcpu_write_sys_reg(vcpu, *(u64 *)valp, SPSR_EL1);
++		return 0;
++	}
  
--static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
--				   const struct sys_reg_desc *r)
--{
--	return REG_RAZ;
--}
+ 	switch (off) {
+ 	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
+ 	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+ 		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
+ 		off /= 2;
+-		return &vcpu_gp_regs(vcpu)[off];
++		addr = &vcpu_gp_regs(vcpu)[off];
++		break;
+ 
+ 	case KVM_REG_ARM_CORE_REG(regs.sp):
+-		return vcpu_sp_el0(vcpu);
++		addr = vcpu_sp_el0(vcpu);
++		break;
+ 
+ 	case KVM_REG_ARM_CORE_REG(regs.pc):
+-		return vcpu_pc(vcpu);
++		addr = vcpu_pc(vcpu);
++		break;
+ 
+ 	case KVM_REG_ARM_CORE_REG(regs.pstate):
+-		return vcpu_cpsr(vcpu);
++		addr = vcpu_cpsr(vcpu);
++		break;
+ 
+ 	case KVM_REG_ARM_CORE_REG(sp_el1):
+-		return kvm_vcpu_get_sp_el1(vcpu);
 -
- /* cpufeature ID register access trap handlers */
+-	case KVM_REG_ARM_CORE_REG(elr_el1):
+-		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
+-
+-	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
+-		return __ctxt_sys_reg(&vcpu->arch.ctxt, SPSR_EL1);
++		addr = kvm_vcpu_get_sp_el1(vcpu);
++		break;
  
- static bool access_id_reg(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 2a983664220c..75d581050b09 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -108,6 +108,12 @@ struct sys_reg_desc {
- #define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
- #define REG_USER_WI		(1 << 2) /* WI from userspace only */
+ 	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_ABT]):
+-		return &vcpu->arch.ctxt.spsr_abt;
++		addr = &vcpu->arch.ctxt.spsr_abt;
++		break;
  
-+static inline unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *r)
-+{
-+	return REG_RAZ;
-+}
-+
- static __printf(2, 3)
- inline void print_sys_reg_msg(const struct sys_reg_params *p,
- 				       char *fmt, ...)
-@@ -237,6 +243,12 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
+ 	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_UND]):
+-		return &vcpu->arch.ctxt.spsr_und;
++		addr = &vcpu->arch.ctxt.spsr_und;
++		break;
  
- int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu);
+ 	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_IRQ]):
+-		return &vcpu->arch.ctxt.spsr_irq;
++		addr = &vcpu->arch.ctxt.spsr_irq;
++		break;
  
-+u64 kvm_read_sanitised_id_reg(struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_desc *r);
-+
-+/* Implemented by each architecture */
-+u64 kvm_sanitised_host_ftr_reg(u32 id);
-+
- #define AA32(_x)	.aarch32_map = AA32_##_x
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
-@@ -257,6 +269,81 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu);
- 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
- 	Op2(sys_reg_Op2(reg))
+ 	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_FIQ]):
+-		return &vcpu->arch.ctxt.spsr_fiq;
++		addr = &vcpu->arch.ctxt.spsr_fiq;
++		break;
  
-+/*
-+ * Since reset() callback and field val are not used for idregs, they will be
-+ * used for specific purposes for idregs.
-+ * The reset() would return KVM sanitised register value. The value would be the
-+ * same as the host kernel sanitised value if there is no KVM sanitisation.
-+ * The val would be used as a mask indicating writable fields for the idreg.
-+ * Only bits with 1 are writable from userspace. This mask might not be
-+ * necessary in the future whenever all ID registers are enabled as writable
-+ * from userspace.
-+ */
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
+ 	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
+ 		off -= KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]);
+ 		off /= 4;
+-		return kvm_vcpu_get_vreg(vcpu, off);
++		addr = kvm_vcpu_get_vreg(vcpu, off);
++		break;
+ 
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
+-		return  kvm_vcpu_get_fpsr(vcpu);
++		addr = kvm_vcpu_get_fpsr(vcpu);
++		break;
+ 
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
+-		return  kvm_vcpu_get_fpcr(vcpu);
++		addr = kvm_vcpu_get_fpcr(vcpu);
++		break;
+ 
+ 	default:
+-		return NULL;
++		return -EINVAL;
+ 	}
 +
-+#define ID_DESC_DEFAULT_CALLBACKS		\
-+	.access	= access_id_reg,		\
-+	.get_user = get_id_reg,			\
-+	.set_user = set_id_reg,			\
-+	.visibility = id_visibility,		\
-+	.reset = kvm_read_sanitised_id_reg
++	if (read)
++		memcpy(valp, addr, size);
++	else
++		memcpy(addr, valp, size);
 +
-+#define ID_DESC(name)				\
-+	SYS_DESC(SYS_##name),			\
-+	ID_DESC_DEFAULT_CALLBACKS
++	return 0;
+ }
+ 
+ int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+@@ -140,7 +167,9 @@ int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	 */
+ 	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
+ 	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
+-	void *addr;
++	__uint128_t tmp;
++	void *valp = &tmp;
++	int ret;
+ 	u32 off;
+ 
+ 	/* Our ID is an index into the kvm_regs struct. */
+@@ -149,11 +178,12 @@ int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
+ 		return -ENOENT;
+ 
+-	addr = core_reg_addr(vcpu, reg);
+-	if (!addr)
+-		return -EINVAL;
+ 
+-	if (copy_to_user(uaddr, addr, KVM_REG_SIZE(reg->id)))
++	ret = core_reg_rw(vcpu, reg->id, valp, true);
++	if (ret)
++		return ret;
 +
-+/* sys_reg_desc initialiser for known cpufeature ID registers */
-+#define ID_SANITISED(name) {			\
-+	ID_DESC(name),				\
-+	.val = 0,				\
-+}
-+
-+/* sys_reg_desc initialiser for writable ID registers */
-+#define ID_WRITABLE(name, mask) {		\
-+	ID_DESC(name),				\
-+	.val = mask,				\
-+}
-+
-+/*
-+ * 32bit ID regs are fully writable when the guest is 32bit
-+ * capable. Nothing in the KVM code should rely on 32bit features
-+ * anyway, only 64bit, so let the VMM do its worse.
-+ */
-+#define AA32_ID_WRITABLE(name) {		\
-+	ID_DESC(name),				\
-+	.visibility = aa32_id_visibility,	\
-+	.val = GENMASK(31, 0),			\
-+}
-+
-+/* sys_reg_desc initialiser for cpufeature ID registers that need filtering */
-+#define ID_FILTERED(sysreg, name, mask) {	\
-+	ID_DESC(sysreg),				\
-+	.set_user = set_##name,				\
-+	.val = (mask),					\
-+}
-+
-+/*
-+ * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
-+ * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
-+ * (1 <= crm < 8, 0 <= Op2 < 8).
-+ */
-+#define ID_UNALLOCATED(crm, op2) {			\
-+	.name = "S3_0_0_" #crm "_" #op2,		\
-+	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
-+	ID_DESC_DEFAULT_CALLBACKS,			\
-+	.visibility = raz_visibility,			\
-+	.val = 0,					\
-+}
-+
-+/*
-+ * sys_reg_desc initialiser for known ID registers that we hide from guests.
-+ * For now, these are exposed just like unallocated ID regs: they appear
-+ * RAZ for the guest.
-+ */
-+#define ID_HIDDEN(name) {			\
-+	ID_DESC(name),				\
-+	.visibility = raz_visibility,		\
-+	.val = 0,				\
-+}
- #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
- ({									       \
- 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
++	if (copy_to_user(uaddr, valp, KVM_REG_SIZE(reg->id)))
+ 		return -EFAULT;
+ 
+ 	return 0;
+@@ -164,7 +194,7 @@ int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
+ 	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
+ 	__uint128_t tmp;
+-	void *valp = &tmp, *addr;
++	void *valp = &tmp;
+ 	u64 off;
+ 	int err = 0;
+ 
+@@ -174,10 +204,6 @@ int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
+ 		return -ENOENT;
+ 
+-	addr = core_reg_addr(vcpu, reg);
+-	if (!addr)
+-		return -EINVAL;
+-
+ 	if (KVM_REG_SIZE(reg->id) > sizeof(tmp))
+ 		return -EINVAL;
+ 
+@@ -220,7 +246,9 @@ int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 		}
+ 	}
+ 
+-	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
++	err = core_reg_rw(vcpu, reg->id, valp, false);
++	if (err)
++		goto out;
+ 
+ 	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
+ 		int i, nr_reg;
 -- 
 2.53.0
 
