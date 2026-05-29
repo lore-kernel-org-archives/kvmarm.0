@@ -1,57 +1,57 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A278D3DA7D7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977833D8138
 	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780069884; cv=none; b=mVxuY4EWu6gc3KqlMjedowNNQtXfPBOzADHl6shGWzwHzkd2qN4luqZUnsj+lQoDSHKxOf0R0Ve192qMVsaqEbwgRYajBFQfmr5QQjTVFPzTBR2bFW944gD+EgKAahs4PtDNxxZk2y1Q8Zg2OAM24P5fdAfZsA/PE6/Tdj43u/8=
+	t=1780069884; cv=none; b=FT4Nh2Rzpb+K72DmSgvhMZBgJd7CfoO605sYbzV56fREshiwRlYAPxpFCA9z4K7ds1BVSrRCOqOVtj8PxXdfDMBOk6rQsxPfiHMNRSqw62FEMe7AA9Ah9gdB/G0BmHs3GfliLkgqvlQjW0yGuYco+n1r8KW1w7sybBgSsod+MD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780069884; c=relaxed/simple;
-	bh=wNiOIKIBhM3BIR1jZX/divVYyRtDiIB3SbdnCMtoLsg=;
+	bh=m08hP7qxixqBzqJ4VGl+StXVhF+wo0hgc7mmHmV7V5U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sYR9JsM/+jSTuP27a+h+bFvJ3x7gJ5pyckt66r9GfHHe+aMYMeezgW4zLJR3oypvHCiDYl1RFVnI1m5u0ovTZaOEu57itmGl2eR1NBoUb4TDKoPrHGTA4b5bY8Mc0uvogWVyI5Hw9r/U3WBzCtn+W17/iqzo062e1tMOmPzebJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NYjWw73L; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ozamxa5vM82lE2pXNu42lcVzg3wckHTsd2LlMKCyd6PZ4QLiEakdv63Ei/kf1ThP5XwCzyAFuFz4HLnnBO1NthFb9Feg9PXnYfak444NL3KUeFBigKdT6iD79ixW50LXbC4SENmE3UJohiPGo724h4CCu7HtO96gunavctOB27M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=D3uNr9eJ; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NYjWw73L"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFAXNo2419213;
-	Fri, 29 May 2026 15:51:07 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="D3uNr9eJ"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TFWMLJ3215599;
+	Fri, 29 May 2026 15:51:04 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=AcKYUB8TSCMvkXvZy
-	Ou6BnDrmtLpILo5gW6XD+S5Ygw=; b=NYjWw73Lnf+9sh6PHUyFEippgHmtsfL6q
-	uWDUnDYH8gW/Ehm7JZOH2wGNsMzVQ6/KRCyugDALXfKcOmOoL5ln5KwTD/o6uY9U
-	FjFpwLSrEbHvlCS+5zYPjJfMkiq7rpPNyu2ienoab+1mXu8J12cRB0d6bmBPoqQT
-	M1+6/vXA769apBPKni6ftmPk3syXg9WS6xxwK+W9POF/ALsAllSJw8c87J2iYs5l
-	FnyC+JnmrTCitRhtBDG7+ppeoKf5OLHubj+wx5gFPRZwfbVwy7hqTRyRTGAu43Fi
-	JftewjpO+fUrw5SHiAGwR/BdPx0MAnBoHtLPx1uK3SREd2D231o1A==
+	:mime-version:references:subject:to; s=pp1; bh=eyKwTe6hpFQxiN/bt
+	9NWRYhj41UgNyxPgPdnoEdXLs4=; b=D3uNr9eJuscGys0voDpdv6YCyBD+zJOk7
+	QXGR13mOBpSXJUNnqLmHZMEIhrUR84wrL55ngAQIlHv/EUvYXkXw8+A2EHQmq/ZK
+	41VQZB9bRLG9YyqFKbHvoYOgvwKltr5zUR2Td/BmHfgb11RRAzhOeFZlpoVGJ+FJ
+	PV2YNx+t2f5WXQsPTe09oPHf7017xdOYAh5K4kCUzY5Od4xRLWwnufu953GMU+X6
+	+tcmqN/NbQ9DDyQmjwH4TxuFfZwquEOy6PqJu1CT2ALvvvibxpm4MjeqGdBNoyfj
+	VWR+G/Qu7IjNv1PoVUjMMREgSNT1xQtLSO83TfHVRn4jvJq/D7lmw==
 Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884ve4k-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee88bkw6h-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:51:07 +0000 (GMT)
+	Fri, 29 May 2026 15:51:04 +0000 (GMT)
 Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFd6cM018485;
-	Fri, 29 May 2026 15:51:06 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc0fd6-1
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFd60M018498;
+	Fri, 29 May 2026 15:51:03 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrc0fbx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:51:06 +0000 (GMT)
+	Fri, 29 May 2026 15:51:03 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFowUQ27197710
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFouQQ17236428
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:50:58 GMT
+	Fri, 29 May 2026 15:50:56 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7B4BF20043;
-	Fri, 29 May 2026 15:50:58 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C02072004D;
+	Fri, 29 May 2026 15:50:56 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 339112005A;
-	Fri, 29 May 2026 15:50:58 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 77C5B2006A;
+	Fri, 29 May 2026 15:50:56 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:50:58 +0000 (GMT)
+	Fri, 29 May 2026 15:50:56 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 21/27] s390/hwcaps: Report SAE support as hwcap
-Date: Fri, 29 May 2026 17:50:35 +0200
-Message-ID: <20260529155050.2902245-22-seiden@linux.ibm.com>
+Subject: [PATCH v3 16/27] KVM: Make device name configurable
+Date: Fri, 29 May 2026 17:50:30 +0200
+Message-ID: <20260529155050.2902245-17-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155050.2902245-1-seiden@linux.ibm.com>
 References: <20260529155050.2902245-1-seiden@linux.ibm.com>
@@ -91,118 +91,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=L4MtheT8 c=1 sm=1 tr=0 ts=6a19b5eb cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfXxYdJulVEG0wa
+ s4kqQbqfifPx2ySRR5KdBLoRGMGqH1Xe9aj/K70fOogmLNOHMEyqHF9GGTn9LmtSPNxTglmY/UU
+ OX/X05nSAVajYFTXiEJcRs5EE4zzlgN6LbQmaXBJ46HKLFbSoqnYl6xMr7HB1VH+H3OZtOxr+be
+ dNx2TKqa1Hd4qieyp4OxxxiBWbtBFPndzsMq52dGzy8nAXko7xL2eww/6PM6iiEkkn25aTIioe8
+ iVxwmW5OocxLLSqbEMDacLWAmp65yE2/qQcm/NUm6zlNQMmJIsbD6IRLl94wZX8MVHh2Fso1uD+
+ rwMboYvzMKMxLv78EQ/Kj8q69Nl33kMBaTWt+Aa5pyCGwsVuyjHZwY8mUM26HuEY6nN1cdGIzp/
+ YnEyj50s7bjpi1YLSQVxEGXizQJ2JeMBikQFNitp6CO1iO5NKg+J/G3tPq0OKkmZTsUw9gCTAee
+ 6ZeoJgPrVrhFDlXLp6g==
+X-Proofpoint-ORIG-GUID: t5IDP58qNaA_KS_82JuigKqa3nNXKADP
+X-Authority-Analysis: v=2.4 cv=IJEyzAvG c=1 sm=1 tr=0 ts=6a19b5e8 cx=c_pps
  a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=MMtvGDNtdIwsdepEW5QA:9
-X-Proofpoint-ORIG-GUID: 3uwzx4Tr4Fe_xcL8X3gP91u-LAqXm7G1
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX9bvtkGDHkPDY
- IzyC7EQNW9x5G3+0/veWMQMhhqhviflID4RJSFNWKpjrsHcegQoQra0OwFJT7OLxtEluSAS1JGk
- 4CeKw0f5O8rofNszXZzBkgQaRpHhgtUtphPcBigPVLOw7vwtNKTT+LOyqHEFrPDGXU+d+kQEnK8
- GfZamRBoEia5Mm1J3FlGbKuCuVtslQJLpB/8gsrQeCO38EZuEsEbJ1QtdmMr7sBT4xO65CAB5bL
- MtXnFIdFHpde4gFrZcOopOoKblEGDo2Y79PJMDc6cZIXjo0s+87Szeb/Ln3qdI3acSnFu7zBVGS
- RPVLUyPhMEvimWITU4lxmCjUF7JkvznntEhsWXuEyy1yixTf6/QU9kpNdhngdrmmx02S9DdGtPJ
- 48eysvv+Pnwkm+6YAiKuLvnpNZqtQll+uRwlEuKH++RpuVUqgCgjV6i1g/aMirowj90GMKxxb7N
- F1ocTsHlJjE/0qKoDAA==
-X-Proofpoint-GUID: 3uwzx4Tr4Fe_xcL8X3gP91u-LAqXm7G1
+ a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=puXK2_GtiNekgUpYIPMA:9
+X-Proofpoint-GUID: t5IDP58qNaA_KS_82JuigKqa3nNXKADP
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- bulkscore=0 impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
+ suspectscore=0 phishscore=0 clxscore=1015 spamscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
+ definitions=main-2605290156
 
-From: Hendrik Brueckner <brueckner@linux.ibm.com>
+Allow KVM implementations to choose alternative device names. This is
+especially useful for architectures providing multiple KVM
+implementations simultaneously.
 
-Report SAE support as hwcap (and /proc/cpuinfo)
-
-Signed-off-by: Hendrik Brueckner <brueckner@linux.ibm.com>
+Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/include/asm/elf.h    | 2 ++
- arch/s390/include/asm/sclp.h   | 5 ++++-
- arch/s390/kernel/processor.c   | 3 +++
- drivers/s390/char/sclp_early.c | 1 +
- 4 files changed, 10 insertions(+), 1 deletion(-)
+ include/linux/kvm_host.h |  4 +++-
+ virt/kvm/kvm_main.c      | 21 ++++++++++++++-------
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/arch/s390/include/asm/elf.h b/arch/s390/include/asm/elf.h
-index bb63fa4d20bb..ad3108ecfb07 100644
---- a/arch/s390/include/asm/elf.h
-+++ b/arch/s390/include/asm/elf.h
-@@ -123,6 +123,7 @@ enum {
- 	HWCAP_NR_NNPA		= 20,
- 	HWCAP_NR_PCI_MIO	= 21,
- 	HWCAP_NR_SIE		= 22,
-+	HWCAP_NR_SAE		= 23,
- 	HWCAP_NR_MAX
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 76da4196b684..f44885fc6e6a 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1069,7 +1069,9 @@ static inline void kvm_irqfd_exit(void)
+ {
+ }
+ #endif
+-int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module);
++int kvm_init(unsigned int vcpu_size, unsigned int vcpu_align, struct module *module);
++int kvm_init_with_dev(unsigned int vcpu_size, unsigned int vcpu_align,
++		      struct module *module, const char *dev_name, int minor);
+ void kvm_exit(void);
+ 
+ bool file_is_kvm(struct file *file);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2eca44a69a9a..454d99b45fa0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5541,9 +5541,7 @@ static struct file_operations kvm_chardev_ops = {
  };
  
-@@ -150,6 +151,7 @@ enum {
- #define HWCAP_NNPA		BIT(HWCAP_NR_NNPA)
- #define HWCAP_PCI_MIO		BIT(HWCAP_NR_PCI_MIO)
- #define HWCAP_SIE		BIT(HWCAP_NR_SIE)
-+#define HWCAP_SAE		BIT(HWCAP_NR_SAE)
+ static struct miscdevice kvm_dev = {
+-	KVM_MINOR,
+-	"kvm",
+-	&kvm_chardev_ops,
++	.fops = &kvm_chardev_ops,
+ };
  
- /*
-  * These are used to set parameters in the core dumps.
-diff --git a/arch/s390/include/asm/sclp.h b/arch/s390/include/asm/sclp.h
-index 0f184dbdbe5e..18e46654227a 100644
---- a/arch/s390/include/asm/sclp.h
-+++ b/arch/s390/include/asm/sclp.h
-@@ -52,7 +52,9 @@ struct sclp_core_entry {
- 	u8 siif : 1;
- 	u8 sigpif : 1;
- 	u8 : 3;
--	u8 reserved2[3];
-+	u8 aef: 1;
-+	u8 : 7;
-+	u8 reserved2[2];
- 	u8 : 2;
- 	u8 ib : 1;
- 	u8 cei : 1;
-@@ -104,6 +106,7 @@ struct sclp_info {
- 	unsigned char has_aisii : 1;
- 	unsigned char has_aeni : 1;
- 	unsigned char has_aisi : 1;
-+	unsigned char has_aef : 1;
- 	unsigned int ibc;
- 	unsigned int mtid;
- 	unsigned int mtid_cp;
-diff --git a/arch/s390/kernel/processor.c b/arch/s390/kernel/processor.c
-index e33a3eccda56..6da55a158027 100644
---- a/arch/s390/kernel/processor.c
-+++ b/arch/s390/kernel/processor.c
-@@ -150,6 +150,7 @@ static void show_cpu_summary(struct seq_file *m, void *v)
- 		[HWCAP_NR_NNPA]		= "nnpa",
- 		[HWCAP_NR_PCI_MIO]	= "pcimio",
- 		[HWCAP_NR_SIE]		= "sie",
-+		[HWCAP_NR_SAE]		= "sae",
- 	};
- 	int i, cpu;
- 
-@@ -254,6 +255,8 @@ static int __init setup_hwcaps(void)
- 	/* virtualization support */
- 	if (sclp.has_sief2)
- 		elf_hwcap |= HWCAP_SIE;
-+	if (sclp.has_aef)
-+		elf_hwcap |= HWCAP_SAE;
- 
- 	return 0;
+ #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
+@@ -6321,13 +6319,13 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
+ 	kfree(env);
  }
-diff --git a/drivers/s390/char/sclp_early.c b/drivers/s390/char/sclp_early.c
-index 6bf501ad8ff0..26a76f09b19a 100644
---- a/drivers/s390/char/sclp_early.c
-+++ b/drivers/s390/char/sclp_early.c
-@@ -94,6 +94,7 @@ static void __init sclp_early_facilities_detect(void)
- 		sclp.has_ib = cpue->ib;
- 		sclp.has_cei = cpue->cei;
- 		sclp.has_skey = cpue->skey;
-+		sclp.has_aef = cpue->aef;
- 		break;
- 	}
  
+-static void kvm_init_debug(void)
++static void kvm_init_debug(const char *dev_name)
+ {
+ 	const struct file_operations *fops;
+ 	const struct kvm_stats_desc *pdesc;
+ 	int i;
+ 
+-	kvm_debugfs_dir = debugfs_create_dir("kvm", NULL);
++	kvm_debugfs_dir = debugfs_create_dir(dev_name, NULL);
+ 
+ 	for (i = 0; i < kvm_vm_stats_header.num_desc; ++i) {
+ 		pdesc = &kvm_vm_stats_desc[i];
+@@ -6463,11 +6461,20 @@ void kvm_unregister_perf_callbacks(void)
+ }
+ #endif
+ 
+-int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
++int kvm_init(unsigned int vcpu_size, unsigned int vcpu_align, struct module *module)
++{
++	return kvm_init_with_dev(vcpu_size, vcpu_align, module, "kvm", KVM_MINOR);
++}
++
++int kvm_init_with_dev(unsigned int vcpu_size, unsigned int vcpu_align,
++		      struct module *module, const char *dev_name, int minor)
+ {
+ 	int r;
+ 	int cpu;
+ 
++	kvm_dev.name = dev_name;
++	kvm_dev.minor = minor;
++
+ 	/* A kmem cache lets us meet the alignment requirements of fx_save. */
+ 	if (!vcpu_align)
+ 		vcpu_align = __alignof__(struct kvm_vcpu);
+@@ -6505,7 +6512,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ 	kvm_preempt_ops.sched_in = kvm_sched_in;
+ 	kvm_preempt_ops.sched_out = kvm_sched_out;
+ 
+-	kvm_init_debug();
++	kvm_init_debug(kvm_dev.name);
+ 
+ 	r = kvm_vfio_ops_init();
+ 	if (WARN_ON_ONCE(r))
 -- 
 2.53.0
 
