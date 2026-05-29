@@ -1,57 +1,57 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449053FCB29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8C73FD159
 	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 15:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780070197; cv=none; b=LczmzNDWVefnhEecwOTsSzJH5PRcofO5JgBhLlO3GU7KWZrZ8NAS2WpublilX/MtnBz/K9y/KxEqpjYjLqA3kTkUhcnO4tm6kX1H+5CoHq3bngovqGKToEZD0i7ag6DqX1yiwGo/ypjrcYHyn6FCslXT8f0Tt5I4DroWX8ovBHY=
+	t=1780070197; cv=none; b=YqdwBUVBhySazbKGVgNYTyuVW3JzNjzCkWBC4ySv3TDc017YVDB3FJ5SaP/hV1BVs/EBZzadutqnUxQMnvJ4nhE6o0K+zO8g1tiRb7G9sgtv1VE4VgfdGnVzhceqMQ+lIb2NwAoG9qpd/TvqzIN000rN7Lo1FRtAbrBQmQUFE2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780070197; c=relaxed/simple;
-	bh=O3yu8MIlfw8EI726kjrzX9JIr7MY1HrswifaiXGWrAo=;
+	bh=Kjsr5tXV2TixyM/dq6YUT3Xky/CisxizSj98DM/4okU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qCBkX44wAwOETYFj3mHL/YrP9/Tccpkgs1T9eQ1vxv1trqqkhSQrll3LZRQ39UlS+LBYlr5Ncrzu7uBVjpaZbXFIXgCBW6Pz63g1RhYCjkm15+G80CSt3fPCsxn032svryyqqBN1th56jqGwfWLKg97x0Gv1Da6S043jLwpcvlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MQJ+nAtm; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=NhkZjgAo8YTUOIylKXrokFjCwbcsfHLPdOvRzlUnytYGz//cpk4wmJHNZo121MdA5KXdhibuRnx+p0pu5wS0Kc1cuaPxKf4GugifWfU3VC3wLYWrOdyxjErJLHoYixJVAGJ5d0K7C94XqEw79GQTUNY/dgy4QaUrbnfbqwZIGbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I0nhmUfo; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MQJ+nAtm"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TF7d2Z2776538;
-	Fri, 29 May 2026 15:56:15 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I0nhmUfo"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TF7d4s1468503;
+	Fri, 29 May 2026 15:56:18 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=IdSp5Vw7z+HR0yKWR
-	iC1T9INgcuPtWfpi9peZITRCZA=; b=MQJ+nAtm4uZZGXJsd46G+Kf+G/EjsLawB
-	OcDKG8qkZ+uIWALCdbhnTzXAlgJ1ih9HPkzQEgo+JWn/r5xbGolBrvsY2ZvxNw/n
-	VZ5e0mucOYOLQ6SROg5ySM09EvT7W8cCSLuIlFrdKSUSJpmC5e5ub2JEAWJg0+GA
-	qV7zp0exmd0tDgvpWvC2++HZ0jPOgo/f9wRaXnwnWuS1gHvZAio/Vf/zFSRaIZiV
-	B5x/YqmRX+FNDKzKIZhgm8ySAmRHBsYWllg+fSOw15W86tLMJPNwzwtOVA9QvojJ
-	Nlc4byPx4uJ/mWSFcH+SSbzPBxLyOBxJh7WxI0wi+ZJ/JmfbvSU+w==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee889m2bq-1
+	:mime-version:references:subject:to; s=pp1; bh=EQ2VuK7ZFaehrQoRt
+	zvCBljTp7pTrarwgW+FNoWOdfE=; b=I0nhmUfo4LDAlEHf3BKf2nOYyI/Je41nO
+	igFFNOwda9L57DJa/sMfVSmqDD4UOFrfl/ns1Zh7aMDpMZjElW1KxI7YenFnSe8z
+	Fb0J0cDY2jam7h7Q+d0XffE/TGeD5gAoajRvPXWxuoOpxjdlb7wRThElrfMazEU4
+	rRxqMoXJkMNd9+DnEvOGuwe7xIxbZuKL6Nf+8+0EYcmy21wFAEbtZQYJzNL5Unju
+	ADp7xZZZKyOr62Nxctgy7CYUd2Y6sSm6u6bR3bYuwaOUYcJ3R2dq3OkehQTGoYhs
+	UJgSSiyKiQafZ/d3CvYSedv63LAHsx1M6KXrA2WPhsrnYNA/w+J9g==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee886mgjh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:15 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs5pn016946;
-	Fri, 29 May 2026 15:56:14 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgjpd-1
+	Fri, 29 May 2026 15:56:18 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TFs9LX029222;
+	Fri, 29 May 2026 15:56:16 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4edjrbgks5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 15:56:14 +0000 (GMT)
+	Fri, 29 May 2026 15:56:16 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu66P36700652
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TFu7tH50004440
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 15:56:06 GMT
+	Fri, 29 May 2026 15:56:08 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B274A2004D;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id DC33820040;
+	Fri, 29 May 2026 15:56:07 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 655E82004B;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8EDCA2004B;
+	Fri, 29 May 2026 15:56:07 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 15:56:06 +0000 (GMT)
+	Fri, 29 May 2026 15:56:07 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 12/26] KVM: arm64: Add PVM_ prefix to avoid name collisions
-Date: Fri, 29 May 2026 17:55:45 +0200
-Message-ID: <20260529155601.2927240-13-seiden@linux.ibm.com>
+Subject: [PATCH v1 15/26] s390: Add functions to query arm guest time
+Date: Fri, 29 May 2026 17:55:48 +0200
+Message-ID: <20260529155601.2927240-16-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260529155601.2927240-1-seiden@linux.ibm.com>
 References: <20260529155601.2927240-1-seiden@linux.ibm.com>
@@ -91,139 +91,146 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7ACddOjvFerXD0E0lV_VSanFeKdPoAcn
-X-Proofpoint-GUID: 7ACddOjvFerXD0E0lV_VSanFeKdPoAcn
-X-Authority-Analysis: v=2.4 cv=XqfK/1F9 c=1 sm=1 tr=0 ts=6a19b71f cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Proofpoint-GUID: zh0j-2KLsmXGXQtSfEQu2miThfmIi10t
+X-Authority-Analysis: v=2.4 cv=Z8Dc2nRA c=1 sm=1 tr=0 ts=6a19b722 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8 a=UoxKMzVWMJxMEg80A50A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfX9wuS4D1QB6x1
- kp1RpIFloqV+maUup3QiOVHUJTBohYC9JyukqiAlpFwt2M80rGHWPKEGm2hIJ5toBChgl0ZG0dv
- OAkDND3dzxNORV4cj1txC4BXdwhR9whZ/VBcKf8FcLV0YJUUmfi3OgUZV1VNYhIB6iB2HnB7/J8
- qtfwsAUkp7VAbkayOY6l+Yij/UKTuulsSTLeWEei59fRB2u9z3jIn5eX0QKMVeqUEo6fBaLlXJX
- SE8Xbgsy3Nh5KKG2QJ4hdnK+9+g/RI42QavKBZzKJleoC6637LUPAxn1wGGl5N1wfrOEAEC+LbV
- NAElljrdJHiYCsyIhvfJqoYFT1f0uazED/Bk4lFIXfQTkYVzyrXQHlztZOWzR77+FgbrOQ8WcBR
- jw+J5J2MNda9llPb4Ecg0yQ7GwWFwax4w80a17pkucClopxVXnEqH/umBTqRSjt0jZmAYA4Uksu
- eOsRi8bItdyq2i7Ckgg==
+ a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=Hmczd7efCeE0AqCQNNQA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDE1NiBTYWx0ZWRfXwHVnBeyemYoW
+ TMg9EI8tQhju9p1KhbfdE08dbjeWDSJ8P5oJJCiJ6wup0bFIwxSCgUcFure2M36PZCTQfq3uWza
+ /rakQn7/qjlP2ZWcpWwcSzwdDu8X3ZjU9x2f1jRQ/tUO0z7WV/z3OmJVfeIcDYlzHoRcx6kvtBy
+ xko2J7N3LnkDLWTiPhbpDNrv32fDd54Uyw+3qAg77u75nfceFUzxGg6NzWAGAIVe1uILaJX7s8t
+ 2c6ZzWQNt87a5st8cZ70HkjrVKmT4Yudclhq+XCCJM8cdysaUAZDyZ7knZicepFWnTNU91xVR8v
+ IvxIHaQCp2uIBqV/DSlDKKYwTygRUnNPObi27ULQ050OlaT7q6lSmpeQ8bBNEtViePN2hU4zg8Y
+ 6/trH9IAoFstnckcZfvfBy5a0DcodKx/3ocBxFacSrwjb0k4dJCcP+L+V10RobxUk5ID5yMl/aa
+ 94fQ/gYd6qQ0twv0o/g==
+X-Proofpoint-ORIG-GUID: zh0j-2KLsmXGXQtSfEQu2miThfmIi10t
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-29_04,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 impostorscore=0 adultscore=0 phishscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 suspectscore=0
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2605290156
+ clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 phishscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605290156
 
-Rename ID_UNALLOCATED to PVM_ID_UNALLOCATED and read_id_reg to
-pvm_read_id_reg to prevent future name collisions with other subsystems.
-While at it, fix whitespace issues in the macro invocations
+Add functions to convert between ARM guest time (LSB0) and s390 host
+time (MSB0) using new ptff function codes.
 
+Co-developed-by: Nico Boehr <nrb@linux.ibm.com>
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 48 +++++++++++++++---------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+ arch/s390/include/asm/timex.h | 49 +++++++++++++++++++++++++++++++++++
+ arch/s390/kernel/time.c       |  1 +
+ arch/s390/kvm/arm64/arm.c     |  9 ++++++-
+ 3 files changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index e8d773d38905..08b14053568b 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -282,8 +282,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	inject_sync64(vcpu, (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT));
+diff --git a/arch/s390/include/asm/timex.h b/arch/s390/include/asm/timex.h
+index 49447b40f038..9ec22a28bbda 100644
+--- a/arch/s390/include/asm/timex.h
++++ b/arch/s390/include/asm/timex.h
+@@ -99,6 +99,8 @@ extern unsigned char ptff_function_mask[16];
+ #define PTFF_QSI	0x02	/* query steering information */
+ #define PTFF_QPT	0x03	/* query physical clock */
+ #define PTFF_QUI	0x04	/* query UTC information */
++#define PTFF_QAGTO	0x10	/* query arm guest time offset */
++#define PTFF_QAGPT	0x11	/* query arm guest physical time offset */
+ #define PTFF_ATO	0x40	/* adjust tod offset */
+ #define PTFF_STO	0x41	/* set tod offset */
+ #define PTFF_SFS	0x42	/* set fine steering rate */
+@@ -136,6 +138,17 @@ struct ptff_qui {
+ 	unsigned int pad_0x5c[41];
+ } __packed;
+ 
++/*
++ * Query Arm Guest Time
++ * used for:
++ *	- Query Arm Guest Time Offset
++ *	- Query Arm Guest Physical Time
++ */
++struct ptff_qagt {
++	u64 in;
++	u64 out;
++};
++
+ /*
+  * ptff - Perform timing facility function
+  * @ptff_block: Pointer to ptff parameter block
+@@ -286,4 +299,40 @@ static inline int tod_after_eq(unsigned long a, unsigned long b)
+ 	return a >= b;
  }
  
--static u64 read_id_reg(const struct kvm_vcpu *vcpu,
--		       struct sys_reg_desc const *r)
-+static u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu,
-+			   struct sys_reg_desc const *r)
++/*
++ * ptff_qagto() -  Query Arm Guest Time Offset
++ *
++ * @physical_time: Arm guest physical time in MSb 0
++ *
++ * Converts Arm guest physical time in MSb 0 bit ordering
++ * into the Arm guest offset in LSb 0 bit ordering.
++ *
++ * Return: Arm guest time offset in LSb 0
++ */
++static inline u64 ptff_qagto(u64 physical_time)
++{
++	struct ptff_qagt qagto = { .in = physical_time };
++
++	ptff(&qagto, sizeof(qagto), PTFF_QAGTO);
++	return qagto.out;
++}
++
++/*
++ * ptff_qagpt() - Query Arm Guest Physical Time
++ *
++ * @guest_time_offset: Arm guest time offset in MSb 0
++ *
++ * Converts Arm guest offset in MSb 0 bit ordering
++ * into the Arm guest physical time in LSb 0 bit ordering.
++ *
++ * Return: Arm guest physical time in LSb 0
++ * */
++static inline u64 ptff_qagpt(u64 guest_time_offset)
++{
++	struct ptff_qagt qagpt = { .in = guest_time_offset };
++
++	ptff(&qagpt, sizeof(qagpt), PTFF_QAGPT);
++	return qagpt.out;
++}
++
+ #endif
+diff --git a/arch/s390/kernel/time.c b/arch/s390/kernel/time.c
+index bd0df61d1907..2b989bebd220 100644
+--- a/arch/s390/kernel/time.c
++++ b/arch/s390/kernel/time.c
+@@ -65,6 +65,7 @@ ATOMIC_NOTIFIER_HEAD(s390_epoch_delta_notifier);
+ EXPORT_SYMBOL(s390_epoch_delta_notifier);
+ 
+ unsigned char ptff_function_mask[16];
++EXPORT_SYMBOL(ptff_function_mask);
+ 
+ static unsigned long lpar_offset;
+ static unsigned long initial_leap_seconds;
+diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+index bf0866659421..636bbeda98a8 100644
+--- a/arch/s390/kvm/arm64/arm.c
++++ b/arch/s390/kvm/arm64/arm.c
+@@ -692,8 +692,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+ 
+ static int __init kvm_s390_arm64_init(void)
  {
- 	struct kvm *kvm = vcpu->kvm;
- 	u32 reg = reg_to_encoding(r);
-@@ -341,7 +341,7 @@ static bool pvm_access_id_aarch64(struct kvm_vcpu *vcpu,
- 		return false;
- 	}
+-	if (!sclp.has_aef)
++	if (!sclp.has_aef) {
++		pr_info("SAE is not available\n");
+ 		return -ENXIO;
++	}
++
++	if (!(ptff_query(PTFF_QAGTO) && ptff_query(PTFF_QAGPT))) {
++		pr_info("PTFF for arm on s390 is not available\n");
++		return -ENXIO;
++	}
  
--	p->regval = read_id_reg(vcpu, r);
-+	p->regval = pvm_read_id_reg(vcpu, r);
- 	return true;
- }
- 
-@@ -379,7 +379,7 @@ static bool pvm_idst_access(struct kvm_vcpu *vcpu,
-  * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
-  * (1 <= crm < 8, 0 <= Op2 < 8).
-  */
--#define ID_UNALLOCATED(crm, op2) {			\
-+#define PVM_ID_UNALLOCATED(crm, op2) {			\
- 	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
- 	.access = pvm_access_id_aarch64,		\
- }
-@@ -438,46 +438,46 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 	AARCH32(SYS_MVFR0_EL1),
- 	AARCH32(SYS_MVFR1_EL1),
- 	AARCH32(SYS_MVFR2_EL1),
--	ID_UNALLOCATED(3,3),
-+	PVM_ID_UNALLOCATED(3, 3),
- 	AARCH32(SYS_ID_PFR2_EL1),
- 	AARCH32(SYS_ID_DFR1_EL1),
- 	AARCH32(SYS_ID_MMFR5_EL1),
--	ID_UNALLOCATED(3,7),
-+	PVM_ID_UNALLOCATED(3, 7),
- 
- 	/* AArch64 ID registers */
- 	/* CRm=4 */
- 	AARCH64(SYS_ID_AA64PFR0_EL1),
- 	AARCH64(SYS_ID_AA64PFR1_EL1),
- 	AARCH64(SYS_ID_AA64PFR2_EL1),
--	ID_UNALLOCATED(4,3),
-+	PVM_ID_UNALLOCATED(4, 3),
- 	AARCH64(SYS_ID_AA64ZFR0_EL1),
--	ID_UNALLOCATED(4,5),
--	ID_UNALLOCATED(4,6),
--	ID_UNALLOCATED(4,7),
-+	PVM_ID_UNALLOCATED(4, 5),
-+	PVM_ID_UNALLOCATED(4, 6),
-+	PVM_ID_UNALLOCATED(4, 7),
- 	AARCH64(SYS_ID_AA64DFR0_EL1),
- 	AARCH64(SYS_ID_AA64DFR1_EL1),
--	ID_UNALLOCATED(5,2),
--	ID_UNALLOCATED(5,3),
-+	PVM_ID_UNALLOCATED(5, 2),
-+	PVM_ID_UNALLOCATED(5, 3),
- 	AARCH64(SYS_ID_AA64AFR0_EL1),
- 	AARCH64(SYS_ID_AA64AFR1_EL1),
--	ID_UNALLOCATED(5,6),
--	ID_UNALLOCATED(5,7),
-+	PVM_ID_UNALLOCATED(5, 6),
-+	PVM_ID_UNALLOCATED(5, 7),
- 	AARCH64(SYS_ID_AA64ISAR0_EL1),
- 	AARCH64(SYS_ID_AA64ISAR1_EL1),
- 	AARCH64(SYS_ID_AA64ISAR2_EL1),
--	ID_UNALLOCATED(6,3),
--	ID_UNALLOCATED(6,4),
--	ID_UNALLOCATED(6,5),
--	ID_UNALLOCATED(6,6),
--	ID_UNALLOCATED(6,7),
-+	PVM_ID_UNALLOCATED(6, 3),
-+	PVM_ID_UNALLOCATED(6, 4),
-+	PVM_ID_UNALLOCATED(6, 5),
-+	PVM_ID_UNALLOCATED(6, 6),
-+	PVM_ID_UNALLOCATED(6, 7),
- 	AARCH64(SYS_ID_AA64MMFR0_EL1),
- 	AARCH64(SYS_ID_AA64MMFR1_EL1),
- 	AARCH64(SYS_ID_AA64MMFR2_EL1),
--	ID_UNALLOCATED(7,3),
--	ID_UNALLOCATED(7,4),
--	ID_UNALLOCATED(7,5),
--	ID_UNALLOCATED(7,6),
--	ID_UNALLOCATED(7,7),
-+	PVM_ID_UNALLOCATED(7, 3),
-+	PVM_ID_UNALLOCATED(7, 4),
-+	PVM_ID_UNALLOCATED(7, 5),
-+	PVM_ID_UNALLOCATED(7, 6),
-+	PVM_ID_UNALLOCATED(7, 7),
- 
- 	/* Scalable Vector Registers are restricted. */
- 
+ 	return kvm_init_with_dev(sizeof(struct kvm_vcpu), 0, THIS_MODULE,
+ 				 KVM_DEV_NAME, MISC_DYNAMIC_MINOR);
 -- 
 2.53.0
 
