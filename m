@@ -1,115 +1,128 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6281F3AB5C3
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 07:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E3E3B2FCC
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 08:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780040627; cv=none; b=J4Qx61uaD+x/jsxWfeqMlSreogvanhYv/aANrBSKlew3fvFyxoRFAPftilSiYrXEVPFNe7T+lTOfLm5JMygb1HxPQprDUGHpkNTQIzY8KAKMlsHsFxwmeA+4eczOFtBq/vic9a1FoxlpNmBwiHR6vSthCZJbqDNrrU0TzjEImUc=
+	t=1780041777; cv=none; b=JkT/6PwIiA5tyL81QM0MgRwUcGu91PbYP2b2v+lcCmz3eeMvTUqdaxQb4mQFJX7TUzQ7V6+SMe5vEq7Dqy4TFq00BIne84ey2y2vH/grIlJF6FJAyI4QGlCYpVvubfJODGtUlTnmm4hrr+3HjKBBlWAgPz5iJOPN5O8IYgF1hRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780040627; c=relaxed/simple;
-	bh=Qps6o6tLw+5Z7L4LX52l3zL+jrsDKX3MK74mb9UYQZA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=udzj0F7caF69xW+W5vg0TzmMfsqCPUta1F6VC04weMtgqYJoW3j+4wInN/TdqsNA0p0PR8dh06ni38PISz3h+qrHQinnUVMzysBHT0Yb6zTfO+si3ypzmVedc/lHFOXTTkyiWHYkw6bj10r+adsEe4gF/fkN5yfyqnV/HU3Jk+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lmLxwqlx; arc=none smtp.client-ip=209.85.221.74
+	s=arc-20240116; t=1780041777; c=relaxed/simple;
+	bh=/1pir3LF79JOz5u0/10ODgRwehHuX74Gb0sQ5Udr+nU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBQFNnmYPnPbQEk7hTgzd0AG795RAt/8C4OftYsadmczoY1hog8uvglCqP5u4L+4l+KTlG8ny+cCZNHgrfElwQcU0mb/b+kT+DI2bqFzTGr0o35ToObZ20lK6Nonzptelf+uuSX+QCi1daz5TB82BDPvb3SOew0hfHSe/oGo4D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MtTcec9A; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lmLxwqlx"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-449b2a183d3so8556884f8f.0
-        for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 00:43:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MtTcec9A"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4891e5b9c1fso118229455e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 01:02:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780040625; x=1780645425; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7WGxRyEbovaCEk6n++MhLN9S+efqVE7Q4ikibcd+yY=;
-        b=lmLxwqlxIvPheBfQc3qXvxH/EHIhDJ+cViY/ivD72/9HJZqQ9rCyle2ZCOPKLIXnOJ
-         4zOGZ5qUXlmBRyzX4LGZtfLTHG/caz4ksKGJawmyYaaOyLCmpmJ64HgRcO0DYTiF4GuM
-         5l6e88fdQyjIbklLY9Pz+5+uoikymA2HUA4II03Pr3nympHvVXAlfoM1RT77czPNjP1u
-         hjp3qrDw2CZpeQIZcr0UMUGAVKz4ndUnaTey8RNyQutmt/GhNISn0JoypUujySPP7VGw
-         oHGXINKNI1LkJvyUQ5j578GhPzybdctJ4Nh4cmX9JSkeqgH0p07w59jk8i4z9ZUYtNpq
-         nnHA==
+        d=google.com; s=20251104; t=1780041773; x=1780646573; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EEpP20QLYbUafDoJ1/D4YHhW2s2jVmPtJASihmV02YE=;
+        b=MtTcec9Ak4I+3lR/+LHlT53a3jcVfOSObXUyiL4Cw5tahGAlBYJ1zcow8hAlsbaA8D
+         Kj8SJrs0UrnmDyg7I9jyxsRSSZVxLbvAWGHph80MhrHXsBU8zFP4EAvrFdCQqy9qGDos
+         giHnvs4ZueosQp8Ya2qnh/MnIA+qn6nkVQGWSO9OWOfNt0+8Zfdxz+NQSkLKUuAnHgXl
+         6D6JzJl/bxfDc/CmtFd/OUbWLQvEzqao99PL8xfOWpP2XhZfD9huuIqfsqrzHQxShkvT
+         cDgdc3pZdFMOxgvyhPrY7TL2ZAG1BbJs4DZzg3Y4L4mKXCrVJY2vGFym+kF55BJ1Vy8H
+         WnuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780040625; x=1780645425;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7WGxRyEbovaCEk6n++MhLN9S+efqVE7Q4ikibcd+yY=;
-        b=jvmrb0QfJg983sqn9DlnSWVOaYPm/jZiAoeq7z7Kmxpnmerhi4C7Q6y2M4nkscv6Dg
-         bhvhKPG/dp53D+mvNVrls3WmaxVzCrULGbIJ+JeZ5Imla8BmbEfT1pvO1/ZEqL+xnZxy
-         N3Y/SOakORxEnJRUrqNw4VxvCPkSjTx75V+Jj9rFUvUUXpXPoKMCAXDM5mhh0cltIDC3
-         FmOZbGzRh5iLKZmJZimUrtWE8Yy8zifHzDGNO4x0EFL+LZh6ni/B8UuNh/I0mKR6o3c1
-         LsWg83vBiqAiCrOvgj26ZA4sBXvt/meuheWOnqXXUXS3SQ2a29CSa47cHQCOj+TniWm/
-         laOA==
-X-Forwarded-Encrypted: i=1; AFNElJ8eTr8YvnQvxXlIgS74HaCr6QzPinm2ipVQ9C7zziXc73eWR38JNpunlbDMLyAY3hVGEdfm6so=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy6xRD3YVFho7gYVyvlj+E9bM0PG1toknjxTtqVniG7K8P4lyNz
-	EDw78jP5ylLr91x8/TZMB4JXPGr5BBJDyIzSc9yqemZtodWcWJBJRulcvU2F1bywzMTDA5OexLe
-	8tA==
-X-Received: from wrzf10.prod.google.com ([2002:a05:6000:1b0a:b0:450:e76e:87e1])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:4683:b0:453:9897:76aa
- with SMTP id ffacd0b85a97d-45ef1385c29mr1854131f8f.21.1780040624606; Fri, 29
- May 2026 00:43:44 -0700 (PDT)
-Date: Fri, 29 May 2026 08:43:41 +0100
-In-Reply-To: <20260529074341.2271950-1-tabba@google.com>
+        d=1e100.net; s=20251104; t=1780041773; x=1780646573;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EEpP20QLYbUafDoJ1/D4YHhW2s2jVmPtJASihmV02YE=;
+        b=JMfMzg0u5qeXWNt42yFvrZimg+HacVvep4EV8zql1c70f6FFU96iDvotx+nMQ0FiUG
+         Vx8qdjYzcnnYCB9SX+E2rIMyNaRm/tJJXxK1bvu0f0vSkffvnlTR0UdnvnpAH8oz7C5v
+         itR59ColHiYDL8tL8fjLUuKo89CtDK3quYBhPbgFx49qxAh/nPLAGOBJUzbSSXQAsd4P
+         ua1gbchIXKuNON9msr9nZV54HpqsRHEIcnlMBNJc6In5vw2QX6byL+NsHMu2chfQccPo
+         ZbPEBqYePUh9L/XqwGrdufYPqK/vL0tN68RGBSpz/mBMfA7uSbMjaKPGr2u0iZmfR5R6
+         Sqgg==
+X-Forwarded-Encrypted: i=1; AFNElJ+sSFqLSIEZHymDGOYRHR9/DqZsV4TwiVjEjVi/1Nv0s4tCgfP/JBrvPX82G0Qq1zAmYkeEboA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzm1uRzKwZyHrOeJmNTF2Tg5FYSxKRVcH1Yf1/yVvrg0YWR+lbJ
+	CpK9Bq962DcO/iSV0nyDBF4FpGPmcdKd7DBQNTeK7AHJPeUHrtjaypr9PUA3WNTipw==
+X-Gm-Gg: Acq92OGNyRQzoJrSe0ZjkY5bssIvmZNuu3QGfPsSE7rGoxumRBAShR9GWyxCR7KW7e3
+	CWhWjyb238SGcskpFs9SY5xMhKemtVsCRHMJxZIla/ASBZGhkuK5j6lakOxX7VO0QxJAZgK0VaY
+	mFEFPyGXxsWFS/asBaT7kW5eZ+igP03V3bzQpu4hPzCO3Fw8xj0FpEkb6YhFZrCHJgYMsBEeGW0
+	eYSCkv065kP3PeHnDU7udFCxBjF8O7eSb3WajXsFpdDCcSqX3Vh843SJLI7prpRHcVDm+pAseYA
+	+3YDsEChOGl5RPjZB5/+rrVo/XoBunTMlpStKjFF3xDX/MiysfeSAXx8I+gU4eF5zt+Qvhs0su8
+	SuDcYU+kynrekm88+dv4w89hoOQ2UQJGR+NC6Do75+CGk+ux4z00Zh03kgC6zs3LFVHIIYsTPuK
+	Sv2LV0iE0wjTwZFlVY9JhkRCbFliMdOnZusN0VKe0M1WFFzE+uy1j2L3EWlxhJooK4wsSJYq5a/
+	RRMsw==
+X-Received: by 2002:a05:600c:c16b:b0:48a:563c:c8c0 with SMTP id 5b1f17b1804b1-4909d2e8ff7mr29149015e9.7.1780041772883;
+        Fri, 29 May 2026 01:02:52 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909c12b6ddsm8900445e9.33.2026.05.29.01.02.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 01:02:51 -0700 (PDT)
+Date: Fri, 29 May 2026 09:02:45 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: tabba@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: arm64: Fix host/hyp tracking on share/unshare
+ hypercall failure
+Message-ID: <ahlIJQU-1b0mayPP@google.com>
+References: <20260529074341.2271950-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260529074341.2271950-1-tabba@google.com>
-X-Mailer: git-send-email 2.54.0.929.g9b7fa37559-goog
-Message-ID: <20260529074341.2271950-3-tabba@google.com>
-Subject: [PATCH 2/2] KVM: arm64: Avoid host/hyp share desync on unshare
- hypercall failure
-From: tabba@google.com
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Quentin Perret <qperret@google.com>, Vincent Donnefort <vdonnefort@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260529074341.2271950-1-tabba@google.com>
 
-unshare_pfn_hyp() erases the tracking node from hyp_shared_pfns
-and frees it before invoking __pkvm_host_unshare_hyp. If the
-hypercall fails (e.g. EL2 refcount still held, or page-state
-mismatch), the host loses its record while EL2 still holds the
-share, breaking later share/unshare attempts on the same pfn.
+On Fri, May 29, 2026 at 08:43:39AM +0100, tabba@google.com wrote:
+> Hi folks,
+> 
+> Yet another bug I found while testing Sashiko locally with fixes to
+> review-prompts.
+> 
+> share_pfn_hyp() and unshare_pfn_hyp() in arch/arm64/kvm/mmu.c
+> maintain a host-side RB-tree mirroring the set of pages shared with
+> EL2. Both invoke a hypercall that can fail (page-state mismatch,
+> EL2 refcount still held), but neither cleans up on failure:
+> 
+> - share_pfn_hyp() inserts the tracking node before the hypercall
+>   and leaves it in the tree on failure, leaking the allocation and
+>   presenting a phantom share to a later unshare.
+> 
+> - unshare_pfn_hyp() erases the tracking node before the hypercall;
+>   on failure the host loses its record while EL2 still owns the
+>   share, breaking later operations on the same pfn.
+> 
+> Severity is low (no isolation impact) and the failure paths are rare
+> in practice, but the desync is real. Both patches are independent and
+> apply cleanly to current mainline. In other words, this can wait for
+> 7.2.
 
-Invoke the hypercall first; erase and free only on success.
 
-Fixes: 52b28657ebd7 ("KVM: arm64: pkvm: Unshare guest structs during teardown")
-Reported-by: Sashiko (local):gemini-3.1-pro
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/mmu.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+I believe I fixed that here lore.kernel.org/all/acyKhZL2di_QQ9xm@google.com but
+as Quentin pointed-out, there's absolutely no reason for the hypercall to fail.
+So I haven't sent a v2.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 4a928fb003ff..8026e834528d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -524,13 +524,17 @@ static int unshare_pfn_hyp(u64 pfn)
- 		goto unlock;
- 	}
- 
--	this->count--;
--	if (this->count)
-+	if (this->count > 1) {
-+		this->count--;
-+		goto unlock;
-+	}
-+
-+	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
-+	if (ret)
- 		goto unlock;
- 
- 	rb_erase(&this->node, &hyp_shared_pfns);
- 	kfree(this);
--	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
- unlock:
- 	mutex_unlock(&hyp_shared_pfns_lock);
- 
--- 
-2.54.0.929.g9b7fa37559-goog
-
+> 
+> Cheers,
+> /fuad
+> 
+> Fuad Tabba (2):
+>   KVM: arm64: Free hyp-share tracking node when share hypercall fails
+>   KVM: arm64: Avoid host/hyp share desync on unshare hypercall failure
+> 
+>  arch/arm64/kvm/mmu.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> -- 
+> 2.54.0.929.g9b7fa37559-goog
+> 
