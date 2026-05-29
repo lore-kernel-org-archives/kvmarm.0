@@ -1,143 +1,105 @@
-Received: from esa5.hc1455-7.c3s2.iphmx.com (esa5.hc1455-7.c3s2.iphmx.com [68.232.139.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C287332EAC
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 00:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029BB349AEA
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 07:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780016140; cv=none; b=FiqlCHI16I4e0u8y2HbsiZZ0XUhE7ohBDj0Kvz4yNDrL0hfM6i1E1fBO4HLjN4T10qRr3I6qR2t9xevVFrBoeLO5Y5d7cifVARAIIiMa3GpVTUGRjd6mY3DVe4P0bp1h8vBascncLOJYFyXg0J5WB7+3Xhe729A7jAb3HqVUV48=
+	t=1780040625; cv=none; b=EsDXKAtvvpUAKSbHS6YjQtBiZwwf9w43trOeteuyo1sM1tRlT+8FklevC/yVs1Ugt79BLUMRwE7yN8403mQ86ydRvcIg0m1lz1e7OPSfOeeOcYFxXH5iKF58DXm7BHyf2kodJ2Jsm4vYX2Rrd8jXalRE/BhKeL07jbQhibXVyco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780016140; c=relaxed/simple;
-	bh=lhpPtqrPlN22mh1WZzcu3aj/wlFlJxXUx2s+ET5Hoyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DvfxTH6bnHrj7K7pPxMxY8T6bEaEzjwZAU69VkBDvzQJid09GqPFd0lYrFFpphafmeWQo/VEJdbLJ1Zrv/T9RUxAjhbo8hloz51YfRvaXK39gohfAflADxqrArYRItXPK9ham1bf+zTmTI+8xqx7Dn1YM2Yiuj5GDKVCcr6+ezY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=bcJVeS2M; arc=none smtp.client-ip=68.232.139.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1780040625; c=relaxed/simple;
+	bh=AQc5VySXy8q2Bk6xN/PY4/4Xyl5t9boY6mhk63Pe8VQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yy8k6VohkQl5JONskt50CdHKg1z61dSLa/qkZfNN9v9BLbrm4J4F+ipidpu4uVvkeF49CvCYjg0wqvhYFjeKU7sTP89g9+/IZOrQI4V0SqPpW08ei/ffEIx/cRESpdI9kgg8aaua6F8pMLiX2lB3TrSJNxV0CbbyYOhwbCV951A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rVl3q1D1; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="bcJVeS2M"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1780016139; x=1811552139;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lhpPtqrPlN22mh1WZzcu3aj/wlFlJxXUx2s+ET5Hoyw=;
-  b=bcJVeS2MBGFFLHRbnhhDHjcAq8Q8TgnjBYXHa7opPcfhGvGEbC8fJVX+
-   RVYl/BuTq7vPJi3YNMZgFxht1tzWBe+lHBrx21+iFCwxwi9ithSCi2dKu
-   53a42WTvH4SRsi0A/9lSVmrd8qv3lbg13nrBpvf4ewU61i0ymfXkREFQj
-   HTWjBJ7PjmYVqQYIn6GKuYN5LiPIXyA7MwK/eapBSXNNFNdwDk8qgGiKH
-   mtJOpH8EUkAEo2ZJ497ApPM1sUIuhP2vKBSuMCWqizf6dw+dBkZj9BiHu
-   As9NXHSTbIWaEOQVDJcvt5v79Tod4pIAWnF9EYNsp+tiEyfhhzjKcnXbE
-   Q==;
-X-CSE-ConnectionGUID: 3EtJbeW8RuOoeyikBU5qRQ==
-X-CSE-MsgGUID: Q/JT6HYUTGepV2IIawG7iQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11800"; a="240339039"
-X-IronPort-AV: E=Sophos;i="6.24,174,1774278000"; 
-   d="scan'208";a="240339039"
-Received: from gmgwnl01.global.fujitsu.com (HELO mgmgwnl01.global.fujitsu.com) ([52.143.17.124])
-  by esa5.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2026 09:55:31 +0900
-Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mgmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 9D826ADBD
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 00:55:31 +0000 (UTC)
-Received: from az2nlsmom4.fujitsu.com (unknown [10.150.26.201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id 5095D188C9A2
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 00:55:31 +0000 (UTC)
-Received: from sm-arm-grace07 (unknown [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmom4.fujitsu.com (Postfix) with ESMTPS id 128DA2000752;
-	Fri, 29 May 2026 00:55:26 +0000 (UTC)
-Date: Fri, 29 May 2026 09:55:24 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: nv: Implement nested stage-2 reverse
- map
-Message-ID: <ahjj_CKuXhDOHhBZ@sm-arm-grace07>
-References: <20260510145338.322962-1-weilin.chang@arm.com>
- <ag1jQB3dRX0RSqbR@sm-arm-grace07>
- <86fr3bvnt5.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rVl3q1D1"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48fde68e420so103403105e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 00:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780040622; x=1780645422; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QroFkfsIzFdk7bYeD2yDP4/NwbzDZKM8O5SP6AVtn2s=;
+        b=rVl3q1D1cbcbpa19zT9dhA4Oi+wgJMGY4ow2BcdkGWGTA0trdd6wi3fGHMG3a0dt4a
+         Gtejggut1GDSxPalYp0aczhqAuhRIoqA+/kLIf2SbZ86gMB6s9FwgaUfyroACxf+He0A
+         +WeySkZh94mnEUWTGoxkOrRVERqW0qcFVeA++mi/ONWEPT98XNwNm0fpsBWY7UoAgJXI
+         0b9rL3dEN6/OcJPzXLdh7GuVbVVpdX4hNYR55TYUkAHMNCjGFwOBEIPXcXh2akeHWd5J
+         SNU1WusL2GUWUMCgUhrBnkJBnOsqrDV0l90v4tMjM82bF9cEXUj0ZaEJBPPKDXdK5fjB
+         6XOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780040622; x=1780645422;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QroFkfsIzFdk7bYeD2yDP4/NwbzDZKM8O5SP6AVtn2s=;
+        b=Aaj2ytSCoMUpiRtX9YoXYZspNJjCyOCUB8L/yrmazDZZHTW6s3329hKJb00PwgpKSV
+         e0MDSYRaql2pLkI/dQt+Ubv/STN6433DZW7teR2ybNmrTdoEOfKIQlYAJ1W2kgbgPcOO
+         QTZEFhsrzOWlS/jPIssEWjnXIVzrEiRugk31bsqWf7qq7xB3lMeT4uqEPqcizT/I6eqS
+         QbrwrOnEb3iRep+v51GTMjVjjm+pz3VhED2MP0X4+M5Njs75KCDY1Ut3wiycTMdimxxD
+         Emjdo7kJ4yUUP9ToXfj6E0HZaSbGiGGg/M1tnTAW3xb95qeEKjqsAsqhEUkC8DHx0AjB
+         qsDg==
+X-Forwarded-Encrypted: i=1; AFNElJ9Tp3MydPx8++sL/pHuKJbcuZQsvaSc/dACMQg8VqMrAT9fZ4qLzfdP09sakIpZ6fs0y6YO9e0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxhRbZDX6zp79t34VV/e/hFKSdapB1UBHqI2Rn34fvVCi/UwDSF
+	SBRAXxVKBGO56nmB9j3ADQ/qoGMHXf+aJZE3Eq9C+EwZBwOWrQw2k9mu61/UBP16eFKPD3IHk1F
+	uSg==
+X-Received: from wmco20.prod.google.com ([2002:a05:600c:a314:b0:48a:5531:d9cb])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a7b:cc1a:0:b0:490:845c:a1ea
+ with SMTP id 5b1f17b1804b1-4909c0b0c32mr22550225e9.21.1780040622146; Fri, 29
+ May 2026 00:43:42 -0700 (PDT)
+Date: Fri, 29 May 2026 08:43:39 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86fr3bvnt5.wl-maz@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.929.g9b7fa37559-goog
+Message-ID: <20260529074341.2271950-1-tabba@google.com>
+Subject: [PATCH 0/2] KVM: arm64: Fix host/hyp tracking on share/unshare
+ hypercall failure
+From: tabba@google.com
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>, Vincent Donnefort <vdonnefort@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 28, 2026 at 11:19:34AM +0100, Marc Zyngier wrote:
-> On Wed, 20 May 2026 08:31:12 +0100,
-> Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
-> > 
-> > Hi Wei Lin,
-> > 
-> > On Sun, May 10, 2026 at 03:53:33PM +0100, Wei-Lin Chang wrote:
-> > > Hi,
-> > > 
-> > > This is v3 of optimizing the shadow s2 mmu unmapping during MMU
-> > > notifiers.
-> > > 
-> > > Two new preparatory patches are added, one reduces a hole in kvm_s2_mmu
-> > > and another refactors the code a bit during s2 faults. Other changes are
-> > > listed below.
-> > > 
-> > > * Changes from v2 [1]:
-> > > 
-> > >   - Removed "polluted" teminology.
-> > > 
-> > >   - Use xa_{mk, to}_value() when storing and retriving values from maple
-> > >     trees.
-> > > 
-> > >   - Avoid using the 63rd bit in maple tree values so that xa_{mk, to}_value()
-> > >     does not lose us a bit.
-> > > 
-> > >   - Added reverse map removal during TLBI handling.
-> > > 
-> > >   - Other suggested refactorings.
-> > > 
-> > > Thanks!
-> > 
-> > With this series applied on the recent kvmarm/fixes (minor local modification), 
-> > your v3 hello_nested runs fine on all three page granules; without this 16KB 
-> > kernel can't handle stage 2 unmapping paths. I tested using the latest QEMU only 
-> > so wonder how you're testing.
-> 
-> Can you clarify this statement?
-> 
-> Are you saying that 16kB S2 unmap do not work with upstream? That
-> seems odd, as it would mean NV wouldn't work on Apple HW, which
-> represents two thirds of my development boxes...
+Hi folks,
 
-Yes, I built this morning's upstream kvmarm/fixes with 16KB granule fresh, and tested
-Wei Lin's propsed KVM selftest, hello_nested on QEMU with the small buildroot
-filesystem and saw the above i.e., the stage 2 unmapping paths never finish.
+Yet another bug I found while testing Sashiko locally with fixes to
+review-prompts.
 
-I thought it was due to the Ubuntu userspace I was using for testing,
-but not sure now.
+share_pfn_hyp() and unshare_pfn_hyp() in arch/arm64/kvm/mmu.c
+maintain a host-side RB-tree mirroring the set of pages shared with
+EL2. Both invoke a hypercall that can fail (page-state mismatch,
+EL2 refcount still held), but neither cleans up on failure:
 
-Thanks,
-Itaru.
+- share_pfn_hyp() inserts the tracking node before the hypercall
+  and leaves it in the tree on failure, leaking the allocation and
+  presenting a phantom share to a later unshare.
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+- unshare_pfn_hyp() erases the tracking node before the hypercall;
+  on failure the host loses its record while EL2 still owns the
+  share, breaking later operations on the same pfn.
+
+Severity is low (no isolation impact) and the failure paths are rare
+in practice, but the desync is real. Both patches are independent and
+apply cleanly to current mainline. In other words, this can wait for
+7.2.
+
+Cheers,
+/fuad
+
+Fuad Tabba (2):
+  KVM: arm64: Free hyp-share tracking node when share hypercall fails
+  KVM: arm64: Avoid host/hyp share desync on unshare hypercall failure
+
+ arch/arm64/kvm/mmu.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+-- 
+2.54.0.929.g9b7fa37559-goog
+
