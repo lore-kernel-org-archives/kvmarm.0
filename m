@@ -1,161 +1,194 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B867340409
-	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 08:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780042889; cv=pass; b=sh8hm2bRkfRuqAfN8OEFOSMybM8hVgIaFGEH/+eeVI7JeQJ5a4OBZAm06ccUoP+VEOrEyQOhS51bzAGOs6pr7jxIE+j3YJHpl9ntZjdn7ZNIrxGzyjZOLKSE+zkpsK74uPPmG0yvNtfG4hG7ySiZawYlzxbw8zPyQWWKGsVg5J8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780042889; c=relaxed/simple;
-	bh=HCRBoVkJzn5YM7vwIS0/sFI8L9azsTe3ITWMrE8Yq3s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eiCYogheyh+3IOkzH5fsfBzUUr1UuICja1nHbTkwexOmBnQWpAFvYfpOH7PIVGWx3wmjakWxG6rGOJtfEVpKv+2Gmbf5BpV2l7WK4Qb1r4M2eazJoKNmmdzSTIl9PWSjjMKRtxX51HtnDTO09mzK34+TkWcbehBbd1BW9xJGW3o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BJantJ76; arc=pass smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36CC3B7756
+	for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 08:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780044076; cv=none; b=WsA0/t0fQHyYIpMwwoLXWhIUEmCFHF8us+y+0nk7rkqf8j8JsNnJu8iHYLvDtIQAUQPA4RooAIm3gD1P8AapodkMd7Sr5fazq44Kv0hrpiEIeHJ36JFMAAKA4ypkHOfPChwWqzvuLUITfWSiT0KKp3xx6nmSBgOTQsTtclp6C5U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780044076; c=relaxed/simple;
+	bh=vbeZEyiR/h6eWp5O0i9nwQvt26tcfiPct0YRF+hL2B0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mL9LehugAmvnSZdLA3JoHbE272LLDoJoaiURDFyz6OnWwHHKBE/fD1RmMGQa2ZhlETEEQhrSqtmZY5zDczLOGHKAFh1SLVoDp41KFpliJ9aOIGPBJAZmW439y0J25qhYM/2A/n8VTSCC5Eo0fXc46TVC91hwEHVO6RmDAD1ifsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OO0OCxUP; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BJantJ76"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-516d78ba1adso7711cf.1
-        for <kvmarm@lists.linux.dev>; Fri, 29 May 2026 01:21:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780042887; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JvtnLpcCnh0RDWLig8EQYR0lc+PZw1GBEFwFQOx39VQINMVfxp82xZSnzOmShJz7Dl
-         cXKgDEx1Ue8W1xke4HX3GHx/F21gh3aCSnGdGzQWABycqqQ/2XfM0Ni773LQIWFOnk7D
-         fyJh3fB+JS6LqjCSY3UZtCzLzc6f2pJsuULkh7i0ZmvmiwmIBBqEWnrKrj+dm2PO57x2
-         hr5GslDQ1BGSMKiXNQOAyGd2bMHGr0f0modwTG9jB0nlmSIUnge6+sGWq239KgQ4HFMx
-         aPb9FQjIUgaaP54c0jSfUoVRvXTWEDRiSzI1lG0MhiAGICEaaK5psNOrL2sWEgNCH00M
-         Xuqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=RTmG6wPP6fYkEoyy61gm5D9QOKDalR8QCsFErCfDfZc=;
-        fh=2+QEuFpwNIAGIZ5/El8oscqG9mOhWrfxl5kPusZofqE=;
-        b=LID6j02SLMWYcwHAo6Czr0NJjOO1faqZEhu7FcKO2/jOQorloLtN07XwNP2uKDU7pQ
-         hVn/j8eEtWRrGy2B+MiqZUjM7nX7S+Y9HkV6H+ORkjvOm87knIWyEQTXflTMi0os6Nu7
-         ZAEUP3gbQQQAGXq6bmtJt9Q96pa8sVNzq0BIiY4KwEJ9YmDUOGHQT7ZXKP9XIzcLrhZv
-         BhO62Tfwb+V0qSujI9DD+i/UstvIgncjG3QHaf1lkzR580u4X5VRJelYVL+fpV3nveKn
-         P6RnW3IjIXDCjqyaWHpZ3qnXliCv6hiBZnQpoXWIunmbAhbahPx5UNlJHRI+gtTNfb1I
-         tQhA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780042887; x=1780647687; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTmG6wPP6fYkEoyy61gm5D9QOKDalR8QCsFErCfDfZc=;
-        b=BJantJ76N/s8S767CCy+Y4nhepM/ibg2MD6d6NEZ1oS2xikVm9JEUpMQmwhBaKyoJK
-         ZkO//O8xpFwlGqYDogXYEjfvIg5sxLArCr6gzDFo5+ibtABAYQ7/vRGrmF/ytduqGpXc
-         LDcPZrxHXvVnbOnpAb7yMxqImOYebPJ3xQtbgqScoS/1XchrFvfePgw9iVaJNbJOA1xS
-         UF+vfO7O4OyRbJrC4RhiHIKBh4D7UGg4h+FpDPlmm4uHgNszOMBRWsvfkQJX8qxIPjkH
-         vl53uhKFtnl2W7QxYBtfkm75Vg6VNjk8F8G6x+AODZY52Hkn7UVRkrpXzbQ6yFuaAvUY
-         Zeig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780042887; x=1780647687;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RTmG6wPP6fYkEoyy61gm5D9QOKDalR8QCsFErCfDfZc=;
-        b=gYBwjr4jZWFuA1WziVwci2B61Ht+Uhc2nL0NPX+jPfSDBvu4RWMDSv0xx0NYl/GkHI
-         et1BeKHSNwXjcUUbG43kDbLmbVftaDz/YRS59UTKgjw7JRCn7mqh7m1pPiMSb0SrOJ0q
-         /GOhTSLYdvjYoaJpCshR48ayDrGhXUZmHAIB62v3R7BrIyfYxmbfzV4wP/+nvOejPIr5
-         tL0DgIP7fbEpFDgDM3dWJTiR9Gn2IiQWI8oAYpO8SaHfBBaZi8YVszGrP9fZXaHjsXOj
-         5aVtdaC8rPNbNHTq2VTtdM2MDcMFkRMXazdSX4coqKM27TRf3wQFHFHVJvWaAgkRS3vs
-         /p0w==
-X-Forwarded-Encrypted: i=1; AFNElJ/5ivuytiEgJLYGwvLHLgcEqIipe3HdkUnIVWAP5XAwio8QqDvThM/eyHhYCVi9oSBUoOw1Kpc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YynD6H6a5w4GAGMiL2kFGBSNV9vV1f9H3NU7yLfb45+wEL3rOA4
-	Q9VAmZCzhJ+SKMJEz2vt/Dbafwll/joXqMR3I+tjZPdMCvYwxqYkWCuJTXIffPL5ldLrkkq9F4A
-	k18Gezi0oNcjBNl5VJFDwMshNzjW1xugm2fwaOjZa
-X-Gm-Gg: Acq92OGyLu0psFQmAj/3gNi9uXMORK5gaZxONhuGyQwLAF7MZXn6YYREJJOxEr66pN1
-	ziV0AiyLn4YQZPGGbKQG2AiQnGDjpxBvtE+XBR/TetXprPqDZcW+Q94mABTMnDrqFcMwd1zK6s4
-	ob50bL7sjRLdQtEwEjnxawk0fCttIQv6zr2G7/8M6I3S5aG8hOJCBWHY93vniSUrt0Ojbhd7rMl
-	bbwswYv1xHpIFfQwwbaF5LxAlzfVh5Tkv/Zdyy4RxLmY/bn7omf07+YvzOS5HcfCp32vwKehWdI
-	3vxq7cYH7bJoAQGgzyk=
-X-Received: by 2002:ac8:58d1:0:b0:50f:af60:3496 with SMTP id
- d75a77b69052e-5172f749fe4mr4854041cf.1.1780042886761; Fri, 29 May 2026
- 01:21:26 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OO0OCxUP"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 28927204C;
+	Fri, 29 May 2026 01:41:09 -0700 (PDT)
+Received: from [10.1.26.144] (unknown [10.1.26.144])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E81C3F632;
+	Fri, 29 May 2026 01:41:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780044074; bh=vbeZEyiR/h6eWp5O0i9nwQvt26tcfiPct0YRF+hL2B0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OO0OCxUP6Tc+Vw1mQUwyArHcpL82pFAPHnZ3imrzhZ9OseGf4HwuTUe3FXyKLiTeL
+	 1Q2sOhtVTRNWg0x2aA5H33QL6zCMLjfS1FH2epOGR7RL3Ov2ia+MiABXfVCuDW/yN4
+	 i940eLqtrT/UE++l48qi+oobYioK4tJkd+/DWeUc=
+Message-ID: <014b8a22-d2fe-4989-a430-861753beb1b1@arm.com>
+Date: Fri, 29 May 2026 09:41:09 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260529074341.2271950-1-tabba@google.com> <ahlIJQU-1b0mayPP@google.com>
- <CA+EHjTxktk4-B6qcAOf4O26++M5s6CKkkP539s4dRBRWxZN83Q@mail.gmail.com> <86a4tivdh3.wl-maz@kernel.org>
-In-Reply-To: <86a4tivdh3.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 29 May 2026 09:20:50 +0100
-X-Gm-Features: AVHnY4LMBqEt41ppX0e4qdU_UDhI0C7nxs47IWnoXMk36_X18jqA-R0xuCxrKOQ
-Message-ID: <CA+EHjTykVY6x+iFwSFH7MaK7rfV5CTSeFwx4cZatbB+Fuzu9Yg@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: Fix host/hyp tracking on share/unshare
- hypercall failure
-To: Marc Zyngier <maz@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/18] arm64: fpsimd: Use assembler for SVE
+ instructions
+To: Mark Rutland <mark.rutland@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ maz@kernel.org, oupton@kernel.org, tabba@google.com, will@kernel.org
+References: <20260528165446.701944-1-mark.rutland@arm.com>
+ <20260528165446.701944-8-mark.rutland@arm.com>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <20260528165446.701944-8-mark.rutland@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 29 May 2026 at 09:15, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 29 May 2026 09:05:35 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > On Fri, 29 May 2026 at 09:02, Vincent Donnefort <vdonnefort@google.com> wrote:
-> > >
-> > > On Fri, May 29, 2026 at 08:43:39AM +0100, tabba@google.com wrote:
-> > > > Hi folks,
-> > > >
-> > > > Yet another bug I found while testing Sashiko locally with fixes to
-> > > > review-prompts.
-> > > >
-> > > > share_pfn_hyp() and unshare_pfn_hyp() in arch/arm64/kvm/mmu.c
-> > > > maintain a host-side RB-tree mirroring the set of pages shared with
-> > > > EL2. Both invoke a hypercall that can fail (page-state mismatch,
-> > > > EL2 refcount still held), but neither cleans up on failure:
-> > > >
-> > > > - share_pfn_hyp() inserts the tracking node before the hypercall
-> > > >   and leaves it in the tree on failure, leaking the allocation and
-> > > >   presenting a phantom share to a later unshare.
-> > > >
-> > > > - unshare_pfn_hyp() erases the tracking node before the hypercall;
-> > > >   on failure the host loses its record while EL2 still owns the
-> > > >   share, breaking later operations on the same pfn.
-> > > >
-> > > > Severity is low (no isolation impact) and the failure paths are rare
-> > > > in practice, but the desync is real. Both patches are independent and
-> > > > apply cleanly to current mainline. In other words, this can wait for
-> > > > 7.2.
-> > >
-> > >
-> > > I believe I fixed that here lore.kernel.org/all/acyKhZL2di_QQ9xm@google.com but
-> > > as Quentin pointed-out, there's absolutely no reason for the hypercall to fail.
-> > > So I haven't sent a v2.
-> >
-> > At the very least we need to add a comment, otherwise, people like me
-> > and LLMs like Sashiko would stumble upon it.
-> >
-> > That said, this fix adds no real overhead, makes the code clearer, and
-> > guards us against a future where that call might fail.
-> > Self-documenting in essense.
-> >
-> > WDYT?
->
-> If a hypercall really cannot fail, why does it have a return value?
+On 5/28/26 17:54, Mark Rutland wrote:
+> Historically we supported assemblers which could not assemble SVE
+> instructions. We dropped support for such assemblers in commit:
+> 
+>   118c40b7b503 ("kbuild: require gcc-8 and binutils-2.30")
+> 
+> Since that commit, all supported assemblers (binutils and LLVM) are
+> capable of assembling SVE instructions, and there's no need for us to
+> manually encode SVE instructions.
+> 
+> Rely on the assembler to encode SVE instructions, and remove the manual
+> encoding. The various _sve_<insn> macros are kept for now, and will be
+> cleaned up in subsequent patches.
+> 
+> There should be no functional change as a result of this patch.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/fpsimdmacros.h | 65 +++++++--------------------
+>  1 file changed, 17 insertions(+), 48 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+> index adf33d2da40c3..4ba23e493cb69 100644
+> --- a/arch/arm64/include/asm/fpsimdmacros.h
+> +++ b/arch/arm64/include/asm/fpsimdmacros.h
+> @@ -99,85 +99,54 @@
+>  	.endif
+>  .endm
+>  
+> -/* SVE instruction encodings for non-SVE-capable assemblers */
+> -/* (pre binutils 2.28, all kernel capable clang versions support SVE) */
+> +/* Deprecated macros for SVE instructions */
+>  
+>  /* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
+>  .macro _sve_str_v nz, nxbase, offset=0
+> -	_sve_check_zreg \nz
+> -	_check_general_reg \nxbase
+> -	_check_num (\offset), -0x100, 0xff
+> -	.inst	0xe5804000			\
+> -		| (\nz)				\
+> -		| ((\nxbase) << 5)		\
+> -		| (((\offset) & 7) << 10)	\
+> -		| (((\offset) & 0x1f8) << 13)
+> +	.arch_extension sve
+> +	str	z\nz, [X\nxbase, #\offset, MUL VL]
+>  .endm
+>  
+>  /* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
+>  .macro _sve_ldr_v nz, nxbase, offset=0
+> -	_sve_check_zreg \nz
+> -	_check_general_reg \nxbase
+> -	_check_num (\offset), -0x100, 0xff
+> -	.inst	0x85804000			\
+> -		| (\nz)				\
+> -		| ((\nxbase) << 5)		\
+> -		| (((\offset) & 7) << 10)	\
+> -		| (((\offset) & 0x1f8) << 13)
+> +	.arch_extension sve
+> +	ldr	z\nz, [X\nxbase, #\offset, MUL VL]
+>  .endm
+>  
+>  /* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
+>  .macro _sve_str_p np, nxbase, offset=0
+> -	_sve_check_preg \np
+> -	_check_general_reg \nxbase
+> -	_check_num (\offset), -0x100, 0xff
+> -	.inst	0xe5800000			\
+> -		| (\np)				\
+> -		| ((\nxbase) << 5)		\
+> -		| (((\offset) & 7) << 10)	\
+> -		| (((\offset) & 0x1f8) << 13)
+> +	.arch_extension sve
+> +	str	p\np, [X\nxbase, #\offset, MUL VL]
+>  .endm
+>  
+>  /* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
+>  .macro _sve_ldr_p np, nxbase, offset=0
+> -	_sve_check_preg \np
+> -	_check_general_reg \nxbase
+> -	_check_num (\offset), -0x100, 0xff
+> -	.inst	0x85800000			\
+> -		| (\np)				\
+> -		| ((\nxbase) << 5)		\
+> -		| (((\offset) & 7) << 10)	\
+> -		| (((\offset) & 0x1f8) << 13)
+> +	.arch_extension sve
+> +	ldr p\np, [x\nxbase, #\offset, MUL VL]
+>  .endm
+>  
+>  /* RDVL X\nx, #\imm */
+>  .macro _sve_rdvl nx, imm
+> -	_check_general_reg \nx
+> -	_check_num (\imm), -0x20, 0x1f
+> -	.inst	0x04bf5000			\
+> -		| (\nx)				\
+> -		| (((\imm) & 0x3f) << 5)
+> +	.arch_extension sve
+> +	rdvl x\nx, #\imm
+>  .endm
+>  
+>  /* RDFFR (unpredicated): RDFFR P\np.B */
+>  .macro _sve_rdffr np
+> -	_sve_check_preg \np
+> -	.inst	0x2519f000			\
+> -		| (\np)
+> +	.arch_extension sve
+> +	rdffr p\np\().b
+>  .endm
+>  
+>  /* WRFFR P\np.B */
+>  .macro _sve_wrffr np
+> -	_sve_check_preg \np
+> -	.inst	0x25289000			\
+> -		| ((\np) << 5)
+> +	.arch_extension sve
+> +	wrffr p\np\().b
+>  .endm
+>  
+>  /* PFALSE P\np.B */
+>  .macro _sve_pfalse np
+> -	_sve_check_preg \np
+> -	.inst	0x2518e400			\
+> -		| (\np)
+> +	.arch_extension sve
+> +	pfalse	p\np\().b
+>  .endm
+>  
+>  /* SME instruction encodings for non-SME-capable assemblers */
+> -- 2.30.2
+> 
 
-Good point. If we know it cannot fail, how about just `void`?
+FWIW,
 
-That said, Vincen't exact words are: `very much unlikely`, not the
-same as cannot fail :)
+Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 
-https://lore.kernel.org/all/acyKhZL2di_QQ9xm@google.com/
 
-/fuad
-
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
