@@ -1,141 +1,110 @@
-Received: from smtpcmd0757.aruba.it (smtpcmd0757.aruba.it [62.149.156.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACFC3A7590
-	for <kvmarm@lists.linux.dev>; Sat, 30 May 2026 11:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.156.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECA13914FD
+	for <kvmarm@lists.linux.dev>; Sun, 31 May 2026 15:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780139333; cv=none; b=IF7aCwDSu5Kb4S4YzOBWT0vLVFDubQxNKV9+nmcJNDnPp4xIhNs16A6Oh0XqQPEDTkbBTNUpb8HuHM5ZOEDJOOXYCutdUWX/JPw4fjpNuaFkJtoyVNwPKB6mpraIq5i05WGbyfMCAvcrfdWA4B71alU7artHg9xd5uDobwMwz5A=
+	t=1780242353; cv=none; b=Fo+ptUxXMxhFM/50uINgw6DLyw+xfJZfx8WhKlunvKFNg/ve7arDl1mBcAQ4URBZ0LqbHRNtw2Wrsf+vaShiuYLP3PzwyHiq2+kYKErzptaptEz1qK7keod4t4RnzZoGUWGGhzv49F5fOaj5jywt1h5WbRDLh7lofsEk4ONvo88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780139333; c=relaxed/simple;
-	bh=GPyYaBIjPJR6VxGYHYgZkTzX7CeNzKdf2h5i4+TkNEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TMVWmgbE5vCQwSlHinyidG6VbgmnS6K4W5z8pBa39G199vbLWU8MClg1wxUzpGbwel4PNV+dHR1L9XXqmOtsECWpen7LMy9ROEWSZNZCMwU1kbZROCW18SDdAJ/mxU5//PMb1BMYvG/8/ikKAq9ir0WRPFpHlnrj5FMuhHNdGf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=kgKGRZBi; arc=none smtp.client-ip=62.149.156.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
+	s=arc-20240116; t=1780242353; c=relaxed/simple;
+	bh=4W1NFT8egfIsuOpwHtsrvwG4F7ILQ3DCUTBazhiSZQ8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q/+FWC8a1OVP2QcTmHKNt2eyOj8ZHOvdwYWHq/ODhj9aptxyagLozOZK9Rxqkhqc4g7GaRIhph3bNCAiWPBW4LqNSKPRQ03nTn6GxzmaRsmPqtWOAJA9n3HMi0jIPppcG2YtJTTVbD8z1k5upOjoFLq2SAjYUgldRjWN3Frk6/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g0EBcBMj; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="kgKGRZBi"
-Received: from [192.168.0.186] ([109.118.80.246])
-	by Aruba SMTP with ESMTPSA
-	id THYcwvMjjtpTfTHYdwL3Pi; Sat, 30 May 2026 13:08:49 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1780139329; bh=GPyYaBIjPJR6VxGYHYgZkTzX7CeNzKdf2h5i4+TkNEg=;
-	h=Date:MIME-Version:Subject:To:From:Content-Type;
-	b=kgKGRZBiSx58E4LAUgStLSQ3R2seSS6CpKU9kJ9hy+keJX+d7/DD3a7K0wTnshwMg
-	 ftkEItSrXwRxergIwPMhm0uf84sJTZnmNeWkIhX1DijGgo+xuErv+CK2qdSXQC/osC
-	 /G/3+ydAvP1mIjjWj5vl5yEQTfS+xju4EXMJDjVCFfiHhyN1jrIgSKgN0XYD6Hxl/y
-	 Fw8mAi/3TMyM8MZ/FLfy36LwEhjcNXeufB0ZTjQ6bABAs5zaKHcZWOn3t4pMrjAf0C
-	 6YpR52XYOXB1bHknwZFujGTTocln5fxtFXd2xu9tTXSYEZvErQqLSo7/M9uH5VuSod
-	 c1fZ4Qh8+lrVQ==
-Message-ID: <912a22e8-878f-4763-958b-71052ee69b36@enneenne.com>
-Date: Sat, 30 May 2026 13:08:46 +0200
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g0EBcBMj"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-beb86e54b79so71943966b.1
+        for <kvmarm@lists.linux.dev>; Sun, 31 May 2026 08:45:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780242349; x=1780847149; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4HGHSV+ymwGZVts9xs57iGtb0PHiB6C1QG35wARFiWM=;
+        b=g0EBcBMjy0PuVyfS7FoQLloRXavhA7rKdKO/EXcwm6gQKfZw0OBoIcICYItWguRumr
+         YKGGsBXWDxX2sq9pY/vB95jpATDCsWHwVPJufIUq+YzDR2s5JrjHSJ+lMJx8cL8PJH/0
+         5nxK29s4rX8llMYxdgVO2Q1B7lBLUl/46MvPc0F72S+2iJBz2J8bb+sFKhri4o0zutGh
+         Sugyh2c3Fi9/+4GzC25PAdRjf6hHlD1qelqu9wnjjfIDUxDxxkbiq0Gm1kmDM2AKsSH8
+         tDtRzJ+AR/CH0ob8yz2gOeYN3BM5PGCDxT4mjCUF/oxjPoBRFMs5/LZtYXlEwdfLPXIp
+         iwcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780242349; x=1780847149;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4HGHSV+ymwGZVts9xs57iGtb0PHiB6C1QG35wARFiWM=;
+        b=naQrLABw51Y1Dd5mzS9T1eg2ADP7R4PYfP9W5A4KqmBqqbD/gpnP+YHaiZdz2nl9xo
+         3XPuqWtSUo7kwUDFHPEESZEFf5EPOnM+nMRanuNM1Pywh1tOKo+Za1ER78XH4jn5gWDK
+         6zXMN1d0Rn+mZ/xcuKYHjpAQ/7FYpSMEAU5d70jEKRzNg7JWckrWZDsMNygC+LEQbAgp
+         6VCPiMqCmDtN9F0F5bDkSTls2nxpXHWWEM4iPSTwI3aWAYqyJHU8qqpuywxuUuCAYS+y
+         364Zh3w4xTbL5hXyvTPoHH0y+NmKTS0tuT/QyZ/C2cdkYRoJxVLkvk+EDlUpyS2nt+M5
+         utrw==
+X-Forwarded-Encrypted: i=1; AFNElJ+1V0wcBKFs8huu3L8KsT3B+iTUG9GhVHQw/eu38cbNMlxkGnoZ4BAwdd7+mb81gRPbQ/HP6OE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YytGO96RAziKKADrSRQYaODLHcrgppLvYOzLmc903WIfrbzC46v
+	GJhIqu11A9a/JH82vgOpkEyuFKWfeYdHWHL4SROwMQj5+t1HDC46EdEryqgwiNbWWh4QUYlVxSu
+	rgQ==
+X-Received: from edqm24.prod.google.com ([2002:aa7:c498:0:b0:68b:eff7:97f1])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:c10:b0:be2:6e41:ba8f
+ with SMTP id a640c23a62f3a-beab5bebadfmr383941866b.44.1780242348882; Sun, 31
+ May 2026 08:45:48 -0700 (PDT)
+Date: Sun, 31 May 2026 16:45:48 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [patch V2 04/25] pps: Convert to ktime_get_snapshot_id()
-Content-Language: en-US
-To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: David Woodhouse <dwmw2@infradead.org>,
- Miroslav Lichvar <mlichvar@redhat.com>, John Stultz <jstultz@google.com>,
- Stephen Boyd <sboyd@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Frederic Weisbecker <frederic@kernel.org>, thomas.weissschuh@linutronix.de,
- Arthur Kiyanovski <akiyano@amazon.com>,
- Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- Oliver Upton <oupton@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- Takashi Iwai <tiwai@suse.com>,
- Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- Johannes Berg <johannes.berg@intel.com>,
- Jacob Keller <jacob.e.keller@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev,
- linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org,
- David Woodhouse <dwmw@amazon.co.uk>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-References: <20260529193435.921555544@kernel.org>
- <20260529195557.123410250@kernel.org>
-From: Rodolfo Giometti <giometti@enneenne.com>
-In-Reply-To: <20260529195557.123410250@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfDEumLSv+pk/U7kUrE6BL3srB8YYK8RA/hJdPG2uEhTOPvKA9Ae3985zLeyJTGgr/CFNuu2TwP1b19so35CyXgPbwgS/+GS4wpS04rqyC5DXeO2e3lwN
- EgRf+BrmXj/gfc10HcckoI9SRkL6j6Kp57c12/EXsEsLtyt5ERq37z9tJBqN/ef46YKkLaZNVovcBNwdrEdpD5h5eEvWQRaI8tUmoazMGe45OuXe9xOu2MtM
- Vt6sbU5QejS71ZbLguWs0nzAy9KuBGa6s8M3UsVhmuLGLgShRdlYeyRSgO2C69aVdiZ6BnW2+9QpDdnJ9rPsVNysuqBHMfCk/1o0NwxNanFEcT6gDCtMseHT
- NW3Bw1DapD9bEybwmSWu2Zf5330Pv2AcCh+kHbC3zGofYr1aTnRG+gZePb295V3qWiZM8JNDREwGyp8QJaqaA2OdZXW2apEw8yLNGEqQN73GCHLdZZcdRnFM
- HNBil37fEqKWVOa/tQt79gxnrDmlqkeFZBWQxjG/hR3RcEp+rKiuiSPx73hbH+IWRMHmX4mohtFeyEP7Vu+xekgyR5RahrSuNyOxM0ZOxTwWqt2L4AxPgcle
- QjjXBe5kivH8MVmAv5NBuGdg3Y3Bkxt8dQ+JyzQ8Pf2VxNDOxxvVis+8e+2O9JghvhEj9641F6Eh4EC2r4tG8SvxMvA7Kl4uFERt7dzBWG7eIFcqPEffjeGY
- QDPjGReTtDcjFDFYHaKelr95XeShfIlPw2CCCaoG5+x/d0B8832Tg1XTs/INUgofCDHRfrD1w3uYUcVnUsDnUbUjDH6SUGA4cRnPpKlVfVMP3jNldxb23ylZ
- eaWdRoAaq0CNuufl1zHXpjCmbwmC7zZbGqUoeTpw+8wBE6yRimRIXelYPWNsh6PINInGPehIaUaetWGzBIaqE6lfol36A8FcFWp+QdKY7V07UnAjWu2YU9wg
- HRqsu4wdF89Qgoke6D3VWDVMS+L7Q/UUbxfJl7GnrYIK/gcxE1hsAgVH9/rRu/9zrvHyxnMjqXPbioXaT+ya5WPb0jZdIBfk+5HAXyCLI2yk0mspHuf0gx+0
- 7npTs+VEZBNH7zP4dydpKWU5LmOAgaM9+JyBec0Dhjm3KmLVPvmtdnKLk2LargZFo9erPppdU5zxSdYZINdZkt5izI3UTdMig+IqgGESyNEiZtfq1FHgEw24
- +4Elt1LutSMUWoDAABdFQQ==
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.929.g9b7fa37559-goog
+Message-ID: <20260531154548.1505799-1-tabba@google.com>
+Subject: [PATCH] KVM: arm64: Flush HCR_EL2.VSE to deliver SErrors to pKVM guests
+From: tabba@google.com
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/05/2026 22:00, Thomas Gleixner wrote:
-> From: Thomas Gleixner <tglx@kernel.org>
-> 
-> ktime_get_snapshot() resolves to ktime_get_snapshot_id(CLOCK_REALTIME).
-> 
-> Make it obvious in the code and convert the readout to use the
-> snapshot::systime and monoraw fields instead of snapshot::real and raw,
-> which aregoing away.
-> 
-> Similar to the PPS generators, avoid the more expensive snapshot when
-> CONFIG_NTP_PPS is disabled.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
-> Reviewed-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
->   include/linux/pps_kernel.h |   10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
-> --- a/include/linux/pps_kernel.h
-> +++ b/include/linux/pps_kernel.h
-> @@ -99,12 +99,14 @@ static inline void timespec_to_pps_ktime
->   
->   static inline void pps_get_ts(struct pps_event_time *ts)
->   {
-> +#ifdef CONFIG_NTP_PPS
->   	struct system_time_snapshot snap;
->   
-> -	ktime_get_snapshot(&snap);
-> -	ts->ts_real = ktime_to_timespec64(snap.real);
-> -#ifdef CONFIG_NTP_PPS
-> -	ts->ts_raw = ktime_to_timespec64(snap.raw);
-> +	ktime_get_snapshot_id(CLOCK_REALTIME, &snap);
-> +	ts->ts_real = ktime_to_timespec64(snap.systime);
-> +	ts->ts_raw = ktime_to_timespec64(snap.monoraw);
-> +#else
-> +	ktime_get_real_ts64(&ts->ts_real);
+With pKVM enabled, the host injects a virtual SError by setting
+HCR_EL2.VSE on its vCPU copy, but flush_hyp_vcpu() only flows TWI/TWE
+into the hyp vCPU that runs, so VSE never reaches it and a deferred
+(masked) SError is never delivered. VSE is a host-owned injection
+control, not a trap-configuration bit, so restricting the host's
+trap-register values should not have dropped it. Flow it on entry;
+sync_hyp_vcpu() already copies hcr_el2 back, so delivery is reflected
+to the host.
 
-	/*
-	 * Prevent kernel stack information disclosure if the
-	 * structure is later copied to userspace.
-	 */
-	ts->ts_raw = (struct timespec64){0, 0};
+Fixes: b56680de9c648 ("KVM: arm64: Initialize trap register values in hyp in pKVM")
+Reported-by: Sashiko (local):gemini-3.1-pro
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+Not an urgent fix. I should stop running Sashiko...
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
->   #endif
->   }
->   
-> 
-
-Ciao,
-
-Rodolfo
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 06db299c37a8..9e4a20df6409 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -129,9 +129,14 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
+ 
+ 	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
+-	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
++	/*
++	 * HCR_EL2.VSE is host-owned (a pending virtual SError to inject), not a
++	 * trap-control bit, so it must flow to the hyp vCPU alongside TWI/TWE
++	 * for the vSError to be delivered. sync_hyp_vcpu() reflects it back.
++	 */
++	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE | HCR_VSE);
+ 	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
+-						 (HCR_TWI | HCR_TWE);
++						 (HCR_TWI | HCR_TWE | HCR_VSE);
+ 
+ 	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
+ 
 -- 
-GNU/Linux Solutions                  e-mail: giometti@enneenne.com
-Linux Device Driver                          giometti@linux.it
-Embedded Systems                     phone:  +39 349 2432127
-UNIX programming
+2.54.0.929.g9b7fa37559-goog
+
