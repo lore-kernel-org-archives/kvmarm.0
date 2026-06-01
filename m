@@ -1,43 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EA2368D79;
-	Mon,  1 Jun 2026 19:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081551A6839;
+	Mon,  1 Jun 2026 19:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780340938; cv=none; b=asGNdOu/SzwjdXUD0fldhsG0/UqGaon1bxj8T0Eg/aT620VWJIRoo4RtRcH20jctvd99WLWahzkzkQCL+FUazYInglev/cmQedHWpTf04eCJI4bg5ZwujpbPHDAgtIW/f2V3+wdkWsBxGXeK/4oXpVjQYMNdRi4pLsk3zDPWoOQ=
+	t=1780341378; cv=none; b=n9mScDmOJRz70ExkPYlTzcB6EQZ+x8s2lXSYZwOeZqOW+E0v+CbAaTG/Ay/dv+lQL7dMl2a6jN2uOnSpVZ3/PDIBf6HO4LJToiXMYT1wHlbUAvS2wsEP5b9lmjeV3j5fodm6zDtmrDcdlw0XYM2u0C03eMEwd5Q7Op4vLduprVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780340938; c=relaxed/simple;
-	bh=560y4INcT3rA8822y8XgXTuuQop81lDWLxMR0lS9FD0=;
+	s=arc-20240116; t=1780341378; c=relaxed/simple;
+	bh=FxeW2c/mt7wpZrOO29SwSdnzqoiGNt2hqOTlkGEbPE0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f5VBvf/MKq0QfIXPB45Le+G7S3YmAGSX+3lj1u7NFyng0HUTO82V+zmgyQhVCHIGxgBc/nnJ4mQDy8xKlwnHh0OM0/lgqSLsrjA+J2tVWuhxcxI6b+BxmObIfOr0dm9+G0AGodum7AZW5hWxJxS//V38sdJAdFwunsiMpZyTHUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mD5ROBon; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fm8w2krEeTjl+f7Uch4bqO/Wy3YAWh3+RFxkL78MW0e9bXVQ9RtkAve+jdmGX1rVQP1L5pT3ph3vtktzWVFr8alwbL8u71fEH0iOBWQg0BOBMjSJFbyrKcxZjkyrjy+lr8McIqWN/TxRdMr3KLgdVzVIyFTFRLBVOCdrhhqMBhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erERrhzw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mD5ROBon"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C29501F00898;
-	Mon,  1 Jun 2026 19:08:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erERrhzw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93D951F00893;
+	Mon,  1 Jun 2026 19:16:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780340937;
-	bh=elXuand+n/viDgsywhdjTLL4Sq6m2LCvhd5nnF4PGAE=;
+	s=k20260515; t=1780341377;
+	bh=3Py+hXu1RT6jBoYKS4W+9qHiEMV6Utt4FtLuxKrveNs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=mD5ROBonnzUew3QCRjyhq+2GxLjZyXfTZHazuIgIgTKTCtPXlSpXOq2KTubw6Bafo
-	 QQ1/jINkJySUG5j5QeHnxk/9GsW+g/QRB+iU1nS/HrWUqoF2M8w8e2wsi2vjCPiT0D
-	 IltrUTYgiyn+GTxaIEx9FU9Ea/eDBFHTyLK3rkARAprsPrUUyD+ikKTg4YPS2Q5zvy
-	 L7kXogwHSq5F9+C1bdWYar3dIK7rmQLvmiqi3V/2hFPoi1jSY13/NNiRUePLmgpk7M
-	 YbbaeYe2Mu7Eg6aiv4Z4jrVem1AfqSuLYs0YAHTyHbvaR2zg6j15n64S0/oLfFMzD6
-	 Ik1b337U8R9Bg==
-Date: Mon, 1 Jun 2026 12:08:55 -0700
+	b=erERrhzwbrBFn4Q6+juSPsSdsefRY/T0KH39K7jN9NHt1RIMTWFGqzmulVPhAbAzm
+	 hZ/yPZivbJgaJwBPKGoqxmAm2F6eFiW0XBaciJfyRMiVF5+SkgJZpY2+9YsJbbCqoo
+	 TiuiKT5L/ImCZM/GNai0IjM25SGU/o/1IwMOCpxjqWQW6cDnjgb74FfidHZ95Zf6hb
+	 skqPiA91AoESwFEWnujFugJECfLJqKM5U93A/v+M9h58S5w3mUWEFsj/TwrX19GxNo
+	 XG0DLAJ7Yzd4KsiVeBgooMeodrhIA+e1gup3TTSdpM/BRokj3De0SN45Cb+WZomn93
+	 4RJzKRCwrHKMg==
+Date: Mon, 1 Jun 2026 12:16:16 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: maz@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kees@kernel.org,
+To: tabba@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Drop the translation cache
- reference only for the erased entry
-Message-ID: <ah3Yx0fjguUdCk_G@kernel.org>
-References: <ah2c5lu4JbUg7dj-@v4bel>
+Subject: Re: [PATCH] KVM: arm64: Flush HCR_EL2.VSE to deliver SErrors to pKVM
+ guests
+Message-ID: <ah3agGh1s61HKiPG@kernel.org>
+References: <20260531154548.1505799-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,111 +48,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ah2c5lu4JbUg7dj-@v4bel>
+In-Reply-To: <20260531154548.1505799-1-tabba@google.com>
 
-Hi Hyunwoo,
+On Sun, May 31, 2026 at 04:45:48PM +0100, tabba@google.com wrote:
+> With pKVM enabled, the host injects a virtual SError by setting
+> HCR_EL2.VSE on its vCPU copy, but flush_hyp_vcpu() only flows TWI/TWE
+> into the hyp vCPU that runs, so VSE never reaches it and a deferred
+> (masked) SError is never delivered. VSE is a host-owned injection
+> control, not a trap-configuration bit, so restricting the host's
+> trap-register values should not have dropped it. Flow it on entry;
+> sync_hyp_vcpu() already copies hcr_el2 back, so delivery is reflected
+> to the host.
 
-Nice find.
+Might be worth mentioning that flush_hyp_vcpu() also forwards VSESR_EL2
+from the host since that bit is _just_ out of context of this diff :)
 
-On Mon, Jun 01, 2026 at 11:53:26PM +0900, Hyunwoo Kim wrote:
-> vgic_its_invalidate_cache() walks the per-ITS translation cache with
-> xa_for_each() and drops the cache's reference on each entry with
-> vgic_put_irq(). It puts the iterated pointer, though, rather than the
-> value returned by xa_erase().
-> 
-> The function is called from contexts that do not exclude one another: the
-> ITS command handlers hold its_lock, the GITS_CTLR write path holds
-> cmd_lock, and the path that clears EnableLPIs in a redistributor's
-> GICR_CTLR holds neither. Two or more of them can drain the same cache
-> concurrently, and if each one observes the same entry, erases it and then
-> puts it, the single reference the cache holds on that entry is dropped
-> more than once. The entry can then be freed while an ITE still maps it.
-> 
-> xa_erase() is atomic and returns the previous entry, so put only the entry
-> that this context actually removed. The cache reference is then dropped
-> exactly once per entry even when the invalidations run concurrently, and
-> the behavior is unchanged when only one context runs.
+> Fixes: b56680de9c648 ("KVM: arm64: Initialize trap register values in hyp in pKVM")
+> Reported-by: Sashiko (local):gemini-3.1-pro
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 
-Next time:
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
-Cc: stable@vger.kernel.org
-
-> Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 1d7e5d560af4..1e3706ac3b8e 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -597,8 +597,10 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
->  	unsigned long idx;
->  
->  	xa_for_each(&its->translation_cache, idx, irq) {
-> -		xa_erase(&its->translation_cache, idx);
-> -		vgic_put_irq(kvm, irq);
-> +		/* Only the context that erases the entry drops its cache ref. */
-> +		irq = xa_erase(&its->translation_cache, idx);
-> +		if (irq)
-> +			vgic_put_irq(kvm, irq);
->  	}
->  }
-
-This definitely works but TBH I'd rather just plug the subtle race and
-do invalidations behind the its_lock since it already nests with the
-cmd_lock.
-
-Could you give this a spin?
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 2ea9f1c7ebcd..b2225da212ec 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -596,6 +596,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
- 	struct vgic_irq *irq;
- 	unsigned long idx;
- 
-+	lockdep_assert_held(&its->its_lock);
-+
- 	xa_for_each(&its->translation_cache, idx, irq) {
- 		xa_erase(&its->translation_cache, idx);
- 		vgic_put_irq(kvm, irq);
-@@ -607,17 +609,16 @@ void vgic_its_invalidate_all_caches(struct kvm *kvm)
- 	struct kvm_device *dev;
- 	struct vgic_its *its;
- 
--	rcu_read_lock();
-+	guard(mutex)(&kvm->lock);
- 
--	list_for_each_entry_rcu(dev, &kvm->devices, vm_node) {
-+	list_for_each_entry(dev, &kvm->devices, vm_node) {
- 		if (dev->ops != &kvm_arm_vgic_its_ops)
- 			continue;
- 
- 		its = dev->private;
-+		guard(mutex)(&its->its_lock);
- 		vgic_its_invalidate_cache(its);
- 	}
--
--	rcu_read_unlock();
- }
- 
- int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
-@@ -1725,8 +1726,10 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
- 		goto out;
- 
- 	its->enabled = !!(val & GITS_CTLR_ENABLE);
--	if (!its->enabled)
-+	if (!its->enabled) {
-+		guard(mutex)(&its->its_lock);
- 		vgic_its_invalidate_cache(its);
-+	}
- 
- 	/*
- 	 * Try to process any pending commands. This function bails out early
-
---
 Thanks,
 Oliver
+
+> ---
+> Not an urgent fix. I should stop running Sashiko...
+> ---
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 06db299c37a8..9e4a20df6409 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -129,9 +129,14 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
+>  
+>  	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
+> -	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
+> +	/*
+> +	 * HCR_EL2.VSE is host-owned (a pending virtual SError to inject), not a
+> +	 * trap-control bit, so it must flow to the hyp vCPU alongside TWI/TWE
+> +	 * for the vSError to be delivered. sync_hyp_vcpu() reflects it back.
+> +	 */
+> +	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE | HCR_VSE);
+>  	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
+> -						 (HCR_TWI | HCR_TWE);
+> +						 (HCR_TWI | HCR_TWE | HCR_VSE);
+>  
+>  	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
+>  
+> -- 
+> 2.54.0.929.g9b7fa37559-goog
+> 
