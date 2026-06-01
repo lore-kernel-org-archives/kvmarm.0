@@ -1,210 +1,231 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286D61A6806
-	for <kvmarm@lists.linux.dev>; Mon,  1 Jun 2026 00:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE85348C51;
+	Mon,  1 Jun 2026 08:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780275040; cv=none; b=DsiRreg8e3bb1CzXyQ6rpIJsQD+ZQMHHMI+sE/pzoDYYmN76BZRfisn1Lr6qmgEgQrnOL/rWq+Q5Pu1usbAxq4U9E9gj5atDjIAk7mYAianU//EZlxuXjUJJSIl3TVSaQAJW6eYeUwPBw8+idtHWbM5b+2ThVmZC+sCXWBpd0iw=
+	t=1780304334; cv=none; b=EBPRAwFP0DWhIrq/90ESeVDLV+txtCQrJSmZymoFP+ddrWitc2GNlLKQgV7Uea28+omaLgwU/vZt6IbVn1gYIoTzXPFz3++7sdgD+aGVP/lb/sWjCez/DFDPbjlkn//cU4jx0w2Th3X3Yx7JrxyVE/zbEFWFbk9dQS1jUcjOr94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780275040; c=relaxed/simple;
-	bh=NkgDjfStwAVwsufE6vFbU/T9ELXHoUZnhbLlqe0wf2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JxjpqN7HR5B7Y32xBbVulpTW9eyfb4YtKTzKYprsPYLU2tZHPNY6FyQ2DlUgQJmccMHnBX0md+E2tdEZHMBlXiqAjJOcsWeVPmu4lNsw3Sm1U7frVEE/RGUzFfzNHpi/Xgt/pvnqc4P38qwDcLla5WwkyMvLo9cB2MwzxbZSJYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrndjjPq; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780304334; c=relaxed/simple;
+	bh=e+t+mSDC6vv3f53R8SJC+vopipZq0n2eqkaarLqR9s0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RsuCgxWkDIHr6rsj5ZxD3spnviWVO4R9aDPR42Y6LA0/N1klr4mJadk3sYZdJJTqaFy4aAAb9pRyxtWQ4gNRwjnCRWgSHoQYE7p3iBsgfw0MBwgsJvWlHxBBdvMeqHkeCxHsEIJmuIt6Ret8wc7bGzynpj628HLFtEnkJY3SAMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVPNXXAH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrndjjPq"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-36b903567fdso3254808a91.1
-        for <kvmarm@lists.linux.dev>; Sun, 31 May 2026 17:50:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780275038; x=1780879838; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cg6Y3xqfBKjzaemeU2L9Q5dBdOV9FXfEg49CMyYPN/s=;
-        b=DrndjjPqDt2q6tVbxW8y6pvDPMvUvJ8HDml5oRyPTTVyhHeg3z0w8K1/RVhLWZgOpd
-         c6SE707muZiiOiG2W6kdO4wtoyhKluMj74IMc640ZB7d+X3Iv/Zyhkcwok4LYP2j4yJX
-         VjQFx93y8l2ow0UP85IlU3XFdQUeF7I2MtHjxwJiObtTWN2BDKl9yMyX/AaWBIKXIqOV
-         2y12Y55UniBHTHtwpPqAaud78BoT+XzdBOR/dcZzdDaqR/2C1MeCLaz3929NQOwAgX3V
-         Hxbh849eK+I/07H97Ip+lumjsss8datpU4T9tHYFtRRrJF6sVWRWCqoXJ8ju4tvBUBEj
-         bdpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780275038; x=1780879838;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cg6Y3xqfBKjzaemeU2L9Q5dBdOV9FXfEg49CMyYPN/s=;
-        b=a3MipwAIJgK74quaqzeZ0vTuGMDcJEq9Hul2h3iHxiKb/EHRX3UNh5onn7wrOdj6nn
-         kFXvuTVnzjpcfn2/FZ4hyn0zGdEN/EjHdsxs+iynYYtL34s2XRqTGsG6RiNcJYGDtH60
-         U9l5rrfm4qr73Ku2si3ibTpdB7GJtowQaZPB1rYMP3mlx3bAY3FHmBKzNJCCdQz6bfZA
-         vEYeE96wP20w9tISdpeTL1aMGVtIq/+25B9cQgqJpjOLfA/w5A0ZNLas/eh/XdJ3l9aO
-         qEFKVD9RTKiXMg6Idaj902xzlvR5u/jr+yyIG4yenSf1+acCuUx0kKi1kV7eOPJOk+Mn
-         g3pA==
-X-Forwarded-Encrypted: i=1; AFNElJ+/s0hi06vVWSKgzRN3r94lgm/sMzqFkXkcUn2GxXURt0QEntREXluZqzUnir1rHKz5yzA6v9w=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz5tjNTQTV58u6zaeaAsuFaw/dA8oI5/sdnyZ6clYd/e9Z1uyX9
-	Jfn4kd2Ab7EIW3TSAKayLgfYfMCcni63zp2AdmBF1HuP8c+MT8bnmGN/
-X-Gm-Gg: Acq92OEwhM74kF+ifbFFAxam6SDoIoinnLqT+nEM8ETUzu+IyyiigEqPHKaelXrS8gu
-	kY6KXaqUL6JOXcnvVkUgLLaZst54s+kGgTxK0bW60pHNec24ik+cLTrtqpHJ2yCnZ0l8xJaUWoV
-	tfW9LoDmsY+AHX3AM85/9jSoed/WC5rhJUWIk+fQwOEsqY+Ry88JZgXOtxBC0mZXO/CCfOJsK81
-	IFdwFANJKwwNkhc64XMaNDYScDl7WvsRTIm8l1NB+T9JxeWE6UJ9h/rYVRQs6X2S8hcjfBZPuc0
-	HY1+Op4lniZ875LJHRl8kz2ajLjceqYg9Fav3Q8kMzYqzI8VsHYTfwR3cI/E8BYLMlfRUfpTPcG
-	CCx6Fs5EXkPAggzyzF6eIb3j3hKHj5cxdRILXTEh2+OGCzFV9YHDn9FWBrpasYpwzCMJOTghM3C
-	GaX+uIdh9Ac7O3PQHDHZRnclyoBdJ1wbHVpw==
-X-Received: by 2002:a17:90b:2586:b0:36d:b424:4f17 with SMTP id 98e67ed59e1d1-36db4245eb0mr1990613a91.1.1780275038259;
-        Sun, 31 May 2026 17:50:38 -0700 (PDT)
-Received: from localhost ([2001:19f0:8001:1b2d:5400:5ff:fefa:a95d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36bbdb5c91bsm5313469a91.1.2026.05.31.17.50.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2026 17:50:37 -0700 (PDT)
-Date: Mon, 1 Jun 2026 08:50:22 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Tian Zheng <zhengtian10@huawei.com>, maz@kernel.org, oupton@kernel.org, 
-	catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org
-Cc: yuzenghui@huawei.com, wangzhou1@hisilicon.com, liuyonglong@huawei.com, 
-	Jonathan.Cameron@huawei.com, yezhenyu2@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
-	suzuki.poulose@arm.com, leo.bras@arm.com, Inochi Amaoto <inochiama@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVPNXXAH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 393B31F00893;
+	Mon,  1 Jun 2026 08:58:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780304333;
+	bh=xra6mQWqXCsVf4c8tbH8WKrL3dgsr6GJMrhvvtsvEsE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=XVPNXXAHjn6v1kFuX0uFalR/tJQcBjcbUwzftVX5kR/SRafza64knp513ByJJYsGx
+	 Bg4CzjUH/S5vFR3Kq44FkD0wgXIKplTCmPAAntc9SDhCpp5zdDer87iFF9A3M0H1Ng
+	 6b2YPqP8BjckxNalyDzH5IwG/9GDgnsXAiylfMiHQs2bxfCcgy0Z8VE4uLE0R6Ko9u
+	 Dgp4RVt4LgCFplNSL4OILuiJd3IPBZWtAGafHxkVJifquLfpD/ewGJ1BgX4j+wN8Z1
+	 FZAsiZ3EzduwkLZORh3NzJqdPok5ZIRQ+dMvu13RMpmhmLLrnxDDY5lDDullwViSvQ
+	 Aj0MK2TY9UsLQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wTyTy-000000087FY-3HQP;
+	Mon, 01 Jun 2026 08:58:50 +0000
+Date: Mon, 01 Jun 2026 09:58:49 +0100
+Message-ID: <864ijmvdpy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Tian Zheng <zhengtian10@huawei.com>,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	liuyonglong@huawei.com,
+	Jonathan.Cameron@huawei.com,
+	yezhenyu2@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	suzuki.poulose@arm.com,
+	leo.bras@arm.com
 Subject: Re: [PATCH v3 3/5] KVM: arm64: Add support for FEAT_HDBSS
-Message-ID: <ahzUUDAMoHtDFJD3@inochi.infowork>
+In-Reply-To: <ahzUUDAMoHtDFJD3@inochi.infowork>
 References: <20260225040421.2683931-1-zhengtian10@huawei.com>
- <20260225040421.2683931-4-zhengtian10@huawei.com>
+	<20260225040421.2683931-4-zhengtian10@huawei.com>
+	<ahzUUDAMoHtDFJD3@inochi.infowork>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225040421.2683931-4-zhengtian10@huawei.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: inochiama@gmail.com, zhengtian10@huawei.com, oupton@kernel.org, catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, liuyonglong@huawei.com, Jonathan.Cameron@huawei.com, yezhenyu2@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, suzuki.poulose@arm.com, leo.bras@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Feb 25, 2026 at 12:04:19PM +0800, Tian Zheng wrote:
-> From: eillon <yezhenyu2@huawei.com>
+On Mon, 01 Jun 2026 01:50:22 +0100,
+Inochi Amaoto <inochiama@gmail.com> wrote:
 > 
-> Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
-> indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100. A CPU capability is added
-> to notify the user of the feature.
+> On Wed, Feb 25, 2026 at 12:04:19PM +0800, Tian Zheng wrote:
+> > From: eillon <yezhenyu2@huawei.com>
+> > 
+> > Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
+> > indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100. A CPU capability is added
+> > to notify the user of the feature.
+> > 
+> > Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
+> > ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
+> > cannot be determined at KVM initialization, an IOCTL interface is
+> > required.
+> > 
+> > Actually exposing the new capability to user space happens in a later
+> > patch.
+> > 
+> > Signed-off-by: eillon <yezhenyu2@huawei.com>
+> > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > ---
+> >  arch/arm64/include/asm/cpufeature.h |  5 +++++
+> >  arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
+> >  arch/arm64/tools/cpucaps            |  1 +
+> >  include/uapi/linux/kvm.h            |  1 +
+> >  tools/include/uapi/linux/kvm.h      |  1 +
+> >  5 files changed, 20 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> > index 4de51f8d92cb..dcc2e2cad5ad 100644
+> > --- a/arch/arm64/include/asm/cpufeature.h
+> > +++ b/arch/arm64/include/asm/cpufeature.h
+> > @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
+> >  	return cpus_have_final_cap(ARM64_HAFT);
+> >  }
+> > 
+> > +static inline bool system_supports_hdbss(void)
+> > +{
+> > +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
+> > +}
+> > +
+> >  static __always_inline bool system_supports_mpam(void)
+> >  {
+> >  	return alternative_has_cap_unlikely(ARM64_MPAM);
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index c31f8e17732a..348b0afffc3e 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2124,6 +2124,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+> >  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+> >  }
+> > 
+> > +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
+> > +{
+> > +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, cope);
+> > +}
+> > +
+> >  bool cpu_supports_bbml2_noabort(void)
+> >  {
+> >  	/*
+> > @@ -2759,6 +2764,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+> >  		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
+> >  	},
+> >  #endif
+> > +	{
+> > +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
+> > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> > +		.capability = ARM64_HAS_HDBSS,
+> > +		.matches = has_vhe_hdbss,
+> > +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
+> > +	},
+> >  	{
+> >  		.desc = "CRC32 instructions",
+> >  		.capability = ARM64_HAS_CRC32,
+> > diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> > index 7261553b644b..f6ece5b85532 100644
+> > --- a/arch/arm64/tools/cpucaps
+> > +++ b/arch/arm64/tools/cpucaps
+> > @@ -68,6 +68,7 @@ HAS_VA52
+> >  HAS_VIRT_HOST_EXTN
+> >  HAS_WFXT
+> >  HAS_XNX
+> > +HAS_HDBSS
+> >  HAFT
+> >  HW_DBM
+> >  KVM_HVHE
 > 
-> Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
-> ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
-> cannot be determined at KVM initialization, an IOCTL interface is
-> required.
 > 
-> Actually exposing the new capability to user space happens in a later
-> patch.
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 65500f5db379..15ee42cdbd51 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -985,6 +985,7 @@ struct kvm_enable_cap {
+> >  #define KVM_CAP_ARM_SEA_TO_USER 245
+> >  #define KVM_CAP_S390_USER_OPEREXEC 246
+> >  #define KVM_CAP_S390_KEYOP 247
+> > +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
+> > 
+> >  struct kvm_irq_routing_irqchip {
+> >  	__u32 irqchip;
+> > diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> > index dddb781b0507..93e0a1e14dc7 100644
+> > --- a/tools/include/uapi/linux/kvm.h
+> > +++ b/tools/include/uapi/linux/kvm.h
+> > @@ -974,6 +974,7 @@ struct kvm_enable_cap {
+> >  #define KVM_CAP_GUEST_MEMFD_FLAGS 244
+> >  #define KVM_CAP_ARM_SEA_TO_USER 245
+> >  #define KVM_CAP_S390_USER_OPEREXEC 246
+> > +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
+> > 
+> >  struct kvm_irq_routing_irqchip {
+> >  	__u32 irqchip;
+> > --
+> > 2.33.0
+> > 
 > 
-> Signed-off-by: eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h |  5 +++++
->  arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
->  arch/arm64/tools/cpucaps            |  1 +
->  include/uapi/linux/kvm.h            |  1 +
->  tools/include/uapi/linux/kvm.h      |  1 +
->  5 files changed, 20 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 4de51f8d92cb..dcc2e2cad5ad 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
->  	return cpus_have_final_cap(ARM64_HAFT);
->  }
-> 
-> +static inline bool system_supports_hdbss(void)
-> +{
-> +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
-> +}
-> +
->  static __always_inline bool system_supports_mpam(void)
->  {
->  	return alternative_has_cap_unlikely(ARM64_MPAM);
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index c31f8e17732a..348b0afffc3e 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2124,6 +2124,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
->  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
->  }
-> 
-> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
-> +{
-> +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, cope);
-> +}
-> +
->  bool cpu_supports_bbml2_noabort(void)
->  {
->  	/*
-> @@ -2759,6 +2764,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
->  	},
->  #endif
-> +	{
-> +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_HAS_HDBSS,
-> +		.matches = has_vhe_hdbss,
-> +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
-> +	},
->  	{
->  		.desc = "CRC32 instructions",
->  		.capability = ARM64_HAS_CRC32,
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 7261553b644b..f6ece5b85532 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -68,6 +68,7 @@ HAS_VA52
->  HAS_VIRT_HOST_EXTN
->  HAS_WFXT
->  HAS_XNX
-> +HAS_HDBSS
->  HAFT
->  HW_DBM
->  KVM_HVHE
+> Instead of having these architecture specific capability, I wonder if
+> we can add a generic capability like "KVM_CAP_HW_DIRTY_STATE", so
+> other architecture supports similar things can reuse this capability,
 
+What of the existing stuff doing the same thing? x86's PML, to start
+with?
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 65500f5db379..15ee42cdbd51 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -985,6 +985,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_ARM_SEA_TO_USER 245
->  #define KVM_CAP_S390_USER_OPEREXEC 246
->  #define KVM_CAP_S390_KEYOP 247
-> +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
-> 
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index dddb781b0507..93e0a1e14dc7 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_GUEST_MEMFD_FLAGS 244
->  #define KVM_CAP_ARM_SEA_TO_USER 245
->  #define KVM_CAP_S390_USER_OPEREXEC 246
-> +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
-> 
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> --
-> 2.33.0
-> 
+> For this generic thing I suggest, the getter returns the max support 
+> entry count (or the buffer size) it supports like the dirty ring
+> capability. And the setter just let the architecture set the parameters
+> based on the user request.
 
-Instead of having these architecture specific capability, I wonder if
-we can add a generic capability like "KVM_CAP_HW_DIRTY_STATE", so
-other architecture supports similar things can reuse this capability,
+This looks wrong on a number of levels.
 
-For this generic thing I suggest, the getter returns the max support 
-entry count (or the buffer size) it supports like the dirty ring
-capability. And the setter just let the architecture set the parameters
-based on the user request. 
+- If you want something generic, there is the existing dirty
+  log/bitmap. How this stuff is populated is none of the user's
+  business (trapping write accesses, dirty bit collection from the
+  PTs, or HW-generated log), and we don't need an extra feature for
+  it. Performance will obviously suck, but that's what you pay for
+  something abstracted and cross-architecture.
 
-This should do no harm to this implement, as everything still depends
-on the architecture behavior, and leave room for other architecture
-to reuse this.
+- If you want something architecture specific, then it can't be
+  generic, by definition. You get the raw speed and compatibility with
+  other arch-specific extensions.
 
-Regards,
-Inochi
+> This should do no harm to this implement, as everything still depends
+> on the architecture behavior, and leave room for other architecture
+> to reuse this.
+
+Again, the generic framework exists, you just have to implement the
+backend you want.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
