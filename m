@@ -1,182 +1,82 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CC13FE352
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 17:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B20C364E84;
+	Tue,  2 Jun 2026 17:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780422411; cv=none; b=Dam5oz3JbcpJTOtsblHrm7P5HS1VqkpgCZJiKfm+pUcacE7RGmS4OJ3fsTLfhaDTB3k18tDx6Tgd5Eddys23f2W0WA8YYbiYscJXfnkI92i1i7ifAvOvWmZUVVCHX4hq0FX1/YMYgkoOTtsUb0L8IQ04da6pckXCZbpqMeBN3yg=
+	t=1780422583; cv=none; b=CssIIQ0AvoMY/Xt7WC1xuPcdX42ogDcLzIIhciaGf85CvLbimc6lEmfQTPzY88DKPhrG81awO4vFsosLf4RWVDeNxrBSNKgwJg0xUJ00/7DnxC+VEhcqWlwn1U5ZUhTumOVoa7T1yUqzxe25QFemxRuZToCBt0hUe053HY+yTRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780422411; c=relaxed/simple;
-	bh=lkXExpOq/3CFxUJ56vajrxY8zubhNMYaVnoxW5VnrOQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tn+4ItryfdiFFmrH5Ribr8xSxCWKXL4xXoUERuFNejEcx+7s7uVWA2w8RWFiB0wGajPkSMwKNQrPfoYnlrlqCZCFoLfJLkszCET3Nugt0h86n32H8db6Ww+67DQhYbKGe4j5d88ns3FOPfYelnd2naMysWFYiD0n3UBpwEhuOAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rmueofPU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1J0yLW4+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rmueofPU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1J0yLW4+; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1780422583; c=relaxed/simple;
+	bh=I5i1xfO+gv8CrjMPywVeoHFCAe/X53UHBxVwURlaVN4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KiVBZ/wji7EaOj81qMv9NS3Q+w/FT+4ZBZlRgAX6IYQ+VWzC0B3ftMprKcfDk1sdQZPiXVl+An0xW0IIP48omEAji3R3vRPyXKLpjJ9XuimZwpQfhI1Ywaysq93Wcb0QCd4B0F4PlSRzoW1sVq4uJRMN4B8EckCcSromAzz6TJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=THcXnvnh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rmueofPU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1J0yLW4+";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rmueofPU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1J0yLW4+"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 44B7A75BE5;
-	Tue,  2 Jun 2026 17:46:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780422405; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
-	b=rmueofPUpwNGSqHiFDJaUhIJ62NzunhrtUKpJ2lWNdQARu6er7L6mkDxEeQR07ZNJiQmPo
-	XG8jXV4z+lO8vvshD4sxjISDa9SPpGHSmdzd+vUBIWzCftPz1pzCT4TOxZh0hmq9VDEwWW
-	KAls6WFHzvR0oQUuF8ApHpSgetNht1s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780422405;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
-	b=1J0yLW4+sa8fhyp7971bnnTPekDKreYZio0Su5wxx0kVl7vjt/u6VsTGsxYBAmZjOexqXa
-	OIonz/LImpd5iJCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780422405; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
-	b=rmueofPUpwNGSqHiFDJaUhIJ62NzunhrtUKpJ2lWNdQARu6er7L6mkDxEeQR07ZNJiQmPo
-	XG8jXV4z+lO8vvshD4sxjISDa9SPpGHSmdzd+vUBIWzCftPz1pzCT4TOxZh0hmq9VDEwWW
-	KAls6WFHzvR0oQUuF8ApHpSgetNht1s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780422405;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
-	b=1J0yLW4+sa8fhyp7971bnnTPekDKreYZio0Su5wxx0kVl7vjt/u6VsTGsxYBAmZjOexqXa
-	OIonz/LImpd5iJCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8739F779A7;
-	Tue,  2 Jun 2026 17:46:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ZOTVHwQXH2qNNAAAD6G6ig
-	(envelope-from <tiwai@suse.de>); Tue, 02 Jun 2026 17:46:44 +0000
-Date: Tue, 02 Jun 2026 19:46:44 +0200
-Message-ID: <87v7c0ygvv.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Miroslav Lichvar <mlichvar@redhat.com>,
-	John Stultz <jstultz@google.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	thomas.weissschuh@linutronix.de,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org,
-	Takashi Iwai <tiwai@suse.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Peter Hilber <peter.hilber@oss.qualcomm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	linux-wireless@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [patch V2 21/25] ALSA: hda/common: Use system_device_crosststamp::sys_systime
-In-Reply-To: <20260529195557.995298795@kernel.org>
-References: <20260529193435.921555544@kernel.org>
-	<20260529195557.995298795@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/30.2 Mule/6.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THcXnvnh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 375831F00893;
+	Tue,  2 Jun 2026 17:49:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780422582;
+	bh=x3SSyL6XDPm0B1wSgJccpgK6c1F2MWcK3UMGOKWZ9yA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=THcXnvnh6bAvtnE2NpOON27TvODIIYnWcLsKAgn+KY/kcro/zOo3a/xoP0wb/Kvl6
+	 g07daCyMzMxmmu5y+VgVYU6hAfhwdtpRtio6OXCL2dnEdrfZme0srbziRhsaRkjzIk
+	 a7OuaqvL5FrPBrMlKPzTC9daOtEVWYcHrRjK5l9zZlPLbfWQZhzAiwLhaANRKtu03k
+	 1g76msvXjZzSFueZUKcdX7zpvJdcSkDdA0NKhxtaPqRp+OrJeauRJe5uZXAe3MLjtK
+	 R0bSNeUCFGmCslHSNglwula4bcpSmrtZZ1CqTjzU3QR4g3LExcIWlfeebEXL6EeIwW
+	 qrzg/4Q/D1K1A==
+Date: Tue, 2 Jun 2026 10:49:41 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: FEAT_{S1POE,ATS1A} support fixes
+Message-ID: <ah8Xtf7zvyTT5MJ6@kernel.org>
+References: <20260602155430.2088142-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Flag: NO
-X-Spam-Score: -3.30
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com,amazon.co.uk];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	R_RATELIMIT(0.00)[to_ip_from(RLjhfkibh7w7a187adt55yhrj9)];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,intel.com:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Level: 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260602155430.2088142-1-maz@kernel.org>
 
-On Fri, 29 May 2026 22:01:13 +0200,
-Thomas Gleixner wrote:
+On Tue, Jun 02, 2026 at 04:54:26PM +0100, Marc Zyngier wrote:
+> Whilst working on a slightly unrelated feature (FEAT_NV3), I found out
+> that an L2 guest wouldn't boot if the host was exposed to FEAT_S1POE.
 > 
-> From: Thomas Gleixner <tglx@kernel.org>
+> Upon investigation (and hours wasted in a SW model), it became
+> apparent that while the AT S1E1A code was ready for action, it had
+> never been fully plugged in (blame the usual suspect...).
 > 
-> sys_systime is an alias for sys_realtime. The latter will be removed so
-> switch the code over to the new naming scheme.
+> This resulted in an extremely odd failure mode, with an L2 being
+> unable to make forward progress, but KVM at L1 not taking the hint
+> that something was really wrong. Additionally, an embarrassing typo
+> was spotted in the CPTR_EL2 handling.
 > 
-> No functional change.
+> With this in, FEAT_S1POE no longer breaks our NV guests.
 > 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Marc Zyngier (3):
+>   KVM: arm64: Key CPTR_EL2.E0POE propagation on FEAT_S1POE
+>   KVM: arm64: Wire AT S1E1A in the system instruction handling table
+>   arm64: cpufeature: Expose ID_AA64ISAR2_EL1.ATS1A to KVM
 
-Acked-by: Takashi Iwai <tiwai@suse.de>
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
+Thanks,
+Oliver
 
-thanks,
-
-Takashi
-
-> ---
->  sound/hda/common/controller.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> --- a/sound/hda/common/controller.c
-> +++ b/sound/hda/common/controller.c
-> @@ -525,7 +525,7 @@ static int azx_get_time_info(struct snd_
->  			break;
->  
->  		default:
-> -			*system_ts = ktime_to_timespec64(xtstamp.sys_realtime);
-> +			*system_ts = ktime_to_timespec64(xtstamp.sys_systime);
->  			break;
->  
->  		}
+>  arch/arm64/kernel/cpufeature.c          | 1 +
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+>  arch/arm64/kvm/sys_regs.c               | 1 +
+>  3 files changed, 3 insertions(+), 1 deletion(-)
 > 
-> 
+> -- 
+> 2.47.3
 > 
