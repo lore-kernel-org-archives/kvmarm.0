@@ -1,145 +1,78 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0063E2ABF
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D29B36495D
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780413161; cv=none; b=hddus5mk1lLY0Mm4u/G4I/z1ePqYDlYW/SI2m9oWTYmnzGR3GWq8iQROlcAjjpfSULzzf/n0gHW9YxX9KUhUgYm8WBKc5GfpmcZVXGKBBIR4TT7Q68p8QJR8xCHqkxf+ot+ReE2ewhctNtTO+Gj/q52Czix+9FIBySqtgXCrFAk=
+	t=1780414256; cv=none; b=jFXgYdqh/5ezMZJEpoc+AGZ/D0rE5OzbawZhnx7i7PKHTc7Z/dF7iauVbOWDlAqpC8Acv2OiY+2UmiVFCXw/UN60rqO8xdzi3vXOk1vSqCrqczeQxukWCZNlCvU/++L60AYQ9v1MdLtFLZmZNOjUu1xQtPcrnGbMHtxK5vFYe/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780413161; c=relaxed/simple;
-	bh=VV+fwEI2oRDciEKVwmpXCawYRlotLtMhk6b7N6IOyBM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qlAmNtl7YPms9TIXdeVkJ3QnghaT4vBkd5gtPv/KbeoEzcY7mLeqH7ISegbBi8bQNTbr1yzpGq0l2lb0DlrlJ5tT0nioOpYF8cOY4+NSwvqc4BohBxP2iIqFHTbVPMkn7QZdCgS+z377vCnQbYu0F9C9tbCb+I1N24X5EuCnQmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=g1+NuG+n; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1780414256; c=relaxed/simple;
+	bh=0w9bwNHa2UecZxB2XFhlAwGJoeNBsQInIIZ5ceAdY8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=osqk8XvTl4eoSBZHpF19W5ZCqQvC4mzBW4vnZ0hgQmT0FA7ldYAIKV73GLaUqIx/ZoZ4cGbW7yrMy42+UWyntkYgcQCNxkEBzOYoC4PDK7+IU0Xx2o8lG4GMf+9EE6/0bCDNZvEqQzmWrPqoEZAg7mO4/BgMbLZ01eNJBA8pGtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yl7N9Yn8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="g1+NuG+n"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B70DD16F3;
-	Tue,  2 Jun 2026 08:12:34 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 448A93F7D8;
-	Tue,  2 Jun 2026 08:12:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780413159; bh=VV+fwEI2oRDciEKVwmpXCawYRlotLtMhk6b7N6IOyBM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g1+NuG+nD8/KuDkV4Cwarl2Xaz90rhIxgzkrERFDBVyUsikW0ySrQIMMaWG/b/nr8
-	 TpkHgPq7/lDR001akiwZ8L5VhCXv0UA+HE/UtfMTvQbmN6QHrUZDM6+KbJy3N3dH0+
-	 Hx5YPq48Opt2T54wNDNmDWjvXNG7Y7sCepQiUvlw=
-From: Mark Rutland <mark.rutland@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: broonie@kernel.org,
-	catalin.marinas@arm.com,
-	james.morse@arm.com,
-	mark.rutland@arm.com,
-	maz@kernel.org,
-	oupton@kernel.org,
-	tabba@google.com,
-	vladimir.murzin@arm.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yl7N9Yn8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1CB51F00893;
+	Tue,  2 Jun 2026 15:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780414254;
+	bh=0w9bwNHa2UecZxB2XFhlAwGJoeNBsQInIIZ5ceAdY8w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Yl7N9Yn8hC36PKtqcw73mNk27lUf+Rc42GyAKT207hsRa3Imn007N/QobCMsp1FwO
+	 rsvg9MH3xqSgXePkFNw+CGKUnVk0viythKJl4vwU32IqRMScKkODMtv/IFwqykvEVK
+	 gObX6UOo98QNuG0jOqJUm4W8UYU4pDYvwtq8IzRcSpeGlFLaCROijnl3hinyRllBuv
+	 03RYubSF4LZEdmk+OPv1HobcFL4WuGOlp0wUxEprcxZNLR3KaCg18GOjU7u7zPVvhg
+	 qd/6iF06QpEZ+R3P+UUNlB5AhIlIbRQV0PnSqy8gEYl7Pmcw13PBfuPlfxgtMdNeU2
+	 dthyommoVrcCA==
+Date: Tue, 2 Jun 2026 16:30:50 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org,
+	oupton@kernel.org, tabba@google.com, vladimir.murzin@arm.com,
 	will@kernel.org
-Subject: [PATCH v3 18/18] arm64: fpsimd: Remove <asm/fpsimdmacros.h>
-Date: Tue,  2 Jun 2026 16:11:50 +0100
-Message-Id: <20260602151150.925126-19-mark.rutland@arm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20260602151150.925126-1-mark.rutland@arm.com>
+Subject: Re: [PATCH v3 17/18] arm64: fpsimd: Move SME save/restore inline
+Message-ID: <8dbd6e01-d6bf-441f-9ea2-15bb947f6d94@sirena.org.uk>
 References: <20260602151150.925126-1-mark.rutland@arm.com>
+ <20260602151150.925126-18-mark.rutland@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LATmKv9d2Fyh2kDV"
+Content-Disposition: inline
+In-Reply-To: <20260602151150.925126-18-mark.rutland@arm.com>
+X-Cookie: The wages of sin are unreported.
 
-We no longer need any of the remaining macros in <asm/fpsimdmacros.h>.
 
-Remove all of it.
+--LATmKv9d2Fyh2kDV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
-Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/fpsimdmacros.h | 64 ---------------------------
- 1 file changed, 64 deletions(-)
- delete mode 100644 arch/arm64/include/asm/fpsimdmacros.h
+On Tue, Jun 02, 2026 at 04:11:49PM +0100, Mark Rutland wrote:
+> Currently the SVE register save/restore sequences are written in
+> out-of-line assembly routines. While this works, it's somewhat painful:
 
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-deleted file mode 100644
-index a763fd03ffef3..0000000000000
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ /dev/null
-@@ -1,64 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * FP/SIMD state saving and restoring macros
-- *
-- * Copyright (C) 2012 ARM Ltd.
-- * Author: Catalin Marinas <catalin.marinas@arm.com>
-- */
--
--#include <asm/assembler.h>
--
--/* Sanity-check macros to help avoid encoding garbage instructions */
--
--.macro _check_general_reg nr
--	.if (\nr) < 0 || (\nr) > 30
--		.error "Bad register number \nr."
--	.endif
--.endm
--
--.macro _sve_check_zreg znr
--	.if (\znr) < 0 || (\znr) > 31
--		.error "Bad Scalable Vector Extension vector register number \znr."
--	.endif
--.endm
--
--.macro _sve_check_preg pnr
--	.if (\pnr) < 0 || (\pnr) > 15
--		.error "Bad Scalable Vector Extension predicate register number \pnr."
--	.endif
--.endm
--
--.macro _check_num n, min, max
--	.if (\n) < (\min) || (\n) > (\max)
--		.error "Number \n out of range [\min,\max]"
--	.endif
--.endm
--
--.macro _sme_check_wv v
--	.if (\v) < 12 || (\v) > 15
--		.error "Bad vector select register \v."
--	.endif
--.endm
--
--.macro __for from:req, to:req
--	.if (\from) == (\to)
--		_for__body %\from
--	.else
--		__for %\from, %((\from) + ((\to) - (\from)) / 2)
--		__for %((\from) + ((\to) - (\from)) / 2 + 1), %\to
--	.endif
--.endm
--
--.macro _for var:req, from:req, to:req, insn:vararg
--	.macro _for__body \var:req
--		.noaltmacro
--		\insn
--		.altmacro
--	.endm
--
--	.altmacro
--	__for \from, \to
--	.noaltmacro
--
--	.purgem _for__body
--.endm
--- 
-2.30.2
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
+--LATmKv9d2Fyh2kDV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoe9ykACgkQJNaLcl1U
+h9BOGAgAhXrneuUEueUUahSkK2Hk1hnf2xL4+ZlC7J7dS3wWunVywLYRWuegAV4C
+BVYSH7LDgQpzslyJWIMvCwRA3CEP9unid3cwH3wsZhV4DrbsplYxOkIuV0wzfyK5
+Ic4hC0J2KQJM2G9Ruv+V6Z9dP1hcSEa+fCuAv1PdovPHAksV2dLfLyykm06QKBkp
+/u2S1ZKiQB7TrPDOVfSO9yss2r0PxjECPT+837FEpWsmDQ9zx63yKK7kf+lvr0Fm
+qrcsXTQZsFXXSoTMHGJ0JSMT5iHHSiS1cfhpGShWBLKfAy8BzehhOtO2eOGydQmy
+9xQn3HY755u4HQtSF5CylCGnbEbgXA==
+=nDAt
+-----END PGP SIGNATURE-----
+
+--LATmKv9d2Fyh2kDV--
