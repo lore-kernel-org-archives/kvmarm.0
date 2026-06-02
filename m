@@ -1,89 +1,111 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D38359A8B
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 13:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BB63F1AB2
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 14:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780406743; cv=none; b=lCa1vZlOhT7Sjzkqxq+NrOA6ikiBmdZgvABERsW2eN/5w+96pQaPlCIA9ZdKdWe/6w6740wW+gmpsZCDvkihv89Tz2hJxGLR2oEFfKxyICqW2ouTjckp6FuvLi0El4/PB1w/JXh2r6GsqAHg72RHqRB4+uJZiwzUOrIcelFfpD8=
+	t=1780411486; cv=none; b=SgKUoNRlNGYlWAhC+Bc82fJnTt2DYVJHyxcB1w73zx7KoYX6XKPz+rA4i0qZK++/+092/Qj6Sw/P/fa1KRzrnkJuq/GjR2KfmrQixnnXVBAwm4Ub6fPPv90P5GDPDXMzXQy4PG7QC5LSRBmElNBfFFaQ1K+FQC4ue0O6ug1Fvbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780406743; c=relaxed/simple;
-	bh=20jx10Qu8sNXhZtuRF1brWTsMt8tcs1xwzSEzJdWcac=;
+	s=arc-20240116; t=1780411486; c=relaxed/simple;
+	bh=JGSh5lAZ01h4V6/aN5YEeVciZCInCwqxQ6QqUvPGo90=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RTucuNkd/1i/gAiawyhqatU0tT7fOXuVpoFn8PPcctsWycKsHk2wCCryXhPnFhwy88TwcRsry8ebp052P76RCPOdkI8KtLP0N7VbsjLpfTQ53GiDMmoKLEed3fRkbKPgWdpaRFJsM41Zh9avF5SA5xJpJY1U3DUxuf9T/gBCWIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S4D4mFDr; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=OiAxSmjzfeyD9OBCCoFDFq8eTk67c5ttMBM0162PHFrr+ile8VX6/k6lh92XlvxhthJLRlQ62zcklVDbxxgwM6QAGtDA2pwCCsqSCxT+Kl36zjtSoAqF/XJX3jdwziJwaLdGUlkpGLpDWMt3zyuxEQYirMOSmPStouWP4LWeUhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=BHY+9/iE; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JMjGUc/Q; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S4D4mFDr"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6524Zqfd1259298;
-	Tue, 2 Jun 2026 13:25:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=w8qDpKjFWjzyE3Z+3P3AumxwDBnmuL
-	FClF4s6OPO1Lg=; b=S4D4mFDrJ+YVkouLu1QaOcwlr97q412sHaGk9z2BZTfz8n
-	xvnoRSGxAhVdlU4NlUXFvgMgr1mw3zyhNRb5hBZuA4qzc/vHHsFBDXCjaDL8PDwF
-	fMlhGZA+kdxjDvsey5KGycUVDIGwknrJKtyyECDo9N4PGyK+HEBu4WtCUtRKMQZA
-	Yz3TVvKxvNVPFnCLcCZ58aQrdsTBsNJrCw6Oi5RyfhhlPq5AdSO2CCtkFLt18HFj
-	o3/6ykLfJ7pxtiVTRedwPLsZ32Mze0EIv0IrOIJ+dDKuVbzSAyMdHp/kqgCwDUsY
-	1BOBoWKQ9qjk67c+eCkrQrGrqW7QzKTymHUJViSQ==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4efqd465b0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jun 2026 13:25:21 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 652DO9Yr012168;
-	Tue, 2 Jun 2026 13:25:20 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4egbqhba68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jun 2026 13:25:20 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 652DPEgt49742098
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 2 Jun 2026 13:25:14 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8693D2004E;
-	Tue,  2 Jun 2026 13:25:13 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 599EF20043;
-	Tue,  2 Jun 2026 13:25:13 +0000 (GMT)
-Received: from localhost (unknown [9.111.42.7])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  2 Jun 2026 13:25:13 +0000 (GMT)
-Date: Tue, 2 Jun 2026 15:25:13 +0200
-From: Andreas Grapentin <gra@linux.ibm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 15/26] s390: Add functions to query arm guest time
-Message-ID: <ah7Ul7YwJOFuSMaD@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
-References: <20260529155601.2927240-1-seiden@linux.ibm.com>
- <20260529155601.2927240-16-seiden@linux.ibm.com>
- <ah4G847iT_pPRuQm@kernel.org>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="BHY+9/iE";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JMjGUc/Q"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 652D10KE2884654
+	for <kvmarm@lists.linux.dev>; Tue, 2 Jun 2026 14:44:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=g1qut49VqY6kixKrk363RsT3
+	75KtaT3Dj3vgJwsvmMA=; b=BHY+9/iEQsfwnfFkozleq2w3xaPvI9jJpUfv9NRD
+	9vIuRgUkEvPLCPdiWlD0M4NVxPar7XJqBHX4V5nxT8LBDbkSj9a7EdiFSxfibu7V
+	btJRt8ioDdDgKZOLU0OI7HpcS/JQatOecRMeGvWtK1KsvB+fE2hPsb391s4Toy5I
+	Yea+abZIfmOPW79A3oHkW+Sm1/g7zGEdL2BHAvgZBj/1otg1Aey735G/FaYIojVB
+	xuH+jYHnuo3x3bmzFL2b7vU43vjZUpPmrjyj18jiDqZlAyT6hokevSB0pCv5sEUp
+	UUbz0NIZ0Wgb1ZAevQh2KqNKDCXgzu+9TsDjpXfBbuZY1A==
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com [209.85.217.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ehsu11wrn-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvmarm@lists.linux.dev>; Tue, 02 Jun 2026 14:44:44 +0000 (GMT)
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-6c33d75153dso1425428137.0
+        for <kvmarm@lists.linux.dev>; Tue, 02 Jun 2026 07:44:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1780411484; x=1781016284; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g1qut49VqY6kixKrk363RsT375KtaT3Dj3vgJwsvmMA=;
+        b=JMjGUc/QCIZ0hbSM/NrGo4UmmBy9uUFGmrokqq4illufPEB129gHZtPmyEJ2P0Tb4g
+         YRTxLZ2l1oz0P8q2QZAqs/ZD485OnigcWnoVUwdSP4U8Hvzgjkx21inENVU0tPrQ7ux5
+         CuRCSy2/LZWwMDZUKilI7G3s6m9OgrpNMIvkmf3HBACwfwInsAU6WVTv+d64+jb5AsoB
+         WkopNExeVWjrn6xUfK9FHlDtpyHp0eUywbqPVslTXEsApq3rvmTZWaRvHaMAXZq+G9zZ
+         7reLIJw2mcG80vLZfD9TXyWIiKCaQVlyOOMU2atfPKwKkV6t8Zl+pUrPvJMZROxwoRCq
+         DNTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780411484; x=1781016284;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g1qut49VqY6kixKrk363RsT375KtaT3Dj3vgJwsvmMA=;
+        b=BjsXcr/q22r2Kh1Q7OInPfUCugLqnN6LkilnCEOnU4WBjPVE1E6VlaROw/45y765EB
+         2avIujTEBc1YNiXBEOnJtg0pNZi7WR2DyQcyYYth4zZH6YbqYFfkafVtT0qEraqVrIOC
+         myyIRgWv1vSxX+a6v4SdgmZs3Z/rPVBdDfVbKZk7qyxTMt9hBfJViyteCeiYpysWEjMw
+         lxDeeL/k8ekpX4UYCB0bUCkhSPBxrLXdbLayRDZbNFKkzzB+mkUvf0s4VvRne+fIGzaZ
+         y4tjCnEpPvbxmE1u4a5GMLeDWA02rgkcsj92FUSuns6ftFAqPb9swUo5a3CW/oY3awU4
+         En1A==
+X-Forwarded-Encrypted: i=1; AFNElJ9lOoWIdRNvjPQOFeA0/GQDh6sJ0U13dXGohW6qhWB0fIDqbS7Lq7AXS9HtvwkPZ9gekd9RxWY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx014idD4VILridkjzTu8NeLwwVQhnjccIHFiM8q6jFo0jaQ9P4
+	Mate6aLevlA0w8lBKvZy0tixDqbAJATxCnFZfRex0fGll4qi6Qw/iad7TDC827n14Xndd06/sIw
+	UTlpNZGpbZlkP1IgsUB1vGgkDv/7xb2RF50CgmCPeZ+l2LphSDMS21iHo6n4=
+X-Gm-Gg: Acq92OGMfinh28iDKTCIMQbbrb/Nba8GRb9VVjGqxMNc5VCj6//PqXwUZn7yzmtIUR1
+	PGYerIjdvOhFF3i9CbRF2fyRWB7P44B78UUx6FN48qxOMohKe1ecCs8cM2rQPsEZwzU9GvuiJ9i
+	yKPsvTVvSeWF59TwrUihgVhNheSX22LOvWteMEB6HfUcn0czeYLcxwZYZi4uErwHM/ymGEpDJj6
+	MFaahyHuPrUBE6RvQP/Hucqcrhq0QMQFQhd9qWdc+Zcu3LzIJnuv0RosQQ2MWcyIyS893ypMIl3
+	OvS4SfZ7LjIz33CyTPCyzA+WLi5tJ0d0iVCLADCXZnYtuQn0sRLyzH7KKJjk6V/rD5SL3ED62X1
+	sjsh+NT22DzEy/VLCk6/YCc3c44+ix4H7FaakyAcXZ7nCatRbXkcny+LmNvYOIidjG10=
+X-Received: by 2002:a05:6102:3753:b0:604:ec90:ba14 with SMTP id ada2fe7eead31-6ea1ff9867fmr51534137.11.1780411483782;
+        Tue, 02 Jun 2026 07:44:43 -0700 (PDT)
+X-Received: by 2002:a05:6102:3753:b0:604:ec90:ba14 with SMTP id ada2fe7eead31-6ea1ff9867fmr51511137.11.1780411483296;
+        Tue, 02 Jun 2026 07:44:43 -0700 (PDT)
+Received: from QCOM-LDTZRie9bq.na.qualcomm.com ([212.136.9.4])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf054e03709sm1166066b.30.2026.06.02.07.44.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 07:44:42 -0700 (PDT)
+Date: Tue, 2 Jun 2026 16:44:40 +0200
+From: Peter Hilber <peter.hilber@oss.qualcomm.com>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>,
+        Miroslav Lichvar <mlichvar@redhat.com>,
+        John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>,
+        Anna-Maria Behnsen <anna-maria@linutronix.de>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        thomas.weissschuh@linutronix.de,
+        Arthur Kiyanovski <akiyano@amazon.com>,
+        Rodolfo Giometti <giometti@enneenne.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>,
+        Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev,
+        linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [patch V2 16/25] virtio_rtc: Use provided clock ID for history
+ snapshot
+Message-ID: <aupnwe2y24oxejpkjnlbzlmdiuuzlbqlahofgzipxwsnoir4jd@cwgplvoe46ok>
+References: <20260529193435.921555544@kernel.org>
+ <20260529195557.744271454@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -92,65 +114,64 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ah4G847iT_pPRuQm@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDEyNiBTYWx0ZWRfX86Wu1ZkmOeKQ
- hYG8JWBI1P8fvdZHvYX/pHQiKCz9rM3lqGdXGG9paghq44fCz7yUQhjVqfYolMHIDwf+g98FKQC
- Aj3zl8tHOPDyDut2meXADMv9XEP8o0cHJV9sHqdlPN8V3e4+kniE0zovCBryZoE7+gfU+AuHBAZ
- JUSthv+czWchKhL9Jt88DWUW/BIVzCzQg40h0yVLJqGsIYVFvXAQDo3YvD38EgbQabOHiTWV/J6
- yVgiBQm0devrxebNiP+9lTedkSFR0o6kpVKp9GEzKtjkvV3fXu07ZOOdE3KHZERjeOAEAehGtr9
- 8kqSFIzLnfopiio7+QlyWXlCKBciORGj0yJyFKyV7AIJW77/zRLy33V2JCyhPCl3TqFT0YDNiCi
- xOMafpg3k3DxCiOnI47Ya2Gt/hTCEFH4IXSNZPjwubArahqtRcGIQrlGQzNFYz+bBNKXTSM9b3X
- MDWYNtr6RC1RzihzigA==
-X-Proofpoint-GUID: RQpxdw-KhYBz1s8-_4mzf7xnJNeZoSB_
-X-Proofpoint-ORIG-GUID: RQpxdw-KhYBz1s8-_4mzf7xnJNeZoSB_
-X-Authority-Analysis: v=2.4 cv=DZknbPtW c=1 sm=1 tr=0 ts=6a1ed9c1 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=iZEGHWcCgkw3lVQR3mYA:9 a=CjuIK1q_8ugA:10
+In-Reply-To: <20260529195557.744271454@kernel.org>
+X-Proofpoint-ORIG-GUID: JaM9QyMaVYT3tJ0MIUiopHNdy8QsuBl1
+X-Proofpoint-GUID: JaM9QyMaVYT3tJ0MIUiopHNdy8QsuBl1
+X-Authority-Analysis: v=2.4 cv=MKFQXsZl c=1 sm=1 tr=0 ts=6a1eec5c cx=c_pps
+ a=N1BjEkVkxJi3uNfLdpvX3g==:117 a=dNlqnMcrdpbb+gQrTujlOQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
+ a=VwQbUJbxAAAA:8 a=vggBfdFIAAAA:8 a=pBOR-ozoAAAA:8 a=QyXUC8HyAAAA:8
+ a=EUspDBNiAAAA:8 a=KhUNALZX6FJHKvLdx2oA:9 a=CjuIK1q_8ugA:10
+ a=crWF4MFLhNY0qMRaF8an:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDE0MiBTYWx0ZWRfXwiTza1uvcPjZ
+ 5fZOjSOiMGvx+1MknCPpsKEHbrHwv5/KcoQjnz9TF5H5p7XvbpfG10z8GKxVhJ/S9QvfwIAKcXS
+ mKcKUMdYcO5CMCdxPqEzaHgcgyCnbmoAXj3kEnxJFVHFVDZsIEGmpEo9gcH8Puhp+4Y2u6Av4Op
+ /PdUhYAW3ZIxoK1fVXvyg9gkYDMJb70XsmUxjfwDWjTl7AOahDKysMVL+ROAFMA20lmRF5tFkqR
+ /pPVgVzK16i5RQX/f22lK9NOuZzW60VVlZgBrf9aIm+LtZyCBgTFOv+WAu1O6Rf5vZ2PD2KaUXW
+ 2MBOI3RKeqJ3vu4ye4512hHT5zSVvzIZOx+++TtWZz0ayp1fNHYecj278bf9tvw2ajkRz+BPFKT
+ 1sp8zHRDQaG6OBCeDw0/SvaQGoBO0vR/oAOEj/RWRS2gBlhZR/0+R1ad9ggNwFnvmI3KQ08NR4q
+ eeiEeKMLPWzwkLFC6kA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-02_02,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1015 suspectscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606020126
+ phishscore=0 priorityscore=1501 impostorscore=0 adultscore=0
+ lowpriorityscore=0 bulkscore=0 spamscore=0 clxscore=1011 suspectscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
+ definitions=main-2606020142
 
-On Jun 01 26, Oliver Upton wrote:
-> > Add functions to convert between ARM guest time (LSB0) and s390 host
-> > time (MSB0) using new ptff function codes.
-> > 
-> > Co-developed-by: Nico Boehr <nrb@linux.ibm.com>
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > ---
-> >  arch/s390/include/asm/timex.h | 49 +++++++++++++++++++++++++++++++++++
-> >  arch/s390/kernel/time.c       |  1 +
-> >  arch/s390/kvm/arm64/arm.c     |  9 ++++++-
-> >  3 files changed, 58 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/s390/include/asm/timex.h b/arch/s390/include/asm/timex.h
-> > index 49447b40f038..9ec22a28bbda 100644
-> > --- a/arch/s390/include/asm/timex.h
-> > +++ b/arch/s390/include/asm/timex.h
-> > @@ -99,6 +99,8 @@ extern unsigned char ptff_function_mask[16];
-> >  #define PTFF_QSI	0x02	/* query steering information */
-> >  #define PTFF_QPT	0x03	/* query physical clock */
-> >  #define PTFF_QUI	0x04	/* query UTC information */
-> > +#define PTFF_QAGTO	0x10	/* query arm guest time offset */
-> > +#define PTFF_QAGPT	0x11	/* query arm guest physical time offset */
+On Fri, May 29, 2026 at 10:00:52PM +0200, Thomas Gleixner wrote:
+> From: Thomas Gleixner <tglx@kernel.org>
 > 
-> Are these analogous to CNTVOFF_EL2 and CNTPOFF_EL2?
+> The PTP core indicates in system_device_crosststamp::clock_id the clock ID
+> for which the system time stamp should be taken. That allows to utilize
+> hardware timestamps with e.g. AUX clocks.
+> 
+> Use ktime_get_snapshot_id() and hand the provided clock ID in.
+> 
+> No functional change.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-They are somewhat related -- we don't have the EL2 counter offset
-registers, but we still need to virtualize the guest counters, so
-instead we have to maintain the guest counter offset separately.
+Acked-by: Peter Hilber <peter.hilber@oss.qualcomm.com>
 
-However, to determine the correct guest counter offset, we are using
-these new PTFF function codes to translate between the s390 and arm64
-architected counter domains.
-
-Best,
-Andreas
+> ---
+>  drivers/virtio/virtio_rtc_ptp.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> --- a/drivers/virtio/virtio_rtc_ptp.c
+> +++ b/drivers/virtio/virtio_rtc_ptp.c
+> @@ -139,7 +139,7 @@ static int viortc_ptp_getcrosststamp(str
+>  	if (ret)
+>  		return ret;
+>  
+> -	ktime_get_snapshot(&history_begin);
+> +	ktime_get_snapshot_id(xtstamp->clock_id, &history_begin);
+>  	if (history_begin.cs_id != cs_id)
+>  		return -EOPNOTSUPP;
+>  
+> 
