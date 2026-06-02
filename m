@@ -1,75 +1,68 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BBA15A86D
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 01:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0B838E5FF;
+	Tue,  2 Jun 2026 04:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780363920; cv=none; b=bCcR743BQj1lkeSrYGDWzSne2aWkO0IIvQubCY/QBb3knko8lhb9UyR2a6ry8zK2gf5+22u/s+oJwWOV5EbkZyllYcRhxuVsGb3XuF2Ee2GdcHcqYkZ3DjNxdmS+nEreP/DrIw1jNmTBeC534nDo6gpLyYKS5WRcJeuF3jkCFg4=
+	t=1780373704; cv=none; b=tnbzO2ozVypY/L0jFe8LguIHAu/EbUJvRsOPMbzw0ychm9HaoPFXsY1aTU6v8nnx/kK05rjacUuTcSidYmiamWiDQ73Vog0rDZ8YSYxq3s7onqNAJGnUCLGs/hEmTzVnCMnljpXU4v6b3zYRBd0x9bglbSlI7PVGS4qO3sVFzis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780363920; c=relaxed/simple;
-	bh=enAQ0z2rMaOhfApLzKBYrRY1EShBbcJkVSMXj1eBNwA=;
+	s=arc-20240116; t=1780373704; c=relaxed/simple;
+	bh=vfRA/Ie/j4izTP90KkxVG6PO83nBUWibXhsc1OZxR+I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UTKMqeoLkLulHOJYvrfxMV9IQfBv1QqIGYnQLE/8ThDBzqcBfqjaKrkwHBrKv7RVNNHnhbaoq7JT4A+vTyx47896Wn8w0CFxPTJWp4cG2cgy7thZhakeq2gapF1wcl7ZQg5o2ZYcGPEmnH+zXz0FBo/YLubTBJdxjhr63XFb2og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOMrVrWe; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=PucwQUo4WVYJlJHv06hs+OMUKNW9oXRsll8gl1CyhfRZ6D0jbpc+8pLcotwwRhcIRUP+VoFe5PgQ3pUgBdYEKy4j4J3w89HO8ZwhXmTf9ME9CNJOeJvQ+d1i9PVUjbHrIT5PL7yBoxPFkCkqAcYrjTkQZic3Bb4cMa4BX+eObog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ci4yQogl; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOMrVrWe"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-36bcf3d2565so2030470a91.3
-        for <kvmarm@lists.linux.dev>; Mon, 01 Jun 2026 18:31:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780363918; x=1780968718; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b3xy2uhIBa9uRGlGCKv6RNNnKNeckiaUZ7Fy0PM5Q/c=;
-        b=KOMrVrWel5Ujb+Vu7tQaijAPVA0I+iwFe5+kB9rUVqgrJRI2AVXYzVz55rSGhLCdhS
-         AcJeVkfNRHd0/1l6lTiPKKi8JWZiE/OMvv2blhmQVdVfAXXBd3bx4H6O6WZpoRhlS1bl
-         cKLfzYUdhpJ11xrGYWR8D872nUgseq8OjMkDFhLfA3zPRmNXp58aeg3WIT0Pk1D9wMPl
-         bBp0lqIM4s7h21JC6mtsfEA6q+6uTHahGqfO9NEQpkVzk223DqH6kqQJ3xfdz/54mbbh
-         SNXit4cCx/dgUIhWkVBvqsHyYH1LeIFskEOtD8b052m+TNRhlAbO8wrUnpKBxeS4JwG7
-         Ssiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780363918; x=1780968718;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b3xy2uhIBa9uRGlGCKv6RNNnKNeckiaUZ7Fy0PM5Q/c=;
-        b=Ns/+0WBKBsM/OKMAe931dGqAv1NVOOcYWHNJ+AizGQENM1zckwSvL/9tRt/iwhqk0z
-         CLgVHCqHR3YiH3/EWRWrD0sNwzYKCwk48p0Hrl/r57y04bGp76JSf1lztpuFf2XzQKn1
-         3/85C/qdRGIcExl9tEyyF30s3tPp4xouBPyPj+T8tlpvu/1mB9GPPy1xNuETWSPRUCgn
-         Y+palq4RKTp2dnQwko5gJI0Ue+WtGk/uah3c7wyKPzDYfhttGmb1UlacytRXU8BocDkD
-         Yas/pjJY0aZs8/jpu4LUnnvQNA4ULD9FgAXy7ebLaCyHdlc1WN5PmOksjpI5pKC8JSek
-         g0rQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8F4L3Byhjun4OUXqpngUgd4ZMHK2nPs2r9fZxomr0/jNRpkKvJ53+VLKIEAI9WX43Xy3Muxnw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz7tcDiTywDnn+nUgvVoWi9qvcibyyCbJf6hKFSnK7ZPccmhJTI
-	rGyuZvRoLfzicaekV2eiaJgGhfdB0eBgn7XxjLdTL9oJOkWYHL5HaU1k
-X-Gm-Gg: Acq92OFgxI1G/Ul5MPWppBie/84sPoH6AnF8nPpNqQOLuLzJEyOJYfTnLWFXqDn4mlI
-	XJXwjGK2LnRKJcMegGZWtRMchhfs7+nUa8dc2xTemsMHOHVt2+ffQILSot+B5R0k4L55VUuZ4nn
-	Fpj8/pQCHYy5sCmDWQMK1A0mZ+lQZH2aC39dz83L/bMNeFHW0ecSHa8NWvenbU6WVuEFIXkeGrn
-	gsEtXgGzKC4uWt5d+jhVo0lHmE5F3U36FCppwQDVQkwsd2s7Afc/8C15Td9mnKDwmfYyRSEZ7xt
-	1+8H14/ZKjnH3TRmthdBjooLK3VSAiyG36iAGWQaOCjaKw2UR+/gIbgUezXL2PoEPOJpBgOY29v
-	6oe1BH+3qYK/yg7YZCPMbjbL2QIx81sppmwEC7X6wdLsfg9hNltwSlInixzvU0Mho4z21ur22Sv
-	oxlstIc7Qr+HqbnMLwHSoRV78MtILOtNNs6Bt8gJ2LDVEDiYcg4FGpLIeXrNqkx3JH
-X-Received: by 2002:a17:903:3884:b0:2bf:33a9:bf4a with SMTP id d9443c01a7336-2bf368a3d92mr163696255ad.38.1780363918317;
-        Mon, 01 Jun 2026 18:31:58 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fd85dsm112089405ad.25.2026.06.01.18.31.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 18:31:57 -0700 (PDT)
-Date: Tue, 2 Jun 2026 10:31:53 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: maz@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kees@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Drop the translation cache
- reference only for the erased entry
-Message-ID: <ah4yiavdXTB10P0d@v4bel>
-References: <ah2c5lu4JbUg7dj-@v4bel>
- <ah3Yx0fjguUdCk_G@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ci4yQogl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780373702; x=1811909702;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vfRA/Ie/j4izTP90KkxVG6PO83nBUWibXhsc1OZxR+I=;
+  b=ci4yQoglSOKGPtqprcXsfNpf6Jt+kN40EJJSizMH+UxxTWadycBPzJXo
+   IKv08vfux5m51WoxL1AsI8PN5dg0Q1UR+lxsXtbTm2atEk4doQ1+0XADV
+   Bm8nU09tlTW33BmJ8rnpZBD60yp3HWwIvFa5ZDXDPwcbyzhkj2DrRDZTz
+   CaEHeHny4IV4MCmifAF6hZn+bURy+8l8qQeqP2QWC1VxOwbBUN89Fm+zL
+   jQNaju/8GfwGbG3CycZCyBDtIWfh7RQWe3tdYScrXRxDiCgheKhgVkSMN
+   V6LfAiI94gw9FESz+t+pSjlSbooS/TPRQTkegSVrHmxC8d/FLPwdSxbpC
+   Q==;
+X-CSE-ConnectionGUID: s6Ei81mCQIympXdb7xeCBw==
+X-CSE-MsgGUID: 9ERmTggTQY+hATRx3iG0Bw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="81332265"
+X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
+   d="scan'208";a="81332265"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 21:15:01 -0700
+X-CSE-ConnectionGUID: 2Wo58T2iR0ymRS+tXnPy6w==
+X-CSE-MsgGUID: XzqRfukNQgysyyAQQYsEyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
+   d="scan'208";a="242752583"
+Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 01 Jun 2026 21:14:58 -0700
+Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wUGWl-00000000BUI-2Uz6;
+	Tue, 02 Jun 2026 04:14:55 +0000
+Date: Tue, 2 Jun 2026 12:14:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Congkai Tan <congkai@amazon.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: oe-kbuild-all@lists.linux.dev, Congkai Tan <congkai@amazon.com>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Haris Okanovic <harisokn@amazon.com>,
+	Geoff Blake <blakgeof@amazon.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Expose PMMIR_EL1.SLOTS to guests
+Message-ID: <202606021209.2lvgE216-lkp@intel.com>
+References: <20260601193954.2103455-1-congkai@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,124 +71,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ah3Yx0fjguUdCk_G@kernel.org>
+In-Reply-To: <20260601193954.2103455-1-congkai@amazon.com>
 
-On Mon, Jun 01, 2026 at 12:08:55PM -0700, Oliver Upton wrote:
-> Hi Hyunwoo,
-> 
-> Nice find.
-> 
-> On Mon, Jun 01, 2026 at 11:53:26PM +0900, Hyunwoo Kim wrote:
-> > vgic_its_invalidate_cache() walks the per-ITS translation cache with
-> > xa_for_each() and drops the cache's reference on each entry with
-> > vgic_put_irq(). It puts the iterated pointer, though, rather than the
-> > value returned by xa_erase().
-> > 
-> > The function is called from contexts that do not exclude one another: the
-> > ITS command handlers hold its_lock, the GITS_CTLR write path holds
-> > cmd_lock, and the path that clears EnableLPIs in a redistributor's
-> > GICR_CTLR holds neither. Two or more of them can drain the same cache
-> > concurrently, and if each one observes the same entry, erases it and then
-> > puts it, the single reference the cache holds on that entry is dropped
-> > more than once. The entry can then be freed while an ITE still maps it.
-> > 
-> > xa_erase() is atomic and returns the previous entry, so put only the entry
-> > that this context actually removed. The cache reference is then dropped
-> > exactly once per entry even when the invalidations run concurrently, and
-> > the behavior is unchanged when only one context runs.
-> 
-> Next time:
-> 
-> Cc: stable@vger.kernel.org
-> 
-> > Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
-> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-its.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> > index 1d7e5d560af4..1e3706ac3b8e 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > @@ -597,8 +597,10 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
-> >  	unsigned long idx;
-> >  
-> >  	xa_for_each(&its->translation_cache, idx, irq) {
-> > -		xa_erase(&its->translation_cache, idx);
-> > -		vgic_put_irq(kvm, irq);
-> > +		/* Only the context that erases the entry drops its cache ref. */
-> > +		irq = xa_erase(&its->translation_cache, idx);
-> > +		if (irq)
-> > +			vgic_put_irq(kvm, irq);
-> >  	}
-> >  }
-> 
-> This definitely works but TBH I'd rather just plug the subtle race and
-> do invalidations behind the its_lock since it already nests with the
-> cmd_lock.
+Hi Congkai,
 
-Thank you for the review.
+kernel test robot noticed the following build errors:
 
-> 
-> Could you give this a spin?
+[auto build test ERROR on 1702da76e017ae0fbe1a92b07bc332972c293e89]
 
-After testing, I've confirmed that this patch approach works well too.
+url:    https://github.com/intel-lab-lkp/linux/commits/Congkai-Tan/KVM-arm64-Expose-PMMIR_EL1-SLOTS-to-guests/20260602-034527
+base:   1702da76e017ae0fbe1a92b07bc332972c293e89
+patch link:    https://lore.kernel.org/r/20260601193954.2103455-1-congkai%40amazon.com
+patch subject: [PATCH] KVM: arm64: Expose PMMIR_EL1.SLOTS to guests
+config: arm64-randconfig-r123-20260602 (https://download.01.org/0day-ci/archive/20260602/202606021209.2lvgE216-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 11.5.0
+sparse: v0.6.5-rc1
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260602/202606021209.2lvgE216-lkp@intel.com/reproduce)
 
-Shall I submit v2 based on this fix?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202606021209.2lvgE216-lkp@intel.com/
 
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 2ea9f1c7ebcd..b2225da212ec 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -596,6 +596,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
->  	struct vgic_irq *irq;
->  	unsigned long idx;
->  
-> +	lockdep_assert_held(&its->its_lock);
-> +
->  	xa_for_each(&its->translation_cache, idx, irq) {
->  		xa_erase(&its->translation_cache, idx);
->  		vgic_put_irq(kvm, irq);
-> @@ -607,17 +609,16 @@ void vgic_its_invalidate_all_caches(struct kvm *kvm)
->  	struct kvm_device *dev;
->  	struct vgic_its *its;
->  
-> -	rcu_read_lock();
-> +	guard(mutex)(&kvm->lock);
->  
-> -	list_for_each_entry_rcu(dev, &kvm->devices, vm_node) {
-> +	list_for_each_entry(dev, &kvm->devices, vm_node) {
->  		if (dev->ops != &kvm_arm_vgic_its_ops)
->  			continue;
->  
->  		its = dev->private;
-> +		guard(mutex)(&its->its_lock);
->  		vgic_its_invalidate_cache(its);
->  	}
-> -
-> -	rcu_read_unlock();
->  }
->  
->  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
-> @@ -1725,8 +1726,10 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
->  		goto out;
->  
->  	its->enabled = !!(val & GITS_CTLR_ENABLE);
-> -	if (!its->enabled)
-> +	if (!its->enabled) {
-> +		guard(mutex)(&its->its_lock);
->  		vgic_its_invalidate_cache(its);
-> +	}
->  
->  	/*
->  	 * Try to process any pending commands. This function bails out early
-> 
-> --
-> Thanks,
-> Oliver
+All errors (new ones prefixed by >>):
+
+   arch/arm64/kvm/sys_regs.c: In function 'access_pmmir':
+>> arch/arm64/kvm/sys_regs.c:1391:28: error: invalid use of undefined type 'struct arm_pmu'
+    1391 |         p->regval = cpu_pmu->reg_pmmir & ARMV8_PMU_SLOTS;
+         |                            ^~
 
 
-Best regards,
-Hyunwoo Kim
+vim +1391 arch/arm64/kvm/sys_regs.c
+
+  1373	
+  1374	/*
+  1375	 * Expose only PMMIR_EL1.SLOTS to the guest, which is consumed by perf in its
+  1376	 * topdown default metric group. Other PMMIR_EL1 fields remain RAZ. Future
+  1377	 * patches can extend the exposed mask incrementally as KVM gains support for
+  1378	 * those features.
+  1379	 */
+  1380	static bool access_pmmir(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+  1381				 const struct sys_reg_desc *r)
+  1382	{
+  1383		struct arm_pmu *cpu_pmu = vcpu->kvm->arch.arm_pmu;
+  1384	
+  1385		if (p->is_write)
+  1386			return write_to_read_only(vcpu, p, r);
+  1387	
+  1388		if (check_pmu_access_disabled(vcpu, 0))
+  1389			return false;
+  1390	
+> 1391		p->regval = cpu_pmu->reg_pmmir & ARMV8_PMU_SLOTS;
+  1392		return true;
+  1393	}
+  1394	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
