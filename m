@@ -1,44 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D13726D4CA;
-	Mon,  1 Jun 2026 22:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BBA15A86D
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 01:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780353279; cv=none; b=BoItrKe01zNFqbAih9xuttFM0r3l5kKzBgechMe0RLsf9wsCzpg4fv+XDU+HgX93uL7qtTHvE9mTbz4pCJST2vPHJ+k9AEn5hw9FdZ4k0MsdrS5hW+ycJ28X7JH/uvBISpUclKrr9jtN1UrGqerbqYxszM1eAsGVglTQ/0B073E=
+	t=1780363920; cv=none; b=bCcR743BQj1lkeSrYGDWzSne2aWkO0IIvQubCY/QBb3knko8lhb9UyR2a6ry8zK2gf5+22u/s+oJwWOV5EbkZyllYcRhxuVsGb3XuF2Ee2GdcHcqYkZ3DjNxdmS+nEreP/DrIw1jNmTBeC534nDo6gpLyYKS5WRcJeuF3jkCFg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780353279; c=relaxed/simple;
-	bh=CIzIWNVf34aOPvHlVu+ySQFIdPlKYMZyzzJHFxOBORU=;
+	s=arc-20240116; t=1780363920; c=relaxed/simple;
+	bh=enAQ0z2rMaOhfApLzKBYrRY1EShBbcJkVSMXj1eBNwA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IqFGJxX6W85ROKJrS0urm5wStAnEa02sGz0NsFgLPtAa6YQnQGOdsbvSQ4UJfTF5CrlbaMbTJOWZqCn2HBIknmc6WL0WbzcHj8i4Y6Mwi7eT5mnVmWSR0QkRNUI/EoUbceWseh0IkvF7QYK60XBxHlnGERcj/vuvpWbxKTAlSqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aNqRe5Np; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=UTKMqeoLkLulHOJYvrfxMV9IQfBv1QqIGYnQLE/8ThDBzqcBfqjaKrkwHBrKv7RVNNHnhbaoq7JT4A+vTyx47896Wn8w0CFxPTJWp4cG2cgy7thZhakeq2gapF1wcl7ZQg5o2ZYcGPEmnH+zXz0FBo/YLubTBJdxjhr63XFb2og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOMrVrWe; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aNqRe5Np"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155DC1F00893;
-	Mon,  1 Jun 2026 22:34:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780353278;
-	bh=q491PBlHFC4UtfwHYxYQwseyQjhxUQHPoJfdmYhu258=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aNqRe5NpO1/4PooV0sbdbMfUDoAWu45ZFyHg0sQuOUJzivCXm6hzvLvrhyAAF7dvJ
-	 Nm3m/T80gUwMDhqwWhnTGNRUsAOL12DcJ/SNMNtfJr3gpC6hM63sjfYT0oJOqhb/+H
-	 RVVB1stgiRYJja7fjn06hrls1Gazt5xssideFaOy7q4EWLqvTJC+k2vmUCto6LZ3re
-	 LpB6oUDgnmfFnLZEL6P0+A/0S/81k7LoufQQkEfgmhJ59xXtLUDQRnea6zFFhyxKfl
-	 AHlip1vJqJHRVi90p8dwySpuO+sRjOISVlJXmRNH+k1TVU592rXVFCfC4WHpx3CP44
-	 lf4NkWj5kEzaQ==
-Date: Mon, 1 Jun 2026 15:34:36 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOMrVrWe"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-36bcf3d2565so2030470a91.3
+        for <kvmarm@lists.linux.dev>; Mon, 01 Jun 2026 18:31:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780363918; x=1780968718; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b3xy2uhIBa9uRGlGCKv6RNNnKNeckiaUZ7Fy0PM5Q/c=;
+        b=KOMrVrWel5Ujb+Vu7tQaijAPVA0I+iwFe5+kB9rUVqgrJRI2AVXYzVz55rSGhLCdhS
+         AcJeVkfNRHd0/1l6lTiPKKi8JWZiE/OMvv2blhmQVdVfAXXBd3bx4H6O6WZpoRhlS1bl
+         cKLfzYUdhpJ11xrGYWR8D872nUgseq8OjMkDFhLfA3zPRmNXp58aeg3WIT0Pk1D9wMPl
+         bBp0lqIM4s7h21JC6mtsfEA6q+6uTHahGqfO9NEQpkVzk223DqH6kqQJ3xfdz/54mbbh
+         SNXit4cCx/dgUIhWkVBvqsHyYH1LeIFskEOtD8b052m+TNRhlAbO8wrUnpKBxeS4JwG7
+         Ssiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780363918; x=1780968718;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b3xy2uhIBa9uRGlGCKv6RNNnKNeckiaUZ7Fy0PM5Q/c=;
+        b=Ns/+0WBKBsM/OKMAe931dGqAv1NVOOcYWHNJ+AizGQENM1zckwSvL/9tRt/iwhqk0z
+         CLgVHCqHR3YiH3/EWRWrD0sNwzYKCwk48p0Hrl/r57y04bGp76JSf1lztpuFf2XzQKn1
+         3/85C/qdRGIcExl9tEyyF30s3tPp4xouBPyPj+T8tlpvu/1mB9GPPy1xNuETWSPRUCgn
+         Y+palq4RKTp2dnQwko5gJI0Ue+WtGk/uah3c7wyKPzDYfhttGmb1UlacytRXU8BocDkD
+         Yas/pjJY0aZs8/jpu4LUnnvQNA4ULD9FgAXy7ebLaCyHdlc1WN5PmOksjpI5pKC8JSek
+         g0rQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8F4L3Byhjun4OUXqpngUgd4ZMHK2nPs2r9fZxomr0/jNRpkKvJ53+VLKIEAI9WX43Xy3Muxnw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz7tcDiTywDnn+nUgvVoWi9qvcibyyCbJf6hKFSnK7ZPccmhJTI
+	rGyuZvRoLfzicaekV2eiaJgGhfdB0eBgn7XxjLdTL9oJOkWYHL5HaU1k
+X-Gm-Gg: Acq92OFgxI1G/Ul5MPWppBie/84sPoH6AnF8nPpNqQOLuLzJEyOJYfTnLWFXqDn4mlI
+	XJXwjGK2LnRKJcMegGZWtRMchhfs7+nUa8dc2xTemsMHOHVt2+ffQILSot+B5R0k4L55VUuZ4nn
+	Fpj8/pQCHYy5sCmDWQMK1A0mZ+lQZH2aC39dz83L/bMNeFHW0ecSHa8NWvenbU6WVuEFIXkeGrn
+	gsEtXgGzKC4uWt5d+jhVo0lHmE5F3U36FCppwQDVQkwsd2s7Afc/8C15Td9mnKDwmfYyRSEZ7xt
+	1+8H14/ZKjnH3TRmthdBjooLK3VSAiyG36iAGWQaOCjaKw2UR+/gIbgUezXL2PoEPOJpBgOY29v
+	6oe1BH+3qYK/yg7YZCPMbjbL2QIx81sppmwEC7X6wdLsfg9hNltwSlInixzvU0Mho4z21ur22Sv
+	oxlstIc7Qr+HqbnMLwHSoRV78MtILOtNNs6Bt8gJ2LDVEDiYcg4FGpLIeXrNqkx3JH
+X-Received: by 2002:a17:903:3884:b0:2bf:33a9:bf4a with SMTP id d9443c01a7336-2bf368a3d92mr163696255ad.38.1780363918317;
+        Mon, 01 Jun 2026 18:31:58 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fd85dsm112089405ad.25.2026.06.01.18.31.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 18:31:57 -0700 (PDT)
+Date: Tue, 2 Jun 2026 10:31:53 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: maz@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kees@kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Preserve all guest ZCR_EL2.LEN values
-Message-ID: <ah4I_G_T_-bZ7pgb@kernel.org>
-References: <20260529-kvm-arm64-fix-zcr-len-nv-v2-1-86cad51992bd@kernel.org>
+	linux-kernel@vger.kernel.org, imv4bel@gmail.com
+Subject: Re: [PATCH] KVM: arm64: vgic-its: Drop the translation cache
+ reference only for the erased entry
+Message-ID: <ah4yiavdXTB10P0d@v4bel>
+References: <ah2c5lu4JbUg7dj-@v4bel>
+ <ah3Yx0fjguUdCk_G@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,183 +78,124 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260529-kvm-arm64-fix-zcr-len-nv-v2-1-86cad51992bd@kernel.org>
+In-Reply-To: <ah3Yx0fjguUdCk_G@kernel.org>
 
-On Fri, May 29, 2026 at 12:01:44AM +0100, Mark Brown wrote:
-> Since commit b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps") when
-> guests write to ZCR_EL2 we have clamped the value of ZCR_EL2.LEN to be
-> at most that configuring the maximum guest VL when accessed directly as
-> ZCR_EL2. This is not clearly the behaviour the architecture documents
-> for ZCR_EL2.LEN, while things are a little ambiguous currently there is
-> a fairly direct reading that suggests values will be read as written.
-> Further, the documented procedure for enumerating vector lengths means
-> that it is expected that values larger than the largest supported vector
-> length will be written in practice.
+On Mon, Jun 01, 2026 at 12:08:55PM -0700, Oliver Upton wrote:
+> Hi Hyunwoo,
 > 
-> The reasoning for the current behaviour is not specifically articulated, my
-> best guess is that it is intended to ensure that the guest can not see an
-> effective VL greater than the maximum that has been configured, though
-> this will be ineffective when a VHE guest uses the ZCR_EL1 accessor.
-> The VL can instead be constrained by configuring ZCR_EL2 when loading
-> L2 guest state:
+> Nice find.
 > 
->  - When the L2 guest is running in EL1 or EL0 state configure
->    ZCR_EL2.LEN to the minimum of the guest ZCR_EL2.LEN and
->    vcpu_sve_max_vq(vcpu)-1.
->  - When the L2 guest is running at EL2 configure the maximum VL for
->    the guest in ZCR_EL2.LEN like we do for L1 guests and load the
->    guest ZCR_EL2 into ZCR_EL1.
+> On Mon, Jun 01, 2026 at 11:53:26PM +0900, Hyunwoo Kim wrote:
+> > vgic_its_invalidate_cache() walks the per-ITS translation cache with
+> > xa_for_each() and drops the cache's reference on each entry with
+> > vgic_put_irq(). It puts the iterated pointer, though, rather than the
+> > value returned by xa_erase().
+> > 
+> > The function is called from contexts that do not exclude one another: the
+> > ITS command handlers hold its_lock, the GITS_CTLR write path holds
+> > cmd_lock, and the path that clears EnableLPIs in a redistributor's
+> > GICR_CTLR holds neither. Two or more of them can drain the same cache
+> > concurrently, and if each one observes the same entry, erases it and then
+> > puts it, the single reference the cache holds on that entry is dropped
+> > more than once. The entry can then be freed while an ITE still maps it.
+> > 
+> > xa_erase() is atomic and returns the previous entry, so put only the entry
+> > that this context actually removed. The cache reference is then dropped
+> > exactly once per entry even when the invalidations run concurrently, and
+> > the behavior is unchanged when only one context runs.
 > 
-> This will ensure that the effective VL seen by the guest is always
-> constrained by all of the maximum VL configured by the VMM and the
-> ZCR_ELx values in effect.
+> Next time:
 > 
-> With the above implemented we can simplify the emulation for trapped
-> writes to ZCR_EL2 to store LEN configured by the guest directly,
-> matching the handling for ZCR_EL1. We still need to sanitise the values
-> written to ensure no unsupported fields are written, do this by adding
-> the register to our generic sanitisation infrastructure. This register
-> is a bit unusual in that as an unnamed field at bits 8:4 which is
-> RAZ/WI, for the purposes of sanitisation treat these bits as though they
-> were RES0.
-> 
-> Fixes: b3d29a823099 ("KVM: arm64: nv: Handle ZCR_EL2 traps")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
 > Cc: stable@vger.kernel.org
-
-Yeah... Can't say what I was thinking here.
-
-With Marc's changelog suggestion:
-
-Reviewed-by: Oliver Upton <oupton@kernel.org>
-
-> ---
-> Changes in v2:
-> - Use generic santisation infrastructure.
-> - Remove redundant !is_hyp_ctxt() check.
-> - Also fix ZCR_EL2 configuration in __hyp_sve_restore_guest().
-> - Commit message clarifications.
-> - Link to v1: https://patch.msgid.link/20260522-kvm-arm64-fix-zcr-len-nv-v1-1-ec254e9078cf@kernel.org
-> ---
->  arch/arm64/include/asm/kvm_host.h       |  2 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 16 ++++++++++------
->  arch/arm64/kvm/nested.c                 |  5 +++++
->  arch/arm64/kvm/sys_regs.c               |  6 +-----
->  4 files changed, 17 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 65eead8362e0..a49042bfa801 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -511,7 +511,6 @@ enum vcpu_sysreg {
->  	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
->  	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
->  	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
-> -	ZCR_EL2,	/* SVE Control Register (EL2) */
->  	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
->  	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
->  	TCR_EL2,	/* Translation Control Register (EL2) */
-> @@ -543,6 +542,7 @@ enum vcpu_sysreg {
->  	SCTLR2_EL2,	/* System Control Register 2 (EL2) */
->  	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
->  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
-> +	ZCR_EL2,	/* SVE Control Register (EL2) */
+> > Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
+> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-its.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> > index 1d7e5d560af4..1e3706ac3b8e 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > @@ -597,8 +597,10 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
+> >  	unsigned long idx;
+> >  
+> >  	xa_for_each(&its->translation_cache, idx, irq) {
+> > -		xa_erase(&its->translation_cache, idx);
+> > -		vgic_put_irq(kvm, irq);
+> > +		/* Only the context that erases the entry drops its cache ref. */
+> > +		irq = xa_erase(&its->translation_cache, idx);
+> > +		if (irq)
+> > +			vgic_put_irq(kvm, irq);
+> >  	}
+> >  }
+> 
+> This definitely works but TBH I'd rather just plug the subtle race and
+> do invalidations behind the its_lock since it already nests with the
+> cmd_lock.
+
+Thank you for the review.
+
+> 
+> Could you give this a spin?
+
+After testing, I've confirmed that this patch approach works well too.
+
+Shall I submit v2 based on this fix?
+
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 2ea9f1c7ebcd..b2225da212ec 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -596,6 +596,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
+>  	struct vgic_irq *irq;
+>  	unsigned long idx;
 >  
->  	/* Any VNCR-capable reg goes after this point */
->  	MARKER(__VNCR_START__),
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index bf0eb5e43427..320cd45d49c5 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -462,11 +462,13 @@ static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
->  
->  static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
->  {
-> +	u64 zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
+> +	lockdep_assert_held(&its->its_lock);
 > +
->  	/*
->  	 * The vCPU's saved SVE state layout always matches the max VL of the
->  	 * vCPU. Start off with the max VL so we can load the SVE state.
->  	 */
-> -	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-> +	sve_cond_update_zcr_vq(zcr_el2, SYS_ZCR_EL2);
->  	__sve_restore_state(vcpu_sve_pffr(vcpu),
->  			    &vcpu->arch.ctxt.fp_regs.fpsr,
->  			    true);
-> @@ -476,8 +478,10 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
->  	 * nested guest, as the guest hypervisor could select a smaller VL. Slap
->  	 * that into hardware before wrapping up.
->  	 */
-> -	if (is_nested_ctxt(vcpu))
-> -		sve_cond_update_zcr_vq(__vcpu_sys_reg(vcpu, ZCR_EL2), SYS_ZCR_EL2);
-> +	if (is_nested_ctxt(vcpu)) {
-> +		zcr_el2 = min(zcr_el2, __vcpu_sys_reg(vcpu, ZCR_EL2));
-> +		sve_cond_update_zcr_vq(zcr_el2, SYS_ZCR_EL2);
+>  	xa_for_each(&its->translation_cache, idx, irq) {
+>  		xa_erase(&its->translation_cache, idx);
+>  		vgic_put_irq(kvm, irq);
+> @@ -607,17 +609,16 @@ void vgic_its_invalidate_all_caches(struct kvm *kvm)
+>  	struct kvm_device *dev;
+>  	struct vgic_its *its;
+>  
+> -	rcu_read_lock();
+> +	guard(mutex)(&kvm->lock);
+>  
+> -	list_for_each_entry_rcu(dev, &kvm->devices, vm_node) {
+> +	list_for_each_entry(dev, &kvm->devices, vm_node) {
+>  		if (dev->ops != &kvm_arm_vgic_its_ops)
+>  			continue;
+>  
+>  		its = dev->private;
+> +		guard(mutex)(&its->its_lock);
+>  		vgic_its_invalidate_cache(its);
+>  	}
+> -
+> -	rcu_read_unlock();
+>  }
+>  
+>  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+> @@ -1725,8 +1726,10 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+>  		goto out;
+>  
+>  	its->enabled = !!(val & GITS_CTLR_ENABLE);
+> -	if (!its->enabled)
+> +	if (!its->enabled) {
+> +		guard(mutex)(&its->its_lock);
+>  		vgic_its_invalidate_cache(its);
 > +	}
 >  
->  	write_sysreg_el1(__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)), SYS_ZCR);
->  }
-> @@ -501,11 +505,11 @@ static inline void fpsimd_lazy_switch_to_guest(struct kvm_vcpu *vcpu)
->  		return;
->  
->  	if (vcpu_has_sve(vcpu)) {
-> +		zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-> +
->  		/* A guest hypervisor may restrict the effective max VL. */
->  		if (is_nested_ctxt(vcpu))
-> -			zcr_el2 = __vcpu_sys_reg(vcpu, ZCR_EL2);
-> -		else
-> -			zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-> +			zcr_el2 = min(zcr_el2, __vcpu_sys_reg(vcpu, ZCR_EL2));
->  
->  		write_sysreg_el2(zcr_el2, SYS_ZCR);
->  
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 883b6c1008fb..38f672e94087 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1834,6 +1834,11 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
->  	resx.res1 = VNCR_EL2_RES1;
->  	set_sysreg_masks(kvm, VNCR_EL2, resx);
->  
-> +	/* ZCR_EL2 - bits 8:4 are RAZ/WI so treat them as RES0 */
-> +	resx.res0 = ZCR_ELx_RES0 | GENMASK_ULL(8, 4);
-> +	resx.res1 = ZCR_ELx_RES1;
-> +	set_sysreg_masks(kvm, ZCR_EL2, resx);
-> +
->  out:
->  	for (enum vcpu_sysreg sr = __SANITISED_REG_START__; sr < NR_SYS_REGS; sr++)
->  		__vcpu_rmw_sys_reg(vcpu, sr, |=, 0);
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 148fc3400ea8..77e1b5d223c6 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2862,8 +2862,6 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
->  			   struct sys_reg_params *p,
->  			   const struct sys_reg_desc *r)
->  {
-> -	unsigned int vq;
-> -
->  	if (guest_hyp_sve_traps_enabled(vcpu)) {
->  		kvm_inject_nested_sve_trap(vcpu);
->  		return false;
-> @@ -2874,9 +2872,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
->  		return true;
->  	}
->  
-> -	vq = SYS_FIELD_GET(ZCR_ELx, LEN, p->regval) + 1;
-> -	vq = min(vq, vcpu_sve_max_vq(vcpu));
-> -	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, vq - 1);
-> +	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, p->regval);
->  	return true;
->  }
->  
+>  	/*
+>  	 * Try to process any pending commands. This function bails out early
 > 
-> ---
-> base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
-> change-id: 20260519-kvm-arm64-fix-zcr-len-nv-9e9e7bae012a
-> 
-> Best regards,
-> --  
-> Mark Brown <broonie@kernel.org>
-> 
+> --
+> Thanks,
+> Oliver
+
+
+Best regards,
+Hyunwoo Kim
