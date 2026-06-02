@@ -1,89 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09A93F1AD9;
-	Tue,  2 Jun 2026 15:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3006F3EC2E6
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 16:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780415683; cv=none; b=FFMKJsiapW8DRnsTdyFEINZDYcTc9WFRoY97m7SN5FuXcm3jTWI2R34KX/pgYTHi0hg7wsdQJhxtHtNl6xWIrH4n6bCyLrnFuC/pnLKg8gEXhVwsp36wqnTgH3ZFwcps9axLfwJY4wWchDCOLBlI5PGDH5BOAhP/t3Ykps3NQKs=
+	t=1780416267; cv=none; b=CJAnzhfpZPs7s4iDmtvY6OxNs97uljHzoMYRoAYGjZO2T9cu4vjvGxfMvkj741JqoAadnYlkZH4lu5JA4eSYVbHPzbl4urLo5GM7Ajcdry0D/pbANUTXGEnHKNZnmDx+3U9dXHkMY89Iq3aWUnH+0SV8ECW1WJSW6uNrQk+rqGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780415683; c=relaxed/simple;
-	bh=Hse4vyEKhmKwlzo9QKW2YumWtafAR4OKwvf/MHle4ro=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dfPf+BbjqSfpkTMO+6blJIfI0Vqyx2spTzes6LYIxRvRS7XLjUwD+bF2wbLqoWmjnMJqvXAvXXkJ/E3jzZ/7C6xQVvIyxTE8yW6+CHUdz2N3hxEKiClpwH05cZ0E7oRDf4SYApuhvBufs4zdp93L2tnHHx3ccc4NeFB3zETCk4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jq98lp5R; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780416267; c=relaxed/simple;
+	bh=CgUR528ltaPd7rr9XGuU8qxQxZkouETPRzdIsLLIalI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=a/1YnD47NJEeJCRlXWDOUbbyyEKNG4p9alrPTr6ZlvaKSoESevS8pHaFnOpEVCWdoJLTfsFniIjkLAJNw4PdlZIbuxlQumM1G3ih/rRNXuQarCgTRw4NO1zfCFlqCYqdmHrOBT0bX3Exb49nrLH/8A/tti+0PHbIi/3QskA6Ejo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JA78ITij; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jq98lp5R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBDE51F00898;
-	Tue,  2 Jun 2026 15:54:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780415681;
-	bh=g6F5AltN2PaZJFgZ1Qy/IqUyWkgsBB7MOGVwDpftwzA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Jq98lp5R4Wne4GQFBsJlJ9/JUnApw+k8nJ5cFtNGtTsPRL5DdWkYymrDAAmKgzv63
-	 6Z3klmZvuNuNoJ3o3S1t49kslZJ6OaX7iL8rnZ1kxR2LZAEc6MtAJ6KuWwJ6THjnsY
-	 cVSEHvCnMFnyCciT8gUC+pVEtBF7gGVzkgWUD4+tMZfabg79fa5CIurvaTRBTDIJNP
-	 FWQPdbquM/GIReZwwmePZsJHW1zpkFHnyQrYTIk8D+qEy28h06XjmeRAur3kjHZpgl
-	 CCnrZFhNTDusRgdosMnvbMaVYqPgFAJmuLrCUznx7Rd8u1WHI7VNmQk2bAZd1hWRm+
-	 pH6rCPjOdMvhg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wURRw-00000008fVv-0EHR;
-	Tue, 02 Jun 2026 15:54:40 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 1/3] KVM: arm64: Key CPTR_EL2.E0POE propagation on FEAT_S1POE
-Date: Tue,  2 Jun 2026 16:54:27 +0100
-Message-ID: <20260602155430.2088142-2-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260602155430.2088142-1-maz@kernel.org>
-References: <20260602155430.2088142-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JA78ITij"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c0c2a68d01so17584795ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 02 Jun 2026 09:04:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780416265; x=1781021065; darn=lists.linux.dev;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CPM66VcrINL92Jo5ORupc7PN6tPDPcidTQjTGXaIkdE=;
+        b=JA78ITijdWL2h1l3j3WzweJ6xBnNuPVbxhH4EXRao5sMRvKNHfvBC0d9XEs6i3kyK4
+         Iid+NoNuY7mU25YXGxGbpZR5taYYr0zSKvsuS0IpMZRSGudFlf1ZhzyT2iWPF9+Wlgnj
+         5FRtOic+tGTVQJIjcpJoyPqr3LCUlPmdxrQFhdovLaOZ5Nmsi5zhK0Qwx4S7Z9wFVgwH
+         y1QEQaK3plNHKRgXYAT1MJ2Zk25fP5WjrR19Ii1ftdTztZsvtHFipDajsHaE+HQb+4SJ
+         PtXwIG/xDUHidzvifQwoFXIyV6T/0OuDk30FQy5e32Cfu9SgxrU9wwH6Km/GaOscm5a6
+         TTsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780416265; x=1781021065;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CPM66VcrINL92Jo5ORupc7PN6tPDPcidTQjTGXaIkdE=;
+        b=As2dqrbczuPbymacSKNu7X9yqPuSKrjo+R2xHtd0g3ufkV5G9lD02S7OBU3oTEjIf8
+         giFpRpDmJkxHb48SqLBRFck6Plw1/h851PltAv1TAKLouTWtRH3iYnW0+XnBFWFjA/Zl
+         HS9S5UED5aTXwVj288vipPWcUt58SDSDHLJUfenX+UHpp58eJNumH8F5POfsXldwXRTs
+         Uk7c3Q2tjutRCvM4PGudoEbxQGL0vpVdBMTjb7UCc5tyetT/pvWOxMCisyjQSRS8oNLQ
+         ehKv9XKktiZkcmktx43uUVN5ygeCQeZMQtS0dwl04thSTKAPD8ZRwpo23INORQaB7oeE
+         oCfQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9JwwzX05mjjVlGND6lqTwxttQZ0zox8PdVNQBL5mnenVi04vwFJi758lN9spe+PMXGKaMhMNA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyy1MsloOKiltVr5fUsW9difFIABiFjgxiVVCe6z1FyfMQKf72T
+	9oDyfi9rSJerVz+6Nm8ILUDR/CELm/ncrTALDRp2/jKNxMn+2oio0qmS
+X-Gm-Gg: Acq92OFQV5br8C/RB4h3nsNpos5NKMCsc3eLmoBNLof1LgOVyRCAxYEW1fWbv0ialkH
+	s4OS6fqt6AmGil0DrmVOBrJTMPu5a8auEjRaxTKrcNnm3G+jiuC0YQDBbTmn47iDM6j5HTr9R63
+	0NTW7+Wwb51cFAHLHm6oPxYHnM9COqDKiTJ9ao+qbiH9apGnhW6xy+B/JiR2RwWGggK0QqBEV7O
+	Q3HXOMUBrPBxoYt+3mtfeXM2LURjKUyBK/U1MwaaKW9TLWarYDK609VxvvUVZoUa8Z7iq3eG0MF
+	ojAp9QHvMzEejlUJBuCqWjoo+QK9g3cLRWLu+oHjUPjqgwrZyorYg/455QPI6cSLX+MD64hgXtV
+	Avm3H46cWKO8Cxgo2mGt9tVxCTtxAWFWRwh4Oe0uB9evLO3CVkQvlcY3gxMCpUc2ptvlcI86QqL
+	zP87I26ERkAlKfABdAYjpPUxeQXs3UYsvxZed8p7rX8A/iBEcPgszORg==
+X-Received: by 2002:a17:903:4b07:b0:2c0:b6c7:2273 with SMTP id d9443c01a7336-2c0b6c7267emr145511365ad.3.1780416265235;
+        Tue, 02 Jun 2026 09:04:25 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23c2381bsm140818235ad.62.2026.06.02.09.04.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 09:04:24 -0700 (PDT)
+Date: Wed, 3 Jun 2026 01:04:20 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	stable@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH] KVM: arm64: Take the SRCU lock for page table walks in fault
+ injection and AT emulation
+Message-ID: <ah7_BAAzHggzdZeI@v4bel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-We propagate CPTR_EL2.E0POE from a L1 into the L0 configuration, but
-we key this on the L1 guest supporting FEAT_S2POE. This is obviously
-wrong, as this bit is solely concerned with Stage-1 translation.
+inject_abt64() rewalks the guest stage-1 page tables via
+__kvm_find_s1_desc_level() when injecting an abort for a failed S1PTW, and
+__kvm_at_s12() calls kvm_walk_nested_s2() to perform the stage-2
+translation. Both walks reference kvm->memslots through kvm_read_guest(),
+which reads the descriptors, and __kvm_at_swap_desc(), which updates the
+access flag, so they must run while holding the kvm->srcu read lock.
+__kvm_at_swap_desc() asserts srcu_read_lock_held() on entry, and the other
+callers of these walks, handle_at_slow(), kvm_translate_vncr() and
+kvm_handle_guest_abort(), take the lock before calling them.
 
-Fix this by making the update depend on FEAT_S1POE.
+inject_abt64() is reached from the SEA and size fault injection paths,
+which run before kvm_handle_guest_abort() takes the lock, and
+__kvm_at_s12() does not hold the lock across the stage-2 walk. Take the
+kvm->srcu read lock with guard(srcu) in both places so that it is held for
+the duration of the walk.
 
-Fixes: cd931bd6093cb ("KVM: arm64: nv: Add additional trap setup for CPTR_EL2")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+Fixes: 50f77dc87f13 ("KVM: arm64: Populate level on S1PTW SEA injection")
+Fixes: be04cebf3e78 ("KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/at.c           | 3 +++
+ arch/arm64/kvm/inject_fault.c | 2 ++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index bf0eb5e434274..161bb2a3e1d90 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -141,7 +141,7 @@ static inline void __activate_cptr_traps_vhe(struct kvm_vcpu *vcpu)
- 	if (!(SYS_FIELD_GET(CPACR_EL1, ZEN, cptr) & BIT(0)))
- 		val &= ~CPACR_EL1_ZEN;
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 9f8f0ae8e86e..eb334a1c2672 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -1569,6 +1569,9 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	/* Do the stage-2 translation */
+ 	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+ 	out.esr = 0;
++
++	guard(srcu)(&vcpu->kvm->srcu);
++
+ 	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
+ 	if (ret < 0)
+ 		return ret;
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 89982bd3345f..868895ed0930 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -121,6 +121,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 		if (hpfar == INVALID_GPA)
+ 			return;
  
--	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
- 		val |= cptr & CPACR_EL1_E0POE;
- 
- 	val |= cptr & CPTR_EL2_TCPAC;
++		guard(srcu)(&vcpu->kvm->srcu);
++
+ 		ret = __kvm_find_s1_desc_level(vcpu, addr, hpfar, &level);
+ 		if (ret)
+ 			return;
 -- 
-2.47.3
+2.43.0
 
