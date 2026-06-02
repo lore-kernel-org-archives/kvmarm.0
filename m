@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0203EBF24
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743BD3E2ABF
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780413144; cv=none; b=nJPjS/lt4wCuksEQhpuMU6pUyy58OqJPV0FFfwJulOEjHqUFMwJKwh4vCZ5LLP9Zv2qRqzX/83J4O2JblugPbi8zTnYNiKYZJIki/wkcet0ShSnrNpW76Cx+YIpJLFLBTZRqZkhWdeoPwlKZHAFNyuxjTy9X85evFasPWmePJ2Y=
+	t=1780413146; cv=none; b=UM8g1nJK8LHpHDwartP3Z4qnokt/BkXDfLrE3wgpjLoOTX8qmLF5Lgmn3+hNQckHQKW3BijRFwf5/NKVtskSCecdoYhUu5BS+pCJkDE4F1VdbRu4S54SdX64BTh0afnPpbcuxIEd4RhkqW+0wmVEWyAmdPROQg5AtifNaILWHFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780413144; c=relaxed/simple;
-	bh=1eQhgk72nu4iO7OJFT9TavJ4ZsTC0pyfvUy/bYwcXkI=;
+	s=arc-20240116; t=1780413146; c=relaxed/simple;
+	bh=AGrOd3maVfHw9KqMwfvglX6A7MxlCueuD5iraJcfrUE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZklcFlXf1xdifZz5p2eqpSvN2hq7MvMBemic4YYwJCiGXh4sgBRhePlMmyf3zRjAbpV6Ql9BNVhLsvwdbspBq5buK1M09MLexqQZRfx60o6jQOx/K+tWz+c+4nnIttqU7SA9c7QKVn1fSc5b0s9VzFn4F1GE7kSn2K+fKoIBSto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WdBaYGxk; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=YrHsGAo4VlWWfGDG3aD2U42FHaR45YVnB2z1dz+fUccQQwJLxrpDmMuxyXarXaKOaooZR4RO+DR7nf0Shjo1+0pi9QjgnUJ3TOTJBHAef3bbLVX7krSjIA1+RgkIomHCrEPHNJotBdIO70x9e3zZqQirveZwle9zRTwJJAwjybc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RJE9zP1L; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WdBaYGxk"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RJE9zP1L"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 257323582;
-	Tue,  2 Jun 2026 08:12:18 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C677E3573;
+	Tue,  2 Jun 2026 08:12:19 -0700 (PDT)
 Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A8A193F7D8;
-	Tue,  2 Jun 2026 08:12:21 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5C3D93F7D8;
+	Tue,  2 Jun 2026 08:12:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780413143; bh=1eQhgk72nu4iO7OJFT9TavJ4ZsTC0pyfvUy/bYwcXkI=;
+	t=1780413144; bh=AGrOd3maVfHw9KqMwfvglX6A7MxlCueuD5iraJcfrUE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WdBaYGxklnbN5UYtHrGQczi9i+diQ3Ksp+/6/KzgaEF092+u5xBRTqGMGf8zZuhaJ
-	 evz3eI7wtxsBlcniQWAbVuUoyyy7tKhSGnJqhCJUbyEdxJg5wLKV2d1UPI6zY4Hiv3
-	 ON8CVwiXPISv+Uqk+tzZc5WeUve8SEFmDmww1Me4=
+	b=RJE9zP1LBfyO2a9sX3jwQdfNHp84mPzRfkyNKpf9XczQvRDCHwftRiFgxVkhdn3zD
+	 j4r2cWbhM1a9kJ/Ma/sBDr3a11AIYE8SkLPs9NGywQ5bhkVe4xsgV0xxgQ3RZLTx3h
+	 LXqAqOgLQ2hJ4vr+Zc556BUhKAIrVWSr2xBsRDo0=
 From: Mark Rutland <mark.rutland@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -38,9 +38,9 @@ Cc: broonie@kernel.org,
 	tabba@google.com,
 	vladimir.murzin@arm.com,
 	will@kernel.org
-Subject: [PATCH v3 08/18] arm64: fpsimd: Use assembler for baseline SME instructions
-Date: Tue,  2 Jun 2026 16:11:40 +0100
-Message-Id: <20260602151150.925126-9-mark.rutland@arm.com>
+Subject: [PATCH v3 09/18] arm64: fpsimd: Move sve_get_vl() and sme_get_vl() inline
+Date: Tue,  2 Jun 2026 16:11:41 +0100
+Message-Id: <20260602151150.925126-10-mark.rutland@arm.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20260602151150.925126-1-mark.rutland@arm.com>
 References: <20260602151150.925126-1-mark.rutland@arm.com>
@@ -52,42 +52,16 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We currently support assemblers which do not support SME instructions,
-and have macros to manually encode SME instructions. This was
-necessary historically as SME support was developed before assembler
-support was widely available, but things have changed:
+The sve_get_vl() and sme_get_vl() functions are wrappers for the RDVL
+and RDSVL instructions respectively. There's no need for those to be
+out-of-line.
 
-* All currently supported versions of LLVM support baseline SME
-  instructions. Building the kernel requires LLVM 15+, while LLVM 13+
-  supports SME.
+Replace the out-of-line assembly functions with equivalent inline
+functions.
 
-* GNU binutils has supported baseline SME instructions since 2.38, which
-  was released on 09 February 2022. Toolchains using this or later are
-  widely available. For example Debian 12 (released on 10 June 2023)
-  provides binutils 2.40. Toolchains provided kernel.org provide
-  binutils 2.38+ since the GCC 12.1.0 release (released between 06 May
-  2022 and 17 August 2022).
-
-* For various reasons, SME support was marked as BROKEN, and re-enabled
-  in v6.16 (released on 27 July 2025). The earliest support LTS kernel
-  with SME support is v6.18.y, v6.18 was tagged on 30 November 2025, and
-  contemporary toolchains (GCC 15.2 and binutils 2.45) supported
-  baseline SME instructions.
-
-* Any distribution which intends to support SME will presumably have a
-  toolchain that supports baseline SME instructions such that userspace
-  can be built.
-
-Considering the above, there's no practical benefit to allowing SME to
-be built when the toolchain doesn't support baseline SME instructions.
-
-Make CONFIG_ARM64_SME depend on assembler support for SME, and remove
-the manual encoding of SME instructions. The various _sme_<insn> macros
-are kept for now, and will be cleaned up in subsequent patches.
-
-A couple of SME2 instructions require a more recent toolchain, and are
-left as-is for now. I've looked through releases of binutils and LLVM to
-find when support was added, and noted this in a comment.
+The _sve_rdvl assembly macro is unused, and so it is removed. The
+_sme_rdsvl assembly macro is still used elsewhere, and so is kept for
+now.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Reviewed-by: Mark Brown <broonie@kernel.org>
@@ -99,95 +73,116 @@ Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oupton@kernel.org>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/Kconfig                    |  5 ++++
- arch/arm64/include/asm/fpsimdmacros.h | 38 +++++++++++----------------
- 2 files changed, 20 insertions(+), 23 deletions(-)
+ arch/arm64/include/asm/fpsimd.h       | 31 +++++++++++++++++++++++++--
+ arch/arm64/include/asm/fpsimdmacros.h |  6 ------
+ arch/arm64/kernel/entry-fpsimd.S      | 10 ---------
+ 3 files changed, 29 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index fe60738e5943b..378e50fef247a 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2247,10 +2247,15 @@ config ARM64_SVE
- 	  booting the kernel.  If unsure and you are not observing these
- 	  symptoms, you should assume that it is safe to say Y.
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index 8efa3c0402a7a..36cf528e64971 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -22,6 +22,9 @@
+ #include <linux/stddef.h>
+ #include <linux/types.h>
  
-+config AS_HAS_SME
-+	# Supported by LLVM 13+ and binutils 2.38+
-+	def_bool $(as-instr,.arch_extension sme)
++#define __SVE_PREAMBLE		".arch_extension sve\n"
++#define __SME_PREAMBLE		".arch_extension sme\n"
 +
- config ARM64_SME
- 	bool "ARM Scalable Matrix Extension support"
- 	default y
- 	depends on ARM64_SVE
-+	depends on AS_HAS_SME
- 	help
- 	  The Scalable Matrix Extension (SME) is an extension to the AArch64
- 	  execution state which utilises a substantial subset of the SVE
+ /* Masks for extracting the FPSR and FPCR from the FPSCR */
+ #define VFP_FPSCR_STAT_MASK	0xf800009f
+ #define VFP_FPSCR_CTRL_MASK	0x07f79f00
+@@ -141,11 +144,23 @@ static inline void *thread_zt_state(struct thread_struct *thread)
+ 	return thread->sme_state + ZA_SIG_REGS_SIZE(sme_vq);
+ }
+ 
++static inline unsigned int sve_get_vl(void)
++{
++	unsigned int vl;
++
++	asm volatile(
++	__SVE_PREAMBLE
++	"	rdvl %x[vl], #1\n"
++	: [vl] "=r" (vl)
++	);
++
++	return vl;
++}
++
+ extern void sve_save_state(void *state, u32 *pfpsr, int save_ffr);
+ extern void sve_load_state(void const *state, u32 const *pfpsr,
+ 			   int restore_ffr);
+ extern void sve_flush_live(bool flush_ffr, unsigned long vq_minus_1);
+-extern unsigned int sve_get_vl(void);
+ extern void sme_save_state(void *state, int zt);
+ extern void sme_load_state(void const *state, int zt);
+ 
+@@ -400,8 +415,20 @@ static inline int sme_max_virtualisable_vl(void)
+ 	return vec_max_virtualisable_vl(ARM64_VEC_SME);
+ }
+ 
++static inline unsigned int sme_get_vl(void)
++{
++	unsigned int vl;
++
++	asm volatile(
++	__SME_PREAMBLE
++	"	rdsvl %x[vl], #1\n"
++	: [vl] "=r" (vl)
++	);
++
++	return vl;
++}
++
+ extern void sme_alloc(struct task_struct *task, bool flush);
+-extern unsigned int sme_get_vl(void);
+ extern int sme_set_current_vl(unsigned long arg);
+ extern int sme_get_current_vl(void);
+ extern void sme_suspend_exit(void);
 diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index 4ba23e493cb69..4a9bf46e52913 100644
+index 4a9bf46e52913..c724fcad7ee02 100644
 --- a/arch/arm64/include/asm/fpsimdmacros.h
 +++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -149,46 +149,38 @@
- 	pfalse	p\np\().b
+@@ -125,12 +125,6 @@
+ 	ldr p\np, [x\nxbase, #\offset, MUL VL]
  .endm
  
--/* SME instruction encodings for non-SME-capable assemblers */
--/* (pre binutils 2.38/LLVM 13) */
-+/* Deprecated macros for SME instructions */
+-/* RDVL X\nx, #\imm */
+-.macro _sve_rdvl nx, imm
+-	.arch_extension sve
+-	rdvl x\nx, #\imm
+-.endm
+-
+ /* RDFFR (unpredicated): RDFFR P\np.B */
+ .macro _sve_rdffr np
+ 	.arch_extension sve
+diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
+index 88c555745b584..7f2d31dff8c17 100644
+--- a/arch/arm64/kernel/entry-fpsimd.S
++++ b/arch/arm64/kernel/entry-fpsimd.S
+@@ -57,11 +57,6 @@ SYM_FUNC_START(sve_load_state)
+ 	ret
+ SYM_FUNC_END(sve_load_state)
  
- /* RDSVL X\nx, #\imm */
- .macro _sme_rdsvl nx, imm
--	_check_general_reg \nx
--	_check_num (\imm), -0x20, 0x1f
--	.inst	0x04bf5800			\
--		| (\nx)				\
--		| (((\imm) & 0x3f) << 5)
-+	.arch_extension sme
-+	rdsvl x\nx, #\imm
- .endm
- 
+-SYM_FUNC_START(sve_get_vl)
+-	_sve_rdvl	0, 1
+-	ret
+-SYM_FUNC_END(sve_get_vl)
+-
  /*
-  * STR (vector from ZA array):
-- *	STR ZA[\nw, #\offset], [X\nxbase, #\offset, MUL VL]
-+ *	STR ZA[W\nw, #\offset], [X\nxbase, #\offset, MUL VL]
-  */
- .macro _sme_str_zav nw, nxbase, offset=0
--	_sme_check_wv \nw
--	_check_general_reg \nxbase
--	_check_num (\offset), -0x100, 0xff
--	.inst	0xe1200000			\
--		| (((\nw) & 3) << 13)		\
--		| ((\nxbase) << 5)		\
--		| ((\offset) & 7)
-+	.arch_extension sme
-+	str	za[w\nw, #\offset], [x\nxbase, #\offset, MUL VL]
- .endm
+  * Zero all SVE registers but the first 128-bits of each vector
+  *
+@@ -84,11 +79,6 @@ SYM_FUNC_END(sve_flush_live)
  
- /*
-  * LDR (vector to ZA array):
-- *	LDR ZA[\nw, #\offset], [X\nxbase, #\offset, MUL VL]
-+ *	LDR ZA[w\nw, #\offset], [X\nxbase, #\offset, MUL VL]
-  */
- .macro _sme_ldr_zav nw, nxbase, offset=0
--	_sme_check_wv \nw
--	_check_general_reg \nxbase
--	_check_num (\offset), -0x100, 0xff
--	.inst	0xe1000000			\
--		| (((\nw) & 3) << 13)		\
--		| ((\nxbase) << 5)		\
--		| ((\offset) & 7)
-+	.arch_extension sme
-+	ldr	za[w\nw, #\offset], [x\nxbase, #\offset, MUL VL]
- .endm
+ #ifdef CONFIG_ARM64_SME
  
-+/*
-+ * SME2 instruction encodings for older assemblers.
-+ * Supported by binutils 2.41+.
-+ * Supported by LLVM 16+
-+ */
-+
+-SYM_FUNC_START(sme_get_vl)
+-	_sme_rdsvl	0, 1
+-	ret
+-SYM_FUNC_END(sme_get_vl)
+-
  /*
-  * LDR (ZT0)
+  * Save the ZA and ZT state
   *
 -- 
 2.30.2
