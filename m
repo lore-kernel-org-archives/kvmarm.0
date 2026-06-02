@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EDD3A6EFC
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 23:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539A939936D;
+	Tue,  2 Jun 2026 23:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780444498; cv=none; b=VFsfNCAAdF0J95ay5S/eFG4bTjB21yu5OM8VqP6WIrpRNCPLzjIcVCB1cXQpOWXaWn3v5ent2u1/d6uUGYHTQdk+jsJJxJ50q8SyqxkE8nxczJp91je5Fup3eC3k4DQ24gYy8KjkZ9UCalmZZo/mHfuityzNlYY7AYktcB+0tQA=
+	t=1780444498; cv=none; b=uEAWzQ437oYC/zYCm3eLtTCVM1cRVX4WWQo52SblBrBBEb9rp9fPAwRitEzSbDBaPFuWRDzQ5QGwLtJOggcwbtr4a5VVYL+WYVeaciAMn6oZwqF/JsNhxlYm0SfT5S/0UDwEymbCyAcvhlVmkMomH5AzmPWxDujQjl2L63dR3Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780444498; c=relaxed/simple;
-	bh=r0wthUi3jn5HPrQURuOCmjomuzsJVZB1AYVmwclcANU=;
+	bh=9C8DQw0flKH0sM335ms4ayLG4jw5+1Dwb3103XIomUk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YtyjPW3RXPPZdb+xoI/ozpENdSThQuNkl09ZHhKFAkJwudOK7XOueOMjZ9HptKVE0KDhRJr8wXUfGJqwWrIkDDilkNhzbpiwNlNvgoU2LRdqs22OOO/SeLhYScQnGd0ix8NqPvjp2cney2jwiXFwOIlVMpCiNnLcWlbBO0xx2u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQzYAaxg; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=q7wxix9vTTGrR7kJNdQGxDiNNFagmzVnuddfJApyELPbpeY4HQdoSjscxfXG4vxjfbF75I6mAhxfpAU2zlM17WQwqAeBQ0/f5DsdSO+k0fJMeAcvf7HTHQvhc7Tz7wcufRUmoB9vhcbwuQC7VkayRWYlLdGGEaoHrOdZUyqeUX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WkVkjvwP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQzYAaxg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE4681F0089C;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkVkjvwP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 126101F0089A;
 	Tue,  2 Jun 2026 23:54:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780444497;
-	bh=qLw5B3Vvecy6bUO6JY+FC/YUR06xZsdpZrc65nkyjWs=;
+	s=k20260515; t=1780444496;
+	bh=0x6QdNpCBv6Ii/bbNu324c1LO1y8u1r1+aTEfVKd050=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=oQzYAaxg9/DE8MVj+B1Jz1tkKoLdx50Ss+N/6ewgjZokt4bEAMiBUiyhCCf42FajU
-	 zF4ljAV2QxSdCMcmh9vRspaY7brpIj3LsOJSLXcecYn5iHYVeC4iCjbu6ha+3OgZ2M
-	 lg5XwALiez3Va+Sx3CiJeI6qpBoB3zsCT30niF0EPGuBb5dMFFxufhPgHOi7ImxqHw
-	 DHmqXOvKqIDFPhhO+0vhwsqb2NqMs3yYdtRlPnx85SuK8XvXfYYv+hMKaUaWN2tTwZ
-	 Ia4ruTc3ykBBssQgst7vDmyg8OGfyO7dbZyLmYp1X7yWfx7SKv7BFdrzMnmBcdEVm0
-	 iEg5dIB15yC7A==
+	b=WkVkjvwPfuN+Z9MaUcb6tGtodaynhsAlbysX2XQuO6RYPO1QgDg4rc094dDQ30a1n
+	 FxPWPCse48KCXe+7XjcjGezzuUWAUxfNRwbgyHhaapE5a631Z65mt5AR+QMuL3qytU
+	 NsNyU0LJtll9v0iWRnKWtyS1Y7zSpiUPkxqhpxJUlDHY5L00wsNxz1gd8fp0DGHLF0
+	 7kCpzsjw79LAYewk67+4AmSITUnAWt2URUqd6AbTipz/93MLn7+1jPI2RoNXRo3b+v
+	 w1xefwZ9QcfV3P9BN8FYuazVRYq6jAt5yh0jxW+m03gOxabPvNOc5iaftTluvuUJsV
+	 XddUOG36lUpow==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,10 +33,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
-	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 5/5] KVM: arm64: nv: Restart stage-1 walk if stage-2 desc update fails
-Date: Tue,  2 Jun 2026 16:54:50 -0700
-Message-ID: <20260602235450.103057-6-oupton@kernel.org>
+	Oliver Upton <oupton@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/5] KVM: arm64: Don't leak PFN when kvm_translate_vncr() races MMU notifier
+Date: Tue,  2 Jun 2026 16:54:46 -0700
+Message-ID: <20260602235450.103057-2-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260602235450.103057-1-oupton@kernel.org>
 References: <20260602235450.103057-1-oupton@kernel.org>
@@ -48,33 +49,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm_walk_nested_s2() returns -EAGAIN as an indication that an underlying
-descriptor update fails due to a race. The expectation is that the
-caller restart translation, yet walk_s1() actually synthesizes an abort.
+In the case that kvm_translate_vncr() races with an MMU notifier the
+early return does not release a reference on the faulted in PFN. Add
+the necessary call to kvm_release_faultin_page() for the unused PFN.
 
-Propagate the -EAGAIN return out of walk_s1(), relying on callers to
-restart the translation fetch.
-
-Fixes: e4c7dfac2f1a ("KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW")
+Cc: stable@vger.kernel.org
+Fixes: 069a05e535496 ("KVM: arm64: nv: Handle VNCR_EL2-triggered faults")
+Reported-by: Sashiko (local):gemini-3.1-pro
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/at.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/nested.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 6cc5892023dd..4d4285e60fce 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -423,6 +423,9 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 883b6c1008fb..4fa82e96454d 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1326,8 +1326,10 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+ 	}
  
- 		if (wi->s2) {
- 			ret = kvm_walk_nested_s2(vcpu, ipa, &s2_trans);
-+			if (ret == -EAGAIN)
-+				return ret;
-+
- 			if (ret) {
- 				fail_s1_walk(wr,
- 					     (s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | level,
+ 	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
+-		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq))
++		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq)) {
++			kvm_release_faultin_page(vcpu->kvm, page, true, false);
+ 			return -EAGAIN;
++		}
+ 
+ 		vt->gva = va;
+ 		vt->hpa = pfn << PAGE_SHIFT;
 -- 
 2.47.3
 
