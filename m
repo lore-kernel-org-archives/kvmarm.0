@@ -1,477 +1,158 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ACF19D8AC;
-	Tue,  2 Jun 2026 14:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487173E9F76
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780411771; cv=none; b=WQMVTV0GRbR40j7lOTRRruytAVWVVpkeUCVED7A2QFBcgXIULHPHAWq05ZNwOOSnLtf7zquitKpHHnRVeV6TcKS7a/HtwluRI8w95lf3BpJ48THqeQOaHu5Jk4TaSZzJgMPiiCgE4VBuekKrJo4EYixBA7pKTO/CBNjqIWoibSc=
+	t=1780413124; cv=none; b=kfMGXmugpONEY6X+JuUy6N6fJDMA9k3Uc2Hb6nxR0+AK9GC+DIprIlkxj59a7cWBuKE2t2RmfmIC45fZygH51I+pdmhPrneloJgsRRohhusr+pZCbOjtaDU6GrDy54fMbzLzn3knhiXow8M2QX5rwqZk6QzCP9XfS5trOuLOTR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780411771; c=relaxed/simple;
-	bh=ckmPbFrrlbBCsj+32r73hmSAIZ202Ey2IW5dvzKVFNU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jxiHvNWis2H3v5Q+uUdoMtN8t18/xeDfT2+OjOrLeVXp5tNMdNKlQ/GABk7qnQV5bp5KB874fEj/rj9bG6oTXHlD1HPfQAes0HoARIxRsmN5nQClUXgWfACKJe2/qPtUNVi/rbd3+QY73RkNZjp5wk7u3lbhF7jqhDzg25YxD4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZLqYKzIH; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1780413124; c=relaxed/simple;
+	bh=yvzqlqjGgLCgIP9jWOj2bAwL1GBYl1xZuYdCYJ1JYhc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NK6ES8H573yqphjwmyNcEd8eU2dNc1dnWlXTbuARR/4iug1EEVgrQmCRioniX4bm9FOAwh5RS85wqGSIbRVVT6GOrQJtie0X8NijcENYubMuMUOArkxcCe3NbWdGFJjM0nT4JeD9RZF9VKJBQUMPlXq3gOQIAmOpkBnkSMxau9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UyhKNZkU; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZLqYKzIH"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UyhKNZkU"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1632C2B;
-	Tue,  2 Jun 2026 07:49:22 -0700 (PDT)
-Received: from [192.168.4.242] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C69B3F632;
-	Tue,  2 Jun 2026 07:49:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D01AF3573;
+	Tue,  2 Jun 2026 08:11:57 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 684A13F905;
+	Tue,  2 Jun 2026 08:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780411767; bh=ckmPbFrrlbBCsj+32r73hmSAIZ202Ey2IW5dvzKVFNU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZLqYKzIHSP8HMndKGizl+Yq34Zk7NUVyl5P/3st9hoGmkaNtMqXgNlC/7ifQwz9Td
-	 6Nu4pINiGvz5KAvzvKb8S70WXr7y9ekxRAVEbLDeBVY9OMsM42pSVPr4AZEVkdcKTP
-	 wKov6Yaqztx4g0geip2EIfbYI0dAxwgYIY1JCkB8=
-Message-ID: <1bb9da2a-bcc2-4232-944e-0730e9e1f45a@arm.com>
-Date: Tue, 2 Jun 2026 15:49:21 +0100
+	t=1780413122; bh=yvzqlqjGgLCgIP9jWOj2bAwL1GBYl1xZuYdCYJ1JYhc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UyhKNZkU05ypheVNB5ygr+hct8bpXWXZwc0Hw9t09nsMODZvvk7qY1S4JxiM5kAJK
+	 qMkEvr4CCXS1LTWHBQ0pzbU+lxlVVn3aCOEzuTDkwKw6RpJCOWN0umVEnyRuNERr3l
+	 sdZ6T8czKrMdUBKSt8W0O/kZNJerntoYn8EXENi0=
+From: Mark Rutland <mark.rutland@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: broonie@kernel.org,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	mark.rutland@arm.com,
+	maz@kernel.org,
+	oupton@kernel.org,
+	tabba@google.com,
+	vladimir.murzin@arm.com,
+	will@kernel.org
+Subject: [PATCH v3 00/18] arm64+KVM: FPSIMD/SVE/SME cleanups
+Date: Tue,  2 Jun 2026 16:11:32 +0100
+Message-Id: <20260602151150.925126-1-mark.rutland@arm.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 14/44] arm64: RMI: Basic infrastructure for creating a
- realm.
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-15-steven.price@arm.com>
- <86ik88ui0g.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86ik88ui0g.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Marc
+Hi.
 
-On 28/05/2026 08:10, Marc Zyngier wrote:
-> On Wed, 13 May 2026 14:17:22 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> Introduce the skeleton functions for creating and destroying a realm.
->> The IPA size requested is checked against what the RMM supports.
->>
->> The actual work of constructing the realm will be added in future
->> patches.
-> 
-> Again, $SUBJECT doesn't reflect that this is purely a KVM patch.
-> 
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v13:
->>   * Rebased and updated to RMM-v2.0-bet1.
->>   * Auxiliary granules have been removed in RMM-v2.0-bet1
->> Changes since v12:
->>   * Drop the RMM_PAGE_{SHIFT,SIZE} defines - the RMM is now configured to
->>     be the same as the host's page size.
->>   * Rework delegate/undelegate functions to use the new RMI range based
->>     operations.
->> Changes since v11:
->>   * Major rework to drop the realm configuration and make the
->>     construction of realms implicit rather than driven by the VMM
->>     directly.
->>   * The code to create RDs, handle VMIDs etc is moved to later patches.
->> Changes since v10:
->>   * Rename from RME to RMI.
->>   * Move the stage2 cleanup to a later patch.
->> Changes since v9:
->>   * Avoid walking the stage 2 page tables when destroying the realm -
->>     the real ones are not accessible to the non-secure world, and the RMM
->>     may leave junk in the physical pages when returning them.
->>   * Fix an error path in realm_create_rd() to actually return an error value.
->> Changes since v8:
->>   * Fix free_delegated_granule() to not call kvm_account_pgtable_pages();
->>     a separate wrapper will be introduced in a later patch to deal with
->>     RTTs.
->>   * Minor code cleanups following review.
->> Changes since v7:
->>   * Minor code cleanup following Gavin's review.
->> Changes since v6:
->>   * Separate RMM RTT calculations from host PAGE_SIZE. This allows the
->>     host page size to be larger than 4k while still communicating with an
->>     RMM which uses 4k granules.
->> Changes since v5:
->>   * Introduce free_delegated_granule() to replace many
->>     undelegate/free_page() instances and centralise the comment on
->>     leaking when the undelegate fails.
->>   * Several other minor improvements suggested by reviews - thanks for
->>     the feedback!
->> Changes since v2:
->>   * Improved commit description.
->>   * Improved return failures for rmi_check_version().
->>   * Clear contents of PGD after it has been undelegated in case the RMM
->>     left stale data.
->>   * Minor changes to reflect changes in previous patches.
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h | 29 ++++++++++++++
->>   arch/arm64/include/asm/kvm_rmi.h     | 51 +++++++++++++++++++++++++
->>   arch/arm64/kvm/arm.c                 | 12 ++++++
->>   arch/arm64/kvm/mmu.c                 | 12 +++++-
->>   arch/arm64/kvm/rmi.c                 | 57 ++++++++++++++++++++++++++++
->>   5 files changed, 159 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 5bf3d7e1d92c..82fd777bd9bb 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -688,4 +688,33 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->>   			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
->>   	}
->>   }
->> +
->> +static inline bool kvm_is_realm(struct kvm *kvm)
->> +{
->> +	if (static_branch_unlikely(&kvm_rmi_is_available))
->> +		return kvm->arch.is_realm;
->> +	return false;
->> +}
->> +
->> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->> +{
->> +	return READ_ONCE(kvm->arch.realm.state);
->> +}
->> +
->> +static inline void kvm_set_realm_state(struct kvm *kvm,
->> +				       enum realm_state new_state)
->> +{
->> +	WRITE_ONCE(kvm->arch.realm.state, new_state);
->> +}
->> +
->> +static inline bool kvm_realm_is_created(struct kvm *kvm)
->> +{
->> +	return kvm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
->> +}
->> +
->> +static inline bool vcpu_is_rec(const struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->> +
->>   #endif /* __ARM64_KVM_EMULATE_H__ */
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index 4936007947fd..9de34983ee52 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -6,12 +6,63 @@
->>   #ifndef __ASM_KVM_RMI_H
->>   #define __ASM_KVM_RMI_H
->>   
->> +#include <asm/rmi_smc.h>
->> +
->> +/**
->> + * enum realm_state - State of a Realm
->> + */
->> +enum realm_state {
->> +	/**
->> +	 * @REALM_STATE_NONE:
->> +	 *      Realm has not yet been created. rmi_realm_create() has not
->> +	 *      yet been called.
->> +	 */
->> +	REALM_STATE_NONE,
->> +	/**
->> +	 * @REALM_STATE_NEW:
->> +	 *      Realm is under construction, rmi_realm_create() has been
->> +	 *      called, but it is not yet activated. Pages may be populated.
->> +	 */
->> +	REALM_STATE_NEW,
->> +	/**
->> +	 * @REALM_STATE_ACTIVE:
->> +	 *      Realm has been created and is eligible for execution with
->> +	 *      rmi_rec_enter(). Pages may no longer be populated with
->> +	 *      rmi_data_create().
->> +	 */
->> +	REALM_STATE_ACTIVE,
->> +	/**
->> +	 * @REALM_STATE_DYING:
->> +	 *      Realm is in the process of being destroyed or has already been
->> +	 *      destroyed.
->> +	 */
->> +	REALM_STATE_DYING,
->> +	/**
->> +	 * @REALM_STATE_DEAD:
->> +	 *      Realm has been destroyed.
->> +	 */
->> +	REALM_STATE_DEAD
->> +};
-> 
-> What is the ABI status of this state? Is it purely internal to KVM? Or
-> is it something that the RMM actively tracks?
+This series cleans up low-level FPSIMD/SVE/SME state management code,
+making it easier to maintain and extend (e.g. adding SME support to
+KVM), and enabling better debugging (e.g. by making SVE/SME save/restore
+visible to KASAN and KCSAN).
 
-The states are in line with what the RMM maintains for the Realm state,
-(Section A2.2.5 Realm Lifecycle)
-except for :
+This is purely cleanup, there are NO bugs addressed by this series.
 
-1. REALM_STATE_DYING is really a KVM internal state to indicate, we
-are in the process of destroying the Realm and no further requests
-needs to be serviced
+The series aims to do a few key things:
 
-2. We don't track the REALM_SYSTEM_OFF, REALM_ZOMBIE states separately
-as we :
-  a) Always TERMINATE the Realm, just before the DESTROY
-  b) SYSTEM_OFF is naturally triggering the tear down path, leading to 
-DYING.
+* Make it harder to mis-manage in-memory SVE state and SME state. These
+  are given opaque types (struct sve_state and struct sme_state), and
+  the (awkward) calling convention for saving/restoring SVE state is
+  simplified to take a pointer to the base of the state rather than a
+  pointer to the FFR within the state.
 
+* Minimize duplications between KVM and the rest of the kernel. The
+  FPSIMD/SVE/SME routines are moved to inline assembly such that the
+  same helper functions can be used everywhere, without the need to wrap
+  assembly macros.
 
+* Make the code easier to follow. Assembly sequences are minimized to
+  avoid address generation and control-flow that can be written more
+  clearly in C. Awkward assembly macros are removed where possible.
 
+* Make it easier to debug state management. Explicit instrumentation is
+  added to the save/restore functions so that KASAN and KCSAN can detect
+  memory safety issues and concurrency issues.
 
-> 
->> +
->>   /**
->>    * struct realm - Additional per VM data for a Realm
->> + *
->> + * @state: The lifetime state machine for the realm
->> + * @rd: Kernel mapping of the Realm Descriptor (RD)
->> + * @params: Parameters for the RMI_REALM_CREATE command
->> + * @ia_bits: Number of valid Input Address bits in the IPA
->>    */
->>   struct realm {
->> +	enum realm_state state;
->> +	void *rd;
-> 
-> Why is this void? Doesn't it have a proper type?
+  This instrumentation is inhibited for nVHE hyp objects, and does not
+  adversely affect KVM. I've confirmed by looking at compiler flags
+  during the build, and disassembling the relevant object files.
 
-Not really. This is an object that RMM manages (Realm Descriptor)
-in the Realm world. We use it as a parameter to address the Realm.
+* Remove unnecessary code. By relying on assembler support for SVE and
+  SME we can remove awkward assembly macros, making the code
+  significantly simpler and easier to read.
 
+Since v1 [1]:
+* Add missing '.arch_extension sve' in asm.
+* Fix FPCR.Z field name.
+* Note the 'Ucj' constraint, and why we don't use it (yet).
+* Add missing 'const' usage.
+* Updates to commit messages.
+* Add tags from Mark Brown and Vladimir Murzin.
 
-> 
->> +	struct realm_params *params;
->> +	unsigned int ia_bits;
-> 
-> Consider reordering this structure to avoid holes.
-> 
->>   };
->>   
->>   void kvm_init_rmi(void);
->> +u32 kvm_realm_ipa_limit(void);
-> 
-> The use of 'realm' is confusing. This is not a per-realm property, but
-> something global. I'd rather reserve the term 'realm' for CCA VMs (cue
-> the two prototypes below).
+Since v2 [2]:
+* Rename struct sme_state to struct arm64_sme_state to avoid clash with enum
+  sme_state in drivers.
+* Rename struct sve_state to struct arm64_sve_state, to match arm64_sme_state.
+* Fix instrumentation for ZT0 to use 64 bytes (512-bit), not SVL.
+* Fix typos in commit messages.
 
-Agreed. Perhaps, kvm_rmm_ipa_limit() ?
+[1] https://lore.kernel.org/linux-arm-kernel/20260521132556.584676-1-mark.rutland@arm.com/
+[2] https://lore.kernel.org/linux-arm-kernel/20260528165446.701944-1-mark.rutland@arm.com/
 
+Mark.
 
-> 
->> +
->> +int kvm_init_realm(struct kvm *kvm);
->> +void kvm_destroy_realm(struct kvm *kvm);
->>   
->>   #endif /* __ASM_KVM_RMI_H */
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 247e03b33035..18251e561524 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -264,6 +264,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>   
->>   	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
->>   
->> +	/* Initialise the realm bits after the generic bits are enabled */
->> +	if (kvm_is_realm(kvm)) {
->> +		ret = kvm_init_realm(kvm);
->> +		if (ret)
->> +			goto err_uninit_mmu;
->> +	}
->> +
->>   	return 0;
->>   
->>   err_uninit_mmu:
->> @@ -326,6 +333,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->>   	kvm_unshare_hyp(kvm, kvm + 1);
->>   
->>   	kvm_arm_teardown_hypercalls(kvm);
->> +	if (kvm_is_realm(kvm))
->> +		kvm_destroy_realm(kvm);
->>   }
->>   
->>   static bool kvm_has_full_ptr_auth(void)
->> @@ -486,6 +495,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>   		else
->>   			r = kvm_supports_cacheable_pfnmap();
->>   		break;
->> +	case KVM_CAP_ARM_RMI:
->> +		r = static_key_enabled(&kvm_rmi_is_available);
->> +		break;
->>   
->>   	default:
->>   		r = 0;
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index d089c107d9b7..ba8286472286 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -877,10 +877,14 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->>   
->>   static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
->>   {
->> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->>   	u32 kvm_ipa_limit = get_kvm_ipa_limit();
->>   	u64 mmfr0, mmfr1;
->>   	u32 phys_shift;
->>   
->> +	if (kvm_is_realm(kvm))
->> +		kvm_ipa_limit = kvm_realm_ipa_limit();
->> +
->>   	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
->>   	if (is_protected_kvm_enabled()) {
->>   		phys_shift = kvm_ipa_limit;
->> @@ -974,6 +978,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->>   		return -EINVAL;
->>   	}
->>   
->> +	mmu->arch = &kvm->arch;
->> +
->>   	err = kvm_init_ipa_range(mmu, type);
->>   	if (err)
->>   		return err;
->> @@ -982,7 +988,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->>   	if (!pgt)
->>   		return -ENOMEM;
->>   
->> -	mmu->arch = &kvm->arch;
-> 
-> Why moving this init?
+Mark Rutland (18):
+  KVM: arm64: Don't include <asm/fpsimdmacros.h>
+  KVM: arm64: Don't override FFR save/restore argument
+  KVM: arm64: pkvm: Save host FPMR in host cpu context
+  KVM: arm64: pkvm: Remove struct cpu_sve_state
+  arm64: fpsimd: Fold sve_init_regs() into do_sve_acc()
+  arm64: fpsimd: Remove sve_set_vq() and sme_set_vq()
+  arm64: fpsimd: Use assembler for SVE instructions
+  arm64: fpsimd: Use assembler for baseline SME instructions
+  arm64: fpsimd: Move sve_get_vl() and sme_get_vl() inline
+  arm64: sysreg: Add FPCR and FPSR
+  arm64: fpsimd: Split FPSR/FPCR from SVE save/restore
+  arm64: fpsimd: Move fpsimd save/restore inline
+  arm64: fpsimd: Use opaque type for SVE state
+  arm64: fpsimd: Use opaque type for SME state
+  arm64: fpsimd: Move SVE save/restore inline
+  arm64: fpsimd: Move sve_flush_live() inline
+  arm64: fpsimd: Move SME save/restore inline
+  arm64: fpsimd: Remove <asm/fpsimdmacros.h>
 
-Because, we need to know the "kvm" instance for kvm_init_ipa_range to
-detect the limit that applies to Realms.
+ arch/arm64/Kconfig                      |   5 +
+ arch/arm64/include/asm/fpsimd.h         | 374 ++++++++++++++++++++++--
+ arch/arm64/include/asm/fpsimdmacros.h   | 357 ----------------------
+ arch/arm64/include/asm/kvm_host.h       |  27 +-
+ arch/arm64/include/asm/kvm_hyp.h        |   5 -
+ arch/arm64/include/asm/kvm_pkvm.h       |   3 +-
+ arch/arm64/include/asm/processor.h      |   7 +-
+ arch/arm64/kernel/Makefile              |   2 +-
+ arch/arm64/kernel/entry-common.c        |   8 +-
+ arch/arm64/kernel/entry-fpsimd.S        | 134 ---------
+ arch/arm64/kernel/fpsimd.c              |  90 +++---
+ arch/arm64/kvm/arm.c                    |  16 +-
+ arch/arm64/kvm/guest.c                  |   4 +-
+ arch/arm64/kvm/hyp/entry.S              |   1 -
+ arch/arm64/kvm/hyp/fpsimd.S             |  33 ---
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  23 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  20 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c         |   4 +-
+ arch/arm64/kvm/hyp/vhe/Makefile         |   2 +-
+ arch/arm64/tools/sysreg                 |  45 +++
+ 21 files changed, 485 insertions(+), 677 deletions(-)
+ delete mode 100644 arch/arm64/include/asm/fpsimdmacros.h
+ delete mode 100644 arch/arm64/kernel/entry-fpsimd.S
+ delete mode 100644 arch/arm64/kvm/hyp/fpsimd.S
 
-> 
->>   	err = KVM_PGT_FN(kvm_pgtable_stage2_init)(pgt, mmu, &kvm_s2_mm_ops);
->>   	if (err)
->>   		goto out_free_pgtable;
->> @@ -1114,7 +1119,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->>   	write_unlock(&kvm->mmu_lock);
->>   
->>   	if (pgt) {
->> -		kvm_stage2_destroy(pgt);
->> +		if (!kvm_is_realm(kvm))
->> +			kvm_stage2_destroy(pgt);
->> +		else
->> +			kvm_pgtable_stage2_destroy_pgd(pgt);
-> 
-> Why can't you make kvm_stage2_destroy() do the right thing? Surely the
-> PTs have to be reclaimed one way or another.
-
-Actually yes, we could make it work. We need to skip walking the page
-table for Realms. We may be able to do the checks via 
-pgt->mmu->arch->kvm and skip the walking for Realms. ( The S2 is 
-unmapped and torn
-down before the RD is destroyed in kvm_destroy_realm(). We can't
-rely on the contents of the PGDs to be zero - e.g., with MEC.)
-
-
-
-> 
->>   		kfree(pgt);
->>   	}
->>   }
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 6e28b669ded2..f51ec667445e 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -5,6 +5,8 @@
->>   
->>   #include <linux/kvm_host.h>
->>   
->> +#include <asm/kvm_emulate.h>
->> +#include <asm/kvm_mmu.h>
->>   #include <asm/kvm_pgtable.h>
->>   #include <asm/rmi_cmds.h>
->>   #include <asm/virt.h>
->> @@ -14,6 +16,61 @@ static bool rmi_has_feature(unsigned long feature)
->>   	return !!u64_get_bits(rmm_feat_reg0, feature);
->>   }
->>   
->> +u32 kvm_realm_ipa_limit(void)
->> +{
->> +	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
->> +}
->> +
->> +void kvm_destroy_realm(struct kvm *kvm)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
->> +
->> +	if (realm->params) {
->> +		free_page((unsigned long)realm->params);
->> +		realm->params = NULL;
->> +	}
->> +
->> +	if (!kvm_realm_is_created(kvm))
->> +		return;
->> +
->> +	kvm_set_realm_state(kvm, REALM_STATE_DYING);
->> +
->> +	write_lock(&kvm->mmu_lock);
->> +	kvm_stage2_unmap_range(&kvm->arch.mmu, 0,
->> +			       BIT(realm->ia_bits - 1), true);
->> +	write_unlock(&kvm->mmu_lock);
->> +
->> +	if (realm->rd) {
->> +		phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +
->> +		if (WARN_ON(rmi_realm_terminate(rd_phys)))
->> +			return;
->> +
->> +		if (WARN_ON(rmi_realm_destroy(rd_phys)))
->> +			return;
->> +		free_delegated_page(rd_phys);
->> +		realm->rd = NULL;
->> +	}
->> +
->> +	if (WARN_ON(rmi_undelegate_range(kvm->arch.mmu.pgd_phys, pgd_size)))
->> +		return;
->> +
->> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
->> +
->> +	/* Now that the Realm is destroyed, free the entry level RTTs */
->> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
->> +}
-> 
-> This really needs documentation: what happens at each stage? What
-> memory is reclaimed when?
-
-Agreed.
-
-> 
-> But even more importantly, why is this built in a completely parallel
-> way, potentially deviating from the existing KVM S2 management?
-
-
-RMM requires a Realm is not live at the time of REALM_DESTROY.
-(See section A2.2.4 Realm Liveness).
-i.e., All RECs are destroyed, Root RTTs wiped clean (no live mappings)
-before the RD is destroyed. So, we need to make sure all of this is
-done at Realm Destroy. Hence we delay the kvm_free_stage2_pgd() until
-we destroy the RD.
-
-Does that help? May be we could improve the comments around it.
-
-
-Suzuki
-
-
-
- > Thanks,>
-> 	M.
-> 
+-- 
+2.30.2
 
