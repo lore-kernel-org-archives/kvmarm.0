@@ -1,228 +1,156 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CA133AD99;
-	Tue,  2 Jun 2026 11:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D38359A8B
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 13:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780398944; cv=none; b=eGPSpBQRX+zDjjhLErOjHmGMfEtCVuf9kK+mLI1dn55sg+97P9s5eCSODC3sqaxW4VJrBGLipYNJMxhHwOuedPcKrpdNmSrqPW64jk7OlvLQob2aotC2T7iivMSRJMFu57ozjmBPQBUeb7VdVKurLQ/jhRg5xb/sSp2fsl0pIC4=
+	t=1780406743; cv=none; b=lCa1vZlOhT7Sjzkqxq+NrOA6ikiBmdZgvABERsW2eN/5w+96pQaPlCIA9ZdKdWe/6w6740wW+gmpsZCDvkihv89Tz2hJxGLR2oEFfKxyICqW2ouTjckp6FuvLi0El4/PB1w/JXh2r6GsqAHg72RHqRB4+uJZiwzUOrIcelFfpD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780398944; c=relaxed/simple;
-	bh=QfyHr6isq3j/daYtaiZs+C2sixCP2JlVzFq08HckBoY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bwrMPdoL/owVyH6MP4svYG5gSlPNTbHdcJig6YVllf+kf5gXxUDXuckr1slWhYAfWmIMihcKpzVmqaHioFrZrnnxvt2+zvKVAFmw4teOPuSeR7/hmQC0T1v1bPXUd3uRf11zzhIK0mYZQg37o940D6U8iZM03dSgyj9PpTZBapM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=HWujxxMN; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1780406743; c=relaxed/simple;
+	bh=20jx10Qu8sNXhZtuRF1brWTsMt8tcs1xwzSEzJdWcac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RTucuNkd/1i/gAiawyhqatU0tT7fOXuVpoFn8PPcctsWycKsHk2wCCryXhPnFhwy88TwcRsry8ebp052P76RCPOdkI8KtLP0N7VbsjLpfTQ53GiDMmoKLEed3fRkbKPgWdpaRFJsM41Zh9avF5SA5xJpJY1U3DUxuf9T/gBCWIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S4D4mFDr; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="HWujxxMN"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D4D919F6;
-	Tue,  2 Jun 2026 04:15:36 -0700 (PDT)
-Received: from [10.1.37.87] (unknown [10.1.37.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5032C3F7D8;
-	Tue,  2 Jun 2026 04:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780398941; bh=QfyHr6isq3j/daYtaiZs+C2sixCP2JlVzFq08HckBoY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HWujxxMNF0XkAEjVFicNlwsFJxdqqIdn1C5dC+VOAOA2kvFM8VFTfg4L0OUgEzkNF
-	 2ea4M4nsnSFabGaTafXGf3lGFZ8hkOkRBy7/6lAzGVKiOOFq4t88VEq0USPJsy6XJT
-	 IUIef4irKsedjTV1++WOJV1wDwD1tW01gZ7IaH0Y=
-Message-ID: <f7962e89-ae08-4ace-9201-21fb3055aeaa@arm.com>
-Date: Tue, 2 Jun 2026 12:15:35 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S4D4mFDr"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6524Zqfd1259298;
+	Tue, 2 Jun 2026 13:25:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=w8qDpKjFWjzyE3Z+3P3AumxwDBnmuL
+	FClF4s6OPO1Lg=; b=S4D4mFDrJ+YVkouLu1QaOcwlr97q412sHaGk9z2BZTfz8n
+	xvnoRSGxAhVdlU4NlUXFvgMgr1mw3zyhNRb5hBZuA4qzc/vHHsFBDXCjaDL8PDwF
+	fMlhGZA+kdxjDvsey5KGycUVDIGwknrJKtyyECDo9N4PGyK+HEBu4WtCUtRKMQZA
+	Yz3TVvKxvNVPFnCLcCZ58aQrdsTBsNJrCw6Oi5RyfhhlPq5AdSO2CCtkFLt18HFj
+	o3/6ykLfJ7pxtiVTRedwPLsZ32Mze0EIv0IrOIJ+dDKuVbzSAyMdHp/kqgCwDUsY
+	1BOBoWKQ9qjk67c+eCkrQrGrqW7QzKTymHUJViSQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4efqd465b0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Jun 2026 13:25:21 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 652DO9Yr012168;
+	Tue, 2 Jun 2026 13:25:20 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4egbqhba68-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Jun 2026 13:25:20 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 652DPEgt49742098
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 2 Jun 2026 13:25:14 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8693D2004E;
+	Tue,  2 Jun 2026 13:25:13 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 599EF20043;
+	Tue,  2 Jun 2026 13:25:13 +0000 (GMT)
+Received: from localhost (unknown [9.111.42.7])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  2 Jun 2026 13:25:13 +0000 (GMT)
+Date: Tue, 2 Jun 2026 15:25:13 +0200
+From: Andreas Grapentin <gra@linux.ibm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v1 15/26] s390: Add functions to query arm guest time
+Message-ID: <ah7Ul7YwJOFuSMaD@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
+References: <20260529155601.2927240-1-seiden@linux.ibm.com>
+ <20260529155601.2927240-16-seiden@linux.ibm.com>
+ <ah4G847iT_pPRuQm@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 13/44] arm64: RMI: Define the user ABI
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-14-steven.price@arm.com>
- <86jysovpxf.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86jysovpxf.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ah4G847iT_pPRuQm@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDEyNiBTYWx0ZWRfX86Wu1ZkmOeKQ
+ hYG8JWBI1P8fvdZHvYX/pHQiKCz9rM3lqGdXGG9paghq44fCz7yUQhjVqfYolMHIDwf+g98FKQC
+ Aj3zl8tHOPDyDut2meXADMv9XEP8o0cHJV9sHqdlPN8V3e4+kniE0zovCBryZoE7+gfU+AuHBAZ
+ JUSthv+czWchKhL9Jt88DWUW/BIVzCzQg40h0yVLJqGsIYVFvXAQDo3YvD38EgbQabOHiTWV/J6
+ yVgiBQm0devrxebNiP+9lTedkSFR0o6kpVKp9GEzKtjkvV3fXu07ZOOdE3KHZERjeOAEAehGtr9
+ 8kqSFIzLnfopiio7+QlyWXlCKBciORGj0yJyFKyV7AIJW77/zRLy33V2JCyhPCl3TqFT0YDNiCi
+ xOMafpg3k3DxCiOnI47Ya2Gt/hTCEFH4IXSNZPjwubArahqtRcGIQrlGQzNFYz+bBNKXTSM9b3X
+ MDWYNtr6RC1RzihzigA==
+X-Proofpoint-GUID: RQpxdw-KhYBz1s8-_4mzf7xnJNeZoSB_
+X-Proofpoint-ORIG-GUID: RQpxdw-KhYBz1s8-_4mzf7xnJNeZoSB_
+X-Authority-Analysis: v=2.4 cv=DZknbPtW c=1 sm=1 tr=0 ts=6a1ed9c1 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
+ a=iZEGHWcCgkw3lVQR3mYA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-02_02,2026-05-28_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015 suspectscore=0 impostorscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606020126
 
-Hi Marc
-
-On 27/05/2026 16:21, Marc Zyngier wrote:
-> On Wed, 13 May 2026 14:17:21 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> There is one CAP which identified the presence of CCA, and one ioctl.
->> The ioctl is used to populate memory during creation of the realm as
->> this requires the RMM to copy data from an unprotected address to the
->> protected memory - CCA does not support memory conversion where the
->> memory contents is preserved as this is incompatible with memory
->> encryption.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v13:
->>   * KVM_ARM_VCPU_RMI_PSCI_COMPLETE removed.
->>   * KVM_ARM_RMI_POPULATE documentation updated to reflect that the
->>     structure is written by the kernel.
->>   * CAP number bumped.
->> Changes since v12:
->>   * Change KVM_ARM_RMI_POPULATE to update the structure with the amount
->>     that has been progressed rather than return the number of bytes
->>     populated.
->>   * Describe the flag KVM_ARM_RMI_POPULATE_FLAGS_MEASURE.
->>   * CAP number is bumped.
->>   * NOTE: The PSCI ioctl may be removed in a future spec release.
->> Changes since v11:
->>   * Completely reworked to be more implicit. Rather than having explicit
->>     CAP operations to progress the realm construction these operations
->>     are done when needed (on populating and on first vCPU run).
->>   * Populate and PSCI complete are promoted to proper ioctls.
->> Changes since v10:
->>   * Rename symbols from RME to RMI.
->> Changes since v9:
->>   * Improvements to documentation.
->>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
->> Changes since v8:
->>   * Minor improvements to documentation following review.
->>   * Bump the magic numbers to avoid conflicts.
->> Changes since v7:
->>   * Add documentation of new ioctls
->>   * Bump the magic numbers to avoid conflicts
->> Changes since v6:
->>   * Rename some of the symbols to make their usage clearer and avoid
->>     repetition.
->> Changes from v5:
->>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
->> ---
->>   Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++++++++++++++
->>   include/uapi/linux/kvm.h       | 13 +++++++++++
->>   2 files changed, 53 insertions(+)
+On Jun 01 26, Oliver Upton wrote:
+> > Add functions to convert between ARM guest time (LSB0) and s390 host
+> > time (MSB0) using new ptff function codes.
+> > 
+> > Co-developed-by: Nico Boehr <nrb@linux.ibm.com>
+> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >  arch/s390/include/asm/timex.h | 49 +++++++++++++++++++++++++++++++++++
+> >  arch/s390/kernel/time.c       |  1 +
+> >  arch/s390/kvm/arm64/arm.c     |  9 ++++++-
+> >  3 files changed, 58 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/s390/include/asm/timex.h b/arch/s390/include/asm/timex.h
+> > index 49447b40f038..9ec22a28bbda 100644
+> > --- a/arch/s390/include/asm/timex.h
+> > +++ b/arch/s390/include/asm/timex.h
+> > @@ -99,6 +99,8 @@ extern unsigned char ptff_function_mask[16];
+> >  #define PTFF_QSI	0x02	/* query steering information */
+> >  #define PTFF_QPT	0x03	/* query physical clock */
+> >  #define PTFF_QUI	0x04	/* query UTC information */
+> > +#define PTFF_QAGTO	0x10	/* query arm guest time offset */
+> > +#define PTFF_QAGPT	0x11	/* query arm guest physical time offset */
 > 
-> $SUBJECT looks wrong. This is a KVM change, not an RMI change.
-> 
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 52bbbb553ce1..ca68aae7faa2 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6553,6 +6553,37 @@ KVM_S390_KEYOP_SSKE
->>     Sets the storage key for the guest address ``guest_addr`` to the key
->>     specified in ``key``, returning the previous value in ``key``.
->>   
->> +4.145 KVM_ARM_RMI_POPULATE
->> +--------------------------
->> +
->> +:Capability: KVM_CAP_ARM_RMI
->> +:Architectures: arm64
->> +:Type: vm ioctl
->> +:Parameters: struct kvm_arm_rmi_populate (in/out)
->> +:Returns: 0 on success, < 0 on error
->> +
->> +::
->> +
->> +  struct kvm_arm_rmi_populate {
->> +	__u64 base;
->> +	__u64 size;
->> +	__u64 source_uaddr;
->> +	__u32 flags;
->> +	__u32 reserved;
->> +  };
->> +
->> +Populate a region of protected address space by copying the data from the
->> +(non-protected) user space pointer provided into a protected region (backed by
->> +guestmem_fd). It implicitly sets the destination region to RIPAS RAM. This is
->> +only valid before any VCPUs have been run. The ioctl might not populate the
->> +entire region and in this case the kernel updates the fields `base`, `size` and
->> +`source_uaddr`. User space may have to repeatedly call it until `size` is 0 to
->> +populate the entire region.
->> +
->> +`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
->> +populated data is hashed and added to the guest's Realm Initial Measurement
->> +(RIM).
-> 
-> Where is that measurement stored? And retrieved? At least a pointer to
-> that would help.
+> Are these analogous to CNTVOFF_EL2 and CNTPOFF_EL2?
 
-The measurement is stored by the RMM and is made available to the Guests
-via RSI interface (RSI_ATTEST_TOKEN_{INIT,CONTINUE}) as part of the 
-attestation report along with the Platform attestation. On Linux Guest,
-this could be fetched using TSM report infrastructure. This could be 
-added to the doc.
+They are somewhat related -- we don't have the EL2 counter offset
+registers, but we still need to virtualize the guest counters, so
+instead we have to maintain the guest counter offset separately.
 
+However, to determine the correct guest counter offset, we are using
+these new PTFF function codes to translate between the s390 and arm64
+architected counter domains.
 
-Suzuki
-
-
-
-> 
->> +
->>   .. _kvm_run:
->>   
->>   5. The kvm_run structure
->> @@ -8904,6 +8935,15 @@ helpful if user space wants to emulate instructions which are not
->>   This capability can be enabled dynamically even if VCPUs were already
->>   created and are running.
->>   
->> +7.47 KVM_CAP_ARM_RMI
->> +--------------------
->> +
->> +:Architectures: arm64
->> +:Target: VM
->> +:Parameters: None
->> +
->> +This capability indicates that support for CCA realms is available.
->> +
->>   8. Other capabilities.
->>   ======================
->>   
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 6c8afa2047bf..b8cff0938041 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -996,6 +996,7 @@ struct kvm_enable_cap {
->>   #define KVM_CAP_S390_USER_OPEREXEC 246
->>   #define KVM_CAP_S390_KEYOP 247
->>   #define KVM_CAP_S390_VSIE_ESAMODE 248
->> +#define KVM_CAP_ARM_RMI 249
->>   
->>   struct kvm_irq_routing_irqchip {
->>   	__u32 irqchip;
->> @@ -1669,4 +1670,16 @@ struct kvm_pre_fault_memory {
->>   	__u64 padding[5];
->>   };
->>   
->> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM */
->> +#define KVM_ARM_RMI_POPULATE	_IOWR(KVMIO, 0xd7, struct kvm_arm_rmi_populate)
->> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE	(1 << 0)
->> +
->> +struct kvm_arm_rmi_populate {
->> +	__u64 base;
->> +	__u64 size;
->> +	__u64 source_uaddr;
->> +	__u32 flags;
->> +	__u32 reserved;
->> +};
->> +
->>   #endif /* __LINUX_KVM_H */
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+Best,
+Andreas
