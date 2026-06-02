@@ -1,90 +1,39 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA403A8734
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 09:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190902BD5B4
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 10:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780392726; cv=none; b=cADkkbDH/Mm06N0bmqULUoZV1D80GAclNqyGEuNRH5tHs4BZkrno6XW5wLpmpuHM7mN7ndlUbdPO4fsV9pIClZnh3bwQxgl56yeEd0o9/t2FkSU1U0HFbxs5VqX2NQbHscZUzqZEDYKP1+8KGBbDQmTO9VHbGrnGigeX6bZepps=
+	t=1780394750; cv=none; b=a2TAfWKo7VmC1kMv3VtP4Na5RhJEgG9h0KNNeE2UEDgXhfE8nyuWWnNbWOfxT2PtPkop9M/1K4OLtOlk9jMoKO3dG4CviPACBka62qCxTS5DvqVrVDwqYpiov4bWmES0XHjuK7Y9ekSfR9kAGtFcMCse+/se4Bm2Rw3yV+rtr2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780392726; c=relaxed/simple;
-	bh=TIXCMYnAz3nRbCiUwoctdyQBtytJ2XAwCJkfxKTlymA=;
+	s=arc-20240116; t=1780394750; c=relaxed/simple;
+	bh=KkZL3kZjlzIKZDczsKUqHdtUtCFsETbMqyj175b7mTo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4tZCYAm88DwPCa6NKCXEwiWctsV19h8a6nfLCj7iqB56T8beYE3lAgTdeQO+3dXmNBxjKtslnLWVd71Nk5btDqXr0sKKljWJWmC0GztQb5gnUO5KiFCKtkmy0qnFEGx3lDJQaLAlPFTp9bekheJYvbUKbzj+WuWH9Uy6+nqWl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l+xomWIK; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=rKPwuzkKBra0DXncuXrInDEda0iFEBsXKQdlzcGsCVWd9lC4V6yqjHQ1OvM+A/p5hPq+CziXetkbpTmrngRcIflqPbk6LjuNAvfSY8PxVc6C6hsWvODNtfXExP0RxwpdCLTaeA7ai0ZER1PTI5EkZth9td/0TqcDB43jkYXqXdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kl9GGNH0; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l+xomWIK"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6527V5c63295133;
-	Tue, 2 Jun 2026 09:31:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=WJm6ApGKzkKEwcgHKyf0jD9MBtlkYj
-	Ex4H0AHzDW9eE=; b=l+xomWIK0Wq/E3Qmh5M/Qa5Hg9vz3Dby5OZC/T+ea4kynl
-	gAbetBvgebQYozhB3j84HFl+y1JnIDw14XV39nhN+TQvXrdYDCFROXHwvSciRsy/
-	sEMEHUdG5ha4E52FiYkjg6XUb2dYUisuut/zO/cKNLkWvjRLufioCofWY6YwJc04
-	4naPjx7U2I5YP6q2v1iUPdskZBZnfV1HbQfd9AXJZQz1pUEdag0v8K5vk5lUPeuV
-	BgIcV51neP/HPcS9wOMmoL5U37wf+cpf6LL3K0VDpdGrBmJhk0WmAqxrxvm6VFb5
-	XGhnuTkpZZTVva4a7ni2k8KGKOvgtIyerx9RgACA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4efnahmyt8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jun 2026 09:31:41 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6529O5pD006737;
-	Tue, 2 Jun 2026 09:31:40 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4egb7k2j23-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jun 2026 09:31:40 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6529VXP530933318
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 2 Jun 2026 09:31:33 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B2A872004B;
-	Tue,  2 Jun 2026 09:31:33 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 863C220043;
-	Tue,  2 Jun 2026 09:31:33 +0000 (GMT)
-Received: from localhost (unknown [9.111.42.7])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  2 Jun 2026 09:31:33 +0000 (GMT)
-Date: Tue, 2 Jun 2026 11:31:33 +0200
-From: Andreas Grapentin <gra@linux.ibm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 10/26] KVM: arm64: Fix set_oslsr_el1 to write to
- OSLAR_EL1
-Message-ID: <ah6fmaSnsM_o8NcR@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
-References: <20260529155601.2927240-1-seiden@linux.ibm.com>
- <20260529155601.2927240-11-seiden@linux.ibm.com>
- <ah4F7dAEA7LFz5fN@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kl9GGNH0"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9091B2309;
+	Tue,  2 Jun 2026 03:05:43 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD7C83F632;
+	Tue,  2 Jun 2026 03:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780394748; bh=KkZL3kZjlzIKZDczsKUqHdtUtCFsETbMqyj175b7mTo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kl9GGNH0LnDyLs5hJh70fo+fntDxJSbU2Yh7BKyfzbFXGHXr6zUg7scfVNhUXhJ6R
+	 Tp5b86PaKl4aa1R0+OHqUW2VZoiwL2z7hFbRPTGwyJS4O/emX/3sQWJUpn62KB2TO+
+	 I+SiFLWoFYfwTYzfDP/8n5OD6HQLahyViUhrFJj4=
+Date: Tue, 2 Jun 2026 11:05:32 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Fix handling of XN[0] when !FEAT_XNX
+Message-ID: <c6ygqahq5cnk7b3q2hyy7aiagmnvytizp7sksjqz6qo57ghifa@ruflsb5snx2s>
+References: <20260602072759.37885-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -93,56 +42,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ah4F7dAEA7LFz5fN@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDA4NSBTYWx0ZWRfX181A+AGJbeaJ
- 8ee4QN6Pl/iBbMATYkWypcyDwv6rUrkLP5JzfF7elSisdcNiLdyb/GH/XLGmsEIojCMBlMmZl1W
- J5f0tMDzUXrw/APH/4C+ne3LmOeaPgyRU7G9Wr/QMZW1gyo6mXjXgH308urEAZDt8Ozc+ngigPJ
- wwKCBu88QTWK3bM2kyMRCWnLNHbxsjdIiNXAiYhxOghTJ9GKhKyoj55EdC0bd5PXpRZ4VGVMrrp
- 8yWeSy1L5jVDOSrPQxyUYnpiTYgEK3xbqUQSywWCN7bZz7Po0xmLBFFLaPeLP7s9H+DGf4UfNvC
- mSHoVMJTnRPUl5UGdOk2+pgPv+T7kMmUnfqYVab5j9f4BprRxQmEc8l1blBRvstLGNAW2XcAWrx
- ELKmit3Op2fgvb349mJAFb1CUe3kjfAZwLwJKq9r4nOF1dqb/0fnnVG5E+g+EVOhLMFqifarP02
- c1g4o1q97OFnAvS2ZlQ==
-X-Proofpoint-ORIG-GUID: UcBU39xqv_22mUun1G5fgwQbsPs36BwG
-X-Authority-Analysis: v=2.4 cv=cOzQdFeN c=1 sm=1 tr=0 ts=6a1ea2fd cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=EMFgzdqWpYFkXg4I9EcA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: UcBU39xqv_22mUun1G5fgwQbsPs36BwG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-01_07,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 impostorscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
- malwarescore=0 phishscore=0 suspectscore=0 priorityscore=1501 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606020085
+In-Reply-To: <20260602072759.37885-1-oupton@kernel.org>
 
-On Jun 01 26, Oliver Upton wrote:
-> The current behavior of KVM is correct. KVM treats OSLSR_EL1 as the
-> stateful representation of the OS lock and is RO from the guest POV.
+On Tue, Jun 02, 2026 at 12:27:59AM -0700, Oliver Upton wrote:
+> XN has already been extracted from its bitfield position so using
+> FIELD_PREP() on the mask that clears XN[0] is completely broken, having
+> the effect of unconditionally granting execute permissions...
 > 
-> We keep the UAPI straightforward by making this register RW from
-> userspace, such that the VMM can directly write back the value returned
-> from KVM_GET_ONE_REG.
+> Fix the obvious mistake by manipulating the right bit.
 > 
-> Do you have another reason for using OSLAR_EL1 as the canonical
-> representation?
+> Cc: stable@vger.kernel.org
+> Fixes: d93febe2ed2e ("KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2")
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 091544e6af44..f5d4eb925198 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -131,7 +131,7 @@ static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *t
+>  	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+>  
+>  	if (!kvm_has_xnx(kvm))
+> -		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
+> +		xn &= BIT(1);
+>  
+>  	switch (xn) {
+>  	case 0b00:
+> @@ -147,7 +147,7 @@ static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *t
+>  	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+>  
+>  	if (!kvm_has_xnx(kvm))
+> -		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
+> +		xn &= BIT(1);
 
-Ah, thanks for pointing that out!
+I think using 0b10 here can improve styling consistency very slightly,
+but either way,
 
-this change must have bled into the shared KVM code by mistake, it was
-supposed to live in the s390 specific code because it deals with an s390
-specific quirk. It was not intended for this change to have any impact
-on the native arm64 KVM implementation.
+Reviewed-by: Wei-Lin Chang <weilin.chang@arm.com>
 
-on s390, we need to map the userspace writes of OSLSR_EL1 to OSLAR_EL1,
-because OSLSR_EL1 is write-only for the facilities that are available to
-us to write system registers. But that detail should be confined to an
-s390-specific implementation of set_oslsr_el1.
-
-We'll amend this for v2.
-
-Best,
-Andreas
+>  
+>  	switch (xn) {
+>  	case 0b00:
+> 
+> base-commit: 5d6919055dec134de3c40167a490f33c74c12581
+> -- 
+> 2.47.3
+> 
