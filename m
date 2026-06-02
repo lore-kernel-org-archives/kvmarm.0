@@ -1,87 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB25364E80;
-	Tue,  2 Jun 2026 07:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205CB24EAB1
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 07:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780385283; cv=none; b=cQlYKWUThdGULK34nw6BeoHCmPu4TL8osKgvV4lx5VMf9JLi5HtdJXii+XBZfGZOS7A3OSLZDMuG36WA0E8HpmoqrQhwxvRgw0y1x14mBBeCU0IFse6DEOhdIkZJYF7Tbg549dpoOtuUaW3HdiWR6Se8Xi702rmWkBgf33xkr4w=
+	t=1780386745; cv=none; b=lSs1h3DVqoAxXJhst5G938+DStZTdwMixnEQI8E1fvyON7CCK1HaaaDM64Q3vvxdN3Y83lO5+2csi6pH26YbvIcfxKQ2uPNK3c92JQfvviqaGZkaiaQsiysbDvjtz7MDUOrPtsMztlrLusez520bgsiF/cR4v2BoTyvYBMgNeto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780385283; c=relaxed/simple;
-	bh=hhvCEdB/JJDW0uD2o6q9xX0G9xeuu8KLHs00YAyAOhw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tBzcMHgUP6AFaphKEzCmItIdzlC3CciukTPcGWOerDnHcpF7NpMsn2wLLOgXO3DxGNRRE7G+JtpmUsj0VDBjhnWeivANLw6/0CyJP0uhjRqIn8XM2mmwv8w0mxXtb/kmuBE1FaVRUcwSZF6EcYl/xVz2zvKn0VC4t4KiYjZlcxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FnzFNL6a; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780386745; c=relaxed/simple;
+	bh=eiSYb56ISqHiWW85Bez4/clFZUsfcUNxHe8kRpVIXmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mQCcIwUqfdvAhxVGlOPdLm4UWTEd1C7UDUm/7sGgcAv/Y3399fwcOpm5yW+zISR0Oraue0KGGKNKXZab8Rf7KuV7XjtDiqun7pnbjdI7sLnVYM5cc01yrOcOOJ9GZqMnuslsCzu8VpY1PIyI5oP+vu0jIEhvnxAg8G5nhs8Tbwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPksQNNn; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnzFNL6a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E571F00893;
-	Tue,  2 Jun 2026 07:28:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780385281;
-	bh=o+FDLE073g6f02yiEQlUrQXnN1L23r2BUAEWpK9WN/I=;
-	h=From:To:Cc:Subject:Date;
-	b=FnzFNL6asX5tiFGJ4FDSnxLwOmy6GVVmW4vf+EYKUjmUoLh4F3hUctWRp+axCGwvj
-	 gj/Z0rFeF2XuN24vyslrQfotXvmb6QuqsZ7GAJNYAkfAjLZlpeIWxcm6pFYehWLA/H
-	 ZvbCKJ5elcyVa+N5FEbO/ROhNUsgoiLmn3G3C1L5ienKArfehr4dShRw+9kdCnqFEi
-	 F0oAhh2xEQ0Rq9Nesu2TD6J42LGHaFGzGBvEWiyquklyEWjibFOWccLHvdct3ibXha
-	 wH+tCF/7Dj7QUCex/VoYasg7a3zAtqiasw4Y662pOTiL3N1e1UhpE7IvTbKzGYvu+o
-	 GLK05HYzZVimA==
-From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oupton@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: nv: Fix handling of XN[0] when !FEAT_XNX
-Date: Tue,  2 Jun 2026 00:27:59 -0700
-Message-ID: <20260602072759.37885-1-oupton@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPksQNNn"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-842358aaf36so851184b3a.2
+        for <kvmarm@lists.linux.dev>; Tue, 02 Jun 2026 00:52:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780386743; x=1780991543; darn=lists.linux.dev;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hP2LSLOcJwd8pqW0+7W9R4omsBDhLT1ZDgtaEvUzbZw=;
+        b=CPksQNNngh4HlLTRaC5wnuIzos6C9Vd7r89Lx6UEwpfjJAdoY8cV3s5fxGBpdBc8mr
+         V4txTzJyDUCoEqvGaYWWWiyNVai9TsuObtHX+1hqyKOqsHmaj7I0toG/VeKaWZcPwNI1
+         3/jhgS4of2xK1j/SGpd1MWAjS1FZgmFXKaRhvfyLYF1T41+MvclcIEFCNEaH9GFhOV/r
+         QGzoz1FFzfual2i6w4B/PTLTQKBFhrvWbfKdDNobg5oz9s+bo5fTwO5sUjhzYcfClX08
+         FwGfk6BN+wzJEBMMkiy0l4kZ8WZ9P2k/2B2vn0UVFlsk6ImQqaIj5HlmFWsbc1DNf4qo
+         FnqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780386743; x=1780991543;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hP2LSLOcJwd8pqW0+7W9R4omsBDhLT1ZDgtaEvUzbZw=;
+        b=srCO4RVr/+g9cGq0spskw0zlb+E0An6ohgv3wk4D3kzdFPOwpQk4gKrleXm5wFTnYP
+         +CrRW0fOlKV2E45mL29R22o7JkY3aM8kPZzH5udOas69LWp29vzYqX+Dyr9m1z//yGR/
+         OtQt2E4Yl814x7N4t/2LWwXUVsKqDEPv9dHQ4+cDYnc3P2NbUofPB/dQxYua0+cMQozW
+         X+pESCJJ2qBSQP9DPXr1jzyu6PcrMedK6Zr3lQwdWcGgTxWkUG5hSSQiZRXcEvHs7Kig
+         mGFBCaBsJIzpVlU37sk2F9Zij9G1wKX6DGXgTOrfUDKvMDkN3zufiG3qIN6LeF2bZCpJ
+         EXKg==
+X-Forwarded-Encrypted: i=1; AFNElJ9IqjFeqSPZLQtRHz9WZtBehzRYd0VLTR0zFf/GeCfFNlS0mOa7GXBp66cwIKru/NCQT8EGlP4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyOMXlkTGo8gR2m9Sk/3BTlkXRoQvrfYM8CYXpvxLPaY2l6yNYo
+	Z61BzU1Vr72i92rAM2nav1KG2He7jJmLySIUWPbMEE5oQlbBtycP+5iH
+X-Gm-Gg: Acq92OGeLEt97KrszQkRz0CQwsYXhsJ+J0n9ILml+WpNFfiO994qLPP2zg+gQy3xHDu
+	53cCyni+3+Jc4o6gIn5IDXZBnl4KjAPjLB0mBQhNKKixYN+sAefnaHlG6OOrJM59ka/KL817I7p
+	PfjdsF2fTwhsPmuMsKpkgH3eLAChnpjO3Kj3KYnvLvz3QE357IUO7zpLKt90lxdr87jEryV2xMu
+	1oejTq/D1jmDiTAtDo9MUBZbEOvN5oQJOoUHg9XatRojnMqpFY5GRbZl3NENfihQXmsSjMubC+I
+	trTFtMM+a4YnGS26H0RlKhHEMR/vId2/DHL9ISyvMqDmF07Ft35D3+IOiX8spfN5Bb4pjcU88TK
+	Mv4AJ1R/p8UwzLG1rxVyjg2O+v6rrhfrOlU0XrRhaTv/lGvR6wtMPAzh/4qNbFXuTOM9W6B5Q36
+	3cnXYri8ZhAmR7vHd/ubqysnQX7EA9HYTojeuU+NEBVEvkDo60fKQzRp/myfiA5ua3
+X-Received: by 2002:a05:6a00:3cd3:b0:835:6388:655d with SMTP id d2e1a72fcca58-84225401e17mr12812962b3a.14.1780386743362;
+        Tue, 02 Jun 2026 00:52:23 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8423dc9f361sm7534426b3a.24.2026.06.02.00.52.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 00:52:22 -0700 (PDT)
+Date: Tue, 2 Jun 2026 16:52:18 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kees@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	imv4bel@gmail.com
+Subject: [PATCH v2] KVM: arm64: vgic-its: Serialize translation cache
+ invalidation under its_lock
+Message-ID: <ah6Lsi4MfKUU6wBR@v4bel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-XN has already been extracted from its bitfield position so using
-FIELD_PREP() on the mask that clears XN[0] is completely broken, having
-the effect of unconditionally granting execute permissions...
+vgic_its_invalidate_cache() walks the per-ITS translation cache with
+xa_for_each() and drops the cache's reference on each entry with
+vgic_put_irq().
 
-Fix the obvious mistake by manipulating the right bit.
+It must be called with its_lock held. The ITS command handlers and the
+ITS teardown path hold it, but two paths that also invalidate the cache do
+not: the GITS_CTLR write path holds only cmd_lock, and the path that
+clears EnableLPIs in a redistributor's GICR_CTLR holds neither lock. Two
+contexts without a common lock, such as two vCPUs clearing EnableLPIs or
+an EnableLPIs clear racing an ITS command, can drain the same cache at
+once. If both observe an entry, erase it and then put it, the single
+reference the cache holds on that entry is dropped more than once, and the
+entry can be freed while an ITE still maps it.
+
+Take its_lock in the two paths that lacked it: the GITS_CTLR write path
+and vgic_its_invalidate_all_caches(), which clears EnableLPIs. Since
+vgic_its_invalidate_all_caches() now takes a mutex, it can no longer walk
+kvm->devices under rcu_read_lock(), so walk it under kvm->lock instead.
+With its_lock held across every invalidation, each entry is erased and put
+by a single context, so the cache reference is dropped exactly once.
 
 Cc: stable@vger.kernel.org
-Fixes: d93febe2ed2e ("KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2")
-Signed-off-by: Oliver Upton <oupton@kernel.org>
+Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
+Suggested-by: Oliver Upton <oupton@kernel.org>
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
- arch/arm64/include/asm/kvm_nested.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes in v2:
+- Serialize the invalidation under its_lock as suggested by Oliver,
+  instead of v1's gating of the put on the xa_erase() return value.
+- v1: https://lore.kernel.org/all/ah2c5lu4JbUg7dj-@v4bel/
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 091544e6af44..f5d4eb925198 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -131,7 +131,7 @@ static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *t
- 	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 1d7e5d560af4..4bf60fa5bd7c 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -596,6 +596,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
+ 	struct vgic_irq *irq;
+ 	unsigned long idx;
  
- 	if (!kvm_has_xnx(kvm))
--		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
-+		xn &= BIT(1);
++	lockdep_assert_held(&its->its_lock);
++
+ 	xa_for_each(&its->translation_cache, idx, irq) {
+ 		xa_erase(&its->translation_cache, idx);
+ 		vgic_put_irq(kvm, irq);
+@@ -607,17 +609,16 @@ void vgic_its_invalidate_all_caches(struct kvm *kvm)
+ 	struct kvm_device *dev;
+ 	struct vgic_its *its;
  
- 	switch (xn) {
- 	case 0b00:
-@@ -147,7 +147,7 @@ static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *t
- 	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+-	rcu_read_lock();
++	guard(mutex)(&kvm->lock);
  
- 	if (!kvm_has_xnx(kvm))
--		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
-+		xn &= BIT(1);
+-	list_for_each_entry_rcu(dev, &kvm->devices, vm_node) {
++	list_for_each_entry(dev, &kvm->devices, vm_node) {
+ 		if (dev->ops != &kvm_arm_vgic_its_ops)
+ 			continue;
  
- 	switch (xn) {
- 	case 0b00:
-
-base-commit: 5d6919055dec134de3c40167a490f33c74c12581
+ 		its = dev->private;
++		guard(mutex)(&its->its_lock);
+ 		vgic_its_invalidate_cache(its);
+ 	}
+-
+-	rcu_read_unlock();
+ }
+ 
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+@@ -1725,8 +1726,10 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+ 		goto out;
+ 
+ 	its->enabled = !!(val & GITS_CTLR_ENABLE);
+-	if (!its->enabled)
++	if (!its->enabled) {
++		guard(mutex)(&its->its_lock);
+ 		vgic_its_invalidate_cache(its);
++	}
+ 
+ 	/*
+ 	 * Try to process any pending commands. This function bails out early
 -- 
-2.47.3
+2.43.0
 
