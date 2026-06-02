@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D68A3EAC9A
-	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F503EA959
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jun 2026 15:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780413139; cv=none; b=HrGIgeut4BpX6B5yRFl3hHjD7eLG9Cn5QdUJtMIquec79Wb/EG61M9tmYDdAKhpNh5vgk2E3VWMVcM/uuSjNMDsN6/ew7duvMvKB1etrvsuDWceoew+eCETuUKXY6djcZKST0l2dQ6gjOswbb/anNFbEdtSU/MIwDhHjiusoqMQ=
+	t=1780413141; cv=none; b=cquTeqAiTC8e5yWrNrwr55gufCDAQavWXhvqL011pE5Lx8fg236jVy+7MQDltZlHbZk06qIt4zLPaNzsbj0lH5+FFN5mugY6Q6YY7oJrz1X1A6C5fN7J1AYOg5uCIXvWCiF/L6j0MJu5tLbKW06jZmGoOKClvE1y5Jw8EAb88+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780413139; c=relaxed/simple;
-	bh=yiYr0l0Iv497+flH8aCC3mO7kOKlOwem5IyW68INDow=;
+	s=arc-20240116; t=1780413141; c=relaxed/simple;
+	bh=tfNiCaPdt6lXy9Oj563avrybTGVNuAd0dPWiS+fz9tk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mVSWVn+hZy56NaKSiLJtdqHbLVgEspKdPv5DkX3A+gjUVShoB4AC1GRKCP4JpJZpTw+95InT1tHv3xZszNfl1qtiZexVoYTAhda0ntxf0ts5Y5Z3GGWc14QXDP0I1lCSqdFZiLXW09cLc8+xhYWsN7wJo+Q+AL1x2k5r3WSWvJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=HlPXb55T; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=oshSQg0OHAFwqvJg6renJM1x6SBopbhGPNwiWF2ptePs9o+aQUXblEvWoCU8U9ujqIYqw05Td5FZjkKpikGGpszhmQowES1WhFX136IgqPo64kIu7RlziFUNocGT7/9j+Xi4pDkzy1Ja5VWEvi48nKNougWquokmlE5Xoc0n2GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TB5vboFX; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="HlPXb55T"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TB5vboFX"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 268803582;
-	Tue,  2 Jun 2026 08:12:13 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C671E3573;
+	Tue,  2 Jun 2026 08:12:14 -0700 (PDT)
 Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AE2853F7D8;
-	Tue,  2 Jun 2026 08:12:16 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 59CED3F7D8;
+	Tue,  2 Jun 2026 08:12:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780413138; bh=yiYr0l0Iv497+flH8aCC3mO7kOKlOwem5IyW68INDow=;
+	t=1780413139; bh=tfNiCaPdt6lXy9Oj563avrybTGVNuAd0dPWiS+fz9tk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HlPXb55TJkY6G0wVbhhGKMzRA9cJaCLZ8u0zG2+og1UUhouCM8nXTB0a6Bs1vi/JH
-	 HxHH71/Ou9mWPeJvn5pg2J4UM7+J3Qd1XQkk4Qc1sdjORKWaLte4KZ6n04flBwxRo+
-	 33ZjqNDwUw3rA+/bjFZVxZFxMOI/mejvZxQLavXc=
+	b=TB5vboFXf1L+XJlnlFXAEr0pLWp0VQc61XogKihAerCed0ArjIjNTFG3tbrlAT8Ee
+	 lGAoHY6wAP1sdUKk0IpphLPJGiIX+TBQAElvQlDS9VKucod5BSeFkCoxzB37HSFAqp
+	 cyoUHygOcXYP3FajcGKVWu73XJfLP2zfZ46CFrho=
 From: Mark Rutland <mark.rutland@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -38,9 +38,9 @@ Cc: broonie@kernel.org,
 	tabba@google.com,
 	vladimir.murzin@arm.com,
 	will@kernel.org
-Subject: [PATCH v3 05/18] arm64: fpsimd: Fold sve_init_regs() into do_sve_acc()
-Date: Tue,  2 Jun 2026 16:11:37 +0100
-Message-Id: <20260602151150.925126-6-mark.rutland@arm.com>
+Subject: [PATCH v3 06/18] arm64: fpsimd: Remove sve_set_vq() and sme_set_vq()
+Date: Tue,  2 Jun 2026 16:11:38 +0100
+Message-Id: <20260602151150.925126-7-mark.rutland@arm.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20260602151150.925126-1-mark.rutland@arm.com>
 References: <20260602151150.925126-1-mark.rutland@arm.com>
@@ -52,14 +52,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For historical reasons, do_sve_acc() is structurally different from
-do_sme_acc(), and the logic to convert the task from FPSIMD to SVE is
-out-of-line in sve_init_regs(). We only use sve_init_regs() within
-do_sve_acc(), so it's not necessary for this to be a separate function.
+The sve_set_vq() and sme_set_vq() assembly functions (and the
+sve_load_vq and sme_load_vq macros they use) are open-coded forms of
+sysreg_clear_set*(). There's no need for these to be implemented
+out-of-line in assembly, and the 'vq_minus_1' argument is unusual and
+confusing.
 
-Fold sve_init_regs() into do_sve_acc(), and simplify the associated
-comments. This makes do_sve_acc() structurally similar to do_sme_acc(),
-making it easier to see similarities and differences.
+Use sysreg_clear_set_s() directly, where the necessary 'vq - 1' encoding
+is more obviously part of encoding the register value.
+
+For now, sve_flush_live() is left with the unusual vq_minus_1 argument.
+This will be addressed in subsequent patches.
 
 There should be no functional change as a result of this patch.
 
@@ -73,76 +76,142 @@ Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oupton@kernel.org>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kernel/fpsimd.c | 48 ++++++++++++++------------------------
- 1 file changed, 17 insertions(+), 31 deletions(-)
+ arch/arm64/include/asm/fpsimd.h       |  2 --
+ arch/arm64/include/asm/fpsimdmacros.h | 22 ----------------------
+ arch/arm64/kernel/entry-fpsimd.S      | 10 ----------
+ arch/arm64/kernel/fpsimd.c            | 24 +++++++++++++-----------
+ 4 files changed, 13 insertions(+), 45 deletions(-)
 
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index d9d00b45ab115..8efa3c0402a7a 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -146,8 +146,6 @@ extern void sve_load_state(void const *state, u32 const *pfpsr,
+ 			   int restore_ffr);
+ extern void sve_flush_live(bool flush_ffr, unsigned long vq_minus_1);
+ extern unsigned int sve_get_vl(void);
+-extern void sve_set_vq(unsigned long vq_minus_1);
+-extern void sme_set_vq(unsigned long vq_minus_1);
+ extern void sme_save_state(void *state, int zt);
+ extern void sme_load_state(void const *state, int zt);
+ 
+diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+index cda81d009c9bd..adf33d2da40c3 100644
+--- a/arch/arm64/include/asm/fpsimdmacros.h
++++ b/arch/arm64/include/asm/fpsimdmacros.h
+@@ -265,28 +265,6 @@
+ 	.purgem _for__body
+ .endm
+ 
+-/* Update ZCR_EL1.LEN with the new VQ */
+-.macro sve_load_vq xvqminus1, xtmp, xtmp2
+-		mrs_s		\xtmp, SYS_ZCR_EL1
+-		bic		\xtmp2, \xtmp, ZCR_ELx_LEN_MASK
+-		orr		\xtmp2, \xtmp2, \xvqminus1
+-		cmp		\xtmp2, \xtmp
+-		b.eq		921f
+-		msr_s		SYS_ZCR_EL1, \xtmp2	//self-synchronising
+-921:
+-.endm
+-
+-/* Update SMCR_EL1.LEN with the new VQ */
+-.macro sme_load_vq xvqminus1, xtmp, xtmp2
+-		mrs_s		\xtmp, SYS_SMCR_EL1
+-		bic		\xtmp2, \xtmp, SMCR_ELx_LEN_MASK
+-		orr		\xtmp2, \xtmp2, \xvqminus1
+-		cmp		\xtmp2, \xtmp
+-		b.eq		921f
+-		msr_s		SYS_SMCR_EL1, \xtmp2	//self-synchronising
+-921:
+-.endm
+-
+ /* Preserve the first 128-bits of Znz and zero the rest. */
+ .macro _sve_flush_z nz
+ 	_sve_check_zreg \nz
+diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
+index 6325db1a2179c..88c555745b584 100644
+--- a/arch/arm64/kernel/entry-fpsimd.S
++++ b/arch/arm64/kernel/entry-fpsimd.S
+@@ -62,11 +62,6 @@ SYM_FUNC_START(sve_get_vl)
+ 	ret
+ SYM_FUNC_END(sve_get_vl)
+ 
+-SYM_FUNC_START(sve_set_vq)
+-	sve_load_vq x0, x1, x2
+-	ret
+-SYM_FUNC_END(sve_set_vq)
+-
+ /*
+  * Zero all SVE registers but the first 128-bits of each vector
+  *
+@@ -94,11 +89,6 @@ SYM_FUNC_START(sme_get_vl)
+ 	ret
+ SYM_FUNC_END(sme_get_vl)
+ 
+-SYM_FUNC_START(sme_set_vq)
+-	sme_load_vq x0, x1, x2
+-	ret
+-SYM_FUNC_END(sme_set_vq)
+-
+ /*
+  * Save the ZA and ZT state
+  *
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 60a45d600b460..a8395cb303344 100644
+index a8395cb303344..2578c2372c89e 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -1293,31 +1293,6 @@ void sme_suspend_exit(void)
+@@ -377,8 +377,10 @@ static void task_fpsimd_load(void)
+ 			if (!thread_sm_enabled(&current->thread))
+ 				WARN_ON_ONCE(!test_and_set_thread_flag(TIF_SVE));
  
- #endif /* CONFIG_ARM64_SME */
+-			if (test_thread_flag(TIF_SVE))
+-				sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
++			if (test_thread_flag(TIF_SVE)) {
++				unsigned long vq = sve_vq_from_vl(task_get_sve_vl(current));
++				sysreg_clear_set_s(SYS_ZCR_EL1, ZCR_ELx_LEN, vq - 1);
++			}
  
--static void sve_init_regs(void)
--{
--	/*
--	 * Convert the FPSIMD state to SVE, zeroing all the state that
--	 * is not shared with FPSIMD. If (as is likely) the current
--	 * state is live in the registers then do this there and
--	 * update our metadata for the current task including
--	 * disabling the trap, otherwise update our in-memory copy.
--	 * We are guaranteed to not be in streaming mode, we can only
--	 * take a SVE trap when not in streaming mode and we can't be
--	 * in streaming mode when taking a SME trap.
--	 */
--	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
+ 			restore_sve_regs = true;
+ 			restore_ffr = true;
+@@ -403,8 +405,10 @@ static void task_fpsimd_load(void)
+ 		unsigned long sme_vl = task_get_sme_vl(current);
+ 
+ 		/* Ensure VL is set up for restoring data */
+-		if (test_thread_flag(TIF_SME))
+-			sme_set_vq(sve_vq_from_vl(sme_vl) - 1);
++		if (test_thread_flag(TIF_SME)) {
++			unsigned long vq = sve_vq_from_vl(sme_vl);
++			sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
++		}
+ 
+ 		write_sysreg_s(current->thread.svcr, SYS_SVCR);
+ 
+@@ -1332,10 +1336,9 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
+ 	 * any effective streaming mode SVE state.
+ 	 */
+ 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
 -		unsigned long vq_minus_one =
 -			sve_vq_from_vl(task_get_sve_vl(current)) - 1;
 -		sve_set_vq(vq_minus_one);
 -		sve_flush_live(true, vq_minus_one);
--		fpsimd_bind_task_to_cpu();
--	} else {
--		fpsimd_to_sve(current);
--		current->thread.fp_type = FP_STATE_SVE;
--		fpsimd_flush_task_state(current);
--	}
--}
--
- /*
-  * Trapped SVE access
-  *
-@@ -1349,13 +1324,24 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
- 		WARN_ON(1); /* SVE access shouldn't have trapped */
++		unsigned long vq = sve_vq_from_vl(task_get_sve_vl(current));
++		sysreg_clear_set_s(SYS_ZCR_EL1, ZCR_ELx_LEN, vq - 1);
++		sve_flush_live(true, vq - 1);
+ 		fpsimd_bind_task_to_cpu();
+ 	} else {
+ 		fpsimd_to_sve(current);
+@@ -1465,9 +1468,8 @@ void do_sme_acc(unsigned long esr, struct pt_regs *regs)
+ 		WARN_ON(1);
  
- 	/*
--	 * Even if the task can have used streaming mode we can only
--	 * generate SVE access traps in normal SVE mode and
--	 * transitioning out of streaming mode may discard any
--	 * streaming mode state.  Always clear the high bits to avoid
--	 * any potential errors tracking what is properly initialised.
-+	 * Convert the FPSIMD state to SVE. Stale SVE state can be present in
-+	 * registers or memory, so we must zero all state that is not shared
-+	 * with FPSIMD.
-+	 *
-+	 * SVE traps cannot be taken from streaming mode, so there cannot be
-+	 * any effective streaming mode SVE state.
- 	 */
--	sve_init_regs();
-+	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
-+		unsigned long vq_minus_one =
-+			sve_vq_from_vl(task_get_sve_vl(current)) - 1;
-+		sve_set_vq(vq_minus_one);
-+		sve_flush_live(true, vq_minus_one);
-+		fpsimd_bind_task_to_cpu();
-+	} else {
-+		fpsimd_to_sve(current);
-+		current->thread.fp_type = FP_STATE_SVE;
-+		fpsimd_flush_task_state(current);
-+	}
+ 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
+-		unsigned long vq_minus_one =
+-			sve_vq_from_vl(task_get_sme_vl(current)) - 1;
+-		sme_set_vq(vq_minus_one);
++		unsigned long vq = sve_vq_from_vl(task_get_sme_vl(current));
++		sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
  
- 	put_cpu_fpsimd_context();
- }
+ 		fpsimd_bind_task_to_cpu();
+ 	} else {
 -- 
 2.30.2
 
