@@ -1,146 +1,161 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B60B44E04A
-	for <kvmarm@lists.linux.dev>; Wed,  3 Jun 2026 11:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780484845; cv=none; b=CNMiGdhM40DvfhSjlpFvyZz0sYRLtwjY1W5QBE4/hyUV1RE1eOkx2oyCSJlKBIzTWEtpZ5SFJTA2P1RkTLfCxx3Ov8ci422jy5yWRsvqHCnXEwJQ0TiguIEqqPz00ueySXsG9gU0FbGvgAL3lAMCA8PAFedh+2tzCAHmI3FD9U0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780484845; c=relaxed/simple;
-	bh=p7t9IwwhIVJ7szPDIPPLd4qn5HtQFfzvbSGJLEXQP3Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bOzrqihvGciql2w3RE+hf1vq2L2zV2XhexSDXxjCFAT0vTE0c1i4W/sI6869xcLAReVoY29Dl2UQl79vp/i7ayAhqnMQlYAYVY6YuaxbAA0VsDZYCUlfw4NuT2cSY979BOdd41V/IF5faPvhLP0NkNYJ+EJNHt4y7MFGzK8mpkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=C/GdyccY; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D366044A718
+	for <kvmarm@lists.linux.dev>; Wed,  3 Jun 2026 11:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780485771; cv=pass; b=pNvBD5CPzxWk1Z6ffAn4HE9Lrx9oE8kTlVde4pjlXK8PH9DLXJkoH9YLMwDz0JnIn33CxnJjqTlLbEvvPtdYs2DGMrNOuierjmcsg8pkM8CMg1jW11kuR5REOB7L3DYcEEltPoEOBPAmTTcggoFER69nJJFNFeZiz5c/Oxf3QA4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780485771; c=relaxed/simple;
+	bh=6i9ll1CJ8XVSAX7aMTO4bnOtHG3uInw9l6OWATwgeIg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IHhyaCaUqU43b9jRocvqNjg1gQrtm3ZO1yganMc3fMAaHOJaqEgMjRKoDMth51CxLwY4KxAnVYte92IHqKz0JjVj7UKOvcqQjUKN0fWkVa4BpvH1IwYt073uCH7c3eqkEkOcu7fmeXp0+t7aAiiJWy5jUFs3+MDb4YIySE/1nFM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IODcqFOX; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="C/GdyccY"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 108CD49FB;
-	Wed,  3 Jun 2026 04:07:19 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 39AD63F86F;
-	Wed,  3 Jun 2026 04:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780484844; bh=p7t9IwwhIVJ7szPDIPPLd4qn5HtQFfzvbSGJLEXQP3Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C/GdyccYgwTxR6Gt6pi5ZQY9reiKcl3vO5w6ic7/wTIQqhcDI4GIdzeL6BKos/lTd
-	 CpkR4v/ZAkWqTDhfHwwLDJm8qDFd1Jh6DSbJevN+tvyPj4InsGwKbUAQKZ4vkdjKEQ
-	 j1o+MetAu10931HxdRhK1nvJySZ3GiiXbXvQ75JY=
-From: Mark Rutland <mark.rutland@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: broonie@kernel.org,
-	catalin.marinas@arm.com,
-	james.morse@arm.com,
-	mark.rutland@arm.com,
-	maz@kernel.org,
-	oupton@kernel.org,
-	stable@vger.kernel.org,
-	tabba@google.com,
-	vladimir.murzin@arm.com,
-	will@kernel.org
-Subject: [PATCH v4 20/20] arm64: fpsimd: Remove <asm/fpsimdmacros.h>
-Date: Wed,  3 Jun 2026 12:06:30 +0100
-Message-Id: <20260603110630.1027435-21-mark.rutland@arm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20260603110630.1027435-1-mark.rutland@arm.com>
-References: <20260603110630.1027435-1-mark.rutland@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IODcqFOX"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5177d1ff061so290351cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 03 Jun 2026 04:22:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780485769; cv=none;
+        d=google.com; s=arc-20240605;
+        b=d381QzfFoZdYDjVtHqJOPcMnF5yixhK3k2HxB/5dTPSY/2gXyETqqPX3LKX9oqByi1
+         WwKOKGkvBSrS6LU4Z1CZmjx4t+O274LCOS/QdBsAb9/3cZNNUze/4/7m7m4oCGTsz2AP
+         o5/+cQjspp/tkjNUvdxOODXvzszx0CmMwIScAWbUTgePSPQBOo2WTi16kcjqa0VGq3o7
+         zWkBFA0VQdu0iNwimULiJZXWqbBAHzSurfNX4nQPccyywiRMsNwh/uKJGVZ+eQCOngNv
+         KVN42L+xabODuc1K4U0MC5GI7Naq7T5kUTh8tT5hZmpwvjM4+ufcgc9wYynI/TZav66W
+         TL6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=6OeStcwvul6xuBmfHmqioB3II/ujcPrLl80+h0LOYME=;
+        fh=9349ZnJZWd8bGGTwf/FDmHN0lCJzZkRIzzPlxw/NmRI=;
+        b=UvU9MIwEPAueL5OomnTJXOXzljON9OUWftpv/q1hPqvb1Sg4GbB4y9tYy+LkBMHfdm
+         o1fL3cvjwoF2wt72ycTLsA7VdHByAn5DhRKiJY6Yeg0AQVTgJp2IP4h7BBqjpro0dhMK
+         V4bEmuSZwCvWbz5dJJHwElp6Q5kZg2DzmC6gGETvbkdLwmM4Uq36xPTuKVMePiprPsiK
+         Ehj8wMzZ9KewlGN7HgVwrom5TApbd527sXuVL7O5Hkchm0b6TkFRVp6LOIgzwBT7KW+n
+         plnlaywqHx/2r1QvtgKTLhpBHpVpl02Qo1aWX0TM9W6Dq3oLT7IjUybLQJma+iq9Rynh
+         X8lQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780485769; x=1781090569; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6OeStcwvul6xuBmfHmqioB3II/ujcPrLl80+h0LOYME=;
+        b=IODcqFOX6oWzHTM9EQjFpJVAZbblxnoLaZHI91qZjHqy8dRPPDcLMn84M52l0fcUer
+         O05jtWaZMlQjLfWbtePlFPbqestX6TquxDwsUziJ5NGoRSpBVXDQcjOxKAdhU3T6rOLf
+         v2wNHWZFDi3ryfwQX2PqNBkXQp+vfEwZhmZmWSwiDBh3BOGpfz8iH2BbKs5TIf3p/Kfu
+         NQcBzFZIPLRN0nNG9dCoUcbmIbz5YuDpqEC/uSJJVsc4DO2BynXJ9wfjqlGV9eqj6aOJ
+         FZ6BexnIh9dNU3tj9VTiMNwvBdSdlOAWfEn9D/5dIn5t1l6mWM+STaY7YtJxwvSMmraJ
+         7GoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780485769; x=1781090569;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6OeStcwvul6xuBmfHmqioB3II/ujcPrLl80+h0LOYME=;
+        b=T4LE25NpDOd/meMfaMnxO0wAKBs2i5X/Obxhcs/fHeoRfQH8kYIkJQQNIuGbkpIxA1
+         Y9uF1OXTB8OSpYLjGUcORjX/tfCUFitP8Hy/0R5p4BlgXFbhk72CY0C/Z1qtVv0D6Wul
+         Bnfevsu7u9iJcOqMGTV5Q1JEeLWs0bM06xg0+WWBp+HwTsIg0Svd1aWW6toqAEqSBGu/
+         1KAj8NGsUzki0acATHJ7R+O0t/wW8RPU08jZN92UMtizrAYzdAX7YCLGt6XHEO6ReGP0
+         xXsxtnsDOq2aUyADbkcK7+mIaVNvJ6OxsovLWB1LaEthgWwUKYZtLlaeDH9HArPKBYUI
+         9EUg==
+X-Forwarded-Encrypted: i=1; AFNElJ9S7zKBDHftZbYNCIoCnpXSvIWxDpTVavgVNgdTJRRrhg+Re3aRP3mmkKtuyqEWj50R3pj37Ps=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxSRLReeyZttqlkzxrcFJT2zB/PxxoNGT9h1d3Yn7JTu+YKK5UO
+	PyGsD+5PQUbgFQFsGbvkTN2kp+Nu4BGSGZatWZ47k24EdYrL8PStnb/gwYCOUqiwL8wlCD6K+/k
+	hdGulOPvkY6d3TkihMOCoV1IC/GLhD0pVlIT3gyo3
+X-Gm-Gg: Acq92OGM6JV4BexkNSqQuQ6g+0Et4d1KisxB+t0kWXyJogZhpP0hZf1ZalzTo6lQ0yQ
+	5ujt/4NQMZ9bc8PllXayjeuWarwj2KrWJ8zRXgFOW+wHk6fWLz+uv9o7Dw4Z6nYhTg8UYf3tzFX
+	8jnO+VchKKbpb3t/gzOtgaSXbMKGdWbqroUjmxB0ZEoY5bJ7NSX8YhVEv6qIDWd618ADBZAeCAG
+	CYKBU2WyLVd9IdbAaZeaTXbhyga4C5k8nKMXtc3M4tkLrx95725a1A2RxSTDV7J/t4tBoiVsPU1
+	9obfRWBrl1cPeYnjHiMuVaiCgtqFpxrTtpnkuhsk6E6LotNY7AnhVSXRAA==
+X-Received: by 2002:ac8:580e:0:b0:50e:41f3:6467 with SMTP id
+ d75a77b69052e-5177bacf8bemr7041881cf.12.1780485768086; Wed, 03 Jun 2026
+ 04:22:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260603110312.2909844-1-vdonnefort@google.com>
+In-Reply-To: <20260603110312.2909844-1-vdonnefort@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 3 Jun 2026 12:22:11 +0100
+X-Gm-Features: AVHnY4KI9ky2nK9uhZkT2wqO6-ArzdUSiw-eQWvqiODT58oZSiJAb0P_fIrw1BA
+Message-ID: <CA+EHjTwFZGNi=WqE_=mD4nifowHidxyNVuho1XiuU7msMe8MFg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Set a linux errno on SMCCC error in kvm_call_hyp_nvhe()
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 
-We no longer need any of the remaining macros in <asm/fpsimdmacros.h>.
+Hi Vincent,
 
-Remove all of it.
+On Wed, 3 Jun 2026 at 12:03, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> If the HVC called in kvm_call_hyp_nvhe() fails with an SMCCC error code,
+> we WARN. However, the returned value isn't initialized and the caller
+> might get garbage or 0 which is likely to be interpreted as success.
+>
+> Set a default -EPERM error value, ensuring all callers get the message
+> when SMCCC calls fail.
+>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+>
+> ---
+>
+> I have encountered this issue while working on a follow-up contribution to the
+> hypervisor tracing. In that case it completely crashed the kernel because
+> IS_ERR() failed on that res.a1 value.
+>
+> Now, if it makes that function more robust, I do not believe it is fixing any
+> existing bug which is why I haven't added a "Fixes:" tag.
+>
+> In case we want to stick one, here it is:
+>
+> Fixes: 054698316d87 ("KVM: arm64: nVHE: Migrate hyp interface to SMCCC")
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
-Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/fpsimdmacros.h | 64 ---------------------------
- 1 file changed, 64 deletions(-)
- delete mode 100644 arch/arm64/include/asm/fpsimdmacros.h
+You are fixing a real bug, even if it's latent; I think you should include it.
 
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-deleted file mode 100644
-index a763fd03ffef3..0000000000000
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ /dev/null
-@@ -1,64 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * FP/SIMD state saving and restoring macros
-- *
-- * Copyright (C) 2012 ARM Ltd.
-- * Author: Catalin Marinas <catalin.marinas@arm.com>
-- */
--
--#include <asm/assembler.h>
--
--/* Sanity-check macros to help avoid encoding garbage instructions */
--
--.macro _check_general_reg nr
--	.if (\nr) < 0 || (\nr) > 30
--		.error "Bad register number \nr."
--	.endif
--.endm
--
--.macro _sve_check_zreg znr
--	.if (\znr) < 0 || (\znr) > 31
--		.error "Bad Scalable Vector Extension vector register number \znr."
--	.endif
--.endm
--
--.macro _sve_check_preg pnr
--	.if (\pnr) < 0 || (\pnr) > 15
--		.error "Bad Scalable Vector Extension predicate register number \pnr."
--	.endif
--.endm
--
--.macro _check_num n, min, max
--	.if (\n) < (\min) || (\n) > (\max)
--		.error "Number \n out of range [\min,\max]"
--	.endif
--.endm
--
--.macro _sme_check_wv v
--	.if (\v) < 12 || (\v) > 15
--		.error "Bad vector select register \v."
--	.endif
--.endm
--
--.macro __for from:req, to:req
--	.if (\from) == (\to)
--		_for__body %\from
--	.else
--		__for %\from, %((\from) + ((\to) - (\from)) / 2)
--		__for %((\from) + ((\to) - (\from)) / 2 + 1), %\to
--	.endif
--.endm
--
--.macro _for var:req, from:req, to:req, insn:vararg
--	.macro _for__body \var:req
--		.noaltmacro
--		\insn
--		.altmacro
--	.endm
--
--	.altmacro
--	__for \from, \to
--	.noaltmacro
--
--	.purgem _for__body
--.endm
--- 
-2.30.2
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a49042bfa801..6b8fd494792c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1273,13 +1273,14 @@ void kvm_arm_resume_guest(struct kvm *kvm);
+>  #define vcpu_has_run_once(vcpu)        (!!READ_ONCE((vcpu)->pid))
+>
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+> -#define kvm_call_hyp_nvhe(f, ...)                                              \
+> +#define kvm_call_hyp_nvhe(f, ...)                                      \
 
+nit: This realignment would muddle a git blame on this. Prefer you drop it.
+
+Otherwise,
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+>         ({                                                              \
+>                 struct arm_smccc_res res;                               \
+>                                                                         \
+>                 arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),               \
+>                                   ##__VA_ARGS__, &res);                 \
+> -               WARN_ON(res.a0 != SMCCC_RET_SUCCESS);                   \
+> +               if (WARN_ON(res.a0 != SMCCC_RET_SUCCESS))               \
+> +                       res.a1 = -EPERM;                                \
+>                                                                         \
+>                 res.a1;                                                 \
+>         })
+>
+> base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
+> --
+> 2.54.0.1032.g2f8565e1d1-goog
+>
