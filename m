@@ -1,82 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539A939936D;
-	Tue,  2 Jun 2026 23:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B968338F249;
+	Wed,  3 Jun 2026 06:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780444498; cv=none; b=uEAWzQ437oYC/zYCm3eLtTCVM1cRVX4WWQo52SblBrBBEb9rp9fPAwRitEzSbDBaPFuWRDzQ5QGwLtJOggcwbtr4a5VVYL+WYVeaciAMn6oZwqF/JsNhxlYm0SfT5S/0UDwEymbCyAcvhlVmkMomH5AzmPWxDujQjl2L63dR3Ec=
+	t=1780469102; cv=none; b=YQ6zWC1FEG11zLGf+2LpgaBD7YuGz1tlct0yHiX8rxBJycifIoDyFhmOphpA5ikAnfP7OFyaUTCZakIihykjOgtbI0ubMI9Djy1J/noE0xrclQ0l5C9+vWL9a+aB51wxKoNSCBW/+smJEqUnqpHnANT5WRjb2AQMZHhh/pjXvOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780444498; c=relaxed/simple;
-	bh=9C8DQw0flKH0sM335ms4ayLG4jw5+1Dwb3103XIomUk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q7wxix9vTTGrR7kJNdQGxDiNNFagmzVnuddfJApyELPbpeY4HQdoSjscxfXG4vxjfbF75I6mAhxfpAU2zlM17WQwqAeBQ0/f5DsdSO+k0fJMeAcvf7HTHQvhc7Tz7wcufRUmoB9vhcbwuQC7VkayRWYlLdGGEaoHrOdZUyqeUX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WkVkjvwP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780469102; c=relaxed/simple;
+	bh=rqsUBhnH/dKfvfEIRcCqGgxOLcrhs1zTyLnKxsShSuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vBBPID3Ydlu/LkNa/mP3abq5W5rKeVACu39LPc5kCA2h1ppgmY6GJEzmQDEghkEG0mqmMGOefIeOlCrezPqypplEY+WsKq6kxvGHPZlAIf+XZAWYciEYF2M7+BkqQzK8/xVfY9sapFtF0gL1QgAJEzwT6dOp5YLQ7HNbFRow/Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9yaNg8X; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkVkjvwP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 126101F0089A;
-	Tue,  2 Jun 2026 23:54:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9yaNg8X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 042161F00893;
+	Wed,  3 Jun 2026 06:44:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780444496;
-	bh=0x6QdNpCBv6Ii/bbNu324c1LO1y8u1r1+aTEfVKd050=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=WkVkjvwPfuN+Z9MaUcb6tGtodaynhsAlbysX2XQuO6RYPO1QgDg4rc094dDQ30a1n
-	 FxPWPCse48KCXe+7XjcjGezzuUWAUxfNRwbgyHhaapE5a631Z65mt5AR+QMuL3qytU
-	 NsNyU0LJtll9v0iWRnKWtyS1Y7zSpiUPkxqhpxJUlDHY5L00wsNxz1gd8fp0DGHLF0
-	 7kCpzsjw79LAYewk67+4AmSITUnAWt2URUqd6AbTipz/93MLn7+1jPI2RoNXRo3b+v
-	 w1xefwZ9QcfV3P9BN8FYuazVRYq6jAt5yh0jxW+m03gOxabPvNOc5iaftTluvuUJsV
-	 XddUOG36lUpow==
+	s=k20260515; t=1780469100;
+	bh=iTLUdDr7rhfaLhCvrgm+quO9P8A4imXJ7Ipa0t0cs/s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=L9yaNg8XpN9Ca4wKpFXg8n6/BMSZM5Ui0s/uLMhC88fnGB2SPh8eL7ETi15uUU/Jn
+	 Gexrze8xT4TXlXkChMCRI2CgGdAhC5XjoiOvix4yRKHgc3C3xQWiPYSGs0MwC1rQVT
+	 ESq0tZR74gp5RaoQPt+qoCCy6t594DowVAD7C236qPeAQVI7arQuMt63vfy5Vl7und
+	 8ucrPeH/eG1QSyvvoINpSJqACRR3c0Tqa7mo69KYThd6Ywvf4PbNeGmVzA/lX/Dklv
+	 F8HIC8O8haPoHO2TN8Ydkb9h6qJMFPZkFkdlNthhXeS6KDJkioSAXAc50hsvPCKE7+
+	 6Fin0w0mwUVTA==
+Date: Tue, 2 Jun 2026 23:44:58 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: maz@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	stable@vger.kernel.org
-Subject: [PATCH 1/5] KVM: arm64: Don't leak PFN when kvm_translate_vncr() races MMU notifier
-Date: Tue,  2 Jun 2026 16:54:46 -0700
-Message-ID: <20260602235450.103057-2-oupton@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260602235450.103057-1-oupton@kernel.org>
-References: <20260602235450.103057-1-oupton@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Take the SRCU lock for page table walks in
+ fault injection and AT emulation
+Message-ID: <ah_Nal3ai65tgt-z@kernel.org>
+References: <ah7_BAAzHggzdZeI@v4bel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ah7_BAAzHggzdZeI@v4bel>
 
-In the case that kvm_translate_vncr() races with an MMU notifier the
-early return does not release a reference on the faulted in PFN. Add
-the necessary call to kvm_release_faultin_page() for the unused PFN.
+Hi Hyunwoo,
 
-Cc: stable@vger.kernel.org
-Fixes: 069a05e535496 ("KVM: arm64: nv: Handle VNCR_EL2-triggered faults")
-Reported-by: Sashiko (local):gemini-3.1-pro
-Signed-off-by: Oliver Upton <oupton@kernel.org>
----
- arch/arm64/kvm/nested.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On Wed, Jun 03, 2026 at 01:04:20AM +0900, Hyunwoo Kim wrote:
+> inject_abt64() rewalks the guest stage-1 page tables via
+> __kvm_find_s1_desc_level() when injecting an abort for a failed S1PTW, and
+> __kvm_at_s12() calls kvm_walk_nested_s2() to perform the stage-2
+> translation. Both walks reference kvm->memslots through kvm_read_guest(),
+> which reads the descriptors, and __kvm_at_swap_desc(), which updates the
+> access flag, so they must run while holding the kvm->srcu read lock.
+> __kvm_at_swap_desc() asserts srcu_read_lock_held() on entry, and the other
+> callers of these walks, handle_at_slow(), kvm_translate_vncr() and
+> kvm_handle_guest_abort(), take the lock before calling them.
+> 
+> inject_abt64() is reached from the SEA and size fault injection paths,
+> which run before kvm_handle_guest_abort() takes the lock, and
+> __kvm_at_s12() does not hold the lock across the stage-2 walk. Take the
+> kvm->srcu read lock with guard(srcu) in both places so that it is held for
+> the duration of the walk.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 883b6c1008fb..4fa82e96454d 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1326,8 +1326,10 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+Just state the expectation that srcu is held rather than giving the
+play by play. Perhaps:
+
+  walk_s1() and kvm_walk_nested_s2() expect to be called while holding
+  kvm->srcu to guard against memslot changes. While this is generally
+  the case, __kvm_at_s12() and __kvm_find_s1_desc_level() call into the
+  respective walkers without taking kvm->srcu.
+
+  Fix by acquiring kvm->srcu prior to the table walk in both instances.
+
+> Cc: stable@vger.kernel.org
+> Fixes: 50f77dc87f13 ("KVM: arm64: Populate level on S1PTW SEA injection")
+> Fixes: be04cebf3e78 ("KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}")
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+
+I'd prefer if we scoped the critical section to only the relevant calls
+to the software table walk, like below.
+
+-- 
+Thanks,
+Oliver
+
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 9f8f0ae8e86e..889c2c15d7bd 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -1569,7 +1569,8 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	/* Do the stage-2 translation */
+ 	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+ 	out.esr = 0;
+-	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
++	scoped_guard(srcu, &vcpu->kvm->srcu)
++		ret = kvm_walk_nested_s2(vcpu, ipa, &out);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -1665,7 +1666,8 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
  	}
  
- 	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
--		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq))
-+		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq)) {
-+			kvm_release_faultin_page(vcpu->kvm, page, true, false);
- 			return -EAGAIN;
-+		}
- 
- 		vt->gva = va;
- 		vt->hpa = pfn << PAGE_SHIFT;
--- 
-2.47.3
-
+ 	/* Walk the guest's PT, looking for a match along the way */
+-	ret = walk_s1(vcpu, &wi, &wr, va);
++	scoped_guard(srcu, &vcpu->kvm->srcu)
++		ret = walk_s1(vcpu, &wi, &wr, va);
+ 	switch (ret) {
+ 	case -EINTR:
+ 		/* We interrupted the walk on a match, return the level */
