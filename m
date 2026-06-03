@@ -1,158 +1,168 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C45392C4B
-	for <kvmarm@lists.linux.dev>; Wed,  3 Jun 2026 11:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDEC3AB482
+	for <kvmarm@lists.linux.dev>; Wed,  3 Jun 2026 11:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780484765; cv=none; b=CKm3jQwAuHT6nWDzvW9ldKGt0nuU9onN3Sa122a9PPuE5Bsdzek2dwnhSKW7HLBH9dFZLO5CwEXvO8WNRuRoC/UCebQGe3rBDp15KOwDXsEGJYfSgA4lNteGuA00JbXKx1RSFI5hIB7Du8WT7JJ1IBQlULDrxARRE8zt20jZZ9s=
+	t=1780484801; cv=none; b=d8ae0wO2md5YXAkawNzwcnseTwMiqJDMymksxYnmaQ1hniarXcZbqljTp1+hcJVbTflbY3sLjmmDAoh+ePpMN6KEFSw+BYsRlZD6WZKCejn9SW8QhhqnncNse4BRdfOQ3iOIqFXEnmKhmBmMNMiSrufcUi8bkT3qY17SsFeJNZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780484765; c=relaxed/simple;
-	bh=OnY6ClRqq2KKYJKV1nVgnAMR5D6LCHElve8USWjdEVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HNu+cP0fiwiu4ksLHwzeYelvwUlVeO34fUOSxbwHoVYl2QPUUW1oIktXJvFWWqkOmSBNwAYJzNutzKAFmKcJWEHetLeeels5201OqaiO22iP+kWfeTTPr3ZEoTLi8hRtSXAB8jg+v1d17npP2pBky99su0ZIEvPHQqALtnwZL6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTgFSxLN; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780484801; c=relaxed/simple;
+	bh=SqjWvKdQP+6Xh7QXp2Bo/RUngiX3OmomTtiNb2YiTYk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MP9/q+WZy8GPLHN9aorJJ6NI1BMSZjng6Hbo1bYwLjopNfPa1zPUjL102nnFz7z2ykDM+Qd8nMTmT5ogIUSxqK6EEiNlaZtGFohBSD2j4zlPbvvPtFyASnA9yGnMygiEhlwrbD2jPFyErdp5rYxc6+LfVHEEWwRjMRoM6PoABAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=o0Qe8uQd; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTgFSxLN"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8423f420455so1575166b3a.3
-        for <kvmarm@lists.linux.dev>; Wed, 03 Jun 2026 04:06:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780484762; x=1781089562; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=spGZim1ZyhgHsaiJXpVGDnA2fCWowtbUu0fv4Gh0GyM=;
-        b=JTgFSxLNXdk0W883OeP9W/EVmaAT9u/AOYo0Fx3adGJ1nuKSn2Vd7275Rl1pOPa0Yh
-         zKza35l/CxjGPKHJgaHwQcoVmRoBuPjGE3AC4oYjOyCAxah3bJQYf4ZXmaB/FomoP2bA
-         b1vvm518eTxESli8ExQCBnMk5MUF1WsH4Zh7dXDswf2Z0duh0PeYr6AUWWm0itx/lGVG
-         MgoFPjDCbJRywlpatklw4pUOy5QIcdWktSljAfxD4MCNnIhvyi0EUHI264vtJMDbyslT
-         L2Ladvz79FMUYG0bomsOIS2viUvU001bRy+Rwa3Vc6AdSxoBOtLiQiz6taWYyBj0W93h
-         rsNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780484762; x=1781089562;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=spGZim1ZyhgHsaiJXpVGDnA2fCWowtbUu0fv4Gh0GyM=;
-        b=DiIV8109xPCWoQ+ygCC7nabQelsEvqdMwq0TMaUEhyr2PBqftl41fVdQwWoairXr4X
-         +vHfMvE/UTL3gv4xQktO5gI7VROJdZJKlSzxw1E8e8H0aIquMqZ5CTPhvpaiw/mMh3GB
-         Gxd6iIr447K8L8XZ6IBvpcSS+wwurLn8heGBAxLOjASzPQgv/8VfnIU21GJVcS7vEEdt
-         SrS3nrO0Yb62Ik1zIbaToK5OQoMX/mQIp3Jt86pvbcZ6Uo+EwE3PYMNfwwdPEyxuVcES
-         ZA2daUGXErHGSbCUiRcjCjTs+4nbDMwZ7jErWksThvkfeOibN93G7gMQum8d9+vPT2SB
-         F9Lw==
-X-Forwarded-Encrypted: i=1; AFNElJ/tQU+qBqEJvXARpVlFPLOOv7lAikQ3xM8R3legA96ViTciZmBsY+eqUeW5XbfMZGPD2BKLIz8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzrvh9/wcvQFxG6iknLbiN3LOzkvBVA7MXEt5aVyqCj/MZL8hHH
-	qM+0RPqalWhR9ECwDwaWAVnkyD+5BX2pLKoExNUFY5t+LoMhFR/hUk/d
-X-Gm-Gg: Acq92OGEVXbPzIlsaVTz6++IDLO2qPSlf3v7KNO4ozNz/pdNMyhU8TSGavopvwf12Kw
-	kOFhx4aRJP2/X1XKVgnwVSZIlbD6C7gg1kUCEksxJCMZAuRsF052zXAUwd3Koe3pF0/Ilg7TSzu
-	OL6oPTGf+sJ3UsngB8DMMT7Kw76jOAZcZahgoscMtlDYgRa8i+mNmPVXgTbvBs3m3zbsKZFzKOa
-	IGEpRk3XDwI3HoO03Kdq6eCWULgzL4VJqFaoDUj1t5pv+4pjZ3W8jlTto/p2dXoMi8KxQGR8c9w
-	4HPLFHJZAaDINvJ5nW/N+aOoJxQuEVlE1LiICUgAsfNza4qsABbluvCBmVD85MVCUSxwqdW8UBW
-	q5z21uJWMQarb23JlZrS9SA7kSiD9ZF7V4N1Wn2byYuEWdBZIlL3eEUZpWPxXkU1YDsZfKHVAU7
-	GN0ehZVVLrHCc+lVzHA3V2ok4CqzxNzy9p1jdJISL/uHvQAxt64nQpbQ==
-X-Received: by 2002:a05:6a00:ad1:b0:841:d0a9:76e with SMTP id d2e1a72fcca58-84284df0234mr3088644b3a.5.1780484762139;
-        Wed, 03 Jun 2026 04:06:02 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828d6bc5sm2583248b3a.43.2026.06.03.04.05.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 04:06:01 -0700 (PDT)
-Date: Wed, 3 Jun 2026 20:05:57 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: maz@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	stable@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH] KVM: arm64: Take the SRCU lock for page table walks in
- fault injection and AT emulation
-Message-ID: <aiAKlchUO_TN4Q2u@v4bel>
-References: <ah7_BAAzHggzdZeI@v4bel>
- <ah_Nal3ai65tgt-z@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="o0Qe8uQd"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A7E4332E4;
+	Wed,  3 Jun 2026 04:06:34 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CEACD3F86F;
+	Wed,  3 Jun 2026 04:06:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780484799; bh=SqjWvKdQP+6Xh7QXp2Bo/RUngiX3OmomTtiNb2YiTYk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o0Qe8uQdkY8elOP54gj9aJVa4mfzCimjfwjYX3P7SuGeBTYETTbbEhhR/EB4i42J4
+	 7dACXMDoYCN6Nq66gRXV+E2kP+QCz4WXekJTGgvbf9RNsRQfEyjKoqt8fi5/sLuGFc
+	 S2wWTSbOtNSIfxNfBlzuvLO3nr0Em7QbG7Tt/uXc=
+From: Mark Rutland <mark.rutland@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: broonie@kernel.org,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	mark.rutland@arm.com,
+	maz@kernel.org,
+	oupton@kernel.org,
+	stable@vger.kernel.org,
+	tabba@google.com,
+	vladimir.murzin@arm.com,
+	will@kernel.org
+Subject: [PATCH v4 00/20] arm64+KVM: FPSIMD/SVE/SME cleanups
+Date: Wed,  3 Jun 2026 12:06:10 +0100
+Message-Id: <20260603110630.1027435-1-mark.rutland@arm.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ah_Nal3ai65tgt-z@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 02, 2026 at 11:44:58PM -0700, Oliver Upton wrote:
-> Hi Hyunwoo,
-> 
-> On Wed, Jun 03, 2026 at 01:04:20AM +0900, Hyunwoo Kim wrote:
-> > inject_abt64() rewalks the guest stage-1 page tables via
-> > __kvm_find_s1_desc_level() when injecting an abort for a failed S1PTW, and
-> > __kvm_at_s12() calls kvm_walk_nested_s2() to perform the stage-2
-> > translation. Both walks reference kvm->memslots through kvm_read_guest(),
-> > which reads the descriptors, and __kvm_at_swap_desc(), which updates the
-> > access flag, so they must run while holding the kvm->srcu read lock.
-> > __kvm_at_swap_desc() asserts srcu_read_lock_held() on entry, and the other
-> > callers of these walks, handle_at_slow(), kvm_translate_vncr() and
-> > kvm_handle_guest_abort(), take the lock before calling them.
-> > 
-> > inject_abt64() is reached from the SEA and size fault injection paths,
-> > which run before kvm_handle_guest_abort() takes the lock, and
-> > __kvm_at_s12() does not hold the lock across the stage-2 walk. Take the
-> > kvm->srcu read lock with guard(srcu) in both places so that it is held for
-> > the duration of the walk.
-> 
-> Just state the expectation that srcu is held rather than giving the
-> play by play. Perhaps:
-> 
->   walk_s1() and kvm_walk_nested_s2() expect to be called while holding
->   kvm->srcu to guard against memslot changes. While this is generally
->   the case, __kvm_at_s12() and __kvm_find_s1_desc_level() call into the
->   respective walkers without taking kvm->srcu.
-> 
->   Fix by acquiring kvm->srcu prior to the table walk in both instances.
-> 
-> > Cc: stable@vger.kernel.org
-> > Fixes: 50f77dc87f13 ("KVM: arm64: Populate level on S1PTW SEA injection")
-> > Fixes: be04cebf3e78 ("KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}")
-> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> 
-> I'd prefer if we scoped the critical section to only the relevant calls
-> to the software table walk, like below.
+Hi,
 
-Thanks for the review.
+This series cleans up low-level FPSIMD/SVE/SME state management code,
+making it easier to maintain and extend (e.g. adding SME support to
+KVM), and enabling better debugging (e.g. by making SVE/SME save/restore
+visible to KASAN and KCSAN).
 
-I agree this direction is the better patch. I'll do some more testing 
-and then submit a v2.
+The first two patches fix a couple of latent issues that don't seem to
+have occurred in practice so far, but would be good to fix for stable to
+avoid any future issues. The rest of the series is purely cleanup.
 
-> 
-> -- 
-> Thanks,
-> Oliver
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 9f8f0ae8e86e..889c2c15d7bd 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -1569,7 +1569,8 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  	/* Do the stage-2 translation */
->  	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
->  	out.esr = 0;
-> -	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
-> +	scoped_guard(srcu, &vcpu->kvm->srcu)
-> +		ret = kvm_walk_nested_s2(vcpu, ipa, &out);
->  	if (ret < 0)
->  		return ret;
->  
-> @@ -1665,7 +1666,8 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
->  	}
->  
->  	/* Walk the guest's PT, looking for a match along the way */
-> -	ret = walk_s1(vcpu, &wi, &wr, va);
-> +	scoped_guard(srcu, &vcpu->kvm->srcu)
-> +		ret = walk_s1(vcpu, &wi, &wr, va);
->  	switch (ret) {
->  	case -EINTR:
->  		/* We interrupted the walk on a match, return the level */
+The series aims to do a few key things:
 
+* Make it harder to mis-manage in-memory SVE state and SME state. These
+  are given opaque types (struct arm64_sve_state and struct
+  arm64_sme_state), and the (awkward) calling convention for
+  saving/restoring SVE state is simplified to take a pointer to the base
+  of the state rather than a pointer to the FFR within the state.
 
-Best regards,
-Hyunwoo Kim
+* Minimize duplications between KVM and the rest of the kernel. The
+  FPSIMD/SVE/SME routines are moved to inline assembly such that the
+  same helper functions can be used everywhere, without the need to wrap
+  assembly macros.
+
+* Make the code easier to follow. Assembly sequences are minimized to
+  avoid address generation and control-flow that can be written more
+  clearly in C. Awkward assembly macros are removed where possible.
+
+* Make it easier to debug state management. Explicit instrumentation is
+  added to the save/restore functions so that KASAN and KCSAN can detect
+  memory safety issues and concurrency issues.
+
+  This instrumentation is inhibited for nVHE hyp objects, and does not
+  adversely affect KVM. I've confirmed by looking at compiler flags
+  during the build, and disassembling the relevant object files.
+
+* Remove unnecessary code. By relying on assembler support for SVE and
+  SME we can remove awkward assembly macros, making the code
+  significantly simpler and easier to read.
+
+Since v1 [1]:
+* Add missing '.arch_extension sve' in asm.
+* Fix FPCR.Z field name.
+* Note the 'Ucj' constraint, and why we don't use it (yet).
+* Add missing 'const' usage.
+* Updates to commit messages.
+* Add tags from Mark Brown and Vladimir Murzin.
+
+Since v2 [2]:
+* Rename struct sme_state to struct arm64_sme_state to avoid clash with enum
+  sme_state in drivers.
+* Rename struct sve_state to struct arm64_sve_state, to match arm64_sme_state.
+* Fix instrumentation for ZT0 to use 64 bytes (512-bit), not SVL.
+* Fix typos in commit messages.
+
+Since v3 [3]:
+* Add patches to fix latent type mismatch issues.
+* Adjust KVM FFR patch to avoid type mismatch issue.
+
+[1] https://lore.kernel.org/linux-arm-kernel/20260521132556.584676-1-mark.rutland@arm.com/
+[2] https://lore.kernel.org/linux-arm-kernel/20260528165446.701944-1-mark.rutland@arm.com/
+[3] https://lore.kernel.org/linux-arm-kernel/20260602151150.925126-1-mark.rutland@arm.com/
+
+Mark.
+
+Mark Rutland (20):
+  arm64: fpsimd: Fix type mismatch in sve_{save,load}_state()
+  arm64: fpsimd: Fix type mismatch in sme_{save,load}_state()
+  KVM: arm64: Don't include <asm/fpsimdmacros.h>
+  KVM: arm64: Don't override FFR save/restore argument
+  KVM: arm64: pkvm: Save host FPMR in host cpu context
+  KVM: arm64: pkvm: Remove struct cpu_sve_state
+  arm64: fpsimd: Fold sve_init_regs() into do_sve_acc()
+  arm64: fpsimd: Remove sve_set_vq() and sme_set_vq()
+  arm64: fpsimd: Use assembler for SVE instructions
+  arm64: fpsimd: Use assembler for baseline SME instructions
+  arm64: fpsimd: Move sve_get_vl() and sme_get_vl() inline
+  arm64: sysreg: Add FPCR and FPSR
+  arm64: fpsimd: Split FPSR/FPCR from SVE save/restore
+  arm64: fpsimd: Move fpsimd save/restore inline
+  arm64: fpsimd: Use opaque type for SVE state
+  arm64: fpsimd: Use opaque type for SME state
+  arm64: fpsimd: Move SVE save/restore inline
+  arm64: fpsimd: Move sve_flush_live() inline
+  arm64: fpsimd: Move SME save/restore inline
+  arm64: fpsimd: Remove <asm/fpsimdmacros.h>
+
+ arch/arm64/Kconfig                      |   5 +
+ arch/arm64/include/asm/fpsimd.h         | 374 ++++++++++++++++++++++--
+ arch/arm64/include/asm/fpsimdmacros.h   | 357 ----------------------
+ arch/arm64/include/asm/kvm_host.h       |  27 +-
+ arch/arm64/include/asm/kvm_hyp.h        |   5 -
+ arch/arm64/include/asm/kvm_pkvm.h       |   3 +-
+ arch/arm64/include/asm/processor.h      |   7 +-
+ arch/arm64/kernel/Makefile              |   2 +-
+ arch/arm64/kernel/entry-common.c        |   8 +-
+ arch/arm64/kernel/entry-fpsimd.S        | 134 ---------
+ arch/arm64/kernel/fpsimd.c              |  90 +++---
+ arch/arm64/kvm/arm.c                    |  16 +-
+ arch/arm64/kvm/guest.c                  |   4 +-
+ arch/arm64/kvm/hyp/entry.S              |   1 -
+ arch/arm64/kvm/hyp/fpsimd.S             |  33 ---
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  23 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  20 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c         |   4 +-
+ arch/arm64/kvm/hyp/vhe/Makefile         |   2 +-
+ arch/arm64/tools/sysreg                 |  45 +++
+ 21 files changed, 485 insertions(+), 677 deletions(-)
+ delete mode 100644 arch/arm64/include/asm/fpsimdmacros.h
+ delete mode 100644 arch/arm64/kernel/entry-fpsimd.S
+ delete mode 100644 arch/arm64/kvm/hyp/fpsimd.S
+
+-- 
+2.30.2
+
