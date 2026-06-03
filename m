@@ -1,146 +1,276 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036272C0274
-	for <kvmarm@lists.linux.dev>; Wed,  3 Jun 2026 10:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A8D37B012;
+	Wed,  3 Jun 2026 10:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780481534; cv=none; b=f0v+c1j0EiSMQA8J3UyTpb+p6El5KNHNUxdaqfPzjrdO1iS6/ikuh7/AX2v7qspYg9s5egFnPs7/RXLBnz4bpxz2Igr6h6adiwinoHmNyDBFEHjPekBlUmmcxHd92QJfmXhK901xEvYge/MqvknQ7+U/rzdKB1Sg12RS2MJNkEs=
+	t=1780481740; cv=none; b=q451SgEEGPzFn29V6P+BbPwHTTzTrozwREkUvTcGe5Wiy2CERoUVibWpb8U7AothhOvT+RgSESSqB1lA1y5zoAXCwT6n8cJ5Iyz5amAbfg4ZXM0QGLqY2YuLy8vrFNmZ5/JKWkGoTxPqI1aJz6OTvWpsrZovrczuQk2P3cvo6gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780481534; c=relaxed/simple;
-	bh=fGTyeVYAfWL4rXKWP8jyLPVlcYjcF45jBG0YBs2uh94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UepZAwzu7i2pk0XUz5FY1nYH7Xcwb3ncdeI/iiN7sQgD4Vsas/V9Ztn5CXkmylWNrj9EnKv8t0kLW6b0xmdu97+lRdW7U0vTba6RThhn96T09k3pyct9CjgmxqgPRcVcqzTTMQqKz3R1MEHhsMEkEQK2gLnPAhP6ZF+ra2uFyXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnhYd+Zv; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1780481740; c=relaxed/simple;
+	bh=5pJBsfHqtfuBBV3AHbQunZhY9vkYfgbc9VmYOhx6YXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WfqkodGJM7csNEbqN8DZA+UGrU7Wv5Q69CkCIfRA3OuOG4UBbAhHvCzhkjaog48jEoPT7vMAHj9lNwO7JNgErQyG5AvuQZbu6NkvU6oSVWMIZ7MUPV/2zAv0V7pn7m19gTgOhNJDWJQYdsf7IM6XJQPNc8aJ5vJfGtUuCUkhGJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=a3tFk1kh; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnhYd+Zv"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490b3e03939so4475065e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 03 Jun 2026 03:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780481530; x=1781086330; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pIaWOz4jzomrlICte653zCUp4/MwcwzwiqZTiopmMBg=;
-        b=jnhYd+ZvXNMzQb+Nhebl7AeSuv9GsYVI7FKH+zJH+je6ypwVjtFyEFyW5G906Gdl9C
-         h5v1efcD21PdX4OKBu0ASmaPC1s2EsXGRgaCIrl/3caw9/wSA0ssbEOs6xXUdoNHpi2A
-         MCm8QU2d6HEWDlGG4aWqGGs6EULnakXznwMJyQLxVI366dQO6o110A1erQjQ0sxUo0Em
-         huIAQYFUQamiJS59ebiHyPlwN9kvrtKdIcclbag+oVMjAx5/kaZDjhbSzsmbRijMWeRt
-         y1Z+PAE2QJtqpGNwcm0RX+GVvt5nRXD6t3qlwF0X94z4FFqegVBySXKkdvizZxuOa24J
-         29bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780481530; x=1781086330;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pIaWOz4jzomrlICte653zCUp4/MwcwzwiqZTiopmMBg=;
-        b=hdPuSGJYC9kZ2FZBuPVayZKoa1HnW1K7XIvCXZERwOpQXKg3rXBu1XU5dx2fHjZ0fS
-         EtoGSIwneR/xtCOuwBuC2a7MIYCogVa2TlZ0jWU5bljlnDc0ALY6cLkyRsifF9YUA2gG
-         qojPiQ248b5aqC/9yY+X8LzV3bbI2sPDpAxmDuPykys2TTKIH33eeI17PV6Tl5EJpEiM
-         a5+dn2rTKkaJNqhR4Z878bE5JXHK+mJlUTfc2wWWDnjbC6EwkjsrT7hdocqoTGSQLQ4A
-         3yhJgTgjv9TOkLGl8azNXwlNkbaKnn0oZ4aKXSly4DVZLDhza0s4CdJbJvb+A7WoQDrV
-         pX+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ82S0ofB0ZINAic5ajKP+Sy60MS6PXRyd1nygr7k1g6kfqhYPSk697AFWAw/sPXehf803Zyyww=@lists.linux.dev
-X-Gm-Message-State: AOJu0YysV0BVyONiEghVW5g5cEhN/LmbAulbKRHvukh6+w0eMqHKYHzT
-	ng913L50DEGOwKd2J3jSnCW1Gkucw2WDFd2yLLzW+ng3/6PuE9y0uz7E7sVbbuBp4w==
-X-Gm-Gg: Acq92OGJED5HU74JwGXROuVaSr+zErl7WdLD4BfNO3XGpWkf40f8AoFLl/ZRhgkibkd
-	CmcvcIYcRevMcWx9FMpoafenTr2JZLVsiy5P8RL/z51zJxorg1dXX4IPtf1hzkzYaNyK6H3jibf
-	syfHZBM96efCK9vj2R+yn/rIhde6TZvOnM2vfYmfYDcfOFcATSShQRgt3UqIJDKU1whwta/wfEO
-	kgfNb2QLg3cHat9GXAVcgQvg9fSIQs8f3xw7k75ORYFXL1axYPZlPE/IU67wVnKijVXiyx9vNez
-	gUGGdsgTyrj8uLkqnvSXn0+fteya08KwpRd/9fawyRHeubX3Dgx+haEjkj2so/xgxV6E6puCtUS
-	5LJs+Atx3wwYP5YVypNWVXZLyMYq+dPf776AI8961bTWG3vpfYVmI5nSuG56IskG27Lqs2keao+
-	y6Zc1v2yGlwrNgBHTSjsrQjSGbg/kNIIvax+ebxoU/k+HK62/sy934t28h5QrUP74bOb1iPQn5t
-	EyXluonD9F4ZvH3
-X-Received: by 2002:a05:600c:8488:b0:490:b4cb:3866 with SMTP id 5b1f17b1804b1-490b613f181mr34363835e9.10.1780481530006;
-        Wed, 03 Jun 2026 03:12:10 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b63e63d7sm51863845e9.12.2026.06.03.03.12.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 03:12:09 -0700 (PDT)
-Date: Wed, 3 Jun 2026 11:12:05 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: tabba@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] KVM: arm64: Fix host/hyp tracking on
- share/unshare hypercall failure
-Message-ID: <ah_99d29qLuQey35@google.com>
-References: <20260529121755.2923500-1-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="a3tFk1kh"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B683A49CF;
+	Wed,  3 Jun 2026 03:15:30 -0700 (PDT)
+Received: from [10.57.26.22] (unknown [10.57.26.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2F2C3F632;
+	Wed,  3 Jun 2026 03:15:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780481735; bh=5pJBsfHqtfuBBV3AHbQunZhY9vkYfgbc9VmYOhx6YXE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a3tFk1khemwD9g5LaC2t2teF0HtH4Dpwpf3xOUJR26p+g4ZJnnOWZmoD9h6frZHuj
+	 OmkCSVrsN/SUCQuC9+0HQKpN2/cHv+SxD5E1grWZpIdFgvPug2xo8ZVC6X3QNRNJFh
+	 yj9zU81YBoaetujXyTDSOjevEaNye32bXTzK++14=
+Message-ID: <c217a495-bd39-408c-9040-010c30bed1e6@arm.com>
+Date: Wed, 3 Jun 2026 11:15:28 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260529121755.2923500-1-tabba@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 04/44] arm64: RMI: Add SMC definitions for calling the
+ RMM
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo.Pieralisi2@arm.com
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <20260513131757.116630-5-steven.price@arm.com> <86ecj5vsu4.wl-maz@kernel.org>
+ <3261b04f-1a0c-451d-8981-1e2bccc8a9ca@arm.com> <87jysvahpb.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <87jysvahpb.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 29, 2026 at 01:17:52PM +0100, tabba@google.com wrote:
-> Hi folks,
+On 22/05/2026 10:58, Marc Zyngier wrote:
+> On Thu, 21 May 2026 16:33:09 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> On 21/05/2026 13:40, Marc Zyngier wrote:
+>>> On Wed, 13 May 2026 14:17:12 +0100,
+>>> Steven Price <steven.price@arm.com> wrote:
+>>>>
+>>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>>> accessed by SMC calls from the host.
+>>>>
+>>>> The SMC definitions are based on DEN0137[1] version 2.0-bet1
+>>>>
+>>>> [1] https://developer.arm.com/documentation/den0137/2-0bet1/
+>>>>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> ---
+>>>> Changes since v13:
+>>>>  * Updated to RMM spec v2.0-bet1
+>>>> Changes since v12:
+>>>>  * Updated to RMM spec v2.0-bet0
+>>>> Changes since v9:
+>>>>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>>>>    this is an 8-bit type with padding afterwards (rather than a u64).
+>>>> Changes since v8:
+>>>>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>>>>    permits to be modified.
+>>>> Changes since v6:
+>>>>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>>>>    these are flag values.
+>>>> Changes since v5:
+>>>>  * Sorted the SMC #defines by value.
+>>>>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>>>>    RMI calls.
+>>>>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>>>>    number of available list registers could be lower.
+>>>>  * Provided a define for the reserved fields of FeatureRegister0.
+>>>>  * Fix inconsistent names for padding fields.
+>>>> Changes since v4:
+>>>>  * Update to point to final released RMM spec.
+>>>>  * Minor rearrangements.
+>>>> Changes since v3:
+>>>>  * Update to match RMM spec v1.0-rel0-rc1.
+>>>> Changes since v2:
+>>>>  * Fix specification link.
+>>>>  * Rename rec_entry->rec_enter to match spec.
+>>>>  * Fix size of pmu_ovf_status to match spec.
+>>>> ---
+>>>>  arch/arm64/include/asm/rmi_smc.h | 448 +++++++++++++++++++++++++++++++
+>>>>  1 file changed, 448 insertions(+)
+>>>>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>>>> new file mode 100644
+>>>> index 000000000000..a09b7a631fef
+>>>> --- /dev/null
+>>>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>>>> @@ -0,0 +1,448 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>>> +/*
+>>>> + * Copyright (C) 2023-2026 ARM Ltd.
+>>>> + *
+>>>> + * The values and structures in this file are from the Realm Management Monitor
+>>>> + * specification (DEN0137) version 2.0-bet1:
+>>>> + * https://developer.arm.com/documentation/den0137/2-0bet1/
+>>>
+>>> How long is this spec going to be available on the ARM web site, which
+>>> has a tendency of being reorganised every other week? And there is
+>>> already a beta2.
+>>
+>> Obviously I can't predict the next reorganisation - but at least it's a
+>> link that could be fed into archive.org or similar.
 > 
-> The first two started as bugs I found testing Sashiko locally with
-> fixes to review-prompts. The third grew out of the v1 discussion.
-> 
-> share_pfn_hyp() and unshare_pfn_hyp() in arch/arm64/kvm/mmu.c maintain
-> a host-side RB-tree mirroring the set of pages shared with EL2. The
-> hypercalls they wrap can fail (page-state mismatch, EL2 refcount still
-> held), and neither the per-pfn helpers nor the multi-page wrappers
-> cleaned up correctly on failure:
-> 
-> - share_pfn_hyp() left its tracking node in the tree on failure,
->   leaking the allocation and presenting a phantom share to a later
->   unshare (patch 1).
-> 
-> - unshare_pfn_hyp() erased its tracking node before the hypercall, so
->   on failure the host lost its record while EL2 still owned the share
->   (patch 2).
-> 
-> - kvm_share_hyp() returned on the first per-page failure, stranding the
->   pages already shared by that call: the caller treats the whole range
->   as failed and never unshares them (patch 3).
-> 
-> As Vincent and Marc noted on v1, none of this compromises isolation. A
-> page that cannot be unshared is simply leaked: it stays shared with the
-> hypervisor and is no longer reusable for pKVM. So kvm_share_hyp() now
-> rolls back on failure, and the unshare WARN_ON()s are left non-fatal
-> and documented rather than promoted to BUG_ON(). The system keeps
-> running, and only later pKVM reuse of a leaked page would fail. We do
-> not expect any of these paths to trigger in practice.
-> 
-> Severity is low and this can wait for 7.2. Patch 3 builds on patch 2,
-> otherwise they are independent.
-> 
-> Changes since v1:
->  - New patch 3: roll back partial shares in kvm_share_hyp(); document
->    the deliberate leak-on-WARN in kvm_unshare_hyp() (Vincent, Marc).
->  - Patches 1 and 2 functionally unchanged (patch 2 gains the call-site
->    comment).
->  - v1: https://lore.kernel.org/all/20260529074341.2271950-1-tabba@google.com/
-> 
-> Cheers,
-> /fuad
+> I found that the PDF spec was less susceptible to creative nonsense,
+> and people can download it for future reference, whereas ARM has
+> happily *deleted* specs from the website over time (try to find PSCI
+> 0.1, for example...).
 
-For the whole series:
+Sadly the nearest I found to a link directly to the PDF is:
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+https://documentation-service.arm.com/static/69cb945ac1586b7c59b1c00c
 
+But I have 0 confidence that that link will work for long (if indeed it
+even works for others now!). If you know of any way of getting a better
+link out of the Arm website that I'm all ears!
+
+> [...]
 > 
-> Fuad Tabba (3):
->   KVM: arm64: Free hyp-share tracking node when share hypercall fails
->   KVM: arm64: Avoid host/hyp share desync on unshare hypercall failure
->   KVM: arm64: Roll back partial shares on kvm_share_hyp() failure
+>>>> +struct realm_params {
+>>>> +	union { /* 0x0 */
+>>>> +		struct {
+>>>> +			u64 flags;
+>>>> +			u64 s2sz;
+>>>> +			u64 sve_vl;
+>>>> +			u64 num_bps;
+>>>> +			u64 num_wps;
+>>>> +			u64 pmu_num_ctrs;
+>>>> +			u64 hash_algo;
+>>>> +			u64 num_aux_planes;
+>>>> +		};
+>>>> +		u8 padding0[0x400];
+>>>
+>>> SZ_1K? And similarly all over the shop?
+>>
+>> I'm a bit less sure that makes the code more readable - these structures
+>> are a bit of a pain because they are somewhat sparse. I've left a
+>> comment where the beginning of each union is, and personally I find it
+>> easier to see 0x0 + 0x400 == 0x400 rather than trying to work out what
+>> SZ_1K is in hex. This is particularly the case in terms of:
+>>
+>>> struct rec_params {
+>>> 	union { /* 0x0 */
+>>> 		u64 flags;
+>>> 		u8 padding0[0x100];
+>>> 	};
+>>> 	union { /* 0x100 */
+>>> 		u64 mpidr;
+>>> 		u8 padding1[0x100];
+>>> 	};
+>>> 	union { /* 0x200 */
+>>> 		u64 pc;
+>>> 		u8 padding2[0x100];
+>>> 	};
+>>> 	union { /* 0x300 */
+>>> 		u64 gprs[REC_CREATE_NR_GPRS];
+>>> 		u8 padding3[0xd00];
+>>> 	};
+>>> };
+>>
+>> Where 0xd00 doesn't even have a correspoding SZ_ define.
 > 
->  arch/arm64/kvm/mmu.c | 39 +++++++++++++++++++++++++++++++++------
->  1 file changed, 33 insertions(+), 6 deletions(-)
+> Indeed, but it is (SZ_4K - SZ_256 * 3).
+
+Do you really think
+
+ 		u8 padding3[SZ_4K - SZ_256 * 3];
+
+is better? I certainly don't. I'll give you (SZ_4K - 0x300) is tempting.
+Although it then makes the BUILD_BUG_ON idea below somewhat pointless.
+
+> And a lot of these structures> seem to be designed to form a 4kB blob.
+I'm sure we can make use of
+> that information (BUILD_BUG_ON?).
+
+BUILD_BUG_ON requires being in a function. But static_assert() can be
+used in the header by the struct definitions - I'll add that, thanks for
+the suggestion.
+
+>>
+>> The RMM deals with this with macro magic:
+>>
+>>> struct rmi_rec_params {
+>>>         /* Flags */
+>>>         SET_MEMBER_RMI(unsigned long flags, 0, 0x100);  /* Offset 0 */
+>>>         /* MPIDR of the REC */
+>>>         SET_MEMBER_RMI(unsigned long mpidr, 0x100, 0x200);      /* 0x100 */
+>>>         /* Program counter */
+>>>         SET_MEMBER_RMI(unsigned long pc, 0x200, 0x300); /* 0x200 */
+>>>         /* General-purpose registers */
+>>>         SET_MEMBER_RMI(unsigned long gprs[REC_CREATE_NR_GPRS], 0x300, 0x1000); /* 0x300 */
+>>> };
+>>
+>> where the offsets are just directly encoded in the macro - but it's not
+>> an especially robust macro and I'm not convinced it's more readable.
 > 
-> -- 
-> 2.54.0.929.g9b7fa37559-goog
+> I think this is just as horrible, but at least it seems to take the
+> boundaries of the structure into account.
 > 
+>>
+>> I'm happy to hear other suggestions on how to encode this neatly.
+> 
+> Honestly, I wouldn't mind having the structures described in a more
+> abstract way and then pre-processed to generate the include files. If
+> the architectural MRS wasn't so huge, I would have added it to the
+> kernel and used that directly for KVM.
+> 
+>>
+>>> I haven't checked the details of the encodings (life is too short),
+>>> but I wonder how much of this exists as an MRS and could be
+>>> automatically generated?
+>>
+>> Automatically generating this would be good - I'm not sure whether we
+>> have a (public) source available to generate from at the moment. I have
+>> tried to methodically work through the spec when updating this file, but
+>> as Gavin has already pointed out there was at least one mistake (in
+>> currently unused definitions) this time.
+> 
+> I'm slightly baffled that even the RMM is written this way. Given the
+> formalism used in the RMM spec, I was expecting that you'd have a
+> bunch of JSON at hand and able to generate any output from that. Doing
+> this stuff by hand is both incredibly dull work *and* extremely error
+> prone.
+
+I'll look into the possibility of generating the headers. While dull and
+error prone I have found it is sometimes useful for forcing a review of
+the spec itself. There have been a number of bugs I've found (and have
+been corrected) in the spec while writing the header files - it's very
+easy to skim read those parts of the document otherwise.
+
+Writing the structures out in a "more abstract way" might be a good
+idea, but I'm just a little wary of writing another tool which is only
+used in this one spot. The RMM structures are somewhat unusual in being
+so sparse.
+
+Thanks,
+Steve
+
+> Thanks,
+> 
+> 	M.
+> 
+
