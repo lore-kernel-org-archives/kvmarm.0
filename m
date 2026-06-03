@@ -1,119 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D1048C8DE;
-	Wed,  3 Jun 2026 21:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F4C42B738
+	for <kvmarm@lists.linux.dev>; Wed,  3 Jun 2026 22:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780520817; cv=none; b=BWA7JejOSLLsNGyqQDX8fO58WDoaPQ46Zzpzf9yoVVEV66EaOmUM0EIJcihG/l7+nVyLkSAE+ke4WKAAbyR2lblvuiu0qT3H5wbZi/cU+hNKKz6WwUpBwPMK3/SYoVhCQvIl7DhUrr+jhdFzxM7MH0uJdkzloshup3mDYPwaFTU=
+	t=1780527453; cv=none; b=AuI4IVgHeoRUy/LcRTh96v2H+kpI6wKGNUQ+GQkCDAKonHGuOupF/Jz4criRdGhaTLOg3AWxAbe1OQPXp7/KCBGd6MQ7e/nsyuSwyzFWkfYn/jTgk/kDyb27QYCrF8CuzZlVUW25KD+dCrS88ZwfKgTgFz3kVP0Q8HEutawTFgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780520817; c=relaxed/simple;
-	bh=lAkQ/QBLFkVioqbuX9FJ8HVGyg7zuNtJxUcElNByQbY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JVhCRrrrUFCkdId9ggpYPMUQHVyTcRWQp4yERrC2hsDMSVFSko39mxSnnOmdF824w13vRiQwYZlbWkLJ7lEIE8JBAtRt2J7rjbqdiqrjKjj7YjlT4H838tpBFzA8wcBZg10p6Cc5nLKYGnazDz86SPNpfacffG/ccP376UWB5Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBlRaD34; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780527453; c=relaxed/simple;
+	bh=0EIrwD+lgpB/geyCy3UdXRKAOa6LD3lv0ucquiJdRBU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IR/BY7glRFV1ij3tgHNuCaX3cxAkhH43n2eTe5Ij97ZVhp1xrsDNdR8X7GIxuu/t/zf+SBVjoiG8Ixhl016/fFgIBznRMi8Ubwr1gZVyz7apekqsEuIXDj0XPIHgoUj2WS4QNCYE0yzapIHfhfSGDYF5iCyxm7s+/1x9iPAITB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=u9embgzY; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBlRaD34"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1406F1F00898;
-	Wed,  3 Jun 2026 21:06:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780520815;
-	bh=0A7+X8eZmyoc1i4vmgDGETla0lDDfCLzGK/eA0mNZd8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=oBlRaD34vBZeBpEWh0RDka5ZDK3j5ozFHCbAA05jkVVLGjJLORfEbxZ92A0YzicD0
-	 89Z4ICbuLLj2HW54kbtlNPSF+QkCYc8v/6sUsaE0m5ustrSkJbYt/kf2FlfiwD0rnP
-	 xiy/iuHuywYn47LXn07o1dBzUflfiAxP794zI2l9sjcexFyJeqsBPG0HXdJEPl14A0
-	 4keVct/og4eG15+4kydngH/fVOQsRQ9NM/NJ/IFWqCDPoohWTMqpcyu5ShpfIy1ZPk
-	 t801mSQbW1dWFOJrR1aqiNaGEYaGMWUSS3PEqcgDuqiut6ljIQWo/Te4CePTcuiu4m
-	 YOI/dZlIb9xfg==
-From: Will Deacon <will@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	broonie@kernel.org,
-	james.morse@arm.com,
-	maz@kernel.org,
-	oupton@kernel.org,
-	stable@vger.kernel.org,
-	tabba@google.com,
-	vladimir.murzin@arm.com
-Subject: Re: [PATCH v4 00/20] arm64+KVM: FPSIMD/SVE/SME cleanups
-Date: Wed,  3 Jun 2026 22:06:28 +0100
-Message-ID: <178050185086.377054.3392422151485171644.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260603110630.1027435-1-mark.rutland@arm.com>
-References: <20260603110630.1027435-1-mark.rutland@arm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="u9embgzY"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D28EA4837;
+	Wed,  3 Jun 2026 15:57:25 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D83163F632;
+	Wed,  3 Jun 2026 15:57:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780527450; bh=0EIrwD+lgpB/geyCy3UdXRKAOa6LD3lv0ucquiJdRBU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u9embgzYSCBW6F3fG2pkIi3sDaOnzDBs91m7puG95nQVk4qSajWCQnNsTtZzf6zcL
+	 WvKp/ZWpyfpOSVMa+PziSVKxaPkMiSSYlZ1HB/qa45dp9265aYlEmnEz/YUZzsYpTY
+	 h+h90T+6J+z8Zwmrix6fJYoxlRkp/zt0vjBZipnQ=
+Date: Wed, 3 Jun 2026 23:57:20 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: nv: Fix handling of XN[0] when
+ !FEAT_XNX
+Message-ID: <zzprmfdgkd4sfxjuvbj65ssmdbcxvb2lrdv7lgywysuthx6t4i@ffehlydwbwy7>
+References: <20260602165901.52800-1-oupton@kernel.org>
+ <20260602165901.52800-2-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260602165901.52800-2-oupton@kernel.org>
 
-On Wed, 03 Jun 2026 12:06:10 +0100, Mark Rutland wrote:
-> This series cleans up low-level FPSIMD/SVE/SME state management code,
-> making it easier to maintain and extend (e.g. adding SME support to
-> KVM), and enabling better debugging (e.g. by making SVE/SME save/restore
-> visible to KASAN and KCSAN).
+Hi Oliver,
+
+On Tue, Jun 02, 2026 at 09:59:00AM -0700, Oliver Upton wrote:
+> XN has already been extracted from its bitfield position so using
+> FIELD_PREP() on the mask that clears XN[0] is completely broken, having
+> the effect of unconditionally granting execute permissions...
 > 
-> The first two patches fix a couple of latent issues that don't seem to
-> have occurred in practice so far, but would be good to fix for stable to
-> avoid any future issues. The rest of the series is purely cleanup.
+> Fix the obvious mistake by manipulating the right bit.
 > 
-> [...]
+> Cc: stable@vger.kernel.org
+> Fixes: d93febe2ed2e ("KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2")
+> Reviewed-by: Wei-Lin Chang <weilin.chang@arm.com>
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 091544e6af44..a0eb83319c2e 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -131,7 +131,7 @@ static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *t
+>  	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+>  
+>  	if (!kvm_has_xnx(kvm))
+> -		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
+> +		xn &= 0b10;
+>  
+>  	switch (xn) {
+>  	case 0b00:
+> @@ -147,7 +147,7 @@ static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *t
+>  	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+>  
+>  	if (!kvm_has_xnx(kvm))
+> -		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
+> +		xn &= 0b10;
+>  
 
-Applied to arm64 (for-next/fpsimd-cleanups), thanks!
+Now that the other patch brings up kvm_pgtable_stage2_pte_prot(), what
+do you think about also using that here? It can save a little bit of
+duplicated decode logic.
 
-[01/20] arm64: fpsimd: Fix type mismatch in sve_{save,load}_state()
-        https://git.kernel.org/arm64/c/ae24f6b06e90
-[02/20] arm64: fpsimd: Fix type mismatch in sme_{save,load}_state()
-        https://git.kernel.org/arm64/c/247bd1539050
-[03/20] KVM: arm64: Don't include <asm/fpsimdmacros.h>
-        https://git.kernel.org/arm64/c/79e66bb7e8b4
-[04/20] KVM: arm64: Don't override FFR save/restore argument
-        https://git.kernel.org/arm64/c/dc2337625880
-[05/20] KVM: arm64: pkvm: Save host FPMR in host cpu context
-        https://git.kernel.org/arm64/c/da20bb4bc5e6
-[06/20] KVM: arm64: pkvm: Remove struct cpu_sve_state
-        https://git.kernel.org/arm64/c/afd7af2b56ec
-[07/20] arm64: fpsimd: Fold sve_init_regs() into do_sve_acc()
-        https://git.kernel.org/arm64/c/3efb6c7f22c6
-[08/20] arm64: fpsimd: Remove sve_set_vq() and sme_set_vq()
-        https://git.kernel.org/arm64/c/e0cde2d2bb1b
-[09/20] arm64: fpsimd: Use assembler for SVE instructions
-        https://git.kernel.org/arm64/c/f27fe9aa2d06
-[10/20] arm64: fpsimd: Use assembler for baseline SME instructions
-        https://git.kernel.org/arm64/c/db9d63eafeba
-[11/20] arm64: fpsimd: Move sve_get_vl() and sme_get_vl() inline
-        https://git.kernel.org/arm64/c/3f26d7c6544c
-[12/20] arm64: sysreg: Add FPCR and FPSR
-        https://git.kernel.org/arm64/c/36a1d1726634
-[13/20] arm64: fpsimd: Split FPSR/FPCR from SVE save/restore
-        https://git.kernel.org/arm64/c/1277531fca43
-[14/20] arm64: fpsimd: Move fpsimd save/restore inline
-        https://git.kernel.org/arm64/c/890712d4507b
-[15/20] arm64: fpsimd: Use opaque type for SVE state
-        https://git.kernel.org/arm64/c/e1b163e40553
-[16/20] arm64: fpsimd: Use opaque type for SME state
-        https://git.kernel.org/arm64/c/eb1a68a00c0a
-[17/20] arm64: fpsimd: Move SVE save/restore inline
-        https://git.kernel.org/arm64/c/2768101b3976
-[18/20] arm64: fpsimd: Move sve_flush_live() inline
-        https://git.kernel.org/arm64/c/18618d9ea1fb
-[19/20] arm64: fpsimd: Move SME save/restore inline
-        https://git.kernel.org/arm64/c/bfdfafd90720
-[20/20] arm64: fpsimd: Remove <asm/fpsimdmacros.h>
-        https://git.kernel.org/arm64/c/987ec51e1841
+Other than this being in a header and we'll have to move the code
+around for this to work, I'm curious are there any other issues with
+this idea?
 
-Cheers,
--- 
-Will
+Thanks,
+Wei-Lin Chang
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+>  	switch (xn) {
+>  	case 0b00:
+> -- 
+> 2.47.3
+> 
