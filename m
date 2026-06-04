@@ -1,74 +1,73 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805172874E6
-	for <kvmarm@lists.linux.dev>; Thu,  4 Jun 2026 20:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8511339B1
+	for <kvmarm@lists.linux.dev>; Thu,  4 Jun 2026 21:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780606762; cv=none; b=BZsLZEsGtdhkJYekh6rxN+7vBPAzcfAj0r94pqcAGk7l8RvWJy4sO6qd6Hr29PWwox6Rpa3k7nJyxpHBWl8dlRpZ0KoDn9QJL80icNJHPSh7DCYPjY0Y5IalkjSz44Q1IW9VszVEbZwUfR9Wu10yZIThKf81uvbSLRVzMC5c8q8=
+	t=1780607774; cv=none; b=DpREtrRn+3RYa7bWqTXxkaj+Ru2CVHudF+b6BZEO3swfR3HvDVzEe/Lln2yzDbUJy0CRrZgFFbfntwiyP7IGn+J/bdbEL3bM0hEuaC+wMGrGZt4Rj04RgFhmQRNB3nFIpfZGWeDaweQXdclWJuEjmdp59jZ2RH9WzVrFDMM8eH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780606762; c=relaxed/simple;
-	bh=chwY3WZnApr+X84SB6feTbcy1B932iGsQl3V9ECK8ko=;
+	s=arc-20240116; t=1780607774; c=relaxed/simple;
+	bh=eCX8oxct0BmaDUeXMCi7VVCO1Fu0v9uiaoGrKeDqBkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=STtBFdvF6uqFLu0wWQIJMM6fsUV4nmS9GpwRYg2IXCXPT9Bn5edDilPDsj85DgXFIp2CJnA30ocIzBJYW0O794C2RuhkMiUS/l3zuHSlihd9ILyrNj5RYwraGmnmPR48k/3L2Lb4qi8TT8uq4E8Ud0PZiWwiDVbem8USa24BfaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oa6/6gpU; arc=none smtp.client-ip=209.85.214.172
+	 Content-Disposition; b=fjyWqK4WwSU4f8HaFkYNBZECavw8X+nskJ1GPbBXkp6Yz+Hdb9q86Qs8LWgbo0MY9ds09i7/4n+l1t8OsCs4vHzP9g9lde6L4tz5VUnQ63/Xh+ClL+ljZ4vmrgg+Qmcx+3HuzJjyMaa/z3F59uxLSYHtMdTcYogBRSzAWIQ7/bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXlUq5Na; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oa6/6gpU"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c0bb4a94b8so9619085ad.2
-        for <kvmarm@lists.linux.dev>; Thu, 04 Jun 2026 13:59:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXlUq5Na"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2bf36a6905cso8599465ad.3
+        for <kvmarm@lists.linux.dev>; Thu, 04 Jun 2026 14:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780606761; x=1781211561; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1780607773; x=1781212573; darn=lists.linux.dev;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DxKhicoquanRcHmBFTA0cKSjkW5cU988lyFYAH+YfGE=;
-        b=Oa6/6gpUlk3C/dQ+AEvzvFPObjTInMBdXtqtptzrtwxUho2DFsvYWXDnCVJ7CYamzM
-         2CaB6jK1VvPY737zWtms0U49pDB603CjvBOLGhh1syy3ZEiu4rgrasdqAj1qvo8aQzeW
-         hVjtnmDezMebJRWVVFb3S4c+hhB2FUZiwVKpCxJufAB4v2AQqmGADLSYks++E/LpGjU7
-         SAkfxVF3I3fvnDuPixJDqyfTCS3BkuTGJiafqUMT2wCKCkcOENt2SLmVraudCStfS15e
-         KYCnzbwCOhBe9HiTRf4hPbLssrUZRuN8sM5s/aCxRrnb8q+6YPoJYC+eimupNJg31dpJ
-         9mwA==
+        bh=O/4ZDPfisq1bDU+cypy52bTEPD40rVLXrFwdCfhs680=;
+        b=bXlUq5NaJ6FGzIVFWBzMgGoTcr8JJ8EnPx1Uecp61UifRgLuu7DykXNiGNZVHnDu+c
+         uoNDSfz9jouDh0paDwspggThaO+vOjZlUWHhRBms/yvXmaJ7UZLf2y1ZhUsHiVTkdLFK
+         PIyxG/oNmoSmGIKY6EyTD4GpdhgjVVlUT+JTxOnlzF3H5tPtP2zZNx6wE6tMvPtrF9OK
+         w/CNrVEq6zl6YJ9/nClH879apcJ5cd2h3YG/mcK3sdt5mTg2Fqcz6zU4nHYelC+QEkn5
+         i7TrO6hSbwdkAPLUF6UL5UC9tSg5V1f6oCGYc6w0D3YHSRT2h0pGQmTJ6OjbEFS6bDVa
+         9jxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780606761; x=1781211561;
+        d=1e100.net; s=20251104; t=1780607773; x=1781212573;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DxKhicoquanRcHmBFTA0cKSjkW5cU988lyFYAH+YfGE=;
-        b=pA1awQuE8xT23n/f3iiHAVxSsW33jzm3lcEaDcvYLqncNsw8qytG+3oPYnDMNmW2vy
-         uHpucmodeJUvOy4+egnUxzDF3vxcPS/IjhsTDJpwWB5yW1zH2mQ1YDmLEg/YZEtLiluy
-         ahHEOTrwB93TF0XFoW4qsNuPUVcmtc9l/4gWhyJsoxQX7d6XN4eyB8wRxxH7vQpXj+GQ
-         K/lS7J69g3jPvneozV5Fj4Kh2K+QY++mnhgeLjcNQNOQv51h8qGPO6DgiWQkwz5qYctG
-         RailJsRTDrTV/V+vTK4pczx6+6mHsNoz2XIFkGwY2F5IsSd3ECPb9ltehT2Nq+XxW5jh
-         M/hg==
-X-Forwarded-Encrypted: i=1; AFNElJ+Wte+vcmwlOu3phXQFeClfV9LvpAAgUxOeXkjlsQiYsGvO1CV+OdQH2vUIK5pnroJq5mdCJ2I=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzaOAM3e9plZQP+Iy52XxzQmBSDE8L/5jkS3OY8vYHE6mbp/QS1
-	lrhsvk9Lr7pEAbrukvBI3sQAz1xIdSfhkju5golERrcJs4GKNM115XEL
-X-Gm-Gg: Acq92OHEpYXfkKc6WhT4US8N2YRHqTj5WOO0tVIPFKlh3dMAwRh6+4aaqSONTAxYk3e
-	XFBfjg7WObg4micWt5SlpYpIIRIv6bmP+lUjOcq/29dEunIp4mrjglxh+wk3w7UPwYeaetweHy4
-	U7uovTxqT5gnuVrPlBGaUaPIQgc2F21Fnqx3NKfU9xwUT0IjQt1SWMyt4viYPQ8hczOK9Sklbii
-	XUKyD/S/bm/yu3z6+SygUnEv4VWbl9pcH20SKJQUJsJk7posXFtnFyY2sZd6L1Q8yEn2cpN7otG
-	mouOT/hniJH2NhAXcP3GqrfCiqr1UCSeutU6e+THCeCRvlPBUqeKzLv4lq/RR1dA1QrYjrrELtC
-	JWjiWwfgPabWhdqm+O1PatR7ZLCu+HJaZFsZ8eCyz9CdTTD3HzIAu278JgaZyMGqMZFplzqna43
-	4Z9KDkRMxaS7/0eRRVBX/H7z+CMK443MeIUXLi3inO+P0jX+u5+BwIBg==
-X-Received: by 2002:a17:902:fc47:b0:2c0:eee2:fc45 with SMTP id d9443c01a7336-2c1e7b2f6c7mr2868755ad.4.1780606760717;
-        Thu, 04 Jun 2026 13:59:20 -0700 (PDT)
+        bh=O/4ZDPfisq1bDU+cypy52bTEPD40rVLXrFwdCfhs680=;
+        b=KzdwVu7puLh1cZnXHaj5n4uhQnVLWoCFAgyiEY8Wa1MiXD0xVYeBC85PYsbs/TwRE5
+         WBNWmPWcjVv/Gncf44Zv2UZJO2d+Sumr7cfsTTJnz03sfi6kLzLVISwAO/l+12xIXehz
+         3MhvPmm2nKQ3Wxy6+YFZXnM9Nw3H/HnAJMgBsB874MGerSQcPE0eus1qsC/BcA9GyGYB
+         3AvvWnDZ7PK3b7VBFIWZ3pvD3aLA4CdbBJHr5yvrivYtztIS2kQ9cTTGvbLCUXcU4XPO
+         vullDn0v3CgRX0AprO4ViIGuL9s6bEAJ40PhZZlMffMlq/8QNOXAdYAgaEI8JuQQ6kcQ
+         UOgA==
+X-Forwarded-Encrypted: i=1; AFNElJ8V7t/Z87t1b/riI/+dK+oQwePwfWfZl4IWAoJpcXCBLoZWT7X/oxdYNZ+4xY/FgWowgYeAXAg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzqsmUynaJGphiWXNpQPKxNtzE8Z4fwV8nXFT9sE2AlkdyrXl8h
+	y3tUon96/nbTtSAvvR5fiKwqdwzoD5+rMmufxXoGvi/Ymy5RLLNvz2aI
+X-Gm-Gg: Acq92OEFg1d3vb4+xa7UEXTKNn/v4lDAfNUwrqDZBgvUyQjwop6e9wo8CnXlU7HKBF7
+	edh6fyUHGViIKrrWmp4WmBZny4+Sy0rxz/jW2kQ1FZFhkedzXwJdfcchA+X1kTswCxAOyOTWn4Z
+	NmZaw3DuNgyqHKmq+HQVGRyhxH6w4oFX2IMkWefJSote8P2mrXkwSIa9zdI2aHuuk2VxhMJOFN4
+	59C8TE6vNppf3saGeIes8JAfIHYXCcpg9wsDPGFfQNq1mP7x4tSbEyRpGZfin/AtnS2p+bi7m7b
+	MpCk2YZVZp5Y1HJbJyd3rhsO7bCG219Ee8bciaFhXxlXJEmSwk5OZDbKZ4nHAPlyjhsUxZQnghz
+	VbA3n/Q02vNFYdFA9P/em5CxSN2uq2hJIM2GuzzE11+c5BG5jAbLJyIP4SLDyKznCwckNcglL6l
+	rHtr0nV/rdFYyNYY4lVFhq9NWyW25VP82Uv0yaAdFRAqXtRtw6dA2sgQ==
+X-Received: by 2002:a17:902:e78c:b0:2c1:42d2:2a66 with SMTP id d9443c01a7336-2c1e8368d03mr3172835ad.33.1780607772824;
+        Thu, 04 Jun 2026 14:16:12 -0700 (PDT)
 Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6e294sm67453635ad.6.2026.06.04.13.59.17
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d59csm65156465ad.4.2026.06.04.14.16.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2026 13:59:20 -0700 (PDT)
-Date: Fri, 5 Jun 2026 05:59:15 +0900
+        Thu, 04 Jun 2026 14:16:12 -0700 (PDT)
+Date: Fri, 5 Jun 2026 06:16:08 +0900
 From: Hyunwoo Kim <imv4bel@gmail.com>
 To: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
 	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com,
-	jic23@kernel.org, timothy.hayes@arm.com, eric.auger@linaro.org,
-	christoffer.dall@linaro.org, andre.przywara@arm.com
+	jic23@kernel.org
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	imv4bel@gmail.com
-Subject: [PATCH] KVM: arm64: vgic: Check the interrupt is still ours before
- migrating it
-Message-ID: <aiHnI1mu6SGQrgnz@v4bel>
+Subject: [PATCH] KVM: arm64: vgic: Use list_del_rcu() when flushing pending
+ LPIs
+Message-ID: <aiHrGM1f8czcUby4@v4bel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,55 +77,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-vgic_prune_ap_list() drops both ap_list_lock and irq_lock while migrating
-an interrupt to another vCPU. After reacquiring the locks it only checks
-that the affinity is unchanged (target_vcpu == vgic_target_oracle(irq))
-before moving the interrupt, which assumes that an interrupt whose affinity
-is preserved is still queued on this vCPU's ap_list.
+vgic_v3_fold_lr_state() walks the ap_list from last_lr_irq without holding
+the ap_list_lock, relying on vgic_irq being freed via kfree_rcu() and on
+interrupts being disabled. vgic_flush_pending_lpis() removes entries with
+list_del(), which clobbers a node's next pointer, so when another vCPU
+disables LPIs via GICR_CTLR the walk can follow the clobbered next pointer
+from a removed node, or from the node that last_lr_irq points to.
 
-That assumption no longer holds if the interrupt is taken off the ap_list
-while the locks are dropped. vgic_flush_pending_lpis() removes the
-interrupt from the list and sets irq->vcpu to NULL, but leaves
-enabled/pending/target_vcpu untouched. As the interrupt is still enabled
-and pending, vgic_target_oracle() returns the same target_vcpu, so the
-affinity check passes and list_del() is run a second time on an entry that
-has already been removed.
+Remove entries with list_del_rcu() so that the next pointer stays valid
+until the walk completes.
 
-Also check that the interrupt is still assigned to this vCPU
-(irq->vcpu == vcpu) before moving it.
-
-Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+Fixes: 3cfd59f81e0f ("KVM: arm64: GICv3: Handle LR overflow when EOImode==0")
 Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
- arch/arm64/kvm/vgic/vgic.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 1e9fe8764584..18b280de9a29 100644
+index 1e9fe8764584d..73efc0f95bfb1 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -818,15 +818,16 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		raw_spin_lock(&irq->irq_lock);
- 
- 		/*
--		 * If the affinity has been preserved, move the
--		 * interrupt around. Otherwise, it means things have
--		 * changed while the interrupt was unlocked, and we
--		 * need to replay this.
-+		 * If the interrupt is still ours and its affinity has
-+		 * been preserved, move it around. Otherwise, it means
-+		 * things have changed while the interrupt was unlocked
-+		 * (it may even have been taken off the list with its
-+		 * affinity left untouched), and we need to replay this.
- 		 *
- 		 * In all cases, we cannot trust the list not to have
- 		 * changed, so we restart from the beginning.
- 		 */
--		if (target_vcpu == vgic_target_oracle(irq)) {
-+		if (irq->vcpu == vcpu && target_vcpu == vgic_target_oracle(irq)) {
- 			struct vgic_cpu *new_cpu = &target_vcpu->arch.vgic_cpu;
- 
- 			list_del(&irq->ap_list);
+@@ -204,7 +204,7 @@ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
+ 	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
+ 		if (irq_is_lpi(vcpu->kvm, irq->intid)) {
+ 			raw_spin_lock(&irq->irq_lock);
+-			list_del(&irq->ap_list);
++			list_del_rcu(&irq->ap_list);
+ 			irq->vcpu = NULL;
+ 			raw_spin_unlock(&irq->irq_lock);
+ 			deleted |= vgic_put_irq_norelease(vcpu->kvm, irq);
 -- 
 2.43.0
 
