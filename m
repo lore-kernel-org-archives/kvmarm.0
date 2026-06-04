@@ -1,229 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA7339861;
-	Thu,  4 Jun 2026 15:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780586895; cv=none; b=jvcbibxIXP0zGgUof8Up91cmdsz6dbYaLLBl7GxYUVruAztv5WuvAfjctM1RBD9TgN4hZMhMUYGAJEbwXqF9U1NjINhs5oEXYCwRBEWGjdWsHyA4iKWUU68GJMNqZksoupp6cLnVq7BtkpXHFN0zGSqZ0vhSXr6CV+MAygiBVq4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780586895; c=relaxed/simple;
-	bh=U+vxUTdHbW20siTX3dFVZo9Bt+XzRLjvG5MjTOCV9RQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HUn07/i+bakymgY1lErVFxdI8i5h4RhaU8IpOtEZsmKtqnfPF1LDyUcEt9hiU4eGuCnclJk5bYRTM0NnRYK2p6MhYHPEgmecav1PF96IkbkX7nZhptgBRGiIvxZv/A1XAjbRigc215tMVY9kw1j/bvA0H1VzzbgOe2TQ5FiUET4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=K0kmt3C/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32FB305663
+	for <kvmarm@lists.linux.dev>; Thu,  4 Jun 2026 15:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780587036; cv=pass; b=dGFq9ifZxh73+LEipvimtpURIyPJoArm4gwDUhmvW+CUv64sjzv7YqdvCSecmh0S8EWDlv7rWR8pIGOeRPWeMC47MbeKww+D1qgiGjFzzuL+Fn7Qx/dppMbi3Qsg80agME7+3820AbYlQnvtuWu1Lq6CzUkifM4CSvcWvkabaVo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780587036; c=relaxed/simple;
+	bh=KqnYPj6rX5ufYoeTO/FnYYGGSEKEYSIS6stxD8Sn63g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GWAE+09VATeuHnu2CaVQ+Qy24TKVRKMPf65XBDcUwI3nPWgE+7pCa5jzZiDNkSi6OvwDv16FtP8wf/W9ixN5ufbrkFPKbBzZAuoI7lQ31HCX/roayTFALxcl0RAAzTJ9V0IdBiQ9Z79uxjgJUzfqhEKdmz6OdnITFwZiVGN36VY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dp9lQhSA; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="K0kmt3C/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B775E1516;
-	Thu,  4 Jun 2026 08:28:07 -0700 (PDT)
-Received: from [10.1.34.54] (e122027.cambridge.arm.com [10.1.34.54])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 285EE3F86F;
-	Thu,  4 Jun 2026 08:28:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780586892; bh=U+vxUTdHbW20siTX3dFVZo9Bt+XzRLjvG5MjTOCV9RQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K0kmt3C/w1k1/6n0F9rLjabKEulh884qSAOTEDtUvrfqwXhIPmD/u/+TDcan9mRlh
-	 Uz3PZDEhQmZP92vxbgVpLeStWi1s2nc35dzj+xBj6xzqW76+pEzcRfzfh9rdvb6zTJ
-	 hqvaO1R6yqUEw1gmGZCfBmf15tWhoWXn85jOGi5k=
-Message-ID: <16e9386c-7180-439d-8174-2be824abbd1e@arm.com>
-Date: Thu, 4 Jun 2026 16:27:58 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dp9lQhSA"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-51765331535so565771cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 04 Jun 2026 08:30:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780587034; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Jwlo4i4QXpWVWy3kkLHY2fzCm2Gy+7V/Q88eSyYhsNpzX72/LDmww6wKQrfsgjWOTo
+         CrwarJTqMCWjSErv0QWVyoiJiIhumJWOalLZ4Xnz1q6DfSmMYm8UIS5g7reVbUI6Y5X6
+         DdbctyyRxchLrdODPZSbh9asFPNMmkNtHkYWiMKIGabAONF+nOTqlH9S2l2WcgCcEHNh
+         EkhZq0hNFUnELi373yiK7wo9AJNaFqX1nR4nnrXIySTnME2sQwO6iGDPx36an0y6EMM5
+         btfmJVDPpnjhPw9HfoxWhbW9yJA2x16kDT0Ghdx5dJNTn/cXh37rc9jE1ZlyuB3Pntk9
+         nWrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=QzQ2Q92BkyZrcIbCUmXt/htpBaJmJbUACSBmA0TFGo0=;
+        fh=VcRGLffnjslt3b0B1tjhzCfz/Cv43jcuBFly8/QIDWk=;
+        b=BrqskYJIX95JIukfkuMHesKlqKb7PEzbOQkjwODMDkuOjh1l1GuETTkyM2aA45U/22
+         mYzvcpweRukPSBKdGpZ5pXOMBnKR404sHVNNSPBQUQDX1WO4DhyaECBNXu5g1s/4cdtq
+         XoZvjrQEkEksjPT7MnxGjcgLNF/kkFcNMqkBUim4o3w8iayLBgWmkypn8wRZmFrtM9ej
+         pcTfn/lvCGlHLBo5VzLmnpu23YKyZvZbfnxxY1OU6H3wVHHoN81FIpaGRtqIwysM3cFg
+         geDYZW2f78V13atoSykqajPDfZRbJLG2Cu10OwcS8OrDF+kPUXNSae2uSZYlfB7eVofK
+         ySBg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780587034; x=1781191834; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QzQ2Q92BkyZrcIbCUmXt/htpBaJmJbUACSBmA0TFGo0=;
+        b=Dp9lQhSAqM+dswAUWaxK2ik/KOMWaCP/gVitYPeS+7pjhpFx0i4zZJ/rdy4dFIhqlU
+         l1ylVeUsbXdQK0mzon9QnKq87+elb7bFtds6CP6sVKGKNZKIiTjPPYCuqnE6RG+BOFmy
+         YutIfqjq75vXEc1mQ8ugLTAbGWeMEPY4ZZctU0TIam4CG1wPUBV4bRpSwQUNPbpffamH
+         4Pp81z5h1WXO/Lo52NthJVVCC+fmNXFEcCIx3K8t7u1kKMEztrMpKRYZSEopaXseG9ot
+         S5XPUz7Jk5p+Pn3zZeOfwjKjUK1YUeLyMJD+eCvoUrp7t8rOQa5mqheJiMsa35zJ1c0O
+         ND4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780587034; x=1781191834;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QzQ2Q92BkyZrcIbCUmXt/htpBaJmJbUACSBmA0TFGo0=;
+        b=spen+ujJrt1yZ9YK2L4BhN5xCO23vU9i9vGQW8W4I7pjaAEs4KxXNlxf8P2Gj4iwpZ
+         +sOHmzx2lifLEf8BcfsT+Rzpq3jQlaK0U4b69V3WJCtPULPshWdVK7190o0jm0e5tKxX
+         ofODZgXBroOE5mbhuy7NaZfyQKZGe7pBkY3Jg57baX5pNx0VrH0tYRLfcQKMTDG8pI2L
+         1OD6mmtlHf90Buz6X8GmB5qopr2We7QIbUdHm0m++H5bR8HzDqWcydPHYTA32J/mrkTP
+         2PiWcheWS1GD0TYOokDYuTDqGW21n4CdSaBq/TfiFYyyNVkBiFx6mSy55tE2mnDTvA6n
+         Y0Zw==
+X-Forwarded-Encrypted: i=1; AFNElJ9v8DfTuSCR6p4sz1h+7jrToSG42eYCzbMSMSnzoI/n9Sxt3M6NHTO+D98FzYvTeYD8FwyNqLQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwqOc0MDovP8MabIbU18s7wvges7Fr61bfaoYP4gn30kxxMK8lL
+	8KIJWxjQPc7rkViUKOOJeg8xRiZYpLp9wl0SgOn78DIwKx35BeAV13PoHQNrxfv4B1wuIaJQU2a
+	3Eox2LlTVVDDBKygcH3pdXkDDgGrfr6qoYsTUYU06
+X-Gm-Gg: Acq92OHOAFWrNscEFpGMOQyCBbxtlzV5Cpit4P2Rmh4tO5BctN1VOT3eWjIauChVlqe
+	ApkJirLnPPAxR0ORB4bfZB6sYLdtar0wxWdrI69j66H9UosGSY1APN9n63yTDYoc2KbwGMV7Eh/
+	US0fib22ZH6iMn0wOjejGgibOz/Y+8D3CPMqkajxvNDY7kNfCto8skEOCDbLODwyZIXtdSJRkQU
+	UVBJkFLa3T9Rw6yfVKf/2/EyD1Ur7jIt4P0AcDmEGWBVXL4sryezRZpP4CkzQ3yrKwWhGNEK48U
+	X7Ea70n9yLvs5xAKfF73SPJcZAEn8g==
+X-Received: by 2002:a05:622a:1801:b0:516:4f62:85f1 with SMTP id
+ d75a77b69052e-51787ab8be5mr8370021cf.22.1780587033025; Thu, 04 Jun 2026
+ 08:30:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 13/44] arm64: RMI: Define the user ABI
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-14-steven.price@arm.com>
- <86jysovpxf.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <86jysovpxf.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260604151210.1304051-1-imv4bel@gmail.com>
+In-Reply-To: <20260604151210.1304051-1-imv4bel@gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 4 Jun 2026 16:29:56 +0100
+X-Gm-Features: AVVi8Cc2MXFGX13UgQv8KxsaFbLAfi1SrGkBO6c_9HOxSmMh56zuIxa4lndJTVw
+Message-ID: <CA+EHjTwaz1fvnOKOPc94S-vdvMa8JMLafd=ZNJcbdN4AB+6M0Q@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: Sanitise host vCPU fields copied in flush_hyp_vcpu()
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 27/05/2026 16:21, Marc Zyngier wrote:
-> On Wed, 13 May 2026 14:17:21 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> There is one CAP which identified the presence of CCA, and one ioctl.
->> The ioctl is used to populate memory during creation of the realm as
->> this requires the RMM to copy data from an unprotected address to the
->> protected memory - CCA does not support memory conversion where the
->> memory contents is preserved as this is incompatible with memory
->> encryption.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v13:
->>  * KVM_ARM_VCPU_RMI_PSCI_COMPLETE removed.
->>  * KVM_ARM_RMI_POPULATE documentation updated to reflect that the
->>    structure is written by the kernel.
->>  * CAP number bumped.
->> Changes since v12:
->>  * Change KVM_ARM_RMI_POPULATE to update the structure with the amount
->>    that has been progressed rather than return the number of bytes
->>    populated.
->>  * Describe the flag KVM_ARM_RMI_POPULATE_FLAGS_MEASURE.
->>  * CAP number is bumped.
->>  * NOTE: The PSCI ioctl may be removed in a future spec release.
->> Changes since v11:
->>  * Completely reworked to be more implicit. Rather than having explicit
->>    CAP operations to progress the realm construction these operations
->>    are done when needed (on populating and on first vCPU run).
->>  * Populate and PSCI complete are promoted to proper ioctls.
->> Changes since v10:
->>  * Rename symbols from RME to RMI.
->> Changes since v9:
->>  * Improvements to documentation.
->>  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
->> Changes since v8:
->>  * Minor improvements to documentation following review.
->>  * Bump the magic numbers to avoid conflicts.
->> Changes since v7:
->>  * Add documentation of new ioctls
->>  * Bump the magic numbers to avoid conflicts
->> Changes since v6:
->>  * Rename some of the symbols to make their usage clearer and avoid
->>    repetition.
->> Changes from v5:
->>  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->>    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
->> ---
->>  Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++++++++++++++
->>  include/uapi/linux/kvm.h       | 13 +++++++++++
->>  2 files changed, 53 insertions(+)
-> 
-> $SUBJECT looks wrong. This is a KVM change, not an RMI change.
+On Thu, 4 Jun 2026 at 16:12, Hyunwoo Kim <imv4bel@gmail.com> wrote:
+>
+> flush_hyp_vcpu() copies the host vCPU context and vGIC state into the
+> hyp's private vCPU on every run. This series sanitises two fields that
+> it currently copies verbatim (host -> EL2): __hyp_running_vcpu is
+> cleared in the guest context, and used_lrs is bounded by the number of
+> implemented list registers.
+>
+> v1 -> v2: split into two patches, one per field, per review.
 
-Ah, true I guess "KVM: arm64: Define the user ABI for CCA" is more accurate.
+For the series:
 
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 52bbbb553ce1..ca68aae7faa2 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6553,6 +6553,37 @@ KVM_S390_KEYOP_SSKE
->>    Sets the storage key for the guest address ``guest_addr`` to the key
->>    specified in ``key``, returning the previous value in ``key``.
->>  
->> +4.145 KVM_ARM_RMI_POPULATE
->> +--------------------------
->> +
->> +:Capability: KVM_CAP_ARM_RMI
->> +:Architectures: arm64
->> +:Type: vm ioctl
->> +:Parameters: struct kvm_arm_rmi_populate (in/out)
->> +:Returns: 0 on success, < 0 on error
->> +
->> +::
->> +
->> +  struct kvm_arm_rmi_populate {
->> +	__u64 base;
->> +	__u64 size;
->> +	__u64 source_uaddr;
->> +	__u32 flags;
->> +	__u32 reserved;
->> +  };
->> +
->> +Populate a region of protected address space by copying the data from the
->> +(non-protected) user space pointer provided into a protected region (backed by
->> +guestmem_fd). It implicitly sets the destination region to RIPAS RAM. This is
->> +only valid before any VCPUs have been run. The ioctl might not populate the
->> +entire region and in this case the kernel updates the fields `base`, `size` and
->> +`source_uaddr`. User space may have to repeatedly call it until `size` is 0 to
->> +populate the entire region.
->> +
->> +`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
->> +populated data is hashed and added to the guest's Realm Initial Measurement
->> +(RIM).
-> 
-> Where is that measurement stored? And retrieved? At least a pointer to
-> that would help.
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
-It's stored within the RMM and retrieved by the guest (using the RSI
-interface). I'll update to:
+Cheers,
+/fuad
 
-`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request
-that the populated data is hashed and added to the guest's Realm Initial
-Measurement (RIM) stored by the RMM. This can then be retrieved by the
-guest (using the RSI interface) to present to an attestation server.
 
-Thanks,
-
-Steve
-
->> +
->>  .. _kvm_run:
->>  
->>  5. The kvm_run structure
->> @@ -8904,6 +8935,15 @@ helpful if user space wants to emulate instructions which are not
->>  This capability can be enabled dynamically even if VCPUs were already
->>  created and are running.
->>  
->> +7.47 KVM_CAP_ARM_RMI
->> +--------------------
->> +
->> +:Architectures: arm64
->> +:Target: VM
->> +:Parameters: None
->> +
->> +This capability indicates that support for CCA realms is available.
->> +
->>  8. Other capabilities.
->>  ======================
->>  
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 6c8afa2047bf..b8cff0938041 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -996,6 +996,7 @@ struct kvm_enable_cap {
->>  #define KVM_CAP_S390_USER_OPEREXEC 246
->>  #define KVM_CAP_S390_KEYOP 247
->>  #define KVM_CAP_S390_VSIE_ESAMODE 248
->> +#define KVM_CAP_ARM_RMI 249
->>  
->>  struct kvm_irq_routing_irqchip {
->>  	__u32 irqchip;
->> @@ -1669,4 +1670,16 @@ struct kvm_pre_fault_memory {
->>  	__u64 padding[5];
->>  };
->>  
->> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM */
->> +#define KVM_ARM_RMI_POPULATE	_IOWR(KVMIO, 0xd7, struct kvm_arm_rmi_populate)
->> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE	(1 << 0)
->> +
->> +struct kvm_arm_rmi_populate {
->> +	__u64 base;
->> +	__u64 size;
->> +	__u64 source_uaddr;
->> +	__u32 flags;
->> +	__u32 reserved;
->> +};
->> +
->>  #endif /* __LINUX_KVM_H */
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+>
+> Hyunwoo Kim (2):
+>   KVM: arm64: Clear __hyp_running_vcpu when flushing the pKVM hyp vCPU
+>   KVM: arm64: Bound used_lrs when flushing the pKVM hyp vCPU
+>
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> --
+> 2.43.0
+>
