@@ -1,177 +1,137 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66223B19D8;
-	Thu,  4 Jun 2026 14:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780584238; cv=none; b=ttnDrcrGyO6nsFD4F8mincuiC+XMYYwrOLZ/vvS6tW6iM4daUlUIMmjOeDk1e6+3cmCGQJ6wTx60NbO+kCs1GLfs5PwCWHKcL9J7Rhq7LOFO3vR1HBIchQ6snJndoUp5XtF/pDG1cVhh9qG5DOaMORU42nudQXOHoB8xSABauDs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780584238; c=relaxed/simple;
-	bh=b/UDPb8ZwzcbmTijGa9ghHw1SVkFtR2lx41scNsuBjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a7tAJAe6liVW+zt/A7sjpNzG5MY6PzblcgCo2RSeu9V0QurbiUA90TPthLjXFedvql2ANb825ErivsPt0+DKXAMExgbZM4RLKLe7recsrRrjCBRD0WxmdzrydkGBgzwcMRQX1G+BA5GizM7o5zwZJ97qrdNmYsopVFonN3qSGL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Gn6z/d22; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCEF2D1911
+	for <kvmarm@lists.linux.dev>; Thu,  4 Jun 2026 14:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780584473; cv=pass; b=mzTLQ1G1pMGD631WmKdzPoqfFbnCMCSBq2UUxSadJ6jxYYANPdOx7FlpeEv4HMCaxHEsJU8g8hyohalABRKQtE/SdeSUQn4cisH4JAorJbSIaTSGC1ikvcgPdxmY0JF3G2fCrXKO9p7A4a75EYW1VnYS3h/y29YgPTsmMfr5yhI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780584473; c=relaxed/simple;
+	bh=cS36YC7Wu3PtL9qTsgYUx0lM3dO2E4U9fKR5NR4EZG8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cv5zM9n2ej1147tPoai7ebowZ9n9xxm38QAE6urCK6nKObzDO57jvHEvt9NELpqAFWihsfkWWJTyscVoWO+WzTGgcrI+d/YDGNjOj60pCDjpieWrbScTzumTUZTjOehIVedWnv6qdnUqAC0PD2ohCe1B9pY+g5TVzt+Z2Wm2VwA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UgHj1c12; arc=pass smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Gn6z/d22"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1F783D4D;
-	Thu,  4 Jun 2026 07:43:49 -0700 (PDT)
-Received: from [10.1.34.54] (e122027.cambridge.arm.com [10.1.34.54])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE2373F7D8;
-	Thu,  4 Jun 2026 07:43:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780584234; bh=b/UDPb8ZwzcbmTijGa9ghHw1SVkFtR2lx41scNsuBjo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Gn6z/d22MGsutY4vrKsRLbGb1JtpNa5H68u4zp2JsNXjaVzof1wCdH042dXjksL32
-	 3bQQkNGnNvI/E3bx/qFU+wirdXrg2s3UT8bnf/anDlnzOBsOrKTbQ0RD5hblrWE1yd
-	 Xm4/PDVe6lFcK9jaluBGd8A0FpR/YMBGavFmftuY=
-Message-ID: <fad5dc03-f7ce-4b15-bb73-e2dbd43810a6@arm.com>
-Date: Thu, 4 Jun 2026 15:43:47 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UgHj1c12"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-bec3f69d343so127049166b.0
+        for <kvmarm@lists.linux.dev>; Thu, 04 Jun 2026 07:47:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780584469; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ifnQFmxb4jmqWza+BoEN5IekIeApZxLwnamFY90zwLBl3ydT7LkG1BAgwp1wQNhJAw
+         JELel2T+zxUiKONSdp+cxlFXEdRRrbSRLe/czeYKntIwQKn8dPVu71UDWW9VrwP73ahn
+         SDke9l2s4OEgvJa+w/BnwOsd/Ng6xaj1/QuLyKwPkJ5SmcOJdwHZxmqPV568s1Ca78Hb
+         sy1/z3aKv8yKxtXohSE1SdMwkH5Ika9rhT2eZ7K4tdGHX1ET0f1w7J0Nxfo8V0sWD80T
+         3ulGlgqvy9Ev8XC4ma8ZrsOuJAPxiz4RNOjnbARdpL43G4UbTpZazNpnPAj6ne30Oyl+
+         oeqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=QSjd1U/70yhpLCdfTmik43TR68lZDDCtC2Km+f9O/NM=;
+        fh=+eq9y8RvMq9Jpf3NJI7UZ2a/PsgNeDA/ABIvIZVtxjQ=;
+        b=bwe19fLFxESXmqd6U/AkEq7Pbh0K6yHjxxuwbdS7RhYhw8lnbxkS16FUt1F7/aV5My
+         xVIK/QoSxBAQz1Zu1WDiCTjVCvk1u0jlQ9fvDKTb9IP+ba+XlM5+fiFLp86zw2EGMTmH
+         5VBZvcBYyDm1Vo6LyilRoIvIaOrOkliG2vdOsLTjY884hzmNhZsDoXMaN4sv3Yi3nqoI
+         ekxxPknv0lwd49eUeCgXwKhXGOkKXG6yZZH2tu/cTj+008dq3WFIpLDvQAnUDDMqP7Ob
+         f06UME02SxkCs9dw9VQ2Jd1LpUoJWppKQx8DtnC4Wc4av/JcBNiBSoJ8QqXt0BJlZg4h
+         fTMA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780584469; x=1781189269; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QSjd1U/70yhpLCdfTmik43TR68lZDDCtC2Km+f9O/NM=;
+        b=UgHj1c127n4YipjmGQ/C8zzuVr6BIGB7HBEUoM3AFb16Otx6DBwhaCQz/NgYsNYLGZ
+         IiMCgf6eODoLPsjjkmFXIrAI4ieZsmzaJmcvkwfaENlR6TT0iR18ZbvVl1sDzV0AWCTA
+         ZPEEmSobizqdzuAj7U72yD0fjkMQFqEPhz4YgZJrnGtAdRb8zWa96+o5wzjQdrkHqYJa
+         bj+5sDw4Vc4jZ4Tq2vWHBHyhGQwCBpNHOqv/atPGAHiUpVh2m2tjrd+3HSr0byrr7X6v
+         Xj+YZGbF9/inE0ElBJBZw74hnRfMK3vkEAmKkCuoL3BNe/c7PezUe1bx8hWZs8qgIwRo
+         vykQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780584469; x=1781189269;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QSjd1U/70yhpLCdfTmik43TR68lZDDCtC2Km+f9O/NM=;
+        b=Jbkb5echhBbVWcVDB8ZmuYZtrLnt8i8vYAwYIoFq9AwQ1KpzWLhn6cV4f8R1o4RJNv
+         KyHukyf203UX25tooZuUticO8lQduvLCZvAKRwG2T0ks6psZfoxlxSlhzd7NyHj0TWNY
+         nfHDBYWqpojAbrq/mwgXjtrzFLhKiqp1bSj/BaEBLBuCcK6LV8kokLyyEVRwLyeVBDQU
+         lx3Ib00+7r76EGSHR1imrjs2x8cGxu22mqKVYV2NuoDl6VcQ4c2XDXJUTtPj64pAxZJv
+         R1RkFd0N5zYDmkKnpUlai1kTCpX+woTduSOZs6KkpbFVI2CLW5r1Fk65iBTaw89FSAiO
+         5D4g==
+X-Forwarded-Encrypted: i=1; AFNElJ8BB6ArOEVnU0wqw7pu/wEddtowiAbKNtQirXXzRQlV6BtW4cDyQorlAXbnWjSwEdiYIUscVWA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw7Tn03mowNVBtYl1lrLdqpXs1hoMBhW25+E3/tYYEMBAH6Y2iS
+	L9V7G7MMvuOjrFK9pQZGrr3G3APEfj/r5sz6TrenZBRRc0Cp8rZtyZ7kxfzLKHM7u6GPZUGaBfx
+	OI6vL4wY8FweA2OnbFEG1l8FqFuQgIOWHi2zPdagg
+X-Gm-Gg: Acq92OGkqZ31QqRLLaukhoJeuBQWM5OFY3wgrmPJLLkTEmctNjsmI01TgNsiz/3Lrbv
+	RY1YzjeC9W2C9WeZAywCsLvXZ0grKvv3NPnAKlgxYp+5jAKwtkWcu/QJwbaEzq/4nA/FagmhQd7
+	X8wiIcDeEnPPsQx7lWnuWwJb7N7IDz4A7KBbjIlyxqRiVQOAZ+BLA8lIjLkJjVoyUl7MNoWnQxe
+	BSc4or5c37fkhsipR6EAhIHIYkXYuEbPA7G36wR6Iw3Zh00RoEMFZIKaJ2DPg60+H/lRaj9FiR8
+	w8lVyGikSZWu6ajNs+H8pMNR/N9SneyCLZ+m4BgA0ExpRE8oRlj9uZzHWFhqdAtSU1O1eg2v4WR
+	haLxVxhg=
+X-Received: by 2002:a17:907:6d26:b0:bb7:eb68:514e with SMTP id
+ a640c23a62f3a-bf0aed0cafemr433224366b.36.1780584468249; Thu, 04 Jun 2026
+ 07:47:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 09/44] arm64: RMI: Provide functions to
- delegate/undelegate ranges of memory
+References: <69a2d58c.050a0220.3a55be.003b.GAE@google.com> <874in0ex49.wl-maz@kernel.org>
+ <CACT4Y+bbQ3qfoy0kuXgTk5H2k=Wrg2t0Ghhc6U6fT-28ter7iA@mail.gmail.com> <86wlzu8ird.wl-maz@kernel.org>
+In-Reply-To: <86wlzu8ird.wl-maz@kernel.org>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Thu, 4 Jun 2026 16:47:36 +0200
+X-Gm-Features: AVHnY4ICfNLxavuIrQN2iJIGM7Z0iBfnUYdb7BfndwNYy6T9AkyY1h7EA6y1Ohw
+Message-ID: <CACT4Y+ZKV6Lq0uBv7ob1cKnVcD7XUvV2srUMDR5R9gxAE_Yxww@mail.gmail.com>
+Subject: Re: [syzbot] [kvmarm?] [kvm?] BUG: unable to handle kernel paging
+ request in kvm_vgic_destroy
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-10-steven.price@arm.com>
- <867bowx3qx.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <867bowx3qx.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc: syzbot <syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com>, 
+	syzkaller@googlegroups.com, catalin.marinas@arm.com, joey.gouly@arm.com, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	oupton@kernel.org, suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, 
+	will@kernel.org, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 21/05/2026 14:59, Marc Zyngier wrote:
-> On Wed, 13 May 2026 14:17:17 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The RMM requires memory is 'delegated' to it so that it can be used
->> either for a realm guest or for various tracking purposes within the RMM
->> (e.g. for metadata or page tables). Memory that has been delegated
->> cannot be accessed by the host (it will result in a Granule Protection
->> Fault).
->>
->> Undelegation may fail if the memory is still in use by the RMM. This
->> shouldn't happen (Linux should ensure it has destroyed the RMM objects
->> before attempting to undelegate). In the event that it does happen this
->> points to a programming bug and the only reasonable approach is for the
->> physical pages to be leaked - it is up to the caller of
->> rmi_undelegate_range() to handle this.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> v14:
->>  * Split into separate patch and moved out of KVM
->> ---
->>  arch/arm64/include/asm/rmi_cmds.h | 13 +++++++++++
->>  arch/arm64/kernel/rmi.c           | 36 +++++++++++++++++++++++++++++++
->>  2 files changed, 49 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
->> index 9078a2920a7c..eb213c8e6f26 100644
->> --- a/arch/arm64/include/asm/rmi_cmds.h
->> +++ b/arch/arm64/include/asm/rmi_cmds.h
->> @@ -33,6 +33,19 @@ struct rmi_sro_state {
->>  } while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY ||			\
->>  	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
->>  
->> +int rmi_delegate_range(phys_addr_t phys, unsigned long size);
->> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
->> +
->> +static inline int rmi_delegate_page(phys_addr_t phys)
->> +{
->> +	return rmi_delegate_range(phys, PAGE_SIZE);
->> +}
->> +
->> +static inline int rmi_undelegate_page(phys_addr_t phys)
->> +{
->> +	return rmi_undelegate_range(phys, PAGE_SIZE);
->> +}
->> +
->>  bool rmi_is_available(void);
->>  
->>  unsigned long rmi_sro_execute(struct rmi_sro_state *sro, gfp_t gfp);
->> diff --git a/arch/arm64/kernel/rmi.c b/arch/arm64/kernel/rmi.c
->> index 52a415e99500..08cef54acadb 100644
->> --- a/arch/arm64/kernel/rmi.c
->> +++ b/arch/arm64/kernel/rmi.c
->> @@ -12,6 +12,42 @@ static bool arm64_rmi_is_available;
->>  unsigned long rmm_feat_reg0;
->>  unsigned long rmm_feat_reg1;
->>  
->> +int rmi_delegate_range(phys_addr_t phys, unsigned long size)
->> +{
->> +	unsigned long ret = 0;
->> +	unsigned long top = phys + size;
->> +	unsigned long out_top;
->> +
->> +	while (phys < top) {
->> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
->> +		if (ret == RMI_SUCCESS)
->> +			phys = out_top;
->> +		else if (ret != RMI_BUSY && ret != RMI_BLOCKED)
->> +			return ret;
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->> +int rmi_undelegate_range(phys_addr_t phys, unsigned long size)
->> +{
->> +	unsigned long ret = 0;
->> +	unsigned long top = phys + size;
->> +	unsigned long out_top;
->> +
->> +	WARN_ON(size == 0);
-> 
-> I find it odd to warn on size = 0. After all, free(NULL) is not an
-> error. But even then, you continue feeding this to the RMM.
+On Mon, 2 Mar 2026 at 14:26, 'Marc Zyngier' via syzkaller
+<syzkaller@googlegroups.com> wrote:
+>
+> Hi Dmitry,
+>
+> On Mon, 02 Mar 2026 12:59:41 +0000,
+> Dmitry Vyukov <dvyukov@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > The reproducer should print at the start specifically to address this concern:
+> >
+> > the reproducer may not work as expected: fault injection setup failed:
+> > failed to write fault injection file
+> >
+> > Isn't it enough?
+>
+> Ah, I totally missed that, because things scroll really
+> quickly... Apologies.
+>
+> I think it'd be a bit better to just stop the test if the
+> preconditions are not met, as nothing useful will happen.
 
-Ok, I'll admit that this is left over debugging - although this is a
-condition that shouldn't happen.
+FTR filed https://github.com/google/syzkaller/issues/7450 for this.
 
-Note that the while() condition prevents this from actually getting to
-the RMM.
-
-I'll drop the WARN_ON() since it's confusing.
-
-Thanks,
-Steve
-
-> You also don't seem to be bothered with that on the delegation side...
-> 
->> +
->> +	while (phys < top) {
->> +		ret = rmi_granule_range_undelegate(phys, top, &out_top);
->> +		if (ret == RMI_SUCCESS)
->> +			phys = out_top;
-> 
-> and size==0 doesn't violate any of the failure conditions listed in
-> B4.5.18.2 (beta2). Will you end-up looping around forever?
-> 
-> Same questions for the delegation, obviously.
-> 
-> 	M.
-> 
-
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller+unsubscribe@googlegroups.com.
+> To view this discussion visit https://groups.google.com/d/msgid/syzkaller/86wlzu8ird.wl-maz%40kernel.org.
