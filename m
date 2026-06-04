@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB933358AF;
-	Thu,  4 Jun 2026 15:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA7339861;
+	Thu,  4 Jun 2026 15:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780586887; cv=none; b=s8VjXrfoWaTDnbQe1Z3t5XHHcfqOChvzlx9eySIsKBaNdCLwIOUmZqI0D44+yFUih/reeJDz6gL10Xb+ho7M2AiW4S+rhGkJcNsBHVkktVPfKOzZLLbEW4f/yTvpFQdhAH+FMU6A4gKwrd9pmRlbg20YkPVpxKqvEmbqJ5PGNno=
+	t=1780586895; cv=none; b=jvcbibxIXP0zGgUof8Up91cmdsz6dbYaLLBl7GxYUVruAztv5WuvAfjctM1RBD9TgN4hZMhMUYGAJEbwXqF9U1NjINhs5oEXYCwRBEWGjdWsHyA4iKWUU68GJMNqZksoupp6cLnVq7BtkpXHFN0zGSqZ0vhSXr6CV+MAygiBVq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780586887; c=relaxed/simple;
-	bh=YtOWVl5eZxf9L/IZyd+Bnj2EBe0YqnfeeGynsWBEQwU=;
+	s=arc-20240116; t=1780586895; c=relaxed/simple;
+	bh=U+vxUTdHbW20siTX3dFVZo9Bt+XzRLjvG5MjTOCV9RQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mZH5qkXxaXgypeydkrl5qLE93nPhm61GysUUuYIA962V6xpW4Dl8JLz/qPD5eDu/QQW2QHelkze6qfayeKzGS2n532yf4mU2R6XhwJMEVCpE+iFyTnxwotSbxLJI/uGxmgXw+iPzwnDHpLk6m5XyXU3vTSbrovsaEh68o5zhS0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PvUdJ+L8; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=HUn07/i+bakymgY1lErVFxdI8i5h4RhaU8IpOtEZsmKtqnfPF1LDyUcEt9hiU4eGuCnclJk5bYRTM0NnRYK2p6MhYHPEgmecav1PF96IkbkX7nZhptgBRGiIvxZv/A1XAjbRigc215tMVY9kw1j/bvA0H1VzzbgOe2TQ5FiUET4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=K0kmt3C/; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PvUdJ+L8"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="K0kmt3C/"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D87E21516;
-	Thu,  4 Jun 2026 08:28:00 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B775E1516;
+	Thu,  4 Jun 2026 08:28:07 -0700 (PDT)
 Received: from [10.1.34.54] (e122027.cambridge.arm.com [10.1.34.54])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 911F13F86F;
-	Thu,  4 Jun 2026 08:28:00 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 285EE3F86F;
+	Thu,  4 Jun 2026 08:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780586885; bh=YtOWVl5eZxf9L/IZyd+Bnj2EBe0YqnfeeGynsWBEQwU=;
+	t=1780586892; bh=U+vxUTdHbW20siTX3dFVZo9Bt+XzRLjvG5MjTOCV9RQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PvUdJ+L8EOCycYtjS/iYCTUrdqQzDKtRaPg5V+u08Q6l+KjZtgLeU/SzxEj+tKvEf
-	 tWjuM3eClZ5UZE5+WeJrBDZfgsgbuAD1A3FaxmK3PeM9p8i2TWL16zOGy5Lp86qsgl
-	 v4fHcEpSPP0jam2x+R+38YVPf1FbB4Jc+eExQnoI=
-Message-ID: <32d691c2-edfd-408c-bb49-7eba623bec11@arm.com>
-Date: Thu, 4 Jun 2026 16:27:57 +0100
+	b=K0kmt3C/w1k1/6n0F9rLjabKEulh884qSAOTEDtUvrfqwXhIPmD/u/+TDcan9mRlh
+	 Uz3PZDEhQmZP92vxbgVpLeStWi1s2nc35dzj+xBj6xzqW76+pEzcRfzfh9rdvb6zTJ
+	 hqvaO1R6yqUEw1gmGZCfBmf15tWhoWXn85jOGi5k=
+Message-ID: <16e9386c-7180-439d-8174-2be824abbd1e@arm.com>
+Date: Thu, 4 Jun 2026 16:27:58 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,11 +36,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v14 13/44] arm64: RMI: Define the user ABI
-To: Wei-Lin Chang <weilin.chang@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
  <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
@@ -51,41 +50,27 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
  Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo.Pieralisi2@arm.com
 References: <20260513131757.116630-1-steven.price@arm.com>
  <20260513131757.116630-14-steven.price@arm.com>
- <vixej2afqamvr7eaksoepr3wmpwzp73rtgrageeyuawa6azotw@payxzyhymwbt>
+ <86jysovpxf.wl-maz@kernel.org>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <vixej2afqamvr7eaksoepr3wmpwzp73rtgrageeyuawa6azotw@payxzyhymwbt>
+In-Reply-To: <86jysovpxf.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/05/2026 23:17, Wei-Lin Chang wrote:
-> On Wed, May 13, 2026 at 02:17:21PM +0100, Steven Price wrote:
+On 27/05/2026 16:21, Marc Zyngier wrote:
+> On Wed, 13 May 2026 14:17:21 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
 >> There is one CAP which identified the presence of CCA, and one ioctl.
 >> The ioctl is used to populate memory during creation of the realm as
 >> this requires the RMM to copy data from an unprotected address to the
 >> protected memory - CCA does not support memory conversion where the
 >> memory contents is preserved as this is incompatible with memory
 >> encryption.
-> 
-> Nit:
-> I believe spelling out the CAP and ioctl names can improve the commit
-> message. Also "memory conversion" is a little vague, maybe
-> 
-> ... CCA does not support shared <-> private memory conversion where ...
-> 
-> would make this clearer?
-
-Thanks for the suggestions - yes I agree that would make it clearer.
-
-Thanks,
-Steve
-
-> Thanks,
-> Wei-Lin Chang
-> 
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
@@ -127,6 +112,11 @@ Steve
 >>  Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++++++++++++++
 >>  include/uapi/linux/kvm.h       | 13 +++++++++++
 >>  2 files changed, 53 insertions(+)
+> 
+> $SUBJECT looks wrong. This is a KVM change, not an RMI change.
+
+Ah, true I guess "KVM: arm64: Define the user ABI for CCA" is more accurate.
+
 >>
 >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
 >> index 52bbbb553ce1..ca68aae7faa2 100644
@@ -166,6 +156,22 @@ Steve
 >> +`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
 >> +populated data is hashed and added to the guest's Realm Initial Measurement
 >> +(RIM).
+> 
+> Where is that measurement stored? And retrieved? At least a pointer to
+> that would help.
+
+It's stored within the RMM and retrieved by the guest (using the RSI
+interface). I'll update to:
+
+`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request
+that the populated data is hashed and added to the guest's Realm Initial
+Measurement (RIM) stored by the RMM. This can then be retrieved by the
+guest (using the RSI interface) to present to an attestation server.
+
+Thanks,
+
+Steve
+
 >> +
 >>  .. _kvm_run:
 >>  
@@ -215,7 +221,9 @@ Steve
 >> +};
 >> +
 >>  #endif /* __LINUX_KVM_H */
->> -- 
->> 2.43.0
->>
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
