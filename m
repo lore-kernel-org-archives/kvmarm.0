@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BC03CF66A;
-	Fri,  5 Jun 2026 15:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506533FF1B8;
+	Fri,  5 Jun 2026 15:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780671689; cv=none; b=OpzOMgvx9p2U0SJkHeyrMxSaJ0hLThmS64JnyF2DF33x7LxkzAKBlLos5HnI3GdAD0IalEE07JbJm+pvHYASFRMf+rJeaiv2qDHGFqmUPn7GbNc/YtIPmQWlIApPKJzzRO/65zek2ySf4a31b8XGuhekdEzcbxGNHZnloi1RL30=
+	t=1780671696; cv=none; b=VV3bZX3k/pQlgsVZr9qbZfqxahgrvSjAUqMKpPaenv+sx+obi/+b8t8PiO4atTc2lWapweM5kZ73N+R0iiIyPKlf35PVOwfYi+NThJul1xZAD65AHi0NJioR5OCE6QFeBA3ANi4G3AFsOU5xWEowF4sBR3tibfgo1mvNrxQYK1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780671689; c=relaxed/simple;
-	bh=pX5cPTm4tKheVEgspbkiw6io31T21tvvDkNgRyQ7yzY=;
+	s=arc-20240116; t=1780671696; c=relaxed/simple;
+	bh=Kw74Th8uleLKaO5LRkIELng/AmZEGicEGgtYZsuXiDM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pihrNMLafhlfDRYVaGeyTWtmltvqwkfjage+ZI0+CtsK/z9sI0nVu6BwKYBbdHlyyOlXHyuyRSnezvu8RO8kBuvKTIQLiIq266T/aQuW3RXPF5tiMfX7OP7qdk1i/1+wxSuTp/aTt4m4UqAlVo6oGb2LvB4sUO0yB3sgWDQGB98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hg3KZbuY; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=BDSQJB1uhZJGWvdyBHT1P2l6hbcb8SHWyq+veSlMQ51+RmWMGSIoHZcISRraCFEuq+Gw88+Nz/DIxtZ+Dt0RvZGw8C3hwPCiAnx0TxR2sc05B/3goQQkz2ii9WgYuCqxQnY5GEDMSnljvemU8Cv8TeY4gE6f17mc/eTvdG84Ir8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sLZaoukS; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hg3KZbuY"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sLZaoukS"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B07E2C40;
-	Fri,  5 Jun 2026 08:01:21 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 85EC52E9D;
+	Fri,  5 Jun 2026 08:01:29 -0700 (PDT)
 Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 65C2E3F7D8;
-	Fri,  5 Jun 2026 08:01:22 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8439D3F7D8;
+	Fri,  5 Jun 2026 08:01:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780671686; bh=pX5cPTm4tKheVEgspbkiw6io31T21tvvDkNgRyQ7yzY=;
+	t=1780671694; bh=Kw74Th8uleLKaO5LRkIELng/AmZEGicEGgtYZsuXiDM=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hg3KZbuYxmtzIfG3Kb4pmvwYU4Jt/S4GmntdiflvcoTJrVFZ69ZZaEr1nNYZ4SHIf
-	 SlAPKF4FlWRk8c+C7l35jSxQOy/g8PNL/ObZS6KkWgGz3YDfgN5WCVPiHZ5EKvOdoK
-	 mh6Yr05koue4HWlcNyPh9TRXn19PDf7zCO3RkbLc=
-Message-ID: <5a278498-f86f-47c4-862d-cdc8087cc939@arm.com>
-Date: Fri, 5 Jun 2026 16:01:20 +0100
+	b=sLZaoukSK9cGr5r3sxgKk4y8LVhQ2VNs87ssT11w2vqpCTeDhdMGx7YhaLota1S9g
+	 HxctiV8g1p0inhSdwHiGjI74yZN7JqyEEpvbK0/HBHOeKScXTHiB5scv59+MUAkrw4
+	 r10HFA1sjZsLx+2KXQ6bQKfL6JK0Db9ua3edkUeY=
+Message-ID: <c6a474b3-225d-42b9-9b64-2f80683ebe9c@arm.com>
+Date: Fri, 5 Jun 2026 16:01:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,14 +54,14 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
 References: <20260513131757.116630-1-steven.price@arm.com>
  <20260513131757.116630-18-steven.price@arm.com>
- <7egwow26r6sbbtm53mujbhpwyts2utzv2ddth7554kqwbk7k7d@iptjpvvbsc2n>
+ <mpesc2j3czpunbg3pvgwbotvfn7vahaabvoiu77vd2g5uervho@255lwycekmxh>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <7egwow26r6sbbtm53mujbhpwyts2utzv2ddth7554kqwbk7k7d@iptjpvvbsc2n>
+In-Reply-To: <mpesc2j3czpunbg3pvgwbotvfn7vahaabvoiu77vd2g5uervho@255lwycekmxh>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/05/2026 23:27, Wei-Lin Chang wrote:
+On 26/05/2026 23:32, Wei-Lin Chang wrote:
 > Hi,
 > 
 > On Wed, May 13, 2026 at 02:17:25PM +0100, Steven Price wrote:
@@ -171,21 +171,80 @@ On 26/05/2026 23:27, Wei-Lin Chang wrote:
 >>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
 >> -	struct kvm_pgtable *pgt = NULL;
 >> +	struct kvm_pgtable *pgt;
+>>  
+>>  	write_lock(&kvm->mmu_lock);
+>>  	pgt = mmu->pgt;
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index f51ec667445e..5b00ccca4af3 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -11,6 +11,14 @@
+>>  #include <asm/rmi_cmds.h>
+>>  #include <asm/virt.h>
+>>  
+>> +static inline unsigned long rmi_rtt_level_mapsize(int level)
+>> +{
+>> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+>> +		return PAGE_SIZE;
+>> +
+>> +	return (1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
+>> +}
+>> +
+>>  static bool rmi_has_feature(unsigned long feature)
+>>  {
+>>  	return !!u64_get_bits(rmm_feat_reg0, feature);
+>> @@ -21,6 +29,144 @@ u32 kvm_realm_ipa_limit(void)
+>>  	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+>>  }
+>>  
+>> +static int get_start_level(struct realm *realm)
+>> +{
+>> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
+>> +}
+>> +
+>> +static void free_rtt(phys_addr_t phys)
+>> +{
+>> +	if (free_delegated_page(phys))
+>> +		return;
+>> +
+>> +	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
+>> +}
+>> +
+>> +/*
+>> + * realm_rtt_destroy - Destroy an RTT at @level for @addr.
+>> + *
+>> + * Returns - Result of the RMI_RTT_DESTROY call, and:
+>> + * @rtt_granule:	RTT granule, if the RTT was destroyed.
+>> + * @next_addr:		IPA corresponding to the next possible valid entry we
+>> + *			can target
+>> + */
+>> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
+>> +			     int level, phys_addr_t *rtt_granule,
+>> +			     unsigned long *next_addr)
+>> +{
+>> +	unsigned long out_rtt;
+>> +	int ret;
+>> +
+>> +	ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
+>> +			      &out_rtt, next_addr);
+>> +
+>> +	*rtt_granule = out_rtt;
+>> +
+>> +	return ret;
+>> +}
 > 
-> Is this included by accident?
+> Looks like out_rtt can be simplified out.
 
-Thanks for spotting that. Yes that change shouldn't have sneaked in
-here. The original code before this series had the redundant assignment
-to NULL. But it's unrelated to this patch so I'll drop the change.
+The issue here is there's a type conversion going on. rmi_rtt_destroy()
+takes an "unsigned long *" to match the general approach of using
+"unsigned long" for the inputs/outputs of SMCCC calls. But rtt_granule
+is a "phys_addr_t". While we know these are (currently) the same size,
+they are not the same type according to the compiler - phys_addr_t is
+"long long unsigned int".
 
 Thanks,
 Steve
 
-> 
->>  
->>  	write_lock(&kvm->mmu_lock);
->>  	pgt = mmu->pgt;
-> 
 > [...]
 > 
 > Thanks,
