@@ -1,42 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FCE4CA26B
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 11:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68993B3BF2
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 12:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780658626; cv=none; b=UOnuy0zeGAGRqVHTvpOIITraJsQiNPcFWvCPs4Nja7yDvrUp2tE18OHayB5VaRpb6LPyGDuYTa3aHZOyApKcjyL8NbDCC0KYFgL+R3KUjf8aW0z9hxwkJT27391dZ1SUFc3gOqqC5VJg2OCEHLtnW5pmJzo8UCyP07G+WGd+tgE=
+	t=1780660894; cv=none; b=WljoP65sBssGJp5t2rv57c6kcqq4SxQjQ41gxfvkoCpMmcMlBeeU+Z9IRJG9yFauAxo8G3LSax+xhAOlj4po9zE8w3IbQR/ano/1mlzNzvT/pFD2z880a+QpwC3QjWvszsFQcqJ9lGovZqwUOiaLYfewOs4Ol6H2lHwuMXJQ5js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780658626; c=relaxed/simple;
-	bh=7b39oZ1rabssA2077RWT7WLd87NqooKg4iMrl/4iZOA=;
+	s=arc-20240116; t=1780660894; c=relaxed/simple;
+	bh=2Hu0OODba5Q6ygSS5Y6An9Vqwxw+RqBSG+XtkbbFEcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohYD7T6fRVGgqEOkBgJPJ7Y/gcSwvjnvNfjjNUtVRLJiMI/jvnunQMvvUZFz1cwt/f2uuNeaw7M8Nyq0PWQ2kvCjS3fchKf7KKbb2WvE/m+kBLHHpEzwNthemDq/Cy5fw1dwPhCfuESNVQWWzyc+lzJe4JdzWHBlaLrqxMh3MrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nnOLGxRa; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=D7YXrWBHUMriATrOf9p44VArKPmzrhr4Fc8uml8vOi24vIjf1MVDnYTNGvxnGuHDq0sd3pnmPFpoOKrWEQMMYwWUubUZXe8cq/cJ561/fb4VhxnJKZO7ZnbwrQyZYVP2Cve934iLiO9w2SoCN8dW4XeWPQxoDkj7GRMuXa8H3dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JtM+7qkd; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nnOLGxRa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE861F00893;
-	Fri,  5 Jun 2026 11:23:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780658625;
-	bh=ibrDkw4cplAxEvZj2EPWnYhxrc+tDX6PdpXQVAA6Xj4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nnOLGxRa1wovQ0EhFRYD9rILOeVIOgDCNz1pDQBWiyUv9YQf4O/m1N/AqS3j5OjNs
-	 6tu+xfb7PtLKhiswywQIvQlu7stn6CpQ5vsc8qbtTngrIteqHgc3cdfx9e2N1Tr0iD
-	 d1AGbeAG6pX+bJ7lNE4+NF0hE3WRR5Czb13ku0a5cLi5zJVAiubA2l4HYw9i0IDD/u
-	 R+Nh/iK5epaZ09K1jdBBRnPfxVVIPCWA3/QAklV2xtfbBEp9Egq2Px2FL34e03ltFf
-	 T9/vVO0dm60VeAMGVTOJIXV2D90LXu5j1Z2Rv0yhOzDbsrMOUYdjj8ABQLYoyBhRzf
-	 R6sdU6RS0i+mg==
-Date: Fri, 5 Jun 2026 12:23:40 +0100
-From: Will Deacon <will@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kernel-team@android.com, tabba@google.com
-Subject: Re: [PATCH] KVM: arm64: Set a linux errno on SMCCC error in
- kvm_call_hyp_nvhe()
-Message-ID: <aiKxvK8HXCac4SYU@willie-the-truck>
-References: <20260603110312.2909844-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JtM+7qkd"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4891b4934ffso68675e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 05 Jun 2026 05:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780660891; x=1781265691; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eaRVw0ksze4pMdMwnejVPQNu/p5iHH1dKv1uIsvyi/U=;
+        b=JtM+7qkdLNl2VIy0/7PwzO1fQ+yNvwvAmOrAWnY32esJw/xv4exQTsLo1yINe3YowG
+         Fw4OkiWDlxSwpR88jLbeVmxFLnBwV5roBmvxQH2AEDeAzqT5wxdZEtf9OJHXw6Os7bmZ
+         fF8JSLzVRLP4ygrqxbh/PUpJJzYNP1XF7BLXDASMApvQ0PyNtecz8OtaDQVqV7HnX862
+         krW5RfvG5rBGC/w5wpYcBF56FSmi7v9/9zJo1qd94Uowhibr+WmGjjPO73Yct+kLR91J
+         UYlh4X9YkWFLvp33jCh3ugI0PLejRX9FCmzWQ+asKdiEdAnvlKVT6NzjKy8X3u3536PO
+         7H+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780660891; x=1781265691;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eaRVw0ksze4pMdMwnejVPQNu/p5iHH1dKv1uIsvyi/U=;
+        b=cYgNuJ35RGHEyUT1CN3G0iBo/wm/n6JPkWNKNU2Dt4mE2hIroVWEHc0HJf7ZRPqON+
+         MQHz/UVcwaftChDLOXnnlNrPFxlzZ2q+qWhSqy0xVCMqlEPjZkvkV2jbaGiK9TGuPr+8
+         3NimwFfnwvkSYaEDWPcz527qlmn2ylYG+Twvc0O4XSKJODDnvKalEELBQ4KQP5KfQzR6
+         7BJDBRZrmB0RAtWOcURLHMw3dbMGzUUoTle6WKioVemOx+UJYWL2xSkEFQiiM7DuFJIY
+         uaSUKbD/oZZw2mRnrqRVtuj49TUJYwHS08zjxZgaKKtAE4EPGb/RrzrKipQb6Oph2Zp7
+         IEAw==
+X-Forwarded-Encrypted: i=1; AFNElJ8Z/vQnV6KEZGy6ASyozcIwYzFpfCFC7WW2jn4S7HQgZMDFvw75dXnwepp0ja0ByEoz2Pz/uoA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwQokMExsOe80k9W1EftToXcYlDd5kMIAioAza62/bf90cQa68u
+	dNnAaLdtLWHmUsU4x/Sh0gCPZ40Q9PW9d22ej5XzoTEVOjckOZ9N7FRR7fPh2Tij2Q==
+X-Gm-Gg: Acq92OEgu7wRVisK9FJNdy5OicLuDmFxe4dX+WUpDm4yuvAD2SxINGsaJnLA3UYdauB
+	VRZEADAqiSIyLPocGzV5WMDzNa4oceMu/JACL93fCz7S+mESeFdfBKdA5l/Nc0eZhNTz7gdqRK1
+	g229YP6z9w0dm0QqU4FaWI3Mg22swvc2dxdocw0o++ji46Imhi9pGW3fxFG2wkSliNz3N24siUX
+	8IyWxop2rYzEg34PA7tMLtQdovr5OZUjIUP0WItQ3n32Yvk9IvRsCE4/uJUbFZaHipE83NpHAer
+	4OLlFrIq5vl1zORANOT79XJTPSYBbNrr3XE03ysiea//WUAh8g2uDaXnnIfdF59HZJNqK0NphFZ
+	8x0GL300sBPbDYRZ3cfmY8AclfAZ1rFshqQQACf31uduYoLkNXzOqOAK8GUqZ549H3ZcLuyVFrV
+	+uuQn74LLR0gEjnc4L1WR/zeREwGaUzvDiMpAoHfsW7mjpkY43QX3f3Si3xiJOI+aCB9hSGJvAG
+	92Cnbso
+X-Received: by 2002:a05:600c:896:b0:490:ab15:b9e8 with SMTP id 5b1f17b1804b1-490c2c782fdmr493135e9.2.1780660890657;
+        Fri, 05 Jun 2026 05:01:30 -0700 (PDT)
+Received: from google.com (220.71.199.104.bc.googleusercontent.com. [104.199.71.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc4082c3sm144221845e9.13.2026.06.05.05.01.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jun 2026 05:01:30 -0700 (PDT)
+Date: Fri, 5 Jun 2026 12:01:26 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, catalin.marinas@arm.com,
+	jens.wiklander@linaro.org, sumit.garg@kernel.org,
+	vdonnefort@google.com, sudeep.holla@kernel.org
+Subject: Re: [PATCH v5 1/6] optee: ffa: Add NULL check in
+ optee_ffa_lend_protmem
+Message-ID: <aiK6lgW5YFWSMTxf@google.com>
+References: <20260526151934.3783707-1-smostafa@google.com>
+ <20260526151934.3783707-2-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,58 +80,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260603110312.2909844-1-vdonnefort@google.com>
+In-Reply-To: <20260526151934.3783707-2-smostafa@google.com>
 
-On Wed, Jun 03, 2026 at 12:03:12PM +0100, Vincent Donnefort wrote:
-> If the HVC called in kvm_call_hyp_nvhe() fails with an SMCCC error code,
-> we WARN. However, the returned value isn't initialized and the caller
-> might get garbage or 0 which is likely to be interpreted as success.
+On Tue, May 26, 2026 at 03:19:29PM +0000, Mostafa Saleh wrote:
+> Sashiko (locally) reports a possible null dereference under memory
+> pressure due to the lack of validation of the allocated pointer.
 > 
-> Set a default -EPERM error value, ensuring all callers get the message
-> when SMCCC calls fail.
+> Fix that by adding the missing check.
 > 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> 
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
 > ---
+>  drivers/tee/optee/ffa_abi.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> I have encountered this issue while working on a follow-up contribution to the
-> hypervisor tracing. In that case it completely crashed the kernel because
-> IS_ERR() failed on that res.a1 value.
-> 
-> Now, if it makes that function more robust, I do not believe it is fixing any
-> existing bug which is why I haven't added a "Fixes:" tag. 
-> 
-> In case we want to stick one, here it is:
-> 
-> Fixes: 054698316d87 ("KVM: arm64: nVHE: Migrate hyp interface to SMCCC")
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index a49042bfa801..6b8fd494792c 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1273,13 +1273,14 @@ void kvm_arm_resume_guest(struct kvm *kvm);
->  #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
+> diff --git a/drivers/tee/optee/ffa_abi.c b/drivers/tee/optee/ffa_abi.c
+> index b4372fa268d0..633715b98625 100644
+> --- a/drivers/tee/optee/ffa_abi.c
+> +++ b/drivers/tee/optee/ffa_abi.c
+> @@ -698,6 +698,9 @@ static int optee_ffa_lend_protmem(struct optee *optee, struct tee_shm *protmem,
+>  	int rc;
 >  
->  #ifndef __KVM_NVHE_HYPERVISOR__
-> -#define kvm_call_hyp_nvhe(f, ...)						\
-> +#define kvm_call_hyp_nvhe(f, ...)					\
->  	({								\
->  		struct arm_smccc_res res;				\
->  									\
->  		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
->  				  ##__VA_ARGS__, &res);			\
-> -		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
-> +		if (WARN_ON(res.a0 != SMCCC_RET_SUCCESS))		\
-> +			res.a1 = -EPERM;				\
->  									\
->  		res.a1;							\
->  	})
+>  	mem_attr = kzalloc_objs(*mem_attr, ma_count);
+> +	if (!mem_attr)
+> +		return -ENOMEM;
+> +
+>  	for (n = 0; n < ma_count; n++) {
+>  		mem_attr[n].receiver = mem_attrs[n] & U16_MAX;
+>  		mem_attr[n].attrs = mem_attrs[n] >> 16;
+> -- 
+> 2.54.0.746.g67dd491aae-goog
+>
 
-Looks like the only error code we return to the host is
-SMCCC_RET_NOT_SUPPORTED, so maybe -EOPNOTSUPP would be more appropriate?
+Thanks for fixing this and for including my other patches in the series
+Reviewed-by: Sebastian Ene <sebastianene@google.com>
 
-Either way:
-
-Acked-by: Will Deacon <will@kernel.org>
-
-Will
+Sebastian
