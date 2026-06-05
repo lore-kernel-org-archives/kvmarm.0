@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506533FF1B8;
-	Fri,  5 Jun 2026 15:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F093FFF97;
+	Fri,  5 Jun 2026 15:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780671696; cv=none; b=VV3bZX3k/pQlgsVZr9qbZfqxahgrvSjAUqMKpPaenv+sx+obi/+b8t8PiO4atTc2lWapweM5kZ73N+R0iiIyPKlf35PVOwfYi+NThJul1xZAD65AHi0NJioR5OCE6QFeBA3ANi4G3AFsOU5xWEowF4sBR3tibfgo1mvNrxQYK1M=
+	t=1780671744; cv=none; b=D2R2UdfEXyM9FnalARv0pBs5kXiI4v5C/Rw7li+O44rlkTAg4y8LEnRUBE96UDuayZThQEYn6kC85PDYfbDJ0+DLoLmNQ9o/+bI1QH/6/JnYE9u4BXz/LvQL05vsPPVTZ3d96pGi7wWZGjCGwSN9FN/+qkVBGku4pIHUhumtilE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780671696; c=relaxed/simple;
-	bh=Kw74Th8uleLKaO5LRkIELng/AmZEGicEGgtYZsuXiDM=;
+	s=arc-20240116; t=1780671744; c=relaxed/simple;
+	bh=BXMLPOIVlOySLpYw/MtI06VoUDEZpmv1p7FDYjKJHaU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BDSQJB1uhZJGWvdyBHT1P2l6hbcb8SHWyq+veSlMQ51+RmWMGSIoHZcISRraCFEuq+Gw88+Nz/DIxtZ+Dt0RvZGw8C3hwPCiAnx0TxR2sc05B/3goQQkz2ii9WgYuCqxQnY5GEDMSnljvemU8Cv8TeY4gE6f17mc/eTvdG84Ir8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sLZaoukS; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=Yi7kgTAtri8OT88CZqqEcnjx1UPj+IsFxBVvxQzU9+pe7RqchqwLRJU25g33eTFtAntuNDuh0vZfv8fxaq1OwJwej9n45/G75kBnw5L6kLF7ZVJczA4SRUlyD2pQITYt3cihNUql/kszz/usBojNtd+A1H3bQUDD7W6KBqnZexo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RNFEV4FK; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sLZaoukS"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RNFEV4FK"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 85EC52E9D;
-	Fri,  5 Jun 2026 08:01:29 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41DC02C40;
+	Fri,  5 Jun 2026 08:02:17 -0700 (PDT)
 Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8439D3F7D8;
-	Fri,  5 Jun 2026 08:01:30 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F7DB3F7D8;
+	Fri,  5 Jun 2026 08:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780671694; bh=Kw74Th8uleLKaO5LRkIELng/AmZEGicEGgtYZsuXiDM=;
+	t=1780671742; bh=BXMLPOIVlOySLpYw/MtI06VoUDEZpmv1p7FDYjKJHaU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sLZaoukSK9cGr5r3sxgKk4y8LVhQ2VNs87ssT11w2vqpCTeDhdMGx7YhaLota1S9g
-	 HxctiV8g1p0inhSdwHiGjI74yZN7JqyEEpvbK0/HBHOeKScXTHiB5scv59+MUAkrw4
-	 r10HFA1sjZsLx+2KXQ6bQKfL6JK0Db9ua3edkUeY=
-Message-ID: <c6a474b3-225d-42b9-9b64-2f80683ebe9c@arm.com>
-Date: Fri, 5 Jun 2026 16:01:30 +0100
+	b=RNFEV4FK0QNoZ6n2k/DmnU7XgfnHZYcXAMctD9ZKqh9w7yNUsxC7nwNBRKMKbjHaD
+	 Jcx+XbPDmG49O8rAAH3cljrbNp5uwFs4Ybuwbr0q2mbvPjKrMA4z4KaaiDLjfFunpI
+	 XdeDSaLnQ5jdssHjNkQbg+X+XqIgYFobqK0KS/Gw=
+Message-ID: <5003b6c2-c773-4dea-87fa-022a9f366fa9@arm.com>
+Date: Fri, 5 Jun 2026 16:02:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 17/44] arm64: RMI: RTT tear down
+Subject: Re: [PATCH v14 19/44] arm64: RMI: Allocate/free RECs to match vCPUs
 To: Wei-Lin Chang <weilin.chang@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -53,198 +53,261 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
 References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-18-steven.price@arm.com>
- <mpesc2j3czpunbg3pvgwbotvfn7vahaabvoiu77vd2g5uervho@255lwycekmxh>
+ <20260513131757.116630-20-steven.price@arm.com>
+ <2uvtjhncf57yek5i4fupdefunukmidzw452mcavnmixpr5u3qd@uoaktzpak3nl>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <mpesc2j3czpunbg3pvgwbotvfn7vahaabvoiu77vd2g5uervho@255lwycekmxh>
+In-Reply-To: <2uvtjhncf57yek5i4fupdefunukmidzw452mcavnmixpr5u3qd@uoaktzpak3nl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/05/2026 23:32, Wei-Lin Chang wrote:
+On 26/05/2026 23:39, Wei-Lin Chang wrote:
 > Hi,
 > 
-> On Wed, May 13, 2026 at 02:17:25PM +0100, Steven Price wrote:
->> The RMM owns the stage 2 page tables for a realm, and KVM must request
->> that the RMM creates/destroys entries as necessary. The physical pages
->> to store the page tables are delegated to the realm as required, and can
->> be undelegated when no longer used.
+> On Wed, May 13, 2026 at 02:17:27PM +0100, Steven Price wrote:
+>> The RMM maintains a data structure known as the Realm Execution Context
+>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+>> virtual CPUs. KVM must delegate memory and request the structures are
+>> created when vCPUs are created, and suitably tear down on destruction.
 >>
->> Creating new RTTs is the easy part, tearing down is a little more
->> tricky. The result of realm_rtt_destroy() can be used to effectively
->> walk the tree and destroy the entries (undelegating pages that were
->> given to the realm).
+>> RECs may require additional pages (e.g. for storing larger register
+>> state for SVE). The RMM can request extra pages for this purpose using
+>> the Stateful RMI Operations (SRO) functionality to request pages during
+>> REC creation. These pages are then passed back to the host from the RMM
+>> ('reclaimed') when the REC is destroyed. The kernel tracking object
+>> (struct rmi_sro_state) is stored in the realm_rec structure to avoid
+>> memory allocation during the destruction path.
+>>
+>> Note that only some of register state for the REC can be set by KVM, the
+>> rest is defined by the RMM (zeroed). The register state then cannot be
+>> changed by KVM after the REC is created (except when the guest
+>> explicitly requests this e.g. by performing a PSCI call).
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
 >> Changes since v13:
->>  * Avoid the double call of kvm_free_stage2_pgd() by splitting the work
->>    across that and a new function kvm_realm_uninit_stage2() which is
->>    only called for realm guests.
+>>  * Support SRO for REC creation/destruction instead of auxiliary
+>>    granules.
 >> Changes since v12:
->>  * Simplify some functions now we know RMM page size is the same as the
->>    host's.
+>>  * Use the new range-based delegation RMI.
 >> Changes since v11:
->>  * Moved some code from earlier in the series to this one so that it's
->>    added when it's first used.
->> Changes since v10:
->>  * RME->RMI rename.
->>  * Some code to handle freeing stage 2 PGD moved into this patch where
->>    it belongs.
+>>  * Remove the KVM_ARM_VCPU_REC feature. User space no longer needs to
+>>    configure each VCPU separately, RECs are created on the first VCPU
+>>    run of the guest.
 >> Changes since v9:
->>  * Add a comment clarifying that root level RTTs are not destroyed until
->>    after the RD is destroyed.
->> Changes since v8:
->>  * Introduce free_rtt() wrapper which calls free_delegated_granule()
->>    followed by kvm_account_pgtable_pages(). This makes it clear where an
->>    RTT is being freed rather than just a delegated granule.
+>>  * Size the aux_pages array according to the PAGE_SIZE of the host.
+>> Changes since v7:
+>>  * Add comment explaining the aux_pages array.
+>>  * Rename "undeleted_failed" variable to "should_free" to avoid a
+>>    confusing double negative.
 >> Changes since v6:
->>  * Move rme_rtt_level_mapsize() and supporting defines from kvm_rme.h
->>    into rme.c as they are only used in that file.
+>>  * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
+>>    realm guest.
+>>  * Support host page size being larger than RMM's granule size when
+>>    allocating/freeing aux granules.
 >> Changes since v5:
->>  * Rename some RME_xxx defines to do with page sizes as RMM_xxx - they are
->>    a property of the RMM specification not the RME architecture.
+>>  * Separate the concept of vcpu_is_rec() and
+>>    kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>>    the indication that the VCPU is a REC.
 >> Changes since v2:
->>  * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
->>    later patch when they are actually used.
->>  * Some simplifications now rmi_xxx() functions allow NULL as an output
->>    parameter.
->>  * Improved comments and code layout.
+>>  * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
 >> ---
->>  arch/arm64/include/asm/kvm_rmi.h |   7 ++
->>  arch/arm64/kvm/mmu.c             |  21 ++++-
->>  arch/arm64/kvm/rmi.c             | 148 +++++++++++++++++++++++++++++++
->>  3 files changed, 174 insertions(+), 2 deletions(-)
+>>  arch/arm64/include/asm/kvm_emulate.h |   2 +-
+>>  arch/arm64/include/asm/kvm_host.h    |   3 +
+>>  arch/arm64/include/asm/kvm_rmi.h     |  17 +++++
+>>  arch/arm64/kvm/arm.c                 |   6 ++
+>>  arch/arm64/kvm/reset.c               |   1 +
+>>  arch/arm64/kvm/rmi.c                 | 105 +++++++++++++++++++++++++++
+>>  6 files changed, 133 insertions(+), 1 deletion(-)
 >>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index 82fd777bd9bb..2e69fe494716 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -714,7 +714,7 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
+>>  
+>>  static inline bool vcpu_is_rec(const struct kvm_vcpu *vcpu)
+>>  {
+>> -	return false;
+>> +	return kvm_is_realm(vcpu->kvm);
+>>  }
+>>  
+>>  #endif /* __ARM64_KVM_EMULATE_H__ */
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 3512696ed506..39b5de03d0fe 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -969,6 +969,9 @@ struct kvm_vcpu_arch {
+>>  
+>>  	/* Hyp-readable copy of kvm_vcpu::pid */
+>>  	pid_t pid;
+>> +
+>> +	/* Realm meta data */
+>> +	struct realm_rec rec;
+>>  };
+>>  
+>>  /*
 >> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index 9de34983ee52..06ba0d4745c6 100644
+>> index 8bd743093ccf..d99bf4fc3c39 100644
 >> --- a/arch/arm64/include/asm/kvm_rmi.h
 >> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -64,5 +64,12 @@ u32 kvm_realm_ipa_limit(void);
+>> @@ -59,6 +59,22 @@ struct realm {
+>>  	unsigned int ia_bits;
+>>  };
 >>  
->>  int kvm_init_realm(struct kvm *kvm);
+>> +/**
+>> + * struct realm_rec - Additional per VCPU data for a Realm
+>> + *
+>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
+>> + * @rec_page: Kernel VA of the RMM's private page for this REC
+>> + * @aux_pages: Additional pages private to the RMM for this REC
+>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+>> + * @sro: A preallocated SRO state context
+>> + */
+>> +struct realm_rec {
+>> +	unsigned long mpidr;
+>> +	void *rec_page;
+>> +	struct rec_run *run;
+>> +	struct rmi_sro_state *sro;
+>> +};
+>> +
+>>  void kvm_init_rmi(void);
+>>  u32 kvm_realm_ipa_limit(void);
+>>  
+>> @@ -66,6 +82,7 @@ int kvm_init_realm(struct kvm *kvm);
+>>  int kvm_activate_realm(struct kvm *kvm);
 >>  void kvm_destroy_realm(struct kvm *kvm);
->> +void kvm_realm_destroy_rtts(struct kvm *kvm);
->> +
->> +static inline bool kvm_realm_is_private_address(struct realm *realm,
->> +						unsigned long addr)
->> +{
->> +	return !(addr & BIT(realm->ia_bits - 1));
->> +}
+>>  void kvm_realm_destroy_rtts(struct kvm *kvm);
+>> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
 >>  
->>  #endif /* __ASM_KVM_RMI_H */
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index ba8286472286..eb56d4e7f21a 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1024,9 +1024,26 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->>  	return err;
+>>  static inline bool kvm_realm_is_private_address(struct realm *realm,
+>>  						unsigned long addr)
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index eb2b61fe1f0a..93d34762db91 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -586,6 +586,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>>  	/* Force users to call KVM_ARM_VCPU_INIT */
+>>  	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
+>>  
+>> +	vcpu->arch.rec.mpidr = INVALID_HWID;
+>> +
+>>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>>  
+>>  	/* Set up the timer */
+>> @@ -1651,6 +1653,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>>  	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
+>>  		return -EINVAL;
+>>  
+>> +	/* Realms are incompatible with AArch32 */
+>> +	if (vcpu_is_rec(vcpu))
+>> +		return -EINVAL;
+>> +
+>>  	return 0;
 >>  }
 >>  
->> +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
->> +{
->> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->> +	struct realm *realm = &kvm->arch.realm;
->> +
->> +	if (kvm_realm_state(kvm) != REALM_STATE_ACTIVE)
->> +		return;
->> +
->> +	write_lock(&kvm->mmu_lock);
->> +	kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), true);
->> +	write_unlock(&kvm->mmu_lock);
->> +	kvm_realm_destroy_rtts(kvm);
->> +}
->> +
->>  void kvm_uninit_stage2_mmu(struct kvm *kvm)
->>  {
->> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
->> +	if (kvm_is_realm(kvm))
->> +		kvm_realm_uninit_stage2(&kvm->arch.mmu);
->> +	else
->> +		kvm_free_stage2_pgd(&kvm->arch.mmu);
->>  	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index b963fd975aac..c18cdca7d125 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -161,6 +161,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>>  	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+>>  	kfree(vcpu->arch.vncr_tlb);
+>>  	kfree(vcpu->arch.ccsidr);
+>> +	kvm_destroy_rec(vcpu);
 >>  }
 >>  
->> @@ -1103,7 +1120,7 @@ void stage2_unmap_vm(struct kvm *kvm)
->>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->>  {
->>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->> -	struct kvm_pgtable *pgt = NULL;
->> +	struct kvm_pgtable *pgt;
->>  
->>  	write_lock(&kvm->mmu_lock);
->>  	pgt = mmu->pgt;
+>>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
 >> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index f51ec667445e..5b00ccca4af3 100644
+>> index 849111817af7..353a5ca45e78 100644
 >> --- a/arch/arm64/kvm/rmi.c
 >> +++ b/arch/arm64/kvm/rmi.c
->> @@ -11,6 +11,14 @@
->>  #include <asm/rmi_cmds.h>
->>  #include <asm/virt.h>
->>  
->> +static inline unsigned long rmi_rtt_level_mapsize(int level)
->> +{
->> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
->> +		return PAGE_SIZE;
->> +
->> +	return (1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
->> +}
->> +
->>  static bool rmi_has_feature(unsigned long feature)
->>  {
->>  	return !!u64_get_bits(rmm_feat_reg0, feature);
->> @@ -21,6 +29,144 @@ u32 kvm_realm_ipa_limit(void)
->>  	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+>> @@ -173,9 +173,108 @@ static int realm_ensure_created(struct kvm *kvm)
+>>  	return -ENXIO;
 >>  }
 >>  
->> +static int get_start_level(struct realm *realm)
+>> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
 >> +{
->> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
->> +}
+>> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
+>> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+>> +	struct realm *realm = &vcpu->kvm->arch.realm;
+>> +	struct realm_rec *rec = &vcpu->arch.rec;
+>> +	unsigned long rec_page_phys;
+>> +	struct rec_params *params;
+>> +	int r, i;
 >> +
->> +static void free_rtt(phys_addr_t phys)
->> +{
->> +	if (free_delegated_page(phys))
->> +		return;
+>> +	if (rec->run)
+>> +		return -EBUSY;
 >> +
->> +	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
->> +}
+>> +	/*
+>> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
+>> +	 * flag covers v0.2 and onwards.
+>> +	 */
+>> +	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
+>> +		return -EINVAL;
 >> +
->> +/*
->> + * realm_rtt_destroy - Destroy an RTT at @level for @addr.
->> + *
->> + * Returns - Result of the RMI_RTT_DESTROY call, and:
->> + * @rtt_granule:	RTT granule, if the RTT was destroyed.
->> + * @next_addr:		IPA corresponding to the next possible valid entry we
->> + *			can target
->> + */
->> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
->> +			     int level, phys_addr_t *rtt_granule,
->> +			     unsigned long *next_addr)
->> +{
->> +	unsigned long out_rtt;
->> +	int ret;
+>> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
+>> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
 >> +
->> +	ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
->> +			      &out_rtt, next_addr);
->> +
->> +	*rtt_granule = out_rtt;
->> +
->> +	return ret;
->> +}
+>> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
+>> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
+>> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
 > 
-> Looks like out_rtt can be simplified out.
+> Should this be cast to (struct rec_run *) ?
 
-The issue here is there's a type conversion going on. rmi_rtt_destroy()
-takes an "unsigned long *" to match the general approach of using
-"unsigned long" for the inputs/outputs of SMCCC calls. But rtt_granule
-is a "phys_addr_t". While we know these are (currently) the same size,
-they are not the same type according to the compiler - phys_addr_t is
-"long long unsigned int".
+Yes it probably should - I'll update. Although IMHO get_zeroed_page()
+should really return void * - but I know that would be a contentious change.
 
 Thanks,
 Steve
 
+>> +	rec->sro = kmalloc_obj(*rec->sro);
+>> +	if (!params || !rec->rec_page || !rec->run || !rec->sro) {
+>> +		r = -ENOMEM;
+>> +		goto out_free_pages;
+>> +	}
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
+>> +		params->gprs[i] = vcpu_regs->regs[i];
+>> +
+>> +	params->pc = vcpu_regs->pc;
+>> +
+>> +	if (vcpu->vcpu_id == 0)
+>> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
+>> +
+>> +	rec_page_phys = virt_to_phys(rec->rec_page);
+>> +
+>> +	if (rmi_delegate_page(rec_page_phys)) {
+>> +		r = -ENXIO;
+>> +		goto out_free_pages;
+>> +	}
+>> +
+>> +	params->mpidr = mpidr;
+>> +
+>> +	if (rmi_rec_create(virt_to_phys(realm->rd), rec_page_phys,
+>> +			   virt_to_phys(params), rec->sro)) {
+>> +		r = -ENXIO;
+>> +		goto out_undelegate_rmm_rec;
+>> +	}
+>> +
+>> +	rec->mpidr = mpidr;
+>> +
+>> +	free_page((unsigned long)params);
+>> +	return 0;
+>> +
+>> +out_undelegate_rmm_rec:
+>> +	if (WARN_ON(rmi_undelegate_page(rec_page_phys)))
+>> +		rec->rec_page = NULL;
+>> +out_free_pages:
+>> +	free_page((unsigned long)rec->run);
+>> +	free_page((unsigned long)rec->rec_page);
+>> +	free_page((unsigned long)params);
+>> +	kfree(rec->sro);
+>> +	rec->run = NULL;
+>> +	return r;
+>> +}
+>> +
+> 
 > [...]
 > 
 > Thanks,
