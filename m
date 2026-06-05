@@ -1,44 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037C83A5E88
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 06:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50ED73A63FB
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 06:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780639240; cv=none; b=jloPmUIlpuWPP71xJAeoBwUAZ8MJeMMNkjKSg4B2HXidhT48PVKkzyloO7e/PaK5Q8lSdsEi1j6fM75p50GAcvJCmbuQ3gkpdUVmo1K3XD6D432UHnWuseayzryIPoNxmH6GdJPDHRqfLU1DwllGX1eSU5BCUZzq2LurMvNHWQI=
+	t=1780639315; cv=none; b=FOAAMLArbvuAV6bYcfheN2TJV2nI4y7RW6DdQN5jM8A7Q1dYwHXMGZ+F3eMjvXwoNiJVkHAigdHCJMvtWfHnX5v4YT/woCscBvKJEwUzWCNmfZ/mWmrB6pVKwtCy7NkKFM+//+6TQ0mokgAcycPSQ+VDoIFEuPXwQ1sb0YpXimo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780639240; c=relaxed/simple;
-	bh=fVwujMcYcmaLdm9Ue8iN6PqhjiKWWJjIod87RSxmz9s=;
+	s=arc-20240116; t=1780639315; c=relaxed/simple;
+	bh=ej37GtpqNValOQ5voiE5G798A3PGvFxWMi9LPZSsN4Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jUBZSPdHUX7TcOqJ4rqmxPoyPZWtDOa2UyR1iZ67bRVof0r07ndK8UaQgAbiJaCvptok8DIrGG4PxQmMbzT+U55TVxfLv8UuIwAOXr8m/JJqAymfFeQkXnTnMqCpePeX/ZDX5wnVOdDTyWzMalsiYhu7W8e7zAdzeXgS0zIJBIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nKSoFLFz; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=rv2ISl6N9du8dKfoIre9a0YaSjkeC+37yYs/Lw/XYQ5+9Kphj7urfx8NS1umsZW8TospU/DL+JEC4xpBvDLy0Q5dD9JqxZ3UvmzBy/DzCiKLMW5Cf2EMKVmNnssHESOHAhdsyLEHQl98+iutTCaHQGzVqNRUrdVXiD4lPC2AjKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewkGhwdX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKSoFLFz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6386D1F00893;
-	Fri,  5 Jun 2026 06:00:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewkGhwdX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E51E01F00893;
+	Fri,  5 Jun 2026 06:01:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780639238;
-	bh=gaVHoAOUI9LUISZtbViLuvlWXQydHijJv4Tcvcf97rw=;
+	s=k20260515; t=1780639314;
+	bh=mOltCJFAEiXOMn/JouwewzAaDuJLAap1VZFGpCvHcIA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nKSoFLFzxN7azm4Cn4DB97IsmJ329/dL9s6fwzI/OROBryOO4b9sSxhniPBS+r3tH
-	 FI6ruK1wwV90ZNmCPSgMIO4Yj5fjDAGj+pAN/mJ6pWU7Chtn7WS8D6P9lkxoqryFfn
-	 16KL+uGoht8P9hNHncLU28eYrctOiWHlnkC1WfHeJS4yEgePP/dy4h//500BKoTXKR
-	 pOTx3HWlNXlQJj7dbcD9eDeubitAzbja40z4eU7arQJ37v6YdEYv7/rfbwNd/ywVCx
-	 n6aOxaIsv+eW4Cl11ECaTz0FqA1PIdKj5EZgm+hibSgpWllBzu/EmfgKGhmkkMM1b7
-	 LlRcJyf1o1N2w==
-Date: Thu, 4 Jun 2026 23:00:37 -0700
+	b=ewkGhwdXA3jXxCUU/ZDD+xelPAyMLHoLodsabcEAwbdwR+baNzCAIcq0KXv9m5DRt
+	 Gk4+HDVIIpTnXDWc1cfBMqDZVD3jZa/T/QlgOmJTHPKjeYBowRuwmG86MXPFwMFreY
+	 K+FVNdCiNitq+7J9mgYhjt6zEgCIAIWMYATyXTEmdPzZGNauwJ02p7tX/jupEooyDR
+	 rJHCSZ5Xayl+TEkTsezpd903WaFRxGLyUiRw1kOAfehkDv7sYuWQtWeApJXqRSoAxz
+	 usC4diPpSx8T5WjmvGzhoQvt5ofjR7s8CNpFrogDZ9fhrKqNT03ZgSKbDMcmWxeDpj
+	 6S6t0PHSdDEPA==
+Date: Thu, 4 Jun 2026 23:01:52 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: maz@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com,
-	jic23@kernel.org, timothy.hayes@arm.com, eric.auger@linaro.org,
-	christoffer.dall@linaro.org, andre.przywara@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: vgic: Check the interrupt is still ours
- before migrating it
-Message-ID: <aiJmBfXAxcytfGha@kernel.org>
-References: <aiHnI1mu6SGQrgnz@v4bel>
+To: Jackie Liu <liu.yun@linux.dev>
+Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+	yuzenghui@huawei.com, will@kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM/arm64: vgic-its: Make ABI commit helpers return
+ void
+Message-ID: <aiJmUCvsSt6k4bvd@kernel.org>
+References: <20260604075147.53299-1-liu.yun@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,87 +43,110 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aiHnI1mu6SGQrgnz@v4bel>
+In-Reply-To: <20260604075147.53299-1-liu.yun@linux.dev>
 
-On Fri, Jun 05, 2026 at 05:59:15AM +0900, Hyunwoo Kim wrote:
-> vgic_prune_ap_list() drops both ap_list_lock and irq_lock while migrating
-> an interrupt to another vCPU. After reacquiring the locks it only checks
-> that the affinity is unchanged (target_vcpu == vgic_target_oracle(irq))
-> before moving the interrupt, which assumes that an interrupt whose affinity
-> is preserved is still queued on this vCPU's ap_list.
+On Thu, Jun 04, 2026 at 03:51:47PM +0800, Jackie Liu wrote:
+> From: Jackie Liu <liuyun01@kylinos.cn>
 > 
-> That assumption no longer holds if the interrupt is taken off the ap_list
-> while the locks are dropped. vgic_flush_pending_lpis() removes the
-> interrupt from the list and sets irq->vcpu to NULL, but leaves
-> enabled/pending/target_vcpu untouched. As the interrupt is still enabled
-> and pending, vgic_target_oracle() returns the same target_vcpu, so the
-> affinity check passes and list_del() is run a second time on an entry that
-> has already been removed.
+> The return values of vgic_its_set_abi() and vgic_its_commit_v0() are always
+> 0 and do not carry useful error information. Simplify by changing them to
+> void.
 > 
-> Also check that the interrupt is still assigned to this vCPU
-> (irq->vcpu == vcpu) before moving it.
-> 
-> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> Suggested-by: Oliver Upton <oupton@kernel.org>
+> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
 
-Looking at this and the other VGIC patch you sent (which should've been
-a combined series), are you trying to deal with a vCPU writing to
-another vCPU's redistributor? I.e. vCPU B setting GICR_CTLR.EnableLPIs=0
-behind the back of vCPU A?
-
-That is extremely relevant information as the off-the-cuff reaction is
-that no race exists. But since the GIC architecture is awesome and
-allows for this sort of insanity, it obviously does....
-
-Anyway, for LPIs resident on a particular RD, there's zero expectation
-that the pending state is preserved when EnableLPIs=0. So I'd rather
-vgic_flush_pending_lpis() just invalidate the pending state.
-
-Beyond that, I see two other fixes for lifetime issues around the
-vgic_irq in the middle of migration. I'd like to see explicit RCU
-protection around the release && reacquire of the ap_list_lock rather
-than depending on the precondition that IRQs are disabled.
-
-Then vgic_flush_pending_lpis() should leave IRQs intact that are pending
-a migration (e.g. irq->vcpu != vgic_target_oracle()) as the only expectation
-we need to uphold is that LPIs resident on the RD have the pending state cleared.
-
-Although I think we could benefit from the wetware implementation of the
-GIC giving this a once over too. Any thoughts Marc?
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
 Thanks,
 Oliver
 
 > ---
->  arch/arm64/kvm/vgic/vgic.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++------------
+>  1 file changed, 9 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1e9fe8764584..18b280de9a29 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -818,15 +818,16 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  		raw_spin_lock(&irq->irq_lock);
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 1d7e5d560af4..ca48b34dec20 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -27,7 +27,7 @@ static struct kvm_device_ops kvm_arm_vgic_its_ops;
 >  
->  		/*
-> -		 * If the affinity has been preserved, move the
-> -		 * interrupt around. Otherwise, it means things have
-> -		 * changed while the interrupt was unlocked, and we
-> -		 * need to replay this.
-> +		 * If the interrupt is still ours and its affinity has
-> +		 * been preserved, move it around. Otherwise, it means
-> +		 * things have changed while the interrupt was unlocked
-> +		 * (it may even have been taken off the list with its
-> +		 * affinity left untouched), and we need to replay this.
->  		 *
->  		 * In all cases, we cannot trust the list not to have
->  		 * changed, so we restart from the beginning.
->  		 */
-> -		if (target_vcpu == vgic_target_oracle(irq)) {
-> +		if (irq->vcpu == vcpu && target_vcpu == vgic_target_oracle(irq)) {
->  			struct vgic_cpu *new_cpu = &target_vcpu->arch.vgic_cpu;
+>  static int vgic_its_save_tables_v0(struct vgic_its *its);
+>  static int vgic_its_restore_tables_v0(struct vgic_its *its);
+> -static int vgic_its_commit_v0(struct vgic_its *its);
+> +static void vgic_its_commit_v0(struct vgic_its *its);
+>  static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>  			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
 >  
->  			list_del(&irq->ap_list);
+> @@ -168,7 +168,7 @@ struct vgic_its_abi {
+>  	int ite_esz;
+>  	int (*save_tables)(struct vgic_its *its);
+>  	int (*restore_tables)(struct vgic_its *its);
+> -	int (*commit)(struct vgic_its *its);
+> +	void (*commit)(struct vgic_its *its);
+>  };
+>  
+>  #define ABI_0_ESZ	8
+> @@ -192,13 +192,13 @@ inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
+>  	return &its_table_abi_versions[its->abi_rev];
+>  }
+>  
+> -static int vgic_its_set_abi(struct vgic_its *its, u32 rev)
+> +static void vgic_its_set_abi(struct vgic_its *its, u32 rev)
+>  {
+>  	const struct vgic_its_abi *abi;
+>  
+>  	its->abi_rev = rev;
+>  	abi = vgic_its_get_abi(its);
+> -	return abi->commit(its);
+> +	abi->commit(its);
+>  }
+>  
+>  /*
+> @@ -472,7 +472,8 @@ static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
+>  
+>  	if (rev >= NR_ITS_ABIS)
+>  		return -EINVAL;
+> -	return vgic_its_set_abi(its, rev);
+> +	vgic_its_set_abi(its, rev);
+> +	return 0;
+>  }
+>  
+>  static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+> @@ -1888,14 +1889,11 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+>  	its->baser_coll_table = INITIAL_BASER_VALUE |
+>  		((u64)GITS_BASER_TYPE_COLLECTION << GITS_BASER_TYPE_SHIFT);
+>  	dev->kvm->arch.vgic.propbaser = INITIAL_PROPBASER_VALUE;
+> -
+>  	dev->private = its;
+>  
+> -	ret = vgic_its_set_abi(its, NR_ITS_ABIS - 1);
+> -
+> +	vgic_its_set_abi(its, NR_ITS_ABIS - 1);
+>  	mutex_unlock(&dev->kvm->arch.config_lock);
+> -
+> -	return ret;
+> +	return 0;
+>  }
+>  
+>  static void vgic_its_destroy(struct kvm_device *kvm_dev)
+> @@ -2610,7 +2608,7 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>  	return ret;
+>  }
+>  
+> -static int vgic_its_commit_v0(struct vgic_its *its)
+> +static void vgic_its_commit_v0(struct vgic_its *its)
+>  {
+>  	const struct vgic_its_abi *abi;
+>  
+> @@ -2623,7 +2621,6 @@ static int vgic_its_commit_v0(struct vgic_its *its)
+>  
+>  	its->baser_device_table |= (GIC_ENCODE_SZ(abi->dte_esz, 5)
+>  					<< GITS_BASER_ENTRY_SIZE_SHIFT);
+> -	return 0;
+>  }
+>  
+>  static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
 > -- 
-> 2.43.0
+> 2.54.0
+> 
 > 
