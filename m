@@ -1,60 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6B53BBFC1
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 07:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE45472782
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 07:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780645176; cv=none; b=YoJrGYgpHkAyy2ir9jLggxbElisuxiLqG9lIVyw6BA/ajeUWu/qGcZFfaXfgc+2xu5kNuJwrMWW843EXOiZBANaPYBvxK8+0yB1e2/ufXLj4SSHER0Qr798IPR9oga5x9UaoRFMVvSglwNAgKFO5sM9x9NMHEN6VlH4du4/JTpE=
+	t=1780645718; cv=none; b=WZWqNVFrW3pN+D/0OD4cPycuGNdOhuE7fhz5X/Y6iKCUkKUI4HMRK36NPv0LHMuat4zALsirflZmxMgKGrpzwE095KFBLb/ZqFBqeN3/MmI51IWJh5r0RF2ngUh5xL2eBGV0neSMlWwdPFEWwSptxbLGQ+2U7diXtdAKozQoBHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780645176; c=relaxed/simple;
-	bh=ICtd0/9rTDrZEp+ym1ctmofF4YhAL0Yf+LyFwdO2dyw=;
+	s=arc-20240116; t=1780645718; c=relaxed/simple;
+	bh=+fc9tgvYeC5BnpjsbzaoII2wEO5RWwQvQFxWYC7MxDE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wt6K3YL8+ka85JZN3GDISmrb1CbQGrM2LfdA2CfUzfOJitY8UB6khDkua7oGcAvFh8hfOh172o0Y2AE8+j0nfBimVEDKp1nNl5DZ6z1hvfvnUx9oniFb9Ot0Ctarr8B/YRopoTNXYyTVCHAVg+SN3cWaD2bh9V03BKAi+Vk77Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHsIJtPF; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=h+5sLhnS+XSTcNipsY5h+TJFqsf0iCTP/RW9SWOD68lsbDhUncSO01MgWelZss8/01usbqNWajSEIt+rdSNtyWvo1UWlI31I9Zs+uj4NvmoCgbL+d/+jVhWXNS8ExPvrBiyyt3q9doT0/KWFXtRojh+Q1QRGugWvUXUG56di+hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNCVOusd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHsIJtPF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66C601F00893;
-	Fri,  5 Jun 2026 07:39:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNCVOusd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C2201F00893;
+	Fri,  5 Jun 2026 07:48:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780645175;
-	bh=6eQtmLE1c8wLqcxp3CgPQl14giwjotvc8+E1FCWm2K4=;
+	s=k20260515; t=1780645717;
+	bh=FZVDInluTaIFvdMQJs+CfkcPbN0fYw+fpNJ0QFXGggI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=DHsIJtPF7yx3ED5qg2nSB/Xc4cuY/8kYs32Kh7L/+tAJAywSNRDN1m5LaKgwT/7TD
-	 EKU8AlYEXtae3aZELbaylxTU+0a+Ypl5foFFGpzW9YrGaQ6AgiP89KqWcy0A8WbQF9
-	 aAifBpFIkaMu+T9r0Qv9dTvY2dWiP/+J0fKU9X1bqnIHLj+YGyUkoZr8XiBOG9tXOy
-	 q6oAlKUmECPlTt3WX0GF5tJ/ichzycY9xenjTcS0J47B8j160kwdS+acEo17WAYwdX
-	 2GPYTqgtkdNTY/UphsgaxLQn56dZey696+IyE3s+JkSAb0fgGG6OxjEHskPrUyDjon
-	 ezd7PzO13U8cQ==
+	b=JNCVOusd8jyIc13IH7WKkfEk6t1xywT9EiJYqjlr8Q/On9JaG++34BP+NUbp5KwHg
+	 kD4dzS1MkMMx0zLHYruyz8S45U9VLyhmtYIpEthV4o1BOlStrNb+DE4HGnomyl5kOF
+	 XgAH8svOuJ6q2Kkotyjdi2Xj4MAIoAZDdzG1jkRT9SJL1K21Voj5wAZ/q/ly9gWL8L
+	 GFo2jS1hVfG0qWb/CCYD9WdJGe+00gH7lgJUKkK+82r1WwkhXamdftdBLJGXrQ7UOr
+	 dpkTfAjwSt/perK9Yz6QK614LQt2EGqmWWCp62jWGQtrsPiq6fpAMM9B6espwnbyDK
+	 mh36QibAAZIhw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wVP9R-00000009fpf-0I9V;
-	Fri, 05 Jun 2026 07:39:33 +0000
-Date: Fri, 05 Jun 2026 08:42:52 +0100
-Message-ID: <87ecila0w3.wl-maz@kernel.org>
+	id 1wVPIB-00000009g0G-1WzI;
+	Fri, 05 Jun 2026 07:48:35 +0000
+Date: Fri, 05 Jun 2026 08:51:54 +0100
+Message-ID: <87cxy5a0h1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Hyunwoo Kim <imv4bel@gmail.com>,
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	joey.gouly@arm.com,
 	seiden@linux.ibm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
 	will@kernel.org,
-	Sascha.Bischoff@arm.com,
-	jic23@kernel.org,
-	timothy.hayes@arm.com,
-	eric.auger@linaro.org,
-	christoffer.dall@linaro.org,
-	andre.przywara@arm.com,
+	christoffer.dall@arm.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: vgic: Check the interrupt is still ours before migrating it
-In-Reply-To: <aiJmBfXAxcytfGha@kernel.org>
-References: <aiHnI1mu6SGQrgnz@v4bel>
-	<aiJmBfXAxcytfGha@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Reallocate the nested_mmus array under the mmu_lock
+In-Reply-To: <aiJgGBv3OCPNJJPc@v4bel>
+References: <aiHEKOeZMVwsRlvP@v4bel>
+	<aiH7xKnprU9bUap5@kernel.org>
+	<aiJgGBv3OCPNJJPc@v4bel>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,60 +62,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, imv4bel@gmail.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com, jic23@kernel.org, timothy.hayes@arm.com, eric.auger@linaro.org, christoffer.dall@linaro.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: imv4bel@gmail.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 05 Jun 2026 07:00:37 +0100,
-Oliver Upton <oupton@kernel.org> wrote:
+On Fri, 05 Jun 2026 06:35:20 +0100,
+Hyunwoo Kim <imv4bel@gmail.com> wrote:
 > 
-> On Fri, Jun 05, 2026 at 05:59:15AM +0900, Hyunwoo Kim wrote:
-> > vgic_prune_ap_list() drops both ap_list_lock and irq_lock while migrating
-> > an interrupt to another vCPU. After reacquiring the locks it only checks
-> > that the affinity is unchanged (target_vcpu == vgic_target_oracle(irq))
-> > before moving the interrupt, which assumes that an interrupt whose affinity
-> > is preserved is still queued on this vCPU's ap_list.
+> On Thu, Jun 04, 2026 at 03:27:16PM -0700, Oliver Upton wrote:
+> > Hi,
 > > 
-> > That assumption no longer holds if the interrupt is taken off the ap_list
-> > while the locks are dropped. vgic_flush_pending_lpis() removes the
-> > interrupt from the list and sets irq->vcpu to NULL, but leaves
-> > enabled/pending/target_vcpu untouched. As the interrupt is still enabled
-> > and pending, vgic_target_oracle() returns the same target_vcpu, so the
-> > affinity check passes and list_del() is run a second time on an entry that
-> > has already been removed.
+> > The shortlog is very confusing, since "allocate behind $LOCK" is usually
+> > something alarming. Maybe instead:
 > > 
-> > Also check that the interrupt is still assigned to this vCPU
-> > (irq->vcpu == vcpu) before moving it.
+> >   KVM: arm64: Reassign nested_mmus array behind mmu_lock
+> 
+> heh, that's confusing indeed. I'll change it that way.
+> 
 > > 
-> > Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
-> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> > On Fri, Jun 05, 2026 at 03:30:00AM +0900, Hyunwoo Kim wrote:
+> > > Code that walks kvm->arch.nested_mmus[] holds kvm->mmu_lock. By contrast,
+> > > kvm_vcpu_init_nested() reallocates the array and frees the old buffer while
+> > > holding only kvm->arch.config_lock, so a walker can reference the freed
+> > > array.
+> > 
+> > It wouldn't hurt to share slightly more information here. Are you
+> > dealing with a concurrent MMU notifier?
 > 
-> Looking at this and the other VGIC patch you sent (which should've been
-> a combined series), are you trying to deal with a vCPU writing to
-> another vCPU's redistributor? I.e. vCPU B setting GICR_CTLR.EnableLPIs=0
-> behind the back of vCPU A?
+> Yes. The MMU notifier path also walks nested_mmus[] under mmu_lock.
+> kvm_vcpu_init_nested() holds only config_lock, so if a notifier fires
+> during vCPU init, it races with the array realloc and free.
 > 
-> That is extremely relevant information as the off-the-cuff reaction is
-> that no race exists. But since the GIC architecture is awesome and
-> allows for this sort of insanity, it obviously does....
+> Here's the reworked changelog. Should I send v2?
 > 
-> Anyway, for LPIs resident on a particular RD, there's zero expectation
-> that the pending state is preserved when EnableLPIs=0. So I'd rather
-> vgic_flush_pending_lpis() just invalidate the pending state.
+>   kvm->arch.nested_mmus[] is walked under kvm->mmu_lock, including from the
+>   MMU notifier path (kvm_unmap_gfn_range() -> kvm_nested_s2_unmap()), which
+>   can run at any time. kvm_vcpu_init_nested() reallocates the array and frees
+>   the old buffer while holding only kvm->arch.config_lock, so such a walker
+>   can reference the freed array.
+> 
+>   Allocate the new array outside of mmu_lock, as the allocation can sleep.
+>   Under the lock, copy the existing entries, fix up the back pointers and
+>   reassign the array. Free the old buffer after dropping the lock, as
+>   kvfree() can sleep as well.
 
-Just clearing the pending state introduces a potential problem as we
-now have an interrupt that is neither active nor pending on the AP
-list. It is not impossible to solve (we now have similar behaviours
-with SPI deactivation from another vcpu), but that requires posting a
-KVM_REQ_VGIC_PROCESS_UPDATE to the target vcpu.
-
-> Beyond that, I see two other fixes for lifetime issues around the
-> vgic_irq in the middle of migration. I'd like to see explicit RCU
-> protection around the release && reacquire of the ap_list_lock rather
-> than depending on the precondition that IRQs are disabled.
-
-I'm not sure I follow. Are you suggesting turning the AP list into an
-RCU protected list?
+That's significantly better. Please send a v2 with this.
 
 Thanks,
 
