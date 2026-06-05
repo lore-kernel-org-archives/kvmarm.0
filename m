@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F093FFF97;
-	Fri,  5 Jun 2026 15:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2703FFFA8;
+	Fri,  5 Jun 2026 15:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780671744; cv=none; b=D2R2UdfEXyM9FnalARv0pBs5kXiI4v5C/Rw7li+O44rlkTAg4y8LEnRUBE96UDuayZThQEYn6kC85PDYfbDJ0+DLoLmNQ9o/+bI1QH/6/JnYE9u4BXz/LvQL05vsPPVTZ3d96pGi7wWZGjCGwSN9FN/+qkVBGku4pIHUhumtilE=
+	t=1780671751; cv=none; b=rRMkX8U0bC0N2jtdtHTfZ+8WOhtmBVoR5tBa4DIa1eoMATMaxqaxoBEWQH0sL2yMNuq8njGK1YgHmv5Y9qfpo/NJB3r4KAEXDiDC88MnBThmbroWMZd3Zphhg74gTOVtdYIwSka8begwJS5DgifyqQXL+OwXljR1xAnrvvUfXqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780671744; c=relaxed/simple;
-	bh=BXMLPOIVlOySLpYw/MtI06VoUDEZpmv1p7FDYjKJHaU=;
+	s=arc-20240116; t=1780671751; c=relaxed/simple;
+	bh=7tt4d8MaJgpOSLKymncdsizpcHBAdx7d144Wan8ieGE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yi7kgTAtri8OT88CZqqEcnjx1UPj+IsFxBVvxQzU9+pe7RqchqwLRJU25g33eTFtAntuNDuh0vZfv8fxaq1OwJwej9n45/G75kBnw5L6kLF7ZVJczA4SRUlyD2pQITYt3cihNUql/kszz/usBojNtd+A1H3bQUDD7W6KBqnZexo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RNFEV4FK; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=cpLezBEmDAFuA2F6E8hHCvsXFxN4bVbdks6SAh2y08EUJWa5expwr3AjNwpOtptpae5Oi5Tzf0sICehYX3huuqlnvIYUAQS6nkTEEetdaKHrKfKRshG0h2DNwpAj2D7L4NoaP47JhSt1eR+8Nf9EWolCwur0HRYHMyZAZj1AcJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=G6NmiYoY; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RNFEV4FK"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="G6NmiYoY"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41DC02C40;
-	Fri,  5 Jun 2026 08:02:17 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18F6B2E9D;
+	Fri,  5 Jun 2026 08:02:25 -0700 (PDT)
 Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F7DB3F7D8;
-	Fri,  5 Jun 2026 08:02:14 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 797C43F7D8;
+	Fri,  5 Jun 2026 08:02:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780671742; bh=BXMLPOIVlOySLpYw/MtI06VoUDEZpmv1p7FDYjKJHaU=;
+	t=1780671749; bh=7tt4d8MaJgpOSLKymncdsizpcHBAdx7d144Wan8ieGE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RNFEV4FK0QNoZ6n2k/DmnU7XgfnHZYcXAMctD9ZKqh9w7yNUsxC7nwNBRKMKbjHaD
-	 Jcx+XbPDmG49O8rAAH3cljrbNp5uwFs4Ybuwbr0q2mbvPjKrMA4z4KaaiDLjfFunpI
-	 XdeDSaLnQ5jdssHjNkQbg+X+XqIgYFobqK0KS/Gw=
-Message-ID: <5003b6c2-c773-4dea-87fa-022a9f366fa9@arm.com>
-Date: Fri, 5 Jun 2026 16:02:12 +0100
+	b=G6NmiYoYNX8kpQgsWGEAAEKqMnc2Q3GqMf446Ca73c0kIwcSLs6I/ps9ycxqLp4VB
+	 bhT7XUxfOJufCkHkLzDHMMS0OLzCkcrsTPDrhEMhUH8N3PrZ9tiOVEWSaeS2AG0rbH
+	 AXF0TKQuPtK5APza+Ph3AGCg2Dbn90hOUmY6cMfE=
+Message-ID: <d9d57c7d-45c7-4747-b7ce-ec3bab537136@arm.com>
+Date: Fri, 5 Jun 2026 16:02:26 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,9 +35,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 19/44] arm64: RMI: Allocate/free RECs to match vCPUs
-To: Wei-Lin Chang <weilin.chang@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
+Subject: Re: [PATCH v14 20/44] arm64: RMI: Support for the VGIC in realms
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>,
@@ -48,268 +47,107 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, Lorenzo.Pieralisi2@arm.com
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
+ <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
 References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-20-steven.price@arm.com>
- <2uvtjhncf57yek5i4fupdefunukmidzw452mcavnmixpr5u3qd@uoaktzpak3nl>
+ <20260513131757.116630-21-steven.price@arm.com>
+ <5ea74b6a-a51a-415e-b53f-5ece9829dee8@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <2uvtjhncf57yek5i4fupdefunukmidzw452mcavnmixpr5u3qd@uoaktzpak3nl>
+In-Reply-To: <5ea74b6a-a51a-415e-b53f-5ece9829dee8@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 26/05/2026 23:39, Wei-Lin Chang wrote:
-> Hi,
+On 28/05/2026 05:07, Gavin Shan wrote:
+> Hi Steve,
 > 
-> On Wed, May 13, 2026 at 02:17:27PM +0100, Steven Price wrote:
->> The RMM maintains a data structure known as the Realm Execution Context
->> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
->> virtual CPUs. KVM must delegate memory and request the structures are
->> created when vCPUs are created, and suitably tear down on destruction.
->>
->> RECs may require additional pages (e.g. for storing larger register
->> state for SVE). The RMM can request extra pages for this purpose using
->> the Stateful RMI Operations (SRO) functionality to request pages during
->> REC creation. These pages are then passed back to the host from the RMM
->> ('reclaimed') when the REC is destroyed. The kernel tracking object
->> (struct rmi_sro_state) is stored in the realm_rec structure to avoid
->> memory allocation during the destruction path.
->>
->> Note that only some of register state for the REC can be set by KVM, the
->> rest is defined by the RMM (zeroed). The register state then cannot be
->> changed by KVM after the REC is created (except when the guest
->> explicitly requests this e.g. by performing a PSCI call).
+> On 5/13/26 11:17 PM, Steven Price wrote:
+>> The RMM provides emulation of a VGIC to the realm guest. With RMM v2.0
+>> the registers are passed in the system registers so this works similar
+>> to a normal guest, but kvm_arch_vcpu_put() need reordering to early out,
+>> and realm guests don't support GICv2 even if the host does.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v13:
->>  * Support SRO for REC creation/destruction instead of auxiliary
->>    granules.
->> Changes since v12:
->>  * Use the new range-based delegation RMI.
->> Changes since v11:
->>  * Remove the KVM_ARM_VCPU_REC feature. User space no longer needs to
->>    configure each VCPU separately, RECs are created on the first VCPU
->>    run of the guest.
->> Changes since v9:
->>  * Size the aux_pages array according to the PAGE_SIZE of the host.
->> Changes since v7:
->>  * Add comment explaining the aux_pages array.
->>  * Rename "undeleted_failed" variable to "should_free" to avoid a
->>    confusing double negative.
->> Changes since v6:
->>  * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
->>    realm guest.
->>  * Support host page size being larger than RMM's granule size when
->>    allocating/freeing aux granules.
->> Changes since v5:
->>  * Separate the concept of vcpu_is_rec() and
->>    kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
->>    the indication that the VCPU is a REC.
->> Changes since v2:
->>  * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
+>> Changes from v12:
+>>   * GIC registers are now passed in the system registers rather than via
+>>     rec_entry/rec_exit which removes most of the changes.
+>> Changes from v11:
+>>   * Minor changes to align with the previous patches. Note that the VGIC
+>>     handling will change with RMM v2.0.
+>> Changes from v10:
+>>   * Make sure we sync the VGIC v4 state, and only populate valid lrs from
+>>     the list.
+>> Changes from v9:
+>>   * Copy gicv3_vmcr from the RMM at the same time as gicv3_hcr rather
+>>     than having to handle that as a special case.
+>> Changes from v8:
+>>   * Propagate gicv3_hcr to from the RMM.
+>> Changes from v5:
+>>   * Handle RMM providing fewer GIC LRs than the hardware supports.
 >> ---
->>  arch/arm64/include/asm/kvm_emulate.h |   2 +-
->>  arch/arm64/include/asm/kvm_host.h    |   3 +
->>  arch/arm64/include/asm/kvm_rmi.h     |  17 +++++
->>  arch/arm64/kvm/arm.c                 |   6 ++
->>  arch/arm64/kvm/reset.c               |   1 +
->>  arch/arm64/kvm/rmi.c                 | 105 +++++++++++++++++++++++++++
->>  6 files changed, 133 insertions(+), 1 deletion(-)
+>>   arch/arm64/kvm/arm.c            | 11 ++++++++---
+>>   arch/arm64/kvm/vgic/vgic-init.c |  2 +-
+>>   2 files changed, 9 insertions(+), 4 deletions(-)
 >>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 82fd777bd9bb..2e69fe494716 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -714,7 +714,7 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
->>  
->>  static inline bool vcpu_is_rec(const struct kvm_vcpu *vcpu)
->>  {
->> -	return false;
->> +	return kvm_is_realm(vcpu->kvm);
->>  }
->>  
->>  #endif /* __ARM64_KVM_EMULATE_H__ */
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 3512696ed506..39b5de03d0fe 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -969,6 +969,9 @@ struct kvm_vcpu_arch {
->>  
->>  	/* Hyp-readable copy of kvm_vcpu::pid */
->>  	pid_t pid;
->> +
->> +	/* Realm meta data */
->> +	struct realm_rec rec;
->>  };
->>  
->>  /*
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index 8bd743093ccf..d99bf4fc3c39 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -59,6 +59,22 @@ struct realm {
->>  	unsigned int ia_bits;
->>  };
->>  
->> +/**
->> + * struct realm_rec - Additional per VCPU data for a Realm
->> + *
->> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
->> + * @rec_page: Kernel VA of the RMM's private page for this REC
->> + * @aux_pages: Additional pages private to the RMM for this REC
->> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
->> + * @sro: A preallocated SRO state context
->> + */
->> +struct realm_rec {
->> +	unsigned long mpidr;
->> +	void *rec_page;
->> +	struct rec_run *run;
->> +	struct rmi_sro_state *sro;
->> +};
->> +
->>  void kvm_init_rmi(void);
->>  u32 kvm_realm_ipa_limit(void);
->>  
->> @@ -66,6 +82,7 @@ int kvm_init_realm(struct kvm *kvm);
->>  int kvm_activate_realm(struct kvm *kvm);
->>  void kvm_destroy_realm(struct kvm *kvm);
->>  void kvm_realm_destroy_rtts(struct kvm *kvm);
->> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>  
->>  static inline bool kvm_realm_is_private_address(struct realm *realm,
->>  						unsigned long addr)
 >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index eb2b61fe1f0a..93d34762db91 100644
+>> index 93d34762db91..21d9dfdb1ea0 100644
 >> --- a/arch/arm64/kvm/arm.c
 >> +++ b/arch/arm64/kvm/arm.c
->> @@ -586,6 +586,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>  	/* Force users to call KVM_ARM_VCPU_INIT */
->>  	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->>  
->> +	vcpu->arch.rec.mpidr = INVALID_HWID;
+>> @@ -786,19 +786,24 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>           kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+>>       }
+>>   +    kvm_timer_vcpu_put(vcpu);
+>> +    kvm_vgic_put(vcpu);
 >> +
->>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->>  
->>  	/* Set up the timer */
->> @@ -1651,6 +1653,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->>  	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
->>  		return -EINVAL;
->>  
->> +	/* Realms are incompatible with AArch32 */
->> +	if (vcpu_is_rec(vcpu))
->> +		return -EINVAL;
+>> +    vcpu->cpu = -1;
 >> +
->>  	return 0;
->>  }
->>  
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index b963fd975aac..c18cdca7d125 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -161,6 +161,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->>  	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
->>  	kfree(vcpu->arch.vncr_tlb);
->>  	kfree(vcpu->arch.ccsidr);
->> +	kvm_destroy_rec(vcpu);
->>  }
->>  
->>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 849111817af7..353a5ca45e78 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -173,9 +173,108 @@ static int realm_ensure_created(struct kvm *kvm)
->>  	return -ENXIO;
->>  }
->>  
->> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
->> +{
->> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
->> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
->> +	struct realm *realm = &vcpu->kvm->arch.realm;
->> +	struct realm_rec *rec = &vcpu->arch.rec;
->> +	unsigned long rec_page_phys;
->> +	struct rec_params *params;
->> +	int r, i;
+>> +    if (vcpu_is_rec(vcpu))
+>> +        return;
 >> +
->> +	if (rec->run)
->> +		return -EBUSY;
->> +
->> +	/*
->> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
->> +	 * flag covers v0.2 and onwards.
->> +	 */
->> +	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
->> +		return -EINVAL;
->> +
->> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
->> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
->> +
->> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
->> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
->> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
 > 
-> Should this be cast to (struct rec_run *) ?
+> For a REC, kvm_vcpu_{load, put}_debug() becomes unbalanced in
+> kvm_arch_vcpu_{load, put}().
+> kvm_vcpu_load_debug() is called in kvm_arch_vcpu_load(), but
+> kvm_vcpu_put_debug() won't
+> be called in kvm_arch_vcpu_put() after this whole series is applied.
 
-Yes it probably should - I'll update. Although IMHO get_zeroed_page()
-should really return void * - but I know that would be a contentious change.
+Good catch. Yes that's not quite right.
 
 Thanks,
 Steve
 
->> +	rec->sro = kmalloc_obj(*rec->sro);
->> +	if (!params || !rec->rec_page || !rec->run || !rec->sro) {
->> +		r = -ENOMEM;
->> +		goto out_free_pages;
->> +	}
->> +
->> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
->> +		params->gprs[i] = vcpu_regs->regs[i];
->> +
->> +	params->pc = vcpu_regs->pc;
->> +
->> +	if (vcpu->vcpu_id == 0)
->> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
->> +
->> +	rec_page_phys = virt_to_phys(rec->rec_page);
->> +
->> +	if (rmi_delegate_page(rec_page_phys)) {
->> +		r = -ENXIO;
->> +		goto out_free_pages;
->> +	}
->> +
->> +	params->mpidr = mpidr;
->> +
->> +	if (rmi_rec_create(virt_to_phys(realm->rd), rec_page_phys,
->> +			   virt_to_phys(params), rec->sro)) {
->> +		r = -ENXIO;
->> +		goto out_undelegate_rmm_rec;
->> +	}
->> +
->> +	rec->mpidr = mpidr;
->> +
->> +	free_page((unsigned long)params);
->> +	return 0;
->> +
->> +out_undelegate_rmm_rec:
->> +	if (WARN_ON(rmi_undelegate_page(rec_page_phys)))
->> +		rec->rec_page = NULL;
->> +out_free_pages:
->> +	free_page((unsigned long)rec->run);
->> +	free_page((unsigned long)rec->rec_page);
->> +	free_page((unsigned long)params);
->> +	kfree(rec->sro);
->> +	rec->run = NULL;
->> +	return r;
->> +}
->> +
-> 
-> [...]
+>>       kvm_vcpu_put_debug(vcpu);
+>>       kvm_arch_vcpu_put_fp(vcpu);
+>>       if (has_vhe())
+>>           kvm_vcpu_put_vhe(vcpu);
+>> -    kvm_timer_vcpu_put(vcpu);
+>> -    kvm_vgic_put(vcpu);
+>>       kvm_vcpu_pmu_restore_host(vcpu);
+>>       if (vcpu_has_nv(vcpu))
+>>           kvm_vcpu_put_hw_mmu(vcpu);
+>>       kvm_arm_vmid_clear_active();
+>>         vcpu_clear_on_unsupported_cpu(vcpu);
+>> -    vcpu->cpu = -1;
+>>   }
+>>     static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/
+>> vgic-init.c
+>> index 933983bb2005..a9db963dfd23 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+>> @@ -81,7 +81,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>        * the proper checks already.
+>>        */
+>>       if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+>> -        !kvm_vgic_global_state.can_emulate_gicv2)
+>> +        (!kvm_vgic_global_state.can_emulate_gicv2 || kvm_is_realm(kvm)))
+>>           return -ENODEV;
+>>         /*
 > 
 > Thanks,
-> Wei-Lin Chang
+> Gavin
+> 
 
