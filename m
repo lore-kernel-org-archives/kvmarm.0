@@ -1,235 +1,123 @@
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5809A3CE4B9
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 08:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025AB3D75C0
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jun 2026 08:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780648197; cv=none; b=ZnkC4MpCIKC5jE3/9KAYFu505jQuMLii4qaSW8GWyN+eBuwRopPItsPyPP0Z9TpAJ8HUj42vlM6093vUfQV99llfVwvILOq+U/3O7PiaqG639fEn2Q9RlFFhV6EucnQH+oGUE7AL4gZZBMr48yBxsT1iSTcncqxvX2T4z54Ash8=
+	t=1780649015; cv=none; b=XWGBCH0dGyjyTu26zaDz32y2uf9/ErPXykDH7U/WDu4dqHeIEhxT7KBgc2bZX3lqDc2RV8xttuPsMTNXySSn+LMGShDUYP9tfXtyT0Dq1Yo6F2soN4VY3kduBKWTWopq7hg9Rtlf908O/FGeOUqN2yt5vzdyZ/akuFMNleayVgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780648197; c=relaxed/simple;
-	bh=nXd0A+r89FuIKQpP6LrasSo0O8BaqgMBBgLC1Hv+46c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jpJDRWCiIHObgBFdlsTOV9Fkp636f6Ck2VJRdTBS0VuJjwM5jWLXrCLY1XJogj9jzX+QEMGvgtUDd7GCDc1SvbUESQPfpTY2E9AiMDv1vTqywe4YcGAoz1lFt5M+Yr0dj9R3xXgdYTdXtwVBxy9TAbyaapMOnNSuZb2YEen5i6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HH0ktyBM; arc=none smtp.client-ip=113.46.200.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1780649015; c=relaxed/simple;
+	bh=RjIk4j1aUD9IqrrCQms3rV/mwtEdld0zNezAD5SNcmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UoGMpCQ4DyHgCX/ujkZwPcRZEtyCwYS5SKv2g0cHySf4Pzq2jgZtFLDXgD1ihpsPlf1E0ecmfS02+MdGnGrJpfyz1QRgMJALtZntDP0MqfT3x68BJpqUV+j5zeUoPqALAwsLZV2KFO+2QYhmxKkO4TjaSDuuJFTNhHjTAlXzjkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxSEptM2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HH0ktyBM"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=eJ3rd6muldb5Ys/jUa4C6DrQYqz6Oo7suf7mdItTnFQ=;
-	b=HH0ktyBMxXWRTw/q/P8xozXjuNm27h8Fvyyfntd5ZSceMqPqC0q4E4xGLazt1dCP72cDoP+ce
-	EEIHUiS04j8T2FGa6sIvRJYuMTAsgJrOvZSoxWM7IdxbUpoUUZfAWjJ/WqKW2Z343vKak3V0mDP
-	fevTQXcqKN9aiQ/bJwyoZGQ=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4gWvYL5dm4zmV8m;
-	Fri,  5 Jun 2026 16:21:58 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2980440562;
-	Fri,  5 Jun 2026 16:29:51 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 5 Jun 2026 16:29:50 +0800
-Message-ID: <22abfaf8-8636-4ed3-9a5c-fb4fdef1bc19@huawei.com>
-Date: Fri, 5 Jun 2026 16:29:49 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxSEptM2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5930A1F008A7;
+	Fri,  5 Jun 2026 08:43:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780649013;
+	bh=xomH7vFXWWtjI+devX73Or32J/jQoae12DQTVZVqU6c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=MxSEptM2U7b3TTvsRGnvsifV7/2mvhUon8g+ClkaM3W3XTRJlMSyNNELzD6lEOGuR
+	 8ms6RqLA8oJtaUJRIxlfVa7Ajpecpkm5C0qLki/zwwVPY4xnVsFB6hj3oHYJ0v5QGF
+	 /ljPAV+X1LdB+UoULpHhNqCIdeCg1YhEF7+2Hczm4flYNIjzKyTIsfD78NieftTSh8
+	 6XbmJDFnv55i1GzKK8i6YwOZPWUz6NOAyWoxVWkqZMvGWt2NqJ5uR3FQN4QyXO+3KQ
+	 15GMRsCJ6WZe9BgoDPhmZHsEhFCVrVF9lFHWZ3HQV5lEQpaR6RkjNyNdbnm8WjBvmK
+	 jw10Oqk5rBf7Q==
+Date: Fri, 5 Jun 2026 01:43:32 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Hyunwoo Kim <imv4bel@gmail.com>, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com,
+	jic23@kernel.org, timothy.hayes@arm.com, eric.auger@linaro.org,
+	christoffer.dall@linaro.org, andre.przywara@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: vgic: Check the interrupt is still ours
+ before migrating it
+Message-ID: <aiKMNIUMv9GQiIbD@kernel.org>
+References: <aiHnI1mu6SGQrgnz@v4bel>
+ <aiJmBfXAxcytfGha@kernel.org>
+ <87ecila0w3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/5] KVM: arm64: Add support for FEAT_HDBSS
-To: Inochi Amaoto <inochiama@gmail.com>, Marc Zyngier <maz@kernel.org>
-CC: <oupton@kernel.org>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
-	<pbonzini@redhat.com>, <will@kernel.org>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <liuyonglong@huawei.com>,
-	<Jonathan.Cameron@huawei.com>, <yezhenyu2@huawei.com>, <linuxarm@huawei.com>,
-	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <skhan@linuxfoundation.org>,
-	<suzuki.poulose@arm.com>, <leo.bras@arm.com>
-References: <20260225040421.2683931-1-zhengtian10@huawei.com>
- <20260225040421.2683931-4-zhengtian10@huawei.com>
- <ahzUUDAMoHtDFJD3@inochi.infowork> <864ijmvdpy.wl-maz@kernel.org>
- <ah1KLrpYBXSMM91H@inochi.infowork>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <ah1KLrpYBXSMM91H@inochi.infowork>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ecila0w3.wl-maz@kernel.org>
 
+On Fri, Jun 05, 2026 at 08:42:52AM +0100, Marc Zyngier wrote:
+> On Fri, 05 Jun 2026 07:00:37 +0100,
+> Oliver Upton <oupton@kernel.org> wrote:
+> > 
+> > On Fri, Jun 05, 2026 at 05:59:15AM +0900, Hyunwoo Kim wrote:
+> > > vgic_prune_ap_list() drops both ap_list_lock and irq_lock while migrating
+> > > an interrupt to another vCPU. After reacquiring the locks it only checks
+> > > that the affinity is unchanged (target_vcpu == vgic_target_oracle(irq))
+> > > before moving the interrupt, which assumes that an interrupt whose affinity
+> > > is preserved is still queued on this vCPU's ap_list.
+> > > 
+> > > That assumption no longer holds if the interrupt is taken off the ap_list
+> > > while the locks are dropped. vgic_flush_pending_lpis() removes the
+> > > interrupt from the list and sets irq->vcpu to NULL, but leaves
+> > > enabled/pending/target_vcpu untouched. As the interrupt is still enabled
+> > > and pending, vgic_target_oracle() returns the same target_vcpu, so the
+> > > affinity check passes and list_del() is run a second time on an entry that
+> > > has already been removed.
+> > > 
+> > > Also check that the interrupt is still assigned to this vCPU
+> > > (irq->vcpu == vcpu) before moving it.
+> > > 
+> > > Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+> > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> > 
+> > Looking at this and the other VGIC patch you sent (which should've been
+> > a combined series), are you trying to deal with a vCPU writing to
+> > another vCPU's redistributor? I.e. vCPU B setting GICR_CTLR.EnableLPIs=0
+> > behind the back of vCPU A?
+> > 
+> > That is extremely relevant information as the off-the-cuff reaction is
+> > that no race exists. But since the GIC architecture is awesome and
+> > allows for this sort of insanity, it obviously does....
+> > 
+> > Anyway, for LPIs resident on a particular RD, there's zero expectation
+> > that the pending state is preserved when EnableLPIs=0. So I'd rather
+> > vgic_flush_pending_lpis() just invalidate the pending state.
+> 
+> Just clearing the pending state introduces a potential problem as we
+> now have an interrupt that is neither active nor pending on the AP
+> list. It is not impossible to solve (we now have similar behaviours
+> with SPI deactivation from another vcpu), but that requires posting a
+> KVM_REQ_VGIC_PROCESS_UPDATE to the target vcpu.
 
-On 6/1/2026 5:05 PM, Inochi Amaoto wrote:
-> On Mon, Jun 01, 2026 at 09:58:49AM +0100, Marc Zyngier wrote:
->> On Mon, 01 Jun 2026 01:50:22 +0100,
->> Inochi Amaoto <inochiama@gmail.com> wrote:
->>> On Wed, Feb 25, 2026 at 12:04:19PM +0800, Tian Zheng wrote:
->>>> From: eillon <yezhenyu2@huawei.com>
->>>>
->>>> Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
->>>> indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100. A CPU capability is added
->>>> to notify the user of the feature.
->>>>
->>>> Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
->>>> ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
->>>> cannot be determined at KVM initialization, an IOCTL interface is
->>>> required.
->>>>
->>>> Actually exposing the new capability to user space happens in a later
->>>> patch.
->>>>
->>>> Signed-off-by: eillon <yezhenyu2@huawei.com>
->>>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->>>> ---
->>>>   arch/arm64/include/asm/cpufeature.h |  5 +++++
->>>>   arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
->>>>   arch/arm64/tools/cpucaps            |  1 +
->>>>   include/uapi/linux/kvm.h            |  1 +
->>>>   tools/include/uapi/linux/kvm.h      |  1 +
->>>>   5 files changed, 20 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->>>> index 4de51f8d92cb..dcc2e2cad5ad 100644
->>>> --- a/arch/arm64/include/asm/cpufeature.h
->>>> +++ b/arch/arm64/include/asm/cpufeature.h
->>>> @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
->>>>   	return cpus_have_final_cap(ARM64_HAFT);
->>>>   }
->>>>
->>>> +static inline bool system_supports_hdbss(void)
->>>> +{
->>>> +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
->>>> +}
->>>> +
->>>>   static __always_inline bool system_supports_mpam(void)
->>>>   {
->>>>   	return alternative_has_cap_unlikely(ARM64_MPAM);
->>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->>>> index c31f8e17732a..348b0afffc3e 100644
->>>> --- a/arch/arm64/kernel/cpufeature.c
->>>> +++ b/arch/arm64/kernel/cpufeature.c
->>>> @@ -2124,6 +2124,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
->>>>   	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
->>>>   }
->>>>
->>>> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
->>>> +{
->>>> +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, cope);
->>>> +}
->>>> +
->>>>   bool cpu_supports_bbml2_noabort(void)
->>>>   {
->>>>   	/*
->>>> @@ -2759,6 +2764,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->>>>   		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
->>>>   	},
->>>>   #endif
->>>> +	{
->>>> +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
->>>> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
->>>> +		.capability = ARM64_HAS_HDBSS,
->>>> +		.matches = has_vhe_hdbss,
->>>> +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
->>>> +	},
->>>>   	{
->>>>   		.desc = "CRC32 instructions",
->>>>   		.capability = ARM64_HAS_CRC32,
->>>> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
->>>> index 7261553b644b..f6ece5b85532 100644
->>>> --- a/arch/arm64/tools/cpucaps
->>>> +++ b/arch/arm64/tools/cpucaps
->>>> @@ -68,6 +68,7 @@ HAS_VA52
->>>>   HAS_VIRT_HOST_EXTN
->>>>   HAS_WFXT
->>>>   HAS_XNX
->>>> +HAS_HDBSS
->>>>   HAFT
->>>>   HW_DBM
->>>>   KVM_HVHE
->>>
->>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>>> index 65500f5db379..15ee42cdbd51 100644
->>>> --- a/include/uapi/linux/kvm.h
->>>> +++ b/include/uapi/linux/kvm.h
->>>> @@ -985,6 +985,7 @@ struct kvm_enable_cap {
->>>>   #define KVM_CAP_ARM_SEA_TO_USER 245
->>>>   #define KVM_CAP_S390_USER_OPEREXEC 246
->>>>   #define KVM_CAP_S390_KEYOP 247
->>>> +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
->>>>
->>>>   struct kvm_irq_routing_irqchip {
->>>>   	__u32 irqchip;
->>>> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
->>>> index dddb781b0507..93e0a1e14dc7 100644
->>>> --- a/tools/include/uapi/linux/kvm.h
->>>> +++ b/tools/include/uapi/linux/kvm.h
->>>> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
->>>>   #define KVM_CAP_GUEST_MEMFD_FLAGS 244
->>>>   #define KVM_CAP_ARM_SEA_TO_USER 245
->>>>   #define KVM_CAP_S390_USER_OPEREXEC 246
->>>> +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
->>>>
->>>>   struct kvm_irq_routing_irqchip {
->>>>   	__u32 irqchip;
->>>> --
->>>> 2.33.0
->>>>
->>> Instead of having these architecture specific capability, I wonder if
->>> we can add a generic capability like "KVM_CAP_HW_DIRTY_STATE", so
->>> other architecture supports similar things can reuse this capability,
->> What of the existing stuff doing the same thing? x86's PML, to start
->> with?
->>
-> In fact I think the HDBSS is the first one with non-fixed size.
-> Although there is a in process RISC-V extension for it, there will
-> be a long story to make it ratified.
->
->>> For this generic thing I suggest, the getter returns the max support
->>> entry count (or the buffer size) it supports like the dirty ring
->>> capability. And the setter just let the architecture set the parameters
->>> based on the user request.
->> This looks wrong on a number of levels.
->>
->> - If you want something generic, there is the existing dirty
->>    log/bitmap. How this stuff is populated is none of the user's
->>    business (trapping write accesses, dirty bit collection from the
->>    PTs, or HW-generated log), and we don't need an extra feature for
->>    it. Performance will obviously suck, but that's what you pay for
->>    something abstracted and cross-architecture.
->>
->> - If you want something architecture specific, then it can't be
->>    generic, by definition. You get the raw speed and compatibility with
->>    other arch-specific extensions.
->>
-> OK, I agree, it is better to keep this thing arch-specific. Doing a
-> generic thing does not benefit too much, I have made a mistake on
-> it. Thanks for your kindly explanation.
+Right, I was suggesting that in addition to deleting the LPI from the AP
+list we actually invalidate the pending state so that someone sitting on
+a pointer to a to-be-freed LPI sees vgic_target_oracle() returning
+NULL
 
+> > Beyond that, I see two other fixes for lifetime issues around the
+> > vgic_irq in the middle of migration. I'd like to see explicit RCU
+> > protection around the release && reacquire of the ap_list_lock rather
+> > than depending on the precondition that IRQs are disabled.
+> 
+> I'm not sure I follow. Are you suggesting turning the AP list into an
+> RCU protected list?
 
-Awesome. Thanks for the review.
+No, sorry, I should expand a little.
 
-I agree with Marc—keeping this ARM-specific is the right approach.
-Also, in v4 we're removing the ioctl interface entirely. HDBSS will be
-auto-enabled during migration setup and auto-disabled when migration
-completes, so the capability naming issue becomes moot.
+We store a reference on the vgic_irq struct in the AP list, which is
+stable so long as the ap_list_lock is held. It should be possible for
+the refcount to drop to 0 between releasing the ap_list_lock and
+reacquiring it.
 
-I plan to post v4 with the updated approach soon.
+So either vgic_prune_ap_list() takes an additional reference on the
+vgic_irq before dropping the ap_list_lock or rely on RCU to protect
+vgic_irq structs observed with a non-zero refcount.
 
-
->>> This should do no harm to this implement, as everything still depends
->>> on the architecture behavior, and leave room for other architecture
->>> to reuse this.
->> Again, the generic framework exists, you just have to implement the
->> backend you want.
->>
->> 	M.
->>
->> -- 
->> Without deviation from the norm, progress is not possible.
-> Regards,
-> Inochi
+Thanks,
+Oliver
