@@ -1,63 +1,63 @@
 Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD10346E40
-	for <kvmarm@lists.linux.dev>; Sat,  6 Jun 2026 17:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A0F27AC4C
+	for <kvmarm@lists.linux.dev>; Sat,  6 Jun 2026 17:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780768638; cv=none; b=uqrC58KOcZn4RE8TLYlEWVTpCs1tmlYrJKGw8n/EM8/gQLMmXq+FKP5MRyEzsZcRra5JBw8Pa5LOh2XOQ16FcN7RukG3C8Nrcq7uyf0qPczWxQrqrZ7nRHtzv/UoJB475Ip4g07LxGiwzOyflYLjoLXjCS7fx2K8N09a0YoahNA=
+	t=1780768643; cv=none; b=o7+MwTJ0pWphLmRXBkVJjBZhGVs+Rwz1M0kZQfw4xW3HCmyic2rnqJSa8VdHu2HaD+NKk0pNiVBxdRNYF8fdt1tlcYMsj43gbja452f2g/LAavDgprtW0P/ogzEiCPfsK5eeUxQch96x2z7urxq7neIfexfaaiMYKwkS7+FZPKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780768638; c=relaxed/simple;
-	bh=6fmYE5D4pZ1hMhe2KPEF9CIGn+2+DUUFbJBJNxmOlNg=;
+	s=arc-20240116; t=1780768643; c=relaxed/simple;
+	bh=GMITEpPOTtrYf7ZhiUASmEirKqHeY2hDHERiaSomMK0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sLCQFRCcBwxlth3FbPu2wJObaWmiRVUOb8eMw+JQfd10jY3Zsft9aEdItTCPTn3Uhfj/cYja8tkzpLo1+x7ru8ZBtunCR0qqTeOqw9+CUlrX3WorFMk4BnVzTGKotEcZNwMwEvJ7PhjnnE6ZhKWVznziW+UHEK1Q9dEkktWtAWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QD0WMjGr; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=MrkSbxQolQI6RQDjK55ca4rGSeFikMiS5YF21ZDIrTrUM2g+7/dXklRWYjLvpPD2+mBE3AktZXo94AIvXutRo4RiFRTnWXZqfrY9O3VkF29eGWJnHmY1ZGaFcKmv3EAi62ejKQy00KE1UjQovitptDocjiAjlkaTu14kCRYRXAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+/UY0S+; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QD0WMjGr"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2bf18c30bb2so20263755ad.0
-        for <kvmarm@lists.linux.dev>; Sat, 06 Jun 2026 10:57:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+/UY0S+"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2c168baac83so13914375ad.2
+        for <kvmarm@lists.linux.dev>; Sat, 06 Jun 2026 10:57:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780768637; x=1781373437; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1780768641; x=1781373441; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DtrLaj5ltFoAG/++WffsPSgWGaLrPwS8Itqpcy4i6xY=;
-        b=QD0WMjGrIhHfnELQCdtdIPCcbCu3Qbi3U/qFFzreuE7gba9ei+uUzzWjoSG/P0Ln3+
-         3RXT+d5He4+jDtQFCs0kO6Wx1KLd7BhX0ApcK9rVhUR0FAcQ9szEhVPd0iRTgerYs65u
-         dRpH1WoolEwur9FPaf7gEIW1HM+1ZWpIo2P6/moNpOSGevNHmSYSTS99QrEln/5MiN9C
-         q+WvnKgS47OwJXmzrOwacFTIMrEkCu1h9YrX0hDo+vRWGcCjy8R6VtaFb14yDjzm4B5Q
-         wCUhAaEAaVhLVaumvPm6d3a52pzw4OutZq8FRb6W/g9e+aHxxNVzs262m9KiPEEIUHCz
-         hwHw==
+        bh=KmWKsP5LOKB/Z4KYBnWg/ptdbuVXbRt6wtHayHObrME=;
+        b=D+/UY0S+OkFj66Ptu7FUctadS4/Z73AXsqpiQEEr8qz1xMqI9bt8nPnW91J5K4P0Lb
+         KGn+1HcMnDrIUWXk3FuUDVvnlRNJQs3ratdUxoZNg7NFmFPotrG1Dl5WX7t47xSVqlft
+         Lba5Pv1rvL1nXmfA8eRQJeUDrmuySwHkM9QJdZiqN8Rc+BYJn5A0s5UhgAvx+3TWDZOv
+         7939dnK0gNwgIIa7VT0fMRg6G/E7dchZK47K73IdGsKnfXCjaukU9dRLcrAqRDNAG0d2
+         tnR85dvkw0ScOeCjRVxID230kgPyUc9X7SKWayrYUJHfgPwBXrnuYyYzkw3Y+zlo/3yC
+         IGsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780768637; x=1781373437;
+        d=1e100.net; s=20251104; t=1780768641; x=1781373441;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DtrLaj5ltFoAG/++WffsPSgWGaLrPwS8Itqpcy4i6xY=;
-        b=jZCYhC2MHNRra1hJ5peis12NiAES6qnqmMCwoqZxUDeCRf9hc3eg0YixzH9mFunyB8
-         GAjtBsMni/yhevG1ZsfMGxkWhGcO0HRPq0a0Dhb/JL9oScd47douItccPaWWINnOvJPm
-         3zP7vJF53yv+nGGo32VCXjfT8q04tcuQYuvqgQnwIu5TUx40+qwQodmWYY8683DBW5mh
-         fgv0tn2vvi2tmBcThHam1KA4THBHvefYRy3zLaP63NlqDqYYSOt2JkznZA+7MjA7ceWW
-         JPatNe/tGKkGn+JVNTecVmHtG4vJy7MZhAd4Tj/aL4haBwUHUTefxAyW/SI/Ty+jwOcf
-         zZJw==
-X-Forwarded-Encrypted: i=1; AFNElJ9kQ80lyTF6EQ+MDW6O1WlzkI/3T19zSsNUTcnTleUcr8IhtyeiU2p5bXZgAImDOXzKmPIQd74=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyGBZjoyQNbrz6g6/4gi3yQhMFG4Qgln8pXUMjJp+mAX44SM76I
-	QUIuyPSeH58qIIL61J5tYK+OrPsukZ96VVIMaU4dwPgjbYs0+wX8ihgl
-X-Gm-Gg: Acq92OFBV8lsVmVRoSjwqtOwjQns6nZvWg8fWn2rkroA+m5ZghxvqJxqZfN3LJ8ooJp
-	1M+xQPkLg4hJZRIvPteBF4ZwgKZRxTDy/PN7Krutu/HajPffvUsxsprNH32Uqk/6OHxjmzsD23Z
-	oDQpFaZ+Uo6teK1xkPc4q4FILEA19h8P27Se0bLa9U8+pcU3732oPtNjX74xBxugJxxkwn+xzbX
-	k3P4joLeXr3Ke8HE4tC19ZTPVGxy0rCqJ8SDajGeQeH+tsFcpY1+LWIHLJdS2IdJKPNQyMz3Q7g
-	Wkcc7tmmygfoXrDjroC7uJbJCSCTQKaG1R6IHlFOG+p5wYGcP9MsftM3Plgh77ELzfX2rgt4VFH
-	QN5h4o0iULEQ3o5fXTJOWycDpM1YyfVuuKcn1L/87pUKnXRhJdaMxEaA8ExBqddCyfpVSa1TPbo
-	IBz4du7UE9i7QR6AwEfn9PJR25y24AeqrI6nXH051V3HJT5ZbNimtKxyI7
-X-Received: by 2002:a17:902:c952:b0:2c0:fa4e:91ed with SMTP id d9443c01a7336-2c1e834699fmr108804645ad.18.1780768636898;
-        Sat, 06 Jun 2026 10:57:16 -0700 (PDT)
+        bh=KmWKsP5LOKB/Z4KYBnWg/ptdbuVXbRt6wtHayHObrME=;
+        b=gY9h9We2rv7t/ZiWLFjJjL/kFNxRBXUGC3oMeO7txIC6YnxdFBySaCUqhoB/v2vWoq
+         uFox8cgv2iFelpiuAh2P7GUu/BZ5dLH1fb022uXFsklpuOqE2tctJdFc7aiQiFSUwOqW
+         GYMhriU+OZNwOxowOw2qXnXBp0ywJ4NsDPAZYTmXLmyhv+ynsHQa5R/xapBaXKjZUgTA
+         8yaoH8VD46sEemMl4vKSqm2njE/E9stUhlabaOaFWoVFsGSsg+DgrOqpfurHhvMz82NE
+         lhegNkpOqDEvFIQBRfund3oUiY7vhX2fp0MGUonsQ/macqrX6WNwtPGwYA9+8lgMyNri
+         dxJg==
+X-Forwarded-Encrypted: i=1; AFNElJ976LFCOGjg158CjGgSMA+gPNWNNmhX2v/sogH7qP6lRZG4k3ZcNxdcQ0qRl3sDHJRiHr+pYjs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzaCdSf8jmPLJNp5FmhvtX7u03TjncgA4f7lY72OXtBFWJDv4VD
+	eROANea8UErk55w78Hf933/cwxKDzCVHXmvGqmLvz276rXKrASswchgt
+X-Gm-Gg: Acq92OF22FBHZsAAx7X7nGz7MCGsHJIAstetAeVO1szyi62kcKmh0z4Fv3FXNidbCJ+
+	jcmZmX6P3gdV8mrpzZp1fo9HJEr8w8YtRBS0jXKpZAFrmGzgQuy/rgylhlZv9+P3JxGwCO79iUj
+	tl0OSit9Yj1I7r+1WUkJIZkf86CoFShxWtIsUKTrzS3gphSnofesII+Q6gbvnIhAJ8rb9FdAU0P
+	ZskKAyenojMdeR0sbsa0xovCcaJggArNlBdbRwBvV29BnmAVc6CW2UjLh9IUZ6uIazAKHP1EAYx
+	WTFjp4SkYg+8gbOZbWq7XhWzjluAvGhbcADtBhGftIdNs5yRFGNJW56qlXWYO98Co9FIhM5TN+I
+	JVwdkUrNRmo7B2hHfPbTd13DLGiS2CcrIbwj9QfEZ9Q7XkSuFpYLLoMCUcxrQ6c7U5RUF6tdDXB
+	YK1BfOGRhpGSDktofaTviiGsOlfFwzOWS2azBcWg3/Ri2k2S1yCsSw/SNe
+X-Received: by 2002:a17:902:e848:b0:2c0:b6c7:2273 with SMTP id d9443c01a7336-2c1e79e29ebmr105792125ad.3.1780768641180;
+        Sat, 06 Jun 2026 10:57:21 -0700 (PDT)
 Received: from v4bel.. ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d69csm129196425ad.2.2026.06.06.10.57.13
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d69csm129196425ad.2.2026.06.06.10.57.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jun 2026 10:57:16 -0700 (PDT)
+        Sat, 06 Jun 2026 10:57:19 -0700 (PDT)
 From: Hyunwoo Kim <imv4bel@gmail.com>
 To: tabba@google.com,
 	maz@kernel.org,
@@ -72,9 +72,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	stable@vger.kernel.org,
 	imv4bel@gmail.com
-Subject: [PATCH v3 1/2] KVM: arm64: Clear __hyp_running_vcpu when flushing the pKVM hyp vCPU
-Date: Sun,  7 Jun 2026 02:56:10 +0900
-Message-ID: <20260606175614.83273-2-imv4bel@gmail.com>
+Subject: [PATCH v3 2/2] KVM: arm64: Bound used_lrs when flushing the pKVM hyp vCPU
+Date: Sun,  7 Jun 2026 02:56:11 +0900
+Message-ID: <20260606175614.83273-3-imv4bel@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260606175614.83273-1-imv4bel@gmail.com>
 References: <20260606175614.83273-1-imv4bel@gmail.com>
@@ -86,37 +86,81 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-flush_hyp_vcpu() copies the host vCPU context into the hyp's private
-vCPU on every run. ctxt_to_vcpu() expects a guest context to have a
-NULL __hyp_running_vcpu, which is only ever set on the host context, so
-that it resolves the vCPU via container_of(). While this is generally
-the case, flush_hyp_vcpu() copies the context verbatim and does not
-enforce this, so a value provided by the host is dereferenced at EL2
+flush_hyp_vcpu() copies the host vGIC state into the hyp's private vCPU
+on every run. The vGIC list register save and restore use used_lrs as
+their loop bound and expect it to stay within the number of implemented
+list registers. While this is generally the case, flush_hyp_vcpu()
+copies vgic_v3 verbatim and does not enforce this, so a value provided
+by the host is used at EL2 to index vgic_lr[] and access ICH_LR<n>_EL2
 (host -> EL2).
 
-Fix by clearing __hyp_running_vcpu after the copy.
+Fix by clamping used_lrs to the number of implemented list registers
+after the copy, as the trusted path already does in
+vgic_flush_lr_state(). The number of implemented list registers is
+constant after init, so it is replicated once from
+kvm_vgic_global_state.nr_lr into hyp_gicv3_nr_lr rather than read on
+every entry.
 
 Cc: stable@vger.kernel.org
 Fixes: be66e67f1750 ("KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()")
 Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/kvm_hyp.h   | 1 +
+ arch/arm64/kvm/arm.c               | 2 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 9 +++++++++
+ 3 files changed, 12 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 8d06b62e7188..e9b2b0c40ec6 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -157,5 +157,6 @@ extern unsigned long kvm_nvhe_sym(__icache_flags);
+ extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+ extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
+ extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
++extern unsigned int kvm_nvhe_sym(hyp_gicv3_nr_lr);
+ 
+ #endif /* __ARM64_KVM_HYP_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9453321ef8c6..9ffd5d4079e6 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2426,6 +2426,8 @@ static int __init init_subsystems(void)
+ 	switch (err) {
+ 	case 0:
+ 		vgic_present = true;
++		if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
++			kvm_nvhe_sym(hyp_gicv3_nr_lr) = kvm_vgic_global_state.nr_lr;
+ 		break;
+ 	case -ENODEV:
+ 	case -ENXIO:
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 06db299c37a8..02c5d6e5abcb 100644
+index 02c5d6e5abcb..a0da08caa6c2 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -128,6 +128,9 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+@@ -24,6 +24,9 @@
  
- 	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
+ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
-+	/* __hyp_running_vcpu must be NULL in a guest context. */
-+	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu = NULL;
++/* Number of implemented GICv3 LRs. Used by flush_hyp_vcpu(). */
++unsigned int hyp_gicv3_nr_lr;
 +
- 	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
- 	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
- 	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
+ void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
+ 
+ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
+@@ -142,6 +145,12 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 
+ 	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
+ 
++	/* Bound used_lrs by the number of implemented list registers. */
++	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs =
++		min_t(unsigned int,
++		      hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs,
++		      hyp_gicv3_nr_lr);
++
+ 	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
+ }
+ 
 -- 
 2.43.0
 
