@@ -1,210 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099F5258CCC
-	for <kvmarm@lists.linux.dev>; Sat,  6 Jun 2026 10:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB9427AC4C
+	for <kvmarm@lists.linux.dev>; Sat,  6 Jun 2026 17:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780742950; cv=none; b=cuENdq0TxsLoYmmyo7RSo/3h2qhxJHn4mAeZwNm+0P95KKHrIUE68lZTZGjsykhFUI3dMzPzdlmB7a0i6G9T7YasJOyALwDc+ByV9afTonNzQUdUd+dmY0IoALzVX5tg5N8QvfzTcIo6O5DSHFQpVHDkEt8vi3OzgfabcIkseZ4=
+	t=1780768635; cv=none; b=d+psEhsc9zXOuxhKJYmXVabCz6kHQhZ2gTz5HcXG0L6p7aQWhbRSIWRRDjtcJXMw407IOappmsYY38RM97Y2slNoZLfn9y0wBdqS/xVTDqwlRBNBUnO5ESgUTf8Xs3znEFj4gQ7gHgIxoZLLHQ6Jh5lEzYKVBokNBmt+KZ2/FmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780742950; c=relaxed/simple;
-	bh=TgMwF7ZI/UpST1V7dntjNqGW0YWsEucGo/PZJWHPY+Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aNPlVOxoX99c4K/jOOrE36GNliqu5I352gqiguWsOCtuC3Zapg7UKbhqxuxbK5N5w1tKCYdDlRe10immXHWfDzgzjhVgVnxmj4One7xVlPyhYKb0L5Q73zrtn6UkqZyotMerNnhDc2wrFjDyFUqHQJ+GnUiFwmT5/WTOZejj408=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oavCZS4B; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780768635; c=relaxed/simple;
+	bh=KSZGHumIxF19ChxQvl5ED5jRjJ8wnG3VPODwq1yEaVA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hwYsWFWVZh+ZeT0CHZdo6Z/jKhXs8lbwdjFKStM9aDJnIWFsq0fa8QJSpixPNKVhhJalC6A34jEEx0KK7i5/7CVV9mXcJLPf3ewEdnYEpfXz5ZjZEiNMPSJEH9K3jDH3T7uoUmZvPx8xdYATg9EBgVdat0pjXv45aYlCOg0UT6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XaKJsSr8; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oavCZS4B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EAFC1F00893;
-	Sat,  6 Jun 2026 10:49:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780742948;
-	bh=s2Xy2or30i+9Y/BGQbdomuCCP79IAxaruc93U4v6Yno=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=oavCZS4BNSkzNMynpY1daQBDgMwItyQE2wXObLBg0M4z84CIM8p9I525OUjVN2s9I
-	 bv//xerVlZ0leGUIV+L1xFXjnS1lJTQ+TUcPeQTA7QrPLFWz2mhji9EUHu/mXAtMWF
-	 +P6EULSnSYNEUQceg5j5fkT/Gjp5DmsdFPY01TSzO99cPE9zJKtvFMPp1rkZElOD1y
-	 LIH6Ttzr6IjJ1+Jf9wrRfDjOSDyKBAf1CXFSyNfFSZHRjtg6ofV7OWJpS3MN8eHojM
-	 CeKioACIdQv0yZbwdPDFnwzXpWD+eAcmgfa8rngl4iejpDQMQxS56vzMVKB6Fa0/dM
-	 nZ6zgxgS96HRQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wVoaQ-0000000A0yQ-1bVr;
-	Sat, 06 Jun 2026 10:49:06 +0000
-Date: Sat, 06 Jun 2026 11:52:23 +0100
-Message-ID: <877boc9c0o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: tabba@google.com,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaKJsSr8"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36da151a152so2162583a91.1
+        for <kvmarm@lists.linux.dev>; Sat, 06 Jun 2026 10:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780768634; x=1781373434; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ME+xNkoeE4ctIAxfAzYaPkyPD55bBWMm21iy3jKU/r4=;
+        b=XaKJsSr80VnLPaKTvIwpZKiLWgM5n5GdmKBXLM/wZakHdhvhnrm9wOpgOyHJmR2GiK
+         Eu7EuKfVgGq2Gp7NS2x+ruhr06DLJVjkYcIvUiAZMc/nVDZKpC0Iks9aU8h7lBoJ7w1j
+         zRXXLCfgbZNXh5zy6lJKpP7xxuo18VBICghHeMxLqDqjqwQlasaSUiYvawwS+Xfb/hbG
+         TfkxcaKxH8mWW2B1Z01GU9MmynGFXHwSywoCh8r7F0+RMiakcwYkHZtDi1hjZa1hKag1
+         bOuiNE3No0I3pQ+6vTQag/ChH477Ct2W4OmeY8PIlK5xkOvQ5cBczWcid1/hQY7xjyms
+         FXeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780768634; x=1781373434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ME+xNkoeE4ctIAxfAzYaPkyPD55bBWMm21iy3jKU/r4=;
+        b=cKeczO2IvutOaHxI+TNNCeMUBGVLy4sHaBzZoMkoKVw5t1LepQB+x9Vh3I65esG5lo
+         PrFKvHSz/dmou5dyiWaEazxLhWRT/s0K2x2kYEmf9CCxZ8f/JvSnSxmpGCw9TAPOIAyX
+         ga0uhutGAeWYC7ieoglu6rOtUTjW6x1zF5+MOOfroVTaZhNPx7iBiv20PKLawx/SnU3b
+         kft9o9MkKHWb9cAUaYPW4SRVv1QSecFw8e7I/BjDM47u2tWgCKdTKxpcDCotvl6njrV4
+         dfd7412MUMV9wR4d0vpWJKETdhKgGPs3Kh5Amaa9SjMIHHX1tqTsM/TCep+NbNQfkz92
+         6Zyg==
+X-Forwarded-Encrypted: i=1; AFNElJ8PNyvQ+Sf9YzKfawulm40r4/F6uyXuOQHlMINxC/4CcQgmgd/1MyqP/A2fFiRSosVYrtdIQak=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyNiAjCPgfFtLZfU9kkY2GJcjvoUqdC2fKZgmGnWHlQX8/qKedq
+	SxP4cyj0naqgg9e1Rr0CuG18xTD9mE5diwSchsF1BgVJeixltwK8Hi8J
+X-Gm-Gg: Acq92OGQIThcDU6+wK14dW2l/pMdFFCQEc7Dohw8DBxXvZt4urc7JEtfNv98JPHUs4G
+	NqtRMod9rWn4gLwD0uRueiRCS+PbhVINN0ytUjGdFtMwXUtD3JExZSqXqUC7GOI3gOEpPgVSAEm
+	Cjz6XDljMsWs/LWq+1Fz1PU3qWhO3niuvHz2EYXsvLOnmjqmurt2JKHlAM5Dlwlx07pe/jeCXXm
+	6L8udNMK1SrUKJDKx2FT1cEfa+fx4FrTyU0QEAaY0mQJ5fF1THkgRb7tkahYM4C0CI80G8wdB68
+	ypJyZqbyTNLST5tvTGbCYTXJbHJ1ziqYrcXsQ8SNhcwHlgY7ct6Xp6KZCcsM1PepT1AaTW2TgZ6
+	1FwE8CmTSUSa7IPpLy/RtUuRICkxz2nlzSd/4FI1XSFyBEUrhGe7lOrKD7r9B25U6A9SI+drnRo
+	03/nTDaQ/Cfp38WoatHTr0GfS++JVZ9haW74Eyvk0jWxtLmQRaTABio+Q9m0Xewkms45Y=
+X-Received: by 2002:a17:902:e545:b0:2bf:1486:e6bc with SMTP id d9443c01a7336-2c1e80ee016mr102752615ad.29.1780768633594;
+        Sat, 06 Jun 2026 10:57:13 -0700 (PDT)
+Received: from v4bel.. ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d69csm129196425ad.2.2026.06.06.10.57.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jun 2026 10:57:13 -0700 (PDT)
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: tabba@google.com,
+	maz@kernel.org,
 	oupton@kernel.org,
 	joey.gouly@arm.com,
 	seiden@linux.ibm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Bound used_lrs when flushing the pKVM hyp vCPU
-In-Reply-To: <aiPfuAmM8JbtT6GY@v4bel>
-References: <20260604151210.1304051-1-imv4bel@gmail.com>
-	<20260604151210.1304051-3-imv4bel@gmail.com>
-	<86zf19tlcu.wl-maz@kernel.org>
-	<aiPfuAmM8JbtT6GY@v4bel>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	stable@vger.kernel.org,
+	imv4bel@gmail.com
+Subject: [PATCH v3 0/2] KVM: arm64: Sanitise host vCPU fields copied in flush_hyp_vcpu()
+Date: Sun,  7 Jun 2026 02:56:09 +0900
+Message-ID: <20260606175614.83273-1-imv4bel@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: imv4bel@gmail.com, tabba@google.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 06 Jun 2026 09:52:08 +0100,
-Hyunwoo Kim <imv4bel@gmail.com> wrote:
-> 
-> On Fri, Jun 05, 2026 at 09:58:09AM +0100, Marc Zyngier wrote:
-> > On Thu, 04 Jun 2026 16:12:03 +0100,
-> > Hyunwoo Kim <imv4bel@gmail.com> wrote:
-> > > 
-> > > flush_hyp_vcpu() copies the host vGIC state into the hyp's private vCPU
-> > > on every run. The vGIC list register save and restore use used_lrs as
-> > > their loop bound and expect it to stay within the number of implemented
-> > > list registers. While this is generally the case, flush_hyp_vcpu()
-> > > copies vgic_v3 verbatim and does not enforce this, so a value provided
-> > > by the host is used at EL2 to index vgic_lr[] and access ICH_LR<n>_EL2
-> > > (host -> EL2).
-> > > 
-> > > Fix by clamping used_lrs to the number of implemented list registers
-> > > after the copy, as the trusted path already does in
-> > > vgic_flush_lr_state().
-> > > 
-> > > Fixes: be66e67f1750 ("KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()")
-> > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > index 02c5d6e5abcbf..cd807fdb11ba8 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > @@ -7,6 +7,7 @@
-> > >  #include <hyp/adjust_pc.h>
-> > >  #include <hyp/switch.h>
-> > >  
-> > > +#include <asm/arch_gicv3.h>
-> > >  #include <asm/pgtable-types.h>
-> > >  #include <asm/kvm_asm.h>
-> > >  #include <asm/kvm_emulate.h>
-> > > @@ -142,6 +143,13 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-> > >  
-> > >  	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
-> > >  
-> > > +	/* Bound used_lrs by the number of implemented list registers. */
-> > > +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> > 
-> > There is no pKVM support without a GICv3 CPU interface, and absolutely
-> > everything already assumes it. Why do we need this extra check?
-> > 
-> > > +		hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs =
-> > > +			min_t(unsigned int,
-> > > +			      hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs,
-> > > +			      (read_gicreg(ICH_VTR_EL2) & 0xf) + 1);
-> > > +
-> > 
-> > Reading ICH_VTR_EL2 on each entry is going to cause some really heavy
-> > trapping under NV, and we should avoid this.
-> > 
-> > kvm_vgic_global_state.nr_lr contains this information, and it should
-> > only be a matter of replicating it (or compute it once) at init time.
-> 
-> Does this approach look reasonable to you?
-> 
-> ---
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 8d06b62e7188..25199769a1d6 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -157,5 +157,6 @@ extern unsigned long kvm_nvhe_sym(__icache_flags);
->  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
->  extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
->  extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
-> +extern unsigned int kvm_nvhe_sym(hyp_vgic_nr_lr);
-> 
->  #endif /* __ARM64_KVM_HYP_H__ */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9453321ef8c6..891fe2c7b854 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2426,6 +2426,7 @@ static int __init init_subsystems(void)
->  	switch (err) {
->  	case 0:
->  		vgic_present = true;
-> +		kvm_nvhe_sym(hyp_vgic_nr_lr) = kvm_vgic_global_state.nr_lr;
+flush_hyp_vcpu() copies the host vCPU context and vGIC state into the
+hyp's private vCPU on every run. This series sanitises two fields that
+it currently copies verbatim (host -> EL2): __hyp_running_vcpu is
+cleared in the guest context, and used_lrs is bounded by the number of
+implemented list registers.
 
-You probably want to guard this on kvm_vgic_global_state.gicv3_cpuif
-to be sure this stays to 0 when running with a GICv2 implementation.
+Changes in v3:
+- 2/2: replicate kvm_vgic_global_state.nr_lr into hyp_gicv3_nr_lr
+  once at init (guarded by gicv3_cpuif), instead of reading
+  ICH_VTR_EL2 on every entry behind a gicv3_cpuif gate. (Marc)
+- v2: https://lore.kernel.org/all/20260604151210.1304051-1-imv4bel@gmail.com/
 
-And maybe rename it to hyp_gicv3_nr_lr to avoid any confusion.
+Changes in v2:
+- split into two patches, one per field, per review.
+- v1: https://lore.kernel.org/all/aiFe-CXo-XVTFz1g@v4bel/
 
->  		break;
->  	case -ENODEV:
->  	case -ENXIO:
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 06db299c37a8..8bb9362bc284 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -128,6 +128,9 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-> 
->  	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
-> 
-> +	/* A guest context must keep a NULL __hyp_running_vcpu. */
-> +	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu = NULL;
-> +
->  	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
->  	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
->  	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-> @@ -139,6 +142,12 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-> 
->  	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
-> 
-> +	/* Bound used_lrs by the number of implemented list registers. */
-> +	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs =
-> +		min_t(unsigned int,
-> +		      hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs,
-> +		      hyp_vgic_nr_lr);
-> +
->  	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
->  }
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index d461981616d9..ebc6b4afc336 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -20,6 +20,7 @@
->  #include <nvhe/trap_handler.h>
-> 
->  unsigned long hyp_nr_cpus;
-> +unsigned int hyp_vgic_nr_lr;
+Hyunwoo Kim (2):
+  KVM: arm64: Clear __hyp_running_vcpu when flushing the pKVM hyp vCPU
+  KVM: arm64: Bound used_lrs when flushing the pKVM hyp vCPU
 
-You could probably move this close to the place where it is used
-instead of an unrelated file.
-
-Other than that, and with the vcpu-related hunk in its own patch, this
-looks reasonable.
-
-Thanks,
-
-	M.
+ arch/arm64/include/asm/kvm_hyp.h   |  1 +
+ arch/arm64/kvm/arm.c               |  2 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 ++++++++++++
+ 3 files changed, 15 insertions(+)
 
 -- 
-Jazz isn't dead. It just smells funny.
+2.43.0
+
