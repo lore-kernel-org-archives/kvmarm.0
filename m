@@ -1,111 +1,188 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32D5226CFE
-	for <kvmarm@lists.linux.dev>; Sun,  7 Jun 2026 08:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580283542E5
+	for <kvmarm@lists.linux.dev>; Sun,  7 Jun 2026 13:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780821839; cv=none; b=PsHbxFoBIUDQDJQhbr6OiMI7Oc1Tp3SIqRQ8DNI3nBEFzmYiVk5t8hOYEptrH+QPzMeuhePBmsaSgxjhr69+plr9UR1oSEUNy+c/aZCGFl4clULpQtyvayslzuNN3KY7qvcJINMKKxlBG0cGq1+ri2d+0PKLKuxOuYdU4mVvL0w=
+	t=1780837341; cv=none; b=OyBoyCUGw6c1EVkpa1Upzpsbo613Ic3RGS5+OHvqXlJVJwLmC9oGGpmZ0kNblBLTsX4UG3kkxnDGHxbj05TVG92WqZw1+UjSoI996lOSdA3CVCH2unRocH3q13wQvtZijDj58wh7mCKNuAIfYkN7FjIGsdId02arzfzSLFuXaPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780821839; c=relaxed/simple;
-	bh=QkkdtfffhCW83bbIECO9svPMXL3gFi5LIcYlxuz1qp8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=JFRyWUJ9VVHc68oH7ALaEwTbHjzO1YoAeAufBjyyjK0o+T0sGXxgRdVarvvy/3Bs7Qr+UmqF+D88JL00K09Oy+43sD/EuU1+fjzYvh8tNMSXe9El8WFEVpVHijQj7JctCL9/ijVwu5Gt/E8LcxgHzH0INlMAEPOl6Ge1i+OvyS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFHR1uPv; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780837341; c=relaxed/simple;
+	bh=0zDitVmi1ZgQUWRwC8nA5Z59NGgo+9/Ri0Ly2sPzgx4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JhH12iXIouzjzkzoZ6SXXkxcEAwae+qtQqQhjcy93+SyFHP0C7dNoPPAqBQ78eQJdxXhFAVjan47M5eiQztlKJ2jlR/JDb/flmIMYE6LRQ7O7pJhQjITOSRGgsN/UfDuUN/0LZRNnuqxJ1Lz4AGbDD4hg894nRw/d3Rm6RxsYp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvpp5drA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFHR1uPv"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c858dc05ee3so2084282a12.2
-        for <kvmarm@lists.linux.dev>; Sun, 07 Jun 2026 01:43:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780821837; x=1781426637; darn=lists.linux.dev;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I12sMqC6/04DUeHmMWlOOJ5aYC5HrERy4a3xEEa3sfM=;
-        b=QFHR1uPvFunhHlbUEcwLMa1loI/9NbbhDFFQXrjoQJkbGO9DHIjZbDNuzWAn6g6lyS
-         HYA2auGnQIhCn8EiYkFhdNZxUKoqS8/ifTjm2gK2Iw9y0Ly2Wc7tsrq3uGXzmTzP6FSi
-         +WF88LrE3xVBIPEH1HV8OkCjBkELJJGWzmRt+KBMmGhbUcTHfn1glWtTK68xAqIrTLs2
-         rde+lfG21LOFUnhesa6LMzHPAMdamh4DcSJhQ9ssN/GAPgMViQMeNlogPLB3+7ge7iUh
-         5AgyPmDwP6hX/4v2PspJ6HRagyBpHUb3l2NFawyQI9DJP6c9b20CM0oI4APmtgJRGPGS
-         HFaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780821837; x=1781426637;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I12sMqC6/04DUeHmMWlOOJ5aYC5HrERy4a3xEEa3sfM=;
-        b=Cz65AuzIbDhfVhn0a9iozat5JckX05Lindyqht43teF+Wk1weuB7xDSW8lxXg49MrN
-         ruzrYCaT838mBC2o7B14yzkmM23Z+SaBMRzCJ5tDS4+oRWe8dUkSYq5Y7nfkz59MDE8d
-         Hd/814z8dnm3a8zRU/P4ozSe9F7XKt/b4zljbjKvBi9clplK3YhMX2LLDgJ9BRb+HyFa
-         met0Q6m+vMwzwWRJtJt0goesiThQNNiyTrF2AyAfnGiUd+fQMQGOj0jHB8POjoeAX7G7
-         PfwMchJeRJ2AAcV0cyje+kICks5pLXxDAwyZmfJh6n8+L7yXbyW26B8nePxcE9Di6X36
-         K1bw==
-X-Forwarded-Encrypted: i=1; AFNElJ/Fd0P4I5j9xNR2dwBR8tW2WuDBNg5upLmOWwiBcMl/Bn9zlP+u80oI8X1SVEV88u7Rbi2Q6gc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx6iWWvd57vaMskDcnBZEQURi4zpsNWFXPZRVLjfIW91AVicvvu
-	4sw6fyyMThbdZ/LAGd20Bw7SUGjF1mY4hnhCeLZfeuI7EFoUm6kd6hUh
-X-Gm-Gg: Acq92OFThn7fMyBAbbDMcSN3/SfH1X6glmpZZ2G9dPXUWlFkPYShgAe/krgThtO1MKV
-	X944v4vmCx1zNtLrMzqoo7eC7D0zN/2JVFOMVbH39+L1JFysBCExeIvEIluyAOCVy2QiRI5pn+g
-	+GjBuPIykzUKhm68Z+abEd2aE9xHxq7T7jVT0m07/qEQZYMF1SUoIdpSw91UPUm+YInazvG6vzZ
-	ad18z4pT0EbCi0PBGETlVEUYfNqVYgGi8Wb6h9I0cr5dd0gkxr7NoIoZktQ3zrd5vj6v6qgQd6m
-	K0y89Q/gfNtwniAfPzGO6UnNbdtEG15RfP3jmLHVJcaqNwd1C+fFPYqiBSwWwVJUTawqR6DRBJn
-	V0DEm76lOEYsJ9/ZIuBiMSyyjcbxQMEpQ3hohcwmFn3olZximv2JxluKm/aZVzdZfAukNrObkZf
-	48XVrpY7+XZIXY0l8woICRp6FOJp8RTi8gLUy7iTjzeCTpvEibKuE/GQ==
-X-Received: by 2002:a05:6a21:4d92:b0:3b4:6c68:b100 with SMTP id adf61e73a8af0-3b4ccdb61f6mr12356449637.19.1780821837181;
-        Sun, 07 Jun 2026 01:43:57 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85deeb2bdesm12177119a12.0.2026.06.07.01.43.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 01:43:56 -0700 (PDT)
-Date: Sun, 7 Jun 2026 17:43:53 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	imv4bel@gmail.com
-Subject: [PATCH] KVM: arm64: nv: Skip vCPUs without a pseudo-TLB in
- invalidate_vncr_va()
-Message-ID: <aiUvSbrWndQeUPc8@v4bel>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvpp5drA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89B11F00893;
+	Sun,  7 Jun 2026 13:02:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780837340;
+	bh=2wN856jABN6Lp/eRQ2e+/2+RP7R/4j14VI4MAkxAbf4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=hvpp5drAdsroCw8dOTkA+lg1gRm/pqsd0aC2FTmKB03MefjxTYpRRxBRfFUIEoc7c
+	 hEuKYV1WKmkGo2z+OefKkm4YqVqPIp7Hh1g30l4Iw6Dfgu3pin+ZEA0HAg9st5KwjZ
+	 LzBJFNwjMBfYz5Sy9Tnv7TVCH/RzsVuV/EBcRtUdVaU80ZVfdmYgfi7fb60Yt6/tlS
+	 SJW8kcGRG+nCe2F/IfDQKtSvpaSyryWM/p6B0tLS8rZLahirWIDLHdlAt885L+qPiy
+	 FA/utdrxsddoWBVSw6+Op2+9QnR6/bRLGT9Qu29aNmwNhJsCCipHIGsGq2zT4SKN/r
+	 xmq771bJNM+zA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wWD8M-0000000ACAj-1XrD;
+	Sun, 07 Jun 2026 13:02:17 +0000
+Date: Sun, 07 Jun 2026 14:05:02 +0100
+Message-ID: <8733yya4ch.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: nv: Skip vCPUs without a pseudo-TLB in invalidate_vncr_va()
+In-Reply-To: <aiUvSbrWndQeUPc8@v4bel>
+References: <aiUvSbrWndQeUPc8@v4bel>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: imv4bel@gmail.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-vncr_tlb is not allocated before a vCPU runs for the first time, so
-vcpu->arch.vncr_tlb is NULL for a vCPU that has been created but not yet
-run. Code that iterates over every vCPU's pseudo-TLB must skip those.
+On Sun, 07 Jun 2026 09:43:53 +0100,
+Hyunwoo Kim <imv4bel@gmail.com> wrote:
+> 
+> vncr_tlb is not allocated before a vCPU runs for the first time, so
+> vcpu->arch.vncr_tlb is NULL for a vCPU that has been created but not yet
+> run. Code that iterates over every vCPU's pseudo-TLB must skip those.
+> 
+> invalidate_vncr_va() iterates over the vCPUs with kvm_for_each_vcpu() and
+> dereferences vt->valid without checking whether vncr_tlb is NULL.
+> 
+> While iterating, skip vCPUs whose pseudo-TLB has not been allocated.
+>
+> Fixes: 4ffa72ad8f37 ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+>  arch/arm64/kvm/nested.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 6f7bc9a9992e..063e079d1d1a 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -969,6 +969,10 @@ static void invalidate_vncr_va(struct kvm *kvm,
+>  		struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
+>  		u64 va_start, va_end, va_size;
+>  
+> +		/* Skip vCPUs whose pseudo-TLB hasn't been allocated yet */
+> +		if (!vt)
+> +			continue;
+> +
+>  		if (!vt->valid)
+>  			continue;
+>  
 
-invalidate_vncr_va() iterates over the vCPUs with kvm_for_each_vcpu() and
-dereferences vt->valid without checking whether vncr_tlb is NULL.
+This looks correct and matches what we already have for
+invalidate_vncr_ipa().
 
-While iterating, skip vCPUs whose pseudo-TLB has not been allocated.
+But I think this misses the opportunity to squash a whole class of
+similar bugs, should we ever have the need for another function that
+iterates over all *valid* VNCR pseudo-TLBs.
 
-Fixes: 4ffa72ad8f37 ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
- arch/arm64/kvm/nested.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Since I'm on a train and have nothing better to do, I've written the
+following hack.
+
+Thoughts?
+
+	M.
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 6f7bc9a9992e..063e079d1d1a 100644
+index 38f672e940878..f0a9f81a08302 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -969,6 +969,10 @@ static void invalidate_vncr_va(struct kvm *kvm,
- 		struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
+@@ -897,9 +897,21 @@ static void invalidate_vncr(struct vncr_tlb *vt)
+ 		clear_fixmap(vncr_fixmap(vt->cpu));
+ }
+ 
++/*
++ * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
++ * either can race against a vcpu not being onlined yet (no pseudo-TLB
++ * allocated). Similarly, the TLB might be invalid.  Skip those, as they
++ * obviously don't participate in the invalidation at this stage.
++ */
++#define kvm_for_each_vncr_tlb(idx, vcpup, tlbp, kvm)	\
++	kvm_for_each_vcpu(idx, vcpu, kvm)		\
++		if (((tlbp) = vcpu->arch.vncr_tlb) &&	\
++		    (tlbp)->valid)
++
+ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+ {
+ 	struct kvm_vcpu *vcpu;
++	struct vncr_tlb *vt;
+ 	unsigned long i;
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+@@ -907,24 +919,9 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
+ 		return;
+ 
+-	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
++	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+ 		u64 ipa_start, ipa_end, ipa_size;
+ 
+-		/*
+-		 * Careful here: We end-up here from an MMU notifier,
+-		 * and this can race against a vcpu not being onlined
+-		 * yet, without the pseudo-TLB being allocated.
+-		 *
+-		 * Skip those, as they obviously don't participate in
+-		 * the invalidation at this stage.
+-		 */
+-		if (!vt)
+-			continue;
+-
+-		if (!vt->valid)
+-			continue;
+-
+ 		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+ 							    vt->wr.level));
+ 		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+@@ -954,17 +951,14 @@ static void invalidate_vncr_va(struct kvm *kvm,
+ 			       struct s1e2_tlbi_scope *scope)
+ {
+ 	struct kvm_vcpu *vcpu;
++	struct vncr_tlb *vt;
+ 	unsigned long i;
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+-	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
++	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
  		u64 va_start, va_end, va_size;
  
-+		/* Skip vCPUs whose pseudo-TLB hasn't been allocated yet */
-+		if (!vt)
-+			continue;
-+
- 		if (!vt->valid)
- 			continue;
- 
--- 
-2.43.0
+-		if (!vt->valid)
+-			continue;
+-
+ 		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+ 							   vt->wr.level));
+ 		va_start = vt->gva & ~(va_size - 1);
 
+-- 
+Jazz isn't dead. It just smells funny.
