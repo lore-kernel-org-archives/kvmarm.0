@@ -1,250 +1,144 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A692B348C6A;
-	Mon,  8 Jun 2026 11:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A126F1E5B63
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 12:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780917310; cv=none; b=tDbtC6RgG7V5yhIURwmr2aYu5QSG4ZSO6hpa+s96KjQY0uy6cDSTgCJASZXaiKRNtZzLFGaJTj9lTJssfNpiUYmJNUU1tbfMMsCQg4kJ9a/7L17/YMeb4fNpyz6YKGfr31dCpqKBmKV1Rv5DBbPnJOprXFgyzWHH8DS6cKcEDc4=
+	t=1780920563; cv=none; b=OZXr7HUJee4k0ryilij40a+Z+d9QewBgaZERaa+YcnKCKR3f12mMqqhCdr/aS/tpIrfGdg+r18jt8zZKPKRdMMi9coK8H8Hk/nQ0uSJ8FL+ZTYtt5BK/YxvaI/KW9veH5wkr76AfFk9HCX0mhzHZJyneobqFtScgC130AJ5ySUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780917310; c=relaxed/simple;
-	bh=NT9SjpeSaUaPs6mTzZoOuRZvfOJboQptqNnZ7k1R9SE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cOqLAsbznEyVfWlikQfenXw5jIqR2fTC4dGywv1oIIJFKi6/QNM499gZqtV8yHX+gcY/2tOzdZuA4qKe5y/R7mx/OgNBUInItVJ/48NpjsbYFMIZGZFFj8tfv8CUNy2L3OBr5qdOqJCLwLuD3E4lyGTz9dj849UlUCG8jFE2JJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MtCboeBz; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1780920563; c=relaxed/simple;
+	bh=lx5/sZHJfsfJ+guaof003PPuTXoIXivzBp1RA0FoL9A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=ECEWQBZgTUD1ROaE6ZzIQX+29wpWX8IBkgXL4+6zYJSj76Z5rnad6f/1VD5JbQ5QVMMU5CkIA8Fi2Hp9xRgxi7mtwRxWIkNBWtZgne8LAYdjeQPGo1cH44PzkH5/fy58Bi1Sqp8/hm6y7ixnrDeY1ARlr3cejg4L7Fw1h/lQtq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V4N8m0h5; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MtCboeBz"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EE8E1C01;
-	Mon,  8 Jun 2026 04:15:03 -0700 (PDT)
-Received: from [10.57.28.93] (unknown [10.57.28.93])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45A3E3F86F;
-	Mon,  8 Jun 2026 04:15:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780917307; bh=NT9SjpeSaUaPs6mTzZoOuRZvfOJboQptqNnZ7k1R9SE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MtCboeBzk2dAdFydLOFiNhb5EdBEEhdtHveoclXm8AKsDlHbycpAmJ59UFP3FGlhh
-	 Ivseopd9E0d4YjveXKT6AvAyvQLVqub98b68CZwu3SNhMIpz58qZdaOQ1NYTky+TRI
-	 uXM0L3c2EL5eG4QbslgeJ0pnOPt/ifx/77lB1ilM=
-Message-ID: <a4a9abf8-0691-488a-b54d-4f1d1a2d89ed@arm.com>
-Date: Mon, 8 Jun 2026 12:15:01 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V4N8m0h5"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 657Lcv9m646062;
+	Mon, 8 Jun 2026 12:09:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=lx5/sZ
+	HJfsfJ+guaof003PPuTXoIXivzBp1RA0FoL9A=; b=V4N8m0h5gplWYy5nhBBNAu
+	LUoWFeZfXih5bkK0YLMJ17hCK1nhLGUXoQGRwC4+4AIORSmLX9GYRINanTQp30ft
+	EtcQ27j2ZewQYlYhX8ZaJVxMfN63AIvXFtSDb8shI5/5TP6e3wcgfi5ejzosaPpa
+	rkivFm1P2b+Lrt3V9HFRGz6WbJuaqkqSjeVrBl3KkuU+2/2i2zsHb+7ieDyo6o72
+	Zs31JwAuwKTsxRf3voi0CWYfvf0ZgGO0fRs1060ngCyap6OAvlvalEmBvh4hl4te
+	rO2g81gGjBw16vsmj9ui++xITSru7TqaM6ZdysJEdRt1Pbt33gUmbMyboMwyEmHg
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4em9ydy4a3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jun 2026 12:09:04 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 658BnguG023861;
+	Mon, 8 Jun 2026 12:09:03 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4emwvpwb1x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jun 2026 12:09:03 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 658C8u1R27328966
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Jun 2026 12:08:56 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4924620043;
+	Mon,  8 Jun 2026 12:08:56 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B5E7720040;
+	Mon,  8 Jun 2026 12:08:55 +0000 (GMT)
+Received: from t14-nrb (unknown [9.111.29.158])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Jun 2026 12:08:55 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 32/44] KVM: arm64: Handle Realm PSCI requests
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-33-steven.price@arm.com>
- <775a0d29-4d92-4ecc-96dd-5b0eaeff1528@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <775a0d29-4d92-4ecc-96dd-5b0eaeff1528@redhat.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Mon, 08 Jun 2026 14:08:55 +0200
+Message-Id: <DJ3NN3DTFU62.CFTF1O1HOP93@linux.ibm.com>
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Oliver Upton" <oupton@kernel.org>,
+        "Andreas Grapentin"
+ <gra@linux.ibm.com>
+Cc: "Steffen Eiden" <seiden@linux.ibm.com>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        "Alexander
+ Gordeev" <agordeev@linux.ibm.com>,
+        "Arnd Bergmann" <arnd@arndb.de>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        "Christian Borntraeger"
+ <borntraeger@linux.ibm.com>,
+        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+        "David Hildenbrand" <david@kernel.org>,
+        "Friedrich Welter"
+ <fritz@linux.ibm.com>,
+        "Gautam Gala" <ggala@linux.ibm.com>,
+        "Hariharan
+ Mari" <hari55@linux.ibm.com>,
+        "Heiko Carstens" <hca@linux.ibm.com>,
+        "Hendrik Brueckner" <brueckner@linux.ibm.com>,
+        "Ilya Leoshkevich"
+ <iii@linux.ibm.com>,
+        "Janosch Frank" <frankja@linux.ibm.com>,
+        "Joey Gouly"
+ <joey.gouly@arm.com>, "Marc Zyngier" <maz@kernel.org>,
+        "Nico Boehr"
+ <nrb@linux.ibm.com>,
+        "Nina Schoetterl-Glausch"
+ <oss@nina.schoetterlglausch.eu>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        "Sven Schnelle"
+ <svens@linux.ibm.com>,
+        "Ulrich Weigand" <Ulrich.Weigand@de.ibm.com>,
+        "Vasily Gorbik" <gor@linux.ibm.com>, "Will Deacon" <will@kernel.org>,
+        "Zenghui Yu" <yuzenghui@huawei.com>
+Subject: Re: [PATCH v1 15/26] s390: Add functions to query arm guest time
+X-Mailer: aerc 0.21.0
+References: <20260529155601.2927240-1-seiden@linux.ibm.com>
+ <20260529155601.2927240-16-seiden@linux.ibm.com>
+ <ah4G847iT_pPRuQm@kernel.org>
+ <ah7Ul7YwJOFuSMaD@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
+ <ah9MFEq09ISAu9cb@kernel.org>
+In-Reply-To: <ah9MFEq09ISAu9cb@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDExNCBTYWx0ZWRfXwMmg62f7h0sB
+ RfcqtOVixT1f4AbtezpbVPnnHvj3LHz2fnYbybT7m/eYsZGA85CY3yxfEoQHIBG5+URxkgly1EO
+ zzkIEqD5u0LOyxim1tyw7Lzofi+VcESL2dBXa8V+KQFVYyNWixGCIFyqwHhwLAMjoAkS71njNTw
+ 4/EI3Zbv+ulFK3ntDnu2eU0/jxOqAYJQ3Sn96KlhGr5NqsF5okkRna7t9fIln2Lk/EMtRMkTJPF
+ GxSFXtjqf4I7szJEAUCjecGvE3JBYHS4k0Gs0v1yRqJxFcC8FgMNWI9OnLM7ZQ6BkjGxzoCq2nr
+ uV9DJp8ueyMF0Cy8bWaFEvu8QaPYId/X6n2z7Es4/UT5MQZoB6cIEEoV1bT0MAwdZlPNlD4+sbx
+ ldAhYFivNU0rghPuUbu/oJOyHTk31LTOcgrcGuIrZiF1VYzEM0yr0JbiXnCw4dA8WgQWDWvtQCt
+ g9qCVc5uIR/2K3u7iNQ==
+X-Authority-Analysis: v=2.4 cv=QKhYgALL c=1 sm=1 tr=0 ts=6a26b0e0 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=HgQSQ640rxy7bNeMIXcA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: huzLH-LR3kW0VDa6TnkgF4yRlFlgHVz1
+X-Proofpoint-ORIG-GUID: huzLH-LR3kW0VDa6TnkgF4yRlFlgHVz1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_03,2026-06-05_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 suspectscore=0 spamscore=0 clxscore=1011
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080114
 
-On 28/05/2026 07:55, Gavin Shan wrote:
-> Hi Steve,
-> 
-> On 5/13/26 11:17 PM, Steven Price wrote:
->> The RMM needs to be informed of the target REC when a PSCI call is made
->> with an MPIDR argument.
->>
->> This requirement will be removed in a future release of the RMM 2.0
->> specification but is still required for v2.0-bet1.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Chanegs since v13:
->>   * The ioctl KVM_ARM_VCPU_RMI_PSCI_COMPLETE has gone. The RMI call is
->>     made automatically just before entering the REC again.
->> Changes since v12:
->>   * Chance return code for non-realms to -ENXIO to better represent that
->>     the ioctl is invalid for non-realms (checkpatch is insistent that
->>     "ENOSYS means 'invalid syscall nr' and nothing else").
->> Changes since v11:
->>   * RMM->RMI renaming.
->> Changes since v6:
->>   * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
->>   * Minor renaming/formatting fixes.
->> ---
->>   arch/arm64/include/asm/kvm_rmi.h |  3 ++
->>   arch/arm64/kvm/psci.c            | 15 ++++++++-
->>   arch/arm64/kvm/rmi.c             | 58 ++++++++++++++++++++++++++++++++
->>   3 files changed, 75 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/
->> asm/kvm_rmi.h
->> index b65cfec10dee..eacf82a7467d 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -109,6 +109,9 @@ int realm_map_non_secure(struct realm *realm,
->>                unsigned long size,
->>                enum kvm_pgtable_prot prot,
->>                struct kvm_mmu_memory_cache *memcache);
->> +int realm_psci_complete(struct kvm_vcpu *source,
->> +            struct kvm_vcpu *target,
->> +            unsigned long status);
->>     static inline bool kvm_realm_is_private_address(struct realm *realm,
->>                           unsigned long addr)
->> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
->> index 3b5dbe9a0a0e..a2cd55dc7b5b 100644
->> --- a/arch/arm64/kvm/psci.c
->> +++ b/arch/arm64/kvm/psci.c
->> @@ -103,7 +103,6 @@ static unsigned long kvm_psci_vcpu_on(struct
->> kvm_vcpu *source_vcpu)
->>         reset_state->reset = true;
->>       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
->> -
-> 
-> This change isn't supposed to be part of this patch :-)
+On Tue Jun 2, 2026 at 11:33 PM CEST, Oliver Upton wrote:
+> I was trying to figure out how these functions
+> apply to the virtual and "physical" views of the counter inside the VM.
 
-Whoops - indeed it isn't!
-
->>       /*
->>        * Make sure the reset request is observed if the RUNNABLE
->> mp_state is
->>        * observed.
->> @@ -142,6 +141,20 @@ static unsigned long
->> kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->>       /* Ignore other bits of target affinity */
->>       target_affinity &= target_affinity_mask;
->>   +    if (vcpu_is_rec(vcpu)) {
->> +        struct kvm_vcpu *target_vcpu;
->> +
->> +        /* RMM supports only zero affinity level */
->> +        if (lowest_affinity_level != 0)
->> +            return PSCI_RET_INVALID_PARAMS;
->> +
->> +        target_vcpu = kvm_mpidr_to_vcpu(kvm, target_affinity);
->> +        if (!target_vcpu)
->> +            return PSCI_RET_INVALID_PARAMS;
->> +
->> +        return PSCI_RET_SUCCESS;
->> +    }
->> +
->>       /*
->>        * If one or more VCPU matching target affinity are running
->>        * then ON else OFF
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 761b38a4071c..2b03e962ee41 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -3,6 +3,7 @@
->>    * Copyright (C) 2023-2025 ARM Ltd.
->>    */
->>   +#include <uapi/linux/psci.h>
->>   #include <linux/kvm_host.h>
->>     #include <asm/kvm_emulate.h>
->> @@ -127,6 +128,25 @@ static void free_rtt(phys_addr_t phys)
->>       kvm_account_pgtable_pages(phys_to_virt(phys), -1);
->>   }
->>   +int realm_psci_complete(struct kvm_vcpu *source, struct kvm_vcpu
->> *target,
->> +            unsigned long status)
->> +{
->> +    int ret;
->> +
->> +    /*
->> +     * XXX: RMM-v2.0 doesn't require the target REC address for
->> completing
->> +     * PSCI requests. Temporary hack until RMM implementation catches up
->> +     * to the full spec.
->> +     */
->> +    ret = rmi_psci_complete(virt_to_phys(source->arch.rec.rec_page),
->> +                virt_to_phys(target->arch.rec.rec_page),
->> +                status);
->> +    if (ret)
->> +        return -EINVAL;
-> 
->         return -ENXIO;
-
-Ack, although as the comment says this should be going away.
-
-Thanks,
-Steve
-
->> +
->> +    return 0;
->> +}
->> +
->>   static int realm_rtt_create(struct realm *realm,
->>                   unsigned long addr,
->>                   int level,
->> @@ -1004,6 +1024,41 @@ static void kvm_complete_ripas_change(struct
->> kvm_vcpu *vcpu)
->>       rec->run->exit.ripas_base = base;
->>   }
->>   +static void kvm_rec_complete_psci(struct kvm_vcpu *vcpu)
->> +{
->> +    struct rec_run *run = vcpu->arch.rec.run;
->> +    unsigned long status = PSCI_RET_DENIED;
->> +    unsigned long ret = vcpu_get_reg(vcpu, 0);
->> +    struct kvm_vcpu *target;
->> +
->> +    switch (run->exit.gprs[0]) {
->> +    /*
->> +     * XXX: RMM-v2.0 doesn't cause RMI_EXIT_PSCI for AFFINITY_INFO
->> +     * Temporary hack until tf-RMM gets the REC to MPIDR mapping via
->> +     * RD Auxiliary granules.
->> +     * For now always report SUCCESS
->> +     */
->> +    case PSCI_0_2_FN64_AFFINITY_INFO:
->> +        status = PSCI_RET_SUCCESS;
->> +        break;
->> +    case PSCI_0_2_FN64_CPU_ON: {
->> +        if (ret != PSCI_RET_SUCCESS &&
->> +            ret != PSCI_RET_ALREADY_ON)
->> +            status = PSCI_RET_DENIED;
->> +        else
->> +            status = PSCI_RET_SUCCESS;
->> +        break;
->> +    }
->> +    default:
->> +        return;
->> +    }
->> +
->> +    target = kvm_mpidr_to_vcpu(vcpu->kvm, run->exit.gprs[1]);
->> +    /* RMM makes sure that we don't get RMI_EXIT_PSCI for invalid
->> mpidrs */
->> +    if (target)
->> +        realm_psci_complete(vcpu, target, status);
->> +}
->> +
->>   /*
->>    * kvm_rec_pre_enter - Complete operations before entering a REC
->>    *
->> @@ -1028,6 +1083,9 @@ int kvm_rec_pre_enter(struct kvm_vcpu *vcpu)
->>           for (int i = 0; i < REC_RUN_GPRS; i++)
->>               rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
->>           break;
->> +    case RMI_EXIT_PSCI:
->> +        kvm_rec_complete_psci(vcpu);
->> +        break;
->>       case RMI_EXIT_RIPAS_CHANGE:
->>           kvm_complete_ripas_change(vcpu);
->>           break;
-> 
-> Thanks,
-> Gavin
-> 
-
+I think conceptually these functions affect what is returned by
+PhysicalCountInt() in ARM pseudocode and thus they apply to both virtual an=
+d
+"physical" views inside the VM.
