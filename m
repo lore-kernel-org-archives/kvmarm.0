@@ -1,14 +1,14 @@
 Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2C73F410A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59843F44EA;
 	Mon,  8 Jun 2026 14:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780929808; cv=none; b=oRnr43fLiT3YeZq2XvyBFYTubIDuMlQptjczKCT1hgBsSD3gGHdB9LW5kyNNFjnFdPHfJo3mEcWaXDSiccFcCOqU9L0RhgLXv8yuxyqf6FSn21+6x0uMS0NiiVVvcjdncr0wzftJkI5K0vsthy59R6gytsIBOQlP7SmVjBJ4cAU=
+	t=1780929808; cv=none; b=KtTN/dWxfo1E28kdxORyEG8qsnryklwMnWsynuf7RhEIKoK8ErH+iL/fWJVOBKZ+E5AR2zkwTPkmBf1OrKMfvGLLw5IpMa9ZzAAAfHENt1gXn5nHswGu8SNP5b8oO6slax2aC4+jY+Gzr1NObPBhYEOoGJVCn7Y2lGmWHb6OdQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780929808; c=relaxed/simple;
-	bh=ZZJbGJUhiiGFWgFTbdDCyJO09rTLqSkOLbFX4XL1Epg=;
+	bh=eWpTCoZzUyM8LplF8Me7jkuNhwXVhyNCQZN7fpSl38I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WLRvZ/Ci/YFsmb5U17kgobIVxurr9Vz05HIyYChnWUuMpb3h9DR3pOxUqv/zs7eAmIq7DQcAO6xEuRjyvb/0vzhMHqzQgkJgoKYKwn38FMe5Niu/J5DrVCBIVB3f+6f/tOXOleQxwOqScxWKCdFZ5cCQmmS+00cP+z4YV6s41ns=
+	 MIME-Version; b=rDkqGJ26ELUq6Uy7kWtfYm5bz0sOwWl0s2JLUrXIBwL5cjwXStrIRnyhDl7kGgh/VsL97Ns1+8XxVFe03K0VWnJTsLWNvHfB/YDEtB2bXXfA7uAj/x3wYKB/F/5/+9zL1iK3bzFmlA9lyfnpBviS/wr/lHOZekujqnk5YrOcA9Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; arc=none smtp.client-ip=85.214.250.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
@@ -16,8 +16,8 @@ Received: from io.home.8bytes.org (p4ffe1d30.dip0.t-ipconnect.de [79.254.29.48])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id E8B912028C3;
-	Mon,  8 Jun 2026 16:43:11 +0200 (CEST)
+	by mail.8bytes.org (Postfix) with ESMTPSA id 9229F2028C6;
+	Mon,  8 Jun 2026 16:43:12 +0200 (CEST)
 From: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
@@ -38,9 +38,9 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>,
 	x86@kernel.org,
 	coconut-svsm@lists.linux.dev,
 	joerg.roedel@amd.com
-Subject: [PATCH 32/60] kvm: Allocate struct kvm_run only for struct kvm_vcpu_common
-Date: Mon,  8 Jun 2026 16:42:24 +0200
-Message-ID: <20260608144252.351443-33-joro@8bytes.org>
+Subject: [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
+Date: Mon,  8 Jun 2026 16:42:27 +0200
+Message-ID: <20260608144252.351443-36-joro@8bytes.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260608144252.351443-1-joro@8bytes.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -52,133 +52,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Joerg Roedel <joerg.roedel@amd.com>
 
-Share the struct kvm_run across all planes for one VCPU id.
+The algorithm is to always run the lowest runnable plane. Plane
+switches are done by stopping the current plane and setting another
+runnable.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Co-developed-by: Joerg Roedel <joerg.roedel@amd.com>
 Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
 ---
- include/linux/kvm_host.h |  3 +++
- virt/kvm/kvm_main.c      | 29 ++++++++++++++++-------------
- 2 files changed, 19 insertions(+), 13 deletions(-)
+ include/linux/kvm_host.h | 16 ++++++++++++++
+ virt/kvm/kvm_main.c      | 45 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 55e3e9046975..385e1ee8fd3a 100644
+index 5c3f9dfa15ea..e3611e6cc3e4 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -327,6 +327,9 @@ struct kvm_mmio_fragment {
+@@ -168,6 +168,7 @@ static inline bool kvm_is_error_gpa(gpa_t gpa)
+ #define KVM_REQ_VM_DEAD			(1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_UNBLOCK			2
+ #define KVM_REQ_DIRTY_RING_SOFT_FULL	3
++#define KVM_REQ_PLANE_RESCHED		4
+ #define KVM_REQUEST_ARCH_BASE		8
+ 
+ /*
+@@ -324,6 +325,8 @@ struct kvm_mmio_fragment {
+ 	unsigned int len;
+ };
+ 
++
++
  struct kvm_vcpu_common {
  	struct kvm *kvm;
  
-+	/* kvm_run struct shared across all planes */
-+	struct kvm_run *run;
-+
- 	int vcpu_idx; /* index into kvm->planes[]->vcpu_array */
+@@ -381,6 +384,8 @@ struct kvm_vcpu_common {
  
- 	/* Currently active VCPU */
+ 	struct kvm_dirty_ring dirty_ring;
+ 
++	bool plane_switch;
++
+ 	struct kvm_vcpu_arch_common arch;
+ };
+ 
+@@ -388,6 +393,12 @@ struct kvm_vcpu_common {
+ 	for ((i) = 0; (i) < KVM_MAX_PLANES; ++(i))		\
+ 		if (((v) = common->vcpus[(i)]) != NULL)
+ 
++/* Tracked per plane-VCPU - used for deciding which plane-vcpu to run */
++enum kvm_vcpu_state {
++	STOPPED,
++	RUNNABLE,
++};
++
+ struct kvm_vcpu {
+ 	struct kvm *kvm;
+ 	struct kvm_plane *plane;
+@@ -401,6 +412,7 @@ struct kvm_vcpu {
+ 	struct kvm_run *run;
+ 
+ 	u64 plane_requests;
++	enum kvm_vcpu_state plane_state;
+ 
+ 	/* S390 only */
+ 	bool valid_wakeup;
+@@ -440,6 +452,10 @@ struct kvm_vcpu {
+ 	unsigned plane_level;
+ };
+ 
++void kvm_vcpu_set_plane_runnable(struct kvm_vcpu *vcpu);
++void kvm_vcpu_set_plane_stopped(struct kvm_vcpu *vcpu);
++struct kvm_vcpu *kvm_vcpu_select_plane(struct kvm_vcpu *vcpu);
++
+ static inline bool kvm_vcpu_wants_to_run(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->common->wants_to_run;
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4f2c8f46a0d3..2d0d5f4fd356 100644
+index 9d30fd85ce5f..a30123b77112 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -441,6 +441,7 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
- static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned long id)
- {
- 	struct kvm_vcpu_common *common __free(kfree) = kzalloc(sizeof(*common), GFP_KERNEL_ACCOUNT);
-+	struct page *page;
- 	int r;
- 
- 	/*
-@@ -466,6 +467,14 @@ static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned
- 
- 	common->vcpu_idx = atomic_read(&kvm->online_vcpus);
- 
-+	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
-+	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!page) {
-+		r = -ENOMEM;
-+		goto out_drop_counter;
-+	}
-+	common->run = page_address(page);
-+
- 	mutex_init(&common->mutex);
- 
- #ifndef __KVM_HAVE_ARCH_WQP
-@@ -487,7 +496,7 @@ static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned
- 		r = kvm_dirty_ring_alloc(kvm, &common->dirty_ring,
- 					 id, kvm->dirty_ring_size);
- 		if (r)
--			goto out_drop_counter;
-+			goto out_free_run;
- 	}
- 
- 	r = kvm_arch_vcpu_common_init(common);
-@@ -503,6 +512,8 @@ static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned
- 
- out_free_dirty_ring:
- 	kvm_dirty_ring_free(&common->dirty_ring);
-+out_free_run:
-+	free_page((unsigned long)common->run);
- out_drop_counter:
- 	mutex_lock(&kvm->lock);
- 	kvm->created_vcpus--;
-@@ -546,6 +557,7 @@ static void kvm_vcpu_common_destroy(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = common->kvm;
- 
- 	vcpu->common = NULL;
-+	vcpu->run = NULL;
- 
- 	if (vcpu->plane_level != 0)
- 	       return;
-@@ -563,6 +575,7 @@ static void kvm_vcpu_common_destroy(struct kvm_vcpu *vcpu)
- 	 */
- 	put_pid(common->pid);
- 	kvm_dirty_ring_free(&common->dirty_ring);
-+	free_page((unsigned long)common->run);
- 	kfree(common);
- }
- 
-@@ -4337,7 +4350,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- {
- 	int r = -EINVAL;
- 	struct kvm_vcpu *vcpu;
--	struct page *page;
- 
- 	mutex_lock(&kvm->lock);
- 	if (kvm->created_vcpus >= kvm->max_vcpus) {
-@@ -4359,20 +4371,13 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 		goto vcpu_free;
- 
+@@ -4397,6 +4397,7 @@ static int kvm_plane_ioctl_create_vcpu(struct kvm_plane *plane, unsigned long id
  	vcpu->vcpu_idx = vcpu->common->vcpu_idx;
--
--	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
--	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
--	if (!page) {
--		r = -ENOMEM;
--		goto vcpu_free_common;
--	}
--	vcpu->run = page_address(page);
-+	vcpu->run = vcpu->common->run;
+ 	vcpu->plane = plane;
+ 	vcpu->plane_level = plane->level;
++	vcpu->plane_state = STOPPED;
+ 	vcpu->run = vcpu->common->run;
  
  	kvm_vcpu_init(vcpu, kvm, id);
+@@ -4938,6 +4939,50 @@ static struct file_operations kvm_plane_fops = {
+ 	KVM_COMPAT(kvm_plane_ioctl),
+ };
  
- 	r = kvm_arch_vcpu_create(vcpu);
- 	if (r)
--		goto vcpu_free_run_page;
-+		goto vcpu_free_common;
- 
- 	mutex_lock(&kvm->lock);
- 
-@@ -4415,8 +4420,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- unlock_vcpu_destroy:
- 	mutex_unlock(&kvm->lock);
- 	kvm_arch_vcpu_destroy(vcpu);
--vcpu_free_run_page:
--	free_page((unsigned long)vcpu->run);
- vcpu_free_common:
- 	kvm_vcpu_common_destroy(vcpu);
- vcpu_free:
++void kvm_vcpu_set_plane_runnable(struct kvm_vcpu *vcpu)
++{
++	vcpu->plane_state = RUNNABLE;
++	vcpu->common->plane_switch = true;
++	kvm_make_request(KVM_REQ_PLANE_RESCHED, vcpu);
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_vcpu_set_plane_runnable);
++
++void kvm_vcpu_set_plane_stopped(struct kvm_vcpu *vcpu)
++{
++	vcpu->plane_state = STOPPED;
++	kvm_make_request(KVM_REQ_PLANE_RESCHED, vcpu);
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_vcpu_set_plane_stopped);
++
++struct kvm_vcpu *kvm_vcpu_select_plane(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_common *common = vcpu->common;
++	struct kvm_vcpu *ret = NULL;
++	unsigned i;
++
++	for (i = 0; i < KVM_MAX_PLANES; i++) {
++		if (common->vcpus[i] == NULL)
++			continue;
++
++		if (common->vcpus[i]->plane_state == RUNNABLE) {
++			ret = common->vcpus[i];
++			break;
++		}
++	}
++
++	if (ret == NULL) {
++		ret = common->vcpus[0];
++		ret->plane_state = RUNNABLE;
++	}
++
++	common->current_vcpu = ret;
++
++	common->plane_switch = false;
++
++	return ret;
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_vcpu_select_plane);
++
+ static int kvm_device_mmap(struct file *filp, struct vm_area_struct *vma)
+ {
+ 	struct kvm_device *dev = filp->private_data;
 -- 
 2.53.0
 
