@@ -1,138 +1,101 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDFD313E29
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 08:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DF2399351;
+	Mon,  8 Jun 2026 08:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780906229; cv=none; b=pz9JrCZSWNzZtcxyU7TrGviQUkrI07XKuOVykFmtvcBx8krNZuTeydg8pdNIH487O3BUXkjwMDI6ZpoKZwcJXvpQv7NC2jIETM5sHu9BPBF8TLBR0ZvBcL3JUC6OtyUUKMPTkc5e4tmty2YLUZL6FHi8c34YacDJMfFZgX0M3ew=
+	t=1780906326; cv=none; b=Lx7OjN3OArSFxto/NcTamanbElWigy0CGhxfLz00HEqPqiWQtVt6Z9wXM7m7gFP5TB6MIpQxRJktPpKSEJjwyGeMkbRfXP2fabsS/ZEfDmYjliUjqPfxk2ylgZwIAOYxMyCQFpYVylqZ1IkUFs7hcx2urf4GeFn+b21MOXiiNnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780906229; c=relaxed/simple;
-	bh=PuW+2DQ9oqE9O+a/yBjXCO94jYHzNrX7BI8SzQ1G7os=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KI1cZcl6Ea9EPbrb858NqFPsRUb66OGtIrQknFkWrVcutsPZX0Bga6+qejR2znPv7f/W+r3HyP5tLB/lEb7uPqjv2WOA8owo2CdcvuvoSGBRTSKXCswDHbgp7zVrlcgc4j8vuT2kmN+vet7hs707FyNABKcIEaCrw+PlIFMn4rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dBhyBufm; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1780906326; c=relaxed/simple;
+	bh=cOjS2e2C5T1rD0ULM3LGdL9XD5ykiLQVenEhKS/uybs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RPyQTwSVg+uTZSZiaPUpOyOyW9pKDADYw+5Yv/qcBh2vwa05PwcIx29Dtc0eBYEs7jJGtrZZCWqM6y2SGxReIL1l927WFJ7NHe+5kt6yu/Q//GJLwWMDfciYk/p8rGo2Er4l1t1A4gRzSgyPHzA2APAlnr8XAtfsF/J0eS+eauA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bRcbnJgm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dBhyBufm"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6579b1fu2990707;
-	Mon, 8 Jun 2026 08:09:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=ybZQjal46FeOrn2hm6lTCaz+t/9Rl0
-	Db41fcp16G+Dg=; b=dBhyBufmfP4wvnfQ9Irzgd66IC9FtHX38d6Tu1bbxef+5D
-	0zrk4mJoy93bWMF4jAi5szsjPx9Tw/dzN7SGBbodJGrGOqRuuK8F84HlhzE2TyZi
-	mNUreGXVwOTCKQ0MBgGCTwM7lYoMjpWNi62HZ/MOKD34ZsLQ8YfyWNXNt1NStGko
-	UDG3fuO7F/oCayF7r/a4ntffPKO+ByTOyV3ownyCK3wZPJOEFhQtJGcD5OCtAxsm
-	CMSQeEW0+nlXK0XB7wiogaJIYF/YMDvNMwfcSVj9eLLutsaPf2MiNgLqeabF/Wke
-	mikzD0yQUw13FncQ6E/KoY8Ke+RhapWMmlhDBZzg==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4em8yhpf9x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jun 2026 08:09:58 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65884ZXK014601;
-	Mon, 8 Jun 2026 08:09:57 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4en03fv82v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jun 2026 08:09:57 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65889pCN55968026
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Jun 2026 08:09:51 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6EF920043;
-	Mon,  8 Jun 2026 08:09:51 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2336620040;
-	Mon,  8 Jun 2026 08:09:50 +0000 (GMT)
-Received: from osiris (unknown [9.87.136.35])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  8 Jun 2026 08:09:50 +0000 (GMT)
-Date: Mon, 8 Jun 2026 10:09:48 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 12/26] KVM: arm64: Add PVM_ prefix to avoid name
- collisions
-Message-ID: <20260608080948.100035-A-seiden@linux.ibm.com>
-References: <20260529155601.2927240-1-seiden@linux.ibm.com>
- <20260529155601.2927240-13-seiden@linux.ibm.com>
- <ah4GaFNM7xfS7CJC@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bRcbnJgm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C93B1F00893;
+	Mon,  8 Jun 2026 08:12:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780906325;
+	bh=jQGth3uiwb0BlK7HMd9jRw5PF8jfshBmNB52ngskoPg=;
+	h=From:To:Cc:Subject:Date;
+	b=bRcbnJgmyUxJ5vaZqOr1e5XO7O6zV/mSlBnkt3xu74BoclQRoqQR190+tEsKfx0SX
+	 KjC9dlsaQHlmMw5OOYS+8hTb7+J7feQpiTdnHHzUyszpPyJxDGNPM5XEopAsjjmioe
+	 28Ua5PCWQEHDASVhWUhGrfRPgifVh7FNpVvgZihz8t/wbVyXpcRCk99ZsEH4gMT1PV
+	 ykPh06LyGIRZZym+CHASGtsRtovL1Mi/I+9xqbxO/qw1BtebhD7rIWsVUqPtG7EB+y
+	 TNCbw010YL0NDrdk27dVpryUhYdBAKkoO/PnkIOaBeaPN/y72zmSQOZMdL89wHZ8zd
+	 d82y9NgHx5gIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wWV5X-0000000ANHQ-11V6;
+	Mon, 08 Jun 2026 08:12:03 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Hold kvm->mmu_lock while initialising vcpu->arch.vncr_tlb
+Date: Mon,  8 Jun 2026 09:11:08 +0100
+Message-ID: <20260608081108.2244133-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ah4GaFNM7xfS7CJC@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDA3NCBTYWx0ZWRfXyCkHnN7Bi5ra
- BiLvAZzGqCaTUYlhd3Fu2wWFJ9R9s01M7j5kvTtiiXgAzuKU25KIjGu/i7RLgMErYk3Yn9t5okg
- oJxFxM9tZARCVdPpr7liIYYsfyLRnLjy8uuNen+Huw0vxnYjQulU0I8aTW9NwWZJBx2fD1jhvKB
- 4GFLIrU2JmKmNrNA3KED9vSxCpVgdp3ct1nmcbMvOvpiMtUm2bDdujf4+e3OCVFpGo3fHvYgDZb
- qUr3+FWmcKKVISox41jOdQznLMMHuc+spBKWUsDra7nyaDWxixcMOYd6lxga/AgRwa6BlV8d32s
- 1WfJDcNVFuo2gAHDjJ57La9sVXR0dNmatppsAyTb/UkgVgouggJ2i1jdzwNCwkjTwbhc3YGzNv+
- ky2AqTU5puiuEGrdKe8qbYbgLZOUuijjX/x/rA6u/DNBHv2WYzD3fPoJSgbU9vBQyCQfvz13MFL
- i8DwoVYtC6nBJM3B2OA==
-X-Authority-Analysis: v=2.4 cv=HvFG3UTS c=1 sm=1 tr=0 ts=6a2678d6 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
- a=sjSFLaudIdQReGWt298A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: 0fCevorcLqPyPvXErUXpRrKCxITKL_ji
-X-Proofpoint-GUID: 0fCevorcLqPyPvXErUXpRrKCxITKL_ji
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-08_02,2026-06-05_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 suspectscore=0
- spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080074
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jun 01, 2026 at 03:23:36PM -0700, Oliver Upton wrote:
-> On Fri, May 29, 2026 at 05:55:45PM +0200, Steffen Eiden wrote:
-> > Rename ID_UNALLOCATED to PVM_ID_UNALLOCATED and read_id_reg to
-> > pvm_read_id_reg to prevent future name collisions with other subsystems.
-> > While at it, fix whitespace issues in the macro invocations
-> > 
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> 
-> No issues with the rename but do you even need the nVHE object at all
-> for s390?
+Sashiko reports that there is a race between initialising vncr_tlb
+and making use of it, as we don't hold the mmu_lock at this point.
 
-No we do not need those definitions. The problem comes with a later patch.
-The ID_UNALLOCATED macro moves to include/kvm/arm64/sys_regs.h. Then
-arch/arm64/kvm/hyp/nvhe/sys_regs.c redefines that macro.
+Additionally, it identifies a memory leak, should userspace repeatedly
+invokes the KVM_RUN ioctl after a failure of kvm_arch_vcpu_run_pid_change(),
+as we assign vncr_tlb blindly on first run, irrespective of prior
+allocations.
 
-I renamed the function to stay consistent. 
+Slap the two bugs in one go by taking the kvm->mmu_lock on assigning
+vncr_tlb, preventing the race for good, and by checking that vncr_tlb
+is indeed NULL prior to allocation.
 
-	Steffen
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20260607180815.85FBC1F00893@smtp.kernel.org
+---
+ arch/arm64/kvm/nested.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 690b8e8564166..d11e36b3cfcc2 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1253,8 +1253,14 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
+ 	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
+ 		return 0;
+ 
+-	vcpu->arch.vncr_tlb = kzalloc_obj(*vcpu->arch.vncr_tlb,
+-					  GFP_KERNEL_ACCOUNT);
++	if (!vcpu->arch.vncr_tlb) {
++		struct vncr_tlb *vt = kzalloc_obj(*vcpu->arch.vncr_tlb,
++						  GFP_KERNEL_ACCOUNT);
++
++		scoped_guard(write_lock, &vcpu->kvm->mmu_lock)
++			vcpu->arch.vncr_tlb = vt;
++	}
++
+ 	if (!vcpu->arch.vncr_tlb)
+ 		return -ENOMEM;
+ 
+-- 
+2.47.3
+
