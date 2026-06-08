@@ -1,154 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377183B777B
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 17:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC16390209;
+	Mon,  8 Jun 2026 20:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780941561; cv=none; b=UJuQf3hiKiqtgbW7K0mEpTDFsn+I5I8OsuNDlBfz34mZoWBGJdIQcRQm9h/nvWnSjYJmQJ97ZjmhdrGT0hkhPs+2OQpIZYTNZTEBZAxMmxdsdwyfl4QyBBvLDUGHIY4l4ao8K8D25jv12pIva9qVVjiRoHH4zw/PGYmnCnZiOko=
+	t=1780952128; cv=none; b=bjhSxrBC40tAJ4Es/amlOAgcP/A/DjlliNmrKPWYITWACUkvCpHA1csnYwU4Atln74YT80Avt5myxEu08RuC/+RfHMIO7lrdOkhrgLoVwK8XT48QGgGqG8R4egnH0mcHOUNCuPih40aLKjP//fs3CghvCwLWKeyinzhYu8I7xQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780941561; c=relaxed/simple;
-	bh=Yh2vF4TIAGag+raZttED/lbT/nnkLgvDu0weKA8pAqo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BkSzXJZXaEeB3WLC0bmVSwsVCQKktzouWFFeOCQbekhxLi3WcXU4qdomuAjcV26+sTOhcs/fKnMzUVjIgQIMzhY0Nx3oyRGFVJ9CsnfHGRVaJthw0fUh3SNF8E0d5Wun545Y0UPWQjEOUSLtQZKVDA/F1rRp9TjvVEuKyWudSDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=efCYMawm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1780952128; c=relaxed/simple;
+	bh=4QBxR2PjlCKAPSvgpGacW2SShPc026qHj1QCYdxzg90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sQAYNqalSfvEJe3iQdsB0xvsZM7thSc+4vFVzbGkMBle77cw+50Lhua6X9jngKr0qfDc8k1UGfX2SNzeqyekEWqfApoXDN3+Xb5hEJDleWk4la+1q07G/Rm4HO21CE4oP1azJlubNFXWtJxV0TJd70Xc9RGmmzVk+TWHwzrwiBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFipMoev; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="efCYMawm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780941559;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B8d2xpklGhwQZIXzXL6uTt/rbyfEnaEp9dTHG5HoHQ0=;
-	b=efCYMawm4kxlvgDS9yRKiiJmt0oecds8TNjEIgubIchTVPIM5Ai+CewaJ4IzoZOcwR/pqv
-	LRCS9K01qODOKe2hx6ARCEklrNWjsPlErTNcZzoZ1P5bzvIfg8tvXmZBAodc0M6J4thCYN
-	tcd/HsgDkDTr5nJeauaaMP4znfSV6wI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-185-tEdE_uZDPTu9K3t8lWCDrA-1; Mon, 08 Jun 2026 13:59:16 -0400
-X-MC-Unique: tEdE_uZDPTu9K3t8lWCDrA-1
-X-Mimecast-MFC-AGG-ID: tEdE_uZDPTu9K3t8lWCDrA_1780941555
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-45efa7755faso1744193f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 08 Jun 2026 10:59:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780941555; x=1781546355;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=B8d2xpklGhwQZIXzXL6uTt/rbyfEnaEp9dTHG5HoHQ0=;
-        b=Sed3k1R9wSObtR0pf49T33EMntiZzhGfoVvThl3r+2e77tcUVpWdSPMzNDjZb7ttG7
-         iL90iGw3chTvhBXXVwiNX/xqBYFu9zYdih/UgmV7G2FugjI3zzzuuX9CjfIjONghHitN
-         OgxxXvL+kZJHABXqiz6b7vY+16I9yiAaQY5Tvo9j0LymV+Q9PIKSsGeMLivrAFHREoP1
-         jomZU7IrNggEIdihSqsbm+qQyGY2e6y+8TP1SQTVbFZjr86jEQsHecs2x96Ra/Fm1r1r
-         xLH4STa7zN9T+KxSUadoW5n9QVsOpFfT0BzSp03xIlJcQom2jnQvqSkn6njFo3AHGLFN
-         XTbA==
-X-Forwarded-Encrypted: i=1; AFNElJ/t4gmhi1WGJrZJfbpV5lZ8c+SrtbFelEDPgIEq5wmFda7WnZYRihCVrXaY7For+2bgVH6ZxEc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzjqS2pMDQlPDSc3SYtspdbId3+i9nyMNhCozOPRbdIXVmrko9s
-	1DwOSvNP6XSC/sV67IDv7L+jAaiajBOUga/7KwkenrKgQe0qfYUinvif5TseHw1P163sYnK6Eoz
-	Uq80zgpAB3GRGzcdVb2m9huHgVyVaRDLxOR3hVk/w0FWd7171TFmLpEi7gmkpwa+821615ZkiwF
-	06pSjMNM0iRDuPKIwBGV/5sskBU/CLsW4E
-X-Gm-Gg: Acq92OEdc1uHXSkTUJNHC/fImXg0I1G5hJp4eqNa1ILddxDqFh+KCd5VqZSj5hQHS6I
-	rFNXZceOGelBdotFVS2HE7mWoFu9tuMrR2GDAtgrMMo6szzAZcEMG+bsAAl4XO4MCCRkxojF4M6
-	eRGu2gtPI9DpV0Gn/f6sh29K0POhYL5OrOBGGfCGjXfrwUYZJspyLNt1M7T9GmL18PhbHW6C1Ze
-	obKqd9Fc3jrKKGc9PeSxy43yX+HYg0FzC0Av5aVSoLVq7rD1cN3etzQUquD6tSyn/OxhRvlTqXb
-	GqSSYE+WAj4nIs8x
-X-Received: by 2002:a05:600c:1908:b0:490:b5d0:598f with SMTP id 5b1f17b1804b1-490c25b5f6cmr285228245e9.13.1780941555103;
-        Mon, 08 Jun 2026 10:59:15 -0700 (PDT)
-X-Received: by 2002:a05:600c:1908:b0:490:b5d0:598f with SMTP id
- 5b1f17b1804b1-490c25b5f6cmr285227865e9.13.1780941554714; Mon, 08 Jun 2026
- 10:59:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFipMoev"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D40F31F00893;
+	Mon,  8 Jun 2026 20:55:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780952127;
+	bh=Ww3MgvoKXBDrHgnorb3FWeSCZJO6ATl+G8SETSPUBWo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=EFipMoevJToto3v2ysvCUrVS+ZNcPWf2WkIrdRmxt6ajG+mXOU7ZP7q3TcvhOXUNC
+	 qDfIs4f6CVWVFDfukXhxcsi/z9+8I8fEfyFVJnAeINqz3tyQMRRFDbbbKp/nRssbgA
+	 earCd0m4XpdT4x8esC01HGbXgpiz6mh4mF3UOURLcb8ccWt9Y5LeMFE82GAF4h587o
+	 g8vcrJMcuWtAqheTqHipclyaiAj3LetvPhcdqHqhdA/aU+XDY07vfcLivY4PLDfrlX
+	 CiMKzToPz8DcjfRwSAhGFz14sWZ+TkdYlvucSh/vYWnhrYREtBF9Fb2cHsVBOs8V1R
+	 uoL19+LlBq3JQ==
+Date: Mon, 8 Jun 2026 20:55:25 +0000
+From: Yosry Ahmed <yosry@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Hold kvm->mmu_lock while initialising
+ vcpu->arch.vncr_tlb
+Message-ID: <aicqzM4W4NN-GndT@google.com>
+References: <20260608081108.2244133-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260608144252.351443-1-joro@8bytes.org> <20260608144252.351443-36-joro@8bytes.org>
- <e7eb0dba-790a-4644-9895-5c9a7420d7fe@redhat.com> <aib8n5lO6HKbLC4Y@8bytes.org>
-In-Reply-To: <aib8n5lO6HKbLC4Y@8bytes.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 8 Jun 2026 19:58:43 +0200
-X-Gm-Features: AVVi8CcaSI98hh9wFoB_n6cKHV5EHNPF6kPS5m5gs3YdhiTjEhtRfK4vGBfAwzg
-Message-ID: <CABgObfbUsDeStnZF-7oyR-W-Bvd4qTMoeUwGizgn10UTdKtZ2A@mail.gmail.com>
-Subject: Re: [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
-To: =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
-Cc: Sean Christopherson <seanjc@google.com>, Tom Lendacky <thomas.lendacky@amd.com>, ashish.kalra@amd.com, 
-	michael.roth@amd.com, nsaenz@amazon.com, anelkz@amazon.de, 
-	James.Bottomley@hansenpartnership.com, Melody Wang <huibo.wang@amd.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, x86@kernel.org, 
-	coconut-svsm@lists.linux.dev, joerg.roedel@amd.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: w0N6UAlf9aK_NRL8KUGhCIRmjzIcIXZnUdpYmc1hAxU_1780941555
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260608081108.2244133-1-maz@kernel.org>
 
-On Mon, Jun 8, 2026 at 7:52=E2=80=AFPM J=C3=B6rg R=C3=B6del <joro@8bytes.or=
-g> wrote:
-> On Mon, Jun 08, 2026 at 06:47:54PM +0200, Paolo Bonzini wrote:
-> > On 6/8/26 16:42, J=C3=B6rg R=C3=B6del wrote:
-> > > The algorithm is to always run the lowest runnable plane. Plane
-> > > switches are done by stopping the current plane and setting another
-> > > runnable.
-> >
-> > This was left arbitrary in my version because for example Hyper-V VTLs =
-use
-> > highest-runnable instead.  It also made pure userspace scheduling possi=
-ble,
-> > though that may not be very important in the grand scheme of things.
->
-> IIRC what Hyper-V does is always the run the highest-privileged runnable =
-level,
-> no?  Maybe in their numbering level 0 has the least privileges?
+On Mon, Jun 08, 2026 at 09:11:08AM +0100, Marc Zyngier wrote:
+> Sashiko reports that there is a race between initialising vncr_tlb
+> and making use of it, as we don't hold the mmu_lock at this point.
+> 
+> Additionally, it identifies a memory leak, should userspace repeatedly
+> invokes the KVM_RUN ioctl after a failure of kvm_arch_vcpu_run_pid_change(),
+> as we assign vncr_tlb blindly on first run, irrespective of prior
+> allocations.
+> 
+> Slap the two bugs in one go by taking the kvm->mmu_lock on assigning
+> vncr_tlb, preventing the race for good, and by checking that vncr_tlb
+> is indeed NULL prior to allocation.
+> 
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20260607180815.85FBC1F00893@smtp.kernel.org
+> ---
+>  arch/arm64/kvm/nested.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 690b8e8564166..d11e36b3cfcc2 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1253,8 +1253,14 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
+>  	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
+>  		return 0;
+>  
+> -	vcpu->arch.vncr_tlb = kzalloc_obj(*vcpu->arch.vncr_tlb,
+> -					  GFP_KERNEL_ACCOUNT);
+> +	if (!vcpu->arch.vncr_tlb) {
+> +		struct vncr_tlb *vt = kzalloc_obj(*vcpu->arch.vncr_tlb,
+> +						  GFP_KERNEL_ACCOUNT);
+> +
+> +		scoped_guard(write_lock, &vcpu->kvm->mmu_lock)
+> +			vcpu->arch.vncr_tlb = vt;
+> +	}
 
-Yes, exactly.
+(I am not familiar with this code at all, so apologies in advance if I
+am making an idiot out of myself here)
 
-> Anyway, I am happy to make changes here, also based on input from the VSM=
- side.
+IIUC, the point of holding the lock here is *not* to protect against
+concurrent initialization, as in this case the NULL check needs to be
+done under the lock.
 
-Related to this, let me know if you want me to pick up again the
-common part, especially with Sashiko being hard at work on it.
+Rather, the goal is to prevent re-ordering of zeroing from kzalloc and
+the assignment to vcpu->arch.vncr_tlb, by depending on the barriers
+provided by the lock. The lock is held by the readers so holding it here
+conviently means we do not need to add any barriers to the readers.
 
-> > Did you drop it because it didn't work, or just for simplicity?
->
-> The user-space scheduling worked, my 6.17 planes implementation used it. =
-But
-> there are some problems with it going forward, because TDX Partitioning (=
-and
-> likely ARM CCA Planes as well) do not allow arbitrary switches forced by =
-the
-> hypervisor. All they allow is a forced switch to the highest privileged p=
-lane,
-> the SVSM on SNP will force the same constraints by making lower-privilege=
- VMSAs
-> not-runnable when it executes.
+Is my understanding correct?
 
-The idea of the userspace scheduling was that you're not forced to use
-it - the kernel can always choose to override it if it's using an
-accelerated implementation of planes (and of plane switching). But it
-also leaves some leeway to different accelerated implementations, each
-of which can pick their own algorithm.
+If yes, I think the code looks confusing, at least to a layman like
+myself. It initially seems like the lock protects against concurrent
+initializations, but then the NULL check is not done again under the
+lock. The goal of the lock is not clear without the original report.
 
-Conceptually I'd rather keep the possibility of userspace scheduling.
-But maybe it doesn't add much.
-
-Paolo
-
-> So exposing an interface for user-space to chose which plane to run does =
-seem
-> to gain some weird, platform dependent semantics going forward. TDX and C=
-CA
-> also require in-kernel switching as they can switch planes without a VMEX=
-IT, so
-> I decided to have it from the start.
->
->
-> -Joerg
->
-
+Mayeb it's clearer to explicitly use barriers if the goal is preventing
+reordering?
