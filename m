@@ -1,123 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E2314A4F0;
-	Mon,  8 Jun 2026 13:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61AE3C9EFB
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 14:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780926844; cv=none; b=Uto/d1jDi63ZqMBDZUtR2XiIkrXoTYQGqsQ3P7kFNbQHYJg9amWSzSbD7s5qLAOLf+tjrtfIS1PJ8ydSxQwPspC1hIoPd0ryfGmGX00CFh5YfMi28zcYaV0DTraLdAgFeWD9NXvWmJjXPGjusnQxjCvcxYk+nAqSiYlUiDcARik=
+	t=1780927710; cv=none; b=psPvezCrilCpuj7mHLinLrhiBGTUbVl3VdCjuHsR3ZJj0kxdDChwp3KZ1wVwiGk424Q2+H0Qe/rH7t61w9PBq2ohJGn++5QdXr3jTk+AxXOxRXIDwsQ1vhXjxyXPb8IupwsbZTQbE5K2RYibFP01JJI+wfljXkmUAMmPcrqzBQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780926844; c=relaxed/simple;
-	bh=zyFb9/SAECng/VTwTudQLxjUQyq0g0AZM0OK2JIT8NA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jNwy33/GQF9mqxdbkSOyouaWaFUiae6p3KHhQYPr2xjjh3WTrnZLtbw6ZSKpAShEuH+3215xNyZ5bY5aP/3zi+7nUDnL4k86KIyEX7PzWi/zVbdhZAnHWN6dfGp4RLHuk1jGpESPh45WVOkbgXOEtsQlmzby9THkU+uIfUx8upo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Am229Gtp; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1780927710; c=relaxed/simple;
+	bh=rW7Uo1G+PXsx+UnaleG4DkWcKETJEmDCkf3BP7R1oFc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dsLZEHS0ADI7S/R1UnRrmpIdt6Jv2Xi5umU9WihKH6S5qn8CkBdlpqW0u5gRCepgVd3jPXYRCIxh6GvXEuDL+DOpQNLLYT3CbilMVI5+gNueF6pA2DSSyC9Awd/iYtvmz4f6G6jvRpigoBPyJl9un8NQQiV7PA09L5yWzoHofMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rq9vaEM4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Am229Gtp"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FD22244B;
-	Mon,  8 Jun 2026 06:53:57 -0700 (PDT)
-Received: from [10.57.28.93] (unknown [10.57.28.93])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B1E43F86F;
-	Mon,  8 Jun 2026 06:53:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780926842; bh=zyFb9/SAECng/VTwTudQLxjUQyq0g0AZM0OK2JIT8NA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Am229GtpwnsAOTgPNgH0rKMU0izNXaGe3sEaiDNq7CSGq+5bEqKfsCQAYLrBmWu9g
-	 R3SFvmmvI0pML1LYEXP6f3iuiDl8j4v8RrDvp7FFT4rwKDMIrcT7jYncMiFsWKki02
-	 FZWtyD5eqhQTmw5GvKPFroyhVAwfW/ZXzGJk0H/A=
-Message-ID: <9631be66-c757-488d-bb66-a62698aa26b8@arm.com>
-Date: Mon, 8 Jun 2026 14:53:56 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rq9vaEM4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD281F00893;
+	Mon,  8 Jun 2026 14:08:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780927706;
+	bh=uQbeUTHlxW33ePNUtyeXO5I2zGh86vHk5u66ukHFhAw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Rq9vaEM4+NIV3eOXVxxEjTDZA/rqgkZVgfe6Sz+3TgYabalz6Kq/VoQXvzN5Ym8mA
+	 3sioXkkXS29eX8QEpjNt+H8K0T1fX9plm2tmzTDholVloS9/4c0Xfsv8w+1MsM6bGi
+	 rh1LVbEWmc6uFvWePU4vjw3i0A8ZFFH3+coBJ7SzlsYWQCt1OAmHCE2NQCpKtvyLwN
+	 rIAmG1NB/PxtXFUgGw7M2V1cdfQIIgHN+ir1HczEHe8TZNw0PwlfyzARVG9t5N9sT/
+	 ujQPnYIBnIDQQS52FxGM5oQQhFvZfpr2S2JVIsBjl0Q5/w0K39XZMEzO1yXtmVJ0uP
+	 wgLlFlmT+NazQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wWaeN-0000000AVTv-46jL;
+	Mon, 08 Jun 2026 14:08:24 +0000
+Date: Mon, 08 Jun 2026 15:08:23 +0100
+Message-ID: <86pl21t99k.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"oupton@kernel.org"
+	<oupton@kernel.org>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	Mark
+ Cave-Ayland <mark.caveayland@nutanix.com>,
+	Shaju Abraham
+	<shaju.abraham@nutanix.com>
+Subject: Re: [RFC] Exposing arm64 ID-register safe_rules semantics to userspace? 
+In-Reply-To: <E58B3007-0BB1-460F-9225-707FCF811B04@nutanix.com>
+References: <B5C9AE36-8181-4A76-905F-3E89B7200215@nutanix.com>
+	<86se6xthih.wl-maz@kernel.org>
+	<E58B3007-0BB1-460F-9225-707FCF811B04@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 26/44] arm64: RMI: Allow populating initial contents
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-27-steven.price@arm.com>
- <ea4be6c5-9506-4253-80c5-c76c9ac3b77d@redhat.com>
- <0c71b4b8-ad0b-4a24-9f4a-180b2aaacdb6@arm.com>
- <ad45c64c-18ab-4d42-9813-0ac1704bb127@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <ad45c64c-18ab-4d42-9813-0ac1704bb127@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: khushit.shah@nutanix.com, kvmarm@lists.linux.dev, oupton@kernel.org, eric.auger@redhat.com, cohuck@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, mark.caveayland@nutanix.com, shaju.abraham@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 08/06/2026 10:41, Suzuki K Poulose wrote:
-> On 08/06/2026 10:36, Steven Price wrote:
->> On 28/05/2026 06:30, Gavin Shan wrote:
->>> Hi Steve,
->>>
->>> On 5/13/26 11:17 PM, Steven Price wrote:
->>>> The VMM needs to populate the realm with some data before starting
->>>> (e.g.
->>>> a kernel and initrd). This is measured by the RMM and used as part of
->>>> the attestation later on.
->>>>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
-> 
-> ...
-> 
->>>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->>>> index a89873a5eb77..209087bcf399 100644
->>>> --- a/arch/arm64/kvm/rmi.c
->>>> +++ b/arch/arm64/kvm/rmi.c
->>>> @@ -486,6 +486,75 @@ void kvm_realm_unmap_range(struct kvm *kvm,
->>>> unsigned long start,
->>>>            realm_unmap_private_range(kvm, start, end, may_block);
->>>>    }
->>>>    +static int realm_data_map_init(struct kvm *kvm, unsigned long ipa,
->>>> +                   kvm_pfn_t dst_pfn, kvm_pfn_t src_pfn,
->>>> +                   unsigned long flags)
->>>> +{
->>>> +    struct realm *realm = &kvm->arch.realm;
->>>> +    phys_addr_t rd = virt_to_phys(realm->rd);
->>>> +    phys_addr_t dst_phys, src_phys;
->>>> +    int ret;
->>>> +
->>>> +    dst_phys = __pfn_to_phys(dst_pfn);
->>>> +    src_phys = __pfn_to_phys(src_pfn);
->>>> +
->>>> +    if (rmi_delegate_page(dst_phys))
->>>> +        return -ENXIO;
->>>> +
->>>> +    ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
->>>> +    if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->>>> +        /* Create missing RTTs and retry */
->>>> +        int level = RMI_RETURN_INDEX(ret);
->>>> +
->>>> +        KVM_BUG_ON(level == KVM_PGTABLE_LAST_LEVEL, kvm);
->>>
->>>          KVM_BUG_ON(level >= KVM_PGTABLE_LAST_LEVEL, kvm);
->>
->> Ack.
->>
-> 
-> Thinking more about this, I guess a buggy VMM can trigger this
-> by populating twice ? (level == KVM_PGTABLE_LAST_LEVEL). So, we should
-> return the error back, than warning here and suppressing the error ?
+On Mon, 08 Jun 2026 14:28:13 +0100,
+Khushit Shah <khushit.shah@nutanix.com> wrote:
+> > On 8 Jun 2026, at 4:40=E2=80=AFPM, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > My question above still stands: why isn't knowing that a field is
+> > writable or not, together with the max value of that field, enough to
+> > decide what is possible to be set for that field?
+>=20
+> Okay, makes sense, there are 57 fields in cpufeatures.c that are not
+> unsigned FTR_LOWER_SAFE.=20
+>=20
+> Right now, only 21 of those are writable. 8 of those are single bit,
+> with FTR_EXACT and safe_value as 0, so no special case for them.
+>=20
+> So, only special handling for 13 fields are needed for now:
+>=20
+> EXACT: 4 (TGRAN*_2, L1Ip)
+> SIGNED_LOWER_SAFE: 7 (TGRAN4, TGRAN64, InnerShr, OuterShr, DoubleLock, PM=
+UVer, PerfMon)
+> HIGHER_SAFE: 2 (SpecSEI)
+>=20
+> Hardcoding these 13 works for today=E2=80=99s kernel. But when new fields=
+ are made
+> writable or are added to ftr_bits, older VMM will by default make assumpt=
+ion
+> of them as LOWER_SAFE, which might be wrong.
 
-Populating twice causes rmi_delegate_page() to be run twice on the same
-page and the second one will then fail. So I don't think this is
-possible (please correct me if I've missed something!)
+Hardcoding *anything* feels very wrong. Each of these features is
+handled differently for a number of reasons that are related to the
+architecture itself and the way the kernel is using it *for itself*.
+This information is not supposed to be consumed by userspace, and is
+not exposed to it.
 
-Thanks,
-Steve
+The problem you seem to have here is that you want to deal with these
+features without capturing any understanding of what these actually
+mean in the context of the architecture. I can't see a good outcome of
+that sort of thing in the long run. The VMM is, for better or worse,
+part of the overall hypervisor. It cannot treat the features as a bag
+of bits.
+
+This is also why the whole "CPU model" thing is IMO a bad idea: it is
+syntactic sugar that falls at the first hurdle, simply because the
+architecture is not fully virtualisable. For example you can't take a
+Neoverse V2 description and apply it to a KVM guest running on V2 HW.
+
+I think you need to revisit your approach to this stuff.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
