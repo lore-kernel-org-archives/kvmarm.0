@@ -1,213 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0FE32694E;
-	Mon,  8 Jun 2026 10:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9363434107D
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 11:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780916203; cv=none; b=Sy+Vyt1rxU47oyUC+TGJlEs+Wmdk18bXCa3ROIA4gqK7qkJxfBY/POrqHzIosIZel3TXlb8ozj2sMGciz8Mzof7RvGdapa2PBXxM2yZRfm6WxpofkJ3X9Pfqp2J+5U2tmTeYqw3pIr8E9Ysg75unIDiOP77d5V6UxciA3KvuXWI=
+	t=1780917017; cv=none; b=gstEhxZJ1a3q88aSt0hRldkD1ZvXqTbZnsIiOLft3ITN+4kwsAEsd+gxBFWreAmdf4uRV/nxBurHzaJ8L6Q03LXv0e75K22WoX2OhOqNKgk5Ziro2T1YN9bJ6nYqDT/LZb/GijnZ0Ht8u0cjpYMQQWetiQ/h7DDPc6wOMC51yvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780916203; c=relaxed/simple;
-	bh=3BsjGEV/zVg1r2FPoepEFV/lYqCNFcXTf/wKQVBDsp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hpYBZpzYAAg6A69ONeAPpunf7DByE3PcMjlFKNnbwjaTkRupgHthO/tzzz/+XSp3XqhCti7s2gHQ7U6MXF1/FJW7DgxRR0zS/karvif3u+2QfjKBZdY7gAt7lEneaM1b4DCXpaIwW6hv00SI5/hwbcsfEAOw6AkwGHwpk6SwBF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hqoMlR8u; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1780917017; c=relaxed/simple;
+	bh=Ws0y5BGKgtOoiq8J5RM73L6W45x0TRUDlGle5Q5dMO4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g+ZNTrGvCffi8ZnAVbOK7+lnw1yx4/Jkd5wPNLcsMetA2NnKT5WgFx5nO07ZzxyoEfkKNSDXcazxVX3LIYrUx1IXifPH8v5IaztA+e+0j82jHbzdgpg5IstUtQdFbls7GeuT8tzVYqYY6aQqMDy/cX8fXyy2u8HkADq+QrabPBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fwbgGu2q; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hqoMlR8u"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 69DEF2403;
-	Mon,  8 Jun 2026 03:56:36 -0700 (PDT)
-Received: from [10.57.28.93] (unknown [10.57.28.93])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C82A13F62B;
-	Mon,  8 Jun 2026 03:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780916201; bh=3BsjGEV/zVg1r2FPoepEFV/lYqCNFcXTf/wKQVBDsp0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hqoMlR8uEV7b745C1VkOn79UIulUNaWCmMMM0DnN/Ijpp9G6x9HQRx8JJG+Qi7u+B
-	 K7vYaiVLgwC1XWknLZd4rOcFUR+6uIGGy9B/lC7a+j8j2gNOn7c7GBDPnvgAjjn9zo
-	 hjzmL/ECH+fbvGNCQJCYelq5XGWF/bN5HfTVJbJI=
-Message-ID: <04e7e38f-950c-4854-921b-79e06af29b5e@arm.com>
-Date: Mon, 8 Jun 2026 11:56:33 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fwbgGu2q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F7351F00893;
+	Mon,  8 Jun 2026 11:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780917016;
+	bh=V7zfnW6nG1q4H+6d51ekdTAwkP6IvVfSqyDMcp3bDKw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=fwbgGu2qUhVSeI+9xzPhv91D0+6uOqK0xMD8xvQUqaVkchFhLkQ3q9jbmN8Tx5jrs
+	 V148OFWCeJRCLcGJoKOrDhNlIfKd65W6GAYzIErBnrzwRlf4qWgweHNGskz//k8yA6
+	 yGO9wb7bd3fUwLKxDENkkxeMtUobely6fzYlxetv5AwOJqfuuK1PAhwXGzLH3APF7g
+	 jr6dmv9nCn0LzSISTfiZ/LQqjNUJzZlCq8fYb6ng7aZEx9P5VOWJvbP+PP3nlPwt3D
+	 M3ig3vMRja3TT7H+Pb6NGmtBaFsPH6yE7g6SkqfEv71a9sSqj45fSplX/pDIZ68aVm
+	 F74qrrChkrrag==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wWXry-0000000ARdp-1lQ9;
+	Mon, 08 Jun 2026 11:10:14 +0000
+Date: Mon, 08 Jun 2026 12:10:14 +0100
+Message-ID: <86se6xthih.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"oupton@kernel.org"
+	<oupton@kernel.org>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	Mark
+ Cave-Ayland <mark.caveayland@nutanix.com>,
+	Shaju Abraham
+	<shaju.abraham@nutanix.com>
+Subject: Re: [RFC] Exposing arm64 ID-register safe_rules semantics to userspace? 
+In-Reply-To: <B5C9AE36-8181-4A76-905F-3E89B7200215@nutanix.com>
+References: <B5C9AE36-8181-4A76-905F-3E89B7200215@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 29/44] arm64: RMI: Runtime faulting of memory
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-30-steven.price@arm.com>
- <d08ca4d6-1e7c-473d-909e-89642bd8c4c2@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <d08ca4d6-1e7c-473d-909e-89642bd8c4c2@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: khushit.shah@nutanix.com, kvmarm@lists.linux.dev, oupton@kernel.org, eric.auger@redhat.com, cohuck@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, mark.caveayland@nutanix.com, shaju.abraham@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 05/06/2026 12:20, Gavin Shan wrote:
-> Hi Steve,
+On Mon, 08 Jun 2026 10:43:11 +0100,
+Khushit Shah <khushit.shah@nutanix.com> wrote:
 > 
-> On 5/13/26 11:17 PM, Steven Price wrote:
->> At runtime if the realm guest accesses memory which hasn't yet been
->> mapped then KVM needs to either populate the region or fault the guest.
->>
->> For memory in the lower (protected) region of IPA a fresh page is
->> provided to the RMM which will zero the contents. For memory in the
->> upper (shared) region of IPA, the memory from the memslot is mapped
->> into the realm VM non secure.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v13:
->>   * Numerous changes due to rebasing.
->>   * Fix addr_range_desc() to encode the correct block size.
->> Changes since v12:
->>   * Switch to RMM v2.0 range based APIs.
->> Changes since v11:
->>   * Adapt to upstream changes.
->> Changes since v10:
->>   * RME->RMI renaming.
->>   * Adapt to upstream gmem changes.
->> Changes since v9:
->>   * Fix call to kvm_stage2_unmap_range() in kvm_free_stage2_pgd() to set
->>     may_block to avoid stall warnings.
->>   * Minor coding style fixes.
->> Changes since v8:
->>   * Propagate the may_block flag.
->>   * Minor comments and coding style changes.
->> Changes since v7:
->>   * Remove redundant WARN_ONs for realm_create_rtt_levels() - it will
->>     internally WARN when necessary.
->> Changes since v6:
->>   * Handle PAGE_SIZE being larger than RMM granule size.
->>   * Some minor renaming following review comments.
->> Changes since v5:
->>   * Reduce use of struct page in preparation for supporting the RMM
->>     having a different page size to the host.
->>   * Handle a race when delegating a page where another CPU has faulted on
->>     a the same page (and already delegated the physical page) but not yet
->>     mapped it. In this case simply return to the guest to either use the
->>     mapping from the other CPU (or refault if the race is lost).
->>   * The changes to populate_par_region() are moved into the previous
->>     patch where they belong.
->> Changes since v4:
->>   * Code cleanup following review feedback.
->>   * Drop the PTE_SHARED bit when creating unprotected page table entries.
->>     This is now set by the RMM and the host has no control of it and the
->>     spec requires the bit to be set to zero.
->> Changes since v2:
->>   * Avoid leaking memory if failing to map it in the realm.
->>   * Correctly mask RTT based on LPA2 flag (see rtt_get_phys()).
->>   * Adapt to changes in previous patches.
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h |   8 ++
->>   arch/arm64/include/asm/kvm_rmi.h     |  12 ++
->>   arch/arm64/kvm/mmu.c                 | 128 ++++++++++++++++----
->>   arch/arm64/kvm/rmi.c                 | 173 +++++++++++++++++++++++++++
->>   4 files changed, 301 insertions(+), 20 deletions(-)
->>
+> Hi all,
 > 
-> [...]
-> 
->> @@ -1604,27 +1641,52 @@ static int gmem_abort(const struct
->> kvm_s2_fault_desc *s2fd)
->>       bool write_fault, exec_fault;
->>       enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
->>       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->> -    struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
->> +    struct kvm_vcpu *vcpu = s2fd->vcpu;
->> +    struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
->> +    gpa_t gpa = kvm_gpa_from_fault(vcpu->kvm, s2fd->fault_ipa);
->>       unsigned long mmu_seq;
->>       struct page *page;
->> -    struct kvm *kvm = s2fd->vcpu->kvm;
->> +    struct kvm *kvm = vcpu->kvm;
->>       void *memcache;
->>       kvm_pfn_t pfn;
->>       gfn_t gfn;
->>       int ret;
->>   -    memcache = get_mmu_memcache(s2fd->vcpu);
->> -    ret = topup_mmu_memcache(s2fd->vcpu, memcache);
->> +    if (kvm_is_realm(vcpu->kvm)) {
->> +        /* check for memory attribute mismatch */
->> +        bool is_priv_gfn = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
->> +        /*
->> +         * For Realms, the shared address is an alias of the private
->> +         * PA with the top bit set. Thus if the fault address matches
->> +         * the GPA then it is the private alias.
->> +         */
->> +        bool is_priv_fault = (gpa == s2fd->fault_ipa);
->> +
->> +        if (is_priv_gfn != is_priv_fault) {
->> +            kvm_prepare_memory_fault_exit(vcpu, gpa, PAGE_SIZE,
->> +                              kvm_is_write_fault(vcpu),
->> +                              false,
->> +                              is_priv_fault);
->> +            /*
->> +             * KVM_EXIT_MEMORY_FAULT requires an return code of
->> +             * -EFAULT, see the API documentation
->> +             */
->> +            return -EFAULT;
->> +        }
->> +    }
->> +
-> 
-> For a Realm, gmem_abort() is called by kvm_handle_guest_abort() only when
-> we're faulting in the private (protected) space.
-> 
->     if (kvm_slot_has_gmem(memslot) && !shared_ipa_fault(vcpu->kvm,
-> fault_ipa))
->         ret = gmem_abort(&s2fd);
->     else
->         ret = user_mem_abort(&s2fd);
-> 
-> With the condition, this block of code can be simplied to handle conversion
-> (shared -> private) instead of both directions.
-> 
->     /* Convert the shared address to the private adress for Realm */
->     if (kvm_is_realm(vcpu->kvm) &&
->         !kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT)) {
->         /*
->          * KVM_EXIT_MEMORY_FAULT requires an return code of
->          * -EFAULT, see the API documentation
->          */
->         kvm_prepare_memory_fault_exit(vcpu, gpa, PAGE_SIZE,
->                                       kvm_is_write_fault(vcpu),
->                                       false, true);
->         return -EFAULT;
->     }
-> 
-> 
-> [...]
-> 
->> @@ -2396,7 +2475,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->>                   !write_fault &&
->>                   !kvm_vcpu_trap_is_exec_fault(vcpu));
->>   -        if (kvm_slot_has_gmem(memslot))
->> +        if (kvm_slot_has_gmem(memslot) && !shared_ipa_fault(vcpu-
->> >kvm, fault_ipa))
->>               ret = gmem_abort(&s2fd);
->>           else
->>               ret = user_mem_abort(&s2fd);
-> gmem_abort() is only called for faults in the protected (private) space.
+> On KVM_SET_ONE_REG for ID registers, KVM validates the requested
+> field values against the host's values using the per-field rules
+> in arm64_ftr_bits[](arch/arm64/kernel/cpufeature.c) (and, some
+> KVM specific overrides on top);
+>
+> In our QEMU RFC for named ARM CPU models [1], we use the safe_rules to:
+> - pre-validate a guest ID register configuration before KVM write back,
 
-You're absolutely correct - that's a nice simplification!
+Pre-validate *how*?
+
+> - report blockers in QMP query-cpu-definitions for a given named
+> model,
+
+Sorry, but I have no idea what this is.
+
+> - enumerate supported values per field for QMP/libvirt/upper layers.
+>
+> RFC has a hand-maintained copy of safe_rules in QEMU that mirrors
+> the kernel.
+> 
+> Any advice for VMMs on how to track the safe_rules used by KVM to
+> validate ID-register field values written by userspace?
+
+Why should the VMM care? Either a field is exposed as writable, and in
+general it is safe to expose something "lower" than the host value to
+the guest, or it isn't, and only that particular value is possible.
+
+There is a few exceptions to this rule, but I expect this to be the
+minority.
+
+> 
+> There is no API that exposes those rules to VMMs. Until a VMM issues
+> KVM_SET_ONE_REG, it cannot know whether the requested set of values
+> will be accepted. On failure, VMM still cannot know the faulting field.
+>
+> We'd like to know what the right approach is:
+> - Should there be a KVM ioctl that exposes the safe_rules to
+> userspace?
+> Maybe Something like KVM_GET_SAFE_RULE (that takes reg_idx and
+> start_bit_pos)
+> or a bulk ioctl like KVM_GET_REG_SAFE_RULES (that returns (reg_idx,
+> start_bit, width, safe_rule, safe_vals) for all the ID registers?
+> - Is it acceptable to keep mirroring ftr_bits[] in userspace?
+> - Or is this simply not meant to be exposed to userspace VMMs?
+
+My question above still stands: why isn't knowing that a field is
+writable or not, together with the max value of that field, enough to
+decide what is possible to be set for that field?
 
 Thanks,
-Steve
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
