@@ -1,122 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61AE3C9EFB
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 14:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCFE3D0BFB
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 14:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780927710; cv=none; b=psPvezCrilCpuj7mHLinLrhiBGTUbVl3VdCjuHsR3ZJj0kxdDChwp3KZ1wVwiGk424Q2+H0Qe/rH7t61w9PBq2ohJGn++5QdXr3jTk+AxXOxRXIDwsQ1vhXjxyXPb8IupwsbZTQbE5K2RYibFP01JJI+wfljXkmUAMmPcrqzBQk=
+	t=1780928550; cv=none; b=QZh0SS5tyZ6LynjIEJl3hwpTF5hmF+kj2POOE2d4IFGD+bJZ+ulQhlANbsbgL66Ypjv1L8T3drMK++nLI2XWHa1sENRS/SsZ4nZqjuNVzkksqIXJ2fDpTcAasDxVNJEk9i9t/Mg1e6PvfaDSi6d5FMOtdnwprALdAICF51FTJ2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780927710; c=relaxed/simple;
-	bh=rW7Uo1G+PXsx+UnaleG4DkWcKETJEmDCkf3BP7R1oFc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dsLZEHS0ADI7S/R1UnRrmpIdt6Jv2Xi5umU9WihKH6S5qn8CkBdlpqW0u5gRCepgVd3jPXYRCIxh6GvXEuDL+DOpQNLLYT3CbilMVI5+gNueF6pA2DSSyC9Awd/iYtvmz4f6G6jvRpigoBPyJl9un8NQQiV7PA09L5yWzoHofMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rq9vaEM4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780928550; c=relaxed/simple;
+	bh=Rlbk9tEGqeQ9ZsVb8Vxb0S3BBhDQl+53BntceG8nbck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mVqA4GesiMwDP30bXVMxVFK4h4OL0IHwY+c/Oh7CsGwj++RIDPTw647GFXlVSNZsr2RqJBzml7BVbLXQfmgHoN9r2gp26KYjIgwAfDE+p6n9SQbBuwKkRLxnXfbVVd0DtkPHvz8PaLKxVt1LsLPjHneflYyrUqHlZqeDJ0F5GOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r5AVFodt; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rq9vaEM4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD281F00893;
-	Mon,  8 Jun 2026 14:08:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780927706;
-	bh=uQbeUTHlxW33ePNUtyeXO5I2zGh86vHk5u66ukHFhAw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Rq9vaEM4+NIV3eOXVxxEjTDZA/rqgkZVgfe6Sz+3TgYabalz6Kq/VoQXvzN5Ym8mA
-	 3sioXkkXS29eX8QEpjNt+H8K0T1fX9plm2tmzTDholVloS9/4c0Xfsv8w+1MsM6bGi
-	 rh1LVbEWmc6uFvWePU4vjw3i0A8ZFFH3+coBJ7SzlsYWQCt1OAmHCE2NQCpKtvyLwN
-	 rIAmG1NB/PxtXFUgGw7M2V1cdfQIIgHN+ir1HczEHe8TZNw0PwlfyzARVG9t5N9sT/
-	 ujQPnYIBnIDQQS52FxGM5oQQhFvZfpr2S2JVIsBjl0Q5/w0K39XZMEzO1yXtmVJ0uP
-	 wgLlFlmT+NazQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wWaeN-0000000AVTv-46jL;
-	Mon, 08 Jun 2026 14:08:24 +0000
-Date: Mon, 08 Jun 2026 15:08:23 +0100
-Message-ID: <86pl21t99k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"oupton@kernel.org"
-	<oupton@kernel.org>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	Mark
- Cave-Ayland <mark.caveayland@nutanix.com>,
-	Shaju Abraham
-	<shaju.abraham@nutanix.com>
-Subject: Re: [RFC] Exposing arm64 ID-register safe_rules semantics to userspace? 
-In-Reply-To: <E58B3007-0BB1-460F-9225-707FCF811B04@nutanix.com>
-References: <B5C9AE36-8181-4A76-905F-3E89B7200215@nutanix.com>
-	<86se6xthih.wl-maz@kernel.org>
-	<E58B3007-0BB1-460F-9225-707FCF811B04@nutanix.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r5AVFodt"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490bd64ca95so197065e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 08 Jun 2026 07:22:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780928548; x=1781533348; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NMlTDtSQVCRaIScLdU5LnPoxCDDHCuJqXKf3DYv7eY4=;
+        b=r5AVFodtv5ftAJNe76daZ8FE2VgPvg7VIaQeyotZKN/jbazwQACpSfh1GARfZ2s5C8
+         f3Y9Va/BHBvg+A7LgJpvBrmdUE38Xss98l+fEkv8qw04JxdJaHBHjS1QMD8e+ZcceJ/y
+         J1hkBwWfyumWYUTcZqmX81Y23rXoLEDpDeEDEiwC95YiFjcEElulTGe8rCaWU9KtEPqw
+         GAJWDtaRN21GAHO/XYMo3hx5AssVSRrTAUu8o4AQ5/+W59udYhe3H5Wxoe5IfIQT/jD1
+         GhQQ91iWgmh1QxksjpJXx8jcuYEzX/NuC1LAC31cw8lxSo05Y384E6oAs8Xu+oMk6ZLA
+         q6eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780928548; x=1781533348;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NMlTDtSQVCRaIScLdU5LnPoxCDDHCuJqXKf3DYv7eY4=;
+        b=TC5sLUiNXNZBYHhiiiWku6kpp5hVPniewU88wwFvtScX/tSUFApkFKoPyfgpBU/pVf
+         IvsitKTiOuBH+RlQH+9sp/NUzN/WROLFskX0yN4TlNUd73zbwCNTmiAwzj2Zdouw3nIr
+         vWt4saB2NM0QBmIxBQGTnf6A495igavpovRV3P/XMclIJzYbjcjqHXbTCyzlaqYEHpfI
+         9U282nt02CdgQOLjLQiDLJ1mNN4sc3zHPbul9OrCrVyspt75KMW6680aAxwXZ1vfMgIE
+         wyVPcSF3vWgBVVaR89QDvetlMxRrTlZ8aXr5NoKkIlPvRze/gIbDUQUcKAsIzFEBPqlY
+         Voxg==
+X-Forwarded-Encrypted: i=1; AFNElJ/d3Zti5wVPaPVzzMlib425SLh+b4SQvAr/YYElL8PKs16uPMfDAnNqRt8yzWw/2eL2DRA64us=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzVHIM/QyQ05z1gaUkziCxCoNDrjgvqxMX9fU7Js6DhmJ/RY9Tb
+	p69G9f9LwkwAmHazWJyZYWm7JL7EIsdTucGRlKVrp6FuWVCoN6WEl/0XZ9HU9Tcfrw==
+X-Gm-Gg: Acq92OG/i5b2fnhnCldG7mBPwK9Bqhkp/HneOYD4BwliEEuMIIxx+d9l2+s8w48mpKv
+	HstUTpvR8Fj5tJUyhECceHRWgdUfCqz2FwbZfxUDEh0clptoGhZAdpVIdcT7eYpwrN+oIJzNkKZ
+	eebIzfOywNyFiSm7/N9cNNHpDy2iI0ovF+MuQjsrRy/pkDAVLD8iGVm80iYLkOBR9ZHh0YMRGXF
+	xC8r6ksyPk3lFDERD/v8TILUdrAzuWrkUHqIkP5eCP3yMjIimI/0Sk3vKhUqvcZB/OIJxanQco6
+	Bfs2DCLqW91pxTDjaDzVcXBFyaK3VNHrz+QVtrYRJPPFuH0/76RqCkHh3j1PykQ33699hAgR8mD
+	dIydsTrhzIICiuJh+/EDDszoYiW/TsfIks/TKZYAi1pqMBiRZtXE8QXpQZEb8viFdRU9a1yM9G9
+	I5h9XeEnwO/WvrXxw7EG2KSgXJYnWsjotwnn50SooZW9QJEFLR6zhw9B8Uc7Q2fV6YexkYmjcBB
+	BWqqzTb
+X-Received: by 2002:a05:600c:3299:b0:490:c2b6:de6c with SMTP id 5b1f17b1804b1-490c2c96beemr2993835e9.13.1780928547315;
+        Mon, 08 Jun 2026 07:22:27 -0700 (PDT)
+Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f344541sm49486271f8f.22.2026.06.08.07.22.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2026 07:22:26 -0700 (PDT)
+Date: Mon, 8 Jun 2026 14:22:22 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, catalin.marinas@arm.com,
+	oupton@kernel.org, joey.gouly@arm.com, korneld@google.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, android-kvm@google.com,
+	mrigendra.chaubey@gmail.com, perlarsen@google.com,
+	suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com,
+	Sudeep Holla <sudeep.holla@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
+Message-ID: <aibQHiYimPP1ylk3@google.com>
+References: <20260501114447.2389222-2-sebastianene@google.com>
+ <86wlxgy00t.wl-maz@kernel.org>
+ <afxuDpecPCVA56cL@google.com>
+ <86se83xrwx.wl-maz@kernel.org>
+ <afyd8u85L5XIl6dh@google.com>
+ <86qznnxptx.wl-maz@kernel.org>
+ <af3fW468-f1KXCrC@google.com>
+ <ahmxiFXXTupafbXw@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: khushit.shah@nutanix.com, kvmarm@lists.linux.dev, oupton@kernel.org, eric.auger@redhat.com, cohuck@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, mark.caveayland@nutanix.com, shaju.abraham@nutanix.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahmxiFXXTupafbXw@willie-the-truck>
 
-On Mon, 08 Jun 2026 14:28:13 +0100,
-Khushit Shah <khushit.shah@nutanix.com> wrote:
-> > On 8 Jun 2026, at 4:40=E2=80=AFPM, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > My question above still stands: why isn't knowing that a field is
-> > writable or not, together with the max value of that field, enough to
-> > decide what is possible to be set for that field?
->=20
-> Okay, makes sense, there are 57 fields in cpufeatures.c that are not
-> unsigned FTR_LOWER_SAFE.=20
->=20
-> Right now, only 21 of those are writable. 8 of those are single bit,
-> with FTR_EXACT and safe_value as 0, so no special case for them.
->=20
-> So, only special handling for 13 fields are needed for now:
->=20
-> EXACT: 4 (TGRAN*_2, L1Ip)
-> SIGNED_LOWER_SAFE: 7 (TGRAN4, TGRAN64, InnerShr, OuterShr, DoubleLock, PM=
-UVer, PerfMon)
-> HIGHER_SAFE: 2 (SpecSEI)
->=20
-> Hardcoding these 13 works for today=E2=80=99s kernel. But when new fields=
- are made
-> writable or are added to ftr_bits, older VMM will by default make assumpt=
-ion
-> of them as LOWER_SAFE, which might be wrong.
+On Fri, May 29, 2026 at 04:32:24PM +0100, Will Deacon wrote:
+> On Fri, May 08, 2026 at 01:04:27PM +0000, Sebastian Ene wrote:
+> > While at it I discovered that none of the FF-A calls in the proxy
+> > currently check for these SBZ registers. Would you be ok with a diff that
+> > fixes this before the patch with the notifications ?
 
-Hardcoding *anything* feels very wrong. Each of these features is
-handled differently for a number of reasons that are related to the
-architecture itself and the way the kernel is using it *for itself*.
-This information is not supposed to be consumed by userspace, and is
-not exposed to it.
+Hi Will,
 
-The problem you seem to have here is that you want to deal with these
-features without capturing any understanding of what these actually
-mean in the context of the architecture. I can't see a good outcome of
-that sort of thing in the long run. The VMM is, for better or worse,
-part of the overall hypervisor. It cannot treat the features as a bag
-of bits.
+> 
+> I'd probably structure it as a separate patch per call, tbh. That way,
+> the commit message can talk about the specific fields that are reserved
+> for a given call. See below.
+> 
+> > Refactor the handling logic in pKVM FF-A proxy to support checking for
+> > SBZ/MBZ values. While at it, drop the do_ffa_mem_xfer macro and replace
+> > it with two functions that make it clear that we re-write the
+> > function-id with a 64-bit variant, to keep the same behavior as before.
+> > Keep each handler in an array of structures together with a mask that
+> > corresponds to the SBZ registers the spec expects.
+> 
+> Although I agree that we should be enforcing SBZ/MBZ paramaters (because
+> we have no idea what they might do in future versions of the spec), I
+> also think that doing this at the register level is too coarse.
+> 
+> For example, the VM ID parameter to FFA_NOTIFICATION_BITMAP_CREATE has bits
+> 31:16 as MBZ. So I think we probably need to do the checking on a
+> per-function basis, like Per is doing in his series:
+> 
+> https://lore.kernel.org/r/20260501-host-direct-messages-v6-0-3f4af727ed85@google.com
+> 
 
-This is also why the whole "CPU model" thing is IMO a bad idea: it is
-syntactic sugar that falls at the first hurdle, simply because the
-architecture is not fully virtualisable. For example you can't take a
-Neoverse V2 description and apply it to a KVM guest running on V2 HW.
+For the newly added calls like FFA_NOTIFICATION_* we can do that in a
+separate functions, but what about the other existing calls that have
+MBZ registers ? that was the reason for the inline proposal in :
+https://lore.kernel.org/all/af3fW468-f1KXCrC@google.com/
+(to avoid duplicate checks).
 
-I think you need to revisit your approach to this stuff.
+> Will
 
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Thanks,
+Sebastian
