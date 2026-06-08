@@ -1,66 +1,34 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCFE3D0BFB
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 14:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9EB3BE647;
+	Mon,  8 Jun 2026 14:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780928550; cv=none; b=QZh0SS5tyZ6LynjIEJl3hwpTF5hmF+kj2POOE2d4IFGD+bJZ+ulQhlANbsbgL66Ypjv1L8T3drMK++nLI2XWHa1sENRS/SsZ4nZqjuNVzkksqIXJ2fDpTcAasDxVNJEk9i9t/Mg1e6PvfaDSi6d5FMOtdnwprALdAICF51FTJ2c=
+	t=1780929637; cv=none; b=SQrN9PATt1RK2qt05xKPs3HkABvNzoKzRk+iHWkxUQYUAT+yhdkODSE8QFuld0/wswi/apjy7dcDEdd2LeibySQgwz8JtKs7wdDsveME3ebBE9hxv3YnzBPnG77+KSx0G7q3WOnmJ7VkG0ijWTFHfmhbYaa5QaY1YIKrJwAk14s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780928550; c=relaxed/simple;
-	bh=Rlbk9tEGqeQ9ZsVb8Vxb0S3BBhDQl+53BntceG8nbck=;
+	s=arc-20240116; t=1780929637; c=relaxed/simple;
+	bh=GDdD/1HLb8/TyOZdkQtSvYrCNpL55+xR88u3XZkUdWs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mVqA4GesiMwDP30bXVMxVFK4h4OL0IHwY+c/Oh7CsGwj++RIDPTw647GFXlVSNZsr2RqJBzml7BVbLXQfmgHoN9r2gp26KYjIgwAfDE+p6n9SQbBuwKkRLxnXfbVVd0DtkPHvz8PaLKxVt1LsLPjHneflYyrUqHlZqeDJ0F5GOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r5AVFodt; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZjtIzVUq7++5hlAon9QEFV4zFfpzToFyVs/B/Uz4KzJjZUF0eiJ3NmdEZg/sX40kcw4XcOB7c6Sw0CGNN2HI9v+1T6ekumGrmV/edsS9VafVjYqyp10YT5q9u0W/eKqRIbllni7gxp6gfWxqerl3qmFkmzhaobP74UATgBhvXTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Npzdjz3X; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r5AVFodt"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490bd64ca95so197065e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 08 Jun 2026 07:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780928548; x=1781533348; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NMlTDtSQVCRaIScLdU5LnPoxCDDHCuJqXKf3DYv7eY4=;
-        b=r5AVFodtv5ftAJNe76daZ8FE2VgPvg7VIaQeyotZKN/jbazwQACpSfh1GARfZ2s5C8
-         f3Y9Va/BHBvg+A7LgJpvBrmdUE38Xss98l+fEkv8qw04JxdJaHBHjS1QMD8e+ZcceJ/y
-         J1hkBwWfyumWYUTcZqmX81Y23rXoLEDpDeEDEiwC95YiFjcEElulTGe8rCaWU9KtEPqw
-         GAJWDtaRN21GAHO/XYMo3hx5AssVSRrTAUu8o4AQ5/+W59udYhe3H5Wxoe5IfIQT/jD1
-         GhQQ91iWgmh1QxksjpJXx8jcuYEzX/NuC1LAC31cw8lxSo05Y384E6oAs8Xu+oMk6ZLA
-         q6eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780928548; x=1781533348;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NMlTDtSQVCRaIScLdU5LnPoxCDDHCuJqXKf3DYv7eY4=;
-        b=TC5sLUiNXNZBYHhiiiWku6kpp5hVPniewU88wwFvtScX/tSUFApkFKoPyfgpBU/pVf
-         IvsitKTiOuBH+RlQH+9sp/NUzN/WROLFskX0yN4TlNUd73zbwCNTmiAwzj2Zdouw3nIr
-         vWt4saB2NM0QBmIxBQGTnf6A495igavpovRV3P/XMclIJzYbjcjqHXbTCyzlaqYEHpfI
-         9U282nt02CdgQOLjLQiDLJ1mNN4sc3zHPbul9OrCrVyspt75KMW6680aAxwXZ1vfMgIE
-         wyVPcSF3vWgBVVaR89QDvetlMxRrTlZ8aXr5NoKkIlPvRze/gIbDUQUcKAsIzFEBPqlY
-         Voxg==
-X-Forwarded-Encrypted: i=1; AFNElJ/d3Zti5wVPaPVzzMlib425SLh+b4SQvAr/YYElL8PKs16uPMfDAnNqRt8yzWw/2eL2DRA64us=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVHIM/QyQ05z1gaUkziCxCoNDrjgvqxMX9fU7Js6DhmJ/RY9Tb
-	p69G9f9LwkwAmHazWJyZYWm7JL7EIsdTucGRlKVrp6FuWVCoN6WEl/0XZ9HU9Tcfrw==
-X-Gm-Gg: Acq92OG/i5b2fnhnCldG7mBPwK9Bqhkp/HneOYD4BwliEEuMIIxx+d9l2+s8w48mpKv
-	HstUTpvR8Fj5tJUyhECceHRWgdUfCqz2FwbZfxUDEh0clptoGhZAdpVIdcT7eYpwrN+oIJzNkKZ
-	eebIzfOywNyFiSm7/N9cNNHpDy2iI0ovF+MuQjsrRy/pkDAVLD8iGVm80iYLkOBR9ZHh0YMRGXF
-	xC8r6ksyPk3lFDERD/v8TILUdrAzuWrkUHqIkP5eCP3yMjIimI/0Sk3vKhUqvcZB/OIJxanQco6
-	Bfs2DCLqW91pxTDjaDzVcXBFyaK3VNHrz+QVtrYRJPPFuH0/76RqCkHh3j1PykQ33699hAgR8mD
-	dIydsTrhzIICiuJh+/EDDszoYiW/TsfIks/TKZYAi1pqMBiRZtXE8QXpQZEb8viFdRU9a1yM9G9
-	I5h9XeEnwO/WvrXxw7EG2KSgXJYnWsjotwnn50SooZW9QJEFLR6zhw9B8Uc7Q2fV6YexkYmjcBB
-	BWqqzTb
-X-Received: by 2002:a05:600c:3299:b0:490:c2b6:de6c with SMTP id 5b1f17b1804b1-490c2c96beemr2993835e9.13.1780928547315;
-        Mon, 08 Jun 2026 07:22:27 -0700 (PDT)
-Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f344541sm49486271f8f.22.2026.06.08.07.22.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 07:22:26 -0700 (PDT)
-Date: Mon, 8 Jun 2026 14:22:22 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Will Deacon <will@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Npzdjz3X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E18A81F00893;
+	Mon,  8 Jun 2026 14:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780929636;
+	bh=xlgzZtWkhSRLPN2fmw7RI5SY6ZXquR97nXbPnLUoA2U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Npzdjz3Xq1UzjuuVBBG0NnSMVk5McHRhfN4uwjquRiwdcccTnwLPPF/7OYZTyDDz+
+	 chk63GUPEjLI0kgRcnnTnn/bLRc9Ca7x4iwTsyb4E77a7C+E47YPzMkn1x74axwQYQ
+	 jqkKBdGSkI3L9wcDkcvBLQXQ0gJH91RmSokyUPvKS7ztUjpXb7pRZVvs1ZZd4yw8yr
+	 4e64YhLCIAUB3aMxBccNLLD/Ufe0FptHj3Ti5/hS3Q8xKVpLgs/H4SsOT0Ym8FJQu6
+	 8UG8tI4ayI+HCSbG8lC9aew6k71VGwP3h7BHG457NDGBIkcPlcusrIqIj1KF7oa2Q4
+	 bdHSaQ2aZKIdg==
+Date: Mon, 8 Jun 2026 15:40:30 +0100
+From: Will Deacon <will@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, catalin.marinas@arm.com,
 	oupton@kernel.org, joey.gouly@arm.com, korneld@google.com,
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -69,7 +37,7 @@ Cc: Marc Zyngier <maz@kernel.org>, catalin.marinas@arm.com,
 	suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com,
 	Sudeep Holla <sudeep.holla@kernel.org>
 Subject: Re: [PATCH] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
-Message-ID: <aibQHiYimPP1ylk3@google.com>
+Message-ID: <aibUXmzfDsVWcZjY@willie-the-truck>
 References: <20260501114447.2389222-2-sebastianene@google.com>
  <86wlxgy00t.wl-maz@kernel.org>
  <afxuDpecPCVA56cL@google.com>
@@ -78,6 +46,7 @@ References: <20260501114447.2389222-2-sebastianene@google.com>
  <86qznnxptx.wl-maz@kernel.org>
  <af3fW468-f1KXCrC@google.com>
  <ahmxiFXXTupafbXw@willie-the-truck>
+ <aibQHiYimPP1ylk3@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,46 +55,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ahmxiFXXTupafbXw@willie-the-truck>
+In-Reply-To: <aibQHiYimPP1ylk3@google.com>
 
-On Fri, May 29, 2026 at 04:32:24PM +0100, Will Deacon wrote:
-> On Fri, May 08, 2026 at 01:04:27PM +0000, Sebastian Ene wrote:
-> > While at it I discovered that none of the FF-A calls in the proxy
-> > currently check for these SBZ registers. Would you be ok with a diff that
-> > fixes this before the patch with the notifications ?
+Hey Seb,
 
-Hi Will,
+On Mon, Jun 08, 2026 at 02:22:22PM +0000, Sebastian Ene wrote:
+> On Fri, May 29, 2026 at 04:32:24PM +0100, Will Deacon wrote:
+> > I'd probably structure it as a separate patch per call, tbh. That way,
+> > the commit message can talk about the specific fields that are reserved
+> > for a given call. See below.
+> > 
+> > > Refactor the handling logic in pKVM FF-A proxy to support checking for
+> > > SBZ/MBZ values. While at it, drop the do_ffa_mem_xfer macro and replace
+> > > it with two functions that make it clear that we re-write the
+> > > function-id with a 64-bit variant, to keep the same behavior as before.
+> > > Keep each handler in an array of structures together with a mask that
+> > > corresponds to the SBZ registers the spec expects.
+> > 
+> > Although I agree that we should be enforcing SBZ/MBZ paramaters (because
+> > we have no idea what they might do in future versions of the spec), I
+> > also think that doing this at the register level is too coarse.
+> > 
+> > For example, the VM ID parameter to FFA_NOTIFICATION_BITMAP_CREATE has bits
+> > 31:16 as MBZ. So I think we probably need to do the checking on a
+> > per-function basis, like Per is doing in his series:
+> > 
+> > https://lore.kernel.org/r/20260501-host-direct-messages-v6-0-3f4af727ed85@google.com
+> > 
+> 
+> For the newly added calls like FFA_NOTIFICATION_* we can do that in a
+> separate functions, but what about the other existing calls that have
+> MBZ registers ? that was the reason for the inline proposal in :
+> https://lore.kernel.org/all/af3fW468-f1KXCrC@google.com/
+> (to avoid duplicate checks).
 
-> 
-> I'd probably structure it as a separate patch per call, tbh. That way,
-> the commit message can talk about the specific fields that are reserved
-> for a given call. See below.
-> 
-> > Refactor the handling logic in pKVM FF-A proxy to support checking for
-> > SBZ/MBZ values. While at it, drop the do_ffa_mem_xfer macro and replace
-> > it with two functions that make it clear that we re-write the
-> > function-id with a 64-bit variant, to keep the same behavior as before.
-> > Keep each handler in an array of structures together with a mask that
-> > corresponds to the SBZ registers the spec expects.
-> 
-> Although I agree that we should be enforcing SBZ/MBZ paramaters (because
-> we have no idea what they might do in future versions of the spec), I
-> also think that doing this at the register level is too coarse.
-> 
-> For example, the VM ID parameter to FFA_NOTIFICATION_BITMAP_CREATE has bits
-> 31:16 as MBZ. So I think we probably need to do the checking on a
-> per-function basis, like Per is doing in his series:
-> 
-> https://lore.kernel.org/r/20260501-host-direct-messages-v6-0-3f4af727ed85@google.com
-> 
+For unused parameter registers that are SBZ, I think you could just add
+a helper, e.g.:
 
-For the newly added calls like FFA_NOTIFICATION_* we can do that in a
-separate functions, but what about the other existing calls that have
-MBZ registers ? that was the reason for the inline proposal in :
-https://lore.kernel.org/all/af3fW468-f1KXCrC@google.com/
-(to avoid duplicate checks).
+	ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int reg);
 
-> Will
+which takes the index of the first unused register and then checks that
+all the registers from there to the last unused parameter register are
+zero. You can then just call that directly before you start parsing the
+SBZ/MBZ fields on the used parameter registers and there's no need for
+the table-based indirection in [1].
 
-Thanks,
-Sebastian
+Will
+
+[1] https://lore.kernel.org/all/af3fW468-f1KXCrC@google.com/
