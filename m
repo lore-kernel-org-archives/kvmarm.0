@@ -1,106 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73443EF649
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 15:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E093D9DD9;
+	Mon,  8 Jun 2026 15:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780932192; cv=none; b=sW4qaco3gyZP7OvlQW4e8wiSnFV4YVTfz8pAw+XDdwvEf3PHAv5Rc3G5tg/ZJPeOphNM0gg47BILdqPx7BS+5Y714nzZNiky192wLiDSl6peDuxs7q5LpUq0xwhCvxzPA3Dvtl9VcuHQNSD0xZET9cqVkpeTlihIL+yy8AMivD4=
+	t=1780932529; cv=none; b=CwxJulK7kH3oo90x/PItxEwSuKbWrKMEr1+qtcK2+MOdIvl/tHgNZtZT7QaVzqoo2ddVZoFfu9rkJAAFl0hBzVkmSHTz1Z+apP/zNbSvpHGhbIvIBr9TxxPlJAxVReKzAVd/SvaCojOUQNw0fVh8YeW8uLT5nY2CJfGC/utoN2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780932192; c=relaxed/simple;
-	bh=U1QnQ8FNiiJRG5/VviIte+UekKuf/B5wCMRztBquyPY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=cwxFkegzizl8lUnsnfAs8VWg59UYSU+/gQHpoGZxTwQYBoz8MQ2nEDigM6gzbSWiA7mEmxvvNZKXCxXEfepzHT4F3SlEE3Mnm/KYzQ73zCfCVdgtagGjoRvGaPo9DUspo9JVNedRAGD2k6u8OjuXAkizNdQSCDX0TBp7rG94ZWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jHAcC9N/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1780932529; c=relaxed/simple;
+	bh=BYNpDnA/rLNB4DFtvpxo3rixLpZtLcno2qtEUdBWlTs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oZkzqdP5gDoLxXnxjPv0y3sadxrgw1MxKZQVb1Nw6Pcj/Eptk7rYTqp6CwVdcNX15m1CbNCVj/p3NvbqGKpw9PbSeEJPgQx8OY25x2qLxLCUKtkpol/eZEFpJuHpLCOn4LOXMdjLCpLLeGOyZ+Xn6O3KR3Tyc6XhrLvMP9EROXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EcUMvxka; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jHAcC9N/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E50321BF3;
-	Mon,  8 Jun 2026 08:23:04 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B5713F86F;
-	Mon,  8 Jun 2026 08:23:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780932189; bh=U1QnQ8FNiiJRG5/VviIte+UekKuf/B5wCMRztBquyPY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jHAcC9N/vOvn59nMvvqwoenkkcnDUrGPzUeSKiRxTczMxoZGZ4LPRzy4sRP6mrK2A
-	 y0Xja/AGpGl0iBvGgDBhIeSeUI46dVszHRenwY4R41VmPuuDN/C9Ps40fA1gcFOhrv
-	 OQHauRT+9IRJiV9DuCoXEiQKXaR+brjzZL/ZLbe4=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EcUMvxka"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99C41F00893;
+	Mon,  8 Jun 2026 15:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780932528;
+	bh=hctmouS3Oa1zQsA8OfIPu6NlW/Bf5FQLselaT1XAaWQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=EcUMvxkaY4O1FldyBxtKNcGT+VLsCmOxbm/MZRJi8k+ial78uBS0B/bUb2NQ5mfxi
+	 ig/f5pjIoH+IFyCDnRLQ0Ay6cN5MKXi/wjrvlrtepUgJCuKrLykz3TU/tgBtOYuLyR
+	 ERJcdef+ZONjKIkCoLbpU+TeW5rgl9lTYW8a75cqGPSOpMmgccdFZaMGPdmh7U+WkB
+	 6vE6vhRDGeNRWu6Q/ggXbnIUW3vF8l+HH2M2gj2TTqN20ZRqT6mDQwQVWUpo5yrufO
+	 nHoVr46xRmSkI+UQgMBCpb514MDG1oSg2ROx7eIuBKn7RkKS0AaSPAN0L48uO/13lD
+	 dXXkT7RTZiEgg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wWbu9-0000000AYTW-3ofg;
+	Mon, 08 Jun 2026 15:28:46 +0000
+Date: Mon, 08 Jun 2026 16:28:45 +0100
+Message-ID: <86o6hlt5jm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jia He <justin.he@arm.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Remove superfluous aligning of gfn for dirty logging
-Date: Mon,  8 Jun 2026 16:23:05 +0100
-Message-ID: <aibeWQY48zEsjqOt@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260605153248.2412064-3-weilin.chang@arm.com>
-References: <20260605153248.2412064-1-weilin.chang@arm.com> <20260605153248.2412064-3-weilin.chang@arm.com>
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] KVM: arm64: Make kvm_s2_fault_pin_pfn() fault-in interruptible
+In-Reply-To: <20260608104336.2405384-2-justin.he@arm.com>
+References: <20260608104336.2405384-1-justin.he@arm.com>
+	<20260608104336.2405384-2-justin.he@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: justin.he@arm.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 05, 2026 at 04:32:48PM +0100, Wei-Lin Chang wrote:
-> Stage-2 mapping size is forced to PAGE_SIZE when dirty logging is
-> enabled for a memslot, therefore we don't need to align it down to
-> a possibly larger vma size or THP adjusted size, they won't happen.
+On Mon, 08 Jun 2026 11:43:36 +0100,
+Jia He <justin.he@arm.com> wrote:
 > 
+> arm64 KVM faults guest memory into the host in kvm_s2_fault_pin_pfn() via
+> __kvm_faultin_pfn(). Today this request is made non-interruptible, so if
+> the host fault-in path blocks for a long time, a vCPU thread that already
+> has a pending signal cannot leave the fault-in path until GUP eventually
+> completes.
+> 
+> This is particularly painful during VM teardown, where userspace may
+> signal vCPU threads while they are blocked faulting in guest memory. In
+> that case there is no benefit in continuing to wait for the fault to
+> complete; the vCPU should return to userspace and let the pending signal
+> be handled.
+> 
+> Ask the generic KVM fault-in helper to use FOLL_INTERRUPTIBLE. When GUP
+> reports a pending signal it returns KVM_PFN_ERR_SIGPENDING; handle it by
+> calling kvm_handle_signal_exit() and returning -EINTR. This matches the
+> behaviour expected by the generic KVM fault-in path and mirrors the
+> signal-exit handling already done by the arm64 run loop, which sets
+> run->exit_reason = KVM_EXIT_INTR before returning to userspace. It is
+> also consistent with architectures such as x86 that already allow the
+> fault-in to be interrupted by pending signals.
 
-IIRC there was some effort being made in terms of tracking in LEVEL2 block 
-granularity instead of LEVEL3 (PAGE_SIZE). It makes sense as some platforms 
-can have very fast networking so setup time is more relevant than actual 
-sending time.
+Only x86, AFAICT. s390 handles signals, but doesn't set GUP as
+interruptible.
 
-Would not making this change affect such effort?
+> 
+> The interrupted fault does not install a partial stage-2 mapping: the
+> -EINTR is returned before any mapping is created, so the fault is simply
+> retried on a subsequent vCPU entry once userspace re-enters KVM_RUN. The
+> only observable effect in the absence of a pending signal is none; this
 
-Thanks!
-Leo
+This sentence reads bizarrely. Do you mean to say "there is no
+observable effect in the absence of a pending signal"?
 
-
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> does not make ordinary stage-2 faults abortable.
+> 
+> Signed-off-by: Jia He <justin.he@arm.com>
 > ---
->  arch/arm64/kvm/mmu.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/mmu.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 06c46124d3e7..d1f6ff7c2943 100644
+> index 4da9281312eb..dfb779e6d792 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -2050,13 +2050,12 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+> @@ -1872,19 +1872,27 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
+>  				struct kvm_s2_fault_vma_info *s2vi)
+>  {
+>  	int ret;
+> +	unsigned int flags = FOLL_INTERRUPTIBLE;
 >  
->  	/*
->  	 * Mark the page dirty only if the fault is handled successfully,
-> -	 * making sure we adjust the canonical IPA if the mapping size has
-> -	 * been updated (via a THP upgrade, for example).
-> +	 * mapping size is forced to PAGE_SIZE if dirty logging is enabled,
-> +	 * so we don't have to adjust the canonical IPA here.
->  	 */
->  	if (writable && !ret) {
-> -		phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
-> -		ipa &= ~(mapping_size - 1);
-> -		mark_page_dirty_in_slot(kvm, s2fd->memslot, gpa_to_gfn(ipa));
-> +		gfn_t canonical_gfn = get_canonical_gfn(s2fd, s2vi);
-> +		mark_page_dirty_in_slot(kvm, s2fd->memslot, canonical_gfn);
+>  	ret = kvm_s2_fault_get_vma_info(s2fd, s2vi);
+>  	if (ret)
+>  		return ret;
+>  
+> +	if (kvm_is_write_fault(s2fd->vcpu))
+> +		flags |= FOLL_WRITE;
+> +
+
+nit: you might as well keep the assignment and the update together.
+
+>  	s2vi->pfn = __kvm_faultin_pfn(s2fd->memslot, get_canonical_gfn(s2fd, s2vi),
+> -				      kvm_is_write_fault(s2fd->vcpu) ? FOLL_WRITE : 0,
+> +				      flags,
+>  				      &s2vi->map_writable, &s2vi->page);
+>  	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
+>  		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
+>  			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
+>  			return 0;
+>  		}
+> +		if (is_sigpending_pfn(s2vi->pfn)) {
+> +			kvm_handle_signal_exit(s2fd->vcpu);
+> +			return -EINTR;
+> +		}
+>  		return -EFAULT;
 >  	}
 >  
->  	if (ret != -EAGAIN)
-> -- 
-> 2.43.0
-> 
+
+The VNCR handling code also uses __kvm_faultin_pfn(). Why isn't it
+similarly updated, given that you are specifically singling out NV as
+an area of concern?
+
+Similarly. pkvm_mem_abort() is using FOLL* flags and could benefit
+from the same optimisation.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
