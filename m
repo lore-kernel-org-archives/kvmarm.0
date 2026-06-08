@@ -1,14 +1,14 @@
 Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816D53D88EF;
-	Mon,  8 Jun 2026 14:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9BF3F1658;
+	Mon,  8 Jun 2026 14:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780929804; cv=none; b=rah5kBimVVGO3v6P/I+nZTwwGSoSpcwaMmD807C33B7rsFzjA9asHu/kh70/kHe2F9UZVbLs9pxDwg0rJv4yh1hv80JpHZrJbBgSsvFkcJ13l0VOtuWnyGKgi/NitvRHc6qvoyL9rPbpGgyWu12KBNHypaCJG7QhwMSBHGnFKVw=
+	t=1780929804; cv=none; b=ntkudaeLZ7oQp7Cvqqo+CWe8tVSVdCJl7rlR0fIAcNv+qIOXFl0CdABdxJ3uE69WDQxnl4zzu48TkFEVY2XjOuyIuARBF+Cigho+zxNp4tSIC4Jogq8gt4xaqlyDHhZ80MokRTs+vkaer5oNS/NSbE6DO6xWJ1eK/piCMsuwNf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780929804; c=relaxed/simple;
-	bh=4ORi4B4afWlRXij5S4yTmEvVrbaYG/uVZorjzk7jihg=;
+	bh=PjYlTb8535WHEQCogDEat0FpfhhlZazoOBVSUD5mpK4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D/GqUCdbYSq3slW7I4z1Pw1dOvS8g3hOybd6YSAkO6Libe73IjkSZAGrecg/R+rHOtqNuwod/7KlUvSfJAnF6y158UBXATzyaK/aqQn59dc2tT9DBOZIDQ7WbJ/8SUyNTvG85iZBetv4YxBVml5A+vM5QLcNrLXhk3MVcs2HDMo=
+	 MIME-Version; b=kS8iu3d0ysAWPNee10VK1RNhd/LzoTH+wpdECX5fOvvNR66GXikXc6POLewLNil+pqllWUZR8rG1k4SBrF3GYhFvj1zR1BIMQ94nlR+CUJxQCrBdr4kcm63ARkUMj3lbQAf03e4MNb9T+JyE3DtFF+IZaN8vIp+oPnlJWL2Z4kM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; arc=none smtp.client-ip=85.214.250.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
@@ -16,8 +16,8 @@ Received: from io.home.8bytes.org (p4ffe1d30.dip0.t-ipconnect.de [79.254.29.48])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id 579A02028AE;
-	Mon,  8 Jun 2026 16:43:07 +0200 (CEST)
+	by mail.8bytes.org (Postfix) with ESMTPSA id 9C7712028BD;
+	Mon,  8 Jun 2026 16:43:10 +0200 (CEST)
 From: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
@@ -37,11 +37,10 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>,
 	kvm-riscv@lists.infradead.org,
 	x86@kernel.org,
 	coconut-svsm@lists.linux.dev,
-	joerg.roedel@amd.com,
-	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
-Subject: [PATCH 11/60] kvm: Introduce struct kvm_vcpu_common
-Date: Mon,  8 Jun 2026 16:42:03 +0200
-Message-ID: <20260608144252.351443-12-joro@8bytes.org>
+	joerg.roedel@amd.com
+Subject: [PATCH 26/60] kvm: Introduce arch-specific plane state
+Date: Mon,  8 Jun 2026 16:42:18 +0200
+Message-ID: <20260608144252.351443-27-joro@8bytes.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260608144252.351443-1-joro@8bytes.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -51,138 +50,240 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Joerg Roedel <joerg.roedel@amd.com>
 
-When creating one VCPU object per plane there is still a lot of VCPU
-state which needes to be shared across all planes. Create struct
-kvm_vcpu_common as a container for this shared state.
+Introduce struct kvm_arch_plane which is per architecture and will be
+used to store architecture-specific per-plane state.
 
-Co-developed-by: Carlos López <clopez@suse.de>
 Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
 ---
- include/linux/kvm_host.h | 10 ++++++++++
- virt/kvm/kvm_main.c      | 36 ++++++++++++++++++++++++++++++++++--
- 2 files changed, 44 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h     | 12 ++++++++++++
+ arch/loongarch/include/asm/kvm_host.h | 12 ++++++++++++
+ arch/mips/include/asm/kvm_host.h      | 12 ++++++++++++
+ arch/powerpc/include/asm/kvm_host.h   | 12 ++++++++++++
+ arch/riscv/include/asm/kvm_host.h     | 12 ++++++++++++
+ arch/s390/include/asm/kvm_host.h      | 12 ++++++++++++
+ arch/x86/include/asm/kvm_host.h       | 12 ++++++++++++
+ include/linux/kvm_host.h              |  2 ++
+ include/linux/kvm_types.h             |  1 +
+ virt/kvm/kvm_main.c                   |  9 +++++++++
+ 10 files changed, 96 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 5a72f73a2f31..c4c4922df965 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -322,6 +322,13 @@ struct kvm_mmio_fragment {
- 	unsigned int len;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 32dc484781f0..e9cca2adb371 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -306,6 +306,18 @@ enum fgt_group_id {
+ 	__NR_FGT_GROUP_IDS__
  };
  
-+struct kvm_vcpu_common {
-+	struct kvm *kvm;
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
 +
-+	/* Currently active VCPU */
-+	struct kvm_vcpu *current_vcpu;
-+};
-+
- struct kvm_vcpu {
- 	struct kvm *kvm;
- 	struct kvm_plane *plane;
-@@ -400,6 +407,9 @@ struct kvm_vcpu {
- 	 */
- 	struct kvm_memory_slot *last_used_slot;
- 	u64 last_used_slot_gen;
-+
-+	struct kvm_vcpu_common *common;
-+	unsigned plane_level;
- };
- 
- /*
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 668645dd3945..fb840d029c56 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -438,6 +438,20 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
- }
- #endif
- 
-+static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm)
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
 +{
-+	struct kvm_vcpu_common *common = kzalloc(sizeof(*common), GFP_KERNEL_ACCOUNT);
-+
-+	if (common == NULL)
-+		return -ENOMEM;
-+
-+	common->kvm = kvm;
-+	common->current_vcpu = vcpu;
-+	vcpu->common = common;
-+
 +	return 0;
 +}
 +
- static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- {
- 	mutex_init(&vcpu->mutex);
-@@ -459,14 +473,26 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
- 	vcpu->last_used_slot = NULL;
- 
-+	vcpu->plane_level = 0;
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
 +
- 	/* Fill the stats id string for the vcpu */
- 	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
- 		 task_pid_nr(current), id);
- }
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
  
-+static void kvm_vcpu_common_destroy(struct kvm_vcpu *vcpu)
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index 776bc487a705..225aa87ebbdd 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -116,6 +116,18 @@ struct kvm_phyid_map {
+ 	struct kvm_phyid_info phys_map[KVM_MAX_PHYID];
+ };
+ 
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
++
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
 +{
-+	if (vcpu->plane_level == 0)
-+		kfree(vcpu->common);
-+
-+	vcpu->common = NULL;
++	return 0;
 +}
 +
- static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
- 	kvm_arch_vcpu_destroy(vcpu);
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
 +
-+	kvm_vcpu_common_destroy(vcpu);
- 	kvm_dirty_ring_free(&vcpu->dirty_ring);
- 
- 	/*
-@@ -1360,8 +1386,8 @@ static void kvm_destroy_vm(struct kvm *kvm)
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
- 	xa_destroy(&kvm->mem_attr_array);
+ struct kvm_arch {
+ 	/* Guest physical mm */
+ 	kvm_pte_t *pgd;
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index c14b10821817..b01911eb9064 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -172,6 +172,18 @@ struct loongson_kvm_ipi {
+ };
  #endif
--	kvm_arch_free_vm(kvm);
- 	kvm_destroy_planes(kvm);
-+	kvm_arch_free_vm(kvm);
- 	preempt_notifier_dec();
- 	kvm_disable_virtualization();
- 	mmdrop(mm);
-@@ -4246,11 +4272,15 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 		goto vcpu_decrement;
- 	}
  
-+	r = kvm_vcpu_init_common(vcpu, kvm);
-+	if (r)
-+		goto vcpu_free;
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
 +
- 	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
- 	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
- 	if (!page) {
- 		r = -ENOMEM;
--		goto vcpu_free;
-+		goto vcpu_free_common;
- 	}
- 	vcpu->run = page_address(page);
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
++{
++	return 0;
++}
++
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
++
+ struct kvm_arch {
+ 	/* Guest physical mm */
+ 	struct mm_struct gpa_mm;
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 2d139c807577..c5b9fbaf34f3 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -269,6 +269,18 @@ struct kvm_hpt_info {
  
-@@ -4318,6 +4348,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 	kvm_arch_vcpu_destroy(vcpu);
- vcpu_free_run_page:
- 	free_page((unsigned long)vcpu->run);
-+vcpu_free_common:
-+	kvm_vcpu_common_destroy(vcpu);
- vcpu_free:
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- vcpu_decrement:
+ struct kvm_resize_hpt;
+ 
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
++
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
++{
++	return 0;
++}
++
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
++
+ /* Flag values for kvm_arch.secure_guest */
+ #define KVMPPC_SECURE_INIT_START 0x1 /* H_SVM_INIT_START has been called */
+ #define KVMPPC_SECURE_INIT_DONE  0x2 /* H_SVM_INIT_DONE completed */
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 75b0a951c1bc..bcbf487d4cb7 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -76,6 +76,18 @@ struct kvm_vcpu_stat {
+ struct kvm_arch_memory_slot {
+ };
+ 
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
++
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
++{
++	return 0;
++}
++
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
++
+ struct kvm_arch {
+ 	/* G-stage vmid */
+ 	struct kvm_vmid vmid;
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 8a4f4a39f7a2..bb3bfbfd35d8 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -638,6 +638,18 @@ struct kvm_s390_pv {
+ 
+ struct kvm_s390_mmu_cache;
+ 
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
++
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
++{
++	return 0;
++}
++
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
++
+ struct kvm_arch {
+ 	struct esca_block *sca;
+ 	debug_info_t *dbf;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 43c92f0ada1e..dd95c70bfdba 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1412,6 +1412,18 @@ enum kvm_mmu_type {
+ 	KVM_NR_MMU_TYPES,
+ };
+ 
++/* Per-plane state of VM */
++struct kvm_arch_plane {};
++
++static inline int kvm_arch_plane_init(struct kvm *kvm,
++				      struct kvm_plane *plane,
++				      unsigned plane_level)
++{
++	return 0;
++}
++
++static inline void kvm_arch_plane_destroy(struct kvm_plane *plane) {}
++
+ struct kvm_arch {
+ 	unsigned long n_used_mmu_pages;
+ 	unsigned long n_requested_mmu_pages;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7d06459a06f3..4a0eaa1de479 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -847,6 +847,8 @@ struct kvm_plane {
+ 
+ 	/* Per-Plane VCPU array */
+ 	struct xarray vcpu_array;
++
++	struct kvm_arch_plane arch;
+ };
+ 
+ struct kvm {
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index a568d8e6f4e8..07e82928c948 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -42,6 +42,7 @@ struct kvm_interrupt;
+ struct kvm_irq_routing_table;
+ struct kvm_memory_slot;
+ struct kvm_one_reg;
++struct kvm_plane;
+ struct kvm_run;
+ struct kvm_userspace_memory_region;
+ struct kvm_vcpu;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index f85ddb0fc781..91fb9abf9b31 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1211,13 +1211,22 @@ static struct kvm_plane *kvm_create_plane(struct kvm *kvm, unsigned plane_level)
+ 
+ 	xa_init(&plane->vcpu_array);
+ 
++	if (kvm_arch_plane_init(kvm, plane, plane_level))
++		goto out_free_plane;
++
+ 	kvm->planes[plane_level] = plane;
+ 
+ 	return plane;
++
++out_free_plane:
++	kfree(plane);
++
++	return NULL;
+ }
+ 
+ static void kvm_destroy_one_plane(struct kvm_plane *plane)
+ {
++	kvm_arch_plane_destroy(plane);
+ 	kfree(plane);
+ }
+ 
 -- 
 2.53.0
 
