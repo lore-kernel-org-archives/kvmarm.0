@@ -1,366 +1,142 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013055.outbound.protection.outlook.com [40.107.162.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B203C29E0FD;
-	Mon,  8 Jun 2026 12:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.55
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780923584; cv=fail; b=cXNFPjxFuuBPgnQGAb3bvxWNVtxTfliWk0QOHeKCLfKoIBvQiPmv7xqD/CoqEqqGz1ImLxNbz/tnFPu5Wx4GO2UesgMTVhh+u9ZI7QRBmf2o8Us6gFOGaIwCrOc5v439CW4fxpHoGbmHFMko9UYDob/GfzFMF4AjT0XfHCNJF68=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780923584; c=relaxed/simple;
-	bh=CB1yQ2WRBkfmmmSSlBgPeQN7ghfoOJYyffHp3gf5b4w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RfUJiIwkTVJcDXNvJEkc6GxxxNrTlnkcTxFiBLtOLPy8HccK9WTnfg991HwdiG/PfQHHDCYqqtoUtLLCdYQR/+hoBmsJjp8kvqux+1H5Nuc5QVKgwcopAfyzsm7bToijPxj8B2AaxzUdZWR64oeaDXlxu0b3BTe5/ubq/Do6JFM=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=oiCgokSY; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=oiCgokSY; arc=fail smtp.client-ip=40.107.162.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317B02DF6F6
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 13:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780924624; cv=pass; b=RRCqWEF4Nku0I5MR1MjorpPcY5jNwUQc4bO9H/rvSZl/0UCKD2g+IUeSNS7fIv/ZHJUelAFJfCCUi1zcbIgwTcnwXHdfhs2EhnmlwgqRww52CPX0a4ap22B/IaY2NoJ9SGnw4MndkUGjnKLN63L3NYVxt+foIWaxWWSPH7YCjOw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780924624; c=relaxed/simple;
+	bh=jpwc82heUpqMLlZQLmJN6guRG5C4um2+SNRKRsuOVas=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O5qet9EPxsphT13UUl4rODnwvJL7Ub4njWXv5T3mSytAgYb+toAGYfMJSgqwM4eWo2WlW8n/tP1rXQ8FpeB9zfi1+RhvOphUc82NWDrS06G/mRafepgRrgKpxmyJwYXpXISRSKKApaf+UrgmwFUbfx2ojGHYrsOBBSCM49e2m/Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RV1NFesR; arc=pass smtp.client-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="oiCgokSY";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="oiCgokSY"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=sixcleEOC/mSGn3iF38C29XEVB30KshOjw3I6J2e1PCeCL9pe4rWtrNC2Q9zmvFGAVOXN6KYs47dXuUJfM1GzctQCOlKMC5+mL4YCKAFrJ7oFNjWC0C/MkVa5KyxAwHGxlCzuoPUKNbvcnhJnvtn+X4F+LTik7zX/+izlM43mvxc9YDWv5SJCc4Va5K8PSi7ke0uoGkeuw5zQy2o/bqJsH56DlEsdO6cxNbBdPx9Ecbagck2Wz6RVyOpd2xJbN8XVqhETdJ8jTCZm9yUDMMo+vSy03gJm3gIkOG+phGWwPBlTzX1qXCpcQTKMdSy3/82gVnYZumkI7FObz79+DJJeA==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=czAJKt5uCbtoAWFp9bjWXOYPCLzG0qz/KM//Y5Q2Ius=;
- b=hIlP7Zuj8nFhLJ2Lsnw0ohYQXvoLupdG1JjNhVFw0wwUvzHRrUh6bLOZ5r93t5aAYZXDIcOHpioPfyzWY6JnoA5Pims1iHA6CVuSt5Xiv3ijCn/8oE2Qw6xUUQipzaseUtTazmx8/C9qKjn6rVHuR5mw/n6+c99OWwsPElJ4YC25BRaTC9IchkmgzyT/MNnqgKGRKSnIVmRjEOO3TXKIIkDaYiBhuiiRh+4RsnH99FxbIituDjIsM3+KexipkLaVSONX2ydF+xpuaza+vJu9KNpnSuV79OnZ+FY2awlgYWYF3tBvkzbErBVv+iqbi1GesCPEadao0PyFWjdmdj0BTQ==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=redhat.com smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=czAJKt5uCbtoAWFp9bjWXOYPCLzG0qz/KM//Y5Q2Ius=;
- b=oiCgokSYjt7zDI8E4cTKJszrrOmbWbEXRSovwEEmMflvyWqafB9QVef8cLsPdx2g32sjib24TyuYx0JjKMEr9tx1Me/YlHbQaGavfIyWDUB91hhkQFYlV+AFqd6cidQKQYp1LYxe+40Io5zFaykA7/AQDFhjSGlqqoWB7Esu3vw=
-Received: from AM9P193CA0016.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:21e::21)
- by PAWPR08MB11557.eurprd08.prod.outlook.com (2603:10a6:102:511::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.12; Mon, 8 Jun 2026
- 12:59:34 +0000
-Received: from AM4PEPF00027A6A.eurprd04.prod.outlook.com
- (2603:10a6:20b:21e:cafe::a0) by AM9P193CA0016.outlook.office365.com
- (2603:10a6:20b:21e::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.13 via Frontend Transport; Mon, 8
- Jun 2026 12:59:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM4PEPF00027A6A.mail.protection.outlook.com (10.167.16.88) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.7
- via Frontend Transport; Mon, 8 Jun 2026 12:59:34 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sOoUUT6r44gTEat1epLeojDqy5/AjMyZJMZtHNIHsVXHvtNMb8++9YFakAO3xgyYVRUeg6L7Xd8ScT9IVYywMAQYWvLhMiGnO/MyTv6YMeyacjcLl1XyW3qmWECxYyX8m8KwaT8/NncqdNK7HFOicPdEQfSM7R2B/CI7Zzx+f1h5Pv7MGZbFzcO8Pd0C6KOujg+FwOR70yERfJMIVNfBCrYxUzKhYgKPTsohkn/Ut8y8O4NUvJF0uLQil81zEqnuaPQrYbnuXziYzTWEoPSx17U+0Dv7TmsGTKhOGTgqJlxqHFS6fC+kKb/8iOElYLMrtOr/JQPGJLAX8MEnVEsnuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=czAJKt5uCbtoAWFp9bjWXOYPCLzG0qz/KM//Y5Q2Ius=;
- b=lCThMZZ9A0qHdhQbJHdKexok3HDYqXxlq5QSi7T0BWqac5QPMDB58ivyOQrYS/ubtJzDOA//DUQPsVbguYbz5Gi3t2O0OlHHw6r9QDKqXbwK+JDRXbkQcHAM8ylf+YXmoV1eTo97Gf/+vExyjkhrs4EcY49o9QaWfFi0yYBwpgl65DVrPshutTMfK2D+KprqCksGusmw6n0Uyq3B85HS8HEcmSCxjEj1y55BmnlEJkHOEiLfwFt0LYZ5ZSte9MSXC4UZ5BhbwnsptuNeBAtJPT4mngrnZu6tDHlWSAr7GJHf0V8LduW1M1m5ZEFpZajgmtnxx/hsuUh/ix5eHpSiQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=czAJKt5uCbtoAWFp9bjWXOYPCLzG0qz/KM//Y5Q2Ius=;
- b=oiCgokSYjt7zDI8E4cTKJszrrOmbWbEXRSovwEEmMflvyWqafB9QVef8cLsPdx2g32sjib24TyuYx0JjKMEr9tx1Me/YlHbQaGavfIyWDUB91hhkQFYlV+AFqd6cidQKQYp1LYxe+40Io5zFaykA7/AQDFhjSGlqqoWB7Esu3vw=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from PAWPR08MB10975.eurprd08.prod.outlook.com (2603:10a6:102:46e::7)
- by AS2PR08MB8830.eurprd08.prod.outlook.com (2603:10a6:20b:5f3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
- 12:58:24 +0000
-Received: from PAWPR08MB10975.eurprd08.prod.outlook.com
- ([fe80::3c7a:9a64:14bc:ce15]) by PAWPR08MB10975.eurprd08.prod.outlook.com
- ([fe80::3c7a:9a64:14bc:ce15%7]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
- 12:58:24 +0000
-Message-ID: <06bfebdf-5698-4a60-aade-2b74c796fca3@arm.com>
-Date: Mon, 8 Jun 2026 13:58:23 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 29/44] arm64: RMI: Runtime faulting of memory
-To: Steven Price <steven.price@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-30-steven.price@arm.com>
- <3359f788-07fa-41a1-9ac7-45c58577c1fa@redhat.com>
- <cecbd148-5d33-49c8-928f-572f71b3dd69@arm.com>
- <21abf014-a68c-49b6-a113-4ec59c520a30@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <21abf014-a68c-49b6-a113-4ec59c520a30@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PA7P264CA0025.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:2df::12) To PAWPR08MB10975.eurprd08.prod.outlook.com
- (2603:10a6:102:46e::7)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RV1NFesR"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-43d133d9a28so1560988fac.2
+        for <kvmarm@lists.linux.dev>; Mon, 08 Jun 2026 06:17:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780924621; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lLDJr0o2dkbRIhZOv4BB0geb81R+K3TA2/anj6aXnfxEfVcOcxhjYpcCrgMFya5ZZ+
+         nQ70dFT2+xQi2ShMPnRD2eTMmYhXyxjET1VNPfvVoZhFyqlLPcSYGXwBSZHQOmMclxCJ
+         ZAxU1Ibf0mwg4j5Gtx5Ey9tLpLZJTUM7aSJST/v4pZb3QXAr7b0ZhvbzQzHJ1rkVfjX2
+         huXwSshERSmKlSKrBbiuMgy3M5/G42pTHZ4abu3cF1VgtPNd4QpI82iO7x1LkTRC5bdr
+         kZ93dT255w9KxN+I4M3syUHDo9lFGo+8yG/dij1EyLnpBHyqMIaqZ7Zvr3OpvWSLl3Kz
+         DWIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=AfDmQD3XkqnhyOK6L1IuRTH5e227SPMKiBMcBej6ec8=;
+        fh=5bqSHc//dKcxsdaSG21SJ0HLJRS4atoQaQX+Gx3/2ZY=;
+        b=dccuCrm3UtFIShAv0GwfGfLacPDlmRFs1PNK4RPKqYUQiWC+BsgOeDFdXgY2/XglTJ
+         FindbErLF+1A0Byf7SbKbajS3EIsJSlk4pkEB5WwukGW/CdohbkQ80Bc5Ro53NkEYH+b
+         VtJvZYpsNtD5g4fm3FHfheLPrQTxqAcxs6eBJ5btxNYtUq4JpzpVKddh26axBzmPzkWM
+         fFyfcDC4R3EYXXZjZMMSJinppGEW0NEbGlcyfH0xhAUE9nN1tEPi6+I83budOXTdEbHn
+         ETLL5iSx4dRVRwSIcTQHsZyjljVh95kqcX7e8xwzYNjiyqAz9wTIdk/V0Q7X2R3k8iYP
+         PvmQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1780924621; x=1781529421; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AfDmQD3XkqnhyOK6L1IuRTH5e227SPMKiBMcBej6ec8=;
+        b=RV1NFesR/dg9WRSHTV5OKMgy5a8h1ylZ5/ZZv/Vpp04ucFZY5hoIvOoRIvjwp3wtMm
+         8pabswnLZOiL82Tl2pep+JwvotI8ffuVccMl1jVkjl882RJl+Kop4i9+UJ5OH7QnjupW
+         /ubAt7VjDFC6YYVTCd0mqlWDTgKCDHE9aIvGjhFhwL+wMlNfPv+Oz1rXG/R84V/mKhwp
+         /gAiahcBC8zlvZ9Jgo5/H8juW/HmnecfrSRNJ47JXQl4ifwecrKOz7/63cpGz+IJf3/x
+         0YkSxONkL/8qQ6inPRAX8ppqRmKRx0F3S6muokca/LFb66Gwtlti+xGWlDvRBHqSUJuv
+         +wuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780924621; x=1781529421;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AfDmQD3XkqnhyOK6L1IuRTH5e227SPMKiBMcBej6ec8=;
+        b=fWwAFerE57n44miWOb5QMiUULgOUn0+bHTwRZYzdS7JEp/ijfvUf/wHAzAMKT+pL3b
+         yzdIcbYTreR8YxM2ifW/bXQDv35pdHXApL4DNgozvngCMDA/ZxyEJo1JYqyB8UKkUMR6
+         zeeLCiLTrQMSJ+t7gk9Riw2mwiTb6jDh5qoSFaMW+RhsGHWldBlvQc+L3/YGwuptlHAd
+         fP+XyK5+mNDdCH1YcGUa2ImlSEECrlB0yK8OPKy3Z5vf6AgZsVFYpKIE0WYaO4hFgbqH
+         Kiw5ZiXqz4ISW1ZDbXY/46XX80avHZKH97WD5UzgPNemc10hmLYmFA8UUmB9LRRnITmp
+         TRNA==
+X-Forwarded-Encrypted: i=1; AFNElJ+YL+v7aO/TzCTWouvrkjw89r3vni1cnmAClZ7f44WT3CyMzBYMcNQBHpg8blR2dAT8l6UItSw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwEjd5mLQZZ39dcmSu6r0Sc4Kfpo1/VazeO8hr3zq/FVKsU3YHC
+	HBbyppIfNVqEBilT2m5W8NEyNSDtXhUBxb/elC7e5NYeoyWl1oE8/lPS0N0bVYt4y6ZFYSPU0vr
+	P9J4HsbtNi5pi6ytDxXuSefAiuS67f4IkKAYuONeEpg==
+X-Gm-Gg: Acq92OG7ilkwUmDWL0dGD4EGIWapclo80ZrCyA8TtJJkZ9BsmiO6n/RINjyuGvuqoRQ
+	Wt2CRNBDIQVfYEo97GssPcg/dcmASNFl8cjwjHP8oz2ARu+RWTl5PQ0UHRPPTJ/XJ71+XxGIw7v
+	/lDRY++GAkOsvxAd1tCmRwjFcC0jNvvcH1ORU7EGA2svFoETyRQf6UlRjLM4edNFjBva5pZCCD+
+	XdDpPQ9uj8F7k4BOTMwI+R6cOfhUoZc3mp9+TL5+26FG4sHtDpmw9I8CD+DGNQ1HJXTaPw9Iwhp
+	8DwaijhXcwwRA1+EPLYZnM3BFbxYuOyDxU9bstXhQGI8Heey
+X-Received: by 2002:a05:687c:2346:20b0:441:b0ff:132a with SMTP id
+ 586e51a60fabf-441b0ff148fmr1273772fac.18.1780924620975; Mon, 08 Jun 2026
+ 06:17:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAWPR08MB10975:EE_|AS2PR08MB8830:EE_|AM4PEPF00027A6A:EE_|PAWPR08MB11557:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96c64cce-8234-40fe-aafa-08dec55dca3e
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|6133799003|22082099003|18002099003|56012099006|11063799006|4143699003;
-X-Microsoft-Antispam-Message-Info-Original:
- Zl8biRku4jfh7ac5PKgyd71seEIzKcss4DZm0UG9BXqgDtMxwFcWl1uqITUuAxThIRDi8QsB1+A0PqKSbAY+KAPEaVLNN+PlMXxtFy6H8ZUzNP9YqyMU7EZR5PefG3xCKNrCrDE1CI1fTOA8UPSEf8eSSYX8kb26AvvrWR8MnpbN+xOVa1vh+cYSoY+5fDant8uvroMf8tO92J4tkPqV6Ha8oSiSgPkU531LEM4wl21z2pecKvCnngP5xyAA3bPBVWYV4SHi3VPeEw9bGz5qfX8csWsGeWYtu1ZJAP2nC3S3sbk//yd5ET/dxPKosQ0UINQ/CMcaccx31jOclszUMhpM2+jtN3DxOxzMphAmRyuPfRMgUITwQpKBdluFGT/LyCszZ6EOBv3BXGBiZJb7U5xotbXq8+ZgH2PqBBksKczwMBSzN/5D2ixidQi7FkXtgKha+MNFzaJMC1qKKYQt5U4GhJcBl290TFMmWcwFniRaRE1YQN3/5m1hlPfx4XYW6v1r2VexsJLiHuYMCTbNtmAfR3sOjbzlQMJY+k0x60AyBerLnLJJPIPynY2jwoQaYQ/AGfCveoULSF1j+ElNrOB8wSOYeT37lqdAP0GQmwn75ccZpeWec12FOEhdg3IeRuJBHJ0qg+d+1iSkPwU3yRI3TCwTeBTVb4gusayOf/++Z+xzMgSuJVG9rFxp1HmS
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR08MB10975.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(6133799003)(22082099003)(18002099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- mQLC4hDPvs9gDjdlHA3U/9LHTv8YbjSqgm/DfhnZIGGIRzNpHRvEkWq/jxVO8N4cIEWsQqPcCXm2XyPp7HrxhiO+1udQXNu4yTrQfm9aAMP0D4jRDzciRzsm8SHm8IaqftP+1IWwGnIid5vsuyk1zVO47Dc2+G7I+uhrk+PcM2lJ2W8BLpAkio5QKqIxyieZ+KJGjrE5M0c1nnz0M5ZbkbIs+RWctRk+q0JNh3UecEl4moBCyo5CjgZw0nVrwdM/sgrfXQ++6K96gjcpNqH5m1vz1gpKhWKFiyTN7u7lP5t6WdiN4RidFeFD7pj90l0ffUuDAgA5woYzXSAljK7Yag==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB8830
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00027A6A.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	c4342021-90eb-477e-424c-08dec55da053
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|14060799003|376014|36860700016|82310400026|35042699022|11063799006|4143699003|56012099006|18002099003|22082099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	xHB5lG863/DCw4ygkHir7tCsT0nRsnyVox81+GYm17Mc1TZCYlLIwm8jUVTngX92J91LW9JHrNS++ClQaGtG0EfPKrmFGk8jat6QrbeBA0YKUXEPp+955K5Jc7ABKUfRMNa3eeK2Y0JDsySt+Tg0c+b5zvdkB8D1MOFTmeSoUBW+X+YH6+NPW4n3n74Zzp5sgeHhgYdd+ZjXSwDIB71Geh9WTT9gcV7WjT8bj42K7b3Mljib0kJJWsLJ2s5JuvcYVXj1HZbrejsN+cC/H9QVAih1HqLR9zwp3F3IiYUr+6FM48wsOpqsAKm/m9opWEudMrmwxs49ruuab62ZFj4tX8gWY8F/VlmUHz2KaWYL25mDvdoDlD+20/vr08mBAynYB8nTrmuE11t+yOWTP1aqSFkKX7zakgf1CoIQ9eDfNFnsvtkxoVunaZtN+yX++PIpWkW+xvROBBA5fNu0epabA+VckqTalBqCvxoLk57Kkmi6QOq3OD1e9RXLuJfqPfKswJy78ehskW41+qCsfbkUxduVMfUSGyXfQ/aVzpW0qyzeKEwtg9pYuR3ZMCV6tFGEv/Qj017gR0J7Rydk+8fbK9T83vOWVniidRjrK0LNShU8gtBlQzc31OmcYY8MbXHf/4YS8VL0RUkfAKVUgiCHgKBvhhuybPG/6EC9IPPb6LMzFbBa8Ns1k4RuOvXkddDg3SAeroHvUN6rYTv20dxpoJGyGUovzi5vNLpX5f4ArT8=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(14060799003)(376014)(36860700016)(82310400026)(35042699022)(11063799006)(4143699003)(56012099006)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	EXDSwdzcg0PrUx7KiP/dt5g4fNgM03hcIo97yBn7iYUY4OuGSOmEm76hGP/ccfXbQBBvd+dMpLzDAdMcpfsQcoUrxYcT1ZhfTj6aK/BQK+FhID/PyBeZIWvmIgoxLb74PP470wZP63hmomXd+nir3YTeVhTBRJN2YcB/byLVb01ZOEWdpFZQE8XfFL2OJouKm9CzU5qTzMdZcMGcmAJpu4PzcEjAayulsftMY80Wr6eLYt0qcA8Xb0q3oxjbpWRWNUxJiuUdLzRibfTbDtUrXlP4w6olG5yXSJafbsXyV8VZsdMnKqE4EsHs+xIt5P9WmNxmcRUAJsPcm9PDQ7dUZW02Qtd3Tl1ysg20mxKMYUlfLU7aOdCf8vgbQ8kSWK4bH1LPZIjqk8Ed1kljBdmvMo0ibtE5UCoulvQesGsyfE0nvClRrjPZklFSN0vJGP9k
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2026 12:59:34.7923
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96c64cce-8234-40fe-aafa-08dec55dca3e
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A6A.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB11557
+References: <20260526151934.3783707-1-smostafa@google.com> <20260526151934.3783707-2-smostafa@google.com>
+ <aiK6lgW5YFWSMTxf@google.com>
+In-Reply-To: <aiK6lgW5YFWSMTxf@google.com>
+From: Jens Wiklander <jens.wiklander@linaro.org>
+Date: Mon, 8 Jun 2026 15:16:49 +0200
+X-Gm-Features: AVVi8CfBberieRGRzkn_uKkTDDGnJq3OimnjM0eDLOzbP178qkP9W2-4m7NvonA
+Message-ID: <CAHUa44FO02DKqqNeFuRfx8bQjwcNRfPMF2=8MdjMUFp6vYUpNw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/6] optee: ffa: Add NULL check in optee_ffa_lend_protmem
+To: Sebastian Ene <sebastianene@google.com>
+Cc: Mostafa Saleh <smostafa@google.com>, op-tee@lists.trustedfirmware.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oupton@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, 
+	sumit.garg@kernel.org, vdonnefort@google.com, sudeep.holla@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 08/06/2026 11:56, Steven Price wrote:
-> On 08/06/2026 10:30, Suzuki K Poulose wrote:
->> On 05/06/2026 07:23, Gavin Shan wrote:
->>> Hi Steve,
->>>
->>> On 5/13/26 11:17 PM, Steven Price wrote:
->>>> At runtime if the realm guest accesses memory which hasn't yet been
->>>> mapped then KVM needs to either populate the region or fault the guest.
->>>>
->>>> For memory in the lower (protected) region of IPA a fresh page is
->>>> provided to the RMM which will zero the contents. For memory in the
->>>> upper (shared) region of IPA, the memory from the memslot is mapped
->>>> into the realm VM non secure.
->>>>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>> Changes since v13:
->>>>    * Numerous changes due to rebasing.
->>>>    * Fix addr_range_desc() to encode the correct block size.
->>>> Changes since v12:
->>>>    * Switch to RMM v2.0 range based APIs.
->>>> Changes since v11:
->>>>    * Adapt to upstream changes.
->>>> Changes since v10:
->>>>    * RME->RMI renaming.
->>>>    * Adapt to upstream gmem changes.
->>>> Changes since v9:
->>>>    * Fix call to kvm_stage2_unmap_range() in kvm_free_stage2_pgd() to set
->>>>      may_block to avoid stall warnings.
->>>>    * Minor coding style fixes.
->>>> Changes since v8:
->>>>    * Propagate the may_block flag.
->>>>    * Minor comments and coding style changes.
->>>> Changes since v7:
->>>>    * Remove redundant WARN_ONs for realm_create_rtt_levels() - it will
->>>>      internally WARN when necessary.
->>>> Changes since v6:
->>>>    * Handle PAGE_SIZE being larger than RMM granule size.
->>>>    * Some minor renaming following review comments.
->>>> Changes since v5:
->>>>    * Reduce use of struct page in preparation for supporting the RMM
->>>>      having a different page size to the host.
->>>>    * Handle a race when delegating a page where another CPU has
->>>> faulted on
->>>>      a the same page (and already delegated the physical page) but not
->>>> yet
->>>>      mapped it. In this case simply return to the guest to either use the
->>>>      mapping from the other CPU (or refault if the race is lost).
->>>>    * The changes to populate_par_region() are moved into the previous
->>>>      patch where they belong.
->>>> Changes since v4:
->>>>    * Code cleanup following review feedback.
->>>>    * Drop the PTE_SHARED bit when creating unprotected page table
->>>> entries.
->>>>      This is now set by the RMM and the host has no control of it and the
->>>>      spec requires the bit to be set to zero.
->>>> Changes since v2:
->>>>    * Avoid leaking memory if failing to map it in the realm.
->>>>    * Correctly mask RTT based on LPA2 flag (see rtt_get_phys()).
->>>>    * Adapt to changes in previous patches.
->>>> ---
->>>>    arch/arm64/include/asm/kvm_emulate.h |   8 ++
->>>>    arch/arm64/include/asm/kvm_rmi.h     |  12 ++
->>>>    arch/arm64/kvm/mmu.c                 | 128 ++++++++++++++++----
->>>>    arch/arm64/kvm/rmi.c                 | 173 +++++++++++++++++++++++++++
->>>>    4 files changed, 301 insertions(+), 20 deletions(-)
->>>>
-> 
-> [...]
-> 
->>>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->>>> index cae29fd3353c..761b38a4071c 100644
->>>> --- a/arch/arm64/kvm/rmi.c
->>>> +++ b/arch/arm64/kvm/rmi.c
->>>> @@ -597,6 +597,179 @@ static int realm_data_map_init(struct kvm *kvm,
->>>> unsigned long ipa,
->>>>        return ret;
->>>>    }
->>>> +static unsigned long addr_range_desc(unsigned long phys, unsigned
->>>> long size)
->>>> +{
->>>> +    unsigned long out = 0;
->>>> +
->>>> +    switch (size) {
->>>> +    case P4D_SIZE:
->>>> +        out = 3 | (1 << 2);
->>>> +        break;
->>>> +    case PUD_SIZE:
->>>> +        out = 2 | (1 << 2);
->>>> +        break;
->>>> +    case PMD_SIZE:
->>>> +        out = 1 | (1 << 2);
->>>> +        break;
->>>> +    case PAGE_SIZE:
->>>> +        out = 0 | (1 << 2);
->>>> +        break;
->>>> +    default:
->>>> +        /*
->>>> +         * Only support mapping at the page level granulatity when
->>>> +         * it's an unusual length. This should get us back onto a
->>>> larger
->>>> +         * block size for the subsequent mappings.
->>>> +         */
->>>> +        out = 0 | ((MIN(size >> PAGE_SHIFT, PTRS_PER_PTE - 1)) << 2);
->>>> +        break;
->>>> +    }
->>>> +
->>>> +    WARN_ON(phys & ~PAGE_MASK);
->>>> +
->>>> +    out |= phys & PAGE_MASK;
->>>> +
->>>> +    return out;
->>>> +}
->>>> +
->>>> +int realm_map_protected(struct kvm *kvm,
->>>> +            unsigned long ipa,
->>>> +            kvm_pfn_t pfn,
->>>> +            unsigned long map_size,
->>>> +            struct kvm_mmu_memory_cache *memcache)
->>>> +{
->>>> +    struct realm *realm = &kvm->arch.realm;
->>>> +    phys_addr_t phys = __pfn_to_phys(pfn);
->>>> +    phys_addr_t base_phys = phys;
->>>> +    phys_addr_t rd = virt_to_phys(realm->rd);
->>>> +    unsigned long base_ipa = ipa;
->>>> +    unsigned long ipa_top = ipa + map_size;
->>>> +    int ret = 0;
->>>> +
->>>> +    if (WARN_ON(!IS_ALIGNED(map_size, PAGE_SIZE) ||
->>>> +            !IS_ALIGNED(ipa, map_size)))
->>>> +        return -EINVAL;
->>>> +
->>>> +    if (rmi_delegate_range(phys, map_size)) {
->>>> +        /*
->>>> +         * It's likely we raced with another VCPU on the same
->>>> +         * fault. Assume the other VCPU has handled the fault
->>>> +         * and return to the guest.
->>>> +         */
->>>> +        return 0;
->>>> +    }
->>>> +
->>>> +    while (ipa < ipa_top) {
->>>> +        unsigned long flags = RMI_ADDR_TYPE_SINGLE;
->>>> +        unsigned long range_desc = addr_range_desc(phys, ipa_top -
->>>> ipa);
->>>> +        unsigned long out_top;
->>>> +
->>>> +        ret = rmi_rtt_data_map(rd, ipa, ipa_top, flags, range_desc,
->>>> +                       &out_top);
->>>> +
->>>> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->>>> +            /* Create missing RTTs and retry */
->>>> +            int level = RMI_RETURN_INDEX(ret);
->>>> +
->>>> +            WARN_ON(level == KVM_PGTABLE_LAST_LEVEL);
->>>> +            ret = realm_create_rtt_levels(realm, ipa, level,
->>>> +                              KVM_PGTABLE_LAST_LEVEL,
->>>> +                              memcache);
->>
->> Could we give the RMM a chance to make use of the Block mappings by
->> creating the Missing RTTs to the level that may work for the current
->> range_desc ? i.e., if the range_desc is a 2M block size, we could create
->> tables upto L2 in the first go and if the RMM still needs RTT, we could
->> go further down to the KVM_PGTABLE_LAST_LEVEL. I understand this is
->> kind of an optimisation, so may be we could defer it. (Same applies for
->> the non_secure map below).
-> 
-> A simple change would be just to create one level at a time like this:
-> 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index b79b96f7dffb..3f3ade1d3895 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -767,15 +767,15 @@ static int realm_map_protected(struct kvm *kvm,
->   			/* Create missing RTTs and retry */
->   			int level = RMI_RETURN_INDEX(ret);
->   
-> -			WARN_ON(level == KVM_PGTABLE_LAST_LEVEL);
-> +			if (WARN_ON(level >= KVM_PGTABLE_LAST_LEVEL))
-> +				goto err_undelegate;
->   			ret = realm_create_rtt_levels(realm, ipa, level,
-> -						      KVM_PGTABLE_LAST_LEVEL,
-> +						      level + 1,
->   						      memcache);
->   			if (ret)
->   				goto err_undelegate;
->   
-> -			ret = rmi_rtt_data_map(rd, ipa, ipa_top, flags,
-> -					       range_desc, &out_top);
-> +			continue;
->   		}
+On Fri, Jun 5, 2026 at 2:01=E2=80=AFPM Sebastian Ene <sebastianene@google.c=
+om> wrote:
+>
+> On Tue, May 26, 2026 at 03:19:29PM +0000, Mostafa Saleh wrote:
+> > Sashiko (locally) reports a possible null dereference under memory
+> > pressure due to the lack of validation of the allocated pointer.
+> >
+> > Fix that by adding the missing check.
+> >
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  drivers/tee/optee/ffa_abi.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/drivers/tee/optee/ffa_abi.c b/drivers/tee/optee/ffa_abi.c
+> > index b4372fa268d0..633715b98625 100644
+> > --- a/drivers/tee/optee/ffa_abi.c
+> > +++ b/drivers/tee/optee/ffa_abi.c
+> > @@ -698,6 +698,9 @@ static int optee_ffa_lend_protmem(struct optee *opt=
+ee, struct tee_shm *protmem,
+> >       int rc;
+> >
+> >       mem_attr =3D kzalloc_objs(*mem_attr, ma_count);
+> > +     if (!mem_attr)
+> > +             return -ENOMEM;
+> > +
+> >       for (n =3D 0; n < ma_count; n++) {
+> >               mem_attr[n].receiver =3D mem_attrs[n] & U16_MAX;
+> >               mem_attr[n].attrs =3D mem_attrs[n] >> 16;
+> > --
+> > 2.54.0.746.g67dd491aae-goog
+> >
+>
+> Thanks for fixing this and for including my other patches in the series
+> Reviewed-by: Sebastian Ene <sebastianene@google.com>
 
-That looks good to me.
+Please add a Fixes: tag. This patch is independent of the others in
+the patch set, so if you send it alone with the Fixes: tag I'll pick
+it up.
 
-Cheers
-Suzuki
-
-
->   
->   		if (WARN_ON(ret))
-> 
-> Thanks,
-> Steve
-> 
-
+Cheers,
+Jens
