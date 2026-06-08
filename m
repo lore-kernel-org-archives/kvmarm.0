@@ -1,14 +1,14 @@
 Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D365C3F4DF0;
-	Mon,  8 Jun 2026 14:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E023F8258;
+	Mon,  8 Jun 2026 14:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780929813; cv=none; b=Cf7ke3Z4SmDAB+KqHXinyXA4HrL9V/oPtzkdcnxJdnzM1pTrkkqMnp6eyKEzAVRkcrRLk2zj15qERHgQzYU0o/FtfsSadgSOTvItH3Y5k8mgavlpGQV7c0N4KYlGjG2IzrW1x+LuYnSMDWTpt5wCCQ2IXO75lk4wxi3mOYQem4k=
+	t=1780929813; cv=none; b=cL3+OQMf2qJ/4QdqKQKkAJPUhHdTCoS1YvzGFqIhzdG0y/BbYunp6CH/5pZ2gNAb4pBoPhal+n43xxZU9BBeWBJ14coeSC58nU7DPsWDGj2OmkQEh54GiT+ikMaFK9Ox6iCyMWQ5ufbVRl+P+WcQE20Z3IZ48cpsGzJNizjK3U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780929813; c=relaxed/simple;
-	bh=Le/G0vQ0/TnbqWe2dBxWLFgIozxJJ/jsvXKWfnBsbj8=;
+	bh=P9kibLlfEUjyZzPaotXP3JYgm+Axn66eD8m0X8kJH4U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q1Bgx7vR+89Bv4+Ri8SyhYvVKkqrY4BEfaTbrkHWtn+epWi3mcSRUooXNilDApFjKCl4CO8AlmrFmxsjC4Wde5bYxYjyrRZU8b6JKdjOCgnzLvun+wcpyzm9kmCm5i/MBhvaHVzMX0WkuA2ZkKlSR82t3hz/cYzm8OvyxoZKybM=
+	 MIME-Version; b=MeMF/tx+zna4ReGXdBoeA4Uhvuom16T8MIYx65T9NFzg1bLaO5IL8COuJKattfsPbuK6ex52Lrpa+02f4pQ6FYMBZo5JT+7qgXmSyovUYBaEu0WRgSz+za7gzA/xTh2A1LTDAbTT54iv+xxGlLvpawACrRUn+eBYSrPq4GtkRc4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; arc=none smtp.client-ip=85.214.250.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
@@ -16,8 +16,8 @@ Received: from io.home.8bytes.org (p4ffe1d30.dip0.t-ipconnect.de [79.254.29.48])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id 3F1722028C9;
-	Mon,  8 Jun 2026 16:43:13 +0200 (CEST)
+	by mail.8bytes.org (Postfix) with ESMTPSA id 611962028D3;
+	Mon,  8 Jun 2026 16:43:15 +0200 (CEST)
 From: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
@@ -38,9 +38,9 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>,
 	x86@kernel.org,
 	coconut-svsm@lists.linux.dev,
 	joerg.roedel@amd.com
-Subject: [PATCH 38/60] kvm: Make KVM_SIGNAL_MSI per plane
-Date: Mon,  8 Jun 2026 16:42:30 +0200
-Message-ID: <20260608144252.351443-39-joro@8bytes.org>
+Subject: [PATCH 48/60] kvm: x86: Make event injection VCPU requests per-plane
+Date: Mon,  8 Jun 2026 16:42:40 +0200
+Message-ID: <20260608144252.351443-49-joro@8bytes.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260608144252.351443-1-joro@8bytes.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -52,104 +52,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Joerg Roedel <joerg.roedel@amd.com>
 
-Allow the KVM_SIGNAL_MSI ioctl for every plane instead of per VM.
+These events must be handled on the plane-vcpu that they were raised
+on.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Co-developed-by: Joerg Roedel <joerg.roedel@amd.com>
 Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
 ---
- include/linux/kvm_host.h |  2 +-
- virt/kvm/irqchip.c       |  4 ++--
- virt/kvm/kvm_main.c      | 25 ++++++++++++++-----------
- 3 files changed, 17 insertions(+), 14 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index cfb6911d6771..05a10836d92d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2370,7 +2370,7 @@ static inline int kvm_init_irq_routing(struct kvm *kvm)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f30173093c44..c2651774d785 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -85,20 +85,20 @@
+ 						 KVM_X86_NOTIFY_VMEXIT_USER)
  
+ /* x86-specific vcpu->requests bit members */
+-#define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
++#define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_PLANE_REQ(0)
+ #define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
+ #define KVM_REQ_TRIPLE_FAULT		KVM_ARCH_REQ(2)
+ #define KVM_REQ_MMU_SYNC		KVM_ARCH_REQ(3)
+ #define KVM_REQ_CLOCK_UPDATE		KVM_ARCH_REQ(4)
+ #define KVM_REQ_LOAD_MMU_PGD		KVM_ARCH_REQ(5)
+-#define KVM_REQ_EVENT			KVM_ARCH_REQ(6)
++#define KVM_REQ_EVENT			KVM_ARCH_PLANE_REQ(6)
+ #define KVM_REQ_APF_HALT		KVM_ARCH_REQ(7)
+ #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(8)
+-#define KVM_REQ_NMI			KVM_ARCH_REQ(9)
+-#define KVM_REQ_PMU			KVM_ARCH_REQ(10)
+-#define KVM_REQ_PMI			KVM_ARCH_REQ(11)
++#define KVM_REQ_NMI			KVM_ARCH_PLANE_REQ(9)
++#define KVM_REQ_PMU			KVM_ARCH_PLANE_REQ(10)
++#define KVM_REQ_PMI			KVM_ARCH_PLANE_REQ(11)
+ #ifdef CONFIG_KVM_SMM
+-#define KVM_REQ_SMI			KVM_ARCH_REQ(12)
++#define KVM_REQ_SMI			KVM_ARCH_PLANE_REQ(12)
  #endif
- 
--int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
-+int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi, unsigned plane_level);
- 
- void kvm_eventfd_init(struct kvm *kvm);
- int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args);
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 14480d1df4f9..a4fea7d8dde6 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -45,7 +45,7 @@ int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
- 	return irq_rt->chip[irqchip][pin];
- }
- 
--int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
-+int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi, unsigned plane_level)
- {
- 	struct kvm_kernel_irq_routing_entry route;
- 
-@@ -57,7 +57,7 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
- 	route.msi.data = msi->data;
- 	route.msi.flags = msi->flags;
- 	route.msi.devid = msi->devid;
--	route.msi.plane_level = 0;
-+	route.msi.plane_level = plane_level;
- 
- 	return kvm_set_msi(&route, kvm, KVM_USERSPACE_IRQ_SOURCE_ID, 1, false);
- }
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a30123b77112..dc59f2f9d405 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4907,6 +4907,17 @@ static long __kvm_plane_ioctl(struct kvm_plane *plane, unsigned int ioctl, unsig
- 	case KVM_CREATE_VCPU:
- 		r = kvm_plane_ioctl_create_vcpu(plane, arg);
- 		break;
-+#ifdef CONFIG_HAVE_KVM_MSI
-+	case KVM_SIGNAL_MSI: {
-+		void __user *argp = (void __user *)arg;
-+		struct kvm_msi msi;
-+
-+		if (copy_from_user(&msi, argp, sizeof(msi)))
-+			return -EFAULT;
-+		r = kvm_send_userspace_msi(plane->kvm, &msi, plane->level);
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -ENOTTY;
- 	}
-@@ -5493,6 +5504,9 @@ static long kvm_vm_ioctl(struct file *filp,
- 		r = kvm_vm_ioctl_create_plane(kvm, arg);
- 		break;
- 	case KVM_CREATE_VCPU:
-+#ifdef CONFIG_HAVE_KVM_MSI
-+	case KVM_SIGNAL_MSI:
-+#endif
- 		r = __kvm_plane_ioctl(kvm->planes[0], ioctl, arg);
- 		break;
- 	case KVM_ENABLE_CAP: {
-@@ -5597,17 +5611,6 @@ static long kvm_vm_ioctl(struct file *filp,
- 		r = kvm_ioeventfd(kvm, &data);
- 		break;
- 	}
--#ifdef CONFIG_HAVE_KVM_MSI
--	case KVM_SIGNAL_MSI: {
--		struct kvm_msi msi;
--
--		r = -EFAULT;
--		if (copy_from_user(&msi, argp, sizeof(msi)))
--			goto out;
--		r = kvm_send_userspace_msi(kvm, &msi);
--		break;
--	}
--#endif
- #ifdef __KVM_HAVE_IRQ_LINE
- 	case KVM_IRQ_LINE_STATUS:
- 	case KVM_IRQ_LINE: {
+ #define KVM_REQ_MASTERCLOCK_UPDATE	KVM_ARCH_REQ(13)
+ #define KVM_REQ_MCLOCK_INPROGRESS \
 -- 
 2.53.0
 
