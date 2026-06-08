@@ -1,160 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E093D9DD9;
-	Mon,  8 Jun 2026 15:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7154D31282C
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jun 2026 15:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780932529; cv=none; b=CwxJulK7kH3oo90x/PItxEwSuKbWrKMEr1+qtcK2+MOdIvl/tHgNZtZT7QaVzqoo2ddVZoFfu9rkJAAFl0hBzVkmSHTz1Z+apP/zNbSvpHGhbIvIBr9TxxPlJAxVReKzAVd/SvaCojOUQNw0fVh8YeW8uLT5nY2CJfGC/utoN2Y=
+	t=1780934152; cv=none; b=YeduNtn0iEmezU+5/pFB/xeQfF0rvey5cFWd48CxV6LFQvqhEj0lX7oS7+MagxC6yCRejMKfryb9J8+ALSClQrpOa1dcUuEsz06SUnrusHGwxOID+TKHjqwTNah21YmEieLJv+B8/B3jghLcPnlCrYLt2EcQoMvzAW5WvA4Ei+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780932529; c=relaxed/simple;
-	bh=BYNpDnA/rLNB4DFtvpxo3rixLpZtLcno2qtEUdBWlTs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oZkzqdP5gDoLxXnxjPv0y3sadxrgw1MxKZQVb1Nw6Pcj/Eptk7rYTqp6CwVdcNX15m1CbNCVj/p3NvbqGKpw9PbSeEJPgQx8OY25x2qLxLCUKtkpol/eZEFpJuHpLCOn4LOXMdjLCpLLeGOyZ+Xn6O3KR3Tyc6XhrLvMP9EROXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EcUMvxka; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780934152; c=relaxed/simple;
+	bh=veGBV30tkSQy3O+cpkSjv7ZCdMRJYieHFctPW8nTs6c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=TAtztLD0rvAS7OWhsZpmm3pkEtWgbhu2mhsbyPCshdqcq1CCDuhA63lbQDhJI/li0tjQvWdG8Bsp55XmV9RTIgSR0i7opVPx0Gzfh44HuOadC+F8ny25Lp+gENWYZhZ8Do/NUs1+3PlbNHvpqdZu6+F9M9k0P0oJHrsPgEQWaD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Y8CzEdVW; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EcUMvxka"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99C41F00893;
-	Mon,  8 Jun 2026 15:28:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780932528;
-	bh=hctmouS3Oa1zQsA8OfIPu6NlW/Bf5FQLselaT1XAaWQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=EcUMvxkaY4O1FldyBxtKNcGT+VLsCmOxbm/MZRJi8k+ial78uBS0B/bUb2NQ5mfxi
-	 ig/f5pjIoH+IFyCDnRLQ0Ay6cN5MKXi/wjrvlrtepUgJCuKrLykz3TU/tgBtOYuLyR
-	 ERJcdef+ZONjKIkCoLbpU+TeW5rgl9lTYW8a75cqGPSOpMmgccdFZaMGPdmh7U+WkB
-	 6vE6vhRDGeNRWu6Q/ggXbnIUW3vF8l+HH2M2gj2TTqN20ZRqT6mDQwQVWUpo5yrufO
-	 nHoVr46xRmSkI+UQgMBCpb514MDG1oSg2ROx7eIuBKn7RkKS0AaSPAN0L48uO/13lD
-	 dXXkT7RTZiEgg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wWbu9-0000000AYTW-3ofg;
-	Mon, 08 Jun 2026 15:28:46 +0000
-Date: Mon, 08 Jun 2026 16:28:45 +0100
-Message-ID: <86o6hlt5jm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jia He <justin.he@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Y8CzEdVW"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D9CE7175A;
+	Mon,  8 Jun 2026 08:55:44 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5858B3FD80;
+	Mon,  8 Jun 2026 08:55:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780934149; bh=veGBV30tkSQy3O+cpkSjv7ZCdMRJYieHFctPW8nTs6c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Y8CzEdVWkK52WP2X2Wny7eBG1Cf0NkljIogcHYA+LhhrKB6mOLLiYeTg5NFrn6raD
+	 nvII1zooStZ5FIIpNg8OZHUWrW2ALX1U0FlMgy5kdM/QXx9EwTCF5fWgJfHhXvFOPn
+	 S/WkUNKVm+eUnTONsxYe7wj4TQQoAoC3feJouD/E=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] KVM: arm64: Make kvm_s2_fault_pin_pfn() fault-in interruptible
-In-Reply-To: <20260608104336.2405384-2-justin.he@arm.com>
-References: <20260608104336.2405384-1-justin.he@arm.com>
-	<20260608104336.2405384-2-justin.he@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Replace memslot_is_logging() with kvm_slot_dirty_track_enabled()
+Date: Mon,  8 Jun 2026 16:55:45 +0100
+Message-ID: <aibmALTEbc7gzSZj@devkitleo>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260605153248.2412064-2-weilin.chang@arm.com>
+References: <20260605153248.2412064-1-weilin.chang@arm.com> <20260605153248.2412064-2-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: justin.he@arm.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Mon, 08 Jun 2026 11:43:36 +0100,
-Jia He <justin.he@arm.com> wrote:
-> 
-> arm64 KVM faults guest memory into the host in kvm_s2_fault_pin_pfn() via
-> __kvm_faultin_pfn(). Today this request is made non-interruptible, so if
-> the host fault-in path blocks for a long time, a vCPU thread that already
-> has a pending signal cannot leave the fault-in path until GUP eventually
-> completes.
-> 
-> This is particularly painful during VM teardown, where userspace may
-> signal vCPU threads while they are blocked faulting in guest memory. In
-> that case there is no benefit in continuing to wait for the fault to
-> complete; the vCPU should return to userspace and let the pending signal
-> be handled.
-> 
-> Ask the generic KVM fault-in helper to use FOLL_INTERRUPTIBLE. When GUP
-> reports a pending signal it returns KVM_PFN_ERR_SIGPENDING; handle it by
-> calling kvm_handle_signal_exit() and returning -EINTR. This matches the
-> behaviour expected by the generic KVM fault-in path and mirrors the
-> signal-exit handling already done by the arm64 run loop, which sets
-> run->exit_reason = KVM_EXIT_INTR before returning to userspace. It is
-> also consistent with architectures such as x86 that already allow the
-> fault-in to be interrupted by pending signals.
+Hi Wei Lin,
 
-Only x86, AFAICT. s390 handles signals, but doesn't set GUP as
-interruptible.
+On Fri, Jun 05, 2026 at 04:32:47PM +0100, Wei-Lin Chang wrote:
+> When checking whether a memslot has dirty logging enabled, the
+> KVM_MEM_LOG_DIRTY_PAGES flag is the source of truth. Previously we were
+> using memslot_is_logging() which only tests dirty bitmap and did not
+> consider dirty ring. This was not detected because
+> KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP was introduced together with KVM
+> arm64 dirty ring, and users need to enable it to ensure dirty
+> information is not lost for the case of VGIC LPI/ITS table changes.
+> 
+> Fix this by using kvm_slot_dirty_track_enabled() instead which checks
+> KVM_MEM_LOG_DIRTY_PAGES.
+> 
+> Note that memslot_is_logging() also treats a memslot as not logging if
+> KVM_MEM_READONLY is set, hence a memslot with both dirty logging and
+> read only would be seen as not logging for memslot_is_logging(), but
+> logging for kvm_slot_dirty_track_enabled(). This allows a read only
+> mapping of size > PAGE_SIZE to be built when memslot_is_logging() is
+> used, leading to a better read performance compared to
+> kvm_slot_dirty_track_enabled(). However memslots that have both
+> KVM_MEM_LOG_DIRTY_PAGES and KVM_MEM_READONLY set do not really make
+> sense as dirty logging is essentially nop for a read only memslot, so
+> this shouldn't affect real workloads much.
+
+
+It worries me a bit that we are ignoring the KVM_MEM_READONLY flag... 
+I have not yet gone through the whole s2_mmu code but IIUC we can have 
+scenarios on which a memslot can be read-only and have dirty-logging 
+enabled. If a memslot is not faulted yet, IIUC it is marked as read-only 
+(so it can be mapped on write fault), and we can have dirty-logging 
+enabled for it as well (as the VMM has no idea). 
+
+Would not that change impact this scenario?
+
+I will take a better look in that part of the code as well, to properly 
+understand it.
+
+Thanks!
+Leo
+
+
+
 
 > 
-> The interrupted fault does not install a partial stage-2 mapping: the
-> -EINTR is returned before any mapping is created, so the fault is simply
-> retried on a subsequent vCPU entry once userspace re-enters KVM_RUN. The
-> only observable effect in the absence of a pending signal is none; this
-
-This sentence reads bizarrely. Do you mean to say "there is no
-observable effect in the absence of a pending signal"?
-
-> does not make ordinary stage-2 faults abortable.
-> 
-> Signed-off-by: Jia He <justin.he@arm.com>
+> Fixes: 9cb1096f8590 ("KVM: arm64: Enable ring-based dirty memory tracking")
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 > ---
->  arch/arm64/kvm/mmu.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+> It took me a long investigation to acquire the context needed to
+> understand this change, however the reason for this problem not being
+> detected is an educated guess. Please let me know if this is wrong or
+> if there are other issues, thanks!
+> 
+>  arch/arm64/kvm/mmu.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 4da9281312eb..dfb779e6d792 100644
+> index 4da9281312eb..06c46124d3e7 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1872,19 +1872,27 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
->  				struct kvm_s2_fault_vma_info *s2vi)
+> @@ -161,11 +161,6 @@ static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
+>  	return ret;
+>  }
+>  
+> -static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+> -{
+> -	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
+> -}
+> -
+>  /**
+>   * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+>   * @kvm:	pointer to kvm structure.
+> @@ -1748,7 +1743,7 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
 >  {
->  	int ret;
-> +	unsigned int flags = FOLL_INTERRUPTIBLE;
+>  	short vma_shift;
 >  
->  	ret = kvm_s2_fault_get_vma_info(s2fd, s2vi);
->  	if (ret)
->  		return ret;
+> -	if (memslot_is_logging(s2fd->memslot)) {
+> +	if (kvm_slot_dirty_track_enabled(s2fd->memslot)) {
+>  		s2vi->max_map_size = PAGE_SIZE;
+>  		vma_shift = PAGE_SHIFT;
+>  	} else {
+> @@ -1953,7 +1948,7 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>  	*prot = KVM_PGTABLE_PROT_R;
 >  
-> +	if (kvm_is_write_fault(s2fd->vcpu))
-> +		flags |= FOLL_WRITE;
-> +
-
-nit: you might as well keep the assignment and the update together.
-
->  	s2vi->pfn = __kvm_faultin_pfn(s2fd->memslot, get_canonical_gfn(s2fd, s2vi),
-> -				      kvm_is_write_fault(s2fd->vcpu) ? FOLL_WRITE : 0,
-> +				      flags,
->  				      &s2vi->map_writable, &s2vi->page);
->  	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
->  		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
->  			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
->  			return 0;
->  		}
-> +		if (is_sigpending_pfn(s2vi->pfn)) {
-> +			kvm_handle_signal_exit(s2fd->vcpu);
-> +			return -EINTR;
-> +		}
->  		return -EFAULT;
->  	}
+>  	if (s2vi->map_writable && (s2vi->device ||
+> -				   !memslot_is_logging(s2fd->memslot) ||
+> +				   !kvm_slot_dirty_track_enabled(s2fd->memslot) ||
+>  				   kvm_is_write_fault(s2fd->vcpu)))
+>  		*prot |= KVM_PGTABLE_PROT_W;
 >  
-
-The VNCR handling code also uses __kvm_faultin_pfn(). Why isn't it
-similarly updated, given that you are specifically singling out NV as
-an area of concern?
-
-Similarly. pkvm_mem_abort() is using FOLL* flags and could benefit
-from the same optimisation.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> @@ -2084,7 +2079,7 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  	 * and a write fault needs to collapse a block entry into a table.
+>  	 */
+>  	memcache = get_mmu_memcache(s2fd->vcpu);
+> -	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
+> +	if (!perm_fault || (kvm_slot_dirty_track_enabled(s2fd->memslot) &&
+>  			    kvm_is_write_fault(s2fd->vcpu))) {
+>  		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+>  		if (ret)
+> -- 
+> 2.43.0
+> 
