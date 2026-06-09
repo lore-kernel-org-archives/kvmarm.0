@@ -1,31 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A764C9007;
-	Tue,  9 Jun 2026 18:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3717A3B27EC
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jun 2026 18:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781031130; cv=none; b=re3ydzBB9WDEUjLY34EuOMo1t78aTQDTKJKHJppq1NwgkTVUDdNI5bSJvnR4idiXGRTicL9HLwnJ7/JnDD1Nw5SdRA5mqpOvgNx9en/M/rLeuo8k+QqD0nMfJz6JdwBt6AQFjHXhuELXqT5POmWFYSILPhims5SSrzONyDFx+6g=
+	t=1781031321; cv=none; b=nHaKZhZBcuXva0xRZN7XLttutxUZBT+Ur2KqJJ6C/yRo2U1i/QF1YShDkZH6AU1mxDoTVQH56db4L05SLonCwfgHGDuci6TOM3dNETCxYUUshlGBvBT2tAnVjz5rkvo6GF9Cx4JHoVI+Uztx4ASR7anjvO/u/aszqdkLT/pU4Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781031130; c=relaxed/simple;
-	bh=QGJmlhlvtGI4GNIr3itNNbMVpJ4+KHPwKPePisMnptg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SCrwDpZl6sbQghuKBl/0rl5Z/cXKtIzFgfAMlmgz77Zlg2FEKtnuSFp+XuQebzKwWueHn0QphZhO5CEnJPQ8OhhW/wXqyhLrmzWf/q7Ho3Lt5UXJZIEntiiwuotAPYotJ2s005z/7AN4DcfSK/JViU4Im6y70S1jDI9nTdPwt3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0AL5ENy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781031321; c=relaxed/simple;
+	bh=NApicFWs2EeFGhFg80oq+kFniEG1RghtPeWHNNHgaBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IU/nWo6796tBOS7GnlrmPnO7faWrulyYVeuwjeK0szYap6Fl18HebiXz/T7QkBm/mKfQgmMYt7Z3N0rpgjlE0QxYyB+RYe4gPWmvu7TSSvECmBCxCeZqQrIiQ7esKKmINiUtWHMn2coj9erLE3nbUi3c/lT05CHdnHG0nkGm4Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jKB6q5mO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0AL5ENy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 930D41F0089E;
-	Tue,  9 Jun 2026 18:52:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jKB6q5mO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B06481F00893;
+	Tue,  9 Jun 2026 18:55:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781031127;
-	bh=CbfVGeHQ3T4us24RDeMQAU4sLc8OUPsCj9BOzojIFNM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=W0AL5ENymCWwh2o5yDAh0iwGEgW9JHlm+CeYUdhu9F7pHwNPjSY+Eak3Jq21GG+sq
-	 eT6qLzufdY+wrGL3YZ0kvKRWiAEP+OkpKWFH18Q5bz9QB8EoMN3stTTgWaKPb2LfOn
-	 rVwkGoOygSzBjq0ncsfwtvD01QVPwxV4UDgAG1UWoitVws1ZNv/44LxCbtdd+1yXCy
-	 d0lA/if0Yrx1e4qi1qEK0vFe/bu7aifc5tPuIQwmNLeVFRTsQcZueRM0R5H5ZRQA9p
-	 vo2sumQ2azyULvRfv26bXodFtsHD0NHt4uG842OktvJoDdkKdX/NLIySV6X9bIbNWL
-	 gea4BSz2/ma4g==
+	s=k20260515; t=1781031319;
+	bh=dGzp5cXTivHGeXtJ5cnc6r8CicmghrZq8NjxACDfGCE=;
+	h=From:To:Cc:Subject:Date;
+	b=jKB6q5mOC2UScYk75b+FIoichLhaFjYMIrCCSMmFJmqxFQgnT07e9oWBGT5ol7fxl
+	 VnPEuwJ1hAhIDs/na5RqPKru7kYKhcSGUP/tVTktAVJ2hXlN366mxikYGmOpSAbJra
+	 ywSjyOdNvUW3iLx/2ZVkDg9OhFhHnRLpEjC/kTEXg848UPmMdhdinxCOk5zGr1gwWj
+	 lZ/6nSFQT3/J11uRRZTaqDDl4V7YbKvtvGRBBKopmXv2Lbk2wexE6LX69LSvoAosXS
+	 lA4I3BTP/rsi8uZzMVLw9JKT5RaSCeI1M/onNAypTqtNBIkzOp+BmXiTyimxo0qg26
+	 VdPls852ET1iA==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,15 +32,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	stable@vger.kernel.org,
-	Sashiko <sashiko-bot@kernel.org>
-Subject: [PATCH v2 3/5] KVM: arm64: nv: Re-translate VNCR before injecting abort
-Date: Tue,  9 Jun 2026 11:52:02 -0700
-Message-ID: <20260609185204.745929-7-oupton@kernel.org>
+	Oliver Upton <oupton@kernel.org>
+Subject: [PATCH RESEND v2 0/5] KVM: arm64: nv: Even more VNCR fixes
+Date: Tue,  9 Jun 2026 11:55:09 -0700
+Message-ID: <20260609185514.746507-1-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260609185204.745929-1-oupton@kernel.org>
-References: <20260609185204.745929-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,165 +45,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM faults in the VNCR page with FOLL_WRITE whenver the guest aborts for
-a write, similar to how a regular stage-2 mapping is handled. It is
-entirely possible that the guest reads from the VNCR before writing to
-it, in which case the PFN could only be read-only.
+Argh, resending. Forgot to clean out my staging directory first. Sorry!
 
-Invalidate the VNCR TLB and re-fetch the translation upon taking a VNCR
-abort, allowing the host mapping to be faulted in for write the second
-time around. Interestingly enough, this also satisfies the ordering
-requirements of FEAT_ETS2/3 between descriptor updates and MMU faults.
+Yes, even more.
 
-Cc: stable@vger.kernel.org
-Fixes: 2a359e072596 ("KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2")
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Signed-off-by: Oliver Upton <oupton@kernel.org>
----
- arch/arm64/kvm/nested.c | 115 +++++++++++++++-------------------------
- 1 file changed, 44 insertions(+), 71 deletions(-)
+On top of the first pile:
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index ebd7ccfeee99..d5c4b57123a9 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1460,92 +1460,65 @@ static void handle_vncr_perm(struct kvm_vcpu *vcpu)
- 	kvm_inject_nested_sync(vcpu, esr);
- }
- 
--static bool kvm_vncr_tlb_lookup(struct kvm_vcpu *vcpu)
--{
--	struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
--
--	lockdep_assert_held_read(&vcpu->kvm->mmu_lock);
--
--	if (!vt->valid)
--		return false;
--
--	if (read_vncr_el2(vcpu) != vt->gva)
--		return false;
--
--	if (vt->wr.nG)
--		return get_asid_by_regime(vcpu, TR_EL20) == vt->wr.asid;
--
--	return true;
--}
--
- int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
- {
- 	struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_gmem, perm;
-+	int ret;
- 
- 	WARN_ON_ONCE(!(esr & ESR_ELx_VNCR));
- 
- 	if (kvm_vcpu_abt_issea(vcpu))
- 		return kvm_handle_guest_sea(vcpu);
- 
--	if (esr_fsc_is_permission_fault(esr)) {
--		handle_vncr_perm(vcpu);
--	} else if (esr_fsc_is_translation_fault(esr)) {
--		bool valid, is_gmem = false;
--		int ret;
--
--		scoped_guard(read_lock, &vcpu->kvm->mmu_lock)
--			valid = kvm_vncr_tlb_lookup(vcpu);
--
--		if (!valid)
--			ret = kvm_translate_vncr(vcpu, &is_gmem);
--		else
--			ret = -EPERM;
-+	if (!esr_fsc_is_translation_fault(esr) && !esr_fsc_is_permission_fault(esr)) {
-+		WARN_ONCE(1, "Unhandled VNCR abort, ESR=%llx\n", esr);
-+		return 1;
-+	}
- 
--		switch (ret) {
--		case -EAGAIN:
--			/* Let's try again... */
--			break;
--		case -ENOMEM:
--			/*
--			 * For guest_memfd, this indicates that it failed to
--			 * create a folio to back the memory. Inform userspace.
--			 */
--			if (is_gmem)
--				return 0;
--			/* Otherwise, let's try again... */
--			break;
--		case -EFAULT:
--		case -EIO:
--		case -EHWPOISON:
--			if (is_gmem)
--				return 0;
--			fallthrough;
--		case -EINVAL:
--		case -ENOENT:
--		case -EACCES:
--			/*
--			 * Translation failed, inject the corresponding
--			 * exception back to EL2.
--			 */
--			BUG_ON(!vt->wr.failed);
-+	ret = kvm_translate_vncr(vcpu, &is_gmem);
-+	switch (ret) {
-+	case -EAGAIN:
-+		/* Let's try again... */
-+		break;
-+	case -ENOMEM:
-+		/*
-+		 * For guest_memfd, this indicates that it failed to
-+		 * create a folio to back the memory. Inform userspace.
-+		 */
-+		if (is_gmem)
-+			return 0;
-+		/* Otherwise, let's try again... */
-+		break;
-+	case -EFAULT:
-+	case -EIO:
-+	case -EHWPOISON:
-+		if (is_gmem)
-+			return 0;
-+		fallthrough;
-+	case -EINVAL:
-+	case -ENOENT:
-+	case -EACCES:
-+		/*
-+		 * Translation failed, inject the corresponding
-+		 * exception back to EL2.
-+		 */
-+		BUG_ON(!vt->wr.failed);
- 
--			esr &= ~ESR_ELx_FSC;
--			esr |= FIELD_PREP(ESR_ELx_FSC, vt->wr.fst);
-+		esr &= ~ESR_ELx_FSC;
-+		esr |= FIELD_PREP(ESR_ELx_FSC, vt->wr.fst);
- 
--			kvm_inject_nested_sync(vcpu, esr);
--			break;
--		case -EPERM:
--			/* Hack to deal with POE until we get kernel support */
--			handle_vncr_perm(vcpu);
--			break;
--		case 0:
--			break;
--		}
--	} else {
--		WARN_ONCE(1, "Unhandled VNCR abort, ESR=%llx\n", esr);
-+		kvm_inject_nested_sync(vcpu, esr);
-+		break;
-+	case 0:
-+		break;
- 	}
- 
-+	perm = kvm_is_write_fault(vcpu) ? vt->wr.pw && vt->hpa_writable : vt->wr.pr;
-+	if (!perm)
-+		handle_vncr_perm(vcpu);
-+
- 	return 1;
- }
- 
+ - KVM needs to fault in the PFN for write before mapping the L1 VNCR
+   with write permissions in the host stage-1
+
+ - Hack to prevent KVM from mapping a non-memory PFN with cacheable
+   mappings. This doesn't align perfectly with the semantics at stage-2,
+   boo hoo.
+
+ - Bonus change to break VNCR abort loops in case by bugging the VM if
+   KVM doesn't know how to handle the fault
+
+Tested by running an L3 VM with kvmarm/next
+
+v1: https://lore.kernel.org/kvmarm/20260608161446.718957-1-oupton@kernel.org/
+
+Oliver Upton (5):
+  KVM: arm64: nv: Respect read-only PFN when mapping L1 VNCR
+  KVM: arm64: nv: Inject SEA if kvm_translate_vncr() can't resolve PFN
+  KVM: arm64: nv: Re-translate VNCR before injecting abort
+  KVM: arm64: nv: Inject SEA if guest VNCR isn't normal memory
+  KVM: arm64: nv: Mark VM as bugged for unexpected VNCR abort
+
+ arch/arm64/include/asm/kvm_nested.h |   8 ++
+ arch/arm64/kvm/at.c                 |   8 --
+ arch/arm64/kvm/nested.c             | 164 ++++++++++++++--------------
+ 3 files changed, 92 insertions(+), 88 deletions(-)
+
+
+base-commit: 406f0c31f47877db036e885f15830106b89ca950
 -- 
 2.47.3
 
