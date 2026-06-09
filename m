@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279D7331EC9;
-	Tue,  9 Jun 2026 18:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5379136680F
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jun 2026 18:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781031129; cv=none; b=vAggpVXpJ4UtBST4aM1kWUbgKZYUW2JtPNX6eWzkFEF2TzJggfehRxpXjpgu6QcB4aYeygeKCDRgFmu68bK8CtHjpr4A6BkvtphQJWumnMB1Yt98cZu3LxbOxUybJdkQvCnVIdOrat1/jWvDk9ok2bUQ3/OT2ux4qlGbSVryenE=
+	t=1781031129; cv=none; b=eyfxk683jhrN/CdL4lEtbQ/PYelV6lUBqjToCgc96A7jgKiLWVJfMW/DIlLPQEPh/+0UIxTJ9CzxS7XrcgpT8Y1XP/89XbTQCFimAnCQt2eqKOsx07ZuTg25IZVc/75MDGOnveTBi/p+6N/mnvbWhMvhYf0Yq87Sc1/wKY21/ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781031129; c=relaxed/simple;
-	bh=pS/mUwGnNpTUlmx84nLsne2qXX4XMTLqGn7FdeebpvA=;
+	bh=fFUSn+NJTOcCcdCLMbNVvNQcRWGIa/Fozz8nBls8ofA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r4XkyHIJp2JTPg0VRQxuprD2gSvOg0pBWvbMCORfyCP6Ebzfj9zO59jQgqJXN5AT9mF3rdgl2sWuTjdnf8pIZO5bXKnnQGbJcOB6NcSoJMRplfob1/QiGUoOSRr1ka87fHQTX4iOMsumgDexBowXpndLYCLd2eqhA4Zq51XjrsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbNOo5Ha; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ZEv7r5NHGlj0Ltl2c5fUjAtk58CVfW1LBVWv+b4FiK/Zny6SZ/EQaoUjvtiI8NtvpHlGGfBkDXkW9fGm29rsblgn0mbLaBbxZ5TzX1xHToxQ8NEJosWgprLFzFLLxlQPTOkHJP5hQDQe9NLGn/Yi3zznsZMzSrOD++ENyGJ8n9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9woWbgg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbNOo5Ha"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAB8F1F0089A;
-	Tue,  9 Jun 2026 18:52:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9woWbgg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DEBE1F00893;
+	Tue,  9 Jun 2026 18:52:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1781031128;
-	bh=Pk28Y4P6W8ymkMldEEHau29x9mHLqn44gGvm2nZ6QGk=;
+	bh=WSYXEQ1MLDegeWyUeLAgpn2EZJeWOqTX55YEjc0LPCE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=dbNOo5Haj5iVEBXor1/Fx1HnTEe3HJq8+3ZzCWLgYyF7oJLQFNtLiIy1BWNZGayXx
-	 JdFXklouJb4ApafOen8EMys2JuioHuvidt1VqJzEGNyqkEtk/g+Fm135nibN2sNTTI
-	 Dqf5lk1Rrq+KZUKyyEwgIrXmmMSCIDXEssE9EnkCoW6URHCgd1vgWMWvJ1JmU1Gvw4
-	 Y2L60WLZDdxpfikvAHMXIB9u48k6vzXRUM0T+QlR1nav3pa+saYqITJ7b505Fsjy/j
-	 ezCG3Vu3XCATBRWIG8wUlNJiZTh4v2wrwj0qxMc7vQj6eoVWSvYc51iG8XdFywYHNa
-	 19jwJbR+TKYpQ==
+	b=b9woWbggasR2v0NmFOhKRB8krO/6/8sbrs4KmC5RRxHrrDjCiNy0NlnoKSkfg9geN
+	 eB+Hf8FaUEib1852qdXctqQxk53eiRQUpqjVQXW9BNv6Gunb+68Zb7mLqRJb3/Sn87
+	 zCvPd1gZ89BetK+VPh5F8gj02TOaSjjoECdf0rKaIFyuzhQI666qP3SpZHI5lmVvAV
+	 Elh42K1Jdw+arpz5LBVbl32xyZIlfJOCi8l/00jYISrEX41qyuu2UoDPI8BAi2M0FU
+	 kgpM8LH8m/f2v/E+TjoiYpFT0XWB/3VdP2r+O0Xewuox+YrFaODzYRfZWu9pJ+No39
+	 MUqf0X5CqW4bg==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,11 +33,10 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 4/5] KVM: arm64: nv: Inject SEA if guest VNCR isn't normal memory
-Date: Tue,  9 Jun 2026 11:52:03 -0700
-Message-ID: <20260609185204.745929-8-oupton@kernel.org>
+	Oliver Upton <oupton@kernel.org>
+Subject: [PATCH v2 5/5] KVM: arm64: nv: Mark VM as bugged for unexpected VNCR abort
+Date: Tue,  9 Jun 2026 11:52:04 -0700
+Message-ID: <20260609185204.745929-9-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260609185204.745929-1-oupton@kernel.org>
 References: <20260609185204.745929-1-oupton@kernel.org>
@@ -49,44 +48,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When constructing an L1 VNCR mapping, KVM unconditionally uses cacheable
-memory attributes, even if the underlying PFN isn't memory. This gets
-particularly hairy if the endpoint doesn't support cacheable memory
-attributes, potentially throwing an SError on writeback...
+KVM is unlikely to resolve an unexpected VNCR abort, meaning that
+returning to the guest will likely leave the vCPU stuck in an abort
+loop. Bug the VM and exit to userspace instead.
 
-While KVM does permit cacheable memory attributes on certain PFNMAP
-VMAs, kvm_translate_vncr() isn't currently grabbing the VMA. So do the
-simpler thing for now and just reject everything that isn't memory.
-
-Cc: stable@vger.kernel.org
-Fixes: 2a359e072596 ("KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2")
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/arm64/kvm/nested.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index d5c4b57123a9..a6bd60856fc3 100644
+index a6bd60856fc3..e9bd4991f7a0 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -1413,6 +1413,17 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 		writable = !(memslot->flags & KVM_MEM_READONLY);
+@@ -1484,8 +1484,8 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
+ 		return kvm_handle_guest_sea(vcpu);
+ 
+ 	if (!esr_fsc_is_translation_fault(esr) && !esr_fsc_is_permission_fault(esr)) {
+-		WARN_ONCE(1, "Unhandled VNCR abort, ESR=%llx\n", esr);
+-		return 1;
++		KVM_BUG(1, vcpu->kvm, "Unhandled VNCR abort, ESR=%llx\n", esr);
++		return -EIO;
  	}
  
-+	/*
-+	 * FIXME: This check is too restrictive as KVM allows cacheable memory
-+	 * attributes for PFNMAP VMAs that have cacheable attributes in host
-+	 * stage-1.
-+	 */
-+	if (!pfn_is_map_memory(pfn)) {
-+		kvm_release_faultin_page(vcpu->kvm, page, true, false);
-+		fail_s1_walk(&vt->wr, ESR_ELx_FSC_EXTABT, false);
-+		return -EFAULT;
-+	}
-+
- 	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
- 		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq)) {
- 			kvm_release_faultin_page(vcpu->kvm, page, true, false);
+ 	ret = kvm_translate_vncr(vcpu, &is_gmem);
 -- 
 2.47.3
 
