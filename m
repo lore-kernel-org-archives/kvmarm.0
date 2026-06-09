@@ -1,143 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D2E37CD5C;
-	Tue,  9 Jun 2026 07:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A65348896
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jun 2026 09:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780989903; cv=none; b=oKAo6LXx0BEyKMIdg2xk6E1tZqdbFYc9gxuuPY4HNYAy/0dp0Y9ZuKB/NOZ90QMMkYc1rE7AXFWtvZJu9dNqtc6+78dLidE4PvowlLclUdTq1pU673dFWz2tZApr4tneaRUS9+NkkQJWLkWVyWAPZtlflYvSzV1vdxVLi+Uyn4A=
+	t=1780997351; cv=none; b=eR737j3CZtFBDaZSYkeqeQ+yDCeME507eTVQpGB6fHaoVAqrpAznEFnFBCptSrk4uIaAAigcos2bPCEJGrdXCGt9yR52Z8A1zJ0r3F5B0az8AsADRVOTlyApBeZCmsZ6WBgjzyGk7s6NihGrvjalXeQnLNYsrvvfVqQaGqwnVeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780989903; c=relaxed/simple;
-	bh=OhmPEdTEX2bgvY3uHBYhAxz6vnODQgfYbE1LLEqq5P0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bf+yXmbAavF4HAnfwre5W/3lZT39rh7jTaBdI480pu19GpCbehez5bShLoP0eAZ2bVdQLyOR84Y1++tpc/ZPLv6TqZDilCcdMm2b7uCR4wpl8iS8A44SKG3v4QBXESQ6iscz+CiCcbMLz/bnnbtb8DUaNeRGK7uRaoL6bFTiZx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diCh9Cro; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diCh9Cro"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E8A1F00893;
-	Tue,  9 Jun 2026 07:25:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780989902;
-	bh=Qpz3SdkUYISithjygHc1jib5Zu/rO+fgThVHu853SKI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=diCh9CroxRr1M/NLX82W9xpSc2vmG5xzr4jz6sRjKRyV3XXh9NeqKnYzFQfOH4Nwh
-	 sFr3o9p4StESVETMkgR1gEBFAB45lfCaAI1WOjXOS0XN0WonIcAZ/P14Ir0l03f2p3
-	 4iGOvT+GtroGBJ9LiW/LCDivHr//MiOKARWqAn2j6YLXyJVXdmiMUs2+rrH9E7vy4i
-	 6M38Tw6ftE8Mp2WVYv8dVbRFOz+StYiGze+nQRvPeTA7SI1n6Freqhf+yOckfJflyg
-	 XccN8eXWgnp5ZHfnoGW+C19PsttbJcQmNlj6LGr75guvbdyGcRUqNbWq/BIIreoerN
-	 ofDyyzCfYkyeg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wWqpY-0000000AnMP-1UFX;
-	Tue, 09 Jun 2026 07:25:00 +0000
-Date: Tue, 09 Jun 2026 08:25:00 +0100
-Message-ID: <86ldcotbub.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Hold kvm->mmu_lock while initialising vcpu->arch.vncr_tlb
-In-Reply-To: <aicqzM4W4NN-GndT@google.com>
-References: <20260608081108.2244133-1-maz@kernel.org>
-	<aicqzM4W4NN-GndT@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1780997351; c=relaxed/simple;
+	bh=FcCAg8VdrQBhc3e9Aqg/PJ3XfA/85D0+dFBWko2gRiE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=YHJ+dASYBw13a1U/nZquF52xnhBtJJokbp7NVkbZf/c1s4u6NunFUmKNORutusDzbZvyQrAld2+8ya22G1pq45smPg7HYeMIaDJXdifPneJftg0eF/uI7K/efhfMVDzMshjeJPE40wqQQelxA/CWgzZ0nfYzaKMOHjDMNhWueJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-69e859a8d5eso3843808eaf.2
+        for <kvmarm@lists.linux.dev>; Tue, 09 Jun 2026 02:29:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780997348; x=1781602148;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tDtntZKOvf+QgM91JxUiEGn+OVlpeQ6B56aULm94QfI=;
+        b=WoLegXUkWTAnsnaNLWs10SIlRcFxxdzMLVn6sXNRGX0cK6C/ffygEouOp+zxjkCCa6
+         xcLYcjhcaoqqce4cEkVihKr7JoU6PMvQ233lX0A05zvf+X20MfD+/R0uxaLlcoLBXBDj
+         MxuQ2Jx6ecWfCFrjqrr31RWz5Qn7Nq8Av/kH12z+weQWH75glFkkFd+FGULClfr5x6Ql
+         bK56Kn4r9f425Em70jyNus/CDLoy3/RZUyhN7nMRJcX9aqGLaoJka9O/GvmJJWVmAR9s
+         xO68+x41VAr5phHEyu/+N/IGAyz7I/nyr+STR5ABspVrrC3V+YnVWJbiUzzqzuon8bPu
+         VdDw==
+X-Forwarded-Encrypted: i=1; AFNElJ9nbL5uHf6wS/irGp1DIbo60ZH0mKwPx2pVeT0aBugrmZnfj2QrrTxwG03BEqH1dC7uU4CPph8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxGIzO/2Yie4n7VLPyBYvRYSTcgfbXY0DrjwKzPywRa20R37U0j
+	lvwD8tkPUY3CQjI8+CADikktFHxo3NEaCGA+T5JJYBN+NwgGSSXV4oCgRuR8neMc9dhCyTKCUsM
+	FJeyP6J+UBiseoj022iqM/H/5waNbMamFaG7HEnZuIr7zqboWiu/sCOqrjtY=
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yosry@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Received: by 2002:a05:6820:818f:b0:69e:424a:8df1 with SMTP id
+ 006d021491bc7-69e68b4b285mr10545972eaf.19.1780997348483; Tue, 09 Jun 2026
+ 02:29:08 -0700 (PDT)
+Date: Tue, 09 Jun 2026 02:29:08 -0700
+In-Reply-To: <20260608144252.351443-1-joro@8bytes.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a27dce4.39669fcc.33b062.0090.GAE@google.com>
+Subject: [syzbot ci] Re: KVM Planes + SEV-SNP Support
+From: syzbot ci <syzbot+ci5127b91b8837842d@syzkaller.appspotmail.com>
+To: anelkz@amazon.de, ashish.kalra@amd.com, clopez@suse.de, 
+	coconut-svsm@lists.linux.dev, huibo.wang@amd.com, 
+	james.bottomley@hansenpartnership.com, joerg.roedel@amd.com, joro@8bytes.org, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
+	michael.roth@amd.com, nsaenz@amazon.com, pbonzini@redhat.com, 
+	seanjc@google.com, thomas.lendacky@amd.com, x86@kernel.org
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 08 Jun 2026 21:55:25 +0100,
-Yosry Ahmed <yosry@kernel.org> wrote:
-> 
-> On Mon, Jun 08, 2026 at 09:11:08AM +0100, Marc Zyngier wrote:
-> > Sashiko reports that there is a race between initialising vncr_tlb
-> > and making use of it, as we don't hold the mmu_lock at this point.
-> > 
-> > Additionally, it identifies a memory leak, should userspace repeatedly
-> > invokes the KVM_RUN ioctl after a failure of kvm_arch_vcpu_run_pid_change(),
-> > as we assign vncr_tlb blindly on first run, irrespective of prior
-> > allocations.
-> > 
-> > Slap the two bugs in one go by taking the kvm->mmu_lock on assigning
-> > vncr_tlb, preventing the race for good, and by checking that vncr_tlb
-> > is indeed NULL prior to allocation.
-> > 
-> > Reported-by: Sashiko <sashiko-bot@kernel.org>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/20260607180815.85FBC1F00893@smtp.kernel.org
-> > ---
-> >  arch/arm64/kvm/nested.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 690b8e8564166..d11e36b3cfcc2 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1253,8 +1253,14 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
-> >  	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
-> >  		return 0;
-> >  
-> > -	vcpu->arch.vncr_tlb = kzalloc_obj(*vcpu->arch.vncr_tlb,
-> > -					  GFP_KERNEL_ACCOUNT);
-> > +	if (!vcpu->arch.vncr_tlb) {
-> > +		struct vncr_tlb *vt = kzalloc_obj(*vcpu->arch.vncr_tlb,
-> > +						  GFP_KERNEL_ACCOUNT);
-> > +
-> > +		scoped_guard(write_lock, &vcpu->kvm->mmu_lock)
-> > +			vcpu->arch.vncr_tlb = vt;
-> > +	}
-> 
-> (I am not familiar with this code at all, so apologies in advance if I
-> am making an idiot out of myself here)
-> 
-> IIUC, the point of holding the lock here is *not* to protect against
-> concurrent initialization, as in this case the NULL check needs to be
-> done under the lock.
-> 
-> Rather, the goal is to prevent re-ordering of zeroing from kzalloc and
-> the assignment to vcpu->arch.vncr_tlb, by depending on the barriers
-> provided by the lock. The lock is held by the readers so holding it here
-> conviently means we do not need to add any barriers to the readers.
-> 
-> Is my understanding correct?
+syzbot ci has tested the following series
 
-It is correct.
+[v1] KVM Planes + SEV-SNP Support
+https://lore.kernel.org/all/20260608144252.351443-1-joro@8bytes.org
+* [PATCH 01/60] x86/sev: Define the #HV doorbell page structure
+* [PATCH 02/60] KVM: SVM: Add support for the SEV-SNP #HV doorbell page NAE event
+* [PATCH 03/60] KVM: SVM: Inject #HV when Restricted Injection is active
+* [PATCH 04/60] KVM: SVM: Inject NMIs when Restricted Injection is active
+* [PATCH 05/60] KVM: SVM: Inject MCEs when Restricted Injection is active
+* [PATCH 06/60] KVM: SVM: Enable Restricted Injection for an SEV-SNP guest
+* [PATCH 07/60] KVM: SVM: Add support for the SEV-SNP #HV IPI NAE event
+* [PATCH 08/60] Documentation: kvm: introduce "VM plane" concept
+* [PATCH 09/60] kvm: Introduce struct kvm_plane
+* [PATCH 10/60] kvm: Move vcpu_array to struct kvm_plane
+* [PATCH 11/60] kvm: Introduce struct kvm_vcpu_common
+* [PATCH 12/60] kvm: Move vcpu accounting to struct kvm_vcpu_common
+* [PATCH 13/60] kvm: Add read accessors for kvm_vcpu scheduling state
+* [PATCH 14/60] kvm: Make kvm_running_vcpus point to struct kvm_vcpu_common
+* [PATCH 15/60] kvm: Move VCPU scheduling state to struct kvm_vcpu_common
+* [PATCH 16/60] kvm: Add accessors for kvm_vcpu->mutex
+* [PATCH 17/60] kvm: Move VCPU locking to struct kvm_vcpu_common
+* [PATCH 18/60] kvm: Move kvm_vcpu->rcuwait to struct kvm_vcpu_common
+* [PATCH 19/60] kvm: Introduce accessors for kvm_vcpu->mode
+* [PATCH 20/60] kvm: Move kvm_vcpu mode and requests field to struct kvm_vcpu_common
+* [PATCH 21/60] kvm: Introduce per-plane VCPU requests
+* [PATCH 22/60] kvm: Move kvm_vcpu pid members to struct kvm_vcpu_common
+* [PATCH 23/60] kvm: Move kvm_vcpu sigset members to struct kvm_vcpu_common
+* [PATCH 24/60] kvm: Move kvm_vcpu spinloop members to struct kvm_vcpu_common
+* [PATCH 25/60] kvm: Move kvm_vcpu->dirty_ring to struct kvm_vcpu_common
+* [PATCH 26/60] kvm: Introduce arch-specific plane state
+* [PATCH 27/60] kvm: Introduce arch-specific part of struct kvm_vcpu_common
+* [PATCH 28/60] kvm: Implement KVM_CAP_PLANES
+* [PATCH 29/60] kvm: Implement KVM_CREATE_PLANE ioctl
+* [PATCH 30/60] kvm: Add KVM_EXIT_PLANE_EVENT
+* [PATCH 31/60] kvm: Allocate struct kvm_plane in architecture code
+* [PATCH 32/60] kvm: Allocate struct kvm_run only for struct kvm_vcpu_common
+* [PATCH 33/60] KVM: Implement KVM_CREATE_VCPU ioctl for planes
+* [PATCH 34/60] kvm: Keep track of plane VCPUs in struct kvm_vcpu_common
+* [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
+* [PATCH 36/60] kvm: Add plane_level to kvm_kernel_irq_routing_entry
+* [PATCH 37/60] kvm: Pass plane_level to kvm_set_routing_entry()
+* [PATCH 38/60] kvm: Make KVM_SIGNAL_MSI per plane
+* [PATCH 39/60] kvm: Make KVM_SET_GSI_ROUTING per plane
+* [PATCH 40/60] kvm: x86: Handle IOAPIC EOIs per plane
+* [PATCH 41/60] kvm: x86: Make apic_map per plane
+* [PATCH 42/60] kvm: x86: Make local APIC code aware of planes
+* [PATCH 43/60] kvm: x86: Move CPUID state to struct kvm_vcpu_arch_common
+* [PATCH 44/60] kvm: x86: Move cpu_caps to struct kvm_vcpu_arch_common
+* [PATCH 45/60] kvm: x86: Update state for all plane VCPUs after CPUID update
+* [PATCH 46/60] kvm: x86: Share MTRR state across planes
+* [PATCH 47/60] kvm: x86: Select a plane to run
+* [PATCH 48/60] kvm: x86: Make event injection VCPU requests per-plane
+* [PATCH 49/60] kvm: x86: Allow hardware backend to overwrite struct kvm_plane allocation
+* [PATCH 50/60] kvm: x86: Make KVM_REQ_UPDATE_PROTECTED_GUEST_STATE per plane
+* [PATCH 51/60] kvm: x86: Share pio_data across planes
+* [PATCH 52/60] kvm: x86: Switch to plane0 if it has events
+* [PATCH 53/60] kvm: x86: Introduce max_planes x86-op
+* [PATCH 54/60] kvm: x86: Restrict KVM planes support to KVM_IRQCHIP_SPLIT
+* [PATCH 55/60] kvm: svm: Track vmsa_features per plane
+* [PATCH 56/60] kvm: svm: Implement GET_AP_APIC_IDS NAE event
+* [PATCH 57/60] kvm: sev: Allow for VMPL level specification in AP create
+* [PATCH 58/60] kvm: svm: Invoke a specified VMPL level VMSA for the vCPU
+* [PATCH 59/60] kvm: svm: Implement max_planes x86 operation
+* [PATCH 60/60] kvm: svm: Advertise full multi-VMPL support to the SNP guest
 
-> 
-> If yes, I think the code looks confusing, at least to a layman like
-> myself. It initially seems like the lock protects against concurrent
-> initializations, but then the NULL check is not done again under the
-> lock. The goal of the lock is not clear without the original report.
->
-> Mayeb it's clearer to explicitly use barriers if the goal is preventing
-> reordering?
+and found the following issue:
+WARNING in __kvm_plane_ioctl
 
-This would require both the initialisation of vncr_tlb to use a store
-release, *and* all the other call sites to use a load acquire.
+Full report is available here:
+https://ci.syzbot.org/series/7426b4e7-e1df-4f2e-8464-acda36316e29
 
-I really don't think it is worth the churn, nor the (very small)
-burden on the readers.
+***
 
-Thanks,
+WARNING in __kvm_plane_ioctl
 
-	M.
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      2d3090a8aeb596a26935db0955d46c9a5db5c6ce
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/f9f7af87-a544-413f-b7e0-662f92794f11/config
+syz repro: https://ci.syzbot.org/findings/751865bf-494c-4000-9b11-d8aa15f03893/syz_repro
 
--- 
-Without deviation from the norm, progress is not possible.
+------------[ cut here ]------------
+r == -EBUSY
+WARNING: arch/x86/kvm/../../../virt/kvm/kvm_main.c:4412 at kvm_plane_ioctl_create_vcpu virt/kvm/kvm_main.c:4412 [inline], CPU#1: syz.2.19/5809
+WARNING: arch/x86/kvm/../../../virt/kvm/kvm_main.c:4412 at __kvm_plane_ioctl+0x8bd/0xa70 virt/kvm/kvm_main.c:4908, CPU#1: syz.2.19/5809
+Modules linked in:
+CPU: 1 UID: 0 PID: 5809 Comm: syz.2.19 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:kvm_plane_ioctl_create_vcpu virt/kvm/kvm_main.c:4412 [inline]
+RIP: 0010:__kvm_plane_ioctl+0x8bd/0xa70 virt/kvm/kvm_main.c:4908
+Code: e8 c8 0a 09 00 4c 89 f7 e8 80 a3 ff ff 48 8b 3d a9 a8 fd 11 4c 89 f6 e8 c1 35 e7 00 49 63 c7 e9 8c fc ff ff e8 94 2f 87 00 90 <0f> 0b 90 41 bf f0 ff ff ff eb bc e8 e3 eb 68 0a 89 f9 80 e1 07 80
+RSP: 0018:ffffc9000318f940 EFLAGS: 00010293
+RAX: ffffffff813f480c RBX: ffff8881ba113410 RCX: ffff88810d4f4a80
+RDX: 0000000000000000 RSI: ffffffff8e6fa0b0 RDI: 00000000fffffff0
+RBP: ffffc9000318fa70 R08: ffff88810d4f4a80 R09: 0000000000000002
+R10: 00000000fffffff0 R11: 0000000000000000 R12: 1ffff92000631f34
+R13: dffffc0000000000 R14: ffff8881b446cb18 R15: 00000000fffffff0
+FS:  00007f13e64ad6c0(0000) GS:ffff8882a929c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f13e64acff8 CR3: 00000001a6053000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ kvm_vm_ioctl+0x88e/0xbf0 virt/kvm/kvm_main.c:5546
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f13e559ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f13e64ad028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f13e5816090 RCX: 00007f13e559ce59
+RDX: 0000000000000000 RSI: 000000000000ae41 RDI: 0000000000000004
+RBP: 00007f13e5632d6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f13e5816128 R14: 00007f13e5816090 R15: 00007fff90c39748
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
