@@ -1,197 +1,194 @@
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A65348896
-	for <kvmarm@lists.linux.dev>; Tue,  9 Jun 2026 09:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11E02D876F
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jun 2026 09:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780997351; cv=none; b=eR737j3CZtFBDaZSYkeqeQ+yDCeME507eTVQpGB6fHaoVAqrpAznEFnFBCptSrk4uIaAAigcos2bPCEJGrdXCGt9yR52Z8A1zJ0r3F5B0az8AsADRVOTlyApBeZCmsZ6WBgjzyGk7s6NihGrvjalXeQnLNYsrvvfVqQaGqwnVeU=
+	t=1780998515; cv=none; b=qr+D+JciJyTF+OGoLiBE1p1SenI22iPqVsUEjRo+T+HzageH8juJHK+SXy6+qBb5qb5OiTQ8gRZFzoBdBwkQTX81oQ7BSt4LSUnQVjm9kOjSon+tXz28KhnNNLDqIg77lBobEgHRnit8ujBEBTOUfnrYTFrfZV+bXiSU3VPq5f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780997351; c=relaxed/simple;
-	bh=FcCAg8VdrQBhc3e9Aqg/PJ3XfA/85D0+dFBWko2gRiE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=YHJ+dASYBw13a1U/nZquF52xnhBtJJokbp7NVkbZf/c1s4u6NunFUmKNORutusDzbZvyQrAld2+8ya22G1pq45smPg7HYeMIaDJXdifPneJftg0eF/uI7K/efhfMVDzMshjeJPE40wqQQelxA/CWgzZ0nfYzaKMOHjDMNhWueJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-69e859a8d5eso3843808eaf.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Jun 2026 02:29:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780997348; x=1781602148;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tDtntZKOvf+QgM91JxUiEGn+OVlpeQ6B56aULm94QfI=;
-        b=WoLegXUkWTAnsnaNLWs10SIlRcFxxdzMLVn6sXNRGX0cK6C/ffygEouOp+zxjkCCa6
-         xcLYcjhcaoqqce4cEkVihKr7JoU6PMvQ233lX0A05zvf+X20MfD+/R0uxaLlcoLBXBDj
-         MxuQ2Jx6ecWfCFrjqrr31RWz5Qn7Nq8Av/kH12z+weQWH75glFkkFd+FGULClfr5x6Ql
-         bK56Kn4r9f425Em70jyNus/CDLoy3/RZUyhN7nMRJcX9aqGLaoJka9O/GvmJJWVmAR9s
-         xO68+x41VAr5phHEyu/+N/IGAyz7I/nyr+STR5ABspVrrC3V+YnVWJbiUzzqzuon8bPu
-         VdDw==
-X-Forwarded-Encrypted: i=1; AFNElJ9nbL5uHf6wS/irGp1DIbo60ZH0mKwPx2pVeT0aBugrmZnfj2QrrTxwG03BEqH1dC7uU4CPph8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxGIzO/2Yie4n7VLPyBYvRYSTcgfbXY0DrjwKzPywRa20R37U0j
-	lvwD8tkPUY3CQjI8+CADikktFHxo3NEaCGA+T5JJYBN+NwgGSSXV4oCgRuR8neMc9dhCyTKCUsM
-	FJeyP6J+UBiseoj022iqM/H/5waNbMamFaG7HEnZuIr7zqboWiu/sCOqrjtY=
+	s=arc-20240116; t=1780998515; c=relaxed/simple;
+	bh=WJQY5ou3eMvIN8qfMQO/miWVII6tdbQNF9XnBaEKqc0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Kc9Hihzzpi8nt4P5EzIjRuM0dC5NIdpoXf9/Lj3mE+dCrAG0f5ajKGipYXKlWCduW9HBDGmQRma906YC0vpizsmuHFozUBiWRwRv8BThOXT6bXReJe6At5F2/I3JVLHBZfUi277GcIeiGB7yYO8uTcBJys1ZJGTfcuGbQOJFUrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=iFWwP7th; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="iFWwP7th"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F29302680;
+	Tue,  9 Jun 2026 02:48:27 -0700 (PDT)
+Received: from entos-yitian-01.Arm.com (unknown [10.168.197.75])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 80E3B3FE53;
+	Tue,  9 Jun 2026 02:48:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1780998512; bh=WJQY5ou3eMvIN8qfMQO/miWVII6tdbQNF9XnBaEKqc0=;
+	h=From:To:Cc:Subject:Date:Reply-To:From;
+	b=iFWwP7thd8N0A0OFADiu87+hSKOky73VuRNwTZyZiOGcCFhppSimmQkqN8N8/tseE
+	 FeY0Tgb3rEKQRxbk4d18EvYkfad4l3H2KeL6T6El4Vq3QOGxUqf1PllCwhwdikVAi1
+	 jsFMeimwWxY6/6Y7wbdFpT2RpRvcaXu7u4gpEUjg=
+From: Jia He <justin.he@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Jia He <justin.he@arm.com>
+Subject: [PATCH v2] KVM: arm64: Make guest memory fault-in interruptible
+Date: Tue,  9 Jun 2026 09:48:18 +0000
+Message-Id: <20260609094818.498775-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.34.1
+Reply-To: 20260608104336.2405384-2-justin.he@arm.com
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:818f:b0:69e:424a:8df1 with SMTP id
- 006d021491bc7-69e68b4b285mr10545972eaf.19.1780997348483; Tue, 09 Jun 2026
- 02:29:08 -0700 (PDT)
-Date: Tue, 09 Jun 2026 02:29:08 -0700
-In-Reply-To: <20260608144252.351443-1-joro@8bytes.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a27dce4.39669fcc.33b062.0090.GAE@google.com>
-Subject: [syzbot ci] Re: KVM Planes + SEV-SNP Support
-From: syzbot ci <syzbot+ci5127b91b8837842d@syzkaller.appspotmail.com>
-To: anelkz@amazon.de, ashish.kalra@amd.com, clopez@suse.de, 
-	coconut-svsm@lists.linux.dev, huibo.wang@amd.com, 
-	james.bottomley@hansenpartnership.com, joerg.roedel@amd.com, joro@8bytes.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
-	michael.roth@amd.com, nsaenz@amazon.com, pbonzini@redhat.com, 
-	seanjc@google.com, thomas.lendacky@amd.com, x86@kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+arm64 KVM faults guest memory into the host in kvm_s2_fault_pin_pfn(),
+kvm_translate_vncr() (for NV's VNCR page) and pkvm_mem_abort() (for
+protected guests). Today these requests are made non-interruptible, so
+if the host fault-in path blocks for a long time, a vCPU thread that
+already has a pending signal cannot leave the fault-in path until GUP
+eventually completes.
 
-[v1] KVM Planes + SEV-SNP Support
-https://lore.kernel.org/all/20260608144252.351443-1-joro@8bytes.org
-* [PATCH 01/60] x86/sev: Define the #HV doorbell page structure
-* [PATCH 02/60] KVM: SVM: Add support for the SEV-SNP #HV doorbell page NAE event
-* [PATCH 03/60] KVM: SVM: Inject #HV when Restricted Injection is active
-* [PATCH 04/60] KVM: SVM: Inject NMIs when Restricted Injection is active
-* [PATCH 05/60] KVM: SVM: Inject MCEs when Restricted Injection is active
-* [PATCH 06/60] KVM: SVM: Enable Restricted Injection for an SEV-SNP guest
-* [PATCH 07/60] KVM: SVM: Add support for the SEV-SNP #HV IPI NAE event
-* [PATCH 08/60] Documentation: kvm: introduce "VM plane" concept
-* [PATCH 09/60] kvm: Introduce struct kvm_plane
-* [PATCH 10/60] kvm: Move vcpu_array to struct kvm_plane
-* [PATCH 11/60] kvm: Introduce struct kvm_vcpu_common
-* [PATCH 12/60] kvm: Move vcpu accounting to struct kvm_vcpu_common
-* [PATCH 13/60] kvm: Add read accessors for kvm_vcpu scheduling state
-* [PATCH 14/60] kvm: Make kvm_running_vcpus point to struct kvm_vcpu_common
-* [PATCH 15/60] kvm: Move VCPU scheduling state to struct kvm_vcpu_common
-* [PATCH 16/60] kvm: Add accessors for kvm_vcpu->mutex
-* [PATCH 17/60] kvm: Move VCPU locking to struct kvm_vcpu_common
-* [PATCH 18/60] kvm: Move kvm_vcpu->rcuwait to struct kvm_vcpu_common
-* [PATCH 19/60] kvm: Introduce accessors for kvm_vcpu->mode
-* [PATCH 20/60] kvm: Move kvm_vcpu mode and requests field to struct kvm_vcpu_common
-* [PATCH 21/60] kvm: Introduce per-plane VCPU requests
-* [PATCH 22/60] kvm: Move kvm_vcpu pid members to struct kvm_vcpu_common
-* [PATCH 23/60] kvm: Move kvm_vcpu sigset members to struct kvm_vcpu_common
-* [PATCH 24/60] kvm: Move kvm_vcpu spinloop members to struct kvm_vcpu_common
-* [PATCH 25/60] kvm: Move kvm_vcpu->dirty_ring to struct kvm_vcpu_common
-* [PATCH 26/60] kvm: Introduce arch-specific plane state
-* [PATCH 27/60] kvm: Introduce arch-specific part of struct kvm_vcpu_common
-* [PATCH 28/60] kvm: Implement KVM_CAP_PLANES
-* [PATCH 29/60] kvm: Implement KVM_CREATE_PLANE ioctl
-* [PATCH 30/60] kvm: Add KVM_EXIT_PLANE_EVENT
-* [PATCH 31/60] kvm: Allocate struct kvm_plane in architecture code
-* [PATCH 32/60] kvm: Allocate struct kvm_run only for struct kvm_vcpu_common
-* [PATCH 33/60] KVM: Implement KVM_CREATE_VCPU ioctl for planes
-* [PATCH 34/60] kvm: Keep track of plane VCPUs in struct kvm_vcpu_common
-* [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
-* [PATCH 36/60] kvm: Add plane_level to kvm_kernel_irq_routing_entry
-* [PATCH 37/60] kvm: Pass plane_level to kvm_set_routing_entry()
-* [PATCH 38/60] kvm: Make KVM_SIGNAL_MSI per plane
-* [PATCH 39/60] kvm: Make KVM_SET_GSI_ROUTING per plane
-* [PATCH 40/60] kvm: x86: Handle IOAPIC EOIs per plane
-* [PATCH 41/60] kvm: x86: Make apic_map per plane
-* [PATCH 42/60] kvm: x86: Make local APIC code aware of planes
-* [PATCH 43/60] kvm: x86: Move CPUID state to struct kvm_vcpu_arch_common
-* [PATCH 44/60] kvm: x86: Move cpu_caps to struct kvm_vcpu_arch_common
-* [PATCH 45/60] kvm: x86: Update state for all plane VCPUs after CPUID update
-* [PATCH 46/60] kvm: x86: Share MTRR state across planes
-* [PATCH 47/60] kvm: x86: Select a plane to run
-* [PATCH 48/60] kvm: x86: Make event injection VCPU requests per-plane
-* [PATCH 49/60] kvm: x86: Allow hardware backend to overwrite struct kvm_plane allocation
-* [PATCH 50/60] kvm: x86: Make KVM_REQ_UPDATE_PROTECTED_GUEST_STATE per plane
-* [PATCH 51/60] kvm: x86: Share pio_data across planes
-* [PATCH 52/60] kvm: x86: Switch to plane0 if it has events
-* [PATCH 53/60] kvm: x86: Introduce max_planes x86-op
-* [PATCH 54/60] kvm: x86: Restrict KVM planes support to KVM_IRQCHIP_SPLIT
-* [PATCH 55/60] kvm: svm: Track vmsa_features per plane
-* [PATCH 56/60] kvm: svm: Implement GET_AP_APIC_IDS NAE event
-* [PATCH 57/60] kvm: sev: Allow for VMPL level specification in AP create
-* [PATCH 58/60] kvm: svm: Invoke a specified VMPL level VMSA for the vCPU
-* [PATCH 59/60] kvm: svm: Implement max_planes x86 operation
-* [PATCH 60/60] kvm: svm: Advertise full multi-VMPL support to the SNP guest
+This is particularly painful during VM teardown, where userspace may
+signal vCPU threads while they are blocked faulting in guest memory. In
+that case there is no benefit in continuing to wait for the fault to
+complete; the vCPU should return to userspace and let the pending signal
+be handled.
 
-and found the following issue:
-WARNING in __kvm_plane_ioctl
+Ask the generic KVM fault-in helper to use FOLL_INTERRUPTIBLE (and pass
+the same flag to pin_user_pages() for the pKVM path). When GUP reports a
+pending signal, __kvm_faultin_pfn() returns KVM_PFN_ERR_SIGPENDING and
+pin_user_pages() returns -EINTR; handle both by calling
+kvm_handle_signal_exit() and returning -EINTR. This mirrors the
+signal-exit handling already done by the arm64 run loop, which sets
+run->exit_reason = KVM_EXIT_INTR before returning to userspace. It is
+also consistent with x86, which already allows the fault-in to be
+interrupted by pending signals.
 
-Full report is available here:
-https://ci.syzbot.org/series/7426b4e7-e1df-4f2e-8464-acda36316e29
-
-***
-
-WARNING in __kvm_plane_ioctl
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      2d3090a8aeb596a26935db0955d46c9a5db5c6ce
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/f9f7af87-a544-413f-b7e0-662f92794f11/config
-syz repro: https://ci.syzbot.org/findings/751865bf-494c-4000-9b11-d8aa15f03893/syz_repro
-
-------------[ cut here ]------------
-r == -EBUSY
-WARNING: arch/x86/kvm/../../../virt/kvm/kvm_main.c:4412 at kvm_plane_ioctl_create_vcpu virt/kvm/kvm_main.c:4412 [inline], CPU#1: syz.2.19/5809
-WARNING: arch/x86/kvm/../../../virt/kvm/kvm_main.c:4412 at __kvm_plane_ioctl+0x8bd/0xa70 virt/kvm/kvm_main.c:4908, CPU#1: syz.2.19/5809
-Modules linked in:
-CPU: 1 UID: 0 PID: 5809 Comm: syz.2.19 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:kvm_plane_ioctl_create_vcpu virt/kvm/kvm_main.c:4412 [inline]
-RIP: 0010:__kvm_plane_ioctl+0x8bd/0xa70 virt/kvm/kvm_main.c:4908
-Code: e8 c8 0a 09 00 4c 89 f7 e8 80 a3 ff ff 48 8b 3d a9 a8 fd 11 4c 89 f6 e8 c1 35 e7 00 49 63 c7 e9 8c fc ff ff e8 94 2f 87 00 90 <0f> 0b 90 41 bf f0 ff ff ff eb bc e8 e3 eb 68 0a 89 f9 80 e1 07 80
-RSP: 0018:ffffc9000318f940 EFLAGS: 00010293
-RAX: ffffffff813f480c RBX: ffff8881ba113410 RCX: ffff88810d4f4a80
-RDX: 0000000000000000 RSI: ffffffff8e6fa0b0 RDI: 00000000fffffff0
-RBP: ffffc9000318fa70 R08: ffff88810d4f4a80 R09: 0000000000000002
-R10: 00000000fffffff0 R11: 0000000000000000 R12: 1ffff92000631f34
-R13: dffffc0000000000 R14: ffff8881b446cb18 R15: 00000000fffffff0
-FS:  00007f13e64ad6c0(0000) GS:ffff8882a929c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f13e64acff8 CR3: 00000001a6053000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- kvm_vm_ioctl+0x88e/0xbf0 virt/kvm/kvm_main.c:5546
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f13e559ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f13e64ad028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f13e5816090 RCX: 00007f13e559ce59
-RDX: 0000000000000000 RSI: 000000000000ae41 RDI: 0000000000000004
-RBP: 00007f13e5632d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f13e5816128 R14: 00007f13e5816090 R15: 00007fff90c39748
- </TASK>
+For the VNCR path, kvm_handle_vncr_abort() handles -EINTR before the
+translation-failure path. A signal-interrupted host fault-in is not a VNCR
+translation failure: kvm_translate_vncr() has already prepared the signal
+exit, while the failure path assumes vt->wr.failed is set and would
+otherwise trip BUG_ON(!vt->wr.failed).
 
 
-***
+The interrupted fault does not install a partial stage-2 mapping: the
+-EINTR is returned before any mapping is created, so the fault is simply
+retried on a subsequent vCPU entry once userspace re-enters KVM_RUN.
+Ordinary stage-2 faults continue to complete as before unless the task
+already has a pending signal while blocked in the fault-in path.
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
+Signed-off-by: Jia He <justin.he@arm.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Changelog:
+v2:
+- Also make the VNCR (kvm_translate_vncr) and pKVM (pkvm_mem_abort)
+  fault-in paths interruptible, not just kvm_s2_fault_pin_pfn(); retitle
+  accordingly. (Marc)
+v1: https://lkml.org/lkml/2026/6/8/1033
 
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
+ arch/arm64/kvm/mmu.c    | 15 +++++++++++++--
+ arch/arm64/kvm/nested.c | 19 +++++++++++++++++--
+ 2 files changed, 30 insertions(+), 4 deletions(-)
 
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 4da9281312eb..f1dce829fefe 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1675,7 +1675,8 @@ struct kvm_s2_fault_vma_info {
+ 
+ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ {
+-	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
++	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE |
++			     FOLL_INTERRUPTIBLE;
+ 	struct kvm_vcpu *vcpu = s2fd->vcpu;
+ 	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
+ 	struct mm_struct *mm = current->mm;
+@@ -1701,6 +1702,10 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 		kvm_send_hwpoison_signal(s2fd->hva, PAGE_SHIFT);
+ 		ret = 0;
+ 		goto dec_account;
++	} else if (ret == -EINTR) {
++		/* GUP was interrupted by a pending signal, return to userspace. */
++		kvm_handle_signal_exit(vcpu);
++		goto dec_account;
+ 	} else if (ret != 1) {
+ 		ret = -EFAULT;
+ 		goto dec_account;
+@@ -1872,19 +1877,25 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
+ 				struct kvm_s2_fault_vma_info *s2vi)
+ {
+ 	int ret;
++	unsigned int flags = FOLL_INTERRUPTIBLE |
++			     (kvm_is_write_fault(s2fd->vcpu) ? FOLL_WRITE : 0);
+ 
+ 	ret = kvm_s2_fault_get_vma_info(s2fd, s2vi);
+ 	if (ret)
+ 		return ret;
+ 
+ 	s2vi->pfn = __kvm_faultin_pfn(s2fd->memslot, get_canonical_gfn(s2fd, s2vi),
+-				      kvm_is_write_fault(s2fd->vcpu) ? FOLL_WRITE : 0,
++				      flags,
+ 				      &s2vi->map_writable, &s2vi->page);
+ 	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
+ 		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
+ 			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
+ 			return 0;
+ 		}
++		if (is_sigpending_pfn(s2vi->pfn)) {
++			kvm_handle_signal_exit(s2fd->vcpu);
++			return -EINTR;
++		}
+ 		return -EFAULT;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 883b6c1008fb..6b4161327222 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1312,8 +1312,16 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+ 
+ 	*is_gmem = kvm_slot_has_gmem(memslot);
+ 	if (!*is_gmem) {
+-		pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
+-					&writable, &page);
++		unsigned int flags = FOLL_INTERRUPTIBLE;
++
++		if (write_fault)
++			flags |= FOLL_WRITE;
++
++		pfn = __kvm_faultin_pfn(memslot, gfn, flags, &writable, &page);
++		if (is_sigpending_pfn(pfn)) {
++			kvm_handle_signal_exit(vcpu);
++			return -EINTR;
++		}
+ 		if (is_error_noslot_pfn(pfn) || (write_fault && !writable))
+ 			return -EFAULT;
+ 	} else {
+@@ -1436,6 +1444,13 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
+ 			/* Hack to deal with POE until we get kernel support */
+ 			inject_vncr_perm(vcpu);
+ 			break;
++		case -EINTR:
++			/*
++			 * The fault-in was interrupted by a pending signal;
++			 * kvm_translate_vncr() has already set up the signal
++			 * exit. Return to userspace and retry on re-entry.
++			 */
++			return -EINTR;
+ 		case 0:
+ 			break;
+ 		}
+-- 
+2.34.1
+
