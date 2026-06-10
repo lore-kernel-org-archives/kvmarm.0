@@ -1,78 +1,78 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B70E3F787C
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 11:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE5240680A
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 12:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781092790; cv=none; b=X7hdLPNmb7yHJO/+eOUGMZA3LJyY9RcmSB63+AWcMUcCT1QfJizKho22LCNdt0WJ319Zo+GfzQKRJOJ/z8i8zd6zVnHXxSlPvVd8YEe3Nagfd74lDLeDza4YwYOJT/ESWF+U86h9d3NKjLLVoQpeB4P4XtHAfE2D/b/t4e8C84A=
+	t=1781093752; cv=none; b=enursM9o/9qpgoaRuJw0jyIi+o2BXA76W3zk8lm74L1TVTZNnurKQms11P6vEjt3zPH87FvejtFCzvnPO7MUIpSBJZuLqoVebOiGq2bo7IKzYdq/SKLZEUc04hdiLVdO0upBVcA2tz2nNe2SSZuRFpEMqxAxYAsREY+TVyIsPH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781092790; c=relaxed/simple;
-	bh=u9EDB4T0+1GDi2LjsjVOwso18YXI7T4zBts/lmLz42o=;
+	s=arc-20240116; t=1781093752; c=relaxed/simple;
+	bh=EQ4ylpXWi+YuFiR5Looby0OijETsTIL2XaXtihxgnN4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CC4rUCRGEYw2sIqzWg0+HwDVsTAS2wxovcEr/VzkLfNL5io8zFejaWj36oJg3AHT347fWHmravtfmPzwecTXs2cyMEFR7eGYqlqdYj2Wh6OhiKpREL27p7h4QVTZaAveHXrvkLGLA84opTzym26A9RVnOzQCJATqFeO9PnsvBoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bo0QHK/i; arc=none smtp.client-ip=209.85.128.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=sg5EI4uWqM2zuN86fSTm/k9NfuU/HMQePis3UfPRoa+xz3nggXrSgiwIwxjZjZgU0B++ppQgameGUyd9Uv8SoUTa0VGuNHcxRZzErqVhQBN0v9KYPssmn70derFk06AL5eE6pnprIw+pO/6l5aeorj39JOJHNhskoqoauOXhi1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UkTAIE/x; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bo0QHK/i"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so27680055e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 04:59:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UkTAIE/x"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-bf1cdcfd6deso821216266b.3
+        for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 05:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781092788; x=1781697588; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781093749; x=1781698549; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c28G8tbnZUyXO5kH0COrZ2xlMJ2YX0+1C3t/9VCQTd8=;
-        b=bo0QHK/i3i5VroAOIa/fnZc7kpp2QeoP4DxncEJzxq0YpyDBVhyHDm+m1XA7HcEWEr
-         5oNu8S5Pk0f2F6SN3q86IosFpdXlbdukuSUoLVp1lX/d3z8Ynq1KQ3XTuGoecoLcH2K/
-         JeYVu8rdGl7ro14xlIBPkJTE1NTzLPcjxLwncYVF9RbgNfJDQZD10aky6KwxubWfp3Zp
-         PGkKg+LfSjovFJKF1jlFoXLwqI9DJgwZ0BDDpG9s81lZIzfY9rJfvPKetOByEaUBP8iJ
-         CXvlc8NnzhK9U8JbxszDOPf2R+4AGiO2JNRffFnv5IVtye5GzT6Vew17M08UpH8WNKTB
-         3nlA==
+        bh=bzJL0f8wCrWQURXF71Dj93R+/8RnEeuOYo8zI8bSgbE=;
+        b=UkTAIE/xXD1lzjAtiaJDtDgGT7yTNlZDYtgVJztgK0dNIzujJJwmQcVaQiYczP8rEB
+         ipXxAeY2SC3l/Cilikjwt0pvGGcBvbJqE5dNucfbNNf46Ub7qKe+BCkh4axy4U3zT2XZ
+         BKlNAL9dYqxgnDDkcebGR5iECz9zBilwpS0fP9h9OcsuWbksnlAyb/9PNkoPlOVrvsOL
+         KOIgVHTF0qoR4GkMNe6TciOl7JkBUFJjjqS5WMg0fHdvaeFza66VFTMbIwUooVD3Z7Vo
+         EcTjYEziRhvUkoQGOpSS43pJTEE9O6VIKvhG/QqRflBxfEcm77GsnhO862AaRT0rVTuu
+         E64Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781092788; x=1781697588;
+        d=1e100.net; s=20251104; t=1781093749; x=1781698549;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c28G8tbnZUyXO5kH0COrZ2xlMJ2YX0+1C3t/9VCQTd8=;
-        b=CXmREHy0OOdZLvsV+Gn3KjjIoYTUwMlrHSRcoNjzkkMna+H99NwvrKgTcBJUk5QbQt
-         f5m+XfS1sabRTc7XgGIs7hglZ8T1o3YK5fq34F7rB5BQgg19BSzxfVSmzVqr0xg8ElTa
-         P5PCwYHjkfNK1efEpRLYtogVZriqr2tYIklcby8DfoB053C9kgqNWp9bDcDh8SNvF3ZN
-         1vUyxn5NYZDf316lPripGwqzbofMwc4m5r3WVEY+22lyE8uLztlYA0P2hD1zOWsFLz/W
-         ZKDk16lD9ZWfuxJYhcD4/78Jwj8lgkoqfgqYaqllpI/+D++owchmuB0Ggm+D0/4DRINw
-         5C2A==
-X-Forwarded-Encrypted: i=1; AFNElJ/xmGA6tPP0guTdxTFoSv21R80+Vn2u/1UVOuIwLePf9GD7s7tV+sexCoTnOdoWlZ/OKb+1HHQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyHtr+zao3SLJbgk0BpJ3ggQYaG6lnyvbxYQ0W6dOv08bYibGwx
-	QE0WCZqbUm4oK5XL/F/JBNO38f3aleP+m9d0ZIEOqU5e/Dg7mSS4NzCJp73RXl5TVQ==
-X-Gm-Gg: Acq92OEn4GW2EK6I9d2jCfH+D/569qWsjN/wakzWZUO8Ozeq74hzJe6feSK3zxEr9nC
-	M0ZkzleSyIg9i7+E9KnP1zFMi1E7OUXwIB7nD7mu/GyE0yAZl4o4vSPDUEH1syIMSItIrhrJnAg
-	N+Pkf5F7f3P+HKqgLvRIQVVOWvYRInUluJgx//P6MdEDwaXqx4TKfhJUDLUvG1AeTsBqB9U15yE
-	HZq1su+6n9hRXBK30YNTD/666JDSrdjPlqqps2Jcajbq7bDjW0GSvdc0vNo3dncSkwdVAIjLGKf
-	rgDsnzk9xuqABAo+u3Ut85jfTLQN3P21RFEJHIv0TqNxOztDEI+h67rHPPDQXzKQ5SsXISyY25+
-	LnUykRp+P8THk+DiyD5B4x2gZxNjTO1GDDzscVcXx263Kh2VJ8P+5QgCsapeAp5ylv6iMY8/DGi
-	sI5/gVyhWysfphtca1VLsW7F7Ffzf6OBX/yOlH4Fmr8WSIjzsZvPDKHjJ+NQaA+ktVxC6xMVHWH
-	pj1rQ==
-X-Received: by 2002:a05:600c:6091:b0:490:601f:d766 with SMTP id 5b1f17b1804b1-490c259a103mr424487945e9.1.1781092787304;
-        Wed, 10 Jun 2026 04:59:47 -0700 (PDT)
+        bh=bzJL0f8wCrWQURXF71Dj93R+/8RnEeuOYo8zI8bSgbE=;
+        b=YIN7+UpRecezyh6ENpErJX92N0eTsHopLMcaYW82mK602rrXBcDdSVMLhaLOx3pq8T
+         OlS2Gx05HDJXlvInmxaQ/g7QRw2TYepZ8A+llEQy2ZQCLX3IPGA8jcRyaaXDsqJymsBq
+         R8EFghO2E8ToNCr2qpjHdUjNxKzjFMhlxgIYQ3LLPe8s8ERXkJZb9E11DiwM6Od68aGS
+         gRPbtYfAoblqGG6IfkalydBaiphEg3izyh25TNrpMt45pFKyoWYAgU+ni4s+kAwuLqmb
+         5x1D+tCvgID4IhPfsd367IE3iPWBlewkKl/42J0yASJYHxXECpvLNOgqTpjmt/0MbKGs
+         U3ZQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+itXK14Klels7yg1Ve/fUnaIK8+xFcCmbCjg2V8Hh9phx6zY1gqxZaN+3zNRxwIBLV3vdCWM4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzamGFh1m2Yq9TF91BkZ5kBr2/PKJfuCz6E/Ml0ZyRlk+MVuTJw
+	FG3y4aoBc0v3sNy3VKbGSGj0AuNLaAbElFw0Bho9UNBpaorR2utnPIuyc4Tqw2sq7A==
+X-Gm-Gg: Acq92OE4KKthuRZQhlghhIZOGv3+rZV4sGnPMKEW/UKCMbxcxM4WGDUogfLberWvssp
+	sJ3576x6pL+2VAFLe+laXgIap03Px423b251Dv6PnqWVN0RXo52ILF9OSz8xjCUSG87x29hq+89
+	8yU4KDq/YOwWavs3H9E4raqSkCJmuj2If8GJjSxz/PtRymENf8rSXAEVKrlZYfweevZORl0ieBQ
+	kZ6F2Wbo4QdC418Ah69+3OW9TApdK8MYZStGW1kkm/CvAmcqTSnhLOURRNWbocAML20m4UMyo01
+	P/K/txygu3TL2fs27h74/sZ7KOkhSLB+Do7LBN89ilhcJzoROjDNBwv52zrHrWwXkXy3LQK54J7
+	yfvwUYvhY/4Nq0r6Wb5Q00Y8lsSogptNoFmPV0funz7oVF1TycLF0wti8Eo8ROhFPH9QdutetMI
+	1iwwHhIoAyRQmPuLRbIcGZBquyZ9HBgguNN9szB66Ee6cSxLkw/8tii4bqb3HQa2xTVpkRAdGcR
+	tyoDw==
+X-Received: by 2002:a17:907:267b:b0:bec:bd4f:e495 with SMTP id a640c23a62f3a-bf37155192bmr921560466b.12.1781093748467;
+        Wed, 10 Jun 2026 05:15:48 -0700 (PDT)
 Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f3446aesm78457172f8f.24.2026.06.10.04.59.46
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf0559f1464sm1197120266b.55.2026.06.10.05.15.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 04:59:46 -0700 (PDT)
-Date: Wed, 10 Jun 2026 12:59:43 +0100
+        Wed, 10 Jun 2026 05:15:47 -0700 (PDT)
+Date: Wed, 10 Jun 2026 13:15:44 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
-	will@kernel.org, joey.gouly@arm.com, korneld@google.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	mrigendra.chaubey@gmail.com, perlarsen@google.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v2 1/7] KVM: arm64: Support
- FFA_NOTIFICATION_BITMAP_CREATE in host handler
-Message-ID: <ailRrxS5nbvNsbWB@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: Sebastian Ene <sebastianene@google.com>, catalin.marinas@arm.com,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	korneld@google.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, mrigendra.chaubey@gmail.com,
+	perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v2 0/7] KVM: arm64: Forward FFA_NOTIFICATION* calls to
+ TrustZone
+Message-ID: <ailVcN-bxY30-XBF@google.com>
 References: <20260608165549.1479409-1-sebastianene@google.com>
- <20260608165549.1479409-2-sebastianene@google.com>
- <aiklq5QvztNk8FZR@google.com>
+ <aikt44sVnpL3_dYi@google.com>
+ <aik5MtvOlnQDmzjr@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,105 +81,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aiklq5QvztNk8FZR@google.com>
+In-Reply-To: <aik5MtvOlnQDmzjr@willie-the-truck>
 
-On Wed, Jun 10, 2026 at 09:51:55AM +0100, Vincent Donnefort wrote:
-> Hi Seb,
-> 
-> On Mon, Jun 08, 2026 at 04:55:43PM +0000, Sebastian Ene wrote:
-> > Allow FF-A notification bitmap creation messages to be forwarded to
-> > Trustzone from the host and introduce a helper to check for SBZ
-> > register fields.
+On Wed, Jun 10, 2026 at 11:15:14AM +0100, Will Deacon wrote:
+> On Wed, Jun 10, 2026 at 10:26:59AM +0100, Vincent Donnefort wrote:
+> > On Mon, Jun 08, 2026 at 04:55:42PM +0000, Sebastian Ene wrote:
+> > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
+> > > FF-A proxy. This restriction was preventing the use of asynchronous
+> > > signaling mechanisms defined by the Arm FF-A specification to
+> > > communicate with the secure services.
+> > > While these calls are markes as optional, there is no reason why the
+> > > hypervisor proxy would block them because:
+> > > 
+> > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
+> > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
+> > >    Because all forwarded notifications are inherently attributed to
+> > >    the Host by the SPMC, there is no risk of VM ID spoofing
+> > >    originating from the Normal World.
+> > > 
+> > > 2. No Memory Pointers or Addresses: The FFA_NOTIFICATION_* ABIs
+> > >    operate strictly via register-based parameters, passing only
+> > >    VM IDs, VCPU IDs, flags, and bitmaps. Because these calls do
+> > >    not contain memory addresses, offsets, or pointers, forwarding
+> > >    them doesn't pose a risk of memory-based confused deputy attack
+> > >    (e.g., tricking the SPMC into overwriting protected memory).
+> > > 
+> > > While the pKVM proxy behaves as a relayer, it doesn't currently have its
+> > > own FF-A ID(only the host has the ID 0). The behavior of the setup
+> > > flow is covered by the spec in the: '10.9 Notification support without
+> > > a Hypervisor'.
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 36 ++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 35 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 1af722771178..c20d45191085 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -71,6 +71,18 @@ static u32 hyp_ffa_version;
-> >  static bool has_version_negotiated;
-> >  static hyp_spinlock_t version_lock;
-> >  
-> > +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int first_reg)
-> > +{
-> > +	int reg;
-> > +
-> > +	for (reg = first_reg; reg < 17; reg++) {
+> > As it is only a relayer. Is it really important to check SBZ arguments and
+> > fields on behalf of Trustzone? It doesn't feel it brings any security. If the
+> > host passes broken arguments, I don't believe this puts pKVM at risk. Does it? 
 > 
-> The upper limit should probably be something like ARRAY_SIZE(ctx->regs.regs) - first_reg?
+> I think the problem would be if an update to FF-A allocated some of the
+> currently SBZ bits to implement some functionality that we would want
+> to filter at EL2.
 
-I wasn't really inspired this morning on the cruiser...
+I suppose that would bump the FF-A version and the proxy would reject it?
 
-But nonetheless, that 17 should probably be a #define somewhere?
-> 
-> > +		if (cpu_reg(ctxt, reg))
-> > +			return true;
-> > +	}
-> > +
-> > +	return false;
-> > +}
-> > +
-> >  static void ffa_to_smccc_error(struct arm_smccc_1_2_regs *res, u64 ffa_errno)
-> >  {
-> >  	*res = (struct arm_smccc_1_2_regs) {
-> > @@ -676,7 +688,6 @@ static bool ffa_call_supported(u64 func_id)
-> >  	case FFA_MEM_DONATE:
-> >  	case FFA_MEM_RETRIEVE_REQ:
-> >         /* Optional notification interfaces added in FF-A 1.1 */
-> > -	case FFA_NOTIFICATION_BITMAP_CREATE:
-> >  	case FFA_NOTIFICATION_BITMAP_DESTROY:
-> >  	case FFA_NOTIFICATION_BIND:
-> >  	case FFA_NOTIFICATION_UNBIND:
-> > @@ -862,6 +873,26 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
-> >  	hyp_spin_unlock(&host_buffers.lock);
-> >  }
-> >  
-> > +static void do_ffa_notif_bitmap_create(struct arm_smccc_1_2_regs *res,
-> > +				       struct kvm_cpu_context *ctxt)
-> > +{
-> > +	DECLARE_REG(u32, vmid, ctxt, 1);
-> > +	struct arm_smccc_1_2_regs *args;
-> > +
-> > +	if (ffa_check_unused_args_sbz(ctxt, 3)) {
-> 
-> Is that expected we start at 3 but only read 0 and 1?
+If we really want to check for those arguments to be 0:
 
-Ha, we do not read 2 but nonetheless it is useful!
+ * Shouldn't we extend this check to other FF-A invocations?
+
+ * Do we really want to also look into the !SBZ arguments to verify what we can?
+   (I'm thinking about the checks on flags)
 
 > 
-> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +		return;
-> > +	}
-> > +
-> > +	if (vmid != HOST_FFA_ID) {
-> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +		return;
-> > +	}
-> > +
-> > +	args = (void *)&ctxt->regs.regs[0];
-> > +	arm_smccc_1_2_smc(args, res);
-> 
-> Should be hyp_smccc_1_2_smc()
-> 
-> > +}
-> > +
-> >  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
-> >  {
-> >  	struct arm_smccc_1_2_regs res;
-> > @@ -920,6 +951,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
-> >  	case FFA_PARTITION_INFO_GET:
-> >  		do_ffa_part_get(&res, host_ctxt);
-> >  		goto out_handled;
-> > +	case FFA_NOTIFICATION_BITMAP_CREATE:
-> > +		do_ffa_notif_bitmap_create(&res, host_ctxt);
-> > +		goto out_handled;
-> >  	}
-> >  
-> >  	if (ffa_call_supported(func_id))
-> > -- 
-> > 2.54.0.1064.gd145956f57-goog
-> > 
+> Will
