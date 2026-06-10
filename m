@@ -1,263 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC022BDC26
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 16:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44D0340A46
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 16:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781107230; cv=none; b=Y34Yqy4OD3+HlKpc+32v4U4gNAPvZU4zYFSQ25Mjnc+VGM/XwS9EaEQtFFnSvhc4hvXirfqGFwPpQL4c1kbxCI6ZwPRODk5+w+wKKXFibom/z73poyvg9lpuihYnKJiwntWgztyXL4Z7yw4RlqIxZWUSM4ZyvJENdhoiExL8Yyk=
+	t=1781109600; cv=none; b=Ngtwa4wtiNMJk5H0YpzEqSwlOyBhF0r7jcXBQttDfTCKMMWLI5s6DM6kPiLMmFMSrIVgFalTmkZ0A8iEpDrF5GBAKhh1ZQAECR0HZ8bs579sLlRcN5Bl2G5E/smqqHilBQNnpdZBCQENpEKwQdsBBV1T//aA/TD8A2Wrm3EZBJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781107230; c=relaxed/simple;
-	bh=qUqUfLn1zCmuP82/l5LGWZ1wJvGfztLdE8rAaSMyuxQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rmfhY5XAy1xsq858T1Ue3Qt35Hj8zPiSvueaQIwW6cbDoK+eWHl8wdzpGkEHqPtBdTjbDsDkuyruZCm8s5toeYP5yr8FouYCv13wjb+cmT4pzkgtUK62QrPfbs5/nz42Vi+JpxNE9F/AgegFcYCQgvjxNqfDUt0WbWoBRJfwV/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKUK7BoJ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781109600; c=relaxed/simple;
+	bh=Z7vIw7KQP0N58o/IuszZIO+3/9P2eBf3Z6F8b/gnZGQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rX51GLmUud2e9g5b3OGzIfxb6+TP73ht07QnokADh9lh7gUQ4NrVc/T8TYxpusgYLCP3Sy8RLoUyq/89gnDl0a8Ai+eO+u+mVDx5vBx5hPeykRsFrblYwAknZWPD652sbiUGdgfq/dergjdb+47BJRyVim9zktgz5bhyVaH5X6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvMH6ICw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKUK7BoJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486011F00893;
-	Wed, 10 Jun 2026 16:00:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvMH6ICw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88AA21F0089D
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 16:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781107228;
-	bh=EYEEupVe94DV+IqIi8IHEJttbhlW/BsT5p7oUDeyBhY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=YKUK7BoJneJM6kmvy5qtLqR7tj/86PtzNViIDoweet8dhWYD0ALSsf7t2f5NCO5k9
-	 NRnBPZHneYFOd/NVO1868BkG9RNnlrZNh1FoB74lDzNz5PdOimh1RgrbChiXWSYfp3
-	 iRSe/Io78Emt03Y5flZv+LLjEItJfGx3tbfiIM2Pw2DswAyfsktduyq1Ovx4taSPcT
-	 geDUkE6qvxRHWI2g/ERzClnQL6u9A0yQifRW/0v+bCiKxV3EekdoiLDpWzddSppem7
-	 /aHd0aZvVE7Matv9ZMOpUjBDjNkYM6/ucbQYct+HcmgYWtreYsYX9/HeYvTPpFgj0V
-	 B4CqCZIVtraNA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wXLLt-0000000BQFf-3QJT;
-	Wed, 10 Jun 2026 16:00:25 +0000
-Date: Wed, 10 Jun 2026 17:00:25 +0100
-Message-ID: <865x3qtmg6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	Sascha.Bischoff@arm.com,
-	jic23@kernel.org,
-	timothy.hayes@arm.com,
-	andre.przywara@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: vgic: Check the interrupt is still ours before migrating it
-In-Reply-To: <ailsCnyoS82r_QRz@v4bel>
-References: <aiHnI1mu6SGQrgnz@v4bel>
-	<aiJmBfXAxcytfGha@kernel.org>
-	<87ecila0w3.wl-maz@kernel.org>
-	<aiKMNIUMv9GQiIbD@kernel.org>
-	<ailsCnyoS82r_QRz@v4bel>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1781109599;
+	bh=fY+/iwaOPYWuto/d+Egk+UNuK/OHewkC2tBLDoQLz7I=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=OvMH6ICwhQKkIUGA+edTgG0PKBmg5SlpfwOfYZ34l99VedDIaip3L+7MVDvXeCWtt
+	 g6U+cI5bZoe9q0fCZEtjBzOHV3t6rRmH35PBUegQ8cs4IM6bmf/NfyuAm+3cWKMGmm
+	 nOcq1MRjcvSMKNHpJbT4mB1RI3qUGDFgHOUrHN+1t4/pCHrzVOvsNhuMMPTrN4G8mg
+	 XScp2AqXA3lTp3p8oqqznFl6pxZxsx4lgcFElF9zUsEHus5rI8M85UjZdrnfGPDIoe
+	 GXcqfRFhmJ6xHRsH2Vjqpui/a8MKhZBlxv+QuJaIl86LZvyjneghsdu51/ZQ91+y03
+	 iaXs6PqJQLhIQ==
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-beb2a97cc9aso1154459866b.2
+        for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 09:39:59 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yw4kTBhyQPkVQNwbpAC58/w5lELHspfxFSRlPvR6xiDgOrT8cbq
+	/RNP6HEEe83qoQVLtZX5iHwELW4iPHPAt3ZRANEnmXdtyaHL34z5Ktgw7aYNU44XcGD+m73tcMK
+	m4z7B/zZ8BI9C8TfurxXdTndvsMZcdUQ=
+X-Received: by 2002:a17:907:7fa8:b0:beb:4674:6a1d with SMTP id
+ a640c23a62f3a-bf936bec9e4mr497683466b.11.1781109598524; Wed, 10 Jun 2026
+ 09:39:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: imv4bel@gmail.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com, jic23@kernel.org, timothy.hayes@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260608081108.2244133-1-maz@kernel.org> <aicqzM4W4NN-GndT@google.com>
+ <86ldcotbub.wl-maz@kernel.org> <CAO9r8zMpvxoVcDvWn3q0C0Dv=0Kknt_BqZ8KqddwuKa5bd44Dw@mail.gmail.com>
+ <868q8mu0hr.wl-maz@kernel.org>
+In-Reply-To: <868q8mu0hr.wl-maz@kernel.org>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Wed, 10 Jun 2026 09:39:46 -0700
+X-Gmail-Original-Message-ID: <CAO9r8zO8e9LCCevab2Rf9ArV9eHJ=L+n-hPWCGgkC47udEVARA@mail.gmail.com>
+X-Gm-Features: AVVi8CcVcXwzy45XyjikMi6K7M6sV9Fac4tlWVWAJx-O0hPoeftmoxR-za9Ausc
+Message-ID: <CAO9r8zO8e9LCCevab2Rf9ArV9eHJ=L+n-hPWCGgkC47udEVARA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Hold kvm->mmu_lock while initialising vcpu->arch.vncr_tlb
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 10 Jun 2026 14:52:10 +0100,
-Hyunwoo Kim <imv4bel@gmail.com> wrote:
-> 
-> On Fri, Jun 05, 2026 at 01:43:32AM -0700, Oliver Upton wrote:
-> > On Fri, Jun 05, 2026 at 08:42:52AM +0100, Marc Zyngier wrote:
-> > > On Fri, 05 Jun 2026 07:00:37 +0100,
-> > > Oliver Upton <oupton@kernel.org> wrote:
-> > > > 
-> > > > On Fri, Jun 05, 2026 at 05:59:15AM +0900, Hyunwoo Kim wrote:
-> > > > > vgic_prune_ap_list() drops both ap_list_lock and irq_lock while migrating
-> > > > > an interrupt to another vCPU. After reacquiring the locks it only checks
-> > > > > that the affinity is unchanged (target_vcpu == vgic_target_oracle(irq))
-> > > > > before moving the interrupt, which assumes that an interrupt whose affinity
-> > > > > is preserved is still queued on this vCPU's ap_list.
-> > > > > 
-> > > > > That assumption no longer holds if the interrupt is taken off the ap_list
-> > > > > while the locks are dropped. vgic_flush_pending_lpis() removes the
-> > > > > interrupt from the list and sets irq->vcpu to NULL, but leaves
-> > > > > enabled/pending/target_vcpu untouched. As the interrupt is still enabled
-> > > > > and pending, vgic_target_oracle() returns the same target_vcpu, so the
-> > > > > affinity check passes and list_del() is run a second time on an entry that
-> > > > > has already been removed.
-> > > > > 
-> > > > > Also check that the interrupt is still assigned to this vCPU
-> > > > > (irq->vcpu == vcpu) before moving it.
-> > > > > 
-> > > > > Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
-> > > > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > > > 
-> > > > Looking at this and the other VGIC patch you sent (which should've been
-> > > > a combined series), are you trying to deal with a vCPU writing to
-> > > > another vCPU's redistributor? I.e. vCPU B setting GICR_CTLR.EnableLPIs=0
-> > > > behind the back of vCPU A?
-> > > > 
-> > > > That is extremely relevant information as the off-the-cuff reaction is
-> > > > that no race exists. But since the GIC architecture is awesome and
-> > > > allows for this sort of insanity, it obviously does....
-> > > > 
-> > > > Anyway, for LPIs resident on a particular RD, there's zero expectation
-> > > > that the pending state is preserved when EnableLPIs=0. So I'd rather
-> > > > vgic_flush_pending_lpis() just invalidate the pending state.
-> > > 
-> > > Just clearing the pending state introduces a potential problem as we
-> > > now have an interrupt that is neither active nor pending on the AP
-> > > list. It is not impossible to solve (we now have similar behaviours
-> > > with SPI deactivation from another vcpu), but that requires posting a
-> > > KVM_REQ_VGIC_PROCESS_UPDATE to the target vcpu.
-> > 
-> > Right, I was suggesting that in addition to deleting the LPI from the AP
-> > list we actually invalidate the pending state so that someone sitting on
-> > a pointer to a to-be-freed LPI sees vgic_target_oracle() returning
-> > NULL
-> > 
-> > > > Beyond that, I see two other fixes for lifetime issues around the
-> > > > vgic_irq in the middle of migration. I'd like to see explicit RCU
-> > > > protection around the release && reacquire of the ap_list_lock rather
-> > > > than depending on the precondition that IRQs are disabled.
-> > > 
-> > > I'm not sure I follow. Are you suggesting turning the AP list into an
-> > > RCU protected list?
-> > 
-> > No, sorry, I should expand a little.
-> > 
-> > We store a reference on the vgic_irq struct in the AP list, which is
-> > stable so long as the ap_list_lock is held. It should be possible for
-> > the refcount to drop to 0 between releasing the ap_list_lock and
-> > reacquiring it.
-> > 
-> > So either vgic_prune_ap_list() takes an additional reference on the
-> > vgic_irq before dropping the ap_list_lock or rely on RCU to protect
-> > vgic_irq structs observed with a non-zero refcount.
-> 
-> What are your thoughts on this approach?
-> 
-> 
-> Best regards,
-> Hyunwoo Kim
-> 
-> ---
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 933983bb2005..7fb871c3ccd8 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -523,7 +523,7 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	 * Retire all pending LPIs on this vcpu anyway as we're
->  	 * going to destroy it.
->  	 */
-> -	vgic_flush_pending_lpis(vcpu);
-> +	vgic_flush_pending_lpis(vcpu, true);
-> 
->  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
->  	kfree(vgic_cpu->private_irqs);
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 5913a20d8301..f85d63f17af0 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -303,7 +303,7 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
->  		if (ctlr != GICR_CTLR_ENABLE_LPIS)
->  			return;
-> 
-> -		vgic_flush_pending_lpis(vcpu);
-> +		vgic_flush_pending_lpis(vcpu, false);
->  		vgic_its_invalidate_all_caches(vcpu->kvm);
->  		atomic_set_release(&vgic_cpu->ctlr, 0);
->  	} else {
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1e9fe8764584..09629a38fc0a 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -192,7 +192,7 @@ static void vgic_release_deleted_lpis(struct kvm *kvm)
->  	xa_unlock_irqrestore(&dist->lpi_xa, flags);
->  }
-> 
-> -void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
-> +void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu, bool destroy)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_irq *irq, *tmp;
-> @@ -204,6 +204,13 @@ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
->  	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
->  		if (irq_is_lpi(vcpu->kvm, irq->intid)) {
->  			raw_spin_lock(&irq->irq_lock);
-> +			/* Leave interrupts pending a migration for prune. */
-> +			if (!destroy && irq->vcpu != vgic_target_oracle(irq)) {
-> +				raw_spin_unlock(&irq->irq_lock);
-> +				continue;
-> +			}
+On Wed, Jun 10, 2026 at 3:57=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Tue, 09 Jun 2026 18:57:26 +0100,
+> Yosry Ahmed <yosry@kernel.org> wrote:
+> >
+> > > > If yes, I think the code looks confusing, at least to a layman like
+> > > > myself. It initially seems like the lock protects against concurren=
+t
+> > > > initializations, but then the NULL check is not done again under th=
+e
+> > > > lock. The goal of the lock is not clear without the original report=
+.
+> > > >
+> > > > Mayeb it's clearer to explicitly use barriers if the goal is preven=
+ting
+> > > > reordering?
+> > >
+> > > This would require both the initialisation of vncr_tlb to use a store
+> > > release, *and* all the other call sites to use a load acquire.
+> > >
+> > > I really don't think it is worth the churn, nor the (very small)
+> > > burden on the readers.
+> >
+> > That's fair. I was mainly just pointing out my initial confusion and
+> > that others may share it. Avoiding the churn on the readers' side is
+> > understandable. Maybe a comment here would help explain why the lock
+> > needs to be held?
+>
+> I have added this:
+>
+>         /*
+>          * Taking the lock on assignment ensures that the TLB is
+>          * seen as initialised when following the pointer (release
+>          * semantics of the unlock), and avoids having acquires on
+>          * each user which already take the lock.
+>          */
 
-It's rather unclear to me what the semantics of this are.
-
-If vcpu-a decides to nuke the LPIs of vcpu-b and the LPI had in the
-meantime been migrated to vcpu-c, but obviously not observed by vcpu-c
-yet as the LPI is still on vcpu-b's AP-list, then I don't see the
-point in keeping this state.
-
-Am I missing something obvious?
-
-> +			/* Pending state is not preserved across EnableLPIs=0. */
-> +			irq->pending_latch = false;
-
-That part I agree with.
-
->  			list_del(&irq->ap_list);
->  			irq->vcpu = NULL;
->  			raw_spin_unlock(&irq->irq_lock);
-> @@ -797,6 +804,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
-> 
->  		/* This interrupt looks like it has to be migrated. */
-> 
-> +		/* Keep the interrupt alive while the locks are dropped. */
-> +		vgic_get_irq_ref(irq);
-> +
->  		raw_spin_unlock(&irq->irq_lock);
->  		raw_spin_unlock(&vgic_cpu->ap_list_lock);
-> 
-> @@ -839,6 +849,8 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  		raw_spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
->  		raw_spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
-> 
-> +		deleted_lpis |= vgic_put_irq_norelease(vcpu->kvm, irq);
-> +
->  		if (target_vcpu_needs_kick) {
->  			kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
->  			kvm_vcpu_kick(target_vcpu);
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 9d941241c8a2..c1ac24ede899 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -341,7 +341,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu);
->  bool vgic_has_its(struct kvm *kvm);
->  int kvm_vgic_register_its_device(void);
->  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
-> -void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
-> +void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu, bool destroy);
->  int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
->  int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
->  int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-> 
-
-I reckon this would work just as well with just the pending state
-being removed in vgic_flush_pending_lpis(), and the reference holding
-hack in gvgic_prune_ap_list().
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Looks good, thank you!
