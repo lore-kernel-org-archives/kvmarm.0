@@ -1,166 +1,358 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469914192F6
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 13:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781099845; cv=none; b=rHLTfqyGDy0YuBS3k8pRGJPyxV2Y83rOU24k3IXtxa86b6bU+1xJ9etu/2xggEpqleo5jNlvycCIX7GFprKaGnaiwP+e/gGVAp3ib6bNf/XmibnH18lSdW2FsMAYTEeZWc09CXp8HE55OR7dwVei2+rSJsGIEWRAtZudLA1gMCQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781099845; c=relaxed/simple;
-	bh=CGrh7KvfdrsdL6DF0jcOf3eHYS7cMBvKypJY6m6cmmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQKUBgJmGHYInlFoQ9usPtkughIMMheuieq0UaR7CjmSGGxlZaueC1UmtU1MONnONiWjqsG8cawxsKwYYdgWz+fR0zE7tmGmo5705z/vZ2N+xz2ZtHF5wGSKZJ0fUWvZ7nQnR0a7YvITZmuMLNeHphX9x7noBWkCAWsXAiJDJAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=l7lmvP4D; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011031.outbound.protection.outlook.com [40.93.194.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017404183B7;
+	Wed, 10 Jun 2026 15:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781103945; cv=fail; b=U+xYuRdTWEPBVsbii7nvsdiVhRUJpxfbPoJva1tMBuW9wW8QXlEa1L59UgS+vhV4s6AxzWWbDTWy4aAVgsXSxUXiAOjh1gu3tAYHQRSe5Ii2WsCVDpSI3MdfxbFOlXBCuNMKoLZgBt33+DiYsSx3UfSPwXGXApbq5v0H2DJmr2A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781103945; c=relaxed/simple;
+	bh=Pt7U8T5TcUzok8eQ/SyNxk4SZYwR0uKWnesyrUojjk0=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jb+z7e4KDDSTk890m+ng3TA6i3gaSYA8cfRdcYuR7EYl/AosrlLt1xwpGlpR6DV8j4ZSt3899IUuozC29rBrdADe6pbkBPtknm4mfI+ly/exe68mVRNM0L0E+0fQmNwH0UZUHSesmPL5YwzknGgJMtxj6ulUUuqThPrLG6dXXiU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uT8yiqK+; arc=fail smtp.client-ip=40.93.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="l7lmvP4D"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA53125DF;
-	Wed, 10 Jun 2026 06:57:18 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 82D093F99C;
-	Wed, 10 Jun 2026 06:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781099843; bh=CGrh7KvfdrsdL6DF0jcOf3eHYS7cMBvKypJY6m6cmmU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l7lmvP4Dg91mMi4EywP9dT+/mWH6HER8VuIebB4WhBrgQG2wKmH9QQ6DBeieh38m7
-	 pLqgqHI/UneyB/aCDcyrjyJ7TrIZAQHvDVxruzvK8e40uFBWburRLkZ+mSG/igMZbu
-	 ddtUCueMRXeNNAcbn3rxc8LiDNFvUgb8qt2I02ec=
-Date: Wed, 10 Jun 2026 14:57:09 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Subject: Re: [PATCH v3 0/9] KVM: arm64: selftests: Basic nested guest support
-Message-ID: <pwkaekvyhbjaztohmuxfrzn5qnfmzsms7k27ocbvtrpelha2m4@awls6yy6lfre>
-References: <20260516183003.799058-1-weilin.chang@arm.com>
- <agzWnS2gzzhEHEG6@kernel.org>
- <ioz7qsirq2v665bqbjin5ekwss46pfg2sfmndkvail2athbo75@cgt7zikhtx6r>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uT8yiqK+"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PO1bTp9XNbJiDAVYJgb7jtuaSYIx8zvfedyfPvPCqiLbWz/mTR1VXi6a+YQLaC9pIxY+CzeWNQoGXIERTJ/VvVSrTPVGtlWRqfGQ7d6UEzIAr9kGGj4c7hY5FwQqYrXjAAWCs4VA6bfccU2+XOhPcSI6DWpYLRksj/BpbpmrudFJNPcDNs5ytjrQ0CfHRZ9MKNu2qnZwSd+qLflTf0+HakM6h7P6RWSxHgJ1WHQJ9fg22WxbIEyq80yYqviz+uYZ/g6XQUBeCzcT0iwbpwEJAB39EkpdBJmqu15l731o25ucg2XaaiuxKiMRWcnjF0hcjavSu+fL+vZ3thex8vNXEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j9tIhIPQphrxm3pR+/cf/HO7w5GMlLnMtFVJ2GKtoLs=;
+ b=bgBgL9LZWwucvLX1ZM974wDhubmHGzvBSQGZShX6dvCqq/etNZukbXJeDwOLOo6KeryqCCTY9M9BCjbqochyQg7vjsbHfRmJJZ9W8vkeSC6SUWGVosdJHMRTi5ly0WFlGEuiBUdgvibdGp4wmfGvsynY/XcGJAzvUcJSET5CCM/XtxleH/BGuK0L357N3FUBhIaltLtzNexoNhRJlJUmmxcRBNR7VRNhh8Qu+NOZbNKtUHgtlueCZVeJ+GaguxQTVJb9ThV0VjmmHvoW1d7O6DwvaUKMq0up2G0ZO+yyRt3y6tVKITYs6k3uDOzEq1KcKMHCy8TOdhw99UG+if6C4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j9tIhIPQphrxm3pR+/cf/HO7w5GMlLnMtFVJ2GKtoLs=;
+ b=uT8yiqK+qy9K3X3mHXpZrWkhivcA69lKS88Ul+UUD0S6s5IgjM1G5uha5Vko+p41fUwoKUX8gwcY3exZ6ICJZXH38/d5YqjV/v3bLZorD4BQM1aRXKQq3G5/TdCQ4vKqCb59RitGR1M2HIQojbtATrDPJJb/RkC3VO3sPzVISKQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN7PR12MB8131.namprd12.prod.outlook.com (2603:10b6:806:32d::12)
+ by DM6PR12MB4236.namprd12.prod.outlook.com (2603:10b6:5:212::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Wed, 10 Jun
+ 2026 15:05:40 +0000
+Received: from SN7PR12MB8131.namprd12.prod.outlook.com
+ ([fe80::c2dd:62c5:67fe:aa46]) by SN7PR12MB8131.namprd12.prod.outlook.com
+ ([fe80::c2dd:62c5:67fe:aa46%4]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
+ 15:05:40 +0000
+Message-ID: <9621612f-c5f4-4c37-93ba-5e79b841e949@amd.com>
+Date: Wed, 10 Jun 2026 10:05:37 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/60] KVM: SVM: Add support for the SEV-SNP #HV doorbell
+ page NAE event
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: ashish.kalra@amd.com, michael.roth@amd.com, nsaenz@amazon.com,
+ anelkz@amazon.de, James.Bottomley@HansenPartnership.com,
+ Melody Wang <huibo.wang@amd.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ x86@kernel.org, coconut-svsm@lists.linux.dev, joerg.roedel@amd.com
+References: <20260608144252.351443-1-joro@8bytes.org>
+ <20260608144252.351443-3-joro@8bytes.org>
+ <be57043d-6abf-402e-93b4-a01519c97c1f@amd.com>
+Content-Language: en-US
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ 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
+ WiyqywZI5g==
+In-Reply-To: <be57043d-6abf-402e-93b4-a01519c97c1f@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH0P223CA0008.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:610:116::19) To SN7PR12MB8131.namprd12.prod.outlook.com
+ (2603:10b6:806:32d::12)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ioz7qsirq2v665bqbjin5ekwss46pfg2sfmndkvail2athbo75@cgt7zikhtx6r>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|DM6PR12MB4236:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96209fec-2a04-4e52-9eb0-08dec701bc16
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|23010399003|7416014|376014|22082099003|18002099003|3023799007|56012099006|11063799006|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	/aGBvAiK11+S0MQXPYLtB2/Ese5utXfC/Hzs0hGVWmSw1epiu+KYgG0ZTTveFIB4HmRTqXqvsPIywWBfddU4uZ2GMJUKBZF99QF9Hy+IuPwG+cmUjkUIO3kM045RcRb3Hntx+U3kGqje6d/5FG1t+RjuWE+sx24HotqQ6v/GStAs/d4FOesRvZlB3tiex0VoeCFnF/iTL0HEGCEnfszB3Y1apeyYPoNkCeeyz/nTYMZNtAGKPoQd1yvQ1aRWC8iHlAkC1LmCWWhYkvzRi2+IvPaKq74MbT8yVHsqMt2s7NNTRX/mKx21X1rJosDtHwKUtOL8Qa4E+AwoSKtVmL+tQkLcFNtjGtSJyIwXC4RbAaHE+FuMgBgACZbQN1V1OZHNEm/lXPcAqLBW7OfGIRnG5jpYgZpzgSIUQ7HqcjXrzIRyRm+PAjm3nzYxX1A1XfW7858PDPBXwA31elRAisJz+GwdaiCa++G1n8JlcQ89j/oJGSp8Bj005q9VSwvLrt7TYGhl+yKrx/sn1q9r5R3m6E5+Xc80AwJRfX8H/zD87iwCqc7tftMUi1cNUzdXkp1n/K9TUPfoWLVAwiT/19LL3yjhFLQlaikxNRRIgXAfg62aQFRWUu0gRfpYL5s4i97kulsvMO3MGRloq9BuATkgTfhW0miHkmEAgwjC5fS+B87QvmZjbEisPZUlHBuxyEVQ
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(7416014)(376014)(22082099003)(18002099003)(3023799007)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RHJIUkd4V0I4Y0I1UWcxS3BCTnVnYjhoODNNRmFodXQrWHFNTmFmQXVudlNJ?=
+ =?utf-8?B?WjBLU3owamZzL2ZDa3Z5amgwcVkzM2p2bTFHN3lBSlA2ZTRQTkVGQjdtVGNZ?=
+ =?utf-8?B?alBOZWROZGtyU0pJZGJQQXFYK25ld1pyT1plY0psMWNkWGpNcXZUVUthREt2?=
+ =?utf-8?B?eS9ia2dCRDFIaGQ0MjRLK2NacVM4TWdyekZVY0dYbmMybHdYVW5BcDMyMkRm?=
+ =?utf-8?B?NURCN2hlTzhDcHltS3VDVzlLTVVYVkJMVXZ6eWhMaTZYeVB0WkdYTjVzMFIx?=
+ =?utf-8?B?cGEzNC9LdlcrZmJFUEhPOU9neUd4ZXcwc01vZmcxUnhkRExXZEFpcys0K1hq?=
+ =?utf-8?B?VHllWFRZaTRVaVJqUzFjcE5uMHlqb2c3SUNFanRCNHp3RkZoU1VVUHFYRHBM?=
+ =?utf-8?B?bEFHenZWUHdpNHdrWkN1WVhPODBHNkNJZitERkIrR2pLRjgreFpzUHZkeXpO?=
+ =?utf-8?B?Zlc2VzNTOU00Q1NVdzQwRVJuUThqT1NNaE43WVNMZEM4bEhJWmNFMWlRUmsx?=
+ =?utf-8?B?UGVpK3hYK0FySHJQdldhVUdZRSs0TTJMTnVFU1luK2xxTmE1WGlDM2J1c2R6?=
+ =?utf-8?B?TmN3aHAzMXdSOE1oRHh5MGo4U1Y5VFhmY3VrbnovanB0WFozeGZqR2FzTzIr?=
+ =?utf-8?B?TjZzVE1NZlJHVkxBTDRCYXJjMTNvNEdKd0hRK1doU0U3OVRad0UrSGV6RDhi?=
+ =?utf-8?B?Y2JYcVBoNGc1dTRVTVNpWXgxeU1ZZzJZY1drckE0dG9OU3BYM2ZCWmV3OGl4?=
+ =?utf-8?B?bWtaOUtrYXhOeHlabmRTcDc3NTY2SEJDc0RaTi9VUmNGZUNZZ21la1dYeHRo?=
+ =?utf-8?B?M0pJK2pieEZ2SEVQVWxSdVpqbFJ3cVRHLzZ3SlZ6U0VzVnlTWVM0WFFVaThv?=
+ =?utf-8?B?aDJJVEJXVUgxK0xRYlZCRFVjSFBEMlc1bzV2bkJzcFY0S1V5SDhkVmxub1hC?=
+ =?utf-8?B?eWsxQVVuSjJJdVRGbEJXL1hRM1kxZGQ2aHI2V2ZCVnErbWhOYkUxWm4xQmdO?=
+ =?utf-8?B?VVJiUno4d3Jhcy81c3hScENzOWt5QktiN0F1RGhSWDNPNjd0d2l4dC92N1ZX?=
+ =?utf-8?B?bUE2ZE11U05QZ0RnbzRqL01ud2tWaGs1RFpiR1NnK1BjdTJZcTFNQVMrVUpL?=
+ =?utf-8?B?bVBCT2J4NERWcU52MXp1K056MGN2NkJNWlFPYmQ4aHY4STBRaHJwRWdBdFcv?=
+ =?utf-8?B?ckE2U1ZtRE16cHJDSEt4WXpoRnV6cWlOZ256SjVBZUh2OU8zK3B1dVQ1cDB4?=
+ =?utf-8?B?eFB6Y2o0eFNjc01USnZQRC9VT2g5aGF5VFI2bytmM1ZpRElJUmxjZ3FVblAz?=
+ =?utf-8?B?YytSV1FOTG1SM2xiV1ZsYUxkREUza3B1N25oRDRIME14dUtmaXdNVUhlalNF?=
+ =?utf-8?B?Z3A4WDJiWUppNUNPNGZmVjJSY2ZWR05VOHJJaW8vNVViM25mU1NGeTBRZ2M1?=
+ =?utf-8?B?L0FJMHBJamdtL1BZSXJRMkpoK0xEb1EyM1NlYW5yOWVXZVMvdjNjUjFXdDBa?=
+ =?utf-8?B?V1B6WFdPelJWbExjTkdJTUpoSWZuWUNhL2ppNnJKVzR3VFVzNUVqWEY3dFE5?=
+ =?utf-8?B?aVFOT2p3NTR5NGx6WHg1aWxVU3NRa3ZPVVJYbngwaFdrOVE4MzlHcmdOQzJS?=
+ =?utf-8?B?UUQ5VG96V2wrWEwxWlphVVZJNlpBc3VzZ1VQVGh3eEFBVkNMajJXNnlrOVlr?=
+ =?utf-8?B?TE5RejlURDFHMmFBb1FnSVNoMUtFMTFnUGdRQ3lia1dGbmNmQkxrdmRUcGJn?=
+ =?utf-8?B?Z2dNcEZmcWZZNDlWR3d1MGJ2UGttNXU4NE0rcHJtbC9sSVVPcXhYWldFbUVi?=
+ =?utf-8?B?dW9iN0x0MGdzTU1oeHZuNlhzRE1KNDd3NTF5N1c1c2lYRng2UzMzb2cxMGdl?=
+ =?utf-8?B?TFhxLzVub0kyMDB0OEFnbXUzNmZxditJcjVsQ08vUWZ4RU5LM2lDR1dZeWJt?=
+ =?utf-8?B?VEtlSzNIaGVMRVEyMmhPaHBWS1lyUTEzR2J4Wm40ZC9ZY3lSc0FlZDkxWHNv?=
+ =?utf-8?B?MnVrVHFJMmY3OVBvaENxUklQWmF0QmNLSlJ0TlA5V2I3RnFZc3A3eUdpcWFj?=
+ =?utf-8?B?ZzM4bWNNNEErM1BMS3o3TDZUZ3hUQWJRdG5ZMGttdGVTdWhOWENCcmg1VkE4?=
+ =?utf-8?B?cElvQTVSdXJ5MUM1YzJoUldjOXIrTHJnaEovYkMxMEFZZm5EbEIvWHAxTVZq?=
+ =?utf-8?B?bjFSdUxmdjJ3NW1OemRTWmhNZXplaTEvcU1EREY5S2s2UnU1WGQwUXExT3NQ?=
+ =?utf-8?B?cGpCMlRWUG9kYVo4QldzY0FQZCt5WnE2cnBoSlB3SG4wOXRiamY2eTFCVzNB?=
+ =?utf-8?Q?maprtK76jjWcPKdAUv?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96209fec-2a04-4e52-9eb0-08dec701bc16
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8131.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 15:05:39.9367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tIzKW1vx3TV+ZWPOHSm3efgzXCzlBRsB98W9e/Jl8sXur4HWoRrVIoPIXH4mqSgdqQGID9Ws2r8QfLcKOezuSA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4236
 
-Hi Oliver,
+On 6/10/26 08:28, Tom Lendacky wrote:
+> On 6/8/26 09:41, Jörg Rödel wrote:
+>> From: Melody Wang <huibo.wang@amd.com>
+>>
+>> To support Restricted Injection, the SEV-SNP guest must register a doorbell
+>> page for use with #HV. This is done using the #HV doorbell page NAE event.
+>>
+>> This event consists of four actions: GET_PREFERRED, SET, QUERY, CLEAR.
+>> Implement it per the GHCB specification.
+>>
+>> Co-developed-by: Thomas Lendacky <thomas.lendacky@amd.com>
+>> Signed-off-by: Thomas Lendacky <thomas.lendacky@amd.com>
+>> Signed-off-by: Melody Wang <huibo.wang@amd.com>
+>> Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+>> ---
+>>  arch/x86/include/uapi/asm/svm.h |  5 +++
+>>  arch/x86/kvm/svm/sev.c          | 71 +++++++++++++++++++++++++++++++++
+>>  arch/x86/kvm/svm/svm.c          |  3 ++
+>>  arch/x86/kvm/svm/svm.h          |  2 +
+>>  4 files changed, 81 insertions(+)
+>>
+>> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+>> index 010a45c9f614..d84a13ac4627 100644
+>> --- a/arch/x86/include/uapi/asm/svm.h
+>> +++ b/arch/x86/include/uapi/asm/svm.h
+>> @@ -117,6 +117,11 @@
+>>  #define SVM_VMGEXIT_AP_CREATE_ON_INIT		0
+>>  #define SVM_VMGEXIT_AP_CREATE			1
+>>  #define SVM_VMGEXIT_AP_DESTROY			2
+>> +#define SVM_VMGEXIT_HVDB_PAGE			0x80000014ull
+>> +#define SVM_VMGEXIT_HVDB_GET_PREFERRED		0
+>> +#define SVM_VMGEXIT_HVDB_SET			1
+>> +#define SVM_VMGEXIT_HVDB_QUERY			2
+>> +#define SVM_VMGEXIT_HVDB_CLEAR			3
+>>  #define SVM_VMGEXIT_SNP_RUN_VMPL		0x80000018ull
+>>  #define SVM_VMGEXIT_SAVIC			0x8000001aull
+>>  #define SVM_VMGEXIT_SAVIC_REGISTER_GPA		0
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 6c6a6d663e29..b9ad1169cb2c 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -3522,6 +3522,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>>  		    control->exit_info_1 == control->exit_info_2)
+>>  			goto vmgexit_err;
+>>  		break;
+>> +	case SVM_VMGEXIT_HVDB_PAGE:
+>> +		if (!is_sev_snp_guest(vcpu))
 
-On Fri, May 29, 2026 at 02:38:53PM +0100, Wei-Lin Chang wrote:
-> Hi Oliver,
-> 
-> On Tue, May 19, 2026 at 02:31:09PM -0700, Oliver Upton wrote:
-> > Hi Wei-Lin,
-> > 
-> > Thank you very much for the series.
-> > 
-> > I haven't had time to read through much of this yet, but I noticed
-> > Itaru's comment about leaving stage-1 translation disabled for the L2.
-> > 
-> > Since selftests expects things like atomics to work we will definitely
-> > need the stage-1 MMU to be enabled w/ Normal mappings (this was broken
-> > in the past [*]). I wonder if we can (ab)use the pre-existing stage-1
-> > tables that the selftests library creates on behalf of the L1. After all,
-> > L1 and L2 are both effectively in the same virtual address space.
-> > 
-> > [*] https://lore.kernel.org/kvmarm/20250405001042.1470552-1-rananta@google.com/
-> 
-> Thanks for the pointer, I see, only inner/outer shareable, write-back
-> normal memory guarantees atomics to work. Interestingly, treating the
-> atomic instruction as a NOP is one of the permitted outcomes if other
-> memory attributes are used...
-> 
-> However, the L2s in this series aren't using atomic instructions, and
-> right now for the current organization of this series, the L1 guest
-> hypervisor infrastructure is in lib/ for future NV selftests to share L2
-> creation code, but L2 code are entirely per selftest. This means other
-> selftest L2s can reuse the L1 stage-1 tables themselves if the implicit
-> memory attributes that comes from MMU being off is not desired.
-> 
-> Sorry if that sounded defensive, I am not opposed to always reusing the
-> L1 stage-1 tables in L2, just wanted to make sure the point gets across.
-> 
-> Always reusing L1 stage-1 tables in L2 allows L2 access to lib/ (which
-> should be helpful for testing recursive NV), and L1-L2 code sharing
-> intra-selftest. OTOH things are a bit simpler with MMU off in this case
-> with testing the shadow stage2.
-> 
-> What do you think?
-
-Gentle ping on this :)
-Would love to hear what you think.
+I think it should also be validated that Restricted Injection is enabled
+for the guest as well - either here or in the sev_snp_hv_doorbell_page()
+function.
 
 Thanks,
-Wei-Lin Chang
+Tom
 
+>> +			goto vmgexit_err;
+>> +		break;
+>>  	default:
+>>  		reason = GHCB_ERR_INVALID_EVENT;
+>>  		goto vmgexit_err;
+>> @@ -4341,6 +4345,65 @@ static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t r
+>>  	return 1; /* resume guest */
+>>  }
+>>  
+>> +static int sev_snp_hv_doorbell_page(struct vcpu_svm *svm)
+>> +{
+>> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+>> +	struct kvm_host_map hvdb_map;
+>> +	gpa_t hvdb_gpa;
+>> +	u64 request;
+>> +
+>> +	if (!is_sev_snp_guest(vcpu))
+>> +		return -EINVAL;
+>> +
+>> +	request = svm->vmcb->control.exit_info_1;
+>> +	hvdb_gpa = svm->vmcb->control.exit_info_2;
+>> +
+>> +	switch (request) {
+>> +	case SVM_VMGEXIT_HVDB_GET_PREFERRED:
+>> +		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, ~0ULL);
+>> +		break;
+>> +	case SVM_VMGEXIT_HVDB_SET:
+>> +		svm->sev_es.hvdb_gpa = INVALID_PAGE;
+>> +
+>> +		if (!PAGE_ALIGNED(hvdb_gpa)) {
+>> +			vcpu_unimpl(vcpu, "vmgexit: unaligned #HV doorbell page address [%#llx] from guest\n",
+>> +				    hvdb_gpa);
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		if (!page_address_valid(vcpu, hvdb_gpa)) {
+>> +			vcpu_unimpl(vcpu, "vmgexit: invalid #HV doorbell page address [%#llx] from guest\n",
+>> +				    hvdb_gpa);
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		/* Map and unmap the GPA just to be sure the GPA is valid */
+>> +		if (kvm_vcpu_map(vcpu, gpa_to_gfn(hvdb_gpa), &hvdb_map)) {
+>> +			vcpu_unimpl(vcpu, "vmgexit: error mapping #HV doorbell page [%#llx] from guest\n",
+>> +				    hvdb_gpa);
+>> +			return -EINVAL;
+>> +		}
+>> +		kvm_vcpu_unmap(vcpu, &hvdb_map);
+>> +
+>> +		svm->sev_es.hvdb_gpa = hvdb_gpa;
+>> +		fallthrough;
+>> +	case SVM_VMGEXIT_HVDB_QUERY:
+>> +		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, svm->sev_es.hvdb_gpa);
+>> +		break;
+>> +	case SVM_VMGEXIT_HVDB_CLEAR:
+>> +		svm->sev_es.hvdb_gpa = INVALID_PAGE;
+>> +		break;
+>> +	default:
+>> +		svm->sev_es.hvdb_gpa = INVALID_PAGE;
+>> +
+>> +		vcpu_unimpl(vcpu, "vmgexit: invalid #HV doorbell page request [%#llx] from guest\n",
+>> +			    request);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>>  {
+>>  	struct vmcb_control_area *control = &svm->vmcb->control;
+>> @@ -4617,6 +4680,14 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>>  	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
+>>  		ret = snp_handle_ext_guest_req(svm, control->exit_info_1, control->exit_info_2);
+>>  		break;
+>> +	case SVM_VMGEXIT_HVDB_PAGE:
+>> +		if (sev_snp_hv_doorbell_page(svm)) {
+>> +			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
+>> +			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
+>> +		}
+>> +
+>> +		ret = 1;
+>> +		break;
+>>  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+>>  		vcpu_unimpl(vcpu,
+>>  			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index e02a38da5296..7981e7583384 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -1277,6 +1277,9 @@ static void __svm_vcpu_reset(struct kvm_vcpu *vcpu)
+>>  
+>>  	svm->nmi_masked = false;
+>>  	svm->awaiting_iret_completion = false;
+>> +
+>> +	if (is_sev_es_guest(vcpu))
+> 
+> Shouldn't this be is_sev_snp_guest() ?
 > 
 > Thanks,
-> Wei-Lin Chang
+> Tom
 > 
-> > 
-> > Thanks,
-> > Oliver
-> > 
-> > On Sat, May 16, 2026 at 07:29:54PM +0100, Wei-Lin Chang wrote:
-> > > Hi,
-> > > 
-> > > This is v3 of adding basic support for running nested guests (L2) in
-> > > kselftest. This time a framework for enabling stage-2 in the guest is
-> > > added, including the s2_mmu struct, s2 translation control setup, and
-> > > a stage-2 page table generator. Similar to L2 vCPU management, all
-> > > stage-2 work is done in the guest instead of userspace.
-> > > 
-> > > An additional shadow_stage2 test is added which leverages the framework
-> > > to run L2 with stage-2 enabled.
-> > > 
-> > > * Changes from v2 [1]:
-> > > 
-> > >   - Update vm_paddr_t to gpa_t, vm_vaddr_t to gva_t.
-> > > 
-> > >   - Added framework for enabling stage-2 in the guest.
-> > > 
-> > >   - Added shadow_stage2 test.
-> > > 
-> > > Thanks!
-> > > 
-> > > [1]: https://lore.kernel.org/kvmarm/20260412142216.3806482-1-weilin.chang@arm.com/
-> > > 
-> > > Wei-Lin Chang (9):
-> > >   KVM: arm64: selftests: Add GPR save/restore functions for NV
-> > >   KVM: arm64: selftests: Add helpers for guest hypervisors
-> > >   KVM: arm64: selftests: Add hello_nested basic NV selftest
-> > >   KVM: arm64: selftests: Enhance hello_nested test
-> > >   KVM: arm64: selftests: Add shadow_stage2 test
-> > >   KVM: arm64: selftests: shadow_stage2: Allocate L2 stack from dedicated
-> > >     pool
-> > >   KVM: arm64: selftests: shadow_stage2: Check supported stage-2 granule
-> > >     size
-> > >   KVM: arm64: selftests: Add infrastructure for using stage-2 in guest
-> > >   KVM: arm64: selftests: shadow_stage2: Turn on stage-2 translation for
-> > >     the nested guest
-> > > 
-> > >  tools/testing/selftests/kvm/Makefile.kvm      |   5 +
-> > >  .../selftests/kvm/arm64/hello_nested.c        | 134 +++++++++
-> > >  .../selftests/kvm/arm64/shadow_stage2.c       | 165 +++++++++++
-> > >  .../selftests/kvm/include/arm64/nested.h      |  85 ++++++
-> > >  tools/testing/selftests/kvm/lib/arm64/entry.S | 137 +++++++++
-> > >  .../selftests/kvm/lib/arm64/hyp-entry.S       |  77 +++++
-> > >  .../testing/selftests/kvm/lib/arm64/nested.c  | 264 ++++++++++++++++++
-> > >  7 files changed, 867 insertions(+)
-> > >  create mode 100644 tools/testing/selftests/kvm/arm64/hello_nested.c
-> > >  create mode 100644 tools/testing/selftests/kvm/arm64/shadow_stage2.c
-> > >  create mode 100644 tools/testing/selftests/kvm/include/arm64/nested.h
-> > >  create mode 100644 tools/testing/selftests/kvm/lib/arm64/entry.S
-> > >  create mode 100644 tools/testing/selftests/kvm/lib/arm64/hyp-entry.S
-> > >  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested.c
-> > > 
-> > > -- 
-> > > 2.43.0
-> > > 
-> > > 
+>> +		svm->sev_es.hvdb_gpa = INVALID_PAGE;
+>>  }
+>>  
+>>  static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>> index 5137416be593..fb956c37c941 100644
+>> --- a/arch/x86/kvm/svm/svm.h
+>> +++ b/arch/x86/kvm/svm/svm.h
+>> @@ -270,6 +270,8 @@ struct vcpu_sev_es_state {
+>>  	gpa_t snp_vmsa_gpa;
+>>  	bool snp_ap_waiting_for_reset;
+>>  	bool snp_has_guest_vmsa;
+>> +
+>> +	gpa_t hvdb_gpa;
+>>  };
+>>  
+>>  struct vcpu_svm {
+> 
+
