@@ -1,198 +1,197 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7917A31E835
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 00:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9880A358D32
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 08:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781052848; cv=none; b=r342k6xz+YIJMYRzOWrdoT0vMcEILQfdke2O920O6bmzrnhU6EAOSOGvJRvqbTUF3IViJn+zpKYtaeoS++Hp4tDZid0NRj3/42ja6qip+yVlk4I8krev9c2wmaPUsYKdNyzHwPSBcASa2G88BtbzFcg+X0rtsHGM/jCd54Yk2ew=
+	t=1781080284; cv=none; b=GSHRE4QTjabms4qUjkvRMNAZDH/n9BHJog1hVvW9NXY7+9ouMFxu8sN3N3TKJ4+HeSA2oZkAP+8oe5YnLKBQ0z4yx5huGfdilV8aFTG/sTAr9wpQFolohhl5pe3xwIlgdAj9V87vweBS61MrjBz+N2+QlfR1d5Bfih+H0eNxJBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781052848; c=relaxed/simple;
-	bh=AiUuBRIX0kUa2VEzwQ/KiwLXhNWB6Ni7nPHSHxTzQ78=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X7K+aHxwLsVYOqUCLQyzatvXBR0BxjDGMQNkKyIQaSsAgo5L8txt05YMJ7d8pG7VsP6S19NRG5VkG28BBv+ydWMtx4rz4R1joghcOS+KEL4U8ZLWhkPqqJas1rf4EyaL/a4Qpjbh6q57JuC1NtctFzG84NPpQpGLhBYa7cgv6PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dF2LNZkW; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1781080284; c=relaxed/simple;
+	bh=8j/2SReMPBKwiPfM1zlJ9hlEC0luvJYmS+ZwCf49daY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aPZItLshNK0FdM/DhI1qQYOK6qdzDXTEowHLo2Y9oN8pkuie+696uXD8ERCDVIFZwiPgYi0oJFAUd8GOcAXYOT42ElYVTkRxDvYWqo7UsEYMFaDDAvcBmzUo7tcf+AY3WQxsUsnHu1OlD0nm6lfVCby7zQo/dMqao35bUtmN1Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CADMmn9g; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dF2LNZkW"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-36d99333358so5874255a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 09 Jun 2026 17:54:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781052847; x=1781657647; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=q4JpkxXanGmrcDhm8+OuLX2LEo2GMxbk1wO2svPpVp4=;
-        b=dF2LNZkWgaU9N5zMYx6/wHoley9pLcp4zEgI7oyKW+tHrSL6e54P8YiBoQAv+vyafZ
-         j5gODaHFYJfrrD4rt37CfWqrMaunvXNwY3WAeyLltgbAQRa/DvpaaoDzadUZ+txKvZYB
-         z1WRejxEeqxq/0SADUY7QBdOapqwn3us9vzsDZ+OxOki/KA+OFpX51hy+8YjfrZAgiem
-         tojjoWp8i9lqjf+NjZqbyi0eXQhIHXSzDECfCdPpCHAmjC+lojg35B67bgVIb2hnaeqE
-         mT62jmukvCPJvY8uIww2vDvrZHNko7R3u/7NQrRf5H0uFJdSYxhKCVEEVq97rk+uXPu4
-         j3Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781052847; x=1781657647;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q4JpkxXanGmrcDhm8+OuLX2LEo2GMxbk1wO2svPpVp4=;
-        b=YUmowu6Kv0FksLcduiUzmSkX8kqpA6APaeh/rqTK0EgTO6NUlT63iCitwQy/tNcsha
-         I8RfqW8jk4m/1UY1v/Gdke/B56Ou8oxXML55Bx9fuYAy4OzJTdGoBvu/qkWKgAJqJIFp
-         LgQbZKMk4JzZS4d3PusB80re25QAp6gHVvwir7qf51jF0j5MLp6oiFTHksXWCf7eK29D
-         yHAmpLwzc0FFln6Jm8tZPWVOBC664q8xuIpIj9frB2nPZmlNdQ2KTRwe/dGTvvL92yCR
-         vu0FwD9FdoaBCKwlNcnSloDZBSX0cRxKy8SY79QsRmSf3SwbPtaN2Y+q8mKdIhN4py4X
-         1O/A==
-X-Forwarded-Encrypted: i=1; AFNElJ8sbWKEdLIZbv/WunX8t1Y24uCfd8lCZHJ3Teq0kOdrjTleQ8opCDqLvoD2TwBgdNQ5m9JmTsM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywa3CZfCOM4cYaKPf+/49Bt7WVT68xdwGZNXyIYZgNJ5VZkVksu
-	i0acMtXs+tVf/CMNfYCthl8y2NEJkv6Mm0l9CyMyjesXoHoSiU1tOmckdOC+hqmI2pU7lfKPd5R
-	CcA1HBw==
-X-Received: from pjbiq21.prod.google.com ([2002:a17:90a:fb55:b0:36b:7f07:6fcd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dc7:b0:36d:cf58:b79
- with SMTP id 98e67ed59e1d1-375211ae901mr6245033a91.19.1781052846605; Tue, 09
- Jun 2026 17:54:06 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Jun 2026 17:53:38 -0700
-In-Reply-To: <20260610005338.2967132-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CADMmn9g"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A7H8DC3134026;
+	Wed, 10 Jun 2026 08:31:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=gsqgT1L8GlUvjVEyoVN0CjEjCJ7lWM
+	1KEW8o6L6f69k=; b=CADMmn9g3GIiN84a6Wh3GVeT862MGYxi1wAl/pL5VqxIr5
+	ekPFQeV/aGKkwOfEKlDTqalwScuyyoKyhK5nzaRsFKVdMYL1XM/okdEFn6jo2GZa
+	a6rv52VNpOdMbxlIAg6Lep5X8BaX//houA96+t3us9hoJUf5i6yoV/zKXQCfLtfd
+	W9908ij74VGNG1bo0DH/4lyFXOv0AqI/4re7neiNXVFJi830ubiNkI9d5v6z4tcs
+	Pdor0IyAIr1YtJtWA0yV2GaHnrn2mX6j5Aqw6yW0oHQaLMhmcLhvC/I0HDh253b6
+	yFBtv4WxR4SlzqcyGSpioijl5ITm6PsGdeLuZduw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4emb95g7d3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jun 2026 08:31:03 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65A8Jb3P028350;
+	Wed, 10 Jun 2026 08:31:02 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4emwvq60ut-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jun 2026 08:31:02 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65A8Uu7e42860894
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Jun 2026 08:30:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 105AC20043;
+	Wed, 10 Jun 2026 08:30:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA92020040;
+	Wed, 10 Jun 2026 08:30:55 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 10 Jun 2026 08:30:55 +0000 (GMT)
+Date: Wed, 10 Jun 2026 10:30:54 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v1 13/26] s390: Introduce read/write ARM sysreg
+ instructions
+Message-ID: <20260610083054.151573-A-seiden@linux.ibm.com>
+References: <20260529155601.2927240-1-seiden@linux.ibm.com>
+ <20260529155601.2927240-14-seiden@linux.ibm.com>
+ <2d73aca5-1858-4a7a-a304-0971e4789dc1@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260610005338.2967132-1-seanjc@google.com>
-X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
-Message-ID: <20260610005338.2967132-19-seanjc@google.com>
-Subject: [PATCH v6 18/18] KVM: selftests: Add xAPIC support in eventfd IRQ test
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>, 
-	Josh Hilke <jrhilke@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d73aca5-1858-4a7a-a304-0971e4789dc1@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=N4UZ0W9B c=1 sm=1 tr=0 ts=6a2920c7 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
+ a=RB1mEpRu8beSFINCoVEA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: rkH4BTGK461Si0Q9cLKjWcrqdRB9jrQ0
+X-Proofpoint-GUID: rkH4BTGK461Si0Q9cLKjWcrqdRB9jrQ0
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA3NSBTYWx0ZWRfX759nmtSYBCtK
+ OKztLB4YBBvkqAJiVWHa0lvNpubxRsfOlLx2KUZJaV23kUwR22A69MRJel9dxDfzuT38zTEwKeW
+ IJIunCCS4RCeF6Tnww6DQX1HJSCU3c8ls4FyaHMlRFBAm/hWqKpgnHGwXznPkvNLZtzr8kd5tgu
+ F1xPqwrF6ykDULEZB+ujCSIXu2m35kJf1t3wgi0fKJrr9e8/IYJ0LYWtUG+WPOApsDbvDp6th8x
+ ZoYhmfTSp+lh/HnM1J5ZYrI3li0/HsyvgWYedEy4h9N1+WklI0E/nxKhag14KXBbKQKpLgXLPRo
+ Qr7jDL46fR9iCaI21z1nlQ/f4rr7y0QOjSBeYn0jvDpfwLNCD2QRxuy8juDc6DntVYmWMPog94I
+ t/jAu+6eeW55eeAy7UYOZ+QjSBUFoeYsFd+NuAE6hW0/KM1i1VCgn5p1M5AUk6e+y5GhYqMLZmn
+ VUSZ9F5NmINukCX1KGQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-10_02,2026-06-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 malwarescore=0 spamscore=0 clxscore=1015 lowpriorityscore=0
+ phishscore=0 impostorscore=0 adultscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606100075
 
-From: David Matlack <dmatlack@google.com>
+On Tue, Jun 09, 2026 at 05:04:10PM +0200, Janosch Frank wrote:
+> On 5/29/26 17:55, Steffen Eiden wrote:
+> > Introduce Extract Arm System Register and Store Arm System Register to
+> > enable s390 hosts to read and write system registers for arm64 guests.
+> > The new instructions use the new RIE_H instruction format. Add assembler
+> > macros to create instructions in RIE_H format manually. Add Support for
+> > disassembling the new instructions.
+> > 
+> > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >   arch/s390/include/asm/sae-asm.h | 48 +++++++++++++++++++++++++++
+> >   arch/s390/include/asm/sae.h     | 58 +++++++++++++++++++++++++++++++++
+> >   arch/s390/kernel/dis.c          |  1 +
+> >   arch/s390/tools/opcodes.txt     |  2 ++
+> >   4 files changed, 109 insertions(+)
+> >   create mode 100644 arch/s390/include/asm/sae-asm.h
+> > 
 
-Extend the eventfd IRQ test with a '-x' flag to let the user run the test
-in xAPIC mode instead of the default x2APIC mode.  When using xAPIC mode,
-sanity check user input to ensure the test is being run with at most 255
-vCPUs, as xAPIC can only address IDs 0-254 (255, i.e. 0xff, broadcasts to
-all CPUs).
 
-Signed-off-by: David Matlack <dmatlack@google.com>
-Co-developed-by: Josh Hilke <jrhilke@google.com>
-Signed-off-by: Josh Hilke <jrhilke@google.com>
-[sean: add sanity check on number of vCPUs]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/irq_test.c | 31 +++++++++++++++++++++-----
- 1 file changed, 26 insertions(+), 5 deletions(-)
+...
 
-diff --git a/tools/testing/selftests/kvm/irq_test.c b/tools/testing/selftests/kvm/irq_test.c
-index 7d64fd29ea8b..2b6fc0335d38 100644
---- a/tools/testing/selftests/kvm/irq_test.c
-+++ b/tools/testing/selftests/kvm/irq_test.c
-@@ -18,6 +18,7 @@ static u64 timeout_ns = 2ULL * 1000 * 1000 * 1000;
- static bool guest_ready_for_irqs[KVM_MAX_VCPUS];
- static bool guest_received_irq[KVM_MAX_VCPUS];
- static bool guest_received_nmi[KVM_MAX_VCPUS];
-+static bool x2apic = true;
- static bool irq_affinity;
- static bool done;
- 
-@@ -31,14 +32,20 @@ static bool done;
- 
- static u32 guest_get_vcpu_id(void)
- {
--	return x2apic_read_reg(APIC_ID);
-+	if (x2apic)
-+		return x2apic_read_reg(APIC_ID);
-+	else
-+		return xapic_read_reg(APIC_ID) >> 24;
- }
- 
- static void guest_irq_handler(struct ex_regs *regs)
- {
- 	WRITE_ONCE(guest_received_irq[guest_get_vcpu_id()], true);
- 
--	x2apic_write_reg(APIC_EOI, 0);
-+	if (x2apic)
-+		x2apic_write_reg(APIC_EOI, 0);
-+	else
-+		xapic_write_reg(APIC_EOI, 0);
- }
- 
- static void guest_nmi_handler(struct ex_regs *regs)
-@@ -48,7 +55,10 @@ static void guest_nmi_handler(struct ex_regs *regs)
- 
- static void guest_code(void)
- {
--	x2apic_enable();
-+	if (x2apic)
-+		x2apic_enable();
-+	else
-+		xapic_enable();
- 
- 	sti_nop();
- 
-@@ -146,7 +156,7 @@ static const char *probe_iommu_type(void)
- 
- static void help(const char *name)
- {
--	printf("Usage: %s [-a] [-d <segment:bus:device.function>] [-e] [-h] [-i nr_irqs] [-m] [-n] [-t iommu_type] [-v nr_vcpus]\n", name);
-+	printf("Usage: %s [-a] [-d <segment:bus:device.function>] [-e] [-h] [-i nr_irqs] [-m] [-n] [-t iommu_type] [-v nr_vcpus] [-x]\n", name);
- 	printf("\n");
- 	printf("Tests KVM interrupt routing and delivery via irqfd.\n");
- 	printf("-a	Affine the device's host IRQ to a random physical CPU\n");
-@@ -157,6 +167,7 @@ static void help(const char *name)
- 	printf("-n	Deliver 50 percent of IRQs as non-maskable interrupts\n");
- 	printf("-t	Override the IOMMU type to use (vfio_type1_iommu or iommufd)\n");
- 	printf("-v	Number of vCPUS to run\n");
-+	printf("-x	Use xAPIC mode instead of x2APIC mode in the guest\n");
- 	printf("\n");
- 	exit(KSFT_FAIL);
- }
-@@ -193,7 +204,7 @@ int main(int argc, char **argv)
- 	struct kvm_vm *vm;
- 	int irq, irq_cpu;
- 
--	while ((c = getopt(argc, argv, "ad:ehi:mnt:v:")) != -1) {
-+	while ((c = getopt(argc, argv, "ad:ehi:mnt:v:x")) != -1) {
- 		switch (c) {
- 		case 'a':
- 			irq_affinity = true;
-@@ -221,6 +232,9 @@ int main(int argc, char **argv)
- 			TEST_ASSERT(nr_vcpus <= KVM_MAX_VCPUS,
- 				    "KVM selftests support at most %u vCPUs", KVM_MAX_VCPUS);
- 			break;
-+		case 'x':
-+			x2apic = false;
-+			break;
- 		case 'h':
- 		default:
- 			help(argv[0]);
-@@ -236,6 +250,11 @@ int main(int argc, char **argv)
- 	vm_install_exception_handler(vm, vector, guest_irq_handler);
- 	vm_install_exception_handler(vm, NMI_VECTOR, guest_nmi_handler);
- 
-+	if (!x2apic) {
-+		TEST_ASSERT(nr_vcpus < 256, "xAPIC can only target IDs [0-254] (255 vCPUs)");
-+		virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
-+	}
-+
- 	if (device_bdf) {
- 		if (!iommu_type)
- 			iommu_type = probe_iommu_type();
-@@ -260,6 +279,8 @@ int main(int argc, char **argv)
- 
- 	kvm_assign_irqfd(vm, gsi, eventfd);
- 
-+	sync_global_to_guest(vm, x2apic);
-+
- 	if (migrate_vcpus)
- 		kvm_sched_getaffinity(0, sizeof(available_cpus), &available_cpus);
- 
--- 
-2.54.0.1099.g489fc7bff1-goog
+> > diff --git a/arch/s390/include/asm/sae.h b/arch/s390/include/asm/sae.h
+> > index fe010a1a7729..1d9a16b91b23 100644
+> > --- a/arch/s390/include/asm/sae.h
+> > +++ b/arch/s390/include/asm/sae.h
+> > @@ -4,6 +4,7 @@
+> >   #include "linux/linkage.h"
+> >   #include <linux/types.h>
+> > +#include <asm/sae-asm.h>
+> >   /* defined in arch/s390/kernel/entry.S */
+> >   asmlinkage int __sae64a(phys_addr_t sae_block_phys);
+> > @@ -12,6 +13,12 @@ asmlinkage int __sae64a(phys_addr_t sae_block_phys);
+> >   #include <linux/io.h>
+> >   #include <asm/kvm_host_arm64_types.h>
+> > +asm(".include \"asm/sae-asm.h\"\n");
+> > +
+> > +#define _SAE_ASR_REG_SHIFT	5
+> > +#define SASR_FLAG_INITIALIZED  0x8
+> > +#define EASR_FLAG_SA           0x8
+> 
+> s/SA/SAVE_AREA/ or SAVEAREA
+> 
+> I think both might fit.
 
+yes, might be a good idea.
+
+> 
+> > +
+> >   /**
+> >    * __sae64a() - Start Arm Execution
+> >    */
+> > @@ -20,6 +27,57 @@ static inline void sae64a(struct kvm_sae_block *sae_block)
+> >   	__sae64a(virt_to_phys(sae_block));
+> >   }
+> > +/**
+> > + * sasr() - Set Arm System Register
+> > + * @arm_reg: ARM system register identifier; compile-time constant
+> > + * @val: Value to set
+> > + * @save_area: Pointer to SAE save area
+> > + * @flags: Operation flags; compile-time constant
+> > + *
+> > + * Sets an ARM system register value.
+> > + */
+> > +static __always_inline void sasr(unsigned int arm_reg, u64 val,
+> > +				 struct kvm_sae_save_area *save_area,
+> > +				 u64 flags)
+> 
+> m4 is 4 bits in length, any reason why we use a u64 here?
+> Same for easr.
+> 
+
+No real reason beside my preference of using u64 by default.
+
+Do you want me to change it to u8?
+
+	Steffen
