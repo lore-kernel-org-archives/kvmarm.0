@@ -1,63 +1,68 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A631F1304
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 00:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456D41F872D
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 00:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781052823; cv=none; b=izNCM3UBgKp4C5Aq3nspoYq1esFVJJeM3ZONSQdXJtBpldljCTmmCiTcLMwX3lC/h+/dnQCXpcJk0uGBFrCaUjcZ9jeODXb1ffqrktpmFzOJUdAU1tH6fOCFxD/LwHqnR0moXMP9t0+XJuMmeTdsID3JsJk3VL2I/muYxMFZfbU=
+	t=1781052825; cv=none; b=f9fi/xRmJ+EoDbXz4XUEOwj3S2EduKj20ZOLMY1WjMaSxMlQvTYIHXFychIFDMFNXd+9NO0d+oEzJdTtPFWSszdT8Nrigfvs4pFORhUqXQ1KK6ELnx1ZnARP/0OMLApQ0GQ3/mKdTPeFgjXe/lBKOHooPQSOCLLCbOxdpPSMyv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781052823; c=relaxed/simple;
-	bh=hZc2uFswrNayFNDYFX7KG+zox1SbVBrHAJg1rSy/lTM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cp43f6Ov8YNMEgjhfBASS3nEZPM70kjadB5k099p42lMwF8AGk42O1b7XvdxYoHFdpbiMNrdRA5t97L6ZJuWmJZPwHuMTCaGtlka+Ga8cflfhOyZeHxxS/dxIkEcb93S8K273nnzKI+xrJJFL2/TaXymlIC90/qyGEKW5SOy+Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vyhngctZ; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1781052825; c=relaxed/simple;
+	bh=ZICe4hE+bdgo/mmBoriJdsV7FkTThoAxxO0XvehbVwI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YF96A6v/r32VLlqD0EYWHD44Rieab/vm6ocEgv+mhMqFrD1Tku4GNn5juNtAJJDFD8s992DbJ3J7S8pM151MbqZtPTnB+QRFMTsAzwVZoIqA42t/KPr3x4q/4d3xJpUUDpKFY6lw3hkRskhqI+ij+DfLNDvJnMOGWehnoYTn7Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=axALYQtW; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vyhngctZ"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2c0c3315d31so66797515ad.3
-        for <kvmarm@lists.linux.dev>; Tue, 09 Jun 2026 17:53:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="axALYQtW"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c8584e80bfcso2667383a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 09 Jun 2026 17:53:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781052821; x=1781657621; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2T4JFnvy3isjzB+jWXF2KXb/Imn3RDItMHvYDoBMt3U=;
-        b=vyhngctZ1/cSWRoPrIPOjhWUQnYBLxtxiOIAEC7TyfpTbOVTijkQhpDvWVS+srorjd
-         imI1iuwPYvXJGqK91dllqSHUj8a6fJWfeDceFmZe1LdOt1tEyX8E6T2Dbg/bzNebnoav
-         z0neDUsct80WKfOiPV45qbLt5txw6vtEjAmKN0L1tyIUrpYZHUKM8S4Avy8WLB/KhK30
-         A7oIBfdvdScpv3bQesGNi2yVK33/YcX8tfi2iqspfgEqM0pNaP3P4OnahumLVkAUzaJ+
-         wI7TlFsafykw6tfSSB6wmup051eAK1Uk7Dkpm4CWVUjWCLlErtoHYdFj5FQ+9PXXom0k
-         jdvQ==
+        d=google.com; s=20251104; t=1781052822; x=1781657622; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=E3dsDf1mwPqE6CLqG/GF7U0hvBMIyZSe2b/ARirZzXU=;
+        b=axALYQtWoDRO7T3ulLDbC0D2sgNAbO0Pzqmrdb31Qi6anUfVSbVmGd7/PVDjVQGds6
+         YJ2qq3CeiY7cyXrq0VAnkgGFMHvAwAKcExnvo26W0+NZdI/kI2bEL5xWzKJheDIQ95ge
+         gvIDhNivQ966yV5TvXAl02uOxhCCwiWMhVAtJnhicuHE+q6sC/2NoyN4fQK/QSECgZJo
+         +JyrJOQktbyCyAw1ggm42DtCYB/LC3ooABh3uqEqA20alkoc5XvskTWU5c1g/SrKY0uh
+         S5cNiCrhoD3so2XlneFvPNelFtou9QEIorMsnjgL5dKHxazDDOXiFNl5zHx/70wpzDgy
+         Q5Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781052821; x=1781657621;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2T4JFnvy3isjzB+jWXF2KXb/Imn3RDItMHvYDoBMt3U=;
-        b=XyEkOWOP8orO42JVMIL4XHkGinf2K36yRB8dZerFOfJhM5baRoOH5k2IqeypJy9SD6
-         ff2kuUA1nyUxI/FiSoxa1EkPxMVVFBbofwfO2U4qiE+EH7WdJAOR5mQHDfS+EC2FXOye
-         LIGeX7V2FCb9/w85Pc9UiKDbc0Zfj3Fena4devZbpAyHSte6ub7492GjdQruJaB6uhvy
-         pH61hkVmfQGkHcSvex365UeQV0mUeTpu67UpDVpTIb7zOrCJXuCdklFrpvBmt95kKBE6
-         ld8rpOCEU9T7RfQFeHQrEg/OUNK5KabSqNANo9MGWNPbnqjb5PQEKddQRvMqnN3IbqF0
-         jg/Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8PR3H+6ult1PCW2SXoNTjAyR6q3AiqF6slimcX5kiQwIjHNJ8QQzTZ7wa6noi49/yW6ICsxp0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzN7dcPmMI06e13+mbwcAOQ1vb7MljPIYC3z97+KSIsEQX8rMBV
-	RylBBhrEaV2NlaxYpK+0M7vyjj8SianE4LvvppOtTUZ8kfBAKc2T0n4A6XcywSDHnMKlc9wtqDp
-	bvguffQ==
-X-Received: from plao3.prod.google.com ([2002:a17:903:3003:b0:2be:3026:1d0f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:240f:b0:2bc:db35:96c7
- with SMTP id d9443c01a7336-2c1e822121cmr244254735ad.28.1781052821294; Tue, 09
- Jun 2026 17:53:41 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781052823; x=1781657623;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E3dsDf1mwPqE6CLqG/GF7U0hvBMIyZSe2b/ARirZzXU=;
+        b=Z3GMrs9aiYsi7hhgWJA81nRivPyadspPWFTNkc4NgAEuLl1el0TK5/qgHCc94303tx
+         neMSJwhH8NG0DilMX0nBpsSkgtr60/m+dH7I8lgH0Q+KCTqmRE5dchlbnCNxT2UlooCD
+         LXO9y2LSkgYclAaUcc4X6jRZtv+JKYqZPf5nvPJtSVyh0OD/ldwQEEpocmqLKBpqr/f7
+         12JavcZgfXX5Xn1g73R4fZ4JprzVQpjYiD6QalNzb4ln1iZw8IgqTXL9GZTZ+45gyut8
+         H7QqXArxfSqNk5I1LzBqrUUDbLOf/j/HkjMtwJVNKurJKS7i0VH1t0mHtbo6Z+kJCChy
+         O5Ig==
+X-Forwarded-Encrypted: i=1; AFNElJ9nS+os/TK97P1s6LFdU9qUdS2GAKcQNRdbCOls0oYaAVLc5KaMAHX8Jtxy7TYLWW+O7fNeI1Q=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzQcuy9pEQmx4PKsF4INU8qkLDIr7PQSU7zCdU6sLUynto9EI07
+	zc/KPThHVinlxnOcjYWu7xRnnv3qOwUwPes6nO8A7OGXTJXsSUk/TLxqj77RxCEsIhJAMPaYywO
+	SxXLX1Q==
+X-Received: from pgwa8.prod.google.com ([2002:a65:6548:0:b0:c86:2164:9671])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:b87:b0:3b4:8268:23e8
+ with SMTP id adf61e73a8af0-3b4ccdf102dmr28032201637.21.1781052822397; Tue, 09
+ Jun 2026 17:53:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Jun 2026 17:53:20 -0700
+Date: Tue,  9 Jun 2026 17:53:21 -0700
+In-Reply-To: <20260610005338.2967132-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260610005338.2967132-1-seanjc@google.com>
 X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
-Message-ID: <20260610005338.2967132-1-seanjc@google.com>
-Subject: [PATCH v6 00/18] KVM: selftests: Add eventfd+VFIO IRQ test
+Message-ID: <20260610005338.2967132-2-seanjc@google.com>
+Subject: [PATCH v6 01/18] KVM: selftests: Build and link selftests/vfio/lib
+ into KVM selftests
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>
@@ -68,106 +73,49 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
 	Josh Hilke <jrhilke@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-David and Josh's series to add a selftest for verifying interrupt delivery
-via eventfd (via KVM_IRQFD), and also from a real device, wired up via VFIO.
+From: David Matlack <dmatlack@google.com>
 
-I originally wanted to get this into 7.2, but that's not going to happen.  But
-I hope to get this applied early in the 7.3 cycle so that additional features
-and whatnot can be developed on top without too much pain (hopefully).
+Include libvfio.mk into the KVM selftests Makefile and link it into all
+KVM selftests by adding it to LIBKVM_OBJS.
 
-Gory details in the patches, and in the v5 cover letter.
+This lays the groundwork for future changes to utilize VFIO devices to
+verify IRQ bypass in KVM selftests.
 
-v6:
- - Massage most changelogs.
- - Fix SoB ordering issues.
- - Clean up KVM_SET_GSI_ROUTING helper.
- - Remove misleading "IRQ injection" and "emulated eventfd" terminology.
- - Add GUEST_RECEIVED_INTERRUPT() to simplifiy the core loop.
- - Use cpu_relax() in tight loops while waiting for interrupts.
- - Print as much information as possible in the actual assert, instead of
-   printing to stdout separately.
- - Make a best guess as to the right VFIO vs. IOMMUFD mode instead of
-   assuming IOMMUFD, and give the user the option to overide said guess.
- - Simplify open_proc_irq_smp_affinity_list() +
-   write_proc_irq_smp_affinity_list() into proc_irq_set_smp_affinity().
- - Drop print_proc_irq_file() and kvm_print_vcpu_affinity() (for now) to avoid
-   potential issues on systems with high CPU counts.
- - Drop the blocking/HLT testing as it was at best broken.
- - Use -e for "empty", not -c for "clear", when completely tearing down GSI
-   routing, because routing can be "cleared" without completely emptying the
-   routing information.
- - Use the main task's CPU affinity as the available_cpus set.
- - Allow overcommiting vCPUs:pCPUs.
- - Set the target vCPU's affinity instead of batching when vCPU0 is targeted.
- - Add support for 256+ vCPUs with x2APIC.
- - Restrict xAPIC mode to 255 vCPUs.
- - Restrict the test to KVM selftest's max supported vCPUs.
+Note that KVM selftests build their own copy of selftests/vfio/lib and
+the resulting object files are placed in $(OUTPUT)/lib. This allows the
+KVM and VFIO selftests to apply different CFLAGS when building without
+conflicting with each other.
 
-v5:
- - https://lore.kernel.org/all/20260604020143.748245-1-jrhilke@google.com
- - Rename get_proc_vfio_irq_number() to vfio_msix_to_host_irq()
- - Rename open_proc_irq_affinity() and write_proc_irq_affinity() to include "_smp_affinity_list"
- - Print /proc/irq/<irq>/smp_affinity and effective_affinity on timeout failures
- - Convert IRQ type from 'int' to 'unsigned int' across helpers and the test
- - Fix compiler warnings for uninitialized variables in irq_test.c
- - Remove rate-limiting on affinity changes
+Signed-off-by: David Matlack <dmatlack@google.com>
+Signed-off-by: Josh Hilke <jrhilke@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/Makefile.kvm | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-v4: https://lore.kernel.org/kvm/20260530002134.558837-1-jrhilke@google.com
-
-David Matlack (12):
-  KVM: selftests: Build and link selftests/vfio/lib into KVM selftests
-  KVM: selftests: Add macros to read/write+sync to/from guest memory
-  KVM: selftests: Add an irqfd send+receive (and later IRQ bypass) test
-  KVM: selftests: Add helper to get host IRQ from device MSI-X for IRQ
-    bypass test
-  KVM: selftests: Add VFIO device support to eventfd IRQ test
-  KVM: selftests: Verify interrupts are received when IRQ affinity
-    changes in IRQ test
-  KVM: selftests: Add option to set empty routing between IRQs in
-    eventfd IRQ test
-  KVM: selftests: Make number of IRQs configurable in IRQ test
-  KVM: selftests: Verify non-postable IRQ remapping in IRQ test
-  KVM: selftests: Verify vCPU migration during IRQ delivery in IRQ test
-  KVM: selftests: Make number of vCPUs configurable in IRQ test
-  KVM: selftests: Add xAPIC support in eventfd IRQ test
-
-Josh Hilke (6):
-  KVM: selftests: Rename guest_rng to kvm_rng
-  KVM: selftests: Add helper to generate random u64 in range [min,max]
-  KVM: selftests: Add a helper to set proc IRQ affinity for IRQ test
-  KVM: selftests: Add kvm_gettid() wrapper and convert users
-  KVM: selftests: Add kvm_sched_getaffinity() wrapper and convert users
-  KVM: selftests: Add a utility to pin a task to a random CPU, given a
-    CPU set
-
- tools/testing/selftests/kvm/Makefile.kvm      |   7 +-
- tools/testing/selftests/kvm/arch_timer.c      |   2 +-
- .../kvm/arm64/arch_timer_edge_cases.c         |   2 +-
- .../selftests/kvm/demand_paging_test.c        |   2 +-
- .../selftests/kvm/dirty_log_perf_test.c       |   4 +-
- tools/testing/selftests/kvm/dirty_log_test.c  |  11 +-
- .../selftests/kvm/include/kvm_syscalls.h      |   7 +
- .../testing/selftests/kvm/include/kvm_util.h  |  12 +
- .../testing/selftests/kvm/include/proc_util.h |  11 +
- .../testing/selftests/kvm/include/test_util.h |  25 +-
- .../selftests/kvm/include/x86/kvm_util_arch.h |   4 +-
- tools/testing/selftests/kvm/irq_test.c        | 349 ++++++++++++++++++
- tools/testing/selftests/kvm/lib/assert.c      |   8 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    |  46 ++-
- tools/testing/selftests/kvm/lib/memstress.c   |   8 +-
- tools/testing/selftests/kvm/lib/proc_util.c   |  54 +++
- tools/testing/selftests/kvm/lib/test_util.c   |  27 +-
- tools/testing/selftests/kvm/mmu_stress_test.c |  15 +-
- tools/testing/selftests/kvm/rseq_test.c       |   6 +-
- tools/testing/selftests/kvm/steal_time.c      |  22 +-
- .../testing/selftests/kvm/x86/sev_dbg_test.c  |   2 +-
- 21 files changed, 541 insertions(+), 83 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/proc_util.h
- create mode 100644 tools/testing/selftests/kvm/irq_test.c
- create mode 100644 tools/testing/selftests/kvm/lib/proc_util.c
-
-
-base-commit: de3a35be92d2391ece4bf3143ef2887192625fd0
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index e0ddd3ff9472..14316358fd9f 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -257,6 +257,7 @@ OVERRIDE_TARGETS = 1
+ # which causes the environment variable to override the makefile).
+ include ../lib.mk
+ include ../cgroup/lib/libcgroup.mk
++include ../vfio/lib/libvfio.mk
+ 
+ INSTALL_HDR_PATH = $(top_srcdir)/usr
+ LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
+@@ -311,7 +312,9 @@ LIBKVM_S := $(filter %.S,$(LIBKVM))
+ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+ LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+-LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ) $(LIBCGROUP_O)
++LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
++LIBKVM_OBJS += $(LIBCGROUP_O)
++LIBKVM_OBJS += $(LIBVFIO_O)
+ SPLIT_TEST_GEN_PROGS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
+ SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH)/%.o, $(SPLIT_TESTS))
+ 
 -- 
 2.54.0.1099.g489fc7bff1-goog
 
