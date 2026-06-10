@@ -1,30 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E52343D86
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 20:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FEDA47B439
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jun 2026 20:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781122911; cv=none; b=n0Fx0wRQdIpUgGbMgBOdz1OFqq7uZxA2MjEiyHyXoE+YBWNSx2G8HxRUEGyReqsRaSU8R90UaiBrVskZ8lDrTJFjX3i/JK2VcjJdmzDnkGtz81MH0DnI9x8KD0jdTCjiQ+9F5Iwy+KY6FqpG5CXRBIEa4678xqJQIrSAEQxlfmc=
+	t=1781122914; cv=none; b=CksWtJF+DTiU0GvgE7EjUzbwSWY37tukPza34bA/9N+bhOsD2j0pxSUvGMs6sN6GMyrhMWOhaj+GzwDHwrBrjUEiyfmjUImiGbKNpKv3EvfX+QlO//yYExb4qWU3XLLEIYO3ZXuwzYn0dc5+/z+93DTH0Pyvv+RJRHWL3RUPyS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781122911; c=relaxed/simple;
-	bh=ERzphoGFlfsnQX/z/pHW9rsKUGoz2XFTjRwpnLKWgsw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m9ZeqHtyhpVB5dcqaHxOeyMFYbUckervFP7iyl6UQLvd5ocXCD57PYQw541oTR7jwUn80RcJqm6RPNNgwqg63VZ92/DtdzjQzLe9B4GeTzOjaCTYmzFVoakFR5qROzAzhHGz/F/XrOXTRUNuY04MDz4TeMS/uCw3Mx5wWvyh7Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vYHFnVxp; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1781122914; c=relaxed/simple;
+	bh=zla4ojH7IRpK8neQWnjZ1NqqA2JQS5zWlyS67zi1LRE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UT/wzjWZTzYxjjQ1qYncGnSLzWeWG5hKspLl0FkiBq7CHfNvqnoUWBf9+iGOjXpGG0UcvNcJEsYvCdOwA0LvLP4Q52tl5ldNKXJvGrhcB8y6tkbAIESl3zvsowt2JuIAgfpdeRoWId513tgdyBYmXOAMpOzd0SDP8GoZRbomShk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tloWJSi1; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vYHFnVxp"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tloWJSi1"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE665201B;
-	Wed, 10 Jun 2026 13:21:43 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4BE723FB7F;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2F5E202C;
 	Wed, 10 Jun 2026 13:21:46 -0700 (PDT)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 247E73FB7F;
+	Wed, 10 Jun 2026 13:21:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781122908; bh=ERzphoGFlfsnQX/z/pHW9rsKUGoz2XFTjRwpnLKWgsw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=vYHFnVxpf8WOs7yJo6tinH+R+HuLLxCdXavmmnL6ix0VlOsXsxv3muNlro7nJjl54
-	 9CHyCQYP8ds9bu1F9z6lnVtzSCtecF7COd2UaGQZQxIG6Dg+jNKhekBFcL0pIbpJAM
-	 LQz9qvg1Za4EILjqNMteTsDm3KgrpfD24lPhAmVs=
+	t=1781122911; bh=zla4ojH7IRpK8neQWnjZ1NqqA2JQS5zWlyS67zi1LRE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tloWJSi1orvV8CRFoDOd6u5uY5bAzN7N+NznpZxFoBiMdE3tdaPh+JoUHguue9l0P
+	 jJ4P7yeKSSWQkrEuTRBVLxZsDawpUg4AVLIoEBjoe9aaBuGjLsqkIsuPVME88jbOy9
+	 H1ke7mKUP8TEnwA+sWGcNQqMbL9d3YnwX5qFoRJQ=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -40,114 +41,141 @@ To: Marc Zyngier <maz@kernel.org>,
 Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 0/2] Optimize S2 page splitting
-Date: Wed, 10 Jun 2026 21:21:07 +0100
-Message-ID: <20260610202112.2695205-2-leo.bras@arm.com>
+Subject: [PATCH v1 1/2] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
+Date: Wed, 10 Jun 2026 21:21:08 +0100
+Message-ID: <20260610202112.2695205-3-leo.bras@arm.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260610202112.2695205-2-leo.bras@arm.com>
+References: <20260610202112.2695205-2-leo.bras@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3772; i=leo.bras@arm.com; h=from:subject; bh=ERzphoGFlfsnQX/z/pHW9rsKUGoz2XFTjRwpnLKWgsw=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLI0j4vKuvdMXPvjnLB/oYVIXofY01yDlblBu/PFU895r WLa8be2o5SFQYyLQVZMkUX20fxVPN+nZBy58mMBzBxWJpAhDFycAjCRenNGhv8TdstP1/Jpsmst Nl555s7p+w2dMfmCBhGWYXFcAo5LfBj+Z0sXR+eyi15hes160GPaikTR5rczQuK3eT6ob1wTvmg PAwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4434; i=leo.bras@arm.com; h=from:subject; bh=zla4ojH7IRpK8neQWnjZ1NqqA2JQS5zWlyS67zi1LRE=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLI0j4veuf4rduXMCY4/J+64yWF44IzrqpvCgqo70vLWB DbVWOnwdZSyMIhxMciKKbLIPpq/iuf7lIwjV34sgJnDygQyhIGLUwAm8t2RkaFRe9Gljjkm5bGe Qg6Xvm6wf+i3/27nVQfe53fu8p/YqO7PyDCrVaPrcUpNaMzhj9yxnkxP2gPr6qqFbUX5vYvsbtV Y8AIA
 X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
 Content-Transfer-Encoding: 8bit
 
-While playing with dirty-bit tracking, I decided to take a look on how page
-splitting works. Found out all entries are walked, even though we can infer,
-for instance that:
-- If a level-3 entry is walked, it means the parent level-2 entry is split
-- If a split just succeeded in an table entry, it means all children nodes
-  are already split
+Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
+when walking the pagetables.
 
-This patches' idea is to introduce new walking flags to skip pagetable 
-levels 0-3. 
-
-The idea of skipping child nodes was also tested, but it was marginally 
-slower than just skipping levels, so it was discarted. 
-
-Optimization measured on two scenarios involving eager-splitting on a
-VM with 1 memslot of 64GB:
-- Scenario 1: No manual protect, whole memslot split at dirty-track enable
-  (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
-  - Split happens only once, whole region
-  - Evalutes improved batch performance of splitting
-- Scenario 2: Manual protect, split happens during every dirty-bit clean
-  (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
-  - Split called multiple times, for smaller 64-page sections.
-  - Evaluate improved performance for multiple calls
-
-Scenario 1, improvement on dirty-track enable ioctl for the memslot:
-- Memory was already split (4k pages):  -35.47% runtime (stdev 5.63%)
-- THP backed memory:                    -11.94% runtime (stdev 2.55%)
-- 64x1GB hugetlb memory:                -14.46% runtime (stdev 2.68%)
-
-Scenario 2, improvement on dirty-log clean ioctl for the memslot:
-- Memory was already split (4k pages):  -26.36% runtime (stdev 3.32%)
-- THP backed memory:                    -12.05% runtime (stdev 0.37%)
-- 64x1GB hugetlb memory:                -13.87% runtime (stdev 0.86%)
-
-For collecting above numbers, the following script was ran in both vanilla 
-and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an 
-AmpereOne with 256GB RAM.
-
---- dirty_test.sh
-#!/bin/bash
-filename=$(uname -r |cut -d'-' -f 4-)
-
-run_test(){
-  uname -a
-  cat /proc/cmdline
-
-  #prepare
-  sudo bash -c 'echo 64 > /proc/sys/vm/nr_hugepages'
-
-  ./dirty_log_perf_test -g -b 64G
-  ./dirty_log_perf_test -g -b 64G -s anonymous_thp
-  ./dirty_log_perf_test -g -b 64G -s shared_hugetlb
-
-  ./dirty_log_perf_test -b 64G
-  ./dirty_log_perf_test -b 64G -s anonymous_thp
-  ./dirty_log_perf_test -b 64G -s shared_hugetlb
-}
-
-run_test 2>&1 | tee ${filename}
+Signed-off-by: Leonardo Bras <leo.bras@arm.com>
 ---
-
-Above dirty_log_perf_test command is the standard kvm selftest found in the 
-kernel tree. It tested the following guest modes:
-Testing guest mode: PA-bits:48,  VA-bits:48,  4K pages
-Testing guest mode: PA-bits:48,  VA-bits:48, 16K pages
-Testing guest mode: PA-bits:48,  VA-bits:48, 64K pages
-Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-Testing guest mode: PA-bits:40,  VA-bits:48, 16K pages
-Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
-
-Performance numbers from above modes were used to calculate average and 
-stdev showed in the optimization results.
-
-Changes since v1:
-- Changed approach from return value to walk flags (Will Deacon)
-- Discarted skip_child approach (Oliver Upton)
-- Measured in real hardware, and from userspace perspective (Marc Zyngier)
-- Better explanation of what and how numbers were collected
-v1 Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
-
-Thanks!
-Leo
-
-Leonardo Bras (2):
-  KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-  KVM: arm64: Make stage2_split_walker() skip unnecessary walks
-
  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 18 ++++++++++++++++--
- 2 files changed, 29 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c         | 15 ++++++++++++++-
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
-
-base-commit: acb7500801e98639f6d8c2d796ed9f64cba83d3a
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 41a8687938eb..20c7c12e0e76 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -311,31 +311,44 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+  * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
+  *					with other software walkers.
+  * @KVM_PGTABLE_WALK_IGNORE_EAGAIN:	Don't terminate the walk early if
+  *					the walker returns -EAGAIN.
+  * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
+  *					without Break-before-make's
+  *					TLB invalidation.
+  * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
+  *					without Cache maintenance
+  *					operations required.
++ * @KVM_PGTABLE_WALK_SKIP_LEVEL0:	Skip visiting level-0+ entries
++ * @KVM_PGTABLE_WALK_SKIP_LEVEL1:	Skip visiting level-1+ entries
++ * @KVM_PGTABLE_WALK_SKIP_LEVEL2:	Skip visiting level-2+ entries
++ * @KVM_PGTABLE_WALK_SKIP_LEVEL3:	Skip visiting level-3 entries
+  */
+ enum kvm_pgtable_walk_flags {
+ 	KVM_PGTABLE_WALK_LEAF			= BIT(0),
+ 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
+ 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
+ 	KVM_PGTABLE_WALK_SHARED			= BIT(3),
+ 	KVM_PGTABLE_WALK_IGNORE_EAGAIN		= BIT(4),
+ 	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
+ 	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
++	KVM_PGTABLE_WALK_SKIP_LEVEL0		= BIT(7),
++	KVM_PGTABLE_WALK_SKIP_LEVEL1		= BIT(8),
++	KVM_PGTABLE_WALK_SKIP_LEVEL2		= BIT(9),
++	KVM_PGTABLE_WALK_SKIP_LEVEL3		= BIT(10),
+ };
+ 
++#define KVM_PGTABLE_WALK_SKIP_LEVELS 	(KVM_PGTABLE_WALK_SKIP_LEVEL0 | \
++					 KVM_PGTABLE_WALK_SKIP_LEVEL1 | \
++					 KVM_PGTABLE_WALK_SKIP_LEVEL2 | \
++					 KVM_PGTABLE_WALK_SKIP_LEVEL3 )
++
+ struct kvm_pgtable_visit_ctx {
+ 	kvm_pte_t				*ptep;
+ 	kvm_pte_t				old;
+ 	void					*arg;
+ 	struct kvm_pgtable_mm_ops		*mm_ops;
+ 	u64					start;
+ 	u64					addr;
+ 	u64					end;
+ 	s8					level;
+ 	enum kvm_pgtable_walk_flags		flags;
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 91a7dfad6686..48d88a290a53 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -137,20 +137,33 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
+ 	 * Ignore the return code altogether for walkers outside a fault handler
+ 	 * (e.g. write protecting a range of memory) and chug along with the
+ 	 * page table walk.
+ 	 */
+ 	if (r == -EAGAIN)
+ 		return walker->flags & KVM_PGTABLE_WALK_IGNORE_EAGAIN;
+ 
+ 	return !r;
+ }
+ 
++static __always_inline bool kvm_pgtable_skip_level(s8 level, enum kvm_pgtable_walk_flags flags)
++{
++	flags &= KVM_PGTABLE_WALK_SKIP_LEVELS;
++
++	if (likely(!flags))
++		return false;
++
++	if (level >= (fls(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
++		return true;
++
++	return false;
++}
++
+ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+ 			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level);
+ 
+ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+ 				      struct kvm_pgtable_mm_ops *mm_ops,
+ 				      kvm_pteref_t pteref, s8 level)
+ {
+ 	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+ 	kvm_pte_t *ptep = kvm_dereference_pteref(data->walker, pteref);
+ 	struct kvm_pgtable_visit_ctx ctx = {
+@@ -185,21 +198,21 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+ 	 * into a newly installed or replaced table.
+ 	 */
+ 	if (reload) {
+ 		ctx.old = READ_ONCE(*ptep);
+ 		table = kvm_pte_table(ctx.old, level);
+ 	}
+ 
+ 	if (!kvm_pgtable_walk_continue(data->walker, ret))
+ 		goto out;
+ 
+-	if (!table) {
++	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
+ 		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
+ 		data->addr += kvm_granule_size(level);
+ 		goto out;
+ 	}
+ 
+ 	childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
+ 	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
+ 	if (!kvm_pgtable_walk_continue(data->walker, ret))
+ 		goto out;
+ 
 -- 
 2.54.0
-
 
