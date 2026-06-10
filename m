@@ -1,88 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A622F5337;
-	Wed, 10 Jun 2026 10:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393E43E0222;
+	Wed, 10 Jun 2026 10:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781086521; cv=none; b=HLdgdk06Ivvxg9i4zj4MTCuUe1hwyrdhLTpxwpHt1494yXVk3imr0/tN+PAI1RusvfKUNGO6Xo/wnnE1+l/bi/OfRTaUfmIWnhn8HoMiXkxXn275DxsaobYUxseU61wTnv605wKhLNz3hUk2PnZ8F1M2q8Va40JDauV8w/Fs2SE=
+	t=1781089032; cv=none; b=fza7dyBF6jrL6AmFatbUtc13qHv0kdiIE3wOlj5NZEylfAaQT6bq4/ma2eSNtji13KhTk28G/6iu9AeuVV6EWu2L73gHAdw5WUuPHfBALyUMdPlWKJC6AQGhcUx6wBRK1JJvVvNBHL566yNWcc/nS/sX+l2LK4RPn4HluclswPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781086521; c=relaxed/simple;
-	bh=ejTTByFAcBZR+8wtj1i8ZDTQde0R5SqbnzOwQddxHTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o1nhdJ5xVfrggKdiW0VPrZY/hoDZEAISV3SqF++sMO4I4NUTLH18pQR+mXXy2htH8e1hVKm5hnKWmmPXwSds50Foy6r9azsdvmM2Qrf9ujvQGhGnM83XEEKWguzj4GhA+2AWiC612E3JaL7UxC4WzC5JB/gIr5fUW/Bp5vFUU6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7cs4Pu3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781089032; c=relaxed/simple;
+	bh=KXuB7L6cHgfycrnWvf78zDcejpO/GHoR/FwkhRqqE2E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sQ9fOLWnY/UwJW5BAEa5H/3vRXrNoTbaBN4wZ0zzi0MBDrCjZ3bTtasuhNSkzGmAA0FkPW1KppMolZvFMpSdm76LTewvDIeWhXveD5pppGt6/5X0QLBv+3Ao2/58TmIc2HwCJbAOfjE1av2yMizLEweq5YOX46aOe+6UF0Ppko0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hz56KSCK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7cs4Pu3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7751F00893;
-	Wed, 10 Jun 2026 10:15:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hz56KSCK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ED6E1F00893;
+	Wed, 10 Jun 2026 10:57:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781086520;
-	bh=BqtuY6893ZMKAPfP3UotyEfU6XvkTSj7lMBiTda4vZg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=n7cs4Pu3UQIrQN/8NOJW86bcYr5KD3XHreJlIMDp8MbvuBM20iyrF4JNMQaEeP+dn
-	 Zv7TIT95ubvs1tHySw9OWRVhaj7Qoo0K0eiIYFBnteEM2UHNvpKnbsztEtqpWolMrr
-	 cNMHVN17sOZIDrsDHpcln5wbzGtG7q6AwzUyjeTajksossw2afAk5MQumHXBp2C467
-	 eD3Mnk639vXK4Bt+UIXQ7D10CYFSbXDJNqoQ9Fd8WRcQjoGh+JEP0IH9oO/+cbMuPi
-	 VTaBum+aEyXvOicmFVMmdUKYrYNaTOKh5DC//c925Bqs6ir12dXOi9VIm5ZfXKrY4e
-	 jKvKKpS8PBDvA==
-Date: Wed, 10 Jun 2026 11:15:14 +0100
-From: Will Deacon <will@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Sebastian Ene <sebastianene@google.com>, catalin.marinas@arm.com,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	korneld@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, mrigendra.chaubey@gmail.com,
-	perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v2 0/7] KVM: arm64: Forward FFA_NOTIFICATION* calls to
- TrustZone
-Message-ID: <aik5MtvOlnQDmzjr@willie-the-truck>
-References: <20260608165549.1479409-1-sebastianene@google.com>
- <aikt44sVnpL3_dYi@google.com>
+	s=k20260515; t=1781089027;
+	bh=4dsbxE+UpFB1gxbxB8yCHBRmb9YT0B/b0rsLXt8UlE8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Hz56KSCKIKm/QlVi1yOtRaw7l4oEe9zAxUjfmOc6JyuyyWD5xyoPjHlQXM7Yk4dDQ
+	 giJAlyKINKAWCr1aSwhyx1s6HFoN4z37ksD3v0vL6duPnaioiVGw4u/CK1d11qjHpA
+	 osJ8EKeg2WahzWjQrkatbBrfdNIJP5YFL/oI01LPep6l9ELR0xQuDIbw2lWzBzwQaL
+	 fe1s+OoSC4TGPpZzlJAAQ+GgnBVgo5Qu2M1Dl1L3LdkwM9bzT0CCxf/foXMEFb6XLr
+	 K+8Gd9NE7C2KrZAi08XtNsjcYdCRGTIZcanKCMrQXtl13BCliIWvpTi1Xc4zUGsp92
+	 M8kjVkTei2BpA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wXGcL-0000000BJXq-12qI;
+	Wed, 10 Jun 2026 10:57:05 +0000
+Date: Wed, 10 Jun 2026 11:57:04 +0100
+Message-ID: <868q8mu0hr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Hold kvm->mmu_lock while initialising vcpu->arch.vncr_tlb
+In-Reply-To: <CAO9r8zMpvxoVcDvWn3q0C0Dv=0Kknt_BqZ8KqddwuKa5bd44Dw@mail.gmail.com>
+References: <20260608081108.2244133-1-maz@kernel.org>
+	<aicqzM4W4NN-GndT@google.com>
+	<86ldcotbub.wl-maz@kernel.org>
+	<CAO9r8zMpvxoVcDvWn3q0C0Dv=0Kknt_BqZ8KqddwuKa5bd44Dw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aikt44sVnpL3_dYi@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yosry@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jun 10, 2026 at 10:26:59AM +0100, Vincent Donnefort wrote:
-> On Mon, Jun 08, 2026 at 04:55:42PM +0000, Sebastian Ene wrote:
-> > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
-> > FF-A proxy. This restriction was preventing the use of asynchronous
-> > signaling mechanisms defined by the Arm FF-A specification to
-> > communicate with the secure services.
-> > While these calls are markes as optional, there is no reason why the
-> > hypervisor proxy would block them because:
-> > 
-> > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
-> >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
-> >    Because all forwarded notifications are inherently attributed to
-> >    the Host by the SPMC, there is no risk of VM ID spoofing
-> >    originating from the Normal World.
-> > 
-> > 2. No Memory Pointers or Addresses: The FFA_NOTIFICATION_* ABIs
-> >    operate strictly via register-based parameters, passing only
-> >    VM IDs, VCPU IDs, flags, and bitmaps. Because these calls do
-> >    not contain memory addresses, offsets, or pointers, forwarding
-> >    them doesn't pose a risk of memory-based confused deputy attack
-> >    (e.g., tricking the SPMC into overwriting protected memory).
-> > 
-> > While the pKVM proxy behaves as a relayer, it doesn't currently have its
-> > own FF-A ID(only the host has the ID 0). The behavior of the setup
-> > flow is covered by the spec in the: '10.9 Notification support without
-> > a Hypervisor'.
+On Tue, 09 Jun 2026 18:57:26 +0100,
+Yosry Ahmed <yosry@kernel.org> wrote:
 > 
-> As it is only a relayer. Is it really important to check SBZ arguments and
-> fields on behalf of Trustzone? It doesn't feel it brings any security. If the
-> host passes broken arguments, I don't believe this puts pKVM at risk. Does it? 
+> > > If yes, I think the code looks confusing, at least to a layman like
+> > > myself. It initially seems like the lock protects against concurrent
+> > > initializations, but then the NULL check is not done again under the
+> > > lock. The goal of the lock is not clear without the original report.
+> > >
+> > > Mayeb it's clearer to explicitly use barriers if the goal is preventing
+> > > reordering?
+> >
+> > This would require both the initialisation of vncr_tlb to use a store
+> > release, *and* all the other call sites to use a load acquire.
+> >
+> > I really don't think it is worth the churn, nor the (very small)
+> > burden on the readers.
+> 
+> That's fair. I was mainly just pointing out my initial confusion and
+> that others may share it. Avoiding the churn on the readers' side is
+> understandable. Maybe a comment here would help explain why the lock
+> needs to be held?
 
-I think the problem would be if an update to FF-A allocated some of the
-currently SBZ bits to implement some functionality that we would want
-to filter at EL2.
+I have added this:
 
-Will
+	/*
+	 * Taking the lock on assignment ensures that the TLB is
+	 * seen as initialised when following the pointer (release
+	 * semantics of the unlock), and avoids having acquires on
+	 * each user which already take the lock.
+	 */
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
