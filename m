@@ -1,63 +1,63 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F863D8135
-	for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 14:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1213749F5
+	for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 14:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781188859; cv=none; b=eYoPOnB4dlnpRzg+2t+nuq5oliTBJedw1nn22DCgYuWbTBNwy7QfUi1s6i5q+KSf3ezqfaVI8m+bSfCsxf4yRzg5nGYCgKdJOQLf6d8qXrwLSaXePtrxe2qgtVFyKLQneVvgwQK0uBjjY6hJ2IISNPkj4aHjw4N5K1JqI8A1FGo=
+	t=1781188863; cv=none; b=gBfsAIfSNbazr0uwJ9OAkDrkUyrdXA/nYy/AaJ6viC6q8RUY1jYfjel+z61zNJEp3npx/223AyhVPqC+/ikfgtF45EpKSiRYcpbXi8yN/iuxEXUGLD2/OOZrPUt5kbtwxtQrCjDcF5CyyewN3mTepiE51lsFABiVYlWjAlgk3fA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781188859; c=relaxed/simple;
-	bh=Akxk/lgy04fLltfbUcYYHUlwVsuQerKKzVJvjg+TK3Y=;
+	s=arc-20240116; t=1781188863; c=relaxed/simple;
+	bh=vkRFnqFRZDNgXItUjQ6xqyVHK57bprpfgDRxGQKjzfs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GbSAZsmy/Tdi0mT5MKWC0jMFyE1nBAs7osjJdqh48yY0ta+yXh0U4VcjEL4DV21B/ilXEMnjmXmnBI8knjMSIg2ZA2LMEXyii2axllCXZNh5VYiY3dTXaNowhqWe5MXDKFahRsqyBdFd4MH0A4TrRW1RaHJVD2hNy+YrnOBqEGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B7ehzWP6; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=WpkpSAZenPsDntE8/wQUQogjOxJPyK5UvdMTO9TMCS23YbH7poGH5i6hfo4SzLpMf8LUKv3bsFhEgiSBSNZWr4l1tyBqY7qr/maBDYl82khoeU1ybD6ms8alQqdqfB2AXFPpGVp/8HGxxI1k4j1gea2waNA/yf8Mmia3wWstBCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QounVKEJ; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7ehzWP6"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c0c379e8ffso55353285ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 07:40:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QounVKEJ"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2c0c1e0b0faso55290905ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 07:40:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781188853; x=1781793653; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1781188857; x=1781793657; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=swEvIx2nUbUpmMkz73waYd0ROkdvdxB7mxOEMjFA3sI=;
-        b=B7ehzWP6t4WleyYkWVaXptprRMxhmwev0OEMvJc3FBtVge6fe/1hzXwJXtPLYKaUQg
-         426bQewz0YSJBW6DoYY6PTSRPCQQ9jpZ2ISzP09PMc8pS5yFjwxUK9a6M1ZUWqefaBOz
-         bs7ik6VZEsBD9MA4CnHcciFJl5Fuueude4V07+JsiFot9UWzfoFnmIK1Y1mE/1P/VOVz
-         FofWTyOaMiV2zeqc6mJdNmny0MAfuaxTTw6MudstTcXA+b2WW1qOIYL/7qofPs7dCmT4
-         sVTqxIVjf/XGls3NsYuVDo4LXsnRkia0ISsGVbgW9DGWAW3eaIr+FNiWbK5di63FkOCM
-         AoFw==
+        bh=OKp05mDY6QDPFoLBnfnNv8HD5BOSRFbCTyjoLTQuk6A=;
+        b=QounVKEJruyCZpLpplM00QsM5X6I0kO6jmQ+46xZLsDZ12Q5YzkBnHQ/DdEmeLcY5b
+         w56aKUy5Nt4pcnagrJZ/bVtgvNjP06fTosNdcD470af8yZyowHz+kPHM105hZ1DZ8H3a
+         KUzcZIp36anOBE0a6W9y0Gno3FcsCQ8JX+XtIH27iyfc3CDq+ywo1AU55heLVH+6baDA
+         JgqeAT5Pka4IwiSQoFFcT4NtnY4v5zzfKCUQDtbZgB1dTZ94rM5RMwzYNFcG9uf5eLL7
+         fh4SIiCEXr8sFKgtehkCmDlPPcsW9eC2ykxZtNQGSaJeWBhAVeyiS/RuE+G4o6mnc3DN
+         zkhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781188853; x=1781793653;
+        d=1e100.net; s=20251104; t=1781188857; x=1781793657;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=swEvIx2nUbUpmMkz73waYd0ROkdvdxB7mxOEMjFA3sI=;
-        b=rLdTvbOld7mOdT1WUuzdLF6iQHCl7MPvOUNz/yBtQq9jU+lSizO387lmoyjjoqb89s
-         SSB0kXTmDYRjJRAvXVTaKzLsv+S2SQthGSzh5zxoCfMsPODNBC0eos3NMsaSEvZSnVFp
-         H43Ui8DWXioEXzF0H/4F8L0NnvM84f3lYjKzHpF6kTibFdxLB1TIMzaTEkocUctQUdRs
-         rvtwxO1U38kGsXAjVjtDHyNPmvOEce8lM2ulD5sYA2lg+qowLJ11KLBaeLQeiaesa9pH
-         qqg8cW/JlGwPl5if2J+zlgTBIw0vQ+MuV2bMhBpyt4cVpkN/xJXeN8Jpom5Bkh0AppPO
-         xJfQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/gNlTN4Mu3a1pSptACAFNJKa8RIeQsIahkEC3Pf+jAr/8G1DArpJf94sywSXq6JUuNzp7LnOs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyEtzMJpOaRila29f5huOnPFhIv3/ANmkb5y68S0bA/NM1P92SK
-	I9cSW6f6F5/MRt0B3nv9Cr2lam9uUK51J0A5/m2fd1ae5GPnIEEZz3HG
-X-Gm-Gg: Acq92OFK4mfwZj3VmkkxQCi1lpK2vxqx5xs41pZe7HKwXuIbsCboCbwS6bTXZTW6dl5
-	7jqJzh2uafTFWUe/OIaOY5WLu8gi3SEL08J1y9bL/9PddeALLb40yDONdtzJdQc7X0xJH29v87l
-	RCBpypXw7rz++d6jfj1QZjkP/bKsPr3qagH0UnKgQOsHM7qeOWHA4VpoEJoRZZluTLGbCrwSaQ1
-	t6BT05lg/5iNJBNs5xGp2bSBI//WpRsMhAGQjku+jORLUj+vtGUUFsn4CjP3+uJISH1yG6H9asf
-	966X5JSYCyrb31jRtN5bqttqXibhsD7HvGUeZDKM9QRcZDXpl+0Ok+63tQ75gzY5cOqe3YApsKa
-	KFLCdf7S32IiYExpRXm08+vvJeN3v3a2BkC8zP/wwAt/QNlheg/0fsz3zzSchy2mMwJaAxqT/gg
-	+l/9eBjG3rXv4cwwXR7Vk4s7WDGUzy4VOnsRJXKtliLcOwpT72VMR+EiuAC7PrGYfwlw==
-X-Received: by 2002:a17:903:2b06:b0:2c0:c262:b919 with SMTP id d9443c01a7336-2c2f18dfddemr39224895ad.5.1781188853537;
-        Thu, 11 Jun 2026 07:40:53 -0700 (PDT)
+        bh=OKp05mDY6QDPFoLBnfnNv8HD5BOSRFbCTyjoLTQuk6A=;
+        b=CdcT/OnECnEXFJVLI2i/Qr5xLem4eJU6R83qLDNNDwyE5Nk8qT0TV8Fc3ZVnjz+Z6L
+         UX/nZ2vwhMyM9CSC4QcYDBU3cb/0k2cs44Ff0ackkHTIQR/kMTWFjM+Rc+30CQ2YbjFn
+         HKtGGes95TIf3qGwW4w/JgmbTziGSFW4g3Sduezfyc7vNlvZ6moQbMjSoglvwJHtuDz8
+         Ai9fo43/OITqgtH3EYlt7P374yh/didpxuBmjpGn+dJ1WGaC0n8uu726SJLkwyrJlErN
+         5DIH3cYSZ83FIyVrMi7NKPtdjhOnVLVAAM4aelx+mI85lFDAd1OGlnfrEqqMM2StBGuY
+         bYkw==
+X-Forwarded-Encrypted: i=1; AFNElJ9pzwK1feewFsJvsWZNq0zrK7CXf3MIaqnk7kBoj5CIS9cW5yXwQN2mnc/gwbklzUAy9yw3xz8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwU3/fwsOCm/ohFeH6Z3c6o1X8Cvq1Z9nHDHlcqUxyOi66yrvIe
+	Eqktc2m37BDQmgVWoDOVyn/hscESI3lCdNmsxiucCQ4iPubIOIg4yFgV
+X-Gm-Gg: Acq92OHz/OttBtelSk05CHInj9ogO8X7o3ZrKD14n8ety9fid82uV6XnvC+pAl/neI7
+	NXoi1U1QFrh/JXzX/G5+zdWIl7sITXYDSvUvXCcV7xcMz7l3td2MzOxvuhDsJEj0z36Quc7Qys4
+	mI/WoULoi8sRviRpqrgebS7+vFV5XOTCeS8rIoeh1iSxVXgFg4F8hssHepICIdNkHMO7MiT8zed
+	YyZmNQf4oo0gFWY6Y7JjotrmMHjPrETVX1Hk0tSWWFtwX+8u3r7PGWNix9nG3twoNsKG3ine+OF
+	9PLCgXhW0cOc8RgZAg39I/YCWlKwhapx7nliO9S2j7XqMoTb/n8ojOlHUuGx8NR3TYAlkMSBQJ0
+	43zwztsetUmTzeuZvgdrxtECqDpCcbkwWQy7j6f+e+mMXLyHPdCxAKJ4pIbMkEltLyO/iiGpJ4N
+	wLrxebTjRpmgqaUry14BQNpuyF91gdB0djHhl1MDdBQ927QJa4TOJDUkuMFZPx2iKZIw==
+X-Received: by 2002:a17:903:1a8b:b0:2c2:8659:da3a with SMTP id d9443c01a7336-2c2f344a23fmr38855055ad.31.1781188857438;
+        Thu, 11 Jun 2026 07:40:57 -0700 (PDT)
 Received: from localhost.localdomain ([2408:80e0:41fc:0:4a46:1ea3:200a:5fb2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c249aeb62csm161097355ad.68.2026.06.11.07.40.50
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c249aeb62csm161097355ad.68.2026.06.11.07.40.54
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 11 Jun 2026 07:40:53 -0700 (PDT)
+        Thu, 11 Jun 2026 07:40:56 -0700 (PDT)
 From: fuqiang wang <fuqiang.wng@gmail.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -67,9 +67,9 @@ To: Marc Zyngier <maz@kernel.org>,
 Cc: dongxu zhang <xu910121@sina.com>,
 	wangfuqiang49 <wangfuqiang49@jd.com>,
 	fuqiang wang <fuqiang.wng@gmail.com>
-Subject: [PATCH v2 1/2] arm64: Add MPIDR_EL1 RES1 definitions
-Date: Thu, 11 Jun 2026 22:40:41 +0800
-Message-ID: <20260611144042.97981-2-fuqiang.wng@gmail.com>
+Subject: [PATCH v2 2/2] KVM: arm64: Skip unreset vCPUs in MPIDR lookup table
+Date: Thu, 11 Jun 2026 22:40:42 +0800
+Message-ID: <20260611144042.97981-3-fuqiang.wng@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260611144042.97981-1-fuqiang.wng@gmail.com>
 References: <20260611144042.97981-1-fuqiang.wng@gmail.com>
@@ -81,25 +81,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MPIDR_EL1 bit 31 is RES1. Add named definitions for the bit.
+When a VM is created with CPU hotplug support, kvm_for_each_vcpu() can
+walk vCPUs that have not been reset yet. Their MPIDR_EL1 state is still
+zero, which aliases vCPU0 when populating the compressed MPIDR lookup
+table.
 
+As a result, cmpidr_to_idx[0] can be overwritten with the index of an
+unreset vCPU. A lookup for MPIDR 0 then returns the wrong vCPU, which
+can prevent interrupts targeting vCPU0 from being delivered correctly
+and make guest boot extremely slow.
+
+Skip vCPUs whose MPIDR_EL1 value does not have the RES1 bit set.
+
+Fixes: 5544750efd51 ("KVM: arm64: Build MPIDR to vcpu index cache at runtime")
 Signed-off-by: fuqiang wang <fuqiang.wng@gmail.com>
 ---
- arch/arm64/include/asm/cputype.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/kvm_emulate.h |  9 +++++++++
+ arch/arm64/kvm/arm.c                 | 14 ++++++++++++--
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index 7b518e81dd15..22dc44d2de03 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -9,6 +9,7 @@
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5bf3d7e1d92c..3d2f0a8b040d 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -506,6 +506,15 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ 	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+ }
  
- #define MPIDR_UP_BITMASK	(0x1 << 30)
- #define MPIDR_MT_BITMASK	(0x1 << 24)
-+#define MPIDR_RES1_BITMASK	(UL(1) << 31)
- #define MPIDR_HWID_BITMASK	UL(0xff00ffffff)
++/*
++ * Check if vCPU MPIDR_EL1 has been reset. MPIDR_EL1.bit[31] is RES1
++ * and set during reset; a zero value indicates the vCPU is unreset.
++ */
++static inline bool kvm_vcpu_mpidr_is_reset(struct kvm_vcpu *vcpu)
++{
++	return !!(__vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_RES1_BITMASK);
++}
++
+ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu_mode_is_32bit(vcpu)) {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3732ee9eb0d4..fccfa97370df 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -887,8 +887,18 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+ 	data->mpidr_mask = mask;
  
- #define MPIDR_LEVEL_BITS_SHIFT	3
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+-		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
+-		u16 index = kvm_mpidr_index(data, aff);
++		u64 aff;
++		u16 index;
++
++		/*
++		 * Skip vCPUs that haven't been reset yet; their MPIDR_EL1 is
++		 * zero.
++		 */
++		if (!kvm_vcpu_mpidr_is_reset(vcpu))
++			continue;
++
++		aff = kvm_vcpu_get_mpidr_aff(vcpu);
++		index = kvm_mpidr_index(data, aff);
+ 
+ 		data->cmpidr_to_idx[index] = c;
+ 	}
 -- 
 2.47.0
 
