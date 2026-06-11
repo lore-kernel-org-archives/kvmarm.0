@@ -1,163 +1,145 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71048339861
-	for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 10:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C833E7BBC
+	for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 14:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781173409; cv=none; b=SQJJDsahOaQh5PHoRhxUGGLYXDT1ciT1XFbj6rdmU86FWbhCCxRg7i+K0VElE2p0ap0n2Q+gP+czoyX/kkdYlkgabRZ0foYPGMHCi0nDXz1HG8GqtR2XVnkjTrMvYf3a47+eGkAN1QIiFcWZllV3y6M3M0Lf6eciXynq5hs/Tdc=
+	t=1781188857; cv=none; b=EuCk8a4K4a+FyWZlrwh0FkOi1neG4k2joVbZV2DFHajNrsUS9QMQsKW7imvjoPWzWbO7DHjy2w9QEF8vP7hgW6LpKdMIlWKkg7CO81lJUYyo0pAIphtg4MQdBOr/zfz7kUtUPAoipmyESh/zjtj9a+giGoz3FKDWAtLTwZdTAOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781173409; c=relaxed/simple;
-	bh=eD31NaAQdrh/zu+6IbhMqo/U/Qb0bYpibROp5yWND8Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mLpb39B2USHJmEh90dgrYQsMni6ei8JXq3zCImX7JhCXqL4TUnj8fzNthBjoqJcbLMaJHDTyGoK6EUiXl4z3W01KCGH9xmJRNp4ebEJ7Jm0mtwXiCF2MNRq84aiUKZieByIB1MlyAOdQufkDWU9IfDl/Vx3+IrdB4JiLW5XU/JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEICe75V; arc=none smtp.client-ip=209.85.215.180
+	s=arc-20240116; t=1781188857; c=relaxed/simple;
+	bh=BDNWeqPNKmBYIFGQanXhaXSEzAkOF+AXd0XlcUwDPJA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WR2yetMecvF0Kf1fBbjfZLchs62BpxH3akN7F3KAUAre1dQvR/mpg4Acvcxs1CPmO1Bt0UaUhLGFm0ekruUhw0Ty5T6FaMi8MvwNDqPNJofJ50Bha9anr95s02GothPJ8sVTQrM7HyfU1jq01zvhUBlBmd/2IWdkZo/hWdoKP5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnxAgiXu; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEICe75V"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c8584e80bd9so3052099a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 03:23:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnxAgiXu"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2c31212104cso3161755ad.2
+        for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 07:40:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781173407; x=1781778207; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QTQLbrDptBniTVJpw5ZWV9E0sbp4op67GXB1lfNz+Nc=;
-        b=KEICe75VDGfSswauKIjrUnq98HX9ohLVKcV/PjXWfqnhup9dF96Q1D+aTriOFXG/Md
-         km0qpOwHl8yLJ0i2bnZ9GSOwh05anGGnu6vPe4AIvaCwuOHTOd9emKRYxiT/twT7pdDG
-         9rxRg/CbCMBky0ifX/BW6M3TxFUOq0d9LdmVZzuAAGoowEMsIwOxaSN2rhl9yBWWr+RQ
-         X0MiqIfQLJbUvem5GhQaUVHKKuyzj7g4huoemjEwqMuxo1dFg2VcRZ2luOskdV9PIic8
-         Yg+c0A95UKiAPtkcbuRvpOrQotT18IH3zPobT4/j9OaNvXYZbTuAh0VGQxo/QejitBtC
-         so5w==
+        d=gmail.com; s=20251104; t=1781188849; x=1781793649; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jWMSanWzJRCsWHlDAnYeE5yp9VLQwxt2P77lroQT7Wg=;
+        b=EnxAgiXud3FbAHnofnuW+tIxxOeEg9dcplyuy5oObnDu+wVekwz3C13o7AE5E3vv9a
+         7uluely9AUVQ7E3MxsjyWDjFPBYzopWE3Y36j9/7aU2prsRiJY3mFUrfp0JePl/Do5Hh
+         J7rIV6Q0h/6a7loCfX3sy9YqcH60oL8Qy5rr3EW73/h9RCkcH11Z3x4io2ZllT2AiV9M
+         t5btMCaKl3D5C93aUBRHcta8vNuwEgBSblMgT1MVIl4oIi+Vv3/Yjk5LcjVrl2mETCrF
+         j84YHYDV6B5b0SkCzmTMyM6E2uj37aDkaWqKjcTaEfUvN55JLN7LDGiC4sEXFP0rz56i
+         8Huw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781173407; x=1781778207;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QTQLbrDptBniTVJpw5ZWV9E0sbp4op67GXB1lfNz+Nc=;
-        b=UwNLQKVeCZiwSuJx65CRwHdrQKXF9GIzWh9rzO93kt4AvV0GilE2i1SrSlfbp6i3CL
-         ZnOEX9vHhMfD6ngeyGTRpXZpXGnghPT1HukPR+zsFvfL6O3e7IrpeLS2UaJ21xsoMPLP
-         HFEQxOZqSNHg7FpNKh1qKrMRAXu04Be/8uKbLpMvZ6ERSLJ7UR6GbnxOErVtFE3U4NCa
-         quGbLkhXx0eNor0KBXZTXAeSRfZk52CgZW2TfcSC48390JcTK0yff/Do7IcD3p8Tx+do
-         cCIuzgBYDrODSoO6JMCEJ4cscOGtGLSXdbCO9rB9KP1+La7IGqz3uFFCTVl9s+wGKa7/
-         Vbvw==
-X-Forwarded-Encrypted: i=1; AFNElJ/pqJuxOuG2rlV//MI+4Tka3aFLNgZkeEV5nR/uuzYz4RfTuZikCsk7B+FIa6hikCQVdBwG3GM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwEg6KblM02Jzu9EuxHEH6xEB6ouyMGAWtRC/xy4LdCmf5rXul2
-	1+64nwZTj3ocCK7FPCrBGYEL8Cj7rS7hr/Ssar2IAtWh4u2qCE/YctqB
-X-Gm-Gg: Acq92OFXFqLe+yDe2BDzs9VTTSaDfpAfCis4OHTxAy9cDTWe+8qhGLoClzzl6zm+Gyx
-	A9uZmvTObvqdVq414oe+tk2zm/MenlLOwkvaVVsjefPDvTqoSEWwL0ZSnYSHvFVZTDk/aaVANEh
-	lWlQYDEQvkwIJssI/Nyfpm83lzMWVc/W3fRLfgWBMyXpr5dOZCiyi8QA9JD+6Baf1geLc9mgdYQ
-	rA65Qw1DlCiiIruODpkHS2izRzjvL5unRJC+KrV3pDdZgqeAsAAUyJwbE7G8YhkA6D5l+ZgWrGl
-	xZf5hZ5005vZLpmotFmPhk0kHxdVrLE5/laWwDB884D58+Kmctw3RoqeQpwYeH5c7PBp8Mp7KPK
-	HoSm+dPwHSBDoDjpTzx8mzRDUQpDrQWrbPk/HR0w4hSJODt+i7JDaAL522m571ovV0FGVxh/lSP
-	jlASYvo5qeolRf5GKZsK2NxIsgSM0=
-X-Received: by 2002:a05:6a20:160f:b0:3b4:8268:23e8 with SMTP id adf61e73a8af0-3b5e334dd4bmr2445120637.21.1781173406766;
-        Thu, 11 Jun 2026 03:23:26 -0700 (PDT)
-Received: from [10.253.74.50] ([115.108.63.147])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c865861226fsm1473268a12.15.2026.06.11.03.23.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2026 03:23:26 -0700 (PDT)
-Message-ID: <5f1cfbc0-8358-4f8e-86d1-85d160a31ea9@gmail.com>
-Date: Thu, 11 Jun 2026 18:23:21 +0800
+        d=1e100.net; s=20251104; t=1781188849; x=1781793649;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jWMSanWzJRCsWHlDAnYeE5yp9VLQwxt2P77lroQT7Wg=;
+        b=KoURZ7m7Mu1CxmdToJxL4QeqEOgM1A/L5SRu1ffiAEffYMxEEgk4HpqsZ0KBAFF9Mv
+         UgVAmCYziXlVkMVXIrJ7lNsRdMZDjmraMSCvk9mvpTuZ4mrtPvwnUUgKkjHq0tBEbiBY
+         C4pDtr2yiJHFl7hKMbNcgB4Z4y8+uQKADeiXUqp95fhaTuqt/nN/5Xp/993j59vpBZOj
+         hPbnHqYv4/viFF6vfofVJGCfzg8BFsDH4MQp3gw5wNtMzB08EYNO2nWDw3V5YqunxAt5
+         3VJi4DDUi222Xk6czspKAurUBRhKRJq31jBOxlbjzXzUhcFax+xPe46ke8KTlXwjdLgl
+         yqRw==
+X-Forwarded-Encrypted: i=1; AFNElJ8WTG7nabAqoowh8kyh25BHsHLwrcQK0VG/zdMPqUZxxNTE7C02VM69I07XFFhW6BUrLqOx4H0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyLPtpwX7bla3azCG3xhyHgOLZvB2eOAQxxs0xX5QHA1Nyhx1r+
+	FTDE/rnS/5VRGtyQqfzW57i9jw74bjSh3zG0AmTw8QVVITkThg9bEYuV
+X-Gm-Gg: Acq92OHcJvVrT63i46N2Nh/3tStPkIpCwsfOo5EHSSAqDr0UXJWqwmlZsqjQhWnqfz6
+	rhAX/1MVTUdzCZwRrSfVj8HKVEMovzEF3pcbYXqkp2w5LmQpejZ9yzQJj+pNegB5L3xtqxOiI6t
+	Yx/lp5OcMV80acDQ40dXFuGtH8CXQxC+CZx42jBus7HhhHSs9TDntPw9F/WcQF4FRxXgdpMHwc0
+	uNMNUbzQZ25KDqyvg4//Vg1JKIvWCZAuWTyYdajoSptphu+Iz4x9zsVS/mzD2vgJ0jYHq+5Sg3M
+	ta3QW3sclHBSo+Km3xanFsOOSbnF+xyn+rWPOzu5vzxABcI2RGZwjezGbs8z+yArzZa7JQf/mdF
+	hhutUIDS0H++ydDrfFqlmDs+XjEGHAv2M18OHfsDbUH5kGckB2luTmXj8vgGS1I/8iXWtrer2Zy
+	KgXInRq/jn0GiP4yYTlVmCTYjAVjPJhLyuI0TGPCUocyZ7XMKzTtWmTCc/JRXdgpfMlA==
+X-Received: by 2002:a17:902:d4c8:b0:2c1:150d:6db5 with SMTP id d9443c01a7336-2c2f0440887mr32717895ad.6.1781188849358;
+        Thu, 11 Jun 2026 07:40:49 -0700 (PDT)
+Received: from localhost.localdomain ([2408:80e0:41fc:0:4a46:1ea3:200a:5fb2])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c249aeb62csm161097355ad.68.2026.06.11.07.40.46
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 11 Jun 2026 07:40:48 -0700 (PDT)
+From: fuqiang wang <fuqiang.wng@gmail.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: dongxu zhang <xu910121@sina.com>,
+	wangfuqiang49 <wangfuqiang49@jd.com>
+Subject: [PATCH v2 0/2] KVM: arm64: Fix MPIDR lookup for unreset vCPUs
+Date: Thu, 11 Jun 2026 22:40:40 +0800
+Message-ID: <20260611144042.97981-1-fuqiang.wng@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: arm64: Skip unreset vCPUs in MPIDR lookup table
-To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.linux.dev
-References: <20260611090934.84469-3-fuqiang.wng@gmail.com>
- <20260611092823.6E5201F00893@smtp.kernel.org>
-From: fuqiang wang <fuqiang.wng@gmail.com>
-In-Reply-To: <20260611092823.6E5201F00893@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+
+From: wangfuqiang49 <wangfuqiang49@jd.com>
+
+Hi,
+
+This series fixes an MPIDR lookup issue when a VM is created with CPU
+hotplug support.
+
+kvm_init_mpidr_data() builds a compressed MPIDR-to-vCPU lookup table by
+walking all possible vCPUs. However, vCPUs that have not been reset yet
+still have a zero MPIDR_EL1 state, which aliases vCPU0. This can cause
+cmpidr_to_idx[0] to be overwritten with the index of an unreset vCPU.
+
+As a result, MPIDR 0 lookups can return the wrong vCPU, preventing
+interrupts targeting vCPU0 from being delivered correctly and making
+guest boot extremely slow in configurations using CPU hotplug.
+
+Patch 1 adds named definitions for the MPIDR_EL1 RES1 bit used to detect
+whether a vCPU's MPIDR_EL1 state has been reset.
+Patch 2 skips unreset vCPUs when populating the compressed MPIDR lookup
+table.
+
+Thanks,
+Fuqiang
+
+SELF-TEST result:
+
+1. use crash debug cmpidr_to_idx[]
+
+(qemu args: -smp maxcpus=512,cpus=4,sockets=2,cores=128,threads=2)
+
+crash> struct kvm_mpidr_data.mpidr_mask 0xffff2020acda15e0
+  mpidr_mask = 3,
+crash> x/8xh 0xffff2020acda15e8
+0xffff2020acda15e8:     0x0000  0x0001  0x0002  0x0003  0x642f  0x7665  0x6e2f  0x6d76
+
+2. use link [1] to test IPI latency(Before the patch was merged, it often took
+   seconds for a kernel thread to be scheduled after being woken up.)
+
+IPI Latency Matrix - avg (ns) [100000 samples]
+
+          CPU0     CPU1     CPU2     CPU3
+CPU0           -    1355    2242    2238
+CPU1        2730       -    2391    1852
+CPU2        2149    3015       -    2033
+CPU3        2005    1651    1801       -
 
 
+Changes in v2:
+- Fix macro naming/placement/type and pass vcpu instead of pre-masked
+  affinity to correctly check MPIDR_EL1 bit[31] (sashiko bot)
 
-On 6/11/26 5:28 PM, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] The `kvm_vcpu_mpidr_is_reset()` check unconditionally evaluates to false due to bitmasking and sign-extension bugs, causing the MPIDR lookup table to remain unpopulated and forcing a slow linear-search fallback for almost all vCPUs.
-> --
-> 
-> commit 492eed93a0927af5d722a777b1e148b77bf39d93
-> Author: fuqiang wang <fuqiang.wng@gmail.com>
-> 
-> KVM: arm64: Skip unreset vCPUs in MPIDR lookup table
-> 
-> This commit attempts to fix an issue where unreset vCPUs overwrite the MPIDR
-> lookup table index for vCPU0 by skipping vCPUs that do not have the RES1 bit
-> set in their MPIDR_EL1 value.
-> 
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> [ ... ]
->> @@ -506,6 +506,15 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
->>   	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
->>   }
->>   
->> +/*
->> + * Check if MPIDR matches hardware reset value. RES1 bits are set after reset,
->> + * while a zero default indicates a vCPU that has not been reset.
->> + */
->> +static inline bool kvm_vcpu_mpidr_is_reset(u64 val)
->> +{
->> +	return (val & MIDR_RES1_MASK) == MIDR_RES1_MASK;
->> +}
-> 
-> [Severity: High]
-> Does this check always evaluate to false due to sign-extension? MIDR_RES1_MASK
-> is defined as (1 << 31), which evaluates to a signed 32-bit int. When compared
-> against the unsigned 64-bit integer val, the mask is sign-extended to
-> 0xffffffff80000000ULL.
-> 
-> Since val only contains the lower 32 bits, the bitwise AND will never match
-> the sign-extended mask.
-> 
-> [ ... ]
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
-> [ ... ]
->> @@ -884,6 +884,16 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
->>   		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
->>   		u16 index = kvm_mpidr_index(data, aff);
->>   
->> +		/*
->> +		 * In the CPU hot-plug scenario, the kvm_for_each_vcpu() macro
->> +		 * iterates over all possible vcpus. For vcpus that are not
->> +		 * reset, kvm_vcpu_get_mpidr_aff() returns 0, then the index
->> +		 * computed by kvm_mpidr_index() will also be 0, thereby
->> +		 * overwriting the original value of vcpu0.
->> +		 */
->> +		if (!kvm_vcpu_mpidr_is_reset(aff))
->> +			continue;
-> 
-> [Severity: High]
-> Will this unconditionally skip all vCPUs?
-> 
-> The aff argument passed here is obtained from kvm_vcpu_get_mpidr_aff(), which
-> masks the raw MPIDR value with MPIDR_HWID_BITMASK (0xff00ffffff). This
-> explicitly clears bits 24-31, stripping the RES1 bit (bit 31) from the
-> returned value before the check even occurs.
-> 
-> Because the check will always fail, the continue statement executes for
-> every vCPU, leaving the cmpidr_to_idx table completely zero-initialized.
-> This causes all MPIDR lookups to fail the cache verification check and
-> permanently fall back to the slow linear search.
-> 
->>   		data->cmpidr_to_idx[index] = c;
->>   	}
-> 
+v1: https://lore.kernel.org/all/20260611090934.84469-1-fuqiang.wng@gmail.com/
 
-I'm very sorry. I made a very low-level mistake and will fix it in the next
-patch and also do sufficient checks and tests before sending out the patch...
+[1]: https://github.com/cai-fuqiang/kernel_test/tree/master/ipi_latency
 
-fuqiang
+fuqiang wang (2):
+  arm64: Add MPIDR_EL1 RES1 definitions
+  KVM: arm64: Skip unreset vCPUs in MPIDR lookup table
+
+ arch/arm64/include/asm/cputype.h     |  1 +
+ arch/arm64/include/asm/kvm_emulate.h |  9 +++++++++
+ arch/arm64/kvm/arm.c                 | 14 ++++++++++++--
+ 3 files changed, 22 insertions(+), 2 deletions(-)
+
+-- 
+2.47.0
 
