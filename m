@@ -1,133 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED863ACA6B;
-	Fri, 12 Jun 2026 20:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB4837AA99
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 23:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781294474; cv=none; b=Yz+nUY97QRwTK5Bbd9mPym9ZSD3il459lQeulCwarbj+sf1TcJWHcIkWJcxPzoOKIscfDg9jESmjpBddh7p15D8pyHrJda6WToppoRZ8O+tmX+YSpiFgJImwlamFwAMNqbDBzJ1xlV/I5u6GQ1IDCGDt6wzVz/BhNo1fqv3IRxw=
+	t=1781305662; cv=none; b=uGMNAAt71JdqW9X5cms3Q6nT93GSuZzLbpBIsTMQk1/Fp8G+2DUooEugwPPEkKGLq05ukw2AbTWLOga8a9BzwWr35X7GYp61evlTRShBS74UYXQBsQlG+2bISvoPSerlyQYQanCnxT8nljzlHCuQKxTihkq9IO40e8YFWqkGCcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781294474; c=relaxed/simple;
-	bh=Mx9xbRlNx6ZnOxh2JtOsNt+CKKABoMFgZWQ5dmEF898=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=UgUBiPIDq4Y5m8SB8QBjwFZWtrsoP7fBfP7EfMfpihxKUXeA+t6wQeP3XyQtsf+nqryHRGuQSPtSYGOEyZ7KSWX5n6p1/unxYXJxiqp3JGwp7nmeo+F1N5dI8ZFTMuIfA90DJ7X8hM4HDV/qbsVphaA/uoOnMZttVvKGQhrKOSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJDbvbAW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781305662; c=relaxed/simple;
+	bh=YBrqrwHyEinMJud+wSOxqD1Dzh0Zrmog//tJakBkST8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=moKr4QzsLGAnG2MU7dxomm7QFqdqzgFaa6XoDtIRkRxSyC5274LLE2Lu+NVSBtlpY6KoXgnw1+Emy3Ulg5v4Z52818HK8m5YaJdKnXxoc9MszqUGOoQ7U+UQ19e+iqeEDHCUfQHHZkMo9BTuRjuUFrJTIfGcF2Hlhc4+wxkK59E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P59EVxRP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJDbvbAW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C11D71F00A3A;
-	Fri, 12 Jun 2026 20:01:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P59EVxRP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21EF81F00A3A;
+	Fri, 12 Jun 2026 23:07:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781294472;
-	bh=GohqCMod4X3F2A0JK+UCem9vPNCDLH7fryAZ4aplsHU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=NJDbvbAWvlgEqR6w6y/JrVLACUbL8QshdI3UlF/bECSHVqOAFnAEi5E3tkpoASz5y
-	 XQEboYT3LZ68hdywYXwLaYMnIC9RsRSlIqjX64a+omBx/a4a9ztzV7zmIF9cgMfOCA
-	 xs/I4hxKWIkjj5t8RLbloXS6nhQ0pk7aGYFWpTZGiacb0oG5F+JDtLJ0yx80y2gdQ7
-	 c2t5WVuB1+dscT37Tk9RLvIrhK7PtuQ/AT3Wf7pEDmOyctFDLrSY3pANe2T5qgaXx1
-	 ns5YTkd2ufASlbg2Y3GXI5H0bIuc41tAtbN+2h63mkqRIeXxrU5Iw6hoCtr1pU9lmq
-	 kxVakNXv/Xoiw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 19/21] KVM: selftests: Add find_bit to KVM library
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260612192909.1153907-20-coltonlewis@google.com>
-References: <20260612192909.1153907-20-coltonlewis@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 20:01:11 +0000
-Message-Id: <20260612200111.C11D71F00A3A@smtp.kernel.org>
+	s=k20260515; t=1781305660;
+	bh=l4Z6iPCoEVif5czqX7mpOnEGf86eCdSIsJaNrDC+CNs=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=P59EVxRPXaqSh1gsxSJZOl4h4HUMAMliJTXhJNvmxyRBMEmmHIR54xiHms+N0/WOq
+	 Wc7k7bkAlNeHYrplgG+/CIOkKu7NJfViXhhrpR+7o5X8JQagPhzGisx0RhjUOvYc+d
+	 h2M/Po7cCcycl0HvgmWnJeiGJNzTILw/cgOzmmfWBOOnVKXWgi/e68TpcqVEkOZqMB
+	 mq2DaT4ndw0Hx1xhUezPfQHCYAY83w/IJ0f+ax2xFaxfwFkkHKqv4pZOMWDgz2+6ip
+	 iI4HRtkiRovbzuV9+S75qS3blsWaUxfBgXp6AvvzdG6kKuvQHKd6JH3C2vKC2IYrTA
+	 +40cCeCmP5gAg==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5C9B0F4006A;
+	Fri, 12 Jun 2026 19:07:39 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Fri, 12 Jun 2026 19:07:39 -0400
+X-ME-Sender: <xms:O5EsasWXLEW7BfEs00q2LOU9UGNxJD8cSyX8hmuNQw6AjmRdF9fjqg>
+    <xme:O5EsauDizZYmqNrKG1kG7XvyhWVjSF-XTC2CAzI1HcX2RJkVGSdX2p8IWW5WD4VsJ
+    SdkkiTQB44YrKdpeLAmbtCMthxV8ac7Uw-ZwfiZYvjLEcY3EyvLuyQ>
+X-ME-Received: <xmr:O5EsagWVT7RSGKTAb2dRsQ753FoYwqJVH5pl_ky2k-XpQPdMjviWPxKxCJQheRyhGJb0wiAI1S-0GXFJUT2sz-213Xqnx7xQvsg>
+X-ME-Proxy-Cause: dmFkZTEJDXZbVWi1dWDhXfR3V8OFIFiukzmdYSaS1v+Di3g5XrlCcZQ2QlKQoSOmWsLUgI
+    fFYKOPBvXSD2ZDBY5QNO9ZOLn4eJl4GE23lbKDOq9+RQnuQznFY+fZe2+MOTgIWBnUIR5c
+    ngPc3VFH7ztEHkppv8h4DL/BcASSCwg+98kWriWtVY2EdphbtpA4jwK+n/gNLhr985JXpV
+    +wCZ4KiAal7aBY0rnSZmnNYNkmEmzhTnfb56Ezfu6V39YKqbO1wtNlmYEzB20t5yaXEQDr
+    VvT7qPO88nnScuZGDmAjNdUC4T2R3ssLj+NJikJAwvx/9Jvnz0VW9GvTyn8bW1OyQ5DNsb
+    aL1Io+iSKFP9VyhFtluoCMXLJ1J99LlVqAbTC69H04hf4ASy496Hfl9japnmqVgoUHhXhL
+    5G6bFTlaIqCLCnTvM/KaqRqVntbjZtTtrhdynyW5KPUtVanarfQRLdydRQ1Q3uaCMX6CXX
+    Xl6E86OWrLbEUcHk+0JUrOM8o3CaMfdulStNuOtYNdihXP1YjItSJGiTLUq817GD0JNEm9
+    lo4QflSOqWvm9DspG1du14Vhh5Ec0T0gB/+Pxt09JU+vhhQPpJ6qamChF5Ry85Y+9SGcq3
+    vs0yMtOD8M8QXLdjNJ3bYO+TUItd3ggWkvxH3zvl8lCB17ryr3QvFTpU/onw
+X-ME-Proxy: <xmx:O5Esas-JpWaqtyuBUxQT17fhEmc3A2gP3VDEOKrFGwXRkHyq0BMdcQ>
+    <xmx:O5Esamn_4yVPWbvirZegfSCN5xEHFNBrHWG6QTUL705GNOar8dJ0Vg>
+    <xmx:O5EsanJHtm2vJS5foGBWbQl6rGnD6xB-Avd9YnSlmzhuzZfeVr1aSg>
+    <xmx:O5EsaspAtn0tZxi8290aSDSph_1CT0x4Te6T-uEEdVr03kyGmBSGiQ>
+    <xmx:O5EsakRxFm_NX6lZNtxUMm8ycxZvTjj1Vziuk8xPU7epbDt4FN8vifXD>
+Feedback-ID: i67ae4b3e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 12 Jun 2026 19:07:38 -0400 (EDT)
+Date: Fri, 12 Jun 2026 16:07:37 -0700
+From: "Dan Williams (nvidia)" <djbw@kernel.org>
+To: Steven Price <steven.price@arm.com>, 
+ Gavin Shan <gshan@redhat.com>, 
+ kvm@vger.kernel.org, 
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+ Marc Zyngier <maz@kernel.org>, 
+ Will Deacon <will@kernel.org>, 
+ James Morse <james.morse@arm.com>, 
+ Oliver Upton <oliver.upton@linux.dev>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, 
+ Joey Gouly <joey.gouly@arm.com>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>, 
+ Christoffer Dall <christoffer.dall@arm.com>, 
+ Fuad Tabba <tabba@google.com>, 
+ linux-coco@lists.linux.dev, 
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+ Shanker Donthineni <sdonthineni@nvidia.com>, 
+ Alper Gun <alpergun@google.com>, 
+ "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
+ Emi Kisanuki <fj0570is@fujitsu.com>, 
+ Vishal Annapurve <vannapurve@google.com>, 
+ WeiLin.Chang@arm.com, 
+ Lorenzo.Pieralisi2@arm.com
+Message-ID: <6a2c91398fad5_a003b10027@djbw-dev.notmuch>
+In-Reply-To: <50d70588-2ebc-4c9b-98ec-68f3d04a9d21@arm.com>
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <20260513131757.116630-11-steven.price@arm.com>
+ <872ce762-0a83-42a4-bbe8-b21ea6f4e1cf@redhat.com>
+ <50d70588-2ebc-4c9b-98ec-68f3d04a9d21@arm.com>
+Subject: Re: [PATCH v14 10/44] arm64: RMI: Add support for SRO
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] The non-atomic `__vcpu_rmw_sys_reg` macro is used to update `PMOVS=
-SET_EL0` from both the VCPU thread and the PMU NMI handler, leading to lost=
- guest overflow events.
---
+Steven Price wrote:
+[..]
+> > alloc_pages_exact() will fail if the requested size exceeds the maximal
+> > allowed
+> > size (1 << MAX_PAGE_ORDER). The maximal size is usually smaller than
+> > PUD_SIZE
+> > but PUD_SIZE is allowed by the RMM.
+> 
+> This is an area where to be honest I'm really not sure what to do.
+> Technically the RMM is allowed to ask for a contiguous range of 512GB
+> pages (on a 4K system - larger with larger page sizes) - but clearly no
+> real OS is going to be able to provide anything like that.
+> 
+> In practise we don't expect the RMM to do anything so crazy. It's not
+> really clear to be whether even 2MB (PMD_SIZE) is needed. But the spec
+> is written to be generic.
+> 
+> So my current approach is to calculate the required size and pass it
+> into alloc_pages_exact(). For "stupidly large" values this will fail and
+> Linux just doesn't support an RMM which attempts this. If there is ever
+> a usecase which needs this then we'd need to find a different method of
+> providing the memory (most likely some form of carveout to avoid
+> fragmentation). But my view is we should wait for that usecase to be
+> identified first.
 
-commit 5ccb539bf3353bcdda1d741299b5fc364734f717
-Author: Colton Lewis <coltonlewis@google.com>
+Just some comparison comments as I am also going through the TDX patches
+which enable "Extension SEAMCALLs". These new SEAMCALLs are similar to
+the SRO mechanism [1].
 
-KVM: selftests: Add find_bit to KVM library
+TDX asks for an upfront delegation of memory at init time using
+alloc_contig_pages() that is never returned until entire module is
+shutdown. alloc_contig_pages() is not subject to the MAX_ORDER limit,
+but not sure that alloc_contig_pages() is suitable for small+dynamic
+runtime memory add / release that SRO potentially wants to do?
 
-This commit adds the find_bit functionality to the KVM selftests library.
-It resolves separate compilation issues for selftests that have a dependency
-on find_bit by including it similarly to rbtree.c.
+Does SRO always balance the size of RMI_OP_MEM_REQ_DONATE with
+RMI_OP_MEM_REQ_RECLAIM, or might some donate requests be a one way
+donation like TDX? Just poking to see if there is a path to preallocate
+a pool vs the fine grained per-operation alloc/free.
 
-> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-> new file mode 100644
-> index 0000000000000..2d2294b78ebe0
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pmu-direct.c
-
-[ ... ]
-
-> +void kvm_pmu_put(struct kvm_vcpu *vcpu)
-> +{
-
-[ ... ]
-
-> +	/* Save pending guest hardware overflows. */
-> +	local_irq_save(flags);
-> +	val =3D read_sysreg(pmovsset_el0);
-> +	__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=3D, val & mask);
-> +	write_sysreg(val & mask, pmovsclr_el0);
-> +	local_irq_restore(flags);
-> +
-> +	/* Stop guest counters and disable interrupts in hardware. */
-> +	write_sysreg(mask, pmcntenclr_el0);
-> +	write_sysreg(mask, pmintenclr_el1);
-> +	kvm_pmu_set_guest_counters(pmu, 0);
-> +	preempt_enable();
-> +}
-
-[Severity: High]
-Does this non-atomic register update risk losing guest overflow events?
-
-Since __vcpu_rmw_sys_reg() is non-atomic, and local_irq_save() does not mask
-NMIs on ARM64 when pseudo-NMIs are enabled, could an NMI interrupt the VCPU
-thread exactly between the load and store phases here?=20
-
-If the PMU NMI handler injects a guest overflow flag during this window,
-wouldn't it be overwritten and permanently lost by the stale writeback?
-
-[ ... ]
-
-> +void kvm_pmu_handle_guest_irq(struct arm_pmu *pmu, u64 pmovsr)
-> +{
-> +	struct kvm_vcpu *vcpu =3D kvm_get_running_vcpu();
-> +	u64 mask =3D kvm_pmu_guest_counter_mask(pmu);
-> +	u64 govf =3D pmovsr & mask;
-> +
-> +	write_pmovsclr(govf);
-> +
-> +	if (!vcpu)
-> +		return;
-> +
-> +	__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=3D, govf);
-
-[Severity: High]
-Is this concurrent modification safe?
-
-Since this NMI handler asynchronously modifies PMOVSSET_EL0 using the same
-non-atomic __vcpu_rmw_sys_reg() macro used by the VCPU thread in kvm_pmu_pu=
-t(),
-could they race?=20
-
-If this handler runs while the VCPU thread is performing its own
-read-modify-write on PMOVSSET_EL0, wouldn't the guest overflow flag be
-overwritten and lost, leading to incorrect counter states in the guest?
-
-> +
-> +	if (kvm_pmu_part_overflow_status(vcpu)) {
-> +		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612192909.1153=
-907-1-coltonlewis@google.com?part=3D19
+[1]: http://lore.kernel.org/20260522034128.3144354-3-yilun.xu@linux.intel.com
