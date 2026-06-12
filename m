@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C654B3A59A7;
-	Fri, 12 Jun 2026 19:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C133148DA;
+	Fri, 12 Jun 2026 19:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781294201; cv=none; b=GghpZetlhr7wZna24HCZarXv+rHl+ZPSLdwH74DK6iD1/NcMW0DNZ3oIZYUYMNejuY5Zt9t3TVVnJMlgNGecuULSmR9PMhu84WhBn7xHVU8l1+JJMoh915S2g8+QkGnsRvYPoxRNKRiF30Lw6lcoVU9e8+Q0aboEDdPDJKNfFkg=
+	t=1781294266; cv=none; b=bmyPbF/kFeLCw22wV8ClUFljtaiSD68mAOWwYqPhSIP45FBohOYt15RBcS88dqA2iZEU6mEGDPQ6hDzpg5WTS3MA2PDLUwoiyAk1jb2kor+c+6GkipPdHJ0qwSY8zWUBkWZ6GDPJCp7K1yPiE7TYFbljQqAD1ZuQ2BwKZx1lzRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781294201; c=relaxed/simple;
-	bh=8i1BUR47saKfcOHXtNaCJcxsCpCKvd67LmoeDydEG9U=;
+	s=arc-20240116; t=1781294266; c=relaxed/simple;
+	bh=0ogKh3eALOfhgqghvmX5NuAIa06w4c8xW64JjIqomnQ=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=rDa5j8LZEDwoCuS8IzzIH4qgC1zqPyRmzcfzvNRpqBGcgRrR3INJSRoFQ5BRw1eUyu7S1uIkvLDuBAu6mS8MEiKi1mYb97xTpIHoa4jk5ZBe+ZLprCXps9A81AM6TNMRtW3WETaiC5H7ssS9vQHYVUKiVUwwAz78xuipPS2GhX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkBQ4DU0; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=FFWPgaL3KUpoZBqqrsUkMLDp0cFFxTPFeZ1WQubn3ZM/RFBPTeIHXphhAklqciAM3VtTr1ba07I+fFSPdi3qr3tEbqRwHc+s28LteT7vOx0GO4ln6knTHKqZxqthZQ3zcuo9YtF/IAfO0Mikh3EdZBDnQrlkOUkaCRZwtshDwTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNgiWjiG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkBQ4DU0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180B71F000E9;
-	Fri, 12 Jun 2026 19:56:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNgiWjiG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80C851F000E9;
+	Fri, 12 Jun 2026 19:57:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781294197;
-	bh=7fX47y6XAfTQt9a74/0clxVHKiRL+N63RyxjWiKBdBQ=;
+	s=k20260515; t=1781294264;
+	bh=SXJIXy8qPBlfNd7leBlkKg99ORW7RPKwzy7ieYkwFSw=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DkBQ4DU0/Z89sjr70eCKMdD4Vh/IotWKb1Xwg8lKQNqc6Kz89992FQd4ItbmeEf1E
-	 lPk/UXmRjbFFEU1673lsfY8cXZZNkmCY/oRzGBQTz9uMQQGlVKH/EYF1UAXK5QWdzs
-	 UP2Zzx6OAfAST/sICJ9STqUwf3OiwUT7T64JFmZzkhJOh6ZQvSml0bvXAPUDd+SxbK
-	 F2wY/WeV9y6TvoYdADPfBczT6m38RnET06t5+QRRJ5152CuSx48Cx4kRjKOTFQqnJs
-	 ertubY6izOemNUq1vH5LUtXxd04OQ+BBP+pwegLj8XHFAQ8klBWiy7uXVy3hxYpLgq
-	 1pNzDKXmX7bmA==
+	b=DNgiWjiGg0jz1AzmFY6oEkmbLcfCDtEvQwBzD6HLkHv6b2sIJFT75cBD0Iz3AG1Oc
+	 VkQ08v/LZT1/xf7gYn6DNQaL294Wsm96TVe7QHXjUoIsPZFKlp+oxr+wKwXNdpNk+y
+	 Obl7eEC/jaS6mhadKnklLhdGY+bkFSDbRAZUShSYzO+UKGei+mKFWnolMuLGUIWG0W
+	 GLVji+ETMibTqGAzoeFjS86XNGbkc7I0EGCTlNH8Ru6dIOOFuTE0qvxmW2Gixnnmad
+	 Wi1TIeSMOjoPqoTLQv1+dEA4pdFfDRutH4rnU3Tw1YhjGeLVXXX7feo07qAUZogVOX
+	 5TgVM3ZYJbbIg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 03/21] KVM: arm64: Reorganize PMU functions
+Subject: Re: [PATCH 16/21] perf: arm_pmuv3: Handle IRQs for Partitioned PMU
+ guest counters
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, linux-perf-users@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260612192909.1153907-4-coltonlewis@google.com>
-References: <20260612192909.1153907-4-coltonlewis@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org
+In-Reply-To: <20260612192909.1153907-17-coltonlewis@google.com>
+References: <20260612192909.1153907-17-coltonlewis@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 19:56:36 +0000
-Message-Id: <20260612195637.180B71F000E9@smtp.kernel.org>
+Date: Fri, 12 Jun 2026 19:57:44 +0000
+Message-Id: <20260612195744.80C851F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,126 +47,122 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-
-Pre-existing issues:
-- [High] The KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS ioctl modifies VM-wide sta=
-te and VCPU system registers without checking if the VM has already run, al=
-lowing a data race with active VCPUs.
-- [High] Host-userspace-reachable WARN_ONCE in __kvm_pmu_event_mask allows =
-unprivileged userspace to trigger a Denial of Service.
+- [Critical] Host perf event overflows corrupt the virtual PMU state of run=
+ning vCPUs.
+- [High] KVM traps PMOVSCLR_EL0 but fails to read live hardware state, brea=
+king guest PMU polling.
 --
 
-commit 5436d8ff9f4b80e9bf5e0df08454fa9ddf4d9e29
+commit 18a5ac7857cf364463b827796f49cf7c00c6ef08
 Author: Colton Lewis <coltonlewis@google.com>
 
-KVM: arm64: Reorganize PMU functions
+perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
 
-A lot of functions in pmu-emul.c aren't specific to the emulated PMU
-implementation. Move them to the more appropriate pmu.c file where
-shared PMU functions should live.
+Because ARM hardware is not yet capable of direct PPI injection into
+guests, guest counters will still trigger interrupts that need to be
+handled by the host PMU interrupt handler. Clear the overflow flags in
+hardware to handle the interrupt as normal, but update the virtual
+overflow register for later injecting the interrupt into the guest.
 
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index 6b48a3d16d0d5..9ad3520417413 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
+> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
+> index bb1f3dca03869..64f40cfb31012 100644
+> --- a/arch/arm64/kvm/pmu-direct.c
+> +++ b/arch/arm64/kvm/pmu-direct.c
+> @@ -405,3 +405,25 @@ void kvm_pmu_set_guest_owned(struct kvm_vcpu *vcpu)
 
 [ ... ]
 
-> +static u32 __kvm_pmu_event_mask(unsigned int pmuver)
+> +/**
+> + * kvm_pmu_handle_guest_irq() - Record IRQs in guest counters
+> + * @pmu: PMU to check for overflows
+> + * @pmovsr: Overflow flags reported by driver
+> + *
+> + * Set overflow flags in guest-reserved counters in the VCPU register
+> + * for the guest to clear later.
+> + */
+> +void kvm_pmu_handle_guest_irq(struct arm_pmu *pmu, u64 pmovsr)
 > +{
-> +	switch (pmuver) {
-> +	case ID_AA64DFR0_EL1_PMUVer_IMP:
-> +		return GENMASK(9, 0);
-> +	case ID_AA64DFR0_EL1_PMUVer_V3P1:
-> +	case ID_AA64DFR0_EL1_PMUVer_V3P4:
-> +	case ID_AA64DFR0_EL1_PMUVer_V3P5:
-> +	case ID_AA64DFR0_EL1_PMUVer_V3P7:
-> +		return GENMASK(15, 0);
-> +	default:		/* Shouldn't be here, just for sanity */
-> +		WARN_ONCE(1, "Unknown PMU version %d\n", pmuver);
-> +		return 0;
-> +	}
+> +	struct kvm_vcpu *vcpu =3D kvm_get_running_vcpu();
+> +	u64 mask =3D kvm_pmu_guest_counter_mask(pmu);
+> +	u64 govf =3D pmovsr & mask;
+> +
+> +	write_pmovsclr(govf);
+> +
+> +	if (!vcpu)
+> +		return;
+> +
+> +	__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=3D, govf);
+
+[Severity: Critical]
+Can host perf event overflows corrupt the virtual pmu state of running vCPU=
+s?
+
+When the host pmu is partitioned, the host perf subsystem is allowed to use
+the guest partition counters (0..hpmn) whenever the currently running vCPU
+does not own the pmu (e.g., vCPUs using the emulated pmu).
+
+However, kvm_pmu_host_counter_mask() unconditionally excludes these
+counters from the host's clear mask. When a host event on these counters
+overflows, the host irq handler leaves the hardware flag set and passes the
+overflow to kvm_pmu_handle_guest_irq().
+
+This code blindly applies the host overflow to the currently running vCPU's
+PMOVSSET_EL0 software state without verifying if the vCPU actually owns
+the pmu partition:
+
+    vcpu->arch.pmu.access =3D=3D VCPU_PMU_ACCESS_GUEST_OWNED
+
+Could this corrupt the virtual pmu state and inject spurious overflows
+into innocent VMs?
+
 > +}
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index c187397134990..6ab15a5209608 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -774,16 +774,15 @@ static void armv8pmu_disable_event_irq(struct perf_=
+event *event)
+>  	armv8pmu_disable_intens(BIT(event->hw.idx));
+>  }
+> =20
+> -static u64 armv8pmu_getreset_flags(void)
+> +static u64 armv8pmu_getovf_flags(void)
+>  {
+>  	u64 value;
+> =20
+>  	/* Read */
+>  	value =3D read_pmovsclr();
+> =20
+> -	/* Write to clear flags */
+> -	value &=3D ARMV8_PMU_CNT_MASK_ALL;
+> -	write_pmovsclr(value);
+> +	/* Only report interrupt enabled counters. */
+> +	value &=3D read_pmintenset();
 
 [Severity: High]
-This is a pre-existing issue, but can this warning be triggered by
-unprivileged host userspace?
+Does masking out overflow flags for counters without interrupts enabled bre=
+ak
+guest pmu polling?
 
-The pmuver here is extracted from the guest's SYS_ID_AA64DFR0_EL1 register.
-KVM allows userspace to downgrade ID registers using safe semantics, meaning
-userspace might purposefully set an unhandled PMUVer (such as 2 or 3) via t=
-he
-KVM_SET_ONE_REG ioctl.
+KVM unconditionally traps guest accesses to PMOVSCLR_EL0 and PMOVSSET_EL0
+(via FGT HDFGRTR_EL2_PMOVS) to prevent the guest from seeing host counter
+overflows. However, the trap handlers (pmu_reg_read and pmu_reg_write
+in arch/arm64/kvm/sys_regs.c) only interact with KVM's software shadow
+state and ignore the live hardware pmovsclr_el0 register for guest-owned
+counters.
 
-If this happens, wouldn't it hit this default case and trigger the warning,
-potentially causing a host denial of service if panic_on_warn is enabled?
+Since this masks hardware overflows with read_pmintenset(), counters with
+interrupts disabled will never trigger the host irq handler to sync the
+shadow state.
 
-[ ... ]
+Consequently, will a guest polling for overflows with pmu interrupts disabl=
+ed
+loop infinitely reading stale zeros and miss the overflow events entirely?
 
-> +static void kvm_arm_set_nr_counters(struct kvm *kvm, unsigned int nr)
-> +{
-> +	kvm->arch.nr_pmu_counters =3D nr;
-> +
-> +	/* Reset MDCR_EL2.HPMN behind the vcpus' back... */
-> +	if (test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features)) {
-> +		struct kvm_vcpu *vcpu;
-> +		unsigned long i;
-> +
-> +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> +			u64 val =3D __vcpu_sys_reg(vcpu, MDCR_EL2);
-> +
-> +			val &=3D ~MDCR_EL2_HPMN;
-> +			val |=3D FIELD_PREP(MDCR_EL2_HPMN, kvm->arch.nr_pmu_counters);
-> +			__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
-> +		}
-> +	}
-> +}
-
-[ ... ]
-
-> +int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_att=
-r *attr)
-> +{
-
-[ ... ]
-
-> +	case KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS: {
-> +		unsigned int __user *uaddr =3D (unsigned int __user *)(long)attr->addr;
-> +		unsigned int n;
-> +
-> +		if (get_user(n, uaddr))
-> +			return -EFAULT;
-> +
-> +		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
-> +	}
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does this ioctl bypass the
-kvm_vm_has_ran_once() check applied to other VM-wide attributes?
-
-If userspace initializes VCPU 0, starts it via KVM_RUN, and then invokes th=
-is
-ioctl on an uninitialized VCPU 1, the check for vcpu->arch.pmu.created at t=
-he
-start of kvm_arm_pmu_v3_set_attr() would pass.
-
-Since kvm_arm_set_nr_counters() loops over all VCPUs and performs a
-read-modify-write on MDCR_EL2 without taking vcpu->mutex or pausing VCPUs:
-
-kvm_arm_set_nr_counters() {
-    ...
-    kvm_for_each_vcpu(i, vcpu, kvm) {
-        u64 val =3D __vcpu_sys_reg(vcpu, MDCR_EL2);
-        val &=3D ~MDCR_EL2_HPMN;
-        val |=3D FIELD_PREP(MDCR_EL2_HPMN, kvm->arch.nr_pmu_counters);
-        __vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
-    }
-}
-
-Could this cause a data race on hypervisor control registers if VCPU 0 is
-actively running, potentially allowing unprivileged userspace to corrupt
-execution state?
+> =20
+>  	return value;
+>  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612192909.1153=
-907-1-coltonlewis@google.com?part=3D3
+907-1-coltonlewis@google.com?part=3D16
