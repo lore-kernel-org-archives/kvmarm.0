@@ -1,168 +1,207 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C133148DA;
-	Fri, 12 Jun 2026 19:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2D537206A;
+	Fri, 12 Jun 2026 19:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781294266; cv=none; b=bmyPbF/kFeLCw22wV8ClUFljtaiSD68mAOWwYqPhSIP45FBohOYt15RBcS88dqA2iZEU6mEGDPQ6hDzpg5WTS3MA2PDLUwoiyAk1jb2kor+c+6GkipPdHJ0qwSY8zWUBkWZ6GDPJCp7K1yPiE7TYFbljQqAD1ZuQ2BwKZx1lzRs=
+	t=1781294288; cv=none; b=frk6GTnTG/Z8u57rH2oRNZ63yXYzax5mvHDYfQjEV/xI29+vQOPZmBXpyIx16tr3GO2x/TUO0aXe4VeEniFj8qmGlsCzBwPoPeBjYmoG+LAW4zMaYiFucFI+jn++Rvbkug+DSDpO3C0jZyjpX5veGHrA8oMf+YlEEafxgSrvDeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781294266; c=relaxed/simple;
-	bh=0ogKh3eALOfhgqghvmX5NuAIa06w4c8xW64JjIqomnQ=;
+	s=arc-20240116; t=1781294288; c=relaxed/simple;
+	bh=bJOLKZvTiWI9KOvDKgZWVmthgbVZoffi36ioc8ETaUw=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=FFWPgaL3KUpoZBqqrsUkMLDp0cFFxTPFeZ1WQubn3ZM/RFBPTeIHXphhAklqciAM3VtTr1ba07I+fFSPdi3qr3tEbqRwHc+s28LteT7vOx0GO4ln6knTHKqZxqthZQ3zcuo9YtF/IAfO0Mikh3EdZBDnQrlkOUkaCRZwtshDwTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNgiWjiG; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=fyXhpjH8R9EXI3QlR+QZqF9BvHRCBqg5ezjckeIOYOjNmHIB96gbTq4b1DKRgaB5l/SlfBfLXzFDMaBpXiesOXOEmlzzkH4CFP4T5PuIqd3j8o/OVfN3UPwc+a52+gZ7gVVhf9Zyl3otjHJiXRldUsNMUlBZM3xjyjZ2m96ESj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lAjrDYIe; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNgiWjiG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80C851F000E9;
-	Fri, 12 Jun 2026 19:57:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAjrDYIe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82C5A1F000E9;
+	Fri, 12 Jun 2026 19:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781294264;
-	bh=SXJIXy8qPBlfNd7leBlkKg99ORW7RPKwzy7ieYkwFSw=;
+	s=k20260515; t=1781294286;
+	bh=iZ5H/kR1eTEeXA7ny9mMFOt69thTVQMgQELSd28aGNM=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DNgiWjiGg0jz1AzmFY6oEkmbLcfCDtEvQwBzD6HLkHv6b2sIJFT75cBD0Iz3AG1Oc
-	 VkQ08v/LZT1/xf7gYn6DNQaL294Wsm96TVe7QHXjUoIsPZFKlp+oxr+wKwXNdpNk+y
-	 Obl7eEC/jaS6mhadKnklLhdGY+bkFSDbRAZUShSYzO+UKGei+mKFWnolMuLGUIWG0W
-	 GLVji+ETMibTqGAzoeFjS86XNGbkc7I0EGCTlNH8Ru6dIOOFuTE0qvxmW2Gixnnmad
-	 Wi1TIeSMOjoPqoTLQv1+dEA4pdFfDRutH4rnU3Tw1YhjGeLVXXX7feo07qAUZogVOX
-	 5TgVM3ZYJbbIg==
+	b=lAjrDYIeNdaxQgKOfODb7jxRaQb0ls8SzbjbkFMYIDTWIukSw4blY8rYep1kA5pSQ
+	 jHhgO3vYrNKW0o2zwR8fwPAR5wIU7JDM7jiShjzQ2cjPm+NRlDgOpY3xthnis2MOJi
+	 Kd6+RO5bF75polwLBzYHdeRRjDf8JBHnlj6H6AQ88yyTm5LI6CxQT+tg1beZu2uqie
+	 6ndg+0IgItPM1Iw0l1RdYzKFlle+4R0ZWFjgk6lMy+tpetzt2rmYb4eyVfKt6mD3mG
+	 H+2eisLJcsT9GwPKb7nYMJIcgIDPu/ncJbvEIRIPx/VJAQMTmkqAWSOxvpEmtGNHio
+	 gunuT48/qoFRg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 16/21] perf: arm_pmuv3: Handle IRQs for Partitioned PMU
- guest counters
+Subject: Re: [PATCH 17/21] KVM: arm64: Detect overflows for the Partitioned
+ PMU
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org
-In-Reply-To: <20260612192909.1153907-17-coltonlewis@google.com>
-References: <20260612192909.1153907-17-coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org
+In-Reply-To: <20260612192909.1153907-18-coltonlewis@google.com>
+References: <20260612192909.1153907-18-coltonlewis@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 19:57:44 +0000
-Message-Id: <20260612195744.80C851F000E9@smtp.kernel.org>
+Date: Fri, 12 Jun 2026 19:58:06 +0000
+Message-Id: <20260612195806.82C5A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 5 potential issue(=
 s) to consider:
-- [Critical] Host perf event overflows corrupt the virtual PMU state of run=
-ning vCPUs.
-- [High] KVM traps PMOVSCLR_EL0 but fails to read live hardware state, brea=
-king guest PMU polling.
+
+New issues:
+- [High] Missing return and failure to synchronize hardware registers when =
+transitioning to VCPU_PMU_ACCESS_GUEST_OWNED drops interrupts and corrupts =
+guest PMU state.
+- [High] kvm_pmu_part_overflow_status() evaluates overflow using stale soft=
+ware PMOVSSET_EL0 instead of the physical register when the PMU is guest-ow=
+ned, missing hardware overflows.
+- [Low] Unused prototype for `kvm_pmu_overflow_status` left in header.
+
+Pre-existing issues:
+- [High] Non-atomic read-modify-write of PMOVSSET_EL0 in hardirq context co=
+rrupts concurrent process-context writes.
+- [High] Missing required `isb()` synchronization immediately following a w=
+rite to the `pmcr_el0` control-plane system register.
 --
 
-commit 18a5ac7857cf364463b827796f49cf7c00c6ef08
+commit df42d2108e88f67258ce6c2dfa8340d8d1ee7a87
 Author: Colton Lewis <coltonlewis@google.com>
 
-perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
-
-Because ARM hardware is not yet capable of direct PPI injection into
-guests, guest counters will still trigger interrupts that need to be
-handled by the host PMU interrupt handler. Clear the overflow flags in
-hardware to handle the interrupt as normal, but update the virtual
-overflow register for later injecting the interrupt into the guest.
+KVM: arm64: Detect overflows for the Partitioned PMU
+   =20
+When we re-enter the VM after handling a PMU interrupt, calculate
+whether it was any of the guest counters that overflowed and inject an
+interrupt into the guest if so.
 
 > diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-> index bb1f3dca03869..64f40cfb31012 100644
+> index 64f40cfb31012..0062d1d8e1999 100644
 > --- a/arch/arm64/kvm/pmu-direct.c
 > +++ b/arch/arm64/kvm/pmu-direct.c
-> @@ -405,3 +405,25 @@ void kvm_pmu_set_guest_owned(struct kvm_vcpu *vcpu)
+
+[Severity: High]
+This isn't a bug introduced by this patch, but looking at
+kvm_pmu_direct_pmcr_write() in this file, is there a missing isb() after
+writing the control register?
+
+arch/arm64/kvm/pmu-direct.c:kvm_pmu_direct_pmcr_write() {
+    write_sysreg(val, pmcr_el0);
+    if (reset_p) {
+...
+}
+
+Architectural rules require every write to a control-plane system register
+to be followed by an isb() as the very next instruction. Since it is follow=
+ed
+immediately by a conditional branch, can the pipeline observe undefined sta=
+te?
+
+> @@ -426,4 +426,52 @@ void kvm_pmu_handle_guest_irq(struct arm_pmu *pmu, u=
+64 pmovsr)
+>  		return;
+> =20
+>  	__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=3D, govf);
+
+[Severity: High]
+This is a pre-existing issue, but does this non-atomic read-modify-write
+in hardirq context corrupt concurrent process-context writes?
+
+When the physical PMU interrupt handler calls kvm_pmu_handle_guest_irq(), it
+executes this macro in hardirq context. Concurrently, the VM-exit path
+(access_pmovs()) can execute the same macro in process context with
+interrupts enabled.
+
+If the hardware interrupt preempts the process context between the read and
+write phases, could the process context overwrite the sysreg with its stale
+read and silently drop the overflow bits?
+
+> +
+> +	if (kvm_pmu_part_overflow_status(vcpu)) {
+> +		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> +
+> +		if (!in_nmi())
+> +			kvm_vcpu_kick(vcpu);
+> +		else
+> +			irq_work_queue(&vcpu->arch.pmu.overflow_work);
+> +	}
+> +}
+> +
+> +/**
+> + * kvm_pmu_part_overflow_status() - Determine if any guest counters have=
+ overflowed
+[ ... ]
+> +bool kvm_pmu_part_overflow_status(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arm_pmu *pmu;
+> +	u64 mask, pmovs, pmint, pmcr;
+> +	bool overflow;
+> +
+> +	pmu =3D vcpu->kvm->arch.arm_pmu;
+> +	mask =3D kvm_pmu_guest_counter_mask(pmu);
+> +
+> +	if (vcpu->arch.pmu.access =3D=3D VCPU_PMU_ACCESS_FREE) {
+> +		pmovs =3D __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+> +		pmint =3D __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+> +		pmcr =3D __vcpu_sys_reg(vcpu, PMCR_EL0);
+> +
+> +		if ((pmcr & ARMV8_PMU_PMCR_E) && (mask & pmovs & pmint))
+> +			kvm_pmu_set_guest_owned(vcpu);
+> +		else
+> +			return false;
+> +	}
+> +
+
+[Severity: High]
+Does this fall through to read uninitialized hardware state?
+
+When a virtual overflow is detected and kvm_pmu_set_guest_owned() is called,
+it transitions the state but there is no return true; here. Execution falls
+through to unconditionally read the physical hardware registers below.
+
+Additionally, looking at kvm_pmu_set_guest_owned(), it grants direct
+hardware access via MDCR_EL2 but fails to invoke kvm_pmu_load() to populate
+the hardware PMU with the guest's context.
+
+Since the hardware wasn't loaded, could these reads return host state,
+causing the calculation to evaluate to false and drop the pending interrupt?
+
+> +	pmovs =3D __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+> +	pmint =3D read_pmintenset();
+> +	pmcr =3D read_pmcr();
+
+[Severity: High]
+Does this evaluate overflow using stale software state instead of the
+physical register when the PMU is guest-owned?
+
+When the PMU is guest-owned, physical hardware overflows update the physical
+register. The software context is only synchronized during kvm_pmu_put().
+
+Since this is called during guest exit via kvm_pmu_sync_hwstate() before
+kvm_pmu_put() runs, could unconditionally reading the software context via
+__vcpu_sys_reg() evaluate against stale state and miss physical hardware
+overflows?
+
+> +	overflow =3D (pmcr & ARMV8_PMU_PMCR_E) && (mask & pmovs & pmint);
+> +
+> +	return overflow;
+>  }
 
 [ ... ]
 
-> +/**
-> + * kvm_pmu_handle_guest_irq() - Record IRQs in guest counters
-> + * @pmu: PMU to check for overflows
-> + * @pmovsr: Overflow flags reported by driver
-> + *
-> + * Set overflow flags in guest-reserved counters in the VCPU register
-> + * for the guest to clear later.
-> + */
-> +void kvm_pmu_handle_guest_irq(struct arm_pmu *pmu, u64 pmovsr)
-> +{
-> +	struct kvm_vcpu *vcpu =3D kvm_get_running_vcpu();
-> +	u64 mask =3D kvm_pmu_guest_counter_mask(pmu);
-> +	u64 govf =3D pmovsr & mask;
-> +
-> +	write_pmovsclr(govf);
-> +
-> +	if (!vcpu)
-> +		return;
-> +
-> +	__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=3D, govf);
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 25163a689ae80..f72d080ee7ba2 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -93,6 +93,8 @@ bool kvm_set_pmuserenr(u64 val);
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_resync_el0(void);
+> +bool kvm_pmu_emul_overflow_status(struct kvm_vcpu *vcpu);
+> +bool kvm_pmu_part_overflow_status(struct kvm_vcpu *vcpu);
 
-[Severity: Critical]
-Can host perf event overflows corrupt the virtual pmu state of running vCPU=
-s?
-
-When the host pmu is partitioned, the host perf subsystem is allowed to use
-the guest partition counters (0..hpmn) whenever the currently running vCPU
-does not own the pmu (e.g., vCPUs using the emulated pmu).
-
-However, kvm_pmu_host_counter_mask() unconditionally excludes these
-counters from the host's clear mask. When a host event on these counters
-overflows, the host irq handler leaves the hardware flag set and passes the
-overflow to kvm_pmu_handle_guest_irq().
-
-This code blindly applies the host overflow to the currently running vCPU's
-PMOVSSET_EL0 software state without verifying if the vCPU actually owns
-the pmu partition:
-
-    vcpu->arch.pmu.access =3D=3D VCPU_PMU_ACCESS_GUEST_OWNED
-
-Could this corrupt the virtual pmu state and inject spurious overflows
-into innocent VMs?
-
-> +}
-> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index c187397134990..6ab15a5209608 100644
-> --- a/drivers/perf/arm_pmuv3.c
-> +++ b/drivers/perf/arm_pmuv3.c
-> @@ -774,16 +774,15 @@ static void armv8pmu_disable_event_irq(struct perf_=
-event *event)
->  	armv8pmu_disable_intens(BIT(event->hw.idx));
->  }
-> =20
-> -static u64 armv8pmu_getreset_flags(void)
-> +static u64 armv8pmu_getovf_flags(void)
->  {
->  	u64 value;
-> =20
->  	/* Read */
->  	value =3D read_pmovsclr();
-> =20
-> -	/* Write to clear flags */
-> -	value &=3D ARMV8_PMU_CNT_MASK_ALL;
-> -	write_pmovsclr(value);
-> +	/* Only report interrupt enabled counters. */
-> +	value &=3D read_pmintenset();
-
-[Severity: High]
-Does masking out overflow flags for counters without interrupts enabled bre=
-ak
-guest pmu polling?
-
-KVM unconditionally traps guest accesses to PMOVSCLR_EL0 and PMOVSSET_EL0
-(via FGT HDFGRTR_EL2_PMOVS) to prevent the guest from seeing host counter
-overflows. However, the trap handlers (pmu_reg_read and pmu_reg_write
-in arch/arm64/kvm/sys_regs.c) only interact with KVM's software shadow
-state and ignore the live hardware pmovsclr_el0 register for guest-owned
-counters.
-
-Since this masks hardware overflows with read_pmintenset(), counters with
-interrupts disabled will never trigger the host irq handler to sync the
-shadow state.
-
-Consequently, will a guest polling for overflows with pmu interrupts disabl=
-ed
-loop infinitely reading stale zeros and miss the overflow events entirely?
-
-> =20
->  	return value;
->  }
+[Severity: Low]
+Since kvm_pmu_overflow_status() was renamed to kvm_pmu_emul_overflow_status=
+()
+in this patch, should the old prototype be removed from this header file?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612192909.1153=
-907-1-coltonlewis@google.com?part=3D16
+907-1-coltonlewis@google.com?part=3D17
