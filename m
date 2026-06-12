@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4032134A3A5;
-	Fri, 12 Jun 2026 19:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C654B3A59A7;
+	Fri, 12 Jun 2026 19:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781294045; cv=none; b=rZKmXAk7JJGOv/o8HYmt2kMg7hjSo9JVN/AiP5/uTSGQWQ58BR00BJIQfm3B6bCZivtO/JeeyUs8GnNsEQXcisk/SaToDoyf7k9haYlj3hYCOL+xl6jDJAawOkO95cB1dQXGe/dcG8iyHzZSP523J1Kyq85ZzPNZUurhbfO94lo=
+	t=1781294201; cv=none; b=GghpZetlhr7wZna24HCZarXv+rHl+ZPSLdwH74DK6iD1/NcMW0DNZ3oIZYUYMNejuY5Zt9t3TVVnJMlgNGecuULSmR9PMhu84WhBn7xHVU8l1+JJMoh915S2g8+QkGnsRvYPoxRNKRiF30Lw6lcoVU9e8+Q0aboEDdPDJKNfFkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781294045; c=relaxed/simple;
-	bh=qDj97zdXKxC09uJyUJ+sXpSoCnZxbTgAj2YMGPrfADo=;
+	s=arc-20240116; t=1781294201; c=relaxed/simple;
+	bh=8i1BUR47saKfcOHXtNaCJcxsCpCKvd67LmoeDydEG9U=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=A27S/ple+waQXNvrefGnl4KyrX9sbodWQqXmgPwRtBSYr6DR4Ecne4BG3UG3g/sd/kZcV2pcnYB18Zu1Dhly/XzxNYVqP3biy+qcgGeGzK2+P7Qv6s6tjqk1Idtm9XlbymQ07q/hWFLAi+4DkQP0e383MpJWQ1r0rFjHeOYtiK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nP4rCf47; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=rDa5j8LZEDwoCuS8IzzIH4qgC1zqPyRmzcfzvNRpqBGcgRrR3INJSRoFQ5BRw1eUyu7S1uIkvLDuBAu6mS8MEiKi1mYb97xTpIHoa4jk5ZBe+ZLprCXps9A81AM6TNMRtW3WETaiC5H7ssS9vQHYVUKiVUwwAz78xuipPS2GhX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkBQ4DU0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nP4rCf47"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A24D21F000E9;
-	Fri, 12 Jun 2026 19:54:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkBQ4DU0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180B71F000E9;
+	Fri, 12 Jun 2026 19:56:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781294043;
-	bh=cv4xbaRmbA/uYMQyLGyxpFxV+CehEPFOTxKOvffz4y0=;
+	s=k20260515; t=1781294197;
+	bh=7fX47y6XAfTQt9a74/0clxVHKiRL+N63RyxjWiKBdBQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=nP4rCf47Wj3+XWKMK0ya8JMkkUZH/8yXOal8zD9N6v6SOiFFm9uFRoyFGuBRXCfK4
-	 WnQ4kDyMH/15TRUZ1ZaJwVXHoeTz4n0HwXIsmpBD/nNCxd6yy+GI12nScE390cN/Yq
-	 FCwuY9jy2zK/wPA7uozcwCAQzeaWz1QODwfDJQlxGYFSxLIQkD8NdikZREj84OpbDF
-	 tiAKwiFYx2K4nVQBePAC0zFDGgAk/9LcRkVhxfavrJr/v66CVyDJ2U9C1j28DEd4zW
-	 l239v2rdFpmMHX4iu5a4WKCmhFJLXhR0J+xiPIK8AKaRWM8GNcadXcABTYeJJmeKsV
-	 V2W8PnYB5VCKA==
+	b=DkBQ4DU0/Z89sjr70eCKMdD4Vh/IotWKb1Xwg8lKQNqc6Kz89992FQd4ItbmeEf1E
+	 lPk/UXmRjbFFEU1673lsfY8cXZZNkmCY/oRzGBQTz9uMQQGlVKH/EYF1UAXK5QWdzs
+	 UP2Zzx6OAfAST/sICJ9STqUwf3OiwUT7T64JFmZzkhJOh6ZQvSml0bvXAPUDd+SxbK
+	 F2wY/WeV9y6TvoYdADPfBczT6m38RnET06t5+QRRJ5152CuSx48Cx4kRjKOTFQqnJs
+	 ertubY6izOemNUq1vH5LUtXxd04OQ+BBP+pwegLj8XHFAQ8klBWiy7uXVy3hxYpLgq
+	 1pNzDKXmX7bmA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 18/21] KVM: arm64: Add vCPU device attr to partition the
- PMU
+Subject: Re: [PATCH 03/21] KVM: arm64: Reorganize PMU functions
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Colton Lewis" <coltonlewis@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, linux-perf-users@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20260612192909.1153907-19-coltonlewis@google.com>
-References: <20260612192909.1153907-19-coltonlewis@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, linux-perf-users@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260612192909.1153907-4-coltonlewis@google.com>
+References: <20260612192909.1153907-4-coltonlewis@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 19:54:03 +0000
-Message-Id: <20260612195403.A24D21F000E9@smtp.kernel.org>
+Date: Fri, 12 Jun 2026 19:56:36 +0000
+Message-Id: <20260612195637.180B71F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,106 +46,126 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Unprivileged host userspace can trigger a host kernel panic (NULL =
-pointer dereference) by calling KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION before=
- the VM's PMU is initialized.
-- [Medium] `kvm_arm_pmu_v3_has_attr()` incorrectly advertises support for t=
-he `KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION` attribute on systems that do not =
-actually support it, breaking live migration.
+
+Pre-existing issues:
+- [High] The KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS ioctl modifies VM-wide sta=
+te and VCPU system registers without checking if the VM has already run, al=
+lowing a data race with active VCPUs.
+- [High] Host-userspace-reachable WARN_ONCE in __kvm_pmu_event_mask allows =
+unprivileged userspace to trigger a Denial of Service.
 --
 
-commit 69324cfdaa77bd05919e5ffe00139f0a4c7a3e0c
+commit 5436d8ff9f4b80e9bf5e0df08454fa9ddf4d9e29
 Author: Colton Lewis <coltonlewis@google.com>
 
-KVM: arm64: Add vCPU device attr to partition the PMU
+KVM: arm64: Reorganize PMU functions
 
-Add a new PMU device attr to enable the partitioned PMU for a given
-VM. This capability can be set when the PMU is initially configured
-before the vCPU starts running.
+A lot of functions in pmu-emul.c aren't specific to the emulated PMU
+implementation. Move them to the more appropriate pmu.c file where
+shared PMU functions should live.
 
 > diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index f5ee18b4dfae7..4e15948ac2565 100644
+> index 6b48a3d16d0d5..9ad3520417413 100644
 > --- a/arch/arm64/kvm/pmu.c
 > +++ b/arch/arm64/kvm/pmu.c
-> @@ -769,6 +769,28 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, s=
-truct kvm_device_attr *attr)
-> =20
->  		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
->  	}
-> +	case KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION: {
-> +		unsigned int __user *uaddr =3D (unsigned int __user *)(long)attr->addr;
-> +		u32 val;
-> +
-> +		if (get_user(val, uaddr))
-> +			return -EFAULT;
-> +
-> +		if (!has_kvm_pmu_partition_support())
-> +			return -EPERM;
-> +
-> +		if (kvm_vm_has_ran_once(kvm))
-> +			return -EBUSY;
-> +
-> +		kvm_pmu_partition_enable(kvm, val);
-> +		if (val) {
-> +			unsigned int max_counters =3D kvm_arm_pmu_get_max_counters(kvm);
 
-[Severity: High]
-Can an unprivileged host userspace process trigger a NULL pointer
-dereference here if the PMU is not yet initialized?
+[ ... ]
 
-If KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION is called before the PMU is
-initialized, kvm->arch.arm_pmu will be NULL.
-
-When this code calls kvm_arm_pmu_get_max_counters(), it dereferences the
-NULL pointer inside bitmap_weight():
-
-arch/arm64/kvm/pmu.c:kvm_arm_pmu_get_max_counters() {
-    struct arm_pmu *arm_pmu =3D kvm->arch.arm_pmu;
-    ...
-    return bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS=
-);
-}
-
-> +
-> +			if (kvm->arch.nr_pmu_counters > max_counters)
-> +				kvm_arm_set_nr_counters(kvm, max_counters);
-> +		}
+> +static u32 __kvm_pmu_event_mask(unsigned int pmuver)
+> +{
+> +	switch (pmuver) {
+> +	case ID_AA64DFR0_EL1_PMUVer_IMP:
+> +		return GENMASK(9, 0);
+> +	case ID_AA64DFR0_EL1_PMUVer_V3P1:
+> +	case ID_AA64DFR0_EL1_PMUVer_V3P4:
+> +	case ID_AA64DFR0_EL1_PMUVer_V3P5:
+> +	case ID_AA64DFR0_EL1_PMUVer_V3P7:
+> +		return GENMASK(15, 0);
+> +	default:		/* Shouldn't be here, just for sanity */
+> +		WARN_ONCE(1, "Unknown PMU version %d\n", pmuver);
 > +		return 0;
 > +	}
+> +}
+
+[Severity: High]
+This is a pre-existing issue, but can this warning be triggered by
+unprivileged host userspace?
+
+The pmuver here is extracted from the guest's SYS_ID_AA64DFR0_EL1 register.
+KVM allows userspace to downgrade ID registers using safe semantics, meaning
+userspace might purposefully set an unhandled PMUVer (such as 2 or 3) via t=
+he
+KVM_SET_ONE_REG ioctl.
+
+If this happens, wouldn't it hit this default case and trigger the warning,
+potentially causing a host denial of service if panic_on_warn is enabled?
+
 [ ... ]
-> @@ -808,6 +830,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, st=
-ruct kvm_device_attr *attr)
->  	case KVM_ARM_VCPU_PMU_V3_FILTER:
->  	case KVM_ARM_VCPU_PMU_V3_SET_PMU:
->  	case KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS:
-> +	case KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION:
->  		if (kvm_vcpu_has_pmu(vcpu))
->  			return 0;
->  	}
 
-[Severity: Medium]
-Does this incorrectly advertise support for KVM_ARM_VCPU_PMU_V3_ENABLE_PART=
-ITION
-on systems that don't support it?
+> +static void kvm_arm_set_nr_counters(struct kvm *kvm, unsigned int nr)
+> +{
+> +	kvm->arch.nr_pmu_counters =3D nr;
+> +
+> +	/* Reset MDCR_EL2.HPMN behind the vcpus' back... */
+> +	if (test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features)) {
+> +		struct kvm_vcpu *vcpu;
+> +		unsigned long i;
+> +
+> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> +			u64 val =3D __vcpu_sys_reg(vcpu, MDCR_EL2);
+> +
+> +			val &=3D ~MDCR_EL2_HPMN;
+> +			val |=3D FIELD_PREP(MDCR_EL2_HPMN, kvm->arch.nr_pmu_counters);
+> +			__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
+> +		}
+> +	}
+> +}
 
-If kvm_arm_pmu_v3_has_attr() returns 0 as long as the VCPU has a PMU, VMMs
-might assume the partition capability is available.
+[ ... ]
 
-However, setting this attribute in kvm_arm_pmu_v3_set_attr() explicitly
-rejects the configuration if has_kvm_pmu_partition_support() is false:
+> +int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_att=
+r *attr)
+> +{
 
-arch/arm64/kvm/pmu.c:kvm_arm_pmu_v3_set_attr() {
+[ ... ]
+
+> +	case KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS: {
+> +		unsigned int __user *uaddr =3D (unsigned int __user *)(long)attr->addr;
+> +		unsigned int n;
+> +
+> +		if (get_user(n, uaddr))
+> +			return -EFAULT;
+> +
+> +		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
+> +	}
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does this ioctl bypass the
+kvm_vm_has_ran_once() check applied to other VM-wide attributes?
+
+If userspace initializes VCPU 0, starts it via KVM_RUN, and then invokes th=
+is
+ioctl on an uninitialized VCPU 1, the check for vcpu->arch.pmu.created at t=
+he
+start of kvm_arm_pmu_v3_set_attr() would pass.
+
+Since kvm_arm_set_nr_counters() loops over all VCPUs and performs a
+read-modify-write on MDCR_EL2 without taking vcpu->mutex or pausing VCPUs:
+
+kvm_arm_set_nr_counters() {
     ...
-    case KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION: {
-        ...
-        if (!has_kvm_pmu_partition_support())
-            return -EPERM;
+    kvm_for_each_vcpu(i, vcpu, kvm) {
+        u64 val =3D __vcpu_sys_reg(vcpu, MDCR_EL2);
+        val &=3D ~MDCR_EL2_HPMN;
+        val |=3D FIELD_PREP(MDCR_EL2_HPMN, kvm->arch.nr_pmu_counters);
+        __vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
     }
 }
 
-Could this inconsistency cause live migrations to fail when the VMM attempts
-to restore this attribute on a destination that lacks partition support?
+Could this cause a data race on hypervisor control registers if VCPU 0 is
+actively running, potentially allowing unprivileged userspace to corrupt
+execution state?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612192909.1153=
-907-1-coltonlewis@google.com?part=3D18
+907-1-coltonlewis@google.com?part=3D3
