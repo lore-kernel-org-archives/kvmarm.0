@@ -1,225 +1,165 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224A434A3A5;
-	Fri, 12 Jun 2026 19:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603F9363096;
+	Fri, 12 Jun 2026 19:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781293955; cv=none; b=VKmyJjeeZUpeIni2SbtOJhjpFZxiTHft0SprTEpcz0y+3HtwCVDEDkzlhnRlGoC5ZRtWQudXOA0KL9uQspq3/M58j65B+GlceMJCidNJ0RmRUx7QTjjtcjAnMtNC83GP9fpg+/COKiG3RxQFAAyfmO8ZL15+P5kf0mAjF3WaV/8=
+	t=1781294003; cv=none; b=p9FAQNGkGyIvnwtWwyirkkbjUdzmR1bw9PV/YMcOk+2vYDyOTwPxz0nPbiCVPFU/NQsT1vTk8XP4flfKcp8Gr+CIAFbxEJBCt9AkgzCnMyg4KRV11TjWXY68E/QvoM6Xv30Pwc54Bgn57zQLZCRi4P/mUq27RLzwOObCbB0CyFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781293955; c=relaxed/simple;
-	bh=y5IGlluuSVjpl4D7/SfzqTuMfUT7DDi82TH/jWvgmWA=;
+	s=arc-20240116; t=1781294003; c=relaxed/simple;
+	bh=kz2FbhLGl9LRodJ26wa2e3Bgs29CXqhcvDcmjtLbh8M=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=gJdChKFq5Hw3r+8iVTt5UmwdHSQKIk+xuwhkJ8b51OEXjM9MkPVl3HQuvLIqdRQ5eyvpha+iGZZcSu3N0wEuduTPoyMBWvFekDSx0PIkk13amjt3ks9xLQD+hQtrNrLR+5xfmmANlJLnPYN9yskaJ4UE5K7uPijg7UvqYxfffS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HTDKDSJC; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=W8Bp4Ww0mh6m2GCajgtx91T/Y7PlaC54DUWCt/8KHbkBGxBj/C6jzeTcGm/49NgACipXYziqWnBZFUq+yJCJZsJww33H2mfvaT5Kfhyz7MU8FufCI9/sgdJ2mD11076zr4LhIWcntz7AbFjkU5ZE3TRNo/0gBtCS/eR42RoROG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oq7r7hLb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HTDKDSJC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1201F00A3A;
-	Fri, 12 Jun 2026 19:52:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oq7r7hLb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26701F000E9;
+	Fri, 12 Jun 2026 19:53:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781293953;
-	bh=LQxA4KkmIJ1xqsjw0+j8jdFHElQuXhSSEVDQJCET3Lg=;
+	s=k20260515; t=1781294002;
+	bh=5ElwdHnQSKejgq6ow0GiWQE1dIST4DSNQfNU0hx8ICE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HTDKDSJCagOcV+cUmB5BusFpDTD5VKxKJHhQLsSXcOkxaPMrZR/VjdiU/ZWeY7996
-	 sAT7YUQQZEQqH+HtefVRPGYNe/mR/EWnX5OkjQSKbhXC/c9nGawQeNCNiTSd1B7aNY
-	 9ZwWHc+tElVObp3JvEnNWgUTCWli/YihvZM/gXwotKZen+vlDMZTrI/PGKpP4KuIKn
-	 o9T8nVuJ0CQ7LMn1YdlopY7B9nCcZ+tDvQnGBwTmKF3vyMIBcvymaW7lTN9+8HhHUs
-	 0S74dZV7rxPmBETuZiPuZwPjNokpmKBFOgzEOvQD/7gV+8drNM3BuRIkixBb768Lwq
-	 G5NPMvxSa/TUg==
+	b=Oq7r7hLbrYHX6YYbUSs1eZ/GXfnhGhea63zjtLr1QqPHf+kIed6ajfqiDS7wpMOV/
+	 G5DAETB425oWfmVXotZHvYm/ZGi2npQsVEt44I3eQsJYf1+0xMp6yA90HJ7TNgpQfn
+	 mhJSB0hDzR0h2MO++doEsDB+/xDw0ffh43Q4RJ7EZ2+suq7Q+pOoL+KDsUUh8Hxn+s
+	 KDayZf1sEGCucr4gV7x+E9rqVz6sK3VgsAB4pLHPI0jdqCI40PifWtH7TKMBjA8jdE
+	 CLQM/p+gqevTJvtynn9vFROXJyfuHhyqM4+yeKidJHWRZouMhOXIzykNzZAEyBLKF/
+	 gISXYAdg/w7Ng==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 10/21] KVM: arm64: Set up MDCR_EL2 to handle a
- Partitioned PMU
+Subject: Re: [PATCH 12/21] KVM: arm64: Enforce PMU event filter at
+ vcpu_load()
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260612192909.1153907-11-coltonlewis@google.com>
-References: <20260612192909.1153907-11-coltonlewis@google.com>
+Cc: linux-perf-users@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260612192909.1153907-13-coltonlewis@google.com>
+References: <20260612192909.1153907-13-coltonlewis@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 19:52:33 +0000
-Message-Id: <20260612195233.6D1201F00A3A@smtp.kernel.org>
+Date: Fri, 12 Jun 2026 19:53:20 +0000
+Message-Id: <20260612195321.B26701F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
 
 New issues:
-- [Critical] MDCR_EL2_HPMN update is incorrectly gated by FEAT_FGT, breakin=
-g hardware PMU isolation and allowing guest escapes on non-FGT CPUs.
-- [High] Unconditional restriction of PMU counters for non-partitioned VMs =
-based on host capabilities.
-- [High] Evaluating a per-CPU variable via `this_cpu_ptr()` from a preempti=
-ble context in `kvm_arm_pmu_get_max_counters()`.
-- [Medium] MDCR_EL2_HPME is set unconditionally for all VMs.
+- [High] Missing Context Synchronization Event (isb) after writing PMU even=
+t configuration registers before enabling counters.
+- [High] Guest PMU counters erroneously count guest EL2 execution when the =
+guest hypervisor requested NOT to count at EL2.
 
 Pre-existing issues:
-- [High] Missing Context Synchronization Event (isb) after writing to the M=
-DCR_EL2 control-plane system register.
+- [High] Guest writes to PMEVTYPERn_EL0 and PMCCFILTR_EL0 under a partition=
+ed PMU are trapped but not synchronously propagated to the hardware PMU, br=
+eaking dynamic PMU configuration.
 --
 
-commit 414972a4abdb129c1ad96b121fefd7a789901b90
+commit 0b5fddb99fdf908d09da2215064503d365b4feac
 Author: Colton Lewis <coltonlewis@google.com>
 
-KVM: arm64: Set up MDCR_EL2 to handle a Partitioned PMU
+KVM: arm64: Enforce PMU event filter at vcpu_load()
 
-Set up MDCR_EL2 to handle a Partitioned PMU. If partitioned, set the
-HPME, HPMD, and HCCD bits. If we have the ability to use Fine Grain
-Traps (FEAT_FGT) also, unset the TPM and TPMCR bits that trap all PMU
-accesses and set HPMN to the correct number of guest counters so
-hardware enforces the right values.
+This commit enforces the KVM PMU event filter by rechecking and applying
+the filter on every vcpu load. It excludes counting at all exception levels
+if the event is filtered before writing to the hardware.
 
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index f4d7b12045e8f..c84321277d893 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
+diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
+--- a/arch/arm64/kvm/pmu-direct.c
++++ b/arch/arm64/kvm/pmu-direct.c
+@@ -131,6 +131,57 @@ u64 kvm_pmu_guest_counter_mask(struct arm_pmu *pmu)
 
 [ ... ]
 
-> @@ -43,14 +43,35 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *v=
-cpu)
->  	vcpu->arch.mdcr_el2 =3D FIELD_PREP(MDCR_EL2_HPMN, *host_data_ptr(nr_eve=
-nt_counters));
->  	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TPM |
->  				MDCR_EL2_TPMS |
->  				MDCR_EL2_TTRF |
->  				MDCR_EL2_TPMCR |
->  				MDCR_EL2_TDRA |
-> -				MDCR_EL2_TDOSA);
-> +				MDCR_EL2_TDOSA |
-> +				MDCR_EL2_HPME);
-
-[Severity: Medium]
-The commit message states "If partitioned, set the HPME, HPMD, and HCCD bit=
-s",
-but MDCR_EL2_HPME is added to the unconditional bitmask here. Does this lea=
-ve
-an inactive state bit that could cause unpredictable interactions in nested
-virtualization environments for non-partitioned VMs?
-
-> +
-> +	if (kvm_pmu_is_partitioned(vcpu->kvm)) {
-> +		u8 nr_guest_cntr =3D vcpu->kvm->arch.nr_pmu_counters;
-> +
-> +		vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_HPMD | MDCR_EL2_HCCD);
-> +
-> +		/*
-> +		 * Take out the coarse grain traps if we are using
-> +		 * fine grain traps and enforce counter access with
-> +		 * HPMN.
-> +		 */
-> +		if (!vcpu_on_unsupported_cpu(vcpu) &&
-> +		    cpus_have_final_cap(ARM64_HAS_FGT) &&
-> +		    (cpus_have_final_cap(ARM64_HAS_HPMN0) || nr_guest_cntr > 0)) {
-> +			vcpu->arch.mdcr_el2 &=3D ~(MDCR_EL2_TPM | MDCR_EL2_TPMCR | MDCR_EL2_H=
-PMN);
-> +			vcpu->arch.mdcr_el2 |=3D FIELD_PREP(MDCR_EL2_HPMN, nr_guest_cntr);
+> +	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
+> +		if (i =3D=3D ARMV8_PMU_CYCLE_IDX) {
+> +			val =3D __vcpu_sys_reg(vcpu, PMCCFILTR_EL0);
+> +			evsel =3D ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+> +		} else {
+> +			val =3D __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> +			evsel =3D val & kvm_pmu_event_mask(vcpu->kvm);
 > +		}
-
-[Severity: Critical]
-Is it safe to gate the MDCR_EL2_HPMN update behind the ARM64_HAS_FGT
-capability check?
-
-If FEAT_FGT is absent, HPMN remains equal to the total number of event
-counters. While KVM falls back to trapping PMU accesses via TPM=3D1 on non-=
-FGT
-CPUs, when the PMU is guest-owned, the trap handlers can write unmasked
-guest values directly to the hardware register:
-
-arch/arm64/kvm/sys_regs.c:pmu_reg_write() {
-    if (kvm_pmu_get_access(vcpu) =3D=3D VCPU_PMU_ACCESS_GUEST_OWNED) {
-        if (set)
-            write_sysreg(val, pmcntenset_el0);
-    ...
-}
-
-Since KVM executes at EL2 and HPMN equals the total number of event counter=
-s,
-could this bypass hardware protections and allow a guest to overwrite host
-performance counters on non-FGT CPUs?
+> +
+> +		guest_include_el2 =3D (val & ARMV8_PMU_INCLUDE_EL2);
+> +		val &=3D ~evtyper_clr;
+> +
+> +		if (unlikely(is_hyp_ctxt(vcpu)) && guest_include_el2)
+> +			val &=3D ~ARMV8_PMU_EXCLUDE_EL1;
 
 [Severity: High]
-This is a pre-existing issue, but I noticed that after MDCR_EL2 is updated
-directly when has_vhe() is true in kvm_arm_setup_mdcr_el2():
+When the guest is executing at guest EL2 (which runs at host EL1 under
+nested virtualization), does this correctly handle the case where the guest
+requested not to count at guest EL2?
 
-arch/arm64/kvm/debug.c:kvm_arm_setup_mdcr_el2() {
-    ...
-    if (has_vhe())
-        write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-
-    preempt_enable();
-}
-
-There is no isb() immediately following the write to this control-plane
-register. Because KVM immediately accesses PMU registers that depend on
-MDCR_EL2 state (like writing to PMCNTENSET_EL0 after returning to
-pmu_reg_write), could it observe architecturally undefined pipeline state?
+If guest_include_el2 is false, but the guest's configuration originally had
+ARMV8_PMU_EXCLUDE_EL1 cleared (for example, to profile guest EL1), this code
+leaves it cleared. Will this cause the hardware PMU to erroneously count
+guest EL2 execution at host EL1?
 
 > +
+> +		if (vcpu->kvm->arch.pmu_filter &&
+> +		    !test_bit(evsel, vcpu->kvm->arch.pmu_filter))
+> +			val |=3D evtyper_set;
 > +
+> +		if (i =3D=3D ARMV8_PMU_CYCLE_IDX)
+> +			write_pmccfiltr(val);
+> +		else
+> +			write_pmevtypern(i, val);
 > +	}
-> =20
->  	/* Is the VM being debugged by userspace? */
->  	if (vcpu->guest_debug)
-
-[ ... ]
-
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index 9ad3520417413..55cda8021400a 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-
-[ ... ]
-
-> @@ -552,6 +552,13 @@ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS))
->  		return 1;
-> =20
-> +	/*
-> +	 * If partitioned then we are limited by the max counters in
-> +	 * the guest partition.
-> +	 */
-> +	if (pmu_is_partitioned(arm_pmu))
-> +		return arm_pmu->max_guest_counters;
+> +}
 
 [Severity: High]
-Does this incorrectly restrict the returned counters for all VMs on a
-partitioned host?
+Does this sequence require a context synchronization event?
 
-By using pmu_is_partitioned(arm_pmu) which checks the host capability, rath=
-er
-than kvm_pmu_is_partitioned(kvm) which checks if the specific VM has opted
-into the feature, this limits the counters to arm_pmu->max_guest_counters
-even for non-partitioned VMs that safely use perf_event multiplexing.
+According to the ARM64 architecture rules, writes to control-plane system
+registers must be followed by an isb() as the very next instruction. This
+code loops over the counters and writes the registers without issuing an
+isb().
 
-Could this degrade PMU capabilities for non-partitioned VMs and break live
-migration?
+Later, kvm_pmu_load() writes to PMCNTENSET_EL0 to enable the counters:
 
-[Severity: High]
-Can evaluating pmu_is_partitioned() here trigger a BUG splat?
-
-kvm_arm_pmu_get_max_counters() is called from preemptible contexts during VM
-configuration, and pmu_is_partitioned() evaluates a per-CPU variable:
-
-arch/arm64/kvm/pmu-direct.c:pmu_is_partitioned() {
-    ...
-    return pmu->max_guest_counters >=3D 0 &&
-        pmu->max_guest_counters <=3D *host_data_ptr(nr_event_counters);
+kvm_pmu_load() {
+        ...
+        kvm_pmu_apply_event_filter(vcpu);
+        ...
+        val =3D __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+        write_sysreg(val & mask, pmcntenset_el0);
 }
 
-Since host_data_ptr() uses this_cpu_ptr(), could accessing this CPU-local
-variable with preemption enabled result in a BUG splat for using
-smp_processor_id() in preemptible contexts?
+Without an intervening isb(), could the PMU hardware start counting before
+the pipeline resolves the new event configurations, leading to spurious
+event counts or PMU filter bypass?
 
-> +
->  	/*
->  	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
->  	 * Ignore those and return only the general-purpose counters.
+[Severity: High]
+This is a pre-existing issue, but does applying the event filter only during
+vcpu_load() break dynamic PMU configuration when the PMU is partitioned?
+
+When the partitioned PMU is enabled, KVM traps guest writes to PMEVTYPERn_E=
+L0
+in pmu_reg_write() in arch/arm64/kvm/sys_regs.c:
+
+pmu_reg_write() {
+        ...
+        if (kvm_pmu_is_partitioned(vcpu->kvm)) {
+                mask =3D kvm_pmu_evtyper_mask(vcpu->kvm);
+                __vcpu_assign_sys_reg(vcpu, reg, val & mask);
+        }
+        ...
+}
+
+This updates the in-memory sys_regs array but fails to push the new value to
+the physical hardware registers or request a KVM_REQ_RELOAD_PMU.
+
+If the guest subsequently enables the counter (which writes directly to the
+physical PMCNTENSET_EL0 without a trap delay), the hardware PMU will use the
+stale event type. The new configuration and the event filter applied here in
+kvm_pmu_apply_event_filter() are delayed until the next VCPU reschedule.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612192909.1153=
-907-1-coltonlewis@google.com?part=3D10
+907-1-coltonlewis@google.com?part=3D12
