@@ -1,126 +1,106 @@
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E1B331230
-	for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 20:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781208992; cv=pass; b=MXIz5F4Tw/ESSCxGWo5f/JhMiYEbxEfYkazTSwVqh5+m4RxqwEXLSTMVYOLuMx1od+COAv55PnimOVA5TW2xX68ac2CxCsvYZvLEGriQyaJd8T7Ju6xe4cbvH2ZZ6O7iZxIlOWmYwdTqAn2YQkRBmXPFfRAQvPYN/b5UfPxoOr8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781208992; c=relaxed/simple;
-	bh=hJba3+vHUhRZcQprsnZOYpmT859TwISmDOQQW+AUK/A=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tq4zBHXifgYR7pQlpj7fifHkD43KwIffCDPHZssAgIm0pVevd0/smcDYjUbnMirY9K10SdHwGshf4UBLF6T/gu/4jL0lfa0iEsRWy3TYXoxpb0b/Lced6VtIk2BgNarg1sXnYGB7lrBXCI8IYkC826wai6sqg08BHHNsQneuovI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v56LczTV; arc=pass smtp.client-ip=74.125.82.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CC93043CE
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 01:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781226432; cv=none; b=gimW+MLQYmmOoqeKb+h2W1iRbm2N7flh9oPXoSfiz7ibQNPD0DFJKfHjs5cksF7ZtKs0VsV3BuLm9kHSyMsDULwti89Qh+vZ9ALsd0iR+/wqfQYfXcR63+Npc1Yf9GWA9WAcnY5SDRaUw2H0oha+tQSVOhfNZbXOS0Akj33DJgw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781226432; c=relaxed/simple;
+	bh=EIdxZ9tCemDGSxRT7l/259cIzPqZovEd7qIl+4+bbZc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MeBMfhe+lEzAH6SDPeqnNJrgxAy7ATS7FxNrHnesNSL2uSBa4BKpeY7mHW/wtgqR85R9p+eHi68ocbGFg1B+OjoQSICjinVhOKuzl7UqAEf8Jir4qLmasOrRRrgtombto+5WkZeWUbIhHFf6OszCI7ZxvcYBLrwkSIubAPYSzK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K9xSO6XP; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v56LczTV"
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-13809223fd4so276757c88.1
-        for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 13:16:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781208990; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cJpHpNXwvZeivIicI7dSkoW9XmFQH+F1D4mLUVNioJ61LTJtSThiXL0VhhJlP+Ekw+
-         1RJ5zfsfAUe++LRjSUmWpQQOnsXoJa+WD4JsDoBWJ0cGfrN56XStjaNHrnpoGEp1Jlhf
-         KYHoNO+Is5+iSdh6FbcGME9dLz4GbuXi9ukdbRC2YAbP2lJcS6Dums0lqxp6b/k2j+Gt
-         UUBRNXnn6Oxm4LU2o0/B3webEy6j/W4kkDSx6L6yepPresEVuDvkA7mjkTJ29oPwGX7Y
-         bPaQxisa8ZcEU05GWbOOTK0lrwfjA1T2OG4l/6jHgsNuMxxhsswXsI3bpRNj2A7rpzBG
-         jrVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=c6w4o8cPFnkNvj1bY6N4ohMTXqYLTs78fDk/pXJtYGc=;
-        fh=k9u/hPHns2PRcYuLsOSZvENebeLRvcFcA5w0fiOty1k=;
-        b=FeuHhGOanCgoogMIPNuu06B114rCr7AWdUiBWKff28ZrPVH8FVfb9A8lbQCGOZMJcX
-         sTdbSAbVXx1+c2+m6pbDj4IIJ7qysX54+bvTGjMxWxlD65YqzHlHap8OmL3mmTwgvM1I
-         fRJoh1Zl1IKAFd9a/HFNYu5OqCITsvO+e9zO/n/aCm6flfIokIDRWDsfvBCjNFeUsdwI
-         x4l5/yaXW2xcLjyyXlUNKQDb7b7O8XEfNbXRWbJolyEH7PBON8JLAsKxmExgjNF3JVP0
-         kTT4rIV65ZmgS2SatB/K6c1S8lGL7LCapqXy0Cyo5rDtA0KiaHQM5KWKlHeUPyTJXHDb
-         il8g==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K9xSO6XP"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c8581f7723aso203504a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Jun 2026 18:07:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781208990; x=1781813790; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=c6w4o8cPFnkNvj1bY6N4ohMTXqYLTs78fDk/pXJtYGc=;
-        b=v56LczTVdpSjWr50VPgFZMhD9GKu3HUd3wbnK7CJugWCGmYDNegPzd9FBHSAgDpOLG
-         Gxl8v5acG5mxYF/iniYB/gq0PGvts9G6vsTL9rHP4gQ8Pm38GGRdh/huK2cDcmGh44/J
-         ItwwdohtacL3bWfkGRZ9eSpV8KzEyiOIcG10pWlSSCuYA+PtbqlM41sgqqX3sEZYO4I6
-         FZgBLkmQ4jcml3hVU4obcDbs5/wwKphszNfrRlKIbSrqSTguVWGdBD5XTGDLQMl+j4Kf
-         syptLPASUD9yOM3cUZ9E+yTTFXPLoWDntheA9guuyaVYe0H2F7MbsIT6T5KrR9BvPO8J
-         mIDQ==
+        d=google.com; s=20251104; t=1781226430; x=1781831230; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ltYTnUEFnoWpppzAgPG27GJdcRnPuw2iznLkjvKvVEY=;
+        b=K9xSO6XPJml0ssNAyHhNPUMYp3HUEY5eRi8kgJYoit3d//it980kLyhZHhoPqYsJ4L
+         19ROGmdS0gbC4WhaFcbvlBOqjtC7ph60FnnUDN1Sf9uC5gL7hIWuwi/A4s+0OENaKmt6
+         Eo4KGPp1wjxlHijMx/4s8Sxr0KAJ1/quuTz+vXwQ/VeOkuabXh2GFP7C6F2y9mdhYK0Y
+         eLoFT3HNBQjDfRvaSDDPxqj4askoF9m8kcox5KO1lbHVGXGztkc48GK/l3wliw7u3nH2
+         aE6o0sGUVUt0w3OaHHqKi8GvzTzjNhOfOXPtpNxCIdpafuXZ4d30zocf5JlTdqZH6UmQ
+         YuGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781208990; x=1781813790;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c6w4o8cPFnkNvj1bY6N4ohMTXqYLTs78fDk/pXJtYGc=;
-        b=Y45WTXOGOyHjTkyy7hrYMitiAf3cHwaZWipX87+K1FQPBGLc3uoT5yxfo68ySckm+W
-         5koAdczT48YIP4Ekuf49lMQd1f0hV0bkzZpPuQ5yq5Jal2M8YZnrL5qtRdzvQYXtIYxI
-         wGsVWD2Bzq3bw4ogsU2JR+7LF0vCKRh6CkQ7YF5U9PYfSfzVLJGjBpX45PSw42ynye7B
-         7YLYEHprbhQsedIGqvVagcpt03YukT9gQhK6DPU/FXnFUnyO+uIKfTa68EYUGnNnvsuQ
-         iuoWiF77RhhMb0mpGPnPKDPUsbtp+YUkAseDOQhz0ThOJc5yWdCmlJ6tKzwrVv3LTYmF
-         Ut9w==
-X-Forwarded-Encrypted: i=1; AFNElJ+8Ig9BumlJVYt9+jJFn0K03f/Yl4Jrd5fmSxh8NtKOF440QkLajTDFwTl7Fm1vrdStR/tD5P4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxcIjaU+KJNe2W/GEcz2PnuGMzvAM53wvm4E57SlLZnLBOHbBZq
-	V/93mqN2+SLk0BSdmYwbagovO3Ad0kz35vrODYA8DiK5Kwv5UJljyEa7ByDXZwnYf+u2TUMBFNC
-	bNYQ947zqcbEes8cOvGwONb4eUSDrQv7I8NQsm/z2
-X-Gm-Gg: Acq92OFlRpPgWvB/Vd+L1F4N5bLznHd76NBk4YCGim0bTzb2afkBp6hguTI17WPlRoZ
-	Hkgdvf8dUk1UYsNPpR+L/198nKxJhjPoerpjICjmtzGoULP7Oqljl9ed4tkztmmf911rNLdknsy
-	kfJfKf8PzmN2EZ03WO6daiPQ0iLyIkuToZa12zUpPJ0P/Km6Jg4k2R+0fDNhHchKLh3UUVAhabR
-	0KK8QHTsAZiiLXYw4ISM742y4U1RgF2yJ0irnHvavbh2snE6k2h7sVhD8OHzeVOFWkglkDFtK43
-	ZF81+VIAPl6Pz0WT7LK5X86imCOwvGpEwFDdIK2PA9Yx28tLRmhJnPUfEggsrdC++mCMjQ==
-X-Received: by 2002:a05:7022:fd04:b0:137:fb6c:5355 with SMTP id
- a92af1059eb24-1384211e6fcmr2478309c88.3.1781208989421; Thu, 11 Jun 2026
- 13:16:29 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 11 Jun 2026 13:16:28 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 11 Jun 2026 13:16:28 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <aisHySKe0PwM5DSg@google.com>
-References: <20260331194202.1722082-1-vipinsh@google.com> <20260331194202.1722082-2-vipinsh@google.com>
- <CAEvNRgGrPKBXh=VA3QBLJOczKRpMOB4nDmZL0XRwV6B3PT_7+Q@mail.gmail.com> <aisHySKe0PwM5DSg@google.com>
+        d=1e100.net; s=20251104; t=1781226430; x=1781831230;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ltYTnUEFnoWpppzAgPG27GJdcRnPuw2iznLkjvKvVEY=;
+        b=HaaYupfvBILU19ViXkS5oXfFJIDF42D06JqHq80yQZS2CDcJFOZ1SAwzSM7xQR/jaf
+         AVwKUZugnNghlTuHD6xymX/AeIxOtRcEXnHMkswRrNs7rOCtCxW5mklUdoLF3m7IN8vy
+         Y154j/J5CSyWpzT/eMnoGZlrkCXf6F7nrtJo8M4NMAbvXGn+2YtKrFhbWLsHvzQEl/l0
+         Nk+vSFH7ts/kE+auEGnVxOl6LtHcqPzmN+e6lCpHuTAQ5t1GT6hwSW9qO/E3RXU6tylx
+         yj02R/84Ermr0hxBQLFxXnpoA4aXHdLFPWh/22Uj8AytG+V9qdhIQEfsw4mzJ7vxRvYM
+         LGPA==
+X-Forwarded-Encrypted: i=1; AFNElJ/UrVZAuJ5zXtdaAHljBf0ga40iOGzK72Bld6U/2ku0AUDQ/YDB6zVMxTnLyl3Ido0Xnp40pUc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzjDMt11OQKUAl3sTVjmmNWjZlw7sfQQLfTh/Z/e/JKQPmh9lCA
+	KsfOliLvvRJWKDee0zIJRNAi+1EuGg3qf1mb3nMDRkWdIoq+0z7Yopxkh98LjJFse39qD3uBvSg
+	J2HC2sg==
+X-Received: from pgam22.prod.google.com ([2002:a05:6a02:2b56:b0:c82:7761:9941])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d8f:b0:3b4:6cae:4a51
+ with SMTP id adf61e73a8af0-3b783b5ffdcmr817576637.11.1781226429893; Thu, 11
+ Jun 2026 18:07:09 -0700 (PDT)
+Date: Thu, 11 Jun 2026 18:07:09 -0700
+In-Reply-To: <CAEvNRgE-qt8DAjOeE5ANpXzrgEKs+2_wh4YSmY=pe6krngBXqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Date: Thu, 11 Jun 2026 13:16:28 -0700
-X-Gm-Features: AVVi8CeGqWOzdSyzWUUivrRwH0AG_QWu1g0DCt9ZOfKtFkCXDKefnGkWsFu90NU
-Message-ID: <CAEvNRgE-qt8DAjOeE5ANpXzrgEKs+2_wh4YSmY=pe6krngBXqQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20260331194202.1722082-1-vipinsh@google.com> <20260331194202.1722082-2-vipinsh@google.com>
+ <CAEvNRgGrPKBXh=VA3QBLJOczKRpMOB4nDmZL0XRwV6B3PT_7+Q@mail.gmail.com>
+ <aisHySKe0PwM5DSg@google.com> <CAEvNRgE-qt8DAjOeE5ANpXzrgEKs+2_wh4YSmY=pe6krngBXqQ@mail.gmail.com>
+Message-ID: <aitbveI2Sdx4s4BP@google.com>
 Subject: Re: [PATCH v4 1/9] KVM: selftest: Create KVM selftest runner
-To: Sean Christopherson <seanjc@google.com>
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
 Cc: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	kvm-riscv@lists.infradead.org, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
 	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
 	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
 	chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
 	ajones@ventanamicro.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, Jun 11, 2026, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Wed, Jun 10, 2026, Ackerley Tng wrote:
+> >> Vipin Sharma <vipinsh@google.com> writes:
+> >> My (future) use case is that with hugepages, I want to run something
+> >> like
+> >>
+> >>   ./guest_memfd_test --order=0
+> >>   ./guest_memfd_test --order=9
+> >>   ./guest_memfd_test --order=18
+> >>
+> >> And 0, 9 and 18 are the supported HugeTLB orders on the machine being
+> >> tested. I'd like to iterate over supported HugeTLB orders at runner
+> >> runtime instead of at build time.
+> >
+> > No.  The right way to handle this is to define testcases for the "interesting"
+> > sizes, and then rely on the test itself to SKIP if the size is unsupported.  This
+> > is no different than a test that requires EPT, or nested VMX, or nested SVM, etc.
+> 
+> That should work too. So at build time I'd make it define all the
+> possible HugeTLB sizes on every arch, and then skip as necessary.
 
-> On Wed, Jun 10, 2026, Ackerley Tng wrote:
->> Vipin Sharma <vipinsh@google.com> writes:
->> My (future) use case is that with hugepages, I want to run something
->> like
->>
->>   ./guest_memfd_test --order=0
->>   ./guest_memfd_test --order=9
->>   ./guest_memfd_test --order=18
->>
->> And 0, 9 and 18 are the supported HugeTLB orders on the machine being
->> tested. I'd like to iterate over supported HugeTLB orders at runner
->> runtime instead of at build time.
->
-> No.  The right way to handle this is to define testcases for the "interesting"
-> sizes, and then rely on the test itself to SKIP if the size is unsupported.  This
-> is no different than a test that requires EPT, or nested VMX, or nested SVM, etc.
+Not necessarily at "build time", the testcases can also come from your local
+environment.
 
-That should work too. So at build time I'd make it define all the
-possible HugeTLB sizes on every arch, and then skip as necessary.
+> Why though, why not find the supported sizes at runtime?
 
-Why though, why not find the supported sizes at runtime?
+You can find the supported sizes at runtime, just not in the test runner.  I want
+the runner itself to be largely oblivious to what's its running.  Disallowing
+more or less _any_ test specific configuration/setup in the runner is the only
+way I see of keeping the runner strictly focused on running tests/testcases.
+
