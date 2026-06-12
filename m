@@ -1,156 +1,119 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B14037475C
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 14:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632D236A009
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 14:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781274154; cv=none; b=AeEkqgw9pPP1pdGO9dibNdiG3DsSn69f/lU9bRfSSbEcgHsp27/sJCyDKT4dDtRWOcnZ6axpwoRqQxueSiEsjtYexfC0VIlPSbYKhyZmBHAGxTIA0L4HiJXwOJjjNT1Mh0fWlBI4+XZbAtwP3KXVBczN3FPMmB+r2DED2fsGHUM=
+	t=1781274176; cv=none; b=Nb5nIsAv2SiuUy1N5O7/oHqQF195aPnkRrc2xmZTJ1QUe8T8ZT08UmMosK9bWHqpDHSt9qoM+SlDFp2jR+iv+oHPhh3Cnt7LRrTDIhCfZALwjW8yl6WIgMFlja3UjGLZrz+lBCoS8S+rTa4QLTLjdOhfa3E3sQGbwDIj1PuPdJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781274154; c=relaxed/simple;
-	bh=zHwPddHtZ+nAl0/u5z9/ESyAgx0+d2S2sHjzyMdqxQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TNQfytW5F7fxkVNNZiRWCIPQ2EBbzj+M7p0EnZeOa7pRYt3jZ+pPO9uMtaNATpKWpriYYwnhlSxUZ6HD43i+mH0zSGN6m6OrHETNO9v7qktqjrSeuW+ThoYidOnCJDnUTGfh9QwqFu6WNgR6V6d82KgafOJC1fsmQPh68QQvEGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J6xAFop9; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1781274176; c=relaxed/simple;
+	bh=8Q73MooLEk26mrOKPo+4oe+OTrUeK0F4sZCo1RasFHM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=geeQzVJ68hwlyXV+NGOFddrvTrn1razqJCgDRAxG8py+/agGVfEEaiL7OgRxCMgCvrFZ9qBq+gq2YBpxplrqMQv2EQsPX046CwHXb66zrS9xAJNHStK1fiejs/QUy3SAdZiCXM4DsHHiWgOv4wjoYJKC838lsfjJKYf0JAUXZko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bivEnvC4; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J6xAFop9"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-490bd64ca95so70705e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 07:22:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bivEnvC4"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490ae3bcf4cso4803235e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 07:22:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781274151; x=1781878951; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U0u5FTqBTXNLLGdidnrnWIaCMVX09cl5M57gIDTlUfs=;
-        b=J6xAFop98stcyrXduEGy9xMZN//neKqhuTEGc0+NIo/GIhY8FghrmH7XLCFEAMCC5r
-         monaEfXHhbrEnaHFMLPM/JsX5dGpYdrPasmhEahRl8lY/Dt/k23BAHI15m30UKjwJFOR
-         +Hw+S9/e2o+KmcDgu0UZrb4ZjgQGkzGaHRqgG9KtSB3ZthUMF3Rd5W6B+YUdabBtWv/g
-         OPqqpt4J2ZadNo1wmJzG1bC95dskmmNRYwd72m3lieICNHYWO8zfG/T2VZsYEtIHkGzO
-         kOfUgLE0Bqti39VLClrLBDYWA1uq56WjbGypSuO4YgsW9ONdXHTQnTv1U3gCs9vZ4rIP
-         iXlw==
+        d=google.com; s=20251104; t=1781274174; x=1781878974; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BOk3rPIMN9MJANkiEj+yRZwzOhJQDKG+UEQQtAnaeSo=;
+        b=bivEnvC41SfUM7f/JuUKvWDHl3mLh4vLjUaD0QSV774dDTt3jC1AjnbBO8AUQbh5xJ
+         nJ4PxBDkkhhC09gpbGwhohD/WSGZFJ4PfptwujzefZF27RWRyUCSYVPlFxzozqq8eohh
+         ls62UGp7t60IDyyzc7BFAsdB8aX9X64xbdTq7Ls+j0rRhNVEPq+CmEGcRSgUxkjCpXtY
+         prZHwpqpfOp+q19UQu83h3uAa2ycCST1Omd7hEA2khdKaRRh+F0KeYP4GnF5Lpcpim03
+         ArcV0gXBQQPpPOzL62YQ7Ny39yhM4KyY3G2wPt7TXK1YtqHHipM7U44QO+IQfnnWWUm9
+         zdIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781274151; x=1781878951;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U0u5FTqBTXNLLGdidnrnWIaCMVX09cl5M57gIDTlUfs=;
-        b=Ni1+WUAjMwbNdndK9g0VxaZVchFNh7OXdVsATZCCWSJwynTmGTtuj7eMxXDMhYIXRl
-         HPeCMcncz4fim2XmywMLU8AO7+c5kZEyx4KehKnj8fF/PeVjizdTApk47ZRiU70N2BhW
-         ZfUglzX8l+RTsyHR8FOwOlNr/wzlGnhsRbpo9p7/xoyhcx7CpGuPXs3zUIaQwaqGZ/cn
-         dYBlCO5Orx0O7dXaenMCKlHx7jPIWYdc9m8NfX/3scDPeU4eIAtb63st30hn9rqlRAu6
-         SgL4teb2MKSjC2vwOzO6pQo/wB4OCavJn0hbB7L7FecCr0lHXiAEXiNryGghlmfQk1sq
-         c9kw==
-X-Forwarded-Encrypted: i=1; AFNElJ/iLdB/pWXKszUup9DfAtasqm3k8wtCcAVyB+elvtJoIjHXsKkyjMc+CuWnY5T+9xWCChORsOc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzhjB1T16DT+lW4/Cg7uE9u+Ym95YVD+0BBLd0EIwZPTNLCdiTe
-	cPY27jHrLI1Wp6NkgUm8IT6IH5reDGZAFD5ibrEK0nERixXaHX5oIbyZFNi5HkGMaw==
-X-Gm-Gg: Acq92OGtVk+p9Hc9baYmDbRX9Q0MzC2USe5sig+HCZe46mwSVonLLJ6bsmwDnDF9HAx
-	OVTV6887JGwhT/v5x5JNB7w3TquHBcA0WHZXq31aGcVxDlm1FxNTdC3ccmZWolymJtpYIe4MKI0
-	/rzh3/AmeWg4OUvxGO3wyJsxJQgItplgDHAqOutrtrZnFwhyLj7jtXAPtdfaYAP05c0LK0KfZKf
-	t11O3mbAxxiYiiG4Qcw2Ru51G7Z1ItIaiMwjzs+c03CscuOJkdx5BulpbEux8vk1WkpbI3YXBbw
-	jr2w47/0PTnZDJu+5UF0wmqePfVuMLLqwlI0BhgV8JSjXQfsfoJea8/Jqzcb9H8ZC2LC/2nBgjb
-	pVW6N0tptxqoZXtLCU8QQOgY+27+rQNU69ZqWeoNgsnM9ilfzXlovC1GZbv5y/oX73Sot8KcsdT
-	z4mCUZor6ZEjQZvLmnY9u7E9LJkWJ5op6YxuV7BzgwczFE5YEQaIrw8uKU6xXTOi1j1qBp+A==
-X-Received: by 2002:a05:600c:6b62:b0:485:1a54:9407 with SMTP id 5b1f17b1804b1-490ea5204ffmr1201925e9.0.1781274150414;
-        Fri, 12 Jun 2026 07:22:30 -0700 (PDT)
-Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490ea7db9c6sm71157125e9.8.2026.06.12.07.22.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 07:22:29 -0700 (PDT)
-Date: Fri, 12 Jun 2026 14:22:25 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, catalin.marinas@arm.com,
-	jens.wiklander@linaro.org, sumit.garg@kernel.org,
-	vdonnefort@google.com, sudeep.holla@kernel.org
-Subject: Re: [PATCH v6 4/6] KVM: arm64: Fix bounds checking in
- do_ffa_mem_reclaim()
-Message-ID: <aiwWIRS-l-SS-wcK@google.com>
-References: <20260527150236.1978655-1-smostafa@google.com>
- <20260527150236.1978655-5-smostafa@google.com>
+        d=1e100.net; s=20251104; t=1781274174; x=1781878974;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BOk3rPIMN9MJANkiEj+yRZwzOhJQDKG+UEQQtAnaeSo=;
+        b=L/mJKTlxTYj3jyLn61LXeemeVERmmfOFAgAKbrxWKLgOsRjPex2ffdT/DEMIPYOqLC
+         FijGPlVmNQ8Z7n+KPzgcDopEOSYTy18a1Nr3N2OSbWElXNEpy2/VIvQWUq7Mo0IaCSPi
+         eL0Anwh6YempIugtOdfROKQy4ZQctK10lhFDscxmWRpxq8G1SEKBxwRlGesBWwuLrrPE
+         zQyjzzy1nlvzrws3Owrzj+dSqWrIfrHV0hQx3ZjtKUc/82jq/r1pqKGgHIc+ZRfceuaK
+         /rFxz9qkkPLrFzxjQgrC6j8h9z2W8rNHUagjtTvx3oTejPSjLi0Ls2BENDL40wN88HuF
+         lzNA==
+X-Forwarded-Encrypted: i=1; AFNElJ+6HdKuDeqVBRcSZOs8/XYKvp3b/4lJ36TGRUUWCXIIpltBToZRVNpXGwH81SZvEf24fW3QGxQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxycYTIOqcTTzvk9khXVPmdyIN8LtAhcE8ek6MjZsVYChlbOvgn
+	5eiKQg+dTRQbCDh4BHqk9XM9wAHgivOIqN23CC6+9xiV3K9JU5uSaF0rzbuQu6iZF9h/02jCASa
+	gM+vw2pGi5JaGKA7y5/bPhQ==
+X-Received: from wmaz11.prod.google.com ([2002:a05:600c:6d8b:b0:48f:c914:1996])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:83c5:b0:490:be14:bfda with SMTP id 5b1f17b1804b1-490ec48058fmr42511215e9.6.1781274173422;
+ Fri, 12 Jun 2026 07:22:53 -0700 (PDT)
+Date: Fri, 12 Jun 2026 15:22:41 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260527150236.1978655-5-smostafa@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260612142245.1015744-1-vdonnefort@google.com>
+Subject: [PATCH v1 0/4] trace_hyp_printk() for pKVM/nVHE hypervisor
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, rostedt@goodmis.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, tabba@google.com, qerret@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, May 27, 2026 at 03:02:34PM +0000, Mostafa Saleh wrote:
-> Sashiko (locally) reports out of bound write possiblity if SPMD
-> returns an invalid data.
-> 
-> While SPMD is considered trusted, pKVM does some basic checks,
-> for offset to be less than or equal len.
-> 
-> However, that is incorrect as even if the offset is smaller than
-> len pKVM can still access out of bound memory in the next
-> ffa_host_unshare_ranges().
-> 
-> Split this check into 2:
-> 1- Check that the fixed portion of the descriptor fits.
-> 2- After getting reg, check the variable array size addr_range_cnt
->    fits.
-> 
-> Also, drop the WARN_ONs as that will panic the kernel and in the
-> next checks there are no WARNs, so that makes it consistent.
-> 
-> Fixes: 0a9f15fd5674 ("KVM: arm64: pkvm: Add support for fragmented FF-A descriptors")
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 1af722771178..b6cf9ad82e12 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -607,8 +607,8 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
->  	 * check that we end up with something that doesn't look _completely_
->  	 * bogus.
->  	 */
-> -	if (WARN_ON(offset > len ||
-> -		    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
-> +	if (offset + CONSTITUENTS_OFFSET(0) > len ||
-> +	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
->  		ret = FFA_RET_ABORTED;
->  		ffa_rx_release(res);
->  		goto out_unlock;
-> @@ -641,6 +641,11 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
->  		goto out_unlock;
->  
->  	reg = (void *)buf + offset;
-> +	if (offset + CONSTITUENTS_OFFSET(reg->addr_range_cnt) > len) {
-> +		ret = FFA_RET_ABORTED;
-> +		goto out_unlock;
-> +	}
-> +
+Hi all,
 
-I wonder if we should do this check first and then mem_reclaim, the rational being that if the check fails
-the page will be lost forever.
+This series adds a hypervisor event "hyp_printk" which enables
+developers to log pretty much anything into the hypervisor tracing
+buffer, just like the kernel function trace_printk().
 
-```
-	reg = (void *)buf + offset;                                                                                                                                                                            
-	if (offset + CONSTITUENTS_OFFSET(reg->addr_range_cnt) > len) {                                                                                                                                         
-		ret = FFA_RET_ABORTED;                                                                                                                                                                         
-		goto out_unlock;                                                                                                                                                                               
-	}
+This enables rich logging from the hypervisor, while leaving all the
+string parsing burden to the kernel. This has been the main way of
+debugging pKVM in Android.
 
-	ffa_mem_reclaim(res, handle_lo, handle_hi, flags);                                                                                                                                                    
-	if (res->a0 != FFA_SUCCESS)                                                                                                                                                                           
-		goto out_unlock; 
-```                                                                                                                                                                                                      
+Even though not strictly related to trace_hyp_printk, I have added the
+following two patches:
 
->  	/* If the SPMD was happy, then we should be too. */
->  	WARN_ON(ffa_host_unshare_ranges(reg->constituents,
->  					reg->addr_range_cnt));
-> -- 
-> 2.54.0.746.g67dd491aae-goog
->
+  * KVM: arm64: Allow early calls to pKVM host_share/unshare_hyp
 
-Sebastian 
+    This one mainly intends to support one of the new features I have
+    posted here [1], which allows to enable tracing as early as
+    possible. I have added it here to limit cross-posting.
+
+  * KVM: arm64: Move kvm_define_hypevents.h to arch/arm64/kvm/
+
+    This one is just a cleanup.
+
+[1] https://lore.kernel.org/all/20260605163825.1762953-1-vdonnefort@google.com/
+
+Vincent Donnefort (4):
+  KVM: arm64: Allow early calls to pKVM host_share/unshare_hyp
+  KVM: arm64: Move kvm_define_hypevents.h to arch/arm64/kvm/
+  tracing/remotes: Add REMOTE_EVENT_CUSTOM_PRINTK() helper
+  KVM: arm64: Add hyp_printk event to nVHE/pKVM hyp
+
+ arch/arm64/include/asm/kvm_asm.h              |  4 +-
+ arch/arm64/include/asm/kvm_hypevents.h        | 14 ++++
+ arch/arm64/include/asm/kvm_hyptrace.h         |  8 +++
+ arch/arm64/kernel/image-vars.h                |  1 +
+ arch/arm64/kernel/vmlinux.lds.S               |  4 ++
+ .../define_hypevents.h}                       |  0
+ .../kvm/hyp/include/nvhe/define_events.h      |  2 -
+ arch/arm64/kvm/hyp/include/nvhe/trace.h       | 65 +++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/events.c              |  6 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  2 +-
+ arch/arm64/kvm/hyp_trace.c                    | 60 ++++++++++++++++-
+ include/trace/define_remote_events.h          | 19 +++++-
+ 12 files changed, 176 insertions(+), 9 deletions(-)
+ rename arch/arm64/{include/asm/kvm_define_hypevents.h => kvm/define_hypevents.h} (100%)
+
+
+base-commit: 4549871118cf616eecdd2d939f78e3b9e1dddc48
+-- 
+2.54.0.1136.gdb2ca164c4-goog
+
