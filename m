@@ -1,164 +1,199 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88163546EF
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 07:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6FF7E0FF
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 07:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781248633; cv=none; b=Gmo9vvCm5YzZ3y8IzIilwkLDPGR9+wSqJ1OwIbBTfirRS4p04PoFFAqewlT7PzF63hZ85SVPmTGh1+Dvm90eBtbV0zD6LCDiGabfYi6XrNHvi0qWwc+LqUnYZ7pMpsu5XP1k5YzkFsZvjNrWQUeXt0ccUXTxJSY2PgGRa4aW2iE=
+	t=1781248766; cv=none; b=bJJKHZY1SvX3vUL6C0oVFKENJmmyIygVucq4RWjbgkX5cv/gxop9jdHtkkPCdRz++JlkUBZQsMyO6WghNZKaRoCrzA9q/MA6b1ntkbsLm023joYnGyXFH0RMaJ9d0QNu+c3OW1FV13EksR1XjljVm5v0KxZBe1D7gj8Q1OWyRfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781248633; c=relaxed/simple;
-	bh=XuHuEPN1DT3M1LiDjuo8/JwAWfGMpWYR+6bUXYxoW24=;
+	s=arc-20240116; t=1781248766; c=relaxed/simple;
+	bh=nRspC37WIaw6uBSJUsMMOLIc2MN0j+s0h56sbh9e+0I=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=H7gy2hsWloqE/lvRA35PpgUSUf0kJ9hM6VC0LkI7UexQ5CtwyqCr1jL+/+y+Ml35PRJmZKPeZxuVPaNyfvWOgR11rtqavU9wIXZrINmiTeDSEv+Y7d4FaoS6PQJ/LIPXZW5YDeMOkkBHQ86nga+HmrB3aDfebDJohk9zBZnBZDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnwB+suM; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=tdxJwdtfDITzQe/Z8EFF89KA8H8BWbqhCGCqixIICEaKnMbfaqsulwSTDjBhxpsxULTcW0c2BjxG1r0ZPyXfwwyHtFd+NB5Ipjy+ggOmCkCHhYeCbsTFfZG/hLWmFut3NIKFUnxPFjK+Cb/y0Zb7i0pIs0sROkxh+0N15J7wIv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngjXlWbl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnwB+suM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DD1E1F000E9;
-	Fri, 12 Jun 2026 07:17:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ngjXlWbl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480E41F000E9;
+	Fri, 12 Jun 2026 07:19:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781248632;
-	bh=2B5VY8FPxFjEtH/OC5yUXfY2SdCYk/oVunqkmrz0X60=;
+	s=k20260515; t=1781248764;
+	bh=hBwosOfKeS4BgWh7sjsEn7o+3PovQQ70XUvBq46rGMY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ZnwB+suMCEGYJRwcNZp37mm7Ri3QQidPX0NmJ2lzJNq1n9vWxM5fp3ILuyYNcagc9
-	 gcWkH1J6w+OFI09ps19lmzh+wSfjr8I1hOIjNWx30Yt7Y000uwdwJAKpZnfHiUjBz4
-	 FLC0mR5gMqveCeE7Rfi1fuIHXbMK8YxkoxiiRoVMHBeu6vcD3yTAjAImGeiXW2Jx/b
-	 Gees171VrkQdnlzMxaoRbfDGu0T+2cMi9K2Tdu/Kf/Ee7UG4ifL9LfSkGAEJf0OJhV
-	 xoVhHGigxZwZXUrY905QmLFlYzQZ58NN90NppcPvgu+J2FbmM0rnCaqH1/hFg+GMz7
-	 7e8BADBC+RKRA==
+	b=ngjXlWblWuahAR95r8Jd/gWsKIBiZYRXBP8jDL/L/1keEgbEPXBl5+ex6BQqwNP64
+	 W1QUDTXG3wQN0fRcWBk41kt5ZFE6pRmK+vQ1LWCsjKJi3yBXQs1o3oWQRg/9oGugsm
+	 fNUHtZvBg75MIpYV7mCGJ+GWsVRQg0QVMw+ArwR0VvUama6iJh14CTdLrctS6gm5It
+	 rlNqHgQXB7CfbCO2UX8DPkVcdJ1IO833tOWM1/QA3R8sRWOUo/uJ0dz+MME3CPHvFE
+	 X8bZjA4gfF6Puzd6Dq00KSFrmM1UL4sx++pYgFXdj0IkBUzdXKYXV1LR6rhbL3gKuD
+	 wb4bAYgeJPG/A==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v1 05/11] KVM: arm64: Make vcpu_{read,write}_sys_reg
- available to HYP code
+Subject: Re: [PATCH v1 11/11] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
 Reply-To: sashiko-reviews@lists.linux.dev
 To: tabba@google.com
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260612065925.755562-6-tabba@google.com>
-References: <20260612065925.755562-6-tabba@google.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260612065925.755562-12-tabba@google.com>
+References: <20260612065925.755562-12-tabba@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 07:17:11 +0000
-Message-Id: <20260612071712.2DD1E1F000E9@smtp.kernel.org>
+Date: Fri, 12 Jun 2026 07:19:23 +0000
+Message-Id: <20260612071924.480E41F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [High] Hardware/Memory State Desynchronization in EL2 sysreg accessors
+
+New issues:
+- [High] Lazy vCPU state sync bypasses vcpu_mode_is_bad_32bit() check on no=
+n-trap VM exits due to stale CPSR.
+- [High] Exceptions injected by the host and other context modifications du=
+ring the KVM_RUN loop are silently dropped, causing infinite VM exit loops =
+or ignored requests.
+
+Pre-existing issues:
+- [Critical] Protected VM register state is unconditionally copied between =
+the hypervisor and untrusted host, violating pKVM confidentiality and integ=
+rity guarantees.
 --
 
-commit 69d4753f169931c6c1990fc9118b5a6cffe54554
+commit 96ecd36038c29097f333a40bf0eebd7b62bffc92
 Author: tabba@google.com <tabba@google.com>
+Subject: KVM: arm64: Implement lazy vCPU state sync for non-protected guests
 
-KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+This commit implements lazy synchronization of vCPU register state for
+non-protected guests running under pKVM. It defers copying the context from
+the host to the hypervisor until the host marks it dirty, and from the
+hypervisor to the host until the host requires it. The PC is synced on every
+exit to maintain accurate tracepoints.
 
-The vcpu_{read,write}_sys_reg() accessors are host-only, so helpers
-built on them such as kvm_vcpu_set_be()/kvm_vcpu_is_be() cannot be
-shared with hyp code. Add _vcpu_read_sys_reg()/_vcpu_write_sys_reg()
-inlines in kvm_emulate.h that dispatch on is_nvhe_hyp_code() to the
-host- or hyp-side accessor. A follow-up series uses this to share that
-emulation code at EL2.
-
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/as=
-m/kvm_emulate.h
-> index 5bf3d7e1d92c7..aed9fc0b717b1 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -506,6 +506,22 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(s=
-truct kvm_vcpu *vcpu)
->  	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
->  }
-> =20
-> +static inline u64 _vcpu_read_sys_reg(struct kvm_vcpu *vcpu, enum vcpu_sy=
-sreg reg)
-> +{
-> +	if (!is_nvhe_hyp_code())
-> +		return vcpu_read_sys_reg(vcpu, reg);
-> +
-> +	return __vcpu_sys_reg(vcpu, reg);
-> +}
-> +
-> +static inline void _vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, e=
-num vcpu_sysreg reg)
-> +{
-> +	if (!is_nvhe_hyp_code())
-> +		vcpu_write_sys_reg(vcpu, val, reg);
-> +	else
-> +		__vcpu_assign_sys_reg(vcpu, reg, val);
-> +}
-
-[Severity: High]
-If these accessors are called from nVHE EL2 code during guest exit handling,
-will they read and write from the in-memory sys_regs array instead of the
-active hardware registers?
-
-Since the guest's system registers remain live in the CPU hardware during t=
-he
-run loop:
-
-    do {
-        __guest_enter(vcpu);
-    } while (fixup_guest_exit(vcpu, &exit_code));
-
-and aren't saved to memory until __sysreg_save_state_nvhe() runs after the
-loop terminates, it seems _vcpu_read_sys_reg() might read stale values from
-memory.
-
-Likewise, would _vcpu_write_sys_reg() updates write to memory without updat=
-ing
-the active hardware registers before the guest is re-entered?
-
-> +
->  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 54aedf93c78b6..dccc3786548b0 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+[ ... ]
+> @@ -489,6 +504,13 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception=
+_index)
+>  /* For exit types that need handling before we can be preempted */
+>  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
 >  {
->  	if (vcpu_mode_is_32bit(vcpu)) {
-> @@ -516,9 +532,9 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *v=
-cpu)
-> =20
->  		r =3D vcpu_has_nv(vcpu) ? SCTLR_EL2 : SCTLR_EL1;
-> =20
-> -		sctlr =3D vcpu_read_sys_reg(vcpu, r);
-> +		sctlr =3D _vcpu_read_sys_reg(vcpu, r);
->  		sctlr |=3D SCTLR_ELx_EE;
-> -		vcpu_write_sys_reg(vcpu, sctlr, r);
-> +		_vcpu_write_sys_reg(vcpu, sctlr, r);
->  	}
->  }
+> +	/*
+> +	 * We just exited, so the state is clean from a hypervisor
+> +	 * perspective.
+> +	 */
+> +	if (is_protected_kvm_enabled())
+> +		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> +
 
 [Severity: High]
-When kvm_vcpu_set_be() is used at EL2, could this result in the guest being
-re-entered without the new endianness taking effect?
+When a guest exits (such as for ARM_EXCEPTION_IL or an IRQ), this clears the
+PKVM_HOST_STATE_DIRTY flag.
 
-Whether updating the 32-bit pstate via *vcpu_cpsr() or the 64-bit SCTLR via
-_vcpu_write_sys_reg(), the modifications appear to happen to the in-memory
-state rather than the active hardware registers (like SPSR_EL2 or SCTLR_EL1=
-).
+If the host handles the exit or processes pending requests (like
+KVM_REQ_VCPU_RESET or injecting undefined/SErrors), those operations modify
+the host's copy of the guest register context (vcpu->arch.ctxt).
 
-If so, wouldn't the updates be lost and unobserved by the guest upon re-ent=
-ry?
+However, since these paths bypass handle_trap_exceptions(), the
+PKVM_HOST_STATE_DIRTY flag is never set again.
 
+On the next guest entry, flush_hyp_vcpu() at EL2 will see the dirty flag is
+clear and skip calling __flush_hyp_vcpu().
+
+Will this cause exceptions injected by the host and other context modificat=
+ions
+made during the KVM_RUN loop to be silently dropped? For ARM_EXCEPTION_IL,
+does this mean the hypervisor will re-enter the guest using the old,
+unmodified register state, causing an instant re-trap?
+
+>  	if (ARM_SERROR_PENDING(exception_index)) {
+>  		if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
+>  			u64 disr =3D kvm_vcpu_get_disr(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index 23e644c24a03a..02383b372258f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+[ ... ]
+> @@ -168,7 +211,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp=
+_vcpu)
+>  	fpsimd_sve_flush();
+>  	flush_debug_state(hyp_vcpu);
 > =20
-> @@ -533,7 +549,7 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vc=
-pu)
->  	r =3D is_hyp_ctxt(vcpu) ? SCTLR_EL2 : SCTLR_EL1;
->  	bit =3D vcpu_mode_priv(vcpu) ? SCTLR_ELx_EE : SCTLR_EL1_E0E;
+> -	hyp_vcpu->vcpu.arch.ctxt	=3D host_vcpu->arch.ctxt;
+> +	/*
+> +	 * If we deal with a non-protected guest and the state is potentially
+> +	 * dirty (from a host perspective), copy the state back into the hyp
+> +	 * vcpu.
+> +	 */
+> +	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> +		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
+> +			__flush_hyp_vcpu(hyp_vcpu);
+> +	} else {
+> +		hyp_vcpu->vcpu.arch.ctxt =3D host_vcpu->arch.ctxt;
+
+[Severity: Critical]
+This is a pre-existing issue, but I have a question about this copy operati=
+on.
+
+This executes at EL2 and copies the entire vcpu.arch.ctxt from host_vcpu
+(memory accessible to the untrusted host EL1) into the protected VM's
+private state.
+
+Could this violate guest integrity by allowing the host to hijack the VM's
+control flow?
+
+> +	}
 > =20
-> -	return vcpu_read_sys_reg(vcpu, r) & bit;
-> +	return _vcpu_read_sys_reg(vcpu, r) & bit;
->  }
+>  	hyp_vcpu->vcpu.arch.mdcr_el2	=3D host_vcpu->arch.mdcr_el2;
+>  	hyp_vcpu->vcpu.arch.hcr_el2 &=3D ~(HCR_TWI | HCR_TWE);
+[ ... ]
+> @@ -191,9 +244,11 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
+vcpu)
+>  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
+>  	sync_debug_state(hyp_vcpu);
+> =20
+> -	host_vcpu->arch.ctxt		=3D hyp_vcpu->vcpu.arch.ctxt;
+> -
+> -	host_vcpu->arch.hcr_el2		=3D hyp_vcpu->vcpu.arch.hcr_el2;
+> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> +		host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
+
+[Severity: Critical]
+This is a pre-existing issue, but I have a similar question about copying
+the protected guest's register state back to the host here.
+
+Does copying hyp_vcpu->vcpu.arch.ctxt back into the untrusted
+host_vcpu->arch.ctxt violate pKVM confidentiality guarantees by leaking
+the state to the host?
+
+> +	else
+> +		/* Keep the PC current for the kvm_exit tracepoint (lazy ctxt sync). */
+> +		host_vcpu->arch.ctxt.regs.pc =3D hyp_vcpu->vcpu.arch.ctxt.regs.pc;
 
 [Severity: High]
-Could this result in kvm_vcpu_is_be() reading an incorrect endianness state
-at EL2?
+Since handle_trap_exceptions() is only called for traps, an exit like
+ARM_EXCEPTION_IRQ won't trigger the __pkvm_vcpu_sync_state hypercall.
 
-If the guest modifies SCTLR_EL1 and traps to EL2, calling this helper would
-use _vcpu_read_sys_reg() which accesses the stale memory array instead of t=
-he
-current hardware register state.
+Because this code only synchronizes the pc field for non-protected guests,
+vcpu->arch.ctxt.regs.pstate (CPSR) remains stale in the host vCPU context.
+
+Does this lazy synchronization leave the host with a stale CPSR on non-trap
+exits?
+
+If the guest transitioned to an illegal 32-bit mode immediately before the
+IRQ was taken, would the KVM_RUN inner loop evaluate vcpu_mode_is_bad_32bit=
+()
+using this stale CPSR, bypassing KVM's architectural protection against ill=
+egal
+AArch32 execution?
+
+> =20
+>  	host_vcpu->arch.fault		=3D hyp_vcpu->vcpu.arch.fault;
+>
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612065925.7555=
-62-1-tabba@google.com?part=3D5
+62-1-tabba@google.com?part=3D11
