@@ -1,118 +1,100 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE093C6608
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 11:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A68392806
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 11:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781263511; cv=none; b=XG8XdSKYzALethpBcKzSLrP+M4S64b5PHCuhPFSDBlchD2ogz4Ux93E03coLG7mvarURdwYpgZphEXnWjzIxP7yVV6S7DMLMMCFTa3vsqiXs6FYKSQ7bQ81/NdH5lQDkTMJ5qAJwI79tfKxBzr2dlaB39H7mm57pfPFYAxX/Zjk=
+	t=1781264059; cv=none; b=kh7csS2HjQGtr4wcVdMpQaJR2614wLXpUX4INeYWrP5NF2BdcAoQFc+l5as0QuCGQlYrlEs8rFLudKS+winqlJ5EC1kz0hGNN6rU4eBCGxKxm1ryMODyUhQKlxQTJReR033N7PIkJrYy4cBt2f03dOZ7JYbeodBpqEruxnn5CAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781263511; c=relaxed/simple;
-	bh=8+TMBPFLOXt4CEGgo5MuL/IbBwkWinUUx43hn6z7Rk4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=o4ra79mU96jgMy45ARe3rIQaUo8XyoSVyyMROSyzuO6QBThGaK/unpoaaQx29/gxurboy2ciVv/k7ZslLaHfBKTvWesWBJYlnDhWPxUqo4PO+KwGurxGjXqT0yk/EukHc1yyx1QiNneOxn9wcJ0ILUcl5n4HKjO2TCBCMVQo7XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AEiHIkDV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1781264059; c=relaxed/simple;
+	bh=39WpqfsqMXIC7gz122vRXwFEhrpbSRz2/WCB6ufDKeg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZkUuoawkeGyhlgIPjxNNahtCsl2nnkdjDjIBG5uzMtyn7AuxLKBX22iCZJTThD8xV9RE9f8j5/wvNqtYoF6YtFC7FIbqG9QBNE5LVjuUNZfkihttcqZjDeN75bxgtSAbItggi+cJARJmZ8MH6jVMDIhqfVuFO9BRJ85AP2+Vbgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BdJT5aFB; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEiHIkDV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781263507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aEJtkLPRSIgHIFIU0/rrxmffA42MTYT1FFKMyK/sGAM=;
-	b=AEiHIkDVSqyt7vgooZBeg00vWKDrvqsseEhumojmpZGT0UqAdozV6hu4p0GbQcd/hN4NRX
-	55lRw9RAEcPZse9S5o1781DfapREZTLGuWNA1kopGItLz2curHWPM0oQgFYgZpbqOdL35t
-	keG88H0BI7japxr6IYV4MQ4PPYA8Mww=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-426-WHrgOT3-MxebZ8ilUpvDmg-1; Fri,
- 12 Jun 2026 07:25:04 -0400
-X-MC-Unique: WHrgOT3-MxebZ8ilUpvDmg-1
-X-Mimecast-MFC-AGG-ID: WHrgOT3-MxebZ8ilUpvDmg_1781263502
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5F94D1800845;
-	Fri, 12 Jun 2026 11:25:02 +0000 (UTC)
-Received: from localhost (unknown [10.44.49.167])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5EFEB1954128;
-	Fri, 12 Jun 2026 11:25:00 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Khushit Shah <khushit.shah@nutanix.com>, "eric.auger@redhat.com"
- <eric.auger@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Shaju Abraham
- <shaju.abraham@nutanix.com>, Mark Cave-Ayland
- <mark.caveayland@nutanix.com>, =?utf-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Shameer
- Kolothum <skolothumtho@nvidia.com>, Jinqian Yang <yangjinqian1@huawei.com>,
- Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: [RFC] arm: property and value naming summary between named CPU
- models vs customizable host model
-In-Reply-To: <B820643E-3F14-4CDA-BA6B-09C632F17B9E@nutanix.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Avril Crosse O'Flaherty"
-References: <B820643E-3F14-4CDA-BA6B-09C632F17B9E@nutanix.com>
-User-Agent: Notmuch/0.40 (https://notmuchmail.org)
-Date: Fri, 12 Jun 2026 13:24:57 +0200
-Message-ID: <87bjdgm25y.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BdJT5aFB"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-68d9309b510so741020a12.3
+        for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 04:34:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781264055; x=1781868855; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Xa5/25SiNRkAqSjzYKvz46uYWaA8u0CL9trp73+tAk4=;
+        b=BdJT5aFBVheWxJFI8qUgAaKbb+Wnl855uF2tweBiPuSCv2ObQJ/Klv/uAuuYKjqvE9
+         oVM/vSCzi51fN1/c3J6JqnZ8bWDER0i5pQcM9WUgeWuji1D2ewZrb940a/W5a+rZWc5k
+         qpZ6SVf0U4a75LignVPtaArmCoGfX2YS+vxkgfJ3lmSn9EOtAbmZdY7KpiE4j8XzZXoq
+         jqWxcAcsWQ2ij0tOkwbDEnwUFq9VF36zg5hoCL5pjiXoWR5XE2bZtr9iD4Wp2BBGuaNq
+         aCLbppjTRXT1Aov6ljBKEC3mbofAeATD+kJS6R7wZ9AoMQ+ikIzalh1QBTwL2/RLssGV
+         Vkuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781264055; x=1781868855;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xa5/25SiNRkAqSjzYKvz46uYWaA8u0CL9trp73+tAk4=;
+        b=NogXWEphL3WJuXq88cLZJMJ2ruUJVYhQOjksVg8gq9TGzQ/WdH8uWZlzNd4yRb6y/G
+         l8WHftibSA3NSsm8rR277syN9yQJaeiLv4R4bvTPHXHQMqWspWaua4grNkHxD85q7gUq
+         vLCpvCKoMZrWovcu03gCQG6jbpxUmkuy3wePXTomnciefeP4ZNXPHc0eVK6RVbpEQ2nK
+         MIJq55TZEDwO4v5GgOMGXvyiUE5fK/JSlaDa7P0QPm3ChJuMWsGWtZtUYf8oSclq89Bu
+         SpPyy77WXyegj1+wIkpzhNTACXER8RFZ4ajbhlLWvy9bCmA5uZilaBftWybExasfpG8w
+         wJOA==
+X-Forwarded-Encrypted: i=1; AFNElJ+tnf0Q82Ks4r6AEQ2hFWi09ouKHEC+OLOAAasW2mNio9rZyy22YRTzgi6lD0/7J0bw7me99eQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YybaFgw4E15ohnsfdKRs/Dsqj1sP1HRu/cYrCq0xAj82fLsZZFm
+	lXzNmX3CPLdqEQQsPOJHZriSOl2i47nN7jfvXwqM0zhM+MX/R+zwrqN8WGtBcINMamqZmfchRgP
+	mKg==
+X-Received: from edber23.prod.google.com ([2002:a05:6402:4497:b0:691:acc4:471e])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:3607:b0:691:956a:cf6a
+ with SMTP id 4fb4d7f45d1cf-693785fed15mr1080488a12.12.1781264054903; Fri, 12
+ Jun 2026 04:34:14 -0700 (PDT)
+Date: Fri, 12 Jun 2026 12:34:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-MFC-PROC-ID: EovqPXTFcoZUN0hCGuniqnYKQ2oalnFMyNs1c2SW4aQ_1781263502
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260612113414.1022901-1-tabba@google.com>
+Subject: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
+From: Fuad Tabba <tabba@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Sascha Bischoff <Sascha.Bischoff@arm.com>, Andrew Jones <drjones@redhat.com>, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jun 10 2026, Khushit Shah <khushit.shah@nutanix.com> wrote:
+When pKVM injects a synchronous exception into a protected guest, it
+re-enters without restoring the guest's EL1 sysregs and writes the EL1
+exception registers to hardware by hand: ESR_EL1 and ELR_EL1, but not
+SPSR_EL1. enter_exception64() sets SPSR_EL1 (the interrupted PSTATE)
+only in memory, so the guest's handler reads a stale SPSR_EL1 and
+restores the wrong PSTATE on eret.
 
-Thank you for the writeup!
+Write SPSR_EL1 alongside the other exception registers.
 
-(...)
+Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
+Reported-by: sashiko <sashiko@sashiko.dev>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> I have tried to keep the comparison above neutral, but Eric/Cornelia can
-> add more. I see real merit in [2]'s simplicity and generalization. But
-> for [1], I love a command line that looks like:
-> -cpu host,feat_DP=off,feat_AES=off,feat_RAS=0.0,...
->
-> instead of:
-> -cpu host \
->      SYSREG_ID_AA64ISAR0_DP=0,\
->      SYSREG_ID_AA64ISAR0_AES=0,\
->      SYSREG_ID_AA64PFR0_RAS=0,\
->      SYSREG_ID_AA64PFR1_RAS_FRAC=0 
->
-> I have no strong preference on this topic. The named CPU model layer is
-> independent of whichever convention we choose here, so I'd like the
-> community to decide which direction makes the most sense :)
-
-I see the human-friendliness of providing prop names as in [1], but I
-also see the advantages of generating properties automatically from the
-ARM specification in [2]. Maybe there's a way to get the best of both
-worlds? Can we expose the feat_XXX properties to users by mapping them
-to the relevant registers respectively the combinations of them and
-still keep the raw sysregs for those cases where something does not
-match to feat_XXX (e.g. some cache values), or just as an alternative
-way of configuring things?
-
-Also, we've mostly talked about KVM so far. If we also consider TCG, or
-other hypervisors such as HVF, I'd be in favour of grabbing definitions
-from the spec, instead of from a specific kernel. (We can still choose
-to match the Linux names, but we should not have to.)
-
-There are also some pre-existing properties for cpus; can we express
-them via the new interfaces, or do we want to deprecate them, only
-keeping those that do not match to hardware, but to accelerator
-implementation details?
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 8c3fbb413a06..1a7d5cd16d72 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -268,6 +268,7 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u64 esr)
+ 
+ 	write_sysreg_el1(esr, SYS_ESR);
+ 	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
++	write_sysreg_el1(read_sysreg_el2(SYS_SPSR), SYS_SPSR);
+ 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+ 	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+ }
+-- 
+2.54.0.1136.gdb2ca164c4-goog
 
