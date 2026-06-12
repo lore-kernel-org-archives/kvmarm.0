@@ -1,210 +1,285 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F0B3EDE73
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 13:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781270390; cv=pass; b=kerh+WfNhi4i0nHEaBlKb1YFkugUqH87Ddhq2qhGkxm47cOtWRWRPcTcHr86b/mir7+l5YquwNsHcI8/qdU8sSMmbFuVnMoQQnw1WXw1YTtYCa+mYyl/vTAXp2CoIUorNGzKENnVLxuZJVonrkC8bUcUHmLQieP1y0qS2v92L0s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781270390; c=relaxed/simple;
-	bh=nFyh8t7EajDFt4ntCcUZcAhFL09Lu/fiOAfEpgamjcE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e0vCX2f1I30Rx7eoWbsQKjvkrS9uy/JIVrCb5cqmBzIjrse7s78YTTlXxJnygPgwvsZMRm9k6ySsOaZkpG7ShtxvlnZWUFQV86dAgBIlwgkViiN6LZQqmGvc0xk8xrSDhNtWYYOLSxNCvafrSgfbAYuBvYFfjO/VuHn7DgThB44=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=auhoh0Ee; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05303DD879
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 13:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781271743; cv=none; b=o53C6BfFHiypTnvNhAx+6VaJi08soKxzPCIqtr+e/Jz69RyCqerjC2dl0awGJplKsuKTxu1fbvIhM/6QUICEfKKpWgrejU7qs0nTBqeojRrpgWxICRH2NxLg+u5LusOKMYjY2H0DusAmsDQdC9IU0xt0CPeKADlDsm5gzs8s6OU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781271743; c=relaxed/simple;
+	bh=eua9MmlsAPXk7l/PzmixtKYHLsF1xQ8UDUBR4GoTHd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sLcyUb3upi8v3SXH2K6QgcadK0nh9Spcec+ROJRy6JloMr1aWK20mPfSmGK89hVf0r8lyTt4pl6jLMm8b0FPsS0IrAgwCsgq1OSi94KFZAIEH36kxBbRLm/lrlQbM0n61tII0wkGP4c+SXCogb8taPLOmNJ239sxE2vgO+C8noc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Khe+2Z2f; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auhoh0Ee"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51765331535so428611cf.1
-        for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 06:19:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781270388; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LGWNB3pVRMyrYpeV1DiSOrbvSZ9NBuyFxUBn5qaWS/Yava3Mq0+uI3XWCRVNPBVV7t
-         AzRNVyRE8zYGEhI3Jz4pAjESF2Gswsjd3mi2muVC1T/NeQ3p3T/Tr7fBQjNVyZTkY/U2
-         i/J1edugAr9N9QizdG0efqfHuNjG5Usr5p1xUUg5nZUpOYz8kLdzLy8l5FXFT0ROuFLZ
-         FDPIRMt0WtAHF5W/zrmBSOiLNoruPZn8EAoWgMRhUuxianelYt/N0oQnKJXnC5EWz7A1
-         FUZzStp08E3g8Mk8uO7uqpU2M6nMRCm6NfzXtlTEsSUtX9htoo2Tv2PYRnU1j2MX0b8O
-         snMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jeBSFCbpglspfyD74FVX/lua1owJC/8kPxNkA+8dxq0=;
-        fh=Ara2QBSz+elVnVa89rTQ6wHqtPcLquY/1o5pXVsdPwI=;
-        b=DPGXM1s8E0TR1Vx8ygt5S8t2m9Q4FxhlnzpHgKG71/KYpE8v9yKxRxrM6gQAYQ8rlj
-         Qvq2q21zur9O8N0McF1VAqt7w47ErXE9G9tkvSBhs4icultTI7G6J822+xA9pDof2XQT
-         WLp4CToMdNft/sc1ilsnbeNrpVBV4FurgW1wm28kQOfPOKz3+7eIdOKrJgGRVEp9p78m
-         lDOP4EX5XlLOdmxOlgBt7UJ/RI94GJVvtHKFw83UysVjYhOdXyKtqRrArGBHshIrsmOz
-         PTAfcVhutiPfp7jQTZyiZnT2u6GW9EYI9ypej7eVT9KaRGdl8GUDuVaV6j0R4LhTqSC3
-         cQAw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781270388; x=1781875188; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jeBSFCbpglspfyD74FVX/lua1owJC/8kPxNkA+8dxq0=;
-        b=auhoh0Eecl3WjzlOLIe2JN5a83kxLm6XuipO7A9Z0ZQ14dAHLi7d5iikX+z5PMaxqL
-         e9+i+WHuQiSbtKxNujA47Gj+G9tuCLnB7kVJ8JgxA5OUoX61edm/3K1r5H/4pEXNnR0K
-         sYoGxSOHIC201J8amU3JxUHo7xH9KgnlX1fEI7u3ws3auKvw7f3LnLetXph0C6stb32R
-         Dx9ljw5ov+FDExodedph/ggOBg4A1TAISWYGSDwXTXaeq0x54LBH+sZsEtcUxzc2nQBh
-         bNVXnpBe+0YiwLqP+oLC8ZbbGJWch3P7lQvlJxt+QVHs9LB87c0sJZUw/v3IoC38WpVz
-         rsTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781270388; x=1781875188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jeBSFCbpglspfyD74FVX/lua1owJC/8kPxNkA+8dxq0=;
-        b=noyirLk3iOATR+lCr7TYgQ5d75oArxyF94Q8QjILGzrqRDBXEBhEY4mQrKK9jPWyaU
-         gGSz5Q0nueydlRh7Qat5UOi4g5AUn1qutPx3Rl1008HyZoh8wuJflDvYv63L1Ou8bGdb
-         lcLy0qwAzyeinI5sucrw2H5dSSbIpYvTIikkt+0+1sYqUFEV2ezITLP4tSknmQYScGtF
-         9PbNR90aL9wYo0K0XMwXjSrusazEqwFVRres3isuLaxm3KuB+3FtBi7LzoV8adNsrj6s
-         x2MMwjN7v8Q9Hmq/nvPezg+mIOBsWfO3n5zyRUK3SPQL19YKFCD/EE/6uJFkEX2JBCUf
-         OTMQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9gFDjPNjWhNg8Z0aQrqHsFymdf15DsTwuBDrYikRmSWPJRLlNeJYKFkNS/cWbb0OG3lBqnqC0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzc87ztlQZcazmMZrHfI0M54kekKOyKf7OLFq+iRum/eqRQ72bh
-	MqFznZH/MZTwJnKN3z/yRBkFsfrGCOY75kTwDCEUm7lHedQ0N5XB89kdI++kNiy5/obqTT0WvaO
-	kaHNKvLrn9mDQ6e/J9wIImIMQI1oGWnyJq2YA6yIG
-X-Gm-Gg: Acq92OFo5HI+9lBjf8GtEW/+CLCnAohPLIfmQoq5BsJVtWiBRcBWV1DMxVl2n4L4Rie
-	OGxj1Dx26dPsIxfRd8x2b6dTmLMfsxJDP5YZGa4RTAFK+pcn1hiHoScKvcryYyr9jXcrTOzQ6GZ
-	NRYBf/s6TdnVuX1F0lVI2dnYjv57+8WmXvR88TH2GFfpCqw/s24gmXrUTe0KZ1kwCSyD+ZxbFs6
-	Ry/TXSlQgVdLGv8CDY9f0is/QW/Z9FYJFgGc+BMaNOvbNrP1Wck1POe8+RvgPpoOYI18nFlV/bu
-	AuhwTDNC
-X-Received: by 2002:ac8:5c84:0:b0:516:4f62:85ee with SMTP id
- d75a77b69052e-517fc539337mr7163811cf.19.1781270387386; Fri, 12 Jun 2026
- 06:19:47 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Khe+2Z2f"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30B272C42;
+	Fri, 12 Jun 2026 06:42:07 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 54D693FBB1;
+	Fri, 12 Jun 2026 06:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1781271731; bh=eua9MmlsAPXk7l/PzmixtKYHLsF1xQ8UDUBR4GoTHd4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Khe+2Z2fsukSNEUHG5rT5+g5dmxqOYQJNKluIlN0/UQsXFyUsYe0BFDBeWEIPMz49
+	 D1qB5JthIFBbxs33MzDr/uolLGNNilkIq99MEJKExQ+zjwkc73VRPEosI76r7qw6Vk
+	 n8Dt97aAMVTSQ64P9brFnMZvQR61XLqVZkBYG4oM=
+Date: Fri, 12 Jun 2026 14:41:59 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Expose shadow page tables in
+ debugfs
+Message-ID: <5djyymfv4a2anfo4gf2uk5xdscrlyjnmznsucmubmouz4qs6fp@m2emhgb2kivp>
+References: <20260317182638.1592507-1-weilin.chang@arm.com>
+ <20260317182638.1592507-3-weilin.chang@arm.com>
+ <aiuF0KSvvv-ZozI1@sm-arm-grace07>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260612113414.1022901-1-tabba@google.com> <20260612115044.16E3B1F000E9@smtp.kernel.org>
-In-Reply-To: <20260612115044.16E3B1F000E9@smtp.kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 12 Jun 2026 14:19:10 +0100
-X-Gm-Features: AVVi8CeZAvlVseat-uw7HL7_ZEkG6zTq14eM1kOd7oylk537wMpvUkPkSyGidyQ
-Message-ID: <CA+EHjTyFFf__9iGFAyAkechiX+gaiK9ksdfgxLSFe8RcAY=HGA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception
- into a pVM
-To: sashiko-reviews@lists.linux.dev, Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aiuF0KSvvv-ZozI1@sm-arm-grace07>
 
-On Fri, 12 Jun 2026 at 12:50, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
->
-> Pre-existing issues:
-> - [High] Stale `SCTLR_EL1` used during synchronous exception injection in=
- protected VMs leads to incorrect `PSTATE` computation.
-> - [High] pKVM's `inject_undef64()` injects an undefined instruction excep=
-tion with the `IL` (Instruction Length) bit cleared in `ESR_EL1`, incorrect=
-ly indicating a 16-bit instruction to an AArch64 guest.
-> --
->
-> commit 5157ad995c29fa359271604075525691515c2f95
-> Author: Fuad Tabba <tabba@google.com>
->
-> KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
->
-> When pKVM injects a synchronous exception into a protected guest, it
-> re-enters without restoring the guest's EL1 sysregs. This commit ensures
-> SPSR_EL1 is written alongside the other exception registers to avoid
-> restoring a stale PSTATE on eret.
->
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nv=
-he/sys_regs.c
-> > index 8c3fbb413a06d..1a7d5cd16d723 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > @@ -268,6 +268,7 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u6=
-4 esr)
-> >
-> >       write_sysreg_el1(esr, SYS_ESR);
-> >       write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
->
-> [Severity: High]
-> This isn't a bug introduced by this patch, but since we are fixing sysreg
-> synchronization in inject_sync64(), is there also a missing synchronizati=
-on
-> for SCTLR_EL1 before pending the exception?
+Hi Itaru,
 
-How quickly you forget my AI friend. I submitted a fix here, when you
-flagged this very issue:
-https://lore.kernel.org/all/20260612102347.914994-1-tabba@google.com/
+On Fri, Jun 12, 2026 at 01:06:40PM +0900, Itaru Kitayama wrote:
+> Hi Wei Lin,
+> On Tue, Mar 17, 2026 at 06:26:38PM +0000, Wei-Lin Chang wrote:
+> > Exposing shadow page tables in debugfs improves the debugability and
+> > testability of NV. With this patch a new directory "nested" is created
+> > for each VM created if the host is NV capable. Within the directory each
+> > valid s2 mmu will have its shadow page table exposed as a readable file
+> > with the file name formatted as 0x<vttbr>-0x<vtcr>-s2-{en,dis}abled. The
+> > creation and removal of the files happen at the points when an s2 mmu
+> > becomes valid, or the context it represents change. In the future the
+> > "nested" directory can also hold other NV related information.
+> > 
+> > This is gated behind CONFIG_PTDUMP_STAGE2_DEBUGFS.
+> > 
+> > Suggested-by: Marc Zyngier <maz@kernel.org>
+> > Reviewed-by: Sebastian Ene <sebastianene@google.com>
+> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  9 +++++++++
+> >  arch/arm64/include/asm/kvm_mmu.h  |  4 ++++
+> >  arch/arm64/kvm/nested.c           |  6 +++++-
+> >  arch/arm64/kvm/ptdump.c           | 27 +++++++++++++++++++++++++++
+> >  4 files changed, 45 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 5d5a3bbdb95e..52977c9a11c3 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+> >  	 */
+> >  	bool	nested_stage2_enabled;
+> >  
+> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > +	struct dentry *shadow_pt_debugfs_dentry;
+> > +#endif
+> > +
+> >  	/*
+> >  	 * true when this MMU needs to be unmapped before being used for a new
+> >  	 * purpose.
+> > @@ -405,6 +409,11 @@ struct kvm_arch {
+> >  	 * the associated pKVM instance in the hypervisor.
+> >  	 */
+> >  	struct kvm_protected_vm pkvm;
+> > +
+> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > +	/* Nested virtualization info */
+> > +	struct dentry *debugfs_nv_dentry;
+> > +#endif
+> >  };
+> >  
+> >  struct kvm_vcpu_fault_info {
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index d968aca0461a..01e9c72d6aa7 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -393,8 +393,12 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
+> >  
+> >  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> >  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
+> > +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
+> > +void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
+> >  #else
+> >  static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
+> > +static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
+> > +static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
+> >  #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> >  
+> >  #endif /* __ASSEMBLER__ */
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index eeea5e692370..31d74ed8449e 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -730,8 +730,10 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+> >  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
+> >  
+> >  	/* Make sure we don't forget to do the laundry */
+> > -	if (kvm_s2_mmu_valid(s2_mmu))
+> > +	if (kvm_s2_mmu_valid(s2_mmu)) {
+> > +		kvm_nested_s2_ptdump_remove_debugfs(s2_mmu);
+> >  		s2_mmu->pending_unmap = true;
+> > +	}
+> >  
+> >  	/*
+> >  	 * The virtual VMID (modulo CnP) will be used as a key when matching
+> > @@ -745,6 +747,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+> >  	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+> >  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
+> >  
+> > +	kvm_nested_s2_ptdump_create_debugfs(s2_mmu);
+> > +
+> 
+> This function can sleep, so I get while running your shadow stage 2 KVM
+> selftest a messge:
+> 
+> [ 4408.411009] BUG: sleeping function called from invalid context at kernel/locking/rwsem.c:1624
+> [ 4408.411075] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 164, name: shadow_stage2
+> [ 4408.411136] preempt_count: 2, expected: 0
+> [ 4408.411172] RCU nest depth: 0, expected: 0
+> [ 4408.411228] CPU: 1 UID: 0 PID: 164 Comm: shadow_stage2 Tainted: G        W           7.1.0-rc2+ #48 PREEMPT(full)
+> [ 4408.411336] Tainted: [W]=WARN
+> [ 4408.411368] Hardware name:  , BIOS
+> [ 4408.411403] Call trace:
+> [ 4408.411427]  show_stack+0x24/0x50 (C)
+> [ 4408.411524]  dump_stack_lvl+0x90/0x158
+> [ 4408.411633]  dump_stack+0x1c/0x38
+> [ 4408.411741]  __might_resched+0x168/0x208
+> [ 4408.411839]  __might_sleep+0x54/0xb0
+> [ 4408.411936]  down_write+0x30/0xe8
+> [ 4408.412048]  start_dirop+0x3c/0xc0
+> [ 4408.412149]  simple_start_creating+0xb8/0xc8
+> [ 4408.412241]  debugfs_start_creating.part.0+0x68/0x180
+> [ 4408.412375]  __debugfs_create_file+0x80/0x1f8
+> [ 4408.412505]  debugfs_create_file_full+0x28/0x68
+> [ 4408.412637]  kvm_nested_s2_ptdump_create_debugfs+0xa0/0x108
+> [ 4408.412734]  kvm_vcpu_load_hw_mmu+0x27c/0x320
+> [ 4408.412839]  kvm_arch_vcpu_load+0x318/0x5a0
+> [ 4408.412971]  kvm_emulate_nested_eret+0x148/0x3d8
+> [ 4408.413072]  kvm_handle_eret+0x110/0x138
+> [ 4408.413190]  handle_exit+0x6c/0x1e8
+> [ 4408.413306]  kvm_arch_vcpu_ioctl_run+0x3c4/0xc90
+> [ 4408.413396]  kvm_vcpu_ioctl+0x1a0/0xa68
+> [ 4408.413508]  __arm64_sys_ioctl+0xd0/0x160
+> [L1] L2 exit[ 4408.413631]  invoke_syscall+0xa8/0x138
+> [ 4408.413723]  el0_svc_common.constprop.0+0x4c/0x140
+> [ 4408.413821]  do_el0_svc+0x28/0x58
+> [ 4408.413911]  el0_svc+0x48/0x230
+> [ 4408.414035]  el0t_64_sync_handler+0xc0/0x108
+> [ 4408.414166]  el0t_64_sync+0x1b4/0x1b8
+> 
+> I tried to move this function out under the KVM MMU lock, but then I see
+> a debug entry is duplicated error. I am not sure where exactly this 
+> nested stage 2 debugfs entry create function should go, your help is
+> much appreciated.
 
->
-> Earlier in inject_sync64(), VBAR_EL1 is explicitly synchronized to memory
-> because traps are handled early:
->
-> arch/arm64/kvm/hyp/nvhe/sys_regs.c:inject_sync64()
->         /*
->          * Make sure we have the latest update to VBAR_EL1, as pKVM
->          * handles traps very early, before sysregs are resync'ed
->          */
->         __vcpu_assign_sys_reg(vcpu, VBAR_EL1, read_sysreg_el1(SYS_VBAR));
->
->         kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
->
->         __kvm_adjust_pc(vcpu);
->
-> However, when __kvm_adjust_pc() eventually invokes enter_exception64(), i=
-t
-> reads SCTLR_EL1 from memory to compute the new PSTATE:
->
-> arch/arm64/kvm/hyp/exception.c:enter_exception64()
->         sctlr =3D __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->
-> Because SCTLR_EL1 wasn't synchronized from hardware like VBAR_EL1 was,
-> could the guest's exception handler end up executing with a stale PSTATE.=
-PAN
-> and PSTATE.SSBS?
->
-> > +     write_sysreg_el1(read_sysreg_el2(SYS_SPSR), SYS_SPSR);
-> >       write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-> >       write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+Thanks for your report!
+
+I think this is a real problem, and it's not trivial to solve..
+As per the backtrace, debugfs_create_file() can sleep, and our context
+is not only holding the mmu_lock, but also non-preemptable.
+
+Moving the file creation out of the mmu_lock triggers debug entry
+duplication because multiple vCPUs can be using the same s2 context.
+Originally in get_s2_mmu_nested() creation is triggered for the case of
+first use (refcnt 0 -> 1).
+
+Adding a check for first use (refcnt == 1) outside of the mmu_lock also
+doesn't help. Once outside the lock there is no guarantee what the
+refcnt of the s2 mmu is, other than it will be >= 1, because we just got
+one reference. As an example both vCPU threads can believe they are the
+second user, and none creates the file. Additionally,
+kvm_vcpu_load_hw_mmu() is still non-preemptable.
+
+After analyzing the above, I think we have to change how this works.
+I am thinking instead of dynamic debugfs files, we move to a static "all
+shadow stage-2 ptdump" file (thanks to AI for pointing out this
+possibility), whose lifetime is tied to the VM, same as the other KVM
+ptdump files. When the file needs to read the shadow stage-2s, we take
+the lock.
+
+Let me know if you find this bad or wrong! In the mean time I'll try
+this out.
+
+Thanks,
+Wei-Lin Chang
+
+> 
+> Thanks,
+> Itaru.
+> 
+> >  out:
+> >  	atomic_inc(&s2_mmu->refcnt);
+> >  
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > index 98763b291956..aebbbad85d38 100644
+> > --- a/arch/arm64/kvm/ptdump.c
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -10,12 +10,14 @@
+> >  #include <linux/kvm_host.h>
+> >  #include <linux/seq_file.h>
+> >  
+> > +#include <asm/cpufeature.h>
+> >  #include <asm/kvm_mmu.h>
+> >  #include <asm/kvm_pgtable.h>
+> >  #include <asm/ptdump.h>
+> >  
+> >  #define MARKERS_LEN		2
+> >  #define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
+> > +#define S2FNAMESZ	sizeof("0x0123456789abcdef-0x0123456789abcdef-s2-disabled")
+> >  
+> >  struct kvm_ptdump_guest_state {
+> >  	struct kvm_s2_mmu	*mmu;
+> > @@ -277,6 +279,28 @@ static const struct file_operations kvm_pgtable_levels_fops = {
+> >  	.release	= kvm_pgtable_debugfs_close,
+> >  };
+> >  
+> > +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu)
+> > +{
+> > +	struct dentry *dent;
+> > +	char file_name[S2FNAMESZ];
+> > +
+> > +	snprintf(file_name, sizeof(file_name), "0x%llx-0x%llx-s2-%sabled",
+> > +		 mmu->tlb_vttbr,
+> > +		 mmu->tlb_vtcr,
+> > +		 mmu->nested_stage2_enabled ? "en" : "dis");
+> > +
+> > +	dent = debugfs_create_file(file_name, 0400,
+> > +				   mmu->arch->debugfs_nv_dentry, mmu,
+> > +				   &kvm_ptdump_guest_fops);
+> > +
+> > +	mmu->shadow_pt_debugfs_dentry = dent;
+> > +}
+> > +
+> > +void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu)
+> > +{
+> > +	debugfs_remove(mmu->shadow_pt_debugfs_dentry);
+> > +}
+> > +
+> >  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
+> >  {
+> >  	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
+> > @@ -285,4 +309,7 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
+> >  			    &kvm->arch.mmu, &kvm_pgtable_range_fops);
+> >  	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
+> >  			    &kvm->arch.mmu, &kvm_pgtable_levels_fops);
+> > +	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+> > +		kvm->arch.debugfs_nv_dentry =
+> > +			debugfs_create_dir("nested", kvm->debugfs_dentry);
 > >  }
->
-> [Severity: High]
-> This is a pre-existing issue, but looking at the related inject_undef64()
-> function located just below inject_sync64():
->
-> arch/arm64/kvm/hyp/nvhe/sys_regs.c:inject_undef64()
-> static void inject_undef64(struct kvm_vcpu *vcpu)
-> {
->         inject_sync64(vcpu, (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT));
-> }
->
-> Does this need to set the ESR_ELx_IL bit?
->
-> According to the ARM Architecture Reference Manual, for an Unknown reason
-> exception (EC =3D 0x00) originating from AArch64, the Instruction Length =
-(IL)
-> bit must be set to 1 to indicate a 32-bit instruction.
->
-> Unconditionally leaving it as 0 by only bit-shifting ESR_ELx_EC_UNKNOWN
-> exposes an architecturally invalid exception syndrome register to the gue=
-st.
->
-> Could this cause the guest kernel's exception decoding logic to fail or
-> panic?
-
-You're right -- the architecture mandates setting IL here. Like you
-said, this is pre-existing, and I'll submit a separate patch to fix
-it. But first, Marc: was there a specific reason for not setting it,
-or is it just an omission?
-
-Cheers,
-/fuad
-
-
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612113414.10=
-22901-1-tabba@google.com?part=3D1
+> > -- 
+> > 2.43.0
+> > 
