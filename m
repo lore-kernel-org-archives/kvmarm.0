@@ -1,103 +1,109 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75961339844
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 10:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D467392823
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 10:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781259831; cv=none; b=pElifJyY2JKcuR5VQ2krv/v6LFgi+2B4guqqLEIL/eaILubJfmiBlbv7jDBjRYw7SYNEIOSYt8YeHvzG17JrcXUwqZXIq0nzdhs+rATtuSWoIZS7IDPAV/Njtxv75pcXhylrnKNwsFtGUHIFcufF5R3sjQ+sr15+8BhXjPX+G0I=
+	t=1781260822; cv=none; b=ZssL2HhdJfo/RT/+0Wrfcp5wwbMvzNUSz/U/kdA+v6m0HCRpOe87ENh59Y9T5iaSms8/mjXSlPVeffSsKQ7QIOy3f52/t7KfFdrjLtHoUGHkW2y1iM/txstZYh1Q0v4hTV2XybxJYc3/i2dGJYPY2uJxR/ygvUNf2SQXKhrWC2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781259831; c=relaxed/simple;
-	bh=2bp6i2caV1IPgQ36ib4fF6m+6xLxOZWEJFaOoMYDZnQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=L51hOqOHTYFTTnQqUTzpE4+G8flSUlWovHZZhR5BeXJf3ISKsumG61KaMmCv7lYNCQLHQIY4YPZO1r2XChQwAombPLy/WIhzJX3TpsnNlBQ76nVLh/yS+Fp32t5Izgq82WfSvTg8vutatT6tyfyn7MOVBBYVCbkI8OwEaB1YXHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bx/XfK8u; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1781260822; c=relaxed/simple;
+	bh=GuZusS2c25bbva1AGIc/3njn+DkQSORJtGBSQm9c4VU=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=N+yhRS56nuSAxztA07upod9yuzHXEE5NA+LTC9suetu/Qw9eKUu7/puvJ7LRtO+dGdt38ni3TxdegI3WJW2r6rAy5fF/BcuelrkL2Ae//qAPR79lweMvQWZXE9y2kPHuPRm4061Wg47cPsQgUKgumEZu45o3KHVS9Rl+kkxB15U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lZfAgm/W; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bx/XfK8u"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-490b8adf8b8so6970985e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 03:23:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781259829; x=1781864629; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0YFcRPBWc1sBVr+dWmTbZ0TsBZp12xAJxg+DiPsswnA=;
-        b=Bx/XfK8uxEKVAR6q6Pyz9+5YBv/6f3GQXPuGMlWFqEyFNpQE/6r/MLQPRj0vxzHzOx
-         r/WpI6zrAXu4po0Ak4VVRClCKspH5Eilg50StS540lnEWBaesEowh7Hh43EhZyrNl8Kj
-         YsOV/29LINCY7to34QTy0wYzLN8JM31sbeZI6ukQRYbBUZZHpEDkqAF7wHkF23KFsIxU
-         NfLv6QEKQJbZttPrw2cljeWtXclS/8KWsjLREyJzU2ZtBO/BFfcgllWb4NuJVS0fhNff
-         nQcPCAd/4YyI+9Uf4UvGZUgcYz9xmGEP0weO9JzvBmu7IaiOJeTBybO6Fyj5Bbum01Rz
-         ht8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781259829; x=1781864629;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0YFcRPBWc1sBVr+dWmTbZ0TsBZp12xAJxg+DiPsswnA=;
-        b=Olyqro4gkSSyIlAu15vV25om8CbqCAo4SUN1gdhFmGdmDd0yKnhXtcYPpnWSLHNVQf
-         MM6gwmkS0j2jefFLpkScYzhBV29ZJl87aBwwq6IYUV9lV95ZttpGHRG6g/Nmzd3vahMy
-         NytaZFzZUO2QWrKVLE1HPYnVOzDQpoMBm2n132QKINUAW6QsMm9MqFdXVrt831oYUSMZ
-         srAVBTtKOQ0r/+mvDR3flmh8iizxoOXvkwbNxlSNuVpET0nwm5s8M0lRc2Njt4duS5N1
-         r2l8EXUfhBgwucvYDGsjSSwBTEfG+35lxF4MFl9pTLkLx/MKTH4PqKkSnr1WoaNzFdnP
-         GvjQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/+2wTR9nDGSQ12fV2Io6sTVsjAVJIrMh0qNyQ/AzONrOjmmZyyxKri4RfzQARbBjhsz1OY1iA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx2bJPYXsbK1eY6BvkePYeNwowpnxk/0hKRzGihlNHqWD6rww0q
-	N47Qj1O9E15q6o83R7dXgYrghcZPPRGVaQJcdxgROdTEX/hxZqeTTvLz+Tl2JFvBpFeGmeMEa9I
-	cZA==
-X-Received: from wmlu18.prod.google.com ([2002:a05:600c:2112:b0:490:b58a:2c9b])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:21da:b0:490:b99c:9337
- with SMTP id 5b1f17b1804b1-490ec4c1712mr18163655e9.10.1781259828771; Fri, 12
- Jun 2026 03:23:48 -0700 (PDT)
-Date: Fri, 12 Jun 2026 11:23:47 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lZfAgm/W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD4EE1F000E9;
+	Fri, 12 Jun 2026 10:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781260821;
+	bh=IXtGE9QAyfCKQrurALapem3i9AOBfk2ZwAoXv1DSYmA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=lZfAgm/W4g+ThcLM7CrsXz6PJhIhYZ8YJ0Rp1mUwfaxI/kDNL7c/LcGNiY8VmYwYg
+	 DOKj4gfKzHLymkSuy8x82hAf8sYKV8auFubrJ0oNslV7KnfzAf/9ZIFO9Nm0PnZZwI
+	 g//V953jd6p2+Or9PebqMBwarm9yV8OKVJyuiMaIE8Ui18PQ9JsbcvXF+aH4U+ep2G
+	 yUUrFbVruzGB8fgE9BH/8+hB0/qlzGBYayDt7RIuvYgv4/n7SJ9eNO/rWr94XO8CM/
+	 KtCQyKEE6Pp2n1OYsKb5lW4r95ea6az7bc67KfNQ+gpb4O2aD9vUtVeZLhlOvcZPU9
+	 vXK7t8hPK/8Uw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] KVM: arm64: Sync SCTLR_EL1 when injecting an exception
+ into a pVM
+Reply-To: sashiko-reviews@lists.linux.dev
+To: tabba@google.com
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260612102347.914994-1-tabba@google.com>
+References: <20260612102347.914994-1-tabba@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Jun 2026 10:40:20 +0000
+Message-Id: <20260612104020.DD4EE1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260612102347.914994-1-tabba@google.com>
-Subject: [PATCH] KVM: arm64: Sync SCTLR_EL1 when injecting an exception into a pVM
-From: tabba@google.com
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Sascha Bischoff <Sascha.Bischoff@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-When pKVM injects a synchronous exception into a protected guest,
-enter_exception64() reads SCTLR_EL1 to set the new PSTATE's PAN and
-SSBS bits. pKVM refreshes VBAR_EL1 from the live value before injecting
-but not SCTLR_EL1, which is untrapped for protected guests, so a guest
-that updates it and then traps takes the exception with stale PAN/SSBS.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-Sync SCTLR_EL1 alongside VBAR_EL1.
+Pre-existing issues:
+- [High] inject_sync64() fails to write the trapped PSTATE into the guest's=
+ hardware SPSR_EL1 register, causing the guest to observe a stale SPSR_EL1 =
+when it handles the injected exception.
+--
 
-Fixes: 798eb5978700 ("KVM: arm64: Sync protected guest VBAR_EL1 on injecting an undef exception")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+commit 0025a59d79e472c72e387019776838f814e85578
+Author: tabba@google.com <tabba@google.com>
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 8c3fbb413a06..7608cc4030b8 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -257,10 +257,11 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u64 esr)
- 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
- 
- 	/*
--	 * Make sure we have the latest update to VBAR_EL1, as pKVM
--	 * handles traps very early, before sysregs are resync'ed
-+	 * Sync VBAR_EL1 and SCTLR_EL1, both read by enter_exception64(),
-+	 * as pKVM handles traps before sysregs are resync'ed.
- 	 */
- 	__vcpu_assign_sys_reg(vcpu, VBAR_EL1, read_sysreg_el1(SYS_VBAR));
-+	__vcpu_assign_sys_reg(vcpu, SCTLR_EL1, read_sysreg_el1(SYS_SCTLR));
- 
- 	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
--- 
-2.54.0.1136.gdb2ca164c4-goog
+KVM: arm64: Sync SCTLR_EL1 when injecting an exception into a pVM
 
+This commit updates pKVM exception injection to synchronize SCTLR_EL1
+alongside VBAR_EL1 so that the newly injected exception observes the
+correct PAN and SSBS bits.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe=
+/sys_regs.c
+> index 8c3fbb413a06d..7608cc4030b88 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -257,10 +257,11 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u6=
+4 esr)
+>  	*vcpu_cpsr(vcpu) =3D read_sysreg_el2(SYS_SPSR);
+> =20
+>  	/*
+> -	 * Make sure we have the latest update to VBAR_EL1, as pKVM
+> -	 * handles traps very early, before sysregs are resync'ed
+> +	 * Sync VBAR_EL1 and SCTLR_EL1, both read by enter_exception64(),
+> +	 * as pKVM handles traps before sysregs are resync'ed.
+>  	 */
+>  	__vcpu_assign_sys_reg(vcpu, VBAR_EL1, read_sysreg_el1(SYS_VBAR));
+> +	__vcpu_assign_sys_reg(vcpu, SCTLR_EL1, read_sysreg_el1(SYS_SCTLR));
+> =20
+>  	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
+> =20
+
+[Severity: High]
+This is a pre-existing issue, but looking at the end of inject_sync64(), it
+appears we fail to write the trapped PSTATE into the guest's hardware
+SPSR_EL1 register.
+
+Later in inject_sync64(), the code updates the hardware exception registers
+for EL1:
+
+	write_sysreg_el1(esr, SYS_ESR);
+	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
+	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+
+While SYS_ESR and SYS_ELR are manually updated for EL1, SYS_SPSR (EL1) is
+omitted. Since pKVM returns control directly to the guest without restoring
+sys_regs from memory, will the guest's exception handler read a stale
+SPSR_EL1 from hardware?
+
+Should the code also sync the memory-backed SPSR_EL1 to the hardware
+register here to prevent corrupted exception state?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612102347.9149=
+94-1-tabba@google.com?part=3D1
