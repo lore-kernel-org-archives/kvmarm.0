@@ -1,159 +1,112 @@
-Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B52A3D6474
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 19:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A8237269C;
+	Fri, 12 Jun 2026 19:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781292577; cv=none; b=JpSSoExBey0RinaRxBUHeNghE3EMiE2gj0qD6+wBlCsWpfyTb5RpeWRCaN6IJwRq9h/0/uqSTQXZ+YURR98rgeZXr0ZLBRmEhv/s6eMYndg2Zptm+3thRpp4H0knlH7dSBXAZxUp9sUgz6hxbbTW6ZvH5xzk4aTsaT106THDTa8=
+	t=1781293356; cv=none; b=iJTdGd1HEskEm7+drnW1qmQolqCzTeAkqoFOItW9DRRg84JWosC/tuibm634l2uBo3UydxGI4iB6neKWYncX52CKvfEjIUrStQ5TABToc4DO+vyE04QuiZLuYc8jfQXq2pxZx0vnj9OClGA0seRkqh6M3QxjY1nywLrVzdxi/Tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781292577; c=relaxed/simple;
-	bh=PiE+dt9fYAPOr4a0xodnENwZbbQVLSZKLUreY8s1sdM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m/RvBMZ2qjYIWsr4LO/dF/q1dxIpogJFt7WzZb+SLt3jhMBB0MSGOB60mrUdB1PtsOe9EJSv5vouQGDTX94oUi0HGiJEDAFeBhoMVGTx47H5tqEjRq8ndETli3n9/dJe7VolqLWvAZH2n7qUSikgzOaFxVKwGergzNoOx0fRBHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJTx1rh5; arc=none smtp.client-ip=209.85.167.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1781293356; c=relaxed/simple;
+	bh=nRbLSM47Oz/MZuTyZSC8Udu+L32ai2E4NJpu2LRqt+E=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=Z85HvyLsEKG6JWbco0O33FTwaMkvnf3V1e70ZhT9XVG+8rrKvkfhOyOYDnZos5+BkCB0rJN9TvhbhTYkz5KFzjTzg5rYuY9LXhi37udAUYuWFNkrUhDjXNnLBbU9i0cho2Pfs1+S/lN17XZqki0kd93d411OvMMqCff3xj67JlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVy87tUC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJTx1rh5"
-Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-486cc29e03bso2001369b6e.3
-        for <kvmarm@lists.linux.dev>; Fri, 12 Jun 2026 12:29:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781292571; x=1781897371; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/bPxt/n97qTMkfypzesmceZlZb8m5faMbDtZZOrJQN8=;
-        b=IJTx1rh5acsUTa05QA1p5mAArKcg8xzB2c/jjYgSTHJvhKN/BBrYzgGED6Yb4qa4WQ
-         1xVakVURUXUFvGHi1m3QNQIBifIQo4eL8KiyJO6Sb3SvVpkq4TrwLpGSGzioj+xbNbjG
-         2s7FJIqGhxSJcp2ReDW+fPqAMg1YA/irkCFwKi48RE8c+0vbhulIp0mEDqBfZbXpE7E1
-         yT7Ezt03UNvcnzqn20XnhQga/6G9oXQ1OJeRr1p212gw+HlfVYQO6zZjXO0dXuC4fcPU
-         ZzMnO2oiQulIOfG0deSI5MNIKi9y31Vn2BkQHXjesBAZ0x7ory/wrmIcl6CJuJ0g+t89
-         TeJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781292571; x=1781897371;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/bPxt/n97qTMkfypzesmceZlZb8m5faMbDtZZOrJQN8=;
-        b=QAHCgVN/4C5rhsbrQoh1Ry4iRfDLwakiRa+pQxxfzdXHjMYjHPecAs2bDhtn+kBuQ8
-         QhPfbm54BIkUnd4Ckof/Dhy5edZKxFRTXJVC+cWUt9C4bOKUzVonqrbSl9xioHPlr68P
-         uAoLgiBTcUu3cEKMsahw3aGc1ARxPRpWje7GSFV6hYze4Q3cT1pOyRzzFajRcvCfEni4
-         IMraoji+uYRjgyKbWEnknEhMaEPDIEus1C+GHf0bi0n2RMMIeElsp1Lj7sf1+Gpfm3/U
-         ymUrfpEfnvHa8xs0QFHY5NmJfBV5UgaMqITIKQUsGUs7KZixtzcN6KxxoTxhmvAm5TDQ
-         vzTA==
-X-Forwarded-Encrypted: i=1; AFNElJ9++z28NTmGwksLRxrP64nEeyQ4R1NidB6tolv+EkXj4R1J1iCoJUvP1PWI+fjaadRgqwXYgdM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YweJt1gJgmLwoDTaKZjLZV7tXCPGPSdHGzh9ZpAsee6ltNpvC3n
-	9vicVh4nkBubs+Zs5uekmMnpkvxz3Lq3TaJAtXMaBC3rkYYbGu+3Z21AEycbFDJrXiOs/BGJh+y
-	Dk6R4O7vban+/NrffDVz/DZnbyw==
-X-Received: from ilbdx1-n1.prod.google.com ([2002:a05:6e02:4201:10b0:4fa:1e84:4047])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:1308:b0:482:4dbd:4fde with SMTP id 5614622812f47-48741a3b47dmr672091b6e.19.1781292571289;
- Fri, 12 Jun 2026 12:29:31 -0700 (PDT)
-Date: Fri, 12 Jun 2026 19:29:09 +0000
-In-Reply-To: <20260612192909.1153907-1-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVy87tUC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E5081F000E9;
+	Fri, 12 Jun 2026 19:42:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781293355;
+	bh=uD2A+PHodxqymkqefL8vL+Iwx4XbNYOdObAbfGszjDs=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=YVy87tUCe4EeHpc0E0EHcLtSYkURXCsFItJa52JAgD6jo8BGFxXSjeTDuaXafcE1C
+	 hmcrUUEyeHyUqSRqGWvw3jQ+DRM/W/O3BEjrz3jnTeltFfVhk7YBELGCDwJVRa+1AO
+	 XI7kX34PAoBkJqHJ9sO9tUzjQwyYjGnM2Wdq4gWo3pPTENY2SqBV7a1S6ugD3DrPfG
+	 Ps6cB5kJxm6mbVRePx81wNa/4rcpXx5Oc8BWSvr9z+f8Y2OEyoquH4t4XiZtpc94RP
+	 RYXscghxwxGNBZfcIlSbdJZbNC/KihksjEWVl5S9SYa/IkIRl2B7+9YFKRs4QY12Ch
+	 pW06Ac+KQU5kw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 05/21] perf: arm_pmuv3: Check cntr_mask before using
+ pmccntr
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Colton Lewis" <coltonlewis@google.com>
+Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20260612192909.1153907-6-coltonlewis@google.com>
+References: <20260612192909.1153907-6-coltonlewis@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Jun 2026 19:42:34 +0000
+Message-Id: <20260612194235.1E5081F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260612192909.1153907-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260612192909.1153907-22-coltonlewis@google.com>
-Subject: [PATCH 21/21] KVM: arm64: selftests: Relax testing for exceptions
- when partitioned
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Shuah Khan <shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	James Clark <james.clark@linaro.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Because the Partitioned PMU must lean heavily on underlying hardware
-support, it can't guarantee an exception occurs when accessing an
-invalid pmc index.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-The ARM manual specifies that accessing PMEVCNTR<n>_EL0 where n is
-greater than the number of counters on the system is constrained
-unpredictable when FEAT_FGT is not implemented, and it is desired the
-Partitioned PMU still work without FEAT_FGT.
+Pre-existing issues:
+- [High] A 64-bit user-access CPU_CYCLES event can bypass hardware width va=
+lidation and be incorrectly mapped to a 32-bit general-purpose counter if a=
+rmv8pmu_can_use_pmccntr() returns false.
+--
 
-Though KVM could enforce exceptions here since all PMU accesses
-without FEAT_FGT are trapped, that creates further difficulties. For
-one example, the manual also says that after writing a value to
-PMSELR_EL0 greater than the number of counters on a system, direct
-reads will return an unknown value, meaning KVM could not rely on the
-hardware register to hold the correct value.
+commit d0aacbccd4b0e735717836a5d526ad70a89f9f39
+Author: Colton Lewis <coltonlewis@google.com>
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- .../selftests/kvm/arm64/vpmu_counter_access.c | 20 ++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+perf: arm_pmuv3: Check cntr_mask before using pmccntr
 
-diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-index 9be6034335283..e8c3856df77b7 100644
---- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-@@ -38,10 +38,14 @@ const char *pmu_impl_str[] = {
- struct vpmu_vm {
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
-+};
-+
-+struct guest_context {
- 	bool pmu_partitioned;
- };
- 
- static struct vpmu_vm vpmu_vm;
-+static struct guest_context guest_context;
- 
- struct pmreg_sets {
- 	u64 set_reg_id;
-@@ -342,11 +346,16 @@ static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 	/*
- 	 * Reading/writing the event count/type registers should cause
- 	 * an UNDEFINED exception.
-+	 *
-+	 * If the pmu is partitioned, we can't guarantee it because
-+	 * hardware doesn't.
- 	 */
--	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
--	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
--	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
--	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
-+	if (!guest_context.pmu_partitioned) {
-+		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
-+		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
-+		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
-+		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
-+	}
- 	/*
- 	 * The bit corresponding to the (unimplemented) counter in
- 	 * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers should be RAZ.
-@@ -459,7 +468,7 @@ static void create_vpmu_vm(void *guest_code, enum pmu_impl impl)
- 		vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION);
- 	if (!ret) {
- 		vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &part_attr);
--		vpmu_vm.pmu_partitioned = partition;
-+		guest_context.pmu_partitioned = partition;
- 		pr_debug("Set PMU partitioning: %d\n", partition);
- 	}
- 
-@@ -511,6 +520,7 @@ static void test_create_vpmu_vm_with_nr_counters(
- 		TEST_ASSERT(!ret, KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
- 
- 	vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_INIT, NULL);
-+	sync_global_to_guest(vpmu_vm.vm, guest_context);
- }
- 
- /*
--- 
-2.54.0.1136.gdb2ca164c4-goog
+Check cntr_mask before using pmccntr to ensure it's available. With a
+partitioned PMU, there may be instances where pmccntr is being used by
+the guest and will be absent from cntr_mask.
 
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index 1cceb1f614515..17bb1cfdc271c 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -1028,7 +1028,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_eve=
+nts *cpuc,
+> =20
+>  	/* Always prefer to place a cycle counter into the cycle counter. */
+>  	if (armv8pmu_can_use_pmccntr(cpuc, event)) {
+> -		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
+> +		if (test_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask) &&
+> +		    !test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
+>  			return ARMV8_PMU_CYCLE_IDX;
+>  		else if (armv8pmu_event_is_64bit(event) &&
+>  			   armv8pmu_event_want_user_access(event) &&
+
+[Severity: High]
+This isn't a bug introduced by this patch, but is it possible for a 64-bit
+user-access CPU_CYCLES event to bypass hardware width validation here?
+
+Because the -EAGAIN rejection logic is nested inside the=20
+armv8pmu_can_use_pmccntr() check, if that function returns false (for examp=
+le,
+if threshold counting is enabled or the system has SMT), this validation is
+entirely skipped.
+
+It looks like the event would then fall through to armv8pmu_get_single_idx()
+and potentially be allocated a 32-bit general-purpose counter. Userspace pe=
+rf
+tools reading the userpage pmc_width as 64 would then treat a 32-bit counter
+as 64-bit, leading to unhandled wraparounds.
+
+Looking at __armv8_pmuv3_map_event(), CPU_CYCLES events are explicitly
+exempted from the 64-bit unsupported check:
+
+__armv8_pmuv3_map_event()
+        if (armv8pmu_event_is_64bit(event) &&
+            (hw_event_id !=3D ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
+            !armv8pmu_has_long_event(armpmu))
+                return -EOPNOTSUPP;
+
+Does this code incorrectly map 64-bit CPU_CYCLES events to 32-bit counters
+when the dedicated 64-bit PMCCNTR is unavailable?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260612192909.1153=
+907-1-coltonlewis@google.com?part=3D5
