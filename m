@@ -1,121 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BEC175A64;
-	Sat, 13 Jun 2026 00:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E591E222580;
+	Sat, 13 Jun 2026 00:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781310670; cv=none; b=ShWs37HV5K+GokC84doqOPuBgdfxvwF1ZykxO6EZKU9cxK7hfFCFF7aw0sN39syW9Y2bg+ynVvAvGYpVBLtYLcN/dFoGdxSZF7yWu0G6rVg0dcnpSyGEuy5G6mAhpzxDFC884mm2LXsFRbS1vK/iPEe/8XqZOAPgdjeb66aLL+A=
+	t=1781310905; cv=none; b=OgD31zuEK+nD+KF2fjM/JIVEPF95Tw3POViA4RnUopaiuCqrzORkIiuovAnlMklI6sZrb12N6L26zHtmqWBIoO7pNta9UntmJF+WWoG2wALTmqFnPaKT9fgBnJ6zAiXnn6wIBzcjbSIKUyCPZVF0XKQx/UBpLDJQgDnmQbYZ4wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781310670; c=relaxed/simple;
-	bh=huX2cPspGZSUR69Zg4DCOfTdm6FLaZXkBhT2O5o0f3c=;
+	s=arc-20240116; t=1781310905; c=relaxed/simple;
+	bh=aLgbRPI5QladbTRYfORYqfuEsYqcluMPLr7+HJ1XXbg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=IOBA1+eqtz+fgn3P0WY9t8VAaH6B0rruV2WKwGKPf2TyCuXpcwQSHA2ByvoVpdku/2lVQOSCMKLd4AGZAWRzTRKCx7K9Rr5cEbgTZWWtkwsdwTjwxGoDc/t2FlxJNIMuXfEkNeSmUYB6w+Frw2n1eVSpxWJaEYeZ3FPywakmRlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFzOEQxo; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=jS16mpMX8eAK0QWhLCrAKOUhd93BWcA2/e6UYQnxcCWnChb7q/hsaFVVrTQVuq2cH4qcGEn7atLXzk2w1nR0jo9hocxO+hA1sFSy6W05VRphSb/qAAvMFztKGRjlRRUHdYKPjvhR/d44ga5YL9vBhZdYk42STWrKKuNlErxC+b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jmmuvvwn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFzOEQxo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF391F000E9;
-	Sat, 13 Jun 2026 00:31:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jmmuvvwn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD5951F000E9;
+	Sat, 13 Jun 2026 00:35:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781310668;
-	bh=wXAIoJd7dQs2FVJvkREj9RCGXsTcfoLvBLoNcnytBGU=;
+	s=k20260515; t=1781310902;
+	bh=m08QP8UI/SGYAlAmalaWB4AWEVPKZ72ZDKPFq57GncU=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VFzOEQxopkGmK1i264DXfdvN5YLLzbfR3NzVgHitHw1IOkXtBfZy77TQVwxU123kn
-	 0d4d915ZgMG2dp2a2Nw7LTr7END8rr7SnCkeuVjNOban8f3Wd/8AD5/sICxHHNmnto
-	 k6vwl9zAmbLbnG5RQyBT3+a2WA6pMYYL1+sRhnZ6b5m8TsyczRfHs7OkK14o4aX3+B
-	 Tyz+5SQKjTPYMn+8iRBUPMMKZuCF4suBK2st9eh3e0cfv598lsTal2V72aqJ//gEac
-	 Pf686QUJ/vmo0BMNoXN1Y3xlsMlrlctH3dpDy9ZTrUvLp0yFfrXcPjNX2hSpAxmN27
-	 1T3+zt93ofE8g==
+	b=Jmmuvvwn5FgiUVyOqHPwYVZg0jA17t4eKGfXRo6vpOHjTBi4JKUeBXM8Vh/1ZQxMU
+	 txwELwp79FZwDp/mADe/rEch3YhMWbSChLj6WM1IwKpdMcp9LSp3e1jyyTQ1wyUx7V
+	 zItUd8jviNVZJ3KviPn9/BUOWGO0A3aWSDVxYx2fWnpyjVbhuse+IU6jd3edIM2uPQ
+	 //KmD7enbs/neTpbGARlEPW8dz7B37AD7TUOAeWsnvDZUmdxvQB+Tr0gdL9fnoqf/g
+	 6mbaiEZHWUfy5mrkCmAxsANuGT2yEWKtstEkoTGBDBr579/0ZzbB+/3SDvWDGgBeSX
+	 RJSUrAJy+yajQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v7 06/20] KVM: selftests: Add helper to generate random
- u64 in range [min,max]
+Subject: Re: [PATCH v7 09/20] KVM: selftests: Add VFIO device support to
+ eventfd IRQ test
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sean Christopherson" <seanjc@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260613002031.745413-7-seanjc@google.com>
-References: <20260613002031.745413-7-seanjc@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260613002031.745413-10-seanjc@google.com>
+References: <20260613002031.745413-10-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Jun 2026 00:31:07 +0000
-Message-Id: <20260613003108.3AF391F000E9@smtp.kernel.org>
+Date: Sat, 13 Jun 2026 00:35:01 +0000
+Message-Id: <20260613003501.DD5951F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Medium] The generic PRNG helper `kvm_random_u64_in_range()` is fundament=
-ally incapable of generating values in large portions of the requested rang=
-e due to the structural limitations of the underlying generator.
+- [Medium] probe_iommu_type() incorrectly probes the /dev/vfio directory in=
+stead of the /dev/vfio/vfio legacy container character device, bypassing th=
+e framework's intended skip behavior for unprivileged users.
+- [Medium] vfio_setup_msi() hardcodes the device's DMA region IOVA to 0, wh=
+ich can cause IOMMU mapping failures on platforms that reserve or restrict =
+IOVA 0.
 --
 
-commit 9b7095f015b8aad9cb0b24b2b051b56cd3917145
-Author: Josh Hilke <jrhilke@google.com>
+commit 2bdd8160743775c8d18e4004e72e7ff0898fbd70
+Author: David Matlack <dmatlack@google.com>
 
-KVM: selftests: Add helper to generate random u64 in range [min,max]
+KVM: selftests: Add VFIO device support to eventfd IRQ test
 
-Introduce kvm_random_u64_in_range(state, min, max) to return a random u64 in
-the inclusive range of [min, max] using a struct kvm_random_state.
+This commit extends the eventfd IRQ test to support triggering interrupts
+using a VFIO device instead of manually signaling the eventfd. It also
+probes for IOMMUFD vs legacy VFIO availability.
 
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/=
-selftests/kvm/lib/test_util.c
-> index e98ca7ef439c4..e208a57f190cf 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -42,6 +42,24 @@ u32 kvm_random_u32(struct kvm_random_state *state)
->  	return state->seed;
+Link: https://lore.kernel.org/all/20260602222941.3133236-1-jrhilke%40google=
+.com [1]
+
+> diff --git a/tools/testing/selftests/kvm/irq_test.c b/tools/testing/selft=
+ests/kvm/irq_test.c
+> index 9f8895b898214..6888be54ee4a9 100644
+> --- a/tools/testing/selftests/kvm/irq_test.c
+> +++ b/tools/testing/selftests/kvm/irq_test.c
+[ ... ]
+> @@ -55,6 +58,36 @@ static void *vcpu_thread_main(void *arg)
+>  	return NULL;
 >  }
 > =20
-> +/* Returns a random u64 in the inclusive range [min, max] */
-> +u64 kvm_random_u64_in_range(struct kvm_random_state *state, u64 min,
-> +			    u64 max)
+> +static int vfio_setup_msi(struct vfio_pci_device *device)
 > +{
-> +	u64 value;
-> +	u64 range;
+> +	const int flags =3D MAP_SHARED | MAP_ANONYMOUS;
+> +	const int prot =3D PROT_READ | PROT_WRITE;
+> +	struct dma_region *region;
 > +
-> +	TEST_ASSERT(min <=3D max, "PEBKAC, min =3D 0x%lx, max =3D 0x%lx", min, =
-max);
+> +	/* A driver is required to generate an MSI. */
+> +	TEST_REQUIRE(device->driver.ops);
 > +
-> +	value =3D kvm_random_u64(state);
-> +
-> +	range =3D max - min;
-> +	if (range =3D=3D ULLONG_MAX)
-> +		return value;
+> +	/* Set up a DMA-able region for the driver to use. */
+> +	region =3D &device->driver.region;
+> +	region->iova =3D 0;
 
 [Severity: Medium]
-Can this regression cause tests to silently miss important edge cases?
+Does hardcoding the DMA region's IOVA to 0 cause IOMMU mapping failures on
+platforms that reserve or restrict IOVA 0?
 
-Since kvm_random_u32() uses a linear congruential generator modulo 0x7FFFFF=
-FF,
-its 31st bit is permanently 0, and it never returns 0.
+If IOVA 0 is unsupported, it seems like iommu_map() will fail and trigger a
+test assertion crash instead of running.
 
-Because kvm_random_u64() concatenates two such values:
-
-tools/testing/selftests/kvm/include/test_util.h:kvm_random_u64() {
-	return ((u64)kvm_random_u32(state) << 32) | kvm_random_u32(state);
-}
-
-bits 31 and 63 of the resulting 64-bit number are permanently 0, and the lo=
-wer
-32 bits are never 0.
-
-When this is called with a large range like min =3D 0 and max =3D ULLONG_MA=
-X, it
-directly returns this 64-bit value. Thus, it can never generate numbers abo=
-ve
-0x7FFFFFFE7FFFFFFE, any numbers with bit 31 or 63 set, or any numbers below
-2^32.
-
-Does this give a false illusion of full mathematical coverage for randomized
-inputs?
-
+> +	region->size =3D SZ_2M;
+> +	region->vaddr =3D kvm_mmap(region->size, prot, flags, -1);
+> +	TEST_ASSERT(region->vaddr !=3D MAP_FAILED, "mmap() failed\n");
+> +	iommu_map(device->iommu, region);
 > +
-> +	return min + (value % (range + 1));
+> +	vfio_pci_driver_init(device);
+> +	return device->driver.msi;
 > +}
+[ ... ]
+> @@ -74,11 +107,29 @@ static void kvm_route_msi(struct kvm_vm *vm, u32 gsi=
+, struct kvm_vcpu *vcpu,
+>  	vm_ioctl(vm, KVM_SET_GSI_ROUTING, &routing.header);
+>  }
+> =20
+> +static const char *probe_iommu_type(void)
+> +{
+> +	int io_fd;
+> +
+> +	io_fd =3D open("/dev/iommu", O_RDONLY);
+> +	if (io_fd >=3D 0) {
+> +		close(io_fd);
+> +		return MODE_IOMMUFD;
+> +	}
+> +
+> +	io_fd =3D __open_path_or_exit("/dev/vfio", O_RDONLY,
+
+[Severity: Medium]
+Because /dev/vfio is a directory, will this open() call succeed for any user
+with read and execute permissions to the directory, bypassing the intended =
+skip
+behavior?
+
+Should this probe the /dev/vfio/vfio legacy container character device inst=
+ead
+so the test can skip gracefully for unprivileged users rather than crashing
+later in iommu_init() due to lack of device permissions?
+
+> +				    "Is VFIO (or IOMMUFD) loaded and enabled?");
+> +	close(io_fd);
+> +	return MODE_VFIO_TYPE1_IOMMU;
+> +}
+> +
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260613002031.7454=
-13-1-seanjc@google.com?part=3D6
+13-1-seanjc@google.com?part=3D9
