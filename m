@@ -1,50 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A9F1474CC;
-	Sun, 14 Jun 2026 08:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91348396D15;
+	Sun, 14 Jun 2026 09:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781426765; cv=none; b=LEEd2ru6KkozuFEGP2oenUAEpNQpkOCb5hTjwpR3qfSABkVHE3CNWMqkwrHsvCJmniTv566osWyDrAG8WJ2d7sKVHWdTxGcZxWQqkMHKda0IlrBavTt227bxipIXskiC98eoYD0xF+U1FuTKukF/7Mf1Q3RMYa4w2x5TdfsZAtk=
+	t=1781428996; cv=none; b=Wxfw6KwEWxbtwRUWmwV4g44hIIsNh6NhzX4oQq+Ar1o59+c7F6pdY3D4qE1U+90UTn54/+5N/rVngf5awftmc3ELvHxAnsf4EEw3qJL/rq4GBcwcQTbYR1PCCAebNsTtMdbpqs6QiT8EQzueR3D1EzRAMgeYIvcOMwknUoGkWvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781426765; c=relaxed/simple;
-	bh=wfs9Bo8vwsW1fnRXS+VbiF3roIH9YD1x+0PEu0MRg+g=;
+	s=arc-20240116; t=1781428996; c=relaxed/simple;
+	bh=7f/1wDwvwLT32WhTJ7B/sL3fgcwNfZRElxLQ0fRgrKM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zgt1+Y3JJZTRYu2cm9PnoDKAmXlLAZDezGPgy7Cl1gxUE131cT17MrSrgZ3thYOjc+vOXWl2ij2R0bhrPTX9bDI+/QUOGJZ+PFtDKMi+RoahhpPm0Xa+TknBX1/LP02O22DPs2+cTvOJ67IHE5/v7fMQIC/tNOuiSv/+/yce3p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPFlpQfq; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=b+YrohF738jgxIhIMaoZnQFma+Zj4Zgm4IxguBfJ4t1WXiemvsQygOXa00/8L+eHnMBi1qHRikVmsKJxR1r3SIFzi04TdhM8YOCBOt9YwLwUO+AnrcQ8Lbhq1fhQRZlKHD+nBr0+CuEzZs/pPR0Fi3ghlLrAfb7571QmPJ/Vzy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9pabxYE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPFlpQfq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F059A1F000E9;
-	Sun, 14 Jun 2026 08:46:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9pabxYE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0121C1F000E9;
+	Sun, 14 Jun 2026 09:23:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781426764;
-	bh=lCUjsqHBobEFf4PCgWD95wW9m403kB/GflewUKsUwHc=;
+	s=k20260515; t=1781428994;
+	bh=BaefkG1z/kYbtXMJ5CudDmFqY4QIwgZsnHg2LHRx7MQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=gPFlpQfqCyJHMCr+dAL43B8gS+NNYPW6XL0mYI8b8xQPkx49tJghZiF3YrcXhVrqe
-	 9ZTAeXVqsg1gp1hizbuguF1IogkSBoaRvRTy0hJeLbLpu89UOpr+KI/YBO4sN+aVrT
-	 u7+i3Cu0SUavkqC5Z/phzmCb/bAdkhl3jTzbbsx4Aybog/jV83EIxjY0Xvyj1+OZpd
-	 6EmrSVWJ9piOpg1yymn54gQOdj5KBqgVmr0mDk7r1ad+87xcXVXjGVT8vqd7Wrq1r7
-	 4HiYVIHValMAGRfRYcqtOSN5zFpKmkauQjGB2bpUAU2rJ79S9FkFcIkaRaWSkT2Gu0
-	 OeMvXDpdXEqRQ==
+	b=I9pabxYEnN7l50HZCX8pARU1Dy2vxhPM6o7/imevcC/tXxgBMJ83oqtvR8ZzFwZhd
+	 v/D64syTRMnI2CpNMFP40VODw/T8olQwxz8nwlOfeJxMGYA7e3Yd4Ep5J1QZrZ90ak
+	 nMrNfJGSdHt7TyxEypxCsocHvDUN9hAbAEDCqqFZE5VyZcPu18v2zFfCGcyRQIn9Le
+	 p/iHrytPjMwAi3DWNZD4Tf8/slQn2FUNsT5S1trgkp3z0ah2Iz5GoTMOr/P5ROOuwl
+	 0NDUWuULGVgm5HrY5xd0XyItz8lHg4n/+n3eYSkxLhlg7Unf2S6MzTPe4yXsjIaWRl
+	 +EjTsWe6fd/Yg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wYgTh-0000000Cd7x-31Jd;
-	Sun, 14 Jun 2026 08:46:01 +0000
-Date: Sun, 14 Jun 2026 09:49:23 +0100
-Message-ID: <87pl1t8q24.wl-maz@kernel.org>
+	id 1wYh3f-0000000CdK9-1x2l;
+	Sun, 14 Jun 2026 09:23:11 +0000
+Date: Sun, 14 Jun 2026 10:26:32 +0100
+Message-ID: <87o6hd8oc7.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: sashiko-reviews@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
+To: fuqiang wang <fuqiang.wng@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
-In-Reply-To: <CA+EHjTyFFf__9iGFAyAkechiX+gaiK9ksdfgxLSFe8RcAY=HGA@mail.gmail.com>
-References: <20260612113414.1022901-1-tabba@google.com>
-	<20260612115044.16E3B1F000E9@smtp.kernel.org>
-	<CA+EHjTyFFf__9iGFAyAkechiX+gaiK9ksdfgxLSFe8RcAY=HGA@mail.gmail.com>
+	dongxu zhang <xu910121@sina.com>,
+	wangfuqiang49 <wangfuqiang49@jd.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Skip unreset vCPUs in MPIDR lookup table
+In-Reply-To: <20260611144042.97981-3-fuqiang.wng@gmail.com>
+References: <20260611144042.97981-1-fuqiang.wng@gmail.com>
+	<20260611144042.97981-3-fuqiang.wng@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,30 +57,107 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, will@kernel.org
+X-SA-Exim-Rcpt-To: fuqiang.wng@gmail.com, oupton@kernel.org, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, xu910121@sina.com, wangfuqiang49@jd.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Jun 2026 14:19:10 +0100,
-Fuad Tabba <tabba@google.com> wrote:
+On Thu, 11 Jun 2026 15:40:42 +0100,
+fuqiang wang <fuqiang.wng@gmail.com> wrote:
 > 
-> On Fri, 12 Jun 2026 at 12:50, <sashiko-bot@kernel.org> wrote:
-> >
-> > Could this cause the guest kernel's exception decoding logic to fail or
-> > panic?
+> When a VM is created with CPU hotplug support,
+
+I'm not sure what you mean by "hotplug support". KVM has no support
+for vcpu hotplug at all (all vcpus must have been created before the
+VM can run).
+
+> kvm_for_each_vcpu() can
+> walk vCPUs that have not been reset yet. Their MPIDR_EL1 state is still
+> zero, which aliases vCPU0 when populating the compressed MPIDR lookup
+> table.
 > 
-> You're right -- the architecture mandates setting IL here. Like you
-> said, this is pre-existing, and I'll submit a separate patch to fix
-> it. But first, Marc: was there a specific reason for not setting it,
-> or is it just an omission?
+> As a result, cmpidr_to_idx[0] can be overwritten with the index of an
+> unreset vCPU. A lookup for MPIDR 0 then returns the wrong vCPU, which
+> can prevent interrupts targeting vCPU0 from being delivered correctly
+> and make guest boot extremely slow.
 
-Just a plain bug. The normal KVM code is usually careful to construct
-the new ESR based on the source of the exception, meaning that we
-always convert ESR_EL2 into ESR_EL1, and propagate IL amongst other
-things. This is obviously not the case here.
+OK, so the problem you are describing is related to vcpus that have
+haven't gone through the INIT phase, and really has nothing to do with
+hotplug.
 
-It'd be worth auditing the rest of the code and make sure this is the
-only case of IL not being correctly set.
+> 
+> Skip vCPUs whose MPIDR_EL1 value does not have the RES1 bit set.
+> 
+> Fixes: 5544750efd51 ("KVM: arm64: Build MPIDR to vcpu index cache at runtime")
+> Signed-off-by: fuqiang wang <fuqiang.wng@gmail.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  9 +++++++++
+>  arch/arm64/kvm/arm.c                 | 14 ++++++++++++--
+>  2 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5bf3d7e1d92c..3d2f0a8b040d 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -506,6 +506,15 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>  	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+>  }
+>  
+> +/*
+> + * Check if vCPU MPIDR_EL1 has been reset. MPIDR_EL1.bit[31] is RES1
+> + * and set during reset; a zero value indicates the vCPU is unreset.
+> + */
+> +static inline bool kvm_vcpu_mpidr_is_reset(struct kvm_vcpu *vcpu)
+> +{
+> +	return !!(__vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_RES1_BITMASK);
+> +}
+> +
+
+This helper has only a single caller, so it would better be placed in
+the function that makes use of it, specially considering that its a
+one-liner.
+
+>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu)) {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3732ee9eb0d4..fccfa97370df 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -887,8 +887,18 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+>  	data->mpidr_mask = mask;
+>  
+>  	kvm_for_each_vcpu(c, vcpu, kvm) {
+> -		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
+> -		u16 index = kvm_mpidr_index(data, aff);
+> +		u64 aff;
+> +		u16 index;
+> +
+> +		/*
+> +		 * Skip vCPUs that haven't been reset yet; their MPIDR_EL1 is
+> +		 * zero.
+> +		 */
+> +		if (!kvm_vcpu_mpidr_is_reset(vcpu))
+> +			continue;
+
+But what about the initial loop that computes the significant bits
+amongst the vcpus?
+
+> +
+> +		aff = kvm_vcpu_get_mpidr_aff(vcpu);
+> +		index = kvm_mpidr_index(data, aff);
+
+In all honesty, I think this is a userspace bug more than anything
+else, and checking for random bits in MPDR_EL1 to verify whether the
+value is plausible is gross.
+
+Yhis isn't different from setting MPIDR_EL1 to the same value on all
+vcpus, which we don't try to mitigate. Late setting of MPIDR_EL1 also
+defeats the whole point of having a cache for the affinity to index
+conversion, making SGIs pretty slow for late CPUs.
+
+I really think that by not finalising your vcpus and start running the
+guest, you have cornered yourself pretty badly, and we shouldn't try
+to paper over it.
 
 Thanks,
 
