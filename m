@@ -1,62 +1,66 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B06D29A309
-	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 16:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDEB2EDD6B
+	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 16:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781454820; cv=none; b=U8RvtM+BoRAM1+DkB5gVkrbHTOctU/WiebWtnPArz4P2/07nRK6pREk/fHGhtaFid/WZemIWI7mCFiLT+cqMWNkhSvVfHn8FdA7MFVHlEdmAIT1bcF0ccPK3Wi0f4+fkDR0/4d5Eofcvcj+R+zOSg2UtXj9FGqZKeWnQK00Xya8=
+	t=1781454821; cv=none; b=dAhvuT4y3v1WlxjHXVZA0HjOe9kYul5P7QoHi3MBUSKvBPWrfWp+FjkYbAjb4VKaP0fN2sCcpHGvKPYbCuFAXIYoUp6KdiQk9p4s9SnwBWf2jkgVsAc64lDKpFM6xWtFMWsGZvFRpGZJj498E7LVm6hgIF+du/II4y3iNOJwsaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781454820; c=relaxed/simple;
-	bh=iIjH5h06cGBmKEwS0baZNP6y+X5SmfaIo9y8hX3w30c=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YuNyYkw1JQ9178V5vMOE//t89+Gjl78ypDNWXiG8E6b5Ob0cJ42bO1u1r7gGr2btj8zxXe++A36ZJUHvwJXxfCiW5dvmyFqywvVDiipEoY7BMfQzr6VgJ3GG/jmiOpDNgBFS69GThQ6G1UpK2aonGtJLZLevEeK1dmuQtFP9fHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fVVlElHq; arc=none smtp.client-ip=209.85.221.74
+	s=arc-20240116; t=1781454821; c=relaxed/simple;
+	bh=Om9tDyrkzAMYgiitUGCRlH8JJcWHv74okAqDlcHmcfE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LEPS0i1gr0eSLwb5ZNzoXHTPHlKnq9hdChHpebfV3Nc3ENDnEqVIHYmoPuWBNAaplc7t+aRU3bqG5s4J7/F9SZ2VV176M+r79oSbY7MY5ilW9NZ1oJTC275Ah9kVHv/rBBeScKaDd7Gi9bfNeOmhPAOAj4hQhUDFnXEb/CNXjD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SxY+g/1h; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fVVlElHq"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-45ef66cc579so1141788f8f.3
-        for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 09:33:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SxY+g/1h"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-490dad70f95so23320775e9.3
+        for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 09:33:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781454818; x=1782059618; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wF52xqv2gt97ZmYG5q8RS9QpeTQBkGWbTxMLhSV4/qM=;
-        b=fVVlElHq+D4p1RZBTAaD98Uu6HD0L6sFdpUvF3tlX+dzUYCIDcKOu2JUFAe0pqbCVX
-         8oiy39S7EOE0s92alkgeXAXJDWi7mvtcQCOgL1r04ancBNqfQ1WIj1+PCS3BQJyjYcq2
-         OIOx9jupWnsE2JefzuqkcV9JIzNeuZYzDcKffqsVhDHelpfk6iy8tVZLXvbIbTyWF9Dp
-         uF4qdDqw0Ptx5UVHODHC1o3/uksddnIZqEZjaHr80bgSYurptHS4H91YA/sEORKJ+iMG
-         2gqKKG9W6TBtJTDvPCUVSQNP72CEGgJUTS0yJ2oEBdNT5zkr9O2U2H90CPxG1P1iTbWh
-         C8gg==
+        d=google.com; s=20251104; t=1781454819; x=1782059619; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=r0hMb6JFLji8duaB2XeitlKTMM8QIWRSHjGJV9xdd+o=;
+        b=SxY+g/1hH+dfy/cOvPLKtHajRm3ozlThrfMlDSCLo2lJfH8FtsA9HeWAblmKxmcNoD
+         YNwc7b8wAUUUBw0IP7pRQuKjepvM/hVgYBkeLpXtT04JvCJOP1HKLqXAhu2cCdIW30TT
+         qbXIjvv8LuFXw/azypKGWuRuTEaRmIlkGN6T9RVxdW8cBdvPMfX38Ia5SH76ZVzBj1K/
+         WGNa8YTRPNyjUY0MviKXVlTAduaW3yGPFv05VFin9aUk8QT2WW2YM4tAI4V3IzSZ4gTV
+         DMbYLHDaqhrlF16p9UBiZzdb26jCdUnUILKYEaxK+3OM4zS5SyqzNmaUGPDyjuGe0Me6
+         aHkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781454818; x=1782059618;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wF52xqv2gt97ZmYG5q8RS9QpeTQBkGWbTxMLhSV4/qM=;
-        b=cbQkKm5Zbp9vBc4IUl17nO1FxsRz1/cKGA7WjfUNyz6e8A4q218gvU8ShqbENGRH/Q
-         QN8nDRYLRDB+PlnxqptWyi4j3xCOarEXNWO3lQqu66nY/kqlYZrVt5F4YflpvX86/Rap
-         Dm3KlT6lvXbV6Gwa9nzuQbZruCDlBFvaz/X1rp/wyb6RKtDHwxzPkEBvRQF+wobdBP6Y
-         7xnKTKrZqlvaC7NtNfMcUAv3Vk4Rbcr0+ruphR2lMya3HOunT73o4Zrq1mIY0QrzwTHi
-         0ZgGlDa7my+JIOcXMvmf4rkTAL9wHwRk5T1JgaA/Kv4tBZeO4QNXwKn9iwdBQcbeLXB2
-         hQEg==
-X-Forwarded-Encrypted: i=1; AFNElJ8kzhhhQVpfNPnkgKuP8jAMLJYbgi8/4rXvKYESNCPRDqxCr+Dfjox0690WnnFTIcsg/hmrTf8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxCV9sxuDRnOkhk8FIYW3tWtnR4unGv8igCe2aDV6QgMteFxIbR
-	ODCOCWdqV2fro1a6QLvDCkrhZ3AJnlPUa8Unmy0NFm+lFJsyfPPIgIMB9KL9z9CoTc7WILarhN0
-	wrw==
-X-Received: from wrnv4.prod.google.com ([2002:adf:ebc4:0:b0:43d:733a:c37e])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:6f1c:0:b0:448:7049:a6c9
- with SMTP id ffacd0b85a97d-4606da5a49dmr14309136f8f.5.1781454817370; Sun, 14
- Jun 2026 09:33:37 -0700 (PDT)
-Date: Sun, 14 Jun 2026 17:33:29 +0100
+        d=1e100.net; s=20251104; t=1781454819; x=1782059619;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r0hMb6JFLji8duaB2XeitlKTMM8QIWRSHjGJV9xdd+o=;
+        b=fvoWF22douyLqoRuyfTQ/VjV/+2JDXVg7CxokvepLOL36o5hArtYvfDxumeAwmQGrp
+         QBXLUt7rf59e0okpqNYIdBnW1cMcpBhcGxuyZ/4Kpd5OJm54ZsCgfrHrfw8J3YwMzDmU
+         5C3BK8LIw+1NptfaX0SNejbtMwGT31rZBcJwxiQ4TB0qT7/6yi5DlOPjvwTqqTn+mlPA
+         iX/SGGJVsDHUA8k2uf2DgofsZN1AshsjXlUDJvW+KlP6h1MiprRSQpPLuBXGXXsOCnkd
+         4p/UVchHGQKi8aq+BjG6FtsyRnSJ+56DwQSDnqFBGY6BLAP//pZc+NxF+ffAYndKH+WM
+         Clmg==
+X-Forwarded-Encrypted: i=1; AFNElJ83fVT7sQVmWt9AN1/MFjD+Svrt9omcUndGijzZK6/zu04+IxBaAPiOQOJSku+xQ0ke/b3fRnU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw7k0dnY6GBEGDIkvvERYVpti+rfswsZNS1jansztdsSWXRxizD
+	8K2ZcEDj8F1C4oOtdfPzxtEWonAA/jbNYq1f0tUYPzTi+uSH0H3Ch7M60bJxuALRr48t5NWEwvc
+	wDw==
+X-Received: from wmcv17.prod.google.com ([2002:a05:600c:4291:b0:490:ae4c:a69c])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:6612:b0:490:bb45:79ee
+ with SMTP id 5b1f17b1804b1-490ec33d4cfmr133385485e9.0.1781454818769; Sun, 14
+ Jun 2026 09:33:38 -0700 (PDT)
+Date: Sun, 14 Jun 2026 17:33:30 +0100
+In-Reply-To: <20260614163336.3490925-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260614163336.3490925-1-tabba@google.com>
 X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260614163336.3490925-1-tabba@google.com>
-Subject: [PATCH 0/7] KVM: arm64: Fix missing ESR_ELx.IL in syndrome injection
+Message-ID: <20260614163336.3490925-2-tabba@google.com>
+Subject: [PATCH 1/7] KVM: arm64: Set ESR_ELx.IL for injected undefined
+ exceptions at EL2
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -67,57 +71,33 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
 	Vincent Donnefort <vdonnefort@google.com>, Sascha Bischoff <Sascha.Bischoff@arm.com>, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi folks,
+inject_undef64() constructs an ESR with EC=0 (Unknown) but does not set
+IL. The architecture mandates IL=1 for EC=0 unconditionally (ARM DDI
+0487, ESR_ELx.IL description), so the injected syndrome is one that
+conforming hardware cannot produce.
 
-After sashiko caught the missing IL bug [1], I did an audit of all ESR
-syndrome construction sites in KVM/arm64 as Marc suggested. This series
-is the result of that audit.
+Set ESR_ELx_IL in the constructed syndrome.
 
-The ARM architecture mandates ESR_ELx.IL=1 for several exception
-classes regardless of instruction length: EC=Unknown, Instruction
-Aborts, Data Aborts with ISV=0, and SError. For FPAC (EC=0x1C), IL
-reflects instruction length, but FPAC can only be generated by A64
-instructions, so IL must also be 1.
+Fixes: e5d40a5a97c1 ("KVM: arm64: pkvm: Add a generic synchronous exception injection primitive")
+Reported-by: sashiko <sashiko@sashiko.dev>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch 1 is the bug sashiko found: inject_undef64() in the pKVM hyp (EL2)
-path never set IL.
-Patch 2 makes the same fix to inject_undef64() in the normal host path,
-where IL was derived from the triggering trap's instruction length. No
-instruction that reaches undef injection has a 16-bit encoding, so patch
-2 has no functional change today.
-Patch 3 makes the matching fix to inject_abt64(). Unlike undef injection,
-abort injection is reachable from a 16-bit T32 instruction (a 32-bit EL0
-task under an AArch64 EL1 guest), so the old code there injects an abort
-with IL=0.
-Patch 4 fixes the FPAC syndrome constructed during nested ERET
-emulation, which did not set IL.
-Patches 5-6 fix SError injection in the emulated and nested paths,
-neither of which set IL.
-Patch 7 fixes a fake ESR used to exit to the host. The host does not
-read IL there, so it is not guest-visible.
-
-Based on Linux 7.1-rc7
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/87pl1t8q24.wl-maz@kernel.org/
-
-Fuad Tabba (7):
-  KVM: arm64: Set ESR_ELx.IL for injected undefined exceptions at EL2
-  KVM: arm64: Unconditionally set IL for injected undefined exceptions
-  KVM: arm64: Unconditionally set IL for injected abort exceptions
-  KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
-  KVM: arm64: Set IL for emulated SError injection
-  KVM: arm64: Set IL for nested SError injection
-  KVM: arm64: Set IL in fake ESR for pKVM memory sharing exit
-
- arch/arm64/kvm/emulate-nested.c    |  4 ++--
- arch/arm64/kvm/hyp/nvhe/pkvm.c     |  3 ++-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c |  2 +-
- arch/arm64/kvm/inject_fault.c      | 18 +++++-------------
- 4 files changed, 10 insertions(+), 17 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 8c3fbb413a06..9767adf1f73e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -278,7 +278,7 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u64 esr)
+  */
+ static void inject_undef64(struct kvm_vcpu *vcpu)
+ {
+-	inject_sync64(vcpu, (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT));
++	inject_sync64(vcpu, (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL);
+ }
+ 
+ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
 -- 
 2.54.0.1136.gdb2ca164c4-goog
 
