@@ -1,124 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AB1146588;
-	Sun, 14 Jun 2026 09:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781429381; cv=none; b=MXi/PS3OF5BwdIEYaM7ugKYk1CtL1eJU8602potZ5v36pHdvlueSONKQGdos4TfccOMYRMw7tV6F6lFWLCenhK0lt2ixrYPVpbtyp4GzE2EaamiV+QT5zsXjA5wJiRFdKmGCo+YpGpCE/4AtyuSVteUmuUOwOeIOAd5zNRyFLDw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781429381; c=relaxed/simple;
-	bh=I/bvVi6jc/VbHTiaCrhgjd5p5b9/upZ5EFx7TYNUhhc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E9i2IsUrS2xgMfH3LYxExrRRrYtwbzQgucP6hNoOaBQTwZGchO77kF7Y5iSmhRvl4XQI0Iye9bYAg7Co8JCb8xAV3pvbqbig1KOjH7Na3AsP2eYvCjpu8+qAMtJRy9oHirbMWRv9DtZCkod7vygCJRay/69s1Al3xbQwrR1AT80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XfzpREgd; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF65E364029
+	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 10:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781433405; cv=pass; b=RqPDz97Kq6XMYBeg/fL1lkaBw3OdBeAG5QDferb9a61WVXDUo31KvUPpqCTCckpHYpdqpl34QJHI6ij/Xy2FJH0JSq4F/AtR035kWGf1TdJd5+Ru7nO6FQd0K8/4f0anI1seCdhkWsK9oE6z0+tAq6SIGO6whSUq5WULrENCKKU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781433405; c=relaxed/simple;
+	bh=LNZzSVh5t+Rz1ZtSfa+00Lh6/l3vF/F0/XGMgP1krc0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jh0A2oCidYlsMSwxlH0Vfuy/P6fHNiKkbVEIbzVC4ihxLGvYKro6kdjQhlCDB+LudAHqdYTyodAa7XzIA6qVNr+ofjoppQmwq9WFFmLkDt/l+dMgqaYRd7jRR+tjETk2CfgZDQF0slaYM/6EV8CO5uqu2qIYPjVeMaoeGK2SYOQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IxFom/dm; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XfzpREgd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14FC71F000E9;
-	Sun, 14 Jun 2026 09:29:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781429379;
-	bh=VGipe1TnTsh2KYuYR/NW/LZHMBf92aj7lIaB8fElLLQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=XfzpREgdfgjZnpz1K2FzM/zFnUPUtOH7Ujq9RFyQCMpsJyAUo2qbz5Ua1DmUjeFkX
-	 v9C/zzxYrKX4ssPoNa3i46rznV2XE65nGwzpek02L3/WPNW9cLnmJyfdifZb1NANKo
-	 PsHrcacSLvd3iTwPypkUCU4XsIeC1tzPi4UmfVo+havuRMsSljj6nFsn/iPQrQenSm
-	 5v76vIdUP12bf2AzgNU1Wp5guyIjFolf9JZDPX2JmBMlzZi7bAz47yG4WxVd60tz88
-	 Wppq1I1qQXqMzvGxLN/htKKVgMtfMsOaA9PK8r+wYZPvmhZPvBMTTDmW/v+KyvNuu2
-	 pUlMBo8GRPDJw==
-Date: Sun, 14 Jun 2026 10:29:34 +0100
-From: Will Deacon <will@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Sebastian Ene <sebastianene@google.com>, catalin.marinas@arm.com,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	korneld@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, mrigendra.chaubey@gmail.com,
-	perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v2 0/7] KVM: arm64: Forward FFA_NOTIFICATION* calls to
- TrustZone
-Message-ID: <ai50fgNHGUqz0muP@willie-the-truck>
-References: <20260608165549.1479409-1-sebastianene@google.com>
- <aikt44sVnpL3_dYi@google.com>
- <aik5MtvOlnQDmzjr@willie-the-truck>
- <ailVcN-bxY30-XBF@google.com>
- <ailXKA1VG8vyKNfV@willie-the-truck>
- <ailtCAcEaJIgZ5Ap@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IxFom/dm"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5177d1ff061so489231cf.1
+        for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 03:36:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781433402; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cKMMM91DIYqiBdufCsmsc3ZdJGTMGnQQyw+ibsXWkR1N8rGnA0snDaGcMgIsE2s+Dh
+         UtTgD2KOqDCPMR5NbTbMdvqxFmvaaIIwZ+rq6biP92oM150QN8leuzwjzXJZF57Xnbr7
+         FLopCR4MhLMrpWe7tTbQIHBorL+EjcXSK//HC0Z85SNb8DZUFTLt6+jxad0FQNNdRqtY
+         ebeUU523f+tdH0aeQQUssMlr8bm6i+/tyk3KUcLK31jvBW4XM9/NXpgJexbvviCe3GcN
+         u+mlQ/cmGKPIoQ0rz3rj9AmpT0DSYmZLBQcbZ3z1SDlP/rNuzSCHpiU0/vsJy7jXLcSF
+         WqHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=zsDo/ZOVPfEdPqS3LglFyoYCxHooaqSGHDtP1XDlcEk=;
+        fh=MCrHQQuE64HVHGB8TJoQoV/DCpiOGh/N0C+vw9CDMZ0=;
+        b=XToYzoipbrf6grzIkhT0dCzHQXapg8M/4FHD30zZf+I1EwcuDT5MRN/MMPYKd7CvpZ
+         BhCr5cBnIWI5CeIv9rTXCRSpyVoHWSO1VQLZUENNAK6eqvndQvkemKcrqRC3VAqNaBYr
+         k7p8KJzBYRsj1foCsBD12SrIWysV82Xdee9k0ti9LSWMPMrpKenAoXjtcOY8fiwL7PZ2
+         6HYHqyPemP0kDDJpJWl4JWyshKIARwCDvIYRh4i3TqE4WhWQwz1lpNdtrIl/7aTZm9CK
+         sJ7K6NoExuAp8nUvDRpLEAL3lJJ0CqxoxNPX+XjxqgctVtUmqkO0+EmKGXiKzfSaOsrP
+         +8AQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781433402; x=1782038202; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zsDo/ZOVPfEdPqS3LglFyoYCxHooaqSGHDtP1XDlcEk=;
+        b=IxFom/dmFGNj1vtWVpzvQu1fHBIBNDx3oabg+Ada7r+ovFGOLjKh/ed7fAfIW02lto
+         76kZhMpxr1tn2/y0h3KLW1Sd6PEV30uJ/fqk02Rvm2t29BvZuxCgU4EGMxlpC1+EPxqP
+         AEK7UT/vCdg29l9e8tyWS63BsnAUbnJCP43NnLyceJkagtzHXZarw4QF4SnNGiTG7R/U
+         N9j2r0ydZaHJdbqCLu+Z5Gk1sKYLeCySV3aLw3WcAPU/E7/wcOmYFRM/EMQ3uuZxgY02
+         MSFFO0wIJiZTYRUZ1FitnTDH7cFbrvo/UUwcJFuZNZpeI1QpHFedXA70yHf57nBawhN1
+         rl5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781433402; x=1782038202;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zsDo/ZOVPfEdPqS3LglFyoYCxHooaqSGHDtP1XDlcEk=;
+        b=biaONvAfJ5zg3zFYTMiLQL23nmKzPq1vBheCYfHYzk1AGCgQssW/C8mAljDw6DtoTj
+         2qInK8FSct0nM2BcN+qlEuBjLxYbSJnxzY2luD0qJecuAKVfZInqElTTRZa0lSnTf0Y4
+         ujWFehXmzI9KHk523ZURda4Xh019DhDkOe54dyu9syug2QwoNC2DNjJ2DVRVxGATXur9
+         rzmsmX4f5Reh05ak8eXH36pZWCCknG6asth+PrcCuxyYzr1aAJNRi2phMQnQK5wdCUeU
+         xynIKWEDiOWDo4SHpEbyHPO366C7rWkO5QRpmA+Q/mJkoFWXUue7MR5vC4NFu11sz1Lk
+         peOw==
+X-Forwarded-Encrypted: i=1; AFNElJ+lcf6o8TkfqARipv5kCq2tAk5x+JrE8YQMfdNfRy/T6Ku8wYEkcW/vu/5kOYFi3CBJFDHfT00=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy45z5IdOnlu+DExQBI53WokcbfopqiMPa9RJjfYHhx0hCy9uEM
+	UPtdjbUcLx7eT43wL39FHRYjw+no0vd6e5Z7rEAYLuQ7LOAYt5uUhL/l1s9FqwN9rcqEUuRP04c
+	OKPYUcS2TBTB3U/qw12VSNqXxI6wJvosAU2og5n8k
+X-Gm-Gg: Acq92OHnZ15NdKIVoqjSqE7v0aJN0LHw4j8FtA8t5jgw4uklEU3ZR/yMhpxn9KRNzj6
+	Pz5MPJlyfRYYvlf4kYi0vnK2Zvb9W6hgl1o3L2NoGDAJkDupR8bqyODeMrCG/grOgxkF0V+BAXO
+	zrARyew6Q9mi6tnRPZdlyb+unHmU0NR7ILWxb6QvOEzKlH62WfUgrLR7wxDg+yidcilGty6Hzr3
+	rNaworjtp2HoY4T47vkBXuFMsnReeNME5dKir2ba1GxJDtgDdOAnS2ivvd0p/q+sKAG/wpMT0pq
+	kNzpf+Mz
+X-Received: by 2002:ac8:5c83:0:b0:517:5e32:2d14 with SMTP id
+ d75a77b69052e-519549b2989mr10393391cf.10.1781433401238; Sun, 14 Jun 2026
+ 03:36:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ailtCAcEaJIgZ5Ap@google.com>
+References: <20260612113414.1022901-1-tabba@google.com> <20260612115044.16E3B1F000E9@smtp.kernel.org>
+ <CA+EHjTyFFf__9iGFAyAkechiX+gaiK9ksdfgxLSFe8RcAY=HGA@mail.gmail.com> <87pl1t8q24.wl-maz@kernel.org>
+In-Reply-To: <87pl1t8q24.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Sun, 14 Jun 2026 11:36:03 +0100
+X-Gm-Features: AVVi8Cf25BgmHVzixnH72Pp4x2je53tjyX44xbNfRJni2U2FbMN2z1y0gR_1GS0
+Message-ID: <CA+EHjTzNPabfo3bnuMuBKKz5T3w=BdTdSkZ7eD3VGZAiyrhJNA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception
+ into a pVM
+To: Marc Zyngier <maz@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jun 10, 2026 at 02:56:24PM +0100, Vincent Donnefort wrote:
-> On Wed, Jun 10, 2026 at 01:23:04PM +0100, Will Deacon wrote:
-> > On Wed, Jun 10, 2026 at 01:15:44PM +0100, Vincent Donnefort wrote:
-> > > On Wed, Jun 10, 2026 at 11:15:14AM +0100, Will Deacon wrote:
-> > > > On Wed, Jun 10, 2026 at 10:26:59AM +0100, Vincent Donnefort wrote:
-> > > > > On Mon, Jun 08, 2026 at 04:55:42PM +0000, Sebastian Ene wrote:
-> > > > > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
-> > > > > > FF-A proxy. This restriction was preventing the use of asynchronous
-> > > > > > signaling mechanisms defined by the Arm FF-A specification to
-> > > > > > communicate with the secure services.
-> > > > > > While these calls are markes as optional, there is no reason why the
-> > > > > > hypervisor proxy would block them because:
-> > > > > > 
-> > > > > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
-> > > > > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
-> > > > > >    Because all forwarded notifications are inherently attributed to
-> > > > > >    the Host by the SPMC, there is no risk of VM ID spoofing
-> > > > > >    originating from the Normal World.
-> > > > > > 
-> > > > > > 2. No Memory Pointers or Addresses: The FFA_NOTIFICATION_* ABIs
-> > > > > >    operate strictly via register-based parameters, passing only
-> > > > > >    VM IDs, VCPU IDs, flags, and bitmaps. Because these calls do
-> > > > > >    not contain memory addresses, offsets, or pointers, forwarding
-> > > > > >    them doesn't pose a risk of memory-based confused deputy attack
-> > > > > >    (e.g., tricking the SPMC into overwriting protected memory).
-> > > > > > 
-> > > > > > While the pKVM proxy behaves as a relayer, it doesn't currently have its
-> > > > > > own FF-A ID(only the host has the ID 0). The behavior of the setup
-> > > > > > flow is covered by the spec in the: '10.9 Notification support without
-> > > > > > a Hypervisor'.
-> > > > > 
-> > > > > As it is only a relayer. Is it really important to check SBZ arguments and
-> > > > > fields on behalf of Trustzone? It doesn't feel it brings any security. If the
-> > > > > host passes broken arguments, I don't believe this puts pKVM at risk. Does it? 
-> > > > 
-> > > > I think the problem would be if an update to FF-A allocated some of the
-> > > > currently SBZ bits to implement some functionality that we would want
-> > > > to filter at EL2.
-> > > 
-> > > I suppose that would bump the FF-A version and the proxy would reject it?
-> > 
-> > Maybe? I don't think they'd _have_ to bump the version number.
-> > 
-> > > If we really want to check for those arguments to be 0:
-> > > 
-> > >  * Shouldn't we extend this check to other FF-A invocations?
-> > 
-> > yes, that's what the diff was doing in the reply here:
-> > 
-> > https://lore.kernel.org/all/af3fW468-f1KXCrC@google.com/
-> > 
-> > but, as I said here:
-> > 
-> > https://lore.kernel.org/all/ahmxiFXXTupafbXw@willie-the-truck/
-> > 
-> > I don't particularly like the table-driven indirection (the checks
-> > should just be inlined).
-> 
-> Ha, sorry I'm late to the party. 
-> 
-> Perhaps this series should start with adding ffa_check_unused_args_sbz() to the
-> existing allowed FF-A invocations?
+On Sun, 14 Jun 2026 at 09:46, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 12 Jun 2026 14:19:10 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > On Fri, 12 Jun 2026 at 12:50, <sashiko-bot@kernel.org> wrote:
+> > >
+> > > Could this cause the guest kernel's exception decoding logic to fail or
+> > > panic?
+> >
+> > You're right -- the architecture mandates setting IL here. Like you
+> > said, this is pre-existing, and I'll submit a separate patch to fix
+> > it. But first, Marc: was there a specific reason for not setting it,
+> > or is it just an omission?
+>
+> Just a plain bug. The normal KVM code is usually careful to construct
+> the new ESR based on the source of the exception, meaning that we
+> always convert ESR_EL2 into ESR_EL1, and propagate IL amongst other
+> things. This is obviously not the case here.
+>
+> It'd be worth auditing the rest of the code and make sure this is the
+> only case of IL not being correctly set.
 
-Yes, that part now seems to be missing.
+Thanks Marc. I'll do that and fix it on the respin.
 
-Seb, please can you respin with that included?
+Cheers,
+/fuad
 
-Will
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Jazz isn't dead. It just smells funny.
