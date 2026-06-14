@@ -1,54 +1,54 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6AA39FCCA
-	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 16:33:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928E53CAA48
+	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 16:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781454822; cv=none; b=FSJvIIOuVB/B9fJdvjvPeZ2Y+CCmrW2jIaEgABI2agi5AO3bK/AJ1WiotB2BSYjS3zFs4IsamAN1tV6FXWDVdwPAPZVS0CDZOajVr4mkMOwDPbLPztlxQXjo7H0xty727wlAESB/A0Zqa2tTBc0vHQW8GPmFLThroG4UAQUH1jo=
+	t=1781454824; cv=none; b=n7eehvlVx3wlw50v8rDDw4eGdKnIRiQ4EOD97wc+4+lQI4FrR4fUp5EWOE636t0DXqWszuNMKplUnW3nENc2HQQDNnDjsCYqYX7BmIij1nkREJmLcbdJKV6DzPm2wZSYHtv/vgaCbqimRv0+8ao9EK0qSXIxJMmVnyvYU/Rk9wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781454822; c=relaxed/simple;
-	bh=S+ANIzhr+1I2ni2Ik563AGs53yzGHssDeuVeRRuhqk4=;
+	s=arc-20240116; t=1781454824; c=relaxed/simple;
+	bh=A2AhPH+33IQk5h5kTOaTRTDdWlQAO0nttY9d2WHTjzg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VcC1XaA59BZhWdp1ZV86Ieh52Cf6PY2pEaUhdDY57iHbk+BBCSaLtFTzAEc3QnKV6WJ6qNEh36aEIaBfHk6kiAi3CMlwLeVKUFAJhikNH8eRQbdf6V8ZkQuLVJEiDtR8j6cOvy08Md81NJslJXRnuAxieGCF9rIvzE/cW+OcAB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lxf6w4Y3; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=SCVArAoLZ2tRrpwzKDyQ3273yvVHxGySCZ+V6Tani4XB/rWW2a+WCrCKV1VE3eX7u2zOaTaNCUv8PHwAoucyKX/IBRy+3aGOeWLKnP2nfse2OkuB9KRw5mrq9hPpG/2YrpWP/iGOmOYrz2oWHgvzifgxxP5nCFfiD38KHmsGnrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PZ9vRAiN; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lxf6w4Y3"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-45efa7755faso978301f8f.1
-        for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 09:33:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PZ9vRAiN"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-bf481a6e4e6so198896666b.3
+        for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 09:33:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781454820; x=1782059620; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781454821; x=1782059621; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1TuWrlseib9lZt4HAdFooYmABBxqslHnBMn4+TnN7o=;
-        b=Lxf6w4Y3WT2ABLaNE9rn19nAswTFqFnZ/mxQAogNF6ZYINruXSXDEpGGcogmhhm6P2
-         T0DJTYpkU7zL5kpSeffVdgQfy20EAYeUVI7A9KwUqsJoT+S2Z4vu1KHPsl9auCXjAFzS
-         k42uyKGkbzcWfwEFSOHqWgqNRMAXLnzrK5OVvVEz0eSLjcVKOvTtBGCdGQZbKcBiUxR4
-         rZ2PuQyxPTjPBkBibtV8syow1wxBkT13Oihamk0/aWqz0vcalY1CZPPqtNARMKUPKo5I
-         P7QUPQ/O4yVs8RxDG0DMQXyg7qJTAmWHY/R1kpyKMFGpkXMdseaT9RXD+mdGCH3cGVFJ
-         sG9g==
+        bh=pUEfSSWjUxPUEBOeVgJgGyeprvmKo0fkBhbWmKqUI0k=;
+        b=PZ9vRAiNLbYi4FmLtb60ZDK8vf2OLcVZPfOVR8t1Adv4Mne45iHa3FnhgGcqITXswN
+         pHHYkrZqI7l9Gc5wDAqtVOUlqtlcv1tfj/MUzYM0vqsbdWcHS9GEY32jlNPJvBPYe3n3
+         +wvzWKdzKjJ2bilIKC2N73dbAIIscyTxYmEw6vM6XEwbyeLNr8VCvkd2f4NsaXg0Rc/1
+         ncUwpL9UgJKWXY3IkVl8feSCwMvNCYwHzggnemI9PAY0cfafhF+xxR4xBfhKy7Y4bUF5
+         aNgaj9KYljPcuAwH1ziXqgClDSL3nPM6EF3TYokAQEYBIYx4o5M0j82CALx8QnGjDeZ4
+         Delg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781454820; x=1782059620;
+        d=1e100.net; s=20251104; t=1781454821; x=1782059621;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1TuWrlseib9lZt4HAdFooYmABBxqslHnBMn4+TnN7o=;
-        b=ZU2Pz+3wcbCegyJTcR1HYkhi/A4PfekQ8Jby5YcQ/yTyk7dtdoQqc0YdPgxzsFGOZ5
-         OR6FmH6/T7EN7WSZ3C2C6EuB+sYXHEN6ExRCYPf+YRsnL2cUr9hZG2uHbrub3djtIlwl
-         Jhcm+MSr9ntut66XA6lMx88sqQPI598aZyjanXOAKt61be0RMc8LQfT2jX7yOfcx2huW
-         m/fYBiTGnvfMhYzQTLBXn0HW3KUTR8AdxE55bQXQwr+YePsw/d7Br0oxslVZmmNS3fW8
-         1ChyTNmIrn9xjKRv0IwKbbWzY+O+TeTaNZ3JknjGtzA2obTG/elhqhn2+2/rh6XmSg2h
-         IXsw==
-X-Forwarded-Encrypted: i=1; AFNElJ83+XgFyUcHkVHjnC4t/X/dN13CtSYcQ80NOXo8Fcmg+T42KiwfwDFcPxcMLTeSSc1egS2a1cY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyXwZIGXBUJm1IHck2txA9RyZIWKNmFUbHRcm9gd0LphTbI4lvj
-	/pPTnSaSoeEBMgLlIZEi2ZBs3a4mES67klJXqGzwDzDtWsGq4kUiRKm/+BCfB6x7iF2lO3RZgo9
-	dnw==
-X-Received: from wrmc12.prod.google.com ([2002:adf:e70c:0:b0:460:18fc:1a70])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:288f:b0:460:13db:4a03
- with SMTP id ffacd0b85a97d-46074a5289amr8873252f8f.7.1781454819748; Sun, 14
- Jun 2026 09:33:39 -0700 (PDT)
-Date: Sun, 14 Jun 2026 17:33:31 +0100
+        bh=pUEfSSWjUxPUEBOeVgJgGyeprvmKo0fkBhbWmKqUI0k=;
+        b=outWbioTTtmQkYkDHZVaP0xJHsv3xUlYqUckS7qZsIMoNecYfSWHW41+sNIrRq94mw
+         JOtboo9cJMvFnvYNZVrIalEsgFsdmzRbkdLDOKMlWZXNrFvF1oi7muZIA2htion+BNgr
+         wEmo/80Gza3uEt5DBXEvfw7UrMt+qCtcx66a49LLpHUWIX0gNKvtp08ScDNud3moRgb5
+         YdW/uXJ7do3Au+qPuP4kjE5RVDTicwo6BdbU2w7eXu3wQxrI9BXuLs1AfYvM7+kjNFfZ
+         FuN7TMZp3Gon12lExT5AGYL35Cx6Jsb9XtLY4tt8G6uAJnpj3ocfp3Sdfs4+Ax9UlLPh
+         WU9w==
+X-Forwarded-Encrypted: i=1; AFNElJ/QxSQvEJPW/7AEaD4XzgQauWFL5L4It2GOaOqquBFLs5qlhya5EXRSl7DfO4rDwvCa3IAgbwc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw1BOqWIjDC1YC1j89BFhA9IRmhTxWljJK2cPQTBtQRrJACuwXA
+	+o55YcHJV5q2DHPZJDpVPMg4HrGCa0WgLwndAbV8u/rH+A5ei64qghsdZBbgkdFan7qJJjEtSPK
+	VLA==
+X-Received: from edl15-n1.prod.google.com ([2002:a05:6402:424f:10b0:67b:f7e5:4f5f])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:7ba2:b0:bee:9809:3ccd
+ with SMTP id a640c23a62f3a-bff499220e7mr377106666b.4.1781454820693; Sun, 14
+ Jun 2026 09:33:40 -0700 (PDT)
+Date: Sun, 14 Jun 2026 17:33:32 +0100
 In-Reply-To: <20260614163336.3490925-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260614163336.3490925-1-tabba@google.com>
 X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260614163336.3490925-3-tabba@google.com>
-Subject: [PATCH 2/7] KVM: arm64: Unconditionally set IL for injected undefined exceptions
+Message-ID: <20260614163336.3490925-4-tabba@google.com>
+Subject: [PATCH 3/7] KVM: arm64: Unconditionally set IL for injected abort exceptions
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -70,42 +70,41 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
 	Vincent Donnefort <vdonnefort@google.com>, Sascha Bischoff <Sascha.Bischoff@arm.com>, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-inject_undef64() derives IL from the triggering trap's instruction
-length (kvm_vcpu_trap_il_is32bit()), but the IL of the injected
-exception is fixed by its EC, not by the triggering instruction. The
-architecture mandates IL=1 for EC=0 (Unknown) unconditionally, so the
-conditional is wrong. The undef-injection paths are not reached from
-16-bit instructions, so there is no functional change today, but the
-logic should not rely on that.
+inject_abt64() derives IL from the triggering trap's instruction length
+(kvm_vcpu_trap_il_is32bit()), but the IL of the injected abort is fixed
+by its EC, not by the triggering instruction. The architecture mandates
+IL=1 for Instruction Aborts unconditionally and for Data Aborts with
+ISV=0, and this function never sets ISV (the FSC is always EXTABT or
+SEA_TTW). For a 16-bit T32 trap (a 32-bit EL0 task under an AArch64 EL1
+guest) the trap has IL=0, so the abort is injected with the wrong IL.
 
 Set ESR_ELx_IL unconditionally.
 
 Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/inject_fault.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ arch/arm64/kvm/inject_fault.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 89982bd3345f..9dfae1bcdf99 100644
+index 9dfae1bcdf99..444d219b0217 100644
 --- a/arch/arm64/kvm/inject_fault.c
 +++ b/arch/arm64/kvm/inject_fault.c
-@@ -170,14 +170,7 @@ void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
+@@ -138,11 +138,10 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 		pend_sync_exception(vcpu);
  
- static void inject_undef64(struct kvm_vcpu *vcpu)
- {
--	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
--
--	/*
--	 * Build an unknown exception, depending on the instruction
--	 * set.
--	 */
+ 	/*
+-	 * Build an {i,d}abort, depending on the level and the
+-	 * instruction set. Report an external synchronous abort.
++	 * Build an {i,d}abort, depending on the level.
++	 * Report an external synchronous abort.
+ 	 */
 -	if (kvm_vcpu_trap_il_is32bit(vcpu))
 -		esr |= ESR_ELx_IL;
-+	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
++	esr |= ESR_ELx_IL;
  
- 	kvm_inject_sync(vcpu, esr);
- }
+ 	/*
+ 	 * Here, the guest runs in AArch64 mode when in EL1. If we get
 -- 
 2.54.0.1136.gdb2ca164c4-goog
 
