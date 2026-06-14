@@ -1,145 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E591E222580;
-	Sat, 13 Jun 2026 00:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A9F1474CC;
+	Sun, 14 Jun 2026 08:46:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781310905; cv=none; b=OgD31zuEK+nD+KF2fjM/JIVEPF95Tw3POViA4RnUopaiuCqrzORkIiuovAnlMklI6sZrb12N6L26zHtmqWBIoO7pNta9UntmJF+WWoG2wALTmqFnPaKT9fgBnJ6zAiXnn6wIBzcjbSIKUyCPZVF0XKQx/UBpLDJQgDnmQbYZ4wg=
+	t=1781426765; cv=none; b=LEEd2ru6KkozuFEGP2oenUAEpNQpkOCb5hTjwpR3qfSABkVHE3CNWMqkwrHsvCJmniTv566osWyDrAG8WJ2d7sKVHWdTxGcZxWQqkMHKda0IlrBavTt227bxipIXskiC98eoYD0xF+U1FuTKukF/7Mf1Q3RMYa4w2x5TdfsZAtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781310905; c=relaxed/simple;
-	bh=aLgbRPI5QladbTRYfORYqfuEsYqcluMPLr7+HJ1XXbg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jS16mpMX8eAK0QWhLCrAKOUhd93BWcA2/e6UYQnxcCWnChb7q/hsaFVVrTQVuq2cH4qcGEn7atLXzk2w1nR0jo9hocxO+hA1sFSy6W05VRphSb/qAAvMFztKGRjlRRUHdYKPjvhR/d44ga5YL9vBhZdYk42STWrKKuNlErxC+b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jmmuvvwn; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781426765; c=relaxed/simple;
+	bh=wfs9Bo8vwsW1fnRXS+VbiF3roIH9YD1x+0PEu0MRg+g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zgt1+Y3JJZTRYu2cm9PnoDKAmXlLAZDezGPgy7Cl1gxUE131cT17MrSrgZ3thYOjc+vOXWl2ij2R0bhrPTX9bDI+/QUOGJZ+PFtDKMi+RoahhpPm0Xa+TknBX1/LP02O22DPs2+cTvOJ67IHE5/v7fMQIC/tNOuiSv/+/yce3p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPFlpQfq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jmmuvvwn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD5951F000E9;
-	Sat, 13 Jun 2026 00:35:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPFlpQfq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F059A1F000E9;
+	Sun, 14 Jun 2026 08:46:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781310902;
-	bh=m08QP8UI/SGYAlAmalaWB4AWEVPKZ72ZDKPFq57GncU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Jmmuvvwn5FgiUVyOqHPwYVZg0jA17t4eKGfXRo6vpOHjTBi4JKUeBXM8Vh/1ZQxMU
-	 txwELwp79FZwDp/mADe/rEch3YhMWbSChLj6WM1IwKpdMcp9LSp3e1jyyTQ1wyUx7V
-	 zItUd8jviNVZJ3KviPn9/BUOWGO0A3aWSDVxYx2fWnpyjVbhuse+IU6jd3edIM2uPQ
-	 //KmD7enbs/neTpbGARlEPW8dz7B37AD7TUOAeWsnvDZUmdxvQB+Tr0gdL9fnoqf/g
-	 6mbaiEZHWUfy5mrkCmAxsANuGT2yEWKtstEkoTGBDBr579/0ZzbB+/3SDvWDGgBeSX
-	 RJSUrAJy+yajQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v7 09/20] KVM: selftests: Add VFIO device support to
- eventfd IRQ test
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sean Christopherson" <seanjc@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260613002031.745413-10-seanjc@google.com>
-References: <20260613002031.745413-10-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Jun 2026 00:35:01 +0000
-Message-Id: <20260613003501.DD5951F000E9@smtp.kernel.org>
+	s=k20260515; t=1781426764;
+	bh=lCUjsqHBobEFf4PCgWD95wW9m403kB/GflewUKsUwHc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=gPFlpQfqCyJHMCr+dAL43B8gS+NNYPW6XL0mYI8b8xQPkx49tJghZiF3YrcXhVrqe
+	 9ZTAeXVqsg1gp1hizbuguF1IogkSBoaRvRTy0hJeLbLpu89UOpr+KI/YBO4sN+aVrT
+	 u7+i3Cu0SUavkqC5Z/phzmCb/bAdkhl3jTzbbsx4Aybog/jV83EIxjY0Xvyj1+OZpd
+	 6EmrSVWJ9piOpg1yymn54gQOdj5KBqgVmr0mDk7r1ad+87xcXVXjGVT8vqd7Wrq1r7
+	 4HiYVIHValMAGRfRYcqtOSN5zFpKmkauQjGB2bpUAU2rJ79S9FkFcIkaRaWSkT2Gu0
+	 OeMvXDpdXEqRQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wYgTh-0000000Cd7x-31Jd;
+	Sun, 14 Jun 2026 08:46:01 +0000
+Date: Sun, 14 Jun 2026 09:49:23 +0100
+Message-ID: <87pl1t8q24.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: sashiko-reviews@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
+In-Reply-To: <CA+EHjTyFFf__9iGFAyAkechiX+gaiK9ksdfgxLSFe8RcAY=HGA@mail.gmail.com>
+References: <20260612113414.1022901-1-tabba@google.com>
+	<20260612115044.16E3B1F000E9@smtp.kernel.org>
+	<CA+EHjTyFFf__9iGFAyAkechiX+gaiK9ksdfgxLSFe8RcAY=HGA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Medium] probe_iommu_type() incorrectly probes the /dev/vfio directory in=
-stead of the /dev/vfio/vfio legacy container character device, bypassing th=
-e framework's intended skip behavior for unprivileged users.
-- [Medium] vfio_setup_msi() hardcodes the device's DMA region IOVA to 0, wh=
-ich can cause IOMMU mapping failures on platforms that reserve or restrict =
-IOVA 0.
---
+On Fri, 12 Jun 2026 14:19:10 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> On Fri, 12 Jun 2026 at 12:50, <sashiko-bot@kernel.org> wrote:
+> >
+> > Could this cause the guest kernel's exception decoding logic to fail or
+> > panic?
+> 
+> You're right -- the architecture mandates setting IL here. Like you
+> said, this is pre-existing, and I'll submit a separate patch to fix
+> it. But first, Marc: was there a specific reason for not setting it,
+> or is it just an omission?
 
-commit 2bdd8160743775c8d18e4004e72e7ff0898fbd70
-Author: David Matlack <dmatlack@google.com>
+Just a plain bug. The normal KVM code is usually careful to construct
+the new ESR based on the source of the exception, meaning that we
+always convert ESR_EL2 into ESR_EL1, and propagate IL amongst other
+things. This is obviously not the case here.
 
-KVM: selftests: Add VFIO device support to eventfd IRQ test
+It'd be worth auditing the rest of the code and make sure this is the
+only case of IL not being correctly set.
 
-This commit extends the eventfd IRQ test to support triggering interrupts
-using a VFIO device instead of manually signaling the eventfd. It also
-probes for IOMMUFD vs legacy VFIO availability.
+Thanks,
 
-Link: https://lore.kernel.org/all/20260602222941.3133236-1-jrhilke%40google=
-.com [1]
+	M.
 
-> diff --git a/tools/testing/selftests/kvm/irq_test.c b/tools/testing/selft=
-ests/kvm/irq_test.c
-> index 9f8895b898214..6888be54ee4a9 100644
-> --- a/tools/testing/selftests/kvm/irq_test.c
-> +++ b/tools/testing/selftests/kvm/irq_test.c
-[ ... ]
-> @@ -55,6 +58,36 @@ static void *vcpu_thread_main(void *arg)
->  	return NULL;
->  }
-> =20
-> +static int vfio_setup_msi(struct vfio_pci_device *device)
-> +{
-> +	const int flags =3D MAP_SHARED | MAP_ANONYMOUS;
-> +	const int prot =3D PROT_READ | PROT_WRITE;
-> +	struct dma_region *region;
-> +
-> +	/* A driver is required to generate an MSI. */
-> +	TEST_REQUIRE(device->driver.ops);
-> +
-> +	/* Set up a DMA-able region for the driver to use. */
-> +	region =3D &device->driver.region;
-> +	region->iova =3D 0;
-
-[Severity: Medium]
-Does hardcoding the DMA region's IOVA to 0 cause IOMMU mapping failures on
-platforms that reserve or restrict IOVA 0?
-
-If IOVA 0 is unsupported, it seems like iommu_map() will fail and trigger a
-test assertion crash instead of running.
-
-> +	region->size =3D SZ_2M;
-> +	region->vaddr =3D kvm_mmap(region->size, prot, flags, -1);
-> +	TEST_ASSERT(region->vaddr !=3D MAP_FAILED, "mmap() failed\n");
-> +	iommu_map(device->iommu, region);
-> +
-> +	vfio_pci_driver_init(device);
-> +	return device->driver.msi;
-> +}
-[ ... ]
-> @@ -74,11 +107,29 @@ static void kvm_route_msi(struct kvm_vm *vm, u32 gsi=
-, struct kvm_vcpu *vcpu,
->  	vm_ioctl(vm, KVM_SET_GSI_ROUTING, &routing.header);
->  }
-> =20
-> +static const char *probe_iommu_type(void)
-> +{
-> +	int io_fd;
-> +
-> +	io_fd =3D open("/dev/iommu", O_RDONLY);
-> +	if (io_fd >=3D 0) {
-> +		close(io_fd);
-> +		return MODE_IOMMUFD;
-> +	}
-> +
-> +	io_fd =3D __open_path_or_exit("/dev/vfio", O_RDONLY,
-
-[Severity: Medium]
-Because /dev/vfio is a directory, will this open() call succeed for any user
-with read and execute permissions to the directory, bypassing the intended =
-skip
-behavior?
-
-Should this probe the /dev/vfio/vfio legacy container character device inst=
-ead
-so the test can skip gracefully for unprivileged users rather than crashing
-later in iommu_init() due to lack of device permissions?
-
-> +				    "Is VFIO (or IOMMUFD) loaded and enabled?");
-> +	close(io_fd);
-> +	return MODE_VFIO_TYPE1_IOMMU;
-> +}
-> +
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260613002031.7454=
-13-1-seanjc@google.com?part=3D9
+-- 
+Jazz isn't dead. It just smells funny.
