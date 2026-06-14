@@ -1,102 +1,142 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4256D2F3C37
-	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 16:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8496B3CAA3A
+	for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 16:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781454830; cv=none; b=ujoDUjdW2xgMnFQa8vwQLYqWISJl4wirei/l+B2tdISLUP8MaBHyEeBADGAWSLDsPUMy5Q2++F+HRBlUQE9AW/ErzDXMRSchX7VCClmtsgCW5uHU3/T0KutfMEBfcmlScT8aNLRJnD7LxLTTnsGTfI5bBnmVhI01perdyfBS4Dg=
+	t=1781455458; cv=none; b=bnMVP2yfUwxm3FGM/eLAtoMuRDNaoz0vbAq9HZiHZjDAX6KrD5anDiR7maBnelYLliwSkd0Q+/++2Sf3yK0G7zK1Wx0PrIXLOieC7VapERhmgBVslwD9pd755i7+mny3zdt814BdUuDRMceHO+Zmp6XE35JbEfIGu9UQtUQxj5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781454830; c=relaxed/simple;
-	bh=6fN8ZpRV3F+mtkNhz/8qmQIMh+9OjyhawKu2ZpLAl6A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t91/HAIW8WDup+9rlJY3ttdKF6S/bdpx79QamLETL6ndT6ScQI+HtZPOdt/X92uOboiuLZkYtgq+nMNhx/ESdCYSx65qaLgMzLL21tVul0KnZZ3Igx/SBj+lldyW7KYu5X5mk5jxjKeCo2lp5kaRgUYapCABMoVp12qSQTOjB7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iYw/bX1g; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1781455458; c=relaxed/simple;
+	bh=4dt+kpOblcoBHX3GrQdIj9TvcyZ5dpBxv8pWJ0g88R0=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=JgkueiglXSJZC4AtCaRCyQFvtxkFbNpHIg1hY12x87UBXEi4oojst8/MglNBvJD+kVUVZWrjkkKyG+9nvTyxncgjnLUjdyGkegOEkQMc7GKIQNAObnz94TUDqWZuG5IBIMO6rsvW1LB2+alfRMoM+EdG3L+ljpkrBrD0U71WtAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ljdmMrCW; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iYw/bX1g"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490bfd70b0fso23576345e9.0
-        for <kvmarm@lists.linux.dev>; Sun, 14 Jun 2026 09:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781454826; x=1782059626; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tv4trLugC2C4NI3RAbn0dCrrthQRiHhpJKIFLbS3QSY=;
-        b=iYw/bX1gjNyaibJ/ipZpJs2AWC1YvJjpEqVm5KD0tUStvmDI5CNCQtVq7ScQQ788To
-         f7cJPI6ZDtTPTld8862sHFgRQoDPBResYkfgXMd9VtBjlLE3BFJm/LCqIIMZVVQvkhgl
-         HSmKxIzX2EQeUcP5R07kMdl4R02QJSJYkWckhNZnloX0DL900VEyDhzaq17w/gcwVQLl
-         QIrZEtWqImM8unY7HkqoW0Rk806J+pddrd09rqg/3rqCJPOMe1LuGTUe8M2L0UTK8S20
-         tfWrOszBlBMC28c5uuJyRxLdsFBcs3msM0cA5qKeNynf7TEHGYk5kDhCfzR4Y1Z+kI/r
-         FMQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781454826; x=1782059626;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tv4trLugC2C4NI3RAbn0dCrrthQRiHhpJKIFLbS3QSY=;
-        b=Dqhzt+42ycqVWgm/RcPQYujoSTT+q0VOGoNb/t2WrfnWMAk2XNyuMusmzXAZMwysas
-         00GEkwo8+zMCq+6t6WK5qahYg1p+2vyMaMmB2cPoE4GKJVy7bYIo7ThrSoshNLz91+/B
-         WUDK+4tawyC5iCWEjZ3DUe4HhHuk1zuNweZvW0XWl8GYtrcjTYkrAxfjApb6iyW7GoDa
-         5cTkA8t+CyC190MI1ol+1m9a0CkQxU6qRiDgxm3Xlbgz+63JbfwOjml107A8bYqN8BZg
-         iCh5rmawGHpY/cVKX56gul4XGYwFlG8ysBrSn/TyveL05LdOK/zyViC2mJzfISW0a1bD
-         +m7w==
-X-Forwarded-Encrypted: i=1; AFNElJ+3huzKkrJTOWjEeNs0ptPMischjyoipmKskNuKgZXuj+tY9MBwOXS739rFekJeGZF81k861mM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyT59ggf+liZrX7ZfMQuV96ifamet44GQpDbOyw6gdsYOonzjeQ
-	2FR/PtGUHFJdr2+UAbuSsJ9im8ek7C+um1Y7cm+TO291gxR/YlHUzsz1zoeYYDc8H5vYuDk6JZC
-	3GQ==
-X-Received: from wmjq15.prod.google.com ([2002:a7b:ce8f:0:b0:490:7e29:9cea])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600d:8494:10b0:490:c7dd:de3e
- with SMTP id 5b1f17b1804b1-490ec521187mr96160565e9.31.1781454825642; Sun, 14
- Jun 2026 09:33:45 -0700 (PDT)
-Date: Sun, 14 Jun 2026 17:33:36 +0100
-In-Reply-To: <20260614163336.3490925-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ljdmMrCW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D37E61F000E9;
+	Sun, 14 Jun 2026 16:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781455457;
+	bh=dp1IEDCTihVOXIrUY62HxqMeePUnxbsAGurul1adsd0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ljdmMrCWUAIauIMxxIVlomt61NJ+1E8k6JHKTZRNEBQriikn1zI8nR1a+iWAa3/RR
+	 HNQzEiwizL81RusvT2JkzLCIeXnr8sUzYA/O6kQ726ZzBVaVLxueJE6k/20FaZcS3a
+	 vqwbcZAB9cZR0YWuU4YsMbXODF87dYzYz11JBAn9aYQ+9YXk7fsJwWWU7qOvKC9upt
+	 rIm0JSf4IiD80yt4VkAzP2eADV6FGlB+aSgLJyZKlQSkJyHK6dAQzFt964f6Jj8iRv
+	 3P/suAYYV0K3tM4YiH+J24l5wlIcNF2rsas8xXt02zU9zYo9jSvClYFRA28tO8Qf3B
+	 KXxZFmE6UfQsw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 6/7] KVM: arm64: Set IL for nested SError injection
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <tabba@google.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260614163336.3490925-7-tabba@google.com>
+References: <20260614163336.3490925-7-tabba@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 14 Jun 2026 16:44:16 +0000
+Message-Id: <20260614164416.D37E61F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260614163336.3490925-1-tabba@google.com>
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260614163336.3490925-8-tabba@google.com>
-Subject: [PATCH 7/7] KVM: arm64: Set IL in fake ESR for pKVM memory sharing exit
-From: Fuad Tabba <tabba@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Sascha Bischoff <Sascha.Bischoff@arm.com>, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
 
-__pkvm_memshare_page_req() constructs a fake DABT ESR_EL2 to exit to
-the host without setting IL. The ESR has ISV=0, so IL must be 1 per the
-architecture. The host does not read IL on this path, but the
-constructed syndrome should still be architecturally valid.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-Set ESR_ELx_IL.
+Pre-existing issues:
+- [High] The constructed SError syndrome (ESR) is silently dropped during n=
+ested EL2 exception injection because `ESR_EL2` is never updated.
+- [High] When SCTLR2_EL1_EASE routes a Synchronous External abort to an SEr=
+ror, the ESR injected has the wrong EC (IABT/DABT instead of SERROR) and an=
+ incorrect ISS format.
+--
 
-Fixes: 03313efed5e2 ("KVM: arm64: Implement the MEM_SHARE hypercall for protected VMs")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+commit 09fd06d56ab3236a0e7af03e0d026ed6725ad6d6
+Author: Fuad Tabba <tabba@google.com>
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index eb1c10120f9f..c982a3a04c37 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -1054,7 +1054,8 @@ static u64 __pkvm_memshare_page_req(struct kvm_vcpu *vcpu, u64 ipa)
- 
- 	/* Fake up a data abort (level 3 translation fault on write) */
- 	vcpu->arch.fault.esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
--				   ESR_ELx_WNR | ESR_ELx_FSC_FAULT |
-+				   ESR_ELx_IL | ESR_ELx_WNR |
-+				   ESR_ELx_FSC_FAULT |
- 				   FIELD_PREP(ESR_ELx_FSC_LEVEL, 3);
- 
- 	/* Shuffle the IPA around into the HPFAR */
--- 
-2.54.0.1136.gdb2ca164c4-goog
+KVM: arm64: Set IL for nested SError injection
 
+This patch modifies the emulated SError injection to unconditionally
+set the IL (Instruction Length) bit in the generated ESR, as mandated
+by the architecture.
+
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index 4b39363cf8911..4262d4c17a877 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2938,6 +2938,6 @@ int kvm_inject_nested_serror(struct kvm_vcpu *vcpu,=
+ u64 esr)
+>  	 * vSError injection. Manually populate EC for an emulated SError
+>  	 * exception.
+>  	 */
+> -	esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
+> +	esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
+>  	return kvm_inject_nested(vcpu, esr, except_type_serror);
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does the carefully construct=
+ed
+esr value actually get written to the guest's ESR_EL2?
+
+Looking at kvm_inject_nested(), it passes the esr_el2 argument down:
+
+kvm_inject_nested(vcpu, esr_el2, type) {
+    ...
+    kvm_inject_el2_exception(vcpu, esr_el2, type);
+    ...
+}
+
+However, in kvm_inject_el2_exception():
+
+static void kvm_inject_el2_exception(...) {
+    ...
+    switch (type) {
+    ...
+    case except_type_serror:
+        kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
+        break;
+    ...
+}
+
+Since except_type_serror only pends the exception and doesn't explicitly
+write the esr_el2 argument into ESR_EL2 (unlike except_type_sync), does the
+nested hypervisor observe a stale or uninitialized syndrome when it takes
+the SError?
+
+[Severity: High]
+This is a pre-existing issue, but since this code deals with fixing SError
+syndromes, what happens when SCTLR2_ELx.EASE is enabled and a Synchronous
+External abort is routed to an SError?
+
+Looking at kvm_inject_nested_sea() in the same file:
+
+int kvm_inject_nested_sea(struct kvm_vcpu *vcpu) {
+    ...
+    u64 esr =3D FIELD_PREP(ESR_ELx_EC_MASK,
+                         iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
+    ...
+    if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
+        return kvm_inject_nested(vcpu, esr, except_type_serror);
+    ...
+}
+
+Does this result in an SError being injected with a Data/Instruction Abort
+EC? According to the ARM Architecture Reference Manual (D8.2.5), shouldn't
+an SError always have its ESR_ELx.EC field set to 0b101111 (SError)?
+
+A similar pattern appears in inject_abt64() for EL1, where a DABT/IABT
+syndrome is constructed and actively written to exception_esr_elx(vcpu)
+even though an SError exception was pended. Would this incorrect EC format
+confuse the guest's exception handlers?
+
+>  }
+>
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260614163336.3490=
+925-1-tabba@google.com?part=3D6
