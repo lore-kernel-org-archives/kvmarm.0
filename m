@@ -1,94 +1,93 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF843F4126
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0B633F369
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781530206; cv=pass; b=Y3wV3L+ytir5W7g3DBfyOht6BGMNGahGdkS4DdZkoNV8hmogkcw832iv5RFCqF7yDDYMvm2htEee0l+5NSXGk7V4vlIPBidRPnoEYLa+CcBThwNDOUHCNmYJirPVjm5A5np24ikQB7VD0xq5CMFOF81l25Fs3JgTGuruesynF74=
+	t=1781531166; cv=pass; b=BM7cGJu7lF9JC+8e+h5wBlG6AgAdbC/DG63SlFM6vB9G45LrWbExu2lLUc8gckvbvf7ismaHxih4p4FEbrH4SEQ3CxWzUWCfrjbvuHt2lBazJYR2bjtYqIueRDLwgHhsXGm7ZRqB1BDws83ZGoMpnUM8zaJk9rvI6DfJc/ZBBg4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781530206; c=relaxed/simple;
-	bh=9ceuLGvv1zMH2eH5W1uoX2v0/qeb7/FjKCkH1pWLJbE=;
+	s=arc-20240116; t=1781531166; c=relaxed/simple;
+	bh=ctm4I3xav7WGAfEmkJRhsxZ+FOrzkCfqD0dnRCKDCAY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OMAkWui2ax8Ia0X62PDx0/GTvHJRnclDBtE+5ypZCVEXNC+CiHckc3YTJAQH45wkXgkUnBXOVKbl6Gq61m/sEDFZuRZboxhepIKFVRNI/7a1nqT0mRH32DV7UPGjOVPTAoyVh0ZDqMY2CYrX0aBOBTT7Z0dhFsmjZVem0zF77bQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E5ea7Rzm; arc=pass smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=JBsI1XqeJe4D/DQ/9DkERR8WbHQpdk6FbeAnCMkMRphB7hCy0dgAZofVpUtnuBbYZBQ7sQEahhbIQUtqc1UCKqfQYudcZ6m0w4uU/2GnasKpn9eyQmdMv/JXGGAvS1DDDo0AepTJJURcJbXLkqa+ZZ35qNpwp/Y9Ly3KpA4WrCU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a09jWWoc; arc=pass smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E5ea7Rzm"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-51765531803so75951cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 06:30:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781530203; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a09jWWoc"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-5177d1ff061so85581cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 06:46:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781531164; cv=none;
         d=google.com; s=arc-20240605;
-        b=IM51rdpQ9U+23+2q984SEmSsL4lpZ/4LvgcYvfCXxlsrw6CVTtsdEcaLIwVZtkQChC
-         1F8vmsptaANxXE56bOJv8v/4XWlWbtIRDRoOtGd5yl3HSz5mv8dwHjPeH7TpZsqlCaPb
-         UQmxE3vAapuGCeLsg05sHBNte9NwYve+nc1g/DnMnwNxgn6Zz7jx6AVvRuB8gqGF1Qg/
-         C4x/oTWfG2ydTgrkZt3xETZ51kRCzU78BYrzxPwyg1U5dvUVof8OHWokY3Qc+mwB/i37
-         znodyxJJ2zpVRsP+yHt5QxxKwJ31mTZjMHhS/ZZu9VcX6LQv2ughd5g3tSLO2kzujrYF
-         xN0w==
+        b=Tw6oZ+KncVFSuod1DXzxmW81haERZJ2WOm5azkukZ1SUI0c237W1Mvf0J4x+EfIAxQ
+         SDJpEqSgt5b/Th8CkEmnW2/6Drom/q265ZWDGL7/OVDJiDZdxwGjI30VZkCh5jNOAQKo
+         VNQpRWOklIYNltFEly5bkSmGEdYWnANP/JcZKo2bvM5vkQO/Omd2xwRNBw0rn3e+cdVd
+         tzCr+7EgDk2QNVjAyBXN7183FqRYDLucEu9z/hRgd8AHkJV5pLDVTLpOnq7G92rAcRfW
+         /v5RkrtC1W68lY5HbeOen/9VSTA775mtd3Z2uD8iy2O3gpzV1vEXOeg2CpRQJsxVVWB8
+         UwZA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=3phygt89mT1L7d+3MFHcmDG0z7MbIjyRqhevKospxxM=;
-        fh=w7UjD8Ozxkn5Cb2cNGlqeDOH7Sg2pS87Kg28zqM7g6I=;
-        b=BJIOzz60LevTAEPiwMWcD7Y4JeCA/BaBMknzbQZId4XR4XDMVmNoJrdyjBFwLBQOHl
-         F73/IBN0YMIigFhPEEiJvglRWm2sjhlvivz34o7JfctAu1UnrQq8Hy/RzUjblWsUWnhw
-         iqA/nn2SXAJEsXcPQjdW274tUZ9ypU02RDTDldQE9ATRFVsWWWV8F0WoKDdTAB1cOZPU
-         VFgqOipiL5/yXZDb/cBbK9jUlheqrQAOWrBFJGjHKEdgUZ04aYW4P0blVmuGBw3uAGcb
-         +BhN9uhNDbqYvWC9J6BEaKGFLNIAIm9cp1/kLHfkzrAk1LeN0CA48BPnB+DErXKevfbc
-         k4iQ==;
+        bh=/RKAlB+YaRvxl+nRljsm0vU9jlQ7EuTV00J5KLHppO0=;
+        fh=LT4ZQ+i4SRit/jGHYFyXLHzMcLDchXWPHIah4EOOiMs=;
+        b=QCkOnW7s6F8dNGpPiOpyTjFXQHpd0KSd0jj98GQGlwIXZId71fH1hBoHrg4CXvnE/Z
+         1+T13VVgW90U4DAvDBMJZIffFH6blVWaaLrM0cSozz1oPfRiti0Av6730waCHqwqOSIv
+         RJ33ccv/Iccmdd35ZJh6DE+UT+v6eIeQcLFAhsHCfHhKVhszwBkpo0GRfR0awa3lBOVY
+         vvuVGV7g+WJaRL4FEBBjXQrFFHBQSeSZjht/zBCJURjcDlsHFJLAW7DTS3Xc+GQy2mOb
+         LBFNtr+4ghMfT8WycaeE3IEthHFzpFn8qcREMLDDFjafp13uCQLY4II3xIByrOuWUdMj
+         P71g==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781530203; x=1782135003; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781531164; x=1782135964; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3phygt89mT1L7d+3MFHcmDG0z7MbIjyRqhevKospxxM=;
-        b=E5ea7Rzm//0Nxyj+9c0abIorCXzROIf85n61NS5vXq/g8iBEufmvNCCLh6BNc/bkG4
-         iFH6yF62OjvRXBACHD+DCRaI9xVyVSG6s8TYGaFOrnevEbDIGogwd4U8wbT/oo8Q2+vm
-         FVLUef8yDNSRiYQ2iHcflSkqSuXt2i+Yd2IZZ5Kl71damJ3y/RHqgicGVRY+svSJLZ33
-         wxbHBAesAznQmqwx8Qs/fzmeSSAdlNskhOXoQPTi2s8S/G5SBiXTMqbvb++BQql6Nxz+
-         OjRFCflW0+8++bRXHzWX0qZqYPgfvfgolz4HwB/wITsSWblU02akeNAm600qGOzfrONN
-         fhmw==
+        bh=/RKAlB+YaRvxl+nRljsm0vU9jlQ7EuTV00J5KLHppO0=;
+        b=a09jWWoc2vUnQlWiu/tfLtVHu41yupeXzfoBog1rypp4RAdf8Aew1y5tSG+EOu5nT9
+         K7JzOKE/TZEXEIPqS44K2FUH9NRRz4lXNHu/rS05C+65GUtGogob6V0m0QxCfABCLqCG
+         1d6Dtq//PJljQ0IQBwBRT1Qm+NXQosXWmpZnpFqDV++nf5qfcOJ0bfqJqi01xljSsIDZ
+         hbUv8pR7OvCzGilTCLMgEuL/v1CkKPzC8J0Md8vuR4ZAvpU4qHlWAJwY4kohqDhY3R0P
+         MbFUm+Ts0dvPiwl5LB/aUyADw/EXMTiAIyp2dJNzfjyJDdGNtEo/flF36AT53AtlxKDU
+         uA8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781530203; x=1782135003;
+        d=1e100.net; s=20251104; t=1781531164; x=1782135964;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3phygt89mT1L7d+3MFHcmDG0z7MbIjyRqhevKospxxM=;
-        b=AuuANN629fhLfnX+2pMbsXk+H7vHl1tVX3aPCAAoSRG4tJYg3ZA2w0rMNz7v8YyvMM
-         2WAQCsIL0h1KbjJWXKEXwuMPRpVXyz5ZvL6geGzpLMCsUgRNQPQvGZIZqNUlDXELQFrx
-         8pXP7o77aAz/yUGINfkY2JsbAyDp3mnWFwP+/mJecf5T++iUgiiuhZW3c+GImlDAO7jB
-         m/oqprD/+dexo7RgEvwSDbZ8jQ1tzEQfFTL8laEN3GJfoBKFVP6dmxoLUQO1aezF2p88
-         F8vUBZMKMpfCu8/UTMI4dxGzQUpbEyzeER2ITZE1ryi/CcL6Kn1fWlG4Hf+Mle6lEXMj
-         j9Cg==
-X-Forwarded-Encrypted: i=1; AFNElJ/TjpnIEyST4ZJJ0yo+RUtHTUs1yaDiDMgiAvV96qtWo+/UtoWMJdzushZNL5oJyR23H5YW1Dw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyyaC5euE+tWtJ0mXECb3eoz5Rf6N6W1PrMkShUUEt3N9JUvel2
-	o7TIXneJECXqU40MdvOY4H7j/P4h/sjRFczqVKuI6JU8L97h4zeEOJqa5K32D3MKg/sEpnAE0Zh
-	5mUAz/wrgJTHR0B2tQtUp2cklFbMbNfg7h6SVZbH7
-X-Gm-Gg: Acq92OHwrm5TDBe0dXyc6oBu9SI5fAd6SO4PoSm1JfEi0YOYiAH3o91eg+thJDavTM+
-	+uRq1YSVif6gKnL7xzFYXM4fDRfAInY71IiBqNz3nOpZQ6yPQGE21sMu1ee/XewPyV+Hm8X7IER
-	OxLXLLVXjgeOOR9mK7rUXdonFZ+qKnNW6rYjnZVIo6CP7YPiXjAWru3u5QyF3d/mvMRaJEmcFnF
-	uVAPorWVC+r8k5phZAXTvHyM4F1obFyiT6p58KIwca+qJfQ0zOfZpXJYRhLgJ+ufjXYCz2Z1ia3
-	ZnjM930A
-X-Received: by 2002:a05:622a:1188:b0:4ff:bfd9:dd31 with SMTP id
- d75a77b69052e-519872df71amr1731631cf.5.1781530202283; Mon, 15 Jun 2026
- 06:30:02 -0700 (PDT)
+        bh=/RKAlB+YaRvxl+nRljsm0vU9jlQ7EuTV00J5KLHppO0=;
+        b=Ebl5NMjOlXzpfCbyEpjUp2SkSOoMYCs1O9QrnDQAtFjttCx6NVL2YENGw069emtdZh
+         9wepqE+eY0ygcRebkIDRnfcGA9L6F8itVj056h1NCFu/H31lZ2RR85FGYDw6zDCXEoGH
+         soi2NR3igsK1dTFLe61e5BwZ/McSdNzY7a2ZewIzuZ6Q498ugQj00BO0rSN00UWk9xyG
+         O2r0XkLbkEE6qAvtSknPnXmWFI1kyJKm9G7XC6CThRK6gw7qfAzj1wyXmTo6Y9nirDN3
+         jaDUJspmjz2GtimlBmQTEUrK5m7Z5RzxlcRWmC23lwBRaE3QVjBw5PoY0zDI0jirFebV
+         oDqA==
+X-Forwarded-Encrypted: i=1; AFNElJ9mJXKm9mqx91pURa8QzjK3qHj20Te4QdcP+QAe0cMg9+upGvrSvi27D5lA9tl6U9vALp9nYi4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzmMCDGxPQf3sYNkTor0o/z1o+L8iMe/bd9tHgbgG91pl94Buxc
+	N9pkCNtpBya62dRqTguA4zt18KNt0RoJ2jfI2MhoPWf8U4dxyKA0d1TKC/MVOthAZd6zx75Wmbj
+	wZUlbcmOEpZEoVlr9SJfW3a0Uee+/UiM/Mf+vePwG
+X-Gm-Gg: Acq92OFuOnycU7o2p0n5Vodbr1MmojK6RzwhuJAZwYdhFyOedub7qQxP/YOcfqJwtaT
+	UnnUBYeOkD3e1SMoehVDovJ8FzPzXzy2TFdIM2cIZe6MVXY8XR/uxkKbThauEeXdHGGH05O6smm
+	WJPP6Y8nXghsok5DACZZGWegj560xIkGCqYXXICPKyXPVxWafGumvVzSSNmymxgkUYp7ivhbuRW
+	0FlNz++10VJ2jaQOOzs+/FQztGqq1FpFTB5nkBUOs/qSdeJzlG/N7kIiZw+wXl9l4IGLGXvq7I4
+	sZH9XDXO
+X-Received: by 2002:ac8:5f8a:0:b0:516:4f62:85e8 with SMTP id
+ d75a77b69052e-5198750abeemr1738961cf.19.1781531162997; Mon, 15 Jun 2026
+ 06:46:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260612065925.755562-1-tabba@google.com> <20260612065925.755562-6-tabba@google.com>
- <ai_5_CoRm-LdoVMm@google.com>
-In-Reply-To: <ai_5_CoRm-LdoVMm@google.com>
+References: <20260612065925.755562-1-tabba@google.com> <20260612065925.755562-7-tabba@google.com>
+ <ai_7FupwNYrudRZZ@google.com>
+In-Reply-To: <ai_7FupwNYrudRZZ@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 15 Jun 2026 14:29:24 +0100
-X-Gm-Features: AVVi8CcrTMGo9YYeBFMqIsQ3CD-jzDAcCVBgdTfRMO0b7ViZFUlAAkK2kzEwfHA
-Message-ID: <CA+EHjTyRR3Rg3BT4guUy_VKw9jgZawKUhg7tv_H8iqSGW5Lsvw@mail.gmail.com>
-Subject: Re: [PATCH v1 05/11] KVM: arm64: Make vcpu_{read,write}_sys_reg
- available to HYP code
+Date: Mon, 15 Jun 2026 14:45:26 +0100
+X-Gm-Features: AVVi8CcBOTp5hYc_iBrEzUZ8L0F0F3uPeIwH6JYDOoas1UfKjcpvzwA29hjvFhE
+Message-ID: <CA+EHjTxZ6WG3ugDq94q5PBuYXQf9b8tpVPpi1ro+wqPUozYEUA@mail.gmail.com>
+Subject: Re: [PATCH v1 06/11] KVM: arm64: Factor out reusable vCPU reset helpers
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
@@ -100,86 +99,211 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Will Deacon
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Jun 2026 at 14:11, Vincent Donnefort <vdonnefort@google.com> wrote:
+On Mon, 15 Jun 2026 at 14:16, Vincent Donnefort <vdonnefort@google.com> wrote:
 >
-> On Fri, Jun 12, 2026 at 07:59:19AM +0100, tabba@google.com wrote:
-> > The vcpu_{read,write}_sys_reg() accessors are host-only, so helpers
-> > built on them such as kvm_vcpu_set_be()/kvm_vcpu_is_be() cannot be
-> > shared with hyp code. Add _vcpu_read_sys_reg()/_vcpu_write_sys_reg()
-> > inlines in kvm_emulate.h that dispatch on is_nvhe_hyp_code() to the
-> > host- or hyp-side accessor. A follow-up series uses this to share that
-> > emulation code at EL2.
+> On Fri, Jun 12, 2026 at 07:59:20AM +0100, tabba@google.com wrote:
+> > Pull the reusable pieces out of kvm_reset_vcpu(): expose the reset
+> > PSTATE values in kvm_arm.h, and split the core register reset and the
+> > PSCI-driven reset into kvm_reset_vcpu_core() and kvm_reset_vcpu_psci().
+> > A follow-up series reuses these to reset protected vCPUs at EL2.
 > >
 > > No functional change intended.
 > >
 > > Signed-off-by: Fuad Tabba <tabba@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_emulate.h | 22 +++++++++++++++++++---
-> >  1 file changed, 19 insertions(+), 3 deletions(-)
+> >  arch/arm64/include/asm/kvm_arm.h     | 12 ++++++
+> >  arch/arm64/include/asm/kvm_emulate.h | 58 +++++++++++++++++++++++++++
+> >  arch/arm64/kvm/reset.c               | 60 ++--------------------------
+> >  3 files changed, 73 insertions(+), 57 deletions(-)
 > >
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 3f9233b5a130..aba4ec09acd2 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -348,4 +348,16 @@
+> >       { PSR_AA32_MODE_UND,    "32-bit UND" }, \
+> >       { PSR_AA32_MODE_SYS,    "32-bit SYS" }
+> >
+> > +/*
+> > + * ARMv8 Reset Values
+> > + */
+> > +#define VCPU_RESET_PSTATE_EL1        (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+> > +                              PSR_F_BIT | PSR_D_BIT)
+> > +
+> > +#define VCPU_RESET_PSTATE_EL2        (PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
+> > +                              PSR_F_BIT | PSR_D_BIT)
+> > +
+> > +#define VCPU_RESET_PSTATE_SVC        (PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+> > +                              PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+> > +
+> >  #endif /* __ARM64_KVM_ARM_H__ */
 > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index 5bf3d7e1d92c..aed9fc0b717b 100644
+> > index aed9fc0b717b..8436e71c402d 100644
 > > --- a/arch/arm64/include/asm/kvm_emulate.h
 > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -506,6 +506,22 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
-> >       return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+> > @@ -704,4 +704,62 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+> >                       vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
+> >       }
 > >  }
-> >
-> > +static inline u64 _vcpu_read_sys_reg(struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
+> > +
+> > +/* Reset a vcpu's core registers. */
+> > +static inline void kvm_reset_vcpu_core(struct kvm_vcpu *vcpu)
+> > +{
+> > +     u32 pstate;
+> > +
+> > +     if (vcpu_el1_is_32bit(vcpu)) {
+> > +             pstate = VCPU_RESET_PSTATE_SVC;
+> > +     } else if (vcpu_has_nv(vcpu)) {
+> > +             pstate = VCPU_RESET_PSTATE_EL2;
+> > +     } else {
+> > +             pstate = VCPU_RESET_PSTATE_EL1;
+> > +     }
 >
-> I am not sure a single underscore is widely used in the kernel.
->
-> Why not move __vcpu_read_sys_reg() and __vcpu_write_sys_reg() from exception.c
-> to kvm_emulate.h? especially this already checks has_vhe().
+> nit: no brackes here, actually there were none before.
 
-Good point. has_vhe() already returns a compile-time constant
-in hyp code and a runtime cap check at EL1, so it works in all
-contexts. I'll move them to kvm_emulate.h and rename to
-kvm_vcpu_read_sys_reg() / kvm_vcpu_write_sys_reg().
-
-Cheers,
+Ack.
 /fuad
 
 >
-> > +{
-> > +     if (!is_nvhe_hyp_code())
-> > +             return vcpu_read_sys_reg(vcpu, reg);
 > > +
-> > +     return __vcpu_sys_reg(vcpu, reg);
+> > +     /* Reset core registers */
+> > +     memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+> > +     memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
+> > +     vcpu->arch.ctxt.spsr_abt = 0;
+> > +     vcpu->arch.ctxt.spsr_und = 0;
+> > +     vcpu->arch.ctxt.spsr_irq = 0;
+> > +     vcpu->arch.ctxt.spsr_fiq = 0;
+> > +     vcpu_gp_regs(vcpu)->pstate = pstate;
 > > +}
 > > +
-> > +static inline void _vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg)
+> > +/* PSCI reset handling for a vcpu. */
+> > +static inline void kvm_reset_vcpu_psci(struct kvm_vcpu *vcpu,
+> > +                                    struct vcpu_reset_state *reset_state)
 > > +{
-> > +     if (!is_nvhe_hyp_code())
-> > +             vcpu_write_sys_reg(vcpu, val, reg);
-> > +     else
-> > +             __vcpu_assign_sys_reg(vcpu, reg, val);
+> > +     unsigned long target_pc = reset_state->pc;
+> > +
+> > +     /* Gracefully handle Thumb2 entry point */
+> > +     if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> > +             target_pc &= ~1UL;
+> > +             vcpu_set_thumb(vcpu);
+> > +     }
+> > +
+> > +     /* Propagate caller endianness */
+> > +     if (reset_state->be)
+> > +             kvm_vcpu_set_be(vcpu);
+> > +
+> > +     *vcpu_pc(vcpu) = target_pc;
+> > +
+> > +     /*
+> > +      * We may come from a state where either a PC update was
+> > +      * pending (SMC call resulting in PC being increpented to
+> > +      * skip the SMC) or a pending exception. Make sure we get
+> > +      * rid of all that, as this cannot be valid out of reset.
+> > +      *
+> > +      * Note that clearing the exception mask also clears PC
+> > +      * updates, but that's an implementation detail, and we
+> > +      * really want to make it explicit.
+> > +      */
+> > +     vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
+> > +     vcpu_clear_flag(vcpu, EXCEPT_MASK);
+> > +     vcpu_clear_flag(vcpu, INCREMENT_PC);
+> > +     vcpu_set_reg(vcpu, 0, reset_state->r0);
 > > +}
 > > +
-> >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >  #endif /* __ARM64_KVM_EMULATE_H__ */
+> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > index 60969d90bdd3..e22d0be9e57c 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -34,18 +34,6 @@
+> >  static u32 __ro_after_init kvm_ipa_limit;
+> >  unsigned int __ro_after_init kvm_host_sve_max_vl;
+> >
+> > -/*
+> > - * ARMv8 Reset Values
+> > - */
+> > -#define VCPU_RESET_PSTATE_EL1        (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+> > -                              PSR_F_BIT | PSR_D_BIT)
+> > -
+> > -#define VCPU_RESET_PSTATE_EL2        (PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
+> > -                              PSR_F_BIT | PSR_D_BIT)
+> > -
+> > -#define VCPU_RESET_PSTATE_SVC        (PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+> > -                              PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+> > -
+> >  unsigned int __ro_after_init kvm_sve_max_vl;
+> >
+> >  int __init kvm_arm_init_sve(void)
+> > @@ -191,7 +179,6 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
 > >  {
-> >       if (vcpu_mode_is_32bit(vcpu)) {
-> > @@ -516,9 +532,9 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >       struct vcpu_reset_state reset_state;
+> >       bool loaded;
+> > -     u32 pstate;
 > >
-> >               r = vcpu_has_nv(vcpu) ? SCTLR_EL2 : SCTLR_EL1;
-> >
-> > -             sctlr = vcpu_read_sys_reg(vcpu, r);
-> > +             sctlr = _vcpu_read_sys_reg(vcpu, r);
-> >               sctlr |= SCTLR_ELx_EE;
-> > -             vcpu_write_sys_reg(vcpu, sctlr, r);
-> > +             _vcpu_write_sys_reg(vcpu, sctlr, r);
+> >       scoped_guard(spinlock, &vcpu->arch.mp_state_lock) {
+> >               reset_state = vcpu->arch.reset_state;
+> > @@ -210,21 +197,8 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >               kvm_vcpu_reset_sve(vcpu);
 > >       }
-> >  }
 > >
-> > @@ -533,7 +549,7 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
-> >       r = is_hyp_ctxt(vcpu) ? SCTLR_EL2 : SCTLR_EL1;
-> >       bit = vcpu_mode_priv(vcpu) ? SCTLR_ELx_EE : SCTLR_EL1_E0E;
+> > -     if (vcpu_el1_is_32bit(vcpu))
+> > -             pstate = VCPU_RESET_PSTATE_SVC;
+> > -     else if (vcpu_has_nv(vcpu))
+> > -             pstate = VCPU_RESET_PSTATE_EL2;
+> > -     else
+> > -             pstate = VCPU_RESET_PSTATE_EL1;
+> > -
+> >       /* Reset core registers */
+> > -     memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+> > -     memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
+> > -     vcpu->arch.ctxt.spsr_abt = 0;
+> > -     vcpu->arch.ctxt.spsr_und = 0;
+> > -     vcpu->arch.ctxt.spsr_irq = 0;
+> > -     vcpu->arch.ctxt.spsr_fiq = 0;
+> > -     vcpu_gp_regs(vcpu)->pstate = pstate;
+> > +     kvm_reset_vcpu_core(vcpu);
 > >
-> > -     return vcpu_read_sys_reg(vcpu, r) & bit;
-> > +     return _vcpu_read_sys_reg(vcpu, r) & bit;
-> >  }
+> >       /* Reset system registers */
+> >       kvm_reset_sys_regs(vcpu);
+> > @@ -233,36 +207,8 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >        * Additional reset state handling that PSCI may have imposed on us.
+> >        * Must be done after all the sys_reg reset.
+> >        */
+> > -     if (reset_state.reset) {
+> > -             unsigned long target_pc = reset_state.pc;
+> > -
+> > -             /* Gracefully handle Thumb2 entry point */
+> > -             if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> > -                     target_pc &= ~1UL;
+> > -                     vcpu_set_thumb(vcpu);
+> > -             }
+> > -
+> > -             /* Propagate caller endianness */
+> > -             if (reset_state.be)
+> > -                     kvm_vcpu_set_be(vcpu);
+> > -
+> > -             *vcpu_pc(vcpu) = target_pc;
+> > -
+> > -             /*
+> > -              * We may come from a state where either a PC update was
+> > -              * pending (SMC call resulting in PC being increpented to
+> > -              * skip the SMC) or a pending exception. Make sure we get
+> > -              * rid of all that, as this cannot be valid out of reset.
+> > -              *
+> > -              * Note that clearing the exception mask also clears PC
+> > -              * updates, but that's an implementation detail, and we
+> > -              * really want to make it explicit.
+> > -              */
+> > -             vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
+> > -             vcpu_clear_flag(vcpu, EXCEPT_MASK);
+> > -             vcpu_clear_flag(vcpu, INCREMENT_PC);
+> > -             vcpu_set_reg(vcpu, 0, reset_state.r0);
+> > -     }
+> > +     if (reset_state.reset)
+> > +             kvm_reset_vcpu_psci(vcpu, &reset_state);
 > >
-> >  static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
+> >       /* Reset timer */
+> >       kvm_timer_vcpu_reset(vcpu);
 > > --
 > > 2.54.0.1136.gdb2ca164c4-goog
 > >
