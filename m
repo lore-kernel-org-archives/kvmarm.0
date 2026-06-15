@@ -1,81 +1,74 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E61A2DECA1
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 07:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD133C4169
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 08:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781509443; cv=none; b=bdpL1lcqbqmujUANSB3T731CSB8l18DYd3dhHgGxWmHKGdbxPKTrRfMxZ/7nZsKcBRg0DDfjT2oQmO6Zbi4KjeXa4cOl2LoTL4mPZwWCxmdCjbgFT0dkWogVsKWESe+q94Ni2MjOf089ocy0zJyLql0olw8TsDrbOo0eJ0LlJNs=
+	t=1781512084; cv=none; b=jTJ9wNaEr0gS9vYKPvYsKvfe0druNTszNb2MaqDn9R1KhCpu5oJG6c6kTmhSsv3psFjk8NY1MkTH1a44Olc3PX90tiFO+6OzUN9CMqkDVQvoq2X1sTc6dhVRZvnup9Usfwoyu0pltvFzNXaSdQYxg7CdoIi0R9tIKfj8sWNiYTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781509443; c=relaxed/simple;
-	bh=YB7lqwAJSemwzzCmfInsR18dvX6vqF3gRDnCJUKI5uw=;
+	s=arc-20240116; t=1781512084; c=relaxed/simple;
+	bh=gfGduFrELxB1Sp5ZZf5aSCZiDd13gs/myAbd/xXnlCE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hwLJw3M4KLXSYQmIcZUBq7e9Z1M8VCM3deEAoyKbRQZYXfjNkVSQ6Xh1ZhwFg/qdC6k7IHpIpd9bZbzamfKUFbR2ggCaUQqr9R1n00UiMvSFgm2q4x25M+Xqg7rmq/NIhOEU17f1072/pZRvwRRn0M6KgurGzkhHBPL34JiQUO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pRde1cS/; arc=none smtp.client-ip=209.85.128.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=uojUyhhB1AzgcerUklv2iENIhNvxoB/VBG2kNr8Ax+H4tQ8By1LrfjGHKdnsSznjbeSitD6eln4Te1a5+Eb4zL1VJQw8Lm1jUoUrQkeLvJK9paOSiWkeEnfGQ7uCS96B1wj25cX+AWuU+JKdsHw7R7dDQbd2ZmfJ3tvhd64/Pb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e3A04UWL; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pRde1cS/"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490bb5ad3bdso85445e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 00:44:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e3A04UWL"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-68b90fc6a1dso5918643a12.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 01:28:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781509440; x=1782114240; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781512080; x=1782116880; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vx+Fcy9JfXnbV77ZN56f/2+W+MwbQKemGkhdPZhU9VU=;
-        b=pRde1cS/HG5V0kt4cjbmuOI0003SERNB/U/pXDYmVApTbevhvID+iKzPW4y1u/GA5w
-         aGm0tE7nDhoiu0u8v0KERmbllrKLxoD6LQSJ6AlKQP2LyYy7rYN3i6M29TTNQIEBJODY
-         bIENKhsB1ZyZOqqamgt0qO2HWbrsTn0Q7cFLuXHVkbiXtCDbXYcgxF/k0rYRGmwFtELN
-         cYZPXd+dGH5uU9663LnQRD04YZ2oyDqn/5eUneBRA6U07ZQ+Toyfs/5dtfIrlbyf+Xyf
-         1K9VeBPBVJi4mbZ3CAAKkbkvZlduYfgsZMpxFOWF2k0f68UyqiIx8B4beuTacsFg+i4s
-         2c0A==
+        bh=nACpjvzcAjptbYO/D+EZnxCKpAsH5nEmPSKqPy+CCm8=;
+        b=e3A04UWL4qU1VV5oxntxceF2chJIkfFnSeGpRjI8DCNyVnQyE2P3x2mJNP2Pi7GMqm
+         yGTJ4vBjX2BdS8yCJFxkqy4jqQULSNMmoOliW1Ww8T1UmNnfLSiEUgQ139W26UlRWEJ/
+         aPB0Rqo/8t7sIkw5oQKPzGLb3AgRSzk0qWr9qJH/fuKVwR1BGpc9STvZL9hrh4Msz6im
+         AmgNEQ0JPrJIbP6tqslAYwXUntm3kuZqmrLqPIGL4eOljHONvGBCPMDqYO46TpMG5bpv
+         Xx0ZKrADa8s0kvZUeOYxeAWqMeh68V8sWAuE9mpg4MOYx5U+7Ij2RHU//Xb+bzmWbqL9
+         cURw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781509440; x=1782114240;
+        d=1e100.net; s=20251104; t=1781512080; x=1782116880;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vx+Fcy9JfXnbV77ZN56f/2+W+MwbQKemGkhdPZhU9VU=;
-        b=OsWotMIjNxUx3fGWYJFkl69GuSxUlia7pqMZNWx8G8QHaikaIxXBIUIY5y84Bb0rrW
-         1PC7/mDqV4NVq+LE/j44URAImFBt3GBqiiId3xvVNNBtwV7JvFXUyidHNzouzvzoV+rl
-         TQeYLLNSw853rbqhbo7tGz0tue+itM+imGY9W32izYaYNQChpfvugYezSiaZzezlF8Pd
-         fYCnruwiNs2tl1M8WKTfFaj3t6Hy6mnNvhAfIVH9zF3DAIlkU/l6B14hr+LKC+t+8JDO
-         59cygm7uDrmuYTJFDf4CsTgnvkxLgEjCysGWcnzewC9Xi6ugD+PwUdI5wCJGU/dsF9TE
-         Yh6g==
-X-Forwarded-Encrypted: i=1; AFNElJ/mXLnU7vHFVt3gr2227maVEzyCpXMNStNaQroK1Ky0/OnDnBPeaM+B2myaJ2Gqfkod6/rISiU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwPYNz50wS1hFl3U2YZzSDYkx7UdIN2p9PZDXov+IYm3SIru654
-	/1PxPLibsAfVJx6be87s2s3/T6cbV00QhC0Vnaa3SjSK2vjrgyY4kYhlW+ENWEOdpQ==
-X-Gm-Gg: Acq92OEB1BfWGRytL47n1xOVZra16Vynw7GB1XNC8S6ZujhZZhImYA5zQwjetX3cXhX
-	/ZVSYLMS/dcWPi3L4mOWzUCIUpmzLsHLJQCbdW3+qZxj+qOFC3SglsB9MiNC3uN20OP5Q9ywLdl
-	BZcndLSUWsF1QWpLtvuP4UzM+wFrDOkLltyqiZsmi6KfS0lslj/InODKxn1tSNIufJWkYUC6+aR
-	1SvsdD0k4kXftLEfqu3mgnJY0teVMQjUGwkLVJdeMJ3d9R5dhjjoTB4WcSBSAiJA/1cSwnncY36
-	osaSUgAEwiiUgiENyQmM11/OCVCWEss6952zbeblMjA2IH6uPRgROyVm8aseDbYkkldCC9PxWfZ
-	OJ8yEvWL/oEK7qlvjud8ek0UHAN5aveQb1cifmwVVSuGgkbNs1pLp9Ro97I5etpxCfTDFWVWOwp
-	EYBOBjuLZ5znQN2wrFrO/89+zbAUmMAeAfh8Gkw/R0Od159E+aFWlk5EL5hcqeO+GYNSIigA==
-X-Received: by 2002:a05:600c:c05a:b0:489:1ace:d0d3 with SMTP id 5b1f17b1804b1-49221849ad5mr2294065e9.3.1781509439578;
-        Mon, 15 Jun 2026 00:43:59 -0700 (PDT)
-Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490ea95b274sm318590355e9.1.2026.06.15.00.43.58
+        bh=nACpjvzcAjptbYO/D+EZnxCKpAsH5nEmPSKqPy+CCm8=;
+        b=bB0ilNz0zKMu0m3waYoXlIFSF4kBcVT6PfB8jJZL0ZnBDpNeI8515kLa6hVsqjUWDd
+         kl/opYZFk4Z67jZfy06QQSnRjp8xGrexHgoHMKpoHbR/SD+pShO2oQRqO1o4vEo9gazp
+         FySw/AKu79lRlDoto7dvB0CTu/yafhD7a8UPeEVJfzrSUF37uYVaYSrGD6tO1M9Jlszq
+         f5azHOmzO2gEpPSLrSDYF7H6aV+8ymetY1FvUGMSi8mCW7MM/aqO5u8WBu8WusHxkwS4
+         MtVvHdXu8+30Fl/6m8W94FeYodL5vv8jNed1Cc7ZJQA8UffwOZLdFhf+7JhoteAsB/8w
+         zCnw==
+X-Forwarded-Encrypted: i=1; AFNElJ/rU7LXMP1vRTgnIA0g67RWxmgv9hw3kMitF+9n4KSSjMUl5NYLzRmFjkF1dDWtx+Xg1U0mJCc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwBhlfrTIwIkOsrt9IwXsz2pyssr6AgKcG817erA1f85xy+z0nD
+	aFVftqOgwZk+qMKOV8m2QFFAfzRu3V/+OuYXdpfhoEyJ4NN/c0B7lIEWaNiV+Bvuug==
+X-Gm-Gg: Acq92OETqbW8C8O0TYjyaeOnuoKkRTNDbhDlJ8rJo1MS9G+2OPRJehQjoS0LuoznsGl
+	c8L1H9izXS9knOrjYCW8251dzkdSbeVj4fsZl4qTuhLsLAWONE1PsQiB2ruYwVWk9Hl5USkuU0Q
+	xpIbx/w71HajMoaz63/RXRI7PdBCWNYsEgXgl8WSds8VzWY9IzynUVEcYCvbRjLmGpV5xhvEgxW
+	6cFAXeK7Y2VCmcF6EpDwGVBMbXnu9TYjCm95ri6T7YKbMBlhJU8+jFoUUGeo6slkmChulweZHf0
+	LhMzwtLwl+NyhrXa+yAJKNcpvzJ2Q++Ii2kYFSwwXYe75fa89AvlwUl4LAONaorxYExI4WtrpaX
+	uamgcqG+q99f7F6S1B1lJ451Pp+sqyXF8pwpwUeMJSthpV8WuoSR1XRBw1sQvZ54h099Vz/D/es
+	Vt2Xvw4nLMiwxasOHDlhsLwKa8TK/JOCIm+ToHJgqu+V8Xlf1HCgTi/o9199fgGYmTrWo=
+X-Received: by 2002:a17:907:9493:b0:bef:87ca:aec3 with SMTP id a640c23a62f3a-bfde279852bmr603924966b.9.1781512079604;
+        Mon, 15 Jun 2026 01:27:59 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb4423439sm416285666b.2.2026.06.15.01.27.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 00:43:59 -0700 (PDT)
-Date: Mon, 15 Jun 2026 07:43:55 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, catalin.marinas@arm.com,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	korneld@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, mrigendra.chaubey@gmail.com,
-	perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v2 0/7] KVM: arm64: Forward FFA_NOTIFICATION* calls to
- TrustZone
-Message-ID: <ai-tO-sSNGp7mjAU@google.com>
-References: <20260608165549.1479409-1-sebastianene@google.com>
- <aikt44sVnpL3_dYi@google.com>
- <aik5MtvOlnQDmzjr@willie-the-truck>
- <ailVcN-bxY30-XBF@google.com>
- <ailXKA1VG8vyKNfV@willie-the-truck>
- <ailtCAcEaJIgZ5Ap@google.com>
- <ai50fgNHGUqz0muP@willie-the-truck>
+        Mon, 15 Jun 2026 01:27:58 -0700 (PDT)
+Date: Mon, 15 Jun 2026 09:27:54 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, rostedt@goodmis.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com, qerret@google.com
+Subject: Re: [PATCH v1 0/4] trace_hyp_printk() for pKVM/nVHE hypervisor
+Message-ID: <ai-3ii1BtOPP25zZ@google.com>
+References: <20260612142245.1015744-1-vdonnefort@google.com>
+ <CA+EHjTxditViT-yd+y-DZ8zM7dATVEpe8qWNGbugq6sL7KN+uw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,94 +77,93 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ai50fgNHGUqz0muP@willie-the-truck>
+In-Reply-To: <CA+EHjTxditViT-yd+y-DZ8zM7dATVEpe8qWNGbugq6sL7KN+uw@mail.gmail.com>
 
-On Sun, Jun 14, 2026 at 10:29:34AM +0100, Will Deacon wrote:
-> On Wed, Jun 10, 2026 at 02:56:24PM +0100, Vincent Donnefort wrote:
-> > On Wed, Jun 10, 2026 at 01:23:04PM +0100, Will Deacon wrote:
-> > > On Wed, Jun 10, 2026 at 01:15:44PM +0100, Vincent Donnefort wrote:
-> > > > On Wed, Jun 10, 2026 at 11:15:14AM +0100, Will Deacon wrote:
-> > > > > On Wed, Jun 10, 2026 at 10:26:59AM +0100, Vincent Donnefort wrote:
-> > > > > > On Mon, Jun 08, 2026 at 04:55:42PM +0000, Sebastian Ene wrote:
-> > > > > > > Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
-> > > > > > > FF-A proxy. This restriction was preventing the use of asynchronous
-> > > > > > > signaling mechanisms defined by the Arm FF-A specification to
-> > > > > > > communicate with the secure services.
-> > > > > > > While these calls are markes as optional, there is no reason why the
-> > > > > > > hypervisor proxy would block them because:
-> > > > > > > 
-> > > > > > > 1. Host is the Sole Non-Secure Endpoint: The Host operates as the
-> > > > > > >    only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
-> > > > > > >    Because all forwarded notifications are inherently attributed to
-> > > > > > >    the Host by the SPMC, there is no risk of VM ID spoofing
-> > > > > > >    originating from the Normal World.
-> > > > > > > 
-> > > > > > > 2. No Memory Pointers or Addresses: The FFA_NOTIFICATION_* ABIs
-> > > > > > >    operate strictly via register-based parameters, passing only
-> > > > > > >    VM IDs, VCPU IDs, flags, and bitmaps. Because these calls do
-> > > > > > >    not contain memory addresses, offsets, or pointers, forwarding
-> > > > > > >    them doesn't pose a risk of memory-based confused deputy attack
-> > > > > > >    (e.g., tricking the SPMC into overwriting protected memory).
-> > > > > > > 
-> > > > > > > While the pKVM proxy behaves as a relayer, it doesn't currently have its
-> > > > > > > own FF-A ID(only the host has the ID 0). The behavior of the setup
-> > > > > > > flow is covered by the spec in the: '10.9 Notification support without
-> > > > > > > a Hypervisor'.
-> > > > > > 
-> > > > > > As it is only a relayer. Is it really important to check SBZ arguments and
-> > > > > > fields on behalf of Trustzone? It doesn't feel it brings any security. If the
-> > > > > > host passes broken arguments, I don't believe this puts pKVM at risk. Does it? 
-> > > > > 
-> > > > > I think the problem would be if an update to FF-A allocated some of the
-> > > > > currently SBZ bits to implement some functionality that we would want
-> > > > > to filter at EL2.
-> > > > 
-> > > > I suppose that would bump the FF-A version and the proxy would reject it?
-> > > 
-> > > Maybe? I don't think they'd _have_ to bump the version number.
-> > > 
-> > > > If we really want to check for those arguments to be 0:
-> > > > 
-> > > >  * Shouldn't we extend this check to other FF-A invocations?
-> > > 
-> > > yes, that's what the diff was doing in the reply here:
-> > > 
-> > > https://lore.kernel.org/all/af3fW468-f1KXCrC@google.com/
-> > > 
-> > > but, as I said here:
-> > > 
-> > > https://lore.kernel.org/all/ahmxiFXXTupafbXw@willie-the-truck/
-> > > 
-> > > I don't particularly like the table-driven indirection (the checks
-> > > should just be inlined).
-> > 
-> > Ha, sorry I'm late to the party. 
-> > 
-> > Perhaps this series should start with adding ffa_check_unused_args_sbz() to the
-> > existing allowed FF-A invocations?
+On Sun, Jun 14, 2026 at 01:57:56PM +0100, Fuad Tabba wrote:
+> Hi Vincent,
+> 
+> On Fri, 12 Jun 2026 at 15:22, Vincent Donnefort <vdonnefort@google.com> wrote:
+> >
+> > Hi all,
+> >
+> > This series adds a hypervisor event "hyp_printk" which enables
+> > developers to log pretty much anything into the hypervisor tracing
+> > buffer, just like the kernel function trace_printk().
+> >
+> > This enables rich logging from the hypervisor, while leaving all the
+> > string parsing burden to the kernel. This has been the main way of
+> > debugging pKVM in Android.
+> 
+> I tested the series on v7.1-rc7 under QEMU (cortex-a53 CPU, pKVM nVHE):
+> - Booted a host under pKVM with a non-protected kvmtool guest (npVM)
+> and a protected kvmtool guest (pVM).
+> - Functional test: added a temporary trace_hyp_printk() call site in
+> handle___kvm_vcpu_run() with 0-arg, 1-arg, and 2-arg calls. Mounted
+> tracefs, enabled the hyp_printk event, ran a kvmtool guest to trigger
+> vcpu_run, read the trace buffer. All expected entries appeared with
+> correctly formatted output.
 
-Hi Will,
+Thanks for the testing!
 
 > 
-> Yes, that part now seems to be missing.
+> One question: kvm_hyp_trace_init() returns early when
+> is_kernel_in_hyp_mode() is true. On VHE-capable hardware, pKVM uses
+> hVHE. So it seams that the entire hyp tracing subsystem (not just
+> hyp_printk) is non-functional in hVHE mode. Is hVHE support
+> intentionally deferred?
 
-I am a bit worried to apply for all of them the check from the relayer
-(ffa_check_unused_args_sbz) because of how it's written in the spec in
-(11.2 Reserved parameter convention). To be more specific, there is no
-mention of what the relayer is expected to do here (which is what hyp
-does). It says 2 things:
-1. the caller (in this case the host driver) is expected to zero out
-unused args
-2. the callee (Trustzone) ignores the values in these registers.
+You got me scared for a moment but I did try hVHE and it seems alright:
 
-If we enforce SBZ in the relayer but (1) doesn't comply with it, we will
-introduce a regression. I left it on purpose without enforcing
-ffa_check_unused_args_sbz for the others.
+  [    5.369985] kvm [1]: Protected hVHE mode initialized successfully
+
+  $ ls /sys/kernel/tracing/remotes/hypervisor/
+
+is_kernel_in_hyp_mode() just checks if the kernel is running at EL2 which it
+shouldn't in the hVHE case?
 
 > 
-> Seb, please can you respin with that included?
+> Cheers,
+> /fuad
 > 
-> Will
-
-Thanks,
-Sebastian
+> >
+> > Even though not strictly related to trace_hyp_printk, I have added the
+> > following two patches:
+> >
+> >   * KVM: arm64: Allow early calls to pKVM host_share/unshare_hyp
+> >
+> >     This one mainly intends to support one of the new features I have
+> >     posted here [1], which allows to enable tracing as early as
+> >     possible. I have added it here to limit cross-posting.
+> >
+> >   * KVM: arm64: Move kvm_define_hypevents.h to arch/arm64/kvm/
+> >
+> >     This one is just a cleanup.
+> >
+> > [1] https://lore.kernel.org/all/20260605163825.1762953-1-vdonnefort@google.com/
+> >
+> > Vincent Donnefort (4):
+> >   KVM: arm64: Allow early calls to pKVM host_share/unshare_hyp
+> >   KVM: arm64: Move kvm_define_hypevents.h to arch/arm64/kvm/
+> >   tracing/remotes: Add REMOTE_EVENT_CUSTOM_PRINTK() helper
+> >   KVM: arm64: Add hyp_printk event to nVHE/pKVM hyp
+> >
+> >  arch/arm64/include/asm/kvm_asm.h              |  4 +-
+> >  arch/arm64/include/asm/kvm_hypevents.h        | 14 ++++
+> >  arch/arm64/include/asm/kvm_hyptrace.h         |  8 +++
+> >  arch/arm64/kernel/image-vars.h                |  1 +
+> >  arch/arm64/kernel/vmlinux.lds.S               |  4 ++
+> >  .../define_hypevents.h}                       |  0
+> >  .../kvm/hyp/include/nvhe/define_events.h      |  2 -
+> >  arch/arm64/kvm/hyp/include/nvhe/trace.h       | 65 +++++++++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/events.c              |  6 ++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  2 +-
+> >  arch/arm64/kvm/hyp_trace.c                    | 60 ++++++++++++++++-
+> >  include/trace/define_remote_events.h          | 19 +++++-
+> >  12 files changed, 176 insertions(+), 9 deletions(-)
+> >  rename arch/arm64/{include/asm/kvm_define_hypevents.h => kvm/define_hypevents.h} (100%)
+> >
+> >
+> > base-commit: 4549871118cf616eecdd2d939f78e3b9e1dddc48
+> > --
+> > 2.54.0.1136.gdb2ca164c4-goog
+> >
