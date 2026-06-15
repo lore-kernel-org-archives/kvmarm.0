@@ -1,63 +1,63 @@
 Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0793EFD15
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 12:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A613EFD3D
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 12:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781528023; cv=none; b=F1uTtPk8uaCVaqdOYwCqqq+rOIihIsAIihAxxSNUv+lrRov8C0kXM5qGW7kuPZLNGqkE4pYPKiPO6puMTiIBFugeEKVd2A8KguDb5j7cAhNAo9KiIpXTCu4gAi9R4Wnh0/2SvSIGYmTQgUW/pqsAHtcHMTQ4A7pIzuiTAKYm4B0=
+	t=1781528359; cv=none; b=Wn/zpXUzEyHjF0Wl+pWwawo4AqUpMJzvWdSRjI9bdEnyo75F7T9/PVPbgodgQtCG465ulqe5y+RCmh333bmR5v9Kk71clKhlmf40FnV02I4a4H+YvwcFqa6cKSDmlmdJAJDphHhgE3khYXalRlE0wrA6uts5ttDsPVTmQRcP6tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781528023; c=relaxed/simple;
-	bh=Z4ogKaGOWOsrgF4xpf7X6IfhLUMGGIDUqw6T9websk8=;
+	s=arc-20240116; t=1781528359; c=relaxed/simple;
+	bh=DhLq32YnhlnWMC6QihPJ9/hReJ0CUKH2703nqNfDb98=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQqg6Wxtfe4db76vd2zBQid02RzMFHE9hEQEo6HTAti6ek6Fwbege8kYc9YyUcYMMnFfAp+n0FYoQ52Yg1DXWWy31jyeiJsTybkkuRY+Sh4BqcRxvFmtyvBTraCmhnGAwTXiwNjyMFN89dl5fMPbBrEYn/WeNxVAEq73Nh6jP/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bdID3IyO; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQ8ae2+40Bh/QjQFmqaaK7LgyW9TBK1OGZFF/8jGqLwB+Xg73UvH8xY8Mi98wElq4ByySR5xIJwNoSFGazx6kYTOOl2j3OJRPmDXbRynbIABeobfR81YK68VFmqlBvYQ0YQOos4eD/DI5QLOW86qrUEotT+RVMD4brVEPTchSao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OYSoXIBk; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bdID3IyO"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4908b92904fso40370375e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 05:53:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OYSoXIBk"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4922244f7c7so16845235e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 05:59:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781528020; x=1782132820; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781528356; x=1782133156; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cfy5IF3x0JtW9CpNalnLLpK8u6eZ7BRMq0IeQhp39Ds=;
-        b=bdID3IyOg4bH4HzcLZKhAcZVOvGJM6+H3/6nqncJ4bcTACjcCtlm9tnli2587zmxrn
-         qFrYpcjTQ7z8RvfevwSHexLvu8QZmJPVxoIAJs+SLoyda0EMBvWO1bCCSkThcdkZJYnE
-         3ffKkdiSbd4s9TbNTaDVe3AEyxgEMj5KrdQPjrFuC8dxXSluiNmgsE4ThUFJB7B4bwOO
-         HlozWN0pUU0Rl6gRyI5LxDSKwzZycz48H8tpJptOGsYcPkrRRCp2ozrUFHL7LugpNSlJ
-         5rCnGWq5R056a9+Nfm6Qj5oCs2bmcIyPQSMn3ocv0vMYfTogE30+RrfLrsk3mjSOWZva
-         FfCw==
+        bh=atWUu23k+hO3cJYWWwwW99/lWaTqjwrXHCOws2r9Rnw=;
+        b=OYSoXIBk+UK54B1oor15IevvdgjsP85/LLGwD88awQqX+1Z0KbaJeB1KDO/xJP4Aik
+         9WP+STNN05E0T0PEO/JeTUIzSChVa9f0J+3l++d5itsEqHWqb8fbDBo6zYdilHj5IvSM
+         fWD4a1nhVVbtHSRGKQXURyKyXYElDL1d3pPct+xxCRxD40u96F/Jt6SGqxYyle2a+G+2
+         zAKZgqrNlTT16nbXwldTao2q3j3hhjkGiLmy3XieiFx/x3Aq6uzUyfaBgkf+8J1xRPMJ
+         MpD/Mxa29+QgvsjyLym+kJHBYPB8KCFwQ806GSY/vHD+djKG2HWrUdhhATaWhiGizvsP
+         eQZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781528020; x=1782132820;
+        d=1e100.net; s=20251104; t=1781528356; x=1782133156;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cfy5IF3x0JtW9CpNalnLLpK8u6eZ7BRMq0IeQhp39Ds=;
-        b=tAFD3Vt7coQ1jNvTgF4c3GDoKya2rICTnM13YR5OQGEXnlbxKYbywdSbq6+INLGgV4
-         ZincYnJyLfXZbQhSSeZwUPnB7wPjOV8g+HzScvXvxpJyyvLLjK5HsZFymHYS/4PLJNz+
-         dm6u29S3gGL0Hnd2hX3D3SsSj9cNPcCq1XenZAOKROxk7vkC2opypyft+ge5/6roDhBa
-         rZuHMz37xmIJv2Ugx2lAP1lQDYOPVpYJShU1UWv4W0EngbmpmP2vQtI6YbEaUrNIGfAv
-         12Th9HOSjBljfgDvB+Q6EHkHotqYd54B2++MNthRtwbj8uDrPnWw+4I3iYu/fceq59RD
-         6aww==
-X-Forwarded-Encrypted: i=1; AFNElJ8zMsEsQZ7aW5bBreq4uCTPaNCeOuPOoHXI2jB4GrRN+dHcMKF2eJFsxHxYIV76KF0bJOpl7OQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwjMOk5RlFNmpwIHE7geKC6mcZ0qnCerTtrwGkmGHprukZnADQO
-	I4yLHjwxj30ngLX6qlGhOxf7ROQoziMhHXCDHGvZomg2Os6IZSizsxXalULlMKHl8Q==
-X-Gm-Gg: Acq92OH5RfNqd5GCDXKFOFE86ag8UfbIVqnkwb7nKt+JA4ULkp5XevvfQXZyj6HOKOn
-	Ere/j4Bb+9QsNc928pnx5KJ/xYXgVDxCyEmg61rcvy6tRTfzbw/UPhdn6uDW+i70AMaEAo+jZXp
-	KffrJ1YJP9KZhY+7U6T3z4U6Jk66ya5+d1piyWvAxcvSo0Tiz96Wr2RlEjC5DzBPScuhSgCKgiy
-	coIH4CfGIoyzkHUQlNARiSK+apTsaq/hJUBD9mDIWik24Suqbys9eRBc6SIrVDovUfXDl6KTGw3
-	XaBVHtzoDZCrNGFIhoxcGnkaavfPK4AgNjiS12xSdc2WuE623w52tkZgj68Bx+fy3TwOkUjIcLF
-	lrtBMlvu8Qa+AvygVpDjTsLZErMPYThHo9m+XF7fjQiHZkdgurX6BDIznzIuugyW6pw6EGMm21t
-	zAiyd3/PVnFKgbo5XsNW63IK8XXSDgV4tqCfEUgqKhRYqEf/+Hy9+kfzYECpRI3oylLDU=
-X-Received: by 2002:a7b:c7d7:0:b0:490:9588:bdb6 with SMTP id 5b1f17b1804b1-490ec5215bamr127730525e9.33.1781528019556;
-        Mon, 15 Jun 2026 05:53:39 -0700 (PDT)
+        bh=atWUu23k+hO3cJYWWwwW99/lWaTqjwrXHCOws2r9Rnw=;
+        b=COKvfmTY+sjVlYQq27s7K0aqQFqhDJQQjU/FiCuOzviIJUmwx4tCQg0ZVi3sfPUuW3
+         Koql1spKAItJF6cy1QMgm3QxIR6hkGr1QysH2eudMZ5teNDLXCBBZWSVRzFa4QkxLxwp
+         B4SNXgLEW+gkJkPmuTw81M2YUIQH1doBzKmtUtVcxDNw/ZV55yb1iA12iJmPuiXRe4jo
+         ewWrcCLDzkXvvBO7OF61cBQWPTfKNpBx2C+M7/X1LQ60icSE5EliDlZqgYNB4C/JvyY/
+         kTEQ/ZsOzceHdFM9bioaLVd5VJk9dVHH1jjNeHvZKZOePWKYQV0q6NseZqlL6pEgjJwz
+         +JSg==
+X-Forwarded-Encrypted: i=1; AFNElJ/Mvr/CU/fLe7uGsVQ1+1longAXm+GuPCN4ysTsFZRucWAyJUrra0gj8/+qrCc78fn05s4UHlo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywo72WdvKqTNd6fTkDOyn2GJqMg2PkIk77KGq1cg61AYx4ltjT7
+	Y6d0aUzB08hW167fuqtQZVtiF1ybe3G8/oUbcsAFVPRIKhRdtuukYLfbzeVhndGcGQ==
+X-Gm-Gg: Acq92OH/q1T0P6Gcab9u4CP0UQZDjZNMayA53ca/hq/4MIwHB7Oq60xnIFTdeTDMJXa
+	BkJbxJycLsAbanOOOuQyrNjoltj9y/N1KNPFszNiZgmC6LDMvpk7IJjSvqjV4/pIxsMLGYwXPV/
+	jOPODrT9eA1P2+c8cieGZkjlriKp+XapqTp/0EZf9gm/WGi61/9PwiqSQ8U4X7DXgiTUsdsDaTq
+	nfL1vGqxfMxwzKteGkNgzLk9KRO6L4HGuiKZe7la2wfGiUJtTpP2HzLd0RKErRsf0zR0x/keYfv
+	PGlZP9r5i3oE0jq4xc6JJeslCYfiTIUSJ918U0jk5qDZf7MGiAqe+SPfluV431O2BPJHPcMb1mJ
+	V5/C1GrwSeslLPa6PUxOApYgizekUls8Yqt1Qcf+yaEEj9sZt6fGS04m67MKP7NOmsVwuTEoo78
+	wAMT0cbi32o3NA/IfPfSE39YTeyYpMInv3o0VaouQZ7RxUT9LhkqdLvUsOr9fRrl4Mb3o=
+X-Received: by 2002:a05:600c:8b16:b0:490:ab8b:1bb3 with SMTP id 5b1f17b1804b1-492200db664mr136674815e9.18.1781528355304;
+        Mon, 15 Jun 2026 05:59:15 -0700 (PDT)
 Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49220308f13sm265864385e9.5.2026.06.15.05.53.38
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490ea4b39e9sm210485135e9.0.2026.06.15.05.59.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 05:53:38 -0700 (PDT)
-Date: Mon, 15 Jun 2026 13:53:35 +0100
+        Mon, 15 Jun 2026 05:59:14 -0700 (PDT)
+Date: Mon, 15 Jun 2026 13:59:10 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
 To: tabba@google.com
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -74,11 +74,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 02/11] KVM: arm64: Use guard(hyp_spinlock) in pKVM
- hypervisor code
-Message-ID: <ai_1z13TyEXbHx4Q@google.com>
+Subject: Re: [PATCH v1 03/11] KVM: arm64: Use guard()/scoped_guard() in arm64
+ KVM EL1 code
+Message-ID: <ai_3Hlf8CakQ7ESQ@google.com>
 References: <20260612065925.755562-1-tabba@google.com>
- <20260612065925.755562-3-tabba@google.com>
+ <20260612065925.755562-4-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -87,307 +87,370 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260612065925.755562-3-tabba@google.com>
+In-Reply-To: <20260612065925.755562-4-tabba@google.com>
 
-On Fri, Jun 12, 2026 at 07:59:16AM +0100, tabba@google.com wrote:
-> Convert the manual hyp_spin_lock()/hyp_spin_unlock() pairs in
-> arch/arm64/kvm/hyp/nvhe/{pkvm,mm,page_alloc,ffa}.c to
-> guard(hyp_spinlock) and scoped_guard(hyp_spinlock), dropping several
-> unlock-only goto labels in favour of direct returns.
+On Fri, Jun 12, 2026 at 07:59:17AM +0100, tabba@google.com wrote:
+> Convert the manual mutex_lock()/spin_lock() pairs in
+> arch/arm64/kvm/{pkvm,arm,mmu,reset,psci}.c to guard(mutex),
+> guard(spinlock) and scoped_guard(), dropping unlock-only goto labels in
+> favour of direct returns. Centralised cleanup gotos that still serve
+> other resources are preserved.
 > 
-> hyp_fixblock_lock in mm.c is left as an explicit lock/unlock pair: it is
-> acquired in hyp_fixblock_map() and released in hyp_fixblock_unmap(), so
-> its critical section spans two functions and cannot be expressed as a
-> single lexical scope.
+> reset.c uses scoped_guard() rather than guard() so the lock covers only
+> the small read/update window inside kvm_reset_vcpu(), leaving the rest
+> of the function outside the critical section.
+
+I believe in that case unless it really helps with cleaning resources, there's
+not much point using scoped_guard().
+
+I would keep it as is.
+
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c        | 154 +++++++++++----------------
->  arch/arm64/kvm/hyp/nvhe/mm.c         |  37 ++-----
->  arch/arm64/kvm/hyp/nvhe/page_alloc.c |  13 +--
->  arch/arm64/kvm/hyp/nvhe/pkvm.c       |  86 +++++----------
->  4 files changed, 105 insertions(+), 185 deletions(-)
+>  arch/arm64/kvm/arm.c   | 14 +++-----
+>  arch/arm64/kvm/mmu.c   | 80 +++++++++++++++---------------------------
+>  arch/arm64/kvm/pkvm.c  | 26 ++++++--------
+>  arch/arm64/kvm/psci.c  | 17 ++++-----
+>  arch/arm64/kvm/reset.c |  8 ++---
+>  5 files changed, 53 insertions(+), 92 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 1af722771178..46cd4fa924be 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -313,17 +313,16 @@ static void do_ffa_rxtx_unmap(struct arm_smccc_1_2_regs *res,
->  			      struct kvm_cpu_context *ctxt)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9453321ef8c6..c9f36932c980 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -793,9 +793,7 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
 >  {
->  	DECLARE_REG(u32, id, ctxt, 1);
 > -	int ret = 0;
+> -
+> -	spin_lock(&vcpu->arch.mp_state_lock);
+> +	guard(spinlock)(&vcpu->arch.mp_state_lock);
 >  
->  	if (id != HOST_FFA_ID) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> @@ -808,12 +806,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  		kvm_arm_vcpu_suspend(vcpu);
+>  		break;
+>  	default:
+> -		ret = -EINVAL;
+> +		return -EINVAL;
 >  	}
 >  
-> -	hyp_spin_lock(&host_buffers.lock);
-> +	guard(hyp_spinlock)(&host_buffers.lock);
->  	if (!host_buffers.tx) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
->  
->  	hyp_unpin_shared_mem(host_buffers.tx, host_buffers.tx + 1);
-> @@ -336,10 +335,7 @@ static void do_ffa_rxtx_unmap(struct arm_smccc_1_2_regs *res,
->  
->  	ffa_unmap_hyp_buffers();
->  
-> -out_unlock:
-> -	hyp_spin_unlock(&host_buffers.lock);
-> -out:
-> -	ffa_to_smccc_res(res, ret);
-> +	ffa_to_smccc_res(res, 0);
+> -	spin_unlock(&vcpu->arch.mp_state_lock);
+> -
+> -	return ret;
+> +	return 0;
 >  }
 >  
->  static u32 __ffa_host_share_ranges(struct ffa_mem_region_addr_range *ranges,
-> @@ -418,18 +414,20 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
->  	DECLARE_REG(u32, fraglen, ctxt, 3);
->  	DECLARE_REG(u32, endpoint_id, ctxt, 4);
->  	struct ffa_mem_region_addr_range *buf;
-> -	int ret = FFA_RET_INVALID_PARAMETERS;
-> +	int ret;
->  	u32 nr_ranges;
-
-nit: inverted christmas tree
-
+>  /**
+> @@ -1726,15 +1722,13 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	/*
+>  	 * Handle the "start in power-off" case.
+>  	 */
+> -	spin_lock(&vcpu->arch.mp_state_lock);
+> +	guard(spinlock)(&vcpu->arch.mp_state_lock);
 >  
-> -	if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)
-> -		goto out;
-> +	if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE ||
-> +	    fraglen % sizeof(*buf)) {
-
-nit: I don't know if we wouldn't want extra parenthesis here for readability.
-
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
+>  	if (power_off)
+>  		__kvm_arm_vcpu_power_off(vcpu);
+>  	else
+>  		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
 >  
-> -	if (fraglen % sizeof(*buf))
-> -		goto out;
+> -	spin_unlock(&vcpu->arch.mp_state_lock);
 > -
-> -	hyp_spin_lock(&host_buffers.lock);
-> -	if (!host_buffers.tx)
-> -		goto out_unlock;
-> +	guard(hyp_spinlock)(&host_buffers.lock);
-> +	if (!host_buffers.tx) {
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
+>  	return 0;
+>  }
 >  
->  	buf = hyp_buffers.tx;
->  	memcpy(buf, host_buffers.tx, fraglen);
-> @@ -444,19 +442,14 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
->  		 */
->  		ffa_mem_reclaim(res, handle_lo, handle_hi, 0);
->  		WARN_ON(res->a0 != FFA_SUCCESS);
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, ret);
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 4da9281312eb..d18f4ce7ceae 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -391,13 +391,13 @@ static void stage2_flush_vm(struct kvm *kvm)
+>   */
+>  void __init free_hyp_pgds(void)
+>  {
+> -	mutex_lock(&kvm_hyp_pgd_mutex);
+> -	if (hyp_pgtable) {
+> -		kvm_pgtable_hyp_destroy(hyp_pgtable);
+> -		kfree(hyp_pgtable);
+> -		hyp_pgtable = NULL;
+> -	}
+> -	mutex_unlock(&kvm_hyp_pgd_mutex);
+> +	guard(mutex)(&kvm_hyp_pgd_mutex);
+> +	if (!hyp_pgtable)
 > +		return;
+> +
+> +	kvm_pgtable_hyp_destroy(hyp_pgtable);
+> +	kfree(hyp_pgtable);
+> +	hyp_pgtable = NULL;
+>  }
+>  
+>  static bool kvm_host_owns_hyp_mappings(void)
+> @@ -424,16 +424,11 @@ static bool kvm_host_owns_hyp_mappings(void)
+>  int __create_hyp_mappings(unsigned long start, unsigned long size,
+>  			  unsigned long phys, enum kvm_pgtable_prot prot)
+>  {
+> -	int err;
+> -
+>  	if (WARN_ON(!kvm_host_owns_hyp_mappings()))
+>  		return -EINVAL;
+>  
+> -	mutex_lock(&kvm_hyp_pgd_mutex);
+> -	err = kvm_pgtable_hyp_map(hyp_pgtable, start, size, phys, prot);
+> -	mutex_unlock(&kvm_hyp_pgd_mutex);
+> -
+> -	return err;
+> +	guard(mutex)(&kvm_hyp_pgd_mutex);
+> +	return kvm_pgtable_hyp_map(hyp_pgtable, start, size, phys, prot);
+>  }
+>  
+>  static phys_addr_t kvm_kaddr_to_phys(void *kaddr)
+> @@ -481,56 +476,42 @@ static int share_pfn_hyp(u64 pfn)
+>  {
+>  	struct rb_node **node, *parent;
+>  	struct hyp_shared_pfn *this;
+> -	int ret = 0;
+>  
+> -	mutex_lock(&hyp_shared_pfns_lock);
+> +	guard(mutex)(&hyp_shared_pfns_lock);
+>  	this = find_shared_pfn(pfn, &node, &parent);
+>  	if (this) {
+>  		this->count++;
+> -		goto unlock;
+> +		return 0;
 >  	}
 >  
->  	ffa_mem_frag_tx(res, handle_lo, handle_hi, fraglen, endpoint_id);
->  	if (res->a0 != FFA_SUCCESS && res->a0 != FFA_MEM_FRAG_RX)
->  		WARN_ON(ffa_host_unshare_ranges(buf, nr_ranges));
+>  	this = kzalloc_obj(*this);
+> -	if (!this) {
+> -		ret = -ENOMEM;
+> -		goto unlock;
+> -	}
+> +	if (!this)
+> +		return -ENOMEM;
 >  
-> -out_unlock:
-> -	hyp_spin_unlock(&host_buffers.lock);
-> -out:
-> -	if (ret)
-> -		ffa_to_smccc_res(res, ret);
+>  	this->pfn = pfn;
+>  	this->count = 1;
+>  	rb_link_node(&this->node, parent, node);
+>  	rb_insert_color(&this->node, &hyp_shared_pfns);
+> -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+> -unlock:
+> -	mutex_unlock(&hyp_shared_pfns_lock);
+> -
+> -	return ret;
+> +	return kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+>  }
+>  
+>  static int unshare_pfn_hyp(u64 pfn)
+>  {
+>  	struct rb_node **node, *parent;
+>  	struct hyp_shared_pfn *this;
+> -	int ret = 0;
+>  
+> -	mutex_lock(&hyp_shared_pfns_lock);
+> +	guard(mutex)(&hyp_shared_pfns_lock);
+>  	this = find_shared_pfn(pfn, &node, &parent);
+> -	if (WARN_ON(!this)) {
+> -		ret = -ENOENT;
+> -		goto unlock;
+> -	}
+> +	if (WARN_ON(!this))
+> +		return -ENOENT;
+>  
+>  	this->count--;
+>  	if (this->count)
+> -		goto unlock;
+> +		return 0;
+>  
+>  	rb_erase(&this->node, &hyp_shared_pfns);
+>  	kfree(this);
+> -	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
+> -unlock:
+> -	mutex_unlock(&hyp_shared_pfns_lock);
+> -
+> -	return ret;
+> +	return kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
+>  }
+>  
+>  int kvm_share_hyp(void *from, void *to)
+> @@ -655,7 +636,7 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
+>  	unsigned long base;
+>  	int ret = 0;
+>  
+> -	mutex_lock(&kvm_hyp_pgd_mutex);
+> +	guard(mutex)(&kvm_hyp_pgd_mutex);
+>  
+>  	/*
+>  	 * This assumes that we have enough space below the idmap
+> @@ -670,8 +651,6 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
+>  	base = io_map_base - size;
+>  	ret = __hyp_alloc_private_va_range(base);
+>  
+> -	mutex_unlock(&kvm_hyp_pgd_mutex);
+> -
+>  	if (!ret)
+>  		*haddr = base;
+>  
+> @@ -714,17 +693,16 @@ int create_hyp_stack(phys_addr_t phys_addr, unsigned long *haddr)
+>  	size_t size;
+>  	int ret;
+>  
+> -	mutex_lock(&kvm_hyp_pgd_mutex);
+> -	/*
+> -	 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
+> -	 * an alignment of our allocation on the order of the size.
+> -	 */
+> -	size = NVHE_STACK_SIZE * 2;
+> -	base = ALIGN_DOWN(io_map_base - size, size);
+> +	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
+> +		/*
+> +		 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
+> +		 * an alignment of our allocation on the order of the size.
+> +		 */
+> +		size = NVHE_STACK_SIZE * 2;
+> +		base = ALIGN_DOWN(io_map_base - size, size);
+>  
+> -	ret = __hyp_alloc_private_va_range(base);
+> -
+> -	mutex_unlock(&kvm_hyp_pgd_mutex);
+> +		ret = __hyp_alloc_private_va_range(base);
+> +	}
+
+Not sure about that one, it's not shorter, doesn't remove any label but add
+a tab.
+
+>  
+>  	if (ret) {
+>  		kvm_err("Cannot allocate hyp stack guard page\n");
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 053e4f733e4b..a39111b70f9f 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -190,39 +190,33 @@ bool pkvm_hyp_vm_is_created(struct kvm *kvm)
+>  
+>  int pkvm_create_hyp_vm(struct kvm *kvm)
+>  {
+> -	int ret = 0;
 > -
 >  	/*
->  	 * If for any reason this did not succeed, we're in trouble as we have
->  	 * now lost the content of the previous fragments and we can't rollback
-> @@ -465,7 +458,6 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
->  	 * sharing/donating them again and may possibly lead to subsequent
->  	 * failures, but this will not compromise confidentiality.
+>  	 * Synchronise with kvm_arch_prepare_memory_region(), as we
+>  	 * prevent memslot modifications on a pVM that has been run.
 >  	 */
-> -	return;
+> -	mutex_lock(&kvm->slots_lock);
+> -	mutex_lock(&kvm->arch.config_lock);
+> -	if (!pkvm_hyp_vm_is_created(kvm))
+> -		ret = __pkvm_create_hyp_vm(kvm);
+> -	mutex_unlock(&kvm->arch.config_lock);
+> -	mutex_unlock(&kvm->slots_lock);
+> +	guard(mutex)(&kvm->slots_lock);
+> +	guard(mutex)(&kvm->arch.config_lock);
+>  
+> -	return ret;
+> +	if (!pkvm_hyp_vm_is_created(kvm))
+> +		return __pkvm_create_hyp_vm(kvm);
+> +
+> +	return 0;
 >  }
 >  
->  static void __do_ffa_mem_xfer(const u64 func_id,
-> @@ -480,29 +472,29 @@ static void __do_ffa_mem_xfer(const u64 func_id,
->  	struct ffa_composite_mem_region *reg;
->  	struct ffa_mem_region *buf;
->  	u32 offset, nr_ranges, checked_offset;
+>  int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
+>  {
 > -	int ret = 0;
-> +	int ret;
+> +	guard(mutex)(&vcpu->kvm->arch.config_lock);
 >  
->  	if (addr_mbz || npages_mbz || fraglen > len ||
->  	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
+> -	mutex_lock(&vcpu->kvm->arch.config_lock);
+>  	if (!vcpu_get_flag(vcpu, VCPU_PKVM_FINALIZED))
+> -		ret = __pkvm_create_hyp_vcpu(vcpu);
+> -	mutex_unlock(&vcpu->kvm->arch.config_lock);
+> +		return __pkvm_create_hyp_vcpu(vcpu);
 >  
->  	if (fraglen < sizeof(struct ffa_mem_region) +
->  		      sizeof(struct ffa_mem_region_attributes)) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
+> -	return ret;
+> +	return 0;
+>  }
 >  
-> -	hyp_spin_lock(&host_buffers.lock);
-> +	guard(hyp_spinlock)(&host_buffers.lock);
->  	if (!host_buffers.tx) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
+>  void pkvm_destroy_hyp_vm(struct kvm *kvm)
+>  {
+> -	mutex_lock(&kvm->arch.config_lock);
+> +	guard(mutex)(&kvm->arch.config_lock);
+>  	__pkvm_destroy_hyp_vm(kvm);
+> -	mutex_unlock(&kvm->arch.config_lock);
+>  }
 >  
->  	if (len > ffa_desc_buf.len) {
-> -		ret = FFA_RET_NO_MEMORY;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_NO_MEMORY);
-> +		return;
->  	}
+>  int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 3b5dbe9a0a0e..e1389c525e9d 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -62,7 +62,6 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	struct vcpu_reset_state *reset_state;
+>  	struct kvm *kvm = source_vcpu->kvm;
+>  	struct kvm_vcpu *vcpu = NULL;
+> -	int ret = PSCI_RET_SUCCESS;
+>  	unsigned long cpu_id;
 >  
->  	buf = hyp_buffers.tx;
-> @@ -512,53 +504,41 @@ static void __do_ffa_mem_xfer(const u64 func_id,
->  			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
->  	offset = ep_mem_access->composite_off;
->  	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
+>  	cpu_id = smccc_get_arg1(source_vcpu);
+> @@ -78,14 +77,13 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
 >  
->  	if (check_add_overflow(offset, sizeof(struct ffa_composite_mem_region), &checked_offset)) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
->  
->  	if (fraglen < checked_offset) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
->  
->  	reg = (void *)buf + offset;
->  	nr_ranges = ((void *)buf + fraglen) - (void *)reg->constituents;
->  	if (nr_ranges % sizeof(reg->constituents[0])) {
-> -		ret = FFA_RET_INVALID_PARAMETERS;
-> -		goto out_unlock;
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
->  	}
->  
->  	nr_ranges /= sizeof(reg->constituents[0]);
->  	ret = ffa_host_share_ranges(reg->constituents, nr_ranges);
-> -	if (ret)
-> -		goto out_unlock;
-> +	if (ret) {
-> +		ffa_to_smccc_res(res, ret);
-> +		return;
-> +	}
->  
->  	ffa_mem_xfer(res, func_id, len, fraglen);
->  	if (fraglen != len) {
-> -		if (res->a0 != FFA_MEM_FRAG_RX)
-> -			goto err_unshare;
+> -	spin_lock(&vcpu->arch.mp_state_lock);
+> +	guard(spinlock)(&vcpu->arch.mp_state_lock);
+> +
+>  	if (!kvm_arm_vcpu_stopped(vcpu)) {
+>  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+> -			ret = PSCI_RET_ALREADY_ON;
+> +			return PSCI_RET_ALREADY_ON;
+>  		else
+> -			ret = PSCI_RET_INVALID_PARAMS;
 > -
-> -		if (res->a3 != fraglen)
-> -			goto err_unshare;
-> +		if (res->a0 != FFA_MEM_FRAG_RX || res->a3 != fraglen)
-> +			WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
->  	} else if (res->a0 != FFA_SUCCESS) {
-> -		goto err_unshare;
-> +		WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
-
-I am not sure this is really better for this function. At least we had a single
-callsite to this WARN_ON(ffa_host_unshare_ranges) ... 
-
-Or alternatively if we really want guard() this can just set ret = XXX and then
-
-  if (ret)
-      WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
-
-So we can keep a single call site for the rollback.
-
+> -		goto out_unlock;
+> +			return PSCI_RET_INVALID_PARAMS;
 >  	}
-> -
+>  
+>  	reset_state = &vcpu->arch.reset_state;
+> @@ -113,9 +111,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
+>  	kvm_vcpu_wake_up(vcpu);
+>  
 > -out_unlock:
-> -	hyp_spin_unlock(&host_buffers.lock);
-> -out:
-> -	if (ret)
-> -		ffa_to_smccc_res(res, ret);
-> -	return;
-> -
-> -err_unshare:
-> -	WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
-> -	goto out_unlock;
+> -	spin_unlock(&vcpu->arch.mp_state_lock);
+> -	return ret;
+> +	return PSCI_RET_SUCCESS;
 >  }
 >  
-
-[...]
-
->  int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
-> @@ -996,22 +975,19 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
->  	struct kvm *host_kvm;
->  	unsigned int idx;
->  	size_t vm_size;
-> -	int err;
->  
-> -	hyp_spin_lock(&vm_table_lock);
-> -	hyp_vm = get_pkvm_unref_hyp_vm_locked(handle);
-> -	if (!hyp_vm || !hyp_vm->kvm.arch.pkvm.is_dying) {
-> -		err = -EINVAL;
-> -		goto err_unlock;
-> +	scoped_guard(hyp_spinlock, &vm_table_lock) {
-> +		hyp_vm = get_pkvm_unref_hyp_vm_locked(handle);
-> +		if (!hyp_vm || !hyp_vm->kvm.arch.pkvm.is_dying)
-> +			return -EINVAL;
-> +
-> +		host_kvm = hyp_vm->host_kvm;
-> +
-> +		/* Ensure the VMID is clean before it can be reallocated */
-> +		__kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
-> +		remove_vm_table_entry(handle);
+>  static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+> @@ -176,9 +172,8 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type, u64 flags)
+>  	 * re-initialized.
+>  	 */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> -		spin_lock(&tmp->arch.mp_state_lock);
+> +		guard(spinlock)(&tmp->arch.mp_state_lock);
+>  		WRITE_ONCE(tmp->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
+> -		spin_unlock(&tmp->arch.mp_state_lock);
 >  	}
+>  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
 >  
-> -	host_kvm = hyp_vm->host_kvm;
-> -
-> -	/* Ensure the VMID is clean before it can be reallocated */
-> -	__kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
-> -	remove_vm_table_entry(handle);
-> -	hyp_spin_unlock(&vm_table_lock);
-> -
->  	/* Reclaim guest pages (including page-table pages) */
->  	mc = &host_kvm->arch.pkvm.teardown_mc;
->  	stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
-> @@ -1042,10 +1018,6 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
->  	teardown_donated_memory(mc, hyp_vm, vm_size);
->  	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
->  	return 0;
-> -
-> -err_unlock:
-> -	hyp_spin_unlock(&vm_table_lock);
-> -	return err;
-
-For this one too I doubt this is really interesting: only one path using
-err_unlock and actually the entire label could be just removed to to simply do
-hyp_spin_unlock() return -EINVAL;
-
-This would avoid adding another tab with that scoped_guard(). But that's
-probably my aversion to scoped_guard() talking.
-
->  }
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index b963fd975aac..60969d90bdd3 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -193,10 +193,10 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	bool loaded;
+>  	u32 pstate;
 >  
->  static u64 __pkvm_memshare_page_req(struct kvm_vcpu *vcpu, u64 ipa)
+> -	spin_lock(&vcpu->arch.mp_state_lock);
+> -	reset_state = vcpu->arch.reset_state;
+> -	vcpu->arch.reset_state.reset = false;
+> -	spin_unlock(&vcpu->arch.mp_state_lock);
+> +	scoped_guard(spinlock, &vcpu->arch.mp_state_lock) {
+> +		reset_state = vcpu->arch.reset_state;
+> +		vcpu->arch.reset_state.reset = false;
+> +	}
+
+Same, I don't find this one really interesting.
+
+>  
+>  	preempt_disable();
+>  	loaded = (vcpu->cpu != -1);
 > -- 
 > 2.54.0.1136.gdb2ca164c4-goog
 > 
