@@ -1,146 +1,200 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E567212F89;
-	Mon, 15 Jun 2026 11:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781523938; cv=none; b=kI7WO+OUQHnqqUl+/bHQT2YHHHN2/qJsE7B7LngAEI/SFtgQBmBM3J14p7STnKrB3w02WHrLrQarb07HGD02+oIUpnD6aicL1I71nl3ggu7QhtlNnm863yVIASEQ3ue38JeDI7ANM5K81dRE/VBJar1shwykoKsNFp8pEqmD53g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781523938; c=relaxed/simple;
-	bh=yl9rySnseoF1FeFXRn9TN4yr2P1Ptx7JPUgpPqcwm0g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lCOYTk8+7JkgOjVkgaVQ8lRrTbPD/ZCNEXHesBhCnu2XU7PcLPv+IB+QhaP9xg90cYriqKV5/uq8xEZJ6LJCtsSRmxYmS2FizMxZ5CdzDtpjtroWKMbdComa8+HZUNUfIya+i1St7pdfjmxB1GeMTaVJWh1nDRwDFLKZl1WZais=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MHnZ0RGn; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAA33F4DD6
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 12:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781527385; cv=pass; b=Vz7y7Nsv0d8kVCuGfRBd4ICKKJtEdRyvBsPKU4YZI1NUUYzfzpZFOx7Qun0uUeUO7uVQmrCaftyVdjYa2VU8zNIfAIY6hk1PGjwIQqp/eXulJUOVf0QEb9wKn3iOwjQwxYIDVQgWzpbmpSF3/1BwFBWedwT/0bQWg17tNDI3MvY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781527385; c=relaxed/simple;
+	bh=Bw9yLChPYY8XYNoz0p+T9zcVRoabwdPf/QVDPf9nI34=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oAhll/8W1SCYXyTFfxU4cEk495UZomnHSZHdsCup2bR88vwBudu4/EyZvN0aEr9ufnnV9JnMgiYJSsp2THGyyBNeWo8vMBArzuQlahbpXHvrgI1rwzl71p0VGomXirXP7HpFlre/RLLBQQdHzjMe8GWautCQkr67qorVsUFR/xg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ePXdnS1a; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MHnZ0RGn"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1E30328D;
-	Mon, 15 Jun 2026 04:45:30 -0700 (PDT)
-Received: from [10.1.29.27] (e122027.cambridge.arm.com [10.1.29.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E2EF23F915;
-	Mon, 15 Jun 2026 04:45:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781523935; bh=yl9rySnseoF1FeFXRn9TN4yr2P1Ptx7JPUgpPqcwm0g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MHnZ0RGnY5yquoeTXirjmrkWmRzjXO/gwWE70gcVFlGHngZWIkgOBZF3tbUpE5U7X
-	 3IAA/JOKX6IPitz0r3JchFuqknr920GAb1G0BhNcbpfE7b5JWLusQrf5zqaFjrTE+d
-	 7Ph+32XAuVOXxEAh0fSZABQvj9sk1oorA+yrbZeU=
-Message-ID: <649692d0-fa5b-455f-b6d7-6f41eec87ff7@arm.com>
-Date: Mon, 15 Jun 2026 12:45:27 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ePXdnS1a"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51765531803so62601cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 05:43:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781527381; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iR0w634JyrYFHj69PHaUU4ZJblTDWT66owAXnTf+ttbeh/xoOQrXtuZUVqAhLM+wMU
+         tRMJ34Sz5Ge6c6MA35GMi4WA56MH1B32T4dqakXNcU2B7ADQGaxbXo8ZtfJGd/Zvd3AU
+         jdMsXawiw2QV218+hDMcWQIi8mGzvzROnnphrCHLw0+Ankh3gzqcANepTph/RIRdzWby
+         WWCXMJnlsP8FzV1LWT3BPklSWiAA1hc+FLr2AswuoStNR/DxLHZoiaRpqspaZI8/DuQr
+         8EvJGMWe+xK+4WTcXYQF3Eg59qEX8iGsa0VMMHul07yBSFNdH9/W5UpoSdrhcNBx7cAT
+         2Jyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6RinZ6UVRLzqeCskT7I+XyHLStsWE+0zve+ajaQieeo=;
+        fh=yJ9rJtB6TAjKjc9/D08d/lu4OZEIZyaWIZwlSvToRBI=;
+        b=f0V496axkvKeIxZS11guWfMPnYshGWrl2A8F71RC3Lu/VKdp6HXyq5RfQdQYSB/+bq
+         dXRxExs25SFL8kRr/K2MtsJMd2C6pXi5J0nEJZOpbmTpgd0f2qtNpn+ldGnwSu6gO+PF
+         jFnCFu0cz/oG72LDbR1+yIoJXSBHbVhXpIm0O/w65O76+Ou6D/gRcdXpTXpC5rRgWI3x
+         Q8WGe/CjgV6rB4zSEK7JDUj0w3K2yFuH31T0J99rjGmiLdUGFYsW/8A4i+U01gfSLwMe
+         nlA05YU8tAs4i5pjiSUQEiBUssF2McYUYJ44BN5VB+EC2E7YPklrtrGtBcUQmfrVOcjg
+         +YdA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781527381; x=1782132181; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6RinZ6UVRLzqeCskT7I+XyHLStsWE+0zve+ajaQieeo=;
+        b=ePXdnS1abGdotB4EFVNEsCmzxVchAP5NmJmeOJenTlVX4l9OATfLOyEP70O9Hv8xzO
+         ii2dvBAEVoXblAFQC/IXxRgz4mR/YwEhxqvjavNq6g6D+nvis8n9eggVNl83MfaS2hvt
+         G+Gd/MskI9LlH0oA5We2+ip64twjX5e22rWzAy0BTIBh35sojQstrcpFo/NFmeaIBLHF
+         7TyZa/3Yzoqnql+yGboPakSsPlkrZVyUex8bq80453JGlOazOipMY/N9II3Df/asQ35L
+         dDHgvVS/21Qu19DZqNDaWPGIHAV5jg8y3pLl5foPc378x3j6LcxldGkpaNPE6eQ/lSlm
+         3sBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781527381; x=1782132181;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6RinZ6UVRLzqeCskT7I+XyHLStsWE+0zve+ajaQieeo=;
+        b=BQdMhimbgPt07MjksVo2fwhtr8WTNsVck4MHgfOGLkk7Jeb8KlAuSPSn21uousi2sD
+         rydsblIuXK98R6RYmz6oduIUmia9HO7EJF+sQoHXWq+mo7LUCjRs7RnQI6Y8VfRqKEwz
+         Zm1ofT+1PPgpec1Ez0aHZw3mv7Kx68mBpyJnP7gksmgRLolcGCVFfcsEhzua/d33ejYu
+         KeSJ8jqYBgQGnCmDr90D7JjW4SPA554EHWyAGYEvingpvEn+SPEYuVrqv99OG+KGqy9w
+         rAew9PrwQbs6ev1bzf879UsHIktri0DwfpvgTWBtQE1z+YP8fhh74eEop8P4k1tsXUTi
+         d+tQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9VNaFfWeZmpegqmHWqrXaP03dOc6qGE+mU2q33J7TYkV8ypqqYv7V4ENkOBLAgbwLfRpCVwOc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzJEbOsLDMi+1OW8Dog0/H9dYNqB679G/HTkc/44rQS260buSTW
+	LuE3T05rlTxboLcj5xs5Go6qW0/3pkS3+q3B5cuEh3qs0mPoDa7SkJ4Cw62z1n4zNnRlsURnv+Z
+	XkjxaDg5Nb78dGUHuKoLi47dBdHyca7crZi4yK9lYhuC7SDKxUu4Cvl0o0V4=
+X-Gm-Gg: Acq92OEoh4l/xM1UfOxRVNY3qMKxs610+rRh9NAVXCMUr43qntlt9tmnoehbMXagjK1
+	ZB12rCIfx51eA1SH3z6NV2ZhiwXri6GGrAZq3TlVjjyNAo+Tg0D/rRhS6h6RkipDG35xH2LSfPT
+	bQS10jn4lY4qS1thTN9WmqLsjtWBeW/AaPvKbTSa+Xxz9K/nU2rQzwd+7L2JUyqIUn9fUq3Pa+t
+	Xuv+k537dbQKc7S61iYq1BAAiDps/onskMdiUZ4eSPKy0U3sZm05ru/Omhf/9fycVb83H0Ra93y
+	rq+d/Hts
+X-Received: by 2002:a05:622a:4f:b0:517:6488:904a with SMTP id
+ d75a77b69052e-5198752b4damr1402741cf.20.1781527380134; Mon, 15 Jun 2026
+ 05:43:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 10/44] arm64: RMI: Add support for SRO
-To: "Dan Williams (nvidia)" <djbw@kernel.org>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-11-steven.price@arm.com>
- <872ce762-0a83-42a4-bbe8-b21ea6f4e1cf@redhat.com>
- <50d70588-2ebc-4c9b-98ec-68f3d04a9d21@arm.com>
- <6a2c91398fad5_a003b10027@djbw-dev.notmuch>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <6a2c91398fad5_a003b10027@djbw-dev.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260614163336.3490925-5-tabba@google.com> <20260614164547.D398B1F000E9@smtp.kernel.org>
+In-Reply-To: <20260614164547.D398B1F000E9@smtp.kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 15 Jun 2026 13:42:23 +0100
+X-Gm-Features: AVVi8Cdrb9YQfLGPkc6Ljw1y0SYp8HnSvtrsJjbiTklgs9sQgOb93MYz_1Urvhg
+Message-ID: <CA+EHjTwHoveK6FT0CGcKuj97aUaHpv7vk=DQjRxT9c6UkkSeoA@mail.gmail.com>
+Subject: Re: [PATCH 4/7] KVM: arm64: Set IL for injected FPAC exceptions
+ during ERET emulation
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Dan,
+On Sun, 14 Jun 2026 at 17:45, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+>
+> Pre-existing issues:
+> - [High] Incorrect Emulation of Illegal Exception Return corrupts ELR_EL2=
+ and may cause spurious Instruction Aborts
+> --
+>
+> commit 56bc216de713f5bf0e45ff5ad97580cbdc7eeb66
+> Author: Fuad Tabba <tabba@google.com>
+>
+> KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
+>
+> This commit fixes the FPAC syndrome constructed during nested ERET
+> emulation to include the IL bit. It ensures that the IL bit is set to 1
+> for ERET and its authenticated variants, which are always 32-bit A64
+> instructions.
+>
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-n=
+ested.c
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -2777,7 +2777,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcp=
+u)
+> >                */
+> >               if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR=
+_IL_BIT)) {
+> >                       esr &=3D ESR_ELx_ERET_ISS_ERETA;
+> > -                     esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_F=
+PAC);
+> > +                     esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_F=
+PAC) | ESR_ELx_IL;
+> >                       kvm_inject_nested_sync(vcpu, esr);
+> >                       return;
+> >               }
+> >       }
+> >
+> >       preempt_disable();
+> >       vcpu_set_flag(vcpu, IN_NESTED_ERET);
+> >       kvm_arch_vcpu_put(vcpu);
+> >
+> >       if (!esr_iss_is_eretax(esr))
+> >               elr =3D __vcpu_sys_reg(vcpu, ELR_EL2);
+> >
+> >       trace_kvm_nested_eret(vcpu, elr, spsr);
+> >
+> >       *vcpu_pc(vcpu) =3D elr;
+> >       *vcpu_cpsr(vcpu) =3D spsr;
+>
+> [Severity: High]
+> This is a pre-existing issue, but does setting the PC to the target addre=
+ss
+> here cause issues when an illegal exception return is detected?
+>
+> If kvm_check_illegal_exception_return() previously detected an illegal re=
+turn
+> and set PSR_IL_BIT in spsr, kvm_emulate_nested_eret() unconditionally
+> advances the guest PC to the ERET target address (elr) and returns to the
+> guest, relying on hardware to generate the Illegal Execution State except=
+ion.
+>
+> Wouldn't the hardware then save the target address into the guest's ELR_E=
+L2
+> instead of the faulting ERET address, corrupting the architectural state?
+>
+> Additionally, since the hardware fetches the instruction at the target ad=
+dress
+> using the guest EL2 translation regime before execution, an unmapped or
+> unexecutable target address could trigger an Instruction Abort instead of=
+ the
+> required Illegal Execution State exception, per ARM ARM D1.8.2.
+>
+> Could this result in the guest hypervisor receiving a spurious Instructio=
+n
+> Abort for an EL1/EL0 address?
 
-On 13/06/2026 00:07, Dan Williams (nvidia) wrote:
-> Steven Price wrote:
-> [..]
->>> alloc_pages_exact() will fail if the requested size exceeds the maximal
->>> allowed
->>> size (1 << MAX_PAGE_ORDER). The maximal size is usually smaller than
->>> PUD_SIZE
->>> but PUD_SIZE is allowed by the RMM.
->>
->> This is an area where to be honest I'm really not sure what to do.
->> Technically the RMM is allowed to ask for a contiguous range of 512GB
->> pages (on a 4K system - larger with larger page sizes) - but clearly no
->> real OS is going to be able to provide anything like that.
->>
->> In practise we don't expect the RMM to do anything so crazy. It's not
->> really clear to be whether even 2MB (PMD_SIZE) is needed. But the spec
->> is written to be generic.
->>
->> So my current approach is to calculate the required size and pass it
->> into alloc_pages_exact(). For "stupidly large" values this will fail and
->> Linux just doesn't support an RMM which attempts this. If there is ever
->> a usecase which needs this then we'd need to find a different method of
->> providing the memory (most likely some form of carveout to avoid
->> fragmentation). But my view is we should wait for that usecase to be
->> identified first.
-> 
-> Just some comparison comments as I am also going through the TDX patches
-> which enable "Extension SEAMCALLs". These new SEAMCALLs are similar to
-> the SRO mechanism [1].
+Not a bug. On an illegal exception return, the Arm ARM specifies that
+PC is set to ELR_ELx unconditionally. The subsequent Illegal Execution
+State exception is taken at the target PC, so ELR_ELx is saved with
+the target address. This is architecturally correct.
 
-Looks like at least at the moment it's much more one-way than the SRO
-mechanism - there's no reclaim mechanism (yet).
+Similarly, an Instruction Abort at an unmapped target would take
+priority over the Illegal Execution State exception, which is also
+correct behavior.
 
-> TDX asks for an upfront delegation of memory at init time using
-> alloc_contig_pages() that is never returned until entire module is
-> shutdown. alloc_contig_pages() is not subject to the MAX_ORDER limit,
-> but not sure that alloc_contig_pages() is suitable for small+dynamic
-> runtime memory add / release that SRO potentially wants to do?
+One thing I noticed while looking at this:
+kvm_check_illegal_exception_return() preserves {N,Z,C,V,D,A,I,F} from
+the current PSTATE, but the Arm ARM says these should come from
+SPSR_ELx on an illegal exception return (EL and SP are unchanged, but
+the flags and masks are taken from SPSR). PAN and ALLINT should also
+come from SPSR_ELx if their respective features are implemented.
 
-Yeah I'm not sure quite what is best. I expect the RMM to only request
-contiguous memory for very small allocations to use as hardware page
-tables. It's an issue I'm trying to work through that the specification
-doesn't provide any guidance for what sort of allocations the host
-should expect to provide.
+Marc, is the current behavior intentional, or should we be
+constructing PSTATE from the original SPSR_EL2 for those fields?
 
-> Does SRO always balance the size of RMI_OP_MEM_REQ_DONATE with
-> RMI_OP_MEM_REQ_RECLAIM, or might some donate requests be a one way
-> donation like TDX? Just poking to see if there is a path to preallocate
-> a pool vs the fine grained per-operation alloc/free.
+Cheers,
+/fuad
 
-The spec is unfortunately not prescriptive on this point. For an
-operation which eventually fails, the expectation is that the RMM will
-return all the memory that was provided (and exactly that memory). But
-the specification doesn't actually require that.
-
-The problem is that there are situations where a racing operation on
-another CPU could trigger this to not happen. For example, a new page
-table needs to be allocated to complete a map operation, but then a
-racing operation on another CPU makes use of this page table (e.g due to
-a map at a different address), the memory for the page table cannot be
-returned even if the operation doesn't complete because it's in use from
-the racing operation.
-
-I don't believe the current RMM design will actually do this - but it's
-not something we actually want to prevent in the spec.
-
-Equally the expectation is that all the donated memory for a guest will
-be returned when the guest is destroyed. But we don't have anything in
-the spec to enforce this.
-
-I don't particularly expect a pool to be that useful for the expected
-memory allocation patterns as I expect SRO donations to be long lived.
-We don't (yet at least) have a concept of donating memory just for
-"scratch" memory during an operation. Although the SRO mechanism doesn't
-rule that out.
-
-Thanks,
-Steve
-
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260614163336.34=
+90925-1-tabba@google.com?part=3D4
