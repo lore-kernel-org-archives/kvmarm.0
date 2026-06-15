@@ -1,100 +1,163 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656E23ECBEA
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FACE1494A8
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781529080; cv=none; b=ZhDjTchEClA/9s4YGNttPbkYbrl+0LGpXq4sH2nabFXUkwXWpLPeFjH5vzPUDGILOKxdbqbLEHnt7gQnFNqZxHsKHS+S0bFsqYxQLMgkzwQ3Yrw8EzavQbH9QqN/cPxc37IZCyBg0KWiqRHj0oGx/1Im2p1KhlZFXuLATdmmz+g=
+	t=1781529093; cv=none; b=FpN2doSrPdwkLALHo5JfP2PIPDmDzojFPoK1rIxWk0ddYarYaOzFurrgsT9NHSG7QM1sUyKYyuEeZPk791G/aoC2Boi4c6c6JcbAhenaPjwmTIhef6uWpK2X/pQi709gACNjWpWNfJDe+WOUSHM5ROGDxV3rycXATXU0f3Atacg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781529080; c=relaxed/simple;
-	bh=Q8TEX85KOjNcdvNCgZVyXSGWbrrAjZBHAj9OERtFzQA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rdiTfSSaAt/Ydrk93rWtLNzFRp3YKSw3rVZG5yTHRl75Rcu/8f7caW819OZhGvfvidtD1htQt9rDxZXpEVJ2pjui74UQW1+ZQDlsBkYxXNuk19QhGcGfugGrGY9mG1Sd8m00IFiFTJbWcFEpb6ZM4l5iJMu3IvB2g4MaIYgmvDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oc0gmWDh; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1781529093; c=relaxed/simple;
+	bh=cI6CZJti5/aPMIs+HJPMCqFkUJo9NlZ3x9Oc3FXQpMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HMmoPg6vyfUAWICq5venFv7GDI12TI9Y7tJOSiU/H0oD5emCBAifb/EV0uq0z4xyTaBxNXfLKQ15DR+SpFUUbdNOO2/4PN4bQ7so8hrOj3r3R5Brcx7g7BJ2ckT2FKAdOs3dYjdczCcrhFvV2eL6Ih4MyAIRmi8+Xhl5FPbp2ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UKXpXURV; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oc0gmWDh"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490dad70f95so34758535e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 06:11:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UKXpXURV"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490b3637b90so25266605e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 06:11:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781529078; x=1782133878; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=M73130SiNKp2+ndBAl5SeIBo8s7L0rXyQ0BMD/dcV4o=;
-        b=oc0gmWDhI6BJLNf0yUgKU6rHWabFN+XFSBpn7taMGLDi1USnBe3aHg9Xj7A/Y5gBwN
-         JlL80/HbeekIXn6jsE5MrRunoICxFW4VpaBCF8voogXfy0reZF6wL2iCk/wFDgPBv+uE
-         01sxy0jLEmYnev65hgK97Mzcua/kJjCEn+mo+mmK1phtwZ2ok4ir+fSQGmE7SLfYR1s0
-         +/blXcvwI0PPB8C59GtG0FpVf6M9ZP5Ap4sEexQyCVnjIaPokGbzU/TVrzyXDzp0rvhS
-         WOrYOA+daCNxaExUhC/OmoxN+QU5Dl1DWzqRyo92HEmbQP+cP9pwKn1AkUbTkumvndBY
-         N8yw==
+        d=google.com; s=20251104; t=1781529090; x=1782133890; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OUgsqjBTFZvdCdtQA3mADF26jeRTv++PPR68ymFBShw=;
+        b=UKXpXURVIneJ2vwtZewnr3np/jBLhCR8QZ0HLQYyEIXYirhCq3JDJuGs7FypGqeeFi
+         oPvnyvlnEsZLae8OQfi+QmCVRF4s8CSvoOUMq9hfLLsY5GOQSF97YTD1Pc4tmalZeH1K
+         0AxmGG29Je9KH9gSZ1dERcrdoWtIhMT6oWUj0gs2H6D8WH5QGdoMfJoJZFEv1SXs9iBj
+         I9rrNiQInGag0FxSA/wFa5mpwInJvYSwrVOIU4wgiUWHgty4JvaIm6BMKoi9ZqUIBT/j
+         WbcZCKgXnZ17L58OnjiXUYyTmPNrMOJjDzSWZAEnE+QTZCEDIkwYv/VT6kB4NyhtEwB9
+         4ETA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781529078; x=1782133878;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M73130SiNKp2+ndBAl5SeIBo8s7L0rXyQ0BMD/dcV4o=;
-        b=lmk9+aqeQ/B0BjIFDHoVhRfKGN+fIn+2ou8xMnSvvgvSzjzqYu53qYtGL/owK/WJMN
-         AkLfsIhpR+GSqt1uS9TE3RE+KMcMgi/hPGK4UaSPmmiDAXUur3pU/C3P6JIDg1HA2MOJ
-         od69Y36jYDUHglXpCwztlSB+tAmRfgGjKdw0y5oLh8VTqCduelF3ujqTjBEtxFTIWOmt
-         JTvq7s/Ya5S23OqXZT3rgFaGmUBw0gBbfvUDLEmPjNXTPJQMcOtYykGn2vJakDb+7GD6
-         E4MNt0xLjgy0YD/QTRG/7gp1evLoH5zJKjKyK+O8AIDrvuS03CgPIODW/5FjFVEjYjYK
-         d4NQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8un7LfbxejsO9MQl4eHqaikSSTHJ1cA6I3PaWh4iz2+qZvx/h8xfmhH0nljcMJqJtnnW7igug=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwLzbXGbybglFliHXXk67QB4nbd3tia2pFTLO3TUUkArHob4r8L
-	z0UqvrooZU+xqeTzmIN+RqOFCoGCKixg21FGSr+zOiA+U/qu7Ui17axyglKzu5FvxH4kyzUM4Cz
-	Iig==
-X-Received: from wmph20.prod.google.com ([2002:a05:600c:4994:b0:490:bd79:13cd])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8b5b:b0:492:25a1:e2f9
- with SMTP id 5b1f17b1804b1-49225a1e350mr103728295e9.26.1781529077262; Mon, 15
- Jun 2026 06:11:17 -0700 (PDT)
-Date: Mon, 15 Jun 2026 14:11:16 +0100
+        d=1e100.net; s=20251104; t=1781529090; x=1782133890;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OUgsqjBTFZvdCdtQA3mADF26jeRTv++PPR68ymFBShw=;
+        b=hW9M8NvkLLEWjEUBH5Jzl94jK1sSC/U3UGvrzh6Sbres00ASm9/i4zNOw9iPEgFlbp
+         VwWflgUcqDMzatvT4oMbDkY0AzrzpkgZWRNJjnlBpYNJxXGEdt1sVYRJWOgfaNnmoMzq
+         eh/iQequG++rtebzL+gqsP5Rjik4TsYd7bdN9vZtftHPyz6Elhdn5LilnMQdDzKfhgSc
+         8sQ/ZPLeav+nfkzmGNj+d260KHWWG90jM/gif7lUWF5uyPjNvZb8C/+CvP4XS0J+SIyb
+         sR7cSDcpbIMzAy3MR7YXrn7rWaoNx0zp0JKOKm2YiL//GMcH2M4trFu8eUUl6MpR6lRN
+         oiGw==
+X-Forwarded-Encrypted: i=1; AFNElJ99mdejbbwYT6CJzNXWj/YRqS1YnIbd8efnYFOOrfhgcfLI2T24CRgy+LfXrgVJ7lNjzoQaZjo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyeLrKG80e09xgy50boMlWWVOmfCC5vuInCRrnNBaBWPHPCYobp
+	NK4d1rKoHNH2qwjtO3Uupg3eTmE6ARepj13YnWlxadB5O4EyJkwKtrL+ClfNWbGFHQ==
+X-Gm-Gg: Acq92OEShnWIebIRXcXLZjSRP6K16CFqhRvVEgeOYRDFg37k4EcZa6naUaX6W8sa8xr
+	Ky8n+EE039Qouxo358mTMBcaRnUF3kmxa9abaVS0ju+zuvyjIzBq038uz5nr8pOBg9w+8CM/1Rh
+	25+DWsZku/P+2UcmN9GrLdZlbqCuoluXKXVXM2H+DsTaHIxV7GIrYrsrw4hB3QQ/H2LF3sjNJrv
+	1pdNlgxfZx1BxZoZytOGijfzCfAGTPqJbDpEukdNqW18+9AC5WCEXwjG0ylEeIjEybeDT7Rhz3i
+	9slrUJ908ONo3U8u4uhRA6BIlDLR2JyaQC5hY3MfdO51MOu/cxvgzwGoQM4FX+PmLqN2s9QR1Zo
+	s8iBC3r+Jg9geU54qO0pmHKOs5lJr5w+AMrP/93sRF4hEdGliPpLwpbOAaE89Yeuxgz0TJl5zYL
+	0E8fobr7k2uq5eJNGtlq+Q532Ux89tMiQUkbH0DXSQNMeKsypuw7DAhh3MY9PO5fAu1RA=
+X-Received: by 2002:a05:600c:628f:b0:492:1e36:85dc with SMTP id 5b1f17b1804b1-4922017b005mr126783175e9.36.1781529088951;
+        Mon, 15 Jun 2026 06:11:28 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490ea95b274sm341373985e9.1.2026.06.15.06.11.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 06:11:28 -0700 (PDT)
+Date: Mon, 15 Jun 2026 14:11:24 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: tabba@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Per Larsen <perlarsen@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 05/11] KVM: arm64: Make vcpu_{read,write}_sys_reg
+ available to HYP code
+Message-ID: <ai_5_CoRm-LdoVMm@google.com>
+References: <20260612065925.755562-1-tabba@google.com>
+ <20260612065925.755562-6-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260615131116.390977-1-tabba@google.com>
-Subject: [PATCH] KVM: arm64: nv: Write ESR_EL2 for injected nested SError exceptions
-From: Fuad Tabba <tabba@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260612065925.755562-6-tabba@google.com>
 
-kvm_inject_el2_exception() writes ESR_EL2 for synchronous exceptions
-but not for SError. enter_exception64() does not write ESR_ELx for any
-exception type, so the constructed syndrome is dropped. A guest L2
-hypervisor taking a nested SError observes stale ESR_EL2.
+On Fri, Jun 12, 2026 at 07:59:19AM +0100, tabba@google.com wrote:
+> The vcpu_{read,write}_sys_reg() accessors are host-only, so helpers
+> built on them such as kvm_vcpu_set_be()/kvm_vcpu_is_be() cannot be
+> shared with hyp code. Add _vcpu_read_sys_reg()/_vcpu_write_sys_reg()
+> inlines in kvm_emulate.h that dispatch on is_nvhe_hyp_code() to the
+> host- or hyp-side accessor. A follow-up series uses this to share that
+> emulation code at EL2.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 22 +++++++++++++++++++---
+>  1 file changed, 19 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5bf3d7e1d92c..aed9fc0b717b 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -506,6 +506,22 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>  	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+>  }
+>  
+> +static inline u64 _vcpu_read_sys_reg(struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
 
-This affects both kvm_inject_nested_serror() and the EASE path in
-kvm_inject_nested_sea().
+I am not sure a single underscore is widely used in the kernel.
 
-Write ESR_EL2 for except_type_serror, matching except_type_sync.
+Why not move __vcpu_read_sys_reg() and __vcpu_write_sys_reg() from exception.c
+to kvm_emulate.h? especially this already checks has_vhe().
 
-Fixes: 77ee70a07357 ("KVM: arm64: nv: Honor SError exception routing / masking")
-Reported-by: sashiko <sashiko@sashiko.dev>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/emulate-nested.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 22d497554c94..c2580d40197e 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2750,6 +2750,7 @@ static void kvm_inject_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
- 		break;
- 	case except_type_serror:
- 		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
-+		vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
- 		break;
- 	default:
- 		WARN_ONCE(1, "Unsupported EL2 exception injection %d\n", type);
--- 
-2.54.0.1136.gdb2ca164c4-goog
-
+> +{
+> +	if (!is_nvhe_hyp_code())
+> +		return vcpu_read_sys_reg(vcpu, reg);
+> +
+> +	return __vcpu_sys_reg(vcpu, reg);
+> +}
+> +
+> +static inline void _vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg)
+> +{
+> +	if (!is_nvhe_hyp_code())
+> +		vcpu_write_sys_reg(vcpu, val, reg);
+> +	else
+> +		__vcpu_assign_sys_reg(vcpu, reg, val);
+> +}
+> +
+>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu)) {
+> @@ -516,9 +532,9 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>  
+>  		r = vcpu_has_nv(vcpu) ? SCTLR_EL2 : SCTLR_EL1;
+>  
+> -		sctlr = vcpu_read_sys_reg(vcpu, r);
+> +		sctlr = _vcpu_read_sys_reg(vcpu, r);
+>  		sctlr |= SCTLR_ELx_EE;
+> -		vcpu_write_sys_reg(vcpu, sctlr, r);
+> +		_vcpu_write_sys_reg(vcpu, sctlr, r);
+>  	}
+>  }
+>  
+> @@ -533,7 +549,7 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
+>  	r = is_hyp_ctxt(vcpu) ? SCTLR_EL2 : SCTLR_EL1;
+>  	bit = vcpu_mode_priv(vcpu) ? SCTLR_ELx_EE : SCTLR_EL1_E0E;
+>  
+> -	return vcpu_read_sys_reg(vcpu, r) & bit;
+> +	return _vcpu_read_sys_reg(vcpu, r) & bit;
+>  }
+>  
+>  static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
+> -- 
+> 2.54.0.1136.gdb2ca164c4-goog
+> 
