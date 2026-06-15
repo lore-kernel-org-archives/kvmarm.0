@@ -1,131 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21AA3845C4;
-	Mon, 15 Jun 2026 15:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54414071C0
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 15:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781536237; cv=none; b=l4E7QO7qOQtfKDB7fA7W9JZeg5OsvcWcTZPh93gQYwy7RbqgwuUL5Dq+1QfqQduB9g/5Cv5fxe4QHmMk+Eq+SL5xzfRfcdAwJDJwvwFeS7bDOgM+AMGNggrBNt+5k2QtQVH96ETBntNROzOOUKprAto6P9wiCJYh7dUf+xWcQbE=
+	t=1781538820; cv=none; b=EM7yqGAxxnB5qksn6Jj2KCSlrQHD7DIVhFxumwwhP+evBgcn+Kdqlo/s8ORAsZP41VpCFCFaGTg4RQzxZ5AkGqBdpavaWNH9csUQswjweNVEWc/ZefJGlMYzMFh8EpUGg6zzXISD2B5RczB3HBe5cCQbOTWIBTLY2V7OVY2IOBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781536237; c=relaxed/simple;
-	bh=vNt975/3gviGMlfk69b9iibSoN4+Ead77KV9pNb6dMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YbA01TS1QqOSS2pDbnf+oqu/WxLC0dZ6I1ynJFr7qfV6HNMfBimUdZmnR9CX5T/JDvompZyC+0CRDrNXrK2xWG4qHepg5Xn1iWMllxoV+TPpslRachUOr4uayrMhuTPtFXY+yUBaqKVorxnEig/gseeBw9yYTdJaTQfWz9JCUe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3TArmm8; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781538820; c=relaxed/simple;
+	bh=cc2Jw+bSMrXT1kH7gubW713jYpPmyCTcIGhtT+kL3L8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=J+x9/yJVF5pj4DF7Hd1pESTNuYQaqWQUliRvwD4pmGTMGDPvUzcTJykW8NxRQ/ua16LHlvNrojWvVc61Jctxi34071Ry1krN7BRX/9hjcdQ9yVJVFfN9Aml62RhFmHtAk8v09tiWvdEMF6X5payhXPqS31KqCfkFJ50YfuoIA9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AF4BUiUI; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3TArmm8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A57051F000E9;
-	Mon, 15 Jun 2026 15:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781536233;
-	bh=ejF4t2I4d+E2yAtG1CLI4adu866j9j/R+6+/ewAAvBY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=G3TArmm82sV+XPBinsQxph2Kk0pHPX8Rb1XflIBKMCSjzApxPuYY57BvERp/w7IF6
-	 KrgZxuzWJfW3dMnw1ipAb/kGztSk6u8Z/A/Hc9PLCfYKPtgGsJjFZHAyOzETLrhX3+
-	 04XQYQiEqn//QM/TA4i0xaqHcpYw2gXn6usv/mjQfRUdg5qFOaHKrVXDHjAtKeq7Fr
-	 DISzGlxucPjT3IkXIznF6BL3ecuHYRRRio7U7vpY4DxLBMMf0pcWhiZYi65BZpyCSj
-	 NfbnCN6lnz4KKcoexji+VAYuJNVElWoZO1C38Hbgc7VDfnD0ou04O5OkVvA8t5u9Xz
-	 76TasGGozIoaw==
-Date: Mon, 15 Jun 2026 16:10:27 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception
- into a pVM
-Message-ID: <ajAV4ymK6puBxkEG@willie-the-truck>
-References: <20260612113414.1022901-1-tabba@google.com>
- <ai_OevUNS-OACPm7@willie-the-truck>
- <CA+EHjTyMOoCLQ7d6+TgkrnOJF-PV9K-BKtb4CNuAg8p4gtg6wg@mail.gmail.com>
- <ajAPNFDsQ63k_jAS@willie-the-truck>
- <CA+EHjTzL4GKw8RQrGnMq81Ohquo48_L4-MNJrCdGnBpMPR7XcA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AF4BUiUI"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47D0124E9;
+	Mon, 15 Jun 2026 08:53:32 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1AFB03FA1F;
+	Mon, 15 Jun 2026 08:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1781538817; bh=cc2Jw+bSMrXT1kH7gubW713jYpPmyCTcIGhtT+kL3L8=;
+	h=From:To:Subject:Date:From;
+	b=AF4BUiUImutl/tiXAlq1UadNlcJhq3hXaUKmgrMOdQYwkSUE6OlZdfO4ZHqAs2T4h
+	 irDufS+TEbgfJGLLle+mrUWlKdFcefHZt/jCl1ixcpdkgWhizHyeMYEBqhITnS1mEI
+	 fbsL5/Q2eH1fyrM7zWu6Yc/LKBTGulWvQ4JvWfe0=
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: pbonzini@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	maz@kernel.org,
+	oupton@kernel.org,
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	seanjc@google.com,
+	david.hildenbrand@arm.com,
+	mark.rutland@arm.com
+Subject: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only memslots
+Date: Mon, 15 Jun 2026 16:52:44 +0100
+Message-ID: <20260615155244.183044-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTzL4GKw8RQrGnMq81Ohquo48_L4-MNJrCdGnBpMPR7XcA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 15, 2026 at 04:03:17PM +0100, Fuad Tabba wrote:
-> On Mon, 15 Jun 2026 at 15:42, Will Deacon <will@kernel.org> wrote:
-> >
-> > On Mon, Jun 15, 2026 at 11:52:10AM +0100, Fuad Tabba wrote:
-> > > On Mon, 15 Jun 2026 at 11:05, Will Deacon <will@kernel.org> wrote:
-> > > >
-> > > > On Fri, Jun 12, 2026 at 12:34:14PM +0100, Fuad Tabba wrote:
-> > > > > When pKVM injects a synchronous exception into a protected guest, it
-> > > > > re-enters without restoring the guest's EL1 sysregs and writes the EL1
-> > > > > exception registers to hardware by hand: ESR_EL1 and ELR_EL1, but not
-> > > > > SPSR_EL1. enter_exception64() sets SPSR_EL1 (the interrupted PSTATE)
-> > > > > only in memory, so the guest's handler reads a stale SPSR_EL1 and
-> > > > > restores the wrong PSTATE on eret.
-> > > > >
-> > > > > Write SPSR_EL1 alongside the other exception registers.
-> > > > >
-> > > > > Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
-> > > > > Reported-by: sashiko <sashiko@sashiko.dev>
-> > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > > ---
-> > > > >  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 +
-> > > > >  1 file changed, 1 insertion(+)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > > > > index 8c3fbb413a06..1a7d5cd16d72 100644
-> > > > > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > > > > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > > > > @@ -268,6 +268,7 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u64 esr)
-> > > > >
-> > > > >       write_sysreg_el1(esr, SYS_ESR);
-> > > > >       write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-> > > > > +     write_sysreg_el1(read_sysreg_el2(SYS_SPSR), SYS_SPSR);
-> > > > >       write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-> > > > >       write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-> > > > >  }
-> > > >
-> > > > Is SPSR_EL1 not set in enter_exception64() using vcpu_cpsr(vcpu), which
-> > > > *is* set here? I'm just a bit wary of the report, as I'd have expected
-> > > > fireworks if we weren't initialising the guest's SPSR on the exception
-> > > > injection path.
-> > >
-> > > Yes, enter_exception64() sets SPSR_EL1, but only in memory:
-> > > __vcpu_write_spsr() takes the nVHE path and calls
-> > > __vcpu_assign_sys_reg(vcpu, SPSR_EL1, val), which writes
-> > > vcpu->arch.ctxt.sys_regs[SPSR_EL1] without touching the hardware
-> > > register.
-> > >
-> > > In the normal nVHE entry path that memory value reaches hardware via
-> > > __sysreg_restore_state_nvhe() before __guest_enter(). But
-> > > inject_sync64() runs inside the fixup_guest_exit() loop, which
-> > > re-enters the guest directly without a sysreg restore pass. ESR_EL1
-> > > and ELR_EL1 are already written to hardware by hand for this reason
-> > > but SPSR_EL1 was missed.
-> >
-> > Ah, I see. Does that mean that all the in-memory updates performed by
-> > enter_exception64() (e.g. the construction of the cpsr) are ignored too?
-> 
-> From looking at the code, no. inject_sync64() reads back the cpsr and
-> PC that enter_exception64() computed in memory and writes them to
-> hardware:
-> 
->     write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
->     write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-> 
-> So the guest re-enters with the right PSTATE. The only value left
-> stranded in memory is SPSR_EL1.
+For guest_memfd-only memslots (kvm_memslot_is_gmem_only() is true), the
+memory provider for the virtual machine is the guest_memfd file, not the
+userspace mapping. Faults are resolved using the guest_memfd page cache,
+and the permissions for the secondary MMU mapping depends exclusively on
+the memslot (i.e, if the memslot is read-only). How userspace happens to
+have the memory mmaped at fault time, or even if the memory is mapped at
+all into userspace, is not taken into consideration.
 
-Ah, thanks. I had pissed that inject_sync64() calls __kvm_adjust_pc()
-immediately after pending the exception. So you've convinced me:
+guest_memfd memory is not evictable, is not movable and there's no backing
+storage. Once memory is allocated for an offset in guest_memfd file, the
+offset will not change, and that memory is not freed unless userspace
+explicitly punches a hole in the file. As a result, memory reclaim, page
+migration, page aging and dirty page tracking for the userspace mapping
+serve little purpose.
 
-Acked-by: Will Deacon <will@kernel.org>
+Despite this, KVM's MMU notifiers still modify the secondary MMU page
+tables, similar to ordinary memslots, only for the same memory to be
+remapped next time a guest accesses it. Make the disconnect between the
+user mapping and the secondary MMU page tables explicit by ignoring the MMU
+notifiers for guest_memfd-only memslots.
 
-Will
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+The only theoretical instance where the MMU notifiers are invoked for the
+userspace mapping of a guest_memfd-only memslot that I was able to find was
+automatic NUMA balancing with a non-NULL NUMA policy for the guest_memfd
+file. I wasn't able to test it in practice. Also my knowledge of MM is very
+limited, so there might be other cases where it happens, or I might be
+wrong and today the MMU notifiers are never invoked.
+
+Either way, when and if it happens, having memory unmapped from the
+seconday MMU in the case of guest_memfd-only memslot is at most a
+performance issue (it causes unnecessary guest faults), but I wanted to
+start a conversation about this because having memory that stays mapped at
+stage 2 (unless userspace explicitly unmaps it from the VM) is needed for a
+Arm feature (called SPE, Statistical Profiling Extension) that I'm working
+to upstream. This patch aims to provide the guarantee that memory won't be
+unmapped from the secondary MMU behind the VMMs back, which is what happens
+for non guest_memfd memslots.
+
+ virt/kvm/kvm_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 881f92d7a469..8c4158996928 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -592,6 +592,10 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 			unsigned long hva_start, hva_end;
+ 
+ 			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
++
++			if (kvm_slot_has_gmem(slot) && kvm_memslot_is_gmem_only(slot))
++				continue;
++
+ 			hva_start = max_t(unsigned long, range->start, slot->userspace_addr);
+ 			hva_end = min_t(unsigned long, range->end,
+ 					slot->userspace_addr + (slot->npages << PAGE_SHIFT));
+
+base-commit: 8cd9520d35a6c38db6567e97dd93b1f11f185dc6
+-- 
+2.54.0
+
