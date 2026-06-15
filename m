@@ -1,429 +1,203 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A803F1669
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F5A3F1ACA
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781529138; cv=pass; b=E8tAlifuQPPNcxGwJst+y9RuHYGMR/ga+vC/uGHVdnR0dv1yh22eS1jlX34WAe/RbCdHEGYEYVFinmmpI07nIHDqtPITrLih6Re/fOUnLY/dL2s4lXzWQSYHvj2Run71e9j5252VEbOBN8zEFww+jKLY9zqPtnXAX6DFG0LV8pI=
+	t=1781529211; cv=pass; b=j2046f93t80/H62ljWycSj9rCHvDrFgm7NrEEZPuL+/6oYvUpdzULhulSFl8HeUjBUwCfRfLqjFxuNRzmwZh8l5O2RMWmXJg2cPJ6Ez5iTLIaJG3u7AAcqma9DUhiXn8s6L5MuUwRUFasVb/zOY7b3Iq6I6gi/V9i1ljjYRJe04=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781529138; c=relaxed/simple;
-	bh=mHsQIC4wwrEe+dGhK+rlnftwIzTOD+l6ul55AVfG8+s=;
+	s=arc-20240116; t=1781529211; c=relaxed/simple;
+	bh=JFSXX89TRMF0cmJ1cK7Y0aUHUQ3U5IIYGQ/no+czA+Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PKBWSHjBVCI0k0praKv0PXM+VNWWokBhT6PJdiPe5NNXEpXkugTyiXJEKQ4riHgb9C3k+6TdQf+GkYSgQR/EQVVaq2+riuFRAQ/DdgF+ATmgEZJHpvBg0Y/qEj+j/OAA+a/KZCCauJTs2Z8Ux7Jyn5JmJZ/G5zU+OAhQIN+jlI8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VSeMFBm5; arc=pass smtp.client-ip=209.85.160.175
+	 To:Cc:Content-Type; b=PuXFMdo+mmf8QVPCBPoKEnUlrr7lzzrrrYJToChV/cUttjGXorcydvbYytLO1FlbszxwGbmTAe95bu8vJc1ksLrGcjhZb8uHnBxUQMQ9hZurl27LBlbrYA5FMdAzb3QNruavMFe2jMnzbVX1wylwC8zTX0BSn3XFjfQ6+OsjXtA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LD+vSaph; arc=pass smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VSeMFBm5"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5177d1ff061so75771cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 06:12:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781529135; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LD+vSaph"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-51765331535so941781cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 06:13:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781529209; cv=none;
         d=google.com; s=arc-20240605;
-        b=lbSgA48kABM7i2Ewy7xyBI4YzfSF8xonj5xhe6dtoMw5KkQAAgD+63HKFI4fjACC6U
-         phq7c8atxVppC+p23bGyTQd1tbAF9w0VAfDwpSuScVJoJv8PCktolswXJz3Yv0xrxRxY
-         nsByfhNPmQNsL30AlRzrI8ViP7SwbiK2dKcjyrL+cBtQm8qXpAI+9y1PjKqsDx6PFNfi
-         ULSWSPxbBxR2NDROPYdTkHa1i9gcIXbH3s3r5h+WmEjIKJ/kYO3Gge0v86nKRiCu3DYK
-         vQOLiYaGqCsNZMEWmJJpz2nlxi1SFzeXrrnDNCFnYcBl4l7UQyihV5nOsRkk6RnhtZeC
-         GyfA==
+        b=O+78+p0Yws4Jvq6z0Oobs2oX4UhpAnh7ndqcq+yf1ZBVMDbRKBejXcm7Xw09gRemnG
+         WNiCJ14r45/0W+aP+dZ4zVmSVLWDvJMgQrKh3PRvKziugIbvNDBvi+78SFvG/s4UEWDi
+         59/EHi7ypPy89g0dg59X3omXAUTe0vQS+xBUPCUMyrWbNi9Btrj5PTsIfyPPc3cYHwnr
+         nSF/HohenG5dNMa6eyzE+XYOcGgJESvlcQR22WFqL44izWv0TyghyoWJ3C0VB0uv6JMs
+         Sm3s50cEveqVuRJUPzlR3qnRZDOIrJBkGtLH7USvunYTqIPk1XeXWuGTLiF9XXvnijQX
+         4a1A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=V9ApFTtIbFndOO5kudQ+mdr96c2vq9dMtY6RicL5Hhg=;
-        fh=pQiba2ybNHCajeRXAeJySmKV6z5WtiSQ+dH8qGTYv4I=;
-        b=W3Ca1X9kwfPz2cEpMO1hMn696G3m+7fJrh+Gy37Hm6PI9C/HZHNzZKKrCwI8gJz6bW
-         4k1/7Fzw67evAdeQQRqIN+CbsXkJpwGQDWcRPhVlhHaAX6vXU+J2VMNBXS1OGWH+tt3/
-         QAc8hn05r+qmOmL2CtMixS3aqIfKB6WpMZNfVmQGD5kHu4TH90k2K2k0Yo1KZYIgN/k7
-         MNPoGK6zpjI09X0xnktkV2D53cbdslaTL1SmDXEWAtjT/Hul8VW3F1Jf5cuMX2s9jddc
-         5nqDPp3JcddDsnJxoQZ5uWnONmd3oBA6APqU6Fx9eUg1O4uUO8Usgix0D71/pxhX44nq
-         PkWw==;
+        bh=2In6AGzrSURwEbShzRwtRfVTt7zDjTYOHDQU3MzBeLw=;
+        fh=GVDQE9m1AjLMAHXQMi9W9JDO5rWkFrSRhH226c3NyCk=;
+        b=S5XWUNgpzydVOg9047bMaK/ilc2sjgAcU/Z1ByfwsHyNeyCY2tKsnmXcQJ7nfDxW9h
+         tLYUxjxTUXa5xOeg8vcyGQmHlWdzMbTJovJ4xci9djDEUiNpMqoPNIJhtJGVsQTCG6ic
+         +a67nCmNKMJcqz/puy6vLvO8khcGZhHr0BvlI6mzUyYT6ddgXnSI8/al9hUp/XEAxLXh
+         KPSXpJHvB0V6AigAVqxxi1IAe3EeYcJf4DfcP08U82xoq+i1DWwPme1Z/2J3dAhdyqff
+         QwYDEc9skHeW6P5fqOhJ5lLpB9lzELXqUsOoFF8zWxTB62Q2EQmCkuDsQTyybXOkCiYt
+         w7Sg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781529135; x=1782133935; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781529209; x=1782134009; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=V9ApFTtIbFndOO5kudQ+mdr96c2vq9dMtY6RicL5Hhg=;
-        b=VSeMFBm5y8pQ5a0nVTZHNgp82YT1VP5B4WTJTTlXjdqsZSVrphaMK9dBpVq0c0rgup
-         lCWltn+yF8qQ5uJLAcWjfAcuBpDu+vJkMsfqKSGJ8aBNiIzmTuAlt3+XjhJkvc6EOE7u
-         850ziy4ms0OblYrLnKv4qIOPjwaDU+6P5oRBw0yyuCvsRyS4RFkSVjX9Lcf3RD1oWKWT
-         y5CeLspBi/+RFtPOwHEr7QklkGF/AV3aS7YfPq7sfbzKFTX23DXj3RQfGbXTXYN9z3Dr
-         I3j0UkUBg7t1WpwYHCRmWzZz+Emn1KmyHuOiXHDcJzvtZZuFSt69PSgcb5fqiBmXLdXK
-         860g==
+        bh=2In6AGzrSURwEbShzRwtRfVTt7zDjTYOHDQU3MzBeLw=;
+        b=LD+vSaphrhJfopfM9hRC12Lj2m8vjAu6J0eDmb6MK3enxFlOB2t1gB8ZV+jfUwwOgC
+         gznXN3ZiFTOIlScIlRSqnKEKymBVR9FK+axf3RMwe2xwdrErp6eKZlKmMKSOR8O70xk1
+         2m3LldtWl3LZFRxtW7j/9+WkkKmARvT4Cy90IV06928CKY0YRqWAwVGUDQgnHLqKwe72
+         J02g7vvN5uFj9bkw3yZBwaQa1kxBcRF0dm1S+XFhzbKgQZgwRVV+CVAjrruU1rKefgag
+         ohLynfATHcLojaXzQc9bjWbVzabtRPS47gGbU3cbBSFnpUuMIodcPFn6t1uusfNAW7zs
+         LLfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781529135; x=1782133935;
+        d=1e100.net; s=20251104; t=1781529209; x=1782134009;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V9ApFTtIbFndOO5kudQ+mdr96c2vq9dMtY6RicL5Hhg=;
-        b=Qr4xVCRO6L8hwCr0QYbKdHb6VftRZvFuUudBFPEs0cE4xhZWq++s31IUcr7kII0Vce
-         +X9HFhYeIK6BaMwyA/jAYnlt720Zr5lcLP+Dw8WMksmEhw0qMT/EaQy7OSrka7wQpjr7
-         Cs3zJ/Th2fWPK+eWnPuUGlfqODJDhkFKDf8f0XZYd/OnjID+RZYtJys73nPkn5FZHO5c
-         50C48rUbmBJq6pNNaah6IJ9FijNp6h1o5VGde8M6eVHfqmgOvjN/ssfmc0tYQtFD3nKQ
-         5i3WsM8Fi80bZxiHtw3H9XAiymGcU2o4BmzYbDEmT5hf1r5cv/Ij8y4C+8WiSTpMgzOo
-         iF7w==
-X-Forwarded-Encrypted: i=1; AFNElJ+bbdppyOicitpG3P2EjzBm/3Q6MU8+WZTm9ikJTN6DUPSuYAx6pa0YvV9H3c5ZpHD+d2VEz+Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz0oqNnx5xr00NOV/PkCEWu44PmHTWN3aU9Y0paJBEhG8C8Ky9j
-	T+eLMewU8PaZHGUWj11qxyKqCWJkwYYSXpRcL6nDLWjP0t80/5kxzR95GNktSTPuo2UZfbMPbKX
-	UBpij/4eiX0nhMBR+faoJo76sA7xoyWpgawxyU+Fa
-X-Gm-Gg: Acq92OEFrh5a+2E7bbKCADi8yDi7iiC09R3FCwuH/qZxegCOv1s+tXpTKRTo3iACNPW
-	ed/UCpDPr9AAX9jwDnDe7wxzhebdThWkyZYZrWs8I1GI4mBk2z1skESB+YATMuMwrdj7djoiv5A
-	JMwA1naBDRIoTEI2axTym//F25LItMGYWVETbMDlVOX5eH7OUIgW0QdpBzApfMEhLG2xLmTqHpt
-	pi3ubv0dR1QGRVK7Rvy/IFELKis8X6kzqzrCxhZ3NB2pRcB0u5BrjIhDYy+CJ4NVmYrJpRJh/tA
-	J/yXMhUBUTOLXRqBq3c=
-X-Received: by 2002:a05:622a:5810:b0:516:3def:1cf4 with SMTP id
- d75a77b69052e-519872df3b4mr1903741cf.1.1781529134395; Mon, 15 Jun 2026
- 06:12:14 -0700 (PDT)
+        bh=2In6AGzrSURwEbShzRwtRfVTt7zDjTYOHDQU3MzBeLw=;
+        b=MLrxdwdv8abOi4eeK2dVDadpNHjRdHfZMHlTR/EfVi6dY4XSanlL3YTF5uHnL7zac0
+         vV3zfb9SPxYrJLeW78gnvpsKDcpPQORlKyd/VCXLRgJ8cSY4Jv7FxowQxeFFyzSzub3C
+         RUp7KXu1bYWLOYUwyg7Cz/uQly6Ej7ncd0rL5FZVfaf70qylz+govqlLzEZJaHijMhoF
+         GgNWJ44Mj38dcVI+Dw6dBXnLlPoHh3Ju7bpdGpPD2taS/286H12BjFnVI5Hauz+YG4Oc
+         3Dd/ccqN7CMjJl5wETVQLYuVy8vYYsPH63FfEMNcPeO8SCZ1ArhjVdmLRRLxpfHzcZr7
+         OOHA==
+X-Forwarded-Encrypted: i=1; AFNElJ9GZ5M3DybfhAKE+MtsdTri6edsVz9lnxA8v91DReef3qZ5+WmCBI2ZBgKxB7YYgMpHIwt+xJ0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxXuXVit1Y2aboh4kH0q5GcMsBvqRdFV5aiFsGQH1sCV7rVoZB8
+	PT/pAp9DL+y4yeJCQDjya7J2/q4yomZZhI6EILVqI/qvRftVZ/vlDIC5+XACDKfw/zoCrfcL6r/
+	AslGmaPGsV6o2Qd7MvXhsV3FwlP0HnoTGBkwtd3MK
+X-Gm-Gg: Acq92OHWaBfymNIbopNIvltx11gxKjx4wdisyG2Gp1+PxrABS/Pp9ug5l0qBfQXFqsB
+	60mhwhky+xhQ8e9ytRpoMTQAHGftRLHHzojqtgAdpvMx24uMA8oGgSnYI5xsquGbmIIhPjZGuhh
+	fFWFyF5CjJ9mXzTFTHNRhIu/lNorCjpJZmrwpJYxUpfaGQEV+0e5hU232K0V+XZuVyuqQGeaZZs
+	O9kK+Vqcw/bFKwAppLA5hfLQXQTL8FAzs+p/bw4X1iY6/tHtkiT2jr6LdCs3UOo0cyML9wiTL6l
+	GxB/ntlf
+X-Received: by 2002:a05:622a:4cc8:b0:516:9871:9a37 with SMTP id
+ d75a77b69052e-519872e7661mr1495431cf.3.1781529208275; Mon, 15 Jun 2026
+ 06:13:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260612065925.755562-1-tabba@google.com> <20260612065925.755562-3-tabba@google.com>
- <ai_1z13TyEXbHx4Q@google.com>
-In-Reply-To: <ai_1z13TyEXbHx4Q@google.com>
+References: <20260614163336.3490925-7-tabba@google.com> <20260614164416.D37E61F000E9@smtp.kernel.org>
+ <ai-DsLydd7ry0RpS@kernel.org>
+In-Reply-To: <ai-DsLydd7ry0RpS@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 15 Jun 2026 14:11:37 +0100
-X-Gm-Features: AVVi8CfeXGRS4qbHoDv1tNV11kQoNJh7W4G-vCO44nFd_V-kW6IwV2WUcVJxP2E
-Message-ID: <CA+EHjTw_goANXAuFiDdkcSW4d0xtTJjqO5Q=ySn9F_pHn+ZBJg@mail.gmail.com>
-Subject: Re: [PATCH v1 02/11] KVM: arm64: Use guard(hyp_spinlock) in pKVM
- hypervisor code
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
-	Sebastian Ene <sebastianene@google.com>, Per Larsen <perlarsen@google.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, 
-	Hyunwoo Kim <imv4bel@gmail.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Date: Mon, 15 Jun 2026 14:12:51 +0100
+X-Gm-Features: AVVi8CcO8m7JqCdVLIloH1KAihfPBodYuoCe0_y-y0JfcVg7oXzuQgANsW62kFI
+Message-ID: <CA+EHjTxn56a-NsNhYns6RSNkqTO+oujM9qnK4JaV0wJmchT43Q@mail.gmail.com>
+Subject: Re: [PATCH 6/7] KVM: arm64: Set IL for nested SError injection
+To: Oliver Upton <oupton@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Vincent,
+On Mon, 15 Jun 2026 at 05:46, Oliver Upton <oupton@kernel.org> wrote:
+>
+> On Sun, Jun 14, 2026 at 04:44:16PM +0000, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> >
+> > Pre-existing issues:
+> > - [High] The constructed SError syndrome (ESR) is silently dropped during nested EL2 exception injection because `ESR_EL2` is never updated.
+> > - [High] When SCTLR2_EL1_EASE routes a Synchronous External abort to an SError, the ESR injected has the wrong EC (IABT/DABT instead of SERROR) and an incorrect ISS format.
+> > --
+> >
+> > commit 09fd06d56ab3236a0e7af03e0d026ed6725ad6d6
+> > Author: Fuad Tabba <tabba@google.com>
+> >
+> > KVM: arm64: Set IL for nested SError injection
+> >
+> > This patch modifies the emulated SError injection to unconditionally
+> > set the IL (Instruction Length) bit in the generated ESR, as mandated
+> > by the architecture.
+> >
+> > > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > > index 4b39363cf8911..4262d4c17a877 100644
+> > > --- a/arch/arm64/kvm/emulate-nested.c
+> > > +++ b/arch/arm64/kvm/emulate-nested.c
+> > > @@ -2938,6 +2938,6 @@ int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr)
+> > >      * vSError injection. Manually populate EC for an emulated SError
+> > >      * exception.
+> > >      */
+> > > -   esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
+> > > +   esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
+> > >     return kvm_inject_nested(vcpu, esr, except_type_serror);
+> >
+> > [Severity: High]
+> > This isn't a bug introduced by this patch, but does the carefully constructed
+> > esr value actually get written to the guest's ESR_EL2?
+> >
+> > Looking at kvm_inject_nested(), it passes the esr_el2 argument down:
+> >
+> > kvm_inject_nested(vcpu, esr_el2, type) {
+> >     ...
+> >     kvm_inject_el2_exception(vcpu, esr_el2, type);
+> >     ...
+> > }
+> >
+> > However, in kvm_inject_el2_exception():
+> >
+> > static void kvm_inject_el2_exception(...) {
+> >     ...
+> >     switch (type) {
+> >     ...
+> >     case except_type_serror:
+> >         kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
+> >         break;
+> >     ...
+> > }
+> >
+> > Since except_type_serror only pends the exception and doesn't explicitly
+> > write the esr_el2 argument into ESR_EL2 (unlike except_type_sync), does the
+> > nested hypervisor observe a stale or uninitialized syndrome when it takes
+> > the SError?
+>
+> Oops, this definitely needs fixing :) OTOH...
 
-On Mon, 15 Jun 2026 at 13:53, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> On Fri, Jun 12, 2026 at 07:59:16AM +0100, tabba@google.com wrote:
-> > Convert the manual hyp_spin_lock()/hyp_spin_unlock() pairs in
-> > arch/arm64/kvm/hyp/nvhe/{pkvm,mm,page_alloc,ffa}.c to
-> > guard(hyp_spinlock) and scoped_guard(hyp_spinlock), dropping several
-> > unlock-only goto labels in favour of direct returns.
-> >
-> > hyp_fixblock_lock in mm.c is left as an explicit lock/unlock pair: it is
-> > acquired in hyp_fixblock_map() and released in hyp_fixblock_unmap(), so
-> > its critical section spans two functions and cannot be expressed as a
-> > single lexical scope.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c        | 154 +++++++++++----------------
-> >  arch/arm64/kvm/hyp/nvhe/mm.c         |  37 ++-----
-> >  arch/arm64/kvm/hyp/nvhe/page_alloc.c |  13 +--
-> >  arch/arm64/kvm/hyp/nvhe/pkvm.c       |  86 +++++----------
-> >  4 files changed, 105 insertions(+), 185 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 1af722771178..46cd4fa924be 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -313,17 +313,16 @@ static void do_ffa_rxtx_unmap(struct arm_smccc_1_2_regs *res,
-> >                             struct kvm_cpu_context *ctxt)
-> >  {
-> >       DECLARE_REG(u32, id, ctxt, 1);
-> > -     int ret = 0;
-> >
-> >       if (id != HOST_FFA_ID) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> > -     hyp_spin_lock(&host_buffers.lock);
-> > +     guard(hyp_spinlock)(&host_buffers.lock);
-> >       if (!host_buffers.tx) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       hyp_unpin_shared_mem(host_buffers.tx, host_buffers.tx + 1);
-> > @@ -336,10 +335,7 @@ static void do_ffa_rxtx_unmap(struct arm_smccc_1_2_regs *res,
-> >
-> >       ffa_unmap_hyp_buffers();
-> >
-> > -out_unlock:
-> > -     hyp_spin_unlock(&host_buffers.lock);
-> > -out:
-> > -     ffa_to_smccc_res(res, ret);
-> > +     ffa_to_smccc_res(res, 0);
-> >  }
-> >
-> >  static u32 __ffa_host_share_ranges(struct ffa_mem_region_addr_range *ranges,
-> > @@ -418,18 +414,20 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
-> >       DECLARE_REG(u32, fraglen, ctxt, 3);
-> >       DECLARE_REG(u32, endpoint_id, ctxt, 4);
-> >       struct ffa_mem_region_addr_range *buf;
-> > -     int ret = FFA_RET_INVALID_PARAMETERS;
-> > +     int ret;
-> >       u32 nr_ranges;
->
-> nit: inverted christmas tree
+https://lore.kernel.org/all/20260615131116.390977-1-tabba@google.com/
 
-Ack.
+Done :)
 
->
-> >
-> > -     if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)
-> > -             goto out;
-> > +     if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE ||
-> > +         fraglen % sizeof(*buf)) {
->
-> nit: I don't know if we wouldn't want extra parenthesis here for readability.
-
-Sure, will add parentheses around the second operand.
-
->
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> > +     }
-> >
-> > -     if (fraglen % sizeof(*buf))
-> > -             goto out;
-> > -
-> > -     hyp_spin_lock(&host_buffers.lock);
-> > -     if (!host_buffers.tx)
-> > -             goto out_unlock;
-> > +     guard(hyp_spinlock)(&host_buffers.lock);
-> > +     if (!host_buffers.tx) {
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> > +     }
-> >
-> >       buf = hyp_buffers.tx;
-> >       memcpy(buf, host_buffers.tx, fraglen);
-> > @@ -444,19 +442,14 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
-> >                */
-> >               ffa_mem_reclaim(res, handle_lo, handle_hi, 0);
-> >               WARN_ON(res->a0 != FFA_SUCCESS);
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, ret);
-> > +             return;
-> >       }
-> >
-> >       ffa_mem_frag_tx(res, handle_lo, handle_hi, fraglen, endpoint_id);
-> >       if (res->a0 != FFA_SUCCESS && res->a0 != FFA_MEM_FRAG_RX)
-> >               WARN_ON(ffa_host_unshare_ranges(buf, nr_ranges));
-> >
-> > -out_unlock:
-> > -     hyp_spin_unlock(&host_buffers.lock);
-> > -out:
-> > -     if (ret)
-> > -             ffa_to_smccc_res(res, ret);
-> > -
-> >       /*
-> >        * If for any reason this did not succeed, we're in trouble as we have
-> >        * now lost the content of the previous fragments and we can't rollback
-> > @@ -465,7 +458,6 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
-> >        * sharing/donating them again and may possibly lead to subsequent
-> >        * failures, but this will not compromise confidentiality.
-> >        */
-> > -     return;
-> >  }
-> >
-> >  static void __do_ffa_mem_xfer(const u64 func_id,
-> > @@ -480,29 +472,29 @@ static void __do_ffa_mem_xfer(const u64 func_id,
-> >       struct ffa_composite_mem_region *reg;
-> >       struct ffa_mem_region *buf;
-> >       u32 offset, nr_ranges, checked_offset;
-> > -     int ret = 0;
-> > +     int ret;
-> >
-> >       if (addr_mbz || npages_mbz || fraglen > len ||
-> >           fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       if (fraglen < sizeof(struct ffa_mem_region) +
-> >                     sizeof(struct ffa_mem_region_attributes)) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> > -     hyp_spin_lock(&host_buffers.lock);
-> > +     guard(hyp_spinlock)(&host_buffers.lock);
-> >       if (!host_buffers.tx) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       if (len > ffa_desc_buf.len) {
-> > -             ret = FFA_RET_NO_MEMORY;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_NO_MEMORY);
-> > +             return;
-> >       }
-> >
-> >       buf = hyp_buffers.tx;
-> > @@ -512,53 +504,41 @@ static void __do_ffa_mem_xfer(const u64 func_id,
-> >                       ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-> >       offset = ep_mem_access->composite_off;
-> >       if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       if (check_add_overflow(offset, sizeof(struct ffa_composite_mem_region), &checked_offset)) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       if (fraglen < checked_offset) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       reg = (void *)buf + offset;
-> >       nr_ranges = ((void *)buf + fraglen) - (void *)reg->constituents;
-> >       if (nr_ranges % sizeof(reg->constituents[0])) {
-> > -             ret = FFA_RET_INVALID_PARAMETERS;
-> > -             goto out_unlock;
-> > +             ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +             return;
-> >       }
-> >
-> >       nr_ranges /= sizeof(reg->constituents[0]);
-> >       ret = ffa_host_share_ranges(reg->constituents, nr_ranges);
-> > -     if (ret)
-> > -             goto out_unlock;
-> > +     if (ret) {
-> > +             ffa_to_smccc_res(res, ret);
-> > +             return;
-> > +     }
-> >
-> >       ffa_mem_xfer(res, func_id, len, fraglen);
-> >       if (fraglen != len) {
-> > -             if (res->a0 != FFA_MEM_FRAG_RX)
-> > -                     goto err_unshare;
-> > -
-> > -             if (res->a3 != fraglen)
-> > -                     goto err_unshare;
-> > +             if (res->a0 != FFA_MEM_FRAG_RX || res->a3 != fraglen)
-> > +                     WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
-> >       } else if (res->a0 != FFA_SUCCESS) {
-> > -             goto err_unshare;
-> > +             WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
->
-> I am not sure this is really better for this function. At least we had a single
-> callsite to this WARN_ON(ffa_host_unshare_ranges) ...
->
-> Or alternatively if we really want guard() this can just set ret = XXX and then
->
->   if (ret)
->       WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
->
-> So we can keep a single call site for the rollback.
-
-Agreed, the single rollback callsite is better. I'll use a flag to
-keep the original control flow readable:
-
->
-> >       }
-> > -
-> > -out_unlock:
-> > -     hyp_spin_unlock(&host_buffers.lock);
-> > -out:
-> > -     if (ret)
-> > -             ffa_to_smccc_res(res, ret);
-> > -     return;
-> > -
-> > -err_unshare:
-> > -     WARN_ON(ffa_host_unshare_ranges(reg->constituents, nr_ranges));
-> > -     goto out_unlock;
-> >  }
-> >
->
-> [...]
->
-> >  int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
-> > @@ -996,22 +975,19 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
-> >       struct kvm *host_kvm;
-> >       unsigned int idx;
-> >       size_t vm_size;
-> > -     int err;
-> >
-> > -     hyp_spin_lock(&vm_table_lock);
-> > -     hyp_vm = get_pkvm_unref_hyp_vm_locked(handle);
-> > -     if (!hyp_vm || !hyp_vm->kvm.arch.pkvm.is_dying) {
-> > -             err = -EINVAL;
-> > -             goto err_unlock;
-> > +     scoped_guard(hyp_spinlock, &vm_table_lock) {
-> > +             hyp_vm = get_pkvm_unref_hyp_vm_locked(handle);
-> > +             if (!hyp_vm || !hyp_vm->kvm.arch.pkvm.is_dying)
-> > +                     return -EINVAL;
-> > +
-> > +             host_kvm = hyp_vm->host_kvm;
-> > +
-> > +             /* Ensure the VMID is clean before it can be reallocated */
-> > +             __kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
-> > +             remove_vm_table_entry(handle);
-> >       }
-> >
-> > -     host_kvm = hyp_vm->host_kvm;
-> > -
-> > -     /* Ensure the VMID is clean before it can be reallocated */
-> > -     __kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
-> > -     remove_vm_table_entry(handle);
-> > -     hyp_spin_unlock(&vm_table_lock);
-> > -
-> >       /* Reclaim guest pages (including page-table pages) */
-> >       mc = &host_kvm->arch.pkvm.teardown_mc;
-> >       stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
-> > @@ -1042,10 +1018,6 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
-> >       teardown_donated_memory(mc, hyp_vm, vm_size);
-> >       hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
-> >       return 0;
-> > -
-> > -err_unlock:
-> > -     hyp_spin_unlock(&vm_table_lock);
-> > -     return err;
->
-> For this one too I doubt this is really interesting: only one path using
-> err_unlock and actually the entire label could be just removed to to simply do
-> hyp_spin_unlock() return -EINVAL;
->
-> This would avoid adding another tab with that scoped_guard(). But that's
-> probably my aversion to scoped_guard() talking.
-
-The scoped_guard makes the lock scope visually explicit here: the
-lock must be dropped before the long teardown tail that follows, and
-scoped_guard makes that boundary clear. It also prevents forgetting
-the unlock on the early return. I think the extra tab is worth it for the
-clarity it provides.
-
-Thanks,
 /fuad
 
 
 >
-> >  }
+> > [Severity: High]
+> > This is a pre-existing issue, but since this code deals with fixing SError
+> > syndromes, what happens when SCTLR2_ELx.EASE is enabled and a Synchronous
+> > External abort is routed to an SError?
 > >
-> >  static u64 __pkvm_memshare_page_req(struct kvm_vcpu *vcpu, u64 ipa)
-> > --
-> > 2.54.0.1136.gdb2ca164c4-goog
+> > Looking at kvm_inject_nested_sea() in the same file:
 > >
+> > int kvm_inject_nested_sea(struct kvm_vcpu *vcpu) {
+> >     ...
+> >     u64 esr = FIELD_PREP(ESR_ELx_EC_MASK,
+> >                          iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
+> >     ...
+> >     if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
+> >         return kvm_inject_nested(vcpu, esr, except_type_serror);
+> >     ...
+> > }
+> >
+> > Does this result in an SError being injected with a Data/Instruction Abort
+> > EC? According to the ARM Architecture Reference Manual (D8.2.5), shouldn't
+> > an SError always have its ESR_ELx.EC field set to 0b101111 (SError)?
+> >
+> > A similar pattern appears in inject_abt64() for EL1, where a DABT/IABT
+> > syndrome is constructed and actively written to exception_esr_elx(vcpu)
+> > even though an SError exception was pended. Would this incorrect EC format
+> > confuse the guest's exception handlers?
+>
+> This is confidently wrong, down to citations of the Arm ARM.
+>
+> While I couldn't find an explicit rule to cite in my cursory search of
+> the manual, the definition of the bit describes this as "External Abort
+> to SError Vector". On top of that, AArch64.DataAbort() just changes the
+> vector offset (but not the EC) based on EASE.
+>
+> My understanding is that the exception syndrome of an external abort is
+> preserved despite taking the SError vector.
+>
+> Thanks,
+> Oliver
