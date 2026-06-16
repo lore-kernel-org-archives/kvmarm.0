@@ -1,73 +1,40 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D904533B97D
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 08:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4B035C183
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 09:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781596983; cv=none; b=t02cPkawa8Vk8PJrgBKLnHcuKLltjchunqRVhnXz9dN3NnS+gCT0ImwKvaNmW5m2doHf92ehJEh+v2ug+za8HuuxFtjIyrtEDbNt0bsR7jhT+luiDkZmsmGN1Pv3u9oBBGbbQ2nSzDaHC0W1g5LJIcMUio1UptuktMC5A7spEKs=
+	t=1781600881; cv=none; b=oNL25Acp1bBeLRZrOPzuvDTEO4hvDfQNYqUx247lhad4vleJuh+Af+5d1sNTYXNHWaQmOwuB9ZQJOqyKul4aSgVYw51uc7RQxgfigmPHCbPPmc1iqQgsdsR09GbUPSQlG9v2+tAfUBWAZAJbasY0Q1aYt4DJnWEm9C51mNp9oZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781596983; c=relaxed/simple;
-	bh=kN2kbp0ZO+hLE5oZ/5WuYNrtaRI3M4w+bQORE2OJafs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZwC2zGVPFSi0Q39KcUbAc9k3VKiFKdYp3Cyl8INwEABplXwPTpzf3E3FfVj4DtfABPOnZno+AlPJQ7To7ynTap8lU5c7crj6yBTGnBfGeJuXfcdi1OYQz1jLO1qGx0FIq3D7s7rCV0LVm0txePNKc50pm//pgV/2Gb93Uxe91pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NWiwTFHO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1781600881; c=relaxed/simple;
+	bh=s4SMwKlC/vOKKlZaGssZALB68bILzCaOblVSJpSShi4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QoZ8rfxdRCagwyamhQvt+P3+XHRehoPc2pqC4wAXUgPVafkMGMJN2S5hGbaqWK9DkGM7ESRrQjrxNYuDyJmaK1Va14RQjg6kole5mRMb/57xOPNeObSpfn1+xzF0qK0zj8rdRlzdQFfnxGFbcRlOWt54d+s+SjRe2jwH76IMOEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ptQ3lVuP; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NWiwTFHO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781596980;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kN2kbp0ZO+hLE5oZ/5WuYNrtaRI3M4w+bQORE2OJafs=;
-	b=NWiwTFHOFDrGzjCtE1LGaPcofSzPSnRHuVCaug1M9zYeXzeOO/A+r6ZHy/QWNfre0PE3WM
-	N7sh+g6GuheDL5azgNl3g5NnjHqQBdXG3vrPDncBYqAYwrXmPdqxioKfdQLjgk2vt6guI0
-	WjDeaiJaEQxkNIqjomp0s9UylOuu+CA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-542-Ih3P4Q5iN1GH0dMlNVe_Fg-1; Tue, 16 Jun 2026 04:02:58 -0400
-X-MC-Unique: Ih3P4Q5iN1GH0dMlNVe_Fg-1
-X-Mimecast-MFC-AGG-ID: Ih3P4Q5iN1GH0dMlNVe_Fg_1781596978
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-bec440e6b9fso360192766b.0
-        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 01:02:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781596977; x=1782201777;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kN2kbp0ZO+hLE5oZ/5WuYNrtaRI3M4w+bQORE2OJafs=;
-        b=hj1oScZTHmxAd3Hei0YA28G98i37D5KyDsPAGRBsVHpwTU3CtMbKDSxiVh36xkCuo8
-         i13vgE4oL6JGrunRjkQIYa25ALkQmn1D/XSzOF2bkSbC6uc8OYeZ6hbsH+m0jVHrOGf+
-         XugbpUqscZvc5W2NlENH8VvR+06RHV+hQ7Gpb/LzUUDjQD4dMkv+QdgX5eI4G4DIpNUp
-         LHkmkf+d9FuxxXkAMpVFrIzas23SfTkX0HG9pxjvrj7+XXylc6fXssalwpULi8fGdmaF
-         YkCSrHFG2daEss9pXwBsKW5GonqvHEf2d2ad3St1h2X7P6CdvyXJBuJRI5smD6ku6p6C
-         zsFQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8Ju/unFUKKwCiknEAOVtRi/182AzIgqx8XgZHoOD7VpnXYthCEy2sZAzWAJa7egJmcP422wrw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyj8MGNrhWAxyjsFH8vG8+eOawi21ABuFryWOiDGCeFhyShm/kj
-	X1fOyXSF7e5pV09BazZoZ8Dcu3XDsllx5LXHn28A6nrh5lxWoDUqFY+dGARx7vnaPOM+cpdHHZq
-	XAgMeiA74qKUw+CWUyT7gCqQ12pVKtoMToqiaGaakW/4KEfC5SQNhz5LMqw==
-X-Gm-Gg: Acq92OFfv9QlyxXtlECiVVj0zAcOvtH2LXfSdwTc4NyFLUWMZ58kAybv58yighb0zSG
-	HjsaavokPHgeHebsxMbLKGeKsPS8fpixuzgjy3Z7vYRFXy7SEWPy+1f9YOXilQT6UYCfpKDTehQ
-	lP8+B/Z4JDuhAPMiE9122mIzTcqHfy+SOo9pm9gCkun1rQYogZC14WTd61NM9annVGbIczV6qXW
-	iWXqQ+B6yURVWyynTcQJ/qKGYpY1fUN4wUntAn/9+SN7AfRCtAKiN5G8r/zPJ6M6X9BFqfNS3pg
-	b+AcMNbqLXroC2rvP4XhvcveeW1aKHZXOphpESZ9ajtvva1EkkwVLJa+bA9bstN/ceV17l1zfkG
-	qIiX8K0bSR0gRlLuqf6AzQsb15AcZmh4R/knYwG/HrMa/46GxpWZERfMtA0+q7ulgBCWV4g==
-X-Received: by 2002:a17:907:1c9f:b0:ba6:e18f:1568 with SMTP id a640c23a62f3a-bfe2a2195a4mr925276566b.32.1781596977407;
-        Tue, 16 Jun 2026 01:02:57 -0700 (PDT)
-X-Received: by 2002:a17:907:1c9f:b0:ba6:e18f:1568 with SMTP id a640c23a62f3a-bfe2a2195a4mr925270166b.32.1781596976848;
-        Tue, 16 Jun 2026 01:02:56 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb522167dsm592049266b.25.2026.06.16.01.02.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jun 2026 01:02:56 -0700 (PDT)
-Message-ID: <4c1bdb4a-2d9c-4a01-87c9-da2ad2c8f254@redhat.com>
-Date: Tue, 16 Jun 2026 10:02:53 +0200
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ptQ3lVuP"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=sU3QkWiFrN4SZorLI8GgUb3+KhkdTqA+waJhyvDUrRY=;
+	b=ptQ3lVuPq4HoFoxQoiDf81+5iqfP5Xi9RbH0Mjcou6X98sDc9Nc6dVXQKiJQlcbUwpkUzFi8+
+	vowuf4jlqCC/8z8m/3YdsDMiWEFdTSsI9S5uau1II6Obp9meNJfyS9gpltVfJ2rPdgG9HOzvZIq
+	VXJXF4bKX8ns5TqH2ovoIjY=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gfgt10GB9z1K9D8;
+	Tue, 16 Jun 2026 16:59:53 +0800 (CST)
+Received: from kwepemo100012.china.huawei.com (unknown [7.202.195.139])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9B03A405D2;
+	Tue, 16 Jun 2026 17:07:49 +0800 (CST)
+Received: from [10.67.120.222] (10.67.120.222) by
+ kwepemo100012.china.huawei.com (7.202.195.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 16 Jun 2026 17:07:48 +0800
+Message-ID: <df30b9e0-6938-47f5-bb5d-5b1e67c8879c@huawei.com>
+Date: Tue, 16 Jun 2026 17:07:48 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,62 +42,63 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 17/18] arm-qmp-cmds: introspection for ID register
- props
-To: Sebastian Ott <sebott@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, peter.maydell@linaro.org, shaju.abraham@nutanix.com,
- khushit.shah@nutanix.com, yangjinqian1@huawei.com, cohuck@redhat.com,
- richard.henderson@linaro.org, skolothumtho@nvidia.com, philmd@linaro.org,
- maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
- armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
- jdenemar@redhat.com
-References: <20260519132905.145643-1-eric.auger@redhat.com>
- <20260519132905.145643-18-eric.auger@redhat.com>
- <10ae56f5-6fc7-fe58-1e17-7c3b968045be@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <10ae56f5-6fc7-fe58-1e17-7c3b968045be@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: R77fsoSxFNTiIxEE7Z7_Qb0ETY02uxS_hjoKJOAb730_1781596978
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v7 11/20] KVM: arm64: Enforce PMU event filter at
+ vcpu_load()
+To: Colton Lewis <coltonlewis@google.com>, <kvm@vger.kernel.org>
+CC: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Russell King
+	<linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will
+ Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+	<oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, Joey Gouly
+	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, Shuah Khan
+	<shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	James Clark <james.clark@linaro.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-perf-users@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, wangyushan <wangyushan12@huawei.com>,
+	<fanghao11@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
+References: <20260504211813.1804997-1-coltonlewis@google.com>
+ <20260504211813.1804997-12-coltonlewis@google.com>
+From: wuyifan <wuyifan50@huawei.com>
+In-Reply-To: <20260504211813.1804997-12-coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemo100012.china.huawei.com (7.202.195.139)
 
+Hi Colton,
 
-
-On 5/27/26 8:29 AM, Sebastian Ott wrote:
-> On Tue, 19 May 2026, Eric Auger wrote:
->> From: Cornelia Huck <cohuck@redhat.com>
->>
->> Implement the capability to query available ID register values by
->> adding SYSREG_* options and values to the cpu model expansion for the
->> host model, if available.
->>
->> Excerpt:
->> (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
->> {"return": {"model": {"name": "host", "props":
->> {"SYSREG_ID_AA64PFR0_EL1_EL3": 1224979098931106066,
->                  ^
-> This looks wrong - more like the full reg value and not just EL3.. 
-effectively! Fixed.
->
->> "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
->> ../..
->>
->> So this allows the upper stack to detect available writable ID
->> regs and the "host passthrough model" values.
->>
->> [CH: moved SYSREG_* values to host model]
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>
->
-> Reviewed-by: Sebastian Ott <sebott@redhat.com> 
-I added the write part now
-
-Thanks
-
-Eric
-
+On 5/5/2026 5:18 AM, Colton Lewis wrote:
+> +	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
+> +		if (i == ARMV8_PMU_CYCLE_IDX) {
+> +			val = __vcpu_sys_reg(vcpu, PMCCFILTR_EL0);
+> +			evsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+> +		} else {
+> +			val = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> +			evsel = val & kvm_pmu_event_mask(vcpu->kvm);
+> +		}
+> +
+> +		guest_include_el2 = (val & ARMV8_PMU_INCLUDE_EL2);
+> +		val &= ~evtyper_clr;
+> +
+> +		if (unlikely(is_hyp_ctxt(vcpu)) && guest_include_el2)
+> +			val &= ~ARMV8_PMU_EXCLUDE_EL1;
+> +
+> +		if (vcpu->kvm->arch.pmu_filter &&
+> +		    !test_bit(evsel, vcpu->kvm->arch.pmu_filter))
+> +			val |= evtyper_set;
+> +
+> +		if (i == ARMV8_PMU_CYCLE_IDX) {
+> +			write_sysreg(val, pmccntr_el0);
+This should be pmccfiltr_el0.
+Writing the filter bits to pmccntr_el0 would corrupt the cycle count value.
+> +		} else {
+> +			write_sysreg(i, pmselr_el0);
+> +			write_sysreg(val, pmxevtyper_el0);
+> +		}
+> +	}
+> +}
+Thanks,
+Yifan
