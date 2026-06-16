@@ -1,63 +1,63 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41C735C1BD
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 12:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55F435C1BD
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 12:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781613633; cv=none; b=AScJWFz78j3Bm3EuPRBUjLhIX9L75UhBXEp08TNH1uwi8ziN41cIluhZME4cJ8mWmujmjB43dJI1KBuA4P/MewNHjV3uGufA8zp3shHZWHfLN4zv/SwQaWyNL+vHhOcjwgrLGCjaGcC94+FcVst69GDLXBP8IreYO1vF68ICQt8=
+	t=1781613763; cv=none; b=gdAPpwwUihXRDfjku69/7L7OSLiiVKNY9PA2DRg4PI0nY/u0LgnBduz2eN7S6Nc3xtdMiYgCcHrSsbjs7HJeY6vH4SmGP/tjdoG9Yv1JzJplD/Fr3ILlV0LmdiioA+HxUojL8ar6bmIuV/lsC3qwXByS58h6nGPg0yvZETv7lkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781613633; c=relaxed/simple;
-	bh=+zYPb9QpAEwlhsEkXT18Zv+K7ppCzOTN3pVgB9pUMBQ=;
+	s=arc-20240116; t=1781613763; c=relaxed/simple;
+	bh=S/14zLWy1OEcuI4mR72n4fdjjZexwK9+L/T7STtQPr8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qzZgbj7OGunihtE7R64tURy8U8chCmZrS+RDaP6Jky14WD/VSxT2dF+D1GtU4IWgJtR3vzWLoQ9pDYPK6m0ZM306I5TJAV04wJEdDKu2r+bCRSy6fBmVL6rndgz3xu8qNO6XJTE2DDscjEseFiFgRhqJYYEC/Vrav/2cFyM2K4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iJbhVsIy; arc=none smtp.client-ip=209.85.128.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4/7e58q0NsO3/b/vVeuoDgGaYDaDir9xdGDvxzGdDbAdPZpRLc4LOXhzQs9SOzlQWo26qSRiupOjyRXQ4hqxWn/dS2EOeCwfwluWXym/sATNV2rhsnyVqkCElz/xhX/eKUC2LQLd2/iML5Jjv2uAGvCrediBNLt6+Q/elxFhFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L06o2cjy; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iJbhVsIy"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490b4a8e28bso33673685e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 05:40:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L06o2cjy"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bec49f7e35eso580597366b.2
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 05:42:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781613630; x=1782218430; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781613760; x=1782218560; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9bkaQdVB1icoUbZrrnd4GITgcdZYxSW0MNtl1DcuHmc=;
-        b=iJbhVsIyKPzI6EOq5x7h08VQqrcEgfX41Cqk9FKgSDHx+9s8dY0EwmqZapkBulAuHO
-         D+mnREZiSZAaioyWnW0PQxEzpAHXwBCq+BMZCZnH3iPibhMyVN0AwY4hCxcTUnpaqTYE
-         DkFuXvHQsUOvAxVJVsU8og7YCHngHOTPFOyRQiYc3QZ0aNze6j4IRs5MgZXb4ajalo5M
-         pgkAT+Q9eWnAqmtNUiXaeR4Q0F8eNsm1HIyaGZZ5fv+rxbTU9LhXsPQiv+wkicaM1U1M
-         sdoi2VBNG0qZt931IdR+pZ+/OYGaS3WHhd8eJfKwonXDQ/YmninhIRdkjvCC64Cz8+ZC
-         KQRQ==
+        bh=KlKBLad2Erh4BtAqk3Be7oRe/1BCOSeCPkKHDyyOPcs=;
+        b=L06o2cjy+HW3nR4fo2m4z2/lJROHSIlSuaKcslfCGaJNFK7+4KT8iiVxRSzqtGCapw
+         GF/XV5gD72WJaF+6unpHSIoTovOJMmp7F9cb1CpAE9A0Pha3Yy8whAWNVXEJw10z9u1U
+         TwIKn0oRf7nnRLqHVjQixCabviZHjygVbA0bAkpmbvsg7hCMt1CrVpVAtnlwrJdnebKE
+         BCfz445jJ5USMLTWPBa/7l3N8X4yJ2Z3jgebWxvl6gqs6HF8jEItwlg6gKUzXVg05qdE
+         RrhU3v9soqx04mNrwRa122XLOksRzDRFmyIhZNVePp7F/YpdrhnkFh2giQ6Gbu+4OMWB
+         kj2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781613630; x=1782218430;
+        d=1e100.net; s=20251104; t=1781613760; x=1782218560;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9bkaQdVB1icoUbZrrnd4GITgcdZYxSW0MNtl1DcuHmc=;
-        b=BdlO4HPvnFvPWqHVSKkmwe2/sxEBUzrXV19urDT44V0OwjztkyQoE1IvT+gl9O2Sug
-         h6ZkZKiHECjhb9L4Uth9qjmFwbfiJJ3JtT6t/TCweeQtkJgywnwumdsJYmiV31cBxEqh
-         D8eCIYaW0rHF5XXqmMEZv1ClDWzLc9aVo7rFY69UcFT3LrrIMnUl1wVTpUeEfrJcTKBW
-         0gUWpF9ZYoCGOFMNAwQ9LI6WSSP8c/69VVFrIzwUmFiJaVWJkd1hdoPuGQE5xkvPV5wx
-         DF13mFgII8/T36LWLyURcicVIAr9QDvRX6H493oQXR25WSbU2ODLG1s/eWAeSfr6wTgw
-         2h4Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/0LLdxVrGjkEfQh+x8myI7vJ/1oEQ9YFMxKntsXr2PPPk9Q6rUfdlCcfCNBGV/yqBpHYdjUs4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyfpkjSWmYs0TtSBUVmhEoXtN43qrJL4s7J5NTUytJTqOD/J5mx
-	Zl+6a3aecCHRp0qDPb/D5M6graBkXela2mFlVDSqsQ1/LXcmqbjfuEw9kEpNixlJaw==
-X-Gm-Gg: Acq92OH8l9CxI4skonaq+EefdicpNe3PlzQffetJgM9IW6taI7E8TAv5I//uvabKARF
-	xywQdqPypaN72+8KHlsO8kgjNalsoA+S8esD4l4k4tmVVKxBajLMorbPmQqcC+jiXREq/F714Xw
-	bsisH9U5xMsDyLQqAn08b7IkwgF646fHt8+0Z1k+jTuNQYdrEyKv1jwFBa9WHxKQV7UkGrFyMDR
-	nbQp+s8oFlbA1mm087NqLhMj66mS99dLu5j272yDf4gEAmlUKLNP71IWwRpQxwSmTEljeB4XtO+
-	NGu7XWfaISin3Qt24Av7ysr0HICtbYxLZYqy28W7eO8XwKXPf6ALWUMfxVv4TKgodoFHR65zlls
-	ZKU9E7Kw2qEujOjzgSggJbGn3XZFEUomqsThmSRKl1iZRrdO9JXic/9ixYus6ER8Zt6x1tkuBIA
-	GtYrne3pShVUILP044vK5nVKThbgN0EdXlwupT8gCM04TU3WuSHcAeNVta5s5mpZvj9Bs=
-X-Received: by 2002:a05:600c:1396:b0:490:c032:ae92 with SMTP id 5b1f17b1804b1-4922ffc87c1mr50927645e9.33.1781613629590;
-        Tue, 16 Jun 2026 05:40:29 -0700 (PDT)
+        bh=KlKBLad2Erh4BtAqk3Be7oRe/1BCOSeCPkKHDyyOPcs=;
+        b=UnVMmFGSSKJ6hjCt0h/hCZARrLM2BfKBU3aRQZtI8KOwynbAITiSgTuQlyYyOBhgh4
+         B2Sdxh0yiGroYIdE6DJVj7FA0AOwVeb2ouDZCDeXhl+3MFMRnrqG9ST9v6cMmEorP6Mv
+         fd7jAfueMN0mfyVljTUY/q88tNuR41WiUAcwbtd1izQuBo/FQ2VdP7+FD778ek5eWeOv
+         0rZFIt4WHgjslWVh8QDFcpZXhzkIUivvZ8XQbrCaRUNrN0Jo4LuzEYt86Q56eAohjUak
+         fFKHDJU0NVLitr3LPqWd3bL/361OI/7brfUbfz/EJpkqwPbk6PjAwkOEoe4JlOXhCvKf
+         vxvQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9fgFQ/NIfgOOdy7pdWKGglAvjzhk/b8UL2sP1J9HJKxuQrW4vW7XyNXgo8Ooh3Kq4WuqH0zoA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzRPlHQJ8nGkYkQQ9F4AEH4MfaQG9O8y9MhcIyrcA51aHJ+pQon
+	zqntxCQYl+Ug8+DQV2IxQXXK2RdvWylJS8mpH/Cgd7Jxpy0iFsLXJ3XkROoVGbJVqw==
+X-Gm-Gg: Acq92OEMlmocRVpdDI4fniea3NuxRvLiabRuQiHdwjAzLMKhYRNirvvvplF0mjFKyJX
+	8hBTzf1ASwZkbtY8/NS9p8KTaE4k65pDUV7Nyj/5baEZogNpsvY4Fha+HjM7C4VkqlmQ2sviNVq
+	/5FcBxDNMlYi4EZXsoO4gHFBVTe7DeA15ztW1gxuYPQ23xQIj08t7wnQN836GzZ/0nE/S8MMSsX
+	o3/O+3eDBTKwF/7h8jFr1K5cfgWOuDC7NQsxrKeUOPBb2WkH+CmXrbz0ihGGck2egy9HGYK7AXy
+	c/lE3oQK1Q6Q23erBGQ1KYAGfiQSCxB3Vru4LcXo6H6tDdjCMzfzbrg/+0CmuNW598G0SRt+E2u
+	k68NaDIj6RnRLxemzG/ZvxkTstfr13ETZjEjs5rwG+GrGQoSPfOR0CLVB79SpOMGzwo5lu621K6
+	2GTNGyv2Srhejzt2UuGJ0WbxO4VWDVSoR1lhGgEL1sLHFTwZSBqCK4FFPzY/nbEdT28Pc=
+X-Received: by 2002:a17:907:ab8:b0:bf3:e968:bf99 with SMTP id a640c23a62f3a-bff49921dfcmr500315166b.10.1781613759630;
+        Tue, 16 Jun 2026 05:42:39 -0700 (PDT)
 Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49230a96d14sm54054125e9.12.2026.06.16.05.40.28
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb8e1db3esm637694466b.56.2026.06.16.05.42.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 05:40:28 -0700 (PDT)
-Date: Tue, 16 Jun 2026 13:40:24 +0100
+        Tue, 16 Jun 2026 05:42:39 -0700 (PDT)
+Date: Tue, 16 Jun 2026 13:42:35 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
 To: Sebastian Ene <sebastianene@google.com>
 Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
@@ -66,11 +66,11 @@ Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
 	linux-kernel@vger.kernel.org, android-kvm@google.com,
 	mrigendra.chaubey@gmail.com, perlarsen@google.com,
 	suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v3 1/7] KVM: arm64: Support
- FFA_NOTIFICATION_BITMAP_CREATE in host handler
-Message-ID: <ajFEOK3bVu5QRoCv@google.com>
+Subject: Re: [PATCH v3 2/7] KVM: arm64: Forward FFA_NOTIFICATION_BITMAP calls
+ to Trustzone
+Message-ID: <ajFEu3rjmWxVKgyW@google.com>
 References: <20260616105417.2578670-1-sebastianene@google.com>
- <20260616105417.2578670-3-sebastianene@google.com>
+ <20260616105417.2578670-4-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -79,65 +79,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260616105417.2578670-3-sebastianene@google.com>
+In-Reply-To: <20260616105417.2578670-4-sebastianene@google.com>
 
-On Tue, Jun 16, 2026 at 10:54:09AM +0000, Sebastian Ene wrote:
-> Allow FF-A notification bitmap creation messages to be forwarded to
-> Trustzone from the host and introduce a helper to check for SBZ
-> register fields.
+On Tue, Jun 16, 2026 at 10:54:10AM +0000, Sebastian Ene wrote:
+> Allow FF-A notification bitmap messages to be forwarded to
+> Trustzone from the host kernel driver enforce checking for
+> SBZ fields.
 > 
 > Signed-off-by: Sebastian Ene <sebastianene@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 36 ++++++++++++++++++++++++++++++++++-
->  1 file changed, 35 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 28 ++++++++++++++++++++++++++--
+>  1 file changed, 26 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 1af722771178..b1e5f9ee86ef 100644
+> index c723a21006aa..dc7496ec295f 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -71,6 +71,18 @@ static u32 hyp_ffa_version;
->  static bool has_version_negotiated;
->  static hyp_spinlock_t version_lock;
->  
-> +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int first_reg)
-> +{
-> +	int reg;
-> +
-> +	for (reg = first_reg; reg < 17; reg++) {
-> +		if (cpu_reg(ctxt, reg))
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-
-Hum, there's something a bit weird, as this function was introduced already in
-the previous patch. (and both have the same number)
-
-
->  static void ffa_to_smccc_error(struct arm_smccc_1_2_regs *res, u64 ffa_errno)
->  {
->  	*res = (struct arm_smccc_1_2_regs) {
-> @@ -676,7 +688,6 @@ static bool ffa_call_supported(u64 func_id)
+> @@ -713,8 +713,6 @@ static bool ffa_call_supported(u64 func_id)
 >  	case FFA_MEM_DONATE:
 >  	case FFA_MEM_RETRIEVE_REQ:
 >         /* Optional notification interfaces added in FF-A 1.1 */
 > -	case FFA_NOTIFICATION_BITMAP_CREATE:
->  	case FFA_NOTIFICATION_BITMAP_DESTROY:
+> -	case FFA_NOTIFICATION_BITMAP_DESTROY:
 >  	case FFA_NOTIFICATION_BIND:
 >  	case FFA_NOTIFICATION_UNBIND:
-> @@ -862,6 +873,26 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
+>  	case FFA_NOTIFICATION_SET:
+> @@ -909,6 +907,28 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
 >  	hyp_spin_unlock(&host_buffers.lock);
 >  }
 >  
 > +static void do_ffa_notif_bitmap(struct arm_smccc_1_2_regs *res,
 > +				struct kvm_cpu_context *ctxt)
 > +{
+> +	DECLARE_REG(u32, func_id, ctxt, 0);
 > +	DECLARE_REG(u32, vmid, ctxt, 1);
 > +	struct arm_smccc_1_2_regs *args;
+> +	u32 idx_unused_args = func_id == FFA_NOTIFICATION_BITMAP_CREATE ? 3 : 2;
+
+nit: should probably better expressed as a int as this is the type in the
+ffa_check_unused_args_sbz proto.
+
+Perhaps you can even fold that directly into the ffa_check_unused_args_sbz()
+call?
+
 > +
-> +	if (ffa_check_unused_args_sbz(ctxt, 3)) {
+> +	if (ffa_check_unused_args_sbz(ctxt, idx_unused_args)) {
 > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
 > +		return;
 > +	}
@@ -154,16 +140,17 @@ the previous patch. (and both have the same number)
 >  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
 >  {
 >  	struct arm_smccc_1_2_regs res;
-> @@ -920,6 +951,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> @@ -967,6 +987,10 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
 >  	case FFA_PARTITION_INFO_GET:
 >  		do_ffa_part_get(&res, host_ctxt);
 >  		goto out_handled;
 > +	case FFA_NOTIFICATION_BITMAP_CREATE:
+> +	case FFA_NOTIFICATION_BITMAP_DESTROY:
 > +		do_ffa_notif_bitmap(&res, host_ctxt);
 > +		goto out_handled;
 >  	}
 >  
 >  	if (ffa_call_supported(func_id))
 > -- 
-> 2.54.0.1099.g489fc7bff1-goog
+> 2.54.0.1136.gdb2ca164c4-goog
 > 
