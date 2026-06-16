@@ -1,52 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB68C38237F
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 20:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D47384238
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 21:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781640881; cv=none; b=eM8g7wHutRqLyt+a++HKvgYQRzz6O2ld2cYDvjB6t1R89m6VhXhJRs5lMMDV9wl7moTxIk7jpa+yut4DfDTeCdrHv/rvQm1aUfuzNBwz1kch2A0hAohIu0iMEqS8ppGy0P+cqlzgVB8H0Sy3JaBYmJqHEfNaafQmA8X0XuHNcKA=
+	t=1781646196; cv=none; b=SA7LuNoJ2RBZZPJ+OjzTNQgkPnDj171qy5tzVFz4IAMpyogRxOPtprSQ+5K3+NW1MLHX5fnY2cGoc4uhtPygeiWuavjpsSrzlHdUtmYpWLzBunasvddS92KH6l01ljVC2+f3c+47cXunzxQW7RMnk5WvUyKGHN3fQqEcuASs0hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781640881; c=relaxed/simple;
-	bh=tMcKLV7BgsDO/NkKWZwDkPQjSBOii3S37wSmv1ze9Dk=;
+	s=arc-20240116; t=1781646196; c=relaxed/simple;
+	bh=Et+a5Lv4E82prCtza7xGjuFzolB2s5kqwAMAXq3oMHk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qOonmkw5eYPgUis/SYh9AX5NM9OhhoH/aqtmlM7I2+kIoxWnVoQno3bI38qJgRvl7MVvwfKCxQb3FmslTlPYA41ABsMykfZ5d/0A+J3YgyHlrUTysGUNSF68AvicB/iQkZXon4rsbyeVPGbdhkJejGT9W2kgQ71ro0/eblTADbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QiYGCEuT; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=NnrD7vElkMsfW7DTyHjfXZ6bQCIXKqlh1qvzixJJ3ZGr1zrHoiSZ49IZ2u71tA/1mwcQgh1YXKqWswEf6SYuV4wy0ZIuw7PbiRMK17EtOmd2Bi7EPGMkZq4czIwW/cvaqBGv22fxsSbADb5kktgNN6V6oLbYBDdYf/OR/yOCOWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qNrloCbp; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QiYGCEuT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6044B1F000E9;
-	Tue, 16 Jun 2026 20:14:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781640880;
-	bh=mX65hj6pHJKi5UZV5lw/UMIZ0zXM54bmOLByN+V/vGs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QiYGCEuTZ/ct0jFJNuBbo5YeJwkX0i3J2Rj1OFr54KSD85o8iFZ6avC0An/qnKWXW
-	 p7bS61sBaEzlSOw0ZS3VmR2ao0iNIQt3SErQxjE8sBf9Tj2GlXMhEUyoOl9ACCSmBC
-	 CIbdHIDMvZ0W4ejSakSn2uG9lMyQoX63Z16Uh4ZfHNAKDgtWA1GGszKEyd/ZefhOQ9
-	 EQy9dZil82utpIkQoGZ06OZ2QJfdCbIajeDjO9+VzpSAyEKclk+jbb9oOhsfSUHtuP
-	 aLbsDP5W7TQcSxTKGByZFqo32tj2BlM2txKR5PAt6k5KK632bf4sucoSBc87TgPD5V
-	 OMBsJ1WpoVMJg==
-Date: Tue, 16 Jun 2026 13:14:39 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Zhong Wang <wangzhong.c0ss4ck@bytedance.com>,
-	Xuanqing Shi <shixuanqing.11@bytedance.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Translate vEL2 PSTATE to EL1 in
- kvm_hyp_handle_mops()
-Message-ID: <ajGur_YEMoMLZPSF@kernel.org>
-References: <20260616114943.81188-2-bestswngs@gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qNrloCbp"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2c69fa0b1f8so22145ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 14:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781646195; x=1782250995; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMGez037eq5i2gLRSfEcQdwkg5zUJPnIQY7TCbEX9MY=;
+        b=qNrloCbpzh9ZTnPPKOQtQ2V0i5VwrbebW4Ld0KbMav8nm70B/ok+bIc1uB1xvEH55u
+         rTbxif7WI+UPZJyCqGayhNwy0jpseaOX2W4jB3ob4p04nM28YrkEdOGvoajx1iAeTqLs
+         PoeVrJlTUM1qyO90P1bpGF2saLSvZuqOd0i4eQNwotWvPt9307FTmp29VHJ4s33C2mox
+         FcnyrApgsE1mtRqdaWKa5RoPyPnoOKTeWfj2FDCT4Bi3QWtHo4NvYyA15B8OJmhAJ6Ec
+         cmf0U2BGNoCkTUK/9Br2Hm7I8X4Z9XzgVITVkL+QS0W/9i9ZObfezsQXTXcSDr7fBAkT
+         PQ3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781646195; x=1782250995;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YMGez037eq5i2gLRSfEcQdwkg5zUJPnIQY7TCbEX9MY=;
+        b=Q2hnSjQjDb+dH3DWx6PiKNE96r99/AOU8w7Yt/x9CMpNYqy3/iihw/g09Y0jaW2FCa
+         EiGfeq8PC/lr5sYAUntrwQj74XxjUXlqULz1ZUSOtlexxrSGFLcsiMJ4oOxXauF8ZOxk
+         d6URn0HAWAVEOfMHRKy7lF8Tg8Sck7waGUL+8RTm0liqZ3JHrcBnlYWJQz3HiNV7laaV
+         w9EN86sPL24gwXIA9/LGW44qih972BtYhOkF8DSVik4DiOzd5Vf8M7GHCBixfTh+EDNM
+         GE2T1Se3RnMxw+K6bfBJP5vuv5AqafPOctyvq3GEqO6RjHZR4sKFPmO/kEY3kdzMm6S3
+         wsFg==
+X-Forwarded-Encrypted: i=1; AFNElJ8nEfZc5lBrz5/EinMVmFDOwUUS7DJq713OaCm3wEaN63NxjfK5BbVAh/JnxOFzAmTVv6paIwk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwjlISg/6JJu7QRvsSUCmmmYNuKgZDv6fJcWwP0wNvC1eODRKV8
+	cx0Jkyp3HzOveZqo3UfbHIzzZRkE6gicsRHu8PnJVobtXXLThtZuC3hAQ2n1pTeD4A==
+X-Gm-Gg: AfdE7cmwjsXNmufRp2dioGhMmiIGTvAlq+nzksr15da9ChXOIjktAjQjiYqAMfE5IGw
+	d6+nFjOSarfqUE9hxNLzEMrEs0f/UMWXLYPD1BaJ5yHpqLL2fzFKwaJ4ClwejNEaKxYZpJCCPeN
+	KdVQxJvkdFnyFBcOo0yheanxCVo91rBfw84reNHGUKJRPz8DrLmL6Te/ctA7p+OxVzO7jrgkYRL
+	TnrND2q/8CWvojKVhM83osQoNjdYd3y44QkUMXb5sqlWbLohnmyuIzl2R5JVcYGlYr7z0xOoTFS
+	DBfGLMW0od/8itE3FEQ17CUKfgw3wryzZI9BVcoYmgQED9g8pUC7tkavFfx6rk+TXKeg7ijmX/9
+	t+TXy3rZ9QA4Frc7/PUyti8NtWhbnVsKq1ob7VVhlWHZoLzPv77Ybl0zpzMVtwMA0iWL3hIhUKp
+	q7IOJaBQyaOLOB6V+OTICmnpx8uwZJhTLdZREPV7HgfpLgBxkc4NVcN3Ch9h6PHsYXVZDJ
+X-Received: by 2002:a17:903:1a8f:b0:2c1:4228:3321 with SMTP id d9443c01a7336-2c6bb8b16ddmr657765ad.12.1781646194557;
+        Tue, 16 Jun 2026 14:43:14 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c5df3588dsm2346191a91.8.2026.06.16.14.43.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 14:43:13 -0700 (PDT)
+Date: Tue, 16 Jun 2026 14:43:09 -0700
+From: Vipin Sharma <vipinsh@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, seanjc@google.com, pbonzini@redhat.com, 
+	borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
+	anup@brainfault.org, atish.patra@linux.dev, zhaotianrui@loongson.cn, 
+	maobibo@loongson.cn, chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	ajones@ventanamicro.com
+Subject: Re: [PATCH v4 1/9] KVM: selftest: Create KVM selftest runner
+Message-ID: <20260616194000.GC1675268.vipinsh@google.com>
+References: <20260331194202.1722082-1-vipinsh@google.com>
+ <20260331194202.1722082-2-vipinsh@google.com>
+ <CAEvNRgGrPKBXh=VA3QBLJOczKRpMOB4nDmZL0XRwV6B3PT_7+Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,119 +79,149 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260616114943.81188-2-bestswngs@gmail.com>
+In-Reply-To: <CAEvNRgGrPKBXh=VA3QBLJOczKRpMOB4nDmZL0XRwV6B3PT_7+Q@mail.gmail.com>
 
-Hi Weiming,
-
-Thanks for the fix.
-
-On Tue, Jun 16, 2026 at 07:49:44PM +0800, Weiming Shi wrote:
-> When a nested virtualisation guest is running its virtual EL2 (vEL2),
-> fixup_guest_exit() rewrites vcpu_cpsr() to the guest's virtual exception
-> level: a hardware PSTATE.M of EL1{t,h} is presented as EL2{t,h}. The
-> hardware, however, executes vEL2 at EL1.
+On Wed, Jun 10, 2026 at 06:17:26PM -0700, Ackerley Tng wrote:
+> Vipin Sharma <vipinsh@google.com> writes:
 > 
-> kvm_hyp_handle_mops() runs on the fast guest re-entry path, where it
-> clears the single-step bit and restores SPSR_EL2 directly from
-> vcpu_cpsr():
+> >
+> > [...snip...]
+> >
+> > +def setup_logging():
+> > +    class TerminalColorFormatter(logging.Formatter):
+> > +        reset = "\033[0m"
+> > +        red_bold = "\033[31;1m"
+> > +        green = "\033[32m"
+> > +        yellow = "\033[33m"
+> > +        blue = "\033[34m"
+> > +
+> > +        COLORS = {
+> > +            SelftestStatus.PASSED: green,
+> > +            SelftestStatus.NO_RUN: blue,
+> > +            SelftestStatus.SKIPPED: yellow,
+> > +            SelftestStatus.FAILED: red_bold
+> > +        }
+> > +
+> > +        def __init__(self, fmt=None, datefmt=None):
+> > +            super().__init__(fmt, datefmt)
+> > +
+> > +        def format(self, record):
+> > +            return (self.COLORS.get(record.levelno, "") +
+> > +                    super().format(record) + self.reset)
+> > +
 > 
-> 	*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
-> 	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+> The commit message above says the printing will be in colors when the
+> terminal supports it, but if I'm reading this correctly, the colors will
+> always be printed.
+
+I meant if a terminal doesn't have support for printing color output
+then it won't be printed in color. Almost all modern terminal supports
+these ANSI escape sequence, so it will always be printed. Its kind of
+a dumb statement I wrote in the commit log.
 > 
-> For a guest hypervisor this writes the vEL2 view (PSTATE.M == EL2h) into
-> the hardware SPSR_EL2 without translating it back. The fast path re-enters
-> the guest via __guest_enter()/ERET without going through
-> __sysreg_restore_el2_return_state(), so neither to_hw_pstate() nor the
-> "return to a less privileged mode" safety check there (which would set
-> PSR_IL_BIT) is applied. The ERET therefore restores PSTATE.M = EL2h and
-> re-enters the guest at the real EL2 with a guest-controlled ELR, escaping
-> stage-2 and the guest/host boundary.
+> I was expecting something like if the output is piped to some file or
+> like "not TTY" then don't print colors.
 > 
-> This is reachable on a kernel with FEAT_MOPS running a KVM nested guest
-> (kvm-arm.mode=nested): KVM sets HCRX_EL2.MCE2, which the guest hypervisor
-> cannot clear for its own context (is_nested_ctxt() is false), so a vEL2
-> MOPS exception is taken to the host and dispatched to kvm_hyp_handle_mops()
-> with VCPU_IN_HYP_CONTEXT set.
+> Would you consider not printing in color at all? Or adding some kind of
+> "turn off all display magic" flag?
+
+Good point about color on/off. I can make following
+changes in following priority, starting with the highest:
+
+1. If NO_COLOR enivornment variable is set then don't print color at
+   all.
+2. If FORCE_COLOR environment variable is set then print color
+   (default).
+3. If output is not TTY then don't print color.
+4. Print color.
+
 > 
-> Translate EL2{t,h} back to EL1{t,h} before writing SPSR_EL2, mirroring
-> kvm_hyp_handle_eret(). For non-nested guests vcpu_cpsr() never holds an
-> EL2 mode, so the translation is a no-op and behaviour is unchanged.
-
-The changelog is unnecessarily verbose, instead:
-
-  kvm_hyp_handle_mops() resets the single-step state machine as part of
-  rewinding state for a MOPS exception by modifying vcpu_cpsr() and
-  writing the result directly into hardware.
-
-  In the case of nested virtualization, vcpu_cpsr() is a synthetic value
-  such that the rest of KVM can deal with vEL2 cleanly. That means the 
-  value requires translation before being written into hardware, which is
-  unfortunately missing from the MOPS handler.
-
-  Fix it by directly modifying SPSR_EL2 and avoiding the synthetic state
-  altogether, which will be resynchronized on the next 'full' exit back
-  to KVM.
-
-Also:
-
-Cc: stable@vger.kernel.org
-
-Definitely meets the bar :)
-
-> Fixes: 2de451a329cf ("KVM: arm64: Add handler for MOPS exceptions")
-> Assisted-by: Claude:claude-opus-4-8
-> Reported-by: Zhong Wang <wangzhong.c0ss4ck@bytedance.com>
-> Reported-by: Xuanqing Shi <shixuanqing.11@bytedance.com>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 23 ++++++++++++++++++++++-
->  1 file changed, 22 insertions(+), 1 deletion(-)
+> I also saw code for a sticky footer in another patch in this series,
+> that's probably not nice for other stuff wrapping this runner.
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e9b36a3b27bbc..a6b7963ddbf0b 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -448,6 +448,8 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
->  
->  static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
-> +	u64 spsr, mode;
-> +
->  	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
->  	arm64_mops_reset_regs(vcpu_gp_regs(vcpu), vcpu->arch.fault.esr_el2);
->  	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-> @@ -457,7 +459,26 @@ static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	 * instruction.
->  	 */
->  	*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
-> -	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-> +
-> +	/*
-> +	 * For a guest hypervisor, vcpu_cpsr() holds the vEL2 view
-> +	 * (PSTATE.M == EL2h) installed by fixup_guest_exit(), but vEL2
-> +	 * runs at EL1. Translate it back before restoring SPSR_EL2, as in
-> +	 * kvm_hyp_handle_eret().
-> +	 */
-> +	spsr = *vcpu_cpsr(vcpu);
-> +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +	switch (mode) {
-> +	case PSR_MODE_EL2t:
-> +		mode = PSR_MODE_EL1t;
-> +		break;
-> +	case PSR_MODE_EL2h:
-> +		mode = PSR_MODE_EL1h;
-> +		break;
-> +	}
-> +	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-> +
-> +	write_sysreg_el2(spsr, SYS_SPSR);
+For sticky update, I can hide it if there is no TTY.
 
-As I allude to in the modified changelog, I'd rather we just manipulate
-the hardware value of SPSR_EL2 directly. We already do this in
-kvm_hyp_handle_eret()
+> > +if __name__ == "__main__":
+> > +    PYTHON_VERSION = (3, 6)
+> > +    if sys.version_info < PYTHON_VERSION:
+> > +        print(f"Minimum required python version {PYTHON_VERSION}, found {sys.version}")
+> > +        sys.exit(1)
+> > +
+> > +    sys.exit(main())
+> 
+> This shouldn't block merge: why not align with the kernel's official
+> required python version?
+> 
 
-	spsr = read_sysreg_el2(SYS_SPSR);
-	write_sysreg_el2(spsr & ~DBG_SPSR_SS, SYS_SPSR);
+When I first proposed official version was 3.5, it got upgraded to 3.9
+in commit 5e25b972a22b ("docs: changes: update Python minimal version")
 
-Thanks,
-Oliver
+I was using some APIs which were not present in 3.5 and 3.6 was the
+minimum version I was able to run all the features I needed.
+
+It just stayed that version and I never checked to keep it in sync with
+the latest python version.
+
+> > +
+> > +        run_args = {
+> > +            "universal_newlines": True,
+> > +            "shell": True,
+> > +            "stdout": subprocess.PIPE,
+> > +            "stderr": subprocess.PIPE
+> > +        }
+> > +        proc = subprocess.run(self.command, **run_args)
+> > +
+> > +        out, err = proc.stdout, proc.stderr
+> > +        self.stdout = out.decode("utf-8", "replace") if isinstance(out, bytes) else (out or "")
+> > +        self.stderr = err.decode("utf-8", "replace") if isinstance(err, bytes) else (err or "")
+> 
+> I think it would be useful to capture stdout and stderr in order that it
+> was output, so that the output being saved shows everything
+> interleaved. I think the order could be useful in debugging.
+> 
+> I can see benefits in knowing which was on stdout and which was on
+> stderr too, so is there some way of having both?
+> 
+
+Both approaches are useful, I am not sure how to achieve what you are
+asking reliably.
+
+However, I think separate stdout and stderr is more useful in automation/CI
+tools. Considering, runner is for the human use I am more inclined on
+having combined output of stdout and stderr as you are suggsting.
+
+I will change it to combined output in next version, new filename will
+be "out" consisting of both stdout and stderr. If there is ever
+need for separate dumps we can revisit it.
+
+One thing we will lose is in current approach, non-zero stderr is signal
+of finding errored out runs. Not a big loss as same information can be
+grepped using master log file.
+
+
+> > +
+> > +        if proc.returncode == 0:
+> > +            self.status = SelftestStatus.PASSED
+> > +        elif proc.returncode == 4:
+> > +            self.status = SelftestStatus.SKIPPED
+> > +        else:
+> > +            self.status = SelftestStatus.FAILED
+> 
+> Using this class-based pattern requires us to do
+> Selftest(test_path).run(). Would you consider using a function-based
+> pattern, like run_selftest(test_path) instead?
+> 
+
+I find current class model provides an easy way to group data in
+hierarchy. For example, test_runner has list of selftests which it needs to
+execute. Selftests have their own test command, output data, result
+status, etc.
+
+Both are suitable to implement runner. But I am little hesitant to
+change it now considering it is already written. If you can provide
+benefits of using functions approach here then I am open to
+rewrite.
+
+> >
+> > [...snip...]
+> >
