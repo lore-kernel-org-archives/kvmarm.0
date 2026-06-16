@@ -1,240 +1,152 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A923043C8
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 13:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5AB32B118
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 14:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781616519; cv=none; b=AzZQmoTJMYCyE4snNL8V5/wNM9cTGOBsuPxRESKjBeRbzqoSt8vpmCsAO2PNabbexnAVxT3Lo/JOhyiotRvM7jtUYNGiFWBVbTlY2d9E9umeLUAIoHtopn4OEA/4a03rQpdRttUWu1sgyQE0NrZCk3Mt1SnW3pt49zqEdG2UqWM=
+	t=1781619851; cv=none; b=gEJT+f34necplttb4Z5WqTSG/vauq7GKdffNhou1Ito54hOKo1cX5lNomOC2LJmV1LARmG6qKO42AsW1FePvjc9UipR1JfOZsMqHRXBrFBFV3l4MVZICXfVwwKceuGbCEgzz5f56Px63CWabi1R6kQoK7q10eclNPWY9hj27S/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781616519; c=relaxed/simple;
-	bh=JeVaW2N2mBXeWA5F/umjR96tnDCabYrvdzENJGWCeBw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=keJBwCWTYeSovZEBcHqcQ30oLcPB1D+plbGBCNHtpCUlW1DXUJLL6Agfo8hftEEpFFB+R+kBF7WSqz5S33yt1jDrJaKVDC9M+6iYNVTzgXLicmkWk9fnXU8kMxcD1BF7ZgB5RItG3LkE/ruC1e9rgYZ8Own3qE0c9ubN+2J5omI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YVSechdG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1781619851; c=relaxed/simple;
+	bh=dP/dL49CLEk7mlnb97NtOWJfS1vkC06UrxTdvbR+S+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b/skNu0SPj4Yo3HHDGJwjtASZHLf4OpH5+bQmsMDC3h06nz+xRucUmNg60e9Zi9zAUUCo2BRq+KTWhPl9OswzbYmmEcpGZBN9fzO4QjI1Z0Mk5bUenVMiKGxcxRImub7z8t45Zh1KSeFGU7RlMluq3vu2LymsQ4Jha6DdifIPxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VxrfJ/zV; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YVSechdG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781616517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7t3/6OthMgSGaRs8vrnLHPfTMlQhBxcgyyk0T/BvuEc=;
-	b=YVSechdG8q2otadyUIUM7s6s1LF6P0IJ4JyWrm0LMtbOMtIa7SaBESSfpsCeTJT6exvuWO
-	3HirqygKeMRJUNfuDSIfikBFbvK1pGggy3BGLLfbAVxJgc4MXwWDxN2vAkkh86Egm7dvq6
-	e9YzjCqeIlliJEgs5cXX3tu+NZC3xQg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-310-B7DwBgrKNb2c7z60jzOqxg-1; Tue,
- 16 Jun 2026 09:28:33 -0400
-X-MC-Unique: B7DwBgrKNb2c7z60jzOqxg-1
-X-Mimecast-MFC-AGG-ID: B7DwBgrKNb2c7z60jzOqxg_1781616511
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F7A91955F56;
-	Tue, 16 Jun 2026 13:28:31 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.44.48.30])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9590C3000203;
-	Tue, 16 Jun 2026 13:28:25 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	shaju.abraham@nutanix.com,
-	khushit.shah@nutanix.com,
-	yangjinqian1@huawei.com,
-	cohuck@redhat.com,
-	richard.henderson@linaro.org,
-	sebott@redhat.com,
-	skolothumtho@nvidia.com,
-	philmd@linaro.org
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Subject: [RFC PATCH v6 17/17] arm/cpu-features: document ID reg properties
-Date: Tue, 16 Jun 2026 15:17:04 +0200
-Message-ID: <20260616132625.1732031-18-eric.auger@redhat.com>
-In-Reply-To: <20260616132625.1732031-1-eric.auger@redhat.com>
-References: <20260616132625.1732031-1-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VxrfJ/zV"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490b23c828aso46615e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 07:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781619848; x=1782224648; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mOKKIBOjWpb4LV8H7itJJDiddCX5oAvi130926on9HY=;
+        b=VxrfJ/zVRjHAhW5ng0h1KFn6Wqsodfarw0euttF0ovl1aUdYEMQ84RTmZ6ceoPjwqC
+         /6vp61jmCKvIaTe4vyYPQMvQiq2uoNKxBMhw8IFvIEXHjX4AGjfM7/NPEhiZ+v4f0N8x
+         gdx29KRa3WzgufYcXpARUL8/eAlC8KhJPbTKINzaOqcK+LRCorr+/KmAagzVOfIWCLmg
+         GD8rxdh3oCORkopKQtOBYxgmPS680hG9LDDDh6CECyiK89mKc16vaT/R6EcoujcTFmYL
+         mhUdLUI3nMLyqebyQNMvwuu3k/mLp2BLQADxNLL7uqUKeyis+ZLMq6vi3uNYout3Ta/N
+         74dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781619848; x=1782224648;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mOKKIBOjWpb4LV8H7itJJDiddCX5oAvi130926on9HY=;
+        b=kc2sDCOZxL/9aw5WLiraqqUjhY+NAiAqvNlGnIaUaelbxP+gsPmohFoVfSIyw+k0nk
+         231MiZBTC6e4bZBUUStzHK+WNRuPXJ+AjA758M/E0qXPZHZdEQJiyr7KijtGHh9g0R6K
+         W5uWsEpQbzMQQ/DCNfgIa28Zz5Mo7z/8RRlcPfjZy/OP3yTxJi+suio7JyhJpAiHO/3C
+         yjkVXC/7wLIrsPba5CuVrZZDXN0T7C9LLgeKiOUJcmiWgvYwBjLTjpW7o/CJjzxu5h9J
+         pFYQethWiEYoUvGqjhbXfpqO88S/bqSrHVtBPwPskm999/QLtbvZacz1whfdY4tHdac0
+         fEOw==
+X-Forwarded-Encrypted: i=1; AFNElJ+SsY9oEBEw+JT2Sc5LJrs6bhd/5Wwmtn8NqNFyJhH1gBGfsxzH1ErfjmT4sjTo1etepL+tAiE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YybbOxgmrvZTU4xvf9KnoE/RXZxxjk1L9eTVR8B1dUd/wjiuDX2
+	zVaQta8tKlXwuAzz/Mv8pmwMIAwgMgeE2RqeUv8MMRx/zJIrDaeDUyDJcvXAD9z6Nw==
+X-Gm-Gg: Acq92OF6tb4faPj3PaTHr97URkG/mnvwjULTfMdj657/2CMucyvSK+MpmU4K04uJGYp
+	E/CoGyaROQbBrDxqIRUMzB1fR93iF4tt9e9dpVwGVXm2ojGQCL3/FP5Zg1PBD1oUOl/0zhIHYAd
+	NsRR4hzjIyexPZn1C4K5qZTrBv23TEnL4cCt8eVpa/AQBXZEE6xQuUOmaycPwKobLkUz0XluvmI
+	ksPrsp6CV0f3ZH65CfupcVzw6mQ16yMrPX7F2jjqRcLeT6tU4hhTx1xlE3DExlXwHG98DiSBxo6
+	CGEt/7jHbFRjhxL4+mssvr3mqBAWu2c+kF8tJO2b8T8pqrhfw67Mm1R0aUzhvPm7h0hQMvVFet7
+	65CmEYogWSBz3Twi++qdI8XJ2/4aollB7JseIu7bz2k6oJTtbj/WhiQZBilLQAXgaveY0+byaku
+	vYJgx4QBTKulXmMhhizBW/ETuRs6C2fDLkOKB7c20tWJaEWKy6uNhyySZb2gbmRmqiFKbvUA==
+X-Received: by 2002:a05:600c:c3db:20b0:490:c2b7:5551 with SMTP id 5b1f17b1804b1-49230894f68mr920755e9.13.1781619847684;
+        Tue, 16 Jun 2026 07:24:07 -0700 (PDT)
+Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f26392esm44203678f8f.3.2026.06.16.07.24.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 07:24:07 -0700 (PDT)
+Date: Tue, 16 Jun 2026 14:24:03 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
+	will@kernel.org, joey.gouly@arm.com, korneld@google.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, android-kvm@google.com,
+	mrigendra.chaubey@gmail.com, perlarsen@google.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v3 6/7] KVM: arm64: Support FFA_NOTIFICATION_GET in host
+ handler
+Message-ID: <ajFcg37mjtT4jt5M@google.com>
+References: <20260616105417.2578670-1-sebastianene@google.com>
+ <20260616105417.2578670-9-sebastianene@google.com>
+ <ajFPIhMGsjqAbtN7@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-MFC-PROC-ID: s3MAeMpHZSzzZARK-v-5DhpAMhgP5LFZ9e6RoP8eDd8_1781616511
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajFPIhMGsjqAbtN7@google.com>
 
-From: Cornelia Huck <cohuck@redhat.com>
+On Tue, Jun 16, 2026 at 02:26:58PM +0100, Vincent Donnefort wrote:
+> On Tue, Jun 16, 2026 at 10:54:15AM +0000, Sebastian Ene wrote:
+> > Allow FF-A notification GET messages to be proxied from the pKVM
+> > hypervisor to Trustzone and enforce MBZ/SBZ fields.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 24 +++++++++++++++++++++++-
+> >  1 file changed, 23 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index fcfaa441770d..549250ff8f82 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -715,7 +715,6 @@ static bool ffa_call_supported(u64 func_id)
+> >  	case FFA_MEM_DONATE:
+> >  	case FFA_MEM_RETRIEVE_REQ:
+> >         /* Optional notification interfaces added in FF-A 1.1 */
+> > -	case FFA_NOTIFICATION_GET:
+> >  	case FFA_NOTIFICATION_INFO_GET:
+> >  	/* Optional interfaces added in FF-A 1.2 */
+> >  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
+> > @@ -1001,6 +1000,26 @@ static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
+> >  	arm_smccc_1_2_smc(args, res);
+> >  }
+> >  
+> > +static void do_ffa_notif_get(struct arm_smccc_1_2_regs *res,
+> > +			     struct kvm_cpu_context *ctxt)
+> > +{
+> > +	DECLARE_REG(u32, flags, ctxt, 2);
+> > +	struct arm_smccc_1_2_regs *args;
+> > +
+> > +	if (ffa_check_unused_args_sbz(ctxt, 3)) {
+> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> > +		return;
+> > +	}
+> 
+> Shall we check that the endpoint ID is HOST_FFA_ID here?
+> 
 
-Add some documentation for how individual ID registers can be
-configured with the host cpu model.
+Yes we can add this check
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
----
- docs/system/arm/cpu-features.rst | 106 ++++++++++++++++++++++++++++---
- 1 file changed, 98 insertions(+), 8 deletions(-)
-
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 10b0eff27e..3a07a87bc3 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -2,7 +2,10 @@ Arm CPU Features
- ================
- 
- CPU features are optional features that a CPU of supporting type may
--choose to implement or not.  In QEMU, optional CPU features have
-+choose to implement or not.  QEMU provides two different mechanisms
-+to configure those features:
-+
-+1. For most CPU models, optional CPU features may have
- corresponding boolean CPU proprieties that, when enabled, indicate
- that the feature is implemented, and, conversely, when disabled,
- indicate that it is not implemented. An example of an Arm CPU feature
-@@ -31,6 +34,18 @@ running guests in AArch32.
- CPU features that are inherently specific to KVM are
- prefixed with "kvm-" and are described in "KVM VCPU Features".
- 
-+2. Additionally, the ``host`` CPU model on KVM allows to configure optional
-+CPU features via the corresponding ID registers. The host kernel allows
-+to write a subset of ID register fields. The host model exposes
-+properties for each writable ID register field. Those options are named
-+SYSREG_<IDREG>_<FIELD>. IDREG and FIELD names are those used in the
-+ARM Architecture Reference Manual. Their availability depend on the host
-+capability to let the userspace write those fields. Values set with those
-+properties override the initial values retrieved from the host. They are
-+written back to KVM and the eventual value applied by KVM depends on whether
-+the value is sanitized or not by the host kernel. Then those field values
-+are likely to be overriden again by legacy CPU options which apply at the end.
-+
- CPU Feature Probing
- ===================
- 
-@@ -126,13 +141,20 @@ A note about CPU models and KVM
- 
- Named CPU models generally do not work with KVM.  There are a few cases
- that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
--seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
--used.  This means the guest is provided all the same CPU features as the
--host CPU type has.  And, for this reason, the ``host`` CPU type should
--enable all CPU features that the host has by default.  Indeed it's even
--a bit strange to allow disabling CPU features that the host has when using
--the ``host`` CPU type, but in the absence of CPU models it's the best we can
--do if we want to launch guests without all the host's CPU features enabled.
-+seattle host, but mostly if KVM is enabled, the ``host`` CPU model must be
-+used.
-+
-+Using the ``host`` type means the guest is provided all the same CPU
-+features as the host CPU type has.  And, for this reason, the ``host``
-+CPU type should enable all CPU features that the host has by default.
-+
-+In case some features need to be hidden from the guest, and the host kernel
-+supports it, the ``host`` model can be instructed to disable individual
-+ID register values. This is especially useful for migration purposes.
-+However, this interface will not allow configuring an arbitrary set of
-+features; the ID registers must describe a subset of the host's features,
-+and all differences to the host's configuration must actually be supported
-+by the kernel to be deconfigured.
- 
- Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
- affect is not only limited to specific features, as pointed out in example
-@@ -169,6 +191,13 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
- 
-+Additionally, if supported by KVM on the host kernel, the ``host`` CPU model
-+may be configured via individual ID register field properties, for example::
-+
-+  $ qemu-system-aarch64 -M virt -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
-+
-+This forces ID_AA64ISAR0_EL1 DP field to 0.
-+
- KVM VCPU Features
- =================
- 
-@@ -495,3 +524,64 @@ Legal values for ``S`` are 30, 34, 36, and 39; the default is 30.
- 
- As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
- removed in some future QEMU release.
-+
-+Configuring CPU features via ID register fields
-+===============================================
-+
-+Note that this is currently only supported under KVM, and with the
-+``host`` CPU model.
-+
-+Querying available ID register fields
-+-------------------------------------
-+
-+QEMU will create properties for all ID register fields that are
-+reported as being writable by the kernel, and that are known to the
-+QEMU instance. Therefore, the same QEMU binary may expose different
-+properties when run under a different kernel.
-+
-+To find out all available writable ID register fields, use the
-+``query-cpu-model-expansion`` QMP command::
-+
-+  (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-+  {"return": {
-+   "model": {"name": "host", "props": {
-+   "SYSREG_ID_AA64PFR0_EL1_EL3": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
-+   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
-+   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
-+   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1, "SYSREG_ID_DFR0_EL1_PerfMon": 4,
-+   "SYSREG_ID_AA64PFR0_EL1_DIT": 0, "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
-+   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0, "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
-+   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
-+   }}}}
-+
-+If a certain field in an ID register does not show up in this list, it
-+is not writable with the specific host kernel.
-+
-+A note on compatibility
-+-----------------------
-+
-+A common use case for providing a defined set of ID register values is
-+to be able to present a fixed set of features to a guest, often referred
-+to as "stable guest ABI". This may take the form of ironing out differences
-+between two similar CPUs with the intention of being able to migrate
-+between machines with those CPUs, or providing the same CPU across Linux
-+kernel updates on the host.
-+
-+Over the course of time, the Linux kernel is changing the set of ID register
-+fields that are writable by userspace. Newly introduced writable ID
-+registers should be initialized to 0 to ensure compatibility. However, ID
-+registers that have already been introduced that undergo a change as to
-+which fields are writable may introduce incompatibilities that need to be
-+addressed on a case-by-case basis for the systems that you wish to migrate
-+inbetween.
-+
-+A note on Arm CPU features (FEAT_xxx)
-+-------------------------------------
-+
-+Configuring CPUs is done on a feature level on other architectures, and this
-+would imply configuring FEAT_xxx values on Arm. However, differences between
-+CPUs may not map to FEAT_xxx, but to differences in other registers in the
-+ID register range; for example, differences in the cache architecture exposed
-+via ``CTR_EL0``. We therefore cannot rely on configuration via FEAT_xxx. A
-+feature-based interface more similar to other architectures may be implemented
-+on top of the ID register interface in the future.
--- 
-2.53.0
-
+> > +
+> > +	if (flags & GENMASK(31, 4)) {
+> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> > +		return;
+> > +	}
+> > +
+> > +	args = (void *)&ctxt->regs.regs[0];
+> > +	arm_smccc_1_2_smc(args, res);
+> > +}
+> > +
+> >  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> >  {
+> >  	struct arm_smccc_1_2_regs res;
+> > @@ -1072,6 +1091,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> >  	case FFA_NOTIFICATION_SET:
+> >  		do_ffa_notif_set(&res, host_ctxt);
+> >  		goto out_handled;
+> > +	case FFA_NOTIFICATION_GET:
+> > +		do_ffa_notif_get(&res, host_ctxt);
+> > +		goto out_handled;
+> >  	}
+> >  
+> >  	if (ffa_call_supported(func_id))
+> > -- 
+> > 2.54.0.1136.gdb2ca164c4-goog
+> > 
