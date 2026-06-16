@@ -1,190 +1,136 @@
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE713B2FCE
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 20:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781553882; cv=pass; b=jDcAXSaMDLMy1IaMWwvgX7DkRT2I2a6j/eGYEiXxGqwknAdCEZNGZLknlkShMtCDS1hIyk51hrP3YyKxc5LzfJIwZQ3Gx4XelexVZCzy8tu5O1bJTt3U/HfEBvpHw1ZncF9htXaZ+lkgUWhLChvfUBsRkg1ukVtlcgxex9BzmuE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781553882; c=relaxed/simple;
-	bh=owPIg6ubh/DQddddT9GGtMkMgKnfwbpYGJjt+//AIJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tGRKUWTH9UVjxHiKFZgy0BQPNPJor8hyUfFSPkfwX9xqJImR8VlMRHMmYcE6g1iLj6nBADapttUJiN4K4YyZkXe0JiSo37NnZhykt+tsMnTAPJ/jbJZSRAEw3c5rSCVlKktUhljhdBFLPTuVaSAQB6XCs+3ylCy7B8jWd+DItAk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IAB88H0e; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D904533B97D
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 08:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781596983; cv=none; b=t02cPkawa8Vk8PJrgBKLnHcuKLltjchunqRVhnXz9dN3NnS+gCT0ImwKvaNmW5m2doHf92ehJEh+v2ug+za8HuuxFtjIyrtEDbNt0bsR7jhT+luiDkZmsmGN1Pv3u9oBBGbbQ2nSzDaHC0W1g5LJIcMUio1UptuktMC5A7spEKs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781596983; c=relaxed/simple;
+	bh=kN2kbp0ZO+hLE5oZ/5WuYNrtaRI3M4w+bQORE2OJafs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZwC2zGVPFSi0Q39KcUbAc9k3VKiFKdYp3Cyl8INwEABplXwPTpzf3E3FfVj4DtfABPOnZno+AlPJQ7To7ynTap8lU5c7crj6yBTGnBfGeJuXfcdi1OYQz1jLO1qGx0FIq3D7s7rCV0LVm0txePNKc50pm//pgV/2Gb93Uxe91pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NWiwTFHO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IAB88H0e"
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1384eb94d20so6478952c88.1
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jun 2026 13:04:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781553881; cv=none;
-        d=google.com; s=arc-20240605;
-        b=P7c9F63o6mLuiyWdHeVeJe9KIsIid9urSbhzc5WFCcVQ/D+a/8MKrGsfb8u3W+kKeq
-         uRJXWvRgFUPtIbT5Tlx7nttW06SAG+wYt6sZEQFhCpJRYydMg8PwZVbXvSJWBkbcN+Bj
-         AsXXAUk5wuHhCg96tAg2JhSTVCnTgtkvN2goV2htTN7Cd2SpChGN5LBqnJWgkBOoCvIH
-         Ubt94p0AF11zlgfcNVRnaMLMPK21EcTiN1roUuAyA+2bN4Hx17jbyZuQA0loG08XNBeF
-         oeuADlNc5dT6n1h9E/5AGQqtES5RbHEcQvX3shELU0SBISCafqnX6q3i29IIezID8QZe
-         VFog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=r3cAuZhgye1IsU1gMrp56etonTXBcaPhEeVfCnENr6Q=;
-        fh=6VnQG0D98aJx2Uxi0VCi4K7eSZWjR3nQC7c8z4M4Xws=;
-        b=L5ZnOCsm4WzM/UmcCKDNJlwObjAaEAukpsbXw7gEM6Cj4TiyPgyZFZ2THx0Ry+HU8e
-         nrXsyBOe+BIPmJpVZT3uUSeLxBOA/xa5Miw3LDrdN4C/Hfq+93chxczI+QNYUB93H6k6
-         NnaCXaRrEsVILttqKkqykOovAN983UvuwYXgi79gMG1SP95/lDdOqEAaD5g8JGt7kxyf
-         H3z60ONky56vWy2z5ckU9nfuzBeEwvU1tOLmWD70D0I072muOWjR5M4pD4yS+BQpi5JH
-         5e+L5sh5dvLqOIZPTZxM5MgVRmSzLcVhoKjo/ZRTuLUh3YIQksqTuUATFPTgjTV3JqI5
-         mUTA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781553881; x=1782158681; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r3cAuZhgye1IsU1gMrp56etonTXBcaPhEeVfCnENr6Q=;
-        b=IAB88H0ehb+fXLHHwIqgOxMgkM/ODxmjW2F9TLz9qqM/5uEkLfjnzntb6SQQeC9c+x
-         s+CAwdtaIQPICSENQrPnd9TY4v+yj6Iq/4BWQ98qrOumqZSjvtYLv5Sdkai282t2Zuj5
-         6c9tu1TO5iEijyG3qATpTuQiiQfETPnIiXAZg2OwHufBiSpi4A+HaQN27nZE3aRQR3Re
-         STPP5q27F0Tv/vNUAHJvnzml9GmkJ6l70fAkKkYBIMzjqWRidrkLRbIXII/jYjQuNWt2
-         mceh3/HefwuVn03KWvfgUXzSa+Q/ts8jAF9BM1iGsruqCJk8YuejVpgDLq3i1mprh+D0
-         SBFA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NWiwTFHO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781596980;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kN2kbp0ZO+hLE5oZ/5WuYNrtaRI3M4w+bQORE2OJafs=;
+	b=NWiwTFHOFDrGzjCtE1LGaPcofSzPSnRHuVCaug1M9zYeXzeOO/A+r6ZHy/QWNfre0PE3WM
+	N7sh+g6GuheDL5azgNl3g5NnjHqQBdXG3vrPDncBYqAYwrXmPdqxioKfdQLjgk2vt6guI0
+	WjDeaiJaEQxkNIqjomp0s9UylOuu+CA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-542-Ih3P4Q5iN1GH0dMlNVe_Fg-1; Tue, 16 Jun 2026 04:02:58 -0400
+X-MC-Unique: Ih3P4Q5iN1GH0dMlNVe_Fg-1
+X-Mimecast-MFC-AGG-ID: Ih3P4Q5iN1GH0dMlNVe_Fg_1781596978
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-bec440e6b9fso360192766b.0
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 01:02:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781553881; x=1782158681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=r3cAuZhgye1IsU1gMrp56etonTXBcaPhEeVfCnENr6Q=;
-        b=o/Z4UJAOza6l8T9EkIT0F3sb57jPTRXRCYW8739XPcD9kV62n360rCAPBw3LG/AQGm
-         dVkxltqUG5dwXtcMJVVfNbZwi1t773zZ2YxSMOEy9fQAW/69neJZWtAUKW15CMR6Kntn
-         Osc5rRuc0JqNVhuLjvXMqO2M9vdxQqFqP+dC396yLetMrgRyPkhuwTEdaWRkNeAc0W99
-         UhGrV9fdzaNbLzPuxnNVq/lI5mVFEN6Ohe32b4Omupw4EYHPOCw0EjdrlGCmMnq8uJsr
-         fIn+P0+/BA96+EGIQrQudaQrzEZP0XVfmRwsLQ3Bh45TZLxK3Qq0D4JM+JwYxlnQ+KtC
-         MrIg==
-X-Forwarded-Encrypted: i=1; AFNElJ/Ur3n5odw5vTInRNusytwgIryhDTGk2zlx17Y+UsgdVEkmWbtdoA/dMhpJoocKjn0W1xZ2je0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz26lNkfPzFWCCJttNyKjsdLSHr2b1bCdAVupHFfHgSVrrK8W4h
-	/LlAH/PTIZLwaKeuTW43EN0bschWvaXJJS2iBemAgmyfK2Sz07izKyC/APFzA434FC9RsX5pR1f
-	kNiB/IGDccjuFDiFz0qGwLQAFG4LAy6bvWwWMaG3r
-X-Gm-Gg: Acq92OFsO8f1g6SmW4HD0sGk0rK1NNwpO2Wgc9M5sZdl3ly1Jv/yW2X5tMaYuPxZB+n
-	rmjkkkBhpDXWtjzqB7Ogy9Qcz5jdly/KZOVE54TevsFlENx3hvp74MI8kOily6C4591L4J+6831
-	KG+HMqyZ7FGNUhqEyYTsnqHN6ypFsCAkLQ+dSgaH8vR/on/TeRYfRwrWEfUmgGsNFwgTwH2SzAL
-	j58VHVNIZw0j6b9x4yXTF7CavWQ/J5t38L5R5TaJmv4Jf6QWYwl+peZsDQ8U3AopBtOuLXXwn9Y
-	+lgCE1QqH3Bqj8kK/A==
-X-Received: by 2002:a05:7022:30d:b0:136:d421:9efa with SMTP id
- a92af1059eb24-1386f38f398mr6171219c88.32.1781553879982; Mon, 15 Jun 2026
- 13:04:39 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781596977; x=1782201777;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kN2kbp0ZO+hLE5oZ/5WuYNrtaRI3M4w+bQORE2OJafs=;
+        b=hj1oScZTHmxAd3Hei0YA28G98i37D5KyDsPAGRBsVHpwTU3CtMbKDSxiVh36xkCuo8
+         i13vgE4oL6JGrunRjkQIYa25ALkQmn1D/XSzOF2bkSbC6uc8OYeZ6hbsH+m0jVHrOGf+
+         XugbpUqscZvc5W2NlENH8VvR+06RHV+hQ7Gpb/LzUUDjQD4dMkv+QdgX5eI4G4DIpNUp
+         LHkmkf+d9FuxxXkAMpVFrIzas23SfTkX0HG9pxjvrj7+XXylc6fXssalwpULi8fGdmaF
+         YkCSrHFG2daEss9pXwBsKW5GonqvHEf2d2ad3St1h2X7P6CdvyXJBuJRI5smD6ku6p6C
+         zsFQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8Ju/unFUKKwCiknEAOVtRi/182AzIgqx8XgZHoOD7VpnXYthCEy2sZAzWAJa7egJmcP422wrw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyj8MGNrhWAxyjsFH8vG8+eOawi21ABuFryWOiDGCeFhyShm/kj
+	X1fOyXSF7e5pV09BazZoZ8Dcu3XDsllx5LXHn28A6nrh5lxWoDUqFY+dGARx7vnaPOM+cpdHHZq
+	XAgMeiA74qKUw+CWUyT7gCqQ12pVKtoMToqiaGaakW/4KEfC5SQNhz5LMqw==
+X-Gm-Gg: Acq92OFfv9QlyxXtlECiVVj0zAcOvtH2LXfSdwTc4NyFLUWMZ58kAybv58yighb0zSG
+	HjsaavokPHgeHebsxMbLKGeKsPS8fpixuzgjy3Z7vYRFXy7SEWPy+1f9YOXilQT6UYCfpKDTehQ
+	lP8+B/Z4JDuhAPMiE9122mIzTcqHfy+SOo9pm9gCkun1rQYogZC14WTd61NM9annVGbIczV6qXW
+	iWXqQ+B6yURVWyynTcQJ/qKGYpY1fUN4wUntAn/9+SN7AfRCtAKiN5G8r/zPJ6M6X9BFqfNS3pg
+	b+AcMNbqLXroC2rvP4XhvcveeW1aKHZXOphpESZ9ajtvva1EkkwVLJa+bA9bstN/ceV17l1zfkG
+	qIiX8K0bSR0gRlLuqf6AzQsb15AcZmh4R/knYwG/HrMa/46GxpWZERfMtA0+q7ulgBCWV4g==
+X-Received: by 2002:a17:907:1c9f:b0:ba6:e18f:1568 with SMTP id a640c23a62f3a-bfe2a2195a4mr925276566b.32.1781596977407;
+        Tue, 16 Jun 2026 01:02:57 -0700 (PDT)
+X-Received: by 2002:a17:907:1c9f:b0:ba6:e18f:1568 with SMTP id a640c23a62f3a-bfe2a2195a4mr925270166b.32.1781596976848;
+        Tue, 16 Jun 2026 01:02:56 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb522167dsm592049266b.25.2026.06.16.01.02.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jun 2026 01:02:56 -0700 (PDT)
+Message-ID: <4c1bdb4a-2d9c-4a01-87c9-da2ad2c8f254@redhat.com>
+Date: Tue, 16 Jun 2026 10:02:53 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260613002031.745413-10-seanjc@google.com> <20260613003501.DD5951F000E9@smtp.kernel.org>
- <CALzav=fsuDxGViwyFmhR1RmQKugR_tcj70gmq-492thdxJTDPg@mail.gmail.com>
- <ajA-5IQ3R5ZO1rSi@google.com> <CALzav=fQ5FENWgGNEqQrmb-i_9fWTRhLXj2-jZKC_zjM3Kg6PA@mail.gmail.com>
- <ajBQ3YEAMyKnJWYb@google.com>
-In-Reply-To: <ajBQ3YEAMyKnJWYb@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 15 Jun 2026 13:04:13 -0700
-X-Gm-Features: AVVi8Cd_8D6rihsAKEHaL9-XhAcm___nO2rBi-Wv8z6QEvOUnZocWEMFIMLJIV4
-Message-ID: <CALzav=efwGdF+q1-_kMREvshbYTqWT4P_+U6Vs_brktvWub09g@mail.gmail.com>
-Subject: Re: [PATCH v7 09/20] KVM: selftests: Add VFIO device support to
- eventfd IRQ test
-To: Sean Christopherson <seanjc@google.com>
-Cc: sashiko-reviews@lists.linux.dev, Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v5 17/18] arm-qmp-cmds: introspection for ID register
+ props
+To: Sebastian Ott <sebott@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, peter.maydell@linaro.org, shaju.abraham@nutanix.com,
+ khushit.shah@nutanix.com, yangjinqian1@huawei.com, cohuck@redhat.com,
+ richard.henderson@linaro.org, skolothumtho@nvidia.com, philmd@linaro.org,
+ maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
+ armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
+ jdenemar@redhat.com
+References: <20260519132905.145643-1-eric.auger@redhat.com>
+ <20260519132905.145643-18-eric.auger@redhat.com>
+ <10ae56f5-6fc7-fe58-1e17-7c3b968045be@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <10ae56f5-6fc7-fe58-1e17-7c3b968045be@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: R77fsoSxFNTiIxEE7Z7_Qb0ETY02uxS_hjoKJOAb730_1781596978
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 15, 2026 at 12:22=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Mon, Jun 15, 2026, David Matlack wrote:
-> > On Mon, Jun 15, 2026 at 11:05=E2=80=AFAM Sean Christopherson <seanjc@go=
-ogle.com> wrote:
-> > >
-> > > On Mon, Jun 15, 2026, David Matlack wrote:
-> > > > On Fri, Jun 12, 2026 at 5:35=E2=80=AFPM <sashiko-bot@kernel.org> wr=
-ote:
-> > > > > > diff --git a/tools/testing/selftests/kvm/irq_test.c b/tools/tes=
-ting/selftests/kvm/irq_test.c
-> > > > > > index 9f8895b898214..6888be54ee4a9 100644
-> > > > > > --- a/tools/testing/selftests/kvm/irq_test.c
-> > > > > > +++ b/tools/testing/selftests/kvm/irq_test.c
-> > > > > [ ... ]
-> > > > > > @@ -55,6 +58,36 @@ static void *vcpu_thread_main(void *arg)
-> > > > > >       return NULL;
-> > > > > >  }
-> > > > > >
-> > > > > > +static int vfio_setup_msi(struct vfio_pci_device *device)
-> > > > > > +{
-> > > > > > +     const int flags =3D MAP_SHARED | MAP_ANONYMOUS;
-> > > > > > +     const int prot =3D PROT_READ | PROT_WRITE;
-> > > > > > +     struct dma_region *region;
-> > > > > > +
-> > > > > > +     /* A driver is required to generate an MSI. */
-> > > > > > +     TEST_REQUIRE(device->driver.ops);
-> > > > > > +
-> > > > > > +     /* Set up a DMA-able region for the driver to use. */
-> > > > > > +     region =3D &device->driver.region;
-> > > > > > +     region->iova =3D 0;
-> > > > >
-> > > > > [Severity: Medium]
-> > > > > Does hardcoding the DMA region's IOVA to 0 cause IOMMU mapping fa=
-ilures on
-> > > > > platforms that reserve or restrict IOVA 0?
-> > > > >
-> > > > > If IOVA 0 is unsupported, it seems like iommu_map() will fail and=
- trigger a
-> > > > > test assertion crash instead of running.
-> > > >
-> > > > This is probably fine for now given the test is only for x86_64. Bu=
-t
-> > > > if you are going to send a v8 you can use the VFIO selftests
-> > > > iova_allocator to fix this, instead of hard-coding.
-> > >
-> > > I'm confused, why is this test setting up a DMA-able region in the fi=
-rst place?
-> >
-> > There might be some devices with which you can trigger an MSI with
-> > pure MMIO. But most devices you need to at least set up some
-> > descriptors in memory that describe what action you want the device to
-> > take and then use MMIO to poke the device to read the desriptor and
-> > perform the action. Reading those descriptors is DMA.
-> >
-> > For Intel DSA specifically, send_msi() works by telling the device to
-> > perform an 8-byte memcpy and send an interrupt when it's done. The
-> > driver region contains the descriptor for that memcpy, as well as the
-> > 8-byte source/destination buffers the device should use.
->
-> Ah, gotcha.  For a comment, how's this look?
 
-That looks great!
 
+On 5/27/26 8:29 AM, Sebastian Ott wrote:
+> On Tue, 19 May 2026, Eric Auger wrote:
+>> From: Cornelia Huck <cohuck@redhat.com>
+>>
+>> Implement the capability to query available ID register values by
+>> adding SYSREG_* options and values to the cpu model expansion for the
+>> host model, if available.
+>>
+>> Excerpt:
+>> (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
+>> {"return": {"model": {"name": "host", "props":
+>> {"SYSREG_ID_AA64PFR0_EL1_EL3": 1224979098931106066,
+>                  ^
+> This looks wrong - more like the full reg value and not just EL3.. 
+effectively! Fixed.
 >
-> diff --git a/tools/testing/selftests/kvm/irq_test.c b/tools/testing/selft=
-ests/kvm/irq_test.c
-> index 6888be54ee4a..9a495fdb52f5 100644
-> --- a/tools/testing/selftests/kvm/irq_test.c
-> +++ b/tools/testing/selftests/kvm/irq_test.c
-> @@ -67,7 +67,12 @@ static int vfio_setup_msi(struct vfio_pci_device *devi=
-ce)
->         /* A driver is required to generate an MSI. */
->         TEST_REQUIRE(device->driver.ops);
+>> "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
+>> ../..
+>>
+>> So this allows the upper stack to detect available writable ID
+>> regs and the "host passthrough model" values.
+>>
+>> [CH: moved SYSREG_* values to host model]
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>
 >
-> -       /* Set up a DMA-able region for the driver to use. */
-> +       /*
-> +        * Set up a DMA-able region for the driver to use.   Very few dev=
-ices
-> +        * provide a way to arbitrarily send interrupts (MSIs), e.g. by w=
-riting
-> +        * an MMIO register.  Instead, most devices send MSIs when an act=
-ion is
-> +        * completed, and practically all actions involve DMA of some for=
-m.
-> +        */
->         region =3D &device->driver.region;
->         region->iova =3D 0;
->         region->size =3D SZ_2M;
+> Reviewed-by: Sebastian Ott <sebott@redhat.com> 
+I added the write part now
+
+Thanks
+
+Eric
+
