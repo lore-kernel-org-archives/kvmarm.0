@@ -1,296 +1,241 @@
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7613F5BE1
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 23:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4132E7390
+	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 02:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781651082; cv=pass; b=Qo48cvbexA33sPQtvaJeduvS4A2EIP3Df/NSiBcXhsAhbJTwoH7At1V6SRgFyElMy+upwJXkAufWYsO8uwCxKZCQAco//28v5x3sxRMtttvSlTNooN9Ax5Wp2bmRXKtwzY7u0ooH0mh61SB9o8cAscu7unUDyijrmzNyBHn4Ykw=
+	t=1781664804; cv=pass; b=L8ilH1B8tihtrc4bjb9PBjhBn4QNFCiQGqOegRnKVK9mhLITKFDRdNaVwH9nIWLuQj22aTAxbyELl5T4CVDdbrp4zFUvGAdppAcZtF7mztBl8ssJ30uZG2SpGhGx/oXJ2d++j3SFqeRwwhdmANj+h+CICCm+SmUsI7XQH3bWyEw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781651082; c=relaxed/simple;
-	bh=Bo53uHY0s3ADC/1KSIqS/4nXPxSM3WGq0VNZ9bGjaas=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rd55+gTFWuuyKibR3oTy+wcj6W58HhKOPhLXHGzOFlNOMJStj7KK2Qgfh+CpjxMnrXMenRQuFtOfcF/1ABzLqg4D9TX8f+uJp+y+RR83XsMEXpLOce5Igy4YMIZ7j0vORdJVPbJZHj8t25CO0AK971CPvRa0A3e4fS22Y4LrN7I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tlMQuWhP; arc=pass smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1781664804; c=relaxed/simple;
+	bh=Y46ACdwRPouvDlauXzeDi6yuSTN7hLpQNEj3G+N9BSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=edW2nh6zT0jDf/2yCQXNievTtEC9FW17LR1SJ1VdwHXzzVZqVyK2gp6a4AQDSjwiCkn12NS/HLOszd9bOdw0PeUxtjvm+XpND2EN0dxZxjoaSy6w7Er4fAPsESCV0z8YbRTMTto/oxKW8/+JdD5xNosCEaQFfJ9LAFmW2GY96vQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+k6dR14; arc=pass smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tlMQuWhP"
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-13981833e13so2496234c88.1
-        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 16:04:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781651074; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+k6dR14"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-68852b58d87so9343023a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jun 2026 19:53:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781664801; cv=none;
         d=google.com; s=arc-20240605;
-        b=jnc6uKJrBmBTqo8BS56iGZwd6vhsCYu6EkpfQ4AM0pFYCbKPCSg4G1jRf5uq1l2KLT
-         ngSCGOEDUhGgTO4j7UY7znr7pfuIIt6v96PExmSNR8kHhBdYvZqQU9YGaonQA0+aMm6j
-         7CDbleDm4KdXj5qUF+pGjy/7t4S43zCVQFQBF/2kFrR/7mofqYShMFHUoPrI6bIghe5t
-         Wg1EnMniyo7qijsAMdYRBB/yFK0k558zx5cLP07qMJj+BAtbDpKZfjOpcysi6IDEXT+F
-         wEey0Kd/sOm9OH9FEya5OgrLa3uR7GA3GBvjAWfnXvm5qH1gttOrhTXl0Hlp/ayJQ+wK
-         wDcQ==
+        b=lf5XOf7IFz36E/kCXu39TZ62MZj/Teac2ydXQWQ3RWW+FeYyeBO+ihSpyjhmddzUBG
+         r1D2PTI27qAsL8FIkLOB6LB06zQSE0msq37SK5yqly5Fh0jn3M4K1F7xvWovk3A+jfM2
+         dhzFYimupiViP6coFgKGgK8Pp/dRSY1kphNw/o7J/VNLMZVsMGwteM6eHrkHrFVoVkXo
+         tpwEsmJj92+wgcq/4XQIoMhqxJmm307tNB629UXPnIn1PO3ToVzF9Yr0WtzbQXeAOwTX
+         0PU/GV75+c8YmHPo75gXmX+shZgmaFN/TkPpTme7vrx+dXo1yiESFQ4+X/JYBa0lWvLD
+         kRiQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=IDtlYzSJ10HUdDDSmXfhgs31EXUJLXgmuoKNNIFB6PM=;
-        fh=pOUcKg5yiTTDlZm+P3ueiLwODtIQGWmScg2pwCRn78c=;
-        b=Qm+3jgYIm6cTL/yxDTCpBDYy10U9LM0aKmH4qw1zCHC9duGT0CkAgwQtB7Z3xnmMw9
-         FE3/rBdqQ1ng8B4TP1NAs+2Fdo0AMGtIOdMzRGA2XHbdshCNGf9IiVydlUhbesYa3ONg
-         zQAMxmZoGJMCGkVARvqmCvHTXyaKmWxiFudN/6frJyK6tHdMfwQfks+X6dHdHr4cr3jF
-         QoKIDsKe2GelpDTEogXtjGTl6GTHlDIlTM29VwX+YHr34KFq8NnfcDdiui4rpJbQTg3H
-         B9xVuNM7eSDj8yyBi1fpiL+6EFacs7ciVv/MmUjbPeG+GypZvqCemFtWwT3eJFxCPQgc
-         QOzA==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Sh64gIF09BcO/9gKi7ofc3N57Hdz3j3jieHCf8F4lzc=;
+        fh=tXcL1R3gRbVPJWGV4HboKsCcspgrTTKaj+TSQXD7ExY=;
+        b=QUi2YT37Mk/dx4gMZcvAi0WHKTrH0Cml4aEi5o/oALMuQ6C/6qHbeGwkm3/oh6hLmZ
+         n5tcYNJQW3oHizNKNU1eytHvwFTAcfRHC2TyCHbAPj3bvKx//bXt4Sf5zMhJA1X4hRZn
+         5dMlSmDvDDVsAwkdgAsSIdYlpjnIv65XX433l8HOOTPr4dM4HuedbeA4BDLaJHYfHuu/
+         K5vrBqhrkONYsWPLID1S/e2DBjocWXnvm3jRTKzpFk3O94lNJ6HAB+5KW+T/rNjuZCep
+         jc7nuaxuWqOYlK2iHVXop+7lTYKeiMlgSBXWPDGg5NCPG7qcuOrukwUxHionC6iFsspz
+         NDYg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781651074; x=1782255874; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IDtlYzSJ10HUdDDSmXfhgs31EXUJLXgmuoKNNIFB6PM=;
-        b=tlMQuWhPmBAz5RGP1LEzo8/C5BYbx/pFvgGQBhYGs+1IrKC87YtSGonJ1pa29aV3Ki
-         hKmmsp+gDH4MOIJljxrIt6hkbVarXOCCKjUkyXtNLojSxJLmhEESRopZItAijN10AhGy
-         hQ23Xh+Xp2ZOSaV2Irch6Xvhs2mllYriU3E4Bv73BokxhLT6KdsDxkSTTsRDbgmtipZs
-         dz6xxG9PKojSd93xhCSaQgNaxtQLOoH/SB+9OduNiZpO1etkTWRHWFsgfBYFYocRR3Zv
-         089bJYWVHTCHnv2a3XZmorXI6b/xFiUzJWcOrIcFrT+dAakDICoYb7scgz66Pug8JT7h
-         CROg==
+        d=gmail.com; s=20251104; t=1781664801; x=1782269601; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sh64gIF09BcO/9gKi7ofc3N57Hdz3j3jieHCf8F4lzc=;
+        b=C+k6dR14WYs0aCDHBQiKxDmiFZeqpTwFw9MFXbjsR9AKL2467lftlAF/lkfAzMiaL4
+         IARPI6Ugi0Vv08zMKo34+tbwiYN7IZC8N8aZTgPkgsAnRCnKd50JsmoAsO13/qPfv37U
+         y2t7/R7sa0JJMVqwgP4ouuGZWSbW1+ytMa2vXF7SISIGJOmYKgVXccCRhpAkCatF1jfK
+         bDP4eD2NuLvc9Mr8V3dZu2MtnMFCidVKziTNGPzN1B92NF7Tp7D1N7pHYZW/rfBzVYm0
+         SqnBdWSifBREj7kZ+wYklXbLARrS1j89hZN2jWHZZtjsC57rMpcajEIKjh/0fanhW0ly
+         guTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781651074; x=1782255874;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IDtlYzSJ10HUdDDSmXfhgs31EXUJLXgmuoKNNIFB6PM=;
-        b=oh76JhwfYDY8HwmqYRWWjWAdWnFZwDJVZyffJ/lI3fE8qW8tgEO9RGX0TmJ1tIjag6
-         A64gTtXklMiEijfEPnAA0qjAZi/ZhiQV6LnelPGmC864fM7A6t6y9gqrPMMX7/1lX5jJ
-         6ctaIoY0u0tOr1nRU02P44Z8ekdqAfeoCpbAKPmbdcDM5Y7JpEk/s3ANOuJCJ+BodqB7
-         biUOeRDkAZ4rmF2VHfTNMjQeMAln0qk3aGbUyRUZewYm3R1hgiuBVaWbh60WgzmoEUIY
-         xPU/6Miapw2hfe/6IT36eXKQn0gRWPZMi+5XP0ulG+UfNTInNiNpjPhpLPERBrvhftnk
-         YKEQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+x4XZSlx3C4Gye4WP8SKVgG+of5LvOtYOcIY9aq2tSysQDOZKOQQ+R3u6YTyNPPqhxfpHjwT0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyPcNl9jpG6b388081wvbsXZDVI87lX7oCkTwdsIHIYbjj0MGdo
-	2+s5u1rFyW11XerJKzWCtMVtNQ3q8lpYaJ/+ULHQMu9kmZNIUFV/xMl5f76bgDx/FqVQqnvD0MJ
-	Swk/x5hJxD+UYT7EDC4mCJibvbMlJbV2fOWVQs9b+
-X-Gm-Gg: Acq92OHIN1uTP56i7n6hD33xadg0LTPNds+FNI9bMHCXoLqNdam+kUIs7rdR6mMrGFo
-	cZclvNKQUAZG9cdr07aVBnOJlVlUDUFyCrcbYGS57CeIU11is8AkDepEY7RZCy/e7BHl/sbfqfw
-	KCxeseAic0mGpiIRekPx3dYp4JjSCpgYgpR098Me5kDZbNXe3uG6WzkSyzlEiciMphuZmStn8tu
-	xI0OnenHRwP9O5ZDonj0KoFbVJpBgu9ZYgOF/zuUSRdDo64lSYuKy/rhWBMj6cAPtKTDq/kqA83
-	+5kEw8mOMzeLWRXN8kg9RZtjhxhJ5MoTwqbFkLZ6eqohLAZ2dphvjUuPh3rPnpfNPl+jlg==
-X-Received: by 2002:a05:7022:fd08:b0:137:1ae1:bc2f with SMTP id
- a92af1059eb24-1398f6547damr476392c88.13.1781651072971; Tue, 16 Jun 2026
- 16:04:32 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 16 Jun 2026 16:04:32 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 16 Jun 2026 16:04:32 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20260616194000.GC1675268.vipinsh@google.com>
-References: <20260331194202.1722082-1-vipinsh@google.com> <20260331194202.1722082-2-vipinsh@google.com>
- <CAEvNRgGrPKBXh=VA3QBLJOczKRpMOB4nDmZL0XRwV6B3PT_7+Q@mail.gmail.com> <20260616194000.GC1675268.vipinsh@google.com>
+        d=1e100.net; s=20251104; t=1781664801; x=1782269601;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Sh64gIF09BcO/9gKi7ofc3N57Hdz3j3jieHCf8F4lzc=;
+        b=QHrQgqgCu5pUmaQK4dk0fR00wjMvz64riqDQVyAPj1jZ0vOCJE3pTLuTLhqW4BEjYl
+         ROnZrbSQdtAm3gj+GeLzRpXZa7pGYk938fuYr7pTa534lxoq71bLW6vIllIVerrrXTzu
+         XFZB4YT1t3yCFR7S7aqEdAIRKJV4cWo7EhPbcCOGY0MUAJ+8RYFu6Y13IXcSm+2U2uF+
+         D5F1rIsCD3m9Z83Ys+WMOznfJstVOEgIR+DciXl5hhoRPkYNgi9jSXoqCJ+h0Ge7QxxM
+         mzwe9gFScFJRl4jjto1xvWaczyoB7/FjkFBpeRaYSz2Sbxq4Pamp6GMqlLCxw7O97ApB
+         MNbA==
+X-Forwarded-Encrypted: i=1; AFNElJ8x5FmBiSv0Dzic6LWiPTFwixT2oNfHBVciYItUZk/OkiLUn3VcMQ5bhaEiL0hU18oLXwXXPgY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyf6qsdAlNSSh31MJ4SnhwH4WUp31sCdyEjnbA2kXzpzPsR+3Q1
+	ins9b1hhPr+ZRh5Uty8zxCTVumgNszutRTqV152499AZ9objplHs7fJNrcXt832X1jHpEhCDP99
+	/SP84vF7C2ZPdY0Pqwc2BT/+zi6R8UZU=
+X-Gm-Gg: Acq92OHcBrpMNcVsmLJXQYDiD/PFRaK4fpnvsXhIv4kJ2YHuLLPa2x9HyQ+gwC7lokB
+	top3Yj1Shhtsnde4JA7zOomeqUVaUNEWTCEQcI9Plgf3qt77u7tlZdgj0sVHLGQiVMcyxGxA8I/
+	iwNvYXqxyOdhpFCZvJWbLQ28hGhP8ZFqJ/X965L0Ee+dnuz8xPc9ZLzgbxhSPHvXUPoGDNwgdH1
+	w5/EahCo3FitKVaWakJPXoy7jCQWeCl25ZfHyvdVkdyKeDdLRsZO8fKnApDVOx4tcqiBulo3/jt
+	2s1YUlLBrEFPot3dmWucxaZnM63KpA==
+X-Received: by 2002:a17:906:6a16:b0:bef:1df6:12f2 with SMTP id
+ a640c23a62f3a-c05a4e0f10fmr128192266b.18.1781664800942; Tue, 16 Jun 2026
+ 19:53:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Tue, 16 Jun 2026 16:04:32 -0700
-X-Gm-Features: AVVi8CcXGzWmHVP01yNQ9cwcnpEans6MeetfVkGQMij7VBGAo0JuOj3VXMX_DH4
-Message-ID: <CAEvNRgF3a7BPBzqDOc0pXe4V1qxXfSHx49VyBHVRzJa0Mch+Bg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/9] KVM: selftest: Create KVM selftest runner
-To: Vipin Sharma <vipinsh@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
-	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
-	chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	ajones@ventanamicro.com
+References: <20260616114943.81188-2-bestswngs@gmail.com> <ajGur_YEMoMLZPSF@kernel.org>
+In-Reply-To: <ajGur_YEMoMLZPSF@kernel.org>
+From: swing sze <bestswngs@gmail.com>
+Date: Wed, 17 Jun 2026 10:52:43 +0800
+X-Gm-Features: AVVi8CfN6BtGW9POfmFZun5i37f-3gFLrO1XOTWCGLSzrmyy6mEwi_EP1Bbx_rk
+Message-ID: <CANgPUi2Rs0YJ3TvZSLGz1d8oFdo9oUiQFrPN-C=DPgucO9-W0w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Translate vEL2 PSTATE to EL1 in kvm_hyp_handle_mops()
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Zhong Wang <wangzhong.c0ss4ck@bytedance.com>, 
+	Xuanqing Shi <shixuanqing.11@bytedance.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Vipin Sharma <vipinsh@google.com> writes:
-
+Oliver Upton <oupton@kernel.org> =E4=BA=8E2026=E5=B9=B46=E6=9C=8817=E6=97=
+=A5=E5=91=A8=E4=B8=89 04:14=E5=86=99=E9=81=93=EF=BC=9A
 >
-> [...snip...]
+> Hi Weiming,
 >
->>
->> I was expecting something like if the output is piped to some file or
->> like "not TTY" then don't print colors.
->>
->> Would you consider not printing in color at all? Or adding some kind of
->> "turn off all display magic" flag?
+> Thanks for the fix.
 >
-> Good point about color on/off. I can make following
-> changes in following priority, starting with the highest:
+> On Tue, Jun 16, 2026 at 07:49:44PM +0800, Weiming Shi wrote:
+> > When a nested virtualisation guest is running its virtual EL2 (vEL2),
+> > fixup_guest_exit() rewrites vcpu_cpsr() to the guest's virtual exceptio=
+n
+> > level: a hardware PSTATE.M of EL1{t,h} is presented as EL2{t,h}. The
+> > hardware, however, executes vEL2 at EL1.
+> >
+> > kvm_hyp_handle_mops() runs on the fast guest re-entry path, where it
+> > clears the single-step bit and restores SPSR_EL2 directly from
+> > vcpu_cpsr():
+> >
+> >       *vcpu_cpsr(vcpu) &=3D ~DBG_SPSR_SS;
+> >       write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+> >
+> > For a guest hypervisor this writes the vEL2 view (PSTATE.M =3D=3D EL2h)=
+ into
+> > the hardware SPSR_EL2 without translating it back. The fast path re-ent=
+ers
+> > the guest via __guest_enter()/ERET without going through
+> > __sysreg_restore_el2_return_state(), so neither to_hw_pstate() nor the
+> > "return to a less privileged mode" safety check there (which would set
+> > PSR_IL_BIT) is applied. The ERET therefore restores PSTATE.M =3D EL2h a=
+nd
+> > re-enters the guest at the real EL2 with a guest-controlled ELR, escapi=
+ng
+> > stage-2 and the guest/host boundary.
+> >
+> > This is reachable on a kernel with FEAT_MOPS running a KVM nested guest
+> > (kvm-arm.mode=3Dnested): KVM sets HCRX_EL2.MCE2, which the guest hyperv=
+isor
+> > cannot clear for its own context (is_nested_ctxt() is false), so a vEL2
+> > MOPS exception is taken to the host and dispatched to kvm_hyp_handle_mo=
+ps()
+> > with VCPU_IN_HYP_CONTEXT set.
+> >
+> > Translate EL2{t,h} back to EL1{t,h} before writing SPSR_EL2, mirroring
+> > kvm_hyp_handle_eret(). For non-nested guests vcpu_cpsr() never holds an
+> > EL2 mode, so the translation is a no-op and behaviour is unchanged.
 >
-> 1. If NO_COLOR enivornment variable is set then don't print color at
->    all.
-> 2. If FORCE_COLOR environment variable is set then print color
->    (default).
-> 3. If output is not TTY then don't print color.
-> 4. Print color.
+> The changelog is unnecessarily verbose, instead:
 >
-
-I think we can take reference from what grep does.
-
-+ --color=auto (default), if output is piped or redirected, no color.
-+ --color=always
-+ --color=never
-
->>
->> I also saw code for a sticky footer in another patch in this series,
->> that's probably not nice for other stuff wrapping this runner.
->>
-> For sticky update, I can hide it if there is no TTY.
+>   kvm_hyp_handle_mops() resets the single-step state machine as part of
+>   rewinding state for a MOPS exception by modifying vcpu_cpsr() and
+>   writing the result directly into hardware.
 >
->> > +if __name__ == "__main__":
->> > +    PYTHON_VERSION = (3, 6)
->> > +    if sys.version_info < PYTHON_VERSION:
->> > +        print(f"Minimum required python version {PYTHON_VERSION}, found {sys.version}")
->> > +        sys.exit(1)
->> > +
->> > +    sys.exit(main())
->>
->> This shouldn't block merge: why not align with the kernel's official
->> required python version?
->>
+>   In the case of nested virtualization, vcpu_cpsr() is a synthetic value
+>   such that the rest of KVM can deal with vEL2 cleanly. That means the
+>   value requires translation before being written into hardware, which is
+>   unfortunately missing from the MOPS handler.
 >
-> When I first proposed official version was 3.5, it got upgraded to 3.9
-> in commit 5e25b972a22b ("docs: changes: update Python minimal version")
+>   Fix it by directly modifying SPSR_EL2 and avoiding the synthetic state
+>   altogether, which will be resynchronized on the next 'full' exit back
+>   to KVM.
 >
-> I was using some APIs which were not present in 3.5 and 3.6 was the
-> minimum version I was able to run all the features I needed.
+> Also:
 >
-> It just stayed that version and I never checked to keep it in sync with
-> the latest python version.
+> Cc: stable@vger.kernel.org
 >
-
-I see, no worries, not a huge issue.
-
->> > +
->> > +        run_args = {
->> > +            "universal_newlines": True,
->> > +            "shell": True,
->> > +            "stdout": subprocess.PIPE,
->> > +            "stderr": subprocess.PIPE
->> > +        }
->> > +        proc = subprocess.run(self.command, **run_args)
->> > +
->> > +        out, err = proc.stdout, proc.stderr
->> > +        self.stdout = out.decode("utf-8", "replace") if isinstance(out, bytes) else (out or "")
->> > +        self.stderr = err.decode("utf-8", "replace") if isinstance(err, bytes) else (err or "")
->>
->> I think it would be useful to capture stdout and stderr in order that it
->> was output, so that the output being saved shows everything
->> interleaved. I think the order could be useful in debugging.
->>
->> I can see benefits in knowing which was on stdout and which was on
->> stderr too, so is there some way of having both?
->>
+> Definitely meets the bar :)
 >
-> Both approaches are useful, I am not sure how to achieve what you are
-> asking reliably.
+> > Fixes: 2de451a329cf ("KVM: arm64: Add handler for MOPS exceptions")
+> > Assisted-by: Claude:claude-opus-4-8
+> > Reported-by: Zhong Wang <wangzhong.c0ss4ck@bytedance.com>
+> > Reported-by: Xuanqing Shi <shixuanqing.11@bytedance.com>
+> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> > ---
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 23 ++++++++++++++++++++++-
+> >  1 file changed, 22 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/h=
+yp/include/hyp/switch.h
+> > index e9b36a3b27bbc..a6b7963ddbf0b 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -448,6 +448,8 @@ static inline bool __populate_fault_info(struct kvm=
+_vcpu *vcpu)
+> >
+> >  static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exi=
+t_code)
+> >  {
+> > +     u64 spsr, mode;
+> > +
+> >       *vcpu_pc(vcpu) =3D read_sysreg_el2(SYS_ELR);
+> >       arm64_mops_reset_regs(vcpu_gp_regs(vcpu), vcpu->arch.fault.esr_el=
+2);
+> >       write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+> > @@ -457,7 +459,26 @@ static inline bool kvm_hyp_handle_mops(struct kvm_=
+vcpu *vcpu, u64 *exit_code)
+> >        * instruction.
+> >        */
+> >       *vcpu_cpsr(vcpu) &=3D ~DBG_SPSR_SS;
+> > -     write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+> > +
+> > +     /*
+> > +      * For a guest hypervisor, vcpu_cpsr() holds the vEL2 view
+> > +      * (PSTATE.M =3D=3D EL2h) installed by fixup_guest_exit(), but vE=
+L2
+> > +      * runs at EL1. Translate it back before restoring SPSR_EL2, as i=
+n
+> > +      * kvm_hyp_handle_eret().
+> > +      */
+> > +     spsr =3D *vcpu_cpsr(vcpu);
+> > +     mode =3D spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +     switch (mode) {
+> > +     case PSR_MODE_EL2t:
+> > +             mode =3D PSR_MODE_EL1t;
+> > +             break;
+> > +     case PSR_MODE_EL2h:
+> > +             mode =3D PSR_MODE_EL1h;
+> > +             break;
+> > +     }
+> > +     spsr =3D (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
+> > +
+> > +     write_sysreg_el2(spsr, SYS_SPSR);
 >
-> However, I think separate stdout and stderr is more useful in automation/CI
-> tools. Considering, runner is for the human use I am more inclined on
-> having combined output of stdout and stderr as you are suggsting.
+> As I allude to in the modified changelog, I'd rather we just manipulate
+> the hardware value of SPSR_EL2 directly. We already do this in
+> kvm_hyp_handle_eret()
 >
-> I will change it to combined output in next version, new filename will
-> be "out" consisting of both stdout and stderr. If there is ever
-> need for separate dumps we can revisit it.
+>         spsr =3D read_sysreg_el2(SYS_SPSR);
+>         write_sysreg_el2(spsr & ~DBG_SPSR_SS, SYS_SPSR);
 >
-> One thing we will lose is in current approach, non-zero stderr is signal
-> of finding errored out runs. Not a big loss as same information can be
-> grepped using master log file.
->
+> Thanks,
+> Oliver
 
-Here's an idea to have both:
+Hi Oliver,
 
-        import selectors
+Thanks for your review. I will send the v2 version later.
 
-        process = subprocess.Popen(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1,
-        )
-
-        sel = selectors.DefaultSelector()
-        sel.register(process.stdout, selectors.EVENT_READ)
-        sel.register(process.stderr, selectors.EVENT_READ)
-
-        output_lines = []
-        stdout_lines = []
-        stderr_lines = []
-
-        while True:
-            events = sel.select()
-            for key, mask in events:
-                line = key.fileobj.readline()
-                if not line:
-                    sel.unregister(key.fileobj)
-                    continue
-
-                if key.fileobj is process.stdout:
-                    # append to stdout_lines... Might need to deal
-with newlines?
-                    # perhaps even print it from the runner's stdout, so
-                    #   the runner gives faster feedback for a human
-                elif key.fileobj is process.stderr:
-                    # do something equivalent for stderr_lines
-
-                output_lines.append(line)
-
-            if not sel.get_map():
-                break
-
-        process.wait()
-
-I'm also okay if it's first combined, and this can be an extension if
-it's really needed.
-
->> > +
->> > +        if proc.returncode == 0:
->> > +            self.status = SelftestStatus.PASSED
->> > +        elif proc.returncode == 4:
->> > +            self.status = SelftestStatus.SKIPPED
->> > +        else:
->> > +            self.status = SelftestStatus.FAILED
->>
->> Using this class-based pattern requires us to do
->> Selftest(test_path).run(). Would you consider using a function-based
->> pattern, like run_selftest(test_path) instead?
->>
->
-> I find current class model provides an easy way to group data in
-> hierarchy. For example, test_runner has list of selftests which it needs to
-> execute. Selftests have their own test command, output data, result
-> status, etc.
->
-> Both are suitable to implement runner. But I am little hesitant to
-> change it now considering it is already written. If you can provide
-> benefits of using functions approach here then I am open to
-> rewrite.
->
-
-I think the classes approach introduces more boilerplate which isn't
-necessary. I don't think there's any state stored in the classes and so
-this is a good fit for using functions. After removing the boilerplate,
-we might actually be able to put everything nicely into 1 file! That's
-not to say classes can't be in 1 file, I think we're more used to
-classes being in separate files.
-
-__main__.py is already mostly in a non-class style, which makes the rest
-being in the class style more jarring.
-
-Most of the kernel is C which is mostly procedural where you need to
-implement your own OOP, so I wish the accompanying python would follow a
-more procedural/function-based style rather than directly reach for OO.
-
-I'm also heavily influenced by Jack Diederich's talk [1], which is a fun
-talk but may be too long to watch, so [2] is a text overview.
-
-[1] https://youtu.be/o9pEzgHorH0
-[2] https://szuckerman.github.io/stop_writing_classes.html
-
-I guess this might be more of a philosophy/preference thing, feel free
-to go ahead if others express preference for the class style.
-
->> >
->> > [...snip...]
->> >
+Best
+Weiming Shi
