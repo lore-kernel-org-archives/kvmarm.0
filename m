@@ -1,54 +1,54 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4F13BE178
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 21:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58993FE677
+	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 21:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781731265; cv=none; b=WQ9vFmZ0WbdyZHKxcyPiJVc9wHgVhR2g8vqoHspMlYsrnFCKS0WROrzYPe+UosVa/cwLw7qC9WYJqOBqD5CC4KEec4EnlNmcUOFjNmtstTDq7OldVNBF/fucNX9vCnkLhA7fLBV6jPjVlj+sgeWOoHHBlhkOPsUbwOvR5jt8Z+0=
+	t=1781731323; cv=none; b=GN43t7p49eiGJa9DmEcscIV2WipD1IaJ2CgRm6qnDs+EfzfRbblRZhb8ts71HfIxMDw2oXaiiOdc3jl1vbYIEWwnBmtTSchoRqLtK+EYLb/b5PBmWGjY5HSnaik8smQAnxoiPq9Hs6SHmo7zPzWlfY9JxBEnAMA5x3lUOVsbrVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781731265; c=relaxed/simple;
-	bh=atB3bgHAvDtmY92Rap1LsxpecyU+4Ejr8Mpz7VCogVk=;
+	s=arc-20240116; t=1781731323; c=relaxed/simple;
+	bh=MGYaW/kGXMvXvkG3YNsp5PL2xIZorPYpsNyujv+1Wxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OqIUc8WCNCfZYLOMEBEbNLpU4eWG6951IJUYhmpaD5XbM7nr48Jby4xQT93EltPZCKM7cZ3DYldeANS9gy+eia3GjLyAgdSO165TFfWWsMtdRCz6gsug4C7XXnuLz9WGzMhfNI/EGXYDX2tKl6nAw1kqrzMpfs95YAq2bG2XSik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wbH/f4He; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Ea0AORZKHVNLQoO8TSaSSmhfUjtdQv8ddt0atq9HvdZv32v1J6gCsU2Z0ikZ0AnIe3P6yVYyKK709qKgQn/heCcLZVvOfVIogAx4MgtyxRNi2ZwyCD60kOrWKH6vXq9V2ElV7M1RFwVWpRceyVfJ5y7MJS7/2fMfMRFkD+NoKPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oXbTLRuD; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wbH/f4He"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-37c64f7ff48so200549a91.2
-        for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 14:21:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oXbTLRuD"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c8952346bb9so4908a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 14:22:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781731263; x=1782336063; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781731322; x=1782336122; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PQ9Yqm4tffKg4e29hqMAX+T2CRy/ICARHYsUqtEuY7U=;
-        b=wbH/f4HetVdlmCATRVMN9xDSIJRO8mWcXXKfzAnw6liq0JK674su55JdMTlaRcS0/f
-         wwkmS5lhQJGlWds7NufEZsHgaKlgHAhpT43SmCptpW58xHukRYeR1qYjg7gseFvDSQEc
-         88aa/XJJHY7vbBH0dLsq5uxcZBTRwlN2SvwFc0KUYpceQxUzmoaTJshaNDGCcR+iH3/J
-         5jVce+eGOrhnMaZUb92Wr9K0K30QQaWPqzlHgtq6QMxJLOK1u2ppiNx0OphYrHJqiEil
-         MzYBfdDgm6rBu/5S6AUu55NNdjn+gxI66RVJ8b2Wy3r9jGCBj/zSnYvBGxXc2jD6rrBV
-         hgtA==
+        bh=g6AeAWlBOIBCo1eUsPzrvFR0RxSzMS/bNs/bO5JhUb8=;
+        b=oXbTLRuDcXg6izZ/HQmnu2x63ddR89z5OYlSc/iQVQCm5KAdJzr4nvfiXUayC3boBR
+         fiQl18zfOOo/OqRi+Epy4edkAm0wqho22kdc45s1ygtohyN31BcDCJXWY0Cgy7DxuDUg
+         2Hc3AD0dBhLPFoiYGV0WMU2Ez48hwziZrxpcL1UEjcGn+4fnkK8BMmy9FvM6JNJDeDGk
+         kD/M4ff9sHlFSgr5EIrKJgiYEw1jPms/U4LsKMhA4W53Hg8j7qH58Fk2FKofzZsSFeeA
+         DTO9zeh7cp7Ev40l3GTzvH9WOcvr6r0wTtWc5yXM23C2dOin5567gDu5g73oVEos/Q38
+         kJng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781731263; x=1782336063;
+        d=1e100.net; s=20251104; t=1781731322; x=1782336122;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PQ9Yqm4tffKg4e29hqMAX+T2CRy/ICARHYsUqtEuY7U=;
-        b=Osa/tO0O4Twk9X9/nAI++3I9ozs5+eyXKuMsEATROm6Cpf/y3+h8qjtfkzcR8ncB0Y
-         7VhDNRS1OnP8NavdDFbyfyfcgQmMKq/y8Gr12gEnN/Iui/NgJZSHRVnQM6kv27I/X/RQ
-         GQ2Zi0cbKlDwdmc0IXShLKS0lsn+MTHVfBW0zCfONi1WA5TihGQPt9kSO6oFCVOeBXtW
-         GofOF1q10F0s1+TcBa94qNPYdWUBdqzQrx+Mn7PhJS1TfciOszOi+O9A2o6MTMufZ4CE
-         AjjsRAmD+fo8LaCcB7x2YjlNVu2TWUQX6dtfp9fC/w8l3mW41RVwtsjZUuhQS8Tdpoo+
-         CYgw==
-X-Forwarded-Encrypted: i=1; AFNElJ9VX7JQP5rgYIvCKl5ZdcuNsNFGaTT+b94VCO9twb/u1q26G+0puP6sqUnqosfFTt/0AwDnTFc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyqLai1E8k8wq/UfXcVrxPeCcFWoZ8VxnZPxp/7S5aZ4U51Yzmv
-	f2qrIgT8Z1LA0+5MXAfGDf6JWL9hLbmn4uyV6vbTqdDoXQA73rTlMP68MIv3IepmEjm1UssitHn
-	B32ENQg==
-X-Received: from pjbpc8.prod.google.com ([2002:a17:90b:3b88:b0:37c:a479:69f5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:558c:b0:369:73a:326a
- with SMTP id 98e67ed59e1d1-37c9e9c8c91mr4984736a91.13.1781731262980; Wed, 17
- Jun 2026 14:21:02 -0700 (PDT)
-Date: Wed, 17 Jun 2026 14:21:02 -0700
+        bh=g6AeAWlBOIBCo1eUsPzrvFR0RxSzMS/bNs/bO5JhUb8=;
+        b=RHsLZ1XgyXxRQ8dGDxMa2m0ga0pots0UBsVErnYjNHxgLewXUhDVHEjsuO2o4ZBGXJ
+         qnMqkBDQoC/KjK5YGkEOZKJVJst8XuxlJbapG7tXrKq8tQzb379Vxm3mh0qQUEw8Ib+z
+         VIONII0JtLCWK1dr5NnbgthjWQG7H+WyTNrqW82Ca1CC22UWYx9XooR+zVe8DDP9IgLu
+         Wg2pKV3COT5jE9TvpiHHDtpgrxFkKyC3ZiwldUUm1ny0Z4kNQlrs1x5DDVcbff/GvK8M
+         aGSAdFCRYgvS6qNh/3la3+TrBfsdNUWpMejbrutZPVlGQq34CmGomSzsuIF3XYoAGfXi
+         /8Pg==
+X-Forwarded-Encrypted: i=1; AFNElJ+G4pM3iFEKPkxhHfgmZlMh+/Fc4XD26vjoqKUNu+MBKB9QFDuCa1rNuwAkHwAzCrjTdaF06pc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwyS7Ra8yEVCkZsnTfbzUK9WkcL3RuzWp+/VD7DUm2RPcq0bkyq
+	HPs0Kyu3cDlXeOL9ngrm7B+Wtoo8y+458U+I+QmzWaCWVqdYfCA2Wp17nuOn/la3g4ka1Iti3QE
+	aSvg2jQ==
+X-Received: from plnw11.prod.google.com ([2002:a17:902:da4b:b0:2c0:b770:dcd7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1590:b0:2bd:606d:b342
+ with SMTP id d9443c01a7336-2c6e529338amr6910895ad.26.1781731322053; Wed, 17
+ Jun 2026 14:22:02 -0700 (PDT)
+Date: Wed, 17 Jun 2026 14:22:01 -0700
 In-Reply-To: <ajKcDRqT5m069PXK@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260615155244.183044-1-alexandru.elisei@arm.com>
  <20260615160901.9A1A61F000E9@smtp.kernel.org> <ajA6ogaNiI3KDv5i@google.com> <ajKcDRqT5m069PXK@raptor>
-Message-ID: <ajMPvgA2eHQCj-B0@google.com>
+Message-ID: <ajMP-cUia1I-sVAE@google.com>
 Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only memslots
 From: Sean Christopherson <seanjc@google.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
@@ -71,90 +71,6 @@ On Wed, Jun 17, 2026, Alexandru Elisei wrote:
 > 
 > Thanks for the reply. Just to make sure, once the bugs have been iron out,
 > you're ok with this idea?
-> 
-> On Mon, Jun 15, 2026 at 10:47:14AM -0700, Sean Christopherson wrote:
-> > On Mon, Jun 15, 2026, sashiko-bot@kernel.org wrote:
-> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > --- a/virt/kvm/kvm_main.c
-> > > > +++ b/virt/kvm/kvm_main.c
-> > > [ ... ]
-> > > > @@ -592,6 +592,10 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
-> > > >  			unsigned long hva_start, hva_end;
-> > > >  
-> > > >  			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
-> > > > +
-> > > > +			if (kvm_slot_has_gmem(slot) && kvm_memslot_is_gmem_only(slot))
-> > > > +				continue;
-> > > > +
-> > > 
-> > > [Severity: Critical]
-> > > Does this change inadvertently introduce a regression in the pfncache retry
-> > > protocol?
-> > > 
-> > > Looking at the pfncache framework, it maps guest memory into kernel space and
-> > > explicitly drops the page reference after mapping it:
-> > > 
-> > > virt/kvm/pfncache.c:hva_to_pfn_retry() {
-> > >     ...
-> > >     kvm_release_page_clean(page);
-> > >     ...
-> > > }
-> > > 
-> > > It appears to rely entirely on KVM's MMU notifiers (kvm->mmu_invalidate_seq)
-> > > to invalidate the cache when the page is unmapped by the host.
-> > > 
-> > > If a VMM defines a guest_memfd-backed memslot with KVM_MEMSLOT_GMEM_ONLY
-> > > but still provides a valid anonymous user mapping as its userspace_addr,
-> > > could this regression lead to a use-after-free?
-> > 
-> > Sadly, yes.  To land this, we would need to first teach the gfn_to_pfn_cache code
-> > to be able to pull directly from guest_memfd.  I forget if anyone is working on
-> > that.
-> 
-> I've been trying to wrap my head around this, and I just can't seem to
-> figure it out.
-> 
-> kvm_mmu_notifier_invalidate_range_start(), before handle_hva_range(), calls
-> gfn_to_pfn_cache_invalidate_start() for the MMU notifier range, and that
-> marks all caches that overlap the range as invalid. kvm_gpc_check() returns
-> false for an invalid cache, so how can the memory still be accessed via the
-> pfncache?
 
-That just forces gpcs to be refreshed, mmu_notifier_retry_cache() still relies
-on mmu_invalidate_seq being bumped to avoid consuming stale state.
-
-> > > By unmapping the anonymous memory, the host would trigger MMU notifiers, but
-> > > this new check skips the memslot. As a result, kvm->mmu_invalidate_seq
-> > > wouldn't increment, and KVM might retain a kernel mapping to a freed physical
-> > > page.
-> 
-> kvm->mmu_invalidate_seq is incremented in kvm_mmu_invalidate_end(), I don't see
-> how that is affected by skipping a memslot in handle_hva_range().
-
-handle_hva_range() only invokes on_lock() if a memslot is found.  By skipping the
-memslot entirely, kvm_mmu_invalidate_{start,end}() won't be called and so
-mmu_invalidate_seq won't be bumped.
-
-> > > Could this allow the guest to read or write arbitrary host physical memory?
-> 
-> The KVM_MEMSLOT_GMEM_ONLY flag is set if the backing guest_memfd has been
-> created with GUEST_MEMFD_FLAG_MMAP. The documentation for the flag says
-> that '[..] the fault will always be consumed from guest_memfd, regardless
-> of whether it is a shared or private fault'.  As far as I can tell, this
-> means that, absent a fallocate(FALLOC_FL_PUNCH_HOLE) call, the page is
-> still in the page cache for the guest_memfd file after userspace has
-> unmapped it, so the guest will not be accessing a freed page.
-
-KVM_MEMSLOT_GMEM_ONLY is somewhat misleading, it only applies to the KVM's MMU.
-For other cases where KVM accesses guest memory, KVM still follows the host virtual
-address, e.g. so that copy_{to,from}_user() Just Works.  But userspace isn't
-strictly *required* to keep the userspace mapping coherent with guest_memfd, nor
-is userspace required to make the userspace mapping fully RWX.  And so if
-userspace modifies the VMA, KVM needs to react accordingly.
-
-When in-place conversion comes along, KVM will also rely on userspace mappings
-being torn down before allow a SHARED page to become PRIVATE (for all intents
-and purposes, we're conceptually treating conversions as free()+re-alloc().  So
-while the page might still be in the page cache, it's effectively been "freed".
-So in that case, KVM really does need to ensure it handles mmu_notifier events
-correctly to avoid UAF.
+Yes, I'm more than ok with this idea.  The only reason I didn't push to do this
+right away is that I completely missed it :-)
