@@ -1,45 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE7E134CCF;
-	Wed, 17 Jun 2026 17:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EA6376467;
+	Wed, 17 Jun 2026 17:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781717564; cv=none; b=Oe8s0u55f0eff4K7k0wByGUmxNnbSYch9T2OXQpx13cgeNiB/AIkYVwmh22DmTQEi7+VFnzLaswvkEatERt+yk0hhpDAcngYmpss3d3UEtXG5mGTFEodMQgW67D0CwYGrUMmRDQJy1ygHedY8xdEMYluI5Huyia8B/3oW5Zec4o=
+	t=1781717791; cv=none; b=FEQodoh+60vQLv+K5XX3XNKhMDh4jXqtS1/6ChoZH/mafI84xBctTJGFw0/Qn+hC0dyGzpP33DpDqCwu9rsy6RY1kITMUoMVxvsb8kjGuGMwSlalKFOW4lnrEyfoZ0Ro4qz6Spq/DbsnXao2QZ7UlMv7sBfg/nsBfh1s9dCN42I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781717564; c=relaxed/simple;
-	bh=KupH7jJqndD1NtvfkW/J5aabXXSPf5uYvELXIFBONXA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=igZTmCRG4mi3lAw4wj/80W0q+qFUEwfx/ZvYJpiHHy79DwElfkgzeGCID9PgVy/reC7w5YgZIrBesQ1xFo77ZkDTU5CyhpmyeFTTknk26OI44Cv98HOWzgGdT34M4e2cHbXi2WDOQ98tkUdL04pxYgb1FswvS6iTYR0UHUxTNCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iiQ6eNI/; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781717791; c=relaxed/simple;
+	bh=iqrijUV+7RRKQYB8khF6N1ZYRFNHBJ9DG7lREmGADJY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H9rpsZqYqaKmQzm0d4/qSjNRAXdxrZckCPJ9c8PPnFR1baPfnYFJTv9OB8uxznRIkMkD+FtMy2MV187uHtozRmlM0nWpx0lQ6LaV76ggOJC8+y9Ie0kByxJV6ihdkATkDa5ZbbsIqPs99lBFgBETlhq3Q8twKFHdXoP/UyT9ZsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aDuOCp5F; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iiQ6eNI/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F34DB1F000E9;
-	Wed, 17 Jun 2026 17:32:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aDuOCp5F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68C261F000E9;
+	Wed, 17 Jun 2026 17:36:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781717563;
-	bh=/SQnDjjaa+ApH6wWe2aDhouAw1YQxs5X6sfF4wLVHvU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=iiQ6eNI/nnjbSO/YiFX5Z05kujMeruwBw0+D0I3irkhPEXHBEwgvQuNehBpvRi0Wp
-	 ji2Uv46GGloJnMYpT6oermju1WzdPejwTil41t0iA6brkwIYYqKs4EcNwu4KRtPNJN
-	 5C5B/wm0cbPwO4qs3aJsBW9CrIq+7bV2jJp3PDgijCSTxPq8v49DjBA0z34YiCf44M
-	 Mc05gm86Lxgc5dd2NlQO+Ykpu93CyNMnSr0r1Ke42izfeMjUxsPJiTniAmaPyo55fi
-	 uJNVejfNyLl9OGFCqBGgtBc1M763qvJJmEDPJK+TMwdcmc+QuT42KA3D+C8rng5oJD
-	 3fVqQv9O8PrsQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20260515; t=1781717788;
+	bh=9c4JXxUSHmrMHbwQQezcBaAvkJYq69p41kAusufWTpI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=aDuOCp5FcyoOulq2FR+bh4HO1geXcFkVep1yQVImvGf0P1gdPhCqy/oQbqfw2kLff
+	 3J19L8KfcIY+CJvWFiL0q1mXXr9yrh4pE2DwVJOSHhQ2wKkKMjktcPePgky3NANOwT
+	 VJ3/0d07Zz5mZ7erZr6qlVhTTamFdHNZyt7Dzxvg+vzflCIXH1C9a/4VqbEoanP0Zk
+	 qjSfrzgzpyqECZTML/rI6mxY/+CiRqMdHze95d/w4T4gIDpWvS7nDQFvrf/qWRnfC9
+	 gUqlfrBAv93hFQqZeX0IvVKWHVTHcqMlvHjESL4UZA6ojMUCTddA9N/UF/lYmF/Aej
+	 LhSzujhqJfkEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wZu80-0000000DlgG-3MYk;
-	Wed, 17 Jun 2026 17:32:40 +0000
-Date: Wed, 17 Jun 2026 18:32:40 +0100
-Message-ID: <86qzm5rs1z.wl-maz@kernel.org>
+	id 1wZuBe-0000000DlkU-2Mrq;
+	Wed, 17 Jun 2026 17:36:26 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+To: Oliver Upton <oupton@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	Fuad Tabba <tabba@google.com>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
@@ -50,170 +48,45 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] KVM: arm64: nv: Fix PSTATE construction on illegal exception return
-In-Reply-To: <CA+EHjTyv107RDF_MG1AtqqpJsiRbFx=xbrp12TgSu_N8dS55oA@mail.gmail.com>
+Date: Wed, 17 Jun 2026 18:36:23 +0100
+Message-ID: <178171777578.3090427.13421187058645390320.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260617144907.2972095-1-tabba@google.com>
 References: <20260617144907.2972095-1-tabba@google.com>
-	<86se6lru7w.wl-maz@kernel.org>
-	<CA+EHjTyv107RDF_MG1AtqqpJsiRbFx=xbrp12TgSu_N8dS55oA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack.lim@linaro.org, gankulkarni@os.amperecomputing.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack.lim@linaro.org, gankulkarni@os.amperecomputing.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 17 Jun 2026 18:19:20 +0100,
-Fuad Tabba <tabba@google.com> wrote:
+On Wed, 17 Jun 2026 15:49:07 +0100, Fuad Tabba wrote:
+> kvm_check_illegal_exception_return() sourced the flags {N,Z,C,V} and
+> masks {D,A,I,F} of the resulting PSTATE from the current PSTATE, but
+> R_VWJHB takes them from the SPSR being returned to and leaves
+> PSTATE.{EL,SP,nRW} (and EXLOCK when FEAT_GCS) unchanged. PAN, ALLINT
+> and PM were not applied at all.
 > 
-> On Wed, 17 Jun 2026 at 17:45, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Wed, 17 Jun 2026 15:49:07 +0100,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > kvm_check_illegal_exception_return() sourced the flags {N,Z,C,V} and
-> > > masks {D,A,I,F} of the resulting PSTATE from the current PSTATE, but
-> > > R_VWJHB takes them from the SPSR being returned to and leaves
-> > > PSTATE.{EL,SP,nRW} (and EXLOCK when FEAT_GCS) unchanged. PAN, ALLINT
-> > > and PM were not applied at all.
-> > >
-> > > Build the PSTATE by taking those fields from the SPSR while preserving
-> > > EL, SP, nRW and EXLOCK from the current PSTATE, then set IL.
-> > >
-> > > Fixes: 47f3a2fc765a ("KVM: arm64: nv: Support virtual EL2 exceptions")
-> > > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > > Link: https://lore.kernel.org/all/86wlvxs5r0.wl-maz@kernel.org/
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > > This is a modified version of Marc's suggested diff [1]. That diff applied
-> > > a single mask to the incoming SPSR, which also takes PSTATE.{EL,SP,nRW}
-> > > (and EXLOCK) from the SPSR. The ARM ARM leaves those fields unchanged on an
-> > > illegal exception return. This path is reached precisely because SPSR.M is
-> > > illegal (EL3, M[1]=1, AArch32, EL1 under TGE), so this version preserves
-> > > EL/SP/nRW/EXLOCK from the current PSTATE and takes only the flags, masks
-> > > and PAN/ALLINT/PM from the SPSR.
-> > >
-> > > [1] https://lore.kernel.org/all/86wlvxs5r0.wl-maz@kernel.org/
-> > > ---
-> > >  arch/arm64/kvm/emulate-nested.c | 33 +++++++++++++++++++++++----------
-> > >  1 file changed, 23 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > > index dba7ced74ca5..ace2b40cf875 100644
-> > > --- a/arch/arm64/kvm/emulate-nested.c
-> > > +++ b/arch/arm64/kvm/emulate-nested.c
-> > > @@ -2738,17 +2738,30 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
-> > >           (spsr & PSR_MODE32_BIT) ||
-> > >           (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
-> > >                                          mode == PSR_MODE_EL1h))) {
-> > > -             /*
-> > > -              * The guest is playing with our nerves. Preserve EL, SP,
-> > > -              * masks, flags from the existing PSTATE, and set IL.
-> > > -              * The HW will then generate an Illegal State Exception
-> > > -              * immediately after ERET.
-> > > -              */
-> > > -             spsr = *vcpu_cpsr(vcpu);
-> > > +             u64 cpsr = *vcpu_cpsr(vcpu);
-> > > +             u64 mask;
-> > >
-> > > -             spsr &= (PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
-> > > -                      PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT | PSR_V_BIT |
-> > > -                      PSR_MODE_MASK | PSR_MODE32_BIT);
-> > > +             /*
-> > > +              * On an illegal exception return, PSTATE.{EL,SP,nRW} and,
-> > > +              * if FEAT_GCS, PSTATE.EXLOCK are unchanged, while the flags
-> > > +              * and masks are taken from the SPSR (R_VWJHB). Set IL so the
-> > > +              * HW generates an Illegal State Exception right after ERET.
-> > > +              */
-> > > +             mask = PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
-> > > +                    PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT | PSR_V_BIT;
-> > > +
-> > > +             if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, IMP))
-> > > +                     mask |= PSR_PAN_BIT;
-> > > +             if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, NMI, IMP))
-> > > +                     mask |= ALLINT_ALLINT;
-> > > +             /* FEAT_SPE_EXC and FEAT_TRBE_EXC also gate PSTATE.PM one day... */
-> > > +             if (kvm_has_feat(vcpu->kvm, ID_AA64DFR1_EL1, EBEP, IMP))
-> > > +                     mask |= BIT_ULL(32);    /* PSTATE.PM */
-> > > +
-> > > +             spsr &= mask;
-> > > +             spsr |= cpsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> > > +             if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> > > +                     spsr |= cpsr & BIT_ULL(34);     /* PSTATE.EXLOCK */
-> > >               spsr |= PSR_IL_BIT;
-> > >       }
-> >
-> > While I'm happy that you caught the bugs I left for you to address,
-> > the overall structure is a bit inconsistent. I'd like to have:
-> >
-> > - a mask of the bits we preserve from SPSR, and apply that to SPSR
-> >   itself
-> >
-> > - a mask of the bits we preserve from PSTATE, and transfer them to
-> >   SPSR
-> >
-> > - the comment at the top to describe this in that particular order.
-> >
-> > With that, I reworked your patch as follows:
-> >
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index bb335fa16f7cc..243e5e26f7018 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -2746,14 +2746,14 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
-> >             (spsr & PSR_MODE32_BIT) ||
-> >             (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
-> >                                            mode == PSR_MODE_EL1h))) {
-> > -               u64 cpsr = *vcpu_cpsr(vcpu);
-> >                 u64 mask;
-> >
-> >                 /*
-> > -                * On an illegal exception return, PSTATE.{EL,SP,nRW} and,
-> > -                * if FEAT_GCS, PSTATE.EXLOCK are unchanged, while the flags
-> > -                * and masks are taken from the SPSR (R_VWJHB). Set IL so the
-> > -                * HW generates an Illegal State Exception right after ERET.
-> > +                * On an illegal exception return, the flags and masks are
-> > +                * taken from the SPSR while PSTATE.{EL,SP,nRW} and, if
-> > +                * FEAT_GCS, PSTATE.EXLOCK are unchanged (R_VWJHB). Set IL
-> > +                * so the HW generates an Illegal State Exception right
-> > +                * after ERET.
-> >                  */
-> >                 mask = PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
-> >                        PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT | PSR_V_BIT;
-> > @@ -2767,9 +2767,12 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
-> >                         mask |= BIT_ULL(32);    /* PSTATE.PM */
-> >
-> >                 spsr &= mask;
-> > -               spsr |= cpsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> > +
-> > +               mask = PSR_MODE_MASK | PSR_MODE32_BIT;
-> >                 if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> > -                       spsr |= cpsr & BIT_ULL(34);     /* PSTATE.EXLOCK */
-> > +                       mask |= BIT_ULL(34);    /* PSTATE.EXLOCK */
-> > +
-> > +               spsr |= *vcpu_cpsr(vcpu) & mask;
-> >                 spsr |= PSR_IL_BIT;
-> >         }
-> >
-> > Does that work for you?
+> Build the PSTATE by taking those fields from the SPSR while preserving
+> EL, SP, nRW and EXLOCK from the current PSTATE, then set IL.
 > 
-> Yes, that's cleaner, thanks. The two-mask form (take from SPSR, then
-> preserve from PSTATE) reads better than my interleaved version.
-> 
-> Would you like me to send a v2 (which would be identical to the above?
-> :) ), or would you fold it in?
+> [...]
 
-I've squashed that in.
+Applied to fixes, thanks!
 
-Thanks,
+[1/1] KVM: arm64: nv: Fix PSTATE construction on illegal exception return
+      commit: 0e8e955b9bcf84a70f20079390e19971fec1586d
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
