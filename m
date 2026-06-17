@@ -1,190 +1,162 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742BA405C30
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 13:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C5D405C30
+	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 13:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781703077; cv=none; b=AXrRAMYk+GzheYgneIRnT3OFJhFJUy8W05BlffFlDJbmHa3SCQDbT2Ir3gsfQr0bdoxbuySTpucG1WtMTCvdkSBi4opyNh3OADDyK+4W2fnr7ErX9TjXPFofvmC2i51OotEDD/VelgxGrXp8kzy00JUOCdk+4pGSgOpzRLg2rt8=
+	t=1781703087; cv=none; b=XEcN/LsLPlauxas/FqwbL2qltDCCVhJalvm04/nA0ECGerM2lhbKSWXcBO9ui6g4MVIpibEJw+f3ftqZsQzFnFuB0zGkHiFd1NMlcriK4stxXHO3I1BTWS5ZHjCbrTIdJyKJCrZizW1B0Qqnp4u+DWes8h+cR7nMWf2IhETdf+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781703077; c=relaxed/simple;
-	bh=4RSlRR4DXqslGaZVePecG7K3a4FqJN78zhQmH65ub2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=GQB2IUk/zwGWGAXETAgGM8nuzrEK6jGaPkn0QtEOpX+8krV51hL+LVRb4Qlz5FU5J+JXJ9jxmJ4xULmYM7+m5Pthdn49C6w4zDsoVj6cbYiNupU40R0z76DdE1h91D4uY/zbrAief1HAESCMdwbfjxlzFG0kHskz/pV67G6boLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sGTh0csT; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1781703087; c=relaxed/simple;
+	bh=xQCt05CjB7ek5aUtSrtBSmFmtLmzXUwvTuLLQdFVE0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NT004ug9KX3xY4e7l2YsDMnEDduK4Mj2cgWj/xYWfFBeOdlqPnSCbn5YCTKIbxLrjnDMnxrqC5O2HsXLZWNUKJKVef81B51K8/GzA8k2ZvFrk9h7WgQa3m0zJk2eFlCE40Ut76pWN5yTAju+ZwrPg/mG9ehMMzft2E0QT3vkexo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=haIPCAWM; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sGTh0csT"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01DD74794;
-	Wed, 17 Jun 2026 06:31:10 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (devkitleo.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB84E3F915;
-	Wed, 17 Jun 2026 06:31:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781703074; bh=4RSlRR4DXqslGaZVePecG7K3a4FqJN78zhQmH65ub2g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sGTh0csTMy0CkaiPUeHWvso+LfAj3NpbVtQ2lLyO9hP0VI/Wi2tI7I4kRz1Ihm7xK
-	 aV6AZZ/awpKaNB/WA6+gKeNjScGaT8Va9g/svgQkPcMQDsfzF+sk/CYHL8trZuWL+O
-	 KmaXeAAkYvluKuOqI5dBqatwHg5GJUYLBWNTCFcU=
-From: Leonardo Bras <leo.bras@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-Date: Wed, 17 Jun 2026 14:30:57 +0100
-Message-ID: <aiqCPDKcb1oA5EgM@devkitleo>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260610203043.25A771F00893@smtp.kernel.org>
-References: <20260610202112.2695205-3-leo.bras@arm.com> <20260610203043.25A771F00893@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="haIPCAWM"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6954810cfefso1427900a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 06:31:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781703085; x=1782307885; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JehmYEYTvH3+KOoQ+zQz5tmrxZTR4p7Nh8L3WHEpuvc=;
+        b=haIPCAWM+pAQDXVQLN5/DL+byZS1RBdrWKvuP1UlnhXW/3UWrYt8k1Sj02sApSSJh/
+         PA6SHj0Wzds4WfDPeflb8Ct+t1DnLoB+mTJGWWYPKuFkv38+IPaeTgm/hZ6p7EnOCPmx
+         ZaUKb/+SlduHA+e2zf6S6pcfuPci1P5Mgr7wvi2WtrJ8HSh2j9AAwFx1Qvczxs/33Y1N
+         M8OrhleCt9M35xR+8aE6Njf9fGcRhu9bk/JXrXOOOlKxlFC7kfFQ7UaL3opkz+OSGgYk
+         gCYDmGnMX2aCoyeaO5VLD41zVofxM1vZ3CC4RpD0ZLyPg/sNKwYb2O/ZKjwW6GuiiNJc
+         pSQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781703085; x=1782307885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JehmYEYTvH3+KOoQ+zQz5tmrxZTR4p7Nh8L3WHEpuvc=;
+        b=FB31NH2W+lI00KOyJ/5f4Ju+NdFDLnDeGnliTRyz99BZsICkU7PV1u2/KDwjKCGiO3
+         wOHEjekfNUlVetFlxsMk4dkTABgsK1HTZUOJ5DMmmBP5qSn8nJIaQrI7pg8bPPYtOcXj
+         vGd03Q3y0vJQP2pyksItDlRxF4ad0pz2N+o2CzIbSfmjsPYn81XxI3d+00mYxs/vQ/yO
+         8CPeFgm4fph+g/jvi/JW3UWUEdkSBat/tDaBrz2GwzWhECa42SKg9z5AdBUP5wpLnHjd
+         FoYbWUBOi2Fc3Am5lgOAm1koMTx0/3Mh6kb7bvQssFX7N6W3pqPfBicPPNtyPNvmy9Ct
+         q6Pg==
+X-Forwarded-Encrypted: i=1; AFNElJ+rm8OPJKa4Xu9Yli/qgr93LgWnAZMaW1i0qHocCN2UDBJCHogCUdsVLQVXEC/2WF1ML2UaMeI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzqCNIyPyBwbgKGODpxc/O60SyPPpc0CB44oR1eV43z583tFz4W
+	zCgKuPC2fF2hM+Jg/Uxfda/VfW0bnUkXe8ckcdaypwW+TjQeVpouXTPVWJ3/4F/eDQ==
+X-Gm-Gg: AfdE7cmlbc4MwZDUn04nvbDjoYs7Szif4oCZgN3ZBu4Zwr9ZsPRKTI/TeiE/3wb5rTj
+	fN39/C/+jBHHI65tkhsi8dGnia4X9NBnWDTF5NJ5YiyaIYhWxva9TLQBwtXNnKp9NwS1m6WQJxh
+	FEwWtS2I4mBDrqVWI8h9hOSO16G4QzimUFy8KAvZ1397B72FeoRjin8rGXlJZgARJzwJypHQ0ua
+	nbDbhpfvr/jXgO6nXYspQKqJasEE8+h0mnbJxyRZCD+j1SSTCJydyP1BPnW5hP9cvtRcPo5XH2e
+	gNN5Kjtx4KoF2vkbuS98hL4fPaCiCspVcNSnSw1NEXR0jPnFG7pO3vdLXbLNJ/w6MrBr+GaxsKI
+	lREul2vhzWfc0qCp5FtWu8nMhTMgsu3tTAfV6wK9+Bl2K8EvjGCf1+ClRc5DEKVi46Dy1hxFFGh
+	lrvBTy8OWY3/beYja5+hh4k8BSzifREBrypBffRTps5ZyiKGIFv6t0REKTTO4IMo+Z1nQ=
+X-Received: by 2002:a05:6402:848:b0:68f:cca5:d9e7 with SMTP id 4fb4d7f45d1cf-69547463699mr2153169a12.27.1781703083904;
+        Wed, 17 Jun 2026 06:31:23 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6937938a145sm6879295a12.15.2026.06.17.06.31.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2026 06:31:23 -0700 (PDT)
+Date: Wed, 17 Jun 2026 14:31:19 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Add missing hyp_enter when trapping sysreg
+Message-ID: <ajKhp-R01iaEL8XX@google.com>
+References: <20260617095238.1530121-1-vdonnefort@google.com>
+ <CA+EHjTz2Hc-mCA4Q0ayw0KV6KJ9_-qN5oPahVqMeKKUs93xtZQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+EHjTz2Hc-mCA4Q0ayw0KV6KJ9_-qN5oPahVqMeKKUs93xtZQ@mail.gmail.com>
 
-On Wed, Jun 10, 2026 at 08:30:42PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> - [Medium] Combining skip flags causes the walker to ignore the more restrictive skip levels due to fls() usage.
-> - [Medium] Skipping a page table level bypasses the KVM_PGTABLE_WALK_TABLE_POST callback, breaking PRE/POST callback symmetry.
-> - [Low] The skip logic cannot prevent the root level from being visited, making SKIP_LEVEL0 ineffective when start_level == 0.
-> --
+On Wed, Jun 17, 2026 at 11:28:11AM +0100, Fuad Tabba wrote:
+> On Wed, 17 Jun 2026 at 10:55, Vincent Donnefort <vdonnefort@google.com> wrote:
+> >
+> > Add a missing hypervisor event call for hyp_enter on sysreg trapping,
+> > causing an unbalanced hyp_enter/hyp_exit.
+> >
+> > The enum hyp_enter_exit_reason is not ABI, so we can keep the ERET
+> > reasons at the end for clarity.
+> >
+> > Fixes: 696dfec22b8e ("KVM: arm64: Add hyp_enter/hyp_exit events to nVHE/pKVM hyp")
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> commit 4e6415e54e22d985a0c97622b8e8b28b4c84b54b
-> Author: Leonardo Bras <leo.bras@arm.com>
+> One thing that caught my eye (as Sashiko would say: pre-existing, not
+> introduced here), __hyp_enter_exit_reason_str() relies on positional
+> correspondence between strs[] and enum hyp_enter_exit_reason, with no
+> compile-time check. Inserting a new value in the middle of the enum
+> (as you do here) silently shifts all the strings after it if the table
+> isn't updated in lockstep.
 > 
-> KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-> 
-> Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
-> when walking the pagetables.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 91a7dfad66866..48d88a290a538 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> 
-> [ ... ]
-> 
-> > @@ -144,6 +144,19 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
-> >  	return !r;
-> >  }
-> >  
-> > +static __always_inline bool kvm_pgtable_skip_level(s8 level, enum kvm_pgtable_walk_flags flags)
-> > +{
-> > +	flags &= KVM_PGTABLE_WALK_SKIP_LEVELS;
-> > +
-> > +	if (likely(!flags))
-> > +		return false;
-> > +
-> > +	if (level >= (fls(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
-> 
-> [Severity: Medium]
-> Will this evaluate to the highest level if multiple skip flags are ORed
-> together?
-> 
-> If a caller combines flags like KVM_PGTABLE_WALK_SKIP_LEVEL1 and
-> KVM_PGTABLE_WALK_SKIP_LEVEL2, fls() will select the highest set bit. This
-> means the threshold evaluates to level 2, effectively ignoring the more
-> restrictive SKIP_LEVEL1 flag and incorrectly descending into levels the
-> caller requested to skip.
-> 
-> Should kvm_pgtable_skip_level() use ffs() instead of fls() to select the
-> lowest requested level as the definitive stopping point?
-> 
+> A BUILD_BUG_ON(ARRAY_SIZE(strs)...) would at least catch size
+> mismatches; catching ordering bugs is harder without per-entry
+> initialisers like [HYP_REASON_SYS] = "sys".
 
-Correct. We should have s/fls/ffs/ in that line, so:
-+   if (level >= (ffs(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
-
-That will select the lowest level, instead of the highest.
-
-Since the tests were done only with a single skiplevel selected, ffs and 
-fls return the same bit, so performance results should not be affected. 
-
-> > +		return true;
-> > +
-> > +	return false;
-> > +}
-> 
-> [ ... ]
-> 
-> > @@ -192,7 +205,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> >  	if (!kvm_pgtable_walk_continue(data->walker, ret))
-> >  		goto out;
-> >  
-> > -	if (!table) {
-> > +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
-> 
-> [Severity: Medium]
-> Does skipping the level here bypass the KVM_PGTABLE_WALK_TABLE_POST callback?
-> 
-> If the current entry is a table, the KVM_PGTABLE_WALK_TABLE_PRE callback is
-> executed earlier in __kvm_pgtable_visit(). If kvm_pgtable_skip_level() then
-> evaluates to true, the code executes an early exit via goto out.
-> 
-> This completely bypasses the KVM_PGTABLE_WALK_TABLE_POST callback at the
-> end of the function, leaving the TABLE_PRE call unbalanced. If a walker
-> relies on symmetric PRE and POST callbacks to clean up resources or track
-> traversal depth, could this asymmetric execution flow lead to resource leaks
-> or state inconsistency?
-
-Correct. PRE and POST are called only on table entries, and in the case 
-skip levels is enabled it will completelly skip that post, which is 
-undesired.
-
-To fix that, I propose the following:
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -209,24 +209,24 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-        childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
-        ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
-        if (!kvm_pgtable_walk_continue(data->walker, ret))
-                goto out;
-
--       if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
-+out:
-+       if (table && ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
-                ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
-
--out:
----
-
-I suppose the extra test will be optimized well by the compiler, and we 
-should see not much difference in performance.
-
-Only other alternative I can see would be to add an extra label, and a copy 
-of the increasing data->addr.
+Both are declared in a different file. You're correct this would be less error
+prone to define [ XXX ] = "xxx". Perhaps I should convert that later.
 
 > 
-> [Severity: Low]
-> Does checking level + 1 prevent the root level from being skipped?
+> Something for a future patch, for now:
 > 
-> The walker unconditionally calls __kvm_pgtable_visit() for entries at the
-> root page table (start_level). Because the skip evaluation checks level + 1,
-> it only governs whether the walker descends into the children of the current
-> level.
-> 
-> If start_level == 0 and the walker requests SKIP_LEVEL0, won't the walker
-> still visit level 0 and invoke its callbacks, making SKIP_LEVEL0 functionally
-> identical to SKIP_LEVEL1 in this case?
-
-Correct. But I don't see the usefulness of this being different.
-SKIP_LEVEL0 is supposed to be useful if the root level is -1.
-What would be a use case of having a flag to skip the root level? Why would 
-the pagetable walk be called, then?
-
-
-> 
-> >  		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
-> >  		data->addr += kvm_granule_size(level);
-> >  		goto out;
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260610202112.2695205-2-leo.bras@arm.com?part=1
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
 
 Thanks!
-Leo
 
+> 
+> Cheers,
+> /fuad
+> 
+> 
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
+> > index 743c49bd878f..5f6e6789d121 100644
+> > --- a/arch/arm64/include/asm/kvm_hypevents.h
+> > +++ b/arch/arm64/include/asm/kvm_hypevents.h
+> > @@ -12,6 +12,7 @@
+> >  enum hyp_enter_exit_reason {
+> >         HYP_REASON_SMC,
+> >         HYP_REASON_HVC,
+> > +       HYP_REASON_SYS,
+> >         HYP_REASON_PSCI,
+> >         HYP_REASON_HOST_ABORT,
+> >         HYP_REASON_GUEST_EXIT,
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > index 06db299c37a8..45a4abb9619d 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -913,6 +913,7 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
+> >                 handle_host_mem_abort(host_ctxt);
+> >                 break;
+> >         case ESR_ELx_EC_SYS64:
+> > +               trace_hyp_enter(host_ctxt, HYP_REASON_SYS);
+> >                 if (handle_host_mte(esr))
+> >                         break;
+> >                 fallthrough;
+> > diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> > index c4b3ee552131..c84434e2349a 100644
+> > --- a/arch/arm64/kvm/hyp_trace.c
+> > +++ b/arch/arm64/kvm/hyp_trace.c
+> > @@ -398,6 +398,7 @@ static const char *__hyp_enter_exit_reason_str(u8 reason)
+> >         static const char strs[][12] = {
+> >                 "smc",
+> >                 "hvc",
+> > +               "sys",
+> >                 "psci",
+> >                 "host_abort",
+> >                 "guest_exit",
+> >
+> > base-commit: 8cd9520d35a6c38db6567e97dd93b1f11f185dc6
+> > --
+> > 2.54.0.1136.gdb2ca164c4-goog
+> >
