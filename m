@@ -1,89 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633963ACF1F;
-	Wed, 17 Jun 2026 12:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6653546CC;
+	Wed, 17 Jun 2026 13:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781700083; cv=none; b=ue0S700NLhBxmUycCczLLltyF1FYExC65UJzenGMfYXQW/B/t5acOP8QAZcYzWdePqDp+8Mzu+Wv71xtBl469BGeBXGcP1OdN4AGsDDti/+bgGmWhUCLbXnbtE8QBppExl3bQSoAeBIIJEfE05FgNTFK7pdCYR64JLELXiHcd9A=
+	t=1781701651; cv=none; b=PULDLOicdgh8rUXwofqpvIpurJenLrK8TGGmH+J157oqupsw564fOdUYCrCevAEtJiOtvl/1lntft/do5a7pr6WIlNjhsGrQe5RcuP/og3/ktHRYBjppIMrj0EYFXFuWkGA6HSVugMFBn6yWKO1LtUnuLRPHxdS3YpGleiwiNrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781700083; c=relaxed/simple;
-	bh=8rlTMnRIsQrEMU9tPMeSADAwXn5em6v1J4AAIfmNCMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qF7Zra4+kkbLDZsriKmW7ca2oYvSwZVisnc6kWueLJGfuCcgDV2EEW6qUwXoPp2aXn6cuJAPS/Az3jYjKAAATJOi1TZyZQ3Zu7b0ASPKz+Xt9WQ/nnaQXT5ufjU+XMWtdg78xoUoPrMhveJ2P5LPDKiVpP9Kw9IOLLRSvkUN/0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8rdqYQD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781701651; c=relaxed/simple;
+	bh=E26IkxFD9DfbeE5HELV5viO8jxbqYwieFPA/wXGFiOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kqg+xySEvxnmhvXHiJBNhGJ2Twwg5qlW6bfg2wYjHYl5R0AUpOHP1l21QcxM/5Ljng4ijcogqr/smYAPJkqABWeo4IHPG5LKdxuHSVi7qE9ylt6N0zKT16OX0QM0Xr3NN/ycjR80ALc5CMf6uo1mp9hLui8vc9IS3RkuBqW86YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RGa5Wtgf; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8rdqYQD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E70BA1F000E9;
-	Wed, 17 Jun 2026 12:41:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781700082;
-	bh=gI37bWtHllnRBBGUGfmHhE8TRqLaBhOaYW5Wb4FZGRk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=j8rdqYQDS88hkg06mnXbShq1Rfj1pe5laKALF1IEXFrMRrAoohE6tfs0dNaF1MSQH
-	 Pi4/uOnztAEsakVFzU+SABfHKM72558O7ZdlWYXgNTBSAgR8gSCXRs5W34ejOnAKtS
-	 xJIqfh6RuORXLPMCVPSFHToRRCya/t9Y2QjDFFzlP5oiPkfFyw8TSQxc429iHo0nap
-	 GTCPlZsKZ30mvereXHWM71MXVt7lzP0d554DLGacHgWcBhkbEi4jl1FvjOxCPuvdl3
-	 B5St1R136wB36X7TJ2wpNU0pprZxjinz70Z6N4WiHcwJKsOzaurTB8SzhQMuOCYzEO
-	 g6PaJ+ADARYfQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wZpa4-0000000DgLp-09VF;
-	Wed, 17 Jun 2026 12:41:20 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
-Date: Wed, 17 Jun 2026 13:41:17 +0100
-Message-ID: <178170006643.3087598.16279897743346268565.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260612113414.1022901-1-tabba@google.com>
-References: <20260612113414.1022901-1-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RGa5Wtgf"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 866FB4794;
+	Wed, 17 Jun 2026 06:07:24 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 334053F915;
+	Wed, 17 Jun 2026 06:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1781701649; bh=E26IkxFD9DfbeE5HELV5viO8jxbqYwieFPA/wXGFiOk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RGa5WtgfTIcNohI2nWzVaLeb9z0fDYlZavwWA6cstCz+iuQH3omNhHjBrnGzgLkDs
+	 erOucRvsbB2GfMtjEqzWGRB+V3lubViVic/PXKqDjHIsGyWQUhjAgsvWwdV2lrVxRU
+	 FNOiW6JDGjFbFaXSPcdLA2JMH6iMeHh7WcLs4AQA=
+Date: Wed, 17 Jun 2026 14:07:25 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: sashiko-reviews@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only
+ memslots
+Message-ID: <ajKcDRqT5m069PXK@raptor>
+References: <20260615155244.183044-1-alexandru.elisei@arm.com>
+ <20260615160901.9A1A61F000E9@smtp.kernel.org>
+ <ajA6ogaNiI3KDv5i@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com, drjones@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <ajA6ogaNiI3KDv5i@google.com>
 
-On Fri, 12 Jun 2026 12:34:14 +0100, Fuad Tabba wrote:
-> When pKVM injects a synchronous exception into a protected guest, it
-> re-enters without restoring the guest's EL1 sysregs and writes the EL1
-> exception registers to hardware by hand: ESR_EL1 and ELR_EL1, but not
-> SPSR_EL1. enter_exception64() sets SPSR_EL1 (the interrupted PSTATE)
-> only in memory, so the guest's handler reads a stale SPSR_EL1 and
-> restores the wrong PSTATE on eret.
+Hi Sean,
+
+Thanks for the reply. Just to make sure, once the bugs have been iron out,
+you're ok with this idea?
+
+On Mon, Jun 15, 2026 at 10:47:14AM -0700, Sean Christopherson wrote:
+> On Mon, Jun 15, 2026, sashiko-bot@kernel.org wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > [ ... ]
+> > > @@ -592,6 +592,10 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+> > >  			unsigned long hva_start, hva_end;
+> > >  
+> > >  			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+> > > +
+> > > +			if (kvm_slot_has_gmem(slot) && kvm_memslot_is_gmem_only(slot))
+> > > +				continue;
+> > > +
+> > 
+> > [Severity: Critical]
+> > Does this change inadvertently introduce a regression in the pfncache retry
+> > protocol?
+> > 
+> > Looking at the pfncache framework, it maps guest memory into kernel space and
+> > explicitly drops the page reference after mapping it:
+> > 
+> > virt/kvm/pfncache.c:hva_to_pfn_retry() {
+> >     ...
+> >     kvm_release_page_clean(page);
+> >     ...
+> > }
+> > 
+> > It appears to rely entirely on KVM's MMU notifiers (kvm->mmu_invalidate_seq)
+> > to invalidate the cache when the page is unmapped by the host.
+> > 
+> > If a VMM defines a guest_memfd-backed memslot with KVM_MEMSLOT_GMEM_ONLY
+> > but still provides a valid anonymous user mapping as its userspace_addr,
+> > could this regression lead to a use-after-free?
 > 
-> [...]
+> Sadly, yes.  To land this, we would need to first teach the gfn_to_pfn_cache code
+> to be able to pull directly from guest_memfd.  I forget if anyone is working on
+> that.
 
-Applied to fixes, thanks!
+I've been trying to wrap my head around this, and I just can't seem to
+figure it out.
 
-[1/1] KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
-      commit: ec40342aaca8162bc8ab2607076535ebab1838b8
+kvm_mmu_notifier_invalidate_range_start(), before handle_hva_range(), calls
+gfn_to_pfn_cache_invalidate_start() for the MMU notifier range, and that
+marks all caches that overlap the range as invalid. kvm_gpc_check() returns
+false for an invalid cache, so how can the memory still be accessed via the
+pfncache?
 
-Cheers,
+> 
+> > By unmapping the anonymous memory, the host would trigger MMU notifiers, but
+> > this new check skips the memslot. As a result, kvm->mmu_invalidate_seq
+> > wouldn't increment, and KVM might retain a kernel mapping to a freed physical
+> > page.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+kvm->mmu_invalidate_seq is incremented in kvm_mmu_invalidate_end(), I don't see
+how that is affected by skipping a memslot in handle_hva_range().
 
+> > 
+> > Could this allow the guest to read or write arbitrary host physical memory?
 
+The KVM_MEMSLOT_GMEM_ONLY flag is set if the backing guest_memfd has been
+created with GUEST_MEMFD_FLAG_MMAP. The documentation for the flag says
+that '[..] the fault will always be consumed from guest_memfd, regardless
+of whether it is a shared or private fault'.  As far as I can tell, this
+means that, absent a fallocate(FALLOC_FL_PUNCH_HOLE) call, the page is
+still in the page cache for the guest_memfd file after userspace has
+unmapped it, so the guest will not be accessing a freed page.
+
+Thoughts? Am I missing something obvious?
+
+Thanks,
+Alex
+
+> > 
+> > >  			hva_start = max_t(unsigned long, range->start, slot->userspace_addr);
+> > >  			hva_end = min_t(unsigned long, range->end,
+> > >  					slot->userspace_addr + (slot->npages << PAGE_SHIFT));
+> > 
+> > -- 
+> > Sashiko AI review · https://sashiko.dev/#/patchset/20260615155244.183044-1-alexandru.elisei@arm.com?part=1
