@@ -1,95 +1,92 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BBD23D7C2
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 13:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CDD3EFFB8
+	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 13:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781701961; cv=none; b=ZCBFGicKnUwMVTqGN1cFtgx/8rz9fzR/75CC8bk/ucmHtTVBciS+XcxzKLmcdov31DMBll7Gwih4metWpS+TK+bBzRC5YlDXBwmvtuNAavVK0ISD7bZFy/5d8aSUpuC+8hROdfA0lHNtuldcXqbXcqhL2u4b5n7OU5rWuiRBls0=
+	t=1781702633; cv=none; b=atNpNXV5+6SUziiO3INVdd0il6COuqtZnWreMvTJTDLv3NWQXTHsQjgpMOQ6t0TMPGlYLzfK8cZ72ZnIT3811s5DdIkwaTe4F0LczrTTUUgctIP7f2Z1Btnh0ynFS3zzxyzhDCWWn936VP4tclYxAVZnJW/2tOLPJECaFOWsKX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781701961; c=relaxed/simple;
-	bh=eg7H94VTr9ptGOsBnrR/DzymoHjiT5DB4lHq2xmOgRg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QiK2wUT9p+OFbhuX/rCMtp7ZjfrKIrlNXd+G6mPbcH0fipGddNjUWHb5fzKLdmaD8xdJL1lff7U4mJdgmJkl8YTjhZE1Mm5kb/MiI+KJYGZcBolC/7wqHuyifdJrwBzpObEuUAObzS8v6DN9XC+5iJCiucqbC660YyYJZj+z36o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=duRFtXRV; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1781702633; c=relaxed/simple;
+	bh=af+vwUJx5/nKf7spNaPaxuPmMl8dQF1xTaTv0lMenRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uNwk6/zgHVfCCOQ+gKK4ypWHiRkQ9pl0F9PM+ICKVpzIe6u7mksCfXySM/AU7LrHLhC2vf6ZIuEIeiRNBEH9ubsKzVwjSSzVT1U5YeR+dHyLA47BwM2O2SyKeEGdnLk3t88x9uQbaEshiQwgH11Isj9LUmmPjVnJX2buw/AfzLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=e0RKjS5e; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="duRFtXRV"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490b0682d2fso53389655e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 06:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781701958; x=1782306758; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qjkZjhMKdgVqRMkCoanmUdUt3sYnMDgOICyf5NDOycQ=;
-        b=duRFtXRVf6B8Gd8rfZxzfzs6Cr2ehrvar4pZu6JOST2BYgI6f/dzDd1Taxvq7kioUl
-         9zDBkKAN/qzMJP+59f7SF7KfM+oL+QM6KYtJ05QdIcPmaKb5RlxKzTS0bSOZqRxusJR4
-         6ScA0fDf2RUKDu5/2UzQ3iqk3ruT1bbjM6yB5grhCNotXUItjUJfmEj6a9KjDtTaadC/
-         PJU7mhPm9CDu1cIt7KX6tCLdkz6Z5PHeCqlgweRfMPj3fWiV4WvGhy9MsavvtcD7paEg
-         TMhKxItbgGFzhVF8JxaFuAmokIGCrMh2plCM3wM2N2eGgqXIZAaS9gtwhlLzjLmJILfr
-         jBQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781701958; x=1782306758;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qjkZjhMKdgVqRMkCoanmUdUt3sYnMDgOICyf5NDOycQ=;
-        b=nC1999/paWAtLdyFQd2uiTYaqGqhOl1PGnFP+XkNxuNjpZDPohNRWA0UOIYIVk1tDU
-         +2+TFh0Kb8lD9m5fdGwyQyBNy8fDTgdZJoxufCawiIGBMDoLJJ6s/+woG3YJRvP9NQza
-         5SVY2zNMNrjxylmWDJfJwKmXl2Rcqmz2/1C5WG2g3dgHp1gIUkdACLZe0tCTKGbuFavJ
-         yc9v5MAqGavdtx1uUW7EwS4Smu9W3O5taE5xl2VrMqrfxViVUR0ii5cVPgS+yHFQMt0V
-         PqDTUNLVD9HDCL3v6Kzj6b1AplHXsK59cr+rmBjzCHCdjWyWpk/KZ3+v123MD9FYNuOm
-         u8eg==
-X-Forwarded-Encrypted: i=1; AFNElJ8UY8FHni+8M3aDigllzlpRGcUQW8c68jlbDEika8QuHU9bUm3ubXw6EQqadT3ukd0f8MQf4jQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw39KSNgY4qLUSsXVjl0TDaq0bklsCKJKFza32pZ51uaJgZDwhP
-	9RR9U2rPVFuOPyUDUHtio5M50bMu6yArL17Z+IPTItHqf2lYrhc4/EzAiAXjsP1hvrhWm4O61k8
-	4Cw==
-X-Received: from wmsk20-n2.prod.google.com ([2002:a05:600d:8494:20b0:490:b475:af3a])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:19c8:b0:48f:d1b8:9ab1
- with SMTP id 5b1f17b1804b1-492333aa56fmr66371605e9.9.1781701957711; Wed, 17
- Jun 2026 06:12:37 -0700 (PDT)
-Date: Wed, 17 Jun 2026 14:12:36 +0100
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="e0RKjS5e"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C1AAA4794;
+	Wed, 17 Jun 2026 06:23:46 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B94FC3F915;
+	Wed, 17 Jun 2026 06:23:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1781702631; bh=af+vwUJx5/nKf7spNaPaxuPmMl8dQF1xTaTv0lMenRU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e0RKjS5efaGFzQSLQqFTgt0U5xjfYBjoUrrXTUdKz6sBI4aYwgx3Fol7GuTwU+tfd
+	 oCi0OKgiG72jmzixU3bWCpjqsXpVpJ6SafCaxjol828e3Pz4YLDg4xopW/Ccxg0uuP
+	 UyLI8cC1NQLB4JBHqj+zCFh6ST0x8KMP2l2S/swA=
+Date: Wed, 17 Jun 2026 14:23:47 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: David Hildenbrand <david.hildenbrand@arm.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	seanjc@google.com, mark.rutland@arm.com
+Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only
+ memslots
+Message-ID: <ajKf41Fgy_jKBAMI@raptor>
+References: <20260615155244.183044-1-alexandru.elisei@arm.com>
+ <42323088-c06e-42e2-b095-136062a8d27c@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260617131237.2842619-1-tabba@google.com>
-Subject: [PATCH] KVM: arm64: Add Fuad Tabba as a reviewer
-From: Fuad Tabba <tabba@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42323088-c06e-42e2-b095-136062a8d27c@arm.com>
 
-I have been working on KVM/arm64 for a couple of years, mostly on
-pKVM, and am currently upstreaming protected guest support, with more
-to come later. I already review KVM/arm64 patches more broadly, and
-am happy to continue doing so in an official capacity.
+Hi David,
 
-Add myself to the KVM/arm64 reviewer list.
+On Mon, Jun 15, 2026 at 09:07:50PM +0200, David Hildenbrand wrote:
+> On 6/15/26 17:52, Alexandru Elisei wrote:
+> > For guest_memfd-only memslots (kvm_memslot_is_gmem_only() is true), the
+> > memory provider for the virtual machine is the guest_memfd file, not the
+> > userspace mapping. Faults are resolved using the guest_memfd page cache,
+> > and the permissions for the secondary MMU mapping depends exclusively on
+> > the memslot (i.e, if the memslot is read-only). How userspace happens to
+> > have the memory mmaped at fault time, or even if the memory is mapped at
+> > all into userspace, is not taken into consideration.
+> > 
+> > guest_memfd memory is not evictable, is not movable and there's no backing
+> > storage. Once memory is allocated for an offset in guest_memfd file, the
+> > offset will not change, and that memory is not freed unless userspace
+> > explicitly punches a hole in the file. As a result, memory reclaim, page
+> > migration, page aging and dirty page tracking for the userspace mapping
+> > serve little purpose.
+> 
+> I don't think any of that is relevant for the patch at hand?
+> 
+> The thing is: invalidation (truncation, later migration, for any other reason)
+> is driven through guest_memfd notifications, not through unrelated page tables.
+> 
+> If we don't lookup pages for the KVM MMU through the page table, then there is
+> also no need for MMU notifiers. It's all guest_memfd only.
+> 
+> Or am I missing something?
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+My thinking was that, because guest_memfd is not evictable, there is no need to
+do page ageing, which would require that secondary MMU mappings be made old.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c3fe46d7c4bc..61eb5dc2bd03 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13991,6 +13991,7 @@ F:	virt/kvm/*
- KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
- M:	Marc Zyngier <maz@kernel.org>
- M:	Oliver Upton <oupton@kernel.org>
-+R:	Fuad Tabba <tabba@google.com>
- R:	Joey Gouly <joey.gouly@arm.com>
- R:	Suzuki K Poulose <suzuki.poulose@arm.com>
- R:	Zenghui Yu <yuzenghui@huawei.com>
--- 
-2.54.0.1136.gdb2ca164c4-goog
+The invalidate callbacks are also used when userspace memory is marked read-only
+for dirty state tracking. I was trying to explaing that, since there is no
+backing for the guest_memfd file, host doesn't need to keep track of dirty state
+for the memory, and ignoring the invalidate callbacks is correct for all cases.
 
+I can drop the paragraph entirely, if you think that would make the commit
+message clearer.
+
+Thanks,
+Alex
