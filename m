@@ -1,79 +1,43 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EE01F5437
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 17:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E4033F5B6;
+	Thu, 18 Jun 2026 19:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781802879; cv=none; b=LhCuc39flFz8l5mDmcCRTuGzw2cBym8Cxfub7QcFO7RXo1uA/w5LLgbjEijUud8IiFuco0Q0MlEVDQC9FojyP8aoEKa16Af1Iy4TCHNlp+zXXJvVQRHEAlAZKdq3cQrMGBIQ65RnG90bfnWWTaw4r006XMSkXCnWGt2f8c4RPd0=
+	t=1781809575; cv=none; b=YjMLqgHWzS0JOcxiwA5ywkJLQVjg7zzkYf3Ks7wE9pg6qMQHRW+PkvNCa9FPodq4mBjjr15m19cKSfWt3CYL0u2LwTVpYVzpyB6ZMTDUr/PTAdty59MB2gaKGMVjVVrxZE8HZ0t8aWv0oRZn4fYwhdYwZaQ9RTligTARjUNHdtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781802879; c=relaxed/simple;
-	bh=aLRhpNncKn9DUj8bxhQ/4BAqsypCWpBBw8Z5q0jDYdc=;
+	s=arc-20240116; t=1781809575; c=relaxed/simple;
+	bh=1Tv0YmVhkx8ud0qt22F8mlihvisOlxy+ZlCpIP1c5vE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RG5m2TszsPXdwBpWnQgvKCFNAz5sWbRUTejg/wJfHOS+Oil6gJR6L/fHbwPWNXJrsg0/dIvzlYwyQtOCm4HAByHeA9VaIQx7V3lirGlOsskUUCn6uMv0iYTjbzFRQp+ZANfPvWRJsqfSfrXgZkIvcu+D0Gu6JwngrrTFDJvvf6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PyGP1pbG; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=ml92Wb4hae3YMHf0hkQe6w94XZkTgLxl9u82DfMdCKcclfxHeTK5e/x+809W09AaXKh6qIKe6zq4jzALaJES9R9Gcu+rjgSTZbAoNluTHOVQ6lExlm1UFcgC5xp1U1kv8BF0GiJvYclPq4IYqJ79QWnMgbDX8w+IaWBwNE43kC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJFYo1fH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PyGP1pbG"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-45fd464d51fso770643f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 10:14:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781802877; x=1782407677; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q37gll9uXRgmI+EFMA1NhDtwvLbIk280Pp5eRyLMrZs=;
-        b=PyGP1pbGT4xwZnS3Nf9JnKKZDLjSRPGADF6wsFhubMhnmdAChDHhgxOk2GPDQ40DM2
-         pvwSMpktQE1vs48t6eC6ytk6FBMkGsxZWupQrRVgrA4rGqPOxILNrBL5Y/CqoxaZp/AG
-         DClt1aTOtvxIGKDH1ZB2PWdvKAe7eyCzCrARWIjXsDMNAdToPY6QcsPq+B9bQqs6/tjv
-         n+NgyX5MOi2Kqr6gKv8jxiD6vP5tgrs4im8FF6O7sU+uceUs+dSP3V1uYXChefyXT7CZ
-         oP8yTLYWBhx1nVZXHqRnQXz4PUXbOywL3kkX21YwBnpst+vWCf9PAvB9Jt/MWm0sVBzB
-         e+hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781802877; x=1782407677;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q37gll9uXRgmI+EFMA1NhDtwvLbIk280Pp5eRyLMrZs=;
-        b=owD9wVOUNRPfo3lO7ldRIXFBNL0c/My20Jk6uwEFV6pOMjwc3xUyZc4d3ubWXs/BGN
-         53zby9aifdYLA9qFM4sb0JpuGGrh/cRFxliZmtt++j0IMFSRYZ2fn0p8oGw6/QL/MDgg
-         3mkRwh5rLV90Mhy4+19/tQrf5f8+xLJb2INW23nfNVKVMz1vQQo/pqrLRTOU4nID92WJ
-         y4gaqkMnxuA9WkU0mPM27M8yDMjdvj+ehjRR3iFn1WLDs192L/5vaDH08PNbTHoDA2og
-         05DzyCATfQEMqlBfZ8BKGzEo8+6E1fb0R8798RNMI9jXt8wyahvCU0K5llXFH8wIAfEy
-         +dmg==
-X-Forwarded-Encrypted: i=1; AFNElJ/p8jg2EOxL/KqNo/BNNz3uWcmhPw1fZDTKAhv3AjYYLbf5dxVXG+DG0Z7M9Ml/yRCXwx+GviE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyPfE7HxGvjwDnSFXod7+fcAS+LNBm/gJoh8iBkGDZOsz5KtCR0
-	oxVril5mnueim4tiXGw4yqqYlnpslxI4OBFB8tV/Q4GOokb89X+gni7ZhCFrxZc7SQ==
-X-Gm-Gg: AfdE7cnASuH4xDE7XielkU+u8kze4zUjPlQvcRkUsNdvwwjgpCPT0LSQ9lD0sAMmTAp
-	Q+3E02FGba1EA8JJGxj4WQIh9qJDRiHa/DZAs4UvbQ/3i8IMpl1lTMwqcrBb06KmBJs58tokcnm
-	ir6IHLr3Zb48Ej4tfTgGLTEIEeaQGKiHdeUwaW47xWhn+gqRPQxcFY6t+Jx1hwDrXkeqX+uUaNF
-	5q8JPbnlwl/V81ygHjsLTifSoEasQhSkAzjfKW7YlB4Xyahual0759MmhWVObTUtwWvn1Prgg49
-	Pusa4W+0dp1df3Wpmy5q77Gy25ptkqm9qm+p4OjqKz1u5h64FIf6buI4AVWjqA6/HcdpjvD3yir
-	knTOalH0Zq5kaV+G7SNyGMAeAbAl+QMadLsoe0ucQIVYl3L0QAdxWj/A2JRcgqKNCNXZ0tJHrAe
-	45KJywI7MQU7HwGilFIyW9rUV6IPZjq5MQYi5RaYXsOQkxNktwa3pnRthY
-X-Received: by 2002:a05:6000:184b:b0:45e:fa38:c899 with SMTP id ffacd0b85a97d-46500a02b15mr590072f8f.4.1781802875940;
-        Thu, 18 Jun 2026 10:14:35 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46508a0546fsm418554f8f.2.2026.06.18.10.14.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 10:14:35 -0700 (PDT)
-Date: Thu, 18 Jun 2026 18:14:32 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, oupton@kernel.org, sudeep.holla@kernel.org,
-	will@kernel.org, jens.wiklander@linaro.org, joey.gouly@arm.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	maz@kernel.org, mrigendra.chaubey@gmail.com,
-	op-tee@lists.trustedfirmware.org, perlarsen@google.com,
-	seiden@linux.ibm.com, smostafa@google.com, sumit.garg@kernel.org,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	Sashiko AI <sashiko-bot@kernel.org>
-Subject: Re: [PATCH v7 7/7] KVM: arm64: Zero out the stack initialized data
- in the FFA handler
-Message-ID: <ajQneFTingGFdPSb@google.com>
-References: <20260617145130.3729015-1-sebastianene@google.com>
- <20260617145130.3729015-8-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJFYo1fH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C0601F000E9;
+	Thu, 18 Jun 2026 19:06:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781809573;
+	bh=wR6Mtq5nZ+5UapL5g8Gruh6bzm0GAsMPkKV4VGUnpD0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QJFYo1fHYvc3pXPSZSAyFDU4Z0SNbW8oFKZ8rnOuhLSFy9g3a3hdDVJ/DyK45vkU/
+	 o7sj9BqU7NRvNOIfnVx+H9IhJRHLBnrCTnoGe+MWP+++QpUbpxQ/NB+6eySUFtDWQP
+	 fXtMJCCjGqSYFIjJqcXXpVVTGolsmDvW3Pf961XCU1S0IYWcU0rsR5xFV++L+mNbad
+	 29wz1z0MgzqDfYbDN/ppBvt+4vcqPHX2uK6nilp6uRIhZ+nRyQMDEooNftiA7d6ejd
+	 vi4YMnbwPcLAeTtRHfk8uAzNTofi6LAi2y5dSiC4Jqb2MwQjeq0Yb2AFJHeW3kLZGa
+	 skCgxmdzudOGQ==
+Date: Thu, 18 Jun 2026 12:06:12 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+	jean-philippe.brucker@arm.com, andre.przywara@arm.com,
+	suzuki.poulose@arm.com, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH kvmtool v2 7/7] arm64: Improve KVM_ARM_VCPU_PMU_V3_CTRL
+ diagnostics
+Message-ID: <ajRBpMnlcNkhWzQL@kernel.org>
+References: <20260618155001.226266-1-alexandru.elisei@arm.com>
+ <20260618155001.226266-8-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -82,45 +46,130 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260617145130.3729015-8-sebastianene@google.com>
+In-Reply-To: <20260618155001.226266-8-alexandru.elisei@arm.com>
 
-On Wed, Jun 17, 2026 at 02:51:30PM +0000, Sebastian Ene wrote:
-> Don't leak hypervisor stack data when using the FFA_VERSION call.
-> When the compiler doesn't support -ftrivial-auto-var-init=zero option
-
-Even when it does, I believe this is an optional kernel option.
-
-> we need to zero out the stack initialized variable before returning data
-> to the host caller.
+On Thu, Jun 18, 2026 at 04:50:01PM +0100, Alexandru Elisei wrote:
+> kvmtool issues several ioctls when configuring the PMU, and each of them
+> can fail for different reasons. Be more specific about the ioctl that
+> failed when that happens.
 > 
-> Reported-by: Sashiko AI <sashiko-bot@kernel.org>
-
-It seems most people are using "Reported-by: Sashiko <sashiko-bot@kernel.org>"
-
-> Closes:
-> https://lore.kernel.org/all/20260616160016.C62C81F000E9@smtp.kernel.org/
-> Fixes: c9c012625e12 ("KVM: arm64: Trap FFA_VERSION host call in pKVM")
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arm64/pmu.c | 31 ++++++++++++++++++++++++-------
+>  1 file changed, 24 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index d7c5701d0584..b321682ead04 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -883,7 +883,7 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
+> diff --git a/arm64/pmu.c b/arm64/pmu.c
+> index 92cacd62479e..78c15f153fad 100644
+> --- a/arm64/pmu.c
+> +++ b/arm64/pmu.c
+> @@ -12,6 +12,24 @@
 >  
->  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>  #include "asm/pmu.h"
+>  
+> +static const char *pmu_attr_names[] = {
+> +	[KVM_ARM_VCPU_PMU_V3_IRQ]	= "KVM_ARM_VCPU_PMU_V3_IRQ",
+> +	[KVM_ARM_VCPU_PMU_V3_INIT]	= "KVM_ARM_VCPU_PMU_V3_INIT",
+> +	[KVM_ARM_VCPU_PMU_V3_FILTER]	= "KVM_ARM_VCPU_PMU_V3_FILTER",
+> +	[KVM_ARM_VCPU_PMU_V3_SET_PMU]	= "KVM_ARM_VCPU_PMU_V3_SET_PMU",
+> +	[KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS] = "KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTER",
+> +};
+> +
+> +static const char *pmu_get_attr_name(u64 attr)
+> +{
+> +	switch (attr) {
+> +	case KVM_ARM_VCPU_PMU_V3_IRQ ... KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS:
+> +		return pmu_attr_names[attr];
+> +	default:
+> +		return "UNKNOWN";
+> +	}
+> +}
+> +
+>  static bool pmu_has_attr(struct kvm_cpu *vcpu, u64 attr)
 >  {
-> -	struct arm_smccc_1_2_regs res;
-> +	struct arm_smccc_1_2_regs res = {0};
+>  	struct kvm_device_attr pmu_attr = {
+> @@ -32,13 +50,12 @@ static void set_pmu_attr(struct kvm_cpu *vcpu, void *addr, u64 attr)
+>  	};
+>  	int ret;
 >  
->  	/*
->  	 * There's no way we can tell what a non-standard SMC call might
-> -- 
-> 2.54.0.1136.gdb2ca164c4-goog
-> 
+> -	if (pmu_has_attr(vcpu, attr)) {
+> -		ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pmu_attr);
+> -		if (ret)
+> -			die_perror("PMU KVM_SET_DEVICE_ATTR");
+> -	} else {
+> -		die_perror("PMU KVM_HAS_DEVICE_ATTR");
+> -	}
+> +	if (!pmu_has_attr(vcpu, attr))
+> +		die_perror("KVM_HAS_DEVICE_ATTR(%s)", pmu_get_attr_name(attr));
+> +
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pmu_attr);
+> +	if (ret)
+> +		die_perror("KVM_SET_DEVICE_ATTR(%s)", pmu_get_attr_name(attr));
+>  }
+
+The whole if (ret) die_perror(...) thing is a bit repetetive IMO. A
+treewide cleanup replacing this with macros would be nice, then you could
+stringize the ioctl under the hood.
+
+diff --git a/arm64/pmu.c b/arm64/pmu.c
+index 5f31d6b..0d9f3df 100644
+--- a/arm64/pmu.c
++++ b/arm64/pmu.c
+@@ -23,23 +23,19 @@ static bool pmu_has_attr(struct kvm_cpu *vcpu, u64 attr)
+ 	return ret == 0;
+ }
+ 
+-static void set_pmu_attr(struct kvm_cpu *vcpu, void *addr, u64 attr)
+-{
+-	struct kvm_device_attr pmu_attr = {
+-		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
+-		.addr	= (u64)addr,
+-		.attr	= attr,
+-	};
+-	int ret;
+-
+-	if (pmu_has_attr(vcpu, attr)) {
+-		ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pmu_attr);
+-		if (ret)
+-			die_perror("PMU KVM_SET_DEVICE_ATTR");
+-	} else {
+-		die_perror("PMU KVM_HAS_DEVICE_ATTR");
+-	}
+-}
++#define kvm_set_device_attr(fd, _group, _attr, _addr)					\
++do {											\
++	struct kvm_device_attr __attr = {						\
++		.group	= (_group),							\
++		.attr	= (_attr),							\
++		.addr	= (u64)(_addr),							\
++	};										\
++	int r;										\
++											\
++	r = ioctl((fd), KVM_SET_DEVICE_ATTR, &__attr);					\
++	if (r)										\
++		die_perror("KVM_SET_DEVICE_ATTR(group:"#_group", attr:"#_attr")");	\
++} while (0)
+ 
+ #define SYS_EVENT_SOURCE	"/sys/bus/event_source/devices/"
+ /*
+@@ -218,14 +214,18 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 
+ 	for (i = 0; i < kvm->nrcpus; i++) {
+ 		vcpu = kvm->cpus[i];
+-		set_pmu_attr(vcpu, &irq, KVM_ARM_VCPU_PMU_V3_IRQ);
++		kvm_set_device_attr(vcpu->vcpu_fd, KVM_ARM_VCPU_PMU_V3_CTRL,
++				    KVM_ARM_VCPU_PMU_V3_IRQ, &irq);
+ 		/*
+ 		 * PMU IDs 0-5 are reserved; a positive value means a PMU was
+ 		 * found.
+ 		 */
+ 		if (pmu_id > 0)
+-			set_pmu_attr(vcpu, &pmu_id, KVM_ARM_VCPU_PMU_V3_SET_PMU);
+-		set_pmu_attr(vcpu, NULL, KVM_ARM_VCPU_PMU_V3_INIT);
++			kvm_set_device_attr(vcpu->vcpu_fd, KVM_ARM_VCPU_PMU_V3_CTRL,
++					    KVM_ARM_VCPU_PMU_V3_SET_PMU, &pmu_id);
++
++		kvm_set_device_attr(vcpu->vcpu_fd, KVM_ARM_VCPU_PMU_V3_CTRL,
++				    KVM_ARM_VCPU_PMU_V3_INIT, NULL);
+ 	}
+ 
+ 	_FDT(fdt_begin_node(fdt, "pmu"));
