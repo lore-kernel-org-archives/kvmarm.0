@@ -1,120 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3463C7E0E;
-	Thu, 18 Jun 2026 12:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E4835202A
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 13:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781786937; cv=none; b=MwYpSbdGKxiJgKQpPcEVBDQNBIqNO6utStcPuMjI4NJVK8ObfPCBoFKyxjTayR2CpChyXQ1AJate/gjP/TvLyvboW3+Itw6FlrC+MDG3Sh5ebbUtS5pKtcUIzRTPTTFK8LjDsEA9hoArIKyomxb7EQwbvi0IsQb+zWYFbkwcwmY=
+	t=1781788504; cv=none; b=K2sWuDFzl1gr/2++fLCr55Dw7c8oWkgViCVnr1ueY1YrplaPgkZ1TBy2crABKh0t5446TBtaI6M8d3yUc+IoByUUstcTenqwDnFbLnxS9hjjwF5Y2t8EKXQMgr8Etig/0HKPN1EBVHQDa0RcFGiIYBv7e/VhAUVqrximlrYyzGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781786937; c=relaxed/simple;
-	bh=WuGBWJ1pz0HXjJrT/ICME/CSZ1MVQLljr/J5RLx68N0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z1tWEjuWrviCMZXcdXyy8bxmFJHcEYUGjbe5ShsMZZ/QJCwv01qwkApKoUkT+QqLs29uAlZ2qqdiPxgEq4yXIsj37fQoHu9hftYKjWIWNPQ/IQj8u2dv/pD6xdyrS/0X5UG0J/SMlOnqexK6WpFYWozHlG4m1pvSqAQPnoXz1vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NoWOubQm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781788504; c=relaxed/simple;
+	bh=+MFJqEWiNc1lFUhDg3t/SDZGSkgQwClK8BWo6/415HU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EEYzYJOjwChrpaH8kKScnCKBDKa1tgPnsr/a9x2FMIfg5dmM8BFkLk4hnoQdPd+TfRJtufcp8ld4tW8ZULac3pX1lMklrovtWParEacXyPSmn0h8zTGXiiQ6G8gaO1Xu4cVnbQm9J0jGs1SuxqJJ5bwd2MLC36jORHJ1fptyVbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Y8mCIPFK; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NoWOubQm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 152CB1F000E9;
-	Thu, 18 Jun 2026 12:48:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781786936;
-	bh=5BQkpnOyL96ryYJZZE0QZ2WkuLeWhsXeeHfNGkh9M4M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=NoWOubQm6sYlgA1UG1pbE/PbyEWXuLt65njQnRlzSSx9eVrE2mtNaIiVnVcTeU7sI
-	 zqisyfqJb0JZsayvaCCmXW2OJ3URV0pqM8f0CvgEtEfM9q0wp6/h54RTgknLZeq4Vc
-	 IeCF7+xZ7XDrt6pOOiFYfmQZWVuCl0W37Y/Mg3UuUajtKHMi9wNDioZexe2WMLvpM/
-	 Yw5LpxLLZQBGiVWhANQyRIMNtmkoN6nj3n35dnuIC/TY2qOPnH1DvCI9rWRcDHOnzu
-	 qSYaT/5vhuRPb5dnGPf4F4dZDyITOIcPZ6OPht2ftewWLegX1Wy3pTDPLML30lgYdk
-	 tUmcpGbBgUfiA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1waCAw-0000000E13l-0Nyy;
-	Thu, 18 Jun 2026 12:48:54 +0000
-Date: Thu, 18 Jun 2026 13:48:53 +0100
-Message-ID: <86cxxorp3e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Fuad Tabba" <tabba@google.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Y8mCIPFK"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E61372936;
+	Thu, 18 Jun 2026 06:14:54 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DFDB63F915;
+	Thu, 18 Jun 2026 06:14:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1781788499; bh=+MFJqEWiNc1lFUhDg3t/SDZGSkgQwClK8BWo6/415HU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Y8mCIPFKpTbMfIzeaqZlLgR4QDYyVKzXlwNYS0WDNPtM2VioUZQJkCpmuCcurypd+
+	 92lOXcBAzfVTAwLPthEfJsg08EPF4/64//5xSkAGlDiFlXT5dCx+zkW8/QVIoIxLTD
+	 f4GbwBba8U2BoxVmvPj5kKi6MbRW6Pl2XyD07ggw=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>
-Subject: Re: [PATCH v2 4/7] KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
-In-Reply-To: <20260618122808.1369D1F000E9@smtp.kernel.org>
-References: <20260618121643.4105064-1-tabba@google.com>
-	<20260618121643.4105064-5-tabba@google.com>
-	<20260618122808.1369D1F000E9@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] Optimize S2 page splitting
+Date: Thu, 18 Jun 2026 14:14:41 +0100
+Message-ID: <20260618131447.764085-1-leo.bras@arm.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, tabba@google.com, kvmarm@lists.linux.dev, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4029; i=leo.bras@arm.com; h=from:subject; bh=+MFJqEWiNc1lFUhDg3t/SDZGSkgQwClK8BWo6/415HU=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLKM37Hd0Y1yqVLYKWjDw39am4W7MT3Dbla0r92H5rLF6 i8tiqZ0lLIwiHExyIopssg+mr+K5/uUjCNXfiyAmcPKBDKEgYtTACayqpbhf1HrPsOHn3XTLJ1k 6/i2vp88/af+1zlOVryPZ37cy/KhfQ0jw9eZWk7RL1dFpNVfVIzJUWruOsawM6ROU29Xj9+v6J3 v+AE=
+X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
+Content-Transfer-Encoding: 8bit
 
-On Thu, 18 Jun 2026 13:28:07 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] The constructed FPAC exception syndrome incorrectly maps the ERET ISS encoding directly to the FPAC ISS encoding, resulting in malformed ISS[2:0] bits being injected into the guest.
-> --
-> 
-> commit 27996a8004c4285e2d114067b3fc644f3f649d64
-> Author: Fuad Tabba <tabba@google.com>
-> KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
-> 
-> This commit sets the IL (Instruction Length) bit for the FPAC syndrome
-> constructed during nested ERET emulation. Since ERET and its authenticated
-> variants are always A64 32-bit instructions, the IL bit must be set to 1.
-> 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index dba7ced74ca5e..b74369e9ad7ff 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -2776,7 +2776,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> >  		 * ERET handling, and the guest will have a little surprise.
-> >  		 */
-> >  		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
-> > -			esr &= ESR_ELx_ERET_ISS_ERETA;
-> > +			esr &= (ESR_ELx_ERET_ISS_ERETA | ESR_ELx_IL);
-> 
-> [Severity: High]
-> This isn't a bug introduced by this patch, but does this mapping of the ERET
-> ISS to the FPAC ISS result in malformed ISS[2:0] bits being injected into
-> the guest?
-> 
-> For an ERET trap (EC=0x1A), ISS[0] indicates the key used (0 for ERETAA,
-> 1 for ERETAB). For an FPAC exception (EC=0x1C), ISS[0] is the Instruction
-> Type (must be 1 for a branch/return instruction), and ISS[2:1] indicates
-> the Authentication Key.
+While playing with dirty-bit tracking, I decided to take a look on how page
+splitting works. Found out all entries are walked, even though we can infer,
+for instance that:
+- If a level-3 entry is walked, it means the parent level-2 entry is split
+- If a split just succeeded in an table entry, it means all children nodes
+  are already split
 
-No. Not at all. ESR_ELx_EC_FPAC (0x1C) defines ISS[0] as BnA. Which
-matches the definition for ERET. On purpose. See ARM DDI 0487, version
-M.b, D24-8777.
+This patches' idea is to introduce new walking flags to skip pagetable
+levels 0-3.
 
->
-> By retaining the ERET ISS[0] bit and clearing the rest, it appears KVM
-> inadvertently maps the ERET key type directly into the FPAC Instruction
-> Type bit, while leaving the FPAC key type (ISS[2:1]) always at 00.
-> 
-> Consequently, wouldn't ERETAA be injected with an FPAC ISS of 0 (wrong
-> instruction type), and ERETAB get an FPAC ISS of 1 (wrong key type)?
+The idea of skipping child nodes was also tested, but it was marginally
+slower than just skipping levels, so it was discarted.
 
-Yes, and that'd be correct.
+Optimization measured on two scenarios involving eager-splitting on a
+VM with 1 memslot of 16GB:
+- Scenario 1: No manual protect, whole memslot split at dirty-track enable
+  (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
+  - Split happens only once, whole region
+  - Evalutes improved batch performance of splitting
+- Scenario 2: Manual protect, split happens during every dirty-bit clean
+  (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
+  - Split called multiple times, for smaller 64-page sections.
+  - Evaluate improved performance for multiple calls
 
-I don't know who told Sashiko about the ARM ARM, but it doesn't seem
-to parse it correctly.
+Scenario 1, improvement on dirty-track enable ioctl for the memslot:
+- Memory was already split (4k pages):  -44.01% runtime (stdev 2.80%)
+- THP backed memory:                    -24.66% runtime (stdev 1.21%)
+- 16x1GB hugetlb memory:                -24.78% runtime (stdev 0.85%)
 
-	M.
+Scenario 2, improvement on dirty-log clean ioctl for the memslot:
+- Memory was already split (4k pages):  -38.98% runtime (stdev 1.91%)
+- THP backed memory:                    -25.49% runtime (stdev 0.65%)
+- 16x1GB hugetlb memory:                -24.24% runtime (stdev 0.65%)
 
+For collecting above numbers, the following script was ran in both vanilla
+and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
+TX2 with 32GB RAM.
+
+--- dirty_test.sh
+#!/bin/bash
+filename=$(uname -r |cut -d'-' -f 4-)
+
+run_test(){
+  uname -a
+  cat /proc/cmdline
+
+  #prepare
+  sudo bash -c 'echo 64 > /proc/sys/vm/nr_hugepages'
+
+  ./dirty_log_perf_test -g -b 64G
+  ./dirty_log_perf_test -g -b 64G -s anonymous_thp
+  ./dirty_log_perf_test -g -b 64G -s shared_hugetlb
+
+  ./dirty_log_perf_test -b 64G
+  ./dirty_log_perf_test -b 64G -s anonymous_thp
+  ./dirty_log_perf_test -b 64G -s shared_hugetlb
+}
+
+run_test 2>&1 | tee ${filename}
+---
+
+Above dirty_log_perf_test command is the standard kvm selftest found in the
+kernel tree. It tested the following guest modes:
+Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
+Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
+Testing guest mode: PA-bits:36,  VA-bits:48,  4K pages
+Testing guest mode: PA-bits:36,  VA-bits:48, 64K pages
+
+Performance numbers from above modes were used to calculate average and
+stdev showed in the optimization results.
+
+Changes since v1:
+- Fixed inverted flag verification priority (Sashiko)
+- Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
+- New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
+v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
+
+Changes since RFC:
+- Changed approach from return value to walk flags (Will Deacon)
+- Discarted skip_child approach (Oliver Upton)
+- Measured in real hardware, and from userspace perspective (Marc Zyngier)
+- Better explanation of what and how numbers were collected
+RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
+
+Thanks!
+Leo
+
+Leonardo Bras (3):
+  KVM: arm64: Avoid re-testing walk_continue
+  KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
+  KVM: arm64: Make stage2_split_walker() skip unnecessary walks
+
+ arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
+ 2 files changed, 34 insertions(+), 7 deletions(-)
+
+
+base-commit: 66affa37cfac0aec061cc4bcf4a065b0c52f7e19
 -- 
-Without deviation from the norm, progress is not possible.
+2.54.0
+
