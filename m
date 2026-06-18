@@ -1,191 +1,202 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0CE369990
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 15:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184703F413D
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 15:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781795038; cv=pass; b=LbeNE3GJsxfvw+XoPDDhstvkp0qdmlG91in/zhyCyThV3dEJ6sLMbCVTV4v4KRygDMrGwkNTEyFaYSouYQUGKFo5yClxmcoMd13CP/43+H/U50mjGO9uzBXNAhS5IAQCCrvo+ogmGy1emrnpUiCY63eqCCr6wWjuxNPgzdsjbak=
+	t=1781795210; cv=pass; b=MLODEbNWHY5ARHsabk6+Qey1lPTohn5nl19vgcDH8FQ4xMJlNXVqawVmKOJeiri/2fzItWs3nnD9wGquxiKI6I7BcUsc791YyS90ABZqd08KUSA77xwdFw+C6iK/PzsMlXQPs/Tmd5pYI9eaG+ctsveXHEvXrD9D1ENYj/H0BhE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781795038; c=relaxed/simple;
-	bh=CreuZGAyA2yXdYiyynjJMmkbAI8xobOWPuumYFkB2SY=;
+	s=arc-20240116; t=1781795210; c=relaxed/simple;
+	bh=OAxAzmYwdcy7zd8tpPxqe24/aSqWkYNzOFXNAJfuqwc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aqVqJwnm9OiigPEK1NI7ORHZZrF+FCOlJ+i9jJ5/FRLvvl+h9mo+KvwlgdSa5VEj2nWDgw2BUb+bpZR3vsdC4s3AhAISzqmpX8sUIw55dcV8W4d9TSfZvwyZFU5pX8ImxHAm3v/iLlcAFfmQ/wYqDAOmGJN3LEW9k87Iz8mbdMs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s65esCUj; arc=pass smtp.client-ip=209.85.167.43
+	 To:Cc:Content-Type; b=CFI/9aBdv3m5HQAP8E0p4wh5u2DyPGrVSJ5RSrNQLCddBrC9twz0OPc7WUBn7fDNxKK+ac4V2P3kxkR7uScC5toPZKyxiQs3p6NIRPgU7VTN3KM26JFANcsZ+Hbbt+YQHfXIJfN8ysSAtQzBU8DqpmhR6EZrzpNGTSNP3I/7qKg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K3VqO5Wu; arc=pass smtp.client-ip=209.85.167.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s65esCUj"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ad4d840d43so7703e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 08:03:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781795035; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K3VqO5Wu"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5ad4d840d43so7749e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 08:06:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781795207; cv=none;
         d=google.com; s=arc-20260327;
-        b=eAghhAEZKhNOsdOSYxsup+HFN6y/0Ma26JznZPa64T8WueJgZFgKbKswKiHmyC+9QS
-         rXN6oNEMyEi87lqa4d1yrPVHUECKCeE0AE0x9HanE+XERPn/gUoWuKwT44TYdoRYH1gM
-         2fs5oP5RWIAJL5yB0lPw+iJ2Cs5DIslAhc/UmQ6ipNosIsMkwjWdO0iQDFP4ds5ICJO1
-         /Ts5q8TKnPN5vrUsodhQiLrievAVFOZDGTsLzJQJ+iw6TdwWXUU0pmYT6t9KZiy76Yji
-         RXx5qCymYVMITKeGpCN0fXwP6FYiR1oGbM9ZTZOfa3LP2dQqNkYJB/yzBsiwV/pxeg7j
-         ewBg==
+        b=S2S2DBHq/QHtz3w8jFweEfkQOQ9E0d5SB1V1OwcxU993kTrYCAK9gXEyGFYxlb2vrH
+         wwzIuJcNCiZIjNNiaDiSas2KkRERAG9H0cKrPiFDWviaf5krPwIbvAW8mh70r4QADxKY
+         RqqKWdV5lW9pvhDGbLIxulF5R+ioZASUSWrzrlL9mEgEUA6VPDu/48cAQu9KBL29RBj5
+         iOcELKRDOXC1ZoN3YCCQvOxl6SkPrYsriGmw6QgLjKY1Kx7iey2vUR7ildChFsowWSwR
+         HfRI+zmBQsJl07oIFuzQ0zVYBMyhtbbQf/CyyadBNgJe+nTNKK2S1QAMJqQdjRIvlMlb
+         W9Rg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=pkfEGlJK0eWAtoOzL9Uv+iGzEXyPiPqwMky2LM9WWSQ=;
-        fh=DSKuzP0vL/udqsp+w3hpJOpxi/gGMzMW1B5oBGTK8XU=;
-        b=BheXQqnPGR2buNztlFqo/1p2hgW3q6UGbscYRGnom9rvl1++2xdqKAEySYvtPgMeco
-         PXbJBkGPWKGnDchHoWM3JVhLQ5OaWybTU9Ai8aZySEm7WkUFjd0+5uAqXtVnF/U0X/Wv
-         iaw2Iwd4tW+Te+ZRY6jGT583RENY/IY0MiSCwl8epGlp+YjKMqA4bntp4S/eDVf3A+MN
-         xlBNwB5uFDqULYt3QgsaK6In3JdeHanPDNV6ZZnRovMRRzOZ/H8YtOtW/8fDIbkWMJM6
-         Ek0+QMsjbNkzqUJXEhptNDsop3KxC1ioFWWvPjpnMCux3IFuBbDpIyg+eu9E836gXnv2
-         ISWQ==;
+        bh=B+Kk4p+Z7Ji+kLPZDyM/vRpxyN8zCW/MQSdfnLHPQPE=;
+        fh=fh2XppqWzfqBgHfx8xMK0ci1JScLC5B4xxq4usAi5/I=;
+        b=B+ImF+2WqTHnEavN9JVCfiksiTfx6QQinMNlxtw1KjUbntTmXMclQncPSioUW2n9Iv
+         Cy92uUw+Falkc38eXcts4Gjv0o9iU8s5cmglJ62CE4uj2IrcBRVbXbIippzD/Na6gTZ/
+         Naw/hzc/3uPwVPLFuiX6KtLJT7xayouVb7KwgVWL8dEhGm4+c4mldL0t3q/USAXG2w8M
+         0u0erGw7hCkafmS6ixazFUQV1P+FlmWpXTBQO8nn26FLJ+UsArpTWpvQAob+29MOjjhi
+         qmrigoPHBJ8f9HDWDmfwQ6VNoZtxkbd+S4ITWibjMJAzkaseSB+BGJLD0H9nt2gXa0wA
+         fbIA==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781795035; x=1782399835; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781795207; x=1782400007; darn=lists.linux.dev;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=pkfEGlJK0eWAtoOzL9Uv+iGzEXyPiPqwMky2LM9WWSQ=;
-        b=s65esCUjpGrV3TnESinThcUZdNiEar1mvUr55rVraPGBNmBMAwGp6MSYdcUr9rYMs5
-         rkX+apZgioctke4Dm3qjiaxyK4rJ8R3QqIcQrtYKp9dKVs85q6K6St3licdeg2f/iZ9e
-         xWsA76U6BV1gXLU8TMhlD2RG9z5jUOcH8+juah5QGlvMqs3yonK2yQPAOrdnXgLPHLHz
-         3O1G5wGjrIi3BnsxJisiJ6pFh1rk0vPycBAf/v8Tjo6mn83m7QDP7/LaBnx/6bHr/4EX
-         CzBUNEfJ1JQVMqWUdDrArAQDrVP2OK1DzCvf07EkM7/jKMLGf2fFapM8yvWIi1ZsAcU1
-         ZFwQ==
+        bh=B+Kk4p+Z7Ji+kLPZDyM/vRpxyN8zCW/MQSdfnLHPQPE=;
+        b=K3VqO5WuIlVAaP7D4cx26aeI75UQ8WpbFR/6tagh7MWzAf2JnDJ4TlRUQS/ROgsz0/
+         jcrCyI1pQ2/yzVitqcaINbQAZ6NwlWMvRJXaLI2FnTaLrwOyjG5/m9CGyUclPBK+mqfd
+         1aika+Uxg65kJfvFiJ4WwHpzVCa7LR1ddstAyoEOWytYRtQH5VKybT1hc3TUMrveY6q0
+         zIVSGZ24qW0QLB4WSY2Ur1kYQhpRV+gHFgv8l2XNTuq/2JzxCnxisggoRob/3qisyiRm
+         iVgtoc3tdwA2su1VTsbeGYgrih2i+Cf3fcIq8TWkpnn04mjIX5L98xk0cPnRvcPL4yP3
+         Ga0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781795035; x=1782399835;
+        d=1e100.net; s=20251104; t=1781795207; x=1782400007;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=pkfEGlJK0eWAtoOzL9Uv+iGzEXyPiPqwMky2LM9WWSQ=;
-        b=h0bx9StS8JB0JBX9+8YitfrEc3oZbY9bU+9pjLGdtbJdoBvA/gye28tkK5zsi6jT3V
-         zPvKBmHwDFhfuF47C2E8I+O/BSBYWczWX7J1J6Ex4iH9BELmrh5gPiybU6KLCUdLTG7t
-         Lt2tK49utfy9fvaPpTWF54mSvtPckyYagmPTVznBZj8/LHqbebEGEo709yLBsmK8WL09
-         EnVJmd7EtctV4jgRx9pw0Ww8KqesDT++wRU8UCFQjmVwqO0IwSSZcki3v+/LwBczaE3o
-         56XOIh3q03OyODmzMPPmtvJLr5e5ru5G3s00PkEnlbOklv45eUuClveWXg40GiHZso1+
-         vaRw==
-X-Forwarded-Encrypted: i=1; AFNElJ84SD1L/x8ShBuJYQBOD/oQRtzR7EkEGqm4oOyR1CyU1d0cpJ/YYeeUfFJqwFqLoe+dkdOQU1E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwV+mKj/SDIepwvzMxcinPmMgakTOSKqlr6DZw/wV/DH7U8du+G
-	9NZ3sz4VDPuvsVOvHB6ilDA5ePwqZs3JTqUesJEjTP21Rl88ZxETFyD7nQ8DVbz47auSIVTvSEl
-	tyjQf9TaMbia3hYGOkbNDnOmuY6DlCjarVFpxYJtX
-X-Gm-Gg: AfdE7cmvq9g+gMo1+OaBVi3kyb5Ot+82nEnX4ad39ChnvHRbSq7aIveOPMBHhjw5DmD
-	wPwqoL3zYCsaXTP6ESnza725HC+UwA5cXzLb3vdSQds5mKGYm5bkvv1CYcTdnCeG6KWJzKXqFhP
-	5SGFN5Orsm0J2nK424x2ycJaEe67Ci2WSflYc2IKvG/RTa+tbuBlr3K5p82zB201JMFI53fWWfR
-	lKQZh16igMTJS5KFjhg3jyz++Q+WNykphZ9gEeGixcVdJjfMRl4ATaD3Jng4LeAaoddDIAmCw==
-X-Received: by 2002:a05:6512:3ca1:b0:5ad:4a8f:58ed with SMTP id
- 2adb3069b0e04-5ad4ee99865mr137935e87.7.1781795034214; Thu, 18 Jun 2026
- 08:03:54 -0700 (PDT)
+        bh=B+Kk4p+Z7Ji+kLPZDyM/vRpxyN8zCW/MQSdfnLHPQPE=;
+        b=WgYGHF0wh2j84RMO3f9nJ4cQmLx4J3VwPSegqP4ofLtwFfG1BXtdHJoq5D7sWJcpb6
+         xnIN5r77iPSB/FWAXxUn9i6p3hoI58d+VUSALbtCoyRSMKg+p8U9iLt9mzyQhgbonGFq
+         0QkEEmL66PqYrzOc9KdrSeIrem5i4aTlPtqdLu4E8d4hghhAyEHfsWXR3+1GaurKir4r
+         3ef88G/T481xt5/MTS9Uqdi7t/MJqjeT4qTsgNVGbrmi8zQF/3LWryLEdjfTlDOrnAE3
+         L5/LJC+2LrPH8plr9NleyFaFGbrYtx8ENDI+f2p4esObHifEV2RPWgXoK/CYAkqwe1cB
+         AmrQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+kY2O6JOh7xW/1e60I5FcKgls4I2UGLF7P6WacMziBkmkmL/AbtP5LLYXUSTCk5PKuj4BNe3U=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0TBkj4qfsSARwDuYgP5cWEkm0Vv2PVZl10o41SiLAMP8aSJW+
+	TilID5VQqoBd8NAr9BUPleOYa6gkNK5QNuf0vej+wkNk7a7BguPudd9oxYI3JNYXoQxsVd3ccy3
+	U2RaN0Pk7F3Lo3BxrvNAgcS9UUoasSOsV/vkep4PI
+X-Gm-Gg: AfdE7cnaVlmM3/vAAc5c1qozMBy777vRx7vIcCLVw3e5pzOPwi4wNNS0wsDaP/zrGnt
+	0mULltqVs2qb3b3bDZWAfSXR4oJXydrp+xQYcceJKvx4KD4xmCuwScmtF4HYxTnVsahIZRFm64N
+	Ahi4JnIhrsE/lIfmLCLtIMb/WvPIsiR1vAMaXlssGVzj0JtKVjoyKynVH01zIFYzovvSxUeNGBJ
+	QULIkZp/DVpBAWoW7/AsvjtFreI4m8z7BWY0cA6nnJnwR+IAY7SDBntIAMK67tmaOZ5ytTZA6nm
+	N8J4x7Pl
+X-Received: by 2002:a05:6512:1287:b0:5aa:8842:241f with SMTP id
+ 2adb3069b0e04-5ad4dba1941mr161077e87.12.1781795206552; Thu, 18 Jun 2026
+ 08:06:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260618121643.4105064-1-tabba@google.com> <20260618121643.4105064-6-tabba@google.com>
- <20260618123251.260FC1F000E9@smtp.kernel.org>
-In-Reply-To: <20260618123251.260FC1F000E9@smtp.kernel.org>
+References: <20260618121643.4105064-1-tabba@google.com> <20260618121643.4105064-7-tabba@google.com>
+ <20260618123349.1F2ED1F000E9@smtp.kernel.org>
+In-Reply-To: <20260618123349.1F2ED1F000E9@smtp.kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 18 Jun 2026 16:03:15 +0100
-X-Gm-Features: AVVi8CcBLEeWh6pfNQLq6GQzYuMrd-zkTAwW9UqiCtrJbRvUWK0UwMXDM5aAgoU
-Message-ID: <CA+EHjTyJUrHZJiM9e2r20_1JLzWQg-+TAr9g720njugLMWTpGw@mail.gmail.com>
-Subject: Re: [PATCH v2 5/7] KVM: arm64: Set IL for emulated SError injection
+Date: Thu, 18 Jun 2026 16:06:06 +0100
+X-Gm-Features: AVVi8CcxJ-IsB4OvmQz77gg32emdl0ycJsg7W-qphmraRq1ydJgHihXlkYAdfEE
+Message-ID: <CA+EHjTzAXQYZ9XYEXxihZOsx0AN3HBKXtZJcndCS=i+UYQzznQ@mail.gmail.com>
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Set IL for nested SError injection
 To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Oliver Upton <oupton@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 18 Jun 2026 at 13:32, <sashiko-bot@kernel.org> wrote:
+On Thu, 18 Jun 2026 at 13:33, <sashiko-bot@kernel.org> wrote:
 >
 > Thank you for your contribution! Sashiko AI review found 2 potential issu=
 e(s) to consider:
 >
 > Pre-existing issues:
-> - [High] kvm_inject_nested_sea() passes an Instruction/Data Abort EC inst=
-ead of an SError EC when FEAT_EASE converts a Synchronous External Abort in=
-to an SError.
+> - [High] The SError syndrome constructed by `kvm_inject_nested_serror()` =
+(including the newly added IL bit) is a dead store because the downstream i=
+njection logic silently drops the syndrome.
+> - [High] When a Synchronous External Abort is routed to an SError via FEA=
+T_DoubleFault2 (`EASE`), KVM incorrectly populates the ESR with an IABT or =
+DABT Exception Class (EC) instead of the architectural SError EC.
 
-Not a bug. EASE does not convert the exception to an SError. It only
-changes the vector offset. The EC remains the original abort EC. The
-non-nested path in inject_abt64() does the same thing. FAR_EL2 is also
-correct since the exception is still a synchronous abort.
+https://lore.kernel.org/all/CA+EHjTyJUrHZJiM9e2r20_1JLzWQg-+TAr9g720njugLMW=
+TpGw@mail.gmail.com/
 
-> - [High] The constructed ESR for a nested SError is discarded during inje=
-ction because kvm_inject_el2_exception() never writes it to the guest's ESR=
-_EL2.
-
-https://lore.kernel.org/all/20260615131116.390977-1-tabba@google.com/
-
-Thanks,
+Cheers,
 /fuad
 
 > --
 >
-> commit da891cfcd9b452feacd8b631f8c20dae39b009fc
+> commit 889dc0193654a25a0ce52006ebe91e58fc4c4ed8
 > Author: Fuad Tabba <tabba@google.com>
 >
-> KVM: arm64: Set IL for emulated SError injection
+> KVM: arm64: Set IL for nested SError injection
 >
-> kvm_inject_serror_esr() constructs an SError syndrome without IL. The
-> architecture mandates IL=3D1 for SError unconditionally.
+> This patch modifies kvm_inject_nested_serror() to unconditionally set the=
+ IL
+> bit in the SError syndrome, as mandated by the architecture.
 >
-> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_faul=
-t.c
-> > index 444d219b02174..d6c4fc16f8795 100644
-> > --- a/arch/arm64/kvm/inject_fault.c
-> > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -381,7 +381,7 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u6=
-4 esr)
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-n=
+ested.c
+> > index b74369e9ad7ff..6f12496cae815 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -2938,6 +2938,6 @@ int kvm_inject_nested_serror(struct kvm_vcpu *vcp=
+u, u64 esr)
+> >        * vSError injection. Manually populate EC for an emulated SError
+> >        * exception.
 > >        */
-> >       if (!serror_is_masked(vcpu)) {
-> >               pend_serror_exception(vcpu);
-> > -             esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
-> > +             esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) |=
- ESR_ELx_IL;
-> >               vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-> >               return 1;
-> >       }
+> > -     esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
+> > +     esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx=
+_IL;
+> >       return kvm_inject_nested(vcpu, esr, except_type_serror);
+> >  }
 >
 > [Severity: High]
-> This isn't a bug introduced by this patch, but while reviewing this SErro=
-r
-> injection logic, I noticed an issue in how ESR is constructed for nested
-> SErrors. When SCTLR2_ELx.EASE is set and a Synchronous External Abort is
-> converted to an SError, does kvm_inject_nested_sea() pass an incorrect
-> Exception Class?
+> This isn't a bug introduced by this patch, but does the constructed syndr=
+ome
+> value get silently dropped downstream?
 >
-> In arch/arm64/kvm/emulate-nested.c:kvm_inject_nested_sea():
+> Looking at kvm_inject_nested(), it forwards the esr to
+> kvm_inject_el2_exception():
 >
->         if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
->                 return kvm_inject_nested(vcpu, esr, except_type_serror);
+> arch/arm64/kvm/emulate-nested.c:kvm_inject_el2_exception() {
+>     ...
+>     case except_type_serror:
+>         kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
+>         break;
+>     ...
+> }
 >
-> The esr variable retains the previously constructed IABT/DABT Exception
-> Class instead of being reconstructed with ESR_ELx_EC_SERROR. Does this
-> present an invalid syndrome to the nested guest hypervisor, since the
-> architecture mandates that ESR_ELx.EC must be 0x2F (SError) when an
-> External abort is treated as an SError?
+> The except_type_serror case doesn't write esr_el2 to ESR_EL2 (unlike the
+> except_type_sync case), and downstream exception entry code doesn't write
+> it either.
 >
-> Also, does this unconditionally update FAR_EL2, which is architecturally
-> incorrect for an SError?
+> The constructed payload appears to be entirely discarded.
+>
+> Would the nested hypervisor observe a stale ESR_EL2 value when taking the
+> SError, rendering this fix functionally ineffective?
 >
 > [Severity: High]
-> This is also a pre-existing issue, but there appears to be a problem wher=
-e
-> the constructed ESR for a nested SError is discarded during injection. Do=
-es
-> kvm_inject_el2_exception() fail to write the esr_el2 argument to ESR_EL2?
+> This is a pre-existing issue, but when a Synchronous External Abort is ro=
+uted
+> to an SError via EASE (FEAT_DoubleFault2), does KVM incorrectly populate =
+the
+> ESR with an Abort Exception Class instead of SError?
 >
-> In arch/arm64/kvm/emulate-nested.c:kvm_inject_el2_exception():
+> In kvm_inject_nested_sea(), if SCTLR2_EL1_EASE is set, an SError is reque=
+sted
+> using an ESR constructed with an Abort EC:
 >
->         case except_type_serror:
->                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
->                 break;
+> arch/arm64/kvm/emulate-nested.c:kvm_inject_nested_sea() {
+>     ...
+>     if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
+>         return kvm_inject_nested(vcpu, esr, except_type_serror);
+>     ...
+> }
 >
-> Unlike the synchronous exception case, the esr_el2 argument isn't written
-> to the guest's ESR_EL2. Since the downstream exception entry path
-> enter_exception64() does not write ESR_ELx, does this result in the neste=
-d
-> guest hypervisor receiving an SError with a stale, unmodified ESR_EL2?
+> Similarly in arch/arm64/kvm/inject_fault.c:inject_abt64(), the ESR is
+> populated with ESR_ELx_EC_IABT_* or ESR_ELx_EC_DABT_* before being writte=
+n.
+>
+> Architecturally, all SError interrupts must have an SError Exception Clas=
+s,
+> even when representing a routed SEA.
+>
+> Does supplying an Abort EC violate the architecture and provide the guest=
+ with
+> a malformed exception syndrome?
 >
 > --
 > Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260618121643.41=
-05064-1-tabba@google.com?part=3D5
+05064-1-tabba@google.com?part=3D6
