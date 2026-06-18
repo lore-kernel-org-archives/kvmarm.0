@@ -1,165 +1,194 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DB52E7F0A
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792698; cv=pass; b=ucHWDXxAfZJiNKAMv97A6cq5NtN6C25ThLwO3QqfAh77yAMhvaRdhKnYbm9DepsCcGcXRgKVYqahMdhTDBpeAsP59PjGsY71UdQobgtOpqFYeXGk21LnVTxkqIBb1kZrHAFZUfq6NI+1EU8gLiizdLLs/EXW7vzOIY8jlb24s84=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792698; c=relaxed/simple;
-	bh=IcUDRh8Om3ZmpHU8OKEmFDWjuWTvs4Y7QkwArrvhnwQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NBEVw20CvJRssiSHbYR4cGMFfk08l4iqb5EKIrqjHOtUjpp8opE5QI99a7UCstloUkoQQ+xFRC6P37S4qaubV6/BUOx6DvSFH6drzlWdw4XhN0mJ9N7pdiIy/esM6gXyDYbzLYgQ837J3ocLy2JocWbQDIaGsI3LyVgHdRwoL4Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZKH1kH2A; arc=pass smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9195B19DF55
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781793525; cv=none; b=ag+m3TS+2aw/VqrnfyO8lXhaFjNS1Nna4et3awyo5Z86QOKFzn5I8CfgFhgYCAZ0kMNK+w/kTc3ySJsyGWMmpKZRUIVNOhRB4XpQEXjegS4J8kqN3E2AUoVPt+8KUihsLnSRaLX0SiXJ4G0nbYlgxEoupQNmZWnd7j1OuVmhWJo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781793525; c=relaxed/simple;
+	bh=3w0JObxZdVXwi0oyADqD4Li3JMTNT34/C+qGah8oPFU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=n2VCjzGJ7ucsS6iPCkqtiM2tUvJ+9p+i2mTHtj6tXuuiYct04MhCzYX+fpG+j4+z0qw3eVEW0vqqKnaC8ZCkshPV1jbd7YJskF3+korvVWMG73R5UD1MM+ktwzYCLcNwWl+NO9JlYhQok8Bkag/Q3n/M7L0bKCXbHyqFhxdwcao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XLYmeN+V; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZKH1kH2A"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5ad2abf31aeso6724e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 07:24:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781792695; cv=none;
-        d=google.com; s=arc-20260327;
-        b=W0VJELJDv/ZYYVJubm1Rf6cSz3GVfg4RErI1K62i0pm7IMNTy4v5+GMCkGAvvOW8+G
-         zq0cBY8PXswVXcHXatQOaQRFn4N5pyYXSkMghwA8lxqPv7KWScj57vIm9F+hSXsR0kHh
-         aLrzAjUJD2aE/hL6ZjDOcBEsYyjvbU7/kCUdNX8/Xgw516ZMeVGuSbbp5uIdt1O547cD
-         lDky5bHr/1xRb2JFwulrir6/7cMzP9+L1jqn5IYydGFfb1lY6S9A/tkv9p5T2wuaz7HT
-         5tY322UPFH4FEnDUQcqc4b5uVQ89rjJwBiaV2Ks6PKUYt052WRiaU2EHoztApZVHaOJ6
-         BHpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=6ZkTLznup++j+ETiI3q7N04K3XjTDaIw/OGbmI0KOEA=;
-        fh=xBnQHbvAsmhfHir4xx7KJvdAaLsnTe7iRDgrhXU0Gds=;
-        b=Wfpysp8izLi2tQuMs6HIOUuo0SO1oNGgO3qbYgqem2jVlj6h+NpMo/rUXpY8zbFGuF
-         ceX9LNBo0gcWWYTUXHPOMX66cgQO4oO4MGERKsxoCf6fQUqpQ50AIuFHRF9BmULxtmIt
-         RKFvmyM89TPlN2Cm+RQ7RlGA1Bk+0d3IiQ1fC3/wMBnDArODgF60ETTZeVx+VtImSQom
-         EnEYla1DuFRc4zBi91/cUH8xpgEAwS/SHNuCF2Su2LTaAsWDPVsQCU8o8RlHQ6yOLYAY
-         dqZ+I1sTKkkn2UY/jcIqmXOcJYnYWNqHuQProBMg6Ksj/vFMRMZM1eIOsTdCnWHb6Qkg
-         Vr7g==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781792695; x=1782397495; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6ZkTLznup++j+ETiI3q7N04K3XjTDaIw/OGbmI0KOEA=;
-        b=ZKH1kH2A52M6r68Fzc66zlWRWEpVuq80lzjHavEJeBtX4bHy3dOXojuknB42PhqHFw
-         lgOSStblD4DBycy7P0G08L71jUdsmOaeWRA4Z1aiIvmB98onsvAhiKhiaRHPTuLuWqll
-         ApBi6h3Rt9sqM9k8+qFQH5PizUnHThIZ3U3r1h9Y+GOSWjoXS8048ALLxNd+TOulhxwX
-         wC1NKmuR+vpC3mKhXLB1YmOhbcuAE8fEz0wMqS0kxQ1IJEjR759ZHZbkLlWpsjLBr51E
-         ssY8uuTZwjKj9Zt5jLT1A5Wkp9fD8ZgSqAmDb3q1RMWzp5YKSYA/7cwChnLZyN6bnqwS
-         sF8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781792695; x=1782397495;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=6ZkTLznup++j+ETiI3q7N04K3XjTDaIw/OGbmI0KOEA=;
-        b=EVCqL4IdXObLkSOgGnh60OwNiyUA23Ys3iH9SYEflW61tVNkqc/En+6DJKn8+mU0SF
-         v1uDT3wibMAAXGTUC2V8Vg9Ecf7J2mlr302uPi25oMnv2knKSUsxoBKd2nmSSo28ftjr
-         FVFeQGrafdCUxcZLS/CSMYARxEjOVsgGgbxmWHahPQnK5V42hYfREiVxE6QAWisH/MIf
-         V1N2+HNy79UEeyEIjZWmcq+bT1SZKftTSu9YPB8tbQ+BtpyACg8MUSVzcaaOYO6isEvT
-         ZOy+FrUoxNZiOGQSn3vyagEGiKFlMi0qtWYigrA6qKSEDFNnd/v59S0YRR/FYDh9uqVH
-         uKGw==
-X-Forwarded-Encrypted: i=1; AFNElJ8LmcVhpZbgD9TSYU0xX30YnqmwWd+X3PcA4AnwmDVxZZdheoRmhiZ157uJi+Ql/dGghc9O8M8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzSooVAN+/Pa3oejdp26isP7oL7ICnDgUKQhEDpKC6NvdTjMQqL
-	WQ13Zi5UG2duEIjJqvb5rhVCeUjqwJxine1mavJqBBRcImNKzifBmBwU3T7AEWoRQeCdMNIRUXM
-	j+hJ1shYmbuFkn8nRnQ2GFney8Tqn9dul/hbKDRNmc0E9uFLj2fzHn8pa
-X-Gm-Gg: AfdE7clmQ4O8wVEiPe3NA3lbOOrvv3zrDSdWxYECU+YjIgXIjI9MV8/9H+yAJ7tYgto
-	8BrDAs9XnEAFZlFBxGdZxFXfZyjmhGG6PKea5HTsbEPh8/hex5LIDCh53TjgScj/sc3YXMqW6gW
-	snnfNQFLEN+47M6aNsQTX9Y36CsNG3GwFnWgKwceOD+D4IOU+Q2Vlb51Fq2Txxet48uXXLMSuM9
-	bJrNi57bym+dIEGbgXg5RTz+i1R3u90KEfuhys6KUTwUkhtnRqpu1Cy4u3ciXjWpfI5qK9hEw==
-X-Received: by 2002:a05:6512:3b21:b0:5aa:6b27:89f5 with SMTP id
- 2adb3069b0e04-5ad4db85135mr171416e87.8.1781792694725; Thu, 18 Jun 2026
- 07:24:54 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XLYmeN+V"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABFF532E2;
+	Thu, 18 Jun 2026 07:38:36 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A41333F62B;
+	Thu, 18 Jun 2026 07:38:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1781793521; bh=3w0JObxZdVXwi0oyADqD4Li3JMTNT34/C+qGah8oPFU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XLYmeN+Vb74ut7WvOdJgTzQESOuzUrZvMd3+PwH2stQLmmfKtyF3FWEme87cjrSpL
+	 pbTp7EA4I5JULt/9d+xgGwqgCxs1bZ/nkX7qVGkxtkakXTxZazvN4Lfk9VFNhdwBvH
+	 BWUZLfnjmvntAAU7S2JTZaSgCIkuhaHl2Rr5fJLM=
+From: Leonardo Bras <leo.bras@arm.com>
+To: kvmarm@lists.linux.dev
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
+Date: Thu, 18 Jun 2026 15:38:25 +0100
+Message-ID: <ajKh-OeWdjtz7eIY@LeoBrasDK>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <aiqCPDKcb1oA5EgM@devkitleo>
+References: <20260610202112.2695205-3-leo.bras@arm.com> <20260610203043.25A771F00893@smtp.kernel.org> <aiqCPDKcb1oA5EgM@devkitleo>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260618121643.4105064-1-tabba@google.com> <20260618121643.4105064-5-tabba@google.com>
- <20260618122808.1369D1F000E9@smtp.kernel.org> <86cxxorp3e.wl-maz@kernel.org>
-In-Reply-To: <86cxxorp3e.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 18 Jun 2026 15:24:15 +0100
-X-Gm-Features: AVVi8CeoopBIbTYaE09ZeamUAMFNzrsBfsl77QFwZoOcgFL63sxSgwLaI5ejrmY
-Message-ID: <CA+EHjTxJOXussAoOpBMCD8Y7WXf_zvcp2K-JaajrtvS88O3-ag@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] KVM: arm64: Set IL for injected FPAC exceptions
- during ERET emulation
-To: Marc Zyngier <maz@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Thu, 18 Jun 2026 at 13:48, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 18 Jun 2026 13:28:07 +0100,
-> sashiko-bot@kernel.org wrote:
-> >
-> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> >
-> > Pre-existing issues:
-> > - [High] The constructed FPAC exception syndrome incorrectly maps the ERET ISS encoding directly to the FPAC ISS encoding, resulting in malformed ISS[2:0] bits being injected into the guest.
+On Wed, Jun 17, 2026 at 02:30:57PM +0100, Leonardo Bras wrote:
+> On Wed, Jun 10, 2026 at 08:30:42PM +0000, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
+> > - [Medium] Combining skip flags causes the walker to ignore the more restrictive skip levels due to fls() usage.
+> > - [Medium] Skipping a page table level bypasses the KVM_PGTABLE_WALK_TABLE_POST callback, breaking PRE/POST callback symmetry.
+> > - [Low] The skip logic cannot prevent the root level from being visited, making SKIP_LEVEL0 ineffective when start_level == 0.
 > > --
-> >
-> > commit 27996a8004c4285e2d114067b3fc644f3f649d64
-> > Author: Fuad Tabba <tabba@google.com>
-> > KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
-> >
-> > This commit sets the IL (Instruction Length) bit for the FPAC syndrome
-> > constructed during nested ERET emulation. Since ERET and its authenticated
-> > variants are always A64 32-bit instructions, the IL bit must be set to 1.
-> >
-> > > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > > index dba7ced74ca5e..b74369e9ad7ff 100644
-> > > --- a/arch/arm64/kvm/emulate-nested.c
-> > > +++ b/arch/arm64/kvm/emulate-nested.c
-> > > @@ -2776,7 +2776,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> > >              * ERET handling, and the guest will have a little surprise.
-> > >              */
-> > >             if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
-> > > -                   esr &= ESR_ELx_ERET_ISS_ERETA;
-> > > +                   esr &= (ESR_ELx_ERET_ISS_ERETA | ESR_ELx_IL);
-> >
-> > [Severity: High]
-> > This isn't a bug introduced by this patch, but does this mapping of the ERET
-> > ISS to the FPAC ISS result in malformed ISS[2:0] bits being injected into
-> > the guest?
-> >
-> > For an ERET trap (EC=0x1A), ISS[0] indicates the key used (0 for ERETAA,
-> > 1 for ERETAB). For an FPAC exception (EC=0x1C), ISS[0] is the Instruction
-> > Type (must be 1 for a branch/return instruction), and ISS[2:1] indicates
-> > the Authentication Key.
->
-> No. Not at all. ESR_ELx_EC_FPAC (0x1C) defines ISS[0] as BnA. Which
-> matches the definition for ERET. On purpose. See ARM DDI 0487, version
-> M.b, D24-8777.
->
-> >
-> > By retaining the ERET ISS[0] bit and clearing the rest, it appears KVM
-> > inadvertently maps the ERET key type directly into the FPAC Instruction
-> > Type bit, while leaving the FPAC key type (ISS[2:1]) always at 00.
-> >
-> > Consequently, wouldn't ERETAA be injected with an FPAC ISS of 0 (wrong
-> > instruction type), and ERETAB get an FPAC ISS of 1 (wrong key type)?
->
-> Yes, and that'd be correct.
->
-> I don't know who told Sashiko about the ARM ARM, but it doesn't seem
-> to parse it correctly.
+> > 
+> > commit 4e6415e54e22d985a0c97622b8e8b28b4c84b54b
+> > Author: Leonardo Bras <leo.bras@arm.com>
+> > 
+> > KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
+> > 
+> > Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
+> > when walking the pagetables.
+> > 
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > index 91a7dfad66866..48d88a290a538 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > 
+> > [ ... ]
+> > 
+> > > @@ -144,6 +144,19 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
+> > >  	return !r;
+> > >  }
+> > >  
+> > > +static __always_inline bool kvm_pgtable_skip_level(s8 level, enum kvm_pgtable_walk_flags flags)
+> > > +{
+> > > +	flags &= KVM_PGTABLE_WALK_SKIP_LEVELS;
+> > > +
+> > > +	if (likely(!flags))
+> > > +		return false;
+> > > +
+> > > +	if (level >= (fls(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
+> > 
+> > [Severity: Medium]
+> > Will this evaluate to the highest level if multiple skip flags are ORed
+> > together?
+> > 
+> > If a caller combines flags like KVM_PGTABLE_WALK_SKIP_LEVEL1 and
+> > KVM_PGTABLE_WALK_SKIP_LEVEL2, fls() will select the highest set bit. This
+> > means the threshold evaluates to level 2, effectively ignoring the more
+> > restrictive SKIP_LEVEL1 flag and incorrectly descending into levels the
+> > caller requested to skip.
+> > 
+> > Should kvm_pgtable_skip_level() use ffs() instead of fls() to select the
+> > lowest requested level as the definitive stopping point?
+> > 
+> 
+> Correct. We should have s/fls/ffs/ in that line, so:
+> +   if (level >= (ffs(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
+> 
+> That will select the lowest level, instead of the highest.
+> 
+> Since the tests were done only with a single skiplevel selected, ffs and 
+> fls return the same bit, so performance results should not be affected. 
+> 
+> > > +		return true;
+> > > +
+> > > +	return false;
+> > > +}
+> > 
+> > [ ... ]
+> > 
+> > > @@ -192,7 +205,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+> > >  	if (!kvm_pgtable_walk_continue(data->walker, ret))
+> > >  		goto out;
+> > >  
+> > > -	if (!table) {
+> > > +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
+> > 
+> > [Severity: Medium]
+> > Does skipping the level here bypass the KVM_PGTABLE_WALK_TABLE_POST callback?
+> > 
+> > If the current entry is a table, the KVM_PGTABLE_WALK_TABLE_PRE callback is
+> > executed earlier in __kvm_pgtable_visit(). If kvm_pgtable_skip_level() then
+> > evaluates to true, the code executes an early exit via goto out.
+> > 
+> > This completely bypasses the KVM_PGTABLE_WALK_TABLE_POST callback at the
+> > end of the function, leaving the TABLE_PRE call unbalanced. If a walker
+> > relies on symmetric PRE and POST callbacks to clean up resources or track
+> > traversal depth, could this asymmetric execution flow lead to resource leaks
+> > or state inconsistency?
+> 
+> Correct. PRE and POST are called only on table entries, and in the case 
+> skip levels is enabled it will completelly skip that post, which is 
+> undesired.
+> 
+> To fix that, I propose the following:
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -209,24 +209,24 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>         childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
+>         ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
+>         if (!kvm_pgtable_walk_continue(data->walker, ret))
+>                 goto out;
+> 
+> -       if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
+> +out:
+> +       if (table && ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
+>                 ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
+> 
+> -out:
+> ---
+> 
+> I suppose the extra test will be optimized well by the compiler, and we 
+> should see not much difference in performance.
+> 
+> Only other alternative I can see would be to add an extra label, and a copy 
+> of the increasing data->addr.
+> 
+> > 
+> > [Severity: Low]
+> > Does checking level + 1 prevent the root level from being skipped?
+> > 
+> > The walker unconditionally calls __kvm_pgtable_visit() for entries at the
+> > root page table (start_level). Because the skip evaluation checks level + 1,
+> > it only governs whether the walker descends into the children of the current
+> > level.
+> > 
+> > If start_level == 0 and the walker requests SKIP_LEVEL0, won't the walker
+> > still visit level 0 and invoke its callbacks, making SKIP_LEVEL0 functionally
+> > identical to SKIP_LEVEL1 in this case?
+> 
+> Correct. But I don't see the usefulness of this being different.
+> SKIP_LEVEL0 is supposed to be useful if the root level is -1.
+> What would be a use case of having a flag to skip the root level? Why would 
+> the pagetable walk be called, then?
+> 
+> 
+> > 
+> > >  		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
+> > >  		data->addr += kvm_granule_size(level);
+> > >  		goto out;
+> > 
+> > -- 
+> > Sashiko AI review · https://sashiko.dev/#/patchset/20260610202112.2695205-2-leo.bras@arm.com?part=1
+> 
+> Thanks!
+> Leo
+> 
 
-The problem is that it _doesn't_ have the ARM ARM, so it hallucinates
-it. I'll reply to the other ones, and then see if I can write up a PR
-to review-prompts to fix this.
-
-Cheers,
-/fuad
-
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Above e-mail should have been sent June 11th, but for some reason got lost 
+in my sent dir.
