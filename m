@@ -1,107 +1,118 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9A83546C7
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 09:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64503C4557
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 09:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781773299; cv=none; b=UbSGdoBsQKpXqfA69h/zlSqoNvjBxk275f/CmPrlD23YYTyrkL6kdcceJBCVN8ki7qvif8L1PvG6eJdlBYNDUH5tx9RC3PVoSiwfj+6s7KQRwB46pqagEsV2Outy7RDSQIuVdzJ+mKbdiUC1h5JtOo8HzhBMVuBaKRcOXYiXrSI=
+	t=1781774544; cv=none; b=VyzgxKt/BeUSQTpyJIbNftIG8Df5CtVkLd40H0JioOt9xIcyGPbXkGsNuJFD2qTOYL+M/fH6yl4Zg0yHhJoU/ZKqDkqbn530efUzbaUCnTQgQORti3fCU+507TYoOrn1TpRLJy0dlY42444ihDRWk381417kH5Tpukj21Esm4R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781773299; c=relaxed/simple;
-	bh=YCUIMNpaFUzUAEyV0dBpCjC+oTFCOiPvsCFjJzX+osw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MfLS9xYkDYDpdPytZWtuClEoHzLtB+afq0e4oZmT1IvoShOfULQ0qLmxchz+42wNJRvLJ0xlnoV4m0QlpI7O9bb5cf0bVIDMMkGVm60fqev8f9rYQoaONIC4se6X/b4XGKnCCoN4LyoXPU2Tj5ax90XWP/5dF/SZjh0CtmpGeHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i1B7nq9k; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1781774544; c=relaxed/simple;
+	bh=nK+RwVsXHkH1pfp9wWFhmTyXxg7D9tKAkcONTBnJEfE=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=AUVO6x+sToiEwOx58ULHHOmNvJwBzBUhN2o0fTnoXu4gxTYU7cpCqcUFdrWWOXV4rZsoUogJFJyI0nK+sr5n4oDSE/zY93lIiazkCByhLaX93dkO1uvQHJjBfekzrXDxtITVgZ4XzLfkBXJtZHdt4Wg3baGcIUNgN5eW+H3WoBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYbRXlue; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i1B7nq9k"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-c0793772071so58497166b.0
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 02:01:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781773293; x=1782378093; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qac8FDS3yeT2+4VM8TKuhIc6uI5EZlyUNr1jGR9SzEs=;
-        b=i1B7nq9kCQZY08GczIEQXQdOs6GFh3wCmvsatiE/gLzcv4VXTUZb/6VN9J7MAltT23
-         fwzP0mNcNtl66zlL3ehc5gSsmaupHwuzk1HiWIo3N6GPjvFqWK3VbPhVamqwOr6dkSgg
-         53OWG16AQbk7TYtKKMvJhYy9v3ppKbfzlWyMR1i4nHKQhuxR6IbUGEX92YeJyrqYYtnP
-         4+h9cbBCHfrbRtmD618A5YXBIJqIt9QtUKlFLEd3xBQfXlnMhviZyNUVGOWPLWwVix8+
-         b9VgEg/SWYHZZM5o7DtpvoqK24cbMNhNWRUXuVoUNOpLlrGtOAXBnTeHj21YWbDENKQk
-         oJSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781773293; x=1782378093;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qac8FDS3yeT2+4VM8TKuhIc6uI5EZlyUNr1jGR9SzEs=;
-        b=r5wkivCmnaYVdJDxVWOgMhHAgTXNAN7mWosiX6RRvOmSamLleEOO6LQWWWg8Oyzrc5
-         x13KOzOoFV5Uu8VLS/SUb9fZIQo8raT+wEt2iADzlRIn7EPxjWSV6uT6Odd41DDVvZr0
-         oX8rGVMFDj7kk5Kj0N1PDb+6BUOOC9GpmnjPTk+f4X6+EApyWkldGI4YN0iOaQl8OZjW
-         aRMFDoFEVPv2uMSDlC2SL07+Hyl2gb7eh32Eqmfgk05xUcvuiXDf0x0Gt20hUyV9+C/z
-         yjUEhKUoUlp2Abqjkm10LmvWv0NhsQ4vMoeGhmTXrmySwV/iOrhi672jno2DAaZjuBeB
-         3Udg==
-X-Forwarded-Encrypted: i=1; AFNElJ+mYMd0IQESIDUZo+T0UJ7JFHB6feyhgt6Ydtep84WDfQEZOJnnkGRulmbotscTFgsMQdW/Yoc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyHPh6k3RNfKUSuFi4Yfa5pEOWBoYfWiZE9NNNLnzYbqegQi1wP
-	sjTyjzQLzVaO2Kg6vtgfTiu1bIOcm9m8WBsY6BBiLZgsarCY21Ew8tp4MAE6Uo8O0HUF9d02aAU
-	LyQ==
-X-Received: from wrbfu2.prod.google.com ([2002:a05:6000:25e2:b0:461:e741:9a7])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:26cb:b0:bd0:df77:98bb
- with SMTP id a640c23a62f3a-c05a1f461femr458002566b.9.1781773292698; Thu, 18
- Jun 2026 02:01:32 -0700 (PDT)
-Date: Thu, 18 Jun 2026 10:01:27 +0100
-In-Reply-To: <20260618090128.3913688-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYbRXlue"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D231F00A3A;
+	Thu, 18 Jun 2026 09:22:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781774543;
+	bh=tlnachJIsRe65mf0xJdjIt8iHwfGk36JLI4XMbvdYE8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=DYbRXlue4twAoLbGYOuGu8139nk9m5C4h038jtUIgBCbBvLnEZ9D4/jsNwhjQymRG
+	 GqRhmexJ+ljYizb6eG1UhcgsI7U5eaB9bytNQGgnJBatiqIsUwJQLoHghuAJ0RpDup
+	 MBiqF1KnC4+zPawAsXWZZSHhpAWC8paImNxQH0E+bvNZ/oJeVflT9iqm+5NhAObEGh
+	 ly5bZFgxq5Su6Pn0orc9ivjDfXJjnTz3v52dapDeXyUoIexBoU9Rx6xSViUqO1BfNT
+	 1uQwXzVTHMTtxU/wm0wfbl2TtsZoMMTlkYM7I4ut9F5+Lp0ITNtVOkUM9Z8cgLxjdu
+	 Fpga24JDJzaQQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 3/3] KVM: arm64: Drop redundant READ_ONCE() in
+ pkvm_hyp_vm_is_created()
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <tabba@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260618090128.3913688-4-tabba@google.com>
+References: <20260618090128.3913688-1-tabba@google.com>
+ <20260618090128.3913688-4-tabba@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jun 2026 09:22:22 +0000
+Message-Id: <20260618092223.45D231F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260618090128.3913688-1-tabba@google.com>
-X-Mailer: git-send-email 2.54.0.1189.g8c84645362-goog
-Message-ID: <20260618090128.3913688-3-tabba@google.com>
-Subject: [PATCH 2/3] KVM: arm64: Remove unreachable early checks in pkvm_init_host_vm()
-From: Fuad Tabba <tabba@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Keir Fraser <keirf@google.com>, 
-	Hyunwoo Kim <imv4bel@gmail.com>, Fuad Tabba <tabba@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-pkvm_init_host_vm() runs once from kvm_arch_init_vm(), while the VM is
-still being allocated and is not yet reachable by another thread. Both
-early checks therefore test impossible state: is_created is still false
-(it is only set on first vCPU run) and the handle is still zero (this
-function is what reserves it). Neither branch can be taken.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-Remove them.
+Pre-existing issues:
+- [High] Teardown sequence inversion in `kvm_arch_destroy_vm()` causes memo=
+ry leak of protected guest pages.
+--
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/pkvm.c | 7 -------
- 1 file changed, 7 deletions(-)
+commit 3c4352fb45fd315836f7f7aa2ad63af580a902d7
+Author: Fuad Tabba <tabba@google.com>
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 053e4f733e4b..67b90a58fbea 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -230,13 +230,6 @@ int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
- 	int ret;
- 	bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
- 
--	if (pkvm_hyp_vm_is_created(kvm))
--		return -EINVAL;
--
--	/* VM is already reserved, no need to proceed. */
--	if (kvm->arch.pkvm.handle)
--		return 0;
--
- 	/* Reserve the VM in hyp and obtain a hyp handle for the VM. */
- 	ret = kvm_call_hyp_nvhe(__pkvm_reserve_vm);
- 	if (ret < 0)
--- 
-2.54.0.1189.g8c84645362-goog
+KVM: arm64: Drop redundant READ_ONCE() in pkvm_hyp_vm_is_created()
 
+This patch removes an unnecessary READ_ONCE() around the read of
+kvm->arch.pkvm.is_created. The read is already serialised against concurrent
+writers by either config_lock, slots_lock, or the teardown VM lifecycle.
+
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 67b90a58fbea2..008766273912e 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -185,7 +185,11 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
+> =20
+>  bool pkvm_hyp_vm_is_created(struct kvm *kvm)
+>  {
+> -	return READ_ONCE(kvm->arch.pkvm.is_created);
+> +	/*
+> +	 * Serialised by config_lock/slots_lock, or by VM lifecycle at
+> +	 * teardown, so a plain read suffices.
+> +	 */
+
+[Severity: High]
+This isn't a bug introduced by this patch, but since the comment mentions t=
+he
+teardown lifecycle, is there a teardown sequence inversion in
+kvm_arch_destroy_vm() that leaks protected guest pages?
+
+Looking at kvm_arch_destroy_vm() in arch/arm64/kvm/arm.c, it calls
+pkvm_destroy_hyp_vm() before kvm_uninit_stage2_mmu().
+
+Because kvm_uninit_stage2_mmu() hasn't run yet, __pkvm_start_teardown_vm()
+is not invoked. This causes the __pkvm_finalize_teardown_vm hypercall inside
+pkvm_destroy_hyp_vm() to be rejected by the hypervisor, and the host clears
+the handle via __pkvm_destroy_hyp_vm():
+
+arch/arm64/kvm/pkvm.c:__pkvm_destroy_hyp_vm() {
+    ...
+    kvm->arch.pkvm.handle =3D 0;
+}
+
+Subsequently, when kvm_uninit_stage2_mmu() does run, it eventually calls
+pkvm_pgtable_stage2_destroy_range(), which returns early due to the cleared
+handle:
+
+arch/arm64/kvm/pkvm.c:pkvm_pgtable_stage2_destroy_range() {
+    if (!handle)
+        return;
+    ...
+}
+
+Does this sequence skip page reclamation and unsharing, permanently leaking
+all memory donated to the protected guest?
+
+> +	return kvm->arch.pkvm.is_created;
+>  }
+> =20
+>  int pkvm_create_hyp_vm(struct kvm *kvm)
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260618090128.3913=
+688-1-tabba@google.com?part=3D3
