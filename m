@@ -1,118 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64503C4557
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 09:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C76E2E7373;
+	Thu, 18 Jun 2026 09:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781774544; cv=none; b=VyzgxKt/BeUSQTpyJIbNftIG8Df5CtVkLd40H0JioOt9xIcyGPbXkGsNuJFD2qTOYL+M/fH6yl4Zg0yHhJoU/ZKqDkqbn530efUzbaUCnTQgQORti3fCU+507TYoOrn1TpRLJy0dlY42444ihDRWk381417kH5Tpukj21Esm4R4=
+	t=1781774592; cv=none; b=sUt+fR167rSNR9DJzlsDIYIVXNMrBzSUKiDVP6SfufnAiYCZQ2zCOxIwn/zzd4Bvm7V1ZyVBU7H3wXpCJc3QcmDj+MV1wv5ooV41beXE4M2JSEjzun4V0DbCbO2stf9QywIfZyYFqZWHmw2iUAV875gx6+EXh2qH083NgcJYgiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781774544; c=relaxed/simple;
-	bh=nK+RwVsXHkH1pfp9wWFhmTyXxg7D9tKAkcONTBnJEfE=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=AUVO6x+sToiEwOx58ULHHOmNvJwBzBUhN2o0fTnoXu4gxTYU7cpCqcUFdrWWOXV4rZsoUogJFJyI0nK+sr5n4oDSE/zY93lIiazkCByhLaX93dkO1uvQHJjBfekzrXDxtITVgZ4XzLfkBXJtZHdt4Wg3baGcIUNgN5eW+H3WoBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYbRXlue; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781774592; c=relaxed/simple;
+	bh=UR1nPFd3k/0uIQvvwLZpmSzSdZlNHJ2b8Wl3kFrei90=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kSPrDXRptZdyU7rvgJSCiYzS4fJpWdhhUgncgS+PoJSTS0adJ9BgE3fNzp6V/FlFTL1tDDkv3dDzC4EygXS1AnYQcT1NGLuYqIOgOnFkXcq2ptnXw+Utc8W/vUf/zIJi7UAVdTkGwC0UkvJtp+3o9Ud4JHXljkVjMlhFCQ2VJR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV21I0Mu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYbRXlue"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D231F00A3A;
-	Thu, 18 Jun 2026 09:22:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mV21I0Mu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEBBD1F000E9;
+	Thu, 18 Jun 2026 09:23:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781774543;
-	bh=tlnachJIsRe65mf0xJdjIt8iHwfGk36JLI4XMbvdYE8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DYbRXlue4twAoLbGYOuGu8139nk9m5C4h038jtUIgBCbBvLnEZ9D4/jsNwhjQymRG
-	 GqRhmexJ+ljYizb6eG1UhcgsI7U5eaB9bytNQGgnJBatiqIsUwJQLoHghuAJ0RpDup
-	 MBiqF1KnC4+zPawAsXWZZSHhpAWC8paImNxQH0E+bvNZ/oJeVflT9iqm+5NhAObEGh
-	 ly5bZFgxq5Su6Pn0orc9ivjDfXJjnTz3v52dapDeXyUoIexBoU9Rx6xSViUqO1BfNT
-	 1uQwXzVTHMTtxU/wm0wfbl2TtsZoMMTlkYM7I4ut9F5+Lp0ITNtVOkUM9Z8cgLxjdu
-	 Fpga24JDJzaQQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] KVM: arm64: Drop redundant READ_ONCE() in
- pkvm_hyp_vm_is_created()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <tabba@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260618090128.3913688-4-tabba@google.com>
-References: <20260618090128.3913688-1-tabba@google.com>
- <20260618090128.3913688-4-tabba@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2026 09:22:22 +0000
-Message-Id: <20260618092223.45D231F00A3A@smtp.kernel.org>
+	s=k20260515; t=1781774590;
+	bh=p35E1mIrhFruMk9fAgHFYQp6iWDdwjql9lvHDZh45to=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=mV21I0MuV4Kuknp46y4dXXGvTPSP/xbcaV2SupW1mqhRoGvL3CYAxm9JVADHPf+G1
+	 IB7dcvO7ItwI4IW0IH5/Qy3IYqAQ1l4RU2+kT/PC1173Wehkqb3CCZ9YsRN9O88mUJ
+	 IZBlrEm6NI8kud373RnTldDs7ZNP4E+dU1N3GHkIrnX1FbREv88l4fEGtshnOd4LVM
+	 jYPrWOT2n7mAtzV8CbApM5d2D9ta26cbPPUaAlvLoBjckDM6uY24jArFFaNgT+5Mmb
+	 rt6LY8WbJk2o1FLxREb43//DJRJNMQnA7muyLAcr+/ElFH3q/pdga0K1qmtKLakxVx
+	 pVtL1OMUGQY9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wa8xo-0000000DwiE-3bcI;
+	Thu, 18 Jun 2026 09:23:08 +0000
+Date: Thu, 18 Jun 2026 10:23:08 +0100
+Message-ID: <86jyrwrymb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: tabba@google.com
+Cc: Oliver Upton <oupton@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Per Larsen <perlarsen@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 03/11] KVM: arm64: Use guard()/scoped_guard() in arm64 KVM EL1 code
+In-Reply-To: <20260612065925.755562-4-tabba@google.com>
+References: <20260612065925.755562-1-tabba@google.com>
+	<20260612065925.755562-4-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, qperret@google.com, vdonnefort@google.com, sebastianene@google.com, perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, seiden@linux.ibm.com, mark.rutland@arm.com, jonathan.cameron@huawei.com, imv4bel@gmail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Fri, 12 Jun 2026 07:59:17 +0100,
+tabba@google.com wrote:
+> 
+> Convert the manual mutex_lock()/spin_lock() pairs in
+> arch/arm64/kvm/{pkvm,arm,mmu,reset,psci}.c to guard(mutex),
+> guard(spinlock) and scoped_guard(), dropping unlock-only goto labels in
+> favour of direct returns. Centralised cleanup gotos that still serve
+> other resources are preserved.
+> 
+> reset.c uses scoped_guard() rather than guard() so the lock covers only
+> the small read/update window inside kvm_reset_vcpu(), leaving the rest
+> of the function outside the critical section.
 
-Pre-existing issues:
-- [High] Teardown sequence inversion in `kvm_arch_destroy_vm()` causes memo=
-ry leak of protected guest pages.
---
+To be brutally honest, I don't think this sort of widespread changes
+bring us anything. This is just churn.
 
-commit 3c4352fb45fd315836f7f7aa2ad63af580a902d7
-Author: Fuad Tabba <tabba@google.com>
+Sure, if you are reworking a particular bit of code that is goto-heavy
+for the purpose of error handling, this has the potential to cleanup
+the code *while you are changing it*.
 
-KVM: arm64: Drop redundant READ_ONCE() in pkvm_hyp_vm_is_created()
+But doing it for the sake of doing it? I think we have bigger fish to
+fry right now.
 
-This patch removes an unnecessary READ_ONCE() around the read of
-kvm->arch.pkvm.is_created. The read is already serialised against concurrent
-writers by either config_lock, slots_lock, or the teardown VM lifecycle.
+	M.
 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 67b90a58fbea2..008766273912e 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -185,7 +185,11 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
-> =20
->  bool pkvm_hyp_vm_is_created(struct kvm *kvm)
->  {
-> -	return READ_ONCE(kvm->arch.pkvm.is_created);
-> +	/*
-> +	 * Serialised by config_lock/slots_lock, or by VM lifecycle at
-> +	 * teardown, so a plain read suffices.
-> +	 */
-
-[Severity: High]
-This isn't a bug introduced by this patch, but since the comment mentions t=
-he
-teardown lifecycle, is there a teardown sequence inversion in
-kvm_arch_destroy_vm() that leaks protected guest pages?
-
-Looking at kvm_arch_destroy_vm() in arch/arm64/kvm/arm.c, it calls
-pkvm_destroy_hyp_vm() before kvm_uninit_stage2_mmu().
-
-Because kvm_uninit_stage2_mmu() hasn't run yet, __pkvm_start_teardown_vm()
-is not invoked. This causes the __pkvm_finalize_teardown_vm hypercall inside
-pkvm_destroy_hyp_vm() to be rejected by the hypervisor, and the host clears
-the handle via __pkvm_destroy_hyp_vm():
-
-arch/arm64/kvm/pkvm.c:__pkvm_destroy_hyp_vm() {
-    ...
-    kvm->arch.pkvm.handle =3D 0;
-}
-
-Subsequently, when kvm_uninit_stage2_mmu() does run, it eventually calls
-pkvm_pgtable_stage2_destroy_range(), which returns early due to the cleared
-handle:
-
-arch/arm64/kvm/pkvm.c:pkvm_pgtable_stage2_destroy_range() {
-    if (!handle)
-        return;
-    ...
-}
-
-Does this sequence skip page reclamation and unsharing, permanently leaking
-all memory donated to the protected guest?
-
-> +	return kvm->arch.pkvm.is_created;
->  }
-> =20
->  int pkvm_create_hyp_vm(struct kvm *kvm)
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260618090128.3913=
-688-1-tabba@google.com?part=3D3
+-- 
+Without deviation from the norm, progress is not possible.
