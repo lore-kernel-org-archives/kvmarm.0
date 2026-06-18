@@ -1,210 +1,174 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1964F280A5A
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6C12E8B64
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781793717; cv=pass; b=P6rRo2lo37pqJhNdGlT+i/xbleIq0wntvcccYzgHlZi9s39/c6IFHx0k4r/vLazDXJozcWT+VvpUU94t9flbMNKGJcrN5ggSPhC8RWaOrU/W03ivIAQqy7Mg0uqWRYLr0F9vRugSQOwJ1/mh47vY1hMvZxoKpsE8vIMQoSb6vPo=
+	t=1781794074; cv=pass; b=YzybPilq7lBSTmx344yk31a52ANBwQIYgRN3Syt50Qc4yLmkB7hZqgLEcQMMPblJKKSfiT15VNayBvhlFrW41cLuF8ZHg8cbIsnvA99J0VnPyetn5baM1ZMDwmsKc6nd3zgCzHb9dDel8bXi+fuCDm4icgIyr0qoVngDCeNJ8cg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781793717; c=relaxed/simple;
-	bh=6jAMPAUU7NxAHfo3CqmuOs+a1P+DBOmdpSJ3YXon3gE=;
+	s=arc-20240116; t=1781794074; c=relaxed/simple;
+	bh=LzQ/2P+hOP+suzGipZPy+apY9BEJgJZMJcc/piGvcxE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JRq8PBK3b74lV5iFsp8zRtFsz5cIej37jI8aH5ExD9jU36NxDOft12zhUaA0sjWtNd63TjVYIGqPluIRDs5exrpZZZAmFtU/f09cNmCYVnlcIyeUOPvcWvFdAeyW0BSZkCsDLUkEKyZdO0srusa2a6jKZl4B0lqD0paPViksQSc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TL9lxz6e; arc=pass smtp.client-ip=209.85.167.43
+	 To:Cc:Content-Type; b=jk2kJDYT06/i4/0W9pEsKxOg9ZXv+bQm+YrjY+fOPpz+CzAkmcjUFr1TEModT7buuq7KOR1MkikB9jVIrIB7vkmtpf5SORI0v8fIu3Zl775cnhzoVMqFlUK254G3VdrcDVyoT2qbPhCDw3uH4FrSA3wMf1IaG0llbJdz9Pw0SIY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bx+4inOX; arc=pass smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TL9lxz6e"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ad4d840d43so7268e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 07:41:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781793714; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bx+4inOX"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5ad4d840d43so7511e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 07:47:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781794069; cv=none;
         d=google.com; s=arc-20260327;
-        b=EnDPx/pkrusDD59H6GRwHdpmn18/kcdoLl8oX6FdoVHqpltzhg3Kvq8qBE4bVAA4Qy
-         ika2HuYewu9U8QhQDk3Ns6L6Y+LambIr9aWedMjm8+f8ckz3dlIqkb48VtmRfXuK93l5
-         eECXASP8NFvR/LEsqrWJ3DZUn9ZxI2JdUyeTOJ0cPcW+forcM7zw+fn62wJKMZxqJF7b
-         qK+phH1E44IeVDjEaUN/jj3ITw1AAUbD+llrOzPX1h2VMNsAyoqrVx85hEDKMjgcFzog
-         wW0hY9iiuQzzacsR/EFTr02f+p3Cg+ccf4eifc2KrZZz/vho31tGi2JxYcZGoNaxZdrV
-         ILgA==
+        b=TXZmdbfhDGnXq/hJMOflWte3WFPO+7/cG0wA7etoUG4U1znUlZJEs7O6GTPC0YBalP
+         ACp0idBeRQ2b41zXAHOFDKHHWefOVPCB9Nmw2JAtfHcZW2WWDZ5Vl/JjRHpEiArWNZTz
+         MJglvNn4gw7lXr5pz39l7jrIY92IKHMsA+3mZwBH4R8IFAX24WA7wOg306LSoYBRoy9F
+         DbU3US/KCuhZBwCBM2H15N7mqo0rTv7ozrABhvdNbaiYApfGVfw1GToi0ii7ZnJ5dZdb
+         BDERxN25khSYG+fXaN0pucokychcSAOpVgb+yUtbGzWdQ0LUtn5bJP6wTSC1bqKAw0DF
+         We6g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=cyv7WmAzvj3n/08dSdKcTP0+sZKN+JUNiB8NClmfTJ8=;
-        fh=4Xn3ig0HNZly+RyCQnyQpoa4N4eMsKR4/adFZfizPqs=;
-        b=Hyl94TOj0mDQVTrCNkhS6BGb7alhnqYL2zJpEm2LUPKC5y4Kr7jT17835ZtrlgcVku
-         5d4b0UuQmdtuJDfv9Ih3oUztYdxaTz9Iihg/jYgTqpZCQxgc7Xiru9enLXC8Xdyigdi+
-         2hcEnK0xSTZC7bsxJUMNeIJGg+08V6uMMno11s1mF6HTkPyel5tx3Ku7CjCGlJEaqfTL
-         tWJyWSF0ZgdCbZPGkYT6Em41Yc1SIjTnEROcisIqigVkSAVNoVNY4JAOsZXb9FD+HcVE
-         vvvKLFJfYIe1+uIaa7/0T7Xwxrou17WGOzMDaBmK5Es7gt073JD9tc0leom3ZWZhFM6s
-         APVw==;
+        bh=dmN9nS4vJ3TKXwg/LI1WEk/6tZyzDcctWdh0WqJnNg4=;
+        fh=6hS9v4pnHqMTlaOnyy4JDUeIkRhTfNk7QI6Kq4+R9Rc=;
+        b=oXSMia1173EKpleZ++pftFcHdxHjG83ul7Ln8+lAfSjq1wht68DVG2TfGkni9pMjnZ
+         ua+QyH+vL/ojM5ll7/b/cK57tLjSVsxHHT17wFHkGbWoUxLkhR6ySIf8Eu49B3L8vwQ+
+         qzcGZxrmmMvoX2q5ReUZMWSSnml6bocoqPyXpH/ErmEslIyLB54njDhU4/Mb6hbxkU2W
+         SixJl3KaSiD1arl7TMC/yc1jpxMDD2ecvMb+d49QBj9931bJheCiF5Au1ulW44EOG5lK
+         0E0p8dADlP4MOa3Ydr7/WQ+7OSXPPbIc4e8t2vvz6jFmYYgvwLCkIu+lnY1p6f25YjtS
+         Wwvw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781793714; x=1782398514; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781794069; x=1782398869; darn=lists.linux.dev;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=cyv7WmAzvj3n/08dSdKcTP0+sZKN+JUNiB8NClmfTJ8=;
-        b=TL9lxz6eLPxTxzLvqeTdvG0YejlLfimR8VsEGyPUQd9Fgnmm5roOa7e0fubnYlz9l/
-         Vsresp70RgCwDVQgBVAufR7fGJyykTlQHlye+7xRwa+kgEkpQgHTnCamW6GPR4d5BRjZ
-         usghkHaJjZ/4PxTS1co3Zxvt/y2VbJ0YZfgoWaSHvuE72D8jukpj7r4viP2Kq4gJ7onU
-         TJhHDETcgZPUzwkXpl6nf73v6rrJrZh24YY7LnxrnFFHGnCxxap56iLuTedomfmawOcm
-         EP9JJvDSRxuFLwix3wBqsqm7zqG1G1/XpRLKTyt5bkOniMwNYfWpk2FPrt11nVhUK7vO
-         V/GA==
+        bh=dmN9nS4vJ3TKXwg/LI1WEk/6tZyzDcctWdh0WqJnNg4=;
+        b=Bx+4inOX87FQayAqGFN2YEY+dhjy7+/TWqhh1YoAfSmPBWsqrcGHx+og6toYwyUh3L
+         AKNcVh3U381m9YbHWQBPFOHXTj5cC4CtP8U61SyWaT9/lubhFseuqo422zZ8K0B1fuuv
+         UW6M4v7XgeX/5sUW2swYk/ATbs2iNdUciRIrPs/rngAkZZgspXTV5ZVCIIB8Wqkl8EYI
+         JxdF0/q2kucOQB4MuvL4G4jzAXwMpwBQC0557cJCGcFLZYq2LsCQc4LweP1mKz3E3TD0
+         mcLgaI3CzrTxxqJ353jyUrSPj2U0dV6I1uHq321g3NZdA5Gfd1WnEqCWXpQgLUnI/6yp
+         S1ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781793714; x=1782398514;
+        d=1e100.net; s=20251104; t=1781794069; x=1782398869;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=cyv7WmAzvj3n/08dSdKcTP0+sZKN+JUNiB8NClmfTJ8=;
-        b=QCTCconvtWgrW+c4xFLu2KvJWz0Wd1BcAHdhuQoImG3veCyFzrawH9ycqD4+Ai0fbP
-         3WBl2gKcgkba9EZfyO1cqGhG7wBSNXHke8ul/sK2uoDVwhO0zS9O/8bdfLibba+qHr23
-         3iL7ra76E/YkEoq7O9DO5mpnlWFES5Jm8qA+ubVgezuBvPn6YBNeeFLEsLr5aJEG/SfX
-         hrrViidcLdxC3jkB2XV76VbKs4cE7UYPN1oS2pD8aUrRURVEMrM5xhs15L3V98oPABn+
-         5O5sbUkt4tAcoii0VOfzkBpzUcelzkG65uJVc5rVSfj/vSaTklNZsN9B2f8Ul/FpCjdi
-         T5nA==
-X-Forwarded-Encrypted: i=1; AFNElJ9RIIo0sPFZFzMYmA4yogvYWU0fujMGY/z+3eBhmA7yfATx3SKzd62eJnsX62egFgbfm+6oMbo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwF8slugR8ObFgnDb/VnCmBDPmIaUX7DPLUgXxr2u+PctkX6DQP
-	F0bU2Qb14fwljaOkEA5CHSBUAtzqUfo4hdyciek8L7oyeBYp+8FKY1VgoFQ3OkzpPIPif+QUMzz
-	5Z4Luq8vW0OHzDriWSIGl7EMHpBVgFzukxUCPaQeq68KoWADYwY4ZEtLg
-X-Gm-Gg: AfdE7cm9rIfKpYwxdEPYgXLAgEYIzkX7aOB+HP164dvkVNM+D27Q6dDvlDNqxJmm04i
-	/rc7TO3GjpsFSL5beGj6snSyI5m0BUVTGWSn/RITuTJTScVc0IxFFr0vMiShTBKT9bRBrVZkojn
-	PdOagqDN0gCT+9cFOPbh5MaWSA4P8qB3QvgIiph+/8tHEFM1crgJLFsnpQHAGw33I/kON83RhX6
-	UYOl0dbhF3XEqoIslZNTeZ4lEafyAe7K8R/xDx3cyA8pF66dmTmtTRsW+OrAbGpiR2Dvt9qeg==
-X-Received: by 2002:a05:6512:3193:b0:5aa:4c72:8732 with SMTP id
- 2adb3069b0e04-5ad4db9bc41mr182457e87.10.1781793713788; Thu, 18 Jun 2026
- 07:41:53 -0700 (PDT)
+        bh=dmN9nS4vJ3TKXwg/LI1WEk/6tZyzDcctWdh0WqJnNg4=;
+        b=lYayfOIldxOLLin2z2yEhRtQKywVQkgvOH/wl65KgpfaFgN2ebgnCQrv1LRHEP0Ozb
+         DeenAPU/9+cJWTdvm+Teu/avYrIA1keAaYH2/RJG/yxoe8rJzY4x2I6txQ142G21X+js
+         32vp4ZLQjaef5OROzR41UAdGOjQGtl/1vPAQ3rR4C3/kEIOUOr2XlqVzotBSmHYqJmeI
+         MG8C5wFpriSj4bI/M6ssh+l0Sh+VXPMp9YidblF/Y/oO1uR6imnQdzbp3Fa/NFte0+P1
+         wmxgagX6fhUSFAZeVBP/pL3yQiTl+F+Mc9V/0hc5tPFPdX1iQasL81xqGif5NUg4QsQY
+         LnGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9q+c3Rci/UiX60LJSLK4b/7gwaMeQI2dDZ2xISOgPk2CQexiy6iRCIon8bGRC59PZ8auacGbM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx+qJtef5qgAMoEX998DgyIgfsfw5z47kM+bYQ4V+fCASSriklp
+	fEuAGGcIzfxcsLKje2ZLafbRdy/wuWHKgDBpKHscElRgssL26BZrUToa0+0UuEqkUFlJiGNmcvR
+	s56ZuMapzTi8P1YQZWOgKg9U8DwbEtkQAE3qiroVj
+X-Gm-Gg: AfdE7cnyW6R+H5oiV+Ywm1izAUQcMSa/9eToftNCh+mFTEUL2TOP+ygJxLyXX0SU5QX
+	3pAJCtiherwlmlT6QX7pxi48frOeqG14u5CufyxPQADNhi6pmL++u1gUs8l+hI29SzMzVGwj5q/
+	vRR9LJJI2H621V3uURrMdhlBow0hPkZDJ/9PAQvqNu9uZYeK4AqSslWDKd62YVl+uAHm5weepKL
+	AtzeLLLOnKCL83VfYCVFKmmDvBCa0qWONP9LEMUyPz1qcnBLgy3dkABAiru7SZOuS3EQ0kIMw==
+X-Received: by 2002:a05:6512:2254:b0:5a1:43ca:1ff5 with SMTP id
+ 2adb3069b0e04-5ad4ee99ce0mr156755e87.3.1781794068379; Thu, 18 Jun 2026
+ 07:47:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260618121643.4105064-1-tabba@google.com> <20260618121643.4105064-3-tabba@google.com>
- <20260618123043.5D1C21F000E9@smtp.kernel.org>
-In-Reply-To: <20260618123043.5D1C21F000E9@smtp.kernel.org>
+References: <20260618121643.4105064-1-tabba@google.com> <20260618121643.4105064-4-tabba@google.com>
+ <20260618122921.F224E1F000E9@smtp.kernel.org>
+In-Reply-To: <20260618122921.F224E1F000E9@smtp.kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 18 Jun 2026 15:41:14 +0100
-X-Gm-Features: AVVi8Cf0GaVcwzO4o9AsKmalolh1Ixou3PwA9WCiyR5ufBQEFXD4fRAnHT5wNkA
-Message-ID: <CA+EHjTyiyCNV40z82=YTTMrx3BoR5gn5uh-xP80gFxX2PSUMAg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Unconditionally set IL for injected
- undefined exceptions
+Date: Thu, 18 Jun 2026 15:47:09 +0100
+X-Gm-Features: AVVi8CfxFGxHU2xBsoMAmS5XZRDUWTuQLVUDaNJBJNQ9Q3veP4V7v9kkWA_RbOc
+Message-ID: <CA+EHjTyX7+n_F85PnScTZeqQChh9m16PwGUr5QNEjiRDOuHpSg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: arm64: Unconditionally set IL for injected
+ abort exceptions
 To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 18 Jun 2026 at 13:30, <sashiko-bot@kernel.org> wrote:
+On Thu, 18 Jun 2026 at 13:29, <sashiko-bot@kernel.org> wrote:
 >
 > Thank you for your contribution! Sashiko AI review found 1 potential issu=
 e(s) to consider:
->
-> Pre-existing issues:
-> - [High] Nested SError exception injection silently drops the ESR_EL2 val=
-ue.
+> - [High] Unconditional IL=3D1 in inject_abt64() creates invalid ESR state=
+ for Address Size faults.
 > --
 >
-> commit e7d1337c1e8d6db55c7b9ce2682f4c52e85c3f44
+> commit 5d93cc0ddb43cdfa88e555d446e07e55b7334637
 > Author: Fuad Tabba <tabba@google.com>
 >
-> KVM: arm64: Unconditionally set IL for injected undefined exceptions
+> KVM: arm64: Unconditionally set IL for injected abort exceptions
 >
-> This commit simplifies the inject_undef64() exception injection path by
-> unconditionally setting the IL bit, as the architecture mandates IL=3D1 f=
-or
-> EC=3D0 (Unknown).
+> This commit unconditionally sets the ESR_ELx_IL bit to 1 for injected
+> aborts, assuming the FSC is always EXTABT or SEA_TTW.
 >
 > > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_faul=
 t.c
-> > index 89982bd3345f6..9dfae1bcdf992 100644
+> > index 9dfae1bcdf992..444d219b02174 100644
 > > --- a/arch/arm64/kvm/inject_fault.c
 > > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -170,14 +170,7 @@ void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 es=
-r)
+>
+> [ ... ]
+>
+> > @@ -138,11 +138,10 @@ static void inject_abt64(struct kvm_vcpu *vcpu, b=
+ool is_iabt, unsigned long addr
+> >               pend_sync_exception(vcpu);
 > >
-> >  static void inject_undef64(struct kvm_vcpu *vcpu)
-> >  {
-> > -     u64 esr =3D (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-> > -
-> > -     /*
-> > -      * Build an unknown exception, depending on the instruction
-> > -      * set.
-> > -      */
+> >       /*
+> > -      * Build an {i,d}abort, depending on the level and the
+> > -      * instruction set. Report an external synchronous abort.
+> > +      * Build an {i,d}abort, depending on the level.
+> > +      * Report an external synchronous abort.
+> >        */
 > > -     if (kvm_vcpu_trap_il_is32bit(vcpu))
 > > -             esr |=3D ESR_ELx_IL;
-> > +     u64 esr =3D (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL=
-;
-> >
-> >       kvm_inject_sync(vcpu, esr);
-> >  }
+> > +     esr |=3D ESR_ELx_IL;
 >
 > [Severity: High]
-> This isn't a bug introduced by this patch, but while reviewing the except=
-ion
-> injection changes, I noticed a pre-existing issue in the nested SError
-> injection path.
+> Does this unconditional setting of IL=3D1 cause an architecturally invali=
+d
+> syndrome for Address Size faults?
 >
-> In arch/arm64/kvm/emulate-nested.c, kvm_inject_nested_serror() constructs
-> the ESR for the nested SError and passes it down to kvm_inject_nested():
+> If a guest executing in AArch32 EL0 issues a 16-bit instruction (such as =
+a
+> 16-bit LDR) that triggers a Stage-2 Address Size fault, the IL bit should
+> accurately reflect the size of the trapped instruction (0 for 16-bit).
 >
-> arch/arm64/kvm/emulate-nested.c:kvm_inject_nested_serror() {
->         ...
->         esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
->         return kvm_inject_nested(vcpu, esr, except_type_serror);
+> Looking at kvm_inject_size_fault(), it injects the abort by calling
+> inject_abt64() via the __kvm_inject_sea() call chain, and then modifies t=
+he
+> FSC to 0 (Address Size Fault):
+>
+> arch/arm64/kvm/inject_fault.c:kvm_inject_size_fault() {
+>     ...
+>     /* inject_abt64() forces IL=3D1 earlier in the call chain */
+>     ...
+>     esr &=3D ~GENMASK_ULL(5, 0);
+>     vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+>     ...
 > }
 >
-> However, when this esr reaches kvm_inject_el2_exception(), the value is
-> silently discarded:
+> Will KVM now inject the Address Size fault with IL=3D1 instead of IL=3D0,
+> potentially causing the guest OS exception handler to incorrectly advance
+> the Program Counter by 4 bytes instead of 2 during fault unwinding?
+
+See https://lore.kernel.org/all/CA+EHjTyiyCNV40z82=3DYTTMrx3BoR5gn5uh-xP80g=
+FxX2PSUMAg@mail.gmail.com/
+
 >
-> arch/arm64/kvm/emulate-nested.c:kvm_inject_el2_exception() {
->         ...
->         switch (type) {
->         case except_type_sync:
->                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
->                 vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
->                 break;
->         case except_type_irq:
->                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_IRQ);
->                 break;
->         case except_type_serror:
->                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
->                 break;
->         ...
-> }
->
-> Because the except_type_serror case breaks without writing esr_el2 to
-> ESR_EL2 (unlike the except_type_sync case), the constructed syndrome is
-> completely dropped.
->
-> Since enter_exception64() does not dynamically update ESR_ELx, will the
-> guest hypervisor observe a stale ESR_EL2 when handling the injected SErro=
-r?
->
-> Could this cause the guest to misinterpret the error, potentially leading
-> to incorrect functional behavior or a guest panic?
-
-IL=3D1 is correct here. The architecture mandates IL=3D1 for any
-Instruction Abort unconditionally, and for any Data Abort where ISV=3D0
-(ARM ARM, ESR_ELx IL bit definition). IL only reflects the faulting
-instruction length when ISV=3D1.
-
-This function never sets ISV. The FSC is always EXTABT or SEA_TTW, and
-FEAT_RAS mandates ISV=3D0 for any synchronous external abort. The
-Address Size Fault case (kvm_inject_size_fault overwriting FSC to 0)
-also has ISV=3D0 since address size faults are detected during
-translation table walks with no valid instruction syndrome.
-
-The old code copying IL from the hardware trap ESR was the bug: it
-produced IL=3D0 for a 16-bit Thumb instruction, which is wrong for an
-ISV=3D0 data abort.
-
-Cheers,
-/fuad
-
-
+> >
+> >       /*
+> >        * Here, the guest runs in AArch64 mode when in EL1. If we get
 >
 > --
 > Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260618121643.41=
-05064-1-tabba@google.com?part=3D2
+05064-1-tabba@google.com?part=3D3
