@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8833EBF16;
-	Thu, 18 Jun 2026 10:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D9D3BE643;
+	Thu, 18 Jun 2026 10:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781777419; cv=none; b=qhDMfCw29QMiVJkpAOmpc+Dky5VHQCNI5sovFCHdfJdlJKktCuA/PfJPkYqXEPfkyv7G3fTQUX+uDX1Ato+edyK520pcgc8oqWwRaTU9kfpey2QRu68RyM65pUF0fAncJIzajOZXExyYRY4EGhrezuLQVirtZJgYZfsSLS0CmcU=
+	t=1781777801; cv=none; b=aKGDieeGIpsbRfqQ8FTvmng5NPYRuTtia0dwZ/Iy4RGbmCZh8fD4IlGRLk0a/HIvQgpR+n6+ARwnRFjxXTHVQqFDg/On99fJ6St6cPZMODcq5N4+uX0C4aVUVT5nWDpe8dI4bMFNRwNHF8KsMGv5xDALkwsYs7jw4CjMBL2rfJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781777419; c=relaxed/simple;
-	bh=XoFpggIC90Bt6ZQLBYo2KFXYKQeWf040VAzIZMA+e8U=;
+	s=arc-20240116; t=1781777801; c=relaxed/simple;
+	bh=YOFVJBgSk/3eTZfHJzyGV4JyhB4FBjHaTCmJd/rZI5k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H4lE1RUDyQk/SVphEMD7oRci5jw2z0ASV48DYUpPadI2ZknALLHPzKSARi26UW9H2RPLjl3XnEhlD1Ke7emUMcZqwcDi0yffDxiz+eLrOc5TgKnM+z5qW1h0U6pyAWK+q7z38WN3oF8yy7ZAkKiPotxudKPPMFrM3FJjS+kSF5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ShVIG4xm; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=P+S4NK/B9bt5M6T8MYF7QnPafb9d4zU4upbvpE0TtH1KNwKifuvcX1FKcmrsoC+aCO690HamkkDZyhmEHdgN4LPdxwKMBASsxPpjNqcEVcp/cSKMxhRh9vzetZ6ILSoy7LIans5ju1frEJwoLr6faahhyJ8ykoGmfi0k+fhk2+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJWyH5g1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ShVIG4xm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF3321F000E9;
-	Thu, 18 Jun 2026 10:10:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJWyH5g1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBA971F000E9;
+	Thu, 18 Jun 2026 10:16:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781777413;
-	bh=RJeDZ8MzzJtFaVX8Goz2+Ds5/kUxUd9U6K4ASVsZApg=;
+	s=k20260515; t=1781777799;
+	bh=66JgIZ+ZfVcAOFUVboi0UgekLa+PJ0VEWzz7UjtLzxI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ShVIG4xmNuuKeS/lspiqhEROcIOqVpD2Er3sM9FckyE5UEa68+Y4LCiLy7HHaPR3+
-	 UMalruvc8WVKuN7fd4IrhNHy+O6WZw7j5cYNmz3yH5Av+YNJM0CsLfT2+fih4J6P/I
-	 TRzE6O2uV9XSr33H+tzCPOAksMtiDWUyNd+tc0abVNMsKvM28/79PYvO2+rCohqwtE
-	 McHbRNRR9+xzSh/NDuepyam2g5dMs1bZccoJjUA8RH0D16GM3XDkzdN0LwKEX4Vp1E
-	 upnVhVkDKJtpQRkTQ8Y17aGkfHLpTaPN8Yo+Ho/qVEr6qYXn5LPRNvCCJSiBCkjnbJ
-	 Ha8hpsEUJKNaA==
+	b=EJWyH5g1605DUv6IWjNVuxBmHWLdme+hDdzyJx7Sc5pjfRoZPQOleZzMUSh9AvfbE
+	 9Wc4l4SDqRoJsC/6h/b6nB4gPDxbu1JyLXtn7IBNl8QIKk1ob2J63NxBEdy5bR+9/e
+	 TKSsf2W03FjQIPvm7QPe4sJB7WzLSJLtI7yBrkj8HjMefZ3hvlEL9JWsFMCldxyTNG
+	 NPEh0mNOXXM12j+U7yHdNkhtn2V5ab4Yk36/GLEAKD8zSnvJqW7rtD4QXYAerDSeUL
+	 wu+O9afpG4PYom2Q1Ure3+Ec0DP0FlNvPlhoCUtOW2gSB1WsI0cvxSKGtLNgGpUGG8
+	 eE93SJGnh7r9Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wa9hL-0000000Dxkr-3mWi;
-	Thu, 18 Jun 2026 10:10:12 +0000
-Date: Thu, 18 Jun 2026 11:10:11 +0100
-Message-ID: <86h5n0rwfw.wl-maz@kernel.org>
+	id 1wa9na-0000000Dxvj-00Cx;
+	Thu, 18 Jun 2026 10:16:38 +0000
+Date: Thu, 18 Jun 2026 11:16:37 +0100
+Message-ID: <86fr2krw56.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: tabba@google.com
 Cc: Oliver Upton <oupton@kernel.org>,
@@ -53,10 +53,10 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 10/11] KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
-In-Reply-To: <20260612065925.755562-11-tabba@google.com>
+Subject: Re: [PATCH v1 11/11] KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+In-Reply-To: <20260612065925.755562-12-tabba@google.com>
 References: <20260612065925.755562-1-tabba@google.com>
-	<20260612065925.755562-11-tabba@google.com>
+	<20260612065925.755562-12-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,56 +72,61 @@ X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, will@kernel.org, catalin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Jun 2026 07:59:24 +0100,
+On Fri, 12 Jun 2026 07:59:25 +0100,
 tabba@google.com wrote:
 > 
-> From: Marc Zyngier <maz@kernel.org>
+> pKVM copies a non-protected guest's register context between the host
+> and the hypervisor on every world switch, even when the host never
+> inspects it. Defer the copy: on entry, flush the host context into the
+> hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
+> exit, leave it in the hyp vCPU and copy it back only when the host needs
+> it, via a __pkvm_vcpu_sync_state hypercall on trap handling or at vcpu
+> put. A protected guest's context is copied as before, since lazy sync
+> only helps where the host is trusted to see the guest's registers.
 > 
-> pKVM performs its own world switch for protected VMs but has no
-> primitives to move the per-vCPU VGIC state between the host and
-> hypervisor vCPU contexts.
+> The PC is the exception: it is copied back on every exit so the
+> kvm_exit tracepoint reports the guest's real exit PC rather than the
+> value left by the previous sync.
 > 
-> Add flush_hyp_vgic_state() and sync_hyp_vgic_state(). Flush copies
-> vgic_hcr, the in-use list registers and used_lrs from the host into the
-> hyp vCPU and pins vgic_sre to a fixed value; sync copies vgic_hcr,
-> vgic_vmcr and the in-use list registers back. The active priority
-> registers are handled separately by the save/restore-aprs path.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Co-developed-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 50 +++++++++++++++++++++++++-----
->  1 file changed, 42 insertions(+), 8 deletions(-)
+>  arch/arm64/include/asm/kvm_asm.h   |  1 +
+>  arch/arm64/include/asm/kvm_host.h  |  2 +
+>  arch/arm64/kvm/arm.c               |  7 +++
+>  arch/arm64/kvm/handle_exit.c       | 22 ++++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 88 ++++++++++++++++++++++++++++--
+>  5 files changed, 115 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 2f165b6c7b07..23e644c24a03 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -99,6 +99,46 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
->  	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
->  }
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 043495f7fc78..6e1135b3ded4 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -113,6 +113,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
 >  
-> +static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> +	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
-> +	unsigned int used_lrs, max_lrs, i;
-> +
-> +	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
-> +	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-> +
-> +	max_lrs		= (read_gicreg(ICH_VTR_EL2) & ICH_VTR_EL2_ListRegs) + 1;
+>  	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a49042bfa801..1ef660774adc 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1113,6 +1113,8 @@ struct kvm_vcpu_arch {
+>  /* SError pending for nested guest */
+>  #define NESTED_SERROR_PENDING	__vcpu_single_flag(sflags, BIT(8))
+>  
+> +/* pKVM host vcpu state is dirty, needs resync (nVHE-only) */
+> +#define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
 
-This really needs to be rebased on the current state of kvmarm/next,
-particularly 8cc8bbbfab14c ("KVM: arm64: Bound used_lrs when flushing
-the pKVM hyp vCPU").
+Please don't add flags in random positions. Keep them grouped by
+type.
 
-I really want to avoid using ICH_VTR_EL2 on each and every entry to
-the guest, as this has really bad performance impacts when running
-this under NV (which is the only way I run pKVM).
-
-Thanks,
+Also, it is unclear to me whether this is really an input to the
+hypervisor (which is what iflags indicates), but rather a new type of
+flag that indicate some hypervisor-private state. May not be that
+important right now, but worth keeping in mind.
 
 	M.
 
