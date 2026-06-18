@@ -1,76 +1,95 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58993FE677
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 21:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88492E62D9
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 01:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781731323; cv=none; b=GN43t7p49eiGJa9DmEcscIV2WipD1IaJ2CgRm6qnDs+EfzfRbblRZhb8ts71HfIxMDw2oXaiiOdc3jl1vbYIEWwnBmtTSchoRqLtK+EYLb/b5PBmWGjY5HSnaik8smQAnxoiPq9Hs6SHmo7zPzWlfY9JxBEnAMA5x3lUOVsbrVg=
+	t=1781747601; cv=none; b=awB+0FbBOI2aW/q9x33UZ+2DYzA+n5SFp70bM8K+T0iYaKGwPiXH3+w2ouO4kMOf8gWJuOjlxhLLVeEqdLxOb8F7LvD+e+fkgg8u0Zfpf2uyQ2CnT3Yb72tipkhf3PZGZ/cfrnyrD4PYkiPi4U+9xjNwmhZ5U+itjq2+GaaZxO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781731323; c=relaxed/simple;
-	bh=MGYaW/kGXMvXvkG3YNsp5PL2xIZorPYpsNyujv+1Wxk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ea0AORZKHVNLQoO8TSaSSmhfUjtdQv8ddt0atq9HvdZv32v1J6gCsU2Z0ikZ0AnIe3P6yVYyKK709qKgQn/heCcLZVvOfVIogAx4MgtyxRNi2ZwyCD60kOrWKH6vXq9V2ElV7M1RFwVWpRceyVfJ5y7MJS7/2fMfMRFkD+NoKPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oXbTLRuD; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1781747601; c=relaxed/simple;
+	bh=Hcc23D1q9nY6KeBD9c4ZLceM+isPNUT/sbG7Ak1FYks=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Or+nETrMrS5EY0V8Ms5WeDhSZyiyDvB8X9j3I4QccEzPS03n/Zf3Dfzit9nliyou4VJAG2Q6hH5Jum9aMERsiiokscpzLt4NtZRkqV5yKyTk2EzvT6vpi2nnpb7XO39aqk2aN3Crr/kLjXWG8gS53oeaI1CtSFOBgWafXAVDcXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ovFV3Jzh; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oXbTLRuD"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c8952346bb9so4908a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 17 Jun 2026 14:22:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781731322; x=1782336122; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g6AeAWlBOIBCo1eUsPzrvFR0RxSzMS/bNs/bO5JhUb8=;
-        b=oXbTLRuDcXg6izZ/HQmnu2x63ddR89z5OYlSc/iQVQCm5KAdJzr4nvfiXUayC3boBR
-         fiQl18zfOOo/OqRi+Epy4edkAm0wqho22kdc45s1ygtohyN31BcDCJXWY0Cgy7DxuDUg
-         2Hc3AD0dBhLPFoiYGV0WMU2Ez48hwziZrxpcL1UEjcGn+4fnkK8BMmy9FvM6JNJDeDGk
-         kD/M4ff9sHlFSgr5EIrKJgiYEw1jPms/U4LsKMhA4W53Hg8j7qH58Fk2FKofzZsSFeeA
-         DTO9zeh7cp7Ev40l3GTzvH9WOcvr6r0wTtWc5yXM23C2dOin5567gDu5g73oVEos/Q38
-         kJng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781731322; x=1782336122;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g6AeAWlBOIBCo1eUsPzrvFR0RxSzMS/bNs/bO5JhUb8=;
-        b=RHsLZ1XgyXxRQ8dGDxMa2m0ga0pots0UBsVErnYjNHxgLewXUhDVHEjsuO2o4ZBGXJ
-         qnMqkBDQoC/KjK5YGkEOZKJVJst8XuxlJbapG7tXrKq8tQzb379Vxm3mh0qQUEw8Ib+z
-         VIONII0JtLCWK1dr5NnbgthjWQG7H+WyTNrqW82Ca1CC22UWYx9XooR+zVe8DDP9IgLu
-         Wg2pKV3COT5jE9TvpiHHDtpgrxFkKyC3ZiwldUUm1ny0Z4kNQlrs1x5DDVcbff/GvK8M
-         aGSAdFCRYgvS6qNh/3la3+TrBfsdNUWpMejbrutZPVlGQq34CmGomSzsuIF3XYoAGfXi
-         /8Pg==
-X-Forwarded-Encrypted: i=1; AFNElJ+G4pM3iFEKPkxhHfgmZlMh+/Fc4XD26vjoqKUNu+MBKB9QFDuCa1rNuwAkHwAzCrjTdaF06pc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwyS7Ra8yEVCkZsnTfbzUK9WkcL3RuzWp+/VD7DUm2RPcq0bkyq
-	HPs0Kyu3cDlXeOL9ngrm7B+Wtoo8y+458U+I+QmzWaCWVqdYfCA2Wp17nuOn/la3g4ka1Iti3QE
-	aSvg2jQ==
-X-Received: from plnw11.prod.google.com ([2002:a17:902:da4b:b0:2c0:b770:dcd7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1590:b0:2bd:606d:b342
- with SMTP id d9443c01a7336-2c6e529338amr6910895ad.26.1781731322053; Wed, 17
- Jun 2026 14:22:02 -0700 (PDT)
-Date: Wed, 17 Jun 2026 14:22:01 -0700
-In-Reply-To: <ajKcDRqT5m069PXK@raptor>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ovFV3Jzh"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=baDTuvvK2rnBrTQYWqm7ATQZOTdxwB6p+v1mQB0ln0U=;
+	b=ovFV3JzhO8N/0lbfun2Dcbo+s3uduzoqK6QFiVNFlaRGSRIEv7jpAN6XoJ/16TPzR05Bm0y3K
+	q0Q304PdA32b4ir8vfHLLV/ktI355N4ho4ZwfONYG/0uu4IaRlj7h7Kg7ymGFOpS9QcGSyGrSLy
+	tIfTWIw3ciHOxrbyGqYCBH8=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4ggk7d4TTKzRhRL;
+	Thu, 18 Jun 2026 09:45:17 +0800 (CST)
+Received: from kwepemo100012.china.huawei.com (unknown [7.202.195.139])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5E8B340538;
+	Thu, 18 Jun 2026 09:53:16 +0800 (CST)
+Received: from [10.67.120.222] (10.67.120.222) by
+ kwepemo100012.china.huawei.com (7.202.195.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 18 Jun 2026 09:53:15 +0800
+Message-ID: <6dca2d6e-54d0-42c4-95df-45a30a473e0b@huawei.com>
+Date: Thu, 18 Jun 2026 09:53:15 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260615155244.183044-1-alexandru.elisei@arm.com>
- <20260615160901.9A1A61F000E9@smtp.kernel.org> <ajA6ogaNiI3KDv5i@google.com> <ajKcDRqT5m069PXK@raptor>
-Message-ID: <ajMP-cUia1I-sVAE@google.com>
-Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only memslots
-From: Sean Christopherson <seanjc@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: sashiko-reviews@lists.linux.dev, Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 15/20] perf: arm_pmuv3: Handle IRQs for Partitioned PMU
+ guest counters
+To: Colton Lewis <coltonlewis@google.com>, <kvm@vger.kernel.org>
+CC: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Russell King
+	<linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will
+ Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+	<oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, Joey Gouly
+	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, Shuah Khan
+	<shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	James Clark <james.clark@linaro.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-perf-users@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, wangyushan <wangyushan12@huawei.com>, Zhou
+ Wang <wangzhou1@hisilicon.com>, <xuwei5@huawei.com>,
+	<prime.zeng@hisilicon.com>, <fanghao11@huawei.com>
+References: <20260504211813.1804997-1-coltonlewis@google.com>
+ <20260504211813.1804997-16-coltonlewis@google.com>
+From: wuyifan <wuyifan50@huawei.com>
+In-Reply-To: <20260504211813.1804997-16-coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemo100012.china.huawei.com (7.202.195.139)
 
-On Wed, Jun 17, 2026, Alexandru Elisei wrote:
-> Hi Sean,
-> 
-> Thanks for the reply. Just to make sure, once the bugs have been iron out,
-> you're ok with this idea?
+Hi Colton,
 
-Yes, I'm more than ok with this idea.  The only reason I didn't push to do this
-right away is that I completely missed it :-)
+On 5/5/2026 5:18 AM, Colton Lewis wrote:
+>   static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
+>   {
+> -	u64 pmovsr;
+>   	struct perf_sample_data data;
+>   	struct pmu_hw_events *cpuc = this_cpu_ptr(cpu_pmu->hw_events);
+>   	struct pt_regs *regs;
+> +	u64 host_set = kvm_pmu_host_counter_mask(cpu_pmu);
+> +	u64 pmovsr;
+kvm_pmu_host_counter_mask() is called from armv8pmu_handle_irq(). This
+interrupt fires in both host and guest contexts.
+
+However, kvm_pmu_host_counter_mask() dereferences
+host_data_ptr(nr_event_counters). This indirection requires
+kvm_arm_hyp_percpu_base[cpu] to be initialized, which only happens during
+KVM hypervisor setup. When the interrupt fires in a guest kernel where 
+KVM is
+compiled but not active, the per-CPU base is NULL and the dereference 
+faults.
+
+Thanks,
+Yifan
+
