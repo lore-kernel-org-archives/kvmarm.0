@@ -1,62 +1,65 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8D7282F26
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 09:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDFE3546C7
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 09:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781773293; cv=none; b=Ta8w+Zvt+y/pQNuL4Y32078ZU+i5IQjNIc1KycHKG+dDQNqBJIlY3zNsZz2vT93fBWAiFu/ieGCqnViEA65iHSzK0NxnAK8AiC2I4CcBZytydt0fmxJNgKQpCIKTaVLRkuwgaBNUJ/wgeWEIpdQaB5pzKm3b4OTyta2TS+dswTU=
+	t=1781773294; cv=none; b=lEFYUI4dt0ckxKWNeNTsDWO0j9fJbElnaXXNhwtLB9CVeN0xdG5e47C0R0rBhbGtjrfTaaltzqzSRUnGjGz4Xmnty0SveIL2PWfTLNGONQstuqv3THIxy8+5Sl1VU3oI15cWfTRM0HiHNzoyKO2RJaR8Mk8a1QnNCP60ZCA5kuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781773293; c=relaxed/simple;
-	bh=JF8xaUxAEefrhGeYdLmqjBr/6MU50meqkgMYwRq5apI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cxMzU1NqC1ZnRxAWiu+wROOrB03CPYyFrp+r0XLLBX2GWClK7ZoMV/z0+y2VDy8bQTR4qBefqe/r7weSFovjPsbHQWGP+5p6yEjecMHtUPLS8/kBSkLYiRw++IW9CBYVPRJLY49+1W4HlBsRSvD9qhNoQZlu0BPAeDyPU0gpwNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LjfjV9Ss; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1781773294; c=relaxed/simple;
+	bh=kPbNiuUzKQMjXCofUmeNgcpZ8erTJTd6Icx4iGmHjGI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sIIMyP73quscS+3VX9VYqt4OtZ+7Yz4mb3kzhGE6IMXT3uqgQ1fjkQSnkNzsBcJLHyMhFyqEOloQdnmQf02s4MEKIt4WcQyQnpDmExXnKyn2Gd6tvSITpuaZnro0s6Dy76fc2hFk7iLsC65fjXvjjz6wBoX1LYsTR/W8B2WVDbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e838wlN9; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LjfjV9Ss"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-490b37e1f48so4225855e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 02:01:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e838wlN9"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-460129ef947so527179f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 02:01:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781773290; x=1782378090; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jYtovqB7kdiINejrOv1fG0IAw5VWPSFbwH/MJT2FPq0=;
-        b=LjfjV9SsUP542PIwpWk/2ro1LJ2KJtjy4W2FFSEctiy6ozwmWXQxYTHEB2Ydi829Ix
-         coRCVqUJisFVNJXqFpAgathZgadhxIQ4vLDPG8C/+/0b6I0+FfHzQcYkBnR9aCCsxHI5
-         rJwwx1EGMx8fdb/FsoXaB4DPcBCj20Nrs8dUd7bEtS24OqrmsVnHhGytIzb09LIIx/Un
-         UGChbgf4R7c8Fzg2jIoO5WbFWndMPmU6S1LXIc1yKQrveXDV1S0P/R2UhGRS+by6/U9e
-         Sl3d+IIlRhgo9Qycect9qn7qXKNMiufWTUD8ej7abxDmBv71iwX+xOUE1O9rk/wdoc6k
-         S+pA==
+        d=google.com; s=20251104; t=1781773291; x=1782378091; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L6i1EBve8VgH9NFCJHV43H1GJ8AEaTDJcQZdwOxP7rs=;
+        b=e838wlN9CkW/ZAUkwWeFW8da2XeYH3SDh9j9W+d81AGL+8Cp81shQJ1EMRCbsg3S8B
+         UVSZoKha3s7RrYn+ghtNsE7DXZSaWerdvXp1+IgJBsmzuFzhRaQnFk/+EkEzLW+8ogjq
+         HhcZ4LGx1Ltx2nYhoCxQ05UfaAdrkG1oZs7g7evrrk71GxaXOe2gbO12QRs4JBNIM24O
+         vNNEvEYovMgiPVDntH2+vXrmUQkZ7add1lFqv1Bc5cqZ9au576MLW2YW8HSLXaV5PALL
+         b6vLVnnTkX/HHF4Vq+EndOKbLgV4qKg2YkMdRb1W319u4NViQ5xsiWsTqw5HFbg/z8yQ
+         4QJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781773290; x=1782378090;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jYtovqB7kdiINejrOv1fG0IAw5VWPSFbwH/MJT2FPq0=;
-        b=p/hQ5Eh0TCQF3dtzd5xu2XvtlgJoUQZotiBnGVcXCRtY5CmoM3UtJ+TBGo5R/Tlt8E
-         pBR1ul9Itz7H/L/OBT3YIgmViNp6Pg/Gri8Sbz0v7aZtrPB1amm1/3RMutNZhC3uAlpT
-         2/S24bIU3Q63oean4IuZ+LUadN4w44Id7kWU6cpxlbNOSazqNP2WT3LPBESfzqGzatSA
-         xRonYOKCdv7h6g80Zw3V0G+8KmF+ZGg0UzCO8CY70Q/tWEiPL/GmIyInoRkjIfnoxywL
-         krwBsreIB1i+AK6NIN3o+2IC1JXFU0+cdeTfApCNszPqFoqII+I+ezJI4MmHyCws8S/d
-         7BHQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/SjCe1wdadkNb/oKDhRFV7QbDo90T2Ard1BT0B4QZfGkTTfs5pVWczFmOYcESDCvzTsd0SL3E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyAJranbkOn1OWgS3C7FNplYu552Z2IodHXc7cXzjaUqtxqi0PC
-	YI60VkDFMabN6hhBWhFKi38TsJ5z2asoa+YS0v/b+DjAZfsdsWWLcZtD1+Qz+zW02ddy7AgzVbP
-	aKA==
-X-Received: from wmrk26.prod.google.com ([2002:a05:600c:b5a:b0:492:2566:3b6e])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4fcf:b0:490:c024:2ec8
- with SMTP id 5b1f17b1804b1-4923819e3f0mr44387665e9.0.1781773289396; Thu, 18
- Jun 2026 02:01:29 -0700 (PDT)
-Date: Thu, 18 Jun 2026 10:01:25 +0100
+        d=1e100.net; s=20251104; t=1781773291; x=1782378091;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L6i1EBve8VgH9NFCJHV43H1GJ8AEaTDJcQZdwOxP7rs=;
+        b=Grh0GuIVG8PMsjWd62TAUOQ3NVUhFaSoe1/o3XOsrL+GN1/gDhknFFfnymy4RK2ZWi
+         1krZYbYg/CTHiMZTNXWibtt9DJK4rqv5NryeYmAUz5VTgn3MxDG5S+lVIJ9bkNxtwP7m
+         XsO7/Q7/6LCFf1ZDZUcwklFQM6Gy0H6GQuoVgo0Mfyb0x41jhNsGgEtModryRxLJ5woo
+         nMJt2s7SrmxHdTjj9+DjsunHtpB9I/KNRS0ohQHFHd6BV56yhMdVn/epviaiMMZdNRkD
+         svXxBbY+I1WFkmh6cKuNQQYxvv6+gOrzudC9gOm2fapKZlvP5GOu66DTNTdLKPPUUdpM
+         0Fsg==
+X-Forwarded-Encrypted: i=1; AFNElJ/JSpEDh93OL5R4qH8XGbcDROFyWgw3PQdFb8WAGj5C25Gnzddj2Tzdm1VtMkt0Y94Sq39GM7g=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzfV6oM7lV9jfH/rE/mLAXd2oNZLcZTEIRflvHS9iTfeXRqlbOZ
+	P+JJq5G6QnXu4AJ7tWd8toALL9gRBibHop4+cw3E7cZx2AWAsrxyl4tSvrxKG2KyXQt9bUVwD6v
+	gJw==
+X-Received: from wrsg17.prod.google.com ([2002:a5d:46d1:0:b0:45e:f3ae:e713])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:adf:f488:0:b0:45e:ea65:d329
+ with SMTP id ffacd0b85a97d-4623627634dmr9439000f8f.7.1781773291246; Thu, 18
+ Jun 2026 02:01:31 -0700 (PDT)
+Date: Thu, 18 Jun 2026 10:01:26 +0100
+In-Reply-To: <20260618090128.3913688-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260618090128.3913688-1-tabba@google.com>
 X-Mailer: git-send-email 2.54.0.1189.g8c84645362-goog
-Message-ID: <20260618090128.3913688-1-tabba@google.com>
-Subject: [PATCH 0/3] KVM: arm64: pKVM is_created cleanup
+Message-ID: <20260618090128.3913688-2-tabba@google.com>
+Subject: [PATCH 1/3] KVM: arm64: Drop the unused EL2-side is_created write
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
@@ -68,32 +71,30 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-This small series tidies up the host-side kvm->arch.pkvm.is_created flag,
-which tracks whether the hypervisor-side (EL2) VM has been instantiated.
+init_pkvm_hyp_vm() sets is_created on the EL2-private VM struct, but the
+hypervisor never reads it: pkvm_hyp_vm_is_created() and every other
+consumer operate on the host's struct kvm, a distinct allocation from
+the EL2-private copy. The field is write-only at EL2.
 
-It comes out of the ongoing pKVM (protected KVM) upstreaming work and runs
-in parallel with it. The changes only remove dead or redundant code around
-the flag, not any of the functional paths that work touches, so there is no
-dependency in either direction and the two can be applied in any order.
+Remove the store; host-side is_created tracking is unaffected.
 
-is_created stays: the pKVM handle is reserved early (so host MMU-notifier
-TLB invalidations have a valid handle before the first vCPU run), so a
-non-zero handle no longer implies the EL2 VM exists. is_created is what
-distinguishes "reserved" from "created", and the teardown path relies on it.
-Only the cruft around it goes.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Cheers,
-/fuad
-
-Fuad Tabba (3):
-  KVM: arm64: Drop the unused EL2-side is_created write
-  KVM: arm64: Remove unreachable early checks in pkvm_init_host_vm()
-  KVM: arm64: Drop redundant READ_ONCE() in pkvm_hyp_vm_is_created()
-
- arch/arm64/kvm/hyp/nvhe/pkvm.c |  1 -
- arch/arm64/kvm/pkvm.c          | 13 +++++--------
- 2 files changed, 5 insertions(+), 9 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index eb1c10120f9f..30dd4b2afc26 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -433,7 +433,6 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+ 	hyp_vm->host_kvm = host_kvm;
+ 	hyp_vm->kvm.created_vcpus = nr_vcpus;
+ 	hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
+-	hyp_vm->kvm.arch.pkvm.is_created = true;
+ 	hyp_vm->kvm.arch.flags = 0;
+ 	pkvm_init_features_from_host(hyp_vm, host_kvm);
+ 
 -- 
 2.54.0.1189.g8c84645362-goog
 
