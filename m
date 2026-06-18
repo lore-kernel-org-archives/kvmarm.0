@@ -1,43 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E4033F5B6;
-	Thu, 18 Jun 2026 19:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643673242D8
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 20:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781809575; cv=none; b=YjMLqgHWzS0JOcxiwA5ywkJLQVjg7zzkYf3Ks7wE9pg6qMQHRW+PkvNCa9FPodq4mBjjr15m19cKSfWt3CYL0u2LwTVpYVzpyB6ZMTDUr/PTAdty59MB2gaKGMVjVVrxZE8HZ0t8aWv0oRZn4fYwhdYwZaQ9RTligTARjUNHdtA=
+	t=1781814123; cv=none; b=bRKMXaFIzjZKRj9kFlAm/OHx73z5TUIHf+eOz8OOzhbJiYQEguw4Y6613cfB2dtLYANOZrXksQ1ZJQGaSsgQC0bPQGxNQuCaPkTz/P3lDE0pIHAUPK/wdvn8aSTZdhSBzCvdcoUbNlLzfIjKQI/wM4+F6zz7eEsyHVjtanrk+tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781809575; c=relaxed/simple;
-	bh=1Tv0YmVhkx8ud0qt22F8mlihvisOlxy+ZlCpIP1c5vE=;
+	s=arc-20240116; t=1781814123; c=relaxed/simple;
+	bh=oZHAxpIqUFadijIyqON+Dd9Hmvbr+/PPGnzg5RHUNoc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ml92Wb4hae3YMHf0hkQe6w94XZkTgLxl9u82DfMdCKcclfxHeTK5e/x+809W09AaXKh6qIKe6zq4jzALaJES9R9Gcu+rjgSTZbAoNluTHOVQ6lExlm1UFcgC5xp1U1kv8BF0GiJvYclPq4IYqJ79QWnMgbDX8w+IaWBwNE43kC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJFYo1fH; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=uURIurWH6265G9M69SNC42NwKQoc4hkNwc/BBlwkXDY61OR3e2ywBo1rnprWvooCGsBBvKiZeu5WXIwGkzIMqMcd6ZpWa66JLcOCpoxZfGXQRYflmp6K6z7/lyCyfLp6+IoFXIvtt9IU0+hgtBiXrnxzN/tSwRW7RvZOC066tts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RZsVvMu3; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJFYo1fH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C0601F000E9;
-	Thu, 18 Jun 2026 19:06:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781809573;
-	bh=wR6Mtq5nZ+5UapL5g8Gruh6bzm0GAsMPkKV4VGUnpD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QJFYo1fHYvc3pXPSZSAyFDU4Z0SNbW8oFKZ8rnOuhLSFy9g3a3hdDVJ/DyK45vkU/
-	 o7sj9BqU7NRvNOIfnVx+H9IhJRHLBnrCTnoGe+MWP+++QpUbpxQ/NB+6eySUFtDWQP
-	 fXtMJCCjGqSYFIjJqcXXpVVTGolsmDvW3Pf961XCU1S0IYWcU0rsR5xFV++L+mNbad
-	 29wz1z0MgzqDfYbDN/ppBvt+4vcqPHX2uK6nilp6uRIhZ+nRyQMDEooNftiA7d6ejd
-	 vi4YMnbwPcLAeTtRHfk8uAzNTofi6LAi2y5dSiC4Jqb2MwQjeq0Yb2AFJHeW3kLZGa
-	 skCgxmdzudOGQ==
-Date: Thu, 18 Jun 2026 12:06:12 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	jean-philippe.brucker@arm.com, andre.przywara@arm.com,
-	suzuki.poulose@arm.com, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool v2 7/7] arm64: Improve KVM_ARM_VCPU_PMU_V3_CTRL
- diagnostics
-Message-ID: <ajRBpMnlcNkhWzQL@kernel.org>
-References: <20260618155001.226266-1-alexandru.elisei@arm.com>
- <20260618155001.226266-8-alexandru.elisei@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RZsVvMu3"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8453f568e84so1229671b3a.0
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 13:22:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781814122; x=1782418922; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R8xCK89QfRMaVvrkpnB5YO+Fnx8pGynYV6YoyF7gSgA=;
+        b=RZsVvMu3q4ZPYrzed0JUHyyausQ+szjZLNMwV1jLbW69q3hnfXyoM+mFXZY8ws+zkg
+         43hI10yBFIN3DbGUTI2JoDRBS4gfy6vN2hjc8Hq5c37Y4P3C/nGkyZRYq2Oyyv2cljbC
+         U1kUTWh1NXNfG3curaKnSgd1xE7mHg38P6nTNjgD4ZezAUd2byUYBm+b1nnX2YERKyQ2
+         xrQNEer7WlR3HP924YdWGXVoyy+oPJzKi4Ekyvapxa1RwbyJdu+OI/yxseiM5oLt0fOf
+         OitxD881VOTCztljOqDQybUQ9wifgB0xQO8RKHdBOzUNF/JcbMS+zqLZTlrmouhVvY1K
+         580g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781814122; x=1782418922;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R8xCK89QfRMaVvrkpnB5YO+Fnx8pGynYV6YoyF7gSgA=;
+        b=Nv9tzNu8EMNOAAWjmWMWPHmE2hQkil5In3LZxYm3EOarX7UVnGDqkhV8si5ZZR0zho
+         YOthMfJX4HNHuojbNPFV9LRbH3+0YxHPb6VSvj3NJEkWGVKgvpwYD5aNQYsJuCzuc7pO
+         B5XhX3zJo6hbyCFE2XLQ7qHwNSziaBlTJzXcucL5YW9KqT1erpg785Z8RDGreux1V9M5
+         ZeTUUV5H/WUa5ivm377Vr25xBTdSx0t/BHYUVoA20zBeVDHRTZbf3jVfKVN9oR+DOolI
+         XvLshE+Zo48MsX8Ed3IhzhGcm8PSx9SdoefrfKiER1pimMPVlclaANi9AG+jEGJQGEjt
+         2x0A==
+X-Forwarded-Encrypted: i=1; AFNElJ8FN2iCxUW7jScTg3qP/0iCzIPp9ZjlWrTYQ6QdkpivKLRQnrREYrLRX37H3lXTqsAFr5vt/Lw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyP0n467AI07M+3wL9ku66jCUQvrK8crZJWQI5a1lQhdVnOz+8y
+	872WP+xIRrWmVoCv8gkbzDMyj0UOhdyq9nnfbDVJZZQEAQvoVfo2BDFlOEgVFFtxeY9Vltd0rVY
+	QE1FdgQ==
+X-Gm-Gg: AfdE7cnnAsVMzLyVKxyzL4jO6xNzGtfqWWqkrH8+4YQxwQhwsEEdiQvYNHqibhE8rB/
+	keehzdBDhT4lWF9LgPfxg1vFDj4f9KfM1EHNWOukVDv0mqi0VRp2iAr20zWDbQZFDIY9KYWrnaO
+	+8MWw1wQIpIb3mjmKG6KULNAsBeiWp3vms8p0tKmvMUwSpeBrggRrg0/82zQ1gpbEJiXkAOmBnL
+	tgijk/0oVErB2CZ0cyrSjkwXAaXNjBvO7ci37/qCpPHbaryvTJu5otFPLxaLL7c0AAPJFi6d6QI
+	L5Ckg1Gaw+wY6aE67M52gjDF3mpEe95NEimlmrFzPtmsCICkBRYO1tYwk38GNe+ix4ks7bdg9Ok
+	STlm0YiVYrAbUiIV5y53KdeSuozt3U0p6yC4vjziz+YTOVmCGVeaBQ84xhBwcTGetRX2gRIcRKH
+	TjEE+UMWYcKdH+ALQdOgh0PkzmBV3kHs+P+Mhk3yCfzMWFrEGWrA0=
+X-Received: by 2002:a05:6a00:4fd1:b0:845:17a6:5741 with SMTP id d2e1a72fcca58-8455079c80amr485384b3a.1.1781814121017;
+        Thu, 18 Jun 2026 13:22:01 -0700 (PDT)
+Received: from google.com (56.149.168.34.bc.googleusercontent.com. [34.168.149.56])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8453a8c9770sm3735614b3a.40.2026.06.18.13.22.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 13:22:00 -0700 (PDT)
+Date: Thu, 18 Jun 2026 20:21:56 +0000
+From: David Matlack <dmatlack@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Josh Hilke <jrhilke@google.com>
+Subject: Re: [PATCH v7 09/20] KVM: selftests: Add VFIO device support to
+ eventfd IRQ test
+Message-ID: <ajRTZNum3u7oVdRa@google.com>
+References: <20260613002031.745413-1-seanjc@google.com>
+ <20260613002031.745413-10-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,130 +81,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260618155001.226266-8-alexandru.elisei@arm.com>
+In-Reply-To: <20260613002031.745413-10-seanjc@google.com>
 
-On Thu, Jun 18, 2026 at 04:50:01PM +0100, Alexandru Elisei wrote:
-> kvmtool issues several ioctls when configuring the PMU, and each of them
-> can fail for different reasons. Be more specific about the ioctl that
-> failed when that happens.
+On 2026-06-12 05:20 PM, Sean Christopherson wrote:
+> From: David Matlack <dmatlack@google.com>
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm64/pmu.c | 31 ++++++++++++++++++++++++-------
->  1 file changed, 24 insertions(+), 7 deletions(-)
+> Extend the eventfd IRQ test with a '-d' argument that takes a BDF (in the
+> format segment:bus:device.function) of an interrupt-capable PCI(e) device
+> bound to VFIO, and use said device to trigger interrupts instead of always
+> synthesizing interrupts via direct writes to the eventfd.
 > 
-> diff --git a/arm64/pmu.c b/arm64/pmu.c
-> index 92cacd62479e..78c15f153fad 100644
-> --- a/arm64/pmu.c
-> +++ b/arm64/pmu.c
-> @@ -12,6 +12,24 @@
->  
->  #include "asm/pmu.h"
->  
-> +static const char *pmu_attr_names[] = {
-> +	[KVM_ARM_VCPU_PMU_V3_IRQ]	= "KVM_ARM_VCPU_PMU_V3_IRQ",
-> +	[KVM_ARM_VCPU_PMU_V3_INIT]	= "KVM_ARM_VCPU_PMU_V3_INIT",
-> +	[KVM_ARM_VCPU_PMU_V3_FILTER]	= "KVM_ARM_VCPU_PMU_V3_FILTER",
-> +	[KVM_ARM_VCPU_PMU_V3_SET_PMU]	= "KVM_ARM_VCPU_PMU_V3_SET_PMU",
-> +	[KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS] = "KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTER",
-> +};
-> +
-> +static const char *pmu_get_attr_name(u64 attr)
+> Using a VFIO device to trigger interrupts validates the end-to-end delivery
+> of IRQs for "real" devices, and when supported by hardware (and KVM), also
+> validates interrupt delivery via IRQ bypass, i.e. via device posted IRQs.
+> 
+> Now that IOMMUFD is a thing, auto-probe IOMMUFD vs. "legacy" VFIO by
+> temporarily opening /dev/iommufd, and skip the test if neither IOMMUFD nor
+> legacy VFIO is available.  Add a '-t' option to the user override the probe
+> logic, e.g. in case IOMMUFD is available but the system is configured for
+> legacy usage.
+> 
+> Note, the device must have a VFIO selftest driver in order to work with
+> the test.  A helper script to list supported devices will hopefully be
+> available in the near future at
+> tools/testing/selftests/vfio/scripts/list_supported_devices.sh[1].
+
+> +static int vfio_setup_msi(struct vfio_pci_device *device)
 > +{
-> +	switch (attr) {
-> +	case KVM_ARM_VCPU_PMU_V3_IRQ ... KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS:
-> +		return pmu_attr_names[attr];
-> +	default:
-> +		return "UNKNOWN";
-> +	}
-> +}
+> +	const int flags = MAP_SHARED | MAP_ANONYMOUS;
+> +	const int prot = PROT_READ | PROT_WRITE;
+> +	struct dma_region *region;
 > +
->  static bool pmu_has_attr(struct kvm_cpu *vcpu, u64 attr)
->  {
->  	struct kvm_device_attr pmu_attr = {
-> @@ -32,13 +50,12 @@ static void set_pmu_attr(struct kvm_cpu *vcpu, void *addr, u64 attr)
->  	};
->  	int ret;
->  
-> -	if (pmu_has_attr(vcpu, attr)) {
-> -		ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pmu_attr);
-> -		if (ret)
-> -			die_perror("PMU KVM_SET_DEVICE_ATTR");
-> -	} else {
-> -		die_perror("PMU KVM_HAS_DEVICE_ATTR");
-> -	}
-> +	if (!pmu_has_attr(vcpu, attr))
-> +		die_perror("KVM_HAS_DEVICE_ATTR(%s)", pmu_get_attr_name(attr));
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pmu_attr);
-> +	if (ret)
-> +		die_perror("KVM_SET_DEVICE_ATTR(%s)", pmu_get_attr_name(attr));
->  }
+> +	/* A driver is required to generate an MSI. */
+> +	TEST_REQUIRE(device->driver.ops);
 
-The whole if (ret) die_perror(...) thing is a bit repetetive IMO. A
-treewide cleanup replacing this with macros would be nice, then you could
-stringize the ioctl under the hood.
+This series is probably going to race with merging another VFIO
+selftests patch to make send_msi() optional [1]. Can you add a check for
+that here?
 
-diff --git a/arm64/pmu.c b/arm64/pmu.c
-index 5f31d6b..0d9f3df 100644
---- a/arm64/pmu.c
-+++ b/arm64/pmu.c
-@@ -23,23 +23,19 @@ static bool pmu_has_attr(struct kvm_cpu *vcpu, u64 attr)
- 	return ret == 0;
- }
- 
--static void set_pmu_attr(struct kvm_cpu *vcpu, void *addr, u64 attr)
--{
--	struct kvm_device_attr pmu_attr = {
--		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
--		.addr	= (u64)addr,
--		.attr	= attr,
--	};
--	int ret;
--
--	if (pmu_has_attr(vcpu, attr)) {
--		ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pmu_attr);
--		if (ret)
--			die_perror("PMU KVM_SET_DEVICE_ATTR");
--	} else {
--		die_perror("PMU KVM_HAS_DEVICE_ATTR");
--	}
--}
-+#define kvm_set_device_attr(fd, _group, _attr, _addr)					\
-+do {											\
-+	struct kvm_device_attr __attr = {						\
-+		.group	= (_group),							\
-+		.attr	= (_attr),							\
-+		.addr	= (u64)(_addr),							\
-+	};										\
-+	int r;										\
-+											\
-+	r = ioctl((fd), KVM_SET_DEVICE_ATTR, &__attr);					\
-+	if (r)										\
-+		die_perror("KVM_SET_DEVICE_ATTR(group:"#_group", attr:"#_attr")");	\
-+} while (0)
- 
- #define SYS_EVENT_SOURCE	"/sys/bus/event_source/devices/"
- /*
-@@ -218,14 +214,18 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 
- 	for (i = 0; i < kvm->nrcpus; i++) {
- 		vcpu = kvm->cpus[i];
--		set_pmu_attr(vcpu, &irq, KVM_ARM_VCPU_PMU_V3_IRQ);
-+		kvm_set_device_attr(vcpu->vcpu_fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_IRQ, &irq);
- 		/*
- 		 * PMU IDs 0-5 are reserved; a positive value means a PMU was
- 		 * found.
- 		 */
- 		if (pmu_id > 0)
--			set_pmu_attr(vcpu, &pmu_id, KVM_ARM_VCPU_PMU_V3_SET_PMU);
--		set_pmu_attr(vcpu, NULL, KVM_ARM_VCPU_PMU_V3_INIT);
-+			kvm_set_device_attr(vcpu->vcpu_fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+					    KVM_ARM_VCPU_PMU_V3_SET_PMU, &pmu_id);
-+
-+		kvm_set_device_attr(vcpu->vcpu_fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_INIT, NULL);
- 	}
- 
- 	_FDT(fdt_begin_node(fdt, "pmu"));
+  TEST_REQUIRE(device->driver.ops);
+  TEST_REQUIRE(device->driver.ops->send_msi);
+
+[1] https://lore.kernel.org/kvm/20260609232855.3808971-4-rubind@nvidia.com/
