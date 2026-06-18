@@ -1,134 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D9D3BE643;
-	Thu, 18 Jun 2026 10:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781777801; cv=none; b=aKGDieeGIpsbRfqQ8FTvmng5NPYRuTtia0dwZ/Iy4RGbmCZh8fD4IlGRLk0a/HIvQgpR+n6+ARwnRFjxXTHVQqFDg/On99fJ6St6cPZMODcq5N4+uX0C4aVUVT5nWDpe8dI4bMFNRwNHF8KsMGv5xDALkwsYs7jw4CjMBL2rfJA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781777801; c=relaxed/simple;
-	bh=YOFVJBgSk/3eTZfHJzyGV4JyhB4FBjHaTCmJd/rZI5k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P+S4NK/B9bt5M6T8MYF7QnPafb9d4zU4upbvpE0TtH1KNwKifuvcX1FKcmrsoC+aCO690HamkkDZyhmEHdgN4LPdxwKMBASsxPpjNqcEVcp/cSKMxhRh9vzetZ6ILSoy7LIans5ju1frEJwoLr6faahhyJ8ykoGmfi0k+fhk2+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJWyH5g1; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5C23CE4A7
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 10:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781777917; cv=pass; b=dHtcVCGBBl1GxD/heXWgM8Me31pTKIjk6H5dOFqYDq5Wv+Ow4aW8wCEQV78wPU4V43o0OZ22ZYP/2jgR0msCEflr3Xi1U1V/OeOLFvZOJfLhxJXdTwcOxJhZK/aKr2Kg4/fqoRbqDpkWHEE8VEnOASeJuR5SGbLO4uroA9J3WTA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781777917; c=relaxed/simple;
+	bh=TtaugEzwOJfQo/R70PjAClcwyy5LTnOGY0jEYm58U5E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oEydezpHovaew3EGcDhEar6pO83JQv1wcOqUDv4pMUkeLBJGoeBOCd4sY1LBALQ4VDPFzh0Eurwa5v7i3cw7ubnAiSDqCDCxWpdbkUk8Ff2NNfMuhfcJs0uVfzg6Y0/3OKnr5McXk5mGyR8MxqcxP97UbUeL8NKdC3OCvgUTSs8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k0ruXvWh; arc=pass smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJWyH5g1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBA971F000E9;
-	Thu, 18 Jun 2026 10:16:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781777799;
-	bh=66JgIZ+ZfVcAOFUVboi0UgekLa+PJ0VEWzz7UjtLzxI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=EJWyH5g1605DUv6IWjNVuxBmHWLdme+hDdzyJx7Sc5pjfRoZPQOleZzMUSh9AvfbE
-	 9Wc4l4SDqRoJsC/6h/b6nB4gPDxbu1JyLXtn7IBNl8QIKk1ob2J63NxBEdy5bR+9/e
-	 TKSsf2W03FjQIPvm7QPe4sJB7WzLSJLtI7yBrkj8HjMefZ3hvlEL9JWsFMCldxyTNG
-	 NPEh0mNOXXM12j+U7yHdNkhtn2V5ab4Yk36/GLEAKD8zSnvJqW7rtD4QXYAerDSeUL
-	 wu+O9afpG4PYom2Q1Ure3+Ec0DP0FlNvPlhoCUtOW2gSB1WsI0cvxSKGtLNgGpUGG8
-	 eE93SJGnh7r9Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wa9na-0000000Dxvj-00Cx;
-	Thu, 18 Jun 2026 10:16:38 +0000
-Date: Thu, 18 Jun 2026 11:16:37 +0100
-Message-ID: <86fr2krw56.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: tabba@google.com
-Cc: Oliver Upton <oupton@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Per Larsen <perlarsen@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 11/11] KVM: arm64: Implement lazy vCPU state sync for non-protected guests
-In-Reply-To: <20260612065925.755562-12-tabba@google.com>
-References: <20260612065925.755562-1-tabba@google.com>
-	<20260612065925.755562-12-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k0ruXvWh"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5ad2abf31aeso4472e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 03:18:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781777914; cv=none;
+        d=google.com; s=arc-20260327;
+        b=cvQlyG57g2ELk5YQyE4+jpAhfHb4QncSyHCfaoe9bbto8ghSiDm32fTqNO+byza82W
+         8yM0+/RPGt6CjESLKtJQkUgu7sVU3sJIj14olvkVZImJ1ugXfFN7WO0w/WtKBGKksf7F
+         aTU9ychtZrLCqa6rkqpk5X+668BO8Kl6EwT92yapZgztWXABHusU/ytfzQ+KB+84A3M6
+         fQBbPHGzE3+HuTbH4JdzrJ8SO8RQYZ2cOjvqjORVlQYZcWG6+UzUssX8dPLrl+29advD
+         pPX4XoX0C8j+G5GGhAjw1N2dm/XXf0wCfDwft1wtxUh3hZTy7orxNDcsq1+83MvHMgZK
+         enpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=ibhvPjwqpM4eGx3+CK2N8NcqS34AHd1q3JqAVLGl61E=;
+        fh=ZwDYgNrgOWg87QwwMn313BVr3N+/R5XiraJqpsf5RbI=;
+        b=dt1julp1fLn314K2mKR0464lQEP6M/zi47fu+0knavOwC2k30DIdKnL4HKSTl5WQiL
+         TC0tCpfVff+RlA7vj3PAK/1feQbxomXbTlxpO8uTF7vuMMZw+79Pwn44epgq91LXViT9
+         VF1m/jO9pPhQkeerfl5WAYfezhkMrClKn7jqOACBKXU6H7nRfGthbr6YHtkUrB0X9UG1
+         rGEDdm7d6ytSg139OQCTbj8Qp7FNouse0kZ+fRqIeBDyvY+xW5L5fgcE62On8mirjQm6
+         D1kUgexf44bzErUkEvTUj5atw/rCHCRrvKzY1+OdbrVYXZHFs1mRIbl44Zis74h116n/
+         RXMg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781777914; x=1782382714; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ibhvPjwqpM4eGx3+CK2N8NcqS34AHd1q3JqAVLGl61E=;
+        b=k0ruXvWhKbRC4+1FzQFpwGYnz5nuK3eJg4aJ/Lcu0Sigra6YRDX4OVohPrkVoCSAor
+         /NVpUQmSu9mlrs24mqtS20cQx1e+eANaQzn402EKdJ4JKTC45UA+GR07SuzRx8ZIAWKV
+         FjsnRlcErFZB2tJuai5SR83jmvOW81vRIHDvACzSiagYnHXkKYjf15rMlHYWTjeIjHJ5
+         NAn+Dmri2rp5lOhTsoR3GuID/aRu6cqkYq2Ya4LN8qUmDsyajBEqsP0caszBL52O15bh
+         7Pq6fzv99VvctPSV5yPVgIjMHv1WyBPAnM51lhhk6QQXISrDT8QwF+IY0ppnLgD3yYfy
+         0f8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781777914; x=1782382714;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ibhvPjwqpM4eGx3+CK2N8NcqS34AHd1q3JqAVLGl61E=;
+        b=eTXqb4wBY/FfuuCDSHt25xEkx6znolETg5Oo/nIhJVmPRyPIjmeR8gmu7FrzeuI95Y
+         +REWQ9DYT73kYEE0Ljlc24zy/zB26K2dtYMCkvXLfLX0/eHOFy6AOQbZRH5HIgWqJZ+F
+         rGD6R2WBhF5Hf0id86KqJdoFcheypF9bgwbPgWAdcg548tAFc+DmfW8/jgnacffR2RQ3
+         wFqyoqAm2BNtqMY3FqXIzRsXUz6MRSijFTZhv8FjSlDJ0COKugFQu8p2OTPE9oxjQo7d
+         Iq7XIAnGotIeoUaexWNdfeFo8vEkUOMqxdzfK2jHd5x4Tt0InCDw5+pl67fTj1TPWsap
+         2B/w==
+X-Forwarded-Encrypted: i=1; AFNElJ977aChjGUT2CGT+F4TQKrGg7mGOaaa8N7GTQdpcuPYLMI/Jxb/lD9TWMKuWmFyWfmxV4e9Cic=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx0eXgOkp9FCacXQSd7l87vgw+E2ZNUTFZSl+Cgtrkkfz7aEh9D
+	/QS+X0M4dfdcJ1+sbC8hEzw0Z3VP6BMwcDfOMHpoFJrSKnb1UjuOrtBGk9heiLdLm2DopfIweuG
+	/VURJMD63cdwviaBPzUb2pL70iRO+OhJNiOhpDs/D
+X-Gm-Gg: AfdE7clLWc8QaTeZCMcFis1AWZXjiPPmhJlq3QVhwicZuLHG61s/FNILFGIZpvlrL8O
+	5m1hNdVr/NZI1hVFYfVGjAaFW/LVdK3KoUAiMSai6Ym6wc/WMArgzWCRenkQD+LulhjO+8yflwN
+	Sh64nsOoJdtZWNeGv5cJpicDZxzM83QwyM1VNgbOV33C9pfpeOGIoqb0kuHmBPPkYgD1bFDWOsG
+	j2Z65JOBxCUtiglguRuaVxupCF+cENCEr4/onv051igVjJV/9r5Nj4cGzFFoTCMt2HdM8Y5mGYl
+	fWlWPnNE
+X-Received: by 2002:a05:6512:239e:b0:5aa:6ede:1a68 with SMTP id
+ 2adb3069b0e04-5ad4db8512amr132698e87.10.1781777913716; Thu, 18 Jun 2026
+ 03:18:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, qperret@google.com, vdonnefort@google.com, sebastianene@google.com, perlarsen@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, seiden@linux.ibm.com, mark.rutland@arm.com, jonathan.cameron@huawei.com, imv4bel@gmail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260612065925.755562-1-tabba@google.com> <20260612065925.755562-11-tabba@google.com>
+ <86h5n0rwfw.wl-maz@kernel.org>
+In-Reply-To: <86h5n0rwfw.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 18 Jun 2026 11:17:55 +0100
+X-Gm-Features: AVVi8CepfST9Vimf9vJgqw8SnCpHejknggCFsqVgJ1T1PMI5H1qLsWqwdsPK1Pc
+Message-ID: <CA+EHjTyHxtyh+CJz=8amZ4bERVazOtYj_qO=BiofxBqZOpjwyw@mail.gmail.com>
+Subject: Re: [PATCH v1 10/11] KVM: arm64: Add primitives to flush/sync the
+ VGIC state at EL2
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Sebastian Ene <sebastianene@google.com>, 
+	Per Larsen <perlarsen@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Jonathan Cameron <jonathan.cameron@huawei.com>, Hyunwoo Kim <imv4bel@gmail.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 12 Jun 2026 07:59:25 +0100,
-tabba@google.com wrote:
-> 
-> pKVM copies a non-protected guest's register context between the host
-> and the hypervisor on every world switch, even when the host never
-> inspects it. Defer the copy: on entry, flush the host context into the
-> hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
-> exit, leave it in the hyp vCPU and copy it back only when the host needs
-> it, via a __pkvm_vcpu_sync_state hypercall on trap handling or at vcpu
-> put. A protected guest's context is copied as before, since lazy sync
-> only helps where the host is trusted to see the guest's registers.
-> 
-> The PC is the exception: it is copied back on every exit so the
-> kvm_exit tracepoint reports the guest's real exit PC rather than the
-> value left by the previous sync.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h   |  1 +
->  arch/arm64/include/asm/kvm_host.h  |  2 +
->  arch/arm64/kvm/arm.c               |  7 +++
->  arch/arm64/kvm/handle_exit.c       | 22 ++++++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 88 ++++++++++++++++++++++++++++--
->  5 files changed, 115 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 043495f7fc78..6e1135b3ded4 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -113,6 +113,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
->  
->  	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index a49042bfa801..1ef660774adc 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1113,6 +1113,8 @@ struct kvm_vcpu_arch {
->  /* SError pending for nested guest */
->  #define NESTED_SERROR_PENDING	__vcpu_single_flag(sflags, BIT(8))
->  
-> +/* pKVM host vcpu state is dirty, needs resync (nVHE-only) */
-> +#define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
+On Thu, 18 Jun 2026 at 11:10, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 12 Jun 2026 07:59:24 +0100,
+> tabba@google.com wrote:
+> >
+> > From: Marc Zyngier <maz@kernel.org>
+> >
+> > pKVM performs its own world switch for protected VMs but has no
+> > primitives to move the per-vCPU VGIC state between the host and
+> > hypervisor vCPU contexts.
+> >
+> > Add flush_hyp_vgic_state() and sync_hyp_vgic_state(). Flush copies
+> > vgic_hcr, the in-use list registers and used_lrs from the host into the
+> > hyp vCPU and pins vgic_sre to a fixed value; sync copies vgic_hcr,
+> > vgic_vmcr and the in-use list registers back. The active priority
+> > registers are handled separately by the save/restore-aprs path.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Co-developed-by: Fuad Tabba <tabba@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 50 +++++++++++++++++++++++++-----
+> >  1 file changed, 42 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > index 2f165b6c7b07..23e644c24a03 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -99,6 +99,46 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
+> >       *host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
+> >  }
+> >
+> > +static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +     struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> > +     struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
+> > +     unsigned int used_lrs, max_lrs, i;
+> > +
+> > +     host_cpu_if     = &host_vcpu->arch.vgic_cpu.vgic_v3;
+> > +     hyp_cpu_if      = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+> > +
+> > +     max_lrs         = (read_gicreg(ICH_VTR_EL2) & ICH_VTR_EL2_ListRegs) + 1;
+>
+> This really needs to be rebased on the current state of kvmarm/next,
+> particularly 8cc8bbbfab14c ("KVM: arm64: Bound used_lrs when flushing
+> the pKVM hyp vCPU").
+>
+> I really want to avoid using ICH_VTR_EL2 on each and every entry to
+> the guest, as this has really bad performance impacts when running
+> this under NV (which is the only way I run pKVM).
 
-Please don't add flags in random positions. Keep them grouped by
-type.
+Will do.
 
-Also, it is unclear to me whether this is really an input to the
-hypervisor (which is what iflags indicates), but rather a new type of
-flag that indicate some hypervisor-private state. May not be that
-important right now, but worth keeping in mind.
+Thanks,
+/fuad
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
