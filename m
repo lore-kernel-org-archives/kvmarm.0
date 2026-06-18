@@ -1,194 +1,164 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9195B19DF55
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0230830566E
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781793525; cv=none; b=ag+m3TS+2aw/VqrnfyO8lXhaFjNS1Nna4et3awyo5Z86QOKFzn5I8CfgFhgYCAZ0kMNK+w/kTc3ySJsyGWMmpKZRUIVNOhRB4XpQEXjegS4J8kqN3E2AUoVPt+8KUihsLnSRaLX0SiXJ4G0nbYlgxEoupQNmZWnd7j1OuVmhWJo=
+	t=1781793545; cv=none; b=HOE10pCBu0uBUUXt0ATujY1WxI01TVRxkTtyBKLJqb+3Nhtn63FX6ECM0Uad/z0aP2U1VevWYt7qrqeJGdm268Q8HrtPwsWYhWzIFZtg83Unxn5v260aqc+CK82NMJj/xn0ed2UYxz/gGGZfHkYBq4Z9UAkZfthfowr1JfB205Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781793525; c=relaxed/simple;
-	bh=3w0JObxZdVXwi0oyADqD4Li3JMTNT34/C+qGah8oPFU=;
+	s=arc-20240116; t=1781793545; c=relaxed/simple;
+	bh=6Am1opJXDmybJuNW2jsyzsVYJ+w2+XBiG7OCTHJPHN0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=n2VCjzGJ7ucsS6iPCkqtiM2tUvJ+9p+i2mTHtj6tXuuiYct04MhCzYX+fpG+j4+z0qw3eVEW0vqqKnaC8ZCkshPV1jbd7YJskF3+korvVWMG73R5UD1MM+ktwzYCLcNwWl+NO9JlYhQok8Bkag/Q3n/M7L0bKCXbHyqFhxdwcao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XLYmeN+V; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type:Content-Disposition; b=UNAP8lSpPaNzwUpTCiX6h9Cdwr6og3x7yR5s0CthNsrunU0V9YYBsp+95/AJ50MJyjMESC4aI7LLxucEvVSZ52r117NSF4yXemp9ACCwltyASz1VVctYnuG2DsqYAhCv6UZe7hb572LI+pVXHNPCm+y08AVux6vbWktxPPJBPv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hbwVow+w; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XLYmeN+V"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hbwVow+w"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABFF532E2;
-	Thu, 18 Jun 2026 07:38:36 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B849232E2;
+	Thu, 18 Jun 2026 07:38:57 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A41333F62B;
-	Thu, 18 Jun 2026 07:38:40 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DA073F62B;
+	Thu, 18 Jun 2026 07:39:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781793521; bh=3w0JObxZdVXwi0oyADqD4Li3JMTNT34/C+qGah8oPFU=;
+	t=1781793542; bh=6Am1opJXDmybJuNW2jsyzsVYJ+w2+XBiG7OCTHJPHN0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XLYmeN+Vb74ut7WvOdJgTzQESOuzUrZvMd3+PwH2stQLmmfKtyF3FWEme87cjrSpL
-	 pbTp7EA4I5JULt/9d+xgGwqgCxs1bZ/nkX7qVGkxtkakXTxZazvN4Lfk9VFNhdwBvH
-	 BWUZLfnjmvntAAU7S2JTZaSgCIkuhaHl2Rr5fJLM=
+	b=hbwVow+wO53EszhaV3KgPSBRjjMo41WZsb5sQsMs6O7T7eaqhNU8P8JGPecidJrJr
+	 gC/yiJEA7GpzXF7USZy5TxxczPJ0S2ouIXctelFmQ2806chPzUp90C8/w9s5newedO
+	 n5gYNqvyn6pjiu/Gy2RJOP9UB7MgnecNe/Cje4VU=
 From: Leonardo Bras <leo.bras@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
+To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-Date: Thu, 18 Jun 2026 15:38:25 +0100
-Message-ID: <ajKh-OeWdjtz7eIY@LeoBrasDK>
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] Optimize S2 page splitting
+Date: Thu, 18 Jun 2026 15:38:50 +0100
+Message-ID: <ajQAkST-8muzZ1b4@LeoBrasDK>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <aiqCPDKcb1oA5EgM@devkitleo>
-References: <20260610202112.2695205-3-leo.bras@arm.com> <20260610203043.25A771F00893@smtp.kernel.org> <aiqCPDKcb1oA5EgM@devkitleo>
+In-Reply-To: <20260618131447.764085-1-leo.bras@arm.com>
+References: <20260618131447.764085-1-leo.bras@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 17, 2026 at 02:30:57PM +0100, Leonardo Bras wrote:
-> On Wed, Jun 10, 2026 at 08:30:42PM +0000, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> > - [Medium] Combining skip flags causes the walker to ignore the more restrictive skip levels due to fls() usage.
-> > - [Medium] Skipping a page table level bypasses the KVM_PGTABLE_WALK_TABLE_POST callback, breaking PRE/POST callback symmetry.
-> > - [Low] The skip logic cannot prevent the root level from being visited, making SKIP_LEVEL0 ineffective when start_level == 0.
-> > --
-> > 
-> > commit 4e6415e54e22d985a0c97622b8e8b28b4c84b54b
-> > Author: Leonardo Bras <leo.bras@arm.com>
-> > 
-> > KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-> > 
-> > Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
-> > when walking the pagetables.
-> > 
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > index 91a7dfad66866..48d88a290a538 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > 
-> > [ ... ]
-> > 
-> > > @@ -144,6 +144,19 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
-> > >  	return !r;
-> > >  }
-> > >  
-> > > +static __always_inline bool kvm_pgtable_skip_level(s8 level, enum kvm_pgtable_walk_flags flags)
-> > > +{
-> > > +	flags &= KVM_PGTABLE_WALK_SKIP_LEVELS;
-> > > +
-> > > +	if (likely(!flags))
-> > > +		return false;
-> > > +
-> > > +	if (level >= (fls(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
-> > 
-> > [Severity: Medium]
-> > Will this evaluate to the highest level if multiple skip flags are ORed
-> > together?
-> > 
-> > If a caller combines flags like KVM_PGTABLE_WALK_SKIP_LEVEL1 and
-> > KVM_PGTABLE_WALK_SKIP_LEVEL2, fls() will select the highest set bit. This
-> > means the threshold evaluates to level 2, effectively ignoring the more
-> > restrictive SKIP_LEVEL1 flag and incorrectly descending into levels the
-> > caller requested to skip.
-> > 
-> > Should kvm_pgtable_skip_level() use ffs() instead of fls() to select the
-> > lowest requested level as the definitive stopping point?
-> > 
+On Thu, Jun 18, 2026 at 02:14:41PM +0100, Leonardo Bras wrote:
+> While playing with dirty-bit tracking, I decided to take a look on how page
+> splitting works. Found out all entries are walked, even though we can infer,
+> for instance that:
+> - If a level-3 entry is walked, it means the parent level-2 entry is split
+> - If a split just succeeded in an table entry, it means all children nodes
+>   are already split
 > 
-> Correct. We should have s/fls/ffs/ in that line, so:
-> +   if (level >= (ffs(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
+> This patches' idea is to introduce new walking flags to skip pagetable
+> levels 0-3.
 > 
-> That will select the lowest level, instead of the highest.
+> The idea of skipping child nodes was also tested, but it was marginally
+> slower than just skipping levels, so it was discarted.
 > 
-> Since the tests were done only with a single skiplevel selected, ffs and 
-> fls return the same bit, so performance results should not be affected. 
+> Optimization measured on two scenarios involving eager-splitting on a
+> VM with 1 memslot of 16GB:
+> - Scenario 1: No manual protect, whole memslot split at dirty-track enable
+>   (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
+>   - Split happens only once, whole region
+>   - Evalutes improved batch performance of splitting
+> - Scenario 2: Manual protect, split happens during every dirty-bit clean
+>   (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
+>   - Split called multiple times, for smaller 64-page sections.
+>   - Evaluate improved performance for multiple calls
 > 
-> > > +		return true;
-> > > +
-> > > +	return false;
-> > > +}
-> > 
-> > [ ... ]
-> > 
-> > > @@ -192,7 +205,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> > >  	if (!kvm_pgtable_walk_continue(data->walker, ret))
-> > >  		goto out;
-> > >  
-> > > -	if (!table) {
-> > > +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
-> > 
-> > [Severity: Medium]
-> > Does skipping the level here bypass the KVM_PGTABLE_WALK_TABLE_POST callback?
-> > 
-> > If the current entry is a table, the KVM_PGTABLE_WALK_TABLE_PRE callback is
-> > executed earlier in __kvm_pgtable_visit(). If kvm_pgtable_skip_level() then
-> > evaluates to true, the code executes an early exit via goto out.
-> > 
-> > This completely bypasses the KVM_PGTABLE_WALK_TABLE_POST callback at the
-> > end of the function, leaving the TABLE_PRE call unbalanced. If a walker
-> > relies on symmetric PRE and POST callbacks to clean up resources or track
-> > traversal depth, could this asymmetric execution flow lead to resource leaks
-> > or state inconsistency?
+> Scenario 1, improvement on dirty-track enable ioctl for the memslot:
+> - Memory was already split (4k pages):  -44.01% runtime (stdev 2.80%)
+> - THP backed memory:                    -24.66% runtime (stdev 1.21%)
+> - 16x1GB hugetlb memory:                -24.78% runtime (stdev 0.85%)
 > 
-> Correct. PRE and POST are called only on table entries, and in the case 
-> skip levels is enabled it will completelly skip that post, which is 
-> undesired.
+> Scenario 2, improvement on dirty-log clean ioctl for the memslot:
+> - Memory was already split (4k pages):  -38.98% runtime (stdev 1.91%)
+> - THP backed memory:                    -25.49% runtime (stdev 0.65%)
+> - 16x1GB hugetlb memory:                -24.24% runtime (stdev 0.65%)
 > 
-> To fix that, I propose the following:
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -209,24 +209,24 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->         childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
->         ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
->         if (!kvm_pgtable_walk_continue(data->walker, ret))
->                 goto out;
+> For collecting above numbers, the following script was ran in both vanilla
+> and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
+> TX2 with 32GB RAM.
 > 
-> -       if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
-> +out:
-> +       if (table && ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
->                 ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
+> --- dirty_test.sh
+> #!/bin/bash
+> filename=$(uname -r |cut -d'-' -f 4-)
 > 
-> -out:
+> run_test(){
+>   uname -a
+>   cat /proc/cmdline
+> 
+>   #prepare
+>   sudo bash -c 'echo 64 > /proc/sys/vm/nr_hugepages'
+> 
+>   ./dirty_log_perf_test -g -b 64G
+>   ./dirty_log_perf_test -g -b 64G -s anonymous_thp
+>   ./dirty_log_perf_test -g -b 64G -s shared_hugetlb
+> 
+>   ./dirty_log_perf_test -b 64G
+>   ./dirty_log_perf_test -b 64G -s anonymous_thp
+>   ./dirty_log_perf_test -b 64G -s shared_hugetlb
+> }
+> 
+> run_test 2>&1 | tee ${filename}
 > ---
+
+s/64G/16G/ on above script
+
 > 
-> I suppose the extra test will be optimized well by the compiler, and we 
-> should see not much difference in performance.
+> Above dirty_log_perf_test command is the standard kvm selftest found in the
+> kernel tree. It tested the following guest modes:
+> Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
+> Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
+> Testing guest mode: PA-bits:36,  VA-bits:48,  4K pages
+> Testing guest mode: PA-bits:36,  VA-bits:48, 64K pages
 > 
-> Only other alternative I can see would be to add an extra label, and a copy 
-> of the increasing data->addr.
+> Performance numbers from above modes were used to calculate average and
+> stdev showed in the optimization results.
 > 
-> > 
-> > [Severity: Low]
-> > Does checking level + 1 prevent the root level from being skipped?
-> > 
-> > The walker unconditionally calls __kvm_pgtable_visit() for entries at the
-> > root page table (start_level). Because the skip evaluation checks level + 1,
-> > it only governs whether the walker descends into the children of the current
-> > level.
-> > 
-> > If start_level == 0 and the walker requests SKIP_LEVEL0, won't the walker
-> > still visit level 0 and invoke its callbacks, making SKIP_LEVEL0 functionally
-> > identical to SKIP_LEVEL1 in this case?
+> Changes since v1:
+> - Fixed inverted flag verification priority (Sashiko)
+> - Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
+> - New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
+> v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
 > 
-> Correct. But I don't see the usefulness of this being different.
-> SKIP_LEVEL0 is supposed to be useful if the root level is -1.
-> What would be a use case of having a flag to skip the root level? Why would 
-> the pagetable walk be called, then?
-> 
-> 
-> > 
-> > >  		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
-> > >  		data->addr += kvm_granule_size(level);
-> > >  		goto out;
-> > 
-> > -- 
-> > Sashiko AI review · https://sashiko.dev/#/patchset/20260610202112.2695205-2-leo.bras@arm.com?part=1
+> Changes since RFC:
+> - Changed approach from return value to walk flags (Will Deacon)
+> - Discarted skip_child approach (Oliver Upton)
+> - Measured in real hardware, and from userspace perspective (Marc Zyngier)
+> - Better explanation of what and how numbers were collected
+> RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
 > 
 > Thanks!
 > Leo
 > 
-
-Above e-mail should have been sent June 11th, but for some reason got lost 
-in my sent dir.
+> Leonardo Bras (3):
+>   KVM: arm64: Avoid re-testing walk_continue
+>   KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
+>   KVM: arm64: Make stage2_split_walker() skip unnecessary walks
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
+>  2 files changed, 34 insertions(+), 7 deletions(-)
+> 
+> 
+> base-commit: 66affa37cfac0aec061cc4bcf4a065b0c52f7e19
+> -- 
+> 2.54.0
+> 
