@@ -1,54 +1,54 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F429398902
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 12:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BE93F44CB
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 12:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781785008; cv=none; b=cS9BN6IvAbIEsoGBF3QH9V/F8CqKabx+qFZ9GZozLCplvOtWp+yNWVByjXBGvp2sm4rVHGXjdlXkZnTE9ZsFp9VsmaWN5/DZxm8j8zjBSRzz81h2nZ/IayRolywU6wAYjmJmD5Sz7w1iKoaF1BtMmlg7Ml59uuxn6Yp1Iy+tWnQ=
+	t=1781785010; cv=none; b=Eum4WsUnUq3om6DGgPv/CgthczdFTbvYoubhTh+7W7ws0vHl/UkoKIMeZ/DBT8+WJwSTFAZVXhuIxZ9RCBhsL3K179iSVjyEncG3ZpRO0yKtsk5crjjJLOmsYFoyd8J16l0kGPF3CTsW6dTOpxN25w0v3tKyhzoj1ZQpaxOm3RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781785008; c=relaxed/simple;
-	bh=k2tUUrjaEOJSqLnYiH4trRmQE35YgYWiuUcxe3jHqqE=;
+	s=arc-20240116; t=1781785010; c=relaxed/simple;
+	bh=waaYT4/DFUf9UowO2Osfh/Wu/cdI6fDHVQqOxUVGlxw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RknIC+zDEmutABQj09XCdgBWtc5zBacOLA76cWk/WJpuaLox92YsG3c0JYkLhZ45CYZoF0tUOD7SpspkmdyJxIue0RiSd6PKNWqI592Mca2sctThvgSaK5XXHjnSN3mnWqza4BaZC28BioFQ1luH+98xb31EwgIkVPRc8jgAziI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WHBCMo+n; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=sfwS94cGs0iKy+Gj/ZVNqh6tvdVODE+qZxqaf8RZu0wVWy9VUB0H5nHe5mljRcvyzEvLLP4KCsqleKUkCm7tfwOA/5rbiaReZ4kI/k6PEioWr6eSJPqvRteQ6zD+QmgvyBTkflJL7bQWVvoNJTxLdFwisLsoFqWEUznwaYxnXA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hFMeIvvq; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WHBCMo+n"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-beb6d964066so60415066b.3
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 05:16:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hFMeIvvq"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-45eec2ba533so694935f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 05:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781785006; x=1782389806; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781785007; x=1782389807; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MmD9Cr1xCcQkaKp0J7hG0PAULLmxV4B2BqTlvVuIlHU=;
-        b=WHBCMo+nExYAGUSLf+blQyVL5KXiVz/VbfKmPXD3psJpxnG/k2UIJn9OFo0yODT6gv
-         FQIlS7J0fjQFnCw9j3Z6EQs/ozoKbrBH7qPl0BqxTXhdPEXOtsM8dc3IlyN5+eW3hIw0
-         yZy6UY4AZIPYKDdqZFuSQlar6W5Kwf4kldy0+dqTLJhkwFCXfeRbK9rfLo7Kkin8SDac
-         cI6hHhHRjeEveLc1ELWQgsQQxiLetIgafu0KOzPaQCPsV3gRvJHg7Zz/b2iDq1VNE7ee
-         7+sGhjDG1VbexMc98CjXen1I3MnXRKCfJqefsR8oL7RsHIJJEVsJ2z8W3Is/eCqXkKuR
-         pSxg==
+        bh=rqX7MefVbPP0W7Hi9ByJyRvIz6FhPEE0my94/je5OUw=;
+        b=hFMeIvvq94epX+zCgjLgRdQiXhMlu6kYicK2OHP7TMDHL1chyiTS+LAtik7iagsiDU
+         1Vb+67d+xjnTCqmg8ZQhVCI8Q7beFf00FRNW7wUVuSqSUUCZ2BnkgIllKKdzafEUbZfg
+         DMiUoRHPQOD4K3uZgDkrkGWgQiiUBXTeWypc6VkcBy6tUmsl7IRnCgXYvgYq3AAqVBGa
+         bCremeTvRYgIcJpvD5iwnteBKyVq4ETBMHr/W5ukG9tOxqBB3j/okXVqXdoFsYtS3h4h
+         3CrxDL0BTNteJUreQYftqu6P4jIY/nnfut77p/1piFttgvTtWGxNFwY7INR/VOIoNbQt
+         vrRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781785006; x=1782389806;
+        d=1e100.net; s=20251104; t=1781785007; x=1782389807;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MmD9Cr1xCcQkaKp0J7hG0PAULLmxV4B2BqTlvVuIlHU=;
-        b=JPtSmr7yxk1+jrIf1cprQf787OPE9MTzO0J1c52XPIsvjIPBZ1i2pOm8heB4sY/oK2
-         VjwncL0bs5VUddElEOmVTG1a8018zWdBlx6b7dqajAx087bzh/HT3OlGWzORGG6VV/w5
-         H9KSyoEuti+5N8mDXV2U8KSfkvd6IloGOGzLeHMs5Bt4MAOU98mrnf3IkJIyJ1DwTTxW
-         qJRTPTg8LNWVxYfOxq48jH3TJLWdjn3NMYH/TyAG9FPigRk0jVe2ORp/GqAZtbafxGI4
-         D0OontihbbCJnQtE/K65fgX+DJoNyKVDY4K2z/FNtLahxrLXc+5/efX6x9cntFgeS4i0
-         BWpQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8w/5NUYZ38mcws5GYSDAW45UpsRQ2/AaspaoegZVT+w8Z5BgxVcylxB16KBuB1rf3Du2vr8Fg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywy0oZOENoRjq0TbENryHIBrAang7foACPVfZ1cTqpwOAY5jCZ1
-	4fw2uGm31grbqlJU0h3+T0b6TjpzHfGHF1ZLvy/x388Kmyq+9WKiBsUvteyL9whCKbqEaILG86l
-	m4g==
-X-Received: from wrs10.prod.google.com ([2002:a05:6000:64a:b0:462:b6f9:c0d7])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:9305:b0:beb:b53d:4841
- with SMTP id a640c23a62f3a-c05a73a7992mr547603266b.35.1781785005667; Thu, 18
- Jun 2026 05:16:45 -0700 (PDT)
-Date: Thu, 18 Jun 2026 13:16:37 +0100
+        bh=rqX7MefVbPP0W7Hi9ByJyRvIz6FhPEE0my94/je5OUw=;
+        b=mdLsGPSGeeEghjdufQj4maybgiW/1s3yvhioZyp/xFW82Fc0B/vUTZHA/znuQ4wLNq
+         39H/7oxnmj5qHqRbPUSmSizC9xCqewcIrhhB/O/zuTfLMxkg+3p5v/nVWm5irp+lnp9p
+         GQYPGQKKQ3juyE4KTNS+W7ytbzQ0UKP2/QctZMeQlWRM+p8/5Yj/oJq6kIzBoYhbtixI
+         Dl8nM7zs8JuAt6Feytfb9ejFBpLssi95C5CXzYQLHkbU/v6Kkvy85NwLb8QtxmbZQd5h
+         z7u6v8hdBT8eV30crxiEItqyTCwb433TEMgVHsJx0V84RbdLKZZrUj2+kqnqNctK0PrO
+         q0eA==
+X-Forwarded-Encrypted: i=1; AFNElJ8rYb+IYQ2Y/J2iOb9Zg5SJnwG3czTn1wR/GQGlhY8dbYjnmHqyy+PbcOneQOFVWF5KLqL7IRw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YygHGfwxK5K2b5fl6V+0EcHaDzbuLhNTRSvikUXmwUNqidIBKwO
+	vOBfqoILWCEG7XHnBTAFSj93tHPx6tPkmIWZUja9qZvkYPbDFa2EEjJOnkTjRK6Q3S45KZTUqew
+	sTA==
+X-Received: from wrvz3.prod.google.com ([2002:a5d:6543:0:b0:463:7bed:40ab])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5390:0:b0:45e:eec6:5020
+ with SMTP id ffacd0b85a97d-463ae25709dmr3971523f8f.38.1781785006903; Thu, 18
+ Jun 2026 05:16:46 -0700 (PDT)
+Date: Thu, 18 Jun 2026 13:16:38 +0100
 In-Reply-To: <20260618121643.4105064-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260618121643.4105064-1-tabba@google.com>
 X-Mailer: git-send-email 2.54.0.1189.g8c84645362-goog
-Message-ID: <20260618121643.4105064-2-tabba@google.com>
-Subject: [PATCH v2 1/7] KVM: arm64: Set ESR_ELx.IL for injected undefined
- exceptions at EL2
+Message-ID: <20260618121643.4105064-3-tabba@google.com>
+Subject: [PATCH v2 2/7] KVM: arm64: Unconditionally set IL for injected
+ undefined exceptions
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, 
@@ -70,33 +70,42 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
 	Vincent Donnefort <vdonnefort@google.com>, Sascha Bischoff <Sascha.Bischoff@arm.com>, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-inject_undef64() constructs an ESR with EC=0 (Unknown) but does not set
-IL. The architecture mandates IL=1 for EC=0 unconditionally (ARM DDI
-0487, ESR_ELx.IL description), so the injected syndrome is one that
-conforming hardware cannot produce.
+inject_undef64() derives IL from the triggering trap's instruction
+length (kvm_vcpu_trap_il_is32bit()), but the IL of the injected
+exception is fixed by its EC, not by the triggering instruction. The
+architecture mandates IL=1 for EC=0 (Unknown) unconditionally, so the
+conditional is wrong. The undef-injection paths are not reached from
+16-bit instructions, so there is no functional change today, but the
+logic should not rely on that.
 
-Set ESR_ELx_IL in the constructed syndrome.
+Set ESR_ELx_IL unconditionally.
 
-Fixes: e5d40a5a97c1 ("KVM: arm64: pkvm: Add a generic synchronous exception injection primitive")
-Reported-by: sashiko <sashiko@sashiko.dev>
+Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/inject_fault.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 8c3fbb413a06..9767adf1f73e 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -278,7 +278,7 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u64 esr)
-  */
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 89982bd3345f..9dfae1bcdf99 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -170,14 +170,7 @@ void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
+ 
  static void inject_undef64(struct kvm_vcpu *vcpu)
  {
--	inject_sync64(vcpu, (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT));
-+	inject_sync64(vcpu, (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL);
- }
+-	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+-
+-	/*
+-	 * Build an unknown exception, depending on the instruction
+-	 * set.
+-	 */
+-	if (kvm_vcpu_trap_il_is32bit(vcpu))
+-		esr |= ESR_ELx_IL;
++	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
  
- static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 	kvm_inject_sync(vcpu, esr);
+ }
 -- 
 2.54.0.1189.g8c84645362-goog
 
