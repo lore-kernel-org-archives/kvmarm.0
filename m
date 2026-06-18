@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D231F2F12D4
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 15:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01B52F8EA3
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 15:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781797842; cv=none; b=BIjFfu7vVh9HZnTmZEdfsB4r2GXnjow4lNzeXekfaaE408Ygs0hEAhhBHdzmHx9EM1vTi9ZZJPfU9mSa8Jof4lHqIHnV98m6On36lVnp2jdURCo4l8wmAqjp1+nSlscYZc5UyAntXm5fIT+IVOua7m+cZAOPBuuiNkicRCOO9+E=
+	t=1781797844; cv=none; b=SoMQ5CsR0Bu5RzfQbo0jZEaEDlatzE04kasjiFPXr8gr1qCD0G/jHtY7vWZj8I8UbN06cYlgaLYd9oWYx+trOz6+eQIEDe0eIKeYimMa4QMPI+OYi4zHYKqSi3OkR3u64+SdJzvwzYlh0fTWLeTPG2aEKvR15+p4GuFIx5tfCa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781797842; c=relaxed/simple;
-	bh=iYCvfqVaLiw0Zvcj4Aa2rFqHjzEE0Lem4pZj/+0mm9Q=;
+	s=arc-20240116; t=1781797844; c=relaxed/simple;
+	bh=BZrnvb+e+D1AKBEDPNGOe+Da6qi61H0n0AapNH7rhm4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WpYaA1vQg05C6Xd04CDKmASQI1jgZAFF2FZgRVa1fww9bBtAKOq7KtHImv//dp5g+jWS7nd8rs6DjFuc7j9QCIeJ7o0no+1DNrFrq+LOC/ISBh0Ikpo28EASDUHecfG5ERi4LcbMDQlBwX0gG9raQ3uKUhpD+u5gkpzaWdKKKpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rP8pXPQb; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=PbwxxyiJOmCBwGrK7djdriGHoBPmQgj2d3HtHUlcgtxML7S3grNcnmt7lrGATLbqzaLnnAAZ+v//XCGSA0Orq+cGyXVg62Q52yONa02VqcTDcpcD+xZPFGVfnKopLy5iUOgBLttYfVpzzJQTkDXfaggAYd/YiSpOEjOvQ5WLa8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=k4EQQ6A8; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rP8pXPQb"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="k4EQQ6A8"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A90CB4923;
-	Thu, 18 Jun 2026 08:50:35 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54DF248FF;
+	Thu, 18 Jun 2026 08:50:37 -0700 (PDT)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED1E13F62B;
-	Thu, 18 Jun 2026 08:50:38 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A2B13F62B;
+	Thu, 18 Jun 2026 08:50:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781797840; bh=iYCvfqVaLiw0Zvcj4Aa2rFqHjzEE0Lem4pZj/+0mm9Q=;
+	t=1781797842; bh=BZrnvb+e+D1AKBEDPNGOe+Da6qi61H0n0AapNH7rhm4=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=rP8pXPQbEnbH/DQBqZnIur//3OeFepNw3jd4sGXmb+oeGgfRvqn5X/OpEgD1+U+iI
-	 h/QmE1sjsGs+QPocukqdIOYiPBVzPm8q65sYXVPrYZNqQ9gcOMHxYTRamwc0Iqv1OL
-	 RDD0AA23fguz3bcrJ2tTEeI1gcwH1DZgoG098RaM=
+	b=k4EQQ6A8WE/LEhNIkEyZFR/xPgQZ3aoFj51a7RAKI0846zddLKpsoIROxDqaT2n9n
+	 osDGxaerAFsQ1tv4x4jkGAj3SCFCidKYl5GJiisPUWLlcEvMphqLVUhHcsxB1tq3KC
+	 F54tOlauieebzc0Sd3qBvSOgd8w8JZH/6sOTfY4o=
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com,
@@ -37,9 +37,9 @@ To: will@kernel.org,
 	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH kvmtool v2 3/7] disk/core: Do not modify const strings in disk_img_name_parser()
-Date: Thu, 18 Jun 2026 16:49:57 +0100
-Message-ID: <20260618155001.226266-4-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool v2 4/7] arm64: Initialise the PMU after the GIC
+Date: Thu, 18 Jun 2026 16:49:58 +0100
+Message-ID: <20260618155001.226266-5-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260618155001.226266-1-alexandru.elisei@arm.com>
 References: <20260618155001.226266-1-alexandru.elisei@arm.com>
@@ -49,154 +49,132 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-@arg is const char *, but disk_img_name_parser() modifies it, which leads
-to a compilation error on x86 with gcc 15.2.1:
+PMU initialisation is done in:
 
-disk/core.c:27:21: error: assignment discards ‘const’ qualifier from pointer target type [-Werror=discarded-qualifiers]
-   27 |                 sep = strstr(arg, ":");
+setup_fdt()
+  vcpu->generate_fdt_nodes()
+    pmu__generate_fdt_nodes()
 
-Make a copy of @arg and modify it instead, and be very careful to free it
-when no longer needed.
+The PMU ioctl KVM_ARM_VCPU_PMU_V3_INIT requires that the GIC has been
+initialised, which is done in gic__init_gic().
+
+gic__init_gic() and setup_fdt() are part of the same initialisation list.
+The relative order on the list depends on the order of compilation: gic.c
+is compiled after fdt.c and this places gic__init_gic() first on the
+initialisation list.
+
+If the compilation order changes and gic.c is compiled *before* fdt.c,
+gic__init_gic() will be executed *after* setup_fdt() and PMU initialisation
+will fail with an error message:
+
+PMU KVM_SET_DEVICE_ATTR: No such device
+
+This is fragile and hard to debug. Improve the situation by having
+gic__init_gic() explicitely initialize the PMU.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- disk/core.c              | 44 +++++++++++++++++++++++++++-------------
- include/kvm/disk-image.h |  6 +++---
- 2 files changed, 33 insertions(+), 17 deletions(-)
+ arm64/gic.c             |  9 ++++++++-
+ arm64/include/asm/pmu.h |  3 +++
+ arm64/pmu.c             | 28 ++++++++++++++++++----------
+ 3 files changed, 29 insertions(+), 11 deletions(-)
 
-diff --git a/disk/core.c b/disk/core.c
-index 91db277f7846..b232eece9e73 100644
---- a/disk/core.c
-+++ b/disk/core.c
-@@ -13,35 +13,42 @@ static int disk_image__close(struct disk_image *disk);
+diff --git a/arm64/gic.c b/arm64/gic.c
+index b0be9e5766df..1e4009625595 100644
+--- a/arm64/gic.c
++++ b/arm64/gic.c
+@@ -9,6 +9,8 @@
+ #include <linux/kvm.h>
+ #include <linux/sizes.h>
  
- int disk_img_name_parser(const struct option *opt, const char *arg, int unset)
- {
--	const char *cur;
--	char *sep;
-+	struct disk_image_params *params;
- 	struct kvm *kvm = opt->ptr;
-+	char *cur, *sep;
- 
- 	if (kvm->nr_disks >= MAX_DISK_IMAGES)
- 		die("Currently only 4 images are supported");
- 
--	kvm->cfg.disk_image[kvm->nr_disks].filename = arg;
--	cur = arg;
-+	params = &kvm->cfg.disk_image[kvm->nr_disks];
- 
- 	if (strncmp(arg, "scsi:", 5) == 0) {
--		sep = strstr(arg, ":");
--		kvm->cfg.disk_image[kvm->nr_disks].wwpn = sep + 1;
-+		params->wwpn = strdup(strstr(arg, ":") + 1);
-+		if (!params->wwpn)
-+			die_perror("strdup");
- 
- 		/* Old invocation had two parameters. Ignore the second one. */
--		sep = strstr(sep + 1, ":");
-+		sep = strstr(params->wwpn, ":");
- 		if (sep) {
- 			*sep = 0;
- 			cur = sep + 1;
-+		} else {
-+			cur = params->wwpn;
- 		}
-+	} else {
-+		params->filename = strdup(arg);
-+		if (!params->filename)
-+			die_perror("strdup");
-+		cur = params->filename;
- 	}
- 
- 	do {
- 		sep = strstr(cur, ",");
- 		if (sep) {
- 			if (strncmp(sep + 1, "ro", 2) == 0)
--				kvm->cfg.disk_image[kvm->nr_disks].readonly = true;
-+				params->readonly = true;
- 			else if (strncmp(sep + 1, "direct", 6) == 0)
--				kvm->cfg.disk_image[kvm->nr_disks].direct = true;
-+				params->direct = true;
- 			*sep = 0;
- 			cur = sep + 1;
- 		}
-@@ -145,8 +152,7 @@ static struct disk_image *disk_image__open(const char *filename, bool readonly,
- static struct disk_image **disk_image__open_all(struct kvm *kvm)
- {
- 	struct disk_image **disks;
--	const char *filename;
--	const char *wwpn;
-+	char *filename, *wwpn;
- 	bool readonly;
- 	bool direct;
- 	void *err;
-@@ -189,18 +195,27 @@ static struct disk_image **disk_image__open_all(struct kvm *kvm)
- 			goto error;
- 		}
- 		disks[i]->debug_iodelay = kvm->cfg.debug_iodelay;
++#include <asm/pmu.h>
 +
-+		free(params[i].filename);
-+		params[i].filename = NULL;
- 	}
+ #define IRQCHIP_GIC 0
  
- 	return disks;
- error:
- 	for (i = 0; i < count; i++) {
--		if (IS_ERR_OR_NULL(disks[i]))
-+		free(params[i].filename);
+ #define GIC_MAINT_IRQ	9
+@@ -355,7 +357,12 @@ static int gic__init_gic(struct kvm *kvm)
+ 
+ 	vgic_is_init = true;
+ 
+-	return irq__setup_irqfd_lines(kvm);
++	ret = irq__setup_irqfd_lines(kvm);
++	if (ret)
++		return ret;
 +
-+		if (IS_ERR_OR_NULL(disks[i])) {
-+			free(params[i].wwpn);
- 			continue;
-+		}
++	/* The PMU requires that the GIC has been initialized. */
++	return pmu__init(kvm);
+ }
+ late_init(gic__init_gic)
  
--		if (disks[i]->wwpn)
-+		if (disks[i]->wwpn) {
-+			free(disks[i]->wwpn);
- 			free(disks[i]);
--		else
-+		} else {
- 			disk_image__close(disks[i]);
-+		}
+diff --git a/arm64/include/asm/pmu.h b/arm64/include/asm/pmu.h
+index 38e3154b11b7..74566943f355 100644
+--- a/arm64/include/asm/pmu.h
++++ b/arm64/include/asm/pmu.h
+@@ -3,6 +3,9 @@
+ 
+ #define KVM_ARM_PMUv3_PPI			23
+ 
++struct kvm;
++
+ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm);
++int pmu__init(struct kvm *kvm);
+ 
+ #endif /* __ARM_PMU_H__ */
+diff --git a/arm64/pmu.c b/arm64/pmu.c
+index 5f31d6b6f346..92cacd62479e 100644
+--- a/arm64/pmu.c
++++ b/arm64/pmu.c
+@@ -193,21 +193,32 @@ static int find_pmu(struct kvm *kvm)
+ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ {
+ 	const char compatible[] = "arm,armv8-pmuv3";
+-	int irq = KVM_ARM_PMUv3_PPI;
+-	struct kvm_cpu *vcpu;
+-	int pmu_id = -ENXIO;
+-	int i;
+-
+ 	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
+ 	u32 irq_prop[] = {
+ 		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+-		cpu_to_fdt32(irq - 16),
++		cpu_to_fdt32(KVM_ARM_PMUv3_PPI - 16),
+ 		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
+ 	};
+ 
+ 	if (!kvm->cfg.arch.has_pmuv3)
+ 		return;
+ 
++	_FDT(fdt_begin_node(fdt, "pmu"));
++	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
++	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
++	_FDT(fdt_end_node(fdt));
++}
++
++int pmu__init(struct kvm *kvm)
++{
++	int irq = KVM_ARM_PMUv3_PPI;
++	struct kvm_cpu *vcpu;
++	int pmu_id = -ENXIO;
++	int i;
++
++	if (!kvm->cfg.arch.has_pmuv3)
++		return 0;
++
+ 	if (pmu_has_attr(kvm->cpus[0], KVM_ARM_VCPU_PMU_V3_SET_PMU)) {
+ 		pmu_id = find_pmu(kvm);
+ 		if (pmu_id < 0) {
+@@ -228,8 +239,5 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 		set_pmu_attr(vcpu, NULL, KVM_ARM_VCPU_PMU_V3_INIT);
  	}
- 	free(disks);
- 	return err;
-@@ -236,6 +251,7 @@ static int disk_image__close(struct disk_image *disk)
- 	if (disk->fd && close(disk->fd) < 0)
- 		pr_warning("close() failed");
  
-+	free(disk->wwpn);
- 	free(disk);
- 
- 	return 0;
-diff --git a/include/kvm/disk-image.h b/include/kvm/disk-image.h
-index bf602b582a3b..cbe91b07af0b 100644
---- a/include/kvm/disk-image.h
-+++ b/include/kvm/disk-image.h
-@@ -47,9 +47,9 @@ struct disk_image_operations {
- };
- 
- struct disk_image_params {
--	const char *filename;
-+	char *filename;
- 	/* wwpn == World Wide Port Number */
--	const char *wwpn;
-+	char *wwpn;
- 	bool readonly;
- 	bool direct;
- };
-@@ -69,7 +69,7 @@ struct disk_image {
- 	pthread_t			thread;
- 	u64				aio_inflight;
- #endif /* CONFIG_HAS_AIO */
--	const char			*wwpn;
-+	char				*wwpn;
- 	int				debug_iodelay;
- };
- 
+-	_FDT(fdt_begin_node(fdt, "pmu"));
+-	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
+-	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
+-	_FDT(fdt_end_node(fdt));
++	return 0;
+ }
 -- 
 2.54.0
 
