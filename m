@@ -1,164 +1,210 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0230830566E
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781793545; cv=none; b=HOE10pCBu0uBUUXt0ATujY1WxI01TVRxkTtyBKLJqb+3Nhtn63FX6ECM0Uad/z0aP2U1VevWYt7qrqeJGdm268Q8HrtPwsWYhWzIFZtg83Unxn5v260aqc+CK82NMJj/xn0ed2UYxz/gGGZfHkYBq4Z9UAkZfthfowr1JfB205Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781793545; c=relaxed/simple;
-	bh=6Am1opJXDmybJuNW2jsyzsVYJ+w2+XBiG7OCTHJPHN0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=UNAP8lSpPaNzwUpTCiX6h9Cdwr6og3x7yR5s0CthNsrunU0V9YYBsp+95/AJ50MJyjMESC4aI7LLxucEvVSZ52r117NSF4yXemp9ACCwltyASz1VVctYnuG2DsqYAhCv6UZe7hb572LI+pVXHNPCm+y08AVux6vbWktxPPJBPv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hbwVow+w; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1964F280A5A
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 14:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781793717; cv=pass; b=P6rRo2lo37pqJhNdGlT+i/xbleIq0wntvcccYzgHlZi9s39/c6IFHx0k4r/vLazDXJozcWT+VvpUU94t9flbMNKGJcrN5ggSPhC8RWaOrU/W03ivIAQqy7Mg0uqWRYLr0F9vRugSQOwJ1/mh47vY1hMvZxoKpsE8vIMQoSb6vPo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781793717; c=relaxed/simple;
+	bh=6jAMPAUU7NxAHfo3CqmuOs+a1P+DBOmdpSJ3YXon3gE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JRq8PBK3b74lV5iFsp8zRtFsz5cIej37jI8aH5ExD9jU36NxDOft12zhUaA0sjWtNd63TjVYIGqPluIRDs5exrpZZZAmFtU/f09cNmCYVnlcIyeUOPvcWvFdAeyW0BSZkCsDLUkEKyZdO0srusa2a6jKZl4B0lqD0paPViksQSc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TL9lxz6e; arc=pass smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hbwVow+w"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B849232E2;
-	Thu, 18 Jun 2026 07:38:57 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DA073F62B;
-	Thu, 18 Jun 2026 07:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1781793542; bh=6Am1opJXDmybJuNW2jsyzsVYJ+w2+XBiG7OCTHJPHN0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hbwVow+wO53EszhaV3KgPSBRjjMo41WZsb5sQsMs6O7T7eaqhNU8P8JGPecidJrJr
-	 gC/yiJEA7GpzXF7USZy5TxxczPJ0S2ouIXctelFmQ2806chPzUp90C8/w9s5newedO
-	 n5gYNqvyn6pjiu/Gy2RJOP9UB7MgnecNe/Cje4VU=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] Optimize S2 page splitting
-Date: Thu, 18 Jun 2026 15:38:50 +0100
-Message-ID: <ajQAkST-8muzZ1b4@LeoBrasDK>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260618131447.764085-1-leo.bras@arm.com>
-References: <20260618131447.764085-1-leo.bras@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TL9lxz6e"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ad4d840d43so7268e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 07:41:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781793714; cv=none;
+        d=google.com; s=arc-20260327;
+        b=EnDPx/pkrusDD59H6GRwHdpmn18/kcdoLl8oX6FdoVHqpltzhg3Kvq8qBE4bVAA4Qy
+         ika2HuYewu9U8QhQDk3Ns6L6Y+LambIr9aWedMjm8+f8ckz3dlIqkb48VtmRfXuK93l5
+         eECXASP8NFvR/LEsqrWJ3DZUn9ZxI2JdUyeTOJ0cPcW+forcM7zw+fn62wJKMZxqJF7b
+         qK+phH1E44IeVDjEaUN/jj3ITw1AAUbD+llrOzPX1h2VMNsAyoqrVx85hEDKMjgcFzog
+         wW0hY9iiuQzzacsR/EFTr02f+p3Cg+ccf4eifc2KrZZz/vho31tGi2JxYcZGoNaxZdrV
+         ILgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cyv7WmAzvj3n/08dSdKcTP0+sZKN+JUNiB8NClmfTJ8=;
+        fh=4Xn3ig0HNZly+RyCQnyQpoa4N4eMsKR4/adFZfizPqs=;
+        b=Hyl94TOj0mDQVTrCNkhS6BGb7alhnqYL2zJpEm2LUPKC5y4Kr7jT17835ZtrlgcVku
+         5d4b0UuQmdtuJDfv9Ih3oUztYdxaTz9Iihg/jYgTqpZCQxgc7Xiru9enLXC8Xdyigdi+
+         2hcEnK0xSTZC7bsxJUMNeIJGg+08V6uMMno11s1mF6HTkPyel5tx3Ku7CjCGlJEaqfTL
+         tWJyWSF0ZgdCbZPGkYT6Em41Yc1SIjTnEROcisIqigVkSAVNoVNY4JAOsZXb9FD+HcVE
+         vvvKLFJfYIe1+uIaa7/0T7Xwxrou17WGOzMDaBmK5Es7gt073JD9tc0leom3ZWZhFM6s
+         APVw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781793714; x=1782398514; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cyv7WmAzvj3n/08dSdKcTP0+sZKN+JUNiB8NClmfTJ8=;
+        b=TL9lxz6eLPxTxzLvqeTdvG0YejlLfimR8VsEGyPUQd9Fgnmm5roOa7e0fubnYlz9l/
+         Vsresp70RgCwDVQgBVAufR7fGJyykTlQHlye+7xRwa+kgEkpQgHTnCamW6GPR4d5BRjZ
+         usghkHaJjZ/4PxTS1co3Zxvt/y2VbJ0YZfgoWaSHvuE72D8jukpj7r4viP2Kq4gJ7onU
+         TJhHDETcgZPUzwkXpl6nf73v6rrJrZh24YY7LnxrnFFHGnCxxap56iLuTedomfmawOcm
+         EP9JJvDSRxuFLwix3wBqsqm7zqG1G1/XpRLKTyt5bkOniMwNYfWpk2FPrt11nVhUK7vO
+         V/GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781793714; x=1782398514;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cyv7WmAzvj3n/08dSdKcTP0+sZKN+JUNiB8NClmfTJ8=;
+        b=QCTCconvtWgrW+c4xFLu2KvJWz0Wd1BcAHdhuQoImG3veCyFzrawH9ycqD4+Ai0fbP
+         3WBl2gKcgkba9EZfyO1cqGhG7wBSNXHke8ul/sK2uoDVwhO0zS9O/8bdfLibba+qHr23
+         3iL7ra76E/YkEoq7O9DO5mpnlWFES5Jm8qA+ubVgezuBvPn6YBNeeFLEsLr5aJEG/SfX
+         hrrViidcLdxC3jkB2XV76VbKs4cE7UYPN1oS2pD8aUrRURVEMrM5xhs15L3V98oPABn+
+         5O5sbUkt4tAcoii0VOfzkBpzUcelzkG65uJVc5rVSfj/vSaTklNZsN9B2f8Ul/FpCjdi
+         T5nA==
+X-Forwarded-Encrypted: i=1; AFNElJ9RIIo0sPFZFzMYmA4yogvYWU0fujMGY/z+3eBhmA7yfATx3SKzd62eJnsX62egFgbfm+6oMbo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwF8slugR8ObFgnDb/VnCmBDPmIaUX7DPLUgXxr2u+PctkX6DQP
+	F0bU2Qb14fwljaOkEA5CHSBUAtzqUfo4hdyciek8L7oyeBYp+8FKY1VgoFQ3OkzpPIPif+QUMzz
+	5Z4Luq8vW0OHzDriWSIGl7EMHpBVgFzukxUCPaQeq68KoWADYwY4ZEtLg
+X-Gm-Gg: AfdE7cm9rIfKpYwxdEPYgXLAgEYIzkX7aOB+HP164dvkVNM+D27Q6dDvlDNqxJmm04i
+	/rc7TO3GjpsFSL5beGj6snSyI5m0BUVTGWSn/RITuTJTScVc0IxFFr0vMiShTBKT9bRBrVZkojn
+	PdOagqDN0gCT+9cFOPbh5MaWSA4P8qB3QvgIiph+/8tHEFM1crgJLFsnpQHAGw33I/kON83RhX6
+	UYOl0dbhF3XEqoIslZNTeZ4lEafyAe7K8R/xDx3cyA8pF66dmTmtTRsW+OrAbGpiR2Dvt9qeg==
+X-Received: by 2002:a05:6512:3193:b0:5aa:4c72:8732 with SMTP id
+ 2adb3069b0e04-5ad4db9bc41mr182457e87.10.1781793713788; Thu, 18 Jun 2026
+ 07:41:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20260618121643.4105064-1-tabba@google.com> <20260618121643.4105064-3-tabba@google.com>
+ <20260618123043.5D1C21F000E9@smtp.kernel.org>
+In-Reply-To: <20260618123043.5D1C21F000E9@smtp.kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 18 Jun 2026 15:41:14 +0100
+X-Gm-Features: AVVi8Cf0GaVcwzO4o9AsKmalolh1Ixou3PwA9WCiyR5ufBQEFXD4fRAnHT5wNkA
+Message-ID: <CA+EHjTyiyCNV40z82=YTTMrx3BoR5gn5uh-xP80gFxX2PSUMAg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Unconditionally set IL for injected
+ undefined exceptions
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Oliver Upton <oupton@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 18, 2026 at 02:14:41PM +0100, Leonardo Bras wrote:
-> While playing with dirty-bit tracking, I decided to take a look on how page
-> splitting works. Found out all entries are walked, even though we can infer,
-> for instance that:
-> - If a level-3 entry is walked, it means the parent level-2 entry is split
-> - If a split just succeeded in an table entry, it means all children nodes
->   are already split
-> 
-> This patches' idea is to introduce new walking flags to skip pagetable
-> levels 0-3.
-> 
-> The idea of skipping child nodes was also tested, but it was marginally
-> slower than just skipping levels, so it was discarted.
-> 
-> Optimization measured on two scenarios involving eager-splitting on a
-> VM with 1 memslot of 16GB:
-> - Scenario 1: No manual protect, whole memslot split at dirty-track enable
->   (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
->   - Split happens only once, whole region
->   - Evalutes improved batch performance of splitting
-> - Scenario 2: Manual protect, split happens during every dirty-bit clean
->   (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
->   - Split called multiple times, for smaller 64-page sections.
->   - Evaluate improved performance for multiple calls
-> 
-> Scenario 1, improvement on dirty-track enable ioctl for the memslot:
-> - Memory was already split (4k pages):  -44.01% runtime (stdev 2.80%)
-> - THP backed memory:                    -24.66% runtime (stdev 1.21%)
-> - 16x1GB hugetlb memory:                -24.78% runtime (stdev 0.85%)
-> 
-> Scenario 2, improvement on dirty-log clean ioctl for the memslot:
-> - Memory was already split (4k pages):  -38.98% runtime (stdev 1.91%)
-> - THP backed memory:                    -25.49% runtime (stdev 0.65%)
-> - 16x1GB hugetlb memory:                -24.24% runtime (stdev 0.65%)
-> 
-> For collecting above numbers, the following script was ran in both vanilla
-> and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
-> TX2 with 32GB RAM.
-> 
-> --- dirty_test.sh
-> #!/bin/bash
-> filename=$(uname -r |cut -d'-' -f 4-)
-> 
-> run_test(){
->   uname -a
->   cat /proc/cmdline
-> 
->   #prepare
->   sudo bash -c 'echo 64 > /proc/sys/vm/nr_hugepages'
-> 
->   ./dirty_log_perf_test -g -b 64G
->   ./dirty_log_perf_test -g -b 64G -s anonymous_thp
->   ./dirty_log_perf_test -g -b 64G -s shared_hugetlb
-> 
->   ./dirty_log_perf_test -b 64G
->   ./dirty_log_perf_test -b 64G -s anonymous_thp
->   ./dirty_log_perf_test -b 64G -s shared_hugetlb
+On Thu, 18 Jun 2026 at 13:30, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+>
+> Pre-existing issues:
+> - [High] Nested SError exception injection silently drops the ESR_EL2 val=
+ue.
+> --
+>
+> commit e7d1337c1e8d6db55c7b9ce2682f4c52e85c3f44
+> Author: Fuad Tabba <tabba@google.com>
+>
+> KVM: arm64: Unconditionally set IL for injected undefined exceptions
+>
+> This commit simplifies the inject_undef64() exception injection path by
+> unconditionally setting the IL bit, as the architecture mandates IL=3D1 f=
+or
+> EC=3D0 (Unknown).
+>
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_faul=
+t.c
+> > index 89982bd3345f6..9dfae1bcdf992 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -170,14 +170,7 @@ void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 es=
+r)
+> >
+> >  static void inject_undef64(struct kvm_vcpu *vcpu)
+> >  {
+> > -     u64 esr =3D (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+> > -
+> > -     /*
+> > -      * Build an unknown exception, depending on the instruction
+> > -      * set.
+> > -      */
+> > -     if (kvm_vcpu_trap_il_is32bit(vcpu))
+> > -             esr |=3D ESR_ELx_IL;
+> > +     u64 esr =3D (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL=
+;
+> >
+> >       kvm_inject_sync(vcpu, esr);
+> >  }
+>
+> [Severity: High]
+> This isn't a bug introduced by this patch, but while reviewing the except=
+ion
+> injection changes, I noticed a pre-existing issue in the nested SError
+> injection path.
+>
+> In arch/arm64/kvm/emulate-nested.c, kvm_inject_nested_serror() constructs
+> the ESR for the nested SError and passes it down to kvm_inject_nested():
+>
+> arch/arm64/kvm/emulate-nested.c:kvm_inject_nested_serror() {
+>         ...
+>         esr |=3D FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
+>         return kvm_inject_nested(vcpu, esr, except_type_serror);
 > }
-> 
-> run_test 2>&1 | tee ${filename}
-> ---
+>
+> However, when this esr reaches kvm_inject_el2_exception(), the value is
+> silently discarded:
+>
+> arch/arm64/kvm/emulate-nested.c:kvm_inject_el2_exception() {
+>         ...
+>         switch (type) {
+>         case except_type_sync:
+>                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
+>                 vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
+>                 break;
+>         case except_type_irq:
+>                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_IRQ);
+>                 break;
+>         case except_type_serror:
+>                 kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
+>                 break;
+>         ...
+> }
+>
+> Because the except_type_serror case breaks without writing esr_el2 to
+> ESR_EL2 (unlike the except_type_sync case), the constructed syndrome is
+> completely dropped.
+>
+> Since enter_exception64() does not dynamically update ESR_ELx, will the
+> guest hypervisor observe a stale ESR_EL2 when handling the injected SErro=
+r?
+>
+> Could this cause the guest to misinterpret the error, potentially leading
+> to incorrect functional behavior or a guest panic?
 
-s/64G/16G/ on above script
+IL=3D1 is correct here. The architecture mandates IL=3D1 for any
+Instruction Abort unconditionally, and for any Data Abort where ISV=3D0
+(ARM ARM, ESR_ELx IL bit definition). IL only reflects the faulting
+instruction length when ISV=3D1.
 
-> 
-> Above dirty_log_perf_test command is the standard kvm selftest found in the
-> kernel tree. It tested the following guest modes:
-> Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-> Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
-> Testing guest mode: PA-bits:36,  VA-bits:48,  4K pages
-> Testing guest mode: PA-bits:36,  VA-bits:48, 64K pages
-> 
-> Performance numbers from above modes were used to calculate average and
-> stdev showed in the optimization results.
-> 
-> Changes since v1:
-> - Fixed inverted flag verification priority (Sashiko)
-> - Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
-> - New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
-> v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
-> 
-> Changes since RFC:
-> - Changed approach from return value to walk flags (Will Deacon)
-> - Discarted skip_child approach (Oliver Upton)
-> - Measured in real hardware, and from userspace perspective (Marc Zyngier)
-> - Better explanation of what and how numbers were collected
-> RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
-> 
-> Thanks!
-> Leo
-> 
-> Leonardo Bras (3):
->   KVM: arm64: Avoid re-testing walk_continue
->   KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
->   KVM: arm64: Make stage2_split_walker() skip unnecessary walks
-> 
->  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
->  2 files changed, 34 insertions(+), 7 deletions(-)
-> 
-> 
-> base-commit: 66affa37cfac0aec061cc4bcf4a065b0c52f7e19
-> -- 
-> 2.54.0
-> 
+This function never sets ISV. The FSC is always EXTABT or SEA_TTW, and
+FEAT_RAS mandates ISV=3D0 for any synchronous external abort. The
+Address Size Fault case (kvm_inject_size_fault overwriting FSC to 0)
+also has ISV=3D0 since address size faults are detected during
+translation table walks with no valid instruction syndrome.
+
+The old code copying IL from the hardware trap ESR was the bug: it
+produced IL=3D0 for a 16-bit Thumb instruction, which is wrong for an
+ISV=3D0 data abort.
+
+Cheers,
+/fuad
+
+
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260618121643.41=
+05064-1-tabba@google.com?part=3D2
