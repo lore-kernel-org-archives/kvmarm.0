@@ -1,145 +1,140 @@
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9631232E73E
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 23:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFB814ABE
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 23:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781826706; cv=none; b=u8dtAMLWfMosb6Kex3SdIIdi8sOT+ViHIUAEm48+4kgf8udKQ8xlEmXdJsb6hX2GB/W2Qc66NaaWJqc0NSEsBkWdr5vvgCH0trSEqGCJlCErzmIB+yinhc9xIZQSw+2P2vh+ClmdBQbH0fXnvjuo329Crp18dflq9GiX4/3FTd4=
+	t=1781827054; cv=none; b=j7aWYS43iAAGn0I5OFET/UUsIl2sgMjJV8Q1xtSQ14e/mK7wa2tl75zTplkWgF80l4PIpECEHLkXoZb/vMLDd0M8YGYZ/BRHOerFBea1L7148EfaeXBWFWRV8sNhOmcNWwlxeOfr3zA4cOxW1pOwvBf2KwS0NohgMCfsSjzJBvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781826706; c=relaxed/simple;
-	bh=LSdlUfbS6mSNUj5xcGjcMT4ohXXE09tTSwdtALp716U=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=i4U7ZlHz9DIKrGdZd9UeHudmQwuMOmfCtMmTADMVzx8un51tQmsC12Qf3AeWf3fbYUGQDZTg6nBoTqtbu5Uio1XfkSiToyDGb/IqyS4UUHqpZdSwzojdbtU1vNqonyarseM96j3pa5krsilJtqG3kFkpWYwT12v3Q2Bk670f+1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=go8blJeE; arc=none smtp.client-ip=209.85.210.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1781827054; c=relaxed/simple;
+	bh=VnUr3M7+PVmlplQ87wva8vyYNbdEbv1oxYPz19Otni8=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=L5UDutKtD7yp5zmkp71o0lUF5DptyDK3nOZ+Y2QmYDExX107km7Hv3f8u94PbyKf/MdNwO4tJzOh3xg+lZJApJMV3YBpCzezS1dJzEDOhGhOj3eRwMbNRQMyJW11L6B1SPFgto0PLYf1VBXe500526tfkWo2BB0alord1/JtaZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nG1yOE15; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="go8blJeE"
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7e6d78299e9so2735572a34.0
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 16:51:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781826703; x=1782431503; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wl+XkAlSIV7reClA+yYwrnI1d2Koghf+XpHoLtIn5rc=;
-        b=go8blJeEXGO6LC/bhqZCXAIVJnGpT143vQ5RVIs8xNg+RYfa86WADlZVe5owRFJKst
-         JatfxNEw4QLS0ZNLfpURJZqsUsUB5nzgatRQLO2tAL/y7NKku/KvfBzdMsLRzniuxVst
-         RRga9G+SfHj7MolzT0WKkxUs6Wy4uNKpqciFU9v7YWfMIRfstYnzucQPQkp5P1FJOT/U
-         wWfY0OlHe1fTs4oSnNslCfcFaOXKTwHn/dcvhOylmbFEZzASaYHK8qd6IW1cMXEClc39
-         p3opj0CgkbkxghaqxoesLRdDkfm8v3Nk3sgsB6wLz6FD/SpNi59Y8KZeVqdgTmDQZ16j
-         yTVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781826703; x=1782431503;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wl+XkAlSIV7reClA+yYwrnI1d2Koghf+XpHoLtIn5rc=;
-        b=f7i/XlmK+bD0tHJ/3IC1zfFwozLFrzXTag+KoklMGThUqDlqMQdgD+ubcTa1+kc6ya
-         TEswd+8orwwSAVwhaYHgCqXXT5a08KwTJngYP7hhjIRSmjMP1h3feJtLHBpVzph2dqFm
-         uQqrObXST7AhlpcTyGOaURURYijQ+KzkFtOqF/xUeVSgdqVNxUBm+CZR/4PQvfwz0HTl
-         PMEU3R+gw+nrbHZ1Eg2gtWUIZnrOE3potcX1xWmXTokFhBoDhL7eUJG/Z3KTcN9zuEmg
-         fdDwnETpCzBIxyciF/idra3lXgBa53pSVOUn8p4LbPlWSVkVk5lQ+q0waKo/0WWLtDfp
-         NVOQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8m98TM9rONb2j+RXAMSvT/HAD22OmjsrPJOGcsMq+kvS8brIRDZvf8/wNqe25LCs2I9tGQU0c=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxWeCmAowE9UEAz05cQy6soWDnByGKZnI45C+M54Dl6c8rMp19w
-	c0Wstsb/wmfVcwvTLJnQ4K3OJlLKKs5TA1zTHEWuAkZQ2r6k2gbEwBEC7ijlFVhG7E4NSA4comD
-	NreR08GpGI6k7RzcbL7KiAG2HqQ==
-X-Received: from jahk15.prod.google.com ([2002:a05:6638:8bcf:b0:5e4:88f2:4eae])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:5296:b0:486:45c7:34bf with SMTP id 5614622812f47-4896aa680f6mr1489246b6e.16.1781826703239;
- Thu, 18 Jun 2026 16:51:43 -0700 (PDT)
-Date: Thu, 18 Jun 2026 23:51:42 +0000
-In-Reply-To: <ajQZ6aKPnybVueJC@raptor> (message from Alexandru Elisei on Thu,
- 18 Jun 2026 17:16:41 +0100)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nG1yOE15"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 197C01F000E9;
+	Thu, 18 Jun 2026 23:57:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781827053;
+	bh=8GKqA+4Lr7cjUc/AzyepH5069Ts+/Nd0/J0UTDV2fTU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=nG1yOE15C38DJY+y5SgynsF8DMkWbnplqwrSMymuyQVzwUN2WLpiGDmR8CbA3nkdg
+	 kMD3k2O0VgmoVorlFR9mmuy+WI77nc2j2K8+SXbsuA1SnmYXPcgwjJUAZSWfhpAQuk
+	 Q3I6ZSs9IrDuQPk0KeaUS3BC2zwKp9aycQLsxlkgKCeSmSVVI1QCKbUqA2qs4OJUk+
+	 xZFGzpQoLFGLNFfRMRTWzL1BzTVxEKiTYuEoYTB4oA7XOge0Cay9pKRdyjqEebsmi8
+	 vGTPDhwKdcyLBMEsjilYA87i/kRjaCamov2TAzvK5GwI90q8O7sUnQuPlwjvc8UImI
+	 0S9S5+bTEAHlg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 2/5] KVM: arm64: nv: Inject SEA if
+ kvm_translate_vncr() can't resolve PFN
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Oliver Upton" <oupton@kernel.org>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260618234207.1063941-3-oupton@kernel.org>
+References: <20260618234207.1063941-1-oupton@kernel.org>
+ <20260618234207.1063941-3-oupton@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jun 2026 23:57:32 +0000
+Message-Id: <20260618235733.197C01F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntpl1ncsq9.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [kvm-unit-tests PATCH] arm: io: Set is_pl011_uart flag in ACPI initialization
-From: Colton Lewis <coltonlewis@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: andrew.jones@linux.dev, eric.auger@redhat.com, maz@kernel.org, 
-	joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Alexandru Elisei <alexandru.elisei@arm.com> writes:
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-> Hi,
+New issues:
+- [High] Unhandled guest_memfd errors ignore prepared memory fault exits an=
+d inject malformed guest exceptions.
 
-> On Wed, May 13, 2026 at 09:16:24PM +0000, Colton Lewis wrote:
->> When booting via ACPI on ARM64, the SPCR table is parsed to initialize
->> the console UART. However, the code was neglecting to set the
->> is_pl011_uart flag. This caused __getchar() to fall back to treating
->> the UART as a 16550A device, which fails on systems with a PL011.
+Pre-existing issues:
+- [High] Host-side PFN resolution errors (e.g., SIGPENDING, HWPOISON) are s=
+ilently converted into guest Synchronous External Aborts (SEA).
+--
 
->> Tests that wait for serial input (like its-migration) would hang
->> indefinitely because __getchar() would always return -1.
+commit 68bfda7f1617f64f7121c49b477f4cf4e33b2e10
+Author: Oliver Upton <oupton@kernel.org>
 
->> Update uart0_init_acpi() to inspect the SPCR interface_type and set
->> is_pl011_uart accordingly. Also define macros for the first four SPCR
->> interface types in lib/acpi.h based on the Microsoft specification.
+KVM: arm64: nv: Inject SEA if kvm_translate_vncr() can't resolve PFN
 
->> Link:  
->> https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/acpi-debug-port-table#table-3-debug-port-types-and-subtypes
->> Assisted-by: Gemini:gemini-3.1-pro
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   lib/acpi.h   | 6 ++++++
->>   lib/arm/io.c | 3 +++
->>   2 files changed, 9 insertions(+)
+This commit updates kvm_translate_vncr() to prepare an external abort
+when failing to resolve a PFN instead of returning -EFAULT and relying
+on kvm_handle_vncr_abort() to BUG_ON() or correctly guess the failure.
+It drops the BUG_ON() in the abort handler to safely inject the SEA.
 
->> diff --git a/lib/acpi.h b/lib/acpi.h
->> index 66e3062d..29b3edd5 100644
->> --- a/lib/acpi.h
->> +++ b/lib/acpi.h
->> @@ -251,6 +251,12 @@ enum acpi_madt_type {
->>   /* MADT Local APIC flags */
->>   #define ACPI_MADT_ENABLED		(1)	/* 00: Processor is usable if set */
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 903ccabca78c5..53dea9c3f14f8 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1395,15 +1395,19 @@ static int kvm_translate_vncr(struct kvm_vcpu *vc=
+pu, bool *is_gmem)
+> =20
+>  	gfn =3D vt->wr.pa >> PAGE_SHIFT;
+>  	memslot =3D gfn_to_memslot(vcpu->kvm, gfn);
+> -	if (!memslot)
+> +	if (!memslot) {
+> +		fail_s1_walk(&vt->wr, ESR_ELx_FSC_EXTABT, false);
+>  		return -EFAULT;
+> +	}
+> =20
+>  	*is_gmem =3D kvm_slot_has_gmem(memslot);
+>  	if (!*is_gmem) {
+>  		pfn =3D __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
+>  					&writable, &page);
+> -		if (is_error_noslot_pfn(pfn))
+> +		if (is_error_noslot_pfn(pfn)) {
+> +			fail_s1_walk(&vt->wr, ESR_ELx_FSC_EXTABT, false);
+>  			return -EFAULT;
+> +		}
 
->> +/* Values for interface_type field in struct spcr_descriptor */
->> +#define ACPI_SPCR_INTERFACE_TYPE_16550		0x0000
->> +#define ACPI_SPCR_INTERFACE_TYPE_16450		0x0001
->> +#define ACPI_SPCR_INTERFACE_TYPE_16550_32BIT	0x0002
->> +#define ACPI_SPCR_INTERFACE_TYPE_ARM_PL011	0x0003
+[Severity: High]
+This is a pre-existing issue, but does this improperly convert host PFN
+resolution errors into guest aborts?
 
-> We could also use the defines from the Linux source tree, from
-> include/acpi/actbl1.h (look below struct acpi_dbg2_device).
+If __kvm_faultin_pfn() encounters a pending host signal or poisoned memory,
+it can return KVM_PFN_ERR_SIGPENDING or KVM_PFN_ERR_HWPOISON. These are
+caught by is_error_noslot_pfn().
 
-Sounds good. I did not know those were there.
+By calling fail_s1_walk() and returning -EFAULT here, kvm_handle_vncr_abort=
+()
+will inject a Synchronous External Abort (SEA) into the guest instead of
+returning to userspace. Will this cause a simple host signal to randomly
+crash the VM and break host HWPOISON recovery?
 
-> I got a bit confused about the value 2 above, because in the Debug Port
-> Table 2 (DBG2) from the link, that value is for a 'MAX311xE SPI UART'. Not
-> saying that it's not the same thing as a 32 bit 16550 uart (or that it
-> is!), just saying that the names don't appear to be matching.
+[ ... ]
 
-I'll make that consistent.
+> @@ -1530,8 +1534,6 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
+>  			 * Translation failed, inject the corresponding
+>  			 * exception back to EL2.
+>  			 */
+> -			BUG_ON(!vt->wr.failed);
+> -
 
->> +
->>   struct spcr_descriptor {
->>   	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
->>   	u8 interface_type;	/* 0=full 16550, 1=subset of 16550 */
->> diff --git a/lib/arm/io.c b/lib/arm/io.c
->> index 836fa854..55102bd7 100644
->> --- a/lib/arm/io.c
->> +++ b/lib/arm/io.c
->> @@ -81,6 +81,9 @@ static void uart0_init_acpi(void)
+[Severity: High]
+Does removing this BUG_ON() unmask an issue when kvm_gmem_get_pfn() fails
+with -EINVAL, -ENOENT, or -EACCES?
 
->>   	assert_msg(spcr, "Unable to find ACPI SPCR");
->>   	uart0_base = ioremap(spcr->serial_port.address,  
->> spcr->serial_port.bit_width);
->> +
->> +	if (spcr->interface_type == ACPI_SPCR_INTERFACE_TYPE_ARM_PL011)
->> +		is_pl011_uart = true;
+In kvm_translate_vncr(), if kvm_gmem_get_pfn() fails, it prepares a memory
+fault exit for userspace and returns the error code without calling
+fail_s1_walk().
 
-> The patch makes sense to me. With or without the Linux define names:
+Because kvm_handle_vncr_abort() lacks an 'if (is_gmem) return 0;' check for
+-EINVAL, -ENOENT, and -EACCES, it will fall through to the exception inject=
+ion
+path below. Since vt->wr.fst is uninitialized (0), won't KVM ignore the
+prepared memory fault exit and inject a malformed exception (FSC=3D0) into =
+the
+guest?
 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>  			esr &=3D ~ESR_ELx_FSC;
+>  			esr |=3D FIELD_PREP(ESR_ELx_FSC, vt->wr.fst);
+>
 
-Thank you Alex. I'll reroll the patch with your suggestions.
-
-
-> Thanks,
-> Alex
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260618234207.1063=
+941-1-oupton@kernel.org?part=3D2
