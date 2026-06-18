@@ -1,33 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34153B3888;
-	Thu, 18 Jun 2026 11:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E1D37C0EB
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 11:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781782000; cv=none; b=nnNSnslL09ruMaiiFoamWokkEN0CdVaIM8uLSa8p6pRMm+Y88gBkFNxG5F36G4NgGthG8AceTLF0Vybf7Cg+Y6UmtYbeTkEzaF59jUjHkhJnqxtELxna0EPZajxHDCIjk7SnEoZAx4ZV0pT0fUfxeRo2tQeIcLE1MEqAHhFm+cI=
+	t=1781782741; cv=none; b=eDk2wkv5Eg+w6C8YXyhsFl8wDq1kYoNoElJ3ptdpQpcVQymKa5OZz+Wfs5twn51Y7fbl20YoHzTpaSGl5KoPUVpr7u7q9+dQiYCkjVr6lF3CT3tpCsNB8g9hx2QFCEusoFmVWijTt5pR57Nnd8e3nn2Zde7YpouPjXnClt21A9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781782000; c=relaxed/simple;
-	bh=LcakeM4oMQyutQUdWBwBM3Vm2qpN4Zfb8HX1pR6lHsc=;
+	s=arc-20240116; t=1781782741; c=relaxed/simple;
+	bh=jAOFsTcTmabZULevaiji0SmZ5BNAK+aF5FkDqsBuBhg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WnsTomaa6GmpYH1s6JJqzgz9EzwdifP3c9ptk1gCOeQuhfyz5WS0tItJgzcUO23CxEB5O7QxHRqlGan+6cCU6x8efuYuNtNQF3twHAigjKfOdc8d4jj9IREf5dlazyX5jTZTy2MDave2KFRjP8/yDdJ2X6h/KjjvW+JdZImIlu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RWOiyur8; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=M8SuCJRdCzDT6+J/VfTTzVl/4UcaFJ0AtIyfk1TvOcAYno6d0cp6NEVBPLngZNWA4/248SN98mLqGvVsUey7X6o0PL8PhgrE3lgZRgz6DuhMvVvdwqJ8gKWRLVlKqXN0A/UFzT310XjB8+rqzw57MmcHo6lxC2wmdRDo+aR2K/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPJ4+0Ay; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWOiyur8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D071F000E9;
-	Thu, 18 Jun 2026 11:26:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781781999;
-	bh=4QDK2jCIWPvZ2ONcm4xowx5WtNzU5+JH9ZsV8OFhnKA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=RWOiyur8C67wNqTpbgGN5qR7NuPJMtmXK7V875vdMJCXviAl5Uy50Hnd659YniuF6
-	 YaveuThHh+nqLCw1lkNT7muJ8bSgMVTqtLKlA8b+MiM6XRtmCl2/BTEdx0/XJ6dPXx
-	 t9Nicf1spXrdiKz5258cvn1Yxfxp3/utXhjtM8lak9smXtSLTRztDJXOxoBa868Yq2
-	 KqS9/xXeIMIMDHV2N3n4ki5J+TCpg8jAC+Y9+yJv2Ky29w7PuZaT9K53yT7eRx2RPd
-	 s1NypOU+Qxtp00E/WYoxwQbSO1W1GXyycjPuS9+FDmMkmXpWwR9SJkL/ulWU70uHQV
-	 pM2WziKqY2frw==
-Message-ID: <499650f7-8c9c-4e58-83d1-0bc26e23b949@kernel.org>
-Date: Thu, 18 Jun 2026 13:26:35 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPJ4+0Ay"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-37cae9b7536so458311a91.3
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jun 2026 04:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781782739; x=1782387539; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IkKXLMODQjJrjCqo090xsQbfSpnPIJwf7cUopEavvaM=;
+        b=nPJ4+0AyMFJSQevgqFrlRr5AlM/fMcCDiM/zySkubpDPL/JigKkN+Sb/NiW+NAnH/f
+         nyieYXNhNbQNug0VWjApzJoReGjNDEMQonmfuyey6FLw0VN+QD1HGndOItCYqEoBaOxl
+         LrtwCNzpyP97OXx+bf5pKgezmyqYMiuaw5kJzINqWC/+8np2HWgLqqSodWAq6vf46ARp
+         Yff3TtstpZXNOmP2OL190q3ZoWh8Azi0F6KaxfuOFxwvtDbvIhFBxwdiaRAd7UsZX0eV
+         f4lYcySc1/kJjRXquJNHwG51Y3x8QjeZ2OZvmlE0Yl2dR3SS2cL56p0MzP02gl/iIYYH
+         tfAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781782739; x=1782387539;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IkKXLMODQjJrjCqo090xsQbfSpnPIJwf7cUopEavvaM=;
+        b=dsizUOZPOfILg5FtuxQOGKvnynZYeCm8QMtSrwR+jgND1pXf5qhDLhJTcQOdlOUg+g
+         8q1RuUYTYuzuBYjW3eq9TgjIXW81LUd85Yu4CxBR09Fau1eXk9bts9gzBEsHKfYShYgd
+         j2LoXuDQ8IIAXXxbRpYbqY29W9O0WyIO6J0yo9wR7xLDkGl6T9//YeWQPTBQNFX065cw
+         p/2kKM/8vLoxbv2LaYGiesbPjVx0BkR6tDw+nPA2hYwpkdRsRq5UTqiGOgod4rEfp5mq
+         dSzYJnpBI5CJ9gJ57nNICx+S2+bOXh4VEi7PspbSjhKmS6HTxSDsygSTnnkbJcr2mvMz
+         Tt3A==
+X-Forwarded-Encrypted: i=1; AFNElJ8k2m9bGKsXMtRyY61QLYw5rzAt4hjO/NywUTT/eBlsVUd7B3nNqFLtwrFr172sqefG6J7Ppd0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxRlbflpOBF9NFKn6eGW1NE+RlAcUi/dsJgNJSgAZvqU5sV7z6g
+	pNI16AbKFzz3Y4A/Qze0SRCbphxBR9wkZEOJ6ZdbSh9KNnhQqofqGe/AyXHxdZOX
+X-Gm-Gg: AfdE7cnq71SHO04a/TpDm/OF/PhUpU2UWBzAYDXPHMWnMjQ0U3X/WM39trShYZEbcml
+	fT9ZNf3V+rH9YC2BQRLUPgqcygMqAz0poEXdKX/KsFeScPTeoE9EvVXJGpofVCrhqrbfdt+GbED
+	V7pnk1U5G98lT06qM4Bb3kOPJCS5GTqBu3lCwlzJZJ90TY33ZrCSPB1NtsEgsG35FU16QGlplT3
+	lZvmFAAjQ27aWu9NfMTqwel2pekLRxxvnAkmRM+R/4xIDGaWgbGiWb3EnuiTHPpIyJ8RO2R3Eag
+	3b5NosLv/DeV2WrOid6J+b+u9ZyMfz28Fsltvc7boSPdVDnTagYDZSKuEKdmswD97Ki6je9mU7g
+	wSmeMKSSJ61K5Q4dbMY91i5YgCfTaaGHC38hNcYnG+4h4Ab+ymwfd8AGAZs/Xq3oM1sOD4bHei9
+	wsuPOglEJC6jI36RlXLZIdwWTCFjCfsaiA3SAKoNof6AampPJGQu9vl9cH6v1zpE2bMdjEdQ==
+X-Received: by 2002:a17:90a:ec87:b0:36b:e8b9:46a4 with SMTP id 98e67ed59e1d1-37ce4743a2fmr3312995a91.14.1781782739152;
+        Thu, 18 Jun 2026 04:38:59 -0700 (PDT)
+Received: from ?IPV6:240f:c0ff:0:4:f139:1acf:f610:fa8f? ([2408:80e0:41fc:0:ef67:1acf:f610:fa8f])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c522a019csm9497619a91.14.2026.06.18.04.38.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Jun 2026 04:38:58 -0700 (PDT)
+Message-ID: <ef4bd4eb-f67a-4a44-a548-08240c2eba30@gmail.com>
+Date: Thu, 18 Jun 2026 19:38:54 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,108 +67,157 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only
- memslots
-To: Sean Christopherson <seanjc@google.com>, sashiko-reviews@lists.linux.dev
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Marc Zyngier
- <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Oliver Upton <oupton@kernel.org>
-References: <20260615155244.183044-1-alexandru.elisei@arm.com>
- <20260615160901.9A1A61F000E9@smtp.kernel.org> <ajA6ogaNiI3KDv5i@google.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <ajA6ogaNiI3KDv5i@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Skip unreset vCPUs in MPIDR lookup
+ table
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, dongxu zhang <xu910121@sina.com>,
+ wangfuqiang49 <wangfuqiang49@jd.com>, "diaojiaqing.1" <diaojiaqing.1@jd.com>
+References: <20260611144042.97981-1-fuqiang.wng@gmail.com>
+ <20260611144042.97981-3-fuqiang.wng@gmail.com> <87o6hd8oc7.wl-maz@kernel.org>
+ <ai99kwiaJq-VIAUk@kernel.org> <87cxxs86bg.wl-maz@kernel.org>
+From: fuqiang wang <fuqiang.wng@gmail.com>
+In-Reply-To: <87cxxs86bg.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 6/15/26 19:47, Sean Christopherson wrote:
-> On Mon, Jun 15, 2026, sashiko-bot@kernel.org wrote:
->>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>> --- a/virt/kvm/kvm_main.c
->>> +++ b/virt/kvm/kvm_main.c
->> [ ... ]
->>> @@ -592,6 +592,10 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
->>>  			unsigned long hva_start, hva_end;
->>>  
->>>  			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
->>> +
->>> +			if (kvm_slot_has_gmem(slot) && kvm_memslot_is_gmem_only(slot))
->>> +				continue;
->>> +
+
+
+On 6/15/26 6:08 PM, Marc Zyngier wrote:
+
+Hi Oliver, Marc
+
+Thank you very much for your replies and guidance. I'm sorry for the
+late reply.(I took some time to brush up on ARM CPU hotplug.)
+
+> On Mon, 15 Jun 2026 05:20:35 +0100,
+> Oliver Upton <oupton@kernel.org> wrote:
 >>
->> [Severity: Critical]
->> Does this change inadvertently introduce a regression in the pfncache retry
->> protocol?
+>> On Sun, Jun 14, 2026 at 10:26:32AM +0100, Marc Zyngier wrote:
+>>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>>> index 3732ee9eb0d4..fccfa97370df 100644
+>>>> --- a/arch/arm64/kvm/arm.c
+>>>> +++ b/arch/arm64/kvm/arm.c
+>>>> @@ -887,8 +887,18 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+>>>>   	data->mpidr_mask = mask;
+>>>>   
+>>>>   	kvm_for_each_vcpu(c, vcpu, kvm) {
+>>>> -		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
+>>>> -		u16 index = kvm_mpidr_index(data, aff);
+>>>> +		u64 aff;
+>>>> +		u16 index;
+>>>> +
+>>>> +		/*
+>>>> +		 * Skip vCPUs that haven't been reset yet; their MPIDR_EL1 is
+>>>> +		 * zero.
+>>>> +		 */
+>>>> +		if (!kvm_vcpu_mpidr_is_reset(vcpu))
+>>>> +			continue;
+>>>
+>>> But what about the initial loop that computes the significant bits
+>>> amongst the vcpus?
+
+Yes, this is indeed missed here, possibly making the following nr_entries
+calculation too large.
+
+>>>
+>>>> +
+>>>> +		aff = kvm_vcpu_get_mpidr_aff(vcpu);
+>>>> +		index = kvm_mpidr_index(data, aff);
+>>>
+>>> In all honesty, I think this is a userspace bug more than anything
+>>> else, and checking for random bits in MPDR_EL1 to verify whether the
+>>> value is plausible is gross.
 >>
->> Looking at the pfncache framework, it maps guest memory into kernel space and
->> explicitly drops the page reference after mapping it:
+>> +1. Checking the MPIDR value is also broken because userspace can write
+>> whatever it wants to the register, which could even clear the RES1 bit
+>> that's getting tested here.
+
+Yes, the change here is quite ugly — it looks like temporary debug code.
+It would be better to change it to !kvm_vcpu_initialized().
+
 >>
->> virt/kvm/pfncache.c:hva_to_pfn_retry() {
->>     ...
->>     kvm_release_page_clean(page);
->>     ...
->> }
+>>> Yhis isn't different from setting MPIDR_EL1 to the same value on all
+>>> vcpus, which we don't try to mitigate. Late setting of MPIDR_EL1 also
+>>> defeats the whole point of having a cache for the affinity to index
+>>> conversion, making SGIs pretty slow for late CPUs.
+>>>
+>>> I really think that by not finalising your vcpus and start running the
+>>> guest, you have cornered yourself pretty badly, and we shouldn't try
+>>> to paper over it.
 >>
->> It appears to rely entirely on KVM's MMU notifiers (kvm->mmu_invalidate_seq)
->> to invalidate the cache when the page is unmapped by the host.
->>
->> If a VMM defines a guest_memfd-backed memslot with KVM_MEMSLOT_GMEM_ONLY
->> but still provides a valid anonymous user mapping as its userspace_addr,
->> could this regression lead to a use-after-free?
+>> I generally agree, although I wouldn't be against a change that nuked
+>> any of the cached routings in case of userspace doing stupid things like
+>> collisions and whatnot.
+
+I once thought about sending patch [1] again, because I found that Oliver
+had done something similar[2]... but then I gave up.
+
+For restless userspace programs, KVM cannot foresee their behavior. For
+example, when a VCPU is running, there may be cases like:
+
++ some vcpus not create, later create
++ some vcpus created but not reset, later reset
++ some vcpu not create, later create BUT never run. This may prevent other
+   vCPU threads from using the mpidr_data, because they rely on the vCPU that
+   destroys the mpidr_data to trigger a rebuild. (Although we can rebuild
+   mpidr_data when resetting the vCPU(just for later-created vcpu), it is
+   preferable to defer the rebuild until after all destruction actions have
+   been completed).
+
+even, as mentioned above, userspace write MPIDR_EL1 to cause collisions. It
+seems somewhat not worth the effort.
+
+[1]: https://github.com/cai-fuqiang/armkvm/commit/eeda9309e0a6c700449e90cf27127a7e4e0238ed
+[2]: https://lore.kernel.org/all/20240508071952.2035422-1-oliver.upton@linux.dev/#r
+
 > 
-> Sadly, yes.  To land this, we would need to first teach the gfn_to_pfn_cache code
-> to be able to pull directly from guest_memfd.  I forget if anyone is working on
-> that.
+> Detecting collisions is difficult, as we have no idea of the overall
+> guest topology. All we can do is work out whether the computed mask
+> has enough bits to represent the number of online vcpus, but that's
+> not necessarily good enough.
+> 
+> One possibility would be to invalidate the cache on each update to any
+> MPIDR_EL1, including reset. People doing silly things by initialising
+> vcpus post first start will still suffer, but should we care?
 
-For completeness, I think this is what you are looking for:
+However, could we detect collisions within the init function and, upon
+detection, notify userspace without taking any corrective or fallback
+action? This would serve as a stronger reminder to userspace of its
+non-compliant behavior.
 
-https://lore.kernel.org/r/20260420154720.29012-1-itazur@amazon.com
+e.g.
 
--- 
-Cheers,
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3732ee9eb0d4..7563feab1a11 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -893,6 +893,17 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+                 data->cmpidr_to_idx[index] = c;
+         }
 
-David
++       kvm_for_each_vcpu(c, vcpu, kvm) {
++               u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
++               u16 index = kvm_mpidr_index(data, aff);
++
++               if (data->cmpidr_to_idx[index] != c) {
++                       pr_warn("Multiple vCPUs share the same MPIDR value, "
++                               "it may cause the guest to hang or run slower\n");
++                       break;
++               }
++       }
++
+         rcu_assign_pointer(kvm->arch.mpidr_data, data);
+  out:
+         mutex_unlock(&kvm->arch.config_lock);
+
+
+Thanks
+fuqiang
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
