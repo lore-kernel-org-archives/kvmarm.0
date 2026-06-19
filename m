@@ -1,54 +1,54 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C38235AC2C
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05B635DA42
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781852718; cv=none; b=b+N7LQ6O7ULzKrY8PoxMCya98O6uExzMZ1gtz/wtZjkT2Bf2Md+cjo6nedvF1/r3cosrH0nNMdgP8+HmY7so8DIE4fORmXVI1OSEprwxFe+b9ifTFugzmiub6ctgls7I2tezdcE3aLqqZV8CMkLqy2ex2tZzN4iXiQ6jnNa+BKY=
+	t=1781852719; cv=none; b=HJiNr8WsNkp8apQzRSZRVzcK7Tg22xDyzQyvoJ+uigJujHCYEbzA2yAka3sj2KQ61xmBWl8+rzWgSe7ot/y/hLUuPnCCKddPbW/O3W9Hudi7SfJApABSNcI/99iv3vYoVAs73x0w4cguXfrYV5M3GVpHfIppYR4JHS2fdjiNdmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781852718; c=relaxed/simple;
-	bh=9JDMmHjB8wIpJAXXialivP1h3vqF/BPRvofAJksL8RU=;
+	s=arc-20240116; t=1781852719; c=relaxed/simple;
+	bh=BZ3bxurJBOF4Xe5fK3RqTc48q2YtrMKRyNLoR9ECWUk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B9mOR2N2o2M9aUDGQKmJa3jMm6/pDWJikvyyqVPFJQl7OrJrXsOYkJPLGDufvAMVZQ1NLhRvGsBA42rFP87DxOvFsue0CR0qPOycwXaTbQt3PeUMy39DqH/6lM4Sl82bH1xNszEySdleSBHuOCWXd1wK1yE76Xb3RYAC5q8HiTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JHlI7+cr; arc=none smtp.client-ip=209.85.208.74
+	 To:Cc:Content-Type; b=jcv+J2hUgzCwQzpDEWFfQwFVpKejjLgiGGPbAjUUc0BGVHEX8dbc1KV2lGdPhIQfvujSN0n1OjScP65bE3IJ2pmKvN/mPMuLBta3oRYKkBOT29qHXubpkigepmnM4YUnoBRblcW37H9q2oqJIqj73GHVBy8U6lzs+6w2a9dwFgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L1iYTuz2; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JHlI7+cr"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-695837464bcso2199553a12.3
-        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:05:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L1iYTuz2"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-45eee3f9f03so2152367f8f.1
+        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:05:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781852715; x=1782457515; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781852716; x=1782457516; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1QUYcee151+QuSJM7wM7vpmF/sftjcL7x2ymejauNs=;
-        b=JHlI7+crT++jZn6vfprxyWMYz6LDWoF9w1vv/xLR5KpdvsMbsbY6A20+Gt14ceMjAA
-         TYuxkwccKkcs2UawslCtnyXpXO0YBg0t8rjeyT40G0eLYLaKdaWPUseYaOBpNP16DodV
-         x3e16tBGC00Dj6NV0wcj7pbBdFXx7H2ZzXV+bQKOyZUjSEQQdVOOQXxuDRyBINElwAvd
-         fyeN0v4gNdCxbZgnRtjGv11/nbq+3iPbE/MLWBV8+GIqgqNClDIfG1F2kHbQTR43CJ2y
-         TI0GqGeDnKyk7naqd31+YqjYmScFD2oh3/fei/2wbKg1w2/USHt6RXT0HY2v5k84tBFf
-         pvRQ==
+        bh=9tQfxVsIaeS+jOhIrhpINETdsAt58seT+ojTMVLuce4=;
+        b=L1iYTuz2+/wOHiYxwQyxTNZ10zYJUgyiQqOJdskYPDnk1oT5clV5JA+fgwNdM6jmsb
+         zCplDzDxzRgHfkgpu6k8F7/rw2P/cZJSz5VNF628Z51xmoY+KvWr5qzSZeiFmBrfpZT7
+         yQ1NK6P22CxrLec5S+DJbEetC1MLvkhg1lXpqRhtNLfLjAIPP1CZ3SE6sx81I9A4b8/s
+         5dyEwVG5YoPBvzLArN0bsOpwFQYXiBaW9g9l+RBbdp6+mBhRhENbnCAW0jtn3lE8a6QF
+         zb9tRhN+hmcp/eShw+EeOeIzBMnf88aQhqwgOXp9HtclPDyuwrxHCxdEvv+5Um7Jsu1x
+         gaXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781852715; x=1782457515;
+        d=1e100.net; s=20251104; t=1781852716; x=1782457516;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1QUYcee151+QuSJM7wM7vpmF/sftjcL7x2ymejauNs=;
-        b=SY+FmlTGMIH2QpyxnrDG1KIuwYbK//vItVp8fafY4KOisRJ8j7vZebtB/+rdMr7OLw
-         sRljaJ5iZEqVRuknOdLGRMmayXbSj6YY+M4etwkgYRjeTQ7WzwTkp6HEVAWs54sjFFXu
-         3NpPgloWg3B1+TW4g/rpgWZA+bvETY0huNMauFg77ITEQFKfYP1iRXRozcAG5s9C+VoN
-         5hGxMqrhi50XsLWoSzHwwKl/ZzQNWFHTFKgTvHrLrVQvepSyNgS4s7iiG8+hjX4pJta2
-         37l/2eb007vAj3rnZ/Y7ouPydb2jS1AseYvKzSF9r58CCBDoqB6qk4h93Pp5nPNU/lh9
-         DhYg==
-X-Forwarded-Encrypted: i=1; AFNElJ83D5UGnvHELbRW+8GIBISJF9QckrI3eLxzS7wGDKg2ueNVCh5HRfAFyZNbc6L7uL7kVWqR0NA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw1moHA3jyv7EM4ZS0zgbefwPwUaZB6QSnJI5iHHSR29jxwFhbA
-	LQeC/c4qlSLadqsgaqZqVPJRKuAzY8SOesqSqDSFFMxjOePa5PxcgxcrVV70PEEf+4ZLvkpaybD
-	Xug==
-X-Received: from edrl9.prod.google.com ([2002:aa7:c3c9:0:b0:696:1db4:76f8])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:274c:b0:693:ed2:3f7a
- with SMTP id 4fb4d7f45d1cf-696e52367dfmr1182084a12.25.1781852714655; Fri, 19
- Jun 2026 00:05:14 -0700 (PDT)
-Date: Fri, 19 Jun 2026 08:05:04 +0100
+        bh=9tQfxVsIaeS+jOhIrhpINETdsAt58seT+ojTMVLuce4=;
+        b=tF0ETZOZLW6H3qsb95AVLcEU9xY23u217Kw92lgJT6n84e7twjFAWAl1vZDcr9DEmY
+         iax4GCeBuptHjbcl86zbNN13dr9Ie+JzyadjXDfKSBAbbflvINikgzmGqCqCop3UUonv
+         0/1HrEq8MWoVsyKKALx9E17PZMF/7rj8jeNl4Yj/w4el69z+16ldqS3TjzpLFChZlHkr
+         HmjU8Me+Zs9HSZB0cWu+RmWH5/VqtrjUoc0VXujpdz9O4N+V3DTWMZF/nBzt5uc4N0nu
+         OmvAnue643/sM0Ilk1G8GSpDokzp/hWqUvN3dH8hFmHfl5zGhkn7EdetkiN/420yKejj
+         dJUQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/nN1H54eGYbpnZxIi86rDczNDEXpAZtuUIIKPUKh/TscWdGCiM6/dcDS485Uq6pWm64jnUrnQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwT7s0ERMdXKAQysqusW+ATRBFGKDQth64kbN8uWdmgKks1fDI3
+	YqAXxrVoEhL2y2hNcrnQKtVCLwHZXJ4UW+ydmdS//6FFm7+iBKK/5qssV0mJJI7/yFE4FNojNyk
+	pWQ==
+X-Received: from wrup11.prod.google.com ([2002:a5d:638b:0:b0:462:5359:f2e5])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:64e7:0:b0:45e:739b:3e43
+ with SMTP id ffacd0b85a97d-464fd2fdc18mr4912063f8f.0.1781852716104; Fri, 19
+ Jun 2026 00:05:16 -0700 (PDT)
+Date: Fri, 19 Jun 2026 08:05:05 +0100
 In-Reply-To: <20260619070508.802802-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260619070508.802802-1-tabba@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.738.g0c8ab3ebcc-goog
-Message-ID: <20260619070508.802802-5-tabba@google.com>
-Subject: [PATCH 4/8] KVM: arm64: Move PSCI helper functions to a shared header
+Message-ID: <20260619070508.802802-6-tabba@google.com>
+Subject: [PATCH 5/8] KVM: arm64: Add host and hypervisor vCPU lookup primitives
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
@@ -71,120 +71,109 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move kvm_psci_valid_affinity() and kvm_psci_narrow_to_32bit() from
-psci.c to include/kvm/arm_psci.h, and move psci_affinity_mask() there
-too, renaming it kvm_psci_affinity_mask() now that it is no longer
-file-local. A follow-up series handles some protected-guest PSCI calls
-at EL2 using these helpers.
+From: Marc Zyngier <maz@kernel.org>
+
+The nVHE hypervisor repeatedly resolves a host vCPU into the EL2
+address space and validates that the loaded hyp vCPU matches it, with
+that logic open-coded in each handler.
+
+Add __get_host_hyp_vcpus() and the get_host_hyp_vcpus() macro, which
+translate the host vCPU into the hypervisor's address space and, when
+pKVM is enabled, also return the loaded hyp vCPU if it matches. If pKVM
+is enabled but the loaded hyp vCPU does not correspond to the requested
+host vCPU, both the host and hyp vCPU are returned as NULL. Convert
+handle___kvm_vcpu_run() to use it.
 
 No functional change intended.
 
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Co-developed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/psci.c  | 30 +-----------------------------
- include/kvm/arm_psci.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 29 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 52 ++++++++++++++++++++++--------
+ 1 file changed, 38 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 3b5dbe9a0a0e..e3db84400d1f 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -21,16 +21,6 @@
-  * as described in ARM document number ARM DEN 0022A.
-  */
- 
--#define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
--
--static unsigned long psci_affinity_mask(unsigned long affinity_level)
--{
--	if (affinity_level <= 3)
--		return MPIDR_HWID_BITMASK & AFFINITY_MASK(affinity_level);
--
--	return 0;
--}
--
- static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- {
- 	/*
-@@ -51,12 +41,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- 	return PSCI_RET_SUCCESS;
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 1d01c6e547f5..8923f594c264 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -212,14 +212,45 @@ static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
+ 		pkvm_put_hyp_vcpu(hyp_vcpu);
  }
  
--static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
--					   unsigned long affinity)
--{
--	return !(affinity & ~MPIDR_HWID_BITMASK);
--}
--
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+-static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
++static struct kvm_vcpu *__get_host_hyp_vcpus(struct kvm_vcpu *arg,
++					     struct pkvm_hyp_vcpu **hyp_vcpup)
  {
- 	struct vcpu_reset_state *reset_state;
-@@ -135,7 +119,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
+-	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
+-	int ret;
++	struct kvm_vcpu *host_vcpu = kern_hyp_va(arg);
++	struct pkvm_hyp_vcpu *hyp_vcpu = NULL;
  
- 	/* Determine target affinity mask */
--	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
-+	target_affinity_mask = kvm_psci_affinity_mask(lowest_affinity_level);
- 	if (!target_affinity_mask)
- 		return PSCI_RET_INVALID_PARAMS;
+ 	if (unlikely(is_protected_kvm_enabled())) {
+-		struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
++		hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
  
-@@ -220,18 +204,6 @@ static void kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
- 	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
- }
++		if (!hyp_vcpu || hyp_vcpu->host_vcpu != host_vcpu) {
++			hyp_vcpu = NULL;
++			host_vcpu = NULL;
++		}
++	}
++
++	*hyp_vcpup = hyp_vcpu;
++	return host_vcpu;
++}
++
++#define get_host_hyp_vcpus(ctxt, regnr, hyp_vcpup)			\
++	({								\
++		DECLARE_REG(struct kvm_vcpu *, __vcpu, ctxt, regnr);	\
++		__get_host_hyp_vcpus(__vcpu, hyp_vcpup);		\
++	})
++
++static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
++{
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++	struct kvm_vcpu *host_vcpu;
++	int ret;
++
++	host_vcpu = get_host_hyp_vcpus(host_ctxt, 1, &hyp_vcpu);
++
++	if (!host_vcpu) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (unlikely(hyp_vcpu)) {
+ 		/*
+ 		 * KVM (and pKVM) doesn't support SME guests for now, and
+ 		 * ensures that SME features aren't enabled in pstate when
+@@ -231,23 +262,16 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+ 			goto out;
+ 		}
  
--static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
--{
--	int i;
+-		if (!hyp_vcpu) {
+-			ret = -EINVAL;
+-			goto out;
+-		}
 -
--	/*
--	 * Zero the input registers' upper 32 bits. They will be fully
--	 * zeroed on exit, so we're fine changing them in place.
--	 */
--	for (i = 1; i < 4; i++)
--		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
--}
+ 		flush_hyp_vcpu(hyp_vcpu);
+ 
+ 		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
+ 
+ 		sync_hyp_vcpu(hyp_vcpu);
+ 	} else {
+-		struct kvm_vcpu *vcpu = kern_hyp_va(host_vcpu);
 -
- static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
- {
- 	/*
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index cbaec804eb83..f86a006d6713 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -38,6 +38,33 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- 	return KVM_ARM_PSCI_0_1;
- }
- 
-+/* Narrow the PSCI register arguments (r1 to r3) to 32 bits. */
-+static inline void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	/*
-+	 * Zero the input registers' upper 32 bits. They will be fully
-+	 * zeroed on exit, so we're fine changing them in place.
-+	 */
-+	for (i = 1; i < 4; i++)
-+		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
-+}
-+
-+static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
-+					   unsigned long affinity)
-+{
-+	return !(affinity & ~MPIDR_HWID_BITMASK);
-+}
-+
-+static inline unsigned long kvm_psci_affinity_mask(unsigned long affinity_level)
-+{
-+	if (affinity_level <= 3)
-+		return MPIDR_HWID_BITMASK &
-+			~((0x1UL << (affinity_level * MPIDR_LEVEL_BITS)) - 1);
-+
-+	return 0;
-+}
- 
- int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
+ 		/* The host is fully trusted, run its vCPU directly. */
+-		fpsimd_lazy_switch_to_guest(vcpu);
+-		ret = __kvm_vcpu_run(vcpu);
+-		fpsimd_lazy_switch_to_host(vcpu);
++		fpsimd_lazy_switch_to_guest(host_vcpu);
++		ret = __kvm_vcpu_run(host_vcpu);
++		fpsimd_lazy_switch_to_host(host_vcpu);
+ 	}
+ out:
+ 	cpu_reg(host_ctxt, 1) =  ret;
 -- 
 2.55.0.rc0.738.g0c8ab3ebcc-goog
 
