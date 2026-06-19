@@ -1,228 +1,410 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C41F3890F7
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 13:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237D7379EEC
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 13:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781874783; cv=none; b=Dwei2NW04Xkec93DbHuNzKkgFV+AnWlZQgL/65dan4yHLFAnvefObHIdgWILWjSX7yqQH6AZW4woKt4ZJqsmqo5eKb/+efT0kkKmBdLuPlBPZNpYkNvYVUYn6xANS+df2xUFWWtOs4KgDerc+tPcOQSowAh+01JZgmPMuNpj2WY=
+	t=1781874981; cv=none; b=KrgLeTPiYp4IZyfPp4U1ERQ9prs/xjdm0G7vt6fjENPr97nXFAeCUMN0YBSUcof7YzCyVDlufecA8ugdc1atew8xiTvPLkFqy0RX+cOxn9Js9ml6b3CHPKupQHt0E/GQlKvnrSs74wZ4MdRlVdTTxa9vxRnyPDSKe4pRabxUdYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781874783; c=relaxed/simple;
-	bh=gIiJ77rBosF5zzaFy+wK5virv0DWqGpiggVdWsntMKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q0iCM7Z8ig6sgz+8nzJa27zGmsACQPwgtwc4+DRKIHz3duG8undpElCM0yxUqSzfy62IOPZcohf8IX0hroF37kdsLS3LUzuogI1LVg9SjIF86ameA0/MCmnvaNuvv9Mo6EYiUMNgvcj/RLtb6AyLv6Yr66DSW9xkxvOi0Z+Q3x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=diKh60c+; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1781874981; c=relaxed/simple;
+	bh=KfK5zVH1gNUmG5wDWRePAyex0AjLqtQHCkwIW2/H9xU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qserXH5ONlcJtsd7LQTAC3v89JvfOaFr6SYEF+ERgWESOs5t4r71IBrXtyw10XVpiU5PGCNdAUU7+1YMmcpugj30fdkracB+WrKzl7yazDbu0ZFtmrba5xMfaJiinRS2PH7Hb2J8i4kuUaonZcTh4c96yeRU+UVUBZA27pFE8Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uwfjAd9k; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="diKh60c+"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-492329c5514so8877695e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 06:13:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781874781; x=1782479581; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fKbHPj4zwl3NIknOENY+4gxJ80U+03HOl4ELuQvS/cA=;
-        b=diKh60c+FYkcVcgXiNI3tnTozqhcgS89MhNBQZWW16gT71FdSra3fJ4O7ssPZ4ylXe
-         //PaQnAAAS3EfKCV1bGhZnH9UBOhOjNohV/8fTMsx1K6UJ8/jx/IT2WhgyNP7LlwLsl4
-         8P/ec8fadoEo9cwOJLZp8K8lEDFQ072IFAgszggVIGRc1xDOeTNRoK43ujK8wj8QYuxR
-         DfyIgou6NuTQN6WWd64GLHKFhzqCNIulgOwC7id/c4JudoTOCUuoRip6LBzCfI0/IC5y
-         WDdexRLpChSfUFYDwqjsHg/Ky+vNteJ47a1VLiXXws779s7NYJrH0lpEhdt8VAB6uE7n
-         bZbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781874781; x=1782479581;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fKbHPj4zwl3NIknOENY+4gxJ80U+03HOl4ELuQvS/cA=;
-        b=N6miudg/rZanX2Kq6A42wsNxyWlr0ATqfUCzJQNfI7CfrL130YF0+y57SP7dGT5o8E
-         5X+z+s+tm629SRIdfa4lHCF5ILlfzn4jqr5T1OpVUaFXF/3FvV1UrpR/STXIwiEy0KO/
-         scHhLAg3MfhMHziSOCb1bIpGgPJ8FFPHcYnyIryYQAqs2aTzlah9jbm8gkO6dSsJ2Ppc
-         rkwzop5a2wr4XXWKMgokpVNoupPckLU/AKm9vPW7fhhATS1nxrvUMwkNZdfIWwLaDF0l
-         LQ/zE32R9vcY8DBUoFcGrLBg2ZMIQRAnyxiWolSJCic2Rm2ULCE9Q3v7ZW39V2NVugu1
-         BpuQ==
-X-Forwarded-Encrypted: i=1; AFNElJ93Z4Q2y9h+mL1TDbULR88XOmV0MovwNFiqi/FxpGCqfsZWRLgBNdyYX/ET+2aFA+nIjxO8+Xc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyPrVokLbBWSrKpF0gL2F5RC4JBgL+yxufhzlqfpuHh5aY/havv
-	a42C2CEU7Gx5rgkh0nPogXjkM/eEwLAkogbSZK7V1Uf6dtgJZF7LoVkZXpJwiqDIDg==
-X-Gm-Gg: AfdE7ckIWBsUYQgTI8lXQc4QzhLt65jYudEzz+8PWlEpFfiTHU1gjHZVpWY/IqNPog5
-	x2GQVnMFcqgxg9D5goP7XwfzvlniBYL8BRHBoTFVNULi4jYccKBdhCn4op0ztQxv7zaxV3MRaxq
-	yHAcznuwfeBf5qigimKfvJXuNMyKCc9z1TM/2eYAmdvad/vwVCkt5mgxeY4Yp8bXVMBdNSbYBzp
-	sXY47IVWeIj3YwP4EzIaJYSSiypCbuqCyvvK9AwIPSVW9WJJs6BH+8xhizOw4pehGhZ/8V/94lJ
-	1tnsbXStWDxLkp5ro1RQ+NOROsQafG1StPBsVS15t3v6klDM9Pl1JaM8TXTdftmKr87f+6YVLUs
-	j+TskaUlvJBPQEoIPSlGuny6JmyHk5fnffmas6apJgjl0TJJD46kgM5LfC0KlZxCar6SnI/ad5e
-	a8LWsOaGOnYYZx+/+WsvIx50cydpgFMbk6u4fCF+uLyGttHIPtGTE2ITO7dhYqUlQe8CY=
-X-Received: by 2002:a05:600c:46ce:b0:492:3767:6973 with SMTP id 5b1f17b1804b1-49240a34552mr41494475e9.9.1781874780106;
-        Fri, 19 Jun 2026 06:13:00 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49240efc160sm55381415e9.2.2026.06.19.06.12.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2026 06:12:59 -0700 (PDT)
-Date: Fri, 19 Jun 2026 14:12:55 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Quentin Perret <qperret@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>
-Subject: Re: [PATCH v2 8/8] KVM: arm64: Implement lazy vCPU state sync for
- non-protected guests
-Message-ID: <ajVAV5ct0xdLn1KX@google.com>
-References: <20260619070719.812227-1-tabba@google.com>
- <20260619070719.812227-9-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uwfjAd9k"
+X-Forwarded-Encrypted: i=1; AFNElJ9NHaqODkQ+GzCQQq1a+ZdoM9f6WNpXy7CFjtrvUZAyR7HNXGDewQqkDZM0+o0JHKrgdOxoMKg=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781874978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YY830pnUj4QXpDu6mPmkbhybD2EnILnaXIcpJX84vgg=;
+	b=uwfjAd9kO3P1KGPvmD8yRr+kPXUSN+WLR1dEzxD4EMNkOFh6QssQrZl2OHDyy8MMl5xBPK
+	5QmobeFooBeJstN3KQoPPRj6mSW+XlAHyRcFWELrCgoHM/uaOKHTbBgDNXGg8n8qcIt8tS
+	HQ1J4XLpsaOMF9kS4xxfxQjSNVhlvE8=
+X-Gm-Message-State: AOJu0YwLronWXGdd7Z1ACVFwJFxFWYpM8F6Eu26v4Khqd/PqCZ2VAt6j
+	QWFtGxIPiQJr8Vi9WFiooPRzs+Imm2+eovmOmcdfAd3o5rjRfp3wk1Hx2M8SqjSDp2+yXYCRfcG
+	KfjxVfvwT7GOCLJiigiWu2i4utRy1tOL+5SKhad/k
+X-Received: by 2002:ac8:598d:0:b0:517:6dc0:698d with SMTP id
+ d75a77b69052e-519e4571767mr8738291cf.0.1781874956028; Fri, 19 Jun 2026
+ 06:15:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260619070719.812227-9-tabba@google.com>
+References: <20260619115415.5475-1-will@kernel.org> <20260619115415.5475-2-will@kernel.org>
+In-Reply-To: <20260619115415.5475-2-will@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 19 Jun 2026 14:15:18 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxQgVON+me-J3SA2kjejSbN43AmMehUQYgcWMjUXYr0YA@mail.gmail.com>
+X-Gm-Features: AVVi8CeqpXj4AREjjDO9bqddFXbAPdA5OkvdTme7j1kr1wKrgJ_b0KZkdYzuYbI
+Message-ID: <CA+EHjTxQgVON+me-J3SA2kjejSbN43AmMehUQYgcWMjUXYr0YA@mail.gmail.com>
+Subject: Re: [PATCH kvmtool 1/4] Sync kernel UAPI headers with v7.1
+To: Will Deacon <will@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Andre Przywara <andre.przywara@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jun 19, 2026 at 08:07:19AM +0100, Fuad Tabba wrote:
-> pKVM copies a non-protected guest's register context between the host
-> and the hypervisor on every world switch, even when the host never
-> inspects it. Defer the copy: on entry, flush the host context into the
-> hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
-> exit, leave it in the hyp vCPU and copy it back only when the host needs
-> it, via a __pkvm_vcpu_sync_state hypercall on trap handling or at vcpu
-> put. A protected guest's context is copied as before, since lazy sync
-> only helps where the host is trusted to see the guest's registers.
-> 
-> PC and PSTATE are the exception: they are copied back on every exit so
-> the kvm_exit tracepoint reports the guest's real exit PC, and the run
-> loop's vcpu_mode_is_bad_32bit() and SError-masking checks evaluate the
-> guest's current PSTATE rather than the value left by the previous sync.
-> 
-> handle_exit_early() can also inject an SError, which writes the guest
-> context (ESR_EL1) outside the trap-handling path. For a non-protected
-> guest it therefore syncs the context from the hyp vCPU and marks it
-> dirty, as handle_trap_exceptions() does, so the injection reaches the
-> hyp vCPU on re-entry rather than being dropped.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+On Fri, 19 Jun 2026 at 12:54, Will Deacon <will@kernel.org> wrote:
+>
+> Generated using util/update_headers.sh.
+>
+> Signed-off-by: Will Deacon <will@kernel.org>
+
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+
+Cheers,
+/fuad
+
 > ---
->  arch/arm64/include/asm/kvm_asm.h   |  1 +
->  arch/arm64/include/asm/kvm_host.h  |  2 +
->  arch/arm64/kvm/arm.c               |  7 +++
->  arch/arm64/kvm/handle_exit.c       | 30 +++++++++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 86 ++++++++++++++++++++++++++++--
->  5 files changed, 121 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 043495f7fc78..6e1135b3ded4 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -113,6 +113,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
->  
->  	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2faa60df847d..caa39ee5125f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1068,6 +1068,8 @@ struct kvm_vcpu_arch {
->  #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
->  /* Target EL/MODE (not a single flag, but let's abuse the macro) */
->  #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
-> +/* Host-set: the hyp flushes the non-protected vCPU state in on entry */
-> +#define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
->  
->  /* Helpers to encode exceptions with minimum fuss */
->  #define __EXCEPT_MASK_VAL	unpack_vcpu_flag(EXCEPT_MASK)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3732ee9eb0d4..4e89558d8027 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -733,6 +733,10 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	if (is_protected_kvm_enabled()) {
->  		kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
->  		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+>  arm64/include/asm/kvm.h     |  1 +
+>  include/linux/kvm.h         | 53 ++++++++++++++++++++++++++++++++-----
+>  include/linux/virtio_ring.h |  5 +---
+>  riscv/include/asm/kvm.h     | 11 +++++---
+>  x86/include/asm/kvm.h       | 21 +++++++++------
+>  5 files changed, 69 insertions(+), 22 deletions(-)
+>
+> diff --git a/arm64/include/asm/kvm.h b/arm64/include/asm/kvm.h
+> index a792a59..1c13bfa 100644
+> --- a/arm64/include/asm/kvm.h
+> +++ b/arm64/include/asm/kvm.h
+> @@ -428,6 +428,7 @@ enum {
+>  #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
+>  #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES 3
+>  #define   KVM_DEV_ARM_ITS_CTRL_RESET           4
+> +#define   KVM_DEV_ARM_VGIC_USERSPACE_PPIS      5
+>
+>  /* Device Control API on vcpu fd */
+>  #define KVM_ARM_VCPU_PMU_V3_CTRL       0
+> diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+> index dddb781..6c8afa2 100644
+> --- a/include/linux/kvm.h
+> +++ b/include/linux/kvm.h
+> @@ -11,9 +11,14 @@
+>  #include <linux/const.h>
+>  #include <linux/types.h>
+>  #include <linux/compiler.h>
+> +#include <linux/stddef.h>
+>  #include <linux/ioctl.h>
+>  #include <asm/kvm.h>
+>
+> +#ifdef __KERNEL__
+> +#include <linux/kvm_types.h>
+> +#endif
 > +
-> +		/* __pkvm_vcpu_put implies a sync of the state */
-> +		if (!kvm_vm_is_protected(vcpu->kvm))
-> +			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
->  	}
->  
->  	kvm_vcpu_put_debug(vcpu);
-> @@ -964,6 +968,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  		return ret;
->  
->  	if (is_protected_kvm_enabled()) {
-> +		/* Start with the vcpu in a dirty state */
-> +		if (!kvm_vm_is_protected(vcpu->kvm))
-> +			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
->  		ret = pkvm_create_hyp_vm(kvm);
->  		if (ret)
->  			return ret;
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 54aedf93c78b..8963621bcdd1 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -422,6 +422,20 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
->  {
->  	int handled;
->  
-> +	/*
-> +	 * If we run a non-protected VM when protection is enabled
-> +	 * system-wide, resync the state from the hypervisor and mark
-> +	 * it as dirty on the host side if it wasn't dirty already
-> +	 * (which could happen if preemption has taken place).
-> +	 */
-> +	if (is_protected_kvm_enabled() && !kvm_vm_is_protected(vcpu->kvm)) {
-> +		guard(preempt)();
-> +		if (!(vcpu_get_flag(vcpu, PKVM_HOST_STATE_DIRTY))) {
-> +			kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
-> +			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-> +		}
-> +	}
+>  #define KVM_API_VERSION 12
+>
+>  /*
+> @@ -135,6 +140,12 @@ struct kvm_xen_exit {
+>         } u;
+>  };
+>
+> +struct kvm_exit_snp_req_certs {
+> +       __u64 gpa;
+> +       __u64 npages;
+> +       __u64 ret;
+> +};
 > +
-
-Could we remove this update here and let handle_exit_early() do the sync
-regardless of the SError injection? One of the main point of handle_exit_early()
-is to do things under !prempt().
-
-
->  	/*
->  	 * See ARM ARM B1.14.1: "Hyp traps on instructions
->  	 * that fail their condition code check"
-> @@ -489,6 +503,22 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
->  /* For exit types that need handling before we can be preempted */
->  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
->  {
-> +	bool inject_serror = ARM_SERROR_PENDING(exception_index) ||
-> +		ARM_EXCEPTION_CODE(exception_index) == ARM_EXCEPTION_EL1_SERROR;
+>  #define KVM_S390_GET_SKEYS_NONE   1
+>  #define KVM_S390_SKEYS_MAX        1048576
+>
+> @@ -180,6 +191,8 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_MEMORY_FAULT     39
+>  #define KVM_EXIT_TDX              40
+>  #define KVM_EXIT_ARM_SEA          41
+> +#define KVM_EXIT_ARM_LDST64B      42
+> +#define KVM_EXIT_SNP_REQ_CERTS    43
+>
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -402,7 +415,7 @@ struct kvm_run {
+>                 } eoi;
+>                 /* KVM_EXIT_HYPERV */
+>                 struct kvm_hyperv_exit hyperv;
+> -               /* KVM_EXIT_ARM_NISV */
+> +               /* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
+>                 struct {
+>                         __u64 esr_iss;
+>                         __u64 fault_ipa;
+> @@ -482,6 +495,8 @@ struct kvm_run {
+>                         __u64 gva;
+>                         __u64 gpa;
+>                 } arm_sea;
+> +               /* KVM_EXIT_SNP_REQ_CERTS */
+> +               struct kvm_exit_snp_req_certs snp_req_certs;
+>                 /* Fix the size of the union. */
+>                 char padding[256];
+>         };
+> @@ -528,7 +543,7 @@ struct kvm_coalesced_mmio {
+>
+>  struct kvm_coalesced_mmio_ring {
+>         __u32 first, last;
+> -       struct kvm_coalesced_mmio coalesced_mmio[];
+> +       __DECLARE_FLEX_ARRAY(struct kvm_coalesced_mmio, coalesced_mmio);
+>  };
+>
+>  #define KVM_COALESCED_MMIO_MAX \
+> @@ -578,7 +593,7 @@ struct kvm_clear_dirty_log {
+>  /* for KVM_SET_SIGNAL_MASK */
+>  struct kvm_signal_mask {
+>         __u32 len;
+> -       __u8  sigset[];
+> +       __DECLARE_FLEX_ARRAY(__u8, sigset);
+>  };
+>
+>  /* for KVM_TPR_ACCESS_REPORTING */
+> @@ -689,6 +704,11 @@ struct kvm_enable_cap {
+>  #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK  0xffULL
+>  #define KVM_VM_TYPE_ARM_IPA_SIZE(x)            \
+>         ((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
 > +
-> +	/*
-> +	 * An SError injected below writes the host ctxt; for a non-protected
-> +	 * guest, sync from the hyp vCPU and keep it dirty so it isn't dropped.
-> +	 */
-> +	if (is_protected_kvm_enabled()) {
-
-Should we test !kvm_vm_is_protected(vcpu->kvm) here, as the
-PKVM_HOST_STATE_DIRTY is only updated for p-guests everywhere else?
-
-> +		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> +#define KVM_VM_TYPE_ARM_PROTECTED      (1UL << 31)
+> +#define KVM_VM_TYPE_ARM_MASK           (KVM_VM_TYPE_ARM_IPA_SIZE_MASK | \
+> +                                        KVM_VM_TYPE_ARM_PROTECTED)
 > +
-> +		if (inject_serror && !kvm_vm_is_protected(vcpu->kvm)) {
-> +			kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
-> +			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-> +		}
-> +	}
+>  /*
+>   * ioctls for /dev/kvm fds:
+>   */
+> @@ -974,6 +994,8 @@ struct kvm_enable_cap {
+>  #define KVM_CAP_GUEST_MEMFD_FLAGS 244
+>  #define KVM_CAP_ARM_SEA_TO_USER 245
+>  #define KVM_CAP_S390_USER_OPEREXEC 246
+> +#define KVM_CAP_S390_KEYOP 247
+> +#define KVM_CAP_S390_VSIE_ESAMODE 248
+>
+>  struct kvm_irq_routing_irqchip {
+>         __u32 irqchip;
+> @@ -1036,7 +1058,7 @@ struct kvm_irq_routing_entry {
+>  struct kvm_irq_routing {
+>         __u32 nr;
+>         __u32 flags;
+> -       struct kvm_irq_routing_entry entries[];
+> +       __DECLARE_FLEX_ARRAY(struct kvm_irq_routing_entry, entries);
+>  };
+>
+>  #define KVM_IRQFD_FLAG_DEASSIGN (1 << 0)
+> @@ -1127,7 +1149,7 @@ struct kvm_dirty_tlb {
+>
+>  struct kvm_reg_list {
+>         __u64 n; /* number of regs */
+> -       __u64 reg[];
+> +       __DECLARE_FLEX_ARRAY(__u64, reg);
+>  };
+>
+>  struct kvm_one_reg {
+> @@ -1209,6 +1231,10 @@ enum kvm_device_type {
+>  #define KVM_DEV_TYPE_LOONGARCH_EIOINTC KVM_DEV_TYPE_LOONGARCH_EIOINTC
+>         KVM_DEV_TYPE_LOONGARCH_PCHPIC,
+>  #define KVM_DEV_TYPE_LOONGARCH_PCHPIC  KVM_DEV_TYPE_LOONGARCH_PCHPIC
+> +       KVM_DEV_TYPE_LOONGARCH_DMSINTC,
+> +#define KVM_DEV_TYPE_LOONGARCH_DMSINTC KVM_DEV_TYPE_LOONGARCH_DMSINTC
+> +       KVM_DEV_TYPE_ARM_VGIC_V5,
+> +#define KVM_DEV_TYPE_ARM_VGIC_V5       KVM_DEV_TYPE_ARM_VGIC_V5
+>
+>         KVM_DEV_TYPE_MAX,
+>
+> @@ -1219,6 +1245,16 @@ struct kvm_vfio_spapr_tce {
+>         __s32   tablefd;
+>  };
+>
+> +#define KVM_S390_KEYOP_ISKE 0x01
+> +#define KVM_S390_KEYOP_RRBE 0x02
+> +#define KVM_S390_KEYOP_SSKE 0x03
+> +struct kvm_s390_keyop {
+> +       __u64 guest_addr;
+> +       __u8  key;
+> +       __u8  operation;
+> +       __u8  pad[6];
+> +};
 > +
->  	if (ARM_SERROR_PENDING(exception_index)) {
->  		if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
->  			u64 disr = kvm_vcpu_get_disr(vcpu);
-
-[...]
+>  /*
+>   * KVM_CREATE_VCPU receives as a parameter the vcpu slot, and returns
+>   * a vcpu fd.
+> @@ -1238,6 +1274,7 @@ struct kvm_vfio_spapr_tce {
+>  #define KVM_S390_UCAS_MAP        _IOW(KVMIO, 0x50, struct kvm_s390_ucas_mapping)
+>  #define KVM_S390_UCAS_UNMAP      _IOW(KVMIO, 0x51, struct kvm_s390_ucas_mapping)
+>  #define KVM_S390_VCPU_FAULT     _IOW(KVMIO, 0x52, unsigned long)
+> +#define KVM_S390_KEYOP           _IOWR(KVMIO, 0x53, struct kvm_s390_keyop)
+>
+>  /* Device model IOC */
+>  #define KVM_CREATE_IRQCHIP        _IO(KVMIO,   0x60)
+> @@ -1579,7 +1616,11 @@ struct kvm_stats_desc {
+>         __u16 size;
+>         __u32 offset;
+>         __u32 bucket_size;
+> -       char name[];
+> +#ifdef __KERNEL__
+> +       char name[KVM_STATS_NAME_SIZE];
+> +#else
+> +       __DECLARE_FLEX_ARRAY(char, name);
+> +#endif
+>  };
+>
+>  #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
+> diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+> index f8c20d3..3c47858 100644
+> --- a/include/linux/virtio_ring.h
+> +++ b/include/linux/virtio_ring.h
+> @@ -31,9 +31,6 @@
+>   * SUCH DAMAGE.
+>   *
+>   * Copyright Rusty Russell IBM Corporation 2007. */
+> -#ifndef __KERNEL__
+> -#include <stdint.h>
+> -#endif
+>  #include <linux/types.h>
+>  #include <linux/virtio_types.h>
+>
+> @@ -202,7 +199,7 @@ static inline void vring_init(struct vring *vr, unsigned int num, void *p,
+>         vr->num = num;
+>         vr->desc = p;
+>         vr->avail = (struct vring_avail *)((char *)p + num * sizeof(struct vring_desc));
+> -       vr->used = (void *)(((uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
+> +       vr->used = (void *)(((unsigned long)&vr->avail->ring[num] + sizeof(__virtio16)
+>                 + align-1) & ~(align - 1));
+>  }
+>
+> diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
+> index 54f3ad7..504e733 100644
+> --- a/riscv/include/asm/kvm.h
+> +++ b/riscv/include/asm/kvm.h
+> @@ -110,6 +110,10 @@ struct kvm_riscv_timer {
+>         __u64 state;
+>  };
+>
+> +/* Possible states for kvm_riscv_timer */
+> +#define KVM_RISCV_TIMER_STATE_OFF      0
+> +#define KVM_RISCV_TIMER_STATE_ON       1
+> +
+>  /*
+>   * ISA extension IDs specific to KVM. This is not the same as the host ISA
+>   * extension IDs as that is internal to the host and should not be exposed
+> @@ -192,6 +196,9 @@ enum KVM_RISCV_ISA_EXT_ID {
+>         KVM_RISCV_ISA_EXT_ZFBFMIN,
+>         KVM_RISCV_ISA_EXT_ZVFBFMIN,
+>         KVM_RISCV_ISA_EXT_ZVFBFWMA,
+> +       KVM_RISCV_ISA_EXT_ZCLSD,
+> +       KVM_RISCV_ISA_EXT_ZILSD,
+> +       KVM_RISCV_ISA_EXT_ZALASR,
+>         KVM_RISCV_ISA_EXT_MAX,
+>  };
+>
+> @@ -235,10 +242,6 @@ struct kvm_riscv_sbi_fwft {
+>         struct kvm_riscv_sbi_fwft_feature pointer_masking;
+>  };
+>
+> -/* Possible states for kvm_riscv_timer */
+> -#define KVM_RISCV_TIMER_STATE_OFF      0
+> -#define KVM_RISCV_TIMER_STATE_ON       1
+> -
+>  /* If you need to interpret the index values, here is the key: */
+>  #define KVM_REG_RISCV_TYPE_MASK                0x00000000FF000000
+>  #define KVM_REG_RISCV_TYPE_SHIFT       24
+> diff --git a/x86/include/asm/kvm.h b/x86/include/asm/kvm.h
+> index 7ceff65..5f2b30d 100644
+> --- a/x86/include/asm/kvm.h
+> +++ b/x86/include/asm/kvm.h
+> @@ -197,13 +197,13 @@ struct kvm_msrs {
+>         __u32 nmsrs; /* number of msrs in entries */
+>         __u32 pad;
+>
+> -       struct kvm_msr_entry entries[];
+> +       __DECLARE_FLEX_ARRAY(struct kvm_msr_entry, entries);
+>  };
+>
+>  /* for KVM_GET_MSR_INDEX_LIST */
+>  struct kvm_msr_list {
+>         __u32 nmsrs; /* number of msrs in entries */
+> -       __u32 indices[];
+> +       __DECLARE_FLEX_ARRAY(__u32, indices);
+>  };
+>
+>  /* Maximum size of any access bitmap in bytes */
+> @@ -245,7 +245,7 @@ struct kvm_cpuid_entry {
+>  struct kvm_cpuid {
+>         __u32 nent;
+>         __u32 padding;
+> -       struct kvm_cpuid_entry entries[];
+> +       __DECLARE_FLEX_ARRAY(struct kvm_cpuid_entry, entries);
+>  };
+>
+>  struct kvm_cpuid_entry2 {
+> @@ -267,7 +267,7 @@ struct kvm_cpuid_entry2 {
+>  struct kvm_cpuid2 {
+>         __u32 nent;
+>         __u32 padding;
+> -       struct kvm_cpuid_entry2 entries[];
+> +       __DECLARE_FLEX_ARRAY(struct kvm_cpuid_entry2, entries);
+>  };
+>
+>  /* for KVM_GET_PIT and KVM_SET_PIT */
+> @@ -398,7 +398,7 @@ struct kvm_xsave {
+>          * the contents of CPUID leaf 0xD on the host.
+>          */
+>         __u32 region[1024];
+> -       __u32 extra[];
+> +       __DECLARE_FLEX_ARRAY(__u32, extra);
+>  };
+>
+>  #define KVM_MAX_XCRS   16
+> @@ -476,6 +476,7 @@ struct kvm_sync_regs {
+>  #define KVM_X86_QUIRK_SLOT_ZAP_ALL             (1 << 7)
+>  #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS       (1 << 8)
+>  #define KVM_X86_QUIRK_IGNORE_GUEST_PAT         (1 << 9)
+> +#define KVM_X86_QUIRK_VMCS12_ALLOW_FREEZE_IN_SMM (1 << 10)
+>
+>  #define KVM_STATE_NESTED_FORMAT_VMX    0
+>  #define KVM_STATE_NESTED_FORMAT_SVM    1
+> @@ -503,6 +504,7 @@ struct kvm_sync_regs {
+>  #define KVM_X86_GRP_SEV                        1
+>  #  define KVM_X86_SEV_VMSA_FEATURES    0
+>  #  define KVM_X86_SNP_POLICY_BITS      1
+> +#  define KVM_X86_SEV_SNP_REQ_CERTS    2
+>
+>  struct kvm_vmx_nested_state_data {
+>         __u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+> @@ -564,7 +566,7 @@ struct kvm_pmu_event_filter {
+>         __u32 fixed_counter_bitmap;
+>         __u32 flags;
+>         __u32 pad[4];
+> -       __u64 events[];
+> +       __DECLARE_FLEX_ARRAY(__u64, events);
+>  };
+>
+>  #define KVM_PMU_EVENT_ALLOW 0
+> @@ -743,6 +745,7 @@ enum sev_cmd_id {
+>         KVM_SEV_SNP_LAUNCH_START = 100,
+>         KVM_SEV_SNP_LAUNCH_UPDATE,
+>         KVM_SEV_SNP_LAUNCH_FINISH,
+> +       KVM_SEV_SNP_ENABLE_REQ_CERTS,
+>
+>         KVM_SEV_NR_MAX,
+>  };
+> @@ -914,8 +917,10 @@ struct kvm_sev_snp_launch_finish {
+>         __u64 pad1[4];
+>  };
+>
+> -#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+> -#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+> +#define KVM_X2APIC_API_USE_32BIT_IDS                   _BITULL(0)
+> +#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK         _BITULL(1)
+> +#define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST       _BITULL(2)
+> +#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST      _BITULL(3)
+>
+>  struct kvm_hyperv_eventfd {
+>         __u32 conn_id;
+> --
+> 2.55.0.rc0.738.g0c8ab3ebcc-goog
+>
+>
