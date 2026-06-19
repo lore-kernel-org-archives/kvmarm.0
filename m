@@ -1,204 +1,274 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010042.outbound.protection.outlook.com [52.101.84.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A1038330E
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 16:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.42
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781887046; cv=fail; b=L5jnqZpuhaH5nTmnCCYdY2l2fmEeaq/5HIQ+Whhz85cc388mwY70JQaxqTt7pajVoIxOiGB7WJTWehGa5YasajSOR/yux19xfLeno8Ig3Fnlj3qE4eSqUW3C/uQp+P2vUvXQulAyh4DDN0YDh/sQuxXMU0/iH8dYUm33sEMAbiU=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781887046; c=relaxed/simple;
-	bh=i1ZvNVTFeTo55ldtE9PjL9l7EUHqjJF3aXHcgYmY9W0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Pdl/Gg29BK0VbilwJ38zKBn5nfGxpPNZctoLDGb0lIxNhAkGvT0KYCy6Js/Hsizmm6NQiLi5YTYSZDAUcHq7Ze2Ga+23nuY1rFUCewHax758brwKbbl7BhcdtHzAUIaAhqsY+8rZ6AoyMqJNC2VSu98++KkrdZTiE2dor5IWPVU=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CnDkdsfR; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CnDkdsfR; arc=fail smtp.client-ip=52.101.84.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E76E3C0630
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 16:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781887333; cv=pass; b=PWYnJgdG0WjY+9twqv7trqPCMjRc5kDe573RcSueLlKVoGiVvu6Pha0lBzfYdTbpI2SuS0VigqcvOP1VqOyu2OzY3HIaRLet1xasCKNtstCpcI3BiWFxRH68UMgx3FY+IkJp4vNRFtk0titdkAF2S1GkfMdtBRlLLEdHbkc7O3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781887333; c=relaxed/simple;
+	bh=IBe5K4iK5H0tQRScCC/J2+7c4L8uaJK/mw2FCOVyCYM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=imek/eSMTyiDFShdMAZJzMW9jPpSEhfdnts2k6C1uGWXU9+YU9DmbN16Ke/lLsAb5wp/gUd0PRCW+t7muBN0E9yakjsv9QuyQnofzowol+wJ3NPW9P7Zsz0AbR3ambBAxTYdQE1aZtbA/U6cZRXIVaIr2OWZ9FjrSZKXLPcgOFA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AwoDGBAY; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CnDkdsfR";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CnDkdsfR"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=Dt6rqzFKKlh91FSCLC+iK9EwS2vhI46a7V1kPkiS6FHTe8ObMmFAnEvVXZLem6UMMTqiINiM4D4y5agLewNKnSATc5lA2qlEFXh56NCfRyCW3urprxZee/L4NCFUZGQzsno8aNp7952oLvRRPbZL10o0bbA1tzhGIYeFjFC5P0+OwefF74GLdr+XxiVA/YRA50fO+9m8IlbBoz58Gh6+410nqRyBE0Y2fePMD5BQk4iJczCgRnRnbSicjjwFP4u2y0KJ20d6xnF8DX3FGC5PjjO64kk9HnPE8UzGllBcYS83IOvTQ/7wMC3hs/YTgk4Nn3yHsSqtVKDVCWVL5osS2w==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/TkRaFhyDU4F6AekNecB/3AwvVr5H8tmS/Mzio3sYfY=;
- b=QmhKITKcKsZeX29n9gWaMUNB8e8LKPz9jgpcaRaJ8o5uO/q7rTkORl7H/pyLGYXaXDY51pmCB7wAd/TxOwnrOsLAz4GuL2ZCjwHwPWTX8sCDOJPQSr9fk/JtUY593boiM7yRh5xw1wE6VazNRh1b5ajH3w0qXjRn1X8mVnAhGzDTYHzMGZBrwkVMCv69ri2vzejuKrmhyRZjv5P2DuYZW3r3GOGLFDIwIK3SeJbBeMJUISfXjivh5bxkNgbNZ5SfaQo4uV+bEsMwFXA60xU98XO6YHxztHFFVdieuLB21NBLHCmI8dtoP18a37NMSFFoQ5N4L+Z2axA2JE/6r+tWmw==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/TkRaFhyDU4F6AekNecB/3AwvVr5H8tmS/Mzio3sYfY=;
- b=CnDkdsfRj/XkQcHy7qEGCCH6AkB2sgCBbP1kTdZl78Q0cDEIq8unOotr4ZlLRugZp9YYmdVI3fiYp99eOx4xMmj8rXrhuz6oeROIul7f5dT3O4s0t+RirIWCARzQ8xa1uGbpCV45lHnU1djaRxquuGotVHDcsFidOpAzNEfRbsc=
-Received: from DUZPR01CA0091.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4bb::26) by AS8PR08MB8222.eurprd08.prod.outlook.com
- (2603:10a6:20b:52a::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Fri, 19 Jun
- 2026 16:37:19 +0000
-Received: from DB1PEPF000509E5.eurprd03.prod.outlook.com
- (2603:10a6:10:4bb:cafe::ae) by DUZPR01CA0091.outlook.office365.com
- (2603:10a6:10:4bb::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.139.14 via Frontend Transport; Fri,
- 19 Jun 2026 16:37:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509E5.mail.protection.outlook.com (10.167.242.55) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.139.8
- via Frontend Transport; Fri, 19 Jun 2026 16:37:17 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FNLCWLmV8Pa9UG14vrApbL8CQ8+7kJe0F8jE1oGoTEgR2g+0MGlowKBzOHXbolhZAuaKBHEL18y2BEO7oxHATguinKZ4+5VUqHeK2p1G4YxYC+MAvnpEjB3H6hh4EgSbECh/3EeesWUYfJ3zw0BqO9BNZN+OSp6tnOQ2KB1I5rVpXbeS/zJkp2XHxatHKcf9vw7eNuCzRkDJI45X4dtSHzaAGnkjFU6kQQw6znDQBgH+Noc82Fa93oGv51/+Bk4+C0Knn+5JX44pMZA48geRq0y7yyiDCP97ant4utO3iIsY+P709212BKpXxS9aYUeJOJZkBdVQU6tL0LOTRgf30w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/TkRaFhyDU4F6AekNecB/3AwvVr5H8tmS/Mzio3sYfY=;
- b=CyZHnTbI9Y8DtVi1ZOcw9Hf4RKyrNh3ueY8+jKFBF13LZhEMFeeQFG8Pz0OyMGKHehIcg2ot2ddp5+2uwly3Kilgrig+3W4zOsaZxos0ffSgfmGTXqMYHRnvFVWn4fI0ew22p6NHlsLP1ItNcAIU5frzf+yCVsLahweCg9Ch4txEhGWZih9kmfPzggxEWtWhVhdmP0cypbzuwap7IwLrU0/n/GRoDrOcBBDlulpHlzLr7mHS9LiICcm8aX1s5sKwKr0xczXWkJi4GrBuiKgNuVbb/HP94pkKd8meZJ5v9Vp2GeL8FOJSjXRDhedpHtiibHpxSMC2iCQFnTDYgwlmIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/TkRaFhyDU4F6AekNecB/3AwvVr5H8tmS/Mzio3sYfY=;
- b=CnDkdsfRj/XkQcHy7qEGCCH6AkB2sgCBbP1kTdZl78Q0cDEIq8unOotr4ZlLRugZp9YYmdVI3fiYp99eOx4xMmj8rXrhuz6oeROIul7f5dT3O4s0t+RirIWCARzQ8xa1uGbpCV45lHnU1djaRxquuGotVHDcsFidOpAzNEfRbsc=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from PAWPR08MB10975.eurprd08.prod.outlook.com (2603:10a6:102:46e::7)
- by AS2PR08MB9974.eurprd08.prod.outlook.com (2603:10a6:20b:643::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Fri, 19 Jun
- 2026 16:36:14 +0000
-Received: from PAWPR08MB10975.eurprd08.prod.outlook.com
- ([fe80::3c7a:9a64:14bc:ce15]) by PAWPR08MB10975.eurprd08.prod.outlook.com
- ([fe80::3c7a:9a64:14bc:ce15%7]) with mapi id 15.21.0139.009; Fri, 19 Jun 2026
- 16:36:14 +0000
-Message-ID: <fe83422c-12e2-40ac-aa9e-26e97e6d2d31@arm.com>
-Date: Fri, 19 Jun 2026 17:36:14 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool 3/4] virtio: Add helper for enabling
- VIRTIO_F_ACCESS_PLATFORM
-To: Will Deacon <will@kernel.org>, kvm@vger.kernel.org
-Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-References: <20260619115415.5475-1-will@kernel.org>
- <20260619115415.5475-4-will@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260619115415.5475-4-will@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: LO4P265CA0126.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2c6::17) To PAWPR08MB10975.eurprd08.prod.outlook.com
- (2603:10a6:102:46e::7)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AwoDGBAY"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-5177d1ff061so230061cf.1
+        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 09:42:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781887331; cv=none;
+        d=google.com; s=arc-20260327;
+        b=HYaDf0xIE+sWEj5VFFiYBzS/Qbe4MkXToWg0xCZ2OQpX0T24SSsX18PE/I34nlYbfm
+         cPz5BlB/Q02f0u6YHv67p56LZRF5haKPcxXhlHMXZ42X9KC6tkArkpQdrRuaSuPKVU9s
+         fT9RdWNpyMUaKCDyaUaT0R5g1lIYGZIH7GxaBhM2GO5KE25LwOc/l/RZ1bJkq0eB14Pc
+         lUziy5C4hrZ/nXd05vV/1KpU6mAzyHZHf+jfGft3mG+TE7IYrXQgl3NV8/6CRcq8ZLQD
+         LB4xwhTZ6MFxrlbz9uG0ky0Cu2TSG0ofkvOvpFdgQk6RSN8n0XIweDFK2ziCHT4E1AQU
+         VLvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=W9jXSUCXwLqMfz03x3rWaIwLOnreZZae42JwqWFDgZo=;
+        fh=SeMYglspTK4T2mrAUlRZUtYqORni63n/Av3A463IAZ8=;
+        b=eAjoOZsud7yc+wcVmRK90OutVIvLPJEF0YK2ZJCDNRJKetFYY8KXptFZlerQE5O352
+         X3fzVTpcMdJQr0bCrSG1UvvT/hlasKBvPBr9EFmR/qjJSsf/PJ1dXIRo8hkZ+zGkcfhi
+         7Lp+Rd66Hm/c7zeYMq3te1FMJejRc08K+GQcMjePVuvXhBzA1+SWql6kNi/s0eqI2Vfa
+         ScBP16b2SjYaoAWWSm/7Uo5Mi4vx5fnqKL9Sbsf/JkuniHf265Nrab8O1iohi6Z3HUZE
+         OAyQM1mM6+phssU5+1j4OUxqAKblGfgfX5p+plODeVGL0zNb1pM2Kb/IwMkZHx9xLVHa
+         mi9g==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781887331; x=1782492131; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=W9jXSUCXwLqMfz03x3rWaIwLOnreZZae42JwqWFDgZo=;
+        b=AwoDGBAY8x+WXYRYFR1swRWmnwJ7TSY4TzBOrc0n0bEpKcQdqvEwYZzEc0oQFlTfbF
+         GW3HUhhOtHLcuyV/lG1OOTyIFBKpyuC5/f7OsAuYvZWVg7EaykEJyoLs6GWDsnABC4eQ
+         709xf/McGLCTvXvrbywFxeahwRMwKTgy8S5yF9W//YbO0q7ib7lONtkfKK3Klk/PQJQT
+         BuuHG5g+Ap8hRr3KQMXgaCNyIM1Ql6DCIqeU7DKbO7/j+d8nWTIve213JUZBI3ClNiLh
+         HAViIxPxpkEyy/eELLZxPcZlsPRVE7yelq2gjfy2WIL1MjZT9AjzbhVTwOrdyTTfBNTM
+         dyMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781887331; x=1782492131;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=W9jXSUCXwLqMfz03x3rWaIwLOnreZZae42JwqWFDgZo=;
+        b=fteA1kpESa7qYyO7QUmBe6goWEWtDAM/Vh18CN5/AiCb8bl97GRphXEy8PFnuPZdFP
+         Rc+UPJwPArZawPadTWSagwoJmWQe4H/EG8J3LpSLgqGDqyO4KpJLyC9y2zbSYnDGEcYh
+         1XrzUaZtYvf7V8XyOuNRbKlLPRrLc38CNIauoFQQJYJHecnazDiyHGUqrvt7AOwFR0fa
+         /JCABoe5/co/Dl4jeKFvYbwG2ly3Uhw4Kf5X5SJ3UjdntxLW5tqqWmYzym5MU1RceSqw
+         R9cAsBuJRIBwkVrEaX/5rPA9n9TD46MJNtGL0iMFeh1zd9w1p52J+1CBCD+v/0/3U4jO
+         5sbQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9ffjeq02lgTJSDo1+rCKBwee5frAbGwxkUPs4iPthBoLFv0kp8eFeINq/yX+l18YpUXzZ/6vA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzcJi0iGq1rAkYNE2ejxmsb+QjzkhhyTI45Gfj5WZlZxRbArcop
+	XxOrcSt4sGmXwegqrT46Ud70qeBrF1H5W9hCHL9KfFvbC9fk7Jnaxo6s+9XfUPxQFfBZ+GAyKYi
+	466TDOauU7321u0cKqO6+q6MeKPHZ3pUTtno0RIvX
+X-Gm-Gg: AfdE7cnfsiGZ7jIRY09f+wVuCoA0p7gJ8DaqFRrg1mP9LM6sybNM94fBXUUkurZzp99
+	lEFtRinqlJ2MeXqd63cQvhZfI6AtM4DpcSba7J/JOItscBa8AiUySQtvwQpJ9IYRtceasW876m5
+	HStYNeoNk/88pj8EGQa3Sl/U6KIs4UJ2tyoD030TiNz1shJE05th1fvRGFnC6NzN0XViHnFKfYg
+	G0DLqI0Z9nFlvn+uoSHArRkM5+ju50Vekq2SUJNaEQR6dgc0kP/x1Qa9Flu2TJjni4gcWwMLA==
+X-Received: by 2002:a05:622a:2489:b0:519:56a8:2693 with SMTP id
+ d75a77b69052e-519e4a7350amr9673821cf.24.1781887330415; Fri, 19 Jun 2026
+ 09:42:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAWPR08MB10975:EE_|AS2PR08MB9974:EE_|DB1PEPF000509E5:EE_|AS8PR08MB8222:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee5b95de-7e42-4de5-33c2-08dece210693
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|23010399003|1800799024|366016|4143699003|56012099006|11063799006|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info-Original:
- 0JjoMQlUePCtQ4BsxqphIxb/h70qc3DGhJFdNWPMXsfJTNAE/xjpSX1e9k0MhnbbbcFoNz3T5zAeToO8kJkHpr7QeEKTa1xrdjFH2rqIM2N4UMrdr1/o/hi+0V8d16sQSQn4HwrHXPd+71dRgQ0CVkmesOCQvB5Mo+T8gljZZ9uOHL5up6rtmRo2RWneK2I8SskRg1Yku9LmOO9kFs1e9CUHEhe8s+2SUnm1QJTnNa969ZCoPuxvJQHfSdM9xoZKNeTOTaDG8MBsWMTvzSDfS5sw2Cdj9VpapOBvhB34BmpLMtNFRg59Pw3wmzPQ0itprRSjojD/10IBbTEz/AmEb+ZXhl/AejdTnIudhOqNyO0qgfY+1vFuQBm270CF0AJdVCCmMQYgWLRG2BDYGnaeu2UGRKvFTWcqXjZPGUWWpRZRZDRe+EaCjWje+tkwTzz88xurxRN/Cm7OlA4QGKdVu1BFdlQTlN5Wj9JsNrEMjy2SMF8T8xOqZLOL7CIjnqu8UR36JUasoT/GSTmcfCgDc283qyliV7MR2HAAUdXyWkghKIAlkZLumltZwKHrKno8hv6Lcv2eqhEGQsCKGcrS5vIO47/D8mNjmFlLOqcphZMpowz2YmSUmDsD+3ER1DIxQIxgvdrpsRbusoan1ny8rli7+dOnCWkWubK4X4dhOEk=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR08MB10975.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(1800799024)(366016)(4143699003)(56012099006)(11063799006)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- fwFT6+ACtGeUDgNhZ4D/4SRthRVsQUCDZSqDu4CkOg5fz9YHKDnhXPwS9AwViFD6CaT789xnYCr/tcLGJ87UWu8CtYZlaVoco0XNM/AV4ihhulpFV7bGiD7VuXorZGSNQggzXs8CsBtV+or408PliOXkNP3tynCZ7pUaN4okBvZpdQmPS91QgEpYJSGIygKO8t4PxkjQZYNVEl/SXz4WpzKsznrcFPMmY3a8xVCP0urk4IeT3+YWWpg4MfI+6HIWlJB0CjV3F7qHLbF5tcohhICANfP52BsOjwRzYuqsvfnuRZMkBOAlrApQleEKGH/KFRytu47iu9RUfufMcEwU0Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB9974
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509E5.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	a346d13b-9d60-48f8-cf29-08dece20e144
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|14060799003|82310400026|36860700016|35042699022|376014|1800799024|56012099006|6133799003|11063799006|4143699003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	HemW3XPSTm/nJQqJa00TAmcF/nCF1onjmR8l38tPc9kPxvdRmT6ydl2XCqVx+hi8frqTOIRJnyKJwi6SXiTMpcPd/1q2a0FLhc87e45Zq2TaUFGn82gdDrgSERvO4txC9xoeiA5LRSkEO6fPPHg7ozRluHrQ1Yc1/XXwSqOZRwhrvQ5vG+3NwlaZvFbDzPg4vLamGc+SHa4q8hb7CxeJyC8QhdkzGf0QqK6c8tWYuxBkMyJkXRGwTi7cNZSyqqq0ynpbnR8MX7SYdHxvE4dCfTD29ntNnNfXCO7kvPmPffimRXOBQQ8HX3UYvAt+iRt3XIq8daJOvNpK876mSE799BmNAK5UshfCBHpjExyGSomWYY2GNjF/GbnyL6ngtcXOep9mZOt6gICOT8jYQxJlNDxsjlael3v5hCpCQYSZ3K1Fff5xAph5TmALfcAwGkngDpvZkJUZXNEN8Sejgy0zpiJyGxQF1Nd+C1lUzPIR5qyfTXJtjLeaWQk8UV1cOmNNjnnvK5RoUKckKJq9dgUAjLUz+LPOKfMyYHnQA2KPeQnHTg/HzRU7Y+pi4Stu5z6UOvXWKjGGz10Ji7/Mb7liPFqy3Z5ubRUSFRRqRyTLCUeaXSBLtGu0Gz3YFB6tLov6icmzKvODXlUrXmThqNWbySupiw+nMqm7YlDRlQ7m1vn/mCv6DSUOOobEmbf5I6BhC9bsVhbOXeZTa529yccj2w==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(14060799003)(82310400026)(36860700016)(35042699022)(376014)(1800799024)(56012099006)(6133799003)(11063799006)(4143699003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	DoRPLaNpOvqDGiSIXer4DAGuWSkuImtHxUkQxfavOoVcf+bKAyqQjygMEEQqOQRT+Nf5dkYbQ+XX1cv7L8SCkHo6DeiDKr70bIFy53+cIVvb2B/4ZiCDdYpNJdbc9f6rC9mgVa8wdGh6yJ/crgTMTG/Dhn5zAlxzKQAnf69WFxtuFqN7t8Fkvm9k4GGJaHhL52ZSpuBAMM/qvjVayJb8KHdTJMbgUiOm0JvB2JotXTaAbdLuKuI5xW75SHez1FCMtMqlR56jKkeqisnumGJuE8DuaWEtDeruYOmnF2qKFOXLRsBcpj9vvh3n1KVbca6ksr9MoPVap/Kf/ffUqb3Qy07kInsEiww9GWVSgop47p2vbXYaiaxVx3S5LsBGxX4qAArftIfkZgHRA+hmWexKrWmFOcgLMllDpc+LqUAabqPLXR326PeSTuk5Pb/+ENRv
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2026 16:37:17.1715
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee5b95de-7e42-4de5-33c2-08dece210693
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509E5.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8222
+References: <20260619070719.812227-1-tabba@google.com> <20260619070719.812227-9-tabba@google.com>
+ <ajVAV5ct0xdLn1KX@google.com>
+In-Reply-To: <ajVAV5ct0xdLn1KX@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 19 Jun 2026 17:41:00 +0100
+X-Gm-Features: AVVi8CeugYeoJkxJ2s1vDW8ayydzdG5A6SaipfjAzjFSd_ia6mU672oeVjPkVZw
+Message-ID: <CA+EHjTz13obYHAZYCW+zpH1RB953FseP9koXydeoLqmn6UONHQ@mail.gmail.com>
+Subject: Re: [PATCH v2 8/8] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Quentin Perret <qperret@google.com>, Sebastian Ene <sebastianene@google.com>, 
+	Hyunwoo Kim <imv4bel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 19/06/2026 12:54, Will Deacon wrote:
-> In preparation for supporting protected guests on arm64, introduce a
-> virtio helper to advertise the VIRTIO_F_ACCESS_PLATFORM feature for the
-> modern transport.
+On Fri, 19 Jun 2026 at 14:13, Vincent Donnefort <vdonnefort@google.com> wrote:
 >
-> Signed-off-by: Will Deacon <will@kernel.org>
+> On Fri, Jun 19, 2026 at 08:07:19AM +0100, Fuad Tabba wrote:
+> > pKVM copies a non-protected guest's register context between the host
+> > and the hypervisor on every world switch, even when the host never
+> > inspects it. Defer the copy: on entry, flush the host context into the
+> > hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
+> > exit, leave it in the hyp vCPU and copy it back only when the host needs
+> > it, via a __pkvm_vcpu_sync_state hypercall on trap handling or at vcpu
+> > put. A protected guest's context is copied as before, since lazy sync
+> > only helps where the host is trusted to see the guest's registers.
+> >
+> > PC and PSTATE are the exception: they are copied back on every exit so
+> > the kvm_exit tracepoint reports the guest's real exit PC, and the run
+> > loop's vcpu_mode_is_bad_32bit() and SError-masking checks evaluate the
+> > guest's current PSTATE rather than the value left by the previous sync.
+> >
+> > handle_exit_early() can also inject an SError, which writes the guest
+> > context (ESR_EL1) outside the trap-handling path. For a non-protected
+> > guest it therefore syncs the context from the hyp vCPU and marks it
+> > dirty, as handle_trap_exceptions() does, so the injection reaches the
+> > hyp vCPU on re-entry rather than being dropped.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h   |  1 +
+> >  arch/arm64/include/asm/kvm_host.h  |  2 +
+> >  arch/arm64/kvm/arm.c               |  7 +++
+> >  arch/arm64/kvm/handle_exit.c       | 30 +++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 86 ++++++++++++++++++++++++++++--
+> >  5 files changed, 121 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index 043495f7fc78..6e1135b3ded4 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -113,6 +113,7 @@ enum __kvm_host_smccc_func {
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+> > +     __KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+> >
+> >       MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 2faa60df847d..caa39ee5125f 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1068,6 +1068,8 @@ struct kvm_vcpu_arch {
+> >  #define INCREMENT_PC         __vcpu_single_flag(iflags, BIT(1))
+> >  /* Target EL/MODE (not a single flag, but let's abuse the macro) */
+> >  #define EXCEPT_MASK          __vcpu_single_flag(iflags, GENMASK(3, 1))
+> > +/* Host-set: the hyp flushes the non-protected vCPU state in on entry */
+> > +#define PKVM_HOST_STATE_DIRTY        __vcpu_single_flag(iflags, BIT(4))
+> >
+> >  /* Helpers to encode exceptions with minimum fuss */
+> >  #define __EXCEPT_MASK_VAL    unpack_vcpu_flag(EXCEPT_MASK)
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 3732ee9eb0d4..4e89558d8027 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -733,6 +733,10 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> >       if (is_protected_kvm_enabled()) {
+> >               kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
+> >               kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+> > +
+> > +             /* __pkvm_vcpu_put implies a sync of the state */
+> > +             if (!kvm_vm_is_protected(vcpu->kvm))
+> > +                     vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> >       }
+> >
+> >       kvm_vcpu_put_debug(vcpu);
+> > @@ -964,6 +968,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+> >               return ret;
+> >
+> >       if (is_protected_kvm_enabled()) {
+> > +             /* Start with the vcpu in a dirty state */
+> > +             if (!kvm_vm_is_protected(vcpu->kvm))
+> > +                     vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> >               ret = pkvm_create_hyp_vm(kvm);
+> >               if (ret)
+> >                       return ret;
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 54aedf93c78b..8963621bcdd1 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -422,6 +422,20 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
+> >  {
+> >       int handled;
+> >
+> > +     /*
+> > +      * If we run a non-protected VM when protection is enabled
+> > +      * system-wide, resync the state from the hypervisor and mark
+> > +      * it as dirty on the host side if it wasn't dirty already
+> > +      * (which could happen if preemption has taken place).
+> > +      */
+> > +     if (is_protected_kvm_enabled() && !kvm_vm_is_protected(vcpu->kvm)) {
+> > +             guard(preempt)();
+> > +             if (!(vcpu_get_flag(vcpu, PKVM_HOST_STATE_DIRTY))) {
+> > +                     kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> > +                     vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > +             }
+> > +     }
+> > +
+>
+> Could we remove this update here and let handle_exit_early() do the sync
+> regardless of the SError injection? One of the main point of handle_exit_early()
+> is to do things under !prempt().
 
-This works fine for us with CCA. Thanks for this.
+Agreed on the move: handle_exit_early() is already preempt-off, so the
+guard() goes away. Not on every exit though. handle_exit_early() runs
+on every exit, and sync_hyp_vcpu() only copies PC/PSTATE/fault back
+for a non-protected guest; the GPRs and sysregs cross solely via
+__pkvm_vcpu_sync_state. Syncing unconditionally would pull the full
+context back on plain IRQ exits, which is the copy this patch avoids.
+So I will gate it on trap-or-SError and drop the
+handle_trap_exceptions() block.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>
+>
+> >       /*
+> >        * See ARM ARM B1.14.1: "Hyp traps on instructions
+> >        * that fail their condition code check"
+> > @@ -489,6 +503,22 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+> >  /* For exit types that need handling before we can be preempted */
+> >  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+> >  {
+> > +     bool inject_serror = ARM_SERROR_PENDING(exception_index) ||
+> > +             ARM_EXCEPTION_CODE(exception_index) == ARM_EXCEPTION_EL1_SERROR;
+> > +
+> > +     /*
+> > +      * An SError injected below writes the host ctxt; for a non-protected
+> > +      * guest, sync from the hyp vCPU and keep it dirty so it isn't dropped.
+> > +      */
+> > +     if (is_protected_kvm_enabled()) {
+>
+> Should we test !kvm_vm_is_protected(vcpu->kvm) here, as the
+> PKVM_HOST_STATE_DIRTY is only updated for p-guests everywhere else?
 
-> ---
->   include/kvm/virtio.h | 1 +
->   virtio/core.c        | 5 +++++
->   2 files changed, 6 insertions(+)
->
-> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-> index c95183b..dd3117b 100644
-> --- a/include/kvm/virtio.h
-> +++ b/include/kvm/virtio.h
-> @@ -277,6 +277,7 @@ void virtio_vhost_reset_vring(struct kvm *kvm, int vh=
-ost_fd, u32 index,
->   int virtio_vhost_set_features(int vhost_fd, u64 features);
->
->   int virtio_transport_parser(const struct option *opt, const char *arg, =
-int unset);
-> +void virtio_modern_enable_feat_access_platform(void);
->   u64 virtio_get_modern_transport_features(void);
->
->   #endif /* KVM__VIRTIO_H */
-> diff --git a/virtio/core.c b/virtio/core.c
-> index 8c5086d..96bbf96 100644
-> --- a/virtio/core.c
-> +++ b/virtio/core.c
-> @@ -355,6 +355,11 @@ bool virtio_access_config(struct kvm *kvm, struct vi=
-rtio_device *vdev,
->
->   static u64 virtio_modern_transport_features =3D 1ULL << VIRTIO_F_VERSIO=
-N_1;
->
-> +void virtio_modern_enable_feat_access_platform(void)
-> +{
-> +     virtio_modern_transport_features |=3D 1ULL << VIRTIO_F_ACCESS_PLATF=
-ORM;
-> +}
-> +
->   u64 virtio_get_modern_transport_features(void)
->   {
->       return virtio_modern_transport_features;
+Yes. The flag is only ever set for non-protected guests, so clearing it
+for a protected one is a no-op, but gating it matches the invariant.
 
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
+Both fold into one block in handle_exit_early():
+
+      if (is_protected_kvm_enabled() && !kvm_vm_is_protected(vcpu->kvm)) {
+              if (inject_serror ||
+                  ARM_EXCEPTION_CODE(exception_index) == ARM_EXCEPTION_TRAP) {
+                      kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+                      vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+              } else {
+                      vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+              }
+      }
+
+I will fold this into the next respin.
+
+Thanks for the reviews!
+/fuad
+
+>
+> > +             vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > +
+> > +             if (inject_serror && !kvm_vm_is_protected(vcpu->kvm)) {
+> > +                     kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> > +                     vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > +             }
+> > +     }
+> > +
+> >       if (ARM_SERROR_PENDING(exception_index)) {
+> >               if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
+> >                       u64 disr = kvm_vcpu_get_disr(vcpu);
+>
+> [...]
