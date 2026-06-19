@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399E6381AFC;
-	Fri, 19 Jun 2026 11:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8B7381B0E;
+	Fri, 19 Jun 2026 11:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781870068; cv=none; b=OoE6Nc+jAguCNhTuqHuQ26PoruLPBZtT/XRjGBNL9GK7G2YhirP0SgOOxuQFBId7r598+7G1WQMvZFbaiyGDyhyyO0amMwVEaR+bckiODApLc0zm6OY7mvXFcrZSNqpK3VFLAb7opWobbGQ0hu7pCQ7PeHeZDm/gGqJEsCbACxA=
+	t=1781870070; cv=none; b=OEU9eSw0K/UOXkLWUwam+n2Aa91nvlupymCHBFR3UI+4vLrY7mqI+8eXUPskbAzjCM5MjfgN8mVbz4fPQ5GSg4OGLNn7Kitkq2peLgwRiGv94mWoOTXQ9qvUWboJYEep440XrPK8vT1qWoXeICSUx6pkDJc9cu5tCaf3ry78KH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781870068; c=relaxed/simple;
-	bh=iE1fyj1TprjtWSNYc7vnadO9pxJouGtVe7jcCnNdBHM=;
+	s=arc-20240116; t=1781870070; c=relaxed/simple;
+	bh=MAidVOm4rcVnmFGFmS+qBAtD2pd6dZONotYiw2EAFzI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I9Q7okIIpgs5fZWYjYCW/Iexq8M7XtcJbs0JC31SzbLZqGK35kYY2aQ02ioAR9jJNj4kdw/9KwsM7yF665udqgivDPQ2DCZMlXF8lOE3mKre86i1mAoOiWCKsAbVfkYjzVZWfv/iSxB1Pzsd/RA0AlvAh3w1F4Pu3jS9tTMAiKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aj8jYgL9; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ChQlr82Ilu+Gnt1MduBEOt/uzTOx44+4atZxb2ZrRLvwQh+ZJR69+NPawu91Op3viIr63Q/ImWt6WCMa0NoirW4ZOuyBcAH/o221NLRAAEJXpJo8SyWSgfLV+khg9NZcr14/llpzrfGmXkTb52CkLO/7sOqhNG8HKd6959ayp8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5nLb/+b; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aj8jYgL9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B07B1F000E9;
-	Fri, 19 Jun 2026 11:54:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5nLb/+b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54D061F00A3A;
+	Fri, 19 Jun 2026 11:54:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781870066;
-	bh=6CJWY49CFsIekALGL686ZfGUyj61NGSBSLJxxNVZE1Y=;
+	s=k20260515; t=1781870069;
+	bh=M+1wOcPo/ykLklISsI5+Rv1fyEi6pM6pHn2Hi2zF5Ao=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=aj8jYgL9R39NBFWe63BMJqgGITpd0kM8TtZezO6Ima3JsX2So11YNQQJc9rripu2f
-	 NZSMbRFLC/1c2+SW4tShvBNstqkrid0ro4TGAbxv36v2CCDw91FkAQuXR6erL0m23R
-	 +AnCDPYdHYRgZvYsYrPRS4LDwn6Z36KLICj9IwC11WCZ3NywJIznH6YDlRMIugazgu
-	 uOwvJXmruNK8JXpNDO1ZwmocAfyDdzIlhvZjL57PZhzQcq7Jq2yGzellGGDvVQYIYm
-	 bJbJA0Siweju0mTJWO8I8PBZ7pOrdFCCSyoi8IiskvfHaMVr9cRrW5okDrxAevyEWo
-	 +NRcL75mymyIg==
+	b=k5nLb/+b8BKFyThq/FScJqwWzDfOH1QKW1gA8nrazhx3fcFlGLcgpKn4bGD6VewwI
+	 zx5sUAdOCfB/g/QQdiEG0nkIVHgwrd3PGBC6pP9hVgf6hpEV4MGhkUwN4E0rNkL9sF
+	 5roTMpKP/1nEFgWEznVKB111ZBR11UFzrLMW/BDx6ZtiiM2PG17OY6eSgfjlxyG0ly
+	 v3zDiCmYR+JWTfQOQummFFLhBYyouQx2DUKI8T1HbEtfwVusTRHGaQZy0pnXatOYOX
+	 7YWwkHDzFSjU38asPCf4aLuQSBf9sdHxzadpwoXhq5EUDE5n2NGr0UyG7A9nLwVo0a
+	 8IuauwhFNSygw==
 From: Will Deacon <will@kernel.org>
 To: kvm@vger.kernel.org
 Cc: kvmarm@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: kvmarm@lists.linux.dev,
 	Andre Przywara <andre.przywara@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kvmtool 2/4] virtio: Factor out base features for modern virtio transports
-Date: Fri, 19 Jun 2026 12:54:12 +0100
-Message-ID: <20260619115415.5475-3-will@kernel.org>
+Subject: [PATCH kvmtool 3/4] virtio: Add helper for enabling VIRTIO_F_ACCESS_PLATFORM
+Date: Fri, 19 Jun 2026 12:54:13 +0100
+Message-ID: <20260619115415.5475-4-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260619115415.5475-1-will@kernel.org>
 References: <20260619115415.5475-1-will@kernel.org>
@@ -49,72 +49,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In preparation for optionally enabling VIRTIO_F_ACCESS_PLATFORM,
-factor out the base features for modern virtio transports.
+In preparation for supporting protected guests on arm64, introduce a
+virtio helper to advertise the VIRTIO_F_ACCESS_PLATFORM feature for the
+modern transport.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
  include/kvm/virtio.h | 1 +
- virtio/core.c        | 7 +++++++
- virtio/mmio-modern.c | 2 +-
- virtio/pci-modern.c  | 2 +-
- 4 files changed, 10 insertions(+), 2 deletions(-)
+ virtio/core.c        | 5 +++++
+ 2 files changed, 6 insertions(+)
 
 diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index 8b7ec1b..c95183b 100644
+index c95183b..dd3117b 100644
 --- a/include/kvm/virtio.h
 +++ b/include/kvm/virtio.h
-@@ -277,5 +277,6 @@ void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
+@@ -277,6 +277,7 @@ void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
  int virtio_vhost_set_features(int vhost_fd, u64 features);
  
  int virtio_transport_parser(const struct option *opt, const char *arg, int unset);
-+u64 virtio_get_modern_transport_features(void);
++void virtio_modern_enable_feat_access_platform(void);
+ u64 virtio_get_modern_transport_features(void);
  
  #endif /* KVM__VIRTIO_H */
 diff --git a/virtio/core.c b/virtio/core.c
-index 50c9ddd..8c5086d 100644
+index 8c5086d..96bbf96 100644
 --- a/virtio/core.c
 +++ b/virtio/core.c
-@@ -353,6 +353,13 @@ bool virtio_access_config(struct kvm *kvm, struct virtio_device *vdev,
- 	return true;
- }
+@@ -355,6 +355,11 @@ bool virtio_access_config(struct kvm *kvm, struct virtio_device *vdev,
  
-+static u64 virtio_modern_transport_features = 1ULL << VIRTIO_F_VERSION_1;
-+
-+u64 virtio_get_modern_transport_features(void)
+ static u64 virtio_modern_transport_features = 1ULL << VIRTIO_F_VERSION_1;
+ 
++void virtio_modern_enable_feat_access_platform(void)
 +{
-+	return virtio_modern_transport_features;
++	virtio_modern_transport_features |= 1ULL << VIRTIO_F_ACCESS_PLATFORM;
 +}
 +
- int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		struct virtio_ops *ops, enum virtio_trans trans,
- 		int device_id, int subsys_id, int class)
-diff --git a/virtio/mmio-modern.c b/virtio/mmio-modern.c
-index 6c0bb38..7787508 100644
---- a/virtio/mmio-modern.c
-+++ b/virtio/mmio-modern.c
-@@ -11,7 +11,7 @@ static void virtio_mmio_config_in(struct kvm_cpu *vcpu,
- 				  struct virtio_device *vdev)
+ u64 virtio_get_modern_transport_features(void)
  {
- 	struct virtio_mmio *vmmio = vdev->virtio;
--	u64 features = 1ULL << VIRTIO_F_VERSION_1;
-+	u64 features = virtio_get_modern_transport_features();
- 	u32 val = 0;
- 
- 	switch (addr) {
-diff --git a/virtio/pci-modern.c b/virtio/pci-modern.c
-index ef2f3e2..888afa5 100644
---- a/virtio/pci-modern.c
-+++ b/virtio/pci-modern.c
-@@ -148,7 +148,7 @@ static bool virtio_pci__common_read(struct virtio_device *vdev,
- {
- 	u32 val;
- 	struct virtio_pci *vpci = vdev->virtio;
--	u64 features = 1ULL << VIRTIO_F_VERSION_1;
-+	u64 features = virtio_get_modern_transport_features();
- 
- 	switch (offset - VPCI_CFG_COMMON_START) {
- 	case VIRTIO_PCI_COMMON_DFSELECT:
+ 	return virtio_modern_transport_features;
 -- 
 2.55.0.rc0.738.g0c8ab3ebcc-goog
 
