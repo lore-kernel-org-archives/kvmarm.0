@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6229635F189
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CF03603D7
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781852722; cv=none; b=I/EQhMm2iWroWZ6/bB8HVSQYiZZXL5Kv6Z+017jeREBJwZnXdZLV5aJkek98AZMjtN50fMK+EhWtSWbeDG94KUkkA42TZZ5w1WgBOoABrSVblWVOfBJIgZ3XfSxqvBj9BOWK7U6fBCDEBS/ZWWF9wfcPN4GflZpudpTnZShbNtY=
+	t=1781852723; cv=none; b=CFBOM7djCLi8W7BTuSn/vTYsJpcslckpOVgU5TVku/OwpTpmsGVusNw39DhVLmGZb0h/K62qHAZYokxehf0+cYdTz5tiEY2txIO2Vj0cBFihrsAk5zlsYBabTK9DKy+VtE8Dd0Jgek5a71es7JIwRp0EFH5o6CVPKQHmMolrUok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781852722; c=relaxed/simple;
-	bh=zWB5u1idfA4AdPs7jMtePhO4jDSl0x0MhXVkrlpo+94=;
+	s=arc-20240116; t=1781852723; c=relaxed/simple;
+	bh=rCZNUD0gCJigk1x42ZGHefT1/KNaI1BInw8ZqAxS56M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NGRn9WiQT/LO618+G3/CrAzPA/JmEjAovu4qSKISGAkn7CV+ZSHMRUUx/ryLP41dtjJ00hiNNq/IVvCHk0xgiDQ3Tn44odC6FJZ48GDj0QpFI1HR3HXxrw4pi0JZjkYo1ywK8yw5iLERCBp8QTGLaUrZTgs0s/QqIsXKmn7xl8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rt0uK9da; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=RmrEUc6tOmBXEp05LaAnTAKZsUomd2+Qo31wIlW+9OZIWkqmvdRoPA96/6237gCnIrvPId+H+dUmNR0wx7Jx+/AE/kopBJG8jh9lnDVPL/KdUQl4OebrAzsXqQ2S/cYo6E6Rdgx69CHM9Wc9aQQyTY1X6eG0gvj8xNZXerV1Ij8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FZCagIYy; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rt0uK9da"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490b93debc8so12005095e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:05:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FZCagIYy"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-490b8adf8b8so14272085e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781852719; x=1782457519; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1781852720; x=1782457520; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HiUT5ABfb1SzLS+/NM78To0mA4a5Z1HMNy+YIWkerC4=;
-        b=Rt0uK9daIgzLQ3XL9ogsSGUSBK8+xgwGmAbgnhHNeWeyyPw5FcjghUOslZVXHJm6ME
-         YN6sh7hCYJd7+GsPe94bABWKFzL03aJp4IjdlbLxvj4nRxsVwHTKUHaePyywiVyaZ2Nu
-         qkj7twcVBfcNKduUrgOUhuwY8HRsHoA7lOfTZWWnFk8ycAzEoNhWs1ek2NQcaowluQ83
-         LxUVQBSV0QbyghrjNzQvMRaHA7qNUtOKL+Wpbb+LBH2x2oS57EvQo3DlcMXNn2lb++21
-         7TV8NEtVIw9Fq5Uww6DnoPS1YMFhQO/AU+re6Z/BQkoiuXL1YpWH/z8zVrAuihE+ym08
-         FhKw==
+        bh=qpP3LSoonJ9EorTtHKWd2w6u9bjj7j9N3BPO/k2UNOg=;
+        b=FZCagIYy2DMTR503TnXBBIwjfMEumZAoMnNlf7LYHzJsUmf2i5rtX4pHo1+FJhY6p2
+         FiYOdck5ZaFU0JWUifhw20TPpev5+w4jBL/jQKMwxrfC4AHfQYuEB1Jaeku1V4YYdHep
+         PWIcwbGxa8W5TKRuKCpbYeuVj5fppkRWXVZ9HmUrY7lqJ5Baa41nrpG8DrFK1n/hSpy/
+         YSWwnW1ZGKt8akipv/aZzVv03gd4l+rdm3935arNvMGEj+tcvpN8RXD9ipa8nnxBOg+q
+         3LGYopyvhVyCDS+dEco6+gMcYIV9DQKlF71lNT9KOCTGgrms0iRr3QZadjXnKcaVNX7p
+         hXxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781852719; x=1782457519;
+        d=1e100.net; s=20251104; t=1781852720; x=1782457520;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HiUT5ABfb1SzLS+/NM78To0mA4a5Z1HMNy+YIWkerC4=;
-        b=jyMCPyBv3O3uGzQhiqBbhvJVmmFeOlh+VuGoALQZ/+Q+WZS+kVY064PvpwYmxIBFFI
-         nlzSH4rpZYCJBrpw8P8TGnvCp2OLV6aHUCiF3BX4DYOneZ0IFVK09aBOa9zJdP5X/bLw
-         JXSK2ls0sTfsNRtUANOuCpklV6kjik2zcgVvIF/KOFNYzBuwlBW86QCETVx1+yGk2e4S
-         mtbgf7b4+0uKkSpEDX7O057vXdC2P+XJhOMcYtwmENb8/aWhH6BkiWSCUNwVWUhvdF2s
-         0cgEkfpVCpevZlhRmi8PT8+9ahVHbQl8kD6y94OXskyq095ENs2MGF9prtqGCpcExk7o
-         /PPg==
-X-Forwarded-Encrypted: i=1; AFNElJ/cF+v/Gh4YxBdF8hbJDEDqQP3PAdmzzWsXyXg33xvEtAN7yiL3mXqmw2Y25edFedMP4THZZDk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwG1vigWNi1pDi2DYSb7bKO5OSLVmbAuVuN33u09jIkFEMktC0U
-	WKoXh3Az0ZWE+rtQ+B5erjzwDxGvXNJMH8U3WcLky67RsldEdw9Z3EQfP6Lvw76n9DYrAvDPUpT
-	sbA==
-X-Received: from wmfv3.prod.google.com ([2002:a05:600c:15c3:b0:492:4352:4fc7])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:c48e:b0:490:b0e0:3de2
- with SMTP id 5b1f17b1804b1-4923f5a8fd6mr40569085e9.33.1781852718385; Fri, 19
- Jun 2026 00:05:18 -0700 (PDT)
-Date: Fri, 19 Jun 2026 08:05:07 +0100
+        bh=qpP3LSoonJ9EorTtHKWd2w6u9bjj7j9N3BPO/k2UNOg=;
+        b=kzNHG4QsYYxBfxW3Kgx3z7hQI41oyl5kIg3x0SoSeg2boQJv7lpIFmEyFEPKSDg3ju
+         Zm0ERvCdnU3cUvq4BHh0bDW1tRDUHGhfHA+LLEHb7Nsp4Vn/8WCw4vAbU2QWdFQAqEog
+         rOQvWX8UOaFOSEaPGRFCRVNtgDrmKmcMOS/BzLtWeEn88QjC2dvXfijv2faw4srsJajF
+         1Y2mmJtRYh6inGp+hsDVImK5MkW0GoMBHTDJxPZGIm3aJ4mHzqyKv3BLaZh22V9n8kfr
+         HF+mQ7Eyc9SUQ048LIA2cpjuhHE7bV82YkMRv+AGfEvbYhFcmQY0AEwEoFYT6vqUFyao
+         /gbg==
+X-Forwarded-Encrypted: i=1; AFNElJ/CJzEERtYYQGNa/hG0Ks2SSdRz/WCmii0OrOxEmyviv/DU/yWm/u1Fd57vOaFsVmTIY51AzZM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzidBx4UtMNVD9Bt2S4JACF55x2HIX05OT2xlOPsuqp5QsY/p/0
+	i2WHX/ZhHt6HJswHU9jcFM4MHmycT5+26phMEGjsNqSffW2b3bBi/guKQQhwF+ouZZ2Z/pHsQ1W
+	P6Q==
+X-Received: from wmsu11-n1.prod.google.com ([2002:a05:600c:c3cb:10b0:492:40df:d66e])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4592:b0:492:32a0:7f92
+ with SMTP id 5b1f17b1804b1-49240e0598amr31784125e9.12.1781852719630; Fri, 19
+ Jun 2026 00:05:19 -0700 (PDT)
+Date: Fri, 19 Jun 2026 08:05:08 +0100
 In-Reply-To: <20260619070508.802802-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260619070508.802802-1-tabba@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.738.g0c8ab3ebcc-goog
-Message-ID: <20260619070508.802802-8-tabba@google.com>
-Subject: [PATCH 7/8] KVM: arm64: Add primitives to flush/sync the VGIC state
- at EL2
+Message-ID: <20260619070508.802802-9-tabba@google.com>
+Subject: [PATCH 8/8] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
@@ -72,117 +72,259 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+pKVM copies a non-protected guest's register context between the host
+and the hypervisor on every world switch, even when the host never
+inspects it. Defer the copy: on entry, flush the host context into the
+hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
+exit, leave it in the hyp vCPU and copy it back only when the host needs
+it, via a __pkvm_vcpu_sync_state hypercall on trap handling or at vcpu
+put. A protected guest's context is copied as before, since lazy sync
+only helps where the host is trusted to see the guest's registers.
 
-pKVM performs its own world switch for protected VMs but has no
-primitives to move the per-vCPU VGIC state between the host and
-hypervisor vCPU contexts.
+PC and PSTATE are the exception: they are copied back on every exit so
+the kvm_exit tracepoint reports the guest's real exit PC, and the run
+loop's vcpu_mode_is_bad_32bit() and SError-masking checks evaluate the
+guest's current PSTATE rather than the value left by the previous sync.
 
-Add flush_hyp_vgic_state() and sync_hyp_vgic_state(). Flush copies
-vgic_hcr, the in-use list registers and used_lrs from the host into the
-hyp vCPU and pins vgic_sre to a fixed value; sync copies vgic_hcr,
-vgic_vmcr and the in-use list registers back. The active priority
-registers are handled separately by the save/restore-aprs path.
+handle_exit_early() can also inject an SError, which writes the guest
+context (ESR_EL1) outside the trap-handling path. For a non-protected
+guest it therefore syncs the context from the hyp vCPU and marks it
+dirty, as handle_trap_exceptions() does, so the injection reaches the
+hyp vCPU on re-entry rather than being dropped.
 
-Bound used_lrs by hyp_gicv3_nr_lr, the cached implemented-LR count,
-instead of reading ICH_VTR_EL2 on each entry. That clamps the
-host-supplied value and avoids a per-entry sysreg read that is costly
-under NV.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Co-developed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 55 ++++++++++++++++++++++--------
- 1 file changed, 41 insertions(+), 14 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   |  1 +
+ arch/arm64/include/asm/kvm_host.h  |  2 +
+ arch/arm64/kvm/arm.c               |  7 +++
+ arch/arm64/kvm/handle_exit.c       | 30 +++++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 86 ++++++++++++++++++++++++++++--
+ 5 files changed, 121 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 043495f7fc78..6e1135b3ded4 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -113,6 +113,7 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
++	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+ 
+ 	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2faa60df847d..caa39ee5125f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1068,6 +1068,8 @@ struct kvm_vcpu_arch {
+ #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
+ /* Target EL/MODE (not a single flag, but let's abuse the macro) */
+ #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
++/* Host-set: the hyp flushes the non-protected vCPU state in on entry */
++#define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
+ 
+ /* Helpers to encode exceptions with minimum fuss */
+ #define __EXCEPT_MASK_VAL	unpack_vcpu_flag(EXCEPT_MASK)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3732ee9eb0d4..4e89558d8027 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -733,6 +733,10 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	if (is_protected_kvm_enabled()) {
+ 		kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
+ 		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
++
++		/* __pkvm_vcpu_put implies a sync of the state */
++		if (!kvm_vm_is_protected(vcpu->kvm))
++			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+ 	}
+ 
+ 	kvm_vcpu_put_debug(vcpu);
+@@ -964,6 +968,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 		return ret;
+ 
+ 	if (is_protected_kvm_enabled()) {
++		/* Start with the vcpu in a dirty state */
++		if (!kvm_vm_is_protected(vcpu->kvm))
++			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+ 		ret = pkvm_create_hyp_vm(kvm);
+ 		if (ret)
+ 			return ret;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 54aedf93c78b..8963621bcdd1 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -422,6 +422,20 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
+ {
+ 	int handled;
+ 
++	/*
++	 * If we run a non-protected VM when protection is enabled
++	 * system-wide, resync the state from the hypervisor and mark
++	 * it as dirty on the host side if it wasn't dirty already
++	 * (which could happen if preemption has taken place).
++	 */
++	if (is_protected_kvm_enabled() && !kvm_vm_is_protected(vcpu->kvm)) {
++		guard(preempt)();
++		if (!(vcpu_get_flag(vcpu, PKVM_HOST_STATE_DIRTY))) {
++			kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
++			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
++		}
++	}
++
+ 	/*
+ 	 * See ARM ARM B1.14.1: "Hyp traps on instructions
+ 	 * that fail their condition code check"
+@@ -489,6 +503,22 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+ /* For exit types that need handling before we can be preempted */
+ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+ {
++	bool inject_serror = ARM_SERROR_PENDING(exception_index) ||
++		ARM_EXCEPTION_CODE(exception_index) == ARM_EXCEPTION_EL1_SERROR;
++
++	/*
++	 * An SError injected below writes the host ctxt; for a non-protected
++	 * guest, sync from the hyp vCPU and keep it dirty so it isn't dropped.
++	 */
++	if (is_protected_kvm_enabled()) {
++		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
++
++		if (inject_serror && !kvm_vm_is_protected(vcpu->kvm)) {
++			kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
++			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
++		}
++	}
++
+ 	if (ARM_SERROR_PENDING(exception_index)) {
+ 		if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
+ 			u64 disr = kvm_vcpu_get_disr(vcpu);
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f25ee3971528..0194965930e6 100644
+index 0194965930e6..acf53aae4fe4 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -102,6 +102,45 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
+@@ -141,6 +141,48 @@ static void sync_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
  }
  
-+static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++static void __copy_vcpu_state(const struct kvm_vcpu *from_vcpu,
++			      struct kvm_vcpu *to_vcpu)
 +{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
-+	unsigned int used_lrs, i;
++	int i;
 +
-+	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
++	to_vcpu->arch.ctxt.regs		= from_vcpu->arch.ctxt.regs;
++	to_vcpu->arch.ctxt.spsr_abt	= from_vcpu->arch.ctxt.spsr_abt;
++	to_vcpu->arch.ctxt.spsr_und	= from_vcpu->arch.ctxt.spsr_und;
++	to_vcpu->arch.ctxt.spsr_irq	= from_vcpu->arch.ctxt.spsr_irq;
++	to_vcpu->arch.ctxt.spsr_fiq	= from_vcpu->arch.ctxt.spsr_fiq;
++	to_vcpu->arch.ctxt.fp_regs	= from_vcpu->arch.ctxt.fp_regs;
 +
-+	used_lrs	= host_cpu_if->used_lrs;
-+	used_lrs	= min(used_lrs, hyp_gicv3_nr_lr);
-+
-+	hyp_cpu_if->vgic_hcr	= host_cpu_if->vgic_hcr;
-+	/* Should be a one-off */
-+	hyp_cpu_if->vgic_sre	= (ICC_SRE_EL1_DIB |
-+				   ICC_SRE_EL1_DFB |
-+				   ICC_SRE_EL1_SRE);
-+	hyp_cpu_if->used_lrs	= used_lrs;
-+
-+	for (i = 0; i < used_lrs; i++)
-+		hyp_cpu_if->vgic_lr[i] = host_cpu_if->vgic_lr[i];
++	/*
++	 * Copy the sysregs, but don't mess with the timer state which
++	 * is directly handled by EL1 and is expected to be preserved.
++	 * enum vcpu_sysreg is sparse: VNCR-mapped registers take values
++	 * derived from their VNCR page offset, so the timer registers do
++	 * not form a contiguous numeric range and must be skipped by name.
++	 */
++	for (i = 1; i < NR_SYS_REGS; i++) {
++		switch (i) {
++		case CNTVOFF_EL2:
++		case CNTV_CVAL_EL0:
++		case CNTV_CTL_EL0:
++		case CNTP_CVAL_EL0:
++		case CNTP_CTL_EL0:
++			continue;
++		}
++		to_vcpu->arch.ctxt.sys_regs[i] = from_vcpu->arch.ctxt.sys_regs[i];
++	}
 +}
 +
-+static void sync_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++static void sync_hyp_vcpu_state(struct pkvm_hyp_vcpu *hyp_vcpu)
 +{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
-+	unsigned int i;
++	__copy_vcpu_state(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu);
++}
 +
-+	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-+
-+	host_cpu_if->vgic_hcr = hyp_cpu_if->vgic_hcr;
-+	host_cpu_if->vgic_vmcr = hyp_cpu_if->vgic_vmcr;
-+
-+	for (i = 0; i < hyp_cpu_if->used_lrs; i++)
-+		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
++static void flush_hyp_vcpu_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	__copy_vcpu_state(hyp_vcpu->host_vcpu, &hyp_vcpu->vcpu);
 +}
 +
  static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
  {
  	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-@@ -150,13 +189,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+@@ -170,7 +212,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	fpsimd_sve_flush();
+ 	flush_debug_state(hyp_vcpu);
  
- 	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
+-	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
++	/*
++	 * If we deal with a non-protected guest and the state is potentially
++	 * dirty (from a host perspective), copy the state back into the hyp
++	 * vcpu.
++	 */
++	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
++		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
++			flush_hyp_vcpu_state(hyp_vcpu);
++	} else {
++		hyp_vcpu->vcpu.arch.ctxt = host_vcpu->arch.ctxt;
++	}
  
--	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
--
--	/* Bound used_lrs by the number of implemented list registers. */
--	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs =
--		min_t(unsigned int,
--		      hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs,
--		      hyp_gicv3_nr_lr);
-+	flush_hyp_vgic_state(hyp_vcpu);
- 
- 	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
- }
-@@ -164,9 +197,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
--	struct vgic_v3_cpu_if *hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
--	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
--	unsigned int i;
- 
+ 	/* __hyp_running_vcpu must be NULL in a guest context. */
+ 	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu = NULL;
+@@ -201,9 +253,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
  	sync_debug_state(hyp_vcpu);
-@@ -179,10 +209,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
  
- 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
+-	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
+-
+-	host_vcpu->arch.hcr_el2		= hyp_vcpu->vcpu.arch.hcr_el2;
++	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
++		host_vcpu->arch.ctxt = hyp_vcpu->vcpu.arch.ctxt;
++	} else {
++		/* Keep PC (tracepoint) and PSTATE (vcpu_mode_is_bad_32bit) current. */
++		host_vcpu->arch.ctxt.regs.pc = hyp_vcpu->vcpu.arch.ctxt.regs.pc;
++		host_vcpu->arch.ctxt.regs.pstate = hyp_vcpu->vcpu.arch.ctxt.regs.pstate;
++	}
  
--	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
--	host_cpu_if->vgic_vmcr		= hyp_cpu_if->vgic_vmcr;
--	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
--		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
-+	sync_hyp_vgic_state(hyp_vcpu);
+ 	host_vcpu->arch.fault		= hyp_vcpu->vcpu.arch.fault;
+ 
+@@ -237,8 +293,27 @@ static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
+ {
+ 	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+ 
+-	if (hyp_vcpu)
++	if (hyp_vcpu) {
++		struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
++
++		if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu) &&
++		    !vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY)) {
++			sync_hyp_vcpu_state(hyp_vcpu);
++		}
++
+ 		pkvm_put_hyp_vcpu(hyp_vcpu);
++	}
++}
++
++static void handle___pkvm_vcpu_sync_state(struct kvm_cpu_context *host_ctxt)
++{
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++
++	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
++	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
++		return;
++
++	sync_hyp_vcpu_state(hyp_vcpu);
  }
  
- static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
+ static struct kvm_vcpu *__get_host_hyp_vcpus(struct kvm_vcpu *arg,
+@@ -869,6 +944,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__pkvm_finalize_teardown_vm),
+ 	HANDLE_FUNC(__pkvm_vcpu_load),
+ 	HANDLE_FUNC(__pkvm_vcpu_put),
++	HANDLE_FUNC(__pkvm_vcpu_sync_state),
+ 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
+ };
+ 
 -- 
 2.55.0.rc0.738.g0c8ab3ebcc-goog
 
