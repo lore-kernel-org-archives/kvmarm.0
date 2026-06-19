@@ -1,147 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD08D313E2B
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781853873; cv=none; b=TLpE5Eas36k5Pyy5FSZnwybZXV36ZTCgLkMjWNKrbbKEgBMZEocMcu5eEL2zNb21S41Re80uwrO27DsY2RMWpSQvEmVnjUa5Zwv4kiGeMqrRZZgxEj3u3POIY5RXQ/7oX0Z/TP58XC6tHqdAN7fxJNNctMHS9Ytlq+GDpVkf/Fs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781853873; c=relaxed/simple;
-	bh=Z+5B3LrI5BcQEwBO6vprxPNpNODY1h9dCHBe9eJbMfI=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=kUPhTrvdvMIaLWLo6RASIsCdbCUKf3PeJLlzFWtOsaLRC7AvsZfUL+TCHOLCrOoYubJRiAwrLPZeeHXWG/0PWGPilNcfgmA8mSLFDAtUpCY99fIxitX8Yf69eVZBFABjOlB0430OxsFV42cILa6RP23/Vb2xU700jTMWH/kry5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lx1HdJr+; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAA9313E2B
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781853903; cv=pass; b=GxuFyIotKAsvxmoGJIR8Y3qjkDJ60TL7RMGhh/UHw/zbzPthkSHDS0vY6NptbcwPqR8dey6uOUzm3eppF3Ho9wgfvoYJVax8ErcuQYASXN5hgBw66GTRVycGxhMZolGrFO/CqCZAwepCQ9vbtbhslMRq5h6Zf4GQJzEdSSF1IDA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781853903; c=relaxed/simple;
+	bh=dmgbPTPiE0xuMurE+gortA5e140VHduAPmVUQVGXPLM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TkQFC0Q5akvIk39smff2Q+bnYLP89Rz+JeM2sCs51Lv98R7cy6TYLY2TUVEfhDNmD9YtVrB2zMVvZywN/OFAI1VVXZvrJJnCAuFxz67tJFcZWets5wWSGB6zLQp/QUqmcWkz4Iq+N5+cy/9XBUU5caztzztf2wanaZGgxvvFAuc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEyRf8K8; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lx1HdJr+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80E331F000E9;
-	Fri, 19 Jun 2026 07:24:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781853872;
-	bh=0KOOxxS3smbu00HrrN1tB5DCZ1xonl0KVVjRbPopO/I=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=lx1HdJr+nS3nSxAAWPfkeHLWnLAeMnkF097ImzErACL3t1CS5xUrP21UyLJvOHz3u
-	 /+b5+Xchex9LFNDdRBXg1we43Fqq/viRN80VrlYID5RtoIThYbHe88K4+9XYcwJYBC
-	 e+y8NoCOX9GHrBtpMLv2aHdKuLsEUS5KtMPUW0a3DUFCvdpVb81388+gL8Nx4y4v/u
-	 Mr6qziWJ1XtHQxdTKqKv04dUrJCwriJay2qJHIDHM08qe+LRZL4wFYyJqIE4tex7+E
-	 3m+SDpf67yTkaH0khBO3bLIw/BiVonf/WAs2ia+ZqAscCqkx7jdIouMX+OK4DhZwTb
-	 q9MQVgkDazNcg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 8/8] KVM: arm64: Implement lazy vCPU state sync for
- non-protected guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260619070508.802802-9-tabba@google.com>
-References: <20260619070508.802802-1-tabba@google.com>
- <20260619070508.802802-9-tabba@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 Jun 2026 07:24:32 +0000
-Message-Id: <20260619072432.80E331F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEyRf8K8"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-51765331535so110421cf.1
+        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:25:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781853900; cv=none;
+        d=google.com; s=arc-20260327;
+        b=PHTZXinM9qr0lpw4PJ0L10Tj5h3rXSPTmS8q18fD/KQBCY/LPFMM7vYUAVmk3SvyeL
+         mLHrAdyptRIjbXEM5IJ+sVmoAih8dHbqIIKTLJqXVKjxSLuzVomIErWIKD7oq5LzXBay
+         1LzISL4YLNSWCWSUPUSw6KcCot8NuRi8qz8LOJr6Y79WwhvsKI7UFeB+0j/cW7k28RA6
+         sZ6X6LmNJgIAsdwVHxbP7cnhRR9WeZO2wa18WkKfei5RJKakPjDAdIpnN9aNHfZn2Dnr
+         bxHrdeVi4MMboPOWHZ0TfCkkqaPaRqt84gpvnHTEPQuA7Hy3A2aKtzKccLvM5GmBXC1B
+         QCNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aZLUNK0C1/C6p4P0m1RciodLT6nPw1lH0hYf9RgcDVA=;
+        fh=HhTV4G5+xnJ3thQDc6cpcOYMN3AitX7qB0zPfKB89LY=;
+        b=NcpbxO4QQRrRYW0l/O+ZDorkpDiHtQZs5S+p3sZk8N5n9d5Sorg8nNXWCrUK/2e6ux
+         B/OvRVqvd2YSt7KpDmhM1uYHmd00JI3MJOgtU7d/u6I+VM6/llks7ti1DU1nQdHukW3R
+         as6k8Ww92X996jVbf26Icqo9yAuuVlO/xSMD+dnqfT0/zAIjYhVUuvzN3W8ytS7RU23V
+         m3KHi1yICRuTFmTczJl2Awdcd5jLQWEvwgAYoLH8dgg3mA+SKc5ewoJLX8d501L83XQ9
+         QNl83hycwZOzAhwxGQw4SXwnmvuvvpQegH+KcPllHfebiMq9YPHHe9jyT6ozKLmgAPTW
+         S3aw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781853900; x=1782458700; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=aZLUNK0C1/C6p4P0m1RciodLT6nPw1lH0hYf9RgcDVA=;
+        b=KEyRf8K8uHDjV0DjOvHWEjZrW79VbnLuhy2tvBW4krkL9pUM+hTKvmnm2tUiLvaOkC
+         b3AMMPXRwytD2OtGAzYOxidzZ0BiPc5T3nMAb+Iob0AMCuI1PWT9kYolhi9e1SSr/mZp
+         HxpEOkMCc8F7YtwXiesStCTfexg4/a9MCsnrtDfxFCSWw0bgIcTyWi5gQOAJbq8e6V6U
+         f5R4FhBfatUoAiq4uBq6rW5ByIx+/gaiOxp8eKZPB9MMlwcCBnPuFS14fAqFkk/FuMf1
+         PsDK1r5h0Y6hPGHWCLp7eTu5kVSAek0uBMy3dQK2TSDHNDfSBWmmzzeN0af/iOvhCK74
+         iVKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781853900; x=1782458700;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=aZLUNK0C1/C6p4P0m1RciodLT6nPw1lH0hYf9RgcDVA=;
+        b=jW3+o/zPHIICOU8yC/5f0cjRjaj5QSfaWzu3nNQ9COEtrrpXR3DD779BV5jdMqTsOg
+         +FSw2xeZmpmPd8wDhjXYFysRv8XA5hAeteCIcxERIsuwMPruGGqJmZzrrRhsVhl2fN4t
+         /UiET8pO2jfukBgttH5yO1YJkUQ3z4aPW06B8/gySTuKqgB+LlpYFE7rFCNa3D2u0i3h
+         G4ZKB21UBMJUAVFdbEJGMrzqry3Hi4KDn7I74V2lXbdz06VT/6QVZWr3RP1J+f9r/U0v
+         apqEEjloIN7Dstww5gyIPH5hRmRv9B7tDU8bbmWNCkn64n9foyiY8J8Xxu/w0Q7JwwuL
+         H3ow==
+X-Gm-Message-State: AOJu0Yz+YLHEKg4mjQKb+GeFpfkoqmf0kCnHsugWrb+o7h9iun0xcrPW
+	QQ2wMK8rVpwRRT6lZlNz7y4HNha36bcRVf7fNsaveIif6T1MqIBJw/gkemQ8tR9TXRPmp5lq7gc
+	ZlQb/uCaiGzX+TYzDpSV3ZfrGkOfIcrxsWKhz/cMA
+X-Gm-Gg: AfdE7cn1xkCcqUur/EwyFVyIexu+JAy3AoR3zPbEkffzh5vhgZS0BH/cJrq2k2vkzgJ
+	oJ+7F63MsoTZaL/BZKp3yD/o3ngnhVjuGDxfVYP8L/pkpTmgwCKjnfoNIJRwwkvnQ89QQW6x8yu
+	wui3LNZQe7s5rnCJjLLaBy91RIqIjNqLlQP/1jrC5TmTkVgQnUfzGAN2QEt+ehQFaivqZs21zwQ
+	+Oh1KfL6QiahQr8ydeLbh1uETi9z6YXTa48+wv/XPx+Bs6nXBcwrvhbiOLjLlkYCTGJpb1mJg==
+X-Received: by 2002:a05:622a:90c:b0:516:8fad:8fd3 with SMTP id
+ d75a77b69052e-519e891bc36mr4796041cf.11.1781853899259; Fri, 19 Jun 2026
+ 00:24:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260619070508.802802-1-tabba@google.com> <20260619070508.802802-5-tabba@google.com>
+ <20260619071601.A5E641F000E9@smtp.kernel.org>
+In-Reply-To: <20260619071601.A5E641F000E9@smtp.kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 19 Jun 2026 08:24:22 +0100
+X-Gm-Features: AVVi8CdA4isQgBYT7r0WSn60YzlM4-QbfOsq3bKp_KL7-hetpmbtMMUTTSzzOM4
+Message-ID: <CA+EHjTwpB2fmoYGfkP5RVZcB4sgbVPQ0=QR5dyUJnpQ_VQa+pA@mail.gmail.com>
+Subject: Re: [PATCH 4/8] KVM: arm64: Move PSCI helper functions to a shared header
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-- [Critical] Removal of `hcr_el2` sync-back causes infinite virtual SError =
-injections.
-- [High] Injected exceptions for Illegal Execution State (ARM_EXCEPTION_IL)=
- are silently dropped on re-entry.
-- [High] Asynchronous guest context modifications (e.g., KVM_REQ_VCPU_RESET=
- via PSCI CPU_ON) are dropped, ignoring resets.
---
+On Fri, 19 Jun 2026 at 08:16, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+> - [Low] The header `include/kvm/arm_psci.h` is not self-contained due to =
+missing includes for dependencies used in the newly added inline functions.
 
-commit 479bc386009beb82e67cb9e9a04495d0872f077c
-Author: Fuad Tabba <tabba@google.com>
+The header was already not self-contained before this commit: the
+pre-existing kvm_psci_version() uses vcpu_has_feature() from
+asm/kvm_emulate.h without including it. Every .c file that includes
+arm_psci.h already includes kvm_emulate.h. The other dependencies
+(lower_32_bits, MPIDR_HWID_BITMASK) are transitively available through
+linux/kvm_host.h.
 
-KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+Cheers,
+/fuad
 
-This commit defers copying a non-protected guest's register context
-between the host and hypervisor until the host explicitly needs it or
-modifies it. It introduces the PKVM_HOST_STATE_DIRTY flag to track when
-the state must be flushed to the hypervisor on guest entry.
-
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-
-[ ... ]
-
-> @@ -489,6 +503,22 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception=
-_index)
->  /* For exit types that need handling before we can be preempted */
->  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
->  {
-> +	bool inject_serror =3D ARM_SERROR_PENDING(exception_index) ||
-> +		ARM_EXCEPTION_CODE(exception_index) =3D=3D ARM_EXCEPTION_EL1_SERROR;
-> +
-> +	/*
-> +	 * An SError injected below writes the host ctxt; for a non-protected
-> +	 * guest, sync from the hyp vCPU and keep it dirty so it isn't dropped.
-> +	 */
-> +	if (is_protected_kvm_enabled()) {
-> +		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-
-[Severity: High]
-Does unconditionally clearing the dirty flag here cause other injected
-exceptions or asynchronous state changes to be silently dropped on the next
-guest entry?
-
-For instance, when a non-protected guest exits with an illegal execution
-state (ARM_EXCEPTION_IL), handle_exit_early() clears PKVM_HOST_STATE_DIRTY.
-Later, handle_exit() processes the exception by calling
-kvm_inject_undefined(), which modifies the host's copy of the guest register
-context (vcpu->arch.ctxt) to deliver an UNDEF exception. Because this happe=
-ns
-outside of handle_trap_exceptions(), the dirty flag is never set back to 1.
-Consequently, on the next entry, flush_hyp_vcpu() skips syncing the modified
-context, and the guest resumes execution with its previous state instead of
-taking the UNDEF exception, leading to an infinite trap loop.
-
-Similarly, if a PSCI CPU_ON call triggers an IPI, the target vCPU exits with
-ARM_EXCEPTION_IRQ, and the dirty flag is cleared here. The run loop then
-processes pending requests via check_vcpu_requests(), handling
-KVM_REQ_VCPU_RESET by calling kvm_reset_vcpu(). The host's context is reset,
-but since the dirty flag remains 0, the next entry skips syncing the reset
-context to the hypervisor, causing the PSCI wake/reset request to be ignore=
-d.
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-
-[ ... ]
-
-> @@ -203,9 +255,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
+> --
+>
+> commit 5533f45659b895d2266b9d4cfb6fd00ea1dc5f92
+> Author: Fuad Tabba <tabba@google.com>
+>
+> KVM: arm64: Move PSCI helper functions to a shared header
+>
+> This commit moves several PSCI helper functions out of psci.c and into th=
+e
+> shared include/kvm/arm_psci.h header. This includes kvm_psci_valid_affini=
+ty()
+> and kvm_psci_narrow_to_32bit(), along with renaming psci_affinity_mask().
+>
+> [ ... ]
+>
+> > diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+> > index cbaec804eb839..f86a006d67136 100644
+> > --- a/include/kvm/arm_psci.h
+> > +++ b/include/kvm/arm_psci.h
+> > @@ -38,6 +38,33 @@ static inline int kvm_psci_version(struct kvm_vcpu *=
 vcpu)
->  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
->  	sync_debug_state(hyp_vcpu);
-> =20
-> -	host_vcpu->arch.ctxt		=3D hyp_vcpu->vcpu.arch.ctxt;
-> -
-> -	host_vcpu->arch.hcr_el2		=3D hyp_vcpu->vcpu.arch.hcr_el2;
-
-[Severity: Critical]
-Does removing the synchronization of arch.hcr_el2 back to the host cause an
-infinite loop of virtual SError injections?
-
-The host uses HCR_VSE to inject a virtual SError. When the guest takes the
-exception, the hardware clears the physical HCR_EL2.VSE bit, which is saved=
- in
-the hyp vCPU's context on exit. Because this sync-back assignment is remove=
-d,
-host_vcpu->arch.hcr_el2 indefinitely retains the stale HCR_VSE bit set to 1.
-
-On every subsequent guest entry, flush_hyp_vcpu() will re-apply this stale
-bit from the host into the hyp context, causing infinite, spurious virtual
-SError injections that will hang or crash the guest.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260619070508.8028=
-02-1-tabba@google.com?part=3D8
+> >       return KVM_ARM_PSCI_0_1;
+> >  }
+> >
+> > +/* Narrow the PSCI register arguments (r1 to r3) to 32 bits. */
+> > +static inline void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+> > +{
+> > +     int i;
+> > +
+> > +     /*
+> > +      * Zero the input registers' upper 32 bits. They will be fully
+> > +      * zeroed on exit, so we're fine changing them in place.
+> > +      */
+> > +     for (i =3D 1; i < 4; i++)
+> > +             vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)=
+));
+>
+> [Severity: Low]
+> Does this change leave arm_psci.h relying on implicit includes?
+>
+> The moved inline function kvm_psci_narrow_to_32bit() relies on vcpu_set_r=
+eg()
+> and vcpu_get_reg() which are defined in asm/kvm_emulate.h, as well as
+> lower_32_bits() which comes from linux/wordpart.h.
+>
+> Should this header explicitly include those files to ensure it remains
+> self-contained, so that future users don't encounter build errors if they
+> include this file first?
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260619070508.80=
+2802-1-tabba@google.com?part=3D4
