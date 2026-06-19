@@ -1,178 +1,217 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB06833344A
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312722F8EB8
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 07:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781855201; cv=pass; b=giPU8AwMr4N+EYstdMSd00amy1f8uZUx1OWznmhEbCaispyGU+9k739KV6dIqWjsKXLcSSQSQrWKP890dVZN7sGGtG6nZof3+pOs2y4R3y6tXcWSvexdCoMpcyuLcCxqObyv6GYrH/gfb99PY+GgmkkxarN7lUQuEOjGdank6vU=
+	t=1781855725; cv=pass; b=WuLWBVr24viwJZei+5OozUjFqo2ZSdny+lD+s/k9r9WZIiou5r8xcWtNSHoYzc6kBent6ivbiJZwBatlQvLMyvOKlVt65hl0xNia628L4D77mbNnbla0SKXeM9Xo/8lgeU/Tkj3kbzWaWe5bmRaXgUIPV6MsGGLV/9+0VyazCSs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781855201; c=relaxed/simple;
-	bh=xcty0z9UhnNB36J/7EuELFPBfvGhxlFASPGjSU2sjM8=;
+	s=arc-20240116; t=1781855725; c=relaxed/simple;
+	bh=zw+YX+HndypObcctYQspJPvJWIECKscJJbFi0hvVZm0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nxDJHy3ZDCuYsIqkBFXv37eLhRLYTb3TyGGGZylyKRuBh/s9JZGhrgqqU4CEiBBw3/Lz+MPbnRQl3uXmqdea6m0JizeeA3ShWnH3QKJvrNZN6S6wT4P1izTeFeS69I1eU8IX6549gNjl5lHDLSpV6G4TY8jfOrOZl5eS9hrYc98=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TjfTyaqL; arc=pass smtp.client-ip=209.85.160.174
+	 To:Cc:Content-Type; b=JtLEL6lfyp//Bw3dINtXP/5zViBIcZHkkW9wSwvrmuDyOyQsTUWQFMbys9u2uC/l35zDA54B6A7Y+wOnLs1rGBnlqyWl4+8ynNp1syeesA9w7QRVn7LwwWMJp8112kUDdAcyX9KpZHO3mBTMLTabw8FduAWq38lQFpO9OqDeVDg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J6EeAY/w; arc=pass smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TjfTyaqL"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-5177d1ff061so108461cf.1
-        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:46:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781855198; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J6EeAY/w"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-51765531803so190371cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 19 Jun 2026 00:55:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781855723; cv=none;
         d=google.com; s=arc-20260327;
-        b=NkT1aZXqIvmU02/YSr06tWgyEl22UQkx0UyB9f7SnJInvrLrsAAOgqgE3unAPvPTlH
-         bks9U7VuZfG1HJcRc3a9nE2lkS5iTzJWHIwilBfIxWIk7UQy1RQY3F3TSlb6AGNlPGp3
-         qTwBOefi7gxZoN4e5/Cc7lvm9Xsz6xLl3u/R0oD0mUcmRf1J1Lx16cw8kp5xw3xlTgfo
-         ZVfm1kYl/vkibPTpfjd1aMXQkPwRZ6oNK1fJ9L3ytkAwTNGX4YpCleFB9U/Cwc4ng6RC
-         iMaIkWWuvAt7haSmUabt3bSSdGbGJjILlTFhYHMKYW7ftGqd1auPpy5zI1ZfPS6qId5O
-         OYYQ==
+        b=dYHGyzPWji+lHCBkq76EiXlpnampDduFw/eW3lNuC32dMGE/6yhRcGGmtZTx2oIDQe
+         nvZlfwasT8EbtGRyUai6Lzx18hGiqLqTepr+XTaah88/3P5ZH+7RfNFWuIjGEvNnK02B
+         J4B0vKKMQxt8Q6hJwrVRKbHMjcDHm7gvWjjWCdCuJ89zLqZYVqcKlT4JiBvfHwJfZBfF
+         qlHbxsnDth0bo+DC8iTa3Oxpan1z6OhdhWU+xBQkyDI6K3cZHLbZo6iZzt/ZAEmFJ93Q
+         lVLSi7npF3fcAxq2HA/qNTipnvPOfNlQt8yHVE+jmVzxQUltGrGKaRymfghlWLVAbJ1u
+         0UaQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=uoBb9RhhJXeg2IBb64GG0HTmaW92lKQM/iFsDpm0ln4=;
-        fh=o3NEfJSjrKd/G01UfnCDhWJebsK5fpobqpi06Nd213I=;
-        b=JlE1YZaXu3RxsV7WcRSlHzkFPW+TZxe4V9i5b3qpFlutHilDo3UBNyNCHUX2Gu+7Bn
-         NR6WtSTWDCKGgfQm+pqJ1jqVTtOD4WDx4m0HFoDDV/Ew/RIPDYK1kuvnlZpEwb/HD1MF
-         CyDqzitFtIZjExx48L/YECddEYqI9e+ZjCz4tjr0/D+YllnNzrLLNZueHVyUEzCST3AC
-         g80bbUZn5MDsH7jy/pPHmwX7GdLoRIR0ftrfbwbNHS8dXdLi2dd5l7RpDJIgRwLYTbow
-         JJavF7KogiSbMrLU/rTlEhZHNLiN/yXrQn6eRNJPk3WBQmGqyFnXjEZxcYdj+mD3X89d
-         dGmg==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Hn0hdCkRxc2qT0F7X8GCIxe/SM8Yd4JR9cMFa/aCR4M=;
+        fh=HhTV4G5+xnJ3thQDc6cpcOYMN3AitX7qB0zPfKB89LY=;
+        b=FsXluUKh5aSuQ4kUxQa+qdCkvGRePDUHCjhvT0aq5I+WWYfBSeMshyRqBkTsrfsONf
+         1mlqEKGq/A8xahLd3G3tw6nGN6R5xwef3LSIw6OhW/ozvf/6wGQaKtXiaTkUIsex/6ab
+         zwYqOlvXcBRelQ+3gxt85AMvVxDDm6SnBguhFeZImazfLbeSzJITwlzOYNGKmyDOJNId
+         +4cchWN4pMYTJd9WslobwEmkLYsoaCGdq0ZZC7GHEuLKh8jhbGa2cvB6UM9IOIk7t5LA
+         BsZHaeOhMftGYVNttUFqnI6SHsMuZ2WqJSnN64GWlIJQzF0UAqK1uMg7T+2ASJBk4SaQ
+         wzRw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781855198; x=1782459998; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=uoBb9RhhJXeg2IBb64GG0HTmaW92lKQM/iFsDpm0ln4=;
-        b=TjfTyaqL8AlP5Nvnq3sPodiUfRmVIaSuY0vWJKKMysXKTy3bTDNHm7317cCzBFA1jI
-         pQtzGzKwV54Itldn0pGqQLp9t5ttRyc8lcVL51aiSLcyaoLdeMryGaxTOo1kqQsbhe5k
-         CNy7cbEIcsnflV9YCDtSY1GMCYREeIjZTFe6OSxnURS/m2MpVL56FwqvjIdfEUr6BQ4t
-         2HyZ85IzzW8/ac2NJY1fwIZrRssxmRA7mpF2qS+/S3TJ0XeSGfxcNgFtMfeXYtk0t79h
-         I5DHEHlfE0YaNa4EGmKGbrc2Hv+mprxICslB5Bod6pYUKm4CriPvx+OexNZY0xA4y96h
-         YWvw==
+        d=google.com; s=20251104; t=1781855723; x=1782460523; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Hn0hdCkRxc2qT0F7X8GCIxe/SM8Yd4JR9cMFa/aCR4M=;
+        b=J6EeAY/wM4o3wqEvaf/OKekM6dT4JVwLvDIoCyOj0oPbhhTqcDJ/VR/1QhbUKVV8U3
+         OtxfIPC3NAEvm3No0O340YgRpI53C1xxTbdd8aXGWb5TGlX7Mc5xH+uXOZopCHqNfv5k
+         GQwEFAQOUauoCLI8bxCqCET5YgdxDOmHCa0n/maHz84foO3DQykPdpw0WuwuzD8RSXpL
+         CQoBfXGC7+zGBdzF0N6H8/tg1PIMW743bwcWniW0cVdmzvfuHYMI/9MBQBoEfEaitrQ5
+         qsHkJBsJ7Na9pNxuD9ATZT85WIoPPT+l3xUpUzEeGzxQesBnS+YysJsMt1xVr46SuSoN
+         l3/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781855198; x=1782459998;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=uoBb9RhhJXeg2IBb64GG0HTmaW92lKQM/iFsDpm0ln4=;
-        b=c+p6+CpXs0FHrgaRZiykm7paLuvZLrwa74j9jmUyA6iMaaidsSo/2kwD4J/JM4jydz
-         KWFLYkbKzOjEbrrlDBTlLMFXHM2MIo/CeWTNNYca0BvZNEKaN/TGYv5zKI1tw3yiSFVy
-         NDjZx0NvzsZnX0O2YLMX9rj9753xMYZb2XBTzGuDd+AQJ4gnhkvuSSDyNTmRoo/B+Yrx
-         edDon/sCpUjfLdxfcSXDMLZU6OB1qWqtxc6VwBa7+ewtKmPWWO6Wh+DYPLrEvH0n03Mw
-         d9FkN6X3jy47P0wITcEU5qjbu1b1o0Sc9UC36sJa0agQ5Kl4S1nXNMVplsGoWjrUYuo+
-         W08A==
-X-Forwarded-Encrypted: i=1; AFNElJ+EX6UTy+5NGImF76opmWReWt6XpBf5ATwuKMorFy/3afAa1ATK4uAoz4zymhZ43Ar0xhfGoLM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxtY+ZkyAofi6CwhBrUuV0rRbm4VK+PEaBmO17WRn7jw4J9MlrX
-	NxdDBJ4WnII3TRbdoufJPaNP7+8esztGgZYOG8yvLOoXGa/lyCdOHywufc8TmYG6lvJDwWOvAEY
-	22XywcX/KkX8ep1RoP5i19x8CKzKUSJMXklxMKu7X
-X-Gm-Gg: AfdE7cnMRJ8AZ+8ejYr2nSRF1V+HI9UdgwsFlYngB3MMPA5Mk8Zx3PdFgidfvAPyp9v
-	qjhgh4VYtyv0tCcLv81bbMNNTP6fkGQjAqSQsuG/F4rg1zBGjSyUu1OWJImy3wozVL2HUPXTRNZ
-	TWAZFu/tpHxHZMtNM92LRZh72/JHg5IZ3gkTyVTxaDkLrCFGn1o1kuJoYArDQ9oo/ipEf/Yc1XC
-	FA5WmhlwaWCKAmpk3AdnNnrJ1WxrpDEuKZnZgGP45hDGpgijYo9hfKHfw1JL2G81PPjhMrJISg4
-	7XJJMiux
-X-Received: by 2002:a05:622a:2489:b0:519:56a8:2693 with SMTP id
- d75a77b69052e-519e4a7350amr6361661cf.24.1781855197057; Fri, 19 Jun 2026
- 00:46:37 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781855723; x=1782460523;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Hn0hdCkRxc2qT0F7X8GCIxe/SM8Yd4JR9cMFa/aCR4M=;
+        b=k67DImOGt4ZK+LbdWtlFNNDMB10CETeKSn+USuxqC2pOitNEbc1KeR/3zhVUEWHXTK
+         KA55BIxB8lz+hDE9gypeP8Z06GC8kYH4QA+ZNXLdnETgA1nx7XUZHYRGwTqT1+VgHFsg
+         YMgEKMFxr2xu9g6k0w+ujYs/SJxVKy83xDOE326NGfocdbhfiroxfBlTuihsSP/8sXpA
+         l/FpjBdI2RItJfHgjN1eAYVm8ZgeY/X9Uua37MFey6BctQeGHVXxfB+CSHVY287qpXoI
+         yF7InvflDLB/+FbrwjmRySpS16AF5pmsYHNei9hFEolZ8mDr7BVytHkkIYuFmYAvrlBH
+         ZLDg==
+X-Gm-Message-State: AOJu0Yy+j3QgwpKbglG8iXnXSqzBUzgh1LY7nqveTDXYAOWAbPbYzVff
+	viAVT5+pnsESqWxJBU7ZP5X1JgguPi5TjonLbOBQrV5fFeFN5zaAFYj3fxs+eGf+kM2XVjwSDID
+	WmDneg6t2ykbMB4IGk95HlaXcetxg0iRhflFg2VAL
+X-Gm-Gg: AfdE7cmIbA1gdKi/xNnW1IXJK3wVZrkEA2oK/6EmeaAjB/keMuYOVpecPyk+h9YsVXT
+	SE76CQQW7cNFRQaXMM+C741VNTlvSXxatiJHriVLFRCoJ3/iIr+opulKRu42eACXcFePguaduQE
+	GbYKDQgsgKgZ0rDCCnwvrBlBT+YMV2wbHAmLnrSThghcTe5bA/JkGWQvo0qFzeUZ3e8Afwnau7l
+	New5OqFcqYbyIQvDuHM8XkEfj2FQSgoRlXy9YXvKmpvXhq5NIYqO69o/ZZmuqrPd29GMEefFQ==
+X-Received: by 2002:a05:622a:2b08:b0:517:99ea:ab7a with SMTP id
+ d75a77b69052e-519e4ab67d5mr6391661cf.26.1781855722453; Fri, 19 Jun 2026
+ 00:55:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260619070719.812227-1-tabba@google.com> <20260619070719.812227-8-tabba@google.com>
- <20260619072121.395E71F000E9@smtp.kernel.org> <86bjd7rn86.wl-maz@kernel.org>
-In-Reply-To: <86bjd7rn86.wl-maz@kernel.org>
+References: <20260619070719.812227-1-tabba@google.com> <20260619070719.812227-9-tabba@google.com>
+ <20260619072826.A4AB91F00A3D@smtp.kernel.org>
+In-Reply-To: <20260619072826.A4AB91F00A3D@smtp.kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Fri, 19 Jun 2026 08:45:59 +0100
-X-Gm-Features: AVVi8Cc5P1L4xDU-nNWT0r99gLLz_hNu_mDPa9aphJH_JNODIeQOsQU0RdoZtMA
-Message-ID: <CA+EHjTw2Q=QV_oXioGeJpY9ycNAD7m5ZmFjBxiwH3vwETchh5g@mail.gmail.com>
-Subject: Re: [PATCH v2 7/8] KVM: arm64: Add primitives to flush/sync the VGIC
- state at EL2
-To: Marc Zyngier <maz@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>
+Date: Fri, 19 Jun 2026 08:54:45 +0100
+X-Gm-Features: AVVi8CdH4KwLcyKMNu0ixYIxChbMsbvn4-3xRBbD02T0RbBs2gqfSqVZV8EKhug
+Message-ID: <CA+EHjTyEikgroi9a9vhtv-pixBj_21RC=4d4EnsfxFk10WCnwA@mail.gmail.com>
+Subject: Re: [PATCH v2 8/8] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 19 Jun 2026 at 08:41, Marc Zyngier <maz@kernel.org> wrote:
+On Fri, 19 Jun 2026 at 08:28, <sashiko-bot@kernel.org> wrote:
 >
-> On Fri, 19 Jun 2026 08:21:20 +0100,
-> sashiko-bot@kernel.org wrote:
-> >
-> > Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> >
-> > New issues:
-> > - [High] flush_hyp_vgic_state() fails to copy vgic_vmcr from the host vCPU to the hyp vCPU, causing host-side VMCR updates to be silently lost and subsequently clobbered.
-> >
-> > Pre-existing issues:
-> > - [High] flush_hyp_vcpu() unconditionally copies mdcr_el2 from the untrusted host vCPU, allowing the host to control debug trap configurations for protected VMs.
-> > --
-> >
-> > commit 5eaa1440f7e2f022736f913bec34aaa0cbd53a5d
-> > Author: Marc Zyngier <maz@kernel.org>
-> >
-> > KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
-> >
-> > pKVM performs its own world switch for protected VMs but has no primitives
-> > to move the per-vCPU VGIC state between the host and hypervisor vCPU
-> > contexts. Add flush_hyp_vgic_state() and sync_hyp_vgic_state() to handle
-> > the required copying.
-> >
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > index f3233ee343a39..2db56146ec493 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > [ ... ]
-> > > @@ -104,6 +104,45 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
-> > >     *host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
-> > >  }
-> > >
-> > > +static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-> > > +{
-> > > +   struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> > > +   struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
-> > > +   unsigned int used_lrs, i;
-> > > +
-> > > +   host_cpu_if     = &host_vcpu->arch.vgic_cpu.vgic_v3;
-> > > +   hyp_cpu_if      = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-> > > +
-> > > +   used_lrs        = host_cpu_if->used_lrs;
-> > > +   used_lrs        = min(used_lrs, hyp_gicv3_nr_lr);
-> > > +
-> > > +   hyp_cpu_if->vgic_hcr    = host_cpu_if->vgic_hcr;
-> > > +   /* Should be a one-off */
-> >
-> > [Severity: High]
-> > Does flush_hyp_vgic_state() need to copy vgic_vmcr from the host vCPU to the
-> > hyp vCPU here?
-> >
-> > For GICv2-on-GICv3 emulation, guest writes to GICC_VMCR and GICC_CTLR trap
-> > to the host (EL1) as MMIO.
->
-> GICC_VMCR doesn't exist, so the guest can't write to it. There is no
-> MMIO involved with pKVM, since it is GICv3 only. And the whole point
-> of having a VGIC is to avoid trapping on each access.
->
-> More importantly, VMCR is not allowed to change behind the guest's
-> back, because it contains the state that the *guest* has programmed
-> there.
->
-> Can someone *please* unplug Sashiko? I've had enough of it.
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to consider:
+> - [High] Dropped register updates for non-protected guests due to missing=
+ PKVM_HOST_STATE_DIRTY flag.
+> - [High] Missing HCR_EL2 sync on guest exit causes an infinite loop of vi=
+rtual SError injections.
 
-I am trying to at least fix it :) Key phrase I am adding in my PR:
+VSE is explicitly synced back, not dropped. The stale-SW-copy concern
+is pre-existing upstream nVHE (no HCR_EL2 readback from HW); the old
+full copy synced the same stale value. PENDING_EXCEPTION rides iflags,
+copied unconditionally (not DIRTY-gated). EL2 re-derives the exception
+via enter_exception64. KVM_REQ_VCPU_RESET targets the OFF->ON vCPU,
+not the running one.
 
-`## Grounding: you do not have the ARM ARM`
-
-along with other things, so it wouldn't hallucinate it :)
-
-Testing this now locally before I send the PR.
-
-Cheers,
 /fuad
 
+> --
 >
->         M.
+> commit b6999f3ffe5ca70d542b029d1a2d4a9e5e9d8276
+> Author: Fuad Tabba <tabba@google.com>
+>
+> KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+>
+> This commit defers copying a non-protected guest's register context betwe=
+en
+> the host and hypervisor. It introduces a PKVM_HOST_STATE_DIRTY flag to on=
+ly
+> sync the state when modified by the host.
+>
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.=
+c
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> [ ... ]
+> > @@ -489,6 +503,22 @@ int handle_exit(struct kvm_vcpu *vcpu, int excepti=
+on_index)
+> >  /* For exit types that need handling before we can be preempted */
+> >  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+> >  {
+> > +     bool inject_serror =3D ARM_SERROR_PENDING(exception_index) ||
+> > +             ARM_EXCEPTION_CODE(exception_index) =3D=3D ARM_EXCEPTION_=
+EL1_SERROR;
+> > +
+> > +     /*
+> > +      * An SError injected below writes the host ctxt; for a non-prote=
+cted
+> > +      * guest, sync from the hyp vCPU and keep it dirty so it isn't dr=
+opped.
+> > +      */
+> > +     if (is_protected_kvm_enabled()) {
+> > +             vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+>
+> [Severity: High]
+> Does unconditionally clearing this flag on every exit drop register updat=
+es
+> for non-trap exits?
+>
+> For non-trap exits like ARM_EXCEPTION_IRQ or ARM_EXCEPTION_IL,
+> handle_trap_exceptions() will not be called to set the flag again.
+>
+> If an asynchronous request like KVM_REQ_VCPU_RESET (triggered by PSCI CPU=
+_ON)
+> modifies the host vcpu->arch.ctxt in the kvm_arch_vcpu_ioctl_run() loop, =
+or
+> if an undefined exception is injected via handle_exit(), flush_hyp_vcpu()
+> will skip copying these updates because the dirty flag is clear.
+>
+> Could this cause the guest to resume execution from its old pc with stale
+> state?
+>
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> [ ... ]
+> > @@ -203,9 +255,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
+p_vcpu)
+> >       fpsimd_sve_sync(&hyp_vcpu->vcpu);
+> >       sync_debug_state(hyp_vcpu);
+> >
+> > -     host_vcpu->arch.ctxt            =3D hyp_vcpu->vcpu.arch.ctxt;
+> > -
+> > -     host_vcpu->arch.hcr_el2         =3D hyp_vcpu->vcpu.arch.hcr_el2;
+>
+> [Severity: High]
+> Does removing the hcr_el2 sync cause an infinite loop of virtual SError
+> injections?
+>
+> To inject a virtual SError, the host sets HCR_VSE in host_vcpu->arch.hcr_=
+el2.
+> When the guest takes the SError, the hardware clears the VSE bit, which i=
+s
+> captured in hyp_vcpu->vcpu.arch.hcr_el2 on exit.
+>
+> Since this patch removes the copy-back of hcr_el2 to the host for both
+> protected and non-protected guests, the host's HCR_VSE bit remains set
+> permanently.
+>
+> Will this cause flush_hyp_vcpu() to endlessly re-inject the SError on eve=
+ry
+> subsequent entry?
+>
+> > +     if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> > +             host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
+> > +     } else {
+> > +             /* Keep PC (tracepoint) and PSTATE (vcpu_mode_is_bad_32bi=
+t) current. */
+> > +             host_vcpu->arch.ctxt.regs.pc =3D hyp_vcpu->vcpu.arch.ctxt=
+.regs.pc;
+> > +             host_vcpu->arch.ctxt.regs.pstate =3D hyp_vcpu->vcpu.arch.=
+ctxt.regs.pstate;
+> > +     }
+> >
+> >       host_vcpu->arch.fault           =3D hyp_vcpu->vcpu.arch.fault;
 >
 > --
-> Without deviation from the norm, progress is not possible.
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260619070719.81=
+2227-1-tabba@google.com?part=3D8
