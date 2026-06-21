@@ -1,136 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from confino.investici.org (confino.investici.org [93.190.126.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572181E2606
-	for <kvmarm@lists.linux.dev>; Sun, 21 Jun 2026 11:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2349D23E342
+	for <kvmarm@lists.linux.dev>; Sun, 21 Jun 2026 21:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782039818; cv=none; b=tpAet+UuQLuVBxK9IZI8+6UeT09We26mRDOP4TJF4BXOv+n3Gm0LXlCThTd6lwCZhkoTaneT8O/dn3Dp54YX3LDGIupUPhaSu2FSSQ5GvnWUeVT/pL7oQiFqWDAkud/qVUNFvY2p+6JWhrtfTlmKnVpj8X2u6wQRbesRXDY7GUk=
+	t=1782077527; cv=none; b=hwp5FRCCcMqz9CQ/FfRf7DYb4auXD+ccf+NRz3aBebVazTXEy3SbnbWTip2mTf1hQHhkS+Kxp+05FZU3DxzBYozy4aOMv5GgKG78Wo+5i641y2AycjNJh7JDd+wpjI0gi3kLy8AcQo8mvgptKVhrCr4QMiwxURoRnSFcJwXVX3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782039818; c=relaxed/simple;
-	bh=f3hdwp8oyCewMdHx6DmRbM/GM8PtcsYlIm59J0yxa38=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A/2dLtCjLxkpGY7/hfTouli4rToTfYm+2KmXWoVYZ009Aqsnwm2nQ3MFGKVPi7IEJmYZLOYvKZ2YZiKn9v65ODwB2e3Dw/P4f4QkwADf/ESg/W81E2CgeNiVoS9Rrt65Z9uKE1f4XMDVk4foTxqSY4IVNddBry3bhlLJOQx9WSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXydN1sX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782077527; c=relaxed/simple;
+	bh=SDLb1cS2N91skoPPJ3reHRFoH9AJINaVn07sOl7wU2k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WEKFZNeBCvS2jqzv1+QVmvgGgNL4NkamhxOQRTuhZ8fGktL53GXOAtBs1/q7Z31lYic3FnXsPNYjBxqnVGD/bCgF60ApD2j8Ga+UPU5I1lw50VzHS3flwZpdAAmXvwx9+Ue5yrgDM2t7mLpG6XZ6FjeTOSafY1mVKxfMZK7yg2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=CTIHjOBg; arc=none smtp.client-ip=93.190.126.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXydN1sX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E25A11F000E9;
-	Sun, 21 Jun 2026 11:03:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782039816;
-	bh=B9ogq3YLS6YatrnBhRoFmnjnt6vcWpQNMaCmLSnDPaw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=RXydN1sX/8bhFUfbTtqfuF7L9Vzdb+Srl98M7TKmV23NA8cN0S1UCo4K1FbedfNor
-	 HDycR0hFqxWRiZtLtH9kwJzcGNguEvxSXew1lnWPJ0jKmBqKivn50Zp1zU4AduFYAi
-	 xuX1yfPucTIIbhWv8/7GlBKqv90tw03qVKb3Br700XNEEZvmFnz8OeoZP5hRm8+QRL
-	 wp6U7+bUfw+b6I6P00GZsod2V9bdiKSmC7s+fmpTyZpYBNe36527qdpDQ8R53LkeQA
-	 y+Dg6pBTrmt2FP0MkaUB1qDk3vlyWUXf+ydL6CJCXPTJozMnUPeRiZ1/RzFHk7As47
-	 sybVYk6xKtLwQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wbFxe-0000000EfG3-2Tub;
-	Sun, 21 Jun 2026 11:03:34 +0000
-Date: Sun, 21 Jun 2026 12:03:34 +0100
-Message-ID: <867bnsrw8p.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="CTIHjOBg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1782077522;
+	bh=/Ryzop9cHyfud4/d7uNpvbJV5dfV4NrntLAoHfM5aDQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CTIHjOBgmIM1IBldz7lPxD44cMRJ6LYDEn6J2SRREEKJVqH2xEkPoRjUrzS+Is18i
+	 ojjobDstlMpraaUwTikYGe6DaLK1MITg/DVBKsWzLaMdiizZ5UtLZnT8nCEHyuwJxf
+	 9r0QxbsiAqJdiOMtxP0LLFvPf/vaIYci/O9zCaDM=
+Received: from mx1.investici.org (unknown [127.0.0.1])
+	by confino.investici.org (Postfix) with ESMTP id 4gk4KZ4K5Jz10y9;
+	Sun, 21 Jun 2026 21:32:02 +0000 (UTC)
+Received: by mx1.investici.org (Postfix) id 4gk4KY65pSz10y6;
+	Sun, 21 Jun 2026 21:32:01 +0000 (UTC)
+From: Bradley Morgan <include@grrlz.net>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	KVMARM <kvmarm@lists.linux.dev>
-Subject: Re: Sashiko review emails to the list
-In-Reply-To: <ajVyJa-mZmYGzt6o@kernel.org>
-References: <CA+EHjTzdCf2waY_Qc+GWzA-MuKG=_XjQ4Hzn3HJ6Yi0NfB_CzQ@mail.gmail.com>
-	<ajVyJa-mZmYGzt6o@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Bradley Morgan <include@grrlz.net>
+Subject: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
+Date: Sun, 21 Jun 2026 21:31:55 +0000
+Message-ID: <20260621213155.6019-1-include@grrlz.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, roman.gushchin@linux.dev, will@kernel.org, vdonnefort@google.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, 19 Jun 2026 17:45:25 +0100,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> Hey,
-> 
-> On Fri, Jun 19, 2026 at 03:19:05PM +0100, Fuad Tabba wrote:
-> > Hi folks,
-> > 
-> > I really like Sashiko and find it very useful. It's flagged real bugs
-> > in series I and others have posted to the list (e.g. [1][2][3]), and I
-> > run it locally before sending, which has saved me a few respins.
-> > 
-> > That said, it's been posting a lot lately, so it seemed worth asking
-> > how the review emails to the list are working out, and whether we
-> > should change anything.
-> 
-> So this is entirely my fault since I added the email configuration for
-> the kvmarm list. Sashiko has been finding some truly nasty bugs, posting
-> on-list is the easiest way to get attention from the right folks to get
-> things fixed.
+Protected guest faults charge long term pins to the VM's mm. Teardown
+can run later from file release, where current->mm may be unrelated.
 
-I don't mind this. Having Sashiko to tell me that something is off is
-great, but we collectively need to learn how to treat the feedback.
+Drop the charge from kvm->mm instead.
 
-> With that being said, the signal to noise ratio hasn't been ideal.
+Fixes: 4e6e03f9eadd ("KVM: arm64: Hook up reclaim hypercall to pkvm_pgtable_stage2_destroy()")
+Signed-off-by: Bradley Morgan <include@grrlz.net>
+---
+ arch/arm64/kvm/pkvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There are a few things that did it for me:
-
-- hallucinations that are close enough to reality that you spend
-  significant amount of time debunking it. Being creative about
-  specifications is particularly annoying.
-
-- the whole "I found a preexisting issue" is great, but leads to an
-  avalanche of patches that themselves trigger cross-reporting
-  (patch fixing issue A triggers a report for issue B, and the
-  reciprocal happens as well). This is overwhelming and we need to
-  better manage this.
-
-- Related to the above, I see a flurry of activity following a review
-  from Sashiko, resulting in unrelated patches that distract from the
-  issue at hand. I reckon that *we* could do a better job keeping the
-  initial patch series focused, and once that is solved, work on the
-  tangential stuff that Sashiko may have reported. At the moment, it's
-  hard to see the wood for the tree.
-
-- We also often end-up with point fixes match the reported issue, but
-  that don't address more general issues. That's even more noise.
-
-My conclusion is that while Shashiko reviews can often be flawed, most
-of the problems are with the way we deal with the reports. No, I don't
-have a magic solution, but that's something to think about.
-
->
-> > These fixes will take a while to land, so the question is what to do
-> > meanwhile. Some options, and surely others:
-> > 
-> >   - Leave it as-is while the fixes propagate.
-> >   - Stop the emails but keep the reviews on sashiko.dev, so people can
-> > look rather than have them pushed.
-> >   - Disable the emails until the noise is down to a reasonable level,
-> > then re-enable.
-> 
-> This sounds like the right approach. I'd like to re-enable emails once
-> we're happy with the quality of reviews.
-
-I'd like to see how the fixes improve the situation, and re-evaluate
-in a couple of weeks.
-
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 053e4f733e4b..428723b1b0f5 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -352,7 +352,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
+ 		page = pfn_to_page(mapping->pfn);
+ 		WARN_ON_ONCE(mapping->nr_pages != 1);
+ 		unpin_user_pages_dirty_lock(&page, 1, true);
+-		account_locked_vm(current->mm, 1, false);
++		account_locked_vm(kvm->mm, 1, false);
+ 		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+ 		kfree(mapping);
+ 	}
 -- 
-Without deviation from the norm, progress is not possible.
+2.53.0
+
