@@ -1,191 +1,138 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5272924886A;
-	Mon, 22 Jun 2026 12:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4693B813E
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 14:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782131666; cv=none; b=CczCN5vdTgB1K7zRwfoOg4zWy3wG8+48UwBq46Hmn1EQqhH9AuYCq+PY35T3neg75aHoDnxVGO0ResnOUHd4g8ARHCg6UwEvuWjm4nA1fW+naKsQfL60oDop7uhjCdVYOKwAjSiE+170Yrahc4i71TS+Zbm9Zbuf0ru1HR8yFdI=
+	t=1782137667; cv=none; b=oX/q4aX1X7K+xSJz5+MZQjKhsN0XOoJ8joVH/84m30tZCrKykqXIGc94EZa4Ao4xAdukXCk5ThxjcT976uOWbHyEnNKnVipSx//U9ZC56r1+pmnb8zHS5m4DY4xuCiHR8arEvywMNKpKxl9AXYm09B4Bg4lOI3ygnNQqEqQT46g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782131666; c=relaxed/simple;
-	bh=/pj1obi5Ax40qSorMiy77BT7ffTextbuFvQGLWH6KQM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lyeVA+/NKedLFzEuXdF0P6SBwtfcTWQ/aK3eDMUqor+tgB1YMYBgI/D381xYpxRpavXQqMFmhwmagON7mfLe34ILpLQKqE6w6SXFrEz+FAAZP9RxjboOkvtxIQXYMZr3rmZg33V4Rg4d3G/tnSYtNSnUEKg+klf6PtmRUGXYg08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GvOltmdD; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+	s=arc-20240116; t=1782137667; c=relaxed/simple;
+	bh=AsVvIRM0LiB6uuIor9GeEXofQ5mDv6boraWopSijpi0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=UFNLg2cszMqrpSrzfuVmRofYEkQuMZXjivHmx6Bd18e3GwNnHqT08qE2NR08TRLSG2znzUPIHtvahW+/Ngc6Ttm38esszDNO9twAPro0Qpgc8JSw69vdW7sVxteGKwz8PbUO5Y0PRvTVVswssihf7XahWOCBZNGtaa1JWGkh/wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AS1Z+vGU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GvOltmdD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/pj1obi5Ax40qSorMiy77BT7ffTextbuFvQGLWH6KQM=; b=GvOltmdDSlmBPbHoB6gYymA7zB
-	14p/Cuy3yXARCFi4eAPdKrWg5H7lNDZ9EbHRjILv3o9VQBz8Jf9QNbLVRxIGmMBGeySxSAqWSnbvu
-	MtroKfO+1pCG5FIVazSIePA38w7ZUV2O8v5q8PZCx6OzGoopXHKcAv9LGkwlPRl8ESTDYsFNfQ1cB
-	qPflA4DNp4sZW9cGACmy0EHOKGVWY1jWWNjaZmr4JwvYB+6fOo5WbTUJ2rkWPbH52LrBgoFeBDln0
-	uqhmDIvMGonfS6iP9inLI+5sNJgeWFY1b3Td+qDFylnlBuJ0l4/4FoIpfMpnsMkn7Mg95bCzrcipV
-	QDgnXqRw==;
-Received: from [2001:8b0:10b:5:9b49:795b:48f5:139a] (helo=u09cd745991455d.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wbdqz-00000004DvI-10eM;
-	Mon, 22 Jun 2026 12:34:17 +0000
-Message-ID: <aeda79e82028a628cf2ccc40cdc91ec911570ef6.camel@infradead.org>
-Subject: Re: [patch V2 18/25] timekeeping: Prepare for cross timestamps on
- arbitrary clock IDs
-From: David Woodhouse <dwmw2@infradead.org>
-To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
- <jstultz@google.com>,  Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker	 <frederic@kernel.org>,
- thomas.weissschuh@linutronix.de, Arthur Kiyanovski	 <akiyano@amazon.com>,
- Rodolfo Giometti <giometti@enneenne.com>, Vincent Donnefort
- <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, 	kvmarm@lists.linux.dev, Oliver Upton
- <oupton@kernel.org>, Richard Cochran	 <richardcochran@gmail.com>,
- netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,  Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, Johannes Berg
- <johannes.berg@intel.com>, Jacob Keller	 <jacob.e.keller@intel.com>, Tony
- Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Peter Hilber <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin"	
- <mst@redhat.com>, virtualization@lists.linux.dev, 
-	linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org, Vadim
- Fedorenko	 <vadim.fedorenko@linux.dev>
-Date: Mon, 22 Jun 2026 13:34:15 +0100
-In-Reply-To: <87se6eltod.ffs@fw13>
-References: <20260529193435.921555544@kernel.org>
-	 <20260529195557.846634842@kernel.org>
-	 <b296182e2e2c1ed2fe1c4879fd6f12d67a7ad22f.camel@infradead.org>
-	 <87se6eltod.ffs@fw13>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-6EKfe1SEMF8EoHczYedx"
-User-Agent: Evolution 3.60.3-0ubuntu1~ppa6 
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AS1Z+vGU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782137665;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C2lZOSHl7jsAhia0SyyH/6Muj5VDwhnEjjlDeTnLCJo=;
+	b=AS1Z+vGUuLqn9V+e9lScBa1CTMvc+mhBQtAgly2lK3prFzQr05qIoz0K9ixFwU7C5WKFFA
+	Rzy98iLDxe2J4r/wDyVsN8Im0z0O3CJ+rAB1qxsT6psy7n2R96wI9VUCVQjuQqT/IssVQl
+	pZhuLs/lyUKYiVeazbwKsuJWZ++Vouc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-343-0wAoWxrbO86M4YMjUKGrvw-1; Mon, 22 Jun 2026 10:14:22 -0400
+X-MC-Unique: 0wAoWxrbO86M4YMjUKGrvw-1
+X-Mimecast-MFC-AGG-ID: 0wAoWxrbO86M4YMjUKGrvw_1782137660
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4623bdcad2fso2789248f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 07:14:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782137660; x=1782742460;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C2lZOSHl7jsAhia0SyyH/6Muj5VDwhnEjjlDeTnLCJo=;
+        b=jZmIByt2gtwYOi3NDy5OXeItxcicCY4zI8B5g1AjBq92qOpwlzePAd8DPT2/HMYE3A
+         aRY2lrC6u2JOhJf/DkqRd6nbxKJwxgBdoRdeJTrbYmV+2wK9sXDBlCg/BGoadOkIf5HA
+         2Ujv/+oRqIAmPIH2DZk6zMwiyNzZKrfFSNhpEqerrN/A0e1g3IFsxXa25Qjhhtolw4JK
+         gos/XnSpM3NX8CIZT6H6jjvkCSNC9Z2NItBI6XRdnTsurCUXbVKsloanJmj5y5TcsGcg
+         IkihASV+sRNdBzsYRvr2fGkkVBYdFcZW0uvaok07jG9MgKJFMJxVwulafBmsDBvH3INy
+         Yg1g==
+X-Forwarded-Encrypted: i=1; AFNElJ/bQUcxXC9lnkHqJBsyoWaKhP/d3pYQTXv599TUltD1dNmKOEsBGBJHvnzTy4m9Mv1uOvuHUm0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzcmXq51l31C9kFqRqGZ7kahlFq7MCUt/MeGshyoSdmUTZhT8n1
+	MwSoHOqs9n3PMG5Q3s1zROTRVxomiy50JiQdDSHf2d0mv4NIxjuvFni5Sfd4mQ8GyDRqg1QrOFh
+	5JEJoVQ3cDaK9K9PrMN/gCLgzjvUgrl0Ihp1UPg0kfYnccFXaJkOszog8BCxUjYeDAw==
+X-Gm-Gg: AfdE7cl5p0J3AqQtz1A+0Wa+E27XzBS27KS32bI29MWHw4RK7w05AZIS6LnOfJqVUZw
+	HJwxyQLAO6KrIcjm1mVJsS6gyl3x19UwR5knQTBnz09nESUIqpL/3wKG6gkPC2eWAaKklp5f+Io
+	GTPpV9X9IegOqPQG7i9s5NIE4aSOkjVKYisDN3OxiLrRF6dVwZcu/N9JeuEfItSz2Bb5rCsV+gW
+	MWXmgjD7aLB5jKcIzRSdYWdCOLn8hPBeB3t519GZIpBebc2rlzmXQviqGlp/9pt5QipMOFh7wtU
+	wImMx+1kdXtnuEOhVSpu+igccyXKKBEowczi49nO8qBJssOSfVnwc5cRa1Z9Cu3JroMDEXqoyu0
+	a1OvKfdxVeNHwGw/EuzX77uKkaS8t/JNxol6E+XfRICT5SRiBAxmNxY64FZ6T
+X-Received: by 2002:a05:600c:828a:b0:492:5297:e8a3 with SMTP id 5b1f17b1804b1-4925297f415mr101043395e9.20.1782137660467;
+        Mon, 22 Jun 2026 07:14:20 -0700 (PDT)
+X-Received: by 2002:a05:600c:828a:b0:492:5297:e8a3 with SMTP id 5b1f17b1804b1-4925297f415mr101042725e9.20.1782137660057;
+        Mon, 22 Jun 2026 07:14:20 -0700 (PDT)
+Received: from rh (p200300f6af2a6100f239e076bbd76784.dip0.t-ipconnect.de. [2003:f6:af2a:6100:f239:e076:bbd7:6784])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49245a69f81sm268598405e9.1.2026.06.22.07.14.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 07:14:19 -0700 (PDT)
+Date: Mon, 22 Jun 2026 16:14:18 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Zenghui Yu <zenghui.yu@linux.dev>
+cc: Jiakai Xu <xujiakai2025@iscas.ac.cn>, Shuah Khan <shuah@kernel.org>, 
+    Andrew Jones <andrew.jones@oss.qualcomm.com>, 
+    Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
+    linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev, 
+    Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+    Oliver Upton <oupton@kernel.org>
+Subject: [PATCH] KVM: selftests: fix steal_time for arm64 with host page size
+ > 4K
+In-Reply-To: <7575a845-a542-4b16-b512-aec3126f97f3@linux.dev>
+Message-ID: <335f21e5-493d-012d-b07c-2e48cc2b9aeb@redhat.com>
+References: <20260504112808.21276-1-sebott@redhat.com> <7575a845-a542-4b16-b512-aec3126f97f3@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: LZZX3LX5YbWlwvvuR3_gFNzW2fy7NO6yNC8-wVMmZCU_1782137660
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
 
---=-6EKfe1SEMF8EoHczYedx
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Fix the following failure when running with 16K host page size:
+==== Test Assertion Failure ====
+   lib/kvm_util.c:991: vm_adjust_num_guest_pages(vm->mode, npages) == npages
+   pid=873 tid=873 errno=0 - Success
+      1  0x0000000000405a27: vm_mem_add at kvm_util.c:991
+      2  0x000000000040241f: check_steal_time_uapi at steal_time.c:223 (discriminator 7)
+      3   (inlined by) main at steal_time.c:539 (discriminator 7)
+      4  0x00007fff8b57af3b: ?? ??:0
+      5  0x00007fff8b57b007: ?? ??:0
+      6  0x0000000000402b6f: _start at ??:?
+   Number of guest pages is not compatible with the host. Try npages=4
 
-On Mon, 2026-06-22 at 13:07 +0200, Thomas Gleixner wrote:
-> On Mon, Jun 22 2026 at 09:55, David Woodhouse wrote:
-> > We ended up with ktime_get_snapshot_id() also supporting CLOCK_BOOTTIME
-> > and CLOCK_MONOTONIC_RAW, but not get_device_system_crosststamp().
-> > Should we make that consistent?
->=20
-> Maybe. The BOOTTIME support is only there for that ARM64 hyper trace muck=
-,
-> but has no other relevance.
->=20
-> MONORAW is there for the PTP EXTENDED IOCTL, but with PRECISE the
-> snapshot already contains the raw value and you'd have to prevent the
-> historical adjustment part for RAW. So I don't see the actual value, but
-> I don't have a strong opinion either.
+Fixes: fc240715fc50 ("KVM: selftests: arm64: Fix steal_time test after UAPI refactoring")
+Reported-by: Zenghui Yu <zenghui.yu@linux.dev>
+Link: https://lore.kernel.org/kvmarm/7575a845-a542-4b16-b512-aec3126f97f3@linux.dev/T/#u
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
+---
+  tools/testing/selftests/kvm/steal_time.c | 6 ++++--
+  1 file changed, 4 insertions(+), 2 deletions(-)
 
-Yeah, I'm not sure I see the need for it; it's just the consistency
-thing that slightly bothered me once I had them both in my sights doing
-the snapshot_ntp_error() thing in both.
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index 76fcdd1fd3cb..cdb81f3ee4b2 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -208,6 +208,7 @@ static void check_steal_time_uapi(void)
+  {
+  	struct kvm_vm *vm;
+  	struct kvm_vcpu *vcpu;
++	unsigned int gpages;
+  	u64 st_ipa;
+  	int ret;
 
---=-6EKfe1SEMF8EoHczYedx
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+@@ -220,8 +221,9 @@ static void check_steal_time_uapi(void)
+  	};
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYyMjEyMzQx
-NlowLwYJKoZIhvcNAQkEMSIEIB+3urY2MjctnpR/OpqCdn7mvd9vqdj4/ootPjt/Ai1nMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAssYZ4UDpEnTV
-s3rZaGE8mRxgbvqJCOi/smjAhp6aHAKcGYm+ozmEj72IL2lYgZIpI9IN6V+AkmF90zC+L2ub3qcs
-pboHownk1/tCFVU1Nhlh0GAbNUe9TTtc0IIuMmjmo/VUHpUtDtk5082qNOauX0Q8Dpcj/ywAlg1c
-1dyvvOFLC39Ze43VY0ySfpP8P51sOyKYfP85S37cd1VeXSgPXBqDHc8LFCn/u3XklzAbt112+m+p
-eFna1GI4Zxw3wHsOM4T6sPPTT2rH+CQ8K89huOafMOzvauhtU3tvwHGm3nqNSj59hof2nUUbA4tN
-47tAjMFxQHp+3jWbmLkPqkwVywzkJFkVFPke9zPFoy9a9Wlyg2cD/tLbDIQ0IaSndKiwiJrwX2Yo
-VDvEj48PLt2mg/bDBoyOXY1wCxkk0SHCDy7kR7NW/JdOLqf5LJ2F8E/PeVVE1SMFJYWQf7/OH2nY
-kw20InbcZCvOHDDfT12oc8zrqqk7wHJve2U3k0p1Uy8pDjJHofvqhT2dL/bIjaYVkGF02cLDqP8W
-+ExJ9dHq9+07qwc4OuRyn106e1/9Ax+zahtBPzN6Oe/YRATjN9uRrmH0hk1HU4WXrqD6cidV7Gp6
-zTHz3K9+hlqJ7siOKRP2sq4GF13lU4WgvfDpfxWx1Eoeqd7Ri90F0us+Lc8OweIAAAAAAAA=
+  	vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
+-	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, 1, 0);
+-	virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, 1);
++	gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, 1);
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
++	virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, gpages);
 
+  	st_ipa = (ulong)ST_GPA_BASE | 1;
+  	ret = __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &dev);
+-- 
+2.54.0
 
---=-6EKfe1SEMF8EoHczYedx--
