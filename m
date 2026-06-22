@@ -1,104 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E610352029;
-	Mon, 22 Jun 2026 08:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970E02D5A19
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 08:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782117153; cv=none; b=TYkIgkc3Tnjo/OiVlAJfsGvBvyjmSosHq665udyW9ECr/yzVYTOJWN9f6/CfEl1xs8DdnMxPE6KpRTxA795+3HppenxGhKwmLl5fX4IeY69BeghyT35H/rwPFkd/PPgpR2C1lWQ9OyKf/7Z5DLMjzrmmZ+263uqysteAU+qLAYE=
+	t=1782117233; cv=none; b=tVZYKgSWzzK+xy/2fGZqMTckYiXq7FDjO1meTr+gA5Ees9Q5H5w0mj1tbQ7Irg7MpF+mHqDVmaNrobY6rzttH+cr4pMLt3cIYUcRB+0a6JgSFVlhxyq6sfdZUDP7KfBCCg3BqHSsTaku3N9nxZD0QVtGE/m/y+mm+fDlmWm+dmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782117153; c=relaxed/simple;
-	bh=0/UDYSD18AQixTO0MreJwJkIhg5Zq7Efs123Q+njPXM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EmpoefcSmy2hLU6+7FqNVHNKk6foxtZ+Lr8jzGcC4VeTl0oDFctQCqgXtuiS+LX64DIop433fw1OSBenf5+nM0LirsWyBU9NkcOiyk6lSCcU3rzZSMlH69uY0kEHvB7ZnIdbiQhn0rCHou/UuAsY22xm0Ul1V6SwJZ4UUZRiiHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ydm/wFmN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782117233; c=relaxed/simple;
+	bh=Nw+KP6Gua04EKOL1i2bS7/ZOL0AXmIEXXmRC1yahR58=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fwtpEl+s+Qg7F8ZQKLLxg/hVyh8Nx6NlDhfEGfyyOGI+7XqJAoCVrt1JIh8yHlexTn9aIuZMrvUGRn1ytScn8j49fzwC5NdDdvlvBqGV3QIBLG2V7RUudJj7v7VtvVG7guOEY4IqS0jnnbZbMXO6F6JyTA4jYIohsnriOoJGKuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tNwtD65N; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ydm/wFmN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EB5A1F00A3D;
-	Mon, 22 Jun 2026 08:32:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782117152;
-	bh=tvmBIBVVRuAKAWEBFS4Pm3z5gdPz73I0izorRDkqqWk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Ydm/wFmNFF0Iq5Tm9r+eGjviUImGLb7pUBrLtF3t35nNQjYpBgYfxQfQ6NdsL7qKn
-	 c11kMT77DWn0Uz1p+PruEN8d+djWgnR/fyVDg5aoFDpK7fdzfN5zwSMBWvVt6lh9Ty
-	 pWxvwu8pGLTISMoMduYleh2zxZyB6H8xC2nY2+Dp22nDhcYd+BobAmTUbhN7GFkOtq
-	 Vz+xHmvVxBlnebJB9T1V8Iw33Uu8V8NB1ROc1Gbqu7K/cIu1PAPWb6qo3HJYq3rwJi
-	 OeZG6B/B0zumsuSKYicxLrHHXvpSX2kW8lrePdjLT/FjzX8wCjb1i4z3Lc1lBXI/hu
-	 E226ukSOX6t6g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wba50-0000000EqQ0-11iI;
-	Mon, 22 Jun 2026 08:32:30 +0000
-Date: Mon, 22 Jun 2026 09:32:29 +0100
-Message-ID: <86zf0nq8ki.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: 	Will Deacon <will@kernel.org>,
-	Bradley Morgan <include@grrlz.net>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
-In-Reply-To: <20260621213155.6019-1-include@grrlz.net>
-References: <20260621213155.6019-1-include@grrlz.net>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tNwtD65N"
+X-Forwarded-Encrypted: i=1; AFNElJ88dQhQ5Q0XN14LQpEc5bYmsBBqwLT8VGjxuBpyjxL6Y4v42geeqWwaaSfbSPTDTh0qImv+Z90=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782117230;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LMlv5sWG4rQ4mDu/88J9tsbgaPKRoMu6C9AqGqZiHXo=;
+	b=tNwtD65Nzrw87R1CPP+MqG1GVoLe3sR2mkeEi3JlcdUWdsnUYYBEEzNW6hhz0zARR4sz2o
+	V+62PfnnpoYc1jd9hIxY12a1wjHaeQ40EvcFMZRJ/bxiwDYZdYtY6qN4Ve9GVzE2A7+1Eg
+	xVCRhGTtE/ZMD6wRZKAdK9x2hvG+jmg=
+X-Gm-Message-State: AOJu0YxYA2isa3g0an0IIzkdnvY/IO2qBlHgWuCo5fE4hmimMpXJd61y
+	E+lyUd6TMHbCvIKaoxgWukAIapG70IGOlGZNdUhDretS6IP9wvIduZavA3mAN9jL2pcNAulpgjp
+	A8ic4RQG8g7Wm38wYTTEH/bHd8F6iW+6nOmxtJ/Bf
+X-Received: by 2002:ac8:5812:0:b0:50e:38f0:ccb2 with SMTP id
+ d75a77b69052e-519e8937418mr20106801cf.15.1782117202105; Mon, 22 Jun 2026
+ 01:33:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, include@grrlz.net, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260621213155.6019-1-include@grrlz.net>
+In-Reply-To: <20260621213155.6019-1-include@grrlz.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 22 Jun 2026 09:32:45 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTztL4O6NH-sNpPywchgER6SswetOCgmaaSGjtKaRtL8XA@mail.gmail.com>
+X-Gm-Features: AVVi8CeGmftOBXIGaXfHmUYTToXb3vtN5VWYlAu0NuHDiDaZP2CXGjkjPm4EAHs
+Message-ID: <CA+EHjTztL4O6NH-sNpPywchgER6SswetOCgmaaSGjtKaRtL8XA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
+To: Bradley Morgan <include@grrlz.net>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, 21 Jun 2026 22:31:55 +0100,
-Bradley Morgan <include@grrlz.net> wrote:
-> 
+On Sun, 21 Jun 2026 at 22:32, Bradley Morgan <include@grrlz.net> wrote:
+>
 > Protected guest faults charge long term pins to the VM's mm. Teardown
 > can run later from file release, where current->mm may be unrelated.
 >
 > Drop the charge from kvm->mm instead.
-> 
+>
 > Fixes: 4e6e03f9eadd ("KVM: arm64: Hook up reclaim hypercall to pkvm_pgtable_stage2_destroy()")
 > Signed-off-by: Bradley Morgan <include@grrlz.net>
+
+Reproduced by creating a protected VM, running the vCPU to fault in a
+page, then forking and having the child close the last fd reference.
+Without the fix, the parent's VmLck leaks (the reclaim decrements the
+child's mm, which is freed on exit). With the fix the parent's VmLck
+returns to zero.
+
+One minor observation: account_locked_vm() also passes `current` as
+the task pointer to __account_locked_vm(), but on the decrement path
+that is only used in the pr_debug log line, so it is technically wrong
+but functionally harmless.
+
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+
+Cheers,
+/fuad
+
 > ---
 >  arch/arm64/kvm/pkvm.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+>
 > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
 > index 053e4f733e4b..428723b1b0f5 100644
 > --- a/arch/arm64/kvm/pkvm.c
 > +++ b/arch/arm64/kvm/pkvm.c
 > @@ -352,7 +352,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
->  		page = pfn_to_page(mapping->pfn);
->  		WARN_ON_ONCE(mapping->nr_pages != 1);
->  		unpin_user_pages_dirty_lock(&page, 1, true);
-> -		account_locked_vm(current->mm, 1, false);
-> +		account_locked_vm(kvm->mm, 1, false);
->  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
->  		kfree(mapping);
->  	}
-
-Seems correct to me, as the final mmdrop(kvm->mm) occurs after S2
-teardown.
-
-Will, what do you think?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>                 page = pfn_to_page(mapping->pfn);
+>                 WARN_ON_ONCE(mapping->nr_pages != 1);
+>                 unpin_user_pages_dirty_lock(&page, 1, true);
+> -               account_locked_vm(current->mm, 1, false);
+> +               account_locked_vm(kvm->mm, 1, false);
+>                 pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+>                 kfree(mapping);
+>         }
+> --
+> 2.53.0
+>
