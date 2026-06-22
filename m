@@ -1,99 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451112E7F39;
-	Mon, 22 Jun 2026 17:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0346347FC4
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 19:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782148694; cv=none; b=NsowRtMGHUxMUqPOH0DS/9LQa84dK+RfNqCQ+OI5u2Upa0JrQhERllxNgHTXBgBe/ULe6BdVP1C7RB2HtfW8j8D0W3BIy59kghxhYEOvwC/ty0TPR3+aX3OHFvYsXqUWt7/ASOGOJSbJTCbqOgfISynbH/V9I2g2qizGeXfz4HA=
+	t=1782155230; cv=none; b=Eyjb8OkVg6bxSN5x8RrzoqJp1tG1t3BMfQosbjrSxdWNDwUV2dUVoZuEL07DMCkuMSU1MeWKRaRdYJWvr+es3ii3S45SuzcATflUX/avpsIEO3c+lttDq0XYpSpdllfL3q3MYJK7R4TaRwFtOq9KmCHOvH/gA6ozUH/xv0e0KPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782148694; c=relaxed/simple;
-	bh=BPBVlQRhTovC9q2tbSui95zXgj4QbMnoXVAtnT9LsSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V92Sz2HiSPH5qOcTvDGYLVgVnXwoUdjSRlfoY23HjsgLSELuBcMCZmKYj3flhtLwE44uo6OfDgrmF5KbKn7fUc2pv4jyDp2+/Z506T52zAJA/mZnqQO5Wt7+Yc1JYkHKoq1TmoR2ejnP9DtnsN0OzI3gVTcAIcXf0rdHmSJNoAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=geKekISS; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782155230; c=relaxed/simple;
+	bh=EZk09mqwniyPaFY6x/GnurTL+HGeh3ghHZEqPVduw8w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iaZ9LXKDQy16aHGKJkesWHh2w/uobWSOpbwhFdza0ISr7VZlWVKxO2TMgJ//i0KGSpjhSyNgZlqpwKwJf31oX9ku/EN/jjnmhpbG9f069Y4Z300+Wa/7B4Ili9rrwqt3t+gvQHIto3U3hn+SooJtc5N6B+0eCKikE3Ew2K/qPjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XDXKXiii; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="geKekISS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7EE41F000E9;
-	Mon, 22 Jun 2026 17:18:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782148692;
-	bh=1cPvP81H1b5BRIhxAghvo1wc+boTiYB73/wR5pZYpvs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=geKekISSvrMZhJnlCjFCeNlCDDPvA+sod1Q0kIN2u2s7o/YAGeC/YVOZYLT0oXFIJ
-	 lGQtnQFPfWKSRF6OxX3xXMgyzIc5Ada16O2t5lcMXaw8bmjAMGdV8FgB8hIhExw8AM
-	 DB9IfrIsvb8Fgvext8/QZMFmfi3AS3y4AvMmzatK5cBUP6GHpDjFuEQl8wzgH5cy2a
-	 sUumPrIV0+9HGX7tCMRoIm2HzgRQNBuKqOPKEJflOfA8CF6Pz75AWa2pASF3Q4fdZE
-	 GxCJeYP+w+vtWakHeHCyFvJZkw/Rh3AgkkAXUvgqxAwCGHoN+8pvXVoAUs1EFV+0Az
-	 rR6yXFFR5fl6w==
-Date: Mon, 22 Jun 2026 10:18:11 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 3/5] KVM: arm64: nv: Re-translate VNCR before
- injecting abort
-Message-ID: <ajluUzbMsicbJ5Ci@kernel.org>
-References: <20260618234207.1063941-1-oupton@kernel.org>
- <20260618234207.1063941-4-oupton@kernel.org>
- <20260619000034.7F2511F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XDXKXiii"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782155227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6FUoNtrIxitio2ZcQ79fK9DlQrFdcFNyScyGhi0wHX0=;
+	b=XDXKXiiifWQNZIr/g1YmsSsbeyBAfeo6+8/OO+eifiMSpBlOJRfGQRJu9UFoVJQi1Ix0XX
+	tdjh/tgmDDXv1UEXGI1ycypC4Wf8M0PJSrFynOimdNkHlJ3vfM99+bN0aw0d/o4kHuYwZL
+	uxDgMv+GHevA/N26axb2YqEWvgF0AaY=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Christoffer Dall <christoffer.dall@linaro.org>,
+	Victor Kamensky <victor.kamensky@linaro.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] KVM: arm64: Fix sign-extension of MMIO loads
+Date: Mon, 22 Jun 2026 20:07:00 +0100
+Message-Id: <20260622190701.2039766-2-fuad.tabba@linux.dev>
+In-Reply-To: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260619000034.7F2511F000E9@smtp.kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jun 19, 2026 at 12:00:33AM +0000, sashiko-bot@kernel.org wrote:
-> > -			handle_vncr_perm(vcpu);
-> > -			break;
-> > -		case 0:
-> > -			break;
-> > -		}
-> > -	} else {
-> > -		WARN_ONCE(1, "Unhandled VNCR abort, ESR=%llx\n", esr);
-> > +	case 0:
-> > +		perm = kvm_is_write_fault(vcpu) ? vt->wr.pw && vt->hpa_writable : vt->wr.pr;
-> > +		if (!perm)
-> >  			handle_vncr_perm(vcpu);
-> > +		break;
-> >  	}
-> >  
-> >  	return 1;
-> 
-> [Severity: High]
-> Does removing the -EPERM loop breaker introduce a host CPU livelock for
-> Write-Only guest VNCR mappings?
-> 
-> If the guest configures a Write-Only mapping, kvm_map_l1_vncr() falls back
-> to mapping it as PAGE_NONE. When the hardware accesses the fixmap, it triggers
-> a Data Abort. KVM then traps and re-translates the mapping.
-> 
-> Because vt->wr.pw is true, the perm check evaluates to true, and KVM returns 1
-> to resume the guest instead of injecting a fault. The hardware will then fault
-> again indefinitely.
+A sign-extending load from MMIO (LDRSB, LDRSH, LDRSW) delivers a
+zero-extended value: in kvm_handle_mmio_return(), vcpu_data_host_to_guest()
+masks the data to the access width after sign-extension, stripping the
+sign bits.
 
-Advertising NV2 to the VM should've been conditioned on hiding S1PIE
-because there's no way to fix this. As the access passes the guest
-permission check, we have no fault that can be injected for stage-1.
+Move vcpu_data_host_to_guest() ahead of sign-extension so the width mask
+runs first. trace_kvm_mmio() moves with it and keeps reporting the raw
+access-width data.
 
-> [Severity: High]
-> Also, does calling kvm_translate_vncr() unconditionally request FOLL_WRITE
-> on a write fault without verifying if the guest's own Stage-1 mapping
-> actually permits writes?
-> 
-> In kvm_translate_vncr(), __kvm_faultin_pfn() is called with FOLL_WRITE if it's
-> a write fault. If the host memslot happens to be read-only, __kvm_faultin_pfn()
-> fails and returns -EFAULT.
-> 
-> This error bubbles up to the switch statement above, which injects an External
-> Abort into the guest. Should the guest instead receive a Stage-1 Permission
-> Fault if its own Stage-1 translation does not permit writes, regardless of the
-> memslot permissions?
+Fixes: b30070862edbd ("ARM64: KVM: MMIO support BE host running LE code")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/mmio.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Again, this is below the bar of stable fixes (intent of this series).
+diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+index e2285ed8c91de..d1c3a352d5a22 100644
+--- a/arch/arm64/kvm/mmio.c
++++ b/arch/arm64/kvm/mmio.c
+@@ -126,6 +126,10 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+ 		len = kvm_vcpu_dabt_get_as(vcpu);
+ 		data = kvm_mmio_read_buf(run->mmio.data, len);
+ 
++		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
++			       &data);
++		data = vcpu_data_host_to_guest(vcpu, data, len);
++
+ 		if (kvm_vcpu_dabt_issext(vcpu) &&
+ 		    len < sizeof(unsigned long)) {
+ 			mask = 1U << ((len * 8) - 1);
+@@ -135,9 +139,6 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+ 		if (!kvm_vcpu_dabt_issf(vcpu))
+ 			data = data & 0xffffffff;
+ 
+-		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+-			       &data);
+-		data = vcpu_data_host_to_guest(vcpu, data, len);
+ 		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+ 	}
+ 
+-- 
+2.39.5
 
-Thanks,
-Oliver
