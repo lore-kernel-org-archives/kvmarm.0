@@ -1,146 +1,214 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6FD398915
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 09:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782120534; cv=none; b=e2L+KxuCgbXWNzGCV7/jNDpHs26OPfP1Op1/7ZdOtsPs2mVe9NqghSqoNd2e7yQhScP0ebbM3JvKlLNHOafgb5AYS4ZseqzA6XVLwTNI+s2QHTGFp38UfjwprEq22RnX9UX8Ri6aHkz0SQpDG/VU5s7wmOYf/rligJz8EFPs0zI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782120534; c=relaxed/simple;
-	bh=7LEgMI4CoHOl8BmYIolkgw6bU3M5d39i+qkLjhPfMtw=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0FB368D73
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 10:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782123291; cv=pass; b=BC8b5FLQRq9HLpBHqp32IKPkrhYT1gtGP2cjinD41JCNeBPNXAUeXbaXrF09eUfaOQ5/9ZpnYn5CPo6gFqwMUj+CLI+1P6IgEbsf9DHnCXP4emuzw7YMCo1EGnsmOGS60Q9dWmFM5WZIAfsYT8IU+DJy7Ueges+LdTwXtQ/Yc+0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782123291; c=relaxed/simple;
+	bh=3yB5LuKJvgiONenw4nzh7uWSxiBTMWM7dIiC9P1HMPA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TwvX6o5UinfPVwvOZURKnpL4y6NgCZSncE9cpCbKCIjsGmicra1icaNUoCCxqazK7/WrnJ2FvXfuJBSUJ9qQ0OliwFXG/PnS96jY4YTrhAZtjR9jY21itgtFMwDCk7Eo04iLeV57w+wN6Vg9nudAdRPPEJJZhMnXSXcHyQPhAhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B9/zX2Sa; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 To:Cc:Content-Type; b=HCNubJfrL/TzY6CKSPvKvhjycpqF6xVsadzqWyoFedX1NRhxi5oU4iAKqWu4xgSTo/zsaUPSR6C6Q9F5tAvfodworKpke3ID+7IpFK1oZdPO+1Uf6mZQN41KhTaJcVuNLG49eOvW/Y6G3ibSNpXIm9SKKOyoh/C1Fxxgw1pr3QQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OyjlK28m; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B9/zX2Sa"
-X-Forwarded-Encrypted: i=1; AFNElJ+ILUpJEcQtXkw7YeRVmCjDJHADH5mMfoxLhf2HvL4Kpritf55AP3g5HC+WQ42cMp49mKlZn20=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782120530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NXXrkGGgWhMIxTmpAsu5SnOrXuzavCRXBgQ6EasiET8=;
-	b=B9/zX2SaWr/wJaKytl7c3qKDaE7MYbhJ6M6PaJGt4H6DWQ1FgohB2aOB0lLe4uMUqWLS2m
-	Q4CJojhX2sislVsxzlhOdml8tL2aEkv/HpKnOeeibljWlK2+GmixKPNKRhiP+SlxGqX7Jn
-	HQRS3rFQt+MtcO5SQo20QgHykZZvaso=
-X-Gm-Message-State: AOJu0Yw4NNWdZLvulfjx7ohyu9of7ZmIqKQFPJnc+l0vP6jncBFrBXHg
-	W3YPneWIcAlze0fuXbeGaR5ouJ1XyMnSKkvHgolk6uE1fqAv4RhprVcHw4I2QTo2GDG06NwP+pL
-	b2eq7xDkPiRUDbKofPA8CBhXZ7Qllq52EB2rmLogR
-X-Received: by 2002:a05:622a:11c5:b0:516:ccc0:ee38 with SMTP id
- d75a77b69052e-519e891bc2bmr19956431cf.9.1782120518257; Mon, 22 Jun 2026
- 02:28:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OyjlK28m"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51765531803so625391cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 03:14:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782123289; cv=none;
+        d=google.com; s=arc-20260327;
+        b=IDddPJHSwaxpqhmegEaNHHf261VWIRCD60X1koWG2oidRvA6WQL6e1CNy3OfZ3l4gy
+         ihdzRh+v7cmC79G+7s0UgINzKP1nuWcc36HJWNJR2rqO/oWkH38N8DTbnctMTh6cnSPs
+         VRrLCgB1NNck8M5Mh9kKWED4MEhxN6+z64vcOpAHBz57YEQ/pNFlbUspJGDAGySIAcwI
+         3VNM6haiy+oKieY/4KvMZH3uG9Xi2tZ1qEunocX/VJXeGekoRespkjCCffiANGnEoIgN
+         JpHNMjREtYrxRr8bZ0/EXQ8lTN18DOgLalT3zzlfWFvTXFI2c2VtNaZs1zVjSSpZvbST
+         1/fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=4c6b6JJaSBLlb1nvUx6oYOg7Wq9Q5dUNaZHbrnZFblw=;
+        fh=EiB8i65bDqg/aYubVTsJQrWiN4qQ2W3CE0PeU1Ji494=;
+        b=NC8c1d5iudbz9ahpja5Lzz5P97RZG1BVIDjWhnE3OKUrEKCPylQVNZ/dbjr1yj9M0p
+         cf7lc8lR+cjKYNYYFfKSJPpzMyuPpFs5Ry2IocOvtertY9aHLN0IfV9rz7Sx1E7fZCLo
+         X7zav+KXV6cJ34idBu8lW0vNRfAmsN96eeie6Bf+yqsqMqU4VMBsxGcjIQrC2TQtwMs2
+         6iH5jL1Wy6sDP+DwslE9Tx1f+a37Itf5fouZ1yfsBDMIDvT8l8AvnuK3SweSpjMhcp1Z
+         rj6PwP9V5/vd56KrZ7jRMKWSUxPo6uQjanyXACku2WHnEjO7QQUM17c6PC7JA5Uiqwj5
+         PSbA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782123289; x=1782728089; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4c6b6JJaSBLlb1nvUx6oYOg7Wq9Q5dUNaZHbrnZFblw=;
+        b=OyjlK28mZYLoqmmsNWdQcWshfXI1qod4p1fXb4tlfQTpv3yO/4tTQizyWdiXIrehM3
+         b0M6U66VgSHCo3rhMsXSpv273pJ2noFrk7aiY6yssqvOxk2MOciG/V6pgKT/6jkA3DQx
+         i6RogQabP29gXmZi0SYspv7mhV11JYmT8NFiMjQMwqXQ/BEmPae/8ZQScxEbyov2BDWT
+         c7WANzfPa/GDbA+V3LLJkjG5tBSm0l/uFKVfDIrUwVlDoQepiuXdzH+mgEnNDA54b72s
+         f91LkUCMmHdnk8DN8jedBfWwnJz0LLM5Tpx8YJCqm7wRWedyL8C2fok4NWeBozdT6qLn
+         cwvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782123289; x=1782728089;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=4c6b6JJaSBLlb1nvUx6oYOg7Wq9Q5dUNaZHbrnZFblw=;
+        b=s5cc96m1S1CD3He+lu+IesmHo6ZVSZd5ui3kIC/M4KB8jHpvM8DLhFjor8zm2Fatp1
+         q6WJUziVgLrpc8Ny/ugKwTTw95zFAdIzwXqYtPJT4h/oPr//qgQYVXoWT7bBbVeFlKmG
+         31jp6Ar3KuZdNPhgYqhurFxbPICW+HCO0KWEtskTLSx6Dqabnu787g4EWz7CkSaZCFbF
+         O1o08vRbyHEFJ2BMq6wfSp9Vy6eh3c5FFT4dU5gy9freXM1xce7bbTLBnM9WadCOQXjM
+         hJP7onv8SSkgHneR25zdyLEVtre5G5/6g2Bd2+wi+qtgGIIy2tWSLKsILEJIJ0kJ8vRP
+         NVpw==
+X-Forwarded-Encrypted: i=1; AFNElJ/JaaTxCQ2pa6C6he7W2XzWwyqcp3INairuPfwsOmsDpTu00fI2Miej4vF3sXdKseb6oHIcAFQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzOhYb7/mLDILh99UCpskYc8uZyCii8KFiWBUaWlxmfRcXhoymF
+	S7keXKGKAz8o4w2PqGBjAqgsX1l/MC3p39XmakgdQC1aeZXKuCQFaNePHXn7Pk9rMeGR5EkPUuF
+	QpK2ba92a4BhDFF1VGhXBnPlfCY5JeymkePDaYkop
+X-Gm-Gg: AfdE7cmH6t8eB7cTvU52K2cp4a3oRthBjZ7u3y+8dhHxSpTb+qcqC5PSzi4EVikPiWN
+	6AZC8ixc6MUDeitgrZA8l0+C9Y4XqrDExu4zmK3fxxbBMeeQuLJfBAzF7FLwcx0HKgyhpP4yJ+B
+	vz0Jp6sKVBc+sSJ+68jxmX7iVGs0eeEEQSjZjNhG7YdofutSFYPubbGJ/5gbkZGOuefYgeoHeEp
+	nb9fwUhC0lXRLhbUom6Az7T1nlNJ0i/oK3rmjdlU6Plo8TR/+56R8Lei7xKyV1UmucNFZAMipkW
+	P89bPqhu
+X-Received: by 2002:a05:622a:2b08:b0:517:99ea:ab7a with SMTP id
+ d75a77b69052e-519e4ab67d5mr23266481cf.26.1782123288572; Mon, 22 Jun 2026
+ 03:14:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CA+EHjTzdCf2waY_Qc+GWzA-MuKG=_XjQ4Hzn3HJ6Yi0NfB_CzQ@mail.gmail.com>
- <ajVyJa-mZmYGzt6o@kernel.org> <867bnsrw8p.wl-maz@kernel.org>
-In-Reply-To: <867bnsrw8p.wl-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 22 Jun 2026 10:28:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTywWT=76DGzwk_U+LOYti9mCQkSchfMhmWSJ7GnwLfVmQ@mail.gmail.com>
-X-Gm-Features: AVVi8CcsrRulZuehrngXQzNj8CDiaAyyd5kQgVa9vm6W5H90fk0n_xb0uv_APbw
-Message-ID: <CA+EHjTywWT=76DGzwk_U+LOYti9mCQkSchfMhmWSJ7GnwLfVmQ@mail.gmail.com>
-Subject: Re: Sashiko review emails to the list
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Will Deacon <will@kernel.org>, Vincent Donnefort <vdonnefort@google.com>, KVMARM <kvmarm@lists.linux.dev>
+References: <20260619070719.812227-1-tabba@google.com> <20260619070719.812227-9-tabba@google.com>
+ <ajVAV5ct0xdLn1KX@google.com> <CA+EHjTz13obYHAZYCW+zpH1RB953FseP9koXydeoLqmn6UONHQ@mail.gmail.com>
+ <ajj3KzUrZZ1-2UQZ@google.com>
+In-Reply-To: <ajj3KzUrZZ1-2UQZ@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 22 Jun 2026 11:14:11 +0100
+X-Gm-Features: AVVi8CdpMK8FMnv9bhBXfcc28TenXa4-d-BsEgeEJUz6o79oKv2h1yruz0fVKMA
+Message-ID: <CA+EHjTwB8OGpK1sJwNXktqDXYhweujUTKfdOdRggsKYF5srk5A@mail.gmail.com>
+Subject: Re: [PATCH v2 8/8] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Quentin Perret <qperret@google.com>, Sebastian Ene <sebastianene@google.com>, 
+	Hyunwoo Kim <imv4bel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-Thanks for your feedback.
-
-On Sun, 21 Jun 2026 at 12:03, Marc Zyngier <maz@kernel.org> wrote:
+On Mon, 22 Jun 2026 at 09:49, Vincent Donnefort <vdonnefort@google.com> wrote:
 >
-> On Fri, 19 Jun 2026 17:45:25 +0100,
-> Oliver Upton <oupton@kernel.org> wrote:
-> >
-> > Hey,
-> >
-> > On Fri, Jun 19, 2026 at 03:19:05PM +0100, Fuad Tabba wrote:
-> > > Hi folks,
+> [...]
+>
+> > > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > > > index 54aedf93c78b..8963621bcdd1 100644
+> > > > --- a/arch/arm64/kvm/handle_exit.c
+> > > > +++ b/arch/arm64/kvm/handle_exit.c
+> > > > @@ -422,6 +422,20 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >       int handled;
+> > > >
+> > > > +     /*
+> > > > +      * If we run a non-protected VM when protection is enabled
+> > > > +      * system-wide, resync the state from the hypervisor and mark
+> > > > +      * it as dirty on the host side if it wasn't dirty already
+> > > > +      * (which could happen if preemption has taken place).
+> > > > +      */
+> > > > +     if (is_protected_kvm_enabled() && !kvm_vm_is_protected(vcpu->kvm)) {
+> > > > +             guard(preempt)();
+> > > > +             if (!(vcpu_get_flag(vcpu, PKVM_HOST_STATE_DIRTY))) {
+> > > > +                     kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> > > > +                     vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > > > +             }
+> > > > +     }
+> > > > +
 > > >
-> > > I really like Sashiko and find it very useful. It's flagged real bugs
-> > > in series I and others have posted to the list (e.g. [1][2][3]), and I
-> > > run it locally before sending, which has saved me a few respins.
+> > > Could we remove this update here and let handle_exit_early() do the sync
+> > > regardless of the SError injection? One of the main point of handle_exit_early()
+> > > is to do things under !prempt().
+> >
+> > Agreed on the move: handle_exit_early() is already preempt-off, so the
+> > guard() goes away. Not on every exit though. handle_exit_early() runs
+> > on every exit, and sync_hyp_vcpu() only copies PC/PSTATE/fault back
+> > for a non-protected guest; the GPRs and sysregs cross solely via
+> > __pkvm_vcpu_sync_state. Syncing unconditionally would pull the full
+> > context back on plain IRQ exits, which is the copy this patch avoids.
+> > So I will gate it on trap-or-SError and drop the
+> > handle_trap_exceptions() block.
+> >
 > > >
-> > > That said, it's been posting a lot lately, so it seemed worth asking
-> > > how the review emails to the list are working out, and whether we
-> > > should change anything.
-> >
-> > So this is entirely my fault since I added the email configuration for
-> > the kvmarm list. Sashiko has been finding some truly nasty bugs, posting
-> > on-list is the easiest way to get attention from the right folks to get
-> > things fixed.
->
-> I don't mind this. Having Sashiko to tell me that something is off is
-> great, but we collectively need to learn how to treat the feedback.
->
-> > With that being said, the signal to noise ratio hasn't been ideal.
->
-> There are a few things that did it for me:
->
-> - hallucinations that are close enough to reality that you spend
->   significant amount of time debunking it. Being creative about
->   specifications is particularly annoying.
->
-> - the whole "I found a preexisting issue" is great, but leads to an
->   avalanche of patches that themselves trigger cross-reporting
->   (patch fixing issue A triggers a report for issue B, and the
->   reciprocal happens as well). This is overwhelming and we need to
->   better manage this.
->
-> - Related to the above, I see a flurry of activity following a review
->   from Sashiko, resulting in unrelated patches that distract from the
->   issue at hand. I reckon that *we* could do a better job keeping the
->   initial patch series focused, and once that is solved, work on the
->   tangential stuff that Sashiko may have reported. At the moment, it's
->   hard to see the wood for the tree.
->
-> - We also often end-up with point fixes match the reported issue, but
->   that don't address more general issues. That's even more noise.
->
-> My conclusion is that while Shashiko reviews can often be flawed, most
-> of the problems are with the way we deal with the reports. No, I don't
-> have a magic solution, but that's something to think about.
->
-> >
-> > > These fixes will take a while to land, so the question is what to do
-> > > meanwhile. Some options, and surely others:
 > > >
-> > >   - Leave it as-is while the fixes propagate.
-> > >   - Stop the emails but keep the reviews on sashiko.dev, so people can
-> > > look rather than have them pushed.
-> > >   - Disable the emails until the noise is down to a reasonable level,
-> > > then re-enable.
+> > > >       /*
+> > > >        * See ARM ARM B1.14.1: "Hyp traps on instructions
+> > > >        * that fail their condition code check"
+> > > > @@ -489,6 +503,22 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+> > > >  /* For exit types that need handling before we can be preempted */
+> > > >  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+> > > >  {
+> > > > +     bool inject_serror = ARM_SERROR_PENDING(exception_index) ||
+> > > > +             ARM_EXCEPTION_CODE(exception_index) == ARM_EXCEPTION_EL1_SERROR;
+> > > > +
+> > > > +     /*
+> > > > +      * An SError injected below writes the host ctxt; for a non-protected
+> > > > +      * guest, sync from the hyp vCPU and keep it dirty so it isn't dropped.
+> > > > +      */
+> > > > +     if (is_protected_kvm_enabled()) {
+> > >
+> > > Should we test !kvm_vm_is_protected(vcpu->kvm) here, as the
+> > > PKVM_HOST_STATE_DIRTY is only updated for p-guests everywhere else?
 > >
-> > This sounds like the right approach. I'd like to re-enable emails once
-> > we're happy with the quality of reviews.
+> > Yes. The flag is only ever set for non-protected guests, so clearing it
+> > for a protected one is a no-op, but gating it matches the invariant.
+> >
+> > Both fold into one block in handle_exit_early():
+> >
+> >       if (is_protected_kvm_enabled() && !kvm_vm_is_protected(vcpu->kvm)) {
+> >               if (inject_serror ||
+> >                   ARM_EXCEPTION_CODE(exception_index) == ARM_EXCEPTION_TRAP) {
+> >                       kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> >                       vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> >               } else {
+> >                       vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> >               }
+> >       }
+> >
+> > I will fold this into the next respin.
 >
-> I'd like to see how the fixes improve the situation, and re-evaluate
-> in a couple of weeks.
+> Ah yes of course, I was hoping we could just have a switch here, just like
+> handle_exit() does, but that's not possible because of ARM_SERROR_PENDING().
+>
+> Perhaps it would look cleaner if done in a separate function
+> handle_exit_pkvm_state()?
 
-The PR I sent to review-prompts should significantly reduce ARM ARM
-hallucinations, based on local testing. It will take a while to
-percolate to review-prompts then to Sashiko though.
-
-If you see any recurring arm64 or KVM issues, please let me know. I've
-spent many hours and tokens setting up the subsystem prompts for these
-and fixing them later, so I have the evals and benchmarks ready to go.
+Agreed, that reads better. Pulling it into handle_exit_pkvm_state()
+also gets inject_serror out of handle_exit_early(), which only used it
+for this. Done for the next respin.
 
 Cheers,
 /fuad
 
 >
-> Thanks,
 >
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> >
+> > Thanks for the reviews!
+> > /fuad
+> >
+> > >
+> > > > +             vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > > > +
+> > > > +             if (inject_serror && !kvm_vm_is_protected(vcpu->kvm)) {
+> > > > +                     kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> > > > +                     vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > > > +             }
+> > > > +     }
+> > > > +
+> > > >       if (ARM_SERROR_PENDING(exception_index)) {
+> > > >               if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
+> > > >                       u64 disr = kvm_vcpu_get_disr(vcpu);
+> > >
+> > > [...]
