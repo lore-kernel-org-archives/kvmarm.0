@@ -1,223 +1,191 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9705739937C
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 11:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5272924886A;
+	Mon, 22 Jun 2026 12:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782127359; cv=none; b=MVXoYaOKpoigjOSINmFFHO1IuL4uiaS6CHzkACn3FGDWDKWSncgvevqpFywGDbdpWqp7BZriQL/IDQHxzKLvUJgrE2rxn3k64JOogT/8mJQiyTd4uWYZOr9FF5mssiChz1WbB/GQbEXwgOjzloFoWovwoz0uSFLcs7t50RaIQJA=
+	t=1782131666; cv=none; b=CczCN5vdTgB1K7zRwfoOg4zWy3wG8+48UwBq46Hmn1EQqhH9AuYCq+PY35T3neg75aHoDnxVGO0ResnOUHd4g8ARHCg6UwEvuWjm4nA1fW+naKsQfL60oDop7uhjCdVYOKwAjSiE+170Yrahc4i71TS+Zbm9Zbuf0ru1HR8yFdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782127359; c=relaxed/simple;
-	bh=70B5mhzskHceq9SpN0r29f++IYglrvBZ5GQWolH6+k0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tl2DVqbXgNNtFaReaAR+rkar8UGDe19ZfciJNsHCHEN9gbvBOAsQOob4PKAEDaP93dRM9miCilHP7wIuJScz4M72M+L4A+z/ZOImDfPwWR+gOrdrg1JKXWU69lXsw50s2s5nQ2YeX1gatjbN1MNDpNOKoApvlqo28j92IQ7IMbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z3TVBYCq; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1782131666; c=relaxed/simple;
+	bh=/pj1obi5Ax40qSorMiy77BT7ffTextbuFvQGLWH6KQM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lyeVA+/NKedLFzEuXdF0P6SBwtfcTWQ/aK3eDMUqor+tgB1YMYBgI/D381xYpxRpavXQqMFmhwmagON7mfLe34ILpLQKqE6w6SXFrEz+FAAZP9RxjboOkvtxIQXYMZr3rmZg33V4Rg4d3G/tnSYtNSnUEKg+klf6PtmRUGXYg08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GvOltmdD; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z3TVBYCq"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4924c5fb51dso43355e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 04:22:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782127356; x=1782732156; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=S1yY6fW7A2By32TyWMvRTUIRlB5g4qNh9tuneOqU99E=;
-        b=Z3TVBYCqcJJzkMA8VfJsuCUQRuvTysRg/v1dtgprpC7khcFKY6XVQgNJwFyOQ+tIbf
-         o3Wv5M6pseKcvEuFg6yA6VigYMJhdlg1XoN/FlDGEJAcVm30JMUtbRocsd66uXQxbzy7
-         tknWX3RN14ysqnCecGfM48oi9rIwPScCuBSKxX1d9zkmMmty527+ryrP68hQ4AmSg+cX
-         JIVhyFSgxnZCuut6Hf61AkdlZlusVwJapYrz9qOHB+jkb12r/pTw7iRE+2cXno0W5THp
-         +o/pAwYBLVcVWeEYXoSf+m0IT8bUy+8xQoDwT+Z66JFV4yjd9UIzn8f82klQuBGZlVTR
-         NR6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782127356; x=1782732156;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=S1yY6fW7A2By32TyWMvRTUIRlB5g4qNh9tuneOqU99E=;
-        b=UcsQCT9WR7liHYtMineAYvY8P6Mca3qcfWQaRGd2MDW8gbVi7maIdEJPTUi5xznvUI
-         MLAxsFuttKQbqDCF3foPsh2HMjUfcDAGxPLag1D0EUm/rT1Fdb28F9eVXFkKqoAnuMjY
-         57og6NGTRZ7u2rm+qE5OwpMNNuTbPRY75l11cHI/lN0xNFVGlMA74EKn97Mg4FTe9EJl
-         Id9FdOup+Ijm27gz4E5Dzu9SmxZBvkVeXHAC1tK6giZCRsBo9+8WNL+MCCPhS95pmEpA
-         yr/f9+S1OQj/9pfMBDyqPrHEak/9k5c9erR2HNDQKqzQfPFPzhNoRWr/AeJaVQeJ5QIz
-         BBzw==
-X-Forwarded-Encrypted: i=1; AFNElJ/4O6hMQFq8NmqL/YN1q+oKhc9FW7yu6SnDnY4/MoNDyHYbpGm+LRt1aKhjFFUybtjJvo90jNI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxcGojVE/41Bp27N2hA/YQjowP1Ny1UGdVLekTVDOonK8YJ36pF
-	2BvtEv4Cj3JQvyOjPLIv5OAZBNQMVMwsZiZiZRL0SYfRfMoWnDoQFT020+z009OLfg==
-X-Gm-Gg: AfdE7cmO6gaP81HE78zgB/L1STOUay48TzhETeh+un8cLk3KqVKvCHCDQpQcPVmC+jv
-	jSm6x3KFGTBDCG2ieA5V3vFyjU5KwlOMOEtOZ1QATQbgris+/W95jfX+myKKxY3FJv7BLAOdbuY
-	JF0E5gAkWglM7bsAX43v+ft1tqHy+Li5ud2wTtrLX+/zlbN/S4T9X12nKzDP2py7pD8fzPRzmfJ
-	ygW7GE5CIuctfV4iew+7nUmgUb4YNvjA27XZUw+zy/ZIGf3jX+jy+a2OHJN5mIOyAe8HFPysBNX
-	YacSNPyWK43CMMQ/C4TrbJO2xT26fvkpUsi20aYCEoE0yYzHJz7VMr1noLzKVRVeQD/Cun/wvMA
-	LsPHLKubWRr/i/fsxmgh38vpUSBCqdaXPZf/aQGBcrfUUQcecfa3207VlnAzil+tuThDrt5lJmP
-	Mf7kd9RmyBqdWnFD7LLy60frrYfV5OgtBCGsvLgg9pimruVYUm0R9RNjfO8t1do606OEG1YA==
-X-Received: by 2002:a05:600c:2254:b0:48a:5618:b4d4 with SMTP id 5b1f17b1804b1-49241527581mr2615965e9.1.1782127355433;
-        Mon, 22 Jun 2026 04:22:35 -0700 (PDT)
-Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46666c579dfsm25252029f8f.31.2026.06.22.04.22.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2026 04:22:34 -0700 (PDT)
-Date: Mon, 22 Jun 2026 11:22:31 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: catalin.marinas@arm.com, oupton@kernel.org, sudeep.holla@kernel.org,
-	will@kernel.org, jens.wiklander@linaro.org, joey.gouly@arm.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	maz@kernel.org, mrigendra.chaubey@gmail.com,
-	op-tee@lists.trustedfirmware.org, perlarsen@google.com,
-	seiden@linux.ibm.com, smostafa@google.com, sumit.garg@kernel.org,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v7 5/7] KVM: arm64: Validate the offset to the mem access
- descriptor
-Message-ID: <ajka9wZXKlYWlYDA@google.com>
-References: <20260617145130.3729015-1-sebastianene@google.com>
- <20260617145130.3729015-6-sebastianene@google.com>
- <ajQjOH9Cjk1UqdT-@google.com>
- <ajj_DkqiDwiF8imZ@google.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GvOltmdD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=/pj1obi5Ax40qSorMiy77BT7ffTextbuFvQGLWH6KQM=; b=GvOltmdDSlmBPbHoB6gYymA7zB
+	14p/Cuy3yXARCFi4eAPdKrWg5H7lNDZ9EbHRjILv3o9VQBz8Jf9QNbLVRxIGmMBGeySxSAqWSnbvu
+	MtroKfO+1pCG5FIVazSIePA38w7ZUV2O8v5q8PZCx6OzGoopXHKcAv9LGkwlPRl8ESTDYsFNfQ1cB
+	qPflA4DNp4sZW9cGACmy0EHOKGVWY1jWWNjaZmr4JwvYB+6fOo5WbTUJ2rkWPbH52LrBgoFeBDln0
+	uqhmDIvMGonfS6iP9inLI+5sNJgeWFY1b3Td+qDFylnlBuJ0l4/4FoIpfMpnsMkn7Mg95bCzrcipV
+	QDgnXqRw==;
+Received: from [2001:8b0:10b:5:9b49:795b:48f5:139a] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wbdqz-00000004DvI-10eM;
+	Mon, 22 Jun 2026 12:34:17 +0000
+Message-ID: <aeda79e82028a628cf2ccc40cdc91ec911570ef6.camel@infradead.org>
+Subject: Re: [patch V2 18/25] timekeeping: Prepare for cross timestamps on
+ arbitrary clock IDs
+From: David Woodhouse <dwmw2@infradead.org>
+To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
+ <jstultz@google.com>,  Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Frederic Weisbecker	 <frederic@kernel.org>,
+ thomas.weissschuh@linutronix.de, Arthur Kiyanovski	 <akiyano@amazon.com>,
+ Rodolfo Giometti <giometti@enneenne.com>, Vincent Donnefort
+ <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, 	kvmarm@lists.linux.dev, Oliver Upton
+ <oupton@kernel.org>, Richard Cochran	 <richardcochran@gmail.com>,
+ netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,  Miri Korenblit
+ <miriam.rachel.korenblit@intel.com>, Johannes Berg
+ <johannes.berg@intel.com>, Jacob Keller	 <jacob.e.keller@intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Peter Hilber <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin"	
+ <mst@redhat.com>, virtualization@lists.linux.dev, 
+	linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org, Vadim
+ Fedorenko	 <vadim.fedorenko@linux.dev>
+Date: Mon, 22 Jun 2026 13:34:15 +0100
+In-Reply-To: <87se6eltod.ffs@fw13>
+References: <20260529193435.921555544@kernel.org>
+	 <20260529195557.846634842@kernel.org>
+	 <b296182e2e2c1ed2fe1c4879fd6f12d67a7ad22f.camel@infradead.org>
+	 <87se6eltod.ffs@fw13>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-6EKfe1SEMF8EoHczYedx"
+User-Agent: Evolution 3.60.3-0ubuntu1~ppa6 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ajj_DkqiDwiF8imZ@google.com>
-
-On Mon, Jun 22, 2026 at 09:23:26AM +0000, Sebastian Ene wrote:
-> On Thu, Jun 18, 2026 at 05:56:24PM +0100, Vincent Donnefort wrote:
-> > On Wed, Jun 17, 2026 at 02:51:28PM +0000, Sebastian Ene wrote:
-> > > Prevent the pKVM hypervisor from making assumptions that the
-> > > endpoint memory access descriptor (EMAD) comes right after the
-> > > FF-A memory region header.
-> > > Prior to FF-A version 1.1 the header of the memory region
-> > > didn't contain an offset to the endpoint memory access descriptor.
-> > > The layout of a memory transaction looks like this from 1.1 onward:
-> > > Type | Field name | Offset
-> > > [ Header | ffa_mem_region  | 0
-> > >   EMAD 1 | ffa_mem_region_attributes) | ffa_mem_region.ep_mem_offset
-> > > ]
-> > > Verify that the offset to the first endpoint memory access descriptor
-> > > is within the mailbox buffer bounds.
-> > > 
-> > > Also, fix one hardcoded sizeof(struct ffa_mem_region_attributes) that
-> > > should be replaced ffa_emad_size_get() for compatibility with FFA v1.0.
-> > > 
-> > > Fixes: 42fb33dde42b ("KVM: arm64: Use FF-A 1.1 with pKVM")
-> > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 29 +++++++++++++++++++++--------
-> > >  1 file changed, 21 insertions(+), 8 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > index 2d211661952e..1a2abd0154c6 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > @@ -476,11 +476,14 @@ static void __do_ffa_mem_xfer(const u64 func_id,
-> > >  	DECLARE_REG(u32, fraglen, ctxt, 2);
-> > >  	DECLARE_REG(u64, addr_mbz, ctxt, 3);
-> > >  	DECLARE_REG(u32, npages_mbz, ctxt, 4);
-> > > +	u32 offset, nr_ranges, checked_offset, em_mem_access_off;
-> > >  	struct ffa_mem_region_attributes *ep_mem_access;
-> > >  	struct ffa_composite_mem_region *reg;
-> > >  	struct ffa_mem_region *buf;
-> > > -	u32 offset, nr_ranges, checked_offset;
-> > >  	int ret = 0;
-> > > +	size_t mem_region_len = !FFA_MEM_REGION_HAS_EP_MEM_OFFSET(hyp_ffa_version) ?
-> > > +		offsetof(struct ffa_mem_region, ep_mem_offset) :
-> > > +		sizeof(struct ffa_mem_region);
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
-While talking with Vincent about this change, we agreed that it would be
-easier to introduce a helper that will get the size of the struct
-ffa_mem_region which is different based on the ff-a version.
+--=-6EKfe1SEMF8EoHczYedx
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This would hopefully increase the readability of this. The description
-of the struct ffa_mem_region can be found in (Table 5.19: Lend, donate or
-share memory transaction descriptor) from DEN0077A.
+On Mon, 2026-06-22 at 13:07 +0200, Thomas Gleixner wrote:
+> On Mon, Jun 22 2026 at 09:55, David Woodhouse wrote:
+> > We ended up with ktime_get_snapshot_id() also supporting CLOCK_BOOTTIME
+> > and CLOCK_MONOTONIC_RAW, but not get_device_system_crosststamp().
+> > Should we make that consistent?
+>=20
+> Maybe. The BOOTTIME support is only there for that ARM64 hyper trace muck=
+,
+> but has no other relevance.
+>=20
+> MONORAW is there for the PTP EXTENDED IOCTL, but with PRECISE the
+> snapshot already contains the raw value and you'd have to prevent the
+> historical adjustment part for RAW. So I don't see the actual value, but
+> I don't have a strong opinion either.
 
-I will spin a new version to address this and collect the review tags.
+Yeah, I'm not sure I see the need for it; it's just the consistency
+thing that slightly bothered me once I had them both in my sights doing
+the snapshot_ntp_error() thing in both.
 
-> > >  
-> > >  	if (addr_mbz || npages_mbz || fraglen > len ||
-> > >  	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-> > > @@ -488,8 +491,7 @@ static void __do_ffa_mem_xfer(const u64 func_id,
-> > >  		goto out;
-> > >  	}
-> > >  
-> > > -	if (fraglen < sizeof(struct ffa_mem_region) +
-> > > -		      sizeof(struct ffa_mem_region_attributes)) {
-> > > +	if (fraglen < mem_region_len + ffa_emad_size_get(hyp_ffa_version)) {
-> > 
-> > Can't we replace mem_region_len with ffa_mem_desc_offset()? that pretty much
-> > looks like the same thing.
-> > 
-> 
-> We can't because `ffa_mem_desc_offset` dereferences struct
-> ffa_mem_region to extract ep_mem_offset as per the latest updates. 
-> 
-> > 
-> > >  		ret = FFA_RET_INVALID_PARAMETERS;
-> > >  		goto out;
-> > >  	}
-> > > @@ -508,8 +510,13 @@ static void __do_ffa_mem_xfer(const u64 func_id,
-> > >  	buf = hyp_buffers.tx;
-> > >  	memcpy(buf, host_buffers.tx, fraglen);
-> > >  
-> > > -	ep_mem_access = (void *)buf +
-> > > -			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-> > > +	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-> > > +	if ((u64)em_mem_access_off + ffa_emad_size_get(hyp_ffa_version) > fraglen) {
-> > 
-> > This check looks like ffa_mem_desc_offset() with count to 1.
-> > 
-> >
-> > > +		ret = FFA_RET_INVALID_PARAMETERS;
-> > > +		goto out_unlock;
-> > > +	}
-> > > +
-> > > +	ep_mem_access = (void *)buf + em_mem_access_off;
-> > >  	offset = ep_mem_access->composite_off;
-> > >  	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
-> > >  		ret = FFA_RET_INVALID_PARAMETERS;
-> > > @@ -574,9 +581,9 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
-> > >  	DECLARE_REG(u32, handle_lo, ctxt, 1);
-> > >  	DECLARE_REG(u32, handle_hi, ctxt, 2);
-> > >  	DECLARE_REG(u32, flags, ctxt, 3);
-> > > +	u32 offset, len, fraglen, fragoff, em_mem_access_off;
-> > >  	struct ffa_mem_region_attributes *ep_mem_access;
-> > >  	struct ffa_composite_mem_region *reg;
-> > > -	u32 offset, len, fraglen, fragoff;
-> > >  	struct ffa_mem_region *buf;
-> > >  	int ret = 0;
-> > >  	u64 handle;
-> > > @@ -599,8 +606,14 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
-> > >  	len = res->a1;
-> > >  	fraglen = res->a2;
-> > >  
-> > > -	ep_mem_access = (void *)buf +
-> > > -			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-> > > +	em_mem_access_off = ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
-> > > +	if ((u64)em_mem_access_off + ffa_emad_size_get(hyp_ffa_version) > fraglen) {
-> > 
-> > ditto. ffa_mem_desc_offset()
-> > 
-> > > +		ret = FFA_RET_INVALID_PARAMETERS;
-> > > +		ffa_rx_release(res);
-> > > +		goto out_unlock;
-> > > +	}
-> > > +
-> > > +	ep_mem_access = (void *)buf + em_mem_access_off;
-> > >  	offset = ep_mem_access->composite_off;
-> > >  	/*
-> > >  	 * We can trust the SPMD to get this right, but let's at least
-> > > -- 
-> > > 2.54.0.1136.gdb2ca164c4-goog
-> > > 
-> 
-> Thanks,
-> Sebastian
+--=-6EKfe1SEMF8EoHczYedx
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYyMjEyMzQx
+NlowLwYJKoZIhvcNAQkEMSIEIB+3urY2MjctnpR/OpqCdn7mvd9vqdj4/ootPjt/Ai1nMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAssYZ4UDpEnTV
+s3rZaGE8mRxgbvqJCOi/smjAhp6aHAKcGYm+ozmEj72IL2lYgZIpI9IN6V+AkmF90zC+L2ub3qcs
+pboHownk1/tCFVU1Nhlh0GAbNUe9TTtc0IIuMmjmo/VUHpUtDtk5082qNOauX0Q8Dpcj/ywAlg1c
+1dyvvOFLC39Ze43VY0ySfpP8P51sOyKYfP85S37cd1VeXSgPXBqDHc8LFCn/u3XklzAbt112+m+p
+eFna1GI4Zxw3wHsOM4T6sPPTT2rH+CQ8K89huOafMOzvauhtU3tvwHGm3nqNSj59hof2nUUbA4tN
+47tAjMFxQHp+3jWbmLkPqkwVywzkJFkVFPke9zPFoy9a9Wlyg2cD/tLbDIQ0IaSndKiwiJrwX2Yo
+VDvEj48PLt2mg/bDBoyOXY1wCxkk0SHCDy7kR7NW/JdOLqf5LJ2F8E/PeVVE1SMFJYWQf7/OH2nY
+kw20InbcZCvOHDDfT12oc8zrqqk7wHJve2U3k0p1Uy8pDjJHofvqhT2dL/bIjaYVkGF02cLDqP8W
++ExJ9dHq9+07qwc4OuRyn106e1/9Ax+zahtBPzN6Oe/YRATjN9uRrmH0hk1HU4WXrqD6cidV7Gp6
+zTHz3K9+hlqJ7siOKRP2sq4GF13lU4WgvfDpfxWx1Eoeqd7Ri90F0us+Lc8OweIAAAAAAAA=
+
+
+--=-6EKfe1SEMF8EoHczYedx--
