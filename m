@@ -1,223 +1,164 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9F5349AE6
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 19:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D330283FE6
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 19:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782155233; cv=none; b=fRdDEpbCB46nVKjXoBTBnqOm6W8TNDNaYWxbh8B58P8B17RTLnAv+pKfhEQx4N5dePuY+uQWIz/hmQNkAlr3+tJThSA5yB24gJHvVBUvFRtrO4VrIF7DzFad76FseO25fyRw99z8lt0UQ65IlDgQsCGvwOkMQAY9U9OeWIvnypc=
+	t=1782156064; cv=none; b=rtfwifjTLlmyLNwjdkQy1jxLbgBv+q2V+64a+8mygqKNsLTAJT/KkkWSKYJO+T7/RRuFmX9HTbCVVQ1tVRecaa1qF9Ut14KWbXTR/labX8GFETLATlqUr+bJn9EmNmOv6oJPuH6qqkqVxo1Yt/h+Ja4rKvMnqlwNXErMi1jtQ1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782155233; c=relaxed/simple;
-	bh=Uydph5RRzoGZrnJ+RHbGdYqpI5UdO5G/DexLf26YrE4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Obey1Bg4cpwMAO2b0YS7F2Lal4sEJoGrElJ6BfFk6U4cBNRgZ1yEaCb9Ot4LWll69pGM/UnP8Pi8iBlaDxWBL1wXtfYehHIPWrC+B5ummk4GdR42InWTNw13rYRqNAZfz/h9r6GAjY0W/F4GsN5cOxBNm1E9+c87B/5aeeJqrGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ukkLvB7X; arc=none smtp.client-ip=91.218.175.181
+	s=arc-20240116; t=1782156064; c=relaxed/simple;
+	bh=yYfFsnpbroLaEhyucoJypWm8v4a6TEOgyaGRt3YJf+M=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Rmqp3WgagadHy93x0ILHaVHSqIcsuqp8RL0iYCEIUUuPur1hB84snxxXEdWrdMv56AB6Yh7//Bcl9+SOz91Gi8haGdHgE/jENthlNbILjvd5Hurobgf2TxjO757/zQ+Zcz8dNCyH65gj7iBs5D3QUpVDmBd02w9j9jgUk6Swp4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=thZnMHAA; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ukkLvB7X"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="thZnMHAA"
+Content-Type: text/plain; charset=utf-8
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782155229;
+	t=1782156061;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=H/ptLYDoNYECHV8Av4vKOACJyHkEJSNp/4xAFTlNvYU=;
-	b=ukkLvB7XmLFD+E8YKhTqcZli2nlA0iadBQfzNjh2oOCZmaHjboqos1B9yGGBJMNZtuMCvp
-	B6NZV1Fl6iWvGbIhTO0lS8t+OuuQ0svpobXhcjIZzEEcUL24/aXJkpL4c4rcv37f6UD0WM
-	f1oF+UmZgxkBjjCCQq0hsSsK3VHCP5A=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Christoffer Dall <christoffer.dall@linaro.org>,
-	Victor Kamensky <victor.kamensky@linaro.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: arm64: selftests: Add MMIO sign-extending load test
-Date: Mon, 22 Jun 2026 20:07:01 +0100
-Message-Id: <20260622190701.2039766-3-fuad.tabba@linux.dev>
-In-Reply-To: <20260622190701.2039766-1-fuad.tabba@linux.dev>
-References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+	bh=yYfFsnpbroLaEhyucoJypWm8v4a6TEOgyaGRt3YJf+M=;
+	b=thZnMHAAAap0EUYTJma5A1H88zx1n6ZWFnHEIO6ucWz+W32Io8YxjzXv5OhoGU+fDrMwGG
+	XM/MhOxN6hSOjdF6JlG9fidijvXdm9iUcOU7PYH1D7Y6QCFmheNz89K5XVuc7m0en/yhj8
+	aCmyBXoHuLhi+qy1wfizMYidMeDdGl8=
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (1.0)
+Subject: Re: Sashiko review emails to the list
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Roman Gushchin <roman.gushchin@linux.dev>
+In-Reply-To: <ajlopihdkRALO-do@kernel.org>
+Date: Mon, 22 Jun 2026 12:20:48 -0700
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, Vincent Donnefort <vdonnefort@google.com>,
+ KVMARM <kvmarm@lists.linux.dev>
+Message-Id: <DC6D08B0-9CB2-48B9-BF1C-4300C095F2B6@linux.dev>
+References: <ajlopihdkRALO-do@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-Add a test for sign-extending MMIO loads (LDRSB, LDRSH, LDRSW) into Xt
-and Wt destinations, with and without the sign bit set. The host supplies
-the MMIO data and checks the guest register holds the sign-extended value.
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/mmio_sign_ext.c       | 133 ++++++++++++++++++
- 2 files changed, 134 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 9118a5a51b89f..0f5803a1092e1 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -171,6 +171,7 @@ TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
- TEST_GEN_PROGS_arm64 += arm64/hypercalls
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
-+TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
- TEST_GEN_PROGS_arm64 += arm64/psci_test
- TEST_GEN_PROGS_arm64 += arm64/sea_to_user
-diff --git a/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-new file mode 100644
-index 0000000000000..d1efbccd1603a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-@@ -0,0 +1,133 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * mmio_sign_ext - Test sign-extending MMIO load emulation (LDRSB/LDRSH/LDRSW)
-+ *
-+ * Copyright (c) 2026 Google LLC
-+ */
-+
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define MMIO_ADDR	0x8000000ULL
-+
-+struct mmio_test {
-+	const char *name;
-+	uint64_t data;
-+	uint8_t len;
-+	uint64_t expected;
-+};
-+
-+/* Paired 1:1, in order, with the loads in guest_code() below. */
-+static const struct mmio_test tests[] = {
-+	/* LDRSB Xt: byte sign-extended to 64 bits */
-+	{ "LDRSB Xt 0xFF",	0xFF,		1, 0xFFFFFFFFFFFFFFFFULL },
-+	{ "LDRSB Xt 0x7F",	0x7F,		1, 0x7FULL },
-+
-+	/* LDRSB Wt: byte sign-extended to 32 bits, upper 32 bits zeroed */
-+	{ "LDRSB Wt 0xFF",	0xFF,		1, 0xFFFFFFFFULL },
-+	{ "LDRSB Wt 0x7F",	0x7F,		1, 0x7FULL },
-+
-+	/* LDRSH Xt: halfword sign-extended to 64 bits */
-+	{ "LDRSH Xt 0x8001",	0x8001,		2, 0xFFFFFFFFFFFF8001ULL },
-+	{ "LDRSH Xt 0x7FFF",	0x7FFF,		2, 0x7FFFULL },
-+
-+	/* LDRSH Wt: halfword sign-extended to 32 bits, upper 32 bits zeroed */
-+	{ "LDRSH Wt 0x8001",	0x8001,		2, 0xFFFF8001ULL },
-+	{ "LDRSH Wt 0x7FFF",	0x7FFF,		2, 0x7FFFULL },
-+
-+	/* LDRSW Xt: word sign-extended to 64 bits (no Wt form) */
-+	{ "LDRSW Xt 0x80000001", 0x80000001,	4, 0xFFFFFFFF80000001ULL },
-+	{ "LDRSW Xt 0x7FFFFFFF", 0x7FFFFFFF,	4, 0x7FFFFFFFULL },
-+};
-+
-+static void guest_code(void)
-+{
-+	uint64_t val;
-+
-+	asm volatile("ldrsb %0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsb %0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsb %w0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsb %w0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsh %0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsh %0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsh %w0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsh %w0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsw %0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	asm volatile("ldrsw %0, [%1]" : "=r"(val) : "r"(MMIO_ADDR) : "memory");
-+	GUEST_SYNC(val);
-+
-+	GUEST_DONE();
-+}
-+
-+static void handle_mmio(struct kvm_run *run, const struct mmio_test *t)
-+{
-+	TEST_ASSERT_EQ(run->mmio.phys_addr, MMIO_ADDR);
-+	TEST_ASSERT(!run->mmio.is_write, "Expected MMIO read for %s", t->name);
-+	TEST_ASSERT_EQ(run->mmio.len, t->len);
-+
-+	memset(run->mmio.data, 0, sizeof(run->mmio.data));
-+	/* Works because arm64 KVM hosts are always little-endian. */
-+	memcpy(run->mmio.data, &t->data, t->len);
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	unsigned int i;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	virt_map(vm, MMIO_ADDR, MMIO_ADDR, 1);
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(tests));
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		const struct mmio_test *t = &tests[i];
-+
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
-+
-+		handle_mmio(vcpu->run, t);
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			TEST_ASSERT_EQ(uc.args[1], t->expected);
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		default:
-+			TEST_FAIL("Unexpected ucall for %s", t->name);
-+		}
-+
-+		ksft_test_result_pass("%s\n", t->name);
-+	}
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_DONE, "Expected UCALL_DONE");
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_finished();
-+}
--- 
-2.39.5
+> On Jun 22, 2026, at 9:54=E2=80=AFAM, Oliver Upton <oupton@kernel.org> wrot=
+e:
+>=20
+> =EF=BB=BFOn Fri, Jun 19, 2026 at 11:05:57AM -0700, Roman Gushchin wrote:
+>>=20
+>>>> On Jun 19, 2026, at 9:45=E2=80=AFAM, Oliver Upton <oupton@kernel.org> w=
+rote:
+>>>=20
+>>> =EF=BB=BFHey,
+>>>=20
+>>>> On Fri, Jun 19, 2026 at 03:19:05PM +0100, Fuad Tabba wrote:
+>>>> Hi folks,
+>>>>=20
+>>>> I really like Sashiko and find it very useful. It's flagged real bugs
+>>>> in series I and others have posted to the list (e.g. [1][2][3]), and I
+>>>> run it locally before sending, which has saved me a few respins.
+>>>>=20
+>>>> That said, it's been posting a lot lately, so it seemed worth asking
+>>>> how the review emails to the list are working out, and whether we
+>>>> should change anything.
+>>>=20
+>>> So this is entirely my fault since I added the email configuration for
+>>> the kvmarm list. Sashiko has been finding some truly nasty bugs, posting=
 
+>>> on-list is the easiest way to get attention from the right folks to get
+>>> things fixed.
+>>>=20
+>>> With that being said, the signal to noise ratio hasn't been ideal.
+>>>=20
+>>>> These fixes will take a while to land, so the question is what to do
+>>>> meanwhile. Some options, and surely others:
+>>>>=20
+>>>> - Leave it as-is while the fixes propagate.
+>>>> - Stop the emails but keep the reviews on sashiko.dev, so people can
+>>>> look rather than have them pushed.
+>>>> - Disable the emails until the noise is down to a reasonable level,
+>>>> then re-enable.
+>>>=20
+>>> This sounds like the right approach. I'd like to re-enable emails once
+>>> we're happy with the quality of reviews.
+>>=20
+>> =46rom my perspective there are 3 main factors affecting the quality of r=
+eviews:
+>> 1) llm model capabilities. we have little control here, but it=E2=80=99s r=
+easonable to expect that things will get better.
+>> 2) sashiko=E2=80=99s common code/harness. we=E2=80=99re improving it, but=
+ I=E2=80=99m not sure we have a lot of room left here, probably some. also, t=
+here are many tradeoffs to make, e.g. if we start verifying each issue separ=
+ately, it almost certainly will improve signal/noise, but it will require wa=
+y more tokens and will be slower.
+>> 3) developing per-subsystem prompts. there is a lot of potential here, bu=
+t this is where we mostly rely on maintainers and developers.
+>>=20
+>> Also not trying to push back on the decision, but I think it=E2=80=99s wo=
+rth asking what is a reasonable level?
+>> I tried to measure the true positive rate several times based on human fe=
+edback and it always was at least ~80% (and usually more for critical/high s=
+everity bugs).
+>> And I=E2=80=99m afraid that it won=E2=80=99t be ~100% without compromisin=
+g on the ability to find bugs. The reality is that there is a significant pe=
+rcentage of issues which are not exactly black and white and even people don=
+=E2=80=99t necessarily agree if it=E2=80=99s an issue or not. Also there is a=
+ non-trivial amount of cases when ai findings are incorrectly dismissed by h=
+umans.
+>>=20
+>> I=E2=80=99m not trying to pretend it=E2=80=99s perfect (it=E2=80=99s not)=
+, and I certainly expect it to be better going forward (and I=E2=80=99m work=
+ing on it),
+>> but the point is that we might not see _dramatic_ improvements going forw=
+ard simple because there is no room left for it,
+>> it=E2=80=99s more like a long tail of grey zone issues.
+>=20
+> Marc touched on it as well, but the architecture hallucinations have
+> been pretty difficult to unwind since I don't expect most contributors
+> to know all the ins and outs of the Arm ARM.
+>=20
+> I'm not terribly worried about this, especially since Fuad is actively
+> working to improve the review prompts / context.
+
+Awesome, thanks!
+
+>=20
+>>> On another note: Roman, is it possible to separately report pre-existing=
+
+>>> issues from findings in a patch? Maintainers have a higher likelihood of=
+
+>>> caring about these than individual contributors anyway.
+>>=20
+>> It=E2=80=99s certainly possible, but how exactly do you see it?
+>>=20
+>> It=E2=80=99s already somewhat separated (separate counters, separate list=
+ on top of each email).
+>> I don=E2=80=99t want to stop reporting them completely (but we can discus=
+s it), because it produces
+>> a constant stream of fixes in the upstream kernel (in hundreds already).
+>>=20
+>> I plan to improve it to e.g. not report multiple times within the same pa=
+tchset.
+>=20
+> Sorry, I was a bit vague.
+>=20
+> Including pre-existing issues inline with the reviews is fine by me.
+> What I was actually hoping for is a way to view all the existing bugs in
+> a single place, either as a summary email on a regular cadence or a view
+> on the webpage.
+>=20
+> We wont have enough cycles to go through every Sashiko review so I'm
+> worried that some bugs will be missed otherwise.
+
+I=E2=80=99m working on something like this and it will be available soon-ish=
+.
+
+Thanks=
