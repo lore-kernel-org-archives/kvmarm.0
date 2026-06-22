@@ -1,82 +1,114 @@
-Received: from confino.investici.org (confino.investici.org [93.190.126.19])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2349D23E342
-	for <kvmarm@lists.linux.dev>; Sun, 21 Jun 2026 21:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D771D7E41
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jun 2026 04:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782077527; cv=none; b=hwp5FRCCcMqz9CQ/FfRf7DYb4auXD+ccf+NRz3aBebVazTXEy3SbnbWTip2mTf1hQHhkS+Kxp+05FZU3DxzBYozy4aOMv5GgKG78Wo+5i641y2AycjNJh7JDd+wpjI0gi3kLy8AcQo8mvgptKVhrCr4QMiwxURoRnSFcJwXVX3g=
+	t=1782100939; cv=none; b=Z1zeDpzxJ93MgQX5mN+okhK3R3wk02qV7HynVCYhvMr6NVFQaR7g7jAYgot3zvJIP6W+HiCNqpV0xvExn67pX60LbVOVqoOFmL2OlIq3fp6vadrPIDa2Moxer0vwLIw8BwWCTPHvpnUpCY38ZtaRNu7XGaW9TVD65tXJahEPLqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782077527; c=relaxed/simple;
-	bh=SDLb1cS2N91skoPPJ3reHRFoH9AJINaVn07sOl7wU2k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WEKFZNeBCvS2jqzv1+QVmvgGgNL4NkamhxOQRTuhZ8fGktL53GXOAtBs1/q7Z31lYic3FnXsPNYjBxqnVGD/bCgF60ApD2j8Ga+UPU5I1lw50VzHS3flwZpdAAmXvwx9+Ue5yrgDM2t7mLpG6XZ6FjeTOSafY1mVKxfMZK7yg2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=CTIHjOBg; arc=none smtp.client-ip=93.190.126.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
+	s=arc-20240116; t=1782100939; c=relaxed/simple;
+	bh=CD5Ph06CPaXxHfHphhlnVu45e1oyKw0c/V8mkUOTLmo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oVLLygM834BZ8cHOwsi95a1yOmF9j+pOCjFDamlKLTk4MLHkkEEdjFAmGwXgcCe7XGMmsf6VN0ko/nCyfnsE/cpGu5RN/dx88xmSE1Lvk/n5WQUlQvlO8vN4Rwhe0Yuo1oJ4Aph3svVAXOz2aWdJHogl42jUfu52zSy5m2mdsaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wEe9oYFq; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="CTIHjOBg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
-	s=stigmate; t=1782077522;
-	bh=/Ryzop9cHyfud4/d7uNpvbJV5dfV4NrntLAoHfM5aDQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=CTIHjOBgmIM1IBldz7lPxD44cMRJ6LYDEn6J2SRREEKJVqH2xEkPoRjUrzS+Is18i
-	 ojjobDstlMpraaUwTikYGe6DaLK1MITg/DVBKsWzLaMdiizZ5UtLZnT8nCEHyuwJxf
-	 9r0QxbsiAqJdiOMtxP0LLFvPf/vaIYci/O9zCaDM=
-Received: from mx1.investici.org (unknown [127.0.0.1])
-	by confino.investici.org (Postfix) with ESMTP id 4gk4KZ4K5Jz10y9;
-	Sun, 21 Jun 2026 21:32:02 +0000 (UTC)
-Received: by mx1.investici.org (Postfix) id 4gk4KY65pSz10y6;
-	Sun, 21 Jun 2026 21:32:01 +0000 (UTC)
-From: Bradley Morgan <include@grrlz.net>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Bradley Morgan <include@grrlz.net>
-Subject: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
-Date: Sun, 21 Jun 2026 21:31:55 +0000
-Message-ID: <20260621213155.6019-1-include@grrlz.net>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wEe9oYFq"
+Message-ID: <7575a845-a542-4b16-b512-aec3126f97f3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782100935;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n8KweA+GOAzNbdnfxjRKoY6yg21KoyRjb/aSyCQSquM=;
+	b=wEe9oYFqc2SXE/qfiBwSL01qIhMH8Mll+m9cXpnpcrLyCZ7siHRJrwc+6qSfFbgkZMBofp
+	Xb2h6NPuQVqokRGgpBt+y+HNkLguAg3pepuPJvpaBDPgJi18FfHL8DfvnzpRnxzQXKxGd2
+	EnFAj0RHdwoh2rouVemdtWnY6jVDHt4=
+Date: Mon, 22 Jun 2026 12:02:05 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] KVM: selftests: fix steal_time for arm64
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Jiakai Xu <xujiakai2025@iscas.ac.cn>, Shuah Khan <shuah@kernel.org>,
+ Andrew Jones <andrew.jones@oss.qualcomm.com>,
+ Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>
+References: <20260504112808.21276-1-sebott@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20260504112808.21276-1-sebott@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Protected guest faults charge long term pins to the VM's mm. Teardown
-can run later from file release, where current->mm may be unrelated.
+Hi Sebastian,
 
-Drop the charge from kvm->mm instead.
+On 5/4/26 7:28 PM, Sebastian Ott wrote:
+> Fix the following failure to the steal_time test on arm64 by making
+> the timer address known to the guest.
+> 
+> ==== Test Assertion Failure ====
+>   steal_time.c:229: !ret
+>   pid=18514 tid=18514 errno=22 - Invalid argument
+>      1  0x000000000040252f: check_steal_time_uapi at steal_time.c:229 (discriminator 20)
+>      2   (inlined by) main at steal_time.c:537 (discriminator 20)
+>      3  0x0000ffffa23d621b: ?? ??:0
+>      4  0x0000ffffa23d62fb: ?? ??:0
+>      5  0x0000000000402b6f: _start at ??:?
+>   KVM_SET_DEVICE_ATTR failed, rc: -1 errno: 22 (Invalid argument)
+> 
+> Fixes: 40351ed924dd ("KVM: selftests: Refactor UAPI tests into dedicated function")
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/steal_time.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+> index 7df2bc8eec02..76fcdd1fd3cb 100644
+> --- a/tools/testing/selftests/kvm/steal_time.c
+> +++ b/tools/testing/selftests/kvm/steal_time.c
+> @@ -220,6 +220,8 @@ static void check_steal_time_uapi(void)
+>  	};
+>  
+>  	vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
+> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, 1, 0);
 
-Fixes: 4e6e03f9eadd ("KVM: arm64: Hook up reclaim hypercall to pkvm_pgtable_stage2_destroy()")
-Signed-off-by: Bradley Morgan <include@grrlz.net>
----
- arch/arm64/kvm/pkvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This leads to the following failure when the host page size is greater than
+the guest's:
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 053e4f733e4b..428723b1b0f5 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -352,7 +352,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
- 		page = pfn_to_page(mapping->pfn);
- 		WARN_ON_ONCE(mapping->nr_pages != 1);
- 		unpin_user_pages_dirty_lock(&page, 1, true);
--		account_locked_vm(current->mm, 1, false);
-+		account_locked_vm(kvm->mm, 1, false);
- 		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
- 		kfree(mapping);
- 	}
--- 
-2.53.0
+[root@localhost kvm]# getconf PAGESIZE
+16384
+[root@localhost kvm]# ./steal_time 
+Random seed: 0x6b8b4567
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+TAP version 13
+1..4
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='660'
+==== Test Assertion Failure ====
+  lib/kvm_util.c:991: vm_adjust_num_guest_pages(vm->mode, npages) == npages
+  pid=873 tid=873 errno=0 - Success
+     1	0x0000000000405a27: vm_mem_add at kvm_util.c:991
+     2	0x000000000040241f: check_steal_time_uapi at steal_time.c:223 (discriminator 7)
+     3	 (inlined by) main at steal_time.c:539 (discriminator 7)
+     4	0x00007fff8b57af3b: ?? ??:0
+     5	0x00007fff8b57b007: ?? ??:0
+     6	0x0000000000402b6f: _start at ??:?
+  Number of guest pages is not compatible with the host. Try npages=4
 
+> +	virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, 1);
+>  
+>  	st_ipa = (ulong)ST_GPA_BASE | 1;
+>  	ret = __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &dev);
+
+Thanks,
+Zenghui
