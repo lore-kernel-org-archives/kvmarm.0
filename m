@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD8B34AB14
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 19:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46791208D0
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 19:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782241438; cv=none; b=cij9a6zr4znGxvcUXCRrY1BbRyzbVNUg+diM7YLCa6xJ7dO2DHVBuZWFNuo6eUCHE50tB42IXV09XWMsfeS5NsyIq3462ZTuFvthyVrIImty0qvaCxBVjJRQKrVz8DZI7v1W0pBUXavD9SjaZwVuoSNMJZ5QIBKOgRVZMn6Vp9I=
+	t=1782241520; cv=none; b=mUcJJYtUrx7aRkg0uuNN8rmfVXkRdlAxu4eKLoQ/PwawjPew/MEXFlLaRN3X2J6nygyV408eVXAALjmGDrQXrHbeB7cblmJAB3LVyBYUDZbklVFc+BiD8cIilJB6ToC9768o1wz2VeMuMISav5gaDlH/Avq2N++lbAxthA5MRDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782241438; c=relaxed/simple;
-	bh=SGHGcOPyAq1blbQ7fFsN/FO1zlkr4R1ESVECtZ+CC9o=;
+	s=arc-20240116; t=1782241520; c=relaxed/simple;
+	bh=NtQ2UtyBzlrlraqkeHj6O8nUEuYp3Ixo3hkgLPKeZyg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=lJ3MSU+1T4zFcvivqBDvSibW7rKnzuC3XR7ftCsRSpaaQkjHVQtxXP/4H15k1Ud5XWpwA2Vd0NGoStVn5qclXkSn8H2DeLfKJehuQ6FRoD+nCzb1JeD07IMXAoeQte50NIghuQ5aMFy15Wuc0dEzbhd8eRyNmTVieUXGW79QuCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S74csimO; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=S9xKMKXiJD8mIiiYC3HSP6OKCEt+imvVPS8A5ETEwoYM8gWNUK+eQ/jViZMjzxhXo29OMmpwk9s942FhceGrcgILHBvl1b+x/9661fAg/MOcayU60Y9N4aGSd5bv36y8OJFfhFSCom9sv9tnJ1p/3pNpdRDOjYIyH+pXYi731F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5WkCVhf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S74csimO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 335231F000E9;
-	Tue, 23 Jun 2026 19:03:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5WkCVhf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CECD71F000E9;
+	Tue, 23 Jun 2026 19:05:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782241437;
-	bh=yE7tPFMXA3Yr3ewa3XXlz6DE0QuzE5jQcJ32OvzgfeE=;
+	s=k20260515; t=1782241519;
+	bh=4O53LxH82MwrEmqp7yBm+47KdOouq6qvNfjzqt0doZM=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=S74csimOPyPynBDmiU7ErTp6uGPq148DXLK2BU7qU4fL6F//xQmahGFC+feeXjM8S
-	 jsLrmK6LQAZH/E9fjv4oSwWWwZhSv6BBUZnd5IoNY/LetnVkoN/U3skugblfs+0/Bx
-	 lSnQ1Lcrt9WmGacS1Y+zzbFM424VqRUJwmUH/lUNJmJCpZiFFlfkgL8zuRe8d1vkeC
-	 cqnWwpQ0uGL4DJOTAGAcb5Z3WvU24RmwfPxgqn7RgVO1v+wbWToJkjAc1gyP/Cm/Iy
-	 Yr4zOZnQbHq06iIZbpgJD8WVj+cNsfutP+XCDSY5Wnr/rkSDc5vWK4RCiYH6ClftKx
-	 1InWQ+Z93Y7eA==
+	b=F5WkCVhfLpHAd/rBeuHmo3/FiUF3ZLLrDlITGqwKMs1BfIoEaRmuMs7ZP6rhmWj+5
+	 aR+WqC9ylIGcVDCuuS1Hqgz+Khl/LeyE59ytkF9ILuaq4xmJk+i5Qn0Tia2ekKtu/8
+	 46LRYEsx12Kmno/y0NntwJTyV6y2Ov5lAL2UQW9omz1L6/j2nMjpCVWCanATJJfb2m
+	 ko7yRKVm4nCxEsVwXs/qq+Lcx39brdLUBO0bQcQPIX9shwiy/qy0WSr07hb/M6OL5Y
+	 WY7NilG2uJvTC/Doe9KPF/YU3bhov/C7MOPpKTkGkvpNXoNcCNftKX6bioIqhdPX1S
+	 ekYikW6nub6sg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 07/22] KVM: arm64: nv: Set dirty state at stage-2
+Subject: Re: [PATCH 18/22] KVM: arm64: nv: Set access flag on table
+ descriptors at stage-2
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Oliver Upton" <oupton@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260623184201.1518871-8-oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20260623184201.1518871-19-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
- <20260623184201.1518871-8-oupton@kernel.org>
+ <20260623184201.1518871-19-oupton@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2026 19:03:56 +0000
-Message-Id: <20260623190357.335231F000E9@smtp.kernel.org>
+Date: Tue, 23 Jun 2026 19:05:18 +0000
+Message-Id: <20260623190518.CECD71F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,53 +47,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] The kvm_s2_trans struct retains stale descriptor values and perm=
-issions because it is populated prior to handle_desc_update(), causing KVM =
-to unnecessarily force a second VM exit for write faults on clean DBM pages.
+- [High] Stage-2 table descriptors fail to generate an Access Flag fault wh=
+en VTCR_EL2.HAFT =3D=3D 1, VTCR_EL2.HA =3D=3D 0, and the descriptor's AF bi=
+t is 0.
 --
 
-commit c42a40795b5eef86805c06b6623a0ccb0c1d888d
+commit 7d14ee3ad8d74a4b9734d83c712bb19ae89c1090
 Author: Oliver Upton <oupton@kernel.org>
 
-KVM: arm64: nv: Set dirty state at stage-2
-   =20
-Set the dirty state on descriptors at stage-2 for write accesses when
-DBM is set.
+KVM: arm64: nv: Set access flag on table descriptors at stage-2
+
+This commit implements access flag updates on stage-2 table descriptors for
+nested virtualization, as required by FEAT_HAFT.
 
 > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index a70af3b3f05db..e5a407fc0880f 100644
+> index 2408d604a1e18..6f540d3481d5a 100644
 > --- a/arch/arm64/kvm/nested.c
 > +++ b/arch/arm64/kvm/nested.c
 [ ... ]
-> @@ -422,6 +430,20 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu,=
+> @@ -424,6 +428,10 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu,=
  struct kvm_walk_access *acc
->  	compute_s2_permissions(vcpu, wi, &ws, out);
->  	out->level =3D ws.level;
->  	out->desc =3D ws.desc;
+>  			return 1;
+>  		}
+> =20
+> +		ret =3D handle_desc_update(vcpu, wi, &ws, out, access);
+> +		if (ret)
+> +			return ret;
 > +
-> +	ret =3D handle_desc_update(vcpu, wi, &ws, out, access);
 
-[Severity: Medium]
-Will this result in KVM mapping the shadow PTE read-only on the first fault,
-causing a second VM exit?
+[Severity: High]
+When VTCR_EL2.HAFT =3D=3D 1 but VTCR_EL2.HA =3D=3D 0, and the table descrip=
+tor's AF
+bit is 0, will this silently bypass the required Access Flag fault?
 
-Because compute_s2_permissions() calculates the out->dirty state based on t=
-he
-pre-update descriptor, it seems out->dirty will remain false even if
-handle_desc_update() successfully sets the dirty bit in guest memory.
+If wi->haft evaluates to false (such as when HA =3D=3D 0), handle_desc_upda=
+te()
+returns 0 without updating the descriptor. The walk then proceeds to the ne=
+xt
+level without checking if the AF bit is 0, which misses the injection of the
+architectural fault.
 
-When the walk returns, KVM's MMU consumes this in adjust_nested_fault_perms=
-()
-and strips KVM_PGTABLE_PROT_W, causing the L2 guest to retry the write and
-immediately trigger a second VM exit.
+Should there be an explicit check for the AF bit here similar to the one at
+the end of the walk for leaf entries, conditioned on VTCR_EL2.HAFT?
 
-Should out->dirty be updated to reflect the newly set dirty bit after
-handle_desc_update() succeeds?
-
-> +	if (ret)
-> +		return ret;
-[ ... ]
+>  		base_addr =3D ws.desc & GENMASK_ULL(47, wi->pgshift);
+> =20
+>  		ws.level +=3D 1;
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623184201.1518=
-871-1-oupton@kernel.org?part=3D7
+871-1-oupton@kernel.org?part=3D18
