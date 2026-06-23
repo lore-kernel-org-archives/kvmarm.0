@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396B838D6A9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D7239281F
 	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782240130; cv=none; b=KpujkglsY3oa3x2CA2Ko6Z29mTzG5M1P0IRJAHvJ7f88s3VtWIa6VGbsChKfYZYeRXXICBCcnly2Iks+eARVtc/+34QTSjlFNL0Jlw84r/oaDAeOMNRQpFRDxJfAabFO13wk5ARp6o4rmZOjeew5wPNZllcYHjEd3xcmovjcylo=
+	t=1782240130; cv=none; b=nMPbse+a/Y/nERpQTcyvpdiHXAeN4bkJGfWbT6kbEsDZfeIMkp45aadOb29/Y5OQQZdsrSUmL15HQP9PsUEcrbBVo6hISslIu+Dr3RFTJmbvEQWEgmZcU6R+9z0CzbIcANAsCth/5g+1gv7GWQrijrT+TIyfwRAOZOe7C9dK72M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782240130; c=relaxed/simple;
-	bh=DVZ70FxGp+I1jNiKZPPorrHSCIPHJ5cjZu+sC3UhdVk=;
+	bh=e2L+LG5bVm5BMhgBEo9+ZR2hnjDDMTB8Xs9RrB6HaYY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AW4EAVV/P2LstI6rt5S4Gcx5oYPQ6uP7NedD0GLh7IUcGiyX5+Q/sR+Qr9hibMHgdmhxpgsyI+TQ48LkaaQfBi4vmnE/PG5V4QpT6XzoQ2yLH+N3UeBgwtC9o3kZSIw3XhiPIiE5bl9gb8nicCkMX/GLke7A2ySPU1TN0HBC5Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBDGBcPU; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=lAfhDdRJnzAN8Ju5XS7QuYWq1Sk9ymJPhd/BxmgTvzgUcvjkGuy5x2aPTGWVx/1nPPKtHLnDVQjzik6v8LxA0dvAGFBxqxKq3UDO9S3mZJzVTp2TtMWwkh0AHQFE8rr4zeW9ywmBT9TW2wUHhdQP9LXyEVLD0zNShFeldEDjz/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JbKEL/Rh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBDGBcPU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B80B1F00A3E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JbKEL/Rh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 403DF1F00ACA;
 	Tue, 23 Jun 2026 18:42:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1782240129;
-	bh=SgfWPY810Ic/5m2xddnEW4wkDjnd1fNtlRb164PWdHA=;
+	bh=RU+U+c/xAjoXTSSG4HxM6LGU6HM7xwVw9oXQ4PSem3Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=JBDGBcPU2//DkfMjUgV/u7y99f6NSM1NwHMdV9BQE2xwNqfgKDbL1+jWot9jPbgiH
-	 8h6PVsSsZwuCL3iDjVo6Q/kx8TWqMvzErn+iOHG2L1L+U5gJ1APafPsCL7lfOHoT6S
-	 kh7QhGYTmkSxr7naSpgLIPKnvP6OR7hYSrrZ6VQlMu2rfQB/dc1PxpVB4TmMzvy75w
-	 J/j4N4EOxoWCxBOMcIHGfoYXSaR5iEG/1/YzjcopwRVn0q/Ob56TTWhEmIaXWmkMSF
-	 XhKtxDztfaQEDiV23uaJE3uz9KSOOE2aZJ88lj9rqNrUl5wZMMPtbFSCJ0aZprQwL+
-	 CQhxDBkgnBhHw==
+	b=JbKEL/Rhmiqm7xMR4Eh9HeId6FJW71JZrXQxWz5unqZJwJvno4yaezThsYpsH9EN0
+	 r8PEMzYZ7NWjdQFvzJ4CCHsTDqrNfvxHmYuF0CCyhk+fLKjw/bvfnRMPreiPzF2eRr
+	 31j8RBTh6wnOGiB+Fs0+klT2kQhGeL/aMNK1PTPy5gtqWKrF0+kZQ+p8z2/9vwN6na
+	 qJhBKIYcgxqYKHua741dgI7DHFgnk2B6rGXJBphe5pw1v3xJ6d+NrTyGOztrBSUJp7
+	 G0+xWyCY+4Rj8fSjd7y4mAwkoiajF7DFUYwhdo20WxU43vIBgv9XFGOaWBrQF/82Gi
+	 iXNBy+4PEHhdw==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 18/22] KVM: arm64: nv: Set access flag on table descriptors at stage-2
-Date: Tue, 23 Jun 2026 11:41:57 -0700
-Message-ID: <20260623184201.1518871-19-oupton@kernel.org>
+Subject: [PATCH 19/22] KVM: arm64: nv: Expose FEAT_HAFT
+Date: Tue, 23 Jun 2026 11:41:58 -0700
+Message-ID: <20260623184201.1518871-20-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
@@ -49,62 +49,27 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement access flag updates on table descriptors as required by
-FEAT_HAFT.
+Both stages of translation now support the access flag on table
+descriptors, advertise the feature.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 2408d604a1e1..6f540d3481d5 100644
+index 6f540d3481d5..dc2a8b6483c2 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -133,6 +133,7 @@ struct s2_walk_info {
- 	bool		be;
- 	bool		ha;
- 	bool		hd;
-+	bool		haft;
- };
+@@ -1799,7 +1799,7 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ 		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
+ 			val &= ~ID_AA64MMFR1_EL1_VH;
  
- struct s2_walk_step {
-@@ -234,12 +235,15 @@ static bool should_set_access_flag(struct s2_walk_info *wi, struct s2_walk_step
- 	if (access->type == WALK_ACCESS_NONARCH)
- 		return false;
+-		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, DBM);
++		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, HAFT);
+ 		break;
  
--	return wi->ha;
-+	return kvm_pte_table(ws->desc, ws->level) ? wi->haft : wi->ha;
- }
- 
- static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
- 				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
- {
-+	if (kvm_pte_table(ws->desc, ws->level))
-+		return false;
-+
- 	switch (access->type) {
- 	/* R_RKMHW */
- 	case WALK_ACCESS_CMO:
-@@ -424,6 +428,10 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
- 			return 1;
- 		}
- 
-+		ret = handle_desc_update(vcpu, wi, &ws, out, access);
-+		if (ret)
-+			return ret;
-+
- 		base_addr = ws.desc & GENMASK_ULL(47, wi->pgshift);
- 
- 		ws.level += 1;
-@@ -562,6 +570,7 @@ static void setup_s2_walk(struct kvm_vcpu *vcpu, struct s2_walk_info *wi)
- 	wi->ha = vtcr & VTCR_EL2_HA;
- 	wi->be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
- 	wi->hd = wi->ha && (vtcr & VTCR_EL2_HD);
-+	wi->haft = wi->ha && (vtcr & VTCR_EL2_HAFT);
- }
- 
- int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
+ 	case SYS_ID_AA64MMFR2_EL1:
 -- 
 2.47.3
 
