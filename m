@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5541C38D3F3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8886438D6BD
 	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782240127; cv=none; b=kgxy7IhJyH5O5dAip3fW6bXYZSQjqEwmbbsLVQs8hCxXcyVtzCIULGOgArcFL5hsMsw72X5uCjsoBw56TCJOhNFVSD6bKs8dak5bHACkJ3CruH2ZcZQ020LHKDpPGxIE6caOVUDed4pTVGIOX7VTF3IIteDCnJQL9uCFNxklZC4=
+	t=1782240127; cv=none; b=TqXFX659QmRYSeNkhdwCXO8+L7GwRxAmbDgRkmGFdUL7Hn9V7H8Z8aonx76TOCZUMTueW7fPr1QvYuaemt/TsptKfUJRlFrqfjkWvX0xeZ641g5I1Qs1+LxA3RwVjgQGCc85bpe1It4x0Jxt+THLVqlA5PAv1nspfhO4cRCez5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782240127; c=relaxed/simple;
-	bh=g36SmZZOhKkBswl5j4i7g4Pbk2GSDDB3XDDOtdNuy4w=;
+	bh=Nskm2fz3M70aPzq9UmSZ1HwmWU6Ol9RUjb3R7YfL6FQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VsIrgKwbzMpPBuOEOh0pJ6p+BsVI5nVfoPVHw4Otx9IeO3VfwH75p2CjjVayHPpEzKhzBSq6BgLNJtg6v9g8Zg/cJvTkOs9YHVgARn2IVGBoELTWjRnJlvb4zmyzJa4GmxDKTYGYwXsbVgRx24Rn+yzEbNZijuR2d+p4/Zf4eAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PB6PyCMD; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=aR5Y7jvxVNiQfaYmhFGvUynVQGcrVMI04zcodafMQms20/5kqbPEbQMBgrnti6RHFpydkMOTyGuo9SXTy7o7uF3OWH0RsbFLhj+0rDOSpmOg+tG6qaJi4cpW5BTmClPOTwhxPofpUnagMTo5Rq8nzveYbh7GcAz3z43OOwFRFFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8wCYrLj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PB6PyCMD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE47F1F00A3F;
-	Tue, 23 Jun 2026 18:42:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8wCYrLj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 557701F00ACF;
+	Tue, 23 Jun 2026 18:42:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1782240126;
-	bh=pBY5M3jWWzWbYJbqTz75rFFHKh3Jk4JO+QYdK8OgyOg=;
+	bh=jdvglPtXveGFdY7L1L3/DQC1mSjBZ9+mdOlIfehpNyc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PB6PyCMDxMwT9c9YeVDSJufeHUmrxWEd4YJgrc8lWCh+nB1eIF1oEztjvlBPLqR23
-	 MPQYtlgcRZau8ac20DSNEmhMOKULnLDZESVbV2GVH6jlT5h0QCjeMowIW6X1SjSzX8
-	 5E/4wJgL4eOjksg13CK611McqT3yt9RgKP9gqRNzGqWV7ZXWbEy3d52YO7N6r8lGXd
-	 Rvbz4iUAclmB9qDOgaJvIP3GHr5GTY3wTU/8qV7UiBEcxsPL2X6+nvA9L3CZYcGaOd
-	 SrVt6u+6HbbLpg4XZSxq9x5DtrZJiOUrmBEXS01NlogZVuc301w3dHl4VE2oTQnREw
-	 KNytYii0nc3UA==
+	b=d8wCYrLjnim+c/ggPobxu9+tT+M5DvXULj5ReD0DJQK5xMaQTNA6q23/+dNkk1A/F
+	 XOxX3+ISGrtwGC5dvJ5iB2ugvKPLPgBgGdaW3dM3If4J+OKe7bRl3KX688KNzUBrpX
+	 afL+xX6Qg6XSwxu6XK59O5Hadv6cDj642Asg1IcY8jWbLy515tBer9ztSUZmMPnK/Z
+	 bLj6Qwa1eJ0TXd8BMOJOEcf8UTbNqeLGsDRTneHFE6NnCN+t0Lkca/CjsidSfz6HUa
+	 t2B0vl2Omkrcb/7C3wkTtgQ1B3MWq2A6a/zfpskrlR2QY0iL9AniIWKmSSOPCjHnnf
+	 /QXSWkcu0MTXA==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 04/22] KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
-Date: Tue, 23 Jun 2026 11:41:43 -0700
-Message-ID: <20260623184201.1518871-5-oupton@kernel.org>
+Subject: [PATCH 06/22] KVM: arm64: nv: Use a helper for stage-2 descriptor updates
+Date: Tue, 23 Jun 2026 11:41:45 -0700
+Message-ID: <20260623184201.1518871-7-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
@@ -49,89 +49,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM will soon add support for hardware dirty state management for nested
-guests. In order to emulate dirty state transitions on the guest
-desciptor, KVM will need to use read-only hardware mappings and re-walk
-the guest page tables upon taking a permission fault.
-
-Prepare by limiting shadow stage-2 and shadow VNCR translations to
-read-only for writable-clean guest translations.
+Use a helper for handling stage-2 descriptor updates so the
+implementation can be shared with updates to table descriptors.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 2 ++
- arch/arm64/kvm/at.c                 | 1 +
- arch/arm64/kvm/mmu.c                | 2 +-
- arch/arm64/kvm/nested.c             | 4 +++-
- 4 files changed, 7 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/nested.c | 47 +++++++++++++++++++++++------------------
+ 1 file changed, 26 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 3b36ed7c7608..7fe6fb56c187 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -94,6 +94,7 @@ struct kvm_s2_trans {
- 	u32		esr;
- 	bool		writable;
- 	bool		readable;
-+	bool		dirty;
- 	bool		px;
- 	bool		ux;
- };
-@@ -323,6 +324,7 @@ struct s1_walk_result {
- 			bool	pr;
- 			bool	pw;
- 			bool	px;
-+			bool	dirty;
- 		};
- 		struct {
- 			u8	fst;
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 86b499e7a9a0..7a84495a2e6d 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -1317,6 +1317,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
- 			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
- 	wr->pw &= !pan;
- 	wr->pr &= !pan;
-+	wr->dirty = !(wr->desc & BIT(7));
- }
- 
- static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 07bd1e3ae9fb..f35c4ce95473 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1572,7 +1572,7 @@ static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
- static enum kvm_pgtable_prot adjust_nested_fault_perms(struct kvm_s2_trans *nested,
- 						       enum kvm_pgtable_prot prot)
- {
--	if (!nested->writable)
-+	if (!(nested->writable && nested->dirty))
- 		prot &= ~KVM_PGTABLE_PROT_W;
- 	if (!nested->readable)
- 		prot &= ~KVM_PGTABLE_PROT_R;
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index b247bc1d83fa..dcc7d0cc7c95 100644
+index c2fb7290f0c8..a70af3b3f05d 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -269,6 +269,8 @@ static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *w
- 
- 	trans->readable = s2ap & BIT(0);
- 	trans->writable = s2ap & BIT(1);
-+
-+	trans->dirty = ws->desc & BIT(7);
+@@ -227,9 +227,23 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
+ 	return 0;
  }
  
- /*
-@@ -1603,7 +1605,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+-static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u64 new,
+-			      struct s2_walk_info *wi)
++static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
++			      struct s2_walk_step *ws, struct kvm_s2_trans *out,
++			      struct kvm_walk_access *access)
+ {
++	u64 old, new;
++	int ret;
++
++	old = new = ws->desc;
++
++	if (wi->ha)
++		new |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
++
++	if (old == new)
++		return 0;
++
++	ws->desc = new;
++
+ 	if (wi->be) {
+ 		old = (__force u64)cpu_to_be64(old);
+ 		new = (__force u64)cpu_to_be64(new);
+@@ -238,7 +252,13 @@ static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u6
+ 		new = (__force u64)cpu_to_le64(new);
+ 	}
  
- 	vt->cpu = smp_processor_id();
+-	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
++	ret = __kvm_at_swap_desc(vcpu->kvm, ws->desc_pa, old, new);
++	if (!ret || ret == -EAGAIN)
++		return ret;
++
++	out->esr = ESR_ELx_FSC_SEA_TTW(ws->level);
++	out->desc = ws->desc;
++	return 1;
+ }
  
--	if (vt->hpa_writable && vt->wr.pw && vt->wr.pr)
-+	if (vt->hpa_writable && vt->wr.pw && vt->wr.dirty && vt->wr.pr)
- 		prot = PAGE_KERNEL;
- 	else if (vt->wr.pr)
- 		prot = PAGE_KERNEL_RO;
+ static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+@@ -287,7 +307,6 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+ 	struct s2_walk_step ws = {};
+ 	phys_addr_t base_addr;
+ 	unsigned int addr_top, addr_bottom;
+-	u64 new_desc;  /* page table entry */
+ 	int ret;
+ 
+ 	switch (BIT(wi->pgshift)) {
+@@ -340,8 +359,6 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+ 			return ret;
+ 		}
+ 
+-		new_desc = ws.desc;
+-
+ 		/* Check for valid descriptor at this point */
+ 		if (!(ws.desc & KVM_PTE_VALID)) {
+ 			out->esr = compute_fsc(ws.level, ESR_ELx_FSC_FAULT);
+@@ -386,21 +403,9 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+ 		return 1;
+ 	}
+ 
+-	if (wi->ha)
+-		new_desc |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+-
+-	if (new_desc != ws.desc) {
+-		ret = swap_guest_s2_desc(vcpu, ws.desc_pa, ws.desc, new_desc, wi);
+-		if (ret == -EAGAIN)
+-			return ret;
+-		if (ret) {
+-			out->esr = ESR_ELx_FSC_SEA_TTW(ws.level);
+-			out->desc = ws.desc;
+-			return 1;
+-		}
+-
+-		ws.desc = new_desc;
+-	}
++	ret = handle_desc_update(vcpu, wi, &ws, out, access);
++	if (ret)
++		return ret;
+ 
+ 	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
+ 		out->esr = compute_fsc(ws.level, ESR_ELx_FSC_ACCESS);
 -- 
 2.47.3
 
