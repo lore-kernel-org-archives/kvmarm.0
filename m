@@ -1,99 +1,77 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473B63AEF49
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 14:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from confino.investici.org (confino.investici.org [93.190.126.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FE53D666A
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 15:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782225883; cv=none; b=gpB6yHeVMnLvpjCRRNSAdBQ+Y83btKBylhx5i2v9MgS8ziJwNzPHYFu8NiVNXSBQGirdNCX5MftYRCmhV4a+6k3FvAqztdjdXRsDYWXV93hyDDktpGK4OcYz9zDeCqgnsYjxzWFU6d5/Qn985jKdoKY9PkGOeepdwGDXJI2jnKw=
+	t=1782226876; cv=none; b=i4xgBK/y2JWkTIPKrgdmucK9Dw6LKrirMofOUBMAgIsykJ/Uu/W5YWuexNQMXk3pgQQ+LDDDrcDwfOXcUW3NViJUKiJNHql0P57Gv38G1FeUyFQCZ1W05pQHbbfAxruHcMHLH5oGnlXG2EwWR/qS8phozTrdYzUpSsrjcyrFrjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782225883; c=relaxed/simple;
-	bh=OLyyvbXtqpwYtrdcTo4YciOw2e2u9muWYAHapaeDZcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewLGQKvmURL7JI6Ekt/a7csqwjRCfFg0aYKsGmZencn4oDIAxYJmj+AzJdEuQoEbXmIZkDh0misYFOArJKgJaE948vKcHxfQlFuzwL4usCRGLknh4dpIxtYioOHhl3T3Lp004SdHjbOtHlepYJnzVPi+mFcmXhZbfzEzh0O9c28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VLpYZwhv; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782226876; c=relaxed/simple;
+	bh=e2FnWsMy6T6/89TNXSXemivgXsEc2hl7D7EPV+933es=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=R6lHlsRj0VQBmTyb2yAug78kYyvs9vt30EWYef9pWWWz32X03vBJA2CpufXpZZ+XrIC6958ZyEkZi7nDE+CTgPZkq0jaK0eQp5u/wc1Ijo0WtH4ZhvCkrzSLnyylUhehWYMKDz69ClyhiLylkNCU0iN0/UM8a6pn6coo9ZIGfNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=Wb20dxWo; arc=none smtp.client-ip=93.190.126.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VLpYZwhv"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25C6A1A25;
-	Tue, 23 Jun 2026 07:44:37 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC4683F632;
-	Tue, 23 Jun 2026 07:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782225881; bh=OLyyvbXtqpwYtrdcTo4YciOw2e2u9muWYAHapaeDZcc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VLpYZwhv/YRlKuEE5RRJyglnvSTlYCj0qlJlvr76oFvssE7LthszFJL5YPy8hZPdS
-	 NSDnKL+l/Qzrn6Mjp/9ze5FnXE9MCi7mGTU9uIBadRpw2tXON7lIGzcnI1qJ6mQl+D
-	 CnQ4No3ZMYwIvYb2KY8JtEKIKtO2n6dX8WbcWB5w=
-Date: Tue, 23 Jun 2026 15:44:25 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>
-Subject: Re: [PATCH RESEND v2 3/5] KVM: arm64: nv: Re-translate VNCR before
- injecting abort
-Message-ID: <cdcjimpyohzgbttm7fnhzzqbiy2s74y7p2lmap2agutosk4d2r@gj7d5nwdbr6y>
-References: <20260609185514.746507-1-oupton@kernel.org>
- <20260609185514.746507-4-oupton@kernel.org>
- <yw6b7zx2qxjckkut4lzkuqekh2omttwmulvqbslk27wt3vu6mp@ostr7avq6a7e>
- <ajRomJ-Y3EOxJUU-@kernel.org>
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="Wb20dxWo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1782226866;
+	bh=FMcvrNMeiunarYDVwOG320BrY694FQ1Ht0HcOfuTAsY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=Wb20dxWoONi9pPs2QuazEXjNsezuZUxJfr6Bt/lJx6L2U5wYsR5Qp+2v8p4iKpKWB
+	 s6YNPlyU+s4GKPlZyLagwVVt3BtXN5LIcebqRuRBmgkhCN7gWjjlD69Hbur4uWxdVx
+	 7pqTFjRLwTMvMunQ9fse9F940xVyvwizQm7889lA=
+Received: from mx1.investici.org (unknown [127.0.0.1])
+	by confino.investici.org (Postfix) with ESMTP id 4gl7YZ52K9z10tQ;
+	Tue, 23 Jun 2026 15:01:06 +0000 (UTC)
+Received: by mx1.investici.org (Postfix) id 4gl7YZ1VJCz10tD;
+	Tue, 23 Jun 2026 15:01:06 +0000 (UTC)
+Date: Tue, 23 Jun 2026 16:01:05 +0100
+From: Bradley Morgan <include@grrlz.net>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+CC: Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+ Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
+In-Reply-To: <178222278590.523236.18181071715501850418.b4-ty@kernel.org>
+References: <20260621213155.6019-1-include@grrlz.net> <178222278590.523236.18181071715501850418.b4-ty@kernel.org>
+Message-ID: <CE64C9AC-32D5-495E-B713-552921468FB9@grrlz.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ajRomJ-Y3EOxJUU-@kernel.org>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 18, 2026 at 02:52:24PM -0700, Oliver Upton wrote:
-> Hey Wei-Lin,
-> 
-> Sorry for the latency on my end.
-> 
-> On Wed, Jun 10, 2026 at 02:46:18PM +0100, Wei-Lin Chang wrote:
-> > Just a comment using this thread:
-> > 
-> > While reading this, I found this part of the code (not this patch in
-> > particular) a little bit difficult to reason about. I think it's because
-> > kvm_translate_vncr() is doing many things, and there are multiple
-> > potential failure reasons e.g. s1 walk fault, no memslot, gmem/user mem
-> > faultin errors, MMU notifier check, etc., and they are all mux'ed into
-> > an error code with some context visible by the caller.
-> > 
-> > So in kvm_handle_vncr_abort() we demux the error code and handle the
-> > errors with the help of the context (vt, is_gmem). We essentially have
-> > to keep track of what error codes correspond to what error reasons.
-> > 
-> > Do you think it is better if we refactor and handle the errors when they
-> > occur? Like inject the exception back to vEL2 right after getting the
-> > results of __kvm_translate_va(), and finish up the abort handling there.
-> > Same for other cases.
-> > 
-> > I can try it out and make it concrete if you also think this is
-> > reasonable. Probably after this series gets applied when the comments
-> > from Marc & Sashiko are addressed. (I reviewed and don't have additional
-> > comments though.)
-> 
-> Yeah, returning error codes for 'normal' behavior is extremely difficult
-> to work with. TBH, I'd rather we go a step further and rework the whole
-> software PTW to only return errors in the case that we have to report it
-> to userspace.
-> 
-> Otherwise, aborted walks due to guest behavior should ideally return 1
-> and and inspect the walk result to differentiate between a successful /
-> aborted translation.
+On June 23, 2026 2:53:11 PM GMT+01:00, Marc Zyngier <maz@kernel.org> wrote:
+>On Sun, 21 Jun 2026 21:31:55 +0000, Bradley Morgan wrote:
+>> Protected guest faults charge long term pins to the VM's mm. Teardown
+>> can run later from file release, where current->mm may be unrelated.
+>> 
+>> Drop the charge from kvm->mm instead.
+>> 
+>> 
+>
+>Applied to fixes, thanks!
+>
+>[1/1] KVM: arm64: account pKVM reclaim against the VM mm
+>      commit: d098bb75d14fde2f12155f1a95ec0168160867ce
+>
+>Cheers,
+>
+>	M.
+>
 
-Thanks for your suggestion!
-I'll put this in the "potential improvements" list for now, there are
-other fixes I need to work on.
 
-Thanks,
-Wei-Lin Chang
+Hey, which tree did you apply it to?
 
-> 
-> Thanks,
-> Oliver
+
+Thanks!
