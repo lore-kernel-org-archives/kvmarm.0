@@ -1,131 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2CC3672A9;
-	Tue, 23 Jun 2026 13:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D420237E2EC
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 13:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782222652; cv=none; b=WQkJyOwFZAslDpV6DrC7EgvYap9rpGgNM+GEresJ/koAKdMm+zrLD6+QX/qH53YfAgI5pC1YbqGioM0cJl+wYfSKu3Bc9kDzrunO9cPkeLimf5DtWZTiFdiXfpiPjUsWprzLrzg8Ywi2nhKM5H9h+2rQ7FG2LWz6QsKbcL+xUaI=
+	t=1782222754; cv=none; b=UVVmkk9p3OY8t7OuGkIRKecV/fTvAmY6q+AWBvoB4NL5XSb3Z77nJlCYbBnmjtmpJ6VEonCUdWVg12LxfOrPXr6BO/OTfAd/EZfhTvpXQ2Olli/CmKNbtl12bbK+elAnEbMGtk+y8hBKfq2gAkLtFER7lsI3PkbZ32iZjWglKTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782222652; c=relaxed/simple;
-	bh=MSDzm2EAmzRkBqd5hSTg/HEfwzJGas72unhIzIhD+rU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cghv7bRwqMDZoGJLcuQzTtmo+jwwf/vJnMF4TlQ7IeOt5R3vlNyh+5PC85zqBEsxi1KOhkgOfuPw7fKiDjLi11wY/bht7l2pYjSMYeTuT/DBnDzE3LomYUC4oBk0KdfdceFX5Cfu2CCp2XbNZ3VfC3f1q3bJbOQbYnYTqWi9+Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=klJpoF9Q; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782222754; c=relaxed/simple;
+	bh=ovLBAvklLxZwC7Jq9ETpckjB1i/iju7Qpbi9FQGDqWQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FZvLYji8cgSqx2PNHnoTJt5qLfV9AK8fKIqfjBt1SpeXPxNrMsvoPkjiJ2b6a5XA0dj9SQt/Bj9mnrfy6AH6p81g/zi0QOaZReUFfKLtL02aF0DqONQ+R86o1O7JH3GF++eqSXHb6CNtcMw0wXc5Ao85igwgyW6iy1ti4wrdmxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MCZwoDif; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="klJpoF9Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB641F000E9;
-	Tue, 23 Jun 2026 13:50:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782222650;
-	bh=T5QITE/W9PWMiSnQSEb25byqiClC1qtSsa9UGS2bkgQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=klJpoF9QJYIA992HykJ0OHqFE91SA7biVpawmOh8gndjtVq7FZdJveGAcnCGHXUHj
-	 XgkbacMTO7qIJdOLo/u931CynW2Pc2BtI1FMbV38yBzieKRsKzF5XM7URKF5Wlv8Xw
-	 6FC7kyHOHcPB08NQCw9XPqwO93g9WbW8LS2unGpp1+61s7YSWoYzuMDnR4RoUv/EiT
-	 2TQ3nCXc9p7xXlqeI2wZwMPi8QOnZ0SpyYhvGDhZMG5Jmb1a31Ots9mosJM9t3jXs2
-	 GKsifzR5QNGIH9TGjjoxBQpajoAezIJYyz3ucIKrc1mcxzEEWKlndlRLvEU7H0Jes/
-	 4GoB86z0yPrbw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wc1Wa-0000000FIy8-2nQI;
-	Tue, 23 Jun 2026 13:50:48 +0000
-Date: Tue, 23 Jun 2026 14:50:48 +0100
-Message-ID: <86se6dqsav.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Bradley Morgan <include@grrlz.net>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
-In-Reply-To: <ajqNANUBCamSjfHM@willie-the-truck>
-References: <20260621213155.6019-1-include@grrlz.net>
-	<86zf0nq8ki.wl-maz@kernel.org>
-	<ajqNANUBCamSjfHM@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MCZwoDif"
+X-Forwarded-Encrypted: i=1; AFNElJ9wu/xZc0qC/kt8SmfJI0FB/lfReVwew20KBq5Qicx6LkjnqtONso7kXP9cdKTt/hYtTAI+Z7c=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782222749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F77g4j7YjD5E5qC6B2ZdRa5uX5Miz2j/ZR1CSt9++g4=;
+	b=MCZwoDifQsCEE9jKD0DQ5C2a+4+dqQPt7+qb2Sdtaqe5hTDmkXDKP2KEePgA/ZFEuQrMi0
+	MWDSNMZSLX3rdFz8ZjoZ5kvSycXvgA+9NewODf9xpISKVc0L8TiCH+/wJrortlds9vRGR7
+	hmqjwqGnD8S/4Pbp92k73YJqnfWrbG0=
+X-Gm-Message-State: AOJu0YyHQLQHGT3gr3Oqr7A1hJN7vK3vEcxYhC2Ic73K54cVzmsBQNP5
+	WoBBn8k6Jyqjps6ML5IImbixIHmeqFFrj6+GRfJK+7q5JYNOIhl80VD29ybjEIQ6+CoQsMcXjS8
+	5g5qd5ENrUlhhBY7gK0+Hngq13zYXgOGp4uL4eNfn
+X-Received: by 2002:a05:622a:411b:b0:519:df4f:6c93 with SMTP id
+ d75a77b69052e-51a5255375emr10017941cf.20.1782222746042; Tue, 23 Jun 2026
+ 06:52:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, include@grrlz.net, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+ <20260622190701.2039766-2-fuad.tabba@linux.dev> <86tsqtqu9u.wl-maz@kernel.org>
+In-Reply-To: <86tsqtqu9u.wl-maz@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 23 Jun 2026 14:51:49 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxn8W=KYqTeqs-ZTw-SBD9tH0zUz_O9rTHsq3M7ELXn_w@mail.gmail.com>
+X-Gm-Features: AVVi8CebMVsOKX8XmdbtdzDxdkE6ig5bh0MmMzjJbv-f8yL8AKg1mgeDyXjOPkk
+Message-ID: <CA+EHjTxn8W=KYqTeqs-ZTw-SBD9tH0zUz_O9rTHsq3M7ELXn_w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix sign-extension of MMIO loads
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Christoffer Dall <christoffer.dall@linaro.org>, Victor Kamensky <victor.kamensky@linaro.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 23 Jun 2026 14:41:20 +0100,
-Will Deacon <will@kernel.org> wrote:
-> 
-> On Mon, Jun 22, 2026 at 09:32:29AM +0100, Marc Zyngier wrote:
-> > On Sun, 21 Jun 2026 22:31:55 +0100,
-> > Bradley Morgan <include@grrlz.net> wrote:
-> > > 
-> > > Protected guest faults charge long term pins to the VM's mm. Teardown
-> > > can run later from file release, where current->mm may be unrelated.
-> > >
-> > > Drop the charge from kvm->mm instead.
-> > > 
-> > > Fixes: 4e6e03f9eadd ("KVM: arm64: Hook up reclaim hypercall to pkvm_pgtable_stage2_destroy()")
-> > > Signed-off-by: Bradley Morgan <include@grrlz.net>
-> > > ---
-> > >  arch/arm64/kvm/pkvm.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> > > index 053e4f733e4b..428723b1b0f5 100644
-> > > --- a/arch/arm64/kvm/pkvm.c
-> > > +++ b/arch/arm64/kvm/pkvm.c
-> > > @@ -352,7 +352,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
-> > >  		page = pfn_to_page(mapping->pfn);
-> > >  		WARN_ON_ONCE(mapping->nr_pages != 1);
-> > >  		unpin_user_pages_dirty_lock(&page, 1, true);
-> > > -		account_locked_vm(current->mm, 1, false);
-> > > +		account_locked_vm(kvm->mm, 1, false);
-> > >  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-> > >  		kfree(mapping);
-> > >  	}
-> > 
-> > Seems correct to me, as the final mmdrop(kvm->mm) occurs after S2
-> > teardown.
-> > 
-> > Will, what do you think?
-> 
-> Thanks, this looks correct to me.
-> 
-> While I was thinking about it, I also started looking at the use of
-> 'current->mm' in kvm_arch_prepare_memory_region() in case that should
-> also be 'kvm->mm'. However, I then realised that I don't really grok
-> that code at all because it does a bunch of checking on the VMAs with
-> mmap_read_lock(current->mm) held, but then that lock is dropped
-> immediately after doing the checks so I'm not really sure what they
-> are protected against. Presumably, the address space could be modified
-> as soon as the lock is dropped?
-> 
-> But it's hot, so I'm probably missing something here.
+On Tue, 23 Jun 2026 at 14:08, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Mon, 22 Jun 2026 20:07:00 +0100,
+> Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> >
+> > A sign-extending load from MMIO (LDRSB, LDRSH, LDRSW) delivers a
+> > zero-extended value: in kvm_handle_mmio_return(), vcpu_data_host_to_guest()
+> > masks the data to the access width after sign-extension, stripping the
+> > sign bits.
+> >
+> > Move vcpu_data_host_to_guest() ahead of sign-extension so the width mask
+> > runs first. trace_kvm_mmio() moves with it and keeps reporting the raw
+> > access-width data.
+> >
+> > Fixes: b30070862edbd ("ARM64: KVM: MMIO support BE host running LE code")
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > ---
+> >  arch/arm64/kvm/mmio.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> > index e2285ed8c91de..d1c3a352d5a22 100644
+> > --- a/arch/arm64/kvm/mmio.c
+> > +++ b/arch/arm64/kvm/mmio.c
+> > @@ -126,6 +126,10 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+> >               len = kvm_vcpu_dabt_get_as(vcpu);
+> >               data = kvm_mmio_read_buf(run->mmio.data, len);
+> >
+> > +             trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+> > +                            &data);
+> > +             data = vcpu_data_host_to_guest(vcpu, data, len);
+>
+> This helper is in charge of the endianness of the read from the
+> guest's PoV. How can the sign-extension (which happens from the host's
+> perspective) correctly work if it takes place after the byte swapping?
+>
+> To me, the real issue appears to be in the that helper, which swaps
+> the data based on the size of the access instead of the width of the
+> register.
+>
+> Or am I once more completely confused with the endianness crap?
 
-I think this is just trying to catch a few obvious issues, such as
-dirty logging on device memory, but that only works for well behaved
-userspace that is making "a honest mistake".
+Endianess always confuses me too :D
 
-For the more trying ones, we end-up doing the same checks again at
-fault time anyway.
+My reading of the ARM ARM is that the byte reversal is keyed on the access
+size there too. It lives in Mem{size}, with the register width handled
+separately by SignExtend(regsize):
 
-	M.
+    data = Mem[address, 2];        // byte-reversed by the access size, BE
+    X[t] = SignExtend(data, regsize);
 
+So vcpu_data_host_to_guest(..., len) swapping by len matches the Mem-side
+reversal. Swapping by the register width would reorder bytes that were never
+loaded. An LDRSH into Wt reads 2 bytes but would bswap 4: the halfword
+reaches the helper as 0x0180 host-native, cpu_to_be32 turns it into
+0x80010000 instead of the 0x8001 cpu_to_be16 gives, and it never sign-extends
+to 0xffff8001.
 
--- 
-Without deviation from the norm, progress is not possible.
+If that reading holds, none of the helper's ops are individually wrong, and
+the only bug was the order, with the sign-extend running before the swap and
+the width mask then dropping it. But I've gone round in circles on endianness
+before (to say the least), so please say if I've done it again.
+
+Cheers,
+/fuad
+
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
