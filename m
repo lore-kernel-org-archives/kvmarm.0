@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46791208D0
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 19:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E745208D0
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 19:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782241520; cv=none; b=mUcJJYtUrx7aRkg0uuNN8rmfVXkRdlAxu4eKLoQ/PwawjPew/MEXFlLaRN3X2J6nygyV408eVXAALjmGDrQXrHbeB7cblmJAB3LVyBYUDZbklVFc+BiD8cIilJB6ToC9768o1wz2VeMuMISav5gaDlH/Avq2N++lbAxthA5MRDQ=
+	t=1782241536; cv=none; b=eAFZz7p6CktktPIeOT1bF5y9s61iQarlJ5Scfe38+XCTMHm7mON4YKVpho9J8s7tzOI2yYeBH/3I4KpkP+br9XVn9/LtJylJjT6atJP2meZP6vJGE1K3wygTN5yikMLcwxcut59SRZ8rYCKJLsLtnWjX5sZSjQ7qUe/G/Gvx1ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782241520; c=relaxed/simple;
-	bh=NtQ2UtyBzlrlraqkeHj6O8nUEuYp3Ixo3hkgLPKeZyg=;
+	s=arc-20240116; t=1782241536; c=relaxed/simple;
+	bh=1G1nf0IgdkF8tmoF850+aArc+2nc7vaHTfbyqCyOTcA=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=S9xKMKXiJD8mIiiYC3HSP6OKCEt+imvVPS8A5ETEwoYM8gWNUK+eQ/jViZMjzxhXo29OMmpwk9s942FhceGrcgILHBvl1b+x/9661fAg/MOcayU60Y9N4aGSd5bv36y8OJFfhFSCom9sv9tnJ1p/3pNpdRDOjYIyH+pXYi731F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5WkCVhf; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=bkuewdN1CgQrixqctZEpWQlkv5WJmDWuJtVKdrS+pH+Th/XuCE03Zs8ds9Rl+zW4LlCXJ2mW4fudI1xPtWuFYc3N3qGBypPnNIJb5KaJmYun8pApmAnT5yBjzUBE7xUo8QE55ZlFlLUvk1W2UJlLXKsxzOjAXX0ZGgRhC2EDqTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTqvuIeZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5WkCVhf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CECD71F000E9;
-	Tue, 23 Jun 2026 19:05:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTqvuIeZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BE9E1F000E9;
+	Tue, 23 Jun 2026 19:05:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782241519;
-	bh=4O53LxH82MwrEmqp7yBm+47KdOouq6qvNfjzqt0doZM=;
+	s=k20260515; t=1782241535;
+	bh=eNmu062UGIi49WmkZQ7G/QjyKiF8IpgKBkJGXxjVJeQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=F5WkCVhfLpHAd/rBeuHmo3/FiUF3ZLLrDlITGqwKMs1BfIoEaRmuMs7ZP6rhmWj+5
-	 aR+WqC9ylIGcVDCuuS1Hqgz+Khl/LeyE59ytkF9ILuaq4xmJk+i5Qn0Tia2ekKtu/8
-	 46LRYEsx12Kmno/y0NntwJTyV6y2Ov5lAL2UQW9omz1L6/j2nMjpCVWCanATJJfb2m
-	 ko7yRKVm4nCxEsVwXs/qq+Lcx39brdLUBO0bQcQPIX9shwiy/qy0WSr07hb/M6OL5Y
-	 WY7NilG2uJvTC/Doe9KPF/YU3bhov/C7MOPpKTkGkvpNXoNcCNftKX6bioIqhdPX1S
-	 ekYikW6nub6sg==
+	b=JTqvuIeZUmWkbVqlNiB6XDtwA4P4FSO0YzETAfcrkmg+LpTVEAlrqUJufbthwntNM
+	 7V7E+J7sHTJc4xMvOj7BHDGSb8oGj2YJomkPrEmKMLYtp87cSlubD6zkA4XVFG6YvM
+	 Lvd6800NPR7GU4KpNXmACTHD1WuOQ9m4cmlCWBW7DOhvFFGI9J1LW5qXE+yDWsgpMI
+	 ll+ctFEj1feTqLuFaqO3P56SghcNn9TwCAGhVwmD+Tu6mETZj7S6J+Y/jbmWayaFEs
+	 pMoA8V0EHwPe4Zcn9kf7FoIvB0r6rkwCpsYfAdj0Y6VBkKYZOWgdVlKgkIDhlGmZ/V
+	 UkCSF8XcPxZHw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 18/22] KVM: arm64: nv: Set access flag on table
- descriptors at stage-2
+Subject: Re: [PATCH 19/22] KVM: arm64: nv: Expose FEAT_HAFT
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Oliver Upton" <oupton@kernel.org>
 Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20260623184201.1518871-19-oupton@kernel.org>
+In-Reply-To: <20260623184201.1518871-20-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
- <20260623184201.1518871-19-oupton@kernel.org>
+ <20260623184201.1518871-20-oupton@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2026 19:05:18 +0000
-Message-Id: <20260623190518.CECD71F000E9@smtp.kernel.org>
+Date: Tue, 23 Jun 2026 19:05:34 +0000
+Message-Id: <20260623190535.0BE9E1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,53 +46,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Stage-2 table descriptors fail to generate an Access Flag fault wh=
-en VTCR_EL2.HAFT =3D=3D 1, VTCR_EL2.HA =3D=3D 0, and the descriptor's AF bi=
-t is 0.
+- [Medium] KVM's AT instruction emulation incorrectly evaluates HD and HAFT=
+ without ensuring the Hardware Access Flag (HA) is enabled, leading to unau=
+thorized hardware updates of the Access flag on table descriptors.
 --
 
-commit 7d14ee3ad8d74a4b9734d83c712bb19ae89c1090
+commit e646aa23aa5bcaa5e6bc04545e6c0d319fc3a058
 Author: Oliver Upton <oupton@kernel.org>
 
-KVM: arm64: nv: Set access flag on table descriptors at stage-2
+KVM: arm64: nv: Expose FEAT_HAFT
 
-This commit implements access flag updates on stage-2 table descriptors for
-nested virtualization, as required by FEAT_HAFT.
+Both stages of translation now support the access flag on table descriptors,
+advertise the feature.
 
 > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 2408d604a1e18..6f540d3481d5a 100644
+> index 6f540d3481d5a..dc2a8b6483c2a 100644
 > --- a/arch/arm64/kvm/nested.c
 > +++ b/arch/arm64/kvm/nested.c
-[ ... ]
-> @@ -424,6 +428,10 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu,=
- struct kvm_walk_access *acc
->  			return 1;
->  		}
+> @@ -1799,7 +1799,7 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 v=
+al)
+>  		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
+>  			val &=3D ~ID_AA64MMFR1_EL1_VH;
 > =20
-> +		ret =3D handle_desc_update(vcpu, wi, &ws, out, access);
-> +		if (ret)
-> +			return ret;
-> +
+> -		val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, DBM);
+> +		val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, HAFT);
 
-[Severity: High]
-When VTCR_EL2.HAFT =3D=3D 1 but VTCR_EL2.HA =3D=3D 0, and the table descrip=
-tor's AF
-bit is 0, will this silently bypass the required Access Flag fault?
+[Severity: Medium]
+Does exposing HAFT here uncover an issue in AT instruction emulation where
+hardware updates are authorized even when the hardware access flag is
+disabled?
 
-If wi->haft evaluates to false (such as when HA =3D=3D 0), handle_desc_upda=
-te()
-returns 0 without updating the descriptor. The walk then proceeds to the ne=
-xt
-level without checking if the AF bit is 0, which misses the injection of the
-architectural fault.
+Looking at setup_s1_walk() in arch/arm64/kvm/at.c, wi->hd and wi->haft
+are evaluated without checking if the hardware access flag (HA) is enabled:
 
-Should there be an explicit check for the AF bit here similar to the one at
-the end of the walk for leaf entries, conditioned on VTCR_EL2.HAFT?
+arch/arm64/kvm/at.c:setup_s1_walk() {
+        ...
+        wi->haft  =3D kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, HAF=
+T) &&
+                    FIELD_GET(TCR2_EL1_HAFT, effective_tcr2(vcpu, wi->regim=
+e));
+        ...
+}
 
->  		base_addr =3D ws.desc & GENMASK_ULL(47, wi->pgshift);
+Then in should_set_access_flag(), this could return wi->haft for table
+descriptors, inadvertently authorizing hardware updates even when HA =3D=3D=
+ 0:
+
+arch/arm64/kvm/at.c:should_set_access_flag() {
+        ...
+        return kvm_pte_table(ws->desc, ws->level) ? wi->haft : wi->ha;
+}
+
+If a nested guest sets TCR_ELx.HD =3D 1 or TCR2_ELx.HAFT =3D 1 but leaves
+TCR_ELx.HA =3D 0, and then executes an AT instruction, could KVM incorrectly
+evaluate the guest's page table permissions as writable or perform an
+unauthorized hardware update of the Access flag on table descriptors?
+
+>  		break;
 > =20
->  		ws.level +=3D 1;
+>  	case SYS_ID_AA64MMFR2_EL1:
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623184201.1518=
-871-1-oupton@kernel.org?part=3D18
+871-1-oupton@kernel.org?part=3D19
