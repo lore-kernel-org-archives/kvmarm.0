@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4A838C433
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5541C38D3F3
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782240127; cv=none; b=LEqwnxl/89dcCOB3lIC7RDXtE7/Ug/lp03nmcD/kdkQfaBjIMnxjfasFrbhKf2DUNDwoD8vO5i6TWnwGBElCAn1BuAzuXiB51j4rZYlmlNbDzf91Tu3cTeUFCJS1X1djYFac9iW8WVxoHjDCNto2Bm1j3i5f6ScKn9KJx8IOS4I=
+	t=1782240127; cv=none; b=kgxy7IhJyH5O5dAip3fW6bXYZSQjqEwmbbsLVQs8hCxXcyVtzCIULGOgArcFL5hsMsw72X5uCjsoBw56TCJOhNFVSD6bKs8dak5bHACkJ3CruH2ZcZQ020LHKDpPGxIE6caOVUDed4pTVGIOX7VTF3IIteDCnJQL9uCFNxklZC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782240127; c=relaxed/simple;
-	bh=SgYjSxLmGm/hsof8eLwKJOs3qe1EDj2KzjSDLToh9gA=;
+	bh=g36SmZZOhKkBswl5j4i7g4Pbk2GSDDB3XDDOtdNuy4w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RD+3Ps/MqPZnq77n5RDCrgtbZ170i5OJqD1vzv0dj3lLtuyH0KMHU/Liw64HHXDM85YLIV6pE9wHMoVzvNkzj9rqdu/u4MSsNcnmmJ5j+T3KP41WsUGDO3Y1TdPdKelxI6Gxjo4R16mSNtgaD+LkGT9Y4Q09MhvNoSjt0SrF7Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFDDlTZI; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=VsIrgKwbzMpPBuOEOh0pJ6p+BsVI5nVfoPVHw4Otx9IeO3VfwH75p2CjjVayHPpEzKhzBSq6BgLNJtg6v9g8Zg/cJvTkOs9YHVgARn2IVGBoELTWjRnJlvb4zmyzJa4GmxDKTYGYwXsbVgRx24Rn+yzEbNZijuR2d+p4/Zf4eAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PB6PyCMD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFDDlTZI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8AB21F00ACA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PB6PyCMD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE47F1F00A3F;
 	Tue, 23 Jun 2026 18:42:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782240125;
-	bh=U8oy23ksSpQx4aH884C4lRGDOHj96WiAdZgOvx/4+Kk=;
+	s=k20260515; t=1782240126;
+	bh=pBY5M3jWWzWbYJbqTz75rFFHKh3Jk4JO+QYdK8OgyOg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jFDDlTZIP5dTTPTJQE2Y6ZVArEXwLEiCHzhu6LxhjRI//+LNq9kuNzTgPPfZMmIeW
-	 jVMeexsnm9oxauGBVxqfJaypl7d1mqv4WR9FG7ipVrts3hqaBFasrFRQU8BAYYI9Ta
-	 ortn+CRvlRU6Ct//LgZUXwztCSJxiPDIVMEvK3vVdhgAeFzJLrEToYPXLTMKDUqi0E
-	 GdQNigwHkXvT/N1qr6dvhr/fsCZguE2bANCf02vUnJV/X6NpihIicMhqQAzOK84TPG
-	 3bn602OCnORTKTo17G4R7wbEvQSvc2AdF9awY69JHpRp3MUHz26d+b5jGY++ACXpqz
-	 Bj+pCI1NQ6Exw==
+	b=PB6PyCMDxMwT9c9YeVDSJufeHUmrxWEd4YJgrc8lWCh+nB1eIF1oEztjvlBPLqR23
+	 MPQYtlgcRZau8ac20DSNEmhMOKULnLDZESVbV2GVH6jlT5h0QCjeMowIW6X1SjSzX8
+	 5E/4wJgL4eOjksg13CK611McqT3yt9RgKP9gqRNzGqWV7ZXWbEy3d52YO7N6r8lGXd
+	 Rvbz4iUAclmB9qDOgaJvIP3GHr5GTY3wTU/8qV7UiBEcxsPL2X6+nvA9L3CZYcGaOd
+	 SrVt6u+6HbbLpg4XZSxq9x5DtrZJiOUrmBEXS01NlogZVuc301w3dHl4VE2oTQnREw
+	 KNytYii0nc3UA==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 03/22] KVM: arm64: nv: Get rid of kvm_s2_trans*() accessors
-Date: Tue, 23 Jun 2026 11:41:42 -0700
-Message-ID: <20260623184201.1518871-4-oupton@kernel.org>
+Subject: [PATCH 04/22] KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
+Date: Tue, 23 Jun 2026 11:41:43 -0700
+Message-ID: <20260623184201.1518871-5-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
@@ -49,193 +49,89 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Access the aptly named fields in kvm_s2_trans directly rather than
-indirecting through useless getters.
+KVM will soon add support for hardware dirty state management for nested
+guests. In order to emulate dirty state transitions on the guest
+desciptor, KVM will need to use read-only hardware mappings and re-walk
+the guest page tables upon taking a permission fault.
+
+Prepare by limiting shadow stage-2 and shadow VNCR translations to
+read-only for writable-clean guest translations.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 35 -----------------------------
- arch/arm64/kvm/at.c                 |  6 ++---
- arch/arm64/kvm/mmu.c                | 20 ++++++++---------
- arch/arm64/kvm/nested.c             |  4 ++--
- 4 files changed, 15 insertions(+), 50 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h | 2 ++
+ arch/arm64/kvm/at.c                 | 1 +
+ arch/arm64/kvm/mmu.c                | 2 +-
+ arch/arm64/kvm/nested.c             | 4 +++-
+ 4 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index aa27f12cf2d4..3b36ed7c7608 100644
+index 3b36ed7c7608..7fe6fb56c187 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -98,47 +98,12 @@ struct kvm_s2_trans {
+@@ -94,6 +94,7 @@ struct kvm_s2_trans {
+ 	u32		esr;
+ 	bool		writable;
+ 	bool		readable;
++	bool		dirty;
+ 	bool		px;
  	bool		ux;
  };
- 
--static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
--{
--	return trans->output;
--}
--
--static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
--{
--	return trans->block_size;
--}
--
--static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
--{
--	return trans->esr;
--}
--
--static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
--{
--	return trans->readable;
--}
--
--static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
--{
--	return trans->writable;
--}
--
- static inline bool kvm_has_xnx(struct kvm *kvm)
- {
- 	return cpus_have_final_cap(ARM64_HAS_XNX) &&
- 		kvm_has_feat(kvm, ID_AA64MMFR1_EL1, XNX, IMP);
- }
- 
--static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *trans)
--{
--	return trans->ux;
--}
--
--static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *trans)
--{
--	return trans->px;
--}
--
- extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 			      struct kvm_s2_trans *result);
- extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+@@ -323,6 +324,7 @@ struct s1_walk_result {
+ 			bool	pr;
+ 			bool	pw;
+ 			bool	px;
++			bool	dirty;
+ 		};
+ 		struct {
+ 			u8	fst;
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 8263c648207b..86b499e7a9a0 100644
+index 86b499e7a9a0..7a84495a2e6d 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -494,14 +494,14 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 				return ret;
- 			}
+@@ -1317,6 +1317,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+ 			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
+ 	wr->pw &= !pan;
+ 	wr->pr &= !pan;
++	wr->dirty = !(wr->desc & BIT(7));
+ }
  
--			if (!kvm_s2_trans_readable(&s2_trans)) {
-+			if (!s2_trans.readable) {
- 				fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level),
- 					     true);
- 
- 				return -EPERM;
- 			}
- 
--			ipa = kvm_s2_trans_output(&s2_trans);
-+			ipa = s2_trans.output;
- 		}
- 
- 		if (wi->filter) {
-@@ -582,7 +582,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 		new_desc |= PTE_AF;
- 
- 	if (new_desc != desc) {
--		if (wi->s2 && !kvm_s2_trans_writable(&s2_trans)) {
-+		if (wi->s2 && !s2_trans.writable) {
- 			fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level), true);
- 			return -EPERM;
- 		}
+ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 8811ad60cf72..07bd1e3ae9fb 100644
+index 07bd1e3ae9fb..f35c4ce95473 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1572,9 +1572,9 @@ static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
+@@ -1572,7 +1572,7 @@ static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
  static enum kvm_pgtable_prot adjust_nested_fault_perms(struct kvm_s2_trans *nested,
  						       enum kvm_pgtable_prot prot)
  {
--	if (!kvm_s2_trans_writable(nested))
-+	if (!nested->writable)
+-	if (!nested->writable)
++	if (!(nested->writable && nested->dirty))
  		prot &= ~KVM_PGTABLE_PROT_W;
--	if (!kvm_s2_trans_readable(nested))
-+	if (!nested->readable)
+ 	if (!nested->readable)
  		prot &= ~KVM_PGTABLE_PROT_R;
- 
- 	return prot | kvm_encode_nested_level(nested);
-@@ -1584,9 +1584,9 @@ static enum kvm_pgtable_prot adjust_nested_exec_perms(struct kvm *kvm,
- 						      struct kvm_s2_trans *nested,
- 						      enum kvm_pgtable_prot prot)
- {
--	if (!kvm_s2_trans_exec_el0(kvm, nested))
-+	if (!nested->ux)
- 		prot &= ~KVM_PGTABLE_PROT_UX;
--	if (!kvm_s2_trans_exec_el1(kvm, nested))
-+	if (!nested->px)
- 		prot &= ~KVM_PGTABLE_PROT_PX;
- 
- 	return prot;
-@@ -1623,7 +1623,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	}
- 
- 	if (s2fd->nested)
--		gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
-+		gfn = s2fd->nested->output >> PAGE_SHIFT;
- 	else
- 		gfn = s2fd->fault_ipa >> PAGE_SHIFT;
- 
-@@ -1817,7 +1817,7 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
- 		 * can only create a block mapping if the guest stage 2 page
- 		 * table uses at least as big a mapping.
- 		 */
--		max_map_size = min(kvm_s2_trans_size(s2fd->nested), max_map_size);
-+		max_map_size = min(s2fd->nested->block_size, max_map_size);
- 
- 		/*
- 		 * Be careful that if the mapping size falls between
-@@ -1891,7 +1891,7 @@ static gfn_t get_canonical_gfn(const struct kvm_s2_fault_desc *s2fd,
- 	if (!s2fd->nested)
- 		return s2vi->gfn;
- 
--	ipa = kvm_s2_trans_output(s2fd->nested);
-+	ipa = s2fd->nested->output;
- 	return ALIGN_DOWN(ipa, s2vi->vma_pagesize) >> PAGE_SHIFT;
- }
- 
-@@ -2322,19 +2322,19 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		}
- 
- 		if (ret) {
--			esr = kvm_s2_trans_esr(&nested_trans);
-+			esr = nested_trans.esr;
- 			kvm_inject_s2_fault(vcpu, esr);
- 			goto out_unlock;
- 		}
- 
- 		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
- 		if (ret) {
--			esr = kvm_s2_trans_esr(&nested_trans);
-+			esr = nested_trans.esr;
- 			kvm_inject_s2_fault(vcpu, esr);
- 			goto out_unlock;
- 		}
- 
--		ipa = kvm_s2_trans_output(&nested_trans);
-+		ipa = nested_trans.output;
- 		nested = &nested_trans;
- 	}
- 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index c9300703bd0d..b247bc1d83fa 100644
+index b247bc1d83fa..dcc7d0cc7c95 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -954,9 +954,9 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
+@@ -269,6 +269,8 @@ static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *w
  
- 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
- 		if (vcpu_mode_priv(vcpu))
--			forward_fault = !kvm_s2_trans_exec_el1(vcpu->kvm, trans);
-+			forward_fault = !trans->px;
- 		else
--			forward_fault = !kvm_s2_trans_exec_el0(vcpu->kvm, trans);
-+			forward_fault = !trans->ux;
- 	} else {
- 		bool write_fault = kvm_is_write_fault(vcpu);
+ 	trans->readable = s2ap & BIT(0);
+ 	trans->writable = s2ap & BIT(1);
++
++	trans->dirty = ws->desc & BIT(7);
+ }
  
+ /*
+@@ -1603,7 +1605,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+ 
+ 	vt->cpu = smp_processor_id();
+ 
+-	if (vt->hpa_writable && vt->wr.pw && vt->wr.pr)
++	if (vt->hpa_writable && vt->wr.pw && vt->wr.dirty && vt->wr.pr)
+ 		prot = PAGE_KERNEL;
+ 	else if (vt->wr.pr)
+ 		prot = PAGE_KERNEL_RO;
 -- 
 2.47.3
 
