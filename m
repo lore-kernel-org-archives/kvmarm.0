@@ -1,143 +1,168 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6263CBE7A
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 08:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573D32E7389;
+	Tue, 23 Jun 2026 08:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782202503; cv=none; b=eLk18CK0qPXV9IBP04t3QeMPG4lcntDx4A85AkWUCiq2gTO1TKE/1Jq4PKuPAPx7IhFjZZ5o/qEZjvmttfWRUflKcGzFGVUISa6CeX9+kOFiGS0EgyFa3+I4SKWta580fB69nUAdZaTV73fbl55LAyevTmQ9YDG5gn4kWIrAllA=
+	t=1782203438; cv=none; b=TI3zcVjti9bIoghCSSkQB9rovbvHlOxMTFidWUiXmMLX2MXagy9ZI6OXSmW/BFDF9F4Fl43mXbwpiSFAiivhH6uoKj6T7D5Go0rxJSSqw3Qw4vPKmtAMFuqo+HIHBdMt7f8qmCENjmHB0PXyRotzlJ4tKiVT4AIcvqD41cXrq9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782202503; c=relaxed/simple;
-	bh=lv00yt5h4iA7zAdiud+2wNlHMeBNwTBGw53WrIYz4fw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QL69PUfOlzwkCrHwzgMxg5YImVpBPOWL9LolKIurK7S7DgQqeTYrrF6kPfeQPstWXCxLeQdIJkFT1clSdQWvimG9hia3hHBEjed358z15+FIz/UwQ/TxsncWs/gRcn4h9oEoQrzt3Lmcyazh5ItMOqDiWKzTOQT9n4eCtWW0Rww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 9da3d15a6edb11f1aa26b74ffac11d73-20260623
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED
-	SA_UNFAMILIAR, SN_UNTRUSTED, SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-UNFAMILIAR: 1
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:e244f643-0d94-4661-9dbe-d3f87441a1ef,IP:10,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:35
-X-CID-INFO: VERSION:1.3.12,REQID:e244f643-0d94-4661-9dbe-d3f87441a1ef,IP:10,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:35
-X-CID-META: VersionHash:e7bac3a,CLOUDID:5549c0c9c56ac87306c3598eda0d2bad,BulkI
-	D:260623161455U457ALV5,BulkQuantity:0,Recheck:0,SF:16|19|66|78|81|82|102|1
-	27|136|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bu
-	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
-	0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_USA,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 9da3d15a6edb11f1aa26b74ffac11d73-20260623
-X-User: leixiang@kylinos.cn
-Received: from ninol.. [(116.128.244.169)] by mailgw.kylinos.cn
-	(envelope-from <leixiang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 276535867; Tue, 23 Jun 2026 16:14:54 +0800
-From: leixiang <leixiang@kylinos.cn>
-To: maz@kernel.org
-Cc: oupton@kernel.org,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	leixiang <leixiang@kylinos.cn>
-Subject: [RFC PATCH] KVM: arm64: Set irqfd->producer to enable vLPI routing updates
-Date: Tue, 23 Jun 2026 16:14:33 +0800
-Message-ID: <20260623081433.21250-1-leixiang@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260622075103.35164-1-leixiang@kylinos.cn>
+	s=arc-20240116; t=1782203438; c=relaxed/simple;
+	bh=zHy/4SDm4gevy9Nrqn/DmaomIgQ1NNEIfBIp1uG5s/E=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=nPVs8KYitWe9oDHu4Qx0B0+aDFMkW5Xu/GBqe/vEVgONfxMLM50UN3DAUYghd+czM1Qp45+IkiUj07k08OqrKeN4A+USMX4ltohCWP8zFYnhY0RKkGzYGqQELj5Cdxbx/n2p9L9SjiylMhvhctO8/Zp1u8J8WtA0zcCdGk0+c9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0lkuPzZ; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0lkuPzZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCC6F1F000E9;
+	Tue, 23 Jun 2026 08:30:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782203437;
+	bh=TYs+oCmAlfzBmfvYUmiGUyoWok0/0BBwKASHaksLMqw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=L0lkuPzZM/aLIPhL8SYkCjijb1QtkhcQ9UDhCv5w8t7qQYGatOwsnCJ8bJkDqORNl
+	 sWd97IkirrBJlJpLsahuX/J9x/avKOttkQuAMARDmmWcOsoCjlyWeT4kKaQ0mu8FXY
+	 4UZabAPn0f0uwnQtFoI3fwre/F6ceAgoxbLkk3hD7OSYLXtZcHVS4QfKKNO38mZSQ3
+	 9iITmm9BRlo1Xs/TgVqfkgmmBmni3bi/MUb3buC9B7fa8ZHtlPSgisYAqnQspwG/Hi
+	 vyej1QECcOf7qQWpCo+Hn+rdmGDsC8Bb1optVh9O6G+S3tMIiZHxQAM1kzga94h4St
+	 94rTpYQTFxgKQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH] KVM: arm64: Set irqfd->producer to enable vLPI
+ routing updates
+Reply-To: sashiko-reviews@lists.linux.dev
+To: leixiang <leixiang@kylinos.cn>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260623081433.21250-1-leixiang@kylinos.cn>
 References: <20260622075103.35164-1-leixiang@kylinos.cn>
+ <20260623081433.21250-1-leixiang@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Jun 2026 08:30:36 +0000
+Message-Id: <20260623083036.BCC6F1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
+
+New issues:
+- [Critical] Early return in `kvm_arch_irq_bypass_del_producer` skips clear=
+ing `irqfd->producer`, leaving a dangling pointer that leads to a Use-After=
+-Free.
+- [High] Late assignment of `irqfd->producer` allows concurrent routing upd=
+ates to silently skip hardware unmapping, leaking vLPI mappings.
+
+Pre-existing issues:
+- [High] Lockless and non-seqcount-protected access to `irqfd->irq_entry` c=
+auses torn reads of MSI routing fields.
+--
+
+commit 6730fdc5cdf162e59409e000dad54d0460124435
+Author: leixiang <leixiang@kylinos.cn>
+
+KVM: arm64: Set irqfd->producer to enable vLPI routing updates
 
 ARM64's kvm_arch_irq_bypass_add_producer() never sets irqfd->producer,
-so kvm_irq_routing_update() never calls the ARM64 routing hook.  That
+so kvm_irq_routing_update() never calls the ARM64 routing hook. That
 hook unmaps the vLPI and falls back to software injection when an
-irqfd's MSI routing changes; with it dead, the vLPI stays bound to the
-old translation.
+irqfd's MSI routing changes. Set irqfd->producer once
+kvm_vgic_v4_set_forwarding() succeeds and clear it in del_producer().
 
-Set irqfd->producer once kvm_vgic_v4_set_forwarding() succeeds and
-clear it in del_producer(), under irqfds.lock; the only reader,
-kvm_irq_routing_update(), takes that lock.  set_forwarding() may sleep,
-so it runs outside the lock and the pointer is published only on
-success, needing no error cleanup.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index d84e80b2ce546..54d4bb5d01899 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2891,6 +2891,7 @@ int kvm_arch_irq_bypass_add_producer(struct irq_byp=
+ass_consumer *cons,
+>  	struct kvm_kernel_irqfd *irqfd =3D
+>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
+>  	struct kvm_kernel_irq_routing_entry *irq_entry =3D &irqfd->irq_entry;
+> +	int ret;
+> =20
+>  	/*
+>  	 * The only thing we have a chance of directly-injecting is LPIs. Maybe
+>  	 * one day...
+>  	 */
+>  	if (irq_entry->type !=3D KVM_IRQ_ROUTING_MSI)
+>  		return 0;
 
-Sent as RFC: the unmap-on-reroute path has been dormant.
+[Severity: High]
+This isn't a bug introduced by this patch, but does this lockless access to
+irqfd->irq_entry cause torn reads of MSI routing fields?
 
-Fixes: 2412405b3141 ("KVM: arm/arm64: register irq bypass consumer on ARM/ARM64")
-Signed-off-by: leixiang <leixiang@kylinos.cn>
----
-A review of the x86/powerpc producer-nullify patch pointed out that
-ARM64 never sets irqfd->producer, so kvm_arch_update_irqfd_routing()
-is dead.  This RFC fills that gap; set_forwarding() may sleep and so
-can't run under irqfds.lock like the x86 path, hence the locking is
-what I'd most like reviewed.
+KVM_SET_GSI_ROUTING updates this struct under irqfds.lock and
+irqfd->irq_entry_sc seqcount. The lockless read here can observe a torn
+state (e.g., mismatched MSI devid and data), causing
+vgic_its_resolve_lpi() to resolve an arbitrary, unintended LPI.
 
- arch/arm64/kvm/arm.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+> -	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+> -					  &irqfd->irq_entry);
+> +	ret =3D kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+> +					 &irqfd->irq_entry);
+> +	if (ret)
+> +		return ret;
+> +
+> +	spin_lock_irq(&irqfd->kvm->irqfds.lock);
+> +	irqfd->producer =3D prod;
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 50adfff75be8..6f1e4f526719 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2935,6 +2935,7 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
- 	struct kvm_kernel_irqfd *irqfd =
- 		container_of(cons, struct kvm_kernel_irqfd, consumer);
- 	struct kvm_kernel_irq_routing_entry *irq_entry = &irqfd->irq_entry;
-+	int ret;
+[Severity: High]
+Does this late assignment of irqfd->producer allow concurrent routing updat=
+es
+to silently skip hardware unmapping, leaking vLPI mappings?
 
- 	/*
- 	 * The only thing we have a chance of directly-injecting is LPIs. Maybe
-@@ -2943,8 +2944,16 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
- 	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
- 		return 0;
+kvm_vgic_v4_set_forwarding() maps the vLPI, but irqfd->producer is published
+afterward. A concurrent routing update will see irqfd->producer =3D=3D NULL=
+ and
+skip unmapping the vLPI, which relies on irqfd->producer being set to invoke
+kvm_arch_update_irqfd_routing().
 
--	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
--					  &irqfd->irq_entry);
-+	ret = kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
-+					 &irqfd->irq_entry);
-+	if (ret)
-+		return ret;
-+
-+	spin_lock_irq(&irqfd->kvm->irqfds.lock);
-+	irqfd->producer = prod;
-+	spin_unlock_irq(&irqfd->kvm->irqfds.lock);
-+
-+	return 0;
- }
+Once add_producer() completes, it unconditionally publishes irqfd->producer.
+The vLPI is now permanently bound in hardware despite KVM treating the
+routing as non-MSI.
 
- void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
-@@ -2957,6 +2966,10 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
- 	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
- 		return;
+> +	spin_unlock_irq(&irqfd->kvm->irqfds.lock);
+> +
+> +	return 0;
+>  }
+> =20
+>  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+> @@ -2913,6 +2922,10 @@ void kvm_arch_irq_bypass_del_producer(struct irq_b=
+ypass_consumer *cons,
+>  	struct kvm_kernel_irqfd *irqfd =3D
+>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
+>  	struct kvm_kernel_irq_routing_entry *irq_entry =3D &irqfd->irq_entry;
+> =20
+>  	if (irq_entry->type !=3D KVM_IRQ_ROUTING_MSI)
+>  		return;
 
-+	spin_lock_irq(&irqfd->kvm->irqfds.lock);
-+	irqfd->producer = NULL;
-+	spin_unlock_irq(&irqfd->kvm->irqfds.lock);
-+
- 	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
- }
+[Severity: Critical]
+Does this early return based on the current routing type skip clearing
+irqfd->producer, leaving a dangling pointer?
 
---
-2.45.0
+When an irqfd's routing is updated from MSI to non-MSI,
+kvm_arch_update_irqfd_routing() unmaps the vLPI but intentionally leaves
+irqfd->producer populated.
+
+If the producer is later unregistered, kvm_arch_irq_bypass_del_producer()
+hits this early return because the routing is now non-MSI. This completely
+skips the newly added irqfd->producer =3D NULL assignment.
+
+The KVM irqfd retains a dangling pointer to the freed producer. A subsequent
+routing update will dereference the freed pointer via irqfd->producer->irq =
+in
+kvm_arch_update_irqfd_routing(), leading to a use-after-free.
+
+> +	spin_lock_irq(&irqfd->kvm->irqfds.lock);
+> +	irqfd->producer =3D NULL;
+> +	spin_unlock_irq(&irqfd->kvm->irqfds.lock);
+> +
+>  	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
+>  }
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623081433.2125=
+0-1-leixiang@kylinos.cn?part=3D1
