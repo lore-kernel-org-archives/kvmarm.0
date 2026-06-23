@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D63370D6E
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A98C2DCBEC
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782241050; cv=none; b=XW/M7yQtEhRz3JgZOjym4ci1b5CQxRLNmru9iJ8CElfYvfkSKtQEYtef8V8p4Gao1NZxEuf/oA0g0+Fnvy5am1MIvc16RAjW3s6xVtQB5sLqfR0K8TT/d9/huAhVL/S6RcDQdEzB9TgtyfLMPCLnvJ1lvNVe79DXh9foP0IlHBQ=
+	t=1782241091; cv=none; b=pT8hzgWHiJ1wSiX6NflRx27XBlz2o0oKdsaI4XvgtVRbKssI/AxxCNMeelq/hvCn1nSK6c3TEHMcRbzwAsiHstyGUMEaM3Sr35D5TVC1D8bCsCG3TwqdZQ3igdYu595PsfUXk0DDN5XfCvJpf7p4Z/3ehZO4v19vCfXKgbZcr2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782241050; c=relaxed/simple;
-	bh=9FjFCk2hVUIQxvlTlj2BER1f5C6sUJ/ZEr7I/Meeo6s=;
+	s=arc-20240116; t=1782241091; c=relaxed/simple;
+	bh=MbZbCPYu3cHPEK6O2xnPjDTwbIs/5Rds52nWX3wUvCE=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=odCX9T4Tc/TyE3Z1q96DBEBhs/mXH8A79BoUTga0UTjDY9i/EA5XMwfyjcqpgext7b7m6QtlgdJDy0LtHDhIAwNAwp+VLbzmwd2oiCNKt0spTNeAiyyFaa/vNlWqMTjDwqguPf+42XDl8LLOAmTfshwCsSjzVOoi9eFLqcGEgPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mcTPZTAd; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=iLQZtNHlpzzoWYGSvYhE/XHCdrcw2j9zPJJu3IIh+FIswTLyye968ZO3Cbf5E47zd80730OgFr/CJt3cCECzggCxQqraQOpeQuzsm8RYuiOiT7w7tg/wlzfhI8X9VR6cjZiGdTWREhB0m4eQ8ebtpBgVFhzT8yxADkW9Ks7hhys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzlv29Df; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mcTPZTAd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DED21F00A3A;
-	Tue, 23 Jun 2026 18:57:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzlv29Df"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08CC61F000E9;
+	Tue, 23 Jun 2026 18:58:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782241049;
-	bh=iHUvFo2ev5BD+N8sZBLKGpERrbQ5ojPczq/viaOqHMs=;
+	s=k20260515; t=1782241090;
+	bh=THgL3tbxunaKjvyboJqgRF55Yl3UykTVt1Og0GvvFfI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mcTPZTAdpFwyIFT/PX8j1CVnfFlSxbAs90O8UynCY46X98/LQfINDNRCyWaJI5/j7
-	 iR20S0+51WmL2k3eBUJAK3XG2AcZmFHMG6nHD2oNXf/pSQMgMCYeNoBxJlF60LFbg8
-	 Sd5iQfav1IqTvJNOdw8reF5zxuNtX60+nUCiYdwkHkIolCuKrpH4Y1r6VWHPMzQBui
-	 kavGt05JjD+eg4L+5jh5dc+CSRK/a8LKBQQUmndoB+8B/cUJmTkW9K//vL5SREJ78U
-	 uP76FPPmfM/9BYfnzTvW0gCkGUpHuNinWz/9iR4uPgwLxQ+JcgYJFF7u6EbsEr3yDb
-	 7gHmsODS7Xdww==
+	b=fzlv29Df7197SkR1EId1iTQH5Tf+Xgjbhra6rZQbNn2ERBBLREqEiKQp4R0IlTItb
+	 G9IBEFYYzojCKj70RgreCUl/xDEdmTX+0HuNPP56MsNHitN8kJLw7qpVfSrpeynJLF
+	 O+m0irsa/jgvmKd98jppW19jsiTqjyIgS5cC2MlXvTECv1zsgGemPpsyvlG11xnkcw
+	 HOf7hAqwzRSm75N/SFNSoAN8Kcal8JMK56F9JS98SWRupX2T1liDam9BLoCswIWh74
+	 lYSN7eXq3a6O2ARkylwBzrLnc2XJ9C4Npjif0bExs0pZ1Pzd37vlZsHmz7CDs4AkUd
+	 Ege1s7BhHAEjA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 14/22] KVM: arm64: Grant write permission when DBM is
- set at S1
+Subject: Re: [PATCH 04/22] KVM: arm64: nv: Only shadow writable-dirty guest
+ descs as writable
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Oliver Upton" <oupton@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260623184201.1518871-15-oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20260623184201.1518871-5-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
- <20260623184201.1518871-15-oupton@kernel.org>
+ <20260623184201.1518871-5-oupton@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2026 18:57:28 +0000
-Message-Id: <20260623185729.1DED21F00A3A@smtp.kernel.org>
+Date: Tue, 23 Jun 2026 18:58:09 +0000
+Message-Id: <20260623185810.08CC61F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,120 +47,107 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] The patch incorrectly grants write permissions based on DBM when h=
-ardware dirty state management is architecturally disabled due to HA=3D0.
-- [High] Hardware dirty state management (FEAT_HAFDBS) is incorrectly emula=
-ted when the Permission Indirection Extension (FEAT_S1PIE) is enabled, lead=
-ing to spurious permission faults and incorrect descriptor updates.
+
+New issues:
+- [High] Uninitialized or incorrectly evaluated `wr->dirty` field during St=
+age-1 page table walks causes an infinite VNCR trap loop.
+
+Pre-existing issues:
+- [High] Write-Only VNCR mappings cause an infinite trap loop because KVM f=
+alls back to `PAGE_KERNEL_NONE` but considers write faults resolved.
 --
 
-commit 7f44240a7dbcb830d02ca9b76f878070fdff7b00
+commit fb5a66a1eb4ac6175aad6cbbd38f45328f4f937b
 Author: Oliver Upton <oupton@kernel.org>
 
-KVM: arm64: Grant write permission when DBM is set at S1
-
-The DBM bit effectively behaves as a permission bit when using direct
-permissions, especially so in the context of accesses that do not update
-the dirty state (like AT).
+KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
+   =20
+KVM will soon add support for hardware dirty state management for nested
+guests. In order to emulate dirty state transitions on the guest
+desciptor, KVM will need to use read-only hardware mappings and re-walk
+the guest page tables upon taking a permission fault.
+   =20
+Prepare by limiting shadow stage-2 and shadow VNCR translations to
+read-only for writable-clean guest translations.
 
 > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index bfba31b270a95..faffb69c2eef5 100644
+> index 86b499e7a9a06..7a84495a2e6d4 100644
 > --- a/arch/arm64/kvm/at.c
 > +++ b/arch/arm64/kvm/at.c
-> @@ -1077,11 +1077,23 @@ static void compute_s1_direct_permissions(struct =
-kvm_vcpu *vcpu,
->  					  struct s1_walk_info *wi,
->  					  struct s1_walk_result *wr)
->  {
-> +	u8 ap =3D FIELD_GET(PTE_USER | PTE_RDONLY, wr->desc);
->  	bool wxn;
-> =20
-> +	/*
-> +	 * Descriptors with the DBM bit set while hardware dirty state are
-> +	 * considered writable, even though certain accesses (like AT instructi=
-ons)
-> +	 * don't actually update the dirty state.
-> +	 *
-> +	 * Assume that walk_s1() made the necessary descriptor updates for the
-> +	 * access and just treat DBM as writable here.
-> +	 */
-> +	if (wi->hd && (wr->desc & PTE_DBM))
-> +		ap &=3D ~BIT(1);
+[ ... ]
+> @@ -1317,6 +1317,7 @@ static void compute_s1_permissions(struct kvm_vcpu =
+*vcpu,
+>  			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
+>  	wr->pw &=3D !pan;
+>  	wr->pr &=3D !pan;
+> +	wr->dirty =3D !(wr->desc & BIT(7));
 
 [Severity: High]
-Does this incorrectly grant write permissions when hardware management of t=
-he
-Access Flag is disabled?
+Could the unconditional use of BIT(7) here cause issues when S1PIE is
+enabled?
 
-According to the ARM Architecture Reference Manual, hardware management of =
-the
-dirty state (TCR_ELx.HD =3D 1) is ignored if hardware management of the Acc=
-ess
-Flag is disabled (TCR_ELx.HA =3D 0).
+With S1PIE, BIT(7) becomes PIIndex[3], so using it to evaluate the dirty
+state might be incorrect.
 
-In setup_s1_walk(), we compute wi->hd directly from TCR.HD without enforcing
-this requirement:
+Also, if the Stage-1 MMU is disabled, __kvm_translate_va() returns early
+without initializing wr->dirty:
 
-arch/arm64/kvm/at.c:setup_s1_walk() {
-        ...
-        wi->hd  =3D kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, DBM);
-        wi->hd &=3D (wi->regime =3D=3D TR_EL2 ?
-                  FIELD_GET(TCR_EL2_HD, tcr) :
-                  FIELD_GET(TCR_HD, tcr));
+arch/arm64/kvm/at.c:__kvm_translate_va() {
+        if (wr->level =3D=3D S1_MMU_DISABLED) {
+                wr->ur =3D wr->uw =3D wr->ux =3D true;
+                wr->pr =3D wr->pw =3D wr->px =3D true;
+                return 0;
+        }
         ...
 }
 
-If a guest OS configures TCR_ELx.HA =3D 0 and TCR_ELx.HD =3D 1, and creates=
- a
-stage-1 descriptor with RDONLY=3D1 and DBM=3D1, it should remain strictly
-read-only and generate a Permission Fault on a write. By relying on the
-ungated wi->hd here, does KVM bypass the Permission Fault and allow a
-guest-visible privilege escalation?
+Since wr->dirty remains false (0-initialized), could this lead to an
+infinite VNCR trap loop? If wr->dirty is false, the shadow fixmap mapping
+is downgraded to PAGE_KERNEL_RO in kvm_map_l1_vncr().
+
+When a guest writes to the redirected register, kvm_handle_vncr_abort()
+sees vt->wr.pw is true, considers the fault handled without injecting a
+permission fault, and the hardware immediately retries and traps again.
+
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index b247bc1d83fa7..dcc7d0cc7c952 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+[ ... ]
+> @@ -1603,7 +1605,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+> =20
+>  	vt->cpu =3D smp_processor_id();
+> =20
+> -	if (vt->hpa_writable && vt->wr.pw && vt->wr.pr)
+> +	if (vt->hpa_writable && vt->wr.pw && vt->wr.dirty && vt->wr.pr)
+>  		prot =3D PAGE_KERNEL;
+>  	else if (vt->wr.pr)
+>  		prot =3D PAGE_KERNEL_RO;
 
 [Severity: High]
-Is hardware dirty state management incorrectly emulated when the Permission
-Indirection Extension (FEAT_S1PIE) is enabled?
+This is a pre-existing issue, but how does this code handle Write-Only VNCR
+mappings?
 
-When FEAT_S1PIE is enabled, the DBM bit (bit 51) acts as Index[1] in the PI
-index. If a write occurs to a "clean" page (DBM=3D1) and HD=3D1, the hardwa=
-re
-checks if clearing bit 51 would grant write access.
+If a nested guest maps its VNCR page as Write-Only (which is possible using
+POE/S1PIE), vt->wr.pr will be false. The logic here then falls through to
+mapping it as PAGE_NONE:
 
-It looks like compute_s1_indirect_permissions() evaluates permissions using
-the current PI index without simulating this dirty bit transition, which co=
-uld
-cause a spurious permission fault instead of updating the dirty state:
-
-arch/arm64/kvm/at.c:compute_s1_indirect_permissions() {
+arch/arm64/kvm/nested.c:kvm_map_l1_vncr() {
         ...
-        idx =3D pte_pi_index(wr->desc);
-        ...
-        set_perms(priv, wr, pp);
+        else if (vt->wr.pr)
+                prot =3D PAGE_KERNEL_RO;
+        else
+                prot =3D PAGE_NONE;
         ...
 }
 
-Additionally, if the dirty state needs to be updated, it appears we
-unconditionally clear bit 7 (PTE_RDONLY) instead of bit 51 (PTE_DBM):
+When the guest writes to the register, kvm_handle_vncr_abort() sees
+vt->wr.pw is true, assumes the write fault is permitted, and returns 1
+without injecting a fault.
 
-arch/arm64/kvm/at.c:handle_desc_update() {
-        ...
-        if (should_set_dirty_state(wi, ws, wr, access))
-                new &=3D ~PTE_RDONLY;
-        ...
-}
-
-For PIE, bit 7 is unrelated to the dirty state. Could this corrupt the
-guest's PIE descriptor?
-
-> =20
->  	/* Non-hierarchical part of AArch64.S1DirectBasePermissions() */
->  	if (wi->regime !=3D TR_EL2) {
-> -		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr->desc)) {
-> +		switch (ap) {
->  		case 0b00:
->  			wr->pr =3D wr->pw =3D true;
->  			wr->ur =3D wr->uw =3D false;
+The hardware then retries against PAGE_NONE and immediately traps again,
+creating an infinite loop that can lock up the host CPU.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623184201.1518=
-871-1-oupton@kernel.org?part=3D14
+871-1-oupton@kernel.org?part=3D4
