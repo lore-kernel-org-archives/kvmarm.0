@@ -1,94 +1,114 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538922BE621;
-	Tue, 23 Jun 2026 13:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4066C242D89;
+	Tue, 23 Jun 2026 13:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782219781; cv=none; b=gg06bvBM2ojI8C4w/iQO8saL3rcXQyFYW+Ka7tBpRzbnBtv60kw7faeeoMuxQHsagQE5GUq7QAuSYW9O7IalHEK7UUqrWefV2FPcGcXWI2FWYB/dkOSS/Ta+lMSRQ7tDJLahnKv3XbpGGw9SGG1mBL4Bt94cX7y/qfLX3da+AL0=
+	t=1782220097; cv=none; b=tWWAOPYf5bRbh9iBtll9v8cSeHsOxHnsh+DoBc3LcTe90f/gQYU6ajyJaAuLeh1vKOM9nAG8p0MH26U7fa6e+BvKOo/obM40phMVsy/WmxR6eYqGdG4W1Y5Ao2TEr+KryeCelLhTnOFMNJKhRr073prFe85Ko1z5kSPL8t2S3e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782219781; c=relaxed/simple;
-	bh=UKxLulHrMeEhawIobmJpAHpxl5LGhIo5vPnLUY05Kyg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KutpRv7wonh36KyBN4Ubv4/ds+HvT8QXCSV+ieBrsdq6+VzUleC8noLNh1tXkGNjFJUqnWKLZgb/KMhzmuVRNxZqy4VTJ3AX2HagFAydTGDzZ8h7glsWzQ8FJSMlbg2aBtU216ZCRN49dD7VpcCl0iPJJ2Bx3eQFh9L+BcaTGVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eN/qzKvq; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782220097; c=relaxed/simple;
+	bh=7vw+9J+DTNSwvtLViC9SiWeB7maDPlQ+Zi/TYykzFzQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d+vI9rGSGsWU0AvZs3d12IaFq5qrz1I2JPY9CQHf75JJWBPOJqJijg5RrQdMgADAhEph43+MVI781cmdMDcUZcBQnf2pGsvFHtpv/OaUt1vkAPE0FjRrIxG5XeGhe+qRrAmJbxQLkKg/13QFFEJIJyr1IrDlLr+de+SGIA2iamc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKdtfNpt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eN/qzKvq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530831F000E9;
-	Tue, 23 Jun 2026 13:02:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKdtfNpt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 012441F000E9;
+	Tue, 23 Jun 2026 13:08:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782219779;
-	bh=Ic50QGLcvtZ0vS3i/+z4+DL+suRayRsebfMRMDJCfJw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eN/qzKvqGAInNy/HebvMYGmi9onQQpGC8yfBHiYsfyqh3jKSOK8vTZhQNlkvPADAt
-	 QoTM93ttGyukAb89gMMID+mAn6Il4qrjbbTKjwm5OomWfXwQ2W5501YjmXweN0I/x9
-	 suendL34NNi5wL9csRkkbAmyi5d5NqeMfemdfvntb0jfZ5oT+L41G1v09dqqurUdMy
-	 ONXsMJ+Yo+LU1U0nEDcwDBapF8D1lpKW8rAtFh3HxQBC/xiVVI/MEsimTgGnY3B7Fy
-	 5sU2WmqG5TgrlkZiHtIaNS5PmfoMBVt8Nsg3sh9rff4w5/AKxFxpw9Rl8EkUBAcDYr
-	 PdOOM8QvrJLnw==
-From: Will Deacon <will@kernel.org>
-To: julien.thierry.kdev@gmail.com,
-	maz@kernel.org,
-	oupton@kernel.org,
-	jean-philippe.brucker@arm.com,
-	andre.przywara@arm.com,
-	suzuki.poulose@arm.com,
-	kvm@vger.kernel.org,
+	s=k20260515; t=1782220096;
+	bh=Z8sTU+8G5Nx/47JjD+XoYdzr54hu2EhVfKCrwOv3fY8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=IKdtfNpthkRsIZNECjJYBclOhDXwhnotLrdCTAhR5DMuhpxIayAjQ4CNj+rqwVf3r
+	 Z5zDiQ5W5UbbmG/IZSTC+Tlg6KTxRtzouWnSGnDxnXWNkBFlqleoqWymQrnLw+gZ+z
+	 hIeBv821mJ9qswsDBUI+SgHxT4AcjK5FbmCk59zU6IKIfuALcJI9EPeJeHdagJDy/i
+	 U1Up6/JsISCwWIb+jPyBJuTHsXxzRFvMjPunOOW5sx50K6TCL1Drw/pSy3xxPon0Nv
+	 higzH/g5EIioQim1dIuaIRm5+prm3NeNnxbepWxBJIoNYut+07nO/i4qTHIwFV+MfA
+	 HdJPvqBLCNJHg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wc0rN-0000000FIFR-1tPY;
+	Tue, 23 Jun 2026 13:08:13 +0000
+Date: Tue, 23 Jun 2026 14:08:13 +0100
+Message-ID: <86tsqtqu9u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Christoffer Dall <christoffer.dall@linaro.org>,
+	Victor Kamensky <victor.kamensky@linaro.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	seiden@linux.ibm.com
-Subject: Re: [PATCH kvmtool v2 0/7] x86 compilation fixes and arm64 PMU improvements
-Date: Tue, 23 Jun 2026 14:02:41 +0100
-Message-ID: <178221837797.2618973.1411525576893271029.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260618155001.226266-1-alexandru.elisei@arm.com>
-References: <20260618155001.226266-1-alexandru.elisei@arm.com>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix sign-extension of MMIO loads
+In-Reply-To: <20260622190701.2039766-2-fuad.tabba@linux.dev>
+References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+	<20260622190701.2039766-2-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, christoffer.dall@linaro.org, victor.kamensky@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 18 Jun 2026 16:49:54 +0100, Alexandru Elisei wrote:
-> v1 here [1].
+On Mon, 22 Jun 2026 20:07:00 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> v1 was sent to fix this compilation error:
+> A sign-extending load from MMIO (LDRSB, LDRSH, LDRSW) delivers a
+> zero-extended value: in kvm_handle_mmio_return(), vcpu_data_host_to_guest()
+> masks the data to the access width after sign-extension, stripping the
+> sign bits.
 > 
-> disk/core.c: In function ‘disk_img_name_parser’:
-> disk/core.c:27:21: error: assignment discards ‘const’ qualifier from pointer target type [-Werror=discarded-qualifiers]
->    27 |                 sep = strstr(arg, ":");
->       |                     ^
+> Move vcpu_data_host_to_guest() ahead of sign-extension so the width mask
+> runs first. trace_kvm_mmio() moves with it and keeps reporting the raw
+> access-width data.
 > 
-> [...]
+> Fixes: b30070862edbd ("ARM64: KVM: MMIO support BE host running LE code")
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/mmio.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index e2285ed8c91de..d1c3a352d5a22 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -126,6 +126,10 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  		len = kvm_vcpu_dabt_get_as(vcpu);
+>  		data = kvm_mmio_read_buf(run->mmio.data, len);
+>  
+> +		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+> +			       &data);
+> +		data = vcpu_data_host_to_guest(vcpu, data, len);
 
-Applied to kvmtool (master), thanks!
+This helper is in charge of the endianness of the read from the
+guest's PoV. How can the sign-extension (which happens from the host's
+perspective) correctly work if it takes place after the byte swapping?
 
-[1/7] x86: Define bioscall only in 32-bit mode
-      https://git.kernel.org/will/kvmtool/c/4ac426b16525
-[2/7] virtio: Do not modify const strings in virtio_9p_rootdir_parser()
-      https://git.kernel.org/will/kvmtool/c/ddb340d8bcd4
-[3/7] disk/core: Do not modify const strings in disk_img_name_parser()
-      https://git.kernel.org/will/kvmtool/c/63a29eb4e73e
-[4/7] arm64: Initialise the PMU after the GIC
-      https://git.kernel.org/will/kvmtool/c/d4f6367f9a92
-[5/7] util: Set exit status to errno in die_perror()
-      https://git.kernel.org/will/kvmtool/c/6bb2256a59c2
-[6/7] util: Allow die_perror() to take a variable list of argument
-      https://git.kernel.org/will/kvmtool/c/88aeb551e3bc
-[7/7] arm64: Improve KVM_ARM_VCPU_PMU_V3_CTRL diagnostics
-      https://git.kernel.org/will/kvmtool/c/1cf1acf838df
+To me, the real issue appears to be in the that helper, which swaps
+the data based on the size of the access instead of the width of the
+register.
 
-Cheers,
+Or am I once more completely confused with the endianness crap?
+
+	M.
+
 -- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Without deviation from the norm, progress is not possible.
