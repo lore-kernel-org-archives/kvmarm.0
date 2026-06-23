@@ -1,80 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A9B1DE4FB;
-	Tue, 23 Jun 2026 00:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70ACD1DDC3F
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 00:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782174013; cv=none; b=reHFrT9QRoLjgAW13BKTXxg7JFaY2sGzurJo4U0l/0ExAzB7dbAMnCEwn4CWu3sWDsQCOuA3upELlahescFAhUoQGL+GRTCiXgsiaUgdFE1ewMmbL09/WrFdkE6+7qwmwXoPacYXXKyXD0Db1QTg+0QBgKCvRtkeMDi1AKJ7lLU=
+	t=1782174093; cv=none; b=WaPFb4dZ2f98Afjynu+Iz+2euThEhcqHcx1K6ocy3+kxaXxMm4XA1EcFWpQXdHfbEktHdt07JRRrUIsWEJaurhE/9/e2NoALwpty3mv4QslgCiSsPyWJYNrYPe4jyB2S21Rc6MAFjP/+RR39zJK/yVpMoJYvNyn2laZEg/Urj6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782174013; c=relaxed/simple;
-	bh=dYMrvQ7QWulmrVl1eu6L5LscUtsG+z/1nPqrW9/6UcY=;
+	s=arc-20240116; t=1782174093; c=relaxed/simple;
+	bh=evq3HtMOX3bw07Jfo1CfEUWAkQifQ9nQ8jZ7fDfWwKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MLis737AQxTBQ02tOQwTpi+5oRhYRBRgbAHM4mAblbOgQk1W7OOgdtYmvV7RmxQtW5MFV7NhNhskcG62Xi4KdtQNI6l6r024rTLBg11nws6bnDIFUntTWpWFXSKy9CUo59Xo68ovDmHCr8sZvG7b8dqqz1JGis/gOFZulvBOi4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ei9u1Gkz; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zyn1DE8jtX7u9kp+/tgO50lsgT3x+Lf2NnEFz38JVPtqcIOn7nsjHVhYKQEBo3oEAfT9/f2hlO5h/eQQwKKj26vvp3AhfNOWfQNJb97kjFhMKosaxcbWJJ+7Kc4BLcgM7XVcS5ii58XJCyHrBylQTwqTnnCsw52WbSX/N44A3CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF55Od1j; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ei9u1Gkz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B54E1F000E9;
-	Tue, 23 Jun 2026 00:20:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF55Od1j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 006A21F000E9;
+	Tue, 23 Jun 2026 00:21:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782174012;
-	bh=BDKUVID7qw6T4mp18P6/ELgU0/lKW+UBMNBhyLpyrEI=;
+	s=k20260515; t=1782174092;
+	bh=FN5+DQM0a1o1AJOQPamNCOXfPdLivFp9bIJwV444tfQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Ei9u1GkzJ84WMGMXM2wTDi3t2Wr8NPXEkmG+WJhM2LwZSiZesTnOlQUBNSvABzMOt
-	 PL1bFvxpcEDkHqf7c9Yvv4jxf62tQshvmaB1xz42UA/TLGivZU5BvZmtR+gsdWjjUI
-	 LzwQNlqkw89gXB5SBaSD8fJk40FmW5Mn53HH8CmDTLzRwdmo4l/NN8+1ZEbTW1VXRI
-	 EEYfYTTZ2MNDzBLorlsfbXg+Q6P2wxwMUFbjXB5QWFGAnWhwigy5VmIArvdYu/J0dn
-	 yETSrn9w9g1aM2SA3rJus8yjDi9TGGwBYBtVe7TxgiYeO3FWfLOjKsLGjqQkzseMqA
-	 Ry/RSuqWXcOwA==
-Date: Mon, 22 Jun 2026 17:20:11 -0700
+	b=LF55Od1ji3hZKHI4MyGoR7q8IP0/fqN1LxS1NPlh+YhULNF0oKkDT0t+hGRkQtFrB
+	 lGWTNpIwqmHr1vzp3PYlxDHga4nzSDvHPm8qZWe9BPGUuAAWaXolumLc/zvXzr1SJM
+	 z6P4D2vogclWTlJLpaTqBIaRM+jxJ6HK8rBsbpKLMCSPVZ9QtXVZdmvxfsxHyxgUn/
+	 4PVKD3HVj0CsfDVIFHmTuu5BKcfXVNI+2jN/evXuWOimPPyXQQf+aHzbkj4TujLZoc
+	 OMC+NFkv5adWkmXfM4QlBS7Q6qE3tzmywFM1INrMnOiq1TwLPapK6FrVtHYpIKdfWs
+	 OPmWU0E/OOLEA==
+Date: Mon, 22 Jun 2026 17:21:30 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Christoffer Dall <christoffer.dall@linaro.org>,
-	Victor Kamensky <victor.kamensky@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Fix and test MMIO sign-extending loads
-Message-ID: <ajnRO9oMrVCXQT9t@kernel.org>
-References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+To: Roman Gushchin <roman.gushchin@linux.dev>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	KVMARM <kvmarm@lists.linux.dev>
+Subject: Re: Sashiko review emails to the list
+Message-ID: <ajnRiqJS8aE-0IwN@kernel.org>
+References: <ajlopihdkRALO-do@kernel.org>
+ <DC6D08B0-9CB2-48B9-BF1C-4300C095F2B6@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DC6D08B0-9CB2-48B9-BF1C-4300C095F2B6@linux.dev>
 
-On Mon, Jun 22, 2026 at 08:06:59PM +0100, Fuad Tabba wrote:
-> Hi folks,
+On Mon, Jun 22, 2026 at 12:20:48PM -0700, Roman Gushchin wrote:
+> > Including pre-existing issues inline with the reviews is fine by me.
+> > What I was actually hoping for is a way to view all the existing bugs in
+> > a single place, either as a summary email on a regular cadence or a view
+> > on the webpage.
+> > 
+> > We wont have enough cycles to go through every Sashiko review so I'm
+> > worried that some bugs will be missed otherwise.
 > 
-> A sign-extending load (LDRSB/LDRSH/LDRSW) from emulated MMIO returns a
-> zero-extended value rather than the sign-extended one the architecture
-> requires; vcpu_data_host_to_guest() strips the sign bits when it masks
-> the data to the access width.
-> 
-> If my git archeology is right, the masking dates to 2014 (b30070862edbd,
-> big-endian support) and has been wrong ever since, but sign-extending
-> loads from device memory are rare enough that nobody hit it. Patch 1
-> fixes it; patch 2 adds a selftest so it doesn't regress.
-> 
-> Cheers,
-> /fuad
-> 
-> Fuad Tabba (2):
->   KVM: arm64: Fix sign-extension of MMIO loads
->   KVM: arm64: selftests: Add MMIO sign-extending load test
+> I’m working on something like this and it will be available soon-ish.
 
-For the oddball guest :)
+Awesome, looking forward to it. Thanks Roman!
 
-Reviewed-by: Oliver Upton <oupton@kernel.org>
-
-Thanks,
+Best,
 Oliver
