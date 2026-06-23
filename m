@@ -1,41 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18203359A91;
-	Tue, 23 Jun 2026 20:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199373955DD;
+	Tue, 23 Jun 2026 20:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782245105; cv=none; b=f3owjIYUNYaTK6ZqCNPlfwIXW3bbrV7NbS1iy3vJGMwxDHCRZqXWhfRUdXW646sqHoGHQqyND8U0+ztgE6aJSDm2/b4XP0+59JkUulRykcYfnyoqKupdT1Iw6umZ59SDjUgrU0Cj4DTmJTZNVutlqsJdbEaGC0V1Ftsl0nuYEbA=
+	t=1782245329; cv=none; b=aVpYYnfRh5R/TuzkDG69N8QDZrNU+8VQGR4vCP2Uw1mld0cD5/NfEG+21FSNK1K+M0UWBrJyJ+pmqe/o43VphLDjG5//YVYktkdhiDNeYuBUcQKIKRpVHYNAwLHkOCnrgDZ7quv9BdiKkqbY1IsZCK4TDWhIGmVPNxgjUQdHZXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782245105; c=relaxed/simple;
-	bh=WXTJvS8nTBoZayCCQ1UkDdbyJOKhq3Upt7bB2bWi/yA=;
+	s=arc-20240116; t=1782245329; c=relaxed/simple;
+	bh=cj/USVJ6VVdYo0NQQmMJUzVIhTYlL52OK+OEkxS/Q/M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u7K7gbL8stmPl6kB7NG3m0VaRlZ2PGm4hgqvBjkMf4rtB5jh3FtltZ5NW1QrnP/ffddGVeMcPEdpfMSdPM4XLe8RzR+IKf+ToI6ZNO9pauXkR4poCNIYn+Lq9RPywuvRPvp+JkySCRv/lHKQSxsD1F0fEttoSIaSNoEdr5mZGgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrUYuk7L; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=FU/PoS39h4zvyUhP6SVwYWJdIdjW8gdaMe65i2Cc/75nN1vh0A5HnOvWxenF11yS1g12n8oVIvnlJSOO+iblzvUuKZHI8V+2LScmOCgXGNI0/oQkAb4ReqrdEAQdYqa1PUxf66PCPwKYelNtaI54u2bfc9RnrVBIzD1cRmIxF7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHHgbYOY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrUYuk7L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDC7B1F000E9;
-	Tue, 23 Jun 2026 20:05:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHHgbYOY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 584FB1F000E9;
+	Tue, 23 Jun 2026 20:08:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782245103;
-	bh=HPChuZ1mWnlDaBUCXDkMUFJwjArhwD0pAA7GS75DrHo=;
+	s=k20260515; t=1782245327;
+	bh=CGmTT+5Sry8TV0Aj4VBTCzQBYznrl1LqVFOb01dCG6k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QrUYuk7Lz4ZAxRyzXVeEw/m13CLKqUUEVuTEpKJIzfQ52UulJ0PEOLLUv3L6YUKZ4
-	 VeSa5uQAWapb9/q0sIn+EyX3sscGxrg2mCDHKdyaTHMF3j/nzeC+MCTp5KEq6NqKjk
-	 MHQ31wF4IWmxMd4SbkYwoYh0NiqLwafSWYG/PNagfuv0mPFtagoVLDsy+UayEmmcWW
-	 joCSflrovj0JzFe2/grT80q8w/NK2fH+3m4MkycXHioBF2G+IZKcRO9XznJ4kgmQxs
-	 38luD68JUaYvQgAGFeAHeSurzzmq8qXaY5zGKZDLbnZEDXnciYw+iGWIjPOBS0fi7h
-	 bqCv0zZcqygVQ==
-Date: Tue, 23 Jun 2026 13:05:02 -0700
+	b=WHHgbYOYDjbdDPNCiSNYV8aKkmismfcWQlgHUbKGGXEM1GvRCVJCgGsKOhv2EpxLR
+	 t0le9tUctUthoZqHz6hp0VX6oFIqEncQQ4xGgqAzCfRKH0qfX/tftbQesPsWZA2xYC
+	 K7x825rbV62T72sKJjsRgUkeqE7xV9edx68BkbVSP1d2Diwu95GJSSKQkOzIk7kZOw
+	 gt2boHvl/V3/NqsuTTreZV9GbBuLMDTVNvKFbdTh8AGIofp3M9ANQjUzwH96en5ndi
+	 yFOJM1V/1Abjdz9tuqAZqNCi97/mDF8G8/5HUe05SdF14uhD8QvKiUIA5Vtd9MWB18
+	 eYyHbnG4y4YnQ==
+Date: Tue, 23 Jun 2026 13:08:46 -0700
 From: Oliver Upton <oupton@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 04/22] KVM: arm64: nv: Only shadow writable-dirty guest
- descs as writable
-Message-ID: <ajrm7rc4WjemIBxE@kernel.org>
+Subject: Re: [PATCH 08/22] KVM: arm64: nv: Treat DBM as writable at stage-2
+Message-ID: <ajrnzgRRb4SK673x@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
- <20260623184201.1518871-5-oupton@kernel.org>
- <20260623185810.08CC61F000E9@smtp.kernel.org>
+ <20260623184201.1518871-9-oupton@kernel.org>
+ <20260623185533.79A841F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,50 +43,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260623185810.08CC61F000E9@smtp.kernel.org>
+In-Reply-To: <20260623185533.79A841F000E9@smtp.kernel.org>
 
-On Tue, Jun 23, 2026 at 06:58:09PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> 
-> New issues:
-> - [High] Uninitialized or incorrectly evaluated `wr->dirty` field during Stage-1 page table walks causes an infinite VNCR trap loop.
-> 
-> Pre-existing issues:
-> - [High] Write-Only VNCR mappings cause an infinite trap loop because KVM falls back to `PAGE_KERNEL_NONE` but considers write faults resolved.
+On Tue, Jun 23, 2026 at 06:55:33PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Critical] DBM incorrectly grants write permission to "No access" stage-2 pages, breaking nested guest isolation.
 > --
 > 
-> commit fb5a66a1eb4ac6175aad6cbbd38f45328f4f937b
+> commit 99b59d5177f5650f344f4c618e4c4dcd2d5d6d1c
 > Author: Oliver Upton <oupton@kernel.org>
 > 
-> KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
->     
-> KVM will soon add support for hardware dirty state management for nested
-> guests. In order to emulate dirty state transitions on the guest
-> desciptor, KVM will need to use read-only hardware mappings and re-walk
-> the guest page tables upon taking a permission fault.
->     
-> Prepare by limiting shadow stage-2 and shadow VNCR translations to
-> read-only for writable-clean guest translations.
+> KVM: arm64: nv: Treat DBM as writable at stage-2
 > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 86b499e7a9a06..7a84495a2e6d4 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
+> This commit modifies the stage-2 permission computation to treat the DBM bit
+> as granting write permission when hardware dirty state is enabled.
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
 > [ ... ]
-> > @@ -1317,6 +1317,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
-> >  			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
-> >  	wr->pw &= !pan;
-> >  	wr->pr &= !pan;
-> > +	wr->dirty = !(wr->desc & BIT(7));
+> > @@ -305,6 +305,17 @@ static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *w
+> >  		break;
+> >  	}
+> >  
+> > +	/*
+> > +	 * Descriptors with the DBM bit set while hardware dirty state are
+> > +	 * considered writable, even though certain accesses (like AT instructions)
+> > +	 * don't actually update the dirty state.
+> > +	 *
+> > +	 * Assume that walk_nestd_s2_pgd() made the necessary descriptor updates
+> > +	 * for the access and just treat DBM as writable here.
+> > +	 */
+> > +	if (wi->hd && ws->desc & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
+> > +		s2ap |= BIT(1);
 > 
-> [Severity: High]
-> Could the unconditional use of BIT(7) here cause issues when S1PIE is
-> enabled?
+> [Severity: Critical]
+> If s2ap is initially 0b00 (No access), this unconditional OR operation will
+> upgrade it to 0b10 (Write-only) in compute_s2_permissions(). Does this
+> inadvertently bypass stage-2 memory protections if an L1 hypervisor maps a
+> page as No access but leaves the DBM bit set?
 > 
-> With S1PIE, BIT(7) becomes PIIndex[3], so using it to evaluate the dirty
-> state might be incorrect.
+> Without verifying that read access is already granted via s2ap & BIT(0),
+> this logic grants write permission to a No access page, allowing an L2 guest
+> to write to memory explicitly protected by the L1 hypervisor.
 
-Bit 7 is nDirty when using indirect permissions, so this is wrong.
+This is wrong.
+
+R_XZFQH defines a descriptor with DBM set that would otherwise generate
+a write permission fault as writable-clean. That means the descriptor
+grants write permission and hardware can relax it to writable-dirty
+depending on the access.
 
 Thanks,
 Oliver
