@@ -1,107 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF70731E84E
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 14:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473B63AEF49
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 14:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782225663; cv=none; b=iDygs4XrVIgw76yWxnz8uVKDHnPbwlGdB02/oso5izYDlewfLoAJfZ2f96IW16N4aBdpqcqcRlJ3GRLFobP2itsFtwxd2jYj7DOeuXZBax/pBsaP+TkEfmjpt7338SdQqjdAqeUcSgOHmJ7fSLAZyHD5I6bWfNm/TXCQLwKMiAw=
+	t=1782225883; cv=none; b=gpB6yHeVMnLvpjCRRNSAdBQ+Y83btKBylhx5i2v9MgS8ziJwNzPHYFu8NiVNXSBQGirdNCX5MftYRCmhV4a+6k3FvAqztdjdXRsDYWXV93hyDDktpGK4OcYz9zDeCqgnsYjxzWFU6d5/Qn985jKdoKY9PkGOeepdwGDXJI2jnKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782225663; c=relaxed/simple;
-	bh=BTaIBMzN05nC+LcZgD0X6/rA6eseqMjJj3YlQ96JkjU=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=UvVojFGGoh4nUzZGEwN6dus/LflPhuUZqDwD3ROyJO1GP9J1o12mCO87L/G01fJdonpj1Q17A13UXYyUtn/va8caYO2Nn1Rp9TjcMCpKsx9y+udp+YhMYvvcwkgrEx80GolDCZTlimoBUNyvTyF2iRfKz/d/gUcJauLf9PdGnsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DjOT6aDs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782225883; c=relaxed/simple;
+	bh=OLyyvbXtqpwYtrdcTo4YciOw2e2u9muWYAHapaeDZcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewLGQKvmURL7JI6Ekt/a7csqwjRCfFg0aYKsGmZencn4oDIAxYJmj+AzJdEuQoEbXmIZkDh0misYFOArJKgJaE948vKcHxfQlFuzwL4usCRGLknh4dpIxtYioOHhl3T3Lp004SdHjbOtHlepYJnzVPi+mFcmXhZbfzEzh0O9c28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VLpYZwhv; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DjOT6aDs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C4C81F000E9;
-	Tue, 23 Jun 2026 14:41:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782225662;
-	bh=tiaFxAMvmH7/HbT/i19pwR6MKV/z/DLZOd75lXM6vHs=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DjOT6aDss2qliGnor1Tvjyx27Rp5CWQdYshjewIu5RYbQbOwsk9kWZWuHzHq7ISL1
-	 yqUyd6qB6KB+EjgYlrIi2YfjZSa/eSEQT/KzRgwCNw9lypA/Gr4H8F956sobOgynKy
-	 VHYO/raIwF5g6PipmB7ul0WrsCpQDkwY1OjS14Rd8bJxthvgI+lmFmRHQV6JF4oDnl
-	 H/O7UWhJ5JNmA3rdZiYr9L37cZjgUt7OULMWuSpmYH5Xdp0nbMszHBnN7/OrO6vGTs
-	 owxasJXVhjuAECjZS18j5ut/IQBEiQYVSzhmtV/vqJcHv9BGpN5vP81c74yac+Vevx
-	 Yl7lOIZbwRi/A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Move to per nested mmu ptdump files
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Wei-Lin Chang" <weilin.chang@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260623142443.648972-4-weilin.chang@arm.com>
-References: <20260623142443.648972-1-weilin.chang@arm.com>
- <20260623142443.648972-4-weilin.chang@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2026 14:41:01 +0000
-Message-Id: <20260623144102.4C4C81F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VLpYZwhv"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25C6A1A25;
+	Tue, 23 Jun 2026 07:44:37 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC4683F632;
+	Tue, 23 Jun 2026 07:44:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782225881; bh=OLyyvbXtqpwYtrdcTo4YciOw2e2u9muWYAHapaeDZcc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VLpYZwhv/YRlKuEE5RRJyglnvSTlYCj0qlJlvr76oFvssE7LthszFJL5YPy8hZPdS
+	 NSDnKL+l/Qzrn6Mjp/9ze5FnXE9MCi7mGTU9uIBadRpw2tXON7lIGzcnI1qJ6mQl+D
+	 CnQ4No3ZMYwIvYb2KY8JtEKIKtO2n6dX8WbcWB5w=
+Date: Tue, 23 Jun 2026 15:44:25 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>
+Subject: Re: [PATCH RESEND v2 3/5] KVM: arm64: nv: Re-translate VNCR before
+ injecting abort
+Message-ID: <cdcjimpyohzgbttm7fnhzzqbiy2s74y7p2lmap2agutosk4d2r@gj7d5nwdbr6y>
+References: <20260609185514.746507-1-oupton@kernel.org>
+ <20260609185514.746507-4-oupton@kernel.org>
+ <yw6b7zx2qxjckkut4lzkuqekh2omttwmulvqbslk27wt3vu6mp@ostr7avq6a7e>
+ <ajRomJ-Y3EOxJUU-@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajRomJ-Y3EOxJUU-@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Thu, Jun 18, 2026 at 02:52:24PM -0700, Oliver Upton wrote:
+> Hey Wei-Lin,
+> 
+> Sorry for the latency on my end.
+> 
+> On Wed, Jun 10, 2026 at 02:46:18PM +0100, Wei-Lin Chang wrote:
+> > Just a comment using this thread:
+> > 
+> > While reading this, I found this part of the code (not this patch in
+> > particular) a little bit difficult to reason about. I think it's because
+> > kvm_translate_vncr() is doing many things, and there are multiple
+> > potential failure reasons e.g. s1 walk fault, no memslot, gmem/user mem
+> > faultin errors, MMU notifier check, etc., and they are all mux'ed into
+> > an error code with some context visible by the caller.
+> > 
+> > So in kvm_handle_vncr_abort() we demux the error code and handle the
+> > errors with the help of the context (vt, is_gmem). We essentially have
+> > to keep track of what error codes correspond to what error reasons.
+> > 
+> > Do you think it is better if we refactor and handle the errors when they
+> > occur? Like inject the exception back to vEL2 right after getting the
+> > results of __kvm_translate_va(), and finish up the abort handling there.
+> > Same for other cases.
+> > 
+> > I can try it out and make it concrete if you also think this is
+> > reasonable. Probably after this series gets applied when the comments
+> > from Marc & Sashiko are addressed. (I reviewed and don't have additional
+> > comments though.)
+> 
+> Yeah, returning error codes for 'normal' behavior is extremely difficult
+> to work with. TBH, I'd rather we go a step further and rework the whole
+> software PTW to only return errors in the case that we have to report it
+> to userspace.
+> 
+> Otherwise, aborted walks due to guest behavior should ideally return 1
+> and and inspect the walk result to differentiate between a successful /
+> aborted translation.
 
-Pre-existing issues:
-- [High] Kernel panic on error path due to kvm_free_stage2_pgd() being call=
-ed on uninitialized kvm_s2_mmu elements.
---
+Thanks for your suggestion!
+I'll put this in the "potential improvements" list for now, there are
+other fixes I need to work on.
 
-commit b126bbf9b1139c4e5f8f15f1b55bdfca981c84c3
-Author: Wei-Lin Chang <weilin.chang@arm.com>
+Thanks,
+Wei-Lin Chang
 
-KVM: arm64: nv: Move to per nested mmu ptdump files
-
-Move the creation of shadow page table debugfs files to be per-nested-mmu
-instance instead of recreating them on context binding, avoiding sleeping
-operations while holding the mmu_lock.
-
-Link: https://lore.kernel.org/kvmarm/aiuF0KSvvv-ZozI1@sm-arm-grace07/
-
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index fb54f6dad995c..07f94b8b82365 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-
-[ ... ]
-
-> @@ -125,6 +130,9 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  		return ret;
->  	}
-> =20
-
-[Severity: High]
-This is a pre-existing issue, but does the error path cleanup loop just
-above this return in kvm_vcpu_init_nested() cause a kernel panic if
-init_nested_s2_mmu() fails?
-
-The cleanup loop unconditionally calls kvm_free_stage2_pgd() on array
-elements from kvm->arch.nested_mmus_size to num_mmus - 1:
-
-	if (ret) {
-		for (int i =3D kvm->arch.nested_mmus_size; i < num_mmus; i++)
-			kvm_free_stage2_pgd(&kvm->arch.nested_mmus[i]);
-
-For any element that failed initialization or wasn't visited yet, the
-kvm_s2_mmu element remains zero-initialized, meaning mmu->arch is NULL.
-Inside arch/arm64/kvm/mmu.c:kvm_free_stage2_pgd(), it calls
-kvm_s2_mmu_to_kvm(mmu) which derives the kvm pointer via container_of()
-on mmu->arch. This yields an invalid pointer, and the subsequent
-write_lock(&kvm->mmu_lock) dereferences it, crashing the kernel.
-
-> +	for (int i =3D kvm->arch.nested_mmus_size; i < num_mmus; i++)
-> +		kvm_nested_s2_ptdump_create_debugfs(&kvm->arch.nested_mmus[i]);
-> +
->  	kvm->arch.nested_mmus_size =3D num_mmus;
-> =20
->  	return 0;
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623142443.6489=
-72-1-weilin.chang@arm.com?part=3D3
+> 
+> Thanks,
+> Oliver
