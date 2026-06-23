@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E9938B7BA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4A838C433
 	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 18:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782240126; cv=none; b=N/YRoRG+khRb19UrHqfvTahLRPZ7VTHYJ4+h2Xhe5JnqShNaGSkZ5L80TCmmOs6qqvStY/z7keHAjvoKidjuAaYjAFxZ5lTXCJfRxIbugLQ2W4eq133rp04eJbp2ZxFJXj0nzt9C88z0ojrhTCphFweHopbWqV7bL9WmkbZlam0=
+	t=1782240127; cv=none; b=LEqwnxl/89dcCOB3lIC7RDXtE7/Ug/lp03nmcD/kdkQfaBjIMnxjfasFrbhKf2DUNDwoD8vO5i6TWnwGBElCAn1BuAzuXiB51j4rZYlmlNbDzf91Tu3cTeUFCJS1X1djYFac9iW8WVxoHjDCNto2Bm1j3i5f6ScKn9KJx8IOS4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782240126; c=relaxed/simple;
-	bh=VWk/3oo4MC6hfXKIuACZ9bKcStC4CZ8DKT7K7GQENnw=;
+	s=arc-20240116; t=1782240127; c=relaxed/simple;
+	bh=SgYjSxLmGm/hsof8eLwKJOs3qe1EDj2KzjSDLToh9gA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dauarvy2F/JHwV5JY3eR/qS9jVo5uUKSr4eoRchaasb9BTg9uH7YeCkWR0UlBVFyjKuzlnndeOf/fnkaudpxx/E3NvLC1Kl8UYTPqpQzDMcyWmrnV7LgEyT4dE6VEk9P99B7RLi/GC3itnzFHe00jsGzzNIa6LNH9EfIdZGjagM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYcQ02MR; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=RD+3Ps/MqPZnq77n5RDCrgtbZ170i5OJqD1vzv0dj3lLtuyH0KMHU/Liw64HHXDM85YLIV6pE9wHMoVzvNkzj9rqdu/u4MSsNcnmmJ5j+T3KP41WsUGDO3Y1TdPdKelxI6Gxjo4R16mSNtgaD+LkGT9Y4Q09MhvNoSjt0SrF7Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFDDlTZI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYcQ02MR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E151F00AC4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFDDlTZI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8AB21F00ACA;
 	Tue, 23 Jun 2026 18:42:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1782240125;
-	bh=V8CbiSl3pCevUkPEiGd8MhsOE49pKegQKqBZsdJoYss=;
+	bh=U8oy23ksSpQx4aH884C4lRGDOHj96WiAdZgOvx/4+Kk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=LYcQ02MRcTM95obYmJ8SN4q3UbqvKW2B1avfQ1IYHaBhEvLQrHj5RNScED021opls
-	 c3WbF9Y8iUbXo84xbTkw/I1B/hoQCfMizaCa/haseArJeS/QCk2NrTOIE1VmWTGhOK
-	 vyzfxS8D1MDT5tQ+KF3ZJdpncq3OR8LHmJfH2vLYcfg0XoLxvk9kjLLOR8D28aZYJi
-	 4HQ7GztplvdQI1e4NsEC4gpt4vUR3FkQsMbCbUGOIzNt8zrU97duT3IYGVOLIhOgPt
-	 nZnFlHBDN40vQ7N/zWglvt/iGjW42zgoiP1JBZVpnYj4EiWvE2H9iWkOuqonEghYP4
-	 bc12F3FeX4kiQ==
+	b=jFDDlTZIP5dTTPTJQE2Y6ZVArEXwLEiCHzhu6LxhjRI//+LNq9kuNzTgPPfZMmIeW
+	 jVMeexsnm9oxauGBVxqfJaypl7d1mqv4WR9FG7ipVrts3hqaBFasrFRQU8BAYYI9Ta
+	 ortn+CRvlRU6Ct//LgZUXwztCSJxiPDIVMEvK3vVdhgAeFzJLrEToYPXLTMKDUqi0E
+	 GdQNigwHkXvT/N1qr6dvhr/fsCZguE2bANCf02vUnJV/X6NpihIicMhqQAzOK84TPG
+	 3bn602OCnORTKTo17G4R7wbEvQSvc2AdF9awY69JHpRp3MUHz26d+b5jGY++ACXpqz
+	 Bj+pCI1NQ6Exw==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 02/22] KVM: arm64: nv: Consolidate computation of stage-2 permissions
-Date: Tue, 23 Jun 2026 11:41:41 -0700
-Message-ID: <20260623184201.1518871-3-oupton@kernel.org>
+Subject: [PATCH 03/22] KVM: arm64: nv: Get rid of kvm_s2_trans*() accessors
+Date: Tue, 23 Jun 2026 11:41:42 -0700
+Message-ID: <20260623184201.1518871-4-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
 References: <20260623184201.1518871-1-oupton@kernel.org>
@@ -49,157 +49,193 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Computing the output permissions from a translation requires
-contextualization, as fields in the descriptors may change depending on
-the MMU context. Centralize the computation of stage-2 permissions
-within the table walk rather as opposed to inspecting the descriptor in
-the case of pX and uX permissions.
+Access the aptly named fields in kvm_s2_trans directly rather than
+indirecting through useless getters.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h  | 42 ++++++++--------------------
- arch/arm64/include/asm/kvm_pgtable.h |  5 ++--
- arch/arm64/kvm/nested.c              | 33 ++++++++++++++++++++--
- 3 files changed, 45 insertions(+), 35 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h | 35 -----------------------------
+ arch/arm64/kvm/at.c                 |  6 ++---
+ arch/arm64/kvm/mmu.c                | 20 ++++++++---------
+ arch/arm64/kvm/nested.c             |  4 ++--
+ 4 files changed, 15 insertions(+), 50 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index cbdaaa2a2903..aa27f12cf2d4 100644
+index aa27f12cf2d4..3b36ed7c7608 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -87,13 +87,15 @@ extern void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu);
- extern void kvm_nested_setup_mdcr_el2(struct kvm_vcpu *vcpu);
- 
- struct kvm_s2_trans {
--	phys_addr_t output;
--	unsigned long block_size;
--	bool writable;
--	bool readable;
--	int level;
--	u32 esr;
--	u64 desc;
-+	u64		desc;
-+	phys_addr_t	output;
-+	unsigned long	block_size;
-+	int		level;
-+	u32		esr;
-+	bool		writable;
-+	bool		readable;
-+	bool		px;
-+	bool		ux;
+@@ -98,47 +98,12 @@ struct kvm_s2_trans {
+ 	bool		ux;
  };
  
- static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
-@@ -129,34 +131,12 @@ static inline bool kvm_has_xnx(struct kvm *kvm)
- 
- static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *trans)
+-static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
+-{
+-	return trans->output;
+-}
+-
+-static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
+-{
+-	return trans->block_size;
+-}
+-
+-static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
+-{
+-	return trans->esr;
+-}
+-
+-static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
+-{
+-	return trans->readable;
+-}
+-
+-static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
+-{
+-	return trans->writable;
+-}
+-
+ static inline bool kvm_has_xnx(struct kvm *kvm)
  {
--	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
--
--	if (!kvm_has_xnx(kvm))
--		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
--
--	switch (xn) {
--	case 0b00:
--	case 0b01:
--		return true;
--	default:
--		return false;
--	}
-+	return trans->ux;
+ 	return cpus_have_final_cap(ARM64_HAS_XNX) &&
+ 		kvm_has_feat(kvm, ID_AA64MMFR1_EL1, XNX, IMP);
  }
  
- static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *trans)
- {
--	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
+-static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *trans)
+-{
+-	return trans->ux;
+-}
 -
--	if (!kvm_has_xnx(kvm))
--		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
+-static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *trans)
+-{
+-	return trans->px;
+-}
 -
--	switch (xn) {
--	case 0b00:
--	case 0b11:
--		return true;
--	default:
--		return false;
--	}
-+	return trans->px;
- }
- 
  extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 41a8687938eb..22aeb2ed18d1 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -79,6 +79,8 @@ typedef u64 kvm_pte_t;
- #define KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR	GENMASK(5, 2)
- #define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R	BIT(6)
- #define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W	BIT(7)
-+#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |	\
-+					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
- #define KVM_PTE_LEAF_ATTR_LO_S2_SH	GENMASK(9, 8)
- #define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS	3
- #define KVM_PTE_LEAF_ATTR_LO_S2_AF	BIT(10)
-@@ -95,8 +97,7 @@ typedef u64 kvm_pte_t;
+ 			      struct kvm_s2_trans *result);
+ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 8263c648207b..86b499e7a9a0 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -494,14 +494,14 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 				return ret;
+ 			}
  
- #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+-			if (!kvm_s2_trans_readable(&s2_trans)) {
++			if (!s2_trans.readable) {
+ 				fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level),
+ 					     true);
  
--#define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
--					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
-+#define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP |	\
- 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+ 				return -EPERM;
+ 			}
  
- /* pKVM invalid pte encodings */
+-			ipa = kvm_s2_trans_output(&s2_trans);
++			ipa = s2_trans.output;
+ 		}
+ 
+ 		if (wi->filter) {
+@@ -582,7 +582,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		new_desc |= PTE_AF;
+ 
+ 	if (new_desc != desc) {
+-		if (wi->s2 && !kvm_s2_trans_writable(&s2_trans)) {
++		if (wi->s2 && !s2_trans.writable) {
+ 			fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level), true);
+ 			return -EPERM;
+ 		}
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8811ad60cf72..07bd1e3ae9fb 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1572,9 +1572,9 @@ static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
+ static enum kvm_pgtable_prot adjust_nested_fault_perms(struct kvm_s2_trans *nested,
+ 						       enum kvm_pgtable_prot prot)
+ {
+-	if (!kvm_s2_trans_writable(nested))
++	if (!nested->writable)
+ 		prot &= ~KVM_PGTABLE_PROT_W;
+-	if (!kvm_s2_trans_readable(nested))
++	if (!nested->readable)
+ 		prot &= ~KVM_PGTABLE_PROT_R;
+ 
+ 	return prot | kvm_encode_nested_level(nested);
+@@ -1584,9 +1584,9 @@ static enum kvm_pgtable_prot adjust_nested_exec_perms(struct kvm *kvm,
+ 						      struct kvm_s2_trans *nested,
+ 						      enum kvm_pgtable_prot prot)
+ {
+-	if (!kvm_s2_trans_exec_el0(kvm, nested))
++	if (!nested->ux)
+ 		prot &= ~KVM_PGTABLE_PROT_UX;
+-	if (!kvm_s2_trans_exec_el1(kvm, nested))
++	if (!nested->px)
+ 		prot &= ~KVM_PGTABLE_PROT_PX;
+ 
+ 	return prot;
+@@ -1623,7 +1623,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	}
+ 
+ 	if (s2fd->nested)
+-		gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
++		gfn = s2fd->nested->output >> PAGE_SHIFT;
+ 	else
+ 		gfn = s2fd->fault_ipa >> PAGE_SHIFT;
+ 
+@@ -1817,7 +1817,7 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+ 		 * can only create a block mapping if the guest stage 2 page
+ 		 * table uses at least as big a mapping.
+ 		 */
+-		max_map_size = min(kvm_s2_trans_size(s2fd->nested), max_map_size);
++		max_map_size = min(s2fd->nested->block_size, max_map_size);
+ 
+ 		/*
+ 		 * Be careful that if the mapping size falls between
+@@ -1891,7 +1891,7 @@ static gfn_t get_canonical_gfn(const struct kvm_s2_fault_desc *s2fd,
+ 	if (!s2fd->nested)
+ 		return s2vi->gfn;
+ 
+-	ipa = kvm_s2_trans_output(s2fd->nested);
++	ipa = s2fd->nested->output;
+ 	return ALIGN_DOWN(ipa, s2vi->vma_pagesize) >> PAGE_SHIFT;
+ }
+ 
+@@ -2322,19 +2322,19 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		}
+ 
+ 		if (ret) {
+-			esr = kvm_s2_trans_esr(&nested_trans);
++			esr = nested_trans.esr;
+ 			kvm_inject_s2_fault(vcpu, esr);
+ 			goto out_unlock;
+ 		}
+ 
+ 		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
+ 		if (ret) {
+-			esr = kvm_s2_trans_esr(&nested_trans);
++			esr = nested_trans.esr;
+ 			kvm_inject_s2_fault(vcpu, esr);
+ 			goto out_unlock;
+ 		}
+ 
+-		ipa = kvm_s2_trans_output(&nested_trans);
++		ipa = nested_trans.output;
+ 		nested = &nested_trans;
+ 	}
+ 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 9e60c7c822ae..c9300703bd0d 100644
+index c9300703bd0d..b247bc1d83fa 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -241,6 +241,36 @@ static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u6
- 	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
- }
+@@ -954,9 +954,9 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
  
-+static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
-+				   struct s2_walk_step *ws, struct kvm_s2_trans *trans)
-+{
-+	u8 s2ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S2_S2AP, ws->desc);
-+	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, ws->desc);
-+
-+	if (!kvm_has_xnx(vcpu->kvm))
-+		xn &= 0b10;
-+
-+	switch (xn) {
-+	case 0b00:
-+		trans->px = trans->ux = true;
-+		break;
-+	case 0b01:
-+		trans->px = false;
-+		trans->ux = true;
-+		break;
-+	case 0b10:
-+		trans->px = trans->ux = false;
-+		break;
-+	case 0b11:
-+		trans->px = true;
-+		trans->ux = false;
-+		break;
-+	}
-+
-+	trans->readable = s2ap & BIT(0);
-+	trans->writable = s2ap & BIT(1);
-+}
-+
- /*
-  * This is essentially a C-version of the pseudo code from the ARM ARM
-  * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
-@@ -382,8 +412,7 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
- 	out->output = (ws.desc & GENMASK_ULL(47, addr_bottom)) |
- 		      (ipa & GENMASK_ULL(addr_bottom - 1, 0));
- 	out->block_size = 1UL << ((3 - ws.level) * stride + wi->pgshift);
--	out->readable = ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
--	out->writable = ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-+	compute_s2_permissions(vcpu, wi, &ws, out);
- 	out->level = ws.level;
- 	out->desc = ws.desc;
- 	return 0;
+ 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
+ 		if (vcpu_mode_priv(vcpu))
+-			forward_fault = !kvm_s2_trans_exec_el1(vcpu->kvm, trans);
++			forward_fault = !trans->px;
+ 		else
+-			forward_fault = !kvm_s2_trans_exec_el0(vcpu->kvm, trans);
++			forward_fault = !trans->ux;
+ 	} else {
+ 		bool write_fault = kvm_is_write_fault(vcpu);
+ 
 -- 
 2.47.3
 
