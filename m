@@ -1,42 +1,41 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDE62FB97D;
-	Tue, 23 Jun 2026 18:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742A0390239;
+	Tue, 23 Jun 2026 18:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782237969; cv=none; b=D+qLLbkdvJTTHUUl2xYxmz7EA9HskhsKLvQ3w5x+nv/JtnblE7ySUIbOLTv9CMZ3gBSzVcfoMPqhC/eKQJBBIXbaKTnwYSLScYdpEHAQf/9ycLYlmlSYlekwxs5dK8Jx55uZiB4FQbMIen4hqMY4gy7YJ3VEPa10DLwx1hMKHDk=
+	t=1782238232; cv=none; b=ghpQxUcq2J6b+vbNqQ1o3CywpAWNPi+d2veHn80kOyhqAnnyXq4oV21VgPeXwKwtoMUgQCPH3ZuKr7qFsSmBwC02UwKPkjjElPy/AqLpwTaRMeXRPRZr7vQhFUkZ4jo+B0zBjRcnM7LDZdV7+/SgQyB/azKhqa/KlKrxG28Ym9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782237969; c=relaxed/simple;
-	bh=Tuvz71pHY3CmXGxnNEKjZJFrNbzU+iKTcWwYIjhrdYI=;
+	s=arc-20240116; t=1782238232; c=relaxed/simple;
+	bh=iQcOJX9HH4cEJulaKgZgAFvfa3GW/KlOaXXDMdc5y5Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/yi/jOXvXhwP51pZ6FIMnPMCwj+tDRNj7bNLmOKcuttulJC4Z82qWQDz1yxepq8QRTlvAhILBk4fOyWos33AsqsZ6lLy9bLm61wUFdILZtNNEVhfLobkbo7SQ8W4sOPbvxqdOkE7J30+uU+YeZ/pcLMiMs+mNIuXeHA9I4+pY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FncEJ90k; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=cB2etK9JyDsiT2XxK/ULMGQ1wLcJsKvYeybQJDCgPYL0H3f3lqIyzx1oTMJGGxfH7r1SKBoGuuPr9QR4L85GEPOt7zL+sQUu4WqnEC8Z8UYKPKiM6YevPmxRIIs9fOpjfFRRpQDBAh5vDl+1wNC5uvEjZN0phFh+hf+PCWwSLFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Loq16k12; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FncEJ90k"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Loq16k12"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AD53175D;
-	Tue, 23 Jun 2026 11:06:01 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 03760175D;
+	Tue, 23 Jun 2026 11:10:26 -0700 (PDT)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE6DD3F632;
-	Tue, 23 Jun 2026 11:06:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 652003F632;
+	Tue, 23 Jun 2026 11:10:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782237966; bh=Tuvz71pHY3CmXGxnNEKjZJFrNbzU+iKTcWwYIjhrdYI=;
+	t=1782238230; bh=iQcOJX9HH4cEJulaKgZgAFvfa3GW/KlOaXXDMdc5y5Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FncEJ90kAvJ9NLtvRWqX/EggsPciNqlc+TMRXQ3wcmE0jT4OKbD4Cmazj9UZiFNY1
-	 oYUhZw8W98a1gW7BYWtHfHpwGymaXl1zE+ZqvsQO8RcQkHinCjuPG2Ut/rBQDPv4kH
-	 4qtR+aj3V1aX3vHW8ObUoXzPUf4kwyr03dx7fR9c=
-Date: Tue, 23 Jun 2026 19:05:39 +0100
+	b=Loq16k12IB0IT8CbwsIGk96HxLOeHSzaa53+QlbPaI5gl7KZEAWTmIJ8fgYpDn7GE
+	 kDHJy6oq5+QIT0l9SunLxHcqzx1RDU7VenSBzuKh/Uql3rdbAr5TvNAGdBlRDwmCSU
+	 QSGIyDO7Qh2YzOR+GRYE1mRc/kQ7UCve16aj2ctw=
+Date: Tue, 23 Jun 2026 19:10:22 +0100
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 1/3] KVM: arm64: nv: Print nested mmu info in
- kvm_ptdump_guest_show()
-Message-ID: <nj6bps35nrytud2iegkhpsl45ptl26tdvczoahtvch2gmqxnfb@2rtrlvlsetu4>
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Move to per nested mmu ptdump files
+Message-ID: <7jmgyrjdfep3jmyva2owu5pw435pcl76cfddnuiyxt5gkciqry@5n74ctjqewdw>
 References: <20260623142443.648972-1-weilin.chang@arm.com>
- <20260623142443.648972-2-weilin.chang@arm.com>
- <20260623144054.B91D21F000E9@smtp.kernel.org>
+ <20260623142443.648972-4-weilin.chang@arm.com>
+ <20260623144102.4C4C81F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,69 +45,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260623144054.B91D21F000E9@smtp.kernel.org>
+In-Reply-To: <20260623144102.4C4C81F000E9@smtp.kernel.org>
 
-On Tue, Jun 23, 2026 at 02:40:54PM +0000, sashiko-bot@kernel.org wrote:
+On Tue, Jun 23, 2026 at 02:41:01PM +0000, sashiko-bot@kernel.org wrote:
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
 > 
 > Pre-existing issues:
-> - [High] Pre-existing Use-After-Free and NULL pointer dereference in debugfs handlers due to concurrent MMU teardown.
+> - [High] Kernel panic on error path due to kvm_free_stage2_pgd() being called on uninitialized kvm_s2_mmu elements.
 > --
 > 
-> commit 09a8b839f22b6806feaaf12ccca901b340acd24f
+> commit b126bbf9b1139c4e5f8f15f1b55bdfca981c84c3
 > Author: Wei-Lin Chang <weilin.chang@arm.com>
 > 
-> KVM: arm64: nv: Print nested mmu info in kvm_ptdump_guest_show()
+> KVM: arm64: nv: Move to per nested mmu ptdump files
 > 
-> This commit extends kvm_ptdump_guest_show() to print VTCR, VTTBR, and s2
-> enabled information for valid nested MMUs. It also converts the MMU lock usage
-> to use a lock guard.
+> Move the creation of shadow page table debugfs files to be per-nested-mmu
+> instance instead of recreating them on context binding, avoiding sleeping
+> operations while holding the mmu_lock.
 > 
-> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > index c9140e22abcf1..2a6afe67646af 100644
-> > --- a/arch/arm64/kvm/ptdump.c
-> > +++ b/arch/arm64/kvm/ptdump.c
-> > @@ -155,9 +155,16 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> >  		.seq		= m,
-> >  	};
+> Link: https://lore.kernel.org/kvmarm/aiuF0KSvvv-ZozI1@sm-arm-grace07/
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index fb54f6dad995c..07f94b8b82365 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> 
+> [ ... ]
+> 
+> > @@ -125,6 +130,9 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >  		return ret;
+> >  	}
 > >  
-> > -	write_lock(&kvm->mmu_lock);
-> > +	guard(write_lock)(&kvm->mmu_lock);
-> > +	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
-> > +		if (!kvm_s2_mmu_valid(mmu)) {
-> > +			seq_puts(m, "invalid nested mmu\n");
-> > +			return 0;
-> > +		}
-> > +		seq_printf(m, "0x%016llx 0x%016llx %d\n", mmu->tlb_vttbr,
-> > +			   mmu->tlb_vtcr, mmu->nested_stage2_enabled ? 1 : 0);
-> > +	}
-> >  	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
 > 
 > [Severity: High]
-> This is a pre-existing issue, but can this dereference of mmu->pgt cause a
-> NULL pointer dereference or a Use-After-Free?
+> This is a pre-existing issue, but does the error path cleanup loop just
+> above this return in kvm_vcpu_init_nested() cause a kernel panic if
+> init_nested_s2_mmu() fails?
 > 
-> If the process holding the VM dies, kvm_mmu_notifier_release() is triggered.
-> This uninitializes the stage-2 MMU and sets mmu->pgt = NULL for the canonical
-> MMU. However, the KVM struct can be kept alive by open file descriptors for
-> debugfs files, so kvm_destroy_vm() is not called yet.
+> The cleanup loop unconditionally calls kvm_free_stage2_pgd() on array
+> elements from kvm->arch.nested_mmus_size to num_mmus - 1:
 > 
-> If a concurrent reader accesses the stage2_page_tables debugfs file and
-> invokes kvm_ptdump_guest_show(), could it blindly evaluate
-> BIT(mmu->pgt->ia_bits) here and trigger a NULL pointer dereference?
+> 	if (ret) {
+> 		for (int i = kvm->arch.nested_mmus_size; i < num_mmus; i++)
+> 			kvm_free_stage2_pgd(&kvm->arch.nested_mmus[i]);
 > 
-> Similarly, in kvm_pgtable_debugfs_open() for other debugfs files like range
-> or levels, the mmu->pgt pointer is cached at open time without synchronization:
-> 
-> 	pgtable = mmu->pgt;
-> 
-> 	ret = single_open(file, show, pgtable);
-> 
-> Could this lead to a Use-After-Free in the show handlers if the page tables
-> are freed by concurrent MMU teardown before a read occurs?
+> For any element that failed initialization or wasn't visited yet, the
+> kvm_s2_mmu element remains zero-initialized, meaning mmu->arch is NULL.
+> Inside arch/arm64/kvm/mmu.c:kvm_free_stage2_pgd(), it calls
+> kvm_s2_mmu_to_kvm(mmu) which derives the kvm pointer via container_of()
+> on mmu->arch. This yields an invalid pointer, and the subsequent
+> write_lock(&kvm->mmu_lock) dereferences it, crashing the kernel.
 
-Yes, this can happen. Just reproduced it by open stage2_page_tables ->
-kill VM -> read file.
+Yes, this can also happen. Reproduced by simulating an allocation error
+(-ENOMEM) return from kvm_init_stage2_mmu() for a nested mmu.
 
 I'll work on it.
 
@@ -116,10 +105,12 @@ Thanks,
 Wei-Lin Chang
 
 > 
-> > -	write_unlock(&kvm->mmu_lock);
+> > +	for (int i = kvm->arch.nested_mmus_size; i < num_mmus; i++)
+> > +		kvm_nested_s2_ptdump_create_debugfs(&kvm->arch.nested_mmus[i]);
+> > +
+> >  	kvm->arch.nested_mmus_size = num_mmus;
 > >  
-> >  	return ret;
-> >  }
+> >  	return 0;
 > 
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=1
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=3
