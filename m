@@ -1,128 +1,93 @@
-Received: from confino.investici.org (confino.investici.org [93.190.126.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5682B3955CF
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 19:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18203359A91;
+	Tue, 23 Jun 2026 20:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782244591; cv=none; b=i3Cf9EiSoEoYNSNrLq96/rOGjCvrrvG9CGAN65zy8JPMIeGojdPQal5vV16Km5tRE3cRlptxKg3WuDrzGllE1DHhK9fLi3cIKb5nUY1ldZ10Zrp2krYEx+2jf+ocGGZvFZAvWW2aHQMsdCQjaq1vC71YiARfJf/CJQqlNwi2zPM=
+	t=1782245105; cv=none; b=f3owjIYUNYaTK6ZqCNPlfwIXW3bbrV7NbS1iy3vJGMwxDHCRZqXWhfRUdXW646sqHoGHQqyND8U0+ztgE6aJSDm2/b4XP0+59JkUulRykcYfnyoqKupdT1Iw6umZ59SDjUgrU0Cj4DTmJTZNVutlqsJdbEaGC0V1Ftsl0nuYEbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782244591; c=relaxed/simple;
-	bh=vK9oCcG5cTm27IB1LvOBgN6BQWOegBMaomXG0ASyceI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=FORgox49Mon1kmgYrKVApeEPbzGbFU9sFJQzXxTfFhXm84Lodkkg/qC/+ZxEJRHJXx5FBtlDOlnyMs8OKnIsZhoRV+93S5He2zHqvp/3eihfiZFc04lFpZW67Uiw6oAR/G4ZR036EX7/MuNYhS/gUIzk7UYB3o641Drso1jPmL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=a5e2Xxlx; arc=none smtp.client-ip=93.190.126.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
+	s=arc-20240116; t=1782245105; c=relaxed/simple;
+	bh=WXTJvS8nTBoZayCCQ1UkDdbyJOKhq3Upt7bB2bWi/yA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u7K7gbL8stmPl6kB7NG3m0VaRlZ2PGm4hgqvBjkMf4rtB5jh3FtltZ5NW1QrnP/ffddGVeMcPEdpfMSdPM4XLe8RzR+IKf+ToI6ZNO9pauXkR4poCNIYn+Lq9RPywuvRPvp+JkySCRv/lHKQSxsD1F0fEttoSIaSNoEdr5mZGgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrUYuk7L; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="a5e2Xxlx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
-	s=stigmate; t=1782244587;
-	bh=RChInjm+nWyVKGXO+685PTvBLIJb+A7HVHd2yzP8uK0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=a5e2Xxlxl5qmkQ5VwXVRiczuK8Gb3nzAFcO4LEOZygqP+qpkAU/d6QumFBVoV5e8/
-	 3gZoh2j7ba3FNeEnwBJn421EfXTkB5TKGnVzSi+140d22onj9X5+rN104Y0sSPnTQU
-	 BFlIeGt3bWxlybGxvsuI84DgPVIpdcKfzQorP2nc=
-Received: from mx1.investici.org (unknown [127.0.0.1])
-	by confino.investici.org (Postfix) with ESMTP id 4glG6M10V9z110m;
-	Tue, 23 Jun 2026 19:56:27 +0000 (UTC)
-Received: by mx1.investici.org (Postfix) id 4glG6L5SR3z10vW;
-	Tue, 23 Jun 2026 19:56:26 +0000 (UTC)
-Date: Tue, 23 Jun 2026 20:56:27 +0100
-From: Bradley Morgan <include@grrlz.net>
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
- Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Quentin Perret <qperret@google.com>,
- Vincent Donnefort <vdonnefort@google.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_1/2=5D_KVM=3A_arm64=3A_skip_pKVM?=
- =?US-ASCII?Q?_cache_flushes_for_non_cacheable_mappings?=
-In-Reply-To: <95A8722F-D486-4030-BA51-9117434C6E63@grrlz.net>
-References: <20260623160339.15143-1-include@grrlz.net> <20260623163756.4591-1-include@grrlz.net> <86qzlxqjf3.wl-maz@kernel.org> <5925B41F-0F57-4BCB-9F93-7600878ECA27@grrlz.net> <86pl1hqiwj.wl-maz@kernel.org> <95A8722F-D486-4030-BA51-9117434C6E63@grrlz.net>
-Message-ID: <B6379439-829E-403B-845B-2259A28526A5@grrlz.net>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrUYuk7L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDC7B1F000E9;
+	Tue, 23 Jun 2026 20:05:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782245103;
+	bh=HPChuZ1mWnlDaBUCXDkMUFJwjArhwD0pAA7GS75DrHo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QrUYuk7Lz4ZAxRyzXVeEw/m13CLKqUUEVuTEpKJIzfQ52UulJ0PEOLLUv3L6YUKZ4
+	 VeSa5uQAWapb9/q0sIn+EyX3sscGxrg2mCDHKdyaTHMF3j/nzeC+MCTp5KEq6NqKjk
+	 MHQ31wF4IWmxMd4SbkYwoYh0NiqLwafSWYG/PNagfuv0mPFtagoVLDsy+UayEmmcWW
+	 joCSflrovj0JzFe2/grT80q8w/NK2fH+3m4MkycXHioBF2G+IZKcRO9XznJ4kgmQxs
+	 38luD68JUaYvQgAGFeAHeSurzzmq8qXaY5zGKZDLbnZEDXnciYw+iGWIjPOBS0fi7h
+	 bqCv0zZcqygVQ==
+Date: Tue, 23 Jun 2026 13:05:02 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 04/22] KVM: arm64: nv: Only shadow writable-dirty guest
+ descs as writable
+Message-ID: <ajrm7rc4WjemIBxE@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org>
+ <20260623184201.1518871-5-oupton@kernel.org>
+ <20260623185810.08CC61F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260623185810.08CC61F000E9@smtp.kernel.org>
 
-On June 23, 2026 7:51:05 PM GMT+01:00, Bradley Morgan <include@grrlz.net>
-wrote:
->On June 23, 2026 6:13:48 PM GMT+01:00, Marc Zyngier <maz@kernel.org>
->wrote:
->>On Tue, 23 Jun 2026 18:04:07 +0100,
->>Bradley Morgan <include@grrlz.net> wrote:
->>> 
->>> I'll go and do V3 with another sashiko suggestion. I'll fix your path
->>too.
->>
->>Before you do that, please verify that whatever Sashiko spits out
->>makes any sense. I'm not convinced by its reply on v1 at all.
->>
->>	M.
->>
->>
->
->Marc, 
->
->hi, I have verified sashikos concern.
->
->I am out right now. So I will give a very short result.
->
->
->Sashiko is being bit dramatic with the whole "Critical" rating, but it
->is real in another way
->
->
->I'll explain it in the code in about 30-40 mins.
->
->Thanks!
+On Tue, Jun 23, 2026 at 06:58:09PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> 
+> New issues:
+> - [High] Uninitialized or incorrectly evaluated `wr->dirty` field during Stage-1 page table walks causes an infinite VNCR trap loop.
+> 
+> Pre-existing issues:
+> - [High] Write-Only VNCR mappings cause an infinite trap loop because KVM falls back to `PAGE_KERNEL_NONE` but considers write faults resolved.
+> --
+> 
+> commit fb5a66a1eb4ac6175aad6cbbd38f45328f4f937b
+> Author: Oliver Upton <oupton@kernel.org>
+> 
+> KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
+>     
+> KVM will soon add support for hardware dirty state management for nested
+> guests. In order to emulate dirty state transitions on the guest
+> desciptor, KVM will need to use read-only hardware mappings and re-walk
+> the guest page tables upon taking a permission fault.
+>     
+> Prepare by limiting shadow stage-2 and shadow VNCR translations to
+> read-only for writable-clean guest translations.
+> 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 86b499e7a9a06..7a84495a2e6d4 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> [ ... ]
+> > @@ -1317,6 +1317,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+> >  			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
+> >  	wr->pw &= !pan;
+> >  	wr->pr &= !pan;
+> > +	wr->dirty = !(wr->desc & BIT(7));
+> 
+> [Severity: High]
+> Could the unconditional use of BIT(7) here cause issues when S1PIE is
+> enabled?
+> 
+> With S1PIE, BIT(7) becomes PIIndex[3], so using it to evaluate the dirty
+> state might be incorrect.
 
+Bit 7 is nDirty when using indirect permissions, so this is wrong.
 
-hey, I'm back now. Let me explain
-
-For the dirty logging report, I agree the bot's wording was not the
-greatest..
-
-
-The issue is not best described as a *guaranteed* -ENOMEM guest abort.
-
-The actual failure path seems to be:
-
-
-user_mem_abort() skips topup_mmu_memcache() for permission faults,
-unless dirty logging is active and
-kvm_is_write_fault() is true.
-
-For an instruction permission fault, kvm_is_write_fault() is false.
-
-Dirty logging makes kvm_s2_resolve_vma_size() force max_map_size to
-PAGE_SIZE.
-
-
-If the existing stage 2 entry is *still* a PMD, then kvm_s2_fault_map()
-has mapping_size == PAGE_SIZE but perm_fault_granule == PMD_SIZE, so
-it calls kvm_pgtable_stage2_map() instead of relax_perms().
-
-The generic stage 2 walker then needs a page table page to split the
-PMD in stage2_map_walk_leaf().
-
-So the real issue is that this path can enter the split path without
-having topped up the memcache. Eager splitting does not make it
-impossible....
-since it is best effort and the default split chunk size is 0.
-
-
-About the V3, I won't send the V3 yet. Until more people review / or 
-it's been a few days
-
-Thanks!
+Thanks,
+Oliver
