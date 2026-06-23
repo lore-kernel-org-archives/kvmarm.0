@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F243D5246
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 12:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F823D525F
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 12:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782216421; cv=none; b=hVz7pC8GucEKQ4jaMC9eIbLBGjEZFMCWsWWuOxADjZRUm2GpBL/NuIJpLeqgCLgAE2Ni25cQO67oiRY3BBDCvPLFX5AZSu31uQhWsDli3sOlhBun1rU3QpCEsYX2E4xKvVWZjPKI5/l7uXBZLu04Zo3MpEwwwVIFY02jsZWOYF4=
+	t=1782216457; cv=none; b=HOOqMOywxtmmmqRPwub3P3p7K2d6P+cfvEJcXe3b7/BD0uD7d4Bk9mDAery+UILEJa7olEMqwto7YvDJHTMRv2S6qlNENVzB7mofjSkQIPiaDBPoiiEHOm42DTlAo1QH2yi2AfAbbCcdePz9GcTzVPO/rxxVe64z/JsesUugc8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782216421; c=relaxed/simple;
-	bh=9rRusmHatwq9OPq/u5kWrlPc6KlyKTDx8CiY0iF8UrE=;
+	s=arc-20240116; t=1782216457; c=relaxed/simple;
+	bh=vFFsU9KIxRv3Pjnj/dAorDwLjyoai3eK8g7PEBgwVQ8=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=opLRGEYLqFFeO79+IJvrHt0R5K/AGY5ckAIlRk7QziMq6kLyXsty3lcK7LjypDSnzKM5xSBVtMf01AIM2Yji8cVPhVn9ByQdhNNG91DwuRNaHHyphTWQEuE21b01qyxSWE322QXctlmPbuitCZLQysBsOCbvlny945NpbqOt83c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jm/WmDyf; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=pi0Bydc/osLFe65+oopA7NlhINXK8Eiv8n+vtopJfY4FZuQSXCFqZrgtc2NX9nW9cwmYoKbGSz3Q8SzwgEm5Sy+oMFc93YxV/jqsWRt0D9XC96f7nTy+fYBAqnm3rwWlM/p9ulwke8QiH3NWZ4u03W8iZ0VQRVY9yftaVSrUmwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NyHYfYpG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jm/WmDyf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1356B1F000E9;
-	Tue, 23 Jun 2026 12:07:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyHYfYpG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 254511F000E9;
+	Tue, 23 Jun 2026 12:07:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782216420;
-	bh=mtQjQ8xQR1cId5S0QsCbWYv6pJVXI+tLl57dBBpoEYI=;
+	s=k20260515; t=1782216456;
+	bh=NqAD/FL5tsc2i3Zir1+aYnJ9TvyqI2CnJTIOoBaCeBg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jm/WmDyf47SHsYIhgPYX0hG8HrwmULsKTNDX94FS20f015zhfYuhXXufy3PL5j4/I
-	 vW2jM4PSgptq6ujxSHnyPUmk2o9NvgviA0RRjIvBjwFv/DepZd3v3hW16slnn59vRt
-	 926pZ6BQuBfyMbPVngpaK1ybAAC/8Ak+1R4k4+3Le9nR0Uqntdg/BKACK/xsur2q3T
-	 coLu2+y25J0Ntl97FR/UsoVnmP09U7mKv0Rkbw1rhKUu+OIqK9RKHZJlUh9lH2Jt2V
-	 1+s8hsKlb7hnwB+GQj3r0BAWnfmfvdD5b0hisRA9awCs+3f5Um+5Nyd3PZs9hg5A07
-	 DbSEVHfxxrz0Q==
+	b=NyHYfYpG5O1Ff9y8lUTZ52reYeF9W6JjVEJAnqSeyey5iWOyYtquWpD4xXAQaBrWS
+	 k4qVfRxvlo0WcFrhHWNI/Ki93vBx9VIOrmRlISG4X65AzMTVzAU+0J+wIEmtPRAbav
+	 EORpuahxEO/gXP9FxvPMvkoMRkuu9+yP2E/KdEbsfPgsk/E1Skk8XXdukbz5s9At1K
+	 MPiD5eW0PpjqOf7gveCAK82rsbcAcjbk2bx0s5y8KHXPX4bVa8pLh2EzgVnCvxJL4U
+	 i2AQpNKgVsebS8b0fjOmME5WqE6ppJr6RMbOZO2NbL45IJmqJupq5C4OJX9gHKmKqP
+	 rR4M8EI7/WarQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 1/7] KVM: arm64: Enforce strict SBZ checks in the
- FF-A proxy
+Subject: Re: [PATCH v5 3/7] KVM: arm64: Support FFA_NOTIFICATION_BIND in
+ host handler
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sebastian Ene" <sebastianene@google.com>
 Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260623115354.632361-2-sebastianene@google.com>
+In-Reply-To: <20260623115354.632361-4-sebastianene@google.com>
 References: <20260623115354.632361-1-sebastianene@google.com>
- <20260623115354.632361-2-sebastianene@google.com>
+ <20260623115354.632361-4-sebastianene@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2026 12:06:59 +0000
-Message-Id: <20260623120700.1356B1F000E9@smtp.kernel.org>
+Date: Tue, 23 Jun 2026 12:07:35 +0000
+Message-Id: <20260623120736.254511F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,82 +47,99 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] The strict SBZ check for unused arguments does not ignore the uppe=
-r 32 bits for SMC32 calls, violating the SMCCC and FF-A specifications.
-- [Medium] The FFA_FEATURES handler incorrectly returns FFA_RET_INVALID_PAR=
-AMETERS instead of FFA_RET_NOT_SUPPORTED when unused arguments are non-zero.
+
+New issues:
+- [High] FFA_NOTIFICATION_BIND rejects per-vCPU bindings for VCPU IDs > 0 d=
+ue to unconditional unused argument check on w5.
+
+Pre-existing issues:
+- [High] `ffa_check_unused_args_sbz()` validates the full 64-bit register f=
+or SMC32 calls, violating the SMCCC specification.
 --
 
-commit d261b7516c8a6d707698f336a32184a5de586911
+commit 0b8b8b81a4ddcd427b7ffa364b793f45c2dd4f37
 Author: Sebastian Ene <sebastianene@google.com>
 
-KVM: arm64: Enforce strict SBZ checks in the FF-A proxy
+KVM: arm64: Support FFA_NOTIFICATION_BIND in host handler
 
-Introduce a helper method ffa_check_unused_args_sbz to enforce strict
-arguments checking when the hypervisor acts as a relayer between the
-host and Trustzone.
+Verify the arguments of the FF-A notification bind call and forward the
+message to Trustzone.
 
 > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 1af722771178a..78bb043b33ee0 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -71,6 +71,20 @@ static u32 hyp_ffa_version;
->  static bool has_version_negotiated;
->  static hyp_spinlock_t version_lock;
+
+[ ... ]
+
+> @@ -930,6 +931,32 @@ static void do_ffa_notif_bitmap(struct arm_smccc_1_2=
+_regs *res,
+>  	hyp_smccc_1_2_smc(args, res);
+>  }
 > =20
-> +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int =
-first_reg)
+> +static void do_ffa_notif_bind(struct arm_smccc_1_2_regs *res,
+> +			      struct kvm_cpu_context *ctxt)
 > +{
-> +	DECLARE_REG(u32, func_id, ctxt, 0);
-> +	int reg, end_reg;
+> +	DECLARE_REG(u32, endp_id, ctxt, 1);
+> +	DECLARE_REG(u32, flags, ctxt, 2);
+> +	struct arm_smccc_1_2_regs *args;
 > +
-> +	end_reg =3D ARM_SMCCC_IS_64(func_id) ? 17 : 7;
-> +	for (reg =3D first_reg; reg <=3D end_reg; reg++) {
-> +		if (cpu_reg(ctxt, reg))
+> +	if (ffa_check_unused_args_sbz(ctxt, 5)) {
 
 [Severity: High]
-Does this correctly handle the upper 32 bits for SMC32 calls?
+Does this unconditionally reject per-vCPU bindings for VCPU IDs greater
+than 0?
 
-According to the SMCCC, for SMC32 calls, the upper 32 bits of X registers a=
-re
-unknown, and the host is not required to clear them. Since cpu_reg() returns
-the full 64-bit register value, this might erroneously reject valid host FF=
--A
-SMC32 calls if there is residual data in the upper 32 bits.
+According to the FF-A 1.1 specification, when Flags bit 0 is set to 1,
+w5 contains the VCPU ID. This means w5 is not an unused argument when
+binding a per-vCPU notification.
 
-> +			return true;
+Could we skip the sbz check for w5 when the per-vCPU flag is set?
+
+[Severity: High]
+This is a pre-existing issue, but I noticed a problem with how
+ffa_check_unused_args_sbz() processes SMC32 calls like this one.
+
+When it checks the registers:
+
+static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int fir=
+st_reg)
+{
+        ...
+        for (reg =3D first_reg; reg <=3D end_reg; reg++) {
+                if (cpu_reg(ctxt, reg))
+                        return true;
+        }
+        ...
+}
+
+It reads the full 64-bit register using cpu_reg(). However, the SMCCC 1.2
+specification states that the upper 32 bits of W0-W7 are unpredictable for
+SMC32 calls.
+
+Will this cause KVM to spuriously reject valid SMC32 FF-A calls if the
+host OS leaves non-zero garbage in the upper 32 bits of the unused
+registers?
+
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
 > +	}
 > +
-> +	return false;
+> +	if (FIELD_GET(FFA_NOTIF_RECEIVER_ENDP_MASK, endp_id) !=3D HOST_FFA_ID) {
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	if (flags > 1) {
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	args =3D (void *)&ctxt->regs.regs[0];
+> +	hyp_smccc_1_2_smc(args, res);
 > +}
 
 [ ... ]
 
-> @@ -890,6 +939,11 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *ho=
-st_ctxt, u32 func_id)
-> =20
->  	switch (func_id) {
->  	case FFA_FEATURES:
-> +		if (ffa_check_unused_args_sbz(host_ctxt, 3)) {
-> +			ffa_to_smccc_res(&res, FFA_RET_INVALID_PARAMETERS);
-
-[Severity: Medium]
-Should this return FFA_RET_NOT_SUPPORTED instead?
-
-According to the FF-A specification, if an unused parameter is non-zero in =
-an
-FFA_FEATURES call, the implementation must return FFA_RET_NOT_SUPPORTED.
-Returning FFA_RET_INVALID_PARAMETERS might violate the FF-A ABI and confuse=
- the
-host driver during capability negotiation.
-
-> +			goto out_handled;
-> +		}
-> +
->  		if (!do_ffa_features(&res, host_ctxt))
->  			return false;
->  		goto out_handled;
-
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623115354.6323=
-61-1-sebastianene@google.com?part=3D1
+61-1-sebastianene@google.com?part=3D3
