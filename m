@@ -1,54 +1,54 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C633D45CF
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 11:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D74340D565
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 11:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782215662; cv=none; b=YFZz0ZpUO8CRDSkz4rS0xhP67OrdirB6v8ykDQugoUXRpI8hK8egybsFMpxxkNc++RV397nnxFtcgoAVj15b2Cl6y304g6Z65/ZV2XvjQv97VFeVI+DbMZjKf6y2gMopvL+eYHAVawR0RtSRnKma03eksJa6+XCpHIer8BvKsRc=
+	t=1782215663; cv=none; b=Vk0EjxslOtQrzrTofudVcDr530iNv3/SFB1UXTM6WHstXFB9LUOlp0mTLfy+A+Xj5V9rr1WxpHAo270KkJ5p1qPYa9tIAWbTIf94k7int2OJAR7EjQ8E49/A/qx66BEN3SFeXQSFZf33bO8vnjobxGbohYtEzMivHX7CDD+Czoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782215662; c=relaxed/simple;
-	bh=eezDZdSoLXchtG7urkrTj3OWBvGJU0WnikLEqxWzfoQ=;
+	s=arc-20240116; t=1782215663; c=relaxed/simple;
+	bh=NN5RVa487CMwqouLW6s4MweF3d/Y67/BacNU3KkxAU8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gv08MmVQnOx5/MEwSGPqyO6VbyFLbTVnRDVXSX2TQMvvefXbYDlfvBglNn+PTl8yXNOyk11zgaZQu60C84QKvg2QUloFDZ454VYczB+aquaWnA1ics70NSf4OaPqeXzNeEzij38j8VpOwKL4tNDbvfVpxUGIojunSJ3iBD8UWQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IV2W7LbP; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=XLcYL/vOXGEnh/MYEOWyx79b/cJmi4QtluaTTuMEFCdbcQsVCf9w9Tqv3EocZIvqJsbODec+A3ujvkYmjqsxiND/39ijE5Kvc9tvsa2Rm40HhfszUBrNwGWvBToopTF9W0a6JBZ1QcztkPw75WPiu5Tm4C+bI6ftZZkwUKSLy/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DFTsGfSs; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IV2W7LbP"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-becd1c46294so489475566b.2
-        for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 04:54:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DFTsGfSs"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4923d323a83so19769995e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 04:54:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782215659; x=1782820459; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1782215661; x=1782820461; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ruH570qazxtSF3aFB7lL9Qp3QXgfyQrybu1/V/Yxmg=;
-        b=IV2W7LbPoCl7Tmp/3ccQZZfUn/Y2JyqPQGfs9etd0Igb5kVlgq7C23XBIbT7z19dxT
-         T7EynQoXIFfMQ5N3o3JosZTtjsTnQ9aE2BadkHjP5hMRYYabHVf/Fi1/cjoD8e05Bhw8
-         fRq14zGyZ1mbBTNGslwhS0JU0DtjQ6pxwIouvMSAAfxoYd1TT2roSWwDvWoOZ4vTNtGf
-         7mQSJsoLJR4ERLqcDuhIeHeUn+5qfJOaKsY4Ci0ugzni7AOzCpGacMi9RtWzzV4dntFt
-         2iXBHx5BTEHOU32TPmFFGTkjK4f0paenV1armtvOnQA6ueJG/ibo8Zom7TTV5y/4sMFw
-         cbow==
+        bh=gM0gY06Xu5IO976P3K6XmNc5FNoYV9i9exHGc/fednc=;
+        b=DFTsGfSsXlcIyPSi5SFZuKYsjIfhwYy3Y+iQ3c6yoIJUYTGFEW0u8qr1Z597Ms+NkM
+         zU6rxi878uVOpC/mEpnFvztZINM1PgcMeJu/kP8fgAUelmFOuEmWbZV3lcC+75lwD97G
+         vi3cPlsnCm6RTe82DQkRwE8D9+PN/KUQ8LObRHcipIz84uP6ukEpX5dK/D7q3B0GYFNC
+         MABwTG5G8W/YFgO+xBVP3ISvZCy5HNniehRiosq6/eK72WV48uNSfc61kb1u9j5ZSPR8
+         kLYPPsRZyCCPCMEnZUINE6c6Omo4FHowVgObUMY3kB3cest2HEDyyVnaYN34N8p4n4fp
+         AuyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782215659; x=1782820459;
+        d=1e100.net; s=20251104; t=1782215661; x=1782820461;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ruH570qazxtSF3aFB7lL9Qp3QXgfyQrybu1/V/Yxmg=;
-        b=qvexHiglA6DXo1YdSrFeLAkJ+pJbAjM+N/Rda7et1EKT741ugzkGOZUqYnz+L5odc0
-         vA3rF5tIL9S8f3c6Vf6REJH9tfliRnt7PBtxrrbyz/vUCUuTq88tIHjPw0wzjWy/2Yz7
-         byqY1ce7nIzZ4oYVnHa8y7V2YLKMScXc5d6ijegIvvIXzeX7VPaKKYIQtUQWuPlW6Mhc
-         m6eod6twaAgwvkTtqmCcBLq6x3096WpVaKKOB4advJPzHsbtrYvtwcknYAS9NLKlkwU0
-         B+Zhg8mDExEMMaskzfSrETxIk+b2HJU2fzUxSjN+2JG5qdQ8p+yPmCbSB3suw1dgsDan
-         CXkg==
-X-Forwarded-Encrypted: i=1; AFNElJ+3vOoe/4wjuo+/kIGyLDuolbzu5lqTTxy5eyeLXTWO6UHS0gb2lpnWK0QNks9wXP6OirqNwss=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwETkHF4+1EwExfE8Z4+Cmy8ZDg4DS38GddaXCbejUjpLPkgUnq
-	YcggCcu41JkGASFWvs9cPFwyLgHzCJJKotmOVqU61A7zZTL+XpoAhpWcx4SFuAnxd+vUvYs7Heu
-	gmLUd6NDdhvekoFlTxLIv2+wZX6FH3Q==
-X-Received: from ejbmf19.prod.google.com ([2002:a17:906:cb93:b0:beb:c090:4709])
+        bh=gM0gY06Xu5IO976P3K6XmNc5FNoYV9i9exHGc/fednc=;
+        b=oIa61mGe6/x76MKhSEp5Qh6SXu4L4YjtAONEHhOypC/49auP96t+NW4k8hJmpCcKNh
+         Se92FrKRaPswyFMTfC8WYiEuGzGDB8LCg/o21+jiYkFzdeB/4d3WHUnovciW0Tom+qFg
+         iXDpbZ+IMNDwapi5BoaMVg+3G+hm7Zacg32mrelDu3Xhsx2UHtifDzc3YdJ/IPvv5Wa1
+         ccLzFj8EOLliwd9wfU+AlX14fo00xwdwfSZ+JATz+txvhXShsmujzBs3BtpUda83RZvN
+         wqjJp9WuDIqU7w2Ufe0hw3VzK1yZ4qXDUnHdXdGiiCZ2oe24lmbFbUtDLWyBIoScGUGY
+         RoSQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/DMjg8zHOKRNY+zwSznwapF5ZnPSOrUHiZQIa7jU7d1vTuO1g1S58qGUDxI3PyCNnt4rT5Brg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxMs8mpYc437Qu2FXOaquHmgNwNFKvD+9Vo5v7mK5vPH//VjV78
+	q4w361JSe3LnQIUlzxCiL82R9D8F30CI+5pwK1kfMgkaHF1uKiRAINAgtNk4oSad8t0r0e8eIds
+	oAt8USHJZnbJTZ6Hv6s3ofcdraUbHNA==
+X-Received: from wmim8.prod.google.com ([2002:a7b:cb88:0:b0:492:2b56:8534])
  (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:906:f585:b0:bed:7f50:c724 with SMTP id a640c23a62f3a-c0c660cedaemr680222866b.37.1782215658302;
- Tue, 23 Jun 2026 04:54:18 -0700 (PDT)
-Date: Tue, 23 Jun 2026 11:53:53 +0000
+ 2002:a05:600c:a51:b0:492:379c:32ee with SMTP id 5b1f17b1804b1-49249083c09mr240289965e9.6.1782215660598;
+ Tue, 23 Jun 2026 04:54:20 -0700 (PDT)
+Date: Tue, 23 Jun 2026 11:53:54 +0000
 In-Reply-To: <20260623115354.632361-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260623115354.632361-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.786.g65d90a0328-goog
-Message-ID: <20260623115354.632361-7-sebastianene@google.com>
-Subject: [PATCH v5 6/7] KVM: arm64: Support FFA_NOTIFICATION_GET in host handler
+Message-ID: <20260623115354.632361-8-sebastianene@google.com>
+Subject: [PATCH v5 7/7] KVM: arm64: Support FFA_NOTIFICATION_INFO_GET in host handler
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
 	will@kernel.org
@@ -70,49 +70,38 @@ Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev,
 	yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-Allow FF-A notification GET messages to be proxied from the pKVM
-hypervisor to Trustzone and enforce MBZ/SBZ fields.
+Allow the host to query the FF-A notifiction status and proxy the info
+get message to Trustzone. Make sure that the SBZ fields are enforced.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index b30dfc192d09..053efd99bf11 100644
+index 053efd99bf11..5539fb0d246e 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -718,7 +718,6 @@ static bool ffa_call_supported(u64 func_id)
+@@ -717,8 +717,6 @@ static bool ffa_call_supported(u64 func_id)
+ 	case FFA_RXTX_MAP:
  	case FFA_MEM_DONATE:
  	case FFA_MEM_RETRIEVE_REQ:
-        /* Optional notification interfaces added in FF-A 1.1 */
--	case FFA_NOTIFICATION_GET:
- 	case FFA_NOTIFICATION_INFO_GET:
+-       /* Optional notification interfaces added in FF-A 1.1 */
+-	case FFA_NOTIFICATION_INFO_GET:
  	/* Optional interfaces added in FF-A 1.2 */
  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
-@@ -1003,6 +1002,32 @@ static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
+ 	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
+@@ -1028,6 +1026,20 @@ static void do_ffa_notif_get(struct arm_smccc_1_2_regs *res,
  	hyp_smccc_1_2_smc(args, res);
  }
  
-+static void do_ffa_notif_get(struct arm_smccc_1_2_regs *res,
-+			     struct kvm_cpu_context *ctxt)
++static void do_ffa_notif_info_get(struct arm_smccc_1_2_regs *res,
++				  struct kvm_cpu_context *ctxt)
 +{
-+	DECLARE_REG(u32, endp_id, ctxt, 1);
-+	DECLARE_REG(u32, flags, ctxt, 2);
 +	struct arm_smccc_1_2_regs *args;
 +
-+	if (FIELD_GET(FFA_NOTIF_RECEIVER_ENDP_MASK, endp_id) != HOST_FFA_ID) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (ffa_check_unused_args_sbz(ctxt, 3)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (flags & GENMASK(31, 4)) {
++	if (ffa_check_unused_args_sbz(ctxt, 1)) {
 +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
 +		return;
 +	}
@@ -124,12 +113,13 @@ index b30dfc192d09..053efd99bf11 100644
  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
  {
  	struct arm_smccc_1_2_regs res;
-@@ -1079,6 +1104,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_NOTIFICATION_SET:
- 		do_ffa_notif_set(&res, host_ctxt);
+@@ -1107,6 +1119,10 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+ 	case FFA_NOTIFICATION_GET:
+ 		do_ffa_notif_get(&res, host_ctxt);
  		goto out_handled;
-+	case FFA_NOTIFICATION_GET:
-+		do_ffa_notif_get(&res, host_ctxt);
++	case FFA_NOTIFICATION_INFO_GET:
++	case FFA_FN64_NOTIFICATION_INFO_GET:
++		do_ffa_notif_info_get(&res, host_ctxt);
 +		goto out_handled;
  	}
  
