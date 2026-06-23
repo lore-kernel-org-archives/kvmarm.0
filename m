@@ -1,187 +1,143 @@
-Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5477C3B6347
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 07:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6263CBE7A
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 08:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782200851; cv=none; b=uKPUAMUrgMjftcdWY7wZnep5H44v/0+De2AWcl82mBxuUQ7LEh8GNiMgqgtRpWEfQQzx769xgB/N3KkStd+DSgcjkMNitiNZ9Z/UU9nEyIlF0XssK41fpv/WADajWxKr2drKhViqn/9n1R52z/ycW/NnFeX3hs9X6KGFw2/xTck=
+	t=1782202503; cv=none; b=eLk18CK0qPXV9IBP04t3QeMPG4lcntDx4A85AkWUCiq2gTO1TKE/1Jq4PKuPAPx7IhFjZZ5o/qEZjvmttfWRUflKcGzFGVUISa6CeX9+kOFiGS0EgyFa3+I4SKWta580fB69nUAdZaTV73fbl55LAyevTmQ9YDG5gn4kWIrAllA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782200851; c=relaxed/simple;
-	bh=pb/y3OHpId8gRg21e98iHl/w2OyFbj6DK2ruwWVF5ws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=paQRZ008Oj72M3xMYz+ah6LrzdmWRm4IAG8GVN28Bz7Exzc/m+9z+OmMHvSExs9o0GXWLYVc8MCoHEaC8D9vKWrL20tqjiJNjtX607/3jKLR313FouTY2svKsXFylWFYpvhghZlcJdu5OjIOu7EIkDekMVNnsB4+tD4TaK+xUcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=MUpYTiBr; arc=none smtp.client-ip=207.54.90.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="MUpYTiBr"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1782200848; x=1813736848;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pb/y3OHpId8gRg21e98iHl/w2OyFbj6DK2ruwWVF5ws=;
-  b=MUpYTiBrCMF2pfKyhOcE+1rHVNoHMjmTOMvvRyBghVT9W9CoaBVLaxLW
-   02oC9XNFCVEpUg5Dx+vch9D8bYJ1MV9eNVImSkcbxSje2/nWlSVg1m5lD
-   EhXwglMIT12Z2VrsX8LGCYJ2uwphWvS6UNzxXySnilHWyw5r+3hTLAF8j
-   OaqyjUq95njIQIZKtWBWlZg5sVldWQDoJyP29UgSgcmyEAwElWnumU6Az
-   olsWDJF6d43KwnV9W+V32h+A1I6d9y6uRbHDthGnd8u2yIBS8u/Ez3ATR
-   DoN7AIgFPbqr5eNmr6ycmia4Ad/KslaFCFQPD1POxlBNPHiiajbaNbSI7
-   g==;
-X-CSE-ConnectionGUID: omf9mwa5QNW8AzDzjOt1Zg==
-X-CSE-MsgGUID: RzLmkXydSjaebRYBR9Pe9w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11825"; a="245040386"
-X-IronPort-AV: E=Sophos;i="6.24,220,1774278000"; 
-   d="scan'208";a="245040386"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 16:46:17 +0900
-Received: from az2uksmgm1.o.css.fujitsu.com (unknown [10.151.22.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 0A605C00224
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 07:46:17 +0000 (UTC)
-Received: from az2nlsmom4.fujitsu.com (unknown [10.150.26.201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id B1A4A829CC3
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 07:46:16 +0000 (UTC)
-Received: from sm-arm-grace07 (unknown [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmom4.fujitsu.com (Postfix) with ESMTPS id 7455F20000F4;
-	Tue, 23 Jun 2026 07:46:12 +0000 (UTC)
-Date: Tue, 23 Jun 2026 16:46:09 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: nv: Implement nested stage-2 reverse
- map
-Message-ID: <ajo5wUzh0usQTXMk@sm-arm-grace07>
-References: <20260510145338.322962-1-weilin.chang@arm.com>
+	s=arc-20240116; t=1782202503; c=relaxed/simple;
+	bh=lv00yt5h4iA7zAdiud+2wNlHMeBNwTBGw53WrIYz4fw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QL69PUfOlzwkCrHwzgMxg5YImVpBPOWL9LolKIurK7S7DgQqeTYrrF6kPfeQPstWXCxLeQdIJkFT1clSdQWvimG9hia3hHBEjed358z15+FIz/UwQ/TxsncWs/gRcn4h9oEoQrzt3Lmcyazh5ItMOqDiWKzTOQT9n4eCtWW0Rww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 9da3d15a6edb11f1aa26b74ffac11d73-20260623
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED
+	SA_UNFAMILIAR, SN_UNTRUSTED, SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
+	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-UNFAMILIAR: 1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:e244f643-0d94-4661-9dbe-d3f87441a1ef,IP:10,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:35
+X-CID-INFO: VERSION:1.3.12,REQID:e244f643-0d94-4661-9dbe-d3f87441a1ef,IP:10,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:35
+X-CID-META: VersionHash:e7bac3a,CLOUDID:5549c0c9c56ac87306c3598eda0d2bad,BulkI
+	D:260623161455U457ALV5,BulkQuantity:0,Recheck:0,SF:16|19|66|78|81|82|102|1
+	27|136|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bu
+	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
+	0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_USA,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 9da3d15a6edb11f1aa26b74ffac11d73-20260623
+X-User: leixiang@kylinos.cn
+Received: from ninol.. [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <leixiang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 276535867; Tue, 23 Jun 2026 16:14:54 +0800
+From: leixiang <leixiang@kylinos.cn>
+To: maz@kernel.org
+Cc: oupton@kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	leixiang <leixiang@kylinos.cn>
+Subject: [RFC PATCH] KVM: arm64: Set irqfd->producer to enable vLPI routing updates
+Date: Tue, 23 Jun 2026 16:14:33 +0800
+Message-ID: <20260623081433.21250-1-leixiang@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260622075103.35164-1-leixiang@kylinos.cn>
+References: <20260622075103.35164-1-leixiang@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260510145338.322962-1-weilin.chang@arm.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Wei-Lin,
+ARM64's kvm_arch_irq_bypass_add_producer() never sets irqfd->producer,
+so kvm_irq_routing_update() never calls the ARM64 routing hook.  That
+hook unmaps the vLPI and falls back to software injection when an
+irqfd's MSI routing changes; with it dead, the vLPI stays bound to the
+old translation.
 
-On Sun, May 10, 2026 at 03:53:33PM +0100, Wei-Lin Chang wrote:
-> Hi,
-> 
-> This is v3 of optimizing the shadow s2 mmu unmapping during MMU
-> notifiers.
-> 
-> Two new preparatory patches are added, one reduces a hole in kvm_s2_mmu
-> and another refactors the code a bit during s2 faults. Other changes are
-> listed below.
-> 
-> * Changes from v2 [1]:
-> 
->   - Removed "polluted" teminology.
-> 
->   - Use xa_{mk, to}_value() when storing and retriving values from maple
->     trees.
-> 
->   - Avoid using the 63rd bit in maple tree values so that xa_{mk, to}_value()
->     does not lose us a bit.
-> 
->   - Added reverse map removal during TLBI handling.
-> 
->   - Other suggested refactorings.
-> 
-> Thanks!
-> 
-> [1]: https://lore.kernel.org/kvmarm/20260411125024.3735989-1-weilin.chang@arm.com/
-> 
-> Wei-Lin Chang (5):
->   KVM: arm64: Use a variable for the canonical GPA in kvm_s2_fault_map()
->   KVM: arm64: Move shadow_pt_debugfs_dentry to reduce holes in
->     kvm_s2_mmu
->   KVM: arm64: nv: Avoid full shadow s2 unmap
->   KVM: arm64: nv: Remove reverse map entries during TLBI handling
->   KVM: arm64: nv: Create nested IPA direct map to speed up reverse map
->     removal
-> 
->  arch/arm64/include/asm/kvm_host.h   |  17 +-
->  arch/arm64/include/asm/kvm_nested.h |   6 +
->  arch/arm64/kvm/mmu.c                |  43 +++--
->  arch/arm64/kvm/nested.c             | 238 +++++++++++++++++++++++++++-
->  arch/arm64/kvm/sys_regs.c           |   3 +
->  5 files changed, 290 insertions(+), 17 deletions(-)
+Set irqfd->producer once kvm_vgic_v4_set_forwarding() succeeds and
+clear it in del_producer(), under irqfds.lock; the only reader,
+kvm_irq_routing_update(), takes that lock.  set_forwarding() may sleep,
+so it runs outside the lock and the pointer is published only on
+success, needing no error cleanup.
 
-While investigating the long VM teardown time on QEMU in the nested shadow 
-stage 2 selftest, I instrumented a few functions with bpftrace.
+Sent as RFC: the unmap-on-reroute path has been dormant.
 
-The same kselftest workload produced the following counts:
+Fixes: 2412405b3141 ("KVM: arm/arm64: register irq bypass consumer on ARM/ARM64")
+Signed-off-by: leixiang <leixiang@kylinos.cn>
+---
+A review of the x86/powerpc producer-nullify patch pointed out that
+ARM64 never sets irqfd->producer, so kvm_arch_update_irqfd_routing()
+is dead.  This RFC fills that gap; set_forwarding() may sleep and so
+can't run under irqfds.lock like the x86 path, hence the locking is
+what I'd most like reviewed.
 
-Without this series (today's kvmarm/fixes):
+ arch/arm64/kvm/arm.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-kvm_nested_s2_unmap: 12
-kvm_pgtable_stage2_unmap: 8,388,623
-kvm_tlb_flush_vmid_range: 8,388,623
-exit_vmid_context: 8,388,639
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 50adfff75be8..6f1e4f526719 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2935,6 +2935,7 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ 	struct kvm_kernel_irqfd *irqfd =
+ 		container_of(cons, struct kvm_kernel_irqfd, consumer);
+ 	struct kvm_kernel_irq_routing_entry *irq_entry = &irqfd->irq_entry;
++	int ret;
 
-With this series:
+ 	/*
+ 	 * The only thing we have a chance of directly-injecting is LPIs. Maybe
+@@ -2943,8 +2944,16 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ 	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
+ 		return 0;
 
-kvm_nested_s2_unmap: 12
-kvm_pgtable_stage2_unmap: 18
-kvm_tlb_flush_vmid_range: 18
-exit_vmid_context: 34
+-	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+-					  &irqfd->irq_entry);
++	ret = kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
++					 &irqfd->irq_entry);
++	if (ret)
++		return ret;
++
++	spin_lock_irq(&irqfd->kvm->irqfds.lock);
++	irqfd->producer = prod;
++	spin_unlock_irq(&irqfd->kvm->irqfds.lock);
++
++	return 0;
+ }
 
-The bpftrace script used was:
+ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+@@ -2957,6 +2966,10 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+ 	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
+ 		return;
 
-#!/usr/bin/env bpftrace
++	spin_lock_irq(&irqfd->kvm->irqfds.lock);
++	irqfd->producer = NULL;
++	spin_unlock_irq(&irqfd->kvm->irqfds.lock);
++
+ 	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
+ }
 
-fentry:kvm_nested_s2_unmap
-{
-    @nested = count();
-}
-
-fentry:kvm_pgtable_stage2_unmap
-{
-    @pgunmap = count();
-}
-
-fentry:kvm_tlb_flush_vmid_range
-{
-    @flush = count();
-}
-
-fentry:exit_vmid_context
-{
-    @exit = count();
-}
-
-END
-{
-    print(@nested);
-    print(@pgunmap);
-    print(@flush);
-    print(@exit);
-}
-
-Is this consistent with what you evaluated during the development?
-I wonder if this is good for nested guest boot paths too.
-
-Thanks,
-Itaru.
-
-> 
-> -- 
-> 2.43.0
-> 
+--
+2.45.0
