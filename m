@@ -1,104 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AF437E317;
-	Tue, 23 Jun 2026 13:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CE438886F
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 14:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782222803; cv=none; b=oO3hMz84Q4XWoepYgW8BWDwdUBM4hGXsCN/iXZeUruWwRzhxTVNZpemqimKBEsVgVW6mLgAYbNgenwokhl5gvfVFNuFegCF9eXLQNtGP++v8cEwHiBh16u0HsYUQK7v2R5mRUyQqnHFTua69lAil45UpkimQe+zeNwC4uwyH2SE=
+	t=1782224734; cv=none; b=mptBy0hnpUEyd1A9TTCfqXkQOiSbwVCtdU+pCaYPkTf2ft4GU5NO5E7xjwAiVcVALKJaoH/2pgqQ+k36hot2a9AXh92T4bbrv0EsRk7RiEcZxh33e1A3t1mpXnx4HBOkcoZfn+eM58YRII3CP/qIBiO1VfAspEXGoGZ8sQSFLY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782222803; c=relaxed/simple;
-	bh=wIb7/HgUvznwwm8bVNqvlAsYrVqdAAE1zWYY4SsRHwU=;
+	s=arc-20240116; t=1782224734; c=relaxed/simple;
+	bh=8l579QzwifHqIylgwlzSwwRSPuALvfSk4I4hKWN5ClY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eFh6iR2YMnMCebNB5E4Ph0FJCEpcoNXo9ZZvvT6p7PeaD850/84HGfJWgYXDM+57zcJAK2iAAer+asjd4nn4eMsXpngZiIDUp82jE9MwwvgLTV8ZI/rVwiqI2Li0Zfq4wsCEI/utt8kGJW+9zVrpgQYn2mZ9WnxWY6xYHFWNKSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B7yv3SdD; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=FMm0lzgVs1B1ek8oBvhqFTJnuVmNepoDBrjvWzJX0CUrpTikm4E6hV+4rEo+sX9ZNB5+hd/dy6gFNmAAlayxMQxPNreUMZAC6UkYtINlzcykJLJzt5QZH/dWX+vQhxVUkJHWIdDorpd7Wgm0ZWvMdbxKU8PiCNLA5nt3aVYhJVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RrYOia/E; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B7yv3SdD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9346E1F00A3D;
-	Tue, 23 Jun 2026 13:53:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782222801;
-	bh=meWB2memLOKnqS1ZBeDjChQ2kV5a6g9aSLarvrxbNlY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=B7yv3SdDMwZTMmLqlpQQZn+9m3exZhTS6zIHORCh2+CuI2ZlnZnVis7V9XeLQeROQ
-	 u1Rm1S6cS64kqPv+Gyxe1E7T8GG4wsaGd11+hCjXGUBOGoM6LqiBGZhiYajgHlc2jM
-	 KFM9HtAV1kA00/NY4p76YnF+FJMyDndb2PFji5ATK3TGCon3rYo3dOZtcWzTAKH9R1
-	 LvazuWcGZoPYEQD+amCpgKJAG4bmVVsL/LeoYunciOrnOBHsjKm9GzhMAYMWhuP/aH
-	 aI1vFQEOtpOO02iU5p/5HPeN+/K3Jl9Wwc9zgpBv2BATi7N4XGrAWEUinjWsoXC7up
-	 rs5paEi0z5uBg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wc1Z1-0000000FJ2G-36BW;
-	Tue, 23 Jun 2026 13:53:19 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RrYOia/E"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FC7E244C;
+	Tue, 23 Jun 2026 07:25:26 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B3603F632;
+	Tue, 23 Jun 2026 07:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782224731; bh=8l579QzwifHqIylgwlzSwwRSPuALvfSk4I4hKWN5ClY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RrYOia/Eyt+n2Yawt4WsHI1PoYwuLZnwyyNCz6lkO8yyo5MLIGyXTTZoz6JpyTrDw
+	 mI9BBDm8cbwtNTmIgyaHD1cPx6UYDdrrkrXvWW7ZSUH9TFkrxfbtlpFxBmCc8Y2e7k
+	 DDT+rLstWSHB9IHuHWtqXi3hJ2mLXoFJJzBzwATE=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>
-Subject: Re: [PATCH v2 0/7] KVM: arm64: Fix missing ESR_ELx.IL in syndrome injection
-Date: Tue, 23 Jun 2026 14:53:17 +0100
-Message-ID: <178222278589.523236.13973129583138292315.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260618121643.4105064-1-tabba@google.com>
-References: <20260618121643.4105064-1-tabba@google.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH 1/3] KVM: arm64: nv: Print nested mmu info in kvm_ptdump_guest_show()
+Date: Tue, 23 Jun 2026 15:24:41 +0100
+Message-ID: <20260623142443.648972-2-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260623142443.648972-1-weilin.chang@arm.com>
+References: <20260623142443.648972-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, Sascha.Bischoff@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 18 Jun 2026 13:16:36 +0100, Fuad Tabba wrote:
-> After sashiko caught the missing IL bug [1], I did an audit of all ESR
-> syndrome construction sites in KVM/arm64 as Marc suggested. This series
-> is the result of that audit.
-> 
-> The ARM architecture mandates ESR_ELx.IL=1 for several exception
-> classes regardless of instruction length: EC=Unknown, Instruction
-> Aborts, Data Aborts with ISV=0, and SError. For FPAC (EC=0x1C), IL
-> reflects instruction length, but FPAC can only be generated by A64
-> instructions, so IL must also be 1.
-> 
-> [...]
+To prepare for creating per nested mmu ptdump file, extend
+kvm_ptdump_guest_show() so that it differentiates canonical and nested
+mmus. If the mmu is nested and valid, print VTCR, VTTBR, s2 enabled
+information in addition to the ptdump.
 
-Applied to fixes, thanks!
+Also switch to a lock guard for mmu_lock.
 
-[1/7] KVM: arm64: Set ESR_ELx.IL for injected undefined exceptions at EL2
-      commit: daa71eca24fdfb43029830bd57ddaddf70c59b23
-[2/7] KVM: arm64: Unconditionally set IL for injected undefined exceptions
-      commit: 1d695dc827957e9570d1b56abac1250d2d13bf0c
-[3/7] KVM: arm64: Unconditionally set IL for injected abort exceptions
-      commit: add40af98b34764ff5603dce297160fde12d784c
-[4/7] KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
-      commit: a52d6d68ad30374dd794bff300d8538e35ee49a8
-[5/7] KVM: arm64: Set IL for emulated SError injection
-      commit: 7514f1785d526207af8512cc6ccb1c35c5c61767
-[6/7] KVM: arm64: Set IL for nested SError injection
-      commit: a69412287a33c931dca9e48d30c0dbf8cde0ffe6
-[7/7] KVM: arm64: Set IL in fake ESR for pKVM memory sharing exit
-      commit: cbe2278aa3dd6832c544782c6cfed1fbc1f71a42
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+---
+ arch/arm64/kvm/ptdump.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Cheers,
-
-	M.
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index c9140e22abcf..2a6afe67646a 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -155,9 +155,16 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+ 		.seq		= m,
+ 	};
+ 
+-	write_lock(&kvm->mmu_lock);
++	guard(write_lock)(&kvm->mmu_lock);
++	if (kvm_is_nested_s2_mmu(kvm, mmu)) {
++		if (!kvm_s2_mmu_valid(mmu)) {
++			seq_puts(m, "invalid nested mmu\n");
++			return 0;
++		}
++		seq_printf(m, "0x%016llx 0x%016llx %d\n", mmu->tlb_vttbr,
++			   mmu->tlb_vtcr, mmu->nested_stage2_enabled ? 1 : 0);
++	}
+ 	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+-	write_unlock(&kvm->mmu_lock);
+ 
+ 	return ret;
+ }
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.43.0
 
