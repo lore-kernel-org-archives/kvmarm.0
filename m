@@ -1,115 +1,115 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from confino.investici.org (confino.investici.org [93.190.126.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92ED21255A
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 15:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4586430567E
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 16:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782229643; cv=none; b=borMHQDjHisZOXeAFHUFVycYh254IgCvsnCSfQuNXZieIe2jTeOSrgddqXezSyZcSoIBuNEFm5Q/HnufCpJXi0oG2ZipVPlWnL+4egzBw/SMfVmYVm3Fipkkcn+WF/W7Mw9acc+qgxILqCpSjOtbYwSJLyWcMVxf4C/mMmVQ+nA=
+	t=1782230627; cv=none; b=io/2ctHIJ9VMa33IcUQDI5DYXMq9M3EAH2huQj/4xqMPeHpaYIPZLqH9rNqFz88+t9C1HI3icmqGG8UA6vh9NPJKTLbGAwzLXNAbsC0gCF5JwfrT3izUwGLGQNTzSU29vJi9CPr3akr6hSMuy0/sX9lO7WDUbtkNok5wcChXkbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782229643; c=relaxed/simple;
-	bh=I1EaV7xG/mJPqH58Pg0SDLR8MfIr1adiPK+6IK3bIDc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lU9xoBnYkfWIGS1wW4rcrqbjrpUiOm8s8yMbGGSMHFhKfEtL7NpR7hdVsrGVPRJjNgpdS20h+DExXOJZIkmkfHmZzaKBFe3sfi0GrGMMA0f6hxAHbxI8pP0ewWx16lNUC4whlHhXLYAg/BMGY/TlJ6HAtXP9pGRY4dc/4oHkW3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Etg/VC8x; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782230627; c=relaxed/simple;
+	bh=xA9YfqTuGRMnUD7VqfUSzd8lOI9h6g5dP4YXGJmaJZw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TZAgh8l8wfCHvoCr2A3NvLUWXc4HXuh/saNpAFSSJTc9tZOu6b4aVc+kSWNW7Ip6e4KEcC2InczT3nvHK3YV8LEYRJcbp/6Q9nrzgehTuJaApXRxPgQ1fnjhRyeVgAyyQaUd+BycOqI/inW97HLQB0RbKLpsu30zj31VQTfOTxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=roH4qtC/; arc=none smtp.client-ip=93.190.126.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Etg/VC8x"
-X-Forwarded-Encrypted: i=1; AFNElJ9DYsOPv2Nxy13yXUMjBAahRoVKtj07NSR7JPWib07WhoEunFSt1XJ2yYjOWSbOE2tLHNRrxdQ=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782229639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IzQcYtj8kWYNRbeGvvHR4FtJasPw1L4TgvKaoF8K5u8=;
-	b=Etg/VC8xvUgF3v2SMh05aVFvI1sRD2ifbm2JYJGFD5kKrelMOf4uJd7MinyGgJAU87yP3Y
-	plYYsnx1QIwpojZA98bCJ+z2J7htOpJUPyNess+t6RcGGY0tHkZqA67KV5L5u2qml5vYhf
-	BG4+Q+FbhSpnkRCCPyQ3CG8r0vTKkjg=
-X-Gm-Message-State: AOJu0YzxE6Pa7Yq7hXan8L01EIc01R128grS3Jii0tZRxEt5uU8p4Wz2
-	GZOt7O4/P/1IDbkxCjR1SOl3+jtfrSTp3chG8BmDi2mWeXA6WxAbfeF/PwgvnhPBtsbj7HV9uEs
-	m0GKW4UMB4yLMhjjJLiGzkQNdhay+MkvvTuT8Vc/T
-X-Received: by 2002:a05:622a:1246:b0:519:f8a0:16b4 with SMTP id
- d75a77b69052e-51a522c6f26mr10190471cf.14.1782229623483; Tue, 23 Jun 2026
- 08:47:03 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="roH4qtC/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1782230623;
+	bh=qp76MOZfkgfbvVC3NAMXAD7D03E4T9rNo0rJqkiEJiI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=roH4qtC/vCJAmrGeyJBBp+EBB3owg2oMpGfPEaMRjNOAHg+SZF+HbaoH7bG+8ARfx
+	 yJC1StVlOmpPO41qaaT090JQeNsMxzxy3dj2t3pZ2vozAHaQ8/gG/z4iiTiGQXj1aj
+	 JaiMqrPOchzCEWycjntF7H8RSOUdN6qXqfCDOtw4=
+Received: from mx1.investici.org (unknown [127.0.0.1])
+	by confino.investici.org (Postfix) with ESMTP id 4gl8xq50DFz110W;
+	Tue, 23 Jun 2026 16:03:43 +0000 (UTC)
+Received: by mx1.investici.org (Postfix) id 4gl8xp6CCYz10hk;
+	Tue, 23 Jun 2026 16:03:42 +0000 (UTC)
+From: Bradley Morgan <include@grrlz.net>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Bradley Morgan <include@grrlz.net>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: skip pKVM cache flushes for non cacheable mappings
+Date: Tue, 23 Jun 2026 16:03:39 +0000
+Message-ID: <20260623160339.15143-1-include@grrlz.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260621213155.6019-1-include@grrlz.net> <178222278590.523236.18181071715501850418.b4-ty@kernel.org>
- <CE64C9AC-32D5-495E-B713-552921468FB9@grrlz.net> <CA+EHjTz+oNerTD3Ygj3EzOA4zm4BKfQYM45ydwVO=2amErkBAQ@mail.gmail.com>
- <54A2BB77-5E81-4730-82A1-DB457118784C@grrlz.net>
-In-Reply-To: <54A2BB77-5E81-4730-82A1-DB457118784C@grrlz.net>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 23 Jun 2026 16:46:26 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx4t1zw_C8qd=NVHjCMzBfq9PGJRxGtqDGi5eF7T5nmFw@mail.gmail.com>
-X-Gm-Features: AVVi8Cflc8_rf7lxBP42NY_9cWCjn7YBQICKN6FR5h2msr8y21OBnBEdKtU1bzc
-Message-ID: <CA+EHjTx4t1zw_C8qd=NVHjCMzBfq9PGJRxGtqDGi5eF7T5nmFw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: account pKVM reclaim against the VM mm
-To: Bradley Morgan <include@grrlz.net>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-Hi Bradley,
+pKVM keeps its own mapping list for stage 2 operations. Its flush path
+uses that list directly, so it lost the PTE attribute check done by the
+generic stage 2 walker.
 
-On Tue, 23 Jun 2026 at 16:11, Bradley Morgan <include@grrlz.net> wrote:
->
-> On June 23, 2026 4:03:30 PM GMT+01:00, Fuad Tabba <fuad.tabba@linux.dev>
-> wrote:
-> >On Tue, 23 Jun 2026 at 16:01, Bradley Morgan <include@grrlz.net> wrote:
-> >>
-> >> On June 23, 2026 2:53:11 PM GMT+01:00, Marc Zyngier <maz@kernel.org>
-> >wrote:
-> >> >On Sun, 21 Jun 2026 21:31:55 +0000, Bradley Morgan wrote:
-> >> >> Protected guest faults charge long term pins to the VM's mm. Teardown
-> >> >> can run later from file release, where current->mm may be unrelated.
-> >> >>
-> >> >> Drop the charge from kvm->mm instead.
-> >> >>
-> >> >>
-> >> >
-> >> >Applied to fixes, thanks!
-> >> >
-> >> >[1/1] KVM: arm64: account pKVM reclaim against the VM mm
-> >> >      commit: d098bb75d14fde2f12155f1a95ec0168160867ce
-> >> >
-> >> >Cheers,
-> >> >
-> >> >       M.
-> >> >
-> >>
-> >>
-> >> Hey, which tree did you apply it to?
-> >
-> >https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=fixes
-> >
-> >/fuad
-> >
-> >>
-> >>
-> >> Thanks!
-> >
->
-> Thanks fuad.
->
-> May I ask if this would be put onto ACK?
+Record whether a mapping is cacheable and skip cache maintenance for
+mappings that are not cacheable.
 
-Yes, I'll pick it into ACK.
+Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+Cc: stable@vger.kernel.org
+Signed-off-by: Bradley Morgan <include@grrlz.net>
+---
+ arch/arm64/include/asm/kvm_pkvm.h | 1 +
+ arch/arm64/kvm/pkvm.c             | 8 +++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-Cheers,
-/fuad
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 74fedd9c5ff0..d9dd8239910d 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -196,6 +196,7 @@ struct pkvm_mapping {
+ 	u64 gfn;
+ 	u64 pfn;
+ 	u64 nr_pages;
++	bool cacheable;
+ 	u64 __subtree_last;	/* Internal member for interval tree */
+ };
+ 
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 428723b1b0f5..105ab1258066 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -473,6 +473,8 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	mapping->gfn = gfn;
+ 	mapping->pfn = pfn;
+ 	mapping->nr_pages = size / PAGE_SIZE;
++	mapping->cacheable = !(prot & (KVM_PGTABLE_PROT_DEVICE |
++				       KVM_PGTABLE_PROT_NORMAL_NC));
+ 	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+ 
+ 	return ret;
+@@ -517,9 +519,13 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	struct pkvm_mapping *mapping;
+ 
+ 	lockdep_assert_held(&kvm->mmu_lock);
+-	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
++	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
++		if (!mapping->cacheable)
++			continue;
++
+ 		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+ 					  PAGE_SIZE * mapping->nr_pages);
++	}
+ 
+ 	return 0;
+ }
+-- 
+2.53.0
 
->
-> Since this affects pixel devices.
->
-> (E.g, my pixel 7....)
->
-> Thanks!
