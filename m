@@ -1,115 +1,116 @@
-Received: from confino.investici.org (confino.investici.org [93.190.126.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4586430567E
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 16:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D738156C6A
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 16:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782230627; cv=none; b=io/2ctHIJ9VMa33IcUQDI5DYXMq9M3EAH2huQj/4xqMPeHpaYIPZLqH9rNqFz88+t9C1HI3icmqGG8UA6vh9NPJKTLbGAwzLXNAbsC0gCF5JwfrT3izUwGLGQNTzSU29vJi9CPr3akr6hSMuy0/sX9lO7WDUbtkNok5wcChXkbc=
+	t=1782231347; cv=none; b=bYZzIMDBK4C3qIBM0rCSFGBUKpQYPrTmd4volOHXUDEaUnVBzV6qSTlbzKYnC7r4ItsplmWvDj4TPxuMFPrxMeaYtHW/ln2RHBXqLlbz2Fpwaq0T3eG0BbOClFKNXvCMZk/2QS3nW67fXisoNoyRxQ/X84694XsKn6CzIEKiqGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782230627; c=relaxed/simple;
-	bh=xA9YfqTuGRMnUD7VqfUSzd8lOI9h6g5dP4YXGJmaJZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TZAgh8l8wfCHvoCr2A3NvLUWXc4HXuh/saNpAFSSJTc9tZOu6b4aVc+kSWNW7Ip6e4KEcC2InczT3nvHK3YV8LEYRJcbp/6Q9nrzgehTuJaApXRxPgQ1fnjhRyeVgAyyQaUd+BycOqI/inW97HLQB0RbKLpsu30zj31VQTfOTxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=roH4qtC/; arc=none smtp.client-ip=93.190.126.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
+	s=arc-20240116; t=1782231347; c=relaxed/simple;
+	bh=jjIjoSHEX/0eh8PGp7nMQkV5msG84yMUzxSxI9VwJp8=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=gGs+zwEV18eXz6Xs+fUQkDpjYjimCXeFHZ9sRtGsgCby++XnsODFxk1ioAPbfMNJi7Lr7uGXM7gsH6pWonmSmFy7ksQuKLNpbCM5tZMYS96mBiLwfMhBr4GRhKxRXJTMmXKSunnxKu7z5NW35Bs5/hicUfvphRGPmqJi/ENSUJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8abtb0d; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="roH4qtC/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
-	s=stigmate; t=1782230623;
-	bh=qp76MOZfkgfbvVC3NAMXAD7D03E4T9rNo0rJqkiEJiI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=roH4qtC/vCJAmrGeyJBBp+EBB3owg2oMpGfPEaMRjNOAHg+SZF+HbaoH7bG+8ARfx
-	 yJC1StVlOmpPO41qaaT090JQeNsMxzxy3dj2t3pZ2vozAHaQ8/gG/z4iiTiGQXj1aj
-	 JaiMqrPOchzCEWycjntF7H8RSOUdN6qXqfCDOtw4=
-Received: from mx1.investici.org (unknown [127.0.0.1])
-	by confino.investici.org (Postfix) with ESMTP id 4gl8xq50DFz110W;
-	Tue, 23 Jun 2026 16:03:43 +0000 (UTC)
-Received: by mx1.investici.org (Postfix) id 4gl8xp6CCYz10hk;
-	Tue, 23 Jun 2026 16:03:42 +0000 (UTC)
-From: Bradley Morgan <include@grrlz.net>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Bradley Morgan <include@grrlz.net>,
-	stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: skip pKVM cache flushes for non cacheable mappings
-Date: Tue, 23 Jun 2026 16:03:39 +0000
-Message-ID: <20260623160339.15143-1-include@grrlz.net>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8abtb0d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA08E1F000E9;
+	Tue, 23 Jun 2026 16:15:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782231346;
+	bh=o3t9/lyB8+nda6TE7MmVJSDSErNOOHD9qhJY8xVFXnc=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=M8abtb0dUJcAvSw5uxUlSYhzDzERUB5UMeyfAb5d9RxbjxEF6MhH4ADhaiVry/Toi
+	 Q2JWuNpexKvCRXNOE4jNC5iYqmNzM0pftC3ddAyDdrIGNRAAHsnpOIZhJm1U0lfz9H
+	 ROeRT3KTItsPCvNvbc+LLCnWeklnadVaHPlnkUieXokDmnE8bGp+H39DAPawT1Is9k
+	 7adMttdVBWcqxG2EmhxausuJK2t4b/x8J01ysU8IwonrUBbdpEZm5+kapgX75yxKxr
+	 rxEOybiO/Pw6rb7VTVIpkhQHQsWpOMMFp62pMGBTJfyD2Dm83X7X4k7XVhlp3Fb3wv
+	 Pw3A35KeQ92Hg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] KVM: arm64: skip pKVM cache flushes for non cacheable
+ mappings
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Bradley Morgan" <include@grrlz.net>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260623160339.15143-1-include@grrlz.net>
+References: <20260623160339.15143-1-include@grrlz.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Jun 2026 16:15:45 +0000
+Message-Id: <20260623161545.EA08E1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-pKVM keeps its own mapping list for stage 2 operations. Its flush path
-uses that list directly, so it lost the PTE attribute check done by the
-generic stage 2 walker.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-Record whether a mapping is cacheable and skip cache maintenance for
-mappings that are not cacheable.
+Pre-existing issues:
+- [Critical] Handling a permission fault that upgrades a mapping to a huge =
+page skips memcache top-up, leading to a NULL pointer dereference in `pkvm_=
+pgtable_stage2_map()`.
+--
 
-Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bradley Morgan <include@grrlz.net>
----
- arch/arm64/include/asm/kvm_pkvm.h | 1 +
- arch/arm64/kvm/pkvm.c             | 8 +++++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+commit d1dad1f606a114503ffa8d910f3c79c232636e5c
+Author: Bradley Morgan <include@grrlz.net>
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 74fedd9c5ff0..d9dd8239910d 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -196,6 +196,7 @@ struct pkvm_mapping {
- 	u64 gfn;
- 	u64 pfn;
- 	u64 nr_pages;
-+	bool cacheable;
- 	u64 __subtree_last;	/* Internal member for interval tree */
- };
- 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 428723b1b0f5..105ab1258066 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -473,6 +473,8 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	mapping->gfn = gfn;
- 	mapping->pfn = pfn;
- 	mapping->nr_pages = size / PAGE_SIZE;
-+	mapping->cacheable = !(prot & (KVM_PGTABLE_PROT_DEVICE |
-+				       KVM_PGTABLE_PROT_NORMAL_NC));
- 	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
- 
- 	return ret;
-@@ -517,9 +519,13 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	struct pkvm_mapping *mapping;
- 
- 	lockdep_assert_held(&kvm->mmu_lock);
--	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
-+	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
-+		if (!mapping->cacheable)
-+			continue;
-+
- 		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
- 					  PAGE_SIZE * mapping->nr_pages);
-+	}
- 
- 	return 0;
- }
--- 
-2.53.0
+KVM: arm64: skip pKVM cache flushes for non cacheable mappings
 
+This patch adds a cacheable flag to pKVM mappings to avoid flushing
+non-cacheable stage 2 mappings. It updates pkvm_pgtable_stage2_map to
+record this attribute and pkvm_pgtable_stage2_flush to skip flushing.
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 053e4f733e4be..efede6b5640e0 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -473,6 +473,8 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, =
+u64 addr, u64 size,
+>  	mapping->gfn =3D gfn;
+>  	mapping->pfn =3D pfn;
+>  	mapping->nr_pages =3D size / PAGE_SIZE;
+
+[Severity: Critical]
+This is a pre-existing issue, but could this lead to a NULL pointer
+dereference if the memcache wasn't topped up?
+
+In arch/arm64/kvm/mmu.c:user_mem_abort(), topup_mmu_memcache() is skipped
+for permission faults when dirty logging is not active:
+
+	memcache =3D get_mmu_memcache(s2fd->vcpu);
+	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
+			    kvm_is_write_fault(s2fd->vcpu))) {
+		ret =3D topup_mmu_memcache(s2fd->vcpu, memcache);
+		if (ret)
+			return ret;
+	}
+
+If a guest triggers a permission fault on an address backed by a transparent
+huge page (where the existing stage-2 mapping is a page-level mapping),
+kvm_s2_fault_map() will upgrade the mapping to a block and call
+pkvm_pgtable_stage2_map().
+
+For non-protected VMs on a pKVM host, pkvm_pgtable_stage2_map() then unshar=
+es
+the old mapping, sets mapping =3D NULL, and swaps it with cache->mapping:
+
+	swap(mapping, cache->mapping);
+	mapping->gfn =3D gfn;
+
+Because the top-up was skipped, cache->mapping is NULL, meaning mapping->gfn
+dereferences NULL, allowing an untrusted guest to crash the host.
+
+> +	mapping->cacheable =3D !(prot & (KVM_PGTABLE_PROT_DEVICE |
+> +				       KVM_PGTABLE_PROT_NORMAL_NC));
+>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+> =20
+>  	return ret;
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623160339.1514=
+3-1-include@grrlz.net?part=3D1
