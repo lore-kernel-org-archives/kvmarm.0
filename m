@@ -1,127 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4555239E9CF
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 21:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782250347; cv=none; b=GsQquCNl0Ybyj22+ZOvtSN+tqXguUUKFdeJDWRnNpu13SvLbMq+FBoXBb/i5cXOUSWNd72kmIN51pu9BSrzA2eC5M7+v7G9R0P6YS0QVekZK64mlTiQJ0Zes+1dagum9cdfz7kYU6uyU++Dk/M2mO6OLFBm23K4I5L+VTnzK4pc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782250347; c=relaxed/simple;
-	bh=YR+FCz4l9MFSdKhg6xkklyCiI52/vmAiqx8TtyDLI/c=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Ult7oaqfUvlVrVdcF0FiD/JYuw+JCNlb2pKn7QOWJLlQcjPxmd1jtz6LOShcOtu2bEUZHtCyhzySyPHqlrneqEV03reFreMglRveREuxKuwJAeGowfdZJR48YacAhWkDEwFyhfG2CKkMilBq8a80lB2LUJoXUoqOdVvI/+4KBgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMcoWyLj; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E5838F22D
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 23:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782258106; cv=pass; b=kKfG34To5OWyTXtpI2wiCjydscY1CYaGGRT0QQAjZI+Qx9SYzmtRztEnt1I/HPbyQ6DhzSSNe6PK55+lH6CIxWA2QzTqThnMk0ojNus4yFA2OGeiLEXlhbr5oxi1wDbvlXh7C0JxC5nbOHvzgK2cGhx/bI+7lMBayPvQgzlpnOs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782258106; c=relaxed/simple;
+	bh=0o2TLZAQfupxDW1DGh5utshxlDAHM+yJodjjXz1Q8ok=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h2Z0oJLuG7n7bZxWPIQFyrZ/XbIvJJWxdizOfA8rvnLp46ao6/GFc2gNLgLMiWWd8Se5y1d9VmCyLlMZr1SM9XYJQm/Q0EPDY/4GxdIqmKhUPpmKZbA2CekzNcMAWAsVO9GORgBDaWncE0f8mK/c+AqpTZ3oMJRB8dMui+XkH/M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AOy4JPiG; arc=pass smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iMcoWyLj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A89CF1F000E9;
-	Tue, 23 Jun 2026 21:32:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782250345;
-	bh=nEyyQAYyzJUXyTGH5UHUE3FveBtpbKe7dXKQfj6Qfx8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=iMcoWyLjVClEH/eTK07GHPMSUhg6P2HZpmhAuW8+34lmtL0KRHnoGdg255jBwviYw
-	 VWmnS2u0oAxX6FBXOJ4FDPhpw5BdXBJDXbHdoFBKc8Uu5UK+01aaKxQ5RcDVK8jfnH
-	 JvgO5jQufIeI4/rOLQRE765yNDxKbe10BQZ6tdaj5wsPAt5q2Zs6gwpKbRmZAfnoIn
-	 9pw4uk20Uc6TkEirwf1ikL5UQ3Ua7PutX6WXL+2MgIdaLFx8ABaGvCeic+oq+ZZHOy
-	 NcZ9E9uccBeO8qNo2DpEI31LLtqF5/XKFKqq3o1jm87rUnK4yjOiyUIUqSOkzl3jEy
-	 6JSqI2V1swUTg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Check RW permissions for insn abort due
- to S1PTW
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Oliver Upton" <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20260623211310.1529760-1-oupton@kernel.org>
-References: <20260623211310.1529760-1-oupton@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2026 21:32:25 +0000
-Message-Id: <20260623213225.A89CF1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AOy4JPiG"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-30bc806fcf8so456978eec.1
+        for <kvmarm@lists.linux.dev>; Tue, 23 Jun 2026 16:41:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782258104; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K5/LmylgwXmX6OZw7qijzvYe/wE2ZP5RTpEQK4OLMaC3dScZOF05mEwdpFXtlPudtY
+         kuJo+n7s9eHq4GzFf9os5L7AV++u8/VPGlNUsrXrc+elfn8+FUqNeLbbzzlVQiaefuWm
+         /CG1qzqLMST9y+UOl7RcWcCEReGgqdwOYbc0cuxhO1NlF9rgE2tK2Eup3uUTUlHBIefd
+         NP7C0LBqIHBkhbsqVlouRUF78nwObxO2z3y9SRRV8Y3IXPswerGt4De4dF+cAsb4ffzb
+         N7JAGm1GKmwnnCNP/Iz1vHi922zTOtMWB9B+Vayy8Ta6+v+tUQXoGmhNmcePRqBLldcm
+         cVkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=5R4jJVdiiD97J3GTz0Op+QXJSLTSXOE5UM4tQq8YjrM=;
+        fh=9gUdO8y/uSRxJmxrQpwjTs+4qWKUU7MReyXmuBQ/TgQ=;
+        b=daxgqbAKxKrS+4o5FwKFMpS+qcvITcsEBXc25wHAB7SkFkPzAPHNxAw5OzPf5R4B4z
+         uxHWXup3u9u7bheFuHn0T6ut5WbfVAh55fiGZgVoTWNMPvlwi6boYd1+AvhegQbAv0Hw
+         KGz6enhoX8VGlp4OCYEmH7JeejYxrzozAxDX4NFAboyqmmSnmSrhOY6S1toJocQM7qAp
+         TBR50O/98a0MPLV3wF/Z6BG2uv3tJOI1d5cN6UvZWdQiUaLNZsZJ/sPh7XDlT9rkagzn
+         HiAhks44qoP9vSfkvhCBvq9apsD/aPbeuQqbrBb/GJp3yu7vcjF1dNJ0byAKX/rndrfG
+         IZ7g==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782258104; x=1782862904; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5R4jJVdiiD97J3GTz0Op+QXJSLTSXOE5UM4tQq8YjrM=;
+        b=AOy4JPiGi+007uQckfOE6MJaayYLXOzU0R9skIh5Rqo225+bNZnCDvJA6+DN737LMT
+         PkA13AZuON60W5vi+p9JeOScBpQKKlWjQ78bFtQunR20jxJ5r2JJObs67PcOXPbU4h39
+         qWwjtarCVZrEy+QGBcPAiPpAzMlb0RFSXokGYTyEY3KLJgCZa8Hegb8VS5xHONCliYl2
+         6ID6vnHvQaE0fpwqR82hLGAEIt82dKZYDTm3PA3DoZDuaNSTSbQQA2U6/bNr7cS9UfT2
+         p7IF9/g5kYPv+7zu0Hna0cKreenEHO3tXd8zckU+dgyXH0irk3h16PnDarWmVQUNxenU
+         y5ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782258104; x=1782862904;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5R4jJVdiiD97J3GTz0Op+QXJSLTSXOE5UM4tQq8YjrM=;
+        b=OOkRntW+fpowd/dBzafPJFkN5gBmM/A4o3hZ1pTlHhqXIRo3S0w12162LyqJoJGO7x
+         MmIgVRJxdAxhCCeDdKFLuZuNWrB9miIYb3ZxSvf0I+MbfnsqvP2bAxByt7l6rVM9tV36
+         lmVz8Ayxp9q+mTMWMnyQDlErVD6vO99+nVEsJoArzYuisKEDIV0ERLfL1JDrV/fQPoUy
+         oxCJgh1j54cxjWiOm53gP6Do2JDBxyz2qk5q9adZK59eApHzdWEo0pLVnRKAn5igSoPv
+         CWqEsTJ2zNYKhPPb036Ir/fOMzGb3q3BTt1gjie8jtRivJ694VuA0tV37XM24RTd3OyT
+         PpVg==
+X-Forwarded-Encrypted: i=1; AHgh+RqeNhqzKQE1zeHIVNAHfcNMpJMLcJaTb3nDPGLA78luhOzJBIkTvQgYHGPHlgW05m5va3h3nCU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyiWicf1r7OVxKYxjB/fnGQzc7EQsGJqIFy0/n8R4DeppMCF9Z5
+	PKaiQbz6X3Sb2paUPv2YH5RiCHCSLr6odMArhZU7LAhS3EbX2dMsm3s+OeijnDRziaKt6IWh+cH
+	I52jBc4S3cfi6X3xzGijOePyMCULJudemzg/v8H3v
+X-Gm-Gg: AfdE7cl6BCs9p/BR1z+BZ6okCWfJhG+FQawkXnZvq5LS3KlteKr+WkPuEcp+OnhvRDd
+	0KKh0sAB4OHJcof9mwqEMcHgRBEnZQj90pkk4SmlfjN1XOqXvHXEDfqg4NDOEHihY6GpeTW5K1D
+	OYGT8pDkZtA3L9WaRyYllcoB+7t6ytyzAOcNrm540fMUTc5x2F9pk8MPHNTcnCAxG6INkkRhxSt
+	IuPAAIs5PgEncuq8TwSXf7MbioS6ZKQg6iTXAGVpW0cA0AydFTxsU8+WClvSxiRwJS9bK8AQzEp
+	xFbcP4PYYNvQsC1DmLWcEPCIL6r8GUHa4k6s+diyVxw2LidnmhhekDfDvjM=
+X-Received: by 2002:a05:7300:4314:b0:30c:41df:3734 with SMTP id
+ 5a478bee46e88-30c58c1760dmr5223426eec.22.1782258103394; Tue, 23 Jun 2026
+ 16:41:43 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 23 Jun 2026 16:41:42 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 23 Jun 2026 16:41:42 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <ajMPvgA2eHQCj-B0@google.com>
+References: <20260615155244.183044-1-alexandru.elisei@arm.com>
+ <20260615160901.9A1A61F000E9@smtp.kernel.org> <ajA6ogaNiI3KDv5i@google.com>
+ <ajKcDRqT5m069PXK@raptor> <ajMPvgA2eHQCj-B0@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Date: Tue, 23 Jun 2026 16:41:42 -0700
+X-Gm-Features: AVVi8Ce0E01zo3uw2YUeY9tYq73kkPJeDmWeesJXGCOlSxxJ-xDfRo5Fdwxu5EY
+Message-ID: <CAEvNRgE9cLfjDbXuR5wq3fEWZyHxYPxdExxNjXUFO1nT5m==1A@mail.gmail.com>
+Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only memslots
+To: Sean Christopherson <seanjc@google.com>, Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: sashiko-reviews@lists.linux.dev, Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+Sean Christopherson <seanjc@google.com> writes:
 
-Pre-existing issues:
-- [High] A malicious L1 guest can cause an infinite loop in KVM by configur=
-ing a nested stage-2 page table entry as Write-Only, exploiting how KVM han=
-dles S1PTW permission faults.
---
+>
+> [...snip...]
+>
+>>
+>> The KVM_MEMSLOT_GMEM_ONLY flag is set if the backing guest_memfd has been
+>> created with GUEST_MEMFD_FLAG_MMAP. The documentation for the flag says
+>> that '[..] the fault will always be consumed from guest_memfd, regardless
+>> of whether it is a shared or private fault'.  As far as I can tell, this
+>> means that, absent a fallocate(FALLOC_FL_PUNCH_HOLE) call, the page is
+>> still in the page cache for the guest_memfd file after userspace has
+>> unmapped it, so the guest will not be accessing a freed page.
+>
+> KVM_MEMSLOT_GMEM_ONLY is somewhat misleading, it only applies to the KVM's MMU.
+> For other cases where KVM accesses guest memory, KVM still follows the host virtual
+> address, e.g. so that copy_{to,from}_user() Just Works.  But userspace isn't
+> strictly *required* to keep the userspace mapping coherent with guest_memfd, nor
+> is userspace required to make the userspace mapping fully RWX.  And so if
+> userspace modifies the VMA, KVM needs to react accordingly.
+>
+> When in-place conversion comes along, KVM will also rely on userspace mappings
+> being torn down before allow a SHARED page to become PRIVATE (for all intents
 
-commit e1bdecc84b14199ce5782e0fa66a3e430d0be5da
-Author: Oliver Upton <oupton@kernel.org>
+Conversions explicitly unmaps the pages being converted from userspace
+page tables, then checks for users other than guest_memfd. Unmapping
+does invoke the MMU notifier stuff, but conversions doesn't rely on MMU
+notifiers to unmap from stage 2 page tables, since conversions directly
+calls kvm_gmem_invalidate_start().
 
-KVM: arm64: nv: Check RW permissions for insn abort due to S1PTW
+On a shared to private conversion, if the page was mapped in stage 2
+page tables, we'd have tried to unmap it twice (the second time doesn't
+actually unmap, but still tells guest vCPUs trying to fault to retry.
 
-This patch modifies permission fault handling for instruction aborts with
-S1PTW set. Instead of evaluating execute permissions, it falls through to
-the read/write permission check.
+So we're good! With this, the first unmap will notify through MMU
+notifiers but actually do no unmapping. Thank you for working on this!
 
-Link: https://lore.kernel.org/kvmarm/20260623190607.7106B1F000E9@smtp.kerne=
-l.org/
+> and purposes, we're conceptually treating conversions as free()+re-alloc().  So
+> while the page might still be in the page cache, it's effectively been "freed".
+> So in that case, KVM really does need to ensure it handles mmu_notifier events
+> correctly to avoid UAF.
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 94df26de6990c..713fc44f362d9 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-[ ... ]
-> @@ -918,7 +918,7 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, s=
-truct kvm_s2_trans *trans)
->  	if (!kvm_vcpu_trap_is_permission_fault(vcpu))
->  		return 0;
-> =20
-> -	if (kvm_vcpu_trap_is_iabt(vcpu)) {
-> +	if (kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu)) {
->  		if (vcpu_mode_priv(vcpu))
->  			forward_fault =3D !kvm_s2_trans_exec_el1(vcpu->kvm, trans);
->  		else
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does this change expose
-instruction aborts to an infinite loop if the L1 guest maps nested stage-2
-memory as Write-Only?
-
-By falling through to the else block in kvm_s2_handle_perm_fault(), S1PTW
-instruction aborts are now evaluated for read/write permissions.
-
-However, if the L1 guest mapped the nested stage-2 page table entry as
-Write-Only, the hardware will still fault on the missing read permission
-during the stage-1 translation table walk.
-
-Looking at kvm_is_write_fault() in arch/arm64/include/asm/kvm_emulate.h:
-
-static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-{
-        if (kvm_vcpu_abt_iss1tw(vcpu)) {
-                ...
-                return kvm_vcpu_trap_is_permission_fault(vcpu);
-        }
-        ...
-}
-
-It unconditionally treats all permission faults on an S1PTW as write faults,
-assuming they are Access Flag or Dirty Bit updates.
-
-Back in the else block of kvm_s2_handle_perm_fault():
-
-        bool write_fault =3D kvm_is_write_fault(vcpu);
-
-        forward_fault =3D ((write_fault && !trans->writable) ||
-                         (!write_fault && !trans->readable));
-
-Because write_fault is true, it only evaluates !trans->writable. Since the
-mapping is Write-Only, this check passes and KVM doesn't forward the fault.
-Instead, KVM resumes the guest, which will immediately fault again on the
-read, causing an infinite loop.
-
-Is there a way to ensure we also check trans->readable when the walk is
-failing due to missing read permissions?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260623211310.1529=
-760-1-oupton@kernel.org?part=3D1
+Just making sure: "handle mmu_notifier events" here refers to
+gfn_to_pfn_cache and other parts of KVM that works with memory. There's
+no issue with a UAF between mmu_notifier invalidations and conversions,
+right?
