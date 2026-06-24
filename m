@@ -1,131 +1,119 @@
-Received: from confino.investici.org (confino.investici.org [93.190.126.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A04A3242AC
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jun 2026 17:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEBD298CA3;
+	Wed, 24 Jun 2026 18:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782323175; cv=none; b=QLYW8FHpaDPvo5YkZIcQ3A7LmjceUAM9olSNO1CMmpf7fBf2iHXs2SCxnw2k6sWAa25StvAyqZ/oYd5UhdSfuH2R7w+j4CdapwBZUcmUNyDZ33DH+K8wWo21RkCw9+eWU9BGrIycS6go5QfToqbapeCt2yqb0EiP1odta3iEWHk=
+	t=1782325508; cv=none; b=rcjlkqsflxJwPm6clrX8Q1EgDWJ3ljwSAM74j/SC2O+B8Qh0npp0Atu01smkvd63auCgz+syL5j8DmhPWzREtEzJ4epQwvRiB6Pnr+7gncawe8iuhFJh0Tqx51w63O8mtk6a/p1R1Spm54+0wThkJCcHZ9KdJbrYWWE7EWMs+30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782323175; c=relaxed/simple;
-	bh=ek7of7SQjem5cMKKZF+sVTxo/ly3jE4WY7lkXW18b80=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=eru0bLetCX5Rit43g3pzzd2IkurnIsB39pQXf4PNuK+qMTyTopxFh5IVlIkzdTmO5yRKU5mNGgjqh8wsr/c+gZ8Zxf0jmVY35QYLu0dvOhZQaWcl3Nd2Fowey5HAcm4oCrXvvIVx6oT4tsWrJVc0zilcbo4k4AsJsFm8gtMR0W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=YK+fmlkx; arc=none smtp.client-ip=93.190.126.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
+	s=arc-20240116; t=1782325508; c=relaxed/simple;
+	bh=5+Sy2FOiWnGoth3jqSOjOwUWo/xuVYB5KHaM0bCqpWk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fYmEA0TOIpoN8mKBcYqo0A1ZdkeJGwURUrdsnXjIA0iYU1IMZ+eQ34Qg0VbBRwisZFWhHgEsKGkzjCxKBHC0wL3cF+/VafDGJuHktcjd1yEKrQeQJ7Ckdq8ZatGaHV/M6L7aO4a90VSe/aMdyfL6+wEzZl8wzarUSk2T5HyHJwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=et54GvQw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="YK+fmlkx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
-	s=stigmate; t=1782323172;
-	bh=c00+0nK5vMbExFKRuy9+Yjtee5J5k7Q2Yj2gd1s+mO8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=YK+fmlkx08peqVre3hV18ZN/FO7pa1Oo9lrTGDKgNbFs/Y5wEUdbfigg1mP2NlIv/
-	 jWwf2bclVjAPoTOOVT3Cri14Cd4dNWkrUs4kwGWv8PfEw0bmkpITw5rN7Pl/ZG37PX
-	 6GzDctpnS7k5Iz3pIGB3em1hEzURKyN4I2eZLi1M=
-Received: from mx1.investici.org (unknown [127.0.0.1])
-	by confino.investici.org (Postfix) with ESMTP id 4glq9c0hFnz10sp;
-	Wed, 24 Jun 2026 17:46:12 +0000 (UTC)
-Received: by mx1.investici.org (Postfix) id 4glq9b3p7pz10sm;
-	Wed, 24 Jun 2026 17:46:11 +0000 (UTC)
-Date: Wed, 24 Jun 2026 18:46:10 +0100
-From: Bradley Morgan <include@grrlz.net>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-CC: Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Quentin Perret <qperret@google.com>,
- Vincent Donnefort <vdonnefort@google.com>, Gavin Shan <gshan@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3_3/3=5D_KVM=3A_arm64=3A_top_up_s?=
- =?US-ASCII?Q?tage_2_memcache_for_dirty_logging_faults?=
-In-Reply-To: <9FCEC7E9-DE50-443F-8E82-9FA22CA15ED6@grrlz.net>
-References: <20260624160028.15591-1-include@grrlz.net> <20260624160028.15591-4-include@grrlz.net> <9FCEC7E9-DE50-443F-8E82-9FA22CA15ED6@grrlz.net>
-Message-ID: <6FBA06E8-B0C4-444C-B226-0B756C0172A7@grrlz.net>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="et54GvQw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF5F1F000E9;
+	Wed, 24 Jun 2026 18:25:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782325507;
+	bh=0fbeFIfFUvGMAe5cuzxSu1wxHQwrTOcqgfAbEnIXJ9I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=et54GvQwwoFwM29uYCezg/ao4/R7nkfnsMbw/fNchDLOPrBnKsXaVQrkXAJnZV9UZ
+	 pKpn+jDq9NWNJzICNboo4ikKAQxuggzhtINQ2HEYkgyaMc26gXoCtM5srIqM22gSh/
+	 iD/d2L0IaNFnWasv7Je+pNlpdh/ue+4fcii7aieLdb74gf0fwtvoFDYzQcBk0GD+w/
+	 6zjCZhdJqwjvNknSYJz7EFZW1/WYy7DaEO7D5OG4J3xqTE1FhRIxliWHPluPT5C/ZJ
+	 r129Cy6UkSnso0cSQna2njd2EaCN0i0lVKNZAdX8wQ3Ado0i37rToef+S4OEAhu3Hm
+	 iuhIxqYjn1Wfw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wcSHY-0000000FjZo-4Aon;
+	Wed, 24 Jun 2026 18:25:05 +0000
+Date: Wed, 24 Jun 2026 19:25:04 +0100
+Message-ID: <86ik77re2n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Bradley Morgan <include@grrlz.net>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] KVM: arm64: top up stage 2 memcache for dirty logging faults
+In-Reply-To: <6FBA06E8-B0C4-444C-B226-0B756C0172A7@grrlz.net>
+References: <20260624160028.15591-1-include@grrlz.net>
+	<20260624160028.15591-4-include@grrlz.net>
+	<9FCEC7E9-DE50-443F-8E82-9FA22CA15ED6@grrlz.net>
+	<6FBA06E8-B0C4-444C-B226-0B756C0172A7@grrlz.net>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: include@grrlz.net, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, vdonnefort@google.com, gshan@redhat.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On June 24, 2026 6:39:16 PM GMT+01:00, Bradley Morgan <include@grrlz.net>
-wrote:
->On June 24, 2026 5:00:28 PM GMT+01:00, Bradley Morgan <include@grrlz.net>
->wrote:
->>Dirty logging forces new stage 2 mappings down to page size, but
->>it does not always remove an existing block mapping before the next
->>fault. Eager splitting is best effort and is disabled by default.
->>
->>A permission fault on such a block can still need a page table page
->>to install the smaller mapping. Top up the memcache for any permission
->>fault while dirty logging is active, not only for write faults.
->>
->>The issue was discovered [1] by Sashiko.
->>
->>Link:
->https://lore.kernel.org/all/59984F6D-06F2-4302-BDD7-92DF334E8FA0@grrlz.net/T/#t
->[1]
->>
->>Fixes: 6f745f1bb5bf ("KVM: arm64: Convert user_mem_abort() to generic
->page-table API")
->>Cc: stable@vger.kernel.org
->>Signed-off-by: Bradley Morgan <include@grrlz.net>
->>---
->> arch/arm64/kvm/mmu.c | 9 ++++-----
->> 1 file changed, 4 insertions(+), 5 deletions(-)
->>
->>diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>index 3f57f6825a33..8911e319e6fa 100644
->>--- a/arch/arm64/kvm/mmu.c
->>+++ b/arch/arm64/kvm/mmu.c
->>@@ -2122,13 +2122,12 @@ static int user_mem_abort(const struct
->kvm_s2_fault_desc *s2fd)
->> 	 * Permission faults just need to update the existing leaf entry,
->> 	 * and so normally don't require allocations from the memcache. The
->> 	 * only exception to this is when dirty logging is enabled at runtime
->>-	 * and a write fault needs to collapse a block entry into a table. With
->>-	 * pKVM, they may still need a fresh mapping object if the fault turns
->>-	 * page entries into a block entry.
->>+	 * and a fault needs to collapse a block entry into a table. With pKVM,
->>+	 * they may still need a fresh mapping object if the fault turns page
->>+	 * entries into a block entry.
->> 	 */
->> 	memcache = get_mmu_memcache(s2fd->vcpu);
->>-	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
->>-			    kvm_is_write_fault(s2fd->vcpu))) {
->>+	if (!perm_fault || memslot_is_logging(s2fd->memslot)) {
->> 		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
->> 		if (ret)
->> 			return ret;
->>
->
->Note: Patch 3 seems to conflict because of patch 2 (the comments)
->
->
->Oops! :(
->
->V4 (after people have their review go), will contain one commit (patch
->3) with the updated comments.
->
->Patch 1 and 2 applies as usual.
->
->Apologies for my messup. 
->
->Thanks!
+On Wed, 24 Jun 2026 18:46:10 +0100,
+Bradley Morgan <include@grrlz.net> wrote:
+> 
+> On June 24, 2026 6:39:16 PM GMT+01:00, Bradley Morgan <include@grrlz.net>
+> wrote:
+> >
+> >Note: Patch 3 seems to conflict because of patch 2 (the comments)
+> >
+> >
+> >Oops! :(
+> >
+> >V4 (after people have their review go), will contain one commit (patch
+> >3) with the updated comments.
+> >
+> >Patch 1 and 2 applies as usual.
+> >
+> >Apologies for my messup. 
+> >
+> >Thanks!
+> 
+> 
+> Actually. Hmm.
+> 
+> I'll just drop patches 2 and 3, I'll do them at a later date, please
+> disregard patches 2 and 3, patch 1 doesn't rely on 2 and 3..
+> 
+> If you guys wanna have a look feel free! :)
 
+As I suggested in my reply to your hasty v2, taking a few *days*
+between versions is generally a good thing. it gives the reviewers
+time to chime in, and gives you the opportunity to reflect on what
+you've just written (reading your own patches after a few days is a
+sure way to go and rewrite them).
 
-Actually. Hmm.
+Actually, by posting more often, you are guaranteeing that people
+*avoid* reviewing your stuff, since odds are that there is a new
+version coming in the next 10 minutes, so why bother...
 
-I'll just drop patches 2 and 3, I'll do them at a later date, please
-disregard patches 2 and 3, patch 1 doesn't rely on 2 and 3..
+But hey, that's free advice, so it's probably worthless.
 
-If you guys wanna have a look feel free! :)
+	M.
 
-Thanks!
+-- 
+Without deviation from the norm, progress is not possible.
