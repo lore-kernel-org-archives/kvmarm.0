@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143723CAE8F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF423E1216
 	for <kvmarm@lists.linux.dev>; Wed, 24 Jun 2026 20:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782332693; cv=none; b=MXLo/CE4fYFQp4WRCM1Mm3d85N8KAjhg+t5Ify9KwdvTVaB/YKnnMKa9I3PMIVPQJyL0cVY6SW6hA8JAuprUI0SiaQXE0qST6RMOUraaVL/J0nFnXNyxli5D1gmH/KqZRMUlYw6nZ/rt2BRleOab8zMLV3Y0Dvk8sbLfHUZC1QU=
+	t=1782332693; cv=none; b=V8DYMnqSliun6cAYt/f0bo7jK5MaZ/UxH/i1zcQNvkyDaHN7cvSF8YQTUAZoKV6tQZZRH/KP9ixjuj+HbJffAU3vlJ74AaVpFGybLovQrbtB8fEr0UoFC8dOGMiD78FgCiW8jkVeVAUw6vwHekcmvToG5FBCXK14wPtcluFSGvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782332693; c=relaxed/simple;
-	bh=Lkc7uLS8VxnjJBferNZDb+CE75aLMSWaijr6HEzt2zY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LoSJI6MPKthvsZJYeGth81H90hJzq8QsTdlbYsxufZhD6t3NCCAXL2ZmDCMDzbQLx0cvz5Uw8opQHJJ+7tMwQ8s0UamgwDn89zIhqJTs5cT24Ax3d9UaXbDjiwp4opo7H7S+DLFaJKKghjpehI6L6uvCt5tysRPXOgyB4faLYPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhtgRjYK; arc=none smtp.client-ip=100.103.45.18
+	bh=9A1yd4V01q1vp6C7cXsTsOFoaPPHb+DkSlMV4Kxd+0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IQBhdlHlrVJ66deO99yMbwIasO24/I0bKj9PQNM6N4U8bfxSaFLVmlT4las4mj/7ii/ST9LPUOZ6xUxC9MB/rlOobTuU+WXMgXlZFPlDGTJll3ySNbdP9hvkK7+Xy4TnXJ44r9pPYRCCFPvNNL/ZaWV+a/p+iHt9Yfe+7QTFMPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmOgIuwZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhtgRjYK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0B451F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmOgIuwZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB0DE1F00A3E;
 	Wed, 24 Jun 2026 20:24:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782332691;
-	bh=SaiY0PYRzfPbuUuxkZCNtIA7XEVg1ACBGxyfc2892eQ=;
-	h=From:To:Cc:Subject:Date;
-	b=FhtgRjYK4T2XoyEHDu+W5mpKmK5J2vass89Ff2ffTAouBATeml2YawdE6S+M7h0y6
-	 yfUfUJp3z4JLve6ww11c1yu0kMCqx10mGOOvB7cre6Zncm8kv9eVoPXIWMKGewQ8AR
-	 UG/ZJkkHkbuHaLtDloruxixF6rXxnI56sMugGgc+3q+HuwyznJsL5hWOBoQZLWNlr2
-	 egzeSdnhiLRSLft3GwRNFqVoEQ9UepsISGzm3Ysd2IXuYgq5DPStr/NorSKqaWKiif
-	 j6HfZpggaKO5ZRUh+PYh/qtKOkTMWfvlvD3qAhHEMj3CaACoxQP0w+N2hWQOvghaCp
-	 XU+NR+idNV/Kg==
+	s=k20260515; t=1782332692;
+	bh=2EbHLmQHprKbbwbbw5XIbT1c6AOB9dukhXoinX2XcVg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=BmOgIuwZMbetjh+aEsV11eNB1bniMLrVQxU6m1FxZWPBSQg3et8WPEOgtk48eKWyo
+	 PS6ZGkwcEput+fohrfCTij/iZDchhQ0TlQJPS16rVG0HJw6mDCzAODwp/pRxASYjUd
+	 OFZ8Ra0bMMjuNlPityLssqtjat8rNqvB32Kp4lKHEiEXvfgozqHje60TIX9teKEUrI
+	 UFISHdMm12FKlv2G5/mFiTeeDXQrxyJiMAlrydxFIP4FDRrM8aDCc4LJlbizl7rOlO
+	 Xra6hr0LXi1KpS7dcQKUWoBjpNEWrzNLUO8ySDT0FJ3M4pNob7v+H6sONQDn+6Jbk3
+	 Hlxum0MpKxq4A==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,11 +34,14 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
-	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 0/2] KVM: arm64: nv: Fix permission checks for S1PTW faults
-Date: Wed, 24 Jun 2026 13:24:44 -0700
-Message-ID: <20260624202446.1698535-1-oupton@kernel.org>
+	Oliver Upton <oupton@kernel.org>,
+	Sashiko <sashiko-bot@kernel.org>
+Subject: [PATCH v2 1/2] KVM: arm64: Only consider S1PTW a write fault if HA is set
+Date: Wed, 24 Jun 2026 13:24:45 -0700
+Message-ID: <20260624202446.1698535-2-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260624202446.1698535-1-oupton@kernel.org>
+References: <20260624202446.1698535-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,37 +50,139 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Small series that papers over arch ambiguity around S1PTW permission
-faults.
+In yet another example where the architecture is awesome, S1PTW faults
+may not have a valid ESR_ELx.WnR. kvm_is_write_fault() worked around
+this by relying on a KVM implementation detail that canonical stage-2
+translations must have at least read-only permissions.
 
-As kvm_s2_handle_perm_fault() wasn't checking for S1PTW instruction
-aborts, it was incorrectly evaluating the execute permissions to decide
-where to send the fault.
+That assumption no longer holds for nested virt where an L1 hypervisor
+could construct write-only mappings that propagate to the shadow
+stage-2.
 
-Fixing that uncovers another issue in that kvm_is_write_fault() assumes
-any S1PTW permission fault was due to write. Nested screws this up since
-an L1 hypervisor could use write-only permissions at stage-2.
+Since there's no exact science to this, assume that the S1PTW fault was
+for write if HA is enabled at stage-1.
 
-We end up papering over architecture ambiguity by potentially evaluating
-*both* read and write permissions for S1PTW, assuming any fault with HA
-set to require write permission (in addition to read).
-
-Applies to kvmarm/fixes.
-
-v1: https://lore.kernel.org/kvmarm/20260623211310.1529760-1-oupton@kernel.org/
-
-Oliver Upton (2):
-  KVM: arm64: Only consider S1PTW a write fault if HA is set
-  KVM: arm64: nv: Treat S1PTW permission faults specially
-
+Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Closes: https://lore.kernel.org/kvmarm/20260623213225.A89CF1F000E9@smtp.kernel.org/
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+---
  arch/arm64/include/asm/kvm_emulate.h | 22 +++++----------
  arch/arm64/include/asm/kvm_nested.h  |  2 ++
  arch/arm64/kvm/at.c                  | 42 +++++++++++++++++++++-------
- arch/arm64/kvm/nested.c              | 20 +++++++++++--
- 4 files changed, 58 insertions(+), 28 deletions(-)
+ 3 files changed, 41 insertions(+), 25 deletions(-)
 
-
-base-commit: d098bb75d14fde2f12155f1a95ec0168160867ce
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5bf3d7e1d92c..8e208ce2597e 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -479,21 +479,13 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+ {
+-	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+-		/*
+-		 * Only a permission fault on a S1PTW should be
+-		 * considered as a write. Otherwise, page tables baked
+-		 * in a read-only memslot will result in an exception
+-		 * being delivered in the guest.
+-		 *
+-		 * The drawback is that we end-up faulting twice if the
+-		 * guest is using any of HW AF/DB: a translation fault
+-		 * to map the page containing the PT (read only at
+-		 * first), then a permission fault to allow the flags
+-		 * to be set.
+-		 */
+-		return kvm_vcpu_trap_is_permission_fault(vcpu);
+-	}
++	/*
++	 * The architecture sucks; assume that the S1PTW fetched for write if
++	 * HA is enabled at stage-1. Note that hardware updates to dirty state
++	 * and table AF are predicated on HA=1 (DDI0487 M.a D24.2.194; R_SNVTX).
++	 */
++	if (kvm_vcpu_abt_iss1tw(vcpu))
++		return effective_tcr_ha(vcpu);
+ 
+ 	if (kvm_vcpu_trap_is_iabt(vcpu))
+ 		return false;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index cbdaaa2a2903..e9f48f94a77f 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -417,4 +417,6 @@ u16 get_asid_by_regime(struct kvm_vcpu *vcpu, enum trans_regime regime);
+ 
+ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new);
+ 
++bool effective_tcr_ha(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 8263c648207b..91154654210e 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -219,6 +219,36 @@ static unsigned int tcr_tg_pgshift(struct kvm *kvm, u64 tcr, bool upper_range)
+ 	return shift;
+ }
+ 
++static bool __effective_tcr_ha(struct kvm_vcpu *vcpu, enum trans_regime regime)
++{
++	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, AF))
++		return false;
++
++	switch (regime) {
++	case TR_EL10:
++		return vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA;
++	case TR_EL20:
++		return vcpu_read_sys_reg(vcpu, TCR_EL2) & TCR_HA;
++	case TR_EL2:
++		return vcpu_read_sys_reg(vcpu, TCR_EL2) & TCR_EL2_HA;
++	default:
++		BUG();
++	}
++}
++
++static enum trans_regime vcpu_trans_regime(struct kvm_vcpu *vcpu)
++{
++	if (!is_hyp_ctxt(vcpu))
++		return TR_EL10;
++
++	return vcpu_el2_e2h_is_set(vcpu) ? TR_EL20 : TR_EL2;
++}
++
++bool effective_tcr_ha(struct kvm_vcpu *vcpu)
++{
++	return __effective_tcr_ha(vcpu, vcpu_trans_regime(vcpu));
++}
++
+ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 			 struct s1_walk_result *wr, u64 va)
+ {
+@@ -407,12 +437,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		goto addrsz;
+ 
+ 	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
+-
+-	wi->ha  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, AF);
+-	wi->ha &= (wi->regime == TR_EL2 ?
+-		  FIELD_GET(TCR_EL2_HA, tcr) :
+-		  FIELD_GET(TCR_HA, tcr));
+-
++	wi->ha = __effective_tcr_ha(vcpu, wi->regime);
+ 	return 0;
+ 
+ addrsz:
+@@ -1723,10 +1748,7 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+ 	struct s1_walk_result wr = {};
+ 	int ret;
+ 
+-	if (is_hyp_ctxt(vcpu))
+-		wi.regime = vcpu_el2_e2h_is_set(vcpu) ? TR_EL20 : TR_EL2;
+-	else
+-		wi.regime = TR_EL10;
++	wi.regime = vcpu_trans_regime(vcpu);
+ 
+ 	ret = setup_s1_walk(vcpu, &wi, &wr, va);
+ 	if (ret)
 -- 
 2.47.3
 
