@@ -1,119 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from confino.investici.org (confino.investici.org [93.190.126.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1418E2EEE60;
-	Wed, 24 Jun 2026 09:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B5A21FF2A
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jun 2026 16:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782295060; cv=none; b=ryTX1o3KOjlqNocciHSI/KV/zHbR+2Qp6GtF7Vcd+hD1jF1QxTyAUKO7o1vgvjPZi61yK4E38P+UHemxgJw0IyV4TftYEDd45UKvhzQc3mse+pMB0XkN0GdL7CzZirjljCds1mnHwcr5ZaU86HNAzDiV4iLiN5/Hsey+kYkELRM=
+	t=1782316856; cv=none; b=ajC+vqBerSUWI5f9hMLWA5x/03jbVrvGVaO8dywzMiKMrRFvXVBZOK0dQ6myptkbBzyyNKbTci+O9i3+KDtyQr5ytG5R297JR5BfHqTCoP4XLS7Un8n2uGyoDnQAacM/0JEDoGEWku1wkI2LUMoyfi3FW9jYriCVtCvYdWkCj44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782295060; c=relaxed/simple;
-	bh=jd69DKk+cUdKUb+eN989Djf4zanqOEdHJ55xxecHLEQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fkKLWBu6M8a8V8yCQF1IaZ4sEg7IslW2aKfhPoLNe5PigSVVgq1IruOsDTs7C3xUZr7nTkAMG7ZicK74tOu97tMXOfjYgSUZgPst+9KgkIh+yZN/AmYFLgZ2PrAzvRwXcXrcg5XfmZrpeF5uDKMKGeh4hzGXuUrL1hhkGTCmrls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zjat725x; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782316856; c=relaxed/simple;
+	bh=MLAz780TLQyTEjsDsSCQW1RACoFxlCiPt56cnGIzqHg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rkzyrPCn0F/hb9FZMc+0Acr24ULibbXY9jf72+ekC68CJlktLT0MgW2LoMmhCYI/Q1Dyu7AplwWA0W8f7FVbNmfj6wIcXElHQ0z2QsH9uYxB3/0Qyxr6Yu+ZpS+P/0lcqY1QriBwYhC2kTcrQLQRGmufNXKaWE5WMxfhr0KuT24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=WXGfyhLO; arc=none smtp.client-ip=93.190.126.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zjat725x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B99511F000E9;
-	Wed, 24 Jun 2026 09:57:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782295058;
-	bh=xGOCGGfz/+i5zRbNpzkCtwa5vuOnFRMn+9rFacWY9MY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Zjat725x4cestm3WggsvO1tUcPrtk1vIcmSQNd49F6us/98RxVaouxlCg05qypzXw
-	 74yBgfN43VsQpyAMZndLZuyNN4hgMv3+wro4c/MxOnRT3WeJFE+JfnGX11bCghFhas
-	 Gfb83oAx3+paL2jGGODz3h+VOIAFiLMJjyAIwmbhowezAC6/TESL7nR293KXAVScVx
-	 LDa6GJUtdZPeVtfjxc3qSCYjRIz8fDTcEm2dQXuDx4RncPy+9jhbMLGeHyvwj0ZCds
-	 GxnHy1s4LR53gqRvQ6Tr0fR5KEBIShV+lUJLpyyxD91m28pBQjcVpEfcUmAqmycPkq
-	 RluCqkqvb4iUQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wcKMS-0000000Fa86-26jv;
-	Wed, 24 Jun 2026 09:57:36 +0000
-Date: Wed, 24 Jun 2026 10:57:36 +0100
-Message-ID: <86ldc4qmzz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: nv: Check RW permissions for insn abort due to S1PTW
-In-Reply-To: <ajul3_7XpTeDn57I@kernel.org>
-References: <20260623211310.1529760-1-oupton@kernel.org>
-	<20260623213225.A89CF1F000E9@smtp.kernel.org>
-	<ajsf1v4X5sJk_Dv5@kernel.org>
-	<86mrwkqqix.wl-maz@kernel.org>
-	<ajul3_7XpTeDn57I@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="WXGfyhLO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1782316847;
+	bh=O7GEdAiyDOwyLdF7enDZh1aPgl+/ZJvbV+Kk7bU5e7Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WXGfyhLOSN9iYMPngnr6gWVCGMvyhzd8+T/Kkm7C9Ioqs3REsr+2dLVS2cZgPmnmf
+	 kAIgCFPDbfKj6s4biQTogPMknehIbHHP+aAMLxkNlRuvZ0cPx5SA/iX9QkUtNyzLQD
+	 RqyzGIKKgu81fKG3vR7KBmapJLyUgvp03yrG2GyU=
+Received: from mx1.investici.org (unknown [127.0.0.1])
+	by confino.investici.org (Postfix) with ESMTP id 4glmqy72M4z10qk;
+	Wed, 24 Jun 2026 16:00:46 +0000 (UTC)
+Received: by mx1.investici.org (Postfix) id 4glmqx0sBTz10rF;
+	Wed, 24 Jun 2026 16:00:45 +0000 (UTC)
+From: Bradley Morgan <include@grrlz.net>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Bradley Morgan <include@grrlz.net>
+Subject: [PATCH v3 0/3] KVM: arm64: fix pKVM mapping cache corner cases
+Date: Wed, 24 Jun 2026 16:00:25 +0000
+Message-ID: <20260624160028.15591-1-include@grrlz.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 24 Jun 2026 10:39:43 +0100,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> On Wed, Jun 24, 2026 at 09:41:26AM +0100, Marc Zyngier wrote:
-> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > > index 5bf3d7e1d92c..d5c61e0027c8 100644
-> > > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > > @@ -479,21 +479,12 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-> > >  
-> > >  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> > > -		/*
-> > > -		 * Only a permission fault on a S1PTW should be
-> > > -		 * considered as a write. Otherwise, page tables baked
-> > > -		 * in a read-only memslot will result in an exception
-> > > -		 * being delivered in the guest.
-> > > -		 *
-> > > -		 * The drawback is that we end-up faulting twice if the
-> > > -		 * guest is using any of HW AF/DB: a translation fault
-> > > -		 * to map the page containing the PT (read only at
-> > > -		 * first), then a permission fault to allow the flags
-> > > -		 * to be set.
-> > > -		 */
-> > > -		return kvm_vcpu_trap_is_permission_fault(vcpu);
-> > > -	}
-> > > +	/*
-> > > +	 * The architecture sucks; assume that the S1PTW fetched for write if
-> > > +	 * HA is enabled at stage-1.
-> > > +	 */
-> > > +	if (kvm_vcpu_abt_iss1tw(vcpu))
-> > > +		return effective_tcr_ha(vcpu);
-> > 
-> > OK, so you're trading the implicit state machine (translation fault ->
-> > RO, permission fault -> RW) for a direct TCR.HA lookup, because the
-> > only reason you'd get a S1PTW fault for write is if you were updating
-> > the descriptor. This is cute, and I wish I had thought of that, as it
-> > saves us a round trip.
-> > 
-> > But why can't that happen with HD? Surely this results in a similar
-> > fault, and I think we should also evaluate that bit.
-> 
-> The effective value of both HAFT and HD is 0 if TCR_ELx.HA is 0. So
-> evaluating HA covers them all :)
+This is a standalone v3.
 
-Indeed it does! Maybe worth capturing in a comment, because it isn't
-completely obvious (we have R_SNVTX for HAFT, but you need to dive
-into the TCR_EL1 register description to read the blurb about the
-effective value of HD).
+Patch 1 fixes pKVM cache maintenance for non cacheable mappings without
+growing struct pkvm_mapping.
 
-Thanks,
+Patch 2 fixes a pKVM mapping cache topup bug on permission faults that
+replace page mappings with a PMD mapping.
 
-	M.
+Patch 3 fixes the generic dirty logging case where a permission fault
+can still need a page table allocation to split a block mapping.
+
+Changes in v3:
+- Send as a standalone series with a cover letter.
+- Store the pKVM cacheable bit in nr_pages instead of adding a bool.
+- Drop stable from patch 1.
+- Add patch 3 for dirty logging permission faults.
+
+Changes in v2:
+- Add patch 2 for the pKVM permission fault mapping cache bug.
+
+Bradley Morgan (3):
+  KVM: arm64: skip pKVM cache flushes for non cacheable mappings
+  KVM: arm64: top up pKVM mapping cache for permission faults
+  KVM: arm64: top up stage 2 memcache for dirty logging faults
+
+ arch/arm64/kvm/mmu.c  | 32 +++++++++++++++++++--------
+ arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 64 insertions(+), 19 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.53.0
