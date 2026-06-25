@@ -1,123 +1,163 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE47260580
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jun 2026 19:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A440C2BEC34;
+	Thu, 25 Jun 2026 20:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782416607; cv=none; b=CB6OZ8RmlMVQzbufpwCx5x4fEOvs53nfcGS94SQ5kqfCy/j7HZl+dTCgtyb5hecE12aDWlFvIm8LOBXAZL6xOMLo/JZ4inXdsJvMqYkj+/NY+ZBQcl5dRuCBL/oGFabC1IrupRRYUH+uM2TADl+cfBB2IuTlyRpsBVKdNott7R8=
+	t=1782420238; cv=none; b=Ta9RoyUIMWdNgp3yczTu6zrK7sDrEYod5Zb0rtPUvTHHdMvvaevx8z924ZwfkU+hcI83iA2ISBtfvL62pIbEiDKB4xtHSJkhwmjkhImT+MIbzna1RfybO1zRRRzKVIv4oFRkgPkqrJxtgar1lLQp0oHFjhWxBbI74PDQloXF+VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782416607; c=relaxed/simple;
-	bh=41K2ntIJwIiJ1XV9qQH8RX2RkhiTpGcUQQvILEiKK2A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VE6YiHXnC8vVEmvXaLU2GDxt+40eb7ZxWCYSsECGjTh4ge0t5WGa16t8is/9XBg0Nxh6hc7nIiT3Pxtr0snBe2kzA5V/s7WwdaIytOcdSt9/jD+F0dYv0JJGUr5KNtbHGj3VKe53pu89+O/Beg0e07GWrycHxnByhLVw1l91YU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rEUFIoL9; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782420238; c=relaxed/simple;
+	bh=6mjm7ztUhM+UsARMBsbn37A9uVvdzJbdEzYTl37em28=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LGH2wXpJvbcs/4017YVPa1nvNxZjD6PuorXeV/5j24x53tXHU+hdURMrMH0lG7i/N7malz/efb6HgKkNUKxBFau1d87wG68q9n20f8wGPaUdrEJDn7X0E/PxvNqKcezn+pt8qpSdw/ioYFJ7/cuM3+FEgzJsfjjcKOSkpsLwSv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGksxVq+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rEUFIoL9"
-X-Forwarded-Encrypted: i=1; AFNElJ949joanuafL4KJZswd6Sst6MVGp3GJVqt2wXAXtku7jrWEf0GM7vrOHltfdIVgDrDvBy4P6qg=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782416603;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nbSjX9AvDpdxOLt0RWMwNd5KM4HdVWEarS1sfRM2aeQ=;
-	b=rEUFIoL9iU4h2HCJn6lCMEWggvWAo0/BE7L8O1NiCWD69TlMOaDQo1vk6cBUEOhoK9bd3P
-	41bxuz3DL8OO19CPIdmyBKLlXmcxT5k3nN/QwgtmI/+CimYW1psSeamHZa3OrvQdxXGICD
-	eK+aUcyO/5RHhav2JvKHQcima9Jrp34=
-X-Gm-Message-State: AOJu0YxqHqX4XElLIuNexq957KyXQo1sVfppKyYQZGynJOBiNLE8JqLg
-	ZFSCu75aPDKRCyNljHM1HREGPBNqRL8YOjZY/QQCnu4VKoU4QknDZoviDAWRj5UkpEFz7BP2yUM
-	mv8WbWbNwEKsyB5wNHARgIH3jpG53zNHKQt0N2imY
-X-Received: by 2002:a05:622a:d0:b0:517:5ec3:b59c with SMTP id
- d75a77b69052e-51a7d60c48emr1462271cf.2.1782416599791; Thu, 25 Jun 2026
- 12:43:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGksxVq+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 518A11F000E9;
+	Thu, 25 Jun 2026 20:43:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782420237;
+	bh=zSwvIEP71JLAUC8GD2o8kJZj3FkWSNlSkDXruBlYrD4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=lGksxVq+0cPxwkswllexFn2c75zliDdYmGN0QEpwCyPI/J8P0oELNpEPAVnzV8uwZ
+	 nOjFnSi/m++bpDkIr2EgdPdL4039b+mEsvkow+O9CBTCMFgm199fLeadALGLyWVrSd
+	 n5gxFCD4Mi+ArrDO7VYquVAB9A4eq1WFdrU+PKNHaxaY0uBezB/OE3ImcgMqQL9dgM
+	 JYIjiVYc4n4tDtQzhWJGZ9KHa4xB5cBKpAoUSvY/w2gJlXN/iqY7Hnub1kMyjcoU0H
+	 69b7qNuJZ+b419VZ0kmnVgapGuN3tB1fb2PsSGh+YLSA+5sxUd0mxxp4LajowRHfqK
+	 gcdDFsZBxmwcQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wcqvT-0000000G6ge-1ONI;
+	Thu, 25 Jun 2026 20:43:55 +0000
+Date: Thu, 25 Jun 2026 21:43:54 +0100
+Message-ID: <86cxxeqrjp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Only consider S1PTW a write fault if HA is set
+In-Reply-To: <aj2C1na3fc_BlvuC@kernel.org>
+References: <20260624202446.1698535-1-oupton@kernel.org>
+	<20260624202446.1698535-2-oupton@kernel.org>
+	<20260624204025.519861F000E9@smtp.kernel.org>
+	<ajxFe5N2CXySmLbU@kernel.org>
+	<86echur5g9.wl-maz@kernel.org>
+	<aj2C1na3fc_BlvuC@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260625171046.4482-1-will@kernel.org>
-In-Reply-To: <20260625171046.4482-1-will@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 25 Jun 2026 20:42:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzT74Yq2Aj9VdSoCNDKc5qP2q7cu0H40MJAoMohw0t6Kw@mail.gmail.com>
-X-Gm-Features: AVVi8CfexivWnztJTGmBWTKtn7LsHEu_5HRnrMWMwOS4QS8mV8LVyPjpMXXEgWc
-Message-ID: <CA+EHjTzT74Yq2Aj9VdSoCNDKc5qP2q7cu0H40MJAoMohw0t6Kw@mail.gmail.com>
-Subject: Re: [PATCH v2 kvmtool 0/4] Add support for running protected VMs on arm64
-To: Will Deacon <will@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Andre Przywara <andre.przywara@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 25 Jun 2026 at 18:10, Will Deacon <will@kernel.org> wrote:
->
-> Hi folks,
->
-> This is v2 of the patches I previously posted here:
->
->   https://lore.kernel.org/r/20260619115415.5475-1-will@kernel.org
->
-> Changes since v1 include:
->
->   * Bail if user specifies less guest memory than the restricted DMA pool.
->   * Avoid silently dropping KVM_VM_TYPE_ARM_PROTECTED on old host kernels.
->   * Added R-b/T-b tags (thank you!)
->
-> The patches are also available here if you want to pull them directly:
->
->   https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/log/?h=pkvm
->
-> Cheers,
->
-> Will
+On Thu, 25 Jun 2026 20:34:46 +0100,
+Oliver Upton <oupton@kernel.org> wrote:
+> 
+> On Thu, Jun 25, 2026 at 04:43:34PM +0100, Marc Zyngier wrote:
+> > On Wed, 24 Jun 2026 22:00:43 +0100,
+> > Oliver Upton <oupton@kernel.org> wrote:
+> > > 
+> > > On Wed, Jun 24, 2026 at 08:40:24PM +0000, sashiko-bot@kernel.org wrote:
+> > > > > +	/*
+> > > > > +	 * The architecture sucks; assume that the S1PTW fetched for write if
+> > > > > +	 * HA is enabled at stage-1. Note that hardware updates to dirty state
+> > > > > +	 * and table AF are predicated on HA=1 (DDI0487 M.a D24.2.194; R_SNVTX).
+> > > > > +	 */
+> > > > > +	if (kvm_vcpu_abt_iss1tw(vcpu))
+> > > > > +		return effective_tcr_ha(vcpu);
+> > > > 
+> > > > [Severity: High]
+> > > > Does unconditionally treating S1PTW faults as writes when HA is enabled break
+> > > > guests that use pre-populated page tables in read-only memslots?
+> > > > 
+> > > > If a guest populates its page tables with the Access Flag already set, places
+> > > > them in an RO memslot, and enables HA in its TCR, the hardware only needs read
+> > > > access during a walk.
+> > 
+> > Correct, this is a consequence of R_HDTRB.
+> 
+> While not _directly_ related, this does seem at odds with the
+> implications of R_JCXVS.
+> 
+> I.e. when HD is set, the PTW can speculatively fetch the S2 translation for
+> write before knowing if the S1 descriptor is actually subject to an
+> update per R_HDTRB.
 
-For the new series:
+I agree that this is a bit odd, and has a taste of speculative writes
+(always a good idea... not!).
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+> 
+> It obviously all still fits together (permission checks are later down
+> the line), just weird is all. Anyway...
+> 
+> > I've been chewing on that one for a bit, and came up with the
+> > following argument:
+> > 
+> > - We're missing one of Read or Write because of L1's doing, and L1
+> >   needs to do *something* about it. We don't need to find out about HA
+> >   in the guest, we just need to forward the fault (and it is probably
+> >   enough to check that we're in a nested context).
+> 
+> We still need to account for host-induced permission faults, e.g. dirty
+> tracking or an RO memslot getting mapped into the L2. So I think we
+> still need to evaluate R+W before forwarding to the L1.
 
-Cheers,
-/fuad
+Hmm. I had forgotten about this indeed. Ultimately, we need to keep
+track of why a S2 entry is RO in the L1 IPA space. We can either use
+more SW bits in the PTE (not that many left), or wait until Wei-Lin is
+done with his reverse + direct map tracking structure.
 
->
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Andre Przywara <andre.przywara@arm.com>
-> Cc: Fuad Tabba <fuad.tabba@linux.dev>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Marc Zyngier <maz@kernel.org>
->
-> --->8
->
-> Will Deacon (4):
->   Sync kernel UAPI headers with v7.1
->   virtio: Factor out base features for modern virtio transports
->   virtio: Add helper for enabling VIRTIO_F_ACCESS_PLATFORM
->   arm64: Add support for protected VMs
->
->  arm64/fdt.c                         | 37 ++++++++++++++++++--
->  arm64/include/asm/kvm.h             |  1 +
->  arm64/include/kvm/fdt-arch.h        | 10 +++++-
->  arm64/include/kvm/kvm-arch.h        |  2 ++
->  arm64/include/kvm/kvm-config-arch.h |  5 ++-
->  arm64/kvm.c                         | 28 +++++++++++++--
->  arm64/pci.c                         |  2 ++
->  include/kvm/virtio.h                |  2 ++
->  include/linux/kvm.h                 | 53 +++++++++++++++++++++++++----
->  include/linux/virtio_ring.h         |  5 +--
->  riscv/include/asm/kvm.h             | 11 +++---
->  virtio/core.c                       | 12 +++++++
->  virtio/mmio-modern.c                |  2 +-
->  virtio/pci-modern.c                 |  2 +-
->  x86/include/asm/kvm.h               | 21 +++++++-----
->  15 files changed, 163 insertions(+), 30 deletions(-)
->
-> --
-> 2.55.0.rc0.799.gd6f94ed593-goog
->
+> Looking ahead to HAFDBS, for this to work we will need to use a liberal
+> interpretation of R_JCXVS at the time of the initial translation fault
+> and always walk with intent for write.
+
+Yeah, I'm not too precious about that, and we might as well take
+advantage of the architecture.
+
+> 
+> Basically, there seems to be a subtle difference arising between writes
+> as observed from the nested MMU and writes as observed at the virtual
+> endpoint (memslot). Funny how something as straightforward as the access
+> flag can be so headache inducing :)
+
+Well, you knew NV was just a sorry hack, didn't you? ;-) It's just
+another case of "SW will sort it out eventually...".
+
+> 
+> > - We have checked that HA==1, derived from that that we need R+W, and
+> >   we're missing the Write permission because the page is marked RO
+> >   (assuming that KVM still maps with Read permission by default):
+> > 
+> >   - either it is "opportunistically" RO (dirty tracking, page never
+> >     written to), and we flip it to RW, rince, repeat.
+> > 
+> >   - or it is hard-wired to RO at the memslot level, and the only
+> >     possibility is that the PTW is trying to perform an atomic access
+> >     (as per R_HDTRB), which we should be able to reject with an
+> >     "Unsupported atomic hardware update fault".
+> > 
+> > Thoughts?
+> 
+> All aboard :) I've just been staring at dirty state crap for too long. I
+> really like the unsupported atomic fault over our current behavior of
+> injecting an SEA.
+> 
+> I'll fold all of this into v3.
+
+Sounds good. Thank you!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
