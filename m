@@ -1,134 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99CA388E5A;
-	Thu, 25 Jun 2026 16:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FB932B11D;
+	Thu, 25 Jun 2026 17:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782404358; cv=none; b=OSPdUFbuRCFnBpZ1rIBxml0YpfYndWQ6yg3G4TawH1F8z3GSpZ2MqETaTtrHCAJwL7YPzQeu6P0NPAzdVIJ6j5Fmh0121HLVIKTYeO9iH3LHN6L6S37bDiysoihEbJ2EBrzqRmeDLyN/PwoD8y3HXE3FZaE0Sn2l/11lHfQNdGg=
+	t=1782406894; cv=none; b=kZ7pWqY3z+IIH6E/AfmByF9K++4rDODOCyjWYiaJqyd7ZK3b2VhPEJkX+SJvQ1EYufwlH3eqZLfUsqQhy/P+DPh5P9PImKv1Roh3QkHA8LkR/k/HFQ380Oux1yShRMCojfx1aVdphdPHu97HEV+ioaM2Kbw5l33ITzocFgR+o0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782404358; c=relaxed/simple;
-	bh=pPOtgiQ6nS0ClOv75U7F6NplWOi+LZM45knFOXi9OCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D+qZ1VaANOx51b3Gp2e/J3TdCRRPq8fftbyRU2Yu5MuohExRD6urzyZrNgxPpm/FIw4BDAU6UZoO1oRzoLheWMuOfpjl0u4XMwZqc/Vw33fdaKagEFeGemSPGbJUxCPUDc2nM7tQyLFv+Apbzim7ccN5kNFbWAVuxogXwVkITSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=R8ky6eK6; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782406894; c=relaxed/simple;
+	bh=qsW0IMHTpwDuA36ssBZ4W6i74HrarexoJaueLvN/Qaw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KxQQGcbVIFdgO7b5jQlwBOK49nt9YxUxv0Y81MmbPXvkTGm/sKOIGe4KTBwmKCkSPhR/Y8U1dux8GB0PRE+m0etDP1MlN/thVq+VQ+LBjxu0dgTpYph6Sn1OXeX7/hG4qISEP35V+gouUchYuhwFr+8+cUk/zoXlXHcaWLBGpeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcxlpDjV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="R8ky6eK6"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B2F23165;
-	Thu, 25 Jun 2026 09:19:11 -0700 (PDT)
-Received: from [10.57.25.211] (unknown [10.57.25.211])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08E4F3F836;
-	Thu, 25 Jun 2026 09:19:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782404356; bh=pPOtgiQ6nS0ClOv75U7F6NplWOi+LZM45knFOXi9OCM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=R8ky6eK6otniQz0tX4X2/mZe2xO749mYgapqpG/Kc2tR/D52NLVkJ8nvedfF1ilEa
-	 r41ZER+aidvk8k3VGWcWbqqmOgGTTlmTkJ0kiy8eQ4jiaOZj/6H+/HCPCqBr1CUwgR
-	 NjT4emEydoEvvFMq+0fmgSaxYNIhbdswRVJLBDjM=
-Message-ID: <9b96068c-97d8-4093-a707-faf39e193857@arm.com>
-Date: Thu, 25 Jun 2026 17:19:11 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcxlpDjV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C55FF1F00A3A;
+	Thu, 25 Jun 2026 17:01:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782406893;
+	bh=Pgndj2O4lUgqBabH5jlv1IWDyp7US4O2X5XAWeenrDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=BcxlpDjVL3KgepCGPu5olhEhUUWGb20VEBYiY5gbIJJBhMaTi48e1Wqjag+LRQZBk
+	 t6WI9CtlJd/y79hDWsKOKLmGyf6EZ9dZCpx4RC3t01Xkh9GWpNk5KxAgrierOzhUIV
+	 n/K+sOoys5yakZjUG+WISZXkgq2S/HFE0TCVIxe9NaJgjQ2Q8xFdHC7aqEZqGHjou5
+	 D+u0PNMNSuww3KVSTsQ4K5LlCXXUbt1tdCkmNmLBV37JW3fKg1doawTkX2mjW5PkHw
+	 OQ/86UnadPTFkp3maA0XGX7/1wsU2hHUSxpHXaEmxFQXNzepTAGQCdzwLHcv0bfdNj
+	 nLqYb7zb0p+Ag==
+Date: Thu, 25 Jun 2026 18:01:28 +0100
+From: Will Deacon <will@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 4/4] arm64: Add support for protected VMs
+Message-ID: <aj1e6LAKfoTYjraf@willie-the-truck>
+References: <20260619115415.5475-1-will@kernel.org>
+ <20260619115415.5475-5-will@kernel.org>
+ <CA+EHjTww=aY50itZBv=jUA6VeFNxgzyPkz2bktmW_ua1UdGmbQ@mail.gmail.com>
+ <ajqnfXfp-fCf9jGF@willie-the-truck>
+ <b161c306-5b78-41dd-aab6-79fc35086c8f@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 26/44] arm64: RMI: Allow populating initial contents
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <20260513131757.116630-27-steven.price@arm.com>
- <ea4be6c5-9506-4253-80c5-c76c9ac3b77d@redhat.com>
- <0c71b4b8-ad0b-4a24-9f4a-180b2aaacdb6@arm.com>
- <ad45c64c-18ab-4d42-9813-0ac1704bb127@arm.com>
- <9631be66-c757-488d-bb66-a62698aa26b8@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <9631be66-c757-488d-bb66-a62698aa26b8@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b161c306-5b78-41dd-aab6-79fc35086c8f@arm.com>
 
-On 08/06/2026 14:53, Steven Price wrote:
-> On 08/06/2026 10:41, Suzuki K Poulose wrote:
->> On 08/06/2026 10:36, Steven Price wrote:
->>> On 28/05/2026 06:30, Gavin Shan wrote:
->>>> Hi Steve,
->>>>
->>>> On 5/13/26 11:17 PM, Steven Price wrote:
->>>>> The VMM needs to populate the realm with some data before starting
->>>>> (e.g.
->>>>> a kernel and initrd). This is measured by the RMM and used as part of
->>>>> the attestation later on.
->>>>>
->>>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>
->> ...
->>
->>>>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->>>>> index a89873a5eb77..209087bcf399 100644
->>>>> --- a/arch/arm64/kvm/rmi.c
->>>>> +++ b/arch/arm64/kvm/rmi.c
->>>>> @@ -486,6 +486,75 @@ void kvm_realm_unmap_range(struct kvm *kvm,
->>>>> unsigned long start,
->>>>>             realm_unmap_private_range(kvm, start, end, may_block);
->>>>>     }
->>>>>     +static int realm_data_map_init(struct kvm *kvm, unsigned long ipa,
->>>>> +                   kvm_pfn_t dst_pfn, kvm_pfn_t src_pfn,
->>>>> +                   unsigned long flags)
->>>>> +{
->>>>> +    struct realm *realm = &kvm->arch.realm;
->>>>> +    phys_addr_t rd = virt_to_phys(realm->rd);
->>>>> +    phys_addr_t dst_phys, src_phys;
->>>>> +    int ret;
->>>>> +
->>>>> +    dst_phys = __pfn_to_phys(dst_pfn);
->>>>> +    src_phys = __pfn_to_phys(src_pfn);
->>>>> +
->>>>> +    if (rmi_delegate_page(dst_phys))
->>>>> +        return -ENXIO;
->>>>> +
->>>>> +    ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
->>>>> +    if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->>>>> +        /* Create missing RTTs and retry */
->>>>> +        int level = RMI_RETURN_INDEX(ret);
->>>>> +
->>>>> +        KVM_BUG_ON(level == KVM_PGTABLE_LAST_LEVEL, kvm);
->>>>
->>>>           KVM_BUG_ON(level >= KVM_PGTABLE_LAST_LEVEL, kvm);
->>>
->>> Ack.
->>>
->>
->> Thinking more about this, I guess a buggy VMM can trigger this
->> by populating twice ? (level == KVM_PGTABLE_LAST_LEVEL). So, we should
->> return the error back, than warning here and suppressing the error ?
+On Wed, Jun 24, 2026 at 09:53:07AM +0100, Suzuki K Poulose wrote:
+> On 23/06/2026 16:34, Will Deacon wrote:
+> > On Fri, Jun 19, 2026 at 02:49:11PM +0100, Fuad Tabba wrote:
+> > > On Fri, 19 Jun 2026 at 12:54, Will Deacon <will@kernel.org> wrote:
+> > > > diff --git a/arm64/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
+> > > > index a50e6a4..e7dd526 100644
+> > > > --- a/arm64/include/kvm/kvm-arch.h
+> > > > +++ b/arm64/include/kvm/kvm-arch.h
+> > > > @@ -87,6 +87,8 @@
+> > > > 
+> > > >   #define MAX_PAGE_SIZE  SZ_64K
+> > > > 
+> > > > +/* Size of DMA region for bouncing when running a protected guest */
+> > > > +#define DMA_MEM_REGION_SIZE    SZ_32M
+> > > 
+> > > Worth scaling with guest RAM, or making it overridable for DMA-heavy guests?
+> > 
+> > It's a bit difficult to know how much to allocate here. It's some
+> > function of the number of devices, but then it also depends on dynamic
+> > properties such as virtqueue sizes. It shouldn't really be related to
+> > the amount of guest RAM or the DMA throughput.
+> > 
+> > The number of devices isn't readily known, but even if I did something
+> > horrible like enumerate them from the arch code, I'd then still need a
+> > magic number to multiply that by. I think that making it overridable
+> > would give the user of kvmtool the same headache.
+> > 
+> > For now, I think I'll add a check to fail if the guest has been
+> > explicitly provisioned with less memory than the bounce buffer (diff
+> > below) but I'll leave anything more advanced for the future if/when we
+> > know what the problems are with a constant size for the pool.
 > 
-> Populating twice causes rmi_delegate_page() to be run twice on the same
-> page and the second one will then fail. So I don't think this is
-> possible (please correct me if I've missed something!)
+> In the future, make it a user problem ? i.e., specify a size for the DMA
+> pool. We did have some hack for this in the past. Can dust it up if
+> there is interest
 
-Good point, but I think this may not fail to allow the hugepages in the
-future. The DELEGATE_RANGE would skip the granules in DELEGATED/DATA 
-state. I am getting this clarified in the spec.
+Yes, I'm not opposed to adding that in the future. I'd just rather do it
+in the context of somebody experiencing a problem with the constant, so
+that we can have a better discussion about the right way to fix it.
 
+For example, we might consider per-device pools.
 
-Suzuki
-
-> 
-> Thanks,
-> Steve
-
+Will
