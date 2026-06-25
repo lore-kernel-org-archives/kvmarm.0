@@ -1,112 +1,222 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0096D35028D
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jun 2026 11:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429442571B8
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jun 2026 13:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782386052; cv=none; b=iU9j2lc2oqW4vDcH/Mxuhld3BlwrO2hici+XZEFv+h4OmMo4qyK/JPQjKJsS3pTU8LSlgR7ahYprtrZHe04vkHlN7aktkFDK0roRVQmHbi4EeTXvA8SZE60eu8oLzuFvmurtNVojUnKUgHPV/dNXbtZxmguqZwuxSCl1x12se1A=
+	t=1782392962; cv=none; b=XwgGhjSsJBxYW9xHOIAmBpgAl6pO0FpHOkT9624hNxgrweHKLEhNCFkp91/x7U7vbtw2SSUqcfqQWzw9YoEsYksB8cnSo1J8Zh0FHpNtYKb3UOKn6A5iiDTFouA8wT6ldU/VruVaFmjV8NHpbsyAcb0rXVgB2JBUnL2zRPB2dSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782386052; c=relaxed/simple;
-	bh=AF4UOY+6DNG4bmW7MhXoWzfZdBspNcMGDyFSUv3KGH0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n1ma5gXk/KyPvJZgxF17vsCgiKkPfZ3WPN8q5asTx5MK6lr29bsEIaisOf/w6v5crcX/zWKnptXI7geKa6mUeDWiP4tZb2/O8mUUR/gDDjI6ehtyAOyI20/DIf02fSDf38IMVTdIkBKbRQ1ySHaBcK/CZk2fV15x/S97y5KY66A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tY9BLDrL; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782392962; c=relaxed/simple;
+	bh=W1Pk/Aig6XQAQUmneVlul/0sh19poM1E5RZ9IEe7iNA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=em4hsIUw69p1aH6IAPzGlEViIkKmqwk4UeBLqD3e9trTkSYyeYcOcnK3Wn8yyzfj2G0Zp6uJXBr9IO9li2tX2brVm0dSJ/I4rvPMw1vLd4zyhVDFRFj0VS9lL17sm+lKLlpFADU3/ovwsV1/U2qZuUAbaiII3g/UEWi3hZw7B3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=G6MKINYb; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tY9BLDrL"
-X-Forwarded-Encrypted: i=1; AFNElJ/DywxW2jZQ5FfDHKd3SlWB+oYLHjK89E7/sL2A0bkVNUV+7ZRE5Al45OwaPTMyag7mCSaoPEw=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782386048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Js4jLF01npwzaOg3T/bUVrQbZfaivvWEjYI8DxgoW1s=;
-	b=tY9BLDrLzyW8QaczU6zegbxbA5jIbigNbBIuN7+HKRgqNNujoo6kmrP1zcHoCJqvFI3zJj
-	rIWbrKUv6JIsoeUPnSc7CCdHASe2wV/H7l5AT1jgCrWUBzn2Md628XrVlGJ05Eg5MZBf4m
-	/nI8VkNWdQWZkB9tn7wZt9zqA5fs3N0=
-X-Gm-Message-State: AOJu0YxU7gOmludqaLllp36j1sxYpW5f8NPgdupBTMJUVQ0EFHabJulY
-	fbKwxCdXQXo5EIxCrzZj+hK1FKL6oD2I7KxxeiEqxvzR158CnF8tZvbRco2Qk2rWru9Uafnqe90
-	3syC4sPCSrieZvd9Y4dpbfMSePBZiTaKBiepkc3E/
-X-Received: by 2002:ac8:7d88:0:b0:517:99ea:ab7e with SMTP id
- d75a77b69052e-51a6ebaf887mr9204431cf.24.1782386044257; Thu, 25 Jun 2026
- 04:14:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="G6MKINYb"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AB923297;
+	Thu, 25 Jun 2026 06:09:16 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C3B93F62B;
+	Thu, 25 Jun 2026 06:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782392960; bh=W1Pk/Aig6XQAQUmneVlul/0sh19poM1E5RZ9IEe7iNA=;
+	h=From:To:Subject:Date:From;
+	b=G6MKINYbpZk+0KBQ1sq+RTQZfHSlWXg1EMU4ckBHmOqrKJkum+JvnRu5RnAgfXEfl
+	 ue0SlVcZdaRHriEuz3Uwpw+1nM8xNWCO2FjVXia6R0ghey12qqMVzV7xiWPkhoSYnP
+	 UfFOYJKv57122qemPJYUBlBaRujReptrSdSHFJ14=
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: pbonzini@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	maz@kernel.org,
+	oupton@kernel.org,
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	seanjc@google.com,
+	david.hildenbrand@arm.com,
+	mark.rutland@arm.com,
+	ackerleytng@google.com
+Subject: [PATCH v1] KVM: Ignore MMU notifiers for guest_memfd-only memslots
+Date: Thu, 25 Jun 2026 14:09:02 +0100
+Message-ID: <20260625130902.258331-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
- <20260622190701.2039766-2-fuad.tabba@linux.dev> <86tsqtqu9u.wl-maz@kernel.org>
- <CA+EHjTxn8W=KYqTeqs-ZTw-SBD9tH0zUz_O9rTHsq3M7ELXn_w@mail.gmail.com> <86fr2bq6b6.wl-maz@kernel.org>
-In-Reply-To: <86fr2bq6b6.wl-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 25 Jun 2026 12:13:27 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzJhP5hPSnp-=2ESCReDz3dPs-Cukw8z5UJru+7haT2jQ@mail.gmail.com>
-X-Gm-Features: AVVi8CfTVMMlR1q7q5K8mMEw1_PqrmGvfIYlVGc5ZR0jkKVtOnV-eMOeM419v3U
-Message-ID: <CA+EHjTzJhP5hPSnp-=2ESCReDz3dPs-Cukw8z5UJru+7haT2jQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix sign-extension of MMIO loads
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Thu, 25 Jun 2026 at 11:10, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 23 Jun 2026 14:51:49 +0100,
-> Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> >
-> > My reading of the ARM ARM is that the byte reversal is keyed on the access
-> > size there too. It lives in Mem{size}, with the register width handled
-> > separately by SignExtend(regsize):
-> >
-> >     data = Mem[address, 2];        // byte-reversed by the access size, BE
-> >     X[t] = SignExtend(data, regsize);
-> >
-> > So vcpu_data_host_to_guest(..., len) swapping by len matches the Mem-side
-> > reversal. Swapping by the register width would reorder bytes that were never
-> > loaded. An LDRSH into Wt reads 2 bytes but would bswap 4: the halfword
-> > reaches the helper as 0x0180 host-native, cpu_to_be32 turns it into
-> > 0x80010000 instead of the 0x8001 cpu_to_be16 gives, and it never sign-extends
-> > to 0xffff8001.
-> >
-> > If that reading holds, none of the helper's ops are individually wrong, and
-> > the only bug was the order, with the sign-extend running before the swap and
-> > the width mask then dropping it. But I've gone round in circles on endianness
-> > before (to say the least), so please say if I've done it again.
->
-> That's quite convincing.
->
-> And the quoted pseudocode is much easier to reason about than the
-> current blurb in the commit message. For reference, J1.2.3.111 Mem{}()
-> is the relevant bit of the M.b spec and clearly shows that the access
-> is done LE, and only then byteswapped. Can you please repaint the
-> commit log to describe things in those terms?
+For guest_memfd-only memslots (kvm_memslot_is_gmem_only() is true), the
+memory provider for the virtual machine is the guest_memfd file, not the
+userspace mapping. Mappings in the secondary MMU are established by
+obtaining folios from guest_memfd directly, not by looking the folios up
+through the page tables through GUP. Consequently, there is no relationship
+between the page tables and the secondary MMU: MMU notifiers do not apply.
 
-Will do.
+Despite this, KVM's MMU notifiers still modify the secondary MMU page
+tables, only for the same memory to be remapped the next time a guest
+accesses it. Make the disconnect between the user mapping and the secondary
+MMU page tables explicit by ignoring the MMU notifiers for guest_memfd-only
+memslots.
 
->
-> Also, can you augment your test to cover for BE accesses from the
-> guest if the HW supports it?
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+RFC can be found here [1].
 
-I'll see what I can come up with...
+The only theoretical instance where the MMU notifiers are invoked for the
+userspace mapping of a guest_memfd-only memslot that I was able to find was
+automatic NUMA balancing with a non-NULL NUMA policy for the guest_memfd
+file. I wasn't able to test it in practice. Ackerley Tng also mentioned
+that this change would fix double unmap on a shared to private in-place
+conversion of the guest_memfd memory [2].
 
-Cheers,
-/fuad
+When and if it happens, having memory unmapped from the seconday MMU in the
+case of a guest_memfd-only memslot is at most a performance issue (it
+causes unnecessary guest faults), but having memory that stays mapped at
+stage 2 (unless userspace explicitly unmaps it from the VM) is needed for a
+Arm feature (called SPE, Statistical Profiling Extension) that I'm working
+to upstream. This patch aims to provide the guarantee that memory won't be
+unmapped from the secondary MMU without the VMM explicitely triggering it
+(by punching a hole or closing the guest_memfd file).
 
+Ran a basic test by hacking KVM_PRE_FAULT_MEMORY for arm64, and modifying
+kvmtool to apply it on the entire VM memory, then munmap the same memory
+from its page tables. Also hacked guest_memfd + GUEST_MEMFD_FLAG_MMAP
+support in kvmtool. Put traces in the arm64 fault handling code and printfs
+in kvm_mmu_unmap_gfn_range(). When running a guest, KVM doesn't unmap the
+memory from the secondary MMU when kvmtool munmaps it; all the faults
+triggered by the guest on the guest_memfd backed memslots are instruction
+faults; and KVM unmaps the guest memory from the secondary MMU when the
+guest_memfd file is closed by userspace. Looks correct to me.
 
+Changes in RFC -> v1:
 
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+* Dropped the RFC tag.
+* Fix unbalanced invalidation reported by sashiko by implementing Sean's
+  approach; I've expanded it to page ageing.
+* Modified the commit message as per DavidH comment.
+
+[1] https://lore.kernel.org/kvm/20260615155244.183044-1-alexandru.elisei@arm.com/
+[2] https://lore.kernel.org/kvm/CAEvNRgE9cLfjDbXuR5wq3fEWZyHxYPxdExxNjXUFO1nT5m==1A@mail.gmail.com/
+
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 50 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 47 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 4c14aee1fb06..483ad9fe8fb7 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -260,6 +260,7 @@ union kvm_mmu_notifier_arg {
+ enum kvm_gfn_range_filter {
+ 	KVM_FILTER_SHARED		= BIT(0),
+ 	KVM_FILTER_PRIVATE		= BIT(1),
++	KVM_FILTER_USERSPACE_MAPPINGS	= BIT(2),
+ };
+ 
+ struct kvm_gfn_range {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 881f92d7a469..204e7faa325a 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -607,8 +607,13 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 			/*
+ 			 * HVA-based notifications aren't relevant to private
+ 			 * mappings as they don't have a userspace mapping.
++			 *
++			 * Memslots where guest_memfd is the only memory
++			 * provider can also safely ignore changes to the
++			 * userspace mapping.
+ 			 */
+-			gfn_range.attr_filter = KVM_FILTER_SHARED;
++			gfn_range.attr_filter = KVM_FILTER_SHARED |
++						KVM_FILTER_USERSPACE_MAPPINGS;
+ 
+ 			/*
+ 			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+@@ -715,6 +720,21 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+ bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
++
++	/*
++	 * When reacting to changes in userspace mappings, don't unmap memslots
++	 * that are guest_memfd-only, in which case KVM's MMU mappings are
++	 * pulled directly from guest_memfd, i.e. don't depend on the userspace
++	 * mappings.
++	 *
++	 * TODO: Skip gmem-only memslots on mmu_notifier events entirely, once
++	 * gfn_to_pfn_cache is also wired up to directly pull from guest_memfd.
++	 */
++	if (range->attr_filter & KVM_FILTER_USERSPACE_MAPPINGS &&
++	    kvm_slot_has_gmem(range->slot) &&
++	    kvm_memslot_is_gmem_only(range->slot))
++		return false;
++
+ 	return kvm_unmap_gfn_range(kvm, range);
+ }
+ 
+@@ -825,12 +845,23 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+ 		rcuwait_wake_up(&kvm->mn_memslots_update_rcuwait);
+ }
+ 
++static bool kvm_mmu_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	/* See comment in kvm_mmu_unmap_gfn_range() */
++	if (range->attr_filter & KVM_FILTER_USERSPACE_MAPPINGS &&
++	    kvm_slot_has_gmem(range->slot) &&
++	    kvm_memslot_is_gmem_only(range->slot))
++		return false;
++
++	return kvm_age_gfn(kvm, range);
++}
++
+ static bool kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
+ 		struct mm_struct *mm, unsigned long start, unsigned long end)
+ {
+ 	trace_kvm_age_hva(start, end);
+ 
+-	return kvm_age_hva_range(mn, start, end, kvm_age_gfn,
++	return kvm_age_hva_range(mn, start, end, kvm_mmu_age_gfn,
+ 				 !IS_ENABLED(CONFIG_KVM_ELIDE_TLB_FLUSH_IF_YOUNG));
+ }
+ 
+@@ -852,7 +883,18 @@ static bool kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+ 	 * cadence. If we find this inaccurate, we might come up with a
+ 	 * more sophisticated heuristic later.
+ 	 */
+-	return kvm_age_hva_range_no_flush(mn, start, end, kvm_age_gfn);
++	return kvm_age_hva_range_no_flush(mn, start, end, kvm_mmu_age_gfn);
++}
++
++static bool kvm_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	/* See comment in kvm_mmu_unmap_gfn_range() */
++	if (range->attr_filter & KVM_FILTER_USERSPACE_MAPPINGS &&
++	    kvm_slot_has_gmem(range->slot) &&
++	    kvm_memslot_is_gmem_only(range->slot))
++		return false;
++
++	return kvm_test_age_gfn(kvm, range);
+ }
+ 
+ static bool kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+@@ -861,7 +903,7 @@ static bool kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+ 	trace_kvm_test_age_hva(address);
+ 
+ 	return kvm_age_hva_range_no_flush(mn, address, address + 1,
+-					  kvm_test_age_gfn);
++					  kvm_mmu_test_age_gfn);
+ }
+ 
+ static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
+
+base-commit: 8cd9520d35a6c38db6567e97dd93b1f11f185dc6
+-- 
+2.54.0
+
