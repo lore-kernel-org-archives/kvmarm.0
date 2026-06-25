@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF703E92BB;
-	Thu, 25 Jun 2026 17:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993D13EBF16;
+	Thu, 25 Jun 2026 17:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782407455; cv=none; b=WyqEGrLJETNYaYiuc/XduB0omUO3upp63wjfWa6XuuencR/qHO0Utf9mQdbFsmYcOA9x/EtKk481jc8S6y8wMbCkfpSQZl9rP08Q9fPBaXP/WFaZtKme5+90PXIUjF3sUT0dLu/7F0VNFQUkeLAb/EYMrV5d4HlgBzxC7IRh8LE=
+	t=1782407460; cv=none; b=ovYPxU232Xdvfs7llZWCyR62mQqlFwC6/TaIEZctx9orruajxcUr6BYQclqg45Yd2gnr0kx1eH0IHrJddsb93q05kmH6frXpIRoU2jMeIfJOHipPjdLCGBtLDo1qqD/iiazxFZRlBKttWcPvZsBiXD+AzgHU32ZJOoOvGlBbUg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782407455; c=relaxed/simple;
-	bh=JdXWfZUJieNLZxEdytgvK1sjfYVtqrqjCbGHlQBLJQk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KbS7VT65P1U7PHbRLV8V1kR4I7h6ycaJ8lp1OxO5MbHGDlnpFBmsl+w16uIbEsxaVjQuB93DtwLH3BJbOXSBhcax+EvEvhxPFPxy4gOFGW4QjUBdZFUmW2uebMqjdd+HM53WzFjwJNe6JMpzW+Z7edheiVFmoFwBENNOClk/I8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSSNj8mI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782407460; c=relaxed/simple;
+	bh=C3yH3LH8xJELbTHZEtwDvOjbGaOHFVVqVysjXqVsDUw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BWxP2402sy5Cb3Y3W1TJrlD9kz8V9b/eDAfO3azhtcf7DWbppeUbrCkQuKQOxxKX7KK5+JGVjos93uU929cEVRrkVuzN6vnASlaUtmmw6XKXdpIdmliAU7DlnNpBgTSxXOewDCq2w0IK4YkjgzzMzwOmr+8a5QAwDIh5IdPZc1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQq5dYVC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSSNj8mI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4CF31F000E9;
-	Thu, 25 Jun 2026 17:10:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQq5dYVC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 187A21F00A3A;
+	Thu, 25 Jun 2026 17:10:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782407453;
-	bh=xTDge6LAEsLKw3tzPDqsO7avyKUb3oYxjRTJp/9v7gs=;
-	h=From:To:Cc:Subject:Date;
-	b=nSSNj8mIjFlSy2+dEzvgTOh3/kpZMldKCPxssHUC7xQW3CgsM0wvYb5VmUuvdA4Bg
-	 qgP6BeNHpXIxxolcUT3NgD+hTmr5t3Qivi+8nmnOS+kyqTjNGErfWBA7TLFQ64WgkJ
-	 etPQnws4VKEhlxClqTmKv8+kZvvetB/J5v17K+4zPOLhTzS1z7xMbkA5GJKYZtmB6V
-	 WiTOZW1Kw+eH+CqOfz7XlZyGuU5qqUQfyvjqKEqkUP3sewy7WsVeyJXg8u4By9CIs1
-	 61szoRnuCmpamJvB86cp9oGy4El2AQo6eNtS2l1t7ShyptxCJ3tx91VU7i5Dw3xPNH
-	 PX2C9a0QYAf7Q==
+	s=k20260515; t=1782407457;
+	bh=9Vx7sJB01zRFFuYrJ7Hqy857cxo/M3AR/MJOk6iYph8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=nQq5dYVCFw4c92S2Os1hg0Y0Y0S9/BRUPAV0veONJclCeHzwhAaZmGylyMxNMvHSx
+	 QvUURis1HQ/yqfFuOoz9YZy1VY3DAfs6iUKZl7Uq2acrhLDi85JkFrMfnvyvAFb7dI
+	 JgWbuK4rOhIymaQsKJpYncGB3MWWQ0lLw/0YStbwPie2aEcDG4s+TT20Tj3KZ+6Dy0
+	 OdObSmaT9JSuNrKjuIvTbIzi1oOkOVVssy8FhfXoDHRa/tYjpuuicsm6Qv8MbKR27r
+	 +zLV4R8Usc2UqF2F95KGIgVtZeZIPepNCx6f6FBrH2vpvZiUyNNJWn2pvQbtkMYzxd
+	 0IrwK/SVYW38A==
 From: Will Deacon <will@kernel.org>
 To: kvm@vger.kernel.org
 Cc: kvmarm@lists.linux.dev,
@@ -35,10 +36,12 @@ Cc: kvmarm@lists.linux.dev,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v2 kvmtool 0/4] Add support for running protected VMs on arm64
-Date: Thu, 25 Jun 2026 18:10:41 +0100
-Message-ID: <20260625171046.4482-1-will@kernel.org>
+Subject: [PATCH v2 kvmtool 1/4] Sync kernel UAPI headers with v7.1
+Date: Thu, 25 Jun 2026 18:10:42 +0100
+Message-ID: <20260625171046.4482-2-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260625171046.4482-1-will@kernel.org>
+References: <20260625171046.4482-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,58 +50,348 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+Generated using util/update_headers.sh.
 
-This is v2 of the patches I previously posted here:
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arm64/include/asm/kvm.h     |  1 +
+ include/linux/kvm.h         | 53 ++++++++++++++++++++++++++++++++-----
+ include/linux/virtio_ring.h |  5 +---
+ riscv/include/asm/kvm.h     | 11 +++++---
+ x86/include/asm/kvm.h       | 21 +++++++++------
+ 5 files changed, 69 insertions(+), 22 deletions(-)
 
-  https://lore.kernel.org/r/20260619115415.5475-1-will@kernel.org
-
-Changes since v1 include:
-
-  * Bail if user specifies less guest memory than the restricted DMA pool.
-  * Avoid silently dropping KVM_VM_TYPE_ARM_PROTECTED on old host kernels.
-  * Added R-b/T-b tags (thank you!)
-
-The patches are also available here if you want to pull them directly:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/log/?h=pkvm
-
-Cheers,
-
-Will
-
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>
-
---->8
-
-Will Deacon (4):
-  Sync kernel UAPI headers with v7.1
-  virtio: Factor out base features for modern virtio transports
-  virtio: Add helper for enabling VIRTIO_F_ACCESS_PLATFORM
-  arm64: Add support for protected VMs
-
- arm64/fdt.c                         | 37 ++++++++++++++++++--
- arm64/include/asm/kvm.h             |  1 +
- arm64/include/kvm/fdt-arch.h        | 10 +++++-
- arm64/include/kvm/kvm-arch.h        |  2 ++
- arm64/include/kvm/kvm-config-arch.h |  5 ++-
- arm64/kvm.c                         | 28 +++++++++++++--
- arm64/pci.c                         |  2 ++
- include/kvm/virtio.h                |  2 ++
- include/linux/kvm.h                 | 53 +++++++++++++++++++++++++----
- include/linux/virtio_ring.h         |  5 +--
- riscv/include/asm/kvm.h             | 11 +++---
- virtio/core.c                       | 12 +++++++
- virtio/mmio-modern.c                |  2 +-
- virtio/pci-modern.c                 |  2 +-
- x86/include/asm/kvm.h               | 21 +++++++-----
- 15 files changed, 163 insertions(+), 30 deletions(-)
-
+diff --git a/arm64/include/asm/kvm.h b/arm64/include/asm/kvm.h
+index a792a59..1c13bfa 100644
+--- a/arm64/include/asm/kvm.h
++++ b/arm64/include/asm/kvm.h
+@@ -428,6 +428,7 @@ enum {
+ #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
+ #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
+ #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
++#define   KVM_DEV_ARM_VGIC_USERSPACE_PPIS	5
+ 
+ /* Device Control API on vcpu fd */
+ #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index dddb781..6c8afa2 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -11,9 +11,14 @@
+ #include <linux/const.h>
+ #include <linux/types.h>
+ #include <linux/compiler.h>
++#include <linux/stddef.h>
+ #include <linux/ioctl.h>
+ #include <asm/kvm.h>
+ 
++#ifdef __KERNEL__
++#include <linux/kvm_types.h>
++#endif
++
+ #define KVM_API_VERSION 12
+ 
+ /*
+@@ -135,6 +140,12 @@ struct kvm_xen_exit {
+ 	} u;
+ };
+ 
++struct kvm_exit_snp_req_certs {
++	__u64 gpa;
++	__u64 npages;
++	__u64 ret;
++};
++
+ #define KVM_S390_GET_SKEYS_NONE   1
+ #define KVM_S390_SKEYS_MAX        1048576
+ 
+@@ -180,6 +191,8 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_MEMORY_FAULT     39
+ #define KVM_EXIT_TDX              40
+ #define KVM_EXIT_ARM_SEA          41
++#define KVM_EXIT_ARM_LDST64B      42
++#define KVM_EXIT_SNP_REQ_CERTS    43
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -402,7 +415,7 @@ struct kvm_run {
+ 		} eoi;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
+-		/* KVM_EXIT_ARM_NISV */
++		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
+ 		struct {
+ 			__u64 esr_iss;
+ 			__u64 fault_ipa;
+@@ -482,6 +495,8 @@ struct kvm_run {
+ 			__u64 gva;
+ 			__u64 gpa;
+ 		} arm_sea;
++		/* KVM_EXIT_SNP_REQ_CERTS */
++		struct kvm_exit_snp_req_certs snp_req_certs;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -528,7 +543,7 @@ struct kvm_coalesced_mmio {
+ 
+ struct kvm_coalesced_mmio_ring {
+ 	__u32 first, last;
+-	struct kvm_coalesced_mmio coalesced_mmio[];
++	__DECLARE_FLEX_ARRAY(struct kvm_coalesced_mmio, coalesced_mmio);
+ };
+ 
+ #define KVM_COALESCED_MMIO_MAX \
+@@ -578,7 +593,7 @@ struct kvm_clear_dirty_log {
+ /* for KVM_SET_SIGNAL_MASK */
+ struct kvm_signal_mask {
+ 	__u32 len;
+-	__u8  sigset[];
++	__DECLARE_FLEX_ARRAY(__u8, sigset);
+ };
+ 
+ /* for KVM_TPR_ACCESS_REPORTING */
+@@ -689,6 +704,11 @@ struct kvm_enable_cap {
+ #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
+ #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
+ 	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
++
++#define KVM_VM_TYPE_ARM_PROTECTED	(1UL << 31)
++#define KVM_VM_TYPE_ARM_MASK		(KVM_VM_TYPE_ARM_IPA_SIZE_MASK | \
++					 KVM_VM_TYPE_ARM_PROTECTED)
++
+ /*
+  * ioctls for /dev/kvm fds:
+  */
+@@ -974,6 +994,8 @@ struct kvm_enable_cap {
+ #define KVM_CAP_GUEST_MEMFD_FLAGS 244
+ #define KVM_CAP_ARM_SEA_TO_USER 245
+ #define KVM_CAP_S390_USER_OPEREXEC 246
++#define KVM_CAP_S390_KEYOP 247
++#define KVM_CAP_S390_VSIE_ESAMODE 248
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+@@ -1036,7 +1058,7 @@ struct kvm_irq_routing_entry {
+ struct kvm_irq_routing {
+ 	__u32 nr;
+ 	__u32 flags;
+-	struct kvm_irq_routing_entry entries[];
++	__DECLARE_FLEX_ARRAY(struct kvm_irq_routing_entry, entries);
+ };
+ 
+ #define KVM_IRQFD_FLAG_DEASSIGN (1 << 0)
+@@ -1127,7 +1149,7 @@ struct kvm_dirty_tlb {
+ 
+ struct kvm_reg_list {
+ 	__u64 n; /* number of regs */
+-	__u64 reg[];
++	__DECLARE_FLEX_ARRAY(__u64, reg);
+ };
+ 
+ struct kvm_one_reg {
+@@ -1209,6 +1231,10 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_LOONGARCH_EIOINTC	KVM_DEV_TYPE_LOONGARCH_EIOINTC
+ 	KVM_DEV_TYPE_LOONGARCH_PCHPIC,
+ #define KVM_DEV_TYPE_LOONGARCH_PCHPIC	KVM_DEV_TYPE_LOONGARCH_PCHPIC
++	KVM_DEV_TYPE_LOONGARCH_DMSINTC,
++#define KVM_DEV_TYPE_LOONGARCH_DMSINTC	KVM_DEV_TYPE_LOONGARCH_DMSINTC
++	KVM_DEV_TYPE_ARM_VGIC_V5,
++#define KVM_DEV_TYPE_ARM_VGIC_V5	KVM_DEV_TYPE_ARM_VGIC_V5
+ 
+ 	KVM_DEV_TYPE_MAX,
+ 
+@@ -1219,6 +1245,16 @@ struct kvm_vfio_spapr_tce {
+ 	__s32	tablefd;
+ };
+ 
++#define KVM_S390_KEYOP_ISKE 0x01
++#define KVM_S390_KEYOP_RRBE 0x02
++#define KVM_S390_KEYOP_SSKE 0x03
++struct kvm_s390_keyop {
++	__u64 guest_addr;
++	__u8  key;
++	__u8  operation;
++	__u8  pad[6];
++};
++
+ /*
+  * KVM_CREATE_VCPU receives as a parameter the vcpu slot, and returns
+  * a vcpu fd.
+@@ -1238,6 +1274,7 @@ struct kvm_vfio_spapr_tce {
+ #define KVM_S390_UCAS_MAP        _IOW(KVMIO, 0x50, struct kvm_s390_ucas_mapping)
+ #define KVM_S390_UCAS_UNMAP      _IOW(KVMIO, 0x51, struct kvm_s390_ucas_mapping)
+ #define KVM_S390_VCPU_FAULT	 _IOW(KVMIO, 0x52, unsigned long)
++#define KVM_S390_KEYOP           _IOWR(KVMIO, 0x53, struct kvm_s390_keyop)
+ 
+ /* Device model IOC */
+ #define KVM_CREATE_IRQCHIP        _IO(KVMIO,   0x60)
+@@ -1579,7 +1616,11 @@ struct kvm_stats_desc {
+ 	__u16 size;
+ 	__u32 offset;
+ 	__u32 bucket_size;
+-	char name[];
++#ifdef __KERNEL__
++	char name[KVM_STATS_NAME_SIZE];
++#else
++	__DECLARE_FLEX_ARRAY(char, name);
++#endif
+ };
+ 
+ #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
+diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+index f8c20d3..3c47858 100644
+--- a/include/linux/virtio_ring.h
++++ b/include/linux/virtio_ring.h
+@@ -31,9 +31,6 @@
+  * SUCH DAMAGE.
+  *
+  * Copyright Rusty Russell IBM Corporation 2007. */
+-#ifndef __KERNEL__
+-#include <stdint.h>
+-#endif
+ #include <linux/types.h>
+ #include <linux/virtio_types.h>
+ 
+@@ -202,7 +199,7 @@ static inline void vring_init(struct vring *vr, unsigned int num, void *p,
+ 	vr->num = num;
+ 	vr->desc = p;
+ 	vr->avail = (struct vring_avail *)((char *)p + num * sizeof(struct vring_desc));
+-	vr->used = (void *)(((uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
++	vr->used = (void *)(((unsigned long)&vr->avail->ring[num] + sizeof(__virtio16)
+ 		+ align-1) & ~(align - 1));
+ }
+ 
+diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
+index 54f3ad7..504e733 100644
+--- a/riscv/include/asm/kvm.h
++++ b/riscv/include/asm/kvm.h
+@@ -110,6 +110,10 @@ struct kvm_riscv_timer {
+ 	__u64 state;
+ };
+ 
++/* Possible states for kvm_riscv_timer */
++#define KVM_RISCV_TIMER_STATE_OFF	0
++#define KVM_RISCV_TIMER_STATE_ON	1
++
+ /*
+  * ISA extension IDs specific to KVM. This is not the same as the host ISA
+  * extension IDs as that is internal to the host and should not be exposed
+@@ -192,6 +196,9 @@ enum KVM_RISCV_ISA_EXT_ID {
+ 	KVM_RISCV_ISA_EXT_ZFBFMIN,
+ 	KVM_RISCV_ISA_EXT_ZVFBFMIN,
+ 	KVM_RISCV_ISA_EXT_ZVFBFWMA,
++	KVM_RISCV_ISA_EXT_ZCLSD,
++	KVM_RISCV_ISA_EXT_ZILSD,
++	KVM_RISCV_ISA_EXT_ZALASR,
+ 	KVM_RISCV_ISA_EXT_MAX,
+ };
+ 
+@@ -235,10 +242,6 @@ struct kvm_riscv_sbi_fwft {
+ 	struct kvm_riscv_sbi_fwft_feature pointer_masking;
+ };
+ 
+-/* Possible states for kvm_riscv_timer */
+-#define KVM_RISCV_TIMER_STATE_OFF	0
+-#define KVM_RISCV_TIMER_STATE_ON	1
+-
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_RISCV_TYPE_MASK		0x00000000FF000000
+ #define KVM_REG_RISCV_TYPE_SHIFT	24
+diff --git a/x86/include/asm/kvm.h b/x86/include/asm/kvm.h
+index 7ceff65..5f2b30d 100644
+--- a/x86/include/asm/kvm.h
++++ b/x86/include/asm/kvm.h
+@@ -197,13 +197,13 @@ struct kvm_msrs {
+ 	__u32 nmsrs; /* number of msrs in entries */
+ 	__u32 pad;
+ 
+-	struct kvm_msr_entry entries[];
++	__DECLARE_FLEX_ARRAY(struct kvm_msr_entry, entries);
+ };
+ 
+ /* for KVM_GET_MSR_INDEX_LIST */
+ struct kvm_msr_list {
+ 	__u32 nmsrs; /* number of msrs in entries */
+-	__u32 indices[];
++	__DECLARE_FLEX_ARRAY(__u32, indices);
+ };
+ 
+ /* Maximum size of any access bitmap in bytes */
+@@ -245,7 +245,7 @@ struct kvm_cpuid_entry {
+ struct kvm_cpuid {
+ 	__u32 nent;
+ 	__u32 padding;
+-	struct kvm_cpuid_entry entries[];
++	__DECLARE_FLEX_ARRAY(struct kvm_cpuid_entry, entries);
+ };
+ 
+ struct kvm_cpuid_entry2 {
+@@ -267,7 +267,7 @@ struct kvm_cpuid_entry2 {
+ struct kvm_cpuid2 {
+ 	__u32 nent;
+ 	__u32 padding;
+-	struct kvm_cpuid_entry2 entries[];
++	__DECLARE_FLEX_ARRAY(struct kvm_cpuid_entry2, entries);
+ };
+ 
+ /* for KVM_GET_PIT and KVM_SET_PIT */
+@@ -398,7 +398,7 @@ struct kvm_xsave {
+ 	 * the contents of CPUID leaf 0xD on the host.
+ 	 */
+ 	__u32 region[1024];
+-	__u32 extra[];
++	__DECLARE_FLEX_ARRAY(__u32, extra);
+ };
+ 
+ #define KVM_MAX_XCRS	16
+@@ -476,6 +476,7 @@ struct kvm_sync_regs {
+ #define KVM_X86_QUIRK_SLOT_ZAP_ALL		(1 << 7)
+ #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS	(1 << 8)
+ #define KVM_X86_QUIRK_IGNORE_GUEST_PAT		(1 << 9)
++#define KVM_X86_QUIRK_VMCS12_ALLOW_FREEZE_IN_SMM (1 << 10)
+ 
+ #define KVM_STATE_NESTED_FORMAT_VMX	0
+ #define KVM_STATE_NESTED_FORMAT_SVM	1
+@@ -503,6 +504,7 @@ struct kvm_sync_regs {
+ #define KVM_X86_GRP_SEV			1
+ #  define KVM_X86_SEV_VMSA_FEATURES	0
+ #  define KVM_X86_SNP_POLICY_BITS	1
++#  define KVM_X86_SEV_SNP_REQ_CERTS	2
+ 
+ struct kvm_vmx_nested_state_data {
+ 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+@@ -564,7 +566,7 @@ struct kvm_pmu_event_filter {
+ 	__u32 fixed_counter_bitmap;
+ 	__u32 flags;
+ 	__u32 pad[4];
+-	__u64 events[];
++	__DECLARE_FLEX_ARRAY(__u64, events);
+ };
+ 
+ #define KVM_PMU_EVENT_ALLOW 0
+@@ -743,6 +745,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_ENABLE_REQ_CERTS,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -914,8 +917,10 @@ struct kvm_sev_snp_launch_finish {
+ 	__u64 pad1[4];
+ };
+ 
+-#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+-#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
++#define KVM_X2APIC_API_USE_32BIT_IDS			_BITULL(0)
++#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK		_BITULL(1)
++#define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST	_BITULL(2)
++#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST	_BITULL(3)
+ 
+ struct kvm_hyperv_eventfd {
+ 	__u32 conn_id;
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
