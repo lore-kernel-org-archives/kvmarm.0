@@ -1,176 +1,134 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0378837B030
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jun 2026 16:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99CA388E5A;
+	Thu, 25 Jun 2026 16:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782404151; cv=none; b=ScH+oiULnYrQUYuvEczz6u71I2JecBH+8e+frcqh11aO6fzKSlGpiP9k5btN5G3ieWCR+wwVhFKWeAE1cZLpGjzjYPhO9deXlS+s6/c/8CkMtK5H/cPyLdhTuJtQ3qTrM8MUNVL4gCKHaC/qwsnUlZP2JtTfjO7MAM0SAmhSUwQ=
+	t=1782404358; cv=none; b=OSPdUFbuRCFnBpZ1rIBxml0YpfYndWQ6yg3G4TawH1F8z3GSpZ2MqETaTtrHCAJwL7YPzQeu6P0NPAzdVIJ6j5Fmh0121HLVIKTYeO9iH3LHN6L6S37bDiysoihEbJ2EBrzqRmeDLyN/PwoD8y3HXE3FZaE0Sn2l/11lHfQNdGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782404151; c=relaxed/simple;
-	bh=g1B1cvHyOF8jXKsO42iY7id1Lb56+h85qCBGS2Z5zyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N9IGsgwCYrTyA6ONlcElYEcUY23syrl+HNddtXpABlNgksrAhJsfaxd9ib2aUWqX5JypCmLdB3hxkhjnwWsjlatAYgx3+C+bjNbzrZ5fCmSN50mIa9XRds3+u8VziXEr9OkpGdhDV4nPaC/j4P4QfMXua341r/ZB2d4ER/pGqeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WsY979Ck; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782404358; c=relaxed/simple;
+	bh=pPOtgiQ6nS0ClOv75U7F6NplWOi+LZM45knFOXi9OCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D+qZ1VaANOx51b3Gp2e/J3TdCRRPq8fftbyRU2Yu5MuohExRD6urzyZrNgxPpm/FIw4BDAU6UZoO1oRzoLheWMuOfpjl0u4XMwZqc/Vw33fdaKagEFeGemSPGbJUxCPUDc2nM7tQyLFv+Apbzim7ccN5kNFbWAVuxogXwVkITSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=R8ky6eK6; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WsY979Ck"
-X-Gm-Message-State: AOJu0YxsEmL/yIUJZzhMR9M5Iastv1ZQSfBAQ3L9lk/DmScP5BAH7kI9
-	f3S7MbPO/1tiGaYX91cqEWyZEMCUVwa3xTbTK4UueRbkEow/3fJ3GXeOwPq1OracO5oL3RRTvn8
-	91++iTe4wcH1xlqF+Dmfe9KR8sOf0EVXHvZWUQC5M
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782404146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nzzok+ws8sgLCcoLt6BxzJuaEaiIk2UI7TgTr+Q9kQU=;
-	b=WsY979CkTXaBgSGOkN0YGqZB2Z1K/KX8encTRtm1/x+GhZaZR3gYRiW49J0xgzfz05Wlqu
-	6B6ix7sjBLqlBfyOv9EjzsHzDbzrf2qay/Y5NptR87/o6fKBY5sbk+aV5vMGflwOaYi1kY
-	Zcsbw+WCrkvn0PYm8KEgxIcSq4m4vTY=
-X-Received: by 2002:a05:622a:2610:b0:517:5ec3:b59c with SMTP id
- d75a77b69052e-51a6e99fc93mr11713871cf.2.1782404139969; Thu, 25 Jun 2026
- 09:15:39 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="R8ky6eK6"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B2F23165;
+	Thu, 25 Jun 2026 09:19:11 -0700 (PDT)
+Received: from [10.57.25.211] (unknown [10.57.25.211])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08E4F3F836;
+	Thu, 25 Jun 2026 09:19:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782404356; bh=pPOtgiQ6nS0ClOv75U7F6NplWOi+LZM45knFOXi9OCM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=R8ky6eK6otniQz0tX4X2/mZe2xO749mYgapqpG/Kc2tR/D52NLVkJ8nvedfF1ilEa
+	 r41ZER+aidvk8k3VGWcWbqqmOgGTTlmTkJ0kiy8eQ4jiaOZj/6H+/HCPCqBr1CUwgR
+	 NjT4emEydoEvvFMq+0fmgSaxYNIhbdswRVJLBDjM=
+Message-ID: <9b96068c-97d8-4093-a707-faf39e193857@arm.com>
+Date: Thu, 25 Jun 2026 17:19:11 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260625144807.2603272-1-fuad.tabba@linux.dev>
- <20260625144807.2603272-3-fuad.tabba@linux.dev> <20260625145703.460B41F000E9@smtp.kernel.org>
-In-Reply-To: <20260625145703.460B41F000E9@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 25 Jun 2026 17:14:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzaPwrS363oGXUCqNz+O1Hho4Z7zAsbBik8mO-eQSKD=g@mail.gmail.com>
-X-Gm-Features: AVVi8CdDBKermqUbxAG9chDiZX1S1v9hJkMy-Mo7dX4CKTB7W6jSYzxLH6sOxn0
-Message-ID: <CA+EHjTzaPwrS363oGXUCqNz+O1Hho4Z7zAsbBik8mO-eQSKD=g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: selftests: Add MMIO sign-extending
- load test
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 26/44] arm64: RMI: Allow populating initial contents
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, Gavin Shan <gshan@redhat.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
+ <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <20260513131757.116630-27-steven.price@arm.com>
+ <ea4be6c5-9506-4253-80c5-c76c9ac3b77d@redhat.com>
+ <0c71b4b8-ad0b-4a24-9f4a-180b2aaacdb6@arm.com>
+ <ad45c64c-18ab-4d42-9813-0ac1704bb127@arm.com>
+ <9631be66-c757-488d-bb66-a62698aa26b8@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <9631be66-c757-488d-bb66-a62698aa26b8@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 25 Jun 2026 at 15:57, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Medium] Guest EL1 will crash with an Instruction Abort because the `el=
-0_be_loads` assembly block shares a page with EL1 test code and is marked a=
-s EL0-accessible.
-> --
->
-> commit 60c24b3648e8f92661ec2d484d27ac4580cad60a
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: selftests: Add MMIO sign-extending load test
->
-> Adds a test for sign-extending MMIO loads (LDRSB, LDRSH, LDRSW) into Xt
-> and Wt destinations, with and without the sign bit set. The host supplies
-> the MMIO data and checks the guest register holds the sign-extended value=
-.
->
-> > diff --git a/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c b/tools/=
-testing/selftests/kvm/arm64/mmio_sign_ext.c
-> > new file mode 100644
-> > index 0000000000000..06708ab6db8c0
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
->
-> [ ... ]
->
-> > +extern char el0_be_loads[], el0_be_loads_end[];
-> > +asm(
-> > +"    .pushsection .text, \"ax\"\n"
-> > +"    .global el0_be_loads\n"
-> > +"el0_be_loads:\n"
->
-> [Severity: Medium]
-> Will this crash guest EL1 with an Instruction Abort?
->
-> The el0_be_loads assembly block lacks page alignment directives, placing =
-it
-> adjacent to EL1 executable code in the same page of the .text section.
->
-> When make_el0_accessible() is called in main():
->
->     make_el0_accessible(vm, (uint64_t)el0_be_loads,
->                         el0_be_loads_end - el0_be_loads);
->
-> It makes the shared page EL0-accessible by setting PTE_USER. This
-> inadvertently makes the EL1 guest_code on the same page EL0-accessible. I=
-n
-> the ARMv8 EL1&0 translation regime, an instruction fetch by EL1 from an
-> EL0-accessible memory page unconditionally generates a Permission Fault.
+On 08/06/2026 14:53, Steven Price wrote:
+> On 08/06/2026 10:41, Suzuki K Poulose wrote:
+>> On 08/06/2026 10:36, Steven Price wrote:
+>>> On 28/05/2026 06:30, Gavin Shan wrote:
+>>>> Hi Steve,
+>>>>
+>>>> On 5/13/26 11:17 PM, Steven Price wrote:
+>>>>> The VMM needs to populate the realm with some data before starting
+>>>>> (e.g.
+>>>>> a kernel and initrd). This is measured by the RMM and used as part of
+>>>>> the attestation later on.
+>>>>>
+>>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>
+>> ...
+>>
+>>>>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>>>>> index a89873a5eb77..209087bcf399 100644
+>>>>> --- a/arch/arm64/kvm/rmi.c
+>>>>> +++ b/arch/arm64/kvm/rmi.c
+>>>>> @@ -486,6 +486,75 @@ void kvm_realm_unmap_range(struct kvm *kvm,
+>>>>> unsigned long start,
+>>>>>             realm_unmap_private_range(kvm, start, end, may_block);
+>>>>>     }
+>>>>>     +static int realm_data_map_init(struct kvm *kvm, unsigned long ipa,
+>>>>> +                   kvm_pfn_t dst_pfn, kvm_pfn_t src_pfn,
+>>>>> +                   unsigned long flags)
+>>>>> +{
+>>>>> +    struct realm *realm = &kvm->arch.realm;
+>>>>> +    phys_addr_t rd = virt_to_phys(realm->rd);
+>>>>> +    phys_addr_t dst_phys, src_phys;
+>>>>> +    int ret;
+>>>>> +
+>>>>> +    dst_phys = __pfn_to_phys(dst_pfn);
+>>>>> +    src_phys = __pfn_to_phys(src_pfn);
+>>>>> +
+>>>>> +    if (rmi_delegate_page(dst_phys))
+>>>>> +        return -ENXIO;
+>>>>> +
+>>>>> +    ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
+>>>>> +    if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+>>>>> +        /* Create missing RTTs and retry */
+>>>>> +        int level = RMI_RETURN_INDEX(ret);
+>>>>> +
+>>>>> +        KVM_BUG_ON(level == KVM_PGTABLE_LAST_LEVEL, kvm);
+>>>>
+>>>>           KVM_BUG_ON(level >= KVM_PGTABLE_LAST_LEVEL, kvm);
+>>>
+>>> Ack.
+>>>
+>>
+>> Thinking more about this, I guess a buggy VMM can trigger this
+>> by populating twice ? (level == KVM_PGTABLE_LAST_LEVEL). So, we should
+>> return the error back, than warning here and suppressing the error ?
+> 
+> Populating twice causes rmi_delegate_page() to be run twice on the same
+> page and the second one will then fail. So I don't think this is
+> possible (please correct me if I've missed something!)
 
-Nice catch! You're right: AP[2:1]=3D01 grants UnprivWrite, and the
-architecture removes PrivExecute whenever UnprivWrite is present,
-regardless of PXN (ARM ARM D8.4.1.2). The call is also unnecessary:
-EL0 instruction fetch is controlled by UXN (already 0), not AP bits.
-The EL0 stub only needs data access to the MMIO page, not to its own
-code.
-
-The fix is to drop the second make_el0_accessible call and the
-now-unused el0_be_loads_end label. Re-tested with and without the
-previous patch (patch 1/2), all tests pass with the fix and the first
-sign-bit case fails without it.
-
-Marc, can you fold this in or would you like me to respin?
-
---- a/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-+++ b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-@@ -77,7 +77,7 @@ static void guest_loads_le(void)
-  * fault on the little-endian tables. x0 holds MMIO_ADDR; results return i=
-n
-  * x19..x28 (tests[] order) via a single SVC.
-  */
--extern char el0_be_loads[], el0_be_loads_end[];
-+extern char el0_be_loads[];
- asm(
- "    .pushsection .text, \"ax\"\n"
- "    .global el0_be_loads\n"
-@@ -93,8 +93,6 @@ asm(
- "    ldrsw    x27, [x0]\n"
- "    ldrsw    x28, [x0]\n"
- "    svc    #0\n"
--"    .global el0_be_loads_end\n"
--"el0_be_loads_end:\n"
- "    .popsection\n"
- );
-
-@@ -213,11 +211,8 @@ int main(void)
-                 el0_svc_handler);
-
-     be =3D vcpu_mixed_endian_el0(vcpu);
--    if (be) {
-+    if (be)
-         make_el0_accessible(vm, MMIO_ADDR, vm->page_size);
--        make_el0_accessible(vm, (uint64_t)el0_be_loads,
-- el0_be_loads_end - el0_be_loads);
--    }
-
-     ksft_print_header();
-     ksft_set_plan(ARRAY_SIZE(tests) * (be ? 2 : 1));
+Good point, but I think this may not fail to allow the hugepages in the
+future. The DELEGATE_RANGE would skip the granules in DELEGATED/DATA 
+state. I am getting this clarified in the spec.
 
 
-Cheers,
-/fuad
+Suzuki
 
+> 
+> Thanks,
+> Steve
 
-
-
-
->
-> > +"    ldrsb   x19, [x0]\n"
-> > +"    ldrsb   x20, [x0]\n"
-> > +"    ldrsb   w21, [x0]\n"
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260625144807.26=
-03272-1-fuad.tabba@linux.dev?part=3D2
->
