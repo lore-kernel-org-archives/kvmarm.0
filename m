@@ -1,57 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B35382F28;
-	Thu, 25 Jun 2026 09:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D233CD8CA;
+	Thu, 25 Jun 2026 10:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782381285; cv=none; b=DCktCI5T9AgI9KpUPTvKr02srRC+4qcBVEzRmnDx6gZP6LxwlbgUfIj4uwj7+OrAs5HViSBLuYc67l9ZE+e01FyRCQtFX03FkoEWSH6nd9dIyetTMdgdbOXetn+uX6okEmOjGLdWkEWuGK77bbWBnoN0oSupTAWXseQK6jZaPdQ=
+	t=1782382225; cv=none; b=TBh1YGDhk3d1hTo9uF0arKBqH07sO+qTxRWtUZZ4bTGVBJpoW06sMkq3ck2L8CWdBEq06sLdZll9eaJwH4xgLiarhq52slBnGuuN3ZNwFWqnwkkETX1EgTnmNplaGjO2boeXw7fjx07HCoQL3VdZafwKP0HmbDHgyN1pkLHwdEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782381285; c=relaxed/simple;
-	bh=XdEUUc0LIH1CG4hWaGSpPsvbNYk3BgSi6lhZsxO0JP4=;
+	s=arc-20240116; t=1782382225; c=relaxed/simple;
+	bh=DGc6Jv/BE+n2OWtHr8sbUeycDoFoHmckf9j1o16hMlc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KMlX8hKZ9PEjx1AMpiNs7p0gG2iaAw4bO883mmthbJ4KpRsmsKyLbDGbujR3gFKpZfkOJUqZlgEd9sDA0IDZfYQf7Y/XEpsMQu4B9f84jq/PDyZb25/3suLZNYz8vhgLeLTfmbnK42Z5RSS6VHs2VuQ3NK1LTSwP+MRHu3o8SBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cW1YDz4i; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Kts8TLAuGuLmTyJ5v4z6DPiR+E0xbkMSofz3ADgELdt5fpmxQDMxaBrTu+6dzdvjmRW6ZbTiN/KphTKBfe/7fcnDzl7grfgnjw+mzhSc7bIdD4oDQcsEc1fpPuK2ZgZK9bRwZ1kdCT5m/uvyoJvVrbcQRcGgB6hRZ72rJ2I8Cko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ow0Y7wLt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cW1YDz4i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DECA11F000E9;
-	Thu, 25 Jun 2026 09:54:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ow0Y7wLt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E9B11F000E9;
+	Thu, 25 Jun 2026 10:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782381283;
-	bh=EQvzmhzhY00voWSBNdbfxNOmR53Cza+WLYkpg4Exsw8=;
+	s=k20260515; t=1782382224;
+	bh=sLRVkQfNkbmqQPg5/CoxfYV5Wz3dafUxaadB1SlbK4A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cW1YDz4iq0eX1gwdCXa4sHqGm/2nXwLngx4dLAAamShH0CkGnA4LN1QTNU1VNP1Vk
-	 gbiNRfi2VcobYiBb9/4nqs1lJLwbJDRPbvd/xLAKtlG8jDQwNsqm0HanEa+sWn6aj/
-	 FP4npsdEgKO98Ab3bKpqCdKS7sysAE5s2Hj08S7R19gdwEV70fFNQEd//xANPzfLjy
-	 qsGq5mC/vKyBsF/vKU0ip5KuaKWxZIYO6qzOsU1Zw19rTzjYqNnawjCkyOnaF9f/Ta
-	 nHo8iUkndGzQ1tk/mO0LZsKIxwbbcIy3btBGY2DMDbSU9ENzm+/pX5Scjc0iqKaxih
-	 scYE5jx11Azlg==
+	b=ow0Y7wLttlgW6E0S9Xkf/kZHeUCKqBDxGluB/V9GQJTJk+ako8Ek3rxAZGwzh9hPS
+	 SpgiWKOXU0UOVoKiPjKk2wUv8tfvw3spG2Cu3ZzbOtBTNXfzKaNS7oMk2dnDykb4TB
+	 5HmcHBkk9tVjdgh+XT9IKb57NhVPRIdBryYPw1BeBYOuq6d22OKXI/Lqv3UN1Yj+/9
+	 uMZc6eViNCv9mNf7+77G3qNQdcHTfprCLBcxvx40R5ePEQAYBt+ysjyZOSZn1xjW/I
+	 Hpb+4E4kC4BfDBK16+M8MpMEWz4x0kUYKaaIsPUOBM1QzTelZtG//Oi8EeIP9m8m7Q
+	 dedHMAldbW6dw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wcgnB-0000000Fvck-0oXg;
-	Thu, 25 Jun 2026 09:54:41 +0000
-Date: Thu, 25 Jun 2026 10:54:40 +0100
-Message-ID: <86h5mrq71b.wl-maz@kernel.org>
+	id 1wch2L-0000000FvsZ-3cAt;
+	Thu, 25 Jun 2026 10:10:22 +0000
+Date: Thu, 25 Jun 2026 11:10:21 +0100
+Message-ID: <86fr2bq6b6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Itaru Kitayama <itaru.kitayama@fujitsu.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 0/3] KVM: arm64: nv: Shadow ptdump fixes
-In-Reply-To: <fabkknc7dqpve4oo2hsgcsodq4syfgg5bp54qi6cywzssaue7u@ow3q6tupzwyz>
-References: <20260623142443.648972-1-weilin.chang@arm.com>
-	<ajty6I7ZqodP4ous@sm-arm-grace07>
-	<fabkknc7dqpve4oo2hsgcsodq4syfgg5bp54qi6cywzssaue7u@ow3q6tupzwyz>
+	Will Deacon <will@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix sign-extension of MMIO loads
+In-Reply-To: <CA+EHjTxn8W=KYqTeqs-ZTw-SBD9tH0zUz_O9rTHsq3M7ELXn_w@mail.gmail.com>
+References: <20260622190701.2039766-1-fuad.tabba@linux.dev>
+	<20260622190701.2039766-2-fuad.tabba@linux.dev>
+	<86tsqtqu9u.wl-maz@kernel.org>
+	<CA+EHjTxn8W=KYqTeqs-ZTw-SBD9tH0zUz_O9rTHsq3M7ELXn_w@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,20 +64,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, itaru.kitayama@fujitsu.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 25 Jun 2026 08:47:04 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
+On Tue, 23 Jun 2026 14:51:49 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> I don't see a way out with this per-mmu file scheme. The core issue is
-> mmus have a different lifetime than the VM's debugfs directory, and
-> both's removal can happen in parallel, i.e. the VM debugfs directory
-> can be removed anytime we are in mmu notifier release freeing the mmus
-> and their shadow ptdump files.
+> My reading of the ARM ARM is that the byte reversal is keyed on the access
+> size there too. It lives in Mem{size}, with the register width handled
+> separately by SignExtend(regsize):
+> 
+>     data = Mem[address, 2];        // byte-reversed by the access size, BE
+>     X[t] = SignExtend(data, regsize);
+> 
+> So vcpu_data_host_to_guest(..., len) swapping by len matches the Mem-side
+> reversal. Swapping by the register width would reorder bytes that were never
+> loaded. An LDRSH into Wt reads 2 bytes but would bswap 4: the halfword
+> reaches the helper as 0x0180 host-native, cpu_to_be32 turns it into
+> 0x80010000 instead of the 0x8001 cpu_to_be16 gives, and it never sign-extends
+> to 0xffff8001.
+> 
+> If that reading holds, none of the helper's ops are individually wrong, and
+> the only bug was the order, with the sign-extend running before the swap and
+> the width mask then dropping it. But I've gone round in circles on endianness
+> before (to say the least), so please say if I've done it again.
 
-Why isn't that a problem with the existing S2 ptdump code?
+That's quite convincing.
+
+And the quoted pseudocode is much easier to reason about than the
+current blurb in the commit message. For reference, J1.2.3.111 Mem{}()
+is the relevant bit of the M.b spec and clearly shows that the access
+is done LE, and only then byteswapped. Can you please repaint the
+commit log to describe things in those terms?
+
+Also, can you augment your test to cover for BE accesses from the
+guest if the HW supports it?
+
+Thanks,
 
 	M.
 
