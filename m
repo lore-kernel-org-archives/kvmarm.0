@@ -1,139 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BFA23BD06;
-	Thu, 25 Jun 2026 22:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C6C3DB640
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 07:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782425886; cv=none; b=lwX95eqA9UcgsgbTJlID8IMEJiOZUcxg5e9nqcmoYcQWAtJc4YjRwzSLsAEb5vZFl2hKhrUDsC5QGHZmTD5qizQRiR3mFn+Pr3zdKNCAVefveDAhARGvxHnX4jTQfhAGPG9IbpOi9wt0zh9DXDDRanCBkWV8+RpFgGuWfGsNRLk=
+	t=1782457471; cv=none; b=aY+K4uEizSEu+z1oAhzSMdopTQqFnAF17uBtziQ2VLpLsSsgc622ggNLKMuihrUFQhlHomlHDlpM9SauywFw7iyIOzvqW+sNxvCMtt/7gtPzx7UPtasb8v03VhhUN1tB75uLamTHUpSRCHa0gue6um/XPCkvnqiNRlt2XaI2ZOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782425886; c=relaxed/simple;
-	bh=gSgDq/IAyrcTqaxmEu14KFUmpyy+BXho2j90sJypEus=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VEWMj5fU51efYjVv9/uc8As7sIbaf3XNPe0Pmu7jLfxXzfae+TOC2qFrVj3cJ+BWsEHf/iSMgoWmnyTaTz28kB8u+8FkbCuvyuPDxTKlD8cFmN6aRAtf8cre3093gA9nNqHdlv+mfPjaf2kZX77U+JmrUeYHrDOfC5dPFZ04byU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehGdWy93; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782457471; c=relaxed/simple;
+	bh=9u0PClUmtcDiwguXuAJwkqw3OOQe5e2NOIHPVG1YQ+M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W8jHVH2ohaq40YcCKFKRJunqdUjSypbeFiHFBrHRafopvascM1EWpBUvo/6BA+A+qEgA28C8BuIHq2f1bs72rLLL80VkJF9NcCp1tPbkdoNyHt6mxgfshBsKZRHCD4jKzE/5sdIz4G1FoYdbF7XtdmkLuDZ+XtwqeHGyZ/xPZak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LnbxhMR3; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehGdWy93"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB2B01F000E9;
-	Thu, 25 Jun 2026 22:18:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782425885;
-	bh=H81/gh1Mc+Yf+SEPryh/OtrEIShaUoJhRuqfU2WfThE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ehGdWy93MY9/83gkqcLqhzcjxLMBt7q4jVShrw5gmnentYjNTl54BoEkiqOAJeRgv
-	 qRHgFP17u/M6GuOdY9v6B2ZxBKUcK8roiGuBUL/sqqjBj+ivZnM0a4Mf+hnXkdqUzy
-	 Ah9lNQokSFJhCo9yIxNG6ySr9L4OBOrgwNVny6mKx3ZKU9cUT+j4Gjq4QLC66hLoW7
-	 ng8k0zdiYHAKTMo5kykef8prM17OXKj4mrMpm18PcUS6fSN9rfq5QYcUGrJ6bREoC4
-	 GnK7lHliHR0scTqgFcjv22WKxI2mBt+bUXa9eRi2rJELjxGs3gcv5zcrFdWKMk1M5o
-	 LFM9VoczMALxQ==
-Date: Thu, 25 Jun 2026 15:18:03 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Only consider S1PTW a write fault if
- HA is set
-Message-ID: <aj2pG5ZW67coAxHR@kernel.org>
-References: <20260624202446.1698535-1-oupton@kernel.org>
- <20260624202446.1698535-2-oupton@kernel.org>
- <20260624204025.519861F000E9@smtp.kernel.org>
- <ajxFe5N2CXySmLbU@kernel.org>
- <86echur5g9.wl-maz@kernel.org>
- <aj2C1na3fc_BlvuC@kernel.org>
- <86cxxeqrjp.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LnbxhMR3"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782457467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YRQkgtC4Uhvu2LqPQiKXLuJu0xhuDXcZhXVNnsQ0O6o=;
+	b=LnbxhMR3FylYtThbm4iqaBaBsRGZWnICij+qaNP+7xN4EdxTfdAh9mU3pTfOtgt4aC+YOR
+	zoHtX0dKuKrHzoaicfjysrihXa0NV1svV0EXwyr08fcLyvQapHzZIQSzEq/i0Ltce7HEel
+	IoM7Z1rknmAXoFr2zFHA433URCdAFoE=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v3 0/8] KVM: arm64: Rework pKVM vCPU state synchronisation
+Date: Fri, 26 Jun 2026 08:04:00 +0100
+Message-Id: <20260626070408.3420953-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86cxxeqrjp.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jun 25, 2026 at 09:43:54PM +0100, Marc Zyngier wrote:
-> On Thu, 25 Jun 2026 20:34:46 +0100, Oliver Upton <oupton@kernel.org> wrote:
-> > We still need to account for host-induced permission faults, e.g. dirty
-> > tracking or an RO memslot getting mapped into the L2. So I think we
-> > still need to evaluate R+W before forwarding to the L1.
-> 
-> Hmm. I had forgotten about this indeed. Ultimately, we need to keep
-> track of why a S2 entry is RO in the L1 IPA space. We can either use
-> more SW bits in the PTE (not that many left), or wait until Wei-Lin is
-> done with his reverse + direct map tracking structure.
+Hi folks,
 
-Pretty sure we can avoid the additional state tracking so long as we
-ensure the nested S2 permission checks are ordered before anything
-happening 'downstream' of the MMU.
+Changes since v2 [1]:
+  - Sync host state only on trap or SError exits, and move it into a
+    dedicated handle_exit_pkvm_state(). (Vincent)
+  - Collected Vincent's Reviewed-by.
 
-Pairing an R+W check in kvm_s2_handle_perm_fault() along with a change
-to kvm_is_write_fault() to only consider HA=1 permission faults to be
-writes should do the trick. I've got the following blurb locally:
+Building on Will's pKVM infrastructure series [2], this series reworks
+how pKVM moves vCPU state between the host and EL2, and stops copying a
+non-protected guest's state on every world switch.
 
-@@ -918,14 +919,39 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
- 	if (!kvm_vcpu_trap_is_permission_fault(vcpu))
- 		return 0;
- 
--	if (kvm_vcpu_trap_is_iabt(vcpu)) {
-+	/*
-+	 * S1PTW permission faults are a pain to deal with, owing to the fact that
-+	 * the architecture sucks and there's insufficient syndrome information to
-+	 * determine if the access failed for read or write permissions. We can still
-+	 * infer it based on the behavior of our pseudo-TLB (i.e. the KVM MMU):
-+	 *
-+	 *  - S1PTW translation faults are treated as read accesses, meaning that
-+	 *    the most relaxed resulting translation is read-only. The L1 hypervisor
-+	 *    could prevent read accesses in the nested stage-2. Since all TTW accesses
-+	 *    require at least read permission, we can detect this by unconditionally
-+	 *    checking read permission in the nested stage-2.
-+	 *
-+	 *  - After establishing that this vCPU observed a read-only translation, we
-+	 *    can infer that the access failed for lacking write permission due to
-+	 *    either the nested stage-2 or KVM. Evaluate the write permission of the
-+	 *    nested stage-2.
-+	 *
-+	 *  - Once the nested stage-2 permission checks have passed the permission
-+	 *    fault must've been due to something downstream; The rest of KVM's
-+	 *    fault handling can safely short-circuit to a write access at this point
-+	 *    and potentially treat the access as unsupported at the virtual endpoint
-+	 *    (e.g. unsupported atomic access to RO memslot).
-+	 */
-+	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-+		forward_fault = !trans->readable;
-+		if (write_fault)
-+			forward_fault |= !trans->writable;
-+	} else if (kvm_vcpu_trap_is_iabt(vcpu)) {
- 		if (vcpu_mode_priv(vcpu))
- 			forward_fault = !kvm_s2_trans_exec_el1(vcpu->kvm, trans);
- 		else
- 			forward_fault = !kvm_s2_trans_exec_el0(vcpu->kvm, trans);
- 	} else {
--		bool write_fault = kvm_is_write_fault(vcpu);
--
- 		forward_fault = ((write_fault && !trans->writable) ||
- 				 (!write_fault && !trans->readable));
- 	}
+EL2 gains proper primitives for the state it transfers: vCPU lookup
+helpers, and VGIC flush/sync that reduces how much host state EL2
+dereferences. The series also moves some preparatory code (such as sys
+reg access and PSCI helpers) to shared headers and HYP, and implements
+lazy copying of a non-protected guest's register state back to the host
+until the host actually needs it, instead of on every exit.
 
-I will admit, I have an extreme distaste for how subtle this is + the
-reliance on implementation detail.
+This is the first of two series moving pKVM vCPU state management to
+EL2. The follow-up completes the job for protected VMs: state
+isolation, PSCI handling at EL2, and the resulting API behaviour.
 
-> > Looking ahead to HAFDBS, for this to work we will need to use a liberal
-> > interpretation of R_JCXVS at the time of the initial translation fault
-> > and always walk with intent for write.
-> 
-> Yeah, I'm not too precious about that, and we might as well take
-> advantage of the architecture.
-> 
-> > 
-> > Basically, there seems to be a subtle difference arising between writes
-> > as observed from the nested MMU and writes as observed at the virtual
-> > endpoint (memslot). Funny how something as straightforward as the access
-> > flag can be so headache inducing :)
-> 
-> Well, you knew NV was just a sorry hack, didn't you? ;-) It's just
-> another case of "SW will sort it out eventually...".
+The series is structured as follows:
 
-Given the present company on NV, I'm not entirely sure SW will actually sort
-itself out :)
+  01-04:  Preparatory refactoring (MPIDR, sys reg access, vCPU reset, PSCI
+          helpers) to shared headers and HYP.
+  05:     Host and hypervisor vCPU lookup primitives.
+  06-07:  VGIC: reduce EL2's exposure to host state, add flush/sync primitives.
+  08:     Lazy state sync for non-protected guests.
 
-Thanks,
-Oliver
+Based on kvmarm/next (1ee27dacbe5dc).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260619070719.812227-1-tabba@google.com/
+[2] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
+
+Fuad Tabba (5):
+  KVM: arm64: Extract MPIDR computation into a shared header
+  KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+  KVM: arm64: Factor out reusable vCPU reset helpers
+  KVM: arm64: Move PSCI helper functions to a shared header
+  KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+
+Marc Zyngier (3):
+  KVM: arm64: Add host and hypervisor vCPU lookup primitives
+  KVM: arm64: Minimise EL2's exposure of host VGIC state during world
+    switch
+  KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
+
+ arch/arm64/include/asm/kvm_arm.h     |  12 ++
+ arch/arm64/include/asm/kvm_asm.h     |   1 +
+ arch/arm64/include/asm/kvm_emulate.h |  79 +++++++-
+ arch/arm64/include/asm/kvm_host.h    |   2 +
+ arch/arm64/kvm/arm.c                 |   7 +
+ arch/arm64/kvm/handle_exit.c         |  23 +++
+ arch/arm64/kvm/hyp/exception.c       |  34 +---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 258 +++++++++++++++++++++++----
+ arch/arm64/kvm/psci.c                |  30 +---
+ arch/arm64/kvm/reset.c               |  60 +------
+ arch/arm64/kvm/sys_regs.c            |  14 +-
+ arch/arm64/kvm/sys_regs.h            |  19 ++
+ include/kvm/arm_psci.h               |  27 +++
+ 13 files changed, 403 insertions(+), 163 deletions(-)
+
+-- 
+2.39.5
+
