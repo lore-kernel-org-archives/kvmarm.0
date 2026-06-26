@@ -1,132 +1,134 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B21C3BB13D
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 15:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF413E559A
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 15:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782487748; cv=none; b=PdIyZ2L5tutIEUG09JmgAVtvOZWYXFFhJLGxb0NbeE2mnwMizBJF1dfCCabTJu9FfCd1dQJX7pUhOGdzZ6enH+TpJe3Fun6I+ENbgDeNj2414eT5FixjSQ2TCwoGTFc+FslMzquUcLLLxzJkMKwIufM2L77BaTxcu+m/FgJtOfs=
+	t=1782487924; cv=none; b=V/yMWuOrDrwCWx9Z8jAaUTN9W8IoVNV4wBnn6NfVHAzCdo7ozaJLotBbDch67Ha1677uT0hhEJYauaoV5MeS2OljD52c9ps6Gb4ucoZHc3n84UdoBllf1HSHkqviqSKZT30Q9Sp9xS0AiUEMN2hhlM1zjF69EvVeIqKwsG7dtVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782487748; c=relaxed/simple;
-	bh=Wy502H7G6EG5DDUhaqL8ZH31eQuVJEouI4PSOxFgm0M=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=AqFwXvrGh1jFkls0XBRWcdq11egauw5Cukm6tO0UvRgM1ZaJAubugQqqoSQnmojTmMSYf5hsmc3k0vVzPovkUyuwJtn50IliKJ5qsjh+T4PfV29XKqG71v100aH6M6YOj7YK94aP6PlXzsUX+YRO585fIFoWvLYbgt0D6Y0ivZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wIhePOhy; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782487924; c=relaxed/simple;
+	bh=QupxKpujNRWQR6aUPinOmOnAwx97mTzDEtfs1dytDhk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=JO5ptYc5f5aDTYEj14l3p88YbzanR1SjjRDxa2k3DFKZq82ER8/bE9ePg30sE4iLPh2EzK2GUNgiDO4cOD2AOHGsWL9g8izbGhu9wX21XWWw7u6LnQBByEIpHeroEjlLhvx7EAYE2gpmAC2ROsOPxodTdUO3Xsxhi4CYphOr+Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jYoiti5I; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wIhePOhy"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jYoiti5I"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C6EB61F37;
+	Fri, 26 Jun 2026 08:31:57 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 283E13F632;
+	Fri, 26 Jun 2026 08:32:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782487922; bh=QupxKpujNRWQR6aUPinOmOnAwx97mTzDEtfs1dytDhk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jYoiti5I5NeNojHkG1QgEr69b1xokk+kUev6ycpPcCUf/xX2sJmrWxi9AtQ5OZc/D
+	 0H7oPvYcK7assVb+AJB75iYyla+FDR5InskWibfhs+vW3/mEO/TXFfHjgfvnDWMrwa
+	 2KFF1cwTy1/xohbCYd4OINpzs3LykFuVYhP65izw=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 00/22] KVM: arm64: nv: Implement FEAT_HAFDBS, FEAT_HAFT
+Date: Fri, 26 Jun 2026 16:31:50 +0100
+Message-ID: <aj6bZZLSk24Ze6_S@LeoBrasDK>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782487742;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A9yV2d4U6Iq5tvwMQAZTQglaDvuPvKN3XGu5+n1GLLQ=;
-	b=wIhePOhyn6G6N5ff0edE/tWPIL0KMu4yLFZwEwWoqZZHrBK6tCDf3vdBAO8t9df+oI6kuQ
-	xLnpFgOEs4zA46/+kNEFwdQe2/mKKSiElfQZLqTo8viWrcXcy9xwbuopsxn4/7w4KV94aW
-	uCiQ2fhh93vV19Hi8UBA0NS234VnMPI=
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 26 Jun 2026 15:28:43 +0000
-Message-Id: <DJJ35VLH2PE5.DFD8OYXEOH97@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Brendan Jackman" <brendan.jackman@linux.dev>
-To: "Takahiro Itazuri" <itazur@amazon.com>, <seanjc@google.com>,
- <ljs@kernel.org>
-Cc: <Liam.Howlett@oracle.com>, <ackerleytng@google.com>,
- <agordeev@linux.ibm.com>, <ajones@ventanamicro.com>,
- <akpm@linux-foundation.org>, <alex@ghiti.fr>, <andrii@kernel.org>,
- <aou@eecs.berkeley.edu>, <ast@kernel.org>, <baolu.lu@linux.intel.com>,
- <catalin.marinas@arm.com>, <chenhuacai@kernel.org>, <corbet@lwn.net>,
- <coxu@redhat.com>, <daniel@iogearbox.net>, <dave.hansen@linux.intel.com>,
- <david@kernel.org>, <dev.jain@arm.com>, <itazur@amazon.co.uk>,
- <jackmanb@google.com>, <jannh@google.com>, <jhubbard@nvidia.com>,
- <jmattson@google.com>, <joey.gouly@arm.com>, <john.fastabend@gmail.com>,
- <jolsa@kernel.org>, <jthoughton@google.com>, <kas@kernel.org>,
- <kernel@xen0n.name>, <kpsingh@kernel.org>, <kvm@vger.kernel.org>,
- <kvmarm@lists.linux.dev>, <lenb@kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
- <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
- <linux-pm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <linux-s390@vger.kernel.org>, <loongarch@lists.linux.dev>,
- <lorenzo.stoakes@oracle.com>, <luto@kernel.org>, <maobibo@loongson.cn>,
- <martin.lau@linux.dev>, <maz@kernel.org>, <mhocko@suse.com>,
- <mingo@redhat.com>, <mlevitsk@redhat.com>, <nikita.kalyazin@linux.dev>,
- <oupton@kernel.org>, <palmer@dabbelt.com>, <patrick.roy@linux.dev>,
- <pavel@kernel.org>, <pbonzini@redhat.com>, <peterx@redhat.com>,
- <peterz@infradead.org>, <pfalcato@suse.de>, <pjw@kernel.org>,
- <prsampat@amd.com>, <rafael@kernel.org>, <riel@surriel.com>,
- <rppt@kernel.org>, <ryan.roberts@arm.com>, <sdf@fomichev.me>,
- <shijie@os.amperecomputing.com>, <skhan@linuxfoundation.org>,
- <song@kernel.org>, <surenb@google.com>, <suzuki.poulose@arm.com>,
- <svens@linux.ibm.com>, <tabba@google.com>, <tglx@kernel.org>,
- <thuth@redhat.com>, <urezki@gmail.com>, <vannapurve@google.com>,
- <vbabka@kernel.org>, <will@kernel.org>, <willy@infradead.org>,
- <wu.fei9@sanechips.com.cn>, <x86@kernel.org>,
- <yang@os.amperecomputing.com>, <yangyicong@hisilicon.com>,
- <yonghong.song@linux.dev>, <yosry@kernel.org>, <yu-cheng.yu@intel.com>,
- <yuzenghui@huawei.com>, <zhengqi.arch@bytedance.com>
-Subject: Re: [PATCH v12 00/16] Direct Map Removal Support for guest_memfd
-References: <aeennZlV60k81OBf@google.com>
- <20260506080753.14517-1-itazur@amazon.com>
-In-Reply-To: <20260506080753.14517-1-itazur@amazon.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Wed May 6, 2026 at 8:07 AM UTC, Takahiro Itazuri wrote:
-> Hi Lorenzo and Sean,
->
-> Apologies for the delayed reply =E2=80=94 Nikita is leaving Amazon, and I=
-'m
-> taking over this series going forward. Thanks for your patience.
->
-> On Tue, Apr 21, 2026 at 01:40:00PM +0000, Lorenzo Stoakes wrote:
->> Hm, given this touches a fair bit of mm, I wonder if we shouldn't try to=
- do this
->> through the mm tree?
->
-> On Tue, Apr 21, 2026 at 04:36:00PM +0000, Sean Christopherson wrote:
->> Yeah, when the time comes, the mm pieces definitely need to go through t=
-he mm
->> tree.  Ideally, I think this would be merged in two separate parts, with=
- all mm
->> changes going through the mm tree, and then the KVM changes through the =
-KVM tree
->> using a stable topic branch/tag from Andrew.
->
-> Thanks for the guidance. The split makes sense to me; I'm planning to
-> follow this approach with patches 1-6 (mm) going through the mm tree
-> and patches 7-16 (KVM) through the KVM tree on top of a stable
-> branch/tag from mm. I'll confirm the exact boundary and coordination
-> details as I prepare the repost.
->
-> On Tue, Apr 21, 2026 at 01:40:00PM +0000, Lorenzo Stoakes wrote:
->> In any case, we definitely need a rebase on something not-next :) if not=
- mm then
->> Linus's tree at least maybe?
->>
->> I'm seeing a lot of conflicts against mm-unstable, it can't b4 shazam ev=
-en patch
->> 1 and in Linus's tree it's failing at an mm patch (mm: introduce
->> AS_NO_DIRECT_MAP).
->
+On Tue, Jun 23, 2026 at 11:41:39AM -0700, Oliver Upton wrote:
+> KVM's support for hardware descriptor updates has been lacking, owing in
+> large part to the fact that the most widely available NV2 hardware
+> actually lacks HAFDBS :)
+> 
+> This series brings support for hardware dirty state and table Access
+> flags to the nested MMU. While KVM uses neither of these features, the
+> kernel definitely does in the stage-1 page tables. Since there is only
+> one hypervisor to rule them all, implementing this stuff at stage-2 is
+> mostly motivated by the desire to enable guest stage-1 :)
+> 
+> Implementing dirty state at stage-2 is a bit more challenging than
+> anticipated, I'm in the middle of seeking a relaxation from Arm that
+> would make this all architectural. See the last patch for the details.
 
-Just as an FYI, I am gonna look at trying to move this forward a bit
-while Takahiro ramps up on taking over (I spoke to him about this off
-list).
+Hi Oliver,
 
-My ulterior motive is that this would give me an excuse to add
-ALLOC_UNMAPPED (formerly __GFP_UNMAPPED) and the mermap [0] which
-unblocks various security nonsense including ASI [1]. (But also, this
-feature is a good idea).
+Haven't read your patchset yet, but in regards to stage-2 dirty-state
+tracking, there have already been some efforts in the area, also
+implementing HDBSS and HACDBS in a way of improving performance / reducing 
+impact of live migration on a system.
 
-[0] https://lore.kernel.org/all/20260320-page_alloc-unmapped-v2-0-28bf1bd54=
-f41@google.com/
-[1] https://linuxasi.dev
+HDBSS support is being done by Tian, and according to his last message, we
+should have a v4 at any moment:
+v3 link:
+https://lore.kernel.org/all/20260225040421.2683931-1-zhengtian10@huawei.com/
+
+I am working on the HACDBS implementation myself, and plan to send a v2 
+next monday. (Just waiting the merge window to close)
+v1 link:
+https://lore.kernel.org/all/20260430111424.3479613-2-leo.bras@arm.com/
+
+Thanks!
+Leo
+
+
+> 
+> Applies to kvmarm/fixes since this depends on some of the earlier VNCR
+> rework. Lightly tested on an implementation with HAFT.
+> 
+> Oliver Upton (22):
+>   KVM: arm64: nv: Introduce struct for stage-2 walk step
+>   KVM: arm64: nv: Consolidate computation of stage-2 permissions
+>   KVM: arm64: nv: Get rid of kvm_s2_trans*() accessors
+>   KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
+>   KVM: arm64: nv: Pass an access descriptor for stage-2 walks
+>   KVM: arm64: nv: Use a helper for stage-2 descriptor updates
+>   KVM: arm64: nv: Set dirty state at stage-2
+>   KVM: arm64: nv: Treat DBM as writable at stage-2
+>   KVM: arm64: Compute S1 permissions as part of s1_walk()
+>   KVM: arm64: Plumb through access descriptor for stage-1
+>   KVM: arm64: Use a struct for stage-1 walk context
+>   KVM: arm64: Create helper for stage-1 descriptor updates
+>   KVM: arm64: Set dirty state at stage-1
+>   KVM: arm64: Grant write permission when DBM is set at S1
+>   KVM: arm64: Don't update descriptors for "non-arch" access
+>   KVM: arm64: nv: Expose FEAT_HAFDBS
+>   KVM: arm64: Set Access flag on table descriptors at stage-1
+>   KVM: arm64: nv: Set access flag on table descriptors at stage-2
+>   KVM: arm64: nv: Expose FEAT_HAFT
+>   KVM: arm64: selftests: Only test AF behavior for emulated AT insns
+>   KVM: arm64: selftests: Test that AT emulation for FEAT_HAFT
+>   HACK: KVM: arm64: nv: Set the dirty state for CMOs that fetch for
+>     write
+> 
+>  arch/arm64/include/asm/kvm_arm.h       |   1 +
+>  arch/arm64/include/asm/kvm_nested.h    |  94 +++------
+>  arch/arm64/include/asm/kvm_pgtable.h   |  17 +-
+>  arch/arm64/kvm/at.c                    | 267 +++++++++++++++++--------
+>  arch/arm64/kvm/hyp/pgtable.c           |  11 -
+>  arch/arm64/kvm/mmu.c                   |  36 +++-
+>  arch/arm64/kvm/nested.c                | 251 ++++++++++++++++-------
+>  tools/testing/selftests/kvm/arm64/at.c | 102 ++++++++--
+>  8 files changed, 515 insertions(+), 264 deletions(-)
+> 
+> 
+> base-commit: d098bb75d14fde2f12155f1a95ec0168160867ce
+> -- 
+> 2.47.3
+> 
