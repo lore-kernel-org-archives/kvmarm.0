@@ -1,150 +1,112 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199193E3D89
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 07:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3891E3DDE
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 07:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782460132; cv=none; b=W2T5u33vakOdkiVacerMGxRyItVFHYDEuTY/U7mbRMjJ/cCy5KydzturJaO2oUulC4mFA9CcU0uTcm39Ln5Ykf3cDZo1IZlukJV+eqrYZ4ikZ8jazi/oRLDnOtNOpAqXbwnbCwJaDS5DPs+B+ryHP4BA2RABW5UTL7UYPzrIcDM=
+	t=1782460548; cv=none; b=X1ixU3hHaZjLbUaPJFKAwkFsptadSFq+JI4DwuzMDJ4fF0okAhdWcUVEV3Dzgtzv2T4BuKo3OdOXIv34H/PLpUph+ZN9IhXMM1OIIQf6uu7ScYUOy8yMVtlnOHYvPVMn72vuOAcuJASMrCCTeAEza6vVUeHgMBeYzzeJWHDKUGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782460132; c=relaxed/simple;
-	bh=+eNgUr5YUqNfYwGiirS2Nnl3zVmfu1/bLUCX16l3Okg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qp/Wcrsiv1L78IS+mjyaE3u3xisnFgUR+WMUEGOelY4vJWcWybNfbDNZEufucuVtTQrFzgLCB7rAHWyaFXlZJjvyaj9+8AFhVOyjuhT28TRKauXE9MRk2Ef0SRqWkdy2V154UNqRerWs3fgvvHMnqzfi5P69t1SQAq+ka86ypbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FxS4BbI1; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1782460548; c=relaxed/simple;
+	bh=g05QQtuoVU/+fRS7ZfcpGd1FmKbE5xNGc9z3a4sknBU=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=U7iS4MfhlCTd+HRhiCvqh1clON0DlBE9Izx1RiC9+vB0Ybh5pdjqaxf5lOhrEuOji4zwsxQnAX7h60or93/6J5a6CcNGKxRI+Fx8ErcDZmUbXglZGfKlW8DczcabisRwDS9o3Th0FQz3K+zpWwWZFTerGQcP+LKztsVoulmBFi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PA0Jd1ml; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FxS4BbI1"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4926e5803e5so4265e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 00:48:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782460129; x=1783064929; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sviuXWEudL4Lc2OsPUzpYG5n9t6uIjHNaWvGJZaU1Ew=;
-        b=FxS4BbI1N/MBEs5LyGUOibALGkxR661Smu+TAHotGHI2pTSpqaOpxOWCT66k2JlVj2
-         AGNuCxX8+Zb7gkqXiJRTr3UwApS5jMjWYSH/xVWUNan4rfJMSJBtVqbgetkbFtcNOsom
-         3rV9fHmiMy96KO3zcv20bIcmVStjbjfnMF6WMC6VsmcEG2RfGLSW8C4UkG+em3NWlYyH
-         mLBYjypxY+GcK0T0SKpDc7CYpyS/lrTQVU9c0rgKe4wm8vG40/CygcVB+Y59FPjKvzcC
-         MPvrszPneNqVqeIVN3zhwYV+l6ZR4TsNPLT5b61KplSDGLyug+HDCaT0SVm4HfFex3xO
-         Sv/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782460129; x=1783064929;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sviuXWEudL4Lc2OsPUzpYG5n9t6uIjHNaWvGJZaU1Ew=;
-        b=ghUj6pysC2ubLLPY5eU/JUO4ympyyASoldRcA+8J+MbSjxUHpb/EjU9OMnObpEG8TE
-         bClxJvl7dCmdgvCCPjdMCA81L8gzZupgYaPVcbKxxLmbfyeqSJl0lQOtAllMR/5K/SN4
-         /rfnb+b0/VJIn60wL52NNwHomHi9nkl0MMg5K8w9QE4GHHzIDBt6alOPo8Fr/uM5wN0P
-         1LPuEc06Z+Yf4O3jI5zZEOeRIquWHquhHbEenCBpBcPYFLTZsVj/ChC+s6bu3l7IYuKT
-         2//0qCzAQPeAtgXVZqKXhXKsvSH6jRkfft8bsczFIqYjosEG5kzaM/Ls0DHtD2fF7ZDs
-         7qow==
-X-Forwarded-Encrypted: i=1; AFNElJ+OPfkmw2nxL3I2JhjEZ+XabAmUxU2fn9JowOM1w9sB7ydAD1yxURwI7zDfRKh0vCkMae+5Z3U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxiieWyyLkBSzpbR8awpuLJcVg5rEJy+kfzySJK8m8d8SxchnLt
-	DoCk71x91zJpRdA2xT9fWq7vXhn9R4wTDnMAe7wt3kRzV7xCv6xnMUJ4I7PxhIdWiw==
-X-Gm-Gg: AfdE7ck5wrseOyiR34Mh7d7xttiXMFP/ei3MrzdFsZXCPA3bGvRyih7g7P+E5LNE2Rf
-	TWORroSQO1wHzt5JTgY/PEIC70mTMaK0+DlsOOxAzl5pj5DV98JU49rNrifPXGTZnS9g/kepbXK
-	dIyNEcGDQVLctPbO1mfbEaWPvSchV5jKc0niz8yuosqJAEBBeF5yN3MMNKlLcBnZFMG7LRN/gZG
-	w8TeymlMMVIeByZHyU9X36zBYzifZo38zUsernTFdWi+aMH3rEeIu9Ql5rexDKN18Fphmf6i79z
-	mdgKCE2EvuhDBP7/Brt7P3T6YQY+v+FW1AnvPcNc6dIpHfM/AKyUbHd2cyzq4syq0Jj6dG+uaUu
-	fOTVNeTrwxXXbEjI4KTpqCqzm59zAVc2mpLrLm5y73Kq2sx2cXYx31lQSXJWmgdkKDEd6QODjwd
-	C14hspI+0980brEsW4jAaW1PKjtdlwlB2DAiFfEBIayvwbvQtrMZBW8issaes=
-X-Received: by 2002:a7b:ce17:0:b0:492:43a3:2fd7 with SMTP id 5b1f17b1804b1-49269ed6ba1mr786145e9.0.1782460129056;
-        Fri, 26 Jun 2026 00:48:49 -0700 (PDT)
-Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49268ff9f40sm57920045e9.6.2026.06.26.00.48.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 00:48:48 -0700 (PDT)
-Date: Fri, 26 Jun 2026 07:48:44 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, mrigendra.chaubey@gmail.com,
-	perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v5 1/7] KVM: arm64: Enforce strict SBZ checks in the FF-A
- proxy
-Message-ID: <aj4u3L2RrUDJpmjp@google.com>
-References: <20260623115354.632361-1-sebastianene@google.com>
- <20260623115354.632361-2-sebastianene@google.com>
- <aj0qOFO3pRA-U_mL@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PA0Jd1ml"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8923A1F000E9;
+	Fri, 26 Jun 2026 07:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782460546;
+	bh=ePJjUs7JoHAZ6tov/2g/bi5YzzFJGnhQS1Y3wKGuzzY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=PA0Jd1mlqAlYe4r8qc6A2lp5/jlRYAfkF/pu5n6ZsvNT2svOWUPgbUGCEinPtj9NS
+	 a8T/hKLtC67/i1KLfl+8EYr+KqMk/DHLF5vL7dKznXU+HKk3mDvI2ykqfznHNvjLEH
+	 HdLIG1Aydh9LM+yea8AviO3SAyjqs2rOINqJp5xMRUDx0Lrv0JAlGta3PSTw4GBoap
+	 83X+jP5TLlkeFagjyaCN7xFYnDMlIJhPZbgBRy61Lw/KMaU3Ui3eXSUU0KN6wNlaDg
+	 etmz1rIHnHQtD59lT4N8RpyGg2Gixaasg9BcO6LrkAiA+kem6YI/j1Iq3eo0FGlKxn
+	 Nghm2y2uQOwiQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 4/7] KVM: arm64: Support FFA_NOTIFICATION_SET in host
+ handler
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sebastian Ene" <sebastianene@google.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260626074545.433234-5-sebastianene@google.com>
+References: <20260626074545.433234-1-sebastianene@google.com>
+ <20260626074545.433234-5-sebastianene@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Jun 2026 07:55:46 +0000
+Message-Id: <20260626075546.8923A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aj0qOFO3pRA-U_mL@willie-the-truck>
 
-On Thu, Jun 25, 2026 at 02:16:40PM +0100, Will Deacon wrote:
-> Hi all,
-> 
-> On Tue, Jun 23, 2026 at 11:53:48AM +0000, Sebastian Ene wrote:
-> > Introduce a helper method ffa_check_unused_args_sbz to enforce strict
-> > arguments checking when the hypervisor acts as a relayer between the
-> > host and Trustzone.
-> > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 54 +++++++++++++++++++++++++++++++++++
-> >  1 file changed, 54 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 1af722771178..78bb043b33ee 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -71,6 +71,20 @@ static u32 hyp_ffa_version;
-> >  static bool has_version_negotiated;
-> >  static hyp_spinlock_t version_lock;
-> >  
-> > +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int first_reg)
-> > +{
-> > +	DECLARE_REG(u32, func_id, ctxt, 0);
-> > +	int reg, end_reg;
-> > +
-> > +	end_reg = ARM_SMCCC_IS_64(func_id) ? 17 : 7;
-> > +	for (reg = first_reg; reg <= end_reg; reg++) {
-> > +		if (cpu_reg(ctxt, reg))
-> > +			return true;
-> > +	}
-> > +
-> > +	return false;
-> > +}
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] Incomplete validation of host-supplied `flags` (MBZ bits) before=
+ proxying FFA_NOTIFICATION_SET to EL3.
+--
 
-Hello Will,
+commit 390edd982e712bdb39d83c8b5c1be4b16e311bcb
+Author: Sebastian Ene <sebastianene@google.com>
 
-> 
-> Seb and I tried taking this for a spin on some Android devices and, sadly,
-> it leads to fireworks. The reason is that the FF-A spec quietly changed
-> the list of unused parameter registers for 64-bit SMCs from v1.1 to v1.2
-> of the spec so that pre-existing calls were affected.
-> 
-> For example, in v1.1 a 64-bit RXTX_MAP only has x4-x7 as MBZ, whereas in
-> v1.2 the same call has x4-x17 as SBZ.
-> 
-> We can follow the spec by predicating the additional check on the FF-A
-> version being >= 1.2, but I'm not hopeful that existing drivers are
-> compliant. I also suggest moving this patch to the end of the series in
-> case we need to revert it.
+KVM: arm64: Support FFA_NOTIFICATION_SET in host handler
 
-I spinned up a new series (v6) which moves the check at the end of the
-series and I made it so that it takes the ff-a version into account.
+Allow FF-A notification SET messages to be proxied from the pKVM
+hypervisor to Trustzone and verify the arguments.
 
-https://lore.kernel.org/all/20260626074545.433234-1-sebastianene@google.com/
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index d52d7c4d5e7f5..2bb16aa414f9f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
 
-> 
-> Cheers,
-> 
-> Will
+[ ... ]
 
-Thanks
-Sebastian
+> @@ -917,6 +917,27 @@ static void do_ffa_notif_unbind(struct arm_smccc_1_2=
+_regs *res,
+>  	hyp_smccc_1_2_smc(args, res);
+>  }
+> =20
+> +static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
+> +			     struct kvm_cpu_context *ctxt)
+> +{
+> +	DECLARE_REG(u32, endp_id, ctxt, 1);
+> +	DECLARE_REG(u32, flags, ctxt, 2);
+> +	struct arm_smccc_1_2_regs *args;
+> +
+> +	if (FIELD_GET(FFA_NOTIF_SENDER_ENDP_MASK, endp_id) !=3D HOST_FFA_ID) {
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	if (flags & GENMASK(15, 2)) {
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+
+[Severity: Medium]
+Does this validation check miss the upper 16 bits of the flags register?
+
+According to the FF-A specification for FFA_NOTIFICATION_SET, when bit 0 of=
+=20
+the flags is 0 (global notification), bits [31:16] must be zero (MBZ). Since
+this check only covers GENMASK(15, 2), it appears the host could pass
+unvalidated data in the upper 16 bits of the flags argument to Trustzone.
+
+Should this check be expanded to enforce the MBZ requirement on bits [31:16]
+before proxying the hypercall to EL3?
+
+> +
+> +	args =3D (void *)&ctxt->regs.regs[0];
+> +	hyp_smccc_1_2_smc(args, res);
+> +}
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260626074545.4332=
+34-1-sebastianene@google.com?part=3D4
