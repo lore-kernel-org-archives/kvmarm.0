@@ -1,41 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC051A9FBD;
-	Fri, 26 Jun 2026 17:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED6C3590C3
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 17:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782494769; cv=none; b=VLYyowxJY+k8YU9GI2HHGTDK2jhGmtz1+/P/p0givPhH/gLGT8G++VTr/9LDucgIZDUa0yeaIeePMY+NEkgphTqGNpALiV2DrGqbby1i/56Pyg125mU3d1X7vzYJfbMbMFA54JRm4HmIAhFZs/SC42+fvUZ0hSLzxzDFnrgg37s=
+	t=1782495342; cv=none; b=LchH2pY9TmK4a+Hhf5utXETuK8II9qOAI+gWD9ISz8kMdlfzkUCu59RulHAy9x8/uSJUkpHtGjMr8XKnt4Wc0s/fn+0YU/obYcm1qMOegvEbsydbyUE9zC+yxCHrqRgVGV/cmDaKBS6H9vleIzdfFXnHMQ/tfPWUEFKs2jXqR5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782494769; c=relaxed/simple;
-	bh=Z6WMdlXFjoqw0Ry9gHWrOwxGPGzFoRmvA1MUQ1HaCY0=;
+	s=arc-20240116; t=1782495342; c=relaxed/simple;
+	bh=Yn7Vok+U6O7xwyDE0u+0ptXdTK11cXJnX5dsDn2+4P8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JwR0eVXPRV2ecQik4JNd0NCpBM44AymdtgbtN12ZDuTHPpuBPHabisLkoEu/WUOLO3colSccjFsswKQoJvFdL0N2Z2SeS4kGEfxrQHaK3urdA+PoYg8ukRpUH6OPrfvlrs6Wbf8I9lNPntpYPld4oZwD1e+gLM84ShzKVtMTJ18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0XolBJ6; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=CjRX0ca27rNO39ni04sA1vK1IE/R6RK3T+39nVof1orMvoNwHHIl7lcGP7098L8rr1RM1wBywIvpbq8madeW7K5vpCCaOEhMTXAVPYpC4GXCNxVlD8EHTif0w+A3VgthqfDedVoDUrr4SoXu5rXuPt+xBH304i95TzLmZxjef0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTIp9/H2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0XolBJ6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658821F000E9;
-	Fri, 26 Jun 2026 17:26:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTIp9/H2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 415551F000E9;
+	Fri, 26 Jun 2026 17:35:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782494768;
-	bh=Z6WMdlXFjoqw0Ry9gHWrOwxGPGzFoRmvA1MUQ1HaCY0=;
+	s=k20260515; t=1782495341;
+	bh=qQrybMvC0tbnbb4oDDO0xN+0Uu1k06cgnDZWPa27Q88=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=M0XolBJ6iKqgB0xbRUcRHq/9NqZzYqfwT7Ebfln64CUP5i6D2Pxu5LqN+EgZY3jHC
-	 OQItae9CemrhT7FXmpnNPld1yxrZFAeMZ9/Gi8biP0HI32W946+opLg4unWEuNjvpm
-	 6y41x21P9XKT//GaGu3gvVuc+fvMZC2dAs80KROXrXf/su2mWoC6ggbMPVTGPwUPqh
-	 jsQbU5R74qsQAdeXfKVre8nCVbx3VuiuVVIso9kBghsKKzudWdjjuyrYG3O6ZQC8hD
-	 nQ4xpKoYf34HE+uCdu0i4FdTiVGFsbOxCH7Pkq6NiccksQcy/Y+YSYWObp3XRMs8mM
-	 C7uTMURqqWgPA==
-Date: Fri, 26 Jun 2026 10:26:06 -0700
+	b=bTIp9/H2uiALt2x27+4iuv/1cFroW1RlQcxxBJWiFPkd6J1hGpixXjLP2/MLcgDrE
+	 3VdFJO7szMvp5JAIb3dJiHKuTMuZvmYE+n83P8t2raV3HJC7N2uO5rUItKflBPaIPu
+	 ZhtTA27VYKDmUp0d+kw5eRP7sQho0c00HjDqb+8OqQXKVoRGTK+zgE48lEW6LJ9wik
+	 Xg90cpjX7FEFw5XHguQnYlFMDdX9G4TLwQ4WB6/4z9VgwF3wveEceveH4odMH+0lNG
+	 NbOWZ8iCazIOWJ3VJ5J3eOGy8Vo2xfL1Si7k1dm/d41b0/zmXLdgYz6RxNgogbM3gK
+	 JXpmtkDbvVVjA==
+Date: Fri, 26 Jun 2026 10:35:40 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: Make kvm_io_bus_get_dev() filter devices by ops
-Message-ID: <aj62LqPZg8yHcDww@kernel.org>
-References: <20260626111344.802555-1-maz@kernel.org>
- <20260626114635.82A0B1F00A3A@smtp.kernel.org>
- <86a4shqxsr.wl-maz@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 13/22] KVM: arm64: Set dirty state at stage-1
+Message-ID: <aj64bOopE9WJoWBX@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org>
+ <20260623184201.1518871-14-oupton@kernel.org>
+ <aj6fj8fEonBQphZM@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,21 +48,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86a4shqxsr.wl-maz@kernel.org>
+In-Reply-To: <aj6fj8fEonBQphZM@LeoBrasDK>
 
-On Fri, Jun 26, 2026 at 01:41:08PM +0100, Marc Zyngier wrote:
-> Gniii... I guess the last option is to bite the bullet and make sure
-> that any filtering occurs with the SRCU lock held. Something like the
-> patch below. Or just move the locking outside of the helper and keep
-> it completely inside the caller.
+On Fri, Jun 26, 2026 at 04:49:36PM +0100, Leonardo Bras wrote:
+> On Tue, Jun 23, 2026 at 11:41:52AM -0700, Oliver Upton wrote:
+> > Mark the descriptor as dirty if the permissions are sufficient to grant
+> > write access. Note that compute_s1_direct_permissions() already
+> > considers the DBM bit as writable.
+> 
+> IIUC the idea here is to avoid having a write fault when we first write to 
+> that page. Is that correct?
+> 
+> When we have HAFDBS the fault does not happen, and it gets marked from 
+> writeable-clean -> writeable-dirty by HAFDBS mechanism, which is cheap as 
+> it happens to be a write to the pgtable when memory is first written to.
+> 
+> On the other hand, when we clean the dirty-bits for the first time, we 
+> have to issue a write for every page that have been dirtied, in sequence.
+> 
+> An alternative would be not marking every page as dirty at first, in 
+> exchange of possibly having a faster first clean pass.
+> What do you think about it?
 
-TBH, I think it makes more sense to have locking done in the caller. We
-already have this precondition for calling the other kvm_io_bus*()
-accessors anyway.
-
-Then we can drop SRCU once we've gotten down to an object which we know
-has a durable lifetime, e.g. the vgic_its struct is valid down to the
-last reference on struct kvm.
+As Marc mentioned on the cover letter, this is unrelated to host dirty
+tracking. I'm implementing HAFDBS as part of our pseudo-TLB refill for
+nested. We need to mark translations as dirty in the nested S2 before
+filling the shadow S2 with something that allows writes.
 
 Thanks,
 Oliver
