@@ -1,79 +1,46 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485C21F1513
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 09:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FB43E9281
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 09:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782465900; cv=none; b=KC/Vln3He/h+HT0GxrNf+j7IzEl4qrU18BgPUEwkMMn+HfYkogBXAVzpDVXQUBiM7gW31xmcUsXMlf9YFSN3bCULNg/w5NHUzQiCivXjLYlU43E59EzxzrtzoVKkr44B+7oGuqWSOmD5gQdv6eZ/S4z/Z1qPTBnqXdRSC6JPxoE=
+	t=1782466695; cv=none; b=bM+MyHVCxFcVsiKtYdhnFqulh01OrZTs2bmhe7UaDbzU2JidIbCEQ8wcHPsyjEDjG1Kh2wzN0NYaN7cy343bNcN5tvxXFbVDmZ7S0JEYj2xzD4iidx4hU7tp2JHvBxqGgfmJ6feUdv9GHTncuQcmYEpNL6y7TrEeuhiF21hAj98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782465900; c=relaxed/simple;
-	bh=UX1LcxIS8tpJdRXXjA5HICZHQL/uQ/FeevsH/uSwcnM=;
+	s=arc-20240116; t=1782466695; c=relaxed/simple;
+	bh=meUP+Y0CS1ctaBI7eOPfAVVBnMsYGpnlBuYQQ6TBgvs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObvodJE9CMNSN12NVq1ghdDCFTW6w7+UiVdcyu2lkcaKCFUtJKNCXTePI75L6TwtkmEI/BkYzdBrIfoCgQzXmYZrVvB4jQBNT81Ajna4BLHGHZI3Htvrep10xxtBHhOQpQu3I7bzdkilYNWtNhTDjdPN1oc+lGnoLlhBIMOEp9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XVpNK7Js; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=KAfIFJHU3zrb+MCtJ7SECv3THXVY2c7Qlmg+Dl3yV9W5BP8ZhG7iy2BKtjUToLAU+2iAU4iK+g0NufU+YvFRpOz9v0HZod1fm3FI91uyVqRwX6ZgQHnHFpl8nA7e3GlO3bl4/3PnyfEh0/0fZKY1gTlkfzDlwB5wu/OjCOPVE1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ogmJejkl; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XVpNK7Js"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4924933d072so31525e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 02:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782465898; x=1783070698; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=yxYemHQPrdk3fS8tD+TpeUcazBw+tvGubw+zL762ZGc=;
-        b=XVpNK7JsfkAsHIAtwUePVUE2V/moAyCFdkNbdYwflUBwNCjf0/sLjzCCpc1czq9x0h
-         SNj+EHVXtsfDwfYGu8rM+719GkYmwBRRXUQOOjLz6cKlM2AfLYJavUYGHbN2Ofroap7S
-         TbObODqnYnm+lYz9XkcCI9RWIL2aSMqkRGEHlHLizRQyKyck2BRdxqGoWSlCjt+Kx1Ne
-         6lrmb1R0e2g5fSmXucEKvAJwu8s4ioMyk25XQsSUYKFy2Z3Wy5khTiuOc7CbXObLOHo8
-         9RINfSxuaKYFvf97dLAol/DmSXP0M/4BMwGI+1FNytcgKxaW0cjQo2IXtLkj5iLWSU+7
-         GNfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782465898; x=1783070698;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=yxYemHQPrdk3fS8tD+TpeUcazBw+tvGubw+zL762ZGc=;
-        b=Acd4lPC1sWm+UHVebac9mOkxq3Pk3o3MMvoIVDTitcCxxbQc6oWCtxAld13hxJpfjk
-         VRLcuoaf16zi469zjkiF6malitNpk8IUsJ0th7uVdxju1YaSertye/3dnyTbq/0cP2wH
-         bfiw0bbUF2FIxDKjwMOaLKAJn0mt6Tjis3aouVqHtni4edIQygzAuoPxgWSWmvUBVMXd
-         2VLZDUBRbfT3BARKaxFxyHC2EXZue8ty4/fKBZkZUFCIwbxr1gqYpnHl8sFAPI3k5w7H
-         o7ft56x8ifgJT4O/THZbJIVQcPji0m2exp5BXnb8TYbdOr41e0wVOvN431Xi0FQSQJeg
-         TqMw==
-X-Forwarded-Encrypted: i=1; AFNElJ/erWA889ne6Xc5+rFjbJ++X1TLZpFMEKjyY1NrDnAOZnW+FU6AAcw2RuyPXeX4E3uoWDTwyUY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxsrOEMSbzo7O/7EPdXYleC3bBk0R/YLxsJuEnc6p728+fH0IMH
-	likYHqKBxng4AUCsaF8fpe5b6cbHFmLEPi4Rm6fqGtNFTCj+picID1ZocKtBYFvf/g==
-X-Gm-Gg: AfdE7ck0TKkFww3gia3mU4h0lRwb66rDWcoQ0v8VtX1p0X3phDpRsW4T5lX19Rysp9a
-	rC4pB1zjVKsU3aA7tozSjw+eVPBc6rTvduelNVIn86k2iPkRo9gXVUT/dOmNNvya85+2rQ5020B
-	vXwZ/zSPEotkrCZcjYal/xolb4BEWGP5czlB8cIfsj8yWV/tUuNnJ46dTY/aaEKFk0SK7gNBUOL
-	6BEceXBKulNYIHc+3iV9s56YHx+pG4BLIgakaHhjwCxWzvI1n8ZZN4v7UrBNH4e4JA8ppe9w3xF
-	a6RPlvFVmXYGQpSPSqkclEz/9KOEcZO+xHB2EgCgK2WxaX4Eq/ZhdnhYKp3fP5AZyRR9uNwjWgv
-	ZywofLbX6iNOOsz7y87ebwWhwr3WHHDElPlpGUhbdYbWUT65YqXJmRYReoq1JR5eha1DMrZCeim
-	XZ4MREwLVXLnuNQAI5UDbm2ZoE20vQeOel+pX8Emnt7MbpzD6BLQ7h4MZloNs=
-X-Received: by 2002:a05:600c:3e05:b0:48a:5d55:c194 with SMTP id 5b1f17b1804b1-49269ffaa9amr983445e9.7.1782465897233;
-        Fri, 26 Jun 2026 02:24:57 -0700 (PDT)
-Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c221d9371sm24794653f8f.21.2026.06.26.02.24.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 02:24:56 -0700 (PDT)
-Date: Fri, 26 Jun 2026 09:24:52 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, mrigendra.chaubey@gmail.com,
-	perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v6 7/7] KVM: arm64: Enforce strict SBZ checks in the FF-A
- proxy
-Message-ID: <aj5FZBO7FJ4r219O@google.com>
-References: <20260626074545.433234-1-sebastianene@google.com>
- <20260626074545.433234-8-sebastianene@google.com>
- <aj5CMsyQ25xuxISV@willie-the-truck>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ogmJejkl"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD049204C;
+	Fri, 26 Jun 2026 02:38:07 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0FCA3F836;
+	Fri, 26 Jun 2026 02:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782466692; bh=meUP+Y0CS1ctaBI7eOPfAVVBnMsYGpnlBuYQQ6TBgvs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ogmJejklrPg6Gl7OxBcpSgA/vb8kqaWxyD/jtOomRZifPgmNp6gk0xNAOYrchUmPH
+	 eDbtd8VNaifCeE8NcEMhy6wXMhJiS8pGjWG90K6Ndy5DrUR7viVVLehMlVsQy8HEzY
+	 FaeycKEJg+W3VzVFYkHKcWan2tsmMgYcdYltXGrc=
+Date: Fri, 26 Jun 2026 10:37:55 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Shadow ptdump fixes
+Message-ID: <tl7vhu4wzqnptrfkl3bvvs5zc2ufcdhn5jwdav5hzve22hqcxq@zyu3drghk4sp>
+References: <20260623142443.648972-1-weilin.chang@arm.com>
+ <ajty6I7ZqodP4ous@sm-arm-grace07>
+ <fabkknc7dqpve4oo2hsgcsodq4syfgg5bp54qi6cywzssaue7u@ow3q6tupzwyz>
+ <86h5mrq71b.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -82,52 +49,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aj5CMsyQ25xuxISV@willie-the-truck>
+In-Reply-To: <86h5mrq71b.wl-maz@kernel.org>
 
-On Fri, Jun 26, 2026 at 10:11:14AM +0100, Will Deacon wrote:
-> On Fri, Jun 26, 2026 at 07:45:45AM +0000, Sebastian Ene wrote:
-> > Introduce a helper method ffa_check_unused_args_sbz to enforce strict
-> > arguments checking when the hypervisor acts as a relayer between the
-> > host and Trustzone.
+On Thu, Jun 25, 2026 at 10:54:40AM +0100, Marc Zyngier wrote:
+> On Thu, 25 Jun 2026 08:47:04 +0100,
+> Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 96 ++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 95 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 712811e89435..bd50ddc5b61c 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -74,6 +74,21 @@ static u32 hyp_ffa_version;
-> >  static bool has_version_negotiated;
-> >  static hyp_spinlock_t version_lock;
-> >  
-> > +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int first_reg)
-> > +{
-> > +	DECLARE_REG(u32, func_id, ctxt, 0);
-> > +	int reg, end_reg = 7;
-> > +
-> > +	if (FFA_MINOR_VERSION(hyp_ffa_version) >= 2)
-> > +		end_reg = ARM_SMCCC_IS_64(func_id) ? 17 : 7;
+> > I don't see a way out with this per-mmu file scheme. The core issue is
+> > mmus have a different lifetime than the VM's debugfs directory, and
+> > both's removal can happen in parallel, i.e. the VM debugfs directory
+> > can be removed anytime we are in mmu notifier release freeing the mmus
+> > and their shadow ptdump files.
 > 
-> This looks like an accident waiting to happen if we don't check the major
-> number as well.
-> 
-> I think you should just check:
-> 
-> 	if (hyp_ffa_version >= FFA_VERSION_1_2)
-> 
-> instead.
-> 
-> You should also add a comment.
+> Why isn't that a problem with the existing S2 ptdump code?
 
-We restrict hyp_ffa_version major to 1.0 here
-https://elixir.bootlin.com/linux/v7.1.1/source/arch/arm64/kvm/hyp/nvhe/ffa.c#L962
-but since this is an easy fix I will include it.
+For existing stuff, in terms of the ptdump files:
+
+ - For the canonical s2, the ptdump files are only removed in
+   kvm_destroy_vm_debugfs().
+
+ - For nested s2, files are removed in two places: "manually" removed
+   at mmu<->context unbind time in get_s2_mmu_nested() and in
+   kvm_destroy_vm_debugfs(). get_s2_mmu_nested() is only called before
+   kvm_destroy_vm_debugfs() of course.
+
+So no dentry UAF in the current code.
+
+Putting everything together, the situation is pretty complicated. The
+canonical mmu, nested mmu, canonical mmu->pgt, nested mmu->pgt all have
+different lifetimes, and kvm_destroy_vm_debugfs() can run in parallel
+with mmu notifier release (like said above), which frees nested mmus and
+canonical + nested pgts. Additionally, the .show() callback can be
+called after mmu notifier release (Sashiko).
+
+Now having thought about this again, per-mmu file can work, just defend
+against freed mmu or pgt.
+
+What I'm thinking now:
+ - Just have all ptdump files removed at kvm_destroy_vm_debugfs(), to
+   avoid accessing the dentry in mmu notifier release.
+ - Revert effects of 204f7c018d76 ("KVM: arm64: ptdump: Make KVM ptdump
+   code s2 mmu aware") because the mmu pointer stored in i_private and
+   the ptdump state is simply invalid after mmu notifier release for
+   nested.
+ - Only store the kvm pointer in inode->i_private or seq_file->private.
+ - For nested, check both mmu and mmu->pgt in .show() under the
+   mmu_lock. For canonical only mmu->pgt check will be needed.
+ - Guard nested_mmus freeing and setting nested_mmus = NULL with the
+   mmu_lock so .show() won't have nested mmus disappear after checking
+   nested_mmus exist.
+
+I *think* this solves all problems known at the moment...
+
+Thanks,
+Wei-Lin Chang
 
 > 
-> Will
-
-Sebastian
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
