@@ -1,106 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5643FF889
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 17:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC051A9FBD;
+	Fri, 26 Jun 2026 17:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782493945; cv=none; b=YpFeUXNrqlPVljIEr3UjjExF56ZePal7RwdXywbPZWoLbiJB3ebndvp5M5ymKQov1u5YG0y/ySmT5DCmleQYtM/j2ArULn6lf7yp2cuAEJVa+0wJ6py9TBZZL2Gmsboy6GdB85qSl9ft4fSj2gmLFc34BsGr9GnSQWcKgo1N4E0=
+	t=1782494769; cv=none; b=VLYyowxJY+k8YU9GI2HHGTDK2jhGmtz1+/P/p0givPhH/gLGT8G++VTr/9LDucgIZDUa0yeaIeePMY+NEkgphTqGNpALiV2DrGqbby1i/56Pyg125mU3d1X7vzYJfbMbMFA54JRm4HmIAhFZs/SC42+fvUZ0hSLzxzDFnrgg37s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782493945; c=relaxed/simple;
-	bh=m+yc1VWeEBPJkPDhEFjMU/MkW0Ves+auARgOKDCY6j8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jnh++w7FWBn9WZ662VV9u9OI+HKqLbUP0dIVi6My2VxLUx54a5q7cKr4Nzr9I8/2DFcTEZzTlEg4ukXlNwMPCbGLql1fHSnX0nl8BVJPIQo8UNCq8SRH90m6wGiWDvfHjdwsRezIuF0BnzIRh+TveYspa6xFWTfWcMT5q7Kuk6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JHGcYvq1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782494769; c=relaxed/simple;
+	bh=Z6WMdlXFjoqw0Ry9gHWrOwxGPGzFoRmvA1MUQ1HaCY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JwR0eVXPRV2ecQik4JNd0NCpBM44AymdtgbtN12ZDuTHPpuBPHabisLkoEu/WUOLO3colSccjFsswKQoJvFdL0N2Z2SeS4kGEfxrQHaK3urdA+PoYg8ukRpUH6OPrfvlrs6Wbf8I9lNPntpYPld4oZwD1e+gLM84ShzKVtMTJ18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0XolBJ6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JHGcYvq1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFE661F00A3A;
-	Fri, 26 Jun 2026 17:12:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0XolBJ6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658821F000E9;
+	Fri, 26 Jun 2026 17:26:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782493943;
-	bh=3C8QalYZLBplVdtm/Rg05aFEAYYw2nxVptame7lNiEk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=JHGcYvq1oV0YlslxsK4BRT7TSdqQi8/H9epLMSykJSxT+0TpTXHsonidY0ZJWmqYW
-	 1xDn07c4/oUVq18SlyFojJG4OckKZFS3GC8l6WV3aqqlcvnVnnVwzUb4hDkNRGAoAY
-	 8mbZfLMyJpb2Y3bx+ggDZbXYskaAaK050isjW4gJEZ/UFvwwO6uMkfbB4LN7H5QRfd
-	 x8k+rWz/hF1TmFtlD0eAZX+bcftL1DlwDvpN/Hb403u2NaReoVTsdGpN9MD6HwlvaR
-	 qWx5gaBNKDKur7N041IZCRnMaG/Ei/djt6UTt8BpJvYwiCpsm8ztdIj7xetbBhwDf1
-	 d9vKeYGvaO2iQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wdA6H-0000000GQ1C-3U6W;
-	Fri, 26 Jun 2026 17:12:21 +0000
-Date: Fri, 26 Jun 2026 18:12:21 +0100
-Message-ID: <8633y9ql8q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 00/22] KVM: arm64: nv: Implement FEAT_HAFDBS, FEAT_HAFT
-In-Reply-To: <aj6bZZLSk24Ze6_S@LeoBrasDK>
-References: <20260623184201.1518871-1-oupton@kernel.org>
-	<aj6bZZLSk24Ze6_S@LeoBrasDK>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1782494768;
+	bh=Z6WMdlXFjoqw0Ry9gHWrOwxGPGzFoRmvA1MUQ1HaCY0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=M0XolBJ6iKqgB0xbRUcRHq/9NqZzYqfwT7Ebfln64CUP5i6D2Pxu5LqN+EgZY3jHC
+	 OQItae9CemrhT7FXmpnNPld1yxrZFAeMZ9/Gi8biP0HI32W946+opLg4unWEuNjvpm
+	 6y41x21P9XKT//GaGu3gvVuc+fvMZC2dAs80KROXrXf/su2mWoC6ggbMPVTGPwUPqh
+	 jsQbU5R74qsQAdeXfKVre8nCVbx3VuiuVVIso9kBghsKKzudWdjjuyrYG3O6ZQC8hD
+	 nQ4xpKoYf34HE+uCdu0i4FdTiVGFsbOxCH7Pkq6NiccksQcy/Y+YSYWObp3XRMs8mM
+	 C7uTMURqqWgPA==
+Date: Fri, 26 Jun 2026 10:26:06 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: Make kvm_io_bus_get_dev() filter devices by ops
+Message-ID: <aj62LqPZg8yHcDww@kernel.org>
+References: <20260626111344.802555-1-maz@kernel.org>
+ <20260626114635.82A0B1F00A3A@smtp.kernel.org>
+ <86a4shqxsr.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, weilin.chang@arm.com, seiden@linux.ibm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86a4shqxsr.wl-maz@kernel.org>
 
-On Fri, 26 Jun 2026 16:31:50 +0100,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> On Tue, Jun 23, 2026 at 11:41:39AM -0700, Oliver Upton wrote:
-> > KVM's support for hardware descriptor updates has been lacking, owing in
-> > large part to the fact that the most widely available NV2 hardware
-> > actually lacks HAFDBS :)
-> > 
-> > This series brings support for hardware dirty state and table Access
-> > flags to the nested MMU. While KVM uses neither of these features, the
-> > kernel definitely does in the stage-1 page tables. Since there is only
-> > one hypervisor to rule them all, implementing this stuff at stage-2 is
-> > mostly motivated by the desire to enable guest stage-1 :)
-> > 
-> > Implementing dirty state at stage-2 is a bit more challenging than
-> > anticipated, I'm in the middle of seeking a relaxation from Arm that
-> > would make this all architectural. See the last patch for the details.
-> 
-> Hi Oliver,
-> 
-> Haven't read your patchset yet, but in regards to stage-2 dirty-state
-> tracking, there have already been some efforts in the area, also
-> implementing HDBSS and HACDBS in a way of improving performance / reducing 
-> impact of live migration on a system.
+On Fri, Jun 26, 2026 at 01:41:08PM +0100, Marc Zyngier wrote:
+> Gniii... I guess the last option is to bite the bullet and make sure
+> that any filtering occurs with the SRCU lock held. Something like the
+> patch below. Or just move the locking outside of the helper and keep
+> it completely inside the caller.
 
-I'm worried you are reading this series the wrong way. This is mostly
-orthogonal to the whole HDBSS/HACDBS/SLAUA (Super Long And
-Unpronounceable Acronym). Oh wait, you haven't read it yet. Great :-(.
+TBH, I think it makes more sense to have locking done in the caller. We
+already have this precondition for calling the other kvm_io_bus*()
+accessors anyway.
 
-This series is about *implementing* HAFDBS and HAFT in NV. We can't
-rely on the HW setting the AF and DB in the guest's own S2 PTs,
-because these page tables are never live. So we have to do it
-ourselves.
+Then we can drop SRCU once we've gotten down to an object which we know
+has a durable lifetime, e.g. the vgic_its struct is valid down to the
+last reference on struct kvm.
 
-So this has nothing to do with S2 dirty tracking for the purpose of
-migration. The guest could implement its own migration based on that,
-but that has nothing to do with what this series is doing.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
