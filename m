@@ -1,30 +1,32 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C6C3DB640
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 07:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986D43DBD4E
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 07:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782457471; cv=none; b=aY+K4uEizSEu+z1oAhzSMdopTQqFnAF17uBtziQ2VLpLsSsgc622ggNLKMuihrUFQhlHomlHDlpM9SauywFw7iyIOzvqW+sNxvCMtt/7gtPzx7UPtasb8v03VhhUN1tB75uLamTHUpSRCHa0gue6um/XPCkvnqiNRlt2XaI2ZOM=
+	t=1782457473; cv=none; b=ibCTu9gYURs0zaipK1DSmtuh/s9qZdpNXa6jEAOTZiIGWrN1XPjyIYPvgWHRDEF7sgNV5eMjsZYeEVFGL82xZSYmDp0F/rmipl1sRZohRHfV30A2iaIHEq3PYf0cU/IR4nPEvqhwkQIBjxp5zs6hOhfHGrYcXxZEH4ezE/PoCG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782457471; c=relaxed/simple;
-	bh=9u0PClUmtcDiwguXuAJwkqw3OOQe5e2NOIHPVG1YQ+M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W8jHVH2ohaq40YcCKFKRJunqdUjSypbeFiHFBrHRafopvascM1EWpBUvo/6BA+A+qEgA28C8BuIHq2f1bs72rLLL80VkJF9NcCp1tPbkdoNyHt6mxgfshBsKZRHCD4jKzE/5sdIz4G1FoYdbF7XtdmkLuDZ+XtwqeHGyZ/xPZak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LnbxhMR3; arc=none smtp.client-ip=95.215.58.183
+	s=arc-20240116; t=1782457473; c=relaxed/simple;
+	bh=SAkqjx3FMxionq2+L+T2JrGjRWdjtpwoZdgT3M4Zi10=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=t9bGuJih2ZJJW7nxKqvP+s6SxxTq8PXIU7cl2nFP2tapX3rK/eP/D1E2NqZSkNQzAdcjscyPTXgMoSMQIEJc9lM8wnhHBp9gWfFbKFpe1H9pqMauDl4qFYO7kS5tGKfStH8S1lsClplvXpVK7fPrLxII+ucb0bL9duJ6sC1iPfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hPCgWDEo; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LnbxhMR3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hPCgWDEo"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782457467;
+	t=1782457469;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YRQkgtC4Uhvu2LqPQiKXLuJu0xhuDXcZhXVNnsQ0O6o=;
-	b=LnbxhMR3FylYtThbm4iqaBaBsRGZWnICij+qaNP+7xN4EdxTfdAh9mU3pTfOtgt4aC+YOR
-	zoHtX0dKuKrHzoaicfjysrihXa0NV1svV0EXwyr08fcLyvQapHzZIQSzEq/i0Ltce7HEel
-	IoM7Z1rknmAXoFr2zFHA433URCdAFoE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AWikHs3zW6hgIq2xRWQpoHjW3c2rokw3trtL2zxEjlo=;
+	b=hPCgWDEokOqbl5bNj/N1xP3CSIzdkVx1QkpBDBoeSdPTd4IUwLdKHeCkOe7cJWesjhL/iM
+	8OkBHLkzwBXRb4PxP2BXkiF8SEdbYupaCedBtx9PVSLx3h3/mYm9HUVlwqCHdNTrOP78kQ
+	p9d+7NuVMIeEfgKhW1h6hGLeOLUGphs=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -42,9 +44,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 0/8] KVM: arm64: Rework pKVM vCPU state synchronisation
-Date: Fri, 26 Jun 2026 08:04:00 +0100
-Message-Id: <20260626070408.3420953-1-fuad.tabba@linux.dev>
+Subject: [PATCH v3 1/8] KVM: arm64: Extract MPIDR computation into a shared header
+Date: Fri, 26 Jun 2026 08:04:01 +0100
+Message-Id: <20260626070408.3420953-2-fuad.tabba@linux.dev>
+In-Reply-To: <20260626070408.3420953-1-fuad.tabba@linux.dev>
+References: <20260626070408.3420953-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,72 +58,77 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi folks,
+Extract the vCPU MPIDR computation embedded in reset_mpidr() into a
+kvm_calculate_mpidr() inline in sys_regs.h, so it can be computed
+without duplicating the logic. A follow-up series reuses it to reset
+protected vCPUs at EL2.
 
-Changes since v2 [1]:
-  - Sync host state only on trap or SError exits, and move it into a
-    dedicated handle_exit_pkvm_state(). (Vincent)
-  - Collected Vincent's Reviewed-by.
+No functional change intended.
 
-Building on Will's pKVM infrastructure series [2], this series reworks
-how pKVM moves vCPU state between the host and EL2, and stops copying a
-non-protected guest's state on every world switch.
+Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/sys_regs.c | 14 +-------------
+ arch/arm64/kvm/sys_regs.h | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+), 13 deletions(-)
 
-EL2 gains proper primitives for the state it transfers: vCPU lookup
-helpers, and VGIC flush/sync that reduces how much host state EL2
-dereferences. The series also moves some preparatory code (such as sys
-reg access and PSCI helpers) to shared headers and HYP, and implements
-lazy copying of a non-protected guest's register state back to the host
-until the host actually needs it, instead of on every exit.
-
-This is the first of two series moving pKVM vCPU state management to
-EL2. The follow-up completes the job for protected VMs: state
-isolation, PSCI handling at EL2, and the resulting API behaviour.
-
-The series is structured as follows:
-
-  01-04:  Preparatory refactoring (MPIDR, sys reg access, vCPU reset, PSCI
-          helpers) to shared headers and HYP.
-  05:     Host and hypervisor vCPU lookup primitives.
-  06-07:  VGIC: reduce EL2's exposure to host state, add flush/sync primitives.
-  08:     Lazy state sync for non-protected guests.
-
-Based on kvmarm/next (1ee27dacbe5dc).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20260619070719.812227-1-tabba@google.com/
-[2] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
-
-Fuad Tabba (5):
-  KVM: arm64: Extract MPIDR computation into a shared header
-  KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
-  KVM: arm64: Factor out reusable vCPU reset helpers
-  KVM: arm64: Move PSCI helper functions to a shared header
-  KVM: arm64: Implement lazy vCPU state sync for non-protected guests
-
-Marc Zyngier (3):
-  KVM: arm64: Add host and hypervisor vCPU lookup primitives
-  KVM: arm64: Minimise EL2's exposure of host VGIC state during world
-    switch
-  KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
-
- arch/arm64/include/asm/kvm_arm.h     |  12 ++
- arch/arm64/include/asm/kvm_asm.h     |   1 +
- arch/arm64/include/asm/kvm_emulate.h |  79 +++++++-
- arch/arm64/include/asm/kvm_host.h    |   2 +
- arch/arm64/kvm/arm.c                 |   7 +
- arch/arm64/kvm/handle_exit.c         |  23 +++
- arch/arm64/kvm/hyp/exception.c       |  34 +---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 258 +++++++++++++++++++++++----
- arch/arm64/kvm/psci.c                |  30 +---
- arch/arm64/kvm/reset.c               |  60 +------
- arch/arm64/kvm/sys_regs.c            |  14 +-
- arch/arm64/kvm/sys_regs.h            |  19 ++
- include/kvm/arm_psci.h               |  27 +++
- 13 files changed, 403 insertions(+), 163 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 33c921df19b54..674fabe1d40d1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -976,21 +976,9 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 
+ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+-	u64 mpidr;
++	u64 mpidr = kvm_calculate_mpidr(vcpu);
+ 
+-	/*
+-	 * Map the vcpu_id into the first three affinity level fields of
+-	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
+-	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
+-	 * of the GICv3 to be able to address each CPU directly when
+-	 * sending IPIs.
+-	 */
+-	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+-	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+-	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+-	mpidr |= (1ULL << 31);
+ 	vcpu_write_sys_reg(vcpu, mpidr, MPIDR_EL1);
+-
+ 	return mpidr;
+ }
+ 
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 2a983664220ce..bd56a45abbf9c 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -222,6 +222,25 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
+ 	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+ }
+ 
++static inline u64 kvm_calculate_mpidr(const struct kvm_vcpu *vcpu)
++{
++	u64 mpidr;
++
++	/*
++	 * Map the vcpu_id into the first three affinity level fields of
++	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
++	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
++	 * of the GICv3 to be able to address each CPU directly when
++	 * sending IPIs.
++	 */
++	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
++	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
++	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
++	mpidr |= (1ULL << 31);
++
++	return mpidr;
++}
++
+ const struct sys_reg_desc *get_reg_by_id(u64 id,
+ 					 const struct sys_reg_desc table[],
+ 					 unsigned int num);
 -- 
 2.39.5
 
