@@ -1,57 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFA92C0299;
-	Fri, 26 Jun 2026 13:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D89330D3FA
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 13:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782480939; cv=none; b=ocOKd5lxhCxxL1Qs4jiMmoSSbG+rKNM7BPam/hj0xp2WHuDmGo/cYcCnEB0Zhi9OXlJHRFbSu4wIhTrXTa45VgJopdxjDRvtBmt8kJZgl/GpHDLSjZxpGQ23y45SQexkHwWu7gll17oRuABjbLaql0CcvJwub+2gEVdwq2j2NDc=
+	t=1782481350; cv=none; b=d1l6bNYOkZws4e54kfBKLm6NDXq0lWSSHABDFnt+BsclqgN4rulTSjaIyJfCi5wT14M4VdVfEIhz4ewXLx930RGhm6qoCyEMNWXA2ueYvOB/CPii/bagVKP9kF/kIksacQXz+cuC3iLIdpKFNlBnPvqukCQCewKnJUdXySFDUHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782480939; c=relaxed/simple;
-	bh=kxzTDbHkEr6q+G5Bg7xpP9Sz4lyuVpfrnGtN6pLP2Bs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cu1YwyeP+Rn575zJX9chIQkNB7pqnEstvnUi5sMQT8Sx69aNjkxVMWYtVl2s9IAwLse6tpX5HoduQZVftCqKJ+kZjpObYEdYskIIYZM9JmCum6TcrHfzFjnixtOkUxTbsqWSWvxnyX2xAd6fkBhnb2ifF0BEGghV5At4GeQTKGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMeT0S1S; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782481350; c=relaxed/simple;
+	bh=NCklkokdvmbYOYomiBZQpm3ulDs/oMA5t4gf7jJtFIU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UviEt/K4sRM04qnEyK9qKLWc+8ubYMQ57e5erOYZ7BJJqrtKmJZhBjWzL5jQngL62b8AhhBwGPt2gT3riQvF2YzfM8q5w8kUBd6jhyHYRcCBnCBUpAgMmQ6hVBbmqbel5LG+eu5ibGQryIrQuKtvj2ZXBhdAUrHvd2RMzA8VW9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReXAkXRD; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMeT0S1S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED28B1F000E9;
-	Fri, 26 Jun 2026 13:35:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782480938;
-	bh=NzHNiZRJs/ug1E3IvLOYIVWeeI5eXvwckhLoUOrOafc=;
-	h=From:To:Cc:Subject:Date;
-	b=VMeT0S1SvqLatI/IwMpCTMXnqFFBPetfizCnvFuQZvF9X2oV6NsBlc8otnciskJ7d
-	 DmNVg/W6U4lrOQdbceCKtUGpvtFWXu26YXitkFfqWlHbd2a0dx1fjEpKpNk2DygS7f
-	 YpgzuqzwwQWIHeWSTu0nYlIG6Oo8DKm8g8k+JZias+t0haj2M6qzxXr5E6C3rz8yrU
-	 DIEQLOuKqJdvJCUR2GQUG8icS+Cz9VM3949Oy6ga6wWJ/VxJ13Qiu63jPsKdznBIk6
-	 T+9qCI8OMnE0Kl2SxClS3up52kDWYpoJRb/spn3gNoCFg+JJFrryiIuDV+oh9g5sYB
-	 J3dWlP/o9k95g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wd6iV-0000000GLsv-1HwZ;
-	Fri, 26 Jun 2026 13:35:35 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Bradley Morgan <include@grrlz.net>,
-	Fuad Tabba <tabba@google.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Weiming Shi <bestswngs@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	Xuanqing Shi <shixuanqing.11@bytedance.com>,
-	Zhong Wang <wangzhong.c0ss4ck@bytedance.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReXAkXRD"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5aa624ff3cbso895126e87.3
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 06:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782481347; x=1783086147; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M7qA3QCgngkwupOanC4fj5zvyRgNy6GXvi+NFYgoU0Q=;
+        b=ReXAkXRDykaDpvgAYWbCYoEVONzJe7Uwxdu/EmPCj9WRoNkKWphZG/v7hNNBlhL6RL
+         J5t9cFD332b5WdjFY4KJPi4l+jzPfl+RdJicCmg3OlNHq5GYoNcMIiuhd8FBsn5LDI4T
+         tMC6zKgKVIpJrmUIrHYBRVHumYDH3jIqqb2MVuunDLrXMupvMn0QpEx9+y58yFy3TJqa
+         5lyngcahka+8s/HtPPxaq5yqK0/1fvUSUNoBppQkrpRfI1oA4dBrQ8OJEV0oorb76hjO
+         nZROtUR6FEuUbzzHm4fF/+ep4+xOPcg3AabDX93XjjqU52QFiySx/n59gLpmpejMtH/T
+         N9MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782481347; x=1783086147;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M7qA3QCgngkwupOanC4fj5zvyRgNy6GXvi+NFYgoU0Q=;
+        b=DpWBf+wwxBxKl0Hf5jZ8otRtl4M44OZlLmpiRizQ/dPiTV/84tWEkjdIzBbqQeGMFT
+         wmuO/rrFV1X4+6xJXGMMdGbCwbpD1q95PWZjc//Q88mJ+bSN00YSLM0O9SZgqmtylAK5
+         u8vtcv2k3qkd3Amxmp89h/z1m7qNJ/R7MFUET8uz2x++8jtTEmiI+zMk4oQdQbakUKdf
+         1pqzZzn/MK7lkO66q3A+gRCCnDq3uzuqP62nHiAwoJ4CBvgYiN/vmpJV7ovigObiUyy4
+         xI6KfEQiRJFKrF/7d/iBDAhP0IsI1WbY69fYhuYsh0oMdjW1iw6B6WLYiPqk9hk8lE92
+         0bsA==
+X-Forwarded-Encrypted: i=1; AHgh+Ror6cicg5GXw41U11Y6yC5Y5+aIrUdylxKWBkIYEJ+qWY3YziYZZimEARdCXCi99oREpmGaGKU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyLKadgwTgg/Sa0fY+JetXNWebx3t48kHgBMsU+ZVclmk+6bFd6
+	1DsiWPIGnB+Hxl2oSVdg/AvwpgmGsRMRqJq7YRsMDg1sJm+j6/bjQj0q
+X-Gm-Gg: AfdE7cnV1OEw7WsajmCbDdHaTIQUYC8rFJeiIhFEaLpmYq9Q4O85KgF7VnJzgIlObbS
+	zgFrtu/WDPWGzgly2XqjAdv6T9yzFCgKlO2Cs+iwUWRLfyfWfh4Vugvag+HXUa1Hc/KLOP9y8Uf
+	DCo3mv3sEfr4poKtJo3VEaSaMwK0JOHdZpUC7HN0tndAIgHGTbVLG8t26PowmqPaHtO7rTkvdqT
+	eZywRWMhuqnOyMYaAj3cgGbjPT4RgdPMm6h5RqJRRpb76OvL1HaCfmJn7AyXtyrHiBsooIaAGJs
+	JhS5eXzHPf7m9W43eT0OMEqVie1raj1NxSDrhgk1ZMyudV9dQeavsBeXdio+W1jyovSzUODLd27
+	puLIBTBw+PsyeEo8MVaW2N21fSfcLoFWM/lpbaFButvTEi4+SEfMg02DFj+7Ac+rRSRRAIKD5nl
+	zRbPTK5xCq2PhHa9ba4JOqtZTC6jaX
+X-Received: by 2002:a05:6512:2521:b0:5aa:68cd:8367 with SMTP id 2adb3069b0e04-5aea1f51f08mr1686486e87.37.1782481347149;
+        Fri, 26 Jun 2026 06:42:27 -0700 (PDT)
+Received: from grower.astra-academy.ru ([185.32.135.49])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad69580fcbsm3476839e87.67.2026.06.26.06.42.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2026 06:42:26 -0700 (PDT)
+From: Alexander Martyniuk <alexevgmart@gmail.com>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Alexander Martyniuk <alexevgmart@gmail.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 7.2, take #1
-Date: Fri, 26 Jun 2026 14:35:26 +0100
-Message-ID: <20260626133526.817232-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Hyunwoo Kim <imv4bel@gmail.com>
+Subject: [PATCH 6.12] KVM: arm64: Take the SRCU lock for page table walks in fault injection and AT emulation
+Date: Fri, 26 Jun 2026 16:42:07 +0300
+Message-ID: <20260626134210.228892-1-alexevgmart@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,109 +83,46 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, include@grrlz.net, tabba@google.com, imv4bel@gmail.com, oupton@kernel.org, bestswngs@gmail.com, will@kernel.org, shixuanqing.11@bytedance.com, wangzhong.c0ss4ck@bytedance.com, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+From: Hyunwoo Kim <imv4bel@gmail.com>
 
-As predicted, here's another largeish set of fixes for KVM/arm64. A
-bunch of them are fairly benign (the PSTATE.IL stuff), but some are
-pretty annoying (vgic, MOPS) and are stable material.
+commit f2ca45b50d4216c9cc7ffabf50d9ad1932209251 upstream.
 
-On the bright side, Fuad has volunteered to be an official reviewer.
-We really need people to engage with the reviewing process instead of
-simply dumping patches on us, as me and Oliver really can't be
-stretched much further. So many thanks Fuad for offering to help.
+walk_s1() and kvm_walk_nested_s2() expect to be called while holding
+kvm->srcu to guard against memslot changes. While this is generally
+the case, __kvm_at_s12() and __kvm_find_s1_desc_level() call into the
+respective walkers without taking kvm->srcu.
 
-I expect to be back next week with a similar delivery, as my Inbox
-keeps filling with this stuff...
+Fix by acquiring kvm->srcu prior to the table walk in both instances.
 
-Please pull,
+Cc: stable@vger.kernel.org
+Fixes: 50f77dc87f13 ("KVM: arm64: Populate level on S1PTW SEA injection")
+Fixes: be04cebf3e78 ("KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}")
+Suggested-by: Oliver Upton <oupton@kernel.org>
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+Reviewed-by: Oliver Upton <oupton@kernel.org>
+Link: https://patch.msgid.link/aiAZfdeyanIvP8SD@v4bel
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+[Alexander: __kvm_find_s1_desc_level() not present, patching only __kvm_at_s12()]
+Signed-off-by: Alexander Martyniuk <alexevgmart@gmail.com>
+---
+ arch/arm64/kvm/at.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-	M.
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 39f0e87a340e..8192bc0bbc87 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -1087,7 +1087,8 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	/* Do the stage-2 translation */
+ 	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+ 	out.esr = 0;
+-	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
++	scoped_guard(srcu, &vcpu->kvm->srcu)
++		ret = kvm_walk_nested_s2(vcpu, ipa, &out);
+ 	if (ret < 0)
+ 		return;
+ 
+-- 
+2.43.0
 
-The following changes since commit 1ee27dacbe5dc4def481794d899d67b0d4570094:
-
-  Merge branch kvm-arm64/nv-mmu-7.2 into kvmarm-master/next (2026-06-12 09:29:34 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-7.2-1
-
-for you to fetch changes up to d098bb75d14fde2f12155f1a95ec0168160867ce:
-
-  KVM: arm64: account pKVM reclaim against the VM mm (2026-06-22 10:48:08 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 7.2, take #1
-
-- Fix an accounting buglet when reclaiming pages from a protected
-  guest
-
-- Fix a bunch of architectural compliance issues when injecting a
-  synthesised exception, most of which were missing the PSTATE.IL bit
-  indicating a 32bit-wide instruction
-
-- Another set of fixes addressing issues with translation of VNCR_EL2,
-  including corner cases where the guest point that register at a RO
-  page...
-
-- Don't warn when trapping accesses to ZCR_EL2 from an L2 guest, as
-  that's not unexpected at all
-
-- Address a bunch of races with LPI migration vs LPIs being disabled
-
-- Fix a total howler of a bug combining FEAT_MOPS and NV, resulting in
-  exception returning in the wrong place...
-
-- Coerce Fuad Tabba into a reviewer role, and may his Inbox catch
-  fire!
-
-----------------------------------------------------------------
-Bradley Morgan (1):
-      KVM: arm64: account pKVM reclaim against the VM mm
-
-Fuad Tabba (11):
-      KVM: arm64: nv: Write ESR_EL2 for injected nested SError exceptions
-      KVM: arm64: Sync SPSR_EL1 when injecting an exception into a pVM
-      KVM: arm64: nv: Fix PSTATE construction on illegal exception return
-      KVM: arm64: Add Fuad Tabba as a reviewer
-      KVM: arm64: Set ESR_ELx.IL for injected undefined exceptions at EL2
-      KVM: arm64: Unconditionally set IL for injected undefined exceptions
-      KVM: arm64: Unconditionally set IL for injected abort exceptions
-      KVM: arm64: Set IL for injected FPAC exceptions during ERET emulation
-      KVM: arm64: Set IL for emulated SError injection
-      KVM: arm64: Set IL for nested SError injection
-      KVM: arm64: Set IL in fake ESR for pKVM memory sharing exit
-
-Hyunwoo Kim (1):
-      KVM: arm64: vgic: Check the interrupt is still ours before migrating it
-
-Marc Zyngier (1):
-      KVM: arm64: vgic: Handle race between interrupt affinity change and LPI disabling
-
-Oliver Upton (6):
-      KVM: arm64: nv: Drop bogus WARN for write to ZCR_EL2
-      KVM: arm64: nv: Respect read-only PFN when mapping L1 VNCR
-      KVM: arm64: nv: Inject SEA if kvm_translate_vncr() can't resolve PFN
-      KVM: arm64: nv: Re-translate VNCR before injecting abort
-      KVM: arm64: nv: Inject SEA if guest VNCR isn't normal memory
-      KVM: arm64: nv: Mark VM as bugged for unexpected VNCR abort
-
-Weiming Shi (1):
-      KVM: arm64: nv: Fix SPSR_EL2 restore in kvm_hyp_handle_mops()
-
- MAINTAINERS                             |   1 +
- arch/arm64/include/asm/kvm_nested.h     |   8 ++
- arch/arm64/kvm/at.c                     |   8 --
- arch/arm64/kvm/emulate-nested.c         |  37 +++++--
- arch/arm64/kvm/hyp/include/hyp/switch.h |  11 ++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |   3 +-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c      |   3 +-
- arch/arm64/kvm/inject_fault.c           |  18 +---
- arch/arm64/kvm/nested.c                 | 164 ++++++++++++++++----------------
- arch/arm64/kvm/pkvm.c                   |   2 +-
- arch/arm64/kvm/vgic/vgic.c              |  20 ++--
- 11 files changed, 149 insertions(+), 126 deletions(-)
