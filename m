@@ -1,110 +1,250 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0F9361670;
-	Fri, 26 Jun 2026 08:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7132EB859;
+	Fri, 26 Jun 2026 08:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782463693; cv=none; b=DrRBMjvFQJ7yu7r6z1aW1Noe0/w5ciGkzHe4B/PHMXOk1zZECp0SiSkGIvxJRqxKLGI5ast6juQJWvSwHb1sI74suqmKCwUOT6fzuJK6J7PJLbq/LUhrAo8G9JL5MI5xxcTBusVy3//GIdfFvYU/2BeJ4SHc6HOTijCXq8RnsrY=
+	t=1782463995; cv=none; b=t6oLeug9aisy6j0DLhSNWFoQ4LwTpBgyAkbak3AlSIiHPZppzDv4sBKFHMY4Sz46u+zPjR4ZHoSfl11wqAU3bq6niTUl5Ed0Y468idmV2e5NaPlGIyKQuVcMWQ1ZfSV46VYH9TM5vaE5C2vTw2HlQuWHu2gm6TM5BSyc/m71HEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782463693; c=relaxed/simple;
-	bh=97Pgkq6adF67eZdz/+XepyKwUN1XtS5Xtm1EzLtTGRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rPI9Ha2zPtW+2gpkEJfUY0IA+ctLwvBtOJL0lclkp+HNgx6OURJIZWwECUYO10tk5jJ0OisC1GM0ocqlv/yG9QN9oCxEYSwrVrvFA/PX2JCwvEsKWW/5qhPK+ZHyvS3H59zpt3sIDMB2F3a8vSMLRFvPGDrdiY/gfCyt1Oso/c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hQr5S+RC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=D6m8j1DR; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1782463995; c=relaxed/simple;
+	bh=p9vOkbqaBZi9cvX5i54t8dgEDQi2LWFk1zzsZEJpODY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pHnvLJZm4EfC3rjg0BRrYgkDy+B4pNx+8ozM+0V8ydrhBkT50Yl9t09VJrPOg4FIuWLYHDxrxWRFLBx3zjWYLa5B+cQIMZdPFds7qUz2q9LEyfXnhi8t8mZcdlvMDEXUqfarXBRZLqJHzIufc1BsEynnU2+pGDOu8Qwrl4PsrK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JQR2Jx0O; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hQr5S+RC";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="D6m8j1DR"
-Date: Fri, 26 Jun 2026 10:48:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1782463690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jbME+aYeChhw+njOkhtdnmfsmFO39c1xH0hF4mprHBM=;
-	b=hQr5S+RC2eRu9S7NHE1xnWBkLxwZkglNFbDx5aO6m5GZfiSMwzlDvaLNYkvMGqGzWObkWm
-	nJ5Q6UcCzmXM19h3lnPwu/EKVAS9FgM6RrtWQUpG7k4/miKl7gYJVeFLHMxGZxfQ9A0u9G
-	JoUlnEIh80X7iKXX0O+1UJ1lgxNNA2G2i7n8UDaxZlZ9Dn/U6zRKFztWMHYRozmLY5Cm5A
-	99uacM0NSvo3kIxVhcUnYKfAMADdqM2wn6U31oHVUDI/a/adBoPlDLNJLGiZk3nO6XGqlC
-	KeATqSn4FHIP+jBEQCRLH88ET1rtP17IlX7gI9f/X/BT7N61yaKTVUhUdYRupg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1782463690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jbME+aYeChhw+njOkhtdnmfsmFO39c1xH0hF4mprHBM=;
-	b=D6m8j1DRWFTBXmKkTp+cYL8Y9jVp9/66ve3/uCPppAIq2JFT4eWs4ARh8Txa2F8tD2YPCf
-	29ptwSplT1ImBsBQ==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, 
-	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
-	Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, 
-	linux-sound@vger.kernel.org
-Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
- ktime_get_snapshot_id()
-Message-ID: <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
-References: <20260526165826.392227559@kernel.org>
- <20260526171223.374814973@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JQR2Jx0O"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F1752247;
+	Fri, 26 Jun 2026 01:47:13 -0700 (PDT)
+Received: from [10.57.28.79] (unknown [10.57.28.79])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D819B3F905;
+	Fri, 26 Jun 2026 01:47:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782463638; bh=p9vOkbqaBZi9cvX5i54t8dgEDQi2LWFk1zzsZEJpODY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JQR2Jx0OWyoQ0O6coNwSG0GeGJhuSAJTr/ID0QDqM9rD++MHxvkPahYtcDC8vrT1I
+	 CArES9Vov5l7eK0s/nZuq8ROmyxo6kDWjlW1se5CL/5VQKBPapEeN0uyQrUcZj6FIZ
+	 gwXB8AZmlEq2CJhAq6Xy5+g4TdrbgoOcm5UrJ5yQ=
+Message-ID: <9482dfbc-4d96-47ba-a615-f4ba0bda833f@arm.com>
+Date: Fri, 26 Jun 2026 09:47:13 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260526171223.374814973@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 29/44] arm64: RMI: Runtime faulting of memory
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
+ <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo.Pieralisi2@arm.com
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <20260513131757.116630-30-steven.price@arm.com>
+ <3359f788-07fa-41a1-9ac7-45c58577c1fa@redhat.com>
+ <aiJ6u83O0nVUtPyv@lpieralisi>
+ <ecef952b-e8c6-4102-933b-c99c46f14431@redhat.com>
+ <aiLes2ecZSr17UwZ@lpieralisi>
+ <1e39094f-7fa3-4ef1-be54-53d7a8643506@redhat.com>
+ <98d2a0f3-b831-466a-8212-5bcf97ad9d8b@arm.com>
+ <8da87878-2a5d-478a-a280-60dbed7ad1b9@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <8da87878-2a5d-478a-a280-60dbed7ad1b9@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
-(...)
-
->  static inline void tk_update_aux_offs(struct timekeeper *tk, ktime_t offs)
-> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
->  		tkd = &tk_core;
->  		offs = &tk_core.timekeeper.offs_boot;
->  		break;
-> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
-> +		tkd = aux_get_tk_data(clock_id);
-> +		if (!tkd)
-> +			return false;
-> +		offs = &tkd->timekeeper.offs_aux;
-> +		break;
-
-'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr_mono'
-are the same for auxilary clocks, so this will compute a wrong 'monoraw'.
-Instead 'monoraw' should be computed based on 'tk_core'.
-Which then also requires the sequence locking of 'tk_core'.
-
-As you know I have a series which unifies the locking between the
-different timekeepers. Maybe we revert this patch for 7.2 and I send
-a fixed variant including the prerequisites for 7.3.
-
-(The same goes for get_device_system_crosststamp())
-
->  	default:
->  		WARN_ON_ONCE(1);
->  		return false;
-> @@ -1228,6 +1239,10 @@ bool ktime_get_snapshot_id(struct system
->  	do {
->  		seq = read_seqcount_begin(&tkd->seq);
->  
-> +		/* Aux clocks can be invalid */
-> +		if (!tk->clock_valid)
-> +			return false;
-> +
->  		now = tk_clock_read(&tk->tkr_mono);
->  		systime_snapshot->cs_id = tk->tkr_mono.clock->id;
->  		systime_snapshot->cs_was_changed_seq = tk->cs_was_changed_seq;
+On 26/06/2026 08:43, Gavin Shan wrote:
+> On 6/26/26 1:58 AM, Suzuki K Poulose wrote:
+>> On 25/06/2026 14:53, Gavin Shan wrote:
+>>> On 6/6/26 12:35 AM, Lorenzo Pieralisi wrote:
+>>>> On Fri, Jun 05, 2026 at 06:11:11PM +1000, Gavin Shan wrote:
+>>>>> On 6/5/26 5:28 PM, Lorenzo Pieralisi wrote:
+>>>>>> On Fri, Jun 05, 2026 at 04:23:15PM +1000, Gavin Shan wrote:
 > 
+> [...]
+> 
+>>>>>
+>>>>> I tried to rebase Jean's latest QEMU series [1] to upstream QEMU, 
+>>>>> and found
+>>>>> that memory slots backed by THP are broken. With THP disabled on 
+>>>>> the host and
+>>>>> other fixes (mentioned in my prevous replies) applied on the top of 
+>>>>> this (v14)
+>>>>> series, I'm able to boot a realm guest with rebased QEMU series 
+>>>>> [2], plus more
+>>>>> fxies on the top.
+>>>>>
+>>>>> [1] https://git.codelinaro.org/linaro/dcap/qemu.git  (branch: cca/ 
+>>>>> latest)
+>>>>> [2] https://git.qemu.org/git/qemu.git                (branch: cca/ 
+>>>>> gavin)
+>>>>>
+>>>>> Lorenzo, You may be saying there is someone making QEMU to support 
+>>>>> ARM/CCA?
+>>>>
+>>>> Mathieu and I are working on that yes and with Steven/Suzuki to fix 
+>>>> the THP
+>>>> issues you pointed out above.
+>>>>
+>>>>> If so, I'm not sure if there is a QEMU repository for me to try?
+>>>>
+>>>> We should be able to submit patches by end of June - we shall let 
+>>>> you know
+>>>> whether we can make something available earlier.
+>>>>
+>>>
+>>> Not sure if there are other known issues in this series. It seems the 
+>>> stage2
+>>> page fault handling on the shared space isn't working well. In my 
+>>> test, the
+>>> vring (struct vring_desc) of virtio-net-pci is updated by the guest, 
+>>> and the
+>>> data isn't seen by QEMU, I'm suspecting if the host-page-frame-number 
+>>> is properly
+>>> resolved in the s2 page fault handler for shared (unprotected) space.
+>>>
+>>> - I rebased Jean's latest qemu branch to the upstream qemu;
+>>>
+>>> - On the host, which is emulated by qemu/tcg, the THP (transparent 
+>>> huge page) is
+>>>    disabled.
+>>>
+>>> - On the guest, I can see the virtio vring (struct vring_desc) is 
+>>> updated. The
+>>>    S1 page-table entry looks correct because the corresponding 
+>>> physical address
+>>>    0x10046880000 is a sane shared (unprotected) space address.
+>>>
+>>>    [   52.094143] software IO TLB: Memory encryption is active and 
+>>> system is using DMA bounce buffers
+>>>    [   52.289746] virtqueue_add_desc_split: 
+>>> desc[0]@0xffff000006880000, [00000100b983f000  00000640  0002  0001]
+>>>    [   52.432150] PTE 0x00e8010046880707 at address 0xffff000006880000
+>>>
+>>> - On the host, the s2 page-table-entry is unmapped due to attribute 
+>>> transition (private -> shared).
+>>>    A subsequent S2 page fault is raised against the adress and the s2 
+>>> page-table-entry is built.
+>>>
+>>>    [  109.259077] ====> realm_unmap_shared_range: 
+>>> tracked_unprot_addr=0x10046880000
+>>>    [  109.260249] realm_unmap_shared_range: unmapped shared range at 
+>>> 0x10046880000
+>>>    [  109.317786] realm_unmap_shared_range: unmapped shared range at 
+>>> 0x10046880000
+>>>    [  109.629939] ====> kvm_handle_guest_abort: 
+>>> fault_ipa=0x10046880000, esr=0x92000007
+>>>    [  109.630245] realm_map_non_secure: ipa=0x10046880000, 
+>>> pfn=0xb8b59, size=0x1000, prot=0xf
+>>>    [  109.630331] realm_map_non_secure: ipa=0x10046880000, 
+>>> ipa_top=0x10046881000, flags=0x1e0001, range_desc=0xb8b59004
+>>
+>> Are you able to correlate the order of the transitions and the Guest
+>> access with RMM log ? We haven't seen this from our end. We are aware
+>> of permission fault issues with Unprotected IPA when backing the memslot
+>> with MAP_PRIVATE areas. But this looks different.
+>>
+>> Lorenzo, have you run into this ?
+>>
+> 
+> It's hard to correlate the order since the logs are collected from two 
+> separate
+> consoles. For the write permission, I add code to the host where the 
+> permission
+> is always added for all s2 page faults in the shared space. Otherwise, 
+> qemu can
+> be killed by -EFAULT or similar error.
+
+This is the problem. We can't add WRITE permission by default. I believe
+you may have MAP_PRIVATE mapping and it has to be mapped as READ only
+and on a permission fault, we replace it with a writable page. By
+overriding the WRITE permission, you let the guest write to a page
+that may not be seen by the VMM.
+
+We identified this as a bug in the KVM driver in this series (reported
+by Lorenzo) and there is a corresponding tf-RMM change that is required
+to get this working. So, please could you wait until the next series
+when this will be addressed ? Or you could switch to using MAP_SHARED
+for the "shared" memory in the memslot.
+
+
+Suzuki
+
+
+> 
+> There are more findings after more experiments: this virtio-net-pci 
+> device has 3
+> queues or vrings (Rx/Tx/Ctrl). The Rx/Tx/Ctrl queue are populated in 
+> order one after
+> one. In the guest kernel, I intentionally write fixed data 
+> (0x0123456789abcdef) to
+> the first 8 bytes of the queue when it gets populated, and stop the 
+> guest at random
+> points to see if the data is gone. I found that the data written to Rx/ 
+> Tx queue are
+> lost after Ctrl queue is allocated.
+> 
+> The data written to Rx/Tx queue is lost if the guest stops (B). The data 
+> written to
+> Rx/Tx queue isn't lost if the guest stops at (A). I can see the pattern 
+> (0x0123...cdef)
+> by dumping the physcial memory through 'pmemsave' command in qemu.
+> 
+> DMA allocation
+> ==============
+> dma_alloc_coherent
+>    dma_alloc_attrs
+>      dma_direct_alloc
+>        __dma_direct_alloc_pages
+>        dma_set_decrypted                    // (A) No data lost if being 
+> stopped here for the Ctrl queue
+>        memset(ret, 0, size)                 // (B) Data lost after being 
+> stopped after memset() for the Ctrl queue
+> 
+> The memset() on the Ctrl queue should trigger a stage2 page fault. It 
+> seems the page
+> fault enforces the shared pages for Rx/Tx queue to be dropped? I need to 
+> add more
+> debugging code and track it down.
+> 
+>> Suzuki
+>>
+>>
+>>>
+>>> - On QEMU, the updated vring (struct vring_desc) at GPA 0x46880000 
+>>> isn't seen. All the
+>>>    data in that adress are zeros.
+>>>
+>>>    ====> virtqueue_split_pop: vdev=<virtio-net>, sz=0x38, 
+>>> queue_index=0x0, vq->vring.num=0x100
+>>>    virtqueue_split_pop: last_avail_idx=0x0, head=0x0
+>>>    address_space_read_cached_slow: cache@0xffff1c036440, addr=0x0, 
+>>> buf=0xffffeee34880, len=0x10
+>>>    address_space_read_cached_slow: cache: ptr=0x0, 
+>>> xlat=0x10046880000, len=0x1000, mrs=<realm-dma-region>, is_write=no
+>>>    address_space_read_cached_slow: translated to mr=<mach-virt.ram>, 
+>>> mr_addr=0x6880000, l=0x10
+>>>    flatview_read_continue_step: mr=<mach-virt.ram>, 
+>>> host=0xffff23e00000, mr_addr=0x6880000, ram_ptr=0xffff2a680000
+>>>    virtqueue_split_pop: desc: 0000000000000000 - 00000000 - 00000000 
+>>> - 00000000
+>>>    qemu-system-aarch64: virtio: zero sized buffers are not allowed
+>>>
+>>>
+> Thanks,
+> Gavin
+> 
+
