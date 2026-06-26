@@ -1,45 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11197149C6F;
-	Fri, 26 Jun 2026 21:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634E1372063;
+	Fri, 26 Jun 2026 21:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782510250; cv=none; b=bXP8seflD37Vkz5FvjRHwg1jnWtr941sVdHHOdHrA5PVuOyqjuMt/gAxcb8pHCrxfwI+VG0CRY5cpb78okY44rhzcogyE4tYhs+Dqkgtznsb1hn0PCYMv20UQL9oJJjpNl/DPV+gv94WTIA5s5YKJO8YRDHn//fxFTSYPa0spsc=
+	t=1782510286; cv=none; b=KpnDINO5hcDzpH8QmcX6SmrSdjQAB1AvGLcy6oj53/Klam7PAUkmAJU6b7KNDD+eK2XSTHi8Hejhl2+dOCFsHsrIarMosZy3FAnxcnSIlXros4uGoAbpZjzy8HHuv2aLH+GBthsyb5hZtDCyyZruKbcuFC4GvteVoSoTRX8GKBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782510250; c=relaxed/simple;
-	bh=fkgk6kTXgkW0J8FpjxZiqSzT1HvzM8QdDEDgho5sgDM=;
+	s=arc-20240116; t=1782510286; c=relaxed/simple;
+	bh=TMfdYLWa6jHJIP4gqNPJcB43oRhnDCqgw8DULZPcChc=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=TfLFU5EXhxaLC7w9MmpXdmB6UsrcCoOJU1Rv7ee1D7c0XtRW44c6/SbBP9YloD0UEs6RbVabW78wE8J8BAlSX2ldYTRR8N5Ix/Ye0OzMyycVeROqka8w+omTiPIYiH1D7BqYHSRUrITl9kKQ3C7KcSjs5VG0cThv84/7QFJGhr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lW/cPbOL; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=UCDGj6FS+6nHFAW+4CFstAyCCgBLvK5GTZifnXFO8MsjAPI3FtYsRSry0BCIQo9oZk6aBR1r50v4NQeMJ4PD5N/QQ6z/XRzjdvj/v6jrWfK7bBSZshV+zvY0znsExYHbw3znkq8T8GGnERHHZWccmOY27kjdlBedKWcb13EppS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+cygxuN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lW/cPbOL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370E01F000E9;
-	Fri, 26 Jun 2026 21:44:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+cygxuN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C52711F000E9;
+	Fri, 26 Jun 2026 21:44:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782510248;
-	bh=xYd53HsDuusi1nLJxxqqcbrQuItKKQC97tAzWhJQcaM=;
+	s=k20260515; t=1782510285;
+	bh=yUjwzxR9D3gk8N0nZW0RzZjaqCR4SW8ZFywmKyRYiZA=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=lW/cPbOLxnZRx4SNd2WEOFiQ4z+tIv8MWsCwnZrHtW03hhUTzG2knSX8RRjxDeUED
-	 K8/6a/DLoxI+2TDQFwSYw9YTlhnnJURu+B3Ycga/UwdJgOfKngRL2pj2QlmQ4xDTNB
-	 VtwnEa/traF+vy8I9qsP+fbCAbUOR0MiX+6DILf7KUVm1bzrP6kA7QNkBny3VrcAMo
-	 SbIdtUBhTJywdJ3sw93aLdeWEBU7LiKzurjYH1Eve2I7VIiD9BFaEFyKy6Xdu2+UB1
-	 UmXyEIqdnavZWMCRJf+pYhtDc9jyOK8OU/gCisXKjkssU/UWAG2BaS4c9WgVKmSqiX
-	 IrwsK/koFTRow==
+	b=C+cygxuNWZGrH9SOdD6atPYapiuwtiJEiL/8CEksuqLQwtJDSOXTq+wbcZia7ehtm
+	 vn8fG591w1ClOr1HhlE76sbkumRq0h+Fznb2azGlmBFNnvhTkWjp6MOrZTfP4M+6if
+	 VnoUp/8XsOwmgDngnKVFe+A5rUD+90sD8S+x/HbZ19/28ooTJpg2ZTHRVR5UP0/+Wr
+	 cb4eHdHb+F4Iu8/a0G7oZzBNsT2iqsFu7XkA2/0iSh8BP1eK4AXqvSWPIOnqTpVRvO
+	 YeHJLOL53YxjV4WizYiwT888/WNurHx4+JDCltcwFC39wNDdyUoNX/aVVlbQf4N8QS
+	 kdnWrHUDZoMHA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 01/20] KVM: selftests: Build and link
- selftests/vfio/lib into KVM selftests
+Subject: Re: [PATCH v8 06/20] KVM: selftests: Add helper to generate random
+ u64 in range [min,max]
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sean Christopherson" <seanjc@google.com>
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260626213534.3866178-2-seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260626213534.3866178-7-seanjc@google.com>
 References: <20260626213534.3866178-1-seanjc@google.com>
- <20260626213534.3866178-2-seanjc@google.com>
+ <20260626213534.3866178-7-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Jun 2026 21:44:07 +0000
-Message-Id: <20260626214408.370E01F000E9@smtp.kernel.org>
+Date: Fri, 26 Jun 2026 21:44:44 +0000
+Message-Id: <20260626214444.C52711F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,47 +48,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Low] The use of `dirname` with multiple arguments in `libvfio.mk` is a G=
-NU-ism that breaks the build on POSIX/BSD systems.
+- [Medium] kvm_random_u64() never sets bits 31 and 63, causing kvm_random_u=
+64_in_range() to have severe blind spots.
 --
 
-commit 070d3095b74eed8d9c8207b3141eb0bb2449cb39
-Author: David Matlack <dmatlack@google.com>
+commit 5a3dcffb3cb35a622072ea5194b7875f774cb3a7
+Author: Josh Hilke <jrhilke@google.com>
 
-KVM: selftests: Build and link selftests/vfio/lib into KVM selftests
+KVM: selftests: Add helper to generate random u64 in range [min,max]
+   =20
+Introduce kvm_random_u64_in_range(state, min, max) to return a random u64=20
+within an inclusive range.
 
-This commit includes libvfio.mk into the KVM selftests Makefile and links it
-into all KVM selftests by adding it to LIBKVM_OBJS. This lays the groundwork
-for future changes to utilize VFIO devices to verify IRQ bypass in KVM
-selftests.
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/=
+selftests/kvm/lib/test_util.c
+> index e98ca7ef439c4..e208a57f190cf 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+[ ... ]
+> @@ -42,6 +42,24 @@ u32 kvm_random_u32(struct kvm_random_state *state)
+>  	return state->seed;
+>  }
+> =20
+> +/* Returns a random u64 in the inclusive range [min, max] */
+> +u64 kvm_random_u64_in_range(struct kvm_random_state *state, u64 min,
+> +			    u64 max)
+> +{
+> +	u64 value;
+> +	u64 range;
+> +
+> +	TEST_ASSERT(min <=3D max, "PEBKAC, min =3D 0x%lx, max =3D 0x%lx", min, =
+max);
+> +
+> +	value =3D kvm_random_u64(state);
 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/sel=
-ftests/kvm/Makefile.kvm
-> index 4ace12606e937..ae0dfd67dd31e 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -259,6 +259,7 @@ OVERRIDE_TARGETS =3D 1
->  # which causes the environment variable to override the makefile).
->  include ../lib.mk
->  include ../cgroup/lib/libcgroup.mk
-> +include ../vfio/lib/libvfio.mk
+[Severity: Medium]
+Will this result in severe blind spots within the generated range?
 
-[Severity: Low]
-Does including libvfio.mk here break the build for KVM selftests on
-environments with a non-GNU dirname?
+Looking at how the random value is constructed:
 
-Looking at tools/testing/selftests/vfio/lib/libvfio.mk, it contains:
+tools/testing/selftests/kvm/include/test_util.h:kvm_random_u64() {
+    return ((u64)kvm_random_u32(state) << 32) | kvm_random_u32(state);
+}
 
-    LIBVFIO_O_DIRS :=3D $(shell dirname $(LIBVFIO_O) | uniq)
+And considering kvm_random_u32() limits its return value with a modulo of=20
+((u32)(1 << 31) - 1), it appears bits 31 and 63 will always remain zero.
 
-Passing multiple arguments to dirname is a GNU extension. On POSIX or BSD
-systems, this command fails and returns an empty string. The subsequent mkd=
-ir
-command then fails to create the required output directories, which causes =
-the
-compiler to fail with a "No such file or directory" error when attempting to
-write the libvfio object files.
+Does this mean the subsequent modulo operation in this function:
+
+> +
+> +	range =3D max - min;
+> +	if (range =3D=3D ULLONG_MAX)
+> +		return value;
+> +
+> +	return min + (value % (range + 1));
+> +}
+
+will fail to cover large portions of requested ranges? For example, if a=20
+test requests a 4GB range, could this only ever return values in the lower=
+=20
+2GB of that range?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260626213534.3866=
-178-1-seanjc@google.com?part=3D1
+178-1-seanjc@google.com?part=3D6
