@@ -1,147 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E338537B020;
-	Fri, 26 Jun 2026 15:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B21C3BB13D
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 15:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782487076; cv=none; b=kbKu3HXbMD7tJDgkFOy4Z/sZ9n47wm41RJ0GA75mSqJpsL3ackf4ju99qsbwrZxU5GMK4LLvZh9HL7xaEY7DmU5qTILIJBAmo8hznuujBHVJC2BSnDsO/aoAPgePXj+gDWoVJq6ZP4wTIc+A+bLi7DezcMcFu8m8FlaeSxX7ges=
+	t=1782487748; cv=none; b=PdIyZ2L5tutIEUG09JmgAVtvOZWYXFFhJLGxb0NbeE2mnwMizBJF1dfCCabTJu9FfCd1dQJX7pUhOGdzZ6enH+TpJe3Fun6I+ENbgDeNj2414eT5FixjSQ2TCwoGTFc+FslMzquUcLLLxzJkMKwIufM2L77BaTxcu+m/FgJtOfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782487076; c=relaxed/simple;
-	bh=+2WMSpeYQauY3ayqAWmihAgxFm5GiuL3JVnsZFr/NDM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f+w5t6OSNUV4w9D96tZ169AzQSTcg+5ehML59ansUStTHIlAPlwi0w9nnqvWdP3lTCsV7sriFremSc4dmkVL9VzbjBBxaEC7n2JUvFUv/+k0Ik5/QsEgkLy1lJX6hcA8CVQRFhuYmiIY/LUHFVguauMVHLygO/QxEFDf9VsLbRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNDxtU8y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782487748; c=relaxed/simple;
+	bh=Wy502H7G6EG5DDUhaqL8ZH31eQuVJEouI4PSOxFgm0M=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=AqFwXvrGh1jFkls0XBRWcdq11egauw5Cukm6tO0UvRgM1ZaJAubugQqqoSQnmojTmMSYf5hsmc3k0vVzPovkUyuwJtn50IliKJ5qsjh+T4PfV29XKqG71v100aH6M6YOj7YK94aP6PlXzsUX+YRO585fIFoWvLYbgt0D6Y0ivZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wIhePOhy; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNDxtU8y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE5531F000E9;
-	Fri, 26 Jun 2026 15:17:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782487075;
-	bh=JkUVs+kU43zS2CPMfq3q5ID+5rkKg3CG5Y2R5GSNDYM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=WNDxtU8yHc2NVDKr01ddEY4wTI1nZFABN1wZqtcq8gJ3HLwowFBdSSRf13AvQ6+AK
-	 KrUPVgy5zp+5DbFIV9NYl+F1JqOc1G55tLbOPBhnBQzK1R6UFqBIsmqNNwR/2ed+RS
-	 93CpYL0hJ5pDCDa3FjX41wu4KnsvHEVo/5vO46UuwWtnOMPlWBvHarRbQAVe0T6seO
-	 DAhRi4rEArIi1MX+Dc0gAF3VnI7yDW5mkwDeC0TAdk62Nz+16DO7c4JKLXFjGVlCMX
-	 L1sb1Oe8QYroTWv2Bs2Eq20hSysa77IDKHYDXZ0fvWCjzR8uiN7xcVqDE/XcrJE1VV
-	 k3ifRTCUaO0Rw==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
- <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
- Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
- <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
- Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
- <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- Johannes Berg <johannes.berg@intel.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
- <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
- linux-sound@vger.kernel.org
-Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
- ktime_get_snapshot_id()
-In-Reply-To: <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
-References: <20260526165826.392227559@kernel.org>
- <20260526171223.374814973@kernel.org>
- <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
- <87echtk24a.ffs@fw13>
- <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
-Date: Fri, 26 Jun 2026 17:17:52 +0200
-Message-ID: <87fr29ib4v.ffs@fw13>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wIhePOhy"
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782487742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A9yV2d4U6Iq5tvwMQAZTQglaDvuPvKN3XGu5+n1GLLQ=;
+	b=wIhePOhyn6G6N5ff0edE/tWPIL0KMu4yLFZwEwWoqZZHrBK6tCDf3vdBAO8t9df+oI6kuQ
+	xLnpFgOEs4zA46/+kNEFwdQe2/mKKSiElfQZLqTo8viWrcXcy9xwbuopsxn4/7w4KV94aW
+	uCiQ2fhh93vV19Hi8UBA0NS234VnMPI=
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 26 Jun 2026 15:28:43 +0000
+Message-Id: <DJJ35VLH2PE5.DFD8OYXEOH97@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Brendan Jackman" <brendan.jackman@linux.dev>
+To: "Takahiro Itazuri" <itazur@amazon.com>, <seanjc@google.com>,
+ <ljs@kernel.org>
+Cc: <Liam.Howlett@oracle.com>, <ackerleytng@google.com>,
+ <agordeev@linux.ibm.com>, <ajones@ventanamicro.com>,
+ <akpm@linux-foundation.org>, <alex@ghiti.fr>, <andrii@kernel.org>,
+ <aou@eecs.berkeley.edu>, <ast@kernel.org>, <baolu.lu@linux.intel.com>,
+ <catalin.marinas@arm.com>, <chenhuacai@kernel.org>, <corbet@lwn.net>,
+ <coxu@redhat.com>, <daniel@iogearbox.net>, <dave.hansen@linux.intel.com>,
+ <david@kernel.org>, <dev.jain@arm.com>, <itazur@amazon.co.uk>,
+ <jackmanb@google.com>, <jannh@google.com>, <jhubbard@nvidia.com>,
+ <jmattson@google.com>, <joey.gouly@arm.com>, <john.fastabend@gmail.com>,
+ <jolsa@kernel.org>, <jthoughton@google.com>, <kas@kernel.org>,
+ <kernel@xen0n.name>, <kpsingh@kernel.org>, <kvm@vger.kernel.org>,
+ <kvmarm@lists.linux.dev>, <lenb@kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+ <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
+ <linux-pm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <linux-s390@vger.kernel.org>, <loongarch@lists.linux.dev>,
+ <lorenzo.stoakes@oracle.com>, <luto@kernel.org>, <maobibo@loongson.cn>,
+ <martin.lau@linux.dev>, <maz@kernel.org>, <mhocko@suse.com>,
+ <mingo@redhat.com>, <mlevitsk@redhat.com>, <nikita.kalyazin@linux.dev>,
+ <oupton@kernel.org>, <palmer@dabbelt.com>, <patrick.roy@linux.dev>,
+ <pavel@kernel.org>, <pbonzini@redhat.com>, <peterx@redhat.com>,
+ <peterz@infradead.org>, <pfalcato@suse.de>, <pjw@kernel.org>,
+ <prsampat@amd.com>, <rafael@kernel.org>, <riel@surriel.com>,
+ <rppt@kernel.org>, <ryan.roberts@arm.com>, <sdf@fomichev.me>,
+ <shijie@os.amperecomputing.com>, <skhan@linuxfoundation.org>,
+ <song@kernel.org>, <surenb@google.com>, <suzuki.poulose@arm.com>,
+ <svens@linux.ibm.com>, <tabba@google.com>, <tglx@kernel.org>,
+ <thuth@redhat.com>, <urezki@gmail.com>, <vannapurve@google.com>,
+ <vbabka@kernel.org>, <will@kernel.org>, <willy@infradead.org>,
+ <wu.fei9@sanechips.com.cn>, <x86@kernel.org>,
+ <yang@os.amperecomputing.com>, <yangyicong@hisilicon.com>,
+ <yonghong.song@linux.dev>, <yosry@kernel.org>, <yu-cheng.yu@intel.com>,
+ <yuzenghui@huawei.com>, <zhengqi.arch@bytedance.com>
+Subject: Re: [PATCH v12 00/16] Direct Map Removal Support for guest_memfd
+References: <aeennZlV60k81OBf@google.com>
+ <20260506080753.14517-1-itazur@amazon.com>
+In-Reply-To: <20260506080753.14517-1-itazur@amazon.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jun 26 2026 at 13:03, Thomas Wei=C3=9Fschuh wrote:
-> On Fri, Jun 26, 2026 at 12:49:41PM +0200, Thomas Gleixner wrote:
->> On Fri, Jun 26 2026 at 10:48, Thomas Wei=C3=9Fschuh wrote:
->> > On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
->> > (...)
->> >
->> >>  static inline void tk_update_aux_offs(struct timekeeper *tk, ktime_t=
- offs)
->> >> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
->> >>  		tkd =3D &tk_core;
->> >>  		offs =3D &tk_core.timekeeper.offs_boot;
->> >>  		break;
->> >> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
->> >> +		tkd =3D aux_get_tk_data(clock_id);
->> >> +		if (!tkd)
->> >> +			return false;
->> >> +		offs =3D &tkd->timekeeper.offs_aux;
->> >> +		break;
->> >
->> > 'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr_mo=
-no'
->> > are the same for auxilary clocks, so this will compute a wrong 'monora=
-w'.
->>=20
->> AUX clocks are independent in the first place and the MONORAW part is
->> the "MONORAW" related to the AUX clock itself.=20
->>=20
->> > Instead 'monoraw' should be computed based on 'tk_core'.
->> > Which then also requires the sequence locking of 'tk_core'.
->>=20
->> No. From a PTP and steering point of view you want the "raw" value which
->> is related to the AUX clock itself and not the global one.
+On Wed May 6, 2026 at 8:07 AM UTC, Takahiro Itazuri wrote:
+> Hi Lorenzo and Sean,
 >
-> Ack.
+> Apologies for the delayed reply =E2=80=94 Nikita is leaving Amazon, and I=
+'m
+> taking over this series going forward. Thanks for your patience.
 >
-> However the kdocs call it 'CLOCK_MONOTONIC_RAW'. Can we clean this up?
+> On Tue, Apr 21, 2026 at 01:40:00PM +0000, Lorenzo Stoakes wrote:
+>> Hm, given this touches a fair bit of mm, I wonder if we shouldn't try to=
+ do this
+>> through the mm tree?
+>
+> On Tue, Apr 21, 2026 at 04:36:00PM +0000, Sean Christopherson wrote:
+>> Yeah, when the time comes, the mm pieces definitely need to go through t=
+he mm
+>> tree.  Ideally, I think this would be merged in two separate parts, with=
+ all mm
+>> changes going through the mm tree, and then the KVM changes through the =
+KVM tree
+>> using a stable topic branch/tag from Andrew.
+>
+> Thanks for the guidance. The split makes sense to me; I'm planning to
+> follow this approach with patches 1-6 (mm) going through the mm tree
+> and patches 7-16 (KVM) through the KVM tree on top of a stable
+> branch/tag from mm. I'll confirm the exact boundary and coordination
+> details as I prepare the repost.
+>
+> On Tue, Apr 21, 2026 at 01:40:00PM +0000, Lorenzo Stoakes wrote:
+>> In any case, we definitely need a rebase on something not-next :) if not=
+ mm then
+>> Linus's tree at least maybe?
+>>
+>> I'm seeing a lot of conflicts against mm-unstable, it can't b4 shazam ev=
+en patch
+>> 1 and in Linus's tree it's failing at an mm patch (mm: introduce
+>> AS_NO_DIRECT_MAP).
+>
 
-Yes. Something like the below?
+Just as an FYI, I am gonna look at trying to move this forward a bit
+while Takahiro ramps up on taking over (I spoke to him about this off
+list).
 
-Thanks,
+My ulterior motive is that this would give me an excuse to add
+ALLOC_UNMAPPED (formerly __GFP_UNMAPPED) and the mermap [0] which
+unblocks various security nonsense including ASI [1]. (But also, this
+feature is a good idea).
 
-        tglx
----
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -1202,10 +1202,21 @@ static inline u64 tk_clock_read_snapshot
-=20
- /**
-  * ktime_get_snapshot_id -  Simultaneously snapshot a given clock ID with
-- *			    CLOCK_MONOTONIC_RAW and the underlying
-+ *			    the corresponding monotonic raw the underlying
-  *			    clocksource counter value.
-  * @clock_id:		The clock ID to snapshot
-  * @systime_snapshot:	Pointer to struct receiving the system time snapshot
-+ *
-+ * For the system time keeping clocks (REALTIME, MONOTONIC and BOOTTIME) t=
-he
-+ * monotonic raw clock is CLOCK_MONOTONIC_RAW. For AUX clocks this is the
-+ * monotonic raw clock related to the AUX clock. These AUX clock related
-+ * monotonic raw clocks have a strict linear offset to the system time
-+ * CLOCK_MONOTONIC_RAW:
-+ *
-+ *	MONOTONIC_RAW(AUX$N) =3D CLOCK_MONOTONIC_RAW(system) + offset(AUX$N)
-+ *
-+ * The offset is established when a AUX clock is initialized, but it is
-+ * currently not accessible.
-  */
- void ktime_get_snapshot_id(clockid_t clock_id, struct system_time_snapshot=
- *systime_snapshot)
- {
-@@ -1512,6 +1523,9 @@ EXPORT_SYMBOL_GPL(ktime_real_to_base_clo
-  * @xtstamp:		Receives simultaneously captured system and device time
-  *
-  * Reads a timestamp from a device and correlates it to system time
-+ *
-+ * See documentation for ktime_get_snapshot_id() for information about the=
- raw
-+ * monotonic time stamp which is used here.
-  */
- int get_device_system_crosststamp(int (*get_time_fn)
- 				  (ktime_t *device_time,
-
+[0] https://lore.kernel.org/all/20260320-page_alloc-unmapped-v2-0-28bf1bd54=
+f41@google.com/
+[1] https://linuxasi.dev
