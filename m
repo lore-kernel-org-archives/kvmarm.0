@@ -1,111 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FB43E9281
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 09:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4D63A873D;
+	Fri, 26 Jun 2026 10:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782466695; cv=none; b=bM+MyHVCxFcVsiKtYdhnFqulh01OrZTs2bmhe7UaDbzU2JidIbCEQ8wcHPsyjEDjG1Kh2wzN0NYaN7cy343bNcN5tvxXFbVDmZ7S0JEYj2xzD4iidx4hU7tp2JHvBxqGgfmJ6feUdv9GHTncuQcmYEpNL6y7TrEeuhiF21hAj98=
+	t=1782470985; cv=none; b=uUKvjO7bHiE2BUNatBnrTC4NlCE5qU6GQNaWS+pUFZpLIXzdpOdCbK8K4lvnA6f5QLqzv8M4isBIHkje6Y3bp84EycVno3CXAhv+zOT2nq8AYoJwgYZsu2xrvU/3/7aEPpz8hGqdHaNZI77TpNpioXzQNvGhiTew6L4yMf4c/vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782466695; c=relaxed/simple;
-	bh=meUP+Y0CS1ctaBI7eOPfAVVBnMsYGpnlBuYQQ6TBgvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KAfIFJHU3zrb+MCtJ7SECv3THXVY2c7Qlmg+Dl3yV9W5BP8ZhG7iy2BKtjUToLAU+2iAU4iK+g0NufU+YvFRpOz9v0HZod1fm3FI91uyVqRwX6ZgQHnHFpl8nA7e3GlO3bl4/3PnyfEh0/0fZKY1gTlkfzDlwB5wu/OjCOPVE1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ogmJejkl; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782470985; c=relaxed/simple;
+	bh=TKcaVW7HVikmiiDGuBeis2gKg/FfUDfyELepoLCpCK8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UGGpYR9vKIFI2sPjL5gjmPDk0mYo6QcFF/Swj51EeQYYDtzpCBvV1AvTrBM280/pKfbZ/J/lbrpFmJS7MDQ5nFx4f5Y0qQay1rDqum01HDO99/RWyHfIaaLmFPRaQSC9fdzBtXqaPXbL6FCRgOpkZgdr2BeE2dHiMCJQg81pHlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S/5AXIbd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ogmJejkl"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD049204C;
-	Fri, 26 Jun 2026 02:38:07 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0FCA3F836;
-	Fri, 26 Jun 2026 02:38:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782466692; bh=meUP+Y0CS1ctaBI7eOPfAVVBnMsYGpnlBuYQQ6TBgvs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ogmJejklrPg6Gl7OxBcpSgA/vb8kqaWxyD/jtOomRZifPgmNp6gk0xNAOYrchUmPH
-	 eDbtd8VNaifCeE8NcEMhy6wXMhJiS8pGjWG90K6Ndy5DrUR7viVVLehMlVsQy8HEzY
-	 FaeycKEJg+W3VzVFYkHKcWan2tsmMgYcdYltXGrc=
-Date: Fri, 26 Jun 2026 10:37:55 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 0/3] KVM: arm64: nv: Shadow ptdump fixes
-Message-ID: <tl7vhu4wzqnptrfkl3bvvs5zc2ufcdhn5jwdav5hzve22hqcxq@zyu3drghk4sp>
-References: <20260623142443.648972-1-weilin.chang@arm.com>
- <ajty6I7ZqodP4ous@sm-arm-grace07>
- <fabkknc7dqpve4oo2hsgcsodq4syfgg5bp54qi6cywzssaue7u@ow3q6tupzwyz>
- <86h5mrq71b.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S/5AXIbd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1151F000E9;
+	Fri, 26 Jun 2026 10:49:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782470984;
+	bh=tnerpNhOrBLh7vhCHDu/AZ606iUJiugWohBIxX532Qs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=S/5AXIbdXtITWNkQPORvCiw4nseJOJtxhQBffsgTYXrnNrXQot4NqaZnEidHnYNd8
+	 jSr0fAmPPtspqyXLi/XeAb3l+yTF6DTc9w2DGHmPOJgYxldJkDuFQvJBx5N3G+u/C9
+	 7rSuDJYFBjclqydxHAfAYlbx7D1s17+03dXk4rtLGEcULg0GaQIX0WJBDganqI0Ujp
+	 r4Nk4fuBeVmRItg41bBL2nwjFWJc867+lzTnbTwexIguKmAUUyyf4w3yamxTZwBuyd
+	 mW4hzNVP+BO+ImKm0S1YRC+jYeVE3o2BLpnVuqmMpDHZSy12fCOpdOVrPwhkym65I7
+	 l0h0PrS7XzFyw==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
+ <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
+ <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
+ Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
+ <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
+ Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
+ <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Johannes Berg <johannes.berg@intel.com>, Jacob Keller
+ <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
+ <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
+ linux-sound@vger.kernel.org
+Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
+ ktime_get_snapshot_id()
+In-Reply-To: <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.374814973@kernel.org>
+ <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
+Date: Fri, 26 Jun 2026 12:49:41 +0200
+Message-ID: <87echtk24a.ffs@fw13>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86h5mrq71b.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 25, 2026 at 10:54:40AM +0100, Marc Zyngier wrote:
-> On Thu, 25 Jun 2026 08:47:04 +0100,
-> Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> > 
-> > I don't see a way out with this per-mmu file scheme. The core issue is
-> > mmus have a different lifetime than the VM's debugfs directory, and
-> > both's removal can happen in parallel, i.e. the VM debugfs directory
-> > can be removed anytime we are in mmu notifier release freeing the mmus
-> > and their shadow ptdump files.
-> 
-> Why isn't that a problem with the existing S2 ptdump code?
+On Fri, Jun 26 2026 at 10:48, Thomas Wei=C3=9Fschuh wrote:
+> On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
+> (...)
+>
+>>  static inline void tk_update_aux_offs(struct timekeeper *tk, ktime_t of=
+fs)
+>> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
+>>  		tkd =3D &tk_core;
+>>  		offs =3D &tk_core.timekeeper.offs_boot;
+>>  		break;
+>> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
+>> +		tkd =3D aux_get_tk_data(clock_id);
+>> +		if (!tkd)
+>> +			return false;
+>> +		offs =3D &tkd->timekeeper.offs_aux;
+>> +		break;
+>
+> 'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr_mono'
+> are the same for auxilary clocks, so this will compute a wrong 'monoraw'.
 
-For existing stuff, in terms of the ptdump files:
+AUX clocks are independent in the first place and the MONORAW part is
+the "MONORAW" related to the AUX clock itself.=20
 
- - For the canonical s2, the ptdump files are only removed in
-   kvm_destroy_vm_debugfs().
+> Instead 'monoraw' should be computed based on 'tk_core'.
+> Which then also requires the sequence locking of 'tk_core'.
 
- - For nested s2, files are removed in two places: "manually" removed
-   at mmu<->context unbind time in get_s2_mmu_nested() and in
-   kvm_destroy_vm_debugfs(). get_s2_mmu_nested() is only called before
-   kvm_destroy_vm_debugfs() of course.
+No. From a PTP and steering point of view you want the "raw" value which
+is related to the AUX clock itself and not the global one.
 
-So no dentry UAF in the current code.
+The global MONORAW and the AUX clock MONORAW are related obviously as
+they share the same conversion factors.
 
-Putting everything together, the situation is pretty complicated. The
-canonical mmu, nested mmu, canonical mmu->pgt, nested mmu->pgt all have
-different lifetimes, and kvm_destroy_vm_debugfs() can run in parallel
-with mmu notifier release (like said above), which frees nested mmus and
-canonical + nested pgts. Additionally, the .show() callback can be
-called after mmu notifier release (Sashiko).
+     MONORAW(AUX$N) =3D MONORAW(GLOBAL) + OFFSET(AUX$N)
 
-Now having thought about this again, per-mmu file can work, just defend
-against freed mmu or pgt.
+We don't have that information anywhere right now and we might want to
+expose it to allow user space a proper correlation, but that's an
+orthogonal problem.
 
-What I'm thinking now:
- - Just have all ptdump files removed at kvm_destroy_vm_debugfs(), to
-   avoid accessing the dentry in mmu notifier release.
- - Revert effects of 204f7c018d76 ("KVM: arm64: ptdump: Make KVM ptdump
-   code s2 mmu aware") because the mmu pointer stored in i_private and
-   the ptdump state is simply invalid after mmu notifier release for
-   nested.
- - Only store the kvm pointer in inode->i_private or seq_file->private.
- - For nested, check both mmu and mmu->pgt in .show() under the
-   mmu_lock. For canonical only mmu->pgt check will be needed.
- - Guard nested_mmus freeing and setting nested_mmus = NULL with the
-   mmu_lock so .show() won't have nested mmus disappear after checking
-   nested_mmus exist.
-
-I *think* this solves all problems known at the moment...
+From a PTP/steering point of view the code is correct as is.
 
 Thanks,
-Wei-Lin Chang
 
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+        tglx
+
+
