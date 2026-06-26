@@ -1,250 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AB43F44FC;
-	Fri, 26 Jun 2026 12:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D95F30D3FA;
+	Fri, 26 Jun 2026 13:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782477672; cv=none; b=b5V5Alth+D6oRBruqD8TwTvhTcgrY4Hw8PFyqNhDGhvg/gKMaFElwAGplCdUcrhjN5Enhcm67BpzJQ0hYyxAHCRzWkpdGCm4seNDSalKxXKHs32M6kqHmwSEc8PAD7V6KwkT/3DHdrSfAqRB+roUYnDDKTodkCJ5OKUfNvwvjMk=
+	t=1782479390; cv=none; b=UxFm6N8ldZeapbq0jIsLvsPV5p/1Jek3UEZ82xEQZ0ohnEw3pmopul6ciaPJs5FxQ3eUKs3JqB+NmtTM04CRmf1s3NQPwCJW9fDUQWA4AcJiFUDYcafRaWdGxRsQju32sjQttBEffHQ+InvJJjNQrCBoNtTlDzh/DWsq+MInorE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782477672; c=relaxed/simple;
-	bh=0UejVAi8/6569N1EBprj5W/iqY2e5pWsMrCOAhU645I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M4X8ny1ALUvD3kbmA7ybcNcE39QT1zeS+sdnCa9eqZ+57o6I4apFipzVSUiVfB7rsEEtKfAdi2x0BudIX0ku5xhKNARxoVCueSdF1el1C/NT/docDjJVmaX7KSkl+v6Hc+EWpvLSzmwd56VGCZNIyNvSJVLoOdjVYm9HYZNOGfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=APJDhQw1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782479390; c=relaxed/simple;
+	bh=+7AwrWVVzoVkvnv9P5vBhSQOWP/QHJ2Ebp6LBHG4hw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kfhJ3LArrPSyzd+z5HRL2oUeMZVN/no8luDHxxJvK+PQNgtyYJDayhmH1FJVnwK4JJ3ax+nZP8mc4q7mRS8QSjOFUaupHuDTTI0knzICBIESZUCHwd4RKSv2VdKpsQaE7Pwu4F1CicjLiTA6ziUqni2K5CZvN12AoeEF5XRAKNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkPWPq3e; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="APJDhQw1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C11AD1F000E9;
-	Fri, 26 Jun 2026 12:41:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkPWPq3e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDB941F000E9;
+	Fri, 26 Jun 2026 13:09:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782477670;
-	bh=3NCzdsx5KZMZ1wmssjwQd/gh170VUGx221Dc/0PwPbk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=APJDhQw18cZQHEntw+EbWHvLcFysGmIjCcOUsPdcXTYMb0YsPKzRdB7GM/lNRBCqi
-	 EjgnnhtcS/Vwrli3SVVGwJyb34oGUU46fcwgvkPGPmy5AK6I/jRxQ5dJYscMUVlYPJ
-	 ggeDj1eiRLtuWUKJBVejTrluidMzRtvieaXgFBe2NX3mU39NlSRXTvafWDcfJNSkAQ
-	 9CVJwELsZmScSu0yMHXXwvKfglSYvDj79Mbtj1hzOHOPBYCrxJwAMPjbVA81nmtHf0
-	 0yTBcwijhJNqyAXpZxzBrCpi+LiuYcK5lzpWYRQ77rpEXl9jBk651lX4ntuNhVfstN
-	 BpVeEhY8GOJiw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wd5rp-0000000GKvi-0Cvk;
-	Fri, 26 Jun 2026 12:41:09 +0000
-Date: Fri, 26 Jun 2026 13:41:08 +0100
-Message-ID: <86a4shqxsr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>
+	s=k20260515; t=1782479388;
+	bh=TTQHpmFLOxYjNbqLTyYlQveQHPZ7fEn2hUfjMLOJy6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=AkPWPq3eupktwRWln5gvYhnuQoNW35/2Th/h195dqesXzlDp1qTlyKYdeBGlmmn5X
+	 NF7ED+wlRwXF1v8ifd9Kk2M+QbrZ1/IHn0K42EzWkA/5rakO2VOxByorIQcyBVUvSA
+	 9eTte6NNf4h0C+kaSbRIa03zs3+Nr6bCP/ejzNKNPUgNJ5g9YGKu+q/gn7IzHRr7XN
+	 EVx4ZkHcjk2FTe9BqzEHnul4xfZuCtnsVFlBO44HNvKPu58TX2GAk464jtcIxkO6HD
+	 NMShw67cZo6Tkn0JsPzjh/diWQnAE3W/x5+mINcnVsAW309brRA/4+mIKn6wq2eCbi
+	 vlHq3AhUjVyrA==
+Date: Fri, 26 Jun 2026 14:09:43 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] KVM: Make kvm_io_bus_get_dev() filter devices by ops
-In-Reply-To: <20260626114635.82A0B1F00A3A@smtp.kernel.org>
+Message-ID: <aj56F3qIsYZ1_xlR@willie-the-truck>
 References: <20260626111344.802555-1-maz@kernel.org>
-	<20260626114635.82A0B1F00A3A@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260626111344.802555-1-maz@kernel.org>
 
-On Fri, 26 Jun 2026 12:46:35 +0100,
-sashiko-bot@kernel.org wrote:
->=20
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
->=20
-> Pre-existing issues:
-> - [High] Dropping the SRCU lock in kvm_io_bus_get_dev() exposes a Use-Aft=
-er-Free for VGIC redistributors.
-> --
->=20
-> commit 954101cd7bbd1642133e68638e5210cf89b88023
-> Author: Marc Zyngier <maz@kernel.org>
->=20
-> KVM: Make kvm_io_bus_get_dev() filter devices by ops
->=20
-> This commit updates kvm_io_bus_get_dev() to check the device ops pointer
-> before dropping the SRCU lock. This aims to prevent lifetime issues where
-> a caller might introspect an object of the wrong type after the lock is
-> dropped.
->=20
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
->=20
-> [ ... ]
->=20
-> > @@ -6081,7 +6082,9 @@ struct kvm_io_device *kvm_io_bus_get_dev(struct k=
-vm *kvm, enum kvm_bus bus_idx,
-> >  	if (dev_idx < 0)
-> >  		goto out_unlock;
-> > =20
-> > -	iodev =3D bus->range[dev_idx].dev;
-> > +	if (bus->range[dev_idx].dev &&
-> > +	    bus->range[dev_idx].dev->ops =3D=3D ops)
-> > +		iodev =3D bus->range[dev_idx].dev;
-> > =20
-> >  out_unlock:
-> >  	srcu_read_unlock(&kvm->srcu, srcu_idx);
->=20
-> [Severity: High]
-> This is a pre-existing issue, but does dropping the SRCU lock here before
-> returning the matched device pointer expose a use-after-free?
->=20
-> If a host VMM concurrently executes KVM_SIGNAL_MSI (with a doorbell addre=
-ss
-> overlapping the redistributor) and KVM_CREATE_VCPU (forced to fail due to
-> resource exhaustion), the failed vCPU creation path can unregister the
-> device and free the vCPU memory.
->=20
-> Because the SRCU lock is already dropped here, the unregister path won't
-> be blocked. When the MSI injection path resumes in __vgic_doorbell_to_its=
-(),
-> it can dereference the freed vCPU memory:
->=20
-> arch/arm64/kvm/vgic/vgic-its.c:__vgic_doorbell_to_its() {
->     ...
->     kvm_io_dev =3D kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, &kvm_io_gic_ops,=
- db);
->     if (!kvm_io_dev)
->         return ERR_PTR(-EINVAL);
->=20
->     iodev =3D container_of(kvm_io_dev, struct vgic_io_device, dev);
->     if (iodev->iodev_type !=3D IODEV_ITS)
->         return ERR_PTR(-EINVAL);
->     ...
-> }
+On Fri, Jun 26, 2026 at 12:13:44PM +0100, Marc Zyngier wrote:
+> kvm_io_bus_get_dev() returns a device that is only matched by the
+> address, and nothing else. This can cause a lifetime issue if
+> the matched device is not the expected type, as by the time
+> the caller can introspect the object, it might be gone (the srcu
+> lock having been dropped).
+> 
+> Add an kvm_io_device_ops pointer to the list of things that this
+> helper must check before dropping the lock and returning the pointer,
+> and update the sole user to pass its own ops.
+> 
+> Reported-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Fixes: 8a39d00670f07 ("KVM: kvm_io_bus: Add kvm_io_bus_get_dev() call")
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 5 +----
+>  include/linux/kvm_host.h       | 1 +
+>  virt/kvm/kvm_main.c            | 5 ++++-
+>  3 files changed, 6 insertions(+), 5 deletions(-)
 
-Gniii... I guess the last option is to bite the bullet and make sure
-that any filtering occurs with the SRCU lock held. Something like the
-patch below. Or just move the locking outside of the helper and keep
-it completely inside the caller.
+Thanks, Marc, this makes sense to me:
 
-	M.
+Acked-by: Will Deacon <will@kernel.org>
 
-=46rom 4f6872cf57b3d30dcc81155e0ef6ac8bc6075fba Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Thu, 25 Jun 2026 15:28:38 +0100
-Subject: [PATCH] KVM: Add lock-protected filtering to kvm_io_bus_get_dev()
-
-kvm_io_bus_get_dev() returns a device that is only matched by the
-address, and nothing else. This can cause a lifetime issue if
-the matched device is not the expected type, as by the time
-the caller can introspect the object, it might be gone (the srcu
-lock having been dropped).
-
-Add a callback to this helper so that users can check the validity
-of the device while under the srcu lock, and update the sole user
-to pass its own filter.
-
-Reported-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Fixes: 8a39d00670f07 ("KVM: kvm_io_bus: Add kvm_io_bus_get_dev() call")
-Cc: stable@vger.kernel.org
----
- arch/arm64/kvm/vgic/vgic-its.c | 24 ++++++++++++++----------
- include/linux/kvm_host.h       |  1 +
- virt/kvm/kvm_main.c            |  4 +++-
- 3 files changed, 18 insertions(+), 11 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 4477f870c7b36..d8541690e7ba2 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -503,23 +503,27 @@ static unsigned long vgic_mmio_read_its_idregs(struct=
- kvm *kvm,
- 	return 0;
- }
-=20
-+static bool vgic_its_device_filter(struct kvm_io_device *dev)
-+{
-+	if (dev && dev->ops =3D=3D &kvm_io_gic_ops) {
-+		struct vgic_io_device *iodev;
-+
-+		iodev =3D container_of(dev, struct vgic_io_device, dev);
-+		return iodev->iodev_type =3D=3D IODEV_ITS;
-+	}
-+
-+	return false;
-+}
-+
- static struct vgic_its *__vgic_doorbell_to_its(struct kvm *kvm, gpa_t db)
- {
- 	struct kvm_io_device *kvm_io_dev;
--	struct vgic_io_device *iodev;
-=20
--	kvm_io_dev =3D kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, db);
-+	kvm_io_dev =3D kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, vgic_its_device_filt=
-er, db);
- 	if (!kvm_io_dev)
- 		return ERR_PTR(-EINVAL);
-=20
--	if (kvm_io_dev->ops !=3D &kvm_io_gic_ops)
--		return ERR_PTR(-EINVAL);
--
--	iodev =3D container_of(kvm_io_dev, struct vgic_io_device, dev);
--	if (iodev->iodev_type !=3D IODEV_ITS)
--		return ERR_PTR(-EINVAL);
--
--	return iodev->its;
-+	return container_of(kvm_io_dev, struct vgic_io_device, dev)->its;
- }
-=20
- static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4c14aee1fb063..3610a6986be3d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -231,6 +231,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_b=
-us bus_idx, gpa_t addr,
- int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 			      struct kvm_io_device *dev);
- struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus=
-_idx,
-+					 bool (*filter)(struct kvm_io_device *),
- 					 gpa_t addr);
-=20
- #ifdef CONFIG_KVM_ASYNC_PF
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 881f92d7a469e..c4f6044ae89fe 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6066,6 +6066,7 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum k=
-vm_bus bus_idx,
- }
-=20
- struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus=
-_idx,
-+					 bool (*filter)(struct kvm_io_device *),
- 					 gpa_t addr)
- {
- 	struct kvm_io_bus *bus;
-@@ -6082,7 +6083,8 @@ struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *=
-kvm, enum kvm_bus bus_idx,
- 	if (dev_idx < 0)
- 		goto out_unlock;
-=20
--	iodev =3D bus->range[dev_idx].dev;
-+	if (filter(bus->range[dev_idx].dev))
-+		iodev =3D bus->range[dev_idx].dev;
-=20
- out_unlock:
- 	srcu_read_unlock(&kvm->srcu, srcu_idx);
---=20
-2.47.3
-
-
---=20
-Without deviation from the norm, progress is not possible.
+Will
