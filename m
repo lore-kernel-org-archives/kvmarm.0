@@ -1,101 +1,139 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7363C09F9
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 21:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52D4211466;
+	Sat, 27 Jun 2026 10:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782511154; cv=none; b=AGzvtClOK3rI6vljL7fB3GGWAab/fYxsAVL9yT2rBwdqYQfcYolxsjuekYHDlH1599u+9n9t9v3he551TUmUdWuJ4BTCiulc/r1aLLABSkApEJHSpx15XGWE9mLiMkFmouuGYTDi6FEAX9ZwAAhyRKQFOZ95OmDF+NNCwhdOCpw=
+	t=1782557477; cv=none; b=MwHt9ndROQrMb17fJ3Rn67ZrXh6o/pr6xpSs9EZEyzuobdpCm6DaICP4O2jwPSHCRI1Zp/TXZ7SHgpVsVz9U2XvuGTF3XTx5EFhr7U0qkmC/yHuhvh/XNfEpN1yDlBVoJFbupk1UOH9d2gBLOZ3qJYEOHv9waLJZOPtYq7d+7xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782511154; c=relaxed/simple;
-	bh=2ZSje1GLJDCobStX5wOp+GMYTYNmrNuHVry91rZPLtc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JNbq4SFAbfd+kg9BkHZan4m25p/2X/8Sq9f4lVTqtnpdOGzzew5Ixu7yj7IifOA/YC81g3Cft8wBbF91p+dG/ik8sa71ZL7vHl98Vzoi9oGht4KtFjTiKMviwfAmhTwPk8BhM+T5EVeGxt3XvAWm7Ue+w6rhZXRXHw83S0wvg28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c8EdNENj; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1782557477; c=relaxed/simple;
+	bh=eiQ91xo216xndNpSYDtCd7KMFnHhu+ZE9kzJMfsSQzA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GsXXZbCofJaJeWEY+XXuN2XKn0Hu9CEfbY513Wlv3wgI0Jp/aggoEWrxquPk6G+heeYie4cB/Y7RX6+DUETK8KdXkV/YkCXuVX5PrNPVHoHkpMlVsZXGksD4WvqfrDuPgsFBOYOVzngPc/+pqUcxEVWZuQMrv1rmzSeFMEdJo3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1+X2Lz2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c8EdNENj"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2c82843005eso8814605ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jun 2026 14:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782511153; x=1783115953; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JDQlpzOhBh6kY656CwR9WiBjifQ7cM+pBied073IksM=;
-        b=c8EdNENjny4tupXExHPnYYdW2KkB6riU+G648vO4afsiE2VaMOe7SsBvwS+5gZRsHH
-         if8uiyeytM2KcyK6XpYwhBr9tKFvXpOyPGs5mLdth5tiDO10kxVhr4XsaCe7Q1wkTiXA
-         qYwIJws8MSZB1W/CdHm4CCH/oba4c/ZvGOMDW3xADnnuD2VAaSSfEHVgRLjVP9YRvoXd
-         hSqrJILi77aUMhz5DEPHr0E/smeKNUD7M80B6m2CHfv3ABba5iWl2f06aMG3MCl9S1v8
-         VwstwHEvpHqEHYJa4rNjbers+JVTQa3GGCz+q4UL1Umg+I6/R6FhEY6pG36NRVD75MKk
-         ghng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782511153; x=1783115953;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JDQlpzOhBh6kY656CwR9WiBjifQ7cM+pBied073IksM=;
-        b=iKmWEMvUrVVbi/DY97+O8fFpO11Xt1QcOPqBgBNgzmFrgJJHCHzjNN8/uf4+kiqT23
-         9kjFj+17QIE4ShaCUXS5HjhZqiaJswNq7LC7HEedhib/am9B6+Zgr/YrxRehmKDj2ADa
-         bOT+paf+Vc8KyLZDb6+jH4mGKkjvW7tKmgSbO29jxVRhpJ12kwslsRcwyRdUdePIRrjo
-         ZCylnktuzKK0lsM1qBAfQeNt/JsSDlhxHpmxnJPzD1J9V8XRZsW8of1uRVoP2cydLLPT
-         1Il+LN3K/xYFGJN8zHnJ5QVQwpgtDswqaMSLht9Z9UeyRn+br6W0wyte0JkDrd+eQo5n
-         ItIA==
-X-Forwarded-Encrypted: i=1; AHgh+RqP0rSM4hqo6K5z02FxlwvYuObavj4f9myOALv/btwGWGlOqXUP95KCroalHwRWha+xuFBLM5A=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx9lfA+8s0bPKY+ZplTTy2kfZtY6FTuKywlNyHC3pinRFNziNa8
-	FR5wNwVukuje8WQbUR71QYjQWh/LhV5W2IKNKxKpPE8fgHLnEP5Dg9Yeg9gNzmsOAMPfLRPIKZQ
-	JHjKQpg==
-X-Received: from pllg5.prod.google.com ([2002:a17:902:7405:b0:2bc:c1af:322f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf07:b0:2c3:5683:9acb
- with SMTP id d9443c01a7336-2c7fccc7b6bmr106313045ad.32.1782511152670; Fri, 26
- Jun 2026 14:59:12 -0700 (PDT)
-Date: Fri, 26 Jun 2026 14:59:12 -0700
-In-Reply-To: <20260626214819.EC79B1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1+X2Lz2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DFF51F000E9;
+	Sat, 27 Jun 2026 10:51:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782557476;
+	bh=D+aL5SBZJsWFJfZTfZtbheXuQGiHvpX7mm9bteynJkE=;
+	h=From:To:Cc:Subject:Date;
+	b=M1+X2Lz2a0tn1R7bVkejNLsLXl+Pk2NjtutG83/iQM/nReueTZGoIpT0LnUJuPCSS
+	 qjtpmXHJcQic8UxtzgWxykBQ17PbpwKmxjWXHPpbAVzAmyKgg6Vrja47WYCQQ5uTW0
+	 t9/SJymPGoU7/0DpNbvmGy0RO50SklyVQttYal3cg67fNBKRGM/mXaCLaYt5BmDQl+
+	 DCb9IZdT/fcCYIwKikrl1Mktm58YtVrI6ciLD1Jnqdr9sglR790Ur1cb12QfItEONp
+	 LIAVU045udJvqKVmxWAz9l1xQ0jykRBDLG8ta/IACZkXJQ+dlngYCDAnw/+Xn5X6aY
+	 gi2aEmrQT7aNQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wdQd0-0000000GZWr-09QM;
+	Sat, 27 Jun 2026 10:51:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] KVM: Move kvm_io_bus_get_dev() locking responsibilities to callers
+Date: Sat, 27 Jun 2026 11:51:05 +0100
+Message-ID: <20260627105105.1005990-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260626213534.3866178-1-seanjc@google.com> <20260626213534.3866178-5-seanjc@google.com>
- <20260626214819.EC79B1F000E9@smtp.kernel.org>
-Message-ID: <aj72MFxS7XinmNrB@google.com>
-Subject: Re: [PATCH v8 04/20] KVM: selftests: Initialize the default/global
- pRNG during kvm_selftest_init()
-From: Sean Christopherson <seanjc@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, pbonzini@redhat.com, will@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 26, 2026, sashiko-bot@kernel.org wrote:
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index 875030c22d07b..1016865d3f7a2 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -24,6 +24,13 @@ u32 kvm_random_seed;
-> >  struct kvm_random_state kvm_rng;
-> >  static u32 last_kvm_seed;
-> >  
-> > +static void kvm_seed_rng(u32 seed)
-> > +{
-> > +	kvm_random_seed = last_kvm_seed = seed;
-> > +	pr_info("Random seed: 0x%x\n", kvm_random_seed);
-> > +	kvm_rng = new_kvm_random_state(kvm_random_seed);
-> > +}
-> > +
-> 
-> [Severity: Medium]
-> Does making this function static prevent tests from reseeding the PRNG
-> early?
-> 
-> If a test draws from kvm_rng before __vm_create() is called (for example,
-> generating gsi and vector at the start of main() in irq_test), the test
-> will use the initial seed from the constructor.
-> 
-> Since kvm_seed_rng() is static and only automatically reseeded during
-> __vm_create(), how can developers override the seed to reproduce CI failures
-> for these pre-VM random variables?
+kvm_io_bus_get_dev() returns a device that is only matched by the
+address, and nothing else. This can cause a lifetime issue if
+the matched device is not the expected type, as by the time
+the caller can introspect the object, it might be gone (the srcu
+lock having been dropped).
 
-By hacking selftests.  Yes, it's ugly, but AFAIK we haven't yet had a failure
-that's actually been dependent on the RNG seed, and plumbing in a way to set the
-seed for every test would be painful.
+Given that there is only a single user of this helper, the simplest
+option is to move the locking responsibility to the caller, which
+can keep the srcu lock held for as long as it wants.
+
+Note that this aligns with other kvm_io_bus*() helpers, which
+already require the srcu lock to be held by the callers.
+
+Reported-by: Will Deacon <will@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Fixes: 8a39d00670f07 ("KVM: kvm_io_bus: Add kvm_io_bus_get_dev() call")
+Link: https://lore.kernel.org/all/20260626111344.802555-1-maz@kernel.org
+Cc: stable@vger.kernel.org
+---
+
+Notes:
+    v2: Drop the previous filtering approach, and move the locking into
+        the only caller, similar to kvm_io_bus_{read,write}().
+
+ arch/arm64/kvm/vgic/vgic-its.c |  2 ++
+ virt/kvm/kvm_main.c            | 16 +++++-----------
+ 2 files changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 4477f870c7b36..740b39875728d 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -508,6 +508,8 @@ static struct vgic_its *__vgic_doorbell_to_its(struct kvm *kvm, gpa_t db)
+ 	struct kvm_io_device *kvm_io_dev;
+ 	struct vgic_io_device *iodev;
+ 
++	guard(srcu)(&kvm->srcu);
++
+ 	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, db);
+ 	if (!kvm_io_dev)
+ 		return ERR_PTR(-EINVAL);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 881f92d7a469e..1a529098eec98 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -6069,25 +6069,19 @@ struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 					 gpa_t addr)
+ {
+ 	struct kvm_io_bus *bus;
+-	int dev_idx, srcu_idx;
+-	struct kvm_io_device *iodev = NULL;
++	int dev_idx;
+ 
+-	srcu_idx = srcu_read_lock(&kvm->srcu);
++	lockdep_assert_held(&kvm->srcu);
+ 
+ 	bus = kvm_get_bus_srcu(kvm, bus_idx);
+ 	if (!bus)
+-		goto out_unlock;
++		return NULL;
+ 
+ 	dev_idx = kvm_io_bus_get_first_dev(bus, addr, 1);
+ 	if (dev_idx < 0)
+-		goto out_unlock;
+-
+-	iodev = bus->range[dev_idx].dev;
+-
+-out_unlock:
+-	srcu_read_unlock(&kvm->srcu, srcu_idx);
++		return NULL;
+ 
+-	return iodev;
++	return bus->range[dev_idx].dev;
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_io_bus_get_dev);
+ 
+-- 
+2.47.3
+
