@@ -1,106 +1,156 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210A53A7F62
-	for <kvmarm@lists.linux.dev>; Sun, 28 Jun 2026 15:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB783451B3;
+	Mon, 29 Jun 2026 03:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782661490; cv=none; b=YSXS7fU3NRCZItx7334Rq5fdFLX7OFtnMfIdil0hORqpc3xNs7NwsjvG+ydSciLLO+o0h+5ZD23FUDpU8Dh6voawA/rJCBlLneMXJmjbWyg4ZHn5HvCYJmd0cnpABk9GrBUSl8p8RhCqOBRzpMhm34XHQsYV5rn9XVvo11Uit/E=
+	t=1782705316; cv=none; b=qMmtlfJ+CiQ9YCpqCzomNKPr+SQJyv83/JWfrcaYS3bBKiVksRvWn+j79TlbACuNcBEsVKDtrxy79eQxQCeC3TS/sd5VpkTDv6Qsg3ihvTIauFvY848bIgabew2qepbreS5n6jjAnB6HjDMcAbqUHl9AKkbR7bdibkMBAEToON8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782661490; c=relaxed/simple;
-	bh=XbLC/hBePDUMf2KSfI/RNXhwv4brM6tuZ32DJhN/Ibs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aawjqMUycMjH6V5XdS+0Bm84q0crZlJEgobhi1XnvMSBRdrQ8wNqAdurNSJdIqaiXg/5o9LhzLruACIjg+HM1rB0N9Rc4ZhAAP4+uUjrAANvXZxX7D6gMEPlqBvFRiSXfWYapeYWdDV2WRAfoGjQtcR/TvxJN/mYiX2FUGV/uZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t4KI/Mfy; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782705316; c=relaxed/simple;
+	bh=+9Gt5xbV0f6uwKj3h75aKeru0YfHJBPFQCGeKZXf2cU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WMnsH4DOmlBU6m99/XjkspTaEtkwLNxrHx41sMAds6AfFBRbBzXYGqlVrSo/9a0G5cdxycoffXhyFAiKIC52ye0xpe8hCYUgCH8kcChVgqgu7DuC0LFlzKRU6idEVfnFRaOnjL/iL+BcDzWCTOYcI0Zn/bimUnB9rKy4Sx3j6gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Pft78SEo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mhU/07WU; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t4KI/Mfy"
-Message-ID: <a6ccc7a8-488b-4454-81b1-f29dd875845c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782661486;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Pft78SEo";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mhU/07WU"
+Date: Mon, 29 Jun 2026 05:55:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1782705313;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SoYBPS92T9jxSeucptjXLkmBHa33QEMKFqRqtKW/zko=;
-	b=t4KI/MfyAx/8dC/ImRGrYtKYp2FWHf5OATwSspzG2rLAQnlorpfLIdH5DHMsHBPpURHdEt
-	6CKebtCpB6rgyPOrrP0qezt0lCo8jnidSyMlnahfleW5Mkq/mBaiF7iluBceFe8CDBdU7O
-	vGGiCIiiTUexvIN4ivwxtVUCMxfmiAk=
-Date: Sun, 28 Jun 2026 23:44:25 +0800
+	bh=fphPRIfC3c7/rVG8Mt/TDc8McgZz28sFey5ZU2tWKdc=;
+	b=Pft78SEoAU9N4qr3lmpoTg0M92qy3Nft6vgej121eR9dSbMe0f8peTU3UQ5ZdZp4xb32eB
+	b7WgzU76UpqfIi0KH7Nok5zMxvDv0BWBBliu/F8F1xalkGFAYdD3oGsQzbc0O5OjAwtWCF
+	mXycnLD/Wd7oQtN0SElsTscfGpUIJ3xYAESLabeu0rfoa+vtgLN19lNYJ3atZNfWAGOetu
+	XZifQFpTfhxnNu61bjULxpRwl9PAqqmE3eXNeppbBRnouZ1TD+2oTzJkKTam5Hq6Pq/Lz1
+	Zl42CcwgABCE3nJlNBy1i0YxdmOXGkBpyzioiyLcnR307F4EAjjODdDMzVT1mA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1782705313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fphPRIfC3c7/rVG8Mt/TDc8McgZz28sFey5ZU2tWKdc=;
+	b=mhU/07WU2k0PFYZQUZgClVivDlMZa7FcCpph6HWnRTGAFP5kbPcuuzB14gmyxBBGCv5W+f
+	6CGdzH8OyJeCbxDw==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, 
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, 
+	linux-sound@vger.kernel.org
+Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
+ ktime_get_snapshot_id()
+Message-ID: <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.374814973@kernel.org>
+ <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
+ <87echtk24a.ffs@fw13>
+ <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
+ <87fr29ib4v.ffs@fw13>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH] KVM: selftests: fix steal_time for arm64 with host page
- size > 4K
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Jiakai Xu <xujiakai2025@iscas.ac.cn>, Shuah Khan <shuah@kernel.org>,
- Andrew Jones <andrew.jones@oss.qualcomm.com>,
- Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>
-References: <20260504112808.21276-1-sebott@redhat.com>
- <7575a845-a542-4b16-b512-aec3126f97f3@linux.dev>
- <335f21e5-493d-012d-b07c-2e48cc2b9aeb@redhat.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <335f21e5-493d-012d-b07c-2e48cc2b9aeb@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87fr29ib4v.ffs@fw13>
 
-On 6/22/26 10:14 PM, Sebastian Ott wrote:
+On Fri, Jun 26, 2026 at 05:17:52PM +0200, Thomas Gleixner wrote:
+> On Fri, Jun 26 2026 at 13:03, Thomas Weißschuh wrote:
+> > On Fri, Jun 26, 2026 at 12:49:41PM +0200, Thomas Gleixner wrote:
+> >> On Fri, Jun 26 2026 at 10:48, Thomas Weißschuh wrote:
+> >> > On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
+> >> > (...)
+> >> >
+> >> >>  static inline void tk_update_aux_offs(struct timekeeper *tk, ktime_t offs)
+> >> >> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
+> >> >>  		tkd = &tk_core;
+> >> >>  		offs = &tk_core.timekeeper.offs_boot;
+> >> >>  		break;
+> >> >> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
+> >> >> +		tkd = aux_get_tk_data(clock_id);
+> >> >> +		if (!tkd)
+> >> >> +			return false;
+> >> >> +		offs = &tkd->timekeeper.offs_aux;
+> >> >> +		break;
+> >> >
+> >> > 'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr_mono'
+> >> > are the same for auxilary clocks, so this will compute a wrong 'monoraw'.
+> >> 
+> >> AUX clocks are independent in the first place and the MONORAW part is
+> >> the "MONORAW" related to the AUX clock itself. 
+> >> 
+> >> > Instead 'monoraw' should be computed based on 'tk_core'.
+> >> > Which then also requires the sequence locking of 'tk_core'.
+> >> 
+> >> No. From a PTP and steering point of view you want the "raw" value which
+> >> is related to the AUX clock itself and not the global one.
+> >
+> > Ack.
+> >
+> > However the kdocs call it 'CLOCK_MONOTONIC_RAW'. Can we clean this up?
 > 
-> Fix the following failure when running with 16K host page size:
-> ==== Test Assertion Failure ====
->   lib/kvm_util.c:991: vm_adjust_num_guest_pages(vm->mode, npages) == npages
->   pid=873 tid=873 errno=0 - Success
->      1  0x0000000000405a27: vm_mem_add at kvm_util.c:991
->      2  0x000000000040241f: check_steal_time_uapi at steal_time.c:223 (discriminator 7)
->      3   (inlined by) main at steal_time.c:539 (discriminator 7)
->      4  0x00007fff8b57af3b: ?? ??:0
->      5  0x00007fff8b57b007: ?? ??:0
->      6  0x0000000000402b6f: _start at ??:?
->   Number of guest pages is not compatible with the host. Try npages=4
+> Yes. Something like the below?
+
+Looks good, thanks.
+The corresponding structure definitions are a also affected, though.
+
+> Thanks,
 > 
-> Fixes: fc240715fc50 ("KVM: selftests: arm64: Fix steal_time test after UAPI refactoring")
-> Reported-by: Zenghui Yu <zenghui.yu@linux.dev>
-> Link: https://lore.kernel.org/kvmarm/7575a845-a542-4b16-b512-aec3126f97f3@linux.dev/T/#u
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+>         tglx
 > ---
->  tools/testing/selftests/kvm/steal_time.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-> index 76fcdd1fd3cb..cdb81f3ee4b2 100644
-> --- a/tools/testing/selftests/kvm/steal_time.c
-> +++ b/tools/testing/selftests/kvm/steal_time.c
-> @@ -208,6 +208,7 @@ static void check_steal_time_uapi(void)
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -1202,10 +1202,21 @@ static inline u64 tk_clock_read_snapshot
+>  
+>  /**
+>   * ktime_get_snapshot_id -  Simultaneously snapshot a given clock ID with
+> - *			    CLOCK_MONOTONIC_RAW and the underlying
+> + *			    the corresponding monotonic raw the underlying
+>   *			    clocksource counter value.
+>   * @clock_id:		The clock ID to snapshot
+>   * @systime_snapshot:	Pointer to struct receiving the system time snapshot
+> + *
+> + * For the system time keeping clocks (REALTIME, MONOTONIC and BOOTTIME) the
+> + * monotonic raw clock is CLOCK_MONOTONIC_RAW. For AUX clocks this is the
+> + * monotonic raw clock related to the AUX clock. These AUX clock related
+> + * monotonic raw clocks have a strict linear offset to the system time
+> + * CLOCK_MONOTONIC_RAW:
+> + *
+> + *	MONOTONIC_RAW(AUX$N) = CLOCK_MONOTONIC_RAW(system) + offset(AUX$N)
+> + *
+> + * The offset is established when a AUX clock is initialized, but it is
+> + * currently not accessible.
+>   */
+>  void ktime_get_snapshot_id(clockid_t clock_id, struct system_time_snapshot *systime_snapshot)
 >  {
->      struct kvm_vm *vm;
->      struct kvm_vcpu *vcpu;
-> +    unsigned int gpages;
->      u64 st_ipa;
->      int ret;
+> @@ -1512,6 +1523,9 @@ EXPORT_SYMBOL_GPL(ktime_real_to_base_clo
+>   * @xtstamp:		Receives simultaneously captured system and device time
+>   *
+>   * Reads a timestamp from a device and correlates it to system time
+> + *
+> + * See documentation for ktime_get_snapshot_id() for information about the raw
+> + * monotonic time stamp which is used here.
+>   */
+>  int get_device_system_crosststamp(int (*get_time_fn)
+>  				  (ktime_t *device_time,
 > 
-> @@ -220,8 +221,9 @@ static void check_steal_time_uapi(void)
->      };
-> 
->      vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
-> -    vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, 1, 0);
-> -    virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, 1);
-> +    gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, 1);
-
-Would vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE) be better
-to describe the number of pages we want to add?
-
-> +    vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
-> +    virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, gpages);
-> 
->      st_ipa = (ulong)ST_GPA_BASE | 1;
->      ret = __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &dev);
