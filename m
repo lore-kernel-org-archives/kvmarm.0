@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B563FDC14
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 09:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A0B3FE64A
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 09:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782725783; cv=none; b=cElTbfs/7jWGY9dfktR0bYm7dSQPC5UYUdtV28JjBrg1L/Stza3PZ0CW5ZvDnuAh2jqZGXrKEThzTS7rdIkg41x8MLqXGRLQNXma3ojtGB/i84g+as+CZ7q7K0SngguMR24DMQigavzzaiinCO5Kg+oZxYuu3Zdy9pZFT4RT53U=
+	t=1782725785; cv=none; b=afkI4i2S6cqpEiNYXaO5o5lShY00kSyu/4nzzU+CSskpWlb9rqZmWEZIpMkL1460x8BMQNbj/oJEzXUoWkHZRT4GdVGtwwYSikH70BPEnqg+I7IaGGgO55Ph4dMVPjh26f4EhRmEufEll82JGzsbFMXqKzQrbutszzYwkGbjEHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782725783; c=relaxed/simple;
-	bh=71oD1q4hx/jEjAFifRSA96kSwwA6DTkKHs5psdGF1cw=;
+	s=arc-20240116; t=1782725785; c=relaxed/simple;
+	bh=2zBgh4m1N7TvcBWeVoAmS/YX4Hm7U8l/VbANdLXbh7s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RkBJ/GOAu3pGJ2uyB+obwvdnByCihczwRbGp08qesWr3ZEkzlyw164euGcl7c+YX2KlO/hBcNu4a1jlW5ZdtnCM9tQkH4RmUBlBlio+G6xaoqFKPxbUI6WhuYQNZX7Kttq/elKgiouO5kmL8g0x49CwtvFUySYw7qkdcnt0VlyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YahZ2rY/; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=V3bX7A1WdlF3u51pwOdHg228TURalkLBUgLnOFgdU7jR798CESFRIehG9VAeUj/6btKspSA3zXlQ1SjFZCRYNkk3Pv5pcEelf8GHMw3KU99FNTWS1b2n8vdeidGejLA8MePL22YKI4NtCQ0yIgWLIbk72x7ySvxieAF1hgGutcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IWuQEVtT; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YahZ2rY/"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490bae3a39bso22659725e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 02:36:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IWuQEVtT"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-493b0fe9659so6108425e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 02:36:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782725778; x=1783330578; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1782725780; x=1783330580; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A3D0xuQZnlofHgVx2W5KKpDjK2IflolNZaSZteTp/rM=;
-        b=YahZ2rY/ldsMYO4WGk+yftAFsSiqkKBHHbuxCCZ4I2/xSIu5KhXc9Zzq6W9mcXBLcx
-         FgH2/TfXIkxR0K0W3y/bhYmH61hbuWxbUuU4GkUKNr9zSMkTergHRBhjzI028y8PAXem
-         gtc1ZLsF/KfQmOkEVl9aeoLXDMwAuYlZhGgr9BUTJZOIHqN2UCCBAT4dwWWKXjqA4YiI
-         5lLdAVik2Gkl/a0aYqy0EECvLEzRdLdfhu2kU5VH5PoEP8wGmxbJNcXIXSKswzATai7H
-         CddzS6z/laS0EoK+2+Qg99Vff8g7A5pIek/MlpgxoYE/dUqJVNribwUH7yEplqKoaqU6
-         DO1g==
+        bh=FnfFrOcHXwa5bmm+nV3SBHa/UP6ZPQaBfRpC1K8u2Oc=;
+        b=IWuQEVtTMDOOdnkQVG3HVS/y21NUeNIo0uhQMRrlDBCM6o7ynsvXEi/V8dH2XqjyVd
+         okEZqUJQiAt+6T5vgjIOWKnbsZ7T6P7sOKGjnO2lFL0k5yECsf0nz2qB8WAGeHHqQDyB
+         kaWOtHrek7ox+6H9kjvVHsCVBKjV7JEIF6wclahchH3mmIGKb4cmrD4VE5VVVDuYBzLC
+         10hNP6NL93doJsGbnWBH1Aq4XhjafN3UcyMVJZ+0tddsgH8tYLPrIXmVqqKXIaWuGF96
+         l4gKooVwpXHUAlPCA2syoeDB7LuA4gVeqpA2XR7WKEAZqvY/pK3bpa6yvOGeOjgEAEs1
+         tFxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782725778; x=1783330578;
+        d=1e100.net; s=20251104; t=1782725780; x=1783330580;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A3D0xuQZnlofHgVx2W5KKpDjK2IflolNZaSZteTp/rM=;
-        b=EHX+/5CD6zDun3CSFsolIteKU92XDMnQGGAymNe4JTB3TenTgOLoq/+Zn2V9edghkA
-         ZTx/63qpPw1s6S/j5e+loyYPJauojgkKp8sWN4OkuSSltMFSEgs/GMeBovuV/+h1tv6w
-         /ygqs/Z72OSZfHb8SrMiLRdc1OHKEiBAwA4/eQTCkI0vFRf1JIeGzGzT/UT3dzRmBvtW
-         A1/RyGFt6DM442pRZD6Pq8OS3KcQreaay0wldDt6z8fwQFMyVXZDPrj9BMDleqpzuZJG
-         c4fSjXZJ/3BlVmMDXQEn7PWM7615HkfcvX0vd62Ode7pCp3PuVcWzt9n+v07hAMSJ0Kz
-         fr6Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/RgVdOT22jZFIEXOyazSzJPTDb2zhi3VyD3zHjHynx5RA8idnSTSiKI6EXSQ0Y4t6ixMHJlX8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzJN8f9LMDqmIuI4sx+y+aPuG+EOxH1NsqgQnbSIA1iDUfhr+K8
-	D/u9gLKUQEIcUqwqAvLe/JV7+k4LtRLJ5GPF0qVPMrxwV2jiN+nLksT1AY8LQReKc61Ja9R1hqO
-	IoaXBAqfCzkCo5SbdJTSUnbruMvFPqQ==
-X-Received: from wmnk7.prod.google.com ([2002:a05:600c:1687:b0:493:b0fe:519e])
+        bh=FnfFrOcHXwa5bmm+nV3SBHa/UP6ZPQaBfRpC1K8u2Oc=;
+        b=V8lxCu9Oxw8tBxTC82EIfHMT8BcE36pk4pt3uuiOwTjh8kCif7RoArSY/HNFdUjTJl
+         2m6zZEwY1T7cvDLNX2+t+f9GEaklzPnlSzfO7CWFGWqT23QnfzUdg+p4Yb49mAgTIx+n
+         qUts+lwfSyGoh0pwF+Hi3xzNL5PBndDfBboVyViKDZfiGIueXWqA4X0HPdGXdO2tf5Ad
+         5JyhGvghhBdY8vYypXHedigzXkBcFBrVPKRKt7cJodncfTEDkoxte4Rg75j8M9Mt/17U
+         SqJLPgESQZ+WtQEyESLdgUzP16bHhlAjdcylKNSIK8ICbT8EmSshCXcUV48ye9YdhhL6
+         C5Ww==
+X-Forwarded-Encrypted: i=1; AFNElJ9q+oHMKia/lEUbfNq/owS4ikylya+aY0bvKCbH+tjIPRZLqeG0KyL5vU1iiDLQVgl4I2xhvTI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyK6s9Yytw9lhCWHxZAKK+gx99Ov5edKcTAZgpHQk/xM4i7Xnhz
+	vkmWVuML7ylU5pygxmKlCHeSPHDCjW5IcI78190/J1GitAQZFb/AfvEeilw9pI+pDELx7YnkOll
+	3k4IdI9Lx3f8e2K3PfLnDyzvdLuq+XQ==
+X-Received: from wma2.prod.google.com ([2002:a05:600c:8902:b0:493:b2c0:5a0d])
  (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3552:b0:492:700b:deea with SMTP id 5b1f17b1804b1-492700bdef5mr174973385e9.13.1782725777696;
- Mon, 29 Jun 2026 02:36:17 -0700 (PDT)
-Date: Mon, 29 Jun 2026 09:35:56 +0000
+ 2002:a05:600c:a111:b0:492:68bc:3237 with SMTP id 5b1f17b1804b1-49268bc34e3mr160747885e9.32.1782725780006;
+ Mon, 29 Jun 2026 02:36:20 -0700 (PDT)
+Date: Mon, 29 Jun 2026 09:35:57 +0000
 In-Reply-To: <20260629093558.2425257-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260629093558.2425257-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260629093558.2425257-6-sebastianene@google.com>
-Subject: [PATCH v7 5/7] KVM: arm64: Support FFA_NOTIFICATION_GET in host handler
+Message-ID: <20260629093558.2425257-7-sebastianene@google.com>
+Subject: [PATCH v7 6/7] KVM: arm64: Support FFA_NOTIFICATION_INFO_GET in host handler
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
 	will@kernel.org
@@ -70,66 +70,28 @@ Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev,
 	yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-Allow FF-A notification GET messages to be proxied from the pKVM
-hypervisor to Trustzone and verify the arguments sent from the host
-driver.
+Allow the host to send FF-A notification queries to Trustzone and proxy
+these messages from pKVM.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 2bb16aa414f9..c22fe4514741 100644
+index c22fe4514741..712811e89435 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -679,7 +679,6 @@ static bool ffa_call_supported(u64 func_id)
+@@ -678,8 +678,6 @@ static bool ffa_call_supported(u64 func_id)
+ 	case FFA_RXTX_MAP:
  	case FFA_MEM_DONATE:
  	case FFA_MEM_RETRIEVE_REQ:
-        /* Optional notification interfaces added in FF-A 1.1 */
--	case FFA_NOTIFICATION_GET:
- 	case FFA_NOTIFICATION_INFO_GET:
+-       /* Optional notification interfaces added in FF-A 1.1 */
+-	case FFA_NOTIFICATION_INFO_GET:
  	/* Optional interfaces added in FF-A 1.2 */
  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
-@@ -938,6 +937,27 @@ static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
- 	hyp_smccc_1_2_smc(args, res);
- }
- 
-+static void do_ffa_notif_get(struct arm_smccc_1_2_regs *res,
-+			     struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(u32, endp_id, ctxt, 1);
-+	DECLARE_REG(u32, flags, ctxt, 2);
-+	struct arm_smccc_1_2_regs *args;
-+
-+	if (FIELD_GET(FFA_NOTIF_RECEIVER_ENDP_MASK, endp_id) != HOST_FFA_ID) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (flags & GENMASK(31, 4)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	args = (void *)&ctxt->regs.regs[0];
-+	hyp_smccc_1_2_smc(args, res);
-+}
-+
- bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- {
- 	struct arm_smccc_1_2_regs res;
-@@ -1009,6 +1029,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_NOTIFICATION_SET:
- 		do_ffa_notif_set(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_NOTIFICATION_GET:
-+		do_ffa_notif_get(&res, host_ctxt);
-+		goto out_handled;
- 	}
- 
- 	if (ffa_call_supported(func_id))
+ 	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
