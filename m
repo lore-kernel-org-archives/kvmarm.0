@@ -1,113 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1D33932F7;
-	Mon, 29 Jun 2026 08:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782722373; cv=none; b=MdLMRKqNfqnW2gzooSgvUOIg2tMftwdc+caUyQb000X9GD5uXT0Hi+RU+EaoKmICYH3RosdbnIpYJPOErG1l3TcjUZVGZaLOnxgbqXuuOL92KA3L7sQkHC7IvabkOhBHclt8qzttOkaTsP7kPzx8sifLr3RvXhuXLYBXRzNn5M4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782722373; c=relaxed/simple;
-	bh=c4sIW5ycgpKIzndr7OBsugpKjXxHJyhKvNXgVBgHeU4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LFy8mFWRDuEQS6JACV50YjB7neu0+Zbt4F0q2ffy7yPMDLqFFtSvXdWQjB/I2i+Zk4uH8APkb8jfZoCQZOIryD+us4Yni7GAj2RyR1AdELeGZZ3Bw5mV5zXsaunY9rzBOh9Q/Q7dBgzBcX7pPDwgXhq70o4RUrclAEkkvRmuu/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0jrwcN7; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8463F823C
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 08:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782723227; cv=pass; b=OQjMf6+4aKc24MnHhzrdFmzmUgxiCBsmkmj0gXIwUTB7AjgM4J1TYwAg22SppMUVyBsXt7yAz32xNJBr8J3sBF90DNyPFeYjyCWfoTglzFbG9jXLaWA95onWxcIQU9qXslS4BMNBPv1FqsFWm85t34Uyr7GMQynECEgeuxDjAU4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782723227; c=relaxed/simple;
+	bh=3wsBQ5BeEJgTtidFgbbjOCTde6FZFgO30nCGnSXQTfM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c0XQVB6dEFinLCTYWLyOm1TdAK1vGlneEeBjY5hAjV8Ij+3mHjuVIW8AOggZLlYLooMkFLVZEMQpP8iGv34idf+bHQHG1mJa/v8xdkhIFdqc/MivveBR4nXykdBoEH/57oI8jeCA0GM83JGGR8jBkzvGvJM2lxWU5n14l+yggig=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oNVBwUF8; arc=pass smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g0jrwcN7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D224C1F000E9;
-	Mon, 29 Jun 2026 08:39:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782722372;
-	bh=lq5LQ9JJIDNlCaG6JOmQhcLy406DV5gppuzq/19j6u4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=g0jrwcN7FicUiZjmTdmUTBj9Jd6bDziwdyJEXWr9dwXtodAHHfT4gyhX90rCOLzMG
-	 LZ/WbKKfW/llBWAnPUID5vrxbWnIsEMzfnmmGlddoEw07yl0+kN0xTCAnYFMAM1lgw
-	 VfQZ+UddMWjc14ffDQM+l63bdsgK0VxxksGsknHAOJfI4QtBSUKewhoH7Zg50oam7D
-	 BqB5DEpDacVIFF3iKVxhOclY55m87G0cONuxRo9/FtK7dRlsqIymFhcCpQ6mQGksTH
-	 q0ZAahQkgb57Le0NwhxkQtp0csuXF43ZGmnQ3v0UfdtZvb8F5+QwwU8dDaVVxRiAnh
-	 0/tWhLjmKBD7Q==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
- <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
- Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
- <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
- Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
- <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- Johannes Berg <johannes.berg@intel.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
- <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
- linux-sound@vger.kernel.org
-Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
- ktime_get_snapshot_id()
-In-Reply-To: <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
-References: <20260526165826.392227559@kernel.org>
- <20260526171223.374814973@kernel.org>
- <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
- <87echtk24a.ffs@fw13>
- <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
- <87fr29ib4v.ffs@fw13>
- <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
-Date: Mon, 29 Jun 2026 10:39:26 +0200
-Message-ID: <87bjctsptt.ffs@fw13>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oNVBwUF8"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-447bb8bb754so2226340fac.1
+        for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 01:53:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782723225; cv=none;
+        d=google.com; s=arc-20260327;
+        b=RFvYHOug6tjGd26iyQHkXvAa6MznmssuMFZE8C5YlSLbX9x8Fxn/zf6qKgQWwwlIB/
+         UJEMpfm+SLAA2hFj57Wcx0Z1sXPmJ4J0bWNSqNHJFdYsxiaYCS159krk/4gy0plMiCAq
+         HxNfXtjDUjwIhG/7rf82g+bulneBMfOQ4rTd/zm0mMt0sFAyvGbGm70AZbSGxn77fCQp
+         KqkNRDorcbBK+BhihnvFMkk+QNCaD7vFR/QlVNrj0CozOX72mBWaz24JHG5vVKPE3brh
+         4xo0NSxPldDOA5GuHqTLd2cWkIgLeELk965b+bSVuNoaGhBZbN6wzq8v8TXloGBn3WW9
+         BGUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Kom0ZAk0sd+EvCK6HQibq96i7GIy+t3E/vTkY+JP0bw=;
+        fh=TzhA8/HJDdvchB2MUms1m6Vv8u5ZgTgj1kVmahaYnoE=;
+        b=moOYNK80uqv3/R+y8j0DBdcLLFOv1sDwtikpXQPWsplZrHLvzflz3eM1EelXkXUkpe
+         EnL9yAnwE9sRNRze9Bm38lGL06i9rMNO9X7OaJTnCKmcenuFN26AamUMh0vFkZ8kFfUA
+         /zIoMnv6qM1U5OCjPd+vge1fZszP3C9czUpVmFTpjR7XFPdNt4svMwbrCrvNm1FzwNlr
+         2rR8OJ3RzSuNvpEgxtBPbTgcNZQ/z4QGrjSkPA0YQPAjxE9eY68LSl3qiiVNpuM7KqRn
+         6jBkYYOhtkEjCbjm2wT1r/3uuswiwon7h2iFQMiA6zLXJnQgcruWvNITS009jSH8ANWU
+         +mIQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1782723225; x=1783328025; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kom0ZAk0sd+EvCK6HQibq96i7GIy+t3E/vTkY+JP0bw=;
+        b=oNVBwUF8Cqyk28U5OxCTekZ4NvU26ROsv1Z9k4JhCuJZGG1C52YjPJjWHFNliHn3T4
+         JGNxCwgSyuS85ivr6KypI8qf6j02AtkLQuIttPn9yF9IDK9GZixcWDduBM5WSWPQofGn
+         3j0CNZ2xyBAwccafxj6A7Tpwxf84uUdmtDjcNIqwPFoK4hUM8QxYR1uIkHAjUXB+dwTZ
+         EGsFKDcDzkSEgF3UjRioeDevVUMN+t9iYSuUErd8dhTAENhKnn/mNY6cqWU7YWx+Cv1z
+         QUId2s4ntRWS0US+D3zcBqficMnyQpGFTecHrEjgFzn+2m3T4hj0NJORlm6lGE8kzkuI
+         y6hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782723225; x=1783328025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Kom0ZAk0sd+EvCK6HQibq96i7GIy+t3E/vTkY+JP0bw=;
+        b=G+bjVuK+OBmWCXxWsopN02vYPlalsRPhwHIMY4QnoZXh+7mxogFGzjt71I9rsgv6uY
+         lgRnTO9NWsMiRnc0PW9KNYb6W+5ZeVf2S2w/RS7tI5j5JHqygzIgk7uoOSndXxIZRb3j
+         8H3CjoeuMirYzUU7qaLukCV4udxIkXpNP8eQH1gRC8QFmNfZT0YxtZX5B1SS9PNFz9bS
+         1G8oH7ttwZv/wSAWdNoYjM2+pN1leGPxt+8clOf2J67KSAqYX/UWj8xMO9/YfZmEPsa+
+         3vcMt4V0ZlhoCvvMkAyhxKrdp4/NvuOUtiL23qNGxJ+QBldPDqU3A2YmM6VXFE3Fdzj+
+         2WtA==
+X-Forwarded-Encrypted: i=1; AHgh+RrQcto6FgxTDgnKAOjMBsKv328F910kof/V+espYumVGKy1FCEpDaKIif35g0I2Ui+C6Zy9DhM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwDQufQPJPjjetsVxiTVIbSSo8ttaETjB5LUmAdoujHMpxdkKMv
+	nMQpdIW61ntw6lgJG1cvrtuuYYsbTpaC1fP0OU+k/wrSGU99a8uSHE6p7WWmQoLL7vS9+PUvB3c
+	ubs/Q11cSw3JgiBMJjoM3+AWqyLGfSyELjA6I/0AICw==
+X-Gm-Gg: AfdE7clE/KavIOqS+J7505pogf67kGULD8K4MYtg6db0XJT0OQr4wqj43chvWJWTMlm
+	2Oshs+7Scyrjo+YSGZc/LCjoOcW3UoKtm88zDNQ+MwZojjRSSMn7C8PoBmCv5vrMFhmR+1k2fxr
+	Pn4JW8zLHBnle1kZao++H/DJs2opO4yWsfic8reCjxMGAjr4EFKcsOKSKDJJqToVDw647WwxHEf
+	UMStOoOlCxLX9Hy9gNhx8I8gwafXE/SDvSqZ6qHFJepbR7k8qCZCzBRTrrEMiedbwtakW9gebj9
+	7gCUWVtHIKkP13boF3J60VNNdvvdKtMxM3ydjg==
+X-Received: by 2002:a05:6870:b3f3:b0:439:b99e:4414 with SMTP id
+ 586e51a60fabf-447aa7368f0mr16814855fac.6.1782723224733; Mon, 29 Jun 2026
+ 01:53:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260617145130.3729015-1-sebastianene@google.com> <20260617145130.3729015-2-sebastianene@google.com>
+In-Reply-To: <20260617145130.3729015-2-sebastianene@google.com>
+From: Jens Wiklander <jens.wiklander@linaro.org>
+Date: Mon, 29 Jun 2026 10:53:33 +0200
+X-Gm-Features: AVVi8CdwEgzZOnIaRh41XK3ftF9jm9u6SUDMnMyJOJvWlzRi07xhGUj8Wp9l8xs
+Message-ID: <CAHUa44GST=efeDepEHWs_=ehr7JVnkg+y0ZLebcLAGZXxpNegA@mail.gmail.com>
+Subject: Re: [PATCH v7 1/7] optee: ffa: Add NULL check in optee_ffa_lend_protmem
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com, oupton@kernel.org, sudeep.holla@kernel.org, 
+	will@kernel.org, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	android-kvm@google.com, maz@kernel.org, mrigendra.chaubey@gmail.com, 
+	op-tee@lists.trustedfirmware.org, perlarsen@google.com, seiden@linux.ibm.com, 
+	smostafa@google.com, sumit.garg@kernel.org, suzuki.poulose@arm.com, 
+	vdonnefort@google.com, yuzenghui@huawei.com, 
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 29 2026 at 05:55, Thomas Wei=C3=9Fschuh wrote:
-> On Fri, Jun 26, 2026 at 05:17:52PM +0200, Thomas Gleixner wrote:
->> On Fri, Jun 26 2026 at 13:03, Thomas Wei=C3=9Fschuh wrote:
->> > On Fri, Jun 26, 2026 at 12:49:41PM +0200, Thomas Gleixner wrote:
->> >> On Fri, Jun 26 2026 at 10:48, Thomas Wei=C3=9Fschuh wrote:
->> >> > On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
->> >> > (...)
->> >> >
->> >> >>  static inline void tk_update_aux_offs(struct timekeeper *tk, ktim=
-e_t offs)
->> >> >> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
->> >> >>  		tkd =3D &tk_core;
->> >> >>  		offs =3D &tk_core.timekeeper.offs_boot;
->> >> >>  		break;
->> >> >> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
->> >> >> +		tkd =3D aux_get_tk_data(clock_id);
->> >> >> +		if (!tkd)
->> >> >> +			return false;
->> >> >> +		offs =3D &tkd->timekeeper.offs_aux;
->> >> >> +		break;
->> >> >
->> >> > 'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr=
-_mono'
->> >> > are the same for auxilary clocks, so this will compute a wrong 'mon=
-oraw'.
->> >>=20
->> >> AUX clocks are independent in the first place and the MONORAW part is
->> >> the "MONORAW" related to the AUX clock itself.=20
->> >>=20
->> >> > Instead 'monoraw' should be computed based on 'tk_core'.
->> >> > Which then also requires the sequence locking of 'tk_core'.
->> >>=20
->> >> No. From a PTP and steering point of view you want the "raw" value wh=
-ich
->> >> is related to the AUX clock itself and not the global one.
->> >
->> > Ack.
->> >
->> > However the kdocs call it 'CLOCK_MONOTONIC_RAW'. Can we clean this up?
->>=20
->> Yes. Something like the below?
->
-> Looks good, thanks.
-> The corresponding structure definitions are a also affected, though.
+Hi,
 
-True.
+On Wed, Jun 17, 2026 at 4:51=E2=80=AFPM Sebastian Ene <sebastianene@google.=
+com> wrote:
+>
+> From: Mostafa Saleh <smostafa@google.com>
+>
+> From: Mostafa Saleh <smostafa@google.com>
+>
+> Sashiko (locally) reports a possible null dereference under memory
+> pressure due to the lack of validation of the allocated pointer.
+>
+> Fix that by adding the missing check.
+>
+> Fixes: 2b78d79cdf96 ("optee: FF-A: dynamic protected memory allocation")
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> Reviewed-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
+>  drivers/tee/optee/ffa_abi.c | 3 +++
+>  1 file changed, 3 insertions(+)
+
+I'm picking up this isolated patch from the patchset.
+
+Cheers,
+Jens
