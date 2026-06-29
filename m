@@ -1,161 +1,142 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07367403AF0
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 12:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C23328631
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 12:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782737875; cv=none; b=Oj0uNIeI3jKMRUCZSHNy1/ySG7O99VKSl/ZGrEyxvnaNrqrMlgoI7PI9lDCk9YBvKUHzgHuXRYbUHpzNQdpLLGltnMRwz+r/uny/X1hhhBKGpJx0kowNRmizKojT5PXFTUPkTFYo6pRtCWS4JQBZEipNpVXKoe9l0Pc5dt7rLrQ=
+	t=1782737941; cv=none; b=VGupAh1uhj1OnM31G/RnmPUj7v2yjviLyiqmbTnY4+G9wL7YX0FOL3lkDm1ojOhC33S4xZQHqnKVRRuSNBonA1t0LgkY4o70rlD2unY2Et4Rh17rL2ZxqriJ43JDwbKnw6ydsN9D8PSpwE2pSt88dWPX/DMCpOKji2N3VCnoJ3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782737875; c=relaxed/simple;
-	bh=k+Vi/mZPK5IYdZqmsog4sgr1/S4FaklSXKezSkCwaHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=JkL2fJDU9XRIP/jDGBooj0SWn55mXYwi47//lb/ipJC7oiSnzfsogyWHRuqHGRK0Mc+vuQvc381JQbqDgF/aQgLuHOzn7FKfgMnPUAQclwMVtcuZDUrv30e5+PNHrRq+69ybBubDbY6NeVyIqyZNtftoXUFM8QwGgUZz3YJAeqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Vtk/+sw/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782737941; c=relaxed/simple;
+	bh=x74qUCoG1tMTPDnpRxgtvOaFFKN+rOKETRKN5NF9hJc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=PqwBPyv5vQjVSGPXv8iCxUcgOSq3F6l5QIp2HX909Jk8dB67oM2jTFH7icnbeP30hkGYPC1zccnd59U7oyz5+MCqh06mMPIy/eqA6JefemwoMG7uFa7GPY3lUb3w9bVQbhcLNQZ+Oj1A6SEgi1cWNMwtxlkMQQFQmjGjAPHvtOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnCR9jRa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Vtk/+sw/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E2F9F1758;
-	Mon, 29 Jun 2026 05:57:47 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84C6C3F905;
-	Mon, 29 Jun 2026 05:57:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782737872; bh=k+Vi/mZPK5IYdZqmsog4sgr1/S4FaklSXKezSkCwaHY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vtk/+sw/e6D7LdP1SknlHoHekEB8ljOqJ9TvT7A7VtHy+K5LO41Td//clWk7SOAEm
-	 1K7m1dvD4aicA0XZTgTARsxiKs+itS+ndngLMukzF98rE3rEz2WuL2tvX19W4kJdCD
-	 4+m+eF0okMGAlmuiRQeMOrM2L6JvRmiyXQ+bzJgw=
-From: Leonardo Bras <leo.bras@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 01/13] KVM: arm64: HDBSS bits
-Date: Mon, 29 Jun 2026 13:57:45 +0100
-Message-ID: <akJryexouA8QrCt_@LeoBrasDK>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260629113457.0D7B61F000E9@smtp.kernel.org>
-References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-2-leo.bras@arm.com> <20260629113457.0D7B61F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnCR9jRa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A1BF1F000E9;
+	Mon, 29 Jun 2026 12:58:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782737939;
+	bh=+zdJmYKjVDHBMVoww9/9+FERKMAJ/5HHq5NF+3ytj6U=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=fnCR9jRavMvDMGLlKWdJp3Nx39m/rtXOgBTw18Rq62Tt/7rWfpQFTxLLPqPeLJamW
+	 xuIL0uiZsjc77wEegsCWVgfUJ7GOoGMZscL1YS88q8NE13YkGAPPJq9hqdTfzZOtye
+	 Zh31Xw2W/LTzIUXEoJ0ntuv0SHcYqkZjA94W+8LG6C5E4fWkKB7TCapch4kuMH+oZv
+	 rPtvdwCvTquGAoB25VA9GDI+t//xj9ioWZNqsNn8rs4+EP4YvPtsX74o4xwdgrVKm7
+	 tq9hXCz9EH5oWHCGDka82QiF4UeWuNu65sve5Tcs9P/X2MgsKE5yuJGMSc1pCLaKGE
+	 U3PvombTSWjtw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v7 7/7] KVM: arm64: Enforce strict SBZ checks in the
+ FF-A proxy
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sebastian Ene" <sebastianene@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260629093558.2425257-8-sebastianene@google.com>
+References: <20260629093558.2425257-1-sebastianene@google.com>
+ <20260629093558.2425257-8-sebastianene@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jun 2026 12:58:59 +0000
+Message-Id: <20260629125859.8A1BF1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 29, 2026 at 11:34:56AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> - [Critical] Mapping writeable pages with both DBM and S2AP_W set causes `kvm_pgtable_stage2_wrprotect` to silently bypass software write-protection.
-> - [High] `has_vhe_hdbss` incorrectly uses `is_kernel_in_hyp_mode()` which evaluates to true during early boot for pKVM (nVHE), erroneously enabling VHE-specific features.
-> - [Low] Typo in the parameter name for `has_vhe_hdbss`.
-> --
-> 
-> commit 49089779295fae526ba79b7c7e78d31fbe6a9636
-> Author: Leonardo Bras <leo.bras@arm.com>
-> 
-> KVM: arm64: HDBSS bits
-> 
-> The commit introduces HDBSS bits from a future patchset to fulfill
-> dependencies and allow building.
-> 
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index 9a22df0c5120f..aa327eebaf1ca 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> 
-> [ ... ]
-> 
-> > @@ -2131,6 +2131,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
-> >  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
-> >  }
-> >  
-> > +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
->                                                                              ^^^^
-> [Severity: Low]
-> This isn't a bug, but there is a typo in the parameter name (cope instead
-> of scope).
-> 
-> > +{
-> > +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, cope);
-> 
-> [Severity: High]
-> Does using is_kernel_in_hyp_mode() here erroneously enable VHE-specific
-> features for pKVM (nVHE)?
-> 
-> During early boot feature detection, is_kernel_in_hyp_mode() evaluates to
-> true because the host kernel boots at EL2 and only drops privileges to
-> EL1 later during device_initcall_sync (finalize_pkvm()).
-> 
-> This early check could force ARM64_HAS_HDBSS to be enabled on pKVM
-> systems, propagating the KVM_PGTABLE_S2_DBM flag to hypervisor-managed
-> stage-2 page tables.
-> 
-> Should this use is_vhe_hyp_mode() instead to avoid incorrectly matching
-> during the nVHE privileged window?
-> 
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-Copied from HDBSS patchset, so notes for Tian Zheng ^
+New issues:
+- [Medium] Lockless read of `hyp_ffa_version` in `ffa_check_unused_args_sbz=
+()` races with concurrent writes.
 
-> > +}
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 91a7dfad66866..e16729f0b7bd2 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> 
-> [ ... ]
-> 
-> > @@ -731,9 +731,13 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
-> >  	if (prot & KVM_PGTABLE_PROT_R)
-> >  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> >  
-> > -	if (prot & KVM_PGTABLE_PROT_W)
-> > +	if (prot & KVM_PGTABLE_PROT_W) {
-> >  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> >  
-> > +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
-> > +			attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> 
-> [Severity: Critical]
-> Can setting KVM_PTE_LEAF_ATTR_HI_S2_DBM here lead to a silent bypass of
-> software write-protection?
-> 
-> When a page is mapped writable, both DBM and S2AP_W are set. If KVM later
-> write-protects the page via kvm_pgtable_stage2_wrprotect(), only S2AP_W
-> is cleared:
-> 
-> kvm_pgtable_stage2_wrprotect() {
->     ...
->     return stage2_update_leaf_attrs(pgt, addr, size, 0,
->                                     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
->                                     NULL, NULL,
->                                     KVM_PGTABLE_WALK_IGNORE_EAGAIN);
-> }
-> 
-> This leaves DBM intact. Hardware interprets DBM=1, S2AP_W=0 as a clean
-> writable page and automatically sets S2AP_W=1 on the next write without
-> generating a Permission Fault.
-> 
-> For pKVM, this allows a guest to bypass memory isolation. For nested
-> virtualization, nested guest writes will silently set S2AP_W=1 without
-> trapping to the host, resulting in lost dirty pages during live migration.
-> 
+Pre-existing issues:
+- [High] Uninitialized fields in the `res` structure leak EL2 stack memory =
+to the host during FF-A version negotiation.
+--
 
-Is there any case where we want to write protect a page that was marked as 
-writeable, but not for dirty-tracking? 
-If so, we need to also clear DBM for that, and make sure it is done only 
-in those cases. 
+commit a19572356269d847d64eebb97bb025807ca073f2
+Author: Sebastian Ene <sebastianene@google.com>
+KVM: arm64: Enforce strict SBZ checks in the FF-A proxy
 
-The whole idea of HAFDBS / HDBSS is that the page is not actually write 
-protected, it just doing dirty-detection, and this is done much much 
-faster.
+This patch introduces a helper function to enforce strict argument checking
+when the hypervisor acts as a relayer between the host and Trustzone. It
+adds calls to this new helper across various FF-A hypercall handlers to
+ensure unused arguments are zeroed.
 
-Thanks!
-Leo
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 712811e894352..334f8a28d942d 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -74,6 +74,21 @@ static u32 hyp_ffa_version;
+>  static bool has_version_negotiated;
+>  static hyp_spinlock_t version_lock;
+> =20
+> +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int =
+first_reg)
+> +{
+> +	DECLARE_REG(u32, func_id, ctxt, 0);
+> +	int reg, end_reg =3D 7;
+> +
+> +	if (hyp_ffa_version >=3D FFA_VERSION_1_2 && ARM_SMCCC_IS_64(func_id))
+
+[Severity: Medium]
+Can this lockless read of hyp_ffa_version cause a data race?
+
+During host initialization, multiple CPUs could issue the FFA_VERSION
+hypercall concurrently. If CPU A acquires version_lock in do_ffa_version()
+and writes to hyp_ffa_version, CPU B entering do_ffa_version() and calling
+ffa_check_unused_args_sbz() will evaluate this condition.=20
+
+Since logical AND evaluates left-to-right, CPU B could locklessly read
+hyp_ffa_version while CPU A is writing it. Swapping the conditions to check
+ARM_SMCCC_IS_64(func_id) first would short-circuit the evaluation for
+FFA_VERSION (which is an SMC32 call) and avoid the unprotected read entirel=
+y.
+
+> +		end_reg =3D 17;
+> +	for (reg =3D first_reg; reg <=3D end_reg; reg++) {
+> +		if (cpu_reg(ctxt, reg))
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+
+[ ... ]
+
+> @@ -764,6 +804,11 @@ static void do_ffa_version(struct arm_smccc_1_2_regs=
+ *res,
+>  {
+>  	DECLARE_REG(u32, ffa_req_version, ctxt, 1);
+> =20
+> +	if (ffa_check_unused_args_sbz(ctxt, 2)) {
+> +		res->a0 =3D FFA_RET_NOT_SUPPORTED;
+> +		return;
+> +	}
+
+[Severity: High]
+This is a pre-existing issue, but does this code leak uninitialized EL2
+stack memory to the host?
+
+In kvm_host_ffa_handler(), an uninitialized struct arm_smccc_1_2_regs res
+is declared on the stack. When do_ffa_version() is called (both on this
+newly added failure path and the existing paths), it only manually assigns
+res->a0 before returning.
+
+Back in kvm_host_ffa_handler(), ffa_set_retval(host_ctxt, &res) then
+blindly copies the entire structure into the host context, which exposes
+the uninitialized a1-a17 fields to the untrusted host.
+
+> +
+>  	if (FFA_MAJOR_VERSION(ffa_req_version) !=3D 1) {
+>  		res->a0 =3D FFA_RET_NOT_SUPPORTED;
+>  		return;
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260629093558.2425=
+257-1-sebastianene@google.com?part=3D7
