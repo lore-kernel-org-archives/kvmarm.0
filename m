@@ -1,114 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C027333B961
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 10:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BECD330666
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 10:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782728707; cv=none; b=fA2SpiCaG2RoS+Wjja+Xep+2zYxYuC3MHyae/36/aSKSnj1eDiIWgOEfu5i52reEdtbGf+xLadfcVGaRHpHWFn42fFLhP2VYAdBOslaKv/Qc10qGB+IaLM0TsH5yIBeg9VWhtBC1+aQKNh910CliM6fJAahYi9Whr8HhNAY1L+c=
+	t=1782729013; cv=none; b=NooEn6cmAwrsFgGywfPA9BtrlN4C9mWDOVQunMspRjIIiLaMoQOhuGa1E8Bb9zepJDWR8gC3Aht5pwJhOPAmww9WI6T2nXOrqLIjNz6xSska/F0Hb9pOcQcpSQf9t3+Ty7DEdRqDxE7EZ49MCq2yqvNnsl4h3rlqdDu0hp2dZKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782728707; c=relaxed/simple;
-	bh=z24lDj6zwgM1wAMauV/Hf2WwtspoK6qt5lnenQ9QAKI=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=qfWXOG+zY4yEYYAvmGRONnS/hm1vW5bbB27FusU+ZZKkgfwFX59tww4XF5pNhjNo89OgvSRGK6sv+VhyUTxR3wz+NTuKnRvUdvrvbZw3f/vX4pFa18+kj7cIHTs4vm5RkrOqflzUkvb4dRMUqsGdV5OxUJ06uuK+zkS4zoR84bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WV0aLCHb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782729013; c=relaxed/simple;
+	bh=Ds6nJwSE6DlTJOVLmnCEfT6iaTAaF5KKMPl6oD7/81I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=QFbapDmCAZz9na333ugUQRqXJ6sPFrn1qrMRErey+h0E0jLSsVh+FXZHAvnYc7TvHH+4O+qR1HDhFGMCs0khZKBdiEQzh/87+gahP/EfkP4P0QP9cOiyyp854TKMC/vW4FFmDxTtZSwL1PGvHTEZAtLzeuvG+GDqTBBJHfvHzOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vB6G5fRK; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WV0aLCHb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A181F000E9;
-	Mon, 29 Jun 2026 10:25:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782728706;
-	bh=9ji7CdNt4jNNjd6gPQNA6EGIP5Q+2NblcdRjb9fBRjQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=WV0aLCHbyIze61zZshePW+cQXEKA3ztTk47zCAbrqFWdEv8Mi0H+umokTw3OX3jnS
-	 vWFpz0dafhTNbEfaV+3rVNy2UbPS3qPHweBiTRdjIigfd7vd5iGSJyugTE2cyYQ+Cz
-	 qi35th+ha/kH/axRQlUraz0NxZt1PAbqNlyyxKir0zWgl/Ju2GCl8ikzaqu8C+YB79
-	 YWR//VsFf0KOpdk0kTKEFoTjJcYgqazYGCI8+E1YkQRfrsK+slHThdZoQ/EDlyu3ed
-	 KCiEye5Jnv/Ao88+ehfAip9heASvo7alkIg4dv7VnmF/P1WDZT5d13S0JyLvYQ57pu
-	 dXvLiHOoCxxHA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v7 4/7] KVM: arm64: Support FFA_NOTIFICATION_SET in host
- handler
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sebastian Ene" <sebastianene@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260629093558.2425257-5-sebastianene@google.com>
-References: <20260629093558.2425257-1-sebastianene@google.com>
- <20260629093558.2425257-5-sebastianene@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2026 10:25:05 +0000
-Message-Id: <20260629102506.31A181F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vB6G5fRK"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8CAC176C;
+	Mon, 29 Jun 2026 03:30:06 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 418263F836;
+	Mon, 29 Jun 2026 03:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782729011; bh=Ds6nJwSE6DlTJOVLmnCEfT6iaTAaF5KKMPl6oD7/81I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vB6G5fRKn9k3DSsZ9kNIFzcAuSNXA10J9wQsTq/LFe/mWIQ48TDRIOCzdG4V9/9el
+	 co63LfgLjYKeghuLBK4QyEv1HbEj8vlc0zfU61Ues9mvX2vGoshJAJ1s56gZpv/UF4
+	 /AxNl+k/45UD7xM2g5uXRP3JCy4xJWRXVYTZh1wg=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 00/22] KVM: arm64: nv: Implement FEAT_HAFDBS, FEAT_HAFT
+Date: Mon, 29 Jun 2026 11:29:50 +0100
+Message-ID: <akJJHlqXPvWoWTT_@LeoBrasDK>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <8633y9ql8q.wl-maz@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <aj6bZZLSk24Ze6_S@LeoBrasDK> <8633y9ql8q.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] Incomplete validation of MBZ bits in the `FFA_NOTIFICATION_SET` =
-flags parameter.
---
+On Fri, Jun 26, 2026 at 06:12:21PM +0100, Marc Zyngier wrote:
+> On Fri, 26 Jun 2026 16:31:50 +0100,
+> Leonardo Bras <leo.bras@arm.com> wrote:
+> > 
+> > On Tue, Jun 23, 2026 at 11:41:39AM -0700, Oliver Upton wrote:
+> > > KVM's support for hardware descriptor updates has been lacking, owing in
+> > > large part to the fact that the most widely available NV2 hardware
+> > > actually lacks HAFDBS :)
+> > > 
+> > > This series brings support for hardware dirty state and table Access
+> > > flags to the nested MMU. While KVM uses neither of these features, the
+> > > kernel definitely does in the stage-1 page tables. Since there is only
+> > > one hypervisor to rule them all, implementing this stuff at stage-2 is
+> > > mostly motivated by the desire to enable guest stage-1 :)
+> > > 
+> > > Implementing dirty state at stage-2 is a bit more challenging than
+> > > anticipated, I'm in the middle of seeking a relaxation from Arm that
+> > > would make this all architectural. See the last patch for the details.
+> > 
+> > Hi Oliver,
+> > 
+> > Haven't read your patchset yet, but in regards to stage-2 dirty-state
+> > tracking, there have already been some efforts in the area, also
+> > implementing HDBSS and HACDBS in a way of improving performance / reducing 
+> > impact of live migration on a system.
+> 
+> I'm worried you are reading this series the wrong way. This is mostly
+> orthogonal to the whole HDBSS/HACDBS/SLAUA (Super Long And
+> Unpronounceable Acronym). Oh wait, you haven't read it yet. Great :-(.
 
-commit 143dce86ae3c0640e01881b137e64cf1efebff28
-Author: Sebastian Ene <sebastianene@google.com>
+Sorry, I have very little understanding of nested, and I wrongly thought 
+this patchset would be in some way also involve hw-accelerated dirty-bit 
+usage.
 
-KVM: arm64: Support FFA_NOTIFICATION_SET in host handler
 
-This commit allows FF-A notification SET messages to be proxied from the
-pKVM hypervisor to Trustzone by validating the endpoint ID and flags argume=
-nts
-before forwarding the hypercall.
+> 
+> This series is about *implementing* HAFDBS and HAFT in NV. We can't
+> rely on the HW setting the AF and DB in the guest's own S2 PTs,
+> because these page tables are never live. So we have to do it
+> ourselves.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index d52d7c4d5e7f5..2bb16aa414f9f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+Got it!
 
-[ ... ]
+> 
+> So this has nothing to do with S2 dirty tracking for the purpose of
+> migration. The guest could implement its own migration based on that,
+> but that has nothing to do with what this series is doing.
+> 
 
-> @@ -917,6 +917,27 @@ static void do_ffa_notif_unbind(struct arm_smccc_1_2=
-_regs *res,
->  	hyp_smccc_1_2_smc(args, res);
->  }
-> =20
-> +static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
-> +			     struct kvm_cpu_context *ctxt)
-> +{
-> +	DECLARE_REG(u32, endp_id, ctxt, 1);
-> +	DECLARE_REG(u32, flags, ctxt, 2);
-> +	struct arm_smccc_1_2_regs *args;
-> +
-> +	if (FIELD_GET(FFA_NOTIF_SENDER_ENDP_MASK, endp_id) !=3D HOST_FFA_ID) {
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
-> +
-> +	if (flags & GENMASK(15, 2)) {
 
-[Severity: Medium]
-Does this missing validation allow the host to pass arbitrary data in the
-upper bits of the flags parameter to EL3?
+Makes sense.
 
-In do_ffa_notif_set(), the check masks and verifies only bits 15:2. However,
-the FF-A specification defines bits 31:16 as Must Be Zero (MBZ) as well.
-
-This seems to introduce a regression where pKVM does not completely sanitize
-host inputs before forwarding them to TrustZone, potentially exposing EL3
-to unauthorized use of future extensions.
-
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
-> +
-> +	args =3D (void *)&ctxt->regs.regs[0];
-> +	hyp_smccc_1_2_smc(args, res);
-> +}
-> +
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260629093558.2425=
-257-1-sebastianene@google.com?part=3D4
+Thanks for clarifying this, and for your patience.
+Leo
