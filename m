@@ -1,202 +1,357 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28433BB12A;
-	Mon, 29 Jun 2026 11:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314A92765D7;
+	Mon, 29 Jun 2026 11:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782732590; cv=none; b=G1FlGsu4Dw6suxsWWHVS8WLyDr6h/ziVxO8CCTXwEMCjFjjSZult1eC6m6H4sH2u6u7Obc5wVK2pJ4ZYyYQdSXvY8DERnNY/i/CFfYgMp9oC+1I0xZtgHq4fYZp8EpN9xx7iBtaIWPVOR+H2BPAj+KX4t5nVeNFiQ6dItWtmYZ0=
+	t=1782732764; cv=none; b=T1znglYXtjcR/1USN3Db21Vwywpbu+1JTlqMiyHsOWovPA6JBajNtuXFIurSAG6Sj4v/nF8OJUAw5mnicIIe0iXguNEeP+ZqP3S5denEHDuJhLb+7O+GbLyZ8zoONvDsmRq/yizSksErzkRSyUjCD3YYBS3L1dKidNNT6soZgF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782732590; c=relaxed/simple;
-	bh=phKbkr1NrhEGoxRyE0iYnd9z6OZ755BRfUpcX5fJVjY=;
+	s=arc-20240116; t=1782732764; c=relaxed/simple;
+	bh=m4jNVzPUsPeWel3qIxjEeWhTZ/km6W2hxeP8BNxWhw8=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=RUEvfO2YlrDF0j/542aHboj1dOdRV17fIAWVNISDaME0xPEePGfrzqrWs3FJrlwvYGQ0Id5Bm1du1TyGd0I7+SQbcHdZSLp09MNBYCc+wCFnBf3OCZF/58GxWrzt3hYPRiatd5wPFYnPz32CmkUU0Jfr/Vo4Ay8wqBsVVwCafyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Il8mzYMM; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=gj68GK7/1RBj/QHdNG3ljHXZLVmPETg4Bd+yS+qow/mnELxWpBbmVPTcINQ3CtBJ7nswqTn7sh4BmxQ6Ls0nYy8Bh8FjRRZAYZ6visaiG/BnM6W9s+AhZ5E6cViizU16dSnGEIRGo87WZRN/cN0nokJa+9MhZxl2pVo7AO9U88k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LnVFsrZb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Il8mzYMM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F4D01F00AC4;
-	Mon, 29 Jun 2026 11:29:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LnVFsrZb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9142A1F000E9;
+	Mon, 29 Jun 2026 11:32:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782732589;
-	bh=Oz2KRsaZ/c3qC5b6J6rWhHj7kgNW6vi+4jACOuEs+ac=;
+	s=k20260515; t=1782732762;
+	bh=ZVA/CtX9Qzzu7HPDp27iELnPMloglYjbfSLba+FTFnc=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Il8mzYMMVArRYCM4FVfItinAfIUdjSMFNedgIqwZ32loy5UTkpWgWcnGmRRbaoB93
-	 XyvDhIak8FGvl21T4ZTOf70D99OSitgF/vdpJA3AGLXuDjYD+KSP/Qd3iCJZhUpz9w
-	 sWHgO4PrQqpkx+blTnOTNamwxfQ6+WZUFESq0+wjGdR8NzjjFY5LTAKPlzYFude3+I
-	 dzZQxBvO8Oia2GZZgdNMAa0fat8hm+l5HrNzqnGtP4Un25ZIOw9mu0/Z/eNY6sfc4Y
-	 eRu4g3ZVxv4ftASByuHhn2gQ0owQOe2zShsxcqf+rRyumyrs+nF1Ss9cQc9EqeFxOo
-	 Ftm7yGap4gEcg==
+	b=LnVFsrZbWkqxlH7+VkbrPuPRwR/3pLjQvdZXb0AWudpR7NKVoXDNC23VjTIdSNHfm
+	 BQmjN/jcelq68KFfBrGAii8bKCnLJ+u9g4aowfcM0MfpVg8EEOlSjjxBHdckivt89i
+	 NqGoVNl0lKQej3Eg1S0OhkR/YZalqBI8bVqVruOhXX5UfdbInmdnbP0JSGKk+JtRip
+	 /40h28ON7jAw0y0gSQmOH71gfyL92RCkTMhE9qFT3rTVT2mbuc4IEhghMOToAs0J90
+	 KB5Q4SYJhjOUW36RlvpAAsLmgY+eDyesQDdae+yc8lmoe+9S4R9zhbplBo9LkHn2lF
+	 EW+BQQpQORTog==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 06/13] KVM: arm64: dirty_bit: Add base FEAT_HACDBS
- cleaning routine
+Subject: Re: [PATCH v2 05/13] KVM: arm64: Detect (via ACPI) and initialize
+ HACDBSIRQ
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260629111820.1873540-7-leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260629111820.1873540-6-leo.bras@arm.com>
 References: <20260629111820.1873540-1-leo.bras@arm.com>
- <20260629111820.1873540-7-leo.bras@arm.com>
+ <20260629111820.1873540-6-leo.bras@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2026 11:29:48 +0000
-Message-Id: <20260629112948.9F4D01F00AC4@smtp.kernel.org>
+Date: Mon, 29 Jun 2026 11:32:42 +0000
+Message-Id: <20260629113242.9142A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 4 potential issue(=
-s) to consider:
-- [High] Missing Context Synchronization Event (ISB) after writes to contro=
-l-plane system registers.
-- [High] TOCTOU race in wfi() polling loop causes a lost wakeup and indefin=
-ite CPU stall.
-- [High] Missing memory barrier (dsb) before starting the HACDBS hardware e=
-ngine.
-- [High] Missing speculative execution barrier (dsb) after disabling an asy=
-nchronous hardware engine.
+Thank you for your contribution! Sashiko AI review found 12 potential issue=
+(s) to consider:
+- [Critical] The `wfi()` loop in `dirty_bit_clear()` creates a check-then-s=
+leep race condition that can stall the CPU indefinitely.
+- [Critical] The level-triggered `HACDBSIRQ` is not acknowledged or cleared=
+ in the interrupt handler, resulting in an infinite interrupt storm.
+- [High] Missing `isb()` context synchronization barrier after writing to c=
+ontrol-plane system registers `HCR_EL2` and `SYS_HACDBSCONS_EL2`.
+- [High] Missing memory barrier (`dmb ish`) before starting the HACDBS hard=
+ware engine.
+- [High] The ACPI MADT parser registers `hacdbsirq_gsi` without verifying i=
+t is non-zero, risking a hijack of SGI 0.
+- [High] Missing `default:` case in the error handling switch statement lea=
+ves the tracking status unchanged on unexpected hardware errors, causing a =
+vCPU hang.
+- [High] If HACDBS IRQ initialization fails, the feature remains enabled in=
+ KVM, causing a permanent host hang upon first use of dirty tracking.
+- [Medium] ACPI GSI mapping is leaked if `request_percpu_irq()` fails.
+- [Medium] Missing teardown of HACDBS resources if KVM subsystem initializa=
+tion fails.
+- [Medium] The per-cpu HACDBS status is initialized after enabling the per-=
+cpu interrupt, causing a TOCTOU race.
+- [Medium] Calling `smp_processor_id()` in a preemptible context triggers a=
+ kernel BUG/warning.
+- [Low] A variable declaration immediately follows a case label, violating =
+C syntax rules and causing a build failure.
 --
 
-commit 47f5964570817fd652e798e082c349d012b3edda
+commit a0d2df687f2678f7a10866e285efd8319bf84cea
 Author: Leonardo Bras <leo.bras@arm.com>
 
-KVM: arm64: dirty_bit: Add base FEAT_HACDBS cleaning routine
+KVM: arm64: Detect (via ACPI) and initialize HACDBSIRQ
 
-Introduce the basic cleaning routine that is going to be used for both
-dirty-bitmap and dirty-ring routines. It sets the required registers with
-the input buffer, and wait for HACDBSIRQ to happen, which means either
-the task is done, or there was some error during processing.
+Find via ACPI the Id for HACDBSIRQ, initialize it as a per-cpu IRQ and make
+sure any cpu able to run virtualization has it active. Introduce a per-cpu
+structure used by the HACDBSIRQ handler to keep track of entries size and
+the status of HACDBS.
+
+Link: https://github.com/tianocore/edk2/issues/12409
+
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 50adfff75be82..dc1a4629aaeb9 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+[ ... ]
+> @@ -2481,6 +2484,8 @@ static int __init init_subsystems(void)
+>  	if (err)
+>  		goto out;
+> =20
+> +	kvm_hacdbs_init();
+> +
+>  	kvm_register_perf_callbacks();
+> =20
+>  	err =3D kvm_hyp_trace_init();
+
+[Severity: Medium]
+If a subsequent initialization step like kvm_hyp_trace_init() fails, the
+code branches to the out: error path and aborts KVM initialization. Does
+this path need to call a teardown function to free the per-CPU IRQ and
+release the GSI allocated by kvm_hacdbs_init()?
 
 > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> index 789da8712b1b4..e4283828b7807 100644
+> index 32fe938d6bf70..789da8712b1b4 100644
 > --- a/arch/arm64/kvm/dirty_bit.c
 > +++ b/arch/arm64/kvm/dirty_bit.c
-
 [ ... ]
-
-> @@ -24,6 +25,86 @@ DEFINE_PER_CPU(struct hacdbs, hacdbs_pcp) =3D {
-> =20
->  static __ro_after_init int hacdbsirq =3D -1;
-> =20
-> +static void hacdbs_start(u64 *hw_entries, int size)
+> @@ -14,3 +21,93 @@
+>  	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+>  #define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+>  #define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+> +
+> +static __ro_after_init int hacdbsirq =3D -1;
+> +
+> +static irqreturn_t hacdbsirq_handler(int irq, void *pcpu)
 > +{
-> +	u64 br;
-> +	/* Each entry is 8 bytes */
-> +	int size_b =3D size * sizeof(hw_entries[0]);
-> +	int size_p2 =3D max(roundup_pow_of_two(size_b), PAGE_SIZE);
+> +	u64 cons =3D read_sysreg_s(SYS_HACDBSCONS_EL2);
+> +	unsigned long err =3D FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons);
 > +
-> +	/* If not using the full size of the array, put a stop entry at the end=
- */
-> +	if (size_b < size_p2)
-> +		hw_entries[size] =3D HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
+> +	switch (err) {
+> +	case HACDBSCONS_EL2_ERR_REASON_NOF:
+> +		this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> +		break;
+> +	case HACDBSCONS_EL2_ERR_REASON_IPAHACF:
+> +		/* When size not a power of two >=3D 4k, exit with reserved TTLW */
+> +		int index =3D FIELD_GET(HACDBSCONS_EL2_INDEX, cons);
+
+[Severity: Low]
+Does this variable declaration cause a build failure? Under standard C rule=
+s,
+a label can only be attached to a statement, and a declaration is not a
+statement.
+
 > +
-> +	sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
-> +			   HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
-> +
+> +		if (index >=3D this_cpu_read(hacdbs_pcp.size)) {
+> +			this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> +			break;
+> +		}
+> +		fallthrough;
+> +	case HACDBSCONS_EL2_ERR_REASON_STRUCTF:
+> +	case HACDBSCONS_EL2_ERR_REASON_IPAF:
+> +		this_cpu_write(hacdbs_pcp.status, HACDBS_ERROR);
+> +		break;
 
 [Severity: High]
-Does this code need an immediate isb() after writing the control-plane syst=
-em
-register SYS_HACDBSCONS_EL2? The ARM64 guidelines indicate that an isb() mu=
-st
-be the very next instruction after writing a control-plane system register =
-to
-ensure the pipeline doesn't operate with architecturally undefined state.
+What happens if the hardware reports an undefined or reserved error reason
+in HACDBSCONS_EL2_ERR_REASON?
 
-[Severity: High]
-Additionally, should there be a dsb() between the memory store to
-hw_entries[size] and the write to SYS_HACDBSBR_EL2 below? Without an explic=
-it
-memory barrier, the store buffer might not be globally visible before the
-engine begins reading memory, which could cause it to miss the stop marker
-and access out-of-bounds memory.
+Without a default: case, the tracking status wouldn't be updated, remaining
+as HACDBS_RUNNING. Could this cause the synchronous wfi() wait loop in
+dirty_bit_clear() to spin forever and lock up the host CPU?
 
-> +	br =3D (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
-> +	     FIELD_PREP(HACDBSBR_EL2_SZ, ilog2(size_p2) - 12) |
-> +	     FIELD_PREP(HACDBSBR_EL2_EN, 1);
+> +	}
 > +
-> +	this_cpu_write(hacdbs_pcp.status, HACDBS_RUNNING);
-> +	this_cpu_write(hacdbs_pcp.size, size);
-> +	write_sysreg_s(br, SYS_HACDBSBR_EL2);
-> +	isb();
+> +	return IRQ_HANDLED;
 > +}
 
-[ ... ]
+[Severity: Critical]
+Is it necessary to write back to a hardware register to acknowledge or clear
+the active source of this interrupt before returning?
 
-> +/*
-> + * Clears dirty-bits for an array of pages (hw_entries) using HACDBS
-> + * Returns the number of items cleaned from the array. If returns value =
-< size,
-> + *	there was an error in the processing.
-> + */
-> +static int dirty_bit_clear(struct kvm *kvm, u64 *hw_entries, int size)
+The ACPI MADT registers the HACDBS interrupt as ACPI_LEVEL_SENSITIVE.
+Since a level-triggered interrupt remains asserted until explicitly cleared,
+would returning IRQ_HANDLED without clearing the hardware signal trap the C=
+PU
+in an infinite loop of executing the ISR?
+
+> +
+> +void kvm_hacdbs_cpu_up(void)
 > +{
-> +	u64 hcr_el2;
-> +	int ret;
+> +	if (hacdbsirq < 0)
+> +		return;
 > +
-> +	preempt_disable();
+> +	enable_percpu_irq(hacdbsirq, IRQ_TYPE_LEVEL_HIGH);
+> +	this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> +}
+
+[Severity: Medium]
+Could this sequence cause a race condition if a pending interrupt fires
+immediately upon being unmasked?
+
+If hacdbsirq_handler() executes and updates the state, and then
+kvm_hacdbs_cpu_up() resumes and unconditionally overwrites the state
+with HACDBS_IDLE, the handler's update would be lost. Should the status
+be initialized before enabling the interrupt?
+
 > +
-> +	hcr_el2 =3D read_sysreg(HCR_EL2);
-> +	write_sysreg(hcr_el2 | HCR_EL2_VM, HCR_EL2);
-> +	__load_stage2(&kvm->arch.mmu);
+> +void kvm_hacdbs_cpu_down(void)
+> +{
+> +	if (hacdbsirq < 0)
+> +		return;
+> +
+> +	disable_percpu_irq(hacdbsirq);
+> +	this_cpu_write(hacdbs_pcp.status, HACDBS_OFF);
+> +}
+> +
+> +#ifdef CONFIG_ACPI
+> +static int __init hacdbs_acpi_get_irq(void)
+> +{
+> +	struct acpi_madt_generic_interrupt *gicc;
+> +	u32 gsi;
+> +	int irq;
+> +
+> +	gicc =3D acpi_cpu_get_madt_gicc(smp_processor_id());
+
+[Severity: Medium]
+Is it safe to call smp_processor_id() here?
+
+Since kvm_hacdbs_init() is called from init_subsystems() during a
+device_initcall, preemption is enabled. Would calling smp_processor_id()
+directly without disabling preemption trigger a kernel bug/warning if
+CONFIG_DEBUG_PREEMPT is enabled? Should raw_smp_processor_id() or
+get_cpu()/put_cpu() be used instead?
+
+> +	if (gicc->header.length < ACPI_MADT_GICC_HACDBSIRQ)
+> +		return -ENXIO;
+> +
+> +	gsi =3D  gicc->hacdbsirq_gsi;
+> +
+> +	irq =3D acpi_register_gsi(NULL, gsi, ACPI_LEVEL_SENSITIVE, ACPI_ACTIVE_=
+HIGH);
 
 [Severity: High]
-Is an isb() required immediately after writing HCR_EL2 before proceeding to
-__load_stage2()? HCR_EL2 is a control-plane register, and delaying the barr=
-ier
-can cause the pipeline to operate with architecturally undefined state.
+Does the GSI read from ACPI need to be validated before registration?
 
+If the firmware does not support HACDBS, it might leave this field as 0.
+On ARM64, GSI 0 corresponds to Software Generated Interrupt (SGI) 0, which =
+is
+used for Inter-Processor Interrupts (IPIs). Could registering a device
+interrupt handler on GSI 0 corrupt host IPI handling and crash the system?
+
+> +	if (irq < 0) {
+> +		pr_warn("ACPI: Unable to register HACDBS interrupt: %d\n", gsi);
+> +		return -ENXIO;
+> +	}
 > +
-> +	hacdbs_start(hw_entries, size);
+> +	return irq;
+> +}
+
+[Severity: Medium]
+If the subsequent call to request_percpu_irq() in kvm_hacdbs_init() fails,
+how is this ACPI GSI mapping cleaned up?
+
+Since hacdbs_acpi_get_irq() only returns the mapped IRQ and discards the
+original GSI, it seems impossible for the caller to properly unregister it
+via acpi_unregister_gsi(), which would result in leaking the resource.
+
+> +#else
+> +#define hacdbs_acpi_get_irq() (-ENXIO)
+> +#endif
 > +
-> +	do {
-> +		wfi();
-> +	} while (this_cpu_read(hacdbs_pcp.status) =3D=3D HACDBS_RUNNING);
+> +void __init kvm_hacdbs_init(void)
+> +{
+> +	int irq;
+> +
+> +	/* FEAT_HACDBS is only supported if Linux runs in EL2 (VHE) */
+> +	if (!system_supports_hacdbs() || !is_kernel_in_hyp_mode())
+> +		return;
+> +
+> +	irq =3D hacdbs_acpi_get_irq();
+> +	if (irq < 0)
+> +		return;
+> +
+> +	if (request_percpu_irq(irq, hacdbsirq_handler, "HACDBSIRQ", &hacdbs_pcp=
+) < 0)
+> +		return;
 
 [Severity: High]
-Could this polling loop cause a lost wakeup and indefinite CPU stall? The l=
-oop
-unconditionally sleeps on the first iteration and checks the condition
-non-atomically with respect to interrupts.=20
+If request_percpu_irq() or hacdbs_acpi_get_irq() fails, the function returns
+early. Is there a global flag that needs to be unset to tell KVM that HACDBS
+hardware cleaning is unavailable?
 
-If the HACDBSIRQ interrupt is delivered and serviced just before the wfi()
-instruction executes, the wfi() will wait for a new interrupt that will nev=
-er
-arrive. Should the check be made atomic with the sleep, for example by mask=
+If KVM later assumes hardware support is available and calls
+dirty_bit_clear() unconditionally, it might set the software status to
+HACDBS_RUNNING and wait in a wfi() loop. Since the IRQ is disabled or
+unmapped, the handler would never fire, resulting in a host hang.
+
+
+Additionally, I have a few questions regarding the implementation of
+dirty_bit_clear() and hacdbs_start(), which appear to interact with the
+features introduced in this patch:
+
+[Severity: High]
+In dirty_bit_clear(), is an isb() required after the write to HCR_EL2?
+
+dirty_bit_clear() {
+    ...
+    write_sysreg(hcr_el2 | HCR_EL2_VM, HCR_EL2);
+    __load_stage2(&kvm->arch.mmu);
+    ...
+}
+
+Similarly, in hacdbs_start(), is an isb() required after writing to
+SYS_HACDBSCONS_EL2?
+
+hacdbs_start() {
+    ...
+    sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
+                       HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
+
+    br =3D (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
+    ...
+}
+
+The ARM64 subsystem guidelines indicate that writes to control-plane system
+registers must be followed by an isb() as the very next instruction to
+ensure subsequent instructions do not execute with an architecturally
+undefined pipeline state.
+
+[Severity: Critical]
+Does the wfi() loop in dirty_bit_clear() contain a check-then-sleep race
+condition?
+
+dirty_bit_clear() {
+    ...
+    do {
+        wfi();
+    } while (this_cpu_read(hacdbs_pcp.status) =3D=3D HACDBS_RUNNING);
+    ...
+}
+
+Although preemption is disabled, local interrupts are not disabled during t=
+his
+check. If the hardware interrupt fires after the condition is checked but
+before the wfi() executes, the CPU could service the interrupt, update the
+status to HACDBS_IDLE, return, and then execute wfi(). The CPU would then
+sleep indefinitely, causing a host hard lockup.
+
+[Severity: High]
+In hacdbs_start(), is a memory barrier like `dmb ish` required before start=
 ing
-IRQs before the check?
+the hardware engine?
 
-> +
-> +	ret =3D hacdbs_stop();
-> +
-> +	write_sysreg(hcr_el2, HCR_EL2);
-> +	isb();
+hacdbs_start() {
+    ...
+    if (size_b < size_p2)
+        hw_entries[size] =3D HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
+    ...
+    write_sysreg_s(br, SYS_HACDBSBR_EL2);
+    isb();
+}
 
-[Severity: High]
-Should there be a speculative execution barrier (dsb) after stopping the en=
-gine
-in hacdbs_stop() and before changing the translation context here?=20
-
-The ARM64 guidelines mandate a speculative execution barrier (dsb + isb) af=
-ter
-disabling an asynchronous engine to definitively halt out-of-context execut=
-ion
-before updating the translation regime.
-
-> +
-> +	/*
-> +	 * No DSB is needed here, as kvm_flush_remote_tlbs_memslot() that happe=
-ns
-> +	 * later in generic dirty-cleaning code already performs a DSB before
-> +	 * doing the TLBI.
-> +	 */
-> +
-> +	preempt_enable();
-> +
-> +	return ret;
-> +}
+A sentinel stop entry is written to the memory buffer before writing to
+SYS_HACDBSBR_EL2 to enable the engine. Since system register writes are not
+inherently ordered with respect to memory stores, the hardware engine might
+begin reading before the stop entry is visible in coherent memory.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260629111820.1873=
-540-1-leo.bras@arm.com?part=3D6
+540-1-leo.bras@arm.com?part=3D5
