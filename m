@@ -1,188 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D75B40D581;
-	Mon, 29 Jun 2026 11:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975D23EDAAE
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 12:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782733974; cv=none; b=LbmLGONgsBlJ39c3Rh/kL4XtCHqdasfRDd+ayKYvPoCS6NfxwyGVY38mR+h/MStzTj/GXLbE3CJoGz4Jdk4KMjRl5/ZRDTTYJx6FfmrLJI87kuvtZELl4IEYaA6GDcPYI0e3uPkNLmUcXGPOMvg4crlvkmLjEXYj/mmh6Eje224=
+	t=1782734703; cv=none; b=OV4XTJL26hkLYQJwWbfDO5hp8taw4nAvsThOTlMhO7I+fPfcwi6ummOEnZhXmxFbn/S+0CYmYjBWtm7+R0zz+1Owdldr5iNtQtw66cigiIGQfAtT75OH8TxiLBwuPUWzEVE9rJMdAGza3jTys71ohJBQ7nnJoFcINd6FmRU6gb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782733974; c=relaxed/simple;
-	bh=jBJCyVOfoELRqet1Hchr9zK6UrEcK5Is9iXtfLYz4xU=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=AaEFmzZJlmGPigqAr2klyGIj3wJYUTB8X5D0ws6jvNKTg/6SrJVTWxCgKRvcTycpdV++jgdXLoPZgW7H/tseVZfb879insOMl8xsbCUZSVf7WiWHC5e1n0fZ6louZ50KdyozMU6jupbrW6oM0w3mk+5JqkimW7wtKyMW8AGjFvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T55iAki1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782734703; c=relaxed/simple;
+	bh=hduq/+QUzvOYvyBjV6zvOD13s4oXxdEzyFDF6XcgV/o=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=DAih6k+pu66C0KzYfZMHMfRPRBTlhVxD+bTv7a0TQk/itVJXBXEJji9xkHwT9OVkNKKqTyCfvrUHJQbgwRMjHkoENOkPooV/qxK3t9p/uwCjlbbLbN6OKgGF1YJwJgBvavVOqryI/agVxyFCJLgyV20iLGeXVTln2Hfppfk0IZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rsv/fO1Y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T55iAki1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A6791F000E9;
-	Mon, 29 Jun 2026 11:52:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782733972;
-	bh=iBcQquI8ybp86BeMq6C0HtO1zKhePFe/3Op4+sVdI0k=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=T55iAki1GeuDOEf/ZzNFdMYzmz1rmlw0IvSMWM7s7VCRF4DzHdm+TyWThAbundBtG
-	 ZL7+ZYxtE3Ny2Pkkw5lRQL3lwK4Nz/ndrnGEcHol7TRG8kuqSenSjeM91C9smGrfmP
-	 NvNNXKZAaZLBq+u3dRjtx751JzBi/cFUc1xtVbrwFng7h6+Z2g0re3eFYKCb8nbUb2
-	 7n9sfTtXNWDR+c3fcdJrSrYxlVb0d62Tlj68xnieGFPB36xN/X4qiH8yiC5YEthtau
-	 sCjSumMv4M87Qr+7iF17xkc+v30ZpezG0WFHJLIwqo9D+rSHKBUKXgjL70/15PH0B5
-	 aFKq0ax274eoQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 13/13] KVM: arm64: Enable KVM_HW_DIRTY_BIT
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260629111820.1873540-14-leo.bras@arm.com>
-References: <20260629111820.1873540-1-leo.bras@arm.com>
- <20260629111820.1873540-14-leo.bras@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2026 11:52:52 +0000
-Message-Id: <20260629115252.9A6791F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rsv/fO1Y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782734700;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yxPybTnAynYrqMa7xM6kuJZ/NYcVq9nFK+M5bYeVejI=;
+	b=Rsv/fO1Yzm0t7ZhwY49MrFav1utHnY0bFHdw3UHioR4FqhaMdPd/Oxi0Vf8Q4uRcsY+EQa
+	VoqsFNfzX+bcW8B5k8THhCsw4T2ZvPoPGH67TQ+Xa6SSWmut8HLHy+hkFZArBjHBC5y+X/
+	j1pmr2857aFQnVRo4LoeJXMZZyL8FlU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-R2wFPN08ONylTjAm-ZgqDg-1; Mon, 29 Jun 2026 08:04:59 -0400
+X-MC-Unique: R2wFPN08ONylTjAm-ZgqDg-1
+X-Mimecast-MFC-AGG-ID: R2wFPN08ONylTjAm-ZgqDg_1782734698
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-49271013dcdso19316345e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 05:04:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782734698; x=1783339498;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yxPybTnAynYrqMa7xM6kuJZ/NYcVq9nFK+M5bYeVejI=;
+        b=Erb3uappO2fFFvaybvm5eUuS59ZrKo4tCa+d/MiEx+5lsMB9ebGPRlW5/mF3WAWDDk
+         +EglsKiJ9wIFgMgDxpsMPHg4ncvb8qS+17clK5BrvYXVcBIUlEIrkxnbsj6Q0m0Cswo5
+         /Bv2QlsA8dIgf52kA0Pt4FcwlKGSMXFqfpxbupRFecyFSOD2DW/JzvBVGhSkQvqmju4I
+         pkHe5EBlU2xz0leOa678r7rRpAOP82Fgiv5LCEzUrNwe3B5MrVSQ998lzg83qRvYyY2z
+         xgZ/uwZz2kCzAS+TVm75wXk2sVJGm2Fm/xQbqsgPScfc+eOLwdBqyp+20jlSw1gjBxCh
+         lKbg==
+X-Forwarded-Encrypted: i=1; AFNElJ9c1D5dw+xIDlIygexHvzon2OmW5e7KpdWcWVeNFbLieDBswkAF2biyieC4J9fIOPkNjO13XDI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzA/1DPbthsdMtRe3QPZlr+Ol7SRx+3PIyx4py+IJZU9otU5Pha
+	zDJMIldHG03XmtfjmzbocHBwZNfLL6AZW0mH0lTcVHsYXV1oG3EOhBNQnBSyPKiW7IiHF8k0A5w
+	/tz9a22rE3rwfHuV/Lk2b77RZXY1cqyTDAnT46nudJX3HwaPAt4c4f0bT6Q==
+X-Gm-Gg: AfdE7ckghpbOA60VERb/5Qfid7UPDNWWBXRFh3oG8Gfw6VvFpu3/4qaSfDbbILJiF+t
+	uIE0EwEHtanOdvOlRpMstC+/hNoNSUYjO1Q75g2tSK7IbI35av0Ec9/UAce6WfpHLLCNeDDuFVO
+	X744c6JxfwlqFPGtElE5gV9VdPUqpFHG1H0Dp94N24LEuwgeGARQHkBthhXXvNXIZdTyX8EX0PM
+	HRF7FBmR1K7J1uHx7xN7MWbCVEGzK9cApFzztIg9scHAOIwL66n0FEn/0MQ+yzZOrLEfyOX+Fin
+	7J4KdeGpkYX6nxY/MbCtL2UF+oGoKf+LjjnqzFjJLBeMRhovrTG8jimlTHKAVHXo2bwluSKn0nN
+	qgo5He1MwhJ0awjrcGWUvSF2ROTsbhjbcz8qkaw6LDsLZsW7YUAEDPwMzG4se
+X-Received: by 2002:a05:600c:6096:b0:490:d32b:39c3 with SMTP id 5b1f17b1804b1-493b719262emr8675195e9.6.1782734697940;
+        Mon, 29 Jun 2026 05:04:57 -0700 (PDT)
+X-Received: by 2002:a05:600c:6096:b0:490:d32b:39c3 with SMTP id 5b1f17b1804b1-493b719262emr8674565e9.6.1782734697481;
+        Mon, 29 Jun 2026 05:04:57 -0700 (PDT)
+Received: from rh (p200300f6af2a6100f239e076bbd76784.dip0.t-ipconnect.de. [2003:f6:af2a:6100:f239:e076:bbd7:6784])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46f8d6f10absm43526066f8f.5.2026.06.29.05.04.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2026 05:04:56 -0700 (PDT)
+Date: Mon, 29 Jun 2026 14:04:55 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Zenghui Yu <zenghui.yu@linux.dev>
+cc: Jiakai Xu <xujiakai2025@iscas.ac.cn>, Shuah Khan <shuah@kernel.org>, 
+    Andrew Jones <andrew.jones@oss.qualcomm.com>, 
+    Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
+    linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev, 
+    Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+    Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH] KVM: selftests: fix steal_time for arm64 with host page
+ size > 4K
+In-Reply-To: <a6ccc7a8-488b-4454-81b1-f29dd875845c@linux.dev>
+Message-ID: <073cfbe1-0a27-015b-c688-53c186100fa1@redhat.com>
+References: <20260504112808.21276-1-sebott@redhat.com> <7575a845-a542-4b16-b512-aec3126f97f3@linux.dev> <335f21e5-493d-012d-b07c-2e48cc2b9aeb@redhat.com> <a6ccc7a8-488b-4454-81b1-f29dd875845c@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: RTAsNIk2B_F7M3I6SxuiHYFeyDA9tycDAqgwd3osIaI_1782734698
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
-s) to consider:
+On Sun, 28 Jun 2026, Zenghui Yu wrote:
 
-Pre-existing issues:
-- [Critical] Malicious userspace can trigger a host kernel panic by providi=
-ng an invalid memslot ID in the dirty ring.
-- [High] Unbounded stall in `dirty_bit_clear()` due to a missed wakeup race=
- with `wfi()`.
-- [High] Missing `isb()` immediately after writes to control-plane system r=
-egisters `HCR_EL2` and `SYS_HACDBSCONS_EL2`.
-- [High] Off-by-one error in `split_end` calculation skips huge page splits=
- for subsequent PMD blocks.
-- [High] kvm_arch_dirty_clear_enabled() uses this_cpu_read() without preemp=
-tion disabled.
---
+> On 6/22/26 10:14 PM, Sebastian Ott wrote:
+>>
+>> Fix the following failure when running with 16K host page size:
+>> ==== Test Assertion Failure ====
+>>   lib/kvm_util.c:991: vm_adjust_num_guest_pages(vm->mode, npages) == npages
+>>   pid=873 tid=873 errno=0 - Success
+>>      1  0x0000000000405a27: vm_mem_add at kvm_util.c:991
+>>      2  0x000000000040241f: check_steal_time_uapi at steal_time.c:223 (discriminator 7)
+>>      3   (inlined by) main at steal_time.c:539 (discriminator 7)
+>>      4  0x00007fff8b57af3b: ?? ??:0
+>>      5  0x00007fff8b57b007: ?? ??:0
+>>      6  0x0000000000402b6f: _start at ??:?
+>>   Number of guest pages is not compatible with the host. Try npages=4
+>>
+>> Fixes: fc240715fc50 ("KVM: selftests: arm64: Fix steal_time test after UAPI refactoring")
+>> Reported-by: Zenghui Yu <zenghui.yu@linux.dev>
+>> Link: https://lore.kernel.org/kvmarm/7575a845-a542-4b16-b512-aec3126f97f3@linux.dev/T/#u
+>> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+>> ---
+>>  tools/testing/selftests/kvm/steal_time.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+>> index 76fcdd1fd3cb..cdb81f3ee4b2 100644
+>> --- a/tools/testing/selftests/kvm/steal_time.c
+>> +++ b/tools/testing/selftests/kvm/steal_time.c
+>> @@ -208,6 +208,7 @@ static void check_steal_time_uapi(void)
+>>  {
+>>      struct kvm_vm *vm;
+>>      struct kvm_vcpu *vcpu;
+>> +    unsigned int gpages;
+>>      u64 st_ipa;
+>>      int ret;
+>>
+>> @@ -220,8 +221,9 @@ static void check_steal_time_uapi(void)
+>>      };
+>>
+>>      vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
+>> -    vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, 1, 0);
+>> -    virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, 1);
+>> +    gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, 1);
+>
+> Would vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE) be better
+> to describe the number of pages we want to add?
 
-commit 7b3668eabb9d9e558d0cab4dd205a0b0b5c74a14
-Author: Leonardo Bras <leo.bras@arm.com>
+Hm, I don't think we care. This is just for the uapi checker - the vm/vcpu
+doesn't even run..
 
-KVM: arm64: Enable KVM_HW_DIRTY_BIT
+Thanks,
+Sebastian
 
-This commit sets the Kconfig flag to enable hardware accelerated
-dirty-bitmap and dirty-ring cleaning for arm64 when ACPI is enabled.
-
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 449154f9a4852..db8487bf738b7 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -34,6 +34,7 @@ menuconfig KVM
->  	select HAVE_KVM_IRQ_BYPASS
->  	select HAVE_KVM_READONLY_MEM
->  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
-> +	select HAVE_KVM_HW_DIRTY_BIT if ACPI
->  	select SCHED_INFO
->  	select GUEST_PERF_EVENTS if PERF_EVENTS
->  	select KVM_GUEST_MEMFD
-
-I noticed a few preexisting issues in the hardware dirty tracking
-implementation enabled by this configuration.
-
-arch/arm64/kvm/dirty_bit.c:dirty_bit_clear() {
-    ...
-    do {
-        wfi();
-    } while (this_cpu_read(hacdbs_pcp.status) =3D=3D HACDBS_RUNNING);
-    ...
-}
-
-[Severity: High]
-This isn't a bug introduced by this patch, but can this wfi() sleep
-unconditionally without disabling local interrupts first?
-
-If the HACDBS hardware finishes and its interrupt is handled immediately
-after hacdbs_start() but before the wfi() instruction, wouldn't the wakeup
-event be missed, causing a regression with an unbounded stall?
-
-
-arch/arm64/kvm/dirty_bit.c:__kvm_arch_dirty_ring_clear() {
-    ...
-    memslot =3D kvm_dirty_ring_get_memslot(kvm, entry->slot);
-    slot =3D entry->slot;
-    slot_offset =3D memslot->base_gfn;
-    ...
-}
-
-[Severity: Critical]
-This is a pre-existing issue, but is it safe to blindly dereference memslot
-here without checking if kvm_dirty_ring_get_memslot() returned NULL?
-
-If unprivileged userspace provides an invalid or out-of-bounds slot ID in
-the dirty ring, kvm_dirty_ring_get_memslot() will return NULL, which would
-trigger a panic regression when memslot->base_gfn is accessed.
-
-
-arch/arm64/kvm/dirty_bit.c:dirty_bit_clear() {
-    ...
-    write_sysreg(hcr_el2 | HCR_EL2_VM, HCR_EL2);
-    __load_stage2(&kvm->arch.mmu);
-    ...
-}
-
-arch/arm64/kvm/dirty_bit.c:hacdbs_start() {
-    ...
-    sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
-                       HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
-
-    br =3D (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
-    ...
-}
-
-[Severity: High]
-This isn't a bug introduced by this patch, but do these writes to HCR_EL2
-and SYS_HACDBSCONS_EL2 need an immediate isb()?
-
-In dirty_bit_clear(), HCR_EL2 is written and immediately followed by
-__load_stage2(). In hacdbs_start(), SYS_HACDBSCONS_EL2 is written without
-an immediate isb(). Could this cause a regression where the CPU executes
-subsequent instructions with architecturally undefined pipeline state?
-
-
-arch/arm64/kvm/dirty_bit.c:__kvm_arch_dirty_log_clear() {
-    ...
-    kvm_mmu_split_huge_pages(kvm, start, end);
-    split_end =3D gpa_to_gfn(ALIGN_DOWN(end, PMD_SIZE) + PMD_SIZE - 1);
-    ...
-}
-
-[Severity: High]
-This is a pre-existing issue, but does the calculation for split_end have
-an off-by-one error?
-
-If the dirtied range perfectly aligns with a PMD boundary (where end is a
-multiple of PMD_SIZE), split_end would advance to cover the entire next
-PMD block.
-
-Subsequent iterations would then evaluate offset + BITS_PER_LONG > split_end
-as false, which skips the kvm_mmu_split_huge_pages() call for that next
-block.
-
-
-arch/arm64/include/asm/kvm_dirty_bit.h:kvm_arch_dirty_clear_enabled() {
-    ...
-    static inline bool kvm_arch_dirty_clear_enabled(struct kvm *kvm)
-    {
-        return this_cpu_read(hacdbs_pcp.status) =3D=3D HACDBS_IDLE &&
-    ...
-}
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does
-kvm_arch_dirty_clear_enabled() use this_cpu_read() in a preemptible
-context?
-
-This function is called from kvm_arch_dirty_log_clear() and
-kvm_arch_dirty_ring_clear(), where preemption is enabled. Could the thread
-migrate to another CPU right after the check, leading to a regression where
-dirty clearing logic runs on a CPU with the hardware scanner disabled?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260629111820.1873=
-540-1-leo.bras@arm.com?part=3D13
