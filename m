@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2741F3B4EA1
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 10:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C027333B961
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jun 2026 10:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782728213; cv=none; b=akORv0yLQCal5VBJSplPZXiteIXaQUbCO165lZcOSB0+rKUG9mFV1FqW8oMo7DasvXyjw/TG2UvYDzTG75QdNuldgRwW/5Y0rN22BVmBF+k3naUZ8cMjGUmR90UrX1GB5mD7tnECHlzWh7gp4KYRiq6ysnaDUKPw6fVlJggSMDA=
+	t=1782728707; cv=none; b=fA2SpiCaG2RoS+Wjja+Xep+2zYxYuC3MHyae/36/aSKSnj1eDiIWgOEfu5i52reEdtbGf+xLadfcVGaRHpHWFn42fFLhP2VYAdBOslaKv/Qc10qGB+IaLM0TsH5yIBeg9VWhtBC1+aQKNh910CliM6fJAahYi9Whr8HhNAY1L+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782728213; c=relaxed/simple;
-	bh=gh59nhcFve/EhAvI3zIZA1yvQdmn+qZmVOav9ukuY24=;
+	s=arc-20240116; t=1782728707; c=relaxed/simple;
+	bh=z24lDj6zwgM1wAMauV/Hf2WwtspoK6qt5lnenQ9QAKI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ATtc6ykxfC4FCgJ3454gnR5/zpArQaJEaJOut1l6zoXG+l9zlTxIHLTBlEaSjaSbzeao63xDkyvqYVDLtrD5T0qK/maczf0LowS8so1i1y65x49wbLv/UonOR6X5CLo1Urd3GQC5Uw2fVefV6u5+1NiXtS4i1xe/aIg5VdWF1nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZ1yIOXk; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=qfWXOG+zY4yEYYAvmGRONnS/hm1vW5bbB27FusU+ZZKkgfwFX59tww4XF5pNhjNo89OgvSRGK6sv+VhyUTxR3wz+NTuKnRvUdvrvbZw3f/vX4pFa18+kj7cIHTs4vm5RkrOqflzUkvb4dRMUqsGdV5OxUJ06uuK+zkS4zoR84bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WV0aLCHb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZ1yIOXk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8742E1F000E9;
-	Mon, 29 Jun 2026 10:16:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WV0aLCHb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A181F000E9;
+	Mon, 29 Jun 2026 10:25:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782728211;
-	bh=faTfFXstiVHus+srBo/QNw/H6bmQFD4abSpj6KXqiQ0=;
+	s=k20260515; t=1782728706;
+	bh=9ji7CdNt4jNNjd6gPQNA6EGIP5Q+2NblcdRjb9fBRjQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mZ1yIOXk9oDGVgI2LIXphJ/KqovzpmnCafOg844aKAlILt5Nnt4+M/iy581+K1cnI
-	 piW2CS9K2AxhUJptUX4UQuRpqFh6liXgGkRcNiymmQLOm4XQYvJD9p4KkZ4WgLOA+v
-	 bWiEM/T/LVTV3q25iJQVFKemFkNwsxNKKrABS+eUkv/sooRZ0X0zordQ+UurILLZLd
-	 ouAXgOsYZWsTr7x0c5pVzXRB3b7aTQ0Rn47AwV5v5aADSutZoSS0a11QKhbAcLvulO
-	 aIJuMbEgn1bwp1MtEOIF3fl9Dl52uBEgWlCQ4/hdCaV8toHXs7z/JVbIiUqoNs8asm
-	 u4KXTR5A3pqhA==
+	b=WV0aLCHbyIze61zZshePW+cQXEKA3ztTk47zCAbrqFWdEv8Mi0H+umokTw3OX3jnS
+	 vWFpz0dafhTNbEfaV+3rVNy2UbPS3qPHweBiTRdjIigfd7vd5iGSJyugTE2cyYQ+Cz
+	 qi35th+ha/kH/axRQlUraz0NxZt1PAbqNlyyxKir0zWgl/Ju2GCl8ikzaqu8C+YB79
+	 YWR//VsFf0KOpdk0kTKEFoTjJcYgqazYGCI8+E1YkQRfrsK+slHThdZoQ/EDlyu3ed
+	 KCiEye5Jnv/Ao88+ehfAip9heASvo7alkIg4dv7VnmF/P1WDZT5d13S0JyLvYQ57pu
+	 dXvLiHOoCxxHA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v7 3/7] KVM: arm64: Support FFA_NOTIFICATION_UNBIND in
- host handler
+Subject: Re: [PATCH v7 4/7] KVM: arm64: Support FFA_NOTIFICATION_SET in host
+ handler
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sebastian Ene" <sebastianene@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260629093558.2425257-4-sebastianene@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260629093558.2425257-5-sebastianene@google.com>
 References: <20260629093558.2425257-1-sebastianene@google.com>
- <20260629093558.2425257-4-sebastianene@google.com>
+ <20260629093558.2425257-5-sebastianene@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2026 10:16:51 +0000
-Message-Id: <20260629101651.8742E1F000E9@smtp.kernel.org>
+Date: Mon, 29 Jun 2026 10:25:05 +0000
+Message-Id: <20260629102506.31A181F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,58 +47,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] The FFA_NOTIFICATION_UNBIND handler incorrectly treats the W2 para=
-meter as a reserved field and forces it to be zero, which violates the FF-A=
- specification and breaks valid unbind operations.
+- [Medium] Incomplete validation of MBZ bits in the `FFA_NOTIFICATION_SET` =
+flags parameter.
 --
 
-commit 607a657720d57d669adb319d0385db08fa611fcc
+commit 143dce86ae3c0640e01881b137e64cf1efebff28
 Author: Sebastian Ene <sebastianene@google.com>
 
-KVM: arm64: Support FFA_NOTIFICATION_UNBIND in host handler
+KVM: arm64: Support FFA_NOTIFICATION_SET in host handler
 
-This commit adds support for the FFA_NOTIFICATION_UNBIND host handler by
-verifying the arguments and forwarding the message to TrustZone. It extracts
-the endpoint ID and verifies that the correct host FF-A ID is used before
-allowing the unbind operation to proceed.
+This commit allows FF-A notification SET messages to be proxied from the
+pKVM hypervisor to Trustzone by validating the endpoint ID and flags argume=
+nts
+before forwarding the hypercall.
 
 > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index d52d7c4d5e7f5..2bb16aa414f9f 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+
 [ ... ]
-> @@ -897,6 +896,27 @@ static void do_ffa_notif_bind(struct arm_smccc_1_2_r=
-egs *res,
+
+> @@ -917,6 +917,27 @@ static void do_ffa_notif_unbind(struct arm_smccc_1_2=
+_regs *res,
 >  	hyp_smccc_1_2_smc(args, res);
 >  }
 > =20
-> +static void do_ffa_notif_unbind(struct arm_smccc_1_2_regs *res,
-> +				struct kvm_cpu_context *ctxt)
+> +static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
+> +			     struct kvm_cpu_context *ctxt)
 > +{
 > +	DECLARE_REG(u32, endp_id, ctxt, 1);
-> +	DECLARE_REG(u32, reserved, ctxt, 2);
+> +	DECLARE_REG(u32, flags, ctxt, 2);
 > +	struct arm_smccc_1_2_regs *args;
 > +
-> +	if (reserved) {
+> +	if (FIELD_GET(FFA_NOTIF_SENDER_ENDP_MASK, endp_id) !=3D HOST_FFA_ID) {
 > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
 > +		return;
 > +	}
+> +
+> +	if (flags & GENMASK(15, 2)) {
 
-[Severity: High]
-Does this incorrectly reject valid unbind operations? The FF-A specification
-defines W2 as the Notification ID(s) Low bitmap for unbind requests.=20
+[Severity: Medium]
+Does this missing validation allow the host to pass arbitrary data in the
+upper bits of the flags parameter to EL3?
 
-By declaring W2 as reserved and forcing it to zero, it looks like this hand=
-ler
-prevents the host from unbinding any notifications that use the lower 32 bi=
-ts
-of the Notification ID bitmap.
+In do_ffa_notif_set(), the check masks and verifies only bits 15:2. However,
+the FF-A specification defines bits 31:16 as Must Be Zero (MBZ) as well.
 
-Additionally, should there be an ffa_check_unused_args_sbz() call here to
-verify the remaining unused registers are zeroed out, similar to the other
-handlers?
+This seems to introduce a regression where pKVM does not completely sanitize
+host inputs before forwarding them to TrustZone, potentially exposing EL3
+to unauthorized use of future extensions.
+
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	args =3D (void *)&ctxt->regs.regs[0];
+> +	hyp_smccc_1_2_smc(args, res);
+> +}
+> +
 
 [ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260629093558.2425=
-257-1-sebastianene@google.com?part=3D3
+257-1-sebastianene@google.com?part=3D4
