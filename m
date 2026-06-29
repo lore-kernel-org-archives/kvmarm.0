@@ -1,45 +1,45 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEED40DFA5;
-	Mon, 29 Jun 2026 14:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3643E1CFB;
+	Mon, 29 Jun 2026 14:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782742640; cv=none; b=G3JZuUt5f72QRsqIiy1ERaE4szKH9DRm6l652WrFQRYIJX2pXEMlixGj0qkzTSxwzZ+B5xfiLuyyGRHFJY6H5o0eMmn8jkSyZ4yQ+vmReAmsj5p7joxxV6gw2/onpto9+Lr7BisbmvQeAAmfPjzeCgfRviZM3e3GZRAUP07kRYM=
+	t=1782744487; cv=none; b=IwZEeshfJ9DBCdYqvV2s/eFnckilXmOtEDQJu24OnN7bIGN52x0pBjOt9IK2Rc2H1wdXKapaMjDsJ8rOl68SYxiB/cHg6CJhhLsJ/YqH/8oVbU+0RGgn9ayAclqUt8xlKtu3/qDtGzI/1HjBsDtv6fxZzpNQunDz2cHhtogjP+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782742640; c=relaxed/simple;
-	bh=90gcL8hBTH3A7fEQyB2mW0muWF5XFEJDaOXxV04p5fU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iUrfkSLY/E4d+mwdGWJ7eqvuj9Wx9Dgnkk1UJ7V+pb96LH6HKA+nunDmu0jc3pRR7KrfDLNWtOpMIXKFw47xR8PQptCRcERn5PnhARlBxcAj/x9Ex2K5pW+0e7bSFuoRwFAWXWh8n49RCsVDq1dqkW+qrVb8oVndHSxzHJ+QfLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g17YYQ9p; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782744487; c=relaxed/simple;
+	bh=+pCNkkGZ56/6raU8EBpJrhM1D7spqmtSQE1bdpbcxMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=CTZU4zCK7liHnODZA3tMZHfEmRLJwkheF79HENt4yHlovejIsJUNWWMMSgsO8FJBi92A7CY1KDMFazKOegmBRtdS9/6FLoy6cRcyOcL6PFNBslN6OljgArz3yfz6GMFqROfEFhZJ9dRvcxi7P5qt3ZuiezUHNB4t20yMoPl/lJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=B2pVSlBC; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g17YYQ9p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1961E1F000E9;
-	Mon, 29 Jun 2026 14:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782742638;
-	bh=S6bK/PN6A/7QZziIgNdwB0ThmToPDxMxFw3ywyUt3A8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=g17YYQ9pShtzfDZmFAtSORwWhh7WRru09j5kEv143sgw1CPB709Xa8Pg9UA/LG6sL
-	 XMpq93KvOEctM9jhvR7f66zxvwTD398LBH8CcoL8ig5FR6igJbFYFNawq9Er1nGV6M
-	 br0hRKbVV7WEWXphm1TsfXvDOz1kOSp7zNY8fF/UgP+jvlPD4SvWInKvwzB0F6kzlA
-	 BPZ2hTfqE73zf/nEnMCZP7ltT/Ks+rDqEaRbupe5upQb1/5ZNWm8602zIpbJZc27yV
-	 FoBoK0H2gHY9vgsfc6bWIVyx+Wc16Y3P926JTUs0L72tEAQLMiAibYjW6Plzcnqr3E
-	 Iil0vBwYg8HUg==
-Date: Mon, 29 Jun 2026 15:17:12 +0100
-From: Will Deacon <will@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, mrigendra.chaubey@gmail.com,
-	perlarsen@google.com, suzuki.poulose@arm.com, vdonnefort@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v7 7/7] KVM: arm64: Enforce strict SBZ checks in the FF-A
- proxy
-Message-ID: <akJ-aNK7yWTI__RE@willie-the-truck>
-References: <20260629093558.2425257-1-sebastianene@google.com>
- <20260629093558.2425257-8-sebastianene@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="B2pVSlBC"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6931416A3;
+	Mon, 29 Jun 2026 07:48:00 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD2D13F905;
+	Mon, 29 Jun 2026 07:48:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782744484; bh=+pCNkkGZ56/6raU8EBpJrhM1D7spqmtSQE1bdpbcxMw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=B2pVSlBCQBm2Envdg9jvKjD6n+rnB3LoLf5kFWbO+8Q06YXHgPWssgdYDCnMx5BL5
+	 Xs/oTXNpxpK4ZAtoi82u9wB4/2uQn0FC/MsXRmZrhJtIbMI/oFfAb1+D1Ql71j7hBV
+	 XzOwJij/KMDptrK4WCjyAlPeONV5Zfv0DFi/YGtE=
+From: Leonardo Bras <leo.bras@arm.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [PATCH v2 02/13] KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+Date: Mon, 29 Jun 2026 15:47:51 +0100
+Message-ID: <akKFlzAdB43lRpi1@LeoBrasDK>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260629113645.BE6801F000E9@smtp.kernel.org>
+References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-3-leo.bras@arm.com> <20260629113645.BE6801F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,46 +48,108 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260629093558.2425257-8-sebastianene@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 29, 2026 at 09:35:58AM +0000, Sebastian Ene wrote:
-> Introduce a helper method ffa_check_unused_args_sbz to enforce strict
-> arguments checking when the hypervisor acts as a relayer between the
-> host and Trustzone.
+On Mon, Jun 29, 2026 at 11:36:45AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-> Acked-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 96 ++++++++++++++++++++++++++++++++++-
->  1 file changed, 95 insertions(+), 1 deletion(-)
+> New issues:
+> - [High] The default eager page splitting chunk size violates the KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE UAPI contract by using a value that is not a valid block size for 16KB and 64KB page kernels.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 712811e89435..334f8a28d942 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -74,6 +74,21 @@ static u32 hyp_ffa_version;
->  static bool has_version_negotiated;
->  static hyp_spinlock_t version_lock;
->  
-> +static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int first_reg)
-> +{
-> +	DECLARE_REG(u32, func_id, ctxt, 0);
-> +	int reg, end_reg = 7;
-> +
-> +	if (hyp_ffa_version >= FFA_VERSION_1_2 && ARM_SMCCC_IS_64(func_id))
-> +		end_reg = 17;
+> Pre-existing issues:
+> - [Critical] Dropping mmu_lock between primary and nested stage-2 write-protection creates a window where nested guests can bypass dirty logging.
+> --
+> 
+> commit 09e1d250ed331b9dc20b42b7f9315892a86a5d50
+> Author: Leonardo Bras <leo.bras@arm.com>
+> 
+> KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+> 
+> This commit enables eager hugepage splitting by default for systems
+> supporting HDBSS, setting the default chunk size to 256K pages at
+> stage2 initialization.
+> 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 6c941aaa10c63..e086c01a9325e 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+> >  	for_each_possible_cpu(cpu)
+> >  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+> >  
+> > -	 /* The eager page splitting is disabled by default */
+> > -	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +	 /* The eager page splitting is disabled by default if system has no HDBSS */
+> > +	if (system_supports_hdbss())
+> > +		mmu->split_page_chunk_size = 256 * 1024 * PAGE_SIZE;
+> 
+> [Severity: High]
+> Does this hardcoded chunk size violate the KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> UAPI contract on kernels with 16KB or 64KB pages?
+> 
+> By setting the default chunk size to 256 * 1024 * PAGE_SIZE, this evaluates to
+> 4GB on 16KB page systems and 16GB on 64KB page systems.
+> 
+> However, in arch/arm64/kvm/arm.c:kvm_vm_ioctl_enable_cap(), the chunk size is
+> validated against valid architectural block sizes:
+> 
+>     if (!new_cap || kvm_is_block_size_supported(new_cap)) {
+>     ...
+> 
+> Since 4GB and 16GB are not valid block sizes on those configurations, a VMM
+> like QEMU attempting to read the default capability via KVM_CHECK_EXTENSION
+> and set it back via KVM_ENABLE_CAP will be rejected with -EINVAL.
 
-Sashiko gets angry about this check, but I don't think we need to change
-anything. Yes, there is a data race on hyp_ffa_version if you issue
-FFA_VERSION concurrently with itself, but FFA_VERSION is a 32-bit call
-so it's all moot.
+Sure, changing this to something like PMD_SIZE or PUD_SIZE should be no issue.
+ 
+But this raises a topic I would like to understand:
+- Do we actually need this to be a block_size to assure correctness? or is 
+  it just about efficiency?
 
-In fact, a 64-bit FFA_VERSION would be problematic for other reasons,
-because a single (non-racy) CPU trying to attempt a version downgrade
-could end up passing non-zero values in registers that SBZ in the running
-version (of which it knows nothing about).
+I was thinking on using PUD_SIZE here before, but that would mean very 
+different splitting granularity, as on 4k pagesize we would be splitting 
+512*512 pages (above mentioned 256k pages), but on 16k pagesize we would be 
+splitting 2048*2048 pages (4M), and on 64k pagesize it would be 8k*8k pages 
+(64M). 
 
-So my Ack stands.
+Doing that could defeat the purpose of chunk size to have a possible sleep 
+to not keep the lock hold for too long. In that case, would not it make 
+more sense to use a fixed number of pages instead?
 
-Will
+
+> 
+> [Severity: Critical]
+> This is a pre-existing issue, but by enabling eager hugepage splitting by
+> default for HDBSS, does this exacerbate a race condition with nested guests
+> bypassing dirty logging?
+> 
+> In arch/arm64/kvm/mmu.c:kvm_arch_mmu_enable_log_dirty_pt_masked(), KVM enables
+> dirty logging by write-protecting the primary stage-2 and then calling
+> kvm_mmu_split_huge_pages():
+> 
+>     if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+>         kvm_mmu_split_huge_pages(kvm, start, end);
+> 
+>     kvm_nested_s2_wp(kvm);
+> 
+> Because kvm_mmu_split_huge_pages() can drop the mmu_lock to top-up the memory
+> cache or reschedule, a race window is created before kvm_nested_s2_wp()
+> protects the nested stage-2 tables.
+> 
+> While the lock is dropped, a nested VCPU can fault, map the page via its
+> separate shadow stage-2 (which hasn't been write-protected yet), and write to
+> the page without setting the dirty bitmap, leading to silent memory corruption
+> after live migration.
+> 
+
+But if it's already write-protected in S2, if the nested VCPU faults 
+something, would not that be handled by non-nested faulting routine?
+
+I understand very little of nested, and I can't understand how does that 
+work properly. Maybe Marc or Wei Lin may have a better answer for that.
+
+CC: Wei Lin
+
+Thanks!
+Leo
+
