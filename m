@@ -1,92 +1,130 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56F9407576;
-	Mon, 29 Jun 2026 17:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DBD276049;
+	Mon, 29 Jun 2026 17:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782752988; cv=none; b=n6yKl/lZ+3kZJqKZfa4dbC9/c6krVbVdpNSlo2jd0TRYKIn19/Uk3hZJxyqJgKO2hR6RuyX5EKkb+vMkpcVj16kxwMWDfEgk6f8u16+JadF6KKHbGFgABlwT8yMWonVuuB95p+OuW/KIskfC8V6IrHvyXiz1U2d5YSHD/G+PNH8=
+	t=1782753735; cv=none; b=HlC28yNYkJAiuHA6//WOC6LmBleBXhcpdaurEkW5SitM2vHqQwc4ZVxDRPZf55Ts6rnrxEjwl129cuRLSMatatH7iBi+P6l8ckHSq4nFFOIbrFGJ8zafjOSOrUfaWHQPRufUDHk2pdHAVUDeDXybwEDD92ZJ0P5iW1e8OhPzxGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782752988; c=relaxed/simple;
-	bh=HtYs6nHNYRhKihK/pnZLJUTygtL0W6XFav106LI/DNY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=iw7SEI7wm+bLfQX0C/GrFQ5hRjsgO8rAoeCxU9IvAEYIAvC4Vc0UJ+uknVNe3gmc2Vm1hSpjBVhbqOLONreFqs7Zz7wn5Z2Y0YuzfR4MogW2I5qBBz1T5zVYE1eB7JFO9rTU3OUh819ZYvaU5gU1aXhCQ7cyIgM1yJv1YGx2hyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gAFadE7n; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782753735; c=relaxed/simple;
+	bh=M0DeJ2sFGocMw0PyGSHvELWdraexiP68myqBLJQNHFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m16Th1tTagZCDQpNLCtohoDhbTlbgLeRFLajAKsnmJM+K3FvpPctcLkgFIimFb1ceA2msOPQ3RkesWeQU5l9U4/Q38/8Q9SJavQEzwXtIOA2SlZzhwJCGTU7IHTgLZ3jgLPT8wr2RJ7gR/eOFoSmQ8FLTPYi1uoMJbV68hswb0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gbqz5hrO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gAFadE7n"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BEA563565;
-	Mon, 29 Jun 2026 10:09:40 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34B503F673;
-	Mon, 29 Jun 2026 10:09:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782752985; bh=HtYs6nHNYRhKihK/pnZLJUTygtL0W6XFav106LI/DNY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gAFadE7nqMC4H76sTmKxXTToqWHnS2wXc/WPOMx94NvoDYSjArCIVVVguFtnc5jFG
-	 H4oVVwVT5tj66rUoKI8kpi5QEcgNT1hoHW4ON9RxfqNQxXUMPon1JV3JoNnuaNmUxI
-	 gH+U9cp7LQOw83SFXKMa76bpHPAjA8leRS9NEHpU=
-From: Leonardo Bras <leo.bras@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvm@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 11/13] kvm/dirty_ring: Add arch-generic interface for hw-accelerated dirty-ring cleaning
-Date: Mon, 29 Jun 2026 18:09:42 +0100
-Message-ID: <akKm1hXLG-oi1HGh@LeoBrasDK>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260629114904.701E81F000E9@smtp.kernel.org>
-References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-12-leo.bras@arm.com> <20260629114904.701E81F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gbqz5hrO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 089DE1F000E9;
+	Mon, 29 Jun 2026 17:22:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782753734;
+	bh=MJcyRBCuDpTSk1/d5SQB/+Lx7UTikZcZTrFMFGtoOvg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Gbqz5hrO7fBgXQ2j8893haOH/rdMwMKj41c+b2V2Z0Uo3rrpysIT0kZCrTydl+GhZ
+	 145+yOuR91ka9e4QPcbrDM+idcikLa659R1gY+j1y1uS1dDmSNW8dXSuWr1B6lJkLL
+	 kAVrQppzIlhrGfDSiz2YNzptozjTEwWYYr7/tGdGPBs/fxoBW7Z+Ez2QfbLbdgFA9J
+	 ZykRMu6xyVfadkTOBtnK2AY5uTFemwfRyG7jHE0ykI9P7deLIn4g7Y8h2uLHtledv/
+	 lYvsaYxpKEGUe1vN5bOzExuP7k+IByZyCirBWzi7Zgz/NYHbLJhuUP/9cojUeTzoae
+	 wQB/XIUGPvRiQ==
+Date: Mon, 29 Jun 2026 10:22:12 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Saket Dumbre <saket.dumbre@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Chengwen Feng <fengchengwen@huawei.com>,
+	Kees Cook <kees@kernel.org>,
+	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
+	James Morse <james.morse@arm.com>, Zeng Heng <zengheng4@huawei.com>,
+	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
+	Thomas Huth <thuth@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>, Mark Brown <broonie@kernel.org>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	James Clark <james.clark@linaro.org>, Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org,
+	acpica-devel@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 05/13] KVM: arm64: Detect (via ACPI) and initialize
+ HACDBSIRQ
+Message-ID: <akKpxDulRN7zDrgM@kernel.org>
+References: <20260629111820.1873540-1-leo.bras@arm.com>
+ <20260629111820.1873540-6-leo.bras@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260629111820.1873540-6-leo.bras@arm.com>
 
-On Mon, Jun 29, 2026 at 11:49:03AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] Hardware-accelerated dirty ring reset completely bypasses the reset tracepoint.
-> --
+On Mon, Jun 29, 2026 at 12:17:53PM +0100, Leonardo Bras wrote:
+> Find via ACPI [1] the Id for HACDBSIRQ, initialize it as a per-cpu IRQ
+> and make sure any cpu able to run virtualization has it active.
 > 
-> commit 8d48fca1a0a1a0e2a8d66dd93d79ffc96e524e83
-> Author: Leonardo Bras <leo.bras@arm.com>
+> Introduce a per-cpu structure used by the HACDBSIRQ handler to keep track
+> of entries size and the status of HACDBS. Size is used to detect end of
+> processing in case the number of entries being processed is different of
+> the supported entries size.
 > 
-> kvm/dirty_ring: Add arch-generic interface for hw-accelerated dirty-ring cleaning
+> Status may look easily replaceable by checking HACDBS registers now, but
+> will make the OFF/IDLE detection easier in next patches.
 > 
-> This commit introduces kvm_arch_dirty_ring_clear() to allow architectures
-> to implement hardware-accelerated dirty-ring routines. It adds a call to
-> this new function in kvm_dirty_ring_reset(), which will fall back to the
-> software version if the hardware version is not implemented or fails.
+> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
 > 
-> [ ... ]
-> 
-> > diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> > index 42de1a511037a..fe4e7da6cc4a6 100644
-> > --- a/virt/kvm/dirty_ring.c
-> > +++ b/virt/kvm/dirty_ring.c
-> > @@ -133,6 +134,9 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
-> >  	 */
-> >  	lockdep_assert_held(&kvm->slots_lock);
-> >  
-> > +	if (kvm_arch_dirty_ring_clear(kvm, ring, nr_entries_reset) >= 0)
-> > +		return 0;
-> 
-> [Severity: Medium]
-> Does this early return bypass the trace_kvm_dirty_ring_reset() tracepoint
-> at the bottom of the function?
-> 
-> When hardware-accelerated dirty ring cleaning succeeds, returning early here
-> skips the tracepoint entirely. This could break observability tools and
-> scripts that rely on this tracepoint to monitor KVM dirty ring resets.
+> [1] https://github.com/tianocore/edk2/issues/12409
 
-Ok, sure, I can goto-out to before the tracing, then.
+Reference the ACPI specification instead please. Any link you want to
+include in a changelog should use the Link: footer, the linkage to the
+inline citation will be obvious.
 
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260629111820.1873540-1-leo.bras@arm.com?part=11
+If we need to initialize the IRQ I'd really like to see device tree
+bindings for HACDBSIRQ as well. Pretty much any system us plebs can get
+our hands on is gonna be DT anyway.
+
+> +static irqreturn_t hacdbsirq_handler(int irq, void *pcpu)
+> +{
+> +	u64 cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
+> +	unsigned long err = FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons);
+> +
+> +	switch (err) {
+> +	case HACDBSCONS_EL2_ERR_REASON_NOF:
+> +		this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> +		break;
+> +	case HACDBSCONS_EL2_ERR_REASON_IPAHACF:
+> +		/* When size not a power of two >= 4k, exit with reserved TTLW */
+> +		int index = FIELD_GET(HACDBSCONS_EL2_INDEX, cons);
+> +
+> +		if (index >= this_cpu_read(hacdbs_pcp.size)) {
+> +			this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> +			break;
+> +		}
+> +		fallthrough;
+> +	case HACDBSCONS_EL2_ERR_REASON_STRUCTF:
+> +	case HACDBSCONS_EL2_ERR_REASON_IPAF:
+> +		this_cpu_write(hacdbs_pcp.status, HACDBS_ERROR);
+> +		break;
+> +	}
+> +
+> +	return IRQ_HANDLED;
+> +}
+
+I have a pretty extreme distaste for creating a state machine between
+the callsite and the IRQ handler. The callsite should poll HACDBS for
+completion. The thread has nothing better to do anyway.
+
+Thanks,
+Oliver
