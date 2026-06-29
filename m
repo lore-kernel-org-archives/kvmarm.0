@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F8534A773;
-	Mon, 29 Jun 2026 11:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134FB3BB670;
+	Mon, 29 Jun 2026 11:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782733007; cv=none; b=axaNokav1m2RbTivUH4+fbRPzT+bmq85SdZ148jfoFDlglwvn0TPILk2aAkG92yDIIX71775v0GbvDHqPvkiX+FeWOY/IrI1EcWDQ1h71VVWefmgNWQM8ABZV1kiH98N831BVkgGeqC0JL/IvBPWIZ/o5aaAOgLpR9FjwVeRzhc=
+	t=1782733101; cv=none; b=tWO+R63r3yB3ecqDpWxFL9zrnR2z7VNN+64QAFFJR9XkWvjknIKaS6Nh/KlCPVmDKPXo02MlOMftcuGF6BiJGFyz9GbuQwR5h1kE095E1OVTYCOIhmORSfiGVjdCt5qb4g/ux92jEyY0nj1qXkkRcawGFmGhjvBAFK+W6A4QbHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782733007; c=relaxed/simple;
-	bh=JbnoyNfNT+PVDzeYVWrXdtFtgFLPvXibaqOOIM3XGbs=;
+	s=arc-20240116; t=1782733101; c=relaxed/simple;
+	bh=wHs7sgs+dM9p+Sm9RNJWJkayI9VKWHJryYnpOsxiEfo=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=dH9XaNiGejgnJ2NVfZ6Angx5NoAaH9XCR3NC/mozN7Z7vuKoTaNnY6hHvdmNiY74dUmhRp4KyjNTAggmGKg9iN9xNSmLDvSmuVy6+tWQTC0e53BF7I3u0fBlCy1BSDXC8GRx3LIlX4tdpgLCACbHSlFN/p2mFgXEV9wSnur03kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oxz3zwOs; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=hAwctMuplDXA1Ij0e+vHtKvozuiqnE7pV2YydSG/Qyex2QUvs5hn20n6BTaLi+5yf9+KxQGNXt/UwoOBIZoekMMU7c9qHTb04yJ90rzkZuZc/5BX41D49c005o7+KSHCR46vcdGUXKaaL7A72ArBdg2viDoBSMxaAb93pNaoqWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9dKtUi7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oxz3zwOs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE6801F000E9;
-	Mon, 29 Jun 2026 11:36:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9dKtUi7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 619D91F000E9;
+	Mon, 29 Jun 2026 11:38:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782733006;
-	bh=JMNsMGHAr5ufY7gpP7dG2XfXCxxVhA1Fl8xTS+E6llw=;
+	s=k20260515; t=1782733099;
+	bh=i1U2j1uKMWDGCRprgio6dHbk3duHDmLaecK7kxCwlXM=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Oxz3zwOsnIG/PBGGqYS7ltHEZQEhA/JbeYFsqwEDl+QodWpWx+YsLizgQiZO31fJC
-	 rQrHF+08y7I038x/kg6Ud7dz10tuS939qIxj/ujZ9eHPvuj1tL1v7ndCaelINWw4Ou
-	 3oWB2PNo5kvjRqRcIReLayPpO4u0gVaw+lK439f4192fdEWb9mlpmc0iLJDtr9KxM+
-	 Piyux3Ugwsx9beRPab1HTQtcfNhyOUNZUILS1rY7lrRzfzz6kXQwogatnxmYZXOFRh
-	 ccb6Ei92CUtzDkFgrzb88d3JeIoHHbHeGhZ51djbp52rlgkIvxF+C+EQabNmV3745I
-	 2Hl8Yx7B1LJZQ==
+	b=l9dKtUi7BD1LHDg9Sh9bpqTSYh1gy0xuNe/LS6qNSRq9/aqVXJIjFf8fAUV58hGzo
+	 3jHCh1cNrWunQFIBEZsVHn6WmFKs+Xhdgn58aff0jY/nUq9nJsasDdqh7zb3llRczZ
+	 it8Bt4d0oECiFyUGVJEuVhpHG0lAvUmYv4sbJNnLV1F7AwwxB7KCQWcwc4NL6zrB6F
+	 WecFWYFrYWrlgpGQiMreq71mS+XHZFWXC9l/y0fG2NnbYtYO8Uo22jLhrgY4ahQK88
+	 vMIhdw7l53AZVmGHy/zfEMt/VoRKiqyeRihojjyyZQB1TLhRAiaRkldUQ74zsbR4KR
+	 4AMH6YMgaQgFw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 02/13] KVM: arm64: Enable eager hugepage splitting if
- HDBSS is available
+Subject: Re: [PATCH v2 07/13] kvm: Add arch-generic interface for
+ hw-accelerated dirty-bitmap cleaning
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-In-Reply-To: <20260629111820.1873540-3-leo.bras@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260629111820.1873540-8-leo.bras@arm.com>
 References: <20260629111820.1873540-1-leo.bras@arm.com>
- <20260629111820.1873540-3-leo.bras@arm.com>
+ <20260629111820.1873540-8-leo.bras@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2026 11:36:45 +0000
-Message-Id: <20260629113645.BE6801F000E9@smtp.kernel.org>
+Date: Mon, 29 Jun 2026 11:38:18 +0000
+Message-Id: <20260629113819.619D91F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,96 +47,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-
-New issues:
-- [High] The default eager page splitting chunk size violates the KVM_CAP_A=
-RM_EAGER_SPLIT_CHUNK_SIZE UAPI contract by using a value that is not a vali=
-d block size for 16KB and 64KB page kernels.
-
-Pre-existing issues:
-- [Critical] Dropping mmu_lock between primary and nested stage-2 write-pro=
-tection creates a window where nested guests can bypass dirty logging.
+- [Critical] Data loss (lost dirty pages) when kvm_arch_dirty_log_clear fai=
+ls during KVM_GET_DIRTY_LOG.
+- [High] Out-of-bounds read of userspace buffer in kvm_arch_dirty_log_clear=
+ during KVM_CLEAR_DIRTY_LOG.
 --
 
-commit 09e1d250ed331b9dc20b42b7f9315892a86a5d50
+commit ea34df3acf2397922e1a2152d707b3b9f6012964
 Author: Leonardo Bras <leo.bras@arm.com>
 
-KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+kvm: Add arch-generic interface for hw-accelerated dirty-bitmap cleaning
 
-This commit enables eager hugepage splitting by default for systems
-supporting HDBSS, setting the default chunk size to 256K pages at
-stage2 initialization.
+Introduce kvm_arch_dirty_log_clear() that allow implementation of
+arch-specific hardware-accelerated dirty-log routines.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6c941aaa10c63..e086c01a9325e 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kv=
-m_s2_mmu *mmu, unsigned long t
->  	for_each_possible_cpu(cpu)
->  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) =3D -1;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index e44c20c049610..a25b8902cdfc1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2262,6 +2263,10 @@ static int kvm_get_dirty_log_protect(struct kvm *k=
+vm, struct kvm_dirty_log *log)
+>  		dirty_bitmap_buffer =3D kvm_second_dirty_bitmap(memslot);
+>  		memset(dirty_bitmap_buffer, 0, n);
 > =20
-> -	 /* The eager page splitting is disabled by default */
-> -	mmu->split_page_chunk_size =3D KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +	 /* The eager page splitting is disabled by default if system has no HD=
-BSS */
-> +	if (system_supports_hdbss())
-> +		mmu->split_page_chunk_size =3D 256 * 1024 * PAGE_SIZE;
-
-[Severity: High]
-Does this hardcoded chunk size violate the KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SI=
-ZE
-UAPI contract on kernels with 16KB or 64KB pages?
-
-By setting the default chunk size to 256 * 1024 * PAGE_SIZE, this evaluates=
- to
-4GB on 16KB page systems and 16GB on 64KB page systems.
-
-However, in arch/arm64/kvm/arm.c:kvm_vm_ioctl_enable_cap(), the chunk size =
-is
-validated against valid architectural block sizes:
-
-    if (!new_cap || kvm_is_block_size_supported(new_cap)) {
-    ...
-
-Since 4GB and 16GB are not valid block sizes on those configurations, a VMM
-like QEMU attempting to read the default capability via KVM_CHECK_EXTENSION
-and set it back via KVM_ENABLE_CAP will be rejected with -EINVAL.
+> +		if (kvm_arch_dirty_log_clear(kvm, memslot, NULL,
+> +					     dirty_bitmap_buffer, &flush) >=3D 0)
+> +			goto out;
+> +
 
 [Severity: Critical]
-This is a pre-existing issue, but by enabling eager hugepage splitting by
-default for HDBSS, does this exacerbate a race condition with nested guests
-bypassing dirty logging?
+If kvm_arch_dirty_log_clear() successfully clears some pages in hardware but
+subsequently fails and returns an error, will the fallback loop overwrite t=
+he
+successfully cleared bits?
 
-In arch/arm64/kvm/mmu.c:kvm_arch_mmu_enable_log_dirty_pt_masked(), KVM enab=
-les
-dirty logging by write-protecting the primary stage-2 and then calling
-kvm_mmu_split_huge_pages():
+It appears that if the arch hook returns an error, KVM falls back to the
+generic software loop which includes:
 
-    if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-        kvm_mmu_split_huge_pages(kvm, start, end);
+    mask =3D xchg(&dirty_bitmap[i], 0);
+    dirty_bitmap_buffer[i] =3D mask;
+   =20
+Because the generic fallback loop blindly overwrites dirty_bitmap_buffer[i]
+with the remaining uncleared bits, could this result in silently losing the
+dirty pages that the arch hook managed to clear before failing?
 
-    kvm_nested_s2_wp(kvm);
+[ ... ]
 
-Because kvm_mmu_split_huge_pages() can drop the mmu_lock to top-up the memo=
-ry
-cache or reschedule, a race window is created before kvm_nested_s2_wp()
-protects the nested stage-2 tables.
-
-While the lock is dropped, a nested VCPU can fault, map the page via its
-separate shadow stage-2 (which hasn't been write-protected yet), and write =
-to
-the page without setting the dirty bitmap, leading to silent memory corrupt=
-ion
-after live migration.
-
-> +	else
-> +		mmu->split_page_chunk_size =3D KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +
->  	mmu->split_page_cache.gfp_zero =3D __GFP_ZERO;
+> @@ -2373,6 +2379,10 @@ static int kvm_clear_dirty_log_protect(struct kvm =
+*kvm,
+>  	if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+>  		return -EFAULT;
 > =20
->  	mmu->pgd_phys =3D __pa(pgt->pgd);
+> +	if (kvm_arch_dirty_log_clear(kvm, memslot, log, dirty_bitmap_buffer,
+> +				     &flush) >=3D 0)
+> +		goto out;
+> +
+
+[Severity: High]
+Could passing dirty_bitmap_buffer directly to the arch-specific routine lead
+to an out-of-bounds read?
+
+When userspace calls KVM_CLEAR_DIRTY_LOG with a first_page > 0, KVM copies
+exactly num_pages bits into dirty_bitmap_buffer starting at index 0.
+
+If the arch implementation of kvm_arch_dirty_log_clear() assumes the buffer
+represents the entire memslot and reads from it using an absolute offset li=
+ke
+log->first_page / BITS_PER_LONG, would it read past the end of this
+partially-sized array?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260629111820.1873=
-540-1-leo.bras@arm.com?part=3D2
+540-1-leo.bras@arm.com?part=3D7
