@@ -1,111 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7397D3ED134
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 11:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A9E385D9E
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 12:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782818360; cv=none; b=qNsjFXL2SYGov99FwQA3t1VIzpu1/up9xDYHQzzevAb06KXe/rMQtf2pVzF6zSqTFfXpTMKWsofM/JR2WwzK/SHvZFEP1BvD/boTKcSJStF8KokHr4Aqob8g65iYGPlOqhKmGP/K5AdcQ6euVOQ/ZOL71Sc4SqSrkTDO3LjXTdw=
+	t=1782821485; cv=none; b=U4s8JeN8pDVTiULTTp3rq1RNYeqRpQT2aVsjKeP/NlRhRyNpE+wTGzPodokCdAy+xpO1A3+TBiQx7jHuTT3g37aesSHC+9OhU7Xrdp2HGOMD+rWPZSzt+qmjiYAIC0flW5KjKLLAiHPgiybSIaBJX0mPjy2pqHDP1ZVrZoO+zvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782818360; c=relaxed/simple;
-	bh=YS31gDUf3HUt/ASvyg4yNlz1M1r31UJAJoHXui6Fk3c=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=azD6aeqYwI1vrOyPxdtZnHhBpyZKBGvxwQ9vF3uhqR5+zeV7CmW0Sx3Ozu+D52V/2P8GzEVoFL2vBHMfcSSocA4rDIdUJQedjPWXMpN/7RtA32TJaDwp+0sX5+Vzy9d+5+O+mlm1C9yWrmozWiJlSvtaf8zOn0Qn5vQjMp76xjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbZGSVw/; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782821485; c=relaxed/simple;
+	bh=fKXhVZd2KbcgtEAsulIof9g1rmwAW3Kz/yvYpw76Jns=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DJyqrbSDjfXudGu8chk2XOn4QiCyx5EXjt68ovJhquHzAFVLTmLzAW+CAtnTJ3zsRKfQiDfSqQovIGdjfIYAwI8vyOXMC9RSUk4fQ1fc76d+Dlr8OdJ44I4kY/prjTsXnPjkrbJURMDMpkOfK0DBWyC4OhVNGRKtE6uXQzwkevM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XmdA4OyG; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbZGSVw/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1701F1F000E9;
-	Tue, 30 Jun 2026 11:19:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782818359;
-	bh=VHIxdGBkHXe0YmpgBcl2rOY+NOrZaFoP4iRrlegEvCc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bbZGSVw/CKCSar1LtDHDx+XIjXHgTvXeB5uOUhufZQuCzIKBk/22Xdv1uK9XVa/kv
-	 hBSoG5yfUWvUZAWk9DWU716Sy3Z7ZAt3cCUlHujvKsCtyJi67HBSEpJ+H3lLAJ1hHj
-	 +VBIvNytePIWoTmsCpE9LBhTr5BksMSIDn+DYYaemGw+xoyy8PsL6Mp01qjvy2F79I
-	 ZhEkZOJxwg875veR5s7XU6ZY7htdJ1co2YUhm8YtK5RDmP36dhqB0KP5r4A0MqEUgz
-	 vImIaDPkqFHsXnH9dod5uZoeoPZVYUMzqoTcyj1ik8deyiTqLWrya+LFsrM+wlS+5H
-	 xhoFLfk6K39Sg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 6/6] KVM: arm64: Zero out the stack initialized data
- in the FFA handler
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sebastian Ene" <sebastianene@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260630102058.3219867-8-sebastianene@google.com>
-References: <20260630102058.3219867-2-sebastianene@google.com>
- <20260630102058.3219867-8-sebastianene@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jun 2026 11:19:18 +0000
-Message-Id: <20260630111919.1701F1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XmdA4OyG"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7736E175A;
+	Tue, 30 Jun 2026 05:11:18 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B9C233F905;
+	Tue, 30 Jun 2026 05:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782821482; bh=fKXhVZd2KbcgtEAsulIof9g1rmwAW3Kz/yvYpw76Jns=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XmdA4OyG03dXigKmUsdRuMpu5OSF8Mmw5WpWNxYworu6arKNkHMlFBlI4BeCOXgXe
+	 GJlTe2zyDRow7+ubJbjFBXGZqcdWvxPA7mcm3FSILAcwAsNb6AvD6D+I/twY6iN8Xk
+	 qb8h00UcGoMoHQJmNceCIAP4n9mXfCXur4Ljbwh8=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
+Date: Tue, 30 Jun 2026 13:09:59 +0100
+Message-ID: <20260630121005.1130996-1-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+Hi,
 
-Pre-existing issues:
-- [High] Downgrade responses from EL3 during FF-A version negotiation are s=
-ilently used as a higher version, leading to version desynchronization.
---
+This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
+per mmu ptdump files work after all, mainly because there isn't a clean way to
+locate the specific nested mmu for each ptdump file as the nested mmus could be
+freed when the file gets opened. Therefore in this series a single file
+"shadow_page_tables" is created that dumps all valid mmus' page table
+information.
 
-commit 301ff1e27b3be974b47bb143428c88b8db810a28
-Author: Sebastian Ene <sebastianene@google.com>
+An advantage of this is that this new ptdump file have a lifetime identical to
+other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
+dentry UAF found last time [1].
 
-KVM: arm64: Zero out the stack initialized data in the FFA handler
+With this all ptdump files are only removed when the last kvm reference gets
+dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
+functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
+prevent UAF.
 
-Don't leak hypervisor stack data when using the FFA_VERSION call.
-When the compiler doesn't support -ftrivial-auto-var-init=3Dzero option
-we need to zero out the stack initialized variable before returning data
-to the host caller.
+Patch 1-2: Undo previous shadow ptdump implementation.
+Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
+           mmu->pgt is freed.
+Patch 4-5: Preparation for the shadow page table dump file.
+Patch 6:   Implementation of the shadow page table dump file.
 
-Link: https://lore.kernel.org/all/20260616160016.C62C81F000E9@smtp.kernel.o=
-rg/
+The fixes are tested with CONFIG_PROVE_LOCKING,
+CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index bb01d8f830561..7407bc4b547af 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -881,7 +881,7 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs=
- *res,
-> =20
->  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
->  {
-> -	struct arm_smccc_1_2_regs res;
-> +	struct arm_smccc_1_2_regs res =3D {0};
+Thanks!
 
-[Severity: High]
-This is a pre-existing issue, but while looking at how res is handled
-during FF-A version negotiation, is it possible for EL2 to silently use
-a downgrade response from EL3 as a higher version?
+* Changes from v1 ([2]):
 
-Looking at do_ffa_version() in arch/arm64/kvm/hyp/nvhe/ffa.c:
+  - Move from per mmu ptdump files to one file that will dump all shadow page
+    tables.
 
-	hyp_smccc_1_2_smc(&(struct arm_smccc_1_2_regs) {
-		.a0 =3D FFA_VERSION,
-		.a1 =3D ffa_req_version,
-	}, res);
-	if ((s32)res->a0 =3D=3D FFA_RET_NOT_SUPPORTED)
-		goto unlock;
+[1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
+[2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
 
-	hyp_ffa_version =3D ffa_req_version;
+Wei-Lin Chang (6):
+  KVM: arm64: ptdump: Remove shadow ptdump files
+  KVM: arm64: ptdump: Undo making the ptdump code mmu aware
+  KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
+  KVM: arm64: ptdump: Factor out initialization of
+    kvm_ptdump_guest_state
+  KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
+    ptdump path
+  KVM: arm64: ptdump: Introduce the shadow ptdump file
 
-If the host requests a minor version lower than the current hyp_ffa_version,
-and EL3 returns a version lower than requested (and not FFA_RET_NOT_SUPPORT=
-ED),
-EL2 appears to blindly set hyp_ffa_version =3D ffa_req_version. It ignores =
-the
-lower version returned by EL3 in res->a0.
+ arch/arm64/include/asm/kvm_host.h |   5 +-
+ arch/arm64/include/asm/kvm_mmu.h  |   4 -
+ arch/arm64/kvm/nested.c           |  18 +--
+ arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
+ 4 files changed, 135 insertions(+), 77 deletions(-)
 
-Can this version desynchronization lead to ABI mismatches across the EL2/EL3
-security boundary, such as mismatched structure sizes or missing fields?
+-- 
+2.43.0
 
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260630102058.3219=
-867-2-sebastianene@google.com?part=3D6
