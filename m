@@ -1,66 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3461A35E95C;
-	Mon, 29 Jun 2026 17:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110B83672AA
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 09:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782754603; cv=none; b=mFakMg5ABTi5q3gblVehDph1Q+0WT3zS0esptkOl9IYdKP0JOD6/VOQkQeSdD9wKELGKK+rygEM1hcTfD05/0Il9g5WTmw4wotJDII1zhg9OnaexjP/3UiPSKiMj/3BjK59gwV3O7/ayGKCbys45KtcVkUzY8b+p1ErrPwjAE/k=
+	t=1782813101; cv=none; b=TmV69ehzB+dZB+B1WUuAP5ifNiP8Q6TA7gbCwOo5VEzSNh9tJwtvjjiQ8KaQ0pdirx3zOIaBE24XKD76itb9yjvF9XWG46DAuDPMLgodQ4KBp9n/pK2l0cGIhoTRe11IIsXx3BM1d+55fV6W0buoOcfZxJ3hzFZc7a7ukKdyJlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782754603; c=relaxed/simple;
-	bh=uULf8Fw4shY92kL1nYHScaoVpSRpERDCQQhHxA+XxtU=;
+	s=arc-20240116; t=1782813101; c=relaxed/simple;
+	bh=yb90SNjFBocihj8fiYGJqdyII0fOUVjjiJzpoUx4P1E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KcfCJksoGvr+yaM/Tu8eQTzWTXUVyM2RKAFgHs8QvBDWIou61iYPb5pKvuvUQsr3r2jnoEqiRT38uPJ8PzlEPBAZbCdVVwb57FUTCZiu4Ejme01QyKKvqJO6JU5fZAmZkZdcczqJLKwdLQz798bxs5ShiqFNwrb3IxHmU7qbVFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KjaI50+g; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=L7zoUQiRQY92gmToWeS/xZmOwpoCwvJRv4gZIapvx1P5sUPUXQI0J7DIEQiaz8d41e3+nd9aSmluvzgBEnWcYau52Y/B/XF8lyWTw2cOWh20L2BMNezpL7EpTjEnuAAhoKwByfPU/hAOJLNn6EnOIoljnYHoykGwDy/YKCkUrGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B6odRqpn; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KjaI50+g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 620E31F000E9;
-	Mon, 29 Jun 2026 17:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782754601;
-	bh=Ck52aVERa/dSK9EW2phIhpiajUjsHvNg/KF8jAj4tKg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=KjaI50+gv3cmFnwRjqe6vTKfy49cDAY23fDmMF3N9T/0Io5q/qT0Q0F2n+Gv1EWzk
-	 GOIm5WnE+sogMZ6SOs6TV9DkwIpebLa+2JgRbXc4BqMd1ieftFthZcvUZEdkoAbIyF
-	 iCKEbj2tJIVRZgPqaF1Axib5kH6LONGp5AdMT8RovzBryMJSQXwma2rQytxsxJ7/XT
-	 +zns84KvzucCrgsGo1h6+jn6PWZTU3nUUnizHk6V5hX891lQRZB3UPhPm9K34CAWai
-	 gixob5Cg7h5dd44cQ98s+DsEdSITlckacEJqhfYJShwirdeuiz4hAjbV9CANlQ+E6b
-	 2g92MUpvRF56g==
-Date: Mon, 29 Jun 2026 10:36:40 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>, Saket Dumbre <saket.dumbre@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Chengwen Feng <fengchengwen@huawei.com>,
-	Kees Cook <kees@kernel.org>,
-	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	James Morse <james.morse@arm.com>, Zeng Heng <zengheng4@huawei.com>,
-	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
-	Thomas Huth <thuth@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>, Mark Brown <broonie@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	James Clark <james.clark@linaro.org>, Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org,
-	acpica-devel@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 06/13] KVM: arm64: dirty_bit: Add base FEAT_HACDBS
- cleaning routine
-Message-ID: <akKtKH8O5hngLenm@kernel.org>
-References: <20260629111820.1873540-1-leo.bras@arm.com>
- <20260629111820.1873540-7-leo.bras@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B6odRqpn"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-493b8d99342so30235e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 02:51:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782813098; x=1783417898; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=RtSqH+WqtZAB5cklSCb440iNsoDcg75bAXjvEoBq+ok=;
+        b=B6odRqpn7PM4iB1WqOefaoRYZoO1CkFZV8605CforxGy3KKeQ1YCKqnfpqCvjviszL
+         FCaik82IG7e4Ns+oQZ1fk8ySS8Ua/kJ+cJoqw4wy4/gIwZGXy0BMYnguHp0NtZZcuBRX
+         nf6qGPjJeIUtlU2g6gmcvz9VGbg/oCpx8+J8cUrzswincx9Q+AB8xY4UWcv5ytpdV3/E
+         WHdtN0BJHrhAGd1qJz3AzlhUnGr1Q61ZKDWbb70eazr5L09QYoH2RkLq+R0nYibTxicC
+         fEuVoG+h1UUNFHY4HqVeze/EiRdhnjlzBLC6n9mG+Nur+wv+SbOaZtnp7DzOrn0tiQ8y
+         kehA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782813098; x=1783417898;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=RtSqH+WqtZAB5cklSCb440iNsoDcg75bAXjvEoBq+ok=;
+        b=pfclnIe1rPvFZDuhCIG+4UnGgLPuURSJMMIl+KUoSn6mdVcq4FhGu35we/GNFE8uWO
+         NE5OryXCPRoxZN1lduUX6G86ewQ92tL/7qn/hM9IsSobxkFaAPi06Pv4/A02h52qMj/1
+         BqLT+qmJN2PeqhZSGvl71bcxap6d3b6Ye7MHCgVKclfRR0GmcDMlpCnBieSIdLIUFUvL
+         UPO4qU4Fe7hZKKTdPD1Kw1VPWjCHS3KUC/L6vuUNf1DYOBlfXcXKxQZZ3VWYIz1EqmNR
+         vPWRBtKp57/+bVtD8REAtz4NIHCxjor3eOHZNE26UvyUiR+Rhqs65AhQkkDfLDa3llk1
+         xFZA==
+X-Forwarded-Encrypted: i=1; AFNElJ9tVZsZS/WiGkTgkR07NilB2LKZj6HnJjNiY6dkFWqIxXReN+B1N+MpCcbfcSf3Kg9a3/cSbSY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxyV7Bt1IYsnq4dIiGi4tyoWWCGow/N24zfHxSOTSOFxlh6VyCW
+	17B87WGYV5ZWfW+kqZzdPlQibhfyvRdEE7ZbeiqX5LfR54ke78Z1J6NJPXQIA3LuFw==
+X-Gm-Gg: AfdE7ckN8/iIRQXrXvzyLqCRsLwwf9usai9wqnhbIhvB4P6AqsNP53tmEXYUkKlRg5C
+	HctFko+mBayG+gDmM4cIiBeDSt6uuLBvz55wxAYFs86SRlcuewdELVjiS1aGziiUGhEitCpIeCP
+	aC05+Se/W6DRu7XGJC0PlT3Z1P1S3Arlv/6UurS22UTzQPPzVvmwIXt8GIJ/1lnyadZ+4jqPQ0b
+	2ub1yt8oD/5fxidIspfALjkmgPHtf96RRMXry9IhzXrr4LhbjDQdLg1ry7cBaJ+E33Xfn6tHshu
+	NBtUan+ImcyFaRuwelq81RQ0V5LKfSU71d9Qo2p7e31Wx6LmQAe5oM3IUFtBh9YXYpOSsBQO81I
+	uK9dsfsMJq9GoIomn4DS+qhEQIWjDf41Q8lhtSbdrzR+k2NkJ/J3NFyQMimxf4HowMIKpB7ETx7
+	VYlIXCjyrx01nvPngqd6EuqgwwCKWrn9LBGnR5DzjdjOFlrU1eDEdlqDVFLKw=
+X-Received: by 2002:a05:600c:58d0:b0:493:adf3:d892 with SMTP id 5b1f17b1804b1-493bd76f95emr1505e9.3.1782813096603;
+        Tue, 30 Jun 2026 02:51:36 -0700 (PDT)
+Received: from google.com (143.11.148.146.bc.googleusercontent.com. [146.148.11.143])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bb4f174esm22907135e9.2.2026.06.30.02.51.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 02:51:36 -0700 (PDT)
+Date: Tue, 30 Jun 2026 09:51:30 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: catalin.marinas@arm.com, oupton@kernel.org, sudeep.holla@kernel.org,
+	will@kernel.org, jens.wiklander@linaro.org, joey.gouly@arm.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, android-kvm@google.com,
+	maz@kernel.org, mrigendra.chaubey@gmail.com,
+	op-tee@lists.trustedfirmware.org, perlarsen@google.com,
+	seiden@linux.ibm.com, smostafa@google.com, sumit.garg@kernel.org,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v7 6/7] KVM: arm64: Ensure FFA ranges are page aligned
+Message-ID: <akORop8Z9Levu9Sr@google.com>
+References: <20260617145130.3729015-1-sebastianene@google.com>
+ <20260617145130.3729015-7-sebastianene@google.com>
+ <ajQmN-UQD3uJJddJ@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -69,136 +83,85 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260629111820.1873540-7-leo.bras@arm.com>
+In-Reply-To: <ajQmN-UQD3uJJddJ@google.com>
 
-On Mon, Jun 29, 2026 at 12:17:54PM +0100, Leonardo Bras wrote:
-> Introduce the basic cleaning routine that is going to be used for both
-> dirty-bitmap and dirty-ring routines.
+On Thu, Jun 18, 2026 at 06:09:11PM +0100, Vincent Donnefort wrote:
+> On Wed, Jun 17, 2026 at 02:51:29PM +0000, Sebastian Ene wrote:
+> > From: Mostafa Saleh <smostafa@google.com>
+> > 
+> > At the moment we only check that the size of the range is page
+> > aligned, and truncate the address to the page boundary.
+> > This make an assumption that TZ will do the same.
+> > 
+> > However, it might decide to use the extra offset of the neighbour
+> > page at the end, which is valid under FFA if NS is using larger
+> > page size.
 > 
-> It sets the required registers with the input buffer, and wait for
-> HACDBSIRQ to happen, which means either the task is done, or there was some
-> error during processing.
+
+Hey Vincent,
+
+> I failed to parse this 
 > 
-> It is ran with preemption disabled, as a task being scheduled in could
-> change the translation registers used by HACDBS and end up corrupting the
-> current dirty-bit tracking and the sched-in task's S2 pagetables.
+> But I see 
 > 
-> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> ---
->  arch/arm64/kvm/dirty_bit.c | 81 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 81 insertions(+)
+> /* The base IPA of the constituent memory region, aligned to 4 kiB */ 
 > 
-> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> index 789da8712b1b..e4283828b780 100644
-> --- a/arch/arm64/kvm/dirty_bit.c
-> +++ b/arch/arm64/kvm/dirty_bit.c
-> @@ -1,36 +1,117 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  /*
->   * Copyright (C) 2026 ARM Ltd.
->   * Author: Leonardo Bras <leo.bras@arm.com>
->   */
->  
->  #include <asm/kvm_dirty_bit.h>
-> +#include <asm/kvm_mmu.h>
->  #include <linux/kconfig.h>
->  #include <linux/acpi.h>
->  
->  DEFINE_PER_CPU(struct hacdbs, hacdbs_pcp) = {
->  	.status = HACDBS_OFF,
->  	.size = 0,
->  };
->  
->  /* HDBSS entry field definitions */
->  #define HDBSS_ENTRY_VALID BIT(0)
->  #define HDBSS_ENTRY_TTWL_SHIFT (1)
->  #define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
->  #define HDBSS_ENTRY_TTWL(x) \
->  	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
->  #define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
->  #define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
->  
->  static __ro_after_init int hacdbsirq = -1;
->  
-> +static void hacdbs_start(u64 *hw_entries, int size)
-> +{
-> +	u64 br;
-> +	/* Each entry is 8 bytes */
-> +	int size_b = size * sizeof(hw_entries[0]);
-> +	int size_p2 = max(roundup_pow_of_two(size_b), PAGE_SIZE);
-> +
-> +	/* If not using the full size of the array, put a stop entry at the end */
-> +	if (size_b < size_p2)
-> +		hw_entries[size] = HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
-> +
-> +	sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
-> +			   HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
-> +
-> +	br = (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
-> +	     FIELD_PREP(HACDBSBR_EL2_SZ, ilog2(size_p2) - 12) |
-> +	     FIELD_PREP(HACDBSBR_EL2_EN, 1);
-> +
-> +	this_cpu_write(hacdbs_pcp.status, HACDBS_RUNNING);
-> +	this_cpu_write(hacdbs_pcp.size, size);
-> +	write_sysreg_s(br, SYS_HACDBSBR_EL2);
-> +	isb();
-> +}
-> +
-> +static int hacdbs_stop(void)
-> +{
-> +	write_sysreg_s(0, SYS_HACDBSBR_EL2);
-> +	isb();
-> +
-> +	if (this_cpu_read(hacdbs_pcp.status) == HACDBS_ERROR) {
-> +		/* In case of error, HACDBSCONS_EL2.INDEX should point the faulty entry */
-> +		u64 cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
-> +		int idx = FIELD_GET(HACDBSCONS_EL2_INDEX, cons);
-> +
-> +		this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
-> +
-> +		return idx;
-> +	}
-> +
-> +	return this_cpu_read(hacdbs_pcp.size);
-> +}
-> +
-> +/*
-> + * Clears dirty-bits for an array of pages (hw_entries) using HACDBS
-> + * Returns the number of items cleaned from the array. If returns value < size,
-> + *	there was an error in the processing.
-> + */
-> +static int dirty_bit_clear(struct kvm *kvm, u64 *hw_entries, int size)
-> +{
-> +	u64 hcr_el2;
-> +	int ret;
-> +
-> +	preempt_disable();
-> +
-> +	hcr_el2 = read_sysreg(HCR_EL2);
-> +	write_sysreg(hcr_el2 | HCR_EL2_VM, HCR_EL2);
+> So it sounds fair to prevent oversharing when PAGE_SIZE > 4KiB
+> 
 
-sysreg_clear_set_hcr(). I'm pretty sure all the speculative AT errata
-depend on HCR_EL2.VM being set _after_ the stage-2 MMU has been loaded.
+I think the problem is when you have a mismatch between FFA_PAGE_SIZE
+and the system PAGE_SIZE. We expect a fixed FFA_PAGE_SIZE of 4kb and
+this is enforced by :
+https://elixir.bootlin.com/linux/v7.1.2/source/arch/arm64/kvm/hyp/nvhe/ffa.c#L761
 
-> +	__load_stage2(&kvm->arch.mmu);
+if FFA_PAGE_SIZE = 4kb and PAGE_SIZE = 16kb you can end up annotating more pages with FF-A then
+needed when the range->address is unaligned.
 
-Pretty sure you need an ISB here to ensure loading the MMU is ordered
-with enabling HACDBS.
+It took me a while to understand this so I guess it is better to rephrase the commit msg.
 
-> +	hacdbs_start(hw_entries, size);
-> +
-> +	do {
-> +		wfi();
-> +	} while (this_cpu_read(hacdbs_pcp.status) == HACDBS_RUNNING);
-
-This is exactly why I said you should just poll hardware instead. It is
-entirely possible that the IRQ arrives before you WFI.
-
-> +	ret = hacdbs_stop();
-> +
-> +	write_sysreg(hcr_el2, HCR_EL2);
-
-write_sysreg_hcr()
+> > 
+> > Harden this check by also checking that the base address is aligned
+> > and reject it otherwise.
+> > 
+> > Fixes: 436090001776 ("KVM: arm64: Handle FFA_MEM_SHARE calls from the host")
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> 
+> Perhaps the commit description needs some improvement.
+> 
+> The rest looks good.
+> 
+> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index 1a2abd0154c6..d7c5701d0584 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -352,7 +352,7 @@ static u32 __ffa_host_share_ranges(struct ffa_mem_region_addr_range *ranges,
+> >  		u64 sz = (u64)range->pg_cnt * FFA_PAGE_SIZE;
+> >  		u64 pfn = hyp_phys_to_pfn(range->address);
+> >  
+> > -		if (!PAGE_ALIGNED(sz))
+> > +		if (!PAGE_ALIGNED(sz | range->address))
+> >  			break;
+> >  
+> >  		if (__pkvm_host_share_ffa(pfn, sz / PAGE_SIZE))
+> > @@ -372,7 +372,7 @@ static u32 __ffa_host_unshare_ranges(struct ffa_mem_region_addr_range *ranges,
+> >  		u64 sz = (u64)range->pg_cnt * FFA_PAGE_SIZE;
+> >  		u64 pfn = hyp_phys_to_pfn(range->address);
+> >  
+> > -		if (!PAGE_ALIGNED(sz))
+> > +		if (!PAGE_ALIGNED(sz | range->address))
+> >  			break;
+> >  
+> >  		if (__pkvm_host_unshare_ffa(pfn, sz / PAGE_SIZE))
+> > -- 
+> > 2.54.0.1136.gdb2ca164c4-goog
+> > 
 
 Thanks,
-Oliver
+Sebastian
