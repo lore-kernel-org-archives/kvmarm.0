@@ -1,76 +1,48 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9531233957;
-	Tue, 30 Jun 2026 17:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC053BC680;
+	Tue, 30 Jun 2026 18:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782839958; cv=none; b=qqNDl3tX7XMfbPZ5xWNvGz4qQD28bdnRh6f8QuwMWsdjkjIx9+opeeGUHWwcnQfTOFjhT2otG0jdFIAjK3aR42+Ig1s0jgRXvJ7fUAiAr1CGbvrDqwXSTIT7Pcmm/ftKAPyDnSEkPnBkYB/j3HDhkWfta+nPch2kr5Bd/E5qFYU=
+	t=1782844984; cv=none; b=bHRBHAONQDkhufXnnas0IUfdqQy8F0mI4P+VkCOLL8z0299GRdwT/LKo2hi7HQElRoXAanXk/i54kFUaUBPinG2C36HHeW77JwnijLf2jYiLOGjz87s1lecLzIX524N1kpaca2Eu9ZOmCaS/9tPlEq/o6SDfOa/ww9w8QYUBSXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782839958; c=relaxed/simple;
-	bh=aazyiOP5gAY0bGpQA8a3lTuATbta7rr4eQjJ8XAQf3Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=dy9LfsiUXQWsjFULXEew5KP5BAWMSPkqFdPaPBSFqEAyQkuF92lGQrVWyA+WMsWfuCxeFOhSVr2CxmS21eV0vo52rkMiAYXCcmrxieL0mOomnKOIG02p27SVcitNAF29c5NSmjoeARnYvxbvVOwMWuTTJSd+VXrQ85aPhmF4g6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Jjk8ATcJ; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782844984; c=relaxed/simple;
+	bh=KCpPnllPAwe9Z27cf/4FimUMcyNxdIrK1MgP/ku1r34=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bFpUSuIUFPPidwaSqzPyCwrNa97HYzJBAqFtqE/fXynVW3/eT3XQFrxi4oyyco7vza7sSrDDW8PujDutS9kEC9/5mjYZJZOrOekyQSzF1pwfW5vppBes4eoFeESyVPOuV/rX7WprF6cVqFjR5k6NKmWKWbJel+J/M+70sALKHBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQtWrNY6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Jjk8ATcJ"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80366302A;
-	Tue, 30 Jun 2026 10:19:11 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA8F93F66F;
-	Tue, 30 Jun 2026 10:19:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782839955; bh=aazyiOP5gAY0bGpQA8a3lTuATbta7rr4eQjJ8XAQf3Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jjk8ATcJ/w4lQ2tQuYzbPDUWPKAvdrvCuZPd0MuwQFPa6Xl1hy6DH++N0pV1P9m+f
-	 5d9nE7JFlgLUZGnzlF8YRqgMBaujBQ//Vn3nB1O3zYaLLmzdB9Xpmkf6rnW9sTJYG9
-	 Hp+DDsFHjmc1R83uBUDzYElhivgIw5vK3F9ZanQg=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>,
-	Saket Dumbre <saket.dumbre@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Chengwen Feng <fengchengwen@huawei.com>,
-	Kees Cook <kees@kernel.org>,
-	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zeng Heng <zengheng4@huawei.com>,
-	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org,
-	acpica-devel@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 05/13] KVM: arm64: Detect (via ACPI) and initialize HACDBSIRQ
-Date: Tue, 30 Jun 2026 18:19:08 +0100
-Message-ID: <akP6jAargbR5jUUu@LeoBrasDK>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <akPoyAGX5_ankwWD@kernel.org>
-References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-6-leo.bras@arm.com> <akKpxDulRN7zDrgM@kernel.org> <akPXqZQBKET1SyvN@LeoBrasDK> <akPoyAGX5_ankwWD@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQtWrNY6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6874A1F000E9;
+	Tue, 30 Jun 2026 18:43:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782844982;
+	bh=oQ+QKmGqWrf4GF4IimLK8GVC3TpRZgBWH53NHUwQR9E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=NQtWrNY6deyk6hU0I6nlk4xSdhwxHXR6kR9B4J1sHsU6FnRp2n6GEO/jH3bNsx4xQ
+	 Hl+pa43WV1nCLHUEpRdsJwFV5obDUWIqJbkI+UVSscYCYT2Z9vjt8zaCw9JAon8U9J
+	 wiqkI67jof5FRKXkHetzhSr//hCaDgM14Tn601cxT7MlY+liS/bC6vYVX57Ltxm5B5
+	 d7R1n0y5BJUJ87vGwq73g5/UwgcMIDIPDUF5fS9bYKAZ3LdkulFhDu8tIxMOnefWid
+	 kOtkPEWL+FE8GMUnU9bja8mUEfopDaar4Y4+cTeWsG2ycAXC/eWU8LP65eOWp9jsBg
+	 rLKJc+WuAT/Lg==
+Date: Tue, 30 Jun 2026 11:43:01 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: sashiko-reviews@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [PATCH v2 02/13] KVM: arm64: Enable eager hugepage splitting if
+ HDBSS is available
+Message-ID: <akQONWoRRZXu1-56@kernel.org>
+References: <20260629111820.1873540-1-leo.bras@arm.com>
+ <20260629111820.1873540-3-leo.bras@arm.com>
+ <20260629113645.BE6801F000E9@smtp.kernel.org>
+ <akKFlzAdB43lRpi1@LeoBrasDK>
+ <akKmHqRaZEUjN3zY@kernel.org>
+ <akO9iHJmKN7MzTjM@LeoBrasDK>
+ <akPkVASjWWYQpkx1@kernel.org>
+ <akP4ZDjZIu2_CfVF@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -79,108 +51,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <akP4ZDjZIu2_CfVF@LeoBrasDK>
 
-On Tue, Jun 30, 2026 at 09:03:20AM -0700, Oliver Upton wrote:
-> On Tue, Jun 30, 2026 at 03:50:17PM +0100, Leonardo Bras wrote:
-> > On Mon, Jun 29, 2026 at 10:22:12AM -0700, Oliver Upton wrote:
-> > > If we need to initialize the IRQ I'd really like to see device tree
-> > > bindings for HACDBSIRQ as well. Pretty much any system us plebs can get
-> > > our hands on is gonna be DT anyway.
-> > 
-> > Agree. I started out with ACPI because that's what the main target is, as 
-> > dirty-logging is focused in Live Migration, which is usually more 
-> > appreciated in the server space, which generally uses ACPI.
-> > 
-> > I spoke to some people, and I could not hear of anyone releasing a product 
-> > based in DT that would implement this yet, so I postponed the DT 
-> > enablement.
-> 
-> Nested virt is always a good example. In some distant future KVM could
-> expose FEAT_HACDBS to the L1 hypervisor, and the VMM may be using DT
-> instead of ACPI (like kvmtool).
-
-Oh, good point.
-
-> 
+On Tue, Jun 30, 2026 at 06:09:56PM +0100, Leonardo Bras wrote:
+> On Tue, Jun 30, 2026 at 08:44:20AM -0700, Oliver Upton wrote:
+> > On Tue, Jun 30, 2026 at 01:58:48PM +0100, Leonardo Bras wrote:
+> > > On Mon, Jun 29, 2026 at 10:06:38AM -0700, Oliver Upton wrote:
+> > > > > But this raises a topic I would like to understand:
+> > > > > - Do we actually need this to be a block_size to assure correctness? or is 
+> > > > >   it just about efficiency?
+> > > > 
+> > > > What value is there in having a chunk size larger than the largest
+> > > > possible block mapping? The whole UAPI is deliberately tied up with page
+> > > > table geometry.
 > > > 
-> > > > +static irqreturn_t hacdbsirq_handler(int irq, void *pcpu)
-> > > > +{
-> > > > +	u64 cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
-> > > > +	unsigned long err = FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons);
-> > > > +
-> > > > +	switch (err) {
-> > > > +	case HACDBSCONS_EL2_ERR_REASON_NOF:
-> > > > +		this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
-> > > > +		break;
-> > > > +	case HACDBSCONS_EL2_ERR_REASON_IPAHACF:
-> > > > +		/* When size not a power of two >= 4k, exit with reserved TTLW */
-> > > > +		int index = FIELD_GET(HACDBSCONS_EL2_INDEX, cons);
-> > > > +
-> > > > +		if (index >= this_cpu_read(hacdbs_pcp.size)) {
-> > > > +			this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
-> > > > +			break;
-> > > > +		}
-> > > > +		fallthrough;
-> > > > +	case HACDBSCONS_EL2_ERR_REASON_STRUCTF:
-> > > > +	case HACDBSCONS_EL2_ERR_REASON_IPAF:
-> > > > +		this_cpu_write(hacdbs_pcp.status, HACDBS_ERROR);
-> > > > +		break;
-> > > > +	}
-> > > > +
-> > > > +	return IRQ_HANDLED;
-> > > > +}
-> > > 
-> > > I have a pretty extreme distaste for creating a state machine between
-> > > the callsite and the IRQ handler. The callsite should poll HACDBS for
-> > > completion. The thread has nothing better to do anyway.
+> > > Not larger, possibly smallerv My concern was the difference in pages to 
+> > > split between 4k, 16k and 64k.
 > > 
-> > Well, there is one argument it could just wait and save some energy, but I 
-> > agree it is not relevant in server space.
-> 
-> I wouldn't suggest polling in a tight loop :) I'd say use something like
-> __mdelay() to get the core into a low-power state w/o using a naked WFI.
-> In fact, that already uses WFxT under the hood.
-
-Awesome!
-
-> 
-> > The main reason I did this is 
-> > because I am planning on later doing an improved version of this that would 
-> > clean the dirty-bit *while* running the guest, and having the IRQ is needed 
-> > for exiting guest so we can notify userspace the cleaning is done. So I 
-> > laid the HACDBSIRQ infra here so we don't have both polling and IRQ options 
-> > happening. 
-> > 
-> > That idea would require us to add new API (a return value for 'cleaned'), 
-> > and also a new flag for the clean ioctl. We also need the VMM to 
-> > implement that, but then we get a proper cpu usage of cleaning time.
+> > Ok, well in any case the upper bound is going to be the largest possible
+> > block mapping for a given page granule.
 > >
-> > I wanted to start with a backwards compatible version, and do the above 
-> > idea once I put my hands in hardware that implements HACDBS, so I can 
-> > properly measure how much performance we get on above strategy.
+> 
+> Sure, we can do this.
+
+I'm describing the UAPI behavior of what we already have. Please do not
+change anything and continue to leave userspace in charge of eager
+splitting / chunk size.
+
+> > > > 
+> > > > Overall, I'm not buying the argument for changing the behavior of
+> > > > KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE. There are very good reasons for
+> > > > *not* eagerly splitting the entire address space, especially if you know
+> > > > the working set of the VM is small.
+> > > > 
+> > > > You can still use HDBSS without eagerly splitting, so long as block
+> > > > mappings are {DBM, S2AP_W} = {0, 0} and leaf mappings (which have
+> > > > a writable PFN) are {1, 0}.
+> > > > 
+> > > 
+> > > Block mappings being read-only, and leaf mappings being writable-clean, 
+> > > then? Could you please ellaborate on why does not it need eager-split?
 > > 
-> > What do you think?
+> > Read-only translations will continue to generate permission faults
+> > whereas writable-clean descriptors can be updated by hardware. You get
+> > the opportunity to split a block mapping lazily while preserving
+> > hardware dirty tracking for page mappings.
+> > 
 > 
-> Yeah, I'd want to see some extremely compelling performance numbers for
-> this approach before considering it, alongside the necessary VMM patches
-> to actually activate it.
+> So you suggest we only enable DBM bit after we split the block, that will 
+> happen only after a block is dirtied for the first time after dirty-log 
+> starts? 
+
+If the VMM wants to do lazy splitting, yes. Otherwise this would happen
+as part of eager page splitting for block mappings that are known to be
+writable.
+
+> > The approach I think we may need is:
+> > 
+> >  - Use a software bit in the PTE to stash whether or not a PFN is
+> >    'software-writable' when constructing the stage-2. By this I mean
+> >    we've already faulted it in for write from the primary MMU.
+> > 
+> >  - At the time of write protection, reap the hardware-writable state
+> >    from all PTEs but preserve the software-writable bit.
+> > 
+> >  - Whenever splitting a block mapping, set the DBM bit in the page-level
+> >    PTEs if the block was software-writable and HDBSS is present.
+> > 
+> > That way you'd have sufficient metadata in the PTE to safely set DBM.
 > 
-> Seems likely to me that the VMM will want the background thread back
-> ASAP that calls the clean ioctl so you'll need to work out how to cope
-> with idle vCPUs in that case.
-
-Fair point, HACDBS should be disabled if the vcpu gets scheduled-out, so we 
-would need to be sure the vcpus stay scheduled, or the cleaning may take 
-too long.
-
+> I remember that, for some reason I can't recall, it would not be great to 
+> set DBM during dirty-log start, and instead we should have it since VM 
+> creation. Maybe it had to do with part of the pagetable using the old 
+> encoding (no DBM), and the other part using the new one.
 > 
-> Even still, with this hypothetical approach I'd expect KVM to inspect
-> the HACDBS state on every exit. The IRQ is just a convenient kick back
-> out to the main KVM_RUN loop.
+> IIRC, only blocks that are backed by writable memory (S1) were supposed to 
+> receive the DBM bit. We could use that info for deciding what to split, 
+> then.
 
-Got it. Will use the HACDBSCONS register instead to get that info on 
-stopping.
+That's why I'm saying to use a software bit. We can't leave DBM=1 on
+block mappings and set VTCR_EL2.HD=1 for obvious reasons.
 
-Thanks!
-Leo
+> Another option would be to split when we are collecting a dirty-entry from 
+> HDBSS, but for live migration that would mean we have to transfer the whole 
+> block (possibly a large LEVEL1 block), because we have no idea which part 
+> of it got dirty.
+
+We need to do dirty tracking at page granularity. The only scenario
+where we have writable block mappings while dirty logging is enabled on
+a memslot is if the VMM enabled KVM_DIRTY_LOG_INITIALLY_SET.
+
+Thanks,
+Oliver
