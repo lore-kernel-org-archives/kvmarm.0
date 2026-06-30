@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CA740B6DF
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 12:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E8F8409624
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 12:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782821492; cv=none; b=d6y4cPSv53iwhcadaqLxlEBIgOu3kPwTP8EUFkXaJQN7vs31kaoizVD7ZEZqRvNiLkmIYq9OdGEfFrhuQO8TgWUFYIL92tAXoamwyXcGhrp7Ya9rVN1QAx0jRwFW2aKiidL4Zx5R235HvnSZYec2TtrTEvD23rOKUhOAJnKG5w0=
+	t=1782821495; cv=none; b=qW2kcUwp7sOAkwEYUdOaKHjp5xEsre+DF8QZ+NwySDJp3uMr6Vd+Z0/wF4QKXtjBsG4hd87FvzFaR7PnvOwJcI4juNQ6pcKP351YLFWRvLRoW4N40kt756cdwueaxQqozEj7nIAvm1CtEP5qwXqUe/2GDfCvR24sNgEWghOMBE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782821492; c=relaxed/simple;
-	bh=NFYyIM4U72kh8EqXRkl12e6lCN6ujyMn5MgKdWQpl2U=;
+	s=arc-20240116; t=1782821495; c=relaxed/simple;
+	bh=28ACkWnLv7YMnNE//WvQjnBg78xe5Fk9GG40vt1q1ig=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YjZQ8YarW2GMKskCdhRj18IjPTrECRJzcgl3pRY0DWBTBTz3kZ4FNeQsRJ31Vu2VO/U+CuL8j5dDJbbCF2NGxroLd7YcnudCDN8yCKNInkwR1L5I8Uqp1i6SLswS2OVRurvd9tXaPwos3PMZw+VO8dqSA5UyienLdNabJQNQbpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=u5pdm3AW; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=BuFxl9IWLYFKoDArmD8nvbTQEAo5PuvooTHvmtxERfg7Y6b7h+90vl9/WCftX9/LNsMaOtTB145BnQcXijL6XAcKP9oV88PAKOsN4nlSiJCDHugDUdKTf0/xnvWeWntO2Ifu8hOHgdqj0ss1c9s4/BBl0a4nQ3ko4DghWZzUl5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lZrVIQJ6; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="u5pdm3AW"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lZrVIQJ6"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF52D2EC6;
-	Tue, 30 Jun 2026 05:11:25 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20C283F905;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 477D9175A;
 	Tue, 30 Jun 2026 05:11:28 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9032C3F905;
+	Tue, 30 Jun 2026 05:11:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782821490; bh=NFYyIM4U72kh8EqXRkl12e6lCN6ujyMn5MgKdWQpl2U=;
+	t=1782821492; bh=28ACkWnLv7YMnNE//WvQjnBg78xe5Fk9GG40vt1q1ig=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=u5pdm3AWHxAcZvSv5sN89bkMA+i92fEVKDzsmCqshT4lBClmIQn9MCjaiR9C42HhQ
-	 fBVWWPKEHv3Qa5J9JAprmUXjbyOEw0k0W4W2pusGaJ+/5S6pYk72Fmplml/CKttV7R
-	 lU4/Ly13nBBvtrm5p81Sqq4UyBdQu4mSIYn/bxIs=
+	b=lZrVIQJ6KwfHxRbspsdaaFLL4JY31qpds++E7hrs7ib/D87PWWSl46Cl/vUvoe79u
+	 18xndfqem2wOolzhzsVmMS8Ycd67tHewNOJlgE66vihKtlwBHMUM6LPAu8eiQ5hH02
+	 z3luARonf6fMy44CZ0L0EyAVhcU06wWp8XTjZfyU=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v2 3/6] KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-Date: Tue, 30 Jun 2026 13:10:02 +0100
-Message-ID: <20260630121005.1130996-4-weilin.chang@arm.com>
+Subject: [PATCH v2 4/6] KVM: arm64: ptdump: Factor out initialization of kvm_ptdump_guest_state
+Date: Tue, 30 Jun 2026 13:10:03 +0100
+Message-ID: <20260630121005.1130996-5-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260630121005.1130996-1-weilin.chang@arm.com>
 References: <20260630121005.1130996-1-weilin.chang@arm.com>
@@ -56,117 +56,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ptdump files can still be read after the pgt of the canonical mmu is
-freed, if they are opened before the VM debugfs directory is removed.
-This triggers UAF in places where we cache the pgt pointer or access it
-without checking its validity.
+Extract the code for initializing kvm_ptdump_guest_state to allow
+reusing the same instance for dumping multiple page tables.
 
-Check the pgt is still alive under the mmu_lock before accessing the
-pgt.
-
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=1
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/kvm/ptdump.c | 38 ++++++++++++++++++++++++--------------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/ptdump.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index d5aa9eff08d1..752d8e0cd25c 100644
+index 752d8e0cd25c..0c9647666e65 100644
 --- a/arch/arm64/kvm/ptdump.c
 +++ b/arch/arm64/kvm/ptdump.c
-@@ -115,13 +115,21 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
+@@ -112,6 +112,23 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
+ 	return 0;
+ }
+ 
++static int kvm_ptdump_parser_init(struct kvm_ptdump_guest_state *st, struct kvm *kvm,
++				  struct kvm_pgtable *pgt)
++{
++	int ret;
++
++	ret = kvm_ptdump_build_levels(&st->level[0], pgt->start_level);
++	if (ret)
++		return ret;
++
++	st->ipa_marker[0].name          = "Guest IPA";
++	st->ipa_marker[1].start_address = BIT(pgt->ia_bits);
++
++	st->kvm                         = kvm;
++
++	return 0;
++}
++
  static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
  {
  	struct kvm_ptdump_guest_state *st;
--	struct kvm_pgtable *pgtable = kvm->arch.mmu.pgt;
-+	struct kvm_pgtable *pgtable;
- 	int ret;
+@@ -129,17 +146,13 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
+ 	}
  
- 	st = kzalloc_obj(struct kvm_ptdump_guest_state, GFP_KERNEL_ACCOUNT);
- 	if (!st)
- 		return ERR_PTR(-ENOMEM);
+ 	pgtable = kvm->arch.mmu.pgt;
++	ret = kvm_ptdump_parser_init(st, kvm, pgtable);
  
-+	guard(write_lock)(&kvm->mmu_lock);
-+	if (!kvm->arch.mmu.pgt) {
-+		kfree(st);
-+		return ERR_PTR(-ENXIO);
-+	}
-+
-+	pgtable = kvm->arch.mmu.pgt;
-+
- 	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
+-	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
  	if (ret) {
  		kfree(st);
-@@ -137,7 +145,6 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
+ 		return ERR_PTR(ret);
+ 	}
  
- static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- {
--	int ret;
- 	struct kvm_ptdump_guest_state *st = m->private;
- 	struct kvm *kvm = st->kvm;
- 	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-@@ -154,11 +161,11 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- 		.seq		= m,
- 	};
- 
--	write_lock(&kvm->mmu_lock);
--	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
--	write_unlock(&kvm->mmu_lock);
-+	guard(write_lock)(&kvm->mmu_lock);
-+	if (mmu->pgt)
-+		return kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
- 
--	return ret;
-+	return 0;
- }
- 
- static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-@@ -206,17 +213,23 @@ static const struct file_operations kvm_ptdump_guest_fops = {
- 
- static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
- {
--	struct kvm_pgtable *pgtable = m->private;
-+	struct kvm *kvm = m->private;
-+
-+	guard(write_lock)(&kvm->mmu_lock);
-+	if (kvm->arch.mmu.pgt)
-+		seq_printf(m, "%2u\n", kvm->arch.mmu.pgt->ia_bits);
- 
--	seq_printf(m, "%2u\n", pgtable->ia_bits);
- 	return 0;
- }
- 
- static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
- {
--	struct kvm_pgtable *pgtable = m->private;
-+	struct kvm *kvm = m->private;
-+
-+	guard(write_lock)(&kvm->mmu_lock);
-+	if (kvm->arch.mmu.pgt)
-+		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - kvm->arch.mmu.pgt->start_level);
- 
--	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
- 	return 0;
- }
- 
-@@ -224,15 +237,12 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
- 				    int (*show)(struct seq_file *, void *))
- {
- 	struct kvm *kvm = m->i_private;
--	struct kvm_pgtable *pgtable;
- 	int ret;
- 
- 	if (!kvm_get_kvm_safe(kvm))
- 		return -ENOENT;
- 
--	pgtable = kvm->arch.mmu.pgt;
+-	st->ipa_marker[0].name		= "Guest IPA";
+-	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
 -
--	ret = single_open(file, show, pgtable);
-+	ret = single_open(file, show, kvm);
- 	if (ret < 0)
- 		kvm_put_kvm(kvm);
- 	return ret;
+-	st->kvm				= kvm;
+ 	return st;
+ }
+ 
 -- 
 2.43.0
 
