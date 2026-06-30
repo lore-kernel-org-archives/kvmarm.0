@@ -1,108 +1,125 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4881E3F1640
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 10:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF403E2AD6
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 10:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782814894; cv=none; b=JFzmGWtyn4t3tGfucDJzx0BQbnbqoMB+psJVnyDQzxuerPBUoGWig8sj0bHcoV+2CpIPOvHSTRPG6TLnDgVrB90YlB1fRIiVfIyqaSeRT1fbI9Ts8LoPffSSjLM9yDIsr3Q4ct7Tt3pitwX31xE5I25ek1CY9qn58Wb4FUkwLAg=
+	t=1782814987; cv=none; b=pHLUk4ePEyshV52kKaQuI1Ehe7HeFOHnD43ThqNCvTaql1smCS9BDfvgT/uXfJ84mkEQ4l9HDpL/34otEEEY0bVrzCimHUyaow7RIB8joTvsOqcvL9kF06T5x6wB1DN1HxTEXTpJZL+qoStq39AgGcMxUJtlIMnluQciUlQf8rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782814894; c=relaxed/simple;
-	bh=mJH6zKl+wPnI8Gh9eK/dhD8a6MoXLFehdUoz/1vLpUI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KRzFgd9qJeva9MM1dwEsxVAbMDcSyK+zJ+14hZYks3qUPszuz5+dwiyZLkb/Jn+XfCLmVs91ZhkRxgFJMtLWKW4Az1ZVafsP1L+5rWJbyH6q/QS7qcgbZY+hhcjsJ/a9Yl3xwGtY7iWiQGii4oHmtR/r2TRhnhEDgI1mkHx72Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SNw2+iaL; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1782814987; c=relaxed/simple;
+	bh=xO1vPXr6jVIbv3ACOnD7BWtFjQzhqCaDlWJshtXaouc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mKnT99xkVp74xBSk1FWX2wpuojCdfVqvuIozLIz/8Yu8vIxw3MAL4bT/x67VleUw/k6drh8yqXpmsurcWXgkMwux7hkSAHyXC0BywZe04Hce0ZpsXdMGjHSvROVApp+CvSz6ETsx5vrl/UH+JzPvZgvg+83zfaIErFIU86Ys8TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GIyOID5p; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SNw2+iaL"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-492714d002cso16797845e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 03:21:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GIyOID5p"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-493b8d92a4eso33875e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 03:23:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782814892; x=1783419692; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b11GVtladPRwtAnrqyMBKjVI7QEbzNXpHeXS1BWCw8Q=;
-        b=SNw2+iaLJsOiTKlVBxcpVEGLKS6vA73RXlTJARmVcuFNUivwwXH9yO0w4LTuCcb/9b
-         tNtRtQa+0qlfoS6Qj4OOOgZ/Jv8MDg8LvA8uyeapzfTGnUEUI4+Fpa1moSBRL8DeRfhQ
-         Iqp+pkIz+BTUiEduzFSu02ZPTIpEGx16baVHHSjAAt7c5BtgPvjGHkSQkzwDMZV1TzFV
-         j6QNo620d0bs6X5ZXWDwpUmj7V9zQFyTG2hU45mcqQLcd7jyQezFfXZWFk8DBbJFHV8l
-         +OoiSp6fXPDm70osd9a9rm9SlQRdAkJLKvcvU0mhznn7irJ7QSYbfRMsTER1DwF19w1P
-         JMGg==
+        d=google.com; s=20251104; t=1782814984; x=1783419784; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=7eQrlr1iqvdXSCnGA9eKw5Pz71hnIxvtQ5reJnEwINc=;
+        b=GIyOID5pNED4nRK8hqKIgIP8eUCd49MTRHGyWMDZvpndrFOebnysPy8rjRaYT4PIGE
+         zk/OBKqKbFw93TA2cMVy6Saro6eP8x7iHeFfXkcBDV8w6Psr95iW2u0jW/d9ZNgMNYEC
+         AH0OSsKAOCpCmb24T86M1XW7n3SbAGyBw4W5nRa9OWJaSjQACT0wNoyf21D/RJ1eQp+g
+         fHryQIgdd4Z0l8d4bcNYbnismt1oozD+aEDKnLtE+G5It8BupWTjVPPfKSvsly4BWjqQ
+         Ne+LF2NJHnLRd0jSjQhNPAk379Veak3G5dFKBnsGhcmoU0uSkRqqEBXQvSzPDmZrmA6D
+         tIyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782814892; x=1783419692;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b11GVtladPRwtAnrqyMBKjVI7QEbzNXpHeXS1BWCw8Q=;
-        b=P+Qlj8D6W+QsqVwIkdsHQKPlopBzDas2UdWRyFy63iPD+WyQAHjYGvZ3NvI9sheDL4
-         24U+yVUfeRvRHWPASoV7uDahQ+OABZd4uyLv73sO4BZdsNZbbeXG15p3M7VPF8CkHANq
-         fcHsHV9YR4OXNKcTDGs4fP8vAsCIoqPGx5eTXrP3/4iQDC7zhmN4w33WR3kp8kjICXhf
-         q1O1klVpP4lN5SGOGIYl1U5Zx0lyrgpj+HHQV5BgzjXRrvTEm8ErbM25veh/yWEgu3x3
-         ieyKUdCLq8em0+VMxJBZxJQQV8vR7uiha5wlWZxswz9C1FZQisZUT6fU23VUV6ABZgvZ
-         fE1g==
-X-Forwarded-Encrypted: i=1; AFNElJ/8RrMSLaZpUEgeDpxHIQidQBYVtd3p2kEWaRZUNIoyvTBO9X0Z/z8dOXYFLVnNF1EdAt6zeOc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzzmVw4U1TEo7Ye6FU0MAx1/JPiOv5YHRxYd/9w4+OXRMyvFHM0
-	EEHhlNPiGBIyCYextmms6KmhRwCUi+nX9symHpeun5sKr0VgbG9mGo/sYgS8pWjh23rbxwBl/se
-	OklhkG0GxLp9l+zZvAYkAdaDx31pfTw==
-X-Received: from wrbdt17.prod.google.com ([2002:a05:6000:d11:b0:470:f736:b5d4])
- (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a7b:cd15:0:b0:493:bd4f:510 with SMTP id 5b1f17b1804b1-493bd4f0530mr3477925e9.19.1782814891385;
- Tue, 30 Jun 2026 03:21:31 -0700 (PDT)
-Date: Tue, 30 Jun 2026 10:20:59 +0000
-In-Reply-To: <20260630102058.3219867-2-sebastianene@google.com>
+        d=1e100.net; s=20251104; t=1782814984; x=1783419784;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=7eQrlr1iqvdXSCnGA9eKw5Pz71hnIxvtQ5reJnEwINc=;
+        b=RKrLspKTiWD8hR0otNVhugD4c6LKPSz9loDx/zKrbECMhjDCzUHgpPJiofdM4Jr8UV
+         QCTFMPuXiUWrmPjLZKFlgUo6CrOe5RcGdfRtFfcTa7K1/ERK8uLa/wHCwGzcooinnOdL
+         pJMSqXmVYvLtfQtf+gwfxjxVmjfS6xOyYz/hITJX7Hl/sBHxotJ7q6VwcF+N5afSIOFv
+         1247OYdiKP8QIixYYnB2SLIW9utEiBF048cD8g+KvgdjIWYXoOudTMpRz9EYGpz27315
+         XbM3cv+K/dPiT4tPwGDr6BX/cVDIiepi9VdHRXdcneAQ1JXx7mxayQg6ONqOUhT4hlRJ
+         1Z1w==
+X-Forwarded-Encrypted: i=1; AFNElJ+CPo2lyNXpsUDpye+BjJhF14ZaGzTdzUXYXlxet/fq1kzoxJED8ljPBrkfe9+h1lXEWmHLgzk=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxyqy9WgV325ku0NQlUNs9h4/Xw++NYkSXDo9xckbHlT08PGQz9
+	j4F1ipb64qbmVgsd2u6aba32nz2e2hhyFexJ0OYIEgv4neNfu3vsEwU0XF9Vz678ZA==
+X-Gm-Gg: AfdE7ckFmWnPuj8LYAhiQpaCmSVY7ZBubgqgfAA201qfuUS3IPgKyflq32lOe6PCXFa
+	KmDp/XEqu7sn2oHQ1vIeNPQjjFNAEY5hYrqJ0F1Rl9BNE2FSU/Sm+GyyawIlaOnDj5Wd+fPCs3U
+	qz/713/Z3BLkgu0mF9aPUrLREeuKkuXJY4fcSpGPindWkbxSWcbgRtEAHS0gvCp/EJTfoPREs9Y
+	RS1fY6DXNZu7miaSlHnepmQJQ5l8xnE/UfNuhsM2BjRWtZ+HIXgUw974e1aZF1rs7EPeB6gCvM9
+	E3hyuFb7GhpUhXuoE7oAGmTpmqeXx7OCZUEb77E6jdNMPksownzrKux5ZsX9lHU5KvwzMPE8zbA
+	7GSgt+k9e2KHDqJLtc55JVcn3rtRy8ZgjSCAl/ivV2xqwAeKasqntXsSN8HVBKUU4FlpEMBQd2p
+	LWdH5O+7bDcZRkMRMArR9QKaiEAb/bAssspSNvUQMBYT2N3RZSR/uJ6rmx6EHwGQ==
+X-Received: by 2002:a05:600c:4314:b0:493:b86f:c913 with SMTP id 5b1f17b1804b1-493bd77921amr14605e9.1.1782814984019;
+        Tue, 30 Jun 2026 03:23:04 -0700 (PDT)
+Received: from google.com (140.240.76.34.bc.googleusercontent.com. [34.76.240.140])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493b8cd8bccsm63196105e9.8.2026.06.30.03.23.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 03:23:03 -0700 (PDT)
+Date: Tue, 30 Jun 2026 10:22:59 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: Vincent Donnefort <vdonnefort@google.com>, catalin.marinas@arm.com,
+	oupton@kernel.org, sudeep.holla@kernel.org, will@kernel.org,
+	jens.wiklander@linaro.org, joey.gouly@arm.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, android-kvm@google.com,
+	maz@kernel.org, mrigendra.chaubey@gmail.com,
+	op-tee@lists.trustedfirmware.org, perlarsen@google.com,
+	seiden@linux.ibm.com, sumit.garg@kernel.org, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v7 6/7] KVM: arm64: Ensure FFA ranges are page aligned
+Message-ID: <akOZAwBn0JkbyzX4@google.com>
+References: <20260617145130.3729015-1-sebastianene@google.com>
+ <20260617145130.3729015-7-sebastianene@google.com>
+ <ajQmN-UQD3uJJddJ@google.com>
+ <akORop8Z9Levu9Sr@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260630102058.3219867-2-sebastianene@google.com>
-X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260630102058.3219867-8-sebastianene@google.com>
-Subject: [PATCH v8 6/6] KVM: arm64: Zero out the stack initialized data in the
- FFA handler
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, oupton@kernel.org, sudeep.holla@kernel.org, 
-	will@kernel.org
-Cc: jens.wiklander@linaro.org, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	android-kvm@google.com, maz@kernel.org, mrigendra.chaubey@gmail.com, 
-	op-tee@lists.trustedfirmware.org, perlarsen@google.com, 
-	sebastianene@google.com, seiden@linux.ibm.com, smostafa@google.com, 
-	sumit.garg@kernel.org, suzuki.poulose@arm.com, vdonnefort@google.com, 
-	yuzenghui@huawei.com, Sashiko AI <sashiko-bot@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <akORop8Z9Levu9Sr@google.com>
 
-Don't leak hypervisor stack data when using the FFA_VERSION call.
-When the compiler doesn't support -ftrivial-auto-var-init=zero option
-we need to zero out the stack initialized variable before returning data
-to the host caller.
+> Hey Vincent,
+> 
+> > I failed to parse this 
+> > 
+> > But I see 
+> > 
+> > /* The base IPA of the constituent memory region, aligned to 4 kiB */ 
+> > 
+> > So it sounds fair to prevent oversharing when PAGE_SIZE > 4KiB
+> > 
+> 
+> I think the problem is when you have a mismatch between FFA_PAGE_SIZE
+> and the system PAGE_SIZE. We expect a fixed FFA_PAGE_SIZE of 4kb and
+> this is enforced by :
+> https://elixir.bootlin.com/linux/v7.1.2/source/arch/arm64/kvm/hyp/nvhe/ffa.c#L761
+> 
+> if FFA_PAGE_SIZE = 4kb and PAGE_SIZE = 16kb you can end up annotating more pages with FF-A then
+> needed when the range->address is unaligned.
+> 
+> It took me a while to understand this so I guess it is better to rephrase the commit msg.
 
-Closes:
-https://lore.kernel.org/all/20260616160016.C62C81F000E9@smtp.kernel.org/
+The problem here is that we only check alignment for size and not
+the address.
+And the code later (__pkvm_host_unshare_ffa()) uses pfn which
+truncates the extra bits.
+So, in case we have an unaligned address and an aligned the size, it
+will round down the address while the actual size spans an extra page.
 
-Reported-by: Sashiko AI <sashiko-bot@kernel.org>
-Fixes: c9c012625e12 ("KVM: arm64: Trap FFA_VERSION host call in pKVM")
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Link: https://lore.kernel.org/all/20260616160016.C62C81F000E9@smtp.kernel.org/
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+For example if base = 0xFFF and size = 0x1000. pKVM will share
+(0-0x1000) while the actual range spans till 0x1FFF causing FFA
+to access an extra page that was not shared by pKVM.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index bb01d8f83056..7407bc4b547a 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -881,7 +881,7 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
- 
- bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- {
--	struct arm_smccc_1_2_regs res;
-+	struct arm_smccc_1_2_regs res = {0};
- 
- 	/*
- 	 * There's no way we can tell what a non-standard SMC call might
--- 
-2.55.0.rc0.799.gd6f94ed593-goog
+Thanks,
+Mostafa
+
 
