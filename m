@@ -1,45 +1,76 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0C13F58FE;
-	Tue, 30 Jun 2026 12:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F0043CEC3;
+	Tue, 30 Jun 2026 14:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782824336; cv=none; b=d07JM6msK0+1QeBPyRICnViRPAREs8I3f75rYUYMAW7g3rpfY3hxQpo6UfSW+FZJHYOeIPnim8DSwX04vr+DfnuJLR+/fNQxiFVST1NTEbyvrEN9CnO57B4fLoVDQoxQiHFtXbbtfBYl4/vQtm5uOdhnrK0VObUoCA3lw7C9lpQ=
+	t=1782831031; cv=none; b=dL7cDu8PUrUncH2fKs7/6/5iYcDwHkYK61GqukyIShdnU5zLlYix8TNYSYHPGtcutfzbVfhIJ2oh9QadO/MYbSqzLyXcZfqQB0diI/IbrRt+m8nD+2bi3rGBv2Rv/+/SVD1IzvaEt3PWq0py1Gukpxl0Ec4yH4hRwqa8ZFZ8fhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782824336; c=relaxed/simple;
-	bh=rQy6ufZS/d06sy42Nw501NI/EZ81qs0zBsu6gj+Ji9s=;
+	s=arc-20240116; t=1782831031; c=relaxed/simple;
+	bh=FmGcRpgqVH1Jyet3amoELywEs1aHDjFjiXmR4Ai9K98=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=t8uvLO7RPLL0IAHwD9K8wa5lXsfVmAJcTZ7hQu35ktN24puKfqkTDAhn4YW4AP2sOkNLCT23NwflfJy/qgXhr4ifYdt1VqTuO+IR4HSCAoXG6u6egjoSKvmfX77xHVpFIxvmpSyEI/5I8M4qTO3C4RGCcBFRhb6NsWDgjdvGi5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=c3QxyXBT; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type:Content-Disposition; b=H4CTvetPQoNjJYqq4UwmYT3NKdt0p2KOQr5XIIGJSVP9Vze2TdxMlfnv7QK1FXL0FBL+mzJcUCNMbNdsMTxaq3c7Gr7fR+GWMnxf4Lu/Sq0eTU0wsOPdpAAUnoJY2N6IhHKqqyGzphfrX0p44RN3lL1LJLT9VfyCI+8EQWxtjUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DEus4bOr; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="c3QxyXBT"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DEus4bOr"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA31016F8;
-	Tue, 30 Jun 2026 05:58:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44C282ED2;
+	Tue, 30 Jun 2026 07:50:24 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E6F43F905;
-	Tue, 30 Jun 2026 05:58:53 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A158A3F85F;
+	Tue, 30 Jun 2026 07:50:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782824334; bh=rQy6ufZS/d06sy42Nw501NI/EZ81qs0zBsu6gj+Ji9s=;
+	t=1782831028; bh=FmGcRpgqVH1Jyet3amoELywEs1aHDjFjiXmR4Ai9K98=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c3QxyXBT0n3rNLXsrfGjdolNmH2SKD+rk1rGRJQT1fdpDUF5wBkAe5GpMLivflJ7k
-	 bqbOMbwtOglkrWwBDb7/VqTHg5ZxgU3zsGX/cAB0WkWuehN7eWjArjntbJVfv3BpBN
-	 vijushwNdXxGe3uHgDG5F7Ytt0w5M8qWHM+fhKi0=
+	b=DEus4bOrMtPLgrSAGt0EtnVJSrPt183sUxeCw5swqIK7G/W+bDiUNlIa/ENsn1q9S
+	 Ix+mwplKNj5DpeBcrAHKKzV8K/1MCOx6g4fV2IBjAXx7Kuo0F4lJTHOlnrbbqtsCKY
+	 2dyl9M0CURgvFIFZVqY/6Inv2dcOymDf4jQSKr4o=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Oliver Upton <oupton@kernel.org>
 Cc: Leonardo Bras <leo.bras@arm.com>,
-	sashiko-reviews@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>,
+	Saket Dumbre <saket.dumbre@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Chengwen Feng <fengchengwen@huawei.com>,
+	Kees Cook <kees@kernel.org>,
+	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zeng Heng <zengheng4@huawei.com>,
+	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: Re: [PATCH v2 02/13] KVM: arm64: Enable eager hugepage splitting if HDBSS is available
-Date: Tue, 30 Jun 2026 13:58:48 +0100
-Message-ID: <akO9iHJmKN7MzTjM@LeoBrasDK>
+	linux-acpi@vger.kernel.org,
+	acpica-devel@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 05/13] KVM: arm64: Detect (via ACPI) and initialize HACDBSIRQ
+Date: Tue, 30 Jun 2026 15:50:17 +0100
+Message-ID: <akPXqZQBKET1SyvN@LeoBrasDK>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <akKmHqRaZEUjN3zY@kernel.org>
-References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-3-leo.bras@arm.com> <20260629113645.BE6801F000E9@smtp.kernel.org> <akKFlzAdB43lRpi1@LeoBrasDK> <akKmHqRaZEUjN3zY@kernel.org>
+In-Reply-To: <akKpxDulRN7zDrgM@kernel.org>
+References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-6-leo.bras@arm.com> <akKpxDulRN7zDrgM@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,150 +81,98 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 29, 2026 at 10:06:38AM -0700, Oliver Upton wrote:
-> On Mon, Jun 29, 2026 at 03:47:51PM +0100, Leonardo Bras wrote:
-> > On Mon, Jun 29, 2026 at 11:36:45AM +0000, sashiko-bot@kernel.org wrote:
-> > > Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> > > 
-> > > New issues:
-> > > - [High] The default eager page splitting chunk size violates the KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE UAPI contract by using a value that is not a valid block size for 16KB and 64KB page kernels.
-> > > 
-> > > Pre-existing issues:
-> > > - [Critical] Dropping mmu_lock between primary and nested stage-2 write-protection creates a window where nested guests can bypass dirty logging.
-> > > --
-> > > 
-> > > commit 09e1d250ed331b9dc20b42b7f9315892a86a5d50
-> > > Author: Leonardo Bras <leo.bras@arm.com>
-> > > 
-> > > KVM: arm64: Enable eager hugepage splitting if HDBSS is available
-> > > 
-> > > This commit enables eager hugepage splitting by default for systems
-> > > supporting HDBSS, setting the default chunk size to 256K pages at
-> > > stage2 initialization.
-> > > 
-> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > index 6c941aaa10c63..e086c01a9325e 100644
-> > > > --- a/arch/arm64/kvm/mmu.c
-> > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
-> > > >  	for_each_possible_cpu(cpu)
-> > > >  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
-> > > >  
-> > > > -	 /* The eager page splitting is disabled by default */
-> > > > -	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> > > > +	 /* The eager page splitting is disabled by default if system has no HDBSS */
-> > > > +	if (system_supports_hdbss())
-> > > > +		mmu->split_page_chunk_size = 256 * 1024 * PAGE_SIZE;
-> > > 
-> > > [Severity: High]
-> > > Does this hardcoded chunk size violate the KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> > > UAPI contract on kernels with 16KB or 64KB pages?
-> > > 
-> > > By setting the default chunk size to 256 * 1024 * PAGE_SIZE, this evaluates to
-> > > 4GB on 16KB page systems and 16GB on 64KB page systems.
-> > > 
-> > > However, in arch/arm64/kvm/arm.c:kvm_vm_ioctl_enable_cap(), the chunk size is
-> > > validated against valid architectural block sizes:
-> > > 
-> > >     if (!new_cap || kvm_is_block_size_supported(new_cap)) {
-> > >     ...
-> > > 
-> > > Since 4GB and 16GB are not valid block sizes on those configurations, a VMM
-> > > like QEMU attempting to read the default capability via KVM_CHECK_EXTENSION
-> > > and set it back via KVM_ENABLE_CAP will be rejected with -EINVAL.
+On Mon, Jun 29, 2026 at 10:22:12AM -0700, Oliver Upton wrote:
+> On Mon, Jun 29, 2026 at 12:17:53PM +0100, Leonardo Bras wrote:
+> > Find via ACPI [1] the Id for HACDBSIRQ, initialize it as a per-cpu IRQ
+> > and make sure any cpu able to run virtualization has it active.
 > > 
-> > Sure, changing this to something like PMD_SIZE or PUD_SIZE should be no issue.
-> >  
-> > But this raises a topic I would like to understand:
-> > - Do we actually need this to be a block_size to assure correctness? or is 
-> >   it just about efficiency?
-> 
-> What value is there in having a chunk size larger than the largest
-> possible block mapping? The whole UAPI is deliberately tied up with page
-> table geometry.
-
-Not larger, possibly smallerv My concern was the difference in pages to 
-split between 4k, 16k and 64k.
-
-> 
-> Overall, I'm not buying the argument for changing the behavior of
-> KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE. There are very good reasons for
-> *not* eagerly splitting the entire address space, especially if you know
-> the working set of the VM is small.
-> 
-> You can still use HDBSS without eagerly splitting, so long as block
-> mappings are {DBM, S2AP_W} = {0, 0} and leaf mappings (which have
-> a writable PFN) are {1, 0}.
-> 
-
-Block mappings being read-only, and leaf mappings being writable-clean, 
-then? Could you please ellaborate on why does not it need eager-split?
-
-As a review, what I recall from the strategy for hw dirty-logging was:
-- If we have HDBSS, add DBM for all writable pages {1, 1}
-- On dirty-logging start, make them writable-clean {1, 0}
-  - Can be done using HACDBS
-  - Enable HDBSS & HAFDBS
-
-We don't have a fault for making pages dirty anymore, as this is done 
-by HAFDBS and recorded by HDBSS, so splitting does not happen on demand 
-anymore. So if we want to split pages, for better tracking granularity, or 
-anything, we have to eager-split them.
-
-Not doing so may cause us to have different level leaf sizes (pages & 
-hugepages) mixed up in HDBSS, which adds complexity, on top of possibly 
-making a live migration slower (the whole leaf entry has to be sent over 
-network).
-
-> > > [Severity: Critical]
-> > > This is a pre-existing issue, but by enabling eager hugepage splitting by
-> > > default for HDBSS, does this exacerbate a race condition with nested guests
-> > > bypassing dirty logging?
-> > > 
-> > > In arch/arm64/kvm/mmu.c:kvm_arch_mmu_enable_log_dirty_pt_masked(), KVM enables
-> > > dirty logging by write-protecting the primary stage-2 and then calling
-> > > kvm_mmu_split_huge_pages():
-> > > 
-> > >     if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-> > >         kvm_mmu_split_huge_pages(kvm, start, end);
-> > > 
-> > >     kvm_nested_s2_wp(kvm);
-> > > 
-> > > Because kvm_mmu_split_huge_pages() can drop the mmu_lock to top-up the memory
-> > > cache or reschedule, a race window is created before kvm_nested_s2_wp()
-> > > protects the nested stage-2 tables.
-> > > 
-> > > While the lock is dropped, a nested VCPU can fault, map the page via its
-> > > separate shadow stage-2 (which hasn't been write-protected yet), and write to
-> > > the page without setting the dirty bitmap, leading to silent memory corruption
-> > > after live migration.
-> > > 
+> > Introduce a per-cpu structure used by the HACDBSIRQ handler to keep track
+> > of entries size and the status of HACDBS. Size is used to detect end of
+> > processing in case the number of entries being processed is different of
+> > the supported entries size.
 > > 
-> > But if it's already write-protected in S2, if the nested VCPU faults 
-> > something, would not that be handled by non-nested faulting routine?
+> > Status may look easily replaceable by checking HACDBS registers now, but
+> > will make the OFF/IDLE detection easier in next patches.
 > > 
-> > I understand very little of nested, and I can't understand how does that 
-> > work properly. Maybe Marc or Wei Lin may have a better answer for that.
+> > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+> > 
+> > [1] https://github.com/tianocore/edk2/issues/12409
 > 
-> The only time this would be an issue is if we allowed userspace to
-> observe a clean dirty bitmap with a stale, writable shadow stage-2. All
-> roads go through the slots_lock, so I don't believe this is actually an
-> issue.
-> 
+> Reference the ACPI specification instead please.
 
-Awesome! 
+It's not accepted yet, unfortunately. I commented that into the cover 
+letter, but forgot to add it here.
 
-> The order of events Sashiko mentions makes no sense. If the shadow
-> stage-2 translation is already writable there would be no intervening
-> fault. Since the dirty bitmap is already cleared for these GFNs, a
-> racing write permission fault would actually set the dirty bitmap.
-> 
-> With that being said, I'd be happy with kvm_nested_s2_wp() getting moved
-> up earlier in the function anyway as it is easy to forget that the
-> mmu_lock could be dropped in between.
-> 
+> Any link you want to
+> include in a changelog should use the Link: footer, the linkage to the
+> inline citation will be obvious.
 
-Makes sense.
+Sure, will remember that in the future.
+
+> 
+> If we need to initialize the IRQ I'd really like to see device tree
+> bindings for HACDBSIRQ as well. Pretty much any system us plebs can get
+> our hands on is gonna be DT anyway.
+
+Agree. I started out with ACPI because that's what the main target is, as 
+dirty-logging is focused in Live Migration, which is usually more 
+appreciated in the server space, which generally uses ACPI.
+
+I spoke to some people, and I could not hear of anyone releasing a product 
+based in DT that would implement this yet, so I postponed the DT 
+enablement.
+
+> 
+> > +static irqreturn_t hacdbsirq_handler(int irq, void *pcpu)
+> > +{
+> > +	u64 cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
+> > +	unsigned long err = FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons);
+> > +
+> > +	switch (err) {
+> > +	case HACDBSCONS_EL2_ERR_REASON_NOF:
+> > +		this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> > +		break;
+> > +	case HACDBSCONS_EL2_ERR_REASON_IPAHACF:
+> > +		/* When size not a power of two >= 4k, exit with reserved TTLW */
+> > +		int index = FIELD_GET(HACDBSCONS_EL2_INDEX, cons);
+> > +
+> > +		if (index >= this_cpu_read(hacdbs_pcp.size)) {
+> > +			this_cpu_write(hacdbs_pcp.status, HACDBS_IDLE);
+> > +			break;
+> > +		}
+> > +		fallthrough;
+> > +	case HACDBSCONS_EL2_ERR_REASON_STRUCTF:
+> > +	case HACDBSCONS_EL2_ERR_REASON_IPAF:
+> > +		this_cpu_write(hacdbs_pcp.status, HACDBS_ERROR);
+> > +		break;
+> > +	}
+> > +
+> > +	return IRQ_HANDLED;
+> > +}
+> 
+> I have a pretty extreme distaste for creating a state machine between
+> the callsite and the IRQ handler. The callsite should poll HACDBS for
+> completion. The thread has nothing better to do anyway.
+
+Well, there is one argument it could just wait and save some energy, but I 
+agree it is not relevant in server space. The main reason I did this is 
+because I am planning on later doing an improved version of this that would 
+clean the dirty-bit *while* running the guest, and having the IRQ is needed 
+for exiting guest so we can notify userspace the cleaning is done. So I 
+laid the HACDBSIRQ infra here so we don't have both polling and IRQ options 
+happening. 
+
+That idea would require us to add new API (a return value for 'cleaned'), 
+and also a new flag for the clean ioctl. We also need the VMM to 
+implement that, but then we get a proper cpu usage of cleaning time.
+
+I wanted to start with a backwards compatible version, and do the above 
+idea once I put my hands in hardware that implements HACDBS, so I can 
+properly measure how much performance we get on above strategy.
+
+What do you think?
 
 Thanks!
 Leo
+
+  
