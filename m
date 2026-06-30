@@ -1,125 +1,109 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF403E2AD6
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 10:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DD93FB074
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 10:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782814987; cv=none; b=pHLUk4ePEyshV52kKaQuI1Ehe7HeFOHnD43ThqNCvTaql1smCS9BDfvgT/uXfJ84mkEQ4l9HDpL/34otEEEY0bVrzCimHUyaow7RIB8joTvsOqcvL9kF06T5x6wB1DN1HxTEXTpJZL+qoStq39AgGcMxUJtlIMnluQciUlQf8rk=
+	t=1782816804; cv=none; b=poFpyLyAKTUgNWDCUDo8Byy+J0JY2RNNeHQlWlz0yOrZ+6Asy6EDURy3gBtRcCyeILf0GXzaGJDHsHoA6ZjJRU7oXymA/N1ySFQ6PlzPFWpAq2QVA4N40+SodIhtTUkZAUYoNjVl+mHiJYjJf5RmzeCg8s37QxVYbVhATZZOxsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782814987; c=relaxed/simple;
-	bh=xO1vPXr6jVIbv3ACOnD7BWtFjQzhqCaDlWJshtXaouc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mKnT99xkVp74xBSk1FWX2wpuojCdfVqvuIozLIz/8Yu8vIxw3MAL4bT/x67VleUw/k6drh8yqXpmsurcWXgkMwux7hkSAHyXC0BywZe04Hce0ZpsXdMGjHSvROVApp+CvSz6ETsx5vrl/UH+JzPvZgvg+83zfaIErFIU86Ys8TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GIyOID5p; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1782816804; c=relaxed/simple;
+	bh=WqnnvaMHoE5lR0gpqfeVthVuGerkbMqkaseyMI8fX74=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=KVlOlugI6GbKHqcRKJTULInX6F+mbV+RrvKjXSjZ6paM4PnI3hD4CXfvhrEeUSXb9bumKwGsbiCYSaWWocPyc+hxFJNh4ApE8/sERkYbOJSfE5QkvzAKnMVe9xhORb4gWnrjFLoBunJEfL3Fg/s9OiY3o9Yqh947w6+AsB3jQA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9os/UZv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GIyOID5p"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-493b8d92a4eso33875e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 30 Jun 2026 03:23:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782814984; x=1783419784; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=7eQrlr1iqvdXSCnGA9eKw5Pz71hnIxvtQ5reJnEwINc=;
-        b=GIyOID5pNED4nRK8hqKIgIP8eUCd49MTRHGyWMDZvpndrFOebnysPy8rjRaYT4PIGE
-         zk/OBKqKbFw93TA2cMVy6Saro6eP8x7iHeFfXkcBDV8w6Psr95iW2u0jW/d9ZNgMNYEC
-         AH0OSsKAOCpCmb24T86M1XW7n3SbAGyBw4W5nRa9OWJaSjQACT0wNoyf21D/RJ1eQp+g
-         fHryQIgdd4Z0l8d4bcNYbnismt1oozD+aEDKnLtE+G5It8BupWTjVPPfKSvsly4BWjqQ
-         Ne+LF2NJHnLRd0jSjQhNPAk379Veak3G5dFKBnsGhcmoU0uSkRqqEBXQvSzPDmZrmA6D
-         tIyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782814984; x=1783419784;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7eQrlr1iqvdXSCnGA9eKw5Pz71hnIxvtQ5reJnEwINc=;
-        b=RKrLspKTiWD8hR0otNVhugD4c6LKPSz9loDx/zKrbECMhjDCzUHgpPJiofdM4Jr8UV
-         QCTFMPuXiUWrmPjLZKFlgUo6CrOe5RcGdfRtFfcTa7K1/ERK8uLa/wHCwGzcooinnOdL
-         pJMSqXmVYvLtfQtf+gwfxjxVmjfS6xOyYz/hITJX7Hl/sBHxotJ7q6VwcF+N5afSIOFv
-         1247OYdiKP8QIixYYnB2SLIW9utEiBF048cD8g+KvgdjIWYXoOudTMpRz9EYGpz27315
-         XbM3cv+K/dPiT4tPwGDr6BX/cVDIiepi9VdHRXdcneAQ1JXx7mxayQg6ONqOUhT4hlRJ
-         1Z1w==
-X-Forwarded-Encrypted: i=1; AFNElJ+CPo2lyNXpsUDpye+BjJhF14ZaGzTdzUXYXlxet/fq1kzoxJED8ljPBrkfe9+h1lXEWmHLgzk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxyqy9WgV325ku0NQlUNs9h4/Xw++NYkSXDo9xckbHlT08PGQz9
-	j4F1ipb64qbmVgsd2u6aba32nz2e2hhyFexJ0OYIEgv4neNfu3vsEwU0XF9Vz678ZA==
-X-Gm-Gg: AfdE7ckFmWnPuj8LYAhiQpaCmSVY7ZBubgqgfAA201qfuUS3IPgKyflq32lOe6PCXFa
-	KmDp/XEqu7sn2oHQ1vIeNPQjjFNAEY5hYrqJ0F1Rl9BNE2FSU/Sm+GyyawIlaOnDj5Wd+fPCs3U
-	qz/713/Z3BLkgu0mF9aPUrLREeuKkuXJY4fcSpGPindWkbxSWcbgRtEAHS0gvCp/EJTfoPREs9Y
-	RS1fY6DXNZu7miaSlHnepmQJQ5l8xnE/UfNuhsM2BjRWtZ+HIXgUw974e1aZF1rs7EPeB6gCvM9
-	E3hyuFb7GhpUhXuoE7oAGmTpmqeXx7OCZUEb77E6jdNMPksownzrKux5ZsX9lHU5KvwzMPE8zbA
-	7GSgt+k9e2KHDqJLtc55JVcn3rtRy8ZgjSCAl/ivV2xqwAeKasqntXsSN8HVBKUU4FlpEMBQd2p
-	LWdH5O+7bDcZRkMRMArR9QKaiEAb/bAssspSNvUQMBYT2N3RZSR/uJ6rmx6EHwGQ==
-X-Received: by 2002:a05:600c:4314:b0:493:b86f:c913 with SMTP id 5b1f17b1804b1-493bd77921amr14605e9.1.1782814984019;
-        Tue, 30 Jun 2026 03:23:04 -0700 (PDT)
-Received: from google.com (140.240.76.34.bc.googleusercontent.com. [34.76.240.140])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493b8cd8bccsm63196105e9.8.2026.06.30.03.23.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 03:23:03 -0700 (PDT)
-Date: Tue, 30 Jun 2026 10:22:59 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>, catalin.marinas@arm.com,
-	oupton@kernel.org, sudeep.holla@kernel.org, will@kernel.org,
-	jens.wiklander@linaro.org, joey.gouly@arm.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	maz@kernel.org, mrigendra.chaubey@gmail.com,
-	op-tee@lists.trustedfirmware.org, perlarsen@google.com,
-	seiden@linux.ibm.com, sumit.garg@kernel.org, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v7 6/7] KVM: arm64: Ensure FFA ranges are page aligned
-Message-ID: <akOZAwBn0JkbyzX4@google.com>
-References: <20260617145130.3729015-1-sebastianene@google.com>
- <20260617145130.3729015-7-sebastianene@google.com>
- <ajQmN-UQD3uJJddJ@google.com>
- <akORop8Z9Levu9Sr@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9os/UZv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D51B51F000E9;
+	Tue, 30 Jun 2026 10:53:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782816796;
+	bh=TtRwF33keShh6nY5OKPg9LN7EGLCxg8s7b/r69hO7/c=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=L9os/UZv1PzDIW9Mqxtat+zUyu4PkaMoqQive27d77wWHb4knztNrXeCmjC3J8Lz/
+	 XOZOAqndl6SN3axqnDDWY1v4AZmJMRGtFbq8lb/WIkj1SHfQzzgvtq5PpaqFIu08+C
+	 01xDAkCrncQ35c4a60KbHYIvGOUVd2KQlN/crAAW7tPapz+h3FTPog3Id0cii4XsBs
+	 /cSvU5PdQlcvhzuDGC+Wo2gdG4eWGI64wE0Dky2aW76VzQp3bN1YS8gzJepjH8y4iX
+	 PjNiEZrctrwht4Yix0uSKLB82YpEx8VA1AQ+TIk8TPOlRnXjDTWXiTngAp3NQER07W
+	 ReW3tAywxrnrw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v8 3/6] KVM: arm64: Fix bounds checking in
+ do_ffa_mem_reclaim()
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sebastian Ene" <sebastianene@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260630102058.3219867-5-sebastianene@google.com>
+References: <20260630102058.3219867-2-sebastianene@google.com>
+ <20260630102058.3219867-5-sebastianene@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 Jun 2026 10:53:15 +0000
+Message-Id: <20260630105315.D51B51F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akORop8Z9Levu9Sr@google.com>
 
-> Hey Vincent,
-> 
-> > I failed to parse this 
-> > 
-> > But I see 
-> > 
-> > /* The base IPA of the constituent memory region, aligned to 4 kiB */ 
-> > 
-> > So it sounds fair to prevent oversharing when PAGE_SIZE > 4KiB
-> > 
-> 
-> I think the problem is when you have a mismatch between FFA_PAGE_SIZE
-> and the system PAGE_SIZE. We expect a fixed FFA_PAGE_SIZE of 4kb and
-> this is enforced by :
-> https://elixir.bootlin.com/linux/v7.1.2/source/arch/arm64/kvm/hyp/nvhe/ffa.c#L761
-> 
-> if FFA_PAGE_SIZE = 4kb and PAGE_SIZE = 16kb you can end up annotating more pages with FF-A then
-> needed when the range->address is unaligned.
-> 
-> It took me a while to understand this so I guess it is better to rephrase the commit msg.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] The patch introduces a spurious `ffa_rx_release(res)` call on an=
+ error path, resulting in a double release of the FF-A RX buffer.
+--
 
-The problem here is that we only check alignment for size and not
-the address.
-And the code later (__pkvm_host_unshare_ffa()) uses pfn which
-truncates the extra bits.
-So, in case we have an unaligned address and an aligned the size, it
-will round down the address while the actual size spans an extra page.
+commit 027ec78db7562e036e73ee20428d8aa5b545f58b
+Author: Mostafa Saleh <smostafa@google.com>
 
-For example if base = 0xFFF and size = 0x1000. pKVM will share
-(0-0x1000) while the actual range spans till 0x1FFF causing FFA
-to access an extra page that was not shared by pKVM.
+KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
 
-Thanks,
-Mostafa
+This commit splits the bounds checking for FF-A memory reclaim descriptors
+into two parts. It first verifies the fixed portion fits before accessing
+the descriptor, and then checks if the variable array size fits to prevent
+out-of-bounds memory accesses.
 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 1af722771178a..2d211661952e3 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+[ ... ]
+> @@ -636,11 +636,17 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2=
+_regs *res,
+>  		ffa_rx_release(res);
+>  	}
+> =20
+> +	reg =3D (void *)buf + offset;
+> +	if (offset + CONSTITUENTS_OFFSET(reg->addr_range_cnt) > len) {
+> +		ret =3D FFA_RET_ABORTED;
+> +		ffa_rx_release(res);
 
+[Severity: Medium]
+Will this result in a double release of the FF-A RX buffer?
+
+Looking at do_ffa_mem_reclaim() in arch/arm64/kvm/hyp/nvhe/ffa.c,
+ffa_rx_release() is called unconditionally before the fragment loop starts,
+and then again at the end of each iteration of the loop.
+
+When the code reaches this new bounds check after the loop, the RX buffer
+has already been released. Calling ffa_rx_release() again on this error
+path sends a spurious FFA_RX_RELEASE SMC to the SPMD when the hypervisor
+does not own the buffer.
+
+Could this violate the FF-A protocol state machine and cause the SPMD to
+return an error or panic?
+
+> +		goto out_unlock;
+> +	}
+> +
+>  	ffa_mem_reclaim(res, handle_lo, handle_hi, flags);
+>  	if (res->a0 !=3D FFA_SUCCESS)
+>  		goto out_unlock;
+> =20
+> -	reg =3D (void *)buf + offset;
+>  	/* If the SPMD was happy, then we should be too. */
+>  	WARN_ON(ffa_host_unshare_ranges(reg->constituents,
+>  					reg->addr_range_cnt));
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260630102058.3219=
+867-2-sebastianene@google.com?part=3D3
