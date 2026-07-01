@@ -1,146 +1,180 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04C1413D66;
-	Wed,  1 Jul 2026 10:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE9D42B72D;
+	Wed,  1 Jul 2026 10:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782902882; cv=none; b=IoYEvDO7L4E9ReqTbcph4+vvr1s9R05dnb5TZydist+AO1PlVXpfUfolZK8GLfMiw9VZH20b95jBCu0h+NDcmKC3JR67PJnsZNIxEkejavw3tQHoygeEIvvfXmxwawTCkXcWpsKmRcUgSeLcwHIQltFn7CulsOKtdjw+gE11jr0=
+	t=1782903208; cv=none; b=VN6OCoXrOvwBhSsku2J96IFWROZw1L4FJPXXFSUOH8BZYU/mWtOBjt7jk+eYKz03pnYMHMcYT2dhCyMJJ29EH7pu0GsTjwe4pG6vJX6S7bw+Hp0WzygiaetwRU1RL1tbyyfxrAZrAoFndI8ZPL0jHOx/A9t9MNc0QoeI2XJcrZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782902882; c=relaxed/simple;
-	bh=k9oLV4IW1kmjddOXs4xgFjCS/8na5VnlDFUVzIfikXo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=K2gzFOsMWV2CbigTGJgjhO3+G5D+FXBFjkL/WH6X7Aqlm2eBTgGaRYh5iw0SZLGKsaKAQijesEr3bQSQWheuJsmzSeSft/F9T3Nju66wTtnBg2zHTWBK2hyNRO8/yFl7Q08AgCz1AqAiLuq4ZOCDW7H4ZK3r7I0siXXEOYAbLzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tnOzSRO0; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1782903208; c=relaxed/simple;
+	bh=JZ56j9O/E/kb3CIeJoDp5K9QusgKfml7k5WJLhXC098=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MtGyzdnO/hbL6xcGeeB9WBc2r7FYbvWL3sKHj97Zg4AObBFUft4Hz/ANOjgqcJ+JhFeejoGeEEUV5jH7Yic3o1E6zB+i9ybpU74sUyITd7LdHd3IMcxE5PmOTF2KAxGlZorAds0q2wFlSeY4muDDHvT7pzGzbHs6P+8kOLzc7dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kWk13RqK; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tnOzSRO0"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kWk13RqK"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C24C2247;
-	Wed,  1 Jul 2026 03:47:55 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1B5C3F85F;
-	Wed,  1 Jul 2026 03:47:54 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5D242247;
+	Wed,  1 Jul 2026 03:53:20 -0700 (PDT)
+Received: from [10.57.37.248] (unknown [10.57.37.248])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 22C093F85F;
+	Wed,  1 Jul 2026 03:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782902880; bh=k9oLV4IW1kmjddOXs4xgFjCS/8na5VnlDFUVzIfikXo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tnOzSRO03HoN3OjxZOBM4zT7QZXKnXvBpvE2UHcg5FHEnAP6Uw1P9kZGjvy4/BHWl
-	 XsLX53rt40c/3Y76DfQ8exxQAa8Zn6lDLlVABiIFTtnUSxB2BpHI8pwOpELG0RrwoS
-	 cJEkgFFdJuQwSs9X0ULTp+Zo7HMVTGwI3C0PQz4s=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>,
-	Saket Dumbre <saket.dumbre@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Chengwen Feng <fengchengwen@huawei.com>,
-	Kees Cook <kees@kernel.org>,
-	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zeng Heng <zengheng4@huawei.com>,
-	mrigendrachaubey <mrigendra.chaubey@gmail.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org,
-	acpica-devel@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 06/13] KVM: arm64: dirty_bit: Add base FEAT_HACDBS cleaning routine
-Date: Wed,  1 Jul 2026 11:47:52 +0100
-Message-ID: <akTwWArtOWJ--fi4@LeoBrasDK>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <akQTypBfpdqSMhm_@kernel.org>
-References: <20260629111820.1873540-1-leo.bras@arm.com> <20260629111820.1873540-7-leo.bras@arm.com> <akKtKH8O5hngLenm@kernel.org> <akPZ2bnh3k6ZZgYx@LeoBrasDK> <akQTypBfpdqSMhm_@kernel.org>
+	t=1782903205; bh=JZ56j9O/E/kb3CIeJoDp5K9QusgKfml7k5WJLhXC098=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kWk13RqKQ05yF/keJKKAoG2johPDXGZZNyWNrYJu6wcvzr07ub1fzAWpTdwka/E6q
+	 Uq1BFIYlBLNqglC/uQ0SRczjha3tUTsAs/HJXvv8ybID9ynHz/NQIPxK+7xL/QRR+s
+	 NlwIFfzy0G7AW2cO1hqgGlJ/eZ6wnw6/sj9T/I3Y=
+Message-ID: <8c0e6a32-2de2-4b94-9fe2-e32f5e9bcc4a@arm.com>
+Date: Wed, 1 Jul 2026 11:53:17 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 00/44] arm64: Support for Arm CCA in KVM
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo.Pieralisi2@arm.com
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <akR0eX0nCumIgnlh@FCCLS0092175.localdomain>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <akR0eX0nCumIgnlh@FCCLS0092175.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 30, 2026 at 12:06:50PM -0700, Oliver Upton wrote:
-> On Tue, Jun 30, 2026 at 03:59:38PM +0100, Leonardo Bras wrote:
-> > > > +	hcr_el2 = read_sysreg(HCR_EL2);
-> > > > +	write_sysreg(hcr_el2 | HCR_EL2_VM, HCR_EL2);
-> > > 
-> > > sysreg_clear_set_hcr(). I'm pretty sure all the speculative AT errata
-> > > depend on HCR_EL2.VM being set _after_ the stage-2 MMU has been loaded.
-> > > 
-> > 
-> > So, move this to after __load_stage2()?
-> > ok
+On 01/07/2026 03:15, Kohei Enju wrote:
+> On 05/13 14:17, Steven Price wrote:
+>> This series adds support for running protected VMs using KVM under the
+>> Arm Confidential Compute Architecture (CCA).
+>>
+>> This is rebased on v7.1-rc1, but still targets RMM v2.0-bet1[1].
+>>
+>> The major updates from v13 remain but have been more fully implemented:
+>> the RMM uses the host's page size, range based RMI APIs mean we don't
+>> have to break everything down to base page sizes, the GIC state is
+>> passed via system registers, and the uAPI has been simplified.
+>>
+>> The main changes since v13 are:
+>>
+>>  * The RMI definitions and wrappers have been fully updated for RMM
+>>    v2.0-bet1. In particular the temporary RMM v1.0 SMC compatibility
+>>    patch has been dropped.
+>>
+>>  * The PSCI completion ioctl has been removed. RMM v2.0-bet1 still
+>>    requires the host to provide the target REC for PSCI calls which
+>>    name another vCPU, but KVM now performs the RMI PSCI completion
+>>    automatically before entering the REC again. Userspace no longer
+>>    needs to issue KVM_ARM_VCPU_RMI_PSCI_COMPLETE. A future spec should
+>>    remove the need for the host to provide the MPIDR mapping.
+>>
+>>  * The generic RMI init, RMM configuration, GPT setup,
+>>    delegate/undelegate helpers and SRO infrastructure have moved out of
+>>    KVM into arch/arm64/kernel/rmi.c. RMI is expected to be used by
+>>    features outside KVM, so this code should be available even when KVM
+>>    is not built.
+>>
+>>  * RMI_GRANULE_TRACKING_GET has been updated to work on a range, this
+>>    allows it to work when the region is not aligned to the tracking
+>>    size. Solves the problem reported by Mathieu[2].
+>>
+>>  * SRO support has been moved earlier in the series and improved. It
+>>    provides a cleaner way for the host to provide the RMM with the extra
+>>    memory it requires. However support is still incomplete where the
+>>    TF-RMM code does not yet implement it. This is noted by FIXMEs in the
+>>    code.
+>>
+>>  * The ARM VM type encoding has been reworked to coexist with the
+>>    upstream pKVM KVM_VM_TYPE_ARM_PROTECTED bit.
+>>
+>>  * The private-memory documentation now notes that arm64 uses
+>>    KVM_CAP_MEMORY_ATTRIBUTES.
+>>
+>>  * PMU support is dropped for now. It will be added later in a separate
+>>    series. Similarly for selecting the hash algorithm and RPV.
 > 
-> Yes.
-> 
-> > > > +	__load_stage2(&kvm->arch.mmu);
-> > > 
-> > > Pretty sure you need an ISB here to ensure loading the MMU is ordered
-> > > with enabling HACDBS.
-> > >
-> > 
-> > does not __load_stage2() have an isb() here?
-> > In any case, will add an isb() after sysreg_clear_set_hcr(), which should 
-> > come after __load_stage2() IIUC.
-> 
-> No, __load_stage2() inserts an ISB only for hardware subject to the
-> speculative AT errata. If an implementation has broken AT and HACDBS in
-> the future then it gets an additional ISB. Oh well.
->
+> Hi Steven,
 
-Makes sense.
- 
-> > > > +	hacdbs_start(hw_entries, size);
-> > > > +
-> > > > +	do {
-> > > > +		wfi();
-> > > > +	} while (this_cpu_read(hacdbs_pcp.status) == HACDBS_RUNNING);
-> > > 
-> > > This is exactly why I said you should just poll hardware instead. It is
-> > > entirely possible that the IRQ arrives before you WFI.
-> > 
-> > It should be fine with WFIT, though, right?
-> 
-> Sure, but we shouldn't assume a functional WFxT even if we have HACDBS.
-> Just rely on pre-existing kernel infrastructure to do the thing you want
-> to.
+Hi,
 
-Got it.
+> Is there any plan to add support for selecting the MEC policy (shared or
+> private)? We have been working on adding support for this on top of your
+> series. If this is not already in the works, we may upstream our
+> implementation later.
 
-> 
-> > I understand the reason in pooling, and even done some workaround in 
-> > pooling for getting this to run in the model. 
-> > 
-> > Based on the previous reply, do you think I should only use polling for 
-> > now, and implement the IRQ later?
-> 
-> Yes.
-> 
+I've been trying to focus on getting the minimum useful series
+upstreamed before looking at additional features (such as hash
+algorithm, MEC policy etc). If you've already got support then yes
+please do upstream it later when we've got this series landed.
 
-Will do, then.
+Thanks,
+Steve
 
-Thanks!
-Leo
+> Thanks,
+> Kohei
+> 
+>>
+>> There are also the usual rebase updates and smaller fixes, including
+>> changes to the RMM v2.0-bet1 range APIs, removal of REC auxiliary
+>> granule handling, fixes to the address range descriptor encoding, and
+>> cleanups around realm stage-2 teardown.
+>>
+>> Stateful RMI Operations
+>> -----------------------
+>>
+>> The RMM v2.0 spec introduces Stateful RMI Operations (SROs), which allow
+>> the RMM to complete an operation over several SMC calls while requesting
+>> or returning memory to the host. This allows interrupts to be handled in
+>> the middle of an operation and lets the RMM dynamically allocate memory
+>> for internal tracking purposes. For example, RMI_REC_CREATE no longer
+>> needs auxiliary granules to be provided up front, and can instead
+>> request memory during the operation.
+>>
+>> This series includes the generic SRO infrastructure in
+>> arch/arm64/kernel/rmi.c and uses it for REC create/destroy. The other
+>> cases are not yet used by TF-RMM and a future revision will be needed to
+>> finish those paths in Linux.
+>>
+>> This series is based on v7.1-rc1. It is also available as a git
+>> repository:
+>>
+>> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v14
+>>
+>> Work in progress changes for kvmtool are available from the git
+>> repository below:
+>>
+>> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v12
+>>
+>> The TF-RMM has not yet merged the RMM v2.0 support, so you will need to
+>> use a branch with RMM v2.0-bet1 support. At the time of writing the
+>> following branch is being used:
+>>
+>> https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc_2
+>> (tested on commit 3340667a291a)
+>>
+>> There is a kvm-unit-test branch which has been updated to support the
+>> attestation used in RMMv2.0 available here:
+>>
+>> https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v4
+>>
+>> [1] https://developer.arm.com/documentation/den0137/2-0bet1/
+>> [2] https://lore.kernel.org/all/acrj-cKphy4hJsEG@p14s/
 
