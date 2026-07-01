@@ -1,235 +1,225 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C89248B363
-	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 13:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE8D2BEFE8;
+	Wed,  1 Jul 2026 13:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782912718; cv=none; b=oFR7yhzQZuE8CAtbfcbewV2Eh8Qs8EMVjWI2GInrI6aY+TfrE9z1iZWGCfDLwL8kezJKbEOjJaVNzRNkY0u742k0ydmQttOXSutG5BNQxi3XmNNgyr3LUVbzpsTqAVBktWMCVlfGFMVlfFbvlMFBlQ6N9Bqhm/9KzzwWz+UMGks=
+	t=1782914311; cv=none; b=mTzVDfBm5j4+k35KXVY8Kg4ov2XVoF9zCKQXD9VGpbDSKYXkdjEVGX5p6T+Tf0Ca+M/pahQOpTZ3r0C+HxwrzZY5KQvla46Ei+d2W72rdP+iwHcmIiCilbEHNdbo3xuHgEL68rtfsYgpf0+Uifnp5ykD1T//kG42uldl9RNHneo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782912718; c=relaxed/simple;
-	bh=cHQGDBv2YgRqGgNgwPodZeLX7f0kk1ApLtscbK58jOE=;
+	s=arc-20240116; t=1782914311; c=relaxed/simple;
+	bh=1hk25nbEOuKfTJrZLJxw/In6GhMhbaplqMUYgfQIhUQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jUab5/FAGhsJYH4/aEYOyXGwpwCU99iCrQUKb8vWxktEiHMqMLwm71FDaOkwHTfVmOpI6bscBIp3xXV/IN5smjfKZvNchw22mWiDgMfp5urQkWKejJ6Zwa549qSN6nVPdoe8tH+FoP2Xp3PWeIjBKRDYWfFPVMrZLJULOkQwpys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lsz8ol6z; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=oDOAZYVl1LDjgcAp3ICo1tWNmcnr+iWR64J7OwxKg2PusOJqQFLVJwG1anGi1CYj2oJMOFlzqQvek/eHiQvSn1X75+shiV5itafvgxvMUfu6Bqr26AwJEfgHl9mCj9SZFbWnvy3TOwikmn4vVEUxrf2KnOR+YFzdn73pjyiJg8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fM7XqVQd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lsz8ol6z"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4758b2a9e2aso431720f8f.2
-        for <kvmarm@lists.linux.dev>; Wed, 01 Jul 2026 06:31:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782912714; x=1783517514; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=54H8ja6qkwc+zSll+xVZzhQ87dmwI3XRpSBDJRGLWNs=;
-        b=lsz8ol6zMFog423vrWPLvi4Ve5GV4pHMl0vHEQUsiRa7tjT1JddTwrvwdPZohOMRr8
-         54fW5l1T0+ItMtSp1nQTlJwJeVShWd83lXb60NYQWb/OLD4lUUrDw1xxwaaGaKR2bhoX
-         GER/N7gFJdf15vaX7zH7ugi4LmflW2Z5RZVEJqEYTk69P3t0jjARSmTT9UzFegiCw5RG
-         Wq3Z3qD6xWhvbLSx8OwRY6ZE60gmBb8NZVzCGAG0krB8oH22KNB8YmG9NtZNzOUvc20m
-         VuzstomEdpN/quQwuXmNZM6WXNu8N5g/Msxd99n+gQZP2QiZDKF/Xe8aNfJMVPbrgutj
-         oodQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782912714; x=1783517514;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=54H8ja6qkwc+zSll+xVZzhQ87dmwI3XRpSBDJRGLWNs=;
-        b=o/IEQ2Df/LV6V7tRW89Jh1P1Qi8TGQ87AStn3uhWG7Vq0PP3uEWaJpWGTBJx3Ku7CM
-         Z1JD+XZYtdit8zR2rBxsMMO2CSI7pi0PfqiOSusBGTbbgglYt7p9T7UjcMH5a0jhGek7
-         95cZWvV1H1Rv9S92kDEtzCpXCMHMGjlkwOxUXNlCVymlmRdgh9eMqETGlC/bF+63TI1c
-         cO3PXbBsRF1Hl1rnBEeXwXmpqDF7u0Z98vn3daKsYmVCOpWhlHN/0N6B3S1MngVFirN5
-         RthM9ad9AdwpiBPWAo5Q3mgaLTRgqsUTa87ud+aP1n/iCZtpOGhn2xvFPlN/5QTH5DkU
-         rJaw==
-X-Forwarded-Encrypted: i=1; AHgh+Rqfor1IxSr2R2LoziQGrBJiyftErqMLZDNPYb1wR8GR/Y5EhpZw9LnwLgtT1u8hkvjkAmrZxUI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzlUJ4EsBGY+LrIDl1GMISVNj/QYbGVzZ6IThK/9HUKyG0bdQuz
-	oAjiMr/Ra+dk92bAqi6mpO4QXIXUCQenq9gKScKrOVCK4Nr9wJPo0k+S8X3LcsoL6A==
-X-Gm-Gg: AfdE7cmR1hBarvrI+xl10RDzWjM0cVZAyvcL5N8komsVVBBk6P2OzacTLas+Pic3sOX
-	sxHU3AxbNNDgy07IKzyA7KxhyQgCHvJ7VmzLFIh8fwnd8Yb3Brhzu+13X2+WekYI2RbvKyE/KwN
-	Thxl0MgOy3pCKzAajxlDT1nmLkIoSzFteQFdLDhq48LAUZWB7wR5Ib/2W7WAjd2cVNN9Ax8w4gP
-	PMf4QIxwgrARv0743BswZ4Kvhf5Gvnkzi0QRyMDizt+0RDKNpFYq1pVMBsJ2/gG/dAUyp1M+ohG
-	1Lgq2/gFx0Zg/w+F+D9YN/K3yqoRKneQM9U7ex9jCy14TKRLpm9/RQBGnjOTw3bLhbMugLii+wL
-	6JGWIbQhkSA/tbQAa7Fh0DzxQ86hx5zrujiIH7lo7fkMFctH3JOkgzM861KREaMzB0o9ZaGGQnm
-	/FGhsIyyhovj7zGHhOERKqg5fIlDBzywyNB0oZJ8+74oKDXL4NOoPQJ065HnX8gw==
-X-Received: by 2002:a05:6000:29db:b0:475:f0c2:5b02 with SMTP id ffacd0b85a97d-4775b45b05emr2137424f8f.56.1782912713855;
-        Wed, 01 Jul 2026 06:31:53 -0700 (PDT)
-Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-475641e4542sm18270184f8f.10.2026.07.01.06.31.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 06:31:52 -0700 (PDT)
-Date: Wed, 1 Jul 2026 14:31:49 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Bradley Morgan <include@grrlz.net>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fM7XqVQd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E8901F00A3A;
+	Wed,  1 Jul 2026 13:58:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782914310;
+	bh=ePmFTt3rstOx1IVudF2odVlsiK0au8knUpVzH4WAluw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fM7XqVQdKtVW76vvm37/QxzvdOzywI+FgauHtn1ml/ste9Tta4xmD/sojvqEVF6lP
+	 FsaN/f3l00uZ6iguLU/zMXTZvDGmS8i/zcGutFF1s/24xfiXPONa2NNiQ+yYYvoiaO
+	 VHcayZERLltwtW0zJ25kGhpfwwQAXfxc1+6wUDHD6vHypyoubtx8PEshKPEPfBrWi6
+	 sD85cR8B9G1zXW3XgN11UyLjtl6qKDonm9IUcJMY74lTzNXFt0VMTsExU2iJB+QNxJ
+	 Nly6uqW4WAFvE5ybUXRWv7nyWDsF7lmUP9+lnKZve63mQrmBI+whbx5P4udDFdceoU
+	 cUqGl1joP0Nkw==
+Date: Wed, 1 Jul 2026 15:58:21 +0200
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
-	Gavin Shan <gshan@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] KVM: arm64: skip pKVM cache flushes for non
- cacheable mappings
-Message-ID: <akUWxY_irosuTF4L@google.com>
-References: <20260624160028.15591-1-include@grrlz.net>
- <20260624160028.15591-2-include@grrlz.net>
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+	Lorenzo.Pieralisi2@arm.com
+Subject: Re: [PATCH v14 29/44] arm64: RMI: Runtime faulting of memory
+Message-ID: <akUc/ScJN0GlM+9G@lpieralisi>
+References: <aiJ6u83O0nVUtPyv@lpieralisi>
+ <ecef952b-e8c6-4102-933b-c99c46f14431@redhat.com>
+ <aiLes2ecZSr17UwZ@lpieralisi>
+ <1e39094f-7fa3-4ef1-be54-53d7a8643506@redhat.com>
+ <98d2a0f3-b831-466a-8212-5bcf97ad9d8b@arm.com>
+ <8da87878-2a5d-478a-a280-60dbed7ad1b9@redhat.com>
+ <9482dfbc-4d96-47ba-a615-f4ba0bda833f@arm.com>
+ <8f81ed99-c53a-4196-baa2-adea9239a000@redhat.com>
+ <aj6sdzlbxT8D5fnf@lpieralisi>
+ <901398bb-ed6c-4997-b3cd-ce2829b09c87@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260624160028.15591-2-include@grrlz.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <901398bb-ed6c-4997-b3cd-ce2829b09c87@redhat.com>
 
-On Wed, Jun 24, 2026 at 04:00:26PM +0000, Bradley Morgan wrote:
-> pKVM keeps its own mapping list for stage 2 operations. Its flush path
-> uses that list directly, so it lost the PTE attribute check done by the
-> generic stage 2 walker.
+On Sun, Jun 28, 2026 at 08:33:01PM +1000, Gavin Shan wrote:
+> On 6/27/26 2:44 AM, Lorenzo Pieralisi wrote:
+> > On Fri, Jun 26, 2026 at 09:43:03PM +1000, Gavin Shan wrote:
+> > > On 6/26/26 6:47 PM, Suzuki K Poulose wrote:
+> > > > On 26/06/2026 08:43, Gavin Shan wrote:
+> > > > > On 6/26/26 1:58 AM, Suzuki K Poulose wrote:
+> > > > > > On 25/06/2026 14:53, Gavin Shan wrote:
+> > > > > > > On 6/6/26 12:35 AM, Lorenzo Pieralisi wrote:
+> > > > > > > > On Fri, Jun 05, 2026 at 06:11:11PM +1000, Gavin Shan wrote:
+> > > > > > > > > On 6/5/26 5:28 PM, Lorenzo Pieralisi wrote:
+> > > > > > > > > > On Fri, Jun 05, 2026 at 04:23:15PM +1000, Gavin Shan wrote:
+> > > > > 
+> > > > > [...]
+> > > > > 
+> > > > > > > > > 
+> > > > > > > > > I tried to rebase Jean's latest QEMU series [1] to upstream QEMU, and found
+> > > > > > > > > that memory slots backed by THP are broken. With THP disabled on the host and
+> > > > > > > > > other fixes (mentioned in my prevous replies) applied on the top of this (v14)
+> > > > > > > > > series, I'm able to boot a realm guest with rebased QEMU series [2], plus more
+> > > > > > > > > fxies on the top.
+> > > > > > > > > 
+> > > > > > > > > [1] https://git.codelinaro.org/linaro/dcap/qemu.git  (branch: cca/ latest)
+> > > > > > > > > [2] https://git.qemu.org/git/qemu.git                (branch: cca/ gavin)
+> > > > > > > > > 
+> > > > > > > > > Lorenzo, You may be saying there is someone making QEMU to support ARM/CCA?
+> > > > > > > > 
+> > > > > > > > Mathieu and I are working on that yes and with Steven/Suzuki to fix the THP
+> > > > > > > > issues you pointed out above.
+> > > > > > > > 
+> > > > > > > > > If so, I'm not sure if there is a QEMU repository for me to try?
+> > > > > > > > 
+> > > > > > > > We should be able to submit patches by end of June - we shall let you know
+> > > > > > > > whether we can make something available earlier.
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > Not sure if there are other known issues in this series. It seems the stage2
+> > > > > > > page fault handling on the shared space isn't working well. In my test, the
+> > > > > > > vring (struct vring_desc) of virtio-net-pci is updated by the guest, and the
+> > > > > > > data isn't seen by QEMU, I'm suspecting if the host-page-frame-number is properly
+> > > > > > > resolved in the s2 page fault handler for shared (unprotected) space.
+> > > > > > > 
+> > > > > > > - I rebased Jean's latest qemu branch to the upstream qemu;
+> > > > > > > 
+> > > > > > > - On the host, which is emulated by qemu/tcg, the THP (transparent huge page) is
+> > > > > > >     disabled.
+> > > > > > > 
+> > > > > > > - On the guest, I can see the virtio vring (struct vring_desc) is updated. The
+> > > > > > >     S1 page-table entry looks correct because the corresponding physical address
+> > > > > > >     0x10046880000 is a sane shared (unprotected) space address.
+> > > > > > > 
+> > > > > > >     [   52.094143] software IO TLB: Memory encryption is active and system is using DMA bounce buffers
+> > > > > > >     [   52.289746] virtqueue_add_desc_split: desc[0]@0xffff000006880000, [00000100b983f000  00000640  0002  0001]
+> > > > > > >     [   52.432150] PTE 0x00e8010046880707 at address 0xffff000006880000
+> > > > > > > 
+> > > > > > > - On the host, the s2 page-table-entry is unmapped due to attribute transition (private -> shared).
+> > > > > > >     A subsequent S2 page fault is raised against the adress and the s2 page-table-entry is built.
+> > > > > > > 
+> > > > > > >     [  109.259077] ====> realm_unmap_shared_range: tracked_unprot_addr=0x10046880000
+> > > > > > >     [  109.260249] realm_unmap_shared_range: unmapped shared range at 0x10046880000
+> > > > > > >     [  109.317786] realm_unmap_shared_range: unmapped shared range at 0x10046880000
+> > > > > > >     [  109.629939] ====> kvm_handle_guest_abort: fault_ipa=0x10046880000, esr=0x92000007
+> > > > > > >     [  109.630245] realm_map_non_secure: ipa=0x10046880000, pfn=0xb8b59, size=0x1000, prot=0xf
+> > > > > > >     [  109.630331] realm_map_non_secure: ipa=0x10046880000, ipa_top=0x10046881000, flags=0x1e0001, range_desc=0xb8b59004
+> > > > > > 
+> > > > > > Are you able to correlate the order of the transitions and the Guest
+> > > > > > access with RMM log ? We haven't seen this from our end. We are aware
+> > > > > > of permission fault issues with Unprotected IPA when backing the memslot
+> > > > > > with MAP_PRIVATE areas. But this looks different.
+> > > > > > 
+> > > > > > Lorenzo, have you run into this ?
+> > > > > > 
+> > > > > 
+> > > > > It's hard to correlate the order since the logs are collected from two separate
+> > > > > consoles. For the write permission, I add code to the host where the permission
+> > > > > is always added for all s2 page faults in the shared space. Otherwise, qemu can
+> > > > > be killed by -EFAULT or similar error.
+> > > > 
+> > > > This is the problem. We can't add WRITE permission by default. I believe
+> > > > you may have MAP_PRIVATE mapping and it has to be mapped as READ only
+> > > > and on a permission fault, we replace it with a writable page. By
+> > > > overriding the WRITE permission, you let the guest write to a page
+> > > > that may not be seen by the VMM.
+> > > > 
+> > > > We identified this as a bug in the KVM driver in this series (reported
+> > > > by Lorenzo) and there is a corresponding tf-RMM change that is required
+> > > > to get this working. So, please could you wait until the next series
+> > > > when this will be addressed ? Or you could switch to using MAP_SHARED
+> > > > for the "shared" memory in the memslot.
+> > > > 
+> > > 
+> > > Exactly. the syntax for MAP_PRIVATE is broken if the write permission is
+> > > enforced for a read fault in the shared space. In my case, the host page can
+> > > be the zero page and eventually multiple s2 page-table entries (for multiple
+> > > unprotected or shared pages) point to the zero page. It's why clearing the
+> > > 3rd queue (Ctrl queue) also clears the first queue (Rx queue) in my case.
+> > > 
+> > > Yes, this issue can be avoid by using a shared memory backend in qemu, something
+> > > like below. With this, I'm able to see virtio-net-pci starts to work...
+> > > 
+> > >      -object memory-backend-ram,id=mem0,size=2G,share=yes
+> > 
+> > Yes, as Suzuki said that's what we have been fixing. QEmu patches
+> > will be on the mailing lists very shortly - the KVM/tf-RMM fixes
+> > to make MAP_PRIVATE work will be included in the next posting.
+> > 
+> > Feel free to drop your QEmu command line so that I can give it
+> > a shot and check whether the fixes solve the problem you hit
+> > (I think so because that's precisely the kind of issue I got
+> > into when I started debugging THP/MAP_PRIVATE but it is better
+> > to check).
+> > 
 > 
-> Record whether a mapping is cacheable and skip cache maintenance for
-> mappings that are not cacheable.
+> The virtio-net-pci doesn't work with the following command lines. The guest
+> kernel image is built from upstream kernel (v7.1.rc7).
 > 
-> Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
-> Signed-off-by: Bradley Morgan <include@grrlz.net>
-> ---
->  arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
->  1 file changed, 41 insertions(+), 10 deletions(-)
+>     qemu-system-aarch64 -enable-kvm -object rme-guest,id=rme0,             \
+>     -machine virt,gic-version=3,confidential-guest-support=rme0            \
+>     -cpu host,pmu=off                                                      \
+>     -smp maxcpus=2,cpus=2,sockets=1,clusters=1,cores=1,threads=2           \
+>     -m 2G -object memory-backend-ram,id=mem0,size=2G                       \
+>     -numa node,nodeid=0,cpus=0-1,memdev=mem0                               \
+>     -serial mon:stdio -monitor none -nographic -nodefaults                 \
+>     -kernel /mnt/linux/arch/arm64/boot/Image                               \
+>     -initrd /mnt/buildroot/output/images/rootfs.cpio.xz                    \
+>     -append earlycon=pl011,mmio,0x10009000000                              \
+>     -device pcie-root-port,bus=pcie.0,chassis=1,id=pcie.1                  \
+>     -device pcie-root-port,bus=pcie.0,chassis=2,id=pcie.2                  \
+>     -device pcie-root-port,bus=pcie.0,chassis=3,id=pcie.3                  \
+>     -device pcie-root-port,bus=pcie.0,chassis=4,id=pcie.4                  \
+>     -netdev tap,id=tap1,vhost=on,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown  \
+>     -device virtio-net-pci,bus=pcie.2,netdev=tap1,mac=b8:3f:d2:1d:3e:c0
+
+Tested with private RAM backend, THP left enabled (and additional KVM and
+RMM patches that will be included in v15) looks like the net interface
+comes up cleanly.
+
+Probably it is best to sync up on the upcoming v15 posting that I am
+testing in the background to make sure you don't spend more time chasing
+it.
+
+Thanks,
+Lorenzo
+
 > 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 428723b1b0f5..ca6e823028c2 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
->  	return m->gfn * PAGE_SIZE;
->  }
->  
-> +#define PKVM_MAPPING_NR_PAGES_MASK	GENMASK_ULL(47, 0)
-> +#define PKVM_MAPPING_CACHEABLE		BIT_ULL(48)
-
-Probably better to make it "_NC". Protected VMs only support cacheable and they
-also use struct pkvm_mapping. 
-
-> +
-> +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
-> +{
-> +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
-> +}
-> +
-> +static bool pkvm_mapping_is_cacheable(struct pkvm_mapping *m)
-> +{
-> +	return m->nr_pages & PKVM_MAPPING_CACHEABLE;
-> +}
-> +
-> +static void pkvm_mapping_set_nr_pages(struct pkvm_mapping *m, u64 nr_pages,
-> +				      bool cacheable)
-> +{
-> +	WARN_ON_ONCE(nr_pages & ~PKVM_MAPPING_NR_PAGES_MASK);
-> +
-> +	m->nr_pages = nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
-> +	if (cacheable)
-> +		m->nr_pages |= PKVM_MAPPING_CACHEABLE;
-> +}
-> +
->  static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
->  {
-> -	return (m->gfn + m->nr_pages) * PAGE_SIZE - 1;
-> +	return (m->gfn + pkvm_mapping_nr_pages(m)) * PAGE_SIZE - 1;
->  }
-
-Perhaps using a bitfield would heavily simplify this code?
-
-struct pkvm_mapping {
-  ...
-  u64 nr_pages : 63
-  u64 flags : 1
-}
-
-Or alternatively, could just make nr_pages u32 and flags u32. nr_pages will not
-exceed PMD_SIZE / PAGE_SIZE, which is at worst 8192 on 64K systems.
-
->  
->  INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
-> @@ -350,7 +373,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
->  			continue;
->  
->  		page = pfn_to_page(mapping->pfn);
-> -		WARN_ON_ONCE(mapping->nr_pages != 1);
-> +		WARN_ON_ONCE(pkvm_mapping_nr_pages(mapping) != 1);
->  		unpin_user_pages_dirty_lock(&page, 1, true);
->  		account_locked_vm(kvm->mm, 1, false);
->  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-> @@ -369,7 +392,7 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
->  
->  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
->  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
-> -					mapping->nr_pages);
-> +					pkvm_mapping_nr_pages(mapping));
->  		if (WARN_ON(ret))
->  			return ret;
->  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-> @@ -448,7 +471,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  		 * permission faults are handled in the relax_perms() path.
->  		 */
->  		if (mapping) {
-> -			if (size == (mapping->nr_pages * PAGE_SIZE))
-> +			if (size == (pkvm_mapping_nr_pages(mapping) * PAGE_SIZE))
->  				return -EAGAIN;
->  
->  			/*
-> @@ -472,7 +495,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  	swap(mapping, cache->mapping);
->  	mapping->gfn = gfn;
->  	mapping->pfn = pfn;
-> -	mapping->nr_pages = size / PAGE_SIZE;
-> +	pkvm_mapping_set_nr_pages(mapping, size / PAGE_SIZE,
-> +				  !(prot & (KVM_PGTABLE_PROT_DEVICE |
-> +					    KVM_PGTABLE_PROT_NORMAL_NC)));
->  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
->  
->  	return ret;
-> @@ -503,7 +528,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  	lockdep_assert_held(&kvm->mmu_lock);
->  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
->  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
-> -					mapping->nr_pages);
-> +					pkvm_mapping_nr_pages(mapping));
->  		if (WARN_ON(ret))
->  			break;
->  	}
-> @@ -517,9 +542,13 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  	struct pkvm_mapping *mapping;
->  
->  	lockdep_assert_held(&kvm->mmu_lock);
-> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
-> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
-> +		if (!pkvm_mapping_is_cacheable(mapping))
-> +			continue;
-> +
->  		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
-> -					  PAGE_SIZE * mapping->nr_pages);
-> +					  PAGE_SIZE * pkvm_mapping_nr_pages(mapping));
-> +	}
->  
->  	return 0;
->  }
-> @@ -536,8 +565,10 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
->  
->  	lockdep_assert_held(&kvm->mmu_lock);
->  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
-> -		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
-> -					   mapping->nr_pages, mkold);
-> +		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest,
-> +					   handle, mapping->gfn,
-> +					   pkvm_mapping_nr_pages(mapping),
-> +					   mkold);
->  
->  	return young;
->  }
-> -- 
-> 2.53.0
+> The virtio-net-pci starts to work with the shareable memory-backend.
 > 
+>     -object memory-backend-ram,id=mem0,size=2G,share=yes
+> 
+> Note that THP is disabled on my host.
+> 
+>     root@host:~# cat /sys/kernel/mm/transparent_hugepage/enabled
+>     always madvise [never]
