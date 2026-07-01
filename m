@@ -1,46 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCC7394E80
-	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 17:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7D5371D04
+	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 17:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782926899; cv=none; b=bjNUXSfbRNjzCbmAlXkjmFlTrTC3Cdo4uN1J1HMKABQxmuFz2JXpLgrndL9jQWqCYyj8HheFJ0WYMya3a3ZBNsvAPMFWfUrvtydUPI+afyMP6vYx+9k/tXhLROc1iocxPYC7q/3m1Wqc7iUxaj14btTAQ9NTIFVZcBaWn8IV0vs=
+	t=1782927200; cv=none; b=C8KJTHK6zA+BOqgbJTNWsxIF94TEMG1Ne9bXOOt+ZDukCbuIoxGenJMTIrn0w7THGGsj/9MII5lCtRldHtJvT2ZVMp/T5q+gUvoA794HT4ApjSfBzzPciRVvbxyR34Nr4I/tVbCU3368tklzsGlcbp/ARvlYrMIvTDfvZyXTjUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782926899; c=relaxed/simple;
-	bh=tg2XKzkuttLBPZ6Tg6EP8dF/jCivv541MMzYuoubyC0=;
+	s=arc-20240116; t=1782927200; c=relaxed/simple;
+	bh=UwqYnvXTRJArH5PhuwcDicJPfOibNsw2Bb8PS13kd3k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZJ8FFw50Hh+O374f5TMVhCgB0PzOTDhWPmVPTn5JpyDrmC5xs2hxe9nITayJ/sf22bHgEGGFdqHxaVWIyi4SbA44URQSsqZMDJwMEJEobwPukUF76qsovw/wOPww73EIGFnqzATDoHgBhV2y5dRRwBuCdmB2ltfW+wHRg7Zu/dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sVZqcCnG; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=PivZdzak4I/Y5EZBJg3/ZIkIxbVVjozCNMcAhROv5306r05GBJyVpe4+9q6Xz4WMHPvKJ8/Nf8ghp5U8tOtDxRaROz2959QwEBj7LSzmkbKfL5pX67uDwWH7jBldr+2SkVZst6FftaLef6B2ZZJhoz+CxuEYv9dcHuYXY0V3W58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCXIW8ab; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sVZqcCnG"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C05E455B;
-	Wed,  1 Jul 2026 10:28:06 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 847FF3F915;
-	Wed,  1 Jul 2026 10:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782926890; bh=tg2XKzkuttLBPZ6Tg6EP8dF/jCivv541MMzYuoubyC0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sVZqcCnGOYXsDUMb/qC//7Zaa5dDRTDgqEeqD9fPG68ZrNLbUWsypw0/oYJNSIgom
-	 CC7LYNLeqSx2AsGQZuDhMw6KbEhqqm+UZfHOlnlOM/dtoCAzslmMiBklKULx2zmT1s
-	 bH6aTAUO3hCoJbTwl3odtlDH3i5Ty80qiaOqgRd8=
-Date: Wed, 1 Jul 2026 18:27:51 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-Message-ID: <5yy625c66j3kgoboejg7hagnmxjzp2tvmvvncmqvo444wtpmzl@sufez6t2iy3r>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <20260630121005.1130996-4-weilin.chang@arm.com>
- <akUrmfQnKmIXTigs@LeoBrasDK>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCXIW8ab"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E2B1F00A3A;
+	Wed,  1 Jul 2026 17:33:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782927199;
+	bh=+z0fbjW9ssNRmSPO2H+7NJGzbAm8sR1IL0A1mKQNDl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RCXIW8abYqClUoCdniO4snhdwe78MvK47WiMjOcQb3ZOCemdXID/tl3zNcgbwGFu2
+	 a8ok1k3NDhJbRe46MIcX61KgPJ23nyTUUrG2TU406wtYG8FT+OhUkCCUBQExYqTTtI
+	 NCqK5GLTX+74dbOgrdOayUgrpXLBLGDiwsGY3vMIQObXLiKTjvDHuHXzuT6HfsKWH2
+	 ERrnqhTyzaq84q8J8AGplyLQ6wgQCjAfLFpGK1YIdWnIElut+wRgR8ppByS7is/I3z
+	 XBnaO9lc2WrG8bVA8DNY/tCiNVaj8Xisp3SIONQtHcedjdcLvJZHIq2DAPAzVeqWN1
+	 TY/zwHDlNPvcQ==
+Date: Wed, 1 Jul 2026 10:33:18 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 22/22] HACK: KVM: arm64: nv: Set the dirty state for CMOs
+ that fetch for write
+Message-ID: <akVPXoMOdw0UaEaH@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org>
+ <20260623184201.1518871-23-oupton@kernel.org>
+ <wt53tup6v5hngzostsualmxnbyhmtjcg6yvyhbqpzellt3x73q@ncz6oc4oxar5>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,160 +49,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <akUrmfQnKmIXTigs@LeoBrasDK>
+In-Reply-To: <wt53tup6v5hngzostsualmxnbyhmtjcg6yvyhbqpzellt3x73q@ncz6oc4oxar5>
 
-On Wed, Jul 01, 2026 at 04:00:41PM +0100, Leonardo Bras wrote:
-> Hi Wei Lin,
+On Wed, Jul 01, 2026 at 11:16:20AM +0100, Wei-Lin Chang wrote:
+> Hi Oliver,
 > 
-> On Tue, Jun 30, 2026 at 01:10:02PM +0100, Wei-Lin Chang wrote:
-> > ptdump files can still be read after the pgt of the canonical mmu is
-> > freed, if they are opened before the VM debugfs directory is removed.
-> > This triggers UAF in places where we cache the pgt pointer or access it
-> > without checking its validity.
+> On Tue, Jun 23, 2026 at 11:42:01AM -0700, Oliver Upton wrote:
+> > From: Oliver Upton <oliver.upton@linux.dev>
 > > 
-> > Check the pgt is still alive under the mmu_lock before accessing the
-> > pgt.
+> > Cache maintenance instructions that fetch for write do not set the dirty
+> > state on descriptors, effectively passing the permission check and
+> > leaving the descriptor in a writable-clean state. While this may make
+> > some sense as the literal write has already occurred, there is no way to
+> > correctly represent a "writable, but only for CMOs" permission in the
+> > shadow stage-2 in such a way that the next genuine write generates a
+> > permission fault.
 > > 
-> > Reported-by: Sashiko <sashiko-bot@kernel.org>
-> > Closes: https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=1
-> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> > ---
-> >  arch/arm64/kvm/ptdump.c | 38 ++++++++++++++++++++++++--------------
-> >  1 file changed, 24 insertions(+), 14 deletions(-)
+> > A possible alternative would be to treat CMOs using writable-clean
+> > translations as NOPs, relying on FWB to force everything coherent on the
+> > CPU. This mostly works but will lead to breakage for VMs that have
+> > assigned devices performing non-coherent DMA.
 > > 
-> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > index d5aa9eff08d1..752d8e0cd25c 100644
-> > --- a/arch/arm64/kvm/ptdump.c
-> > +++ b/arch/arm64/kvm/ptdump.c
-> > @@ -115,13 +115,21 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
-> >  static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
-> >  {
-> >  	struct kvm_ptdump_guest_state *st;
-> > -	struct kvm_pgtable *pgtable = kvm->arch.mmu.pgt;
-> > +	struct kvm_pgtable *pgtable;
-> >  	int ret;
-> >  
-> >  	st = kzalloc_obj(struct kvm_ptdump_guest_state, GFP_KERNEL_ACCOUNT);
-> >  	if (!st)
-> >  		return ERR_PTR(-ENOMEM);
-> >  
-> > +	guard(write_lock)(&kvm->mmu_lock);
-> > +	if (!kvm->arch.mmu.pgt) {
-> > +		kfree(st);
-> > +		return ERR_PTR(-ENXIO);
-> > +	}
-> > +
-> > +	pgtable = kvm->arch.mmu.pgt;
-> > +
-> >  	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-> >  	if (ret) {
-> >  		kfree(st);
-> > @@ -137,7 +145,6 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
-> >  
-> >  static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> >  {
-> > -	int ret;
-> >  	struct kvm_ptdump_guest_state *st = m->private;
-> >  	struct kvm *kvm = st->kvm;
-> >  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > @@ -154,11 +161,11 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> >  		.seq		= m,
-> >  	};
-> >  
-> > -	write_lock(&kvm->mmu_lock);
-> > -	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> > -	write_unlock(&kvm->mmu_lock);
-> > +	guard(write_lock)(&kvm->mmu_lock);
-> > +	if (mmu->pgt)
-> > +		return kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> > Another option would be to set HCR_EL2.TPCP and do full trap+emulate of
+> > CMOs. And yes, dear reader, that would suck.
+> > 
+> > Just do the obvious thing instead and mark the descriptor as dirty for
+> > CMOs. Maybe we can get an architectural relaxation if we're lucky...
 > 
-> IIUC, that's the same behavior, right?
-> Just changed to look about the same with the rest of this file?
-
-I'm not too sure what you are referring to, if you mean the
-write_lock/unlock -> guard(write_lock) change, then yes, mostly. Just
-also checking mmu->pgt is still not freed.
-
+> This is interesting... So the problem is that when a CMO that require
+> write permission is run by a nested guest, and the guest stage-2 is
+> still in the writable-clean state (which means the shadow mapping must
+> not have W) the instruction gets trapped and KVM gets in an awkard
+> position.
 > 
-> >  
-> > -	return ret;
-> > +	return 0;
-> >  }
+> If we keep the guest s2 writable-clean and shadow mapping RO -> guest
+> can't make progress unless we emulate the instruction, but if we make
+> the guest s2 writable-dirty and shadow mapping RW -> not architectural
+> as of now. Treating it as a NOP also comes with problems as you said.
 > 
-> So if the pgt does not exist anymore, it returns zero. Is that the desired 
-> behavior?
+> Am I understanding this correctly?
 
-Good question, so the question is what contract between the ptdump and
-user do we want to make for this case. I guess returning some error like -EIO
-could make a little more sense than just printing nothing?
+Yep, it's exactly as you've put it. We need both FWB and fully coherent
+DMA to safely treat the CMO as a NOP and full CMO emulation is the line in
+the sand for me :)
 
-> 
-> I guess it's aligned with the idea of single file mentioned in the cover, 
-> right?
-
-Sorry, I don't get what you are asking here?
-
-> 
-> >  
-> >  static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-> > @@ -206,17 +213,23 @@ static const struct file_operations kvm_ptdump_guest_fops = {
-> >  
-> >  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
-> >  {
-> > -	struct kvm_pgtable *pgtable = m->private;
-> > +	struct kvm *kvm = m->private;
-> > +
-> > +	guard(write_lock)(&kvm->mmu_lock);
-> > +	if (kvm->arch.mmu.pgt)
-> > +		seq_printf(m, "%2u\n", kvm->arch.mmu.pgt->ia_bits);
-> >  
-> > -	seq_printf(m, "%2u\n", pgtable->ia_bits);
-> >  	return 0;
-> >  }
-> >  
-> >  static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
-> >  {
-> > -	struct kvm_pgtable *pgtable = m->private;
-> > +	struct kvm *kvm = m->private;
-> > +
-> > +	guard(write_lock)(&kvm->mmu_lock);
-> > +	if (kvm->arch.mmu.pgt)
-> > +		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - kvm->arch.mmu.pgt->start_level);
-> >  
-> > -	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
-> >  	return 0;
-> >  }
-> >  
-> > @@ -224,15 +237,12 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
-> >  				    int (*show)(struct seq_file *, void *))
-> >  {
-> >  	struct kvm *kvm = m->i_private;
-> > -	struct kvm_pgtable *pgtable;
-> >  	int ret;
-> >  
-> >  	if (!kvm_get_kvm_safe(kvm))
-> >  		return -ENOENT;
-> >  
-> > -	pgtable = kvm->arch.mmu.pgt;
-> > -
-> > -	ret = single_open(file, show, pgtable);
-> > +	ret = single_open(file, show, kvm);
-> 
-> Maybe this change is more related with the previous patch?
-
-I see your point, but I divided it into first fixing mmu UAF, then the
-pgt UAF, which I also think makes sense.
+KVM could potentially detect the presence of noncoherent DMA (see x86's
+kvm_arch_[un]register_dma()), but devices can be assigned long after
+we've computed the vCPU feature set so no chance of limiting FEAT_HAFDBS
+to situations where the stars align.
 
 Thanks,
-Wei-Lin Chang
-
-> 
-> >  	if (ret < 0)
-> >  		kvm_put_kvm(kvm);
-> >  	return ret;
-> > -- 
-> > 2.43.0
-> > 
-> 
-> Thanks!
-> Leo
+Oliver
