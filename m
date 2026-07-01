@@ -1,225 +1,223 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE8D2BEFE8;
-	Wed,  1 Jul 2026 13:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C467D233953
+	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 14:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782914311; cv=none; b=mTzVDfBm5j4+k35KXVY8Kg4ov2XVoF9zCKQXD9VGpbDSKYXkdjEVGX5p6T+Tf0Ca+M/pahQOpTZ3r0C+HxwrzZY5KQvla46Ei+d2W72rdP+iwHcmIiCilbEHNdbo3xuHgEL68rtfsYgpf0+Uifnp5ykD1T//kG42uldl9RNHneo=
+	t=1782914704; cv=none; b=l/d4COnvPJy6FIx8jOtKlZNl3l1SiQ1p9OYmgyyVlKrIEI9OaMVWcqZI3felrgb0bj/kiBpKVRVWUOeDLWSlTroua97ZxKoRcKw5VCrLSIAoTAoRVaRCF+wz1U1La+8iIjw8ntgENm2GyWKpidnii72CoXy1c0G79ikajTCCA1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782914311; c=relaxed/simple;
-	bh=1hk25nbEOuKfTJrZLJxw/In6GhMhbaplqMUYgfQIhUQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oDOAZYVl1LDjgcAp3ICo1tWNmcnr+iWR64J7OwxKg2PusOJqQFLVJwG1anGi1CYj2oJMOFlzqQvek/eHiQvSn1X75+shiV5itafvgxvMUfu6Bqr26AwJEfgHl9mCj9SZFbWnvy3TOwikmn4vVEUxrf2KnOR+YFzdn73pjyiJg8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fM7XqVQd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782914704; c=relaxed/simple;
+	bh=jLRi1shH8PjXc7hfGKlds880MgKVpT3AMnonDKUdnjU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UGiV1rqKAKbR0/rrAz20gokpOS50ifZLjLnATpIemzJn7pAhrfw30fndyhGXyaD2CdoTXLwtrejLkrj/y7+fVgMscT7VtsQeuiYseGJQtcIoGy4Q53WKnIyGMh1DxYR/r94RKwwIVsEGQNQHuqrEmOCsMA62BuRmcg6GqfxId+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EERoXObI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fM7XqVQd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E8901F00A3A;
-	Wed,  1 Jul 2026 13:58:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782914310;
-	bh=ePmFTt3rstOx1IVudF2odVlsiK0au8knUpVzH4WAluw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=fM7XqVQdKtVW76vvm37/QxzvdOzywI+FgauHtn1ml/ste9Tta4xmD/sojvqEVF6lP
-	 FsaN/f3l00uZ6iguLU/zMXTZvDGmS8i/zcGutFF1s/24xfiXPONa2NNiQ+yYYvoiaO
-	 VHcayZERLltwtW0zJ25kGhpfwwQAXfxc1+6wUDHD6vHypyoubtx8PEshKPEPfBrWi6
-	 sD85cR8B9G1zXW3XgN11UyLjtl6qKDonm9IUcJMY74lTzNXFt0VMTsExU2iJB+QNxJ
-	 Nly6uqW4WAFvE5ybUXRWv7nyWDsF7lmUP9+lnKZve63mQrmBI+whbx5P4udDFdceoU
-	 cUqGl1joP0Nkw==
-Date: Wed, 1 Jul 2026 15:58:21 +0200
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
-	Lorenzo.Pieralisi2@arm.com
-Subject: Re: [PATCH v14 29/44] arm64: RMI: Runtime faulting of memory
-Message-ID: <akUc/ScJN0GlM+9G@lpieralisi>
-References: <aiJ6u83O0nVUtPyv@lpieralisi>
- <ecef952b-e8c6-4102-933b-c99c46f14431@redhat.com>
- <aiLes2ecZSr17UwZ@lpieralisi>
- <1e39094f-7fa3-4ef1-be54-53d7a8643506@redhat.com>
- <98d2a0f3-b831-466a-8212-5bcf97ad9d8b@arm.com>
- <8da87878-2a5d-478a-a280-60dbed7ad1b9@redhat.com>
- <9482dfbc-4d96-47ba-a615-f4ba0bda833f@arm.com>
- <8f81ed99-c53a-4196-baa2-adea9239a000@redhat.com>
- <aj6sdzlbxT8D5fnf@lpieralisi>
- <901398bb-ed6c-4997-b3cd-ce2829b09c87@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EERoXObI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782914701;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lec8VUI2yjzTXicodtt6XfLuullf5XdbBMwWNAy7kqg=;
+	b=EERoXObIJyrDTKusab6GJJSbzAxf5xc2SSGdrveX87UYlMXG3DphFu1Racpc/2ACWm/Cxa
+	7uiC7HrQY/Fj0wCEytVNYy8t2luNF4H+p/VfIS3wmrqTBut25IdlUN7dlVmkWvYjPq0gR/
+	eQRo4Gb0CdrnsrTnZ1638ykf7KCQ5oo=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-711-_Xj-DPSWOIC_4IJX3caeeQ-1; Wed, 01 Jul 2026 10:05:00 -0400
+X-MC-Unique: _Xj-DPSWOIC_4IJX3caeeQ-1
+X-Mimecast-MFC-AGG-ID: _Xj-DPSWOIC_4IJX3caeeQ_1782914699
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5aeb711dff7so321607e87.3
+        for <kvmarm@lists.linux.dev>; Wed, 01 Jul 2026 07:05:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782914699; x=1783519499;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lec8VUI2yjzTXicodtt6XfLuullf5XdbBMwWNAy7kqg=;
+        b=XnqxZvxmn4JCL/iLbIiyTceRBxIyH3NCc1iWWznXm1FiemW0qz/dQvZpbzIPs5TBM/
+         O9JAJIdzzQlkUYZ2qG2/HQs5I06rfkfKVSqrDrLEJDSaCKCsR7uG517Ksocde72mqt7X
+         DLEt1tHb6nm7md7q8xzZxyEGpZvO3kOPAWnSpz0+4MLkO35/ng5vJ6RiFEvhzVfb9oej
+         LHkcpNRaVsXeiRYx381/neq2FapxY0vVje6o+h9MP6iswK/OZ4v1Qp87Y0IXZEQnmlOY
+         o+WwCz36zGebqKtswFql0+U0kauI2tTtQGiICITNBsiSUw1TnWq8ZQbLzw386y1Qs2zI
+         deUw==
+X-Forwarded-Encrypted: i=1; AHgh+Rp/Ncyf8c1LP80F8juOkhyY4M8a90nL8gBO+X6GojDvt1ZoPgUSuFtwyTAb11zNOPuPVfnCuds=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzuO/EuXsVlFT2cmgERQ2MQGsx01NJWrjiUjuzcQUWq7VVhdKfY
+	9zKnXoGUjPOtkWIuh5zTDz9+FoZJsWFmgv1yQIpt4OFeMtPkGhwO0emihyxxmect5XvhQWbEfLE
+	c+eso5LVrp31CKq30IwqeR6bTGMbor0fzdYunZ7eWnMLsxWe8Rxampf4MAw==
+X-Gm-Gg: AfdE7cnDHJF0i+Y/BkwXEIEblUFuR5oF5Rq7kzeXgqIRjooTmDhbnGU+14w3jvLCr8S
+	Yr3SW85CBBVT4GKmRQVD+O3RAQqofPuxEQcr02fq80Hn0rgP2Fjio9MWzTwaD7V1FOqGefwjOId
+	PLZeDBpCIPxCBjk9eenxEzSM0tEaDPepEswPSvbjuI/TRwDkFsmdki1+Cv/aZz+ykUXmk6spCaw
+	jGBacIjKPoE+BqM9czGGp+ieC1v4wTMCyvmWn2ro0SIKVsvihAQITXNFJIvQLssdlppIMDXZYpe
+	dhUG5OolSxHoCnZdrPYEwotbUI/hkjwkV5pQxHQJIlh66J0AE43Dyvu8a2ZQrmP1VEMITPKpXnC
+	/8mcpbNHZp3AjawsYjOutIDL31lwAVkDhJHK24KgzfZUF8+0MDX+MVm35FJw=
+X-Received: by 2002:a05:6512:31ca:b0:5ae:aaa8:eb21 with SMTP id 2adb3069b0e04-5aec67a2c1dmr631170e87.14.1782914698918;
+        Wed, 01 Jul 2026 07:04:58 -0700 (PDT)
+X-Received: by 2002:a05:6512:31ca:b0:5ae:aaa8:eb21 with SMTP id 2adb3069b0e04-5aec67a2c1dmr631140e87.14.1782914698392;
+        Wed, 01 Jul 2026 07:04:58 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5aec8991affsm20145e87.13.2026.07.01.07.04.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2026 07:04:57 -0700 (PDT)
+Message-ID: <1f338105-9d60-4239-b4aa-fa2e442d338a@redhat.com>
+Date: Wed, 1 Jul 2026 16:04:54 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <901398bb-ed6c-4997-b3cd-ce2829b09c87@redhat.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC PATCH v6 08/17] target/arm/cpu-idregs.h.inc: Generate enum
+ values
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+ "philmd@linaro.org" <philmd@linaro.org>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260616132625.1732031-1-eric.auger@redhat.com>
+ <20260616132625.1732031-9-eric.auger@redhat.com>
+ <F517E5C6-EF76-4D2A-97E8-6C232E3CE3DB@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <F517E5C6-EF76-4D2A-97E8-6C232E3CE3DB@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: LXQ3-Qiv4COw5uOhEEy2uzjivAVEqnPekBvHGfwYso8_1782914699
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jun 28, 2026 at 08:33:01PM +1000, Gavin Shan wrote:
-> On 6/27/26 2:44 AM, Lorenzo Pieralisi wrote:
-> > On Fri, Jun 26, 2026 at 09:43:03PM +1000, Gavin Shan wrote:
-> > > On 6/26/26 6:47 PM, Suzuki K Poulose wrote:
-> > > > On 26/06/2026 08:43, Gavin Shan wrote:
-> > > > > On 6/26/26 1:58 AM, Suzuki K Poulose wrote:
-> > > > > > On 25/06/2026 14:53, Gavin Shan wrote:
-> > > > > > > On 6/6/26 12:35 AM, Lorenzo Pieralisi wrote:
-> > > > > > > > On Fri, Jun 05, 2026 at 06:11:11PM +1000, Gavin Shan wrote:
-> > > > > > > > > On 6/5/26 5:28 PM, Lorenzo Pieralisi wrote:
-> > > > > > > > > > On Fri, Jun 05, 2026 at 04:23:15PM +1000, Gavin Shan wrote:
-> > > > > 
-> > > > > [...]
-> > > > > 
-> > > > > > > > > 
-> > > > > > > > > I tried to rebase Jean's latest QEMU series [1] to upstream QEMU, and found
-> > > > > > > > > that memory slots backed by THP are broken. With THP disabled on the host and
-> > > > > > > > > other fixes (mentioned in my prevous replies) applied on the top of this (v14)
-> > > > > > > > > series, I'm able to boot a realm guest with rebased QEMU series [2], plus more
-> > > > > > > > > fxies on the top.
-> > > > > > > > > 
-> > > > > > > > > [1] https://git.codelinaro.org/linaro/dcap/qemu.git  (branch: cca/ latest)
-> > > > > > > > > [2] https://git.qemu.org/git/qemu.git                (branch: cca/ gavin)
-> > > > > > > > > 
-> > > > > > > > > Lorenzo, You may be saying there is someone making QEMU to support ARM/CCA?
-> > > > > > > > 
-> > > > > > > > Mathieu and I are working on that yes and with Steven/Suzuki to fix the THP
-> > > > > > > > issues you pointed out above.
-> > > > > > > > 
-> > > > > > > > > If so, I'm not sure if there is a QEMU repository for me to try?
-> > > > > > > > 
-> > > > > > > > We should be able to submit patches by end of June - we shall let you know
-> > > > > > > > whether we can make something available earlier.
-> > > > > > > > 
-> > > > > > > 
-> > > > > > > Not sure if there are other known issues in this series. It seems the stage2
-> > > > > > > page fault handling on the shared space isn't working well. In my test, the
-> > > > > > > vring (struct vring_desc) of virtio-net-pci is updated by the guest, and the
-> > > > > > > data isn't seen by QEMU, I'm suspecting if the host-page-frame-number is properly
-> > > > > > > resolved in the s2 page fault handler for shared (unprotected) space.
-> > > > > > > 
-> > > > > > > - I rebased Jean's latest qemu branch to the upstream qemu;
-> > > > > > > 
-> > > > > > > - On the host, which is emulated by qemu/tcg, the THP (transparent huge page) is
-> > > > > > >     disabled.
-> > > > > > > 
-> > > > > > > - On the guest, I can see the virtio vring (struct vring_desc) is updated. The
-> > > > > > >     S1 page-table entry looks correct because the corresponding physical address
-> > > > > > >     0x10046880000 is a sane shared (unprotected) space address.
-> > > > > > > 
-> > > > > > >     [   52.094143] software IO TLB: Memory encryption is active and system is using DMA bounce buffers
-> > > > > > >     [   52.289746] virtqueue_add_desc_split: desc[0]@0xffff000006880000, [00000100b983f000  00000640  0002  0001]
-> > > > > > >     [   52.432150] PTE 0x00e8010046880707 at address 0xffff000006880000
-> > > > > > > 
-> > > > > > > - On the host, the s2 page-table-entry is unmapped due to attribute transition (private -> shared).
-> > > > > > >     A subsequent S2 page fault is raised against the adress and the s2 page-table-entry is built.
-> > > > > > > 
-> > > > > > >     [  109.259077] ====> realm_unmap_shared_range: tracked_unprot_addr=0x10046880000
-> > > > > > >     [  109.260249] realm_unmap_shared_range: unmapped shared range at 0x10046880000
-> > > > > > >     [  109.317786] realm_unmap_shared_range: unmapped shared range at 0x10046880000
-> > > > > > >     [  109.629939] ====> kvm_handle_guest_abort: fault_ipa=0x10046880000, esr=0x92000007
-> > > > > > >     [  109.630245] realm_map_non_secure: ipa=0x10046880000, pfn=0xb8b59, size=0x1000, prot=0xf
-> > > > > > >     [  109.630331] realm_map_non_secure: ipa=0x10046880000, ipa_top=0x10046881000, flags=0x1e0001, range_desc=0xb8b59004
-> > > > > > 
-> > > > > > Are you able to correlate the order of the transitions and the Guest
-> > > > > > access with RMM log ? We haven't seen this from our end. We are aware
-> > > > > > of permission fault issues with Unprotected IPA when backing the memslot
-> > > > > > with MAP_PRIVATE areas. But this looks different.
-> > > > > > 
-> > > > > > Lorenzo, have you run into this ?
-> > > > > > 
-> > > > > 
-> > > > > It's hard to correlate the order since the logs are collected from two separate
-> > > > > consoles. For the write permission, I add code to the host where the permission
-> > > > > is always added for all s2 page faults in the shared space. Otherwise, qemu can
-> > > > > be killed by -EFAULT or similar error.
-> > > > 
-> > > > This is the problem. We can't add WRITE permission by default. I believe
-> > > > you may have MAP_PRIVATE mapping and it has to be mapped as READ only
-> > > > and on a permission fault, we replace it with a writable page. By
-> > > > overriding the WRITE permission, you let the guest write to a page
-> > > > that may not be seen by the VMM.
-> > > > 
-> > > > We identified this as a bug in the KVM driver in this series (reported
-> > > > by Lorenzo) and there is a corresponding tf-RMM change that is required
-> > > > to get this working. So, please could you wait until the next series
-> > > > when this will be addressed ? Or you could switch to using MAP_SHARED
-> > > > for the "shared" memory in the memslot.
-> > > > 
-> > > 
-> > > Exactly. the syntax for MAP_PRIVATE is broken if the write permission is
-> > > enforced for a read fault in the shared space. In my case, the host page can
-> > > be the zero page and eventually multiple s2 page-table entries (for multiple
-> > > unprotected or shared pages) point to the zero page. It's why clearing the
-> > > 3rd queue (Ctrl queue) also clears the first queue (Rx queue) in my case.
-> > > 
-> > > Yes, this issue can be avoid by using a shared memory backend in qemu, something
-> > > like below. With this, I'm able to see virtio-net-pci starts to work...
-> > > 
-> > >      -object memory-backend-ram,id=mem0,size=2G,share=yes
-> > 
-> > Yes, as Suzuki said that's what we have been fixing. QEmu patches
-> > will be on the mailing lists very shortly - the KVM/tf-RMM fixes
-> > to make MAP_PRIVATE work will be included in the next posting.
-> > 
-> > Feel free to drop your QEmu command line so that I can give it
-> > a shot and check whether the fixes solve the problem you hit
-> > (I think so because that's precisely the kind of issue I got
-> > into when I started debugging THP/MAP_PRIVATE but it is better
-> > to check).
-> > 
-> 
-> The virtio-net-pci doesn't work with the following command lines. The guest
-> kernel image is built from upstream kernel (v7.1.rc7).
-> 
->     qemu-system-aarch64 -enable-kvm -object rme-guest,id=rme0,             \
->     -machine virt,gic-version=3,confidential-guest-support=rme0            \
->     -cpu host,pmu=off                                                      \
->     -smp maxcpus=2,cpus=2,sockets=1,clusters=1,cores=1,threads=2           \
->     -m 2G -object memory-backend-ram,id=mem0,size=2G                       \
->     -numa node,nodeid=0,cpus=0-1,memdev=mem0                               \
->     -serial mon:stdio -monitor none -nographic -nodefaults                 \
->     -kernel /mnt/linux/arch/arm64/boot/Image                               \
->     -initrd /mnt/buildroot/output/images/rootfs.cpio.xz                    \
->     -append earlycon=pl011,mmio,0x10009000000                              \
->     -device pcie-root-port,bus=pcie.0,chassis=1,id=pcie.1                  \
->     -device pcie-root-port,bus=pcie.0,chassis=2,id=pcie.2                  \
->     -device pcie-root-port,bus=pcie.0,chassis=3,id=pcie.3                  \
->     -device pcie-root-port,bus=pcie.0,chassis=4,id=pcie.4                  \
->     -netdev tap,id=tap1,vhost=on,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown  \
->     -device virtio-net-pci,bus=pcie.2,netdev=tap1,mac=b8:3f:d2:1d:3e:c0
+Hi Khushit,
 
-Tested with private RAM backend, THP left enabled (and additional KVM and
-RMM patches that will be included in v15) looks like the net interface
-comes up cleanly.
+On 6/19/26 8:28 AM, Khushit Shah wrote:
+> From f0e489cebdac1ba94b8082bc240f2d889555f7ea Mon Sep 17 00:00:00 2001
+> From: Khushit Shah <khushit.shah@nutanix.com>
+> Date: Fri, 19 Jun 2026 11:54:29 +0530
+> Subject: [PATCH] scripts: bug fixes in update-aarch64-cpu-sysreg-properties
+>
+> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
+> ---
+> While rebasing I found two bugs here:
+> - It outputs incorrect value for field that defined a ValueRange.
+>    For example, CTX_CMPs (and all similar fields).
+> - decimal 10 might be incorrectly parsed as to 2.
 
-Probably it is best to sync up on the upcoming v15 posting that I am
-testing in the background to make sure you don't spend more time chasing
-it.
+OK thanks, I will integrate this in next respin
 
-Thanks,
-Lorenzo
+Eric
+>
+> Sending inline patch that I have added.
+> ---
+>  .../update-aarch64-cpu-sysreg-properties.py   | 56 ++++++++++++-------
+>  1 file changed, 35 insertions(+), 21 deletions(-)
+>  mode change 100644 => 100755 scripts/update-aarch64-cpu-sysreg-properties.py
+>
+> diff --git a/scripts/update-aarch64-cpu-sysreg-properties.py b/scripts/update-aarch64-cpu-sysreg-properties.py
+> old mode 100644
+> new mode 100755
+> index 9e829fda2e..2e28b03598
+> --- a/scripts/update-aarch64-cpu-sysreg-properties.py
+> +++ b/scripts/update-aarch64-cpu-sysreg-properties.py
+> @@ -106,6 +106,29 @@ def collect_fields(item, bit_offset=0):
+>  
+>      return fields
+>  
+> +def parse_value_int(raw_val):
+> +    if raw_val is None or isinstance(raw_val, bool):
+> +        return None
+> +
+> +    # may already be real number
+> +    if isinstance(raw_val, int):
+> +        return raw_val
+> +
+> +    raw_str = str(raw_val).strip()
+> +
+> +    if "'" in raw_str:
+> +        # quoted bitstring like "'0100'"
+> +        bits = raw_str.replace("'", "")
+> +        try:
+> +            return int(bits, 2)
+> +        except ValueError:
+> +            return None
+> +
+> +    # unquoted, try decimal
+> +    try:
+> +        return int(raw_str, 0)
+> +    except ValueError:
+> +        return None
+>  
+>  def extract_field_enums(field):
+>      enums = []
+> @@ -124,32 +147,23 @@ def extract_field_enums(field):
+>      if not isinstance(val_entries, list):
+>          return enums
+>  
+> +    # A Values.ValueRange field specifies start and end value for a range.
+> +    # Don't enumerate anything for them.
+> +    for val_entry in val_entries:
+> +        if isinstance(val_entry, dict) and \
+> +           val_entry.get("_type") == "Values.ValueRange":
+> +               return []
+> +
+>      for val_entry in val_entries:
+>          if not isinstance(val_entry, dict):
+>              continue
+> -            
+> +
+>          if val_entry.get("_type") == "Values.Value":
+> -            raw_val = val_entry.get("value")
+> -            if raw_val is None:
+> +            int_val = parse_value_int(val_entry.get("value"))
+> +            if int_val is None:
+>                  continue
+> -                
+> -            # some of the values have ' like "'0100'"
+> -            raw_val_str = str(raw_val).strip().replace("'", "")
+> -            
+> -            try:
+> -                # convert into bin 
+> -                int_val = int(raw_val_str, 2)
+> -            except ValueError:
+> -                try:
+> -                    # Fallback to dec if not bin
+> -                    int_val = int(raw_val_str, 0)
+> -                except ValueError:
+> -                    continue
+> -            
+> -            enums.append({
+> -                'value': int_val
+> -            })
+> -            
+> +            enums.append({'value': int_val})
+> +
+>      return enums
+>  
+>  def generate_sysreg_properties_from_registers_json(id_reg_names, raw_json_path):
+> --
+> 2.52.0
+>
+>
+>
 
-> 
-> The virtio-net-pci starts to work with the shareable memory-backend.
-> 
->     -object memory-backend-ram,id=mem0,size=2G,share=yes
-> 
-> Note that THP is disabled on my host.
-> 
->     root@host:~# cat /sys/kernel/mm/transparent_hugepage/enabled
->     always madvise [never]
