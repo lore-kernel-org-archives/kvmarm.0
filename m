@@ -1,296 +1,208 @@
-Received: from confino.investici.org (confino.investici.org [93.190.126.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D400837C0FC
-	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 16:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCC7394E80
+	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 17:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782925072; cv=none; b=sSB39pz5IVmkeexu6vpRodloPm3EQoAekgpiXR7wEVPYJ7nJfBHEwqyVttN92G+CZpXkOUyB5Su0r+9pfrMUIVEFfmwYO+sIC6unn4UU3A9kMaf62JDQFtf4BwaaAp9gTVgBFGA4UWmTNzl8NFtIWC9FLH4ffFstNwfbhIHlL/0=
+	t=1782926899; cv=none; b=bjNUXSfbRNjzCbmAlXkjmFlTrTC3Cdo4uN1J1HMKABQxmuFz2JXpLgrndL9jQWqCYyj8HheFJ0WYMya3a3ZBNsvAPMFWfUrvtydUPI+afyMP6vYx+9k/tXhLROc1iocxPYC7q/3m1Wqc7iUxaj14btTAQ9NTIFVZcBaWn8IV0vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782925072; c=relaxed/simple;
-	bh=BwGWFotnsZzZp6jiybzD8x7Rlg/t14VDU1JIwKGNxj0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=hqhZO0B7nXbI11Pot8hqbYgLTy03kmlw05XfvYVUOf3qLbIB6wPdgfb4aSbU8RewRncEPoIr4/xwGwfHce8J8myG9m0COxf2+4toD1uF6vFiqIrwKL1PfaisA/7KSGUXR35c5wk7rkTEQDSPeKNa9WWr/d9TRQ02d40wYGpCP3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=A8tgAIfG; arc=none smtp.client-ip=93.190.126.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
+	s=arc-20240116; t=1782926899; c=relaxed/simple;
+	bh=tg2XKzkuttLBPZ6Tg6EP8dF/jCivv541MMzYuoubyC0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZJ8FFw50Hh+O374f5TMVhCgB0PzOTDhWPmVPTn5JpyDrmC5xs2hxe9nITayJ/sf22bHgEGGFdqHxaVWIyi4SbA44URQSsqZMDJwMEJEobwPukUF76qsovw/wOPww73EIGFnqzATDoHgBhV2y5dRRwBuCdmB2ltfW+wHRg7Zu/dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sVZqcCnG; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="A8tgAIfG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
-	s=stigmate; t=1782925067;
-	bh=x2gAU526mDE70c8Ho7FWXOkJNWi/PMp/vNCRWmB74IA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=A8tgAIfGxO5hTUHgT3WvqYCtGtSL6zSjG2Qu1iaaPR72kaomDZbsMOlX3mAl11SL7
-	 FcQ6Zv4SU9jlQhou+NCKSVb99w9XzP93uq5g4dSPqyLRGdDEIeWkUDV68gyS0Kie+2
-	 qcxkUJ7ZXmA965eqSYdic2s7wRXTs6c9WXHOKD28=
-Received: from mx1.investici.org (unknown [127.0.0.1])
-	by confino.investici.org (Postfix) with ESMTP id 4gr5mW558sz1145;
-	Wed, 01 Jul 2026 16:57:47 +0000 (UTC)
-Received: by mx1.investici.org (Postfix) id 4gr5mW10QKz113y;
-	Wed, 01 Jul 2026 16:57:47 +0000 (UTC)
-Date: Wed, 01 Jul 2026 17:57:48 +0100
-From: Bradley Morgan <include@grrlz.net>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sVZqcCnG"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C05E455B;
+	Wed,  1 Jul 2026 10:28:06 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 847FF3F915;
+	Wed,  1 Jul 2026 10:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782926890; bh=tg2XKzkuttLBPZ6Tg6EP8dF/jCivv541MMzYuoubyC0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sVZqcCnGOYXsDUMb/qC//7Zaa5dDRTDgqEeqD9fPG68ZrNLbUWsypw0/oYJNSIgom
+	 CC7LYNLeqSx2AsGQZuDhMw6KbEhqqm+UZfHOlnlOM/dtoCAzslmMiBklKULx2zmT1s
+	 bH6aTAUO3hCoJbTwl3odtlDH3i5Ty80qiaOqgRd8=
+Date: Wed, 1 Jul 2026 18:27:51 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
 To: Leonardo Bras <leo.bras@arm.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Quentin Perret <qperret@google.com>,
- Vincent Donnefort <vdonnefort@google.com>, Gavin Shan <gshan@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3_1/3=5D_KVM=3A_arm64=3A_skip_pKVM?=
- =?US-ASCII?Q?_cache_flushes_for_non_cacheable_mappings?=
-In-Reply-To: <akVGxdakrVYp8kho@LeoBrasDK>
-References: <20260624160028.15591-1-include@grrlz.net> <20260624160028.15591-2-include@grrlz.net> <akU64YK5dqcWGdCD@LeoBrasDK> <5105C9D2-C708-452E-BA61-F22083A33C74@grrlz.net> <akVGDoI9FltrVduP@LeoBrasDK> <EB48DA64-1E2E-4D8C-8F8A-ED6257AD93E9@grrlz.net> <akVGxdakrVYp8kho@LeoBrasDK>
-Message-ID: <BCFEB62C-FA80-474B-A9F5-9CD6CA87E857@grrlz.net>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
+Message-ID: <5yy625c66j3kgoboejg7hagnmxjzp2tvmvvncmqvo444wtpmzl@sufez6t2iy3r>
+References: <20260630121005.1130996-1-weilin.chang@arm.com>
+ <20260630121005.1130996-4-weilin.chang@arm.com>
+ <akUrmfQnKmIXTigs@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <akUrmfQnKmIXTigs@LeoBrasDK>
 
-On July 1, 2026 5:56:37 PM GMT+01:00, Leonardo Bras <leo.bras@arm.com>
-wrote:
->On Wed, Jul 01, 2026 at 05:54:40PM +0100, Bradley Morgan wrote:
->> On July 1, 2026 5:53:34 PM GMT+01:00, Leonardo Bras <leo.bras@arm.com>
->> wrote:
->> >On Wed, Jul 01, 2026 at 05:40:46PM +0100, Bradley Morgan wrote:
->> >> On July 1, 2026 5:05:53 PM GMT+01:00, Leonardo Bras
-><leo.bras@arm.com>
->> >> wrote:
->> >> >On Wed, Jun 24, 2026 at 04:00:26PM +0000, Bradley Morgan wrote:
->> >> >> pKVM keeps its own mapping list for stage 2 operations. Its flush
->> >path
->> >> >> uses that list directly, so it lost the PTE attribute check done
->by
->> >the
->> >> >> generic stage 2 walker.
->> >> >> 
->> >> >> Record whether a mapping is cacheable and skip cache maintenance
->for
->> >> >> mappings that are not cacheable.
->> >> >> 
->> >> >> Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
->> >> >> Signed-off-by: Bradley Morgan <include@grrlz.net>
->> >> >> ---
->> >> >>  arch/arm64/kvm/pkvm.c | 51
->> >++++++++++++++++++++++++++++++++++---------
->> >> >>  1 file changed, 41 insertions(+), 10 deletions(-)
->> >> >> 
->> >> >> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
->> >> >> index 428723b1b0f5..ca6e823028c2 100644
->> >> >> --- a/arch/arm64/kvm/pkvm.c
->> >> >> +++ b/arch/arm64/kvm/pkvm.c
->> >> >> @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct
->> >pkvm_mapping
->> >> >*m)
->> >> >>  	return m->gfn * PAGE_SIZE;
->> >> >>  }
->> >> >>  
->> >> >> +#define PKVM_MAPPING_NR_PAGES_MASK	GENMASK_ULL(47, 0)
->> >> >> +#define PKVM_MAPPING_CACHEABLE		BIT_ULL(48)
->> >> >
->> >> >Out of curiosity here, why do you choose to use bit 48 here instead
->of,
->> >> >let's say, bit 63?
->> >> >
->> >> >(I know it makes absolutely no difference to inner working here, as
->> >there 
->> >> >should probably not be 2^48 pages in one mapping.)
->> >> >
->> >> >Thanks!
->> >> >Leo
->> >> 
->> >> 
->> >> sup Leo, here's a quote from maz 
->> >
->> >Hi Bradley,
->> >
->> >> 
->> >> "This thing is already big enough, let's not add a bool right in the
->> >> middle (use pahole to find out why this is bad).
->> >
->> >I suppose you proposed to add a bool into a struct, maybe?
->> >It would screw the struct alignment.
->> 
->> yep, crappy old me
->> 
->
->Hah, you were probably focused on the big picture.
->
->> 
->> >> Given that nr_pages
->> >> is for a range, and that the minimum page size uses 12 bits, the
->> >> largest number of pages you can have here is 56-12=48 bit wide.
->That's
->> >> another 16 bits worth of flags you can use."
->> >
->> >Humm, makes sense.
->> >And since he mentions 16 bits worth of flags, you start by using the
->48th 
->> >bit. Ok, got your rationale.
->> >
->> >(I would possibly start with the 63, though, but that's more on
->personal 
->> >taste)
->> 
->> 48 won't make the world blow up :)
->
->yeap,
+On Wed, Jul 01, 2026 at 04:00:41PM +0100, Leonardo Bras wrote:
+> Hi Wei Lin,
+> 
+> On Tue, Jun 30, 2026 at 01:10:02PM +0100, Wei-Lin Chang wrote:
+> > ptdump files can still be read after the pgt of the canonical mmu is
+> > freed, if they are opened before the VM debugfs directory is removed.
+> > This triggers UAF in places where we cache the pgt pointer or access it
+> > without checking its validity.
+> > 
+> > Check the pgt is still alive under the mmu_lock before accessing the
+> > pgt.
+> > 
+> > Reported-by: Sashiko <sashiko-bot@kernel.org>
+> > Closes: https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=1
+> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > ---
+> >  arch/arm64/kvm/ptdump.c | 38 ++++++++++++++++++++++++--------------
+> >  1 file changed, 24 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > index d5aa9eff08d1..752d8e0cd25c 100644
+> > --- a/arch/arm64/kvm/ptdump.c
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -115,13 +115,21 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
+> >  static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
+> >  {
+> >  	struct kvm_ptdump_guest_state *st;
+> > -	struct kvm_pgtable *pgtable = kvm->arch.mmu.pgt;
+> > +	struct kvm_pgtable *pgtable;
+> >  	int ret;
+> >  
+> >  	st = kzalloc_obj(struct kvm_ptdump_guest_state, GFP_KERNEL_ACCOUNT);
+> >  	if (!st)
+> >  		return ERR_PTR(-ENOMEM);
+> >  
+> > +	guard(write_lock)(&kvm->mmu_lock);
+> > +	if (!kvm->arch.mmu.pgt) {
+> > +		kfree(st);
+> > +		return ERR_PTR(-ENXIO);
+> > +	}
+> > +
+> > +	pgtable = kvm->arch.mmu.pgt;
+> > +
+> >  	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
+> >  	if (ret) {
+> >  		kfree(st);
+> > @@ -137,7 +145,6 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
+> >  
+> >  static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+> >  {
+> > -	int ret;
+> >  	struct kvm_ptdump_guest_state *st = m->private;
+> >  	struct kvm *kvm = st->kvm;
+> >  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+> > @@ -154,11 +161,11 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+> >  		.seq		= m,
+> >  	};
+> >  
+> > -	write_lock(&kvm->mmu_lock);
+> > -	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> > -	write_unlock(&kvm->mmu_lock);
+> > +	guard(write_lock)(&kvm->mmu_lock);
+> > +	if (mmu->pgt)
+> > +		return kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> 
+> IIUC, that's the same behavior, right?
+> Just changed to look about the same with the rest of this file?
 
+I'm not too sure what you are referring to, if you mean the
+write_lock/unlock -> guard(write_lock) change, then yes, mostly. Just
+also checking mmu->pgt is still not freed.
 
-Would you like to be CCed on v4 or nahhhh?
+> 
+> >  
+> > -	return ret;
+> > +	return 0;
+> >  }
+> 
+> So if the pgt does not exist anymore, it returns zero. Is that the desired 
+> behavior?
 
->> 
->> >> 
->> >> this should just clarify things, any questions, feel more than free
->to
->> >ask!
->> >> 
->> >> (btw V4 is coming soon)
->> >
->> >Thanks!
->> >Leo
->> >
->> >> 
->> >> >> +
->> >> >> +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
->> >> >> +{
->> >> >> +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
->> >> >> +}
->> >> >> +
->> >> >> +static bool pkvm_mapping_is_cacheable(struct pkvm_mapping *m)
->> >> >> +{
->> >> >> +	return m->nr_pages & PKVM_MAPPING_CACHEABLE;
->> >> >> +}
->> >> >> +
->> >> >> +static void pkvm_mapping_set_nr_pages(struct pkvm_mapping *m, u64
->> >> >nr_pages,
->> >> >> +				      bool cacheable)
->> >> >> +{
->> >> >> +	WARN_ON_ONCE(nr_pages & ~PKVM_MAPPING_NR_PAGES_MASK);
->> >> >> +
->> >> >> +	m->nr_pages = nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
->> >> >> +	if (cacheable)
->> >> >> +		m->nr_pages |= PKVM_MAPPING_CACHEABLE;
->> >> >> +}
->> >> >> +
->> >> >>  static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
->> >> >>  {
->> >> >> -	return (m->gfn + m->nr_pages) * PAGE_SIZE - 1;
->> >> >> +	return (m->gfn + pkvm_mapping_nr_pages(m)) * PAGE_SIZE - 1;
->> >> >>  }
->> >> >>  
->> >> >>  INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64,
->__subtree_last,
->> >> >> @@ -350,7 +373,7 @@ static int
->__pkvm_pgtable_stage2_reclaim(struct
->> >> >kvm_pgtable *pgt, u64 start, u64
->> >> >>  			continue;
->> >> >>  
->> >> >>  		page = pfn_to_page(mapping->pfn);
->> >> >> -		WARN_ON_ONCE(mapping->nr_pages != 1);
->> >> >> +		WARN_ON_ONCE(pkvm_mapping_nr_pages(mapping) != 1);
->> >> >>  		unpin_user_pages_dirty_lock(&page, 1, true);
->> >> >>  		account_locked_vm(kvm->mm, 1, false);
->> >> >>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
->> >> >> @@ -369,7 +392,7 @@ static int
->__pkvm_pgtable_stage2_unshare(struct
->> >> >kvm_pgtable *pgt, u64 start, u64
->> >> >>  
->> >> >>  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
->> >> >>  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
->> >> >> -					mapping->nr_pages);
->> >> >> +					pkvm_mapping_nr_pages(mapping));
->> >> >>  		if (WARN_ON(ret))
->> >> >>  			return ret;
->> >> >>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
->> >> >> @@ -448,7 +471,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable
->> >*pgt,
->> >> >u64 addr, u64 size,
->> >> >>  		 * permission faults are handled in the relax_perms() path.
->> >> >>  		 */
->> >> >>  		if (mapping) {
->> >> >> -			if (size == (mapping->nr_pages * PAGE_SIZE))
->> >> >> +			if (size == (pkvm_mapping_nr_pages(mapping) * PAGE_SIZE))
->> >> >>  				return -EAGAIN;
->> >> >>  
->> >> >>  			/*
->> >> >> @@ -472,7 +495,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable
->> >*pgt,
->> >> >u64 addr, u64 size,
->> >> >>  	swap(mapping, cache->mapping);
->> >> >>  	mapping->gfn = gfn;
->> >> >>  	mapping->pfn = pfn;
->> >> >> -	mapping->nr_pages = size / PAGE_SIZE;
->> >> >> +	pkvm_mapping_set_nr_pages(mapping, size / PAGE_SIZE,
->> >> >> +				  !(prot & (KVM_PGTABLE_PROT_DEVICE |
->> >> >> +					    KVM_PGTABLE_PROT_NORMAL_NC)));
->> >> >>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
->> >> >>  
->> >> >>  	return ret;
->> >> >> @@ -503,7 +528,7 @@ int pkvm_pgtable_stage2_wrprotect(struct
->> >kvm_pgtable
->> >> >*pgt, u64 addr, u64 size)
->> >> >>  	lockdep_assert_held(&kvm->mmu_lock);
->> >> >>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
->> >> >>  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
->> >> >> -					mapping->nr_pages);
->> >> >> +					pkvm_mapping_nr_pages(mapping));
->> >> >>  		if (WARN_ON(ret))
->> >> >>  			break;
->> >> >>  	}
->> >> >> @@ -517,9 +542,13 @@ int pkvm_pgtable_stage2_flush(struct
->kvm_pgtable
->> >> >*pgt, u64 addr, u64 size)
->> >> >>  	struct pkvm_mapping *mapping;
->> >> >>  
->> >> >>  	lockdep_assert_held(&kvm->mmu_lock);
->> >> >> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
->> >> >> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
->> >> >> +		if (!pkvm_mapping_is_cacheable(mapping))
->> >> >> +			continue;
->> >> >> +
->> >> >>  		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
->> >> >> -					  PAGE_SIZE * mapping->nr_pages);
->> >> >> +					  PAGE_SIZE * pkvm_mapping_nr_pages(mapping));
->> >> >> +	}
->> >> >>  
->> >> >>  	return 0;
->> >> >>  }
->> >> >> @@ -536,8 +565,10 @@ bool
->pkvm_pgtable_stage2_test_clear_young(struct
->> >> >kvm_pgtable *pgt, u64 addr, u64
->> >> >>  
->> >> >>  	lockdep_assert_held(&kvm->mmu_lock);
->> >> >>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
->> >> >> -		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
->> >> >> -					   mapping->nr_pages, mkold);
->> >> >> +		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest,
->> >> >> +					   handle, mapping->gfn,
->> >> >> +					   pkvm_mapping_nr_pages(mapping),
->> >> >> +					   mkold);
->> >> >>  
->> >> >>  	return young;
->> >> >>  }
->> >> >> -- 
->> >> >> 2.53.0
->> >> >> 
->> >> >
->> >> 
->> >> Thanks!
->> >
->> 
->> Thanks!
->
->Thanks!
->
+Good question, so the question is what contract between the ptdump and
+user do we want to make for this case. I guess returning some error like -EIO
+could make a little more sense than just printing nothing?
 
-Thanks!
+> 
+> I guess it's aligned with the idea of single file mentioned in the cover, 
+> right?
+
+Sorry, I don't get what you are asking here?
+
+> 
+> >  
+> >  static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
+> > @@ -206,17 +213,23 @@ static const struct file_operations kvm_ptdump_guest_fops = {
+> >  
+> >  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
+> >  {
+> > -	struct kvm_pgtable *pgtable = m->private;
+> > +	struct kvm *kvm = m->private;
+> > +
+> > +	guard(write_lock)(&kvm->mmu_lock);
+> > +	if (kvm->arch.mmu.pgt)
+> > +		seq_printf(m, "%2u\n", kvm->arch.mmu.pgt->ia_bits);
+> >  
+> > -	seq_printf(m, "%2u\n", pgtable->ia_bits);
+> >  	return 0;
+> >  }
+> >  
+> >  static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
+> >  {
+> > -	struct kvm_pgtable *pgtable = m->private;
+> > +	struct kvm *kvm = m->private;
+> > +
+> > +	guard(write_lock)(&kvm->mmu_lock);
+> > +	if (kvm->arch.mmu.pgt)
+> > +		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - kvm->arch.mmu.pgt->start_level);
+> >  
+> > -	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
+> >  	return 0;
+> >  }
+> >  
+> > @@ -224,15 +237,12 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
+> >  				    int (*show)(struct seq_file *, void *))
+> >  {
+> >  	struct kvm *kvm = m->i_private;
+> > -	struct kvm_pgtable *pgtable;
+> >  	int ret;
+> >  
+> >  	if (!kvm_get_kvm_safe(kvm))
+> >  		return -ENOENT;
+> >  
+> > -	pgtable = kvm->arch.mmu.pgt;
+> > -
+> > -	ret = single_open(file, show, pgtable);
+> > +	ret = single_open(file, show, kvm);
+> 
+> Maybe this change is more related with the previous patch?
+
+I see your point, but I divided it into first fixing mmu UAF, then the
+pgt UAF, which I also think makes sense.
+
+Thanks,
+Wei-Lin Chang
+
+> 
+> >  	if (ret < 0)
+> >  		kvm_put_kvm(kvm);
+> >  	return ret;
+> > -- 
+> > 2.43.0
+> > 
+> 
+> Thanks!
+> Leo
