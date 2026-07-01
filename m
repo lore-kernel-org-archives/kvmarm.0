@@ -1,180 +1,235 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE9D42B72D;
-	Wed,  1 Jul 2026 10:53:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C89248B363
+	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 13:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782903208; cv=none; b=VN6OCoXrOvwBhSsku2J96IFWROZw1L4FJPXXFSUOH8BZYU/mWtOBjt7jk+eYKz03pnYMHMcYT2dhCyMJJ29EH7pu0GsTjwe4pG6vJX6S7bw+Hp0WzygiaetwRU1RL1tbyyfxrAZrAoFndI8ZPL0jHOx/A9t9MNc0QoeI2XJcrZ4=
+	t=1782912718; cv=none; b=oFR7yhzQZuE8CAtbfcbewV2Eh8Qs8EMVjWI2GInrI6aY+TfrE9z1iZWGCfDLwL8kezJKbEOjJaVNzRNkY0u742k0ydmQttOXSutG5BNQxi3XmNNgyr3LUVbzpsTqAVBktWMCVlfGFMVlfFbvlMFBlQ6N9Bqhm/9KzzwWz+UMGks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782903208; c=relaxed/simple;
-	bh=JZ56j9O/E/kb3CIeJoDp5K9QusgKfml7k5WJLhXC098=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MtGyzdnO/hbL6xcGeeB9WBc2r7FYbvWL3sKHj97Zg4AObBFUft4Hz/ANOjgqcJ+JhFeejoGeEEUV5jH7Yic3o1E6zB+i9ybpU74sUyITd7LdHd3IMcxE5PmOTF2KAxGlZorAds0q2wFlSeY4muDDHvT7pzGzbHs6P+8kOLzc7dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kWk13RqK; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782912718; c=relaxed/simple;
+	bh=cHQGDBv2YgRqGgNgwPodZeLX7f0kk1ApLtscbK58jOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jUab5/FAGhsJYH4/aEYOyXGwpwCU99iCrQUKb8vWxktEiHMqMLwm71FDaOkwHTfVmOpI6bscBIp3xXV/IN5smjfKZvNchw22mWiDgMfp5urQkWKejJ6Zwa549qSN6nVPdoe8tH+FoP2Xp3PWeIjBKRDYWfFPVMrZLJULOkQwpys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lsz8ol6z; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kWk13RqK"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5D242247;
-	Wed,  1 Jul 2026 03:53:20 -0700 (PDT)
-Received: from [10.57.37.248] (unknown [10.57.37.248])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 22C093F85F;
-	Wed,  1 Jul 2026 03:53:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782903205; bh=JZ56j9O/E/kb3CIeJoDp5K9QusgKfml7k5WJLhXC098=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kWk13RqKQ05yF/keJKKAoG2johPDXGZZNyWNrYJu6wcvzr07ub1fzAWpTdwka/E6q
-	 Uq1BFIYlBLNqglC/uQ0SRczjha3tUTsAs/HJXvv8ybID9ynHz/NQIPxK+7xL/QRR+s
-	 NlwIFfzy0G7AW2cO1hqgGlJ/eZ6wnw6/sj9T/I3Y=
-Message-ID: <8c0e6a32-2de2-4b94-9fe2-e32f5e9bcc4a@arm.com>
-Date: Wed, 1 Jul 2026 11:53:17 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lsz8ol6z"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4758b2a9e2aso431720f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 01 Jul 2026 06:31:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782912714; x=1783517514; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=54H8ja6qkwc+zSll+xVZzhQ87dmwI3XRpSBDJRGLWNs=;
+        b=lsz8ol6zMFog423vrWPLvi4Ve5GV4pHMl0vHEQUsiRa7tjT1JddTwrvwdPZohOMRr8
+         54fW5l1T0+ItMtSp1nQTlJwJeVShWd83lXb60NYQWb/OLD4lUUrDw1xxwaaGaKR2bhoX
+         GER/N7gFJdf15vaX7zH7ugi4LmflW2Z5RZVEJqEYTk69P3t0jjARSmTT9UzFegiCw5RG
+         Wq3Z3qD6xWhvbLSx8OwRY6ZE60gmBb8NZVzCGAG0krB8oH22KNB8YmG9NtZNzOUvc20m
+         VuzstomEdpN/quQwuXmNZM6WXNu8N5g/Msxd99n+gQZP2QiZDKF/Xe8aNfJMVPbrgutj
+         oodQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782912714; x=1783517514;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=54H8ja6qkwc+zSll+xVZzhQ87dmwI3XRpSBDJRGLWNs=;
+        b=o/IEQ2Df/LV6V7tRW89Jh1P1Qi8TGQ87AStn3uhWG7Vq0PP3uEWaJpWGTBJx3Ku7CM
+         Z1JD+XZYtdit8zR2rBxsMMO2CSI7pi0PfqiOSusBGTbbgglYt7p9T7UjcMH5a0jhGek7
+         95cZWvV1H1Rv9S92kDEtzCpXCMHMGjlkwOxUXNlCVymlmRdgh9eMqETGlC/bF+63TI1c
+         cO3PXbBsRF1Hl1rnBEeXwXmpqDF7u0Z98vn3daKsYmVCOpWhlHN/0N6B3S1MngVFirN5
+         RthM9ad9AdwpiBPWAo5Q3mgaLTRgqsUTa87ud+aP1n/iCZtpOGhn2xvFPlN/5QTH5DkU
+         rJaw==
+X-Forwarded-Encrypted: i=1; AHgh+Rqfor1IxSr2R2LoziQGrBJiyftErqMLZDNPYb1wR8GR/Y5EhpZw9LnwLgtT1u8hkvjkAmrZxUI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzlUJ4EsBGY+LrIDl1GMISVNj/QYbGVzZ6IThK/9HUKyG0bdQuz
+	oAjiMr/Ra+dk92bAqi6mpO4QXIXUCQenq9gKScKrOVCK4Nr9wJPo0k+S8X3LcsoL6A==
+X-Gm-Gg: AfdE7cmR1hBarvrI+xl10RDzWjM0cVZAyvcL5N8komsVVBBk6P2OzacTLas+Pic3sOX
+	sxHU3AxbNNDgy07IKzyA7KxhyQgCHvJ7VmzLFIh8fwnd8Yb3Brhzu+13X2+WekYI2RbvKyE/KwN
+	Thxl0MgOy3pCKzAajxlDT1nmLkIoSzFteQFdLDhq48LAUZWB7wR5Ib/2W7WAjd2cVNN9Ax8w4gP
+	PMf4QIxwgrARv0743BswZ4Kvhf5Gvnkzi0QRyMDizt+0RDKNpFYq1pVMBsJ2/gG/dAUyp1M+ohG
+	1Lgq2/gFx0Zg/w+F+D9YN/K3yqoRKneQM9U7ex9jCy14TKRLpm9/RQBGnjOTw3bLhbMugLii+wL
+	6JGWIbQhkSA/tbQAa7Fh0DzxQ86hx5zrujiIH7lo7fkMFctH3JOkgzM861KREaMzB0o9ZaGGQnm
+	/FGhsIyyhovj7zGHhOERKqg5fIlDBzywyNB0oZJ8+74oKDXL4NOoPQJ065HnX8gw==
+X-Received: by 2002:a05:6000:29db:b0:475:f0c2:5b02 with SMTP id ffacd0b85a97d-4775b45b05emr2137424f8f.56.1782912713855;
+        Wed, 01 Jul 2026 06:31:53 -0700 (PDT)
+Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-475641e4542sm18270184f8f.10.2026.07.01.06.31.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jul 2026 06:31:52 -0700 (PDT)
+Date: Wed, 1 Jul 2026 14:31:49 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Bradley Morgan <include@grrlz.net>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] KVM: arm64: skip pKVM cache flushes for non
+ cacheable mappings
+Message-ID: <akUWxY_irosuTF4L@google.com>
+References: <20260624160028.15591-1-include@grrlz.net>
+ <20260624160028.15591-2-include@grrlz.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 00/44] arm64: Support for Arm CCA in KVM
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo.Pieralisi2@arm.com
-References: <20260513131757.116630-1-steven.price@arm.com>
- <akR0eX0nCumIgnlh@FCCLS0092175.localdomain>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <akR0eX0nCumIgnlh@FCCLS0092175.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260624160028.15591-2-include@grrlz.net>
 
-On 01/07/2026 03:15, Kohei Enju wrote:
-> On 05/13 14:17, Steven Price wrote:
->> This series adds support for running protected VMs using KVM under the
->> Arm Confidential Compute Architecture (CCA).
->>
->> This is rebased on v7.1-rc1, but still targets RMM v2.0-bet1[1].
->>
->> The major updates from v13 remain but have been more fully implemented:
->> the RMM uses the host's page size, range based RMI APIs mean we don't
->> have to break everything down to base page sizes, the GIC state is
->> passed via system registers, and the uAPI has been simplified.
->>
->> The main changes since v13 are:
->>
->>  * The RMI definitions and wrappers have been fully updated for RMM
->>    v2.0-bet1. In particular the temporary RMM v1.0 SMC compatibility
->>    patch has been dropped.
->>
->>  * The PSCI completion ioctl has been removed. RMM v2.0-bet1 still
->>    requires the host to provide the target REC for PSCI calls which
->>    name another vCPU, but KVM now performs the RMI PSCI completion
->>    automatically before entering the REC again. Userspace no longer
->>    needs to issue KVM_ARM_VCPU_RMI_PSCI_COMPLETE. A future spec should
->>    remove the need for the host to provide the MPIDR mapping.
->>
->>  * The generic RMI init, RMM configuration, GPT setup,
->>    delegate/undelegate helpers and SRO infrastructure have moved out of
->>    KVM into arch/arm64/kernel/rmi.c. RMI is expected to be used by
->>    features outside KVM, so this code should be available even when KVM
->>    is not built.
->>
->>  * RMI_GRANULE_TRACKING_GET has been updated to work on a range, this
->>    allows it to work when the region is not aligned to the tracking
->>    size. Solves the problem reported by Mathieu[2].
->>
->>  * SRO support has been moved earlier in the series and improved. It
->>    provides a cleaner way for the host to provide the RMM with the extra
->>    memory it requires. However support is still incomplete where the
->>    TF-RMM code does not yet implement it. This is noted by FIXMEs in the
->>    code.
->>
->>  * The ARM VM type encoding has been reworked to coexist with the
->>    upstream pKVM KVM_VM_TYPE_ARM_PROTECTED bit.
->>
->>  * The private-memory documentation now notes that arm64 uses
->>    KVM_CAP_MEMORY_ATTRIBUTES.
->>
->>  * PMU support is dropped for now. It will be added later in a separate
->>    series. Similarly for selecting the hash algorithm and RPV.
+On Wed, Jun 24, 2026 at 04:00:26PM +0000, Bradley Morgan wrote:
+> pKVM keeps its own mapping list for stage 2 operations. Its flush path
+> uses that list directly, so it lost the PTE attribute check done by the
+> generic stage 2 walker.
 > 
-> Hi Steven,
-
-Hi,
-
-> Is there any plan to add support for selecting the MEC policy (shared or
-> private)? We have been working on adding support for this on top of your
-> series. If this is not already in the works, we may upstream our
-> implementation later.
-
-I've been trying to focus on getting the minimum useful series
-upstreamed before looking at additional features (such as hash
-algorithm, MEC policy etc). If you've already got support then yes
-please do upstream it later when we've got this series landed.
-
-Thanks,
-Steve
-
-> Thanks,
-> Kohei
+> Record whether a mapping is cacheable and skip cache maintenance for
+> mappings that are not cacheable.
 > 
->>
->> There are also the usual rebase updates and smaller fixes, including
->> changes to the RMM v2.0-bet1 range APIs, removal of REC auxiliary
->> granule handling, fixes to the address range descriptor encoding, and
->> cleanups around realm stage-2 teardown.
->>
->> Stateful RMI Operations
->> -----------------------
->>
->> The RMM v2.0 spec introduces Stateful RMI Operations (SROs), which allow
->> the RMM to complete an operation over several SMC calls while requesting
->> or returning memory to the host. This allows interrupts to be handled in
->> the middle of an operation and lets the RMM dynamically allocate memory
->> for internal tracking purposes. For example, RMI_REC_CREATE no longer
->> needs auxiliary granules to be provided up front, and can instead
->> request memory during the operation.
->>
->> This series includes the generic SRO infrastructure in
->> arch/arm64/kernel/rmi.c and uses it for REC create/destroy. The other
->> cases are not yet used by TF-RMM and a future revision will be needed to
->> finish those paths in Linux.
->>
->> This series is based on v7.1-rc1. It is also available as a git
->> repository:
->>
->> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v14
->>
->> Work in progress changes for kvmtool are available from the git
->> repository below:
->>
->> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v12
->>
->> The TF-RMM has not yet merged the RMM v2.0 support, so you will need to
->> use a branch with RMM v2.0-bet1 support. At the time of writing the
->> following branch is being used:
->>
->> https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc_2
->> (tested on commit 3340667a291a)
->>
->> There is a kvm-unit-test branch which has been updated to support the
->> attestation used in RMMv2.0 available here:
->>
->> https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v4
->>
->> [1] https://developer.arm.com/documentation/den0137/2-0bet1/
->> [2] https://lore.kernel.org/all/acrj-cKphy4hJsEG@p14s/
+> Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+> Signed-off-by: Bradley Morgan <include@grrlz.net>
+> ---
+>  arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 41 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 428723b1b0f5..ca6e823028c2 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
+>  	return m->gfn * PAGE_SIZE;
+>  }
+>  
+> +#define PKVM_MAPPING_NR_PAGES_MASK	GENMASK_ULL(47, 0)
+> +#define PKVM_MAPPING_CACHEABLE		BIT_ULL(48)
 
+Probably better to make it "_NC". Protected VMs only support cacheable and they
+also use struct pkvm_mapping. 
+
+> +
+> +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
+> +{
+> +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+> +}
+> +
+> +static bool pkvm_mapping_is_cacheable(struct pkvm_mapping *m)
+> +{
+> +	return m->nr_pages & PKVM_MAPPING_CACHEABLE;
+> +}
+> +
+> +static void pkvm_mapping_set_nr_pages(struct pkvm_mapping *m, u64 nr_pages,
+> +				      bool cacheable)
+> +{
+> +	WARN_ON_ONCE(nr_pages & ~PKVM_MAPPING_NR_PAGES_MASK);
+> +
+> +	m->nr_pages = nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+> +	if (cacheable)
+> +		m->nr_pages |= PKVM_MAPPING_CACHEABLE;
+> +}
+> +
+>  static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
+>  {
+> -	return (m->gfn + m->nr_pages) * PAGE_SIZE - 1;
+> +	return (m->gfn + pkvm_mapping_nr_pages(m)) * PAGE_SIZE - 1;
+>  }
+
+Perhaps using a bitfield would heavily simplify this code?
+
+struct pkvm_mapping {
+  ...
+  u64 nr_pages : 63
+  u64 flags : 1
+}
+
+Or alternatively, could just make nr_pages u32 and flags u32. nr_pages will not
+exceed PMD_SIZE / PAGE_SIZE, which is at worst 8192 on 64K systems.
+
+>  
+>  INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
+> @@ -350,7 +373,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
+>  			continue;
+>  
+>  		page = pfn_to_page(mapping->pfn);
+> -		WARN_ON_ONCE(mapping->nr_pages != 1);
+> +		WARN_ON_ONCE(pkvm_mapping_nr_pages(mapping) != 1);
+>  		unpin_user_pages_dirty_lock(&page, 1, true);
+>  		account_locked_vm(kvm->mm, 1, false);
+>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+> @@ -369,7 +392,7 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
+>  
+>  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+>  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+> -					mapping->nr_pages);
+> +					pkvm_mapping_nr_pages(mapping));
+>  		if (WARN_ON(ret))
+>  			return ret;
+>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+> @@ -448,7 +471,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		 * permission faults are handled in the relax_perms() path.
+>  		 */
+>  		if (mapping) {
+> -			if (size == (mapping->nr_pages * PAGE_SIZE))
+> +			if (size == (pkvm_mapping_nr_pages(mapping) * PAGE_SIZE))
+>  				return -EAGAIN;
+>  
+>  			/*
+> @@ -472,7 +495,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	swap(mapping, cache->mapping);
+>  	mapping->gfn = gfn;
+>  	mapping->pfn = pfn;
+> -	mapping->nr_pages = size / PAGE_SIZE;
+> +	pkvm_mapping_set_nr_pages(mapping, size / PAGE_SIZE,
+> +				  !(prot & (KVM_PGTABLE_PROT_DEVICE |
+> +					    KVM_PGTABLE_PROT_NORMAL_NC)));
+>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+>  
+>  	return ret;
+> @@ -503,7 +528,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+>  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+> -					mapping->nr_pages);
+> +					pkvm_mapping_nr_pages(mapping));
+>  		if (WARN_ON(ret))
+>  			break;
+>  	}
+> @@ -517,9 +542,13 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	struct pkvm_mapping *mapping;
+>  
+>  	lockdep_assert_held(&kvm->mmu_lock);
+> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+> +		if (!pkvm_mapping_is_cacheable(mapping))
+> +			continue;
+> +
+>  		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+> -					  PAGE_SIZE * mapping->nr_pages);
+> +					  PAGE_SIZE * pkvm_mapping_nr_pages(mapping));
+> +	}
+>  
+>  	return 0;
+>  }
+> @@ -536,8 +565,10 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+>  
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+> -		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+> -					   mapping->nr_pages, mkold);
+> +		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest,
+> +					   handle, mapping->gfn,
+> +					   pkvm_mapping_nr_pages(mapping),
+> +					   mkold);
+>  
+>  	return young;
+>  }
+> -- 
+> 2.53.0
+> 
