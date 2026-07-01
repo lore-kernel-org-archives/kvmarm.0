@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C467D233953
-	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 14:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4D12DA75B
+	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 14:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782914704; cv=none; b=l/d4COnvPJy6FIx8jOtKlZNl3l1SiQ1p9OYmgyyVlKrIEI9OaMVWcqZI3felrgb0bj/kiBpKVRVWUOeDLWSlTroua97ZxKoRcKw5VCrLSIAoTAoRVaRCF+wz1U1La+8iIjw8ntgENm2GyWKpidnii72CoXy1c0G79ikajTCCA1o=
+	t=1782914998; cv=none; b=E4siBQ6pGWj6Ovl9sSTE/QVx/UrtLA5ECabu90qXdq7iFRZ/hQ+4Yaa14QyArpHBd+ApBJBXC0BAcTsypE+N2q29X0jNs7AqpE8tuh0tNOCMpq3MY5xn/pNlEBgvV52mvyWeqj1six/UedadQfyoetzvucSr1uBZOzzej705/j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782914704; c=relaxed/simple;
-	bh=jLRi1shH8PjXc7hfGKlds880MgKVpT3AMnonDKUdnjU=;
+	s=arc-20240116; t=1782914998; c=relaxed/simple;
+	bh=OFwP+pkMVADKt0UXYr+23yQYYFR6cnfpwehkutpLP1g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UGiV1rqKAKbR0/rrAz20gokpOS50ifZLjLnATpIemzJn7pAhrfw30fndyhGXyaD2CdoTXLwtrejLkrj/y7+fVgMscT7VtsQeuiYseGJQtcIoGy4Q53WKnIyGMh1DxYR/r94RKwwIVsEGQNQHuqrEmOCsMA62BuRmcg6GqfxId+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EERoXObI; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=ncxTCT91g8KhafvTAX3k20U3kbfHPbEZXFiSUquUKn9BhpX0YPXFyU2/lmsysvm7EUVey5syUMrRbUsPU1HAlx1AfYEl8EnuL/10FDqfqA6AJzfsxX3ZQYOErSmO9hoSsFsLannjiQ1Cm6sXlqHTJhYnajDW0A6rRBjQlUtfehg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OJ73NTB3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EERoXObI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJ73NTB3"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782914701;
+	s=mimecast20190719; t=1782914996;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lec8VUI2yjzTXicodtt6XfLuullf5XdbBMwWNAy7kqg=;
-	b=EERoXObIJyrDTKusab6GJJSbzAxf5xc2SSGdrveX87UYlMXG3DphFu1Racpc/2ACWm/Cxa
-	7uiC7HrQY/Fj0wCEytVNYy8t2luNF4H+p/VfIS3wmrqTBut25IdlUN7dlVmkWvYjPq0gR/
-	eQRo4Gb0CdrnsrTnZ1638ykf7KCQ5oo=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wSJoBP1n90AixtXBkqkDbkBEiMdcH6OFxpJmUJV3xi0=;
+	b=OJ73NTB3Phl2k2jh81GqwWfmonCvuC2Q4TDNlS+qsl3U3SgFo9OTnBSVMl3HvLoPhzl3TC
+	8AQMKKMaxFdRPHkp1hQ3OKeM2X7xbyXxMo9d9jQRkKgUE8tiB/0NveQY00KzJ3GbTWNWa8
+	klQuYnPgnAPAaMckReK0thkgHn1J0a4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-711-_Xj-DPSWOIC_4IJX3caeeQ-1; Wed, 01 Jul 2026 10:05:00 -0400
-X-MC-Unique: _Xj-DPSWOIC_4IJX3caeeQ-1
-X-Mimecast-MFC-AGG-ID: _Xj-DPSWOIC_4IJX3caeeQ_1782914699
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5aeb711dff7so321607e87.3
-        for <kvmarm@lists.linux.dev>; Wed, 01 Jul 2026 07:05:00 -0700 (PDT)
+ us-mta-93-W47VBIP2OcKXJDF6xG-0vQ-1; Wed, 01 Jul 2026 10:09:55 -0400
+X-MC-Unique: W47VBIP2OcKXJDF6xG-0vQ-1
+X-Mimecast-MFC-AGG-ID: W47VBIP2OcKXJDF6xG-0vQ_1782914994
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c12823d7822so59546066b.0
+        for <kvmarm@lists.linux.dev>; Wed, 01 Jul 2026 07:09:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782914699; x=1783519499;
+        d=1e100.net; s=20251104; t=1782914994; x=1783519794;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lec8VUI2yjzTXicodtt6XfLuullf5XdbBMwWNAy7kqg=;
-        b=XnqxZvxmn4JCL/iLbIiyTceRBxIyH3NCc1iWWznXm1FiemW0qz/dQvZpbzIPs5TBM/
-         O9JAJIdzzQlkUYZ2qG2/HQs5I06rfkfKVSqrDrLEJDSaCKCsR7uG517Ksocde72mqt7X
-         DLEt1tHb6nm7md7q8xzZxyEGpZvO3kOPAWnSpz0+4MLkO35/ng5vJ6RiFEvhzVfb9oej
-         LHkcpNRaVsXeiRYx381/neq2FapxY0vVje6o+h9MP6iswK/OZ4v1Qp87Y0IXZEQnmlOY
-         o+WwCz36zGebqKtswFql0+U0kauI2tTtQGiICITNBsiSUw1TnWq8ZQbLzw386y1Qs2zI
-         deUw==
-X-Forwarded-Encrypted: i=1; AHgh+Rp/Ncyf8c1LP80F8juOkhyY4M8a90nL8gBO+X6GojDvt1ZoPgUSuFtwyTAb11zNOPuPVfnCuds=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzuO/EuXsVlFT2cmgERQ2MQGsx01NJWrjiUjuzcQUWq7VVhdKfY
-	9zKnXoGUjPOtkWIuh5zTDz9+FoZJsWFmgv1yQIpt4OFeMtPkGhwO0emihyxxmect5XvhQWbEfLE
-	c+eso5LVrp31CKq30IwqeR6bTGMbor0fzdYunZ7eWnMLsxWe8Rxampf4MAw==
-X-Gm-Gg: AfdE7cnDHJF0i+Y/BkwXEIEblUFuR5oF5Rq7kzeXgqIRjooTmDhbnGU+14w3jvLCr8S
-	Yr3SW85CBBVT4GKmRQVD+O3RAQqofPuxEQcr02fq80Hn0rgP2Fjio9MWzTwaD7V1FOqGefwjOId
-	PLZeDBpCIPxCBjk9eenxEzSM0tEaDPepEswPSvbjuI/TRwDkFsmdki1+Cv/aZz+ykUXmk6spCaw
-	jGBacIjKPoE+BqM9czGGp+ieC1v4wTMCyvmWn2ro0SIKVsvihAQITXNFJIvQLssdlppIMDXZYpe
-	dhUG5OolSxHoCnZdrPYEwotbUI/hkjwkV5pQxHQJIlh66J0AE43Dyvu8a2ZQrmP1VEMITPKpXnC
-	/8mcpbNHZp3AjawsYjOutIDL31lwAVkDhJHK24KgzfZUF8+0MDX+MVm35FJw=
-X-Received: by 2002:a05:6512:31ca:b0:5ae:aaa8:eb21 with SMTP id 2adb3069b0e04-5aec67a2c1dmr631170e87.14.1782914698918;
-        Wed, 01 Jul 2026 07:04:58 -0700 (PDT)
-X-Received: by 2002:a05:6512:31ca:b0:5ae:aaa8:eb21 with SMTP id 2adb3069b0e04-5aec67a2c1dmr631140e87.14.1782914698392;
-        Wed, 01 Jul 2026 07:04:58 -0700 (PDT)
+        bh=wSJoBP1n90AixtXBkqkDbkBEiMdcH6OFxpJmUJV3xi0=;
+        b=e3Q2GPP1tk0Zv//WkLmDGPKGS9NWQqbof8H6y2BGvg+2ouHVl4bPvfNuyl5bAM8AwJ
+         zywpHX7COwzIeltdWqPJveVpNJ4OzGpLdL0bE02KBV9Ce+bH7lEfAe9CkWgbpLmVxNGj
+         Rob/4pMd9CqQjoAaDegSxFzENhnbrB5xitOTJGKolanqvkVcN7deEj2SBhRTv4Bf67ZI
+         lt6QuQ8Je0E7SqwRL7b6tUWT824b2vJOCYSAeJI1TCtLuXiqqGMmieTQQ18Z+K0PjNEQ
+         BAraLuIP4WpWpTDy95MAgQhz4O1goekn4X2aw2PtXAz11fMuBlaC9leEv1KEMNNRqtUH
+         Qr6Q==
+X-Forwarded-Encrypted: i=1; AHgh+Roxtgg/qdion8gJrNbLYzz3/1kC0LwtckSOP3qC38HSAiThMN8cB+HOy+H0pGiuY578lZfF70k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxNKU31o/LQk0gFdeT5Ly4vgD3s4niJ251eharppqKS55BUXEpl
+	EwVtpDULNJDVLMlsmFsj5jljs8DpNteBeh6Q4chMZL+S1rwIiLolEX/nVC0vA36ErcFN+GtrUSm
+	e7kA0e5deCQju+qkuD+1j21GuEPUbHhsGCKvikvGA6OuZkJMdiT5GqsTmAA==
+X-Gm-Gg: AfdE7clJH2aSCWTTkcb+A2hRB5tdPrh/w9g7st6gPPYYY2THoRtFmy0/lr8cV4+SNFP
+	FotkzsTfCJ2xI8lK5lBzzNq/CKErTlzRbA6NoVajoJ3OPzllbD878F0DnwDawv53fCCOjvK4VWv
+	PhK1tujh2tVb01NRY+e7EBMjeWOGula98dn6iJORlyTj6f4re54jOxw5B2V4T2IhMXlJ6Jo9kHz
+	Znv0PY7Pko28mtTrzyO2ZWSgrzdBOPNTLKBImEKlblRoPSlHrGHRfDtaF+ynBOm9WrTWCsormPz
+	xR+NaMpDTgfQyQ7gMXm+pzOvE7uXcqnyBiSSUChGkobITfQE/LWCd8kRh+meEQ7OU2eOXwYaLut
+	CUvwVtlPcrL+XNeubT1k072HuHu7sScfEr1396e83JFz37YkLb2UKjdAuCjA=
+X-Received: by 2002:a17:906:f84a:b0:c12:9136:8a1a with SMTP id a640c23a62f3a-c12aa137356mr70448566b.31.1782914994241;
+        Wed, 01 Jul 2026 07:09:54 -0700 (PDT)
+X-Received: by 2002:a17:906:f84a:b0:c12:9136:8a1a with SMTP id a640c23a62f3a-c12aa137356mr70444966b.31.1782914993819;
+        Wed, 01 Jul 2026 07:09:53 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5aec8991affsm20145e87.13.2026.07.01.07.04.55
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1288f0dfdesm279151066b.30.2026.07.01.07.09.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2026 07:04:57 -0700 (PDT)
-Message-ID: <1f338105-9d60-4239-b4aa-fa2e442d338a@redhat.com>
-Date: Wed, 1 Jul 2026 16:04:54 +0200
+        Wed, 01 Jul 2026 07:09:53 -0700 (PDT)
+Message-ID: <5d91c5f7-9f69-4cd2-bc8c-7d06962e5fe6@redhat.com>
+Date: Wed, 1 Jul 2026 16:09:51 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v6 08/17] target/arm/cpu-idregs.h.inc: Generate enum
- values
+Subject: Re: [RFC PATCH v6 14/17] arm-qmp-cmds: introspection for ID register
+ props
 To: Khushit Shah <khushit.shah@nutanix.com>
 Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
@@ -96,128 +96,173 @@ Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
  "armbru@redhat.com" <armbru@redhat.com>,
  "berrange@redhat.com" <berrange@redhat.com>,
  "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
+ "jdenemar@redhat.com" <jdenemar@redhat.com>,
+ Sandesh Patel <sandesh.patel@nutanix.com>
 References: <20260616132625.1732031-1-eric.auger@redhat.com>
- <20260616132625.1732031-9-eric.auger@redhat.com>
- <F517E5C6-EF76-4D2A-97E8-6C232E3CE3DB@nutanix.com>
+ <20260616132625.1732031-15-eric.auger@redhat.com>
+ <c6f663fc-93ad-4a22-b9dc-d7a4653bf348@redhat.com>
+ <A6010F6F-FF60-4227-ACFE-B141EEBE88AC@nutanix.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <F517E5C6-EF76-4D2A-97E8-6C232E3CE3DB@nutanix.com>
+In-Reply-To: <A6010F6F-FF60-4227-ACFE-B141EEBE88AC@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: LXQ3-Qiv4COw5uOhEEy2uzjivAVEqnPekBvHGfwYso8_1782914699
+X-Mimecast-MFC-PROC-ID: d1zm2z2LE4DjVcZpSDuULW1oOYZdHwjmZ-k5H4TfRx8_1782914994
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Khushit,
 
-On 6/19/26 8:28 AM, Khushit Shah wrote:
-> From f0e489cebdac1ba94b8082bc240f2d889555f7ea Mon Sep 17 00:00:00 2001
-> From: Khushit Shah <khushit.shah@nutanix.com>
-> Date: Fri, 19 Jun 2026 11:54:29 +0530
-> Subject: [PATCH] scripts: bug fixes in update-aarch64-cpu-sysreg-properties
+
+On 6/19/26 8:05 AM, Khushit Shah wrote:
 >
-> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
-> ---
-> While rebasing I found two bugs here:
-> - It outputs incorrect value for field that defined a ValueRange.
->    For example, CTX_CMPs (and all similar fields).
-> - decimal 10 might be incorrectly parsed as to 2.
+>> On 18 Jun 2026, at 2:56 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
+>>
+>> |-------------------------------------------------------------------!
+>>
+>> Hi Khushit,
+>>
+>> On 6/16/26 3:17 PM, Eric Auger wrote:
+>>> From: Cornelia Huck <cohuck@redhat.com>
+>>>
+>>> Implement the capability to query available ID register values by
+>>> adding SYSREG_* options and values to the cpu model expansion for the
+>>> host model, if available.
+>>>
+>>> Excerpt:
+>>> (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
+>>> {"return": {"model": {"name": "host", "props": {"SYSREG_ID_AA64PFR0_EL1_EL3": 1,
+>>> "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0, "SYSREG_CTR_EL0_L1Ip": 3,
+>>> "SYSREG_MIDR_EL1_PartNum": 3407, "SYSREG_CTR_EL0_DminLine": 4,
+>>> "SYSREG_ID_AA64MMFR0_EL1_PARange": 5, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0
+>>> ../..
+>>>
+>>> So this allows the upper stack to detect available writable ID
+>>> regs and the "host passthrough model" values.
+>>>
+>>> It also allows to test some ID reg field values:
+>>> (QEMU) query-cpu-model-expansion type=full model={"name":"host","props":{"SYSREG_ID_AA64ISAR0_EL1_DP":0x13}}
+>>> {"error": {"class": "GenericError", "desc": "idreg SYSREG_ID_AA64ISAR0_EL1_DP set value (0x13) exceeds length of field (4)!"}}
+>>>
+>>> (QEMU) query-cpu-model-expansion type=full model={"name":"host","props":{"SYSREG_ID_AA64ISAR0_EL1_DP":0x2}}
+>>> {"error": {"class": "GenericError", "desc": "idreg SYSREG_ID_AA64ISAR0_EL1_DP set value (0x2) does not match any arch valid enum value!"}}
+>> for your info I am currently exploring ways to test set field values
+>> against KVM. Current check only test against field size and enum values
+>> if any.
+>>
+>> I have a POC instantiating a scratch vcpu and it is totally feasible to
+>> set the id reg with the modified value. What is more tricky is to build
+>> an incremental scratch vcpu with all the set values accumulating But I
+>> guess it should be feasible too.
+>>
+>> If we manage to do that, I don't think you need safe rules/values
+>> anymore because using query-cpu-model-expansion you could directly check
+>> the enhanced cpu model can safely apply on host. I will share as soon as
+>> I get something clean enough. Thanks Eric
+> This seems like it is definitely doable. But, I think it is inefficient and does not
+> scale with the number of cpu models.
+>
+> It will essentially require 1 (vcpu create) + x (number of id register) ioctl calls
+> per Named CPU model or a configuration that management software wants
+> to test.
+yes. But that's also the only way to test incremental stacked settings.
+If an IDREG setting depends on a formerly applied one and is
+incompatible, you will know. With only safe_rules/values you won't have
+that precision I am afraid.
+>
+> In v3, I will  change how we handle safe_rules. As the analysis in mail to Marc
+> almost all of the writeable ID register fields supports writing a lower value.
+>
+> There are only few exceptions.
 
-OK thanks, I will integrate this in next respin
+OK
+>
+> Another point I want to raise is without safe_rules, we will not have
+> QMP feature parity with x86 where cpu-definitions reports model
+> blocker properties. This in-parity means some management
+Interesting. I need to further look at cpu-definitions I acknowledge
+
+Thanks
 
 Eric
+> software can not be easily ported to work with arm64 named
+> cpu models. 
 >
-> Sending inline patch that I have added.
-> ---
->  .../update-aarch64-cpu-sysreg-properties.py   | 56 ++++++++++++-------
->  1 file changed, 35 insertions(+), 21 deletions(-)
->  mode change 100644 => 100755 scripts/update-aarch64-cpu-sysreg-properties.py
->
-> diff --git a/scripts/update-aarch64-cpu-sysreg-properties.py b/scripts/update-aarch64-cpu-sysreg-properties.py
-> old mode 100644
-> new mode 100755
-> index 9e829fda2e..2e28b03598
-> --- a/scripts/update-aarch64-cpu-sysreg-properties.py
-> +++ b/scripts/update-aarch64-cpu-sysreg-properties.py
-> @@ -106,6 +106,29 @@ def collect_fields(item, bit_offset=0):
->  
->      return fields
->  
-> +def parse_value_int(raw_val):
-> +    if raw_val is None or isinstance(raw_val, bool):
-> +        return None
-> +
-> +    # may already be real number
-> +    if isinstance(raw_val, int):
-> +        return raw_val
-> +
-> +    raw_str = str(raw_val).strip()
-> +
-> +    if "'" in raw_str:
-> +        # quoted bitstring like "'0100'"
-> +        bits = raw_str.replace("'", "")
-> +        try:
-> +            return int(bits, 2)
-> +        except ValueError:
-> +            return None
-> +
-> +    # unquoted, try decimal
-> +    try:
-> +        return int(raw_str, 0)
-> +    except ValueError:
-> +        return None
->  
->  def extract_field_enums(field):
->      enums = []
-> @@ -124,32 +147,23 @@ def extract_field_enums(field):
->      if not isinstance(val_entries, list):
->          return enums
->  
-> +    # A Values.ValueRange field specifies start and end value for a range.
-> +    # Don't enumerate anything for them.
-> +    for val_entry in val_entries:
-> +        if isinstance(val_entry, dict) and \
-> +           val_entry.get("_type") == "Values.ValueRange":
-> +               return []
-> +
->      for val_entry in val_entries:
->          if not isinstance(val_entry, dict):
->              continue
-> -            
-> +
->          if val_entry.get("_type") == "Values.Value":
-> -            raw_val = val_entry.get("value")
-> -            if raw_val is None:
-> +            int_val = parse_value_int(val_entry.get("value"))
-> +            if int_val is None:
->                  continue
-> -                
-> -            # some of the values have ' like "'0100'"
-> -            raw_val_str = str(raw_val).strip().replace("'", "")
-> -            
-> -            try:
-> -                # convert into bin 
-> -                int_val = int(raw_val_str, 2)
-> -            except ValueError:
-> -                try:
-> -                    # Fallback to dec if not bin
-> -                    int_val = int(raw_val_str, 0)
-> -                except ValueError:
-> -                    continue
-> -            
-> -            enums.append({
-> -                'value': int_val
-> -            })
-> -            
-> +            enums.append({'value': int_val})
-> +
->      return enums
->  
->  def generate_sysreg_properties_from_registers_json(id_reg_names, raw_json_path):
-> --
-> 2.52.0
->
->
+> Warm Regards,
+> Khushit
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>
+>>> ---
+>>>
+>>> v5 -> v6:
+>>> - add the write capability
+>>> ---
+>>> target/arm/arm-qmp-cmds.c | 29 +++++++++++++++++++++++++++++
+>>> 1 file changed, 29 insertions(+)
+>>>
+>>> diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
+>>> index 83ec95c290..edcfc82a25 100644
+>>> --- a/target/arm/arm-qmp-cmds.c
+>>> +++ b/target/arm/arm-qmp-cmds.c
+>>> @@ -21,6 +21,7 @@
+>>>  */
+>>>
+>>> #include "qemu/osdep.h"
+>>> +#include "qemu/error-report.h"
+>>> #include "qemu/target-info.h"
+>>> #include "hw/core/boards.h"
+>>> #include "kvm_arm.h"
+>>> @@ -84,6 +85,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+>>>                                                      Error **errp)
+>>> {
+>>>     CpuModelExpansionInfo *expansion_info;
+>>> +    ObjectPropertyIterator iter;
+>>> +    ObjectProperty *idregprop;
+>>>     const QDict *qdict_in;
+>>>     QDict *qdict_out;
+>>>     ObjectClass *oc;
+>>> @@ -145,6 +148,20 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+>>>         }
+>>>
+>>>         qdict_in = qobject_to(QDict, model->props);
+>>> +
+>>> +        object_property_iter_init(&iter, obj);
+>>> +
+>>> +        while ((idregprop = object_property_iter_next(&iter))) {
+>>> +            if (!g_str_has_prefix(idregprop->name, "SYSREG_")) {
+>>> +                continue;
+>>> +            }
+>>> +            if (qdict_get(qdict_in, idregprop->name)) {
+>>> +                if (!object_property_set(obj, idregprop->name, visitor, &err)) {
+>>> +                    break;
+>>> +                }
+>>> +            }
+>>> +        }
+>>> +
+>>>         i = 0;
+>>>         while ((name = cpu_model_advertised_features[i++]) != NULL) {
+>>>             if (qdict_get(qdict_in, name)) {
+>>> @@ -190,6 +207,18 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+>>>         }
+>>>     }
+>>>
+>>> +    object_property_iter_init(&iter, obj);
+>>> +
+>>> +    while ((idregprop = object_property_iter_next(&iter))) {
+>>> +        QObject *value;
+>>> +
+>>> +        if (!g_str_has_prefix(idregprop->name, "SYSREG_")) {
+>>> +            continue;
+>>> +        }
+>>> +        value = object_property_get_qobject(obj, idregprop->name, &error_abort);
+>>> +        qdict_put_obj(qdict_out, idregprop->name, value);
+>>> +    }
+>>> +
+>>>     if (!qdict_size(qdict_out)) {
+>>>         qobject_unref(qdict_out);
+>>>     } else {
 >
 
