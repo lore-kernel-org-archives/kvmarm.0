@@ -1,113 +1,75 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480E1347514
-	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 20:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7BE35201E
+	for <kvmarm@lists.linux.dev>; Wed,  1 Jul 2026 23:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782939372; cv=none; b=jO3ZB+ZPjDAaE6K17XWXsPwLPm4c6K7ND+a9fpCUSNV7SWbJNrK06tGiOBSaAn7qbDTBfJKz42UaDz1Qvo8H3VRaOQ4TVxp7HBXCkyDga0GruYBYL4syuiXwnc6rzIHD989j50gSsfte3y3sHYv5HdpV+HrzkFPUs2sJYoEEAvY=
+	t=1782947796; cv=none; b=aEfirBIhaZHIxuf2IsglX/HeYCS2WD5/wHHwDNAZROXAC3Tf36H+L0MVNUFJI5sMM02IlcmbAzJDkwsJTv+iJ4s5TchYYmaW/6Qz7dcQZvyvDr+4BD/QNZZrc0pN3jMlW7STVuUA/nnsTUU4jEqg/TszHz6YUEM6HHsVFgipNSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782939372; c=relaxed/simple;
-	bh=lYHvHu/DMj38a13ilyT9SCdihJwz+PKdHRiAsZB9q5M=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Tj6gThinDmk6GnjDOVSw6HUKUFQQMgu7+8IdW30mLzju3zc20Ukkiykfk3iKUya7KiqbDyu+K0ytwMgjZtmBk1ruyiWU3IwHuwxNy71i9hTyhsM+yvjEe7TN47fWxY6LZgcrwkuOuUKnufOgp178kbndC8/LunmfbhuOJog7g7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ur8E5uGb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782947796; c=relaxed/simple;
+	bh=pDkTB/DorVP+bAB4xov6DS6cmLax7raAfTTL29usDOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OjsLudPQ9BOJKQ4q8HqJhcNmuNYBGmWnb4p3O0wpm+xf4qn+bez1FvJeiU5FwnGPhkWzBpT0qHRaxITB2AmPHtsyvz4Oo5yM4s3UGYlXf5/6MPpD80vQwNru+wJIF02YXC6z4iHPx6mzrzDlB0YFGd+c2TbLLgmTqGxsebAQDEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCqa6RhE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ur8E5uGb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA5971F000E9;
-	Wed,  1 Jul 2026 20:56:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCqa6RhE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E5041F000E9;
+	Wed,  1 Jul 2026 23:16:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782939370;
-	bh=Z7AIkw6EuF9f8qndTmupN/Zb/7w933pXN4nhkaOTciA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Ur8E5uGbmSz3BqTypW3dJaPrmOzc00Jmirnk6+EIMnFH76xFo7Ecael85j9luO3iC
-	 ww0KtMGtbekJTOKG0hM2NeGFF8fBEI4EY4URA8KDKd9LxmQ2TR23/NLnxQlbVAm5Iy
-	 ObMeFXc0jNg322lr6xSootmGZHDzJHRoTZC5pWG/1BLqf2iqcBvKQjjAd8FvnsQDAV
-	 SfXrHkBGSW5VXfnEw1/JOxbE8FUiqcA0wxjWdaQ/Zwkbu7I7njSUyP5PfVbZWjR47I
-	 klnMnHKFpQZeOmSXpbuOpftalobIeho1cqxUsUR1tEl5e94QmQZlO2e8lRr1t7y9dU
-	 4tORsHY1ccufA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/5] arm64: Treat HCR_EL2.E2H as RES1 when
- ID_AA64MMFR4_EL1.E2H0 is negative
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260701204342.2654385-3-coltonlewis@google.com>
-References: <20260701204342.2654385-1-coltonlewis@google.com>
- <20260701204342.2654385-3-coltonlewis@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Jul 2026 20:56:10 +0000
-Message-Id: <20260701205610.AA5971F000E9@smtp.kernel.org>
+	s=k20260515; t=1782947792;
+	bh=WRyz9Vh487BDYIFx7AbXC+KRAbvVVVDHjmFL2zW57jU=;
+	h=From:To:Cc:Subject:Date;
+	b=QCqa6RhEAnqYWvuKqmB5Y2L08NaID0VD0AU/18rRZa0WPHVd2K61ZS/CXfWnUr6JL
+	 AgFB7cqwfO3Y1sZGvxKuY5llmGbr/Y9rTrYgxGwBCotsyyly8Apu1r8NTUJWUwsX7g
+	 uzYlcLo4wK86IacQGOY9sDA5AQbrta8q9rmpSfmRykIfovW/XARrvi7auXPRwEnLsg
+	 VvU7wvhBKMml8gzcj93//Q6cMPZ51sUcEtzCNnFMcqVJ6ucJCn/MpOJ+2Y/x265rW/
+	 vcB72fIRvNw+XdcgEbBgm30Lv7glHdP7T49gh0dgiA1BdIKJrwloqQ8ZzMXrYlml2s
+	 d6RPy5QZaOLuA==
+From: Oliver Upton <oupton@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Oliver Upton <oupton@kernel.org>
+Subject: [PATCH 0/2] KVM: arm64: Fixes for S2 permission relaxation
+Date: Wed,  1 Jul 2026 16:16:18 -0700
+Message-ID: <20260701231620.3300204-1-oupton@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] The `ubfx` instruction zeroes out the upper bits of `x0`, causing =
-the subsequent `tbnz` instruction to test a bit that is unconditionally zer=
-o, meaning the branch to the VHE-only boot path is never taken.
---
+Couple of small fixes for S2 permission relaxation.
 
-commit 917edd241242a39cab8dc68759b48cf9583ba1a0
-Author: Marc Zyngier <maz@kernel.org>
+The first patch looks a bit worse than it actually is, potentially
+consuming an uninitialized stack variable as a TLBI TTL hint in the
+event of a race to update the PTE. However, if the bad TTL value results
+in the stale TLB entry remaining valid, the vCPU will just fault again
+and (hopefully) avoid the race.
 
-arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is negative
+Second patch is of a similar flavor, where the permission relaxation was
+unconditionally updating XN, potentially reaping execute permissions
+when handling a write fault. The consequence of this is taking an
+unintended execute permission fault to restore the original XN value.
 
-This commit tweaks early boot logic in init_el2 to check ID_AA64MMFR4_EL1.E=
-2H0
-before HCR_EL2.E2H. It aims to properly support CPUs that advertise
-VHE-onlyness with a negative E2H0 value. I see this issue was addressed in a
-later commit (b196767cce7549b6fb016f11fb98e5c15bbcaa71), but I wanted to po=
-int
-it out here for the historical record.
+Applies to 7.2-rc1.
 
-Link: https://lore.kernel.org/r/20240122181344.258974-8-maz@kernel.org
+Oliver Upton (2):
+  KVM: arm64: Ensure level is always initialized when relaxing perms
+  KVM: arm64: Only update XN attr when requested during S2 relaxation
 
-> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> index 6517bf2644a08..e32c8dd0b17a7 100644
-> --- a/arch/arm64/kernel/head.S
-> +++ b/arch/arm64/kernel/head.S
+ arch/arm64/kvm/hyp/pgtable.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-[ ... ]
 
-> @@ -589,25 +589,32 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
->  	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
-> =20
->  	/*
-> -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
-> -	 * making it impossible to start in nVHE mode. Is that
-> -	 * compliant with the architecture? Absolutely not!
-> +	 * Compliant CPUs advertise their VHE-onlyness with
-> +	 * ID_AA64MMFR4_EL1.E2H0 < 0. HCR_EL2.E2H can be
-> +	 * RES1 in that case.
-> +	 *
-> +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
-> +	 * don't advertise it (they predate this relaxation).
->  	 */
-> +	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
-> +	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-> +	tbnz	x0, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH - =
-1), 1f
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+-- 
+2.47.3
 
-[Severity: High]
-Does this tbnz instruction in init_el2 check a bit that was just cleared?
-
-The ubfx instruction extracts the 4-bit field to x0[3:0] and explicitly=20
-zero-extends the rest of the register. Since the shift is 24 and the width=
-=20
-is 4, the bit being tested by tbnz (24 + 4 - 1 =3D 27) will always evaluate=
-=20
-to zero after the ubfx operation.
-
-Will this cause the kernel to bypass the intended VHE-only boot path and fa=
-il=20
-to boot in hVHE mode on systems without FEAT_E2H0?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260701204342.2654=
-385-1-coltonlewis@google.com?part=3D2
