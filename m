@@ -1,173 +1,253 @@
-Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E39377006
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0373AC0E4
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783033457; cv=none; b=TJHRCSaf+pi0KZlXLJSIULlU6qFlvju1BHYv+3ef7SZmKWAwmPiqNrKyAaCZ0KwBj2uXUds/zLJohi/weyBKI1J75fTFgXPno3u1By4Di43vDroM7E+z5HsKa1yQWhj9oZ9dMBTtrYECljn6gx/c63xbIJrwBe3IkXIdfd1tdeU=
+	t=1783035340; cv=none; b=IOaY2J4mmEV/zVrIjC6SkdIUm7TWSdBSj73jWtkOpIRpUwRaIIHuorYRPJoKqjKGWn+GtGEkpfketPvIx1NBhN9tj+hq1y3ZkXQ37meBIr+XdKXtKBr5ZF8t9Yp6HJ4lTdySFGi1HnwUsKtVu6pWS3IERVSiQmLMpInOrXAPkLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783033457; c=relaxed/simple;
-	bh=SzSr1oCqgTulCTXhvORBDKf3m8KOYxNNU1XaE1bIAds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a7VSLcIn6w7Hq/Ahi+NDs2aylvhqM5QWcvl6B9K9lnRa0sYFuuhbUehZrFNxRgpYblCDgik/Ciq28S89V3m5giih7ZT1IX60W7ja6J8nWMhSg6X+c6mAabPnEVjIXPO/J9Q1BKVHl0w8OP3CpClmpRKXNDBOv8r/11zj8PIe9Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=Zou+f/3x; arc=none smtp.client-ip=139.138.61.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1783035340; c=relaxed/simple;
+	bh=CE3zTd7jgcg+4nIuXpXocZe7qBHqVS9qM0qJDLRF/IY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uMS1saKvcbF0eWnf20B67CMuHQfKNl7BZjknkSN94bKGUV5sQM5xlYaAnxm6y/Sld0f7gPlU6NyqbilphSsG7Q744AFM3DtuihmOaRj94tFOJkZElTL1rlsH5D4szKN0BoAf7zc7+Wdjwv8Q8NtJMIBjFf11q4xZkI9aPknpKeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YgssDtrE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5121OBXH; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YgssDtrE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5121OBXH; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="Zou+f/3x"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1783033456; x=1814569456;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SzSr1oCqgTulCTXhvORBDKf3m8KOYxNNU1XaE1bIAds=;
-  b=Zou+f/3xKbhJWoEw+/553g4AQ27y3DSzeaN4/7bCSWtciMIudwTdEZNq
-   /dNITwfMLp8pOdCuL0/Q1wcG7P3lsL3ZiftfVK9tg/cvNcUygDJLgDnRo
-   OlT5mmGzl1DlDkrLGGe3n2ShUT+iyMt+atGHUHqi3G4QY4npAu3LMXRme
-   0kQPDmGm4crE09aAjQLGrqm0PbozSLegHIckygbK7Hnp0x/4fDnuuJPzQ
-   huL1hkKwIRf9WVcRDGsTPrG0EidTTgKfkhtYD/EytNhD6V5LAKsCQ5Ggw
-   wgBQOBgsf+D+r/bcvCp7S8jOJY14m8CehKFO2BtQJXZRFGMUBIGHH3bmk
-   A==;
-X-CSE-ConnectionGUID: AB11NX/ZSHOhAW94D8zHNA==
-X-CSE-MsgGUID: zQOFqf6ISOmbobCO83tTbw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11835"; a="225009869"
-X-IronPort-AV: E=Sophos;i="6.25,144,1779116400"; 
-   d="scan'208";a="225009869"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 08:03:04 +0900
-Received: from az2uksmgm3.o.css.fujitsu.com (unknown [10.151.22.200])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YgssDtrE";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5121OBXH";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YgssDtrE";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5121OBXH"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id B90841C1C707
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:03:04 +0000 (UTC)
-Received: from az2uksmom4.o.css.fujitsu.com (unknown [10.151.22.204])
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 27B0B7623E;
+	Thu,  2 Jul 2026 23:35:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783035336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=J49rRWK+qTk3ZnrtvyvNoD7HOLGONSLhcd4y/Bizufk=;
+	b=YgssDtrEEmGzdbbzS2YgPuyqF/rCu/UGawglGjkbRyTyveZMYhkUWuz0/HhgD1h7Oogamp
+	/IQiYzUA1/5DTTZ8jw4yCh+/f4SSZy36Jd1f2clLCaHHDmsUjJcULv/GdgTZLkl/sj+ByE
+	2NFenXWytz65z0tVvinp+UlUu5wPXFM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783035336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=J49rRWK+qTk3ZnrtvyvNoD7HOLGONSLhcd4y/Bizufk=;
+	b=5121OBXHUo21gfnnQcH+v7dnhd/ubWpmOt/vrYAf7kWlDg8KavOXqs8RXX7V/2k0JyR4z/
+	dlb4cmtrruVT+WCw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=YgssDtrE;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=5121OBXH
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783035336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=J49rRWK+qTk3ZnrtvyvNoD7HOLGONSLhcd4y/Bizufk=;
+	b=YgssDtrEEmGzdbbzS2YgPuyqF/rCu/UGawglGjkbRyTyveZMYhkUWuz0/HhgD1h7Oogamp
+	/IQiYzUA1/5DTTZ8jw4yCh+/f4SSZy36Jd1f2clLCaHHDmsUjJcULv/GdgTZLkl/sj+ByE
+	2NFenXWytz65z0tVvinp+UlUu5wPXFM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783035336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=J49rRWK+qTk3ZnrtvyvNoD7HOLGONSLhcd4y/Bizufk=;
+	b=5121OBXHUo21gfnnQcH+v7dnhd/ubWpmOt/vrYAf7kWlDg8KavOXqs8RXX7V/2k0JyR4z/
+	dlb4cmtrruVT+WCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by az2uksmgm3.o.css.fujitsu.com (Postfix) with ESMTPS id 70E7CC02F16
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:03:04 +0000 (UTC)
-Received: from sm-arm-grace07 (unknown [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTPS id 924EA40261C;
-	Thu,  2 Jul 2026 23:02:59 +0000 (UTC)
-Date: Fri, 3 Jul 2026 08:02:56 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>,
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7AFBD779AA;
+	Thu,  2 Jul 2026 23:35:35 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id wlNIG8f1Rmo6QgAAD6G6ig
+	(envelope-from <clopez@suse.de>); Thu, 02 Jul 2026 23:35:35 +0000
+From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
+To: kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
-Message-ID: <akbuIDmd_zH9_m6K@sm-arm-grace07>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <akYLdEuPXEGIZx3E@sm-arm-grace07>
- <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
+	linux-arm-kernel@lists.infradead.org (moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64))
+Subject: [PATCH] KVM: arm64: vgic: Fix race between LPI release and re-registration
+Date: Fri,  3 Jul 2026 01:35:14 +0200
+Message-ID: <20260702233514.2581921-1-clopez@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 27B0B7623E
+X-Spam-Flag: NO
+X-Spam-Score: -3.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_ALL(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email,suse.de:mid];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-On Thu, Jul 02, 2026 at 08:41:43AM +0100, Wei-Lin Chang wrote:
-> On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
-> > Hi Wei-Lin,
-> > On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
-> > > Hi,
-> > > 
-> > > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
-> > > per mmu ptdump files work after all, mainly because there isn't a clean way to
-> > > locate the specific nested mmu for each ptdump file as the nested mmus could be
-> > > freed when the file gets opened. Therefore in this series a single file
-> > > "shadow_page_tables" is created that dumps all valid mmus' page table
-> > > information.
-> > > 
-> > > An advantage of this is that this new ptdump file have a lifetime identical to
-> > > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
-> > > dentry UAF found last time [1].
-> > > 
-> > > With this all ptdump files are only removed when the last kvm reference gets
-> > > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
-> > > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
-> > > prevent UAF.
-> > > 
-> > > Patch 1-2: Undo previous shadow ptdump implementation.
-> > > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
-> > >            mmu->pgt is freed.
-> > > Patch 4-5: Preparation for the shadow page table dump file.
-> > > Patch 6:   Implementation of the shadow page table dump file.
-> > > 
-> > > The fixes are tested with CONFIG_PROVE_LOCKING,
-> > > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
-> > > 
-> > > Thanks!
-> > 
-> > Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
-> > for shadow stage 2 translation tables are built with ia_bits = 52 and
-> > start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
-> > out that's 3 levels. Is this fully expected?
-> 
-> Where is this level information you are seeing from? If it is
-> "stage2_level", that only reports the number of levels for the canonical
-> stage-2 (non nested). For nested mmus only the page tables are dumped in
-> nested/shadow_page_tables.
+Fix a potential race between decrementing an LPI's reference count and
+evicting that structure from the LPI xarray.
 
-Yes I know. The initial stage 2 translation table structure information is obtained by 
-instrumenting the kernel using eBPF fexit to __kvm_pgtable_stage2_init().
+LPI structures are maintained in the VGIC LPI xarray (dist->lpi_xa).
+When the reference count of an LPI structure drops to zero,
+vgic_release_lpi_locked() removes the structure from the xarray and
+frees it under the xarray lock.
 
-Since you're correctly loopin over nested_mmus array, and the output is
-correctly shown using the kvm_pgtable information via the kvm_s2_mmu for
-them, I am confused at this moment.
+However, the release of an LPI can race with a concurrent LPI
+re-registration with the same INTID via vgic_add_lpi() on another CPU,
+since the reference count drop and the xarray eviction are not performed
+in a single atomic step. This can happen e.g. if the guest issues a
+DISCARD while the LPI is still referenced from a vCPU's active-pending
+list (ap_list), and the same INTID is re-mapped via MAPTI.
 
-Thanks,
-Itaru.
+Particularly, vgic_release_lpi_locked() is called from two distinct
+paths: direct release via vgic_put_irq(), and deferred release via
+vgic_release_deleted_lpis(). During direct release, the issue can result
+in deleting a newly registered LPI from the xarray:
 
-> 
-> Thanks,
-> Wei-Lin Chang
-> 
-> > 
-> > Thanks,
-> > Itaru.
-> > 
-> > > 
-> > > * Changes from v1 ([2]):
-> > > 
-> > >   - Move from per mmu ptdump files to one file that will dump all shadow page
-> > >     tables.
-> > > 
-> > > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
-> > > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
-> > > 
-> > > Wei-Lin Chang (6):
-> > >   KVM: arm64: ptdump: Remove shadow ptdump files
-> > >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
-> > >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-> > >   KVM: arm64: ptdump: Factor out initialization of
-> > >     kvm_ptdump_guest_state
-> > >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
-> > >     ptdump path
-> > >   KVM: arm64: ptdump: Introduce the shadow ptdump file
-> > > 
-> > >  arch/arm64/include/asm/kvm_host.h |   5 +-
-> > >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
-> > >  arch/arm64/kvm/nested.c           |  18 +--
-> > >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
-> > >  4 files changed, 135 insertions(+), 77 deletions(-)
-> > > 
-> > > -- 
-> > > 2.43.0
-> > > 
+  CPU0 (Releasing LPI)                    CPU1 (Adding new LPI)
+  ====================                    =====================
+  vgic_put_irq()
+      __vgic_put_irq()
+          refcount_dec_and_test()
+                                          vgic_add_lpi()
+                                              xa_lock_irqsave(..);
+                                              old_irq = xa_load(&dist->lpi_xa, intid);
+                                              vgic_try_get_irq_ref(old_irq) == false
+                        new IRQ inserted -->  __xa_store(&dist->lpi_xa, intid, ..)
+                                              xa_unlock_irqrestore(..);
+  xa_lock_irqsave(..);
+  vgic_release_lpi_locked()
+      __xa_erase(&dist->lpi_xa, irq->intid);   <-- BUG: new IRQ is erased
+      kfree_rcu(old_irq)
+
+During the deferred release path, the old IRQ can be leaked:
+
+  CPU0 (Releasing LPI)                    CPU1 (Adding new LPI)
+  ====================                    =====================
+  vgic_put_irq_norelease()
+      __vgic_put_irq()
+          refcount_dec_and_test()
+      irq->pending_release = true
+                                          vgic_add_lpi()
+                                              xa_lock_irqsave(..);
+                                              old_irq = xa_load(&dist->lpi_xa, intid);
+                                              vgic_try_get_irq_ref() == false
+                 BUG: old IRQ overwritten --> __xa_store(&dist->lpi_xa, intid, ..)
+                                              xa_unlock_irqrestore(..);
+
+  vgic_release_deleted_lpis()
+      xa_lock_irqsave(..);
+      xa_for_each() { .. } <-- old IRQ with pending_release = true
+                               is gone, so it cannot be released
+
+Fix both issues with two coordinated changes. On the release path,
+erase and free the IRQ only if the xarray entry still contains the IRQ
+being released. On the registration path, if a dead LPI is encountered
+(non-NULL entry with refcount=0), release the old structure after
+storing the new one. This ensures that whichever CPU acquires the
+xarray lock first, it will take on the responsibility of releasing a
+to-be-cleaned-up LPI.
+
+Reported-by: Claude:claude-opus-4-6
+Fixes: 3a08a6ca7c37 ("KVM: arm64: vgic-v3: Use bare refcount for VGIC LPIs")
+Fixes: d54594accf73 ("KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks")
+Signed-off-by: Carlos López <clopez@suse.de>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 10 +++++++++-
+ arch/arm64/kvm/vgic/vgic.c     | 14 ++++++++++++--
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 67d107e9a77d..42983d5211cc 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -116,7 +116,15 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 		kfree(irq);
+ 		irq = oldirq;
+ 	} else {
+-		ret = xa_err(__xa_store(&dist->lpi_xa, intid, irq, 0));
++		/*
++		 * The entry is either empty or contains an IRQ whose refcount is 0
++		 * but has not yet been freed by vgic_release_lpi_locked(). Evict the
++		 * IRQ and free it, if there is one.
++		 */
++		oldirq = __xa_store(&dist->lpi_xa, intid, irq, 0);
++		ret = xa_err(oldirq);
++		if (!ret && oldirq)
++			kfree_rcu(oldirq, rcu);
+ 	}
+ 
+ 	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 5a4768d8cd4f..b7f6b6c4dcf2 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -131,9 +131,19 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
+ 
+ static void vgic_release_lpi_locked(struct vgic_dist *dist, struct vgic_irq *irq)
+ {
++	struct vgic_irq *old;
++
+ 	lockdep_assert_held(&dist->lpi_xa.xa_lock);
+-	__xa_erase(&dist->lpi_xa, irq->intid);
+-	kfree_rcu(irq, rcu);
++
++	/*
++	 * Free the IRQ if it is still present in the xarray, as its entry could have
++	 * been overwritten after the refcount was dropped, but before the xarray lock
++	 * was acquired. If the cmpxchg fails, vgic_add_lpi() grabbed the lock first
++	 * and freed the old IRQ along the way.
++	 */
++	old = __xa_cmpxchg(&dist->lpi_xa, irq->intid, irq, NULL, 0);
++	if (old == irq)
++		kfree_rcu(irq, rcu);
+ }
+ 
+ static __must_check bool __vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+
+base-commit: 1ee27dacbe5dc4def481794d899d67b0d4570094
+-- 
+2.51.0
+
