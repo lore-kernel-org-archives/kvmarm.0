@@ -1,60 +1,60 @@
-Received: from esa6.hc1455-7.c3s2.iphmx.com (esa6.hc1455-7.c3s2.iphmx.com [68.232.139.139])
+Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9483B19A9
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 21:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E39377006
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783028968; cv=none; b=CNHKJ5YbPiqSJFZisIbCd3Oe0fV7vCsO5g9F3p6V43cD65Y9bIyumXQIt2Z+v3+C7e/03ebf7I2ammvRVNis0ZYXEs4zOIoOXLRGJVBNc0oyeugmAN0wHTXUbETtuTl65n66EZnu6Bk3D+sCv63v/KtKspoIPR0N/u989cMXMXQ=
+	t=1783033457; cv=none; b=TJHRCSaf+pi0KZlXLJSIULlU6qFlvju1BHYv+3ef7SZmKWAwmPiqNrKyAaCZ0KwBj2uXUds/zLJohi/weyBKI1J75fTFgXPno3u1By4Di43vDroM7E+z5HsKa1yQWhj9oZ9dMBTtrYECljn6gx/c63xbIJrwBe3IkXIdfd1tdeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783028968; c=relaxed/simple;
-	bh=eQ/r81yq7SBHVmjU6sNi5AKmD7P2Gx79kRYPEcoBKn4=;
+	s=arc-20240116; t=1783033457; c=relaxed/simple;
+	bh=SzSr1oCqgTulCTXhvORBDKf3m8KOYxNNU1XaE1bIAds=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dOEotNPtlRYfpVp+749lA0cvsevVnbKjLyWxtXTfbjVlygoljoe3XzS1fjndpAk418lQioMYAKdxqJGmhS7dduiGSjNXsaLTa278n9UluvNe0WznTv9Xuf4H0KX6cP6Nt9bt8d4ILdL5S4lXbYqutSPimGYcVwjZtnd4aXaUcZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=COj5PHM+; arc=none smtp.client-ip=68.232.139.139
+	 Content-Type:Content-Disposition:In-Reply-To; b=a7VSLcIn6w7Hq/Ahi+NDs2aylvhqM5QWcvl6B9K9lnRa0sYFuuhbUehZrFNxRgpYblCDgik/Ciq28S89V3m5giih7ZT1IX60W7ja6J8nWMhSg6X+c6mAabPnEVjIXPO/J9Q1BKVHl0w8OP3CpClmpRKXNDBOv8r/11zj8PIe9Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=Zou+f/3x; arc=none smtp.client-ip=139.138.61.252
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="COj5PHM+"
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="Zou+f/3x"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1783028968; x=1814564968;
+  t=1783033456; x=1814569456;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=eQ/r81yq7SBHVmjU6sNi5AKmD7P2Gx79kRYPEcoBKn4=;
-  b=COj5PHM+pXEByKDdK3N2zJtLAaujtA5as+RzV7qcHycHr/DYA3AwMVPq
-   h3L4Ic/iOIcUsQwlhXuSLfWU42DL1kDCPtUi76T1KQnvSnTQwNtcOON5G
-   3Db1+NJHTMG9/RKUXb9/YtYgX5jg+j0mG/W4OmF9OMskDWnuTZx/yCDUM
-   s4HRpGLQbV+l+gpqbKlGMIgFWivoDewQvSYNy5+Z9K46DnGTtaaU0PxUV
-   Cq1r8ncqW2V9g+4BCLxvx5FoowYyrGOK2JeI6AeUPLCUevgssmRbqOfpq
-   zQEvSqnq4VYnU5lbpZA4x2NXCAOXuV+1eaIt+wirgsGe9hv/znJ1bdHTU
-   w==;
-X-CSE-ConnectionGUID: go7h+TCdS16+MtsMOyy+Tw==
-X-CSE-MsgGUID: JCwFnP0AQCeSZXad+0cPsg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11835"; a="249536182"
+  bh=SzSr1oCqgTulCTXhvORBDKf3m8KOYxNNU1XaE1bIAds=;
+  b=Zou+f/3xKbhJWoEw+/553g4AQ27y3DSzeaN4/7bCSWtciMIudwTdEZNq
+   /dNITwfMLp8pOdCuL0/Q1wcG7P3lsL3ZiftfVK9tg/cvNcUygDJLgDnRo
+   OlT5mmGzl1DlDkrLGGe3n2ShUT+iyMt+atGHUHqi3G4QY4npAu3LMXRme
+   0kQPDmGm4crE09aAjQLGrqm0PbozSLegHIckygbK7Hnp0x/4fDnuuJPzQ
+   huL1hkKwIRf9WVcRDGsTPrG0EidTTgKfkhtYD/EytNhD6V5LAKsCQ5Ggw
+   wgBQOBgsf+D+r/bcvCp7S8jOJY14m8CehKFO2BtQJXZRFGMUBIGHH3bmk
+   A==;
+X-CSE-ConnectionGUID: AB11NX/ZSHOhAW94D8zHNA==
+X-CSE-MsgGUID: zQOFqf6ISOmbobCO83tTbw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11835"; a="225009869"
 X-IronPort-AV: E=Sophos;i="6.25,144,1779116400"; 
-   d="scan'208";a="249536182"
+   d="scan'208";a="225009869"
 Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa6.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 06:48:17 +0900
-Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
+  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 08:03:04 +0900
+Received: from az2uksmgm3.o.css.fujitsu.com (unknown [10.151.22.200])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id A00801C1C707
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 21:48:15 +0000 (UTC)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id B90841C1C707
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:03:04 +0000 (UTC)
 Received: from az2uksmom4.o.css.fujitsu.com (unknown [10.151.22.204])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id 58718148AD36
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 21:48:15 +0000 (UTC)
+	by az2uksmgm3.o.css.fujitsu.com (Postfix) with ESMTPS id 70E7CC02F16
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 23:03:04 +0000 (UTC)
 Received: from sm-arm-grace07 (unknown [10.124.178.20])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTPS id 7205640260E;
-	Thu,  2 Jul 2026 21:48:10 +0000 (UTC)
-Date: Fri, 3 Jul 2026 06:48:07 +0900
+	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTPS id 924EA40261C;
+	Thu,  2 Jul 2026 23:02:59 +0000 (UTC)
+Date: Fri, 3 Jul 2026 08:02:56 +0900
 From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 To: Wei-Lin Chang <weilin.chang@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
@@ -67,11 +67,11 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: ptdump: Introduce the shadow ptdump
- file
-Message-ID: <akbcl8vFrpq40qUM@sm-arm-grace07>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
+Message-ID: <akbuIDmd_zH9_m6K@sm-arm-grace07>
 References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <20260630121005.1130996-7-weilin.chang@arm.com>
+ <akYLdEuPXEGIZx3E@sm-arm-grace07>
+ <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -80,155 +80,94 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260630121005.1130996-7-weilin.chang@arm.com>
+In-Reply-To: <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
 
-On Tue, Jun 30, 2026 at 01:10:05PM +0100, Wei-Lin Chang wrote:
-> Create a ptdump file for all shadow page tables. It will dump out all
-> valid shadow page tables at the time of request, with the mmu's index,
-> guest VTCR_EL2, VTTBR_EL2, and whether the guest stage-2 is enabled or
-> not.
+On Thu, Jul 02, 2026 at 08:41:43AM +0100, Wei-Lin Chang wrote:
+> On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
+> > Hi Wei-Lin,
+> > On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
+> > > Hi,
+> > > 
+> > > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
+> > > per mmu ptdump files work after all, mainly because there isn't a clean way to
+> > > locate the specific nested mmu for each ptdump file as the nested mmus could be
+> > > freed when the file gets opened. Therefore in this series a single file
+> > > "shadow_page_tables" is created that dumps all valid mmus' page table
+> > > information.
+> > > 
+> > > An advantage of this is that this new ptdump file have a lifetime identical to
+> > > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
+> > > dentry UAF found last time [1].
+> > > 
+> > > With this all ptdump files are only removed when the last kvm reference gets
+> > > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
+> > > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
+> > > prevent UAF.
+> > > 
+> > > Patch 1-2: Undo previous shadow ptdump implementation.
+> > > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
+> > >            mmu->pgt is freed.
+> > > Patch 4-5: Preparation for the shadow page table dump file.
+> > > Patch 6:   Implementation of the shadow page table dump file.
+> > > 
+> > > The fixes are tested with CONFIG_PROVE_LOCKING,
+> > > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
+> > > 
+> > > Thanks!
+> > 
+> > Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
+> > for shadow stage 2 translation tables are built with ia_bits = 52 and
+> > start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
+> > out that's 3 levels. Is this fully expected?
 > 
-> Also detach the nested mmu array under the mmu_lock in
-> kvm_arch_flush_shadow_all() so readers cannot race with the array being
-> removed, then free the old array after dropping the lock.
-> 
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> ---
->  arch/arm64/kvm/nested.c | 12 ++++++--
->  arch/arm64/kvm/ptdump.c | 61 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 69 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 6435efd65cb5..17a180ddf6ca 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1283,6 +1283,7 @@ void kvm_nested_s2_flush(struct kvm *kvm)
->  
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  {
-> +	struct kvm_s2_mmu *mmus;
->  	int i;
->  
->  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> @@ -1291,9 +1292,14 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
->  			kvm_free_stage2_pgd(mmu);
->  	}
-> -	kvfree(kvm->arch.nested_mmus);
-> -	kvm->arch.nested_mmus = NULL;
-> -	kvm->arch.nested_mmus_size = 0;
-> +
-> +	scoped_guard(write_lock, &kvm->mmu_lock) {
-> +		mmus = kvm->arch.nested_mmus;
-> +		kvm->arch.nested_mmus = NULL;
-> +		kvm->arch.nested_mmus_size = 0;
-> +	}
-> +
-> +	kvfree(mmus);
->  	kvm_uninit_stage2_mmu(kvm);
->  }
->  
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 40f93b7c7ad9..1649eaa75798 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -181,6 +181,50 @@ static int kvm_ptdump_guest_canonical_show(struct seq_file *m, void *unused)
->  	return 0;
->  }
->  
-> +static int kvm_ptdump_guest_nested_show(struct seq_file *m, void *unused)
-> +{
-> +	int ret = 0, i;
-> +	struct kvm_ptdump_guest_state *st = m->private;
-> +	struct kvm *kvm = st->kvm;
-> +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
-> +		.cb	= kvm_ptdump_visitor,
-> +		.arg	= &st->parser_state,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +	};
-> +
-> +	guard(write_lock)(&kvm->mmu_lock);
-> +
-> +	if (!kvm->arch.nested_mmus)
-> +		return 0;
-> +
-> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> +
-> +		if (!mmu->pgt)
-> +			continue;
-> +
-> +		if (kvm_s2_mmu_valid(mmu)) {
-> +			memset(st, 0, sizeof(*st));
-> +			ret = kvm_ptdump_parser_init(st, kvm, mmu->pgt);
-> +			if (ret)
-> +				return ret;
-> +			st->parser_state = (struct ptdump_pg_state) {
-> +				.marker		= &st->ipa_marker[0],
-> +				.level		= -1,
-> +				.pg_level	= &st->level[0],
-> +				.seq		= m,
-> +			};
-> +			seq_printf(m, "nested mmu %d VTCR: 0x%016llx VTTBR: 0x%016llx s2: %s\n",
-> +				   i, mmu->tlb_vtcr, mmu->tlb_vttbr,
-> +				   mmu->nested_stage2_enabled ? "enabled" : "disabled");
+> Where is this level information you are seeing from? If it is
+> "stage2_level", that only reports the number of levels for the canonical
+> stage-2 (non nested). For nested mmus only the page tables are dumped in
+> nested/shadow_page_tables.
 
-This header information in the debugfs "shadow_page_tables" file, under
-the nested directory is showing guest hypervisor's configuration while
-the file is designed to show nested guest's shadwo stage 2 translation
-tables layouts owned by Host EL2 hypervisor. Is this intentional?
+Yes I know. The initial stage 2 translation table structure information is obtained by 
+instrumenting the kernel using eBPF fexit to __kvm_pgtable_stage2_init().
+
+Since you're correctly loopin over nested_mmus array, and the output is
+correctly shown using the kvm_pgtable information via the kvm_s2_mmu for
+them, I am confused at this moment.
 
 Thanks,
 Itaru.
 
-> +			ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +	}
-> +	return ret;
-> +}
-> +
->  static int kvm_ptdump_guest_open(struct inode *m, struct file *file,
->  				 int (*show)(struct seq_file *, void *))
->  {
-> @@ -212,6 +256,11 @@ static int kvm_ptdump_guest_canonical_open(struct inode *m, struct file *file)
->  	return kvm_ptdump_guest_open(m, file, kvm_ptdump_guest_canonical_show);
->  }
->  
-> +static int kvm_ptdump_guest_nested_open(struct inode *m, struct file *file)
-> +{
-> +	return kvm_ptdump_guest_open(m, file, kvm_ptdump_guest_nested_show);
-> +}
-> +
->  static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
->  {
->  	struct kvm *kvm = m->i_private;
-> @@ -230,6 +279,13 @@ static const struct file_operations kvm_ptdump_guest_canonical_fops = {
->  	.release	= kvm_ptdump_guest_close,
->  };
->  
-> +static const struct file_operations kvm_ptdump_guest_nested_fops = {
-> +	.open		= kvm_ptdump_guest_nested_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= kvm_ptdump_guest_close,
-> +};
-> +
->  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
->  {
->  	struct kvm *kvm = m->private;
-> @@ -307,6 +363,9 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
->  			    kvm, &kvm_pgtable_range_fops);
->  	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
->  			    kvm, &kvm_pgtable_levels_fops);
-> -	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> +	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT)) {
->  		kvm->arch.debugfs_nv_dentry = debugfs_create_dir("nested", kvm->debugfs_dentry);
-> +		debugfs_create_file("shadow_page_tables", 0400, kvm->arch.debugfs_nv_dentry,
-> +				    kvm, &kvm_ptdump_guest_nested_fops);
-> +	}
->  }
-> -- 
-> 2.43.0
 > 
+> Thanks,
+> Wei-Lin Chang
+> 
+> > 
+> > Thanks,
+> > Itaru.
+> > 
+> > > 
+> > > * Changes from v1 ([2]):
+> > > 
+> > >   - Move from per mmu ptdump files to one file that will dump all shadow page
+> > >     tables.
+> > > 
+> > > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
+> > > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
+> > > 
+> > > Wei-Lin Chang (6):
+> > >   KVM: arm64: ptdump: Remove shadow ptdump files
+> > >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
+> > >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
+> > >   KVM: arm64: ptdump: Factor out initialization of
+> > >     kvm_ptdump_guest_state
+> > >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
+> > >     ptdump path
+> > >   KVM: arm64: ptdump: Introduce the shadow ptdump file
+> > > 
+> > >  arch/arm64/include/asm/kvm_host.h |   5 +-
+> > >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
+> > >  arch/arm64/kvm/nested.c           |  18 +--
+> > >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
+> > >  4 files changed, 135 insertions(+), 77 deletions(-)
+> > > 
+> > > -- 
+> > > 2.43.0
+> > > 
