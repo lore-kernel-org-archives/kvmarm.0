@@ -1,128 +1,198 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD7539479F
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 07:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF062DC79F;
+	Thu,  2 Jul 2026 08:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782978129; cv=none; b=Cm/W4HPsHO8DTe27SPobaEJzU6D4dyjFhXNefQQtd7DWYl8BaqGy9OUkQx6GYUqTQW6dHMglolvbRPRlMTCO/Z+9A3sdUDT3ByHofEU5uLiDMXplqqrlTE+nYtonoWg9FIFhrjbuhIKNLUnoQnlw6SF5uW8/CRHPWg6pV0Xu7Ug=
+	t=1782982768; cv=none; b=KlCytDaLWYPJ1mC7j5nPFHt6+3sdi/tcm06758D6e2J/qJiip2vod1UCt9s4MKuCYE6AzkClPBVGNud1aYloVmZcPyK6P4ZQBCyAO+rrgBeECxjcQxVDegCIXuJLfNQUgvVZ3iIPrVlKhMd3bHhcVi9/MoJYiRKcPD0gcFMdlGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782978129; c=relaxed/simple;
-	bh=DPzfo6/w+ULEP1PseWJbMhgHybRliNbNTvQjB2jqyGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pi82Ktxqcu+6bbYEnK8zNxV3aIxZSVuSWOqaCuAjUqwBUNzOtXw4g97y1xSDrpN7qrncEwfGC3271yu36jWStAVpgL1cL45JCd0oSgNGCOaXguSqmJ0Iwb5A7LPQD5CXxHPaLgUEZs2N9afkT57nCWzN8jVoxnoEuesx26UyUg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=c8Gtrz9D; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1782982768; c=relaxed/simple;
+	bh=wU8TzNA4MPzV7sDSd0TyVyIjzkf5ttSJ/KYWcuL98bA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tpsq232b6OzSHXFhO743ZB03V8+fkSa3l3zEjsuu5c/vfNvg76SZu3dBHaBXYCkZOajjNT7/Weg3eSTfxfgmF9VASgyjXKuCoXY5I9Mm+hjEkCOELoHRgbr28btsegqFN7upuAxhtoNxOVcznW1y1eU5iiqsnPqpceE3ateKCIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YExUfOca; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="c8Gtrz9D"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 026C8288E;
-	Thu,  2 Jul 2026 00:42:01 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 307CA3F85F;
-	Thu,  2 Jul 2026 00:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782978125; bh=DPzfo6/w+ULEP1PseWJbMhgHybRliNbNTvQjB2jqyGA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c8Gtrz9D82PDtqc+9tsHSuV/kv/KTXFr41Tx6UUyVGL3vCTtsynONLT5HPkP/YK1U
-	 Oj7wS2TVn5u2PM90po5FDjIMhnm72OWFfvNhkWIlD7b9OATWlEZ5fuEbE/N+7mrX3x
-	 xQKn0Qcn4cCxI2+d4YZt0stj0pIe4NNXnca7JXNI=
-Date: Thu, 2 Jul 2026 08:41:43 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
-Message-ID: <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <akYLdEuPXEGIZx3E@sm-arm-grace07>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YExUfOca"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57D5E1F000E9;
+	Thu,  2 Jul 2026 08:59:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782982766;
+	bh=l2velwsnohbwy8q48d6Bt5Uv2TXPTqq28bnIf7woLN4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=YExUfOcaKfYTXXu7qIUP3JOAwAlriclxvx0JyfiXQ3Lue2ctRmQYDhnh4NAuMYnmA
+	 duR5tazcXZgMxbUXYjPX/Apr1FGGm1re+urMGaL/nNYgFhmBWR19eNdkJ320k9TbJP
+	 +PSZ4i3RVA83dKhiOlMkNC1ahazJ2ufI5NZwAnliDYMFNYkN1lWeKd+UvYCFURW7hC
+	 2zTuHGfokdfFAXgIFAvM4Yd9TkMbDHce55uBTuELbMhdCu+Uw/Q+nWtmaN4x/Oj6N3
+	 y1FdqJSTU/UCZHLFl3PNVTxKXACbgYhrbd7EyhXv8/4qYdHync++WzEirdpbv1iE58
+	 29ksXmHHHbO0w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wfDGV-00000000e9O-498O;
+	Thu, 02 Jul 2026 08:59:24 +0000
+Date: Thu, 02 Jul 2026 09:59:23 +0100
+Message-ID: <86qzllpy1g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Bradley Morgan <include@grrlz.net>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Leonardo Bras <leo.bras@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] KVM: arm64: Record whether pKVM stage 2 mapping is cacheable
+In-Reply-To: <20260701192428.17430-1-include@grrlz.net>
+References: <20260701192428.17430-1-include@grrlz.net>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akYLdEuPXEGIZx3E@sm-arm-grace07>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: include@grrlz.net, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, vdonnefort@google.com, leo.bras@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
-> Hi Wei-Lin,
-> On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
-> > Hi,
-> > 
-> > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
-> > per mmu ptdump files work after all, mainly because there isn't a clean way to
-> > locate the specific nested mmu for each ptdump file as the nested mmus could be
-> > freed when the file gets opened. Therefore in this series a single file
-> > "shadow_page_tables" is created that dumps all valid mmus' page table
-> > information.
-> > 
-> > An advantage of this is that this new ptdump file have a lifetime identical to
-> > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
-> > dentry UAF found last time [1].
-> > 
-> > With this all ptdump files are only removed when the last kvm reference gets
-> > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
-> > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
-> > prevent UAF.
-> > 
-> > Patch 1-2: Undo previous shadow ptdump implementation.
-> > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
-> >            mmu->pgt is freed.
-> > Patch 4-5: Preparation for the shadow page table dump file.
-> > Patch 6:   Implementation of the shadow page table dump file.
-> > 
-> > The fixes are tested with CONFIG_PROVE_LOCKING,
-> > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
-> > 
-> > Thanks!
++ Vincent, Leo
+
+On Wed, 01 Jul 2026 20:24:28 +0100,
+Bradley Morgan <include@grrlz.net> wrote:
 > 
-> Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
-> for shadow stage 2 translation tables are built with ia_bits = 52 and
-> start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
-> out that's 3 levels. Is this fully expected?
+> pKVM keeps its own mapping list for stage 2 operations. Its flush path
+> uses that list directly, so it lost the PTE attribute check done by the
+> generic stage 2 walker.
+> 
+> Record whether a mapping is cacheable and skip cache maintenance for
+> mappings that are not cacheable.
+> 
+> Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+> Signed-off-by: Bradley Morgan <include@grrlz.net>
+> ---
+> Changes since V3:
+> - addressed some review :)
 
-Where is this level information you are seeing from? If it is
-"stage2_level", that only reports the number of levels for the canonical
-stage-2 (non nested). For nested mmus only the page tables are dumped in
-nested/shadow_page_tables.
+This isn't a change log. If you want to be taken seriously, I'd
+suggest you start by following the process. You are otherwise wasting
+people's time. Again.
 
-Thanks,
-Wei-Lin Chang
+You also failed to Cc people who have provided feedback on previous
+versions. That's not right.
 
 > 
-> Thanks,
-> Itaru.
+>  arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 41 insertions(+), 10 deletions(-)
 > 
-> > 
-> > * Changes from v1 ([2]):
-> > 
-> >   - Move from per mmu ptdump files to one file that will dump all shadow page
-> >     tables.
-> > 
-> > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
-> > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
-> > 
-> > Wei-Lin Chang (6):
-> >   KVM: arm64: ptdump: Remove shadow ptdump files
-> >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
-> >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-> >   KVM: arm64: ptdump: Factor out initialization of
-> >     kvm_ptdump_guest_state
-> >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
-> >     ptdump path
-> >   KVM: arm64: ptdump: Introduce the shadow ptdump file
-> > 
-> >  arch/arm64/include/asm/kvm_host.h |   5 +-
-> >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
-> >  arch/arm64/kvm/nested.c           |  18 +--
-> >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
-> >  4 files changed, 135 insertions(+), 77 deletions(-)
-> > 
-> > -- 
-> > 2.43.0
-> > 
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 053e4f733e4b..6d1cad890c7e 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
+>  	return m->gfn * PAGE_SIZE;
+>  }
+>  
+> +#define PKVM_MAPPING_NR_PAGES_MASK     GENMASK_ULL(47, 0)
+> +#define PKVM_MAPPING_NC                        BIT_ULL(48)
+> +
+> +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
+> +{
+> +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+> +}
+
+No. You've been pointed to the correct data structure (an anonymous
+structure containing bit fields). Please consider taking the review
+comments into account.
+
+This would avoid most of the churn in this patch, and make it easy to
+backport. Something like the untested hack below.
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 74fedd9c5ff02..cdddc9e3a11f5 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -195,7 +195,10 @@ struct pkvm_mapping {
+ 	struct rb_node node;
+ 	u64 gfn;
+ 	u64 pfn;
+-	u64 nr_pages;
++	struct {
++		unsigned long nr_pages:48;
++		unsigned int  nc:1;
++	};
+ 	u64 __subtree_last;	/* Internal member for interval tree */
+ };
+ 
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 428723b1b0f5c..5932b93bded58 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -369,7 +369,7 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
+ 
+ 	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+ 		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+-					mapping->nr_pages);
++					(u64)mapping->nr_pages);
+ 		if (WARN_ON(ret))
+ 			return ret;
+ 		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+@@ -473,6 +473,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	mapping->gfn = gfn;
+ 	mapping->pfn = pfn;
+ 	mapping->nr_pages = size / PAGE_SIZE;
++	mapping->nc = !!(prot & (KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC));
+ 	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+ 
+ 	return ret;
+@@ -503,7 +504,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	lockdep_assert_held(&kvm->mmu_lock);
+ 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+ 		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+-					mapping->nr_pages);
++					(u64)mapping->nr_pages);
+ 		if (WARN_ON(ret))
+ 			break;
+ 	}
+@@ -517,10 +518,11 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	struct pkvm_mapping *mapping;
+ 
+ 	lockdep_assert_held(&kvm->mmu_lock);
+-	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+-		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+-					  PAGE_SIZE * mapping->nr_pages);
+-
++	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
++		if (!mapping->nc)
++			__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
++						  PAGE_SIZE * mapping->nr_pages);
++	}
+ 	return 0;
+ }
+ 
+@@ -537,7 +539,7 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+ 	lockdep_assert_held(&kvm->mmu_lock);
+ 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+ 		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+-					   mapping->nr_pages, mkold);
++					   (u64)mapping->nr_pages, mkold);
+ 
+ 	return young;
+ }
+
+-- 
+Without deviation from the norm, progress is not possible.
