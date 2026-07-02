@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D507E4DB561
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 14:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5300C4DA528
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 14:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783002577; cv=none; b=Jh/fA3qXDmcgvt+l5T8qtAyESU5j8HxA2op5HnGpUSocFOrNi3IfbCkdf1m2B3clfpmk5PJBmFDa6Mrb8b71UWCF6YEBmwSdfFr6n4vH9Jl6Uv78CoZ6mG57oJ+ez8MM9MiOCn7RWxyusBK5Gs3T86MV8abLFT12UTe+5LPDxFo=
+	t=1783002580; cv=none; b=Tll7OBRki0npENdAbuN/WI8tirBZtuX25Y62NSxgZ6CAr5PqSb3zToYJv9KnWtgW8RvO2TdQsSZwnWn1mh2YPhH9iHL2aE7cJZtMuK7NqhlREH8UmdCOItrtEey4K/ZUWTrPHOmdNJehtfNp8w2+BZ5r3W+NVZzKLEEMKqTijPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783002577; c=relaxed/simple;
-	bh=bjWD2vILSQXIZllhkioupcthlnL7s1U2P1SakfeewUE=;
+	s=arc-20240116; t=1783002580; c=relaxed/simple;
+	bh=WgbFyb2eXKItzxCgEFOpscwp6g8ppePS7so0jNHjZjw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QOFP1he8S/NhknXZesEoSlbRh8H1VK0sBvkPwrlODjsgbu4ZB0/tM3+DALsVWePwAMk0/Ll9ZPWS9eBDC0DLI8aT0n/hSiASLTYQ68bpmi7g7wCcxgDXU0Ey8GwJDeN9y1zOrGS+NAN7CwzGKLjTAvYH2oRi/KzGYZxCi3n9Xi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=n5jPsuAG; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=OW2f6N8g8DQLa9mN0+O5dSsE6WQ5QehYK2Is66trz4Er1qc3LmR4NDX71KgJ4eOw300sHwbSFOQvMFOk31RaHAITG9hmXYOWiBtt59ZoTKtClytk6Vh70GlojMU/5DLVdqk7fyXh52UJXzBhzxGfv9qDzqik/O7HW/mupSyeE2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IQNpx2yg; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="n5jPsuAG"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IQNpx2yg"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E535C35A0;
-	Thu,  2 Jul 2026 07:29:30 -0700 (PDT)
-Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A9953F673;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6171B35A8;
 	Thu,  2 Jul 2026 07:29:33 -0700 (PDT)
+Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B6083F673;
+	Thu,  2 Jul 2026 07:29:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783002575; bh=bjWD2vILSQXIZllhkioupcthlnL7s1U2P1SakfeewUE=;
+	t=1783002577; bh=WgbFyb2eXKItzxCgEFOpscwp6g8ppePS7so0jNHjZjw=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=n5jPsuAGxaJvyFWYOBivmVwo1hy8kcMU+dIpAnL6KCNpTniMBSYF0O2ektk4QdFs0
-	 ymIHc5zH47Txs2+jTW2Gga/4cE2r/o4GzwnotQ+PRyIlyilhJd2IM6nWkFvaFcAQlz
-	 1bdNfTYx0c6BENyB5etfbcE99noabmEqimHMgNME=
+	b=IQNpx2ygYdLi5rjfHPz6RVqdHIILBz/xGJlQ43+Jep0KnmVtbP2oWgxlW7bUO0Nhd
+	 Neno79ZUQcjtMuEDhvDymCvrwhR8RagigtSsHrE8c/UNH9Qcux/w+xQXDSPEVatN/V
+	 tcTWt8abSekDA1LhpmLBWqY4VbSEMyGGHLbTb0Xw=
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: pbonzini@redhat.com,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ To: pbonzini@redhat.com,
 	kvmarm@lists.linux.dev,
 	fuad.tabba@linux.dev,
 	mark.rutland@arm.com
-Subject: [RFC PATCH 1/3] KVM: guest_memfd: Use memslot id to keep track of associated memslots
-Date: Thu,  2 Jul 2026 15:29:10 +0100
-Message-ID: <20260702142912.6395-2-alexandru.elisei@arm.com>
+Subject: [RFC PATCH 2/3] KVM: Implement dirty page logging for guest_memfd-only memslots
+Date: Thu,  2 Jul 2026 15:29:11 +0100
+Message-ID: <20260702142912.6395-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260702142912.6395-1-alexandru.elisei@arm.com>
 References: <20260702142912.6395-1-alexandru.elisei@arm.com>
@@ -55,245 +55,316 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To enable memslot operations, KVM maintains two arrays of memslots, and an
-RCU pointer to the active (in use) array. Changes are made first to the
-inactive array, and the RCU pointer is updated to point to the inactive
-array, which becomes active.
+The entire memory represented by guest_memfd-only memslot is shared and
+accessible by userspace. Enable dirty page logging for such memslots, and
+allow architectures to advertise support for it with the
+KVM_CAP_GUEST_MEMFD_MMAP_LOG_DIRTY_PAGES capability.
 
-The guest_memfd file maintains an xarray of pointers to memslots that use
-it as the memory provider. After the RCU pointer to the active memslots is
-updated and until SRCU is synchronized, readers can observe the old or the
-new value for the active array, and therefore the old or the new pointer
-for a given memslot.  For memslot creation or deletion that is not an issue
-for guest_memfd, as readers will either read the same memslot pointer saved
-by the guest_memfd file, or a non-existing memslot.
-
-But when changing the flags for a memslot, readers can read two different
-and non-NULL memslot pointers. Since there is no easy way to ensure that
-the memslot pointer that the guest_memfd stores is consistent with both
-views at the same time, modify how the guest_memfd file keeps track of the
-associated memslots: instead of storing the pointer directly, store the
-memslot id and address space id (as_id), and use that to reach the memslot
-in the active list of memslots.
-
-This only changes how guest_memfd keeps track of memslots, userspace is not
-allowed to make changes to a memslot yet.
+No architecture supports it yet.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- virt/kvm/guest_memfd.c | 95 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 80 insertions(+), 15 deletions(-)
+ Documentation/virt/kvm/api.rst |  9 +++++
+ include/linux/kvm_host.h       | 15 ++++++++
+ include/uapi/linux/kvm.h       |  1 +
+ virt/kvm/guest_memfd.c         | 70 ++++++++++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c            | 44 ++++++++++-----------
+ virt/kvm/kvm_mm.h              | 11 ++++++
+ 6 files changed, 128 insertions(+), 22 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index a5f9ee92f43e..5012afe6a9b5 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -9493,6 +9493,15 @@ take care to differentiate between these cases.
+ The presence of this capability indicates that the nested KVM guest can
+ start in ESA mode.
+ 
++8.48 KVM_CAP_GUEST_MEMFD_MMAP_LOG_DIRTY_PAGES
++---------------------------------------------
++
++:Architectures: all
++
++The presence of this capability indicates that memslots backed by a guest_memfd
++file descriptor created with the GUEST_MEMFD_FLAG_MMAP flag can have dirty
++page logging enabled.
++
+ 9. Known KVM API problems
+ =========================
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ab8cfaec82d3..c44e9253eb40 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -56,6 +56,7 @@
+  */
+ #define KVM_MEMSLOT_INVALID			(1UL << 16)
+ #define KVM_MEMSLOT_GMEM_ONLY			(1UL << 17)
++#define MEMSLOT_USER_FLAGS_MASK			0xffff
+ 
+ /*
+  * Bit 63 of the memslot generation number is an "update in-progress flag",
+@@ -731,6 +732,9 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+ 
+ #ifdef CONFIG_KVM_GUEST_MEMFD
+ bool kvm_arch_supports_gmem_init_shared(struct kvm *kvm);
++bool kvm_arch_supports_gmem_mmap_dirty_logging(struct kvm *kvm);
++int kvm_gmem_check_no_change(struct kvm *kvm, struct kvm_memory_slot *slot,
++			     unsigned int fd, loff_t offset);
+ 
+ static inline u64 kvm_gmem_get_supported_flags(struct kvm *kvm)
+ {
+@@ -741,6 +745,17 @@ static inline u64 kvm_gmem_get_supported_flags(struct kvm *kvm)
+ 
+ 	return flags;
+ }
++#else
++static inline bool kvm_arch_supports_gmem_mmap_dirty_logging(struct kvm *kvm)
++{
++	return false;
++}
++static inline int kvm_gmem_check_no_change(struct kvm *kvm, struct kvm_memory_slot *slot,
++					   unsigned int fd, loff_t offset)
++{
++	WARN_ON_ONCE(1);
++	return -EIO;
++}
+ #endif
+ 
+ #ifndef kvm_arch_has_readonly_mem
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 419011097fa8..5a53e2e19b2f 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -997,6 +997,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_S390_KEYOP 247
+ #define KVM_CAP_S390_VSIE_ESAMODE 248
+ #define KVM_CAP_S390_HPAGE_2G 249
++#define KVM_CAP_GUEST_MEMFD_MMAP_LOG_DIRTY_PAGES 250
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
 diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index db57c5766ab6..43ef8e908aaf 100644
+index 43ef8e908aaf..210bdd76f0aa 100644
 --- a/virt/kvm/guest_memfd.c
 +++ b/virt/kvm/guest_memfd.c
-@@ -25,6 +25,7 @@ struct gmem_file {
- 	struct kvm *kvm;
- 	struct xarray bindings;
- 	struct list_head entry;
-+	bool found_memslot;	/* Used for balancing invalidations when punching a hole */
- };
+@@ -622,6 +622,11 @@ bool __weak kvm_arch_supports_gmem_init_shared(struct kvm *kvm)
+ 	return true;
+ }
  
- struct gmem_inode {
-@@ -43,6 +44,29 @@ static __always_inline struct gmem_inode *GMEM_I(struct inode *inode)
- #define kvm_gmem_for_each_file(f, inode) \
- 	list_for_each_entry(f, &GMEM_I(inode)->gmem_file_list, entry)
- 
-+static void *memslot_to_xa_value(struct kvm_memory_slot *slot)
++bool __weak kvm_arch_supports_gmem_mmap_dirty_logging(struct kvm *kvm)
 +{
-+	WARN_ON_ONCE(sizeof(slot->as_id) > 16);
-+	WARN_ON_ONCE(sizeof(slot->id) > 16);
-+	WARN_ON_ONCE(sizeof(slot->as_id) + sizeof(slot->id) > sizeof(unsigned long));
-+
-+	return xa_mk_value(((unsigned long)slot->as_id) << 16 | (unsigned long)slot->id);
++	return false;
 +}
 +
-+static struct kvm_memory_slot *xa_value_to_memslot(struct kvm *kvm, const void *entry)
+ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ {
+ 	static const char *name = "[kvm-gmem]";
+@@ -705,6 +710,66 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+ 	return __kvm_gmem_create(kvm, size, flags);
+ }
+ 
++static int __kvm_gmem_check_no_change(struct kvm *kvm, struct kvm_memory_slot *old,
++				      struct file *old_file, unsigned int fd,
++				      loff_t offset)
 +{
-+	unsigned long full_id = xa_to_value(entry);
-+	u16 as_id = (full_id >> 16) & U16_MAX;
-+	short id = full_id & U16_MAX;
++	struct file *new_file;
 +
-+	/*
-+	 * Do not ignore KVM_MEMSLOT_INVALID memslots, as we want
-+	 * ->error_remove_folio(), when it races with memslot deletion, to have
-+	 *  unmapped the memory upon completion.
-+	 */
-+	return id_to_memslot(__kvm_memslots(kvm, as_id), id);
++	new_file = fget(fd);
++	if (!new_file)
++		return -EBADF;
++	if (new_file != old_file) {
++		fput(new_file);
++		return -EBADF;
++	}
++	fput(new_file);
++
++	if (old->gmem.pgoff != offset >> PAGE_SHIFT)
++		return -EINVAL;
++
++	return 0;
 +}
 +
- /**
-  * folio_file_pfn - like folio_file_page, but return a pfn.
-  * @folio: The folio which contains this index.
-@@ -157,7 +181,7 @@ static enum kvm_gfn_range_filter kvm_gmem_get_invalidate_filter(struct inode *in
- 	return KVM_FILTER_PRIVATE;
- }
- 
--static void __kvm_gmem_invalidate_start(struct gmem_file *f, pgoff_t start,
-+static bool __kvm_gmem_invalidate_start(struct gmem_file *f, pgoff_t start,
- 					pgoff_t end,
- 					enum kvm_gfn_range_filter attr_filter)
- {
-@@ -165,9 +189,15 @@ static void __kvm_gmem_invalidate_start(struct gmem_file *f, pgoff_t start,
- 	struct kvm_memory_slot *slot;
- 	struct kvm *kvm = f->kvm;
- 	unsigned long index;
-+	void *entry;
++int kvm_gmem_check_no_change(struct kvm *kvm, struct kvm_memory_slot *old,
++			     unsigned int fd, loff_t offset)
++{
++	CLASS(gmem_get_file, old_file)(old);
 +
-+	xa_for_each_range(&f->bindings, index, entry, start, end - 1) {
-+		pgoff_t pgoff;
- 
--	xa_for_each_range(&f->bindings, index, slot, start, end - 1) {
--		pgoff_t pgoff = slot->gmem.pgoff;
-+		slot = xa_value_to_memslot(kvm, entry);
-+		if (!slot)
-+			continue;
-+		pgoff = slot->gmem.pgoff;
- 
- 		struct kvm_gfn_range gfn_range = {
- 			.start = slot->base_gfn + max(pgoff, start) - pgoff,
-@@ -192,6 +222,8 @@ static void __kvm_gmem_invalidate_start(struct gmem_file *f, pgoff_t start,
- 
- 	if (found_memslot)
- 		KVM_MMU_UNLOCK(kvm);
++	return __kvm_gmem_check_no_change(kvm, old, old_file, fd, offset);
++}
 +
-+	return found_memslot;
- }
- 
- static void kvm_gmem_invalidate_start(struct inode *inode, pgoff_t start,
-@@ -199,11 +231,22 @@ static void kvm_gmem_invalidate_start(struct inode *inode, pgoff_t start,
- {
- 	enum kvm_gfn_range_filter attr_filter;
- 	struct gmem_file *f;
-+	struct kvm *kvm;
-+	int idx;
- 
- 	attr_filter = kvm_gmem_get_invalidate_filter(inode);
- 
--	kvm_gmem_for_each_file(f, inode)
--		__kvm_gmem_invalidate_start(f, start, end, attr_filter);
-+	kvm_gmem_for_each_file(f, inode) {
-+		kvm = f->kvm;
-+		idx = srcu_read_lock(&kvm->srcu);
-+		/*
-+		 * This is safe to do because calls to
-+		 * kvm_gmem_invalidate_start() are serialized by
-+		 * filemap_invalidate_lock().
-+		 */
-+		f->found_memslot = __kvm_gmem_invalidate_start(f, start, end, attr_filter);
-+		srcu_read_unlock(&kvm->srcu, idx);
++int kvm_gmem_change_flags(struct kvm *kvm, struct kvm_memory_slot *old,
++			  struct kvm_memory_slot *new, unsigned int fd,
++			  loff_t offset)
++{
++	struct gmem_file *old_f;
++	int ret;
++
++	lockdep_assert_held(&kvm->slots_lock);
++
++	if (!kvm_memslot_is_gmem_only(old))
++		return -EINVAL;
++
++	CLASS(gmem_get_file, old_file)(old);
++
++	ret = __kvm_gmem_check_no_change(kvm, old, old_file, fd, offset);
++	if (ret)
++		return ret;
++
++	old_f = old_file->private_data;
++	if (xa_load(&old_f->bindings, old->gmem.pgoff) != memslot_to_xa_value(new)) {
++		WARN_ON_ONCE(xa_to_value(xa_load(&old_f->bindings, old->gmem.pgoff)));
++		return -EIO;
 +	}
- }
- 
- static void __kvm_gmem_invalidate_end(struct gmem_file *f, pgoff_t start,
-@@ -223,8 +266,11 @@ static void kvm_gmem_invalidate_end(struct inode *inode, pgoff_t start,
++
++	new->gmem.file = old->gmem.file;
++	new->gmem.pgoff = old->gmem.pgoff;
++	new->flags |= KVM_MEMSLOT_GMEM_ONLY;
++
++	return 0;
++}
++
+ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		  unsigned int fd, uoff_t offset)
  {
- 	struct gmem_file *f;
+@@ -734,6 +799,11 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	if (!PAGE_ALIGNED(offset) || offset + size > i_size_read(inode))
+ 		goto err;
  
--	kvm_gmem_for_each_file(f, inode)
-+	kvm_gmem_for_each_file(f, inode) {
-+		if (!f->found_memslot)
-+			continue;
- 		__kvm_gmem_invalidate_end(f, start, end);
-+	}
- }
- 
- static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
-@@ -326,6 +372,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	struct kvm_memory_slot *slot;
- 	struct kvm *kvm = f->kvm;
- 	unsigned long index;
-+	void *entry;
- 
- 	/*
- 	 * Prevent concurrent attempts to *unbind* a memslot.  This is the last
-@@ -344,17 +391,18 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 
++	if (slot->flags & KVM_MEM_LOG_DIRTY_PAGES &&
++	    (!kvm_gmem_supports_mmap(inode) ||
++	     !kvm_arch_supports_gmem_mmap_dirty_logging(kvm)))
++		goto err;
++
  	filemap_invalidate_lock(inode->i_mapping);
  
--	xa_for_each(&f->bindings, index, slot)
-+	xa_for_each(&f->bindings, index, entry) {
-+		slot = xa_value_to_memslot(kvm, entry);
- 		WRITE_ONCE(slot->gmem.file, NULL);
-+	}
- 
- 	/*
- 	 * All in-flight operations are gone and new bindings can be created.
- 	 * Zap all SPTEs pointed at by this file.  Do not free the backing
- 	 * memory, as its lifetime is associated with the inode, not the file.
- 	 */
--	__kvm_gmem_invalidate_start(f, 0, -1ul,
--				    kvm_gmem_get_invalidate_filter(inode));
--	__kvm_gmem_invalidate_end(f, 0, -1ul);
-+	if (__kvm_gmem_invalidate_start(f, 0, -1ul, kvm_gmem_get_invalidate_filter(inode)))
-+		__kvm_gmem_invalidate_end(f, 0, -1ul);
- 
- 	list_del(&f->entry);
- 
-@@ -498,14 +546,20 @@ static int kvm_gmem_migrate_folio(struct address_space *mapping,
- 
- static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *folio)
+ 	start = offset >> PAGE_SHIFT;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e44c20c04961..af380e8f2b68 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1573,14 +1573,14 @@ static void kvm_replace_memslot(struct kvm *kvm,
+ static int check_memory_region_flags(struct kvm *kvm,
+ 				     const struct kvm_userspace_memory_region2 *mem)
  {
-+	enum kvm_gfn_range_filter attr_filter;
-+	struct inode *inode = mapping->host;
-+	struct gmem_file *f;
- 	pgoff_t start, end;
-+	bool found_memslot;
-+	struct kvm *kvm;
-+	int idx;
+-	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
++	u32 valid_flags = 0;
  
- 	filemap_invalidate_lock_shared(mapping);
+ 	if (IS_ENABLED(CONFIG_KVM_GUEST_MEMFD))
+ 		valid_flags |= KVM_MEM_GUEST_MEMFD;
  
- 	start = folio->index;
- 	end = start + folio_nr_pages(folio);
- 
--	kvm_gmem_invalidate_start(mapping->host, start, end);
-+	attr_filter = kvm_gmem_get_invalidate_filter(inode);
+-	/* Dirty logging private memory is not currently supported. */
+-	if (mem->flags & KVM_MEM_GUEST_MEMFD)
+-		valid_flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
++	if (!(mem->flags & KVM_MEM_GUEST_MEMFD) ||
++	    kvm_arch_supports_gmem_mmap_dirty_logging(kvm))
++		valid_flags |= KVM_MEM_LOG_DIRTY_PAGES;
  
  	/*
- 	 * Do not truncate the range, what action is taken in response to the
-@@ -515,8 +569,19 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
- 	 * at which point KVM can either terminate the VM or propagate the
- 	 * error to userspace.
- 	 */
-+	kvm_gmem_for_each_file(f, inode) {
-+		kvm = f->kvm;
-+
-+		idx = srcu_read_lock(&kvm->srcu);
-+		found_memslot = __kvm_gmem_invalidate_start(f, start, end, attr_filter);
-+		srcu_read_unlock(&kvm->srcu, idx);
+ 	 * GUEST_MEMFD is incompatible with read-only memslots, as writes to
+@@ -1739,16 +1739,6 @@ static void kvm_commit_memory_region(struct kvm *kvm,
+ 		 */
+ 		if (old->dirty_bitmap && !new->dirty_bitmap)
+ 			kvm_destroy_dirty_bitmap(old);
+-
+-		/*
+-		 * Unbind the guest_memfd instance as needed; the @new slot has
+-		 * already created its own binding.  TODO: Drop the WARN when
+-		 * dirty logging guest_memfd memslots is supported.  Until then,
+-		 * flags-only changes on guest_memfd slots should be impossible.
+-		 */
+-		if (WARN_ON_ONCE(old->flags & KVM_MEM_GUEST_MEMFD))
+-			kvm_gmem_unbind(old);
+-
+ 		/*
+ 		 * The final quirk.  Free the detached, old slot, but only its
+ 		 * memory, not any metadata.  Metadata, including arch specific
+@@ -2073,22 +2063,27 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
+ 			return -EINVAL;
+ 	} else { /* Modify an existing slot. */
+-		/* Private memslots are immutable, they can only be deleted. */
+-		if (mem->flags & KVM_MEM_GUEST_MEMFD)
+-			return -EINVAL;
+ 		if ((mem->userspace_addr != old->userspace_addr) ||
+ 		    (npages != old->npages) ||
+ 		    ((mem->flags ^ old->flags) & (KVM_MEM_READONLY | KVM_MEM_GUEST_MEMFD)))
+ 			return -EINVAL;
  
--	kvm_gmem_invalidate_end(mapping->host, start, end);
-+		if (found_memslot) {
-+			KVM_MMU_LOCK(kvm);
-+			kvm_mmu_invalidate_end(kvm);
-+			KVM_MMU_UNLOCK(kvm);
+-		if (base_gfn != old->base_gfn)
++		if (base_gfn != old->base_gfn) {
+ 			change = KVM_MR_MOVE;
+-		else if (mem->flags != old->flags)
++		} else if (mem->flags != (old->flags & MEMSLOT_USER_FLAGS_MASK)) {
+ 			change = KVM_MR_FLAGS_ONLY;
+-		else /* Nothing to change. */
++		} else if (mem->flags & KVM_MEM_GUEST_MEMFD) {
++			return kvm_gmem_check_no_change(kvm, old, mem->guest_memfd,
++							mem->guest_memfd_offset);
++		} else {
+ 			return 0;
 +		}
-+	}
- 
- 	filemap_invalidate_unlock_shared(mapping);
- 
-@@ -691,7 +756,7 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	if (kvm_gmem_supports_mmap(inode))
- 		slot->flags |= KVM_MEMSLOT_GMEM_ONLY;
- 
--	xa_store_range(&f->bindings, start, end - 1, slot, GFP_KERNEL);
-+	xa_store_range(&f->bindings, start, end - 1, memslot_to_xa_value(slot), GFP_KERNEL);
- 	filemap_invalidate_unlock(inode->i_mapping);
- 
- 	/*
-@@ -765,8 +830,8 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
- 		return ERR_PTR(-EFAULT);
  	}
  
--	if (xa_load(&f->bindings, index) != slot) {
--		WARN_ON_ONCE(xa_load(&f->bindings, index));
-+	if (xa_load(&f->bindings, index) != memslot_to_xa_value(slot)) {
-+		WARN_ON_ONCE(xa_to_value(xa_load(&f->bindings, index)));
- 		return ERR_PTR(-EIO);
++	if (mem->flags & KVM_MEM_GUEST_MEMFD &&
++	    change != KVM_MR_CREATE && change != KVM_MR_FLAGS_ONLY)
++		return -EINVAL;
++
+ 	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
+ 	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
+ 		return -EEXIST;
+@@ -2105,7 +2100,12 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 	new->flags = mem->flags;
+ 	new->userspace_addr = mem->userspace_addr;
+ 	if (mem->flags & KVM_MEM_GUEST_MEMFD) {
+-		r = kvm_gmem_bind(kvm, new, mem->guest_memfd, mem->guest_memfd_offset);
++		if (change == KVM_MR_CREATE) {
++			r = kvm_gmem_bind(kvm, new, mem->guest_memfd, mem->guest_memfd_offset);
++		} else if (change == KVM_MR_FLAGS_ONLY) {
++			r = kvm_gmem_change_flags(kvm, old, new, mem->guest_memfd,
++						  mem->guest_memfd_offset);
++		}
+ 		if (r)
+ 			goto out;
  	}
+@@ -2117,7 +2117,7 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 	return 0;
  
+ out_unbind:
+-	if (mem->flags & KVM_MEM_GUEST_MEMFD)
++	if ((mem->flags & KVM_MEM_GUEST_MEMFD) && change == KVM_MR_CREATE)
+ 		kvm_gmem_unbind(new);
+ out:
+ 	kfree(new);
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index 7510ca915dd1..c58dfeb0f3df 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -77,6 +77,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args);
+ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		  unsigned int fd, uoff_t offset);
+ void kvm_gmem_unbind(struct kvm_memory_slot *slot);
++int kvm_gmem_change_flags(struct kvm *kvm, struct kvm_memory_slot *old,
++			  struct kvm_memory_slot *new, unsigned int fd,
++			  loff_t offset);
+ #else
+ static inline int kvm_gmem_init(struct module *module)
+ {
+@@ -95,6 +98,14 @@ static inline void kvm_gmem_unbind(struct kvm_memory_slot *slot)
+ {
+ 	WARN_ON_ONCE(1);
+ }
++static inline int kvm_gmem_change_flags(struct kvm *kvm,
++					struct kvm_memory_slot *old,
++					struct kvm_memory_slot *new,
++					unsigned int fd, loff_t offset)
++{
++	WARN_ON_ONCE(1);
++	return -EIO;
++}
+ #endif /* CONFIG_KVM_GUEST_MEMFD */
+ 
+ #endif /* __KVM_MM_H__ */
 -- 
 2.43.0
 
