@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091E4339844;
-	Thu,  2 Jul 2026 18:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956D035DA65;
+	Thu,  2 Jul 2026 18:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783015991; cv=none; b=FIHXc4SrWCG5FI/loIW83qfFudKK04xSYHB0IksdCJZw+NI2RYHw6kPogf0Gl9bTMQ8gyoYo7gc8vggT8KjGEER7nHu6PSvGVpLOsg4Yne4O4UAooeCrcnCWHTFdM4ojlhax6TLWoacog+sZhUM2seeMt7ZKmMyHigfkQi/SVsQ=
+	t=1783016174; cv=none; b=b6tx4J1MwwPaVbfIjpLzRhiWEi+rpqm0jtIHXtZaocAoJijGY5qqqc4IilUGXI4iUkSM4ROFS90JShfiri9jpvT1qBddAJorgzg05zSnlkjRhcfC8FroQ5R5Y/KDdCE1GRoOy7HVBebOIwqRgmriViKgxj3Gr7ywITrfWvgIiOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783015991; c=relaxed/simple;
-	bh=/IUrRrU2fqS2wvO4KMRmmEZyUgG7zWNHLp/fCtLzedM=;
+	s=arc-20240116; t=1783016174; c=relaxed/simple;
+	bh=Pur5+iFigoUL5oFjBTaKkS17T9h/wgR7mjJJvzdsSKQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TpJ4RA1zK690CTA5U49ItjPzK7SUhX4eJXk4RqkJwJB6JYD88K8C9uNjC7yzT0hVU1DyeGe37DbAnVkopeKGzJlupNYKx1yyuDM9NoCnrOqF+B/7nXBTRqB62oesrGu1fWiqL0RJerbmV+iQ7vSPV1rHCvAB675vtnya8t76ECU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMW+4NWp; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=WkePj3N6FDLuzduD6P5pBx1gk7iybw2ldAeFV/zAYVc6wpc+RilSkpuiTcJ+yF3bNPwG/2gN3dc2Zx5dYk3JpCt1ugypc6mWgJlHx4ignGwDtphCqdgnIuQ/vHtHzq312TKX1Q1agmdkvLPpGNo2p1ew8Pe59iczhNaJ7o3/2oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ix6APPCM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMW+4NWp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE431F000E9;
-	Thu,  2 Jul 2026 18:13:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ix6APPCM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C92B1F000E9;
+	Thu,  2 Jul 2026 18:16:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783015989;
-	bh=ATD6Voa6jFN5dw/wJtF0KsbwSNwAYDBGrIbKhlvGEFU=;
+	s=k20260515; t=1783016173;
+	bh=1XWCRc2aDLCrNx/mZAuGEfWBR64mAtCf1kgD723Iig0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=UMW+4NWp1T2E6BecOnXDvoOp3r+qTv5Toi0KKT3U9nAgwvskEaswtlPCqXvI/6t5K
-	 U1cM452vCWng9NPx32wkuYKSNqImbI33nsL5IrGlecgoNfsVJtkA+ODi+zewfiigYC
-	 +JvyqrKuy1y4y3O2nL4S9/KMaJLt3bzr416lYP4IPRHs/CSQQgpwoLcDnOLznuOYib
-	 hXUVxIBRv0vPKuOZci8BxYSuTRX6SAuiRjdseqXrX7V5jV9FBZPcMqE8wPW6XlSVAV
-	 3OvWbZz9JaxjHABQ1LHNrmnGGgJgW2WSWJfNwJj5vSSBrMzkN09weo/67CN2wgolDr
-	 a1qT4G76RmMhw==
+	b=ix6APPCMJKaBQUbtMl6FdJhmzkVihTxJiT0L5Jho9AmVRfxiMkLbEcIpL9K8r3ltJ
+	 /6b6yTYyCsMR/Fui/lM0f8GuiCcSHJ1iPDsVGtXNvtl80RmJ5oeqQv8e9Ld8nG3dcn
+	 Yix85T3JPxS3Pnsl44jOYSXW1zqHFhmBmxVJ3hkzSLWzseRYbGJ+86tHwxvdBp76nO
+	 ZkQIlZStO0FINXCGJcP1CQ7g8QajawKcGF1CmwSOCGDi92BghCrak6AihaVr250u2f
+	 IAIsfwj65SzbaI/hyvMdIAQxMRZiUjGoHReNUM3tG7nMKefeld22E0luTEXflP6Id1
+	 cRILvVreOmsBw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfLuN-00000000rvQ-2CKv;
-	Thu, 02 Jul 2026 18:13:07 +0000
-Date: Thu, 02 Jul 2026 19:14:56 +0100
-Message-ID: <87wlvd6yxr.wl-maz@kernel.org>
+	id 1wfLxL-00000000ryY-2DIo;
+	Thu, 02 Jul 2026 18:16:11 +0000
+Date: Thu, 02 Jul 2026 19:18:00 +0100
+Message-ID: <87v7ax6ysn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 22/28] KVM: arm64: Add routing for NVHCR_EL2 trap
-In-Reply-To: <20260702162608.6D0FD1F00A3D@smtp.kernel.org>
+	kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>
+Subject: Re: [PATCH 05/28] KVM: arm64: Plumb HCRX_EL2.SRMASKEn in HCRX_EL2 sanitisation
+In-Reply-To: <20260702162816.7D5CE1F00A3D@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-23-maz@kernel.org>
-	<20260702162608.6D0FD1F00A3D@smtp.kernel.org>
+	<20260702160248.1377250-6-maz@kernel.org>
+	<20260702162816.7D5CE1F00A3D@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,59 +55,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:26:07 +0100,
+On Thu, 02 Jul 2026 17:28:15 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] The trap routing condition for `NVHCR_EL2` incorrectly uses a logical OR (`MCB`) instead of a logical AND, causing improper trap injection to guest EL2.
+> 
+> Pre-existing issues:
+> - [High] Missing RES0 constraints in system register feature map for `HCRX_EL2` allows nested guests to set reserved hardware bits.
 > --
 > 
-> commit 6d634fa5ff4e9b082f4e46e999fa4990ecf38957
+> commit 5fb0fde52515a7e2e03636fdc18f15c38a091ddd
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Add routing for NVHCR_EL2 trap
->     
-> NVHCR_EL2 accesses from EL1 are taken to EL2 when HCRX_EL2.NVTGE==0
-> and HCR_EL2.NV==1. Describe this in the exception routing tables.
+> KVM: arm64: Plumb HCRX_EL2.SRMASKEn in HCRX_EL2 sanitisation
 > 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index b7f3d86a94031..f5dc578d8c985 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> [ ... ]
-> > @@ -468,6 +477,7 @@ static const enum cgt_group_id *coarse_control_combo[] = {
-> >  					CGT_HCR_TVM, CGT_HCR_TRVM, CGT_HCRX_SCTLR2En),
-> >  	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
-> >  	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
-> > +	MCB(CGT_HCR_NV_HCRX_nNVTGE,	CGT_HCR_NV, CGT_HCRX_nNVTGE),
+> This patch adds the HCRX_EL2.SRMASKEn bit to the HCRX_EL2 feature map to
+> enable FEAT_SRMASK for a guest. It also updates the system register
+> definitions to reflect the new bit field.
+> 
+> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > --- a/arch/arm64/kvm/config.c
+> > +++ b/arch/arm64/kvm/config.c
+> > @@ -904,6 +904,7 @@ static const DECLARE_FEAT_MAP_FGT(hdfgwtr2_desc, hdfgwtr2_masks,
+> >  
+> >  
+> >  static const struct reg_bits_to_feat_map hcrx_feat_map[] = {
+> > +	NEEDS_FEAT(HCRX_EL2_SRMASKEn, FEAT_SRMASK),
 > 
 > [Severity: High]
-> Does this correctly evaluate the trap condition as an AND?
-> 
-> The commit message indicates the trap is taken when "HCRX_EL2.NVTGE==0 and
-> HCR_EL2.NV==1". However, coarse_control_combo[] uses the MCB() macro, which
-> evaluates multiple conditions using a bitwise OR:
-> 
-> arch/arm64/kvm/emulate-nested.c:__compute_trap_behaviour() {
-> 	...
-> 		for (int i = 0; cgids[i] != __RESERVED__; i++)
-> 			b |= __compute_trap_behaviour(vcpu, cgids[i], b);
-> 	...
-> }
-> 
-> Because this ORs the behaviors, the trap will be forwarded if HCR_EL2.NV == 1
-> OR HCRX_EL2.NVTGE == 0 evaluates to forward. This would erroneously send the
-> trap to EL2 even if normal execution without nested virt is active (NV == 0
-> and NVTGE == 0).
-> 
-> Should this use a __COMPLEX_CONDITIONS__ callback instead to enforce the
-> logical AND?
+> This isn't a bug introduced by this patch, but a pre-existing issue in
+> hcrx_feat_map: does the omission of FORCE_RES0(HCRX_EL2_RES0) and
+> FORCE_RES1(HCRX_EL2_RES1) allow a nested guest to set architecturally reserved
+> hardware bits?
 
-Grmbl. Yes, well spotted.
+No, because any bit that is not allocated will be treated as RES0, and
+the kernel will warn about this. FORCE_RES0() is only an additional
+way to detect these things.
+
+Worth doing, but not a real issue.
 
 	M.
 
