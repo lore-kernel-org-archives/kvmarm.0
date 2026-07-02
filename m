@@ -1,134 +1,250 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC6937A83A;
-	Thu,  2 Jul 2026 14:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A03E433E94
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 14:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783003682; cv=none; b=YQlVwU+Y45Y+fGH8hXF1MNDooRghrp1DXkRijJEh4yv5jD3pm2J+MfiINTJ9iNclRb6qXZ6+27SFIusygZJJlv/jzqMO5VJ5w6OcfmMMgfRdft76zJHMF/+72RxcF2amiDjNm3sPE1xH24JT5jGAtP7pCC3xgjQ9P4pjY0rNEL4=
+	t=1783003940; cv=none; b=E0uXdKZJQb/lSsCXBy3Tz6LNKuAqbPX2hp3uelSCXNzULYY0r0SFigQSbI1DV1ViDrcSqrRZdIPXc5Rvu2qJI++MCgd0+Q7Txmgkj6t1kNQdGQo9R78fJ0HCgZPlDl9maCY/tXa191qjYDx8wJ4ohabzXk4vPjwMwuN/h4vAOaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783003682; c=relaxed/simple;
-	bh=xX8rOaNNkPQaC5aTJHsIjlCUYARQVvi3p4TYyCvsG7k=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=kZec1PtkrYuYavSEna0IijypzBcBWj048Cq24XxsMm0iKJ3kIMaO2vebnPm1+gjRU3mvdUDG5Z/UyoP3ZXKuZ/NdmbNmjcjqwrfLHkjIcTm5+N9ZRDFc02rimPBKZ5I12VbE/5eDn0Z+oScbOKmwkWGC7AMpBJLlnAEyFMGCIP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqKYI1Wv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783003940; c=relaxed/simple;
+	bh=vDNSLq1F8HZ2y7taNy7lRS+QK5B1BmyekWO4LCqQe9w=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=roIGruHGWnBVX76h5jHBl3qKriP0ANnqMS2gF9ipB14oMnQ22Hg6cHSieo/0EZXq0hG2x+pYCFLyfO+/F6MF/KcoKgFaoQolw+i11n03KY8t/eH6WjEgvDNeS/sdImjWVlho/6q4WuKxikHt5pARNUdyqAuMjf5wJJUwikBpXIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=FnpUWfrb; arc=none smtp.client-ip=198.167.222.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HqKYI1Wv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D5821F00ADF;
-	Thu,  2 Jul 2026 14:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783003679;
-	bh=it5yP2Vyx2kme8r83sKSfOusL/ik9sWCmpsffykBpVQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HqKYI1WvVL0H8+HqaySP1n6Iou6H8xdfq7kwP3PiqCA069op76g0OH1ZvuJdEJxav
-	 NHF6HN+0sukrU9GcVRXSo74R60HD7kUsxw7YgRkqh8PdbL0umXWEXPIYALFCXMyYNS
-	 LfheWz0/aPlBtTqer32HeVvrQxKGCThO7OgKo9RjYRv45nGISwYMOdLi+zUJPdhdua
-	 mI/75GX2FgfMI7Qm3SSfUo7Y8Ar3BqFckH08tWv7PBi7r+9r1GM7oS+33CZ2Cfwg+7
-	 lGnJOk3gCdllDvaZ8ze1Evo5WfHsQCUxUNejeNkyQ4SP18N8QziA9PzTz724pmrArB
-	 N3A/O3lj3eqtA==
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH 1/3] KVM: guest_memfd: Use memslot id to keep track
- of associated memslots
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Alexandru Elisei" <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260702142912.6395-2-alexandru.elisei@arm.com>
-References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <20260702142912.6395-2-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jul 2026 14:47:57 +0000
-Message-Id: <20260702144758.9D5821F00ADF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="FnpUWfrb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1783003935;
+	bh=yck47zcByevXRW9PaNo4vNiwJK3y51xvS+uhfVcQUH8=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=FnpUWfrbjPTPKg9x2FatIxUrRfOIwjzPfjQtS0fVADxkOBTu2pBNsKYpFec3cEh90
+	 c0PawhBq7e4TMeO73hqOcy2fVf5OYUP4Hl0UsbVREvFWlWOY9brXdXgAgjxljwDJHx
+	 9bs2U2lp+vi+vdiB+XeLA1y+NbW72YeW4cKdT59o=
+Received: from mx2.investici.org (unknown [127.0.0.1])
+	by devianza.investici.org (Postfix) with ESMTP id 4grfxC28xNz6vMx;
+	Thu, 02 Jul 2026 14:52:15 +0000 (UTC)
+Received: by mx2.investici.org (Postfix) id 4grfxB5CJ7z4y2q;
+	Thu, 02 Jul 2026 14:52:14 +0000 (UTC)
+Date: Thu, 02 Jul 2026 15:52:14 +0100
+From: Bradley Morgan <include@grrlz.net>
+To: Leonardo Bras <leo.bras@arm.com>, Marc Zyngier <maz@kernel.org>
+CC: Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>,
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Quentin Perret <qperret@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v4=5D_KVM=3A_arm64=3A_Record_whe?=
+ =?US-ASCII?Q?ther_pKVM_stage_2_mapping_is_cacheable?=
+In-Reply-To: <akZJIm6mTza7qAuu@LeoBrasDK>
+References: <20260701192428.17430-1-include@grrlz.net> <86qzllpy1g.wl-maz@kernel.org> <akZJIm6mTza7qAuu@LeoBrasDK>
+Message-ID: <6495D546-8FC7-4A31-B18C-88F34E1B64BB@grrlz.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Critical] Stale SPTEs are left mapped during concurrent memslot deletion=
-, causing a Use-After-Free when backing folios are freed.
-- [Low] Silent suppression of kernel warnings for memslot 0 mismatches.
---
+On July 2, 2026 12:18:58 PM GMT+01:00, Leonardo Bras <leo.bras@arm.com>
+wrote:
+>On Thu, Jul 02, 2026 at 09:59:23AM +0100, Marc Zyngier wrote:
+>> + Vincent, Leo
+>> 
+>> On Wed, 01 Jul 2026 20:24:28 +0100,
+>> Bradley Morgan <include@grrlz.net> wrote:
+>> > 
+>> > pKVM keeps its own mapping list for stage 2 operations. Its flush path
+>> > uses that list directly, so it lost the PTE attribute check done by
+>the
+>> > generic stage 2 walker.
+>> > 
+>> > Record whether a mapping is cacheable and skip cache maintenance for
+>> > mappings that are not cacheable.
+>> > 
+>> > Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+>> > Signed-off-by: Bradley Morgan <include@grrlz.net>
+>> > ---
+>> > Changes since V3:
+>> > - addressed some review :)
+>> 
+>> This isn't a change log. If you want to be taken seriously, I'd
+>> suggest you start by following the process. You are otherwise wasting
+>> people's time. Again.
+>
+>Agree... the process has a reason: the changelog here helps the reviewer 
+>having an overview of what actually changed between versions, and that 
+>makes reviewing much easier, and costs very little to the contributor.
+>
+>Also, the 1 week waiting time is really important, as mentioned before, as
+>it allows more reviewers and maintainers to give feedback: different 
+>people, from different companies and lifestyles have different schedules 
+>for dev/rev, but in general it happens weekly. So waiting for a week is 
+>really recommended, as it tends to avoid people re-reading 2+ versions of 
+>the same patchset, and allows revs time to discuss the suggestions in the 
+>same thread.
+>
+>(I know the waiting can be really frustating, and that sending a vN+1 fast
+>seems to show that you are interested in it, but it really does not help)
 
-commit ca8b0f095e48299dd0d910de62ee16780d361eec
-Author: Alexandru Elisei <alexandru.elisei@arm.com>
+Well, it's fair, let me give you reasoning on why I do quick Rerolls.
 
-KVM: guest_memfd: Use memslot id to keep track of associated memslots
-   =20
-To enable memslot operations, KVM maintains two arrays of memslots, and an
-RCU pointer to the active (in use) array. Changes are made first to the
-inactive array, and the RCU pointer is updated to point to the inactive
-array, which becomes active.
+So, if I do something wrong, e.g: checkpatch, I don't want to wait a week,
+because I would get grilled for a said checkpatch failure.
 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index db57c5766ab60..43ef8e908aaf6 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
 
-[ ... ]
+In this case, I was just excited /shrug.
+>> 
+>> You also failed to Cc people who have provided feedback on previous
+>> versions. That's not right.
+>
+>(Bradley: usually you want as many people as possible to review your
+>stuff, 
+>so CC'ing previous reviewers is actually good for you)
 
-> @@ -165,9 +189,15 @@ static void __kvm_gmem_invalidate_start(struct gmem_=
-file *f, pgoff_t start,
->  	struct kvm_memory_slot *slot;
->  	struct kvm *kvm =3D f->kvm;
->  	unsigned long index;
-> +	void *entry;
-> +
-> +	xa_for_each_range(&f->bindings, index, entry, start, end - 1) {
-> +		pgoff_t pgoff;
-> =20
-> -	xa_for_each_range(&f->bindings, index, slot, start, end - 1) {
-> -		pgoff_t pgoff =3D slot->gmem.pgoff;
-> +		slot =3D xa_value_to_memslot(kvm, entry);
-> +		if (!slot)
-> +			continue;
-> +		pgoff =3D slot->gmem.pgoff;
+Vincent not being CCed was dumb of me, no idea how I didn't get him on get
+maintainers.
 
-[Severity: Critical]
-Could this leave stale SPTEs mapped during concurrent memslot deletion,
-leading to a Use-After-Free?
+For you, I didn't want to annoy you with another patch, since maintainers
+tend to be stressed and annoyed. And I didn't wanna add on to the pain.
 
-If a guest_memfd hole punch executes concurrently while a KVM_MR_DELETE
-operation is waiting in synchronize_srcu(), xa_value_to_memslot() will retu=
-rn
-the invalid_slot. Because kvm_copy_memslot() does not copy the conditionally
-compiled gmem struct, invalid_slot->gmem.pgoff is 0.
+>> 
+>> > 
+>> >  arch/arm64/kvm/pkvm.c | 51
+>++++++++++++++++++++++++++++++++++---------
+>> >  1 file changed, 41 insertions(+), 10 deletions(-)
+>> > 
+>> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+>> > index 053e4f733e4b..6d1cad890c7e 100644
+>> > --- a/arch/arm64/kvm/pkvm.c
+>> > +++ b/arch/arm64/kvm/pkvm.c
+>> > @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct
+>pkvm_mapping *m)
+>> >  	return m->gfn * PAGE_SIZE;
+>> >  }
+>> >  
+>> > +#define PKVM_MAPPING_NR_PAGES_MASK     GENMASK_ULL(47, 0)
+>> > +#define PKVM_MAPPING_NC                        BIT_ULL(48)
+>> > +
+>> > +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
+>> > +{
+>> > +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+>> > +}
+>> 
+>> No. You've been pointed to the correct data structure (an anonymous
+>> structure containing bit fields). Please consider taking the review
+>> comments into account.
+>
+>(and if you do not agree with the suggestion, discuss it in the same 
+>thread. Although as Marc shows below, it becames much simpler like that)
+>
+>Thanks! 
+>Leo
+>
 
-When __kvm_gmem_invalidate_start() calculates the gfn_range using a 0 pgoff,
-it can result in start >=3D end, causing kvm_mmu_unmap_gfn_range() to skip
-zapping the SPTEs. When the backing folios are then freed by
-truncate_inode_pages_range(), the guest could access freed host memory.
+I'll test it. If it's good. I'll do 
 
-[ ... ]
+Suggested-by? Or co-developed by?
 
-> @@ -765,8 +830,8 @@ static struct folio *__kvm_gmem_get_pfn(struct file *=
-file,
->  		return ERR_PTR(-EFAULT);
->  	}
-> =20
-> -	if (xa_load(&f->bindings, index) !=3D slot) {
-> -		WARN_ON_ONCE(xa_load(&f->bindings, index));
-> +	if (xa_load(&f->bindings, index) !=3D memslot_to_xa_value(slot)) {
-> +		WARN_ON_ONCE(xa_to_value(xa_load(&f->bindings, index)));
+I'll hold the patch on for a week.
 
-[Severity: Low]
-Will this suppress the intended warning when the corruption involves memslo=
-t 0?
 
-If the xarray state erroneously points to memslot 0 (as_id=3D0, id=3D0),
-xa_load() returns xa_mk_value(0). xa_to_value() unwraps this to 0, causing
-WARN_ON_ONCE(0) to evaluate to false and fail to warn.
+Thanks you lot for taking my bull crap.
 
-(This logic would also similarly suppress the warning in kvm_gmem_change_fl=
-ags()
-when there is a structural state inconsistency involving memslot 0).
+>> 
+>> This would avoid most of the churn in this patch, and make it easy to
+>> backport. Something like the untested hack below.
+>> 
+>> 	M.
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_pkvm.h
+>b/arch/arm64/include/asm/kvm_pkvm.h
+>> index 74fedd9c5ff02..cdddc9e3a11f5 100644
+>> --- a/arch/arm64/include/asm/kvm_pkvm.h
+>> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+>> @@ -195,7 +195,10 @@ struct pkvm_mapping {
+>>  	struct rb_node node;
+>>  	u64 gfn;
+>>  	u64 pfn;
+>> -	u64 nr_pages;
+>> +	struct {
+>> +		unsigned long nr_pages:48;
+>> +		unsigned int  nc:1;
+>> +	};
+>>  	u64 __subtree_last;	/* Internal member for interval tree */
+>>  };
+>>  
+>> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+>> index 428723b1b0f5c..5932b93bded58 100644
+>> --- a/arch/arm64/kvm/pkvm.c
+>> +++ b/arch/arm64/kvm/pkvm.c
+>> @@ -369,7 +369,7 @@ static int __pkvm_pgtable_stage2_unshare(struct
+>kvm_pgtable *pgt, u64 start, u64
+>>  
+>>  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+>>  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+>> -					mapping->nr_pages);
+>> +					(u64)mapping->nr_pages);
+>>  		if (WARN_ON(ret))
+>>  			return ret;
+>>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+>> @@ -473,6 +473,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt,
+>u64 addr, u64 size,
+>>  	mapping->gfn = gfn;
+>>  	mapping->pfn = pfn;
+>>  	mapping->nr_pages = size / PAGE_SIZE;
+>> +	mapping->nc = !!(prot & (KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC));
+>>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+>>  
+>>  	return ret;
+>> @@ -503,7 +504,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable
+>*pgt, u64 addr, u64 size)
+>>  	lockdep_assert_held(&kvm->mmu_lock);
+>>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+>>  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+>> -					mapping->nr_pages);
+>> +					(u64)mapping->nr_pages);
+>>  		if (WARN_ON(ret))
+>>  			break;
+>>  	}
+>> @@ -517,10 +518,11 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable
+>*pgt, u64 addr, u64 size)
+>>  	struct pkvm_mapping *mapping;
+>>  
+>>  	lockdep_assert_held(&kvm->mmu_lock);
+>> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+>> -		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+>> -					  PAGE_SIZE * mapping->nr_pages);
+>> -
+>> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+>> +		if (!mapping->nc)
+>> +			__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+>> +						  PAGE_SIZE * mapping->nr_pages);
+>> +	}
+>>  	return 0;
+>>  }
+>>  
+>> @@ -537,7 +539,7 @@ bool pkvm_pgtable_stage2_test_clear_young(struct
+>kvm_pgtable *pgt, u64 addr, u64
+>>  	lockdep_assert_held(&kvm->mmu_lock);
+>>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+>>  		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+>> -					   mapping->nr_pages, mkold);
+>> +					   (u64)mapping->nr_pages, mkold);
+>>  
+>>  	return young;
+>>  }
+>> 
+>> -- 
+>> Without deviation from the norm, progress is not possible.
+>
 
->  		return ERR_PTR(-EIO);
->  	}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260702142912.6395=
--1-alexandru.elisei@arm.com?part=3D1
+Thanks!
