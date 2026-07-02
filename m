@@ -1,91 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9259353A63;
-	Thu,  2 Jul 2026 15:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69B42BEC2B;
+	Thu,  2 Jul 2026 16:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783006497; cv=none; b=Vcidkag9+M7QO/AJu+Qlb66FWIsD35TDN+HV6g5sq5pWYF7K50q2z4D54y+l/DhGXzuwu0g3byDqCPRzDCy/Ba1qNr4qeR5S6tF0WdL/nmubPUHDoE13A78DDMiomaYMDtSNQaRAWWQzTqrJ+CJBDkwWNCIeI7SzsKlZt0qT/To=
+	t=1783008181; cv=none; b=Sh/qdUKcXooLpK/O6PX9JzPo4kj71Ats+SNUyeLDLFLgyz823Gw2nXCc+sFB0pdzaPfFWmMEChU0R8bUpkrxcP3w5yOVBqE2+UVFW0nTrugUwnmWtxyuCWBHXvzwBu5xslcyDlt+R9/NLXh+fNz6dBszCcDJzte9IQcBFRmQh2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783006497; c=relaxed/simple;
-	bh=9pXl1sgvMZXrLx5WX6MOKJiJBSIDJTYN2d66V4RyPB0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dEmc7sxMdwIg9yYWzxsqTMnZdFKIpSAnfq3F5wkvnfnJzybkYL4EEcu5pm954QHZkKDlGuEYJrwW/Ue2mpTwHb9qE4T7pgrLB2je/A5GXW3G1ifn8Wt/+8aMpbp6PLP/6TmlCVZzps5GsEz61cfgPBABTYUGOwAjlFBhNKCtSHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTc2tH78; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783008181; c=relaxed/simple;
+	bh=xsXV9MWbxPw9K7shC81x/Rrri9wc0wvaH7floDeCMN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P3nimgb/3yqWMQQ9K35vbYTauCHdG6R8vq1zwqI1UHita1IfUEqVCuyopvP4ry4m0dnvaUxZfq6giscfe9iMyKaNNke7YHrOmc77a8OsXM4F0PrweFbeVoTH620sFpmWN/mYZ6p/iT30jpzwAhvZEbQXQxCTmPuhkSnDEUuTdE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=an3wJfxw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTc2tH78"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD64D1F000E9;
-	Thu,  2 Jul 2026 15:34:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="an3wJfxw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A3C01F00A3A;
+	Thu,  2 Jul 2026 16:03:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783006496;
-	bh=38XR+EdcAsjk4FPndfrI8xQIQj0tw1j2RtbtaAzrd2U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=UTc2tH78V+6NXMo+1bhmpBKb4o7di9Ua1ZZBmeeDXgn9QXD02Hcsz5l9jmKBn2jvX
-	 ziIBYL2hVsvs7C+Va/x/xcEIdMEXDh4nUdUOe0Bh1XZoKgWwyModUj5M2nw24JBtqN
-	 tQixkRGP3WRCufTW5PiapnrS9d23xWIPOLgC/jRWy7UTIMdFmmxKl9Dvtkg1KW4ttk
-	 Vr9xgz26qm64+DgslVnCRrH95KwSpU5SnMRcBKBH8JbZQH1cTOVbDr5pCYzC59fse4
-	 Pzuv2LA4xcJPsqRx4orjrOG/rW8lmx97hQcYyGTLnbE4VZJdJ+bCIjxKmPKL5FR3ef
-	 SIiXHAAXeJRPg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20260515; t=1783008180;
+	bh=coVcvglA4gi9EbFO8pV//jEU/rmnn0BkIq6bsE7KnOU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=an3wJfxwsZ1QQZ2LzI+wk6yOlnJjtz02Z7f0AmY/PAelPekQDEZrvzxOSA1wH3/iY
+	 vrEr1G5FEgo5mofQNlWIL1z/KgtQxRR1ES19OOa18zL4JGBN+gNW6zHYIg5NN1aKwx
+	 qMpXx/FCzx4CI9upO8wZkn6oxhR0aHWoJpTDwu0tVRaz6DsyySWvgw9dkhs21x7ssD
+	 fB4b5JvjBem+DCu7hJSC34hcIVlct2DpHoJRJLYGUnM2ZDloH+gMINrOIhlThsiwtu
+	 CA+imR72Wt+XhpyPM81OQpoYEiuGu5uzP4ZjzJNF3Pw+s/maFc5V+payyG8+mIVqbQ
+	 DhvqxpLbZ8J/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfJRG-00000000o5q-052D;
-	Thu, 02 Jul 2026 15:34:54 +0000
-Date: Thu, 02 Jul 2026 16:34:53 +0100
-Message-ID: <86pl15pfqa.wl-maz@kernel.org>
+	id 1wfJsQ-00000000ojd-2ARZ;
+	Thu, 02 Jul 2026 16:02:58 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Bradley Morgan <include@grrlz.net>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] KVM: arm64: Record whether pKVM stage 2 mapping is cacheable
-In-Reply-To: <6495D546-8FC7-4A31-B18C-88F34E1B64BB@grrlz.net>
-References: <20260701192428.17430-1-include@grrlz.net>
-	<86qzllpy1g.wl-maz@kernel.org>
-	<akZJIm6mTza7qAuu@LeoBrasDK>
-	<6495D546-8FC7-4A31-B18C-88F34E1B64BB@grrlz.net>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 02/28] arm64: Update ID_AA64MMFR4_EL1 description to 2026-03 JSON release
+Date: Thu,  2 Jul 2026 17:02:22 +0100
+Message-ID: <20260702160248.1377250-3-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260702160248.1377250-1-maz@kernel.org>
+References: <20260702160248.1377250-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: include@grrlz.net, leo.bras@arm.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 15:52:14 +0100,
-Bradley Morgan <include@grrlz.net> wrote:
-> 
-> I'll test it. If it's good. I'll do
-> 
-> Suggested-by? Or co-developed by?
+ID_AA64MMFR4_EL1 has gained a few fields and enum values in the past
+few months, so resync its definition with the 2026-03 JSON release.
 
-Sb if you want, definitely not Cdb. More importantly, I expect to you
-to follow the process described at [1]. Nothing there is optional.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/sysreg | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
 
-Thanks,
-
-	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst
-
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index bc1788b1662b7..32e2f9856768b 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2386,17 +2386,40 @@ EndEnum
+ EndSysreg
+ 
+ Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
+-Res0	63:48
++UnsignedEnum	63:60	MTEFGT
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	59:56	SCRX
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	55:52	TEV
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	51:48	TPS
++	0b0000	VAL_0000
++	0b0001	VAL_0001
++	0b0010	VAL_0010
++EndEnum
+ UnsignedEnum	47:44	SRMASK
+ 	0b0000	NI
+ 	0b0001	IMP
++	0b0010	SRMASK2
++EndEnum
++UnsignedEnum	43:40	TLBID
++	0b0000	NI
++	0b0001	IMP
+ EndEnum
+-Res0	43:40
+ UnsignedEnum	39:36	E3DSE
+ 	0b0000	NI
+ 	0b0001	IMP
+ EndEnum
+-Res0	35:32
++UnsignedEnum	35:32	EAESR
++	0b0000	NI
++	0b0001	IMP
++EndEnum
+ UnsignedEnum	31:28	RMEGDI
+ 	0b0000	NI
+ 	0b0001	IMP
+@@ -2410,6 +2433,7 @@ UnsignedEnum	23:20	NV_frac
+ 	0b0000	NV_NV2
+ 	0b0001	NV2_ONLY
+ 	0b0010	NV2P1
++	0b0011	NV3
+ EndEnum
+ UnsignedEnum	19:16	FGWTE3
+ 	0b0000	NI
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
