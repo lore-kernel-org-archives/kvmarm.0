@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C29D3890E7;
-	Thu,  2 Jul 2026 20:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E399230BD5;
+	Thu,  2 Jul 2026 20:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783022529; cv=none; b=QV0cM/sEcy+MdsBYkBoRDncV8zZnqG0Cf6KqnA7quglVD8gVbesIXicp5RCLbmCt+AajTWcagrwG8eCspByU7xlaFhpuKzq+y40DfvFc1dGEtnkjmlRL5LFZAREOha6JNi/WfvUI3hPt4XKQoB6waiTlQVn6ewHHCDVgLwF2fR0=
+	t=1783024031; cv=none; b=j7kPKmtyhAwwa4JN8BQD/a2+RwMgGmuxWmEirkHkYSLmtHQAkjbwR9zIeOXqwiGrnvV/6bLaDU48QTHOOsHTEMbrJmj6/J3vrxg2Dhiv8TNimpIo25/qvyKoDGhCbjGLPw5L9thhYWvNXll181sg46nWIefHh8HURUj50+blFTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783022529; c=relaxed/simple;
-	bh=NMtx1JDe/uoQByEGku9I/NGARnxasGKXWW3OjvoVlRM=;
+	s=arc-20240116; t=1783024031; c=relaxed/simple;
+	bh=V+2LAbZfPtxMZCg3dJHlMMXsKrPNqwdQenqRat3nZiE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pu9RbSVUdDc2yKB08oGVOdDJew0SGJZxdqVd0UhMqQ7YNOkIF1s4nXntjgbOieOSWtwL0vUBiscM6h5kMF17Gc5DnfvV5KTWlepWme5GUVFFqpYNy2XjdoBaXwji/DkeDZsIdEoP+OUZrOLvuADzt7yRHbN099aS4VZY+9mL7PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBJtLa9l; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Mo7nOh60XsZtPdRyL92jXZyrlwMHtOlwvaXea47GB2b0UqB1mDQRXjeS51BsEjhfj+6/gAyY6QLdywrMfyl3hRgdCAsRY06me4wnqg/4jMe9qkmOsQyqTpn4PymAZbGHnL8PtE11e4jFd5q6TSE5dcJO7C1dZJvyuY0uumRKTZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InPqjOmj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBJtLa9l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813431F000E9;
-	Thu,  2 Jul 2026 20:02:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InPqjOmj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2225B1F000E9;
+	Thu,  2 Jul 2026 20:27:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783022526;
-	bh=wuNccrweE1OgyLfC5/hMVOIjVaxZ778ZW9vyVVpXunk=;
+	s=k20260515; t=1783024030;
+	bh=HoK9M+3vrnVkofbRcUnP+3r/PuAZFEUfLJGmPUPuqgo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=iBJtLa9lIbsHSMyghdQnl+Mslv4yGdvvxJyEUQZpZGPxFMGdYd87K2d5/6ZlQ55dU
-	 upWa8JqQr+7A5j3VdQI2x1oqrghV8Bzh2mQzAuDK8q+hY2fHuXg6NhX3PQXu5L5vCl
-	 bpSdaMcIP5taqQ2weOsE0YGf2MGpU4EW5Zmiv7DQjmFVQix+j8OD45G5d7JncKC7JK
-	 KOunvJVflAiiDXJyDikCtCXvPxQKPl9dfyZwbNX4URkssUdktDgw3pyoWHqj31BHTW
-	 zA6Ur8YXohKQL3jLuamfWlr240g3koF6pZs/EVmRvsHLyl5ncsezY7oqZRtgLeVBES
-	 cYXIV0hMG/bhA==
+	b=InPqjOmjEZlNMUG/+pR0RLGh5seuI5QIYQg12cnLi/HHF9FWia7BvR7BnP2ZO6NlR
+	 7tpuV7wWCmbhGgGM4lDikAj53GJTgkwozTQIhiSEGX7iqgnDWeLRGWMMULSe/11q85
+	 FwtGM3zYnGbOciO7j5o1GBBgvePVRXJvfyZAKole5jnLVmEYpbqYU7mka7q08qCxeI
+	 bDhj9PYoOxBiDoc1fPYyu5FS5sXH+rIU9xH/g3nLPgCasYC0JmGObFC4cy3Okhivbh
+	 ZYVm0eDadOMjJAf/40ELUsGfXpjV/IDbZ4605ipX6mDU6g9xHD2CXq4FcA4j+Gxgzl
+	 oRc9rL9aYvnOQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfNbo-00000000txy-3Nlp;
-	Thu, 02 Jul 2026 20:02:04 +0000
-Date: Thu, 02 Jul 2026 21:03:53 +0100
-Message-ID: <87pl156tw6.wl-maz@kernel.org>
+	id 1wfO03-00000000uD6-3U3d;
+	Thu, 02 Jul 2026 20:27:07 +0000
+Date: Thu, 02 Jul 2026 21:28:56 +0100
+Message-ID: <87o6gp6sqf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
+Cc: kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH 26/28] KVM: arm64: Add FEAT_NV3 detection
-In-Reply-To: <20260702163950.81D301F00A3A@smtp.kernel.org>
+Subject: Re: [PATCH 23/28] KVM: arm64: Add NVHCR_EL2 context switching
+In-Reply-To: <20260702164310.03AAC1F00A3A@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-27-maz@kernel.org>
-	<20260702163950.81D301F00A3A@smtp.kernel.org>
+	<20260702160248.1377250-24-maz@kernel.org>
+	<20260702164310.03AAC1F00A3A@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,80 +55,91 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:39:50 +0100,
+On Thu, 02 Jul 2026 17:43:09 +0100,
 sashiko-bot@kernel.org wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] Writes to the SYS_NVHCR_EL2 control system register are not followed by an immediate isb().
-> - [High] Writes to CNTKCTL_EL1 and CNTHCTL_EL2 control registers using sysreg_clear_set() lack an immediate isb().
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Cross-VM Information Leak via unswitched SYS_NVHCR_EL2 physical register
 > --
 > 
-> commit b72de4ae5666d0aaa35b94915af5eab1152df83b
+> commit ce2ffdc8cef6935283480a976d01a70bb788a885
 > Author: Marc Zyngier <maz@kernel.org>
-> KVM: arm64: Add FEAT_NV3 detection
 > 
-> This commit adds the detection code for FEAT_NV3 to the cpufeature
-> capabilities. This engages the FEAT_NV3 fast-path when the hardware
-> supports it.
+> KVM: arm64: Add NVHCR_EL2 context switching
+>     
+> This commit adds context switching for the NVHCR_EL2 register to manage
+> the HCR_EL2 state of an EL1 guest. The switch is conditional on the guest
+> using NV3.
 > 
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index c9c124b0ccc8e..6ae1c816e2010 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -2627,6 +2627,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
-> >  		.matches = has_cpuid_feature,
-> >  		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2P1)
-> >  	},
-> 
-> [Severity: High]
-> Could the system operate under a stale configuration when updating timer
-> control registers based on the ARM64_HAS_NV2P1 capability?
-> 
-> In arch/arm64/kvm/arch_timer.c:timer_set_traps(), the control registers
-> are modified without an immediate isb() following the update:
-> 
-> arch/arm64/kvm/arch_timer.c:timer_set_traps()
-> 	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-> 		sysreg_clear_set(cnthctl_el2, clr, set);
-> 	else
-> 		sysreg_clear_set(cntkctl_el1, clr, set);
-> 
-> The sysreg_clear_set() macro expands to a read-modify-write sequence that
-> does not include an isb() as the very next instruction. Is an explicit
-> barrier required here to prevent undefined pipeline state?
-
-No. And "undefined pipeline state" means fsck all.
-
-> 
-> > +	{
-> > +		.desc = "FEAT_NV3",
-> > +		.capability = ARM64_HAS_NV3,
-> > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> > +		.matches = has_cpuid_feature,
-> > +		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV3)
-> > +	},
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > @@ -172,6 +172,10 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+> >  
+> >  	if (ctxt_has_sctlr2(ctxt))
+> >  		ctxt_sys_reg(ctxt, SCTLR2_EL1) = read_sysreg_el1(SYS_SCTLR2);
+> > +
+> > +	/* Retrieve L2's HCR_EL2, and save it for future use */
+> > +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
+> > +		ctxt_sys_reg(ctxt, NVHCR_EL2) = read_sysreg_s(SYS_NVHCR_EL2);
 > 
 > [Severity: High]
-> Does enabling the ARM64_HAS_NV3 capability expose missing synchronization
-> when writing the SYS_NVHCR_EL2 control register?
+> Could this leak information between VMs when the host hardware supports NV3
+> but the guest doesn't have it enabled?
 > 
-> Looking at __compute_hcr() in arch/arm64/kvm/hyp/vhe/switch.c, the guest
-> view is published to SYS_NVHCR_EL2 without an immediate isb():
-> 
-> arch/arm64/kvm/hyp/vhe/switch.c:__compute_hcr()
-> 		if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
-> 			write_sysreg_s(__vcpu_sys_reg(vcpu, HCR_EL2), SYS_NVHCR_EL2);
-> 		else
-> 			__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
-> 
-> Similarly, the L2 view of HCR_EL2 is restored without an immediate isb()
-> before returning:
+> If the host hardware implements FEAT_NV3 and runs an L2 guest with physical
+> HCR_EL2.NV=1, the hardware will redirect EL1 accesses of HCR_EL2 to the
+> physical SYS_NVHCR_EL2 register.
 
-ERET in the guest is a CSE. The end.
+No. If L1 doesn't have NV3 enabled (meaning that its view of
+HCRX_EL2.NVTGE == 0), then HCRX_EL2.NVTGE ==0 on the host as well, as
+per the propagation of HCRX_EL2 in __activate_traps_common().
+
+As per the architecture, an HCR_EL2 access from EL1 with NVTGE==0
+results in accessing the corresponding VNCR_EL2 slot. Not the
+NVHCR_EL2 register.
+
+Stop making things up, specially when you don't even have access to
+the spec.
+
+> Since is_nested_nv3_ctxt() evaluates to false when the guest lacks the
+> virtual NV3 capability, __sysreg_save_el1_state() skips saving this register.
+> Does this allow an untrusted L2 guest to read the SYS_NVHCR_EL2 state left
+> behind by a previously running VM, bypassing software isolation?
+
+No.
+
+>
+> >  }
+> >  
+> [ ... ]
+> > @@ -285,6 +289,13 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+> >  
+> >  	if (ctxt_has_sctlr2(ctxt))
+> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR2_EL1), SYS_SCTLR2);
+> > +
+> > +	/*
+> > +	 * Publish the L2 view of HCR_EL2 to the HW if L1 is using NV3.
+> > +	 * Otherwise, the data is already in place in the L1's own VNCR.
+> > +	 */
+> > +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
+> > +		write_sysreg_s(ctxt_sys_reg(ctxt, NVHCR_EL2), SYS_NVHCR_EL2);
+> 
+> [Severity: High]
+> Similar to the save path above in __sysreg_save_el1_state(), should this
+> context switch be based on the host's hardware capability rather than the
+> guest's software configuration?
+> 
+> If the physical register isn't explicitly overwritten in
+> __sysreg_restore_el1_state() because is_nested_nv3_ctxt() is false, the
+> L2 guest could potentially read the stale configuration state of a
+> completely different VM.
+
+No.
 
 	M.
 
