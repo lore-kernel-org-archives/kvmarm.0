@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFFA34107D;
-	Thu,  2 Jul 2026 17:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3919C36308F;
+	Thu,  2 Jul 2026 17:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783013982; cv=none; b=LX94h/gbZcf/SB6SoVBDslV71wQwCHxw8QHHF8k94zHd+5XieUWGYUBSkuvdCw251W9LTFjccUhweNsfjEoDiVPD3D/9LZdWloMeECN3MrtlKH1QFpJZ50ibq4HHMTB5uG9hNeK0gYthwrM6W88I6VQMP2txJ5irQvYbvajas0s=
+	t=1783014307; cv=none; b=Fu94PC3hOjpJCkid2kd8G5K/oS1NL2H8j/UP2fyNE+9K1WyDm/wlB5sGJDpumSplIc8t97Rn5+HdrGEw+wMF8h8P/OmpLwE6WpiAzhgPPPofilAPFrQgNwwE9Mani4QiDN8SDjg3MzM/dxDjDqqVraSkUeuSfmjsMD3oNksSuqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783013982; c=relaxed/simple;
-	bh=6N4Bg2b+t+GrNSxoSFhr4+LgUE7IVDBhDXPK5KLLMH8=;
+	s=arc-20240116; t=1783014307; c=relaxed/simple;
+	bh=GlMpKWSsi+b6vus2AXDaFTcRTJzGgSl34g5vQKcCgnQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KoNY8a9omM3lIbjFXMNRR17rytNKcmgdm1cpMR/RA3roSsBeP8dvus13hT68hFOeulLUWTtOsKCdSgTKbiOdSAezwb4hRGUZY0agVAUm2g4UWGGc+wvbB9skKEIu1nJ0U48Gnr/VGFzVCL9g2hPwh34fnF82shbdGdzZKHymNNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GCbLnA/q; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Yzk2YR90Mvzq2SfAy8DMoPv5Xcf/anXTgiNuWaDe7BKywwy8FIx+Of6SR0q/Doh6tl3R9c0074+0LfbJj8hSF8F4Y+74f8wa3EkZFDxbVd395GdLyD06LnMxPB4QJMqtscZbSVW2YU8EPEQj61hutw9OvNoHJwpNXvVPEk0lGgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I81kHzwp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GCbLnA/q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 533AD1F000E9;
-	Thu,  2 Jul 2026 17:39:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I81kHzwp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335D1F000E9;
+	Thu,  2 Jul 2026 17:45:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783013981;
-	bh=7p6mwMxIeKEOLzjG5YeSK0tG82ZYp+L69Hc1Bm6FBFA=;
+	s=k20260515; t=1783014305;
+	bh=wNTdYzKbpfZuT2TJ+ZXo+3SX8JDz1ri+M7HbhaVmEY0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=GCbLnA/q1ritVqINJF+YEyPX/TKqQiACrIRjJfvGcVhIkKeOpqAS29vL946EByl/h
-	 I3+ie2VO8aYWJVJT5pzDVGjV3BxlkLJCawDszzQSL4xxWc5WGhXZ8JwLmwxy8lCJ/0
-	 PvkLdjy/atAXNb6BlLXBIPqe6yC0yv9g1SZGtBAYgsrsuVVDjKGJK/nGVAxuUMMcVo
-	 AO6FQyTsOTON8JTKhu14Xzq+Z0S3kX6cTykPiwUbFGY3+3heZLPLvPrNvn+xsYRX+j
-	 jOszkEUIrg6unrWXHDa+eQ74VkvGTCmaNfnVurO7ynwJyHcPcIb4ZsyK2477gpJQ07
-	 pOW3nK1+TAadQ==
+	b=I81kHzwpLAKU8IWPG4z2c5YniUVs/E37EOW1244ihLkY4kGrb/W79wmLWZv8Hatbu
+	 zwM6m2SaV4bf29I7Gu3olsRs1vbzWDh5Ly6+6DoDrSFyl6vCyvqRocCYvCnK+KK323
+	 CsOHD6cu2wZrFFk/M8ulkPhHosXKHexdUZpinQBG9xu2ov0o2fk+Je2+DHdxbOQtlT
+	 Qi6MnDgFDl8JDUpMpOrXOjodK4jqa3bPqvxdnTBzL1ULe/565bRi/seAyZkcGu//2Y
+	 D9n5xEJgKm7UoT1ISplwPFqmTn1IBcfnrQchQzrYwIz9bEhDMdAQSHck4jsebhuAAc
+	 c4kaZJJUASx7w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfLNz-00000000rEr-0DmQ;
-	Thu, 02 Jul 2026 17:39:39 +0000
-Date: Thu, 02 Jul 2026 18:41:27 +0100
-Message-ID: <8733y18f20.wl-maz@kernel.org>
+	id 1wfLTD-00000000rKs-31nB;
+	Thu, 02 Jul 2026 17:45:03 +0000
+Date: Thu, 02 Jul 2026 18:46:52 +0100
+Message-ID: <871pdl8esz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>
-Subject: Re: [PATCH 01/28] arm64: sysreg: Emit RESx/UNKN values for Mapping definitions
-In-Reply-To: <20260702161927.B3C9F1F000E9@smtp.kernel.org>
+Cc: kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
+In-Reply-To: <20260702162132.091A51F000E9@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-2-maz@kernel.org>
-	<20260702161927.B3C9F1F000E9@smtp.kernel.org>
+	<20260702160248.1377250-11-maz@kernel.org>
+	<20260702162132.091A51F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,55 +55,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:19:27 +0100,
+On Thu, 02 Jul 2026 17:21:31 +0100,
 sashiko-bot@kernel.org wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Low] Invalid `_RESx` macros generated for `Mapping` aliases when the target uses `Fields`.
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> 
+> New issues:
+> - [High] Unconditional use of the CNTKCTL_EL1 hardware alias under FEAT_NV2p1 clobbers the CNTHCTL_EL2.ECV bit for both the host and the guest.
+> 
+> Pre-existing issues:
+> - [High] Writes to the control-plane system registers CNTHCTL_EL2 and CNTKCTL_EL1 are missing a mandatory ISB instruction.
 > --
 > 
-> commit ba830a7cd4d5bdb5ba927754ed4d1c4e3a0b4f1c
+> commit 71cc9698fb316a6dc28bed5d5465cd03b6074925
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> arm64: sysreg: Emit RESx/UNKN values for Mapping definitions
+> KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
 > 
-> The sysreg script uses the Mapping qualifier to indicate an encoding is a
-> mapping to a particular register, but macro generation for RESx classes was
-> previously skipped. This patch relaxes that rule to emit RESx and UNKN
-> values for Mapping qualifiers.
+> This patch optimizes CNTHCTL_EL2 accesses when FEAT_NV2p1 is present by
+> treating the CNTKCTL_EL1 accessor as normal. It replaces the split approach
+> with direct use of the CNTKCTL_EL1 hardware alias.
 > 
-> > diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-> > index 86860ab672dc7..d7f7ceb768fe5 100755
-> > --- a/arch/arm64/tools/gen-sysreg.awk
-> > +++ b/arch/arm64/tools/gen-sysreg.awk
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 4155fe89b58a1..db60facad9f3c 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
 > 
 > [ ... ]
 > 
-> > @@ -239,9 +239,15 @@ $1 == "EndSysreg" && block_current() == "Sysreg" {
-> >  	print ""
+> > @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+> >  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
+> >  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
 > >  
-> >  	next_bit = -1
-> > -	res0 = null
-> > -	res1 = null
-> > -	unkn = null
-> > +	if ($1 == "Mapping") {
-> > +		res0 = $2 "_RES0"
-> > +		res1 = $2 "_RES1"
-> > +		unkn = $2 "_UNKN"
+> > -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
+> > -	sysreg_clear_set(cnthctl_el2, clr, set);
+> > +	/*
+> > +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
+> > +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
+> > +	 */
+> > +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
+> > +		sysreg_clear_set(cnthctl_el2, clr, set);
+> > +	else
+> > +		sysreg_clear_set(cntkctl_el1, clr, set);
 > 
-> [Severity: Low]
-> Does this logic generate invalid macros if the target register uses the
-> "Fields" directive?
+> [Severity: High]
+> Does this read-modify-write on the host's physical state using the
+> cntkctl_el1 alias inadvertently clear KVM's own physical CNTHCTL_EL2.ECV bit?
+> 
+> Since the alias drops or mishandles the ECV bit, reading it might return ECV
+> as 0 and write it back as 0. This could silently disable the host's ECV
+> functionality, such as CNTPOFF initialization from kvm_timer_init_vhe().
 
-Interesting point. This indeed breaks for a Mapping->Fields
-indirection.
+No, and that's the whole point of NV2p1: the CNTKCTL_EL1 bits are
+guaranteed to be stateful, and we don't need to do anything else
 
-We don't have anything of this shape just yet, but it shouldn't hurt
-to generate the RESx/UNKN symbols for those as well.
+> [Severity: High]
+> This is a pre-existing issue, but shouldn't there be an isb() instruction
+> immediately following these control-plane system register writes?
+
+"control-plane"? WTF???
+
+And no. These bits only need to take effect when entering the guest,
+for which we already have a context synchronisation event.
+
+> Writing to CNTHCTL_EL2 or CNTKCTL_EL1 without an explicit context
+> synchronization event can cause the CPU to operate under a stale timer trap
+> configuration for several cycles before returning.
+
+Bollocks.
 
 	M.
 
