@@ -1,183 +1,233 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8663BED7B
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 10:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CF33909A2
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 10:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782989329; cv=none; b=g5Q5yMBuxi6w8tKo7eP9SNOFboKmVXDX8dxp+PSXti/rWQx9tFIF1YHl80sezISmDpA9vh38jkHFCyLLvhbqU2nwiABaZ0Up/1QB9Yu7mVEOslJDrAUhFXmpxu2SFXu2E0dMGProwE9duuw6nHpMyD2LRdRVvhHohmsM+9PiqeI=
+	t=1782989892; cv=none; b=mkYH91jcR39XtUb6BCeS+tAvzyiWZsTC60MkrodR7opQ2ErKUo7jF6JTEYNQVSMnqrmmdQuA+O7kcwP8VPyULluFgKBx4S4thTB91ePVwqG3KQHpW3mgdlRFLyEBxkvdVR9IGC3H945jraTD6qjgOzZvcWYLdD3Ut1Wzo7QSfHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782989329; c=relaxed/simple;
-	bh=11FOirbKHp5I01k7N5quP6/+laMK07HakTvOvUmPKaA=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=GYuiVFd3ddKJ44NClDhVAy/IuxQ0xikLbh0D3xrWu3QpshPIU8L9NUcfsc6iFtMeEKWIA8RsAMvz+Mzn/bo0yABCsGMTMUXvsWm79u7C1cwMNwIeSip21M8FFNQoPv1r8UTbVExF7wyyPpcyX1Uu8I3dUNQHSR3MJSD5T/UOW/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GVrvGrZv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782989892; c=relaxed/simple;
+	bh=GKe7TITEFnRW0+TIwdiAaqbX7l401DXeRZ1PFimE7Ic=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=ISVvwJOTkJn0uzJDSlZ8F2skm6UtN44oYuUaARrS6yvPeMfLCoAi2ej2KJE+trK880vtdaesmwoq+/MIFVLMXvpXMzyNdV7fZ8d+mqvm1mCvVp9RbTyg/SmlpgX+Cgs/0cxBShqSOLT4oV54pYhlgYUNeeKzkmdd+tNh5rsJqVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ScaL9klc; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GVrvGrZv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F157E1F00A3A;
-	Thu,  2 Jul 2026 10:48:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782989327;
-	bh=KUVfm1KgGhQZ13ZFRT6USRYppx7Fnxv3+kUJuGmEgiM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=GVrvGrZvS7Zohj55rNz2IU/79A+ICrNhrqaskomPdo2O/9q+Q72W3vY+HnJpUWHMC
-	 Wd0EdBYewQmy1LLfSiZdYoHNQIpe0aFZH5Le8JbzCSa8lVM8qyOdBoDsC5behRapfx
-	 dxIo9o1zWaqZTBIqJGfvlxhW3VMBKQvuhtoRDccnRbGkapbyafI/i30l1EEMpYXlKF
-	 Psq7nOBzkHTVw8j8lw9+k/nMl6BNd3cjUhRWnCmH8ya+c9ZkRAiYkYX161ECvKHc/U
-	 x8ngCoa0GWK1Xu2KcxIQPEsy3fhiVZ/OF6RnpSLwmWTjkjhVUXWbhbPjMKfX6Wl9cL
-	 KiR6eqHqIx7qQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 6/6] KVM: arm64: Zero out the stack initialized data
- in the FFA handler
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sebastian Ene" <sebastianene@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260702103848.1647249-7-sebastianene@google.com>
-References: <20260702103848.1647249-1-sebastianene@google.com>
- <20260702103848.1647249-7-sebastianene@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jul 2026 10:48:46 +0000
-Message-Id: <20260702104846.F157E1F00A3A@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ScaL9klc"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95DDE356E;
+	Thu,  2 Jul 2026 03:58:05 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 017293F905;
+	Thu,  2 Jul 2026 03:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782989889; bh=GKe7TITEFnRW0+TIwdiAaqbX7l401DXeRZ1PFimE7Ic=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ScaL9klctrfC1nZszPATlBNGZfQgSLLUmDS9rlpFskG4zAekS3k2R94pM6p7Y10VT
+	 gOD9XlGOfmnC7K/iKF504aaS49Ekpm/VEnxdRSwAwfj8M4YeDMMnaEBNRQYbHdsXsQ
+	 zKN74dQtoj2Bar84aEcbbNxdyccUayNbkswmKn1k=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
+Date: Thu,  2 Jul 2026 11:58:06 +0100
+Message-ID: <akZEPVJhCcYbyoN2@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <5yy625c66j3kgoboejg7hagnmxjzp2tvmvvncmqvo444wtpmzl@sufez6t2iy3r>
+References: <20260630121005.1130996-1-weilin.chang@arm.com> <20260630121005.1130996-4-weilin.chang@arm.com> <akUrmfQnKmIXTigs@LeoBrasDK> <5yy625c66j3kgoboejg7hagnmxjzp2tvmvvncmqvo444wtpmzl@sufez6t2iy3r>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
+On Wed, Jul 01, 2026 at 06:27:51PM +0100, Wei-Lin Chang wrote:
+> On Wed, Jul 01, 2026 at 04:00:41PM +0100, Leonardo Bras wrote:
+> > Hi Wei Lin,
+> > 
+> > On Tue, Jun 30, 2026 at 01:10:02PM +0100, Wei-Lin Chang wrote:
+> > > ptdump files can still be read after the pgt of the canonical mmu is
+> > > freed, if they are opened before the VM debugfs directory is removed.
+> > > This triggers UAF in places where we cache the pgt pointer or access it
+> > > without checking its validity.
+> > > 
+> > > Check the pgt is still alive under the mmu_lock before accessing the
+> > > pgt.
+> > > 
+> > > Reported-by: Sashiko <sashiko-bot@kernel.org>
+> > > Closes: https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=1
+> > > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > > ---
+> > >  arch/arm64/kvm/ptdump.c | 38 ++++++++++++++++++++++++--------------
+> > >  1 file changed, 24 insertions(+), 14 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > > index d5aa9eff08d1..752d8e0cd25c 100644
+> > > --- a/arch/arm64/kvm/ptdump.c
+> > > +++ b/arch/arm64/kvm/ptdump.c
+> > > @@ -115,13 +115,21 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
+> > >  static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
+> > >  {
+> > >  	struct kvm_ptdump_guest_state *st;
+> > > -	struct kvm_pgtable *pgtable = kvm->arch.mmu.pgt;
+> > > +	struct kvm_pgtable *pgtable;
+> > >  	int ret;
+> > >  
+> > >  	st = kzalloc_obj(struct kvm_ptdump_guest_state, GFP_KERNEL_ACCOUNT);
+> > >  	if (!st)
+> > >  		return ERR_PTR(-ENOMEM);
+> > >  
+> > > +	guard(write_lock)(&kvm->mmu_lock);
+> > > +	if (!kvm->arch.mmu.pgt) {
+> > > +		kfree(st);
+> > > +		return ERR_PTR(-ENXIO);
+> > > +	}
+> > > +
+> > > +	pgtable = kvm->arch.mmu.pgt;
+> > > +
+> > >  	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
+> > >  	if (ret) {
+> > >  		kfree(st);
+> > > @@ -137,7 +145,6 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
+> > >  
+> > >  static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+> > >  {
+> > > -	int ret;
+> > >  	struct kvm_ptdump_guest_state *st = m->private;
+> > >  	struct kvm *kvm = st->kvm;
+> > >  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+> > > @@ -154,11 +161,11 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+> > >  		.seq		= m,
+> > >  	};
+> > >  
+> > > -	write_lock(&kvm->mmu_lock);
+> > > -	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> > > -	write_unlock(&kvm->mmu_lock);
+> > > +	guard(write_lock)(&kvm->mmu_lock);
+> > > +	if (mmu->pgt)
+> > > +		return kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> > 
+> > IIUC, that's the same behavior, right?
+> > Just changed to look about the same with the rest of this file?
+> 
+> I'm not too sure what you are referring to, if you mean the
+> write_lock/unlock -> guard(write_lock) change, then yes, mostly. Just
+> also checking mmu->pgt is still not freed.
 
-Pre-existing issues:
-- [High] EL2 silently accepts a downgrade response from EL3 and incorrectly=
- uses the host's requested version as the negotiated version, leading to ve=
-rsion desynchronization.
-- [Medium] Host can trigger a reliable EL2 hypervisor panic (Denial of Serv=
-ice) by passing a fake handle to FFA_MEM_FRAG_TX alongside an invalid PFN d=
-uring rollback.
-- [Medium] Optional FF-A 1.1/1.2 interfaces not implemented by pKVM are not=
- masked in `FFA_FEATURES` queries, allowing them to be passed through to EL=
-3.
---
+I was referring just to lock+unlock -> guard() strategy.
+IIUC this has the same effect, so I was wondering on why you suggested the 
+change.
 
-commit 04220564e97901b7aa4aa40ada1444ec9b7ccea7
-Author: Sebastian Ene <sebastianene@google.com>
+I then supposed it was to look the same of the rest of the file.
 
-KVM: arm64: Zero out the stack initialized data in the FFA handler
-   =20
-This commit initializes the arm_smccc_1_2_regs structure with zeros in
-kvm_host_ffa_handler to prevent leaking hypervisor stack data.
+> 
+> > 
+> > >  
+> > > -	return ret;
+> > > +	return 0;
+> > >  }
+> > 
+> > So if the pgt does not exist anymore, it returns zero. Is that the desired 
+> > behavior?
+> 
+> Good question, so the question is what contract between the ptdump and
+> user do we want to make for this case. I guess returning some error like -EIO
+> could make a little more sense than just printing nothing?
+>
 
-Link: https://lore.kernel.org/all/20260616160016.C62C81F000E9@smtp.kernel.o=
-rg/
+It depends on what is the behaviour you want to see... see below..
+ 
+> > 
+> > I guess it's aligned with the idea of single file mentioned in the cover, 
+> > right?
+> 
+> Sorry, I don't get what you are asking here?
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 9c96e72e522e5..a327c2bbb6b64 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -880,7 +880,7 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs=
- *res,
-> =20
->  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
->  {
-> -	struct arm_smccc_1_2_regs res;
-> +	struct arm_smccc_1_2_regs res =3D {0};
+IIUC you mentioned in the cover letter that you planned to have a file 
+which would, on read, output ptdump for every nested pgtable. Did I get 
+that right? 
 
-While reviewing this code, I noticed a few pre-existing issues in the same
-file.
+If so, I imagine that the user has no idea how many nested pgtables are 
+there, and if the ioctl initially finds N, but ends up printing N-1 
+(because a pgtable was not there anymore), that would not be an error that 
+the user should be worried about.
 
-arch/arm64/kvm/hyp/nvhe/ffa.c:do_ffa_version() {
-    ...
-    hyp_smccc_1_2_smc(&(struct arm_smccc_1_2_regs) {
-        .a0 =3D FFA_VERSION,
-        .a1 =3D ffa_req_version,
-    }, res);
-    if ((s32)res->a0 =3D=3D FFA_RET_NOT_SUPPORTED)
-        goto unlock;
+It could be an issue if you were printing in multiple steps (multiple 
+checks), as a part of that pgtable could be printed while another part 
+could not. Which does not seem to be the case.
 
-    hyp_ffa_version =3D ffa_req_version;
-    ...
-}
+> 
+> > 
+> > >  
+> > >  static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
+> > > @@ -206,17 +213,23 @@ static const struct file_operations kvm_ptdump_guest_fops = {
+> > >  
+> > >  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
+> > >  {
+> > > -	struct kvm_pgtable *pgtable = m->private;
+> > > +	struct kvm *kvm = m->private;
+> > > +
+> > > +	guard(write_lock)(&kvm->mmu_lock);
+> > > +	if (kvm->arch.mmu.pgt)
+> > > +		seq_printf(m, "%2u\n", kvm->arch.mmu.pgt->ia_bits);
+> > >  
+> > > -	seq_printf(m, "%2u\n", pgtable->ia_bits);
+> > >  	return 0;
+> > >  }
+> > >  
+> > >  static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
+> > >  {
+> > > -	struct kvm_pgtable *pgtable = m->private;
+> > > +	struct kvm *kvm = m->private;
+> > > +
+> > > +	guard(write_lock)(&kvm->mmu_lock);
+> > > +	if (kvm->arch.mmu.pgt)
+> > > +		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - kvm->arch.mmu.pgt->start_level);
+> > >  
+> > > -	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
+> > >  	return 0;
+> > >  }
+> > >  
+> > > @@ -224,15 +237,12 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
+> > >  				    int (*show)(struct seq_file *, void *))
+> > >  {
+> > >  	struct kvm *kvm = m->i_private;
+> > > -	struct kvm_pgtable *pgtable;
+> > >  	int ret;
+> > >  
+> > >  	if (!kvm_get_kvm_safe(kvm))
+> > >  		return -ENOENT;
+> > >  
+> > > -	pgtable = kvm->arch.mmu.pgt;
+> > > -
+> > > -	ret = single_open(file, show, pgtable);
+> > > +	ret = single_open(file, show, kvm);
+> > 
+> > Maybe this change is more related with the previous patch?
+> 
+> I see your point, but I divided it into first fixing mmu UAF, then the
+> pgt UAF, which I also think makes sense.
+> 
 
-[Severity: High]
-This is a pre-existing issue, but does EL2 silently accept a downgrade
-response from EL3 here and incorrectly use the host's requested version as
-the negotiated version?
+Okay then
 
-If EL3 accepts but returns an even lower version in res->a0, EL2 ignores it
-and sets hyp_ffa_version =3D ffa_req_version.
-
-Could this version desynchronization between EL2 and EL3 lead to mismatched
-memory descriptor parsing and break guest isolation?
-
-
-arch/arm64/kvm/hyp/nvhe/ffa.c:do_ffa_mem_frag_tx() {
-    ...
-    ret =3D ffa_host_share_ranges(buf, nr_ranges);
-    if (ret) {
-        /*
-         * We're effectively aborting the transaction, so we need
-         * to restore the global state back to what it was prior to
-         * transmission of the first fragment.
-         */
-        ffa_mem_reclaim(res, handle_lo, handle_hi, 0);
-        WARN_ON(res->a0 !=3D FFA_SUCCESS);
-        goto out_unlock;
-    }
-    ...
-}
-
-[Severity: Medium]
-This isn't a bug introduced by this patch, but can the host trigger a
-reliable EL2 hypervisor panic here?
-
-If the host provides an invalid memory range, ffa_host_share_ranges() fails.
-In the rollback path, if the host also provided an unauthorized or fake
-handle_lo or handle_hi, EL3 rejects the reclaim and returns an error.
-
-Does this cause EL2 to hit the WARN_ON(res->a0 !=3D FFA_SUCCESS), which exp=
-ands
-to a fatal BUG() and causes a denial of service?
-
-
-arch/arm64/kvm/hyp/nvhe/ffa.c:ffa_call_supported() {
-    ...
-    /* Optional notification interfaces added in FF-A 1.1 */
-    case FFA_NOTIFICATION_BITMAP_CREATE:
-    ...
-    case FFA_PARTITION_INFO_GET_REGS:
-        return false;
-    }
-
-    return true;
-}
-
-arch/arm64/kvm/hyp/nvhe/ffa.c:do_ffa_features() {
-    ...
-    switch (id) {
-    case FFA_MEM_SHARE:
-    ...
-        goto out_handled;
-    default:
-        return false;
-    }
-    ...
-}
-
-[Severity: Medium]
-This is a pre-existing issue, but are we missing masking for optional
-FF-A 1.1/1.2 interfaces not implemented by pKVM?
-
-ffa_call_supported() omits several optional interfaces such as
-FFA_FN64_NOTIFICATION_INFO_GET and FFA_MSG_SEND2, returning true for them.
-
-Then in do_ffa_features(), it returns false for these unhandled queries,
-causing kvm_host_ffa_handler() to forward the query to EL3.
-
-Could this incorrectly advertise optional FF-A features to the host that the
-hypervisor does not actually implement?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260702103848.1647=
-249-1-sebastianene@google.com?part=3D6
+Thanks!
+Leo
