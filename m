@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250973A7F79;
-	Thu,  2 Jul 2026 18:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780E73A59B1;
+	Thu,  2 Jul 2026 18:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783016496; cv=none; b=kN4e+8DVL1ybYXxst4Mwp0C0ThwGYZaP1Ribt7I1w64ktqrRx/QZFB+AzwBh5fhmV0pZOML3IN1x0Sf1TN22VTwfnj3Yb0nXYmAIjzgw59X+zQInlpmXQ2kVH3heraUS0vXnCOgj4pZ+DAFBbBOrsENTzglFBC3sXQo14lw5GOY=
+	t=1783016845; cv=none; b=r5Igt+mxa84YmM+u56H5NVJAxJ0xFbTSV4MLpcMem/LsrnL4LmOfYY97BqeVmTlM0BCrmC2ZZvy5VLE1+Qx9X6TSCVovOkrUpigoGhE4kBBZlfS/Qj2mdGzuuBRW/QH6d1nTh/6jA5h7g9IGw3E5aupacYHXDqCQo97gad4McBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783016496; c=relaxed/simple;
-	bh=jU2AoG6IndK9idfzHQDC+NU7d1Pkfnzg2EVrx2Dl4BQ=;
+	s=arc-20240116; t=1783016845; c=relaxed/simple;
+	bh=tUNl1L/Tvt9Lw9z28XQPOJw4gf0w7g1efNRYWEiEUQA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j/SS+djvIXNrUpFpdGIyGRfOuNlf3nwax56QpLQHeAJcKAnq57IeQV4Tdagc+fIQ7Df/dY57XafuL84+WpmUXS3iePVIjvtDI5WmiY2E5ANZce3Auhp/xyMOCl5EU1dLhOo5ZD+fg2auVW+WRf17Vdf8ax0NVzrCbqeFUhk4lEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ktiw7l1C; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=EtD8C3WijYewMlfvceTkXiYKhTzgj2TgqQRqa96SBSIug8F6F20Xcjvsj5np8oFUOnJb3iIOG8fj/+clOCrRuTki5HTXK6/lsK1z0ndBg2/3rLm4hgdA9NzzrxJ43WVxzl6iL90TB1JjOWw5eqsYNvsBExVPpllr/Gv7ZmLpBW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sz8K5BhT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktiw7l1C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D98EF1F000E9;
-	Thu,  2 Jul 2026 18:21:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sz8K5BhT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E58B11F000E9;
+	Thu,  2 Jul 2026 18:27:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783016494;
-	bh=1SuULpCnv+ZtgunZ3kmCJaCLinbfhln/r9wXvhLyFbY=;
+	s=k20260515; t=1783016843;
+	bh=NymyTv3BRAYOKJnkWhgABGHjBidtkeFYqde854oTNgc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ktiw7l1CEBuJ6CjFZ4tdXC+z5MwTFTj4mGxcS/3W6aUwPPBizEsYIVe8S6tZ2ivTg
-	 F8+x8qm1NtgcxkM11ouf1Pk16YB2B8wNR1DSAquCtVxPMGCuvyfp17ZjleI1E1HdL5
-	 qQfGLChtCaSZnKlV1OHw/Ya155x2G+NNLgglU1n+EcHVqOql6iZ5zCWSUXf4z8G3GK
-	 tk5M88ME7pHvAZQhFutDzO0l+eb9IiFZGRgNjN3C5sAsQMm5Q633JO4bmPVvutEfro
-	 NYnmJe7xH3BasHIbQIzT4vp9ls04E9i2tyK8mBsTsbG99pmP6tXIvv92BxbLSy4KjQ
-	 kGIgx+H4A7GFA==
+	b=Sz8K5BhTbLLtJq2fXhiyYckyCZaFTciidyNQNfFpdazOQwzeftdfEPyZi+0uUxOnh
+	 gBW7F/XHIoAt/Op5pYmYYz0abrwxRrOhYeJmZTy5vpKVHmvR+qarwjGMg4X0URZ+vo
+	 DaxVkXN3e7w7uwFMZGF2Thj/Qt0MVCBRwJ4EA26wVfmBACaDkERbzeINlnh4wXx1HG
+	 a4/8xf2kmC5T3bQvMCWJDrRGWwvj5gHtmRq8TDHLpkeHK9cfl300oa8j/GSg8wQzXC
+	 joPwmY7Mmcf3WZsfcG+FC3Z2j7uA6yJgiCJ8/Tgr1jimT0EH090oFOURhIweNQHCv2
+	 M5G2ASLCmFmlw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfM2W-00000000s7U-4B7F;
-	Thu, 02 Jul 2026 18:21:33 +0000
-Date: Thu, 02 Jul 2026 19:23:21 +0100
-Message-ID: <87tsqh6yjq.wl-maz@kernel.org>
+	id 1wfM8A-00000000sFg-0YRL;
+	Thu, 02 Jul 2026 18:27:22 +0000
+Date: Thu, 02 Jul 2026 19:29:10 +0100
+Message-ID: <87se616ya1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests
-In-Reply-To: <20260702162831.4D2661F00A3D@smtp.kernel.org>
+	kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>
+Subject: Re: [PATCH 03/28] KVM: arm64: Merge guest's HCRX_EL2 using NV_HCRX_GUEST_EXCLUDE
+In-Reply-To: <20260702163411.C2F861F00A3E@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-12-maz@kernel.org>
-	<20260702162831.4D2661F00A3D@smtp.kernel.org>
+	<20260702160248.1377250-4-maz@kernel.org>
+	<20260702163411.C2F861F00A3E@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,58 +55,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:28:30 +0100,
+On Thu, 02 Jul 2026 17:34:11 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Inconsistent preservation of `ID_AA64MMFR4_EL1` feature fields based on host support for `ARM64_HAS_NV2P1` (and later `ARM64_HAS_NV3`), leading to uncontrolled UAPI feature leaks and migration breakages.
+> - [High] Missing RES0 Sanitization / Unsafe Register Merge for HCRX_EL2
 > --
 > 
-> commit 11eacfaa8962f15232e1ae99c1e9f7d1dfee6846
+> commit a8dae7a323ff7e33355d5cb4c144294087a9bbfa
 > Author: Marc Zyngier <maz@kernel.org>
+> KVM: arm64: Merge guest's HCRX_EL2 using NV_HCRX_GUEST_EXCLUDE
 > 
-> KVM: arm64: Expose FEAT_NV2p1 to NV guests
+> This commit changes how the guest-provided HCRX_EL2 value is merged with
+> the host's value. It replaces positive masking with an exclusion list
+> of bits that the guest is not allowed to override.
 > 
-> This commit exposes the FEAT_NV2p1 feature to nested virtualization guests.
-> It does so by updating the ID_AA64MMFR4_EL1 feature register limits in
-> limit_nv_id_reg() based on host support.
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 4bf624a49591d..8e5f492f39086 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
 > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1740,7 +1740,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
-> >  		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features)) {
-> >  			val = 0;
-> >  		} else {
-> > -			val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
-> > +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> > +				val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P1);
-> > +			else
-> > +				val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+> [ ... ]
+> 
+> > @@ -350,8 +368,8 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+> >  		u64 hcrx = vcpu->arch.hcrx_el2;
+> >  		if (is_nested_ctxt(vcpu)) {
+> >  			u64 val = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> > -			hcrx |= val & __HCRX_EL2_MASK;
+> > -			hcrx &= ~(~val & __HCRX_EL2_nMASK);
+> > +			hcrx |= (val & ~NV_HCRX_GUEST_EXCLUDE);
+> > +			hcrx &= ~(~val & ~NV_HCRX_GUEST_EXCLUDE);
 > 
 > [Severity: High]
-> Does this introduce inconsistent preservation of ID_AA64MMFR4_EL1 feature fields?
-> 
-> When the host supports NV2P1, KVM uses ID_REG_LIMIT_FIELD_ENUM(), which only
-> modifies the NV_frac field and preserves the rest of the original val. This 
-> means the guest will inherit other host-populated feature bits from
-> ID_AA64MMFR4_EL1 (like ASID2, HACDBS, FGWTE3, etc.).
-> 
-> However, if the host is NV2-only, it falls back to the original assignment
-> using SYS_FIELD_PREP_ENUM(), which effectively wipes out all other fields in
-> val.
-> 
-> Could this uncontrolled feature leak cause guest-visible state divergence based
-> on the underlying hardware and break live migration?
-> 
-> >  			val &= ~ID_AA64MMFR4_EL1_E2H0;
-> >  			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI_NV1);
+> Does this allow an untrusted L1 guest to write garbage to the
+> architecturally RES0 bits of the physical HCRX_EL2 register?
 
-Yeah, that's indeed wrong. Another one to fix.
+A guest is by definition untrusted. Reading a VNCR-backed system
+register implies sanitisation to enforce RESx bits.
+
+>
+> By switching from a positive mask to a negative exclusion mask, any bits
+> not explicitly excluded are now merged into the host value.
+> 
+> If the guest modifies its VNCR page at the VNCR_HCRX_EL2 offset and sets
+> RES0 bits, these bits would be passed through. Since hcrx_feat_map lacks
+> FORCE_RES0(HCRX_EL2_RES0), KVM's register mask application in
+> kvm_vcpu_apply_reg_masks() will fail to clear them before they reach this
+> merge point in __activate_traps_common().
+
+No, the RES0 bits are implicitly handled. FORCE_RESx() is exclusively
+sugar coating here. Case in point:
+
+root@say-please:/home/maz# grep HCRX /sys/kernel/debug/kvm/976-14/resx
+        SYS_HCRX_EL2:	RES0:0000000005ffcfe7	RES1:0000000000000000
+
+Go away.
 
 	M.
 
