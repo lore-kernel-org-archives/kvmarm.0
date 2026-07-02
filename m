@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3919C36308F;
-	Thu,  2 Jul 2026 17:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAAD38947F;
+	Thu,  2 Jul 2026 17:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783014307; cv=none; b=Fu94PC3hOjpJCkid2kd8G5K/oS1NL2H8j/UP2fyNE+9K1WyDm/wlB5sGJDpumSplIc8t97Rn5+HdrGEw+wMF8h8P/OmpLwE6WpiAzhgPPPofilAPFrQgNwwE9Mani4QiDN8SDjg3MzM/dxDjDqqVraSkUeuSfmjsMD3oNksSuqQ=
+	t=1783014952; cv=none; b=BVLWWtVnNkuJJJyhcGPSC+9xDGIU//gwMRQwWlH/6OpTnVFxLEq4kOjIzc3sg83ESxx4MNOmJfHW4CraecMlL/pfz7B/j+QwDtAyMWBuDg9Uly3NYwhu/COoKq44TGeYZphjFVng4HT3iU5PQkn3ZeRs0M74FXpIiDxQb1TJ7qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783014307; c=relaxed/simple;
-	bh=GlMpKWSsi+b6vus2AXDaFTcRTJzGgSl34g5vQKcCgnQ=;
+	s=arc-20240116; t=1783014952; c=relaxed/simple;
+	bh=rzIoOfYsyeRGOCUjFeingkIXt3w8PrBF/49bZVWjeDI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yzk2YR90Mvzq2SfAy8DMoPv5Xcf/anXTgiNuWaDe7BKywwy8FIx+Of6SR0q/Doh6tl3R9c0074+0LfbJj8hSF8F4Y+74f8wa3EkZFDxbVd395GdLyD06LnMxPB4QJMqtscZbSVW2YU8EPEQj61hutw9OvNoHJwpNXvVPEk0lGgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I81kHzwp; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=VVZmvwxOoHUp3FBgduP9S7dquRdUTK9ASW4ts4/lFPMpn+WuxGSIfs+MnkEAQXRlxflHweVDWFOuueIod/PI8C4/KpycG+Wfda750bAB5fD+K3FRArDT04MJwwQP+3Z0jEIWZyXeUELQgiVbJ9p8JBGiLJ/SLdIo6MBbG8Wdlnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7iEh2x+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I81kHzwp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335D1F000E9;
-	Thu,  2 Jul 2026 17:45:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7iEh2x+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981491F00A3D;
+	Thu,  2 Jul 2026 17:55:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783014305;
-	bh=wNTdYzKbpfZuT2TJ+ZXo+3SX8JDz1ri+M7HbhaVmEY0=;
+	s=k20260515; t=1783014950;
+	bh=y1x+0bSxTJqOfHaNmLtGC+jIcvppxaZIz+BytpXd6dM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=I81kHzwpLAKU8IWPG4z2c5YniUVs/E37EOW1244ihLkY4kGrb/W79wmLWZv8Hatbu
-	 zwM6m2SaV4bf29I7Gu3olsRs1vbzWDh5Ly6+6DoDrSFyl6vCyvqRocCYvCnK+KK323
-	 CsOHD6cu2wZrFFk/M8ulkPhHosXKHexdUZpinQBG9xu2ov0o2fk+Je2+DHdxbOQtlT
-	 Qi6MnDgFDl8JDUpMpOrXOjodK4jqa3bPqvxdnTBzL1ULe/565bRi/seAyZkcGu//2Y
-	 D9n5xEJgKm7UoT1ISplwPFqmTn1IBcfnrQchQzrYwIz9bEhDMdAQSHck4jsebhuAAc
-	 c4kaZJJUASx7w==
+	b=d7iEh2x+CnhV9P4ayluah1uLTpAs669sTDsBEt1ZBCfPPaWwAAt+/HZbn9hONW7VM
+	 yTGTHE4pITUyBsSIUNUht9psnJIJSYkk5yAZRHmopi2Q5UpInQwvI3MeBAvxZmStqP
+	 fPjrzLG3724qMas7I48/ZDwmCKRNOLA7K+1wahaNfaeVXAGnsx4gBzx8+Z0YX+ffl5
+	 Co5hFi1PWLUzhCSgrDoNpZ+OrrUNhMGPhIVLTN13JbhFW3HmEFTkJECj1pkz1/Hypv
+	 bdV4ExCyd250DYaGwNh7w+LqsYC70Lg4gyaqvnJSB240nL9WQHilL3syg/8Ilmm2Or
+	 gpmBbMmYBuGKw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfLTD-00000000rKs-31nB;
-	Thu, 02 Jul 2026 17:45:03 +0000
-Date: Thu, 02 Jul 2026 18:46:52 +0100
-Message-ID: <871pdl8esz.wl-maz@kernel.org>
+	id 1wfLdc-00000000rXA-3tgP;
+	Thu, 02 Jul 2026 17:55:48 +0000
+Date: Thu, 02 Jul 2026 18:57:37 +0100
+Message-ID: <87zf096zqm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvm@vger.kernel.org,
 	"Oliver Upton" <oupton@kernel.org>,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
-In-Reply-To: <20260702162132.091A51F000E9@smtp.kernel.org>
+Subject: Re: [PATCH 07/28] KVM: arm64: Don't evaluate HCR_EL2.NV on ERET fast path
+In-Reply-To: <20260702162424.4A13F1F00A3A@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-11-maz@kernel.org>
-	<20260702162132.091A51F000E9@smtp.kernel.org>
+	<20260702160248.1377250-8-maz@kernel.org>
+	<20260702162424.4A13F1F00A3A@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,74 +59,63 @@ X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:21:31 +0100,
+On Thu, 02 Jul 2026 17:24:23 +0100,
 sashiko-bot@kernel.org wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> 
-> New issues:
-> - [High] Unconditional use of the CNTKCTL_EL1 hardware alias under FEAT_NV2p1 clobbers the CNTHCTL_EL2.ECV bit for both the host and the guest.
-> 
-> Pre-existing issues:
-> - [High] Writes to the control-plane system registers CNTHCTL_EL2 and CNTKCTL_EL1 are missing a mandatory ISB instruction.
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] The `kvm_hyp_handle_eret` fast-path incorrectly evaluates an L1 hypervisor's virtual `HFGITR_EL2` register to determine if L1's own `ERET` should be optimized. Because `is_nested_ctxt(vcpu)` is false for L1, the condition falls through to check `__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET`. This virtual register reflects L1's trap configuration for its L2 guest, and has no architectural bearing on L1's own execution. If L1 configures L2's ERETs to trap, KVM will spuriously abort the fast-path for L1's local ERETs. (For L2, the check is dead code since `is_nested_ctxt(vcpu)` short-circuits it).
 > --
 > 
-> commit 71cc9698fb316a6dc28bed5d5465cd03b6074925
+> commit b3baa466fe54b91fd60bc2025656ec74bb249ab9
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
+> KVM: arm64: Don't evaluate HCR_EL2.NV on ERET fast path
 > 
-> This patch optimizes CNTHCTL_EL2 accesses when FEAT_NV2p1 is present by
-> treating the CNTKCTL_EL1 accessor as normal. It replaces the split approach
-> with direct use of the CNTKCTL_EL1 hardware alias.
+> This commit replaces the check for HCR_EL2.NV in the ERET fast path with
+> a check for is_nested_ctxt(). This ensures we evaluate if we are actually
+> running an L2 guest, rather than just checking if HCR_EL2.NV is set.
 > 
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 4155fe89b58a1..db60facad9f3c 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index bbe9cebd3d9d5..3b76e0468317b 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
 > 
 > [ ... ]
 > 
-> > @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
-> >  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
-> >  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
-> >  
-> > -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
-> > -	sysreg_clear_set(cnthctl_el2, clr, set);
-> > +	/*
-> > +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
-> > +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
-> > +	 */
-> > +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-> > +		sysreg_clear_set(cnthctl_el2, clr, set);
-> > +	else
-> > +		sysreg_clear_set(cntkctl_el1, clr, set);
+> > @@ -349,8 +349,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * Unless the trap has to be forwarded further down the line,
+> >  	 * of course...
+> >  	 */
+> > -	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
+> > -	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
+> > +	if (is_nested_ctxt(vcpu) ||
+> > +	    __vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET)
 > 
-> [Severity: High]
-> Does this read-modify-write on the host's physical state using the
-> cntkctl_el1 alias inadvertently clear KVM's own physical CNTHCTL_EL2.ECV bit?
+> [Severity: Medium]
+> Will this apply L1's virtual trap configuration to L1's own execution?
 > 
-> Since the alias drops or mishandles the ECV bit, reading it might return ECV
-> as 0 and write it back as 0. This could silently disable the host's ECV
-> functionality, such as CNTPOFF initialization from kvm_timer_init_vhe().
+> Since is_nested_ctxt(vcpu) is true for L2 guests, this condition will
+> short-circuit and the HFGITR_EL2 check becomes dead code for L2.
 
-No, and that's the whole point of NV2p1: the CNTKCTL_EL1 bits are
-guaranteed to be stateful, and we don't need to do anything else
+And that's intentional. If we take an ERET from a nested context, then
+the exception must be forwarded to the L1, because we're not the ones
+in charge of the L2.
 
-> [Severity: High]
-> This is a pre-existing issue, but shouldn't there be an isb() instruction
-> immediately following these control-plane system register writes?
+And actually, *any* ERET from a nested context must be deferred to the
+L1 until we get NV3. So this FGT check is not only dead code, it is
+wrong and must go.
 
-"control-plane"? WTF???
+> 
+> For an L1 guest, is_nested_ctxt(vcpu) is false, causing it to evaluate the
+> HFGITR_EL2 check. However, this virtual register reflects L1's trap
+> configuration for its L2 guest and doesn't apply to L1's own execution.
+> 
+> If L1 configures L2's ERETs to trap, won't KVM spuriously abort the
+> fast-path for L1's local ERETs and incorrectly fall back to the slow path?
 
-And no. These bits only need to take effect when entering the guest,
-for which we already have a context synchronisation event.
-
-> Writing to CNTHCTL_EL2 or CNTKCTL_EL1 without an explicit context
-> synchronization event can cause the CPU to operate under a stale timer trap
-> configuration for several cycles before returning.
-
-Bollocks.
+If L1 configures L2's ERETs to trap, then there *cannot* be a fast
+path. It is by definition handled on the slow path, since we need to
+switch between L2 and L1.
 
 	M.
 
