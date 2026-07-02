@@ -1,38 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231633C5DB6
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 11:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33573F889E
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 11:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782990016; cv=none; b=n90N/tDOpVPiVQy8yVsTok9h2/GX5cw6muS2pb+lIjzaO2M67EW50/7CwuR1Tlm1mOVRZ9qOJnaeVx1XOUgrlGSSYlDfGu6MU3gVff03xqE+A8N27Jy8F69HgbCsTNBCsv9xiMDK6bprDIa+r7zDoCzOnlcWg5JLexUD3NkOcCI=
+	t=1782991144; cv=none; b=US08UWpBhXOpmlwncmrHcM8Tbe/eCG30uZJvT3VrUHhLqdcK6BC9qs4LtZDOVDiLOvseeHBimnxC8TjomkQ2H5+MjVNAnILmnMwb1Cn81kCUGEyCNlntp6mMKqZ94CGzilyJRHnqTsNmqsqIglPp7UBgKS+bb5e9QJOSfCQJlg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782990016; c=relaxed/simple;
-	bh=V8/qMswdwNdFf1xTboS6y3yLYa9m8hQRVWhaPq1J4IM=;
+	s=arc-20240116; t=1782991144; c=relaxed/simple;
+	bh=0+zbDFXG6FtoGNtPuSLojExer0eoDd5/HSltKVjcE8Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=sMlT+ED6UK3O0mUWaAU2p7JI51exhb0yMzZ/cke6huA50pRr+9MaIBZXC9+3xtC+9sCfg1aT6IH4/0PyzvNmcj+z8Niomjv7xdKizGzL6tfBZfdpgzmNu68glUnkAR3KsnHeeftyboUa7b5VU62y0brDGu+gi2N5H7p7mqI8jWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JVaOa8er; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type:Content-Disposition; b=gpx5nEdeKVHaasrmpraBtEQU8ui8KB+WgQHB+3giROlUMiT/Jo/eLhyPdYWaFdFfJWTjT/vjG55mzdttBG54uA4t//RkX5BHVm48EBejKMzxVecEDm4Aaz0RSIpGUrVFB52OyzP0zsLDtF5Fh1xZYvj+I0+xbs/Y3ovn3HojX6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jLgTVXGk; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JVaOa8er"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jLgTVXGk"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2ED7C356E;
-	Thu,  2 Jul 2026 04:00:10 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F9D9356E;
+	Thu,  2 Jul 2026 04:18:58 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3DF0D3F905;
-	Thu,  2 Jul 2026 04:00:12 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 86CE83F85F;
+	Thu,  2 Jul 2026 04:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1782990014; bh=V8/qMswdwNdFf1xTboS6y3yLYa9m8hQRVWhaPq1J4IM=;
+	t=1782991142; bh=0+zbDFXG6FtoGNtPuSLojExer0eoDd5/HSltKVjcE8Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JVaOa8eriyqzJawPpuRgeIqLCrB+8Yo4VF9ifU2rQej6fbPs5/v66rNca3vSR9xN0
-	 3B7t580oiWlsZ8o6ztB88TGYgiozJW/2yeDTgz6oWFj64pVUjE1GMgjnxbUSrsMW/t
-	 Bk7UFus/qKXHG2Lz8PtuRJch+z5zZw3brPnB8D0M=
+	b=jLgTVXGkfty017eV2riR0+pXviDlDkCMTHhGcgt9RTFpDMf7WzD95UHx6UjL/VZrB
+	 5HxBJpcSCbV/VEJGyzUYEYiKshHxZFqK7/nFkpaVG/DXCoDsXfvOrOoa5Nx/Wds7PL
+	 0w+g5jYewf9x3NNvyLBAmT28W5+zV5vnR+C58YF4=
 From: Leonardo Bras <leo.bras@arm.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Leonardo Bras <leo.bras@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
+	Bradley Morgan <include@grrlz.net>,
 	Oliver Upton <oupton@kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -41,14 +38,17 @@ Cc: Leonardo Bras <leo.bras@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: ptdump: Introduce the shadow ptdump file
-Date: Thu,  2 Jul 2026 12:00:10 +0100
-Message-ID: <akZEujlMp2H1cYOH@LeoBrasDK>
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] KVM: arm64: Record whether pKVM stage 2 mapping is cacheable
+Date: Thu,  2 Jul 2026 12:18:58 +0100
+Message-ID: <akZJIm6mTza7qAuu@LeoBrasDK>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <w6ffknve2o3l5pgk7mblovsu5xzjwsgf7qyjd66nqwbtsea4ue@h5wj26fbb6kb>
-References: <20260630121005.1130996-1-weilin.chang@arm.com> <20260630121005.1130996-7-weilin.chang@arm.com> <akUyI3Z9JbggzE5P@LeoBrasDK> <w6ffknve2o3l5pgk7mblovsu5xzjwsgf7qyjd66nqwbtsea4ue@h5wj26fbb6kb>
+In-Reply-To: <86qzllpy1g.wl-maz@kernel.org>
+References: <20260701192428.17430-1-include@grrlz.net> <86qzllpy1g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,167 +59,160 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 01, 2026 at 06:35:41PM +0100, Wei-Lin Chang wrote:
-> On Wed, Jul 01, 2026 at 04:28:35PM +0100, Leonardo Bras wrote:
-> > On Tue, Jun 30, 2026 at 01:10:05PM +0100, Wei-Lin Chang wrote:
-> > > Create a ptdump file for all shadow page tables. It will dump out all
-> > > valid shadow page tables at the time of request, with the mmu's index,
-> > > guest VTCR_EL2, VTTBR_EL2, and whether the guest stage-2 is enabled or
-> > > not.
-> > > 
-> > > Also detach the nested mmu array under the mmu_lock in
-> > > kvm_arch_flush_shadow_all() so readers cannot race with the array being
-> > > removed, then free the old array after dropping the lock.
-> > 
-> > Out of curiosity: why drop the lock before kfree'ing ?
+On Thu, Jul 02, 2026 at 09:59:23AM +0100, Marc Zyngier wrote:
+> + Vincent, Leo
 > 
-> Because kvfree() can sleep! :)
+> On Wed, 01 Jul 2026 20:24:28 +0100,
+> Bradley Morgan <include@grrlz.net> wrote:
+> > 
+> > pKVM keeps its own mapping list for stage 2 operations. Its flush path
+> > uses that list directly, so it lost the PTE attribute check done by the
+> > generic stage 2 walker.
+> > 
+> > Record whether a mapping is cacheable and skip cache maintenance for
+> > mappings that are not cacheable.
+> > 
+> > Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+> > Signed-off-by: Bradley Morgan <include@grrlz.net>
+> > ---
+> > Changes since V3:
+> > - addressed some review :)
 > 
+> This isn't a change log. If you want to be taken seriously, I'd
+> suggest you start by following the process. You are otherwise wasting
+> people's time. Again.
 
-Damn, I was certain to read kfree, not kvfree(), LOL
+Agree... the process has a reason: the changelog here helps the reviewer 
+having an overview of what actually changed between versions, and that 
+makes reviewing much easier, and costs very little to the contributor.
 
-You are right, then :)
+Also, the 1 week waiting time is really important, as mentioned before, as 
+it allows more reviewers and maintainers to give feedback: different 
+people, from different companies and lifestyles have different schedules 
+for dev/rev, but in general it happens weekly. So waiting for a week is 
+really recommended, as it tends to avoid people re-reading 2+ versions of 
+the same patchset, and allows revs time to discuss the suggestions in the 
+same thread.
 
-Thanks!
-Leoy
+(I know the waiting can be really frustating, and that sending a vN+1 fast 
+seems to show that you are interested in it, but it really does not help)
 
+> 
+> You also failed to Cc people who have provided feedback on previous
+> versions. That's not right.
 
-> Thanks,
-> Wei-Lin Chang
+(Bradley: usually you want as many people as possible to review your stuff, 
+so CC'ing previous reviewers is actually good for you)
+
 > 
 > > 
-> > Thanks!
-> > Leo
+> >  arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
+> >  1 file changed, 41 insertions(+), 10 deletions(-)
 > > 
-> > > 
-> > > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/nested.c | 12 ++++++--
-> > >  arch/arm64/kvm/ptdump.c | 61 ++++++++++++++++++++++++++++++++++++++++-
-> > >  2 files changed, 69 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index 6435efd65cb5..17a180ddf6ca 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -1283,6 +1283,7 @@ void kvm_nested_s2_flush(struct kvm *kvm)
-> > >  
-> > >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> > >  {
-> > > +	struct kvm_s2_mmu *mmus;
-> > >  	int i;
-> > >  
-> > >  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> > > @@ -1291,9 +1292,14 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> > >  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
-> > >  			kvm_free_stage2_pgd(mmu);
-> > >  	}
-> > > -	kvfree(kvm->arch.nested_mmus);
-> > > -	kvm->arch.nested_mmus = NULL;
-> > > -	kvm->arch.nested_mmus_size = 0;
-> > > +
-> > > +	scoped_guard(write_lock, &kvm->mmu_lock) {
-> > > +		mmus = kvm->arch.nested_mmus;
-> > > +		kvm->arch.nested_mmus = NULL;
-> > > +		kvm->arch.nested_mmus_size = 0;
-> > > +	}
-> > > +
-> > > +	kvfree(mmus);
-> > >  	kvm_uninit_stage2_mmu(kvm);
-> > >  }
-> > >  
-> > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > > index 40f93b7c7ad9..1649eaa75798 100644
-> > > --- a/arch/arm64/kvm/ptdump.c
-> > > +++ b/arch/arm64/kvm/ptdump.c
-> > > @@ -181,6 +181,50 @@ static int kvm_ptdump_guest_canonical_show(struct seq_file *m, void *unused)
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +static int kvm_ptdump_guest_nested_show(struct seq_file *m, void *unused)
-> > > +{
-> > > +	int ret = 0, i;
-> > > +	struct kvm_ptdump_guest_state *st = m->private;
-> > > +	struct kvm *kvm = st->kvm;
-> > > +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
-> > > +		.cb	= kvm_ptdump_visitor,
-> > > +		.arg	= &st->parser_state,
-> > > +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> > > +	};
-> > > +
-> > > +	guard(write_lock)(&kvm->mmu_lock);
-> > > +
-> > > +	if (!kvm->arch.nested_mmus)
-> > > +		return 0;
-> > > +
-> > > +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> > > +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> > > +
-> > > +		if (!mmu->pgt)
-> > > +			continue;
-> > > +
-> > > +		if (kvm_s2_mmu_valid(mmu)) {
-> > > +			memset(st, 0, sizeof(*st));
-> > > +			ret = kvm_ptdump_parser_init(st, kvm, mmu->pgt);
-> > > +			if (ret)
-> > > +				return ret;
-> > > +			st->parser_state = (struct ptdump_pg_state) {
-> > > +				.marker		= &st->ipa_marker[0],
-> > > +				.level		= -1,
-> > > +				.pg_level	= &st->level[0],
-> > > +				.seq		= m,
-> > > +			};
-> > > +			seq_printf(m, "nested mmu %d VTCR: 0x%016llx VTTBR: 0x%016llx s2: %s\n",
-> > > +				   i, mmu->tlb_vtcr, mmu->tlb_vttbr,
-> > > +				   mmu->nested_stage2_enabled ? "enabled" : "disabled");
-> > > +			ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> > > +			if (ret)
-> > > +				return ret;
-> > > +		}
-> > > +	}
-> > > +	return ret;
-> > > +}
-> > > +
-> > >  static int kvm_ptdump_guest_open(struct inode *m, struct file *file,
-> > >  				 int (*show)(struct seq_file *, void *))
-> > >  {
-> > > @@ -212,6 +256,11 @@ static int kvm_ptdump_guest_canonical_open(struct inode *m, struct file *file)
-> > >  	return kvm_ptdump_guest_open(m, file, kvm_ptdump_guest_canonical_show);
-> > >  }
-> > >  
-> > > +static int kvm_ptdump_guest_nested_open(struct inode *m, struct file *file)
-> > > +{
-> > > +	return kvm_ptdump_guest_open(m, file, kvm_ptdump_guest_nested_show);
-> > > +}
-> > > +
-> > >  static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
-> > >  {
-> > >  	struct kvm *kvm = m->i_private;
-> > > @@ -230,6 +279,13 @@ static const struct file_operations kvm_ptdump_guest_canonical_fops = {
-> > >  	.release	= kvm_ptdump_guest_close,
-> > >  };
-> > >  
-> > > +static const struct file_operations kvm_ptdump_guest_nested_fops = {
-> > > +	.open		= kvm_ptdump_guest_nested_open,
-> > > +	.read		= seq_read,
-> > > +	.llseek		= seq_lseek,
-> > > +	.release	= kvm_ptdump_guest_close,
-> > > +};
-> > > +
-> > >  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
-> > >  {
-> > >  	struct kvm *kvm = m->private;
-> > > @@ -307,6 +363,9 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
-> > >  			    kvm, &kvm_pgtable_range_fops);
-> > >  	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
-> > >  			    kvm, &kvm_pgtable_levels_fops);
-> > > -	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> > > +	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT)) {
-> > >  		kvm->arch.debugfs_nv_dentry = debugfs_create_dir("nested", kvm->debugfs_dentry);
-> > > +		debugfs_create_file("shadow_page_tables", 0400, kvm->arch.debugfs_nv_dentry,
-> > > +				    kvm, &kvm_ptdump_guest_nested_fops);
-> > > +	}
-> > >  }
-> > > -- 
-> > > 2.43.0
-> > > 
+> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> > index 053e4f733e4b..6d1cad890c7e 100644
+> > --- a/arch/arm64/kvm/pkvm.c
+> > +++ b/arch/arm64/kvm/pkvm.c
+> > @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
+> >  	return m->gfn * PAGE_SIZE;
+> >  }
+> >  
+> > +#define PKVM_MAPPING_NR_PAGES_MASK     GENMASK_ULL(47, 0)
+> > +#define PKVM_MAPPING_NC                        BIT_ULL(48)
+> > +
+> > +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
+> > +{
+> > +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+> > +}
+> 
+> No. You've been pointed to the correct data structure (an anonymous
+> structure containing bit fields). Please consider taking the review
+> comments into account.
+
+(and if you do not agree with the suggestion, discuss it in the same 
+thread. Although as Marc shows below, it becames much simpler like that)
+
+Thanks! 
+Leo
+
+
+> 
+> This would avoid most of the churn in this patch, and make it easy to
+> backport. Something like the untested hack below.
+> 
+> 	M.
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 74fedd9c5ff02..cdddc9e3a11f5 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -195,7 +195,10 @@ struct pkvm_mapping {
+>  	struct rb_node node;
+>  	u64 gfn;
+>  	u64 pfn;
+> -	u64 nr_pages;
+> +	struct {
+> +		unsigned long nr_pages:48;
+> +		unsigned int  nc:1;
+> +	};
+>  	u64 __subtree_last;	/* Internal member for interval tree */
+>  };
+>  
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 428723b1b0f5c..5932b93bded58 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -369,7 +369,7 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
+>  
+>  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+>  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+> -					mapping->nr_pages);
+> +					(u64)mapping->nr_pages);
+>  		if (WARN_ON(ret))
+>  			return ret;
+>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+> @@ -473,6 +473,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	mapping->gfn = gfn;
+>  	mapping->pfn = pfn;
+>  	mapping->nr_pages = size / PAGE_SIZE;
+> +	mapping->nc = !!(prot & (KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC));
+>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+>  
+>  	return ret;
+> @@ -503,7 +504,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+>  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+> -					mapping->nr_pages);
+> +					(u64)mapping->nr_pages);
+>  		if (WARN_ON(ret))
+>  			break;
+>  	}
+> @@ -517,10 +518,11 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	struct pkvm_mapping *mapping;
+>  
+>  	lockdep_assert_held(&kvm->mmu_lock);
+> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+> -		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+> -					  PAGE_SIZE * mapping->nr_pages);
+> -
+> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+> +		if (!mapping->nc)
+> +			__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+> +						  PAGE_SIZE * mapping->nr_pages);
+> +	}
+>  	return 0;
+>  }
+>  
+> @@ -537,7 +539,7 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+>  		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+> -					   mapping->nr_pages, mkold);
+> +					   (u64)mapping->nr_pages, mkold);
+>  
+>  	return young;
+>  }
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
