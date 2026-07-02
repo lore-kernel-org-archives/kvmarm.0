@@ -1,158 +1,125 @@
-Received: from pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.13.214.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362273803E9
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jul 2026 19:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.13.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5BF3806B8;
+	Thu,  2 Jul 2026 19:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783019088; cv=none; b=ilbDpTR8Zk8+F2CmN2jzVHdne3iqp65Bmnz9kQIaNHFRTY8uI/bY+pGA9HRW2oY1fwLWBtJUgmb+VE2mGR3aB7hwxMFgJafqbO/sDQtpH4Q1upF6bdKPSRnmFz07P0K6qObfZvO8+mX4a+CsdRZnOFYorNcgADp+eOkM/p/jC3c=
+	t=1783020562; cv=none; b=o3LxaoN+ohYYCZoQLnQEMf84FaguhdvDrVVpD7EEKphB2L6Pu1QVxdy9ZmhSSpsWqONgFSn3CHF4EWpp5zV8VLPtrxDMqKZepRpQ/IpemjSpc8PZWSXsRihecowOZ3xZl+77D6oaj5drdyrS32va7V4Zx+Esq6+TpnV7ruvJYVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783019088; c=relaxed/simple;
-	bh=8tuJxCNBOWXuUagNrDc+bjsm5o3QNE9mkekLHhRL+ko=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=naur8rH3e9JKj12R5sKP6DHImzouZtExOj2xOR+cCdKuLclzCHFssGRIBeQz6Age+sgsX1dRT+FIkTrPdhCi0CZzf9KBno5BpMc49Z54now62DAL79lpMe1+qLimxfm/8blYq0bBRo2ZiEDsX91NuyIMKvQqkdM+eVsvGpgPy1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=pqGNjnPK; arc=none smtp.client-ip=52.13.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1783020562; c=relaxed/simple;
+	bh=eMTCveHf4b42UmPLsVog/6eKcO5YH1mS3KOYnWImkOM=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=XgGUKBtdjcxKTU2ffU+G9W1IUtEZZ0I/dkOuzPGF6UafzujzR/b28bFOi8P5mR/RFPDXgSDaEzLRWsa+8u8H5FXD9r9So9dCyKqnJz5FRdUC5WN1n1AYWVYK4F80xodXA8jEKIRuf3oBF7Hcl55sAy8rMvSN7gdeG8c3qAZWMvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=haEiZMQv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="pqGNjnPK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1783019087; x=1814555087;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=28PbrJsue24gxCxFzMj1TZNmDll7upM8xjPIwGE2HHc=;
-  b=pqGNjnPKznFlsBd3A72LbumvG1E8KxcOuzW62eAGPcZN9LwAueetoqAB
-   I1TgzB+DGxcacMLsMq7SusLfEHIUiqZIuEvLL1fjb12uKNORHU4j93K7m
-   4NLaIjSZGbEM6JtB4bfnRcjOoMCRZsuwWk6sYuuXtrAeldA3G2XOjj+Qa
-   BiX1TKpV8JunCxCDthm3EpAcRIkdUt3EoeWSCI6tdWmuKzsnKCTWCNPPx
-   rjFHVLJLYXkD1dQ3r5iiVgZ3eDERY/gHWyzoxlHqv30TSoMSJG3IiWmfp
-   FX5NqllJIU/2VAFmIikZdT4D/1no6w96OXOt1sObksQQtV10p/PCVTnHS
-   Q==;
-X-CSE-ConnectionGUID: Z1BcOmIYQYKK6k3LUBa7pQ==
-X-CSE-MsgGUID: 3IFZy54RQYaqxgK0r4k1gA==
-X-IronPort-AV: E=Sophos;i="6.25,144,1779148800"; 
-   d="scan'208";a="22933538"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 19:04:43 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:32053]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.112:2525] with esmtp (Farcaster)
- id 8a338137-edab-4456-8313-f0c7488aa835; Thu, 2 Jul 2026 19:04:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 8a338137-edab-4456-8313-f0c7488aa835
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 2 Jul 2026 19:04:42 +0000
-Received: from dev-dsk-congkai-2a-df9e8fab.us-west-2.amazon.com
- (172.23.251.204) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43; Thu, 2 Jul 2026
- 19:04:42 +0000
-From: Congkai Tan <congkai@amazon.com>
-To: Oliver Upton <oupton@kernel.org>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>
-CC: Congkai Tan <congkai@amazon.com>, Marc Zyngier <maz@kernel.org>, "Joey
- Gouly" <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "Jonathan
- Corbet" <corbet@lwn.net>, Haris Okanovic <harisokn@amazon.com>, Geoff Blake
-	<blakgeof@amazon.com>, Stanislav Spassov <stanspas@amazon.de>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 3/3] KVM: arm64: Advertise STALL_SLOT* in PMCEID1 under strict PMUv3 UAPI
-Date: Thu, 2 Jul 2026 19:04:21 +0000
-Message-ID: <20260702190421.420992-4-congkai@amazon.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260702190421.420992-1-congkai@amazon.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="haEiZMQv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 303A01F000E9;
+	Thu,  2 Jul 2026 19:29:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783020558;
+	bh=iZl9JDQIHjG62388ytP/5VgAVIl3zMuub6V9fDzeAuw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=haEiZMQvgIjuALSwDDApmPg2HIP2vPGtpoAg/SQqEpNtaPVpjuKIGOveQDx3Ltz8i
+	 yHks9sDyTNrj6xuDWCgaNsojTPhDrMG/uUxoYRrf9PrnLXaWFybnniCi05F2+CzUwX
+	 +nMs/Kavol4E3gosAOSEiRtzWR0hAzOroQb5yuywCiFPjRhAuxVOeP+omz20K1MPBI
+	 Tnsm2UU6OYUqzyHP6pBX+bmTwL6913ivnhseMo/ayzwNsUDT7ixdBZIKTPmgQXUgK+
+	 HR2nNhUJtPSPwwTSFTZnuqLHgETRZXuXy0BrlUngvO7WJBYwxuonMf7DdPgTiGtCKR
+	 +p4+gBq/jEonw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_STRICT vCPU
+ feature
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Congkai Tan" <congkai@amazon.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260702190421.420992-2-congkai@amazon.com>
 References: <20260702190421.420992-1-congkai@amazon.com>
+ <20260702190421.420992-2-congkai@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 02 Jul 2026 19:29:17 +0000
+Message-Id: <20260702192918.303A01F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Skip masking STALL_SLOT, STALL_SLOT_FRONTEND and STALL_SLOT_BACKEND out
-of PMCEID1 when KVM_ARM_VCPU_PMU_V3_STRICT is set, because this is when
-PMMIR_EL1.SLOTS is exposed to guests, making these events meaningful for
-collection.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] Silent truncation of PMU event counter states and PMCR_EL0.N durin=
+g VCPU sysreg restoration before PMU initialization.
+--
 
-Change the parameter of compute_pmceid1() from arm_pmu to kvm_vcpu, to
-check if KVM_ARM_VCPU_PMU_V3_STRICT is set. Also updated the signature of
-compute_pmceid0() for consistency.
+commit 7651e4c8e75621127e5fba611a9aa7f3257fa4b2
+Author: Congkai Tan <congkai@amazon.com>
 
-Signed-off-by: Congkai Tan <congkai@amazon.com>
-Reviewed-by: Geoff Blake <blakgeof@amazon.com>
-Reviewed-by: Haris Okanovic <harisokn@amazon.com>
-Reviewed-by: Stanislav Spassov <stanspas@amazon.de>
----
- arch/arm64/kvm/pmu-emul.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_STRICT vCPU feature
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 9595bce6519f..89eec5a1a499 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -851,9 +851,9 @@ static u64 __compute_pmceid(struct arm_pmu *pmu, bool pmceid1)
- 	return ((u64)hi[pmceid1] << 32) | lo[pmceid1];
- }
- 
--static u64 compute_pmceid0(struct arm_pmu *pmu)
-+static u64 compute_pmceid0(struct kvm_vcpu *vcpu)
- {
--	u64 val = __compute_pmceid(pmu, 0);
-+	u64 val = __compute_pmceid(vcpu->kvm->arch.arm_pmu, 0);
- 
- 	/* always support SW_INCR */
- 	val |= BIT(ARMV8_PMUV3_PERFCTR_SW_INCR);
-@@ -862,32 +862,33 @@ static u64 compute_pmceid0(struct arm_pmu *pmu)
- 	return val;
- }
- 
--static u64 compute_pmceid1(struct arm_pmu *pmu)
-+static u64 compute_pmceid1(struct kvm_vcpu *vcpu)
- {
--	u64 val = __compute_pmceid(pmu, 1);
-+	u64 val = __compute_pmceid(vcpu->kvm->arch.arm_pmu, 1);
- 
- 	/*
--	 * Don't advertise STALL_SLOT*, as PMMIR_EL0 is handled
--	 * as RAZ
-+	 * If KVM_ARM_VCPU_PMU_V3_STRICT is not set, PMMIR_EL1 is
-+	 * unconditionally RAZ, so don't advertise STALL_SLOT* events.
- 	 */
--	val &= ~(BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32) |
--		 BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT_FRONTEND - 32) |
--		 BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT_BACKEND - 32));
-+	if (!kvm_vcpu_has_pmuv3_strict(vcpu))
-+		val &= ~(BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32) |
-+			 BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT_FRONTEND - 32) |
-+			 BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT_BACKEND - 32));
-+
- 	return val;
- }
- 
- u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- {
--	struct arm_pmu *cpu_pmu = vcpu->kvm->arch.arm_pmu;
- 	unsigned long *bmap = vcpu->kvm->arch.pmu_filter;
- 	u64 val, mask = 0;
- 	int base, i, nr_events;
- 
- 	if (!pmceid1) {
--		val = compute_pmceid0(cpu_pmu);
-+		val = compute_pmceid0(vcpu);
- 		base = 0;
- 	} else {
--		val = compute_pmceid1(cpu_pmu);
-+		val = compute_pmceid1(vcpu);
- 		base = 32;
- 	}
- 
--- 
-2.50.1
+This patch introduces the KVM_ARM_VCPU_PMU_V3_STRICT vCPU feature, preventi=
+ng
+KVM from creating a default PMU on initialization. Userspace must instead
+explicitly select a PMU via KVM_ARM_VCPU_PMU_V3_SET_PMU before the first
+KVM_RUN.
 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index e1860acae641f..1f24169505a91 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+
+[ ... ]
+
+> @@ -1021,6 +1024,14 @@ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
+>  {
+>  	struct arm_pmu *arm_pmu =3D kvm->arch.arm_pmu;
+> =20
+> +	/*
+> +	 * Under KVM_ARM_VCPU_PMU_V3_STRICT no PMU exists until userspace sets
+> +	 * one, so this can be reached before arm_pmu is set. Report no
+> +	 * counters in that case.
+> +	 */
+> +	if (!arm_pmu)
+> +		return 0;
+> +
+
+[Severity: High]
+Could returning 0 here before the PMU is explicitly selected cause silent
+truncation of PMU event counter states during live migration?
+
+If a VMM restores PMU sysregs via KVM_SET_ONE_REG before selecting the PMU
+via KVM_ARM_VCPU_PMU_V3_SET_PMU, set_pmcr() in arch/arm64/kvm/sys_regs.c
+evaluates:
+
+arch/arm64/kvm/sys_regs.c:set_pmcr() {
+    if (!kvm_vm_has_ran_once(kvm) &&
+        !vcpu_has_nv(vcpu)        &&
+        new_n <=3D kvm_arm_pmu_get_max_counters(kvm))
+        kvm->arch.nr_pmu_counters =3D new_n;
+    ...
+}
+
+Because kvm_arm_pmu_get_max_counters() now returns 0, the bounds check fail=
+s.
+set_pmcr() then leaves nr_pmu_counters at 0 without returning an error to
+userspace.
+
+Consequently, when set_pmreg() executes:
+
+arch/arm64/kvm/sys_regs.c:set_pmreg() {
+    ...
+    u64 mask =3D kvm_pmu_accessible_counter_mask(vcpu);
+    __vcpu_assign_sys_reg(vcpu, r->reg, val & mask);
+}
+
+The mask evaluates to only the cycle counter since nr_pmu_counters is 0.
+This silently zeroes out the restored event counter bits for registers like
+PMOVSSET_EL0, PMINTENSET_EL1, and PMCNTENSET_EL0.
+
+Should the KVM API reject this out-of-order restoration sequence with an
+error like -EINVAL, rather than silently discarding the VMM's restored
+PMCR_EL0.N and event counter states?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260702190421.4209=
+92-1-congkai@amazon.com?part=3D1
