@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EC8397331;
-	Thu,  2 Jul 2026 17:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091E4339844;
+	Thu,  2 Jul 2026 18:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783015198; cv=none; b=W+vB2fttn3U2FGAKbFa8OdqpPkH0RtP+faVk6BVS+Az+bvAHwvMveAhfXkYLNogVQdh4IiRvpbmA3xauPfxbAcb8pDFF2+4KigwsDVLlRxb32EMDMyHEjZvBd0PYcXvFdMhEn1ZyPWVgQfnC1S9+k/GAUxjuDrtRP4xubXmVXDM=
+	t=1783015991; cv=none; b=FIHXc4SrWCG5FI/loIW83qfFudKK04xSYHB0IksdCJZw+NI2RYHw6kPogf0Gl9bTMQ8gyoYo7gc8vggT8KjGEER7nHu6PSvGVpLOsg4Yne4O4UAooeCrcnCWHTFdM4ojlhax6TLWoacog+sZhUM2seeMt7ZKmMyHigfkQi/SVsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783015198; c=relaxed/simple;
-	bh=JA7zzd8bNR6cG7/sc2t+cCuhMn28W41qhvQE5775Kn8=;
+	s=arc-20240116; t=1783015991; c=relaxed/simple;
+	bh=/IUrRrU2fqS2wvO4KMRmmEZyUgG7zWNHLp/fCtLzedM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sYG9+4+Wagms+QBDZ7EuQ1HwO14IeSE14hBY8Bsx+DnkHHJKx8ublrsEGPTlN3ImpPH3gvAGsXcwrgUdb24n/ijQ9LlJSAp9lpsdM9uSdDx0ZEuHC5bF/N4oUluLYXFjz3CaIlvkJaQlyNBNm6w1lnTwYipgLJZr8Fzo8M3zv/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJVmu5N1; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=TpJ4RA1zK690CTA5U49ItjPzK7SUhX4eJXk4RqkJwJB6JYD88K8C9uNjC7yzT0hVU1DyeGe37DbAnVkopeKGzJlupNYKx1yyuDM9NoCnrOqF+B/7nXBTRqB62oesrGu1fWiqL0RJerbmV+iQ7vSPV1rHCvAB675vtnya8t76ECU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMW+4NWp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJVmu5N1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C401F000E9;
-	Thu,  2 Jul 2026 17:59:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMW+4NWp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE431F000E9;
+	Thu,  2 Jul 2026 18:13:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783015196;
-	bh=f2tGSoghUAj8sAx3DE3zlIQnEkvxY18ZQfnsf4mVnwc=;
+	s=k20260515; t=1783015989;
+	bh=ATD6Voa6jFN5dw/wJtF0KsbwSNwAYDBGrIbKhlvGEFU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HJVmu5N1yIMqby3EAVNHLo2H7grPbWvpAfSfLrR34YAJeY4Da6BRgKmg5ySh8zNAI
-	 3eMtQvYXR7iXj94ywQ8qfIFSRYZfPPoAqeg/NL1PrzGe5yS1YikqIDzvAhO0sWb6tl
-	 x3Jc1a47JtQjuWe+ntZHB/+Hc98c71TXdi/Kz2AfxSTEhJkEjgEKN+5f2wRASpVgQh
-	 cXYQtmxL+7zAfcPw3TmJv01Yz24Kz1/UvodVGWJppwawAmtItuJlSsnZJOE3eazJW6
-	 pGHER7Ynq+e/ZpOeltd0u0+LUtuIcX0lPaiLu5S9X5knstAh4GNaaUJ9X/eFaqovfC
-	 EY1AxWVyVLsNg==
+	b=UMW+4NWp1T2E6BecOnXDvoOp3r+qTv5Toi0KKT3U9nAgwvskEaswtlPCqXvI/6t5K
+	 U1cM452vCWng9NPx32wkuYKSNqImbI33nsL5IrGlecgoNfsVJtkA+ODi+zewfiigYC
+	 +JvyqrKuy1y4y3O2nL4S9/KMaJLt3bzr416lYP4IPRHs/CSQQgpwoLcDnOLznuOYib
+	 hXUVxIBRv0vPKuOZci8BxYSuTRX6SAuiRjdseqXrX7V5jV9FBZPcMqE8wPW6XlSVAV
+	 3OvWbZz9JaxjHABQ1LHNrmnGGgJgW2WSWJfNwJj5vSSBrMzkN09weo/67CN2wgolDr
+	 a1qT4G76RmMhw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfLha-00000000rau-43s3;
-	Thu, 02 Jul 2026 17:59:55 +0000
-Date: Thu, 02 Jul 2026 19:01:43 +0100
-Message-ID: <87y0ft6zjs.wl-maz@kernel.org>
+	id 1wfLuN-00000000rvQ-2CKv;
+	Thu, 02 Jul 2026 18:13:07 +0000
+Date: Thu, 02 Jul 2026 19:14:56 +0100
+Message-ID: <87wlvd6yxr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org,
+Cc: kvmarm@lists.linux.dev,
 	"Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 18/28] KVM: arm64: Add kvm_has_nv{2,3}() predicates
-In-Reply-To: <20260702162518.0ACF11F00A3F@smtp.kernel.org>
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 22/28] KVM: arm64: Add routing for NVHCR_EL2 trap
+In-Reply-To: <20260702162608.6D0FD1F00A3D@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-19-maz@kernel.org>
-	<20260702162518.0ACF11F00A3F@smtp.kernel.org>
+	<20260702160248.1377250-23-maz@kernel.org>
+	<20260702162608.6D0FD1F00A3D@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,56 +55,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:25:17 +0100,
+On Thu, 02 Jul 2026 17:26:07 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] `is_nested_nv3_ctxt()` incorrectly identifies NV3 context when the guest clears `HCR_EL2.E2H`, diverging from hardware execution semantics.
+> - [High] The trap routing condition for `NVHCR_EL2` incorrectly uses a logical OR (`MCB`) instead of a logical AND, causing improper trap injection to guest EL2.
 > --
 > 
-> commit c75857355bb73ff60c1d0206705bb863784f8183
+> commit 6d634fa5ff4e9b082f4e46e999fa4990ecf38957
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Add kvm_has_nv{2,3}() predicates
+> KVM: arm64: Add routing for NVHCR_EL2 trap
+>     
+> NVHCR_EL2 accesses from EL1 are taken to EL2 when HCRX_EL2.NVTGE==0
+> and HCR_EL2.NV==1. Describe this in the exception routing tables.
 > 
-> Add a new set of predicates indicating whether VM is capable of
-> NV2, NV3, and is in a nested NV3 context. This is going to become
-> useful as we start dealing with a mix of behaviours.
-> 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index 9831166695186..c562d8171d5e1 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> 
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > index b7f3d86a94031..f5dc578d8c985 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
 > [ ... ]
-> 
-> > +static inline bool kvm_has_nv3(struct kvm *kvm)
-> > +{
-> > +	return (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-> > +		cpus_have_final_cap(ARM64_HAS_NV3) &&
-> > +		kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV3));
-> > +}
-> > +
-> > +static inline bool is_nested_nv3_ctxt(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return (has_vhe() && kvm_has_nv3(vcpu->kvm) && is_nested_ctxt(vcpu) &&
-> > +		(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV) &&
-> > +		(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_NVTGE));
-> > +}
+> > @@ -468,6 +477,7 @@ static const enum cgt_group_id *coarse_control_combo[] = {
+> >  					CGT_HCR_TVM, CGT_HCR_TRVM, CGT_HCRX_SCTLR2En),
+> >  	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
+> >  	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
+> > +	MCB(CGT_HCR_NV_HCRX_nNVTGE,	CGT_HCR_NV, CGT_HCRX_nNVTGE),
 > 
 > [Severity: High]
-> Does this predicate miss a mandatory check for HCR_EL2.E2H?
+> Does this correctly evaluate the trap condition as an AND?
 > 
-> Architecturally, NVTGE is RES0 when E2H is 0. If a guest sets HCR_EL2.NV = 1
-> and HCRX_EL2.NVTGE = 1, but leaves HCR_EL2.E2H = 0, the hardware will not
-> execute the guest under NV3 semantics.
+> The commit message indicates the trap is taken when "HCRX_EL2.NVTGE==0 and
+> HCR_EL2.NV==1". However, coarse_control_combo[] uses the MCB() macro, which
+> evaluates multiple conditions using a bitwise OR:
+> 
+> arch/arm64/kvm/emulate-nested.c:__compute_trap_behaviour() {
+> 	...
+> 		for (int i = 0; cgids[i] != __RESERVED__; i++)
+> 			b |= __compute_trap_behaviour(vcpu, cgids[i], b);
+> 	...
+> }
+> 
+> Because this ORs the behaviors, the trap will be forwarded if HCR_EL2.NV == 1
+> OR HCRX_EL2.NVTGE == 0 evaluates to forward. This would erroneously send the
+> trap to EL2 even if normal execution without nested virt is active (NV == 0
+> and NVTGE == 0).
+> 
+> Should this use a __COMPLEX_CONDITIONS__ callback instead to enforce the
+> logical AND?
 
-Stop inventing the architecture. NV3 is only applicable to E2H==1, and
-KVM doesn't allow NV with E2H==0.
+Grmbl. Yes, well spotted.
 
 	M.
 
