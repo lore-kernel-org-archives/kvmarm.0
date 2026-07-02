@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E399230BD5;
-	Thu,  2 Jul 2026 20:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3042571A0;
+	Thu,  2 Jul 2026 21:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783024031; cv=none; b=j7kPKmtyhAwwa4JN8BQD/a2+RwMgGmuxWmEirkHkYSLmtHQAkjbwR9zIeOXqwiGrnvV/6bLaDU48QTHOOsHTEMbrJmj6/J3vrxg2Dhiv8TNimpIo25/qvyKoDGhCbjGLPw5L9thhYWvNXll181sg46nWIefHh8HURUj50+blFTw=
+	t=1783026178; cv=none; b=PPj5yS8HNofLrmPN6xNfkCYKpOh8uIs5hVwxJ4rRXazZs6sg4gtWYjA34/8QthJy3paHKPqjxX/fzzK8xyK+rHzXIf6bm8a0+n39Z9rJTnCfgg3PlqGs3i53KC2DAAxO1T+9ZsfUELO3jwetUQ8rO+G+/ijPUrFJ7Ct9KmXJouw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783024031; c=relaxed/simple;
-	bh=V+2LAbZfPtxMZCg3dJHlMMXsKrPNqwdQenqRat3nZiE=;
+	s=arc-20240116; t=1783026178; c=relaxed/simple;
+	bh=oRoobASajO99MaP1F2kZ5hI2McBFNYeAI9TMQVWz778=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mo7nOh60XsZtPdRyL92jXZyrlwMHtOlwvaXea47GB2b0UqB1mDQRXjeS51BsEjhfj+6/gAyY6QLdywrMfyl3hRgdCAsRY06me4wnqg/4jMe9qkmOsQyqTpn4PymAZbGHnL8PtE11e4jFd5q6TSE5dcJO7C1dZJvyuY0uumRKTZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InPqjOmj; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=jd3ZzrzM6IgPB1M6rTngS3tI7TaHY8x/0pASZ1FQKUccpMmvXKIb+7FqffG1MLn+UtLMX5RKYFk+V8ktyp4s5ATbF0+Gzvy8CAG6IdQ2IqmisbrtbGUKbU78kDWj+gElf/VLGzcLqpkwTOtsDbFXG8Wkma4fiMOgfoY3QvYoR9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDRpBlz9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InPqjOmj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2225B1F000E9;
-	Thu,  2 Jul 2026 20:27:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDRpBlz9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7985E1F000E9;
+	Thu,  2 Jul 2026 21:02:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783024030;
-	bh=HoK9M+3vrnVkofbRcUnP+3r/PuAZFEUfLJGmPUPuqgo=;
+	s=k20260515; t=1783026176;
+	bh=S5P/GL2wpYH6WTHGlfcwNG/3r8kbd7VYOP/LEq11yIA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=InPqjOmjEZlNMUG/+pR0RLGh5seuI5QIYQg12cnLi/HHF9FWia7BvR7BnP2ZO6NlR
-	 7tpuV7wWCmbhGgGM4lDikAj53GJTgkwozTQIhiSEGX7iqgnDWeLRGWMMULSe/11q85
-	 FwtGM3zYnGbOciO7j5o1GBBgvePVRXJvfyZAKole5jnLVmEYpbqYU7mka7q08qCxeI
-	 bDhj9PYoOxBiDoc1fPYyu5FS5sXH+rIU9xH/g3nLPgCasYC0JmGObFC4cy3Okhivbh
-	 ZYVm0eDadOMjJAf/40ELUsGfXpjV/IDbZ4605ipX6mDU6g9xHD2CXq4FcA4j+Gxgzl
-	 oRc9rL9aYvnOQ==
+	b=IDRpBlz9hdFz+BiW11MKcOAQT91a8+5OO3K/evQvsCSf1w5tNXeYeSrVOANZOxybx
+	 RdTCX/EyD3hpBJfm7IoQc+Im51boWUZu7H9Lg/UFS/KFs342DAkdK0fkvu/FFjK1xh
+	 zLyIYNsOoBwhjnm00OZJE9aq/BI03w1t10Xa3MfGRxoou6BDLDqLd/Rkr1YCUomOZ3
+	 Fbhn8eLv2lPZ4Hrb4LdMXcofRjHS1uTnqmNbBM6+IHmcuK4z2kiJisPbr+5QFCz//D
+	 BoC4EC5fqO/YDwSvsLPcNhN2lINj5WbToWR+vW1darGaKFJUI5pmU+w8JRnVyB+DL6
+	 NOuuEKvqj0WHQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfO03-00000000uD6-3U3d;
-	Thu, 02 Jul 2026 20:27:07 +0000
-Date: Thu, 02 Jul 2026 21:28:56 +0100
-Message-ID: <87o6gp6sqf.wl-maz@kernel.org>
+	id 1wfOYg-00000000ukk-2tSs;
+	Thu, 02 Jul 2026 21:02:54 +0000
+Date: Thu, 02 Jul 2026 22:04:43 +0100
+Message-ID: <87mrw96r2s.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 23/28] KVM: arm64: Add NVHCR_EL2 context switching
-In-Reply-To: <20260702164310.03AAC1F00A3A@smtp.kernel.org>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>
+Subject: Re: [PATCH 25/28] KVM: arm64: Engage NV3 TLBI trap elision
+In-Reply-To: <20260702164514.C41EF1F00A3D@smtp.kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-24-maz@kernel.org>
-	<20260702164310.03AAC1F00A3A@smtp.kernel.org>
+	<20260702160248.1377250-26-maz@kernel.org>
+	<20260702164514.C41EF1F00A3D@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,91 +55,121 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 02 Jul 2026 17:43:09 +0100,
+On Thu, 02 Jul 2026 17:45:14 +0100,
 sashiko-bot@kernel.org wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Cross-VM Information Leak via unswitched SYS_NVHCR_EL2 physical register
+> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
+> 
+> New issues:
+> - [Critical] Enabling FEAT_NV3 TLBI elision (NVnTTLB) breaks KVM's nested S2 MMU caching, leaving stale L2 guest S1 TLB entries across cached physical VMIDs.
+> - [High] TLBI trap elision for NV1 guests is nested inside a check requiring the guest to use VHE, rendering the optimization dead code.
+> - [Medium] NV3 TLBI trap elision is incomplete because HCRX_EL2_NVnTTLBOS is omitted from the TLBI elision mask.
+> 
+> Pre-existing issues:
+> - [High] vcpu_set_hcrx() statically evaluates the guest's dynamic HCR_EL2.E2H state at boot, permanently disabling HCRX_EL2_NVTGE even if the guest later enables VHE.
 > --
 > 
-> commit ce2ffdc8cef6935283480a976d01a70bb788a885
+> commit e34c9c8b4a16d0026abc090c888c49e7f1c66d8a
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Add NVHCR_EL2 context switching
->     
-> This commit adds context switching for the NVHCR_EL2 register to manage
-> the HCR_EL2 state of an EL1 guest. The switch is conditional on the guest
-> using NV3.
+> KVM: arm64: Engage NV3 TLBI trap elision
 > 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > @@ -172,6 +172,10 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> >  
-> >  	if (ctxt_has_sctlr2(ctxt))
-> >  		ctxt_sys_reg(ctxt, SCTLR2_EL1) = read_sysreg_el1(SYS_SCTLR2);
-> > +
-> > +	/* Retrieve L2's HCR_EL2, and save it for future use */
-> > +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
-> > +		ctxt_sys_reg(ctxt, NVHCR_EL2) = read_sysreg_s(SYS_NVHCR_EL2);
+> This commit enables FEAT_NV3 TLBI trap elision for guests that are not
+> NV2-aware. It relaxes TLBI traps to only TGE=0 using HCRX_EL2 bits.
+> 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index b32870a5e1236..d6f432b1558f5 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -715,6 +715,15 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+> >  		if (cpus_have_final_cap(ARM64_HAS_NV3) &&
+> >  		    vcpu_has_nv(vcpu) && vcpu_el2_e2h_is_set(vcpu)) {
 > 
 > [Severity: High]
-> Could this leak information between VMs when the host hardware supports NV3
-> but the guest doesn't have it enabled?
+> This isn't a bug introduced by this patch, but because vcpu_set_hcrx is
+> called once during kvm_calculate_traps at the first VCPU run, the guest
+> has not yet executed and its virtual HCR_EL2.E2H is 0. 
 > 
-> If the host hardware implements FEAT_NV3 and runs an L2 guest with physical
-> HCR_EL2.NV=1, the hardware will redirect EL1 accesses of HCR_EL2 to the
-> physical SYS_NVHCR_EL2 register.
+> Since vcpu_el2_e2h_is_set checks the dynamic HCR_EL2 register, does this
+> evaluate to false and permanently disable HCRX_EL2_NVTGE even if the guest
+> later sets HCR_EL2.E2H at runtime?
 
-No. If L1 doesn't have NV3 enabled (meaning that its view of
-HCRX_EL2.NVTGE == 0), then HCRX_EL2.NVTGE ==0 on the host as well, as
-per the propagation of HCRX_EL2 in __activate_traps_common().
+No. E2H is never configurable in KVM. You should know it by now.
 
-As per the architecture, an HCR_EL2 access from EL1 with NVTGE==0
-results in accessing the corresponding VNCR_EL2 slot. Not the
-NVHCR_EL2 register.
-
-Stop making things up, specially when you don't even have access to
-the spec.
-
-> Since is_nested_nv3_ctxt() evaluates to false when the guest lacks the
-> virtual NV3 capability, __sysreg_save_el1_state() skips saving this register.
-> Does this allow an untrusted L2 guest to read the SYS_NVHCR_EL2 state left
-> behind by a previously running VM, bypassing software isolation?
-
-No.
-
+> 
+> [Severity: High]
+> Does checking vcpu_el2_e2h_is_set here prevent the NV1 TLBI elision
+> optimization from ever being reached?
 >
-> >  }
-> >  
-> [ ... ]
-> > @@ -285,6 +289,13 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-> >  
-> >  	if (ctxt_has_sctlr2(ctxt))
-> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR2_EL1), SYS_SCTLR2);
-> > +
-> > +	/*
-> > +	 * Publish the L2 view of HCR_EL2 to the HW if L1 is using NV3.
-> > +	 * Otherwise, the data is already in place in the L1's own VNCR.
-> > +	 */
-> > +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
-> > +		write_sysreg_s(ctxt_sys_reg(ctxt, NVHCR_EL2), SYS_NVHCR_EL2);
-> 
-> [Severity: High]
-> Similar to the save path above in __sysreg_save_el1_state(), should this
-> context switch be based on the host's hardware capability rather than the
-> guest's software configuration?
-> 
-> If the physical register isn't explicitly overwritten in
-> __sysreg_restore_el1_state() because is_nested_nv3_ctxt() is false, the
-> L2 guest could potentially read the stale configuration state of a
-> completely different VM.
+> Since an NV1 guest does not have VHE enabled (E2H=0), this outer condition
+> will evaluate to false, meaning the inner !kvm_has_nv2(vcpu->kvm) block
+> added below will be skipped.
 
-No.
+And that's on purpose.
+
+FEAT_NV3 doesn't apply to E2H==0. Because frankly, it is about as
+useful as a concrete parachute.
+
+> 
+> >  			vcpu->arch.hcrx_el2 |= HCRX_EL2_NVTGE;
+> > +
+> > +			/*
+> > +			 * If the guest is NV2-capable, then we need to see
+> > +			 * all the TLBIs, as configured in HCR_EL2.
+> > +			 * Otherwise, relax the TLBI traps to only TGE=0.
+> > +			 */
+> > +			if (!kvm_has_nv2(vcpu->kvm))
+> > +				vcpu->arch.hcrx_el2 |= (HCRX_EL2_NVnTTLB  |
+> > +							HCRX_EL2_NVnTTLBIS);
+> 
+> [Severity: Medium]
+> Does this mask omit the Outer Shareable S1 TLBI elision bit
+> (HCRX_EL2_NVnTTLBOS)?
+
+It does.
+
+> 
+> Without it, will Outer Shareable S1 TLBI instructions continue to
+> trap to KVM, missing out on the intended performance optimization?
+>
+
+Yeah. Not that it matters, but might as well be consistent. But that
+can't be unconditional (we rely on trapping all OS TLBIs if OS TLBIs
+are not advertised to the guest.
+
+> [Severity: Critical]
+> Does enabling hardware TLBI elision here break KVM's nested S2 MMU
+> caching?
+> 
+> KVM caches multiple S2 MMU contexts (with distinct physical VMIDs) for
+> the same virtual VMID, and defers physical VMID switches until guest entry.
+>
+
+Not really, but hey, I'm getting tired of explaining stuff to a
+machine that won't even read my emails.
+
+> If a guest hypervisor writes to VTTBR_EL2 and executes an S1 TLBI natively,
+> hardware will only invalidate the currently active physical VMID.
+>
+
+This depends on the value of NVHCR_EL2.TGE.
+
+> Could this cause the hardware to invalidate the wrong context (the
+> hypervisor's own S1 TLB instead of the L2 guest's) and miss other cached
+> physical VMIDs sharing the virtual VMID, potentially leading to stale
+> TLB entries?
+
+If NVHCR_EL2.TGE == 1, then this will only invalidate L1's own TLBs,
+as per the architecture (TGE controls whether TLBI S1E1* affects the
+host or the guest). If L1 does the wrong thing, that's its problem,
+not the host's, and this is no different from what already happens in
+KVM or on bare metal.
+
+So no, that doesn't cause anything wrong.
 
 	M.
 
