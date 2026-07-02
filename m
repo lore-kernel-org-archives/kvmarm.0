@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD35931D74B;
-	Thu,  2 Jul 2026 16:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CD13115BD;
+	Thu,  2 Jul 2026 16:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783008186; cv=none; b=dhTN6x56TwkZacPeNtccQd1IY0WeO9Cej90gAA9hJZJumI/iAeurQINAgytRTEdhWxohxmVvOhNXbonbGZgF3gnm3mFfw9f2OgxQsaEYtQB3TPjlLwS6bPSFzwxRt/pLAA4V3x9MFcp9ATNxnSPL8QE2zaZe04izUO978OVF7tM=
+	t=1783008186; cv=none; b=mz6BNalMFdhMNP4ZPmCkytR2NO/ilxHHFPW7aCSEqnLJeEQvAp1EHYkLBdyKY8yTKIF+4m1v6trtGwHXYzhusM0EUTf9yRbVoRmTNIO+zVCM9UMwfeGv8QJ2TiBaOi2fjufHuqRBAPiIXz8BrBul0VIADYdAlgaxRcvu+vYh//0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783008186; c=relaxed/simple;
-	bh=VLZWYBZnScUMVbCqb39qjY6ehohCLw5zitTNdWOBcHI=;
+	bh=+AC0ZAnxae81VfoQo1YmtmSDnC5nuOsQgviqngbcL+k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=urETOdIYxlNS59MM27SPw1Jt17Sw0nnZzC2WJV8/kQyPzwa9gKrkELuRM81nHrznYoUkvESIQaH7WFHlLalfNuOCtQp74MbQOzePgPxzH4z9NDmSr9kKwYo9OhNM4HPIzLvR0IvAplNauarlMKsT6qOYijSD+OnIUa9pYm6aFl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dBwa+dNU; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=HRKQpWpYF2SGAxqQEY9ufPlnjMQHDILr4qDmydpymj6a5SzXPlGvPgxMA8vFI0u8ZrPdmYhI4PJLsflNqPTEFbMhLdkPed8xe2fe+9kpvJmLpTrsYhxYKOG3RCjV8Nwrktw9c4b+W9AD7PLgr+DskG8H8BAHITk+ybRYUoIC91k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JD5hKmtZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dBwa+dNU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7357C1F00ADE;
-	Thu,  2 Jul 2026 16:03:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JD5hKmtZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 117011F00A3E;
+	Thu,  2 Jul 2026 16:03:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783008182;
-	bh=Zj2ikyX7bBttwfozOnp0vCaUHZFhgvkkDvwyqU4jtCU=;
+	s=k20260515; t=1783008184;
+	bh=nyIGlzMp8KtUkHTmmzLTDwn4GTo9DZ59gUjGug7RCBk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=dBwa+dNU2zAeWNRSxThplGypY+pt92rT5JS/3TK5y0xx/TyBU/JAZgnnSbStNzVsi
-	 gAD393dKttSxcosw43bhrkJ7Uc7YmDfiZ2n9PR0dICc5c9P9z5aiGlnYvkfRdJ/ia7
-	 yPwP24r8iFWc09UASMPq0fHTi91doySNAS/zsDtH/yNUtD67Myujbvf4W+TIkJHRVb
-	 hrHLy+RhKoyUYB7CHxWrlg5fFgkiiNtjbKlttJ7AyIg7OccAM0fhSfeBKroDkPKr/g
-	 aaAoo2KYM9bDPv1kf+dsN2mUjibMtTjKSeCRPphiOZcCv/p8vYUYh3QIUvCZtBvYls
-	 qbHI737ReeSrA==
+	b=JD5hKmtZghfO0knt1ar04iDQ0BK0ZwChAAlf02qkU5xV/spae397mpfre7wMfMw8j
+	 0+oCnhHOjBb8MMFmrI2P3+/spjp88MSZ2tReBaQYU6kAHSv/89/I0wVGvdDWxvoOOH
+	 5beYZzZH1Yjv6tVQMO/1+6t6D2/5WKznHjwfvMSDnC15FpFp5MG/2U8MRM01xwKq8d
+	 sK9obBqVbvra6i7Dg/0SoaRBKe+hS8/c6/c+M5nsm3Gh/OS/ce74Hm9vF6XyZZ3K29
+	 a2wTRT6YSHgX7hv/DgnGk2h8Qoqjq9guxJ+6yf1LxEN8Cld013BI+eHLWdLJqup1K4
+	 3Q9k30ZmhFQPw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wfJsS-00000000ojd-38xG;
-	Thu, 02 Jul 2026 16:03:00 +0000
+	id 1wfJsU-00000000ojd-1Yzj;
+	Thu, 02 Jul 2026 16:03:02 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 13/28] arm64: sysreg: Add NVHCR_EL2 description as a mirror of HCR_EL2
-Date: Thu,  2 Jul 2026 17:02:33 +0100
-Message-ID: <20260702160248.1377250-14-maz@kernel.org>
+Subject: [PATCH 21/28] KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
+Date: Thu,  2 Jul 2026 17:02:41 +0100
+Message-ID: <20260702160248.1377250-22-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260702160248.1377250-1-maz@kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
@@ -59,31 +59,84 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_NV3 introduces a new register that contains the HCR_EL2 value
-exposed to a NV guest. As such, it has the exact same layout as
-HCR_EL2.
+Expose NVHCR_EL2 to userspace, and treat the direct access as UNDEF,
+as that would only outline a bug in our exception routing.
 
-Describe NVHCR_EL2 as a mapping to HCR_EL2.
+The generic accessors are also updated to deal with the relatively
+uncommon location of that register.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index c6e8117a6f9cd..31e4ea455a9ce 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -4266,6 +4266,9 @@ Field	1	E2TRE
- Field	0	E0HTRE
- EndSysreg
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9439c5b2b1fe8..0aeb2e736fde3 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -221,6 +221,20 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
+ 		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
+ 			loc->loc = SR_LOC_SPECIAL;
+ 		break;
++	case NVHCR_EL2:
++		/*
++		 * Yes, NVHCR_EL2 maps to itself when loaded in nested
++		 * context. If you feel like the architecture is double
++		 * backing on itself upside down, you're not alone.
++		 */
++		WARN_ON_ONCE(!kvm_has_nv3(vcpu->kvm));
++		if (is_hyp_ctxt(vcpu)) {
++			loc->loc = SR_LOC_MEMORY;
++		} else {
++			loc->loc = SR_LOC_LOADED | SR_LOC_MAPPED;
++			loc->map_reg = NVHCR_EL2;
++		}
++		break;
+ 	default:
+ 		loc->loc = locate_direct_register(vcpu, reg);
+ 	}
+@@ -260,6 +274,7 @@ static u64 read_sr_from_cpu(enum vcpu_sysreg reg)
+ 	case DACR32_EL2:	val = read_sysreg_s(SYS_DACR32_EL2);	break;
+ 	case IFSR32_EL2:	val = read_sysreg_s(SYS_IFSR32_EL2);	break;
+ 	case DBGVCR32_EL2:	val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
++	case NVHCR_EL2:		val = read_sysreg_s(SYS_NVHCR_EL2);	break;
+ 	default:		WARN_ON_ONCE(1);
+ 	}
  
-+Sysreg	NVHCR_EL2	3	4	1	5	0
-+Mapping	HCR_EL2
-+EndSysreg
+@@ -298,6 +313,7 @@ static void write_sr_to_cpu(enum vcpu_sysreg reg, u64 val)
+ 	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
+ 	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
+ 	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
++	case NVHCR_EL2:		write_sysreg_s(val, SYS_NVHCR_EL2);	break;
+ 	default:		WARN_ON_ONCE(1);
+ 	}
+ }
+@@ -2861,6 +2877,16 @@ static unsigned int vncr_el2_visibility(const struct kvm_vcpu *vcpu,
+ 	return REG_HIDDEN;
+ }
  
- Sysreg HDFGRTR2_EL2	3	4	3	1	0
- Res0	63:25
++static unsigned int nvhcr_el2_visibility(const struct kvm_vcpu *vcpu,
++					const struct sys_reg_desc *rd)
++{
++	if (el2_visibility(vcpu, rd) == 0 &&
++	    kvm_has_feat(vcpu->kvm, ID_AA64MMFR4_EL1, NV_frac, NV3))
++		return 0;
++
++	return REG_HIDDEN;
++}
++
+ static unsigned int sctlr2_visibility(const struct kvm_vcpu *vcpu,
+ 				      const struct sys_reg_desc *rd)
+ {
+@@ -3774,6 +3800,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 			 sve_el2_visibility),
+ 
+ 	EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
++	EL2_REG_FILTERED(NVHCR_EL2, undef_access, reset_val, 0,
++			 nvhcr_el2_visibility),
+ 
+ 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
 -- 
 2.47.3
 
