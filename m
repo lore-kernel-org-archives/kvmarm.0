@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824D83A6B99;
-	Thu,  2 Jul 2026 16:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078EA414DE1;
+	Thu,  2 Jul 2026 16:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783009700; cv=none; b=swyjXODDWWVGFP9e5BQRDiXmctdHPGE+VCUPx+VgReCiUFtAPCoP1eogLYtWbnNRaKZB37ZeQn0oxTpw932DQj1UZDJTd3qE7wPIPlY7Pb3m4Ap4e748MJ5t/2W4EJYo4rtiM0eNvC+tMt+daNtyf/TwOt5aEn1+/ybMqKqVu2s=
+	t=1783009714; cv=none; b=V3sAb7A2CdZnGm/m//I3xl7zE8zNa1PAGc+lMN7iMFpYIPELViSca+nVs8Ek9Tz1xgjCX7qA5nBfLWiaYG1JaqIHaxM4x6raar4Ibf8jg/LmYCMvx4id8/b9WWIi7hzZ2Uuk3C2LZZRKb2dJmo4nyF+ceOAHbF79uLuHtLM27ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783009700; c=relaxed/simple;
-	bh=YZtx7FicGuo2ZQg6kLwnphmWkM3QJoabNXSfysMMR6Q=;
+	s=arc-20240116; t=1783009714; c=relaxed/simple;
+	bh=+fnMyEA1SoLoFVyArlLnj1I0RH+5p6l+jG22xG5NWtY=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=C/IY95WgoCbZzRDXHswhcLMVAUhs9uKftZMmG8T6dJiS7Y3m0pr94jPOhSetZ8MJcxKArmllsgXIxdjVy0xZzUpJDFrXZWkucMP0zpx6cde51Ycp8evlrYDp8O6e+SBne6kPTe+BAwqv2P0SI9EqrQwBvEbvWQG1OeaI7l9Ats8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GScRDoLK; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Ft1W0xxy715aqABeodK3Mt69Gw77kdgzl3Hs5xzdJOg1a9aC8qubBDfiNv6OC2req0JGJH8Mz3VsJA9tO9rklnMA9PgIoLvRYtmSWHnKzQ2tcinrZpdCnAxzqdE5hZI+2OrlMtM5JIx+5N6FX4ic25S9Nlm0McusaXlMBZhBbQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lHKrH05m; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GScRDoLK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D5CE1F00A3D;
-	Thu,  2 Jul 2026 16:28:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lHKrH05m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D2661F00A3D;
+	Thu,  2 Jul 2026 16:28:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783009696;
-	bh=GQvfeBO5KmqUbuxipvt5AfkfMvKAqHItUAv5ICJw7gc=;
+	s=k20260515; t=1783009711;
+	bh=xqjSxXSxkFnMe7xvsCuCNhfIuUZJwk7JvxoqbN3voQg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=GScRDoLKLfSdh8ibzsYDmjyh9RoZElALOiIYJnWvPVeP+SkejYT0LlB8LqrZvznHV
-	 mnQDyGVtM2inXuYajbfrpFwQ7UUSMQCWi1H+5cEgC1mfLJPEPWdc+5Wj0gK/wbHlaa
-	 923/zOXMXYoAzJpaXMUQ4kMlveEnjdOoOuccOBb7C/bjVHGTTRshKSR+WLtRcBa8mN
-	 bfiRx88tii9isU7nSL40v7OTWa/+PfC9kWFJokUbu6tbKHRuMrATVvBEi07rxh8LWp
-	 iYuZ9kAeQ0LarAfWb0pGzU2JDnOjqHYn0bWa1HDYmy0rzuriOAjsRSmunhGWQq41+Q
-	 Ho9cOP3R5T0Gw==
+	b=lHKrH05mX3+v9mk2AcMFBAupzydcPSJYEGnvoBp28c9uDkPrR90kubYh6w9KnTxeK
+	 waYBkN2d3Lvz3YA3nxIv7AZDnL+I0HRr5SkEavO+c1/OgvtkKBU+NZ+w4zramOs1B6
+	 d1rx/M+X0EkMDRUIrlXZncTNfHWaXn1TEnWfriq2BmD8KjlvYZHq+8jNU4NyEVWbNq
+	 IQsn2fWAJZivlTRESfdL9ZgJjr4ULzDkH3VE/dhy5FCToOXjHoZeAAtkkmMBf+0AyA
+	 pTICroSPiz8ARfvDh8NbLe2y6jTg6yQTmpZ89tfQYIa9FDPgrHQUdynMWjF2e1+A0f
+	 PahSzKrzRxHzg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 05/28] KVM: arm64: Plumb HCRX_EL2.SRMASKEn in HCRX_EL2
- sanitisation
+Subject: Re: [PATCH 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260702160248.1377250-6-maz@kernel.org>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260702160248.1377250-12-maz@kernel.org>
 References: <20260702160248.1377250-1-maz@kernel.org>
- <20260702160248.1377250-6-maz@kernel.org>
+ <20260702160248.1377250-12-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jul 2026 16:28:15 +0000
-Message-Id: <20260702162816.7D5CE1F00A3D@smtp.kernel.org>
+Date: Thu, 02 Jul 2026 16:28:30 +0000
+Message-Id: <20260702162831.4D2661F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,53 +46,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-
-Pre-existing issues:
-- [High] Missing RES0 constraints in system register feature map for `HCRX_=
-EL2` allows nested guests to set reserved hardware bits.
+- [High] Inconsistent preservation of `ID_AA64MMFR4_EL1` feature fields bas=
+ed on host support for `ARM64_HAS_NV2P1` (and later `ARM64_HAS_NV3`), leadi=
+ng to uncontrolled UAPI feature leaks and migration breakages.
 --
 
-commit 5fb0fde52515a7e2e03636fdc18f15c38a091ddd
+commit 11eacfaa8962f15232e1ae99c1e9f7d1dfee6846
 Author: Marc Zyngier <maz@kernel.org>
 
-KVM: arm64: Plumb HCRX_EL2.SRMASKEn in HCRX_EL2 sanitisation
+KVM: arm64: Expose FEAT_NV2p1 to NV guests
 
-This patch adds the HCRX_EL2.SRMASKEn bit to the HCRX_EL2 feature map to
-enable FEAT_SRMASK for a guest. It also updates the system register
-definitions to reflect the new bit field.
+This commit exposes the FEAT_NV2p1 feature to nested virtualization guests.
+It does so by updating the ID_AA64MMFR4_EL1 feature register limits in
+limit_nv_id_reg() based on host support.
 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -904,6 +904,7 @@ static const DECLARE_FEAT_MAP_FGT(hdfgwtr2_desc, hdfg=
-wtr2_masks,
-> =20
-> =20
->  static const struct reg_bits_to_feat_map hcrx_feat_map[] =3D {
-> +	NEEDS_FEAT(HCRX_EL2_SRMASKEn, FEAT_SRMASK),
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1740,7 +1740,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 =
+val)
+>  		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features)) {
+>  			val =3D 0;
+>  		} else {
+> -			val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+> +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+> +				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P=
+1);
+> +			else
+> +				val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
 
 [Severity: High]
-This isn't a bug introduced by this patch, but a pre-existing issue in
-hcrx_feat_map: does the omission of FORCE_RES0(HCRX_EL2_RES0) and
-FORCE_RES1(HCRX_EL2_RES1) allow a nested guest to set architecturally reser=
-ved
-hardware bits?
+Does this introduce inconsistent preservation of ID_AA64MMFR4_EL1 feature f=
+ields?
 
-Because FORCE_RES0(HCRX_EL2_RES0) is omitted from this array, the architect=
-ural
-RES0 bits (like 63:27, 25, 21:17) are not included in the virtual RES0 mask.
-If a nested guest writes a 1 to these RES0 bits, KVM's dynamic mask applica=
-tion
-in __vcpu_sys_reg() will leave those bits unmodified.
+When the host supports NV2P1, KVM uses ID_REG_LIMIT_FIELD_ENUM(), which only
+modifies the NV_frac field and preserves the rest of the original val. This=
+=20
+means the guest will inherit other host-populated feature bits from
+ID_AA64MMFR4_EL1 (like ASID2, HACDBS, FGWTE3, etc.).
 
-When KVM later transitions to the guest, it will write this unsanitized val=
-ue
-directly to the host's hardware SYS_HCRX_EL2 register. Can this violate
-architectural invariants and trigger CONSTRAINED UNPREDICTABLE behavior or
-silently enable unknown future hardware features?
+However, if the host is NV2-only, it falls back to the original assignment
+using SYS_FIELD_PREP_ENUM(), which effectively wipes out all other fields in
+val.
 
-[ ... ]
+Could this uncontrolled feature leak cause guest-visible state divergence b=
+ased
+on the underlying hardware and break live migration?
+
+>  			val &=3D ~ID_AA64MMFR4_EL1_E2H0;
+>  			val |=3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI_NV1);
+>  		}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260702160248.1377=
-250-1-maz@kernel.org?part=3D5
+250-1-maz@kernel.org?part=3D11
