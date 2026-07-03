@@ -1,45 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BAA274658;
-	Fri,  3 Jul 2026 16:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F79274658;
+	Fri,  3 Jul 2026 16:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783096060; cv=none; b=lanPhihvL1iHNlwRmyQpF9CcsttMbbHXJxniXomgOWl5I6mew3+p6EtpeaoGKDZxdBzzY/dhzK8gUoVpkL/SfBTNMi3eECdDxJCrC8d2t9v9rV1DCVUKHb5n4qVbJGKL16zvFG5DbEntUG/rWHjhGVpYUvLwPjDF2/lSJnu8m2U=
+	t=1783096072; cv=none; b=gap4IEeGwDfjjoTPuVRN8a2LEmbJ4v5avlNYPy+C/ECfeHhDvbXzIWVlY7k5VxqSUqmYEQYJ4TxIPbVtpjJT91lZfF4t/Pv+JdoRieiQc0mgRboGs0rDZsg2NHTc9e181eb3Ipzy/3Fh2pkUT/GT206pE1qFhH6XJNDyK/Wc18s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783096060; c=relaxed/simple;
-	bh=ANAFc+sUOa+MNGc3J1iA8O/vr4C5//nH1PBaGt0U8ZQ=;
+	s=arc-20240116; t=1783096072; c=relaxed/simple;
+	bh=QSzJ3lq0NA5nGjGariJ8dHpn+5Dg3VsZ4IquM//3FO0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=YPb9N60YuGHKdxWg6HMpK6OFNqFfuBni+2YF1GQaQeFlGOQ+JZR+/likAWc907vdkex1Lm4uYYz4RBHQdSWNDwGgePlmsAZid1A5Mam3F0L5AlImwxgi6uvqS3kFJYD1NvkPXNdCYfatNY7Ha1cG2Rd9ozM/mYU95hkURLVonXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JaYP+Zi4; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=iWJlaBGM/1J0abN3Tmjg/rH+E8TAmKNpWud0Ueyhc2SYkZDq7ox3cWZcrO/tFE6ut/uD4Ay8YSVhE7SiOmM1sz16Phk9SO+CCN5VIff73rYhf2SuN09DvXKfADM8jBxMHK8AEfdgmIijKl3YWcxPL5g1mhrm1ZsfwWjTRvI0QFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrWUHYnn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JaYP+Zi4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DA701F000E9;
-	Fri,  3 Jul 2026 16:27:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrWUHYnn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9DF41F000E9;
+	Fri,  3 Jul 2026 16:27:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783096058;
-	bh=rUzpNBuYFph2/QMUg9F8olOH1vGxs/0vptOS+SUrUXI=;
+	s=k20260515; t=1783096070;
+	bh=IjR5hjjzRRrefQ33nZ6HDgBp9mYkwndhRtGLbx4cJZ0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=JaYP+Zi4eVafWqpdKpxCQLOTFNuWhgMOzCLNqY/DrqT3FMiYe8FFgOqGVN1S0cVnH
-	 +tnQR70pvQqp/0Fv59wcXL8wHZkpvBaSFsJXYOGdA/akMZfe2eGfBaqj+KpoXpmtvF
-	 uLKuQL459EE0pLfN/6zzYGLn5fa4SasRq20zdzTrYgiSeyYaP1yTHqCCjimBB8uMmn
-	 chMvdQ6iF1gSg8enuORKw+eBxAmT5K08ScBOosIG7ghRvxIIcj16HXku8Ru0em4EYy
-	 nt6gWrVmtlaFFO/GS/TD6nIizEnySTtcOk+WuGoyq/jFBCA8M6qiDvKO1T1raOqiv+
-	 7IGlxdoJwv/yw==
+	b=GrWUHYnnFn9XRKg42UqYDgl5FHobq+WEHWETGo3mVA7dHif72DUhgmU1tpOkEUHUO
+	 nk6MAkKnu18qppaOUPR+1cXvXQ0qjeECQx4gQsVtD8qOmgllehsaEoblXXu8q3I8/H
+	 h0H5Sn77ZhPJ4opWoiMiO4VKSF4lPdEN4HjYCRU/IB8uT6XyuKM3Cou+mShqu1pZe2
+	 nE5jekDmJ1VAstgipXV2JSbhKWc8+9pBU//VMMAjAzuW+hEqfNZynuOdPdwkrzExCW
+	 skLmfPfDKy9L3Jyxk4HAcretXlNP5FfhFJfsGQN0lK1w43Q13ffmS9sex0ESx7Uh1C
+	 83LUYO9HzjErw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 14/40] KVM: arm64: gic-v5: Set up VMTEs and VPE
- doorbells
+Subject: Re: [PATCH v3 30/40] Documentation: KVM: Extend VGICv5 docs for
+ KVM_VGIC_V5_ADDR_TYPE_IRS
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260703154811.3355680-15-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260703154811.3355680-31-sascha.bischoff@arm.com>
 References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
- <20260703154811.3355680-15-sascha.bischoff@arm.com>
+ <20260703154811.3355680-31-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 16:27:37 +0000
-Message-Id: <20260703162738.4DA701F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 16:27:49 +0000
+Message-Id: <20260703162749.E9DF41F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,80 +48,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Early returns in `vgic_v5_teardown()` on hardware command failure =
-skip software cleanup, leaking doorbell IRQs and causing a Use-After-Free o=
-f VCPU structures.
+- [Medium] The commit message fails to mention the documentation added for =
+`KVM_DEV_ARM_VGIC_GRP_NR_IRQS`.
 --
 
-commit 0e7cc2cc83975127589c6dbceb977e9f1bd837a2
+commit 92443b4583f2d91d23b1a76accf4a3fbb6ee8c84
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Set up VMTEs and VPE doorbells
+Documentation: KVM: Extend VGICv5 docs for KVM_VGIC_V5_ADDR_TYPE_IRS
 
-This commit introduces the initialization and teardown paths for GICv5 VM T=
-able
-Entries and VPE doorbells. It allocates a VM ID, configures a per-VM doorbe=
-ll
-IRQ domain, and creates handlers for managing doorbell interrupts per VCPU.
+This commit updates the VGICv5 documentation to specify the GPA space
+requirements for the GICv5 IRS. It also expands the supported interrupt
+types and adds documentation for the KVM_DEV_ARM_VGIC_GRP_NR_IRQS group.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 6d7d9e6ed9dbf..f1cc36696669d 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> Now that it is possible and required to set the address of the GICv5
+> IRS in GPA space, update the documentation accordingly. This region
+> must be 64KByte-aligned, and covers a total range of 128KBytes.
 
+[Severity: Medium]
+Is the commit description missing some context? The message focuses entirely
+on KVM_VGIC_V5_ADDR_TYPE_IRS, but the patch also introduces the following
+documentation block for KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+
+> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentati=
+on/virt/kvm/devices/arm-vgic-v5.rst
+> index 70b9162755c7e..5c6323d82f784 100644
+> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
 [ ... ]
-
-> +void vgic_v5_teardown(struct kvm *kvm)
-> +{
-> +	struct vgic_dist *dist =3D &kvm->arch.vgic;
-> +	struct kvm_vcpu *vcpu, *vcpu0;
-> +	unsigned long i;
-> +	int rc;
+> +  KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+> +   Attributes:
 > +
-> +	/*
-> +	 * If the VM's ID isn't valid, then we either failed init very early or
-> +	 * we've been called a second time. Nothing to do here in either case.
-> +	 */
-> +	if (kvm->arch.vgic.gicv5_vm.vm_id =3D=3D VGIC_V5_VM_ID_INVAL)
-> +		return;
-> +
-> +	if (kvm->arch.vgic.gicv5_vm.vmte_allocated) {
-> +		/* Make the VM invalid  */
-> +		vcpu0 =3D kvm_get_vcpu(kvm, 0);
-> +		rc =3D vgic_v5_send_command(vcpu0, VMTE_MAKE_INVALID);
-> +		if (rc) {
-> +			kvm_err("could not make VMTE invalid\n");
-> +			return;
+> +    A value describing the number of SPIs for this GIC instance. This is
+> +    GICv5-specific: unlike GICv2/v3, the value does not include SGIs or =
+PPIs.
+> +    The value ranges from 32 to the maximum value reported by
+> +    GICV5_IRS_IDR5.SPI_RANGE, in increments of 32. If userspace does not=
+ set
+> +    this attribute, KVM uses 32 SPIs by default.
 
-[Severity: High]
-If the hardware command fails, this early return skips the rest of the
-software cleanup including vgic_v5_free_doorbells(). The same applies to the
-early return below if vgic_v5_vmte_release() fails.
-
-If this happens during VM destruction, the VCPU structures will eventually
-be freed. Since the doorbell IRQs are left active and registered with the
-VCPU pointers, could a subsequent hardware doorbell IRQ fire and cause
-db_handler() to write to the freed VCPU pointer, leading to a
-use-after-free?
-
-Is it possible to continue tearing down the software resources (like
-freeing the doorbells) even if the hardware invalidation or release fails?
-
-> +		}
-> +
-> +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> +			if (vgic_v5_vmte_free_vpe(vcpu))
-> +				kvm_err("Failed to free VPE\n");
-> +		}
-> +
-> +		if (vgic_v5_vmte_release(kvm)) {
-> +			kvm_err("Failed to release VM 0x%x\n", dist->gicv5_vm.vm_id);
-> +			return;
-> +		}
-> +	}
-> +
-> +	vgic_v5_free_doorbells(kvm, atomic_read(&kvm->online_vcpus));
+Could the commit message be expanded to accurately describe the full scope
+of the documentation changes?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703154811.3355=
-680-1-sascha.bischoff@arm.com?part=3D14
+680-1-sascha.bischoff@arm.com?part=3D30
