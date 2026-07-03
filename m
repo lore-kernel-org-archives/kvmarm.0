@@ -1,134 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DA7357CE5
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15CB357CE5
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073940; cv=none; b=pet4Ap4cbHjdY/C0lMNsxZOzaX6qDYfP1mezMko4JU3V6kQI9JWDpM0JrCua2u5GyXHqwyUAkgoI04P37f3LEVBmUcQV9MlMV8+ddYOMCrVDmtHIelYbqF5DlQrqU9KOPVpeCwQKL/eMyN9bSasulv/cRVbiklwHJQKxLWNn0bc=
+	t=1783073948; cv=none; b=l6EUyLDCuHPizHICJQtPnDupy+cBJp8X25N1UhIvuCmHJBpZQJ7qPVACzDK7PASuHEaU0EpQ0fuqe13NJzXZRJVN35toAw3EBZSqKF8n/oWQ8coSnoqZYbm0Tac8fuMT4TWYCv/R/a7e1Swse9iSz0TXZEqsVydS2KwcJDk6Wow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073940; c=relaxed/simple;
-	bh=DWukcGjrjeqQhAoiiO5A4ZyAVkId69llbWR8IylHa/g=;
+	s=arc-20240116; t=1783073948; c=relaxed/simple;
+	bh=XJxFjcg6a6Ff2u/ZuI82PCDc98CFsdrms3bLSldUb/I=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=QyK9m79aZ58VqJrbJFw/9QYE5Kbo5654Xv+J9Pw9NIxNk3Y5dRmzcaDbPVbdslUBRrcitV4WKkTbdUq79vhjz9lj94PR6/VF9/6f+5V43aWJAY1643bPSPGDuxsKykG/r4QPbsBU8M2frYmYplzJJri4rhdi07ydViTOvrA5ZA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VABvP+0J; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=hUPH8j8iRkVZ9AgmNdQDVWY83wTx+6+AORc/3R79KOWkdhAP9ZA8JH1jxjGS5HNWLLIJVbQkEjTc3fH+OGudWabUyMJbhSgQQpcvgVXi98ewsIgWdjYb5ctF2puY4fw9MiRCIHZsmaUKBd6L57KWIobrI6hT1RD1An0V2+JPZBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nvyyyt2I; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VABvP+0J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D451F000E9;
-	Fri,  3 Jul 2026 10:18:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nvyyyt2I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6C21F000E9;
+	Fri,  3 Jul 2026 10:19:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783073939;
-	bh=I75o/74iarFoPITXxdQ+mosqxUNNMMo3r8shLTwsuoo=;
+	s=k20260515; t=1783073946;
+	bh=TYpdiRurvwlpR1iweOflMo7IYbZdi9WYeiMwVgyKAE0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VABvP+0J7P9qkRdVbbc3X4jztIyiX5iicleqpG9ToezPy5eklijw+38zQjIf7Rjj0
-	 k8ZlmLnZuhhJESRFYJwBGSJ+4j13F9rEW8bBJh9308T0KvtkSz9oPe+nbF8k2baLnJ
-	 fat7HErsuYPBLbYv+7dHcmJaysQLIvzglFMSiD6zbA/s2S/eP0mfk2LZ404y2kvGq3
-	 rb9aJViMVdWcxp2cnoasFXnKPGujjX9UeHH1D8C4xV1m4V1vLIK+6rt1ggYvIYk8U/
-	 2C+nC6l9iuzpkIJiSIkFqnzUgxM693pkzFzxUrK/oyIhwmvQpM9KQxzUPSvpzmAbUq
-	 o+K160y4PQA6Q==
+	b=Nvyyyt2IXDxbwh4MmB1Q/eB8DOhjshAgZoaScfHGttbFXD+i+sqvnTE7OSxpSc1wh
+	 79hBkY2gbEGQlUp/+ArER7ucvU8lVJBUE9qbz8pghs6VAZAXjoD2WnViK1yLm+2Owi
+	 VysLGqrpIq0gKPv4ONdMy7jOw7CGipyhVbzfDxbPjG0yNZAti8wMDAeq8OUJ3SzCXo
+	 dsFen8kweyGY11VpFbtHwceA3dwbL2gr7VA7GKiq/JDa1n8vX99hIbxUz7vp3CCbnL
+	 oK1kDake2PqNOORoUqtnjlxyfmznuFhl88vP7POAR+0WLSkIvHbKrh48SdZDqsvX2d
+	 kNi0Q6GhCOnPA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 07/17] arm64/sysreg: Add definitions for immediate
- versions of MSR ALLINT
+Subject: Re: [PATCH 15/17] arm64/nmi: Add handling of superpriority
+ interrupts as NMIs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jinjie Ruan" <ruanjinjie@huawei.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260703100135.2512312-8-ruanjinjie@huawei.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260703100135.2512312-16-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <20260703100135.2512312-8-ruanjinjie@huawei.com>
+ <20260703100135.2512312-16-ruanjinjie@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 10:18:57 +0000
-Message-Id: <20260703101858.F3D451F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 10:19:05 +0000
+Message-Id: <20260703101906.0D6C21F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] The `_allint_clear()` and `_allint_set()` functions lack compiler =
-memory barriers, allowing dangerous compiler reordering across NMI boundari=
-es.
-- [Low] The new `arch/arm64/include/asm/nmi.h` header uses macros from `<as=
-m/sysreg.h>` but fails to include it, breaking self-containment.
+- [High] The early return for superpriority NMIs in `el1_interrupt()` skips=
+ restoring the DAIF exception mask, leaving Debug and SError exceptions unm=
+asked during the kernel exception exit sequence.
 --
 
-commit f45a4a26dfbea0878dc6e4ccc4dcf5b6a158b356
+commit d42506f146936c84b19bd8abaf9cf4045e0c586d
 Author: Mark Brown <broonie@kernel.org>
 
-arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
+arm64/nmi: Add handling of superpriority interrupts as NMIs
 
-This commit adds system register definitions for immediate versions of
-MSR ALLINT (SYS_ALLINT_CLR, SYS_ALLINT_SET). It also introduces a new
-header, asm/nmi.h, with wrappers _allint_clear() and _allint_set() that
-write to these registers using xzr.
+This commit introduces superpriority interrupts as NMIs to allow prompt
+handling of time-critical interrupts. It updates EL1 and EL0 interrupt entry
+paths to check isr_el1 for superpriority status before unmasking normal
+interrupts, routing them to newly added root handlers.
 
-Link: https://lore.kernel.org/r/20221112151708.175147-5-broonie@kernel.org
+Link: https://lore.kernel.org/r/20221112151708.175147-13-broonie@kernel.org
 
-> diff --git a/arch/arm64/include/asm/nmi.h b/arch/arm64/include/asm/nmi.h
-> new file mode 100644
-> index 0000000000000..eb2c9a8350cc8
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/nmi.h
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2022 ARM Ltd.
-> + */
-> +#ifndef __ASM_NMI_H
-> +#define __ASM_NMI_H
-> +
-> +#ifdef CONFIG_ARM64_NMI
-
-[Severity: Low]
-Is a #include <asm/sysreg.h> directive missing in this new header?
-
-It uses the __msr_s macro and SYS_ALLINT_CLR/SET definitions from sysreg.h.
-Without the include, it might break self-containment if another file includ=
-es
-asm/nmi.h first.
-
-> +static __always_inline void _allint_clear(void)
-> +{
-> +	asm volatile(__msr_s(SYS_ALLINT_CLR, "xzr"));
+> diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-c=
+ommon.c
+> index dc223085e7735..4115a5e7c3925 100644
+> --- a/arch/arm64/kernel/entry-common.c
+> +++ b/arch/arm64/kernel/entry-common.c
+[ ... ]
+> @@ -537,11 +549,20 @@ static __always_inline void __el1_irq(struct pt_reg=
+s *regs,
+> =20
+>  	arm64_exit_to_kernel_mode(regs, state);
+>  }
+> -static void noinstr el1_interrupt(struct pt_regs *regs,
+> -				  void (*handler)(struct pt_regs *))
+> +static void noinstr el1_interrupt(struct pt_regs *regs, u64 nmi_flag,
+> +				  void (*handler)(struct pt_regs *),
+> +				  void (*nmi_handler)(struct pt_regs *))
+>  {
+>  	struct exception_mask mask =3D irq_entry_unmask_debug_serror(regs);
+> =20
+> +	if (system_uses_nmi()) {
+> +		/* Is there a NMI to handle? */
+> +		if (read_sysreg(isr_el1) & nmi_flag) {
+> +			__el1_nmi(regs, nmi_handler);
+> +			return;
 
 [Severity: High]
-Does this inline assembly need a "memory" clobber?
+Does this early return path in el1_interrupt() bypass the required
+exception_exit_restore_mask(mask) call at the end of the function?
 
-Without a compiler memory barrier, the compiler might hoist or sink memory
-accesses across the NMI masking/unmasking boundary. This could lead to data
-corruption or kernel panics when protected data structures are accessed
-concurrently.
+It looks like this might leave Debug and SError exceptions unmasked during =
+the
+kernel exception exit sequence. If an asynchronous SError or hardware
+breakpoint triggers during the assembly exception return sequence after this
+point, it could clobber the exception state and cause a fatal recursive fau=
+lt.
 
-> +}
+> +		}
+> +	}
 > +
-> +static __always_inline void _allint_set(void)
-> +{
-> +	asm volatile(__msr_s(SYS_ALLINT_SET, "xzr"));
-
-[Severity: High]
-Should this masking function also use a "memory" clobber to prevent compiler
-reordering across the boundary?
-
-> +}
-> +#else
-> +static __always_inline void _allint_clear(void) { }
-> +static __always_inline void _allint_set(void) { }
-
-[Severity: High]
-Would it be safer for these fallback implementations to include a barrier()
-call?
-
-If they are used outside of strict architectural checks, an empty function
-allows the compiler to reorder memory operations across where the NMI criti=
-cal
-section was intended.
-
-> +#endif /* CONFIG_ARM64_NMI */
-> +
-> +#endif
+>  	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && regs_irqs_disabled(regs))
+>  		__el1_pnmi(regs, handler);
+>  	else
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
-312-1-ruanjinjie@huawei.com?part=3D7
+312-1-ruanjinjie@huawei.com?part=3D15
