@@ -1,38 +1,38 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A5F3CBE69
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863E33CC7C5
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783072995; cv=none; b=AdTYp8TNxDDuqknoKSI3Swv2tbSvVXNapiMqDZgWTSQjeYyanPLvMOOtj/ycS8Fc/yiOkXPQWyYhewmtgn1xzJsMoejoMr7qzzIoj3wHLVmZvs9NAJTYFm8rslyXIyPUjJqEMUMyXAgL9zLyIgNQwyeawjDlGxxQthltUFbRQAc=
+	t=1783072998; cv=none; b=mF4lfaKhS1m2bH234cT8OwxVrNdj9vN7E65kZaAOjNUJLFr6tCGXJwsPI1sEI2gGDJQRgjdLM4u8cp4c0SwIkoMPwBw4klkv57qouj/7yAqZAV6Darb0Rlu0/2dBKGseRcEQrVixxwzX16SfDV88B39lhNuVxy+H2JOOi9OVcRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783072995; c=relaxed/simple;
-	bh=Nt7oacJhoSyiV/9AEvrUCSc56P1e7xY04dRAuL8r/Jw=;
+	s=arc-20240116; t=1783072998; c=relaxed/simple;
+	bh=032/ARW3S+uTYXJQvj4l/1JT7V1vuUzRgbkrInblA9U=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M/uBQgTE58DlNQX9tJwx4bR190PukW8yyJdkL8pmh9vLmgaGoMNjz0nwROoTprl+WTxF0sPdj1PVJALz1C0h+Yc2IJIpiLWk5xWUsYtLSu1LTTfHlGX9Sp0sXpxvprKG5q3NMgjiotGbkdgUVfyPyuC83DIibZRydhxibJ0v0Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=KKdJ0Gyr; arc=none smtp.client-ip=113.46.200.220
+	 MIME-Version:Content-Type; b=Dyvbc5M+oNTEXo6L+/dnaQniE/ZM0UPD+KsG6MLIqSIW8sN+NxZgxxKCLrQA+4hAI6oL8KYxG+tKCbzikac9PnE8CbuC9dfWkzyMulQDh80OoemgnAJwVynxUUWr3E4yPm9QlPhjed423+Gm/uv9k+mQM7xw/3/qNYeuIVnn2og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=dJLCxaMM; arc=none smtp.client-ip=113.46.200.222
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="KKdJ0Gyr"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="dJLCxaMM"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=yO0sd593m6RaXzL4VpFP1av4etRqaQ/IZOv+ZznrMgs=;
-	b=KKdJ0GyrS4UKsufLfsbMymq6XKdHN86/tKzmcZi9+2jneFpTl26tkFZ4n9SFYICJm7V7qkJwq
-	bWR+XRyaSc2ZMiDofLA5wdq8ophTWhdLvITpC/2CB17DQAWA7K3Jx9x0WJV46TI9tD8NYotVz89
-	RixOz+aXZQcP0XGj/vMhxtc=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4gs8H96yMBz12LJ8;
-	Fri,  3 Jul 2026 17:54:29 +0800 (CST)
+	bh=m9R38XtJrQtsn4NIrQT2WoM7Q3dBIYtavm6X0wJ2GFM=;
+	b=dJLCxaMMpv5Bq6aEao5m1OP3xEQ4vb/uFkDH0iYO16Z9eF3bP7kGJTcRimw1x1KOAn5DmqpEw
+	kKI+BS7vx0EjyJBKvADeopbmspciaDImE0zeUaP2oU6DM9ikyPQG0eT6ZkJ2Ov9P5b0HAw/iqS0
+	hMmdf9IjhOivQP31P6KO9rU=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gs8Fk3M5gzLmHq;
+	Fri,  3 Jul 2026 17:53:14 +0800 (CST)
 Received: from dggpemf500011.china.huawei.com (unknown [7.185.36.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 020484056D;
-	Fri,  3 Jul 2026 18:03:12 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 6541D4058B;
+	Fri,  3 Jul 2026 18:02:25 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by dggpemf500011.china.huawei.com
  (7.185.36.131) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 3 Jul
- 2026 18:03:08 +0800
+ 2026 18:02:21 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
 	<skhan@linuxfoundation.org>, <maz@kernel.org>, <ardb@kernel.org>,
@@ -60,9 +60,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-efi@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 16/17] arm64/nmi: Add Kconfig for NMI
-Date: Fri, 3 Jul 2026 18:01:34 +0800
-Message-ID: <20260703100135.2512312-17-ruanjinjie@huawei.com>
+Subject: [PATCH 03/17] arm64: entry: arm64: entry: Move DAIF masking for EL1 exit to C code
+Date: Fri, 3 Jul 2026 18:01:21 +0800
+Message-ID: <20260703100135.2512312-4-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260703100135.2512312-1-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
@@ -77,47 +77,97 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  dggpemf500011.china.huawei.com (7.185.36.131)
 
-From: Mark Brown <broonie@kernel.org>
+Move the DAIF masking logic on exception exit from the assembly
+macro kernel_exit into the respective EL1 C handler functions.
 
-Since NMI handling is in some fairly hot paths we provide a Kconfig option
-which allows support to be compiled out when not needed.
+Originally, when returning to a privileged mode (el != 0), kernel_exit
+invoked the disable_daif macro ("msr daifset, #0xf") to ensure that the
+subsequent registers and PMR state restoration occurred with all local
+interrupts fully masked.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20221112151708.175147-14-broonie@kernel.org
+Move the DAIF masking out of the assembly macro and into the individual
+C exception handlers, immediately after the core handler logic.
+Specifically, add `write_sysreg(DAIF_MASK, daif)` at the end of:
+
+- el1h_64_sync_handler().
+- el1_interrupt().
+- el1h_64_error_handler).
+
+We achieve identical masking behavior before entering the low-level
+assembly exit path.
+
+This change cleans up the assembly macro and consolidates the exception
+lifecycle management in C code.
+
+No functional change intended.
+
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- arch/arm64/Kconfig | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/include/asm/assembler.h | 4 ----
+ arch/arm64/kernel/entry-common.c   | 5 +++++
+ arch/arm64/kernel/entry.S          | 4 ----
+ 3 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index b3afe0688919..218996752079 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2195,6 +2195,23 @@ endmenu # "ARMv8.7 architectural features"
- config AS_HAS_MOPS
- 	def_bool $(as-instr,.arch_extension mops)
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index effae53e9739..0b58b550e8dc 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -34,10 +34,6 @@
+ 	wx\n	.req	w\n
+ 	.endr
  
-+menu "ARMv8.8 architectural features"
+-	.macro disable_daif
+-	msr	daifset, #0xf
+-	.endm
+-
+ /*
+  * Save/restore interrupts.
+  */
+diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
+index 195af3f8001e..6fdf74ff4835 100644
+--- a/arch/arm64/kernel/entry-common.c
++++ b/arch/arm64/kernel/entry-common.c
+@@ -486,6 +486,8 @@ asmlinkage void noinstr el1h_64_sync_handler(struct pt_regs *regs)
+ 	default:
+ 		__panic_unhandled(regs, "64-bit el1h sync", esr);
+ 	}
 +
-+config ARM64_NMI
-+	bool "Enable support for Non-maskable Interrupts (NMI)"
-+	default y
-+	help
-+	  Non-maskable interrupts are an architecture and GIC feature
-+	  which allow the system to configure some interrupts to be
-+	  configured to have superpriority, allowing them to be handled
-+	  before other interrupts and masked for shorter periods of time.
-+
-+	  The feature is detected at runtime, and will remain disabled
-+	  if the cpu does not implement the feature. It will also be
-+	  disabled if pseudo NMIs are enabled at runtime.
-+
-+endmenu # "ARMv8.8 architectural features"
-+
- menu "ARMv8.9 architectural features"
++	write_sysreg(DAIF_MASK, daif);
+ }
  
- config ARM64_POE
+ static __always_inline void __el1_pnmi(struct pt_regs *regs,
+@@ -520,6 +522,8 @@ static void noinstr el1_interrupt(struct pt_regs *regs,
+ 		__el1_pnmi(regs, handler);
+ 	else
+ 		__el1_irq(regs, handler);
++
++	write_sysreg(DAIF_MASK, daif);
+ }
+ 
+ asmlinkage void noinstr el1h_64_irq_handler(struct pt_regs *regs)
+@@ -541,6 +545,7 @@ asmlinkage void noinstr el1h_64_error_handler(struct pt_regs *regs)
+ 	state = irqentry_nmi_enter(regs);
+ 	do_serror(regs, esr);
+ 	irqentry_nmi_exit(regs, state);
++	write_sysreg(DAIF_MASK, daif);
+ }
+ 
+ static void noinstr el0_da(struct pt_regs *regs, unsigned long esr)
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index e0db14e9c843..f63049ac32dc 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -333,10 +333,6 @@ alternative_else_nop_endif
+ 	.endm
+ 
+ 	.macro	kernel_exit, el
+-	.if	\el != 0
+-	disable_daif
+-	.endif
+-
+ #ifdef CONFIG_ARM64_PSEUDO_NMI
+ alternative_if_not ARM64_HAS_GIC_PRIO_MASKING
+ 	b	.Lskip_pmr_restore\@
 -- 
 2.34.1
 
