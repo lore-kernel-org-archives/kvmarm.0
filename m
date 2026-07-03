@@ -1,38 +1,38 @@
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1AE3CDBB5
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304153BCD21
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073007; cv=none; b=HCh33kF/KxFF5Tyz/OidvO7gQ9fMuo78gacOW7r7tVP6CI1o4M+f2GwvWTLtZhjf2bVnNGTf1OW4brWKK1+WCQtswfTeYl+EgIvPmKyAhlMcIy+Eszi0lSz8zUGcPuw6UmfDd5g3LVZgSGolf1UNINpTz+SaVvF9JU6qtEFhp2o=
+	t=1783073014; cv=none; b=pmf7gzZ5K+yE3cUy9883ky1lGLRlJ80iqHxn9bi6U9zcxoXpZr02Utmnf+gg+kBgAhyazXoill4n25HuNc5+alMkMJTShXQGkP66w9ao1AMHp7bGCG6pnWGIgdw/Fk9nxlhWyW2F9b10YFWXBA5PS9+GbhPRhd9x55gGRO0x0hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073007; c=relaxed/simple;
-	bh=rMHYfsPIj9csZmiTJp3AzJLzHYimBrTFl9ATWh8WQNo=;
+	s=arc-20240116; t=1783073014; c=relaxed/simple;
+	bh=6Z1bbdHGZt22b/FQnm5MjfuGRsZXHgDFpFWlKIw2EKk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VeHCER5rfav28/zN3Ky46c4vghmUG9VQW1OOzLjSFe6LnE3nWp7OYOoy4VpUkCJvQGgYe1Q7fIosnWtH0GxnHFuVYc/qluVelcdk6QRFbohr1HQXUgfWA59hzCafLpOWIBAtw1YCwdtak0AOYKb1ImJAImMzp+pVIMuZgcsZlDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=5sq/TnO4; arc=none smtp.client-ip=113.46.200.222
+	 MIME-Version:Content-Type; b=CWdfTXar+IseM6RkUhCiBM7wUkaqTEie2aRq7jgAVJ3LIZwp/0YZBE6iG+OXHyrgmYhi674oohJ46yvhJJGsoxWM+UYWAw23kc465SToSaL6LBGgst69WOW6ixJCwUrLJW0MsbSe/KPgl6ztAnMNTEQ1hJf845Ad4o+rYr2FIhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=VaVZTKoQ; arc=none smtp.client-ip=113.46.200.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="5sq/TnO4"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="VaVZTKoQ"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=d1sS0on0PHC89aq4LdBePidBgA9ZlZCJ5FDeW7rZmOI=;
-	b=5sq/TnO4eai2Jxm8uXOzt0fWd/v5w2BSJgrbu+cuIwfcKnAS/omwHcWq8Jdj45jNjpRMl8uJ7
-	lbHnWBnb6Q2NOlxzyT77UyeDDYHmFyc6LIIBxWFPkSiEE3CwCosFn4mrCa32XcpYzo4aBhqlW2m
-	cnNn5zqCCDVqrLNFB8Oea5Q=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gs8Fs4W47zLmHr;
-	Fri,  3 Jul 2026 17:53:21 +0800 (CST)
+	bh=KuP1crWk9eUujw3xN38yMPbfy3wyNjYZwSuHmFEAs0o=;
+	b=VaVZTKoQzfPv7I+q5220hhMw+SOJXfR1SEWHxSdLXzJEM5EXPWqpY/1fJR860yBQWeyGjed+H
+	trq1gw/LyTyJ23O+NVGLL3jTiOdzN9xLxnp9hhTNkzlQ0dkOnC6oxPHgGY/o/wr1RPTFm48CRdE
+	c3OIMtTloofqn94ahjsBCq8=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4gs8GT2PyBz1T4HH;
+	Fri,  3 Jul 2026 17:53:53 +0800 (CST)
 Received: from dggpemf500011.china.huawei.com (unknown [7.185.36.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 90D8E4058B;
-	Fri,  3 Jul 2026 18:02:32 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id E7A934056E;
+	Fri,  3 Jul 2026 18:02:46 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by dggpemf500011.china.huawei.com
  (7.185.36.131) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 3 Jul
- 2026 18:02:28 +0800
+ 2026 18:02:43 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
 	<skhan@linuxfoundation.org>, <maz@kernel.org>, <ardb@kernel.org>,
@@ -60,9 +60,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-efi@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 05/17] arm64: Introduce helpers for restoring standard exception masks
-Date: Fri, 3 Jul 2026 18:01:23 +0800
-Message-ID: <20260703100135.2512312-6-ruanjinjie@huawei.com>
+Subject: [PATCH 09/17] arm64/idreg: Add an override for FEAT_NMI
+Date: Fri, 3 Jul 2026 18:01:27 +0800
+Message-ID: <20260703100135.2512312-10-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260703100135.2512312-1-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
@@ -77,138 +77,31 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  dggpemf500011.china.huawei.com (7.185.36.131)
 
-Several non-entry call sites construct and restore standard exception
-masks by open-coding patterns like
+From: Mark Brown <broonie@kernel.org>
 
-	local_exception_restore(arm64_make_noirq_mask());
-	local_exception_restore(arm64_make_procctx_mask());
-	local_exception_restore(arm64_make_errctx_mask());
+Add a named override for FEAT_NMI, allowing it to be explicitly disabled
+in case of problems.
 
-These scattered calls directly manipulate DAIF and are blind to the
-ongoing rework of exception mask management (DAIF + PMR + future
-ALLINT).  Encapsulate each pattern into a dedicated helper:
-
-	local_exception_restore_noirq()
-	local_exception_restore_procctx()
-	local_exception_restore_errctx()
-
-This centralises the mask construction, avoids open-coding of
-arch-specific mask details, and prepares for the entry-specific
-exception mask framework that will manage DAIF, PMR and eventually
-ALLINT in a consistent way.
-
-Callers in ACPI, IRQ setup, SMP, KVM VHE switch and elsewhere are
-converted to use the new helpers.  No functional change.
-
-No functional change.
-
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20221112151708.175147-8-broonie@kernel.org
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- arch/arm64/include/asm/exception_masks.h | 15 +++++++++++++++
- arch/arm64/kernel/acpi.c                 |  4 ++--
- arch/arm64/kernel/irq.c                  |  2 +-
- arch/arm64/kernel/setup.c                |  2 +-
- arch/arm64/kernel/smp.c                  |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c          |  2 +-
- 6 files changed, 21 insertions(+), 6 deletions(-)
+ arch/arm64/kernel/pi/idreg-override.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/include/asm/exception_masks.h b/arch/arm64/include/asm/exception_masks.h
-index 2c87f7c90f62..fbbba769ca03 100644
---- a/arch/arm64/include/asm/exception_masks.h
-+++ b/arch/arm64/include/asm/exception_masks.h
-@@ -196,4 +196,19 @@ static __always_inline void exception_exit_restore_mask(struct exception_mask ma
- {
- 	write_sysreg(mask.daif, daif);
- }
-+
-+static inline void local_exception_restore_noirq(void)
-+{
-+	local_exception_restore(arm64_make_noirq_mask());
-+}
-+
-+static inline void local_exception_restore_errctx(void)
-+{
-+	local_exception_restore(arm64_make_errctx_mask());
-+}
-+
-+static inline void local_exception_restore_procctx(void)
-+{
-+	local_exception_restore(arm64_make_procctx_mask());
-+}
- #endif /* __ASM_EXCEPTION_MASKS_H */
-diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
-index 4d413419309d..88883d074ecd 100644
---- a/arch/arm64/kernel/acpi.c
-+++ b/arch/arm64/kernel/acpi.c
-@@ -407,7 +407,7 @@ int apei_claim_sea(struct pt_regs *regs)
- 	 * SEA can interrupt SError, mask it and describe this as an NMI so
- 	 * that APEI defers the handling.
- 	 */
--	local_exception_restore(arm64_make_errctx_mask());
-+	local_exception_restore_errctx();
- 	nmi_enter();
- 	err = ghes_notify_sea();
- 	nmi_exit();
-@@ -418,7 +418,7 @@ int apei_claim_sea(struct pt_regs *regs)
- 	 */
- 	if (!err) {
- 		if (return_to_irqs_enabled) {
--			local_exception_restore(arm64_make_noirq_mask());
-+			local_exception_restore_noirq();
- 			__irq_enter();
- 			irq_work_run();
- 			__irq_exit();
-diff --git a/arch/arm64/kernel/irq.c b/arch/arm64/kernel/irq.c
-index 9e7fb0d22586..fff0efd5a195 100644
---- a/arch/arm64/kernel/irq.c
-+++ b/arch/arm64/kernel/irq.c
-@@ -130,6 +130,6 @@ void __init init_IRQ(void)
- 		 * the PMR/PSR pair to a consistent state.
- 		 */
- 		WARN_ON(read_sysreg(daif) & PSR_A_BIT);
--		local_exception_restore(arm64_make_noirq_mask());
-+		local_exception_restore_noirq();
- 	}
- }
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index 10507e55e2ce..bd7aa8263ebe 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -311,7 +311,7 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
- 	 * IRQ and FIQ will be unmasked after the root irqchip has been
- 	 * detected and initialized.
- 	 */
--	local_exception_restore(arm64_make_noirq_mask());
-+	local_exception_restore_noirq();
- 
- 	/*
- 	 * TTBR0 is only used for the identity mapping at this stage. Make it
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index d153ff77d25c..a94ebb1bb6d7 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -263,7 +263,7 @@ asmlinkage notrace void secondary_start_kernel(void)
- 	 * as the root irqchip has already been detected and initialized we can
- 	 * unmask IRQ and FIQ at the same time.
- 	 */
--	local_exception_restore(arm64_make_procctx_mask());
-+	local_exception_restore_procctx();
- 
- 	/*
- 	 * OK, it's off to the idle thread for us
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 024876efe0c3..d11fb05e558b 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -650,7 +650,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 * local_exception_restore() takes care to properly restore PSTATE.DAIF
- 	 * and the GIC PMR if the host is using IRQ priorities.
- 	 */
--	local_exception_restore(arm64_make_noirq_mask());
-+	local_exception_restore_noirq();
- 
- 	return ret;
- }
+diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
+index bc57b290e5e7..e5ea280452c3 100644
+--- a/arch/arm64/kernel/pi/idreg-override.c
++++ b/arch/arm64/kernel/pi/idreg-override.c
+@@ -154,6 +154,7 @@ static const struct ftr_set_desc pfr1 __prel64_initconst = {
+ 		FIELD("bt", ID_AA64PFR1_EL1_BT_SHIFT, NULL ),
+ 		FIELD("gcs", ID_AA64PFR1_EL1_GCS_SHIFT, NULL),
+ 		FIELD("mte", ID_AA64PFR1_EL1_MTE_SHIFT, NULL),
++		FIELD("nmi", ID_AA64PFR1_EL1_NMI_SHIFT, NULL),
+ 		FIELD("sme", ID_AA64PFR1_EL1_SME_SHIFT, pfr1_sme_filter),
+ 		FIELD("mpam_frac", ID_AA64PFR1_EL1_MPAM_frac_SHIFT, NULL),
+ 		{}
 -- 
 2.34.1
 
