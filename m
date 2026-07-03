@@ -1,246 +1,326 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CA134252C
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 09:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6E7357CF3
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783070784; cv=none; b=K5cIvv0v1sT9vhzzVHDIP6DnjQj33Kod0PWkcxoN+Efkx8897iL+xlookwheaZpgb7L9yh7JWe4QdUvWJdQMwPYCfDXetyMpUNkgysKJMX+RMIindz9I25+MY0kzd1rHg7wspAcqLhxclDzNG4KBTl/4YG5gm+jwr34d3WhNQfo=
+	t=1783072945; cv=none; b=GKdO8hNeguSUs+BYnTOBosfEYjDs/3+l+RvgahoerRJk06mNJmB8C5x1F9MJBw7aBmeGBc+cR7xBmOVCE8fpcJ1fWqJ+K2Z/vdxV5no2P6RtolNVl0QIslmciR6GrQwuOQjhoW9lC/voGbHmoje3Nnr0HT9TFT2fzC0oLD+2KlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783070784; c=relaxed/simple;
-	bh=4r3qWx8Ds3/hTzzeotmLLuGM39MujgZ6TSswYYw5CB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OlALUsmkOU8uJCGMaqZw4A7BYx0geoC230k1wYfXuy/DxtIUh7nVB26DrD5EJg+zNQnYF/JWYoIHCuy2dT5ghoHvt2m6TA+QQwK0Hv45zPg+f7R1NX3hDQG6fOFzwVnXq5vT/DH6gUsYPvpbyD1N1RWmduyBj3Kiaf55K4UG36Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hifszK3F; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783072945; c=relaxed/simple;
+	bh=JWCxTOsV2dA7z6VxVONQlPLmdWFhrFsM9+oISbpODdQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ujk2imAVG8W1tIau4t6FAPVY7TwBRrZyOG3W1qX8b+ghDaeyu9c+Vq+ylgaxNZYS2LNkr6Bm/OgPpvDIiLEIPz/xiHvsUUTjn3YliZ9oAvs8V8hfSOoINwaUDX8uApK/jpu9KrfIkBQWBZzCMLismU/4f0oVH34iouQXNzDd+b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=GQIlrVZ2; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hifszK3F"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1153A1EDB;
-	Fri,  3 Jul 2026 02:26:17 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 703C73F673;
-	Fri,  3 Jul 2026 02:26:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783070781; bh=4r3qWx8Ds3/hTzzeotmLLuGM39MujgZ6TSswYYw5CB8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hifszK3FOqihx8yzRGLCoyv4ym7BMwtkSBVfHsleZsBJyYhwGoO5e7D6UuLuQzH3K
-	 +lX9Hc+uNJmEDXeGtAU3M5WxL4QNakdJIEZl4N1GZuwUmyjaD+pKkJXr1VR9VEJKNY
-	 BU+a7i+xtk0h9jO6dtFKe8nuQ2WsJS+93LuAV4iA=
-Date: Fri, 3 Jul 2026 10:26:03 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-Message-ID: <mffciffp7dx7u3kjvb6scu3tzbur34wkgndc5w2qwhmrqjtgq5@rfxk4apyhv3a>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <20260630121005.1130996-4-weilin.chang@arm.com>
- <akUrmfQnKmIXTigs@LeoBrasDK>
- <5yy625c66j3kgoboejg7hagnmxjzp2tvmvvncmqvo444wtpmzl@sufez6t2iy3r>
- <akZEPVJhCcYbyoN2@LeoBrasDK>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="GQIlrVZ2"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=6a6mDkZdZ+OBlzajcYcMQbQWF9p+PLV7Ah7P0dvJklc=;
+	b=GQIlrVZ2TK2Rh0A1ilD5HVA8yknucAhH67lTSe6r48BWk3EDCcBlSkzlbr6qFvR03KaIfWqvE
+	zvQiPmt0FDevX4I+nFoCFyz+bGAkEc3V7z6DKm1cOrX+XBvoZSd6QN/NxywOTp3aBlb867A9zaW
+	SmlycWbjr+Gfuv7/0K4wGYE=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4gs8G81rXFz12LD7;
+	Fri,  3 Jul 2026 17:53:36 +0800 (CST)
+Received: from dggpemf500011.china.huawei.com (unknown [7.185.36.131])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4167F40579;
+	Fri,  3 Jul 2026 18:02:18 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by dggpemf500011.china.huawei.com
+ (7.185.36.131) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 3 Jul
+ 2026 18:02:14 +0800
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
+	<skhan@linuxfoundation.org>, <maz@kernel.org>, <ardb@kernel.org>,
+	<ilias.apalodimas@linaro.org>, <oupton@kernel.org>, <joey.gouly@arm.com>,
+	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<oleg@redhat.com>, <mark.rutland@arm.com>, <lpieralisi@kernel.org>,
+	<tglx@kernel.org>, <ada.coupriediaz@arm.com>, <anshuman.khandual@arm.com>,
+	<ruanjinjie@huawei.com>, <ebiggers@kernel.org>, <broonie@kernel.org>,
+	<mrigendra.chaubey@gmail.com>, <baohua@kernel.org>, <lucaswei@google.com>,
+	<james.morse@arm.com>, <zengheng4@huawei.com>, <thuth@redhat.com>,
+	<yang@os.amperecomputing.com>, <leo.bras@arm.com>, <Sascha.Bischoff@arm.com>,
+	<james.clark@linaro.org>, <peterz@infradead.org>, <leitao@debian.org>,
+	<ben.horgan@arm.com>, <punit.agrawal@oss.qualcomm.com>, <gshan@redhat.com>,
+	<osama.abdelkader@gmail.com>, <fengchengwen@huawei.com>,
+	<ryan.roberts@arm.com>, <yangyicong@hisilicon.com>, <kevin.brodsky@arm.com>,
+	<kees@kernel.org>, <jeson.gao@unisoc.com>, <zhaoyang.huang@unisoc.com>,
+	<ryotkkr98@gmail.com>, <wsw9603@163.com>, <pasha.tatashin@soleen.com>,
+	<jeremy.linton@arm.com>, <schuster.simon@siemens-energy.com>,
+	<osandov@fb.com>, <arnd@arndb.de>, <zhangpengjie2@huawei.com>,
+	<smostafa@google.com>, <vladimir.murzin@arm.com>, <tabba@google.com>,
+	<vdonnefort@google.com>, <kaleshsingh@google.com>, <jic23@kernel.org>,
+	<timothy.hayes@arm.com>, <alexandru.elisei@arm.com>, <zenghui.yu@linux.dev>,
+	<david@kernel.org>, <akpm@linux-foundation.org>, <ljs@kernel.org>,
+	<memxor@gmail.com>, <qperret@google.com>, <chaitanyas.prakash@arm.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-efi@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>
+Subject: [PATCH 01/17] arm64: Move DAIF macros to ptrace.h and use them centrally
+Date: Fri, 3 Jul 2026 18:01:19 +0800
+Message-ID: <20260703100135.2512312-2-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260703100135.2512312-1-ruanjinjie@huawei.com>
+References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akZEPVJhCcYbyoN2@LeoBrasDK>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500011.china.huawei.com (7.185.36.131)
 
-On Thu, Jul 02, 2026 at 11:58:06AM +0100, Leonardo Bras wrote:
-> On Wed, Jul 01, 2026 at 06:27:51PM +0100, Wei-Lin Chang wrote:
-> > On Wed, Jul 01, 2026 at 04:00:41PM +0100, Leonardo Bras wrote:
-> > > Hi Wei Lin,
-> > > 
-> > > On Tue, Jun 30, 2026 at 01:10:02PM +0100, Wei-Lin Chang wrote:
-> > > > ptdump files can still be read after the pgt of the canonical mmu is
-> > > > freed, if they are opened before the VM debugfs directory is removed.
-> > > > This triggers UAF in places where we cache the pgt pointer or access it
-> > > > without checking its validity.
-> > > > 
-> > > > Check the pgt is still alive under the mmu_lock before accessing the
-> > > > pgt.
-> > > > 
-> > > > Reported-by: Sashiko <sashiko-bot@kernel.org>
-> > > > Closes: https://sashiko.dev/#/patchset/20260623142443.648972-1-weilin.chang@arm.com?part=1
-> > > > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> > > > ---
-> > > >  arch/arm64/kvm/ptdump.c | 38 ++++++++++++++++++++++++--------------
-> > > >  1 file changed, 24 insertions(+), 14 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > > > index d5aa9eff08d1..752d8e0cd25c 100644
-> > > > --- a/arch/arm64/kvm/ptdump.c
-> > > > +++ b/arch/arm64/kvm/ptdump.c
-> > > > @@ -115,13 +115,21 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
-> > > >  static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
-> > > >  {
-> > > >  	struct kvm_ptdump_guest_state *st;
-> > > > -	struct kvm_pgtable *pgtable = kvm->arch.mmu.pgt;
-> > > > +	struct kvm_pgtable *pgtable;
-> > > >  	int ret;
-> > > >  
-> > > >  	st = kzalloc_obj(struct kvm_ptdump_guest_state, GFP_KERNEL_ACCOUNT);
-> > > >  	if (!st)
-> > > >  		return ERR_PTR(-ENOMEM);
-> > > >  
-> > > > +	guard(write_lock)(&kvm->mmu_lock);
-> > > > +	if (!kvm->arch.mmu.pgt) {
-> > > > +		kfree(st);
-> > > > +		return ERR_PTR(-ENXIO);
-> > > > +	}
-> > > > +
-> > > > +	pgtable = kvm->arch.mmu.pgt;
-> > > > +
-> > > >  	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-> > > >  	if (ret) {
-> > > >  		kfree(st);
-> > > > @@ -137,7 +145,6 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
-> > > >  
-> > > >  static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> > > >  {
-> > > > -	int ret;
-> > > >  	struct kvm_ptdump_guest_state *st = m->private;
-> > > >  	struct kvm *kvm = st->kvm;
-> > > >  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > > > @@ -154,11 +161,11 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> > > >  		.seq		= m,
-> > > >  	};
-> > > >  
-> > > > -	write_lock(&kvm->mmu_lock);
-> > > > -	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> > > > -	write_unlock(&kvm->mmu_lock);
-> > > > +	guard(write_lock)(&kvm->mmu_lock);
-> > > > +	if (mmu->pgt)
-> > > > +		return kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> > > 
-> > > IIUC, that's the same behavior, right?
-> > > Just changed to look about the same with the rest of this file?
-> > 
-> > I'm not too sure what you are referring to, if you mean the
-> > write_lock/unlock -> guard(write_lock) change, then yes, mostly. Just
-> > also checking mmu->pgt is still not freed.
-> 
-> I was referring just to lock+unlock -> guard() strategy.
-> IIUC this has the same effect, so I was wondering on why you suggested the 
-> change.
-> 
-> I then supposed it was to look the same of the rest of the file.
+Currently, various subsystems and low-level headers explicitly combine
+PSR_I_BIT, PSR_F_BIT, and other DAIF bits (such as D and A) to mask
+or unmask interrupts and exceptions. This hardcoded approach reduces
+code readability and increases the maintenance burden when managing
+processor contexts.
 
-Yeah, and I believe using guard() is encouraged, since it's less error
-prone.
+So move the definitions of DAIF_PROCCTX, DAIF_PROCCTX_NOIRQ, DAIF_ERRCTX,
+and DAIF_MASK from <asm/daifflags.h> to <asm/ptrace.h>. And clean this up
+by replacing explicit bitmask combinations with the unified
+macros defined in <asm/daifflags.h>. Specifically:
 
-> 
-> > 
-> > > 
-> > > >  
-> > > > -	return ret;
-> > > > +	return 0;
-> > > >  }
-> > > 
-> > > So if the pgt does not exist anymore, it returns zero. Is that the desired 
-> > > behavior?
-> > 
-> > Good question, so the question is what contract between the ptdump and
-> > user do we want to make for this case. I guess returning some error like -EIO
-> > could make a little more sense than just printing nothing?
-> >
-> 
-> It depends on what is the behaviour you want to see... see below..
->  
-> > > 
-> > > I guess it's aligned with the idea of single file mentioned in the cover, 
-> > > right?
-> > 
-> > Sorry, I don't get what you are asking here?
-> 
-> IIUC you mentioned in the cover letter that you planned to have a file 
-> which would, on read, output ptdump for every nested pgtable. Did I get 
-> that right? 
+- Replace `PSR_I_BIT | PSR_F_BIT` with `DAIF_PROCCTX_NOIRQ` where
+  normal interrupts are disabled but NMIs/asynchronous errors can
+  still be taken.
 
-Correct.
+- Replace the full explicit DAIF bit mask with `DAIF_MASK`.
 
-> 
-> If so, I imagine that the user has no idea how many nested pgtables are 
-> there, and if the ioctl initially finds N, but ends up printing N-1 
-> (because a pgtable was not there anymore), that would not be an error that 
-> the user should be worried about.
+This unifies DAIF flag manipulation across kvm, cpuidle, daifflags, and
+efi subsystems, making the code more readable.
 
-In kvm_ptdump_guest_nested_show() I acquire the mmu_lock, therefore
-"initially finds N but printing N-1" won't happen, the whole operation
-of looking at the nested mmu array and printing them out is atomic.
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+ arch/arm64/include/asm/cpuidle.h   |  3 ++-
+ arch/arm64/include/asm/daifflags.h | 12 +++---------
+ arch/arm64/include/asm/efi.h       |  2 +-
+ arch/arm64/include/asm/ptrace.h    | 11 +++++++----
+ arch/arm64/kvm/emulate-nested.c    |  6 +++---
+ arch/arm64/kvm/hyp/nvhe/host.S     |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S |  3 ++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++--
+ arch/arm64/kvm/reset.c             |  6 ++----
+ 9 files changed, 24 insertions(+), 27 deletions(-)
 
-> 
-> It could be an issue if you were printing in multiple steps (multiple 
-> checks), as a part of that pgtable could be printed while another part 
-> could not. Which does not seem to be the case.
+diff --git a/arch/arm64/include/asm/cpuidle.h b/arch/arm64/include/asm/cpuidle.h
+index 2047713e097d..64ddb533d3ec 100644
+--- a/arch/arm64/include/asm/cpuidle.h
++++ b/arch/arm64/include/asm/cpuidle.h
+@@ -6,6 +6,7 @@
+ 
+ #ifdef CONFIG_ARM64_PSEUDO_NMI
+ #include <asm/arch_gicv3.h>
++#include <asm/ptrace.h>
+ 
+ struct arm_cpuidle_irq_context {
+ 	unsigned long pmr;
+@@ -17,7 +18,7 @@ struct arm_cpuidle_irq_context {
+ 		struct arm_cpuidle_irq_context *c = __c;		\
+ 		if (system_uses_irq_prio_masking()) {			\
+ 			c->daif_bits = read_sysreg(daif);		\
+-			write_sysreg(c->daif_bits | PSR_I_BIT | PSR_F_BIT, \
++			write_sysreg(c->daif_bits | DAIF_PROCCTX_NOIRQ, \
+ 				     daif);				\
+ 			c->pmr = gic_read_pmr();			\
+ 			gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET); \
+diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
+index 795b35128467..3a4b63a948ac 100644
+--- a/arch/arm64/include/asm/daifflags.h
++++ b/arch/arm64/include/asm/daifflags.h
+@@ -12,12 +12,6 @@
+ #include <asm/cpufeature.h>
+ #include <asm/ptrace.h>
+ 
+-#define DAIF_PROCCTX		0
+-#define DAIF_PROCCTX_NOIRQ	(PSR_I_BIT | PSR_F_BIT)
+-#define DAIF_ERRCTX		(PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
+-#define DAIF_MASK		(PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
+-
+-
+ /* mask/save/unmask/restore all exceptions, including interrupts. */
+ static __always_inline void local_daif_mask(void)
+ {
+@@ -47,7 +41,7 @@ static __always_inline unsigned long local_daif_save_flags(void)
+ 	if (system_uses_irq_prio_masking()) {
+ 		/* If IRQs are masked with PMR, reflect it in the flags */
+ 		if (read_sysreg_s(SYS_ICC_PMR_EL1) != GIC_PRIO_IRQON)
+-			flags |= PSR_I_BIT | PSR_F_BIT;
++			flags |= DAIF_PROCCTX_NOIRQ;
+ 	}
+ 
+ 	return flags;
+@@ -69,7 +63,7 @@ static __always_inline void local_daif_restore(unsigned long flags)
+ 	bool irq_disabled = flags & PSR_I_BIT;
+ 
+ 	WARN_ON(system_has_prio_mask_debugging() &&
+-		(read_sysreg(daif) & (PSR_I_BIT | PSR_F_BIT)) != (PSR_I_BIT | PSR_F_BIT));
++		(read_sysreg(daif) & DAIF_PROCCTX_NOIRQ) != DAIF_PROCCTX_NOIRQ);
+ 
+ 	if (!irq_disabled) {
+ 		trace_hardirqs_on();
+@@ -86,7 +80,7 @@ static __always_inline void local_daif_restore(unsigned long flags)
+ 			 * If interrupts are disabled but we can take
+ 			 * asynchronous errors, we can take NMIs
+ 			 */
+-			flags &= ~(PSR_I_BIT | PSR_F_BIT);
++			flags &= ~DAIF_PROCCTX_NOIRQ;
+ 			pmr = GIC_PRIO_IRQOFF;
+ 		} else {
+ 			pmr = GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
+diff --git a/arch/arm64/include/asm/efi.h b/arch/arm64/include/asm/efi.h
+index e8a9783235cb..ae2a24868ee7 100644
+--- a/arch/arm64/include/asm/efi.h
++++ b/arch/arm64/include/asm/efi.h
+@@ -48,7 +48,7 @@ void arch_efi_call_virt_teardown(void);
+ 	(efi_rt_stack_top != NULL &&					\
+ 	 on_task_stack(current, READ_ONCE(efi_rt_stack_top[-1]), 1))
+ 
+-#define ARCH_EFI_IRQ_FLAGS_MASK (PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
++#define ARCH_EFI_IRQ_FLAGS_MASK (DAIF_MASK)
+ 
+ /*
+  * Even when Linux uses IRQ priorities for IRQ disabling, EFI does not.
+diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
+index 39582511ad72..f33f75881c9a 100644
+--- a/arch/arm64/include/asm/ptrace.h
++++ b/arch/arm64/include/asm/ptrace.h
+@@ -12,14 +12,17 @@
+ 
+ #include <uapi/asm/ptrace.h>
+ 
++#define DAIF_PROCCTX		0
++#define DAIF_PROCCTX_NOIRQ	(PSR_I_BIT | PSR_F_BIT)
++#define DAIF_ERRCTX		(PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
++#define DAIF_MASK		(PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
++
+ /* Current Exception Level values, as contained in CurrentEL */
+ #define CurrentEL_EL1		(1 << 2)
+ #define CurrentEL_EL2		(2 << 2)
+ 
+-#define INIT_PSTATE_EL1 \
+-	(PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT | PSR_MODE_EL1h)
+-#define INIT_PSTATE_EL2 \
+-	(PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT | PSR_MODE_EL2h)
++#define INIT_PSTATE_EL1	(DAIF_MASK | PSR_MODE_EL1h)
++#define INIT_PSTATE_EL2	(DAIF_MASK | PSR_MODE_EL2h)
+ 
+ #include <linux/irqchip/arm-gic-v3-prio.h>
+ 
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index e688bc5139c1..356b67aa8dc0 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -9,6 +9,7 @@
+ 
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_nested.h>
++#include <asm/ptrace.h>
+ 
+ #include "hyp/include/hyp/adjust_pc.h"
+ 
+@@ -2754,9 +2755,8 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+ 		 */
+ 		spsr = *vcpu_cpsr(vcpu);
+ 
+-		spsr &= (PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
+-			 PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT | PSR_V_BIT |
+-			 PSR_MODE_MASK | PSR_MODE32_BIT);
++		spsr &= (DAIF_MASK | PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT |
++			 PSR_V_BIT | PSR_MODE_MASK | PSR_MODE32_BIT);
+ 		spsr |= PSR_IL_BIT;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 9393fe3ea6a1..cbe2a616c726 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -11,6 +11,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_ptrauth.h>
++#include <asm/ptrace.h>
+ 
+ 	.text
+ 
+@@ -111,8 +112,7 @@ SYM_FUNC_END(__host_enter)
+  */
+ SYM_FUNC_START(__hyp_do_panic)
+ 	/* Prepare and exit to the host's panic function. */
+-	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+-		      PSR_MODE_EL1h)
++	mov	lr, #(DAIF_MASK | PSR_MODE_EL1h)
+ 	msr	spsr_el2, lr
+ 	adr_l	lr, nvhe_hyp_panic_handler
+ 	hyp_kimg_va lr, x6
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 89cb553be1e5..26ea02e7f5fd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -15,6 +15,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/pgtable-hwdef.h>
++#include <asm/ptrace.h>
+ #include <asm/sysreg.h>
+ #include <asm/virt.h>
+ 
+@@ -224,7 +225,7 @@ SYM_CODE_START(__kvm_handle_stub_hvc)
+ 
+ 	/* This is where we're about to jump, staying at EL2 */
+ 	msr	elr_el2, x1
+-	mov	x0, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT | PSR_MODE_EL2h)
++	mov	x0, #(DAIF_MASK | PSR_MODE_EL2h)
+ 	msr	spsr_el2, x0
+ 
+ 	/* Shuffle the arguments, and don't come back */
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index d3c69de698f4..69dfbbe109ad 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -8,6 +8,7 @@
+ #include <hyp/switch.h>
+ 
+ #include <asm/pgtable-types.h>
++#include <asm/ptrace.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
+@@ -859,8 +860,7 @@ void inject_host_exception(u64 esr)
+ 	}
+ 
+ 	spsr_el2 &= spsr_mask;
+-	spsr_el2 |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
+-		    PSR_MODE_EL1h;
++	spsr_el2 |= DAIF_MASK | PSR_MODE_EL1h;
+ 
+ 	sctlr = read_sysreg_el1(SYS_SCTLR);
+ 	if (!(sctlr & SCTLR_EL1_SPAN))
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b963fd975aac..0e1167eee5c0 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -37,11 +37,9 @@ unsigned int __ro_after_init kvm_host_sve_max_vl;
+ /*
+  * ARMv8 Reset Values
+  */
+-#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+-				 PSR_F_BIT | PSR_D_BIT)
++#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | DAIF_MASK)
+ 
+-#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
+-				 PSR_F_BIT | PSR_D_BIT)
++#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | DAIF_MASK)
+ 
+ #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+ 				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+-- 
+2.34.1
 
-Yes, that's one of the problems not taking the lock can introduce.
-
-Thanks,
-Wei-Lin Chang
-
-> 
-> > 
-> > > 
-> > > >  
-> > > >  static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-> > > > @@ -206,17 +213,23 @@ static const struct file_operations kvm_ptdump_guest_fops = {
-> > > >  
-> > > >  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
-> > > >  {
-> > > > -	struct kvm_pgtable *pgtable = m->private;
-> > > > +	struct kvm *kvm = m->private;
-> > > > +
-> > > > +	guard(write_lock)(&kvm->mmu_lock);
-> > > > +	if (kvm->arch.mmu.pgt)
-> > > > +		seq_printf(m, "%2u\n", kvm->arch.mmu.pgt->ia_bits);
-> > > >  
-> > > > -	seq_printf(m, "%2u\n", pgtable->ia_bits);
-> > > >  	return 0;
-> > > >  }
-> > > >  
-> > > >  static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
-> > > >  {
-> > > > -	struct kvm_pgtable *pgtable = m->private;
-> > > > +	struct kvm *kvm = m->private;
-> > > > +
-> > > > +	guard(write_lock)(&kvm->mmu_lock);
-> > > > +	if (kvm->arch.mmu.pgt)
-> > > > +		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - kvm->arch.mmu.pgt->start_level);
-> > > >  
-> > > > -	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
-> > > >  	return 0;
-> > > >  }
-> > > >  
-> > > > @@ -224,15 +237,12 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
-> > > >  				    int (*show)(struct seq_file *, void *))
-> > > >  {
-> > > >  	struct kvm *kvm = m->i_private;
-> > > > -	struct kvm_pgtable *pgtable;
-> > > >  	int ret;
-> > > >  
-> > > >  	if (!kvm_get_kvm_safe(kvm))
-> > > >  		return -ENOENT;
-> > > >  
-> > > > -	pgtable = kvm->arch.mmu.pgt;
-> > > > -
-> > > > -	ret = single_open(file, show, pgtable);
-> > > > +	ret = single_open(file, show, kvm);
-> > > 
-> > > Maybe this change is more related with the previous patch?
-> > 
-> > I see your point, but I divided it into first fixing mmu UAF, then the
-> > pgt UAF, which I also think makes sense.
-> > 
-> 
-> Okay then
-> 
-> Thanks!
-> Leo
