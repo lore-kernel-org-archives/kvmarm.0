@@ -1,241 +1,127 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A773F3DD873
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 14:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FD53E5A35
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 14:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783088154; cv=none; b=i+GHYWKU5rlK0ZpqY91OGlXULE0SrbfrI+yihULFe09NUE1myI7a6f6tnfG02eCVX2os5qCYVLjVLhCzKbR+Zjub7xJ6SlwNJHyUkdz8LF3pOIGVJoxQSGLjI3XHKQqZfnn7Z2GUT5uViqATQ8JIVfWvHAMYydMh5N2mDw5sSas=
+	t=1783090501; cv=none; b=hKWEpVw6kYMO4/GhLs0A68P2ldpzlziGorT6fQyaCsrZF+mENsBle/+TfhK0jIE5PrQcJr0cw0x2Jwru2GSPpL1DSA3N1iwAmwEFMeeGTYT62giRXp9wHgPO2Zw3Z+th5oa5GkmiE9UGJXXM+bPAzg+pFJEenTvIka+o0h7VTXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783088154; c=relaxed/simple;
-	bh=c2iKZ8/uXxQA0af8ZFoWEp9/z/46QEA6ldJuCnB0+QI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hrVlQAXaasymdXNRdGkJpVpUo/XEpmCARDCceDxEd2LHMogLyYtvThT4C97VFFe50qZcAQOndw7cVxujVPmez9ppF6fOZoA1lDwmm6X71CeumIZFbWPsuco+AeBuBHQjC2EDbrkc0qqWpkcKnNy2U1QSJdZP+Y3yAqwardYp8do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MPlzZXmg; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783090501; c=relaxed/simple;
+	bh=SbPuoxe9/8K5nDiss1P1G+SXa5cD6+BbCbutJ10O3gA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=ptELqpKX3+ztBHhcRjgdcEHJkaw5DYOzopE/fzKZbDVZG9VAcMHBMgwRXZcEJTYbkd8zh616w5dOral8BLvcyq/90VDYfCH7D3Xt5QbM5V4dfvIHY0V7rRmFExBQHiF5t3gataJ+bQQ2ovm7nBVErL+vbxtVhY3oNJPppy9V4OQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GoqgUdNe; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MPlzZXmg"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 422B9463D;
-	Fri,  3 Jul 2026 07:15:46 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED47B3F905;
-	Fri,  3 Jul 2026 07:15:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783088150; bh=c2iKZ8/uXxQA0af8ZFoWEp9/z/46QEA6ldJuCnB0+QI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MPlzZXmgBYb1/l5ZuUhWGKlKqLha+H/RXkeXpAOWYtqRqXl0ki7o+BmPjVcdPdzRw
-	 zqM6p736TPv5gw047WchhCTlqDAYpIRtjPsfugKYKVKb2C+vZMN3BzyDH0RjHPTcod
-	 2Eq2BC/LspCF67SfpIAniYyHlhVFw3G3dVT+HNrI=
-Date: Fri, 3 Jul 2026 15:15:36 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net,
-	skhan@linuxfoundation.org, maz@kernel.org, ardb@kernel.org,
-	ilias.apalodimas@linaro.org, oupton@kernel.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	oleg@redhat.com, lpieralisi@kernel.org, tglx@kernel.org,
-	ada.coupriediaz@arm.com, anshuman.khandual@arm.com,
-	ebiggers@kernel.org, broonie@kernel.org,
-	mrigendra.chaubey@gmail.com, baohua@kernel.org, lucaswei@google.com,
-	james.morse@arm.com, zengheng4@huawei.com, thuth@redhat.com,
-	yang@os.amperecomputing.com, leo.bras@arm.com,
-	Sascha.Bischoff@arm.com, james.clark@linaro.org,
-	peterz@infradead.org, leitao@debian.org, ben.horgan@arm.com,
-	punit.agrawal@oss.qualcomm.com, gshan@redhat.com,
-	osama.abdelkader@gmail.com, fengchengwen@huawei.com,
-	ryan.roberts@arm.com, yangyicong@hisilicon.com,
-	kevin.brodsky@arm.com, kees@kernel.org, jeson.gao@unisoc.com,
-	zhaoyang.huang@unisoc.com, ryotkkr98@gmail.com, wsw9603@163.com,
-	pasha.tatashin@soleen.com, jeremy.linton@arm.com,
-	schuster.simon@siemens-energy.com, osandov@fb.com, arnd@arndb.de,
-	zhangpengjie2@huawei.com, smostafa@google.com,
-	vladimir.murzin@arm.com, tabba@google.com, vdonnefort@google.com,
-	kaleshsingh@google.com, jic23@kernel.org, timothy.hayes@arm.com,
-	alexandru.elisei@arm.com, zenghui.yu@linux.dev, david@kernel.org,
-	akpm@linux-foundation.org, ljs@kernel.org, memxor@gmail.com,
-	qperret@google.com, chaitanyas.prakash@arm.com,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 00/17] arm64: Support FEAT_NMI and Rework Exception
- Masking
-Message-ID: <akfECMwlZL1aoXHl@J2N7QTR9R3>
-References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GoqgUdNe"
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260703100135.2512312-1-ruanjinjie@huawei.com>
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783090495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SbPuoxe9/8K5nDiss1P1G+SXa5cD6+BbCbutJ10O3gA=;
+	b=GoqgUdNey9WibpT4bCWElWCK/Q8ZarEulgJnOwtH8yUYJA68i9+SGQflaQqhfntmLTLqoe
+	eB23ClEBpn2xCd2QuZuRlpe/F6BVVRjYG8MpJKtoXNNPTsnfkNo24Jc6bEsuCimTjf2nDr
+	Gtk6mCa7gTMDQeIwZl5Jn3GGSudvZ6Y=
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 03 Jul 2026 14:54:45 +0000
+Message-Id: <DJP0TON6OW7J.EPYIYFFA5ZOZ@linux.dev>
+Cc: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+ <kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
+ <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
+ <linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+ <linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
+ <loongarch@lists.linux.dev>, "linux-pm@vger.kernel.org"
+ <linux-pm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "suzuki.poulose@arm.com"
+ <suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "will@kernel.org" <will@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>, "tglx@kernel.org" <tglx@kernel.org>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "luto@kernel.org" <luto@kernel.org>, "peterz@infradead.org"
+ <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org"
+ <david@kernel.org>, "lorenzo.stoakes@oracle.com"
+ <lorenzo.stoakes@oracle.com>, "vbabka@kernel.org" <vbabka@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com"
+ <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
+ <kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
+ "haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
+ <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
+ <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
+ "jannh@google.com" <jannh@google.com>, "pfalcato@suse.de"
+ <pfalcato@suse.de>, "skhan@linuxfoundation.org"
+ <skhan@linuxfoundation.org>, "riel@surriel.com" <riel@surriel.com>,
+ "ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
+ <jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
+ "kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>, "yosry@kernel.org"
+ <yosry@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
+ "tabba@google.com" <tabba@google.com>, "prsampat@amd.com"
+ <prsampat@amd.com>, "jthoughton@google.com" <jthoughton@google.com>,
+ "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, "aou@eecs.berkeley.edu"
+ <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
+ <borntraeger@linux.ibm.com>, "chenhuacai@kernel.org"
+ <chenhuacai@kernel.org>, "baolu.lu@linux.intel.com"
+ <baolu.lu@linux.intel.com>, "dev.jain@arm.com" <dev.jain@arm.com>,
+ "gor@linux.ibm.com" <gor@linux.ibm.com>, "hca@linux.ibm.com"
+ <hca@linux.ibm.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
+ "pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
+ <shijie@os.amperecomputing.com>, "svens@linux.ibm.com"
+ <svens@linux.ibm.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ "yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
+ <urezki@gmail.com>, "zhengqi.arch@bytedance.com"
+ <zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
+ <gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
+ <jiayuan.chen@shopee.com>, "rafael@kernel.org" <rafael@kernel.org>,
+ "yangyicong@hisilicon.com" <yangyicong@hisilicon.com>,
+ "vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
+ <jackmanb@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>,
+ "Itazuri, Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek"
+ <derekmn@amazon.com>
+Subject: Re: [PATCH v12 02/16] set_memory: add
+ folio_{zap,restore}_direct_map helpers
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Brendan Jackman" <brendan.jackman@linux.dev>
+To: "Mike Rapoport" <rppt@kernel.org>, "Brendan Jackman"
+ <brendan.jackman@linux.dev>
+References: <20260410151746.61150-1-kalyazin@amazon.com>
+ <20260410151746.61150-3-kalyazin@amazon.com>
+ <DJOUYOKL6N3R.BFIO8HEL03OA@linux.dev> <ake7aPB2O_-dAXhI@kernel.org>
+In-Reply-To: <ake7aPB2O_-dAXhI@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Jinjie
-On Fri, Jul 03, 2026 at 06:01:18PM +0800, Jinjie Ruan wrote:
-> Hi all,
+On Fri Jul 3, 2026 at 1:38 PM UTC, Mike Rapoport wrote:
+> On Fri, Jul 03, 2026 at 10:19:10AM +0000, Brendan Jackman wrote:
+...
+>> Alternatively, we maybe should disable secretmem for highmem systems
+>> since it evidently doesn't have any users.
+>
+> Yes, please :)=20
 
-Vladimir (cc'd) has also been working on NMI support, but hadn't posted
-to the list yet (due to some delays with testing).
-
-I haven't had the chance to look at this yet, but at a high-level we'll
-need to figure out what to do going forwards.
-
-Mark.
-
-> This patch series implements support for the ARMv8.8-A/v9.3-A
-> hardware NMI extension (FEAT_NMI), introducing the use of PSTATE.ALLINT
-> to manage superpriority interrupts on arm64.
-> 
-> Background and Current Status
-> -----------------------------
-> 
-> The hardware ecosystem is already mature and fully ready for FEAT_NMI:
-> 
-> - Production Hardware: Huawei's Kunpeng servers (such as the HIP12 based
->   platforms) already feature native hardware support for FEAT_NMI.
-> 
-> - Emulation: QEMU has integrated robust FEAT_NMI emulation[1] support
->   since 2024.
-> 
-> Despite the hardware readiness, upstream support for FEAT_NMI has been
-> delayed. Previous patch[2] attempts tried to bundle ALLINT management
-> directly into the existing DAIF abstraction layers. As Mark Rutland
-> pointed out[3], pretending ALLINT or pseudo-NMI (GIC PMR) is part of
-> DAIF creates convoluted, unmaintainable hacks that frequently fail to
-> handle complex edge cases correctly (such as state escape during
-> context switching).
-> 
-> Reworking Exception Masking (Mark's Feedback)
-> ---------------------------------------------
-> 
-> Following Mark Rutland's strong recommendation ("We must clean up
-> the existing approach before we add the real NMI support"), this series
-> does not simply stack FEAT_NMI on top of the old framework. Instead, it
-> completely reworks how the arm64 kernel manages abstract and logical
-> exception masks.
-> 
-> Per Mark's guidelines, this series achieves the following architectural
-> improvements:
-> 
-> 1. Entry/Exit Specific Helpers (a):
-> 
->    Introduces abstract exception mask helpers specifically for exception
->    boundaries. They handle unified unmask-at-entry and mask-at-exit
->    behaviors. This decouples the entry/exit paths from raw DAIF
->    manipulation. In this series, these helpers are first refactored to
->    manage DAIF + PMR cleanly, preparing the ground before any FEAT_NMI
->    code is introduced.
-> 
-> 2. Logical Exception Mask Separation (b):
-> 
->    Introduces a decoupled logical mask tracking mechanism that treats DAIF,
->    PMR, and ALLINT as separate, distinct elements. This enables accurate
->    irqflag tracking and debug assertions to save, restore, and validate all
->    elements without forcing them to fake or pollute a traditional DAIF
->    layout.
-> 
-> Production Bug Fixes & Integration
-> -----------------------------------
-> 
-> On top of this solid architectural foundation, this series adds the actual
-> support for FEAT_NMI (ALLINT management). Crucially, during baisc testing
-> and validation on production Kunpeng (HIP12) servers, we identified and
-> resolved several critical bugs.
-> 
-> The series is structured as follows:
-> 
-> - Patches 1-5: Clean up and rework the existing DAIF/PMR masking into
->   separate logical exception helpers (Pre-requisite refactoring).
-> 
-> - Patches 6-17: Add FEAT_NMI support for ARM64, including specific
->   stability fixes found on Kunpeng hardware and QEmu.
-> 
-> Any feedback, testing, or review, especially regarding the exception
-> masking refactoring, is highly appreciated.
-> 
-> [1]: https://lore.kernel.org/all/20240407081733.3231820-1-ruanjinjie@huawei.com/
-> [2]: https://lore.kernel.org/linux-arm-kernel/20221112151708.175147-1-broonie@kernel.org/
-> [3]: https://lore.kernel.org/linux-arm-kernel/Y5c9SLeJacLYHmP7@FVFF77S0Q05N/
-> 
-> Jinjie Ruan (5):
->   arm64: Move DAIF macros to ptrace.h and use them centrally
->   arm64: Rework exception masking into abstract logical mask
->   arm64: entry: arm64: entry: Move DAIF masking for EL1 exit to C code
->   arm64: entry: Add entry-specific helpers
->   arm64: Introduce helpers for restoring standard exception masks
-> 
-> Lorenzo Pieralisi (1):
->   irqchip/gic-v3: Implement FEAT_GICv3_NMI support
-> 
-> Mark Brown (11):
->   arm64/booting: Document boot requirements for FEAT_NMI
->   arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
->   arm64/hyp-stub: Enable access to ALLINT
->   arm64/idreg: Add an override for FEAT_NMI
->   arm64/cpufeature: Detect PE support for FEAT_NMI
->   KVM: arm64: Hide FEAT_NMI from guests
->   arm64/nmi: Manage masking for superpriority interrupts along with DAIF
->   arm64/entry: Don't call preempt_schedule_irq() with NMIs masked
->   arm64/irq: Document handling of FEAT_NMI in irqflags.h
->   arm64/nmi: Add handling of superpriority interrupts as NMIs
->   arm64/nmi: Add Kconfig for NMI
-> 
->  Documentation/arch/arm64/booting.rst     |   6 +
->  arch/arm64/Kconfig                       |  17 ++
->  arch/arm64/include/asm/arch_gicv3.h      |   7 +-
->  arch/arm64/include/asm/assembler.h       |  17 +-
->  arch/arm64/include/asm/cpufeature.h      |   5 +
->  arch/arm64/include/asm/cpuidle.h         |  30 ++-
->  arch/arm64/include/asm/daifflags.h       | 144 --------------
->  arch/arm64/include/asm/efi.h             |  22 ++-
->  arch/arm64/include/asm/el2_setup.h       |  13 ++
->  arch/arm64/include/asm/entry-common.h    |  11 +-
->  arch/arm64/include/asm/exception_masks.h | 232 +++++++++++++++++++++++
->  arch/arm64/include/asm/irq.h             |   2 +
->  arch/arm64/include/asm/irqflags.h        |  10 +
->  arch/arm64/include/asm/kvm_host.h        |   2 +-
->  arch/arm64/include/asm/mmu_context.h     |   2 +-
->  arch/arm64/include/asm/nmi.h             |  23 +++
->  arch/arm64/include/asm/ptrace.h          |  11 +-
->  arch/arm64/include/asm/sysreg.h          |   2 +
->  arch/arm64/include/uapi/asm/ptrace.h     |   1 +
->  arch/arm64/kernel/acpi.c                 |  14 +-
->  arch/arm64/kernel/cpufeature.c           |  58 +++++-
->  arch/arm64/kernel/debug-monitors.c       |   9 +-
->  arch/arm64/kernel/entry-common.c         | 167 +++++++++++-----
->  arch/arm64/kernel/entry.S                |   4 -
->  arch/arm64/kernel/hibernate.c            |  10 +-
->  arch/arm64/kernel/idle.c                 |   7 +-
->  arch/arm64/kernel/irq.c                  |  36 +++-
->  arch/arm64/kernel/machine_kexec.c        |   4 +-
->  arch/arm64/kernel/pi/idreg-override.c    |   1 +
->  arch/arm64/kernel/probes/kprobes.c       |   9 +-
->  arch/arm64/kernel/process.c              |   7 +-
->  arch/arm64/kernel/setup.c                |   4 +-
->  arch/arm64/kernel/signal.c               |   2 +-
->  arch/arm64/kernel/smp.c                  |  22 +--
->  arch/arm64/kernel/suspend.c              |  15 +-
->  arch/arm64/kernel/traps.c                |   2 +-
->  arch/arm64/kvm/emulate-nested.c          |   6 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h  |   6 +
->  arch/arm64/kvm/hyp/nvhe/host.S           |   4 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S       |   3 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c       |   4 +-
->  arch/arm64/kvm/hyp/vgic-v3-sr.c          |   6 +-
->  arch/arm64/kvm/hyp/vhe/switch.c          |   6 +-
->  arch/arm64/kvm/reset.c                   |   6 +-
->  arch/arm64/mm/fault.c                    |   2 +-
->  arch/arm64/mm/mmu.c                      |   6 +-
->  arch/arm64/tools/cpucaps                 |   2 +
->  drivers/firmware/psci/psci.c             |   7 +-
->  drivers/irqchip/irq-gic-v3.c             | 152 +++++++++++++--
->  include/linux/irqchip/arm-gic-v3.h       |   4 +
->  50 files changed, 822 insertions(+), 320 deletions(-)
->  delete mode 100644 arch/arm64/include/asm/daifflags.h
->  create mode 100644 arch/arm64/include/asm/exception_masks.h
->  create mode 100644 arch/arm64/include/asm/nmi.h
-> 
-> -- 
-> 2.34.1
-> 
+https://lore.kernel.org/all/20260703-secretmem-highmem-v1-1-30d5ff944664@go=
+ogle.com/
