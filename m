@@ -1,93 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08F33AB291
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 11:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D311A3093CF
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 12:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783077531; cv=none; b=B8n9e7Nym4lGZNqSg28Nxf4pKQwk0+csx8d1dDf3UBBcxLhBsfS1KDbJu5363wlbGxW0AGBJ2xnJ0x6cdY527RkoNBxCmFwlPqAX2sbWHVBL9Hm5xVPN3/51GozkBsyRqa90sn7ICUaKE9A5yELVWaI2JKp1FYt1HrxDFM8OEk8=
+	t=1783081658; cv=none; b=qC400rjB6O2F//SVNWyijy4gM5MzXRSmYsQv3A0H6DPlt23JxuuT/chMsGgCIj2BgNUpcVZdq/35r9WYCkG+moFE6uOezkZGcmwlKANuoZ7NLEy6ipr4f8Y16iytfePEx0tcqI/aPZqmI+j+Tv05JdmdHERMOcqQTn1ppgbCX/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783077531; c=relaxed/simple;
-	bh=106TCBySQeDjx5uZY+J50uPUxl87VJgzFLeIh+aPVkE=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=PmcBYX3C1BFlIAQHu+VnGy9l+hD51ebjXfWYT1xG9ARKqLD2/9ATCSWIHXlfTFJby2/7PWqjq2j1olTPMpsQ7+KrP0zYuk4CN7Fn0lWgfuIKIZR07NSkovu4uj+SZaZIcZpSaXt5Yzr+q3KyGrVEjzAYQC6B2hUQvz6CX6YmZNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nq4qvpc6; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783081658; c=relaxed/simple;
+	bh=DNuhKED9jVnRH6pdAbcp2KLbjx0rKbaFTkcHdLkr8oY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nSkKCt0P+WfarqiRA2wCwCzZaUekCHrTOfX87iyBMKPTwHw4sIAPCntQISmBVaFNRC+nDI/+uviZU8OkG1SQprba5jqqMZVovjFv4i0jc1zSBTpPjI8WJ7uCW992RTBEoROA1yzxJ6a2moZ0pzaPQM/hwA6gxAGhhr6424CRgF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AMLsZcU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sJv+21uc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AMLsZcU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sJv+21uc; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nq4qvpc6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20CA41F000E9;
-	Fri,  3 Jul 2026 11:18:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783077530;
-	bh=amsEra5/qKz3CtAFuQuYeetEpPf+dkWs9W/Akza6JsE=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=nq4qvpc60XKeQghPEUwtDicAExr8CzSw0Wyg+Q34d/UXa+H1kZsoNkKQwjSN7Kdzo
-	 jbWIbnRzSSiLs38n5gfnWMRyi1B+Xc7t/hKs8wLBXWhpyodV3rQFc9EHtup+pCStzu
-	 +kVABeLqTGU+xtjICLwd2Wf/ipoXsWyv4PQLsjN/xdqvEoFm0dq1Tlia89GyBbDGPq
-	 zP8PG13CoWrxnC8eRWxtT8W/dm4bT1ZRrPnsFQH7zNI+mzr5iGWa5Kg5O/OsJ+AvHn
-	 KS4PIBWTVEeqmEW/tk3RFnQyZyczEOkWg6ssGcKzwgNqk7rCz+y0B3djiRJAx4zxgo
-	 fmBouw0P2CLXg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: vgic: Mitigate potential LPI
- registration failure
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?Q2FybG9zIEzDs3Bleg==?= <clopez@suse.de>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260703110130.2609872-4-clopez@suse.de>
-References: <20260703110130.2609872-2-clopez@suse.de>
- <20260703110130.2609872-4-clopez@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 11:18:49 +0000
-Message-Id: <20260703111850.20CA41F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AMLsZcU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sJv+21uc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AMLsZcU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sJv+21uc"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 077C572B71;
+	Fri,  3 Jul 2026 12:27:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783081655; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
+	b=0AMLsZcUNV2HQ/hEY7zLJFcidNm+mTIiNPKnT/MQgSzLWkA36TCiy2Ut0hq3TExlu71cSx
+	JLl9jd6ZNnHv/vhh2ujzfkgBHam9Ps1BUBWrHTgK/ejvc6E/V8r6GBEUfhG1sOTTCFZ5CK
+	+DTzSTHao+Kgeo5i+uHJTCuqvq1VFDA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783081655;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
+	b=sJv+21ucU8geHw4xoPX1fzF4rdBpGZkiOwmGRj+1SmzoRrYVvk712GtqjKvO/wBZZYMe6y
+	0KbHfyeZU7/uqJCA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783081655; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
+	b=0AMLsZcUNV2HQ/hEY7zLJFcidNm+mTIiNPKnT/MQgSzLWkA36TCiy2Ut0hq3TExlu71cSx
+	JLl9jd6ZNnHv/vhh2ujzfkgBHam9Ps1BUBWrHTgK/ejvc6E/V8r6GBEUfhG1sOTTCFZ5CK
+	+DTzSTHao+Kgeo5i+uHJTCuqvq1VFDA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783081655;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
+	b=sJv+21ucU8geHw4xoPX1fzF4rdBpGZkiOwmGRj+1SmzoRrYVvk712GtqjKvO/wBZZYMe6y
+	0KbHfyeZU7/uqJCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 383EE779AA;
+	Fri,  3 Jul 2026 12:27:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 1L7SCLaqR2rGIwAAD6G6ig
+	(envelope-from <clopez@suse.de>); Fri, 03 Jul 2026 12:27:34 +0000
+From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
+To: kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
+Subject: [PATCH v4 0/2] KVM: arm64: vgic: Fix racy LPI release and re-registration handling
+Date: Fri,  3 Jul 2026 14:25:59 +0200
+Message-ID: <20260703122601.2617577-2-clopez@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.30
+X-Spamd-Result: default: False [-3.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.993];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid]
+X-Spam-Level: 
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] Fallback XArray node allocation bypasses memcg accounting
---
+Fix a couple of potential issues that could arise from racy LPI release
+and re-registration for the same INTID.
 
-commit bdc0b53cd314d49c8e7e70017bf5fb300a832c2b
-Author: Carlos L=C3=B3pez <clopez@suse.de>
-KVM: arm64: vgic: Mitigate potential LPI registration failure
+The issue fixed in patch 1 can manifest itself through either a
+leaked LPI structure, or a prematurely deleted LPI. The issue fixed
+in patch 2 could materialize as a spurious -ENOMEM failure when
+registering an LPI.
 
-This commit mitigates a race condition in vgic_add_lpi() where an LPI might
-be discarded and re-mapped concurrently. It allows __xa_store() to allocate
-a new node under the lock if the previously reserved entry was freed.
+v4:
+* Add __GFP_ACCOUNT to patch 2 (Sashiko).
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
-s.c
-> index 577286069368d..ace3e59fff971 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-[ ... ]
-> @@ -121,7 +121,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm,=
- u32 intid,
->  		 * from the deferred release path, pending cleanup by
->  		 * vgic_release_deleted_lpis(). Evict and free it if present.
->  		 */
-> -		oldirq =3D __xa_store(&dist->lpi_xa, intid, irq, 0);
-> +		oldirq =3D __xa_store(&dist->lpi_xa, intid, irq, GFP_NOWAIT);
+v3:
+* Use refcount_dec_and_lock_irqsave() instead of unconditionally
+  grabbing the xarray lock in patch 1.
+* Add patch 2.
 
-[Severity: Low]
-Does this __xa_store() fallback allocation bypass memcg accounting?
+v2:
+* Address Sashiko's review. Fix the direct release path by decrementing
+  the refcount under the xarray spinlock, preventing a UAF that would
+  have been introduced in v1.
 
-The initial allocation in vgic_add_lpi() via xa_reserve_irq() correctly uses
-GFP_KERNEL_ACCOUNT. However, the GFP_NOWAIT flag here does not include
-__GFP_ACCOUNT.
 
-If a guest races a DISCARD and MAPTI command such that the LPI is released
-after xa_reserve_irq() but before xa_lock_irqsave(), this __xa_store()
-will allocate a new node. Should this use GFP_NOWAIT | __GFP_ACCOUNT to
-ensure this allocation is still charged to the guest's memory cgroup?
+Carlos López (2):
+  KVM: arm64: vgic: Fix race between LPI release and re-registration
+  KVM: arm64: vgic: Mitigate potential LPI registration failure
 
->  		ret =3D xa_err(oldirq);
->  		if (!ret && oldirq)
->  			kfree_rcu(oldirq, rcu);
+ arch/arm64/kvm/vgic/vgic-its.c | 11 ++++++++++-
+ arch/arm64/kvm/vgic/vgic.c     | 10 ++++++----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703110130.2609=
-872-2-clopez@suse.de?part=3D2
+
+base-commit: 1ee27dacbe5dc4def481794d899d67b0d4570094
+-- 
+2.51.0
+
