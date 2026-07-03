@@ -1,119 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC5C3B42F8
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1B4224FA
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073605; cv=none; b=U4ZpABwjcbd91y2LjxBZ3FtkdCH937m1lLRzcF2qa6DpuD08niHhsrjg5/fhy02b2TxmMEVQRwCQo8D6beDxZlGRFxNs+nkwg5rOb5vQeOa9UJ/OuN3Xepifu4AWAFHXmC9BmjrU3v4G0PMa69Qpix/cSlPJLE7be56D8qMs/uo=
+	t=1783073740; cv=none; b=We3dkub+Na/CBEVXMqu4szlLAg209t6vfqRJwm92S+2DbZk7ZidUA7Zr0aapWEUxA55womCbzvwAdfiv7gN0TQm7zcMFJ4UE5eZZwyBVFtTpdaqU6QmOwbsqX00TCPWgmD0dAMyROpLRUCjGTzR2FOTGdP4nOoeZC+aw4jnD+K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073605; c=relaxed/simple;
-	bh=9hla3t+c5zqJimSduN+LQTaDyhccWGBvvsfkaUe/QuU=;
+	s=arc-20240116; t=1783073740; c=relaxed/simple;
+	bh=VCiCaMi4q04cK7jQAYRYngR/21HF4LGgolIgPcv8FbQ=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jTJSPCFs3cyhg+9z5sKjyjuM1MGwKlGLxjCWPueOgb7AYUY1FrN/eHAbZH6b0Q+c//S5G50b5d8fh2IxVJuPlxeUBSjMUI9gJFPLeWzCnTE2VASUuE0zfdkw6mX7nqLFXliQPSAcBGJb7di8gsjTUp2CldCsvrg24G/svz6R1+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hid7gq88; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=KEXOARoURYxClzAmpOF/d9pNgGc5BptkTl2YPHCDpCVy6vG9xHR7zUzhOUBQiZXo89AORhWvgv/LFeEooPFJoc1MOirfun/XZSfsaQPkIvL4T4nu/2q2b/+CRPEkh/n5Z0pV4Lo7uozmXwC6RlqwI2Nu16Egr7yMQNgZYR0iKwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NRMySUJB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hid7gq88"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB4141F00ADE;
-	Fri,  3 Jul 2026 10:13:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NRMySUJB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180161F000E9;
+	Fri,  3 Jul 2026 10:15:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783073603;
-	bh=ZOxZaDzzEMtDCNjx0frIMwgVtHY0saQRjvWOWQpODqo=;
+	s=k20260515; t=1783073739;
+	bh=PAhcGfiCRXGSeWh8vddYPOYsZPSepyne6ZPdVnBUk7w=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=hid7gq88u/Y8ZNitoDA2xuXjI5FqYQf1sVZEgJNR24M63MhBk1tAOzC19MlkD8KvD
-	 ASJh7gv/E30xzTPspqYkUJmNqAPORD1pYyYQF++emZvtDt8F7u0MzFmCYujODO1BMq
-	 pIwUmvKGTb74YpdwiHZgkIKrabV0iHP4Iytu+i1zbG8UNd+lUTPY7gWH5FR6u3MvQf
-	 VmxFlGaeI4juhWO99MXtiY6fjUZpJhtjwaGPGZP1KcWc4daFfhGqJ+0Rw+kQizQ7UJ
-	 jZCS62zlmABHHKzINQi3+7FQNX85PvozyCoWlUFmPSN4TRtFAUbALMC3glY2CUrPSG
-	 VA6UYNO4xBhkQ==
+	b=NRMySUJBTYtiJGQ5zufiAtGYTvdnFDgSgVoHDbtEuAZCrAXqmtfRuQZr0vEIoWFZk
+	 TIFvsi1XvNB95HCfWVMfHuB+FmnuFc8/U+ShdDFgTOkEPJNz1ZrOrCEkYA2bQOXYk6
+	 Tdzgz+qID/BqH7xuh3hcHDQHuTU6svUE0Jq0MR1VLXSldrZ0YYCeEN7wAX+pbAK4Dg
+	 hAEegMioYCjTmcSZFdSno5pG+10iN1W1C0nsVFjttoUC5AgMEz7dOnglYcSmumpv7q
+	 nof7pPxDMANm88JdmkssmmVHFrkjQSxIUakd4LAhXyOFY4aN4I3HCgDLVIHcS+nvw6
+	 et1EkuuWoqaNw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 11/17] KVM: arm64: Hide FEAT_NMI from guests
+Subject: Re: [PATCH 06/17] arm64/booting: Document boot requirements for
+ FEAT_NMI
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jinjie Ruan" <ruanjinjie@huawei.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260703100135.2512312-12-ruanjinjie@huawei.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260703100135.2512312-7-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <20260703100135.2512312-12-ruanjinjie@huawei.com>
+ <20260703100135.2512312-7-ruanjinjie@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 10:13:22 +0000
-Message-Id: <20260703101322.EB4141F00ADE@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 10:15:38 +0000
+Message-Id: <20260703101539.180161F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] The HCRX_EL2.TALLINT trap is inadvertently bypassed for the guest =
-and erroneously enabled for the host due to a register overwrite and a poll=
-uted host context save.
-- [High] Missing Context Synchronization Event (ISB) after writing to the c=
-ontrol-plane system register SYS_HCRX_EL2.
+
+Pre-existing issues:
+- [High] Missing `isb()` after writing to the `MDSCR_EL1` control-plane sys=
+tem register.
 --
 
-commit 8eef1f43bfda118ac8512933d8d6a2f3483208ee
+commit 46ea647f84f4a1084bfe385f4fadb172648a5a6f
 Author: Mark Brown <broonie@kernel.org>
 
-KVM: arm64: Hide FEAT_NMI from guests
+arm64/booting: Document boot requirements for FEAT_NMI
+   =20
+In order to use FEAT_NMI we must be able to use ALLINT, require that it
+behave as though not trapped when it is present.
 
-This commit hides FEAT_NMI from guests pending vGIC support. It masks out
-the feature from the ID register and sets HCRX_EL2.TALLINT to trap guest
-writes to ALLINT.ALLINT.
+Link: https://lore.kernel.org/r/20221112151708.175147-2-broonie@kernel.org
 
-Link: https://lore.kernel.org/r/20221112151708.175147-10-broonie@kernel.org
-
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
-/include/hyp/switch.h
-> index 18131e395e24c..21b19f331a12f 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -346,6 +346,9 @@ static inline void __activate_traps_common(struct kvm=
-_vcpu *vcpu)
->  		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
->  	}
+> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/ar=
+m64/booting.rst
+> index 13ef311dace83..aaabe8fa4cdd7 100644
+> --- a/Documentation/arch/arm64/booting.rst
+> +++ b/Documentation/arch/arm64/booting.rst
+> @@ -419,6 +419,12 @@ Before jumping into the kernel, the following condit=
+ions must be met:
 > =20
-> +	if (cpus_have_final_cap(ARM64_HAS_NMI))
-> +		sysreg_clear_set_s(SYS_HCRX_EL2, 0, HCRX_EL2_TALLINT);
+>      - HCR_EL2.ATA (bit 56) must be initialised to 0b1.
+> =20
+> +  For CPUs with Non-maskable Interrupts (FEAT_NMI):
 > +
->  	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
->  		u64 hcrx =3D vcpu->arch.hcrx_el2;
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HCRX_EL2.TALLINT must be initialised to 0b0.
+> +
+>    For CPUs with the Scalable Matrix Extension version 2 (FEAT_SME2):
+> =20
+>    - If EL3 is present:
 
 [Severity: High]
-Does this sequence inadvertently drop the trap for the guest and pollute the
-host context?
+This isn't a bug introduced by this patch, but there is a pre-existing issue
+in arch/arm64/kernel/debug-monitors.c:
 
-Because FEAT_HCX is mandatory with FEAT_NMI, the code will execute the HCX
-block immediately after setting TALLINT:
+arch/arm64/kernel/debug-monitors.c:mdscr_write() {
+	struct exception_mask mask;
 
-arch/arm64/kvm/hyp/include/hyp/switch.h:__activate_traps_common() {
-    ...
-    if (cpus_have_final_cap(ARM64_HAS_HCX)) {
-        u64 hcrx =3D vcpu->arch.hcrx_el2;
-        ...
-        ctxt_sys_reg(hctxt, HCRX_EL2) =3D read_sysreg_s(SYS_HCRX_EL2);
-        write_sysreg_s(hcrx, SYS_HCRX_EL2);
-    }
+	mask =3D local_exception_save_and_mask();
+	write_sysreg(mdscr, mdscr_el1);
+	local_exception_restore(mask);
 }
 
-Since SYS_HCRX_EL2 is immediately overwritten with the guest's hcrx_el2
-(which lacks the TALLINT bit), it appears the trap is bypassed for the gues=
-t.
+Is an isb() missing after writing to the MDSCR_EL1 control-plane system
+register?
 
-Additionally, this reads the newly modified SYS_HCRX_EL2 (with TALLINT set)
-into the host's context. When the host context is later restored, will it
-leave the host running with the TALLINT trap incorrectly active?
+The write_sysreg(mdscr, mdscr_el1) call is not immediately followed by an i=
+sb()
+instruction. Instead, local_exception_restore() executes multiple instructi=
+ons
+against architecturally undefined pipeline state.
 
+Can this missing context synchronization cause the CPU to operate under a s=
+tale
+configuration for several cycles?
 
-[Severity: High]
-Can this read-back observe architecturally undefined pipeline state?
-
-Immediately after sysreg_clear_set_s() writes to the control-plane system
-register SYS_HCRX_EL2, the ARM64_HAS_HCX block executes a read-back via
-read_sysreg_s(SYS_HCRX_EL2) without an intervening context synchronization
-event (isb()).
+Because this path is reachable by unprivileged userspace via the ptrace sys=
+tem
+call, could this lead to unexpected traps or violations of architectural
+invariants?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
-312-1-ruanjinjie@huawei.com?part=3D11
+312-1-ruanjinjie@huawei.com?part=3D6
