@@ -1,145 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D291430676C;
-	Fri,  3 Jul 2026 16:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EAA30D3EF;
+	Fri,  3 Jul 2026 16:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783096385; cv=none; b=JYTERajYcztb1K781Oyn3lbuH+5drGOcJOarAeCsss27WPk9TfLvuvmYaF7tasdh8ezw/LDJqvHB07wVq054kpH5JcFd8WizkOQl/Rdo0T8gPi2OvZzDYB0cDc8aYjHl1MKKZu1A9tjDS5fejkjFBYx2VdaO6XIJXyw6SgPb68E=
+	t=1783096403; cv=none; b=Yia+cgR+y0Snkckijtup7hJF8EhvPOdqRMQKWe9XTTBM1GU5yzOqCKDYcT7ym094K/c1da+PI2v5AvTFYj939VcuOXK/iUc54HuGcf070w1Bd8A4CnDMsqcWxiZY+O0XV3jR6wg+LT1RbZqxisMJ85pwqF2kdJonTq6Zf0k5Dj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783096385; c=relaxed/simple;
-	bh=tTcbXaAsr91mWWFotajSr9UjcONUjkOCIjkaKrgOPSU=;
+	s=arc-20240116; t=1783096403; c=relaxed/simple;
+	bh=4ooGemjroHOkN2Fv3Tr+5Te0QzoiNzjhaHXiObfbvP0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=dtGO4WykZw4Ghn+enmSn/U6GRIh7aeUN0UFamz0F+nGKcISlj9ypB8IxfeFvFwCdAMg2BsPgF4w3Dv9OtjMbGPiYR3qRaHOCTiPN+anQAx/X/pnlliaHmS236LaWo35qGSjK95vD6isGzxn2MbQFvl9ElU7PpFBFCYo/OgfIjx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fvOy9Vll; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=sELpqJD158f3uZDB85AwHY0hOtcFLVtEZ57IPt7kds9fhBKi61rLwudtH1r5nqFDfAWNwBQOroq7VuRl2cpAL7L87s53ifHB0VpFsQRTIRWvfZUOZ02TCmgTdHUlIVgb5VxVwDOBFavYOl/X543b51SP3z5nG24aWey6LxbNsOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LP0HGsM6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fvOy9Vll"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 669601F00A3A;
-	Fri,  3 Jul 2026 16:33:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LP0HGsM6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A4391F000E9;
+	Fri,  3 Jul 2026 16:33:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783096383;
-	bh=SgK4GhdZOoo8LNxIlPHDmnkqDXstDpGpTTjkIo3q3o8=;
+	s=k20260515; t=1783096401;
+	bh=N9Jq3kjNV674DbijTSDDVQe4/R2z9zJTzA0301+rZt8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fvOy9VllsWw9FXlC+dti+mk2utxFB7094/BwtT10KLoAhlSj+KhbP7H2MK9tFCf7f
-	 fjnNyNFErqdChGLKnPOzNhDxQaI8b3RSTOU1fZIZBM3mXLO33lKwTPw+1L0AO9LxhX
-	 eegWAP3obD/wczo8QASjeXC4BttJXMOZeBu4KcVH33lVtaaM/A8ZFbg7IEOgV3hXnL
-	 VDwg8bVkXCoCeTAA+EtGJPx/I+AOUEjXxKKGbhXv0PSDmbX1ax8ugx+u4tfcTEipmf
-	 7g88sHOukIaQf2Di4thoQT3bwGVnNEsTJvRuuRtiMQ8+u8uFKEIRtl9a/Ii4Pco3/m
-	 HaQJbEQk789Nw==
+	b=LP0HGsM694SBLnj1hiY+Mr5orX5Jt2ZaHyyklODgB2teTZKstS3koyN165H7Bqd97
+	 o/0qeLQ7uv/+BaExB3wZzgzjKylz3v19kk8qMkCXdpqdPrRXgwMsPJYfw27yUKwUVC
+	 +rkYY32h9cspwnMCi5aOI047r8wsZikT5iEOknwXxMmo+pWfS0DIwAar6ziYqtZolF
+	 79Jm616LC0jHQjT9kl1/yQLrgcUlf4I+SQ9Dyx44uYmpuON1BwZeqkkwGV+odV/rt/
+	 wB6+zyG1I0XrQGGCeORecMgocHj598FUwbNjKvaYbar2ZGa1zOA3tyewgnlK2clCfZ
+	 yzUiiwspY024w==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 01/40] irqchip/gic-v5: Allow KVM setup without a
- maintenance IRQ
+Subject: Re: [PATCH v3 40/40] Documentation: KVM: Add the VGICv5 IRS
+ save/restore sequences
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260703154811.3355680-2-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260703154811.3355680-41-sascha.bischoff@arm.com>
 References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
- <20260703154811.3355680-2-sascha.bischoff@arm.com>
+ <20260703154811.3355680-41-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 16:33:02 +0000
-Message-Id: <20260703163303.669601F00A3A@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 16:33:21 +0000
+Message-Id: <20260703163321.8A4391F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-
-New issues:
-- [Medium] Leaked KVM `gic_kvm_info` allocation on error path when GICv5 le=
-gacy is supported but maintenance IRQ is absent.
-
-Pre-existing issues:
-- [High] Writes to GICv5 control-plane system registers (ICC_*_EL1) lack im=
-mediate `isb()` synchronization.
+- [Medium] Crucial MMIO register restore ordering constraints detailed in t=
+he commit message are omitted from the added documentation, which can lead =
+to failed guest restoration.
 --
 
-commit 77500f7dacbe8c6ac1528bc594d810bf95cef563
+commit 79d8bc0db4bccb0f97ab687e528e56b0455f7ae3
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Subject: irqchip/gic-v5: Allow KVM setup without a maintenance IRQ
 
-This commit modifies the GICv5 driver to allow KVM setup even if the
-maintenance interrupt is absent, provided that legacy GICv3 support is
-not required. It sets a flag to inform KVM that the maintenance interrupt
-is not needed for native GICv5 operation.
+Documentation: KVM: Add the VGICv5 IRS save/restore sequences
 
-> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
-> index e9d1795235a66..c04523a438cee 100644
-> --- a/drivers/irqchip/irq-gic-v5.c
-> +++ b/drivers/irqchip/irq-gic-v5.c
-> @@ -1143,10 +1143,18 @@ static void __init gic_of_setup_kvm_info(struct d=
-evice_node *node)
->  	/* GIC Virtual CPU interface maintenance interrupt */
->  	gic_v5_kvm_info.no_maint_irq_mask =3D false;
->  	gic_v5_kvm_info.maint_irq =3D irq_of_parse_and_map(node, 0);
-> -	if (!gic_v5_kvm_info.maint_irq) {
-> -		pr_warn("cannot find GICv5 virtual CPU interface maintenance interrupt=
-\n");
-> -		return;
-> -	}
+This commit documents the required sequences for saving and restoring
+the state of the virtual GICv5 IRS to avoid failures when restoring a guest.
+
+> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentati=
+on/virt/kvm/devices/arm-vgic-v5.rst
+> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+
+[ ... ]
+
+> +IRS Restore Sequence:
+> +---------------------
 > +
-> +	/*
-> +	 * We require an MI if we have legacy support, but don't, otherwise.
-> +	 * Given that there's an existing flag to convey that an MI isn't
-> +	 * needed, we (ab)use it to tell KVM that the MI isn't needed if we
-> +	 * don't support legacy.
-> +	 *
-> +	 * The check for ARM64_HAS_GICV5_LEGACY explicitly doesn't use
-> +	 * cpus_have_final_cap() here as we run too early.
-> +	 */
-> +	if (!cpus_have_cap(ARM64_HAS_GICV5_LEGACY) && !gic_v5_kvm_info.maint_ir=
-q)
-> +		gic_v5_kvm_info.no_maint_irq_mask =3D true;
-> =20
->  	vgic_set_kvm_info(&gic_v5_kvm_info);
+> +The following ordering must be followed when restoring the virtual GICv5=
+ and
+> +IRS:
+
+[ ... ]
+
+> +e) Restore guest memory.
+> +f) Restore the IRS MMIO register state by issuing KVM_SET_DEVICE_ATTR on
+> +   KVM_DEV_ARM_VGIC_GRP_IRS_REGS. KVM uses the restored IRS_IST_CFGR and
+> +   IRS_IST_BASER state to allocate the LPI IST during the following step.
+> +g) Restore the ISTs by issuing KVM_SET_DEVICE_ATTR on
 
 [Severity: Medium]
-Does this introduce a memory leak of the gic_kvm_info allocation?
+The commit message notes that IRS_IDx registers must be restored first,
+and that IRS_IST_CFGR must be restored prior to IRS_IST_BASER. Should these
+intra-group ordering constraints be explicitly mentioned in step f?
 
-If ARM64_HAS_GICV5_LEGACY is supported and maint_irq is 0, this bypasses
-the early return and proceeds to vgic_set_kvm_info(), which dynamically
-allocates gic_kvm_info.
-
-Later, kvm_vgic_hyp_init() processes this configuration:
-
-arch/arm64/kvm/vgic/vgic-init.c:kvm_vgic_hyp_init() {
-    ...
-	if (has_mask && !gic_kvm_info->maint_irq) {
-		kvm_err("No vgic maintenance irq\n");
-		return -ENXIO;
-	}
-    ...
-}
-
-Will this early return bypass the kfree(gic_kvm_info) at the end of the
-function and leak the memory?
-
-
-[Severity: High]
-This is a pre-existing issue, but do the writes to GICv5 control-plane syst=
-em
-registers lack immediate isb() synchronization?
-
-For example, in drivers/irqchip/irq-gic-v5.c:gicv5_cpu_disable_interrupts():
-
-	cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 0);
-	write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
-
-And in gicv5_cpu_enable_interrupts():
-
-	write_sysreg_s(0, SYS_ICC_PPI_ENABLER0_EL1);
-	write_sysreg_s(0, SYS_ICC_PPI_ENABLER1_EL1);
-
-	gicv5_ppi_priority_init();
-
-ARM64 architectural invariants require writes to control-plane system
-registers to be followed immediately by an isb() as the very next
-instruction. Missing this can cause the CPU to operate under a stale
-configuration for several cycles.
+Without these constraints documented here, userspace implementers might
+restore the MMIO registers in an arbitrary or address-sequential order,
+which the commit message states will almost certainly fail to restore a gue=
+st
+capable of handling interrupts correctly.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703154811.3355=
-680-1-sascha.bischoff@arm.com?part=3D1
+680-1-sascha.bischoff@arm.com?part=3D40
