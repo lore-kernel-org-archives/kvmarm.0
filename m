@@ -1,169 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE793B7B96
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DA7357CE5
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073873; cv=none; b=prBc5jlYfxiCjlPUuOWK82nLblOtBK2DDSliThziPjONIWGO2pMgDX1Xwue8kBF2oVBWOkYlKRxpJoAG2/ONBhdaar3h5ZN5DEiaYl/wQNuB2o2bKfv3Mvf8QrmlzWYLuE1mL3NkBCxIGUhVa918m0NhMuy8RLe3dOLy/G6KuKg=
+	t=1783073940; cv=none; b=pet4Ap4cbHjdY/C0lMNsxZOzaX6qDYfP1mezMko4JU3V6kQI9JWDpM0JrCua2u5GyXHqwyUAkgoI04P37f3LEVBmUcQV9MlMV8+ddYOMCrVDmtHIelYbqF5DlQrqU9KOPVpeCwQKL/eMyN9bSasulv/cRVbiklwHJQKxLWNn0bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073873; c=relaxed/simple;
-	bh=3TCBPOzM6DBTGylMkiw4tsthr8gbTWmvhH+J1h7xFaQ=;
+	s=arc-20240116; t=1783073940; c=relaxed/simple;
+	bh=DWukcGjrjeqQhAoiiO5A4ZyAVkId69llbWR8IylHa/g=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jVDK4jjs68APQh+E/2tNue+yGXcPyks8cpGgOzrhAgyPGBZjA2Vov+fucH+7eol+Pp4D+W9HK1kYvEDAQHQTSpCuttv6iabBIUzRRkhwVNUJrY0nd1Db58nwk8v3WNTlqr3/VjZQBactaE0XJTozSNc9wSlimrxJrKyvPG03sqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y8rd1Ge4; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=QyK9m79aZ58VqJrbJFw/9QYE5Kbo5654Xv+J9Pw9NIxNk3Y5dRmzcaDbPVbdslUBRrcitV4WKkTbdUq79vhjz9lj94PR6/VF9/6f+5V43aWJAY1643bPSPGDuxsKykG/r4QPbsBU8M2frYmYplzJJri4rhdi07ydViTOvrA5ZA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VABvP+0J; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y8rd1Ge4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076651F000E9;
-	Fri,  3 Jul 2026 10:17:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VABvP+0J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D451F000E9;
+	Fri,  3 Jul 2026 10:18:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783073871;
-	bh=nF8SIk1n9ZTyDQko1532Rk5Ga5etMwMv060Cd3BBq1Y=;
+	s=k20260515; t=1783073939;
+	bh=I75o/74iarFoPITXxdQ+mosqxUNNMMo3r8shLTwsuoo=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Y8rd1Ge4jGuYzTbVXNO7e+/wvL1qtZi11oaBeLB+aBNGckoIRMlznUKUgd7earhuv
-	 Fz2fXgeqcyPgSXkrlbOh/+s0NyvNxdv28uwCuQ2HlFJdYuVHG+77STnV89hAIIkOHe
-	 XoJPfmZmoezmNlgQ7vKeQQxdxPtcdxG1VO30jrb8brEF3urmTOOTMel2ViO1Hkw982
-	 gD9Mv6uG+FtzcKCIpQSVht4CcX0jQvBBL2yvKnryjFyDOZinrVMm2YRupTlvZrcmkr
-	 dayjvqTdsptxRHepjrAej7QduOrR+hR8nAE2zPqN8PV9OGanUpPHPGl9KD+4uDeKmR
-	 Xj9SEriaU68wA==
+	b=VABvP+0J7P9qkRdVbbc3X4jztIyiX5iicleqpG9ToezPy5eklijw+38zQjIf7Rjj0
+	 k8ZlmLnZuhhJESRFYJwBGSJ+4j13F9rEW8bBJh9308T0KvtkSz9oPe+nbF8k2baLnJ
+	 fat7HErsuYPBLbYv+7dHcmJaysQLIvzglFMSiD6zbA/s2S/eP0mfk2LZ404y2kvGq3
+	 rb9aJViMVdWcxp2cnoasFXnKPGujjX9UeHH1D8C4xV1m4V1vLIK+6rt1ggYvIYk8U/
+	 2C+nC6l9iuzpkIJiSIkFqnzUgxM693pkzFzxUrK/oyIhwmvQpM9KQxzUPSvpzmAbUq
+	 o+K160y4PQA6Q==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 04/17] arm64: entry: Add entry-specific helpers
+Subject: Re: [PATCH 07/17] arm64/sysreg: Add definitions for immediate
+ versions of MSR ALLINT
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jinjie Ruan" <ruanjinjie@huawei.com>
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260703100135.2512312-5-ruanjinjie@huawei.com>
+In-Reply-To: <20260703100135.2512312-8-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <20260703100135.2512312-5-ruanjinjie@huawei.com>
+ <20260703100135.2512312-8-ruanjinjie@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 10:17:50 +0000
-Message-Id: <20260703101751.076651F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 10:18:57 +0000
+Message-Id: <20260703101858.F3D451F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-
-New issues:
-- [Medium] The new exception mask abstraction introduces unnecessary system=
- register reads on exception entry that are immediately discarded, causing =
-overhead on hot paths.
-- [Medium] exception_exit_restore_mask() fails to restore PMR and ALLINT, d=
-irectly contradicting its explicit description in the commit message.
-
-Pre-existing issues:
-- [High] Missing pmr_sync() barrier on the PMR unmasking path in local_exce=
-ption_inherit().
+- [High] The `_allint_clear()` and `_allint_set()` functions lack compiler =
+memory barriers, allowing dangerous compiler reordering across NMI boundari=
+es.
+- [Low] The new `arch/arm64/include/asm/nmi.h` header uses macros from `<as=
+m/sysreg.h>` but fails to include it, breaking self-containment.
 --
 
-commit 2feb968bf7f065e9063df058fc7166adcf349514
-Author: Jinjie Ruan <ruanjinjie@huawei.com>
-Date:   Fri Jul 3 10:01:22 2026 +0000
+commit f45a4a26dfbea0878dc6e4ccc4dcf5b6a158b356
+Author: Mark Brown <broonie@kernel.org>
 
-arm64: entry: Add entry-specific helpers
+arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
 
-The existing hacks to bodge pseudo-NMI into the DAIF management code
-are convoluted and difficult to maintain. To pave the way for real
-hardware NMI support (FEAT_NMI) without compounding the existing
-complexity, we need to abstract the low-level exception masking
-and unmasking operations into entry-specific helpers.
+This commit adds system register definitions for immediate versions of
+MSR ALLINT (SYS_ALLINT_CLR, SYS_ALLINT_SET). It also introduces a new
+header, asm/nmi.h, with wrappers _allint_clear() and _allint_set() that
+write to these registers using xzr.
 
-Link: https://lore.kernel.org/linux-arm-kernel/Y5c9SLeJacLYHmP7@FVFF77S0Q05=
-N/
+Link: https://lore.kernel.org/r/20221112151708.175147-5-broonie@kernel.org
 
-> diff --git a/arch/arm64/include/asm/exception_masks.h b/arch/arm64/includ=
-e/asm/exception_masks.h
-> index 0a21fb97c3ca8..2c87f7c90f628 100644
-> --- a/arch/arm64/include/asm/exception_masks.h
-> +++ b/arch/arm64/include/asm/exception_masks.h
-
-[ ... ]
-
-> +static __always_inline struct exception_mask el1_sync_entry_unmask_inher=
-it(struct pt_regs *regs)
-> +{
-> +	struct exception_mask orig;
+> diff --git a/arch/arm64/include/asm/nmi.h b/arch/arm64/include/asm/nmi.h
+> new file mode 100644
+> index 0000000000000..eb2c9a8350cc8
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/nmi.h
+> @@ -0,0 +1,23 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2022 ARM Ltd.
+> + */
+> +#ifndef __ASM_NMI_H
+> +#define __ASM_NMI_H
 > +
-> +	local_exception_save_mask(&orig);
-> +	local_exception_inherit(regs);
+> +#ifdef CONFIG_ARM64_NMI
+
+[Severity: Low]
+Is a #include <asm/sysreg.h> directive missing in this new header?
+
+It uses the __msr_s macro and SYS_ALLINT_CLR/SET definitions from sysreg.h.
+Without the include, it might break self-containment if another file includ=
+es
+asm/nmi.h first.
+
+> +static __always_inline void _allint_clear(void)
+> +{
+> +	asm volatile(__msr_s(SYS_ALLINT_CLR, "xzr"));
 
 [Severity: High]
-This is a pre-existing issue, but does local_exception_inherit() miss a
-required pmr_sync() barrier?
+Does this inline assembly need a "memory" clobber?
 
-When el1_sync_entry_unmask_inherit() calls local_exception_inherit(), it
-writes regs->pmr to ICC_PMR_EL1 to unmask interrupts:
+Without a compiler memory barrier, the compiler might hoist or sink memory
+accesses across the NMI masking/unmasking boundary. This could lead to data
+corruption or kernel panics when protected data structures are accessed
+concurrently.
 
-	if (system_uses_irq_prio_masking())
-		gic_write_pmr(regs->pmr);
-
-Unmasking interrupts via PMR typically requires a pmr_sync() barrier (DSB) =
-so
-the priority change is immediately visible to the GIC redistributor. Without
-this barrier, the redistributor might delay interrupt delivery.
-
+> +}
 > +
-> +	return orig;
-> +}
-
-[ ... ]
-
-> +/*
-> + * Mask all exceptions, ready to return to interrupted context
-> + */
-> +static __always_inline void exception_exit_restore_mask(struct exception=
-_mask mask)
+> +static __always_inline void _allint_set(void)
 > +{
-> +	write_sysreg(mask.daif, daif);
+> +	asm volatile(__msr_s(SYS_ALLINT_SET, "xzr"));
+
+[Severity: High]
+Should this masking function also use a "memory" clobber to prevent compiler
+reordering across the boundary?
+
 > +}
+> +#else
+> +static __always_inline void _allint_clear(void) { }
+> +static __always_inline void _allint_set(void) { }
 
-[Severity: Medium]
-Does this function fully match its description in the commit message?
+[Severity: High]
+Would it be safer for these fallback implementations to include a barrier()
+call?
 
-The commit message states that exception_exit_restore_mask() restores both
-the DAIF and PMR states:
+If they are used outside of strict architectural checks, an empty function
+allows the compiler to reorder memory operations across where the NMI criti=
+cal
+section was intended.
 
-"- exception_exit_restore_mask(): A unified exit-side helper to safely
-   restore the hardware exception mask states (DAIF and PMR)..."
-  =20
-However, the implementation only restores DAIF and drops the PMR and ALLINT
-states. While kernel_exit and eret might handle those separately in practic=
-e,
-the documented API contract seems inconsistent with the implementation.
-
-> diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-c=
-ommon.c
-> index 6fdf74ff48352..dc223085e7735 100644
-> --- a/arch/arm64/kernel/entry-common.c
-> +++ b/arch/arm64/kernel/entry-common.c
-
-[ ... ]
-
-> @@ -824,7 +849,7 @@ static void noinstr el0_interrupt(struct pt_regs *reg=
-s,
->  {
->  	arm64_enter_from_user_mode(regs);
-> =20
-> -	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-> +	irq_entry_unmask_debug_serror(regs);
-
-[Severity: Medium]
-Does discarding the return value of irq_entry_unmask_debug_serror()
-introduce unnecessary overhead on the hot EL0 interrupt path?
-
-irq_entry_unmask_debug_serror() calls local_exception_save_mask(), which
-executes multiple volatile 'mrs' instructions to read DAIF, PMR, and ALLINT.
-Since these reads are performed via asm volatile, the compiler cannot optim=
-ize
-them out even though the returned exception_mask is ignored here.
-
-> =20
->  	if (regs->pc & BIT(55))
->  		arm64_apply_bp_hardening();
+> +#endif /* CONFIG_ARM64_NMI */
+> +
+> +#endif
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
-312-1-ruanjinjie@huawei.com?part=3D4
+312-1-ruanjinjie@huawei.com?part=3D7
