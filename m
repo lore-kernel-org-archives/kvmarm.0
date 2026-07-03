@@ -1,133 +1,151 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F6625F994;
-	Fri,  3 Jul 2026 16:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA042BF3F4;
+	Fri,  3 Jul 2026 16:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783095772; cv=none; b=RadR3EeBZlcYLzvUrNGwC1hdD6krvIeJu/quThLHK3sxHu9ntb+2w1OV3FVwl+lD25cliIr//6vcEdXKD1ECO1ohP0OwouB7y45y0o1KO1oW8imqPA/6CQlZQq80fKlpQGn4nqwB/dEwWLJHpHWgLGkbX2XaTnLvkO8sHwKaITQ=
+	t=1783095784; cv=none; b=n0R763CY7xl6yxG9hntnFCsaTZaP1UXd7Ok2HOakGdcB9KS5hI+85VbUVDQGl+2v8Kv57WCOFBg1fNVGdIPfEtmwBo47wG+nUNXE6aWee1YcNnu4lLlIeCbqqQvZ/fDCys6sFAkE+6LPN/KQ9p+x9sB0l/mhZpkVv4qeGQ/BmGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783095772; c=relaxed/simple;
-	bh=7tX+Is8S6ryg6lsBbB1kXBtC4dMNh6MPFz2oVJVByV0=;
+	s=arc-20240116; t=1783095784; c=relaxed/simple;
+	bh=lNk/GJUF4sEqYaUF6Xr7J5lqwzbInf0Efk+UuSQglqs=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=pf+41x+4qdAduHdClcDzqN+ZuYGMTk5UbEpjc0wInrr5qRojXQ4sDwU2qaD1ZKmYmxs/8SkZdgJTvOYxBBkbbZHSy2F4DS6x2PwE5ik8DPppxgrZgtZXNCQt1vPXia2TmtBl3SFyXKcWfHTJxML02oYH0V1wcOWl3c2z8Ytpgs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQbijA4n; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=oL4chkzQKZiCtmMRGNgAqZnH5yt4v/M8oCJ7DpqvLR2g0nsuwraw8jp2xX3ex2xtxGBnVQTA+QpjsGDB9wJQ5Db3lmlGnPm5yBqsUCDxSdcGCai82p5vzpkyEamHs+Cj/vPCNBLDU9p0XQ2qV4HiCdxqof6lcMG98BtLI79vmHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R5ZN82SE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQbijA4n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC8B11F000E9;
-	Fri,  3 Jul 2026 16:22:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R5ZN82SE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1311F000E9;
+	Fri,  3 Jul 2026 16:23:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783095771;
-	bh=LQiG1pbIcPaZgVyQOoxX7qgVd5js1Qz8lujx9Y37oIw=;
+	s=k20260515; t=1783095782;
+	bh=CIww3kfVBUBNW5+OOFzlq1xMzjnjIXR7aNRO3sfajV8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SQbijA4nCSinquwZH/EXrtv8W64wKKffEjf6SMslf9RkgI57RU0vKKTlmDIe9MROp
-	 x85rOW1pGgKrFU2FJXbTT7dut7EnBe+orAEQ52XMdRDxxcDpFrEdywLBQtJU6c/h1G
-	 EQrhqsXXyz/8d2u53icMdfBqvN4dkiNNHVLQi8ppaEm+8nIPKhrfZUIixUdnwwrJMg
-	 ca+flcIPL8B9cjRgIBRGgfykg4y5ICl++EYHSBoiraD31TchQ7SAtVmKCjqC5IVeH0
-	 YM8snRjCOYFOh2awO9HQwtU3XTtiwyAIXP0n4XjPiTt4kfxAzrsULpOxRow51eG56N
-	 EMZUlr7vghCTg==
+	b=R5ZN82SECNQYgzYM4aq6++bjwyxrFfQQUBSA8HsmpCDn9M8nh6tPLM+svOkVCN2kv
+	 fq5YT+7NMSPU30y+I2PZhje4oak/ZsAXXCzpmnQy2eNXGj6UcQfbJS0hqTc6TFzg3p
+	 MIRzSfRaWLqojFUP3OE7J0Vey/5i6/2fBV4GSKUxYa5s0Sf5D1oOPTX5BKx6R7tza+
+	 UgGIFqEiMfZFZpnAFdepgsvoYcbTnVsjAFFMsWbnhWbwITctLGhNLSmsdSEoU/yVQa
+	 5taCw22e4eLIGU8Gmgclsf9NWqtmZu3Gebrq3jTaNni+Zxbm6YC38g7n4ngBLaRixC
+	 UHHCV6TVIfedA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 06/40] arm64/sysreg: Update ICC_CR0_EL1 with LINK and
- LINK_IDLE fields
+Subject: Re: [PATCH v3 15/40] KVM: arm64: gic-v5: Add resident/non-resident
+ hyp calls
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260703154811.3355680-7-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260703154811.3355680-16-sascha.bischoff@arm.com>
 References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
- <20260703154811.3355680-7-sascha.bischoff@arm.com>
+ <20260703154811.3355680-16-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 16:22:50 +0000
-Message-Id: <20260703162250.AC8B11F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 16:23:01 +0000
+Message-Id: <20260703162302.6A1311F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-
-Pre-existing issues:
-- [High] Writes to control-plane system registers (e.g., ICC_CR0_EL1, ICC_P=
-CR_EL1, ICC_PPI_ENABLERx_EL1) are not followed by an immediate isb() instru=
-ction.
+- [Critical] EL2 directly writes unvalidated, host-controlled memory to `SY=
+S_ICH_CONTEXTR_EL2`, violating the pKVM trust boundary and allowing a compr=
+omised host to hijack protected VMs' interrupts.
+- [High] Time-of-Check to Time-of-Use (TOCTOU) vulnerability due to a doubl=
+e-fetch of the host-shared `vgic_contextr` field when evaluating the hardwa=
+re fault status.
 --
 
-commit a711c6a81167d568ab1f95533a38518adf17a484
+commit 7cd120d3ed0e8b391f422c1d75c53d34d13d0b6c
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+KVM: arm64: gic-v5: Add resident/non-resident hyp calls
 
-arm64/sysreg: Update ICC_CR0_EL1 with LINK and LINK_IDLE fields
+This commit introduces new hypercalls to make a GICv5 VPE resident or
+non-resident by writing to ICH_CONTEXTR_EL2. It extends the load and put
+functions to handle this residency interval and checks for residency faults.
 
-This commit updates the sysreg generator definition for ICC_CR0_EL1 to
-include the LINK and LINK_IDLE fields, which have been added to the
-architecture.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index 1d01c6e547f5d..8d0896f50f879 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+[ ... ]
+> @@ -689,6 +689,20 @@ static void handle___tracing_write_event(struct kvm_=
+cpu_context *host_ctxt)
+>  	trace_selftest(id);
+>  }
+> =20
+> +static void handle___vgic_v5_make_resident(struct kvm_cpu_context *host_=
+ctxt)
+> +{
+> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+> +
+> +	__vgic_v5_make_resident(kern_hyp_va(cpu_if));
+> +}
+[ ... ]
+> diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5=
+-sr.c
+> index 6d69dfe89a96c..f064045a31aee 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
+> @@ -7,6 +7,32 @@
+> =20
+>  #include <asm/kvm_hyp.h>
+> =20
+> +void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if)
+> +{
+> +	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 6c3ff14e561e6..57ab09404267c 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -3736,7 +3736,9 @@ Sysreg	ICC_CR0_EL1	3	1	12	0	1
->  Res0	63:39
->  Field	38	PID
->  Field	37:32	IPPT
-> -Res0	31:1
-> +Res0	31:3
-> +Field	2	LINK_IDLE
-> +Field	1	LINK
->  Field	0	EN
->  EndSysreg
+[Severity: Critical]
+Can this regression allow the host to force the GICv5 hardware to make a
+protected VM's VPE resident?
+
+The handle___vgic_v5_make_resident hypercall is exposed to the untrusted
+host. Here, EL2 directly writes the host-controlled cpu_if->vgic_contextr
+memory to the SYS_ICH_CONTEXTR_EL2 register without validating if
+the requested VM/VPE belongs to a protected VM. This could break guest
+isolation by allowing the host to modify a protected VM's interrupts.
+
+> +	isb();
+> +
+> +	/* Catch any faults */
+> +	cpu_if->vgic_contextr =3D read_sysreg_s(SYS_ICH_CONTEXTR_EL2);
+> +	if (!!FIELD_GET(ICH_CONTEXTR_EL2_F, cpu_if->vgic_contextr))
 
 [Severity: High]
-This isn't a bug introduced by this patch, but since it updates the definit=
-ion
-of ICC_CR0_EL1, I noticed that writes to control-plane system registers (e.=
-g.,
-ICC_CR0_EL1, ICC_PCR_EL1, ICC_PPI_ENABLERx_EL1) are missing immediate isb()
-synchronization in several places.
+Does this introduce a Time-of-Check to Time-of-Use (TOCTOU) regression?
 
-For example, in drivers/irqchip/irq-gic-v5.c:gicv5_cpu_disable_interrupts():
+The code writes the SYS_ICH_CONTEXTR_EL2 value into cpu_if->vgic_contextr,
+which resides in host memory. It then immediately fetches it back
+to check the ICH_CONTEXTR_EL2_F bit. A concurrent host CPU could overwrite
+this value in the small window between the store and the load, clearing the
+fault bit and hiding a hardware residency fault from the hypervisor.
 
-	cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 0);
-	write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
-}
+> +		return;
+> +
+> +	cpu_if->gicv5_vpe.resident =3D true;
+> +}
+> +
+> +void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if)
+> +{
+> +	/*
+> +	 * Make as non-resident before actually making non-resident. Avoids race
+> +	 * with doorbell arriving.
+> +	 */
+> +	cpu_if->gicv5_vpe.resident =3D false;
+> +	dsb(st);
+> +
+> +	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
 
-And in drivers/irqchip/irq-gic-v5.c:gicv5_cpu_enable_interrupts():
+[Severity: Critical]
+Similar to the resident path, does this write introduce the same regression?
 
-	pcr =3D FIELD_PREP(ICC_PCR_EL1_PRIORITY, GICV5_IRQ_PRI_MI);
-	write_sysreg_s(pcr, SYS_ICC_PCR_EL1);
+The non-resident path also directly writes the host-controlled vgic_contextr
+value to the hardware register without validation.
 
-	cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 1);
-	write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
-
-There are also instances where multiple writes are batched without an immed=
-iate
-isb() in between, such as in gicv5_cpu_enable_interrupts():
-
-	write_sysreg_s(0, SYS_ICC_PPI_ENABLER0_EL1);
-	write_sysreg_s(0, SYS_ICC_PPI_ENABLER1_EL1);
-
-	gicv5_ppi_priority_init();
-
-And in drivers/irqchip/irq-gic-v5.c:gicv5_ppi_priority_init():
-
-	write_sysreg_s(REPEAT_BYTE(GICV5_IRQ_PRI_MI), SYS_ICC_PPI_PRIORITYR0_EL1);
-	write_sysreg_s(REPEAT_BYTE(GICV5_IRQ_PRI_MI), SYS_ICC_PPI_PRIORITYR1_EL1);
-
-The exact same missing isb() patterns appear in the selftest implementations
-in tools/testing/selftests/kvm/include/arm64/gic_v5.h.
-
-Could this leave the CPU operating under an architecturally undefined pipel=
-ine
-state? According to architectural rules, every write to a control-plane sys=
-tem
-register (including all ICC_*_EL1 registers except ICC_PMR_EL1) must be
-followed by an isb() as the very next instruction.
-
-Batching writes or executing any instruction between the write and the isb()
-might lead to unpredictable behavior, spurious traps, or kernel panics.
+> +	isb();
+> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703154811.3355=
-680-1-sascha.bischoff@arm.com?part=3D6
+680-1-sascha.bischoff@arm.com?part=3D15
