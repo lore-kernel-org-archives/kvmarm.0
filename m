@@ -1,221 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01BD3B6C18
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131F7358388
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073759; cv=none; b=jz5HuYALCsxa5pIR+SZ/OWBWBwnQuUZBzGCSRcnoFoTEk2RRgMyZiWF7/ZEgm6vPu6kszcsvxyin0x5dci/7tRIvaHFxD7KNetINNxmIUEQF0W0pbGoJJ6X2wLQGcA7y2dI4Bg0MOnVZX1xlycg+BItisz36e7p/jjbIeLX2Uaw=
+	t=1783073790; cv=none; b=vBk1aXCAZGOOR515Z24rmiN9knpotOCkuOO8aYt87OPsCbytJEVFGebkx4TiQtOtMxOdRKB2wOgyvB03aHuppY/J08LW4dj7O5uzICkekluk6dlmnRu2jjjkPz/Ua7Fh1LPcXlOFGJphI0VKuak9RlhnVOMWZP/VciRhL3zFBGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073759; c=relaxed/simple;
-	bh=OOL+t+5P4F3Lqxoy6dRaAa0g91ml6rep7oUMQTQ8zKw=;
+	s=arc-20240116; t=1783073790; c=relaxed/simple;
+	bh=akJ/4WynMwhxRqSCP81P4Ru7jrSDX/553yca9nVPu8s=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=oQ+AAhcrlAgDx/eoYRvAqhTErSVVWkF9Gx8MPuC6fyyi+Zrdt2rpwfVZBfCkcSnSzprrCwdtdx3yb9K/Y/QU4poAimuXcFfDo5UZ2eudg8f2qDE1bT5ivjiHiZPI8vdS+RhUhvUeahy0aMBHznCJ/33f0VPyu7WlULTHkK3xbCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0cLU/A+; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=uWWJ0OzGUs969k8080wKFKVm36xy6FwsL7fsGvMqEIl6IK1h46PKe2LpMjykbN/D66g1bs4LwllMHu8lkjHEGxcKfh6j3jPCPApTZoHx7kCz0jgBxs8v9U2ZJJWG/uFRDOKW+9gWFHp9KPi/tydGW8GvFUEONEMy+3J8F3bSu3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FoPDlX7p; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0cLU/A+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5FB71F000E9;
-	Fri,  3 Jul 2026 10:15:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FoPDlX7p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AC881F000E9;
+	Fri,  3 Jul 2026 10:16:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783073756;
-	bh=PIFWawAHhqW+xvR6etkAKAlOVO4mLL7AKAJyBTKEORw=;
+	s=k20260515; t=1783073788;
+	bh=RlCcnJ0T3P+C0ewWZYAbzyyc3SkEkUCDfWs5q7m6wDE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Q0cLU/A+LPNucHKs1P6/nf6NbTIifmP4Vnn8hhuRzGSXGymgAOk1igbku30czTFRa
-	 3pr44JkE2oXr749voyEklwVcgvT/uza7rhS0avrqI9aN8sG6A4UEx8Z5IU8cDg7tQd
-	 IGYIvo1j9tFGlNCJQkVGNU8EzkG1QSMl2eq6vTJn0hL0rKgOAxZ6iFGiSipWc5+PF5
-	 l6yl3CDFfBXJjGxOdAa91+uYCHE0Rdv4arj1+W97Pk3Jv0xFsXvfQHtM811YMKBg74
-	 eJE3x2u3aF/4/QSvI0ga4yMU5r4d9ysubJFG4anMR1s1syJYtqKDHeBTlQUMqEiKHR
-	 IFZOmRefU1sLQ==
+	b=FoPDlX7pT4iwBiFR0xCO68Dc6iJ7rveTnaVzudapSkZnxilnhreghjK82VI3a4a85
+	 sjCwXNNvmE8MrbPAKpqCHr89eUA4gfRRQBAx03TLNfm3RxXnspP7CpKm6Bx86P+O7F
+	 S4+DBY5GKaunjnZYFAPwvyr75nOiiJ/m9bsenQFwCFZlB5IU3Xsxk6Wp0PUiFc0ARQ
+	 L/LsGPqA7Vdw3qRN/fM72T89c722hdyhw/z4+tXvYbZ5OlkrHDvI6z04P0aNT+Oy++
+	 PzbHH/d2flkHFNKVDJUhOwQB//qYVF8VYJ5GrU78jacDKrHn+aPOYozWm8+R85h+Vj
+	 W2wjOPX51Dgmw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 02/17] arm64: Rework exception masking into abstract
- logical mask
+Subject: Re: [PATCH 08/17] arm64/hyp-stub: Enable access to ALLINT
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jinjie Ruan" <ruanjinjie@huawei.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260703100135.2512312-3-ruanjinjie@huawei.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260703100135.2512312-9-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <20260703100135.2512312-3-ruanjinjie@huawei.com>
+ <20260703100135.2512312-9-ruanjinjie@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 10:15:55 +0000
-Message-Id: <20260703101555.E5FB71F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 10:16:27 +0000
+Message-Id: <20260703101628.5AC881F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-
-New issues:
-- [High] The `pmr` and `allint` fields of `struct exception_mask` are left =
-uninitialized when hardware features are disabled, causing Undefined Behavi=
-or and KMSAN panics.
-- [High] Missing `__always_inline` on exception mask helpers leads to noins=
-tr violations.
-- [High] `arm64_make_errctx_mask` incorrectly masks pseudo-NMIs during SErr=
-or handling.
-- [High] Unnecessary `pmr_sync()` (DSB barrier) executes unconditionally on=
- masked restore paths.
-
-Pre-existing issues:
-- [High] Missing `isb()` after writing to the control-plane system register=
- `mdscr_el1`.
+- [High] Missing `isb()` instruction after writing to the control-plane sys=
+tem register `SYS_HCRX_EL2`.
+- [High] Uninitialized register `x1` used for NMI feature check, leading to=
+ dead code / skipped initialization.
 --
 
-commit 464598f1f40c66ead1ff67f84cc61270622c7aa4
-Author: Jinjie Ruan <ruanjinjie@huawei.com>
+commit e25e512407767afb5fe8ee7e72e600b4c00a8c3a
+Author: Mark Brown <broonie@kernel.org>
+Subject: arm64/hyp-stub: Enable access to ALLINT
 
-arm64: Rework exception masking into abstract logical mask
+This commit updates HCRX_EL2 to ensure TALLINT is not set when support
+for NMIs is detected. This allows the system to use NMIs without them
+being trapped.
 
-The current pseudo-NMI implementation in arm64 bodges the GICv3 PMR state
-into the DAIF management code. Introduce a new abstract exception_mask
-that explicitly treats DAIF, PMR, and ALLINT as separate elements to cleanly
-track the exact hardware masking state.
+Link: https://lore.kernel.org/r/20221112151708.175147-7-broonie@kernel.org
 
-Link: https://lore.kernel.org/linux-arm-kernel/Y5c9SLeJacLYHmP7@FVFF77S0Q05=
-N/
-
-> diff --git a/arch/arm64/include/asm/exception_masks.h b/arch/arm64/includ=
-e/asm/exception_masks.h
-> new file mode 100644
-> index 0000000000000..0a21fb97c3ca8
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/exception_masks.h
-> @@ -0,0 +1,141 @@
-[ ... ]
-> +static inline struct exception_mask arm64_make_procctx_mask(void)
-> +{
-> +	struct exception_mask mask;
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/=
+el2_setup.h
+> index aa8ec9df80243..73b8997f8d432 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -600,6 +600,19 @@
+> =20
+>  	msr_s	SYS_SMPRIMAP_EL2, xzr		// Make all priorities equal
+>  .Lskip_sme_\@:
 > +
-> +	mask.daif =3D DAIF_PROCCTX;
-> +	if (system_uses_irq_prio_masking())
-> +		mask.pmr =3D GIC_PRIO_IRQON;
+> +	// NMIs
+> +	__check_override id_aa64pfr1, ID_AA64PFR1_EL1_NMI_SHIFT, 4, .Linit_nmi_=
+\@, .Lskip_nmi_\@, x1, x2
 
 [Severity: High]
-Does this leave the pmr field in the returned mask uninitialized when
-system_uses_irq_prio_masking() is false? Returning this struct by value
-might propagate garbage data and trigger use-of-uninitialized-value KMSAN
-panics during exception entry paths.
+Is it possible that x1 is uninitialized here?
+
+When compiled for the host kernel context, the __check_override macro
+expects its first temporary register (x1) to be preloaded with the target
+system register value.=20
+
+Because this calls __check_override directly instead of using the
+check_override wrapper, and lacks a preceding mrs x1, id_aa64pfr1_el1
+instruction, it looks like it might evaluate leftover garbage in x1 from
+the preceding SME block.=20
+
+Could this cause the NMI setup to be silently skipped?
 
 > +
-> +	mask.allint =3D 0;
+> +.Linit_nmi_\@:
+> +	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
+> +	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
+> +	cbz	x1, .Lskip_nmi_\@
 > +
-> +	return mask;
-> +}
-> +
-> +static inline struct exception_mask arm64_make_errctx_mask(void)
-> +{
-> +	struct exception_mask mask;
-> +
-> +	mask.daif =3D DAIF_ERRCTX;
-> +	if (system_uses_irq_prio_masking())
-> +		mask.pmr =3D GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
+> +	mrs_s	x1, SYS_HCRX_EL2
+> +	and	x1, x1, # ~HCRX_EL2_TALLINT_MASK	// Don't trap ALLINT
+> +	msr_s	SYS_HCRX_EL2, x1
 
 [Severity: High]
-Could this construction inadvertently mask pseudo-NMIs during system error
-handling? By statically setting mask.daif =3D DAIF_ERRCTX, the I-bit is left
-set, which masks NMIs at the CPU PSTATE level. The legacy code cleared the
-I-bit and set PMR to GIC_PRIO_IRQOFF to allow NMIs while blocking normal
-IRQs.
+Does this control-plane register write require synchronization?
 
-> +
-> +	mask.allint =3D 0;
-> +
-> +	return mask;
-> +}
-[ ... ]
-> +/* Mask all exceptions immediately */
-> +static inline void local_exception_mask(void)
-> +{
+Writes to SYS_HCRX_EL2 typically require an immediate isb() to ensure the
+context synchronization event completes before subsequent instructions
+execute.=20
 
-[Severity: High]
-Should local_exception_mask() be marked __always_inline? If the compiler
-decides not to inline it, calling it from noinstr exception entry and exit
-paths (like arm64_exit_to_kernel_mode) violates noinstr constraints and
-can lead to recursive panics when tracing is enabled.
+Since this macro is expanded in callers like __finalise_el2, the
+instruction immediately following this msr_s might observe undefined
+pipeline state. Should an isb() be added as the very next instruction?
 
-> +	WARN_ON(system_has_prio_mask_debugging() &&
-> +		(read_sysreg_s(SYS_ICC_PMR_EL1) =3D=3D (GIC_PRIO_IRQOFF |
-> +						    GIC_PRIO_PSR_I_SET)));
-[ ... ]
-> +static inline void local_exception_save_mask(struct exception_mask *mask)
-> +{
-> +	mask->daif =3D read_sysreg(daif);
-> +	if (system_uses_irq_prio_masking())
-> +		mask->pmr =3D gic_read_pmr();
-
-[Severity: High]
-Is it possible this conditionally populates the mask and leaves the pmr fie=
-ld
-uninitialized when hardware priority masking is disabled? Since the caller
-might return this struct by value, it could propagate uninitialized memory.
-
-> +
-> +	mask->allint =3D 0;
-> +}
-[ ... ]
-> +static inline void local_exception_restore(const struct exception_mask m=
-ask)
-> +{
-
-[Severity: High]
-Could the lack of __always_inline on local_exception_restore() also cause
-noinstr violations? Similar to local_exception_mask(), compiler heuristics
-deciding to out-of-line this function would break the noinstr invariant
-during exception handling.
-
-> +	bool irq_disabled =3D mask.daif & PSR_I_BIT;
-[ ... ]
-> +	if (!irq_disabled)
-> +		trace_hardirqs_on();
-> +
-> +	if (system_uses_irq_prio_masking()) {
-> +		gic_write_pmr(mask.pmr);
-> +		pmr_sync();
-> +	}
-
-[Severity: High]
-Is this pmr_sync() execution necessary when interrupts remain disabled?
-The legacy code placed the synchronization barrier inside the !irq_disabled
-branch, as writing to the pmr register to mask interrupts is
-architecturally self-synchronizing. Executing a pipeline-draining dsb
-instruction unconditionally adds overhead on masked restore paths like
-kernel exception exits.
-
-> +
-> +	write_sysreg(mask.daif, daif);
-[ ... ]
-> diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug=
--monitors.c
-> index 29307642f4c90..5b53034428e46 100644
-> --- a/arch/arm64/kernel/debug-monitors.c
-> +++ b/arch/arm64/kernel/debug-monitors.c
-[ ... ]
-> @@ -40,10 +40,11 @@ u8 debug_monitors_arch(void)
->   */
->  static void mdscr_write(u64 mdscr)
->  {
-> -	unsigned long flags;
-> -	flags =3D local_daif_save();
-> +	struct exception_mask mask;
-> +
-> +	mask =3D local_exception_save_and_mask();
->  	write_sysreg(mdscr, mdscr_el1);
-
-[Severity: High]
-This is a pre-existing issue, but does mdscr_write() require a subsequent
-isb() before returning after writing to the control-plane system register
-mdscr_el1? Without synchronization, the cpu pipeline might operate under an
-undefined debug configuration for several cycles when reached via debug
-mechanisms like ptrace.
-
-> -	local_daif_restore(flags);
-> +	local_exception_restore(mask);
->  }
->  NOKPROBE_SYMBOL(mdscr_write);
+> +.Lskip_nmi_\@:
+>  .endm
+> =20
+>  #endif /* __ARM_KVM_INIT_H__ */
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
-312-1-ruanjinjie@huawei.com?part=3D2
+312-1-ruanjinjie@huawei.com?part=3D8
