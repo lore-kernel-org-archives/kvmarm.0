@@ -1,38 +1,38 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C9F3BADB1
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34FEF3C4174
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783072960; cv=none; b=HfZ3qbT8PXuD3HjehV0/P3qObzo2R/DRWPwxD5zdB9mVGj+LWrKHCp2IMOb3CGWJ4Rgl2nkSL7stW66PyQ60cUmoPbiPhhSQOJ2mnD3Gh0axn79PAKQje9DBRoXIRso46+MDod5NsaUxP5bIb/FXcqw9LeOW9Mzi8Kkes1RCD8g=
+	t=1783072967; cv=none; b=JrGrwE4E0K+vxDuWpMcgSmxao0Wb0rDkkua9IqPYUWBFRtNeHnbQJImSylfHaluJPUxNQd6pwW2HxQfXVJS49a7WR66eI3gGA3HKe1hVj8YUk6WNnyoAO+McT3Otiwm8jjilzZf77zjKjmrAl4f5z9o3JnDn4V4KKOTv3qYHsj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783072960; c=relaxed/simple;
-	bh=qbhs/EDp0zTe4JlBeDIOQEUwoeSJI9z5sggurtEfhdc=;
+	s=arc-20240116; t=1783072967; c=relaxed/simple;
+	bh=NDFexQ5BKeDf4gEuFlHQ8AsOpoifbFfm//3bGq7vdDU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u902a/miPpct443qIH7oR5DWY0QWUJahz3G+xFtdMFZTasQEIlF5POaOoWZLnHk089kzxG3Npt85iSSw2SmDckLWHJ3WYo5FB/P3za49Mq3fQWNnLbAOzJqJIOUM3p3g7oTzM5ksZjHAnCf/uIC35RoxnfSX0cnG8jcwuZ1FQbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ZAiGm3hJ; arc=none smtp.client-ip=113.46.200.227
+	 MIME-Version:Content-Type; b=Pq403A5eH0/i77NfT+TZ6ISsgfyy9wQ+KhWbQXL2yfI9tRmi6CQBbFI6yLUnuDPn8HhI6+gOx58pq2Fij+os9+cBIZa5+7rHqbjr58u+O7hqz0BzXQ+1xYYIM757CoX77gS1qjewMyN0Le/8m2SeLZcI85vGhiZornePRTuR3NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WvopodRT; arc=none smtp.client-ip=113.46.200.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ZAiGm3hJ"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="WvopodRT"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=UVb3+TSY4Wp1O/dSsSJ6V4ITHk2L3Q3jWLDM6kUPSNQ=;
-	b=ZAiGm3hJEoo13iy2TJIJntThCAmftqKTK97BmH1pHQUanZR2x44vowB70M4Y5y0tQ7J+V6uuM
-	LZLlb5gIKP4b2D28RVM+WZOVJgxeLOkGlBnzYy1181PA4pddMseqe/i3PvoEiRZEzRp7/m75j9A
-	s0LP2iw9/kurpLmfRUgovLU=
-Received: from mail.maildlp.com (unknown [172.19.163.127])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gs8GQ1rdJznTVy;
-	Fri,  3 Jul 2026 17:53:50 +0800 (CST)
+	bh=VL6qCd0a4PG2MJPT7gtPh7SqzyGRsG/EHUESrsti9Sk=;
+	b=WvopodRTvpSktb01egf0YexerCdPdzpqHZO8UJBVXX3M4xpjMacrmJMm2pV1QqhNWm3y+gn7X
+	a6wNV+Sq7C1c1VkhNYaukRfbEkq5kbOpjhxK7ECqhZ78hgMuPqJB8eBdFwa43qIQ+O0Vxl9NS71
+	2mdJ7MNmkCxQwyqBJHC9HOs=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gs8Gq6q3RzpSvY;
+	Fri,  3 Jul 2026 17:54:11 +0800 (CST)
 Received: from dggpemf500011.china.huawei.com (unknown [7.185.36.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 16E7B40572;
-	Fri,  3 Jul 2026 18:02:29 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 59C3440579;
+	Fri,  3 Jul 2026 18:02:43 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by dggpemf500011.china.huawei.com
  (7.185.36.131) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 3 Jul
- 2026 18:02:25 +0800
+ 2026 18:02:39 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
 	<skhan@linuxfoundation.org>, <maz@kernel.org>, <ardb@kernel.org>,
@@ -60,9 +60,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-efi@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 04/17] arm64: entry: Add entry-specific helpers
-Date: Fri, 3 Jul 2026 18:01:22 +0800
-Message-ID: <20260703100135.2512312-5-ruanjinjie@huawei.com>
+Subject: [PATCH 08/17] arm64/hyp-stub: Enable access to ALLINT
+Date: Fri, 3 Jul 2026 18:01:26 +0800
+Message-ID: <20260703100135.2512312-9-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260703100135.2512312-1-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
@@ -77,544 +77,44 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  dggpemf500011.china.huawei.com (7.185.36.131)
 
-The existing hacks to bodge pseudo-NMI into the DAIF management code
-are convoluted and difficult to maintain. To pave the way for real
-hardware NMI support (FEAT_NMI) without compounding the existing
-complexity, we need to abstract the low-level exception masking
-and unmasking operations into entry-specific helpers.
+From: Mark Brown <broonie@kernel.org>
 
-Introduce a set of high-level abstract exception mask helpers to
-encapsulate the "unmask-at-entry" and "mask-at-exit" behaviors across
-different exception paths (IRQ, SError, EL1 Sync, and EL0 Sync):
+In order to use NMIs we need to ensure that traps are disabled for it so
+update HCRX_EL2 to ensure that TALLINT is not set when we detect support
+for NMIs.
 
-- irq_entry_unmask_debug_serror(): Used at IRQ entry to save the original
-  mask state and switch to a safe NOIRQ context.
-
-- error_entry_unmask_debug(): Used at SError entry to mask all exceptions
-  except Debug.
-
-- el1_sync_entry_unmask_inherit(): Used at EL1 synchronous exception entry
-  to inherit the interrupted kernel context's masks.
-
-- el0_sync_entry_unmask_all() / el0_sync_exit_unmask_all(): Used
-  at EL0 synchronous exception entry/exit boundaries to cleanly allow
-  all exceptions under a standard process context.
-
-- exception_exit_restore_mask(): A unified exit-side helper to safely
-  restore the hardware exception mask states (DAIF and PMR) before
-  returning to the interrupted context.
-
-By replacing the raw register bit manipulations with these abstract
-helpers in entry-common.c, we achieve better code encapsulation, cleaner
-lifecycle symmetry, and a clear path forward for ALLINT integration.
-
-No functional change intended.
-
-Link: https://lore.kernel.org/linux-arm-kernel/Y5c9SLeJacLYHmP7@FVFF77S0Q05N/
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20221112151708.175147-7-broonie@kernel.org
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- arch/arm64/include/asm/exception_masks.h |  58 +++++++++++++
- arch/arm64/kernel/entry-common.c         | 103 ++++++++++++++---------
- 2 files changed, 122 insertions(+), 39 deletions(-)
+ arch/arm64/include/asm/el2_setup.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/arm64/include/asm/exception_masks.h b/arch/arm64/include/asm/exception_masks.h
-index 0a21fb97c3ca..2c87f7c90f62 100644
---- a/arch/arm64/include/asm/exception_masks.h
-+++ b/arch/arm64/include/asm/exception_masks.h
-@@ -138,4 +138,62 @@ static inline void local_exception_inherit(struct pt_regs *regs)
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index aa8ec9df8024..73b8997f8d43 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -600,6 +600,19 @@
  
- 	write_sysreg(regs->pstate & DAIF_MASK, daif);
- }
+ 	msr_s	SYS_SMPRIMAP_EL2, xzr		// Make all priorities equal
+ .Lskip_sme_\@:
 +
-+/*
-+ * Allow Debug exceptions and SError, mask IRQ/FIQ
-+ */
-+static __always_inline struct exception_mask irq_entry_unmask_debug_serror(struct pt_regs *regs)
-+{
-+	struct exception_mask orig;
++	// NMIs
++	__check_override id_aa64pfr1, ID_AA64PFR1_EL1_NMI_SHIFT, 4, .Linit_nmi_\@, .Lskip_nmi_\@, x1, x2
 +
-+	local_exception_save_mask(&orig);
-+	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
++.Linit_nmi_\@:
++	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
++	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
++	cbz	x1, .Lskip_nmi_\@
 +
-+	return orig;
-+}
-+
-+static __always_inline struct exception_mask error_entry_unmask_debug(struct pt_regs *regs)
-+{
-+	struct exception_mask orig;
-+
-+	local_exception_save_mask(&orig);
-+	local_exception_restore(arm64_make_errctx_mask());
-+
-+	return orig;
-+}
-+
-+static __always_inline struct exception_mask el1_sync_entry_unmask_inherit(struct pt_regs *regs)
-+{
-+	struct exception_mask orig;
-+
-+	local_exception_save_mask(&orig);
-+	local_exception_inherit(regs);
-+
-+	return orig;
-+}
-+
-+/*
-+ * Unmask all exceptions to establish a standard process context.
-+ * Suitable for EL0 sync entry and secondary CPU boot streaming.
-+ */
-+static __always_inline void el0_sync_entry_unmask_all(struct pt_regs *regs)
-+{
-+	local_exception_restore(arm64_make_procctx_mask());
-+}
-+
-+/*
-+ * Retained for symmetric naming, used before returning to EL0
-+ */
-+static __always_inline void el0_sync_exit_unmask_all(struct pt_regs *regs)
-+{
-+	local_exception_restore(arm64_make_procctx_mask());
-+}
-+
-+/*
-+ * Mask all exceptions, ready to return to interrupted context
-+ */
-+static __always_inline void exception_exit_restore_mask(struct exception_mask mask)
-+{
-+	write_sysreg(mask.daif, daif);
-+}
- #endif /* __ASM_EXCEPTION_MASKS_H */
-diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
-index 6fdf74ff4835..dc223085e773 100644
---- a/arch/arm64/kernel/entry-common.c
-+++ b/arch/arm64/kernel/entry-common.c
-@@ -315,80 +315,97 @@ UNHANDLED(el1t, 64, error)
- static void noinstr el1_abort(struct pt_regs *regs, unsigned long esr)
- {
- 	unsigned long far = read_sysreg(far_el1);
-+	struct exception_mask mask;
- 	irqentry_state_t state;
++	mrs_s	x1, SYS_HCRX_EL2
++	and	x1, x1, # ~HCRX_EL2_TALLINT_MASK	// Don't trap ALLINT
++	msr_s	SYS_HCRX_EL2, x1
++.Lskip_nmi_\@:
+ .endm
  
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_mem_abort(far, esr, regs);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_pc(struct pt_regs *regs, unsigned long esr)
- {
- 	unsigned long far = read_sysreg(far_el1);
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_sp_pc_abort(far, esr, regs);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_undef(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_el1_undef(regs, esr);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_bti(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_el1_bti(regs, esr);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_gcs(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_el1_gcs(regs, esr);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_mops(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_el1_mops(regs, esr);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_breakpt(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
-+	local_exception_save_mask(&mask);
- 	state = arm64_enter_el1_dbg(regs);
- 	debug_exception_enter(regs);
- 	do_breakpoint(esr, regs);
- 	debug_exception_exit(regs);
- 	arm64_exit_el1_dbg(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_softstp(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
-+	local_exception_save_mask(&mask);
- 	state = arm64_enter_el1_dbg(regs);
- 	if (!cortex_a76_erratum_1463225_debug_handler(regs)) {
- 		debug_exception_enter(regs);
-@@ -403,40 +420,49 @@ static void noinstr el1_softstp(struct pt_regs *regs, unsigned long esr)
- 		debug_exception_exit(regs);
- 	}
- 	arm64_exit_el1_dbg(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_watchpt(struct pt_regs *regs, unsigned long esr)
- {
- 	/* Watchpoints are the only debug exception to write FAR_EL1 */
- 	unsigned long far = read_sysreg(far_el1);
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
-+	local_exception_save_mask(&mask);
- 	state = arm64_enter_el1_dbg(regs);
- 	debug_exception_enter(regs);
- 	do_watchpoint(far, esr, regs);
- 	debug_exception_exit(regs);
- 	arm64_exit_el1_dbg(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_brk64(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
-+	local_exception_save_mask(&mask);
- 	state = arm64_enter_el1_dbg(regs);
- 	debug_exception_enter(regs);
- 	do_el1_brk64(esr, regs);
- 	debug_exception_exit(regs);
- 	arm64_exit_el1_dbg(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el1_fpac(struct pt_regs *regs, unsigned long esr)
- {
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
- 	state = arm64_enter_from_kernel_mode(regs);
--	local_exception_inherit(regs);
-+	mask = el1_sync_entry_unmask_inherit(regs);
- 	do_el1_fpac(regs, esr);
- 	arm64_exit_to_kernel_mode(regs, state);
-+	exception_exit_restore_mask(mask);
- }
- 
- asmlinkage void noinstr el1h_64_sync_handler(struct pt_regs *regs)
-@@ -486,8 +512,6 @@ asmlinkage void noinstr el1h_64_sync_handler(struct pt_regs *regs)
- 	default:
- 		__panic_unhandled(regs, "64-bit el1h sync", esr);
- 	}
--
--	write_sysreg(DAIF_MASK, daif);
- }
- 
- static __always_inline void __el1_pnmi(struct pt_regs *regs,
-@@ -516,14 +540,14 @@ static __always_inline void __el1_irq(struct pt_regs *regs,
- static void noinstr el1_interrupt(struct pt_regs *regs,
- 				  void (*handler)(struct pt_regs *))
- {
--	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-+	struct exception_mask mask = irq_entry_unmask_debug_serror(regs);
- 
- 	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && regs_irqs_disabled(regs))
- 		__el1_pnmi(regs, handler);
- 	else
- 		__el1_irq(regs, handler);
- 
--	write_sysreg(DAIF_MASK, daif);
-+	exception_exit_restore_mask(mask);
- }
- 
- asmlinkage void noinstr el1h_64_irq_handler(struct pt_regs *regs)
-@@ -539,13 +563,14 @@ asmlinkage void noinstr el1h_64_fiq_handler(struct pt_regs *regs)
- asmlinkage void noinstr el1h_64_error_handler(struct pt_regs *regs)
- {
- 	unsigned long esr = read_sysreg(esr_el1);
-+	struct exception_mask mask;
- 	irqentry_state_t state;
- 
--	local_exception_restore(arm64_make_errctx_mask());
-+	mask = error_entry_unmask_debug(regs);
- 	state = irqentry_nmi_enter(regs);
- 	do_serror(regs, esr);
- 	irqentry_nmi_exit(regs, state);
--	write_sysreg(DAIF_MASK, daif);
-+	exception_exit_restore_mask(mask);
- }
- 
- static void noinstr el0_da(struct pt_regs *regs, unsigned long esr)
-@@ -553,7 +578,7 @@ static void noinstr el0_da(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_mem_abort(far, esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -571,7 +596,7 @@ static void noinstr el0_ia(struct pt_regs *regs, unsigned long esr)
- 		arm64_apply_bp_hardening();
- 
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_mem_abort(far, esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -579,7 +604,7 @@ static void noinstr el0_ia(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_fpsimd_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_fpsimd_acc(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -587,7 +612,7 @@ static void noinstr el0_fpsimd_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sve_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_sve_acc(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -595,7 +620,7 @@ static void noinstr el0_sve_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sme_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_sme_acc(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -603,7 +628,7 @@ static void noinstr el0_sme_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_fpsimd_exc(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_fpsimd_exc(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -611,7 +636,7 @@ static void noinstr el0_fpsimd_exc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sys(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_sys(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -624,7 +649,7 @@ static void noinstr el0_pc(struct pt_regs *regs, unsigned long esr)
- 		arm64_apply_bp_hardening();
- 
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_sp_pc_abort(far, esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -632,7 +657,7 @@ static void noinstr el0_pc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sp(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_sp_pc_abort(regs->sp, esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -640,7 +665,7 @@ static void noinstr el0_sp(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_undef(regs, esr);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -648,7 +673,7 @@ static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_bti(struct pt_regs *regs)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_bti(regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -656,7 +681,7 @@ static void noinstr el0_bti(struct pt_regs *regs)
- static void noinstr el0_mops(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_mops(regs, esr);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -664,7 +689,7 @@ static void noinstr el0_mops(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_gcs(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_gcs(regs, esr);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -672,7 +697,7 @@ static void noinstr el0_gcs(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_inv(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	bad_el0_sync(regs, 0, esr);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -686,7 +711,7 @@ static void noinstr el0_breakpt(struct pt_regs *regs, unsigned long esr)
- 	debug_exception_enter(regs);
- 	do_breakpoint(esr, regs);
- 	debug_exception_exit(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_exit_unmask_all(regs);
- 	arm64_exit_to_user_mode(regs);
- }
- 
-@@ -705,7 +730,7 @@ static void noinstr el0_softstp(struct pt_regs *regs, unsigned long esr)
- 	 * the single-step is complete.
- 	 */
- 	step_done = try_step_suspended_breakpoints(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	if (!step_done)
- 		do_el0_softstep(esr, regs);
- 	arm64_exit_to_user_mode(regs);
-@@ -720,14 +745,14 @@ static void noinstr el0_watchpt(struct pt_regs *regs, unsigned long esr)
- 	debug_exception_enter(regs);
- 	do_watchpoint(far, esr, regs);
- 	debug_exception_exit(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_exit_unmask_all(regs);
- 	arm64_exit_to_user_mode(regs);
- }
- 
- static void noinstr el0_brk64(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_brk64(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -737,7 +762,7 @@ static void noinstr el0_svc(struct pt_regs *regs)
- 	arm64_syscall_enter_from_user_mode(regs);
- 	cortex_a76_erratum_1463225_svc_handler();
- 	fpsimd_syscall_enter();
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_svc(regs);
- 	arm64_syscall_exit_to_user_mode(regs);
- 	fpsimd_syscall_exit();
-@@ -746,7 +771,7 @@ static void noinstr el0_svc(struct pt_regs *regs)
- static void noinstr el0_fpac(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_fpac(regs, esr);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -824,7 +849,7 @@ static void noinstr el0_interrupt(struct pt_regs *regs,
- {
- 	arm64_enter_from_user_mode(regs);
- 
--	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-+	irq_entry_unmask_debug_serror(regs);
- 
- 	if (regs->pc & BIT(55))
- 		arm64_apply_bp_hardening();
-@@ -862,11 +887,11 @@ static void noinstr __el0_error_handler_common(struct pt_regs *regs)
- 	irqentry_state_t state;
- 
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_errctx_mask());
-+	error_entry_unmask_debug(regs);
- 	state = irqentry_nmi_enter(regs);
- 	do_serror(regs, esr);
- 	irqentry_nmi_exit(regs, state);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_exit_unmask_all(regs);
- 	arm64_exit_to_user_mode(regs);
- }
- 
-@@ -879,7 +904,7 @@ asmlinkage void noinstr el0t_64_error_handler(struct pt_regs *regs)
- static void noinstr el0_cp15(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_cp15(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
-@@ -888,7 +913,7 @@ static void noinstr el0_svc_compat(struct pt_regs *regs)
- {
- 	arm64_syscall_enter_from_user_mode(regs);
- 	cortex_a76_erratum_1463225_svc_handler();
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_el0_svc_compat(regs);
- 	arm64_syscall_exit_to_user_mode(regs);
- }
-@@ -896,7 +921,7 @@ static void noinstr el0_svc_compat(struct pt_regs *regs)
- static void noinstr el0_bkpt32(struct pt_regs *regs, unsigned long esr)
- {
- 	arm64_enter_from_user_mode(regs);
--	local_exception_restore(arm64_make_procctx_mask());
-+	el0_sync_entry_unmask_all(regs);
- 	do_bkpt32(esr, regs);
- 	arm64_exit_to_user_mode(regs);
- }
+ #endif /* __ARM_KVM_INIT_H__ */
 -- 
 2.34.1
 
