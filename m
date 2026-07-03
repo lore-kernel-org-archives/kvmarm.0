@@ -1,161 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB933B47FC
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1632C3B4432
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783074316; cv=none; b=Yy81TZgNnjzpl5CkaygnnIoL2tD0BPCR9mlyGf3YsumP9kIPC4HjDOcAt7P8uHBMoMKhDKnJSqGMO74pPQzbx69TmDGREkPSoFEbgUnJZ0pwQqGDJf+SYnyR0SBbFfsw8zEGar770o7SjQ/t52d/Kl7zDE0oS2mTzqYoYFuH2Lg=
+	t=1783074447; cv=none; b=mBPpy5Sycqhy65671MGd7Ik5LxR9WbT7qSztLJ59k9omVEsMXB6Ebpq40+8hkAJqldLCCsNeoS9Yih7HOZGUg4lAmlEt6HTr5MDgVpnbz4+/sliYT7BpgiHMM2+cK3xFsLg7A+Z1nSlq/a1UHH6mTSCj7bhSU4Z8EekLDSkf68A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783074316; c=relaxed/simple;
-	bh=ZQ7CAuTPM6Tf9+DTaYp2vlX5tPQhRYzc+U6LC/OQ2LQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t3lIsTebtHcNKFbSXSglZ3OEpTO7pAna8y1mB0WS/QrO53XwSApnOJJUIs7bkYElK2I79oilMu3YfpaA45X1QNojeBXTDBcwBTd41TlikKDkGm9jfCelK+oFBvQE+SjH6vg+dfbJYbKfiviy92MO9SsqPbkSuloKs6pLK5Bg+yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=d8n/v18V; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783074447; c=relaxed/simple;
+	bh=V7aliVCKrH+2PKOBxNFT2n07OZBT6KnC0ON46xZrQuQ=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=mZ/QGFlKShJrUFKBCo/SPaltmmCFnUJGV1fthHElzn+2xeRglZOTpOoELdnFCZfxmXo8/kvDCM+DgpJYm5Lh//bsVZmclVMiwehG3E81H0Ht0gZbELrByD2KbCuuU9Ykub4qO7Q+S4GDiQm6Hha0eowq7WdXatBFqcJ7tkpxLWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RVQFJgk3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="d8n/v18V"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 795301F91;
-	Fri,  3 Jul 2026 03:25:10 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77A5F3F905;
-	Fri,  3 Jul 2026 03:25:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783074314; bh=ZQ7CAuTPM6Tf9+DTaYp2vlX5tPQhRYzc+U6LC/OQ2LQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d8n/v18VXUB34szM/yrAGV780z+7NVyAa8tqQWd3++dvpUiIZe42DsrEhhvoop3Hv
-	 4gQVbD147+LYcsrJQr1Ld/MG53+LJxvWo91A9QowhOFgTtIC1o6NvjezyDBVRLOb6s
-	 L43MNKKcgmzotD72h/Y//bM9/I0DQk1MT0DLLMN0=
-Date: Fri, 3 Jul 2026 11:24:53 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
-Message-ID: <nzvizmyxj4otyo5itl425vdflimp6pnkuwo4qtwzzsbjobhzco@ygxydualln47>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <akYLdEuPXEGIZx3E@sm-arm-grace07>
- <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
- <akbuIDmd_zH9_m6K@sm-arm-grace07>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RVQFJgk3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A47D1F000E9;
+	Fri,  3 Jul 2026 10:27:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783074445;
+	bh=EjlkIEM/4xX3K205S7KioqEyN19nQCsxa5ftMsqHKwA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=RVQFJgk3ygTL5io4mJeVE1LmzIDDGjZWH0RQaewMH36P40AloAbYit2NA6T2bwP8X
+	 UcaeHqoVgNHCF4W3rwd9Di6yjDOJOkVEIEYl1dM/Pj4N0OV02kBeeHxQI41h379uGU
+	 r87EOR9XTXxZVtT1PbhbtPD/+KhMBLp9uvH2LkXNLtax/OeXwoq36ShxAGyx/4vFco
+	 4zTwwqWqwGbBd9rlbUJ/FTyeOhQRYQc+joOZuOP4tHUwKvj69yOLUiVngVH+MPdm13
+	 gNNL2VE4XMhXNilguXhr+jtgpZK7HnFTPzrc2JUmpRlMI9LJASScJTDtpcyjSuFVFz
+	 TRlwtXuDaIumQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 12/17] arm64/nmi: Manage masking for superpriority
+ interrupts along with DAIF
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jinjie Ruan" <ruanjinjie@huawei.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260703100135.2512312-13-ruanjinjie@huawei.com>
+References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
+ <20260703100135.2512312-13-ruanjinjie@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Jul 2026 10:27:25 +0000
+Message-Id: <20260703102725.7A47D1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akbuIDmd_zH9_m6K@sm-arm-grace07>
 
-On Fri, Jul 03, 2026 at 08:02:56AM +0900, Itaru Kitayama wrote:
-> On Thu, Jul 02, 2026 at 08:41:43AM +0100, Wei-Lin Chang wrote:
-> > On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
-> > > Hi Wei-Lin,
-> > > On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
-> > > > Hi,
-> > > > 
-> > > > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
-> > > > per mmu ptdump files work after all, mainly because there isn't a clean way to
-> > > > locate the specific nested mmu for each ptdump file as the nested mmus could be
-> > > > freed when the file gets opened. Therefore in this series a single file
-> > > > "shadow_page_tables" is created that dumps all valid mmus' page table
-> > > > information.
-> > > > 
-> > > > An advantage of this is that this new ptdump file have a lifetime identical to
-> > > > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
-> > > > dentry UAF found last time [1].
-> > > > 
-> > > > With this all ptdump files are only removed when the last kvm reference gets
-> > > > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
-> > > > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
-> > > > prevent UAF.
-> > > > 
-> > > > Patch 1-2: Undo previous shadow ptdump implementation.
-> > > > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
-> > > >            mmu->pgt is freed.
-> > > > Patch 4-5: Preparation for the shadow page table dump file.
-> > > > Patch 6:   Implementation of the shadow page table dump file.
-> > > > 
-> > > > The fixes are tested with CONFIG_PROVE_LOCKING,
-> > > > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
-> > > > 
-> > > > Thanks!
-> > > 
-> > > Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
-> > > for shadow stage 2 translation tables are built with ia_bits = 52 and
-> > > start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
-> > > out that's 3 levels. Is this fully expected?
-> > 
-> > Where is this level information you are seeing from? If it is
-> > "stage2_level", that only reports the number of levels for the canonical
-> > stage-2 (non nested). For nested mmus only the page tables are dumped in
-> > nested/shadow_page_tables.
-> 
-> Yes I know. The initial stage 2 translation table structure information is obtained by 
-> instrumenting the kernel using eBPF fexit to __kvm_pgtable_stage2_init().
-> 
-> Since you're correctly loopin over nested_mmus array, and the output is
-> correctly shown using the kvm_pgtable information via the kvm_s2_mmu for
-> them, I am confused at this moment.
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
+- [High] Kprobes IRQ flag save/restore drops ALLINT state, inadvertently un=
+masking NMIs upon return.
+- [High] `exception_exit_restore_mask` fails to restore the `allint` field,=
+ leaving NMIs unmasked during critical exception exit.
+- [Medium] Returning `struct exception_mask` by value copies uninitialized =
+memory when `system_uses_nmi()` is false.
+--
 
-Two things here:
+commit 0abc1ecd8853e1c8db5ff01b3c4dad448c23b517
+Author: Mark Brown <broonie@kernel.org>
 
-Firstly ia_bits being 52 is not expected to me, as I didn't change the
-VM's IPA size via KVM_VM_TYPE_ARM_IPA_SIZE in the selftest, to me I
-would expect ia_bits to be 40 (the default). Start level being 0 looks
-normal.
+arm64/nmi: Manage masking for superpriority interrupts along with DAIF
 
-Second thing is I still can't get what you are confused about, if it's
-not about the first point. Note that the "3" in ptdump means it is a
-level 3 mapping, not saying the page tables are using 3 levels.
+This patch updates DAIF management routines to also mask and unmask=20
+superpriority interrupts (NMIs) when asynchronous exceptions are handled.=20
+It modifies both inline C functions and assembly macros to track and=20
+restore the ALLINT state.
 
-Happy to discuss more if you clarify. I'll also check the ia_bits when I
-get to it.
+Link: https://lore.kernel.org/r/20221112151708.175147-11-broonie@kernel.org
 
-Thanks,
-Wei-Lin Chang
+> diff --git a/arch/arm64/include/asm/exception_masks.h b/arch/arm64/includ=
+e/asm/exception_masks.h
+> index fbbba769ca031..3dd41998f705c 100644
+> --- a/arch/arm64/include/asm/exception_masks.h
+> +++ b/arch/arm64/include/asm/exception_masks.h
+[ ... ]
+> @@ -87,7 +94,8 @@ static inline void local_exception_save_mask(struct exc=
+eption_mask *mask)
+>  	if (system_uses_irq_prio_masking())
+>  		mask->pmr =3D gic_read_pmr();
+> =20
+> -	mask->allint =3D 0;
+> +	if (system_uses_nmi())
+> +		mask->allint =3D read_sysreg_s(SYS_ALLINT);
+>  }
 
-> 
-> Thanks,
-> Itaru.
-> 
-> > 
-> > Thanks,
-> > Wei-Lin Chang
-> > 
-> > > 
-> > > Thanks,
-> > > Itaru.
-> > > 
-> > > > 
-> > > > * Changes from v1 ([2]):
-> > > > 
-> > > >   - Move from per mmu ptdump files to one file that will dump all shadow page
-> > > >     tables.
-> > > > 
-> > > > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
-> > > > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
-> > > > 
-> > > > Wei-Lin Chang (6):
-> > > >   KVM: arm64: ptdump: Remove shadow ptdump files
-> > > >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
-> > > >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-> > > >   KVM: arm64: ptdump: Factor out initialization of
-> > > >     kvm_ptdump_guest_state
-> > > >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
-> > > >     ptdump path
-> > > >   KVM: arm64: ptdump: Introduce the shadow ptdump file
-> > > > 
-> > > >  arch/arm64/include/asm/kvm_host.h |   5 +-
-> > > >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
-> > > >  arch/arm64/kvm/nested.c           |  18 +--
-> > > >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
-> > > >  4 files changed, 135 insertions(+), 77 deletions(-)
-> > > > 
-> > > > -- 
-> > > > 2.43.0
-> > > > 
+[Severity: Medium]
+Does this leave mask->allint uninitialized on systems where system_uses_nmi=
+()
+is false?
+
+When local_exception_save_and_mask() allocates mask on the stack and return=
+s=20
+it by value, returning the struct with an uninitialized field could copy=20
+uninitialized memory and trigger KMSAN warnings.
+
+[ ... ]
+> @@ -118,6 +126,9 @@ static inline void local_exception_restore(const stru=
+ct exception_mask mask)
+>  		pmr_sync();
+>  	}
+> =20
+> +	if (system_uses_nmi())
+> +		write_sysreg_s(mask.allint, SYS_ALLINT);
+> +
+>  	write_sysreg(mask.daif, daif);
+
+[Severity: High]
+Does exception_exit_restore_mask() also need to be updated to restore the=20
+allint field?
+
+Unlike local_exception_restore(), it appears exception_exit_restore_mask() =
+was
+not updated to restore SYS_ALLINT, which might leave NMIs unmasked during=20
+exception exit paths when returning to user or kernel mode.
+
+[ ... ]
+> diff --git a/arch/arm64/kernel/probes/kprobes.c b/arch/arm64/kernel/probe=
+s/kprobes.c
+> index 70d311e415ac9..8045245ebbdde 100644
+> --- a/arch/arm64/kernel/probes/kprobes.c
+> +++ b/arch/arm64/kernel/probes/kprobes.c
+> @@ -197,12 +197,19 @@ static void __kprobes kprobes_save_local_irqflag(st=
+ruct kprobe_ctlblk *kcb,
+>  {
+>  	kcb->saved_irqflag =3D regs->pstate & DAIF_MASK;
+>  	regs->pstate |=3D DAIF_MASK;
+> +
+> +	if (system_uses_nmi())
+> +		regs->pstate |=3D ALLINT_ALLINT;
+>  }
+> =20
+>  static void __kprobes kprobes_restore_local_irqflag(struct kprobe_ctlblk=
+ *kcb,
+>  						struct pt_regs *regs)
+>  {
+>  	regs->pstate &=3D ~DAIF_MASK;
+> +
+> +	if (system_uses_nmi())
+> +		regs->pstate &=3D ~ALLINT_ALLINT;
+> +
+>  	regs->pstate |=3D kcb->saved_irqflag;
+
+[Severity: High]
+Does this sequence inadvertently drop the ALLINT state and permanently unma=
+sk=20
+NMIs upon returning from the kprobe?=20
+
+In kprobes_save_local_irqflag(), DAIF_MASK does not include ALLINT_ALLINT, =
+so=20
+the original NMI mask state is not saved in kcb->saved_irqflag. When=20
+kprobes_restore_local_irqflag() later clears ALLINT_ALLINT and restores=20
+saved_irqflag, any previously masked NMIs could become unexpectedly unmaske=
+d.
+
+>  }
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
+312-1-ruanjinjie@huawei.com?part=3D12
