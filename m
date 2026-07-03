@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A877433E8A;
-	Fri,  3 Jul 2026 16:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29916279917;
+	Fri,  3 Jul 2026 16:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783095950; cv=none; b=QgFxYmCj+6iUpTOxD/t/coErLzArt6SrlhiKoFxTdWEHRS1qN4jPeHU2rFVXzj5w7larjFaWNNOz8K9f8u3P2bMBNtjpWGo0nbvZ7xZfPJzfgsw6XEjf6Pbo0GQChzwnw9IU8f5Ev6V1aaU+Od1Ud8A4ffXVE/VJo1gSZRR/Ldo=
+	t=1783095992; cv=none; b=pIQINtMNjTtkBK/QOMR2r7R18lClqZcqU6AvjYFqR4MvRCbS3Kyac5PQmkKWFBweCn6C/4YJhwJEDEM+Bp5/8IEZGUWp9YVhBXG+8udCfT1RWIzJQ8zLYkmnqciXAj4aLgZCmPKkz1ab+YBb0pc/B6qFj6LBoTEbOtwmgqbDuN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783095950; c=relaxed/simple;
-	bh=mQj79BNJpFmsvNsIwB8J02G+fwbSWo5niw6tP9N/Irg=;
+	s=arc-20240116; t=1783095992; c=relaxed/simple;
+	bh=E8wBU4eZ3wQuwAcheuks1iYPT2XDH5PxkjBKARyM4ko=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=A7AZeWb/K516MbQcxwMTA1jbY+Mpymt8Hd3XbYASiRglP6tkCqMVrdIYw+rZmtmnQhASjihXhRimkoqGJW6ssXLQSw1CWIIjWHnfqiOU/fIar56FBmV+BcZrvZr6oQTTJJjHlYCOgT4h/bcCfkKi/PVboC8o+9kR+5dTM2mtPlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMkaT3PS; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=WFP6+XITk7fBxk+dIua1vupTq7QvXi+OHzIJ1zh19HDQZKwNz0SS6ZqlYwSCSck5kcSPcPuJQorfQ0gCcx/ftGuyRxvN8REBuWMUyDhkhbKlbGRT68N5EADWcr0zvL85pAT6fLiz7Tbm0c/jfhttmgbc/5YxirrwzV2LZCInt/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbH0JZPQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMkaT3PS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D5AF1F000E9;
-	Fri,  3 Jul 2026 16:25:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbH0JZPQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D381F000E9;
+	Fri,  3 Jul 2026 16:26:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783095948;
-	bh=fzwa+GMnSM4gl/5raIN7V89c0WKGbnF3BZobK9Oh0nw=;
+	s=k20260515; t=1783095990;
+	bh=iMKo3ffDdzCsIWyfXsx8t2/Re4sWCgrZvqvUof8lHSI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=AMkaT3PS/wEsejbIGme9rRW26Kfh9sEmrNvVu/LJbUlZ8s+Srs835P3P8ooBJAKfX
-	 TYVLohbkgnfNB3C/mOF6VNnDa2xKOuNfEoIuI73hLBQn913Wu3w1c0tUKetFJsyh3N
-	 010/WyHr+kW0i8k0xJerESTX++NeNkL/6i/C93U2P4hSouvqKvS/RjxpPwV6pdH6ci
-	 ycuID1ia6Xs/RUYy1RwjPTtCvbv8Tj8gKYmLhUyk2PpTWPNXH7XETwgSp5NaLjmL+o
-	 WFJxWnIiTS3/Q8aCZ1YuBOtpb2HCj941ByYtnnn9tcV+PXWzpZlhCd7sElu/sJ9fsy
-	 W72n1rLVNhSgw==
+	b=NbH0JZPQTLqQKGtNL627w7LLgaGE+mf1NYDdD7hWucZf3/YsuqRoBFm3Kls8Qjm0N
+	 uE991/QfEI0CiuFdrSgnYkM4xJzbWls8XvHLlwmhWDE9Wes+1z+ExLEbfQ9eHCVlA3
+	 vMvUAG3NI6pOoreeQgC44OwOmSXcJKzA10qmNTj829of4gKXJzGH32AypYe76z3nmL
+	 0VTVw9r3skudbUm+up7dm5nqh9n2kxfnEz4V/1wKSv4IVQJ0m2iUY+xDrWB42V4ju4
+	 WYwPY1N5jS/JKlDVObiOx/idGzImlx+Mv/KuB2BqBt+BZwtJCoJavdlGqu2FpF8xWm
+	 R3fmpRsdhC3MA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 08/40] KVM: arm64: gic-v5: Add VPE doorbell domain
+Subject: Re: [PATCH v3 13/40] KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260703154811.3355680-9-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260703154811.3355680-14-sascha.bischoff@arm.com>
 References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
- <20260703154811.3355680-9-sascha.bischoff@arm.com>
+ <20260703154811.3355680-14-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 16:25:48 +0000
-Message-Id: <20260703162548.8D5AF1F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 16:26:29 +0000
+Message-Id: <20260703162630.67D381F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,69 +47,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] Missing NULL check for fwnode allocation allows unintended fallb=
-ack to nameless domains.
+- [High] Missing hardware idle check before issuing VPE commands in `vgic_v=
+5_irs_set_up_vpe()` causes state corruption on timeout recovery.
 --
 
-commit 6a3e1b90ffc14235d7c9484abe0167a310e9d6ca
+commit 0e86d7c766cc2f59e9782a84658b0e7ed678597a
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Subject: KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
 
-KVM: arm64: gic-v5: Add VPE doorbell domain
-
-This commit adds support for a per-VM VPE doorbell irq domain to handle
-GICv5 hardware notifications for non-resident VPEs. It allocates a doorbell
-per VPE under the GICv5 LPI domain and stores the base in the VM's GICv5
-state. The per-VPE doorbell state is also added to the CPU interface state.
+This commit introduces interfaces to validate and configure VPEs via the=20
+host's IRS MMIO interface. It also extends the VPE doorbell commands with=20
+VPE_MAKE_VALID.
 
 > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 3f7b132110114..1baec8e97ac28 100644
+> index fd64ea0173b2f..6d7d9e6ed9dbf 100644
 > --- a/arch/arm64/kvm/vgic/vgic-v5.c
 > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
 
 [ ... ]
 
-> @@ -152,6 +153,132 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
+> @@ -332,10 +344,73 @@ static int vgic_v5_irs_set_vist_invalid(u16 vm_id, =
+bool spi_ist)
+>  	return __vgic_v5_irs_update_vist_validity(vm_id, spi_ist, true);
 >  }
-
-[ ... ]
-
-> +static int vgic_v5_create_per_vm_domain(struct kvm *kvm)
+> =20
+> +static int vgic_v5_irs_set_up_vpe(u16 vm_id, u16 vpe_id,
+> +				  irq_hw_number_t db_hwirq)
 > +{
-> +	struct vgic_v5_vm *vm =3D &kvm->arch.vgic.gicv5_vm;
-> +	int nr_vcpus =3D atomic_read(&kvm->online_vcpus);
-> +	int id =3D task_pid_nr(current);
-> +	int ret, db_virq =3D 0;
+> +	u64 vmap_vper, dbr, selr;
+> +	u32 statusr, cr0;
+> +	int ret;
 > +
-> +	if (!gicv5_global_data.lpi_domain) {
-> +		kvm_err("LPI domain uninitialized, can't set up KVM Doorbells\n");
-> +		return -ENODEV;
-> +	}
+> +	guard(raw_spinlock_irqsave)(&global_irs_lock);
 > +
-> +	vm->fwnode =3D irq_domain_alloc_named_id_fwnode("GICv5-vpe-db", id);
-
-[Severity: Medium]
-Is it possible for irq_domain_alloc_named_id_fwnode() to fail and return NU=
-LL
-here under memory pressure?
-
-If it does, passing a NULL fwnode into irq_domain_create_hierarchy() below
-will cause it to silently fall back to a nameless domain, degrading the
-diagnostic state. Should there be a check here to return -ENOMEM if
-vm->fwnode fails to allocate?
-
+> +	/* Make sure that we are idle to begin with */
+> +	ret =3D vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
 > +
-> +	/*
-> +	 * KVM per-VM VPE DB domain; child of LPI domain; only ever handles
-> +	 * doorbells. We know how many doorbells we have, and therefore we
-> +	 * create a linear domain.
-> +	 */
-> +	vm->domain =3D irq_domain_create_hierarchy(gicv5_global_data.lpi_domain,
-> +						 0, nr_vcpus, vm->fwnode,
-> +						 &vgic_v5_irq_db_domain_ops, vm);
+> +	/* Mark the VPE as valid */
+> +	vmap_vper =3D FIELD_PREP(GICV5_IRS_VMAP_VPER_VPE_ID, vpe_id) |
+> +		    FIELD_PREP(GICV5_IRS_VMAP_VPER_VM_ID, vm_id) |
+> +		    GICV5_IRS_VMAP_VPER_M;
+> +	irs_writeq_relaxed(vmap_vper, GICV5_IRS_VMAP_VPER);
+> +
+> +	/* Wait for the VPE to be marked valid in the VPET */
+> +	ret =3D vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	selr =3D FIELD_PREP(GICV5_IRS_VPE_SELR_VPE_ID, vpe_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_VM_ID, vm_id) |
+> +	       GICV5_IRS_VPE_SELR_S;
+> +	irs_writeq_relaxed(selr, GICV5_IRS_VPE_SELR);
 
-[ ... ]
+[Severity: High]
+Is it possible to clobber a still-busy VPE engine here if a previous
+operation timed out?
+
+While vgic_v5_irs_set_up_vpe() checks vgic_v5_irs_wait_for_vm_op() at the
+start of the function, there does not appear to be a hardware idle check for
+the VPE operation unit (like vgic_v5_irs_wait_for_vpe_op()) before writing
+to GICV5_IRS_VPE_SELR.
+
+If an earlier call to vgic_v5_irs_set_up_vpe() timed out waiting for a VPE
+operation and released global_irs_lock on the error path, a subsequent call
+could find the VM operation unit idle but the VPE operation unit still busy.
+Writing to GICV5_IRS_VPE_SELR in this state could corrupt the hardware stat=
+e.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703154811.3355=
-680-1-sascha.bischoff@arm.com?part=3D8
+680-1-sascha.bischoff@arm.com?part=3D13
