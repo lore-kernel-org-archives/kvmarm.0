@@ -1,73 +1,37 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D311A3093CF
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 12:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41FB3BA236
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 12:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783081658; cv=none; b=qC400rjB6O2F//SVNWyijy4gM5MzXRSmYsQv3A0H6DPlt23JxuuT/chMsGgCIj2BgNUpcVZdq/35r9WYCkG+moFE6uOezkZGcmwlKANuoZ7NLEy6ipr4f8Y16iytfePEx0tcqI/aPZqmI+j+Tv05JdmdHERMOcqQTn1ppgbCX/E=
+	t=1783081659; cv=none; b=LgUrtrjKq44TK9Nz+AAMdajgkpcfHheSebgiw/RnQV8OV6wZxjyc8af6lHmcNQoS5d23ZBtZe5nj2c2k6MiTppJd2aNrxajAoZHs+1wUsFrfbdBqhaDV5WbEhSxUvmUreJTZuASENKjkO3oaOVJkWnURomMvw+jncLAlx5THaYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783081658; c=relaxed/simple;
-	bh=DNuhKED9jVnRH6pdAbcp2KLbjx0rKbaFTkcHdLkr8oY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nSkKCt0P+WfarqiRA2wCwCzZaUekCHrTOfX87iyBMKPTwHw4sIAPCntQISmBVaFNRC+nDI/+uviZU8OkG1SQprba5jqqMZVovjFv4i0jc1zSBTpPjI8WJ7uCW992RTBEoROA1yzxJ6a2moZ0pzaPQM/hwA6gxAGhhr6424CRgF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AMLsZcU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sJv+21uc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AMLsZcU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sJv+21uc; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1783081659; c=relaxed/simple;
+	bh=D18ibp70N1lueT6EbT3wXabuep3VCo7WEa+reapGatg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ridDaisC5u/fhyuq7LQbIHyMUoBTrYn4QYOwZPh79dpUjU0xHMsN2NTDY0irzmCMTM9eP+Uk67/qYIsmZWOUj9C4Yf1kaS+rYDCC8KmgGWOkXELC9rHqPUcgNPdnPH5pbY5qqbCZNxXxq47OIMQax7KYcWVG7YkD/ZTnv2RzWXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AMLsZcU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sJv+21uc";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AMLsZcU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sJv+21uc"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 077C572B71;
-	Fri,  3 Jul 2026 12:27:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783081655; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
-	b=0AMLsZcUNV2HQ/hEY7zLJFcidNm+mTIiNPKnT/MQgSzLWkA36TCiy2Ut0hq3TExlu71cSx
-	JLl9jd6ZNnHv/vhh2ujzfkgBHam9Ps1BUBWrHTgK/ejvc6E/V8r6GBEUfhG1sOTTCFZ5CK
-	+DTzSTHao+Kgeo5i+uHJTCuqvq1VFDA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783081655;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
-	b=sJv+21ucU8geHw4xoPX1fzF4rdBpGZkiOwmGRj+1SmzoRrYVvk712GtqjKvO/wBZZYMe6y
-	0KbHfyeZU7/uqJCA==
-Authentication-Results: smtp-out1.suse.de;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 17F94760B5;
+	Fri,  3 Jul 2026 12:27:36 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
 	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783081655; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
-	b=0AMLsZcUNV2HQ/hEY7zLJFcidNm+mTIiNPKnT/MQgSzLWkA36TCiy2Ut0hq3TExlu71cSx
-	JLl9jd6ZNnHv/vhh2ujzfkgBHam9Ps1BUBWrHTgK/ejvc6E/V8r6GBEUfhG1sOTTCFZ5CK
-	+DTzSTHao+Kgeo5i+uHJTCuqvq1VFDA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783081655;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=z0l//AzH2HTZT5yTyy4Dvdztx+UanKNGZzbJYyisHgU=;
-	b=sJv+21ucU8geHw4xoPX1fzF4rdBpGZkiOwmGRj+1SmzoRrYVvk712GtqjKvO/wBZZYMe6y
-	0KbHfyeZU7/uqJCA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 383EE779AA;
-	Fri,  3 Jul 2026 12:27:34 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 50FE9779AA;
+	Fri,  3 Jul 2026 12:27:35 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 1L7SCLaqR2rGIwAAD6G6ig
-	(envelope-from <clopez@suse.de>); Fri, 03 Jul 2026 12:27:34 +0000
+	id 4DHYELeqR2rGIwAAD6G6ig
+	(envelope-from <clopez@suse.de>); Fri, 03 Jul 2026 12:27:35 +0000
 From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
 To: kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
@@ -81,10 +45,12 @@ Cc: maz@kernel.org,
 	will@kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
-Subject: [PATCH v4 0/2] KVM: arm64: vgic: Fix racy LPI release and re-registration handling
-Date: Fri,  3 Jul 2026 14:25:59 +0200
-Message-ID: <20260703122601.2617577-2-clopez@suse.de>
+Subject: [PATCH v4 1/2] KVM: arm64: vgic: Fix race between LPI release and re-registration
+Date: Fri,  3 Jul 2026 14:26:00 +0200
+Message-ID: <20260703122601.2617577-3-clopez@suse.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260703122601.2617577-2-clopez@suse.de>
+References: <20260703122601.2617577-2-clopez@suse.de>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -93,61 +59,141 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Queue-Id: 17F94760B5
 X-Spam-Flag: NO
-X-Spam-Score: -3.30
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.993];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid]
+X-Spam-Score: -4.00
 X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
 
-Fix a couple of potential issues that could arise from racy LPI release
-and re-registration for the same INTID.
+Fix a potential race between decrementing an LPI's reference count and
+evicting that structure from the LPI xarray.
 
-The issue fixed in patch 1 can manifest itself through either a
-leaked LPI structure, or a prematurely deleted LPI. The issue fixed
-in patch 2 could materialize as a spurious -ENOMEM failure when
-registering an LPI.
+LPI structures are maintained in the VGIC LPI xarray (dist->lpi_xa).
+When the reference count of an LPI structure drops to zero,
+vgic_release_lpi_locked() removes the structure from the xarray and
+frees it under the xarray lock.
 
-v4:
-* Add __GFP_ACCOUNT to patch 2 (Sashiko).
+However, the release of an LPI can race with a concurrent LPI
+re-registration with the same INTID via vgic_add_lpi() on another CPU,
+since the reference count drop and the xarray eviction are not performed
+in a single atomic step. This can happen e.g. if the guest issues a
+DISCARD while the LPI is still referenced from a vCPU's active-pending
+list (ap_list), and the same INTID is re-mapped via MAPTI.
 
-v3:
-* Use refcount_dec_and_lock_irqsave() instead of unconditionally
-  grabbing the xarray lock in patch 1.
-* Add patch 2.
+Particularly, vgic_release_lpi_locked() is called from two distinct
+paths: direct release via vgic_put_irq(), and deferred release via
+vgic_release_deleted_lpis(). During direct release, the issue can result
+in deleting a newly registered LPI from the xarray:
 
-v2:
-* Address Sashiko's review. Fix the direct release path by decrementing
-  the refcount under the xarray spinlock, preventing a UAF that would
-  have been introduced in v1.
+  CPU0 (Releasing LPI)                    CPU1 (Adding new LPI)
+  ====================                    =====================
+  vgic_put_irq()
+      __vgic_put_irq()
+          refcount_dec_and_test()
+                                          vgic_add_lpi()
+                                              xa_lock_irqsave()
+                                              old_irq = xa_load(.., intid)
+                                              vgic_try_get_irq_ref(old_irq) == false
+                        new IRQ inserted -->  __xa_store(.., intid, ..)
+                                              xa_unlock_irqrestore()
+  xa_lock_irqsave();
+  vgic_release_lpi_locked()
+      __xa_erase(.., irq->intid)   <-- BUG: new IRQ is erased
+      kfree_rcu(old_irq)
 
+During the deferred release path, the old IRQ can be leaked:
 
-Carlos López (2):
-  KVM: arm64: vgic: Fix race between LPI release and re-registration
-  KVM: arm64: vgic: Mitigate potential LPI registration failure
+  CPU0 (Releasing LPI)                    CPU1 (Adding new LPI)
+  ====================                    =====================
+  vgic_put_irq_norelease()
+      __vgic_put_irq()
+          refcount_dec_and_test()
+      irq->pending_release = true
+                                          vgic_add_lpi()
+                                              xa_lock_irqsave()
+                                              old_irq = xa_load(.., intid)
+                                              vgic_try_get_irq_ref(oldirq) == false
+                 BUG: old IRQ overwritten --> __xa_store(.., intid, ..)
+                                              xa_unlock_irqrestore()
 
- arch/arm64/kvm/vgic/vgic-its.c | 11 ++++++++++-
+  vgic_release_deleted_lpis()
+      xa_lock_irqsave()
+      xa_for_each() { .. } <-- old IRQ with pending_release = true
+                               is gone, so it cannot be released
+
+To fix the direct release path, move the reference count drop inside
+the xarray lock, making sure that vgic_add_lpi() never encounters the
+to-be-released LPI.
+
+To fix the deferred release path, since the refcount drop must happen
+under a raw spinlock, the same solution does not work. Instead, update
+vgic_add_lpi(), so that if it evicts a non-NULL refcount=0 LPI from the
+xarray, it takes on the responsibility of releasing it. If this happens,
+vgic_release_deleted_lpis() will iterate the xarray normally and will
+simply not find the already released structure.
+
+Reported-by: Claude:claude-opus-4-6
+Fixes: 3a08a6ca7c37 ("KVM: arm64: vgic-v3: Use bare refcount for VGIC LPIs")
+Fixes: d54594accf73 ("KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks")
+Signed-off-by: Carlos López <clopez@suse.de>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 10 +++++++++-
  arch/arm64/kvm/vgic/vgic.c     | 10 ++++++----
- 2 files changed, 16 insertions(+), 5 deletions(-)
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-
-base-commit: 1ee27dacbe5dc4def481794d899d67b0d4570094
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 67d107e9a77d..577286069368 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -116,7 +116,15 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 		kfree(irq);
+ 		irq = oldirq;
+ 	} else {
+-		ret = xa_err(__xa_store(&dist->lpi_xa, intid, irq, 0));
++		/*
++		 * The entry is either empty or contains a dead LPI (refcount=0)
++		 * from the deferred release path, pending cleanup by
++		 * vgic_release_deleted_lpis(). Evict and free it if present.
++		 */
++		oldirq = __xa_store(&dist->lpi_xa, intid, irq, 0);
++		ret = xa_err(oldirq);
++		if (!ret && oldirq)
++			kfree_rcu(oldirq, rcu);
+ 	}
+ 
+ 	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 5a4768d8cd4f..cc09e0c45b46 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -167,12 +167,14 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 		guard(spinlock_irqsave)(&dist->lpi_xa.xa_lock);
+ 	}
+ 
+-	if (!__vgic_put_irq(kvm, irq))
++	if (!irq_is_lpi(kvm, irq->intid))
+ 		return;
+ 
+-	xa_lock_irqsave(&dist->lpi_xa, flags);
+-	vgic_release_lpi_locked(dist, irq);
+-	xa_unlock_irqrestore(&dist->lpi_xa, flags);
++	if (refcount_dec_and_lock_irqsave(&irq->refcount,
++					  &dist->lpi_xa.xa_lock, &flags)) {
++		vgic_release_lpi_locked(dist, irq);
++		xa_unlock_irqrestore(&dist->lpi_xa, flags);
++	}
+ }
+ 
+ static void vgic_release_deleted_lpis(struct kvm *kvm)
 -- 
 2.51.0
 
