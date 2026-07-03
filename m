@@ -1,275 +1,127 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B8F3B71C6
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2446A371072
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073983; cv=none; b=fmn/eSDfOWxGBGFPgGkzhMnsNUy7laTylGGzT6D2/J0L2cm+rkdZbjdIYjWro7yk4bADIO4OJK9m8t8ZDZ2KkoRTjyVy8x33wRcAzX0Q6hgGGF2PSAZklh2yErRe+fXMjMhYJSWxcBVuhXr36+HIGh0S8RR8OZN7EyHtfMkDvYo=
+	t=1783074011; cv=none; b=rp6hHJ/4NUl2LJMG2pf//q5h6T+8Z27kgiiHgIxg4p6pC34RSnPKnS+V4flxJFWex2yBcLhkBGgRbR46tcKsAawOvPi0exhzRN/zmqFs75HRNesr3d8byyYccwxPBx9fT8AHLKrnKUEzV8fDBHrcdrdDWm/hBQf5a03Tz6oJpTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073983; c=relaxed/simple;
-	bh=tRqX3R6EiKC5w+Fjl8swgCaFgI3p6H6/SqU24pOE9sM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=FyPvM9hJTTepwdpJw1iT73+SHOVqiVsg1KdlACKw2z4jrJV3c+IvHhsEKm8e8pjNMtOZrf1g6JTFKjZ5M04pgCkpgPLLWH2nnNVWtfPRVRA2RisyBHEfdBu35psld1+I7TMQHhL7Gj72T+8skVe/zzIrtc1L+gkD5/TCzyJutEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e0Cuc7Jv; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783074011; c=relaxed/simple;
+	bh=Mrjgxa4s7ivgXnID9SQpxnZQ4zuPKRtXCoZCN4NEwto=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=XoYJMOUS7tZRuYPc6UcNlegTTzf6MjBUF39HRTccMmVdnI7epsATY572yw61R/ccdD5o5rd7xe1YNqc8VoOVyqh2UsgVmC2gDDgW3DwphEHzxz+5a8bJhweICTqmnDAY8ke1ZZ/LRGPTx8ziYbnnNkTn0aXz/w7WWr0qQb/KAJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rim4htuI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e0Cuc7Jv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rim4htuI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716041F000E9;
+	Fri,  3 Jul 2026 10:20:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783074009;
+	bh=VwDPrRij7dU8Pt2h1IkiZmIbd5ofO7MadBXGEuFcW5U=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Rim4htuIxFyFzkuIgBWqiwI3wxTZ9PMzg+FVlQrnOtR2PDLDmfShdspzk5mcgz+Xn
+	 ikwnnpaQlYTfUKfpJH4kMEO4ORxo65wLo6S8Joe3ioebkDRj56B4KZeUHuLZJXY4iz
+	 Mqe3gzz8hgsqwRPYPsG3CekHST1kGXxHyH8ZPI3ZTxsaG4ouXQE4+gMwpSgbb//76p
+	 lDRAXs6sJEufCtw+JILnDN6whtcSt29WosejRWnMYCcltS/ugFn+U3wqCV45gu2i+R
+	 llzWOiZje8J6EkxcaG2KVPko7rizl8G8y6yfV6fnq5poHeAV6Dp8MMPuzNe6SEQs6H
+	 G9HUCLz141qIw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 09/17] arm64/idreg: Add an override for FEAT_NMI
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jinjie Ruan" <ruanjinjie@huawei.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260703100135.2512312-10-ruanjinjie@huawei.com>
+References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
+ <20260703100135.2512312-10-ruanjinjie@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Jul 2026 10:20:08 +0000
+Message-Id: <20260703102009.716041F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783073967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kh3FyxapX81U/ZPkDXPQ35eHo8l1a0EYTCkh/tPyQcQ=;
-	b=e0Cuc7JvJVHteKushc+UtNVkwNT9o1lVu5LvqWVmdqPsMSPQgu9A2kRfsnx0xQfRnUHPYp
-	E5DoGGsQTiJ/6LeWKpBLgQMBOdLAW9HcOCrzUybirGsEQP8UiAZrRmv4xietGvdTMPXY2X
-	gD/tE/T+aE5W3zMioXiLzp1kYJy+Cz0=
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 03 Jul 2026 10:19:10 +0000
-Message-Id: <DJOUYOKL6N3R.BFIO8HEL03OA@linux.dev>
-Subject: Re: [PATCH v12 02/16] set_memory: add
- folio_{zap,restore}_direct_map helpers
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Brendan Jackman" <brendan.jackman@linux.dev>
-To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
- <kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
- <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
- <linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
- <linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
- <loongarch@lists.linux.dev>, "linux-pm@vger.kernel.org"
- <linux-pm@vger.kernel.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
- <corbet@lwn.net>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "will@kernel.org"
- <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
- "tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
- <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
- "hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org"
- <willy@infradead.org>, "akpm@linux-foundation.org"
- <akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "vbabka@kernel.org" <vbabka@kernel.org>, "rppt@kernel.org"
- <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
- "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com"
- <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
- <kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
- "haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
- <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
- <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
- "jannh@google.com" <jannh@google.com>, "pfalcato@suse.de"
- <pfalcato@suse.de>, "skhan@linuxfoundation.org"
- <skhan@linuxfoundation.org>, "riel@surriel.com" <riel@surriel.com>,
- "ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
- <jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
- "kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>, "yosry@kernel.org"
- <yosry@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
- "tabba@google.com" <tabba@google.com>, "prsampat@amd.com"
- <prsampat@amd.com>, "jthoughton@google.com" <jthoughton@google.com>,
- "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, "aou@eecs.berkeley.edu"
- <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
- <borntraeger@linux.ibm.com>, "chenhuacai@kernel.org"
- <chenhuacai@kernel.org>, "baolu.lu@linux.intel.com"
- <baolu.lu@linux.intel.com>, "dev.jain@arm.com" <dev.jain@arm.com>,
- "gor@linux.ibm.com" <gor@linux.ibm.com>, "hca@linux.ibm.com"
- <hca@linux.ibm.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
- "pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
- <shijie@os.amperecomputing.com>, "svens@linux.ibm.com"
- <svens@linux.ibm.com>, "thuth@redhat.com" <thuth@redhat.com>,
- "yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
- <urezki@gmail.com>, "zhengqi.arch@bytedance.com"
- <zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
- <gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
- <jiayuan.chen@shopee.com>, "rafael@kernel.org" <rafael@kernel.org>,
- "yangyicong@hisilicon.com" <yangyicong@hisilicon.com>,
- "vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
- <jackmanb@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>,
- "Itazuri, Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek"
- <derekmn@amazon.com>
-References: <20260410151746.61150-1-kalyazin@amazon.com>
- <20260410151746.61150-3-kalyazin@amazon.com>
-In-Reply-To: <20260410151746.61150-3-kalyazin@amazon.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Fri Apr 10, 2026 at 3:18 PM UTC, Nikita Kalyazin wrote:
-> From: Nikita Kalyazin <nikita.kalyazin@linux.dev>
->
-> Let's provide folio_{zap,restore}_direct_map helpers as preparation for
-> supporting removal of the direct map for guest_memfd folios.
-> In folio_zap_direct_map(), flush TLB to make sure the data is not
-> accessible.  On some architectures, there may be a double TLB flush
-> issued because set_direct_map_valid_noflush already performs a flush
-> internally.
->
-> The new helpers need to be accessible to KVM on architectures that
-> support guest_memfd (x86 and arm64).
->
-> Direct map removal gives guest_memfd the same protection that
-> memfd_secret does, such as hardening against Spectre-like attacks
-> through in-kernel gadgets.
->
-> Acked-by: David Hildenbrand (Arm) <david@kernel.org>
-> Signed-off-by: Nikita Kalyazin <nikita.kalyazin@linux.dev>
-> ---
->  include/linux/set_memory.h | 13 +++++++++++
->  mm/memory.c                | 45 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 58 insertions(+)
->
-> diff --git a/include/linux/set_memory.h b/include/linux/set_memory.h
-> index 1a2563f525fc..24caea2931f9 100644
-> --- a/include/linux/set_memory.h
-> +++ b/include/linux/set_memory.h
-> @@ -41,6 +41,15 @@ static inline int set_direct_map_valid_noflush(const v=
-oid *addr,
->  	return 0;
->  }
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] Missing `isb()` after writing to the `SYS_HCRX_EL2` control system=
+ register in the `finalise_el2_state` macro.
+- [Medium] The EL2 setup logic for FEAT_NMI unconditionally fails because `=
+__check_override` operates on a garbage value instead of the actual `id_aa6=
+4pfr1_el1` register.
+--
+
+commit e25e512407767afb5fe8ee7e72e600b4c00a8c3a
+Author: Mark Brown <broonie@kernel.org>
+
+arm64/hyp-stub: Enable access to ALLINT
+
+This commit updates HCRX_EL2 to ensure that TALLINT is not set when support
+for NMIs is detected. This prevents traps from being enabled for NMIs,
+allowing them to be used properly.
+
+Link: https://lore.kernel.org/r/20221112151708.175147-7-broonie@kernel.org
+
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/=
+el2_setup.h
+> index aa8ec9df80243..73b8997f8d432 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -600,6 +600,19 @@
 > =20
-> +static inline int folio_zap_direct_map(struct folio *folio)
-> +{
-> +	return 0;
-> +}
+>  	msr_s	SYS_SMPRIMAP_EL2, xzr		// Make all priorities equal
+>  .Lskip_sme_\@:
 > +
-> +static inline void folio_restore_direct_map(struct folio *folio)
-> +{
-> +}
+> +	// NMIs
+> +	__check_override id_aa64pfr1, ID_AA64PFR1_EL1_NMI_SHIFT, 4, .Linit_nmi_=
+\@, .Lskip_nmi_\@, x1, x2
+
+[Severity: Medium]
+Could this inadvertently bypass the NMI setup by using __check_override
+instead of check_override?
+
+Because __check_override expects the hardware register value to already be
+loaded into x1, and it isn't loaded here, x1 contains leftover data from the
+preceding SME checks.
+
+As a result, the bitfield extraction will always evaluate to 0,
+unconditionally skipping the .Linit_nmi_\@ block and nullifying this
+initialization.
+
 > +
->  static inline bool kernel_page_present(struct page *page)
->  {
->  	return true;
-> @@ -57,6 +66,10 @@ static inline bool can_set_direct_map(void)
->  }
->  #define can_set_direct_map can_set_direct_map
->  #endif
+> +.Linit_nmi_\@:
+> +	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
+> +	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
+> +	cbz	x1, .Lskip_nmi_\@
 > +
-> +int folio_zap_direct_map(struct folio *folio);
-> +void folio_restore_direct_map(struct folio *folio);
-> +
->  #endif /* CONFIG_ARCH_HAS_SET_DIRECT_MAP */
+> +	mrs_s	x1, SYS_HCRX_EL2
+> +	and	x1, x1, # ~HCRX_EL2_TALLINT_MASK	// Don't trap ALLINT
+> +	msr_s	SYS_HCRX_EL2, x1
+
+[Severity: High]
+Is an isb instruction required immediately after writing to the SYS_HCRX_EL2
+control register here?
+
+Because the finalise_el2_state macro immediately terminates, the CPU will
+execute subsequent instructions without a context synchronization event.
+For instance, in arch/arm64/kvm/hyp/nvhe/hyp-init.S:
+
+__kvm_init_el2_state:
+    init_el2_state
+    finalise_el2_state
+    ret
+
+The ret instruction will execute against undefined pipeline state before the
+new configuration is synchronized.
+
+> +.Lskip_nmi_\@:
+>  .endm
 > =20
->  #ifdef CONFIG_X86_64
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 2f815a34d924..3b9ada2cc19c 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -78,6 +78,7 @@
->  #include <linux/sched/sysctl.h>
->  #include <linux/pgalloc.h>
->  #include <linux/uaccess.h>
-> +#include <linux/set_memory.h>
-> =20
->  #include <trace/events/kmem.h>
-> =20
-> @@ -7479,3 +7480,47 @@ void vma_pgtable_walk_end(struct vm_area_struct *v=
-ma)
->  	if (is_vm_hugetlb_page(vma))
->  		hugetlb_vma_unlock_read(vma);
->  }
-> +
-> +#ifdef CONFIG_ARCH_HAS_SET_DIRECT_MAP
-> +/**
-> + * folio_zap_direct_map - remove a folio from the kernel direct map
-> + * @folio: folio to remove from the direct map
-> + *
-> + * Removes the folio from the kernel direct map and flushes the TLB.  Th=
-is may
-> + * require splitting huge pages in the direct map, which can fail due to=
- memory
-> + * allocation.  So far, only order-0 folios are supported.
-> + *
-> + * Return: 0 on success, or a negative error code on failure.
-> + */
-> +int folio_zap_direct_map(struct folio *folio)
-> +{
-> +	const void *addr =3D folio_address(folio);
-> +	int ret;
-> +
-> +	if (folio_test_large(folio))
-> +		return -EINVAL;
-> +
-> +	ret =3D set_direct_map_valid_noflush(addr, folio_nr_pages(folio), false=
-);
-> +	flush_tlb_kernel_range((unsigned long)addr,
-> +			       (unsigned long)addr + folio_size(folio));
-> +
-> +	return ret;
-> +}
+>  #endif /* __ARM_KVM_INIT_H__ */
 
-My local Sashiko run pointed out that this is broken for highmem.
-
-There's no highmem for guest_memfd but there is for secretmem.
-
-... but this isn't actually an issue with the patch, it's currently
-broken in Linus' master:
-
-Su[   30.071284] ------------[ cut here ]------------
-ccessfully allocated and mapped 2097152000 bytes at 0x3a449000
-Populating memor[   30.074614] CPA: called for zero pte. vaddr =3D 0 cpa->v=
-addr =3D 0
-y...
-[   30.078636] WARNING: arch/x86/mm/pat/set_memory.c:1840 at __cpa_process_=
-fault+0x34d/0x360, CPU#5: allocate_secret/570
-[   30.084789] CPU: 5 UID: 0 PID: 570 Comm: allocate_secret Not tainted 7.1=
-.0-14063-g4edcdefd4083-dirty #10 PREEMPTLAZY
-[   30.090937] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
-[   30.097543] EIP: __cpa_process_fault+0x34d/0x360
-[   30.100514] Code: ff ff 85 c0 0f 89 7d fe ff ff e9 3d fe ff ff 8b 03 8b =
-00 c7 04 24 c8 ff 64 c1 89 44 24 08 8b 45 e8 89 44 24 04 e8 53 7a 00 00 <0f=
-> 0b c7 45 f0 f2 ff ff ff e9 fc fc ff ff 90 8d 74 26 00 55 25 00
-[   30.110829] EAX: 00000000 EBX: f64afe98 ECX: 00000000 EDX: 00000000
-[   30.114799] ESI: 00000000 EDI: f64afe98 EBP: f64afe04 ESP: f64afdcc
-[   30.118785] DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068 EFLAGS: 0001024=
-6
-[   30.123020] CR0: 80050033 CR2: 46c48ffc CR3: 038c8000 CR4: 00000690
-[   30.127010] Call Trace:
-[   30.129078]  __change_page_attr_set_clr+0x5e7/0x870
-[   30.132275]  ? console_unlock+0x99/0x130
-[   30.135069]  ? irq_work_queue+0x36/0x70
-[   30.137853]  ? page_address+0xd3/0xf0
-[   30.140421]  set_direct_map_invalid_noflush+0x52/0x60
-[   30.143782]  secretmem_fault+0x128/0x210
-[   30.146560]  __do_fault+0x25/0x90
-[   30.149053]  handle_mm_fault+0x6d1/0xcb0
-[   30.151759]  exc_page_fault+0x135/0x3b0
-[   30.154487]  ? doublefault_shim+0x150/0x150
-[   30.157416]  handle_exception+0x130/0x130
-[   30.160137] EIP: 0x804d29f
-[   30.162307] Code: 89 54 08 e1 89 54 08 e5 89 54 08 e9 89 54 08 ed c3 0f =
-b6 44 24 08 89 7c 24 0c 69 c0 01 01 01 01 8b 7c 24 04 f7 c7 0f 00 00 00 <89=
-> 44 0f fc 75 0e c1 e9 02 f3 ab 8b 44 24 04 8b 7c 24 0c c3 31 d2
-[   30.172936] EAX: 5a5a5a5a EBX: 00000000 ECX: 0c800000 EDX: 3a449000
-[   30.176927] ESI: 00000000 EDI: 3a449000 EBP: bfbbae18 ESP: bfbbadac
-[   30.180897] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 0001024=
-6
-[   30.185161]  ? doublefault_shim+0x150/0x150
-[   30.187979] ---[ end trace 0000000000000000 ]---
-Bus error                  (core dumped) ./allocate_secret_i686 2000M
-
-Fixing this directly in secretmem.c is kinda yucky but if we can just
-make folio_zap_direct_map() a NOP for highmem folios it's nice and easy
-so I propose to just fix it as a followup to this series.
-
-Alternatively, we maybe should disable secretmem for highmem systems
-since it evidently doesn't have any users.
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
+312-1-ruanjinjie@huawei.com?part=3D9
