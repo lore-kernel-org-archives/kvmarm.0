@@ -1,123 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BBF2E8E09;
-	Fri,  3 Jul 2026 16:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D291430676C;
+	Fri,  3 Jul 2026 16:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783096352; cv=none; b=gb8iuSc44Yh63gQFL/s54qrwF2kP+2AUJP9sXFF1ddFQY9FhVFbs0SBco20tfIfr6tK6g4V8RshB0W6lfiz+eNmzgLV2CRa0mQTu82jFk34yK0a/hFGuS8CNzWx7w+XvEkIhHCeHl2kw8X263IG3z+AttdGUq41f85s50LDisCs=
+	t=1783096385; cv=none; b=JYTERajYcztb1K781Oyn3lbuH+5drGOcJOarAeCsss27WPk9TfLvuvmYaF7tasdh8ezw/LDJqvHB07wVq054kpH5JcFd8WizkOQl/Rdo0T8gPi2OvZzDYB0cDc8aYjHl1MKKZu1A9tjDS5fejkjFBYx2VdaO6XIJXyw6SgPb68E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783096352; c=relaxed/simple;
-	bh=vPNaW4ZjgBH0UydRP5uACLrpJFosAYjsrkD8KT6JnTc=;
+	s=arc-20240116; t=1783096385; c=relaxed/simple;
+	bh=tTcbXaAsr91mWWFotajSr9UjcONUjkOCIjkaKrgOPSU=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=VV8rjOPuGWu3koU0kSaTUJaCCCbPQAyIDcH6l7AzGZsqubJWUCbk6wLvDNidUZCSBFZGU9Z97vPEz+2IHHYPiqnkOazDnlz4US2NJENjp2FUrQY1PFHuX0NMxErevzMiJAQ2e8CjwKh9gdy/LW8AA/JP1fLpUzkOAFcNCQVO71w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BP5YEPGE; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=dtGO4WykZw4Ghn+enmSn/U6GRIh7aeUN0UFamz0F+nGKcISlj9ypB8IxfeFvFwCdAMg2BsPgF4w3Dv9OtjMbGPiYR3qRaHOCTiPN+anQAx/X/pnlliaHmS236LaWo35qGSjK95vD6isGzxn2MbQFvl9ElU7PpFBFCYo/OgfIjx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fvOy9Vll; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BP5YEPGE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 750BE1F000E9;
-	Fri,  3 Jul 2026 16:32:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fvOy9Vll"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 669601F00A3A;
+	Fri,  3 Jul 2026 16:33:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783096350;
-	bh=6w4iFi7awEeoI6TFm3jP7AXWigyNZ/bymjmhaMqlMbU=;
+	s=k20260515; t=1783096383;
+	bh=SgK4GhdZOoo8LNxIlPHDmnkqDXstDpGpTTjkIo3q3o8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=BP5YEPGEjWCqKPbmW5M8TNGKwXe/JFNZnf8L1/3PkZg8ruUWgbcUffVNEP9TpHhGe
-	 A17/Tt43TOPtlA+gZQVjwpmSVt/c365oA3qjiP8hQZm5djUz96NeelxpjlFN68Bm57
-	 s+1jgS1UOktfsC6Mju9CkQNjfHvbtBIJlL0SUtmcMvdZe/CLvK3kfsyXxD/KpKuy7r
-	 h4yEWCDY/v+Z3c3TX5gYk1I9KAtbrF5p8hzF4UwuZR3VPUQgamutEDj2vgbmbvwmgM
-	 JT27QVQ/miXBoOccAnrl1AxLoZrNux3hxoZfc+KpEQrCEmaC9M9eZkR9GKshuH5AGP
-	 WUsYviGqlB0rQ==
+	b=fvOy9VllsWw9FXlC+dti+mk2utxFB7094/BwtT10KLoAhlSj+KhbP7H2MK9tFCf7f
+	 fjnNyNFErqdChGLKnPOzNhDxQaI8b3RSTOU1fZIZBM3mXLO33lKwTPw+1L0AO9LxhX
+	 eegWAP3obD/wczo8QASjeXC4BttJXMOZeBu4KcVH33lVtaaM/A8ZFbg7IEOgV3hXnL
+	 VDwg8bVkXCoCeTAA+EtGJPx/I+AOUEjXxKKGbhXv0PSDmbX1ax8ugx+u4tfcTEipmf
+	 7g88sHOukIaQf2Di4thoQT3bwGVnNEsTJvRuuRtiMQ8+u8uFKEIRtl9a/Ii4Pco3/m
+	 HaQJbEQk789Nw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 28/40] KVM: arm64: gic: Introduce set_pending_state()
- to irq_op
+Subject: Re: [PATCH v3 01/40] irqchip/gic-v5: Allow KVM setup without a
+ maintenance IRQ
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260703154811.3355680-29-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260703154811.3355680-2-sascha.bischoff@arm.com>
 References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
- <20260703154811.3355680-29-sascha.bischoff@arm.com>
+ <20260703154811.3355680-2-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 16:32:30 +0000
-Message-Id: <20260703163230.750BE1F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 16:33:02 +0000
+Message-Id: <20260703163303.669601F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Hardware pending state desynchronization for GICv5 SPIs and LPIs d=
-ue to omitted `set_pending_state` / `VDPEND` invocation in guest MMIO and M=
-SI paths.
+
+New issues:
+- [Medium] Leaked KVM `gic_kvm_info` allocation on error path when GICv5 le=
+gacy is supported but maintenance IRQ is absent.
+
+Pre-existing issues:
+- [High] Writes to GICv5 control-plane system registers (ICC_*_EL1) lack im=
+mediate `isb()` synchronization.
 --
 
-commit ee2f2b77547da18f2f1da7d79905b67a8cbca929
+commit 77500f7dacbe8c6ac1528bc594d810bf95cef563
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Subject: KVM: arm64: gic: Introduce set_pending_state() to irq_op
+Subject: irqchip/gic-v5: Allow KVM setup without a maintenance IRQ
 
-This commit introduces a new set_pending_state() function pointer to
-irq_ops for the ARM64 KVM VGIC. It calls this function in
-kvm_vgic_inject_irq() to allow the backend to mirror the updated VGIC
-shadow pending state into hardware for cases where hardware manages the
-lifecycle, such as GICv5 SPIs and LPIs.
+This commit modifies the GICv5 driver to allow KVM setup even if the
+maintenance interrupt is absent, provided that legacy GICv3 support is
+not required. It sets a flag to inform KVM that the maintenance interrupt
+is not needed for native GICv5 operation.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 8b15938464ab9..ee7fc0c7104e6 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-[ ... ]
-> @@ -563,6 +563,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_v=
-cpu *vcpu,
->  	else
->  		irq->pending_latch =3D true;
-> =20
-> +	if (irq->ops && irq->ops->set_pending_state)
-> +		WARN_ON_ONCE(!irq->ops->set_pending_state(vcpu, irq));
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> index e9d1795235a66..c04523a438cee 100644
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
+> @@ -1143,10 +1143,18 @@ static void __init gic_of_setup_kvm_info(struct d=
+evice_node *node)
+>  	/* GIC Virtual CPU interface maintenance interrupt */
+>  	gic_v5_kvm_info.no_maint_irq_mask =3D false;
+>  	gic_v5_kvm_info.maint_irq =3D irq_of_parse_and_map(node, 0);
+> -	if (!gic_v5_kvm_info.maint_irq) {
+> -		pr_warn("cannot find GICv5 virtual CPU interface maintenance interrupt=
+\n");
+> -		return;
+> -	}
 > +
+> +	/*
+> +	 * We require an MI if we have legacy support, but don't, otherwise.
+> +	 * Given that there's an existing flag to convey that an MI isn't
+> +	 * needed, we (ab)use it to tell KVM that the MI isn't needed if we
+> +	 * don't support legacy.
+> +	 *
+> +	 * The check for ARM64_HAS_GICV5_LEGACY explicitly doesn't use
+> +	 * cpus_have_final_cap() here as we run too early.
+> +	 */
+> +	if (!cpus_have_cap(ARM64_HAS_GICV5_LEGACY) && !gic_v5_kvm_info.maint_ir=
+q)
+> +		gic_v5_kvm_info.no_maint_irq_mask =3D true;
+> =20
+>  	vgic_set_kvm_info(&gic_v5_kvm_info);
+
+[Severity: Medium]
+Does this introduce a memory leak of the gic_kvm_info allocation?
+
+If ARM64_HAS_GICV5_LEGACY is supported and maint_irq is 0, this bypasses
+the early return and proceeds to vgic_set_kvm_info(), which dynamically
+allocates gic_kvm_info.
+
+Later, kvm_vgic_hyp_init() processes this configuration:
+
+arch/arm64/kvm/vgic/vgic-init.c:kvm_vgic_hyp_init() {
+    ...
+	if (has_mask && !gic_kvm_info->maint_irq) {
+		kvm_err("No vgic maintenance irq\n");
+		return -ENXIO;
+	}
+    ...
+}
+
+Will this early return bypass the kfree(gic_kvm_info) at the end of the
+function and leak the memory?
+
 
 [Severity: High]
-Since set_pending_state() is needed to mirror the shadow pending state to
-hardware for GICv5 SPIs and LPIs, does it also need to be called in other
-paths that update irq->pending_latch?
+This is a pre-existing issue, but do the writes to GICv5 control-plane syst=
+em
+registers lack immediate isb() synchronization?
 
-For example, when a guest writes to ISPENDR/ICPENDR to manually pend or
-clear an SPI, the shadow state is updated but the hardware update appears
-to be bypassed:
+For example, in drivers/irqchip/irq-gic-v5.c:gicv5_cpu_disable_interrupts():
 
-arch/arm64/kvm/vgic/vgic-mmio.c:__set_pending() {
-    ...
-    irq->pending_latch =3D true;
-    if (irq->hw && !is_user)
-        vgic_irq_set_phys_active(irq, true);
-   =20
-    vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-    ...
-}
+	cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 0);
+	write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
 
-Similarly, for LPIs injected via the ITS, the hardware update seems to be
-omitted:
+And in gicv5_cpu_enable_interrupts():
 
-arch/arm64/kvm/vgic/vgic-its.c:vgic_its_trigger_msi() {
-    ...
-    raw_spin_lock_irqsave(&irq->irq_lock, flags);
-    irq->pending_latch =3D true;
-    vgic_queue_irq_unlock(kvm, irq, flags);
-    ...
-}
+	write_sysreg_s(0, SYS_ICC_PPI_ENABLER0_EL1);
+	write_sysreg_s(0, SYS_ICC_PPI_ENABLER1_EL1);
 
-Could this lead to lost interrupts and potential system hangs if the
-hardware remains unaware of the pending state in these paths?
+	gicv5_ppi_priority_init();
 
-Additionally, do GICv5 LPIs get assigned an irq_ops struct? If not, they
-might lack a mechanism to issue the required VDPEND command when triggered
-via vgic_its_trigger_msi().
-
->  	vgic_queue_irq_unlock(kvm, irq, flags);
->  	vgic_put_irq(kvm, irq);
->
+ARM64 architectural invariants require writes to control-plane system
+registers to be followed immediately by an isb() as the very next
+instruction. Missing this can cause the CPU to operate under a stale
+configuration for several cycles.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703154811.3355=
-680-1-sascha.bischoff@arm.com?part=3D28
+680-1-sascha.bischoff@arm.com?part=3D1
