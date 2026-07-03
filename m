@@ -1,165 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD993B530F
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB933B47FC
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783074315; cv=none; b=EFxuIP9ybyze5WMWxA3/gQ6Wf7Akzv593/bBEVDjg0Gm6mhEHQcdZz/hx/YoGNk6Fa8Bby79WhyLaDIajsNLiKXpYIFBhcBicosekix2cqfFzvSpbzgSLCtaLxKnb1M3OnM51OdGQ8KfbfZUmifciobTRTiJabBMA4b31jSghfQ=
+	t=1783074316; cv=none; b=Yy81TZgNnjzpl5CkaygnnIoL2tD0BPCR9mlyGf3YsumP9kIPC4HjDOcAt7P8uHBMoMKhDKnJSqGMO74pPQzbx69TmDGREkPSoFEbgUnJZ0pwQqGDJf+SYnyR0SBbFfsw8zEGar770o7SjQ/t52d/Kl7zDE0oS2mTzqYoYFuH2Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783074315; c=relaxed/simple;
-	bh=JO9JnTib1lCpH5BdSAWrOTHZA3AN5xXQ2s+kIl5RHXE=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=CPhdLm+s5qy/aK/LC4SfbkYJfzmKyA4FDmdipmUaBNGf3AF9X1IS3Er3yzaJ77DNNC4isSDXNmm5ciA+Yud+UnFP+vVGRKRJWOaJpx23ubuLkTHeRzlh75eERrWjU2s8XWWZPREL8qI3ZggoRdzQ0q9kDnJE9QsXKfFcD/qMxMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iB7vWOw3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783074316; c=relaxed/simple;
+	bh=ZQ7CAuTPM6Tf9+DTaYp2vlX5tPQhRYzc+U6LC/OQ2LQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t3lIsTebtHcNKFbSXSglZ3OEpTO7pAna8y1mB0WS/QrO53XwSApnOJJUIs7bkYElK2I79oilMu3YfpaA45X1QNojeBXTDBcwBTd41TlikKDkGm9jfCelK+oFBvQE+SjH6vg+dfbJYbKfiviy92MO9SsqPbkSuloKs6pLK5Bg+yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=d8n/v18V; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iB7vWOw3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85AF91F000E9;
-	Fri,  3 Jul 2026 10:25:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783074313;
-	bh=meiEW+0kYqRmC+wGfkS7HDXZlx1QsRbB7YTMi1/+Be4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=iB7vWOw3+3xfUQ6qmAB+bFVC5xcqU01vYWl6o2lFekdd0zp2Eod1y+zUj5cbm4KOZ
-	 tMP1Xs/pZVwwpB/8wqJFH+DlDaJSdxlYQ3O8tm+r3iBQbIe7qAzQIU8fM/USi/drVV
-	 Wmxk20CPrQjgYg7oH7OdYNgc+FnL8OxXJ+XEM/wz70DexTwnZmXWPZvCwy+zWd7Lcf
-	 vFl3CZXi+52HWAdvqxLdga4ewMEXTyPoSY/NqeQ5UhtGhKNks2F2PcDchCT1E/bWTM
-	 SOkh51q6SoARErHb8QbM9rE1My7kUJj72pMFtcNlZX8vijC4GmRlpAhmJzqDBkbgbQ
-	 y2o0Tsm7XyfGw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 17/17] irqchip/gic-v3: Implement FEAT_GICv3_NMI support
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Jinjie Ruan" <ruanjinjie@huawei.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260703100135.2512312-18-ruanjinjie@huawei.com>
-References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <20260703100135.2512312-18-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 10:25:13 +0000
-Message-Id: <20260703102513.85AF91F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="d8n/v18V"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 795301F91;
+	Fri,  3 Jul 2026 03:25:10 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77A5F3F905;
+	Fri,  3 Jul 2026 03:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783074314; bh=ZQ7CAuTPM6Tf9+DTaYp2vlX5tPQhRYzc+U6LC/OQ2LQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d8n/v18VXUB34szM/yrAGV780z+7NVyAa8tqQWd3++dvpUiIZe42DsrEhhvoop3Hv
+	 4gQVbD147+LYcsrJQr1Ld/MG53+LJxvWo91A9QowhOFgTtIC1o6NvjezyDBVRLOb6s
+	 L43MNKKcgmzotD72h/Y//bM9/I0DQk1MT0DLLMN0=
+Date: Fri, 3 Jul 2026 11:24:53 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
+Message-ID: <nzvizmyxj4otyo5itl425vdflimp6pnkuwo4qtwzzsbjobhzco@ygxydualln47>
+References: <20260630121005.1130996-1-weilin.chang@arm.com>
+ <akYLdEuPXEGIZx3E@sm-arm-grace07>
+ <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
+ <akbuIDmd_zH9_m6K@sm-arm-grace07>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <akbuIDmd_zH9_m6K@sm-arm-grace07>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] Missing mapping for GICD_INMIR to GICD_INMIRnE in convert_offset_i=
-ndex() for ESPIs
-- [Low] Comment typo contradicts the implementation regarding expected inte=
-rrupt state
---
+On Fri, Jul 03, 2026 at 08:02:56AM +0900, Itaru Kitayama wrote:
+> On Thu, Jul 02, 2026 at 08:41:43AM +0100, Wei-Lin Chang wrote:
+> > On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
+> > > Hi Wei-Lin,
+> > > On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
+> > > > Hi,
+> > > > 
+> > > > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
+> > > > per mmu ptdump files work after all, mainly because there isn't a clean way to
+> > > > locate the specific nested mmu for each ptdump file as the nested mmus could be
+> > > > freed when the file gets opened. Therefore in this series a single file
+> > > > "shadow_page_tables" is created that dumps all valid mmus' page table
+> > > > information.
+> > > > 
+> > > > An advantage of this is that this new ptdump file have a lifetime identical to
+> > > > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
+> > > > dentry UAF found last time [1].
+> > > > 
+> > > > With this all ptdump files are only removed when the last kvm reference gets
+> > > > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
+> > > > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
+> > > > prevent UAF.
+> > > > 
+> > > > Patch 1-2: Undo previous shadow ptdump implementation.
+> > > > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
+> > > >            mmu->pgt is freed.
+> > > > Patch 4-5: Preparation for the shadow page table dump file.
+> > > > Patch 6:   Implementation of the shadow page table dump file.
+> > > > 
+> > > > The fixes are tested with CONFIG_PROVE_LOCKING,
+> > > > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
+> > > > 
+> > > > Thanks!
+> > > 
+> > > Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
+> > > for shadow stage 2 translation tables are built with ia_bits = 52 and
+> > > start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
+> > > out that's 3 levels. Is this fully expected?
+> > 
+> > Where is this level information you are seeing from? If it is
+> > "stage2_level", that only reports the number of levels for the canonical
+> > stage-2 (non nested). For nested mmus only the page tables are dumped in
+> > nested/shadow_page_tables.
+> 
+> Yes I know. The initial stage 2 translation table structure information is obtained by 
+> instrumenting the kernel using eBPF fexit to __kvm_pgtable_stage2_init().
+> 
+> Since you're correctly loopin over nested_mmus array, and the output is
+> correctly shown using the kvm_pgtable information via the kvm_s2_mmu for
+> them, I am confused at this moment.
 
-commit d7c99cd0a83704d2374d8fa536ff561f0b757f91
-Author: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Two things here:
 
-irqchip/gic-v3: Implement FEAT_GICv3_NMI support
+Firstly ia_bits being 52 is not expected to me, as I didn't change the
+VM's IPA size via KVM_VM_TYPE_ARM_IPA_SIZE in the selftest, to me I
+would expect ia_bits to be 40 (the default). Start level being 0 looks
+normal.
 
-The FEAT_GICv3_NMI GIC feature coupled with the CPU FEAT_NMI enables
-handling NMI interrupts in HW on aarch64, by adding a superpriority
-interrupt to the existing GIC priority scheme.
+Second thing is I still can't get what you are confused about, if it's
+not about the first point. Note that the "3" in ptdump means it is a
+level 3 mapping, not saying the page tables are using 3 levels.
 
-Link: https://lore.kernel.org/r/20221112151708.175147-15-broonie@kernel.org
+Happy to discuss more if you clarify. I'll also check the ia_bits when I
+get to it.
 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 111cd882c7a95..6e48dd9990219 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
+Thanks,
+Wei-Lin Chang
 
-[ ... ]
-
-> @@ -467,6 +482,42 @@ static int gic_peek_irq(struct irq_data *d, u32 offs=
-et)
->  	return !!(readl_relaxed(base + offset + (index / 32) * 4) & mask);
->  }
-> =20
-> +static DEFINE_RAW_SPINLOCK(irq_controller_lock);
-> +
-> +static void gic_irq_configure_nmi(struct irq_data *d, bool enable)
-> +{
-> +	void __iomem *base, *addr;
-> +	u32 offset, index, mask, val;
-> +
-> +	offset =3D convert_offset_index(d, GICD_INMIR, &index);
-
-[Severity: High]
-Does this miss the ESPI mapping for GICD_INMIR?
-
-When configuring an NMI for an Extended SPI (ESPI), convert_offset_index()
-is called with GICD_INMIR. However, the ESPI_RANGE switch block in
-convert_offset_index() currently lacks a case for GICD_INMIR:
-
-	case ESPI_RANGE:
-		*index =3D d->hwirq - ESPI_BASE_INTID;
-		switch (offset) {
-		case GICD_ISENABLER:
-			return GICD_ISENABLERnE;
-		...
-		default:
-			break;
-		}
-
-This will cause the switch to fall through to the default handler, trigger
-a WARN_ON(1), reset the index to the raw hardware IRQ number (>=3D 4096),
-and return the baseline GICD_INMIR offset.
-
-Could this result in an out-of-bounds MMIO read-modify-write on an
-incorrect register address when calculating addr below?
-
-> +	mask =3D 1 << (index % 32);
-> +
-> +	if (gic_irq_in_rdist(d))
-> +		base =3D gic_data_rdist_sgi_base();
-> +	else
-> +		base =3D gic_data.dist_base;
-> +
-> +	addr =3D base + offset + (index / 32) * 4;
-
-[ ... ]
-
-> @@ -857,6 +915,28 @@ static void __gic_handle_irq_from_irqson(struct pt_r=
-egs *regs)
->  	bool is_nmi;
->  	u32 irqnr;
-> =20
-> +	/*
-> +	 * We should enter here with interrupts disabled, otherwise we may met
-> +	 * a race here with FEAT_NMI/FEAT_GICv3_NMI:
-> +	 *
-> +	 * [interrupt disabled]
-> +	 *                   <- normal interrupt pending, for example timer int=
-errupt
-> +	 *                   <- NMI occurs, ISR_EL1.nmi =3D 1
-> +	 * do_el1_interrupt()
-> +	 *                   <- NMI withdraw, ISR_EL1.nmi =3D 0
-> +	 *   ISR_EL1.nmi =3D 0, not an NMI interrupt
-> +	 *   gic_handle_irq()
-> +	 *     __gic_handle_irq_from_irqson()
-> +	 *       irqnr =3D gic_read_iar() <- Oops, ack and handle an normal int=
-errupt
-> +	 *                                 in interrupt disabled context!
-> +	 *
-> +	 * So if we met this case here, just return from the interrupt context.
-> +	 * Since the interrupt is still pending, we can handle it once the
-> +	 * interrupt re-enabled and it'll not be missing.
-> +	 */
-> +	if (!interrupts_enabled(regs))
-> +		return;
-
-[Severity: Low]
-This isn't a bug, but does this comment contradict the code immediately
-below it?
-
-The comment states "We should enter here with interrupts disabled", but the
-code immediately returns if interrupts are disabled. Should the comment say
-"enabled" instead, or "we could enter here with interrupts disabled"?
-
-> +
->  	irqnr =3D gic_read_iar();
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
-312-1-ruanjinjie@huawei.com?part=3D17
+> 
+> Thanks,
+> Itaru.
+> 
+> > 
+> > Thanks,
+> > Wei-Lin Chang
+> > 
+> > > 
+> > > Thanks,
+> > > Itaru.
+> > > 
+> > > > 
+> > > > * Changes from v1 ([2]):
+> > > > 
+> > > >   - Move from per mmu ptdump files to one file that will dump all shadow page
+> > > >     tables.
+> > > > 
+> > > > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
+> > > > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
+> > > > 
+> > > > Wei-Lin Chang (6):
+> > > >   KVM: arm64: ptdump: Remove shadow ptdump files
+> > > >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
+> > > >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
+> > > >   KVM: arm64: ptdump: Factor out initialization of
+> > > >     kvm_ptdump_guest_state
+> > > >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
+> > > >     ptdump path
+> > > >   KVM: arm64: ptdump: Introduce the shadow ptdump file
+> > > > 
+> > > >  arch/arm64/include/asm/kvm_host.h |   5 +-
+> > > >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
+> > > >  arch/arm64/kvm/nested.c           |  18 +--
+> > > >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
+> > > >  4 files changed, 135 insertions(+), 77 deletions(-)
+> > > > 
+> > > > -- 
+> > > > 2.43.0
+> > > > 
