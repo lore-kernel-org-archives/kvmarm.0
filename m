@@ -1,212 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8EB3B5305
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A801E3B530F
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783074487; cv=none; b=I+PoQPqSYpZJD1gM4EA8ovQXKNxeUMroqRjfxMka49Cn9JdYzSr0f3QQS4ppDBRuK+eSnnpZTmOpJScj15O6OA1JpJVPRbFDu1Ry540oXb4TGj5gM7UZd9cX29Iz9qqND4j7s5OyOflBDWsB2njU82Irc6tvqff2flY0J058rTs=
+	t=1783074503; cv=none; b=HZjpgwF1qvE/i2GwdZZlTtzfgyEyDojFFVTUPSA70AdT07H8RW4v7oINypiQJdaoG17MM78Fk2zvlFYPOXN4BbFxa06s1bag/YJ8mxhBkbKYbFkyUrkhMyezsZgYzRB6cUm2SIG3W02NLP/u7UQ12H2IZEogjrUufT3+MogditE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783074487; c=relaxed/simple;
-	bh=HCfaiQ70wDFRE9iE7hAdyxdatvon4JcTAsPQjZG1BnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D0Mqbg8MbUHckyotOAS6XLgxKdu1/CbxOMs6hWckfBLlXcpmOvC284uFkqHb+iLDAcV/vlxLqoZYDtKDvMFRQ+TJMaYMXJdZE60RBX2BIwCwd5MVzucMRnzYIgcsFZyRBQhPzx0Td3VzTnGEinw+hREn+S0JzN2hnmrNqOkDdKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FhdgFc7m; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783074503; c=relaxed/simple;
+	bh=3LJprq2PH1kgXaH+2RR/kmwaIqKoF1OsBV4LQ2RES/M=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=cw7NLKU8opqxiE+I+TrsBnmVRX0egFSLhZXaO461BiqQYC9hdNTnZmHQ4wTQR+jc9t0SZ+tknhE49Tix659rM6RRL89ICmARISCoDGgbYOm7kPIzR4cgdKqcpwb0WlhMVDR5wK80HEXK54/yII26wNXi78jurFHIP3BFFbobpc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hn29AqYX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FhdgFc7m"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E2181F91;
-	Fri,  3 Jul 2026 03:28:01 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11C553F905;
-	Fri,  3 Jul 2026 03:27:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783074485; bh=HCfaiQ70wDFRE9iE7hAdyxdatvon4JcTAsPQjZG1BnM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FhdgFc7m0+X94gzv10Bb3P3XVYELZ7ey/aqt8urO0IQxMb8K1w46DpvxF4JsXg8/x
-	 L2GY3bCek9PXtG0GR4A2UCqgKELuPcjckiuHLErhDC6FwupKW8mmeqIMVyBTW8ckG/
-	 Gj+zLIcvhJJ2/Dbpr259d9FeiOPzSB1RqjIZZfUo=
-Date: Fri, 3 Jul 2026 11:27:47 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: ptdump: Introduce the shadow ptdump
- file
-Message-ID: <scnwtpvy2gkkzwjmweiaiiinxx7xtisbpjjlrtf2nxkraqqpg3@haaa3d3ll4et>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <20260630121005.1130996-7-weilin.chang@arm.com>
- <akbcl8vFrpq40qUM@sm-arm-grace07>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hn29AqYX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13E761F000E9;
+	Fri,  3 Jul 2026 10:28:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783074502;
+	bh=sh6yXJc8vvVxrLNUbmPnyUP8gMxMn2i56Ah5hgoyLV8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Hn29AqYX1qT7JzKRHqF0LrCzaXLqoHTeyv2pO8wYSU/mCmx9c5sFdEgzhiTJnkSm6
+	 KzOU9Pg+UPsuplHwF99Zu3QGH5ZcVXhirDcYFHeXqPViguzV86rP7YuuNJo/YCVwIN
+	 WmDcUV8xwC4XckA6OhU8XyHq1P04VrNZRwABduAhfAU7DptUe5K4nlwBSSOVb7NOOX
+	 yytrkZY7kj7jlc5UmUgkwcCdraLRGoMgGUIV3enmvWWZnE6Z52nzZgxjcdZdBjqK+z
+	 V/znM1EiCu+KkNQqKDhd17g7PoDCsXlcRkX0gDlbLlqY4kKf5BI9XFDBYlX3L+FrvF
+	 mFUXK1hUwBF1g==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 16/17] arm64/nmi: Add Kconfig for NMI
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jinjie Ruan" <ruanjinjie@huawei.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260703100135.2512312-17-ruanjinjie@huawei.com>
+References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
+ <20260703100135.2512312-17-ruanjinjie@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Jul 2026 10:28:21 +0000
+Message-Id: <20260703102822.13E761F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akbcl8vFrpq40qUM@sm-arm-grace07>
 
-On Fri, Jul 03, 2026 at 06:48:07AM +0900, Itaru Kitayama wrote:
-> On Tue, Jun 30, 2026 at 01:10:05PM +0100, Wei-Lin Chang wrote:
-> > Create a ptdump file for all shadow page tables. It will dump out all
-> > valid shadow page tables at the time of request, with the mmu's index,
-> > guest VTCR_EL2, VTTBR_EL2, and whether the guest stage-2 is enabled or
-> > not.
-> > 
-> > Also detach the nested mmu array under the mmu_lock in
-> > kvm_arch_flush_shadow_all() so readers cannot race with the array being
-> > removed, then free the old array after dropping the lock.
-> > 
-> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> > ---
-> >  arch/arm64/kvm/nested.c | 12 ++++++--
-> >  arch/arm64/kvm/ptdump.c | 61 ++++++++++++++++++++++++++++++++++++++++-
-> >  2 files changed, 69 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 6435efd65cb5..17a180ddf6ca 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1283,6 +1283,7 @@ void kvm_nested_s2_flush(struct kvm *kvm)
-> >  
-> >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> >  {
-> > +	struct kvm_s2_mmu *mmus;
-> >  	int i;
-> >  
-> >  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> > @@ -1291,9 +1292,14 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> >  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
-> >  			kvm_free_stage2_pgd(mmu);
-> >  	}
-> > -	kvfree(kvm->arch.nested_mmus);
-> > -	kvm->arch.nested_mmus = NULL;
-> > -	kvm->arch.nested_mmus_size = 0;
-> > +
-> > +	scoped_guard(write_lock, &kvm->mmu_lock) {
-> > +		mmus = kvm->arch.nested_mmus;
-> > +		kvm->arch.nested_mmus = NULL;
-> > +		kvm->arch.nested_mmus_size = 0;
-> > +	}
-> > +
-> > +	kvfree(mmus);
-> >  	kvm_uninit_stage2_mmu(kvm);
-> >  }
-> >  
-> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > index 40f93b7c7ad9..1649eaa75798 100644
-> > --- a/arch/arm64/kvm/ptdump.c
-> > +++ b/arch/arm64/kvm/ptdump.c
-> > @@ -181,6 +181,50 @@ static int kvm_ptdump_guest_canonical_show(struct seq_file *m, void *unused)
-> >  	return 0;
-> >  }
-> >  
-> > +static int kvm_ptdump_guest_nested_show(struct seq_file *m, void *unused)
-> > +{
-> > +	int ret = 0, i;
-> > +	struct kvm_ptdump_guest_state *st = m->private;
-> > +	struct kvm *kvm = st->kvm;
-> > +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
-> > +		.cb	= kvm_ptdump_visitor,
-> > +		.arg	= &st->parser_state,
-> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> > +	};
-> > +
-> > +	guard(write_lock)(&kvm->mmu_lock);
-> > +
-> > +	if (!kvm->arch.nested_mmus)
-> > +		return 0;
-> > +
-> > +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> > +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> > +
-> > +		if (!mmu->pgt)
-> > +			continue;
-> > +
-> > +		if (kvm_s2_mmu_valid(mmu)) {
-> > +			memset(st, 0, sizeof(*st));
-> > +			ret = kvm_ptdump_parser_init(st, kvm, mmu->pgt);
-> > +			if (ret)
-> > +				return ret;
-> > +			st->parser_state = (struct ptdump_pg_state) {
-> > +				.marker		= &st->ipa_marker[0],
-> > +				.level		= -1,
-> > +				.pg_level	= &st->level[0],
-> > +				.seq		= m,
-> > +			};
-> > +			seq_printf(m, "nested mmu %d VTCR: 0x%016llx VTTBR: 0x%016llx s2: %s\n",
-> > +				   i, mmu->tlb_vtcr, mmu->tlb_vttbr,
-> > +				   mmu->nested_stage2_enabled ? "enabled" : "disabled");
-> 
-> This header information in the debugfs "shadow_page_tables" file, under
-> the nested directory is showing guest hypervisor's configuration while
-> the file is designed to show nested guest's shadwo stage 2 translation
-> tables layouts owned by Host EL2 hypervisor. Is this intentional?
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] ARM64_NMI enables architected NMI support but forgets to select =
+HAVE_PERF_EVENTS_NMI, disabling the Perf Hardlockup Detector.
+--
 
-Yes, this is intentional. Here we are exposing guest hypervisor VTCR,
-VTTBR, s2 enabled or not, because that is how the host hypervisor
-distinguishes between different nested mmus (lookup_s2_mmu()).
+commit f760a575acac0e1b2376b42b4862ffcc32421ca9
+Author: Mark Brown <broonie@kernel.org>
 
-Thanks,
-Wei-Lin Chang
+arm64/nmi: Add Kconfig for NMI
+   =20
+Since NMI handling is in some fairly hot paths we provide a Kconfig option
+which allows support to be compiled out when not needed.
 
-> 
-> Thanks,
-> Itaru.
-> 
-> > +			ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> > +			if (ret)
-> > +				return ret;
-> > +		}
-> > +	}
-> > +	return ret;
-> > +}
-> > +
-> >  static int kvm_ptdump_guest_open(struct inode *m, struct file *file,
-> >  				 int (*show)(struct seq_file *, void *))
-> >  {
-> > @@ -212,6 +256,11 @@ static int kvm_ptdump_guest_canonical_open(struct inode *m, struct file *file)
-> >  	return kvm_ptdump_guest_open(m, file, kvm_ptdump_guest_canonical_show);
-> >  }
-> >  
-> > +static int kvm_ptdump_guest_nested_open(struct inode *m, struct file *file)
-> > +{
-> > +	return kvm_ptdump_guest_open(m, file, kvm_ptdump_guest_nested_show);
-> > +}
-> > +
-> >  static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
-> >  {
-> >  	struct kvm *kvm = m->i_private;
-> > @@ -230,6 +279,13 @@ static const struct file_operations kvm_ptdump_guest_canonical_fops = {
-> >  	.release	= kvm_ptdump_guest_close,
-> >  };
-> >  
-> > +static const struct file_operations kvm_ptdump_guest_nested_fops = {
-> > +	.open		= kvm_ptdump_guest_nested_open,
-> > +	.read		= seq_read,
-> > +	.llseek		= seq_lseek,
-> > +	.release	= kvm_ptdump_guest_close,
-> > +};
-> > +
-> >  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
-> >  {
-> >  	struct kvm *kvm = m->private;
-> > @@ -307,6 +363,9 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
-> >  			    kvm, &kvm_pgtable_range_fops);
-> >  	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
-> >  			    kvm, &kvm_pgtable_levels_fops);
-> > -	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> > +	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT)) {
-> >  		kvm->arch.debugfs_nv_dentry = debugfs_create_dir("nested", kvm->debugfs_dentry);
-> > +		debugfs_create_file("shadow_page_tables", 0400, kvm->arch.debugfs_nv_dentry,
-> > +				    kvm, &kvm_ptdump_guest_nested_fops);
-> > +	}
-> >  }
-> > -- 
-> > 2.43.0
-> > 
+Link: https://lore.kernel.org/r/20221112151708.175147-14-broonie@kernel.org
+
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index b3afe0688919b..218996752079e 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -2195,6 +2195,23 @@ endmenu # "ARMv8.7 architectural features"
+>  config AS_HAS_MOPS
+>  	def_bool $(as-instr,.arch_extension mops)
+> =20
+> +menu "ARMv8.8 architectural features"
+> +
+> +config ARM64_NMI
+> +	bool "Enable support for Non-maskable Interrupts (NMI)"
+
+[Severity: Medium]
+Does this configuration need to propagate its capability to the perf events
+subsystem?
+
+Currently, the main ARM64 configuration conditionally selects
+HAVE_PERF_EVENTS_NMI when ARM64_PSEUDO_NMI is enabled:
+
+arch/arm64/Kconfig:config ARM64
+    ...
+    select HAVE_PERF_EVENTS_NMI if ARM64_PSEUDO_NMI
+    ...
+
+Without similar treatment for ARM64_NMI, does the perf-based hardlockup
+detector become silently unavailable when the system is configured to use
+architected NMIs instead of pseudo-NMIs?
+
+Should the ARM64 configuration be updated to select HAVE_PERF_EVENTS_NMI if
+ARM64_NMI is also enabled?
+
+> +	default y
+> +	help
+> +	  Non-maskable interrupts are an architecture and GIC feature
+> +	  which allow the system to configure some interrupts to be
+> +	  configured to have superpriority, allowing them to be handled
+> +	  before other interrupts and masked for shorter periods of time.
+> +
+> +	  The feature is detected at runtime, and will remain disabled
+> +	  if the cpu does not implement the feature. It will also be
+> +	  disabled if pseudo NMIs are enabled at runtime.
+> +
+> +endmenu # "ARMv8.8 architectural features"
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
+312-1-ruanjinjie@huawei.com?part=3D16
