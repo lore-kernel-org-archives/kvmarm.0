@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2446A371072
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD993B530F
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jul 2026 10:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783074011; cv=none; b=rp6hHJ/4NUl2LJMG2pf//q5h6T+8Z27kgiiHgIxg4p6pC34RSnPKnS+V4flxJFWex2yBcLhkBGgRbR46tcKsAawOvPi0exhzRN/zmqFs75HRNesr3d8byyYccwxPBx9fT8AHLKrnKUEzV8fDBHrcdrdDWm/hBQf5a03Tz6oJpTE=
+	t=1783074315; cv=none; b=EFxuIP9ybyze5WMWxA3/gQ6Wf7Akzv593/bBEVDjg0Gm6mhEHQcdZz/hx/YoGNk6Fa8Bby79WhyLaDIajsNLiKXpYIFBhcBicosekix2cqfFzvSpbzgSLCtaLxKnb1M3OnM51OdGQ8KfbfZUmifciobTRTiJabBMA4b31jSghfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783074011; c=relaxed/simple;
-	bh=Mrjgxa4s7ivgXnID9SQpxnZQ4zuPKRtXCoZCN4NEwto=;
+	s=arc-20240116; t=1783074315; c=relaxed/simple;
+	bh=JO9JnTib1lCpH5BdSAWrOTHZA3AN5xXQ2s+kIl5RHXE=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=XoYJMOUS7tZRuYPc6UcNlegTTzf6MjBUF39HRTccMmVdnI7epsATY572yw61R/ccdD5o5rd7xe1YNqc8VoOVyqh2UsgVmC2gDDgW3DwphEHzxz+5a8bJhweICTqmnDAY8ke1ZZ/LRGPTx8ziYbnnNkTn0aXz/w7WWr0qQb/KAJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rim4htuI; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=CPhdLm+s5qy/aK/LC4SfbkYJfzmKyA4FDmdipmUaBNGf3AF9X1IS3Er3yzaJ77DNNC4isSDXNmm5ciA+Yud+UnFP+vVGRKRJWOaJpx23ubuLkTHeRzlh75eERrWjU2s8XWWZPREL8qI3ZggoRdzQ0q9kDnJE9QsXKfFcD/qMxMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iB7vWOw3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rim4htuI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716041F000E9;
-	Fri,  3 Jul 2026 10:20:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iB7vWOw3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85AF91F000E9;
+	Fri,  3 Jul 2026 10:25:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783074009;
-	bh=VwDPrRij7dU8Pt2h1IkiZmIbd5ofO7MadBXGEuFcW5U=;
+	s=k20260515; t=1783074313;
+	bh=meiEW+0kYqRmC+wGfkS7HDXZlx1QsRbB7YTMi1/+Be4=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Rim4htuIxFyFzkuIgBWqiwI3wxTZ9PMzg+FVlQrnOtR2PDLDmfShdspzk5mcgz+Xn
-	 ikwnnpaQlYTfUKfpJH4kMEO4ORxo65wLo6S8Joe3ioebkDRj56B4KZeUHuLZJXY4iz
-	 Mqe3gzz8hgsqwRPYPsG3CekHST1kGXxHyH8ZPI3ZTxsaG4ouXQE4+gMwpSgbb//76p
-	 lDRAXs6sJEufCtw+JILnDN6whtcSt29WosejRWnMYCcltS/ugFn+U3wqCV45gu2i+R
-	 llzWOiZje8J6EkxcaG2KVPko7rizl8G8y6yfV6fnq5poHeAV6Dp8MMPuzNe6SEQs6H
-	 G9HUCLz141qIw==
+	b=iB7vWOw3+3xfUQ6qmAB+bFVC5xcqU01vYWl6o2lFekdd0zp2Eod1y+zUj5cbm4KOZ
+	 tMP1Xs/pZVwwpB/8wqJFH+DlDaJSdxlYQ3O8tm+r3iBQbIe7qAzQIU8fM/USi/drVV
+	 Wmxk20CPrQjgYg7oH7OdYNgc+FnL8OxXJ+XEM/wz70DexTwnZmXWPZvCwy+zWd7Lcf
+	 vFl3CZXi+52HWAdvqxLdga4ewMEXTyPoSY/NqeQ5UhtGhKNks2F2PcDchCT1E/bWTM
+	 SOkh51q6SoARErHb8QbM9rE1My7kUJj72pMFtcNlZX8vijC4GmRlpAhmJzqDBkbgbQ
+	 y2o0Tsm7XyfGw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 09/17] arm64/idreg: Add an override for FEAT_NMI
+Subject: Re: [PATCH 17/17] irqchip/gic-v3: Implement FEAT_GICv3_NMI support
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jinjie Ruan" <ruanjinjie@huawei.com>
 Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260703100135.2512312-10-ruanjinjie@huawei.com>
+In-Reply-To: <20260703100135.2512312-18-ruanjinjie@huawei.com>
 References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <20260703100135.2512312-10-ruanjinjie@huawei.com>
+ <20260703100135.2512312-18-ruanjinjie@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Jul 2026 10:20:08 +0000
-Message-Id: <20260703102009.716041F000E9@smtp.kernel.org>
+Date: Fri, 03 Jul 2026 10:25:13 +0000
+Message-Id: <20260703102513.85AF91F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,81 +47,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Missing `isb()` after writing to the `SYS_HCRX_EL2` control system=
- register in the `finalise_el2_state` macro.
-- [Medium] The EL2 setup logic for FEAT_NMI unconditionally fails because `=
-__check_override` operates on a garbage value instead of the actual `id_aa6=
-4pfr1_el1` register.
+- [High] Missing mapping for GICD_INMIR to GICD_INMIRnE in convert_offset_i=
+ndex() for ESPIs
+- [Low] Comment typo contradicts the implementation regarding expected inte=
+rrupt state
 --
 
-commit e25e512407767afb5fe8ee7e72e600b4c00a8c3a
-Author: Mark Brown <broonie@kernel.org>
+commit d7c99cd0a83704d2374d8fa536ff561f0b757f91
+Author: Lorenzo Pieralisi <lpieralisi@kernel.org>
 
-arm64/hyp-stub: Enable access to ALLINT
+irqchip/gic-v3: Implement FEAT_GICv3_NMI support
 
-This commit updates HCRX_EL2 to ensure that TALLINT is not set when support
-for NMIs is detected. This prevents traps from being enabled for NMIs,
-allowing them to be used properly.
+The FEAT_GICv3_NMI GIC feature coupled with the CPU FEAT_NMI enables
+handling NMI interrupts in HW on aarch64, by adding a superpriority
+interrupt to the existing GIC priority scheme.
 
-Link: https://lore.kernel.org/r/20221112151708.175147-7-broonie@kernel.org
+Link: https://lore.kernel.org/r/20221112151708.175147-15-broonie@kernel.org
 
-> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/=
-el2_setup.h
-> index aa8ec9df80243..73b8997f8d432 100644
-> --- a/arch/arm64/include/asm/el2_setup.h
-> +++ b/arch/arm64/include/asm/el2_setup.h
-> @@ -600,6 +600,19 @@
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 111cd882c7a95..6e48dd9990219 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+
+[ ... ]
+
+> @@ -467,6 +482,42 @@ static int gic_peek_irq(struct irq_data *d, u32 offs=
+et)
+>  	return !!(readl_relaxed(base + offset + (index / 32) * 4) & mask);
+>  }
 > =20
->  	msr_s	SYS_SMPRIMAP_EL2, xzr		// Make all priorities equal
->  .Lskip_sme_\@:
+> +static DEFINE_RAW_SPINLOCK(irq_controller_lock);
 > +
-> +	// NMIs
-> +	__check_override id_aa64pfr1, ID_AA64PFR1_EL1_NMI_SHIFT, 4, .Linit_nmi_=
-\@, .Lskip_nmi_\@, x1, x2
-
-[Severity: Medium]
-Could this inadvertently bypass the NMI setup by using __check_override
-instead of check_override?
-
-Because __check_override expects the hardware register value to already be
-loaded into x1, and it isn't loaded here, x1 contains leftover data from the
-preceding SME checks.
-
-As a result, the bitfield extraction will always evaluate to 0,
-unconditionally skipping the .Linit_nmi_\@ block and nullifying this
-initialization.
-
+> +static void gic_irq_configure_nmi(struct irq_data *d, bool enable)
+> +{
+> +	void __iomem *base, *addr;
+> +	u32 offset, index, mask, val;
 > +
-> +.Linit_nmi_\@:
-> +	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
-> +	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
-> +	cbz	x1, .Lskip_nmi_\@
-> +
-> +	mrs_s	x1, SYS_HCRX_EL2
-> +	and	x1, x1, # ~HCRX_EL2_TALLINT_MASK	// Don't trap ALLINT
-> +	msr_s	SYS_HCRX_EL2, x1
+> +	offset =3D convert_offset_index(d, GICD_INMIR, &index);
 
 [Severity: High]
-Is an isb instruction required immediately after writing to the SYS_HCRX_EL2
-control register here?
+Does this miss the ESPI mapping for GICD_INMIR?
 
-Because the finalise_el2_state macro immediately terminates, the CPU will
-execute subsequent instructions without a context synchronization event.
-For instance, in arch/arm64/kvm/hyp/nvhe/hyp-init.S:
+When configuring an NMI for an Extended SPI (ESPI), convert_offset_index()
+is called with GICD_INMIR. However, the ESPI_RANGE switch block in
+convert_offset_index() currently lacks a case for GICD_INMIR:
 
-__kvm_init_el2_state:
-    init_el2_state
-    finalise_el2_state
-    ret
+	case ESPI_RANGE:
+		*index =3D d->hwirq - ESPI_BASE_INTID;
+		switch (offset) {
+		case GICD_ISENABLER:
+			return GICD_ISENABLERnE;
+		...
+		default:
+			break;
+		}
 
-The ret instruction will execute against undefined pipeline state before the
-new configuration is synchronized.
+This will cause the switch to fall through to the default handler, trigger
+a WARN_ON(1), reset the index to the raw hardware IRQ number (>=3D 4096),
+and return the baseline GICD_INMIR offset.
 
-> +.Lskip_nmi_\@:
->  .endm
+Could this result in an out-of-bounds MMIO read-modify-write on an
+incorrect register address when calculating addr below?
+
+> +	mask =3D 1 << (index % 32);
+> +
+> +	if (gic_irq_in_rdist(d))
+> +		base =3D gic_data_rdist_sgi_base();
+> +	else
+> +		base =3D gic_data.dist_base;
+> +
+> +	addr =3D base + offset + (index / 32) * 4;
+
+[ ... ]
+
+> @@ -857,6 +915,28 @@ static void __gic_handle_irq_from_irqson(struct pt_r=
+egs *regs)
+>  	bool is_nmi;
+>  	u32 irqnr;
 > =20
->  #endif /* __ARM_KVM_INIT_H__ */
+> +	/*
+> +	 * We should enter here with interrupts disabled, otherwise we may met
+> +	 * a race here with FEAT_NMI/FEAT_GICv3_NMI:
+> +	 *
+> +	 * [interrupt disabled]
+> +	 *                   <- normal interrupt pending, for example timer int=
+errupt
+> +	 *                   <- NMI occurs, ISR_EL1.nmi =3D 1
+> +	 * do_el1_interrupt()
+> +	 *                   <- NMI withdraw, ISR_EL1.nmi =3D 0
+> +	 *   ISR_EL1.nmi =3D 0, not an NMI interrupt
+> +	 *   gic_handle_irq()
+> +	 *     __gic_handle_irq_from_irqson()
+> +	 *       irqnr =3D gic_read_iar() <- Oops, ack and handle an normal int=
+errupt
+> +	 *                                 in interrupt disabled context!
+> +	 *
+> +	 * So if we met this case here, just return from the interrupt context.
+> +	 * Since the interrupt is still pending, we can handle it once the
+> +	 * interrupt re-enabled and it'll not be missing.
+> +	 */
+> +	if (!interrupts_enabled(regs))
+> +		return;
+
+[Severity: Low]
+This isn't a bug, but does this comment contradict the code immediately
+below it?
+
+The comment states "We should enter here with interrupts disabled", but the
+code immediately returns if interrupts are disabled. Should the comment say
+"enabled" instead, or "we could enter here with interrupts disabled"?
+
+> +
+>  	irqnr =3D gic_read_iar();
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260703100135.2512=
-312-1-ruanjinjie@huawei.com?part=3D9
+312-1-ruanjinjie@huawei.com?part=3D17
