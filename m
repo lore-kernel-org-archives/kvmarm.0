@@ -1,220 +1,114 @@
-Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE96380FE2
-	for <kvmarm@lists.linux.dev>; Sun,  5 Jul 2026 14:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287CE1DB95E
+	for <kvmarm@lists.linux.dev>; Sun,  5 Jul 2026 17:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783260781; cv=none; b=oc366xy9TU7iFe0mIil77zsAx25a5jvJilIYjkIG9AKCsFEPfftP927h7XN9TajyrQG6jIBg1exdDdJIh8sgVpxRk3glkyTBNljmv3NUmRIwbrBy3tqx2yxTgkW6LpRnQgwzel3UbENAxp18WGdvC7Jjx3TSTgtff4yK+XwKnf8=
+	t=1783272540; cv=none; b=E3q+Oh4N0nmX4mH7IcdEvamxSdlPNVGFir/thUhLFgF3LrxjOA8hV3HW4J0AXTxzX+zAe7KfvX4/Zxx1zjLR7U/WdmpLZhSg3AuHq39GQmeElN36jVVeFV1L0v81wPHgkn2YHuV8ie7dLzepmTJKEIBPX/JifrJ/ECllXlSZn7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783260781; c=relaxed/simple;
-	bh=IxWISSH164qW4Dnm2hhDGpC1SNwe3zHnzxSDLrHz5bY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=kseDi18aGpSCmx8ASxAPdxAfVzJgRDLTwEbFVOaxbFEt5+J3T+trcQkCfg7N656tcOYdrmt5mzrVkKU165Z4WbrkuKqdEAcFUGrrr5aCN9z4NXF4ZlRtF3I5Yae/gEhv0nQjS5iarsoO6qZsSuuEpcp27rt5How85spZrvwqkGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=nb/ADLbr; arc=none smtp.client-ip=198.167.222.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
+	s=arc-20240116; t=1783272540; c=relaxed/simple;
+	bh=Nn0UY7IDrPjzK/lXT6hguEQXCE8OQUIxdHe1hkL3bKg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cxxgaZKJ6aOxaeTwB6Tki7gtgmuv+glj4/v9pPyIzy0+2cEHpNqvHXAZVBeqUsqaTGDiEuv4Mz8ee5FregWsvSvnNqrjP5O5NMMu/C/TbBh/Iz+tVUrBH8+icVwV866+wdakiXcsJHl29oQlS13JlDesU3FktefYKjeEjYqXAKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UhAXijQp; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="nb/ADLbr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
-	s=stigmate; t=1783260776;
-	bh=KDxJowX8uG8aO7Na9kyr/L73fRaMGy5rrKi3qF4akZQ=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=nb/ADLbrfwqNbUN+fLGRFnh4SKVPd2HH10HBW4ts4pYCmHVpsUo1H8ShmnkkY+S7w
-	 +6PeX9SmHE7A7sYyPQtedO1Z0eZ90rQXo4UYFDDsRyIyh1fM2H5FVkwhuqV7gSrhB7
-	 4qg60LsyEdxfBzyuFQi6TYZSrxZZZkUmb0hK13Cg=
-Received: from mx2.investici.org (unknown [127.0.0.1])
-	by devianza.investici.org (Postfix) with ESMTP id 4gtTwS1K3mz6vMK;
-	Sun, 05 Jul 2026 14:12:56 +0000 (UTC)
-Received: by mx2.investici.org (Postfix) id 4gtTwR5Gm8z4y71;
-	Sun, 05 Jul 2026 14:12:55 +0000 (UTC)
-Date: Sun, 05 Jul 2026 15:12:55 +0100
-From: Bradley Morgan <include@grrlz.net>
-To: Dev Jain <dev.jain@arm.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>
-CC: Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v4=5D_KVM=3A_arm64=3A_Record_whe?=
- =?US-ASCII?Q?ther_pKVM_stage_2_mapping_is_cacheable?=
-In-Reply-To: <a3b2423e-d8bc-4713-90ef-5bfac7079834@arm.com>
-References: <20260701192428.17430-1-include@grrlz.net> <a3b2423e-d8bc-4713-90ef-5bfac7079834@arm.com>
-Message-ID: <FBC97CAC-3047-4FA1-AB83-DBE1C1270123@grrlz.net>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UhAXijQp"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 211DC1D31;
+	Sun,  5 Jul 2026 10:28:53 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A7F823F85F;
+	Sun,  5 Jul 2026 10:28:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783272537; bh=Nn0UY7IDrPjzK/lXT6hguEQXCE8OQUIxdHe1hkL3bKg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UhAXijQpiBPuV/526F+dgHXeewqd+rhE/0ewe7SMKY2NdsUbGa3MDQarqJqwajpoW
+	 gob92GGdy8vh446kYIK1GNLd0ujz4aqmZLrINbKA8uyKC3puWkFsJwRkoFaH2MC9+6
+	 MMD4uYgBBwDIkCkphsL5mdaZopYvLGNU6eaDljFU=
+Date: Sun, 5 Jul 2026 18:28:36 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Tangnianyao <tangnianyao@huawei.com>, Marc Zyngier <maz@kernel.org>, 
+	oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Cc: "guoyang (C)" <guoyang2@huawei.com>, 
+	"huanglingyan (A)" <huanglingyan2@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
+ guarantee with VTTBR_EL2.CnP
+Message-ID: <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
+References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
 
-On July 5, 2026 3:08:58 PM GMT+01:00, Dev Jain <dev.jain@arm.com> wrote:
->
->
->On 02/07/26 12:54 am, Bradley Morgan wrote:
->> pKVM keeps its own mapping list for stage 2 operations. Its flush path
->> uses that list directly, so it lost the PTE attribute check done by the
->> generic stage 2 walker.
->> 
->> Record whether a mapping is cacheable and skip cache maintenance for
->> mappings that are not cacheable.
->> 
->> Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
->
->Is Fixes tag required? If I am reading correctly, Arm ARM says this:
->
->"For VA-based cache maintenance instructions, the instruction operates on
->the
->caches regardless of the memory type and cacheability attributes marked
->for
->the memory address in the VMSA translation table entries. This means that
->the effects of the cache maintenance instructions can apply regardless of:
->  Whether the address accessed:
->    Is Normal memory or Device memory.
->    Has the Cacheable attribute or the Non-cacheable attribute."
->
->So nothing goes wrong if we do dcache clean for non-cacheable memory.
+Hi,
 
-hmmm. Makes sense, fair enough, in V5 I'll also remove the fixes tag
+Let me try to answer this:
 
+On Sat, Jul 04, 2026 at 03:45:56PM +0800, Tangnianyao wrote:
+> Hi, all
+> 
+> I'm trying to understand the TLB and I-cache invalidation in
+> `kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
+> I-cache are private to each vCPU".
+> 
+> As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
+> only performs a local TLB and I-cache invalidation, which does not seem
+> sufficient to guarantee that property.
+> 
+> In fact, even if the invalidation were extended to the Inner Shareable
+> domain, it still seems difficult to guarantee “TLBs and I-cache are
+> private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
+> vCPUs from the same VM may be running concurrently on different PEs.
 
->> Signed-off-by: Bradley Morgan <include@grrlz.net>
->> ---
->> Changes since V3:
->> - addressed some review :)
->> 
->>  arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
->>  1 file changed, 41 insertions(+), 10 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
->> index 053e4f733e4b..6d1cad890c7e 100644
->> --- a/arch/arm64/kvm/pkvm.c
->> +++ b/arch/arm64/kvm/pkvm.c
->> @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct pkvm_mapping
->*m)
->>  	return m->gfn * PAGE_SIZE;
->>  }
->>  
->> +#define PKVM_MAPPING_NR_PAGES_MASK     GENMASK_ULL(47, 0)
->> +#define PKVM_MAPPING_NC                        BIT_ULL(48)
->> +
->> +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
->> +{
->> +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
->> +}
->> +
->> +static bool pkvm_mapping_is_nc(struct pkvm_mapping *m)
->> +{
->> +	return m->nr_pages & PKVM_MAPPING_NC;
->> +}
->> +
->> +static void pkvm_mapping_set_nr_pages(struct pkvm_mapping *m, u64
->nr_pages,
->> +				      bool nc)
->> +{
->> +	WARN_ON_ONCE(nr_pages & ~PKVM_MAPPING_NR_PAGES_MASK);
->> +
->> +	m->nr_pages = nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
->> +	if (nc)
->> +		m->nr_pages |= PKVM_MAPPING_NC;
->> +}
->> +
->>  static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
->>  {
->> -	return (m->gfn + m->nr_pages) * PAGE_SIZE - 1;
->> +	return (m->gfn + pkvm_mapping_nr_pages(m)) * PAGE_SIZE - 1;
->>  }
->>  
->>  INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
->> @@ -350,7 +373,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct
->kvm_pgtable *pgt, u64 start, u64
->>  			continue;
->>  
->>  		page = pfn_to_page(mapping->pfn);
->> -		WARN_ON_ONCE(mapping->nr_pages != 1);
->> +	       WARN_ON_ONCE(pkvm_mapping_nr_pages(mapping) != 1);
->>  		unpin_user_pages_dirty_lock(&page, 1, true);
->>  		account_locked_vm(current->mm, 1, false);
->>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
->> @@ -369,7 +392,7 @@ static int __pkvm_pgtable_stage2_unshare(struct
->kvm_pgtable *pgt, u64 start, u64
->>  
->>  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
->>  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
->> -					mapping->nr_pages);
->> +				       pkvm_mapping_nr_pages(mapping));
->>  		if (WARN_ON(ret))
->>  			return ret;
->>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
->> @@ -448,7 +471,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt,
->u64 addr, u64 size,
->>  		 * permission faults are handled in the relax_perms() path.
->>  		 */
->>  		if (mapping) {
->> -			if (size == (mapping->nr_pages * PAGE_SIZE))
->> +			if (size == (pkvm_mapping_nr_pages(mapping) * PAGE_SIZE))
->>  				return -EAGAIN;
->>  
->>  			/*
->> @@ -472,7 +495,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt,
->u64 addr, u64 size,
->>  	swap(mapping, cache->mapping);
->>  	mapping->gfn = gfn;
->>  	mapping->pfn = pfn;
->> -	mapping->nr_pages = size / PAGE_SIZE;
->> +	pkvm_mapping_set_nr_pages(mapping, size / PAGE_SIZE,
->> +				  (prot & (KVM_PGTABLE_PROT_DEVICE |
->> +					   KVM_PGTABLE_PROT_NORMAL_NC)));
->>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
->>  
->>  	return ret;
->> @@ -503,7 +528,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable
->*pgt, u64 addr, u64 size)
->>  	lockdep_assert_held(&kvm->mmu_lock);
->>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
->>  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
->> -					mapping->nr_pages);
->> +				       pkvm_mapping_nr_pages(mapping));
->>  		if (WARN_ON(ret))
->>  			break;
->>  	}
->> @@ -517,9 +542,13 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable
->*pgt, u64 addr, u64 size)
->>  	struct pkvm_mapping *mapping;
->>  
->>  	lockdep_assert_held(&kvm->mmu_lock);
->> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
->> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
->> +		if (pkvm_mapping_is_nc(mapping))
->> +			continue;
->> +
->>  		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
->> -					  PAGE_SIZE * mapping->nr_pages);
->> +					  PAGE_SIZE * pkvm_mapping_nr_pages(mapping));
->> +	}
->>  
->>  	return 0;
->>  }
->> @@ -536,8 +565,10 @@ bool pkvm_pgtable_stage2_test_clear_young(struct
->kvm_pgtable *pgt, u64 addr, u64
->>  
->>  	lockdep_assert_held(&kvm->mmu_lock);
->>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
->> -		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
->> -					   mapping->nr_pages, mkold);
->> +		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest,
->> +					   handle, mapping->gfn,
->> +					   pkvm_mapping_nr_pages(mapping),
->> +					   mkold);
->>  
->>  	return young;
->>  }
->
->
+I think you have missed that when 2 stages are involved, both stages
+have to set CnP == 1 in order to share TLB entries (Arm ARM R_ZVRZW).
+So if TLB entry sharing happens, the guest kernel must have allowed it
+in the first place (by setting TTBR0/1_EL1.CnP == 1), hence accidental
+sharing that you are worried about won't happen.
 
-Thanks!
+__kvm_flush_cpu_context() is solving problems that occur when multiple
+vCPUs of a VM are multiplexed on a single physical CPU.
+
+> 
+> So I have two questions:
+> 
+> 1. What is the rationale behind the comment that "guarantee that both TLBs
+> and I-cache are private to each vCPU"?
+
+I assume you are asking why keeping both TLBs and I-cache private per
+each vCPU is required. The fundamental answer is that each physical CPU
+is expected to have its own TLB and I-cache, so we must uphold that
+property for vCPUs as well. vCPUs can be scheduled on the same physical
+CPU, and use the same physical TLB/I-cache, obviously, so extra
+invalidations need to be done.
+
+As for how this can go wrong without __kvm_flush_cpu_context(), you can
+look at commit 94d0e5980d67 ("arm/arm64: KVM: Perform local TLB
+invalidation when multiplexing vcpus on a single CPU") and commit
+01dc9262ff57 ("VM: arm64: Ensure I-cache isolation between vcpus of a
+same VM"). The commit messages and the linked thread explained the
+problems pretty well for me.
+
+> 2. Should the effect of `VTTBR_EL2.CnP` be taken into account when
+> reasoning about this guarantee?
+
+Please see the first part of the answer.
+
+Hope this helps!
+
+Thanks,
+Wei-Lin Chang
+
+> 
+> Thanks
+> Nianyao Tang
+> 
