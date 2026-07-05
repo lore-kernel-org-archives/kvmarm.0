@@ -1,89 +1,170 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C4C305669
-	for <kvmarm@lists.linux.dev>; Sat,  4 Jul 2026 07:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CB5328B5E;
+	Sun,  5 Jul 2026 12:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783151201; cv=none; b=QkMJSKQqo/AT5smcIPKAq7EW+mKRkMfbTIGFhig9WIEYOJ8ssc5rJl9Epr43cyn6MzVFwgFKvkUGmzPZWmF+cqPr+l+jwnZsrqaIyDDTeWNaWM8USB/h7K1zPWXqXLCmY8fAjQ7UDN/5rLYu4Xu0p3a6TkDrS869eOmeHNOBnxk=
+	t=1783255088; cv=none; b=H8tAZXrdrePe77ZxYlKtVuVfwQXv7uFPWVk6f+8Y662+RlRRut6woi0kZcxaqiqkGTYFBZlcuiwZYcV5lnfULa2YNpwIbfIUgzMU6YxtBLlmF9dvf/YaKcMc0mPpMvo0FSdrJeg6r8SypseUBad2OwPXJtkZuE/prThS07PRQMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783151201; c=relaxed/simple;
-	bh=34vNWbXe9tXff0tvnC0WcH98XXWhqm99ucJyEx2XldY=;
-	h=To:CC:From:Subject:Message-ID:Date:MIME-Version:Content-Type; b=fIRoX+YKDrJWEL6d/OR1kS7YlaUrO7rhLuYTnvXqrZ+lwaahyDh1SvsTeujjGtbAr5eC7P+sNqp9fMCjoFZ2j1/Wmr2Mcc4lZhZ1FgpfXztD1JPTk1E7ws6VbnXNw73/ewTSzcc8rNEnqUfEipjFyuOoDv8S1IWYkbjn0YMv8l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=3lUxwxsO; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1783255088; c=relaxed/simple;
+	bh=Gl8MfTt8suXBO7Pu5/maEDsc0GlZdohSGzjmR3J0T+U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KQQL6WvnXw+CCDhDvn6005N5+JBdq7hlwBPl3JlGyKZ6gr/wusKJH7W7eLdaMHyUvqEWCsNi/M6F+erk8U5sAKnPpv6vrqlknm96IDc93NplJaLW2ckX6m8rT4xrW88lLlmaFKvg6PqstKXMqyAFYoVSzjTJ9uz70RT0lsl0p1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3ypc1ba; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="3lUxwxsO"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=34vNWbXe9tXff0tvnC0WcH98XXWhqm99ucJyEx2XldY=;
-	b=3lUxwxsODXylrwAAueb3Y3T+dtOigJ1WSNjGIlJ5lmfqowv7O6vWcBeZTjB8k6eK8FxQ4VZ67
-	Ts2cepUHIT+r5Kk+WUNOP6VuJcOpgNS9M10jxIHlEsVgXsflpQqJyWQ3zhwCkKmkg+N4HjMyhAz
-	FCfGcho3JiDDhzohIU0sXxA=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4gsjB62BhTzRhTy;
-	Sat,  4 Jul 2026 15:37:02 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 86E4740594;
-	Sat,  4 Jul 2026 15:46:12 +0800 (CST)
-Received: from kwepemq500001.china.huawei.com (7.202.195.224) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 4 Jul 2026 15:46:12 +0800
-Received: from [10.67.146.137] (10.67.146.137) by
- kwepemq500001.china.huawei.com (7.202.195.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 4 Jul 2026 15:46:11 +0800
-To: Marc Zyngier <maz@kernel.org>, <oupton@kernel.org>, <joey.gouly@arm.com>,
-	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<catalin.marinas@arm.com>, <will@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-CC: "guoyang (C)" <guoyang2@huawei.com>, "huanglingyan (A)"
-	<huanglingyan2@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
-From: Tangnianyao <tangnianyao@huawei.com>
-Subject: Question about the "TLBs and I-cache are private to each vCPU"
- guarantee with VTTBR_EL2.CnP
-Message-ID: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
-Date: Sat, 4 Jul 2026 15:45:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3ypc1ba"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D2471F000E9;
+	Sun,  5 Jul 2026 12:38:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783255087;
+	bh=rVncT2+p9KqQfIvl5pGhLMSnQrP7IONrb76DatfXrmU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=b3ypc1baMCcYHKP78bk38XYOF7stZ4HSVpDDcrLmr72LmG+/JXlrWkfL+/2DskJle
+	 NSV1L6u47otAthV4uhriDp9PDhmZ7H/mX3/A0xmfQb99kVxYTtCEJyqdsxVHVBW1Dv
+	 nLtJReYfY0sJLhQbCiwkaHDACS4HjAYHF6tN3XQdt/uMARPTPejO58C1hqEZRCKZ+P
+	 Ja3tgg6+AdxwVbLgHeYnTTfXQ5P8NZkVasSr0jN03qaB1loYDUqYIozwhTl8I+VTti
+	 XVB6D0KorrlmcfO/oUGrK9vwheVY1+uN8d0vtZX2TSU+SvdesPhy2fx08xCpB+nWSv
+	 ZLgNQHDn4S5BQ==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
+ <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
+ <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
+ Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
+ <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
+ Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
+ <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Johannes Berg <johannes.berg@intel.com>, Jacob Keller
+ <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
+ <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
+ linux-sound@vger.kernel.org
+Subject: [PATCH] timekeeping: Document monotonic raw timestamps in snapshots
+ correctly
+In-Reply-To: <87bjctsptt.ffs@fw13>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.374814973@kernel.org>
+ <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
+ <87echtk24a.ffs@fw13>
+ <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
+ <87fr29ib4v.ffs@fw13>
+ <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
+ <87bjctsptt.ffs@fw13>
+Date: Sun, 05 Jul 2026 14:38:04 +0200
+Message-ID: <87wlv9k3wz.ffs@fw13>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemq500001.china.huawei.com (7.202.195.224)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi, all
+The comments related to raw monotonic timestamps for the various
+snapshot mechanisms in code and struct documentation are ambiguous. They
+reference them as CLOCK_MONOTONIC_RAW timestamps, but with the arrival
+of AUX clocks that's not longer correct.
 
-I'm trying to understand the TLB and I-cache invalidation in
-`kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
-I-cache are private to each vCPU".
+The raw monotonic timestamps only represent CLOCK_MONOTONIC_RAW for the
+system time clock IDs, i.e. REALTIME, MONOTONIC, BOOTTIME, TAI.
 
-As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
-only performs a local TLB and I-cache invalidation, which does not seem
-sufficient to guarantee that property.
+For AUX clocks they refer to the monotonic raw clock which is related to
+the individual AUX clocks. These monotonic raw timestamps have the same
+conversion factor as CLOCK_MONOTONIC_RAW, but differ from that by an
+offset:
 
-In fact, even if the invalidation were extended to the Inner Shareable
-domain, it still seems difficult to guarantee “TLBs and I-cache are
-private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
-vCPUs from the same VM may be running concurrently on different PEs.
+	MONORAW(AUX$N) =3D MONORAW(SYSTEM) + OFFSET(AUX$N)
 
-So I have two questions:
+The offset is established when a AUX clock is enabled and stays constant
+for the lifetime of the AUX clock.
 
-1. What is the rationale behind the comment that "guarantee that both TLBs
-and I-cache are private to each vCPU"?
-2. Should the effect of `VTTBR_EL2.CnP` be taken into account when
-reasoning about this guarantee?
+Update the comments so they reflect reality.
 
-Thanks
-Nianyao Tang
+Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+Reported-by: Thomas Wei=C3=9Fschuh <thomas.weissschuh@linutronix.de>
+---
+ include/linux/timekeeping.h |   10 +++++++++-
+ kernel/time/timekeeping.c   |   16 +++++++++++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
+--- a/include/linux/timekeeping.h
++++ b/include/linux/timekeeping.h
+@@ -276,7 +276,7 @@ static inline bool ktime_get_aux_ts64(cl
+ #endif
+=20
+ /**
+- * struct system_time_snapshot - Simultaneous time capture of CLOCK_MONOTO=
+NIC_RAW,
++ * struct system_time_snapshot - Simultaneous time capture of monotonic ra=
+w time,
+  *				 a selected CLOCK_* and the clocksource counter value
+  * @cycles:		Clocksource counter value to produce the system times
+  * @hw_cycles:		For derived clocksources, the hardware counter value from
+@@ -289,6 +289,10 @@ static inline bool ktime_get_aux_ts64(cl
+  * @clock_was_set_seq:	The sequence number of clock-was-set events
+  * @cs_was_changed_seq:	The sequence number of clocksource change events
+  * @valid:		True if the snapshot is valid
++ *
++ * @monoraw is CLOCK_MONOTONIC_RAW for system time CLOCK ids. For CLOCK_AU=
+X$N
++ * clock ids it's the monotonic raw time related to the AUX clock, which is
++ * CLOCK_MONOTONIC_RAW plus a AUX clock specific offset.
+  */
+ struct system_time_snapshot {
+ 	u64			cycles;
+@@ -326,6 +330,10 @@ struct system_counterval_t {
+  * @sys_counter:	Clocksource counter value simultaneous with device time
+  * @sys_systime:	System time for @clock_id
+  * @sys_monoraw:	Monotonic raw simultaneous with device time
++ *
++ * @sys_monoraw is CLOCK_MONOTONIC_RAW for system time CLOCK ids. For
++ * CLOCK_AUX$N clock ids it's the monotonic raw time related to the AUX cl=
+ock,
++ * which is CLOCK_MONOTONIC_RAW plus a AUX clock specific offset.
+  */
+ struct system_device_crosststamp {
+ 	clockid_t			clock_id;
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -1202,10 +1202,21 @@ static inline u64 tk_clock_read_snapshot
+=20
+ /**
+  * ktime_get_snapshot_id -  Simultaneously snapshot a given clock ID with
+- *			    CLOCK_MONOTONIC_RAW and the underlying
++ *			    the corresponding monotonic raw and the underlying
+  *			    clocksource counter value.
+  * @clock_id:		The clock ID to snapshot
+  * @systime_snapshot:	Pointer to struct receiving the system time snapshot
++ *
++ * For the system time keeping clocks (REALTIME, MONOTONIC and BOOTTIME) t=
+he
++ * monotonic raw clock is CLOCK_MONOTONIC_RAW. For AUX clocks this is the
++ * monotonic raw clock related to the AUX clock. These AUX clock related
++ * monotonic raw clocks have a strict linear offset to the system time
++ * CLOCK_MONOTONIC_RAW:
++ *
++ *	MONOTONIC_RAW(AUX$N) =3D CLOCK_MONOTONIC_RAW(system) + offset(AUX$N)
++ *
++ * The offset is established when a AUX clock is initialized, but it is
++ * currently not accessible.
+  */
+ void ktime_get_snapshot_id(clockid_t clock_id, struct system_time_snapshot=
+ *systime_snapshot)
+ {
+@@ -1512,6 +1523,9 @@ EXPORT_SYMBOL_GPL(ktime_real_to_base_clo
+  * @xtstamp:		Receives simultaneously captured system and device time
+  *
+  * Reads a timestamp from a device and correlates it to system time
++ *
++ * See documentation for ktime_get_snapshot_id() for information about the=
+ raw
++ * monotonic time stamp which is used here.
+  */
+ int get_device_system_crosststamp(int (*get_time_fn)
+ 				  (ktime_t *device_time,
