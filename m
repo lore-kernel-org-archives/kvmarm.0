@@ -1,114 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287CE1DB95E
-	for <kvmarm@lists.linux.dev>; Sun,  5 Jul 2026 17:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40562FC01B;
+	Sun,  5 Jul 2026 19:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783272540; cv=none; b=E3q+Oh4N0nmX4mH7IcdEvamxSdlPNVGFir/thUhLFgF3LrxjOA8hV3HW4J0AXTxzX+zAe7KfvX4/Zxx1zjLR7U/WdmpLZhSg3AuHq39GQmeElN36jVVeFV1L0v81wPHgkn2YHuV8ie7dLzepmTJKEIBPX/JifrJ/ECllXlSZn7Q=
+	t=1783279550; cv=none; b=M8acPCKsLoGVrJiST1rY/hXMUGjjbrD8mMsYO7EklGU/CgZXWZ1dFELvC8+6eDVFJTj4lM9jS+Hs7hj+erbF4JNCrhSInIEBK3iXn0IgnSLxR03t6u/I/v1/ZE7IXvdYPpwcfXM1YyuSE6/GxRQjVKju9QfzdeyAAqXM+YUYy2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783272540; c=relaxed/simple;
-	bh=Nn0UY7IDrPjzK/lXT6hguEQXCE8OQUIxdHe1hkL3bKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cxxgaZKJ6aOxaeTwB6Tki7gtgmuv+glj4/v9pPyIzy0+2cEHpNqvHXAZVBeqUsqaTGDiEuv4Mz8ee5FregWsvSvnNqrjP5O5NMMu/C/TbBh/Iz+tVUrBH8+icVwV866+wdakiXcsJHl29oQlS13JlDesU3FktefYKjeEjYqXAKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UhAXijQp; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783279550; c=relaxed/simple;
+	bh=KeFIokG0C7O2yN256TOKgtfjvTcpRnMR8yDALgFm+7Q=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PP5Mi0yfBzbEOY8ibZRvolS/SKbU/2avLgl7H+7uC6oxdnTKQLqJvNMziqnyxmYSNy6StLpH0U+dUOdCcAXUhGZELCh2Dg235bH6pIgDzXde0tEUWENs/UydTyy9sKGNITAFtqAgyM3R+Y6Aa1tGtZ6n02Ky+lz3Zecx/WbbKqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QKAn6fqm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UhAXijQp"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 211DC1D31;
-	Sun,  5 Jul 2026 10:28:53 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A7F823F85F;
-	Sun,  5 Jul 2026 10:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783272537; bh=Nn0UY7IDrPjzK/lXT6hguEQXCE8OQUIxdHe1hkL3bKg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UhAXijQpiBPuV/526F+dgHXeewqd+rhE/0ewe7SMKY2NdsUbGa3MDQarqJqwajpoW
-	 gob92GGdy8vh446kYIK1GNLd0ujz4aqmZLrINbKA8uyKC3puWkFsJwRkoFaH2MC9+6
-	 MMD4uYgBBwDIkCkphsL5mdaZopYvLGNU6eaDljFU=
-Date: Sun, 5 Jul 2026 18:28:36 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Tangnianyao <tangnianyao@huawei.com>, Marc Zyngier <maz@kernel.org>, 
-	oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Cc: "guoyang (C)" <guoyang2@huawei.com>, 
-	"huanglingyan (A)" <huanglingyan2@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
- guarantee with VTTBR_EL2.CnP
-Message-ID: <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
-References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QKAn6fqm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88CD51F000E9;
+	Sun,  5 Jul 2026 19:25:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783279548;
+	bh=OPI+ApKqdzBUwz1sXIFVIUKT6N0yjrQCNo8ScPon0rE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=QKAn6fqmHWbVb6fQ26XB5SXr8dfPE/yyl6eeEnIY4buUZrRYYnOLCXflQL468TJXv
+	 g2bWXPkBhcuLddlkoEPAdslZykWk5gnMk1i7KQtunwTrY+f6LUH7AqI2tUlvRkLnSZ
+	 7JnRUD+nuA01QSzTm+gvIoizkdplV7cQBK00trh3Evme0/iaawGzFmWFjoqHSPG8G3
+	 Yi+nvqlGxjXJ9RZC4kO3SjRvVxIsKL1w5XPlr7GxqBHJah9PWmDDmZ6RgACsKdLXf9
+	 /gm7Ffyk72sC4AG1pQ6wpkcQ2ITzqetGFl46xPxtLoDUn4YH/tuuvVT6FI5d41fk9j
+	 vgl+yMGcSPNRA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wgSTK-00000001frG-14pI;
+	Sun, 05 Jul 2026 19:25:46 +0000
+Date: Sun, 05 Jul 2026 20:27:34 +0100
+Message-ID: <87echh6xuh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Dev Jain <dev.jain@arm.com>
+Cc: Bradley Morgan <include@grrlz.net>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] KVM: arm64: Record whether pKVM stage 2 mapping is cacheable
+In-Reply-To: <a3b2423e-d8bc-4713-90ef-5bfac7079834@arm.com>
+References: <20260701192428.17430-1-include@grrlz.net>
+	<a3b2423e-d8bc-4713-90ef-5bfac7079834@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dev.jain@arm.com, include@grrlz.net, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-Let me try to answer this:
-
-On Sat, Jul 04, 2026 at 03:45:56PM +0800, Tangnianyao wrote:
-> Hi, all
+On Sun, 05 Jul 2026 15:08:58 +0100,
+Dev Jain <dev.jain@arm.com> wrote:
 > 
-> I'm trying to understand the TLB and I-cache invalidation in
-> `kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
-> I-cache are private to each vCPU".
 > 
-> As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
-> only performs a local TLB and I-cache invalidation, which does not seem
-> sufficient to guarantee that property.
 > 
-> In fact, even if the invalidation were extended to the Inner Shareable
-> domain, it still seems difficult to guarantee “TLBs and I-cache are
-> private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
-> vCPUs from the same VM may be running concurrently on different PEs.
-
-I think you have missed that when 2 stages are involved, both stages
-have to set CnP == 1 in order to share TLB entries (Arm ARM R_ZVRZW).
-So if TLB entry sharing happens, the guest kernel must have allowed it
-in the first place (by setting TTBR0/1_EL1.CnP == 1), hence accidental
-sharing that you are worried about won't happen.
-
-__kvm_flush_cpu_context() is solving problems that occur when multiple
-vCPUs of a VM are multiplexed on a single physical CPU.
-
+> On 02/07/26 12:54 am, Bradley Morgan wrote:
+> > pKVM keeps its own mapping list for stage 2 operations. Its flush path
+> > uses that list directly, so it lost the PTE attribute check done by the
+> > generic stage 2 walker.
+> > 
+> > Record whether a mapping is cacheable and skip cache maintenance for
+> > mappings that are not cacheable.
+> > 
+> > Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
 > 
-> So I have two questions:
+> Is Fixes tag required? If I am reading correctly, Arm ARM says this:
 > 
-> 1. What is the rationale behind the comment that "guarantee that both TLBs
-> and I-cache are private to each vCPU"?
-
-I assume you are asking why keeping both TLBs and I-cache private per
-each vCPU is required. The fundamental answer is that each physical CPU
-is expected to have its own TLB and I-cache, so we must uphold that
-property for vCPUs as well. vCPUs can be scheduled on the same physical
-CPU, and use the same physical TLB/I-cache, obviously, so extra
-invalidations need to be done.
-
-As for how this can go wrong without __kvm_flush_cpu_context(), you can
-look at commit 94d0e5980d67 ("arm/arm64: KVM: Perform local TLB
-invalidation when multiplexing vcpus on a single CPU") and commit
-01dc9262ff57 ("VM: arm64: Ensure I-cache isolation between vcpus of a
-same VM"). The commit messages and the linked thread explained the
-problems pretty well for me.
-
-> 2. Should the effect of `VTTBR_EL2.CnP` be taken into account when
-> reasoning about this guarantee?
-
-Please see the first part of the answer.
-
-Hope this helps!
-
-Thanks,
-Wei-Lin Chang
-
+> "For VA-based cache maintenance instructions, the instruction operates on the
+> caches regardless of the memory type and cacheability attributes marked for
+> the memory address in the VMSA translation table entries. This means that
+> the effects of the cache maintenance instructions can apply regardless of:
+>   Whether the address accessed:
+>     Is Normal memory or Device memory.
+>     Has the Cacheable attribute or the Non-cacheable attribute."
 > 
-> Thanks
-> Nianyao Tang
-> 
+> So nothing goes wrong if we do dcache clean for non-cacheable
+> memory.
+
+Two things:
+
+- having to perform CMOs for something that is not *expected* to be
+  cacheable is both pointless and a contradiction of the intent
+
+- what you quote is about the nature of the *mapping*, and not the
+  memory that is being mapped. Cleaning a dirty cache line on an
+  unsuspecting MMIO endpoint is never going to end nicely. Just have a
+  try.
+
+My reading of all this is that a fix indeed is required, and therefore
+a Fixes tag *must* be present.
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
