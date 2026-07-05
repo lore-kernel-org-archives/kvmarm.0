@@ -1,170 +1,202 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CB5328B5E;
-	Sun,  5 Jul 2026 12:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16C83644A4
+	for <kvmarm@lists.linux.dev>; Sun,  5 Jul 2026 14:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783255088; cv=none; b=H8tAZXrdrePe77ZxYlKtVuVfwQXv7uFPWVk6f+8Y662+RlRRut6woi0kZcxaqiqkGTYFBZlcuiwZYcV5lnfULa2YNpwIbfIUgzMU6YxtBLlmF9dvf/YaKcMc0mPpMvo0FSdrJeg6r8SypseUBad2OwPXJtkZuE/prThS07PRQMc=
+	t=1783260551; cv=none; b=rQ59HkzlxXDzIqmu5Tz3IV86TzCIo4C/VwXHUxZPSuT5MQQ/U7mBMpyuOgrpYNvoNFiYuNZT9GpBj2mD5PKcMYhIo15+IPbfUukXxgQYQ5FdRqGJWAwphxecXH3Pls19Fp5Sbo+nHvDgL+14tR+2rT7+UquD7UjyxPinW51vFFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783255088; c=relaxed/simple;
-	bh=Gl8MfTt8suXBO7Pu5/maEDsc0GlZdohSGzjmR3J0T+U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KQQL6WvnXw+CCDhDvn6005N5+JBdq7hlwBPl3JlGyKZ6gr/wusKJH7W7eLdaMHyUvqEWCsNi/M6F+erk8U5sAKnPpv6vrqlknm96IDc93NplJaLW2ckX6m8rT4xrW88lLlmaFKvg6PqstKXMqyAFYoVSzjTJ9uz70RT0lsl0p1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3ypc1ba; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783260551; c=relaxed/simple;
+	bh=tton+mxcFxiJVWf32c1zvDyubZlrW/ZkabAOaNPXrwM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I89Btx67VwObAtSuXxqjFHuDzzNYjtXTEY69sRAXePoNkvdWXkJLQGCG1DjhL5Zd3ygUTHdCFQ37IvbrChEmdrL6CLNYGhlGyinciBcL+OSNrBYUEkIwzg7eHU9Uo8YhICC+oFNJb1kERc1DfhGGTeNT+rpBcLno5YM4q94rHmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=J8qSZd0S; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3ypc1ba"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D2471F000E9;
-	Sun,  5 Jul 2026 12:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783255087;
-	bh=rVncT2+p9KqQfIvl5pGhLMSnQrP7IONrb76DatfXrmU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=b3ypc1baMCcYHKP78bk38XYOF7stZ4HSVpDDcrLmr72LmG+/JXlrWkfL+/2DskJle
-	 NSV1L6u47otAthV4uhriDp9PDhmZ7H/mX3/A0xmfQb99kVxYTtCEJyqdsxVHVBW1Dv
-	 nLtJReYfY0sJLhQbCiwkaHDACS4HjAYHF6tN3XQdt/uMARPTPejO58C1hqEZRCKZ+P
-	 Ja3tgg6+AdxwVbLgHeYnTTfXQ5P8NZkVasSr0jN03qaB1loYDUqYIozwhTl8I+VTti
-	 XVB6D0KorrlmcfO/oUGrK9vwheVY1+uN8d0vtZX2TSU+SvdesPhy2fx08xCpB+nWSv
-	 ZLgNQHDn4S5BQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
- <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
- Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
- <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
- Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
- <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- Johannes Berg <johannes.berg@intel.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
- <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
- linux-sound@vger.kernel.org
-Subject: [PATCH] timekeeping: Document monotonic raw timestamps in snapshots
- correctly
-In-Reply-To: <87bjctsptt.ffs@fw13>
-References: <20260526165826.392227559@kernel.org>
- <20260526171223.374814973@kernel.org>
- <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
- <87echtk24a.ffs@fw13>
- <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
- <87fr29ib4v.ffs@fw13>
- <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
- <87bjctsptt.ffs@fw13>
-Date: Sun, 05 Jul 2026 14:38:04 +0200
-Message-ID: <87wlv9k3wz.ffs@fw13>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="J8qSZd0S"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A5F0F1D31;
+	Sun,  5 Jul 2026 07:09:03 -0700 (PDT)
+Received: from [10.57.73.233] (unknown [10.57.73.233])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DDBC23F905;
+	Sun,  5 Jul 2026 07:09:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783260548; bh=tton+mxcFxiJVWf32c1zvDyubZlrW/ZkabAOaNPXrwM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=J8qSZd0SBfShFknERJGrB1ZVz4rGkhg/AUDMTWxX1ycbLO792EFw8JwVkczZfWPCL
+	 NYmP7NSnxtBRMjxfN+oMb0u+viwuxDaZNNlrgSNCgaETnsrQS1sXQY1AN7zd92Y4zt
+	 IgHQnBWYv5cuEoLqzyYuWCFm49MY1Jd+eAPJTX70=
+Message-ID: <a3b2423e-d8bc-4713-90ef-5bfac7079834@arm.com>
+Date: Sun, 5 Jul 2026 19:38:58 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] KVM: arm64: Record whether pKVM stage 2 mapping is
+ cacheable
+To: Bradley Morgan <include@grrlz.net>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+ Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20260701192428.17430-1-include@grrlz.net>
+Content-Language: en-US
+From: Dev Jain <dev.jain@arm.com>
+In-Reply-To: <20260701192428.17430-1-include@grrlz.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The comments related to raw monotonic timestamps for the various
-snapshot mechanisms in code and struct documentation are ambiguous. They
-reference them as CLOCK_MONOTONIC_RAW timestamps, but with the arrival
-of AUX clocks that's not longer correct.
 
-The raw monotonic timestamps only represent CLOCK_MONOTONIC_RAW for the
-system time clock IDs, i.e. REALTIME, MONOTONIC, BOOTTIME, TAI.
 
-For AUX clocks they refer to the monotonic raw clock which is related to
-the individual AUX clocks. These monotonic raw timestamps have the same
-conversion factor as CLOCK_MONOTONIC_RAW, but differ from that by an
-offset:
+On 02/07/26 12:54 am, Bradley Morgan wrote:
+> pKVM keeps its own mapping list for stage 2 operations. Its flush path
+> uses that list directly, so it lost the PTE attribute check done by the
+> generic stage 2 walker.
+> 
+> Record whether a mapping is cacheable and skip cache maintenance for
+> mappings that are not cacheable.
+> 
+> Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
 
-	MONORAW(AUX$N) =3D MONORAW(SYSTEM) + OFFSET(AUX$N)
+Is Fixes tag required? If I am reading correctly, Arm ARM says this:
 
-The offset is established when a AUX clock is enabled and stays constant
-for the lifetime of the AUX clock.
+"For VA-based cache maintenance instructions, the instruction operates on the
+caches regardless of the memory type and cacheability attributes marked for
+the memory address in the VMSA translation table entries. This means that
+the effects of the cache maintenance instructions can apply regardless of:
+  Whether the address accessed:
+    Is Normal memory or Device memory.
+    Has the Cacheable attribute or the Non-cacheable attribute."
 
-Update the comments so they reflect reality.
+So nothing goes wrong if we do dcache clean for non-cacheable memory.
 
-Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-Reported-by: Thomas Wei=C3=9Fschuh <thomas.weissschuh@linutronix.de>
----
- include/linux/timekeeping.h |   10 +++++++++-
- kernel/time/timekeeping.c   |   16 +++++++++++++++-
- 2 files changed, 24 insertions(+), 2 deletions(-)
+> Signed-off-by: Bradley Morgan <include@grrlz.net>
+> ---
+> Changes since V3:
+> - addressed some review :)
+> 
+>  arch/arm64/kvm/pkvm.c | 51 ++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 41 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 053e4f733e4b..6d1cad890c7e 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -302,9 +302,32 @@ static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
+>  	return m->gfn * PAGE_SIZE;
+>  }
+>  
+> +#define PKVM_MAPPING_NR_PAGES_MASK     GENMASK_ULL(47, 0)
+> +#define PKVM_MAPPING_NC                        BIT_ULL(48)
+> +
+> +static u64 pkvm_mapping_nr_pages(struct pkvm_mapping *m)
+> +{
+> +	return m->nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+> +}
+> +
+> +static bool pkvm_mapping_is_nc(struct pkvm_mapping *m)
+> +{
+> +	return m->nr_pages & PKVM_MAPPING_NC;
+> +}
+> +
+> +static void pkvm_mapping_set_nr_pages(struct pkvm_mapping *m, u64 nr_pages,
+> +				      bool nc)
+> +{
+> +	WARN_ON_ONCE(nr_pages & ~PKVM_MAPPING_NR_PAGES_MASK);
+> +
+> +	m->nr_pages = nr_pages & PKVM_MAPPING_NR_PAGES_MASK;
+> +	if (nc)
+> +		m->nr_pages |= PKVM_MAPPING_NC;
+> +}
+> +
+>  static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
+>  {
+> -	return (m->gfn + m->nr_pages) * PAGE_SIZE - 1;
+> +	return (m->gfn + pkvm_mapping_nr_pages(m)) * PAGE_SIZE - 1;
+>  }
+>  
+>  INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
+> @@ -350,7 +373,7 @@ static int __pkvm_pgtable_stage2_reclaim(struct kvm_pgtable *pgt, u64 start, u64
+>  			continue;
+>  
+>  		page = pfn_to_page(mapping->pfn);
+> -		WARN_ON_ONCE(mapping->nr_pages != 1);
+> +	       WARN_ON_ONCE(pkvm_mapping_nr_pages(mapping) != 1);
+>  		unpin_user_pages_dirty_lock(&page, 1, true);
+>  		account_locked_vm(current->mm, 1, false);
+>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+> @@ -369,7 +392,7 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
+>  
+>  	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+>  		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+> -					mapping->nr_pages);
+> +				       pkvm_mapping_nr_pages(mapping));
+>  		if (WARN_ON(ret))
+>  			return ret;
+>  		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+> @@ -448,7 +471,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		 * permission faults are handled in the relax_perms() path.
+>  		 */
+>  		if (mapping) {
+> -			if (size == (mapping->nr_pages * PAGE_SIZE))
+> +			if (size == (pkvm_mapping_nr_pages(mapping) * PAGE_SIZE))
+>  				return -EAGAIN;
+>  
+>  			/*
+> @@ -472,7 +495,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	swap(mapping, cache->mapping);
+>  	mapping->gfn = gfn;
+>  	mapping->pfn = pfn;
+> -	mapping->nr_pages = size / PAGE_SIZE;
+> +	pkvm_mapping_set_nr_pages(mapping, size / PAGE_SIZE,
+> +				  (prot & (KVM_PGTABLE_PROT_DEVICE |
+> +					   KVM_PGTABLE_PROT_NORMAL_NC)));
+>  	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
+>  
+>  	return ret;
+> @@ -503,7 +528,7 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+>  		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+> -					mapping->nr_pages);
+> +				       pkvm_mapping_nr_pages(mapping));
+>  		if (WARN_ON(ret))
+>  			break;
+>  	}
+> @@ -517,9 +542,13 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	struct pkvm_mapping *mapping;
+>  
+>  	lockdep_assert_held(&kvm->mmu_lock);
+> -	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+> +	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+> +		if (pkvm_mapping_is_nc(mapping))
+> +			continue;
+> +
+>  		__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+> -					  PAGE_SIZE * mapping->nr_pages);
+> +					  PAGE_SIZE * pkvm_mapping_nr_pages(mapping));
+> +	}
+>  
+>  	return 0;
+>  }
+> @@ -536,8 +565,10 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+>  
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+> -		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+> -					   mapping->nr_pages, mkold);
+> +		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest,
+> +					   handle, mapping->gfn,
+> +					   pkvm_mapping_nr_pages(mapping),
+> +					   mkold);
+>  
+>  	return young;
+>  }
 
---- a/include/linux/timekeeping.h
-+++ b/include/linux/timekeeping.h
-@@ -276,7 +276,7 @@ static inline bool ktime_get_aux_ts64(cl
- #endif
-=20
- /**
-- * struct system_time_snapshot - Simultaneous time capture of CLOCK_MONOTO=
-NIC_RAW,
-+ * struct system_time_snapshot - Simultaneous time capture of monotonic ra=
-w time,
-  *				 a selected CLOCK_* and the clocksource counter value
-  * @cycles:		Clocksource counter value to produce the system times
-  * @hw_cycles:		For derived clocksources, the hardware counter value from
-@@ -289,6 +289,10 @@ static inline bool ktime_get_aux_ts64(cl
-  * @clock_was_set_seq:	The sequence number of clock-was-set events
-  * @cs_was_changed_seq:	The sequence number of clocksource change events
-  * @valid:		True if the snapshot is valid
-+ *
-+ * @monoraw is CLOCK_MONOTONIC_RAW for system time CLOCK ids. For CLOCK_AU=
-X$N
-+ * clock ids it's the monotonic raw time related to the AUX clock, which is
-+ * CLOCK_MONOTONIC_RAW plus a AUX clock specific offset.
-  */
- struct system_time_snapshot {
- 	u64			cycles;
-@@ -326,6 +330,10 @@ struct system_counterval_t {
-  * @sys_counter:	Clocksource counter value simultaneous with device time
-  * @sys_systime:	System time for @clock_id
-  * @sys_monoraw:	Monotonic raw simultaneous with device time
-+ *
-+ * @sys_monoraw is CLOCK_MONOTONIC_RAW for system time CLOCK ids. For
-+ * CLOCK_AUX$N clock ids it's the monotonic raw time related to the AUX cl=
-ock,
-+ * which is CLOCK_MONOTONIC_RAW plus a AUX clock specific offset.
-  */
- struct system_device_crosststamp {
- 	clockid_t			clock_id;
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -1202,10 +1202,21 @@ static inline u64 tk_clock_read_snapshot
-=20
- /**
-  * ktime_get_snapshot_id -  Simultaneously snapshot a given clock ID with
-- *			    CLOCK_MONOTONIC_RAW and the underlying
-+ *			    the corresponding monotonic raw and the underlying
-  *			    clocksource counter value.
-  * @clock_id:		The clock ID to snapshot
-  * @systime_snapshot:	Pointer to struct receiving the system time snapshot
-+ *
-+ * For the system time keeping clocks (REALTIME, MONOTONIC and BOOTTIME) t=
-he
-+ * monotonic raw clock is CLOCK_MONOTONIC_RAW. For AUX clocks this is the
-+ * monotonic raw clock related to the AUX clock. These AUX clock related
-+ * monotonic raw clocks have a strict linear offset to the system time
-+ * CLOCK_MONOTONIC_RAW:
-+ *
-+ *	MONOTONIC_RAW(AUX$N) =3D CLOCK_MONOTONIC_RAW(system) + offset(AUX$N)
-+ *
-+ * The offset is established when a AUX clock is initialized, but it is
-+ * currently not accessible.
-  */
- void ktime_get_snapshot_id(clockid_t clock_id, struct system_time_snapshot=
- *systime_snapshot)
- {
-@@ -1512,6 +1523,9 @@ EXPORT_SYMBOL_GPL(ktime_real_to_base_clo
-  * @xtstamp:		Receives simultaneously captured system and device time
-  *
-  * Reads a timestamp from a device and correlates it to system time
-+ *
-+ * See documentation for ktime_get_snapshot_id() for information about the=
- raw
-+ * monotonic time stamp which is used here.
-  */
- int get_device_system_crosststamp(int (*get_time_fn)
- 				  (ktime_t *device_time,
