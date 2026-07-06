@@ -1,214 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8503F8241;
-	Mon,  6 Jul 2026 21:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340392D780C
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 21:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783373212; cv=none; b=MM6V080Q2cW8L3jSjRI1O5O4BOzUctqLa8qvIRCoi6R42Z6D3NavWJMAe30kFFjo1sxcp3JPA2z6GjcHwgdlqkE6QgQBg6FLCWdviwd58IlCDbQpK8KqlNX3u+eWeHq1dmVAhLR36wei00RLfP9oO8572hRSDAvj0oElOSzv19o=
+	t=1783373487; cv=none; b=ci/+iiFGpZ40rQooHvRGRgYGK1GoOiMjjRIPrO+qddWoCIQZ5w1jjqX9R6OVhAPH+sZ05hCf7Y01dhaWa6ymzKVtXjL2VNwO8UHU6ZuBbZQJTz5RWRUMjMeuszwjT0jwq14L05KrbStTorp1dDIiX5fdPwEqebacqxqUAZxhSTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783373212; c=relaxed/simple;
-	bh=VWv2LRjxHkQEh814EbSvCcJKLdk6GxMAU+fgME4WUW8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m+YvCPbDpWfs6fAz6Io7RkqHsPPLl5ls6oIaXtmZlYBrlrwxCm3EMb32P/KyYzMY5aLP3VLVrnjDDqKz/SHftd4V3EYosEKHDlZ0ZJMrN8rzF62xsirGi2NbLQdRPNSUaw2Vlaq8ptuRFRGUFprQp3RaCLAznnGjo8ruQlANBzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=je6eqx5r; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783373487; c=relaxed/simple;
+	bh=KNBWdwrXuVuLe1pGgzoYnnrur2xfF1tee4C4t7SlKBI=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=J8I7HL1AILwdNiTYsuVQYoA+5RTwNn9+gxek75doaZgDttV1KplL50w81v7UZy1cB0BcxepNgHV/yA66AZh3WmeVUaQaYFVHbgK0jwtwkKDSR0k8KAOtqYxrDkGc2/dVJgSc3Sebb9OyJbobfUR34xBZSd1gOIuZAcuI42pxZ/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OwmPPM9j; arc=none smtp.client-ip=209.85.210.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="je6eqx5r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACFFC1F000E9;
-	Mon,  6 Jul 2026 21:26:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783373210;
-	bh=T9lDsB/+NcYvsgur+jzOVo5SNmXQlABei/7lUjSJfZI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=je6eqx5rUBP2UGCChKvezCJTL51nWqAmpUjT9xlKJI+oSC+RKx6pgAaMNVkuB7qc9
-	 KTpP8JMIJZoG9DkSHlZoaP6bOwMx5AZTpAbT2P7pTpwZguH8e0NCUU2VQZo5lijMxi
-	 DpoCH1iCRve2Gy1ot1kYaOGm5xcOZkzfIhkIb+YVDCtIEutXhbOAbp+i/u/eZ2IX+0
-	 FnWSPCTwm8pwD6uTa1BCDwevfQJ79kJtt1UkqItVpJ4PjVil6D9JNAqExLbys1F6vs
-	 KW8NLTtKCppJNXy23XDymbrKnUR9k8QNvU3/DDvAj4jdzIULiZt5QBOUkLOuzPs9P8
-	 FPidM6Zafwerw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wgqq0-000000028nF-33rS;
-	Mon, 06 Jul 2026 21:26:48 +0000
-Date: Mon, 06 Jul 2026 22:28:37 +0100
-Message-ID: <877bn77qpm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 08/27] KVM: arm64: Prepare sharing arm64 code with s390
-In-Reply-To: <20260706085229.979525-9-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
-	<20260706085229.979525-9-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OwmPPM9j"
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7e9e2db9914so8466a34.1
+        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 14:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783373484; x=1783978284; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wrEtuZnNKTHhXzzXH6FBZuUyiD4QdjI7aUV2ges9QRI=;
+        b=OwmPPM9jtwdXw2F0YEStcGwszi8a1rlrAhkOkMy354jQDZB8EgDDhqEc7OBdq98ZYx
+         1USioEAKFFNO1KLR7TLlm6zVNk6ss3ibXheCrA2XK/cnt5q2R4hz29T7Tj9jMs5MipsU
+         JkzRNHkaq6xheoKWad8iJS77BVDOgsibJoH8jp2iw31IGEn7/+amsNi19UduOYUSLtP4
+         pp1c65E8giws7kTtCrb4u4mJCWAXA6BjKu0Pu7bOvB0O2JlVWyahjl3RF6y9T6Hjp2Un
+         J4eE1dUqb8vg870LEha5CuqVuh+TFIRHrSfrKR3cflzuVPiBxKPdZI7Z0M4pMP0s6hsQ
+         tn1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783373484; x=1783978284;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wrEtuZnNKTHhXzzXH6FBZuUyiD4QdjI7aUV2ges9QRI=;
+        b=tEdmOUa9fWz8knM1gbz2y0S/IXV5A5DldjuPu5w6dw5a3+wZbAhDY8U5X9hF248BkY
+         j3D/TC8jdtjx3DoPCkcgD52z8llXeZjjaUsSPkj3nJDxQenUSFymqZ1sZWscyYa4Z0r8
+         64PiM3q/bHHxSwcl2dqCk7NqI9Sdm0jivsjDBTsHocU23f+4BS3URu2wMAGlmu+Wml01
+         IXzCU053GB3fHwlAPmCb4d7DuHkL2ExfWPSFy7Kn8aWprqkM2DdWoyfEgAmw1jEd9xgc
+         G5R2UcJbR2Hf/90xdSAGSO/OzmESe1sF4eOcVxEQ850o9RTTO6x8JpyIZ54iC5Om0qkg
+         qUvQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/R9VdCE4R44cDF+1ceyAKJON4kcvLVgAYvzsZe1kBDB2rfojX5bvv04vh1o21h4lMYX/HOHT0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzfenjCLQKGflvROIKWUObjbJ981DGitRPwQ07Hb3+T0Okri9NQ
+	9NWZZ3y/kBlaYsEfV1hAE0YKHnR4J8EKDLBDw4jTkAtjRDXXKvEPF9vlLFReKyH7ThPMmUmp0Si
+	fAiRyPW7o1XlrZZ8QpmFNdf4N0Q==
+X-Received: from ioel1.prod.google.com ([2002:a05:6602:2761:b0:9a7:ea8a:6db6])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6820:c92:b0:6a1:93a5:cd70 with SMTP id 006d021491bc7-6a35c45cbfbmr12190eaf.31.1783373483917;
+ Mon, 06 Jul 2026 14:31:23 -0700 (PDT)
+Date: Mon, 06 Jul 2026 21:31:22 +0000
+In-Reply-To: <akWhad3U5VNjWzxu@kernel.org> (message from Oliver Upton on Wed,
+ 1 Jul 2026 16:23:21 -0700)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Message-ID: <gsntqzlf6c0l.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 0/5] Backport ARM64 VHE boot fixes to 6.6.y
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: stable@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, 06 Jul 2026 09:52:08 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> Mark functions that s390 can use to implement arm on s390 as shared
-> functions.
-> 
-> No functional change.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/kvm/arm.c         |  3 +++
->  arch/arm64/kvm/guest.c       |  3 +++
->  arch/arm64/kvm/handle_exit.c |  6 ++++++
->  arch/arm64/kvm/mmio.c        | 14 ++++++++++++++
->  arch/arm64/kvm/reset.c       |  3 +++
->  5 files changed, 29 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 50adfff75be8..c992308b2dce 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1580,6 +1580,7 @@ static unsigned long system_supported_vcpu_features(void)
->  	return features;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->  					const struct kvm_vcpu_init *init)
->  {
-> @@ -1628,6 +1629,8 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
->  			     KVM_VCPU_MAX_FEATURES);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index b01d6622b872..5a202cfd27bc 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -543,6 +543,7 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
->  	return -EINVAL;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
->  				 u64 __user *uindices)
->  {
-> @@ -591,6 +592,8 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
->  	return copy_core_reg_indices(vcpu, NULL);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
->  {
->  	const unsigned int slices = vcpu_sve_slices(vcpu);
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 54aedf93c78b..d511af145ee6 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -213,6 +213,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
->  {
->  	u64 esr = kvm_vcpu_get_esr(vcpu);
-> @@ -224,6 +225,8 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /*
->   * Guest access to SVE registers should be routed to this handler only
->   * when the system doesn't support SVE.
-> @@ -404,6 +407,7 @@ static exit_handle_fn arm_exit_handlers[] = {
->  	[ESR_ELx_EC_GCS]	= kvm_handle_gcs,
->  };
->  
-> +#ifdef ARM64_S390_COMMON
->  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->  {
->  	u64 esr = kvm_vcpu_get_esr(vcpu);
-> @@ -439,6 +443,8 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
->  	return handled;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /*
->   * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
->   * proper exit to userspace.
-> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> index e2285ed8c91d..876d56dd5b64 100644
-> --- a/arch/arm64/kvm/mmio.c
-> +++ b/arch/arm64/kvm/mmio.c
-> @@ -10,6 +10,7 @@
->  
->  #include "trace.h"
->  
-> +#ifdef ARM64_S390_COMMON
->  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data)
->  {
->  	void *datap = NULL;
-> @@ -135,8 +136,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->  		if (!kvm_vcpu_dabt_issf(vcpu))
->  			data = data & 0xffffffff;
->  
-> +#endif /* ARM64_S390_COMMON */
->  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
->  			       &data);
-> +		//TODO  tracing
-> +#ifdef ARM64_S390_COMMON
+Hi Oliver, thanks for reviewing.
 
-Irk. The deal is that you lift full functions, not cherry-pick which
-lines you want. Just define empty stubs for the trace nonsense, and be
-done with it. But not this, please!
+Oliver Upton <oupton@kernel.org> writes:
 
-	M.
+> The subject prefix should be "[PATCH 6.6 0/5]" so people know right up
+> front where this is going.
 
--- 
-Jazz isn't dead. It just smells funny.
+I'll make sure to include that in the subject.
+
+
+> On Wed, Jul 01, 2026 at 08:43:37PM +0000, Colton Lewis wrote:
+>> This series backports VHE CPU boot fixes to the 6.6.y stable branch.
+
+>> These fixes are already present in the 6.12.y stable branch (and
+>> newer), but are missing in 6.6.y. They are required to enable booting
+>> L1 guests with nested virtualization enabled (kvm-arm.mode=nested).
+
+> It's a bit worse than this. The architecture retroactively made
+> FEAT_E2H0 an optional feature, there are now implementations in the wild
+> that do not support the feature.
+
+Good to know. I'll include that context in my next cover letter.
+
+>> Without these patches, a 6.6.y guest boots with HCR_EL2.E2H
+>> incorrectly configured (because it misses VHE-only detection or early
+>> initialization), causing early boot hangs/trap loops.
+
+>> Conflict resolutions:
+>> - Patch 4 (KVM: arm64: Initialize HCR_EL2.E2H early) had conflicts in
+>>    arch/arm64/kvm/hyp/nvhe/hyp-init.S due to differences in state
+>>    initialization. Resolved by extracting EL2 state initialization into
+>>    __kvm_init_el2_state.
+>> - Patch 5 (arm64: Revamp HCR_EL2.E2H RES1 detection) had conflicts in
+>>    arch/arm64/include/asm/el2_setup.h. Resolved by using raw msr hcr_el2
+>>    instead of the missing msr_hcr_el2 macro.
+
+
+>> Marc Zyngier (4):
+>>    arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
+>>    arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is
+>>      negative
+>>    arm64: Fix early handling of FEAT_E2H0 not being implemented
+>>    arm64: Revamp HCR_EL2.E2H RES1 detection
+
+>> Mark Rutland (1):
+>>    KVM: arm64: Initialize HCR_EL2.E2H early
+
+>>   arch/arm64/include/asm/el2_setup.h | 52 ++++++++++++++++++++++++++++++
+>>   arch/arm64/kernel/head.S           | 17 +++-------
+>>   arch/arm64/kvm/hyp/nvhe/hyp-init.S | 16 +++++++--
+>>   arch/arm64/tools/sysreg            | 37 +++++++++++++++++++++
+>>   4 files changed, 107 insertions(+), 15 deletions(-)
+
+
+>> base-commit: d1cfde2d5d15be14123bdd1689162bd27f995a90
+>> --
+>> 2.55.0.rc2.803.g1fd1e6609c-goog
+
