@@ -1,351 +1,175 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4458042376D
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6160A3FF1CB
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783338946; cv=none; b=oJYAVSQ5TbWO73uTxsgqsiQV7ax+r9WOwKEcfiF3eOlyZX+5TlUNuqiZMrok3H+Fau4Y6n8KM87EmmFc8n1SKyasbh3C+NvyYlT+qnvBXC9MSmzH57+yhw0Qggq+zAYnJhY3b3rrEJPCsp0/702Jg/eRIoLFEA29mg6AJ2K3BNo=
+	t=1783338964; cv=none; b=J1jV+Sr7hCEtKSBBXRqSdzYGmW9DWrkY30YHitAgUOng3oUxe0EJToTylAWAXAgaBV1QWmles+pmIgOTzugG0xGh1pNPAm2KLgTeT2ZLvAN23fihkWrO+NkT69Cudmt2q1JGP9HaJlmvSjrjo6qoLhiUemt1Fi/O3biD+bCbKGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783338946; c=relaxed/simple;
-	bh=rk6GUB4TuwsYbbKiq1ex3jY/SkmwpfsBouredCp446s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PlWLPcjOAVAmFEUVd9ZJUUNPK5RfiAddmm0MhxtVi8lEVWLA+f39thPbu2fljAUbU/UBe3vYntlgjVg3ZnmIMd5ulatU1JpWhlDBaZBrqRxNEz8AdR6dFT/o+DfWgRDkqB0HG5xADl2aXsUHmo7PE9YMRm4gNdNOiDmDHWbo3qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d9RMSk4l; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783338964; c=relaxed/simple;
+	bh=T2+/MxshT4faHWobdn3NYjZE20baAH6OTWyB3vFGMRs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mi4TY1JlaTqVLinAFXY2UdGo1UKIepK2/WSi3ByRp5ZNWRRD3jRnrpxQAkQK2pLpiAvzn3qXE5oxu9FAbvzH+bSjGb1RuLgU5Bn6C8BCgyRMcMA6al8aLw7apiag9fiMcjcYCh3vzYpu6vSByURyRHAl87fSDAA2tGtpMLjOFIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GAjgK8y8; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d9RMSk4l"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783338941;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KkMZQjVazcLr8m65HOjyPo6MkHANVDH7iz/Ags55g/8=;
-	b=d9RMSk4lOidpliUb7gw+yei2fJ4KEQCYbxVxAT6rzeH6NQOevW6V84qaXfdaZ9/NLwy87j
-	UslYkAebmhFSRh4qSIpNJ6ojZfxJKpEQBZm1AZOcqDg3YaeJCsu3S4OKyFlKwGKmcbv9KQ
-	gNWQ1/qPZyTFzB64efqCPFMKk/t8Obk=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Christoffer Dall <christoffer.dall@linaro.org>,
-	Victor Kamensky <victor.kamensky@linaro.org>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] KVM: arm64: selftests: Add MMIO sign-extending load test
-Date: Mon,  6 Jul 2026 12:55:22 +0100
-Message-Id: <20260706115522.954913-3-fuad.tabba@linux.dev>
-In-Reply-To: <20260706115522.954913-1-fuad.tabba@linux.dev>
-References: <20260706115522.954913-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GAjgK8y8"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666BIMH6319021;
+	Mon, 6 Jul 2026 11:50:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PM8mgZ
+	GFv9V3whszJWsS631tUAseRrLfXwwq9BabCYk=; b=GAjgK8y8X5+VWDSReJonlA
+	0yHyuvMQyH+eHfpc97bB7gODjYLKxvYku0weGbIb3oiVRosQLb+FZP/hGkTYZBTl
+	ft9+dJthSwMmLAseUj0B+73gJRKWtCHh2Cm7pO1BskE9yPDJFgRbEPvbR51NVUxz
+	CMEPXHoN2+v7lrFFKSa+vMhUadk4A0t4v1Hfcp03BTbPdY3a53F2KjpPbkJCUUrO
+	nYDxblInkFvHHl4MA0ImRPsCPYD1RxyJiY1FBQiE5vCR+SEiOPbYIhFxCOpvwXtO
+	cQFefhdGhKRUj4W9QQfGTLRgQ0nz8OvlndcR9VTIetBlEcQ7jHEaj9MwcNhElDwA
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6suqh3rb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jul 2026 11:50:48 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 666BneEW006937;
+	Mon, 6 Jul 2026 11:50:47 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4f7dgjwdh3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jul 2026 11:50:46 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 666BoehN54133110
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Jul 2026 11:50:40 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0DC352004B;
+	Mon,  6 Jul 2026 11:50:40 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C66E520040;
+	Mon,  6 Jul 2026 11:50:38 +0000 (GMT)
+Received: from [9.87.152.232] (unknown [9.87.152.232])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Jul 2026 11:50:38 +0000 (GMT)
+Message-ID: <fcb7606b-6665-4bee-890d-bf1b4fb01dbf@linux.ibm.com>
+Date: Mon, 6 Jul 2026 13:50:38 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 21/27] s390/hwcaps: Report SAE support as hwcap
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter
+ <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+ <20260706085229.979525-22-seiden@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20260706085229.979525-22-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDEyMCBTYWx0ZWRfXwRcRagw5tc39
+ i176er3javwQRe7aPo5kaar/0ys2xEUukHNTlgav8lV9J5dPaA4TGRxc1n9PMmga5ncluP5xuBp
+ 068cSpwU9E8qp1nrJkViifUjsmT6d34=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDEyMCBTYWx0ZWRfX0Kz71sfLuLh2
+ ie8iK/nQSjRHYO5AEb53tqJuxs7wyJRRNn09/KeOHMbkFxOvsO2y2Xiv3gl5sp6xhsyoHvVk0so
+ aVbWrQTVIt4bcdf1k7at/xgII+9xp35yHJcs17IpEXhO2VBJqUF1algPuhBm9+t7Es3Yj2gR5W9
+ h1yeyHgfT5dJRrJQauXRxjasCuxBsB+9krsYHQ2VcZ8w1KOaCiqE/J69MX2OXhZqFo5sVZADbjP
+ LmrMZyUiGcazNwd3wWR3FiEKAugEkEeEkGfBPeXbG/o4ztP3rKZo8hOKBLPAl6t8VhT9TPQaFe9
+ 1IArFjeM9nBtYfRtLHBz770R2sv1MFtjA+8tcrzarOJVx67ZMmjQognMujHUoLfbntdET/WWqx7
+ LFOWZwCMJYB4fQQzGZtbvfrZOfBdfkLJY6dvnsV952Ca5EvrHcAEnFWlNSmDBPXqpBBUnBppA45
+ 0swnaVDBSahidt05smA==
+X-Proofpoint-GUID: 7Hu70ozHqR6ctOm-R4g1Y02gkoqjhD5h
+X-Authority-Analysis: v=2.4 cv=Oot/DS/t c=1 sm=1 tr=0 ts=6a4b9698 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=DC7w-37DyXz6KZ0clhkA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: 7Hu70ozHqR6ctOm-R4g1Y02gkoqjhD5h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-06_01,2026-07-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060120
 
-Add a test for sign-extending MMIO loads (LDRSB, LDRSH, LDRSW) into Xt
-and Wt destinations, with and without the sign bit set. The host supplies
-the MMIO data and checks the guest register holds the sign-extended value.
-
-Repeat the loads big-endian on a mixed-endian implementation. Issue those
-at EL0: SCTLR_EL1.EE would make an EL1 load big-endian but also walk the
-little-endian page tables big-endian, whereas SCTLR_EL1.E0E selects only
-EL0 data endianness and leaves the walk little-endian.
-
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/mmio_sign_ext.c       | 255 ++++++++++++++++++
- 2 files changed, 256 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index d28a057fa6c2d..6fc34e9bf8e1b 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -174,6 +174,7 @@ TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
- TEST_GEN_PROGS_arm64 += arm64/hypercalls
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
-+TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
- TEST_GEN_PROGS_arm64 += arm64/psci_test
- TEST_GEN_PROGS_arm64 += arm64/sea_to_user
-diff --git a/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-new file mode 100644
-index 0000000000000..25196f1e6322d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-@@ -0,0 +1,255 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * mmio_sign_ext - Test sign-extending MMIO load emulation (LDRSB/LDRSH/LDRSW)
-+ *
-+ * Copyright (c) 2026 Google LLC
-+ * Author: Fuad Tabba <fuad.tabba@linux.dev>
-+ */
-+
-+#include <asm/ptrace.h>
-+
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define MMIO_ADDR	0x8000000ULL
-+
-+/* AP[1]: allow unprivileged (EL0) access to a mapping. */
-+#define PTE_USER	BIT(6)
-+
-+/* SPSR for ERET to EL0t with DAIF masked. */
-+#define SPSR_EL0	(PSR_MODE_EL0t | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
-+
-+struct mmio_test {
-+	const char *name;
-+	uint64_t data;		/* access-width value, host byte order */
-+	uint8_t len;
-+	uint64_t expected;	/* sign-extended result; same for LE and BE */
-+};
-+
-+/* Paired 1:1, in order, with the loads in guest_loads_le() and el0_be_loads. */
-+static const struct mmio_test tests[] = {
-+	/* LDRSB Xt: byte sign-extended to 64 bits */
-+	{ "LDRSB Xt 0xFF",	0xFF,		1, 0xFFFFFFFFFFFFFFFFULL },
-+	{ "LDRSB Xt 0x7F",	0x7F,		1, 0x7FULL },
-+
-+	/* LDRSB Wt: byte sign-extended to 32 bits, upper 32 bits zeroed */
-+	{ "LDRSB Wt 0xFF",	0xFF,		1, 0xFFFFFFFFULL },
-+	{ "LDRSB Wt 0x7F",	0x7F,		1, 0x7FULL },
-+
-+	/* LDRSH Xt: halfword sign-extended to 64 bits */
-+	{ "LDRSH Xt 0x8001",	0x8001,		2, 0xFFFFFFFFFFFF8001ULL },
-+	{ "LDRSH Xt 0x7FFF",	0x7FFF,		2, 0x7FFFULL },
-+
-+	/* LDRSH Wt: halfword sign-extended to 32 bits, upper 32 bits zeroed */
-+	{ "LDRSH Wt 0x8001",	0x8001,		2, 0xFFFF8001ULL },
-+	{ "LDRSH Wt 0x7FFF",	0x7FFF,		2, 0x7FFFULL },
-+
-+	/* LDRSW Xt: word sign-extended to 64 bits (no Wt form) */
-+	{ "LDRSW Xt 0x80000001", 0x80000001,	4, 0xFFFFFFFF80000001ULL },
-+	{ "LDRSW Xt 0x7FFFFFFF", 0x7FFFFFFF,	4, 0x7FFFFFFFULL },
-+};
-+
-+/* Issue one sign-extending load from MMIO and report the result. */
-+#define GUEST_LDRS(load) do {						\
-+	uint64_t val;							\
-+									\
-+	asm volatile(load : "=r"(val) : "r"(MMIO_ADDR) : "memory");	\
-+	GUEST_SYNC(val);						\
-+} while (0)
-+
-+/* Little-endian pass: loads issued at EL1. */
-+static void guest_loads_le(void)
-+{
-+	GUEST_LDRS("ldrsb %0, [%1]");
-+	GUEST_LDRS("ldrsb %0, [%1]");
-+	GUEST_LDRS("ldrsb %w0, [%1]");
-+	GUEST_LDRS("ldrsb %w0, [%1]");
-+	GUEST_LDRS("ldrsh %0, [%1]");
-+	GUEST_LDRS("ldrsh %0, [%1]");
-+	GUEST_LDRS("ldrsh %w0, [%1]");
-+	GUEST_LDRS("ldrsh %w0, [%1]");
-+	GUEST_LDRS("ldrsw %0, [%1]");
-+	GUEST_LDRS("ldrsw %0, [%1]");
-+}
-+
-+/*
-+ * Run the big-endian loads at EL0, where SCTLR_EL1.E0E flips only the data
-+ * endianness; at EL1, SCTLR_EL1.EE would also flip the page-table walk and
-+ * fault on the little-endian tables. x0 holds MMIO_ADDR; results return in
-+ * x19..x28 (tests[] order) via a single SVC.
-+ */
-+extern char el0_be_loads[];
-+asm(
-+"	.pushsection .text, \"ax\"\n"
-+"	.global el0_be_loads\n"
-+"el0_be_loads:\n"
-+"	ldrsb	x19, [x0]\n"
-+"	ldrsb	x20, [x0]\n"
-+"	ldrsb	w21, [x0]\n"
-+"	ldrsb	w22, [x0]\n"
-+"	ldrsh	x23, [x0]\n"
-+"	ldrsh	x24, [x0]\n"
-+"	ldrsh	w25, [x0]\n"
-+"	ldrsh	w26, [x0]\n"
-+"	ldrsw	x27, [x0]\n"
-+"	ldrsw	x28, [x0]\n"
-+"	svc	#0\n"
-+"	.popsection\n"
-+);
-+
-+/* EL1 handler for the EL0 SVC: report the results, then finish. */
-+static void el0_svc_handler(struct ex_regs *regs)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++)
-+		GUEST_SYNC(regs->regs[19 + i]);
-+
-+	GUEST_DONE();
-+}
-+
-+static bool guest_mixed_endian_el0(void)
-+{
-+	uint64_t mmfr0 = read_sysreg(id_aa64mmfr0_el1);
-+
-+	return SYS_FIELD_GET(ID_AA64MMFR0_EL1, BIGEND, mmfr0) ||
-+	       SYS_FIELD_GET(ID_AA64MMFR0_EL1, BIGENDEL0, mmfr0);
-+}
-+
-+static void guest_code(void)
-+{
-+	guest_loads_le();
-+
-+	if (guest_mixed_endian_el0()) {
-+		write_sysreg(read_sysreg(sctlr_el1) | SCTLR_EL1_E0E, sctlr_el1);
-+		isb();
-+
-+		asm volatile(
-+		"	msr	elr_el1, %[pc]\n"
-+		"	msr	spsr_el1, %[spsr]\n"
-+		"	mov	x0, %[mmio]\n"
-+		"	isb\n"
-+		"	eret\n"
-+		:
-+		: [pc] "r"(el0_be_loads),
-+		  [spsr] "r"((uint64_t)SPSR_EL0),
-+		  [mmio] "r"(MMIO_ADDR)
-+		: "x0", "memory");
-+		__builtin_unreachable();	/* el0_svc_handler ends the test */
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void handle_mmio(struct kvm_run *run, const struct mmio_test *t, bool be)
-+{
-+	int i;
-+
-+	TEST_ASSERT_EQ(run->mmio.phys_addr, MMIO_ADDR);
-+	TEST_ASSERT(!run->mmio.is_write, "Expected MMIO read for %s", t->name);
-+	TEST_ASSERT_EQ(run->mmio.len, t->len);
-+
-+	memset(run->mmio.data, 0, sizeof(run->mmio.data));
-+	if (be) {
-+		/* The guest reads the device bytes most-significant first. */
-+		for (i = 0; i < t->len; i++)
-+			run->mmio.data[i] = t->data >> (8 * (t->len - 1 - i));
-+	} else {
-+		/* Works because arm64 KVM hosts are always little-endian. */
-+		memcpy(run->mmio.data, &t->data, t->len);
-+	}
-+}
-+
-+static void expect_sync(struct kvm_vcpu *vcpu, struct ucall *uc,
-+			const struct mmio_test *t)
-+{
-+	switch (get_ucall(vcpu, uc)) {
-+	case UCALL_SYNC:
-+		TEST_ASSERT(uc->args[1] == t->expected,
-+			    "%s: got %#lx, want %#lx", t->name,
-+			    (unsigned long)uc->args[1], (unsigned long)t->expected);
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(*uc);
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected ucall for %s", t->name);
-+	}
-+}
-+
-+/* OR PTE_USER into the leaf descriptors covering [gva, gva + len). */
-+static void make_el0_accessible(struct kvm_vm *vm, uint64_t gva, uint64_t len)
-+{
-+	uint64_t addr;
-+
-+	for (addr = gva & ~((uint64_t)vm->page_size - 1); addr < gva + len;
-+	     addr += vm->page_size)
-+		*virt_get_pte_hva(vm, addr) |= PTE_USER;
-+}
-+
-+static bool vcpu_mixed_endian_el0(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t mmfr0 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1));
-+
-+	return SYS_FIELD_GET(ID_AA64MMFR0_EL1, BIGEND, mmfr0) ||
-+	       SYS_FIELD_GET(ID_AA64MMFR0_EL1, BIGENDEL0, mmfr0);
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	unsigned int i;
-+	bool be;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	virt_map(vm, MMIO_ADDR, MMIO_ADDR, 1);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_LOWER_64, ESR_ELx_EC_SVC64,
-+				el0_svc_handler);
-+
-+	be = vcpu_mixed_endian_el0(vcpu);
-+	if (be)
-+		make_el0_accessible(vm, MMIO_ADDR, vm->page_size);
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(tests) * (be ? 2 : 1));
-+
-+	/* Little-endian pass: one load and one result per iteration. */
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		const struct mmio_test *t = &tests[i];
-+
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
-+		handle_mmio(vcpu->run, t, false);
-+
-+		vcpu_run(vcpu);
-+		expect_sync(vcpu, &uc, t);
-+
-+		ksft_test_result_pass("%s\n", t->name);
-+	}
-+
-+	if (be) {
-+		/* The EL0 stub issues all the loads, then reports the results. */
-+		for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+			vcpu_run(vcpu);
-+			TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
-+			handle_mmio(vcpu->run, &tests[i], true);
-+		}
-+		for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+			vcpu_run(vcpu);
-+			expect_sync(vcpu, &uc, &tests[i]);
-+			ksft_test_result_pass("BE %s\n", tests[i].name);
-+		}
-+	}
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_DONE, "Expected UCALL_DONE");
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_finished();
-+}
--- 
-2.39.5
-
+On 7/6/26 10:52, Steffen Eiden wrote:
+> From: Hendrik Brueckner <brueckner@linux.ibm.com>
+> 
+> Report SAE support as hwcap (and /proc/cpuinfo)
+> 
+> Signed-off-by: Hendrik Brueckner <brueckner@linux.ibm.com>
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
