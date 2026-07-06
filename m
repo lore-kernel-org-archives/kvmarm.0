@@ -1,154 +1,274 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EB441DEE2
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B06422555
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 12:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783339123; cv=none; b=UFO3hGEvNS1NtLiiCsu8RdzCvsBZngXZytscBIoEBnbC6MBfBnHtkLlImC+PagivBZoAJRVI4u96a5OU71SClLZyulUCauFfcPO6/U9qObU9qpaDVKkW3t8DLMBvlcrst6f6iQX2To2xeqrqGR23gMyyPcDPXvV7vMHjn5AAkdo=
+	t=1783339225; cv=none; b=of0ZskMlYJgGkapvP9jC3EWPuYL7uAu0U5JlU1tF3vgToTD8VIJ9MFZ3YE4aJncNdPP/YUADxRhWrzdpMC1dbIfm5gws8PSYD4qC/kkKwipS0xOFhJc5Vo7S5BkotFJnQCr3lUy0xzqjvKgsOH3Ghz8eqt1v3+Nn0bovtpK4F7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783339123; c=relaxed/simple;
-	bh=nEXi64q5a1wrNnASTARi80cobxBLMIzpl0YhDo40VEM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V1GeQiXXhKz03fi9mfbhh1uCuAlFytFIOYuwepeSvnZvfMh8zwLBodbmPvAFUYCMhh1MNoXoNt8RDZR4qfUxl8tHpfZr/GpQjzYXhSTnWIKebI1FrfGvPPVNJy+P6egXgTp4qD2PCWAKlFuwZMU9O8dO8SWUWpI3E4uj0vf1wAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=i4sWTmK5; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1783339225; c=relaxed/simple;
+	bh=U6kB1ASAxdVMsg3tw9qEyKCm14JuyVwKMIb9hQ/96wg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J507+Tds2ABT9vezDWLsQcgtdCrB9YHZaO9FPCeWh92RUHTPvPRE7wvb28+NuoSA1XDA6mOhxvfesOIiGkQA/QUEDQz69EiL1tsmUwhdtZWinAbwLOrBZLIeyUkN8gVgse0muiZA1bMaSqLSkHGyMAS1g0RtzsHIgc067Rr4q+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cAHG4/pZ; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i4sWTmK5"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666BIMoU041179;
-	Mon, 6 Jul 2026 11:58:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=tj+23o
-	ywlRnO3Y+5JLlSRU3ga/eLwNTnH+xgyNne3Vw=; b=i4sWTmK5+VR1PoSNWVxdXk
-	rt3DjDXyMiiQHiL4kHX7+684aNXrXz7widiZUazpiQWgknYy+n/n1JrWaK0Yvuhr
-	Y6tVWr6fXpXboiNPwJ0PFQlk+CV5XPxjW6m2Xp2lQ/1th8V8JBDZbKPRJS8/RW7d
-	qr57Q9L6koRqaEEyJifvLzjL3XnQPgTb+RqASci+BBQts9GORDQY08sQhGwF4BLZ
-	g2WOLF5x2nI6cmFQ3/QgohjIWhe/R31KJ3PJWN0E4DxR9dMnDM3hqk8I7mOsy74J
-	CabeMyYHsdnYaOjWu/1MmJr4LTj4DYY43FAh0wuiRo8VHdzaNqTt/H+m6xTgsbKQ
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6qkn9b92-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Jul 2026 11:58:28 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 666Bnbxe016482;
-	Mon, 6 Jul 2026 11:58:27 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4f7cvvwjr1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Jul 2026 11:58:27 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 666BwKEX45941006
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 Jul 2026 11:58:20 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 257152004B;
-	Mon,  6 Jul 2026 11:58:20 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 23BB120040;
-	Mon,  6 Jul 2026 11:58:19 +0000 (GMT)
-Received: from osiris (unknown [9.111.31.209])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  6 Jul 2026 11:58:19 +0000 (GMT)
-Date: Mon, 6 Jul 2026 13:58:17 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 19/27] s390: Introduce Start Arm Execution instruction
-Message-ID: <20260706115817.104396-Q-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-20-seiden@linux.ibm.com>
- <8239c9ba-154c-4e2d-b2fc-700ba12eb585@linux.ibm.com>
- <721266da-db8f-4385-87c1-ca26c430892c@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cAHG4/pZ"
+X-Forwarded-Encrypted: i=1; AHgh+Rp/GLCmpbPNptQA62sm9LO3fqIevXqAcffVHGnBc1fAtBVPE9I7FmS00tqfZGjujfYn+RtgS3Q=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783339221;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=76HxWMmhkdI9JrbpQAb+ExNibxcc5C01zdg+a34h5Hc=;
+	b=cAHG4/pZMBQboPjCanbKrqZBgW5BIg0vvf9khIzaT5W4de1YALQ7zVteg9CmgZsm7NUKtW
+	E4RPpiDq1F6jL7hHg+BXbyzYOniLmFJu19zoQvVRrvDat/FLxndo5PMEaLu0pVelZhXaSg
+	gfgTPnHDJGewU7Gvjn1ghQs7rlVIWt4=
+X-Gm-Message-State: AOJu0Yw/FlykouxmVQbCaIZh6DsTdJN6Eiqeo2dIR33wmWrP4sLTa4vs
+	90El3vc/XnPxZYc131embbBbUS3suGqV+kdd/cyCf/DBXr2sBV879OK/xGJESy8Qgw9vJokM/cx
+	FssqyMUkAGbEWsmLh6gcUSfcho3K/5A05vzzNDgnU
+X-Received: by 2002:a05:622a:c01:b0:51b:ff0a:2048 with SMTP id
+ d75a77b69052e-51c4bf83afcmr16783941cf.3.1783339205460; Mon, 06 Jul 2026
+ 05:00:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <721266da-db8f-4385-87c1-ca26c430892c@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Q/XiJY2a c=1 sm=1 tr=0 ts=6a4b9864 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=8nJEP1OIZ-IA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=FTWlFeZUYPafzdOhfvQA:9
- a=3ZKOabzyN94A:10 a=wPNLvfGTeEIA:10
-X-Proofpoint-GUID: P9k7z7Z_-LJ633J5h5ZAbGS_1o5NSp29
-X-Proofpoint-ORIG-GUID: P9k7z7Z_-LJ633J5h5ZAbGS_1o5NSp29
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDEyMCBTYWx0ZWRfX86pjNKnjcEBv
- O1NRzWszvfaa3PA8qtTL/+y+PePzWaM1r8x16LoGaPRLdmAwbVhoI1m8XgW6n8wlRCI37pP8985
- Ji6iI1DvV2kxFN0JUtdutIAez+z40DI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDEyMCBTYWx0ZWRfXycyknJwSF+9d
- s22nUFQOtFXZ6AmwRN0W9n/PRaxHVLXKaEcPYiJzNb64Y8UZMRBRgKfFSKLfkgvGQZedtR2/pB2
- +1UiEhzN/Cr7ghUZaDXkLW3x1T+RVzpLgAlvSLu2of4XBOOkKTZGw8YN1Wq04aRSDI0+o6CcgcF
- Lf34IY3kmhxg2vnKd2rMECRSgqqxyXC5hU4iR5xcUT0XlLZuOQWXpoAW8u+1d8tvGGOU9aIS4k/
- Q21n45b2zSEqlc9iU5x6SYbFsyd4JB5A6MT4WS9WMMt74mZLhuOVUC+W7JLdH3UfLpHZ8SqjEsI
- CGcVQq4iJji2cBRtqu5OWKQGiIjS0lCAUmrNknec0vDk+8M6I8dFqCjYg+R3L3az5RpMf+Vw3xn
- p2xckP5k+7TSqORnSLYGyka9/CnIceFidfl3WJ21jlOfj/5ij9r2NuTzr8oN9vPEKm4gOcEmAOH
- 26Qq12rBNLKJclH+PaQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-06_01,2026-07-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0 spamscore=0 phishscore=0 priorityscore=1501
- bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060120
+References: <20260706095927.560795-1-fuad.tabba@linux.dev> <20260706095927.560795-9-fuad.tabba@linux.dev>
+ <20260706103651.3D1A41F000E9@smtp.kernel.org>
+In-Reply-To: <20260706103651.3D1A41F000E9@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 6 Jul 2026 12:59:28 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTz9Qdznk=cPMYLWHkHag_7cc53=ZkYdBfQ7tXb9myqHcQ@mail.gmail.com>
+X-Gm-Features: AVVi8CepLtV5kGFJPMfqEIjpyJZJF_Wy1QszVyxax0Tq6BeSIYL3S-Vl10FyPxg
+Message-ID: <CA+EHjTz9Qdznk=cPMYLWHkHag_7cc53=ZkYdBfQ7tXb9myqHcQ@mail.gmail.com>
+Subject: Re: [PATCH v4 8/8] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jul 06, 2026 at 01:30:20PM +0200, Christian Borntraeger wrote:
-> 
-> 
-> Am 06.07.26 um 13:17 schrieb Janosch Frank:
-> 
-> > > +SYM_FUNC_START(__sae64a)
-> > > +    stmg    %r6,%r14,__SF_GPRS(%r15)    # store kernel registers
-> > > +    STBEAR    __SF_SAE_BEAR(%r15)        # save breaking event address register
-> > > +    .insn    rre,0xb9a50000,%r2,0        # Start Arm Execution
-> > > +# Let the next instruction be NOP to avoid triggering a machine check
-> > > +# and handling it in a guest as result of the instruction execution.
-> > 
-> > @Christian:
-> > I have the feeling things got lost in translation when this comment was written.
-> > How would we trigger a MCHECK by having an instruction after SIE/SAE?
-> > AFAIU this allows us to have a label which we can check in the mcheck handler to decide who triggered the mcheck.
-> 
-> the original rationale was that some machine checks are nullifying some are terminating. So the PSW might point
-> to SAE or the instruction afterwards for a guest machine check.
-> In SIE, we use that nop to account any machine check on that nop as a guest machine check.
-> 
-> > 
-> > Without the label the comment and NOP are useless as far as I can see.
-> > So we need to decide if this still applies and then either remove it or add sae handling to mcck_int_handler and maybe other mcheck functions.
-> 
-> We plan to get more information on the machine checks for sae so we might no longer need that.
-> But this series does not yet contain the machine check handling. Maybe its better to remove comment and
-> nop and introduce that later when we add machine check handling and if still needed.
+On Mon, 6 Jul 2026 at 11:36, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 3 potential issu=
+e(s) to consider:
 
-Ok I'll remove the comment and the nop for the next round.
+https://lore.kernel.org/all/CA+EHjTyEikgroi9a9vhtv-pixBj_21RC=3D4d4EnsfxFk1=
+0WCnwA@mail.gmail.com/
+https://lore.kernel.org/all/CA+EHjTx_sf1n2cakTCt=3D=3Dtp5y9L2ZS0qGMA9KGUCQr=
+wd=3DaXz_A@mail.gmail.com/
+
+> New issues:
+> - [High] The commit silently removes the synchronization of hcr_el2 from =
+the hyp vCPU back to the host vCPU on guest exit, breaking host-injected ru=
+ntime signals like virtual SErrors.
+
+VSE is synced back selectively.
+
+> - [High] Host-side modifications to a non-protected guest's system regist=
+ers via asynchronous KVM requests (e.g. KVM_REQ_PMU) are silently discarded=
+ because the dirty flag is cleared on IRQ exits.
+
+Injection flags and HCR_VSE are flushed unconditionally, not gated by
+DIRTY. The one real case (SError ESR) was found and fixed.
+
+> Pre-existing issues:
+> - [Critical] pKVM completely fails to isolate the register state of prote=
+cted guests by unconditionally copying the full execution context between t=
+he untrusted host and the hypervisor on every world switch.
+
+Pre-existing upstream placeholder; per-field marshalling is added by
+the follow-up series.
+
+Cheers,
+/fuad
+
+
+> --
+>
+> commit 417bef11bf8b55291221bae4776c5695349c903d
+> Author: Fuad Tabba <fuad.tabba@linux.dev>
+>
+> KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+>
+> pKVM copies a non-protected guest's register context between the host
+> and the hypervisor on every world switch, even when the host never
+> inspects it. Defer the copy: on entry, flush the host context into the
+> hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
+> exit, leave it in the hyp vCPU and copy it back only when the host needs
+> it, via a __pkvm_vcpu_sync_state hypercall or at vcpu put.
+>
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.=
+c
+> > index 54aedf93c78b6..29108e5c0206e 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+>
+> [ ... ]
+>
+> > @@ -486,9 +486,32 @@ int handle_exit(struct kvm_vcpu *vcpu, int excepti=
+on_index)
+> >       }
+> >  }
+> >
+> > +static void handle_exit_pkvm_state(struct kvm_vcpu *vcpu, int exceptio=
+n_index)
+> > +{
+> > +     int exception_code =3D ARM_EXCEPTION_CODE(exception_index);
+> > +
+> > +     if (!is_protected_kvm_enabled() || kvm_vm_is_protected(vcpu->kvm)=
+)
+> > +             return;
+> > +
+> > +     /*
+> > +      * Sync the context back when the host will read (trap) or write
+> > +      * (SError) it. Preempt-off here, so the loaded hyp vCPU is stabl=
+e.
+> > +      */
+> > +     if (exception_code =3D=3D ARM_EXCEPTION_TRAP ||
+> > +         exception_code =3D=3D ARM_EXCEPTION_EL1_SERROR ||
+> > +         ARM_SERROR_PENDING(exception_index)) {
+> > +             kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> > +             vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> > +     } else {
+> > +             vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+>
+> [Severity: High]
+> Does clearing the dirty flag on other exits (like IRQ) blind the lazy syn=
+c to
+> subsequent host-side state modifications?
+>
+> If a non-protected guest exits due to a physical IRQ, the PKVM_HOST_STATE=
+_DIRTY
+> flag is cleared here. If the host IRQ handler then updates guest state (e=
+.g. via
+> PMU overflow) and queues an asynchronous KVM request, the next time the g=
+uest is
+> entered, flush_hyp_vcpu() will skip flush_hyp_vcpu_state() because the di=
+rty
+> flag is clear.
+>
+> Will this result in the guest running with stale state, discarding the ho=
+st's
+> modifications?
+>
+> > +     }
+> > +}
+> > +
+> >  /* For exit types that need handling before we can be preempted */
+> >  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+> >  {
+> > +     handle_exit_pkvm_state(vcpu, exception_index);
+> > +
+> >       if (ARM_SERROR_PENDING(exception_index)) {
+> >               if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
+> >                       u64 disr =3D kvm_vcpu_get_disr(vcpu);
+>
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index 2db56146ec493..4a8445b636e60 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>
+> [ ... ]
+>
+> > @@ -172,7 +214,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *h=
+yp_vcpu)
+> >       fpsimd_sve_flush();
+> >       flush_debug_state(hyp_vcpu);
+> >
+> > -     hyp_vcpu->vcpu.arch.ctxt        =3D host_vcpu->arch.ctxt;
+> > +     /*
+> > +      * If we deal with a non-protected guest and the state is potenti=
+ally
+> > +      * dirty (from a host perspective), copy the state back into the =
+hyp
+> > +      * vcpu.
+> > +      */
+> > +     if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> > +             if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
+> > +                     flush_hyp_vcpu_state(hyp_vcpu);
+> > +     } else {
+> > +             hyp_vcpu->vcpu.arch.ctxt =3D host_vcpu->arch.ctxt;
+>
+> [Severity: Critical]
+> This is a pre-existing issue, but pKVM seems to completely fail to isolat=
+e the
+> register state of protected guests by unconditionally copying the untrust=
+ed host
+> context into the protected hyp vCPU context here on every world switch.
+>
+> Can this allow the host kernel, which is treated as an adversary against =
+guest
+> confidentiality and integrity, to arbitrarily inject state into the prote=
+cted VM?
+>
+> > +     }
+> >
+> >       /* __hyp_running_vcpu must be NULL in a guest context. */
+> >       hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu =3D NULL;
+> > @@ -203,9 +255,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
+p_vcpu)
+> >       fpsimd_sve_sync(&hyp_vcpu->vcpu);
+> >       sync_debug_state(hyp_vcpu);
+> >
+> > -     host_vcpu->arch.ctxt            =3D hyp_vcpu->vcpu.arch.ctxt;
+> > -
+> > -     host_vcpu->arch.hcr_el2         =3D hyp_vcpu->vcpu.arch.hcr_el2;
+> > +     if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> > +             host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
+>
+> [Severity: Critical]
+> This is a pre-existing issue, but similar to the copy on entry, unconditi=
+onally
+> copying the protected hyp vCPU context back to the untrusted host context=
+ here
+> leaks the guest's execution context.
+>
+> Does this break the core pKVM confidentiality guarantees by allowing the =
+host
+> to read all guest registers?
+>
+> > +     } else {
+> > +             /* Keep PC (tracepoint) and PSTATE (vcpu_mode_is_bad_32bi=
+t) current. */
+> > +             host_vcpu->arch.ctxt.regs.pc =3D hyp_vcpu->vcpu.arch.ctxt=
+.regs.pc;
+> > +             host_vcpu->arch.ctxt.regs.pstate =3D hyp_vcpu->vcpu.arch.=
+ctxt.regs.pstate;
+> > +     }
+>
+> [Severity: High]
+> Does removing the synchronization of hcr_el2 from the hyp vCPU back to th=
+e host
+> vCPU break host-injected runtime signals like virtual SErrors?
+>
+> When a virtual SError is injected via HCR_VSE, the guest hardware clears =
+the
+> bit upon delivery. Previously, this cleared state was synced back to the =
+host
+> here in sync_hyp_vcpu().
+>
+> Since the sync is now removed, won't the host's hcr_el2 retain the stale =
+HCR_VSE
+> bit forever? On every subsequent guest entry, flush_hyp_vcpu() will OR th=
+is
+> stale bit back into the hyp vCPU's hcr_el2, which seems like it would cau=
+se an
+> infinite loop of spurious virtual SError injections into the guest.
+>
+> >
+> >       host_vcpu->arch.fault           =3D hyp_vcpu->vcpu.arch.fault;
+> >
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706095927.56=
+0795-1-fuad.tabba@linux.dev?part=3D8
