@@ -1,232 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B2B374E62
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE303BD22B
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783334212; cv=none; b=K8NnPpmdF84t7s9Z0rx/fZuUPW5IpUqPlbO/54sFDnKUEJEhZsWhUYWMJjB8ttPd/on3XLUpJtU5oGBjw97UUgm7UQ4finxAgDeuyFlMwaDSTv9g8T5s5SEg/idITVI+gQRy/A6sO6nxnIShOP6z6yrlRns2nBzkhn8jApb4VQY=
+	t=1783334531; cv=none; b=CDRw2ZDWCPMwMCtfNdUWVKN2HVWYUKRzB1B6gMfiM14Fn2Fwcur1wzfgsFeBQaqCmu1Eo6UYswk0EdIqr9Txpt2hZOk36nPu9dtt1uWpoTT9dIKc8yiYRxuHqi+NnXgCRsMxQzrwgVk0Tn2IlzIHmNgImY6ok9WhLfjBFGpYO3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783334212; c=relaxed/simple;
-	bh=wfY30cjnNkse06YocelR0HoCMOAO2g5XSzjEgov4Sic=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=kfH0B4VJZJWck2i0NifKPVBRMPXYquh94RrqMqkk10dGZOEkwKYM/BMB3fLgYwZsJ4oK6NYcJdhntzuD9bap2Kf5aWUKQsi1GxD8pzd0rl4rPBlQP3HyWJxBU9vs56Lc1c+/PbEHZoo8sXkKKdDhOAZRTIT8pFQOlrbA71jwxN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZv0yOPG; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783334531; c=relaxed/simple;
+	bh=KfTYKj+lZLN2LhtlKXAUB7TQrI5mlOEDuZ2IB9Jfhp8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DsO+2U9Yb+7nBfnRVvSldbUSTfOrm1fFr2BJT1KBqlhDq/KI4jGsTU01CX0/a3frL2lhpmGoDuVIIR9j43xZu56Bvd9uz6ZfSCsK6Ky4M9nSmo55Sj4YuAMG4SFeVkG3YpaS8n9IjkFbREUEkBDB3nxmLTkrSWFEZxckXui0ZLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Adys5vKo; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZv0yOPG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D1A41F000E9;
-	Mon,  6 Jul 2026 10:36:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783334211;
-	bh=m/yiEM4fwYaeTFPMqoS/pObw9GrqXZouLF56dfKk+No=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DZv0yOPGXCfmPliHHBtGRmV4y+I0sGLA7jFkY4CoX9wYEXU+LGLlVJoqE7nvXBbOg
-	 UP1xrCb8uEPQfW+9EYHTSZSxz2baAAL4Q4dh8wdgucjjSyAmWfZVpXu11JZRyZZ3IN
-	 6I7rd8nFddtivDnNEs7v/PXS8nFmD+PdtxhKweNR/THKdZEEXt3pdPtYmBMMKDwrrT
-	 rLAuHrvSLPtMr/GlZXoASpQxbNUiP5rAdHIYB2mEjot9CE7rLmG5emY/2nv81Ndo/p
-	 X4aJz+MJO//m6fjXX11ccKymuZLRGd6u5jblplal6PoeIT3Qo9xghxUb0ZxLuvnBEW
-	 s0kTGlFFOmaRw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 8/8] KVM: arm64: Implement lazy vCPU state sync for
- non-protected guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260706095927.560795-9-fuad.tabba@linux.dev>
-References: <20260706095927.560795-1-fuad.tabba@linux.dev>
- <20260706095927.560795-9-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2026 10:36:50 +0000
-Message-Id: <20260706103651.3D1A41F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Adys5vKo"
+X-Forwarded-Encrypted: i=1; AHgh+RrhcrmYRcMHA1k6QZET0kwj4WzJI+QlVmeFOpntP1kShR0e/5gtGwx7aXL8lHovqWhPth5Td04=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783334526;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2MrO46WcW/eT/nIXvgXIv30AaHJGF7753Sjqr/5EqeM=;
+	b=Adys5vKorFLYR3Upp+asrDJ52XUa1twmier3A2E3gfdMAjV4vWX9omiuSVYc+QV6QUDNW+
+	0XtQE0QMqvp2wS74C42Jae1GUvphx36tPyL6blOUgKKc14Zc5cWy3ZNP8sGpmlQsK2CqkD
+	YNzy2o7qUZV4MFZhqvFd9nIr7iitXs0=
+X-Gm-Message-State: AOJu0YxBx1TvjIykHhbqCxK5AcW7uTVaPHxZKpCRMIYOu19MVrRlVzoq
+	1dfyhnthrm8SYqIN5b3A/dtD+LThxeeFYGlbpGYBR87OBzwez2uHCV2Lqi2VEg3WCZRyWPCjTyW
+	F6xM8sfsVcTPl6GiMszwOeKNbSfJg386Var9DPRXt
+X-Received: by 2002:a05:622a:254:b0:51b:fe30:b8c5 with SMTP id
+ d75a77b69052e-51c4bfa0b5fmr16022321cf.6.1783334518140; Mon, 06 Jul 2026
+ 03:41:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260706083555.302972-1-fuad.tabba@linux.dev> <20260706083555.302972-4-fuad.tabba@linux.dev>
+ <556ab72c-f440-434b-a24d-84200bd25842@arm.com>
+In-Reply-To: <556ab72c-f440-434b-a24d-84200bd25842@arm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 6 Jul 2026 11:41:21 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwA1w3eE-mn2r9DCCduFQuoRn_usPO0pxGf1k-jzLsDyw@mail.gmail.com>
+X-Gm-Features: AVVi8Ceeij0EvNcVjL34byFUgSH0rVyFks1d71upJAeGiHZe4P9wi8o9zrsK10g
+Message-ID: <CA+EHjTwA1w3eE-mn2r9DCCduFQuoRn_usPO0pxGf1k-jzLsDyw@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v1 3/5] Use kvm_userspace_memory_region2 for all
+ memory registration
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
+Hi Suzuki,
 
-New issues:
-- [High] The commit silently removes the synchronization of hcr_el2 from th=
-e hyp vCPU back to the host vCPU on guest exit, breaking host-injected runt=
-ime signals like virtual SErrors.
-- [High] Host-side modifications to a non-protected guest's system register=
-s via asynchronous KVM requests (e.g. KVM_REQ_PMU) are silently discarded b=
-ecause the dirty flag is cleared on IRQ exits.
-
-Pre-existing issues:
-- [Critical] pKVM completely fails to isolate the register state of protect=
-ed guests by unconditionally copying the full execution context between the=
- untrusted host and the hypervisor on every world switch.
---
-
-commit 417bef11bf8b55291221bae4776c5695349c903d
-Author: Fuad Tabba <fuad.tabba@linux.dev>
-
-KVM: arm64: Implement lazy vCPU state sync for non-protected guests
-
-pKVM copies a non-protected guest's register context between the host
-and the hypervisor on every world switch, even when the host never
-inspects it. Defer the copy: on entry, flush the host context into the
-hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
-exit, leave it in the hyp vCPU and copy it back only when the host needs
-it, via a __pkvm_vcpu_sync_state hypercall or at vcpu put.
-
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 54aedf93c78b6..29108e5c0206e 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-
-[ ... ]
-
-> @@ -486,9 +486,32 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception=
-_index)
->  	}
->  }
-> =20
-> +static void handle_exit_pkvm_state(struct kvm_vcpu *vcpu, int exception_=
-index)
-> +{
-> +	int exception_code =3D ARM_EXCEPTION_CODE(exception_index);
-> +
-> +	if (!is_protected_kvm_enabled() || kvm_vm_is_protected(vcpu->kvm))
-> +		return;
-> +
-> +	/*
-> +	 * Sync the context back when the host will read (trap) or write
-> +	 * (SError) it. Preempt-off here, so the loaded hyp vCPU is stable.
-> +	 */
-> +	if (exception_code =3D=3D ARM_EXCEPTION_TRAP ||
-> +	    exception_code =3D=3D ARM_EXCEPTION_EL1_SERROR ||
-> +	    ARM_SERROR_PENDING(exception_index)) {
-> +		kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
-> +		vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-> +	} else {
-> +		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-
-[Severity: High]
-Does clearing the dirty flag on other exits (like IRQ) blind the lazy sync =
-to
-subsequent host-side state modifications?
-
-If a non-protected guest exits due to a physical IRQ, the PKVM_HOST_STATE_D=
-IRTY
-flag is cleared here. If the host IRQ handler then updates guest state (e.g=
-. via
-PMU overflow) and queues an asynchronous KVM request, the next time the gue=
-st is
-entered, flush_hyp_vcpu() will skip flush_hyp_vcpu_state() because the dirty
-flag is clear.
-
-Will this result in the guest running with stale state, discarding the host=
-'s
-modifications?
-
-> +	}
-> +}
-> +
->  /* For exit types that need handling before we can be preempted */
->  void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
->  {
-> +	handle_exit_pkvm_state(vcpu, exception_index);
-> +
->  	if (ARM_SERROR_PENDING(exception_index)) {
->  		if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
->  			u64 disr =3D kvm_vcpu_get_disr(vcpu);
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 2db56146ec493..4a8445b636e60 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-
-[ ... ]
-
-> @@ -172,7 +214,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp=
-_vcpu)
->  	fpsimd_sve_flush();
->  	flush_debug_state(hyp_vcpu);
-> =20
-> -	hyp_vcpu->vcpu.arch.ctxt	=3D host_vcpu->arch.ctxt;
-> +	/*
-> +	 * If we deal with a non-protected guest and the state is potentially
-> +	 * dirty (from a host perspective), copy the state back into the hyp
-> +	 * vcpu.
-> +	 */
-> +	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> +		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
-> +			flush_hyp_vcpu_state(hyp_vcpu);
-> +	} else {
-> +		hyp_vcpu->vcpu.arch.ctxt =3D host_vcpu->arch.ctxt;
-
-[Severity: Critical]
-This is a pre-existing issue, but pKVM seems to completely fail to isolate =
-the
-register state of protected guests by unconditionally copying the untrusted=
- host
-context into the protected hyp vCPU context here on every world switch.
-
-Can this allow the host kernel, which is treated as an adversary against gu=
-est
-confidentiality and integrity, to arbitrarily inject state into the protect=
-ed VM?
-
-> +	}
-> =20
->  	/* __hyp_running_vcpu must be NULL in a guest context. */
->  	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu =3D NULL;
-> @@ -203,9 +255,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
-vcpu)
->  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
->  	sync_debug_state(hyp_vcpu);
-> =20
-> -	host_vcpu->arch.ctxt		=3D hyp_vcpu->vcpu.arch.ctxt;
-> -
-> -	host_vcpu->arch.hcr_el2		=3D hyp_vcpu->vcpu.arch.hcr_el2;
-> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> +		host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
-
-[Severity: Critical]
-This is a pre-existing issue, but similar to the copy on entry, uncondition=
-ally
-copying the protected hyp vCPU context back to the untrusted host context h=
-ere
-leaks the guest's execution context.
-
-Does this break the core pKVM confidentiality guarantees by allowing the ho=
-st
-to read all guest registers?
-
-> +	} else {
-> +		/* Keep PC (tracepoint) and PSTATE (vcpu_mode_is_bad_32bit) current. */
-> +		host_vcpu->arch.ctxt.regs.pc =3D hyp_vcpu->vcpu.arch.ctxt.regs.pc;
-> +		host_vcpu->arch.ctxt.regs.pstate =3D hyp_vcpu->vcpu.arch.ctxt.regs.pst=
-ate;
-> +	}
-
-[Severity: High]
-Does removing the synchronization of hcr_el2 from the hyp vCPU back to the =
-host
-vCPU break host-injected runtime signals like virtual SErrors?
-
-When a virtual SError is injected via HCR_VSE, the guest hardware clears the
-bit upon delivery. Previously, this cleared state was synced back to the ho=
-st
-here in sync_hyp_vcpu().
-
-Since the sync is now removed, won't the host's hcr_el2 retain the stale HC=
-R_VSE
-bit forever? On every subsequent guest entry, flush_hyp_vcpu() will OR this
-stale bit back into the hyp vCPU's hcr_el2, which seems like it would cause=
- an
-infinite loop of spurious virtual SError injections into the guest.
-
-> =20
->  	host_vcpu->arch.fault		=3D hyp_vcpu->vcpu.arch.fault;
+On Mon, 6 Jul 2026 at 11:25, Suzuki K Poulose <suzuki.poulose@arm.com> wrot=
+e:
 >
+> Hi Fuad
+>
+> On 06/07/2026 09:35, Fuad Tabba wrote:
+> > Switch kvm__register_mem() and kvm__destroy_mem() from
+> > kvm_userspace_memory_region to kvm_userspace_memory_region2 and
+> > KVM_SET_USER_MEMORY_REGION2 unconditionally. The v2 struct is a
+> > superset; when the extra fields are zero, the ioctl behaves
+> > identically to v1.
+>
+> Doesn't this break using this on older KVM implementations ? Not that I
+> care, but do others care ?
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706095927.5607=
-95-1-fuad.tabba@linux.dev?part=3D8
+KVM_SET_USER_MEMORY_REGION2 goes back to 6.8, so this would break
+kernels older than that. I can gate it so that REGION2 is only used
+when --guest-memfd is requested, keeping REGION for the default path.
+But like you said, do others care for kernels that old?
+
+Cheers,
+/fuad
+
+>
+> Cheers
+> Suzuki
+>
+>
+> >
+> > This prepares for adding guest_memfd support.
+> >
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > ---
+> >   kvm.c | 11 +++++------
+> >   1 file changed, 5 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/kvm.c b/kvm.c
+> > index 95ccfcb..8a7fd09 100644
+> > --- a/kvm.c
+> > +++ b/kvm.c
+> > @@ -189,7 +189,7 @@ core_exit(kvm__exit);
+> >   int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+> >                    void *userspace_addr)
+> >   {
+> > -     struct kvm_userspace_memory_region mem;
+> > +     struct kvm_userspace_memory_region2 mem;
+> >       struct kvm_mem_bank *bank;
+> >       int ret;
+> >
+> > @@ -213,14 +213,14 @@ int kvm__destroy_mem(struct kvm *kvm, u64 guest_p=
+hys, u64 size,
+> >               goto out;
+> >       }
+> >
+> > -     mem =3D (struct kvm_userspace_memory_region) {
+> > +     mem =3D (struct kvm_userspace_memory_region2) {
+> >               .slot                   =3D bank->slot,
+> >               .guest_phys_addr        =3D guest_phys,
+> >               .memory_size            =3D 0,
+> >               .userspace_addr         =3D (unsigned long)userspace_addr=
+,
+> >       };
+> >
+> > -     ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
+> > +     ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem);
+> >       if (ret < 0) {
+> >               ret =3D -errno;
+> >               goto out;
+> > @@ -239,7 +239,6 @@ out:
+> >   int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+> >                     void *userspace_addr, enum kvm_mem_type type)
+> >   {
+> > -     struct kvm_userspace_memory_region mem;
+> >       struct kvm_mem_bank *merged =3D NULL;
+> >       struct kvm_mem_bank *bank;
+> >       struct list_head *prev_entry;
+> > @@ -320,7 +319,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_ph=
+ys, u64 size,
+> >               flags |=3D KVM_MEM_READONLY;
+> >
+> >       if (type !=3D KVM_MEM_TYPE_RESERVED) {
+> > -             mem =3D (struct kvm_userspace_memory_region) {
+> > +             struct kvm_userspace_memory_region2 mem =3D {
+> >                       .slot                   =3D slot,
+> >                       .flags                  =3D flags,
+> >                       .guest_phys_addr        =3D guest_phys,
+> > @@ -328,7 +327,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_ph=
+ys, u64 size,
+> >                       .userspace_addr         =3D (unsigned long)usersp=
+ace_addr,
+> >               };
+> >
+> > -             ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &me=
+m);
+> > +             ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &m=
+em);
+> >               if (ret < 0) {
+> >                       ret =3D -errno;
+> >                       goto out;
+>
+> IMPORTANT NOTICE: The contents of this email and any attachments are conf=
+idential and may also be privileged. If you are not the intended recipient,=
+ please notify the sender immediately and do not disclose the contents to a=
+ny other person, use it for any purpose, or store or copy the information i=
+n any medium. Thank you.
