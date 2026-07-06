@@ -1,206 +1,303 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013063.outbound.protection.outlook.com [40.107.162.63])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D521A3FD147
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.63
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783336497; cv=fail; b=XG7UJvNn+o/S5kORqFG2cycZlVocxiOfiJ595iB21+2WpdFDFco2Q66OkTOPBv17ilR1ixzzVR5QG6geDST4/jbx817LAA3S00b+uhRAcWD1+/Jp1cl9qshTafaFJQG3Zlbd+ni/ChFZ+vSCTjMBXtpNVri2amsHnpW5s3tkKvA=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783336497; c=relaxed/simple;
-	bh=5sgfrtC6euyHQ+jCRInld4njc9CLE7w9D+8ACclAhE4=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Cz2kD/UbDYGpbBwEYfdZFoHba1THlSZJrurPnPbZw/A2QhRPLFZjTBlDKo2IEfMk/3PH1LEArQBMC2vqhDuoyiGMK2qV7mLMV3edWwAkuskHL/PD/0AnIozaXfA92s6WA48ron+3LLZ3hzo8eoE9WDapi/26D4+aleuMy0lWxI8=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cZxDS7NV; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cZxDS7NV; arc=fail smtp.client-ip=40.107.162.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2B0367F31
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783336647; cv=none; b=uHB73SE9Xg4N7EdmJHKi0C527z9QjnD3BpGmKWXyrDGUwfHBVwJNp2Q0Udd0/sEwIhXUQejRN5vwDTGAWISGMqO23T1ajcAeZcpYeQoP9OcMyVTXn+z6d51mG/5q+JrTn8xJE0+tTuL1ne6w+ma7KUOHi16HiSkzvKh8Jiy4MuQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783336647; c=relaxed/simple;
+	bh=q4xzhbvHky63KgGYTrvsex25Fh+Bal0Wm+f67FAD4W0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OjQfINhOj4fd3cXy8rAHMrk+g/eFjh7xg4lV+4r3JVnoTKqEeaCAWIF3do11TO1XkabGmwgOx/UJ1Jo6jPMoUDDnz9cGTAuJZiOQerI/DuJ44RQmhgCUCA+G3o2U9Um7NkdSACRAFg7sHCOE/EOvdFoGO0Q5nIQLfnJN6IfcfMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WLRDPsB7; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cZxDS7NV";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cZxDS7NV"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=u11bRJ0beruCxBJO4bhtTz47sAJ3qdXMxAOTFHLUgM1DR2AKMir5D0yKz80vOLtE1JgBrCHW8qkZcskdHNSl13bCeo0GpuZ0+LFkZ1+m95Kf0ZQkzeRT/ODXgl+BMFrvQ9lx1MIpryAtHsVIzjdq/JiUB/x6ZHePG7/ZL9Ni2XZILlAvZ3+ZW0cH92dkWN0ZTRS2gTvaXpuS3LHFXucoiHdjFpNslJbFZCwD1LZvssw/5ogcZYYEEYcAg/b59Gh1qGg9MVIBXnCqaJgwc6rTVDhhlN5UfpHiB6Qe4F0PoGXNlciNNdD6dLQLzW4tFqF2FTL5ncYP+9CNIxBWjkPHMg==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
- b=K04463oIeNhtwcEu9fPkBh3hAk/YKnR2Ms2nkHg/tVsW/zZ36Yo9XRIMVO+cbDvI4uRMotxRykHBfrRLS5g0HgWyPAOWkK/BeEQ8UgmycKnCxcuO43z1LF91t9lj4+mkF5SomNkz0oLKQQ+fifIq/HzsNrvs3VSofNyPNOzRJkDiVVuJl4Y4p9rOjTiUnuUseRerk4cMwch7dJ8r6dOmzPEXwCzU8kMQHg9txksnX6wpraEHRjOL57nZnP04Y5h5J+76/iE4VXcasqd7BlHzDH34UZ5cjofBeodtbTvLq8pEnEsyFPaw/shkoPtVPjd0//4pbYPXI0iV+cO8njUhFw==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
- b=cZxDS7NVQ07ynylvdYWRkOhFfIZTLcHVqas7Lw9FsGbrs6Thnrq4NJay3AZA2aY0HQSUUejeg1mmNURJuneCCnffg7qTF7Lr0UzcBjKeyc8aKkZi0OCsh4G3qBqJP/eTUkQYac8gk1PpbHhYSraNllhQlcNXyLi/G6ZJtsM07zw=
-Received: from DU7P195CA0012.EURP195.PROD.OUTLOOK.COM (2603:10a6:10:54d::22)
- by PAWPR08MB11144.eurprd08.prod.outlook.com (2603:10a6:102:46a::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Mon, 6 Jul
- 2026 11:14:50 +0000
-Received: from DU6PEPF00009528.eurprd02.prod.outlook.com
- (2603:10a6:10:54d:cafe::a8) by DU7P195CA0012.outlook.office365.com
- (2603:10a6:10:54d::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.13 via Frontend Transport; Mon, 6
- Jul 2026 11:14:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DU6PEPF00009528.mail.protection.outlook.com (10.167.8.9) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.6 via
- Frontend Transport; Mon, 6 Jul 2026 11:14:49 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qhWdmcudVBBjvX4taKacFD2E9dazw53c60bdOPXfISJvKHKArMH7BOodDWZCXcR0ATSER4wpIgBAFhd4lQ4X+K39u8jy9A0k3z002YuujtQpOxp1U+gfbPh0aHoSfY8tdwXp89mCRl5C1BoLfOksxIDoRNLszWCAbvymfPE0/E2Cj/JqBa0JDlUdRg6h6faV/yD7yv7IZ5If5Trw1U4Oh2+fRUCqm6JX7Ln8QzyTLyQaY9/6HSlB5UdOwhixnpGIyExbgNRcHU8e6YVB2ijKF3DMxwDCfiIZveR0A5tP8Bnp3+p4DOMq6GDVPP41rOJKDAe2KbGEqpFTPy0ddfp28g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
- b=kG9WyV8W72y4umeiGwcSLr563gYF43cYBdvH9vi0jBhwnI+HM9WazzlnwiNVtR9GQxqo7HSLV4PzLJThULgS6QeHxBIiCOg7gXDHL40+h58oZh/8ziRXBqfPWRx3/khejPe+vMQIhPdvZN8g61gLv0/D4IGwzQzKbbNu9s1shk99kvweJ233ysF685WAmXk2yxjxsjxOj/9toa5yA7bv1/slHi/c8cU+rEUjdRglhQOVibb6p+6qtDIPFj0az9BMPpu6bqsv6dcuji7ceTcict+KyjuMAn5gkViskJ6cgMKzqPDN7qI52vE3EfIfyO4iOweSzcD96Ce1OY0VkGMq9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
- b=cZxDS7NVQ07ynylvdYWRkOhFfIZTLcHVqas7Lw9FsGbrs6Thnrq4NJay3AZA2aY0HQSUUejeg1mmNURJuneCCnffg7qTF7Lr0UzcBjKeyc8aKkZi0OCsh4G3qBqJP/eTUkQYac8gk1PpbHhYSraNllhQlcNXyLi/G6ZJtsM07zw=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from PAWPR08MB10975.eurprd08.prod.outlook.com (2603:10a6:102:46e::7)
- by AS1PR08MB7563.eurprd08.prod.outlook.com (2603:10a6:20b:472::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Mon, 6 Jul
- 2026 11:13:46 +0000
-Received: from PAWPR08MB10975.eurprd08.prod.outlook.com
- ([fe80::3c7a:9a64:14bc:ce15]) by PAWPR08MB10975.eurprd08.prod.outlook.com
- ([fe80::3c7a:9a64:14bc:ce15%7]) with mapi id 15.21.0181.009; Mon, 6 Jul 2026
- 11:13:46 +0000
-Message-ID: <ab60e6a1-e59a-4089-a6d4-386b83627b87@arm.com>
-Date: Mon, 6 Jul 2026 12:13:45 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v1 4/5] Add guest_memfd support to
- kvm__register_mem()
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>, kvm@vger.kernel.org
-Cc: kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- Fuad Tabba <tabba@google.com>
-References: <20260706083555.302972-1-fuad.tabba@linux.dev>
- <20260706083555.302972-5-fuad.tabba@linux.dev>
- <5a699a28-07ce-4a6c-bc41-8b9bc7ca0d4a@arm.com>
-Content-Language: en-US
-In-Reply-To: <5a699a28-07ce-4a6c-bc41-8b9bc7ca0d4a@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: LO2P123CA0093.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:139::8) To PAWPR08MB10975.eurprd08.prod.outlook.com
- (2603:10a6:102:46e::7)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WLRDPsB7"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6669IR2B4015302;
+	Mon, 6 Jul 2026 11:17:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ZJTBwG
+	jSNZDKHvbuJOa1scVEvsZc8DeSukn7IhD19hA=; b=WLRDPsB7kST9YOfgb4OG/o
+	/idedUb65mvL/dYnwo6NeMtsL2tLXklY1qz6UtmEO+JojrFszgejDDVSdLREM1md
+	lx26nlSelJaVcNyeUzdro30GLR+DQDgGuNGTzYBCG3mfo4Vdbg6eDWjhhBZkX7bY
+	Z17GENWETp3naR6Ex0X9F0xD+dQJpOLBjbAUtiGM1o71QOLPE0DOYv4dQhAkhfsM
+	AIuuPfmj4ZINmJcIQD3pODFCl+dO6zzw0LxwZhBzsO/kI8rUbKS+qDBWhf9+P2Xm
+	KVVLRByjfKmWlKNeCR5IXejV13PSLDSMdMQ+AwMu5eKVyPYzCWNnZ8njW2VZPmWg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6suqh09d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jul 2026 11:17:12 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 666AnZoZ011804;
+	Mon, 6 Jul 2026 11:17:11 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7f6xvygu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jul 2026 11:17:11 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 666BH4XH47382910
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Jul 2026 11:17:04 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 043672004B;
+	Mon,  6 Jul 2026 11:17:04 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 44C3E20043;
+	Mon,  6 Jul 2026 11:17:03 +0000 (GMT)
+Received: from [9.87.152.232] (unknown [9.87.152.232])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Jul 2026 11:17:03 +0000 (GMT)
+Message-ID: <8239c9ba-154c-4e2d-b2fc-700ba12eb585@linux.ibm.com>
+Date: Mon, 6 Jul 2026 13:17:02 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAWPR08MB10975:EE_|AS1PR08MB7563:EE_|DU6PEPF00009528:EE_|PAWPR08MB11144:EE_
-X-MS-Office365-Filtering-Correlation-Id: cbaf9c92-487a-4f83-9b15-08dedb4fcb97
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|23010399003|366016|1800799024|376014|4143699003|11063799006|56012099006|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info-Original:
- xuNNU6xHD0Gzp4RO1z4mHKwNNkORLJO4xbfxI3foUzHhwHjkUNfyTBypzlabqLrSw2QKyiYS6iAsuUCQwTdXnrU8HOst726uMMveW81HKVizLZ9ER4mX73EDpJ7dJQgLpyk4WnzMC3UGGZa009tPnLdTyWOBEj2w9cOAtGeY+0jG+F+Zr1algIufItdwM6FH1lY3H98eXUQT8b5UNX1uING3SwrUh4NYjXPEAxxIz8y5TBAqZQsD/ffIPHdmmmN310OuM+iBJgxGRbnUdxTBDyWjGLoLdAQdgXFqqIViaWGkFUSJd+0dtA12tm7dS9OzvpdbmmBGH3yajPWC7uXq3HzhQoHRqfMgpvo53ztZywbgUt/Ajk5wqev6sjzUT8ws/qxUl6zXg2Mh+udzgmbrhbkY0kzBxIbihoTh30ZTBXcDMgoM+RCT+PicHKXJqbS9wtYKc2/fc0/UTLYku2tFu/OdyD+uNudOHcK7ABlUqXe3fbRM8m1D+y0YeCJf6ptCsg73f6JQQExCZUHkx4QCtpYSVyYIHhdig8V5TOJssCpOSslo4uqszc/xtzWEsZQTWo+hMWoBtaKexwqEPDj5POVwyigFBTq2T6hPZYXo6NLYU6QdBW0BrwedzYpqBZgMxDjTF7DPUwoIgsYS+XMsX9Sv1Yfbg0y9vaZ7nc7Rfvk=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR08MB10975.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(376014)(4143699003)(11063799006)(56012099006)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- rIxx2ToEjNpUBxu2u8Mo1XCXW4a7M6FDxq+wBYCG3bYScKtdM69J50Z0KbznrmpSEUjFvwdLhAB8vEytJKnOfhPqNNIYtcOol4W56W8lXh2QXPo2ANEObcXhymqgYel2xdp3yAV7KcgpjbbAVwCnz1jIwk3LLEpTF60PKSwdfqAgnzlQ1lG9+VtYuN0Xo47ZWxI8sOFxbx6QbqKu45Vx5xyTRaQKLhe+UrT8jYWXgJX8EKIrQUf0G7luTlP0ZrtwpL9BkFp7uJR1gciAbzHJlAo3DNTo26DMGdKCF2tKGp5gGlcjs+aO9ETALSO5T2iQ/mdNYA8LJP0dUVQ08dA9rQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR08MB7563
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU6PEPF00009528.eurprd02.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	79d591f9-da3c-4756-994b-08dedb4fa5b6
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|14060799003|36860700016|376014|1800799024|35042699022|82310400026|23010399003|4143699003|56012099006|18002099003|11063799006|22082099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	rFQWZG+YDlsv1qKHjgr4tDiYQrhX6caOkiqefX2Mcxla9Ww0lCppQ2NQ7K4Cu4OkKMzEOUgJg3/cSo9Z1lSUWWOft+yItihUYMYCycn4Ex3tuRw/lawnVcQNbYIsoYCIsM6D//L7ZXvljtZPYtslgW3xx8MJmddsHHDYvT/AYY3xiFv4rC1J16vQkm7zPaSp6/p8RBnOlCh7bVUnjpjnoZvi1gSdP9XQvVnM82kypcITKUXiYh76YWtIE3l25e7VkRK3/JOgkerP7WvoW7wCwKSG4mxYgLIZYiyQqf6AJV4mSQy1AQcJLQTx4NpkPNJZvf539LbuuJHzZteKECIelgphDDVIvkGfh/o5+2mTeMn42/6m9pywIHCcG2Y1+b23PVY+YFNLV3MkfhcPSfSpK+I1S4NaiBI8z+LVxAIY7sJNorTW2uYnGkfkndnC+R4vJASowYWfY4Iy+FE8ccUCrs6mm72xN/W4LtmdRMLw7fMbBm/etfZys1Fjzf9eyDnUluP61sT8wYsAHdRVfBOXmmW4Fi26UBN8PcunrJoLNaxql+dYGoYLhkuxF3es4jcqH2BJW70ZAtUdvI6B6EZbhNg8hitGoHqlktQlLdClCX8VDVzxM6PE0diqJGZBw3YYmmAQhhYA2tv9J3BwRmmg40jIKSllnWw0YPVfR0Ui8sqw8B67YlNpC7Z+TYfAIjtXxgzS0x9sb3f4SnCpY7oOYg==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(36860700016)(376014)(1800799024)(35042699022)(82310400026)(23010399003)(4143699003)(56012099006)(18002099003)(11063799006)(22082099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	ZG7EcaH5kYuumTQJ5Hm5bgskvBpD5+DZxJuaKeMpVtqb8vgQNk3wWV0iLBa5LiZiP9xdTVIdJX02ZQMox4Lllxe+lc6dcA/mWGySYT+ZLQd7UiAvuPk0mq4OdET5XoIf4pRgBggW7uscYIDXvrrRxeQRdUv5WeXh6GN4yomfqbpDh9CtYBtPZle8Er3zo2827LicTSdFbrvoUtG9UlHA5n6m4Z+WKM7icj8SCx7MKWjE2ugwtMhYNz/6Rzfzu2vXHs9vGVzitl1+tveZ0G+D0XNlRVUOkkXxO7ltEIZt7rIMLh0ny80/f5I02UJ+Myq3rTq+LLZy+8gmGfC9967WR0bQsGl9aXepg1uJNgaoprX5WU8VHEKoCzesSSWjfut0cHHQbSOh8l8n9ic2lJnNfQz3doQKoYWmWKPi5JhZU1cnXLpwE++nsTPMZ7tkaUnX
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 11:14:49.6657
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cbaf9c92-487a-4f83-9b15-08dedb4fcb97
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009528.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB11144
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 19/27] s390: Introduce Start Arm Execution instruction
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter
+ <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+ <20260706085229.979525-20-seiden@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20260706085229.979525-20-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDEwOSBTYWx0ZWRfX+xIhLAcxsHLZ
+ f9Rbt2L9sMzlOlmiuaBV/trvtk8Anz1boO8La5Yq1tJHC7H3MZNacc8bOMQw6jP++eds89zWf1c
+ MEgJALXgnggU4S1OJ4pEZm3L8/U61oY=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDEwOSBTYWx0ZWRfX9ItXXrPx0Eho
+ MmApuRdym0zu+BWxo5RNN6GkY8w39oZAbnexTdQm5nGWemvBHbHTn5ImhU2uxdbIc640QO5JJ7S
+ ORDTZyxBetxbGjI5rDL6iT/JkykMuxpAUtzyMnd7pNyRzmFGoqDM5vJRsSsndrF7X5NLKBKiF2n
+ 9ULgONVX3kTRr7wZiasCa/Kj7lBgGRD5nW3HJ3wS9sk+nCETJqKjTUjcKtVn/3QfZXX8f7dNQXD
+ tr3EIOr6166Qmd7FaYHAaPvo5kCZsgHHn/h1Sh/9EExEw8O2mn1dZBpAs+C+UUM3C6MbneotCpS
+ Jirktf+vB3gWVsMQfPho5GS5qVJGDnzM183J3nrsSOJFbdLH0CcnnPZ6odYjkHAcCx618puJT56
+ jDTuaCF8qHvJmkcrAS53tFsaf+Wcq9ul8sq7GFuiioaqIfaNg2+GetOhOi+oidUSzpRLpzoP+hC
+ KlkAjUufKmO3Yyhl/Pg==
+X-Proofpoint-GUID: osnHUPaW3GcYLybZTEv5viafEL5-tZh3
+X-Authority-Analysis: v=2.4 cv=Oot/DS/t c=1 sm=1 tr=0 ts=6a4b8eb8 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=yZFHy3xYVWHLONAxsiAA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: osnHUPaW3GcYLybZTEv5viafEL5-tZh3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-07-06_01,2026-07-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060109
+
+On 7/6/26 10:52, Steffen Eiden wrote:
+> The Start Arm Execution (SAE) instruction is the centerpiece for
+> executing arm64 (KVM) guests on s390. Its purpose is, similar to SIE, to
+> enable accelerated execution of arm64 virtual machines. SAE expects the
+> physical address of a control block as the only argument.
+> 
+> The host is responsible to save & restore
+>   - GPRs 0-13
+>   - access register 0-15
+>   - breaking event register (BEAR)
+>   - vector/floating point registers
+> between SAE executions to guarantee host consistency.
+> 
+> GPRs and BEAR are save and restores in the asm functions. The other
+> register are handled in within C code. Access registers are handled in a
+> later patch and SVEs will be handled when they are introduced in a
+> future series. Most arm64 registers are handled by a satellite block
+> called save_area. Some registers, frequently used by hypervisors, are
+> placed into the SAE control block itself.
+> 
+> Enlighten asm/kvm_host_types.h for the new header variant. The new
+> header is chosen instead of asm/kvm_host_s390_types.h if KVM_S390_ARM64
+> is defined.
+> 
+
+[...]
+
+> +	u64	gpr[31];		/* 0x0300  */
+> +	u64	_03f8;			/* 0x03f8  */
+> +
+> +	union {
+> +		u64	icptd[8];		/* 0x0400 */
+> +		/* validity-interception reason; icptr 0x01 */
+> +#define SAE_VIR_UNKNOWN		0x00
+> +#define SAE_VIR_UNSUPP_FORMAT	0x01
+> +#define SAE_VIR_MSO_BOUNDS	0x02
+> +#define SAE_VIR_MSLA		0x03
+> +#define SAE_VIR_MGPAS		0x04
+> +#define SAE_VIR_INVAL_SYSREG	0x05
+> +#define SAE_VIR_HOST_CONTROL	0x06
+> +#define SAE_VIR_SCA		0x07
+> +#define SAE_VIR_MSO_ALIGN	0x08
+> +#define SAE_VIR_HLC		0x09
+> +#define SAE_VIR_IRPTC		0x0a
+
+Will these ever be used for something?
 
 
 
-On 06/07/2026 12:00, Suzuki K Poulose wrote:
-> On 06/07/2026 09:35, Fuad Tabba wrote:
->> Add a guest_memfd file descriptor and offset to kvm__register_mem().
->> When guest_memfd >=3D 0, set KVM_MEM_GUEST_MEMFD and populate the
->> guest_memfd fields, binding the memslot to the file. This prepares
->> for backing guest RAM with guest_memfd on arm64.
->>
->> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
->
-> Looks good to me
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> +		u16 vir;			/* 0x0400 */
+> +		/* host access interception details; icptr 0x02 */
+> +		struct {
+> +			u64		esr_elz;	/* 0x0400 */
+> +			u8		_0408[6];	/* 0x0408 */
+> +			u16		pic;		/* 0x040e */
+> +			union teid	teid;		/* 0x0410 */
+> +			gva_t		far_elz;	/* 0x0418 */
+> +			gva_t		vaddr;		/* 0x0420 */
+> +			u64		suppl;		/* 0x0428 */
+> +			u8		gltl;		/* 0x0430 */
+> +			u8		_0431[7];	/* 0x0431 */
+> +			u64		_0438;		/* 0x0438 */
+> +		} hai;
+> +		/* exception-interception details; icptr 0x03 */
+> +		struct {
+> +			u64	esr_elz;		/* 0x0400 */
+> +			u64	_0408[2];		/* 0x0408 */
+> +			gva_t	far_elz;		/* 0x0418 */
+> +		} trap;
+> +		/* timer-interception reason; icptr 0x04 */
+> +#define SAE_IR_TIMER_ID_VIRT		BIT(6)
+> +#define SAE_IR_TIMER_ID_PHYS		BIT(7)
+> +		u8	tir;			/* 0x0400 */
+> +	};
+> +	u64	_0440[376];			/* 0x0440 */
+> +} __packed __aligned(PAGE_SIZE);
+> +static_assert(sizeof(struct kvm_sae_block) == PAGE_SIZE);
+> +
 
-Having another look... Thought of adding my comment, no changes to the
-above.
+[...]
 
+> +#if IS_ENABLED(CONFIG_KVM_ARM64)
+> +/*
+> + * __sae64a calling convention:
+> + * %r2 pointer to sae control block physical address
+> + */
+> +SYM_FUNC_START(__sae64a)
+> +	stmg	%r6,%r14,__SF_GPRS(%r15)	# store kernel registers
+> +	STBEAR	__SF_SAE_BEAR(%r15)		# save breaking event address register
+> +	.insn	rre,0xb9a50000,%r2,0		# Start Arm Execution
+> +# Let the next instruction be NOP to avoid triggering a machine check
+> +# and handling it in a guest as result of the instruction execution.
 
->>   int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
->> -              void *userspace_addr, enum kvm_mem_type type)
->> +              void *userspace_addr, int guest_memfd,
->> +              u64 guest_memfd_offset, enum kvm_mem_type type)
->>   {
->>       struct kvm_mem_bank *merged =3D NULL;
->>       struct kvm_mem_bank *bank;
->> @@ -327,6 +328,12 @@ int kvm__register_mem(struct kvm *kvm, u64
->> guest_phys, u64 size,
->>               .userspace_addr        =3D (unsigned long)userspace_addr,
->>           };
->> +        if (guest_memfd >=3D 0) {
->> +            mem.flags    |=3D KVM_MEM_GUEST_MEMFD;
->> +            mem.guest_memfd        =3D guest_memfd;
->> +            mem.guest_memfd_offset    =3D guest_memfd_offset;
->> +        }
+@Christian:
+I have the feeling things got lost in translation when this comment was 
+written.
+How would we trigger a MCHECK by having an instruction after SIE/SAE?
+AFAIU this allows us to have a label which we can check in the mcheck 
+handler to decide who triggered the mcheck.
 
-It may be worth capturing the fd and the offset in the mem_bank here,
-but agree that can be added on the need basis and there are no users
-of it for now, without conversion support.
+Without the label the comment and NOP are useless as far as I can see.
+So we need to decide if this still applies and then either remove it or 
+add sae handling to mcck_int_handler and maybe other mcheck functions.
 
-Suzuki
+> +	nopr	7
+> +	LBEAR	__SF_SAE_BEAR(%r15)		# restore breaking event address register
+> +	lmg	%r6,%r14,__SF_GPRS(%r15)	# restore kernel registers
+> +	xgr	%r0,%r0				# clear guest registers to
+> +	xgr	%r1,%r1				# prevent speculative use
+> +	xgr	%r3,%r3
+> +	xgr	%r2,%r2
+> +	xgr	%r4,%r4
+> +	xgr	%r5,%r5
+> +	BR_EX	%r14
+> +SYM_FUNC_END(__sae64a)
+> +EXPORT_SYMBOL(__sae64a)
+> +#endif
+> +
+>   /*
+>    * SVC interrupt handler routine. System calls are synchronous events and
+>    * are entered with interrupts disabled.
+> diff --git a/arch/s390/tools/opcodes.txt b/arch/s390/tools/opcodes.txt
+> index def2659f6602..0e4773c94af0 100644
+> --- a/arch/s390/tools/opcodes.txt
+> +++ b/arch/s390/tools/opcodes.txt
+> @@ -594,6 +594,9 @@ b9a0	clp	RRF_U0RR
+>   b9a1	tpei	RRE_RR
+>   b9a2	ptf	RRE_R0
+>   b9a4	uvc	RRF_URR
+> +b9a5	sae	RRE_R0
+> +b9a6	lasrm	RRE_R0
+> +b9a7	stiasrm	RRE_R0
+>   b9aa	lptea	RRF_RURR2
+>   b9ab	essa	RRF_U0RR
+>   b9ac	irbm	RRE_RR
 
-
->> +
->>           ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem);
->>           if (ret < 0) {
->>               ret =3D -errno;
->
-
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
