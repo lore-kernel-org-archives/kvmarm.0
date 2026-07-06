@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DCF346E59
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 08:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCE844D6B2
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 08:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783327980; cv=none; b=oioCQ4EttWqbRaXgZhIYgpl7+7J/L+NF9GZJfhyGViv7Ln0a45XM5vlNEzWYasVRgP6H+hibJRL1uPcW/rYBCCq9grB7avx2SxP9Mfy9c+zaDVrJi2ANtjvB0vF0zKonbazpPSIoOkM7zV85F5rCg3KXnlhZt00WOZcJvMogErA=
+	t=1783327979; cv=none; b=SPiDGoRX6RVXz6PKwMc2z4ZW/YBerYxSYAwLeZC411a32qEMYUM8vPn7Ly/v/WLYTgzK4D70vE1xYNrBE1pCjorYptSNOeDhWoDXsqlk1Yu5MWKh1Xsyj1DfglRjLfRKoF3tyH1rO7kw4eDq5ygVTDGoTW3ZSMJYfaGguG2wwfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783327980; c=relaxed/simple;
-	bh=zL8phE3G7Xbv3LgqttCQ/eBISgNOG9xNpRqsjGmb08g=;
+	s=arc-20240116; t=1783327979; c=relaxed/simple;
+	bh=qZ5xMbKfSNtfmX+oP+Ql2/t5/cY9A7ak3nV0vDFhx4c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cEXem1QgDPlWA3m5Uj3zWnxgP/D3AT6Rz3P2cFD4+YAlrRhzwvlGSmLrbN2coF8kV2aIDoNYNOQVyREpS7jQMHHyOn0zkTBcqEZlEBUy0rugTnIiYbqXT+FeMdqoI3wyMZHoJDrZgDljnUxuL9sn3q6Rhw2WDyHcHWg9QM0RTDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IK4cPMj2; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=lMcccurgvgv3Epdr6OC5q581ez9CF7ASMcSJJPd3rVRoIIDzV3qeCs+Oj0dCRULclRhWwKoA92LTymhnUIsiNEiOXHJRKVggoeLz0IUb+ltwUdUXHwHme3GYiq5bDh9NQ+MMWLxl6XjOWbLL3WjczGCx99czPlEYHbCYmK/Ll3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jBW3zovj; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IK4cPMj2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jBW3zovj"
 Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 665MIBW02197637;
-	Mon, 6 Jul 2026 08:52:40 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 665MIEBQ2197657;
+	Mon, 6 Jul 2026 08:52:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=VhyXP5vSSTAH6Llcs
-	HqRNXbRvToXpKcr3B3MWyVvrzM=; b=IK4cPMj2uHlwPuAkAQG4TTz1zW967Sv8k
-	CpI3CuBV1vHDy9y3AkXIbYG5SMQfJN50ETPbN8PdN9g2xWEeKcGajeiww0JoMuNF
-	DDm3D+E8UaV7M6F9KMDD/xvYFa4zxF2aTFfabpm/ElyEwGODEfIfyj/nbDNVG283
-	QKRobjC5oqSjLnwFu08TaZHKDR7oG1HSOsP0gvQie6f8FQ5/+n4JS2kE05ujAT5m
-	xW6etnsOfayHqWlYCREWrUSxTmguHGVJZY8MTBsPgQpIzppmCCiWpsDHVTZQSY68
-	yj8p7nWpDhe+U4cvAsIjJq4u6UG61SYVOI1W0t5jWDxK0yF8upm7Q==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6sw4ghew-1
+	:mime-version:references:subject:to; s=pp1; bh=/yQcyuyBh62+1Y5+J
+	buLtGzzWfP1m9RxL1C5ZBt5Iss=; b=jBW3zovjB5Yx3lCL03rc7IJkN97R2teoi
+	cZQrh5JUe4b9C6oRY6hQgJaud2sALzybIbbyq8H7+YLre2yIG3+65f7cGAC1cNOR
+	BWiAdHf0Uqr5EEBOrINj93uKS4QNtPyfpOHDx21fkkRZfKDUqA815Wa5FdjWlqCW
+	VFz3v/KlMwDK9iJ1sCUjTVWldFIyvg9mlqhJN50ma22gPZo1no/9IdVIViG+jFvk
+	sHlpASrxYNYWrD8I8FJCa7KcGsYlWgRJkwiXxKK3tQiu0+RsNmrCJSDvPyS31shC
+	j2pCLygmM6SFQqowD2lyASTqhwOp7hewP+/peYKc9wf7q5KSeHRZQ==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6sw4ghev-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Jul 2026 08:52:40 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6668ndrp023223;
-	Mon, 6 Jul 2026 08:52:39 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4f7cvvvyh4-1
+	Mon, 06 Jul 2026 08:52:39 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6668nis7009869;
+	Mon, 6 Jul 2026 08:52:38 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7cgpw1b8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 06 Jul 2026 08:52:38 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6668qVbU25887390
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6668qWNo43778368
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 Jul 2026 08:52:31 GMT
+	Mon, 6 Jul 2026 08:52:32 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 28B7F20040;
+	by IMSVA (Postfix) with ESMTP id 02A5720040;
+	Mon,  6 Jul 2026 08:52:32 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 94EBC2004D;
 	Mon,  6 Jul 2026 08:52:31 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C290E2004E;
-	Mon,  6 Jul 2026 08:52:30 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 Jul 2026 08:52:30 +0000 (GMT)
+	Mon,  6 Jul 2026 08:52:31 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 03/27] KVM, vfio: remove symbol_get(kvm_put_kvm) from vfio
-Date: Mon,  6 Jul 2026 10:52:03 +0200
-Message-ID: <20260706085229.979525-4-seiden@linux.ibm.com>
+Subject: [PATCH v4 05/27] KVM: Remove KVM_MMIO as config option
+Date: Mon,  6 Jul 2026 10:52:05 +0200
+Message-ID: <20260706085229.979525-6-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260706085229.979525-1-seiden@linux.ibm.com>
 References: <20260706085229.979525-1-seiden@linux.ibm.com>
@@ -91,24 +91,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hJi40U7MfPaskyH7CtMQyiFhKQ7HXHzv
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfX3Ws4NFA6EA1l
- gRblKAaCLgPzILuk5ivIJa0isWOw37HKT6ly3FC4VST6rWsrlTeEXgom9Urdxl8X5b0OFMGGy9D
- QRYjtAaPqS7Mnk3jMaYvhc6HvgE1WGqKjM7UEoYXkEPY2cQsSZ8AW9a/PH4ERI5nPhdTdVex7pZ
- JmgYQuat64pOeTh6QRCL4/Uh+Y7eikHo9+r9+CM42peAu+y8MWggtbxEs35Y0OgRJ/aoR70YsFf
- aIG5VSKK5/vFN8iBcGgufU5smE7mKUA/cNsfGcRxsQNQYe0IpDR5nqZPmJy8qH4bhGFIrP89CW3
- ofkH0f6JZwryLQWEhHR32HetWm1tay4odATafKy8nosdNN2wLU9Cpy6sQiyHdVjkZ3YoHv3MwTf
- J6EzKsv06aL5WMbLR6/0yUnmk/4KSgacQjKRuDLIBiq3DgByA0ly0gnYbTFL2AtjMrQQPIblzzP
- aR8Zb1kK1W26GV1IIGQ==
-X-Proofpoint-ORIG-GUID: hJi40U7MfPaskyH7CtMQyiFhKQ7HXHzv
-X-Authority-Analysis: v=2.4 cv=FqQ1OWrq c=1 sm=1 tr=0 ts=6a4b6cd8 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+X-Proofpoint-GUID: 8iEipEAP3wSdDWjSj84-FUWrSIdS08Y4
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfXwXJ4RNdWsuGK
+ DifjcyZzHlHkqUKrXT1PoGEHBvtWBMmZ3xuGDjSLnxIGn/on0Gx4OYldyS19L+fDrLgtTdHYI9L
+ 6fwz1F7hSbcTYuwc5uKqODTxGq4wW4FooECdwiectdaGWkPF0kyrLbfTC815AboukK0mlrMazLt
+ XEDntZ/YNm4pehuBZna1E71ZAFh86YBfPNyQBOHUeI/bpR6Cx1Ff/FXKIUUwRwqzIjEmkPgThT7
+ foQhrzlJf0TQoywi+ShLhlo7j3m+DsJNj25WNYLsUYoPus5zeeG7hmcsnyuHag6RfnurYdBbVoU
+ R80g224K8qw5DHF31dvnIe0MsBVhlKmPeB6p28kWU7kZkwT37RoTItbOgKGRrY3M0nMmBtSGwY+
+ l/qTZZpZjgwvm0uIAzc8ktm4MeB6H5u4zlV2wND3umWAf8XeupNcNzDJFLb93y+5jq045OSoyfN
+ 5udY4vehYavPHPx5RIg==
+X-Proofpoint-ORIG-GUID: 8iEipEAP3wSdDWjSj84-FUWrSIdS08Y4
+X-Authority-Analysis: v=2.4 cv=FqQ1OWrq c=1 sm=1 tr=0 ts=6a4b6cd7 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=r1p2_3pzAAAA:8
- a=Iid1VeoRPhL8jyw1u-UA:9 a=r_pkcD-q9-ctt7trBg_g:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfX6dTeKarU6+Dl
- rXEsQpvzX0dp0ZJU6qUxA7JpXUtzfh801V5PbZaUXbmKDmZzt9sahlvWGltEuOXaRxKWdxDC4NO
- MZEEVnW16ZqkUrAUzGlJT/t28uJP7Vk=
+ a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=8UI0e4M0uH3UOGHAWE8A:9
+ a=9IkURH4LAGRwoN1D:21
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfXyqSv1k4SrddO
+ PYBTeyOWeEIjjoR29o6QuPz+9Xgpylx9udoFQmkPH/n45Leq+LMur2AD6MtDGbjJej3UF+nK9ZI
+ vd9Ea8e/AWfZVSu8LYJLFu6hUKzVZcY=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-07-05_02,2026-07-03_01,2025-10-01_01
@@ -118,178 +118,325 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060088
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Defining KVM_MMIO is not flexible enough for multi-KVM systems with
+different Kconfig options regarding KVM_MMIO. Therefore, remove KVM_MMIO
+from the config space and use the macro HAVE_KVM_MMIO instead.
 
-Right now, KVM and VFIO are using symbol_get to access each other's
-symbols because of a circular reference between the modules, as well
-as to avoid loading them unnecessarily.
-
-The remaining use in VFIO is for kvm_put_kvm, which is not inline
-because it needs to call kvm_destroy_vm.  However, storing the
-address of kvm_destroy_vm in the "struct kvm" is enough to remove
-the dependency from VFIO.
-
-This also makes it possible to direct kvm_put_kvm to either the arm64
-or the s390 implementation of kvm_destroy_vm.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-Acked-by: Alex Williamson <alex@shazbot.org>
+Suggested-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- drivers/vfio/vfio_main.c  | 24 +++---------------------
- include/linux/kvm_host.h  |  1 -
- include/linux/kvm_types.h |  9 +++++++++
- include/linux/vfio.h      |  1 -
- virt/kvm/kvm_main.c       |  9 ++-------
- 5 files changed, 14 insertions(+), 30 deletions(-)
+ arch/arm64/include/asm/kvm_host.h     | 2 ++
+ arch/arm64/kvm/Kconfig                | 1 -
+ arch/loongarch/include/asm/kvm_host.h | 2 ++
+ arch/loongarch/kvm/Kconfig            | 1 -
+ arch/mips/include/asm/kvm_host.h      | 2 ++
+ arch/mips/kvm/Kconfig                 | 1 -
+ arch/powerpc/include/asm/kvm_host.h   | 7 +++++++
+ arch/powerpc/kvm/Kconfig              | 4 ----
+ arch/riscv/include/asm/kvm_host.h     | 2 ++
+ arch/riscv/kvm/Kconfig                | 1 -
+ arch/x86/include/asm/kvm_host.h       | 2 ++
+ arch/x86/kvm/Kconfig                  | 1 -
+ include/linux/kvm_host.h              | 2 +-
+ virt/kvm/Kconfig                      | 3 ---
+ virt/kvm/Makefile.kvm                 | 3 +--
+ virt/kvm/coalesced_mmio.c             | 3 +++
+ virt/kvm/coalesced_mmio.h             | 2 +-
+ virt/kvm/kvm_main.c                   | 8 ++++----
+ 18 files changed, 27 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index b7b8b45f1cec..6bddea4d384f 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -17,7 +17,7 @@
- #include <linux/idr.h>
- #include <linux/iommu.h>
- #if IS_ENABLED(CONFIG_KVM)
--#include <linux/kvm_host.h>
-+#include <linux/kvm_types.h>
- #endif
- #include <linux/list.h>
- #include <linux/miscdevice.h>
-@@ -451,9 +451,6 @@ EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
- void vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm,
- 			      struct module *kvm_module)
- {
--	void (*pfn)(struct kvm *kvm);
--	bool ret;
--
- 	lockdep_assert_held(&device->dev_set->lock);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bae2c4f92ef5..245bda0fb571 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -33,6 +33,8 @@
  
- 	if (!kvm)
-@@ -462,21 +459,13 @@ void vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm,
- 	if (!try_module_get(kvm_module))
- 		return;
+ #define KVM_HALT_POLL_NS_DEFAULT 500000
  
--	pfn = symbol_get(kvm_put_kvm);
--	if (WARN_ON(!pfn))
-+	if (!kvm_get_kvm_safe(kvm))
- 		goto out_put_mod;
++#define HAVE_KVM_MMIO
++
+ #include <kvm/arm_vgic.h>
+ #include <kvm/arm_arch_timer.h>
+ #include <kvm/arm_pmu.h>
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 449154f9a485..dd138b730217 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -22,7 +22,6 @@ menuconfig KVM
+ 	select KVM_COMMON
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+-	select KVM_MMIO
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select VIRT_XFER_TO_GUEST_WORK
+ 	select KVM_VFIO
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index 23cfbecebbd7..47003a85b35a 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -27,6 +27,8 @@
  
--	ret = kvm_get_kvm_safe(kvm);
--	if (!ret)
--		goto out_put_sym;
--
--	device->put_kvm = pfn;
- 	device->kvm = kvm;
- 	device->kvm_module = kvm_module;
- 	return;
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
  
--out_put_sym:
--	symbol_put(kvm_put_kvm);
- out_put_mod:
- 	module_put(kvm_module);
- }
-@@ -488,14 +477,7 @@ void vfio_device_put_kvm(struct vfio_device *device)
- 	if (!device->kvm)
- 		return;
++#define HAVE_KVM_MMIO
++
+ /* Loongarch KVM register ids */
+ #define KVM_GET_IOC_CSR_IDX(id)		((id & KVM_CSR_IDX_MASK) >> LOONGARCH_REG_SHIFT)
+ #define KVM_GET_IOC_CPUCFG_IDX(id)	((id & KVM_CPUCFG_IDX_MASK) >> LOONGARCH_REG_SHIFT)
+diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
+index 15da2d88c0c1..f03872ba0ba8 100644
+--- a/arch/loongarch/kvm/Kconfig
++++ b/arch/loongarch/kvm/Kconfig
+@@ -28,7 +28,6 @@ config KVM
+ 	select KVM_COMMON
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+-	select KVM_MMIO
+ 	select VIRT_XFER_TO_GUEST_WORK
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index c14b10821817..e3cb7c8c9461 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -26,6 +26,8 @@
  
--	if (WARN_ON(!device->put_kvm))
--		goto clear;
--
--	device->put_kvm(device->kvm);
--	device->put_kvm = NULL;
--	symbol_put(kvm_put_kvm);
--
--clear:
-+	kvm_put_kvm(device->kvm);
- 	device->kvm = NULL;
- 	module_put(device->kvm_module);
- 	device->kvm_module = NULL;
+ #include <kvm/iodev.h>
+ 
++#define HAVE_KVM_MMIO
++
+ /* MIPS KVM register ids */
+ #define MIPS_CP0_32(_R, _S)					\
+ 	(KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
+diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
+index b1b9a1d67758..c65596fdf54f 100644
+--- a/arch/mips/kvm/Kconfig
++++ b/arch/mips/kvm/Kconfig
+@@ -22,7 +22,6 @@ config KVM
+ 	select EXPORT_UASM
+ 	select KVM_COMMON
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+-	select KVM_MMIO
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select HAVE_KVM_READONLY_MEM
+ 	help
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 2d139c807577..92d14438e31b 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -29,6 +29,13 @@
+ 
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ 
++#if defined(CONFIG_KVM_BOOK3S_32_HANDLER) || \
++	defined(CONFIG_KVM_BOOK3S_PR_POSSIBLE) || \
++	defined(CONFIG_KVM_E500V2) || \
++	defined(CONFIG_KVM_E500MC)
++#define HAVE_KVM_MMIO
++#endif
++
+ #define KVM_MAX_VCPUS		NR_CPUS
+ #define KVM_MAX_VCORES		NR_CPUS
+ 
+diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+index 9a0d1c1aca6c..d97a4a51ec55 100644
+--- a/arch/powerpc/kvm/Kconfig
++++ b/arch/powerpc/kvm/Kconfig
+@@ -29,7 +29,6 @@ config KVM_BOOK3S_HANDLER
+ config KVM_BOOK3S_32_HANDLER
+ 	bool
+ 	select KVM_BOOK3S_HANDLER
+-	select KVM_MMIO
+ 
+ config KVM_BOOK3S_64_HANDLER
+ 	bool
+@@ -37,7 +36,6 @@ config KVM_BOOK3S_64_HANDLER
+ 
+ config KVM_BOOK3S_PR_POSSIBLE
+ 	bool
+-	select KVM_MMIO
+ 
+ config KVM_BOOK3S_HV_POSSIBLE
+ 	bool
+@@ -200,7 +198,6 @@ config KVM_E500V2
+ 	depends on PPC_E500 && !PPC_E500MC
+ 	depends on !CONTEXT_TRACKING_USER
+ 	select KVM
+-	select KVM_MMIO
+ 	help
+ 	  Support running unmodified E500 guest kernels in virtual machines on
+ 	  E500v2 host processors.
+@@ -215,7 +212,6 @@ config KVM_E500MC
+ 	depends on PPC_E500MC
+ 	depends on !CONTEXT_TRACKING_USER
+ 	select KVM
+-	select KVM_MMIO
+ 	select KVM_BOOKE_HV
+ 	help
+ 	  Support running unmodified E500MC/E5500/E6500 guest kernels in
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 60017ceec9d2..38333a01e5bb 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -26,6 +26,8 @@
+ #include <asm/kvm_vcpu_timer.h>
+ #include <asm/kvm_vcpu_pmu.h>
+ 
++#define HAVE_KVM_MMIO
++
+ #define KVM_MAX_VCPUS			1024
+ 
+ #define KVM_HALT_POLL_NS_DEFAULT	500000
+diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
+index ec2cee0a39e0..3aea8d4939d2 100644
+--- a/arch/riscv/kvm/Kconfig
++++ b/arch/riscv/kvm/Kconfig
+@@ -28,7 +28,6 @@ config KVM
+ 	select KVM_COMMON
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+-	select KVM_MMIO
+ 	select VIRT_XFER_TO_GUEST_WORK
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5f6c1ce9673b..69a374e48fe7 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -46,6 +46,8 @@
+ 
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ 
++#define HAVE_KVM_MMIO
++
+ /*
+  * CONFIG_KVM_MAX_NR_VCPUS is defined iff CONFIG_KVM!=n, provide a dummy max if
+  * KVM is disabled (arbitrarily use the default from CONFIG_KVM_MAX_NR_VCPUS).
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 801bf9e520db..da5d9fa8a11c 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -32,7 +32,6 @@ config KVM_X86
+ 	select VHOST_TASK
+ 	select KVM_ASYNC_PF
+ 	select USER_RETURN_NOTIFIER
+-	select KVM_MMIO
+ 	select SCHED_INFO
+ 	select PERF_EVENTS
+ 	select GUEST_PERF_EVENTS
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 015d02018109..1f967b1d68b9 100644
+index aa573e2530f7..f179a9230e30 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1072,7 +1072,6 @@ static inline void kvm_irqfd_exit(void)
- int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module);
- void kvm_exit(void);
+@@ -834,7 +834,7 @@ struct kvm {
+ 	struct list_head ioeventfds;
+ 	struct kvm_vm_stat stat;
+ 	struct kvm_arch arch;
+-#ifdef CONFIG_KVM_MMIO
++#ifdef HAVE_KVM_MMIO
+ 	struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
+ 	spinlock_t ring_lock;
+ 	struct list_head coalesced_zones;
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 794976b88c6f..c4a983e41765 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -40,9 +40,6 @@ config NEED_KVM_DIRTY_RING_WITH_BITMAP
+ 	bool
+ 	depends on HAVE_KVM_DIRTY_RING
  
--void kvm_put_kvm(struct kvm *kvm);
- bool file_is_kvm(struct file *file);
- void kvm_put_kvm_no_destroy(struct kvm *kvm);
+-config KVM_MMIO
+-       bool
+-
+ config KVM_ASYNC_PF
+        bool
  
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index add7cc2016e8..aadee536771a 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -144,6 +144,7 @@ struct kvm_vcpu_stat_generic {
+diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
+index d047d4cf58c9..3c27c18b49a0 100644
+--- a/virt/kvm/Makefile.kvm
++++ b/virt/kvm/Makefile.kvm
+@@ -5,9 +5,8 @@
  
- struct kvm_refcount {
- 	refcount_t users_count;
-+	void (*destroy)(struct kvm *kvm);
- };
+ KVM ?= ../../../virt/kvm
  
- static inline void kvm_get_kvm(struct kvm *kvm)
-@@ -164,6 +165,14 @@ static inline bool kvm_get_kvm_safe(struct kvm *kvm)
- 	return refcount_inc_not_zero(&rc->users_count);
+-kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
++kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o $(KVM)/coalesced_mmio.o
+ kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
+-kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+ kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
+ kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
+ kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
+diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+index 6b1d90161099..070eba3c6534 100644
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -12,6 +12,8 @@
+ #include <kvm/iodev.h>
+ 
+ #include <linux/kvm_host.h>
++
++#ifdef HAVE_KVM_MMIO
+ #include <linux/slab.h>
+ #include <linux/kvm.h>
+ 
+@@ -188,3 +190,4 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+ 	 */
+ 	return 0;
  }
++#endif /* ifdef HAVE_KVM_MMIO */
+diff --git a/virt/kvm/coalesced_mmio.h b/virt/kvm/coalesced_mmio.h
+index 36f84264ed25..a8430d41945b 100644
+--- a/virt/kvm/coalesced_mmio.h
++++ b/virt/kvm/coalesced_mmio.h
+@@ -11,7 +11,7 @@
+  *
+  */
  
-+static inline void kvm_put_kvm(struct kvm *kvm)
-+{
-+	struct kvm_refcount *rc = (struct kvm_refcount *)kvm;
-+
-+	if (refcount_dec_and_test(&rc->users_count))
-+		rc->destroy(kvm);
-+}
-+
- #endif /* !__ASSEMBLER__ */
+-#ifdef CONFIG_KVM_MMIO
++#ifdef HAVE_KVM_MMIO
  
- #endif /* __KVM_TYPES_H__ */
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 5bfec0339804..81f04e60ebfd 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -67,7 +67,6 @@ struct vfio_device {
- 	unsigned int open_count;
- 	struct completion comp;
- 	struct iommufd_access *iommufd_access;
--	void (*put_kvm)(struct kvm *kvm);
- 	struct inode *inode;
- #if IS_ENABLED(CONFIG_IOMMUFD)
- 	struct iommufd_device *iommufd_device;
+ #include <linux/list.h>
+ 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7dec697ce35a..271884089f58 100644
+index dcad33cc2f25..6ac79d80e7ec 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -119,6 +119,7 @@ static struct dentry *kvm_debugfs_dir;
+@@ -4035,7 +4035,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
+ 	else if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
+ 		page = virt_to_page(vcpu->arch.pio_data);
+ #endif
+-#ifdef CONFIG_KVM_MMIO
++#ifdef HAVE_KVM_MMIO
+ 	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
+ 		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
+ #endif
+@@ -4861,7 +4861,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_ENABLE_CAP_VM:
+ 	case KVM_CAP_HALT_POLL:
+ 		return 1;
+-#ifdef CONFIG_KVM_MMIO
++#ifdef HAVE_KVM_MMIO
+ 	case KVM_CAP_COALESCED_MMIO:
+ 		return KVM_COALESCED_MMIO_PAGE_OFFSET;
+ 	case KVM_CAP_COALESCED_PIO:
+@@ -5202,7 +5202,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		break;
+ 	}
+ #endif
+-#ifdef CONFIG_KVM_MMIO
++#ifdef HAVE_KVM_MMIO
+ 	case KVM_REGISTER_COALESCED_MMIO: {
+ 		struct kvm_coalesced_mmio_zone zone;
  
- static const struct file_operations stat_fops_per_vm;
- 
-+static void kvm_destroy_vm(struct kvm *kvm);
- static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
- 			   unsigned long arg);
- #ifdef CONFIG_KVM_COMPAT
-@@ -1148,6 +1149,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
- 
- 	BUILD_BUG_ON(offsetof(struct kvm, rc) != 0);
- 	refcount_set(&kvm->rc.users_count, 1);
-+	kvm->rc.destroy = kvm_destroy_vm;
- 
- 	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
- 		for (j = 0; j < 2; j++) {
-@@ -1310,13 +1312,6 @@ static void kvm_destroy_vm(struct kvm *kvm)
- 	mmdrop(mm);
- }
- 
--void kvm_put_kvm(struct kvm *kvm)
--{
--	if (refcount_dec_and_test(&kvm->rc.users_count))
--		kvm_destroy_vm(kvm);
--}
--EXPORT_SYMBOL_GPL(kvm_put_kvm);
--
- /*
-  * Used to put a reference that was taken on behalf of an object associated
-  * with a user-visible file descriptor, e.g. a vcpu or device, if installation
+@@ -5524,7 +5524,7 @@ static long kvm_dev_ioctl(struct file *filp,
+ #ifdef CONFIG_X86
+ 		r += PAGE_SIZE;    /* pio data page */
+ #endif
+-#ifdef CONFIG_KVM_MMIO
++#ifdef HAVE_KVM_MMIO
+ 		r += PAGE_SIZE;    /* coalesced mmio ring page */
+ #endif
+ 		break;
 -- 
 2.53.0
 
