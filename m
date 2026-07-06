@@ -1,154 +1,125 @@
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09393C3448
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 08:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858A63ED3C1
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 08:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783326368; cv=none; b=RRmLYfUKaXO4BftC18ncLu3xkieuqK9nTfAcF4Fb45QtA0JMJWUJOyQ2gNjjRtEmWmkWVJlm5lKaFXeoCVpotkbNSxXUPt/IUtBR3G8ILdnJHJCQXhy4JaBOaqOhrg90D6kZzjLgRHz0G1iiVas8rYsXOgbDX3M9UCB9ZAhQSpk=
+	t=1783326989; cv=none; b=uWhNuSquGDMjlZUoVmPfsNCO50fQJbrm3fgK8MLf8I74AcDyyToib+exKDf4bIuOc/7JkOh1Hu4i/8cL2qnxm/2011q/8NiYPZ/4MRNIsKyiZkFO4/8NZ0NfMtc9jqon9HV6/qC1XtIEqelepSi10grBv9Z0dxGjGtR3eWu66xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783326368; c=relaxed/simple;
-	bh=eo7khvNd3lFAVrArYsAcVORYTVzNouFKGa6OioR3Rjk=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=rZDy2z+w4zwZ5GK+SjZ+LjQ+iKQgy6Yw+w7Ctb+rUrsRhiMJfrKaUZSGZa1IQMVnaUPOseKwDJVDf3P30+r81v5DG+qUCV9tRBpdYuj6PM2jGcs/bGKB/U9SZZaQvnZT8E0CEgF3hSzEb7gjIiYnxl7cF3KezWQo5ULuiHRG8uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=yRyhSjHm; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1783326989; c=relaxed/simple;
+	bh=vl/iryhf9udICuhQXglL/J5ZJ7SSiFYsibHhvsCeNaY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=p8vP8HAn+2IisuOoSgVP8DG+RkgpLdy8uT5qacQCb0W4ifO34+mWSKFo2rUKpUy/lk5KWlOQJ04TxY+td8Hoou5WTCk6nU1asRU43uhS1vr25QHlNcXPACf+Nx9e0Syv+ascSZwbZG5d5DFQydaCmCRC/ctI8MbBpzMBmYd8hDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FdiueYq8; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="yRyhSjHm"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=v4FdqJvosPko5czYRrhhNlwZrhnoPDJZNAF44CKBIgw=;
-	b=yRyhSjHmg8xHc3laHVlNNk8GwIsBQ+p3A5QoB6CXkKneF229G2n/jiQBC7IZjodBiK8jF+IRK
-	MUtt780CxaPMW8NHPSCzjaOL5vEL1pN/BxexONNhSzOkDmlinWz+OMaH861WRvRaR6yJV1HNiVD
-	UJ41OYl5IE5yl98dYayxxes=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gtxzW1C9YzpSvQ;
-	Mon,  6 Jul 2026 16:17:11 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id BF20040579;
-	Mon,  6 Jul 2026 16:25:47 +0800 (CST)
-Received: from kwepemq500001.china.huawei.com (7.202.195.224) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 6 Jul 2026 16:25:47 +0800
-Received: from [10.67.146.137] (10.67.146.137) by
- kwepemq500001.china.huawei.com (7.202.195.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 6 Jul 2026 16:25:46 +0800
-Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
- guarantee with VTTBR_EL2.CnP
-To: Marc Zyngier <maz@kernel.org>
-CC: Wei-Lin Chang <weilin.chang@arm.com>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <seiden@linux.ibm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, "guoyang (C)" <guoyang2@huawei.com>,
-	"huanglingyan (A)" <huanglingyan2@huawei.com>, "Wangzhou (B)"
-	<wangzhou1@hisilicon.com>
-References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
- <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
- <292b5734-9005-6db0-da08-3da04628e620@huawei.com>
- <86o6gkpokm.wl-maz@kernel.org>
-From: Tangnianyao <tangnianyao@huawei.com>
-Message-ID: <21eb51aa-443c-4d08-b4dd-3f813bbc9880@huawei.com>
-Date: Mon, 6 Jul 2026 16:25:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FdiueYq8"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783326969;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EvB+FrHYwLZwyAle5HzB6D+RY21yU1tK+IKQCUMzJJQ=;
+	b=FdiueYq8aLnVNoz75vlrH+WzecD9DgMOxHPjoBpSyduh+aExylHFKqU3H6nMgn+2+PhnIn
+	DBsz0p2VRZ/o1UUJdc5oKaJGdH+swhLa+32DvdAdyTRy/oKY6r4O9Go0mtT7EXWr4kItAy
+	vGG/60YJFEmZhGzlPIMXcSb5lscr474=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH kvmtool v1 3/5] Use kvm_userspace_memory_region2 for all memory registration
+Date: Mon,  6 Jul 2026 09:35:53 +0100
+Message-Id: <20260706083555.302972-4-fuad.tabba@linux.dev>
+In-Reply-To: <20260706083555.302972-1-fuad.tabba@linux.dev>
+References: <20260706083555.302972-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <86o6gkpokm.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemq500001.china.huawei.com (7.202.195.224)
+X-Migadu-Flow: FLOW_OUT
 
+Switch kvm__register_mem() and kvm__destroy_mem() from
+kvm_userspace_memory_region to kvm_userspace_memory_region2 and
+KVM_SET_USER_MEMORY_REGION2 unconditionally. The v2 struct is a
+superset; when the extra fields are zero, the ioctl behaves
+identically to v1.
 
+This prepares for adding guest_memfd support.
 
-On 7/6/2026 15:25, Marc Zyngier wrote:
-> On Mon, 06 Jul 2026 04:30:30 +0100,
-> Tangnianyao <tangnianyao@huawei.com> wrote:
->>
->>
->> On 7/6/2026 1:28, Wei-Lin Chang wrote:
->>> Hi,
->>>
->>> Let me try to answer this:
->>>
->>> On Sat, Jul 04, 2026 at 03:45:56PM +0800, Tangnianyao wrote:
->>>> Hi, all
->>>>
->>>> I'm trying to understand the TLB and I-cache invalidation in
->>>> `kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
->>>> I-cache are private to each vCPU".
->>>>
->>>> As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
->>>> only performs a local TLB and I-cache invalidation, which does not seem
->>>> sufficient to guarantee that property.
->>>>
->>>> In fact, even if the invalidation were extended to the Inner Shareable
->>>> domain, it still seems difficult to guarantee “TLBs and I-cache are
->>>> private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
->>>> vCPUs from the same VM may be running concurrently on different PEs.
->>> I think you have missed that when 2 stages are involved, both stages
->>> have to set CnP == 1 in order to share TLB entries (Arm ARM R_ZVRZW).
->>> So if TLB entry sharing happens, the guest kernel must have allowed it
->>> in the first place (by setting TTBR0/1_EL1.CnP == 1), hence accidental
->>> sharing that you are worried about won't happen.
->>>
->>> __kvm_flush_cpu_context() is solving problems that occur when multiple
->>> vCPUs of a VM are multiplexed on a single physical CPU.
->> Thanks for you answer.
->>
->> If guest kernel allow TLB shared across CPUs by setting TTBR0/1_EL1.CnP == 1,
->> does kvm still need to guarantee that TLBs are private to each vCPU?
-> Yes, because there is nothing that describes which physical CPUs
-> actually share TLBs. So the only possible course of action is to
-> ignore what the guest says and fallback to something that is safe.
->
->>>> So I have two questions:
->>>>
->>>> 1. What is the rationale behind the comment that "guarantee that both TLBs
->>>> and I-cache are private to each vCPU"?
->>> I assume you are asking why keeping both TLBs and I-cache private per
->>> each vCPU is required. The fundamental answer is that each physical CPU
->>> is expected to have its own TLB and I-cache, so we must uphold that
->>> property for vCPUs as well. vCPUs can be scheduled on the same physical
->>> CPU, and use the same physical TLB/I-cache, obviously, so extra
->>> invalidations need to be done.
->> Let's assume that both Stage-1 CnP and Stage-2 CnP are enabled.
->>
->> As I understand it, the architecture permits TLB to be shared by multiple
->> PEs within an Inner Shareable domain. Right?
->>
->> If an implementation allows TLB entries to be shared in this way, it seems
->> that the current invalidation performed by kvm would no longer be sufficient
->> to guarantee that TLBs are private to each vCPU.
-> Care to explain why?
->
-> The core assumption is that a TLBI take effect on all the PEs the TLB
-> is shared with. If this doesn't work, then CnP is unusable, because it
-> is then impossible to guarantee that a translation will be refetched
-> (you could always hit in another PEs TLBs). Such an implementation
-> would be terminally broken.
->
-> 	M.
->
-For example:
-Sharing the TLB between the two SMT threads of the same physical core can
-reduce hardware cost while increasing the effective TLB coverage.
-A local TLBI take effect on the whole TLB shared by the two SMT threads,
-with the sharing enabled by CnP.
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ kvm.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-In this scenario, enabling CnP in KVM appears to break the guarantee that
-TLBs are private to each vCPU when multiple vCPUs of the same VM run
-concurrently on different SMT threads of the same PE.
+diff --git a/kvm.c b/kvm.c
+index 95ccfcb..8a7fd09 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -189,7 +189,7 @@ core_exit(kvm__exit);
+ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		     void *userspace_addr)
+ {
+-	struct kvm_userspace_memory_region mem;
++	struct kvm_userspace_memory_region2 mem;
+ 	struct kvm_mem_bank *bank;
+ 	int ret;
+ 
+@@ -213,14 +213,14 @@ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		goto out;
+ 	}
+ 
+-	mem = (struct kvm_userspace_memory_region) {
++	mem = (struct kvm_userspace_memory_region2) {
+ 		.slot			= bank->slot,
+ 		.guest_phys_addr	= guest_phys,
+ 		.memory_size		= 0,
+ 		.userspace_addr		= (unsigned long)userspace_addr,
+ 	};
+ 
+-	ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
++	ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem);
+ 	if (ret < 0) {
+ 		ret = -errno;
+ 		goto out;
+@@ -239,7 +239,6 @@ out:
+ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		      void *userspace_addr, enum kvm_mem_type type)
+ {
+-	struct kvm_userspace_memory_region mem;
+ 	struct kvm_mem_bank *merged = NULL;
+ 	struct kvm_mem_bank *bank;
+ 	struct list_head *prev_entry;
+@@ -320,7 +319,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		flags |= KVM_MEM_READONLY;
+ 
+ 	if (type != KVM_MEM_TYPE_RESERVED) {
+-		mem = (struct kvm_userspace_memory_region) {
++		struct kvm_userspace_memory_region2 mem = {
+ 			.slot			= slot,
+ 			.flags			= flags,
+ 			.guest_phys_addr	= guest_phys,
+@@ -328,7 +327,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 			.userspace_addr		= (unsigned long)userspace_addr,
+ 		};
+ 
+-		ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
++		ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem);
+ 		if (ret < 0) {
+ 			ret = -errno;
+ 			goto out;
+-- 
+2.39.5
 
-Thanks
-Nianyao Tang
