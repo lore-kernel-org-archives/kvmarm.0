@@ -1,84 +1,326 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5122E975E;
-	Mon,  6 Jul 2026 17:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98553B8130;
+	Mon,  6 Jul 2026 17:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783357476; cv=none; b=VWj4IBXUHrPgWPbXCCF7A+Q4qrbEa8hkA9Y9KBb7tn7LxB3reMH0EeXuxugRptPgNDIzGMOPOhw3pYwEQktxHRFSbZjj5stihoD5w+pgG9t8c7V9YJdwmVXRRjuk/riO2FKLLYVSyxTMgkAN+y3CR5rgZcaXvvXE+SOKoBBqPW0=
+	t=1783359851; cv=none; b=F0+uX/KdlXeMPbkXSo4U0fXIVdzioWMSm31dGGPAlQ4QG/qtBEbjKDX8Tf0btSbg5zPGdZnA+6t8CYdZd/i9h8nCHsG071VkxD5s/gaBPOHg3EQDIDhLtcLigRiBEltpF786drgCKFlJIGVG6XndaXN/iAKSEGD7IuNflzReBtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783357476; c=relaxed/simple;
-	bh=q2bf0hck/kteT/8BiENk5zi92hNnZDmATG4EbRm5dQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MNG6Wlnl/KXobjTggWRV5JUz3YGbP2nulao76WITmzSY3BJWSXxd9UJYonTEQfwuPS2YGN/GMjnIt+oWzED2Gq4316OckfLNjzsB8hvA/b9vYiVHpXcy7wiaC10OU4901D70RSRJ2TCabvcYjx3E4cqNGs4TZ3WoDsiwRZFgRV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyaaNu0D; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783359851; c=relaxed/simple;
+	bh=Uio2Qd2L46mxZJ94QAsPrm0IPNeCGBLMHzQ3WLes4RI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mr9MVTbvqpT35sHGGHJdGisjfqawU6DQdckGn8C+z6Q4z+bF079Dj7HYgx0CnEsbcyG0gPoHS7fydgRPAryJtEXp3CDRYX4YhzBSYN0awFjJR/5qgPC+C32L3+wAkuRGiy46Cc9vrGr58SEWEHrpgCzqZkkAIJCTa33hhA6KRrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvOfA70A; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyaaNu0D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9FE31F000E9;
-	Mon,  6 Jul 2026 17:04:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvOfA70A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED8191F000E9;
+	Mon,  6 Jul 2026 17:44:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783357475;
-	bh=REmuzwIaNWYa8LGBVvGUzNpeujzoKq+eMU1Gq13kbjc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gyaaNu0DZ3lY+wpZZZxQ/iX7UMQqh0yyWYHoi78HU774kBB/02mxwoerTE+/DOWYp
-	 ftBdYzRQvBWyb/29euRzLW3wmTKXWID7tadSd+Nb97HQ7Lw24Q07dQc6tis00rC92/
-	 8xZPYUxbdNceoDK6j/iBacm63/gI7YctudjwjYi4ceHK5RpWkagVWH7umCwngTYW8+
-	 jtsPBAUVsgiN2pTUkDm/0+7BMFzZCznXpYKvpmV6GwD+WlIHud9o4aaWD5Cu3YNgOe
-	 hDWiQNhcSgbvwgEyZXnd/V4YDoYbh9ZojTux/OFUUB/09bWTQe07B9eRAbrcWc2BXO
-	 kT/8DfH8xtg5w==
-Date: Mon, 6 Jul 2026 10:04:33 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	s=k20260515; t=1783359849;
+	bh=frnQFusfT7+zqiZrlJxNpJYyEtPIwtYA5/ws7Q9gAkc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=gvOfA70Ao/AlKfxPTs5UKQfoR1IxQQsSJZzOSlPCk46BZ5j5NgI+/c7iRXlGcSHzs
+	 Z5eaBB41yC7bxRaU7eXoXLj/321K5Yin3erXamGkTy2qErQ4titZCbd6FnlWvmeJWy
+	 ZSM1bDT4qmLtNLR5VR8Yk/pLMEhWVCpP8xXPCdY/nDQszkIiOMJUm1w0HvaiB4JwYq
+	 z3frqKRGVIZs48rrbSDI4DsF+TPtgkunYuQ5UaoIKHtFlx8lqDabjcNoovDDGLdQIF
+	 huXlwYZV84lWtc/1Su3BuGdbCGTOOgBleUvIPMz7WvJaamtFVSruM8vBmwwNrWQciF
+	 bLCwzW8dvCMpg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wgnMU-000000024DS-2U8z;
+	Mon, 06 Jul 2026 17:44:06 +0000
+Date: Mon, 06 Jul 2026 18:44:06 +0100
+Message-ID: <86cxx0ovx5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v8 1/7] KVM: arm64: Disallow vPMU when pPMUs do not cover
- all CPUs
-Message-ID: <akvgIWqBjAp_VA_A@kernel.org>
-References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <20260706-hybrid-v8-1-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 09/27] KVM: arm64: Access elements of vcpu_gp_regs individually
+In-Reply-To: <20260706085229.979525-10-seiden@linux.ibm.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+	<20260706085229.979525-10-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260706-hybrid-v8-1-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On Mon, Jul 06, 2026 at 07:03:24PM +0900, Akihiko Odaki wrote:
-> Commit ec3eb9ed6081 ("KVM: arm64: PMU: Disallow vPMU on non-uniform
-> PMUVer") made KVM reject vPMU unless the system-wide PMUVer is usable.
-> That covers systems where PMUv3 is absent or non-uniform, as well as
-> systems where IMPDEF PMUv3 sysreg traps are unavailable.
+On Mon, 06 Jul 2026 09:52:09 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> However, KVM can still accept vPMU when all CPUs uniformly trap PMUv3
-> sysregs, but the pPMUs registered with KVM only cover a subset of
-> possible CPUs.
+> While for arm64 the members of vcpu_gp_regs are allocated continuous
+> this is not necessarily true for other architectures implementing ARM.
 > 
-> Reject vPMU unless the registered pPMUs cover every possible CPU.
-> This avoids carrying support for partial pPMU coverage into the
-> fixed-counters-only UAPI introduced later in the series.
+> Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
+> the vcpu context but the address of the gp-register array field in the
+> user_pt_reg struct.
 
-Doesn't CPU hotplug screw this up? I could online a CPU that doesn't
-have a PMU after creating the VM.
+That's an interesting change of semantics, because this excludes PC
+from the GPRs. This is valid on AArch64, but wrong for AArch32 (PC
+really is R15, and is just another GPR).
 
-I'd rather just change ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS to become a
-system feature. That way any CPU which breaks the system-wide assumption
-cannot be onlined.
+It isn't a huge deal, and nothing breaks, but that's something that
+you may want to capture.
+
+>
+> Share the gp register functions with s390.
+> 
+> No functional change.
+> 
+> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h       | 13 +++++++++----
+>  arch/arm64/include/asm/kvm_host.h          |  8 +++++++-
+>  arch/arm64/kvm/guest.c                     | 19 +++++++++++--------
+>  arch/arm64/kvm/hyp/exception.c             |  7 +++++--
+>  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  4 ++--
+>  arch/arm64/kvm/hyp/include/hyp/switch.h    |  6 +++---
+>  arch/arm64/kvm/reset.c                     |  6 ++++--
+>  7 files changed, 41 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index a1c92d2436ae..15d6d6a08d37 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -140,12 +140,17 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+>  
+>  static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+>  {
+> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->pc;
+> +	return (unsigned long *)&vcpu->arch.ctxt.regs.pc;
+>  }
+>  
+>  static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
+>  {
+> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->pstate;
+> +	return (unsigned long *)&vcpu->arch.ctxt.regs.pstate;
+> +}
+> +
+> +static __always_inline unsigned long *vcpu_sp_el0(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (unsigned long *)&vcpu->arch.ctxt.regs.sp;
+>  }
+>  
+>  static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+> @@ -175,14 +180,14 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+>  static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
+>  					 u8 reg_num)
+>  {
+> -	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
+> +	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)[reg_num];
+>  }
+>  
+>  static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+>  				unsigned long val)
+>  {
+>  	if (reg_num != 31)
+> -		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+> +		vcpu_gp_regs(vcpu)[reg_num] = val;
+>  }
+>  
+>  #endif /* ARM64_S390_COMMON */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ae9f76378218..2fce38fd9152 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1170,7 +1170,7 @@ struct kvm_vcpu_arch {
+>  #define vcpu_clear_on_unsupported_cpu(vcpu)				\
+>  	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
+>  
+> -#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
+> +#define vcpu_gp_regs(v)		((v)->arch.ctxt.regs.regs)
+>
+>  /*
+>   * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
+> @@ -1201,6 +1201,12 @@ static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+>  
+>  #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+>  
+> +#define kvm_vcpu_get_sp_el1(__vcpu) (__ctxt_sys_reg(&(__vcpu)->arch.ctxt, SP_EL1))
+> +#define kvm_vcpu_get_vreg(__vcpu, _n) (&(__vcpu)->arch.ctxt.fp_regs.vregs[_n])
+> +#define kvm_vcpu_get_vregs(__vcpu) (&(__vcpu)->arch.ctxt.fp_regs.vregs)
+> +#define kvm_vcpu_get_fpsr(__vcpu) (&(__vcpu)->arch.ctxt.fp_regs.fpsr)
+> +#define kvm_vcpu_get_fpcr(__vcpu) (&(__vcpu)->arch.ctxt.fp_regs.fpcr)
+> +
+>  u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
+>  
+>  #define __vcpu_assign_sys_reg(v, r, val)				\
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 5a202cfd27bc..5e1e1faa98c2 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -62,6 +62,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  		       sizeof(kvm_vcpu_stats_desc),
+>  };
+>  
+> +#ifdef ARM64_S390_COMMON
+
+I really think this patch (and a few others) needs splitting. What I'd
+like to see is a prefix to this series adding the required arm64
+rework, and only in a subsequent patch add the "make this shared"
+attributes.
+
+Also, quite a lot of this patch is about using the existing accessors
+instead of an open-coded version. These changes should be standalone.
+
+>  static bool core_reg_offset_is_vreg(u64 off)
+>  {
+>  	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
+> @@ -134,19 +135,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+>  		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
+>  		off /= 2;
+> -		return &vcpu->arch.ctxt.regs.regs[off];
+> +		return &vcpu_gp_regs(vcpu)[off];
+>  
+>  	case KVM_REG_ARM_CORE_REG(regs.sp):
+> -		return &vcpu->arch.ctxt.regs.sp;
+> +		return vcpu_sp_el0(vcpu);
+>  
+>  	case KVM_REG_ARM_CORE_REG(regs.pc):
+> -		return &vcpu->arch.ctxt.regs.pc;
+> +		return vcpu_pc(vcpu);
+>  
+>  	case KVM_REG_ARM_CORE_REG(regs.pstate):
+> -		return &vcpu->arch.ctxt.regs.pstate;
+> +		return vcpu_cpsr(vcpu);
+>  
+>  	case KVM_REG_ARM_CORE_REG(sp_el1):
+> -		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
+> +		return  kvm_vcpu_get_sp_el1(vcpu);
+>  
+>  	case KVM_REG_ARM_CORE_REG(elr_el1):
+>  		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
+> @@ -170,13 +171,13 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
+>  		off -= KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]);
+>  		off /= 4;
+> -		return &vcpu->arch.ctxt.fp_regs.vregs[off];
+> +		return kvm_vcpu_get_vreg(vcpu, off);
+>  
+>  	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
+> -		return &vcpu->arch.ctxt.fp_regs.fpsr;
+> +		return  kvm_vcpu_get_fpsr(vcpu);
+>  
+>  	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
+> -		return &vcpu->arch.ctxt.fp_regs.fpcr;
+> +		return  kvm_vcpu_get_fpcr(vcpu);
+
+Odd additional spaces (3 instances).
+
+>  
+>  	default:
+>  		return NULL;
+> @@ -306,6 +307,8 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	return err;
+>  }
+>  
+> +#endif /* ARM64_S390_COMMON */
+> +
+>  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
+>  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+>  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index bef40ddb16db..82611442a2d1 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -277,6 +277,9 @@ static const u8 return_offsets[8][2] = {
+>  	[7] = { 4, 4 },		/* FIQ, unused */
+>  };
+>  
+> +#define OFFSETOF_PT_REG(__r) offsetof(struct user_pt_regs, __r)
+> +#define COMPAT_IDX(__c) ((OFFSETOF_PT_REG(__c) - OFFSETOF_PT_REG(regs[0])) / sizeof(u64))
+> +
+
+Oh $gawd, this is... awful.
+
+>  static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  {
+>  	unsigned long spsr = *vcpu_cpsr(vcpu);
+> @@ -292,12 +295,12 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  	switch(mode) {
+>  	case PSR_AA32_MODE_ABT:
+>  		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
+> -		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
+> +		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_abt)] = return_address;
+>  		break;
+
+Stupid idea: why don't you simply have new #defines that make the
+register number standalone, and make ptrace.h use that? Something line
+this (which can obviously be extended to all the compat registers):
+
+diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
+index 39582511ad72f..2d3d324d2598e 100644
+--- a/arch/arm64/include/asm/ptrace.h
++++ b/arch/arm64/include/asm/ptrace.h
+@@ -104,6 +104,10 @@
+ #define COMPAT_USER_SZ	296
+ 
+ /* Architecturally defined mapping between AArch32 and AArch64 registers */
++enum aarch32_reg_mapping {
++	__compat_lr_und = 22,
++};
++
+ #define compat_usr(x)	regs[(x)]
+ #define compat_fp	regs[11]
+ #define compat_sp	regs[13]
+@@ -115,7 +119,7 @@
+ #define compat_sp_svc	regs[19]
+ #define compat_lr_abt	regs[20]
+ #define compat_sp_abt	regs[21]
+-#define compat_lr_und	regs[22]
++#define compat_lr_und	regs[__compat_lr_und]
+ #define compat_sp_und	regs[23]
+ #define compat_r8_fiq	regs[24]
+ #define compat_r9_fiq	regs[25]
+
+and then your #defines from hell can go?
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
