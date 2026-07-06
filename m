@@ -1,72 +1,45 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CED3C5552
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 19:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D624A3D349C;
+	Mon,  6 Jul 2026 20:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783367597; cv=none; b=dRMZ5rL7u7xFdTtkZhhJv9h/m39OrkKP3p37kgq7xmW2VhHB60m/C5x6dxh4Bmnfk7E/UC3y4xGY8WIQKXwCh+eM8KDNcfEssWKFAfgFxBvLqWQwCZKgrQ8C4Y8XZZlgl5NKld1MtYyk1nO4GHxZyk1453Nouf0A8jdMifcfCbc=
+	t=1783370050; cv=none; b=cHOxEV4qIdUvkp3JHupZG2xwL6IO/wtO7lr0umoGfU3uPdCtjoMczItlfdw0/gVlCh/7pNQfK+olt/BSkdijxwe67mDbAvhJpS47+6TAOhd04TAGU1kPkG8HaVVfl//awAHbIvqDq1S7HQBhiwk4CiDW5wRI0uaRzf1VZYpynAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783367597; c=relaxed/simple;
-	bh=1B+jpjxTx5TOVbLZW+lRl8rr9j7yKX/HAr+WiXhXlbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WolfNFKJgTvbaPy/JWnu09lnrwl5aGrhkbrTxwx7Q0gDMjsB7OTn/VUP/ja3YMKmEXmVFob8KyKVsKzWRHXxrak0V4lB+H5vcZxabgVyb6cXGiQ4EJ0LcfjdPuWdfTvUW5kDE+6wHad/PMMHiwVy/lCTM8crryMgVssONie08go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mormQX5F; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1783370050; c=relaxed/simple;
+	bh=yToCroHuvQGPIhLjDJwYf1h3Y/ubYLilCysljbHg1ZQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qh8SVbmuIH7kA5qpEU6p2MNUJpHVhLWHKnpimcW7Cly2GvkqYOEB23ziTz83/Yaq0RX+zhD1tZUmXD699W80ZrMbF9EVXJTu1ROg3embEgVLQIwyPtCOYswhHisslT4ZUFhuG8V4NoDQrbgSjYEnVm/Be1H9sAFBIRjhHmuu17w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AF9KK0LK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mormQX5F"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-92e6391b114so245671085a.3
-        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 12:53:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1783367595; x=1783972395; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ryDaMDdUIlJtmHnTUoGTHsXnTD+6T4wqV6GsP0/9lPI=;
-        b=mormQX5FRyXxFb7pnwY/7T4yGWFa41xyao/KSQQGUn6Jz0JiGSYwQ1KpeOC7isTdn9
-         QvOSEemnIOC30nHlBYYy8bxR/c+r8LO6fX+LKr90OrPB3YZWEYWKlCFqIWJgyW2LtsXt
-         KPUF8QKi7kydf/D8j3VH888f94uPvd5jfosVmd6nYmTRT7bM2RsrrTgxpIMQf/lxjEeC
-         MBsDROuzRYCgbcAZRe4yYjOmMn50yelC/SzsmpEefVVLhKp9XPFWf4Jkxqgm8TLIj7Ij
-         WRkwrHMGShm+1CYTkmYezLT+dZqd8vtjoFqIvnZMe+Q2NCtLHKJ54iYo601e4JnturxN
-         Y6Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783367595; x=1783972395;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ryDaMDdUIlJtmHnTUoGTHsXnTD+6T4wqV6GsP0/9lPI=;
-        b=mhv3gjIddsJR07z+edPolK1JHOqzbQrmoHsHxz0aUU1bHt3OwnlB2Q8uAwqB80mbL1
-         DUITR9zfInjqnedq0bWpNzUSPv6DB1leZ+O1zk//BUap1aft/V7QquUpMXdJR4Yzdu1R
-         vT09s5ho3a95ADes0S/3gJ7wJAmAyyXxqK+3oWZocdW3P38T+Fo4Sh80YpiM2L2jH+wL
-         1zjTSS11xj8CWTOA/wVnMIQ2J2NU5aJOGPNB+hXddiEyGjvRkvOtq6c/RkvE/NrbIIn6
-         3BLJyvIcbutog6xmiux29poHBtc/bajYjST9XyOJRMRDi5iFITKizk8BGsZKpKOtEQ+e
-         okeg==
-X-Forwarded-Encrypted: i=1; AHgh+RrzxP9lRac50I9wCGlxFSns2jx4y3CC7yG7yeJTdVvKUiynEAEmHS+VhyLeDY7wyheLToWo16c=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwpQZyWN3PVWh2umPC9ARbKOV0xAt8glA9x1uc71qqts1VnGp26
-	l10dUBiwtefGaCm+loQIorFjTMsnwfe8ToBh2GEsL53s+ZUjt7CgXnVfC++O8GGky9I=
-X-Gm-Gg: AfdE7clUsifg4xIYPHDJp1cQM+L1b1+/cmDE7IvlUmHPhh3nwDUVSWCSc1/f7pLp1QD
-	etXJLKhOuZtXBrHkg840xp8D0jio2opxMMzR5+7QZH7cCWyzOFexyCffCzf4Dd078338LSqINfB
-	IsbF2Yh3wIJbRgPcIRnCxV1GeiNbPjomsd+PZ4G8RW4qYL3z0WlcQmocQf6Mivwu/rTnAaW9Rts
-	3cPfq8NgziMQa9dg9U6CWdo28amf68W0Rma/SQx5o6FcqohHFZR4B2rLLaPxrRcriA5VINxxcba
-	1ZegdIsw/3H2OZzmfDZzqQ90yh5NOQcArpDAs6wFZZYQVFtWE8cFNwv9xl6NTpFnJGTsr293M90
-	Bf2dN6f1yGoqekIrI0o5JQA89MTfCvID7vhiSZVW1GinHuxhFR+biIjIh8II/
-X-Received: by 2002:a05:620a:1791:b0:92e:4773:5a05 with SMTP id af79cd13be357-92ebb52f990mr273301285a.4.1783367594962;
-        Mon, 06 Jul 2026 12:53:14 -0700 (PDT)
-Received: from ziepe.ca ([159.2.72.92])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e90cce037sm988196785a.38.2026.07.06.12.53.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 12:53:14 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1wgpNR-00000000euT-3bF7;
-	Mon, 06 Jul 2026 16:53:13 -0300
-Date: Mon, 6 Jul 2026 16:53:13 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AF9KK0LK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E3521F000E9;
+	Mon,  6 Jul 2026 20:34:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783370048;
+	bh=ICjdoME0JwWsU+/ij6M8X9yZNnPoOxQqARhN6EoKhzc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=AF9KK0LKjBLYXlId0LcJAPAvyA3G7m8eikBSrbGWTdTFnF9qMIPBRMBFugibY3s+o
+	 pRFBN4JoJ6S8AK9Fndz+NQl/9fkNvVoUX61h/oiV5PnMfYOR6MBS0S/LzuJsFi8e+g
+	 SWeTH0ZtDn23NuqcjxbJUGx2zXXKraHAP/G42EiTTD/+zTKbMGV1b5WAqa+ItqE+Tq
+	 fzwWLGivvASXAZ8cVs8mMwNk6jv+5UW1vevvASTfp55dSFMPIgPn3yolDYNUXoyaIo
+	 eiXY6XruA/kMLcaPAOG0tio0Kr2iQZD6vin1SdDp//W0GOuL7PeRFQRiHFkX4Q9C7g
+	 5wtpcdYyV1ngg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wgq10-0000000280c-0vix;
+	Mon, 06 Jul 2026 20:34:06 +0000
+Date: Mon, 06 Jul 2026 21:35:54 +0100
+Message-ID: <87bjcj7t5h.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	linux-s390@vger.kernel.org,
 	Alexander Gordeev <agordeev@linux.ibm.com>,
 	Andreas Grapentin <gra@linux.ibm.com>,
@@ -82,7 +55,7 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Hendrik Brueckner <brueckner@linux.ibm.com>,
 	Ilya Leoshkevich <iii@linux.ibm.com>,
 	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Nico Boehr <nrb@linux.ibm.com>,
 	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
 	Oliver Upton <oupton@kernel.org>,
@@ -90,30 +63,345 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Sven Schnelle <svens@linux.ibm.com>,
 	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 01/27] VFIO: take reference to the KVM module
-Message-ID: <20260706195313.GE118978@ziepe.ca>
+Subject: Re: [PATCH v4 23/27] KVM: s390: arm64: Implement required functions
+In-Reply-To: <20260706085229.979525-24-seiden@linux.ibm.com>
 References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-2-seiden@linux.ibm.com>
+	<20260706085229.979525-24-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260706085229.979525-2-seiden@linux.ibm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jul 06, 2026 at 10:52:01AM +0200, Steffen Eiden wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
+On Mon, 06 Jul 2026 09:52:23 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> VFIO is implicitly taking a reference to the KVM module between
-> vfio_device_get_kvm_safe and vfio_device_put_kvm, thanks to
-> symbol_get and symbol_put.
+> Implement the mostly trivial functions that the shared arm64 (kvm)
+> code & headers oblige s390 to implement.
+> 
+> Implement a very basic smccc handler that (non-compliantly) is just able
+> to stop a vcpu.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>  arch/s390/include/arm64/kvm_emulate.h | 135 ++++++++++++++++++++++++++
+>  arch/s390/include/arm64/kvm_nested.h  |  11 +++
+>  arch/s390/kvm/arm64/handle_exit.c     | 110 +++++++++++++++++++++
+>  arch/s390/kvm/arm64/inject_fault.c    |  21 ++++
+>  4 files changed, 277 insertions(+)
+>  create mode 100644 arch/s390/include/arm64/kvm_emulate.h
+>  create mode 100644 arch/s390/include/arm64/kvm_nested.h
+>  create mode 100644 arch/s390/kvm/arm64/handle_exit.c
+>  create mode 100644 arch/s390/kvm/arm64/inject_fault.c
+> 
+> diff --git a/arch/s390/include/arm64/kvm_emulate.h b/arch/s390/include/arm64/kvm_emulate.h
+> new file mode 100644
+> index 000000000000..6ad21398f86f
+> --- /dev/null
+> +++ b/arch/s390/include/arm64/kvm_emulate.h
+> @@ -0,0 +1,135 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef __S390_ARM64_KVM_EMULATE_H__
+> +#define __S390_ARM64_KVM_EMULATE_H__
+> +
+> +#include <asm/fault.h>
+> +#include <asm/ptrace.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <arm64/kvm_arm.h>
+> +#include <arm64/sysreg.h>
+> +
+> +static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (unsigned long *)&vcpu->arch.sae_block.pc;
+> +}
+> +
+> +static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (unsigned long *)&vcpu->arch.sae_block.pstate;
+> +}
+> +
+> +static __always_inline unsigned long *vcpu_sp_el0(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (unsigned long *)&vcpu->arch.sae_block.sp_el0;
+> +}
+> +
+> +static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.sae_block.hai.esr_elz;
+> +}
+> +
+> +static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.sae_block.hai.far_elz;
+> +}
+> +
+> +static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.sae_block.hai.teid.addr * PAGE_SIZE;
+> +}
+> +
+> +static inline u16 kvm_vcpu_fault_pic(const struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.sae_block.hai.pic & PGM_INT_CODE_MASK;
+> +}
+> +
+> +static __always_inline
+> +bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_vcpu_fault_pic(vcpu) == PGM_PROTECTION;
+> +}
+> +
+> +static __always_inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
+> +{
+> +	return true;
+> +}
+> +
+> +static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_elz = HCR_E2H | HCR_RW | HCR_AMO | HCR_IMO | HCR_FMO |
+> +			     HCR_PTW;
+> +	/* traps */
+> +	vcpu->arch.hcr_elz |= HCR_TSC | HCR_TID1 | HCR_TID2 | HCR_TID3 |
+> +			      HCR_TID4 | HCR_TID5 | HCR_TIDCP;
 
-I thought we weren't doing this approach? Use the struct file as the
-kvm handle. I thought I saw patches doing that already?
+Since this is new code, consider using the generated symbols
+(HCR_EL2_*). I intend to get rid of the compat symbols at some point.
 
-Jason
+> +}
+> +
+> +static inline unsigned long vcpu_get_vsesr(struct kvm_vcpu *vcpu)
+> +{
+> +	WARN(true, "not implemented, just feat RAS");
+
+WARN_ONCE() should be enough. And really, this code shouldn't be
+reachable at all.
+
+> +
+> +	return 0L;
+> +}
+> +
+> +static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+> +{
+> +	WARN(true, "not implemented, just feat RAS");
+
+Same thing.
+
+> +}
+> +
+> +static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline int kvm_vcpu_abt_gltl(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.sae_block.hai.gltl;
+> +}
+> +
+> +static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool is_nested_ctxt(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+> +{
+> +	u32 mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
+> +
+> +	return mode != PSR_MODE_EL0t;
+> +}
+> +
+> +#define SPSR_SS BIT(21)
+
+We may be better off defining SPSR_ELx in the sysreg file and use that
+all over the place.
+
+> +
+> +static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+> +{
+> +	*vcpu_pc(vcpu) += 4;
+> +	*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
+> +
+> +	/* advance the singlestep state machine */
+> +	*vcpu_cpsr(vcpu) &= ~SPSR_SS;
+> +}
+> +
+> +#include <arm64/kvm_emulate-part.h>
+> +
+> +#endif /* __S390_ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/s390/include/arm64/kvm_nested.h b/arch/s390/include/arm64/kvm_nested.h
+> new file mode 100644
+> index 000000000000..e950b1a10c41
+> --- /dev/null
+> +++ b/arch/s390/include/arm64/kvm_nested.h
+> @@ -0,0 +1,11 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef ASM_KVM_NESTED_H
+> +#define ASM_KVM_NESTED_H
+> +
+> +static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +#endif /* ASM_KVM_NESTED_H */
+> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/handle_exit.c
+> new file mode 100644
+> index 000000000000..a0ebe5ffa19a
+> --- /dev/null
+> +++ b/arch/s390/kvm/arm64/handle_exit.c
+> @@ -0,0 +1,110 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <arm64/esr.h>
+> +#include <arm64/kvm_emulate.h>
+> +
+> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+> +exit_handle_fn arm_exit_handlers[ESR_ELx_EC_MAX + 1];
+> +
+> +#define __INCL_GEN_ARM_FILE
+> +#include "generated/handle_exit.inc"
+> +#undef __INCL_GEN_ARM_FILE
+> +
+> +#define PSCI_0_2_FN_SYSTEM_OFF		0x84000008
+> +#define PSCI_RET_NOT_SUPPORTED		-1
+> +#define PSCI_RET_INTERNAL_FAILURE	-6
+
+All of this exists in include/uapi/linux/psci.h.
+
+> +/*
+> + * Temporary smc/hvc handler. Non-compliant implementation (features missing).
+> + * Implements only system off so that test programs are able to end their execution
+> + */
+> +static int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 func_id = vcpu_get_reg(vcpu, 0);
+> +	u64 val = PSCI_RET_NOT_SUPPORTED;
+> +	int ret = 1;
+> +
+> +	if (func_id == PSCI_0_2_FN_SYSTEM_OFF) {
+> +		spin_lock(&vcpu->arch.mp_state_lock);
+> +		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
+> +		spin_unlock(&vcpu->arch.mp_state_lock);
+
+scoped_guard()?
+
+> +		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+> +		memset(&vcpu->run->system_event, 0,
+> +		       sizeof(vcpu->run->system_event));
+> +		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SHUTDOWN;
+> +		vcpu->run->system_event.ndata = 1;
+> +		vcpu->run->system_event.data[0] = 0;
+> +		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +		val = PSCI_RET_INTERNAL_FAILURE;
+> +		ret = 0;
+> +	}
+> +	vcpu_set_reg(vcpu, 0, val);
+> +
+> +	return ret;
+> +}
+> +
+> +static int handle_hvc(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->stat.hvc_exit_stat++;
+> +	return kvm_smccc_call_handler(vcpu);
+> +}
+> +
+> +exit_handle_fn arm_exit_handlers[] = {
+> +	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+> +	[ESR_ELx_EC_HVC64]	= handle_hvc,
+> +};
+> +
+> +/* manually copied from arch/arm64/kernel/traps.c */
+> +static const char * const esr_class_str[] = {
+> +	[0 ... ESR_ELx_EC_MAX]		= "UNRECOGNIZED EC",
+> +	[ESR_ELx_EC_UNKNOWN]		= "Unknown/Uncategorized",
+> +	[ESR_ELx_EC_WFx]		= "WFI/WFE",
+> +	[ESR_ELx_EC_CP15_32]		= "CP15 MCR/MRC",
+> +	[ESR_ELx_EC_CP15_64]		= "CP15 MCRR/MRRC",
+> +	[ESR_ELx_EC_CP14_MR]		= "CP14 MCR/MRC",
+> +	[ESR_ELx_EC_CP14_LS]		= "CP14 LDC/STC",
+> +	[ESR_ELx_EC_FP_ASIMD]		= "ASIMD",
+> +	[ESR_ELx_EC_CP10_ID]		= "CP10 MRC/VMRS",
+> +	[ESR_ELx_EC_PAC]		= "PAC",
+> +	[ESR_ELx_EC_CP14_64]		= "CP14 MCRR/MRRC",
+> +	[ESR_ELx_EC_BTI]		= "BTI",
+> +	[ESR_ELx_EC_ILL]		= "PSTATE.IL",
+> +	[ESR_ELx_EC_SVC32]		= "SVC (AArch32)",
+> +	[ESR_ELx_EC_HVC32]		= "HVC (AArch32)",
+> +	[ESR_ELx_EC_SMC32]		= "SMC (AArch32)",
+> +	[ESR_ELx_EC_SVC64]		= "SVC (AArch64)",
+> +	[ESR_ELx_EC_HVC64]		= "HVC (AArch64)",
+> +	[ESR_ELx_EC_SMC64]		= "SMC (AArch64)",
+> +	[ESR_ELx_EC_SYS64]		= "MSR/MRS (AArch64)",
+> +	[ESR_ELx_EC_SVE]		= "SVE",
+> +	[ESR_ELx_EC_ERET]		= "ERET/ERETAA/ERETAB",
+> +	[ESR_ELx_EC_FPAC]		= "FPAC",
+> +	[ESR_ELx_EC_SME]		= "SME",
+> +	[ESR_ELx_EC_IMP_DEF]		= "EL3 IMP DEF",
+> +	[ESR_ELx_EC_IABT_LOW]		= "IABT (lower EL)",
+> +	[ESR_ELx_EC_IABT_CUR]		= "IABT (current EL)",
+> +	[ESR_ELx_EC_PC_ALIGN]		= "PC Alignment",
+> +	[ESR_ELx_EC_DABT_LOW]		= "DABT (lower EL)",
+> +	[ESR_ELx_EC_DABT_CUR]		= "DABT (current EL)",
+> +	[ESR_ELx_EC_SP_ALIGN]		= "SP Alignment",
+> +	[ESR_ELx_EC_MOPS]		= "MOPS",
+> +	[ESR_ELx_EC_FP_EXC32]		= "FP (AArch32)",
+> +	[ESR_ELx_EC_FP_EXC64]		= "FP (AArch64)",
+> +	[ESR_ELx_EC_GCS]		= "Guarded Control Stack",
+> +	[ESR_ELx_EC_SERROR]		= "SError",
+> +	[ESR_ELx_EC_BREAKPT_LOW]	= "Breakpoint (lower EL)",
+> +	[ESR_ELx_EC_BREAKPT_CUR]	= "Breakpoint (current EL)",
+> +	[ESR_ELx_EC_SOFTSTP_LOW]	= "Software Step (lower EL)",
+> +	[ESR_ELx_EC_SOFTSTP_CUR]	= "Software Step (current EL)",
+> +	[ESR_ELx_EC_WATCHPT_LOW]	= "Watchpoint (lower EL)",
+> +	[ESR_ELx_EC_WATCHPT_CUR]	= "Watchpoint (current EL)",
+> +	[ESR_ELx_EC_BKPT32]		= "BKPT (AArch32)",
+> +	[ESR_ELx_EC_VECTOR32]		= "Vector catch (AArch32)",
+> +	[ESR_ELx_EC_BRK64]		= "BRK (AArch64)",
+> +};
+
+There are a lot of AArch32-specific ECs here that you may not need.
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
