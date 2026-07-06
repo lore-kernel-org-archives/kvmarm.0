@@ -1,234 +1,193 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1B234887E
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 14:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5EA379979
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 14:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783346495; cv=none; b=Jpj1YtLjMSM0zdCN9J9GNFnPTnlVChlTF1uvZxVIs6xoVtwh8ZMq3c+ZdbmKInwBP8OdY6J6o0pckX527UWOB6wSJVMWU2p3GTFyrplZKKn8n8D3R+2YVK4Amn7xvmKQc/a7r8hX5GfgqFbBzfDEVEmhHbULhJM43R9FrsaZ450=
+	t=1783347312; cv=none; b=f6VECp98kwdscYk7PWr48uxpObr24rGX0Qb1xzIfmYLxaRxGGJFKpdYgajOTR8njYxGcPOhsZMYdW2n2ZP2L9NuT1HyUn8c6CFd4Y71LMJVkbdaAW7ItlCK6OAQ3lP6vMXiv+nNkN5s2TI1irDjStnciLN3h7EItByqvYWqM8do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783346495; c=relaxed/simple;
-	bh=+oN658RgH9K/lAIMCdUeIY2Kt33aA1hzIvXPSf3IE5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=noRUByfRYMRrSwSRIrew70Gk9xvuFByvXl9PYcsOq/EXn2LWGhw7jOD24GrYbXoNyFyTRW1beUzHuf0uPlvU52RcbV8KrX2UJOwoCM6XjWmYRS/bQyLi6EdunfqfpfktaDspLuOXmHu+OKjGVQF3yuET5XNbYa5s/U6EEP2IxwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lEFY1Rdi; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783347312; c=relaxed/simple;
+	bh=l6Y6/mffapjDFffyMC+Y4hGMEx2oj1hLxT/Lzbx5Crs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=dq+0ZIlA8SdzOqPvl9JP2zhvNbTCaolL58CfBdTp+jxcCw53z4XtSLO6mAZ8kn6MW9Yi3lAiWka8VXMhapXrlkcevbzYghV6VXLIzFJ04HLEb151FkgMOJD/DRlY/PZBIQGexKsUGF2vcoXIQryqoM9DwFvgbjdKv1XtRgblvDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=41tMsLXM; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lEFY1Rdi"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA6892BCB;
-	Mon,  6 Jul 2026 07:01:28 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F79E3F7B4;
-	Mon,  6 Jul 2026 07:01:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783346493; bh=+oN658RgH9K/lAIMCdUeIY2Kt33aA1hzIvXPSf3IE5g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lEFY1Rdig2oEpz4BrvC0JKnSfTlRJptRPbVsfRu2RwWrm1wSluz9NtO4DHEzW5khu
-	 AtYbRZv5jnqRrGXEWAFWUDxH6i1d0KYXPavUNPM9vsnePRaj+osYyterI5ho0/r5IJ
-	 nWgHLLRf+GGC3pRJDorVzlXs2O2xEvuLeG00NEDQ=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Marc Zyngier <maz@kernel.org>,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	liuyonglong@huawei.com,
-	Jonathan.Cameron@huawei.com,
-	yezhenyu2@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v3 3/5] KVM: arm64: Add support for FEAT_HDBSS
-Date: Mon,  6 Jul 2026 15:01:28 +0100
-Message-ID: <aku1N23Szkta9uA6@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <22abfaf8-8636-4ed3-9a5c-fb4fdef1bc19@huawei.com>
-References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-4-zhengtian10@huawei.com> <ahzUUDAMoHtDFJD3@inochi.infowork> <864ijmvdpy.wl-maz@kernel.org> <ah1KLrpYBXSMM91H@inochi.infowork> <22abfaf8-8636-4ed3-9a5c-fb4fdef1bc19@huawei.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="41tMsLXM"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=LEJv5GyWiRmG2lSUuloOO2+UEipCg7jbRxfrhXUgk8s=;
+	b=41tMsLXMaDSYZJPXIupOQyQvb/gpqtDKslYG4fVwdZxBpGOjnW1vcH8VebS+y9NQsh6CqKZcO
+	uSjqIilj09n3cowX5IoRtYcC0hk5wlZzZF+Srsrb5YASwLtv4t1PXDZ9xFMyjYstbfK1DqrnKCM
+	kFdeNgQVKTmIQ8P3fZ0lD8w=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4gv5jr67xRzmV7V;
+	Mon,  6 Jul 2026 22:05:52 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id F268540565;
+	Mon,  6 Jul 2026 22:15:05 +0800 (CST)
+Received: from kwepemq500001.china.huawei.com (7.202.195.224) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 6 Jul 2026 22:15:05 +0800
+Received: from [10.67.146.137] (10.67.146.137) by
+ kwepemq500001.china.huawei.com (7.202.195.224) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 6 Jul 2026 22:15:04 +0800
+Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
+ guarantee with VTTBR_EL2.CnP
+To: Marc Zyngier <maz@kernel.org>
+CC: Wei-Lin Chang <weilin.chang@arm.com>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <seiden@linux.ibm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, "guoyang (C)" <guoyang2@huawei.com>,
+	"huanglingyan (A)" <huanglingyan2@huawei.com>, "Wangzhou (B)"
+	<wangzhou1@hisilicon.com>
+References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
+ <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
+ <292b5734-9005-6db0-da08-3da04628e620@huawei.com>
+ <86o6gkpokm.wl-maz@kernel.org>
+ <21eb51aa-443c-4d08-b4dd-3f813bbc9880@huawei.com>
+ <86jyr8pkw8.wl-maz@kernel.org>
+From: Tangnianyao <tangnianyao@huawei.com>
+Message-ID: <5685cdb9-95d8-9ead-4d24-d6ad06dd9547@huawei.com>
+Date: Mon, 6 Jul 2026 22:15:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <86jyr8pkw8.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq500001.china.huawei.com (7.202.195.224)
 
-On Fri, Jun 05, 2026 at 04:29:49PM +0800, Tian Zheng wrote:
-> 
-> On 6/1/2026 5:05 PM, Inochi Amaoto wrote:
-> > On Mon, Jun 01, 2026 at 09:58:49AM +0100, Marc Zyngier wrote:
-> > > On Mon, 01 Jun 2026 01:50:22 +0100,
-> > > Inochi Amaoto <inochiama@gmail.com> wrote:
-> > > > On Wed, Feb 25, 2026 at 12:04:19PM +0800, Tian Zheng wrote:
-> > > > > From: eillon <yezhenyu2@huawei.com>
-> > > > > 
-> > > > > Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
-> > > > > indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100. A CPU capability is added
-> > > > > to notify the user of the feature.
-> > > > > 
-> > > > > Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
-> > > > > ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
-> > > > > cannot be determined at KVM initialization, an IOCTL interface is
-> > > > > required.
-> > > > > 
-> > > > > Actually exposing the new capability to user space happens in a later
-> > > > > patch.
-> > > > > 
-> > > > > Signed-off-by: eillon <yezhenyu2@huawei.com>
-> > > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> > > > > ---
-> > > > >   arch/arm64/include/asm/cpufeature.h |  5 +++++
-> > > > >   arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
-> > > > >   arch/arm64/tools/cpucaps            |  1 +
-> > > > >   include/uapi/linux/kvm.h            |  1 +
-> > > > >   tools/include/uapi/linux/kvm.h      |  1 +
-> > > > >   5 files changed, 20 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> > > > > index 4de51f8d92cb..dcc2e2cad5ad 100644
-> > > > > --- a/arch/arm64/include/asm/cpufeature.h
-> > > > > +++ b/arch/arm64/include/asm/cpufeature.h
-> > > > > @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
-> > > > >   	return cpus_have_final_cap(ARM64_HAFT);
-> > > > >   }
-> > > > > 
-> > > > > +static inline bool system_supports_hdbss(void)
-> > > > > +{
-> > > > > +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
-> > > > > +}
-> > > > > +
-> > > > >   static __always_inline bool system_supports_mpam(void)
-> > > > >   {
-> > > > >   	return alternative_has_cap_unlikely(ARM64_MPAM);
-> > > > > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > > > > index c31f8e17732a..348b0afffc3e 100644
-> > > > > --- a/arch/arm64/kernel/cpufeature.c
-> > > > > +++ b/arch/arm64/kernel/cpufeature.c
-> > > > > @@ -2124,6 +2124,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
-> > > > >   	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
-> > > > >   }
-> > > > > 
-> > > > > +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
-> > > > > +{
-> > > > > +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, cope);
-> > > > > +}
-> > > > > +
-> > > > >   bool cpu_supports_bbml2_noabort(void)
-> > > > >   {
-> > > > >   	/*
-> > > > > @@ -2759,6 +2764,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
-> > > > >   		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
-> > > > >   	},
-> > > > >   #endif
-> > > > > +	{
-> > > > > +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
-> > > > > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> > > > > +		.capability = ARM64_HAS_HDBSS,
-> > > > > +		.matches = has_vhe_hdbss,
-> > > > > +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
-> > > > > +	},
-> > > > >   	{
-> > > > >   		.desc = "CRC32 instructions",
-> > > > >   		.capability = ARM64_HAS_CRC32,
-> > > > > diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> > > > > index 7261553b644b..f6ece5b85532 100644
-> > > > > --- a/arch/arm64/tools/cpucaps
-> > > > > +++ b/arch/arm64/tools/cpucaps
-> > > > > @@ -68,6 +68,7 @@ HAS_VA52
-> > > > >   HAS_VIRT_HOST_EXTN
-> > > > >   HAS_WFXT
-> > > > >   HAS_XNX
-> > > > > +HAS_HDBSS
-> > > > >   HAFT
-> > > > >   HW_DBM
-> > > > >   KVM_HVHE
-> > > > 
-> > > > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > > > index 65500f5db379..15ee42cdbd51 100644
-> > > > > --- a/include/uapi/linux/kvm.h
-> > > > > +++ b/include/uapi/linux/kvm.h
-> > > > > @@ -985,6 +985,7 @@ struct kvm_enable_cap {
-> > > > >   #define KVM_CAP_ARM_SEA_TO_USER 245
-> > > > >   #define KVM_CAP_S390_USER_OPEREXEC 246
-> > > > >   #define KVM_CAP_S390_KEYOP 247
-> > > > > +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
-> > > > > 
-> > > > >   struct kvm_irq_routing_irqchip {
-> > > > >   	__u32 irqchip;
-> > > > > diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> > > > > index dddb781b0507..93e0a1e14dc7 100644
-> > > > > --- a/tools/include/uapi/linux/kvm.h
-> > > > > +++ b/tools/include/uapi/linux/kvm.h
-> > > > > @@ -974,6 +974,7 @@ struct kvm_enable_cap {
-> > > > >   #define KVM_CAP_GUEST_MEMFD_FLAGS 244
-> > > > >   #define KVM_CAP_ARM_SEA_TO_USER 245
-> > > > >   #define KVM_CAP_S390_USER_OPEREXEC 246
-> > > > > +#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 248
-> > > > > 
-> > > > >   struct kvm_irq_routing_irqchip {
-> > > > >   	__u32 irqchip;
-> > > > > --
-> > > > > 2.33.0
-> > > > > 
-> > > > Instead of having these architecture specific capability, I wonder if
-> > > > we can add a generic capability like "KVM_CAP_HW_DIRTY_STATE", so
-> > > > other architecture supports similar things can reuse this capability,
-> > > What of the existing stuff doing the same thing? x86's PML, to start
-> > > with?
-> > > 
-> > In fact I think the HDBSS is the first one with non-fixed size.
-> > Although there is a in process RISC-V extension for it, there will
-> > be a long story to make it ratified.
-> > 
-> > > > For this generic thing I suggest, the getter returns the max support
-> > > > entry count (or the buffer size) it supports like the dirty ring
-> > > > capability. And the setter just let the architecture set the parameters
-> > > > based on the user request.
-> > > This looks wrong on a number of levels.
-> > > 
-> > > - If you want something generic, there is the existing dirty
-> > >    log/bitmap. How this stuff is populated is none of the user's
-> > >    business (trapping write accesses, dirty bit collection from the
-> > >    PTs, or HW-generated log), and we don't need an extra feature for
-> > >    it. Performance will obviously suck, but that's what you pay for
-> > >    something abstracted and cross-architecture.
-> > > 
-> > > - If you want something architecture specific, then it can't be
-> > >    generic, by definition. You get the raw speed and compatibility with
-> > >    other arch-specific extensions.
-> > > 
-> > OK, I agree, it is better to keep this thing arch-specific. Doing a
-> > generic thing does not benefit too much, I have made a mistake on
-> > it. Thanks for your kindly explanation.
-> 
-> 
-> Awesome. Thanks for the review.
-> 
-> I agree with Marc—keeping this ARM-specific is the right approach.
-> Also, in v4 we're removing the ioctl interface entirely. HDBSS will be
-> auto-enabled during migration setup and auto-disabled when migration
-> completes, so the capability naming issue becomes moot.
-> 
-> I plan to post v4 with the updated approach soon.
 
-Hi Tian,
 
-Any updates in the v4?
-Please let me know if you want help in any kind, in regards to this 
-patchset. 
+On 7/6/2026 16:44, Marc Zyngier wrote:
+> On Mon, 06 Jul 2026 09:25:46 +0100,
+> Tangnianyao <tangnianyao@huawei.com> wrote:
+>>
+>>
+>> On 7/6/2026 15:25, Marc Zyngier wrote:
+>>> On Mon, 06 Jul 2026 04:30:30 +0100,
+>>> Tangnianyao <tangnianyao@huawei.com> wrote:
+>>>>
+>>>> On 7/6/2026 1:28, Wei-Lin Chang wrote:
+>>>>> Hi,
+>>>>>
+>>>>> Let me try to answer this:
+>>>>>
+>>>>> On Sat, Jul 04, 2026 at 03:45:56PM +0800, Tangnianyao wrote:
+>>>>>> Hi, all
+>>>>>>
+>>>>>> I'm trying to understand the TLB and I-cache invalidation in
+>>>>>> `kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
+>>>>>> I-cache are private to each vCPU".
+>>>>>>
+>>>>>> As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
+>>>>>> only performs a local TLB and I-cache invalidation, which does not seem
+>>>>>> sufficient to guarantee that property.
+>>>>>>
+>>>>>> In fact, even if the invalidation were extended to the Inner Shareable
+>>>>>> domain, it still seems difficult to guarantee “TLBs and I-cache are
+>>>>>> private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
+>>>>>> vCPUs from the same VM may be running concurrently on different PEs.
+>>>>> I think you have missed that when 2 stages are involved, both stages
+>>>>> have to set CnP == 1 in order to share TLB entries (Arm ARM R_ZVRZW).
+>>>>> So if TLB entry sharing happens, the guest kernel must have allowed it
+>>>>> in the first place (by setting TTBR0/1_EL1.CnP == 1), hence accidental
+>>>>> sharing that you are worried about won't happen.
+>>>>>
+>>>>> __kvm_flush_cpu_context() is solving problems that occur when multiple
+>>>>> vCPUs of a VM are multiplexed on a single physical CPU.
+>>>> Thanks for you answer.
+>>>>
+>>>> If guest kernel allow TLB shared across CPUs by setting TTBR0/1_EL1.CnP == 1,
+>>>> does kvm still need to guarantee that TLBs are private to each vCPU?
+>>> Yes, because there is nothing that describes which physical CPUs
+>>> actually share TLBs. So the only possible course of action is to
+>>> ignore what the guest says and fallback to something that is safe.
+>>>
+>>>>>> So I have two questions:
+>>>>>>
+>>>>>> 1. What is the rationale behind the comment that "guarantee that both TLBs
+>>>>>> and I-cache are private to each vCPU"?
+>>>>> I assume you are asking why keeping both TLBs and I-cache private per
+>>>>> each vCPU is required. The fundamental answer is that each physical CPU
+>>>>> is expected to have its own TLB and I-cache, so we must uphold that
+>>>>> property for vCPUs as well. vCPUs can be scheduled on the same physical
+>>>>> CPU, and use the same physical TLB/I-cache, obviously, so extra
+>>>>> invalidations need to be done.
+>>>> Let's assume that both Stage-1 CnP and Stage-2 CnP are enabled.
+>>>>
+>>>> As I understand it, the architecture permits TLB to be shared by multiple
+>>>> PEs within an Inner Shareable domain. Right?
+>>>>
+>>>> If an implementation allows TLB entries to be shared in this way, it seems
+>>>> that the current invalidation performed by kvm would no longer be sufficient
+>>>> to guarantee that TLBs are private to each vCPU.
+>>> Care to explain why?
+>>>
+>>> The core assumption is that a TLBI take effect on all the PEs the TLB
+>>> is shared with. If this doesn't work, then CnP is unusable, because it
+>>> is then impossible to guarantee that a translation will be refetched
+>>> (you could always hit in another PEs TLBs). Such an implementation
+>>> would be terminally broken.
+>>>
+>>> 	M.
+>>>
+>> For example:
+>> Sharing the TLB between the two SMT threads of the same physical core can
+>> reduce hardware cost while increasing the effective TLB coverage.
+> I have a precise idea of what TLB sharing can achieve.
+>
+>> A local TLBI take effect on the whole TLB shared by the two SMT threads,
+>> with the sharing enabled by CnP.
+>>
+>> In this scenario, enabling CnP in KVM appears to break the guarantee that
+>> TLBs are private to each vCPU when multiple vCPUs of the same VM run
+>> concurrently on different SMT threads of the same PE.
+> Please stop inventing your own terminology. A PE *is* a thread in the
+> architecture. There is no such thing as "threads of the same PE".
+>
+> But more to the point: if TLBI invalidates the relevant TLBs for all
+> the PEs that share them, *why* isn't the current KVM behaviour not
+> enough to ensure that the vcpu will not hit old TLBs that are there as
+> a result of a vcpu having run there previously?
+>
+> Please explain.
+>
+> 	M.
+>
 
-Thanks!
-Leo
+Two SMT threads(PE0,PE1) on the same physical core share TLB.
+
+VM0 has 2 vcpus, vcpu0 and vcpu1 that share all architectural context
+except the address translation context.
+
+Vcpu0 may observe TLB entries that are supposed to be private to vcpu1
+in the following case:
+
+    PE0(core0,smt0)         PE1(core0,smt1)
+vcpu0 load           
+vcpu0 va->pa0        
+vcpu0 put            
+                                       vcpu1 load
+                                       vcpu1 flush local tlb
+                                       vcpu1 modify desc to va->pa1
+vcpu0 load
+vcpu0 hit *va->pa1*
+
+
+Thanks
+Nianyao Tang
