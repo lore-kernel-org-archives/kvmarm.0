@@ -1,54 +1,56 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09333BF673
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 17:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815C83E4C99
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 17:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783360477; cv=none; b=B08des633fAQraVLi20sy4yz4fQD8tfT2xLTINtcqch2oTLG4GlF7vJhSJcPdaYXM6TZdHUQvK8pDbD69EKkP13ChQeVahbPVobfbFbrexPCXrdzmW8MWO/+/1kjuGtb9T4A6ilojHwe0+DPi8HScmx+N2mh4o7S1dfIzttDqM0=
+	t=1783360478; cv=none; b=S0RptOD8KxJFBW/Z1Ma0H+mJuHQvzlBCndGTaGsB6gbcOD5Tc9AAtnEPYUE//A+akwahhstYB+1cU7IsDK1w5I0ckfZewylOJBy+lwpdI5jomnn+WYrExfndmCQPSYGxG+EXlYFf/WGgSHKr96x89vuiP2LITJszCGFkorZQbUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783360477; c=relaxed/simple;
-	bh=ltjw/zBfy/Q2HaCy5Hyz/FBotjetzh2uXLTndJfujC8=;
+	s=arc-20240116; t=1783360478; c=relaxed/simple;
+	bh=Cvvr4XCxRsGWTi5hfByvAZCy7EGbJ2j6jI5nIp/JarE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=klLIJ65T+yf2/iMjYSVxcjNcBCPI/1Cgd6tbzPyCFgNPZugvy64h+okKs9Y7zrDfif/3seLf6ivFM12GlLOd4je71pK3qmSgUjrKiMz9U3uEMCQ1vmPsfMF+qWa46kf5eh5S5wuTpYskMor1ua1PL5hDM6/zEHnqEiV87Fv0sVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QwAdjqs5; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=YrepuOiDYl+Gtjm9PfRHkug09v5GGzU4fdrOgElKl3kro8CNPDpR57OqlyKE7vkE9cjKG+yFueWWObYUuNmEY96kIwOvr+0RHas+h5tCZkSTGF5+7diayoHt4Ad9PklFXnIwRGMlFMlhKUr+ewx0OogXBrAb+6EOnIQXRLkPv5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pK9WtYDc; arc=none smtp.client-ip=209.85.208.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QwAdjqs5"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-493bd1716b4so21652615e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 10:54:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pK9WtYDc"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-69a1ab55774so2629322a12.1
+        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 10:54:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783360472; x=1783965272; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZzdJHXVuXMAee7pvhjvjmYNerb4Ls3nAVJtLDckvOmI=;
-        b=QwAdjqs52KIVfnSvp1kDx/9C4FxQftn4g5zL5DZwt4LGqbycc53frQUktowcPtqCFA
-         jVya4XVrUxM/F+OEWLI4LSJCpJ8BVUFAAfm8q4oM8vxg7Gh+CdkxhFp3cSwMNpn3hoU9
-         dWBvOVltgnEwfhKe3PoRY8SkfwNEfes5EoqyYXGsZnaucoHbaxb9axFyP2vm9j56HGeX
-         mrIRJSD2Wz+kRUeCmIknKdooeGuVUBFVRV3+teWkcrSGbQAh4CwPi81jiay6guykxQ5T
-         ShMwqx3NDf2HuU6P/GkSiaFYlfI8+ulaTWLyLxDJN0BHqTNGL3EvlmZ87bw8vI19Od9R
-         VnvA==
+        d=google.com; s=20251104; t=1783360475; x=1783965275; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=TQiMVMx4zM7AUICQBs4M4uVBI5SQsJSaNu2y2QlLlKE=;
+        b=pK9WtYDchanB6thIMVzd05qCmwEyYU54i1lC586cYSEYrMkznb/YLOOEeQCMXVs0sv
+         6rVzZp4gDgWyh8Gv17rqcDKysfyxYeGXNr3F6wE15nHcsuCfIcHQqlJFrhxP4+0kTJrv
+         ADzMiuV2GABSWTNNW+Vq199fFOmYb5v/OGx/2Oi9EWS3Wdhnbn0i5de8mNGgTPFC3EpR
+         h6XoxKx42id+5zrpQr+kgBY9iEp9PleuZH5r4GO1/5gxE6YS/Rp8HwbMC+5KlRIf4Giw
+         7R/ypf1pCe91C1XQ2gTdIk9JIJ+4PoEeX10Xse/U2alfOHPvLW3N1Y2kuljuwvpv0SAx
+         P/eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783360472; x=1783965272;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZzdJHXVuXMAee7pvhjvjmYNerb4Ls3nAVJtLDckvOmI=;
-        b=RoaNjlRxEwPAaKHl3+drQjisJO/fC4U877kxJq5pJe2GutqrKJSD+A5OgJfOWgDyRe
-         8/rSuODJrcvKMQUIYeq2pEz7rIMQ+dzCpKZCYn9M4Fum25GaT9J+x23JDna11ZAuny8q
-         nyufgfKVQUexcJN9SSUYmXr7/X1qLEknAcLs12MOYbGOprR02tu59saejgFDhyjmcB9f
-         iitZxxVj5kJ1aq01JyTDfgsXWMaW/kqsHU2NL2lQtyMqXU+d5v4uz3+ZMEFfc/u8xBm+
-         ea9X05HQrj/dDfdP9Mw8KjB1mtLrVRl5M/tKeCqKOoQWfBZvve6HzzsVFdhgTDPC1GF5
-         8qPQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrbGgdiYTOgJ50EhjJOG//JHMHsC9aS/fsgogxbcE1Xb/xM67zWNOMQz/t2E63Dn9qTC12oaN0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyTJqFCzM31MhdjAEemVdb/KdhJco5S6inpBWlYkXRcayRgMUsK
-	ep8XxZxqs94f9ig/lRZcnOqhTxgERCaIgFkCfmM0zIMLxv92bIRXf7hM1AJf0OvAns7KOoh4FJU
-	fN8lVozuZW/HWdNGEIZp+cQ==
-X-Received: from wmog11.prod.google.com ([2002:a05:600c:310b:b0:490:b2e5:e62d])
+        d=1e100.net; s=20251104; t=1783360475; x=1783965275;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=TQiMVMx4zM7AUICQBs4M4uVBI5SQsJSaNu2y2QlLlKE=;
+        b=h+SOB87t6BuSWZTHRSYf8uLaKC4ziqXt6lP0MO8wqCzXYk8y25xLUScdC707va2uZ9
+         xekVKjTPcQ2iK2UWvWv0jAGko07HIwt0gsTzby5ZXotPfzMwROyBVD1DUYbhvLOWlqos
+         SgxJWtPmkeOuNZDSFlNRkV1IDlAvO7iZVFLDyzxX1NZYOdgM+bGZyYs2RN7JDrx/9VC1
+         c9Weh6Pw4a7St7KVBBLhneDCp26aaUmj/QOzwuaoBCoaUYKtR/rTzKDR/wV9IYWdSo25
+         M6MEeSfLPoS8bgXpe6o6Up+pq2BX18zlFFcD8+TywrOmtAnVtr4ws2onP+A3iE1snL+z
+         i+Sw==
+X-Forwarded-Encrypted: i=1; AHgh+RpMPc2HcbwFxy/HnJae2lA5mLBSypkcfti77kojVZMQf146gWXFu55dbwjOCjzT3AREbGHT22s=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwhwnWVkn6CCkt9v4CKvipWLiuOoS95SXUJhaeQ83G5K6ARINLJ
+	MXQKqa1NjKFHe+yQVtRwjIWBigFYZ7vEAkxJSAkybRE8gDDfGcsGE98wQ363hOuSC8dkumrLrLU
+	xaPiHQahExplHgBaot2oNpQ==
+X-Received: from edrl12.prod.google.com ([2002:aa7:c3cc:0:b0:698:c100:5437])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:19c6:b0:493:b03c:5650 with SMTP id 5b1f17b1804b1-493df06d8cdmr18356455e9.19.1783360471797;
- Mon, 06 Jul 2026 10:54:31 -0700 (PDT)
-Date: Mon,  6 Jul 2026 18:54:06 +0100
+ 2002:a05:6402:516f:b0:69a:6f1:d2f5 with SMTP id 4fb4d7f45d1cf-69a85c49758mr744077a12.40.1783360474512;
+ Mon, 06 Jul 2026 10:54:34 -0700 (PDT)
+Date: Mon,  6 Jul 2026 18:54:08 +0100
 In-Reply-To: <20260706175415.2604046-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260706175415.2604046-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.55.0.rc2.803.g1fd1e6609c-goog
-Message-ID: <20260706175415.2604046-10-vdonnefort@google.com>
-Subject: [PATCH v2 09/18] KVM: arm64: Add reclaim interface for the pKVM heap alloc
+Message-ID: <20260706175415.2604046-12-vdonnefort@google.com>
+Subject: [PATCH v2 11/18] KVM: arm64: Add a shrinker for pKVM
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -69,133 +71,73 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Introduce a host interface to reclaim donated memory from the pKVM heap
-allocator back to the host.
+Integrate the pKVM memory reclaim interface with the host's memory
+management subsystem.
 
-It specifically provides two helpers that will make it easier to
-create a shrinker for pKVM:
-
-  pkvm_hyp_reclaimable()
-  pkvm_hyp_relaim()
+This allows the host to automatically recover unused memory fom the
+hypervisor's heap allocator when the host is under memory pressure.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 681b7bf8ac08..b427ef790b15 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -115,6 +115,8 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_topup,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_reclaim,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_reclaimable,
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 50adfff75be8..3dc2b9d2c322 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -122,6 +122,8 @@ static bool vgic_present, kvm_arm_initialised;
  
- 	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
- };
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 99daa985856f..3a8590d1793e 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -21,6 +21,9 @@ enum pkvm_topup_id {
- 	PKVM_TOPUP_HYP_ALLOC,
- };
+ static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
  
-+unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target);
-+unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id);
++static struct shrinker *pkvm_shrinker;
 +
- int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
- int pkvm_create_hyp_vm(struct kvm *kvm);
- bool pkvm_hyp_vm_is_created(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index e270a974fa37..8fbebe64a93d 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -657,6 +657,42 @@ static void handle___pkvm_hyp_topup(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 3) = host_mc.nr_pages;
+ bool is_kvm_arm_initialised(void)
+ {
+ 	return kvm_arm_initialised;
+@@ -2526,8 +2528,8 @@ static void __init teardown_hyp_mode(void)
+ 		}
+ 
+ 		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
+-
+ 	}
++	shrinker_free(pkvm_shrinker);
  }
  
-+static void handle___pkvm_hyp_reclaim(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(enum pkvm_topup_id, id, host_ctxt, 1);
-+	DECLARE_REG(unsigned long, target, host_ctxt, 2);
-+	struct kvm_hyp_memcache host_mc = {};
-+	int ret = 0;
-+
-+	switch (id) {
-+	case PKVM_TOPUP_HYP_ALLOC:
-+		hyp_alloc_reclaim(&host_mc, target);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+
-+	cpu_reg(host_ctxt, 1) = ret;
-+	cpu_reg(host_ctxt, 2) = host_mc.head;
-+	cpu_reg(host_ctxt, 3) = host_mc.nr_pages;
-+}
-+
-+static void handle___pkvm_hyp_reclaimable(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(enum pkvm_topup_id, id, host_ctxt, 1);
-+	unsigned long reclaimable = 0;
-+
-+	switch (id) {
-+	case PKVM_TOPUP_HYP_ALLOC:
-+		reclaimable = hyp_alloc_reclaimable();
-+		break;
-+	default:
-+		reclaimable = 0;
-+	}
-+
-+	cpu_reg(host_ctxt, 1) = reclaimable;
-+}
-+
- static void handle___tracing_load(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(unsigned long, desc_hva, host_ctxt, 1);
-@@ -788,6 +824,8 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_vcpu_put),
- 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__pkvm_hyp_topup),
-+	HANDLE_FUNC(__pkvm_hyp_reclaim),
-+	HANDLE_FUNC(__pkvm_hyp_reclaimable),
- };
- 
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index adc418076cb0..eb4c60a0db5a 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -115,6 +115,28 @@ static int pkvm_hyp_topup(enum pkvm_topup_id id, unsigned long nr_pages)
- 	return ret;
+ static int __init do_pkvm_init(u32 hyp_va_bits)
+@@ -2713,6 +2715,18 @@ static void pkvm_hyp_init_ptrauth(void)
+ 	}
  }
  
-+unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
++static unsigned long
++pkvm_shrinker_count(struct shrinker *shrink, struct shrink_control *sc)
 +{
-+	struct kvm_hyp_memcache mc;
-+	struct arm_smccc_res res;
-+	unsigned long reclaimed;
-+
-+	arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(__pkvm_hyp_reclaim), id, target, &res);
-+	if (WARN_ON_ONCE(res.a0 != SMCCC_RET_SUCCESS) || WARN_ON_ONCE(res.a1))
-+		return 0;
-+
-+	init_hyp_memcache(&mc);
-+	mc.head = res.a2;
-+	mc.nr_pages = reclaimed = res.a3;
-+	free_hyp_memcache(&mc);
-+
-+	return reclaimed;
++	return pkvm_hyp_reclaimable(PKVM_TOPUP_HYP_ALLOC) ?: SHRINK_EMPTY;
 +}
 +
-+unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
++static unsigned long
++pkvm_shrinker_scan(struct shrinker *shrink, struct shrink_control *sc)
 +{
-+	return kvm_call_hyp_nvhe(__pkvm_hyp_reclaimable, id);
++	return pkvm_hyp_reclaim(PKVM_TOPUP_HYP_ALLOC, sc->nr_to_scan);
 +}
- static void __pkvm_destroy_hyp_vm(struct kvm *kvm)
++
+ /* Inits Hyp-mode on all online CPUs */
+ static int __init init_hyp_mode(void)
  {
- 	if (pkvm_hyp_vm_is_created(kvm)) {
+@@ -2883,6 +2897,16 @@ static int __init init_hyp_mode(void)
+ 			kvm_err("Failed to init hyp memory protection\n");
+ 			goto out_err;
+ 		}
++
++		pkvm_shrinker = shrinker_alloc(0, "pkvm");
++		if (pkvm_shrinker) {
++			pkvm_shrinker->count_objects = pkvm_shrinker_count;
++			pkvm_shrinker->scan_objects = pkvm_shrinker_scan;
++			shrinker_register(pkvm_shrinker);
++		} else {
++			kvm_err("Failed to register shrinker for pKVM\n");
++		}
++
+ 	}
+ 
+ 	return 0;
 -- 
 2.55.0.rc2.803.g1fd1e6609c-goog
 
