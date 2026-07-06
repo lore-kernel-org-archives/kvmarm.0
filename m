@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813FA3C10A2;
-	Mon,  6 Jul 2026 06:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380282C181;
+	Mon,  6 Jul 2026 06:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783317920; cv=none; b=IzF6PXEhANA7/IWO8d309e5Fw/Wr0Q94kN2gLRke7LCP8Wl4oTcYTeieEJ6axpeZeoh6FPNcU9LJ2FW5uBbk1VQlmAoQVuoKb6JhCBLeGnd++YOZBI1Eex0uHIt2dCWAHvp68RY+/8J1D71oD2RpIALMQ7Ih6WT5j8vLSaJmk6U=
+	t=1783317924; cv=none; b=MDmkxIdsY8TbcAnBSFph4CB3UIW2yGlC6aSdkylLw1CzhgRft1sNEWQ0wGRae4crI6h2X/qfEwnpN68QAfTitr/lMkACX4H6vFs1gkJ+rNctGA2tR71+sgakL3Qf6iwse4hzLj+xERYgMKuNjhglgloV18xFYjuXjOmUrsb/8WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783317920; c=relaxed/simple;
-	bh=vRGeLz9uTygkok0d/nLp9chMqt1hZRjTlGkBos2rc6Y=;
+	s=arc-20240116; t=1783317924; c=relaxed/simple;
+	bh=5Fh/HF+sh6aJFodEmfl0wYTeQLetdm7629n3hJL8VIY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LxVZAemDc0Q+Lu/fysyG47CSAnMnZRi8KU+eQ0UpCIcLGAu1Huv34flHMSKBLQ/QtRnT8Slp62i51WC8RkgpZZk0R0MkLEw8qobvwa2LavaIPuTh9hqRiVp/yvZxueIC1ABpdL7tO7ZNk5z5gOdEgMcp/U63+fwNAouK+QP63SQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGq5LAK2; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=nq+p3kBiJY1HxJPXszaRcwrrQMvTcjaEV5/kZHINEg0JZ0pr+8RHiWg6JilLJ6xxaYGfoddBuRlgICPjqs1F/m5MtmCxQ7Q6RMBqseHqfGY0jNePWeeaTkEk1P8gBnbZ1SlcqWMpDm63azSS6JxP7uu8Z7whaK8BIhEfaePtUyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8JG8hBs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGq5LAK2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8507A1F000E9;
-	Mon,  6 Jul 2026 06:05:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8JG8hBs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 055D61F00A3A;
+	Mon,  6 Jul 2026 06:05:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783317916;
-	bh=z+bPfSuQARImroV5BkbmoGryt8x5TsbegRK/YB3WTqw=;
+	s=k20260515; t=1783317923;
+	bh=e2V3VqU4Wtz37YK1GAfo+NDcDqEETC18sWhhjPNJ4SU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AGq5LAK2N1saAxqSz5Vt6bmFurZ7JFxzV/U+nWXFTylLAZiE1DEl4C5XD2g20oK+Y
-	 2fsdg49V3jrpAIg2uqIzleiq2C0QdbPUTERFuk3kOGLxJ7XVYXV4WsWpc55feBywC9
-	 iSSs2HM6CjCTu+aS+sH02WI7p/465mZKkhW3ImZSp2CHz1TW0ROAAYyWoOEKZh+u0o
-	 EM5EgjeLAcByJT3tWVvTDwMgo5atfQ79cmG5huP7rMPaEOkTDe8ro2PZDGwdIl94rX
-	 K4aiQDkyVCDr0/9UtK+9MbEPTUfzkqwkDjUvDDkmL3qSSwI1y8oOEK2d/9NcQMLcq4
-	 CgpWH8GynLScw==
+	b=L8JG8hBsi7TeebOUuOSZlVgb8uOzreNkz4Lu8dOGqF6RK+IsodD4hcPNs3XwR8r30
+	 8+9AbGoKFF16IhQX6xvaIQ6WDdgF+08nRLe+YFpiGh82047xona2TEvgDy8SwEyNYY
+	 h60+QAnm28YIAtDPwj7dXKZkCoZkWIigteci+qjDqqYIlHmjnxMqmcb9r3+AntLSxw
+	 GzLIMudvqM5YBG80WnBD/aV4um2euTd6qc69SPNLeux04yUQ4BJAfTr0IMxGxFZJIS
+	 lkXPTeSe9H89xpQ3IQ3RhLxjTw6hh1bKxY2QEctLOoKQy+KMjRnjwf8+BdEUaLQOwH
+	 jbSZYDPBul29Q==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Thomas Gleixner <tglx@kernel.org>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v5 04/10] dma-direct: Align CoCo shared DMA allocations to the shared granule size
-Date: Mon,  6 Jul 2026 11:34:26 +0530
-Message-ID: <20260706060432.1375570-5-aneesh.kumar@kernel.org>
+Subject: [PATCH v5 05/10] swiotlb: Align shared IO TLB pools to the shared granule size
+Date: Mon,  6 Jul 2026 11:34:27 +0530
+Message-ID: <20260706060432.1375570-6-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260706060432.1375570-1-aneesh.kumar@kernel.org>
 References: <20260706060432.1375570-1-aneesh.kumar@kernel.org>
@@ -56,127 +56,117 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-DMA allocations that create shared backing pages for confidential-computing
-guests are converted between private and shared memory before being used
-for DMA. On some architecture, the conversion granule may be larger than
-PAGE_SIZE, so converting only the requested size can leave the rest of the
-host-managed granule private.
+swiotlb pools used by confidential-computing guests are shared with the
+host and therefore must be converted at the host shared-granule size. A
+PAGE_SIZE-sized or PAGE_SIZE-aligned pool is not sufficient when the host
+tracks shared state at a larger granularity.
 
-Use the internal __DMA_ATTR_ALLOC_CC_SHARED allocation attribute to
-identify those allocations in the DMA allocation paths. Round the allocated
-and converted size up to mem_cc_shared_granule_size(), and use the same
-aligned size when restoring encryption on free.
-
-Also reject CMA allocations for CoCo shared backing pages when CMA cannot
-provide alignment at the required shared granule size, and keep atomic DMA
-pool expansion from falling below the order needed for shared-buffer
-conversions.
+Round swiotlb pool sizes to mem_cc_shared_granule_size(), allocate the
+pools at that alignment, and use the same aligned size when decrypting,
+encrypting and freeing pool memory. Apply the same rule to dynamically
+allocated swiotlb pools.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- kernel/dma/contiguous.c |  9 +++++++++
- kernel/dma/direct.c     | 16 ++++++++++++++--
- kernel/dma/pool.c       |  4 +++-
- 3 files changed, 26 insertions(+), 3 deletions(-)
+ kernel/dma/swiotlb.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/kernel/dma/contiguous.c b/kernel/dma/contiguous.c
-index 6c8a61ab5456..3d0eac2e2a20 100644
---- a/kernel/dma/contiguous.c
-+++ b/kernel/dma/contiguous.c
-@@ -45,6 +45,7 @@
- #include <linux/dma-map-ops.h>
- #include <linux/cma.h>
- #include <linux/nospec.h>
-+#include <linux/mem_encrypt.h>
+diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+index 897aba538c5b..1d77746b6f31 100644
+--- a/kernel/dma/swiotlb.c
++++ b/kernel/dma/swiotlb.c
+@@ -287,7 +287,8 @@ void __init swiotlb_update_mem_attributes(void)
  
- #ifdef CONFIG_CMA_SIZE_MBYTES
- #define CMA_SIZE_MBYTES CONFIG_CMA_SIZE_MBYTES
-@@ -417,6 +418,14 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp,
- #ifdef CONFIG_DMA_NUMA_CMA
- 	int nid = dev_to_node(dev);
- #endif
-+	/*
-+	 * CoCo shared allocations require CMA alignment large enough for the
-+	 * architecture's shared-buffer granule.
-+	 */
-+	if (attrs & __DMA_ATTR_ALLOC_CC_SHARED) {
-+		if (get_order(mem_cc_shared_granule_size()) > CONFIG_CMA_ALIGNMENT)
-+			return NULL;
-+	}
+ 	if (!mem->nslabs || mem->late_alloc)
+ 		return;
+-	bytes = PAGE_ALIGN(mem->nslabs << IO_TLB_SHIFT);
++
++	bytes = mem_cc_align_to_shared_granule(mem->nslabs << IO_TLB_SHIFT);
  
- 	/* CMA can be used only in the context which permits sleeping */
- 	if (!gfpflags_allow_blocking(gfp))
-diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-index 80f9f7d23ad4..6d0e485fdc34 100644
---- a/kernel/dma/direct.c
-+++ b/kernel/dma/direct.c
-@@ -280,6 +280,9 @@ void *dma_direct_alloc(struct device *dev, size_t size,
- 		return NULL;
+ 	if (io_tlb_default_mem.cc_shared) {
+ 		int ret;
+@@ -354,8 +355,8 @@ static void __init *swiotlb_memblock_alloc(unsigned long nslabs,
+ 		unsigned int flags,
+ 		int (*remap)(void *tlb, unsigned long nslabs))
+ {
+-	size_t bytes = PAGE_ALIGN(nslabs << IO_TLB_SHIFT);
+ 	void *tlb;
++	size_t bytes = mem_cc_align_to_shared_granule(nslabs << IO_TLB_SHIFT);
+ 
+ 	/*
+ 	 * By default allocate the bounce buffer memory from low memory, but
+@@ -363,9 +364,9 @@ static void __init *swiotlb_memblock_alloc(unsigned long nslabs,
+ 	 * memory encryption.
+ 	 */
+ 	if (flags & SWIOTLB_ANY)
+-		tlb = memblock_alloc(bytes, PAGE_SIZE);
++		tlb = memblock_alloc(bytes, mem_cc_shared_granule_size());
+ 	else
+-		tlb = memblock_alloc_low(bytes, PAGE_SIZE);
++		tlb = memblock_alloc_low(bytes, mem_cc_shared_granule_size());
+ 
+ 	if (!tlb) {
+ 		pr_warn("%s: Failed to allocate %zu bytes tlb structure\n",
+@@ -374,7 +375,7 @@ static void __init *swiotlb_memblock_alloc(unsigned long nslabs,
  	}
  
-+	if (mark_mem_decrypt)
-+		size = mem_cc_align_to_shared_granule(size);
-+
- 	/* we always manually zero the memory once we are done */
- 	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO,
- 					allow_highmem, attrs);
-@@ -402,6 +405,9 @@ void dma_direct_free(struct device *dev, size_t size,
- 		/* Swiotlb doesn't need a page attribute update on free */
- 		mark_mem_encrypted = false;
- 
-+	if (mark_mem_encrypted && force_dma_unencrypted(dev))
-+		size = mem_cc_align_to_shared_granule(size);
-+
- 	if (is_vmalloc_addr(cpu_addr)) {
- 		vunmap(cpu_addr);
- 	} else {
-@@ -448,6 +454,9 @@ struct page *dma_direct_alloc_pages(struct device *dev, size_t size,
- 		goto setup_page;
+ 	if (remap && remap(tlb, nslabs) < 0) {
+-		memblock_free(tlb, PAGE_ALIGN(bytes));
++		memblock_free(tlb, bytes);
+ 		pr_warn("%s: Failed to remap %zu bytes\n", __func__, bytes);
+ 		return NULL;
  	}
+@@ -496,7 +497,7 @@ int swiotlb_init_late(size_t size, gfp_t gfp_mask,
+ 		swiotlb_adjust_nareas(num_possible_cpus());
  
-+	if (attrs & __DMA_ATTR_ALLOC_CC_SHARED)
-+		size = mem_cc_align_to_shared_granule(size);
-+
- 	page = __dma_direct_alloc_pages(dev, size, gfp, false, attrs);
+ retry:
+-	order = get_order(nslabs << IO_TLB_SHIFT);
++	order = get_order(mem_cc_align_to_shared_granule(nslabs << IO_TLB_SHIFT));
+ 	nslabs = SLABS_PER_PAGE << order;
+ 
+ 	while ((SLABS_PER_PAGE << order) > IO_TLB_MIN_SLABS) {
+@@ -505,6 +506,8 @@ int swiotlb_init_late(size_t size, gfp_t gfp_mask,
+ 		if (vstart)
+ 			break;
+ 		order--;
++		if (order < get_order(mem_cc_shared_granule_size()))
++			break;
+ 		nslabs = SLABS_PER_PAGE << order;
+ 		retried = true;
+ 	}
+@@ -585,7 +588,7 @@ void __init swiotlb_exit(void)
+ 
+ 	pr_info("tearing down default memory pool\n");
+ 	tbl_vaddr = (unsigned long)phys_to_virt(mem->start);
+-	tbl_size = PAGE_ALIGN(mem->end - mem->start);
++	tbl_size = mem_cc_align_to_shared_granule(mem->end - mem->start);
+ 	slots_size = PAGE_ALIGN(array_size(sizeof(*mem->slots), mem->nslabs));
+ 
+ 	if (io_tlb_default_mem.cc_shared) {
+@@ -629,12 +632,14 @@ void __init swiotlb_exit(void)
+ static struct page *alloc_dma_pages(gfp_t gfp, size_t bytes,
+ 		u64 phys_limit, unsigned long attrs)
+ {
+-	unsigned int order = get_order(bytes);
+ 	bool cc_shared = attrs & __DMA_ATTR_ALLOC_CC_SHARED;
++	unsigned int order;
+ 	struct page *page;
+ 	phys_addr_t paddr;
+ 	void *vaddr;
+ 
++	bytes = mem_cc_align_to_shared_granule(bytes);
++	order = get_order(bytes);
+ 	page = alloc_pages(gfp, order);
  	if (!page)
  		return NULL;
-@@ -488,8 +497,11 @@ void dma_direct_free_pages(struct device *dev, size_t size,
- 	if (swiotlb_pool)
- 		mark_mem_encrypted = false;
+@@ -725,6 +730,7 @@ static void swiotlb_free_tlb(void *vaddr, size_t bytes, bool cc_shared)
+ 	    dma_free_from_pool(NULL, vaddr, bytes))
+ 		return;
  
--	if (mark_mem_encrypted && dma_set_encrypted(dev, vaddr, size))
--		return;
-+	if (mark_mem_encrypted) {
-+		size = mem_cc_align_to_shared_granule(size);
-+		if (dma_set_encrypted(dev, vaddr, size))
-+			return;
-+	}
- 
- 	if (swiotlb_pool)
- 		swiotlb_free_from_pool(dev, phys, swiotlb_pool);
-diff --git a/kernel/dma/pool.c b/kernel/dma/pool.c
-index 5115a3e8c722..d02b630e80fc 100644
---- a/kernel/dma/pool.c
-+++ b/kernel/dma/pool.c
-@@ -90,7 +90,9 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
- 	bool leak_pages = false;
- 	void *addr;
- 	int ret = -ENOMEM;
-+	unsigned int min_encrypt_order = get_order(mem_cc_shared_granule_size());
- 
-+	pool_size = mem_cc_align_to_shared_granule(pool_size);
- 	/* Cannot allocate larger than MAX_PAGE_ORDER */
- 	order = min(get_order(pool_size), MAX_PAGE_ORDER);
- 
-@@ -101,7 +103,7 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
- 							 order, false);
- 		if (!page)
- 			page = alloc_pages(gfp | __GFP_NOWARN, order);
--	} while (!page && order-- > 0);
-+	} while (!page && order-- > min_encrypt_order);
- 	if (!page)
- 		goto out;
- 
++	bytes = mem_cc_align_to_shared_granule(bytes);
+ 	/* Intentional leak if pages cannot be encrypted again. */
+ 	if (!cc_shared ||
+ 	    !set_memory_encrypted((unsigned long)vaddr, PFN_UP(bytes)))
 -- 
 2.43.0
 
