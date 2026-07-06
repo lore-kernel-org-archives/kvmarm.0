@@ -1,128 +1,246 @@
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340392D780C
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 21:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCB8414A35
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 21:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783373487; cv=none; b=ci/+iiFGpZ40rQooHvRGRgYGK1GoOiMjjRIPrO+qddWoCIQZ5w1jjqX9R6OVhAPH+sZ05hCf7Y01dhaWa6ymzKVtXjL2VNwO8UHU6ZuBbZQJTz5RWRUMjMeuszwjT0jwq14L05KrbStTorp1dDIiX5fdPwEqebacqxqUAZxhSTY=
+	t=1783373501; cv=none; b=ruCt/XCo6Oj0h7z2vXHGde+AQ7VpJlYtRhyXTKXp5ws6ma23jaQ183SwXAHvrUKL13K4yaV2vWgBDSmTwag2a986LqU23sIcCSJwuExzqovW1ywv4IXfhwKdq/FB5gS8CCincru7vLrh+J7fQmLLmSvAba4xKr17ySRQlKqCxq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783373487; c=relaxed/simple;
-	bh=KNBWdwrXuVuLe1pGgzoYnnrur2xfF1tee4C4t7SlKBI=;
+	s=arc-20240116; t=1783373501; c=relaxed/simple;
+	bh=gIEgmpBmmVS11WSNffYfGjf/wazL67qccBpRaTidqd0=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=J8I7HL1AILwdNiTYsuVQYoA+5RTwNn9+gxek75doaZgDttV1KplL50w81v7UZy1cB0BcxepNgHV/yA66AZh3WmeVUaQaYFVHbgK0jwtwkKDSR0k8KAOtqYxrDkGc2/dVJgSc3Sebb9OyJbobfUR34xBZSd1gOIuZAcuI42pxZ/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OwmPPM9j; arc=none smtp.client-ip=209.85.210.73
+	 Content-Type; b=GZ4RXWUUvVcXRpSXm0yc+a6fhTfOfFBk6/cNHYBuU+w/GSZL6dmeWU1uv4Lftyeg26RQCbUjk9ES57hzim48Q4Zzi6IZLUQO5hDlIp8IhAE2GknfEplykP1BFyODg0gFnO0lcBkoeWAncaOWMJOP52lYe51ajS0s10THZSX+uKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EjL+9XSY; arc=none smtp.client-ip=209.85.167.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OwmPPM9j"
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7e9e2db9914so8466a34.1
-        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 14:31:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EjL+9XSY"
+Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-48f0c5d20c6so5268019b6e.2
+        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 14:31:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783373484; x=1783978284; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wrEtuZnNKTHhXzzXH6FBZuUyiD4QdjI7aUV2ges9QRI=;
-        b=OwmPPM9jtwdXw2F0YEStcGwszi8a1rlrAhkOkMy354jQDZB8EgDDhqEc7OBdq98ZYx
-         1USioEAKFFNO1KLR7TLlm6zVNk6ss3ibXheCrA2XK/cnt5q2R4hz29T7Tj9jMs5MipsU
-         JkzRNHkaq6xheoKWad8iJS77BVDOgsibJoH8jp2iw31IGEn7/+amsNi19UduOYUSLtP4
-         pp1c65E8giws7kTtCrb4u4mJCWAXA6BjKu0Pu7bOvB0O2JlVWyahjl3RF6y9T6Hjp2Un
-         J4eE1dUqb8vg870LEha5CuqVuh+TFIRHrSfrKR3cflzuVPiBxKPdZI7Z0M4pMP0s6hsQ
-         tn1g==
+        d=google.com; s=20251104; t=1783373498; x=1783978298; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ztXhPiC5C0Bq1auzB2bcnsLF7iN1phawknwlOjPpe6k=;
+        b=EjL+9XSYj0FpXXWPa1j/eDS9qRy+57K1cQZ1Cyay76kVoVT1SkPJBfK1UYdpUYeLxa
+         4MKQ36MVqMbPBa8yZ8SYOVsKvKvEE9bJnSyezIAGpJKES9o67kivumHwUmFQSQHziGZc
+         E71DBy+s4TnkuGkWB4SaR/d97boktFtqif/2henxpgSXdWkl/aubgrY6DY3xDE7U68N9
+         yonzQ8pGMa0pXF731QKP14tMkMXqkQZFXGSQVXq/WQ/kMk+6i2LX0w4lKO/Zy2KV69e6
+         cNTHyj/hcA5dMR2JNsmqUibK1djg3UwTxzsecycrIhvfaHbl4RJLkDv/0qXLlfdUmDow
+         RjRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783373484; x=1783978284;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wrEtuZnNKTHhXzzXH6FBZuUyiD4QdjI7aUV2ges9QRI=;
-        b=tEdmOUa9fWz8knM1gbz2y0S/IXV5A5DldjuPu5w6dw5a3+wZbAhDY8U5X9hF248BkY
-         j3D/TC8jdtjx3DoPCkcgD52z8llXeZjjaUsSPkj3nJDxQenUSFymqZ1sZWscyYa4Z0r8
-         64PiM3q/bHHxSwcl2dqCk7NqI9Sdm0jivsjDBTsHocU23f+4BS3URu2wMAGlmu+Wml01
-         IXzCU053GB3fHwlAPmCb4d7DuHkL2ExfWPSFy7Kn8aWprqkM2DdWoyfEgAmw1jEd9xgc
-         G5R2UcJbR2Hf/90xdSAGSO/OzmESe1sF4eOcVxEQ850o9RTTO6x8JpyIZ54iC5Om0qkg
-         qUvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/R9VdCE4R44cDF+1ceyAKJON4kcvLVgAYvzsZe1kBDB2rfojX5bvv04vh1o21h4lMYX/HOHT0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzfenjCLQKGflvROIKWUObjbJ981DGitRPwQ07Hb3+T0Okri9NQ
-	9NWZZ3y/kBlaYsEfV1hAE0YKHnR4J8EKDLBDw4jTkAtjRDXXKvEPF9vlLFReKyH7ThPMmUmp0Si
-	fAiRyPW7o1XlrZZ8QpmFNdf4N0Q==
-X-Received: from ioel1.prod.google.com ([2002:a05:6602:2761:b0:9a7:ea8a:6db6])
+        d=1e100.net; s=20251104; t=1783373498; x=1783978298;
+        h=content-type:cc:to:from:subject:message-id:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ztXhPiC5C0Bq1auzB2bcnsLF7iN1phawknwlOjPpe6k=;
+        b=PUn2CBCnXSMCEWXn2i8sHWbKPmXI6Eza7x9qoYwdnPBz/MGYiQ8/xo9aXXCoX5I/VK
+         Gb8D6+CrbP5Y7DB+27K0ndH7UmYdeXKOB0I3pTnH7POA2EUi3+KOjfwWqoHX1Nyf+AUK
+         O0FgOra5AdKL4g4i5EbT8XAFpup6vPVVM+2kI8pjTb++cD0GikCXkM6RToGwMzajGE1X
+         FfXHAWyA5x+vlDZFKV/uPuhokPqMilkk/o6iC9Jci78TwnX1gWHw/5PPieUuTWTpvulw
+         uyg7Old0VObsF11KdxyXd50ruEsFfpk5Vd96F0EegGaGfr0H+NPDMbYQ/BELIWqIpts7
+         2l5w==
+X-Forwarded-Encrypted: i=1; AFNElJ+HOJ4iKtAPiTYo4E2qAyPEFvJeEP0FnZK2wY5Z1G2nh57cqAv//ed+F88Ti/gTpxG7a001eYU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzSBHD8PzMgqWQLUOu7fCYoMleaAS9Z4BarvF7VPvwCa4olUzNd
+	y9/G+5hcuS5hBmbiZI0JJlEqDnqOsACYKuvtQwwi/rnFNZYDodd0UwFIyrqOf8kVAcJOnxNEEO6
+	1Rr2xQdP7+bty9BYhkfrjZYO8zQ==
+X-Received: from jaar22.prod.google.com ([2002:a05:6638:c096:b0:5e7:3ea0:602c])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:c92:b0:6a1:93a5:cd70 with SMTP id 006d021491bc7-6a35c45cbfbmr12190eaf.31.1783373483917;
- Mon, 06 Jul 2026 14:31:23 -0700 (PDT)
-Date: Mon, 06 Jul 2026 21:31:22 +0000
-In-Reply-To: <akWhad3U5VNjWzxu@kernel.org> (message from Oliver Upton on Wed,
- 1 Jul 2026 16:23:21 -0700)
+ 2002:a05:6808:5383:b0:495:ff85:d33d with SMTP id 5614622812f47-49fdc55800amr2041656b6e.12.1783373497444;
+ Mon, 06 Jul 2026 14:31:37 -0700 (PDT)
+Date: Mon, 06 Jul 2026 21:31:36 +0000
+In-Reply-To: <akWmqLQ31UvRLCxt@kernel.org> (message from Oliver Upton on Wed,
+ 1 Jul 2026 16:45:44 -0700)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntqzlf6c0l.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 0/5] Backport ARM64 VHE boot fixes to 6.6.y
+Message-ID: <gsntpl0z6c07.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: Initialize HCR_EL2.E2H early
 From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oupton@kernel.org>
 Cc: stable@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, 
 	maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
+	linux-kernel@vger.kernel.org, mark.rutland@arm.com, ahmed.genidi@arm.com, 
+	ben.horgan@arm.com, leo.yan@arm.com
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-
-Hi Oliver, thanks for reviewing.
 
 Oliver Upton <oupton@kernel.org> writes:
 
-> The subject prefix should be "[PATCH 6.6 0/5]" so people know right up
-> front where this is going.
+> On Wed, Jul 01, 2026 at 08:43:41PM +0000, Colton Lewis wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
 
-I'll make sure to include that in the subject.
+>> [ Upstream commit 7a68b55ff39b0d2dcd92ee241b12b23a7e03c621 ]
+
+>> On CPUs without FEAT_E2H0, HCR_EL2.E2H is RES1, but may reset to an
+>> UNKNOWN value out of reset and consequently may not read as 1 unless it
+>> has been explicitly initialized.
+
+>> We handled this for the head.S boot code in commits:
+
+>>    3944382fa6f22b54 ("arm64: Treat HCR_EL2.E2H as RES1 when  
+>> ID_AA64MMFR4_EL1.E2H0 is negative")
+>>    b3320142f3db9b3f ("arm64: Fix early handling of FEAT_E2H0 not being  
+>> implemented")
+
+>> Unfortunately, we forgot to apply a similar fix to the KVM PSCI entry
+>> points used when relaying CPU_ON, CPU_SUSPEND, and SYSTEM SUSPEND. When
+>> KVM is entered via these entry points, the value of HCR_EL2.E2H may be
+>> consumed before it has been initialized (e.g. by the 'init_el2_state'
+>> macro).
+
+>> Initialize HCR_EL2.E2H early in these paths such that it can be consumed
+>> reliably. The existing code in head.S is factored out into a new
+>> 'init_el2_hcr' macro, and this is used in the __kvm_hyp_init_cpu()
+>> function common to all the relevant PSCI entry points.
+
+>> For clarity, I've tweaked the assembly used to check whether
+>> ID_AA64MMFR4_EL1.E2H0 is negative. The bitfield is extracted as a signed
+>> value, and this is checked with a signed-greater-or-equal (GE)  
+>> comparison.
+
+>> As the hyp code will reconfigure HCR_EL2 later in ___kvm_hyp_init(), all
+>> bits other than E2H are initialized to zero in __kvm_hyp_init_cpu().
+
+>> Fixes: 3944382fa6f22b54 ("arm64: Treat HCR_EL2.E2H as RES1 when  
+>> ID_AA64MMFR4_EL1.E2H0 is negative")
+>> Fixes: b3320142f3db9b3f ("arm64: Fix early handling of FEAT_E2H0 not  
+>> being implemented")
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Ahmed Genidi <ahmed.genidi@arm.com>
+>> Cc: Ben Horgan <ben.horgan@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Leo Yan <leo.yan@arm.com>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: Will Deacon <will@kernel.org>
+>> Link:  
+>> https://lore.kernel.org/r/20250227180526.1204723-2-mark.rutland@arm.com
+>> [maz: fixed LT->GE thinko]
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+>> [ Backport: Resolved conflict in arch/arm64/kvm/hyp/nvhe/hyp-init.S
+>>    by extracting EL2 state initialization into __kvm_init_el2_state
+>>    and calling it after HCR setup. ]
+>> ---
+>>   arch/arm64/include/asm/el2_setup.h | 26 ++++++++++++++++++++++++++
+>>   arch/arm64/kernel/head.S           | 19 +------------------
+>>   arch/arm64/kvm/hyp/nvhe/hyp-init.S | 16 +++++++++++++---
+>>   3 files changed, 40 insertions(+), 21 deletions(-)
+
+>> diff --git a/arch/arm64/include/asm/el2_setup.h  
+>> b/arch/arm64/include/asm/el2_setup.h
+>> index b7afaa026842b..3498dc5d02c18 100644
+>> --- a/arch/arm64/include/asm/el2_setup.h
+>> +++ b/arch/arm64/include/asm/el2_setup.h
+>> @@ -16,6 +16,32 @@
+>>   #include <asm/sysreg.h>
+>>   #include <linux/irqchip/arm-gic-v3.h>
+
+>> +.macro init_el2_hcr	val
+>> +	mov_q	x0, \val
+>> +
+>> +	/*
+>> +	 * Compliant CPUs advertise their VHE-onlyness with
+>> +	 * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
+>> +	 * can reset into an UNKNOWN state and might not read as 1 until it has
+>> +	 * been initialized explicitly.
+>> +	 *
+>> +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
+>> +	 * don't advertise it (they predate this relaxation).
+>> +	 *
+>> +	 * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
+>> +	 * indicating whether the CPU is running in E2H mode.
+>> +	 */
+>> +	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
+>> +	sbfx	x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
+>> +	cmp	x1, #0
+>> +	b.ge	.LnVHE_\@
+>> +
+>> +	orr	x0, x0, #HCR_E2H
+>> +.LnVHE_\@:
+>> +	msr	hcr_el2, x0
+>> +	isb
+>> +.endm
+>> +
+>>   .macro __init_el2_sctlr
+>>   	mov_q	x0, INIT_SCTLR_EL2_MMU_OFF
+>>   	msr	sctlr_el2, x0
+>> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+>> index e0e710b36da37..ff7769821166a 100644
+>> --- a/arch/arm64/kernel/head.S
+>> +++ b/arch/arm64/kernel/head.S
+>> @@ -575,25 +575,8 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+>>   	msr	sctlr_el2, x0
+>>   	isb
+>>   0:
+>> -	mov_q	x0, HCR_HOST_NVHE_FLAGS
+>> -
+>> -	/*
+>> -	 * Compliant CPUs advertise their VHE-onlyness with
+>> -	 * ID_AA64MMFR4_EL1.E2H0 < 0. HCR_EL2.E2H can be
+>> -	 * RES1 in that case. Publish the E2H bit early so that
+>> -	 * it can be picked up by the init_el2_state macro.
+>> -	 *
+>> -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
+>> -	 * don't advertise it (they predate this relaxation).
+>> -	 */
+>> -	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
+>> -	tbz	x1, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH -  
+>> 1), 1f
+>> -
+>> -	orr	x0, x0, #HCR_E2H
+>> -1:
+>> -	msr	hcr_el2, x0
+>> -	isb
+
+>> +	init_el2_hcr	HCR_HOST_NVHE_FLAGS
+>>   	init_el2_state
+
+>>   	/* Hypervisor stub */
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S  
+>> b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+>> index 1cc06e6797bda..a08363b9b10fd 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+>> @@ -75,6 +75,16 @@ __do_hyp_init:
+>>   	eret
+>>   SYM_CODE_END(__kvm_hyp_init)
+
+>> +/*
+>> + * Initialize EL2 CPU state to sane values.
+>> + *
+>> + * HCR_EL2.E2H must have been initialized already.
+>> + */
+>> +SYM_CODE_START_LOCAL(__kvm_init_el2_state)
+>> +	init_el2_state				// Clobbers x0..x2
+>> +	finalise_el2_state
+>> +	ret
+>> +SYM_CODE_END(__kvm_init_el2_state)
+>>   /*
+>>    * Initialize the hypervisor in EL2.
+>>    *
+>> @@ -202,9 +212,9 @@ SYM_CODE_START_LOCAL(__kvm_hyp_init_cpu)
+
+>>   2:	msr	SPsel, #1			// We want to use SP_EL{1,2}
+
+>> -	/* Initialize EL2 CPU state to sane values. */
+>> -	init_el2_state				// Clobbers x0..x2
+>> -	finalise_el2_state
+>> +	init_el2_hcr	0
+>> +
+>> +	bl	__kvm_init_el2_state
+
+> Please don't churn unrelated code. Leave everything where it is and make
+> sure init_el2_hcr is done before the others.
+
+Understood.
 
 
-> On Wed, Jul 01, 2026 at 08:43:37PM +0000, Colton Lewis wrote:
->> This series backports VHE CPU boot fixes to the 6.6.y stable branch.
-
->> These fixes are already present in the 6.12.y stable branch (and
->> newer), but are missing in 6.6.y. They are required to enable booting
->> L1 guests with nested virtualization enabled (kvm-arm.mode=nested).
-
-> It's a bit worse than this. The architecture retroactively made
-> FEAT_E2H0 an optional feature, there are now implementations in the wild
-> that do not support the feature.
-
-Good to know. I'll include that context in my next cover letter.
-
->> Without these patches, a 6.6.y guest boots with HCR_EL2.E2H
->> incorrectly configured (because it misses VHE-only detection or early
->> initialization), causing early boot hangs/trap loops.
-
->> Conflict resolutions:
->> - Patch 4 (KVM: arm64: Initialize HCR_EL2.E2H early) had conflicts in
->>    arch/arm64/kvm/hyp/nvhe/hyp-init.S due to differences in state
->>    initialization. Resolved by extracting EL2 state initialization into
->>    __kvm_init_el2_state.
->> - Patch 5 (arm64: Revamp HCR_EL2.E2H RES1 detection) had conflicts in
->>    arch/arm64/include/asm/el2_setup.h. Resolved by using raw msr hcr_el2
->>    instead of the missing msr_hcr_el2 macro.
-
-
->> Marc Zyngier (4):
->>    arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
->>    arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is
->>      negative
->>    arm64: Fix early handling of FEAT_E2H0 not being implemented
->>    arm64: Revamp HCR_EL2.E2H RES1 detection
-
->> Mark Rutland (1):
->>    KVM: arm64: Initialize HCR_EL2.E2H early
-
->>   arch/arm64/include/asm/el2_setup.h | 52 ++++++++++++++++++++++++++++++
->>   arch/arm64/kernel/head.S           | 17 +++-------
->>   arch/arm64/kvm/hyp/nvhe/hyp-init.S | 16 +++++++--
->>   arch/arm64/tools/sysreg            | 37 +++++++++++++++++++++
->>   4 files changed, 107 insertions(+), 15 deletions(-)
-
-
->> base-commit: d1cfde2d5d15be14123bdd1689162bd27f995a90
->> --
->> 2.55.0.rc2.803.g1fd1e6609c-goog
-
+> Thanks,
+> Oliver
