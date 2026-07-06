@@ -1,126 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5822035898
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED84E3AFB13
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783333699; cv=none; b=qgfqt3VnezPwLzUIBuR3S/nQHdaARYEUwMqIejDpYLA7xIGahKVgpuDQMCo015dGI5E4qjumb0EV2gqVfTMhVUmh9/+GPfI1OOl1eaSdOBX7KdJ08BkqZ2biYX+Z7bnx2a4x8Yigaj+t1hdh4gnNx0nZqP6CrDGFjr161XGPH+I=
+	t=1783333899; cv=none; b=XKvKKRyO/2jdLuzh1gFOvIfBJvQs5uZjZB1UphzZKziZP+S4Gs0OkmVoGpatFEVTv7ONINyIBM4b8Gr7LtXUKIBEYvj4ig2xpFmGkv2EqtK4otYSyUCsCiMMyr0k3y7CDE6mSP4/rkFzxRTWeNvWmSk7uAh/1wkn+bPN571/xEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783333699; c=relaxed/simple;
-	bh=DzjH+op0vdYWAQwFjAPVFEOtihdBghYJbsQcvZfnrV4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=D7PBebpfs/uGinDjNbqIFSIT2d9soZEWvZjikKYdTSWX5d/QHGXMHzOJo033G0mKFuU4cDQqeqs9cUQD7yo8iWit7iNcAFd8iRPYq0RIC/2u3Wc/x84LirVMZWBA8MihLqsDEdkxMN5Ty/ofXzUmHDBXaLBh9LGeA9KjiKA/acE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I4HEr02m; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783333899; c=relaxed/simple;
+	bh=BzWmGmhDSX9H7Qwx2j4ifAMxfY7LvD8ZDgxYcBW2C8Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aDTVCVA8jh41G1UqFI7/1dAm+uGJClRNUMaO4Mg+wdOa4UoLJCMyiAR4WtCIkaPQgtgi67OcC2gonPA4+a1+T5aCH/DejcvqPiBzeNoRIpUauKtFphWkTGoFFbEhrmpaTSdMIROYKk/b9L9RcKIYPsE1DZ50fr3ft5likliRpS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tgfxylSg; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I4HEr02m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03AF1F000E9;
-	Mon,  6 Jul 2026 10:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783333698;
-	bh=pUueC1DW9LQjWeluElUjTkI/YzyggSRew61VqtYFPy4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=I4HEr02mm4RNKVJenvOoP8yk9OJIr1ZPQVFgaQ7o4e+z846JTjn1h9MMxnlmBgHgp
-	 Ivk63cCuqNLSqnoQH+0e5YtGnNuXH9DOEF7vGGvYtEhdV4Jtid5Uh9+FQjzTRtjHdD
-	 OSWiB4AfCNamWf1HtNcIzIL+WOMjP0n3GEHtqjeyVibTelPWE/dNqvaVr+tz/JG5dL
-	 CznvOBldaBbRr+vF2C+ixPYv/I5znGrfreHE2D2la276G058+XEirj8VZaX2vThiU6
-	 d+0/Qafw1SPM83XLJAeVBc7Y2rNdIFQCp/n0KzGTbdq+cGGoIcnAOFXvYOcDqvpEjd
-	 ZNRudGr6ELGpA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 6/8] KVM: arm64: Minimise EL2's exposure of host VGIC
- state during world switch
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260706095927.560795-7-fuad.tabba@linux.dev>
-References: <20260706095927.560795-1-fuad.tabba@linux.dev>
- <20260706095927.560795-7-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2026 10:28:17 +0000
-Message-Id: <20260706102817.B03AF1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tgfxylSg"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783333893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UUV8G5l+8y4VKTIs3LKjPdf1ZbZ+/55y0GSb0c64wC0=;
+	b=tgfxylSgq1mxGv3YhjrLl+pFCjKU4T+ERAUdE5N5foYO9rMA/IF+gR8jvB+botICUQdrZv
+	iwDtl5MxnL7jVUaa6CclQoSkJvJREbo3SVqxklz2sp4jtssn+7fd2Tkn27kBSBySbJfZNF
+	KT7LG7pBns2aH92snAv91lW9r56Z0lM=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Keir Fraser <keirf@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] KVM: arm64: Tidy up is_created
+Date: Mon,  6 Jul 2026 11:31:26 +0100
+Message-Id: <20260706103129.706974-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] Userspace KVM_SET_ONE_REG modifications to ICC_VMCR_EL1 and Active=
- Priority Registers (APRs) are silently overwritten and lost on vcpu_put() =
-under pKVM.
---
+Hi folks,
 
-commit 8bda67fe364c44ad574acb3da5de4bf16e0ccbbf
-Author: Marc Zyngier <maz@kernel.org>
+Changes since v1 [1]:
+- Carried Keir's Reviewed-by. No code changes.
 
-KVM: arm64: Minimise EL2's exposure of host VGIC state during world switch
+This small series tidies up the host-side kvm->arch.pkvm.is_created flag,
+which tracks whether the hypervisor-side (EL2) VM has been instantiated.
 
-This commit avoids exposing the host's entire vgic_v3_cpu_if to EL2 by
-copying only the necessary vgic_vmcr and active priority registers during
-save and restore operations.
+It comes out of the ongoing pKVM (protected KVM) upstreaming work and runs
+in parallel with it. The changes only remove dead or redundant code around
+the flag, not any of the functional paths that work touches, so there is no
+dependency in either direction and the two can be applied in any order.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 45d717889f6ea..f3233ee343a39 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+is_created stays: the pKVM handle is reserved early (so host MMU-notifier
+TLB invalidations have a valid handle before the first vCPU run), so a
+non-zero handle no longer implies the EL2 VM exists. is_created is what
+distinguishes "reserved" from "created", and the teardown path relies on it.
+Only the cruft around it goes.
 
-[ ... ]
+Cheers,
+/fuad
 
-> @@ -508,16 +520,63 @@ static void handle___vgic_v3_save_aprs(struct kvm_c=
-pu_context *host_ctxt)
->  {
-> -	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
-> +	struct pkvm_hyp_vcpu *hyp_vcpu;
-> +	struct kvm_vcpu *host_vcpu;
-> =20
-> -	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-> +	host_vcpu =3D get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1,
-> +							   &hyp_vcpu);
-> +	if (!host_vcpu)
-> +		return;
-> +
-> +	if (unlikely(hyp_vcpu)) {
-> +		struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
-> +		int i;
-> +
-> +		hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-> +		__vgic_v3_save_aprs(hyp_cpu_if);
-> +
-> +		host_cpu_if =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
-> +		host_cpu_if->vgic_vmcr =3D hyp_cpu_if->vgic_vmcr;
-> +		for (i =3D 0; i < ARRAY_SIZE(host_cpu_if->vgic_ap0r); i++) {
-> +			host_cpu_if->vgic_ap0r[i] =3D hyp_cpu_if->vgic_ap0r[i];
-> +			host_cpu_if->vgic_ap1r[i] =3D hyp_cpu_if->vgic_ap1r[i];
-> +		}
+[1] https://lore.kernel.org/all/20260618090128.3913688-1-tabba@google.com/
 
-[Severity: High]
-Does this sequence risk clobbering userspace writes to ICC_VMCR_EL1 and the
-Active Priority Registers?
+Fuad Tabba (3):
+  KVM: arm64: Drop the unused EL2-side is_created write
+  KVM: arm64: Remove unreachable early checks in pkvm_init_host_vm()
+  KVM: arm64: Drop redundant READ_ONCE() in pkvm_hyp_vm_is_created()
 
-When userspace modifies the GIC CPU interface via KVM_SET_ONE_REG, the
-ioctl is wrapped by vcpu_load() and vcpu_put().
+ arch/arm64/kvm/hyp/nvhe/pkvm.c |  1 -
+ arch/arm64/kvm/pkvm.c          | 13 +++++--------
+ 2 files changed, 5 insertions(+), 9 deletions(-)
 
-Under pKVM, vcpu_load() calls __vgic_v3_restore_vmcr_aprs, which restores
-the hardware with the current values.
+-- 
+2.39.5
 
-The ioctl then updates host_cpu_if in memory with the new userspace values.
-
-Finally, vcpu_put() issues the __vgic_v3_save_aprs hypercall.
-
-Since the hardware and hyp_cpu_if only have the pre-ioctl stale values,
-will this explicit copy back to host_cpu_if overwrite the new values set
-by userspace? This could cause state restoration or live migration to
-silently lose these register updates.
-
-> +	} else {
-> +		__vgic_v3_save_aprs(&host_vcpu->arch.vgic_cpu.vgic_v3);
-> +	}
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706095927.5607=
-95-1-fuad.tabba@linux.dev?part=3D6
