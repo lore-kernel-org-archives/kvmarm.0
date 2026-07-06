@@ -1,132 +1,154 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274623FD14D
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331883FE67A
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783338547; cv=none; b=kDRMVHiKt7ig5kUU8etttdQD6jUvSJHxnu/aPf/+ez/XRRKPHbRlnyQl2s7uGDGtmfNYIj834FmlNDoEtkf4//MWUKs4xP2ZzG+5CY0jf7HB0V/ZkTEqahbG21rANQWW2PJzFzfllWaJ2dpRDAtCgdNkCxenJRtYei9nU68ltis=
+	t=1783338836; cv=none; b=KO0nrArBDH5cunQmJOBnNvRL3RGkmphhnWAGA28nKRe4mbTtaWIHUy+8KSETa9jo1Ikyh4GB3yyvYSjZ/Q836VRq8gr04sJrFQ65mmPGkukSGa/k9iKPmwAKRC/tX83KINwF9ykOPewLWOIZ0Z88LdK+19Myxi3CBvoYzzErRwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783338547; c=relaxed/simple;
-	bh=fe0Rz8nHynEhV/ZZ3U6JZCje8MBT7WJE6lk7gAhdFl8=;
+	s=arc-20240116; t=1783338836; c=relaxed/simple;
+	bh=pQ2sBx1yflRxuOdyqgGzEEWEaQnnZZWHr6wFLS1861Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hYnfJxKpEtK73uvMo2D7T9HmOxezR4XH1odEZuU5tF9/XwzICzxft3WSaQ84sTQJTMFLmzYsomuVYl1/uGYg+k40+hLT7k8Co4vqjEhMir9Y+DIjLVtKoJPsWXmOWPn6Uhl61IfUaGnYYnuu86+bwmMWGRQmmwtshNzSHntiGL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sibykEO6; arc=none smtp.client-ip=95.215.58.170
+	 To:Cc:Content-Type; b=d6vA3Dx/eezCYenW7rcK1pzGAbdLlREIhCuFEArnFckkAfD+1Ft1IdBIUWfPctvIBD6oiEV8YCet/m7Z4XshZwwWRQJZdSlzur8/lVD5p5Si4pPlkTX1yCjY3uhTird1ItQr8Jh9m++I3QOlmIPrgJa4Pyt2dMt/u/BLBqHpLmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QmjaIEJH; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sibykEO6"
-X-Forwarded-Encrypted: i=1; AHgh+RqO1bYXvUX5ehVdq+q0yZ5+XLanvOjOnvKTnZADV9f2yWUIoRcOgQNhRiqXa4FWv7ZNZcULF8U=@lists.linux.dev
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QmjaIEJH"
+X-Forwarded-Encrypted: i=1; AHgh+RrrWFFwE0fs5YrDCSfwA5D0APXGzLD0Z9VJ5a4MZ/V7ygqDwsHkDOu5rTGD3Jwx6SzcI5p5v0I=@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783338544;
+	t=1783338833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=olPZygbLOizmTmPPUlNgqgJKSwcw8Tk5/Z/jDgCDUwQ=;
-	b=sibykEO6ukPeEdAT4+hpwjgKbbHIdc27ZE5947mRE80p9mQzcnv0BA2AHA8vrVxOOe8MEZ
-	eUgRYu11MfbB7h8mDlEqY5xnd+rNrrd1SnELNpOAQfdDDo3HmXWhiLFyChFhvxmW13eunz
-	nzlTlxWh1ZiLIQxrBZSeCXqZAFyr/1s=
-X-Gm-Message-State: AOJu0YyFA0849GgeZz/SX5ShdQob9v3Li3vH2x3y53WojUJVR4spUI0/
-	XapVsded/MuyEbmTfkc7oR+8EkM5EA3mP1jhm43VAxOkHYLQSagoL2p2JCDi8q2ftqYefIraBM7
-	SmLF6A/4OBQ9GI1DWaW6uM9wJkneo01YOhVdw9/OZ
-X-Received: by 2002:a05:622a:b:b0:51c:ca9:3d17 with SMTP id
- d75a77b69052e-51c4c0c00demr17821591cf.12.1783338522321; Mon, 06 Jul 2026
- 04:48:42 -0700 (PDT)
+	bh=s+eed6la7DRVrFBf17KyzvgFRJ5+OioCbBp3mjbwXuY=;
+	b=QmjaIEJHE1uY7IxK8zApWhkKVAT0owPm4UcwM3/4ox2a6AhGckjmp7Mfn4d4mxG+90RQEO
+	0XZl8GsZMeRuTsnD+Jdme6YDnFPOciVSHwcqQdOZ7YGId6BRoAGqL0gdRBjex7GDR3NuIa
+	7mLB3U+svQdwQiat1gAe0pTUaFt8sNM=
+X-Gm-Message-State: AOJu0YxZViSxx7EmUVr5tIS0bmHkyAlkHvT4tdOI5Jlu4kcAnU8gthCX
+	p7lILhm9gOADPjYG0UZj9r0zYpq3YZVquLg8c1GkzAyGGuTX6XLkrwMlNndsBEexhMVG1du8IOl
+	M00kMzUYSQsEqMxr0CYDcTKfkE5HfPVcRtfuAQNtZ
+X-Received: by 2002:ac8:5a15:0:b0:51a:713c:7444 with SMTP id
+ d75a77b69052e-51c4c0f67bbmr18296841cf.18.1783338829969; Mon, 06 Jul 2026
+ 04:53:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260706095927.560795-1-fuad.tabba@linux.dev> <20260706095927.560795-3-fuad.tabba@linux.dev>
- <20260706102503.63AD01F000E9@smtp.kernel.org>
-In-Reply-To: <20260706102503.63AD01F000E9@smtp.kernel.org>
+References: <20260706095927.560795-1-fuad.tabba@linux.dev> <20260706095927.560795-7-fuad.tabba@linux.dev>
+ <20260706102817.B03AF1F000E9@smtp.kernel.org>
+In-Reply-To: <20260706102817.B03AF1F000E9@smtp.kernel.org>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 6 Jul 2026 12:48:04 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxaG6_CWU0OQkmsiaDKJjdaCVokwh42msKbJoHhK2n2Vg@mail.gmail.com>
-X-Gm-Features: AVVi8Cfj4xOt_3SERBm8sssTrFAt_HqnKSgE08h1ZpdRK28j9UUStRw5TIp64n4
-Message-ID: <CA+EHjTxaG6_CWU0OQkmsiaDKJjdaCVokwh42msKbJoHhK2n2Vg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg
- available to HYP code
+Date: Mon, 6 Jul 2026 12:53:12 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyM3CYofmj_ugC_vkZkUBGw-7UFyXRJbi5QkF4QqcV2YA@mail.gmail.com>
+X-Gm-Features: AVVi8CcufXl79qkj69YuJOxGM3lFnmm8GA-GesmNUrodYSpOe3hBd_p7YCWrQzI
+Message-ID: <CA+EHjTyM3CYofmj_ugC_vkZkUBGw-7UFyXRJbi5QkF4QqcV2YA@mail.gmail.com>
+Subject: Re: [PATCH v4 6/8] KVM: arm64: Minimise EL2's exposure of host VGIC
+ state during world switch
 To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, 6 Jul 2026 at 11:25, <sashiko-bot@kernel.org> wrote:
+On Mon, 6 Jul 2026 at 11:28, <sashiko-bot@kernel.org> wrote:
 >
 > Thank you for your contribution! Sashiko AI review found 1 potential issu=
 e(s) to consider:
->
-> Pre-existing issues:
-> - [High] `kvm_vcpu_read_sys_reg()` and `kvm_vcpu_write_sys_reg()` are fun=
-damentally unsafe for nVHE EL2 emulation (e.g., during `fixup_guest_exit`),=
- despite the commit claiming they are "valid in any context".
+> - [High] Userspace KVM_SET_ONE_REG modifications to ICC_VMCR_EL1 and Acti=
+ve Priority Registers (APRs) are silently overwritten and lost on vcpu_put(=
+) under pKVM.
 
-    https://lore.kernel.org/all/20260612102347.914994-1-tabba@google.com/
+The vcpu_load/vcpu_put path under pKVM uses the same direct
+__vgic_v3_save_aprs / __vgic_v3_restore_vmcr_aprs on the host cpu_if
+as non-pKVM nVHE, not the hyp-main.c wrappers.
 
 /fuad
 
+
 > --
 >
-> commit 61ee8756572b776a9170ae13bb7ede91ed5afb18
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
+> commit 8bda67fe364c44ad574acb3da5de4bf16e0ccbbf
+> Author: Marc Zyngier <maz@kernel.org>
 >
-> KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+> KVM: arm64: Minimise EL2's exposure of host VGIC state during world switc=
+h
 >
-> This commit moves the wrappers for vcpu_read_sys_reg and vcpu_write_sys_r=
-eg
-> from exception.c to kvm_emulate.h as kvm_vcpu_read_sys_reg and
-> kvm_vcpu_write_sys_reg. This makes them available to all hyp code so that
-> emulation logic can be shared at EL2.
+> This commit avoids exposing the host's entire vgic_v3_cpu_if to EL2 by
+> copying only the necessary vgic_vmcr and active priority registers during
+> save and restore operations.
 >
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/=
-asm/kvm_emulate.h
-> > index 5bf3d7e1d92c7..80b30fead3d16 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -506,6 +506,22 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff=
-(struct kvm_vcpu *vcpu)
-> >       return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-> >  }
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index 45d717889f6ea..f3233ee343a39 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>
+> [ ... ]
+>
+> > @@ -508,16 +520,63 @@ static void handle___vgic_v3_save_aprs(struct kvm=
+_cpu_context *host_ctxt)
+> >  {
+> > -     DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
+> > +     struct pkvm_hyp_vcpu *hyp_vcpu;
+> > +     struct kvm_vcpu *host_vcpu;
 > >
-> > +static inline u64 kvm_vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, i=
-nt reg)
-> > +{
-> > +     if (has_vhe())
-> > +             return vcpu_read_sys_reg(vcpu, reg);
+> > -     __vgic_v3_save_aprs(kern_hyp_va(cpu_if));
+> > +     host_vcpu =3D get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1=
+,
+> > +                                                        &hyp_vcpu);
+> > +     if (!host_vcpu)
+> > +             return;
 > > +
-> > +     return __vcpu_sys_reg(vcpu, reg);
-> > +}
+> > +     if (unlikely(hyp_vcpu)) {
+> > +             struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
+> > +             int i;
+> > +
+> > +             hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+> > +             __vgic_v3_save_aprs(hyp_cpu_if);
+> > +
+> > +             host_cpu_if =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
+> > +             host_cpu_if->vgic_vmcr =3D hyp_cpu_if->vgic_vmcr;
+> > +             for (i =3D 0; i < ARRAY_SIZE(host_cpu_if->vgic_ap0r); i++=
+) {
+> > +                     host_cpu_if->vgic_ap0r[i] =3D hyp_cpu_if->vgic_ap=
+0r[i];
+> > +                     host_cpu_if->vgic_ap1r[i] =3D hyp_cpu_if->vgic_ap=
+1r[i];
+> > +             }
 >
 > [Severity: High]
-> This is a pre-existing issue, but are these accessors actually safe for n=
-VHE
-> EL2 emulation? The commit message claims they are valid in any context, b=
-ut
-> during early exit handling (like fixup_guest_exit), the live guest state =
-is
-> still in hardware registers.
+> Does this sequence risk clobbering userspace writes to ICC_VMCR_EL1 and t=
+he
+> Active Priority Registers?
 >
-> Because has_vhe() evaluates to false in nVHE EL2, kvm_vcpu_read_sys_reg()=
- falls
-> back to reading the memory context via __vcpu_sys_reg(). This means it re=
-ads
-> stale state until __sysreg_save_state_nvhe() runs.
+> When userspace modifies the GIC CPU interface via KVM_SET_ONE_REG, the
+> ioctl is wrapped by vcpu_load() and vcpu_put().
 >
-> For example, when an exception is injected into a protected guest via
-> inject_sync64(), enter_exception64() uses this helper to read SCTLR_EL1 a=
-nd
-> computes the new PSTATE from it. This reads a stale SCTLR_EL1, potentiall=
-y
-> corrupting the injected PSTATE.SPAN and PSTATE.SSBS bits.
+> Under pKVM, vcpu_load() calls __vgic_v3_restore_vmcr_aprs, which restores
+> the hardware with the current values.
 >
-> Could exposing these as generic helpers lead to more traps where EL2 code
-> accidentally reads stale memory-backed sysregs before they are synced?
+> The ioctl then updates host_cpu_if in memory with the new userspace value=
+s.
+>
+> Finally, vcpu_put() issues the __vgic_v3_save_aprs hypercall.
+>
+> Since the hardware and hyp_cpu_if only have the pre-ioctl stale values,
+> will this explicit copy back to host_cpu_if overwrite the new values set
+> by userspace? This could cause state restoration or live migration to
+> silently lose these register updates.
+>
+> > +     } else {
+> > +             __vgic_v3_save_aprs(&host_vcpu->arch.vgic_cpu.vgic_v3);
+> > +     }
+> >  }
 >
 > --
 > Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706095927.56=
-0795-1-fuad.tabba@linux.dev?part=3D2
+0795-1-fuad.tabba@linux.dev?part=3D6
