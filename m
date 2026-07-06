@@ -1,55 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C42430CC6;
-	Mon,  6 Jul 2026 16:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF044432BFE
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 16:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783354796; cv=none; b=kXCyiGZqWH3ZaF7a2gpiQyvJ07Ga8XOS+p9XW6ZRQTytDhTGyXi2lDuOTyc7l07DN/L9CWVJsx93GCpcKPE9tOclgFcPXbhOhcKKQVRhYbchgvHBAWq77KZBJErEbQfQRLhz4vDXgFXmaZKf3CKHLZkhsxnfAuCs7mUS7A2bQak=
+	t=1783354798; cv=none; b=cFTi7RELWk4quKpqcMQo8ZHnXGcj3XDlMXskQmDipdKBvV/osmR/U/1U6hcs+J4AGlsiJGcnDeTPBcQPm/N8JEcsUjyNXhYEjc7XXtvhyvX/UAfFMZndJLPKoZYwS9kxu42dfBy+mij5MK54/nEtRWVO5jTHAKYX7rSlAwaiwZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783354796; c=relaxed/simple;
-	bh=78fhhankv14oGSqYHnz2NT+Tk9f3xYa5kAjCmEehPn4=;
+	s=arc-20240116; t=1783354798; c=relaxed/simple;
+	bh=yjGhQMbHDenpraLHixtOwqZoPtKGdjSXhEbErZkn3Fo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mJgmfzeb4BHW2F6OCnRqNQj6NNx+5DhU7eIXXwUGzK++yI2Z+cSeglyjlfsrGa6Tuxall6yPh4fDZtmhn2gKwHTU4py0rg1OHzEypw7NLQVzVq4N32S9caIcCTD1EZQOCJmCulr9YhpY0Gl7YlIGgG+11vsJhePPklidKKgUV1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZDwuy93; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=qffdUc2PMaldrbMTKfUH/+9wX1Az0hQRJFupTK5qJySVEyoTlGHZUalel3uZVNwVG0fSvDgEZVgujeNfvCpvHL/2t9udsQqMo3k6w6bADWQUHoc1kakOhqXymjxOXZvLpm6lRUS1JetEHce0PvUSWcvp2+XSbUFkwQ8A4yCcRoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RobDKBWa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZDwuy93"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E261F00A3D;
-	Mon,  6 Jul 2026 16:19:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RobDKBWa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BCEE1F00A3D;
+	Mon,  6 Jul 2026 16:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783354795;
-	bh=qkeQCDXCe8FgrurW8DLDVZj+1YSS1GZoll7hPEXalKU=;
+	s=k20260515; t=1783354797;
+	bh=RDwYh1YeuGi/b0Zy7yz3GHb7NjrEdb3AENsC67E47M8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EZDwuy93qzpSMRj4Ucu3W+Ex/p2JCeSFM5Zga7VwZh0v9DxSVnUAR1rF++JY7yGlA
-	 x+7Yn6UTjNbWEBFVMGqI9KbUYWsoikGx88ZrwdzwK74Zej141pLbb31dVGEbxYUQvh
-	 tqzHDz1CaKRdzRs0vJ+8Zy4dqvcXE7e5JgrKyze+EeNH0eOcoCSmwYHoL8zurEGNz3
-	 0hjCjY+eiDn3ddu3oLxOXb4QfkwtjN2UidanIOX0cgVcH9uwLMe+/CtLUglX/42Kxe
-	 d52PpUw2z7gpPpB/9iBq6G+XGTwcY2Rv9FRR+R4CR/pNMm/9I6YhoD5afnv506z8rf
-	 lXiM6D5EEz1Gg==
+	b=RobDKBWayUG+X/Ilh3SHUd4xyFMcP+n++3qa72I/4xv1dWQC486U5r1qRJVl19lRe
+	 AxK/UZvOYR//foEoZobPJk+KTDHVgKFrS9JdXGU0nLENKiJ2UUTg2jU9wGqtl89QGY
+	 pxraSevz8cSLuNdCcsiveuHeygnWWQSpm7Azw7S0iqP0zq1Klx402CWQAHERhI+3xU
+	 8mnNmoyrGAWXIQLH91iUEwRXlTNHoHCO52+uKkE5XAuuWBkABLpQyYvVkFBi3e6vfn
+	 OTryaSu85BVGZEjUC4zq0w7DUeNpht0qgj6kFdTzzpLWMbRmutd4MEq5914qADaxQG
+	 RPIXg7zVf1N8A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wgm2y-00000002244-2k4P;
-	Mon, 06 Jul 2026 16:19:52 +0000
+	id 1wgm31-00000002249-2oy6;
+	Mon, 06 Jul 2026 16:19:55 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: Move kvm_io_bus_get_dev() locking responsibilities to callers
-Date: Mon,  6 Jul 2026 17:19:49 +0100
-Message-ID: <178335476041.1423186.3105343217982386007.b4-ty@kernel.org>
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fixes for S2 permission relaxation
+Date: Mon,  6 Jul 2026 17:19:52 +0100
+Message-ID: <178335476041.1423186.1281496157054528117.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260627105105.1005990-1-maz@kernel.org>
-References: <20260627105105.1005990-1-maz@kernel.org>
+In-Reply-To: <20260701231620.3300204-1-oupton@kernel.org>
+References: <20260701231620.3300204-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,27 +55,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, pbonzini@redhat.com, will@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, weilin.chang@arm.com, seiden@linux.ibm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 27 Jun 2026 11:51:05 +0100, Marc Zyngier wrote:
-> kvm_io_bus_get_dev() returns a device that is only matched by the
-> address, and nothing else. This can cause a lifetime issue if
-> the matched device is not the expected type, as by the time
-> the caller can introspect the object, it might be gone (the srcu
-> lock having been dropped).
+On Wed, 01 Jul 2026 16:16:18 -0700, Oliver Upton wrote:
+> Couple of small fixes for S2 permission relaxation.
 > 
-> Given that there is only a single user of this helper, the simplest
-> option is to move the locking responsibility to the caller, which
-> can keep the srcu lock held for as long as it wants.
+> The first patch looks a bit worse than it actually is, potentially
+> consuming an uninitialized stack variable as a TLBI TTL hint in the
+> event of a race to update the PTE. However, if the bad TTL value results
+> in the stale TLB entry remaining valid, the vCPU will just fault again
+> and (hopefully) avoid the race.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/1] KVM: Move kvm_io_bus_get_dev() locking responsibilities to callers
-      commit: 3a07249981629ace483ebbef81ef6b34c2d2afec
+[1/2] KVM: arm64: Ensure level is always initialized when relaxing perms
+      commit: 100baf0184896f859290a684f864b8200d8ac872
+[2/2] KVM: arm64: Only update XN attr when requested during S2 relaxation
+      commit: f35c08c092505f3a83ce097d94fe51eb8bc9c1b5
 
 Cheers,
 
