@@ -1,32 +1,32 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C96395AFA
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E4C3542D4
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783333904; cv=none; b=u1UFD3sZEsm/G4VxCQGqpKeM2iiPmO1V+t9bMTi+BxOQI+JAKJ0dWSTHsq1AWjKABUfbB4P4gyVyJTJ2qQyZuOqfVzxb4NISE7tIO1lvkrF2JAtDlDt/v3DCU3MAjuTpzar9fR0IeDsZKywJEZoH26QymUiO8rTQtbw6+bV9NfI=
+	t=1783333904; cv=none; b=UQsAQjHdzegHAXk34/lXWx/uCjZo1uZeH8V+8TYlhs+4Mksolsl52IaDyqHPTHvsoIWYkS/KjOsoAbTH4EIqQQ4flYCaYXjoM41MK3k60pRV2JBxBceNhFiQ+vLRU0KJ48iryCG9DVcf8+o12VF+9zm3Y6urpSTiuIpdVUQTvEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783333904; c=relaxed/simple;
-	bh=LTX3qS9MJW2HW2SAsF4CbrSVk/s27g2Zg/IShaeqkOY=;
+	bh=sRMf8iKM0NV4389HiXRgySDOyEsPpVMcCrowfvib0lE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XOC49ZmkBpcNlUq4YVmRA7BVqSMx42W185qTOZEcLIbV2fxYl07mZxBISq1bb3nTNg8LM8O/j3BWyI+igd0VdlXk2aA5HMayn+NfA5WRzUIe1DW41qGhkovf1k8+52W9Bl5o3aNLrOrfKSw066xhvmzYzOYrTOpDkF6gON5vtAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HyBiiCAs; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version; b=H4cKgTY66jckyC8BNc8FVqGWkTXxO4RgtEONfZ8NeDcfEOSfP/jZc+g6xaCJi41QM2dDbyRQ7hY3u8aIUfaLe72QyNK56q2P3hbvcccWWr91zY/UDIxIKzAHl7taQ8CodbFacnygYCD4Tz+eZ+5HcjxE1rIZvBR/ZkAxR4xXhOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Nmmu6IaO; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HyBiiCAs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Nmmu6IaO"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783333897;
+	t=1783333898;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Sf3aVvVWV5y32+hWgZQOR7Ij0Kq541DNImzJ0Vu0T7Y=;
-	b=HyBiiCAsxm62at1/d1SoF3e4BUauw5uVShsxvFGFJumWpcj/EaO3A0Lb1NUDa3A2jyJyR2
-	4JyoG9Codo2PEfpRDG1+yeV17tFmKInZUaddCU5PV8csfFuNzxeWgg9oWS//lhwPvtJ1e1
-	3b7lYo1Mf2AZpfQPuNchABPHMysyjiU=
+	bh=e/ipqegKk/EDFfUXsHGBuepdJETo3GeI79VTrPNPXuo=;
+	b=Nmmu6IaOrdu6PBW/jnkewszoEC/rWSD1PRGq5VlcO3nSUoGX0RRL/cU+kCeymTymlnW5GX
+	NXTfN77zactK172DKBzUvh4R8VrNeKzrU0rx7uWb7avw40TYpRVgw7XUuZT64QgUvPUuZf
+	RtgdErx9A8biXmpazxNXQ0MRDAZdyGY=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] KVM: arm64: Remove unreachable early checks in pkvm_init_host_vm()
-Date: Mon,  6 Jul 2026 11:31:28 +0100
-Message-Id: <20260706103129.706974-3-fuad.tabba@linux.dev>
+Subject: [PATCH v2 3/3] KVM: arm64: Drop redundant READ_ONCE() in pkvm_hyp_vm_is_created()
+Date: Mon,  6 Jul 2026 11:31:29 +0100
+Message-Id: <20260706103129.706974-4-fuad.tabba@linux.dev>
 In-Reply-To: <20260706103129.706974-1-fuad.tabba@linux.dev>
 References: <20260706103129.706974-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -57,38 +57,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-pkvm_init_host_vm() runs once from kvm_arch_init_vm(), while the VM is
-still being allocated and is not yet reachable by another thread. Both
-early checks therefore test impossible state: is_created is still false
-(it is only set on first vCPU run) and the handle is still zero (this
-function is what reserves it). Neither branch can be taken.
-
-Remove them.
+is_created is written under config_lock. Every concurrent reader is
+serialised against that write: pkvm_create_hyp_vm() under config_lock,
+and the memslot path (kvm_arch_prepare_memory_region) via slots_lock,
+which the creation writer also holds. The teardown-path accesses have no
+concurrent writer. The read is therefore serialised, and the READ_ONCE()
+is unnecessary.
 
 Reviewed-by: Keir Fraser <keirf@google.com>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/pkvm.c | 7 -------
- 1 file changed, 7 deletions(-)
+ arch/arm64/kvm/pkvm.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 053e4f733e4be..67b90a58fbea2 100644
+index 67b90a58fbea2..008766273912e 100644
 --- a/arch/arm64/kvm/pkvm.c
 +++ b/arch/arm64/kvm/pkvm.c
-@@ -230,13 +230,6 @@ int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
- 	int ret;
- 	bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
+@@ -185,7 +185,11 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
  
--	if (pkvm_hyp_vm_is_created(kvm))
--		return -EINVAL;
--
--	/* VM is already reserved, no need to proceed. */
--	if (kvm->arch.pkvm.handle)
--		return 0;
--
- 	/* Reserve the VM in hyp and obtain a hyp handle for the VM. */
- 	ret = kvm_call_hyp_nvhe(__pkvm_reserve_vm);
- 	if (ret < 0)
+ bool pkvm_hyp_vm_is_created(struct kvm *kvm)
+ {
+-	return READ_ONCE(kvm->arch.pkvm.is_created);
++	/*
++	 * Serialised by config_lock/slots_lock, or by VM lifecycle at
++	 * teardown, so a plain read suffices.
++	 */
++	return kvm->arch.pkvm.is_created;
+ }
+ 
+ int pkvm_create_hyp_vm(struct kvm *kvm)
 -- 
 2.39.5
 
