@@ -1,152 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAFF414A2F;
-	Mon,  6 Jul 2026 09:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682DE430CF0
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783331743; cv=none; b=gTFbtou8hJ1L3becRvRsPA/t0e9gUGdUeuGcLc7kW7cEwjW9OqUw4YV0Tr/cl9R0nVPEADyRXi9YHUpy0dzDXaYUobGVmOimnw37MPExAP8v0rBtPRlqCDV7CeX+Z/c1WcgOxMONk4fXLOuN9qrVICW4EbkflxS6dWu8tyhA9kk=
+	t=1783332012; cv=none; b=GtbQ6GAwS0a1AM7WBFpSD6aoc/kzmNDwCue7qr9DxbBXYhB5PBVKXccOhEB4W8f2heWCa1+Xtdzi7jLeMk+N3QJHa0FR2A2Rp12Tp1cQ/fyI8BW1xeic94WYigmEQDKn6GfrTJtin1RgbNuuOaEpZl4V1/LqBmHIMq0Z86RYAEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783331743; c=relaxed/simple;
-	bh=9ki5cF70D3Uh3ZOW6IDmpeK33szzbrypcA1bbqKDVb8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=mZU2WlqBDurwYW0P0EO4s8MZTfXUSS94CwC2gcJIOfNSMOhyz6QWhF98Fy0zNSN2U5OR5SRsCq2W5fH6hT8hP8P35McbKqlxhtsXpTcGh3DIr+wcVAWuh82msbU9e45RZM8WMkiw9DfFtE4aLPpBL4XbzJ3LXHxUKBqQvO0EN2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxzW/x6T; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783332012; c=relaxed/simple;
+	bh=TEhDVW1tmAVdRHyzDFkMNvWaFkZT0pFBDr7kil1Didw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RkxqjLd97nzjQSRJpz3jVkJ4e4sIR6zjheS6EAARNro/YfSezolXJZDLQIrB3KdM5dJ471Or5F91+v/mOqL2zntNHti3un0WrFyex9Frelftya4E9Un50r7s809iU9DRkWQS+QKGtNfrYpTO1k7AENwg0BUBLCA6aVFiPKr/sTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N13TejMj; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxzW/x6T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B45631F000E9;
-	Mon,  6 Jul 2026 09:55:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783331739;
-	bh=2Bd4ZNNAr16/hhJQLZA+glw+EwFamZs+63t8jbmQ9WI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fxzW/x6TMR4pu0UnBbrNXMug//fGY0wBBvH5h15LRc4oxr0nhErrTEwZBSauq674I
-	 tXIgP9MuAh1xlJmyKE1ozrPGLAHgkPJ/BzcXLBetd8kVnW/hyO36Et8G7lZOUXgZJh
-	 jZabBht1Y0PewRVe46QkjpSpc0fWblg9TuLic58B82pzG7fklOGN6zUwLjaNwvc3B5
-	 nLegJ3gg+kfsy3NuTGI+SclqcLIzX7iABhTmD0RRgTqghnuFM8gbivz18CXAURVDsh
-	 NBO6hduMa+bVLXokuHucX4IzpvcUGkLaLoXvaGt8xcmsrP2hQK5vSFTmWogXv8HKkp
-	 CXh3AGxUoByOg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 23/27] KVM: s390: arm64: Implement required functions
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Vasily Gorbik" <gor@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, linux-s390@vger.kernel.org, "Heiko
- Carstens" <hca@linux.ibm.com>, "Alexander Gordeev" <agordeev@linux.ibm.com>
-In-Reply-To: <20260706085229.979525-24-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-24-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2026 09:55:38 +0000
-Message-Id: <20260706095538.B45631F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N13TejMj"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783332007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SZ3QkxL5lSmQITjRayAuuXXHTP7vXqbAqjUunG+3nfU=;
+	b=N13TejMj6aKLDaskvb0oPXUPQdrPBi2Qri7KqBg0czzHUdzykakftn+zwI71VpgOy7qsHM
+	jpXtMmiSk7jgHFUV9osvTD9nzGZ4OmUXB1Et/7bKEgcs4K58xDPbz+NRJhnWV6rJsmrf81
+	fy7QuZ8SJqSmgJer6RfV95OdFYg1f7o=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v4 0/8] KVM: arm64: pKVM vCPU state management at EL2 (series A)
+Date: Mon,  6 Jul 2026 10:59:19 +0100
+Message-Id: <20260706095927.560795-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] PSCI SYSTEM_OFF handler fails to stop other vCPUs, leading to pote=
-ntial guest corruption during shutdown.
-- [Medium] Empty stubs for exception injection cause guest vCPUs to hang in=
- an infinite loop.
---
+Hi folks,
 
-commit b5600b88451aab2daf96c3e367bc2f2db0abeb0c
-Author: Steffen Eiden <seiden@linux.ibm.com>
+Changes since v3 [1]:
+  - Rebased onto v7.2-rc2. No code changes.
+  - Carried Vincent's Reviewed-by.
 
-KVM: s390: arm64: Implement required functions
+Building on Will's pKVM infrastructure series [2], this series reworks
+how pKVM moves vCPU state between the host and EL2, and stops copying a
+non-protected guest's state on every world switch.
 
-This commit implements the required functions for s390 to support shared
-arm64 KVM code. It also introduces a basic SMCCC handler to stop a vCPU.
+EL2 gains proper primitives for the state it transfers: vCPU lookup
+helpers, and VGIC flush/sync that reduces how much host state EL2
+dereferences. The series also moves some preparatory code (such as sys
+reg access and PSCI helpers) to shared headers and HYP, and implements
+lazy copying of a non-protected guest's register state back to the host
+until the host actually needs it, instead of on every exit.
 
-> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/hand=
-le_exit.c
-> new file mode 100644
-> index 0000000000000..a0ebe5ffa19a6
-> --- /dev/null
-> +++ b/arch/s390/kvm/arm64/handle_exit.c
+This is the first of two series moving pKVM vCPU state management to
+EL2. The follow-up completes the job for protected VMs: state
+isolation, PSCI handling at EL2, and the resulting API behaviour.
 
-[ ... ]
+The series is structured as follows:
 
-> +static int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
-> +{
-> +	u32 func_id =3D vcpu_get_reg(vcpu, 0);
-> +	u64 val =3D PSCI_RET_NOT_SUPPORTED;
-> +	int ret =3D 1;
-> +
-> +	if (func_id =3D=3D PSCI_0_2_FN_SYSTEM_OFF) {
-> +		spin_lock(&vcpu->arch.mp_state_lock);
-> +		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
-> +		spin_unlock(&vcpu->arch.mp_state_lock);
-> +		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+  01-04:  Preparatory refactoring (MPIDR, sys reg access, vCPU reset, PSCI
+          helpers) to shared headers and HYP.
+  05:     Host and hypervisor vCPU lookup primitives.
+  06-07:  VGIC: reduce EL2's exposure to host state, add flush/sync primitives.
+  08:     Lazy state sync for non-protected guests.
 
-[Severity: High]
-Does this actually stop all other vCPUs in the system?
+Based on v7.2-rc2 (8cdeaa50eae8d).
 
-Because the mp_state is only updated for the calling vCPU, broadcasting
-KVM_REQ_SLEEP will leave the other vCPUs in their current state. When they
-process the sleep request, won't they evaluate their own mp_state, see they
-aren't STOPPED, and continue executing guest code while the VM is supposed
-to be shutting down?
+Cheers,
+/fuad
 
-> +		memset(&vcpu->run->system_event, 0,
-> +		       sizeof(vcpu->run->system_event));
-> +		vcpu->run->system_event.type =3D KVM_SYSTEM_EVENT_SHUTDOWN;
-> +		vcpu->run->system_event.ndata =3D 1;
-> +		vcpu->run->system_event.data[0] =3D 0;
-> +		vcpu->run->exit_reason =3D KVM_EXIT_SYSTEM_EVENT;
-> +		val =3D PSCI_RET_INTERNAL_FAILURE;
-> +		ret =3D 0;
-> +	}
-> +	vcpu_set_reg(vcpu, 0, val);
-> +
-> +	return ret;
-> +}
+[1] https://lore.kernel.org/all/20260626070408.3420953-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
 
-[ ... ]
+Fuad Tabba (5):
+  KVM: arm64: Extract MPIDR computation into a shared header
+  KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+  KVM: arm64: Factor out reusable vCPU reset helpers
+  KVM: arm64: Move PSCI helper functions to a shared header
+  KVM: arm64: Implement lazy vCPU state sync for non-protected guests
 
-> diff --git a/arch/s390/kvm/arm64/inject_fault.c b/arch/s390/kvm/arm64/inj=
-ect_fault.c
-> new file mode 100644
-> index 0000000000000..425dbeaa421c6
-> --- /dev/null
-> +++ b/arch/s390/kvm/arm64/inject_fault.c
-> @@ -0,0 +1,21 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <arm64/kvm_emulate.h>
-> +
-> +/**
-> + * kvm_inject_undefined - inject an undefined instruction into the guest
-> + * @vcpu: The vCPU in which to inject the exception
-> + *
-> + * It is assumed that this code is called from the VCPU thread and that =
-the
-> + * VCPU therefore is not currently executing guest code.
-> + */
-> +void kvm_inject_undefined(struct kvm_vcpu *vcpu)
-> +{
-> +	/* Stub until s390 supports arm64 sysregs TODO sysregs*/
-> +}
+Marc Zyngier (3):
+  KVM: arm64: Add host and hypervisor vCPU lookup primitives
+  KVM: arm64: Minimise EL2's exposure of host VGIC state during world
+    switch
+  KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
 
-[Severity: Medium]
-Will this empty stub cause the guest to get stuck in an infinite exit loop?
+ arch/arm64/include/asm/kvm_arm.h     |  12 ++
+ arch/arm64/include/asm/kvm_asm.h     |   1 +
+ arch/arm64/include/asm/kvm_emulate.h |  79 +++++++-
+ arch/arm64/include/asm/kvm_host.h    |   2 +
+ arch/arm64/kvm/arm.c                 |   7 +
+ arch/arm64/kvm/handle_exit.c         |  23 +++
+ arch/arm64/kvm/hyp/exception.c       |  34 +---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 258 +++++++++++++++++++++++----
+ arch/arm64/kvm/psci.c                |  30 +---
+ arch/arm64/kvm/reset.c               |  60 +------
+ arch/arm64/kvm/sys_regs.c            |  14 +-
+ arch/arm64/kvm/sys_regs.h            |  19 ++
+ include/kvm/arm_psci.h               |  27 +++
+ 13 files changed, 403 insertions(+), 163 deletions(-)
 
-Since the function does nothing, it doesn't advance the guest's Program
-Counter or update exception state. When handle_exit() resumes the guest,
-won't it immediately re-execute the same trapping instruction over and over,
-hanging the vCPU and burning host CPU cycles?
 
-> +
-> +int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
-> +{
-> +	/* Stub until s390 supports arm64 sysregs TODO sysregs*/
-> +	return 1;
-> +}
+base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+-- 
+2.39.5
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706085229.9795=
-25-1-seiden@linux.ibm.com?part=3D23
