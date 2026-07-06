@@ -1,181 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013063.outbound.protection.outlook.com [40.107.162.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDD6305698;
-	Mon,  6 Jul 2026 11:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783336407; cv=none; b=UwoQV0IgubTLy2LmgS3+/wCTwFJE7KC4izZbfDNBqyiyRdL6WDqsE/vtwfmWaHVZLhxOgQ2/P/ICX8q8qI9bVy2U6sCtGiq4mPQFzHu0FrD8sEpZ43wXkxc9UxCnVmoBN2OwH5Dc1N0GuNTuqGQ2cFpsgaSJIslpXCJTVngwqW0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783336407; c=relaxed/simple;
-	bh=eAPfHgsgztUwKbfWhNdcUsRQYC0U6AZV/3HLMsLI8zE=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=uCXZM14Mm7CVYxjet5NWhZccDschbhirQ1rNw3SX2/+AzwAveB+fZDtrhYztkxxVEBQ6dqgRA38DwUCJnaZgGF4pHuy24OAvV37SJ3E5adINLAnp0SS7ArQCK6VdH9X8hCbStSfEmYhL6B9GGOVLVbIkM+hh7jvqTv31YD1uU00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uniq0lh5; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D521A3FD147
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 11:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.63
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783336497; cv=fail; b=XG7UJvNn+o/S5kORqFG2cycZlVocxiOfiJ595iB21+2WpdFDFco2Q66OkTOPBv17ilR1ixzzVR5QG6geDST4/jbx817LAA3S00b+uhRAcWD1+/Jp1cl9qshTafaFJQG3Zlbd+ni/ChFZ+vSCTjMBXtpNVri2amsHnpW5s3tkKvA=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783336497; c=relaxed/simple;
+	bh=5sgfrtC6euyHQ+jCRInld4njc9CLE7w9D+8ACclAhE4=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Cz2kD/UbDYGpbBwEYfdZFoHba1THlSZJrurPnPbZw/A2QhRPLFZjTBlDKo2IEfMk/3PH1LEArQBMC2vqhDuoyiGMK2qV7mLMV3edWwAkuskHL/PD/0AnIozaXfA92s6WA48ron+3LLZ3hzo8eoE9WDapi/26D4+aleuMy0lWxI8=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cZxDS7NV; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cZxDS7NV; arc=fail smtp.client-ip=40.107.162.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uniq0lh5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E70F81F000E9;
-	Mon,  6 Jul 2026 11:13:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783336405;
-	bh=x75Efjm4jUDg/OTRwR+YL51tKG+yW5kaRuK1wz80leI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Uniq0lh5lpuG3pSUiUXn0CG+9ysHTOUuzzgx6Psb8HIMuZbR4q+KYuvZfl8B3Nw2p
-	 TY2AtdAPrLNopjKjVLC7zmTTgUgOP1tHyOG4HF0M88FUb4LPTNyxGDwfyOREDu13lJ
-	 OEhMUukKbxN9o+kCRRDP047HtIFNgqG6mRt1OlKQZrS4BXxaWakTfqbUAB25+z7PcT
-	 BQbH299VF9pU6wEolTvU2obH0IzD88Yn5X4S/9JchJIjE5JCm75RyBE2bI5Sj43THZ
-	 /ken5wwGTZ72wmfc8bgpzQcPJnl5VrmKSf9Q30UWUj/dG29V6tFYs3cinLI3yBPcRr
-	 ofcLm6zCX+mhQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 6/7] KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Akihiko Odaki" <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260706-hybrid-v8-6-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
-References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <20260706-hybrid-v8-6-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
-Content-Type: text/plain; charset=utf-8
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cZxDS7NV";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cZxDS7NV"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=u11bRJ0beruCxBJO4bhtTz47sAJ3qdXMxAOTFHLUgM1DR2AKMir5D0yKz80vOLtE1JgBrCHW8qkZcskdHNSl13bCeo0GpuZ0+LFkZ1+m95Kf0ZQkzeRT/ODXgl+BMFrvQ9lx1MIpryAtHsVIzjdq/JiUB/x6ZHePG7/ZL9Ni2XZILlAvZ3+ZW0cH92dkWN0ZTRS2gTvaXpuS3LHFXucoiHdjFpNslJbFZCwD1LZvssw/5ogcZYYEEYcAg/b59Gh1qGg9MVIBXnCqaJgwc6rTVDhhlN5UfpHiB6Qe4F0PoGXNlciNNdD6dLQLzW4tFqF2FTL5ncYP+9CNIxBWjkPHMg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
+ b=K04463oIeNhtwcEu9fPkBh3hAk/YKnR2Ms2nkHg/tVsW/zZ36Yo9XRIMVO+cbDvI4uRMotxRykHBfrRLS5g0HgWyPAOWkK/BeEQ8UgmycKnCxcuO43z1LF91t9lj4+mkF5SomNkz0oLKQQ+fifIq/HzsNrvs3VSofNyPNOzRJkDiVVuJl4Y4p9rOjTiUnuUseRerk4cMwch7dJ8r6dOmzPEXwCzU8kMQHg9txksnX6wpraEHRjOL57nZnP04Y5h5J+76/iE4VXcasqd7BlHzDH34UZ5cjofBeodtbTvLq8pEnEsyFPaw/shkoPtVPjd0//4pbYPXI0iV+cO8njUhFw==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
+ b=cZxDS7NVQ07ynylvdYWRkOhFfIZTLcHVqas7Lw9FsGbrs6Thnrq4NJay3AZA2aY0HQSUUejeg1mmNURJuneCCnffg7qTF7Lr0UzcBjKeyc8aKkZi0OCsh4G3qBqJP/eTUkQYac8gk1PpbHhYSraNllhQlcNXyLi/G6ZJtsM07zw=
+Received: from DU7P195CA0012.EURP195.PROD.OUTLOOK.COM (2603:10a6:10:54d::22)
+ by PAWPR08MB11144.eurprd08.prod.outlook.com (2603:10a6:102:46a::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Mon, 6 Jul
+ 2026 11:14:50 +0000
+Received: from DU6PEPF00009528.eurprd02.prod.outlook.com
+ (2603:10a6:10:54d:cafe::a8) by DU7P195CA0012.outlook.office365.com
+ (2603:10a6:10:54d::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.13 via Frontend Transport; Mon, 6
+ Jul 2026 11:14:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ DU6PEPF00009528.mail.protection.outlook.com (10.167.8.9) with Microsoft SMTP
+ Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.6 via
+ Frontend Transport; Mon, 6 Jul 2026 11:14:49 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qhWdmcudVBBjvX4taKacFD2E9dazw53c60bdOPXfISJvKHKArMH7BOodDWZCXcR0ATSER4wpIgBAFhd4lQ4X+K39u8jy9A0k3z002YuujtQpOxp1U+gfbPh0aHoSfY8tdwXp89mCRl5C1BoLfOksxIDoRNLszWCAbvymfPE0/E2Cj/JqBa0JDlUdRg6h6faV/yD7yv7IZ5If5Trw1U4Oh2+fRUCqm6JX7Ln8QzyTLyQaY9/6HSlB5UdOwhixnpGIyExbgNRcHU8e6YVB2ijKF3DMxwDCfiIZveR0A5tP8Bnp3+p4DOMq6GDVPP41rOJKDAe2KbGEqpFTPy0ddfp28g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
+ b=kG9WyV8W72y4umeiGwcSLr563gYF43cYBdvH9vi0jBhwnI+HM9WazzlnwiNVtR9GQxqo7HSLV4PzLJThULgS6QeHxBIiCOg7gXDHL40+h58oZh/8ziRXBqfPWRx3/khejPe+vMQIhPdvZN8g61gLv0/D4IGwzQzKbbNu9s1shk99kvweJ233ysF685WAmXk2yxjxsjxOj/9toa5yA7bv1/slHi/c8cU+rEUjdRglhQOVibb6p+6qtDIPFj0az9BMPpu6bqsv6dcuji7ceTcict+KyjuMAn5gkViskJ6cgMKzqPDN7qI52vE3EfIfyO4iOweSzcD96Ce1OY0VkGMq9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G7d65Wc+aQK31EJy22CFA5aq0tav37cNiiOeHH0sjOg=;
+ b=cZxDS7NVQ07ynylvdYWRkOhFfIZTLcHVqas7Lw9FsGbrs6Thnrq4NJay3AZA2aY0HQSUUejeg1mmNURJuneCCnffg7qTF7Lr0UzcBjKeyc8aKkZi0OCsh4G3qBqJP/eTUkQYac8gk1PpbHhYSraNllhQlcNXyLi/G6ZJtsM07zw=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from PAWPR08MB10975.eurprd08.prod.outlook.com (2603:10a6:102:46e::7)
+ by AS1PR08MB7563.eurprd08.prod.outlook.com (2603:10a6:20b:472::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Mon, 6 Jul
+ 2026 11:13:46 +0000
+Received: from PAWPR08MB10975.eurprd08.prod.outlook.com
+ ([fe80::3c7a:9a64:14bc:ce15]) by PAWPR08MB10975.eurprd08.prod.outlook.com
+ ([fe80::3c7a:9a64:14bc:ce15%7]) with mapi id 15.21.0181.009; Mon, 6 Jul 2026
+ 11:13:46 +0000
+Message-ID: <ab60e6a1-e59a-4089-a6d4-386b83627b87@arm.com>
+Date: Mon, 6 Jul 2026 12:13:45 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v1 4/5] Add guest_memfd support to
+ kvm__register_mem()
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>, kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Fuad Tabba <tabba@google.com>
+References: <20260706083555.302972-1-fuad.tabba@linux.dev>
+ <20260706083555.302972-5-fuad.tabba@linux.dev>
+ <5a699a28-07ce-4a6c-bc41-8b9bc7ca0d4a@arm.com>
+Content-Language: en-US
+In-Reply-To: <5a699a28-07ce-4a6c-bc41-8b9bc7ca0d4a@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2026 11:13:24 +0000
-Message-Id: <20260706111324.E70F81F000E9@smtp.kernel.org>
+X-ClientProxiedBy: LO2P123CA0093.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:139::8) To PAWPR08MB10975.eurprd08.prod.outlook.com
+ (2603:10a6:102:46e::7)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-
-New issues:
-- [High] Host-userspace can trigger a WARN_ON_ONCE in KVM by scheduling a V=
-CPU on a physical CPU without a PMU.
-- [Medium] KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS can silently override the KV=
-M_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY restriction.
-
-Pre-existing issues:
-- [High] kvm_arm_set_nr_counters() modifies MDCR_EL2 for all vCPUs without =
-acquiring their vcpu->mutex, causing a data race with KVM_SET_ONE_REG.
---
-
-commit 18166de56dc2a0622e0ddd3b21dbd03b3b4d6bd7
-Author: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-
-KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
-
-Introduce the KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY attribute to
-create a "fixed-counters-only" PMU.
-
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-
-[ ... ]
-
-> @@ -1151,6 +1153,22 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu =
-*vcpu, int pmu_id)
->  	return ret;
->  }
-> =20
-> +static int kvm_arm_pmu_v3_set_pmu_fixed_counters_only(struct kvm_vcpu *v=
-cpu)
-> +{
-> +	struct kvm *kvm =3D vcpu->kvm;
-> +
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
-> +	if (kvm_vm_has_ran_once(kvm) || kvm->arch.pmu_filter ||
-> +	    test_bit(KVM_ARCH_FLAG_PMU_V3_EXPLICIT, &kvm->arch.flags))
-> +		return -EBUSY;
-> +
-> +	set_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &kvm->arch.flags);
-> +	kvm_arm_set_nr_counters(kvm, 0);
-
-[Severity: High]
-Can an unprivileged host userspace trigger a WARN_ON_ONCE if they bind the
-VCPU thread to a physical CPU without a PMU and run the VM?
-
-If KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY is set, it appears
-kvm_pmu_create_perf_event() will attempt to find a PMU using
-kvm_pmu_probe_armpmu(vcpu->cpu):
-
-arch/arm64/kvm/pmu-emul.c:kvm_pmu_create_perf_event() {
-    ...
-	if (kvm_pmu_fixed_counters_only(vcpu->kvm)) {
-		arm_pmu =3D kvm_pmu_probe_armpmu(vcpu->cpu);
-		if (WARN_ON_ONCE(!arm_pmu))
-			return;
-	}
-    ...
-}
-
-If the CPU lacks a PMU, wouldn't this hit the WARN_ON_ONCE and act as a host
-denial of service if panic_on_warn is set?
+MIME-Version: 1.0
+X-MS-TrafficTypeDiagnostic:
+	PAWPR08MB10975:EE_|AS1PR08MB7563:EE_|DU6PEPF00009528:EE_|PAWPR08MB11144:EE_
+X-MS-Office365-Filtering-Correlation-Id: cbaf9c92-487a-4f83-9b15-08dedb4fcb97
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|23010399003|366016|1800799024|376014|4143699003|11063799006|56012099006|22082099003|18002099003|6133799003;
+X-Microsoft-Antispam-Message-Info-Original:
+ xuNNU6xHD0Gzp4RO1z4mHKwNNkORLJO4xbfxI3foUzHhwHjkUNfyTBypzlabqLrSw2QKyiYS6iAsuUCQwTdXnrU8HOst726uMMveW81HKVizLZ9ER4mX73EDpJ7dJQgLpyk4WnzMC3UGGZa009tPnLdTyWOBEj2w9cOAtGeY+0jG+F+Zr1algIufItdwM6FH1lY3H98eXUQT8b5UNX1uING3SwrUh4NYjXPEAxxIz8y5TBAqZQsD/ffIPHdmmmN310OuM+iBJgxGRbnUdxTBDyWjGLoLdAQdgXFqqIViaWGkFUSJd+0dtA12tm7dS9OzvpdbmmBGH3yajPWC7uXq3HzhQoHRqfMgpvo53ztZywbgUt/Ajk5wqev6sjzUT8ws/qxUl6zXg2Mh+udzgmbrhbkY0kzBxIbihoTh30ZTBXcDMgoM+RCT+PicHKXJqbS9wtYKc2/fc0/UTLYku2tFu/OdyD+uNudOHcK7ABlUqXe3fbRM8m1D+y0YeCJf6ptCsg73f6JQQExCZUHkx4QCtpYSVyYIHhdig8V5TOJssCpOSslo4uqszc/xtzWEsZQTWo+hMWoBtaKexwqEPDj5POVwyigFBTq2T6hPZYXo6NLYU6QdBW0BrwedzYpqBZgMxDjTF7DPUwoIgsYS+XMsX9Sv1Yfbg0y9vaZ7nc7Rfvk=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR08MB10975.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(376014)(4143699003)(11063799006)(56012099006)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
+X-Exchange-RoutingPolicyChecked:
+ rIxx2ToEjNpUBxu2u8Mo1XCXW4a7M6FDxq+wBYCG3bYScKtdM69J50Z0KbznrmpSEUjFvwdLhAB8vEytJKnOfhPqNNIYtcOol4W56W8lXh2QXPo2ANEObcXhymqgYel2xdp3yAV7KcgpjbbAVwCnz1jIwk3LLEpTF60PKSwdfqAgnzlQ1lG9+VtYuN0Xo47ZWxI8sOFxbx6QbqKu45Vx5xyTRaQKLhe+UrT8jYWXgJX8EKIrQUf0G7luTlP0ZrtwpL9BkFp7uJR1gciAbzHJlAo3DNTo26DMGdKCF2tKGp5gGlcjs+aO9ETALSO5T2iQ/mdNYA8LJP0dUVQ08dA9rQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR08MB7563
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DU6PEPF00009528.eurprd02.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	79d591f9-da3c-4756-994b-08dedb4fa5b6
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|14060799003|36860700016|376014|1800799024|35042699022|82310400026|23010399003|4143699003|56012099006|18002099003|11063799006|22082099003|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	rFQWZG+YDlsv1qKHjgr4tDiYQrhX6caOkiqefX2Mcxla9Ww0lCppQ2NQ7K4Cu4OkKMzEOUgJg3/cSo9Z1lSUWWOft+yItihUYMYCycn4Ex3tuRw/lawnVcQNbYIsoYCIsM6D//L7ZXvljtZPYtslgW3xx8MJmddsHHDYvT/AYY3xiFv4rC1J16vQkm7zPaSp6/p8RBnOlCh7bVUnjpjnoZvi1gSdP9XQvVnM82kypcITKUXiYh76YWtIE3l25e7VkRK3/JOgkerP7WvoW7wCwKSG4mxYgLIZYiyQqf6AJV4mSQy1AQcJLQTx4NpkPNJZvf539LbuuJHzZteKECIelgphDDVIvkGfh/o5+2mTeMn42/6m9pywIHCcG2Y1+b23PVY+YFNLV3MkfhcPSfSpK+I1S4NaiBI8z+LVxAIY7sJNorTW2uYnGkfkndnC+R4vJASowYWfY4Iy+FE8ccUCrs6mm72xN/W4LtmdRMLw7fMbBm/etfZys1Fjzf9eyDnUluP61sT8wYsAHdRVfBOXmmW4Fi26UBN8PcunrJoLNaxql+dYGoYLhkuxF3es4jcqH2BJW70ZAtUdvI6B6EZbhNg8hitGoHqlktQlLdClCX8VDVzxM6PE0diqJGZBw3YYmmAQhhYA2tv9J3BwRmmg40jIKSllnWw0YPVfR0Ui8sqw8B67YlNpC7Z+TYfAIjtXxgzS0x9sb3f4SnCpY7oOYg==
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(36860700016)(376014)(1800799024)(35042699022)(82310400026)(23010399003)(4143699003)(56012099006)(18002099003)(11063799006)(22082099003)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	ZG7EcaH5kYuumTQJ5Hm5bgskvBpD5+DZxJuaKeMpVtqb8vgQNk3wWV0iLBa5LiZiP9xdTVIdJX02ZQMox4Lllxe+lc6dcA/mWGySYT+ZLQd7UiAvuPk0mq4OdET5XoIf4pRgBggW7uscYIDXvrrRxeQRdUv5WeXh6GN4yomfqbpDh9CtYBtPZle8Er3zo2827LicTSdFbrvoUtG9UlHA5n6m4Z+WKM7icj8SCx7MKWjE2ugwtMhYNz/6Rzfzu2vXHs9vGVzitl1+tveZ0G+D0XNlRVUOkkXxO7ltEIZt7rIMLh0ny80/f5I02UJ+Myq3rTq+LLZy+8gmGfC9967WR0bQsGl9aXepg1uJNgaoprX5WU8VHEKoCzesSSWjfut0cHHQbSOh8l8n9ic2lJnNfQz3doQKoYWmWKPi5JhZU1cnXLpwE++nsTPMZ7tkaUnX
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 11:14:49.6657
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbaf9c92-487a-4f83-9b15-08dedb4fcb97
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU6PEPF00009528.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB11144
 
 
-[Severity: High]
-This is a pre-existing issue, but can this call to kvm_arm_set_nr_counters()
-cause a data race with KVM_SET_ONE_REG?
 
-Looking at kvm_arm_set_nr_counters(), it iterates over all vCPUs and modifi=
-es
-__vcpu_sys_reg(vcpu, MDCR_EL2) "behind their back" without acquiring their
-vcpu->mutex:
+On 06/07/2026 12:00, Suzuki K Poulose wrote:
+> On 06/07/2026 09:35, Fuad Tabba wrote:
+>> Add a guest_memfd file descriptor and offset to kvm__register_mem().
+>> When guest_memfd >=3D 0, set KVM_MEM_GUEST_MEMFD and populate the
+>> guest_memfd fields, binding the memslot to the file. This prepares
+>> for backing guest RAM with guest_memfd on arm64.
+>>
+>> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+>
+> Looks good to me
+>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-arch/arm64/kvm/pmu-emul.c:kvm_arm_set_nr_counters() {
-    ...
-		kvm_for_each_vcpu(i, vcpu, kvm) {
-			u64 val =3D __vcpu_sys_reg(vcpu, MDCR_EL2);
-			val &=3D ~MDCR_EL2_HPMN;
-			val |=3D FIELD_PREP(MDCR_EL2_HPMN, kvm->arch.nr_pmu_counters);
-			__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
-		}
-    ...
-}
+Having another look... Thought of adding my comment, no changes to the
+above.
 
-Concurrently, userspace could call KVM_SET_ONE_REG on another vCPU to modify
-MDCR_EL2 bits, leading to a read-modify-write corruption since the global
-config_lock is not taken by KVM_SET_ONE_REG.
 
-> +
-> +	return 0;
-> +}
-> +
->  static int kvm_arm_pmu_v3_set_nr_counters(struct kvm_vcpu *vcpu, unsigne=
-d int n)
->  {
+>>   int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+>> -              void *userspace_addr, enum kvm_mem_type type)
+>> +              void *userspace_addr, int guest_memfd,
+>> +              u64 guest_memfd_offset, enum kvm_mem_type type)
+>>   {
+>>       struct kvm_mem_bank *merged =3D NULL;
+>>       struct kvm_mem_bank *bank;
+>> @@ -327,6 +328,12 @@ int kvm__register_mem(struct kvm *kvm, u64
+>> guest_phys, u64 size,
+>>               .userspace_addr        =3D (unsigned long)userspace_addr,
+>>           };
+>> +        if (guest_memfd >=3D 0) {
+>> +            mem.flags    |=3D KVM_MEM_GUEST_MEMFD;
+>> +            mem.guest_memfd        =3D guest_memfd;
+>> +            mem.guest_memfd_offset    =3D guest_memfd_offset;
+>> +        }
 
-[ ... ]
+It may be worth capturing the fd and the offset in the mem_bank here,
+but agree that can be added on the need basis and there are no users
+of it for now, without conversion support.
 
-> @@ -1270,6 +1288,8 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, =
-struct kvm_device_attr *attr)
-> =20
->  		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
->  	}
-> +	case KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY:
-> +		return kvm_arm_pmu_v3_set_pmu_fixed_counters_only(vcpu);
+Suzuki
 
-[Severity: Medium]
-If userspace configures the PMU for fixed-counters-only, can this state be
-silently overwritten if userspace subsequently calls
-KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS?
 
-The kvm_arm_pmu_v3_set_nr_counters() function does not check if
-KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY is active:
+>> +
+>>           ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem);
+>>           if (ret < 0) {
+>>               ret =3D -errno;
+>
 
-arch/arm64/kvm/pmu-emul.c:kvm_arm_pmu_v3_set_nr_counters() {
-    ...
-	if (n > kvm_arm_pmu_get_max_counters(kvm))
-		return -EINVAL;
-
-	kvm_arm_set_nr_counters(kvm, n);
-	return 0;
-}
-
-Could this allow exposing programmable counters to the guest despite being
-configured for fixed-counters-only?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706-hybrid-v8-=
-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp?part=3D6
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
