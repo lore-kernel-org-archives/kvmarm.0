@@ -1,261 +1,243 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010034.outbound.protection.outlook.com [52.101.69.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F81442108;
-	Mon,  6 Jul 2026 10:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783333005; cv=none; b=JCcLBmbxJMSOOvoQALvPX26VKmGu13sRD3xhr9S49P5+WeKnPPAqr9khe+Jzp5Pdm36f2MLaAm6zHf4rOgfdqbyFcqOSV8Dtm/o493eEHfQAKsdUCXOeYWrVL5tUN8jlfLCoije9u1cZUh0h7LVgfI8gVVSOTEwcg1goQEGaklI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783333005; c=relaxed/simple;
-	bh=7SrU/iePr5+vWkkl3oywkUabdE78XwNV4MJNcBwtgYc=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=DelSQc/OUgubeEmlvksJAzDEpI21dKJ7vV1U8XatTYNAzKIkTfXqqi51xlHIH55nf7/ebQ2IKNiL0+Kh4IWCm6xHjpoyOto4Wy42lsjCQcb3i/rsfhmCZ6/4vZNMAU5TJuVT48O/72AlKDsEMl5oXL2e++kEew8NmQQcqWLyIXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hm30TbrZ; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C6C36F8FD
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.34
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783333501; cv=fail; b=mxliT69JFqRZ97dSBESFp7QwoJf5bkF12tuhPqLiy03DbFayDp1NqEdSODstTGAV0vMBUe3aevy9e/Cd218+lgjm6cbOADJyKS8GAJFT2rpZU6UFaESWCteoe8QtH1El+jUIE52aTH3MXLhzzzQRiLZKm4wQt2sgeF2Zf/EOY9U=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783333501; c=relaxed/simple;
+	bh=TD2Q3o6FzuGmVy7tgKRxvWta551sYUWF/kw06hnmwrw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Brhejm4jg4J+LG5qY707dcEEUSFEBMdIer3G3N+6e7Sn+dB33qr12t9zpUcP05ufdCfGZmdloJQbo2M9C8SA2NhBwxf1onCfbPJGH5iMnl4nI9wpLrgLiokQz9H4Z9PVfFO6flIo4/5OqJ/DiP3lB4QNN2NyvDt7zz8G4t4+XmM=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cwBvX6cM; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cwBvX6cM; arc=fail smtp.client-ip=52.101.69.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hm30TbrZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DCC1F000E9;
-	Mon,  6 Jul 2026 10:16:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783333003;
-	bh=yrisIXx6y+gv4MP7X9h+3PO47CAPhJud1/GPbP+xDwc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Hm30TbrZQKsmmpPxl9CY30PfmPAS2LBw+KCGI0W5FNScvU8aE0Khy2jwakIz/Enh3
-	 vjq5sMbIz/287K1enBuVNMHoc75Yuq+HabIUd0Eup3YggYEANeBkYWd4uvotXPV7sz
-	 9XFwvgkIUCTs8km7v9kXJTm7cDiKmYYj/vL1u/7CK44GkZ9h6RkbL9xjNE6blApkKt
-	 LmfOuvCnASrR8f99wJnoIszkT2KaAIm+/r0g4FDhKyEqJsUnk5hXoCiwu6uX7ChPPc
-	 DAO1jhcN4LuFkC82Pn/6nbo6e13JhFpGo4e+iesEHa74KndSVGJuXyWUjNUBRiCa3Z
-	 kL0Vc5d69iDvA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 25/27] KVM: s390: arm64: Implement vCPU IOCTLs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Alexander Gordeev" <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Heiko Carstens" <hca@linux.ibm.com>, "Vasily
- Gorbik" <gor@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260706085229.979525-26-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-26-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cwBvX6cM";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cwBvX6cM"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=OpRPkK7jEmHwxboWwQh2sQMXFeevF/Di5MkLlnh/zPWhGJScKPmWDzyE04H3N5L4DU6bZestgBfXx6//F9VXcYHgnKUk2Cpqcz5dr3UgkmNGPGBF3JfgkjRzIFyPAw4kP2mRcM9jGtWAmI7pQmn7Ypy53GYtLRTARaqHleXlfLFYlpoTrmIZCaA0U9KNAf9vDlbIwLW6oo2MklMtlRxfkPsEMPa4nX1M3o2z0u9EgkqdxnY36YBQp+Ew46+tcVhoGGjkY1bns4te5QhyScRtjXI2MRUosBn1riADI3zzKilit+2xaH/NaLj0J6gKokmX0pCmjGTdbmDW85mNVzoJ4A==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/ttlXtiMHXuvJaHGpY1UI8E5q0jMCLIzt+j+NDWM+ms=;
+ b=FQIGM/2haF3yIsrXEMWpWtxLnRT9OYklIHmC96YVXgVVyptue6MVUQUEpZav+57rC0ak0EthwVPZ9883nCX9VM2qUAbU5EU4jnaqUnRTzmoeze3f8YNFhIqcZTT9ba0gtfA8+8q+/9bYQaQMyPurP7bnU+Vh43d4SDrKBuyurh4GwGOa+yMWwNtSI+8Y7s71Uv5Ng8BTTMHDQzGVyZWwLpIVpbpbGVozf0haDs9l+SdlhWq6iG41XKcmPkOAX5yKURjHyBUVtlwmMjApDyWp1GNhIva7CkJYbK5F5oX8tpVsIitk434cedH1xx34mqZvPCEo+ePzZXWF3Z2LLV05ig==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/ttlXtiMHXuvJaHGpY1UI8E5q0jMCLIzt+j+NDWM+ms=;
+ b=cwBvX6cM6epFNgne8mydlqC1jVBm66pUxp9odByqSCHsNgW3VLhjZm47M3+Kg9a8/rOo3P3Uz5Jgpm5L3FRM++/HYDXynsV7dKDfb4za8D/1BIpJFTlBP0xmuFrhrL24ctkAJWpeOtvwPUQIB3sZU9TcFbLURIIerhBhjlllypE=
+Received: from AS9PR06CA0559.eurprd06.prod.outlook.com (2603:10a6:20b:485::23)
+ by VI0PR08MB11042.eurprd08.prod.outlook.com (2603:10a6:800:257::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Mon, 6 Jul
+ 2026 10:24:54 +0000
+Received: from AM4PEPF00027A66.eurprd04.prod.outlook.com
+ (2603:10a6:20b:485:cafe::71) by AS9PR06CA0559.outlook.office365.com
+ (2603:10a6:20b:485::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.13 via Frontend Transport; Mon, 6
+ Jul 2026 10:24:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ AM4PEPF00027A66.mail.protection.outlook.com (10.167.16.91) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.6
+ via Frontend Transport; Mon, 6 Jul 2026 10:24:53 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Q7MC664acSpTtpWx+9+C9bL1wvlfy25XKa/FlBKdH1BBRXU1aVvsX8MuafFE0pLtpgXw/l/J/K+b2Q58T1apS6UfzsgIfMzZ6hOEXQMaHFzYvT9EUZOInmpkWv7fUYgqUHXsjXerj19YYfEk93slrJaBKoHUF6Nekmjqv+bxi+8VS3F0Oj3oTKP23oYepffR9NQTrbaD0hh6n0ShyTDMaeMFLmpd7PTQ7vGtFwOsoyIOCmos6BON4YnME/V0c0KA4bHyyZXAn+ANoI+wETOTVYT+F3H9umzT9jIdPvU1Yqwj9tmivjoQ6JItPf7289MQgMmywY1i+Cx5rXmuf/Umrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/ttlXtiMHXuvJaHGpY1UI8E5q0jMCLIzt+j+NDWM+ms=;
+ b=BgGZyzTXl1jJIAM+UxZQEX3e5+LHkRIIQOiAPUcKqFKGV7MDXPbO1O5y20GM2kmO6gmc2TpA0iDLFKrnQ9naoyvLv5Hn45Pz+0QfKauGspOwZODsyh/uh+6ivjH75v0pnkdxam99HVm0F3DGn2c6AJ0+7Y6ZU3Mq5kCpuJauM5cNhipIu9sDIyslnhcYQ2l2UVTqgijPuNpJCfQSXysSLSYBZ8z5TCcMTuzJwa83XcKP1t2hTVU8XvWPAcw0E27vqQ4sLF2RbLSzriYGnlASlUY+Qa6z0AEIhyVL0G9jWDXayIRKBlMPYMNh4fagZMFBv23z5R401xBtGcNs2MSdtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/ttlXtiMHXuvJaHGpY1UI8E5q0jMCLIzt+j+NDWM+ms=;
+ b=cwBvX6cM6epFNgne8mydlqC1jVBm66pUxp9odByqSCHsNgW3VLhjZm47M3+Kg9a8/rOo3P3Uz5Jgpm5L3FRM++/HYDXynsV7dKDfb4za8D/1BIpJFTlBP0xmuFrhrL24ctkAJWpeOtvwPUQIB3sZU9TcFbLURIIerhBhjlllypE=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from PAWPR08MB10975.eurprd08.prod.outlook.com (2603:10a6:102:46e::7)
+ by GV2PR08MB11465.eurprd08.prod.outlook.com (2603:10a6:150:2a7::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.16; Mon, 6 Jul
+ 2026 10:23:48 +0000
+Received: from PAWPR08MB10975.eurprd08.prod.outlook.com
+ ([fe80::3c7a:9a64:14bc:ce15]) by PAWPR08MB10975.eurprd08.prod.outlook.com
+ ([fe80::3c7a:9a64:14bc:ce15%7]) with mapi id 15.21.0181.009; Mon, 6 Jul 2026
+ 10:23:48 +0000
+Message-ID: <556ab72c-f440-434b-a24d-84200bd25842@arm.com>
+Date: Mon, 6 Jul 2026 11:23:47 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v1 3/5] Use kvm_userspace_memory_region2 for all
+ memory registration
+To: Fuad Tabba <fuad.tabba@linux.dev>, kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Fuad Tabba <tabba@google.com>
+References: <20260706083555.302972-1-fuad.tabba@linux.dev>
+ <20260706083555.302972-4-fuad.tabba@linux.dev>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260706083555.302972-4-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2026 10:16:41 +0000
-Message-Id: <20260706101643.69DCC1F000E9@smtp.kernel.org>
+X-ClientProxiedBy: LO4P123CA0684.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:351::17) To PAWPR08MB10975.eurprd08.prod.outlook.com
+ (2603:10a6:102:46e::7)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+X-MS-TrafficTypeDiagnostic:
+	PAWPR08MB10975:EE_|GV2PR08MB11465:EE_|AM4PEPF00027A66:EE_|VI0PR08MB11042:EE_
+X-MS-Office365-Filtering-Correlation-Id: 379fffe2-7590-485f-4e3f-08dedb48d1f7
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|23010399003|366016|376014|1800799024|18002099003|22082099003|4143699003|56012099006|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info-Original:
+ Y8MmAeHr4DoOUT6cNUSnPEkX9+Xq0LdK/3Sub7Ou4vroCgNtVTPRcoXXcHuSRCfmOwUP6o6VOvHOyRHUo5V8uB3wFmbk4AnXtet/meWKdqmt+KTtEwrRHPuPV7DGP2OlSGhV4A8hORKMMxhVYSCza2CMNw2zzw7fwTJwOc34b48ZV3djar2xFqdksP8iUKOgChnfgcTVTTI1Ma/+yPL4yA+lwkei/AaIzNFXrXCwhU1QHK2MQ6i1w62RpIN2zRn8lVfb96CfjuPb2JY+hP29L9KiARc/9EN0E5nZY03nyzBQYEJjhTINWLaK5k9qOUdTC4qFBRMg1hfYtDMhNRx25O9sRWmSRpXfUt786RAGYj+AyYkvJUBz3otAPOnu2J6Z3BDel3fEt8E2Mn071phTHve5O7bJGzSrWCW4mP+3kvv7e+JGMlAsNSgFTCSJA8Af7MWRXkZeIYVybi/DD/cx3YsbhP0VDfMKn8W8mPtQBbtAvjjW3WnbUFAU8hbGg0c7YTbFuW4lYHERdAY6ICCegS/VvG97Kb4KOpwnCIh+tWFtQM9kyX65ZpD8l3zTNVWFIoUpNBqzHUEg9o4lh0oBWO21sNFrGM44zKfuoyCWfabGdD0PoRRbZtr5ail1XR4SDEqDdn1kdi9p5UbwkDyAXi7qOeqPnKAD1XXLefFOGGo=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR08MB10975.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(376014)(1800799024)(18002099003)(22082099003)(4143699003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+X-Exchange-RoutingPolicyChecked:
+ tEFFOF7YSYDhu4KcXQPGsfBE5TmKuobEXWtp5+j5T8+QtTllroryHJq0JWcay7oT/ZHHqJ5Scn/NM1kEsNCqBvOrIxx9nguJk0uvFBP9SoRroKw5J4lDW9h7Sc4133996le/IsPQaB6QDwJJ4dVmRAJrgtQUWtPXXn20eme1ZbsRETTaDtA/Q3PEOop9mQ193bkKrODcOvTmJypWoR2fn8MgrClN3aAbgRxikqqhSZR8/ndv4WLgiyYZWvW/BnwIDmJiE+JevB8ZNzjirNTDzyMDZDpKFFXNw+9/RcfN3LkYnyhcxJr9h1XTElETFU2yNWdvznReJ12lXNYVA76sDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB11465
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM4PEPF00027A66.eurprd04.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	2bbcae51-bb86-4272-63f7-08dedb48ab01
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|35042699022|82310400026|1800799024|376014|14060799003|23010399003|18002099003|4143699003|11063799006|22082099003|56012099006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	ffbEnED64Xk/d4SprTVWd3srTOpT/xgZX8+rQmcxRAbIBtktyGPS6I8w2n662XGgEuXor39bog01KX8gBjXS97kzQDeXnSp9TG3SpQzx2k+1fQxVLX1khJyKRJzm4M5cbbmURn5PO+mnRL8ewkpss0DJUAl+pnrXJG3OLAea550d7RzLdwJufm1FP7XBdMSy29LQ0Aj9OI1s7to8I7++LaJR9LXUUPE/axIZCO4tBJc/NWVFLgsmE8tmOXelunKIr2KqIS2vJKFPjUrHiDACACRoap053nAqPs7gsIsTNQg3r25vmTpRpYmc1h/Zf3U2g5Zwn11GH0mhH3Ui0w+DI7y/zOROm/3CIHRtlbDVmYIjGpxjIIpWGfYKcaxjEFNWJi7euk3AtQOQCyI+t45AAGHykCKyh6Ef39VAXdXdIG49FAGLBGiv8RQ3HW1D4lI//hvSO8lVOh2ITsRlaG0R1vMV18nVHiFWC0NiLNch91VaHTqIW/68boKdWiGjRTxecSP3wCtNiI8h2CcWGR8cgPGOt2Xfnf4bvvx2Ns0paL9XaLIM/6E8zPn0PfxVGRHa+Egm66+gEo6e7pg2kkL9xGNiRSdCuZKsCxE1ZU8n7o0VG/5dahnF0NfIGXFQ6Qu0LFIzEfHQ1l1J3XUVum6jALYuiR+ysZdo9Rk0DTfNPfHoj0u0BspRThYl0cUK0HsDzzvWD7KUWcerWtSEyWkaHg==
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(35042699022)(82310400026)(1800799024)(376014)(14060799003)(23010399003)(18002099003)(4143699003)(11063799006)(22082099003)(56012099006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	I3zhi/LgszvYu8wpKIjxU6qEuFzAe7+k+cnD8SiGA1Fo8d0LMQCnE7wdk/FiF9bkz3Un7p+aKREou8JSaiQQOsW1fE5l0zE55kaJQYkQnQ4gQ+DUUt6838IXZOhffO6Zn1/oBDs1zPZbbKYYeO9MbPKHR56++kzE+jWqp0ys/Xc7LFqlcR56sDavYpOK+LqH09n7wr6LEHUMY2HfbjO+ZXZVIjanT8r3L2b3C0Lk+HBf23dmqvVnP75QpSPnyeAD4pf3KpVAJ4SHwmVEPZQ7BhbnhXm23Ubf+Cbd1YdXF4THN9Jaa1DT7cYlzIb+oaM7Mi1LMm4c0MCxrhY/EFijFUaMQOoSfRYoOLGK7BtRE2RxxbjkAIbv91TGvHVedQGh/xPSgGlz6HFE3SIzTWO2/H8AZb1FvexiAdIscpIzL2t1PSFcsmsvUuzF/xxKKDDw
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 10:24:53.9112
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 379fffe2-7590-485f-4e3f-08dedb48d1f7
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM4PEPF00027A66.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB11042
 
-Thank you for your contribution! Sashiko AI review found 7 potential issue(=
-s) to consider:
-- [High] Guest vector registers are not properly reset when KVM_REQ_VCPU_RE=
-SET is processed during the KVM_RUN loop.
-- [High] Userspace-reachable WARN_ONCE during validity intercept handling a=
-llows unprivileged processes to taint or panic the kernel.
-- [High] Executing local_irq_enable() while in an RCU extended quiescent st=
-ate (EQS) triggers lockdep warnings and system crashes.
-- [High] Guest PC increment is overwritten and lost due to calling `adjust_=
-pc` before `vcpu_put`.
-- [High] Missing `vcpu_load()` and `vcpu_put()` around KVM IOCTLs modifying=
- architectural state.
-- [Medium] KVM_GET_REG_LIST ioctl returns a positive integer instead of 0 o=
-n success.
-- [Medium] KVM_ARM_VCPU_FINALIZE ioctl unconditionally returns 0, failing t=
-o reject unrecognized features.
---
+Hi Fuad
 
-commit 13eb2c521ea373c254d3f7904b5979dc114e1d21
-Author: Steffen Eiden <seiden@linux.ibm.com>
-Subject: KVM: s390: arm64: Implement vCPU IOCTLs
+On 06/07/2026 09:35, Fuad Tabba wrote:
+> Switch kvm__register_mem() and kvm__destroy_mem() from
+> kvm_userspace_memory_region to kvm_userspace_memory_region2 and
+> KVM_SET_USER_MEMORY_REGION2 unconditionally. The v2 struct is a
+> superset; when the extra fields are zero, the ioctl behaves
+> identically to v1.
 
-Implement all vCPU IOCTLs.
+Doesn't this break using this on older KVM implementations ? Not that I
+care, but do others care ?
 
-> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> --- a/arch/s390/kvm/arm64/arm.c
-> +++ b/arch/s390/kvm/arm64/arm.c
-[ ... ]
-> @@ -375,6 +375,18 @@ static void arm_vcpu_run(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_sae_block *sae_block =3D &vcpu->arch.sae_block;
-> =20
->  	adjust_pc(vcpu);
-> =20
->  	local_irq_disable();
->  	guest_enter_irqoff();
->  	local_irq_enable();
+Cheers
+Suzuki
 
-[Severity: High]
-Could enabling interrupts immediately after entering the guest context
-trigger an RCU-idle splat?
 
-guest_enter_irqoff() places the CPU into an RCU extended quiescent state
-(EQS). Calling local_irq_enable() inside this state violates the API
-contract since it makes the kernel preemptible while RCU is not watching,
-which can lead to lockdep warnings and system stalls.
+>
+> This prepares for adding guest_memfd support.
+>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>   kvm.c | 11 +++++------
+>   1 file changed, 5 insertions(+), 6 deletions(-)
+>
+> diff --git a/kvm.c b/kvm.c
+> index 95ccfcb..8a7fd09 100644
+> --- a/kvm.c
+> +++ b/kvm.c
+> @@ -189,7 +189,7 @@ core_exit(kvm__exit);
+>   int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+>                    void *userspace_addr)
+>   {
+> -     struct kvm_userspace_memory_region mem;
+> +     struct kvm_userspace_memory_region2 mem;
+>       struct kvm_mem_bank *bank;
+>       int ret;
+>
+> @@ -213,14 +213,14 @@ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phy=
+s, u64 size,
+>               goto out;
+>       }
+>
+> -     mem =3D (struct kvm_userspace_memory_region) {
+> +     mem =3D (struct kvm_userspace_memory_region2) {
+>               .slot                   =3D bank->slot,
+>               .guest_phys_addr        =3D guest_phys,
+>               .memory_size            =3D 0,
+>               .userspace_addr         =3D (unsigned long)userspace_addr,
+>       };
+>
+> -     ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
+> +     ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem);
+>       if (ret < 0) {
+>               ret =3D -errno;
+>               goto out;
+> @@ -239,7 +239,6 @@ out:
+>   int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+>                     void *userspace_addr, enum kvm_mem_type type)
+>   {
+> -     struct kvm_userspace_memory_region mem;
+>       struct kvm_mem_bank *merged =3D NULL;
+>       struct kvm_mem_bank *bank;
+>       struct list_head *prev_entry;
+> @@ -320,7 +319,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys=
+, u64 size,
+>               flags |=3D KVM_MEM_READONLY;
+>
+>       if (type !=3D KVM_MEM_TYPE_RESERVED) {
+> -             mem =3D (struct kvm_userspace_memory_region) {
+> +             struct kvm_userspace_memory_region2 mem =3D {
+>                       .slot                   =3D slot,
+>                       .flags                  =3D flags,
+>                       .guest_phys_addr        =3D guest_phys,
+> @@ -328,7 +327,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys=
+, u64 size,
+>                       .userspace_addr         =3D (unsigned long)userspac=
+e_addr,
+>               };
+>
+> -             ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem)=
+;
+> +             ret =3D ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2, &mem=
+);
+>               if (ret < 0) {
+>                       ret =3D -errno;
+>                       goto out;
 
-[ ... ]
-> @@ -396,6 +408,61 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  {
->  	DECLARE_KERNEL_FPU_ONSTACK32(fpu_save);
->  	struct kvm_run *kvm_run =3D vcpu->run;
->  	int ret;
-[ ... ]
->  	kernel_fpu_begin(&fpu_save, KERNEL_FPC | KERNEL_VXR);
->  	load_vx_regs((vcpu->arch.ctxt.vregs));
-> =20
->  	if (!vcpu->wants_to_run) {
->  		ret =3D -EINTR;
->  		goto out;
->  	}
-> =20
->  	kvm_sigset_activate(vcpu);
-> =20
->  	might_fault();
-> =20
->  	ret =3D 1;
->  	do {
-[ ... ]
->  		if (ret > 0)
->  			ret =3D check_vcpu_requests(vcpu);
-
-[Severity: High]
-If a KVM_REQ_VCPU_RESET is pending and processed by check_vcpu_requests(),
-the memory copy of the core registers is zeroed out by kvm_reset_vcpu().
-However, the hardware CPU vector registers were already loaded before the
-loop via load_vx_regs().
-
-When the loop exits, won't save_vx_regs() copy the stale hardware state back
-into memory, completely overriding the reset we just performed?
-
-[ ... ]
->  		arm_vcpu_run(vcpu);
-> =20
->  		ret =3D handle_exit(vcpu);
-> =20
->  	} while (ret > 0);
-> =20
->  	kvm_sigset_deactivate(vcpu);
->  out:
->  	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
->  		adjust_pc(vcpu);
-> =20
->  	save_vx_regs(vcpu->arch.ctxt.vregs);
->  	kernel_fpu_end(&fpu_save, KERNEL_FPC | KERNEL_VXR);
->  	vcpu_put(vcpu);
-
-[Severity: High]
-Does this sequence overwrite the PC increment?
-
-adjust_pc() modifies the PC in the vCPU's memory state, but the immediate
-subsequent call to vcpu_put() executes the stiasrm hardware instruction.
-This dumps the current internal hardware register state (with the
-un-incremented PC) into the exact same memory save area.
-
-Could this permanently overwrite the software increment and cause infinite
-guest execution loops?
-
-[ ... ]
-> @@ -463,6 +530,95 @@ long kvm_arch_vcpu_ioctl(struct file *filp, unsigned=
- int ioctl, unsigned long ar
->  {
->  	struct kvm_vcpu *vcpu =3D filp->private_data;
->  	void __user *argp =3D (void __user *)arg;
->  	struct kvm_device_attr attr;
->  	int ret;
-> =20
->  	switch (ioctl) {
-
-[Severity: High]
-Are we missing calls to vcpu_load() and vcpu_put() around these IOCTLs?
-
-Operations like KVM_SET_ONE_REG and KVM_ARM_VCPU_INIT directly modify or
-read the vCPU architectural state. The KVM subsystem mandates that IOCTLs
-modifying architectural state must use these wrappers to manage vCPU
-attachment.
-
-Without them, could this lead to hardware state synchronization issues or
-leaked preempt notifiers?
-
-[ ... ]
->  	case KVM_GET_REG_LIST: {
->  		struct kvm_reg_list __user *user_list =3D argp;
->  		struct kvm_reg_list reg_list;
->  		unsigned int n;
-[ ... ]
->  		n =3D reg_list.n;
->  		reg_list.n =3D kvm_arm_num_regs(vcpu);
->  		if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
->  			break;
->  		ret =3D -E2BIG;
->  		if (n < reg_list.n)
->  			break;
->  		ret =3D kvm_arm_copy_reg_indices(vcpu, user_list->reg);
->  		break;
->  	}
-
-[Severity: Medium]
-Should this explicitly return 0 on success?
-
-kvm_arm_copy_reg_indices() returns the positive number of registers copied.
-Passing this positive count directly back to userspace goes against the KVM
-ABI requirement that this ioctl returns 0 on success.
-
-Could this cause userspace programs like QEMU to misinterpret a successful
-call as an error?
-
-[ ... ]
-> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/hand=
-le_exit.c
-> --- a/arch/s390/kvm/arm64/handle_exit.c
-> +++ b/arch/s390/kvm/arm64/handle_exit.c
-[ ... ]
-> @@ -55,6 +57,35 @@ exit_handle_fn arm_exit_handlers[] =3D {
->  	[ESR_ELx_EC_HVC64]	=3D handle_hvc,
->  };
-> =20
-> +int handle_exit(struct kvm_vcpu *vcpu)
-> +{
-> +	u8 icptr =3D vcpu->arch.sae_block.icptr;
-> +	int ret =3D 1;
-> +
-> +	switch (icptr) {
-> +	case SAE_ICPTR_SPURIOUS:
-> +		break;
-> +	case SAE_ICPTR_VALIDITY:
-> +		WARN_ONCE(true, "SAE: validity intercept. vir: 0x%04x",
-> +			  vcpu->arch.sae_block.vir);
-> +		ret =3D -EINVAL;
-> +		break;
-
-[Severity: High]
-Is it safe to have a WARN_ONCE here?
-
-Unprivileged host userspace can set arbitrary guest register states via
-KVM_SET_ONE_REG prior to calling KVM_RUN. This allows a malicious userspace
-process to intentionally construct an invalid CPU state that hardware
-rejects.
-
-Would this allow an unprivileged process to drive this warning condition and
-create a host-side denial of service vector if panic_on_warn is enabled?
-
-[ ... ]
-> diff --git a/arch/s390/kvm/arm64/reset.c b/arch/s390/kvm/arm64/reset.c
-> --- /dev/null
-> +++ b/arch/s390/kvm/arm64/reset.c
-[ ... ]
-> +int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
-> +{
-> +	return 0;
-> +}
-
-[Severity: Medium]
-Should this validate the feature parameter instead of unconditionally
-returning 0?
-
-The KVM API specifies that finalizing an unsupported or invalid feature must
-fail with -EINVAL or -EPERM. Returning 0 silently acknowledges invalid
-feature finalizations.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706085229.9795=
-25-1-seiden@linux.ibm.com?part=3D25
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
