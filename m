@@ -1,57 +1,57 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C5631280D
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 08:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112E644D6B2
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 08:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783327988; cv=none; b=peKwXokkylx5SYIt6nxt6dhMW9Er1cJhrldLLls4kxbXRzjxOg133F2zR8OL3LXW1upYL4unQvKNvdinjRSWYKL/ByLpN95dTkENI9em4wd+k8T3SsY1q8/kZQCJbUfiReM2ZuCdL1jHA2qj//zBK2r6W+tW6mTVrN1QkwQKd2A=
+	t=1783327989; cv=none; b=IVKBHuLFhT6bgM0/jCJceTZZYPrJIQeJ8vrji+RdtAvEp2V5zN/Miq+hM2aZrQhk3uzQtirqreSZhX2qGE2IcSWv0Z+KYyZuNfeZGtfbs9PgauRtnX1fyi3X0TEl77AEeQEgtdZgo6cjhhkH/t0n7OuvULZ5mGShJ7BzndS90BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783327988; c=relaxed/simple;
-	bh=qyWjMr0in4XBEcfYGFOEa/aw9cPJxKuyMXA/RUqKwpw=;
+	s=arc-20240116; t=1783327989; c=relaxed/simple;
+	bh=FgZHrJHK6/2Zwujwx3UkPJR+U0gRH7wtVhYbWbSOmSc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=np1hssynWQUsW81LgviToneYuAYlnh7UQtt+Nv5N5g8Y37ESQvNGupph1qx+GGSvXYgjVTUv3JdaOye7ljPfcwPpl6r290h0Gp4+2YGzl+qsnJaN4DYFEFY2A/fplI7Wqvh1MUEDSdUlJ4hKbwJZXEWGnv7sDUSm7GGwStrHgkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nAAsl59K; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=B6ObuLMAbbwA7OTQDHdSqGU2naNXyawZ0FmAwYJ4Z98ue4bhkIvwSLusYi6Nn9m5r5b3h0qALUsQTC7cqMGnET19Lr5xEJZFbUNgW+3Lo8y8mwy+O+Q0NQj0JbIVBq8JbRbCVZmAxG9eowFYwOqfvCfKLeoF8229w+TmnB1au8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kiK84Wlo; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nAAsl59K"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 665MIQ8Z1497598;
-	Mon, 6 Jul 2026 08:52:39 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kiK84Wlo"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 665MIZ6h2250769;
+	Mon, 6 Jul 2026 08:52:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=tHwZQ4tmrN0ZHJE/2
-	GE1DxC831uKzKZ7Exyx4051O38=; b=nAAsl59KtpbsKxydW1Rmi0lCOFigSQNaq
-	+tLHIDz2Vh438aPGh1mjDbqfqN59rc8ot/JUPA+TW1XDosY5vx6B/rNOf/DA9rDI
-	lmI6PtmRteWGOiX0s0Wh752kwEgunonPmEflCXDsAAJS+E+Ii606Tl2LVPkawewS
-	UPlbU1mP3EgjPhwgzMliUX8yOTmImPSRxq+g/oFJdZryzydiv02L52WQ/Viohfg6
-	Jk2mMcr/AaBLsgfUkP3Xr4o4hAffJbi3bRjz2FIV/1WmDLE92FSuflNdLBAnJlt0
-	rvAMt8GxqWXkhjxza5guKoonGbvArtnnwp2ZNsvagIhebIkRJ7VUQ==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6stsh2ke-1
+	:mime-version:references:subject:to; s=pp1; bh=i14rM4vcwrX517qmR
+	Bfd+AHM+6Me9WyF7fJHKq5CWXg=; b=kiK84WloisksP17fH8yV+G+qmgeXMpPJJ
+	05G23oz7cbfxzlQgrsNvddC7fpNFIKO/uc8WX3Cdd0q4YJkpfKJ7M87L+LDSXYdu
+	44+nzja+dU5INlQtgBsJY/78tECmXyy8y/UYr3aqz5rKu2UYso8iF0wv/q+t4Vhk
+	q6YKLhOZb6QW7XLaAnpETesCZUW8tawcpqGmL9AfrLdfEs7+Iz+ZNoj/Fr5nugXi
+	+4eQTN8RPvz1usUfL5MQt9H+6tZngZPAmPD9b1960Us36mUOXwOAazuYrhNZvRHO
+	6xsvItnItOJ3+X+n2qVpCnGqDkbMq1b0iFXIwIOyNPFVnyO7dIL6w==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6qkn8p60-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Jul 2026 08:52:39 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6668ncfK013056;
-	Mon, 6 Jul 2026 08:52:38 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4f7dgjvtw8-1
+	Mon, 06 Jul 2026 08:52:43 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6668nc6c023202;
+	Mon, 6 Jul 2026 08:52:42 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4f7cvvvyhe-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Jul 2026 08:52:38 +0000 (GMT)
+	Mon, 06 Jul 2026 08:52:42 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6668qVIp14483940
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6668qZlR47382966
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 Jul 2026 08:52:31 GMT
+	Mon, 6 Jul 2026 08:52:35 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8E84620040;
-	Mon,  6 Jul 2026 08:52:31 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id DF1A020040;
+	Mon,  6 Jul 2026 08:52:34 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 301CA20043;
-	Mon,  6 Jul 2026 08:52:31 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 847E92004D;
+	Mon,  6 Jul 2026 08:52:34 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 Jul 2026 08:52:31 +0000 (GMT)
+	Mon,  6 Jul 2026 08:52:34 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 04/27] KVM: Make device name configurable
-Date: Mon,  6 Jul 2026 10:52:04 +0200
-Message-ID: <20260706085229.979525-5-seiden@linux.ibm.com>
+Subject: [PATCH v4 12/27] KVM: s390: Use arm64 code
+Date: Mon,  6 Jul 2026 10:52:12 +0200
+Message-ID: <20260706085229.979525-13-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260706085229.979525-1-seiden@linux.ibm.com>
 References: <20260706085229.979525-1-seiden@linux.ibm.com>
@@ -91,153 +91,167 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: IRENFyMPARZoMHPi_dM5a9Db0LcXnUpB
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfX91RAubjdKhnS
- U1b2BcJ0/PV+tZMye6oxqDK5529XsbSSgW9xulzs6wRiOLFXFPTZIxqWR75v8P8M+bHgRxj/T6E
- xfUYKOUGgctObe2ah0c+2cJoBov9tQw=
-X-Authority-Analysis: v=2.4 cv=DKW/JSNb c=1 sm=1 tr=0 ts=6a4b6cd7 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Authority-Analysis: v=2.4 cv=Q/XiJY2a c=1 sm=1 tr=0 ts=6a4b6cdb cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=2WgmTXUmergQkmqjKA0A:9
-X-Proofpoint-GUID: IRENFyMPARZoMHPi_dM5a9Db0LcXnUpB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfX2o4Fy2VBfwLq
- WGSwSnk41hr1EMI8ZhQE36x9mvSoHr6PzEYF3KyzYSnqeXwF5FvfF7ZLgE2r3PyO6vAHAyyLRMs
- 8uj7BY0MmEpAQU7Tdn4Dqi0kDrRioiPXmKcVLVPXuOsADUMSq9Z8u2beT+9JgTxLwJ3ycxqIHtr
- C4T4RjagA5Ly3Mm4jstIG2cca6b93vnipYjNWUi3eBYVHGuy8GV2Okktj84Dqq34y98caWb9I/4
- d3FKFAfpds9FOfUYsVzi0c9nXWw8jYOz6IiuwUaO7h1h/Fomu/Z3vzou0TTvhjS4/KochU4P7Gt
- 1Cy/CCIcfjlR6LHp4JOERRVhMuJOcPQuDZo9Pg92T62uL7YPiMj7ibIXYh/a+W8Q68C/DjLaCKF
- Av483IcriCmuDoxN0whe7NWbgeANnCPzZrBhLdu2LKS0A8TRuLVNkXpLMqNPljHsjS0qA1LocV2
- d1LN5SmR/1givi1/ynw==
+ a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8 a=f4bS4SikUpCF4YNHCQsA:9
+X-Proofpoint-GUID: 5TO-cAI8mLp1RRudQdtIhYEZKiPnnbQS
+X-Proofpoint-ORIG-GUID: 5TO-cAI8mLp1RRudQdtIhYEZKiPnnbQS
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfX4a+aNNvC55HN
+ dO6UNUqbhv+90NGDnkE/qwZ2EgI5xt16C94dcRe7VZDGU1Oo8aoooym2qwFuCd1JTFINUuUPunQ
+ ySLl4Ad3IXGYo6tio8Y8KAAfb9hJzjY=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDA4OCBTYWx0ZWRfXw2OlDKjf75Yb
+ 0L2drh7kkw2osCOtlrSIwbHQsbJZrQ1qY4mxVGQQR9doH9gvjoJQBCUOVSI/fuv8VSO77RQaeJx
+ A62K+Z0P/TJ+rx5S0uW3XxkCr2DY/kSkzT3UJcUm8dxBHwFmFjT3P2zpRWQ+QuQ4nA9nYOuArNK
+ H3MbIS6cweOuiFT6dZ5pNsglX/PHNdo1eONGJ8YRFJqtwCiVgRb1Kh0Q3PSqA9EE6QPrf87aVLA
+ +q0I/tVZEAVuzyTPuPQ2FZsQ9nOoTLh6fvlJ1AlzizhqjGInBcVd2UY1ONupCkeb+DsUmUHka7t
+ CvD2Xg3hdZsRfqT066XXZgrTqtZfbYlXrNW7jFEiDsj2DjUViRAzt/0mXMTXF0vaABgSMXIBns+
+ OIizSrcA4vMrWE9LDk52JJzbT7b5tst12sa5lhpWoOrTmR+J0bZafz94ra8Sex4nTC11e+vYga/
+ cVLnT3szOGWU24K0nww==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-07-05_02,2026-07-03_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 clxscore=1015 phishscore=0 impostorscore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 suspectscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607060088
+ adultscore=0 impostorscore=0 spamscore=0 phishscore=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060088
 
-Allow KVM implementations to choose alternative device names. This is
-especially useful for architectures providing multiple KVM
-implementations simultaneously.
+Add the infrastructure to extract KVM/arm64 code into s390 at built
+time similar to the arm64 header sharing. Add copy-arm64c.awk hat
+detects ARM64_S390_COMMON markers and extracts marked section into an
+.inc file that can be consumed by arm on s390 host code. If no marker is
+found make will fail.
 
-Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To ensure that no code is consumed twice by accident a guard is added
+during file generation. A s390 C file wanting to consume such an inc
+file must first define __INCL_GEN_ARM_FILE otherwise the inc file will
+emit a compile error.
+
+Example:
+	#define __INCL_GEN_ARM_FILE
+	#include <generated/arm.inc>
+	#undef __INCL_GEN_ARM_FILE
+
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- include/linux/kvm_host.h |  4 +++-
- virt/kvm/kvm_main.c      | 31 +++++++++++++++++++++++--------
- 2 files changed, 26 insertions(+), 9 deletions(-)
+ arch/s390/kvm/arm64/Makefile.gen    | 30 +++++++++++++
+ arch/s390/kvm/arm64/copy-arm64c.awk | 69 +++++++++++++++++++++++++++++
+ 2 files changed, 99 insertions(+)
+ create mode 100644 arch/s390/kvm/arm64/Makefile.gen
+ create mode 100644 arch/s390/kvm/arm64/copy-arm64c.awk
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1f967b1d68b9..aa573e2530f7 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1069,7 +1069,9 @@ static inline void kvm_irqfd_exit(void)
- {
- }
- #endif
--int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module);
-+int kvm_init(unsigned int vcpu_size, unsigned int vcpu_align, struct module *module);
-+int kvm_init_with_dev(unsigned int vcpu_size, unsigned int vcpu_align,
-+		      struct module *module, const char *dev_name, int minor);
- void kvm_exit(void);
- 
- bool file_is_kvm(struct file *file);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 271884089f58..dcad33cc2f25 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5542,9 +5542,7 @@ static struct file_operations kvm_chardev_ops = {
- };
- 
- static struct miscdevice kvm_dev = {
--	KVM_MINOR,
--	"kvm",
--	&kvm_chardev_ops,
-+	.fops = &kvm_chardev_ops,
- };
- 
- #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
-@@ -6322,13 +6320,13 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
- 	kfree(env);
- }
- 
--static void kvm_init_debug(void)
-+static void kvm_init_debug(const char *dev_name)
- {
- 	const struct file_operations *fops;
- 	const struct kvm_stats_desc *pdesc;
- 	int i;
- 
--	kvm_debugfs_dir = debugfs_create_dir("kvm", NULL);
-+	kvm_debugfs_dir = debugfs_create_dir(dev_name, NULL);
- 
- 	for (i = 0; i < kvm_vm_stats_header.num_desc; ++i) {
- 		pdesc = &kvm_vm_stats_desc[i];
-@@ -6464,11 +6462,22 @@ void kvm_unregister_perf_callbacks(void)
- }
- #endif
- 
--int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
-+int kvm_init(unsigned int vcpu_size, unsigned int vcpu_align, struct module *module)
-+{
-+	return kvm_init_with_dev(vcpu_size, vcpu_align, module, "kvm", KVM_MINOR);
+diff --git a/arch/s390/kvm/arm64/Makefile.gen b/arch/s390/kvm/arm64/Makefile.gen
+new file mode 100644
+index 000000000000..2e8838bc6921
+--- /dev/null
++++ b/arch/s390/kvm/arm64/Makefile.gen
+@@ -0,0 +1,30 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Extracts ARM64 marked sections to .inc files that are included by main source
++# files
++
++# List of ARM64 C files to extract
++ARM64_CFILES := \
++	arm.c \
++	guest.c \
++	reset.c \
++	handle_exit.c \
++	mmio.c \
++
++quiet_cmd_extract_inc = GEN     $@
++      cmd_extract_inc = mkdir -p $(dir $@); \
++                        $(AWK) -f $(src)/copy-arm64c.awk $< > $@ || \
++                        { echo "Error: No ARM64_S390_COMMON markers in $<" >&2; rm -f $@; exit 1; }
++
++$(obj)/generated/%.inc: $(srctree)/arch/arm64/kvm/%.c $(src)/copy-arm64c.awk FORCE
++	$(call if_changed,extract_inc)
++
++ARM64_INC_FILES := $(foreach cfile,$(ARM64_CFILES),generated/$(basename $(cfile)).inc)
++
++targets += $(ARM64_INC_FILES)
++clean-files += generated/*.inc
++
++$(addprefix $(obj)/,$(kvm-arm64-obj)): $(addprefix $(obj)/,$(ARM64_INC_FILES))
++
++$(foreach cfile,$(basename $(ARM64_CFILES)),\
++	$(eval $(obj)/$(cfile).o: $(obj)/generated/$(cfile).inc))
+diff --git a/arch/s390/kvm/arm64/copy-arm64c.awk b/arch/s390/kvm/arm64/copy-arm64c.awk
+new file mode 100644
+index 000000000000..45d9c7034c17
+--- /dev/null
++++ b/arch/s390/kvm/arm64/copy-arm64c.awk
+@@ -0,0 +1,69 @@
++#!/usr/bin/awk -f
++# SPDX-License-Identifier: GPL-2.0
++#
++# Extract marked sections from ARM64 C files for sharing with s390 KVM
++#
++# Usage: share-arm64-cfile.awk <input_file>
++#
++# Extracts all sections between start/end markers. If no markers found, signals failure.
++
++BEGIN {
++	# Constants
++	start_pattern = "^#ifdef ARM64_S390_COMMON$"
++	end_pattern = "^#endif /\\* ARM64_S390_COMMON \\*/$"
++
++	# State variables
++	copying = found_marker = 0
++	file_header_done = 0
 +}
 +
-+int kvm_init_with_dev(unsigned int vcpu_size, unsigned int vcpu_align,
-+		      struct module *module, const char *dev_name, int minor)
- {
- 	int r;
- 	int cpu;
- 
-+	kvm_dev.minor = minor;
-+	kvm_dev.name = kstrdup(dev_name, GFP_KERNEL);
-+	if (!kvm_dev.name)
-+		return -ENOMEM;
++!file_header_done {
++	if (/^\/\*/ || /^\/\/ SPDX-License-Identifier:/) {
++		print
++		next
++	}
++	if (/[[:space:]]\*([[:space:]]|$)/) {
++		print
++		next
++	}
++	if (/\*\//) {
++		print " *"
++	} else {
++		print "/*"
++	}
 +
- 	/* A kmem cache lets us meet the alignment requirements of fx_save. */
- 	if (!vcpu_align)
- 		vcpu_align = __alignof__(struct kvm_vcpu);
-@@ -6479,8 +6488,9 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 					   offsetofend(struct kvm_vcpu, stats_id)
- 					   - offsetof(struct kvm_vcpu, arch),
- 					   NULL);
-+	r = -ENOMEM;
- 	if (!kvm_vcpu_cache)
--		return -ENOMEM;
-+		goto err_dev_name;
- 
- 	for_each_possible_cpu(cpu) {
- 		if (!alloc_cpumask_var_node(&per_cpu(cpu_kick_mask, cpu),
-@@ -6506,7 +6516,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	kvm_preempt_ops.sched_in = kvm_sched_in;
- 	kvm_preempt_ops.sched_out = kvm_sched_out;
- 
--	kvm_init_debug();
-+	kvm_init_debug(kvm_dev.name);
- 
- 	r = kvm_vfio_ops_init();
- 	if (WARN_ON_ONCE(r))
-@@ -6547,6 +6557,8 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	for_each_possible_cpu(cpu)
- 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
- 	kmem_cache_destroy(kvm_vcpu_cache);
-+err_dev_name:
-+	kfree(kvm_dev.name);
- 	return r;
- }
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_init);
-@@ -6572,5 +6584,8 @@ void kvm_exit(void)
- 	kvm_vfio_ops_exit();
- 	kvm_async_pf_deinit();
- 	kvm_irqfd_exit();
++	filename = FILENAME
++	sub(/^.*arch\/arm64\//, "arch/arm64/", filename)
++	print " * This file was automatically generated from " filename
++	print " * Do not modify this file directly."
++	print " */"
++	print ""
++	print "#ifndef __INCL_GEN_ARM_FILE"
++	print "#error included .inc file w/o proper guard definition"
++	print "#undef __INCL_GEN_ARM_FILE"
++	print "#endif /* __INCL_GEN_ARM_FILE */"
++	print ""
 +
-+	kfree(kvm_dev.name);
-+	kvm_dev.name = NULL;
- }
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_exit);
++	file_header_done = 1
++}
++
++$0 ~ start_pattern {
++	copying = found_marker = 1
++	next
++}
++
++$0 ~ end_pattern {
++	copying = 0
++	next
++}
++
++copying {
++	gsub(/#include <asm\//, "#include <arm64/")
++	gsub(/#include <uapi\/asm\//, "#include <uapi/arm64/")
++	print
++	next
++}
++
++END {
++	exit !found_marker
++}
 -- 
 2.53.0
 
