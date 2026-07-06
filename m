@@ -1,148 +1,204 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB1B35839C
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 03:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CED73BE65F;
+	Mon,  6 Jul 2026 06:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783308637; cv=none; b=R+E2ng/MvyDV0VyuSkRXB1MtVM7qJCaaea+myAYEjIaAWIKCVETrOSbotcVvPFBkh++++pDhfmrOtczMs19GUiuC1UcvqjCv/V4Nf6LIKKKlVMtHDOWtwuMWgOu5Q6UpmJAgK96NxST/04mil0RCqVKSQKKM3Csrzk/nthk0Z64=
+	t=1783317889; cv=none; b=TTcfvI/aYPEpMPd027uKa7TdG2M2EJ7o+o5MepR+d0pPwHv/tIG1jG8womlMQCcY52v8bnKxBh9BB86lIVI5LcBJsBBvgyV2ka4hNvrttcmyFS0m25Rrcrt49lwEBny2Jf7uuo7WKcWtvM7oNvNCwDLUAjRZRPLMTawaCncgvpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783308637; c=relaxed/simple;
-	bh=oeDFtJqPPkIfeXsJxq7Iw1OJTnUGE3bv41tKkXFbJkE=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=chDYhBRjAKCF/idoQfVaoNTLhXhhv00lORUv0qp0pcgGmUD58PQJuLuW4tN+NAv0plzPjsXPqX9uE4dEkZxQgoJ/fePN7TqkUk9e1VIX2Ij9nTvvm7pGUOcmNWJkjNrjMScm7mz6LohRgrtnmhciMc6pbnT7EIw+GaAgkGMKgIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=tF3qCKhL; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1783317889; c=relaxed/simple;
+	bh=7te/CAcGObZJLUIHz05wHRJYiwBQGgnwieQ+rDaZY+A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nCQ/1uvEaj+uGBf2wDIWSBKmbQBvxB0TWL3A5VjPWlfZcusp2g0xNNn8YKoId88RxOlyrn7tIr8SXkSXoVpKEB0XHu7FcFq0GTAG1uFIWfIVLo3VzMVWxDJXyuXdVdJ2LDtgz/LO+dsjsrCXTVnH/C605QWFk8+NJTRt8MHL9cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FPUBOXwc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="tF3qCKhL"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=ni1f8BldCx7faqIHDSsy647pWPJEZK7CSd6Q/V6Yajg=;
-	b=tF3qCKhLy8MJplT3WXZidmCJ9frXH7RmXhqPccoYAmfW6nQmPpIeLtqYa1ioADuyX/iYjZUps
-	NvydI4k2aE7zY9yIYA9aD/UbHEyECECDMMEImMoWQVECzZcEFsrhbFj8BFd5CrUbMffh+iY2R5K
-	7ZeSiixi5FMZIdnzNJaWR/M=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4gtqQl3j7Qz12LJx;
-	Mon,  6 Jul 2026 11:21:51 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 008FE40577;
-	Mon,  6 Jul 2026 11:30:32 +0800 (CST)
-Received: from kwepemq500001.china.huawei.com (7.202.195.224) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 6 Jul 2026 11:30:31 +0800
-Received: from [10.67.146.137] (10.67.146.137) by
- kwepemq500001.china.huawei.com (7.202.195.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 6 Jul 2026 11:30:31 +0800
-Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
- guarantee with VTTBR_EL2.CnP
-To: Wei-Lin Chang <weilin.chang@arm.com>, Marc Zyngier <maz@kernel.org>,
-	<oupton@kernel.org>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-CC: "guoyang (C)" <guoyang2@huawei.com>, "huanglingyan (A)"
-	<huanglingyan2@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
-References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
- <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
-From: Tangnianyao <tangnianyao@huawei.com>
-Message-ID: <292b5734-9005-6db0-da08-3da04628e620@huawei.com>
-Date: Mon, 6 Jul 2026 11:30:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FPUBOXwc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A39E91F000E9;
+	Mon,  6 Jul 2026 06:04:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783317887;
+	bh=r3OLwCLzrdfNnIhPdS1rljkW4wI+QhRkJZeINfWIVlI=;
+	h=From:To:Cc:Subject:Date;
+	b=FPUBOXwcOcvi0mzuPTG5EqefR5H2RHu+VaPrcXVL7v7PGpNUZopqxrLYlwHZhgSd+
+	 iyfDYb5/hiKTlfstROFGvlKE2itlmXf9Ct/5abewCOh8/8Dd1pa6/SI1gNYsn3KP3g
+	 nmgaIZNW//jvhE6fweSYso9MSg1I6ORlrtNw8RTwMF10qkpNwJX3+dr1cQEnaDtJ5X
+	 iML/5REx2CCDfsVUQNAMCD2yXl3w5gxiAdd/EqSNskZFd0MKz3gEoiSGQQfBQgmUkd
+	 l7XIezjr1GxhW6VL3EPYy7iwctDa+ZoffmoLbqKc8Yk2JEw3Igb5hRlx5o1g/W8c1U
+	 REqsQXol5CUqA==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v5 00/10] coco: guest: Enforce host page-size alignment for shared buffers
+Date: Mon,  6 Jul 2026 11:34:22 +0530
+Message-ID: <20260706060432.1375570-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq500001.china.huawei.com (7.202.195.224)
 
+Hi,
 
+This series tightens the alignment requirements for buffers that are shared
+between confidential-computing guests and the host.
 
-On 7/6/2026 1:28, Wei-Lin Chang wrote:
-> Hi,
->
-> Let me try to answer this:
->
-> On Sat, Jul 04, 2026 at 03:45:56PM +0800, Tangnianyao wrote:
->> Hi, all
->>
->> I'm trying to understand the TLB and I-cache invalidation in
->> `kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
->> I-cache are private to each vCPU".
->>
->> As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
->> only performs a local TLB and I-cache invalidation, which does not seem
->> sufficient to guarantee that property.
->>
->> In fact, even if the invalidation were extended to the Inner Shareable
->> domain, it still seems difficult to guarantee “TLBs and I-cache are
->> private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
->> vCPUs from the same VM may be running concurrently on different PEs.
-> I think you have missed that when 2 stages are involved, both stages
-> have to set CnP == 1 in order to share TLB entries (Arm ARM R_ZVRZW).
-> So if TLB entry sharing happens, the guest kernel must have allowed it
-> in the first place (by setting TTBR0/1_EL1.CnP == 1), hence accidental
-> sharing that you are worried about won't happen.
->
-> __kvm_flush_cpu_context() is solving problems that occur when multiple
-> vCPUs of a VM are multiplexed on a single physical CPU.
+When a guest runs with private memory, buffers shared with the hypervisor
+are not only accessed by the guest. They are also accessed by the host
+kernel, and the host may manage the corresponding shared/private state at a
+granularity larger than the guest page size.
 
-Thanks for you answer.
+This matters for CCA systems where the Realm stage-2 mappings managed by
+the RMM can still operate at 4K granularity, while the non-secure host may
+manage the IPA state change at a larger page size, for example 64K. In that
+case, allowing a guest to convert and share only a 4K subrange of a
+host-managed granule is unsafe.
 
-If guest kernel allow TLB shared across CPUs by setting TTBR0/1_EL1.CnP == 1,
-does kvm still need to guarantee that TLBs are private to each vCPU?
- 
+Architectures such as Arm can detect incorrect accesses to Realm physical
+address space PFNs through GPC faults. However, relying on that as the only
+line of defence is fragile and can still lead to kernel crashes. The risk
+is especially visible for shared buffers that are later mmapped into
+userspace, such as guest_memfd or dma-buf backed allocations. Once
+userspace can access the mapping, the kernel cannot guarantee that
+applications will only touch the intended 4K region rather than the whole
+host page mapped into their address space. Those userspace addresses may
+also be passed back into the kernel and accessed through the linear map,
+resulting in a GPC fault.
 
->> So I have two questions:
->>
->> 1. What is the rationale behind the comment that "guarantee that both TLBs
->> and I-cache are private to each vCPU"?
-> I assume you are asking why keeping both TLBs and I-cache private per
-> each vCPU is required. The fundamental answer is that each physical CPU
-> is expected to have its own TLB and I-cache, so we must uphold that
-> property for vCPUs as well. vCPUs can be scheduled on the same physical
-> CPU, and use the same physical TLB/I-cache, obviously, so extra
-> invalidations need to be done.
-Let's assume that both Stage-1 CnP and Stage-2 CnP are enabled.
+To avoid this, shared buffers must satisfy two constraints:
 
-As I understand it, the architecture permits TLB to be shared by multiple
-PEs within an Inner Shareable domain. Right?
+  - the address must be aligned to the CoCo shared-granule size
+  - the size must be a multiple of that granule size
 
-If an implementation allows TLB entries to be shared in this way, it seems
-that the current invalidation performed by kvm would no longer be sufficient
-to guarantee that TLBs are private to each vCPU.
+The series adds generic helpers for this:
 
->
-> As for how this can go wrong without __kvm_flush_cpu_context(), you can
-> look at commit 94d0e5980d67 ("arm/arm64: KVM: Perform local TLB
-> invalidation when multiplexing vcpus on a single CPU") and commit
-> 01dc9262ff57 ("VM: arm64: Ensure I-cache isolation between vcpus of a
-> same VM"). The commit messages and the linked thread explained the
-> problems pretty well for me.
->
->> 2. Should the effect of `VTTBR_EL2.CnP` be taken into account when
->> reasoning about this guarantee?
-> Please see the first part of the answer.
->
-> Hope this helps!
->
-> Thanks,
-> Wei-Lin Chang
->
->> Thanks
->> Nianyao Tang
->>
-> .
->
-Thanks
-Nianyao Tang
+  - mem_cc_shared_granule_size()
+  - mem_cc_align_to_shared_granule()
+
+The generic implementation defaults to PAGE_SIZE. arm64 CCA overrides this
+by querying the host IPA state change granule size through RHI and exposing that
+value through the arm64 memory-encryption operations.
+
+The patche series update the main shared-buffer allocation paths that can
+be used by private-memory guests:
+
+  - arm64 set_memory_encrypted()/set_memory_decrypted() now reject unaligned
+    addresses or sizes.
+  - GIC ITS shared allocations are rounded to the shared granule size.
+  - dma-direct and atomic DMA pool allocations use aligned allocation and
+    conversion sizes.
+  - SWIOTLB pools, including dynamic pools, are allocated and converted at the
+    shared granule size.
+  - restricted-dma-pool regions are checked and rejected if firmware did not
+    provide a base and size aligned to the shared granule size.
+  - dma-buf system heap cc-shared allocations require aligned sizes and use at
+    least the required allocation order.
+
+Hyper-V users of set_memory_encrypted() and set_memory_decrypted() are not
+changed by this series. Those paths are not currently used by the arm64 CCA
+code path, and therefore are not part of the arm64 CCA IPA state change alignment
+problem addressed here.
+
+The series is based on:
+
+  - https://lore.kernel.org/all/20260701054926.825925-1-aneesh.kumar@kernel.org
+  - https://lore.kernel.org/all/20260611130429.295516-1-aneesh.kumar@kernel.org
+
+Changes from v4:
+https://lore.kernel.org/all/20260427063108.909019-1-aneesh.kumar@kernel.org
+Changes since v4:
+* Rename the helpers to use CoCo terminology
+  (mem_cc_shared_granule_size() / mem_cc_align_to_shared_granule() instead of
+  mem_decrypt_granule_size() / mem_decrypt_align()).
+* Use __DMA_ATTR_ALLOC_CC_SHARED to pass CoCo shared allocation requirements
+  down to CMA-based allocation helpers.
+* Add validation for restricted DMA pools to reject pools that are not aligned
+  to the shared granule size.
+* Add dma-buf system heap handling for cc-shared buffers.
+* Split the previous combined DMA/SWIOTLB/ITS change into smaller subsystem
+  patches covering ITS, DMA direct, SWIOTLB, restricted DMA pools, dma-buf
+  system heap, and arm64 Realm support.
+* Rework arm64 Realm support by moving Realm memory encryption ops into RSI
+  code and exposing the CCA shared granule size through arm64_mem_crypt_ops.
+
+Changes from v3:
+https://lore.kernel.org/all/20260309102625.2315725-1-aneesh.kumar@kernel.org
+* Fix build error reported by kernel test robot <lkp@intel.com>
+
+Changes from v2:
+https://lore.kernel.org/all/20251221160920.297689-1-aneesh.kumar@kernel.org
+* Rebase to latest kernel
+* Consider swiotlb always decrypted and don't align when allocating from swiotlb.
+
+Changes from v1:
+* Rename the helper to mem_encrypt_align
+* Improve the commit message
+* Handle DMA allocations from contiguous memory
+* Handle DMA allocations from the pool
+* swiotlb is still considered unencrypted. Support for an encrypted swiotlb pool
+  is left as TODO and is independent of this series.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: Steven Price <steven.price@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+
+Aneesh Kumar K.V (Arm) (10):
+  mm/mem_encrypt: Add helpers for shared-buffer alignment
+  irqchip/gic-v3-its: Align shared ITS allocations to the CoCo shared
+    granule size
+  dma-mapping: Pass allocation attrs to contiguous allocation helpers
+  dma-direct: Align CoCo shared DMA allocations to the shared granule
+    size
+  swiotlb: Align shared IO TLB pools to the shared granule size
+  swiotlb: Reject misaligned restricted DMA pools for CoCo guests
+  dma-buf: system_heap: Enforce shared-granule alignment for cc-shared
+    buffers
+  arm64: realm: Move Realm memory encryption ops to RSI code
+  arm64: realm: Add RHI helper to query IPA state change alignment
+  arm64: realm: Expose the CCA shared granule size through mem_encrypt
+    ops
+
+ arch/arm64/include/asm/mem_encrypt.h |  5 +-
+ arch/arm64/include/asm/rsi_cmds.h    | 10 ++++
+ arch/arm64/kernel/rsi.c              | 90 ++++++++++++++++++++++++++++
+ arch/arm64/mm/mem_encrypt.c          | 32 ++++++++--
+ arch/arm64/mm/pageattr.c             | 38 +-----------
+ drivers/dma-buf/heaps/system_heap.c  | 50 +++++++++++++---
+ drivers/iommu/dma-iommu.c            |  2 +-
+ drivers/irqchip/irq-gic-v3-its.c     | 17 ++++--
+ include/linux/arm-smccc-rhi.h        | 25 ++++++++
+ include/linux/arm-smccc-rsi.h        |  7 +++
+ include/linux/dma-map-ops.h          |  5 +-
+ include/linux/mem_encrypt.h          | 14 +++++
+ kernel/dma/contiguous.c              | 13 +++-
+ kernel/dma/direct.c                  | 27 ++++++---
+ kernel/dma/ops_helpers.c             |  3 +-
+ kernel/dma/pool.c                    |  4 +-
+ kernel/dma/swiotlb.c                 | 36 ++++++++---
+ 17 files changed, 300 insertions(+), 78 deletions(-)
+ create mode 100644 include/linux/arm-smccc-rhi.h
+
+-- 
+2.43.0
+
