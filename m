@@ -1,130 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72541DDC33
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 12:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8251DFDA6
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 12:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783339706; cv=none; b=dBo6pXLbOhAHe9z9joQ4zDX1T6zBMTKvTGmM/jW/48lyXJPrt0uNaGV/SrCQ7RClMhvGzGekH/w9zAlbT1ODNGOsRADYw+9DrAsKieWUnBIZBSTpw6LLyDp3yCjOnFNcqM8OMz+CzSPIHTVLsqdLFkqsf1WuELItRSh+T47zxsY=
+	t=1783340165; cv=none; b=d+AR8Jf0aoml56XT6MI/pNFfXwODwAq+ENeDqaUhZesr/UuMmxziBBOx3OxFOrmsBOtvRKPJx0tMkKBxdBCOhgMzlvQf+NfNKQBim6UHjf3wB/0vddmW8o+d4NL48J00lOvTyNy9kDoJ/B3nornAJb+F2J/4YiPzhAdnqSvdD0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783339706; c=relaxed/simple;
-	bh=z4y8erDb6j+TUM58O5mqAx6G1fXWaZqcSl62ugosxOw=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=U+XKY67SgtVGsLXIVOj0EQXcdKLtQB+Teg1UuG0gEiD8CerGn+oy/vM2x1gUlD7vxhaukYGKSHImR6PUs7acwxZmvX9gAUDBW8j29w+FrUIgs+MZh7RWylgs6KVhge2Fz6j5+Fl7JFYUhseGTEp2kg/GLyAalJsOHAiDspCxfqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgrN0x+x; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783340165; c=relaxed/simple;
+	bh=nm/F2nTaUxoWYUST3596aNSIo5IVASvCgv+CtyAOv/o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ONn1pMXxO8GxoTXxlerhxfjBUTneXADQoVeTl7SJnieXUqb+22Q4og5DihkvdHkch6x7MRzJ5a4UOMlbFDSeMkwscMti/oEAEG3Y9Lp7Lw+kf+jRIeijIwHKTA91s28M23Cu89CmqCsb0Qx6pqbNJr/Ji1Wg4MKVX0dtckxswEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=trQj4Uqc; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgrN0x+x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0853C1F000E9;
-	Mon,  6 Jul 2026 12:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783339704;
-	bh=Up0GZwVl41xmI986jUpJVbIrICCFU2rGfw9O2Nar4UU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MgrN0x+x9yJTvPr2QHII3pxJW9nl/oMUWbayUjeLtxRwqLso8ZgNKPwNIALKCvaOe
-	 Q3/ikYkFgYzW0NEoiT+ja7lN5e88MAqpW8bJdWVkzBP2KQVbVUUIGcqVPqrazQNpPI
-	 XKiR13dgcVv+7IFd030J7SYbBeHolm1IhxAvNjB+yiE9iqz0fhhuQ7kSFarA4yqNFI
-	 aZYL1FwDTNiaPSgG9Bx56pUO89GztXSFy8eqJxKbEJ31fLr1C3xbbiOUorQZpDXbf/
-	 HnDLKjRJd6Ab/HD5vxpWVv8E3DQ+ewqP7fVai7MoX2g5nkU9bSBN+CsSEIwYnS2lxz
-	 uadsp5mC12cFA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: selftests: Add MMIO sign-extending
- load test
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260706115522.954913-3-fuad.tabba@linux.dev>
-References: <20260706115522.954913-1-fuad.tabba@linux.dev>
- <20260706115522.954913-3-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2026 12:08:23 +0000
-Message-Id: <20260706120824.0853C1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="trQj4Uqc"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666BIOD33465244;
+	Mon, 6 Jul 2026 12:15:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=7gmy4C
+	PRHm3jqZJsv5jigI35IHg15IAOTrRNJJTAI2M=; b=trQj4Uqch1bfQDnFE8raSS
+	3Xtu/L6DMn9sxWYZxu1Uil5gNAQ2gU+BRKvCv8hEWxaJCe+0HgZOkeWnqSkeTcWz
+	t1M0lBZTSpKLKVq+sOhLfmivoTe8eU/kVqcIAgQdp5rx0yOx6FPUA/BOUdcFcCtX
+	6wzUITXNqXIvOX9Zbs40NjqQYEfvC5wl4v+G9AXf/Kv9eRaE7lFFlycqUf01SBSM
+	tewmKhVMzxacWTaj7i+cCQF0DkB4/RohXD2UG9yxGGqE3TGdPNuR2SSrvpa3vwny
+	c6aNY80TY6QEGAXee8dSIXaNL1gQLcTSEQizhs4RTox9tRjVVsomd9/Pl3S3dr0A
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6rkdhxfe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jul 2026 12:15:49 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 666C4dix015153;
+	Mon, 6 Jul 2026 12:15:49 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7eqfw8mv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jul 2026 12:15:48 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 666CFgSQ29688268
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Jul 2026 12:15:42 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DFE7720043;
+	Mon,  6 Jul 2026 12:15:41 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2865D2004B;
+	Mon,  6 Jul 2026 12:15:41 +0000 (GMT)
+Received: from [9.87.152.232] (unknown [9.87.152.232])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Jul 2026 12:15:41 +0000 (GMT)
+Message-ID: <f66efe81-cd11-4bfa-aa72-c5c1f2850343@linux.ibm.com>
+Date: Mon, 6 Jul 2026 14:15:40 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 23/27] KVM: s390: arm64: Implement required functions
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter
+ <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+ <20260706085229.979525-24-seiden@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20260706085229.979525-24-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=M7J97Sws c=1 sm=1 tr=0 ts=6a4b9c76 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
+ a=XTNHhXoCNXvMEjF8tJMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDEyMCBTYWx0ZWRfX69rDwgYN4VvW
+ qNnbBCU/e85RZjbo5eNAoyA8J4XgUPqkIKXRJk4wD1Wbkn5AsUdwnIKdP7IYXzSd5JkykAe0fEa
+ fBfKl7CO61g599aRmU0F+Pt0GUVtZP3BYaIRKpOI9hly08u4OdNWmPjWlRIaaZWmodOadE79VwY
+ Ah0GCV5sZ5frUXrXOyUaW5eRBs92m+PmU1m2B9lyzbVwBgVIkoLuBoy2Nh3+iuHrt1GWQMw6+az
+ sZ3P3H6Xd+XJ00wPOvQUbiN/zER6FURFtzZjd1olc67PENRM4pR/l3AGj5H5NG1+EAjwE8ehnHJ
+ X7WgUF1ZNj6A/WhkIM8/J1SjjINdjhkdSewRRxkzWY420aVlnFvvcwio+vYI/81H8zRVkUVF03N
+ NKNpqYlH+LYmXAORLAQDA4RqIEiJmlEIa8QltMuIrnEPzgVUr93fjugokzoaL/HdK86ZiPYaOav
+ HS3LFwdDZxry3V6tvFw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDEyMCBTYWx0ZWRfX+RJCwijO6USa
+ DPqcCKbH+sqnYBiJvcE4zTuBRy2XTK2IJapL4eld8A+8S0Ty8PNZIxIDB+HQrgOdlzfg900yyKf
+ PpEZcWnWj9NCiGvpN4LR3YnQ7LYe82A=
+X-Proofpoint-GUID: V8JBv4LKY6dLxLcyn28d1r3gFH1SMzB7
+X-Proofpoint-ORIG-GUID: V8JBv4LKY6dLxLcyn28d1r3gFH1SMzB7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-06_01,2026-07-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 lowpriorityscore=0 malwarescore=0 clxscore=1015 adultscore=0
+ priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060120
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] The test executes guest code at EL0 but fails to map the executa=
-ble text segment with unprivileged access permissions (PTE_USER), causing a=
-n immediate Instruction Abort.
---
+On 7/6/26 10:52, Steffen Eiden wrote:
+> Implement the mostly trivial functions that the shared arm64 (kvm)
+> code & headers oblige s390 to implement.
+> 
+> Implement a very basic smccc handler that (non-compliantly) is just able
+> to stop a vcpu.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   arch/s390/include/arm64/kvm_emulate.h | 135 ++++++++++++++++++++++++++
+>   arch/s390/include/arm64/kvm_nested.h  |  11 +++
+>   arch/s390/kvm/arm64/handle_exit.c     | 110 +++++++++++++++++++++
+>   arch/s390/kvm/arm64/inject_fault.c    |  21 ++++
+>   4 files changed, 277 insertions(+)
+>   create mode 100644 arch/s390/include/arm64/kvm_emulate.h
+>   create mode 100644 arch/s390/include/arm64/kvm_nested.h
+>   create mode 100644 arch/s390/kvm/arm64/handle_exit.c
+>   create mode 100644 arch/s390/kvm/arm64/inject_fault.c
+> 
 
-commit 8d8bc26c675634520d0cf6c2769677a38145f1a9
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+[...]
 
-KVM: arm64: selftests: Add MMIO sign-extending load test
-
-Add a test for sign-extending MMIO loads (LDRSB, LDRSH, LDRSW) into Xt
-and Wt destinations, with and without the sign bit set. The host supplies
-the MMIO data and checks the guest register holds the sign-extended value.
-
-> diff --git a/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c b/tools/te=
-sting/selftests/kvm/arm64/mmio_sign_ext.c
-> new file mode 100644
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
-
-[ ... ]
-
-> +static void guest_code(void)
-> +{
-> +	guest_loads_le();
+> +/* manually copied from arch/arm64/kernel/traps.c */
+> +static const char * const esr_class_str[] = {
+> +	[0 ... ESR_ELx_EC_MAX]		= "UNRECOGNIZED EC",
+> +	[ESR_ELx_EC_UNKNOWN]		= "Unknown/Uncategorized",
+> +	[ESR_ELx_EC_WFx]		= "WFI/WFE",
+> +	[ESR_ELx_EC_CP15_32]		= "CP15 MCR/MRC",
+> +	[ESR_ELx_EC_CP15_64]		= "CP15 MCRR/MRRC",
+> +	[ESR_ELx_EC_CP14_MR]		= "CP14 MCR/MRC",
+> +	[ESR_ELx_EC_CP14_LS]		= "CP14 LDC/STC",
+> +	[ESR_ELx_EC_FP_ASIMD]		= "ASIMD",
+> +	[ESR_ELx_EC_CP10_ID]		= "CP10 MRC/VMRS",
+> +	[ESR_ELx_EC_PAC]		= "PAC",
+> +	[ESR_ELx_EC_CP14_64]		= "CP14 MCRR/MRRC",
+> +	[ESR_ELx_EC_BTI]		= "BTI",
+> +	[ESR_ELx_EC_ILL]		= "PSTATE.IL",
+> +	[ESR_ELx_EC_SVC32]		= "SVC (AArch32)",
+> +	[ESR_ELx_EC_HVC32]		= "HVC (AArch32)",
+> +	[ESR_ELx_EC_SMC32]		= "SMC (AArch32)",
+> +	[ESR_ELx_EC_SVC64]		= "SVC (AArch64)",
+> +	[ESR_ELx_EC_HVC64]		= "HVC (AArch64)",
+> +	[ESR_ELx_EC_SMC64]		= "SMC (AArch64)",
+> +	[ESR_ELx_EC_SYS64]		= "MSR/MRS (AArch64)",
+> +	[ESR_ELx_EC_SVE]		= "SVE",
+> +	[ESR_ELx_EC_ERET]		= "ERET/ERETAA/ERETAB",
+> +	[ESR_ELx_EC_FPAC]		= "FPAC",
+> +	[ESR_ELx_EC_SME]		= "SME",
+> +	[ESR_ELx_EC_IMP_DEF]		= "EL3 IMP DEF",
+> +	[ESR_ELx_EC_IABT_LOW]		= "IABT (lower EL)",
+> +	[ESR_ELx_EC_IABT_CUR]		= "IABT (current EL)",
+> +	[ESR_ELx_EC_PC_ALIGN]		= "PC Alignment",
+> +	[ESR_ELx_EC_DABT_LOW]		= "DABT (lower EL)",
+> +	[ESR_ELx_EC_DABT_CUR]		= "DABT (current EL)",
+> +	[ESR_ELx_EC_SP_ALIGN]		= "SP Alignment",
+> +	[ESR_ELx_EC_MOPS]		= "MOPS",
+> +	[ESR_ELx_EC_FP_EXC32]		= "FP (AArch32)",
+> +	[ESR_ELx_EC_FP_EXC64]		= "FP (AArch64)",
+> +	[ESR_ELx_EC_GCS]		= "Guarded Control Stack",
+> +	[ESR_ELx_EC_SERROR]		= "SError",
+> +	[ESR_ELx_EC_BREAKPT_LOW]	= "Breakpoint (lower EL)",
+> +	[ESR_ELx_EC_BREAKPT_CUR]	= "Breakpoint (current EL)",
+> +	[ESR_ELx_EC_SOFTSTP_LOW]	= "Software Step (lower EL)",
+> +	[ESR_ELx_EC_SOFTSTP_CUR]	= "Software Step (current EL)",
+> +	[ESR_ELx_EC_WATCHPT_LOW]	= "Watchpoint (lower EL)",
+> +	[ESR_ELx_EC_WATCHPT_CUR]	= "Watchpoint (current EL)",
+> +	[ESR_ELx_EC_BKPT32]		= "BKPT (AArch32)",
+> +	[ESR_ELx_EC_VECTOR32]		= "Vector catch (AArch32)",
+> +	[ESR_ELx_EC_BRK64]		= "BRK (AArch64)",
+> +};
 > +
-> +	if (guest_mixed_endian_el0()) {
-> +		write_sysreg(read_sysreg(sctlr_el1) | SCTLR_EL1_E0E, sctlr_el1);
-> +		isb();
-> +
-> +		asm volatile(
-> +		"	msr	elr_el1, %[pc]\n"
-> +		"	msr	spsr_el1, %[spsr]\n"
-> +		"	mov	x0, %[mmio]\n"
-> +		"	isb\n"
-> +		"	eret\n"
+We could rip out the 32bit ones.
+Not necessarily right now as it's easier to compare to the aarch64 
+implementation like this but at least at a later time.
 
-[ ... ]
-
-> +int main(void)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	struct ucall uc;
-> +	unsigned int i;
-> +	bool be;
-> +
-> +	vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
-> +	virt_map(vm, MMIO_ADDR, MMIO_ADDR, 1);
-> +
-> +	vm_init_descriptor_tables(vm);
-> +	vcpu_init_descriptor_tables(vcpu);
-> +	vm_install_sync_handler(vm, VECTOR_SYNC_LOWER_64, ESR_ELx_EC_SVC64,
-> +				el0_svc_handler);
-> +
-> +	be =3D vcpu_mixed_endian_el0(vcpu);
-> +	if (be)
-> +		make_el0_accessible(vm, MMIO_ADDR, vm->page_size);
-
-[Severity: Medium]
-Will this cause an immediate Instruction Abort on hardware supporting
-mixed endianness at EL0?
-
-The MMIO address is made EL0-accessible here, but the code segment
-containing el0_be_loads is not. KVM selftests map the test payload
-(including the .text segment) as EL1-only by default (AP[1]=3D0).
-
-When vcpu_mixed_endian_el0() is true, guest_code() drops to EL0 using eret
-to execute el0_be_loads. Since the page containing el0_be_loads lacks
-unprivileged access permissions (PTE_USER), the instruction fetch at EL0
-will trigger a Permission Fault.
-
-Should the page containing el0_be_loads also be made EL0-accessible here?
-
-> +
-> +	ksft_print_header();
-> +	ksft_set_plan(ARRAY_SIZE(tests) * (be ? 2 : 1));
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706115522.9549=
-13-1-fuad.tabba@linux.dev?part=3D2
+I was also wondering if it would make sense to have all the feature 
+checks for unimplemented features in one file.
