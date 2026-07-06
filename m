@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891983C0623;
-	Mon,  6 Jul 2026 06:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813FA3C10A2;
+	Mon,  6 Jul 2026 06:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783317913; cv=none; b=o7tKqvCUCNtnKpMukJkEdWLuRK6+Bz6ok74aVV7W78w26JzcL2+8TnVDb2fHD88KsKVy2Jk8hPyGrQFqCv78bZu1XrpH9ZxyiRYYvugV7HiFm3y1eKTHGGIUp8f9YOQ0GneVDO//Tc5V1yUzf9sZzvFsWJaTySY4dD4yYqqu4FY=
+	t=1783317920; cv=none; b=IzF6PXEhANA7/IWO8d309e5Fw/Wr0Q94kN2gLRke7LCP8Wl4oTcYTeieEJ6axpeZeoh6FPNcU9LJ2FW5uBbk1VQlmAoQVuoKb6JhCBLeGnd++YOZBI1Eex0uHIt2dCWAHvp68RY+/8J1D71oD2RpIALMQ7Ih6WT5j8vLSaJmk6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783317913; c=relaxed/simple;
-	bh=/qkHPYnVfz/t1AnGGJVoBJOAsr3PdmgR3F3Lktgx544=;
+	s=arc-20240116; t=1783317920; c=relaxed/simple;
+	bh=vRGeLz9uTygkok0d/nLp9chMqt1hZRjTlGkBos2rc6Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KbTw3Vx4pYrWvtyFDto8q+PDfnyeowy3lkOioH/ZX/y/T9iEnzAWgkedRyyXMuLRcQGM1ziiNnDQWc88es0ZvTH6LtA2lmuWTLUdHH2kdbOoeFCxAuWJd2yBczFvBrIcYAs8lE7QPl9/J/wJ2jG5XQmuLknSKMQWYewc2V5Pgmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ASzXjcVF; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=LxVZAemDc0Q+Lu/fysyG47CSAnMnZRi8KU+eQ0UpCIcLGAu1Huv34flHMSKBLQ/QtRnT8Slp62i51WC8RkgpZZk0R0MkLEw8qobvwa2LavaIPuTh9hqRiVp/yvZxueIC1ABpdL7tO7ZNk5z5gOdEgMcp/U63+fwNAouK+QP63SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGq5LAK2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASzXjcVF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D621F00A3A;
-	Mon,  6 Jul 2026 06:05:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGq5LAK2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8507A1F000E9;
+	Mon,  6 Jul 2026 06:05:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783317908;
-	bh=ofp0MrdUzNa7XupP7o8c8i/wr02mLs0ptrPxTOVDMXI=;
+	s=k20260515; t=1783317916;
+	bh=z+bPfSuQARImroV5BkbmoGryt8x5TsbegRK/YB3WTqw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ASzXjcVF+pgwQE+oJgM1a463oGMTAFYuZXkS5CKr7QamRJ7pAauCrPKFSDYDZKNPC
-	 10REZauexCApsQYbFDA2KidvoQou01I1kj2YPOxypgmQ/MBB/fmj+u+IFQvopJ86pb
-	 uJQAGnFuXpZ9o0qUKADknVsWFbpTbFN8ciC7JlX87RNz2oSw4Kpb9DQZFKUO3V0gat
-	 0QrtrxDYu0oFyBan+HmvB6zy9+oiF5x8C27DV7szwXUqfdJSjRJfHVhdyy85/ysHDE
-	 tGN+ay5ql5ol2lWgBhoZc3DcAl/aDYXssjB7Sk2f5KaMECreanCJWbabW+XMesB93/
-	 E5MVMYHtr7J7Q==
+	b=AGq5LAK2N1saAxqSz5Vt6bmFurZ7JFxzV/U+nWXFTylLAZiE1DEl4C5XD2g20oK+Y
+	 2fsdg49V3jrpAIg2uqIzleiq2C0QdbPUTERFuk3kOGLxJ7XVYXV4WsWpc55feBywC9
+	 iSSs2HM6CjCTu+aS+sH02WI7p/465mZKkhW3ImZSp2CHz1TW0ROAAYyWoOEKZh+u0o
+	 EM5EgjeLAcByJT3tWVvTDwMgo5atfQ79cmG5huP7rMPaEOkTDe8ro2PZDGwdIl94rX
+	 K4aiQDkyVCDr0/9UtK+9MbEPTUfzkqwkDjUvDDkmL3qSSwI1y8oOEK2d/9NcQMLcq4
+	 CgpWH8GynLScw==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Thomas Gleixner <tglx@kernel.org>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v5 03/10] dma-mapping: Pass allocation attrs to contiguous allocation helpers
-Date: Mon,  6 Jul 2026 11:34:25 +0530
-Message-ID: <20260706060432.1375570-4-aneesh.kumar@kernel.org>
+Subject: [PATCH v5 04/10] dma-direct: Align CoCo shared DMA allocations to the shared granule size
+Date: Mon,  6 Jul 2026 11:34:26 +0530
+Message-ID: <20260706060432.1375570-5-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260706060432.1375570-1-aneesh.kumar@kernel.org>
 References: <20260706060432.1375570-1-aneesh.kumar@kernel.org>
@@ -56,144 +56,127 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Prepare for handling CoCo shared allocation requirements in the common
-contiguous allocation path by passing DMA allocation attributes down to the
-helpers that may allocate from CMA.
+DMA allocations that create shared backing pages for confidential-computing
+guests are converted between private and shared memory before being used
+for DMA. On some architecture, the conversion granule may be larger than
+PAGE_SIZE, so converting only the requested size can leave the rest of the
+host-managed granule private.
 
-The next patch uses this to apply shared-granule alignment only to
-allocations that are actually creating CoCo shared backing pages.
+Use the internal __DMA_ATTR_ALLOC_CC_SHARED allocation attribute to
+identify those allocations in the DMA allocation paths. Round the allocated
+and converted size up to mem_cc_shared_granule_size(), and use the same
+aligned size when restoring encryption on free.
+
+Also reject CMA allocations for CoCo shared backing pages when CMA cannot
+provide alignment at the required shared granule size, and keep atomic DMA
+pool expansion from falling below the order needed for shared-buffer
+conversions.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- drivers/iommu/dma-iommu.c   |  2 +-
- include/linux/dma-map-ops.h |  5 +++--
- kernel/dma/contiguous.c     |  4 +++-
- kernel/dma/direct.c         | 11 ++++++-----
- kernel/dma/ops_helpers.c    |  3 ++-
- 5 files changed, 15 insertions(+), 10 deletions(-)
+ kernel/dma/contiguous.c |  9 +++++++++
+ kernel/dma/direct.c     | 16 ++++++++++++++--
+ kernel/dma/pool.c       |  4 +++-
+ 3 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index fe387829ee92..da4aa4373842 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -1627,7 +1627,7 @@ static void *iommu_dma_alloc_pages(struct device *dev, size_t size,
- 	struct page *page = NULL;
- 	void *cpu_addr;
- 
--	page = dma_alloc_contiguous(dev, alloc_size, gfp);
-+	page = dma_alloc_contiguous(dev, alloc_size, gfp, attrs);
- 	if (!page)
- 		page = alloc_pages_node(node, gfp, get_order(alloc_size));
- 	if (!page)
-diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
-index 8fae2b7deb20..1849f352fb88 100644
---- a/include/linux/dma-map-ops.h
-+++ b/include/linux/dma-map-ops.h
-@@ -102,7 +102,8 @@ struct page *dma_alloc_from_contiguous(struct device *dev, size_t count,
- 				       unsigned int order, bool no_warn);
- bool dma_release_from_contiguous(struct device *dev, struct page *pages,
- 				 int count);
--struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp);
-+struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp,
-+		unsigned long attrs);
- void dma_free_contiguous(struct device *dev, struct page *page, size_t size);
- 
- void dma_contiguous_early_fixup(phys_addr_t base, unsigned long size);
-@@ -136,7 +137,7 @@ static inline bool dma_release_from_contiguous(struct device *dev,
- }
- /* Use fallback alloc() and free() when CONFIG_DMA_CMA=n */
- static inline struct page *dma_alloc_contiguous(struct device *dev, size_t size,
--		gfp_t gfp)
-+		gfp_t gfp, unsigned long attrs)
- {
- 	return NULL;
- }
 diff --git a/kernel/dma/contiguous.c b/kernel/dma/contiguous.c
-index f754079a287d..6c8a61ab5456 100644
+index 6c8a61ab5456..3d0eac2e2a20 100644
 --- a/kernel/dma/contiguous.c
 +++ b/kernel/dma/contiguous.c
-@@ -400,6 +400,7 @@ static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp)
-  * @dev:   Pointer to device for which the allocation is performed.
-  * @size:  Requested allocation size.
-  * @gfp:   Allocation flags.
-+ * @attrs: DMA attributes.
-  *
-  * tries to use device specific contiguous memory area if available, or it
-  * tries to use per-numa cma, if the allocation fails, it will fallback to
-@@ -410,7 +411,8 @@ static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp)
-  * there is no need to waste CMA pages for that kind; it also helps reduce
-  * fragmentations.
-  */
--struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
-+struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp,
-+		unsigned long attrs)
- {
+@@ -45,6 +45,7 @@
+ #include <linux/dma-map-ops.h>
+ #include <linux/cma.h>
+ #include <linux/nospec.h>
++#include <linux/mem_encrypt.h>
+ 
+ #ifdef CONFIG_CMA_SIZE_MBYTES
+ #define CMA_SIZE_MBYTES CONFIG_CMA_SIZE_MBYTES
+@@ -417,6 +418,14 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp,
  #ifdef CONFIG_DMA_NUMA_CMA
  	int nid = dev_to_node(dev);
+ #endif
++	/*
++	 * CoCo shared allocations require CMA alignment large enough for the
++	 * architecture's shared-buffer granule.
++	 */
++	if (attrs & __DMA_ATTR_ALLOC_CC_SHARED) {
++		if (get_order(mem_cc_shared_granule_size()) > CONFIG_CMA_ALIGNMENT)
++			return NULL;
++	}
+ 
+ 	/* CMA can be used only in the context which permits sleeping */
+ 	if (!gfpflags_allow_blocking(gfp))
 diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-index 9575d68571bf..80f9f7d23ad4 100644
+index 80f9f7d23ad4..6d0e485fdc34 100644
 --- a/kernel/dma/direct.c
 +++ b/kernel/dma/direct.c
-@@ -113,7 +113,7 @@ static struct page *dma_direct_alloc_swiotlb(struct device *dev, size_t size,
- }
- 
- static struct page *__dma_direct_alloc_pages(struct device *dev, size_t size,
--		gfp_t gfp, bool allow_highmem)
-+		gfp_t gfp, bool allow_highmem, unsigned long attrs)
- {
- 	int node = dev_to_node(dev);
- 	struct page *page;
-@@ -122,7 +122,7 @@ static struct page *__dma_direct_alloc_pages(struct device *dev, size_t size,
- 	WARN_ON_ONCE(!PAGE_ALIGNED(size));
- 
- 	gfp |= dma_direct_optimal_gfp_mask(dev, &phys_limit);
--	page = dma_alloc_contiguous(dev, size, gfp);
-+	page = dma_alloc_contiguous(dev, size, gfp, attrs);
- 	if (page) {
- 		if (dma_coherent_ok(dev, page_to_phys(page), size) &&
- 		    (allow_highmem || !PageHighMem(page)))
-@@ -182,7 +182,7 @@ static void *dma_direct_alloc_no_mapping(struct device *dev, size_t size,
- {
- 	struct page *page;
- 
--	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO, true);
-+	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO, true, 0);
- 	if (!page)
+@@ -280,6 +280,9 @@ void *dma_direct_alloc(struct device *dev, size_t size,
  		return NULL;
- 
-@@ -281,7 +281,8 @@ void *dma_direct_alloc(struct device *dev, size_t size,
  	}
  
++	if (mark_mem_decrypt)
++		size = mem_cc_align_to_shared_granule(size);
++
  	/* we always manually zero the memory once we are done */
--	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO, allow_highmem);
-+	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO,
-+					allow_highmem, attrs);
- 	if (!page)
- 		return NULL;
+ 	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO,
+ 					allow_highmem, attrs);
+@@ -402,6 +405,9 @@ void dma_direct_free(struct device *dev, size_t size,
+ 		/* Swiotlb doesn't need a page attribute update on free */
+ 		mark_mem_encrypted = false;
  
-@@ -447,7 +448,7 @@ struct page *dma_direct_alloc_pages(struct device *dev, size_t size,
++	if (mark_mem_encrypted && force_dma_unencrypted(dev))
++		size = mem_cc_align_to_shared_granule(size);
++
+ 	if (is_vmalloc_addr(cpu_addr)) {
+ 		vunmap(cpu_addr);
+ 	} else {
+@@ -448,6 +454,9 @@ struct page *dma_direct_alloc_pages(struct device *dev, size_t size,
  		goto setup_page;
  	}
  
--	page = __dma_direct_alloc_pages(dev, size, gfp, false);
-+	page = __dma_direct_alloc_pages(dev, size, gfp, false, attrs);
++	if (attrs & __DMA_ATTR_ALLOC_CC_SHARED)
++		size = mem_cc_align_to_shared_granule(size);
++
+ 	page = __dma_direct_alloc_pages(dev, size, gfp, false, attrs);
  	if (!page)
  		return NULL;
+@@ -488,8 +497,11 @@ void dma_direct_free_pages(struct device *dev, size_t size,
+ 	if (swiotlb_pool)
+ 		mark_mem_encrypted = false;
  
-diff --git a/kernel/dma/ops_helpers.c b/kernel/dma/ops_helpers.c
-index 20caf9cabf69..d67a5c838291 100644
---- a/kernel/dma/ops_helpers.c
-+++ b/kernel/dma/ops_helpers.c
-@@ -66,7 +66,8 @@ struct page *dma_common_alloc_pages(struct device *dev, size_t size,
- 	struct page *page;
- 	phys_addr_t phys;
+-	if (mark_mem_encrypted && dma_set_encrypted(dev, vaddr, size))
+-		return;
++	if (mark_mem_encrypted) {
++		size = mem_cc_align_to_shared_granule(size);
++		if (dma_set_encrypted(dev, vaddr, size))
++			return;
++	}
  
--	page = dma_alloc_contiguous(dev, size, gfp);
-+	/* __DMA_ATTR_ALLOC_CC_SHARED is not yet supported here, attrs = 0 */
-+	page = dma_alloc_contiguous(dev, size, gfp, 0);
+ 	if (swiotlb_pool)
+ 		swiotlb_free_from_pool(dev, phys, swiotlb_pool);
+diff --git a/kernel/dma/pool.c b/kernel/dma/pool.c
+index 5115a3e8c722..d02b630e80fc 100644
+--- a/kernel/dma/pool.c
++++ b/kernel/dma/pool.c
+@@ -90,7 +90,9 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
+ 	bool leak_pages = false;
+ 	void *addr;
+ 	int ret = -ENOMEM;
++	unsigned int min_encrypt_order = get_order(mem_cc_shared_granule_size());
+ 
++	pool_size = mem_cc_align_to_shared_granule(pool_size);
+ 	/* Cannot allocate larger than MAX_PAGE_ORDER */
+ 	order = min(get_order(pool_size), MAX_PAGE_ORDER);
+ 
+@@ -101,7 +103,7 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
+ 							 order, false);
+ 		if (!page)
+ 			page = alloc_pages(gfp | __GFP_NOWARN, order);
+-	} while (!page && order-- > 0);
++	} while (!page && order-- > min_encrypt_order);
  	if (!page)
- 		page = alloc_pages_node(dev_to_node(dev), gfp, get_order(size));
- 	if (!page)
+ 		goto out;
+ 
 -- 
 2.43.0
 
