@@ -1,326 +1,184 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98553B8130;
-	Mon,  6 Jul 2026 17:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0C9233926
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 17:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783359851; cv=none; b=F0+uX/KdlXeMPbkXSo4U0fXIVdzioWMSm31dGGPAlQ4QG/qtBEbjKDX8Tf0btSbg5zPGdZnA+6t8CYdZd/i9h8nCHsG071VkxD5s/gaBPOHg3EQDIDhLtcLigRiBEltpF786drgCKFlJIGVG6XndaXN/iAKSEGD7IuNflzReBtU=
+	t=1783360465; cv=none; b=AW/ID1g/dyXSXQYK+OlF3SE651K849Q9ULSCe5w/7tyog23RCOKcE9CD4eIwBL5OFKFu63GJxwGQ7ypulIMeOQ5tsXGsAS3t6EJdVZdeN7vTGWNYdCJKdHVVv7L3Fj3gNYWoOFfvnSSdfzuDhh0GffNnlnb0Ch0JC/oxW5QlNGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783359851; c=relaxed/simple;
-	bh=Uio2Qd2L46mxZJ94QAsPrm0IPNeCGBLMHzQ3WLes4RI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mr9MVTbvqpT35sHGGHJdGisjfqawU6DQdckGn8C+z6Q4z+bF079Dj7HYgx0CnEsbcyG0gPoHS7fydgRPAryJtEXp3CDRYX4YhzBSYN0awFjJR/5qgPC+C32L3+wAkuRGiy46Cc9vrGr58SEWEHrpgCzqZkkAIJCTa33hhA6KRrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvOfA70A; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783360465; c=relaxed/simple;
+	bh=UYzTYbAtvFle5/zsWQmFRLQm8unbr2pDUjRYM49v4Ck=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KTVQTrQsx6UBYGX1Z1ahzlT29NYXi8or6d6Pjq0uFFMAtwlkWef7EVyi29WwtfqsEUNEFU39dZWYbJAv9Ar6VmTmhNZuwHNWHIwEnQDJAdkWoX0bu6iKTeKbFHQ0O/3pB/qQKJVHFUm/LUJ2c5uvcDEk28ofD9ypSN6pYljzMyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=INLAufHW; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvOfA70A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED8191F000E9;
-	Mon,  6 Jul 2026 17:44:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783359849;
-	bh=frnQFusfT7+zqiZrlJxNpJYyEtPIwtYA5/ws7Q9gAkc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=gvOfA70Ao/AlKfxPTs5UKQfoR1IxQQsSJZzOSlPCk46BZ5j5NgI+/c7iRXlGcSHzs
-	 Z5eaBB41yC7bxRaU7eXoXLj/321K5Yin3erXamGkTy2qErQ4titZCbd6FnlWvmeJWy
-	 ZSM1bDT4qmLtNLR5VR8Yk/pLMEhWVCpP8xXPCdY/nDQszkIiOMJUm1w0HvaiB4JwYq
-	 z3frqKRGVIZs48rrbSDI4DsF+TPtgkunYuQ5UaoIKHtFlx8lqDabjcNoovDDGLdQIF
-	 huXlwYZV84lWtc/1Su3BuGdbCGTOOgBleUvIPMz7WvJaamtFVSruM8vBmwwNrWQciF
-	 bLCwzW8dvCMpg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wgnMU-000000024DS-2U8z;
-	Mon, 06 Jul 2026 17:44:06 +0000
-Date: Mon, 06 Jul 2026 18:44:06 +0100
-Message-ID: <86cxx0ovx5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 09/27] KVM: arm64: Access elements of vcpu_gp_regs individually
-In-Reply-To: <20260706085229.979525-10-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
-	<20260706085229.979525-10-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="INLAufHW"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-470cb859d96so1707910f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 06 Jul 2026 10:54:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783360461; x=1783965261; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=R1Fq6vKEPrXMgPLx08XSndJMwPqltkg40bPnPrjHOfI=;
+        b=INLAufHWWi+g2p2T45pfbfSTrnxeSe8XXTzqhRDGpzQlor/Fgv5zRsbldpQFdFfeIb
+         y3QMIckzBjbGJtyP1QCcjjk0MJXWi0vuUuaOx2V8r4GPIvYn6b5zE+SjlA4wBp9DvdRf
+         VKcidIpDQWdDdxQT0+Gusd7RLFvJiL646k/4sZg15TB8tO8l20dr+Nf4P6VVHCoj9xKT
+         QiPPIzBEt3QlQhVwhvn7nJRlpnTVGt53Q28X67vDtqK+uq3VYCF+Cgco1rl0GOhx076q
+         A+g14hQ7v7sSzlMUUuNXPsvZ+wg2k4MoGFqWb+mVoYp8vwnzJTfkCR8JoopJ1Q1O9Z93
+         tqHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783360461; x=1783965261;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=R1Fq6vKEPrXMgPLx08XSndJMwPqltkg40bPnPrjHOfI=;
+        b=hrH5335bKPWjqabSx+sQqW4ioRlJdTt7qBm1Nt2cYlXbL0cLF0gB4KxDOiIcC5r7mq
+         bbABG9eWGxjdZjolgwR7MrtyYQoOkU/3OcTyGv+X14jH5aIofYwjp8D3U2+AoJU8Xvwv
+         GhOoTzX30gN/z5BMOexaUkOTYYMIf+RJsNvBfH5XV5gcbufYw2Xkz4uxKcXsUaxOXsBm
+         N3nuyJVvKaIRn0L5Zrw1ZCtFlWxjfOyNjVehXSYHebDs3nVEDgGkqq25YI4yF4ES3p2k
+         w8ch13GQl/Ew/RlrN325oBCcTKTPFfJFbmkvVvfY8ZHvvZ/5r5L7t7l+tBxVcLm9KF9A
+         CpGQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpv1shhd83CCdWOXsVIHQmTLz8i8o2Q8s84Zc6Dtbk8JM1bsW48HGa8xCfBFsxhCNBW7hxP0is=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzKMhcF1J0M53dvjz8lNNcxQwTUK9gQNl2CrCs5rNKFwurn3iwq
+	CjpQhz9ces4SXuZKhRVQyuXR7UuHqaxyR/HT8teNMcv7UAs1I00JBtzTcHgqTx+QKxTSgLg/Aq8
+	+8A2dQVfIol0+I7g2OAV9AA==
+X-Received: from wrpx16.prod.google.com ([2002:adf:f650:0:b0:478:511d:6f9e])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:29d7:b0:46f:a0f1:c346 with SMTP id ffacd0b85a97d-47de66fdd24mr1141479f8f.29.1783360461311;
+ Mon, 06 Jul 2026 10:54:21 -0700 (PDT)
+Date: Mon,  6 Jul 2026 18:53:57 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.rc2.803.g1fd1e6609c-goog
+Message-ID: <20260706175415.2604046-1-vdonnefort@google.com>
+Subject: [PATCH v2 00/18] KVM: arm64: Introduce pKVM hypervisor heap allocator
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com, tabba@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 06 Jul 2026 09:52:09 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> While for arm64 the members of vcpu_gp_regs are allocated continuous
-> this is not necessarily true for other architectures implementing ARM.
-> 
-> Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
-> the vcpu context but the address of the gp-register array field in the
-> user_pt_reg struct.
+pKVM historically lacked a dynamic memory allocator: all hypervisor-side
+VM and VCPU structures had to be sized on the host, allocated as
+contiguous pages and donated to the hypervisor.
 
-That's an interesting change of semantics, because this excludes PC
-from the GPRs. This is valid on AArch64, but wrong for AArch32 (PC
-really is R15, and is just another GPR).
+This design tightly coupled the hypervisor's memory footprint to
+host-side constraints, complicated memory reclaim, and severely
+restricted VM scalability.
 
-It isn't a huge deal, and nothing breaks, but that's something that
-you may want to capture.
+This patch series introduces a dynamically-mapped custom heap allocator
+(hyp_allocator) to the pKVM hypervisor. The initial users are the
+pkvm_hyp_vm and pkvm_hyp_vcpu structs, and the hypervisor tracing
+metadata.
 
->
-> Share the gp register functions with s390.
-> 
-> No functional change.
-> 
-> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h       | 13 +++++++++----
->  arch/arm64/include/asm/kvm_host.h          |  8 +++++++-
->  arch/arm64/kvm/guest.c                     | 19 +++++++++++--------
->  arch/arm64/kvm/hyp/exception.c             |  7 +++++--
->  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  4 ++--
->  arch/arm64/kvm/hyp/include/hyp/switch.h    |  6 +++---
->  arch/arm64/kvm/reset.c                     |  6 ++++--
->  7 files changed, 41 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index a1c92d2436ae..15d6d6a08d37 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -140,12 +140,17 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
->  
->  static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
->  {
-> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->pc;
-> +	return (unsigned long *)&vcpu->arch.ctxt.regs.pc;
->  }
->  
->  static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
->  {
-> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->pstate;
-> +	return (unsigned long *)&vcpu->arch.ctxt.regs.pstate;
-> +}
-> +
-> +static __always_inline unsigned long *vcpu_sp_el0(const struct kvm_vcpu *vcpu)
-> +{
-> +	return (unsigned long *)&vcpu->arch.ctxt.regs.sp;
->  }
->  
->  static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
-> @@ -175,14 +180,14 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
->  static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
->  					 u8 reg_num)
->  {
-> -	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
-> +	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)[reg_num];
->  }
->  
->  static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
->  				unsigned long val)
->  {
->  	if (reg_num != 31)
-> -		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
-> +		vcpu_gp_regs(vcpu)[reg_num] = val;
->  }
->  
->  #endif /* ARM64_S390_COMMON */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index ae9f76378218..2fce38fd9152 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1170,7 +1170,7 @@ struct kvm_vcpu_arch {
->  #define vcpu_clear_on_unsupported_cpu(vcpu)				\
->  	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
->  
-> -#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
-> +#define vcpu_gp_regs(v)		((v)->arch.ctxt.regs.regs)
->
->  /*
->   * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-> @@ -1201,6 +1201,12 @@ static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
->  
->  #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
->  
-> +#define kvm_vcpu_get_sp_el1(__vcpu) (__ctxt_sys_reg(&(__vcpu)->arch.ctxt, SP_EL1))
-> +#define kvm_vcpu_get_vreg(__vcpu, _n) (&(__vcpu)->arch.ctxt.fp_regs.vregs[_n])
-> +#define kvm_vcpu_get_vregs(__vcpu) (&(__vcpu)->arch.ctxt.fp_regs.vregs)
-> +#define kvm_vcpu_get_fpsr(__vcpu) (&(__vcpu)->arch.ctxt.fp_regs.fpsr)
-> +#define kvm_vcpu_get_fpcr(__vcpu) (&(__vcpu)->arch.ctxt.fp_regs.fpcr)
-> +
->  u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
->  
->  #define __vcpu_assign_sys_reg(v, r, val)				\
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 5a202cfd27bc..5e1e1faa98c2 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -62,6 +62,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
->  		       sizeof(kvm_vcpu_stats_desc),
->  };
->  
-> +#ifdef ARM64_S390_COMMON
+In the near future, this heap allocator is expected to be leveraged to
+support SVE in protected VMs and in the distant future, it will also
+support dynamic device assignment.
 
-I really think this patch (and a few others) needs splitting. What I'd
-like to see is a prefix to this series adding the required arm64
-rework, and only in a subsequent patch add the "make this shared"
-attributes.
+By moving to a hypervisor-managed dynamic allocator, we also allow
+deduplicating the donation/reclaim path of EL2-private structures.
 
-Also, quite a lot of this patch is about using the existing accessors
-instead of an open-coded version. These changes should be standalone.
+The main building blocks for this series are:
 
->  static bool core_reg_offset_is_vreg(u64 off)
->  {
->  	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
-> @@ -134,19 +135,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
->  		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
->  		off /= 2;
-> -		return &vcpu->arch.ctxt.regs.regs[off];
-> +		return &vcpu_gp_regs(vcpu)[off];
->  
->  	case KVM_REG_ARM_CORE_REG(regs.sp):
-> -		return &vcpu->arch.ctxt.regs.sp;
-> +		return vcpu_sp_el0(vcpu);
->  
->  	case KVM_REG_ARM_CORE_REG(regs.pc):
-> -		return &vcpu->arch.ctxt.regs.pc;
-> +		return vcpu_pc(vcpu);
->  
->  	case KVM_REG_ARM_CORE_REG(regs.pstate):
-> -		return &vcpu->arch.ctxt.regs.pstate;
-> +		return vcpu_cpsr(vcpu);
->  
->  	case KVM_REG_ARM_CORE_REG(sp_el1):
-> -		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
-> +		return  kvm_vcpu_get_sp_el1(vcpu);
->  
->  	case KVM_REG_ARM_CORE_REG(elr_el1):
->  		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
-> @@ -170,13 +171,13 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
->  		off -= KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]);
->  		off /= 4;
-> -		return &vcpu->arch.ctxt.fp_regs.vregs[off];
-> +		return kvm_vcpu_get_vreg(vcpu, off);
->  
->  	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
-> -		return &vcpu->arch.ctxt.fp_regs.fpsr;
-> +		return  kvm_vcpu_get_fpsr(vcpu);
->  
->  	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
-> -		return &vcpu->arch.ctxt.fp_regs.fpcr;
-> +		return  kvm_vcpu_get_fpcr(vcpu);
+1. pkvm_hyp_req:
+----------------
+When the hypervisor heap allocator goes out of memory (-ENOMEM), it
+suspends the hypercall, embeds a PKVM_HYP_REQ_HYP_ALLOC top-up request
+into the SMCCC HVC return registers, and exits back to the host.
 
-Odd additional spaces (3 instances).
+This building block will also be useful for the future huge-mapping
+support in protected guests, allowing EL2 to raise requests such as
+block splitting back to the host.
 
->  
->  	default:
->  		return NULL;
-> @@ -306,6 +307,8 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return err;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
->  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
->  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index bef40ddb16db..82611442a2d1 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -277,6 +277,9 @@ static const u8 return_offsets[8][2] = {
->  	[7] = { 4, 4 },		/* FIQ, unused */
->  };
->  
-> +#define OFFSETOF_PT_REG(__r) offsetof(struct user_pt_regs, __r)
-> +#define COMPAT_IDX(__c) ((OFFSETOF_PT_REG(__c) - OFFSETOF_PT_REG(regs[0])) / sizeof(u64))
-> +
+2. hyp_allocator:
+----------------
+This heap allocator manages a reserved VA space range, dynamically
+mapping and unmapping physical pages on-demand to minimise the pKVM
+hypervisor footprint. As memory is reclaimed and relinquished to the
+host, unmapped holes are introduced within the VA space. To prevent
+orphan mapped regions, neighboring unused chunks cannot be merged if
+they are separated by an unmapped region.
 
-Oh $gawd, this is... awful.
+The allocator chunk metadata is stored directly into the VA space range.
+To minimize metadata overhead, chunks only link to each other via a
+relative 32-bit offset.
 
->  static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
->  {
->  	unsigned long spsr = *vcpu_cpsr(vcpu);
-> @@ -292,12 +295,12 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
->  	switch(mode) {
->  	case PSR_AA32_MODE_ABT:
->  		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
-> -		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
-> +		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_abt)] = return_address;
->  		break;
+A simple hardening of the metadata is added via a simple 32-bit hash.
 
-Stupid idea: why don't you simply have new #defines that make the
-register number standalone, and make ptrace.h use that? Something line
-this (which can obviously be extended to all the compat registers):
+3. shrinker:
+------------
+As the heap allocator isn't reclaimed actively on VM or tracing
+teardown, a shrinker is added to allow the host to reclaim unused memory
+from the hypervisor when the host is under heavy memory pressure.
 
-diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
-index 39582511ad72f..2d3d324d2598e 100644
---- a/arch/arm64/include/asm/ptrace.h
-+++ b/arch/arm64/include/asm/ptrace.h
-@@ -104,6 +104,10 @@
- #define COMPAT_USER_SZ	296
- 
- /* Architecturally defined mapping between AArch32 and AArch64 registers */
-+enum aarch32_reg_mapping {
-+	__compat_lr_und = 22,
-+};
-+
- #define compat_usr(x)	regs[(x)]
- #define compat_fp	regs[11]
- #define compat_sp	regs[13]
-@@ -115,7 +119,7 @@
- #define compat_sp_svc	regs[19]
- #define compat_lr_abt	regs[20]
- #define compat_sp_abt	regs[21]
--#define compat_lr_und	regs[22]
-+#define compat_lr_und	regs[__compat_lr_und]
- #define compat_sp_und	regs[23]
- #define compat_r8_fiq	regs[24]
- #define compat_r9_fiq	regs[25]
+v1 -> v2:
+  - Rebased series on 7.2-rc2.
+  - Use scope-based hyp_spinlock.
+  - Fix best_missing/best_data_size priority in hyp_allocator_find_efficient_chunk() (Sashiko)
+  - Fix missing free_hyp_memcache() in pkvm_hyp_topup() (Sashiko)
+  - Fix unused selftest_init() warning when !CONFIG_NVHE_EL2_DEBUG (Sashiko)
+  - Fix missing shrinker_free() in teardown_hyp_mode() (Sashiko)
 
-and then your #defines from hell can go?
+v1: https://lore.kernel.org/r/20260520152650.4107895-1-vdonnefort@google.com
 
-Thanks,
+Vincent Donnefort (18):
+  KVM: arm64: Add __pkvm_private_range_pa
+  KVM: arm64: Add pkvm_remove_mappings
+  KVM: arm64: Add __hyp_allocator_map for the pKVM hyp
+  KVM: arm64: Add a heap allocator for the pKVM hyp
+  KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
+  KVM: arm64: Add topup interface for the pKVM heap allocator
+  KVM: arm64: Add pkvm_hyp_req infrastructure
+  KVM: arm64: Handle PKVM_HYP_REQ_HYP_ALLOC request
+  KVM: arm64: Add reclaim interface for the pKVM heap alloc
+  KVM: arm64: Add selftests for the pKVM heap allocator
+  KVM: arm64: Add a shrinker for pKVM
+  KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
+  KVM: arm64: Move hyp_vm refcount into the structure
+  KVM: arm64: Use noclear for PGD in __pkvm_init_vm error path
+  KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
+  KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+  KVM: arm64: Reject hyp trace descriptors with fewer CPUs than
+    hyp_nr_cpus
+  KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
 
-	M.
+ arch/arm64/include/asm/kvm_asm.h           |    4 +
+ arch/arm64/include/asm/kvm_host.h          |   14 +-
+ arch/arm64/include/asm/kvm_mmu.h           |    3 +
+ arch/arm64/include/asm/kvm_pkvm.h          |  104 ++
+ arch/arm64/kvm/arm.c                       |   26 +-
+ arch/arm64/kvm/hyp/hyp-constants.c         |    2 -
+ arch/arm64/kvm/hyp/include/nvhe/alloc.h    |   24 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h       |    3 +
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h     |   19 +-
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h |    5 +
+ arch/arm64/kvm/hyp/nvhe/Makefile           |    2 +-
+ arch/arm64/kvm/hyp/nvhe/alloc.c            | 1217 ++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  124 +-
+ arch/arm64/kvm/hyp/nvhe/mm.c               |   33 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c             |  111 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c            |    5 +
+ arch/arm64/kvm/hyp/nvhe/trace.c            |   66 +-
+ arch/arm64/kvm/hyp_trace.c                 |   16 +-
+ arch/arm64/kvm/mmu.c                       |    4 +-
+ arch/arm64/kvm/pkvm.c                      |  136 ++-
+ arch/arm64/kvm/trace_pkvm.h                |   37 +
+ 21 files changed, 1801 insertions(+), 154 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/alloc.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/alloc.c
+ create mode 100644 arch/arm64/kvm/trace_pkvm.h
 
+
+base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
 -- 
-Without deviation from the norm, progress is not possible.
+2.55.0.rc2.803.g1fd1e6609c-goog
+
