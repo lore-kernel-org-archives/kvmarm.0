@@ -1,194 +1,261 @@
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8941D41DEED
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 10:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F81442108;
+	Mon,  6 Jul 2026 10:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783332552; cv=none; b=OIFT4F1vdxBKh5kNZE13kHUG5TFDGI+AQjuhMVnFHMkXzo2q+5z4WZpOlGHsNmud7WwMXUdspTCQr1YP/rYKUOHXzVJo6dRXYQClLxT7oQNGpmv8JjFlr3aVplsBjvNSWzrfqHueTPfnvMN7RAEmywnPvux+km399zoL49QOWv0=
+	t=1783333005; cv=none; b=JCcLBmbxJMSOOvoQALvPX26VKmGu13sRD3xhr9S49P5+WeKnPPAqr9khe+Jzp5Pdm36f2MLaAm6zHf4rOgfdqbyFcqOSV8Dtm/o493eEHfQAKsdUCXOeYWrVL5tUN8jlfLCoije9u1cZUh0h7LVgfI8gVVSOTEwcg1goQEGaklI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783332552; c=relaxed/simple;
-	bh=r6e98YlV4OLCCvE9+/j+v6Rli9RH4Iy/ZRmHUETXBw0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rrlYJrmoLwoCUbNcYyWqbw6nwggDoGYiRyj2zi6JTpd/OzDA/xu6HtNOW/b9gy2JkaJsA15wiDRKwXHGrqk/jqnkmqVLMVHOZR5zfhtmMg6amq43SgZC3fP0+F3wjrQ8aAct6d+Th9bih0Cnv70umTpfUk4U+/ohreWbwb2Umys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=DU1X6V89 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+	s=arc-20240116; t=1783333005; c=relaxed/simple;
+	bh=7SrU/iePr5+vWkkl3oywkUabdE78XwNV4MJNcBwtgYc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=DelSQc/OUgubeEmlvksJAzDEpI21dKJ7vV1U8XatTYNAzKIkTfXqqi51xlHIH55nf7/ebQ2IKNiL0+Kh4IWCm6xHjpoyOto4Wy42lsjCQcb3i/rsfhmCZ6/4vZNMAU5TJuVT48O/72AlKDsEMl5oXL2e++kEew8NmQQcqWLyIXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hm30TbrZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="DU1X6V89"
-Received: from h183.csg.ci.i.u-tokyo.ac.jp (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 666A3TQ4013128
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 6 Jul 2026 19:03:43 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=nCwZNeDZlJVGlaWCLeWYvbGvxte1zenM4jubK+YhaG0=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Message-Id:To:Subject:Date;
-        s=rs20250326; t=1783332223; v=1;
-        b=DU1X6V895JVkXdpTIAHNPQNWV5xjYrmYk8nt6k0TwVv2ESbhpC7q09iWxmCFBnSM
-         LjlIq0647f8DMew/wQ0GlTAwmY+reFS9YOSeIUPzsVQz5wTxfpuIQmim3mGYqOJ8
-         1INSgWTuy2fUXrfv1+YN9KCwKDaBYeGH3szy2HijVP4BJwNBlqd1RrkufE/DmfRG
-         o3Q88L81VzlPKx4sdBFXTtZwWvsRFVuWNPqIbRA3eoy4rGDA5BvZwCPg7s7Zzbgg
-         OeptxjvHbFbfkXxPccrcR1BvsKXMwrqPP24wl7HFYMrxPnGTTI9V5BUY8Hnji/py
-         zuI1kyA7vN5/z7NMNtqtLg==
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Mon, 06 Jul 2026 19:03:24 +0900
-Subject: [PATCH v8 1/7] KVM: arm64: Disallow vPMU when pPMUs do not cover
- all CPUs
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hm30TbrZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DCC1F000E9;
+	Mon,  6 Jul 2026 10:16:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783333003;
+	bh=yrisIXx6y+gv4MP7X9h+3PO47CAPhJud1/GPbP+xDwc=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Hm30TbrZQKsmmpPxl9CY30PfmPAS2LBw+KCGI0W5FNScvU8aE0Khy2jwakIz/Enh3
+	 vjq5sMbIz/287K1enBuVNMHoc75Yuq+HabIUd0Eup3YggYEANeBkYWd4uvotXPV7sz
+	 9XFwvgkIUCTs8km7v9kXJTm7cDiKmYYj/vL1u/7CK44GkZ9h6RkbL9xjNE6blApkKt
+	 LmfOuvCnASrR8f99wJnoIszkT2KaAIm+/r0g4FDhKyEqJsUnk5hXoCiwu6uX7ChPPc
+	 DAO1jhcN4LuFkC82Pn/6nbo6e13JhFpGo4e+iesEHa74KndSVGJuXyWUjNUBRiCa3Z
+	 kL0Vc5d69iDvA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 25/27] KVM: s390: arm64: Implement vCPU IOCTLs
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: "Alexander Gordeev" <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Heiko Carstens" <hca@linux.ibm.com>, "Vasily
+ Gorbik" <gor@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260706085229.979525-26-seiden@linux.ibm.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+ <20260706085229.979525-26-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Jul 2026 10:16:41 +0000
+Message-Id: <20260706101643.69DCC1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260706-hybrid-v8-1-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
-References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-X-Mailer: b4 0.16-dev-925f5
 
-Commit ec3eb9ed6081 ("KVM: arm64: PMU: Disallow vPMU on non-uniform
-PMUVer") made KVM reject vPMU unless the system-wide PMUVer is usable.
-That covers systems where PMUv3 is absent or non-uniform, as well as
-systems where IMPDEF PMUv3 sysreg traps are unavailable.
+Thank you for your contribution! Sashiko AI review found 7 potential issue(=
+s) to consider:
+- [High] Guest vector registers are not properly reset when KVM_REQ_VCPU_RE=
+SET is processed during the KVM_RUN loop.
+- [High] Userspace-reachable WARN_ONCE during validity intercept handling a=
+llows unprivileged processes to taint or panic the kernel.
+- [High] Executing local_irq_enable() while in an RCU extended quiescent st=
+ate (EQS) triggers lockdep warnings and system crashes.
+- [High] Guest PC increment is overwritten and lost due to calling `adjust_=
+pc` before `vcpu_put`.
+- [High] Missing `vcpu_load()` and `vcpu_put()` around KVM IOCTLs modifying=
+ architectural state.
+- [Medium] KVM_GET_REG_LIST ioctl returns a positive integer instead of 0 o=
+n success.
+- [Medium] KVM_ARM_VCPU_FINALIZE ioctl unconditionally returns 0, failing t=
+o reject unrecognized features.
+--
 
-However, KVM can still accept vPMU when all CPUs uniformly trap PMUv3
-sysregs, but the pPMUs registered with KVM only cover a subset of
-possible CPUs.
+commit 13eb2c521ea373c254d3f7904b5979dc114e1d21
+Author: Steffen Eiden <seiden@linux.ibm.com>
+Subject: KVM: s390: arm64: Implement vCPU IOCTLs
 
-Reject vPMU unless the registered pPMUs cover every possible CPU.
-This avoids carrying support for partial pPMU coverage into the
-fixed-counters-only UAPI introduced later in the series.
+Implement all vCPU IOCTLs.
 
-Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
----
- arch/arm64/kvm/arm.c      | 16 +++++++++++++---
- arch/arm64/kvm/pmu-emul.c | 20 ++++++++++++++++++--
- include/kvm/arm_pmu.h     |  6 +++---
- 3 files changed, 34 insertions(+), 8 deletions(-)
+> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+> --- a/arch/s390/kvm/arm64/arm.c
+> +++ b/arch/s390/kvm/arm64/arm.c
+[ ... ]
+> @@ -375,6 +375,18 @@ static void arm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_sae_block *sae_block =3D &vcpu->arch.sae_block;
+> =20
+>  	adjust_pc(vcpu);
+> =20
+>  	local_irq_disable();
+>  	guest_enter_irqoff();
+>  	local_irq_enable();
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 29f48f2c63ec..68767bb08285 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1527,14 +1527,19 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 	return -EINVAL;
- }
- 
--static unsigned long system_supported_vcpu_features(void)
-+static long system_supported_vcpu_features(void)
- {
- 	unsigned long features = KVM_VCPU_VALID_FEATURES;
-+	int r;
- 
- 	if (!cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
- 		clear_bit(KVM_ARM_VCPU_EL1_32BIT, &features);
- 
--	if (!kvm_supports_guest_pmuv3())
-+	r = kvm_supports_guest_pmuv3();
-+	if (r < 0)
-+		return r;
-+
-+	if (!r)
- 		clear_bit(KVM_ARM_VCPU_PMU_V3, &features);
- 
- 	if (!system_supports_sve())
-@@ -1555,6 +1560,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 					const struct kvm_vcpu_init *init)
- {
- 	unsigned long features = init->features[0];
-+	long r;
- 	int i;
- 
- 	if (features & ~KVM_VCPU_VALID_FEATURES)
-@@ -1565,7 +1571,11 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 			return -ENOENT;
- 	}
- 
--	if (features & ~system_supported_vcpu_features())
-+	r = system_supported_vcpu_features();
-+	if (r < 0)
-+		return r;
-+
-+	if (features & ~r)
- 		return -EINVAL;
- 
- 	/*
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index c816db5d6761..f50bb9d9a1e7 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -24,10 +24,26 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc);
- static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc);
- static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc);
- 
--bool kvm_supports_guest_pmuv3(void)
-+int kvm_supports_guest_pmuv3(void)
- {
-+	cpumask_var_t cpus __free(free_cpumask_var) = CPUMASK_VAR_NULL;
-+	struct arm_pmu_entry *entry;
-+
-+	if (!alloc_cpumask_var(&cpus, GFP_KERNEL))
-+		return -ENOMEM;
-+
-+	cpumask_copy(cpus, cpu_possible_mask);
-+
- 	guard(mutex)(&arm_pmus_lock);
--	return !list_empty(&arm_pmus);
-+
-+	list_for_each_entry(entry, &arm_pmus, entry) {
-+		struct arm_pmu *pmu = entry->arm_pmu;
-+
-+		if (!cpumask_andnot(cpus, cpus, &pmu->supported_cpus))
-+			return 1;
-+	}
-+
-+	return 0;
- }
- 
- static struct kvm_vcpu *kvm_pmc_to_vcpu(const struct kvm_pmc *pmc)
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 0a36a3d5c894..354f06edfdee 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -40,7 +40,7 @@ struct arm_pmu_entry {
- 	struct arm_pmu *arm_pmu;
- };
- 
--bool kvm_supports_guest_pmuv3(void);
-+int kvm_supports_guest_pmuv3(void);
- #define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num != 0)
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
-@@ -99,9 +99,9 @@ void kvm_pmu_nested_transition(struct kvm_vcpu *vcpu);
- struct kvm_pmu {
- };
- 
--static inline bool kvm_supports_guest_pmuv3(void)
-+static inline int kvm_supports_guest_pmuv3(void)
- {
--	return false;
-+	return 0;
- }
- 
- #define kvm_arm_pmu_irq_initialized(v)	(false)
+[Severity: High]
+Could enabling interrupts immediately after entering the guest context
+trigger an RCU-idle splat?
 
--- 
-2.55.0
+guest_enter_irqoff() places the CPU into an RCU extended quiescent state
+(EQS). Calling local_irq_enable() inside this state violates the API
+contract since it makes the kernel preemptible while RCU is not watching,
+which can lead to lockdep warnings and system stalls.
 
+[ ... ]
+> @@ -396,6 +408,61 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  {
+>  	DECLARE_KERNEL_FPU_ONSTACK32(fpu_save);
+>  	struct kvm_run *kvm_run =3D vcpu->run;
+>  	int ret;
+[ ... ]
+>  	kernel_fpu_begin(&fpu_save, KERNEL_FPC | KERNEL_VXR);
+>  	load_vx_regs((vcpu->arch.ctxt.vregs));
+> =20
+>  	if (!vcpu->wants_to_run) {
+>  		ret =3D -EINTR;
+>  		goto out;
+>  	}
+> =20
+>  	kvm_sigset_activate(vcpu);
+> =20
+>  	might_fault();
+> =20
+>  	ret =3D 1;
+>  	do {
+[ ... ]
+>  		if (ret > 0)
+>  			ret =3D check_vcpu_requests(vcpu);
+
+[Severity: High]
+If a KVM_REQ_VCPU_RESET is pending and processed by check_vcpu_requests(),
+the memory copy of the core registers is zeroed out by kvm_reset_vcpu().
+However, the hardware CPU vector registers were already loaded before the
+loop via load_vx_regs().
+
+When the loop exits, won't save_vx_regs() copy the stale hardware state back
+into memory, completely overriding the reset we just performed?
+
+[ ... ]
+>  		arm_vcpu_run(vcpu);
+> =20
+>  		ret =3D handle_exit(vcpu);
+> =20
+>  	} while (ret > 0);
+> =20
+>  	kvm_sigset_deactivate(vcpu);
+>  out:
+>  	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
+>  		adjust_pc(vcpu);
+> =20
+>  	save_vx_regs(vcpu->arch.ctxt.vregs);
+>  	kernel_fpu_end(&fpu_save, KERNEL_FPC | KERNEL_VXR);
+>  	vcpu_put(vcpu);
+
+[Severity: High]
+Does this sequence overwrite the PC increment?
+
+adjust_pc() modifies the PC in the vCPU's memory state, but the immediate
+subsequent call to vcpu_put() executes the stiasrm hardware instruction.
+This dumps the current internal hardware register state (with the
+un-incremented PC) into the exact same memory save area.
+
+Could this permanently overwrite the software increment and cause infinite
+guest execution loops?
+
+[ ... ]
+> @@ -463,6 +530,95 @@ long kvm_arch_vcpu_ioctl(struct file *filp, unsigned=
+ int ioctl, unsigned long ar
+>  {
+>  	struct kvm_vcpu *vcpu =3D filp->private_data;
+>  	void __user *argp =3D (void __user *)arg;
+>  	struct kvm_device_attr attr;
+>  	int ret;
+> =20
+>  	switch (ioctl) {
+
+[Severity: High]
+Are we missing calls to vcpu_load() and vcpu_put() around these IOCTLs?
+
+Operations like KVM_SET_ONE_REG and KVM_ARM_VCPU_INIT directly modify or
+read the vCPU architectural state. The KVM subsystem mandates that IOCTLs
+modifying architectural state must use these wrappers to manage vCPU
+attachment.
+
+Without them, could this lead to hardware state synchronization issues or
+leaked preempt notifiers?
+
+[ ... ]
+>  	case KVM_GET_REG_LIST: {
+>  		struct kvm_reg_list __user *user_list =3D argp;
+>  		struct kvm_reg_list reg_list;
+>  		unsigned int n;
+[ ... ]
+>  		n =3D reg_list.n;
+>  		reg_list.n =3D kvm_arm_num_regs(vcpu);
+>  		if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
+>  			break;
+>  		ret =3D -E2BIG;
+>  		if (n < reg_list.n)
+>  			break;
+>  		ret =3D kvm_arm_copy_reg_indices(vcpu, user_list->reg);
+>  		break;
+>  	}
+
+[Severity: Medium]
+Should this explicitly return 0 on success?
+
+kvm_arm_copy_reg_indices() returns the positive number of registers copied.
+Passing this positive count directly back to userspace goes against the KVM
+ABI requirement that this ioctl returns 0 on success.
+
+Could this cause userspace programs like QEMU to misinterpret a successful
+call as an error?
+
+[ ... ]
+> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/hand=
+le_exit.c
+> --- a/arch/s390/kvm/arm64/handle_exit.c
+> +++ b/arch/s390/kvm/arm64/handle_exit.c
+[ ... ]
+> @@ -55,6 +57,35 @@ exit_handle_fn arm_exit_handlers[] =3D {
+>  	[ESR_ELx_EC_HVC64]	=3D handle_hvc,
+>  };
+> =20
+> +int handle_exit(struct kvm_vcpu *vcpu)
+> +{
+> +	u8 icptr =3D vcpu->arch.sae_block.icptr;
+> +	int ret =3D 1;
+> +
+> +	switch (icptr) {
+> +	case SAE_ICPTR_SPURIOUS:
+> +		break;
+> +	case SAE_ICPTR_VALIDITY:
+> +		WARN_ONCE(true, "SAE: validity intercept. vir: 0x%04x",
+> +			  vcpu->arch.sae_block.vir);
+> +		ret =3D -EINVAL;
+> +		break;
+
+[Severity: High]
+Is it safe to have a WARN_ONCE here?
+
+Unprivileged host userspace can set arbitrary guest register states via
+KVM_SET_ONE_REG prior to calling KVM_RUN. This allows a malicious userspace
+process to intentionally construct an invalid CPU state that hardware
+rejects.
+
+Would this allow an unprivileged process to drive this warning condition and
+create a host-side denial of service vector if panic_on_warn is enabled?
+
+[ ... ]
+> diff --git a/arch/s390/kvm/arm64/reset.c b/arch/s390/kvm/arm64/reset.c
+> --- /dev/null
+> +++ b/arch/s390/kvm/arm64/reset.c
+[ ... ]
+> +int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
+> +{
+> +	return 0;
+> +}
+
+[Severity: Medium]
+Should this validate the feature parameter instead of unconditionally
+returning 0?
+
+The KVM API specifies that finalizing an unsupported or invalid feature must
+fail with -EINVAL or -EPERM. Returning 0 silently acknowledges invalid
+feature finalizations.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260706085229.9795=
+25-1-seiden@linux.ibm.com?part=3D25
