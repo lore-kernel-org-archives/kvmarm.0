@@ -1,275 +1,148 @@
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E5C1FBC8C
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 01:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB1B35839C
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jul 2026 03:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783300264; cv=none; b=qaozmCM7TF93uqamqBtwjezjksY25l3piVvZ+ZF7Kxc2rTKhD9JaitxlnU7qI57M/rIizN3ty46kfg4Ghg1n91MiYFrwUWUpj8CY8oNHcNX7qkYm9X3fICdeCajAQ2Or1sPC3Ec9a/580RRRkZIYBwk+Cd8XXflTfxBgUTi5eEY=
+	t=1783308637; cv=none; b=R+E2ng/MvyDV0VyuSkRXB1MtVM7qJCaaea+myAYEjIaAWIKCVETrOSbotcVvPFBkh++++pDhfmrOtczMs19GUiuC1UcvqjCv/V4Nf6LIKKKlVMtHDOWtwuMWgOu5Q6UpmJAgK96NxST/04mil0RCqVKSQKKM3Csrzk/nthk0Z64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783300264; c=relaxed/simple;
-	bh=+mFtAZF0Y1qfK9ADwCo+hiTtit9pa08Y6Ft+SqCB77k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=R/Nxp4ju8PGXuIr0ki0C6z1r/v6gLAzORKWv452R8389o4wQxqn8GqcT9eC66zCmf9WAV4mLmN9ps6NEmHC06E1jkXBAg2NgEILnERV8n0gd6jNEWpvoizW7tsoXbkf5adML6Jhz54l89oUXBhRSSs1kye9YXtuxsDJcVPgH1S0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=gXhF0EEq; arc=none smtp.client-ip=113.46.200.225
+	s=arc-20240116; t=1783308637; c=relaxed/simple;
+	bh=oeDFtJqPPkIfeXsJxq7Iw1OJTnUGE3bv41tKkXFbJkE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=chDYhBRjAKCF/idoQfVaoNTLhXhhv00lORUv0qp0pcgGmUD58PQJuLuW4tN+NAv0plzPjsXPqX9uE4dEkZxQgoJ/fePN7TqkUk9e1VIX2Ij9nTvvm7pGUOcmNWJkjNrjMScm7mz6LohRgrtnmhciMc6pbnT7EIw+GaAgkGMKgIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=tF3qCKhL; arc=none smtp.client-ip=113.46.200.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="gXhF0EEq"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="tF3qCKhL"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=fKW/eZslkM1EUWN4dnuNhaWVEjQYW+mbj+8OJe7YWmg=;
-	b=gXhF0EEqSo+6LwAzTVBtw4M7Bl7hoYpbRCzdeXyHZznOH6FTwvLj6lIWGn/6//n8GcNWsPAQT
-	9Ga9EkK2d8RfZ83YTV/WHXkb6YzIHbbkVQSg5sP5vrY0QIW5hDzjx1ljXSD68C2iTRTyXxRJUab
-	UdqiEkQRIIRSGY6/73tx1GM=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gtmJt6tjFz1K99W;
-	Mon,  6 Jul 2026 09:01:34 +0800 (CST)
-Received: from dggpemf500011.china.huawei.com (unknown [7.185.36.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4D8614056C;
-	Mon,  6 Jul 2026 09:10:46 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- dggpemf500011.china.huawei.com (7.185.36.131) with Microsoft SMTP Server
+	bh=ni1f8BldCx7faqIHDSsy647pWPJEZK7CSd6Q/V6Yajg=;
+	b=tF3qCKhLy8MJplT3WXZidmCJ9frXH7RmXhqPccoYAmfW6nQmPpIeLtqYa1ioADuyX/iYjZUps
+	NvydI4k2aE7zY9yIYA9aD/UbHEyECECDMMEImMoWQVECzZcEFsrhbFj8BFd5CrUbMffh+iY2R5K
+	7ZeSiixi5FMZIdnzNJaWR/M=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4gtqQl3j7Qz12LJx;
+	Mon,  6 Jul 2026 11:21:51 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 008FE40577;
+	Mon,  6 Jul 2026 11:30:32 +0800 (CST)
+Received: from kwepemq500001.china.huawei.com (7.202.195.224) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 6 Jul 2026 09:10:41 +0800
-Message-ID: <6c84d7f6-ce5b-49f0-889b-7e953cf29bf6@huawei.com>
-Date: Mon, 6 Jul 2026 09:10:40 +0800
+ 15.2.1544.11; Mon, 6 Jul 2026 11:30:31 +0800
+Received: from [10.67.146.137] (10.67.146.137) by
+ kwepemq500001.china.huawei.com (7.202.195.224) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 6 Jul 2026 11:30:31 +0800
+Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
+ guarantee with VTTBR_EL2.CnP
+To: Wei-Lin Chang <weilin.chang@arm.com>, Marc Zyngier <maz@kernel.org>,
+	<oupton@kernel.org>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+CC: "guoyang (C)" <guoyang2@huawei.com>, "huanglingyan (A)"
+	<huanglingyan2@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
+References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
+ <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
+From: Tangnianyao <tangnianyao@huawei.com>
+Message-ID: <292b5734-9005-6db0-da08-3da04628e620@huawei.com>
+Date: Mon, 6 Jul 2026 11:30:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/17] arm64: Support FEAT_NMI and Rework Exception
- Masking
-To: Mark Rutland <mark.rutland@arm.com>
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
-	<skhan@linuxfoundation.org>, <maz@kernel.org>, <ardb@kernel.org>,
-	<ilias.apalodimas@linaro.org>, <oupton@kernel.org>, <joey.gouly@arm.com>,
-	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<oleg@redhat.com>, <lpieralisi@kernel.org>, <tglx@kernel.org>,
-	<ada.coupriediaz@arm.com>, <anshuman.khandual@arm.com>,
-	<ebiggers@kernel.org>, <broonie@kernel.org>, <mrigendra.chaubey@gmail.com>,
-	<baohua@kernel.org>, <lucaswei@google.com>, <james.morse@arm.com>,
-	<zengheng4@huawei.com>, <thuth@redhat.com>, <yang@os.amperecomputing.com>,
-	<leo.bras@arm.com>, <Sascha.Bischoff@arm.com>, <james.clark@linaro.org>,
-	<peterz@infradead.org>, <leitao@debian.org>, <ben.horgan@arm.com>,
-	<punit.agrawal@oss.qualcomm.com>, <gshan@redhat.com>,
-	<osama.abdelkader@gmail.com>, <fengchengwen@huawei.com>,
-	<ryan.roberts@arm.com>, <yangyicong@hisilicon.com>, <kevin.brodsky@arm.com>,
-	<kees@kernel.org>, <jeson.gao@unisoc.com>, <zhaoyang.huang@unisoc.com>,
-	<ryotkkr98@gmail.com>, <wsw9603@163.com>, <pasha.tatashin@soleen.com>,
-	<jeremy.linton@arm.com>, <schuster.simon@siemens-energy.com>,
-	<osandov@fb.com>, <arnd@arndb.de>, <zhangpengjie2@huawei.com>,
-	<smostafa@google.com>, <vladimir.murzin@arm.com>, <tabba@google.com>,
-	<vdonnefort@google.com>, <kaleshsingh@google.com>, <jic23@kernel.org>,
-	<timothy.hayes@arm.com>, <alexandru.elisei@arm.com>, <zenghui.yu@linux.dev>,
-	<david@kernel.org>, <akpm@linux-foundation.org>, <ljs@kernel.org>,
-	<memxor@gmail.com>, <qperret@google.com>, <chaitanyas.prakash@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-efi@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>
-References: <20260703100135.2512312-1-ruanjinjie@huawei.com>
- <akfECMwlZL1aoXHl@J2N7QTR9R3>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <akfECMwlZL1aoXHl@J2N7QTR9R3>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500011.china.huawei.com (7.185.36.131)
+In-Reply-To: <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemq500001.china.huawei.com (7.202.195.224)
 
 
 
-On 7/3/2026 10:15 PM, Mark Rutland wrote:
-> Hi Jinjie
-> On Fri, Jul 03, 2026 at 06:01:18PM +0800, Jinjie Ruan wrote:
->> Hi all,
-> 
-> Vladimir (cc'd) has also been working on NMI support, but hadn't posted
-> to the list yet (due to some delays with testing).
-> 
-> I haven't had the chance to look at this yet, but at a high-level we'll
-> need to figure out what to do going forwards.
+On 7/6/2026 1:28, Wei-Lin Chang wrote:
+> Hi,
+>
+> Let me try to answer this:
+>
+> On Sat, Jul 04, 2026 at 03:45:56PM +0800, Tangnianyao wrote:
+>> Hi, all
+>>
+>> I'm trying to understand the TLB and I-cache invalidation in
+>> `kvm_arch_vcpu_load()` that is intended to "guarantee that both TLBs and
+>> I-cache are private to each vCPU".
+>>
+>> As I understand it, when `VTTBR_EL2.CnP == 1`, `__kvm_flush_cpu_context()`
+>> only performs a local TLB and I-cache invalidation, which does not seem
+>> sufficient to guarantee that property.
+>>
+>> In fact, even if the invalidation were extended to the Inner Shareable
+>> domain, it still seems difficult to guarantee “TLBs and I-cache are
+>> private to each vCPU”, when `VTTBR_EL2.CnP == 1`, as long as multiple
+>> vCPUs from the same VM may be running concurrently on different PEs.
+> I think you have missed that when 2 stages are involved, both stages
+> have to set CnP == 1 in order to share TLB entries (Arm ARM R_ZVRZW).
+> So if TLB entry sharing happens, the guest kernel must have allowed it
+> in the first place (by setting TTBR0/1_EL1.CnP == 1), hence accidental
+> sharing that you are worried about won't happen.
+>
+> __kvm_flush_cpu_context() is solving problems that occur when multiple
+> vCPUs of a VM are multiplexed on a single physical CPU.
 
+Thanks for you answer.
 
-Hi Mark,
+If guest kernel allow TLB shared across CPUs by setting TTBR0/1_EL1.CnP == 1,
+does kvm still need to guarantee that TLBs are private to each vCPU?
+ 
 
-Thanks for the heads-up. We are very excited about the NMI support and
-would love to see the related refactoring and FEAT_NMI features
-mainlined as early as possible.
+>> So I have two questions:
+>>
+>> 1. What is the rationale behind the comment that "guarantee that both TLBs
+>> and I-cache are private to each vCPU"?
+> I assume you are asking why keeping both TLBs and I-cache private per
+> each vCPU is required. The fundamental answer is that each physical CPU
+> is expected to have its own TLB and I-cache, so we must uphold that
+> property for vCPUs as well. vCPUs can be scheduled on the same physical
+> CPU, and use the same physical TLB/I-cache, obviously, so extra
+> invalidations need to be done.
+Let's assume that both Stage-1 CnP and Stage-2 CnP are enabled.
 
-We are completely open and flexible regarding the collaboration model
-going forward. Whether Vladimir posts his series and we assist with
-review and testing, or we drive the development while Vladimir helps
-with testing and review, either way is highly welcomed on our side.
+As I understand it, the architecture permits TLB to be shared by multiple
+PEs within an Inner Shareable domain. Right?
 
-Our ultimate goal is to get this aligned and landed smoothly. Please let
-us know how you and Vladimir would prefer to proceed once you've had a
-chance to look into this.
+If an implementation allows TLB entries to be shared in this way, it seems
+that the current invalidation performed by kvm would no longer be sufficient
+to guarantee that TLBs are private to each vCPU.
 
-Best regards,
-Jinjie
-
-> 
-> Mark.
-> 
->> This patch series implements support for the ARMv8.8-A/v9.3-A
->> hardware NMI extension (FEAT_NMI), introducing the use of PSTATE.ALLINT
->> to manage superpriority interrupts on arm64.
+>
+> As for how this can go wrong without __kvm_flush_cpu_context(), you can
+> look at commit 94d0e5980d67 ("arm/arm64: KVM: Perform local TLB
+> invalidation when multiplexing vcpus on a single CPU") and commit
+> 01dc9262ff57 ("VM: arm64: Ensure I-cache isolation between vcpus of a
+> same VM"). The commit messages and the linked thread explained the
+> problems pretty well for me.
+>
+>> 2. Should the effect of `VTTBR_EL2.CnP` be taken into account when
+>> reasoning about this guarantee?
+> Please see the first part of the answer.
+>
+> Hope this helps!
+>
+> Thanks,
+> Wei-Lin Chang
+>
+>> Thanks
+>> Nianyao Tang
 >>
->> Background and Current Status
->> -----------------------------
->>
->> The hardware ecosystem is already mature and fully ready for FEAT_NMI:
->>
->> - Production Hardware: Huawei's Kunpeng servers (such as the HIP12 based
->>   platforms) already feature native hardware support for FEAT_NMI.
->>
->> - Emulation: QEMU has integrated robust FEAT_NMI emulation[1] support
->>   since 2024.
->>
->> Despite the hardware readiness, upstream support for FEAT_NMI has been
->> delayed. Previous patch[2] attempts tried to bundle ALLINT management
->> directly into the existing DAIF abstraction layers. As Mark Rutland
->> pointed out[3], pretending ALLINT or pseudo-NMI (GIC PMR) is part of
->> DAIF creates convoluted, unmaintainable hacks that frequently fail to
->> handle complex edge cases correctly (such as state escape during
->> context switching).
->>
->> Reworking Exception Masking (Mark's Feedback)
->> ---------------------------------------------
->>
->> Following Mark Rutland's strong recommendation ("We must clean up
->> the existing approach before we add the real NMI support"), this series
->> does not simply stack FEAT_NMI on top of the old framework. Instead, it
->> completely reworks how the arm64 kernel manages abstract and logical
->> exception masks.
->>
->> Per Mark's guidelines, this series achieves the following architectural
->> improvements:
->>
->> 1. Entry/Exit Specific Helpers (a):
->>
->>    Introduces abstract exception mask helpers specifically for exception
->>    boundaries. They handle unified unmask-at-entry and mask-at-exit
->>    behaviors. This decouples the entry/exit paths from raw DAIF
->>    manipulation. In this series, these helpers are first refactored to
->>    manage DAIF + PMR cleanly, preparing the ground before any FEAT_NMI
->>    code is introduced.
->>
->> 2. Logical Exception Mask Separation (b):
->>
->>    Introduces a decoupled logical mask tracking mechanism that treats DAIF,
->>    PMR, and ALLINT as separate, distinct elements. This enables accurate
->>    irqflag tracking and debug assertions to save, restore, and validate all
->>    elements without forcing them to fake or pollute a traditional DAIF
->>    layout.
->>
->> Production Bug Fixes & Integration
->> -----------------------------------
->>
->> On top of this solid architectural foundation, this series adds the actual
->> support for FEAT_NMI (ALLINT management). Crucially, during baisc testing
->> and validation on production Kunpeng (HIP12) servers, we identified and
->> resolved several critical bugs.
->>
->> The series is structured as follows:
->>
->> - Patches 1-5: Clean up and rework the existing DAIF/PMR masking into
->>   separate logical exception helpers (Pre-requisite refactoring).
->>
->> - Patches 6-17: Add FEAT_NMI support for ARM64, including specific
->>   stability fixes found on Kunpeng hardware and QEmu.
->>
->> Any feedback, testing, or review, especially regarding the exception
->> masking refactoring, is highly appreciated.
->>
->> [1]: https://lore.kernel.org/all/20240407081733.3231820-1-ruanjinjie@huawei.com/
->> [2]: https://lore.kernel.org/linux-arm-kernel/20221112151708.175147-1-broonie@kernel.org/
->> [3]: https://lore.kernel.org/linux-arm-kernel/Y5c9SLeJacLYHmP7@FVFF77S0Q05N/
->>
->> Jinjie Ruan (5):
->>   arm64: Move DAIF macros to ptrace.h and use them centrally
->>   arm64: Rework exception masking into abstract logical mask
->>   arm64: entry: arm64: entry: Move DAIF masking for EL1 exit to C code
->>   arm64: entry: Add entry-specific helpers
->>   arm64: Introduce helpers for restoring standard exception masks
->>
->> Lorenzo Pieralisi (1):
->>   irqchip/gic-v3: Implement FEAT_GICv3_NMI support
->>
->> Mark Brown (11):
->>   arm64/booting: Document boot requirements for FEAT_NMI
->>   arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
->>   arm64/hyp-stub: Enable access to ALLINT
->>   arm64/idreg: Add an override for FEAT_NMI
->>   arm64/cpufeature: Detect PE support for FEAT_NMI
->>   KVM: arm64: Hide FEAT_NMI from guests
->>   arm64/nmi: Manage masking for superpriority interrupts along with DAIF
->>   arm64/entry: Don't call preempt_schedule_irq() with NMIs masked
->>   arm64/irq: Document handling of FEAT_NMI in irqflags.h
->>   arm64/nmi: Add handling of superpriority interrupts as NMIs
->>   arm64/nmi: Add Kconfig for NMI
->>
->>  Documentation/arch/arm64/booting.rst     |   6 +
->>  arch/arm64/Kconfig                       |  17 ++
->>  arch/arm64/include/asm/arch_gicv3.h      |   7 +-
->>  arch/arm64/include/asm/assembler.h       |  17 +-
->>  arch/arm64/include/asm/cpufeature.h      |   5 +
->>  arch/arm64/include/asm/cpuidle.h         |  30 ++-
->>  arch/arm64/include/asm/daifflags.h       | 144 --------------
->>  arch/arm64/include/asm/efi.h             |  22 ++-
->>  arch/arm64/include/asm/el2_setup.h       |  13 ++
->>  arch/arm64/include/asm/entry-common.h    |  11 +-
->>  arch/arm64/include/asm/exception_masks.h | 232 +++++++++++++++++++++++
->>  arch/arm64/include/asm/irq.h             |   2 +
->>  arch/arm64/include/asm/irqflags.h        |  10 +
->>  arch/arm64/include/asm/kvm_host.h        |   2 +-
->>  arch/arm64/include/asm/mmu_context.h     |   2 +-
->>  arch/arm64/include/asm/nmi.h             |  23 +++
->>  arch/arm64/include/asm/ptrace.h          |  11 +-
->>  arch/arm64/include/asm/sysreg.h          |   2 +
->>  arch/arm64/include/uapi/asm/ptrace.h     |   1 +
->>  arch/arm64/kernel/acpi.c                 |  14 +-
->>  arch/arm64/kernel/cpufeature.c           |  58 +++++-
->>  arch/arm64/kernel/debug-monitors.c       |   9 +-
->>  arch/arm64/kernel/entry-common.c         | 167 +++++++++++-----
->>  arch/arm64/kernel/entry.S                |   4 -
->>  arch/arm64/kernel/hibernate.c            |  10 +-
->>  arch/arm64/kernel/idle.c                 |   7 +-
->>  arch/arm64/kernel/irq.c                  |  36 +++-
->>  arch/arm64/kernel/machine_kexec.c        |   4 +-
->>  arch/arm64/kernel/pi/idreg-override.c    |   1 +
->>  arch/arm64/kernel/probes/kprobes.c       |   9 +-
->>  arch/arm64/kernel/process.c              |   7 +-
->>  arch/arm64/kernel/setup.c                |   4 +-
->>  arch/arm64/kernel/signal.c               |   2 +-
->>  arch/arm64/kernel/smp.c                  |  22 +--
->>  arch/arm64/kernel/suspend.c              |  15 +-
->>  arch/arm64/kernel/traps.c                |   2 +-
->>  arch/arm64/kvm/emulate-nested.c          |   6 +-
->>  arch/arm64/kvm/hyp/include/hyp/switch.h  |   6 +
->>  arch/arm64/kvm/hyp/nvhe/host.S           |   4 +-
->>  arch/arm64/kvm/hyp/nvhe/hyp-init.S       |   3 +-
->>  arch/arm64/kvm/hyp/nvhe/hyp-main.c       |   4 +-
->>  arch/arm64/kvm/hyp/vgic-v3-sr.c          |   6 +-
->>  arch/arm64/kvm/hyp/vhe/switch.c          |   6 +-
->>  arch/arm64/kvm/reset.c                   |   6 +-
->>  arch/arm64/mm/fault.c                    |   2 +-
->>  arch/arm64/mm/mmu.c                      |   6 +-
->>  arch/arm64/tools/cpucaps                 |   2 +
->>  drivers/firmware/psci/psci.c             |   7 +-
->>  drivers/irqchip/irq-gic-v3.c             | 152 +++++++++++++--
->>  include/linux/irqchip/arm-gic-v3.h       |   4 +
->>  50 files changed, 822 insertions(+), 320 deletions(-)
->>  delete mode 100644 arch/arm64/include/asm/daifflags.h
->>  create mode 100644 arch/arm64/include/asm/exception_masks.h
->>  create mode 100644 arch/arm64/include/asm/nmi.h
->>
->> -- 
->> 2.34.1
->>
-> 
-
+> .
+>
+Thanks
+Nianyao Tang
