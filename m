@@ -1,196 +1,88 @@
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E563F789C
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 11:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05C23FE362;
+	Tue,  7 Jul 2026 11:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783424228; cv=none; b=UqQD3uRq/I/odt8axhJAF1yU6jseybxNq/HS79y5DaWg8tzulqA15D4fd6FzkS5AyHZTMmxw/eQ0s48iDf85J/B0XHnNNLdQjz6rjWfjFG3Lg8VSKQgQPr62pJFtXTlOoj2H16EJeL8hPldiEUYaw4RK1E0UoI6/GYqMsLQs4ck=
+	t=1783425393; cv=none; b=ZF5XZZZJM7ykfyjxCn/IdylW4vnPvqVRGkiTUOxoG7CAdnjMaap+h/UKmezGb4jPkFIq64qp9BEm+F1RF4LoDHLyeDhwZbaOs1d/2LpsWzW8mX+9uyWhx7ZjXp7WvseEMOOIRqa5uvKFHlcgqawWFEAU86+MIi8GCR9eZ5xbRG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783424228; c=relaxed/simple;
-	bh=zisHKAD74OWux5/tK8lytmVqjM6h3AIY4NHgLxcwVtg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s+S0PafmQmOkiwUdmvaKStUtphWjSGt6m3FEOAEQYd21FSxGdPVilThevqGIcN2UZEUrj4m5nEfGa0XEL1vjGJyMvhTGItMjkofpqoIEdBvRMrtQTHw9QrAt9VJFuWPNyRYa7d1HfwkXA6wFYDTboUP2ZJ0usU8GOWHIwS04Z8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=TJ9+WCJu reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+	s=arc-20240116; t=1783425393; c=relaxed/simple;
+	bh=VHyQyW91mk/rV9J35jEDjKnS65l+3GqidQKWJGCYFvY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z2Jqa1pNIySokgsGx9NdahPh5WoV0EMxEgFiRBGweeNTLjGsxUMKK5f9dX/mOpuGsAvuPbuO9GL+MbNpfKSNzXyeTDbuxCqa5MR+ulrBi5iSZvssp6YilZqoQIIeBtHD5pz3RPNjbGzmFINNrWjZ04FXh1EeqzvREL3kAQRD4r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLaFw+j2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="TJ9+WCJu"
-Received: from [133.11.54.183] (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 667BaXR6009375
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 7 Jul 2026 20:36:33 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=PC9H9+hfBUgJc1h9fKgLECYX3wbgWyiwPKt7KOMjAiE=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20250326; t=1783424194; v=1;
-        b=TJ9+WCJuvN2HY9GfRKpGwzZshGSjYSg+ZCQPyx+qgt+W3BRyH5dvAMZNxppn7WPz
-         KWg4fLBC8zWUuwbNrQrvtEciEtr3hzWw2BgyPziP7Tz9IAtBBJ96qe1kaSSZyN1a
-         CtNdBeuNKcYX6EG9UT8iaiSkatol3VYDd+FkjSQqNMVCD0ajPTR8LH/cQd2teirB
-         WhZc42jMhxC7y3nYH4eeUVst6bLixn5KanS+l+9ciFjtWUfnH5ZfdaGif2Sg3Z0o
-         iUTu6Pc2W3lxcodV0dFvbkAQDmL18va8K84f1tATGhEOsG/TV0InJ0JkrkuR1WFR
-         driv6wIpea3cPdDdCv26EA==
-Message-ID: <db672f83-a6c4-4d94-a959-930a624a7915@rsg.ci.i.u-tokyo.ac.jp>
-Date: Tue, 7 Jul 2026 20:36:32 +0900
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLaFw+j2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8D371F01559;
+	Tue,  7 Jul 2026 11:56:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783425391;
+	bh=dfqKIJOu25jIvGp/MHMBBQ/zA+78h3cOEbJXVr/juXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kLaFw+j20wmNLTAhrt8SIoCgi9fuNsefFqDsKoq3ghMgJ5Coo4Ut3x6FW3iCmq2x/
+	 yQHHKkJGahcmV/iDfAtzZcAIwFnChkHsZ559TRHDa+R+17elV+tA8aXeBdG5dFX0IF
+	 ZQ6rKwJAz9F6j5yse9QyvZCy6y/s4KT4of1GKlH+SOA+4ICqfwTr1Bi53BtYDcWoa3
+	 +eDl9knq8FmECFBkGnqsDgov0sPFtDdzYCGEj8nl9zs3C2UmmS0slodBDe68tFbgHf
+	 59y6nJoHWBs1upSEtDDn3IeWxo1Ah6xvbMFs9sI3awvukoaxp8Z/RKK0nWwnyivcpT
+	 vsaHe8lUAaeCg==
+Date: Tue, 7 Jul 2026 12:56:24 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, sudeep.holla@kernel.org
+Cc: catalin.marinas@arm.com, oupton@kernel.org,
+	Sebastian Ene <sebastianene@google.com>, jens.wiklander@linaro.org,
+	joey.gouly@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, mrigendra.chaubey@gmail.com,
+	op-tee@lists.trustedfirmware.org, perlarsen@google.com,
+	seiden@linux.ibm.com, smostafa@google.com, sumit.garg@kernel.org,
+	suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com
+Subject: Re: (subset) [PATCH v9 0/6] arm_ffa, KVM: Fix FF-A emad offset
+ calculations
+Message-ID: <akzpaD3VmMp8Dq4S@willie-the-truck>
+References: <20260702103848.1647249-1-sebastianene@google.com>
+ <178342187223.1892339.1923162787460489447.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 6/7] KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <20260706-hybrid-v8-6-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <akvsuBcqCCzlrBLk@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <akvsuBcqCCzlrBLk@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178342187223.1892339.1923162787460489447.b4-ty@kernel.org>
 
-On 2026/07/07 2:58, Oliver Upton wrote:
-> On Mon, Jul 06, 2026 at 07:03:29PM +0900, Akihiko Odaki wrote:
->> +1.6 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY
->> +------------------------------------------------------
->> +
->> +:Parameters: no additional parameter in kvm_device_attr.addr
->> +
->> +:Returns:
->> +
->> +	 =======  ==================================================
->> +	 -EBUSY   PMUv3 already initialized, a VCPU has already run,
->> +		  an event filter has already been set or
->> +		  a hardware PMU has already been specified
->> +	 -ENXIO   Attempted to get before setting
->> +	 -ENODEV  Attempted to set while PMUv3 not supported
->> +	 =======  ==================================================
->> +
->> +If set, KVM emulates PMUv3 without programmable event counters. Only fixed
->> +counters are exposed to the guest: the cycle counter today, and the instruction
->> +counter if support for FEAT_PMUv3_ICNTR is added.
+On Tue, Jul 07, 2026 at 11:58:01AM +0100, Marc Zyngier wrote:
+> On Thu, 02 Jul 2026 10:38:37 +0000, Sebastian Ene wrote:
+> > This series fixes the Endpoint Memory Access Descriptor (EMAD) offset
+> > calculations and adds the necessary bounds checks for both the core
+> > FF-A driver and the pKVM hypervisor.
+> > 
+> > Prior to FF-A version 1.1, the memory region header didn't specify an
+> > explicit offset for the EMADs, leading to the assumption that they
+> > immediately follow the header.
+> > However, from v1.1 onwards, the specification dictates using the
+> > ep_mem_offset` field to determine the start of the memory access
+> > array.
+> > 
+> > [...]
 > 
-> Drop the mention of cycle counter and FEAT_PMUv3_ICNTR, I want to avoid
-> the argument later down the line when ICNTR support is added to this
-> mode.
+> Applied to fixes, thanks!
 > 
-> The expectation is that the VMM discovers the feature set using the ID
-> registers just like every other CPU feature. KVM documentation doesn't
-> need to describe the architecture.
-I'll drop it with the next version.
+> [3/6] KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
+>       commit: 8c6db30d79528279abbeb416e4f533f1f91b8724
+> [4/6] KVM: arm64: Validate the offset to the mem access descriptor
+>       commit: a6b49d27c17909608d54523220bb6f3498d4a1df
+> [5/6] KVM: arm64: Ensure FFA ranges are page aligned
+>       commit: 6a7a181f6921db3d9aed1bba7e15547fefd7eedc
+> [6/6] KVM: arm64: Zero out the stack initialized data in the FFA handler
+>       commit: 2bd3c6c702f3a9e2bcb3b536b0fbbaa645005d71
 
-> 
->> +With programmable counters disabled, the VCPU can run on any physical CPU.
->> +This is particularly useful on heterogeneous systems where different hardware
->> +PMUs cover different physical CPUs. All VCPUs in a VM share this attribute.
-> 
->    When this attribute is enabled, the vCPU can run on any physical CPU
->    that has a PMU, regardless of the underlying implementation. This
->    attribute is VM-scoped.
-> 
-> The documentation is focused on unambiguously representing the UAPI, not
-> providing application recommendations.
+Thanks, Marc!
 
-I agree. I'll use your wording for the next version.
+I think Sudeep was also happy for the driver changes to go via the KVM
+tree, unless you'd prefer not to pick them up [1].
 
-> 
->>   2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->>   =================================
->>   
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index 1c13bfa2d38a..39a1a1e412e6 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -437,6 +437,7 @@ enum {
->>   #define   KVM_ARM_VCPU_PMU_V3_FILTER		2
->>   #define   KVM_ARM_VCPU_PMU_V3_SET_PMU		3
->>   #define   KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS	4
->> +#define   KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY	5
->>   #define KVM_ARM_VCPU_TIMER_CTRL		1
->>   #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->>   #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index 40cad183376c..ad9ff4d0d89c 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -1149,11 +1149,13 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
->>   		arm_pmu = entry->arm_pmu;
->>   		if (arm_pmu->pmu.type == pmu_id) {
->>   			if (kvm_vm_has_ran_once(kvm) ||
->> +			    kvm_pmu_fixed_counters_only(kvm) ||
->>   			    (kvm->arch.pmu_filter && kvm->arch.arm_pmu != arm_pmu)) {
->>   				ret = -EBUSY;
->>   				break;
->>   			}
->>   
->> +			set_bit(KVM_ARCH_FLAG_PMU_V3_EXPLICIT, &kvm->arch.flags);
-> 
-> Why is this flag necessary? kvm->arch.arm_pmu is NULL if no PMU
-> implementation was selected by userspace.
+Will
 
-The explicit flag is there because kvm->arch.arm_pmu is also populated
-by KVM_ARM_VCPU_INIT through kvm_arm_set_default_pmu(). I wanted to keep
-allowing userspace to enable FIXED_COUNTERS_ONLY after that default PMU
-selection, as long as PMUv3 has not been initialized and the VM has not
-run, while still rejecting it after an explicit SET_PMU.
-
-> 
->>   			kvm_arm_set_pmu(kvm, arm_pmu);
->>   			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
->>   			ret = 0;
->> @@ -1164,6 +1166,22 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
->>   	return ret;
->>   }
->>   
->> +static int kvm_arm_pmu_v3_set_pmu_fixed_counters_only(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +
->> +	lockdep_assert_held(&kvm->arch.config_lock);
->> +
->> +	if (kvm_vm_has_ran_once(kvm) || kvm->arch.pmu_filter ||
->> +	    test_bit(KVM_ARCH_FLAG_PMU_V3_EXPLICIT, &kvm->arch.flags))
->> +		return -EBUSY;
->> +
->> +	set_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &kvm->arch.flags);
->> +	kvm_arm_set_nr_counters(kvm, 0);
->> +
->> +	return 0;
->> +}
->> +
->>   static int kvm_arm_pmu_v3_set_nr_counters(struct kvm_vcpu *vcpu, unsigned int n)
->>   {
->>   	struct kvm *kvm = vcpu->kvm;
->> @@ -1238,7 +1256,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>   		     filter.action != KVM_PMU_EVENT_DENY))
->>   			return -EINVAL;
->>   
->> -		if (kvm_vm_has_ran_once(kvm))
->> +		if (kvm_vm_has_ran_once(kvm) || kvm_pmu_fixed_counters_only(kvm))
-> 
-> There's no reason for doing this, just let userspace create an event
-> filter. Even with the current PMU implementation it's possible that the
-> fixed cycle counter gets filtered.
-
-This check was added as the consequence of the discussion in the 
-following thread:
-https://lore.kernel.org/all/327f74e4-78b8-4629-a418-d1d3ba78859f@rsg.ci.i.u-tokyo.ac.jp/
-
-Regards,
-Akihiko Odaki
+[1] https://lore.kernel.org/r/20260518-heavy-intelligent-partridge-ddc80b@sudeepholla
