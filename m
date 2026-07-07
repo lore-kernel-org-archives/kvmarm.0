@@ -1,232 +1,145 @@
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649B930100E
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 11:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8256D3FA5EB
+	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 11:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783423753; cv=none; b=RI0e1zPPGi3J2VaXVkcEgK9lYdLCENPec9moBAoGELjlrot+v3IpoQ70qIdQy80E4Icq7Gvzei6BSE631ECJ9tMwxzlzGu3F/608oZK1fvC/IH9VN5twmNfjBiHTaNOPGwr8zxVW/QfoMPw9txN/eH8mTL1cYA6BIb2LqqcshFo=
+	t=1783424038; cv=none; b=NYbpHgmzUwnI0UiaIqiwwaXluGTB1R8h75HzInrii/u5nKop3s2WjamfewNDNAlDpjgL0ncLfaCnVzT4UDKa4j8aGvL/URmE/6l3zEwZlzTijSnAuYz11J9a9UW0ddbymjlE9peUq6doOWIL0pMyW0riWq+OBAFT3HmO8M5Df/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783423753; c=relaxed/simple;
-	bh=onBhDyqzL4dpAY4chrVkKmkoS4sjWp6Os00FF9DRTZs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tb7+4SXr4l0pbOZjbbZWr7QIU8TLiGLz41sfC9ayVpjQKnArgr/Us7covpsPfZPEBXuok5DAcCXbIcHjg+2DNR2aLeUHWAW1c9QVuuKj5W8rs9Tf/XS9hC6Snh7IqaTk0J8jt8/Pb7OLIWAS/XNT6RC/O8ocrQY6GyjihNR5BQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=pUJ/OyF7 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+	s=arc-20240116; t=1783424038; c=relaxed/simple;
+	bh=1XAe2ZUhlvOC7QtmdS5UOWU2IRYchF7auYMnIfgw640=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cLI6UqUdgt3PjYwz+K1PgsLwE2Y5CTOH753MqDne5QyxvQzQfPxNE8x14UrJxwn9hZlz/WWTq0GEDig0XYbnMyu7zWzo0SHsovxHanW20lPyptssqqXEew5S4lrR2rVLXRZ9mp2J6px0cYKUXLd91QvSoB2daLYhPGeBTyrA/do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hi0VXlpI; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="pUJ/OyF7"
-Received: from [133.11.54.183] (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 667BNfJs005495
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 7 Jul 2026 20:23:42 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=FbPusrcXPnpYFyMiIMTwRTROLwgbaX8b1Agwe0KIe8E=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20250326; t=1783423422; v=1;
-        b=pUJ/OyF7ICHeyUEuLdKMr4YCFsLqDapVuMRnLQ1VG7qoZLxt4aFcFeO4o7kJliWn
-         H3b7btpDubqYTMc9GZCHY5WXZStHC0PvxFiMDD07iruin19bvrgV4oOrmbqrFwGL
-         2e6SFbIbSZA2dMHu2Ue3tvi0icj3flekDGu400ANaIoILfDXU2YSG92LLbGEfKwY
-         qeakxzWWZshEsXfQfd+3pw9cJNbdEwZEsTMAMFX1PtjbqZUypMMGWCmgWfK2C6AI
-         gS95j9Ph4YatoHewtYhkaTotazxRpdOEUFGz1u8zd/R7Fg7xuNZKLxD6q/fhCtwI
-         dK+JUrYcPvBaufMKvSU3Lw==
-Message-ID: <cb5d5f13-a1a9-47dd-a717-5533a8b32b20@rsg.ci.i.u-tokyo.ac.jp>
-Date: Tue, 7 Jul 2026 20:23:41 +0900
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hi0VXlpI"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38834175D;
+	Tue,  7 Jul 2026 04:33:51 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.2.213.26])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 54FB93F85F;
+	Tue,  7 Jul 2026 04:33:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783424035; bh=1XAe2ZUhlvOC7QtmdS5UOWU2IRYchF7auYMnIfgw640=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hi0VXlpIpiZ82hwRLQm5Vofkrk3YhxHCdOoNNs87xSBVSU1V0U0EEvdkkvK+DS0lg
+	 GrfYYYtPrsBtb28egqmvgPcoydYQi2cefyaHB0nb2TN7baSbudDSaiSIlHOQmmL6Ze
+	 Z1t3wvX4dTb6+G7meqSLeiOJ7g2ZDlU5HIc2HFYs=
+Date: Tue, 7 Jul 2026 12:33:49 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 06/28] KVM: arm64: Classify CPTR_EL2 as a SR_LOC_SPECIAL
+ register
+Message-ID: <20260707113349.GA922094@e124191.cambridge.arm.com>
+References: <20260702160248.1377250-1-maz@kernel.org>
+ <20260702160248.1377250-7-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 5/7] KVM: arm64: PMU: Implement fixed-counters-only
- emulation
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <20260706-hybrid-v8-5-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <akvyvclUQ2b2YHiU@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <akvyvclUQ2b2YHiU@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702160248.1377250-7-maz@kernel.org>
 
-On 2026/07/07 3:23, Oliver Upton wrote:
-> On Mon, Jul 06, 2026 at 07:03:28PM +0900, Akihiko Odaki wrote:
->> Add internal state for PMUv3 emulation without programmable event
->> counters. When fixed-counters-only mode is active, KVM reports no
->> programmable counters and hides PMCEID, avoiding event-counter state
->> whose behavior can depend on the selected hardware PMU.
->>
->> The cycle counter still uses a host perf event. Unlike the normal PMU
->> path, fixed-counters-only mode may create that event from the hardware
->> PMU attached to the VCPU's current pCPU. If the VCPU later loads on a
->> pCPU that is not covered by the existing event's PMU, request a PMU
->> reload so the cycle counter can be recreated against the new pCPU's PMU.
->> Keep this affinity check limited to fixed-counters-only VMs; the normal
->> programmable-counter mode continues to use the VM-wide PMU and does not
->> need per-load reload decisions.
->>
->> Add a separate internal flag for explicit userspace PMU selection. The
->> UAPI wiring added later will use it to keep explicit PMU selection and
->> fixed-counters-only mode mutually exclusive while still allowing
->> fixed-counters-only mode to replace the default PMU selected during
->> KVM_ARM_VCPU_INIT.
->>
->> The UAPI wiring that sets the fixed-counters-only flag and records
->> explicit PMU selection is added later in the series.
->>
->> Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
->> ---
->>   arch/arm64/include/asm/kvm_host.h |  4 ++++
->>   arch/arm64/kvm/arm.c              |  1 +
->>   arch/arm64/kvm/pmu-emul.c         | 43 +++++++++++++++++++++++++++++++++++++--
->>   include/kvm/arm_pmu.h             |  2 ++
->>   4 files changed, 48 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 0c39d9db7d57..aa07b05b8231 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -353,6 +353,10 @@ struct kvm_arch {
->>   #define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS		10
->>   	/* Unhandled SEAs are taken to userspace */
->>   #define KVM_ARCH_FLAG_EXIT_SEA				11
->> +	/* PMUv3 is emulated with an explicitly specified hardware PMU */
->> +#define KVM_ARCH_FLAG_PMU_V3_EXPLICIT			12
->> +	/* PMUv3 is emulated without progammable event counters */
->> +#define KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY	13
->>   	unsigned long flags;
->>   
->>   	/* VM-wide vCPU feature set */
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 68767bb08285..1cc7754d5ace 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -687,6 +687,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>   	if (has_vhe())
->>   		kvm_vcpu_load_vhe(vcpu);
->>   	kvm_arch_vcpu_load_fp(vcpu);
->> +	kvm_vcpu_load_pmu(vcpu);
->>   	kvm_vcpu_pmu_restore_guest(vcpu);
->>   	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->>   		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index e70628653e4b..40cad183376c 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -96,6 +96,11 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
->>   	return mask;
->>   }
->>   
->> +static bool kvm_pmu_fixed_counters_only(struct kvm *kvm)
->> +{
->> +	return test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &kvm->arch.flags);
->> +}
->> +
->>   /**
->>    * kvm_pmc_is_64bit - determine if counter is 64bit
->>    * @pmc: counter context
->> @@ -343,7 +348,11 @@ u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu)
->>   
->>   static void kvm_pmc_enable_perf_event(struct kvm_pmc *pmc)
->>   {
->> -	if (!pmc->perf_event) {
->> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->> +
->> +	if (!pmc->perf_event ||
->> +	    (kvm_pmu_fixed_counters_only(vcpu->kvm) &&
->> +	     !cpumask_test_cpu(vcpu->cpu, &to_arm_pmu(pmc->perf_event->pmu)->supported_cpus))) {
->>   		kvm_pmu_create_perf_event(pmc);
->>   		return;
->>   	}
->> @@ -720,6 +729,12 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->>   	int eventsel;
->>   	u64 evtreg;
->>   
->> +	if (kvm_pmu_fixed_counters_only(vcpu->kvm)) {
->> +		arm_pmu = kvm_pmu_probe_armpmu(vcpu->cpu);
->> +		if (WARN_ON_ONCE(!arm_pmu))
->> +			return;
->> +	}
->> +
->>   	evtreg = kvm_pmc_read_evtreg(pmc);
->>   
->>   	kvm_pmu_stop_counter(pmc);
->> @@ -748,7 +763,7 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->>   	 * Don't create an event if we're running on hardware that requires
->>   	 * PMUv3 event translation and we couldn't find a valid mapping.
->>   	 */
->> -	eventsel = kvm_map_pmu_event(vcpu->kvm->arch.arm_pmu, eventsel);
->> +	eventsel = kvm_map_pmu_event(arm_pmu, eventsel);
->>   	if (eventsel < 0)
->>   		return;
->>   
->> @@ -878,6 +893,9 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->>   	u64 val, mask = 0;
->>   	int base, i, nr_events;
->>   
->> +	if (kvm_pmu_fixed_counters_only(vcpu->kvm))
->> +		return 0;
->> +
+On Thu, Jul 02, 2026 at 05:02:26PM +0100, Marc Zyngier wrote:
+> It may not be obvious unless you look at it closely, but CPTR_EL2
+> is treated very differently from other registers. It is one the
+> registers that, despite looking very similar between EL1 and EL2
+> when E2H==1, have RES0 bits that get in the way.
 > 
-> Even if we advertise bits in PMCEID, does it matter? There's no PMC that
-> the guest could use to count it.
+> Make it clear that CPTR_EL2 is odd by classifying it as SR_LOC_SPECIAL,
+> just like CNTHCTL_EL2 (and for the same reasons). This makes it
+> possible to use vcpu_read_sys_reg() with it, and will be necessary
+> once we support FEAT_NV2P1.
 > 
-> I understand it isn't aesthetic but I really want to minimize the
-> special-casing that has to be done for this feature.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-This strictly ensures that sysregs are stable after migrating across 
-physical CPUs, which may have different PMCEID values.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  2 +-
+>  arch/arm64/kvm/sys_regs.c            | 20 ++++++++++++++++++--
+>  2 files changed, 19 insertions(+), 3 deletions(-)
 > 
->> +void kvm_vcpu_load_pmu(struct kvm_vcpu *vcpu)
->> +{
->> +	/*
->> +	 * ARMV8_PMU_INSTR_IDX will need the same check once
->> +	 * FEAT_PMUv3_ICNTR is supported.
->> +	 */
->> +	struct kvm_pmc *pmc = kvm_vcpu_idx_to_pmc(vcpu, ARMV8_PMU_CYCLE_IDX);
->> +	struct arm_pmu *cpu_pmu;
->> +
->> +	if (!kvm_pmu_fixed_counters_only(vcpu->kvm) ||
->> +	    !kvm_pmu_counter_is_enabled(pmc) || !pmc->perf_event)
->> +		return;
->> +
->> +	cpu_pmu = to_arm_pmu(pmc->perf_event->pmu);
->> +	if (!cpumask_test_cpu(vcpu->cpu, &cpu_pmu->supported_cpus))
->> +		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> 
-> Just detect the changing PMU implementation here, KVM_REQ_RELOAD_PMU
-> will need to detect the PMCs that require an update anyway. Stash the
-> last cpu in kvm_arch_vcpu_load() and pass it to this:
-> 
-> void kvm_vcpu_load_pmu(struct kvm_vcpu *vcpu, int last_cpu)
-> {
-> 	if (!kvm_pmu_fixed_counters_only(vcpu->kvm) || vcpu->cpu == last_cpu)
-> 		return;
-> 
-> 	if (kvm_pmu_probe_armpmu(vcpu->cpu) != kvm_pmu_probe_armpmu(last_cpu))
-> 		kvm_make_request(KVM_REQ_RELOAD_PMU);
-> }
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5bf3d7e1d92c7..9831166695186 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -617,7 +617,7 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+>   */
+>  static inline u64 vcpu_sanitised_cptr_el2(const struct kvm_vcpu *vcpu)
+>  {
+> -	u64 cptr = __vcpu_sys_reg(vcpu, CPTR_EL2);
+> +	u64 cptr = vcpu_read_sys_reg(vcpu, CPTR_EL2);
+>  
+>  	if (!vcpu_el2_e2h_is_set(vcpu))
+>  		cptr = translate_cptr_el2_to_cpacr_el1(cptr);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5d5c579d45790..6b47d936efb32 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -183,8 +183,6 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
+>  	switch (reg) {
+>  		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
+>  				  translate_sctlr_el2_to_sctlr_el1	     );
+> -		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
+> -				  translate_cptr_el2_to_cpacr_el1	     );
+>  		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
+>  				  translate_ttbr0_el2_to_ttbr0_el1	     );
+>  		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
+> @@ -210,6 +208,19 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
+>  		loc->loc = ((is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu)) ?
+>  			    SR_LOC_SPECIAL : SR_LOC_MEMORY);
+>  		break;
+> +	case CPTR_EL2:
+> +		/*
+> +		 * CPTR_EL2 is just as special, and needs a certain amount
+> +		 * of handholding. It always lives in memory, due to being
+> +		 * heavily trapped thanks to CPACR_EL1.TCPAC being RES0.
+> +		 * FEAT_NV2p1 fixes this.
+> +		 */
+> +		locate_mapped_el2_register(vcpu, CPTR_EL2, CPACR_EL1,
+> +					   translate_cptr_el2_to_cpacr_el1,
+> +					   loc);
+> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
+> +			loc->loc = SR_LOC_SPECIAL;
 
-It is a nice way to simplify the code and to avoid hardcoding 
-ARMV8_PMU_INSTR_IDX. I'll use the code for the next version.
+Very Minor thing here (feel free to ignore) is that this deviates from
+CNTHCTL_EL2 slightly in that it does: `loc->loc = .. ? SR_LOC : SR_LOC`..
 
-Regards,
-Akihiko Odaki
+> +		break;
+>  	default:
+>  		loc->loc = locate_direct_register(vcpu, reg);
+>  	}
+> @@ -314,6 +325,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
+>  			val &= CNTKCTL_VALID_BITS;
+>  			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
+>  			return val;
+> +		case CPTR_EL2:
+> +			return __vcpu_sys_reg(vcpu, reg);
+>  		default:
+>  			WARN_ON_ONCE(1);
+>  		}
+> @@ -359,6 +372,9 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg)
+>  			 */
+>  			write_sysreg_el1(val, SYS_CNTKCTL);
+>  			break;
+> +		case CPTR_EL2:
+> +			write_sysreg_el1(val, SYS_CPACR);
+> +			break;
+>  		default:
+>  			WARN_ON_ONCE(1);
+>  		}
+> -- 
+> 2.47.3
+> 
+
+Thanks,
+Joey
