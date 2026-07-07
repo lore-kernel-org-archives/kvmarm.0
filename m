@@ -1,147 +1,106 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC2242089E
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 07:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3AF320CD9;
+	Tue,  7 Jul 2026 07:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783410018; cv=none; b=dCrM/5bc65npkgx1aVFHs0GZfW5cXQVEcW0S1RjLg8Sp54tZd2kTuDwBeXozEqEQbAxXL+oDz8LXLfTVRwXOfEX6RJAtkNpFbXZfytOzjeUJybZpKmnkrGWnzHFDfcruNJxLzgwcQsG5cpLcCZVheZ0a8raj/X4OTetukz+/NG4=
+	t=1783411134; cv=none; b=tzPSnNSv1NpU7IfxcZgO5hQpukX42qlfVG4So1WrlofzzMmmuCG6WNrRJhjnRlPrDxI59LJ0eBcq4Tl5/OAxa0F3Pn8Ryw55hV5oILSZiSABVyWXKsI/WHwo2quHKcwQVMuEKKxQwnk6T0LnqNXDm2ihn9McRelSC0BbECTmpIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783410018; c=relaxed/simple;
-	bh=N2YBLQ2q+JlwFKcecWltDkVVJM0NmmZbDmKRyhij1Pc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gDF6dRLX+6gSXzQNdPnD2Cm3yOGdbqsQVwtdpu5NhyWL3MCykXzTGGtQJdexvglL8OC4ozRO552jEO913ySDtyWs4QxtaHwa58mIJMyEPbIwnq4sOTDof92lrLiWaZ7VPgchRknwNV6wGDNYYzdWV4Zq7XlmX0VK78wcCu2Nvwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lEtT2GXI; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1783411134; c=relaxed/simple;
+	bh=GAtw8czhd2aMhjWO4X9p/ubNApLmoZ7OyAVteOFs1kA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YFJMNoL3j1cwI+UrJcAWRcL15Znlg+eSAgshWhigmY8J8V7KxNsCxxojwbVa3cm2gJ/sv1M2b2VzBIjAjBgfYvCnvSG/Z8kjpRegnmMvbEXtFycGrZpwVgbnGTQZo9UVD1yQ1iVYf9P21OhgFkChbcaUSwrMsw+Y0lCf9xk/X+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F9dO4cZw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lEtT2GXI"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6674IDBi2725423;
-	Tue, 7 Jul 2026 07:40:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=1d2VBan8/XM9utBiTkiyVaE7rbR0Nx
-	uli4JKEtTFc8M=; b=lEtT2GXICudrfpNmeInB/4FfnpK7pKmaAxmWJVtsDV2jW8
-	Eh8wmRx6R+Gut8wPztuXxgw/vlh1aWc2qWYzXmllwEJ9b7eybg+TOTPiCrLfQSA1
-	mRejkv6x2MjiLf8FtkcKMdf9GA+SpZv4q9J8Ef9IwNOAwS/8XMudUTzPZ9530jj7
-	E2P30NheIfHRnCyp5u6UcWSnWeZ2v/RUtUHD0XtG09X+XR6xfqbqwnJGoLdDB/EH
-	I5JBZfwlP1tSNJxfz6unZNfnO4140rrAgpWGUhN7QMAb9tSH3q+yhWzFKQBq5G8c
-	idfVC7WVmYrm7qBoVQbc65heO+zAxR3zm3fuUmUw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6suqnkcq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jul 2026 07:40:04 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6677YaOB008650;
-	Tue, 7 Jul 2026 07:40:03 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7cgq1sg7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jul 2026 07:40:03 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6677dxBI51446060
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Jul 2026 07:39:59 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 941A32004F;
-	Tue,  7 Jul 2026 07:39:59 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3504E2004B;
-	Tue,  7 Jul 2026 07:39:59 +0000 (GMT)
-Received: from osiris (unknown [9.224.76.185])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue,  7 Jul 2026 07:39:59 +0000 (GMT)
-Date: Tue, 7 Jul 2026 09:39:58 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 01/27] VFIO: take reference to the KVM module
-Message-ID: <20260707073958.583632-B-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-2-seiden@linux.ibm.com>
- <20260706195313.GE118978@ziepe.ca>
- <akwaVzghHzi8o8fK@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9dO4cZw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B1E41F000E9;
+	Tue,  7 Jul 2026 07:58:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783411133;
+	bh=tpIOncymRCGSppNzLVX19mro9eWiUYLlNmVFoYEKqAI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=F9dO4cZwh1Vri6X2ijnhDlSIeGJOGovGYffqHyySj7nzYEr2MILNdMg3efat6xdz3
+	 5Ej2/E5dObGvSw3d/Q9kdz2yamr7Sbv1eGDcdL8t051hapZVIlF7hV3lHBJgYNjsvU
+	 i3vQfU/QdAaktekq4NtBAUy1WNHsXsEDzsLZWMAXA5pCsW8CQzVRDBe0meaHOC0w/l
+	 WgaxpM+DiBSUkS7ZKgTLHAiPmzDZVZ2qGD4lLNBmXFXz4s0OlYElT3DVdt8cEHq1be
+	 MUDdt1KW/xM50igh6KWtmse79REct2ygy6jJ15qjiFTUf6i3Y151sUTUxjqPrnthLo
+	 uytkDo8ScI+qg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wh0hf-00000002I1m-0pfp;
+	Tue, 07 Jul 2026 07:58:51 +0000
+Date: Tue, 07 Jul 2026 08:58:50 +0100
+Message-ID: <86bjcjp6x1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	devel@daynix.com,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] KVM: arm64: PMU: Use multiple host PMUs
+In-Reply-To: <akvzxDwZbj_sZ4pI@kernel.org>
+References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+	<akvzxDwZbj_sZ4pI@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akwaVzghHzi8o8fK@google.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA3MDA2OSBTYWx0ZWRfXysR8zSDAEOBH
- 4x5xHPncdCmEZG24O4GLzeODqCXEzIARoD+2bCONtp17c+bEVbxINx14SyxMjvPB0O3V6nSaw6B
- 9/a3WbPOJOja3fcoN0AJjkJnSchJKxk=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA3MDA2OSBTYWx0ZWRfXyP4Hzwh8Cw5z
- dY4Mx1OFCm4qeu9UxNKbSgqE6ke0fKSKIGXo7qLDzhILzFZIZB9otVhz/rtalbVrMHNVq2JBJ4m
- IaZjbrOHZJHZQcBvxL6T1D/oeIoqPUo/ftxc79rqeIBf+Edrmae3WM+skt3jeaNrHlyp3SscJIQ
- 6xZUfP7BpcWsltTRzoy/89bHHoUPZvETetwoUMzhdc+mpREEWHAAAINMxDpxCDRvAwfiHMt2yqO
- 1HFCuXfibiDfImQyb7E8TT1bFX1mHdsYYkp4/1cufmCtuwUAJn4CCUMtN1Jcr7oGdFzXCrryAoD
- kynir/mGuVDLfNxxb0dkAYBtmdx2qoafg4EGRwy1E6vBKvtbXqYVjKpTDf0WMa4eeMghAGs3Pzf
- gC7CJziQuysqBLV3fgpJdQxACoUm5oOXtlTjiW2cyfXxa8C4ZKc0dY/NpRzWTtQgK7j0rC1bHKY
- mBQy5dnIwfFHl4drcDg==
-X-Proofpoint-GUID: HSBOqlTnliJyzGOBDLWHxtevcP-AF-dI
-X-Authority-Analysis: v=2.4 cv=Oot/DS/t c=1 sm=1 tr=0 ts=6a4cad55 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
- a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=Ubti9o167-X3AsrDlZIA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: bmiDYJpYbB5YE7vJNJudbxkVJtNQZl-h
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-07_01,2026-07-06_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 lowpriorityscore=0 clxscore=1011 impostorscore=0 phishscore=0
- malwarescore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607070069
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, odaki@rsg.ci.i.u-tokyo.ac.jp, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, skhan@linuxfoundation.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jul 06, 2026 at 02:12:55PM -0700, Sean Christopherson wrote:
-> On Mon, Jul 06, 2026, Jason Gunthorpe wrote:
-> > On Mon, Jul 06, 2026 at 10:52:01AM +0200, Steffen Eiden wrote:
-> > > From: Paolo Bonzini <pbonzini@redhat.com>
-> > > 
-> > > VFIO is implicitly taking a reference to the KVM module between
-> > > vfio_device_get_kvm_safe and vfio_device_put_kvm, thanks to
-> > > symbol_get and symbol_put.
-> > 
-> > I thought we weren't doing this approach? Use the struct file as the
-> > kvm handle. I thought I saw patches doing that already?
+On Mon, 06 Jul 2026 19:28:20 +0100,
+Oliver Upton <oupton@kernel.org> wrote:
 > 
-> +1, my joking-but-serious NAK stands.
+> On Mon, Jul 06, 2026 at 07:03:23PM +0900, Akihiko Odaki wrote:
+> > Akihiko Odaki (7):
+> >       KVM: arm64: Disallow vPMU when pPMUs do not cover all CPUs
+> >       KVM: arm64: PMU: Protect the list of PMUs with RCU
+> >       KVM: arm64: PMU: Pass the pPMU to kvm_map_pmu_event()
+> >       KVM: arm64: PMU: Pass the target CPU to kvm_pmu_probe_armpmu()
+> >       KVM: arm64: PMU: Implement fixed-counters-only emulation
+> >       KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
+> >       KVM: arm64: selftests: Test PMU_V3_FIXED_COUNTERS_ONLY
 > 
-> https://lore.kernel.org/all/adf29Rn7q9Db0hxc@google.com
+> Thanks for respinning the series, I left some comments. I'd really like
+> to get this feature picked up, hope you have cycles to work on it soon.
+> 
+> FWIW, we're considering adding a new vCPU feature flag to deprecate all
+> the ugliness of the old PMUv3 UAPI. I'm tempted to say that the
+> FIXED_COUNTERS_ONLY feature is conditioned on the new feature flag...
 
-My bad, I did not cover this topic in the cover letter: 
+It'd be good to have a strawman proposal on the list if we are going
+to change add a new API, specially if this is likely to gate new code.
 
-I included those tree patches so that the rest of the series links in all configurations.
-I know we will not use this approach to mitigate this issue.
+Thanks,
 
-	Steffen
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
