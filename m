@@ -1,138 +1,119 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82023ED135
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 13:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E96313E29;
+	Tue,  7 Jul 2026 14:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783432526; cv=none; b=LVoWmDB2v9PwepdcHslJEeYHC1ohpGM46CnZiNlAlQZ8+Wz8hXIL249TrC+91vDtOLZpvHgOBembdKhJHdOzLjuRcJ3vsSf0Gpxg00sPPD4XNZVRIF5y6a9v0Joe1csez8t2+FUmfa/B6BqMTRCO2iDHj0GbIf76Cm9mxyTwRK0=
+	t=1783433010; cv=none; b=mk1YK10y42+PlCwRAEcAGg23+oqTMVdhAZSbCN8uHzMWdnrSg+0L6O9RHz9Fp2eAQl8ZR8BHVpMGJSvFN6Sr+8fKE4pZOa6eQEB8pTnWWyUWM0/TdwiB18ETB8PRrtG0I5/25/xslsPplht7P72hX1guolOhSMMseTgql4wXi/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783432526; c=relaxed/simple;
-	bh=ICx3pfpfzRC6B2jMY/97ptCXRIXl9HJdina4SUTaGAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=anwIyExbp1yHUwFwfMROLDJPnYNCpTUoPr2VtH4qVkpSZKlO8GSx5RRJ7HJ0tOwfSvSOgMrEOQoVqbEGd4sJo2OcyeSwwgvXtqRTig6Q5brM7BljnHg5LbScyrrKRU+YHTtO5OV/W9VCQFmJVo8D9cqaO+ZW4lSd30IzWXE+rPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=r8of3wY/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783433010; c=relaxed/simple;
+	bh=il2J2gdV62bj82WEBJwjQ4QoNdv/Fpkk+Qw1CgrRbvk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a5921kFO2qdtYR/0vuvtG776Bp2d4YJ+i4NyZPcYwHe97KoqmpYmEzeQglfSLAYplQk5B4GulP40ovjVMzfqeTGcceZ/3glJd2VPgaTQeeeI9o0cw4lI5+B6BxsLy2ZaJ9AfVb0degjocasrW8TPPmhCo9WDAyfVP9BfzbIE4KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0bldvom; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="r8of3wY/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC5311A2D;
-	Tue,  7 Jul 2026 06:55:19 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.2.213.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CCEDD3F85F;
-	Tue,  7 Jul 2026 06:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783432524; bh=ICx3pfpfzRC6B2jMY/97ptCXRIXl9HJdina4SUTaGAk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r8of3wY/XjYZJZHOKfxPdd3GPh2MArwl/HPgItGmZ8ELFmveS/0aL84ZcirScE/6l
-	 zwmexmBW7XqSC+Sez/ExU6fNBrPDYNBHE1ssBv2Cfu2IogXLmnwYcbRJfOUZvv6EV4
-	 Bwi8/2tor3fuOswaAjOycwBcWS5Xg3XHxBI/7z38=
-Date: Tue, 7 Jul 2026 14:55:20 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 09/28] KVM: arm64: Relax CPTR_EL2 handling when
- FEAT_NV2p1 is present
-Message-ID: <20260707135520.GB922094@e124191.cambridge.arm.com>
-References: <20260702160248.1377250-1-maz@kernel.org>
- <20260702160248.1377250-10-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0bldvom"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6BBE1F000E9;
+	Tue,  7 Jul 2026 14:03:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783433008;
+	bh=tTRBXbvulB91ZVKgj2dOdSPkdCSn+3IeDxDA7Og0HyM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=l0bldvom+caLP5yxjwhpxc1Q9tIBSGgD9FBkTCNJMcAJevbO//baG8pQfZCeo+7xM
+	 ZzKsLwooUHUpSwFStTa0zagHbVsoWeYNiSJjNPTTLtQBbbYB1oVuUcef9VytYQc4ii
+	 YoFbLm2ydM+E3L9+ky0G6zDJKMzZYQzyxlXlsAZkc80t7zyILm1zvwFtgRBsnGmSXd
+	 YcVWyDWQtiT+ZHVsov1P5XcmnZPm5YLFLSRM0ijyiCdVJg5FmlBoiENQygRBq4aBr/
+	 Ec1PbTPQ66iu8T8D/FoLUhkwJzKksZPp9EDXAkrKQi/UIGzn5SveUeWf2H2Q/8xQ9e
+	 ug22o/sZcoERg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wh6OU-00000002RFJ-3ZbS;
+	Tue, 07 Jul 2026 14:03:26 +0000
+Date: Tue, 07 Jul 2026 15:03:26 +0100
+Message-ID: <864iiaq4lt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: sudeep.holla@kernel.org,
+	catalin.marinas@arm.com,
+	oupton@kernel.org,
+	Sebastian Ene <sebastianene@google.com>,
+	jens.wiklander@linaro.org,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	android-kvm@google.com,
+	mrigendra.chaubey@gmail.com,
+	op-tee@lists.trustedfirmware.org,
+	perlarsen@google.com,
+	seiden@linux.ibm.com,
+	smostafa@google.com,
+	sumit.garg@kernel.org,
+	suzuki.poulose@arm.com,
+	vdonnefort@google.com,
+	yuzenghui@huawei.com
+Subject: Re: (subset) [PATCH v9 0/6] arm_ffa, KVM: Fix FF-A emad offset calculations
+In-Reply-To: <akzpaD3VmMp8Dq4S@willie-the-truck>
+References: <20260702103848.1647249-1-sebastianene@google.com>
+	<178342187223.1892339.1923162787460489447.b4-ty@kernel.org>
+	<akzpaD3VmMp8Dq4S@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260702160248.1377250-10-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, sudeep.holla@kernel.org, catalin.marinas@arm.com, oupton@kernel.org, sebastianene@google.com, jens.wiklander@linaro.org, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, mrigendra.chaubey@gmail.com, op-tee@lists.trustedfirmware.org, perlarsen@google.com, seiden@linux.ibm.com, smostafa@google.com, sumit.garg@kernel.org, suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jul 02, 2026 at 05:02:29PM +0100, Marc Zyngier wrote:
-> With FEAT_NV2P1, it is no longer necessary to trap CPTR_EL2 accesses
-> via CPACR_EL1, as CPACR_EL1.TCPAC is guaranteed to be stateful.
+On Tue, 07 Jul 2026 12:56:24 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Prevent such trapping and context switch CPACTR_EL1 in NV contexts
-> when NV2P1 is present.
+> On Tue, Jul 07, 2026 at 11:58:01AM +0100, Marc Zyngier wrote:
+> > On Thu, 02 Jul 2026 10:38:37 +0000, Sebastian Ene wrote:
+> > > This series fixes the Endpoint Memory Access Descriptor (EMAD) offset
+> > > calculations and adds the necessary bounds checks for both the core
+> > > FF-A driver and the pKVM hypervisor.
+> > > 
+> > > Prior to FF-A version 1.1, the memory region header didn't specify an
+> > > explicit offset for the EMADs, leading to the assumption that they
+> > > immediately follow the header.
+> > > However, from v1.1 onwards, the specification dictates using the
+> > > ep_mem_offset` field to determine the start of the memory access
+> > > array.
+> > > 
+> > > [...]
+> > 
+> > Applied to fixes, thanks!
+> > 
+> > [3/6] KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
+> >       commit: 8c6db30d79528279abbeb416e4f533f1f91b8724
+> > [4/6] KVM: arm64: Validate the offset to the mem access descriptor
+> >       commit: a6b49d27c17909608d54523220bb6f3498d4a1df
+> > [5/6] KVM: arm64: Ensure FFA ranges are page aligned
+> >       commit: 6a7a181f6921db3d9aed1bba7e15547fefd7eedc
+> > [6/6] KVM: arm64: Zero out the stack initialized data in the FFA handler
+> >       commit: 2bd3c6c702f3a9e2bcb3b536b0fbbaa645005d71
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Thanks, Marc!
+> 
+> I think Sudeep was also happy for the driver changes to go via the KVM
+> tree, unless you'd prefer not to pick them up [1].
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Ah, I missed that. Let me queue these suckers as well.
 
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 5 +++--
->  arch/arm64/kvm/hyp/vhe/switch.c         | 3 +++
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c      | 8 +++++---
->  arch/arm64/kvm/sys_regs.c               | 5 ++++-
->  4 files changed, 15 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 8e5f492f39086..7b27296c94607 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -108,9 +108,10 @@ static inline void __activate_cptr_traps_vhe(struct kvm_vcpu *vcpu)
->  	 * The architecture is a bit crap (what a surprise): an EL2 guest
->  	 * writing to CPTR_EL2 via CPACR_EL1 can't set any of TCPAC or TTA,
->  	 * as they are RES0 in the guest's view. To work around it, trap the
-> -	 * sucker using the very same bit it can't set...
-> +	 * sucker using the very same bit it can't set. FEAT_NV2p1 fixes it.
->  	 */
-> -	if (vcpu_el2_e2h_is_set(vcpu) && is_hyp_ctxt(vcpu))
-> +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1) &&
-> +	    vcpu_el2_e2h_is_set(vcpu) && is_hyp_ctxt(vcpu))
->  		val |= CPTR_EL2_TCPAC;
->  
->  	/*
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 3b76e0468317b..361d3f8344dd8 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -441,6 +441,9 @@ static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	u64 esr = kvm_vcpu_get_esr(vcpu);
->  	int rt;
->  
-> +	if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +		return false;
-> +
->  	if (!is_hyp_ctxt(vcpu) || esr_sys64_to_sysreg(esr) != SYS_CPACR_EL1)
->  		return false;
->  
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index be685b63e8cf2..6f0f046e4ca4e 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -42,10 +42,12 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
->  		u64 val;
->  
->  		/*
-> -		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
-> -		 * are always trapped, ensuring that the in-memory
-> -		 * copy is always up-to-date. A small blessing...
-> +		 * Without FEAT_NV2p1, we don't save CPTR_EL2, as accesses
-> +		 * to CPACR_EL1 are always trapped, ensuring that the
-> +		 * in-memory copy is always up-to-date. A small blessing...
->  		 */
-> +		if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +			__vcpu_assign_sys_reg(vcpu, CPTR_EL2, read_sysreg_el1(SYS_CPACR));
->  		__vcpu_assign_sys_reg(vcpu, SCTLR_EL2,	 read_sysreg_el1(SYS_SCTLR));
->  		__vcpu_assign_sys_reg(vcpu, TTBR0_EL2,	 read_sysreg_el1(SYS_TTBR0));
->  		__vcpu_assign_sys_reg(vcpu, TTBR1_EL2,	 read_sysreg_el1(SYS_TTBR1));
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 6b47d936efb32..1dfc1f88bec82 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -326,7 +326,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
->  			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
->  			return val;
->  		case CPTR_EL2:
-> -			return __vcpu_sys_reg(vcpu, reg);
-> +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +				return read_sysreg_el1(SYS_CPACR);
-> +			else
-> +				return __vcpu_sys_reg(vcpu, reg);
->  		default:
->  			WARN_ON_ONCE(1);
->  		}
-> -- 
-> 2.47.3
-> 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
