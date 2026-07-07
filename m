@@ -1,145 +1,196 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8256D3FA5EB
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 11:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E563F789C
+	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 11:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783424038; cv=none; b=NYbpHgmzUwnI0UiaIqiwwaXluGTB1R8h75HzInrii/u5nKop3s2WjamfewNDNAlDpjgL0ncLfaCnVzT4UDKa4j8aGvL/URmE/6l3zEwZlzTijSnAuYz11J9a9UW0ddbymjlE9peUq6doOWIL0pMyW0riWq+OBAFT3HmO8M5Df/Y=
+	t=1783424228; cv=none; b=UqQD3uRq/I/odt8axhJAF1yU6jseybxNq/HS79y5DaWg8tzulqA15D4fd6FzkS5AyHZTMmxw/eQ0s48iDf85J/B0XHnNNLdQjz6rjWfjFG3Lg8VSKQgQPr62pJFtXTlOoj2H16EJeL8hPldiEUYaw4RK1E0UoI6/GYqMsLQs4ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783424038; c=relaxed/simple;
-	bh=1XAe2ZUhlvOC7QtmdS5UOWU2IRYchF7auYMnIfgw640=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cLI6UqUdgt3PjYwz+K1PgsLwE2Y5CTOH753MqDne5QyxvQzQfPxNE8x14UrJxwn9hZlz/WWTq0GEDig0XYbnMyu7zWzo0SHsovxHanW20lPyptssqqXEew5S4lrR2rVLXRZ9mp2J6px0cYKUXLd91QvSoB2daLYhPGeBTyrA/do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hi0VXlpI; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783424228; c=relaxed/simple;
+	bh=zisHKAD74OWux5/tK8lytmVqjM6h3AIY4NHgLxcwVtg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s+S0PafmQmOkiwUdmvaKStUtphWjSGt6m3FEOAEQYd21FSxGdPVilThevqGIcN2UZEUrj4m5nEfGa0XEL1vjGJyMvhTGItMjkofpqoIEdBvRMrtQTHw9QrAt9VJFuWPNyRYa7d1HfwkXA6wFYDTboUP2ZJ0usU8GOWHIwS04Z8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=TJ9+WCJu reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hi0VXlpI"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38834175D;
-	Tue,  7 Jul 2026 04:33:51 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.2.213.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 54FB93F85F;
-	Tue,  7 Jul 2026 04:33:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783424035; bh=1XAe2ZUhlvOC7QtmdS5UOWU2IRYchF7auYMnIfgw640=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hi0VXlpIpiZ82hwRLQm5Vofkrk3YhxHCdOoNNs87xSBVSU1V0U0EEvdkkvK+DS0lg
-	 GrfYYYtPrsBtb28egqmvgPcoydYQi2cefyaHB0nb2TN7baSbudDSaiSIlHOQmmL6Ze
-	 Z1t3wvX4dTb6+G7meqSLeiOJ7g2ZDlU5HIc2HFYs=
-Date: Tue, 7 Jul 2026 12:33:49 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 06/28] KVM: arm64: Classify CPTR_EL2 as a SR_LOC_SPECIAL
- register
-Message-ID: <20260707113349.GA922094@e124191.cambridge.arm.com>
-References: <20260702160248.1377250-1-maz@kernel.org>
- <20260702160248.1377250-7-maz@kernel.org>
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="TJ9+WCJu"
+Received: from [133.11.54.183] (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 667BaXR6009375
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 7 Jul 2026 20:36:33 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=PC9H9+hfBUgJc1h9fKgLECYX3wbgWyiwPKt7KOMjAiE=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20250326; t=1783424194; v=1;
+        b=TJ9+WCJuvN2HY9GfRKpGwzZshGSjYSg+ZCQPyx+qgt+W3BRyH5dvAMZNxppn7WPz
+         KWg4fLBC8zWUuwbNrQrvtEciEtr3hzWw2BgyPziP7Tz9IAtBBJ96qe1kaSSZyN1a
+         CtNdBeuNKcYX6EG9UT8iaiSkatol3VYDd+FkjSQqNMVCD0ajPTR8LH/cQd2teirB
+         WhZc42jMhxC7y3nYH4eeUVst6bLixn5KanS+l+9ciFjtWUfnH5ZfdaGif2Sg3Z0o
+         iUTu6Pc2W3lxcodV0dFvbkAQDmL18va8K84f1tATGhEOsG/TV0InJ0JkrkuR1WFR
+         driv6wIpea3cPdDdCv26EA==
+Message-ID: <db672f83-a6c4-4d94-a959-930a624a7915@rsg.ci.i.u-tokyo.ac.jp>
+Date: Tue, 7 Jul 2026 20:36:32 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260702160248.1377250-7-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 6/7] KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu
+ <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <20260706-hybrid-v8-6-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <akvsuBcqCCzlrBLk@kernel.org>
+Content-Language: en-US
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <akvsuBcqCCzlrBLk@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 02, 2026 at 05:02:26PM +0100, Marc Zyngier wrote:
-> It may not be obvious unless you look at it closely, but CPTR_EL2
-> is treated very differently from other registers. It is one the
-> registers that, despite looking very similar between EL1 and EL2
-> when E2H==1, have RES0 bits that get in the way.
+On 2026/07/07 2:58, Oliver Upton wrote:
+> On Mon, Jul 06, 2026 at 07:03:29PM +0900, Akihiko Odaki wrote:
+>> +1.6 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY
+>> +------------------------------------------------------
+>> +
+>> +:Parameters: no additional parameter in kvm_device_attr.addr
+>> +
+>> +:Returns:
+>> +
+>> +	 =======  ==================================================
+>> +	 -EBUSY   PMUv3 already initialized, a VCPU has already run,
+>> +		  an event filter has already been set or
+>> +		  a hardware PMU has already been specified
+>> +	 -ENXIO   Attempted to get before setting
+>> +	 -ENODEV  Attempted to set while PMUv3 not supported
+>> +	 =======  ==================================================
+>> +
+>> +If set, KVM emulates PMUv3 without programmable event counters. Only fixed
+>> +counters are exposed to the guest: the cycle counter today, and the instruction
+>> +counter if support for FEAT_PMUv3_ICNTR is added.
 > 
-> Make it clear that CPTR_EL2 is odd by classifying it as SR_LOC_SPECIAL,
-> just like CNTHCTL_EL2 (and for the same reasons). This makes it
-> possible to use vcpu_read_sys_reg() with it, and will be necessary
-> once we support FEAT_NV2P1.
+> Drop the mention of cycle counter and FEAT_PMUv3_ICNTR, I want to avoid
+> the argument later down the line when ICNTR support is added to this
+> mode.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> The expectation is that the VMM discovers the feature set using the ID
+> registers just like every other CPU feature. KVM documentation doesn't
+> need to describe the architecture.
+I'll drop it with the next version.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |  2 +-
->  arch/arm64/kvm/sys_regs.c            | 20 ++++++++++++++++++--
->  2 files changed, 19 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5bf3d7e1d92c7..9831166695186 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -617,7 +617,7 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
->   */
->  static inline u64 vcpu_sanitised_cptr_el2(const struct kvm_vcpu *vcpu)
->  {
-> -	u64 cptr = __vcpu_sys_reg(vcpu, CPTR_EL2);
-> +	u64 cptr = vcpu_read_sys_reg(vcpu, CPTR_EL2);
->  
->  	if (!vcpu_el2_e2h_is_set(vcpu))
->  		cptr = translate_cptr_el2_to_cpacr_el1(cptr);
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5d5c579d45790..6b47d936efb32 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -183,8 +183,6 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
->  	switch (reg) {
->  		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
->  				  translate_sctlr_el2_to_sctlr_el1	     );
-> -		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
-> -				  translate_cptr_el2_to_cpacr_el1	     );
->  		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
->  				  translate_ttbr0_el2_to_ttbr0_el1	     );
->  		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
-> @@ -210,6 +208,19 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
->  		loc->loc = ((is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu)) ?
->  			    SR_LOC_SPECIAL : SR_LOC_MEMORY);
->  		break;
-> +	case CPTR_EL2:
-> +		/*
-> +		 * CPTR_EL2 is just as special, and needs a certain amount
-> +		 * of handholding. It always lives in memory, due to being
-> +		 * heavily trapped thanks to CPACR_EL1.TCPAC being RES0.
-> +		 * FEAT_NV2p1 fixes this.
-> +		 */
-> +		locate_mapped_el2_register(vcpu, CPTR_EL2, CPACR_EL1,
-> +					   translate_cptr_el2_to_cpacr_el1,
-> +					   loc);
-> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			loc->loc = SR_LOC_SPECIAL;
-
-Very Minor thing here (feel free to ignore) is that this deviates from
-CNTHCTL_EL2 slightly in that it does: `loc->loc = .. ? SR_LOC : SR_LOC`..
-
-> +		break;
->  	default:
->  		loc->loc = locate_direct_register(vcpu, reg);
->  	}
-> @@ -314,6 +325,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
->  			val &= CNTKCTL_VALID_BITS;
->  			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
->  			return val;
-> +		case CPTR_EL2:
-> +			return __vcpu_sys_reg(vcpu, reg);
->  		default:
->  			WARN_ON_ONCE(1);
->  		}
-> @@ -359,6 +372,9 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg)
->  			 */
->  			write_sysreg_el1(val, SYS_CNTKCTL);
->  			break;
-> +		case CPTR_EL2:
-> +			write_sysreg_el1(val, SYS_CPACR);
-> +			break;
->  		default:
->  			WARN_ON_ONCE(1);
->  		}
-> -- 
-> 2.47.3
+>> +With programmable counters disabled, the VCPU can run on any physical CPU.
+>> +This is particularly useful on heterogeneous systems where different hardware
+>> +PMUs cover different physical CPUs. All VCPUs in a VM share this attribute.
 > 
+>    When this attribute is enabled, the vCPU can run on any physical CPU
+>    that has a PMU, regardless of the underlying implementation. This
+>    attribute is VM-scoped.
+> 
+> The documentation is focused on unambiguously representing the UAPI, not
+> providing application recommendations.
 
-Thanks,
-Joey
+I agree. I'll use your wording for the next version.
+
+> 
+>>   2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>>   =================================
+>>   
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 1c13bfa2d38a..39a1a1e412e6 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -437,6 +437,7 @@ enum {
+>>   #define   KVM_ARM_VCPU_PMU_V3_FILTER		2
+>>   #define   KVM_ARM_VCPU_PMU_V3_SET_PMU		3
+>>   #define   KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS	4
+>> +#define   KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY	5
+>>   #define KVM_ARM_VCPU_TIMER_CTRL		1
+>>   #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>>   #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>> index 40cad183376c..ad9ff4d0d89c 100644
+>> --- a/arch/arm64/kvm/pmu-emul.c
+>> +++ b/arch/arm64/kvm/pmu-emul.c
+>> @@ -1149,11 +1149,13 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+>>   		arm_pmu = entry->arm_pmu;
+>>   		if (arm_pmu->pmu.type == pmu_id) {
+>>   			if (kvm_vm_has_ran_once(kvm) ||
+>> +			    kvm_pmu_fixed_counters_only(kvm) ||
+>>   			    (kvm->arch.pmu_filter && kvm->arch.arm_pmu != arm_pmu)) {
+>>   				ret = -EBUSY;
+>>   				break;
+>>   			}
+>>   
+>> +			set_bit(KVM_ARCH_FLAG_PMU_V3_EXPLICIT, &kvm->arch.flags);
+> 
+> Why is this flag necessary? kvm->arch.arm_pmu is NULL if no PMU
+> implementation was selected by userspace.
+
+The explicit flag is there because kvm->arch.arm_pmu is also populated
+by KVM_ARM_VCPU_INIT through kvm_arm_set_default_pmu(). I wanted to keep
+allowing userspace to enable FIXED_COUNTERS_ONLY after that default PMU
+selection, as long as PMUv3 has not been initialized and the VM has not
+run, while still rejecting it after an explicit SET_PMU.
+
+> 
+>>   			kvm_arm_set_pmu(kvm, arm_pmu);
+>>   			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
+>>   			ret = 0;
+>> @@ -1164,6 +1166,22 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+>>   	return ret;
+>>   }
+>>   
+>> +static int kvm_arm_pmu_v3_set_pmu_fixed_counters_only(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +
+>> +	lockdep_assert_held(&kvm->arch.config_lock);
+>> +
+>> +	if (kvm_vm_has_ran_once(kvm) || kvm->arch.pmu_filter ||
+>> +	    test_bit(KVM_ARCH_FLAG_PMU_V3_EXPLICIT, &kvm->arch.flags))
+>> +		return -EBUSY;
+>> +
+>> +	set_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &kvm->arch.flags);
+>> +	kvm_arm_set_nr_counters(kvm, 0);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   static int kvm_arm_pmu_v3_set_nr_counters(struct kvm_vcpu *vcpu, unsigned int n)
+>>   {
+>>   	struct kvm *kvm = vcpu->kvm;
+>> @@ -1238,7 +1256,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>   		     filter.action != KVM_PMU_EVENT_DENY))
+>>   			return -EINVAL;
+>>   
+>> -		if (kvm_vm_has_ran_once(kvm))
+>> +		if (kvm_vm_has_ran_once(kvm) || kvm_pmu_fixed_counters_only(kvm))
+> 
+> There's no reason for doing this, just let userspace create an event
+> filter. Even with the current PMU implementation it's possible that the
+> fixed cycle counter gets filtered.
+
+This check was added as the consequence of the discussion in the 
+following thread:
+https://lore.kernel.org/all/327f74e4-78b8-4629-a418-d1d3ba78859f@rsg.ci.i.u-tokyo.ac.jp/
+
+Regards,
+Akihiko Odaki
