@@ -1,126 +1,172 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4811F43784E
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jul 2026 17:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738D8225791;
+	Tue,  7 Jul 2026 18:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783444364; cv=none; b=rcbEgTpjXvrHNDkWJSumXVgCwngjFTtJy6XTYNDVcdotyKQxgausfk576CwiFOWOcQ5stFy90xTSPahL+fGXpIU15SKVa5kBjYn1WJLVuMAd2OAQWj8njbkJM7ZV2FCnIzuFh2Q2tw1RcgkXuO0uSW7ewUAU8SH09dkJJF4th+M=
+	t=1783447360; cv=none; b=qhcdcUwjLV9Ba5F85Wt3bZ4B0+fFibMzSDi4fCCnopFap95dbJnJwwErK4SafWQGbT6JzQtq/r/Bg37m1v1a6aYURSfslnHhj4qNPiL9wFfLAnM6LHdhje0Mgr8/TGoxCldoHq7zT2MT1OxKz1xTGOn5RG/sHFoGxH489ALO5QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783444364; c=relaxed/simple;
-	bh=FFjXvxdIEmW78NOb7O4ot75fXMGl848EVDxXEcHT2kM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ogNL3CWre4G1YdjB1bx93nj2JCQEk58P1qJ5njeF/E6DxpjitG3GZ9YSmog++2WA+fmbhZW3qEDfc9jd0AIGByMEuLZjvm1vKx/jOgM0vLkqzpJM7cIwu7OEiTB1uRUYJOkNlTK31v0iJntwkyrG8BIaw2oB8xKAZP46x0a9kNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tIm726sr; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1783447360; c=relaxed/simple;
+	bh=v5UE4CN/5U1UeycwVcqpmK3ZPN8kJbKTuuCG+EL1iLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Il+ij5X9Y384JJmfhQppciOmcycKQD6liBipyP2qW191VinXaxH/s01uXSlaIelFhcCfum3GZyQe2uh9rl3ISv0GnuTALH8x1LMCM6HP2HcGvOYk0M9nQeHayh/z4Sp+BakD+FVrPlvT4bCXKmKq+PMZL8xz+hpeEwq8VaDn5NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+Vnbwou; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tIm726sr"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c892143db7fso3916818a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 07 Jul 2026 10:12:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783444363; x=1784049163; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=mjL5lkh4mRywMsy9wb/JKlBVu6SpNdiAeQ5oUXhs6l4=;
-        b=tIm726srCBhFit6IFKWt129Ue+j6++9hWWdO6gQCemnD2et94VuHww855l5M/Z3CQl
-         9VkcNdK+JLI5fv3ofvG/tKAad/VviwKU8dwWaq/63Snx3dMghoMIktiJmDNKmdqMGY3y
-         xqNC57qPfENzarWb4+wbTaDMWjYPkYlLJJ9R7FhBwuI1fRMIrJszPJFNuoDyVBFfjfCG
-         XJEhDxgCcQTXwSAS+hUkxN3MZC4IuJjimlU97jldytFDYOApgG2viyqckv+0jzpI0odB
-         i1zcgD7/gAPUTVgd/ClWuwvo+OXb79mBGXi5bWplCbi74H7V7NSlWmD8F77craTjOx2A
-         8Idw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783444363; x=1784049163;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mjL5lkh4mRywMsy9wb/JKlBVu6SpNdiAeQ5oUXhs6l4=;
-        b=lZd77ZDI9fdyooP17Zgac12AkHvT23XEsQ/9m0/Gbad4NyjMMYfEjtOUluJ3Hulycm
-         4EMIZReMQtx/DOwAFDaoKoShV16pgBXcbJAOm4Lg9waBbdQjZ9PppJXoruQ8uKkGfziJ
-         T9p3ffzVFASkaIt0D05IHeaPbFtYEsIsLd5zdMqjwUbvKeCDBDRtBp3poO4sqRc9nUvz
-         o0hwkolAX33eyX+1kztUNEtF0yb4Z1n4tUpWPl9759Jwd/LkjvVXMekWWWnuOsxjQnB+
-         KID+CG0pCYh2Qdiuim6GdeJwOTVxsHjRpwbfPmWPnbSoFboCXkHeJ7uBQmqJXmUiz2Ix
-         IqLQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqBpyCdf4mJdXDGMZGDcIeA7ZVlhJeUvxnwpyetz54FmTEcE2jaNnRZtXDDkJe+AQiuSqqp5nw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz/lB0IIl+4tUZPjcEUGTt4MGzjMgpphAGW6qEALre98+w+wRoa
-	qnfoHnpqpthv/H9aGV01w6Rn05B0gxGrbFLZmbBAwfsDvpErbGmcHlK9OPB67HBt+IPMibfjuMO
-	YjiIiKA==
-X-Received: from plrs4.prod.google.com ([2002:a17:902:b184:b0:2cc:6ddb:debc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e74a:b0:2bf:7b62:a038
- with SMTP id d9443c01a7336-2ccbe616766mr60096485ad.9.1783444362422; Tue, 07
- Jul 2026 10:12:42 -0700 (PDT)
-Date: Tue, 7 Jul 2026 10:12:41 -0700
-In-Reply-To: <ak0wSQ1133O7B96D@raptor>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+Vnbwou"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B41221F000E9;
+	Tue,  7 Jul 2026 18:02:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783447359;
+	bh=FryudSw1T2aBIUC8yNaOKfA0SsyG7mefxgdiOUUg/jo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=N+Vnbwoua/QGFqX1FJgxTZEeQArxQywA5ZLkb+cuyiLT1RyZBO8UKEnY1TN1bRU+y
+	 mmImothqrfHNURIQLWJ/FVvuF+nGkjn62x3ctvrxuKVMdasv+rz8+EhJWbyE9bVMAP
+	 XeXPvElu8iOFTsq5ShjS+JCrJ+t9w6iHaJZ2BvoL54Gs1evNMASXj19FeDmeueAseD
+	 M7yO3DIThFb6/MbvZUUbt+47vSyWcwfhLN5nmXrCiCUy18/Fgo7e71ItmXyNIni1sr
+	 e1Cudg/8AwbbkWQxfyGpEJeGE//8QxHgz5emwJUSZxpzTmnrZQg99BNpuQfCaJSKtR
+	 0RMZFg5mGzjig==
+Date: Tue, 7 Jul 2026 11:02:37 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v8 5/7] KVM: arm64: PMU: Implement fixed-counters-only
+ emulation
+Message-ID: <ak0_PSnxyAWm9_Fu@kernel.org>
+References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <20260706-hybrid-v8-5-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <akvyvclUQ2b2YHiU@kernel.org>
+ <cb5d5f13-a1a9-47dd-a717-5533a8b32b20@rsg.ci.i.u-tokyo.ac.jp>
+ <5e66748a-bfda-41a9-8614-88cbf2fe1f09@rsg.ci.i.u-tokyo.ac.jp>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <akxOrMnlNga-vtQv@google.com> <ak0wSQ1133O7B96D@raptor>
-Message-ID: <ak0ziUcCXUlDdcla@google.com>
-Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only memslots
-From: Sean Christopherson <seanjc@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, david.hildenbrand@arm.com, 
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	fuad.tabba@linux.dev, mark.rutland@arm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5e66748a-bfda-41a9-8614-88cbf2fe1f09@rsg.ci.i.u-tokyo.ac.jp>
 
-On Tue, Jul 07, 2026, Alexandru Elisei wrote:
-> Hi Sean,
-> 
-> On Mon, Jul 06, 2026 at 05:56:12PM -0700, Sean Christopherson wrote:
-> > On Thu, Jul 02, 2026, Alexandru Elisei wrote:
-> > > The memory represented by guest_memfd-only memslots
-> > > (kvm_memslot_is_gmem_only() is true) is shared with userspace, which can
-> > > freely mmap it and access it. The only thing that is preventing dirty page
-> > > logging for such memslots is that KVM doesn't allow slots backed by
-> > > guest_memfd to have their flags changed; they can only be created and
-> > > deleted.
+On Tue, Jul 07, 2026 at 09:52:49PM +0900, Akihiko Odaki wrote:
+> On 2026/07/07 20:23, Akihiko Odaki wrote:
+> > On 2026/07/07 3:23, Oliver Upton wrote:
+> > > Just detect the changing PMU implementation here, KVM_REQ_RELOAD_PMU
+> > > will need to detect the PMCs that require an update anyway. Stash the
+> > > last cpu in kvm_arch_vcpu_load() and pass it to this:
+> > > 
+> > > void kvm_vcpu_load_pmu(struct kvm_vcpu *vcpu, int last_cpu)
+> > > {
+> > >     if (!kvm_pmu_fixed_counters_only(vcpu->kvm) || vcpu->cpu == last_cpu)
+> > >         return;
+> > > 
+> > >     if (kvm_pmu_probe_armpmu(vcpu->cpu) !=
+> > > kvm_pmu_probe_armpmu(last_cpu))
+> > >         kvm_make_request(KVM_REQ_RELOAD_PMU);
+> > > }
 > > 
-> > Please (publicly) document *why*  you want to add dirty-logging support.  It's
-> > all but impossible to review new uAPI without knowing the use case.
+> > It is a nice way to simplify the code and to avoid hardcoding
+> > ARMV8_PMU_INSTR_IDX. I'll use the code for the next version.
 > 
-> Of course, my mistake, I was so deep in this that I didn't realise that
-> there might be different perspectives.
-> 
-> My thinking was that since guest_memfd created with GUEST_MEMFD_FLAG_MMAP +
-> GUEST_MEMFD_FLAG_INIT_SHARED is extremely similar from a userspace point of
-> view to using an anonymous file (created with memfd_create()), that
-> supporting dirty page logging and migration would be a natural next step
-> and would expand the usefulness of guest_memfd. It has nothing to do with
-> confidential compute.
+> I tried this but unfortunately it doesn't seem to work. kvm_arch_vcpu_put()
+> sets vcpu->cpu to -1 so we cannot simply read it to get the last cpu in
+> kvm_arch_vcpu_load().
 
-Sure, but just because userspace usage *might* be extremely similar, doesn't mean
-the logic is technically solid.  There is simply no requirement that guest_memfd
-be mmap()-able.  And that's the one of the main selling points of guest_memfd:
-the memory doesn't need to be mapped into userspace in order to map it into the
-guest.
+Urgh, there's no reason for doing that any more. Let's fix it, I want a
+straightforward way to detect pCPU migrations. There may be other
+reasons for using it in the future.
 
-> As to why I'm working on it now, it's because of an arm64 feature that
-> requires that memory remains mapped at stage 2, called Statistical
-> Profiling Extension (SPE), similar to Intel's PEBS or AMD's IBS. Exposing
-> the feature to a guest requires that memory remains mapped at stage 2
-> outside of userspace explicitely unmapping it, and guest_memfd, with the
-> patch to ignore the MMU notifiers [1], has this property.  I wanted to
-> expand the functionality of guest_memfd to support migration of virtual
-> machines when that arm64 feature is exposed to guests.
+Untested, but could you give this a whirl?
 
-I'm all for adding dirty logging support for guest_memfd, but for SPE I don't
-think relying on guest_memfd always being mapped is a good idea.  guest_memfd
-is "pinned" purely because adding support for page migration is (very) low
-priority for SNP, TDX, and pKVM.  guest_memfd page migration might play nice
-with SPE?  Probably depends on whether KVM is forced to do break-before-make?
+From bb5af058030aada66f5c9eafa54db604979acf55 Mon Sep 17 00:00:00 2001
+From: Oliver Upton <oupton@kernel.org>
+Date: Tue, 7 Jul 2026 09:50:00 -0700
+Subject: [PATCH] KVM: arm64: Don't clear vcpu->cpu in kvm_arch_vcpu_put()
 
-And at some point guest_memfd may support userspace-driven swap, but I suppose
-we can cross that bridge when we come to it.
+commit e9b152cb957c ("arm/arm64: kvm: Set vcpu->cpu to -1 on vcpu_put")
+reset vcpu->cpu in order for the VGIC to determine if there was any vCPU
+running at the time of access. The VGIC has gone through an entire
+rewrite since then, and with commit 7d450e282171 ("KVM: arm/arm64:
+vgic-new: Add userland access to VGIC dist registers") the user
+accessors just grab all vCPU mutexes instead.
 
-From a uABI perspective, forcing userspace to use guest_memfd to get access to
-something like SPE isn't ideal.  While I have aspirations of using guest_memfd
-much more broadly, I don't know that banking on guest_memfd replacing "everything"
-is a winning strategy.
+Drop this remaining vestige such that kvm_arch_vcpu_load() can properly
+detect a CPU migration. While at it, rework kvm_reset_vcpu() to do a
+much more pedantic check that the provided vCPU is actually what's
+running on the present CPU.
+
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+---
+ arch/arm64/kvm/arm.c   |  1 -
+ arch/arm64/kvm/reset.c | 15 ++++++++++-----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 50adfff75be8..735acc42b50b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -749,7 +749,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	kvm_arm_vmid_clear_active();
+ 
+ 	vcpu_clear_on_unsupported_cpu(vcpu);
+-	vcpu->cpu = -1;
+ }
+ 
+ static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b963fd975aac..6aba085c0673 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -190,7 +190,8 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_reset_state reset_state;
+-	bool loaded;
++	struct kvm_vcpu *running;
++	bool loaded = false;
+ 	u32 pstate;
+ 
+ 	spin_lock(&vcpu->arch.mp_state_lock);
+@@ -198,10 +199,15 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.reset_state.reset = false;
+ 	spin_unlock(&vcpu->arch.mp_state_lock);
+ 
+-	preempt_disable();
+-	loaded = (vcpu->cpu != -1);
+-	if (loaded)
++	guard(preempt)();
++
++	if ((running = kvm_get_running_vcpu())) {
++		if (KVM_BUG_ON(running != vcpu, vcpu->kvm))
++			return;
++
++		loaded = true;
+ 		kvm_arch_vcpu_put(vcpu);
++	}
+ 
+ 	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
+ 		if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
+@@ -269,7 +275,6 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 
+ 	if (loaded)
+ 		kvm_arch_vcpu_load(vcpu, smp_processor_id());
+-	preempt_enable();
+ }
+ 
+ u32 kvm_get_pa_bits(struct kvm *kvm)
+-- 
+2.47.3
+
