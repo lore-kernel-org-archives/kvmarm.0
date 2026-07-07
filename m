@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738D8225791;
-	Tue,  7 Jul 2026 18:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA8626AC5;
+	Tue,  7 Jul 2026 18:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783447360; cv=none; b=qhcdcUwjLV9Ba5F85Wt3bZ4B0+fFibMzSDi4fCCnopFap95dbJnJwwErK4SafWQGbT6JzQtq/r/Bg37m1v1a6aYURSfslnHhj4qNPiL9wFfLAnM6LHdhje0Mgr8/TGoxCldoHq7zT2MT1OxKz1xTGOn5RG/sHFoGxH489ALO5QI=
+	t=1783448408; cv=none; b=hCulSriXt3FgexwqVI9uphryGEol5GMOQRVTZG6NNCBz/ZtxWVf+zNtuj/+5McE8WFcyHoo12RdcgOIspXFp62L5RDjPLv392g36BfxkkEvzXJ/n3178tUiKMsacTmuurtidUVcPkSSSl4p+1TGxwRr5Da4qp6d5UnLgsFUeznQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783447360; c=relaxed/simple;
-	bh=v5UE4CN/5U1UeycwVcqpmK3ZPN8kJbKTuuCG+EL1iLU=;
+	s=arc-20240116; t=1783448408; c=relaxed/simple;
+	bh=I86E8RIIAR6boEDHK81W0I51tU6/MnrPYSU5+rKgpT0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Il+ij5X9Y384JJmfhQppciOmcycKQD6liBipyP2qW191VinXaxH/s01uXSlaIelFhcCfum3GZyQe2uh9rl3ISv0GnuTALH8x1LMCM6HP2HcGvOYk0M9nQeHayh/z4Sp+BakD+FVrPlvT4bCXKmKq+PMZL8xz+hpeEwq8VaDn5NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+Vnbwou; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=CB36AO/ByDNDm2HQevYjQjOXGz6RRwbBeDWMtz6vHgXVTK778sTYFxizk6cjSl/iyngWtTlHw6Lb0cGJqOz/qZKtN+RErFCJnl5Heh2nknRzYQm+sOwwQ4UlSh3UevOYILiZ8dG/cF/2c/+EMbIkeQS4MFwsnSlth5npYaayCps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ep0suLij; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+Vnbwou"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B41221F000E9;
-	Tue,  7 Jul 2026 18:02:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ep0suLij"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACF961F000E9;
+	Tue,  7 Jul 2026 18:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783447359;
-	bh=FryudSw1T2aBIUC8yNaOKfA0SsyG7mefxgdiOUUg/jo=;
+	s=k20260515; t=1783448407;
+	bh=AWIzIpH8a00nMIO23YrefbZEhT8NbDGs3/Ve9oenG9g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=N+Vnbwoua/QGFqX1FJgxTZEeQArxQywA5ZLkb+cuyiLT1RyZBO8UKEnY1TN1bRU+y
-	 mmImothqrfHNURIQLWJ/FVvuF+nGkjn62x3ctvrxuKVMdasv+rz8+EhJWbyE9bVMAP
-	 XeXPvElu8iOFTsq5ShjS+JCrJ+t9w6iHaJZ2BvoL54Gs1evNMASXj19FeDmeueAseD
-	 M7yO3DIThFb6/MbvZUUbt+47vSyWcwfhLN5nmXrCiCUy18/Fgo7e71ItmXyNIni1sr
-	 e1Cudg/8AwbbkWQxfyGpEJeGE//8QxHgz5emwJUSZxpzTmnrZQg99BNpuQfCaJSKtR
-	 0RMZFg5mGzjig==
-Date: Tue, 7 Jul 2026 11:02:37 -0700
+	b=ep0suLijWN3eWlVd2Fpqz+yCycdYo+MNXSN0RmNnb84pJ7Ym/zvlHhZ+yQCzN7Fln
+	 mBRJ2yMJDx9RWbXnfb1dBoY+nskN7XRxrU3hfUM99tCczOI2mCyvieaC61VDUbyyml
+	 1z2swx2WCvXQFjqpB3T2YArm4OfIGpw0hV9mr5reikdj4MpRhuK3BSQt/l3/RwWO9V
+	 PxLSCgIAFC2hf+yYA+dBuRxho7Qh57l7zrQNFjmhlgUP7aSj597ytZycegiTG+FMuq
+	 RS8diYtYN1HGOY9ZestohQsiYB9rBLFD+L8zfbiw6Zsf5p/TJoaARjDEFzGzGrAGL4
+	 UaN10YmI1I4mw==
+Date: Tue, 7 Jul 2026 11:20:05 -0700
 From: Oliver Upton <oupton@kernel.org>
 To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
@@ -42,131 +42,76 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
 	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v8 5/7] KVM: arm64: PMU: Implement fixed-counters-only
- emulation
-Message-ID: <ak0_PSnxyAWm9_Fu@kernel.org>
+Subject: Re: [PATCH v8 1/7] KVM: arm64: Disallow vPMU when pPMUs do not cover
+ all CPUs
+Message-ID: <ak1DVUs0bgkpZh0N@kernel.org>
 References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <20260706-hybrid-v8-5-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
- <akvyvclUQ2b2YHiU@kernel.org>
- <cb5d5f13-a1a9-47dd-a717-5533a8b32b20@rsg.ci.i.u-tokyo.ac.jp>
- <5e66748a-bfda-41a9-8614-88cbf2fe1f09@rsg.ci.i.u-tokyo.ac.jp>
+ <20260706-hybrid-v8-1-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <akvgIWqBjAp_VA_A@kernel.org>
+ <e03f17b2-a765-4912-adf6-3da26e7eeecd@rsg.ci.i.u-tokyo.ac.jp>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5e66748a-bfda-41a9-8614-88cbf2fe1f09@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <e03f17b2-a765-4912-adf6-3da26e7eeecd@rsg.ci.i.u-tokyo.ac.jp>
 
-On Tue, Jul 07, 2026 at 09:52:49PM +0900, Akihiko Odaki wrote:
-> On 2026/07/07 20:23, Akihiko Odaki wrote:
-> > On 2026/07/07 3:23, Oliver Upton wrote:
-> > > Just detect the changing PMU implementation here, KVM_REQ_RELOAD_PMU
-> > > will need to detect the PMCs that require an update anyway. Stash the
-> > > last cpu in kvm_arch_vcpu_load() and pass it to this:
-> > > 
-> > > void kvm_vcpu_load_pmu(struct kvm_vcpu *vcpu, int last_cpu)
-> > > {
-> > >     if (!kvm_pmu_fixed_counters_only(vcpu->kvm) || vcpu->cpu == last_cpu)
-> > >         return;
-> > > 
-> > >     if (kvm_pmu_probe_armpmu(vcpu->cpu) !=
-> > > kvm_pmu_probe_armpmu(last_cpu))
-> > >         kvm_make_request(KVM_REQ_RELOAD_PMU);
-> > > }
+On Tue, Jul 07, 2026 at 08:08:03PM +0900, Akihiko Odaki wrote:
+> On 2026/07/07 2:04, Oliver Upton wrote:
+> > Hi,
 > > 
-> > It is a nice way to simplify the code and to avoid hardcoding
-> > ARMV8_PMU_INSTR_IDX. I'll use the code for the next version.
+> > On Mon, Jul 06, 2026 at 07:03:24PM +0900, Akihiko Odaki wrote:
+> > > Commit ec3eb9ed6081 ("KVM: arm64: PMU: Disallow vPMU on non-uniform
+> > > PMUVer") made KVM reject vPMU unless the system-wide PMUVer is usable.
+> > > That covers systems where PMUv3 is absent or non-uniform, as well as
+> > > systems where IMPDEF PMUv3 sysreg traps are unavailable.
+> > > 
+> > > However, KVM can still accept vPMU when all CPUs uniformly trap PMUv3
+> > > sysregs, but the pPMUs registered with KVM only cover a subset of
+> > > possible CPUs.
+> > > 
+> > > Reject vPMU unless the registered pPMUs cover every possible CPU.
+> > > This avoids carrying support for partial pPMU coverage into the
+> > > fixed-counters-only UAPI introduced later in the series.
+> > 
+> > Doesn't CPU hotplug screw this up? I could online a CPU that doesn't
+> > have a PMU after creating the VM.>
+> > I'd rather just change ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS to become a
+> > system feature. That way any CPU which breaks the system-wide assumption
+> > cannot be onlined.
 > 
-> I tried this but unfortunately it doesn't seem to work. kvm_arch_vcpu_put()
-> sets vcpu->cpu to -1 so we cannot simply read it to get the last cpu in
-> kvm_arch_vcpu_load().
+> ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS only says that IMPDEF PMUv3 sysregs are
+> trapped. It does not say that KVM has a driver-backed PMU usable for PMUv3
+> emulation. This patch checks that extra requirement.
+> 
+> I re-checked CPU hotplug. Onlining a CPU without a PMU later does not make
+> an accepted VM unsafe, since the check is against cpu_possible_mask.
 
-Urgh, there's no reason for doing that any more. Let's fix it, I want a
-straightforward way to detect pCPU migrations. There may be other
-reasons for using it in the future.
+Sorry, I missed that this was against the possible mask.
 
-Untested, but could you give this a whirl?
+> The problem is the reverse case on ACPI: this check can disable vPMU when a
+> possible CPU is offline. DT populates supported_cpus at boot, while ACPI
+> initially populates it only from online CPUs and grows it as matching CPUs
+> come online.
+> 
+> That makes this patch too conservative. In practice, I do not expect systems
+> to mix CPUs with and without a usable PMU. A better approach is probably to
+> treat such a host as out of spec and add TAINT_CPU_OUT_OF_SPEC. We already
+> do that for architectural PMUv3 by detecting mismatches in
+> ID_AA64DFR0_EL1.PMUVer; we can do the same for
+> ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS with non-standard PMUs.
 
-From bb5af058030aada66f5c9eafa54db604979acf55 Mon Sep 17 00:00:00 2001
-From: Oliver Upton <oupton@kernel.org>
-Date: Tue, 7 Jul 2026 09:50:00 -0700
-Subject: [PATCH] KVM: arm64: Don't clear vcpu->cpu in kvm_arch_vcpu_put()
+The presence of the workaround is, by definition, out of spec. I just
+never bothered tainting the kernel because these machines are already
+TAINT_CPU_OUT_OF_SPEC by way of the broken VGIC.
 
-commit e9b152cb957c ("arm/arm64: kvm: Set vcpu->cpu to -1 on vcpu_put")
-reset vcpu->cpu in order for the VGIC to determine if there was any vCPU
-running at the time of access. The VGIC has gone through an entire
-rewrite since then, and with commit 7d450e282171 ("KVM: arm/arm64:
-vgic-new: Add userland access to VGIC dist registers") the user
-accessors just grab all vCPU mutexes instead.
+Ok, so how about you keep the check that you're doing here and promote
+IMPDEF_TRAPS to a system-wide feature? That would satisfy the two
+preconditions we have for PMU emulation, which is system register traps
+and a backing arm_pmu that understands PMUv3 events.
 
-Drop this remaining vestige such that kvm_arch_vcpu_load() can properly
-detect a CPU migration. While at it, rework kvm_reset_vcpu() to do a
-much more pedantic check that the provided vCPU is actually what's
-running on the present CPU.
-
-Signed-off-by: Oliver Upton <oupton@kernel.org>
----
- arch/arm64/kvm/arm.c   |  1 -
- arch/arm64/kvm/reset.c | 15 ++++++++++-----
- 2 files changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 50adfff75be8..735acc42b50b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -749,7 +749,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	kvm_arm_vmid_clear_active();
- 
- 	vcpu_clear_on_unsupported_cpu(vcpu);
--	vcpu->cpu = -1;
- }
- 
- static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b963fd975aac..6aba085c0673 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -190,7 +190,8 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
- void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_reset_state reset_state;
--	bool loaded;
-+	struct kvm_vcpu *running;
-+	bool loaded = false;
- 	u32 pstate;
- 
- 	spin_lock(&vcpu->arch.mp_state_lock);
-@@ -198,10 +199,15 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	vcpu->arch.reset_state.reset = false;
- 	spin_unlock(&vcpu->arch.mp_state_lock);
- 
--	preempt_disable();
--	loaded = (vcpu->cpu != -1);
--	if (loaded)
-+	guard(preempt)();
-+
-+	if ((running = kvm_get_running_vcpu())) {
-+		if (KVM_BUG_ON(running != vcpu, vcpu->kvm))
-+			return;
-+
-+		loaded = true;
- 		kvm_arch_vcpu_put(vcpu);
-+	}
- 
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
- 		if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
-@@ -269,7 +275,6 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 
- 	if (loaded)
- 		kvm_arch_vcpu_load(vcpu, smp_processor_id());
--	preempt_enable();
- }
- 
- u32 kvm_get_pa_bits(struct kvm *kvm)
--- 
-2.47.3
-
+Thanks,
+Oliver
