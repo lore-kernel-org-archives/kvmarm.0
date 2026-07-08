@@ -1,67 +1,63 @@
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2DE3859D7
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 22:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0437D384258
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 22:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783551131; cv=none; b=SxdFQSGoP/Z5onjywWTV7eNT6H5u2yO9WwnFCv2dhM3AJ43gIj47BmZDrrZLa2DiqaGXveVmPIcjMMDza1Me56R/C1000BKpV30rgxE5kHcDiwryStOsTvqBximTnqNWh2lpBA8qGPlLr+ygcULfSof2yAA1q8b/krqrYNekYR0=
+	t=1783551131; cv=none; b=Qbpn+wjZA5hiimj1fcbdHJvSi8gsFsnnjcliiOfEFGZm20NVd3WRjXb91OBUcjSe8jdn6jPMwI1Su3YU7t6E2KV1nruYnaseq7lLuVWZ7IeuW9Yfr5bE/ZF/w92/0vc5La4pkmkghLfwlXIlZF73RiA3UNZ/mQvTogLa+KbxD/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783551131; c=relaxed/simple;
-	bh=2c8XTPNphIfSHGS9kO7V0RYBdRMxPd8eKXEBM1ea3OI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZY0ZYV1GogImoBCzORuvkskO1w5osZY3yceiqfnbfNXPuzy+KG1UFsX8I8rBpHb9gMoPe26X1ZMHbKlmW90xLNNxx+9z0449QGGvcvNWRM7xDRgsxxRIq0Na1/s06dg3TRpm7H7Ktw1GSmC5kkfv5fi1gq/eRTFVm3sjAeEeTmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j+JVwsHa; arc=none smtp.client-ip=209.85.161.74
+	bh=W9eRCyxeQaxWVre9xRAxVREG5IbAzd3SpzWk9523/DY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tMHgeLtY0f3OS/geoTXThxT4+69DEQ2VL8k7/xdggxaahuVByNipnFWFo5fJ3hBqbws3jX1srI2OX58IgbX40Klg45Pld0tp8QTQKr7gDkxf4DRz/D0tBSvBlzegRJlFgQDmnfEcTQ/uEhK8DWWBo6k9Q98u5AKRqYi/20Havks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Oyt5CJ8l; arc=none smtp.client-ip=209.85.210.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j+JVwsHa"
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-6a37685f41aso544202eaf.3
-        for <kvmarm@lists.linux.dev>; Wed, 08 Jul 2026 15:52:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Oyt5CJ8l"
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7e9e2db9914so392525a34.1
+        for <kvmarm@lists.linux.dev>; Wed, 08 Jul 2026 15:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783551129; x=1784155929; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=nzHvY4Nn6plbaCF35zKiwiQUdpmfX8uqx6rHpqc+ZhY=;
-        b=j+JVwsHa6geU7X366A/sRCIodXfvxYyroeERUgSOlrU3GuRMQQmQX6JmIe8ErPhpVH
-         9PM5VhJFIiAP0yVm4ARUNHhdeivj168DxlEoaTtwzGMdqdWYmMRSYax1qAjiYUHP07/E
-         x6ySRR6iWhB66IwzOdoDnGQQ5tjf99jEc95NBMEsPyWjEYmJdPS1GInXO6MGb03eD22k
-         1wAioprVJRL3Miwm+TeN/8EMpxnRvekgr/BG1Q7DysoTifKATcqAYb+xMQgDnXR+2L0j
-         ddVgR/e6A7pfTyknvq5GT/uVQuTxLPEQoncFtbdqRwccOMFzpMHGWxWGpZN91irwtJnM
-         4V0w==
+        d=google.com; s=20251104; t=1783551128; x=1784155928; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=VXjaTRbhjgdEqS1UyFYRJTvGMmWZaq4i6pqgK3sf76s=;
+        b=Oyt5CJ8lGoO1AXqQCYz4+uIaL9t276MW0pL/063LRHsnAh6RnIKfgLj+X2241rYCPl
+         ppfv4iQZZbjZRcmKIrk7yL2gvz9awgR2FnAGt7t8eKSSbN1+wjFd7fothvOV3EgmN/vn
+         NxOyCC5tfxiSoHZbw+zIm/XtYQIKnRXSurXmo/JR4FgnF26fxHP8F7sgse7fcIM2vkO3
+         PnlzVpY74SZwveZ3j5VuW8gJe3XIEL495iLodKKoAJ8njuJLKx86Z1z+OiyuzW/bYfYo
+         FkKKa1KYrEHNxQGE+DLAdP+jcctLqYcT8qxz+eWOixLi+iMLyxDwo2s26xsXNdVGG6MM
+         xJuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783551129; x=1784155929;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=nzHvY4Nn6plbaCF35zKiwiQUdpmfX8uqx6rHpqc+ZhY=;
-        b=Zrpz7cgJNWyPLKI8IWYg7MRf0NIdfxEgyxbF4zov/+05oYf4mJfLVivKHS+YEnC4gk
-         eYTzfYTBy/d8yYdA9BrCuBPlIF5ckX6I2Ff9f0eZQn/bzspmq9P1O6iNM9VVj+UKu7++
-         QqsYcYWQnKJMhJcrfKG/zkN13osHPV4neFfqwaeWDpdjU2Vj7ZeqppTGIGrqVAYOmo1K
-         C4GttL3PL84cwcZOE4AY/MKuOVa7i+/YD/yEu4bhCdn17YdjB8scVl6v+rnhPnTB0kKx
-         pPxRLxbRi3rNusNWoK+oPurPJLo29K8U+KmXVJBaR3odmpC+GvscafMG2pcSnPqFuA+F
-         8+Ng==
-X-Forwarded-Encrypted: i=1; AFNElJ+88Asp6tu3iHM0zfKpBsJdAEsf8oxiRto89N0kUni56jNIzFUZSxQb/OCNmAHwEPYgB3p84NY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywx8IV2pY+qev+JTx0tQM1ut3VDCw+SHQa6iLuVr+Zd/lipnDHJ
-	Pr7Rvgz+iOpddAtu2Ziwvt5E71f/7IJhMpOj+uTdIAte4LpFk0WD3sKviRMeEr4WP/58dAD/x8B
-	qKQj5aktU500V2uns1KF2jNd5IA==
-X-Received: from ilqn12.prod.google.com ([2002:a92:d9cc:0:b0:503:92be:9a74])
+        d=1e100.net; s=20251104; t=1783551128; x=1784155928;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VXjaTRbhjgdEqS1UyFYRJTvGMmWZaq4i6pqgK3sf76s=;
+        b=NlPfiOwatHCwEExzRss7nCWbEaRyDZr1R1YxXvkv63N7i1GkSZlkRDXHp7rJlAzb4h
+         8alK1LaxuxrDf1GR6MM+pHKjNnG2gMaTybCrONP0tWVG1ebc8cNkSp8A35hkeL+H3VE9
+         S7fuqlbDFmuvHSVpYfBTR0NrwITM61Qh5AEL2iodkzOXUI65TQ84iqtsCk8v0ZF7uv4j
+         u8m7PhpNOcFDaYBos3/NDnGQv+xKCxrNs9JVGbiTqUDk4iqAiZwL/dhBAWkja9a+lKUZ
+         u2L+biyCwinHNd76TCXZRx6IN2BVWKeD82TlzUYNcKchzMa8cb90TCI5yF6tDtyQadFp
+         wBNw==
+X-Forwarded-Encrypted: i=1; AFNElJ+6OPNDJWtaNquHdYakxLofkXIxHlHJbZ+SC8eCqAxo7ljm0ABwZV2lNyrifCY77fU6jVJiLjg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw8uavhSa6gQUewbY3My5ULgpOKFVanfNP2vWwOvdTasWviRZo2
+	unymibRnQ8dd6K/mrNdGvAk4NZWhYhHBkqhi6ORqqAjgAZapu2KEznEyPfaEPBbR0vk69VMZuuZ
+	URElweFNVcNDju9sU9OcfEWkMJg==
+X-Received: from ilsl6.prod.google.com ([2002:a05:6e02:5c6:b0:502:20e8:e7ce])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:2222:b0:6a1:805b:5281 with SMTP id 006d021491bc7-6a36da5e3a0mr3401844eaf.37.1783551128581;
- Wed, 08 Jul 2026 15:52:08 -0700 (PDT)
-Date: Wed,  8 Jul 2026 22:51:19 +0000
-In-Reply-To: <20260708225124.4130846-1-coltonlewis@google.com>
+ 2002:a05:6820:2209:b0:6a3:7d5a:1ae0 with SMTP id 006d021491bc7-6a37d9d6e0amr220936eaf.29.1783551127438;
+ Wed, 08 Jul 2026 15:52:07 -0700 (PDT)
+Date: Wed,  8 Jul 2026 22:51:18 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20260708225124.4130846-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
-Message-ID: <20260708225124.4130846-2-coltonlewis@google.com>
-Subject: [PATCH 6.6 v2 1/6] arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
+Message-ID: <20260708225124.4130846-1-coltonlewis@google.com>
+Subject: [PATCH 6.6 v2 0/6] arm64: KVM: Backport VHE-only boot fixes
 From: Colton Lewis <coltonlewis@google.com>
 To: stable@vger.kernel.org
 Cc: oliver.upton@linux.dev, sashal@kernel.org, gregkh@linuxfoundation.org, 
@@ -69,77 +65,57 @@ Cc: oliver.upton@linux.dev, sashal@kernel.org, gregkh@linuxfoundation.org,
 	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
 	mark.rutland@arm.com, ahmed.genidi@arm.com, leo.yan@arm.com, 
 	miguel.luis@oracle.com, dbrazdil@google.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+Architectural updates retroactively made FEAT_E2H0 optional, meaning
+hardware can implement FEAT_VHE without FEAT_E2H0. On such CPUs,
+HCR_EL2.E2H can reset to an unknown state and must be initialized early
+so later code can reliably detect whether E2H mode is active.
 
-[ Upstream commit cfc680bb04c54e61faa51a34d8383a0aa25b583f ]
+Without these fixes, booting 6.6.y as a guest under KVM nested
+virtualization will hang at boot.
 
-ARMv9.5 has infroduced ID_AA64MMFR4_EL1 with a bunch of new features.
-Add the corresponding layout.
+This series targets 6.6.y specifically because these patches are all
+present in 6.12.y and applying these patches to 6.1.y and presumably
+older kernels has more conflicts and results in other issues booting
+as a guest under nested virtualization. More work is needed to enable
+that.
 
-This is extracted from the public ARM SysReg_xml_A_profile-2023-09
-delivery, timestamped d55f5af8e09052abe92a02adf820deea2eaed717.
+Changes in v2:
+- Updated commit messages to reference correct upstream SHA1s.
+- Preserved inline EL2 state initialization in Patch 4 to avoid
+  unrelated code churn.
+- Added upstream commit 3855a7b91d42 ("KVM: arm64: Initialize SCTLR_EL1 in
+  __kvm_hyp_init_cpu()") as Patch 5.
+- Verified boot and KVM initialization across all KVM execution modes
+  (nVHE, hVHE/nested, VHE, and protected).
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-Link: https://lore.kernel.org/r/20240122181344.258974-5-maz@kernel.org
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/tools/sysreg | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+v1:
+https://lore.kernel.org/kvmarm/20260701204342.2654385-1-coltonlewis@google.com/
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 76ce150e7347e..f7180d391f829 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1669,6 +1669,43 @@ UnsignedEnum	3:0	TCRX
- EndEnum
- EndSysreg
- 
-+Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
-+Res0	63:40
-+UnsignedEnum	39:36	E3DSE
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+Res0	35:28
-+SignedEnum	27:24	E2H0
-+	0b0000	IMP
-+	0b1110	NI_NV1
-+	0b1111	NI
-+EndEnum
-+UnsignedEnum	23:20	NV_frac
-+	0b0000	NV_NV2
-+	0b0001	NV2_ONLY
-+EndEnum
-+UnsignedEnum	19:16	FGWTE3
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+UnsignedEnum	15:12	HACDBS
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+UnsignedEnum	11:8	ASID2
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+SignedEnum	7:4	EIESB
-+	0b0000	NI
-+	0b0001	ToEL3
-+	0b0010	ToELx
-+	0b1111	ANY
-+EndEnum
-+Res0	3:0
-+EndSysreg
-+
- Sysreg	SCTLR_EL1	3	0	1	0	0
- Field	63	TIDCP
- Field	62	SPINTMASK
--- 
+Ahmed Genidi (1):
+  KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu()
+
+Marc Zyngier (4):
+  arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
+  arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is
+    negative
+  arm64: Fix early handling of FEAT_E2H0 not being implemented
+  arm64: Revamp HCR_EL2.E2H RES1 detection
+
+Mark Rutland (1):
+  KVM: arm64: Initialize HCR_EL2.E2H early
+
+ arch/arm64/include/asm/el2_setup.h   | 56 ++++++++++++++++++++++++++--
+ arch/arm64/kernel/head.S             | 20 ++++------
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  3 +-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c |  3 ++
+ arch/arm64/tools/sysreg              | 37 ++++++++++++++++++
+ 5 files changed, 101 insertions(+), 18 deletions(-)
+
+
+base-commit: da47cbc254661aa66d61ef061485a7080305c4be
+--
 2.55.0.795.g602f6c329a-goog
-
