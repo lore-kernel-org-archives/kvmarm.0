@@ -1,275 +1,147 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8DD409286
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 15:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C6B41CB5F;
+	Wed,  8 Jul 2026 16:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783526400; cv=none; b=FOLSZVIG2ZM6k8UlHkuw/YLssBv0Gklg7PM9Atgwi19sIi/znX4qxkrepgHgfRTKkM6+xtxxFs0l/PIqIxPcjCLepJbG15EZqOHFnFXoxJO+IRwOgZYgMa4mKZoef5hjSrFGvAyEW4RP8zN817+9/fug292YUfd1j7cM8xixdAk=
+	t=1783527199; cv=none; b=CN5sdgE/bKc4Xol6JBLWIdMuU50lEzPX4wI+MZwImYJlN4Zb5JZN2ywNlbP8j3ByGg29PlUAUjJr0c6dNRpIl2ODF8Q10Z+PFpLPaqLOtAHpg2J/9VcS4G3j5/OC+GaM8cHsGwsOywED8+B7Rxkql5y9wMiN9v3vwoVQ5O3Ov1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783526400; c=relaxed/simple;
-	bh=Wisa0hatuEJjiJu8RfGgGd55BM75sG9fW5fgSsBCR6w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PIXbiohPf01zVrKre+jyFi1vGxViJLbtK40Wj2LBSIFMeCHUoVyH2LEaGh3FFVkq2JP7iqkVLYdH2hwO+VQq5lp8xDQEjqmsYKhE5opeJp3WiiNhsozbH1teog5mbBxWB922bDaL3DQHCiTQ1LWJJz79DVatVxZP9nVHJFK/q7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RbQ7LMp0; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783527199; c=relaxed/simple;
+	bh=9ggp97/tHTaJdHj8n9/QKZROiz9ApVfJN6VLyx5YqKE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XDU6wRbdPZzcqPunRhLPYIAwJ0VzN5P7YmB+6ymJNzMsd30U5i8Cq2lwUz3pQ+i+D1PI2Qy0RQPebINiNzR8PzHwo6Ny6xe8yEVMXldwk11KP0+v/QO+mnYFTRU6INZcr44vYtAGWOcqNT1IdTYNhCk7sQtJs6zyxAvci44zrmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QuQ5rORC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RbQ7LMp0"
-X-Forwarded-Encrypted: i=1; AHgh+Rq+v9sNjz6gKtmCIoXWo+qPmLsIZPPRbwvu7styjv7rGypfMeD0g4i5vLhX7ELg6cYOt0cSzRk=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783526396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BYWRPdLaFuG1romC1lCIBnWdBcrZaYParIdEPwnHq5s=;
-	b=RbQ7LMp0M/xJU/8tAfIBda2U0mMPSuw0Ctt/YiKSkRA1en+9U6okdoJ7u8OQX55dvdS4H+
-	srGyoQdVvfH0wvvIWRIyNVOjwZ79zBTV2WP7Uw32gkn+YRZtR4s8VM5dwFy0eVy4Gpdvh0
-	ub2suxcmd0tFAbo5Zsdyq2ExNN5nrck=
-X-Gm-Message-State: AOJu0YynsgbNg2joAlIsjCNQ/tOIMxU1w2JjFKXXLWx9hS44DhISAwLa
-	kpG8dM5BMEC4skfrrSk6pdKH3NlN4vWrxUVH39Hc99JC+9McspfqmWeKeJjyxpSWXOiXi21qWTC
-	BVuAW4eQz3aankPkIovEUUeZaMycDdCgLWDgXNspV
-X-Received: by 2002:a05:622a:1909:b0:517:5d71:84e5 with SMTP id
- d75a77b69052e-51c88756ce0mr10244531cf.5.1783526377949; Wed, 08 Jul 2026
- 08:59:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QuQ5rORC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AE901F000E9;
+	Wed,  8 Jul 2026 16:13:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783527197;
+	bh=yfr5Zf8QzEAmiPLqkiJdK20n52r9vrdmIA+s+Q3YgkU=;
+	h=From:To:Cc:Subject:Date;
+	b=QuQ5rORC2BJ+4iEkH95ElRXMac4sTZeDwlFIMs+c0EAVRrSNbJYdKVLCHsNma0q6G
+	 crVKepBLgdIkmXpEXN1JkEoCjaXRu4Uvle7DTy/sB+Ep6l+cW1XCpw9J2sLT5VCFAS
+	 CHLaOrUcfWitOSCaBkg67qi8ENFWWLbE0nOrEwZfm3pM/rMdza7glLLhpUwY4I9O4v
+	 z/zgtpBgf28mkZt1GvcVa3881rb9e0XjU9iEFHJ+UsPaHiFG8y/iQubf/4pH+GdbeH
+	 ElSQmDLINOMKkO6hHkCEh86k6Wgb4gc82Q3E544abnmfapLTrPUgjnEAzrFrL+4OZa
+	 R9trNpAQZXiAQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1whUtf-00000002uOx-1Kbd;
+	Wed, 08 Jul 2026 16:13:15 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	Mark Brown <broonie@kernel.org>,
+	Mostafa Saleh <smostafa@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Sebastian Ene <sebastianene@google.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 7.2, take #2
+Date: Wed,  8 Jul 2026 17:12:42 +0100
+Message-ID: <20260708161242.1912769-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260706083555.302972-1-fuad.tabba@linux.dev> <20260706083555.302972-6-fuad.tabba@linux.dev>
- <ak5KcuSzEo7s9P1s@raptor>
-In-Reply-To: <ak5KcuSzEo7s9P1s@raptor>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 8 Jul 2026 16:59:01 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzXDaN2xPHW3iocrJZFAnY34Svq4OFsgJ=gc3ove0iYHA@mail.gmail.com>
-X-Gm-Features: AUfX_myqNOr7mXQIdwBZF9pz250HWIccvC8EjVkA9Pco7CACbbHZP63pPBeyxYU
-Message-ID: <CA+EHjTzXDaN2xPHW3iocrJZFAnY34Svq4OFsgJ=gc3ove0iYHA@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v1 5/5] arm64: Add --guest-memfd option to back
- guest RAM with guest_memfd
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, fuad.tabba@linux.dev, broonie@kernel.org, smostafa@google.com, oupton@kernel.org, sebastianene@google.com, sudeep.holla@kernel.org, vdonnefort@google.com, weilin.chang@arm.com, will@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 8 Jul 2026 at 14:02, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi Fuad,
->
-> Looks good me, two small things: it might be useful for debugging to first
-> check that KVM supports KVM_CAP_GUEST_MEMFD before checking
-> KVM_CAP_GUEST_MEMFD_FLAGS, and the file descriptor could be closed after it
-> is unmapped.
+Paolo,
 
-Good points, will fix both in v2.
+Here's the second drop of KVM/arm64 fixes for 7.2. This time around,
+we have a locking issue in kvm_io_bus_get_dev(), which is only used by
+arm64, a few S2 page table fixes, a set of FFA proxy fixes for pKVM,
+and finally a very esoteric fix for emulation of sign-extended loads
+from MMIO. Not only this is rather niche, it dates back to day one of
+KVM support for 32bit ARM...
 
-Thanks,
-/fuad
+Note that this is on top of the kvmarm-fixes-7.2-1 tag pull request
+posted at [1] about 12 days ago.
 
+Please pull,
 
->
-> Thanks,
-> Alex
->
-> On Mon, Jul 06, 2026 at 09:35:55AM +0100, Fuad Tabba wrote:
-> > Back guest RAM with a guest_memfd created with GUEST_MEMFD_FLAG_MMAP
-> > and GUEST_MEMFD_FLAG_INIT_SHARED, mmapped MAP_SHARED to provide the
-> > userspace mapping.
-> >
-> > Protected VMs need in-place shared/private conversion of guest_memfd,
-> > which the kernel does not support yet, so reject the combination of
-> > --protected and --guest-memfd.
-> >
-> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > ---
-> >  arm64/include/kvm/kvm-config-arch.h |  5 +++-
-> >  arm64/kvm.c                         | 38 +++++++++++++++++++++++------
-> >  include/kvm/kvm.h                   |  1 +
-> >  include/kvm/util.h                  |  1 +
-> >  kvm.c                               |  1 +
-> >  util/util.c                         | 34 ++++++++++++++++++++++++++
-> >  6 files changed, 71 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> > index c2702d5..d8a8ef7 100644
-> > --- a/arm64/include/kvm/kvm-config-arch.h
-> > +++ b/arm64/include/kvm/kvm-config-arch.h
-> > @@ -20,6 +20,7 @@ struct kvm_config_arch {
-> >       bool            no_pvtime;
-> >       bool            psci;
-> >       bool            protected;
-> > +     bool            guest_memfd;
-> >  };
-> >
-> >  int irqchip_parser(const struct option *opt, const char *arg, int unset);
-> > @@ -73,6 +74,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
-> >       OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,                                 \
-> >                   "Create guest without VHE support"),                        \
-> >       OPT_BOOLEAN('\0', "protected", &(cfg)->protected,                       \
-> > -                     "Create a protected VM when pKVM is enabled"),
-> > +                     "Create a protected VM when pKVM is enabled"),          \
-> > +     OPT_BOOLEAN('\0', "guest-memfd", &(cfg)->guest_memfd,                   \
-> > +                     "Use guest_memfd to back guest RAM"),
-> >
-> >  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> > diff --git a/arm64/kvm.c b/arm64/kvm.c
-> > index fb0b98d..b594578 100644
-> > --- a/arm64/kvm.c
-> > +++ b/arm64/kvm.c
-> > @@ -49,9 +49,14 @@ void kvm__init_ram(struct kvm *kvm)
-> >       kvm->arch.ram_alloc_size = kvm->ram_size;
-> >       if (!kvm->cfg.hugetlbfs_path)
-> >               kvm->arch.ram_alloc_size += SZ_2M;
-> > -     kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
-> > -                                             kvm->cfg.hugetlbfs_path,
-> > -                                             kvm->arch.ram_alloc_size);
-> > +
-> > +     if (kvm->cfg.arch.guest_memfd)
-> > +             kvm->arch.ram_alloc_start =
-> > +                     mmap_guest_memfd(kvm, kvm->arch.ram_alloc_size);
-> > +     else
-> > +             kvm->arch.ram_alloc_start =
-> > +                     mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path,
-> > +                                            kvm->arch.ram_alloc_size);
-> >
-> >       if (kvm->arch.ram_alloc_start == MAP_FAILED)
-> >               die("Failed to map %lld bytes for guest memory (%d)",
-> > @@ -60,17 +65,25 @@ void kvm__init_ram(struct kvm *kvm)
-> >       kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
-> >                                       SZ_2M);
-> >
-> > -     madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > -             MADV_MERGEABLE);
-> > +     if (!kvm->cfg.arch.guest_memfd) {
-> > +             madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > +                     MADV_MERGEABLE);
-> >
-> > -     madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > -             MADV_HUGEPAGE);
-> > +             madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > +                     MADV_HUGEPAGE);
-> > +     }
-> >
-> >       phys_start      = kvm->cfg.ram_addr;
-> >       phys_size       = kvm->ram_size;
-> >       host_mem        = kvm->ram_start;
-> >
-> > -     err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> > +     if (kvm->cfg.arch.guest_memfd)
-> > +             err = kvm__register_ram_guest_memfd(kvm, phys_start,
-> > +                                                 phys_size, host_mem,
-> > +                                                 kvm->ram_guest_memfd,
-> > +                                                 host_mem - kvm->arch.ram_alloc_start);
-> > +     else
-> > +             err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> >       if (err)
-> >               die("Failed to register %lld bytes of memory at physical "
-> >                   "address 0x%llx [err %d]", phys_size, phys_start, err);
-> > @@ -468,6 +481,15 @@ void kvm__arch_validate_cfg(struct kvm *kvm)
-> >       if (kvm->cfg.arch.e2h0 && !kvm->cfg.arch.nested_virt)
-> >               pr_warning("--e2h0 requires --nested, ignoring");
-> >
-> > +     if (kvm->cfg.arch.guest_memfd) {
-> > +             /* Requires in-place shared/private conversion of guest_memfd. */
-> > +             if (kvm->cfg.arch.protected)
-> > +                     die("Protected VMs do not yet support guest_memfd");
-> > +
-> > +             if (kvm->cfg.hugetlbfs_path)
-> > +                     die("guest_memfd cannot be backed by hugetlbfs");
-> > +     }
-> > +
-> >       if (kvm->cfg.arch.protected) {
-> >               if (kvm->cfg.ram_size &&
-> >                   kvm->cfg.ram_size < DMA_MEM_REGION_SIZE) {
-> > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> > index 5e7b5eb..95dc52f 100644
-> > --- a/include/kvm/kvm.h
-> > +++ b/include/kvm/kvm.h
-> > @@ -90,6 +90,7 @@ struct kvm {
-> >       u64                     ram_size;       /* Guest memory size, in bytes */
-> >       void                    *ram_start;
-> >       u64                     ram_pagesize;
-> > +     int                     ram_guest_memfd; /* guest_memfd backing RAM, -1 if none */
-> >       struct mutex            mem_banks_lock;
-> >       struct list_head        mem_banks;
-> >
-> > diff --git a/include/kvm/util.h b/include/kvm/util.h
-> > index a6dba11..9e23431 100644
-> > --- a/include/kvm/util.h
-> > +++ b/include/kvm/util.h
-> > @@ -148,5 +148,6 @@ static inline int pow2_size(unsigned long x)
-> >  struct kvm;
-> >  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
-> >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
-> > +void *mmap_guest_memfd(struct kvm *kvm, u64 size);
-> >
-> >  #endif /* KVM__UTIL_H */
-> > diff --git a/kvm.c b/kvm.c
-> > index 3d05756..a400dd2 100644
-> > --- a/kvm.c
-> > +++ b/kvm.c
-> > @@ -162,6 +162,7 @@ struct kvm *kvm__new(void)
-> >       mutex_init(&kvm->mem_banks_lock);
-> >       kvm->sys_fd = -1;
-> >       kvm->vm_fd = -1;
-> > +     kvm->ram_guest_memfd = -1;
-> >
-> >  #ifdef KVM_BRLOCK_DEBUG
-> >       kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
-> > diff --git a/util/util.c b/util/util.c
-> > index 05d49c4..c60fe02 100644
-> > --- a/util/util.c
-> > +++ b/util/util.c
-> > @@ -6,7 +6,9 @@
-> >  #include "kvm/util.h"
-> >
-> >  #include <kvm/kvm.h>
-> > +#include <linux/kvm.h>
-> >  #include <linux/magic.h>     /* For HUGETLBFS_MAGIC */
-> > +#include <sys/ioctl.h>
-> >  #include <sys/mman.h>
-> >  #include <sys/stat.h>
-> >  #include <sys/statfs.h>
-> > @@ -169,3 +171,35 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 si
-> >               return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
-> >       }
-> >  }
-> > +
-> > +/*
-> > + * Map guest RAM backed by a guest_memfd. The file descriptor must stay open
-> > + * for the lifetime of the VM: closing it invalidates the memslot bindings.
-> > + */
-> > +void *mmap_guest_memfd(struct kvm *kvm, u64 size)
-> > +{
-> > +     u64 flags = GUEST_MEMFD_FLAG_MMAP | GUEST_MEMFD_FLAG_INIT_SHARED;
-> > +     struct kvm_create_guest_memfd gmem = {
-> > +             .size   = size,
-> > +             .flags  = flags,
-> > +     };
-> > +     void *addr;
-> > +     int ret;
-> > +
-> > +     ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_GUEST_MEMFD_FLAGS);
-> > +     if (ret < 0 || ((u64)ret & flags) != flags)
-> > +             die("kernel does not support guest_memfd with mmap");
-> > +
-> > +     ret = ioctl(kvm->vm_fd, KVM_CREATE_GUEST_MEMFD, &gmem);
-> > +     if (ret < 0)
-> > +             die_perror("KVM_CREATE_GUEST_MEMFD");
-> > +
-> > +     addr = mmap(NULL, size, PROT_RW, MAP_SHARED, ret, 0);
-> > +     if (addr == MAP_FAILED)
-> > +             die_perror("guest_memfd mmap");
-> > +
-> > +     kvm->ram_guest_memfd = ret;
-> > +     kvm->ram_pagesize = getpagesize();
-> > +
-> > +     return addr;
-> > +}
-> > --
-> > 2.39.5
-> >
+	M.
+
+[1] https://lore.kernel.org/all/20260626133526.817232-1-maz@kernel.org
+
+The following changes since commit d098bb75d14fde2f12155f1a95ec0168160867ce:
+
+  KVM: arm64: account pKVM reclaim against the VM mm (2026-06-22 10:48:08 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-7.2-2
+
+for you to fetch changes up to 8d187d4b33c262c0f3e44842553521151d8629e8:
+
+  KVM: arm64: Fix propagation of TLBI level in kvm_pgtable_stage2_relax_perms() (2026-07-07 17:43:39 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 7.2, take #2
+
+- Move locking for kvm_io_bus_get_dev() into the caller, ensuring
+  race-free checks that the returned object is of the correct type
+
+- Fix initialisation of the page-table walk level when relaxing
+  permissions
+
+- Correctly update the XN attribute when relaxing permissions
+
+- Fix the sign extension of loads from emulated MMIO regions
+
+- Assorted collection of fixes for pKVM's FFA proxy, together with a
+  couple of FFA driver adjustments
+
+----------------------------------------------------------------
+Fuad Tabba (2):
+      KVM: arm64: Fix sign-extension of MMIO loads
+      KVM: arm64: selftests: Add MMIO sign-extending load test
+
+Marc Zyngier (2):
+      KVM: Move kvm_io_bus_get_dev() locking responsibilities to callers
+      KVM: arm64: Fix propagation of TLBI level in kvm_pgtable_stage2_relax_perms()
+
+Mostafa Saleh (3):
+      KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
+      KVM: arm64: Ensure FFA ranges are page aligned
+      firmware: arm_ffa: Fix out-of-bound writes in ffa_setup_and_transmit()
+
+Oliver Upton (2):
+      KVM: arm64: Ensure level is always initialized when relaxing perms
+      KVM: arm64: Only update XN attr when requested during S2 relaxation
+
+Sebastian Ene (3):
+      KVM: arm64: Validate the offset to the mem access descriptor
+      KVM: arm64: Zero out the stack initialized data in the FFA handler
+      firmware: arm_ffa: Fix Endpoint Memory Access Descriptor offset calculation
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c                     |  44 ++--
+ arch/arm64/kvm/hyp/pgtable.c                      |  15 +-
+ arch/arm64/kvm/mmio.c                             |   7 +-
+ arch/arm64/kvm/vgic/vgic-its.c                    |   2 +
+ drivers/firmware/arm_ffa/driver.c                 |  25 ++-
+ include/linux/arm_ffa.h                           |   9 +-
+ tools/testing/selftests/kvm/Makefile.kvm          |   1 +
+ tools/testing/selftests/kvm/arm64/mmio_sign_ext.c | 255 ++++++++++++++++++++++
+ virt/kvm/kvm_main.c                               |  16 +-
+ 9 files changed, 331 insertions(+), 43 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
