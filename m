@@ -1,200 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07B64252B5;
-	Wed,  8 Jul 2026 10:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E499F436370
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 11:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783507386; cv=none; b=KI+9fcC4BTCPEy3ZLxKSfs/+iZk37TmMVlMFRKX4RnVxQAZ21UU0Td+YtyXKRB7K3GIP4iNOuiAmHgxGCshI2M3qZwseEUeeLuxpZXNIpBXuPytrilh9uzdnth6cFdWxEPhOifkzZD7XhTMATzW+AfdOGA2KqNZY9P+igObiuLw=
+	t=1783509522; cv=none; b=CJVnZdkraoeR/Y15fopb9wxyIxRsM5oA+iKkuNzhmo0Qq6fbzee+/BNGNWnxSugVMPmnfrRQSOZWHJo1Vt4sQ+ciOOP86Nlxxe3gv7rRQbafpjwMgUMf5qnh9gM71+H3YVBmgOVbmvzhXJLjBCU012ZV1/eKdfYYF2E1p4e23H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783507386; c=relaxed/simple;
-	bh=g1cEDVucPut9nx4DxUDgLwvwvEc+KFxNwPycj1pZ2/Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MEgiYnJZ4OkVRFt9yOTiv+dulCvnVfuPdeUkUN746n2uD4v1IJmr3CVndZywLivPmtg2fOrM2ShWbEcBMpNdJZJ6bsDd8WgsEcPafFYoj672iRbkAH7Cpxuk2P04KVZ08XOBlIi0UXiyaqAkD8Gbp0K7sX197sMSAC/toZmZbxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eok20oS+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783509522; c=relaxed/simple;
+	bh=Q3mIYycQy8bOLg/worl5ZK/PQN7XNptnDVDQhCRzReM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yix1TSyjHweSIOcH9oMlDttaCTX+9Ngf9Y2JSJ8KyyiOY5sgJ2fUDVM8FBWq07EXkNvtzvedMi6SJFcMUWuUHeAB+dzpffahXjHMk6q/IZ3Xr14pyzK6NJTQ0Pb1AiN4zTX4C3oNWuIW+w2ds4W5xqJ1xtpOITOUebyN6+UHOk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=X9En1xPY; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eok20oS+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F29401F000E9;
-	Wed,  8 Jul 2026 10:42:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783507373;
-	bh=l4UyoSNyXebLeXjulHaoflPQw9V3It1bzboWcTLzP7s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Eok20oS+ydCL9nQkOELYtvSANI3EO+8Mppguumlyf4qv4bE/mnNXLqjmaKSJLdLAz
-	 e6wySYAdHbh0lv8vXonOiEQ1APKQGtVddR3qvacEXeqAGRcGA1Nr85Lgc3tF1lgoo2
-	 bLF4lm+DuOFXrVmxvIDPZq/3uf3OfiMmil7FQwibynaZFTySQNWU4ZltrUHId1Jlf5
-	 YsFeiJTQHvj3P9MVcPixYII7pO1Y15qOzHIniZGV/3SMGy3jCBCoW3GvxJ3JKpl6Bi
-	 8IQwKmj/gDaHZCvwr6Vo2JjHZnC0Ya/9yiBQRw77Z5UBjQ53S4As7lVm39Rmv10X43
-	 qSS3NqxqZ35vg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1whPju-00000002mQn-1Zh5;
-	Wed, 08 Jul 2026 10:42:50 +0000
-Date: Wed, 08 Jul 2026 11:44:37 +0100
-Message-ID: <874ii97obu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="X9En1xPY"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A96B71516;
+	Wed,  8 Jul 2026 04:18:34 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.2.213.26])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8BAA73F85F;
+	Wed,  8 Jul 2026 04:18:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783509519; bh=Q3mIYycQy8bOLg/worl5ZK/PQN7XNptnDVDQhCRzReM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X9En1xPYusv8IDZUhoObjF477Iwi+uP/2tcsxErNG3U1j4VAUJ3/e3FZ16l4tSQ43
+	 Jkvjm9GWmNxtp09fyP2qj3CQ0aKO/sEr2f2AjcjTcFwgRkRn3UUW4cvnY6Vj1yfhtn
+	 L7fOug012cdLeudm56L6DVc3F+m2flj3MBom21pg=
+Date: Wed, 8 Jul 2026 12:18:32 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 25/27] KVM: s390: arm64: Implement vCPU IOCTLs
-In-Reply-To: <20260706085229.979525-26-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
-	<20260706085229.979525-26-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 19/28] KVM: arm64: Make HCR_EL2 a non-VNCR register
+Message-ID: <20260708111832.GA99849@e124191.cambridge.arm.com>
+References: <20260702160248.1377250-1-maz@kernel.org>
+ <20260702160248.1377250-20-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702160248.1377250-20-maz@kernel.org>
 
-On Mon, 06 Jul 2026 09:52:25 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+On Thu, Jul 02, 2026 at 05:02:39PM +0100, Marc Zyngier wrote:
+> FEAT_NV3 makes a fundamental change to the architecture, by moving
+> guest-initiated HCR_EL2 accesses to the NVHCR_EL2 register. As the
+> names suggests, this is HCR_EL2 for a NV guest.
 > 
-> +static void adjust_pc(struct kvm_vcpu *vcpu)
-> +{
-> +	if (vcpu_get_flag(vcpu, INCREMENT_PC)) {
-> +		kvm_skip_instr(vcpu);
-> +		vcpu_clear_flag(vcpu, INCREMENT_PC);
-> +	}
-> +}
+> But where do NVHCR_EL2 accesses from a guest go? The are redirected
+> to the VNCR page, right where HCR_EL2 is stored in the NV2 case.
+> Does it hurt? Good. There's more coming.
+> 
+> The challenge here is to make KVM work seamlessly, without rewriting
+> everything. Which implies that things such as __vcpu_sys_reg(HCR_EL2)
+> must work, no matter the underlying NV implementation.
+> 
+> A simple way to deal with it is to move HCR_EL2's canonical storage
+> outside of VNCR for the vast majority of the KVM code, and only have
+> a copy at entry/exit times. Given that we don't really support NV3
+> yet, this is pretty simple.
+> 
+> In the process, advertise NVHCR_EL2 as the register that now holds
+> offset 0x78 in the VNCR page.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Can you clarify the semantics of adjust_pc() here? arm64 also deals
-with exceptions in the same code, and I wonder how you deal with this.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+> ---
+>  arch/arm64/include/asm/kvm_host.h     | 3 ++-
+>  arch/arm64/include/asm/vncr_mapping.h | 2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c       | 9 +++++++++
+>  3 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bae2c4f92ef5c..2648c8a717ba0 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -543,6 +543,7 @@ enum vcpu_sysreg {
+>  	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+>  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+>  	ZCR_EL2,	/* SVE Control Register (EL2) */
+> +	HCR_EL2,	/* Hypervisor Control Register */
+>  
+>  	/* Any VNCR-capable reg goes after this point */
+>  	MARKER(__VNCR_START__),
+> @@ -571,7 +572,7 @@ enum vcpu_sysreg {
+>  	VNCR(TFSR_EL1),	/* Tag Fault Status Register (EL1) */
+>  	VNCR(VPIDR_EL2),/* Virtualization Processor ID Register */
+>  	VNCR(VMPIDR_EL2),/* Virtualization Multiprocessor ID Register */
+> -	VNCR(HCR_EL2),	/* Hypervisor Configuration Register */
+> +	VNCR(NVHCR_EL2),/* NV Hypervisor Configuration Register */
+>  	VNCR(HSTR_EL2),	/* Hypervisor System Trap Register */
+>  	VNCR(VTTBR_EL2),/* Virtualization Translation Table Base Register */
+>  	VNCR(VTCR_EL2),	/* Virtualization Translation Control Register */
+> diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+> index 14366d35ce82f..9e8a49fa8b638 100644
+> --- a/arch/arm64/include/asm/vncr_mapping.h
+> +++ b/arch/arm64/include/asm/vncr_mapping.h
+> @@ -11,7 +11,7 @@
+>  #define VNCR_VTCR_EL2           0x040
+>  #define VNCR_VMPIDR_EL2         0x050
+>  #define VNCR_CNTVOFF_EL2        0x060
+> -#define VNCR_HCR_EL2            0x078
+> +#define VNCR_NVHCR_EL2          0x078
+>  #define VNCR_HSTR_EL2           0x080
+>  #define VNCR_VPIDR_EL2          0x088
+>  #define VNCR_TPIDR_EL2          0x090
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 8268779df4fa9..05bcf8bf7f978 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -70,6 +70,9 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+>  		if (!vcpu_el2_e2h_is_set(vcpu))
+>  			hcr |= HCR_NV1;
+>  
+> +		/* Publish the guest's view of HCR_EL2 to the HW */
+> +		__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+> +
+>  		/*
+>  		 * Nothing in HCR_EL2 should impact running in hypervisor
+>  		 * context, apart from bits we have defined as RESx (E2H,
+> @@ -547,6 +550,7 @@ static void fixup_nv_guest_exit(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (unlikely(host_data_test_flag(VCPU_IN_HYP_CONTEXT))) {
+>  		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> +		u64 hcr;
+>  
+>  		switch (mode) {
+>  		case PSR_MODE_EL1t:
+> @@ -559,6 +563,11 @@ static void fixup_nv_guest_exit(struct kvm_vcpu *vcpu)
+>  
+>  		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
+>  		*vcpu_cpsr(vcpu) |= mode;
+> +
+> +		/* Publish the latest HCR_EL2 to the emulation */
+> +		hcr = __vcpu_sys_reg(vcpu, NVHCR_EL2);
+
+My alarm bells went off reading this, because the context (in-memory) seemed
+wrong, but I see that patch 23 further modifies this for NV3!
 
 > +
-> +static void arm_vcpu_run(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sae_block *sae_block = &vcpu->arch.sae_block;
-> +
-> +	adjust_pc(vcpu);
-> +
-> +	local_irq_disable();
-> +	guest_enter_irqoff();
-> +	local_irq_enable();
-> +
-> +	sae_block->icptr = 0;
-> +
-> +	sae64a(sae_block);
-> +
-> +	local_irq_disable();
-> +	guest_exit_irqoff();
-> +	local_irq_enable();
-> +}
-> +
-> +/** kvm_arch_vcpu_ioctl_run() - run arm64 vCPU
-> + *
-> + * Execute arm64 guest instructions using SAE.
-> + *
-> + * Returns:
-> + * 1 enter the guest (should not be observed by userspace)
-> + * 0 exit to userspace
-> + * < 0 exit to userspace, where the return value indicates n error
-> + *
-> + *
-> + */
-> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> +{
-> +	DECLARE_KERNEL_FPU_ONSTACK32(fpu_save);
-> +	struct kvm_run *kvm_run = vcpu->run;
-> +	int ret;
-> +
-> +	if (kvm_run->exit_reason == KVM_EXIT_MMIO) {
-> +		ret = kvm_handle_mmio_return(vcpu);
-> +		if (ret <= 0)
-> +			return ret;
-> +	}
-> +
-> +	vcpu_load(vcpu);
-> +
-> +	kernel_fpu_begin(&fpu_save, KERNEL_FPC | KERNEL_VXR);
-> +	load_vx_regs((vcpu->arch.ctxt.vregs));
-> +
-> +	if (!vcpu->wants_to_run) {
-> +		ret = -EINTR;
-> +		goto out;
-> +	}
-> +
-> +	kvm_sigset_activate(vcpu);
-> +
-> +	might_fault();
-> +
-> +	ret = 1;
-> +	do {
-> +		if (signal_pending(current)) {
-> +			kvm_run->exit_reason = KVM_EXIT_INTR;
-> +			ret = -EINTR;
-> +			continue;
-> +		}
-> +
-> +		if (need_resched())
-> +			schedule();
-> +
-> +		if (ret > 0)
-> +			ret = check_vcpu_requests(vcpu);
-> +
-> +		vcpu->arch.sae_block.icptr = 0;
-> +
-> +		arm_vcpu_run(vcpu);
-> +
-> +		ret = handle_exit(vcpu);
-> +
-> +	} while (ret > 0);
-> +
-> +	kvm_sigset_deactivate(vcpu);
-> +out:
-> +	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
-> +		adjust_pc(vcpu);
-
-arm64 has the following statements:
-
-	if (unlikely(vcpu_get_flag(vcpu, PENDING_EXCEPTION) ||
-		     vcpu_get_flag(vcpu, INCREMENT_PC)))
-		kvm_call_hyp(__kvm_adjust_pc, vcpu);
-
-It isn't clear to me why you can afford not to deal with pending
-exceptions when returning to userspace.
-
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+> +		__vcpu_assign_sys_reg(vcpu, HCR_EL2, hcr);
+>  	}
+>  
+>  	/* Apply extreme paranoia! */
+> -- 
+> 2.47.3
+> 
