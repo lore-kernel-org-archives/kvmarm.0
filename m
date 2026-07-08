@@ -1,124 +1,95 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8CF41CB51;
-	Wed,  8 Jul 2026 16:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61098423760;
+	Wed,  8 Jul 2026 16:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783527380; cv=none; b=H5A8lgBA2+lBwapd84INmgFlC1+Wis4FYdK7X7W87qYc7uR3iEtYtYu9ezZVP+Z/yxechZDznWo0pOHg6nkrW2zDKcHT+O9Yl/nqfFtCPTRn5xcRjL5Vig31DRLES0f6FigeG8gSRSoSdPTYWR0msMTBqXAObIYkQsl9FVE3Wko=
+	t=1783528759; cv=none; b=LZiMsuD1C1QaQmOFsUNLShDHwZqK/K4BzCdwM2vuxxetNerhfiTA7BSi81wEbtBtETEXxfth18A2pqyrUQHCRmam4WHDgIK8bfzLGMkVRqQH1W72tpDgIlDkoWRAYc5ls4A6EMvnugT0LKe0Znivob6xfvDQ/hcApln6dWl6Am4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783527380; c=relaxed/simple;
-	bh=byPWw+QjRNa2CBjLXS6387ax3lQgdQFw1P84TMJL9fg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=XlzmOsaRQURPXKTC9+btbMMvIquORCMAfZLiNyzehpTWLprVvXP/erICXUs9NCz+5Jel1TKF/l/5APi77K/STxa2u4Thnlwk9CBcYgzFizn3O7R5BCoGQeGwdUw5hw5nlpXZRJuGa8hl4boyz06aywZhHL+VX5QfUIzpxPM5878=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WvfSEoYh; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783528759; c=relaxed/simple;
+	bh=U7gjayLxp9nvdld9EPLyo54p/ncljryzTW0Yxr0rz0A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ec06TpylRJC+KF8TxzOWSUtqmmCmyqSUmBWWwRs2B1Sj5xFz/LwSFhOyTTb0+qyUgqKAD8/Eovw9xHJDn6kbVOQ9Ed7ozYjGt18/CaM5naz+HELGIIHGmvSYrS3nPsYrPvrkLFmMJ68jAciNlnb35IudJRqrMFLiIyTN8a1ZWJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dUl1bxY9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WvfSEoYh"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 766571D14;
-	Wed,  8 Jul 2026 09:16:10 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C18AE3F7B4;
-	Wed,  8 Jul 2026 09:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783527374; bh=byPWw+QjRNa2CBjLXS6387ax3lQgdQFw1P84TMJL9fg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WvfSEoYh6I+u+OUFSlJMyuqeYIAfEBZ1YsonpazbNVcwMGnq3OIS0mznEHCX85BVn
-	 jf2O97gwJPeG4KXPJ78r2x7AEsGnoS/kHSmsLmEwdBVUOsy1/pQ/UTDMINttVcFZC6
-	 ZqS6j5YXSCxS6yRjzLBo2PU3KuBgFewDK/mMgOQg=
-From: Leonardo Bras <leo.bras@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dUl1bxY9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E6381F000E9;
+	Wed,  8 Jul 2026 16:39:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783528758;
+	bh=s17L25CKf6N69n47kq5IfOEmXIhfMV81UIxYDG1zrNg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dUl1bxY9rew5rS9hqYip2CHsshSWH5nY76m0otTtVHyCzupnUfD3dyMmXcm/hPIIu
+	 Q4PvC2p7Z428yGtVZTjIpR71+UoV/gW9OPkM8t9uRChGLC3tGID2VlHD8GG68XBSLD
+	 rTQEi3T5xH479HRADzb0ra8fNgofDFY6HF9PW71qdLzIxVU+DSPc7q8MVZL2oPZMNN
+	 oo4o9sMmhnzgkjFVVCncFdNn1UTdpnRewQgsXZ0bIBY8sEzDXLcseQUwugf8y/f+Fg
+	 7pTNsRT+w1UD22+IFK+0orjJbnp9WWMWTCE+f9SSE7RHLJLTzZsn9g+VxQMMe4KM13
+	 8+UDVg2Ovb1rg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1whVIp-00000002v6F-3wwj;
+	Wed, 08 Jul 2026 16:39:16 +0000
+Date: Wed, 08 Jul 2026 17:41:05 +0100
+Message-ID: <8733xt77tq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 2/3] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-Date: Wed,  8 Jul 2026 17:16:11 +0100
-Message-ID: <ak53y_LNND3Gp-pD@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <ak5xbWIh4U3hbbx8@LeoBrasDK>
-References: <20260708134101.2514759-1-leo.bras@arm.com> <20260708134101.2514759-3-leo.bras@arm.com> <20260708135012.3B21A1F000E9@smtp.kernel.org> <ak5xbWIh4U3hbbx8@LeoBrasDK>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] KVM: arm64: Avoid re-testing walk_continue
+In-Reply-To: <20260708134101.2514759-2-leo.bras@arm.com>
+References: <20260708134101.2514759-1-leo.bras@arm.com>
+	<20260708134101.2514759-2-leo.bras@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jul 08, 2026 at 04:49:01PM +0100, Leonardo Bras wrote:
-> On Wed, Jul 08, 2026 at 01:50:11PM +0000, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> > - [Medium] KVM_PGTABLE_WALK_SKIP_LEVEL* flags fail to skip the starting root level of the page table walk.
-> > --
-> > 
-> > --- Patch [2]: [PATCH v3 2/3] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags ---
-> > commit 5ddf63ba492be8c2a84af0b81cf00790fc72767a
-> > Author: Leonardo Bras <leo.bras@arm.com>
-> > 
-> > KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-> > 
-> > This commit adds new walking flags that tell kvm_pgtable_walk() to skip
-> > lower levels when traversing page tables.
-> > 
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > index 4be1d51a6ac58..b9a2078efc519 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > 
-> > [ ... ]
-> > 
-> > > @@ -192,7 +205,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> > >  	if (!kvm_pgtable_walk_continue(data->walker, ret))
-> > >  		return ret;
-> > >  
-> > > -	if (!table) {
-> > > +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
-> > 
-> > [Severity: Medium]
-> > Does this fail to skip the starting level of the page table walk if that
-> > initial level matches the skip criteria?
-> > 
-> > Looking at __kvm_pgtable_visit() in arch/arm64/kvm/hyp/pgtable.c, the visitor
-> > callbacks are executed unconditionally for the current level before we reach
-> > this skip check:
-> > 
-> > 	if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE)) {
-> > 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
-> > 		reload = true;
-> > 	}
-> > 
-> > 	if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
-> > 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
-> > 		reload = true;
-> > 	}
-> > 
-> > Since the skip condition here only evaluates level + 1 to prevent descending
-> > further, if a caller begins a walk at a level that should be skipped (for
-> > example, starting at level 2 with KVM_PGTABLE_WALK_SKIP_LEVEL2), the callbacks
-> > for that root level will still execute. 
-> > 
-> > Should the current level also be checked against the skip flags before
-> > executing the pre-table or leaf visitor callbacks?
+On Wed, 08 Jul 2026 14:40:57 +0100,
+Leonardo Bras <leo.bras@arm.com> wrote:
 > 
-> Yes, we do execute the callback at least in the root we are given, which 
-> can have bad results in some scenario. That being said, testing here is not 
-> the best place, as this function will be called a lot.
+> In __kvm_pgtable_visit(), a couple tests for kvm_pgtable_walk_continue()
+> will 'goto out' if it should not continue. This means the same test will be
+> ran again before returning ret, which is unnecessary.
 > 
-> If we want to avoid that scenario, I suggest we do that test before 
-> starting the walk, which would be on  _kvm_pgtable_walk(), except that both
-> kvm_pgtable_stage2_create_unlinked(), and 
-> kvm_pgtable_stage2_free_unlinked()
-> will call _kvm_pgtable_walk() directly.
+> Return ret directly instead.
+> This will simplify next patch.
 
-will call __kvm_pgtable_walk() directly.
+This reads quite badly, and doesn't explain what you are trying to do.
+How about something like:
 
-> 
-> (although they don't use skip_level paramters, yet)
-> 
-> Will take a look on that.
-> 
-> Thanks!
-> Leo
+"__kvm_pgtable_visit() performs a bunch of calls to
+ kvm_pgtable_walk_continue() to find out whether the walk can continue
+ further, and if not, falls back to an 'goto out' which retests the
+ possibility of continuing the walk.
+
+ Given that there is no reason why the situation would have changed
+ between the two checks, turn this goto into an early return,
+ simplifying the code and paving the way for further rework."
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
