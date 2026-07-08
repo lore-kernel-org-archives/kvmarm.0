@@ -1,181 +1,150 @@
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D0D38551A
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 22:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99B626158B
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 22:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783551139; cv=none; b=kknkAWl0yPCcdIE9kwDyJ/i6OVJBmNNoWVHWlFpBf5IfiZfy3zn0yPnwgjdnumsOFPjlOurA3rRMeNrBpDg+h4Jp5mdarcvZ9fmu2XGV6nxeIQbgCWP6+Vk9oGM3r3INgyNNDGTK3FZQ+e6Za+2LLIaPFR+/gWP4l0CzluH3M8U=
+	t=1783551570; cv=none; b=CR3oshVYRRcV1dgR1rBi4zupYYyx2nXHLhH4YUjTRMQ6yEYm6yGOTUnC76WhTqWtKrEz3k2+XkEBrjJOW3QQMmykzcG6elDuo+gJYRPmuBLt5c21HEywRT9e6KvBGxO1/MdukEEU54jYE/C9C7eIvnWKbEaxxfBepNg+p9Bq59U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783551139; c=relaxed/simple;
-	bh=nUhFMfzpySNDZtLZSUs7iGBvYNcjPGt8shYlgz2wNtQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VDkFQ+SIpGj/vyxMP2n/zpzyJTQPPJAZhphc6toiW4LsNaAQRJl6FDDZugIbtpqYZr/U7D+kB0Y56/5yZHbxs0+adPtmGRDPrAoHCPzC8blF7mtJrSXAFrHGCnyxD4RIqd4ij9HdRq6emgLJVo61fVCkviskHs4ldSssDPLRQJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B2zvI5Bn; arc=none smtp.client-ip=209.85.161.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1783551570; c=relaxed/simple;
+	bh=KlUaHVEe++9WD9V49EqQNsbmJnOn1MAAFCMQijbxpkw=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=T3ygTH8yRagqST6NcYtP6y7uOSt8gNK82MQ68CChgagcvF2pxFZmJIBhyCqmarij029BY118PgfwxUkOqEn3vNxxb7gPlj3JT+8D/F2SMHNUmcbtc4kCddIQfpxr4t1Qyhcvl3PdKgIpiiFCAwcxNE7KGubZE/LjMwhGCiB9Rfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WBoR/ccz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B2zvI5Bn"
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-6a0c02365c7so1718356eaf.2
-        for <kvmarm@lists.linux.dev>; Wed, 08 Jul 2026 15:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783551133; x=1784155933; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=BRLBDv0GR5+I5QEs+yagz6DalTxaINze8PKIAjmPSRo=;
-        b=B2zvI5BnIPMuW5i6BSrqpQiIThPwl6wj0SDrcCV5Z3lVzB6Hh24fPy6B9Hdni02Kg2
-         sq519PXlS+E6SyAF1GDIT41aay3t+Wq1atvNPEck23tsZGMdfnqv+YJNCV00hIvG67ew
-         DOZXK8mrIuBGCj9/gQT/iByH5+TpuxzecpfSDIE747LDajfU52qOGuyujlaRbQ/GnHEW
-         myHFLrELJ1ygusi3xnJK2ofWSexbHKkb3M4TW67bicXpTVZ7NSHTBpU1vX0g2EEE6mL3
-         5icFlP6we8MSOPeXchszve0/Cd/OgzCUmW0yWUGQ0KciPayJQu/ahl5Uuorek9lSvcnq
-         dbEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783551133; x=1784155933;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=BRLBDv0GR5+I5QEs+yagz6DalTxaINze8PKIAjmPSRo=;
-        b=Lvoo1nz9IAhpSJrtQzC2NZzGK19J7PJJZRZokZNuRJ4PgeXQ5PFHT7/RGIZbS8wcFa
-         0EF9qN+yEv72DXFoRGVNHg9Ts2/DTLd+bi9hatormsWMeX3fjTjyKSuQLHa9Tzw9ueLK
-         na2ALAZPdcYiGpQZ05Fz2/umsQni3b3X6WsTQpgWtmbPflzNMqpeMWDAsug3GNZS4PWC
-         uBwiSvNupyOJkABcIui0/e32YIKUOpDWr2DVHud/y3ZFVrtcI6OjXfnsnkW4NlLU2YQw
-         EHd+GKAJErB7FnRIijHNiXKOatkn0iGXGoHFCvtGtNoCslnKlW2XfV72B9d0UawXxbPO
-         LYew==
-X-Forwarded-Encrypted: i=1; AFNElJ97paLkbZcQFA/cySKPriNO96SLWdiAEkqTgzmgcpecMRiMXRccSEs/HzFJ4XelNSkuXTER1wo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyzJPNThQHajpSnWtrfHv04JcaUI+71oJ+D9qXuR6e4zblUYrwG
-	F7qeOaNoCBMoo82eeUSVysm8/88BnVcXJW1PZki2Ai68AUv1j8qztqjObChrhJRFLfcDsbIH1gv
-	YXqiMRF6uN0QuEHqGznsyEW7VgQ==
-X-Received: from ilmq1.prod.google.com ([2002:a92:d401:0:b0:503:8d4a:5b5b])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:5708:10b0:6a3:74fd:a86f with SMTP id 006d021491bc7-6a374fdb227mr1250772eaf.9.1783551133388;
- Wed, 08 Jul 2026 15:52:13 -0700 (PDT)
-Date: Wed,  8 Jul 2026 22:51:24 +0000
-In-Reply-To: <20260708225124.4130846-1-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WBoR/ccz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8841F000E9;
+	Wed,  8 Jul 2026 22:59:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783551568;
+	bh=qiqISiNFs1AGzYhRUG67sY7skaj3Lb5IS+CtinetH8s=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=WBoR/cczmF8ByU6CWhWbPQB5Rs/RCTrdJtic785Tk9gNEFrFPgFBAhbGHPcn/WNlV
+	 LLdkqiy949MDeYv1RfagLhieeFVNEIPkcVBuDhryQ/f9KiEeEIdtc1FNa7AGUgzFjs
+	 h09dbNfVc12A6wsY0uFHaSP6HLkpviRTOxU+qSQH3D2JYafnZPKoCzfrL6m3MA8LHY
+	 tQFJqYvuFVp497EIHwzRcwn8R1d0eNKU9ogcSwQxYG+6Y9AIdUL3/YZlyekfkDSdYO
+	 Hk/Iw/9tmGipDPozfiMrcACRTSfuvSuqWbYF7wWVYXcK35fRqrIlmsejv8HMVqE6Uh
+	 iDwwH7q8TrWgA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 6.6 v2 2/6] arm64: Treat HCR_EL2.E2H as RES1 when
+ ID_AA64MMFR4_EL1.E2H0 is negative
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Colton Lewis" <coltonlewis@google.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260708225124.4130846-3-coltonlewis@google.com>
+References: <20260708225124.4130846-1-coltonlewis@google.com>
+ <20260708225124.4130846-3-coltonlewis@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Jul 2026 22:59:27 +0000
+Message-Id: <20260708225928.0D8841F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260708225124.4130846-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
-Message-ID: <20260708225124.4130846-7-coltonlewis@google.com>
-Subject: [PATCH 6.6 v2 6/6] arm64: Revamp HCR_EL2.E2H RES1 detection
-From: Colton Lewis <coltonlewis@google.com>
-To: stable@vger.kernel.org
-Cc: oliver.upton@linux.dev, sashal@kernel.org, gregkh@linuxfoundation.org, 
-	mizhang@google.com, catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, ahmed.genidi@arm.com, leo.yan@arm.com, 
-	miguel.luis@oracle.com, dbrazdil@google.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Jan Kotas <jank@cadence.com>
-Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-[ Upstream commit ca88ecdce5f51874a7c151809bd2c936ee0d3805 ]
+New issues:
+- [High] The feature check for `ID_AA64MMFR4_EL1.E2H0 < 0` will always eval=
+uate to false because `tbnz` tests a bit that has been unconditionally clea=
+red by `ubfx`.
 
-We currently have two ways to identify CPUs that only implement FEAT_VHE
-and not FEAT_E2H0:
+Pre-existing issues:
+- [High] Writes to control-plane system registers (`SYS_SCTLR_EL12` and `sc=
+tlr_el1`) are not immediately followed by an `isb()` instruction.
+--
 
-- either they advertise it via ID_AA64MMFR4_EL1.E2H0,
-- or the HCR_EL2.E2H bit is RAO/WI
+--- Patch [2]: [PATCH 6.6 v2 2/6] arm64: Treat HCR_EL2.E2H as RES1 when ID_=
+AA64MMFR4_EL1.E2H0 is negative ---
+commit c23e23c763b1ca2a9cc5f6843036bd8b47bf9194
+Author: Marc Zyngier <maz@kernel.org>
 
-However, there is a third category of "cpus" that fall between these
-two cases: on CPUs that do not implement FEAT_FGT, it is IMPDEF whether
-an access to ID_AA64MMFR4_EL1 can trap to EL2 when the register value
-is zero.
+arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is negative
+   =20
+For CPUs that have ID_AA64MMFR4_EL1.E2H0 as negative, it is important
+to avoid the boot path that sets HCR_EL2.E2H=3D0. This patch tweaks init_el2
+to look at ID_AA64MMFR4_EL1.E2H0 first.
+   =20
+Link: https://lore.kernel.org/r/20240122181344.258974-8-maz@kernel.org
 
-A consequence of this is that on systems such as Neoverse V2, a NV
-guest cannot reliably detect that it is in a VHE-only configuration
-(E2H is writable, and ID_AA64MMFR0_EL1 is 0), despite the hypervisor's
-best effort to repaint the id register.
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index 6517bf2644a08..e32c8dd0b17a7 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -589,25 +589,32 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+>  	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
+> =20
+>  	/*
+> -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
+> -	 * making it impossible to start in nVHE mode. Is that
+> -	 * compliant with the architecture? Absolutely not!
+> +	 * Compliant CPUs advertise their VHE-onlyness with
+> +	 * ID_AA64MMFR4_EL1.E2H0 < 0. HCR_EL2.E2H can be
+> +	 * RES1 in that case.
+> +	 *
+> +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
+> +	 * don't advertise it (they predate this relaxation).
+>  	 */
+> +	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
+> +	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
+> +	tbnz	x0, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH - =
+1), 1f
 
-Replace the RAO/WI test by a sequence that makes use of the VHE
-register remnapping between EL1 and EL2 to detect this situation,
-and work out whether we get the VHE behaviour even after having
-set HCR_EL2.E2H to 0.
+[Severity: High]
+Does this bit test evaluate correctly? The ubfx instruction extracts 4 bits
+starting at the shift and places them into bits 3:0 of x0, zero-extending
+the rest of the register.
 
-This solves the NV problem, and provides a more reliable acid test
-for CPUs that do not completely follow the letter of the architecture
-while providing a RES1 behaviour for HCR_EL2.E2H.
+However, the tbnz instruction here tests a bit based on the original shift
+amount plus the width minus 1. Because the upper bits of x0 are
+unconditionally cleared by ubfx, will this branch ever be taken?
 
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Tested-by: Jan Kotas <jank@cadence.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/15A85F2B-1A0C-4FA7-9FE4-EEC2203CC09E@global.cadence.com
+> +
+>  	mrs	x0, hcr_el2
+>  	and	x0, x0, #HCR_E2H
+> -	cbz	x0, 1f
+> -
+> +	cbz	x0, 2f
+> +1:
+>  	/* Set a sane SCTLR_EL1, the VHE way */
+>  	pre_disable_mmu_workaround
+>  	msr_s	SYS_SCTLR_EL12, x1
+>  	mov	x2, #BOOT_CPU_FLAG_E2H
 
-[ Backport: Resolved conflict in arch/arm64/include/asm/el2_setup.h
-  by replacing msr_hcr_el2 macro usages with raw msr hcr_el2 (since
-  the macro is missing in 6.6.y). ]
----
- arch/arm64/include/asm/el2_setup.h | 38 +++++++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 6 deletions(-)
+[Severity: High]
+This is a pre-existing issue, but does this system register write need an
+immediate isb()?
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 76b0d50d286d5..4c7467b382b60 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -24,22 +24,48 @@
- 	 * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
- 	 * can reset into an UNKNOWN state and might not read as 1 until it has
- 	 * been initialized explicitly.
--	 *
--	 * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
--	 * don't advertise it (they predate this relaxation).
--	 *
- 	 * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
- 	 * indicating whether the CPU is running in E2H mode.
- 	 */
- 	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
- 	sbfx	x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
- 	cmp	x1, #0
--	b.ge	.LnVHE_\@
-+	b.lt	.LnE2H0_\@
- 
-+	/*
-+	 * Unfortunately, HCR_EL2.E2H can be RES1 even if not advertised
-+	 * as such via ID_AA64MMFR4_EL1.E2H0:
-+	 *
-+	 * - Fruity CPUs predate the !FEAT_E2H0 relaxation, and seem to
-+	 *   have HCR_EL2.E2H implemented as RAO/WI.
-+	 *
-+	 * - On CPUs that lack FEAT_FGT, a hypervisor can't trap guest
-+	 *   reads of ID_AA64MMFR4_EL1 to advertise !FEAT_E2H0. NV
-+	 *   guests on these hosts can write to HCR_EL2.E2H without
-+	 *   trapping to the hypervisor, but these writes have no
-+	 *   functional effect.
-+	 *
-+	 * Handle both cases by checking for an essential VHE property
-+	 * (system register remapping) to decide whether we're
-+	 * effectively VHE-only or not.
-+	 */
-+	msr	hcr_el2, x0		// Setup HCR_EL2 as nVHE
-+	isb
-+	mov	x1, #1		// Write something to FAR_EL1
-+	msr	far_el1, x1
-+	isb
-+	mov	x1, #2		// Try to overwrite it via FAR_EL2
-+	msr	far_el2, x1
-+	isb
-+	mrs	x1, far_el1	// If we see the latest write in FAR_EL1,
-+	cmp	x1, #2		// we can safely assume we are VHE only.
-+	b.ne	.LnVHE_\@	// Otherwise, we know that nVHE works.
-+
-+.LnE2H0_\@:
- 	orr	x0, x0, #HCR_E2H
--.LnVHE_\@:
- 	msr	hcr_el2, x0
- 	isb
-+.LnVHE_\@:
- .endm
- 
- .macro __init_el2_sctlr
--- 
-2.55.0.795.g602f6c329a-goog
+According to ARM64 context synchronization rules, writes to control-plane
+system registers like SYS_SCTLR_EL12 must be followed by an isb() as the
+very next instruction. Here, a mov instruction intervenes, which might
+observe architecturally undefined pipeline state.
 
+> -	b	2f
+> +	b	3f
+> =20
+> -1:
+> +2:
+>  	pre_disable_mmu_workaround
+>  	msr	sctlr_el1, x1
+>  	mov	x2, xzr
+
+[Severity: High]
+This is a pre-existing issue, but is the nVHE path missing an isb() here
+as well?=20
+
+Similar to the VHE path above, msr sctlr_el1, x1 is immediately followed by=
+ a
+mov instruction rather than a synchronization barrier.
+
+> -2:
+> +3:
+>  	__init_el2_nvhe_prepare_eret
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260708225124.4130=
+846-1-coltonlewis@google.com?part=3D2
