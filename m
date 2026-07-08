@@ -1,133 +1,151 @@
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904E83F7A84
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 08:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670FA330328
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 08:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783498236; cv=none; b=iaSfeWhbXsfXDWiNd6bwJRZoaaAMz2Vg+BXosX98smSUrWMnyemCNXRW1ajP0OG6WjD8m5T2bwNwztP8d5bL9Cu3NivkS8dWD9c33/TKDgu7WDu3cpjiMPwqwUowz3XFigHQcSe+9TZOMwlYsy9cdu30o9ereWmTM3J4zHihm8k=
+	t=1783499581; cv=none; b=frqNLIQhKqKdAQadGI6hZbkSGjAeeOHQ4CU8QUBOENmDJx4JwDtf5ODk84vLbjfAyiHqSWOjxu6OmV/ojzs2Tyt2Z0Q0hDCgiXF5vfiLJSS1C+LPqFyjNaqq5eA3uwkAgS20yYjuhPnoRUS1svdx5SYDG55yfmHSudOiE8vs8Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783498236; c=relaxed/simple;
-	bh=42ZnsNEzYU3qeOHMIxvJnRrAOG+XDR4kOm+vyUij7Ko=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=gOnDNN+NuJ/Nai2uJ/REYAQns8vFwuLGrJvnrszlvmsMwDEACouVmnaQ7kkYiwL0QiDbFVpM4MpzdMdE24KzEkPwn0r7VdqVP07AJfqSyH8tG2zCikP9rgHe+8qQK2jVk0Bb7LLT/UgOeSySRnzJG5wUMIBNCjUIvc5IA7ESwxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cZ5Mo1cT; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1783499581; c=relaxed/simple;
+	bh=fFhtZ67NZllrYCd832GHNGIAdgvZJIjHuqhWxtbGXmo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lMP8aCEYdM4WtKWDLBVitBh5VtMjz/q3UoahKGD6mE96pY/NRqEwMN57PhPvDpDkYhWsjEaQMsTPfq+nDMsJVe4/nZvBB75jQNLzZ/aKh5XajEZRoorujS6atFT+xYdFgXNAiGhC63RVSdCgtRSoGEgLJdMHtY5IRlVAZcayxRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ZiFIfM95 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cZ5Mo1cT"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=47j1tF26x6yEbj/B+EdsoVKcuds2e4qIDMPTidVXRP4=;
-	b=cZ5Mo1cTlxIyNqwxhoF5dogAW8csvXRhcbfaU+tjzIdKJvQ1L7fwjbbBToUf1lkpvMBN82aXh
-	es5eKyFp/PcASbMIPD+R2fBp8abjeHWeCJCR4eszQDyRdygM9Jkc9GV41izViCtZT9L23FXu8Kn
-	mhWhk9Ju4xk2eVJ1VJjvhtE=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gw9X60kprz1K9XX;
-	Wed,  8 Jul 2026 16:01:10 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id DB8624055B;
-	Wed,  8 Jul 2026 16:10:22 +0800 (CST)
-Received: from kwepemq500001.china.huawei.com (7.202.195.224) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 8 Jul 2026 16:10:20 +0800
-Received: from [10.67.146.137] (10.67.146.137) by
- kwepemq500001.china.huawei.com (7.202.195.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 8 Jul 2026 16:10:19 +0800
-Subject: Re: Question about the "TLBs and I-cache are private to each vCPU"
- guarantee with VTTBR_EL2.CnP
-To: Oliver Upton <oupton@kernel.org>
-CC: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>, <joey.gouly@arm.com>,
-	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<catalin.marinas@arm.com>, <will@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, "guoyang (C)" <guoyang2@huawei.com>,
-	"huanglingyan (A)" <huanglingyan2@huawei.com>, "Wangzhou (B)"
-	<wangzhou1@hisilicon.com>
-References: <e85b957d-c8bc-aac0-b413-03441d05c3df@huawei.com>
- <xx4obnrmf6lp5dbyo2uwn4pglq7q5nw7ccoyude4zavrgejctg@ll25qpga7qef>
- <292b5734-9005-6db0-da08-3da04628e620@huawei.com>
- <86o6gkpokm.wl-maz@kernel.org>
- <21eb51aa-443c-4d08-b4dd-3f813bbc9880@huawei.com>
- <86jyr8pkw8.wl-maz@kernel.org>
- <5685cdb9-95d8-9ead-4d24-d6ad06dd9547@huawei.com>
- <akvKvePWiu4pB47Q@J2N7QTR9R3.cambridge.arm.com>
- <7d97b19a-ef56-dea1-cd99-056e0e34a7fa@huawei.com>
- <akyeWPzrMDuAGRXP@kernel.org>
-From: Tangnianyao <tangnianyao@huawei.com>
-Message-ID: <007d69fe-9554-b9c1-dd89-23856d78571b@huawei.com>
-Date: Wed, 8 Jul 2026 16:10:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ZiFIfM95"
+Received: from [133.11.54.183] (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 6688WKbc097244
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 8 Jul 2026 17:32:20 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=CE0Ute93tZYNyM/ptOJZ4hDRYpAdgE2IvA/+HRQtmKs=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20250326; t=1783499541; v=1;
+        b=ZiFIfM95K+oOjjYwp9L1z9EKyqwpu4VPlhs0nyMnWoctpX/G6HUndJyHy9FFN1z/
+         neri5+DSRWnKKNke2RFzpZgjUoxG3NbV9aqpSQbp1xNzKceqMYM6/12aLhXwEhZy
+         ODNcSHI1/pmWB+a29oR0TlimAr0jZvBhIU/LdUkYz6rx7ZpSSdzi6/TUC+EVSXky
+         kc/lCR0J4/rZ08bUkhGfIEGjis4TLL3K6n5xD6ovdVZqKSB/9W82xlZvsZpN8e0G
+         7ynZZSeiwbxcWAqRSTGi9tzp+Dxe4pVnemAPliUgzZk5hBoLaNJ+6j3+IanDRzF3
+         HfT8XOd9Jk/lD9fWn456aQ==
+Message-ID: <7bf6c440-5f14-4326-9800-9821adc4e2e4@rsg.ci.i.u-tokyo.ac.jp>
+Date: Wed, 8 Jul 2026 17:32:20 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <akyeWPzrMDuAGRXP@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 1/7] KVM: arm64: Disallow vPMU when pPMUs do not cover
+ all CPUs
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu
+ <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <20260706-hybrid-v8-1-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <akvgIWqBjAp_VA_A@kernel.org>
+ <e03f17b2-a765-4912-adf6-3da26e7eeecd@rsg.ci.i.u-tokyo.ac.jp>
+ <ak1DVUs0bgkpZh0N@kernel.org>
 Content-Language: en-US
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemq500001.china.huawei.com (7.202.195.224)
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <ak1DVUs0bgkpZh0N@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-
-On 7/7/2026 14:36, Oliver Upton wrote:
-> On Tue, Jul 07, 2026 at 10:41:35AM +0800, Tangnianyao wrote:
->> On 7/6/2026 23:33, Mark Rutland wrote:
->>> If *both* of the vCPUs set TTBRn_EL1.CnP, then surely that is
->>> indistinguishable from physical CPUs:
+On 2026/07/08 3:20, Oliver Upton wrote:
+> On Tue, Jul 07, 2026 at 08:08:03PM +0900, Akihiko Odaki wrote:
+>> On 2026/07/07 2:04, Oliver Upton wrote:
+>>> Hi,
 >>>
->>>     PE0(core0,smt0)         PE1(core0,smt1)
->>>     cpu0 va->pa0        
->>>                             cpu1 flush local tlb
->>>                             cpu1 modify desc to va->pa1
->>>     cpu0 hit *va->pa1*
+>>> On Mon, Jul 06, 2026 at 07:03:24PM +0900, Akihiko Odaki wrote:
+>>>> Commit ec3eb9ed6081 ("KVM: arm64: PMU: Disallow vPMU on non-uniform
+>>>> PMUVer") made KVM reject vPMU unless the system-wide PMUVer is usable.
+>>>> That covers systems where PMUv3 is absent or non-uniform, as well as
+>>>> systems where IMPDEF PMUv3 sysreg traps are unavailable.
+>>>>
+>>>> However, KVM can still accept vPMU when all CPUs uniformly trap PMUv3
+>>>> sysregs, but the pPMUs registered with KVM only cover a subset of
+>>>> possible CPUs.
+>>>>
+>>>> Reject vPMU unless the registered pPMUs cover every possible CPU.
+>>>> This avoids carrying support for partial pPMU coverage into the
+>>>> fixed-counters-only UAPI introduced later in the series.
 >>>
->>> Mark. 
->>>
->>> .
->>>
->> Thanks for the clarification.
->> Stage-1 CnP determines whether Stage-1 translation entries may be shared
->> across vCPUs, and the hardware is responsible for enforcing the
->> architectural semantics.
+>>> Doesn't CPU hotplug screw this up? I could online a CPU that doesn't
+>>> have a PMU after creating the VM.>
+>>> I'd rather just change ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS to become a
+>>> system feature. That way any CPU which breaks the system-wide assumption
+>>> cannot be onlined.
 >>
->> Given that, why does KVM still need to guarantee that TLBs are private to
->> each vCPU?
+>> ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS only says that IMPDEF PMUv3 sysregs are
+>> trapped. It does not say that KVM has a driver-backed PMU usable for PMUv3
+>> emulation. This patch checks that extra requirement.
 >>
->> Assuming VTTBR_EL2.CnP == 1:
->> If TTBRx_EL1.CnP == 1, the guest is responsible for ensuring that the
->> translations referenced by TTBRx_EL1 are shareable, as required by the
->> architecture.
->> If TTBRx_EL1.CnP == 0, the hardware must ensure that Stage-1 translations
->> are not shared, again according to the architectural definition.
+>> I re-checked CPU hotplug. Onlining a CPU without a PMU later does not make
+>> an accepted VM unsafe, since the check is against cpu_possible_mask.
+> 
+> Sorry, I missed that this was against the possible mask.
+> 
+>> The problem is the reverse case on ACPI: this check can disable vPMU when a
+>> possible CPU is offline. DT populates supported_cpus at boot, while ACPI
+>> initially populates it only from online CPUs and grows it as matching CPUs
+>> come online.
 >>
->> The reason I'm asking is the potential performance impact. In a scenario
->> where multiple vCPUs of the same VM are scheduled onto a single PE, this
->> TLB flush may prevent a vCPU from reusing its previously populated
->> translation entries, potentially increasing TLB misses.
-> The problem is you can't infer the state of the TLB based on the current
-> value of CnP at stage-1. CnP only applies to the current TTBR;
-> nothing stops the guest from using a mix of CnP=0/1 for different TTBRs.
->
-> KVM still needs to invalidate in the case that the PE retained a CnP=0
-> TLB entry for a different stage-1 context than the one configured at
-> the time of vcpu_load().
->
-> Thanks,
-> Oliver
-> .
->
+>> That makes this patch too conservative. In practice, I do not expect systems
+>> to mix CPUs with and without a usable PMU. A better approach is probably to
+>> treat such a host as out of spec and add TAINT_CPU_OUT_OF_SPEC. We already
+>> do that for architectural PMUv3 by detecting mismatches in
+>> ID_AA64DFR0_EL1.PMUVer; we can do the same for
+>> ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS with non-standard PMUs.
+> 
+> The presence of the workaround is, by definition, out of spec. I just
+> never bothered tainting the kernel because these machines are already
+> TAINT_CPU_OUT_OF_SPEC by way of the broken VGIC.
+> 
+> Ok, so how about you keep the check that you're doing here and promote
+> IMPDEF_TRAPS to a system-wide feature? That would satisfy the two
+> preconditions we have for PMU emulation, which is system register traps
+> and a backing arm_pmu that understands PMUv3 events.
 
-Thanks for the explanation. When the guest uses `Stage-1 CnP = 0`, kvm
-does need the flush to maintain the "private to each vCPU" guarantee.
+This check turned out to be faulty: it can disable PMU emulation on ACPI
+systems when a possible CPU is offline, because ACPI grows
+arm_pmu::supported_cpus as matching CPUs come online.
 
-Thanks,
-Nianyao Tang
+My current plan is:
+
+- drop the possible-mask coverage check, to avoid breaking ACPI;
+- promote ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS to
+   ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, so the system will have the
+   feature only if all online CPUs implement it;
+- explicitly taint hosts with ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
+   matching what KVM already does for non-architectural VGICs. The
+   comment will make it clear that this is out of spec because KVM cannot
+   make the usual architectural assumptions about PMUv3 sysreg traps and
+   uniform driver-backed PMU availability.
+
+That lets the code keep assuming uniform PMU availability without adding 
+an ACPI-hostile possible-CPU check, and makes that assumption explicit 
+for humans like me and tools such as Sashiko [1].
+
+[1] 
+https://sashiko.dev/#/patchset/20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp?part=6
+
+Regards,
+Akihiko Odaki
+
