@@ -1,96 +1,156 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D2C3DFC8C
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 07:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BC23F888B;
+	Wed,  8 Jul 2026 07:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783496144; cv=none; b=H2/5JF3jzRhQh0836wFZGrVpBVzx6vH6rglYU8DsV9+4EPdBXjjgbe02wljYvF+B/v66DPUJmN6X+CI4xXrzAdkm4sndPzlRj2zVoZj9iOihaIMp2l8W7lNSZ4CB2+Jlkk9N+rSd/IQkwbP8FpjXMw9PxT9CmMegABhUpCebxHA=
+	t=1783496194; cv=none; b=JvN8oOxLReG0wen9aFBm4OzNmPe7dsBgy0FJ94tVEaykV36rvAR00xJ0WqklkgOkdxlHfYqS111DAZ7etGmhn1bBpZyTIFjmnOwYeYZ6s7UvCO3I2z6vguATgDAy0W77M19Nbyg1CDZUe05rNg5jKuIfKDxAFxSgoP6oIkluS20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783496144; c=relaxed/simple;
-	bh=St2sZCr9NHAgjv5yTPGfEIfeyGCZIJL/tRgDlrGh+tM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i7aWgtyRBfyIR3NNAe/qHt7Ie+++1NITRP029yW+HTKpzbbDEnygFLtsdnWsoXYcCIC2Ms0BvQZDftN44JR4rd8rEtCvxhxIY4kVr6wQNIdtJJH97beAokiPKUVcogXjCqMJbVEA9P9y9zZOCPkqj7/R4Faowv8EvZ+ZrmhuRtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLsqRk2V; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783496194; c=relaxed/simple;
+	bh=GkSu0T/j1EigHEvHkz4OfSe+5dY8ZtTvL5k3rcGsVg0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Bh7Mi6kct4YIDw+Xej9iMp3DFn+oKGz1Ejl5eB1m6L8NGipKw397Q7s+MQkqSJvEMa+Sq4koQsS+EytmEVLXlVia69elZB9yzRa7zvZYpg+rmMJmWjsy7iY12Wk8Vc8GK3xWRZgsz2xQla5yUbcAetJSNOKpdsSGYenalaivuoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ip4NvB47; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLsqRk2V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 451071F000E9;
-	Wed,  8 Jul 2026 07:35:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ip4NvB47"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D24431F000E9;
+	Wed,  8 Jul 2026 07:36:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783496131;
-	bh=Pd+pzOlXDML+Uj4/IA83ZRyXHr2Fo3zY9NZKouptYuE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oLsqRk2VYjH2qYusNx394n+tuCIg4dkiZG1tC+M/c3trd/UOyYLZR4VgRemcGhK+l
-	 H91Fh7LbCAtXIZv6beLlj4a1j6YKLUUawRrZAkZTBrlxZvS1hORigckLfM+CWTNoEX
-	 awEbBBqmOsIV4NNsbL0GeunTZBhvbJ0FRHF6j1ie/n5+pP7UhY/Zlr8hDhSIOjEixf
-	 PjfYR6oGBk58t5MRRmiD+NIGUcBpK2KBoMyZNZvpXg3dX5fY3XLyCBBIOtxICov93v
-	 gzC6YOghXtCwfWJATSotCMgCs9jehdwRwkwAts2iQSlUfJ8fxYNY/NXp02fNxvPYoi
-	 qDoR2LRvUoWfg==
-Date: Wed, 8 Jul 2026 00:35:30 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	s=k20260515; t=1783496177;
+	bh=xls0ncCjyWcLCH10SsoXeKirDHltIOo0E/jR/8APp6g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Ip4NvB47gbOwipZa0QyaFhGhU4Vm+o/21PVfALYlAyU6X0qJyBv4zSdlp/zMVzpOM
+	 BTI3YYYMtX3GtDTOvAalB+L3bvT11rvpKtqt7d6LHlu+NX5opY4w+bJSIZW02QITLn
+	 /3dQC6ZjeWlTa+WoM5tyjJI2XGPyha02Vo21UBZUd6lZm4z1OJ976CmocY7Yi2FI1N
+	 QcS7aTomqtppnG+LbYRUdzOarl/452D7tERIU83hgc7aLI5g+fVUjCJuDBBzLJU0BS
+	 MJDitX2DWqgbP+PQ1j2dHuodEFH5RLddS2fFDwdb6wVCv8xD2uOuD56qeXgcW8g6UH
+	 ACxJKR8XzLxJg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1whMpL-00000002hwZ-1cyF;
+	Wed, 08 Jul 2026 07:36:15 +0000
+Date: Wed, 08 Jul 2026 08:36:14 +0100
+Message-ID: <861pdeorv5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 07/22] KVM: arm64: nv: Set dirty state at stage-2
-Message-ID: <ak39whrJvABuX-um@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org>
- <20260623184201.1518871-8-oupton@kernel.org>
- <bnjj67ht3pepmu4hd6jztiymzkkna57atvjr6eec25otuac3jc@jmgtpj4im3ew>
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 24/27] KVM: s390: arm64: Implement vm/vcpu create destroy.
+In-Reply-To: <20260708065150.583632-C-seiden@linux.ibm.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+	<20260706085229.979525-25-seiden@linux.ibm.com>
+	<8633xuq1ic.wl-maz@kernel.org>
+	<20260708065150.583632-C-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bnjj67ht3pepmu4hd6jztiymzkkna57atvjr6eec25otuac3jc@jmgtpj4im3ew>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jul 06, 2026 at 05:50:14PM +0100, Wei-Lin Chang wrote:
-> Hi Oliver,
+On Wed, 08 Jul 2026 07:51:50 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> On Tue, Jun 23, 2026 at 11:41:46AM -0700, Oliver Upton wrote:
-> > Set the dirty state on descriptors at stage-2 for write accesses when
-> > DBM is set.
+> On Tue, Jul 07, 2026 at 04:10:19PM +0100, Marc Zyngier wrote:
+> > On Mon, 06 Jul 2026 09:52:24 +0100,
+> > Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > > 
+> > > Implement init and destroy IOCTLS for vcpu and vm.
+> > > Implement arch vm IOCTL. Use s390 gmap.
+> > > 
+> > > Co-developed-by: Janosch Frank <frankja@linux.ibm.com>
+> > > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> > > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> > > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> > > Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > > ---
+> > >  arch/s390/kvm/arm64/arm.c       | 190 ++++++++++++++++++++++++++++++++
+> > >  arch/s390/kvm/arm64/arm.h       |  56 ++++++++++
+> > >  arch/s390/kvm/gmap/faultin.c    |   5 +
+> > >  arch/s390/kvm/gmap/gmap.c       |   4 +
+> > >  arch/s390/kvm/gmap/trace-gmap.h |  13 +++
+> > >  5 files changed, 268 insertions(+)
+> > > 
+> > > diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+> > > index 19249ec5c539..3a4092698fae 100644
+> > > --- a/arch/s390/kvm/arm64/arm.c
+> > > +++ b/arch/s390/kvm/arm64/arm.c
+> > > @@ -8,6 +8,10 @@
+> > >  #include <linux/kvm_types.h>
+> > >  #include <linux/kvm_host.h>
+> > >  
+> > > +#include <arm64/kvm_mmu.h>
+> > > +
+> > > +#include <gmap.h>
+> > > +
+> > >  #include "arm.h"
+> > >  
+> > >  static unsigned long system_supported_vcpu_features(void);
+> > > @@ -31,6 +35,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> > >  		break;
+> > >  	case KVM_CAP_IOEVENTFD:
+> > >  	case KVM_CAP_ARM_USER_IRQ:
+> > > +	case KVM_CAP_PRE_FAULT_MEMORY:
 > > 
-> > Signed-off-by: Oliver Upton <oupton@kernel.org>
-> > ---
-> >  arch/arm64/kvm/nested.c | 43 +++++++++++++++++++++++++++++++----------
-> >  1 file changed, 33 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index a70af3b3f05d..e5a407fc0880 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -132,6 +132,7 @@ struct s2_walk_info {
-> >  	unsigned int	t0sz;
-> >  	bool		be;
-> >  	bool		ha;
-> > +	bool		hd;
-> >  };
-> >  
-> >  struct s2_walk_step {
-> > @@ -227,6 +228,20 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
-> >  	return 0;
-> >  }
-> >  
-> > +static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
-> > +				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
-> > +{
-> > +	switch (access->type) {
-> > +	/* R_RKMHW */
+> > arm64 *doesn't* support this yet. Please make sure you don't deviate
+> > from what arm64 currently supports.
+> >
 > 
-> Just saying that I found that R_RKMHW is not about this behavior anymore
-> in the latest M.c Arm ARM. This is covered by R_ZYGHJ now.
+> I hoped the corresponding arm64 series is merged when we got this :) 
 
-Thanks for the callout! What good are the rules if the citations change
-over revisions :-/ Although in this case the language was indeed
-updated.
+If the quality of the previous postings of that series is anything to
+go by, I doubt this will be merged on this side of the death of the
+universe.
 
-Will fix it in v2.
+> I will remove this advertisement. I'll keep the implementation as the compiler
+> expect that function to be present anyways, as native s390 KVM now implements
+> this CAP. OK? 
 
-Thanks,
-Oliver
+As long as the code isn't reachable from the arm64 side, that's fine
+by me.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
