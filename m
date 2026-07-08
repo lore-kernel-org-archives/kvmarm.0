@@ -1,375 +1,234 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8263C3AB28C
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 15:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783524364; cv=none; b=Y9uS7Vi85XDWcfPIJ1V03op3iGxJb7tQVxGYmTpW47YN4idSY40FDa3lwU5/U6LGkWUru8jC+CtBITqvXMRAzwFEDF0CuydMGSEzYIYjd2RBnqpwo/Ia01QxIYn8sB70lz6YHWBEvu1J6VT0xomg8rYXqELvX6oBOz71gvTDSGk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783524364; c=relaxed/simple;
-	bh=Qc5J1mA5nOpSmBhZlE7Db0dGxN2luX9BQPzOnxfX7AA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ld7GlAOMv/R1dwBq7yJFXu5QeEj6s9i8DE6ph7oPaW3JgzMH/B7R7FoO4YTIsrAhQAtE+kHmt4y/SHDJ8gWjjfHo0x+FU7YOAPFJYwDYCZ9+u817J8uHkL9y2lKS6kKxlABiw4eFg/wcknnLrEyKCnuTDKXnznyE5awGQl6BICw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=A9oldg6t; arc=none smtp.client-ip=217.140.110.172
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011052.outbound.protection.outlook.com [52.101.65.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B723F12C0;
+	Wed,  8 Jul 2026 15:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.52
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783525021; cv=fail; b=op/4H6RRvwp6OgL+PYknOgJH7SYAWo6RskfTy8y643XC+8vNsaQY1UcB2ARaw+ZI2+Ka7k4yZPjCKS/ya/DukW80bw5/318m7Evvdv6NWfR2cS8ypWYe8hbRp12wl8/YxU8RI8zI0gK+GvAVAv+VeKxQ4eRPggZRWweDTLUGQ9E=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783525021; c=relaxed/simple;
+	bh=S74rvhIK3AjVXe/Z+N5vI8sTMqTz6XEBkH4508fK5jQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GdWR+vsgCvf+R9oiuK/ybwJu6OJBk/Ebvx9hYZvfTPl8z6CoNr9xo63X34+YDCZTqaZCytfrLJPRxkrZIRKKUi6lEEeFgqm12UN+4dMvvfcObK2oGtnyLflEA6ZHFjQVfZuc9ZnKNpYJ7oKZL7Y4nMnCOsqIIIkyjolU3chD+FU=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gue3CY+w; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gue3CY+w; arc=fail smtp.client-ip=52.101.65.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="A9oldg6t"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 73CB91CDD;
-	Wed,  8 Jul 2026 08:25:57 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0C2A3F905;
-	Wed,  8 Jul 2026 08:25:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783524361; bh=Qc5J1mA5nOpSmBhZlE7Db0dGxN2luX9BQPzOnxfX7AA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A9oldg6tDXUovM58m4WZv7a3flqXTX9FrkBp6XO1ebw9wAuCQqkt7usuayaiINyAX
-	 DN6paf1W4f4fxdob1OW7EuUdpxxDJz3/ARYbTYmaxF89h0lnJbwJr3H6HMxV9doYMJ
-	 9MhupGujSbxqhuZuhpkUJkac1YQIf0+Cd6view3E=
-Date: Wed, 8 Jul 2026 16:25:55 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Jack Thomson <jackabt.amazon@gmail.com>
-Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	shuah@kernel.org, corbet@lwn.net, vladimir.murzin@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	isaku.yamahata@intel.com, Jack Thomson <jackabt@amazon.com>
-Subject: Re: [PATCH v5 2/5] KVM: arm64: Add pre_fault_memory implementation
-Message-ID: <ak5sAxb3G6hhFmBF@raptor>
-References: <20260612162354.73378-1-jackabt.amazon@gmail.com>
- <20260612162354.73378-3-jackabt.amazon@gmail.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gue3CY+w";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gue3CY+w"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=LmIx3YtmqdBQJP3FWkKzXnJiZSNzZ78/JbNofluu6sF7DuG4j9RDCeB9NjkLt8zDudk/XMMmXi6COkyxDl95VzVPKBXic7Hpox4cz26CufnkdTClHH1wCYMqJSgZW4cTgTsedjqrj76d8qNDrKiAPm71UgiZJn9BiuCx/mkmMn8NfrqzV9susjkLBjZIL0e57X+r6UWy/PrseWVJam/NFhGpbleqVKmh009nxgo7AElMIi2k1MK2ifqco3VUqCWqBP/kbZ+r5C4sGhSaK2TmhmRms7mIGbZjCQmktU5fV/hLVzHK6RO81ZsXndviKL6Gd5SvizLCCYWuBhLTsuQ6Tw==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S74rvhIK3AjVXe/Z+N5vI8sTMqTz6XEBkH4508fK5jQ=;
+ b=Us69PUQoDQdydZIigr+l8xMi5H8pOvewr5hX2NmirGJLyE+6AfDK4Hr6ep4cZqAsmRLyvDanFNr9p9uxKgpLo3ZtIl18MQfGedHV+JTwXKOg+SWuZcLC/owVmNo2XsHFvFk2PwKRzBaX6VRRbEAFq3HTh5x24qilq0kAvj9+rUZdi8O6i0F/LBz/zBrE1gEYmLbB1gdxRLE0SnCFlCtovoO493Sj9zsFRix4Y5QTWxEsEaO18/9kV2Il8OPdUt7hXd65GmxAGu6oAAwOWR1lW33EUkgNpTdmo1a867tGXpyrCkJ8QxxuVHKnvc7cJhbIwHqE2vamOgnjKFIIcXbsSA==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S74rvhIK3AjVXe/Z+N5vI8sTMqTz6XEBkH4508fK5jQ=;
+ b=gue3CY+wk/EkzPvgmcTL72N9ROjsAH9jVf6rOt19dqg6XQrOax09Bdmcz3EJ1n7YcSQyHAntfIBwvEFn3LJ26isIyGx+M6T3Vy1/HAE+3mCfXVCXVjMs6blJM3shu3OGPBd2gxeunrAW/aPXPEw2hzh1EcaI/2LWFsSzDglBUHc=
+Received: from AS4P189CA0062.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:659::9)
+ by DB3PR08MB9059.eurprd08.prod.outlook.com (2603:10a6:10:430::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Wed, 8 Jul
+ 2026 15:36:52 +0000
+Received: from AMS0EPF000001B5.eurprd05.prod.outlook.com
+ (2603:10a6:20b:659:cafe::84) by AS4P189CA0062.outlook.office365.com
+ (2603:10a6:20b:659::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.10 via Frontend Transport; Wed, 8
+ Jul 2026 15:36:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ AMS0EPF000001B5.mail.protection.outlook.com (10.167.16.169) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.6
+ via Frontend Transport; Wed, 8 Jul 2026 15:36:52 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DXjlDC6y4EFOr+rX80oZDHevkbaTod/KpR3ei1cEz41uzFtkES/QeqNtrClbFCnWgK9w/8qSCHrHTFRj4+naOuw4v5hCDycxpNchwFFcYkSpNjur5drIvU+PHauKrYht67PFbMgPOXtGpn6RkFhvjW+iJemv+57dTRjd6c3F630kDeWFwL5qtHKU9wXibbH3cgU1OevPydtGRZEZ7rMeNYJZXEmfrUeN01lZ2KiXRDK/DDS0h97UH5V5nfsB0AGokoyAoBez3B+32ZCoQ53kr8ojmc8MvTtlb1BMvtntZIY/je9HrSd85S+Wvo6E3ooXfr5N2QLgnbe+WhiPTrD5MA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S74rvhIK3AjVXe/Z+N5vI8sTMqTz6XEBkH4508fK5jQ=;
+ b=CrQz4OXN49p8/SW3GW9f6Zggn6W+eXoXbST4Cipur1BbprqCaJ8PSi7OqJLA0/j1NbLp9bC7jVKIIHRvmB7fZkeRWX03R2i3tqPFQQZwijDGgPa+FeZ+uJU6gLstpi0Wa94Y0XNKgab+fL+BZ1ACRqK3QTsCFYs/GiSxOcY8xqguLXaW9LEVvsMNlQ7Em6CKtOZXQQ3opnrI/C9+NqJYtqP0Of+4VF7S/7c3dTE34XJsi2obkTzqBwWHAo1OryBI0wYesubgQNAjaqRguEozbhLslVAt3ZzQCBMUF7hVGaxjf4JB6d8a8sy+jNx4qkATWBYrfiui42VFI+EJQOfFhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S74rvhIK3AjVXe/Z+N5vI8sTMqTz6XEBkH4508fK5jQ=;
+ b=gue3CY+wk/EkzPvgmcTL72N9ROjsAH9jVf6rOt19dqg6XQrOax09Bdmcz3EJ1n7YcSQyHAntfIBwvEFn3LJ26isIyGx+M6T3Vy1/HAE+3mCfXVCXVjMs6blJM3shu3OGPBd2gxeunrAW/aPXPEw2hzh1EcaI/2LWFsSzDglBUHc=
+Received: from DU0PR08MB8421.eurprd08.prod.outlook.com (2603:10a6:10:407::19)
+ by FRZPR08MB11047.eurprd08.prod.outlook.com (2603:10a6:d10:13b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Wed, 8 Jul
+ 2026 15:35:49 +0000
+Received: from DU0PR08MB8421.eurprd08.prod.outlook.com
+ ([fe80::2158:1cab:1d88:ba2e]) by DU0PR08MB8421.eurprd08.prod.outlook.com
+ ([fe80::2158:1cab:1d88:ba2e%5]) with mapi id 15.21.0181.009; Wed, 8 Jul 2026
+ 15:35:49 +0000
+From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+To: "sashiko-reviews@lists.linux.dev" <sashiko-reviews@lists.linux.dev>
+CC: "maz@kernel.org" <maz@kernel.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"oupton@kernel.org" <oupton@kernel.org>, nd <nd@arm.com>
+Subject: Re: [PATCH v3 16/40] KVM: arm64: gic-v5: Request doorbells when VPEs
+ enter WFI
+Thread-Topic: [PATCH v3 16/40] KVM: arm64: gic-v5: Request doorbells when VPEs
+ enter WFI
+Thread-Index: AQHdCwTRbiDaMUH2wEOmPJ4pBCPjFrZb/d6AgAfK/YA=
+Date: Wed, 8 Jul 2026 15:35:48 +0000
+Message-ID: <7d32adbf26454f5db1721bc28c716297c5e599ea.camel@arm.com>
+References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
+	 <20260703154811.3355680-17-sascha.bischoff@arm.com>
+	 <20260703163527.76C871F000E9@smtp.kernel.org>
+In-Reply-To: <20260703163527.76C871F000E9@smtp.kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.52.3-0ubuntu1.1 
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+x-ms-traffictypediagnostic:
+	DU0PR08MB8421:EE_|FRZPR08MB11047:EE_|AMS0EPF000001B5:EE_|DB3PR08MB9059:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddfa37d5-5bbb-4b09-260f-08dedd06bbc7
+x-checkrecipientrouted: true
+nodisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|38070700021|18002099003|6133799003|4143699003|11063799006|56012099006|22082099003;
+X-Microsoft-Antispam-Message-Info-Original:
+ nFoGRin5/bAS0oI0YvoT03H0+0kjlV3NDr9WAdpnIRmBUAcUipPqVEry13lusnZV/gUNGP+3a6LvaaQ4FWgc6cwIDaJ8MJ3mByLyKOc50vmUvQzx6O8Syw1qZafRqExYt3WY2c1EzqVtT0iTEbk0fk15IXJ/g60vixLIL+qt1HkPNfLrICqQjwyTQ7oNkbUz91GkCti3cbYvP8QzRwKJGWEOpCEJLeQdPqSoWVL3MhOIWWI62YMZshg5d7ljzoessIcV7Gxjgjc/vOkJUj41pboT3p0H25DtfahLlw45rGMQLFpzUTrPdDY7NSZw9mW3oMVz++OgWQVRSqC2K96dROxkfJLQjbm3SRXGEhmTDi6TDic+ORaoOOO5NrGO5IAuRuvCZKvpeO6xsEXyq1OobxBnmBTkN6Y5fR0gRuwkAt9J3995C7IPRxIjDnSvT8lXCz6FFRgcpCQ1ESt1Z4AfGVDzd1GpY5YWdG+WfCan1mo7HV50BwztF/W2MlB2YeAuhLAwG43OaPRdb9PN3Djh5u6rhvhI2IteYDXnsoJISuJTH6nxhwgBJKpcQQ+T/jiiC2raQp/dR/odQoJSYM/AXiF+LnbdennXpIPP6vUy0bimDa5sepbv0BlZlU0Y149xHrKGoUv9U4lWKhNP7vJsLKkmWIJtTvWUZ1Btm+w5pnB0tZ57OCWW+zhRZBNzEbPeosGUanO6kdkPUORTzPSOSMYhgaMfbq4IY5SjEhUqdzo=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB8421.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(38070700021)(18002099003)(6133799003)(4143699003)(11063799006)(56012099006)(22082099003);DIR:OUT;SFP:1101;
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DD6960026F5642498CB19E5B7E87FAD6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260612162354.73378-3-jackabt.amazon@gmail.com>
+X-Exchange-RoutingPolicyChecked:
+ W4OF8IqNR+E21P4M0vt6O1qk+Uj0oigHM+GFl5OUpI2Sobz/iaaeN4GS1XxZ2YISDkJu5PMOADOns5FSd0QKb2a7F2Hjw2MbvopMsJ2lyZZODpi5xx8VOy2lcf9HOAG38m5ZVh23ySdBBoJOEw6/MVU8TX53vcRxt5ZeGNwcKrWYcP15PlEBCfe2lMNc9ncq0CN2NlvoduqGCXls7nbiyZ88PQp3vPK2rLNcUX+7d5yCQlrvCJkE6O+YqBiSMEjxNsb9qgQxr632Q5mlSg1mzXwt3mfR+hAJHFwU5dZkUPNYxAM1ZT3GGN5iVGGqI9buJy/oRlvqZFOW2t4nke9TbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FRZPR08MB11047
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AMS0EPF000001B5.eurprd05.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	7a261fa1-95d3-4dc9-941e-08dedd069607
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|35042699022|1800799024|36860700016|82310400026|376014|14060799003|23010399003|22082099003|18002099003|56012099006|4143699003|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	CMbsqrGG6GrNuiqxbdaOKGw+JgwzTnPoVJEagHGw2/XwBw+aMNvGNaVQeBa9dXrCn2XvECQX9qo+/TLznnl7q+y7d4AooiX0OGq49Ul3yvbuSCUd1rx0atAAOWwso1VFkfvYvJ8fo0dN7y8VZ5H/qOrQ/W0aA5ddPh/tlgdLfapM9uDESryIgNwL7wxg4uVoDH9ZMAD4MD3zIPI8gclDKVKFYELuh66MNbHNuQAXRYmMNy+WztpKWEhVwsGq23U9B1nwGyYrkpxyL7628OKhEoceawfHqBaqrDPP8whk6MnL6CUrSHyt4YVB3hJqV0h3E0x21kgllD9nIW1RImq/j0Tw8OLQr209TxIu8CjQSJiFPrVejJwhfy5cpC5Dv4kYqOInBMCx6SsnQk48dLvWRtVXyn/uQ7ifxto+slhei6a8jw5ZuO0jlln6vTIl5oyNUXBoIAgjuonwl5LgXBF/kCGyQ0yJram/AQAGZzfWtgVgNS1a9CNrUDy9n+P1pijB0QRtpKRC96v0IV87ug77Guhob3OUrk5bgzUwk2AladKm5QMI32AmRLsGK2HZ0z/YKkwOKMtYRpagA3mPktJZ7kzBw9h0VR5JVuHeH/wrTyLR8Fq6Ih8hnkH0UF//ICfCpQ57+Np5DZEWE36DQquqxIJFpjyqWYlHiqj5xOu3oYlBrCN0Cbhx/aZ7naun29i1EBvzc+ktmL9mPGlKmIhtpw==
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(1800799024)(36860700016)(82310400026)(376014)(14060799003)(23010399003)(22082099003)(18002099003)(56012099006)(4143699003)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	pBOYn+gRjIzpAcU7v3EvPTLDfhTA8EFY8XR3Mh/Oj1jljGJjoB39NTmqaPSIZj7Md8Uq5lH0QpYj8/pdyZAuTqEHF7pn7uwbKHqIbhNl7bnetZ+G+ugkwy8+vUYVYwR3Ikt+2NeyZNTfgolBM07HtPtxCh4xsMXbxf2kSdZuK+PWo43SytSTd5wmVqwxDOUeoC0y5GudqOR/i7PO/9z3GuXPg4RdASvyg595wZSre6JD30r6wmASWgGwHXyUA1h/hQGG2+Cu+evjrYn5T/HQTY9IZXqOqBxr8peEIAe6pNEczi5PO8zybTdBa/HtsYlkTB6U9mAYHoUbgdTAVM2PVrj53dCyZHiJtRaRriZ11rprBDnghpN/xfyLqMaqit4u4rWjiaPez2fQ+ue7BoiWdfgjpuP6SYa/VZsuyecXFCZo3gzLvA/TN+9e6k0Gbj/x
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 15:36:52.2094
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddfa37d5-5bbb-4b09-260f-08dedd06bbc7
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF000001B5.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB3PR08MB9059
 
-Hi Jack,
-
-I've been trying to review the patch, until I realised that I don't
-understand what KVM_PRE_FAULT_MEMORY is supposed to do.
-
-Does it guarantee that, after it completes and returns to userspace, the
-address range [gpa, gpa + size] is mapped in the VM's stage 2 tables? Or
-does it guarantee that the address range was mapped at stage 2 at some
-point during the ioctl's execution, but parts, or all of it, might not be
-mapped after the ioctl completes and returns to userspace?
-
-Thanks,
-Alex
-
-On Fri, Jun 12, 2026 at 05:23:50PM +0100, Jack Thomson wrote:
-> From: Jack Thomson <jackabt@amazon.com>
-> 
-> Add arm64 support for KVM_PRE_FAULT_MEMORY by synthesizing a read data
-> abort and routing it through the existing stage-2 fault handlers. Treat
-> the requested GPA as an IPA in the userspace-owned VM's memslot space
-> and always target the canonical stage-2, even if the vCPU last ran with
-> a nested/shadow MMU selected.
-> 
-> If the vCPU last ran in a nested context, switch to the canonical
-> stage-2 with the vCPU put/load helpers so VMID, VNCR and shadow-MMU
-> refcount state stay consistent. Leave the switch in place for the ioctl;
-> vcpu_put() at ioctl exit drops the hw_mmu and the next vcpu_load()
-> reselects the correct MMU from vCPU state.
-> 
-> Check existing mappings with a shared page-table walk under the MMU read
-> lock, and use the resulting walk level when constructing the synthetic
-> fault. Report poisoned pages through the ioctl return path with
-> -EHWPOISON instead of also queueing SIGBUS, and use the installed
-> mapping size to advance the prefault range.
-> 
-> Advertise KVM_CAP_PRE_FAULT_MEMORY on arm64. Protected VMs remain
-> unsupported: pKVM filters the capability, and the ioctl returns
-> -EOPNOTSUPP if invoked anyway.
-> 
-> Signed-off-by: Jack Thomson <jackabt@amazon.com>
-> ---
->  Documentation/virt/kvm/api.rst |  18 +++-
->  arch/arm64/kvm/Kconfig         |   1 +
->  arch/arm64/kvm/arm.c           |   1 +
->  arch/arm64/kvm/mmu.c           | 162 +++++++++++++++++++++++++++++++++
->  4 files changed, 178 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 52bbbb553ce1..657e05656fa6 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6462,7 +6462,7 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
->  ---------------------------
->  
->  :Capability: KVM_CAP_PRE_FAULT_MEMORY
-> -:Architectures: none
-> +:Architectures: x86, arm64
->  :Type: vcpu ioctl
->  :Parameters: struct kvm_pre_fault_memory (in/out)
->  :Returns: 0 if at least one page is processed, < 0 on error
-> @@ -6470,11 +6470,14 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
->  Errors:
->  
->    ========== ===============================================================
-> +  EAGAIN     A memslot update raced with the ioctl before any page was
-> +             processed.
->    EINVAL     The specified `gpa` and `size` were invalid (e.g. not
->               page aligned, causes an overflow, or size is zero).
->    ENOENT     The specified `gpa` is outside defined memslots.
->    EINTR      An unmasked signal is pending and no page was processed.
->    EFAULT     The parameter address was invalid.
-> +  EHWPOISON  A poisoned host page was encountered.
->    EOPNOTSUPP Mapping memory for a GPA is unsupported by the
->               hypervisor, and/or for the current vCPU state/mode.
->    EIO        unexpected error conditions (also causes a WARN)
-> @@ -6494,7 +6497,14 @@ Errors:
->  KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
->  for the current vCPU state.  KVM maps memory as if the vCPU generated a
->  stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
-> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
-> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
-> +Accessed.  On arm64, newly created stage-2 PTEs are marked Accessed.
-> +
-> +On arm64, `gpa` is interpreted as an IPA in the userspace-owned VM's
-> +memslot address space.  If the vCPU most recently ran a nested guest, KVM
-> +still targets the VM's canonical stage-2, and does not interpret `gpa` as
-> +a nested guest IPA or target the nested/shadow stage-2 selected by the
-> +vCPU's last run state.
->  
->  In the case of confidential VM types where there is an initial set up of
->  private guest memory before the guest is 'finalized'/measured, this ioctl
-> @@ -6507,9 +6517,9 @@ case, the ioctl can be called in parallel.
->  
->  When the ioctl returns, the input values are updated to point to the
->  remaining range.  If `size` > 0 on return, the caller can just issue
-> -the ioctl again with the same `struct kvm_map_memory` argument.
-> +the ioctl again with the same `struct kvm_pre_fault_memory` argument.
->  
-> -Shadow page tables cannot support this ioctl because they
-> +On x86, shadow page tables cannot support this ioctl because they
->  are indexed by virtual address or nested guest physical address.
->  Calling this ioctl when the guest is using shadow page tables (for
->  example because it is running a nested guest with nested page tables)
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 449154f9a485..6b89262e8ba7 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -24,6 +24,7 @@ menuconfig KVM
->  	select HAVE_KVM_CPU_RELAX_INTERCEPT
->  	select KVM_MMIO
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> +	select KVM_GENERIC_PRE_FAULT_MEMORY
->  	select VIRT_XFER_TO_GUEST_WORK
->  	select KVM_VFIO
->  	select HAVE_KVM_DIRTY_RING_ACQ_REL
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9453321ef8c6..dcb92bee13af 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -392,6 +392,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_COUNTER_OFFSET:
->  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
->  	case KVM_CAP_ARM_SEA_TO_USER:
-> +	case KVM_CAP_PRE_FAULT_MEMORY:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index c720f07cb82e..4bf048bbcf8b 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1571,6 +1571,8 @@ struct kvm_s2_fault_desc {
->  	struct kvm_s2_trans	*nested;
->  	struct kvm_memory_slot	*memslot;
->  	unsigned long		hva;
-> +	unsigned long		*page_size;
-> +	bool			prefault;
->  };
->  
->  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> @@ -1882,6 +1884,13 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
->  				      &s2vi->map_writable, &s2vi->page);
->  	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
->  		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
-> +			/*
-> +			 * When prefaulting, report the poison via -EHWPOISON
-> +			 * only; don't also queue a SIGBUS as the run path
-> +			 * does for the faulting vCPU thread.
-> +			 */
-> +			if (s2fd->prefault)
-> +				return -EHWPOISON;
->  			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
->  			return 0;
->  		}
-> @@ -2053,6 +2062,9 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
->  	kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
->  	kvm_fault_unlock(kvm);
->  
-> +	if (s2fd->page_size && !ret)
-> +		*s2fd->page_size = mapping_size;
-> +
->  	/*
->  	 * Mark the page dirty only if the fault is handled successfully,
->  	 * making sure we adjust the canonical IPA if the mapping size has
-> @@ -2757,3 +2769,153 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->  
->  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->  }
-> +
-> +/*
-> + * Prefaulting always targets the canonical stage-2.  If the vCPU last ran
-> + * in a nested context, swap in the canonical MMU via the vCPU put/load
-> + * helpers so that preemption, VMID, VNCR fixmap and shadow-MMU refcount
-> + * state stay consistent.
-> + *
-> + * The swap is deliberately not undone: nothing runs in between the
-> + * per-page invocations of kvm_arch_vcpu_pre_fault_memory() except the
-> + * generic prefault loop, and the vcpu_put() at ioctl exit discards
-> + * vcpu->arch.hw_mmu anyway (see kvm_vcpu_put_hw_mmu()), so the next
-> + * vcpu_load() re-derives the correct MMU from the vCPU's context.  If the
-> + * prefault task is preempted in the meantime, kvm_vcpu_put_hw_mmu()
-> + * keeps the canonical MMU in place for the reload.  Leaving the swap in
-> + * place also bounds the cost to at most one put/load pair per ioctl,
-> + * rather than two pairs per prefaulted page.
-> + */
-> +static void kvm_pre_fault_load_canonical_mmu(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!vcpu_has_nv(vcpu) || vcpu->arch.hw_mmu == &vcpu->kvm->arch.mmu)
-> +		return;
-> +
-> +	preempt_disable();
-> +	kvm_arch_vcpu_put(vcpu);
-> +	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-> +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> +	preempt_enable();
-> +}
-> +
-> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> +				    struct kvm_pre_fault_memory *range)
-> +{
-> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
-> +	struct kvm_vcpu_fault_info fault_backup = *fault_info;
-> +	s8 walk_level = KVM_PGTABLE_LAST_LEVEL;
-> +	unsigned long page_size = PAGE_SIZE;
-> +	struct kvm_memory_slot *memslot;
-> +	phys_addr_t gpa = range->gpa;
-> +	struct kvm_pgtable *pgt;
-> +	phys_addr_t end;
-> +	kvm_pte_t pte;
-> +	hva_t hva;
-> +	gfn_t gfn;
-> +	long ret;
-> +
-> +	if (vcpu_is_protected(vcpu))
-> +		return -EOPNOTSUPP;
-> +
-> +	/*
-> +	 * Interpret range->gpa in the userspace-owned VM's IPA space, not in
-> +	 * any nested guest IPA space that may have been active on the vCPU's
-> +	 * last run.  Always target the canonical stage-2.
-> +	 */
-> +	kvm_pre_fault_load_canonical_mmu(vcpu);
-> +
-> +	if (gpa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
-> +		ret = -ENOENT;
-> +		goto out;
-> +	}
-> +
-> +	gfn = gpa_to_gfn(gpa);
-> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-> +	if (!memslot) {
-> +		ret = -ENOENT;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * A racing memslot deletion or move installs an invalid slot before
-> +	 * zapping stage-2.  Ask userspace to retry once the update settles.
-> +	 */
-> +	if (memslot->flags & KVM_MEMSLOT_INVALID) {
-> +		ret = -EAGAIN;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * pKVM stage-2 mappings aren't directly walkable from the host; let
-> +	 * the fault path handle both new and existing mappings.
-> +	 */
-> +	if (!is_protected_kvm_enabled()) {
-> +		pgt = vcpu->arch.hw_mmu->pgt;
-> +		scoped_guard(read_lock, &vcpu->kvm->mmu_lock) {
-> +			ret = kvm_pgtable_get_leaf(pgt, gpa, &pte, &walk_level,
-> +						   KVM_PGTABLE_WALK_SHARED);
-> +		}
-> +		if (ret)
-> +			goto out;
-> +
-> +		if (kvm_pte_valid(pte)) {
-> +			page_size = kvm_granule_size(walk_level);
-> +			if (!(pte & KVM_PTE_LEAF_ATTR_LO_S2_AF))
-> +				handle_access_fault(vcpu, gpa);
-> +			goto out_success;
-> +		}
-> +	}
-> +
-> +	/*
-> +	 * Synthesize a read translation fault for the canonical IPA, at the
-> +	 * level where the stage-2 walk currently ends (the last level under
-> +	 * pKVM, where stage-2 isn't walkable from the host).
-> +	 */
-> +	fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
-> +		ESR_ELx_IL | ESR_ELx_FSC_FAULT_L(walk_level);
-> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
-> +		FIELD_PREP(HPFAR_EL2_FIPA, gpa >> 12);
-> +
-> +	struct kvm_s2_fault_desc s2fd = {
-> +		.vcpu		= vcpu,
-> +		.fault_ipa	= gpa,
-> +		.nested		= NULL,
-> +		.memslot	= memslot,
-> +		.page_size	= &page_size,
-> +		.prefault	= true,
-> +	};
-> +
-> +	/*
-> +	 * As in the run path, -EAGAIN from the abort handlers is treated as
-> +	 * progress: either a parallel fault installed the mapping, or a racing
-> +	 * invalidation is in flight and the next access will refault.
-> +	 */
-> +	if (kvm_slot_has_gmem(memslot)) {
-> +		ret = gmem_abort(&s2fd);
-> +	} else {
-> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
-> +		if (kvm_is_error_hva(hva)) {
-> +			ret = -EFAULT;
-> +			goto out;
-> +		}
-> +
-> +		s2fd.hva = hva;
-> +		ret = user_mem_abort(&s2fd);
-> +	}
-> +
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +out_success:
-> +	end = ALIGN_DOWN(gpa, page_size) + page_size;
-> +	ret = min_t(u64, range->size, end - gpa);
-> +out:
-> +	/*
-> +	 * Restore the synthetic fault state so a subsequent KVM_RUN does not
-> +	 * observe it. kvm_handle_mmio_return() runs before guest entry can
-> +	 * refresh fault.esr_el2 from hardware, so leaving the synthetic ESR
-> +	 * in place would corrupt the completion of a pending MMIO exit.
-> +	 */
-> +	*fault_info = fault_backup;
-> +	return ret;
-> +}
-> -- 
-> 2.43.0
-> 
-> 
+T24gRnJpLCAyMDI2LTA3LTAzIGF0IDE2OjM1ICswMDAwLCBzYXNoaWtvLWJvdEBrZXJuZWwub3Jn
+IHdyb3RlOg0KPiBUaGFuayB5b3UgZm9yIHlvdXIgY29udHJpYnV0aW9uISBTYXNoaWtvIEFJIHJl
+dmlldyBmb3VuZCAyIHBvdGVudGlhbA0KPiBpc3N1ZShzKSB0byBjb25zaWRlcjoNCj4gLSBbSGln
+aF0gVXNlIG9mIGBXQVJOX09OKClgIHdyYXBwaW5nIHRoZSBmYWxsaWJsZQ0KPiBgaXJxX3NldF9h
+ZmZpbml0eSgpYCBBUEkgb24gYSBndWVzdC1kcml2ZW4gV0ZJIHBhdGggYWxsb3dzIGENCj4gbWFs
+aWNpb3VzIGd1ZXN0IHRvIHRyaWdnZXIgYSBob3N0IGRlbmlhbCBvZiBzZXJ2aWNlLg0KPiAtIFtI
+aWdoXSBPZmYtYnktb25lIGVycm9yIHdoZW4gY29tcHV0aW5nIHRoZSBEb29yYmVsbCBQcmlvcml0
+eSBNYXNrDQo+IChEQlBNKSBjYXVzZXMgdGhlIGhhcmR3YXJlIHRvIG1pc3MgZG9vcmJlbGwgc2ln
+bmFscyBmb3IgdmFsaWQgcGVuZGluZw0KPiBpbnRlcnJ1cHRzLg0KPiAtLQ0KPiANCj4gY29tbWl0
+IGE4MTBlMWNjNWY5NGMxZjI1YjEyN2IxODA0MTlmNjkxN2I5MmM4MDMNCj4gQXV0aG9yOiBTYXNj
+aGEgQmlzY2hvZmYgPFNhc2NoYS5CaXNjaG9mZkBhcm0uY29tPg0KPiBTdWJqZWN0OiBLVk06IGFy
+bTY0OiBnaWMtdjU6IFJlcXVlc3QgZG9vcmJlbGxzIHdoZW4gVlBFcyBlbnRlciBXRkkNCj4gDQo+
+IFRoaXMgY29tbWl0IGFkZHMgc3VwcG9ydCBmb3IgcmVxdWVzdGluZyBHSUN2NSBWUEUgZG9vcmJl
+bGxzIHdoZW4gYQ0KPiB2Q1BVDQo+IGVudGVycyBXRkkgYW5kIHRoZSBWUEUgYmVjb21lcyBub24t
+cmVzaWRlbnQuIEl0IHNldHMgdGhlIGRvb3JiZWxsDQo+IHByaW9yaXR5DQo+IG1hc2sgdG8gYXZv
+aWQgdW5uZWNlc3Nhcnkgd2FrZXVwcy4gSXQgYWxzbyByb3V0ZXMgdGhlIGRvb3JiZWxsDQo+IGlu
+dGVycnVwdCB0bw0KPiB0aGUgY3VycmVudCBDUFUgYW5kIHVwZGF0ZXMgdGhlIHBlbmRpbmcgY2hl
+Y2sgdG8gb2JzZXJ2ZSB0aGUgZG9vcmJlbGwNCj4gZmlyZWQgc3RhdGUuDQo+IA0KPiA+IGRpZmYg
+LS1naXQgYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjUuYw0KPiA+IGIvYXJjaC9hcm02NC9r
+dm0vdmdpYy92Z2ljLXY1LmMNCj4gPiBpbmRleCA5YzM4M2I2ODY0MjcwLi42ZTk3NjE2MmVjM2My
+IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NS5jDQo+ID4gKysr
+IGIvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY1LmMNCj4gPiBAQCAtMTA5NCw2ICsxMDk0LDQ2
+IEBAIHZvaWQgdmdpY192NV9wdXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+IMKgCWt2bV9j
+YWxsX2h5cChfX3ZnaWNfdjVfc2F2ZV9hcHIsIGNwdV9pZik7DQo+ID4gwqANCj4gPiDCoAljcHVf
+aWYtPnZnaWNfY29udGV4dHIgPSAwOw0KPiA+ICsJaWYgKHZjcHVfZ2V0X2ZsYWcodmNwdSwgSU5f
+V0ZJKSkgew0KPiA+ICsJCXUzMiBwcmlvcml0eV9tYXNrOw0KPiA+ICsJCWludCBkYnBtOw0KPiA+
+ICsNCj4gPiArCQkvKg0KPiA+ICsJCSAqIEZpbmQgdGhlIHZpcnR1YWwgcnVubmluZyBwcmlvcml0
+eSBhbmQgdXNlIHRoaXMNCj4gPiB0byBjYWxjdWxhdGUNCj4gPiArCQkgKiB0aGUgZG9vcmJlbGwg
+cHJpb3JpdHkgbWFzay4gV2UgY29tYmluZSB0aGUNCj4gPiBoaWdoZXN0IGFjdGl2ZQ0KPiA+ICsJ
+CSAqIHByaW9yaXR5IGFuZCB0aGUgQ1BVJ3MgcHJpb3JpdHkgbWFzay4gVGhlIGd1ZXN0DQo+ID4g
+Y2FuJ3QgaGFuZGxlDQo+ID4gKwkJICogaW50ZXJydXB0cyB3aXRoIHByaW9yaXRpZXMgbGVzcyB0
+aGFuIG9yIGVxdWFsDQo+ID4gdG8gdGhlIHZpcnR1YWwNCj4gPiArCQkgKiBydW5uaW5nIHByaW9y
+aXR5LCBzbyB0aGVyZSdzIGxpdGVyYWxseSBubyBwb2ludA0KPiA+IGluIHdha2luZyB0aGUNCj4g
+PiArCQkgKiBndWVzdCBmb3IgdGhlc2UuDQo+ID4gKwkJICoNCj4gPiArCQkgKiBUaGUgcHJpb3Jp
+dHkgbmVlZHMgdG8gYmUgaGlnaGVyIHRoYW4gdGhlIG1hc2sNCj4gPiB0byBzaWduYWwsIHNvDQo+
+ID4gKwkJICogcGljayB0aGUgbmV4dCBoaWdoZXIgcHJpb3JpdHkgKHN1YnRyYWN0IDEpLg0KPiA+
+ICsJCSAqLw0KPiA+ICsJCXByaW9yaXR5X21hc2sgPQ0KPiA+IHZnaWNfdjVfZ2V0X2VmZmVjdGl2
+ZV9wcmlvcml0eV9tYXNrKHZjcHUpOw0KPiA+ICsNCj4gPiArCQkvKg0KPiA+ICsJCSAqIFJlcXVl
+c3QgYSBkb29yYmVsbCAqdW5sZXNzKiB0aGUgcHJpb3JpdHkgaXMgMCwNCj4gPiBpbmRpY2F0aW5n
+DQo+ID4gKwkJICogdGhhdCBubyBpbnRlcnJ1cHQgY2FuIHdha2UgdGhlIENQVSB1cC4NCj4gPiAr
+CQkgKi8NCj4gPiArCQlpZiAocHJpb3JpdHlfbWFzaykgew0KPiA+ICsJCQlpbnQgZGJfaXJxID0g
+dmdpY192NV92cGVfZGIodmNwdSk7DQo+ID4gKwkJCXN0cnVjdCBpcnFfZGF0YSAqZCA9DQo+ID4g
+aXJxX2dldF9pcnFfZGF0YShkYl9pcnEpOw0KPiA+ICsJCQljb25zdCBzdHJ1Y3QgY3B1bWFzayAq
+YWZmID0NCj4gPiBpcnFfZGF0YV9nZXRfZWZmZWN0aXZlX2FmZmluaXR5X21hc2soZCk7DQo+ID4g
+KwkJCWludCBjcHUgPSBzbXBfcHJvY2Vzc29yX2lkKCk7DQo+ID4gKw0KPiA+ICsJCQlkYnBtID0g
+cHJpb3JpdHlfbWFzayAtIDE7DQo+ID4gKwkJCWNwdV9pZi0+dmdpY19jb250ZXh0ciA9DQo+ID4g
+RklFTERfUFJFUChJQ0hfQ09OVEVYVFJfRUwyX0RCLCAxKSB8DQo+ID4gKwkJCQkJCUZJRUxEX1BS
+RVAoSUNIX0NPTg0KPiA+IFRFWFRSX0VMMl9EQlBNLCBkYnBtKTsNCj4gDQo+IFtTZXZlcml0eTog
+SGlnaF0NCj4gRG9lcyB0aGlzIHN1YnRyYWN0aW9uIGNvbmZpZ3VyZSB0aGUgbWFzayB0b28gc3Ry
+aWN0bHk/IFNpbmNlIHRoZQ0KPiBoYXJkd2FyZQ0KPiBhbHJlYWR5IGV2YWx1YXRlcyB1c2luZyBh
+IHN0cmljdGx5LWxlc3MtdGhhbiBjaGVjayAoUHJpb3JpdHkgPCBEQlBNKSwNCj4gd291bGQNCj4g
+c2V0dGluZyBpdCB0byBwcmlvcml0eV9tYXNrIC0gMSBjYXVzZSB0aGUgaGFyZHdhcmUgdG8gbWlz
+cyBkb29yYmVsbA0KPiBzaWduYWxzDQo+IGZvciBpbnRlcnJ1cHRzIGFycml2aW5nIGF0IHRoZSBs
+b3dlc3QgdW5tYXNrZWQgcHJpb3JpdHkgbGV2ZWw/DQoNCk5vLiBXaGVuIHdlIGNhbGN1bGF0ZSB0
+aGUgWy4uLl1lZmZlY3RpdmVfcHJpb3JpdHlfbWFzaygpIHdlJ3JlDQpyZXR1cm5pbmcgdGhlIGxv
+d2VzdCBwcmlvcml0eSB0aGF0IGNhbm5vdCBiZSBzaWduYWxsZWQgdG8gdGhlIGd1ZXN0Lg0KVGhl
+cmVmb3JlLCB0aGUgbG93ZXN0IHByaW9yaXR5IHRoYXQgY2FuIGJlIHNpZ25hbGxlZCBpcyB0aGUN
+CnByaW9yaXR5X21hc2sgLSAxLg0KDQpJbiB0aGUgY2FzZSB3aGVyZSB0aGUgcHJpb3JpdHlfbWFz
+ayBpcyBhbHJlYWR5IDAsIHdlIHNraXAgcmVxdWVzdGluZw0KZG9vcmJlbGxzIGFsdG9nZXRoZXIg
+YXMgdGhlcmUncyBubyB3YXkgZm9yIHRoZSBhbiBpbnRlcnJ1cHQgdG8gYmUNCnNpZ25hbGxlZCB0
+byB0aGUgZ3Vlc3QuDQoNCj4gDQo+ID4gKw0KPiA+ICsJCQkvKg0KPiA+ICsJCQkgKiBNYWtlIHRo
+ZSBkb29yYmVsbCBhZmZpbmUgdG8gdGhpcyBDUFUsDQo+ID4gaWYgaXQgaXNuJ3QNCj4gPiArCQkJ
+ICogYWxyZWFkeS4gQWN0aXZlbHkgY2hlY2sgdGhlIGNwdW1hc2sNCj4gPiBmaXJzdCBhcyBpdCBp
+cw0KPiA+ICsJCQkgKiBjaGVhcGVyIHRoYW4gY2hhbmdpbmcgdGhlIGFmZmluaXR5DQo+ID4gZXZl
+cnkgdGltZS4NCj4gPiArCQkJICovDQo+ID4gKwkJCWlmICghY3B1bWFza190ZXN0X2NwdShjcHUs
+IGFmZikpDQo+ID4gKwkJCQlXQVJOX09OKGlycV9zZXRfYWZmaW5pdHkoZGJfaXJxLA0KPiA+IGNw
+dW1hc2tfb2YoY3B1KSkpOw0KPiANCj4gW1NldmVyaXR5OiBIaWdoXQ0KPiBTaG91bGQgd2UgaGFu
+ZGxlIHRoZSBmYWlsdXJlIG9mIGlycV9zZXRfYWZmaW5pdHkoKSBoZXJlIHdpdGhvdXQgdXNpbmcN
+Cj4gYQ0KPiBXQVJOX09OKCk/DQo+IA0KPiBCZWNhdXNlIHRoaXMgaXMgYSBmYWxsaWJsZSBBUEkg
+YW5kIHRoZSBXRkkgcGF0aCBpcyBkcml2ZW4gZGlyZWN0bHkgYnkNCj4gdGhlDQo+IGd1ZXN0LCBh
+IG1hbGljaW91cyBndWVzdCBjb3VsZCBleGVjdXRlIFdGSSBpbiBhIHRpZ2h0IGxvb3AgdG8gdHJp
+Z2dlcg0KPiB0aGlzDQo+IHdhcm5pbmcgY29udGludW91c2x5LiBUaGlzIGNvdWxkIGxlYWQgdG8g
+YSBob3N0IGRlbmlhbCBvZiBzZXJ2aWNlDQo+IGVpdGhlcg0KPiB0aHJvdWdoIHNldmVyZSBsb2cg
+c3BhbSBvciBhIHBhbmljIGlmIHBhbmljX29uX3dhcm4gaXMgZW5hYmxlZC4NCg0KVGhpcyBjYWxs
+IGlzIG5vdCByZWFsaXN0aWNhbGx5IGV4cGVjdGVkIHRvIGZhaWwgaW4gdGhlIGZpcnN0IHBsYWNl
+LCBzbw0KdGhpbmdzIHdvdWxkIG5lZWQgdG8gYmUgc29tZXdoYXQgYnJva2VuIHRvIGJlZ2luIHdp
+dGguIFBlcnNvbmFsbHksIEknZA0KcmF0aGVyIHNlZSBhIHdhcm5pbmcgaGVyZSB0aGFuIGhpZGUg
+aXQgYWx0b2dldGhlci4NCg0KPiANCj4gPiArCQl9DQo+ID4gKwl9DQo+ID4gwqANCj4gPiDCoAlr
+dm1fY2FsbF9oeXAoX192Z2ljX3Y1X21ha2Vfbm9uX3Jlc2lkZW50LCBjcHVfaWYpOw0KPiA+IA0K
+PiANClRoYW5rcywNClNhc2NoYQ0K
