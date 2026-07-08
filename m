@@ -1,52 +1,46 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE70D3F12C5
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 15:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8263C3AB28C
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 15:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783524341; cv=none; b=jmrcFRdz+gUplEMg7NhMVochd60mZs+fvRVi6GO63wXxh/ueSxIDM14bI+By0npZA6773JsPmyB4sO1wOrKBN4xL3B0qPc7tae8IEFzfJ99HzXvsDyXB/0jQv9oRfbDMEFbvQRos5HeJsyB61umSxH8XpRw5I2n9p0TVuRxXSoo=
+	t=1783524364; cv=none; b=Y9uS7Vi85XDWcfPIJ1V03op3iGxJb7tQVxGYmTpW47YN4idSY40FDa3lwU5/U6LGkWUru8jC+CtBITqvXMRAzwFEDF0CuydMGSEzYIYjd2RBnqpwo/Ia01QxIYn8sB70lz6YHWBEvu1J6VT0xomg8rYXqELvX6oBOz71gvTDSGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783524341; c=relaxed/simple;
-	bh=CgJko2Bh+h3b+qr0aWBDGt72KBNs22h2ls6+1sgNj70=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=BzKfM8Cxy1M4UQwvD+rlI6nURmOcPytwAN4faWcjxHLD4RqjtZFxinuJN5apAhIl2TD6VNy20crcFmpYb8oEmUeNSbYNtLrUXGraTpFoIaIs3HniRds/U7J84GfyMf8l43NHec8ch6WSkpw7E7pF5dAUhs4P2FTZZbQGOqOHLm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZIakAqvl; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1783524364; c=relaxed/simple;
+	bh=Qc5J1mA5nOpSmBhZlE7Db0dGxN2luX9BQPzOnxfX7AA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ld7GlAOMv/R1dwBq7yJFXu5QeEj6s9i8DE6ph7oPaW3JgzMH/B7R7FoO4YTIsrAhQAtE+kHmt4y/SHDJ8gWjjfHo0x+FU7YOAPFJYwDYCZ9+u817J8uHkL9y2lKS6kKxlABiw4eFg/wcknnLrEyKCnuTDKXnznyE5awGQl6BICw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=A9oldg6t; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZIakAqvl"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="A9oldg6t"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4A3A1D14;
-	Wed,  8 Jul 2026 08:25:34 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CA363F905;
-	Wed,  8 Jul 2026 08:25:37 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 73CB91CDD;
+	Wed,  8 Jul 2026 08:25:57 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0C2A3F905;
+	Wed,  8 Jul 2026 08:25:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783524339; bh=CgJko2Bh+h3b+qr0aWBDGt72KBNs22h2ls6+1sgNj70=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZIakAqvlbM7AK9RmfXmXx/06jJgSnHaiBnx5wiv3+43dfDmh+Abx1xFI7orkc9VBL
-	 7deRDveKNGdzk/gcGsoOjkj29jlJWt124mhQMOQvl7IeVBJjMZciEVL+tqG5vbTP7q
-	 0OTiYIn7jMEI6kP3J/LK7xUNirdaNwGWL0D8rFdI=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/3] Optimize S2 page splitting
-Date: Wed,  8 Jul 2026 16:25:35 +0100
-Message-ID: <ak5r73cHx36SP0-O@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260708134101.2514759-1-leo.bras@arm.com>
-References: <20260708134101.2514759-1-leo.bras@arm.com>
+	t=1783524361; bh=Qc5J1mA5nOpSmBhZlE7Db0dGxN2luX9BQPzOnxfX7AA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A9oldg6tDXUovM58m4WZv7a3flqXTX9FrkBp6XO1ebw9wAuCQqkt7usuayaiINyAX
+	 DN6paf1W4f4fxdob1OW7EuUdpxxDJz3/ARYbTYmaxF89h0lnJbwJr3H6HMxV9doYMJ
+	 9MhupGujSbxqhuZuhpkUJkac1YQIf0+Cd6view3E=
+Date: Wed, 8 Jul 2026 16:25:55 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Jack Thomson <jackabt.amazon@gmail.com>
+Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	shuah@kernel.org, corbet@lwn.net, vladimir.murzin@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+	isaku.yamahata@intel.com, Jack Thomson <jackabt@amazon.com>
+Subject: Re: [PATCH v5 2/5] KVM: arm64: Add pre_fault_memory implementation
+Message-ID: <ak5sAxb3G6hhFmBF@raptor>
+References: <20260612162354.73378-1-jackabt.amazon@gmail.com>
+ <20260612162354.73378-3-jackabt.amazon@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,118 +49,327 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260612162354.73378-3-jackabt.amazon@gmail.com>
 
-On Wed, Jul 08, 2026 at 02:40:56PM +0100, Leonardo Bras wrote:
-> While playing with dirty-bit tracking, I decided to take a look on how page
-> splitting works. Found out all entries are walked, even though we can infer,
-> for instance that:
-> - If a level-3 entry is walked, it means the parent level-2 entry is split
-> - If a split just succeeded in an table entry, it means all children nodes
->   are already split
+Hi Jack,
+
+I've been trying to review the patch, until I realised that I don't
+understand what KVM_PRE_FAULT_MEMORY is supposed to do.
+
+Does it guarantee that, after it completes and returns to userspace, the
+address range [gpa, gpa + size] is mapped in the VM's stage 2 tables? Or
+does it guarantee that the address range was mapped at stage 2 at some
+point during the ioctl's execution, but parts, or all of it, might not be
+mapped after the ioctl completes and returns to userspace?
+
+Thanks,
+Alex
+
+On Fri, Jun 12, 2026 at 05:23:50PM +0100, Jack Thomson wrote:
+> From: Jack Thomson <jackabt@amazon.com>
 > 
-> This patches' idea is to introduce new walking flags to skip pagetable
-> levels 0-3.
+> Add arm64 support for KVM_PRE_FAULT_MEMORY by synthesizing a read data
+> abort and routing it through the existing stage-2 fault handlers. Treat
+> the requested GPA as an IPA in the userspace-owned VM's memslot space
+> and always target the canonical stage-2, even if the vCPU last ran with
+> a nested/shadow MMU selected.
 > 
-> The idea of skipping child nodes was also tested, but it was marginally
-> slower than just skipping levels, so it was discarted.
+> If the vCPU last ran in a nested context, switch to the canonical
+> stage-2 with the vCPU put/load helpers so VMID, VNCR and shadow-MMU
+> refcount state stay consistent. Leave the switch in place for the ioctl;
+> vcpu_put() at ioctl exit drops the hw_mmu and the next vcpu_load()
+> reselects the correct MMU from vCPU state.
 > 
-> Optimization measured on two scenarios involving eager-splitting on a
-> VM with 32 memslot of 2GB (total 64GB), and vcpu per slot:
-> - Scenario 1: No manual protect, whole memslot split at dirty-track enable
->   (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
->   - Split happens only once, whole region
->   - Evalutes improved batch performance of splitting
-> - Scenario 2: Manual protect, split happens during every dirty-bit clean
->   (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
->   - Split called multiple times, for smaller 64-page sections.
->   - Evaluate improved performance for multiple calls
+> Check existing mappings with a shared page-table walk under the MMU read
+> lock, and use the resulting walk level when constructing the synthetic
+> fault. Report poisoned pages through the ioctl return path with
+> -EHWPOISON instead of also queueing SIGBUS, and use the installed
+> mapping size to advance the prefault range.
 > 
-> Scenario 1, improvement on dirty-track enable ioctl for the memslot:
-> - Memory was already split (4k pages):  -43.18% runtime (stdev 3.87%)
-> - THP backed memory:                    -25.77% runtime (stdev 1.01%)
-> - 64x1GB hugetlb memory:                -25.62% runtime (stdev 1.09%)
+> Advertise KVM_CAP_PRE_FAULT_MEMORY on arm64. Protected VMs remain
+> unsupported: pKVM filters the capability, and the ioctl returns
+> -EOPNOTSUPP if invoked anyway.
 > 
-> Scenario 2, improvement on dirty-log clean ioctl for the memslot:
-> - Memory was already split (4k pages):  -39.88% runtime (stdev 2.71%)
-> - THP backed memory:                    -25.18% runtime (stdev 0.32%)
-> - 64x1GB hugetlb memory:                -49.17% runtime (stdev 1.86%)
-> 
-> For collecting above numbers, the following script was ran in both vanilla
-> and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
-> TX2 with 128GB RAM.
-> 
-> --- dirty_test.sh
-> #!/bin/bash
-> filename=$(uname -r |cut -d'-' -f 4-)
-> 
-> run_test(){
->   base_test="./dirty_log_perf_test -b 2G -v 32 -m 6 -m 8"
-> 
->   # Manual cleaning disable
->   ${base_test} -g
->   ${base_test} -g -s anonymous_thp
->   echo 64 > /proc/sys/vm/nr_hugepages  
->   ${base_test} -g -s shared_hugetlb
->   echo 0 > /proc/sys/vm/nr_hugepages
-> 
->   # Manual cleaning enable
->   ${base_test}
->   ${base_test} -s anonymous_thp
->   echo 64 > /proc/sys/vm/nr_hugepages  
->   ${base_test} -s shared_hugetlb
->   echo 0 > /proc/sys/vm/nr_hugepages
-> }
-> 
-> run_test 2>&1 | tee ${filename}
+> Signed-off-by: Jack Thomson <jackabt@amazon.com>
 > ---
+>  Documentation/virt/kvm/api.rst |  18 +++-
+>  arch/arm64/kvm/Kconfig         |   1 +
+>  arch/arm64/kvm/arm.c           |   1 +
+>  arch/arm64/kvm/mmu.c           | 162 +++++++++++++++++++++++++++++++++
+>  4 files changed, 178 insertions(+), 4 deletions(-)
 > 
-> Above dirty_log_perf_test command is the standard kvm selftest found in the
-> kernel tree. It tested the following guest modes:
-> Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-> Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
-> (Modes with PA-bits:36 were discarted in this version, given the amount
-> of RAM being used for testing, and the similarity of previous results)
-> 
-> Performance numbers from above modes were used to calculate average and
-> stdev showed in the optimization results.
-> 
-> Changes since v2:
-> - Rebased on top of v7.2-rc1
-> - Improved testing, added more memory, re-tested
->   - Now: 32 vcpus @ total of 64G
->   - Before: 1cpu @ 16G
-v2 Link: https://lore.kernel.org/all/20260618131447.764085-1-leo.bras@arm.com/
-
-> 
-> Changes since v1:
-> - Fixed inverted flag verification priority (Sashiko)
-> - Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
-> - New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
-> v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
-> 
-> Changes since RFC:
-> - Changed approach from return value to walk flags (Will Deacon)
-> - Discarted skip_child approach (Oliver Upton)
-> - Measured in real hardware, and from userspace perspective (Marc Zyngier)
-> - Better explanation of what and how numbers were collected
-> RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
-> 
-> Thanks!
-> Leo
-> 
-> 
-> Leonardo Bras (3):
->   KVM: arm64: Avoid re-testing walk_continue
->   KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
->   KVM: arm64: Make stage2_split_walker() skip unnecessary walks
-> 
->  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
->  2 files changed, 34 insertions(+), 7 deletions(-)
-> 
-> 
-> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 52bbbb553ce1..657e05656fa6 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6462,7 +6462,7 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
+>  ---------------------------
+>  
+>  :Capability: KVM_CAP_PRE_FAULT_MEMORY
+> -:Architectures: none
+> +:Architectures: x86, arm64
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_pre_fault_memory (in/out)
+>  :Returns: 0 if at least one page is processed, < 0 on error
+> @@ -6470,11 +6470,14 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
+>  Errors:
+>  
+>    ========== ===============================================================
+> +  EAGAIN     A memslot update raced with the ioctl before any page was
+> +             processed.
+>    EINVAL     The specified `gpa` and `size` were invalid (e.g. not
+>               page aligned, causes an overflow, or size is zero).
+>    ENOENT     The specified `gpa` is outside defined memslots.
+>    EINTR      An unmasked signal is pending and no page was processed.
+>    EFAULT     The parameter address was invalid.
+> +  EHWPOISON  A poisoned host page was encountered.
+>    EOPNOTSUPP Mapping memory for a GPA is unsupported by the
+>               hypervisor, and/or for the current vCPU state/mode.
+>    EIO        unexpected error conditions (also causes a WARN)
+> @@ -6494,7 +6497,14 @@ Errors:
+>  KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
+>  for the current vCPU state.  KVM maps memory as if the vCPU generated a
+>  stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
+> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
+> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
+> +Accessed.  On arm64, newly created stage-2 PTEs are marked Accessed.
+> +
+> +On arm64, `gpa` is interpreted as an IPA in the userspace-owned VM's
+> +memslot address space.  If the vCPU most recently ran a nested guest, KVM
+> +still targets the VM's canonical stage-2, and does not interpret `gpa` as
+> +a nested guest IPA or target the nested/shadow stage-2 selected by the
+> +vCPU's last run state.
+>  
+>  In the case of confidential VM types where there is an initial set up of
+>  private guest memory before the guest is 'finalized'/measured, this ioctl
+> @@ -6507,9 +6517,9 @@ case, the ioctl can be called in parallel.
+>  
+>  When the ioctl returns, the input values are updated to point to the
+>  remaining range.  If `size` > 0 on return, the caller can just issue
+> -the ioctl again with the same `struct kvm_map_memory` argument.
+> +the ioctl again with the same `struct kvm_pre_fault_memory` argument.
+>  
+> -Shadow page tables cannot support this ioctl because they
+> +On x86, shadow page tables cannot support this ioctl because they
+>  are indexed by virtual address or nested guest physical address.
+>  Calling this ioctl when the guest is using shadow page tables (for
+>  example because it is running a nested guest with nested page tables)
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 449154f9a485..6b89262e8ba7 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -24,6 +24,7 @@ menuconfig KVM
+>  	select HAVE_KVM_CPU_RELAX_INTERCEPT
+>  	select KVM_MMIO
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> +	select KVM_GENERIC_PRE_FAULT_MEMORY
+>  	select VIRT_XFER_TO_GUEST_WORK
+>  	select KVM_VFIO
+>  	select HAVE_KVM_DIRTY_RING_ACQ_REL
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9453321ef8c6..dcb92bee13af 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -392,6 +392,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_COUNTER_OFFSET:
+>  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+>  	case KVM_CAP_ARM_SEA_TO_USER:
+> +	case KVM_CAP_PRE_FAULT_MEMORY:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c720f07cb82e..4bf048bbcf8b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1571,6 +1571,8 @@ struct kvm_s2_fault_desc {
+>  	struct kvm_s2_trans	*nested;
+>  	struct kvm_memory_slot	*memslot;
+>  	unsigned long		hva;
+> +	unsigned long		*page_size;
+> +	bool			prefault;
+>  };
+>  
+>  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> @@ -1882,6 +1884,13 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
+>  				      &s2vi->map_writable, &s2vi->page);
+>  	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
+>  		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
+> +			/*
+> +			 * When prefaulting, report the poison via -EHWPOISON
+> +			 * only; don't also queue a SIGBUS as the run path
+> +			 * does for the faulting vCPU thread.
+> +			 */
+> +			if (s2fd->prefault)
+> +				return -EHWPOISON;
+>  			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
+>  			return 0;
+>  		}
+> @@ -2053,6 +2062,9 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  	kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+>  	kvm_fault_unlock(kvm);
+>  
+> +	if (s2fd->page_size && !ret)
+> +		*s2fd->page_size = mapping_size;
+> +
+>  	/*
+>  	 * Mark the page dirty only if the fault is handled successfully,
+>  	 * making sure we adjust the canonical IPA if the mapping size has
+> @@ -2757,3 +2769,153 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+>  
+>  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+>  }
+> +
+> +/*
+> + * Prefaulting always targets the canonical stage-2.  If the vCPU last ran
+> + * in a nested context, swap in the canonical MMU via the vCPU put/load
+> + * helpers so that preemption, VMID, VNCR fixmap and shadow-MMU refcount
+> + * state stay consistent.
+> + *
+> + * The swap is deliberately not undone: nothing runs in between the
+> + * per-page invocations of kvm_arch_vcpu_pre_fault_memory() except the
+> + * generic prefault loop, and the vcpu_put() at ioctl exit discards
+> + * vcpu->arch.hw_mmu anyway (see kvm_vcpu_put_hw_mmu()), so the next
+> + * vcpu_load() re-derives the correct MMU from the vCPU's context.  If the
+> + * prefault task is preempted in the meantime, kvm_vcpu_put_hw_mmu()
+> + * keeps the canonical MMU in place for the reload.  Leaving the swap in
+> + * place also bounds the cost to at most one put/load pair per ioctl,
+> + * rather than two pairs per prefaulted page.
+> + */
+> +static void kvm_pre_fault_load_canonical_mmu(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vcpu_has_nv(vcpu) || vcpu->arch.hw_mmu == &vcpu->kvm->arch.mmu)
+> +		return;
+> +
+> +	preempt_disable();
+> +	kvm_arch_vcpu_put(vcpu);
+> +	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
+> +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> +	preempt_enable();
+> +}
+> +
+> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> +				    struct kvm_pre_fault_memory *range)
+> +{
+> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
+> +	struct kvm_vcpu_fault_info fault_backup = *fault_info;
+> +	s8 walk_level = KVM_PGTABLE_LAST_LEVEL;
+> +	unsigned long page_size = PAGE_SIZE;
+> +	struct kvm_memory_slot *memslot;
+> +	phys_addr_t gpa = range->gpa;
+> +	struct kvm_pgtable *pgt;
+> +	phys_addr_t end;
+> +	kvm_pte_t pte;
+> +	hva_t hva;
+> +	gfn_t gfn;
+> +	long ret;
+> +
+> +	if (vcpu_is_protected(vcpu))
+> +		return -EOPNOTSUPP;
+> +
+> +	/*
+> +	 * Interpret range->gpa in the userspace-owned VM's IPA space, not in
+> +	 * any nested guest IPA space that may have been active on the vCPU's
+> +	 * last run.  Always target the canonical stage-2.
+> +	 */
+> +	kvm_pre_fault_load_canonical_mmu(vcpu);
+> +
+> +	if (gpa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
+> +		ret = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	gfn = gpa_to_gfn(gpa);
+> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+> +	if (!memslot) {
+> +		ret = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * A racing memslot deletion or move installs an invalid slot before
+> +	 * zapping stage-2.  Ask userspace to retry once the update settles.
+> +	 */
+> +	if (memslot->flags & KVM_MEMSLOT_INVALID) {
+> +		ret = -EAGAIN;
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * pKVM stage-2 mappings aren't directly walkable from the host; let
+> +	 * the fault path handle both new and existing mappings.
+> +	 */
+> +	if (!is_protected_kvm_enabled()) {
+> +		pgt = vcpu->arch.hw_mmu->pgt;
+> +		scoped_guard(read_lock, &vcpu->kvm->mmu_lock) {
+> +			ret = kvm_pgtable_get_leaf(pgt, gpa, &pte, &walk_level,
+> +						   KVM_PGTABLE_WALK_SHARED);
+> +		}
+> +		if (ret)
+> +			goto out;
+> +
+> +		if (kvm_pte_valid(pte)) {
+> +			page_size = kvm_granule_size(walk_level);
+> +			if (!(pte & KVM_PTE_LEAF_ATTR_LO_S2_AF))
+> +				handle_access_fault(vcpu, gpa);
+> +			goto out_success;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Synthesize a read translation fault for the canonical IPA, at the
+> +	 * level where the stage-2 walk currently ends (the last level under
+> +	 * pKVM, where stage-2 isn't walkable from the host).
+> +	 */
+> +	fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
+> +		ESR_ELx_IL | ESR_ELx_FSC_FAULT_L(walk_level);
+> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
+> +		FIELD_PREP(HPFAR_EL2_FIPA, gpa >> 12);
+> +
+> +	struct kvm_s2_fault_desc s2fd = {
+> +		.vcpu		= vcpu,
+> +		.fault_ipa	= gpa,
+> +		.nested		= NULL,
+> +		.memslot	= memslot,
+> +		.page_size	= &page_size,
+> +		.prefault	= true,
+> +	};
+> +
+> +	/*
+> +	 * As in the run path, -EAGAIN from the abort handlers is treated as
+> +	 * progress: either a parallel fault installed the mapping, or a racing
+> +	 * invalidation is in flight and the next access will refault.
+> +	 */
+> +	if (kvm_slot_has_gmem(memslot)) {
+> +		ret = gmem_abort(&s2fd);
+> +	} else {
+> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+> +		if (kvm_is_error_hva(hva)) {
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +
+> +		s2fd.hva = hva;
+> +		ret = user_mem_abort(&s2fd);
+> +	}
+> +
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +out_success:
+> +	end = ALIGN_DOWN(gpa, page_size) + page_size;
+> +	ret = min_t(u64, range->size, end - gpa);
+> +out:
+> +	/*
+> +	 * Restore the synthetic fault state so a subsequent KVM_RUN does not
+> +	 * observe it. kvm_handle_mmio_return() runs before guest entry can
+> +	 * refresh fault.esr_el2 from hardware, so leaving the synthetic ESR
+> +	 * in place would corrupt the completion of a pending MMIO exit.
+> +	 */
+> +	*fault_info = fault_backup;
+> +	return ret;
+> +}
 > -- 
-> 2.55.0
+> 2.43.0
+> 
 > 
