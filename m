@@ -1,244 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13A3349CDF;
-	Wed,  8 Jul 2026 17:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FFD4307A9
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 18:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783530966; cv=none; b=Gqli6BluTlkQXFhHL87t1RsfdSl6mWyfIcHaULFqpEQ/Z831cOqqPYgfDzqXjAIm7dkEiuKNiIK4xA1EsOGeBiq/QYL4NXpKR/QjIDwPLOzbJ7QuFq8yRVn0AuoGMudE2Q67vK/dPUUVJqo38cLW5iqwxm8LtYt6eSXa8Zk69mE=
+	t=1783535130; cv=none; b=alh+yMo/Ykq810qlhwwZphkZZnKRDhfUn35qv3Hgk0//XiqMa5YsrRhKMt9Uhc8hBBMh9maAYAgSCSWp25ANHDS5AMLP6uhjs0Gkqaq2k/6Zc4LFISRR3o4QrM1GBUSofVrC1zZ2wufIusJQWNCLoNFf5wOKyOaC2Lyo0CQ4on8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783530966; c=relaxed/simple;
-	bh=DQfTutNj0v5B6Ga4ZqbsWhJlXaj+Wk133YkqIYYMChY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pcgAwxC0uswdRnJn0VGUlpCM4HxwTugFKvqF0eGEZ1CB7tJD6OSGRE3WvquCn7+Dcws7eOf8kQbeNIRXjwYZlD16q7hQ7qjFshhqJ91WWNpEjcVHV4VerPBFveihQp44xqDgzNnYwuCyjx6/i+OPD8NIeQmb4CvpKVsHt+jVZaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcIXC+Pv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783535130; c=relaxed/simple;
+	bh=RYx5v18Z5gMilMsvjwdRbOpAmNJ9bj6sLktqRdYL3C8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P2ojMlAv7rReXzooaIBe32uvEHQJhngpZ/ijvsJaNHa5AltqCnZmdPNQUOoR6dEtXmi1xMt8901Rm+D9GHq1XH/oI+wB0AZ7z86xjCZbJ5a4Rg4yTzsaRbMBMfVl2spTphrviaNrsEkg8S/igE8DkmHJlKFu/tiFfN3A2vsQi0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ENcKiQkl; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcIXC+Pv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE541F000E9;
-	Wed,  8 Jul 2026 17:16:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783530964;
-	bh=j59Lt3CniKdsjoZd0o6bh+5+lN1t2lbIWVTWZt9rC9g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=fcIXC+PvrYw+KyOJa0Eu125sFS4OWtveDCzMjmtln3wqBhDQ1mOaBR/orHIED2crj
-	 mLFKnPC4/p4SL046dAJhlT8edXs0XrlLb3uhlLM1aPkUseWfZUmUCytAn61HuHOYic
-	 Z3zhlCpKzd+P5GZZDCB1fRtg3yb5IfgJowIHY95YOvLXnEQk9gbql9/waUHG9Ao0EL
-	 4a2rsgG6APc8KUg57r99jG6SI1ELPjl6yqlNn375oK561sQyEUecl8C1tXHbgnoPnt
-	 H1YZo8Rz0QzQPF5IAIWli/dyHPN/7yKEVep7ptd0JLgAKvqTMjVW0tjxbkm9JN+dQl
-	 32gXrLHWD8jGw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1whVsQ-00000002vtp-34lw;
-	Wed, 08 Jul 2026 17:16:02 +0000
-Date: Wed, 08 Jul 2026 18:17:51 +0100
-Message-ID: <871pdd764g.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ENcKiQkl"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783535125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nH70brhKreuaxH7Whw6ZNqLkWsohR1XxsGRTQjLL1OE=;
+	b=ENcKiQklMlFU4InOky7hb4tnnQBsdPp4rlpyYbMQ1tn070eflxus/0FBExWz1OqFUYs/Up
+	P2yK5rjdfb81nRgMWN/z1oCBhAGqpWnjcVJtmWd6Ei6IFJdR+fbdX1jI3oBrjTccdeGEGL
+	73ufJ63OB0joWSW9vba8OOdInAc6Sfs=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-In-Reply-To: <20260708134101.2514759-3-leo.bras@arm.com>
-References: <20260708134101.2514759-1-leo.bras@arm.com>
-	<20260708134101.2514759-3-leo.bras@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH kvmtool v2 0/4] Add guest_memfd support for arm64
+Date: Wed,  8 Jul 2026 19:25:06 +0100
+Message-Id: <20260708182510.2181857-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 08 Jul 2026 14:40:58 +0100,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
-> when walking the pagetables.
+Hi folks,
 
-I don't understand what 'lower' means here. There is also no
-description of what this patch is trying to do, or why it is trying to
-do it. All I see is a wall of code with no rationale, no explanation.
+Changes since v1 [1]:
+- Use kvm_userspace_memory_region2 only for guest_memfd slots (Suzuki)
+- Check KVM_CAP_GUEST_MEMFD before KVM_CAP_GUEST_MEMFD_FLAGS (Alexandru)
+- Close guest_memfd fd after unmapping at teardown (Alexandru)
+- Carried Reviewed-bys
 
->
-> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 19 ++++++++++++++++---
->  2 files changed, 29 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 41a8687938eb..20c7c12e0e76 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -311,31 +311,44 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
->   * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
->   *					with other software walkers.
->   * @KVM_PGTABLE_WALK_IGNORE_EAGAIN:	Don't terminate the walk early if
->   *					the walker returns -EAGAIN.
->   * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
->   *					without Break-before-make's
->   *					TLB invalidation.
->   * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
->   *					without Cache maintenance
->   *					operations required.
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL0:	Skip visiting level-0+ entries
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL1:	Skip visiting level-1+ entries
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL2:	Skip visiting level-2+ entries
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL3:	Skip visiting level-3 entries
+Due to popular demand, i.e., Alexandru asking me about it, I repolished my
+guest_memfd support series. The one I sent years ago was stale and
+over-engineered, so this is a fresh start instead.
 
-Skip under which conditions? Always?
+This series adds support for backing guest RAM with guest_memfd on
+arm64, for non-protected VMs under both regular KVM and pKVM.
 
->   */
->  enum kvm_pgtable_walk_flags {
->  	KVM_PGTABLE_WALK_LEAF			= BIT(0),
->  	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
->  	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
->  	KVM_PGTABLE_WALK_SHARED			= BIT(3),
->  	KVM_PGTABLE_WALK_IGNORE_EAGAIN		= BIT(4),
->  	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
->  	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL0		= BIT(7),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL1		= BIT(8),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL2		= BIT(9),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL3		= BIT(10),
+The first two patches are standalone fixes in the code this series
+builds on: an uninitialized return value in kvm__for_each_mem_bank(),
+and doubled newlines in die() messages. Patch 3 adds guest_memfd
+plumbing to kvm__register_mem(), using kvm_userspace_memory_region2
+only for guest_memfd-backed slots.
 
-There is a strong assumption that these bits must be contiguous. And
-yet that's not captured anywhere. Want to bet what is going to happen
-next?
+A new --guest-memfd option creates guest RAM from a guest_memfd with
+mmap support (GUEST_MEMFD_FLAG_MMAP and GUEST_MEMFD_FLAG_INIT_SHARED,
+Linux 6.18+), maps it to provide the userspace mapping, and registers
+it with KVM_SET_USER_MEMORY_REGION2.
 
->  };
->  
-> +#define KVM_PGTABLE_WALK_SKIP_LEVELS 	(KVM_PGTABLE_WALK_SKIP_LEVEL0 | \
-> +					 KVM_PGTABLE_WALK_SKIP_LEVEL1 | \
-> +					 KVM_PGTABLE_WALK_SKIP_LEVEL2 | \
-> +					 KVM_PGTABLE_WALK_SKIP_LEVEL3 )
-> +
->  struct kvm_pgtable_visit_ctx {
->  	kvm_pte_t				*ptep;
->  	kvm_pte_t				old;
->  	void					*arg;
->  	struct kvm_pgtable_mm_ops		*mm_ops;
->  	u64					start;
->  	u64					addr;
->  	u64					end;
->  	s8					level;
->  	enum kvm_pgtable_walk_flags		flags;
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 4be1d51a6ac5..b9a2078efc51 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -137,20 +137,33 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
->  	 * Ignore the return code altogether for walkers outside a fault handler
->  	 * (e.g. write protecting a range of memory) and chug along with the
->  	 * page table walk.
->  	 */
->  	if (r == -EAGAIN)
->  		return walker->flags & KVM_PGTABLE_WALK_IGNORE_EAGAIN;
->  
->  	return !r;
->  }
->  
-> +static __always_inline bool kvm_pgtable_skip_level(s8 level, enum kvm_pgtable_walk_flags flags)
+Protected VMs need in-place shared/private conversion of guest_memfd,
+which is still in progress in the kernel [2], so --protected rejects
+the option.
 
-Why __always_inline? I'm sure the compiler can decide for itself.
+Based on kvmtool master (ca0ddafa941d).
 
-> +{
-> +	flags &= KVM_PGTABLE_WALK_SKIP_LEVELS;
-> +
-> +	if (likely(!flags))
-> +		return false;
-> +
-> +	if (level >= (ffs(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
-> +		return true;
+Cheers,
+/fuad
 
-This looks awfully complex for something this trivial:
+[1] https://lore.kernel.org/all/20260706083555.302972-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260618-gmem-inplace-conversion-v8-0-9d2959357853@google.com/
 
-	u32 skip = FIELD_GET(KVM_PGTABLE_WALK_SKIP_LEVELS, flags);
+Fuad Tabba (4):
+  Initialize the return value in kvm__for_each_mem_bank()
+  Remove newline from end of die() aborts
+  Add support for registering guest_memfd-backed memory regions
+  arm64: Add --guest-memfd option to back guest RAM with guest_memfd
 
-	return skip && level >= ffs(skip);
-
-But also, you seem to assume that there cannot be more than one such
-flag set. I have no idea of the outcome in this situation, and the
-whole thing is completely undocumented anyway...
-
-> +
-> +	return false;
-> +}
-> +
->  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->  			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level);
->  
->  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  				      struct kvm_pgtable_mm_ops *mm_ops,
->  				      kvm_pteref_t pteref, s8 level)
->  {
->  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
->  	kvm_pte_t *ptep = kvm_dereference_pteref(data->walker, pteref);
->  	struct kvm_pgtable_visit_ctx ctx = {
-> @@ -185,35 +198,35 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  	 * into a newly installed or replaced table.
->  	 */
->  	if (reload) {
->  		ctx.old = READ_ONCE(*ptep);
->  		table = kvm_pte_table(ctx.old, level);
->  	}
->  
->  	if (!kvm_pgtable_walk_continue(data->walker, ret))
->  		return ret;
->  
-> -	if (!table) {
-> +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
->  		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
->  		data->addr += kvm_granule_size(level);
->  		goto out;
->  	}
->  
->  	childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
->  	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
->  	if (!kvm_pgtable_walk_continue(data->walker, ret))
->  		return ret;
->  
-> -	if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
-> +out:
-> +	if (table && ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
-
-I don't understand this change. Care to explain?
-
->  		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
->  
-> -out:
->  	if (kvm_pgtable_walk_continue(data->walker, ret))
->  		return 0;
->  
->  	return ret;
->  }
->  
->  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->  			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level)
->  {
->  	u32 idx;
-
-Thanks,
-
-	M.
+ arm64/include/kvm/kvm-config-arch.h |  5 ++-
+ arm64/kvm.c                         | 43 +++++++++++++++++++++-----
+ hw/cfi_flash.c                      |  2 +-
+ include/kvm/kvm.h                   | 16 ++++++++--
+ include/kvm/util.h                  |  1 +
+ kvm.c                               | 42 ++++++++++++++++++--------
+ util/util.c                         | 47 ++++++++++++++++++++++++++---
+ 7 files changed, 127 insertions(+), 29 deletions(-)
 
 -- 
-Jazz isn't dead. It just smells funny.
+2.39.5
+
