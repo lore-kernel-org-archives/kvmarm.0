@@ -1,156 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BC23F888B;
-	Wed,  8 Jul 2026 07:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E963115AF
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 07:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783496194; cv=none; b=JvN8oOxLReG0wen9aFBm4OzNmPe7dsBgy0FJ94tVEaykV36rvAR00xJ0WqklkgOkdxlHfYqS111DAZ7etGmhn1bBpZyTIFjmnOwYeYZ6s7UvCO3I2z6vguATgDAy0W77M19Nbyg1CDZUe05rNg5jKuIfKDxAFxSgoP6oIkluS20=
+	t=1783496642; cv=none; b=lMr09N23NCvplsVq8R0nMAtHvnK1Qk72qOXShFcC3T6EP+/aGG48fkS0k2e9piRAU0BnHGOL3hPpJVdNYAmA9TZLw3CkBvGYJyRpxVbFDS8qrrjDv/m8OpDCaaALLLns3YGwb2BRVCnlQGxXxKRNSaIDRIwMWC7mVLY6jtGNho4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783496194; c=relaxed/simple;
-	bh=GkSu0T/j1EigHEvHkz4OfSe+5dY8ZtTvL5k3rcGsVg0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bh7Mi6kct4YIDw+Xej9iMp3DFn+oKGz1Ejl5eB1m6L8NGipKw397Q7s+MQkqSJvEMa+Sq4koQsS+EytmEVLXlVia69elZB9yzRa7zvZYpg+rmMJmWjsy7iY12Wk8Vc8GK3xWRZgsz2xQla5yUbcAetJSNOKpdsSGYenalaivuoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ip4NvB47; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783496642; c=relaxed/simple;
+	bh=YU1TUKrNRfp8ojTfZTb63dnHOLC15tLJTvRpWDB2FPM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S/OKuCBGAXT47VFfglAquWOkovRi07f7SvMfy78BtsgJSFpB3rSOLVFFJscIySMgiPTokbvhMNjnm19AY2duK5rzg6bRHbbKuG1oSJCbS7ej+K/vnThLJIJ51c1gB17RrnyARvnu9UTOodihme0dXtzDqmQRL2Is627VfQPOlOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bp+SB2I4; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ip4NvB47"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D24431F000E9;
-	Wed,  8 Jul 2026 07:36:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783496177;
-	bh=xls0ncCjyWcLCH10SsoXeKirDHltIOo0E/jR/8APp6g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Ip4NvB47gbOwipZa0QyaFhGhU4Vm+o/21PVfALYlAyU6X0qJyBv4zSdlp/zMVzpOM
-	 BTI3YYYMtX3GtDTOvAalB+L3bvT11rvpKtqt7d6LHlu+NX5opY4w+bJSIZW02QITLn
-	 /3dQC6ZjeWlTa+WoM5tyjJI2XGPyha02Vo21UBZUd6lZm4z1OJ976CmocY7Yi2FI1N
-	 QcS7aTomqtppnG+LbYRUdzOarl/452D7tERIU83hgc7aLI5g+fVUjCJuDBBzLJU0BS
-	 MJDitX2DWqgbP+PQ1j2dHuodEFH5RLddS2fFDwdb6wVCv8xD2uOuD56qeXgcW8g6UH
-	 ACxJKR8XzLxJg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1whMpL-00000002hwZ-1cyF;
-	Wed, 08 Jul 2026 07:36:15 +0000
-Date: Wed, 08 Jul 2026 08:36:14 +0100
-Message-ID: <861pdeorv5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 24/27] KVM: s390: arm64: Implement vm/vcpu create destroy.
-In-Reply-To: <20260708065150.583632-C-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
-	<20260706085229.979525-25-seiden@linux.ibm.com>
-	<8633xuq1ic.wl-maz@kernel.org>
-	<20260708065150.583632-C-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bp+SB2I4"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47c2b362ee2so309159f8f.1
+        for <kvmarm@lists.linux.dev>; Wed, 08 Jul 2026 00:43:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783496629; x=1784101429; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n82prq6kBMNM74HC3u8a/YGx7R3skaf4VOdGW85odhg=;
+        b=bp+SB2I4nvUaE3qRpPC9OT3lLxE6hpDNX2WwxXpCLVqbPFvGY4J3Gk00K3ClOYATLn
+         5dNrrAOH//jzqeosqBzA6LFqonymk+wm91ALEKxo1KtZIjQ9qt5CDUvX8tuWrg9Qv+UG
+         axBte0OK5l5Ui7K185iwzRByGXduushKRfC2nI9SrfRE4i4PGLKfvcdAtseGEkuXujEd
+         Ga217PB63YUgvYhczxEbIjW//jQ1jj8nIXqVG8USWtcN4PNRq3TfuvFAoUarOwJVaDWA
+         15mPCzTm60TdwnigN/GA13Agdj8pThvwGPAMhQ55jsIkr+vCht/DRsDC70ESE8hizArL
+         O3WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783496629; x=1784101429;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n82prq6kBMNM74HC3u8a/YGx7R3skaf4VOdGW85odhg=;
+        b=hLaNyNYjX22LgC+jZC5QFjGpJA6Gpyl29nEo5/QGTtQdYsJ8eor2BYph1O7jwJYSIB
+         mFKiQVg/XRnUFOY9hV34jEySmv1XQXFySdZFs6mKpEq/8VDDruOnt8W4wUDPA7PreYxi
+         nkeiQ0obgaP/YLojbJW8HCLBrJzJhm9XSAn33shTAqr0ijtqGfxp4q/54i6t2slpqKqK
+         3V3weHlabCBpII4ffxvWMZE4xjWdkVV1e4xi2xk0E64dk9kPo+v962UQN42s6jDAJeSc
+         wPw7UnzLXJMMFNpZvGMOdv0+h/G/7+TufY4PBChR2aN52wK+qMbSGAtKY9ync6fWh/Q9
+         8/pQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrEDFo8DPt0SDLUNSu+O2iaDoViYLD0lcDcSBCMDFNRfYl8LsU1DVLromZIbWA+bFuhZYWXXbA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzECHmCjCk6vOwApJZzDyNebPSRlzxOMkGWZGmoCqZhRIYCf9J7
+	o+wZPDcyVmvIyaMpRGV0SY5FN7n5h1PKrAn1DesnbpuGXi2UC+CnCXk6kBb9RjHo4A==
+X-Gm-Gg: AfdE7clkDqqZQK6woBCcNyyG8Xh1m1KaIkqhA4Isaycezn4+90CxD2BkqI1MN0cUjf9
+	81CAlsvUMBU3lMQCI2UVmEEVjPtpvkyLRbboSb0dCfONw2D4kAWqtaoEmLRhPbv9IO2VqGMGnC2
+	pI3+kvx0+P96Syl0HA3B1EWUlmtDkyp1zP2RHwk81NYaK3N00bLcts2RxgcGyddwXtHX88bVilM
+	HXqPN3jSfFGubuU8m9uSEgKwxrm4v6ZzovG/1wFvgsPIv48aIN/mHDQ7QK2uoqo6gPflhYd/2Qs
+	hLsqAqvYvDQ4doeQsW2AHjODstm1r5Jf0oebeVsgip7XmjDSaRSWaTlqx4gGnvK6JNKY0YTTD34
+	4V/plhejuFGpr0z4d+I4pc9T1NvKKZ52sAfHhssIaQMKCYoMuSZuDPQHVng0jV4aELbS6cWg/+Q
+	9ynkIlC96HuxnZXBQxE7VorlsVUmFt27GxVuunIrq7hnUgX9ci+okIxvUF9XZK+g==
+X-Received: by 2002:a05:6000:290b:b0:47d:e50f:94d with SMTP id ffacd0b85a97d-47df073b177mr1317865f8f.11.1783496628970;
+        Wed, 08 Jul 2026 00:43:48 -0700 (PDT)
+Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960af0sm37239696f8f.30.2026.07.08.00.43.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 00:43:48 -0700 (PDT)
+Date: Wed, 8 Jul 2026 08:43:44 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com, Sashiko <sashiko-bot@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Fix potential leak in
+ hyp_trace_buffer_alloc_bpages_backing
+Message-ID: <ak3_sKu616ZZBdYL@google.com>
+References: <20260707165029.3410701-1-vdonnefort@google.com>
+ <CA+EHjTx7C7BEmyoZgx6-PWvfAHpP8AWMOefTdwOQjw8NrPhLNQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTx7C7BEmyoZgx6-PWvfAHpP8AWMOefTdwOQjw8NrPhLNQ@mail.gmail.com>
 
-On Wed, 08 Jul 2026 07:51:50 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+On Tue, Jul 07, 2026 at 07:32:44PM +0100, Fuad Tabba wrote:
+> Hi Vincent,
 > 
-> On Tue, Jul 07, 2026 at 04:10:19PM +0100, Marc Zyngier wrote:
-> > On Mon, 06 Jul 2026 09:52:24 +0100,
-> > Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > > 
-> > > Implement init and destroy IOCTLS for vcpu and vm.
-> > > Implement arch vm IOCTL. Use s390 gmap.
-> > > 
-> > > Co-developed-by: Janosch Frank <frankja@linux.ibm.com>
-> > > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> > > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> > > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> > > Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > > ---
-> > >  arch/s390/kvm/arm64/arm.c       | 190 ++++++++++++++++++++++++++++++++
-> > >  arch/s390/kvm/arm64/arm.h       |  56 ++++++++++
-> > >  arch/s390/kvm/gmap/faultin.c    |   5 +
-> > >  arch/s390/kvm/gmap/gmap.c       |   4 +
-> > >  arch/s390/kvm/gmap/trace-gmap.h |  13 +++
-> > >  5 files changed, 268 insertions(+)
-> > > 
-> > > diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> > > index 19249ec5c539..3a4092698fae 100644
-> > > --- a/arch/s390/kvm/arm64/arm.c
-> > > +++ b/arch/s390/kvm/arm64/arm.c
-> > > @@ -8,6 +8,10 @@
-> > >  #include <linux/kvm_types.h>
-> > >  #include <linux/kvm_host.h>
-> > >  
-> > > +#include <arm64/kvm_mmu.h>
-> > > +
-> > > +#include <gmap.h>
-> > > +
-> > >  #include "arm.h"
-> > >  
-> > >  static unsigned long system_supported_vcpu_features(void);
-> > > @@ -31,6 +35,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> > >  		break;
-> > >  	case KVM_CAP_IOEVENTFD:
-> > >  	case KVM_CAP_ARM_USER_IRQ:
-> > > +	case KVM_CAP_PRE_FAULT_MEMORY:
-> > 
-> > arm64 *doesn't* support this yet. Please make sure you don't deviate
-> > from what arm64 currently supports.
+> On Tue, 7 Jul 2026 at 17:50, Vincent Donnefort <vdonnefort@google.com> wrote:
 > >
+> > In the very unlikely event of a failure in __map_hyp, the allocated
+> > backing pages are leaked in hyp_trace_buffer_alloc_bpages_backing(). Fix
+> > this by freeing the pages on error.
+> >
+> > Fixes: 3aed038aac8d ("KVM: arm64: Add trace remote for the nVHE/pKVM hyp")
+> > Reported-by: Sashiko <sashiko-bot@kernel.org>
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> >
+> > diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> > index 2411b4c32932..5fbbfd40376f 100644
+> > --- a/arch/arm64/kvm/hyp_trace.c
+> > +++ b/arch/arm64/kvm/hyp_trace.c
+> > @@ -160,6 +160,7 @@ static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_
+> >         int nr_bpages = (PAGE_ALIGN(size) / PAGE_SIZE) + 1;
+> >         size_t backing_size;
+> >         void *start;
+> > +       int ret;
+> >
+> >         backing_size = PAGE_ALIGN(sizeof(struct simple_buffer_page) * nr_bpages *
+> >                                   num_possible_cpus());
+> > @@ -171,7 +172,11 @@ static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_
+> >         trace_buffer->desc->bpages_backing_start = (unsigned long)start;
+> >         trace_buffer->desc->bpages_backing_size = backing_size;
+> >
+> > -       return __map_hyp(start, backing_size);
+> > +       ret = __map_hyp(start, backing_size);
+> > +       if (ret)
+> > +               free_pages_exact(start, backing_size);
+> > +
+> > +       return ret;
+> >  }
 > 
-> I hoped the corresponding arm64 series is merged when we got this :) 
+> nit: would be a bit cleaner to do move the desc assignment to after
+> the check. Also, I think sashiko found another real bug, don't think
+> it's serious but worth fixing.
 
-If the quality of the previous postings of that series is anything to
-go by, I doubt this will be merged on this side of the death of the
-universe.
+Ha yes good point.
 
-> I will remove this advertisement. I'll keep the implementation as the compiler
-> expect that function to be present anyways, as native s390 KVM now implements
-> this CAP. OK? 
+For the other bug, I saw it but that will be for the tracing ML
 
-As long as the code isn't reachable from the arm64 side, that's fine
-by me.
+> 
+> That said...
+> 
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
 
-	M.
+Thanks
 
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Cheers,
+> /fuad
+> 
+> >
+> >  static void hyp_trace_buffer_free_bpages_backing(struct hyp_trace_buffer *trace_buffer)
+> >
+> > base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+> > --
+> > 2.55.0.rc2.803.g1fd1e6609c-goog
+> >
