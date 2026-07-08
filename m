@@ -1,171 +1,172 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3712FD1B5
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 15:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE70D3F12C5
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 15:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783523992; cv=none; b=Bc+QQW29SKMKcIVNvQVUVzZuHPQbG1oeGC8zuD+YOhxEgZ91HseC8XqrBg4WoFLus7Y6snZKtJNrXFDZ3r74axniv2cGICQP91I2kC5ElnrACv40J32aNr5bL7gQnBDENK9RZugWHoDpa81n844S70PbN8xLxGeq2J7AgaAqwb0=
+	t=1783524341; cv=none; b=jmrcFRdz+gUplEMg7NhMVochd60mZs+fvRVi6GO63wXxh/ueSxIDM14bI+By0npZA6773JsPmyB4sO1wOrKBN4xL3B0qPc7tae8IEFzfJ99HzXvsDyXB/0jQv9oRfbDMEFbvQRos5HeJsyB61umSxH8XpRw5I2n9p0TVuRxXSoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783523992; c=relaxed/simple;
-	bh=Ql7KTdiruqwIMVFE4sjNG6lU7UucIdeojr9NCI04wLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PvgT4UkbohQOpCN4XOhmWktPp5aDpThw+kyABf28uB4BpSXBTUSP/Ow/gMhnAxZa85R36hR5kLg/KOhCfc0HTEqvIabN8MzTDKTT7jtc3ociM164oPMh3Tm5dfOm/4dvYdFAvFEsfSYW5X0mpTbxoE1vymTUL/HGLqToXQffC3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K602iJt8; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1783524341; c=relaxed/simple;
+	bh=CgJko2Bh+h3b+qr0aWBDGt72KBNs22h2ls6+1sgNj70=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=BzKfM8Cxy1M4UQwvD+rlI6nURmOcPytwAN4faWcjxHLD4RqjtZFxinuJN5apAhIl2TD6VNy20crcFmpYb8oEmUeNSbYNtLrUXGraTpFoIaIs3HniRds/U7J84GfyMf8l43NHec8ch6WSkpw7E7pF5dAUhs4P2FTZZbQGOqOHLm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZIakAqvl; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K602iJt8"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-490cf3000f0so5806175e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 08 Jul 2026 08:19:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783523989; x=1784128789; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DqR44mUfA9LKMBGDHZfmsXYR0vrldtmDsyb0BeR+gO0=;
-        b=K602iJt8YKEJycKicUo7UvTMmN1BVPTwD8GvwSQODuFqx12hm2P9DQj1aazuD0ufSL
-         tkLDUWhtZPVMpfQb6yCrf0uTejP+zSxd6T8AsT3cEerMqzoYLgrzRBtxvtZci+VIz0p0
-         VrX8MLvaQaVCvlk+pS/5PimZTTH9MrU3KpOEth7iKJoAuNZDOyHfJjcz205cdJYTpIVM
-         kTulrbVKQvYCW5xtuDghUNCsf4BELL5jhRhFQ686vzVchieSbTnDP8318P4BSKjSOzZq
-         T6/weKmpo0PGtFYUzoUjNl5SYYJeLUWffGdEkgI4vMRI9zyU9Gs2sBtuqCgz5wkmCcg0
-         vnRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783523989; x=1784128789;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=DqR44mUfA9LKMBGDHZfmsXYR0vrldtmDsyb0BeR+gO0=;
-        b=a7tQtx+vflQjrAOqz4b9pHyrqaqVBSpSeeBcTdcyM0ivH2tcUc4WOMiaOHqFvJn41n
-         YGafFWRyGK4Ou5Zug+cIOQG77D4GC2O70uQlJCAShE3ZFv6LoH7/m62uNbcIE71WAQ+U
-         BBxTwTF7Upvx/vS0yuOTPONz8QTVZzptCFqfkToo9ufAPK7ee2fPdDj3BaKNhbFBEyhk
-         3EU45t7qf6zS2mNheKrqYvhd36A/DZjF45obB5VKqHI6lMTsZDixRbb9qG6Tpd6+suR4
-         gedf7XKZkG12GFY9dBSH1v6rlfqhIudtoGPBGzh/joZcLqwx5CvXkSXnHe/Uoz7WM6fG
-         110A==
-X-Gm-Message-State: AOJu0YxumxkCFWQekgJtWShWn8zbQEvfiaWdF5NfJ+yCC7P+ajWeUt3u
-	B3LWOh2Gs29PghB4y2PPS+BTDJAD9XRwhTbSBx7ckC+xVODAFPGCh+OJbt1mAKB5JQ==
-X-Gm-Gg: AfdE7cmC4oFvgvmFyjLo4LRhGfxlSen7X5e/whYeRas0lCPhVSk9+TYjeOlI19a/hZJ
-	PKCZOZ23wDdE4T1qKhvZUnTSKWPvjApJpOo5GE3YdeJQi48Qbz9fTM5HJCwAefT55NRZhdv6Qx3
-	JFHfhuzO4Z7Sec6tdXKHAGUgf2t/cVY3cACdDR31kIro80lOF3YBJE9RhcfUuAOQEiihgoyQ8Z6
-	Bx37RIwEydIoJ1NckLuSvAhvf/j3qDsdsrlY1bbdr5JYmmJkuZraJl6f1zgJlN1v2ooIuM9lIZv
-	lJWiAlUara0WFjFDSkuB98rDjU9aGsqQ6404EkIXe/I7SkgbvXcyuAixvEcKzKuz8WZm/+pC4nU
-	ANoL+37ynmGwZZFVNKvnYgZJuoe+Hlon8a/IZY2sdqVs5thhZXfzNCG1L1CK7tjwsqymVbZ9Unw
-	X92QeVMdnvI8h1USIhnU1z1+gZLIFwDfmTi899WcpuoZKJB2ZtXdc=
-X-Received: by 2002:a05:600d:6450:20b0:493:b2c1:b2f9 with SMTP id 5b1f17b1804b1-493e6898c5bmr25566325e9.8.1783523988694;
-        Wed, 08 Jul 2026 08:19:48 -0700 (PDT)
-Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e736sm47041125f8f.7.2026.07.08.08.19.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 08:19:47 -0700 (PDT)
-Date: Wed, 8 Jul 2026 16:19:43 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Fix potential leak in
- hyp_trace_buffer_alloc_bpages_backing
-Message-ID: <ak5qjzhwSooBcjsZ@google.com>
-References: <20260707165029.3410701-1-vdonnefort@google.com>
- <20260707170245.3967E1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZIakAqvl"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4A3A1D14;
+	Wed,  8 Jul 2026 08:25:34 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CA363F905;
+	Wed,  8 Jul 2026 08:25:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783524339; bh=CgJko2Bh+h3b+qr0aWBDGt72KBNs22h2ls6+1sgNj70=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ZIakAqvlbM7AK9RmfXmXx/06jJgSnHaiBnx5wiv3+43dfDmh+Abx1xFI7orkc9VBL
+	 7deRDveKNGdzk/gcGsoOjkj29jlJWt124mhQMOQvl7IeVBJjMZciEVL+tqG5vbTP7q
+	 0OTiYIn7jMEI6kP3J/LK7xUNirdaNwGWL0D8rFdI=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/3] Optimize S2 page splitting
+Date: Wed,  8 Jul 2026 16:25:35 +0100
+Message-ID: <ak5r73cHx36SP0-O@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260708134101.2514759-1-leo.bras@arm.com>
+References: <20260708134101.2514759-1-leo.bras@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260707170245.3967E1F000E9@smtp.kernel.org>
 
-On Tue, Jul 07, 2026 at 05:02:44PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+On Wed, Jul 08, 2026 at 02:40:56PM +0100, Leonardo Bras wrote:
+> While playing with dirty-bit tracking, I decided to take a look on how page
+> splitting works. Found out all entries are walked, even though we can infer,
+> for instance that:
+> - If a level-3 entry is walked, it means the parent level-2 entry is split
+> - If a split just succeeded in an table entry, it means all children nodes
+>   are already split
 > 
-> Pre-existing issues:
-> - [High] trace_remote_alloc_buffer leaks page allocations on the error path if a per-CPU ring buffer allocation fails.
-> --
+> This patches' idea is to introduce new walking flags to skip pagetable
+> levels 0-3.
 > 
-> --- Patch [1]: [PATCH] KVM: arm64: Fix potential leak in hyp_trace_buffer_alloc_bpages_backing ---
-> commit 21f10293a05c7439f7a1d1be691e92ef2d36331a
-> Author: Vincent Donnefort <vdonnefort@google.com>
+> The idea of skipping child nodes was also tested, but it was marginally
+> slower than just skipping levels, so it was discarted.
 > 
-> KVM: arm64: Fix potential leak in hyp_trace_buffer_alloc_bpages_backing
+> Optimization measured on two scenarios involving eager-splitting on a
+> VM with 32 memslot of 2GB (total 64GB), and vcpu per slot:
+> - Scenario 1: No manual protect, whole memslot split at dirty-track enable
+>   (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
+>   - Split happens only once, whole region
+>   - Evalutes improved batch performance of splitting
+> - Scenario 2: Manual protect, split happens during every dirty-bit clean
+>   (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
+>   - Split called multiple times, for smaller 64-page sections.
+>   - Evaluate improved performance for multiple calls
 > 
-> In the very unlikely event of a failure in __map_hyp, the allocated
-> backing pages are leaked in hyp_trace_buffer_alloc_bpages_backing(). Fix
-> this by freeing the pages on error.
+> Scenario 1, improvement on dirty-track enable ioctl for the memslot:
+> - Memory was already split (4k pages):  -43.18% runtime (stdev 3.87%)
+> - THP backed memory:                    -25.77% runtime (stdev 1.01%)
+> - 64x1GB hugetlb memory:                -25.62% runtime (stdev 1.09%)
 > 
-> Fixes: 3aed038aac8d ("KVM: arm64: Add trace remote for the nVHE/pKVM hyp")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> Scenario 2, improvement on dirty-log clean ioctl for the memslot:
+> - Memory was already split (4k pages):  -39.88% runtime (stdev 2.71%)
+> - THP backed memory:                    -25.18% runtime (stdev 0.32%)
+> - 64x1GB hugetlb memory:                -49.17% runtime (stdev 1.86%)
 > 
-> > diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-> > index 2411b4c32932c..5fbbfd40376f7 100644
-> > --- a/arch/arm64/kvm/hyp_trace.c
-> > +++ b/arch/arm64/kvm/hyp_trace.c
-> > @@ -160,6 +160,7 @@ static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_
-> >  	int nr_bpages = (PAGE_ALIGN(size) / PAGE_SIZE) + 1;
-> >  	size_t backing_size;
-> >  	void *start;
-> > +	int ret;
-> >  
-> >  	backing_size = PAGE_ALIGN(sizeof(struct simple_buffer_page) * nr_bpages *
-> >  				  num_possible_cpus());
-> > @@ -171,7 +172,11 @@ static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_
-> >  	trace_buffer->desc->bpages_backing_start = (unsigned long)start;
-> >  	trace_buffer->desc->bpages_backing_size = backing_size;
-> >  
-> > -	return __map_hyp(start, backing_size);
-> > +	ret = __map_hyp(start, backing_size);
-> > +	if (ret)
-> > +		free_pages_exact(start, backing_size);
-> > +
-> > +	return ret;
-> >  }
+> For collecting above numbers, the following script was ran in both vanilla
+> and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
+> TX2 with 128GB RAM.
 > 
-> [Severity: High]
-> This is a pre-existing issue, but since this patch fixes a memory leak in the 
-> trace buffer allocation, I noticed a potential leak in a related error path.
+> --- dirty_test.sh
+> #!/bin/bash
+> filename=$(uname -r |cut -d'-' -f 4-)
 > 
-> In kernel/trace/trace_remote.c:trace_remote_alloc_buffer(), if an allocation
-> fails, the code jumps to the err label:
+> run_test(){
+>   base_test="./dirty_log_perf_test -b 2G -v 32 -m 6 -m 8"
 > 
-> 	rb_desc->meta_va = (unsigned long)__get_free_page(GFP_KERNEL);
-> 	if (!rb_desc->meta_va)
-> 		goto err;
+>   # Manual cleaning disable
+>   ${base_test} -g
+>   ${base_test} -g -s anonymous_thp
+>   echo 64 > /proc/sys/vm/nr_hugepages  
+>   ${base_test} -g -s shared_hugetlb
+>   echo 0 > /proc/sys/vm/nr_hugepages
 > 
-> 	for (id = 0; id < nr_pages; id++) {
-> 		rb_desc->page_va[id] = (unsigned long)__get_free_page(GFP_KERNEL);
-> 		if (!rb_desc->page_va[id])
-> 			goto err;
+>   # Manual cleaning enable
+>   ${base_test}
+>   ${base_test} -s anonymous_thp
+>   echo 64 > /proc/sys/vm/nr_hugepages  
+>   ${base_test} -s shared_hugetlb
+>   echo 0 > /proc/sys/vm/nr_hugepages
+> }
 > 
-> 		rb_desc->nr_page_va++;
-> 	}
-> 	desc->nr_cpus++;
+> run_test 2>&1 | tee ${filename}
+> ---
 > 
-> Because desc->nr_cpus is only incremented after all pages for the current CPU
-> are allocated, any successfully allocated pages for the failing CPU are left
-> out of the count.
+> Above dirty_log_perf_test command is the standard kvm selftest found in the
+> kernel tree. It tested the following guest modes:
+> Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
+> Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
+> (Modes with PA-bits:36 were discarted in this version, given the amount
+> of RAM being used for testing, and the similarity of previous results)
 > 
-> When the error path calls trace_remote_free_buffer(), it iterates based on
-> desc->nr_cpus:
+> Performance numbers from above modes were used to calculate average and
+> stdev showed in the optimization results.
 > 
-> 	for_each_ring_buffer_desc(rb_desc, cpu, desc) {
-> 		unsigned int id;
-> 
-> 		free_page(rb_desc->meta_va);
-> 
-> 		for (id = 0; id < rb_desc->nr_page_va; id++)
-> 			free_page(rb_desc->page_va[id]);
-> 	}
-> 
-> Does this skip the partially initialized ring buffer for the failing CPU and 
-> leak its allocated pages?
-
-https://lore.kernel.org/all/20260708133201.295072-1-vdonnefort@google.com/
+> Changes since v2:
+> - Rebased on top of v7.2-rc1
+> - Improved testing, added more memory, re-tested
+>   - Now: 32 vcpus @ total of 64G
+>   - Before: 1cpu @ 16G
+v2 Link: https://lore.kernel.org/all/20260618131447.764085-1-leo.bras@arm.com/
 
 > 
+> Changes since v1:
+> - Fixed inverted flag verification priority (Sashiko)
+> - Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
+> - New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
+> v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
+> 
+> Changes since RFC:
+> - Changed approach from return value to walk flags (Will Deacon)
+> - Discarted skip_child approach (Oliver Upton)
+> - Measured in real hardware, and from userspace perspective (Marc Zyngier)
+> - Better explanation of what and how numbers were collected
+> RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
+> 
+> Thanks!
+> Leo
+> 
+> 
+> Leonardo Bras (3):
+>   KVM: arm64: Avoid re-testing walk_continue
+>   KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
+>   KVM: arm64: Make stage2_split_walker() skip unnecessary walks
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
+>  2 files changed, 34 insertions(+), 7 deletions(-)
+> 
+> 
+> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260707165029.3410701-1-vdonnefort@google.com?part=1
+> 2.55.0
 > 
