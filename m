@@ -1,116 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3493822A6
-	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 13:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C26947B403
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 14:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783518614; cv=none; b=OHRI7fLf280Vz0SGxFK060ILMAPMAlW59sHYK5YOGeB0dcERKvgDiyl35pQZKM2772fmMDdpruSZ7HOauJ0r0e0Tf/wSRM7fqVHbBKGBldbWwmjnAWbcfFh4Wtz/2CHI4/ZwdIIoTEgtNzEhUD48IdHxQMr2iqo+SleRsNbyj5c=
+	t=1783519927; cv=none; b=UVjj2U4w0aC2L0ZhDzGr2vx1OuRkt/5ysHUvDCKXND1ZFqp+IbarPs7WNcAbRUqD0YM79ud8GK+H5Ll3hrMm/rw9TcggFM6cuLWRaD3Z86qlRvaP6q2ihBJrXT7VImr+tLBrW4hgGEHqXZkbtq8YcUOROfxY9qs8i/+7b/xcP14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783518614; c=relaxed/simple;
-	bh=NdtvlDHhVoj+GEBoivRewltS3/8ML2WhEd2DeXFekHc=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=mR7wnPBeeszOQ03L7Es3RuGdsxuxAowyrblTiDww0X0cjb/YgFb+PzSxYG13dCXn1mGJ/INmlarB/vSG76VpKiK4S5fL6jzvlWRT1XqTubD8CJVs7iovYaKm12jDi7kAAJS1NaphwvIYIWPmBd9OkaTRPWOU5ImmhRZQq21p83A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+ti0UO+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783519927; c=relaxed/simple;
+	bh=pS4fc+DWPWj0gMe6msC77y6Fpi4tYZKDlh0OobjR0d4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jsqtUcBGdJtiJ1skrvUzdaXyFx1Ptf/mpY9OBNk2NADiptk3PVJ2H4RSyLv3+A6J0V8mcCciKwkbsDltYzMyxpK1fvq3MtPOAQTWhNbdxPmIz1PBIVnbQJ6wVBhWpcuADQtEUt440za3jy6JYCOhzb8FbWVf5qvbv3TojujTDB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TOGRuL4m; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+ti0UO+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B21A1F000E9;
-	Wed,  8 Jul 2026 13:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783518612;
-	bh=yfnnuXgTfosh8s6hZgitwKpSAbQ8wwLi/t85YcCkBPM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=D+ti0UO++sQMk46Zd9yuiMjfYySMf1uadh3zka6Qk5u6f8IMl1ofSB35hE/ljVwOy
-	 YT9S9cS6/SgihVs8k2RoBQBCZhyBDT3rFTXvSexHYfM8PSwH51ia9GvTgjyEHd/qXi
-	 B+dXlS6lSSQf7ItFQGfO9ALAmTzXcQVACw72aXyw6Lx5gk++6CXKf4G+xn1sUVKq13
-	 96uGTJY9Vr2u/YgotxL82thtKUbsqyYAgCJksFbQquTviBUr3zg6s/5S0iJ7BrCNdW
-	 6giKNvXSRWKOt3sjKnxBlJlSQbdyD/c6Fo8aDT2MqwB9nkDmOgi12PinHWzEY+Tmu7
-	 KIbjz7YDRoxHg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 2/3] KVM: arm64: Introduce
- KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260708134101.2514759-3-leo.bras@arm.com>
-References: <20260708134101.2514759-1-leo.bras@arm.com>
- <20260708134101.2514759-3-leo.bras@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Jul 2026 13:50:11 +0000
-Message-Id: <20260708135012.3B21A1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TOGRuL4m"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88B4A1A00;
+	Wed,  8 Jul 2026 07:12:00 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.2.213.26])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 984173F7B4;
+	Wed,  8 Jul 2026 07:12:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783519924; bh=pS4fc+DWPWj0gMe6msC77y6Fpi4tYZKDlh0OobjR0d4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TOGRuL4moMpwF+YU4AL5KUA2+6hainzJazOPH9RkMdp+oWnl1nZg9tRtFfmpleidM
+	 x07ANFJS81TcNAOB3DgjkugblJrnNtkL8VpClA0PW9jucsRXW6EChV4tZWYzpjqlQY
+	 dWlCkFPkPMWDOqWjNB95emNEjSCynj79uIvvReGw=
+Date: Wed, 8 Jul 2026 15:11:58 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 23/28] KVM: arm64: Add NVHCR_EL2 context switching
+Message-ID: <20260708141158.GA12293@e124191.cambridge.arm.com>
+References: <20260702160248.1377250-1-maz@kernel.org>
+ <20260702160248.1377250-24-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702160248.1377250-24-maz@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] KVM_PGTABLE_WALK_SKIP_LEVEL* flags fail to skip the starting roo=
-t level of the page table walk.
---
+On Thu, Jul 02, 2026 at 05:02:43PM +0100, Marc Zyngier wrote:
+> Since NVHCR_EL2 represents the HCR_EL2 state of the EL1 guest, it
+> must be dealt with in some particular way:
+> 
+> - for a guest in hyp context (an L1 by definition), NVHCR_EL2 directly
+>   reflects HCR_EL2 as read and written by the guest itself. It must
+>   therefore be eagerly synced back with the emulation code which only
+>   knows about HCR_EL2. This is unconditional if NV3 is available on
+>   the host.
+> 
+> - For an L2 guest, NVHCR_EL2 is controlled by the L1 guest, and we
+>   just context switch it like any other EL1 register. Yes, EL1, as
+>   that's where this thing runs from the PoV of L1. This is conditioned
+>   on the guest using NV3.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
---- Patch [2]: [PATCH v3 2/3] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_L=
-EVEL* walk flags ---
-commit 5ddf63ba492be8c2a84af0b81cf00790fc72767a
-Author: Leonardo Bras <leo.bras@arm.com>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-
-This commit adds new walking flags that tell kvm_pgtable_walk() to skip
-lower levels when traversing page tables.
-
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 4be1d51a6ac58..b9a2078efc519 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-
-[ ... ]
-
-> @@ -192,7 +205,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgta=
-ble_walk_data *data,
->  	if (!kvm_pgtable_walk_continue(data->walker, ret))
->  		return ret;
-> =20
-> -	if (!table) {
-> +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
-
-[Severity: Medium]
-Does this fail to skip the starting level of the page table walk if that
-initial level matches the skip criteria?
-
-Looking at __kvm_pgtable_visit() in arch/arm64/kvm/hyp/pgtable.c, the visit=
-or
-callbacks are executed unconditionally for the current level before we reach
-this skip check:
-
-	if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE)) {
-		ret =3D kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
-		reload =3D true;
-	}
-
-	if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
-		ret =3D kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
-		reload =3D true;
-	}
-
-Since the skip condition here only evaluates level + 1 to prevent descending
-further, if a caller begins a walk at a level that should be skipped (for
-example, starting at level 2 with KVM_PGTABLE_WALK_SKIP_LEVEL2), the callba=
-cks
-for that root level will still execute.=20
-
-Should the current level also be checked against the skip flags before
-executing the pre-table or leaf visitor callbacks?
-
->  		data->addr =3D ALIGN_DOWN(data->addr, kvm_granule_size(level));
->  		data->addr +=3D kvm_granule_size(level);
->  		goto out;
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260708134101.2514=
-759-1-leo.bras@arm.com?part=3D2
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 11 +++++++++++
+>  arch/arm64/kvm/hyp/vhe/switch.c            | 10 ++++++++--
+>  2 files changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index a17cbe7582de9..c382848d31947 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -172,6 +172,10 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>  
+>  	if (ctxt_has_sctlr2(ctxt))
+>  		ctxt_sys_reg(ctxt, SCTLR2_EL1) = read_sysreg_el1(SYS_SCTLR2);
+> +
+> +	/* Retrieve L2's HCR_EL2, and save it for future use */
+> +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
+> +		ctxt_sys_reg(ctxt, NVHCR_EL2) = read_sysreg_s(SYS_NVHCR_EL2);
+>  }
+>  
+>  static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+> @@ -285,6 +289,13 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+>  
+>  	if (ctxt_has_sctlr2(ctxt))
+>  		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR2_EL1), SYS_SCTLR2);
+> +
+> +	/*
+> +	 * Publish the L2 view of HCR_EL2 to the HW if L1 is using NV3.
+> +	 * Otherwise, the data is already in place in the L1's own VNCR.
+> +	 */
+> +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
+> +		write_sysreg_s(ctxt_sys_reg(ctxt, NVHCR_EL2), SYS_NVHCR_EL2);
+>  }
+>  
+>  /* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 05bcf8bf7f978..c5c06ae41b229 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -71,7 +71,10 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+>  			hcr |= HCR_NV1;
+>  
+>  		/* Publish the guest's view of HCR_EL2 to the HW */
+> -		__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+> +		if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
+> +			write_sysreg_s(__vcpu_sys_reg(vcpu, HCR_EL2), SYS_NVHCR_EL2);
+> +		else
+> +			__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+>  
+>  		/*
+>  		 * Nothing in HCR_EL2 should impact running in hypervisor
+> @@ -565,7 +568,10 @@ static void fixup_nv_guest_exit(struct kvm_vcpu *vcpu)
+>  		*vcpu_cpsr(vcpu) |= mode;
+>  
+>  		/* Publish the latest HCR_EL2 to the emulation */
+> -		hcr = __vcpu_sys_reg(vcpu, NVHCR_EL2);
+> +		hcr = (cpus_have_final_cap(ARM64_HAS_NV3) &&
+> +		       vcpu_el2_e2h_is_set(vcpu)) ?
+> +			read_sysreg_s(SYS_NVHCR_EL2) :
+> +			__vcpu_sys_reg(vcpu, NVHCR_EL2);
+>  
+>  		__vcpu_assign_sys_reg(vcpu, HCR_EL2, hcr);
+>  	}
+> -- 
+> 2.47.3
+> 
