@@ -1,42 +1,35 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61098423760;
-	Wed,  8 Jul 2026 16:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A994D43F4CB
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jul 2026 17:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783528759; cv=none; b=LZiMsuD1C1QaQmOFsUNLShDHwZqK/K4BzCdwM2vuxxetNerhfiTA7BSi81wEbtBtETEXxfth18A2pqyrUQHCRmam4WHDgIK8bfzLGMkVRqQH1W72tpDgIlDkoWRAYc5ls4A6EMvnugT0LKe0Znivob6xfvDQ/hcApln6dWl6Am4=
+	t=1783530027; cv=none; b=LPaKPKxj74bX9hNHVq6vVwWHgY1Q81oEqTe5pSP3o92Oh4cZewEgrQRRpWoR1uWbRoA5ebXm1gEJa4XbjEef5KTdLQO8TZdcowVjUZSY/0XJ+VnaQX0CVb6Kz6EXTDN5ecunT0hqqEgg2IB3IPK3KTbDkf9KOV5g/DpM+9t5orA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783528759; c=relaxed/simple;
-	bh=U7gjayLxp9nvdld9EPLyo54p/ncljryzTW0Yxr0rz0A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ec06TpylRJC+KF8TxzOWSUtqmmCmyqSUmBWWwRs2B1Sj5xFz/LwSFhOyTTb0+qyUgqKAD8/Eovw9xHJDn6kbVOQ9Ed7ozYjGt18/CaM5naz+HELGIIHGmvSYrS3nPsYrPvrkLFmMJ68jAciNlnb35IudJRqrMFLiIyTN8a1ZWJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dUl1bxY9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783530027; c=relaxed/simple;
+	bh=cfr+dPlXU3RH6R71sBVR+lg3TvtZzuQin7cnXsJOpN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=L02k6MTzroOdygx91j4ubwy6stOyiEx9Tyh+X+Nkf5A7Xyb14Jysh3mgDKTkuasDCm+AqpSOMQX9FzDd5IuTBHRpRWqXfDPh+pbvbGg/CHxRpW0MmYaRChj0QFbKrFZT6HCUCqN1UKc00f3hDd3yZp2qQHBOpjbglMg5FY50yj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Pq+8oaDk; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dUl1bxY9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E6381F000E9;
-	Wed,  8 Jul 2026 16:39:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783528758;
-	bh=s17L25CKf6N69n47kq5IfOEmXIhfMV81UIxYDG1zrNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dUl1bxY9rew5rS9hqYip2CHsshSWH5nY76m0otTtVHyCzupnUfD3dyMmXcm/hPIIu
-	 Q4PvC2p7Z428yGtVZTjIpR71+UoV/gW9OPkM8t9uRChGLC3tGID2VlHD8GG68XBSLD
-	 rTQEi3T5xH479HRADzb0ra8fNgofDFY6HF9PW71qdLzIxVU+DSPc7q8MVZL2oPZMNN
-	 oo4o9sMmhnzgkjFVVCncFdNn1UTdpnRewQgsXZ0bIBY8sEzDXLcseQUwugf8y/f+Fg
-	 7pTNsRT+w1UD22+IFK+0orjJbnp9WWMWTCE+f9SSE7RHLJLTzZsn9g+VxQMMe4KM13
-	 8+UDVg2Ovb1rg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1whVIp-00000002v6F-3wwj;
-	Wed, 08 Jul 2026 16:39:16 +0000
-Date: Wed, 08 Jul 2026 17:41:05 +0100
-Message-ID: <8733xt77tq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Pq+8oaDk"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 571C71D14;
+	Wed,  8 Jul 2026 10:00:20 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F10AE3F7B4;
+	Wed,  8 Jul 2026 10:00:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783530024; bh=cfr+dPlXU3RH6R71sBVR+lg3TvtZzuQin7cnXsJOpN4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Pq+8oaDkeXoQ71qDYisedxETmd1HbvAj5vViUMd6MuR6hyiF6ruvC+QvM7UCNiKz4
+	 j2JEIUr4Iz3K1+/wgoWOITAQyfw0CWCirp6sPN0EoVFJmj/tE+602UJxK/KHkgrw/A
+	 COdzQ4BYhIQEyLWi3AuFlC/PoaiuIizLMOmsOgH4=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -49,47 +42,48 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v3 1/3] KVM: arm64: Avoid re-testing walk_continue
-In-Reply-To: <20260708134101.2514759-2-leo.bras@arm.com>
-References: <20260708134101.2514759-1-leo.bras@arm.com>
-	<20260708134101.2514759-2-leo.bras@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Date: Wed,  8 Jul 2026 18:00:21 +0100
+Message-ID: <ak6CJWdhPaIYj2GU@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <8733xt77tq.wl-maz@kernel.org>
+References: <20260708134101.2514759-1-leo.bras@arm.com> <20260708134101.2514759-2-leo.bras@arm.com> <8733xt77tq.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Wed, 08 Jul 2026 14:40:57 +0100,
-Leonardo Bras <leo.bras@arm.com> wrote:
+On Wed, Jul 08, 2026 at 05:41:05PM +0100, Marc Zyngier wrote:
+> On Wed, 08 Jul 2026 14:40:57 +0100,
+> Leonardo Bras <leo.bras@arm.com> wrote:
+> > 
+> > In __kvm_pgtable_visit(), a couple tests for kvm_pgtable_walk_continue()
+> > will 'goto out' if it should not continue. This means the same test will be
+> > ran again before returning ret, which is unnecessary.
+> > 
+> > Return ret directly instead.
+> > This will simplify next patch.
 > 
-> In __kvm_pgtable_visit(), a couple tests for kvm_pgtable_walk_continue()
-> will 'goto out' if it should not continue. This means the same test will be
-> ran again before returning ret, which is unnecessary.
+> This reads quite badly, and doesn't explain what you are trying to do.
+> How about something like:
 > 
-> Return ret directly instead.
-> This will simplify next patch.
+> "__kvm_pgtable_visit() performs a bunch of calls to
+>  kvm_pgtable_walk_continue() to find out whether the walk can continue
+>  further, and if not, falls back to an 'goto out' which retests the
+>  possibility of continuing the walk.
+> 
+>  Given that there is no reason why the situation would have changed
+>  between the two checks, turn this goto into an early return,
+>  simplifying the code and paving the way for further rework."
+> 
 
-This reads quite badly, and doesn't explain what you are trying to do.
-How about something like:
+Agree, your version looks better.
+Will try to be more clear, and reuse some of your version, in my next 
+version.
 
-"__kvm_pgtable_visit() performs a bunch of calls to
- kvm_pgtable_walk_continue() to find out whether the walk can continue
- further, and if not, falls back to an 'goto out' which retests the
- possibility of continuing the walk.
-
- Given that there is no reason why the situation would have changed
- between the two checks, turn this goto into an early return,
- simplifying the code and paving the way for further rework."
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+Thanks!
+Leo
