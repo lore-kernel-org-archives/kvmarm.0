@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336954E3788;
-	Thu,  9 Jul 2026 18:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7864F7981;
+	Thu,  9 Jul 2026 18:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783622412; cv=none; b=XHUZswwtG3qGExM9Dx+YwK9VFrhmiQSS3uHet+flUFOVTW/tuFyQpBUES0e42sg7jtqCcuLDvStLRL7swoLeTv81DAdEgSGYsG3rkgrDjOx9kFsyIpPOwOE8lD6cFTDA91JWyYlYaqM7n29SomeCmvlpF53bEI3KOMaZslDQAQU=
+	t=1783622417; cv=none; b=XpFtyaXBl3S6p+SDaUxpUbbmJ2uVB4/y7HGVDJF78xbTvQR6OU/cAVdZInQIMsJ8a0NGgcSybqI7bOglZ4xHWG+Lu88HDvgscODorcX9wpRlS/elMOYjptCwE2Y2F7wP4ssODfaAogRSzoF52s3ihv8bMdFVuZp8dPAamNXmYEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783622412; c=relaxed/simple;
-	bh=gzzsP4OMBAKH5syutaWFaVFk6QC8CDQSj953+mInO7w=;
+	s=arc-20240116; t=1783622417; c=relaxed/simple;
+	bh=0XvV/YeRJrO9B2CFARjUgzNQGXMLM6qPBMtNGxGdbBc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OaBAR5XCP8cEa8Xh605RdW2y6PLNWM1ROK3RVPxOV6WOM8Bb3TCWuYbG/5Wc6Bk3wtrJoYs5S9Zv9DIsNekmoCRp57rbUWNEJQfKRVKHeFreCQlCWozK2bB1FhC9FfGO57u0G6Fk5oVL1LDlYOmc3zZayTP8uEM1BbtmdTLaZj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZbchbECU; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=Xr4Mpi44ipl/E1UWrHhyj6REpYnpVltgcTHfrKisBENMEjoSJVCtTj2Nx8gPJRlq3jZPIItsZukLtzDJmcu9dlEeodVi64YD7bw5WoAhBXo3ENISEkAZiwfVsUtlVS17MHKbb24gAvW3E8HU1CsTpGRBx0nxUx4F4HTsSauWya4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2IAErhd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZbchbECU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B45A1F00A3A;
-	Thu,  9 Jul 2026 18:40:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2IAErhd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3179B1F00AC4;
+	Thu,  9 Jul 2026 18:40:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783622410;
-	bh=/QjA1AblP9L+Kt9SpYOOkyJVVOOzYmepn7GTlwZFelA=;
+	s=k20260515; t=1783622415;
+	bh=8qpVDx4UpWHjMsfsBGz1zwBdy92zZEuyHy7wmDCoc1U=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=ZbchbECU3TgvDU9TfKk07SWKmdAeq0RpQ4u52YETSBtL4NVKmeqgzzVYiwlmp3gkR
-	 w7CWPmLyF1YuVVzrKg94orJD1cwQGwg0KaICevffgR2WZL8oCDUrE4zOLwq5hJKZfQ
-	 I3Swon6TGYL9TZVro/L/hbj5iDh/Mg/FFczzqtcg2c2EGYNe56HAPd1nedf8lEZX5g
-	 d9aNNf4mPQY5NSin65kAMqPBBY4cZER/WqgoCb2Jr7be67l1XjkMzZQ/ssZDMq4Rd+
-	 CBZ0PbHkI2yy5xbaAIpJ39qc1MwO/TdWLMm+xsvjVlRc+q/uQNwV8xNT/YlNbZo2yv
-	 ruT96phC1mcvA==
+	b=P2IAErhdgKWTcjA8mSRwy0bSsJpispvTa7nU1cfWA/BfUqGEmh9tmOMdZwISvxsUd
+	 557VhfBtJJ4dbPlBtMu8UD0HT03S3Qn2B4z1sFhv+/8kbF5VQ7ciiakxSX/2RlSE7m
+	 WNxMEYtykYDK51FDSu+UBhu5wO0JU/rIX2YAnR9zewuOk5oZw3+RognrQd4//qkyWl
+	 ABPYSw7mLyx2blvVl6VtoK71njdUcKaOSZjJJGJPEfG8Aovi/gUWXNmXOBXciXJGAq
+	 r4WAA7fCijYxAgbq8S11bUQ6rjpttvWUSpoZ30w/JkQvRK19giLtcXALiuXz2RU3Mo
+	 cKTaJ7jSZNiEg==
 From: Mark Brown <broonie@kernel.org>
-Date: Thu, 09 Jul 2026 19:27:22 +0100
-Subject: [PATCH v12 01/29] arm64/sysreg: Define full value
- read/modify/write helpers
+Date: Thu, 09 Jul 2026 19:27:23 +0100
+Subject: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
+ loading SME state
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260709-kvm-arm64-sme-v12-1-d0301d79ef58@kernel.org>
+Message-Id: <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
 References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
 In-Reply-To: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -55,44 +55,202 @@ Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
  Peter Maydell <peter.maydell@linaro.org>, 
  Eric Auger <eric.auger@redhat.com>, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=951; i=broonie@kernel.org;
- h=from:subject:message-id; bh=gzzsP4OMBAKH5syutaWFaVFk6QC8CDQSj953+mInO7w=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqT+rq2VgOet80BJWD6Xh/o3WcW28LRlhze8qrE
- b4cZrVNCe6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCak/q6gAKCRAk1otyXVSH
- 0F+yB/4mbTCi3gD2Q4fl6xZyQFLCtztRwO4QXcc69jR3p5oUmCZtxnfmfIMo48auy7toplQM1C2
- nrebDOyEN4RGz+nbVuXPUjCTH7uPFygS7UJg8sEYC8+X/UtmvrwIrrMQE+8NUkrxSWXY+4qEeqo
- qDobBHmgPLc0AAz97bCvy5oDrv3tvHiJCRbFHShnb37WwZT5azCcL9hJFFWf/JYzQ13EW2OnWT0
- kHqh2ke8cZvmG/BTRgwa//QcL508JNaftLrCNfhaTRCLQUdOGkZYfSRiYjj27SnR0Frh5VJeNAF
- 32iiyGcb6r+YYrtS2qrEKLEscDXE7FlEPTJNTWZJVGXgs7Dp
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6750; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=0XvV/YeRJrO9B2CFARjUgzNQGXMLM6qPBMtNGxGdbBc=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqT+rrz/851J8pfXfj1JOEBY1LgOLZyhapWyk/3
+ iVX1huk2/OJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCak/q6wAKCRAk1otyXVSH
+ 0KRkB/42+vniuyHSbVcH1FtK+u4Hcjqvg83pv5iQxKxgDhuxw6zdTdTG/WuMBGbPlervae/MycY
+ fKuRFj0FYY0dGqwd28klFDeCtOJTIzGDZMBKLTeDpsmeSVyI4Mi17D6O/PIhs9MfQS7MVXlRIHn
+ n3YhZDRL6OB9+0syjKlajuNyLM4V6UQCSa/cSmWPPjXU9jSOPAUV7CvBrC8I5XbHkspKSR0vJ3L
+ yGQ0JBL1frzM65lo2ia4QI5RkkXGw0vih+Uye/e+hNolBzWWSstTsBdqLmWjTxrwplMYYuor7P9
+ b5/f2cuaLOOD7nwrxdzY9g3qXwPu8wVbR+jMi5DVLmvj5wKi
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-We have read/modify write helpers for updating bitfields in sysregs if they
-have changed but we do not have them for updating the whole register.
-Define sysreg_cond_update() for that.
+Currently we enable EL0 and EL1 access to FA64 and ZT0 at boot and leave
+them enabled throughout the runtime of the system. When we add KVM support
+we will need to make this configuration dynamic, these features may be
+disabled for some KVM guests. Since the host kernel saves the floating
+point state for non-protected guests and we wish to avoid KVM having to
+reload the floating point state needlessly on guest reentry let's move the
+configuration of these enables to the floating point state reload.
+
+Provide a helper task_smcr() which generates the value of SMCR_EL1 to
+use based on the task struct and use it when we set the vector length
+SMCR_EL1, currently while handling SME access traps or FP state load.
+
+For consistency handle ZCR_EL1 the same way, currently the only field it
+has is the LEN so the change is less meaningful there.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/include/asm/fpsimd.h |  2 --
+ arch/arm64/kernel/cpufeature.c  |  2 --
+ arch/arm64/kernel/fpsimd.c      | 72 ++++++++++++++++++-----------------------
+ 3 files changed, 31 insertions(+), 45 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7aa08d59d494..4b96449e0ffa 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -1235,6 +1235,12 @@
- 		write_sysreg_s(__scs_new, sysreg);			\
- } while (0)
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index a67d5774e672..8d2a3d63481b 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -360,8 +360,6 @@ struct arm64_cpu_capabilities;
+ extern void cpu_enable_fpsimd(const struct arm64_cpu_capabilities *__unused);
+ extern void cpu_enable_sve(const struct arm64_cpu_capabilities *__unused);
+ extern void cpu_enable_sme(const struct arm64_cpu_capabilities *__unused);
+-extern void cpu_enable_sme2(const struct arm64_cpu_capabilities *__unused);
+-extern void cpu_enable_fa64(const struct arm64_cpu_capabilities *__unused);
+ extern void cpu_enable_fpmr(const struct arm64_cpu_capabilities *__unused);
  
-+#define sysreg_cond_update(sysreg, val) \
-+	 sysreg_clear_set(sysreg, ~0UL, val)
+ /*
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9a22df0c5120..0609dce1989e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2992,7 +2992,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+ 		.capability = ARM64_SME_FA64,
+ 		.matches = has_cpuid_feature,
+-		.cpu_enable = cpu_enable_fa64,
+ 		ARM64_CPUID_FIELDS(ID_AA64SMFR0_EL1, FA64, IMP)
+ 	},
+ 	{
+@@ -3000,7 +2999,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+ 		.capability = ARM64_SME2,
+ 		.matches = has_cpuid_feature,
+-		.cpu_enable = cpu_enable_sme2,
+ 		ARM64_CPUID_FIELDS(ID_AA64PFR1_EL1, SME, SME2)
+ 	},
+ #endif /* CONFIG_ARM64_SME */
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 25dc5afe9ba0..8009213288b1 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -277,6 +277,27 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+ 	task->thread.vl_onexec[type] = vl;
+ }
+ 
++static unsigned long task_zcr(const struct task_struct *task)
++{
++	unsigned long vq = sve_vq_from_vl(task_get_sve_vl(task));
++	unsigned long zcr = vq - 1;
 +
-+#define sysreg_cond_update_s(sysreg, val) \
-+	 sysreg_clear_set_s(sysreg, ~0UL, val)
++	return zcr;
++}
 +
- #define write_sysreg_hcr(__val) do {					\
- 	if (IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23) &&		\
- 	   (!system_capabilities_finalized() ||				\
++static unsigned long task_smcr(const struct task_struct *task)
++{
++	unsigned long vq = sve_vq_from_vl(task_get_sme_vl(task));
++	unsigned long smcr = vq - 1;
++
++	if (system_supports_fa64())
++		smcr |= SMCR_ELx_FA64;
++	if (system_supports_sme2())
++		smcr |= SMCR_ELx_EZT0;
++
++	return smcr;
++}
++
+ /*
+  * TIF_SME controls whether a task can use SME without trapping while
+  * in userspace, when TIF_SME is set then we must have storage
+@@ -377,10 +398,8 @@ static void task_fpsimd_load(void)
+ 			if (!thread_sm_enabled(&current->thread))
+ 				WARN_ON_ONCE(!test_and_set_thread_flag(TIF_SVE));
+ 
+-			if (test_thread_flag(TIF_SVE)) {
+-				unsigned long vq = sve_vq_from_vl(task_get_sve_vl(current));
+-				sysreg_clear_set_s(SYS_ZCR_EL1, ZCR_ELx_LEN, vq - 1);
+-			}
++			if (system_supports_sve())
++				sysreg_cond_update_s(SYS_ZCR_EL1, task_zcr(current));
+ 
+ 			restore_sve_regs = true;
+ 			restore_ffr = true;
+@@ -402,12 +421,13 @@ static void task_fpsimd_load(void)
+ 
+ 	/* Restore SME, override SVE register configuration if needed */
+ 	if (system_supports_sme()) {
+-		unsigned long sme_vl = task_get_sme_vl(current);
+-
+-		/* Ensure VL is set up for restoring data */
++		/*
++		 * Ensure VL is set up for restoring data.  KVM might
++		 * disable subfeatures so we reset them each time.
++		 */
+ 		if (test_thread_flag(TIF_SME)) {
+-			unsigned long vq = sve_vq_from_vl(sme_vl);
+-			sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
++			sysreg_cond_update_s(SYS_SMCR_EL1, task_smcr(current));
++			isb();
+ 		}
+ 
+ 		write_sysreg_s(current->thread.svcr, SYS_SVCR);
+@@ -1217,26 +1237,6 @@ void cpu_enable_sme(const struct arm64_cpu_capabilities *__always_unused p)
+ 	isb();
+ }
+ 
+-void cpu_enable_sme2(const struct arm64_cpu_capabilities *__always_unused p)
+-{
+-	/* This must be enabled after SME */
+-	BUILD_BUG_ON(ARM64_SME2 <= ARM64_SME);
+-
+-	/* Allow use of ZT0 */
+-	write_sysreg_s(read_sysreg_s(SYS_SMCR_EL1) | SMCR_ELx_EZT0_MASK,
+-		       SYS_SMCR_EL1);
+-}
+-
+-void cpu_enable_fa64(const struct arm64_cpu_capabilities *__always_unused p)
+-{
+-	/* This must be enabled after SME */
+-	BUILD_BUG_ON(ARM64_SME_FA64 <= ARM64_SME);
+-
+-	/* Allow use of FA64 */
+-	write_sysreg_s(read_sysreg_s(SYS_SMCR_EL1) | SMCR_ELx_FA64_MASK,
+-		       SYS_SMCR_EL1);
+-}
+-
+ void __init sme_setup(void)
+ {
+ 	struct vl_info *info = &vl_info[ARM64_VEC_SME];
+@@ -1281,17 +1281,9 @@ void __init sme_setup(void)
+ 
+ void sme_suspend_exit(void)
+ {
+-	u64 smcr = 0;
+-
+ 	if (!system_supports_sme())
+ 		return;
+ 
+-	if (system_supports_fa64())
+-		smcr |= SMCR_ELx_FA64;
+-	if (system_supports_sme2())
+-		smcr |= SMCR_ELx_EZT0;
+-
+-	write_sysreg_s(smcr, SYS_SMCR_EL1);
+ 	write_sysreg_s(0, SYS_SMPRI_EL1);
+ }
+ 
+@@ -1336,8 +1328,7 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
+ 	 * any effective streaming mode SVE state.
+ 	 */
+ 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
+-		unsigned long vq = sve_vq_from_vl(task_get_sve_vl(current));
+-		sysreg_clear_set_s(SYS_ZCR_EL1, ZCR_ELx_LEN, vq - 1);
++		sysreg_cond_update_s(SYS_ZCR_EL1, task_zcr(current));
+ 		sve_flush_live();
+ 		fpsimd_bind_task_to_cpu();
+ 	} else {
+@@ -1468,8 +1459,7 @@ void do_sme_acc(unsigned long esr, struct pt_regs *regs)
+ 		WARN_ON(1);
+ 
+ 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
+-		unsigned long vq = sve_vq_from_vl(task_get_sme_vl(current));
+-		sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
++		sysreg_cond_update_s(SYS_SMCR_EL1, task_smcr(current));
+ 
+ 		fpsimd_bind_task_to_cpu();
+ 	} else {
 
 -- 
 2.47.3
