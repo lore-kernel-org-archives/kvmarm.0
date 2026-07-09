@@ -1,306 +1,186 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA9842E8F1
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 15:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6468242B316
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 15:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783611278; cv=none; b=ZzfKtqK6IdTFbkPhMz87bILuQ/dyRHPA1X4Q1P764qrXSvvIk9tLceSc2t2AtaBoPVCRrAJXOpk5IcvAQKsXR+m1LtzJ1k+qJPaUvZ4+yWv8/Ef52K10tOBs6v4z6bfnO6cPW6TN/iJ/z1TpoEgvMWrfQKUHysCyOCJ1Z6usxzo=
+	t=1783612378; cv=none; b=PE//4mPZEizTNAhz6pjompYto1FZx7VOatyRA68U+BEB0EHeqV6EzroHCq3r98lNOqzkeWst/TWFuA4ilkdXYhGeBajbjVPxkUul6EHInHfIgAQMefMmvA7EABWxN3LKASA0kHZDFTwYWwZqIHzNDV8X14wx5mQsGs+Of2IGuTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783611278; c=relaxed/simple;
-	bh=Po0ucGHQ9vjoHBhJxLrE90YM6Y2qru2SrJjFniEe8J4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=liwBIRqaz0sXfRiR+xniwOYfDKEBcw3jvogH88Ax1JCDAVkBZs6OPE4siz2l9cMAPSjvlW6GAR6Q1lYnpquYzfGdWR4ykg0q9XyncvoTP9HJ3SlULTd1SbrVs3fXkBsDhvQFZe2qLL5qvd0nu9iMC/z8gRxciqhdw49+xrLQpk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Sf/kdOTz; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783612378; c=relaxed/simple;
+	bh=cKu4Ytkydn/JjdPFoHEBLzPZcvnA4Bk40RS/TjINZFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fFqWTSO9CAgFEKCJB9CVph6eGL2Xw0WlTE59J3yX6GpvirY4/JVwgCNSIexnkAZyOO0oEqwVsW/AcpAycMJQaF1P/g3rpVB44JV7NnEcRTXLH0O7ttglV+PlaiFLVXSz6UNYauk45LEnUU+/GiDZOrnramsjPZ6dia7efWkbOL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FH+342Jb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y70LFOlS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FH+342Jb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y70LFOlS; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Sf/kdOTz"
-X-Forwarded-Encrypted: i=1; AHgh+RpLJlPnGs+MO7Z9Z7RJZILr1W1Qwlte/cB52qcXBf8uAxSj4DXeMNrBAQ7fvgyK2wM/gTrCdQc=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783611274;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FH+342Jb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y70LFOlS";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FH+342Jb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y70LFOlS"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8B9A37629E;
+	Thu,  9 Jul 2026 15:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783612374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XlT1yEbMLsOWcLBX/jcPsMdZHLl1lGie+MylW86S6Qs=;
-	b=Sf/kdOTzuqiKfgUpxGHVx35P6nEKrwYdsYWNuPCC+1WydBy3sycqny7PYAWUatpdCi05V8
-	Xfc/fKEt+DrFVwSI1k2CM2FBa8R6qJnjVFLtPUUbiD3Uwg1DtcPwXOZDb///NVo8YoiHcz
-	b78LzdXL2LElmf7MoYBYNj5O6z0cCEY=
-X-Gm-Message-State: AOJu0YzCM7NNi8FpZ5+ru0wJ6rgL6q7IjaHMLmqaTphBinWrJpH1o8v7
-	/iLsIaalFzr2enSrZCsYMAZHs2kZ6TbBzK6NpivWMwIT/bl7ClvtfzrT9O2VPodocuHlQZlAaou
-	vNCfrpWBkKLoSBCCLLNZYpR8JHHcBsJp1pIPrQcz6
-X-Received: by 2002:a05:622a:90a:b0:50d:edb1:6bd1 with SMTP id
- d75a77b69052e-51c9c56d70dmr7964761cf.13.1783611268918; Thu, 09 Jul 2026
- 08:34:28 -0700 (PDT)
+	bh=8JEYJt05zpQhkVlZAL3o9x7vxcg0QOPkmR8Ew+/Mpjo=;
+	b=FH+342Jbo9MDJbU/9fXNHcfSmWIAo0csN1G2/5B2UOU+CIu1ASw0qNKW6UKUPIeRQTPGLZ
+	rw0/hKCprmWs9lxKiUPgmxLKClX4GvWOsvaA1xogrinU0/2crR7Wbo+0cVkYHAUpF2DfW+
+	FGktTFiyuUbjdb26xQj8DggbUMxDkHg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783612374;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8JEYJt05zpQhkVlZAL3o9x7vxcg0QOPkmR8Ew+/Mpjo=;
+	b=Y70LFOlSTtdzjd7P5BwPzEHq15Y9i4oyJwsqKvKTJPtizyLnogWjU9MkPlGAe86F+B1tBH
+	lcJbTLrmA01AiiAg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783612374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8JEYJt05zpQhkVlZAL3o9x7vxcg0QOPkmR8Ew+/Mpjo=;
+	b=FH+342Jbo9MDJbU/9fXNHcfSmWIAo0csN1G2/5B2UOU+CIu1ASw0qNKW6UKUPIeRQTPGLZ
+	rw0/hKCprmWs9lxKiUPgmxLKClX4GvWOsvaA1xogrinU0/2crR7Wbo+0cVkYHAUpF2DfW+
+	FGktTFiyuUbjdb26xQj8DggbUMxDkHg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783612374;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8JEYJt05zpQhkVlZAL3o9x7vxcg0QOPkmR8Ew+/Mpjo=;
+	b=Y70LFOlSTtdzjd7P5BwPzEHq15Y9i4oyJwsqKvKTJPtizyLnogWjU9MkPlGAe86F+B1tBH
+	lcJbTLrmA01AiiAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5BC84779AA;
+	Thu,  9 Jul 2026 15:52:52 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 6kYrEdTDT2onPQAAD6G6ig
+	(envelope-from <clopez@suse.de>); Thu, 09 Jul 2026 15:52:52 +0000
+Message-ID: <bdcfcedd-4914-4fab-bede-a16357e2a7b3@suse.de>
+Date: Thu, 9 Jul 2026 17:52:31 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260708182510.2181857-1-fuad.tabba@linux.dev>
- <20260708182510.2181857-5-fuad.tabba@linux.dev> <ak-5dlgHGe0Ru0OU@raptor>
-In-Reply-To: <ak-5dlgHGe0Ru0OU@raptor>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 9 Jul 2026 16:33:52 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxTLWR4yQAZaMwhWxtsYSaCPoKokxAHK19Gq=wrTKrUzQ@mail.gmail.com>
-X-Gm-Features: AUfX_mz6WX5uQPXZbDrAQuKVv3g_RBKnrnZyjhDqiarIXCrn0WHhZvQECs9xJPs
-Message-ID: <CA+EHjTxTLWR4yQAZaMwhWxtsYSaCPoKokxAHK19Gq=wrTKrUzQ@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v2 4/4] arm64: Add --guest-memfd option to back
- guest RAM with guest_memfd
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/2] KVM: arm64: vgic: Mitigate potential LPI
+ registration failure
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
+ Marc Zyngier <maz@kernel.org>
+References: <20260709144225.3433646-2-clopez@suse.de>
+ <20260709144225.3433646-4-clopez@suse.de>
+ <20260709150934.626561F000E9@smtp.kernel.org>
+From: =?UTF-8?Q?Carlos_L=C3=B3pez?= <clopez@suse.de>
+Content-Language: en-US
+In-Reply-To: <20260709150934.626561F000E9@smtp.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.992];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-On Thu, 9 Jul 2026 at 16:08, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi Fuad,
->
-> On Wed, Jul 08, 2026 at 07:25:10PM +0100, Fuad Tabba wrote:
-> > Back guest RAM with a guest_memfd created with GUEST_MEMFD_FLAG_MMAP
-> > and GUEST_MEMFD_FLAG_INIT_SHARED, mmapped MAP_SHARED to provide the
-> > userspace mapping. The guest_memfd file descriptor is closed at
-> > teardown, after the mapping is removed.
-> >
-> > Protected VMs need in-place shared/private conversion of guest_memfd,
-> > which the kernel does not support yet, so reject the combination of
-> > --protected and --guest-memfd.
-> >
-> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > ---
-> >  arm64/include/kvm/kvm-config-arch.h |  5 +++-
-> >  arm64/kvm.c                         | 43 +++++++++++++++++++++++------
-> >  include/kvm/kvm.h                   |  1 +
-> >  include/kvm/util.h                  |  1 +
-> >  kvm.c                               |  1 +
-> >  util/util.c                         | 37 +++++++++++++++++++++++++
-> >  6 files changed, 79 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> > index c2702d5..d8a8ef7 100644
-> > --- a/arm64/include/kvm/kvm-config-arch.h
-> > +++ b/arm64/include/kvm/kvm-config-arch.h
-> > @@ -20,6 +20,7 @@ struct kvm_config_arch {
-> >       bool            no_pvtime;
-> >       bool            psci;
-> >       bool            protected;
-> > +     bool            guest_memfd;
-> >  };
-> >
-> >  int irqchip_parser(const struct option *opt, const char *arg, int unset);
-> > @@ -73,6 +74,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
-> >       OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,                                 \
-> >                   "Create guest without VHE support"),                        \
-> >       OPT_BOOLEAN('\0', "protected", &(cfg)->protected,                       \
-> > -                     "Create a protected VM when pKVM is enabled"),
-> > +                     "Create a protected VM when pKVM is enabled"),          \
-> > +     OPT_BOOLEAN('\0', "guest-memfd", &(cfg)->guest_memfd,                   \
-> > +                     "Use guest_memfd to back guest RAM"),
-> >
-> >  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> > diff --git a/arm64/kvm.c b/arm64/kvm.c
-> > index fb0b98d..bf4e34e 100644
-> > --- a/arm64/kvm.c
-> > +++ b/arm64/kvm.c
-> > @@ -49,9 +49,14 @@ void kvm__init_ram(struct kvm *kvm)
-> >       kvm->arch.ram_alloc_size = kvm->ram_size;
-> >       if (!kvm->cfg.hugetlbfs_path)
-> >               kvm->arch.ram_alloc_size += SZ_2M;
-> > -     kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
-> > -                                             kvm->cfg.hugetlbfs_path,
-> > -                                             kvm->arch.ram_alloc_size);
-> > +
-> > +     if (kvm->cfg.arch.guest_memfd)
-> > +             kvm->arch.ram_alloc_start =
-> > +                     mmap_guest_memfd(kvm, kvm->arch.ram_alloc_size);
-> > +     else
-> > +             kvm->arch.ram_alloc_start =
-> > +                     mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path,
-> > +                                            kvm->arch.ram_alloc_size);
->
-> Would you mind not splitting the line after the equal sign? It makes
-> parsing the code really hard (at least for me).
+On 7/9/26 5:09 PM, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> 
+> Pre-existing issues:
+> - [High] The error path in `vgic_add_lpi()` calls `xa_release()`, which acquires the `lpi_xa` lock without disabling interrupts, leading to a potential deadlock.
+> --
+> 
+> --- Patch [2]: [PATCH v5 2/2] KVM: arm64: vgic: Mitigate potential LPI registration failure ---
+> commit c5f231166837f986fca0d6f0a35dc7e8c46a61d1
+> Author: Carlos López <clopez@suse.de>
+> Subject: KVM: arm64: vgic: Mitigate potential LPI registration failure
+> 
+> This commit mitigates a potential allocation failure when inserting a new LPI 
+> into the VGIC LPI xarray. It updates vgic_add_lpi() to pass GFP_NOWAIT and 
+> __GFP_ACCOUNT to __xa_store(), allowing allocation to occur under the lock if 
+> the reserved entry was removed concurrently.
+> 
+>> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+>> --- a/arch/arm64/kvm/vgic/vgic-its.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>> @@ -124,7 +124,8 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>>  		 * holds before freeing it, as otherwise someone else could still
+>>  		 * hold a pointer to the evicted struct.
+>>  		 */
+>> -		oldirq = __xa_store(&dist->lpi_xa, intid, irq, 0);
+>> +		oldirq = __xa_store(&dist->lpi_xa, intid, irq,
+>> +				    GFP_NOWAIT | __GFP_ACCOUNT);
+>>  		ret = xa_err(oldirq);
+>>  		if (!ret && oldirq &&
+>>  		    !WARN_ON_ONCE(refcount_read(&oldirq->refcount) ||
+>>  				  !oldirq->pending_release))
+>>  			kfree_rcu(oldirq, rcu);
+>>  	}
+>>  
+>>  	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+>>  
+>>  	if (ret) {
+>>  		xa_release(&dist->lpi_xa, intid);
+> 
+> [Severity: High]
+> This is a pre-existing issue, but does calling xa_release() here introduce a
+> potential lock inversion deadlock with hardirqs?
 
-Done.
+I clearly did not read Oliver's diff carefully enough, this does not
+happen with those changes.
 
+> The xa_release() function internally uses xa_cmpxchg(), which acquires the 
+> lpi_xa.xa_lock using spin_lock() without disabling local interrupts.
+> 
+> If a hardware interrupt fires on this CPU while the lock is held (for example,
+> an eventfd signal triggering irqfd_wakeup() in hardirq context for fast-path 
+> MSIs), it can inject an LPI and eventually call vgic_put_irq().
+> 
+> Because vgic_put_irq() acquires lpi_xa.xa_lock using spin_lock_irqsave(), the 
+> interrupt handler would spin forever waiting for the lock held by the preempted
+> vgic_add_lpi() thread.
+> 
+> Since this patch makes it more likely for the error path to be hit (if the 
+> GFP_NOWAIT allocation fails), should this path be updated to manually erase 
+> the entry while holding the xarray lock with interrupts disabled?
+> 
+>>  		kfree(irq);
+>>  
+>>  		return ERR_PTR(ret);
+> 
 
->
-> >
-> >       if (kvm->arch.ram_alloc_start == MAP_FAILED)
-> >               die("Failed to map %lld bytes for guest memory (%d)",
-> > @@ -60,17 +65,25 @@ void kvm__init_ram(struct kvm *kvm)
-> >       kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
-> >                                       SZ_2M);
-> >
-> > -     madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > -             MADV_MERGEABLE);
-> > +     if (!kvm->cfg.arch.guest_memfd) {
-> > +             madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > +                     MADV_MERGEABLE);
-> >
-> > -     madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > -             MADV_HUGEPAGE);
-> > +             madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > +                     MADV_HUGEPAGE);
-> > +     }
-> >
-> >       phys_start      = kvm->cfg.ram_addr;
-> >       phys_size       = kvm->ram_size;
-> >       host_mem        = kvm->ram_start;
-> >
-> > -     err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> > +     if (kvm->cfg.arch.guest_memfd)
-> > +             err = kvm__register_ram_guest_memfd(kvm, phys_start,
-> > +                                                 phys_size, host_mem,
-> > +                                                 kvm->ram_guest_memfd,
-> > +                                                 host_mem - kvm->arch.ram_alloc_start);
-> > +     else
-> > +             err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> >       if (err)
-> >               die("Failed to register %lld bytes of memory at physical "
-> >                   "address 0x%llx [err %d]", phys_size, phys_start, err);
-> > @@ -84,6 +97,11 @@ void kvm__init_ram(struct kvm *kvm)
-> >  void kvm__arch_delete_ram(struct kvm *kvm)
-> >  {
-> >       munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
-> > +
-> > +     if (kvm->ram_guest_memfd >= 0) {
-> > +             close(kvm->ram_guest_memfd);
-> > +             kvm->ram_guest_memfd = -1;
-> > +     }
-> >  }
-> >
-> >  void kvm__arch_read_term(struct kvm *kvm)
-> > @@ -468,6 +486,15 @@ void kvm__arch_validate_cfg(struct kvm *kvm)
-> >       if (kvm->cfg.arch.e2h0 && !kvm->cfg.arch.nested_virt)
-> >               pr_warning("--e2h0 requires --nested, ignoring");
-> >
-> > +     if (kvm->cfg.arch.guest_memfd) {
-> > +             /* Requires in-place shared/private conversion of guest_memfd. */
-> > +             if (kvm->cfg.arch.protected)
-> > +                     die("Protected VMs do not yet support guest_memfd");
-> > +
-> > +             if (kvm->cfg.hugetlbfs_path)
-> > +                     die("guest_memfd cannot be backed by hugetlbfs");
-> > +     }
->
-> I think MTE is incompatible with guest_memfd, KVM certainly returns an
-> error from kvm_arch_prepare_memory_region() when both are set. Since MTE is
-> enabled by default, it might be useful to let the user know that MTE has
-> been disabled because of guest_memfd.
-
-You're right, VMAs don't get VM_MTE_ALLOWED, so
-kvm_arch_prepare_memory_region rejects the memslot when MTE is
-enabled.
-
-I'll disable MTE when --guest-memfd is used, with a message to let the
-user know.
-
-Cheers,
-/fuad
-
->
-> Otherwise, everything looks good.
->
-> Thanks,
-> Alex
->
-> > +
-> >       if (kvm->cfg.arch.protected) {
-> >               if (kvm->cfg.ram_size &&
-> >                   kvm->cfg.ram_size < DMA_MEM_REGION_SIZE) {
-> > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> > index 5e7b5eb..95dc52f 100644
-> > --- a/include/kvm/kvm.h
-> > +++ b/include/kvm/kvm.h
-> > @@ -90,6 +90,7 @@ struct kvm {
-> >       u64                     ram_size;       /* Guest memory size, in bytes */
-> >       void                    *ram_start;
-> >       u64                     ram_pagesize;
-> > +     int                     ram_guest_memfd; /* guest_memfd backing RAM, -1 if none */
-> >       struct mutex            mem_banks_lock;
-> >       struct list_head        mem_banks;
-> >
-> > diff --git a/include/kvm/util.h b/include/kvm/util.h
-> > index a6dba11..9e23431 100644
-> > --- a/include/kvm/util.h
-> > +++ b/include/kvm/util.h
-> > @@ -148,5 +148,6 @@ static inline int pow2_size(unsigned long x)
-> >  struct kvm;
-> >  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
-> >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
-> > +void *mmap_guest_memfd(struct kvm *kvm, u64 size);
-> >
-> >  #endif /* KVM__UTIL_H */
-> > diff --git a/kvm.c b/kvm.c
-> > index 947721b..96583f9 100644
-> > --- a/kvm.c
-> > +++ b/kvm.c
-> > @@ -162,6 +162,7 @@ struct kvm *kvm__new(void)
-> >       mutex_init(&kvm->mem_banks_lock);
-> >       kvm->sys_fd = -1;
-> >       kvm->vm_fd = -1;
-> > +     kvm->ram_guest_memfd = -1;
-> >
-> >  #ifdef KVM_BRLOCK_DEBUG
-> >       kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
-> > diff --git a/util/util.c b/util/util.c
-> > index 05d49c4..51a4591 100644
-> > --- a/util/util.c
-> > +++ b/util/util.c
-> > @@ -6,7 +6,9 @@
-> >  #include "kvm/util.h"
-> >
-> >  #include <kvm/kvm.h>
-> > +#include <linux/kvm.h>
-> >  #include <linux/magic.h>     /* For HUGETLBFS_MAGIC */
-> > +#include <sys/ioctl.h>
-> >  #include <sys/mman.h>
-> >  #include <sys/stat.h>
-> >  #include <sys/statfs.h>
-> > @@ -169,3 +171,38 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 si
-> >               return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
-> >       }
-> >  }
-> > +
-> > +/*
-> > + * Map guest RAM backed by a guest_memfd. The file descriptor is kept open
-> > + * until teardown (kvm__arch_delete_ram), after the mapping is removed.
-> > + */
-> > +void *mmap_guest_memfd(struct kvm *kvm, u64 size)
-> > +{
-> > +     u64 flags = GUEST_MEMFD_FLAG_MMAP | GUEST_MEMFD_FLAG_INIT_SHARED;
-> > +     struct kvm_create_guest_memfd gmem = {
-> > +             .size   = size,
-> > +             .flags  = flags,
-> > +     };
-> > +     void *addr;
-> > +     int ret;
-> > +
-> > +     if (!kvm__supports_extension(kvm, KVM_CAP_GUEST_MEMFD))
-> > +             die("kernel does not support guest_memfd");
-> > +
-> > +     ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_GUEST_MEMFD_FLAGS);
-> > +     if (ret < 0 || ((u64)ret & flags) != flags)
-> > +             die("VM type does not support guest_memfd with mmap");
-> > +
-> > +     ret = ioctl(kvm->vm_fd, KVM_CREATE_GUEST_MEMFD, &gmem);
-> > +     if (ret < 0)
-> > +             die_perror("KVM_CREATE_GUEST_MEMFD");
-> > +
-> > +     addr = mmap(NULL, size, PROT_RW, MAP_SHARED, ret, 0);
-> > +     if (addr == MAP_FAILED)
-> > +             die_perror("guest_memfd mmap");
-> > +
-> > +     kvm->ram_guest_memfd = ret;
-> > +     kvm->ram_pagesize = getpagesize();
-> > +
-> > +     return addr;
-> > +}
-> > --
-> > 2.39.5
-> >
