@@ -1,104 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207684071F2;
-	Thu,  9 Jul 2026 10:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBEC3FF8B9
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 10:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783592109; cv=none; b=MBqaV+tkpf58TRAiH7YVqBPelPP0kX15NqGnoVHlnuQkpeHqiAMt9GGsihY7isyQRkbD/0AcNpAfhB+t8OdXp0HEyU7anObpQPVHco26qNy1vtZipT87lpYXizoAd3bvgdYSgW6eqrfz5IOxrjGTozXIrxEH89hYl675RKj3qls=
+	t=1783592876; cv=none; b=RUar3VG7zF9bMV8NkRiUqUMmZfhbqwA2ri7JQ9HATs1q6ZAmZjedR+f7OT3b6KsdbHsoEgTrxYMQr33mrL9uLvBAjRRLmR9EgnTVZu4oNqHGsZU0invXJT3OJ/QBocVXIwHNbRQ5/fFQpmrfcCM8hHMyhQfIkeGJeKfquGp9c0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783592109; c=relaxed/simple;
-	bh=iRNmyl0uZFg9GGzcYY2mInIz+v/Q6dZ549PnB7ss4r0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LNRp23zfS9BU7CpW/bolJaCL8Kn4p8a/1E/vRDRdZS9uB6HctBIwxSkIVC2MxQ7Su8iljNB7eOtQj4RDQD271PZ8n8Ey7yY1Z13zKYhS3WZgF10h1Uevc5P/SHrd0kC22+jEuiwv853LdB40jic3OOLPcGRhZkIuGEZa1Ab6GJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hj2yD2TO; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783592876; c=relaxed/simple;
+	bh=MxLey4kR4pPKpR8Eqs6jpbSuCMQEbnoM8JXbBb9w8kA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CKZ3OBy5jUYgdh/Fl0v1iAYZ9X1e/NP9E/zplGF3dHLUzurrK2UaTmS8ZsZTf88YjOWiLl/K4skxz+RNquwLQZUry8XMtyWaX2OjFtOFm2d4y1rZ4avYmUNt1C5QmCOGP/oTlr/8mVPSxYEk4tsBBv6UghJZAXHTMBsdF6AHxhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wWAC0k3j; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hj2yD2TO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98BF51F000E9;
-	Thu,  9 Jul 2026 10:15:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783592107;
-	bh=6MZ389cEc2lyiKpJAWuYgikhhXSP3O53lnQuS0Sbe10=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Hj2yD2TON4H60q7yeJBLImX0WTnGyyxdz6ETx39jHmIe/VohCrrioyzKjcuUGLgKT
-	 X4aB9HGFP1wNVTZNDNDQYQoY4OnHqZnx39ie5tYKX7ynvhDP9MusfWTGUdPVftBwu5
-	 6/inVAwwLiJDm7IL1WxrItlc13a+Wvcul/6XoDTmR0mn6wLBwpwZAXrtMjqwTK5av8
-	 PZRXuquPNyNJInw5V7gmxJuaXPdD61HNt+d+NTZcGAHCqI5+gKT6MCiYDHIxxl5bWJ
-	 d2uDr2k25FmOQdGt5uGXDLCFqEXRPf+8uOHK/HAf2nKvkxDpCpEESB6Ax2JKFc/Cj+
-	 0MsvDVqxEn8MA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1whlma-00000003ChL-3Ed9;
-	Thu, 09 Jul 2026 10:15:05 +0000
-Date: Thu, 09 Jul 2026 11:16:37 +0100
-Message-ID: <87y0fk5uyi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: stable@vger.kernel.org,
-	oliver.upton@linux.dev,
-	sashal@kernel.org,
-	gregkh@linuxfoundation.org,
-	mizhang@google.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	ahmed.genidi@arm.com,
-	leo.yan@arm.com,
-	miguel.luis@oracle.com,
-	dbrazdil@google.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6.6 v2 1/6] arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
-In-Reply-To: <20260708225124.4130846-2-coltonlewis@google.com>
-References: <20260708225124.4130846-1-coltonlewis@google.com>
-	<20260708225124.4130846-2-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wWAC0k3j"
+X-Forwarded-Encrypted: i=1; AHgh+Rrq+sTpEmJDqVwnK+dRo9LTWSQMH+Q9pN1O01CHEceioGoixd3qgnMfVcpwL58AB+Fi5VSQbpc=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783592873;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MxLey4kR4pPKpR8Eqs6jpbSuCMQEbnoM8JXbBb9w8kA=;
+	b=wWAC0k3jzeI2I/Yb/1CJqLQdLDqbaqziD1CwjH6W6Tzq4psL92fG4HL6L121kLC4SkNmSU
+	J2B47PGlAyCi1Owzyo9ltNl/tU9Lnr/OvNfn6ZXos/Aup8WhJVWhHIlVliY77zeL+Jy3c/
+	cw85XAKC31lmODJ/+knq/aZnrJwYElA=
+X-Gm-Message-State: AOJu0YwfbXv5Nau/vSP7L9cOPuASFOJXouETtARl3K0li/GoqV0i5dLh
+	wObMlsEQ4WC0GLkbIEpTHvuFdILjE+e2Ha1kVTrbJeBWMKvADuRy1HO3QeDvqIK2K1GBq73Yfys
+	bYqObETteSymf/PBG5s+fKXtVLB25KPg5hDLUl554
+X-Received: by 2002:a05:622a:248b:b0:517:5ac7:332e with SMTP id
+ d75a77b69052e-51c9a7990e9mr6344801cf.6.1783592838569; Thu, 09 Jul 2026
+ 03:27:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, stable@vger.kernel.org, oliver.upton@linux.dev, sashal@kernel.org, gregkh@linuxfoundation.org, mizhang@google.com, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, ahmed.genidi@arm.com, leo.yan@arm.com, miguel.luis@oracle.com, dbrazdil@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260709-kvm-arm64-sme-v11-0-32799f66db9d@kernel.org>
+In-Reply-To: <20260709-kvm-arm64-sme-v11-0-32799f66db9d@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 9 Jul 2026 11:26:41 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyAxBx4jhGq-Gme5hPi1ZyDAkL2CP_U22ykkQemD1dUhg@mail.gmail.com>
+X-Gm-Features: AUfX_mwpyfAsKpUMf2tNxcvppePr82pc_iCQFLAefIFcUoHnYHNmsUIYIv4f_m4
+Message-ID: <CA+EHjTyAxBx4jhGq-Gme5hPi1ZyDAkL2CP_U22ykkQemD1dUhg@mail.gmail.com>
+Subject: Re: [PATCH v11 00/29] KVM: arm64: Implement support for SME
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	Jean-Philippe Brucker <jpb@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 08 Jul 2026 23:51:19 +0100,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> [ Upstream commit cfc680bb04c54e61faa51a34d8383a0aa25b583f ]
-> 
-> ARMv9.5 has infroduced ID_AA64MMFR4_EL1 with a bunch of new features.
-> Add the corresponding layout.
-> 
-> This is extracted from the public ARM SysReg_xml_A_profile-2023-09
-> delivery, timestamped d55f5af8e09052abe92a02adf820deea2eaed717.
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> Link: https://lore.kernel.org/r/20240122181344.258974-5-maz@kernel.org
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Hi Mark,
 
-Please read Documentation/process/backporting.rst, and in particular
-the section indicating the requirement for your own SoB.
+[snip]
 
-None of these patches can be merged if this is missing.
+> base-commit: 4c45e14df2f4e77982ad70d6d8e3fe750edd4c37
 
-	M.
+I think this SHA is local to your tree. I can't locate it, and neither
+could Sashiko [1, 2]. For a series this big and complex, it would be
+good to get Sashiko to review it. Could you please fix that?
 
--- 
-Jazz isn't dead. It just smells funny.
+Thanks,
+/fuad
+
+[1] https://sashiko.dev/#/patchset/20260709-kvm-arm64-sme-v11-0-32799f66db9d%40kernel.org
+[2] https://sashiko.dev/#/log/baseline/42725/0
+
+> change-id: 20230301-kvm-arm64-sme-06a1246d3636
+>
+> Best regards,
+> --
+> Mark Brown <broonie@kernel.org>
+>
