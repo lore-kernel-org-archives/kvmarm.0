@@ -1,84 +1,140 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBEC3FF8B9
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 10:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7205409620
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 10:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783592876; cv=none; b=RUar3VG7zF9bMV8NkRiUqUMmZfhbqwA2ri7JQ9HATs1q6ZAmZjedR+f7OT3b6KsdbHsoEgTrxYMQr33mrL9uLvBAjRRLmR9EgnTVZu4oNqHGsZU0invXJT3OJ/QBocVXIwHNbRQ5/fFQpmrfcCM8hHMyhQfIkeGJeKfquGp9c0c=
+	t=1783593636; cv=none; b=pJ7K6d6nMi0GTMbOkoRQDg6ZO/DXJjy0CPSXnAhIqSmidVTtE7076g5LvIMpQMoIrrTYQd2OrottBXnzheA2AVnf355uBxHPbLVW9Zr0Sj+lP1AQCDkxph9zb9ie4RkJZqFa8agPnbi0Xhuw6vAqiicabbDi4vcLB7Nz2lf37o8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783592876; c=relaxed/simple;
-	bh=MxLey4kR4pPKpR8Eqs6jpbSuCMQEbnoM8JXbBb9w8kA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CKZ3OBy5jUYgdh/Fl0v1iAYZ9X1e/NP9E/zplGF3dHLUzurrK2UaTmS8ZsZTf88YjOWiLl/K4skxz+RNquwLQZUry8XMtyWaX2OjFtOFm2d4y1rZ4avYmUNt1C5QmCOGP/oTlr/8mVPSxYEk4tsBBv6UghJZAXHTMBsdF6AHxhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wWAC0k3j; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783593636; c=relaxed/simple;
+	bh=6BsRTKjJK/hWYca3nJZ3vBwv/NCGEhQ+AVoz8d6ZD1g=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RJymhsKjumxtOQxyErpokW3hqkva474UWFndYvwwCRBho6jImIc8sn3Zwk4+vSG1b9cc9sHs2kCPKisdsZWtvsF6x6IlX5k2hrtf8l1o7FYV0lGeBAwSVlFDliW0H/HSqlAQsWoOvnETIJ1HN+G7NW8TEosOCJzPJKOHHOk25Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=OagxP5wd; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wWAC0k3j"
-X-Forwarded-Encrypted: i=1; AHgh+Rrq+sTpEmJDqVwnK+dRo9LTWSQMH+Q9pN1O01CHEceioGoixd3qgnMfVcpwL58AB+Fi5VSQbpc=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783592873;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MxLey4kR4pPKpR8Eqs6jpbSuCMQEbnoM8JXbBb9w8kA=;
-	b=wWAC0k3jzeI2I/Yb/1CJqLQdLDqbaqziD1CwjH6W6Tzq4psL92fG4HL6L121kLC4SkNmSU
-	J2B47PGlAyCi1Owzyo9ltNl/tU9Lnr/OvNfn6ZXos/Aup8WhJVWhHIlVliY77zeL+Jy3c/
-	cw85XAKC31lmODJ/+knq/aZnrJwYElA=
-X-Gm-Message-State: AOJu0YwfbXv5Nau/vSP7L9cOPuASFOJXouETtARl3K0li/GoqV0i5dLh
-	wObMlsEQ4WC0GLkbIEpTHvuFdILjE+e2Ha1kVTrbJeBWMKvADuRy1HO3QeDvqIK2K1GBq73Yfys
-	bYqObETteSymf/PBG5s+fKXtVLB25KPg5hDLUl554
-X-Received: by 2002:a05:622a:248b:b0:517:5ac7:332e with SMTP id
- d75a77b69052e-51c9a7990e9mr6344801cf.6.1783592838569; Thu, 09 Jul 2026
- 03:27:18 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="OagxP5wd"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Dcqf9lUhEOQLu4tqiv3oGYn+/OLqWtAH2Drj2KbvTpM=;
+	b=OagxP5wd/3HfasTRHWWPKeQFsvwmqFLXCHx4q4N6KFj51D2RLuolaeEWIOPgryn9Zpsc9aSXu
+	/Rzg2pjY2U1DWulwmKus401733L2rXAkw8ESF8PggzJokZmNJLQAYNV4IufKHN8HBzxzaiszZXH
+	+MCuul3Z5nRgtLA2ceuG7/E=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4gwrpm15wZz1prLf;
+	Thu,  9 Jul 2026 18:31:12 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id C947C40561;
+	Thu,  9 Jul 2026 18:40:28 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
+ (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 9 Jul
+ 2026 18:40:27 +0800
+From: Tian Zheng <zhengtian10@huawei.com>
+To: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <zhengtian10@huawei.com>
+CC: <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
+	<yangjinqian1@huawei.com>, <caijian11@h-partners.com>,
+	<liuyonglong@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <leo.bras@arm.com>
+Subject: [PATCH v4 2/6] KVM: arm64: Add support for FEAT_HDBSS
+Date: Thu, 9 Jul 2026 18:40:22 +0800
+Message-ID: <20260709104026.2612599-3-zhengtian10@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260709104026.2612599-1-zhengtian10@huawei.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260709-kvm-arm64-sme-v11-0-32799f66db9d@kernel.org>
-In-Reply-To: <20260709-kvm-arm64-sme-v11-0-32799f66db9d@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 9 Jul 2026 11:26:41 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyAxBx4jhGq-Gme5hPi1ZyDAkL2CP_U22ykkQemD1dUhg@mail.gmail.com>
-X-Gm-Features: AUfX_mwpyfAsKpUMf2tNxcvppePr82pc_iCQFLAefIFcUoHnYHNmsUIYIv4f_m4
-Message-ID: <CA+EHjTyAxBx4jhGq-Gme5hPi1ZyDAkL2CP_U22ykkQemD1dUhg@mail.gmail.com>
-Subject: Re: [PATCH v11 00/29] KVM: arm64: Implement support for SME
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	Jean-Philippe Brucker <jpb@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-Hi Mark,
+Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS)
+feature, indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100.
 
-[snip]
+Add CPU capability detection for HDBSS. The feature requires VHE mode
+and is detected via ID_AA64MMFR1_EL1.HAFDBS.HDBSS field. A helper
+function system_supports_hdbss() is provided to check hardware support.
 
-> base-commit: 4c45e14df2f4e77982ad70d6d8e3fe750edd4c37
+Suggested-by: Zhou Wang <wangzhou1@hisilicon.com>
+Co-developed-by: Eillon <yezhenyu2@huawei.com>
+Signed-off-by: Eillon <yezhenyu2@huawei.com>
+Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+---
+ arch/arm64/include/asm/cpufeature.h |  5 +++++
+ arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
+ arch/arm64/tools/cpucaps            |  1 +
+ 3 files changed, 18 insertions(+)
 
-I think this SHA is local to your tree. I can't locate it, and neither
-could Sashiko [1, 2]. For a series this big and complex, it would be
-good to get Sashiko to review it. Could you please fix that?
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index a57870fa96db..bdfab086fd94 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -863,6 +863,11 @@ static inline bool system_supports_haft(void)
+ 	return cpus_have_final_cap(ARM64_HAFT);
+ }
 
-Thanks,
-/fuad
++static inline bool system_supports_hdbss(void)
++{
++	return cpus_have_final_cap(ARM64_HAS_HDBSS);
++}
++
+ static __always_inline bool system_supports_mpam(void)
+ {
+ 	return alternative_has_cap_unlikely(ARM64_MPAM);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9a22df0c5120..aa327eebaf1c 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2131,6 +2131,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+ 	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+ }
 
-[1] https://sashiko.dev/#/patchset/20260709-kvm-arm64-sme-v11-0-32799f66db9d%40kernel.org
-[2] https://sashiko.dev/#/log/baseline/42725/0
++static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
++{
++	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, cope);
++}
++
+ bool cpu_supports_bbml2_noabort(void)
+ {
+ 	/*
+@@ -2781,6 +2786,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
+ 	},
+ #endif
++	{
++		.desc = "Hardware Dirty state tracking structure (HDBSS)",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_HDBSS,
++		.matches = has_vhe_hdbss,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
++	},
+ 	{
+ 		.desc = "CRC32 instructions",
+ 		.capability = ARM64_HAS_CRC32,
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 9b85a84f6fd4..a87706c9d160 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -69,6 +69,7 @@ HAS_VA52
+ HAS_VIRT_HOST_EXTN
+ HAS_WFXT
+ HAS_XNX
++HAS_HDBSS
+ HAFT
+ HW_DBM
+ KVM_HVHE
+--
+2.33.0
 
-> change-id: 20230301-kvm-arm64-sme-06a1246d3636
->
-> Best regards,
-> --
-> Mark Brown <broonie@kernel.org>
->
