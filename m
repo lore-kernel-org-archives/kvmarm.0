@@ -1,283 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDF022097
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 15:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4302C320CAD
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 15:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783609725; cv=none; b=WHOy1d/YqvY+ej+vzoR44/U0C8uUH1HsI1GtPWh7ew/wjkDXarz2iPCjCeTSqTdtQ1L20M3iVDvfk00f5MVkUj1bgtpuGgzSJ84J3WIA6VaGFTFXeh9c/IsB/o0ATRCpRaqY/JxFdhQJoQ2zH8TRIvF/mOEUl9kz3CtjsjFNmmQ=
+	t=1783609776; cv=none; b=OjDEaCoV4lgImimux8gmMJqEjBssraTe4SryrIdwR27iPmfECecz2xT5t5NY/4Wrwx9gApjJRQp7647k6sJJNMbGG/xR9agSccd0LK+Peh036JhdfH34nPlrMC5c+F/3ZiuIr2rb+/BwPjbPg8y41vHt6SkISMypaWjaQCp0n9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783609725; c=relaxed/simple;
-	bh=CwFS2WJlCFio/mpGaO/vq3m3jKq4Qc+Ry2rokgUyHTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pU9K3NbaDxa3vSM0+spwlykaY0a2f03z2b7pI5ufu1gCsjQFoRT1W2Gr1g7gHBTv26oFLjtrNYYMfsgWNetVHTW2ztPQniBS87wMVUICgFjfKIVVFCr05S1us7ZzR8c2N2p/U+pAjgPsBM0diH8DwebHqQ731pkcc7c1CtUNO/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=a4XqcMvB; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783609776; c=relaxed/simple;
+	bh=S2vtE9rkBUYeI5k2OTxB4fbkTZ6Aqh2mkat66Ey0n+g=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=jBp1GPyT8QB0KFxpG9AsagVyfcetiK1A9nhUBpNDc5LYONGIeT7zsaOsd9cItlNiNjdUDc6kXHqbP4sJGmmo0diylCf9WG8Lgc2UiW+CXG000hyJ/oTHvseqs9y9wHUML79ZYD3sSNgS852i4GlI/2CbhJpdTFQG9lJu3w9tBcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+aziALF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="a4XqcMvB"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 607371595;
-	Thu,  9 Jul 2026 08:08:38 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FE773F85F;
-	Thu,  9 Jul 2026 08:08:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783609722; bh=CwFS2WJlCFio/mpGaO/vq3m3jKq4Qc+Ry2rokgUyHTM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a4XqcMvBLz1GPPKAxACip7/c1Oi2a0hKQyx87OicbZU6kL+onYLkxRXSBQUYcjwPm
-	 a+u7UPZJS8NEA+Tb19RrI+QZ0fmuvdzjWYwxdxisTMBSaV9Mv09ZUdAF1PZb9URL9l
-	 I/Evs4jQ0iv84H4pDDrrEna4N+eK4hVoEq1L87d4=
-Date: Thu, 9 Jul 2026 16:08:38 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH kvmtool v2 4/4] arm64: Add --guest-memfd option to back
- guest RAM with guest_memfd
-Message-ID: <ak-5dlgHGe0Ru0OU@raptor>
-References: <20260708182510.2181857-1-fuad.tabba@linux.dev>
- <20260708182510.2181857-5-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+aziALF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626561F000E9;
+	Thu,  9 Jul 2026 15:09:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783609774;
+	bh=Zgdf+dcffsMWG8bEiHPavaEBk/vGYABjWVpoWtrWtmo=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=e+aziALFigUOhMwCYW+GhBAwL6S6Tj7JovH10M8AxV6d1ZBNYv/qbQHXmqFdorcQm
+	 zrItGzIccdbCPnwa+43ic3N4wR9wEoUveAmjtCJ92pT+HUgeQKeQxZdTe2EWnJFfrz
+	 xja5ESR2EWVxpeanJJQMN/egqEHerfH83ub6lFBpOYH7Oqaiw21fduCMaPRDk5Qx80
+	 l8L2J1BbC+/YW2q5rAwtwxTDfVQcT8Pw9xyy1fu/1Xq6ku/hOTLz6j1U8pyNwNI+yj
+	 d2/erIOlhInXF9yGpQ78bYUOkfTma+h05g1f2nWj3D+peb+fKdReixw3YajEkJ74f1
+	 +hDtoUahOFVow==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 2/2] KVM: arm64: vgic: Mitigate potential LPI
+ registration failure
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?Q2FybG9zIEzDs3Bleg==?= <clopez@suse.de>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260709144225.3433646-4-clopez@suse.de>
+References: <20260709144225.3433646-2-clopez@suse.de>
+ <20260709144225.3433646-4-clopez@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Jul 2026 15:09:33 +0000
+Message-Id: <20260709150934.626561F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260708182510.2181857-5-fuad.tabba@linux.dev>
 
-Hi Fuad,
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-On Wed, Jul 08, 2026 at 07:25:10PM +0100, Fuad Tabba wrote:
-> Back guest RAM with a guest_memfd created with GUEST_MEMFD_FLAG_MMAP
-> and GUEST_MEMFD_FLAG_INIT_SHARED, mmapped MAP_SHARED to provide the
-> userspace mapping. The guest_memfd file descriptor is closed at
-> teardown, after the mapping is removed.
-> 
-> Protected VMs need in-place shared/private conversion of guest_memfd,
-> which the kernel does not support yet, so reject the combination of
-> --protected and --guest-memfd.
-> 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arm64/include/kvm/kvm-config-arch.h |  5 +++-
->  arm64/kvm.c                         | 43 +++++++++++++++++++++++------
->  include/kvm/kvm.h                   |  1 +
->  include/kvm/util.h                  |  1 +
->  kvm.c                               |  1 +
->  util/util.c                         | 37 +++++++++++++++++++++++++
->  6 files changed, 79 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> index c2702d5..d8a8ef7 100644
-> --- a/arm64/include/kvm/kvm-config-arch.h
-> +++ b/arm64/include/kvm/kvm-config-arch.h
-> @@ -20,6 +20,7 @@ struct kvm_config_arch {
->  	bool		no_pvtime;
->  	bool		psci;
->  	bool		protected;
-> +	bool		guest_memfd;
->  };
->  
->  int irqchip_parser(const struct option *opt, const char *arg, int unset);
-> @@ -73,6 +74,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
->  	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
->  		    "Create guest without VHE support"),			\
->  	OPT_BOOLEAN('\0', "protected", &(cfg)->protected,			\
-> -			"Create a protected VM when pKVM is enabled"),
-> +			"Create a protected VM when pKVM is enabled"),		\
-> +	OPT_BOOLEAN('\0', "guest-memfd", &(cfg)->guest_memfd,			\
-> +			"Use guest_memfd to back guest RAM"),
->  
->  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> diff --git a/arm64/kvm.c b/arm64/kvm.c
-> index fb0b98d..bf4e34e 100644
-> --- a/arm64/kvm.c
-> +++ b/arm64/kvm.c
-> @@ -49,9 +49,14 @@ void kvm__init_ram(struct kvm *kvm)
->  	kvm->arch.ram_alloc_size = kvm->ram_size;
->  	if (!kvm->cfg.hugetlbfs_path)
->  		kvm->arch.ram_alloc_size += SZ_2M;
-> -	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
-> -						kvm->cfg.hugetlbfs_path,
-> -						kvm->arch.ram_alloc_size);
-> +
-> +	if (kvm->cfg.arch.guest_memfd)
-> +		kvm->arch.ram_alloc_start =
-> +			mmap_guest_memfd(kvm, kvm->arch.ram_alloc_size);
-> +	else
-> +		kvm->arch.ram_alloc_start =
-> +			mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path,
-> +					       kvm->arch.ram_alloc_size);
+Pre-existing issues:
+- [High] The error path in `vgic_add_lpi()` calls `xa_release()`, which acq=
+uires the `lpi_xa` lock without disabling interrupts, leading to a potentia=
+l deadlock.
+--
 
-Would you mind not splitting the line after the equal sign? It makes
-parsing the code really hard (at least for me).
+--- Patch [2]: [PATCH v5 2/2] KVM: arm64: vgic: Mitigate potential LPI regi=
+stration failure ---
+commit c5f231166837f986fca0d6f0a35dc7e8c46a61d1
+Author: Carlos L=C3=B3pez <clopez@suse.de>
+Subject: KVM: arm64: vgic: Mitigate potential LPI registration failure
 
->  
->  	if (kvm->arch.ram_alloc_start == MAP_FAILED)
->  		die("Failed to map %lld bytes for guest memory (%d)",
-> @@ -60,17 +65,25 @@ void kvm__init_ram(struct kvm *kvm)
->  	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
->  					SZ_2M);
->  
-> -	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> -		MADV_MERGEABLE);
-> +	if (!kvm->cfg.arch.guest_memfd) {
-> +		madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> +			MADV_MERGEABLE);
->  
-> -	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> -		MADV_HUGEPAGE);
-> +		madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> +			MADV_HUGEPAGE);
-> +	}
->  
->  	phys_start	= kvm->cfg.ram_addr;
->  	phys_size	= kvm->ram_size;
->  	host_mem	= kvm->ram_start;
->  
-> -	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> +	if (kvm->cfg.arch.guest_memfd)
-> +		err = kvm__register_ram_guest_memfd(kvm, phys_start,
-> +						    phys_size, host_mem,
-> +						    kvm->ram_guest_memfd,
-> +						    host_mem - kvm->arch.ram_alloc_start);
-> +	else
-> +		err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
->  	if (err)
->  		die("Failed to register %lld bytes of memory at physical "
->  		    "address 0x%llx [err %d]", phys_size, phys_start, err);
-> @@ -84,6 +97,11 @@ void kvm__init_ram(struct kvm *kvm)
->  void kvm__arch_delete_ram(struct kvm *kvm)
->  {
->  	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
-> +
-> +	if (kvm->ram_guest_memfd >= 0) {
-> +		close(kvm->ram_guest_memfd);
-> +		kvm->ram_guest_memfd = -1;
-> +	}
->  }
->  
->  void kvm__arch_read_term(struct kvm *kvm)
-> @@ -468,6 +486,15 @@ void kvm__arch_validate_cfg(struct kvm *kvm)
->  	if (kvm->cfg.arch.e2h0 && !kvm->cfg.arch.nested_virt)
->  		pr_warning("--e2h0 requires --nested, ignoring");
->  
-> +	if (kvm->cfg.arch.guest_memfd) {
-> +		/* Requires in-place shared/private conversion of guest_memfd. */
-> +		if (kvm->cfg.arch.protected)
-> +			die("Protected VMs do not yet support guest_memfd");
-> +
-> +		if (kvm->cfg.hugetlbfs_path)
-> +			die("guest_memfd cannot be backed by hugetlbfs");
-> +	}
+This commit mitigates a potential allocation failure when inserting a new L=
+PI=20
+into the VGIC LPI xarray. It updates vgic_add_lpi() to pass GFP_NOWAIT and=
+=20
+__GFP_ACCOUNT to __xa_store(), allowing allocation to occur under the lock =
+if=20
+the reserved entry was removed concurrently.
 
-I think MTE is incompatible with guest_memfd, KVM certainly returns an
-error from kvm_arch_prepare_memory_region() when both are set. Since MTE is
-enabled by default, it might be useful to let the user know that MTE has
-been disabled because of guest_memfd.
-
-Otherwise, everything looks good.
-
-Thanks,
-Alex
-
-> +
->  	if (kvm->cfg.arch.protected) {
->  		if (kvm->cfg.ram_size &&
->  		    kvm->cfg.ram_size < DMA_MEM_REGION_SIZE) {
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index 5e7b5eb..95dc52f 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -90,6 +90,7 @@ struct kvm {
->  	u64			ram_size;	/* Guest memory size, in bytes */
->  	void			*ram_start;
->  	u64			ram_pagesize;
-> +	int			ram_guest_memfd; /* guest_memfd backing RAM, -1 if none */
->  	struct mutex		mem_banks_lock;
->  	struct list_head	mem_banks;
->  
-> diff --git a/include/kvm/util.h b/include/kvm/util.h
-> index a6dba11..9e23431 100644
-> --- a/include/kvm/util.h
-> +++ b/include/kvm/util.h
-> @@ -148,5 +148,6 @@ static inline int pow2_size(unsigned long x)
->  struct kvm;
->  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
->  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
-> +void *mmap_guest_memfd(struct kvm *kvm, u64 size);
->  
->  #endif /* KVM__UTIL_H */
-> diff --git a/kvm.c b/kvm.c
-> index 947721b..96583f9 100644
-> --- a/kvm.c
-> +++ b/kvm.c
-> @@ -162,6 +162,7 @@ struct kvm *kvm__new(void)
->  	mutex_init(&kvm->mem_banks_lock);
->  	kvm->sys_fd = -1;
->  	kvm->vm_fd = -1;
-> +	kvm->ram_guest_memfd = -1;
->  
->  #ifdef KVM_BRLOCK_DEBUG
->  	kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
-> diff --git a/util/util.c b/util/util.c
-> index 05d49c4..51a4591 100644
-> --- a/util/util.c
-> +++ b/util/util.c
-> @@ -6,7 +6,9 @@
->  #include "kvm/util.h"
->  
->  #include <kvm/kvm.h>
-> +#include <linux/kvm.h>
->  #include <linux/magic.h>	/* For HUGETLBFS_MAGIC */
-> +#include <sys/ioctl.h>
->  #include <sys/mman.h>
->  #include <sys/stat.h>
->  #include <sys/statfs.h>
-> @@ -169,3 +171,38 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 si
->  		return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
+s.c
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -124,7 +124,8 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm,=
+ u32 intid,
+>  		 * holds before freeing it, as otherwise someone else could still
+>  		 * hold a pointer to the evicted struct.
+>  		 */
+> -		oldirq =3D __xa_store(&dist->lpi_xa, intid, irq, 0);
+> +		oldirq =3D __xa_store(&dist->lpi_xa, intid, irq,
+> +				    GFP_NOWAIT | __GFP_ACCOUNT);
+>  		ret =3D xa_err(oldirq);
+>  		if (!ret && oldirq &&
+>  		    !WARN_ON_ONCE(refcount_read(&oldirq->refcount) ||
+>  				  !oldirq->pending_release))
+>  			kfree_rcu(oldirq, rcu);
 >  	}
->  }
-> +
-> +/*
-> + * Map guest RAM backed by a guest_memfd. The file descriptor is kept open
-> + * until teardown (kvm__arch_delete_ram), after the mapping is removed.
-> + */
-> +void *mmap_guest_memfd(struct kvm *kvm, u64 size)
-> +{
-> +	u64 flags = GUEST_MEMFD_FLAG_MMAP | GUEST_MEMFD_FLAG_INIT_SHARED;
-> +	struct kvm_create_guest_memfd gmem = {
-> +		.size	= size,
-> +		.flags	= flags,
-> +	};
-> +	void *addr;
-> +	int ret;
-> +
-> +	if (!kvm__supports_extension(kvm, KVM_CAP_GUEST_MEMFD))
-> +		die("kernel does not support guest_memfd");
-> +
-> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_GUEST_MEMFD_FLAGS);
-> +	if (ret < 0 || ((u64)ret & flags) != flags)
-> +		die("VM type does not support guest_memfd with mmap");
-> +
-> +	ret = ioctl(kvm->vm_fd, KVM_CREATE_GUEST_MEMFD, &gmem);
-> +	if (ret < 0)
-> +		die_perror("KVM_CREATE_GUEST_MEMFD");
-> +
-> +	addr = mmap(NULL, size, PROT_RW, MAP_SHARED, ret, 0);
-> +	if (addr == MAP_FAILED)
-> +		die_perror("guest_memfd mmap");
-> +
-> +	kvm->ram_guest_memfd = ret;
-> +	kvm->ram_pagesize = getpagesize();
-> +
-> +	return addr;
-> +}
-> -- 
-> 2.39.5
-> 
+> =20
+>  	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+> =20
+>  	if (ret) {
+>  		xa_release(&dist->lpi_xa, intid);
+
+[Severity: High]
+This is a pre-existing issue, but does calling xa_release() here introduce a
+potential lock inversion deadlock with hardirqs?
+
+The xa_release() function internally uses xa_cmpxchg(), which acquires the=
+=20
+lpi_xa.xa_lock using spin_lock() without disabling local interrupts.
+
+If a hardware interrupt fires on this CPU while the lock is held (for examp=
+le,
+an eventfd signal triggering irqfd_wakeup() in hardirq context for fast-pat=
+h=20
+MSIs), it can inject an LPI and eventually call vgic_put_irq().
+
+Because vgic_put_irq() acquires lpi_xa.xa_lock using spin_lock_irqsave(), t=
+he=20
+interrupt handler would spin forever waiting for the lock held by the preem=
+pted
+vgic_add_lpi() thread.
+
+Since this patch makes it more likely for the error path to be hit (if the=
+=20
+GFP_NOWAIT allocation fails), should this path be updated to manually erase=
+=20
+the entry while holding the xarray lock with interrupts disabled?
+
+>  		kfree(irq);
+> =20
+>  		return ERR_PTR(ret);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260709144225.3433=
+646-2-clopez@suse.de?part=3D2
