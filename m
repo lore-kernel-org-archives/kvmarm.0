@@ -1,38 +1,38 @@
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E4540F8ED
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 10:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D36841166B
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 10:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783593640; cv=none; b=m4DnfSUEXSlM4k8oKImbGTe26NIlgrK9FFnL4o9Ad51/0FwbfJ1gAZ/bDg95vmEdpSHnokiip2QkrxB5uJsDXd0y+PUtTPhHt9p99zmEDx66O3CcqubTl+ZYYbwy38lpDx1o6MZeg3mJwu00HF1eJOWiD2lpaMe1bM+SYsEO0Co=
+	t=1783593640; cv=none; b=BHiQMXGqU5VR1bunzIECIwDF005eszx9dAsYrlyvHhVv4m3Rtjf1b7xXh8oocYqyI5zlLA6qa8VgaBOFkXxI4gj00hgzNL0nn954Nkw5QxtPMVayJje7JDiHkElEaU5S5OyQ0ocHW/YsEu3wIy1vKVFa1EsSHx/3S3Tu0qDEs8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783593640; c=relaxed/simple;
-	bh=rg8b0PL5O9xAe9uKALesdbeYuZuRIaC5vu59T0PMLIA=;
+	bh=TNeyXQrWb4ktidro+XtNsapHakJH3l3+QbyQjqCZCyM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aU89clA5mw/u5uuZo5X9+l8Th5615fEAoBsBPyUpOb78wk0PLFCdvlt059YClNMKv9BJLXnIf1GhBUMJf5kaeiqHrDR+7NDc1fbecFoFwEufZe8CcbSpuZwfRZL0/CI6im+pSMVt1G5LEhr1Yg5wKmXmbQU5Y0m0R2UXFSN6XM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=36OzWK3j; arc=none smtp.client-ip=113.46.200.226
+	 MIME-Version:Content-Type; b=BElOUm9hhJJdQOs0aQ67UnYlTMrGxXxxPooFRxZJeaIKpZDg0fdSod9GrJ0j0qPA+denHdzzQyep3NrncQ82nQn8icO7oTMkjWnoT3boXloWrodnxLew9ZjuuSiQdEzzOwNcKcyEJlO9xkhb1V2PAs1LlXN0yJJWYBinywzgexA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=iU0ITqX4; arc=none smtp.client-ip=113.46.200.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="36OzWK3j"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="iU0ITqX4"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=eWPREcJym9bdOle0sxzYXf4RDxMshoqHFiSjTUXHuk4=;
-	b=36OzWK3jq6Yhk86VJ7Lzky66AjXZPRuts2Mk4B0y2oxxSlyV1viwRPK6CQMFaRw38X4u+7w0P
-	HVJaF96y3oWS2AbEIeP1v5Gw0LqRF3ZxibUfhp5BDEAu2QcmnNt+UTt8SJhYfwiGuwwy0apjXNT
-	q3BRn5wQkDhHdJCeeHrpfGo=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gwrpm1vJ1zKm60;
-	Thu,  9 Jul 2026 18:31:12 +0800 (CST)
+	bh=jHl1Xys4x/oN/Jol8O/4l6bfCsnvsVRKGoScL4MjRMc=;
+	b=iU0ITqX4gt2tt0iKWX8G71zXIz1qDsxijhjb43d9Tsx2FgBc129YcMduxodj1onRK79ZBn4yp
+	y9dwhG6/zer8c9uMLxt2GoCN6F0TrjbZL19fjThM68LnnGOmpJMa6scWvmNU5ClzfbRjl+fOMWT
+	kJvMm7TVgffBCXhVB7YYEaY=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gwrqb5k9KznTWQ;
+	Thu,  9 Jul 2026 18:31:55 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6CD4E40586;
-	Thu,  9 Jul 2026 18:40:29 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 3B0A64048B;
+	Thu,  9 Jul 2026 18:40:31 +0800 (CST)
 Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
  (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 9 Jul
- 2026 18:40:28 +0800
+ 2026 18:40:30 +0800
 From: Tian Zheng <zhengtian10@huawei.com>
 To: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
 	<will@kernel.org>, <zhengtian10@huawei.com>
@@ -43,9 +43,9 @@ CC: <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
 	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
 	<suzuki.poulose@arm.com>, <leo.bras@arm.com>
-Subject: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
-Date: Thu, 9 Jul 2026 18:40:23 +0800
-Message-ID: <20260709104026.2612599-4-zhengtian10@huawei.com>
+Subject: [PATCH v4 6/6] KVM: arm64: Add auto HDBSS enable/disable on dirty logging change
+Date: Thu, 9 Jul 2026 18:40:26 +0800
+Message-ID: <20260709104026.2612599-7-zhengtian10@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260709104026.2612599-1-zhengtian10@huawei.com>
 References: <20260709104026.2612599-1-zhengtian10@huawei.com>
@@ -55,150 +55,198 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="y"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
-The DBM (Dirty Bit Modifier) attribute, introduced in ARMv8.1, enables
-hardware to automatically promote write-clean pages to write-dirty. This
-prevents the guest from being trapped in EL2 due to missing write
-permissions.
+From: eillon <yezhenyu2@huawei.com>
 
-In this design, DBM is controlled by the page-table level flag
-KVM_PGTABLE_S2_DBM rather than per-PTE software flags. DBM is
-automatically set for writable non-device pages when the page-table has
-KVM_PGTABLE_S2_DBM flag, which is determined at MMU init time based on
-hardware capability.
+HDBSS buffers store per-page dirty state after the stage-2 page tables
+have been split down to page granularity (chunk_size == PAGE_SIZE).
+When chunk_size == 0 the kernel may lazily skip splitting block mappings,
+leaving the page table coarser than what HDBSS expects. Therefore,
+enabling HDBSS requires disabling lazy split so that all block mappings
+are eagerly broken down before the buffer starts recording.
 
-The DBM bit is set in stage2_set_prot_attr() for initial mappings and
-hugepage splitting, and directly manipulated in
-kvm_pgtable_stage2_relax_perms() when removing write-protection. On
-W->RO downgrade, DBM is cleared to prevent hardware from silently
-upgrading RO+DBM back to W+dirty, which would bypass KVM's write
-tracking.
+Add VM-level HDBSS enable/disable support. When dirty logging is
+enabled on any memslot, HDBSS is automatically enabled. When dirty
+logging is disabled on all memslots, HDBSS is automatically disabled.
 
-kvm_pgtable_stage2_pte_prot() does not extract the DBM bit back into
-enum kvm_pgtable_prot because DBM is a page-table policy determined by
-pgt->flags, not a per-PTE property. Callers should check
-pgt->flags & KVM_PGTABLE_S2_DBM instead.
+This includes:
+- kvm_arm_enable_hdbss_global() to enable HDBSS for all vCPUs
+- kvm_arm_disable_hdbss_global() to disable and free HDBSS buffers
+- kvm_arm_hdbss_on_dirty_logging_change() for auto enable/disable
+- kvm_arch_destroy_vm() cleanup path
+- kvm_arch_commit_memory_region() integration
 
-This ensures DBM is consistently applied across all PTEs, including
-during hugepage splitting where child PTEs inherit DBM from the parent
-block entry via the pgt->flags mechanism.
-
-Safety: DBM bit is only interpreted by hardware when VTCR_EL2.HD=1.
-When HDBSS is not enabled (HD=0), ARM architecture guarantees hardware
-completely ignores DBM bit in PTEs.
-
-Co-developed-by: Eillon <yezhenyu2@huawei.com>
 Signed-off-by: Eillon <yezhenyu2@huawei.com>
-Co-developed-by: Leonardo Bras <leo.bras@arm.com>
-Signed-off-by: Leonardo Bras <leo.bras@arm.com>
 Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  4 ++++
- arch/arm64/kvm/hyp/pgtable.c         | 35 ++++++++++++++++++++++++++--
- arch/arm64/kvm/mmu.c                 |  3 +++
- 3 files changed, 40 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_dirty_bit.h |   2 +
+ arch/arm64/kvm/arm.c                   |   8 ++
+ arch/arm64/kvm/dirty_bit.c             | 105 +++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c                   |   3 +
+ 4 files changed, 118 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 41a8687938eb..5e0fac4bfa53 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -93,6 +93,8 @@ typedef u64 kvm_pte_t;
+diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+index 4b28000e972f..a4cda8cdab24 100644
+--- a/arch/arm64/include/asm/kvm_dirty_bit.h
++++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+@@ -23,5 +23,7 @@ int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
+ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+ void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+ int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
++void kvm_arm_hdbss_on_dirty_logging_change(struct kvm *kvm, int nr_memslots_logging);
++void kvm_arm_disable_hdbss_global(struct kvm *kvm);
 
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+ #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 566953a4e23a..536d94799ba8 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -317,6 +317,14 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	if (is_protected_kvm_enabled())
+ 		pkvm_destroy_hyp_vm(kvm);
 
-+#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
++	/*
++	 * Userspace may destroy the VM without disabling dirty logging,
++	 * so the auto-disable path is never reached. Force disable HDBSS
++	 * here to ensure vCPU buffers are freed and prevent memory leaks.
++	 */
++	if (kvm->arch.enable_hdbss)
++		kvm_arm_disable_hdbss_global(kvm);
 +
- #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+ 	kvm_uninit_stage2_mmu(kvm);
+ 	kvm_destroy_mpidr_data(kvm);
 
- #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-@@ -249,10 +251,12 @@ struct kvm_pgtable_mm_ops {
-  * enum kvm_pgtable_stage2_flags - Stage-2 page-table flags.
-  * @KVM_PGTABLE_S2_IDMAP:	Only use identity mappings.
-  * @KVM_PGTABLE_S2_AS_S1:	Final memory attributes are that of Stage-1.
-+ * @KVM_PGTABLE_S2_DBM:	Hardware-managed DBM for writable pages.
-  */
- enum kvm_pgtable_stage2_flags {
- 	KVM_PGTABLE_S2_IDMAP			= BIT(0),
- 	KVM_PGTABLE_S2_AS_S1			= BIT(1),
-+	KVM_PGTABLE_S2_DBM			= BIT(2),
- };
-
- /**
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 91a7dfad6686..21ec456ecc41 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -731,9 +731,23 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
- 	if (prot & KVM_PGTABLE_PROT_R)
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-
--	if (prot & KVM_PGTABLE_PROT_W)
-+	if (prot & KVM_PGTABLE_PROT_W) {
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-
-+		/*
-+		 * Set DBM bit for writable non-device pages if the page-table
-+		 * has KVM_PGTABLE_S2_DBM flag (system supports HDBSS).
-+		 *
-+		 * For stage 2 translations using Indirect permissions, if the
-+		 * Effective value of VTCR_EL2.HD is 0, then dirty state is
-+		 * managed by software. Hardware only updates the dirty state
-+		 * when VTCR_EL2.HD=1 (HDBSS enabled).
-+		 */
-+		if ((pgt->flags & KVM_PGTABLE_S2_DBM) &&
-+		    !(prot & KVM_PGTABLE_PROT_DEVICE))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+index 002366337637..c5bf866c23ef 100644
+--- a/arch/arm64/kvm/dirty_bit.c
++++ b/arch/arm64/kvm/dirty_bit.c
+@@ -112,3 +112,108 @@ int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+ 		return -EFAULT;
+ 	}
+ }
++
++static unsigned int hdbss_auto_select_order(struct kvm *kvm)
++{
++	unsigned long npages = 0;
++	struct kvm_memory_slot *memslot;
++	int bkt;
++
++	kvm_for_each_memslot(memslot, bkt, kvm_memslots(kvm))
++		npages += memslot->npages;
++
++	if (npages <= 16384)
++		return 0;
++	else if (npages <= 262144)
++		return 3;
++	else if (npages <= 4194304)
++		return 6;
++	else
++		return 9;
++}
++
++/*
++ * Enable HDBSS for all vCPUs in the VM.
++ *
++ * Called from kvm_arm_hdbss_on_dirty_logging_change() which is invoked
++ * by kvm_arch_commit_memory_region() under kvm->slots_lock.
++ *
++ * If buffer allocation fails, HDBSS remains disabled and dirty tracking
++ * falls back to the traditional software-based approach (PTE write-protect
++ * + software dirty marking). This does not affect correctness; dirty
++ * logging remains functional without HDBSS.
++ */
++static int kvm_arm_enable_hdbss_global(struct kvm *kvm)
++{
++	int err;
++	unsigned long i;
++	unsigned int order;
++	struct kvm_vcpu *vcpu;
++
++	if (!system_supports_hdbss())
++		return 0;
++
++	if (kvm->dirty_ring_size) /* Don't support HDBSS in dirty ring mode */
++		return 0;
++
++	if (kvm->arch.enable_hdbss) /* Already On */
++		return 0;
++
++	/* Turn it on */
++	order = hdbss_auto_select_order(kvm);
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		err = kvm_arm_vcpu_alloc_hdbss(vcpu, order);
++		if (err)
++			goto error_alloc;
 +	}
 +
- 	if (!kvm_lpa2_is_enabled())
- 		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-
-@@ -1367,9 +1381,26 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	if (prot & KVM_PGTABLE_PROT_R)
- 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-
--	if (prot & KVM_PGTABLE_PROT_W)
-+	if (prot & KVM_PGTABLE_PROT_W) {
- 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-
-+		/*
-+		 * No DEVICE filter needed here: relax_perms is only called
-+		 * on FSC_PERM faults. Device pages always get full RW from
-+		 * initial mapping and are never write-protected during
-+		 * migration, so they never trigger a permission fault.
-+		 */
-+		if (pgt->flags & KVM_PGTABLE_S2_DBM)
-+			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-+	} else {
-+		/*
-+		 * Clear DBM on W→RO downgrade to prevent hardware from
-+		 * silently upgrading RO+DBM back to W+dirty, which would
-+		 * bypass KVM's write tracking and cause data corruption.
-+		 */
-+		clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-+	}
++	kvm->arch.enable_hdbss = true;
++	kvm->arch.mmu.vtcr |= VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA;
 +
- 	ret = stage2_set_xn_attr(prot, &xn);
- 	if (ret)
- 		return ret;
++	/*
++	 * We should kick vcpus out of guest mode here to load new
++	 * vtcr value to vtcr_el2 register when re-enter guest mode.
++	 */
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_vcpu_kick(vcpu);
++
++	return 0;
++
++error_alloc:
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		if (vcpu->arch.hdbss.base_phys)
++			kvm_arm_vcpu_free_hdbss(vcpu);
++
++	pr_warn_once("kvm: failed to allocate HDBSS buffers (order=%u), "
++		     "falling back to software dirty tracking\n", order);
++	return -ENOMEM;
++}
++
++void kvm_arm_disable_hdbss_global(struct kvm *kvm)
++{
++	unsigned long i;
++	struct kvm_vcpu *vcpu;
++
++	if (!kvm->arch.enable_hdbss) /* Already Off */
++		return;
++
++	/* Turn it off */
++	kvm->arch.mmu.vtcr &= ~(VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA);
++
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_arm_vcpu_free_hdbss(vcpu);
++
++	kvm->arch.enable_hdbss = false;
++}
++
++void kvm_arm_hdbss_on_dirty_logging_change(struct kvm *kvm, int nr_memslots_logging)
++{
++	/*
++	 * Called from kvm_arch_commit_memory_region() under kvm->slots_lock.
++	 * All state transitions are serialized by slots_lock.
++	 */
++	if (nr_memslots_logging > 0 && !kvm->arch.enable_hdbss)
++		kvm_arm_enable_hdbss_global(kvm);
++	else if (nr_memslots_logging == 0 && kvm->arch.enable_hdbss)
++		kvm_arm_disable_hdbss_global(kvm);
++}
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index e086c01a9325..346efed6e605 100644
+index 949fb895add6..484f48dae000 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1014,6 +1014,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	if (err)
- 		goto out_free_pgtable;
+@@ -2588,6 +2588,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ {
+ 	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
 
-+	if (system_supports_hdbss())
-+		pgt->flags |= KVM_PGTABLE_S2_DBM;
++	kvm_arm_hdbss_on_dirty_logging_change(kvm,
++		atomic_read(&kvm->nr_memslots_dirty_logging));
 +
- 	mmu->pgt = pgt;
- 	if (is_protected_kvm_enabled())
- 		return 0;
+ 	/*
+ 	 * At this point memslot has been committed and there is an
+ 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
 --
 2.33.0
 
