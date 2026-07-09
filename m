@@ -1,99 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C0B3D16FB;
-	Thu,  9 Jul 2026 20:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FCC4499A4
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 22:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783629215; cv=none; b=cAjzx95S7g+Y7DjI2dQwFivGVCaMWn92mwmZ81MIEExU5uP/mfFPaCT3vbnl/xrZAf0tK4QlIWXFPjMRs/sj9G5+M4iDeiGzzwDcQA01K3m3J/rzIZqmWq3PJxvo6IhaSOGAovSmjoUSNZbnCNco5m+zaU5msKnN+bD18YKL5es=
+	t=1783636636; cv=none; b=VHH3P7EJCZ1ix0r7N57fj0qR34aZsLVBLbbdIfGdIv+rBPu/df1J1xFeGcOXubawZXNukGcG9bgMaEoCPpz96cmpAFZaxvPCDfISkL6oc7LgulW5Z0PScxNu2JoiXAMEvAFM4vFusHVOhwqzySdR6AQW8o170HGEoR4JyT9sAVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783629215; c=relaxed/simple;
-	bh=5XLUSjo9f+m/g+adaAiK4fuzGZo41zT1cScw0AsmnqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rTXbX2d+AqU70zCN5P9rLxAkXu2AaMJzxaHN/ldrX9E3p7D9E++YNn3+g1SXP1lmkFmonRgIQDN3RbDAonnFZ2eMH6L0Zgl+f6qwaVJ9Rstto8CE7OrxqSVr/TcqSbdKBJi8TfohZXBdybd1nZ2ZPgCORSKQjr+ayVecryAFTts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/2GuPIy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783636636; c=relaxed/simple;
+	bh=EaexnPqrmtpzjh8qzHPIamRGJjDLlHmrtHt32D9rGTQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hW4ULk+O25NGrp+mOY3z4j18cAuB8bp/X3/tyMLJawwYP+611J4xBq+1VOJzaIt5Vi6zQxUTap3qRWNcqHlShomur8SAAO90uagDeLK8eFBptKqk0WN9xnyEtZcIVP1wc9+7nQbkTZCNPBAvR6tJVDCQcp1BWM7QfpsIYRY0zgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rj9VSL7s; arc=none smtp.client-ip=209.85.167.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/2GuPIy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE471F000E9;
-	Thu,  9 Jul 2026 20:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783629212;
-	bh=b/KG7TIcBpiZiS4el0LE+iYccTuVv/lNii4KjbUfLL0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=n/2GuPIy58VJVIIU1zKh5qySaCHdgamXriRoUFBqoKkaRGjPaM3dGXmEGkwVF6UVn
-	 snC9P4KEKbCoetvivfNhSiKy7tzw0MNAEXzI4nn8aWyr0942zZ7I56qAyLsHdC91vB
-	 2GQSaaJA+U8w4zbSwaUuT50IO2PdLuVZST6PFbCzIWvthi77nuJC36mhFNS3cgnFzq
-	 2HFhcm3oKTidQO3FIT8xOEQkwH3v2iWXrtTl7TYSHQm5twnVUiDXEluK45ZWPjceCx
-	 zrhGDTX+JyY47GBo52d2ypfw420234eFXAzbfsX/dm75ZKHxCQBfDLgXU1aG5X/hDr
-	 QtEuFMFGVm/9Q==
-Date: Thu, 9 Jul 2026 13:33:30 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-	kvm@vger.kernel.org, david.hildenbrand@arm.com, maz@kernel.org,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, fuad.tabba@linux.dev, mark.rutland@arm.com
-Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only
- memslots
-Message-ID: <alAFmiAsNf6Xm49_@kernel.org>
-References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <akxOrMnlNga-vtQv@google.com>
- <ak0wSQ1133O7B96D@raptor>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rj9VSL7s"
+Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-485fdae1db3so293070b6e.1
+        for <kvmarm@lists.linux.dev>; Thu, 09 Jul 2026 15:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783636634; x=1784241434; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=7wbRxqeXe6OhAyO1MWhkHUo2TrAk/KOd+lAMmZEbmWc=;
+        b=Rj9VSL7sz5+8oDflfvWVNVPBpdC3CHmGtkai8neW8aUiRBgGOZbgJUap33vnNMRYRa
+         Bu12I4CTMQRs8+pGXFSHsS3zhavOAV0dWPy3PLRvlXHyRaDkpJqKdz4y4Qtv1SYebkAG
+         0TIooBl7FGS8YN3XPD6rKV7nMVhrzBIp82xKKqb8Xv2oPEk2OL137UWArvvnScWmzyfw
+         BwtfX6G2l1caDJXaW9q/rpQvmBLUNQw6gjJCKCF7OwPdlr7mStx0nF0SVagP+HYpqpn0
+         84KdMn43lLdUaaZwHhNFIvmavnNZusbt9AbmwzvXaU6UMMu71sSK4fJ5oVMSBe2kN0jy
+         wIeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783636634; x=1784241434;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=7wbRxqeXe6OhAyO1MWhkHUo2TrAk/KOd+lAMmZEbmWc=;
+        b=iywjrdGQyX6aB/8ks9MFJYgexu4Md6Cvl0Z4IKprW9dcvKFBZsxkQeRNSnnjgkOCdG
+         h3a1exR5cGznXM3HFGI5QvSoEJCt69mF0HsKYKHoZKdhCAFyUJQxybyd+smSCsKAXLja
+         NBiGw/uxAR96eDAsa4huQBZE/PJ3nFBo/x7NQJvpKgCx5nIc9Zn3v7QqcnzLKEpnc6Oq
+         GLqbij9szZO3a8TFRV9r9c5ICTWdpuFwFPXm+7ZubmrfREjDLmyjIjztEk+RVBfl4HqO
+         pQLO+hPmKYr0NVdCJAgUPgkkO8gzdMmJBGG1bxDbrngaJ0VCpbBE9ZM8Uf6whHaGYM3M
+         WAoA==
+X-Forwarded-Encrypted: i=1; AFNElJ/ExnhPqnecqs4RR8lVj2hSPNZ8MKYg7eKQZonZpWx6xxSQe/I+ttTeoFzmC+rhGqPe5koi2II=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwLeQS6fThXqmmnwEapIZ8j7GTGThnlbX2T2OPOWVIfpnqWhF6Z
+	/EhK42B51LCyVr8tvXn9R6dq4IxhibbodkUafDCDmC5TfQGlyR7qCzl3s2FntWbwy2MwvTcBKOO
+	nv530TvZE+njm7iWGkO7+RX1Wjw==
+X-Received: from ilax6.prod.google.com ([2002:a92:d306:0:b0:503:4f93:1524])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:c410:b0:48c:3b4:2b95 with SMTP id 5614622812f47-4a2042c6d24mr8647572b6e.29.1783636633855;
+ Thu, 09 Jul 2026 15:37:13 -0700 (PDT)
+Date: Thu,  9 Jul 2026 22:35:57 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ak0wSQ1133O7B96D@raptor>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
+Message-ID: <20260709223604.12934-1-coltonlewis@google.com>
+Subject: [PATCH 6.6 v3 0/6] arm64: KVM: Backport VHE-only boot fixes
+From: Colton Lewis <coltonlewis@google.com>
+To: stable@vger.kernel.org
+Cc: oliver.upton@linux.dev, sashal@kernel.org, gregkh@linuxfoundation.org, 
+	mizhang@google.com, catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, ahmed.genidi@arm.com, leo.yan@arm.com, 
+	miguel.luis@oracle.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jul 07, 2026 at 05:58:49PM +0100, Alexandru Elisei wrote:
-> Hi Sean,
-> 
-> On Mon, Jul 06, 2026 at 05:56:12PM -0700, Sean Christopherson wrote:
-> > On Thu, Jul 02, 2026, Alexandru Elisei wrote:
-> > > The memory represented by guest_memfd-only memslots
-> > > (kvm_memslot_is_gmem_only() is true) is shared with userspace, which can
-> > > freely mmap it and access it. The only thing that is preventing dirty page
-> > > logging for such memslots is that KVM doesn't allow slots backed by
-> > > guest_memfd to have their flags changed; they can only be created and
-> > > deleted.
-> > 
-> > Please (publicly) document *why*  you want to add dirty-logging support.  It's
-> > all but impossible to review new uAPI without knowing the use case.
-> 
-> Of course, my mistake, I was so deep in this that I didn't realise that
-> there might be different perspectives.
-> 
-> My thinking was that since guest_memfd created with GUEST_MEMFD_FLAG_MMAP +
-> GUEST_MEMFD_FLAG_INIT_SHARED is extremely similar from a userspace point of
-> view to using an anonymous file (created with memfd_create()), that
-> supporting dirty page logging and migration would be a natural next step
-> and would expand the usefulness of guest_memfd. It has nothing to do with
-> confidential compute.
-> 
-> As to why I'm working on it now, it's because of an arm64 feature that
-> requires that memory remains mapped at stage 2, called Statistical
-> Profiling Extension (SPE), similar to Intel's PEBS or AMD's IBS. Exposing
-> the feature to a guest requires that memory remains mapped at stage 2
-> outside of userspace explicitely unmapping it, and guest_memfd, with the
-> patch to ignore the MMU notifiers [1], has this property.  I wanted to
-> expand the functionality of guest_memfd to support migration of virtual
-> machines when that arm64 feature is exposed to guests.
+Architectural updates retroactively made FEAT_E2H0 optional, meaning
+hardware can implement FEAT_VHE without FEAT_E2H0. On such CPUs,
+HCR_EL2.E2H can reset to an unknown state and must be initialized early
+so later code can reliably detect whether E2H mode is active.
 
-Can you please expand a bit on how you actually expect dirty tracking to
-work with SPE? Taking write permission faults seem to be at odds with
-"thou shalt not fault".
+Without these fixes, booting 6.6.y as a guest under KVM nested
+virtualization will hang at boot.
 
-Seems to me like you'd need hardware dirty state and the "noabort"
-flavor of BBML2 to actually get things down to page mappings. Oh, and an
-SPE implementation that actually respects write permissions... Is there
-even an implementation out there where the stars align?
+This series targets 6.6.y specifically because these patches are all
+present in 6.12.y and applying these patches to 6.1.y and presumably
+older kernels has more conflicts and results in other issues booting
+as a guest under nested virtualization. More work is needed to enable
+that.
 
-Fixing rotten architecture would be a more appropriate starting point :-/
+Changes in v3:
+- Added Signed-off-by: Colton Lewis <coltonlewis@google.com> to all commits.
+- Added explicit '[ Backport: ... ]' conflict resolution notes indicating why
+  conflicts occurred and how they were resolved (Patches 4, 5, and 6,
+  including Patch 4 where the conflict was trivial).
 
-Thanks,
-Oliver
+v2:
+https://lore.kernel.org/kvmarm/20260708225124.4130846-1-coltonlewis@google.com/
+
+v1:
+https://lore.kernel.org/kvmarm/20260701204342.2654385-1-coltonlewis@google.com/
+
+Ahmed Genidi (1):
+  KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu()
+
+Marc Zyngier (4):
+  arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
+  arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is
+    negative
+  arm64: Fix early handling of FEAT_E2H0 not being implemented
+  arm64: Revamp HCR_EL2.E2H RES1 detection
+
+Mark Rutland (1):
+  KVM: arm64: Initialize HCR_EL2.E2H early
+
+ arch/arm64/include/asm/el2_setup.h   | 56 ++++++++++++++++++++++++++--
+ arch/arm64/kernel/head.S             | 20 ++++------
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  3 +-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c |  3 ++
+ arch/arm64/tools/sysreg              | 37 ++++++++++++++++++
+ 5 files changed, 101 insertions(+), 18 deletions(-)
+
+
+base-commit: da47cbc254661aa66d61ef061485a7080305c4be
+-- 
+2.55.0.795.g602f6c329a-goog
