@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D488B2D877B
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 22:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9AA4315F
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 22:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783637179; cv=none; b=OHrsu0tR0A+4Qy/AOltUwgpena0qnLv50ITLq6027Y/WBsIQlbipsgWXU6U+skuKr6hQOKPHAfJQ8N9F5tEurKbXino5CO09T2XBZHPOff4Dln6gJ6CutXjGFZKqGpVXJOqfPnZ1bVd17/EGno6IO6ZtqX7To/EmNGtQbZlhQu4=
+	t=1783637220; cv=none; b=L18yObUd7rEZmv6SbJesbqmbo/GBSTLDB1ZcEZuUjc74qmXgXRlA7a0irHYw+CtxH9WuXqeoSNkxnILnL0VQ40+wWJCJfqw9Mf5mbJLnAarwZMDlVzp/WUnfgn0lA4KjjnjeFicgqTFUyf+USBGVEGoEZW/cU705rvxjqzNfwOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783637179; c=relaxed/simple;
-	bh=AQQuNUafpb4UG9pRXj5Q4qk9Kw3lU1w9dx1WXjOG25c=;
+	s=arc-20240116; t=1783637220; c=relaxed/simple;
+	bh=Dx+bvElB0HBKCjB1SwDsvrXdi76ReqAIT+bAyHpflCo=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=G+vpWtKu5rsMpsdtX0tHO12LXRBnj32YKhZYwLXkNggEyoZ3HRpge/NJdWY59Bjr1etbawUojGiiWWNMkvYtcx/zHHYaGlS1usls+wueGD8Ni7CQ05WgCRXiq36VDSyo6tpDKPUhXCyiQTPMAOBvMagF9jKjVOi9VpOnsI9O4s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VBZgoerL; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=EE3Uh1TcluMqT0F0932vngDHvWdAUF90drrVu2ocKCVNeBx8Rao0y75adM58JQlqtqOhzXj7Rl5rizgCxHqOAh1jFrFftbq7vqW80dxgIti0Dz0MLYHY4f8ECm8I6kGWlvH6n4ztDxoeZNPC5/Vb2e4zZN/i/Aj+qQ5X3jBEYFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zcr1WEKz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VBZgoerL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 761791F000E9;
-	Thu,  9 Jul 2026 22:46:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zcr1WEKz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FCA61F00A3D;
+	Thu,  9 Jul 2026 22:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783637177;
-	bh=WCMCARNoTvnHTWk3GmE47UDmP8Hz1lv6GeLOZkP2O7M=;
+	s=k20260515; t=1783637218;
+	bh=Dx+bvElB0HBKCjB1SwDsvrXdi76ReqAIT+bAyHpflCo=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VBZgoerLACpx8OeUvdL77Xxjax99iyBjaK3qAMUg1MM49F77x+gBXqpee7PiRbjUm
-	 k1TPUfqLEkphpXLaq3zTVmFdWo9yj3mrv8IwjgbMJr/CrxcCgjpklxndbQ3jAeGG2p
-	 jb4y0fIJLLe9p/iMrgQB/3xBFQYYP7Da4V1xdb18BgmcozJycou8lim0euxW1A/y4m
-	 SN648oaIe7NOt2F7utigAiF7GEHfHo+eBka85I9yeI8ZiFzXjJljNuhEJp3wFCxoyz
-	 qwqqeIq9Wy93IIAmVMxReg8/2nVK/zVYliB9fex8iBnscsAkPoXr43QZVpqV4HUBLv
-	 wcVQ6bm4P3AIA==
+	b=Zcr1WEKz4zS4SFEg1aK8+lw0I59XHNUucJMczzbxA9N4G4FgNxh+gan9MFWWYaCma
+	 BoyNEmXINZdigL004v9fQ6WprZytKphtSYT8q5gLg0+Oe1dkhhKxIlpJI7M3u5it90
+	 FlGDVRU240x01WgCM0q0ALhP0H97jPKlFGELo23gOUM1OcLKm1XYX5DJ8+iBqy1Imh
+	 M5wFtZazSqyczt/RDn3uy/vSq4xwHochkdwbO0FW7BRCBss8869MekAQavO7rV4HNq
+	 mRliltN+yO2PX3mYAZ2R3TcT97cs8zTFNZV4DadjZNNOj435eNUvzELoxIUK+r/1tN
+	 gEQ2xCXd4iewQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 6.6 v3 3/6] arm64: Fix early handling of FEAT_E2H0 not
- being implemented
+Subject: Re: [PATCH 6.6 v3 4/6] KVM: arm64: Initialize HCR_EL2.E2H early
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260709223604.12934-4-coltonlewis@google.com>
+In-Reply-To: <20260709223604.12934-5-coltonlewis@google.com>
 References: <20260709223604.12934-1-coltonlewis@google.com>
- <20260709223604.12934-4-coltonlewis@google.com>
+ <20260709223604.12934-5-coltonlewis@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jul 2026 22:46:17 +0000
-Message-Id: <20260709224617.761791F000E9@smtp.kernel.org>
+Date: Thu, 09 Jul 2026 22:46:58 +0000
+Message-Id: <20260709224658.8FCA61F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,95 +49,46 @@ Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
 
 Pre-existing issues:
-- [High] This problem wasn't introduced by this patch, but writes to contro=
-l-plane system registers (such as `SYS_SCTLR_EL12`, `sctlr_el1`, `cnthctl_e=
-l2`, `cntvoff_el2`, `SYS_HCRX_EL2`, and fine-grained trap registers like `S=
-YS_HDFGRTR_EL2`) are not immediately followed by an `isb()` instruction. Th=
-is violates architectural context synchronization rules which mandate that =
-every control-plane sysreg write must be followed by an `isb()` as the very=
- next instruction.
+- [High] Preexisting sysreg write paths in `___kvm_hyp_init` and `init_el2_=
+state` macros omit the architecturally required `isb` immediately after wri=
+ting control-plane system registers.
 --
 
---- Patch [3]: [PATCH 6.6 v3 3/6] arm64: Fix early handling of FEAT_E2H0 no=
-t being implemented ---
-commit 7771c286d908263811f7e18fed1ebdcc2d0d16e0
-Author: Marc Zyngier <maz@kernel.org>
+--- Patch [4]: [PATCH 6.6 v3 4/6] KVM: arm64: Initialize HCR_EL2.E2H early =
+---
+(Note: The format of this report is altered to provide a free-form summary =
+instead of quoting the patch code directly, due to recitation restrictions.)
 
-arm64: Fix early handling of FEAT_E2H0 not being implemented
+commit 726047e1aa205da54b261630927b54303540481f
+Author: Mark Rutland <mark.rutland@arm.com>
 
-This commit fixes a bug where the check for ID_AA64MMFR4_EL1.E2H0
-was incorrect and happened too late in the initialization sequence.
-It updates the check and publishes the HCR_EL2.E2H bit earlier to
-ensure hVHE mode boots successfully as a nested guest.
+KVM: arm64: Initialize HCR_EL2.E2H early
 
-Link: https://lore.kernel.org/r/20240321115414.3169115-1-maz@kernel.org
+This commit initializes HCR_EL2.E2H early in KVM PSCI entry points to avoid
+consuming an uninitialized value on CPUs without FEAT_E2H0. It factors out
+existing head.S logic into a new init_el2_hcr macro.
 
-> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> index e32c8dd0b17a7..e0e710b36da37 100644
-> --- a/arch/arm64/kernel/head.S
-> +++ b/arch/arm64/kernel/head.S
-[ ... ]
-> @@ -588,22 +603,10 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
-> =20
->  	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
-> =20
-> -	/*
-> -	 * Compliant CPUs advertise their VHE-onlyness with
-> -	 * ID_AA64MMFR4_EL1.E2H0 < 0. HCR_EL2.E2H can be
-> -	 * RES1 in that case.
-> -	 *
-> -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
-> -	 * don't advertise it (they predate this relaxation).
-> -	 */
-> -	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
-> -	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-> -	tbnz	x0, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH - =
-1), 1f
-> -
->  	mrs	x0, hcr_el2
->  	and	x0, x0, #HCR_E2H
->  	cbz	x0, 2f
-> -1:
-> +
->  	/* Set a sane SCTLR_EL1, the VHE way */
->  	pre_disable_mmu_workaround
->  	msr_s	SYS_SCTLR_EL12, x1
+Link: https://lore.kernel.org/r/20250227180526.1204723-2-mark.rutland@arm.c=
+om
 
 [Severity: High]
-This isn't a bug introduced by this patch, but do the writes to control-pla=
-ne
-system registers here and in nearby setup functions need to be immediately
-followed by an isb() instruction?
+This isn't a bug introduced by this patch, but there appears to be a
+pre-existing issue with missing context synchronization events in the EL2
+initialization paths.
 
-Looking at init_el2() in arch/arm64/kernel/head.S, the write to
-SYS_SCTLR_EL12 is immediately followed by a mov instruction instead of
-an isb():
+In arch/arm64/kvm/hyp/nvhe/hyp-init.S:___kvm_hyp_init, writes to mair_el2,
+hcr_el2, and vttbr_el2 are followed by memory loads or other operations
+without an immediate isb instruction.
 
-        msr_s   SYS_SCTLR_EL12, x1
-        mov     x2, #BOOT_CPU_FLAG_E2H
+Similarly, in arch/arm64/include/asm/el2_setup.h:__init_el2_hcrx, the write
+to SYS_HCRX_EL2 is followed by a branch rather than an isb. Also, in
+__init_el2_timers within the same file, cnthctl_el2 and cntvoff_el2 are
+written consecutively without an isb between or immediately after them.
 
-Operating with a stale pipeline configuration after control-plane sysreg wr=
-ites
-can cause unexpected CPU traps, undefined behavior, or boot failures.
-
-The same pattern appears in init_el2() where sctlr_el1 is written:
-
-2:
-        pre_disable_mmu_workaround
-        msr     sctlr_el1, x1
-        mov     x2, xzr
-
-This also seems to occur in arch/arm64/include/asm/el2_setup.h:
-
-- __init_el2_timers() writes cnthctl_el2 and cntvoff_el2 without an
-  intervening isb().
-- __init_el2_hcrx() writes to SYS_HCRX_EL2.
-- __init_el2_fgt() writes to fine-grained trap registers like
-  SYS_HDFGRTR_EL2.
-
-Could these missing synchronization barriers cause boot failures on
-microarchitectures that require strict enforcement?
+Could this cause the CPU to execute subsequent instructions under a stale
+architectural configuration, potentially leading to unpredictable behavior
+or unexpected traps during hypervisor setup?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260709223604.1293=
-4-1-coltonlewis@google.com?part=3D3
+4-1-coltonlewis@google.com?part=3D4
