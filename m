@@ -1,218 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F4C3E3DB8;
-	Thu,  9 Jul 2026 11:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6475E3ED5C9
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 11:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783595739; cv=none; b=e/BOodMTfwqQmlA1PdRPmi3Rdij48EGM8eimNEKRAbgDXYaTHapScPKZSKQzuhCChtn4v5fPvUcRxDy2OmKuGcSmnAY2gK4oiBMFJzhIg1XM6nDth6N6leqUHLB9Wtea6c/gtKP474x4GbH5VCKiKSxxMDmMcIa8jpRZIEmX0gE=
+	t=1783596083; cv=none; b=CbxY+z2jfcYa6GFp5m081EoInxip/Ta8X0fzMIuP/O+2JwZyZnEGO4DETPmHT36QeZO3lsd4qwKcGjhx34VZ5Clx/Pa8M8eoTD5YafqJG9EZEEBr3eH56bBZioVJmNsxM8SftGcAvwAGaJL+5+yh7HVMkrPIwxsqWq80Xc88Nac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783595739; c=relaxed/simple;
-	bh=Xg63DGN8QQ/hdIZjSvRRhHnLj97wYdiYLd+ZhQU6p70=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=pO/qBMSvgpMddw81JU42JKX1qqVEhYl1tgJtR++cjPMm0shu257d0ulUcwD4TFI2/rQzLQ4hNmWWi8EJtup6jdZZjMXWDPPFqSRqORcHhb5E/ANxzJBXnRnTswgHZTkw3BXXJZXfWlH9enUi6T1foExdkWWFS2m2i4WLu3yYyL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dmygzzZq; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783596083; c=relaxed/simple;
+	bh=x0zF6RctJI2oj7xqS+CM8W2IeGPyRQGsTPlFyL7qVzQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bv6w8DaRzehXF3EEGFDjVqZX1h9P3J1WMqI82e4Vj4K8QLDleuZFwqXsIUFezU0vTPcOfps6dUvV+oGrFrwYIGd9t4znS1FTD3EazfeuQboIoZZY/A6a+Eg1uwcDcy/MqJklYJiM++nVvrHhxSOJTFZc3AFgrfjlSUj9CveaPR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pAFjneuX; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dmygzzZq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AEDD1F000E9;
-	Thu,  9 Jul 2026 11:15:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783595738;
-	bh=DeiyCDiwWO4N/BiU3nW4UwBd9LDm9aDpF7rPj85Ka+c=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dmygzzZqZ/uGSh9jwJXl3ETwXWe8Zc4Ni70I61bwSksjCFSRGj3QSIoa9pXJ1TBav
-	 f2bIGogY3ChY2CWHvYixvVpqV7kcydJ5dfJifKzPunKgMJdMStqW+cnSovjFB2MH/z
-	 lCqUJfcVd3eovayyhxKFX/D/Hsd7Z/rh6b4XXIhcSzk2bD/SaaMDStHG18cgYGb5HS
-	 fvtmVwLb7ghnExyyIpY/4LxFpMyLhVB4nZ+4i+JYq/gOQGWwLIQ1z/Tqm/WYs1Sd8b
-	 H8ouyuRYjzWqGTfGfaApBneMLr9PhKc4Pk01IdHOg3/m5G1C/f5N/uwFvZhl4w8Uix
-	 rAt1xOnhETJeQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 4/6] KVM: arm64: Add HDBSS per-vCPU buffer management
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tian Zheng" <zhengtian10@huawei.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-In-Reply-To: <20260709104026.2612599-5-zhengtian10@huawei.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <20260709104026.2612599-5-zhengtian10@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jul 2026 11:15:37 +0000
-Message-Id: <20260709111538.0AEDD1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pAFjneuX"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 886223570;
+	Thu,  9 Jul 2026 04:21:17 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 905A13FE53;
+	Thu,  9 Jul 2026 04:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783596081; bh=x0zF6RctJI2oj7xqS+CM8W2IeGPyRQGsTPlFyL7qVzQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pAFjneuXOC/mavJU+ZBHx7MCX1JeT+brvnQARglyOslkF0b1wfoUruD1+BnxskyVQ
+	 18dvl+2MhIxfu/l3yG33GjyTV7RNrF1LAV/t7RlafgV+TYmDrrmGzeMTGHpjZ3qRij
+	 6IRASP294x/i0/g1b0co+eA7BLkRyeCX3mbpoZZ4=
+Date: Thu, 9 Jul 2026 12:21:13 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+	kvm@vger.kernel.org, david.hildenbrand@arm.com, maz@kernel.org,
+	oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	fuad.tabba@linux.dev
+Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only
+ memslots
+Message-ID: <ak-EKSslAz1uqEtv@J2N7QTR9R3>
+References: <20260702142912.6395-1-alexandru.elisei@arm.com>
+ <akxOrMnlNga-vtQv@google.com>
+ <ak0wSQ1133O7B96D@raptor>
+ <ak0ziUcCXUlDdcla@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ak0ziUcCXUlDdcla@google.com>
 
-Thank you for your contribution! Sashiko AI review found 6 potential issue(=
-s) to consider:
-- [High] Broken error handling in `kvm_arch_vcpu_create` leads to success m=
-asking and hypervisor memory leaks.
-- [High] The hardware producer index `SYS_HDBSSPROD_EL2` is lost during vCP=
-U context switch.
-- [High] `__load_hdbss()` risks a fatal UNDEFINED exception on hardware lac=
-king HDBSS.
-- [High] Misinterpretation of the `order` parameter causes memory waste or =
-buffer undersizing on non-4KB page granules.
-- [Medium] Missing context synchronization event (ISB) after control-plane =
-system register write.
-- [Low] Memory leak when an allocation resolves to physical address 0.
---
+Hi Sean,
 
---- Patch [4]: [PATCH v4 4/6] KVM: arm64: Add HDBSS per-vCPU buffer managem=
-ent ---
-commit 1967caa637e339cacc49eecff93c9e0e02ecad9e
-Author: eillon <yezhenyu2@huawei.com>
+Ignoring dirty page logging for the moment, I think you've raised a much
+bigger concern.
 
-KVM: arm64: Add HDBSS per-vCPU buffer management
+I've dumped a bit more context below, with a couple of high-level
+questions. The important thing for Alexandru and I is whether core folk
+are willing to consider some mechanism to ensure that guest PAs are
+pinned writeable and never fault (even transiently).
 
-This commit introduces the infrastructure for HDBSS (Hardware Dirty Bit Sta=
-te
-Structure) per-vCPU buffer management, including allocation, freeing, and
-loading of HDBSS registers during vCPU load.
+On Tue, Jul 07, 2026 at 10:12:41AM -0700, Sean Christopherson wrote:
+> On Tue, Jul 07, 2026, Alexandru Elisei wrote:
+> > On Mon, Jul 06, 2026 at 05:56:12PM -0700, Sean Christopherson wrote:
+> > > On Thu, Jul 02, 2026, Alexandru Elisei wrote:
 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -565,6 +566,12 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	err =3D kvm_share_hyp(vcpu, vcpu + 1);
->  	if (err)
->  		kvm_vgic_vcpu_destroy(vcpu);
-> =20
-> +	if (vcpu->kvm->arch.enable_hdbss) {
-> +		err =3D kvm_arm_vcpu_alloc_hdbss(vcpu, vcpu->kvm->arch.hdbss_order);
+> > > Please (publicly) document *why*  you want to add dirty-logging support.  It's
+> > > all but impossible to review new uAPI without knowing the use case.
 
-[Severity: High]
-Does this code mask kvm_share_hyp() failures? If kvm_share_hyp() fails, the
-code falls through. If HDBSS is enabled and allocation succeeds, err is
-overwritten to 0.
+> > As to why I'm working on it now, it's because of an arm64 feature that
+> > requires that memory remains mapped at stage 2, called Statistical
+> > Profiling Extension (SPE), similar to Intel's PEBS or AMD's IBS. Exposing
+> > the feature to a guest requires that memory remains mapped at stage 2
+> > outside of userspace explicitely unmapping it, and guest_memfd, with the
+> > patch to ignore the MMU notifiers [1], has this property.  I wanted to
+> > expand the functionality of guest_memfd to support migration of virtual
+> > machines when that arm64 feature is exposed to guests.
+> 
+> I'm all for adding dirty logging support for guest_memfd, but for SPE I don't
+> think relying on guest_memfd always being mapped is a good idea.  guest_memfd
+> is "pinned" purely because adding support for page migration is (very) low
+> priority for SNP, TDX, and pKVM.  guest_memfd page migration might play nice
+> with SPE?  Probably depends on whether KVM is forced to do break-before-make?
 
-Additionally, if kvm_share_hyp() succeeds but kvm_arm_vcpu_alloc_hdbss() fa=
-ils,
-is the hypervisor mapping leaked since kvm_unshare_hyp() isn't called before
-returning?
+The key thing for SPE is that any pages that the SPE HW is using must
+have a valid writeable end-to-end (VA to real PA) mapping at all times
+while the guest is running (and while the host drains buffers). If that
+requirement is violated, even transiently, then data is lost and the
+guest will see an unexpected fault reported by SPE.
 
-> +		if (err)
-> +			kvm_vgic_vcpu_destroy(vcpu);
-> +	}
-> +
->  	return err;
->  }
+If there's any reason we might (transiently) unmap a leaf entry (or
+entire sub-tree) from the stage-2 tables, or might (transiently) remove
+write permission, then we can't guarantee SPE will work correctly from
+the guest's PoV.
 
-> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> --- /dev/null
-> +++ b/arch/arm64/kvm/dirty_bit.c
-[ ... ]
-> +int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order)
-> +{
-> +	struct page *hdbss_pg =3D NULL;
-> +
-> +	if (vcpu->arch.hdbss.hdbssbr_el2 || !system_supports_hdbss())
-> +		return 0;
-> +
-> +	if (order > HDBSS_MAX_ORDER)
-> +		return -EINVAL;
-> +
-> +	hdbss_pg =3D alloc_pages(GFP_KERNEL_ACCOUNT, order);
-> +	if (!hdbss_pg)
-> +		return -ENOMEM;
-> +
-> +	vcpu->arch.hdbss =3D (struct vcpu_hdbss_state) {
-> +		.base_phys =3D page_to_phys(hdbss_pg),
-> +		.hdbssbr_el2 =3D HDBSSBR_EL2(page_to_phys(hdbss_pg), order),
+Obviously we can't guarantee that for regular memslots backed by
+userspace memory, hence we were hoping we could rely on guest_memfd.
 
-[Severity: High]
-Is the order parameter interpreted differently depending on the page granule
-size? The order parameter is used both for alloc_pages() (which scales by
-PAGE_SIZE) and HDBSSBR_EL2() (which expects an absolute hardware size).=20
+Am I right to understand that we expect (in future) to do things with
+guest_memfd that could violate that? If so (and if we're not happy to
+have some options to say "always keep this pinned end-to-end no matter
+what"), then I think that means that in practice we cannot virtualize
+SPE correctly, and Alexandru and I need to go back to our architects.
 
-On 64KB pages, supplying order=3D9 for a 2MB buffer would allocate 32MB fro=
-m the
-buddy allocator, while order=3D5 would configure the hardware for 128KB.
+> And at some point guest_memfd may support userspace-driven swap, but I
+> suppose we can cross that bridge when we come to it.
 
-> +		.hdbssprod_el2 =3D 0,
-> +	};
-> +
-> +	return 0;
-> +}
-> +
-> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
-> +{
-> +	struct page *hdbss_pg;
-> +
-> +	if (!vcpu->arch.hdbss.hdbssbr_el2) {
-> +		return;
-> +	}
+Unfortunately, I think we need to figure out now whether it would be
+acceptable to suppress that (or making it mutually exclusive with SPE),
+if only to decide whether or not we continue trying to virtualize SPE.
 
-[Severity: Low]
-Could this leak the buffer if the buddy allocator returns physical address 0
-and order is 0? The resulting HDBSSBR_EL2 value would be 0, causing this
-early return to intercept a valid allocation.
+We don't need to figure out all the details; just whether or not that
+broad approach would be acceptable, or whether we have to give up on SPE
+virtualization.
 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/swi=
-tch.c
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-[ ... ]
-> @@ -213,6 +214,19 @@ static void __vcpu_put_deactivate_traps(struct kvm_v=
-cpu *vcpu)
->  	local_irq_restore(flags);
->  }
-> =20
-> +static void __load_hdbss(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm =3D vcpu->kvm;
-> +
-> +	if (!kvm->arch.enable_hdbss)
-> +		return;
-> +
-> +	write_sysreg_s(vcpu->arch.hdbss.hdbssbr_el2, SYS_HDBSSBR_EL2);
+> From a uABI perspective, forcing userspace to use guest_memfd to get access to
+> something like SPE isn't ideal.  While I have aspirations of using guest_memfd
+> much more broadly, I don't know that banking on guest_memfd replacing "everything"
+> is a winning strategy.
 
-[Severity: High]
-Will __load_hdbss() trigger a fatal UNDEFINED exception on hardware without
-HDBSS? The function relies solely on kvm->arch.enable_hdbss. If it is enabl=
-ed
-but the hardware lacks support, accessing SYS_HDBSSBR_EL2 could panic the
-hypervisor.
+I agree this isn't ideal, and we're certainly not expecting that this is
+suitable for all users. We're just trying to get as much functionality
+as we practically can with today's SPE hardware.
 
-> +	write_sysreg_s(vcpu->arch.hdbss.hdbssprod_el2, SYS_HDBSSPROD_EL2);
-
-[Severity: Medium]
-Is an isb() required immediately after writing to SYS_HDBSSBR_EL2? ARM64
-subsystem rules state that every write to a control-plane system register m=
-ust
-be followed by an isb() as the very next instruction.
-
-> +
-> +	isb();
-> +}
-> +
->  void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
->  {
->  	host_data_ptr(host_ctxt)->__hyp_running_vcpu =3D vcpu;
-> @@ -220,6 +234,7 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
->  	__vcpu_load_switch_sysregs(vcpu);
->  	__vcpu_load_activate_traps(vcpu);
->  	__load_stage2(vcpu->arch.hw_mmu);
-> +	__load_hdbss(vcpu);
->  }
-> =20
->  void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
->  {
->  	__vcpu_put_deactivate_traps(vcpu);
->  	__vcpu_put_switch_sysregs(vcpu);
-> =20
->  	host_data_ptr(host_ctxt)->__hyp_running_vcpu =3D NULL;
->  }
-
-[Severity: High]
-Are the hardware producer index updates lost during context switch?=20
-
-The producer index is loaded in kvm_vcpu_load_vhe(), but it doesn't appear =
-KVM
-reads and saves it back to vcpu->arch.hdbss.hdbssprod_el2 during
-kvm_vcpu_put_vhe(). Would this rewind the hardware index on the next load?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260709104026.2612=
-599-1-zhengtian10@huawei.com?part=3D4
+Thanks,
+Mark.
