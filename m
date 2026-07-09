@@ -1,147 +1,306 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB174218A6
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 11:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A46377EB0;
+	Thu,  9 Jul 2026 11:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783596766; cv=none; b=bTysjwDuRu4tsxwrGbGFHzCqYBp7sqhS+DPXXh4kN3pL/Zv2XNvOMCFqpmjCWqlC37LJ+tvgXm/JoGwnFnlxTd4YkqHCJzTyxxSYpClKPQ8jTHUyg9CozHopM5kmf6TByvnV1iwLIJzJf0t9cv1O16rptY4wM8SrdEM2leZPqn8=
+	t=1783596880; cv=none; b=RZtqdEqyrMwzwSSdbW8pQkLwgZbO2ji+CEik+wbFef2ak98xAQaXZD5u9DEeJygF4xodDCrLxewR5WOy42Lo9s7aDlOuufUcSrFPfAIADKEY5qSpA4Tf96mqSv+AgCfJAWfPwW22obJG2D1eKPuoexVaOw4YME6fwp78q1pXOTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783596766; c=relaxed/simple;
-	bh=z16PvigLS058MHv1wfx29a13QNUFK91jo1BID9oENIY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XFUdlYu61iqSOshf+jIG+Wwi28EFKaeLTlcMFR3H+VSmOpCxc/we8CheR2ZEP6K20aS4vlVnBjoVYWvBeqU9X8irEHom4HwRMJR+S3kZYJEKBMKod10zzCorwzKiPRPD6HtoEsWshtmmgMa0fq9zTYk8XYgYUOEOv0Xf72rYViE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mul/sTL6; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783596880; c=relaxed/simple;
+	bh=0DgU8nSUzuh7seiSQfdsTqIZmeO7w2A+x2yFCcVfHTk=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=BAVZd+VxcHy3y5iyJ25JqHLz+wYH2wBp1URwH0xgpH1UHCC+PFF1qcJ+F24sO0sWj3d1Vv+HarRMiTyWjM8IlZeQIbZ/8/1N3zU8fA4ldrImBsNz2st379LWi+k9vXvHmqVVUTUIVU6UwL+qdykqrOOdmqQ4JJn7DUTaAT0h2dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hltU2Hhy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mul/sTL6"
-X-Forwarded-Encrypted: i=1; AHgh+Rr7r4h+Zh/MRBZvawYa0F0yc8HZEwztHaz6UUpekFyW2GZr60MVlUIKhV5zSkF3TJEdyfkZjd0=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783596763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oqW88DJFtJlNXKD0B61OXZAk1eUBO5rLtZZ2XEzp0us=;
-	b=Mul/sTL6VqgEzDwbwGWaMKCj4eAPjewLqC29XOprQrMa/Mk2eJjGhUeIsq1T4K8rc2CbJp
-	hg17npD9hUHrUEy5fwjvDGV3aXnPohXjKT1PAz36iiY3qTig2P46hG19eo/E2jXYYCuUO2
-	LORrH3G7YTl1y/Kj4u6ofwDria9Lynk=
-X-Gm-Message-State: AOJu0YxAQ35/7R6KRRz6rkL6bHxNgrwTtzBql7+jsZAhmGVKnl2a8+RI
-	fKsHSGE5f3nzV9sOxqJqPbaXr3Hjkl72KJgl2aT7XCZ06OzJ3vNDSrFr6bBPBIf/sK+c+KoPZlC
-	6rvDnwCOoRRop6/5vWdAtnKmlxaoTBJMWIp5PGhfh
-X-Received: by 2002:ac8:58cd:0:b0:51c:7a8b:c3ff with SMTP id
- d75a77b69052e-51c9a8c4a19mr6188411cf.24.1783596742599; Thu, 09 Jul 2026
- 04:32:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hltU2Hhy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 951C81F000E9;
+	Thu,  9 Jul 2026 11:34:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783596876;
+	bh=fmn14wJir933jVT1nI75/QtO1LPl1Dtrh02i7Nq7xZE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=hltU2HhyBdZiIclsgR78rvLHgQ8wkRzJKHcyb62bYh7OP77gscEY51GS+1kkjTiti
+	 YcZ5ZxJSZ1A+YDMtn2Rnx86gSuQZp2kwMnj68uBmWQ9GXwBIDaa4g8KNFNqlZ38wel
+	 XuILBxFCn/Je7UvyXp1MR3Eg/YE0QnUFcm5YTwEx/vNfF3p2xiLmwSfttXSgJVkYFn
+	 8UNuiQ1VbM9BInxDgwKh0k7lMdUOyyETgISKij5qW6GskgYGNkwd56UAnAAj7YzLlp
+	 PMm3kJhd2QbqcYx7wnSsQr0O0V9uGzylAnLyDUzCFCeCzgnosUsMQ7GnfQyNJpci7g
+	 r74hqy9Xzcplw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 6/6] KVM: arm64: Add auto HDBSS enable/disable on
+ dirty logging change
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Tian Zheng" <zhengtian10@huawei.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260709104026.2612599-7-zhengtian10@huawei.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
+ <20260709104026.2612599-7-zhengtian10@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Jul 2026 11:34:35 +0000
+Message-Id: <20260709113436.951C81F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260709-kvm-arm64-sme-v11-0-32799f66db9d@kernel.org>
- <CA+EHjTyAxBx4jhGq-Gme5hPi1ZyDAkL2CP_U22ykkQemD1dUhg@mail.gmail.com> <ak-Fyvzpj9SkF75j@J2N7QTR9R3>
-In-Reply-To: <ak-Fyvzpj9SkF75j@J2N7QTR9R3>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 9 Jul 2026 12:31:45 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTydGzbgi9FwWQaFjuRNqUFC_HeOfHggZAHhPL4FfLYBog@mail.gmail.com>
-X-Gm-Features: AUfX_mxg-IrJum1hjxntITyGClBTO4jOHGBsAV60-jkEzyj12MdjxQXpT6c3yl8
-Message-ID: <CA+EHjTydGzbgi9FwWQaFjuRNqUFC_HeOfHggZAHhPL4FfLYBog@mail.gmail.com>
-Subject: Re: [PATCH v11 00/29] KVM: arm64: Implement support for SME
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Ben Horgan <ben.horgan@arm.com>, Jean-Philippe Brucker <jpb@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
 
-On Thu, 9 Jul 2026 at 12:28, Mark Rutland <mark.rutland@arm.com> wrote:
->
-> On Thu, Jul 09, 2026 at 11:26:41AM +0100, Fuad Tabba wrote:
-> > > base-commit: 4c45e14df2f4e77982ad70d6d8e3fe750edd4c37
-> >
-> > I think this SHA is local to your tree. I can't locate it, and neither
-> > could Sashiko [1, 2].
->
-> That's the tagged commit for v7.2.-rc2. See:
->
->   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D4c45e14df2f4e77982ad70d6d8e3fe750edd4c37
->
-> I think that neither you nor sashiko have fetched mainline recently.
+Thank you for your contribution! Sashiko AI review found 8 potential issue(=
+s) to consider:
+- [Critical] Freeing HDBSS buffers synchronously in `kvm_arm_disable_hdbss_=
+global()` without kicking vCPUs causes a hardware Use-After-Free and host m=
+emory corruption.
+- [High] The patch fails to enforce eager page table splitting when `KVM_DI=
+RTY_LOG_INITIALLY_SET` is used, violating the HDBSS requirement.
+- [High] Global enable/disable functions mutate per-vCPU HDBSS state across=
+ all vCPUs without proper locking or KVM request mechanisms.
+- [High] Missing `kvm_unshare_hyp()` on the vCPU creation error path breaks=
+ pKVM memory ownership.
+- [High] Memslots are accessed without SRCU protection when flushing the HD=
+BSS buffer.
+- [Medium] The dynamically calculated HDBSS buffer order is never saved, ca=
+using newly created vCPUs to allocate incorrect 1-page buffers.
+- [Medium] A conditional check in `kvm_arm_vcpu_destroy` leaks HDBSS buffer=
+s if a TOCTOU race left a vCPU with an allocated buffer while `enable_hdbss=
+` is false.
+- [Medium] Missing immediate Context Synchronization Events (ISB) for contr=
+ol-plane system registers.
+--
 
-Thanks, I have 7.2-rc2, but `git show
-4c45e14df2f4e77982ad70d6d8e3fe750edd4c37` gives me `fatal: bad object
-4c45e14df2f4e77982ad70d6d8e3fe750edd4c37` . The SHA for rc2 is
-8cdeaa50eae8dad34885515f62559ee83e7e8dda (which is what shows in the
-link above, not sure what ID is, which is the part that matches your
-SHA.
+--- Patch [6]: [PATCH v4 6/6] KVM: arm64: Add auto HDBSS enable/disable on =
+dirty logging change ---
+commit c993a05c79f4338df277681c6534d32f65490e56
+Author: eillon <yezhenyu2@huawei.com>
 
-That's what confused both Sashiko and I, since it's used as the base-commit=
- SHA.
+KVM: arm64: Add auto HDBSS enable/disable on dirty logging change
 
-Cheers,
-/fuad
+This commit adds VM-level HDBSS enable/disable support tied to dirty logging
+changes. It automatically enables HDBSS when dirty logging starts and disab=
+les
+it when all memslots stop dirty logging.
 
->
-> I have it locally after fetching from Linus's tree, as below.
->
-> Mark.
->
-> | [mark@lakrids:~/src/linux]% git describe 4c45e14df2f4e77982ad70d6d8e3fe=
-750edd4c37
-> | v7.2-rc2
-> | [mark@lakrids:~/src/linux]% git show 4c45e14df2f4e77982ad70d6d8e3fe750e=
-dd4c37
-> | tag v7.2-rc2
-> | Tagger:     Linus Torvalds <torvalds@linux-foundation.org>
-> | TaggerDate: Sun Jul 5 14:44:06 2026 -1000
-> |
-> | Linux 7.2-rc2
-> | -----BEGIN PGP SIGNATURE-----
-> |
-> | iQFSBAABCgA8FiEEq68RxlopcLEwq+PEeb4+QwBBGIYFAmpK+lYeHHRvcnZhbGRz
-> | QGxpbnV4LWZvdW5kYXRpb24ub3JnAAoJEHm+PkMAQRiGsv8H/Rn7Hr3Hp8t6au8B
-> | xQueZThJWjqQ4v8pyLnXF6OomKiDR24OTXMCrFgDkcmZ7RK2ALqowI3tQVwLUTuI
-> | yUN0qL2z2y+LyTcO0CYf3Lple8KlgLAXYMsv7pGLsOvhS7BW2jW97/bcbpUNxoHb
-> | eghxqbIEnyRImUbbyg+nW7VVk65RKdPUNkBPXfQ2NMVwe+SDE5Rl+NXNVqDNjGad
-> | soDTUBrD9yXkWX+4s0myleE62UzzH5nYgGPQeQgYmzWgq7LybH6WBlbQK9D7ODJR
-> | Cw3LCq1hwZZ2w04Yx+XwMHquGJYHW8L2pj77h95uhzksz8buKnM0AGwBCTC6RMoi
-> | AyUQvdc=3D
-> | =3DJUWl
-> | -----END PGP SIGNATURE-----
-> |
-> | commit 8cdeaa50eae8dad34885515f62559ee83e7e8dda (HEAD, tag: v7.2-rc2, k=
-ernel-org-tip/locking/debug, kernel-org-stable/master, kernel-org-rw-pm/mas=
-ter, kernel-org-rw-pm/fixes, kernel-org-powerpc/topic/ppc-kvm, kernel-org-p=
-owerpc/next-test, kernel-org-powerpc/next, kernel-org-powerpc/fixes-test, k=
-ernel-org-powerpc/fixes, google-android-kvm/master)
-> | Author:     Linus Torvalds <torvalds@linux-foundation.org>
-> | AuthorDate: Sun Jul 5 14:44:06 2026 -1000
-> | Commit:     Linus Torvalds <torvalds@linux-foundation.org>
-> | CommitDate: Sun Jul 5 14:44:06 2026 -1000
-> |
-> |     Linux 7.2-rc2
-> |
-> | diff --git a/Makefile b/Makefile
-> | index b9c5792c79e01..b4035d3cef266 100644
-> | --- a/Makefile
-> | +++ b/Makefile
-> | @@ -2,7 +2,7 @@
-> |  VERSION =3D 7
-> |  PATCHLEVEL =3D 2
-> |  SUBLEVEL =3D 0
-> | -EXTRAVERSION =3D -rc1
-> | +EXTRAVERSION =3D -rc2
-> |  NAME =3D Baby Opossum Posse
-> |
-> |  # *DOCUMENTATION*
->
+> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> index 002366337637c..c5bf866c23ef2 100644
+> --- a/arch/arm64/kvm/dirty_bit.c
+> +++ b/arch/arm64/kvm/dirty_bit.c
+[ ... ]
+> +static int kvm_arm_enable_hdbss_global(struct kvm *kvm)
+> +{
+> +	int err;
+> +	unsigned long i;
+> +	unsigned int order;
+> +	struct kvm_vcpu *vcpu;
+[ ... ]
+> +	/* Turn it on */
+> +	order =3D hdbss_auto_select_order(kvm);
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		err =3D kvm_arm_vcpu_alloc_hdbss(vcpu, order);
+
+[Severity: Medium]
+Will newly created vCPUs allocate buffers of the correct size?
+
+The optimal HDBSS buffer order is calculated here based on memslot sizes and
+used to allocate buffers for currently online vCPUs, but the value doesn't
+seem to be saved to kvm->arch.hdbss_order.
+
+When a new vCPU is created later, it appears kvm_arch_vcpu_create() allocat=
+es
+its buffer using the uninitialized kvm->arch.hdbss_order:
+
+arch/arm64/kvm/arm.c:kvm_arch_vcpu_create() {
+    ...
+    err =3D kvm_arm_vcpu_alloc_hdbss(vcpu, vcpu->kvm->arch.hdbss_order);
+    ...
+}
+
+Could this cause new vCPUs to receive order-0 buffers instead of the
+dynamically selected size, leading to mismatched sizes and excessive
+buffer-full exits?
+
+[Severity: High]
+Is it safe to directly mutate per-vCPU HDBSS state across all vCPUs from the
+thread handling the memslot ioctl?
+
+This loop directly calls kvm_arm_vcpu_alloc_hdbss() to mutate vcpu->arch.hd=
+bss
+without holding vcpu->mutex or using the KVM vCPU requests framework.
+
+Could concurrently running vCPUs undergoing a context switch (like
+__load_hdbss) or fault path read partially updated, torn, or freed state,
+leading to unpredictable hardware register programming?
+
+> +		if (err)
+> +			goto error_alloc;
+> +	}
+[ ... ]
+> +void kvm_arm_disable_hdbss_global(struct kvm *kvm)
+> +{
+> +	unsigned long i;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	if (!kvm->arch.enable_hdbss) /* Already Off */
+> +		return;
+> +
+> +	/* Turn it off */
+> +	kvm->arch.mmu.vtcr &=3D ~(VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA);
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		kvm_arm_vcpu_free_hdbss(vcpu);
+
+[Severity: Critical]
+Does this code risk hardware use-after-free and host memory corruption?
+
+When dirty logging is disabled, the enable_hdbss flag and VTCR_EL2 bits are
+cleared, and the physical pages are immediately freed. Since this occurs un=
+der
+kvm->slots_lock, which does not prevent vCPUs from executing in guest mode,
+running vCPUs could continue executing with their hardware VTCR_EL2 and
+HDBSSBR_EL2 registers still active.
+
+Should this function force running vCPUs to exit (e.g., via kvm_vcpu_kick()=
+ or
+a KVM request) before freeing the physical pages to prevent the hardware MMU
+from asynchronously writing dirty page records into newly freed memory?
+
+> +
+> +	kvm->arch.enable_hdbss =3D false;
+> +}
+[ ... ]
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 949fb895add6a..484f48dae0003 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2588,6 +2588,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>  {
+>  	bool log_dirty_pages =3D new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
+[ ... ]
+>  	if (log_dirty_pages) {
+> =20
+>  		if (change =3D=3D KVM_MR_DELETE)
+>  			return;
+> =20
+>  		/*
+>  		 * Huge and normal pages are write-protected and split
+>  		 * on either of these two cases:
+>  		 *
+>  		 * 1. with initial-all-set: gradually with CLEAR ioctls,
+>  		 */
+>  		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+>  			return;
+
+[Severity: High]
+Does this early return violate the HDBSS requirement for eager page table
+splitting?
+
+The commit message states that enabling HDBSS requires disabling lazy split=
+ so
+that all block mappings are eagerly broken down before the buffer starts
+recording. However, if userspace utilizes KVM_DIRTY_LOG_INITIALLY_SET, this
+path returns early without calling kvm_mmu_split_memory_region().
+
+Since HDBSS was already globally enabled earlier in this function, could it
+now operate on block mappings instead of page-granularity tables, defeating
+the hardware expectation and corrupting the dirty log state?
+
+[Severity: Medium]
+Can a Time-of-Check to Time-of-Use (TOCTOU) race leak HDBSS buffers during
+vCPU destruction?
+
+Looking at kvm_arm_vcpu_destroy() in arch/arm64/kvm/reset.c:
+
+kvm_arm_vcpu_destroy() {
+    ...
+    if (vcpu->kvm->arch.enable_hdbss)
+        kvm_arm_vcpu_free_hdbss(vcpu);
+    ...
+}
+
+If KVM_CREATE_VCPU allocates an HDBSS buffer but kvm_arm_disable_hdbss_glob=
+al()
+runs before the vCPU is added to online_vcpus, the global disable loop would
+miss the vCPU and clear enable_hdbss. When the VM is destroyed, the conditi=
+on
+would evaluate to false, skipping the cleanup.
+
+Since kvm_arm_vcpu_free_hdbss() natively checks for the existence of the
+buffer, is the outer check against enable_hdbss necessary?
+
+[Severity: High]
+Does the vCPU creation error path break pKVM memory ownership by missing a
+call to kvm_unshare_hyp()?
+
+In arch/arm64/kvm/arm.c, kvm_arch_vcpu_create() shares the vCPU struct memo=
+ry
+with the hypervisor. If the new allocation fails, the function cleans up and
+returns the error:
+
+kvm_arch_vcpu_create() {
+    ...
+    if (vcpu->kvm->arch.enable_hdbss) {
+        err =3D kvm_arm_vcpu_alloc_hdbss(vcpu, vcpu->kvm->arch.hdbss_order);
+        if (err)
+            kvm_vgic_vcpu_destroy(vcpu);
+    }
+
+    return err;
+}
+
+Could the memory for the vcpu struct be subsequently freed back to the host
+allocator while still marked as shared with the hypervisor, violating pKVM
+trust boundaries and triggering a hypervisor panic upon reuse?
+
+[Severity: High]
+Does flushing the HDBSS buffer access memslots without SRCU protection?
+
+kvm_flush_hdbss_buffer() processes dirty pages by resolving GFNs via
+kvm_vcpu_mark_page_dirty():
+
+arch/arm64/kvm/dirty_bit.c:kvm_flush_hdbss_buffer() {
+    ...
+    kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+    ...
+}
+
+This internal function requires srcu_read_lock(&kvm->srcu) to safely access
+the KVM memslots array. However, kvm_flush_hdbss_buffer() is invoked from
+kvm_arch_vcpu_put() and check_vcpu_requests(), neither of which hold the SR=
+CU
+read lock.
+
+Could this create a use-after-free risk when memslots are concurrently
+modified?
+
+[Severity: Medium]
+Are immediate Context Synchronization Events (ISB) missing for control-plane
+system registers?
+
+The ARM64 subsystem rules require that every write to a control-plane system
+register must be followed by an isb() as the very next instruction.
+
+In arch/arm64/kvm/dirty_bit.c, a memory store executes between the write and
+the isb():
+
+kvm_flush_hdbss_buffer() {
+    ...
+    write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+    vcpu->arch.hdbss.hdbssprod_el2 =3D 0;
+    isb();
+    ...
+}
+
+Similarly, in arch/arm64/kvm/hyp/vhe/switch.c, two sysreg writes occur
+back-to-back without an intervening isb():
+
+__load_hdbss() {
+    ...
+    write_sysreg_s(vcpu->arch.hdbss.hdbssbr_el2, SYS_HDBSSBR_EL2);
+    write_sysreg_s(vcpu->arch.hdbss.hdbssprod_el2, SYS_HDBSSPROD_EL2);
+    ...
+}
+
+Could these patterns risk observing undefined pipeline state?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260709104026.2612=
+599-1-zhengtian10@huawei.com?part=3D6
