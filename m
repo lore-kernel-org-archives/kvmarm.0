@@ -1,245 +1,248 @@
-Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1845A1509AB
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 07:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82363CDBD3
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 08:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783668474; cv=none; b=D5lA6i+3AIDxwdkePE9LCLVU+wDMVvtfkuV1LmkvTepKr+ID+Ro2/r/UmowJQC5aZpR/QdnsmgieBGqTl6gM/xIrMceQJufWVmd80zF1XkstnnmM+Q1wegysRGNPfbvkz0Wt3KPOud9Oq25b7nQkaEiq7YI+1Dl+kOeGl4s5YBU=
+	t=1783673044; cv=none; b=iFSCd1ug3Sp8ZHCJDx/J7ixMVbTrDnG5aIYJMoCJkbz4liFnrGTwd/pQJK4agoKlkKiq1lfb131teeVyWPiv5BLzMrAdAJsKGOqri84gkv+yNeShvMUYKQTSbRmuEBryKdU89DJVb+iVq93hGb7hT2CAcpvcYiI9wlktQfno8nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783668474; c=relaxed/simple;
-	bh=zznoagUEBRjA/KDqLgxm31OiKTSDk9+kUK0j3IfcVlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o7dpPCMsiSSmk1NEEOoJA1IKrgQHB0buXTkLiIcJRok2kCILTr7liX4mroCA2sGA39CKb8jCqXP9tahl1zNZu60c5typJN23b2hmk9nDKprJWYYq/jizzW5kyVkq8B1Ws45K7SQOJG0LwTpKtNgKPnxboJWfddPwXIiWwxlHopI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=Xz0dPAVV; arc=none smtp.client-ip=139.138.61.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1783673044; c=relaxed/simple;
+	bh=WBqhhNaUo0Wti5P891QHXsZMh0Ox3ClSmdHtOCtrUIA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HuActvmBtdlhvRz4Fk0UgJ7LWkbgHtCR4C9KZ+iWUwylb6M7PW3tODKnNCiAJC4J+QGVbDeKqDk2/l95aTeD+XbzRg7IbvKP9EmAc4OGRjArZ0ETuEftcJjSCDJTHwDsIs/CAFKJEQjm7m8Zan5Pymubl3fuR/bRqizjWpftoXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IVrLQq/M; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="Xz0dPAVV"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1783668473; x=1815204473;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zznoagUEBRjA/KDqLgxm31OiKTSDk9+kUK0j3IfcVlQ=;
-  b=Xz0dPAVVc7bgZeTw9NiVZi93jGttpqHEvrld5ZQmOyPwsYghzSffTkdW
-   KifGvWzTw6Q3VS8sHd9iB32wiv7FW7PhbkH2xDhYC+YkIA49BH9zCm7UK
-   FlzXlf8rwohDG2wUxFVyFBGe5A7DuHTXvHZwvCsNHiPdM2bDKpFYAR3Tn
-   8EuYbZAjPuyGjRPMtfjguva13UskQr7LiKZfMUjH+OsPN2/fumZ5dkVTC
-   XXI97PlQLWvAMOO9km82+v5guWdeMHgY07kgHflc7kdjhoOr7FYU6BGg9
-   qGCIwozo0Lk8mLOgkDOmja0tbar8PtP1poquuEtepZCwTEmtl77sLtUIL
-   w==;
-X-CSE-ConnectionGUID: O1y8CxZLR7W2dmTcVbs+UA==
-X-CSE-MsgGUID: Tw6m4ACsSSWsvm0Vp8J8NA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="225828960"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779116400"; 
-   d="scan'208";a="225828960"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 16:26:42 +0900
-Received: from az2uksmgm1.o.css.fujitsu.com (unknown [10.151.22.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 146711002832
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 07:26:42 +0000 (UTC)
-Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id C1E07968478
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 07:26:41 +0000 (UTC)
-Received: from sm-arm-grace07 (unknown [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmom2.o.css.fujitsu.com (Postfix) with ESMTPS id 628291802EF7;
-	Fri, 10 Jul 2026 07:26:36 +0000 (UTC)
-Date: Fri, 10 Jul 2026 16:26:32 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
-Message-ID: <alCeqFsNubTAt-YY@sm-arm-grace07>
-References: <20260630121005.1130996-1-weilin.chang@arm.com>
- <akYLdEuPXEGIZx3E@sm-arm-grace07>
- <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
- <akbuIDmd_zH9_m6K@sm-arm-grace07>
- <nzvizmyxj4otyo5itl425vdflimp6pnkuwo4qtwzzsbjobhzco@ygxydualln47>
- <ak9PHJJzjliTeiFB@sm-arm-grace07>
- <m637wmil3r2bnhlw2mbj5xy5ahucbykk7b4uc6yfcz3c3dfkkj@z4hkns5sieds>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IVrLQq/M"
+X-Forwarded-Encrypted: i=1; AHgh+Rr7e7FKaJbCPoGlp9/qvbJ0a3HrOcUbwNOOUq8n03UfGSvLUHkTszl9g2smeHFWD9DJajnY8uE=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783673039;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=siduqZ2wtPSfCiwUG4eYK+3EbnxMFmH0JOEC1+cp3Go=;
+	b=IVrLQq/MYYZRMw27PyHScXd04kBjscpRnUq0Iw5EEOOeUZJKcIhfz/J1Ufm6cekAR3yhp8
+	uh2o3pSFQvSFwBiiMVgHpFW4HMRAYmK9lRRLKgcxkWrrmFWKyXojEW71ksoxzH+PhhAhAR
+	HPte/k7g6lWT7AwuOt41XCEMDudN+8A=
+X-Gm-Message-State: AOJu0Yw6btaa01UP0qJ8IZvvmhZAfcoM+Vyd+XV750h8IdsyjUelTwyW
+	j2zNAKmFtvu8N1Gzp622MR5fNswvMD2/m9iVAeYTv9qvmq+HTNCyiNN2Q32h3VqmUnKQcU14HNi
+	r41gWw0SVag3bL9TrdaVTfWmtwTjgHJq1iUty91Qm
+X-Received: by 2002:a05:622a:5908:b0:517:5e32:2d14 with SMTP id
+ d75a77b69052e-51caa298ab4mr8006471cf.10.1783673035194; Fri, 10 Jul 2026
+ 01:43:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <m637wmil3r2bnhlw2mbj5xy5ahucbykk7b4uc6yfcz3c3dfkkj@z4hkns5sieds>
+References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
+In-Reply-To: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 10 Jul 2026 09:43:17 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzgFA0_Pu5FkSAx46Ax9hdGS0QYCVAf+UcFvjgWWgAfZw@mail.gmail.com>
+X-Gm-Features: AUfX_mxrvzBv6NCMbjRMoOO6a2K0vxT04s13QWsrnVddbkkVnfBSRhldHB06vuw
+Message-ID: <CA+EHjTzgFA0_Pu5FkSAx46Ax9hdGS0QYCVAf+UcFvjgWWgAfZw@mail.gmail.com>
+Subject: Re: [PATCH v12 00/29] KVM: arm64: Implement support for SME
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	Jean-Philippe Brucker <jpb@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jul 10, 2026 at 07:43:46AM +0100, Wei-Lin Chang wrote:
-> On Thu, Jul 09, 2026 at 04:34:52PM +0900, Itaru Kitayama wrote:
-> > On Fri, Jul 03, 2026 at 11:24:53AM +0100, Wei-Lin Chang wrote:
-> > > On Fri, Jul 03, 2026 at 08:02:56AM +0900, Itaru Kitayama wrote:
-> > > > On Thu, Jul 02, 2026 at 08:41:43AM +0100, Wei-Lin Chang wrote:
-> > > > > On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
-> > > > > > Hi Wei-Lin,
-> > > > > > On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
-> > > > > > > Hi,
-> > > > > > > 
-> > > > > > > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
-> > > > > > > per mmu ptdump files work after all, mainly because there isn't a clean way to
-> > > > > > > locate the specific nested mmu for each ptdump file as the nested mmus could be
-> > > > > > > freed when the file gets opened. Therefore in this series a single file
-> > > > > > > "shadow_page_tables" is created that dumps all valid mmus' page table
-> > > > > > > information.
-> > > > > > > 
-> > > > > > > An advantage of this is that this new ptdump file have a lifetime identical to
-> > > > > > > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
-> > > > > > > dentry UAF found last time [1].
-> > > > > > > 
-> > > > > > > With this all ptdump files are only removed when the last kvm reference gets
-> > > > > > > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
-> > > > > > > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
-> > > > > > > prevent UAF.
-> > > > > > > 
-> > > > > > > Patch 1-2: Undo previous shadow ptdump implementation.
-> > > > > > > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
-> > > > > > >            mmu->pgt is freed.
-> > > > > > > Patch 4-5: Preparation for the shadow page table dump file.
-> > > > > > > Patch 6:   Implementation of the shadow page table dump file.
-> > > > > > > 
-> > > > > > > The fixes are tested with CONFIG_PROVE_LOCKING,
-> > > > > > > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
-> > > > > > > 
-> > > > > > > Thanks!
-> > > > > > 
-> > > > > > Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
-> > > > > > for shadow stage 2 translation tables are built with ia_bits = 52 and
-> > > > > > start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
-> > > > > > out that's 3 levels. Is this fully expected?
-> > > > > 
-> > > > > Where is this level information you are seeing from? If it is
-> > > > > "stage2_level", that only reports the number of levels for the canonical
-> > > > > stage-2 (non nested). For nested mmus only the page tables are dumped in
-> > > > > nested/shadow_page_tables.
-> > > > 
-> > > > Yes I know. The initial stage 2 translation table structure information is obtained by 
-> > > > instrumenting the kernel using eBPF fexit to __kvm_pgtable_stage2_init().
-> > > > 
-> > > > Since you're correctly loopin over nested_mmus array, and the output is
-> > > > correctly shown using the kvm_pgtable information via the kvm_s2_mmu for
-> > > > them, I am confused at this moment.
-> > > 
-> > > Two things here:
-> > > 
-> > > Firstly ia_bits being 52 is not expected to me, as I didn't change the
-> > > VM's IPA size via KVM_VM_TYPE_ARM_IPA_SIZE in the selftest, to me I
-> > > would expect ia_bits to be 40 (the default). Start level being 0 looks
-> > > normal.
-> > 
-> > Instrumenting the ptdump code you're proposing I see the shadow stage 2
-> > translation tables are constructed with the max 52-bit IPA; irrespective
-> > of the IPA bits set in the init_s2_mmu() helper for the guest hypervisor
-> > setup in the selftest, I am guessing here to me fixed? 52-bit IPA size 
-> > because it's awkward if nestd guest's IPA size is larger than the shadow 
-> > stage 2's IPA size.
-> 
-> Sorry, I got it wrong. It is correct that shadow stage-2 translation
-> tables are constructed with 52-bit IPA, irrespective of what L1 sets in
-> init_s2_mmu(). This is because L1 is free to decide what memory map it
-> exposes to its guest, so we only constrain it with the PARange exposed
-> to the guest. Please see the comments in init_nested_s2_mmu().
+Hi Mark,
 
-Thanks for the cofirmation, yes on QEMU the "max" CPU model that's what
-the PARange exposes, bpftrace was showing that too.
+[snip]
 
-> 
-> > 
-> > I confirmed using the __vm_create() helper with various guest modes
-> > supported that canonical stage 2's "ipa_range" changes according to the 
-> > guest (L1) PA size so I wonder if it is a good idea to create something like
-> > shadow_ipa_range and shadow_stage2_levels files under nested directoy.
-> 
-> I guess shadow_ipa_range and shadow_stage2_levels can be added if there
-> are explicit demand for it. Although right now they aren't too difficult
-> to infer from the PARange exposed to the guest.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Surely, it's up to you. If you kindly take my Tested-by: tag, that'd be
-great the kernel I used for this series is the latest kvmarm/fixes, with
-your series applied I can see the mapping information extracted by
-walking the shadow stage 2 translation tables.
+Gave this a spin on top of v7.2-rc2, applied cleanly and built fine.
 
-Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Booted a host+guest with the host in VHE and in nVHE mode, and booted
+both a normal guest and a protected guest under pKVM. All came up
+cleanly. Note that a protected guest doesn't get SME, but it boots
+fine without it.
 
-Thanks,
-Itaru.
+Ran set_id_regs against a guest in all three host configurations (VHE,
+nVHE, and protected/pKVM); all passed, with the new SME ID-register
+checks actually executing rather than skipping, since QEMU's max CPU
+exposes SME2.
 
-> 
-> Thanks,
-> Wei-Lin Chang
-> 
-> > 
-> > Thanks,
-> > Itaru.
-> > 
-> > > 
-> > > Second thing is I still can't get what you are confused about, if it's
-> > > not about the first point. Note that the "3" in ptdump means it is a
-> > > level 3 mapping, not saying the page tables are using 3 levels.
-> > > 
-> > > Happy to discuss more if you clarify. I'll also check the ia_bits when I
-> > > get to it.
-> > > 
-> > > Thanks,
-> > > Wei-Lin Chang
-> > > 
-> > > > 
-> > > > Thanks,
-> > > > Itaru.
-> > > > 
-> > > > > 
-> > > > > Thanks,
-> > > > > Wei-Lin Chang
-> > > > > 
-> > > > > > 
-> > > > > > Thanks,
-> > > > > > Itaru.
-> > > > > > 
-> > > > > > > 
-> > > > > > > * Changes from v1 ([2]):
-> > > > > > > 
-> > > > > > >   - Move from per mmu ptdump files to one file that will dump all shadow page
-> > > > > > >     tables.
-> > > > > > > 
-> > > > > > > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
-> > > > > > > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
-> > > > > > > 
-> > > > > > > Wei-Lin Chang (6):
-> > > > > > >   KVM: arm64: ptdump: Remove shadow ptdump files
-> > > > > > >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
-> > > > > > >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
-> > > > > > >   KVM: arm64: ptdump: Factor out initialization of
-> > > > > > >     kvm_ptdump_guest_state
-> > > > > > >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
-> > > > > > >     ptdump path
-> > > > > > >   KVM: arm64: ptdump: Introduce the shadow ptdump file
-> > > > > > > 
-> > > > > > >  arch/arm64/include/asm/kvm_host.h |   5 +-
-> > > > > > >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
-> > > > > > >  arch/arm64/kvm/nested.c           |  18 +--
-> > > > > > >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
-> > > > > > >  4 files changed, 135 insertions(+), 77 deletions(-)
-> > > > > > > 
-> > > > > > > -- 
-> > > > > > > 2.43.0
-> > > > > > > 
+Also ran get-reg-list, since patch 28 adds the SME registers to the
+expected reg list, so it's the regression guard confirming the
+guest-visible register set matches what the series intends to expose.
+It passed too.
+
+Will start reviewing soon. For now:
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+
+Cheers,
+/fuad
+
+
+> ---
+> Changes in v12:
+> - Resend with commit rather than tag object specified as the base.
+> - Link to v11: https://patch.msgid.link/20260709-kvm-arm64-sme-v11-0-32799f66db9d@kernel.org
+>
+> Changes in v11:
+> - Rebase onto v7.2-rc2.
+> - Rework VL enumeration.
+> - Refactor ZCR and SMCR value generation for the host into helper
+>   functions.
+> - Add handling of FEAT_IDST for hidden system registers.
+> - Ensure we manage traps correctly for emulated EL2.
+> - Always allocate space for ZT0 if the hardware supports it.
+> - Tighten the register enumeration ABI to reflect current VM state.
+> - Sanitise SMIDR_EL1.
+> - Fix generation of invalid values in set_id_regs.
+> - Various smaller fixups, including from Jean-Phillipe's review.
+> - Link to v10: https://patch.msgid.link/20260306-kvm-arm64-sme-v10-0-43f7683a0fb7@kernel.org
+>
+> Changes in v10:
+> - Define and use a SME_VQ_INVALID for the case where there is no
+>   virtuablisable SME VL.
+> - Fix handling of SMCR_EL2 accesses.
+> - Correct VNCR constant for SMPRI_EL2.
+> - Correct trapping for SMPRI_EL1.
+> - Reject userspace access to FFR when in streaming mode without FA64.
+> - Constrain the VL set by sme_cond_update_smcr() to fit within LEN.
+> - Reject userspace access to ZA and ZT0 when SVCR.SM is 0.
+> - Use -EACCESS for inaccessible SME registers.
+> - Remove some unused functions.
+> - Further bugfixes from review.
+> - Commit log typo fixes.
+>
+> - Link to v9: https://patch.msgid.link/20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org
+>
+> Changes in v9:
+> - Rebase onto v6.19-rc1.
+> - ABI document clarifications.
+> - Add changes dropping asserts on single bit wide bitfields in set_id_regs.
+> - Link to v8: https://lore.kernel.org/r/20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org
+>
+> Changes in v8:
+> - Small fixes in ABI documentation.
+> - Link to v7: https://lore.kernel.org/r/20250822-kvm-arm64-sme-v7-0-7a65d82b8b10@kernel.org
+>
+> Changes in v7:
+> - Rebase onto v6.17-rc1.
+> - Handle SMIDR_EL1 as a VM wide ID register and use this in feat_sme_smps().
+> - Expose affinity fields in SMIDR_EL1.
+> - Remove SMPRI_EL1 from vcpu_sysreg, the value is always 0 currently.
+> - Prevent userspace writes to SMPRIMAP_EL2.
+> - Link to v6: https://lore.kernel.org/r/20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org
+>
+> Changes in v6:
+> - Rebase onto v6.16-rc3.
+> - Link to v5: https://lore.kernel.org/r/20250417-kvm-arm64-sme-v5-0-f469a2d5f574@kernel.org
+>
+> Changes in v5:
+> - Rebase onto v6.15-rc2.
+> - Add pKVM guest support.
+> - Always restore SVCR.
+> - Link to v4: https://lore.kernel.org/r/20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org
+>
+> Changes in v4:
+> - Rebase onto v6.14-rc2 and Mark Rutland's fixes.
+> - Expose SME to nested guests.
+> - Additional cleanups and test fixes following on from the rebase.
+> - Flush register state on VMM PSTATE.{SM,ZA}.
+> - Link to v3: https://lore.kernel.org/r/20241220-kvm-arm64-sme-v3-0-05b018c1ffeb@kernel.org
+>
+> Changes in v3:
+> - Rebase onto v6.12-rc2.
+> - Link to v2: https://lore.kernel.org/r/20231222-kvm-arm64-sme-v2-0-da226cb180bb@kernel.org
+>
+> Changes in v2:
+> - Rebase onto v6.7-rc3.
+> - Configure subfeatures based on host system only.
+> - Complete nVHE support.
+> - There was some snafu with sending v1 out, it didn't make it to the
+>   lists but in case it hit people's inboxes I'm sending as v2.
+>
+> ---
+> Mark Brown (29):
+>       arm64/sysreg: Define full value read/modify/write helpers
+>       arm64/fpsimd: Update FA64 and ZT0 enables when loading SME state
+>       arm64/fpsimd: Decide to save ZT0 and streaming mode FFR at bind time
+>       arm64/sve: Factor virtualizable VL discovery out of SVE specific code
+>       arm64/fpsimd: Determine maximum virtualisable SME vector length
+>       KVM: arm64: Handle FEAT_IDST for guest accesses to hidden registers
+>       KVM: arm64: Pull ctxt_has_ helpers to start of sysreg-sr.h
+>       KVM: arm64: Rename SVE finalization constants to be more general
+>       KVM: arm64: Define internal features for SME
+>       KVM: arm64: Rename sve_state_reg_region
+>       KVM: arm64: Store vector lengths in an array
+>       KVM: arm64: Factor SVE code out of fpsimd_lazy_switch_to_host()
+>       KVM: arm64: Document the KVM ABI for SME
+>       KVM: arm64: Implement SME vector length configuration
+>       KVM: arm64: Support SME control registers
+>       KVM: arm64: Support TPIDR2_EL0
+>       KVM: arm64: Support SME identification registers for guests
+>       KVM: arm64: Support SME priority registers
+>       KVM: arm64: Support userspace access to streaming mode Z and P registers
+>       KVM: arm64: Flush register state on writes to SVCR.SM and SVCR.ZA
+>       KVM: arm64: Expose SME specific state to userspace
+>       KVM: arm64: Context switch SME state for guests
+>       KVM: arm64: Handle SME exceptions
+>       KVM: arm64: Expose SME to nested guests
+>       KVM: arm64: Provide interface for configuring and enabling SME for guests
+>       KVM: arm64: selftests: Remove spurious check for single bit safe values
+>       KVM: arm64: selftests: Skip impossible invalid value tests
+>       KVM: arm64: selftests: Add SME system registers to get-reg-list
+>       KVM: arm64: selftests: Add SME to set_id_regs test
+>
+>  Documentation/virt/kvm/api.rst                   | 124 +++++---
+>  arch/arm64/include/asm/fpsimd.h                  |  17 +-
+>  arch/arm64/include/asm/kvm_emulate.h             |  16 +
+>  arch/arm64/include/asm/kvm_host.h                | 113 ++++++-
+>  arch/arm64/include/asm/kvm_hyp.h                 |   2 +-
+>  arch/arm64/include/asm/kvm_nested.h              |   2 +
+>  arch/arm64/include/asm/kvm_pkvm.h                |   2 +-
+>  arch/arm64/include/asm/sysreg.h                  |   8 +
+>  arch/arm64/include/asm/vncr_mapping.h            |   2 +
+>  arch/arm64/include/uapi/asm/kvm.h                |  34 +++
+>  arch/arm64/kernel/cpufeature.c                   |   2 -
+>  arch/arm64/kernel/fpsimd.c                       | 134 ++++----
+>  arch/arm64/kvm/arm.c                             |  10 +
+>  arch/arm64/kvm/config.c                          |  12 +-
+>  arch/arm64/kvm/emulate-nested.c                  |   6 +-
+>  arch/arm64/kvm/fpsimd.c                          |  27 +-
+>  arch/arm64/kvm/guest.c                           | 369 ++++++++++++++++++++---
+>  arch/arm64/kvm/handle_exit.c                     |  14 +
+>  arch/arm64/kvm/hyp/include/hyp/switch.h          | 234 +++++++++++---
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h       |  96 +++---
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c               | 129 ++++++--
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                   |  90 ++++--
+>  arch/arm64/kvm/hyp/nvhe/switch.c                 |   2 +
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c               |   6 +
+>  arch/arm64/kvm/hyp/vhe/switch.c                  |  17 +-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c               |   7 +
+>  arch/arm64/kvm/inject_fault.c                    |  15 +
+>  arch/arm64/kvm/nested.c                          |   8 +-
+>  arch/arm64/kvm/reset.c                           | 159 +++++++---
+>  arch/arm64/kvm/sys_regs.c                        | 152 +++++++++-
+>  include/uapi/linux/kvm.h                         |   1 +
+>  tools/testing/selftests/kvm/arm64/get-reg-list.c |  15 +-
+>  tools/testing/selftests/kvm/arm64/set_id_regs.c  |  96 +++++-
+>  33 files changed, 1554 insertions(+), 367 deletions(-)
+> ---
+> base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+> change-id: 20230301-kvm-arm64-sme-06a1246d3636
+>
+> Best regards,
+> --
+> Mark Brown <broonie@kernel.org>
+>
