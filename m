@@ -1,94 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9AA4315F
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jul 2026 22:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E51E3B38B9
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 06:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783637220; cv=none; b=L18yObUd7rEZmv6SbJesbqmbo/GBSTLDB1ZcEZuUjc74qmXgXRlA7a0irHYw+CtxH9WuXqeoSNkxnILnL0VQ40+wWJCJfqw9Mf5mbJLnAarwZMDlVzp/WUnfgn0lA4KjjnjeFicgqTFUyf+USBGVEGoEZW/cU705rvxjqzNfwOc=
+	t=1783665849; cv=none; b=CgtyFIwgvudgofk+5V4chbff+v480rLzRrgudJBwlVPZgoInY5z59sKranuRCit20iLP1Rwe9QIVFGUrwfHC9N4fFcDnNXraEE1tcygMLBiNIf75SvH5QhfVDs2U/fXNtbbIgi9V6EweZ/+h0iCWAwFrbz5zc/YDTsqEyA+WqME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783637220; c=relaxed/simple;
-	bh=Dx+bvElB0HBKCjB1SwDsvrXdi76ReqAIT+bAyHpflCo=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=EE3Uh1TcluMqT0F0932vngDHvWdAUF90drrVu2ocKCVNeBx8Rao0y75adM58JQlqtqOhzXj7Rl5rizgCxHqOAh1jFrFftbq7vqW80dxgIti0Dz0MLYHY4f8ECm8I6kGWlvH6n4ztDxoeZNPC5/Vb2e4zZN/i/Aj+qQ5X3jBEYFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zcr1WEKz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783665849; c=relaxed/simple;
+	bh=RUI0hFPWUQ+wlVC5kBXZqbX6ZHXl7Xsre0FPPOU8rDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mm6x7k0EmjMrLHk4X44NI7mvPZBfqD1j1EtqHPUTbdedOqDuDJKgaIjoIlbfZhwaNN0jUmx3+lfFTw0sxuN1lFJw9Yj9q+BcrWf+54ZZxLcZ5oI3tADUS0BtNljLo56kYVTlh04Abv/4yY8JQaKReLJ5DBN43cooyoCsvOis1QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ogrNzINH; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zcr1WEKz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FCA61F00A3D;
-	Thu,  9 Jul 2026 22:46:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783637218;
-	bh=Dx+bvElB0HBKCjB1SwDsvrXdi76ReqAIT+bAyHpflCo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Zcr1WEKz4zS4SFEg1aK8+lw0I59XHNUucJMczzbxA9N4G4FgNxh+gan9MFWWYaCma
-	 BoyNEmXINZdigL004v9fQ6WprZytKphtSYT8q5gLg0+Oe1dkhhKxIlpJI7M3u5it90
-	 FlGDVRU240x01WgCM0q0ALhP0H97jPKlFGELo23gOUM1OcLKm1XYX5DJ8+iBqy1Imh
-	 M5wFtZazSqyczt/RDn3uy/vSq4xwHochkdwbO0FW7BRCBss8869MekAQavO7rV4HNq
-	 mRliltN+yO2PX3mYAZ2R3TcT97cs8zTFNZV4DadjZNNOj435eNUvzELoxIUK+r/1tN
-	 gEQ2xCXd4iewQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 6.6 v3 4/6] KVM: arm64: Initialize HCR_EL2.E2H early
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Colton Lewis" <coltonlewis@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260709223604.12934-5-coltonlewis@google.com>
-References: <20260709223604.12934-1-coltonlewis@google.com>
- <20260709223604.12934-5-coltonlewis@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jul 2026 22:46:58 +0000
-Message-Id: <20260709224658.8FCA61F00A3D@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ogrNzINH"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29E7F1682;
+	Thu,  9 Jul 2026 23:44:00 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 106A63F66F;
+	Thu,  9 Jul 2026 23:43:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783665844; bh=RUI0hFPWUQ+wlVC5kBXZqbX6ZHXl7Xsre0FPPOU8rDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ogrNzINHFx6blHrS6Ebu3TmeUPsyjjsrDcKrTLlp0jBwt2T37Hi5yQ/RWOTV5+ZrV
+	 k+Sp8OBLmV3UkoqV/7q/jsi4hjzzZ6E0YJVeF2ehOwr5On3wCr/yEj7/fSEEA+eO+2
+	 uOOXPF3Bqcy6s98ieI23nyfB66pqAstTkyq2vBU8=
+Date: Fri, 10 Jul 2026 07:43:46 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: ptdump: Shadow ptdump fixes
+Message-ID: <m637wmil3r2bnhlw2mbj5xy5ahucbykk7b4uc6yfcz3c3dfkkj@z4hkns5sieds>
+References: <20260630121005.1130996-1-weilin.chang@arm.com>
+ <akYLdEuPXEGIZx3E@sm-arm-grace07>
+ <vfzn6kbhyemhkum2s72yucbgj4shn7j3g7qd3iima242yph2fr@vdihx2sfibki>
+ <akbuIDmd_zH9_m6K@sm-arm-grace07>
+ <nzvizmyxj4otyo5itl425vdflimp6pnkuwo4qtwzzsbjobhzco@ygxydualln47>
+ <ak9PHJJzjliTeiFB@sm-arm-grace07>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ak9PHJJzjliTeiFB@sm-arm-grace07>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Thu, Jul 09, 2026 at 04:34:52PM +0900, Itaru Kitayama wrote:
+> On Fri, Jul 03, 2026 at 11:24:53AM +0100, Wei-Lin Chang wrote:
+> > On Fri, Jul 03, 2026 at 08:02:56AM +0900, Itaru Kitayama wrote:
+> > > On Thu, Jul 02, 2026 at 08:41:43AM +0100, Wei-Lin Chang wrote:
+> > > > On Thu, Jul 02, 2026 at 03:55:48PM +0900, Itaru Kitayama wrote:
+> > > > > Hi Wei-Lin,
+> > > > > On Tue, Jun 30, 2026 at 01:09:59PM +0100, Wei-Lin Chang wrote:
+> > > > > > Hi,
+> > > > > > 
+> > > > > > This is v2 of fixing shadow ptdump debugfs files. Unfortunately I couldn't make
+> > > > > > per mmu ptdump files work after all, mainly because there isn't a clean way to
+> > > > > > locate the specific nested mmu for each ptdump file as the nested mmus could be
+> > > > > > freed when the file gets opened. Therefore in this series a single file
+> > > > > > "shadow_page_tables" is created that dumps all valid mmus' page table
+> > > > > > information.
+> > > > > > 
+> > > > > > An advantage of this is that this new ptdump file have a lifetime identical to
+> > > > > > other ptdump files i.e. stage2_page_tables, ipa_range, etc., hence avoiding the
+> > > > > > dentry UAF found last time [1].
+> > > > > > 
+> > > > > > With this all ptdump files are only removed when the last kvm reference gets
+> > > > > > dropped and kvm_destroy_vm_debugfs() is called, in their open(), show()
+> > > > > > functions the nested mmu array and mmu->pgt are checked with mmu_lock held to
+> > > > > > prevent UAF.
+> > > > > > 
+> > > > > > Patch 1-2: Undo previous shadow ptdump implementation.
+> > > > > > Patch 3:   Fix a mmu->pgt UAF that happens when ptdump files are read after
+> > > > > >            mmu->pgt is freed.
+> > > > > > Patch 4-5: Preparation for the shadow page table dump file.
+> > > > > > Patch 6:   Implementation of the shadow page table dump file.
+> > > > > > 
+> > > > > > The fixes are tested with CONFIG_PROVE_LOCKING,
+> > > > > > CONFIG_DEBUG_ATOMIC_SLEEP, and CONFIG_KASAN.
+> > > > > > 
+> > > > > > Thanks!
+> > > > > 
+> > > > > Running your shadow stage 2 kselftest with bpftrace shows me that __kvm_pgtable_stage2_init()
+> > > > > for shadow stage 2 translation tables are built with ia_bits = 52 and
+> > > > > start_level = 0, but the debugfs entry for the active shadow stage 2 tables prints
+> > > > > out that's 3 levels. Is this fully expected?
+> > > > 
+> > > > Where is this level information you are seeing from? If it is
+> > > > "stage2_level", that only reports the number of levels for the canonical
+> > > > stage-2 (non nested). For nested mmus only the page tables are dumped in
+> > > > nested/shadow_page_tables.
+> > > 
+> > > Yes I know. The initial stage 2 translation table structure information is obtained by 
+> > > instrumenting the kernel using eBPF fexit to __kvm_pgtable_stage2_init().
+> > > 
+> > > Since you're correctly loopin over nested_mmus array, and the output is
+> > > correctly shown using the kvm_pgtable information via the kvm_s2_mmu for
+> > > them, I am confused at this moment.
+> > 
+> > Two things here:
+> > 
+> > Firstly ia_bits being 52 is not expected to me, as I didn't change the
+> > VM's IPA size via KVM_VM_TYPE_ARM_IPA_SIZE in the selftest, to me I
+> > would expect ia_bits to be 40 (the default). Start level being 0 looks
+> > normal.
+> 
+> Instrumenting the ptdump code you're proposing I see the shadow stage 2
+> translation tables are constructed with the max 52-bit IPA; irrespective
+> of the IPA bits set in the init_s2_mmu() helper for the guest hypervisor
+> setup in the selftest, I am guessing here to me fixed? 52-bit IPA size 
+> because it's awkward if nestd guest's IPA size is larger than the shadow 
+> stage 2's IPA size.
 
-Pre-existing issues:
-- [High] Preexisting sysreg write paths in `___kvm_hyp_init` and `init_el2_=
-state` macros omit the architecturally required `isb` immediately after wri=
-ting control-plane system registers.
---
+Sorry, I got it wrong. It is correct that shadow stage-2 translation
+tables are constructed with 52-bit IPA, irrespective of what L1 sets in
+init_s2_mmu(). This is because L1 is free to decide what memory map it
+exposes to its guest, so we only constrain it with the PARange exposed
+to the guest. Please see the comments in init_nested_s2_mmu().
 
---- Patch [4]: [PATCH 6.6 v3 4/6] KVM: arm64: Initialize HCR_EL2.E2H early =
----
-(Note: The format of this report is altered to provide a free-form summary =
-instead of quoting the patch code directly, due to recitation restrictions.)
+> 
+> I confirmed using the __vm_create() helper with various guest modes
+> supported that canonical stage 2's "ipa_range" changes according to the 
+> guest (L1) PA size so I wonder if it is a good idea to create something like
+> shadow_ipa_range and shadow_stage2_levels files under nested directoy.
 
-commit 726047e1aa205da54b261630927b54303540481f
-Author: Mark Rutland <mark.rutland@arm.com>
+I guess shadow_ipa_range and shadow_stage2_levels can be added if there
+are explicit demand for it. Although right now they aren't too difficult
+to infer from the PARange exposed to the guest.
 
-KVM: arm64: Initialize HCR_EL2.E2H early
+Thanks,
+Wei-Lin Chang
 
-This commit initializes HCR_EL2.E2H early in KVM PSCI entry points to avoid
-consuming an uninitialized value on CPUs without FEAT_E2H0. It factors out
-existing head.S logic into a new init_el2_hcr macro.
-
-Link: https://lore.kernel.org/r/20250227180526.1204723-2-mark.rutland@arm.c=
-om
-
-[Severity: High]
-This isn't a bug introduced by this patch, but there appears to be a
-pre-existing issue with missing context synchronization events in the EL2
-initialization paths.
-
-In arch/arm64/kvm/hyp/nvhe/hyp-init.S:___kvm_hyp_init, writes to mair_el2,
-hcr_el2, and vttbr_el2 are followed by memory loads or other operations
-without an immediate isb instruction.
-
-Similarly, in arch/arm64/include/asm/el2_setup.h:__init_el2_hcrx, the write
-to SYS_HCRX_EL2 is followed by a branch rather than an isb. Also, in
-__init_el2_timers within the same file, cnthctl_el2 and cntvoff_el2 are
-written consecutively without an isb between or immediately after them.
-
-Could this cause the CPU to execute subsequent instructions under a stale
-architectural configuration, potentially leading to unpredictable behavior
-or unexpected traps during hypervisor setup?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260709223604.1293=
-4-1-coltonlewis@google.com?part=3D4
+> 
+> Thanks,
+> Itaru.
+> 
+> > 
+> > Second thing is I still can't get what you are confused about, if it's
+> > not about the first point. Note that the "3" in ptdump means it is a
+> > level 3 mapping, not saying the page tables are using 3 levels.
+> > 
+> > Happy to discuss more if you clarify. I'll also check the ia_bits when I
+> > get to it.
+> > 
+> > Thanks,
+> > Wei-Lin Chang
+> > 
+> > > 
+> > > Thanks,
+> > > Itaru.
+> > > 
+> > > > 
+> > > > Thanks,
+> > > > Wei-Lin Chang
+> > > > 
+> > > > > 
+> > > > > Thanks,
+> > > > > Itaru.
+> > > > > 
+> > > > > > 
+> > > > > > * Changes from v1 ([2]):
+> > > > > > 
+> > > > > >   - Move from per mmu ptdump files to one file that will dump all shadow page
+> > > > > >     tables.
+> > > > > > 
+> > > > > > [1]: https://lore.kernel.org/kvmarm/ajty6I7ZqodP4ous@sm-arm-grace07/
+> > > > > > [2]: https://lore.kernel.org/kvmarm/20260623142443.648972-1-weilin.chang@arm.com/
+> > > > > > 
+> > > > > > Wei-Lin Chang (6):
+> > > > > >   KVM: arm64: ptdump: Remove shadow ptdump files
+> > > > > >   KVM: arm64: ptdump: Undo making the ptdump code mmu aware
+> > > > > >   KVM: arm64: ptdump: Fix UAF when mmu->pgt is freed
+> > > > > >   KVM: arm64: ptdump: Factor out initialization of
+> > > > > >     kvm_ptdump_guest_state
+> > > > > >   KVM: arm64: ptdump: Extract kvm_ptdump_guest_open() from canonical
+> > > > > >     ptdump path
+> > > > > >   KVM: arm64: ptdump: Introduce the shadow ptdump file
+> > > > > > 
+> > > > > >  arch/arm64/include/asm/kvm_host.h |   5 +-
+> > > > > >  arch/arm64/include/asm/kvm_mmu.h  |   4 -
+> > > > > >  arch/arm64/kvm/nested.c           |  18 +--
+> > > > > >  arch/arm64/kvm/ptdump.c           | 185 ++++++++++++++++++++----------
+> > > > > >  4 files changed, 135 insertions(+), 77 deletions(-)
+> > > > > > 
+> > > > > > -- 
+> > > > > > 2.43.0
+> > > > > > 
