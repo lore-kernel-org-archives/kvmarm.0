@@ -1,58 +1,58 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598D0374E5A
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 13:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A497C2BDC28
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 14:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783690875; cv=none; b=aZ+u/+imMF0XMFqnjqozV/X9wBVpAD+lgT84mUPlwDmCGCLrN12vUpEHGk5WmG7yZSJjN/7oUSIcrjLaKnZi0yJiYnc3Y62fNBu5lLjOYbff+g8DHUiVx/arvxFcsIFu2Qk2zyJOh/qXY9pKmiD8tYuNXUBlpyccfemkEOjHl4g=
+	t=1783692497; cv=none; b=sTw1w2dZCmx76pfULvn+xUEgyNHZRVryEOrIfyx3+RrLni6YVkyfTZNd+HK+y5pEjD3rbqTX25brzcS8auRsgibVyq1km7LwBDErpLx1apHm8FNoz78DN+3Ibe69QzucP7FUXkpe2qDjb3bqW8mlyO/z0Kd9YUwkI5bz/IKvF50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783690875; c=relaxed/simple;
-	bh=y7imvDBUf0TciTUd+NP7o0tXn/u7oKHLwDJ7ePlVId8=;
+	s=arc-20240116; t=1783692497; c=relaxed/simple;
+	bh=rkScPtTnLXF3KcoGwGa2oXkZQKek9VUd6Uc92br9zRY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DjHKSizfNTErr9FBaKJg+X4hMnDzCHSOUQVbeQedZ8K/G2rt7sHyU7BlMYXfCOKgzeD6bua5axhQYaWFrVN49NfjZnBhEL+mYTtCiderbDWFpLwvSh9qeuVjNytX7HhO/5l6FBP5HFHUhsae8wW0CkE2peSSdGoUkHPhRnkS7mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=i3rziSTp; arc=none smtp.client-ip=148.163.156.1
+	 Content-Type:Content-Disposition:In-Reply-To; b=hyjD2MAyyRNNZV2gd7XJ4YdI14UGOFGMZP63EMNRs+opnMA6N0O9cNhDNGNNcFlQuYuH/+Gf1S18q7WnAnrxWAcLX4+naFP3koxiLvNVsaFDh/NFGGUUh/T6/NFzZtt9OprybZJ3/5/Cuftv/edyZ6va4NRO5qqjSqv4r1/YHUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=N86bWeZF; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i3rziSTp"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66ADIDXJ1713075;
-	Fri, 10 Jul 2026 13:41:00 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N86bWeZF"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66ADIRCa971536;
+	Fri, 10 Jul 2026 14:08:04 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=N9LSC889O68KIxMLOEUoke37oASt8N
-	T31vCJEcDdTOg=; b=i3rziSTpsz+IImWsw7MCjmADLQnmzEZtJSJSofxHoc8UlP
-	OcKkIh/S1Zi84nC9S+iOsUeEHitZyqqlNhtvvD6dx1l7Fbi4dOSFxji4F4YYXdl8
-	OlFLjnzqCt5xUuy3BuOfZ4cIjWc23VwAcNNB9bxgztxeDxq7iudAbz8hLL+TEHOz
-	qUBVCrec9UtPMWbFbEdp+G5HUkmPiW/sRGZ6oa/+NuidZ95sCC2XUEfw3XACVJFn
-	LeWl4ieDZXIKEXPkyt+PLJYhM+bk7dFEJgcRIQXXIyco06VOLo4LPGNnKve7CtHY
-	k+hf857iZGVgsqccjDg3PBqAXL+PFerQ5CiIzwKg==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6sur6qy6-1
+	:references:subject:to; s=pp1; bh=gOOk9gLsXApIvwBA8M0tLy+tmj4tVP
+	TyU1/BKJeSsMA=; b=N86bWeZFLP5N010H6UrSrANf8j6o+zhFRWES4H0AoAe89S
+	+FuOR/LbKozpOBsrNPk104babkc9fKNcQrEpZCkq+IlIyO6l3x2V37HIM6vWOE4Z
+	mSYUyiSq6TGfua646w8FnA2xRPsKRqv6pLm5yOHN3R9+dxToqAmA56ymY//c5U6V
+	ZwECIf8R3UwlLp3O5TzgGfrTVaegzy6VYgRx/fugOej8qbWOSbo0uCqywwESZMEi
+	drWbnwk/HXWVcEi5zZv8OVIJA38Ahuo+QzBKq3fZSN3Lz3zk4cXGQ2ieJq5y5+y6
+	9qTogxHFPvcWvIAss99UVNEKj2PLzCFhTbyvLZNA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6sw574yy-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 13:41:00 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66ADYjGu003964;
-	Fri, 10 Jul 2026 13:40:59 GMT
+	Fri, 10 Jul 2026 14:08:03 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66AE4quP031520;
+	Fri, 10 Jul 2026 14:08:03 GMT
 Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7cgqjebj-1
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7eqgj4h7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 13:40:59 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66ADepJ029360624
+	Fri, 10 Jul 2026 14:08:02 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66AE7sWL28377470
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jul 2026 13:40:51 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 931192004D;
-	Fri, 10 Jul 2026 13:40:51 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B5CEA20040;
-	Fri, 10 Jul 2026 13:40:50 +0000 (GMT)
+	Fri, 10 Jul 2026 14:07:54 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A8CAE2004B;
+	Fri, 10 Jul 2026 14:07:54 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC76F20040;
+	Fri, 10 Jul 2026 14:07:53 +0000 (GMT)
 Received: from osiris (unknown [9.87.147.219])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 10 Jul 2026 13:40:50 +0000 (GMT)
-Date: Fri, 10 Jul 2026 15:40:49 +0200
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 10 Jul 2026 14:07:53 +0000 (GMT)
+Date: Fri, 10 Jul 2026 16:07:52 +0200
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -78,11 +78,11 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 23/27] KVM: s390: arm64: Implement required functions
-Message-ID: <20260710134049.984749-J-seiden@linux.ibm.com>
+Subject: Re: [PATCH v4 25/27] KVM: s390: arm64: Implement vCPU IOCTLs
+Message-ID: <20260710140752.984749-K-seiden@linux.ibm.com>
 References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-24-seiden@linux.ibm.com>
- <87bjcj7t5h.wl-maz@kernel.org>
+ <20260706085229.979525-26-seiden@linux.ibm.com>
+ <874ii97obu.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -91,103 +91,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87bjcj7t5h.wl-maz@kernel.org>
+In-Reply-To: <874ii97obu.wl-maz@kernel.org>
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDEzMiBTYWx0ZWRfX3ROGKCS0YtfH
- QFpX266GmP1th1voyuu9ytstSczZDgwjBOmRrvn6c9sgbI0q8aeEo0cWUFMAGE3HKZY/ZrzDJFK
- KIkuuPqoSHNWtvcWI10i7kdjs863gPI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDEzMiBTYWx0ZWRfX9sgiu26vVoXN
- gdez2/XVYkga5ITBLcWUbbTgmVuMFQ7cJWmwuRknWjQ6MDdwulbkITzSDOsMtEoX21jeYelo2he
- Bi9KI3h5SIKMPd13gqFG+Ox3gnoa9zT6r8QUkSa/oEdgvGGZ6PIDWdVKYxUPV9oJPk7Y85AVmuR
- vAWE4POrfzZTXoULkStEatexfPO1O/WY77rRD4gP6AS3cPPnpI0L7MrCPTSSPyRCRqkVzDIyqQM
- rIbMW8phIC1emakSE/CCF98Rju/vWGskunxZ+0tQ6qzHRFOfrBqjvynC5QBQqJTEsCCiVc8+5fD
- 5KeUKIdXCHwjof8NI4/kdH6cc4m6A+fhFpZ2Ftyth27v6yhLlGniWWrLdMToM/9f39jtImpd+6O
- +uZO33TequZ1ic2fvZ9QdGs7ekNtRr+h87ry1rZtPNtSo4hbGBqI2QX0h+Mgn0OA/hQtXiJcnLy
- B6Cyo/X6UGU4gtA03Qw==
-X-Proofpoint-GUID: 9G33u2V4ajpbDsBj3uLwc9D7zJAckEKf
-X-Authority-Analysis: v=2.4 cv=Oot/DS/t c=1 sm=1 tr=0 ts=6a50f66c cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+X-Proofpoint-GUID: sS_TGlGHVq4bSthohWRx-DfYjg95dK3s
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDEzNyBTYWx0ZWRfX7WYWPja+doT7
+ 2MXIQ5AQFFqGugG6IM1pswLbY03miFWCsxVp5f3nB3eOvEZgIG9zcyqQQ73Dw7cJQ/tVsN30J8u
+ eFTQtICUvkSYltrRlP8A9R8O+aX6GW51pSZJg7E7TAIJse6DaJUnVbLfP9Q9HEiZf5xQWQxLF8l
+ lu2HSLnEgdlnKPjwFWZg+SP3qsr5G65EBMu07AaA1v1k++kYiuaobbggkS18jp21/S6HJ/nonCc
+ pV4V+HisuOf+eBkOp1lckxMLbZyWEmfD7lelgm3rovAmXZCYXjbCYKAJjwkEvoRAZ+PH6uvg7a+
+ hwdAu4+YRdmNpBkXYulkLk6fkVEGinag2mYU/5WlrXUEDfg+gVmsxddZufDP7MizvoABWDulCDb
+ sLmsBEBMCsQjF6bV2BE3gWwADhlUJ11/GR95dDA/qwN6AXxpi1/z9wFOc9RWMvx8Le8puvtP/mD
+ sjMB9mLDa+A7B95UQfg==
+X-Proofpoint-ORIG-GUID: sS_TGlGHVq4bSthohWRx-DfYjg95dK3s
+X-Authority-Analysis: v=2.4 cv=FqQ1OWrq c=1 sm=1 tr=0 ts=6a50fcc3 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
- a=RsO_Ah-4iS8lBfzd37cA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: 9G33u2V4ajpbDsBj3uLwc9D7zJAckEKf
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
+ a=KsXPjCIZ-yAXfevDvz8A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDEzNyBTYWx0ZWRfX0HKpe059BwhW
+ 1iF3fZngMzkFQx029U5OmavLgwyIc0r4qa2RAh669gT1pniKbAjWqMvHELwDqZ7Hh9Z8XxdZC8m
+ JSUY9aUOjmRxEsZP+jIg8MVhdfihbPs=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-10_03,2026-07-10_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
- malwarescore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ adultscore=0 impostorscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 spamscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100132
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100137
 
-On Mon, Jul 06, 2026 at 09:35:54PM +0100, Marc Zyngier wrote:
-> On Mon, 06 Jul 2026 09:52:23 +0100,
+On Wed, Jul 08, 2026 at 11:44:37AM +0100, Marc Zyngier wrote:
+> On Mon, 06 Jul 2026 09:52:25 +0100,
 > Steffen Eiden <seiden@linux.ibm.com> wrote:
 > > 
-> > Implement the mostly trivial functions that the shared arm64 (kvm)
-> > code & headers oblige s390 to implement.
-> > 
-> > Implement a very basic smccc handler that (non-compliantly) is just able
-> > to stop a vcpu.
-> > 
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > ---
-> >  arch/s390/include/arm64/kvm_emulate.h | 135 ++++++++++++++++++++++++++
-> >  arch/s390/include/arm64/kvm_nested.h  |  11 +++
-> >  arch/s390/kvm/arm64/handle_exit.c     | 110 +++++++++++++++++++++
-> >  arch/s390/kvm/arm64/inject_fault.c    |  21 ++++
-> >  4 files changed, 277 insertions(+)
-> >  create mode 100644 arch/s390/include/arm64/kvm_emulate.h
-> >  create mode 100644 arch/s390/include/arm64/kvm_nested.h
-> >  create mode 100644 arch/s390/kvm/arm64/handle_exit.c
-> >  create mode 100644 arch/s390/kvm/arm64/inject_fault.c
+> > +static void adjust_pc(struct kvm_vcpu *vcpu)
+> > +{
+> > +	if (vcpu_get_flag(vcpu, INCREMENT_PC)) {
+> > +		kvm_skip_instr(vcpu);
+> > +		vcpu_clear_flag(vcpu, INCREMENT_PC);
+> > +	}
+> > +}
+> 
+> Can you clarify the semantics of adjust_pc() here? arm64 also deals
+> with exceptions in the same code, and I wonder how you deal with this.
+>
+
+We will do the same thing as native arm64 does. The KVM in this series
+has no clue what an exception is. Thus I skipped the handling here. The
+exception stuff is added in the second series anlongside with the sysreg
+handling.
 
 ...
 
 > > +
-> > +#define SPSR_SS BIT(21)
+> > +	kvm_sigset_deactivate(vcpu);
+> > +out:
+> > +	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
+> > +		adjust_pc(vcpu);
 > 
-> We may be better off defining SPSR_ELx in the sysreg file and use that
-> all over the place.
+> arm64 has the following statements:
+> 
+> 	if (unlikely(vcpu_get_flag(vcpu, PENDING_EXCEPTION) ||
+> 		     vcpu_get_flag(vcpu, INCREMENT_PC)))
+> 		kvm_call_hyp(__kvm_adjust_pc, vcpu);
+> 
+> It isn't clear to me why you can afford not to deal with pending
+> exceptions when returning to userspace.
 > 
 
-make sense. I'll create a patch for this.
+Same reasoning like above. We'll do the exact same thing as native arm64
+with the next series.
 
-...
-
-> > +
-> > +#define __INCL_GEN_ARM_FILE
-> > +#include "generated/handle_exit.inc"
-> > +#undef __INCL_GEN_ARM_FILE
-> > +
-> > +#define PSCI_0_2_FN_SYSTEM_OFF		0x84000008
-> > +#define PSCI_RET_NOT_SUPPORTED		-1
-> > +#define PSCI_RET_INTERNAL_FAILURE	-6
-> 
-> All of this exists in include/uapi/linux/psci.h.
-
-Yes. We'll use them in a later series as well.
-this is just a placeholder implememtation so guests do not have to run
-idefenitely. 
-
-
-...
-
-> > +	[ESR_ELx_EC_SOFTSTP_CUR]	= "Software Step (current EL)",
-> > +	[ESR_ELx_EC_WATCHPT_LOW]	= "Watchpoint (lower EL)",
-> > +	[ESR_ELx_EC_WATCHPT_CUR]	= "Watchpoint (current EL)",
-> > +	[ESR_ELx_EC_BKPT32]		= "BKPT (AArch32)",
-> > +	[ESR_ELx_EC_VECTOR32]		= "Vector catch (AArch32)",
-> > +	[ESR_ELx_EC_BRK64]		= "BRK (AArch64)",
-> > +};
-> 
-> There are a lot of AArch32-specific ECs here that you may not need.
-
-you are absolutely right. This was just a blind 1to1 copy. IMO they do
-not hurt but I can reduce 32 specific ones.
-
-FYI
-The code is not shared as I would have to spin up a whole sharing
-infrastructure to share this one defenition from arm kernel code.
+Thanks for looking into s390 code :) 
 
 	Steffen
+
