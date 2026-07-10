@@ -1,175 +1,109 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0DD3242B0
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 10:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A474B3ACA7E
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 11:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783680715; cv=none; b=VaYSwd3Exawa33ciLELUYKkH3/QBkCK8XQgxW8BNtNCy5iphCEzZy6fVaPDgyQ38mCqyPnauQapDyBUvRakz3TV4dtlLq8IHJV6d0wyD7Rw0yad2bq9fzjXUA21HmAFCR6zug126AhxbQpgbI9WLpB2tfk/vf3iJDeIrLBvjnZI=
+	t=1783682159; cv=none; b=Xe72fVFL4Zf8qw3D4HIubWD2SszJnszq/h73gPiaVAcisQSpbzfAHSMWyL/0m9zwQ6lotr+b4ARjjKN57B6t49x1ouQlq/tlFbsoaooTa80scA39YvtEgsFEevSNGee+QBgZpuLdyGurvlHN217jyS/aa/DN5Ah/PPAiLjJ9Wfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783680715; c=relaxed/simple;
-	bh=BOZ5ry/n+ZfBztT+fRHNB26u/OqM4NCUia4lwGUW3lI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0k2WQqVd9/7ARv+/I61dcGgw9LmGQtgfCuXX88PeraCV0FxCUbSMhB92ToaUcCOhZKVzncaBzk/R8IVudnHv9g7XskV8hij5ACnofmrWcZk9RF+eMDhE17JvUpm1Ioa2WDDQcgQvSxyjb1ol/iDVu29FS2S6lNhIFHGQts1TXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VGgz5mhB; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1783682159; c=relaxed/simple;
+	bh=hp0lEkOwUA4Gek6D7M1hRbpbu/V7WYaGYBv95FZV7oc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=CtPnJ43a1cG0wgJM5Dx7XyPhbvsz7z54k5xYnDQao5scwkIuKTN8fI6kx1Dfbn3Etb+SWNfVB+BZ/ls5bl8LnX69sR/HXJ6YKv2ZsBRExCgTQtH3iAxd5gtD6nqdnYkokWrGLPoKJxFVUirl6uCcvQm/cPaWbRFvrAu05l3cyuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=cypq5tmg reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VGgz5mhB"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66AAmijR1390824;
-	Fri, 10 Jul 2026 10:51:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=GOt9UTfd15E1bmXXOo8yVb8JvjAgMS
-	QeHBt96w88/lg=; b=VGgz5mhB7pvtkSg86KDe+v1YOa3KoxHi3E/EGNpgCrOWnv
-	J78KChO+feSW4mi7bI1gzXyww3UyP7xmvvnXuEgqMT/2BZfWuQowdtqFrZ9rFNq9
-	GgmbrROYOIBGs/DxNWAh38gJph/GSawOJRqVprobnf+Vg04sPvs8eSwJ5bAXHnNf
-	S/ybdW090VTMFsQZuXwgCdpKRgMM/qVVH7oC11aBrm7Zz6++ktN+RP9EW1YmwZtq
-	jvAugQTosYYTMwwVWveA1KnlYX7CwN/7a/6qaZJlyP7tG+RpwQaNunVZvCnu99KA
-	KXYJqMFaeSDYvFw5ispNdfTVpsir20v6brQ3Uyew==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6sur60nx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 10:51:43 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66AAo3xj021453;
-	Fri, 10 Jul 2026 10:51:42 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7f6yh8vu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 10:51:42 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66AApZCs42860824
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jul 2026 10:51:35 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7F31D2004D;
-	Fri, 10 Jul 2026 10:51:35 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A65D320043;
-	Fri, 10 Jul 2026 10:51:34 +0000 (GMT)
-Received: from osiris (unknown [9.87.147.219])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 10 Jul 2026 10:51:34 +0000 (GMT)
-Date: Fri, 10 Jul 2026 12:51:33 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 13/27] KVM: s390: Prepare KVM/s390 for a second KVM
- module
-Message-ID: <20260710105133.984749-G-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
- <20260706085229.979525-14-seiden@linux.ibm.com>
- <857debcd-3e44-4844-8abc-b26b892d3d7c@linux.ibm.com>
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="cypq5tmg"
+Received: from h183.csg.ci.i.u-tokyo.ac.jp (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 66ABEvsI024946
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 10 Jul 2026 20:15:10 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=pJjKbNakwtm0jMT04UBxbp6wN2PKOAbYt/K0ZhCrjUc=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=From:Message-Id:To:Subject:Date;
+        s=rs20250326; t=1783682110; v=1;
+        b=cypq5tmgi8sW1J1vY+7FX5yhIamwUYgJ8fnr/uY3GitaU8yixH4poE4ECyVNednC
+         CpQJaOhbEVn4aCzaqk4zNVeEHkOmedKuH0fSuSDr184wCx92thrc4vMugRvyuFr/
+         w8Pk/BRGggqeeSD6cdoTNEIVR4xONf3EhlvO2hr0lZ4x3AbbdZ3AR9Gpp5dVOsZn
+         nx/HgECEJtwZ4tx3Y7tefssdGAB7Em5FNfC5H5YOeudZ0PnlWw8WZM2gW9dE1nx1
+         mAlH8CoRhbOuyt7CpOxC2wkjp/tpBX8nHzJlWUiS0FJzoOX+9w9/lkgEEDrwjo4U
+         U6Ky2Ar/ayLG5jEEZiGl4A==
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Date: Fri, 10 Jul 2026 20:14:58 +0900
+Subject: [PATCH v8 04/11] arm64: errata: Require Apple IMPDEF PMUv3 traps
+ on all CPUs
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <857debcd-3e44-4844-8abc-b26b892d3d7c@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDEwNyBTYWx0ZWRfX4zdIBNagPqa0
- gow44HyeI+ZE8COEI5Df/iYOXHuCJZHcb65sFe2LS1k9gKhL162cEPMJaDdCVChbjTNslF2mUq6
- 1NmQG6QREOoqR4oJD+e9jaLSpJgxkKQ=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDEwNyBTYWx0ZWRfX/p7pRWT1fj/s
- ClwVNWbmThtrMJBs0xfC/3ZFJuLnVNHceKRH3C1gkMY7TiGhfi2I/QF4NcAaC7wLTpyDClyoH9N
- qtUkqRRpjrsUZZMlojOR5abFGV0XPs+GLXgw7Aso/biq2WVee6IevLjacQ0EDIEG+MUXMR6t434
- JbJbPHViwnhLYH5VLjsXR+XmwCRYB16J0Fmly4+kvMuPBNaDP2/IHggRKSiRfAZuH9U7xOrVY3I
- dilbbccVv7VU3lx2FjJV/EWStypteNLmI4/kjlR0v348gIoyxSYh/U0Hqyq2gXsNe/fyBCS5IzD
- v5wqoql9nZTVu0lD3u6pjwflNCfMgN2lwLvTFpeGvZAELe0scRyGKdcNYWB+jEWE95jTB3iQiiF
- DuD7Sc09/A9B7nl7jKHFfwv9U619+ci94kxyLi4LWllHr44zEQBvIlIZ50AHSsFOE9SF4dcUQsX
- 6KBTc5p/RjvU85QinUg==
-X-Proofpoint-GUID: vSk_p_zZRro3pgiNR5436sG61bZennMI
-X-Authority-Analysis: v=2.4 cv=Oot/DS/t c=1 sm=1 tr=0 ts=6a50cebf cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=YB9r6mRHUy78XhmW5L8A:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: vSk_p_zZRro3pgiNR5436sG61bZennMI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-10_03,2026-07-09_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
- malwarescore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100107
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260710-hybrid-v8-4-621409f3a592@rsg.ci.i.u-tokyo.ac.jp>
+References: <20260710-hybrid-v8-0-621409f3a592@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20260710-hybrid-v8-0-621409f3a592@rsg.ci.i.u-tokyo.ac.jp>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+X-Mailer: b4 0.16-dev-925f5
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1261;
+ i=odaki@rsg.ci.i.u-tokyo.ac.jp; h=from:subject:message-id;
+ bh=hp0lEkOwUA4Gek6D7M1hRbpbu/V7WYaGYBv95FZV7oc=;
+ b=owGbwMvMwCWmMbc20y1CyJDxtFoSQ1bAFbMHm2WVY578mzc1ruRV9qK3tZ7tuz6LBAXcKpZ5c
+ PX4uvJbHaUsDGJcDLJiiiwpRbu5NaJrPxUmxLfAzGFlAhnCwMUpABOJtmVk+DWtN10kdo3lwx0B
+ f+4c3f7++GrhIzwq9ez/du/89cbvGzMjQ8OutReeTvjbPzeOpbnvdNtddZ9Em+enI33lObbyFwY
+ bsgAA
+X-Developer-Key: i=odaki@rsg.ci.i.u-tokyo.ac.jp; a=openpgp;
+ fpr=AEDC03C9AF734F2EC26A7BFFA4BAEAA73536753C
 
-On Fri, Jul 10, 2026 at 11:22:29AM +0200, Christian Borntraeger wrote:
-> 
-> 
-> Am 06.07.26 um 10:52 schrieb Steffen Eiden:
-> > Lay the groundwork for a second KVM module. Guard KVM/s390 behind the
-> > KVM_S390 config and turn CONFIG_KVM on if selected. Move all the
-> > kvm_host definitions to _s390 postfixed headers. Prepare local header
-> > include guards for a new location. Move gamp related tracing into a
-> > separate file. While at it, rename the main KVM/s390 files from
-> > s390-kvm.{c,h} to just s390.{c,h} to match the naming scheme of other
-> > architectures.
-> > 
-> > No functional change.
-> 
-> [...]
-> >   arch/s390/include/asm/kvm_host.h              | 774 +-----------------
-> >   .../asm/{kvm_host.h => kvm_host_s390.h}       |   6 +-
-> >   arch/s390/include/asm/kvm_host_types.h        | 347 +-------
-> [...]
-> >   copy arch/s390/include/asm/{kvm_host.h => kvm_host_s390.h} (99%)
-> >   copy arch/s390/include/asm/{kvm_host_types.h => kvm_host_s390_types.h} (98%)
-> This is just an "almost" rename only in the end. Maybe we can convince git to show a better diffstat to reflect that?
-> 
+KVM relies on ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS as a system-wide
+precondition for PMUv3 emulation on affected Apple CPUs. A local CPU
+erratum is too weak for that: once the workaround is enabled, a late CPU
+that misses it may still be onlined.
 
-The rename only part worked quite well (6 lined diff). I used
---find-copies / --break-rewrites with format-patch when creating this
-patchfile to reduce the diff. Otherwhise we get a diff like: 
+Make the workaround an all-early-CPU capability instead. The matcher is
+still local because it depends on MIDR_EL1, but the capability is only
+advertised if all early CPUs match, and late CPUs that miss it are
+rejected once the capability is enabled.
 
-...
- arch/s390/include/asm/kvm_host.h            | 774 +------------------
- arch/s390/include/asm/kvm_host_s390.h       | 778 ++++++++++++++++++++
- arch/s390/include/asm/kvm_host_s390_types.h | 347 +++++++++
- arch/s390/include/asm/kvm_host_types.h      | 347 +--------
-...
+Assisted-by: Codex:gpt-5.5
+Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+---
+ arch/arm64/kernel/cpu_errata.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Which I think is more confusing and bloats the diff unessecary.
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 476a37c82108..14ce49d693c4 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -964,7 +964,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 	{
+ 		.desc = "Apple IMPDEF PMUv3 Traps",
+ 		.capability = ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
+-		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
++		.type = ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
+ 		.matches = has_impdef_pmuv3,
+ 		.cpu_enable = cpu_enable_impdef_pmuv3_traps,
+ 	},
 
-But I cannot find an option to convince git that kvm_host.h should be
-treated as a new file. This problem seems to be out of scope for gits
-heuristics.
+-- 
+2.55.0
 
-The only way to get this smaller is to split up the patch but then the
-first of the two patches will not compile.
-
-> In any case, I guess we can handle patch 13 and patch 14 pretty soon upfront so that the patch series gets smaller and is easier to review.
-
-yes +1.
-I would argue that the gmap refactorings (PATCH 15-17) can get handled upfront as
-well. They also have no functional changes as well.
-
-FYI: I made some smaller cleanups on those refactrrings since monday.
-
-	Steffen
