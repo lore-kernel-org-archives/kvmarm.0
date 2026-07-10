@@ -1,46 +1,88 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF9C40D588
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 10:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0DD3242B0
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 10:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783680263; cv=none; b=M2ZorIz7/vOMvQCWU8gL7CR+65NU4KlQ11aqnsIQcdx0Bci7eRKqNIRKbz/gom13oV2ZQNQkEl9Buz/TLmTAbVUblbaWFikm9PYpJ9GAGWvExzNRpQGXOziYUA5wVIlR5oFiOyqUZ8vCFJ+YHsaq5cvQvOAsx7IAz1VLwHqbczg=
+	t=1783680715; cv=none; b=VaYSwd3Exawa33ciLELUYKkH3/QBkCK8XQgxW8BNtNCy5iphCEzZy6fVaPDgyQ38mCqyPnauQapDyBUvRakz3TV4dtlLq8IHJV6d0wyD7Rw0yad2bq9fzjXUA21HmAFCR6zug126AhxbQpgbI9WLpB2tfk/vf3iJDeIrLBvjnZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783680263; c=relaxed/simple;
-	bh=8Cx8untwN/qp2iJnkWjwQ3VQrhGq5Urk0jCglcMue34=;
+	s=arc-20240116; t=1783680715; c=relaxed/simple;
+	bh=BOZ5ry/n+ZfBztT+fRHNB26u/OqM4NCUia4lwGUW3lI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LgUOhZ40EHURT4iADNyz7fnWLtmmm30JpDSv4iiFe1d2KiH0x4Tto8nFRYwtyml/bKWiSKnRkzKg0xGWZ2jle2gelbGVUT3J0n8kaVnU3Dj45NbxNpwFYg/cqXU/V8DmioiGcfOmlQAgO3ggrjNo4REc9Nej/KbG2N2u6tDAF4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mLfdPwvS; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=F0k2WQqVd9/7ARv+/I61dcGgw9LmGQtgfCuXX88PeraCV0FxCUbSMhB92ToaUcCOhZKVzncaBzk/R8IVudnHv9g7XskV8hij5ACnofmrWcZk9RF+eMDhE17JvUpm1Ioa2WDDQcgQvSxyjb1ol/iDVu29FS2S6lNhIFHGQts1TXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VGgz5mhB; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mLfdPwvS"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87C091E7D;
-	Fri, 10 Jul 2026 03:44:15 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 058183F66F;
-	Fri, 10 Jul 2026 03:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783680259; bh=8Cx8untwN/qp2iJnkWjwQ3VQrhGq5Urk0jCglcMue34=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mLfdPwvSDhrSyU6GwZeSZO+Uv39kY/Tl12drVJXc/D2jqFNEh4KsnIUA0qMfJdEmN
-	 PNSH1a2j7hfgZw2vAVz2270PtcdqX/Dqa3TCMqCn+5IS9DgMDq/o24Bq7RLnCLA8OH
-	 o+IXMHjWNLdLKE0zoclOvkQBt/GXPCvmdPSjBBUM=
-Date: Fri, 10 Jul 2026 11:44:15 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-	kvm@vger.kernel.org, david.hildenbrand@arm.com, maz@kernel.org,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, fuad.tabba@linux.dev, mark.rutland@arm.com
-Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only
- memslots
-Message-ID: <alDM_yikef16lC5h@raptor>
-References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <akxOrMnlNga-vtQv@google.com>
- <ak0wSQ1133O7B96D@raptor>
- <alAFmiAsNf6Xm49_@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VGgz5mhB"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66AAmijR1390824;
+	Fri, 10 Jul 2026 10:51:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=GOt9UTfd15E1bmXXOo8yVb8JvjAgMS
+	QeHBt96w88/lg=; b=VGgz5mhB7pvtkSg86KDe+v1YOa3KoxHi3E/EGNpgCrOWnv
+	J78KChO+feSW4mi7bI1gzXyww3UyP7xmvvnXuEgqMT/2BZfWuQowdtqFrZ9rFNq9
+	GgmbrROYOIBGs/DxNWAh38gJph/GSawOJRqVprobnf+Vg04sPvs8eSwJ5bAXHnNf
+	S/ybdW090VTMFsQZuXwgCdpKRgMM/qVVH7oC11aBrm7Zz6++ktN+RP9EW1YmwZtq
+	jvAugQTosYYTMwwVWveA1KnlYX7CwN/7a/6qaZJlyP7tG+RpwQaNunVZvCnu99KA
+	KXYJqMFaeSDYvFw5ispNdfTVpsir20v6brQ3Uyew==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6sur60nx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jul 2026 10:51:43 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66AAo3xj021453;
+	Fri, 10 Jul 2026 10:51:42 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7f6yh8vu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jul 2026 10:51:42 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66AApZCs42860824
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Jul 2026 10:51:35 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7F31D2004D;
+	Fri, 10 Jul 2026 10:51:35 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A65D320043;
+	Fri, 10 Jul 2026 10:51:34 +0000 (GMT)
+Received: from osiris (unknown [9.87.147.219])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 10 Jul 2026 10:51:34 +0000 (GMT)
+Date: Fri, 10 Jul 2026 12:51:33 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 13/27] KVM: s390: Prepare KVM/s390 for a second KVM
+ module
+Message-ID: <20260710105133.984749-G-seiden@linux.ibm.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+ <20260706085229.979525-14-seiden@linux.ibm.com>
+ <857debcd-3e44-4844-8abc-b26b892d3d7c@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,93 +91,85 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alAFmiAsNf6Xm49_@kernel.org>
+In-Reply-To: <857debcd-3e44-4844-8abc-b26b892d3d7c@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDEwNyBTYWx0ZWRfX4zdIBNagPqa0
+ gow44HyeI+ZE8COEI5Df/iYOXHuCJZHcb65sFe2LS1k9gKhL162cEPMJaDdCVChbjTNslF2mUq6
+ 1NmQG6QREOoqR4oJD+e9jaLSpJgxkKQ=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDEwNyBTYWx0ZWRfX/p7pRWT1fj/s
+ ClwVNWbmThtrMJBs0xfC/3ZFJuLnVNHceKRH3C1gkMY7TiGhfi2I/QF4NcAaC7wLTpyDClyoH9N
+ qtUkqRRpjrsUZZMlojOR5abFGV0XPs+GLXgw7Aso/biq2WVee6IevLjacQ0EDIEG+MUXMR6t434
+ JbJbPHViwnhLYH5VLjsXR+XmwCRYB16J0Fmly4+kvMuPBNaDP2/IHggRKSiRfAZuH9U7xOrVY3I
+ dilbbccVv7VU3lx2FjJV/EWStypteNLmI4/kjlR0v348gIoyxSYh/U0Hqyq2gXsNe/fyBCS5IzD
+ v5wqoql9nZTVu0lD3u6pjwflNCfMgN2lwLvTFpeGvZAELe0scRyGKdcNYWB+jEWE95jTB3iQiiF
+ DuD7Sc09/A9B7nl7jKHFfwv9U619+ci94kxyLi4LWllHr44zEQBvIlIZ50AHSsFOE9SF4dcUQsX
+ 6KBTc5p/RjvU85QinUg==
+X-Proofpoint-GUID: vSk_p_zZRro3pgiNR5436sG61bZennMI
+X-Authority-Analysis: v=2.4 cv=Oot/DS/t c=1 sm=1 tr=0 ts=6a50cebf cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=YB9r6mRHUy78XhmW5L8A:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: vSk_p_zZRro3pgiNR5436sG61bZennMI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-10_03,2026-07-09_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100107
 
-Hi Oliver,
-
-On Thu, Jul 09, 2026 at 01:33:30PM -0700, Oliver Upton wrote:
-> On Tue, Jul 07, 2026 at 05:58:49PM +0100, Alexandru Elisei wrote:
-> > Hi Sean,
-> > 
-> > On Mon, Jul 06, 2026 at 05:56:12PM -0700, Sean Christopherson wrote:
-> > > On Thu, Jul 02, 2026, Alexandru Elisei wrote:
-> > > > The memory represented by guest_memfd-only memslots
-> > > > (kvm_memslot_is_gmem_only() is true) is shared with userspace, which can
-> > > > freely mmap it and access it. The only thing that is preventing dirty page
-> > > > logging for such memslots is that KVM doesn't allow slots backed by
-> > > > guest_memfd to have their flags changed; they can only be created and
-> > > > deleted.
-> > > 
-> > > Please (publicly) document *why*  you want to add dirty-logging support.  It's
-> > > all but impossible to review new uAPI without knowing the use case.
-> > 
-> > Of course, my mistake, I was so deep in this that I didn't realise that
-> > there might be different perspectives.
-> > 
-> > My thinking was that since guest_memfd created with GUEST_MEMFD_FLAG_MMAP +
-> > GUEST_MEMFD_FLAG_INIT_SHARED is extremely similar from a userspace point of
-> > view to using an anonymous file (created with memfd_create()), that
-> > supporting dirty page logging and migration would be a natural next step
-> > and would expand the usefulness of guest_memfd. It has nothing to do with
-> > confidential compute.
-> > 
-> > As to why I'm working on it now, it's because of an arm64 feature that
-> > requires that memory remains mapped at stage 2, called Statistical
-> > Profiling Extension (SPE), similar to Intel's PEBS or AMD's IBS. Exposing
-> > the feature to a guest requires that memory remains mapped at stage 2
-> > outside of userspace explicitely unmapping it, and guest_memfd, with the
-> > patch to ignore the MMU notifiers [1], has this property.  I wanted to
-> > expand the functionality of guest_memfd to support migration of virtual
-> > machines when that arm64 feature is exposed to guests.
+On Fri, Jul 10, 2026 at 11:22:29AM +0200, Christian Borntraeger wrote:
 > 
-> Can you please expand a bit on how you actually expect dirty tracking to
-> work with SPE? Taking write permission faults seem to be at odds with
-> "thou shalt not fault".
-
-For the initial posting on the mailing list, my approach was to keep things
-as simple as possible: allow memory to be made read-only and then have the
-host map the memory as writable at stage 2 when SPE reports a permission
-fault, if the buffer happens to be enabled while dirty page logging is also
-enabled. Of course, that means that the quality of the profiling data might
-be degraded. I was planning to point this out, to start a discussion about
-it, but we can talk about it now.
-
-Another approach that builds on that, which I have prototyped locally, is
-to have a VCPU exit to userspace when/if the buffer is enabled and there is
-at least one memslot with dirty page logging enabled (with a specific
-hardware_exit_reason) and then let userspace decide what to do: resume the
-VCPU and live with the blackout window, or keep the VCPU stopped, and the
-guest gets non-degraded profiling data as the expense of the VCPU making
-progress. My hope is that if migration is fast enough, the VCPU not running
-for (possibly) the entire duration of the migration process won't be
-noticeable, but I might be naive in thinking that.
-
 > 
-> Seems to me like you'd need hardware dirty state and the "noabort"
-> flavor of BBML2 to actually get things down to page mappings. Oh, and an
-> SPE implementation that actually respects write permissions... Is there
-> even an implementation out there where the stars align?
-
-According to the Neoverse v3 errata document (MP168), r0p0 is affected,
-r0p1 is not affected. A quick google search revealed that Microsoft's
-Cobalt 200 CPU is based on Neoverse v3, same for the Arm AGI CPU. Wikipedia
-also says that Graviton 5 is based on Neoverse v3. Don't know the exact
-revision though, for either of them.
-
-I was planning to add a kernel parameter that permits SPE on the affected
-parts, so people who trust their guests* can still use it from a VM. I
-don't think migration would be possible in this case because SPE bypasses
-the read-only permission at stage 2, and the host would not know to mark
-that memory as dirty (for dirty page logging).
-
-* Ignoring migration, guest_memfd is always mapped as writable at stage 2,
-so a guest would have to point the buffer at memory that KVM represents
-with a KVM_MEM_READONLY memslot, like the CFI flash device used by EDK2.
-
+> Am 06.07.26 um 10:52 schrieb Steffen Eiden:
+> > Lay the groundwork for a second KVM module. Guard KVM/s390 behind the
+> > KVM_S390 config and turn CONFIG_KVM on if selected. Move all the
+> > kvm_host definitions to _s390 postfixed headers. Prepare local header
+> > include guards for a new location. Move gamp related tracing into a
+> > separate file. While at it, rename the main KVM/s390 files from
+> > s390-kvm.{c,h} to just s390.{c,h} to match the naming scheme of other
+> > architectures.
+> > 
+> > No functional change.
 > 
-> Fixing rotten architecture would be a more appropriate starting point :-/
+> [...]
+> >   arch/s390/include/asm/kvm_host.h              | 774 +-----------------
+> >   .../asm/{kvm_host.h => kvm_host_s390.h}       |   6 +-
+> >   arch/s390/include/asm/kvm_host_types.h        | 347 +-------
+> [...]
+> >   copy arch/s390/include/asm/{kvm_host.h => kvm_host_s390.h} (99%)
+> >   copy arch/s390/include/asm/{kvm_host_types.h => kvm_host_s390_types.h} (98%)
+> This is just an "almost" rename only in the end. Maybe we can convince git to show a better diffstat to reflect that?
+> 
 
-I like to think that the architecture is constantly improving :)
+The rename only part worked quite well (6 lined diff). I used
+--find-copies / --break-rewrites with format-patch when creating this
+patchfile to reduce the diff. Otherwhise we get a diff like: 
 
-Thanks,
-Alex
+...
+ arch/s390/include/asm/kvm_host.h            | 774 +------------------
+ arch/s390/include/asm/kvm_host_s390.h       | 778 ++++++++++++++++++++
+ arch/s390/include/asm/kvm_host_s390_types.h | 347 +++++++++
+ arch/s390/include/asm/kvm_host_types.h      | 347 +--------
+...
+
+Which I think is more confusing and bloats the diff unessecary.
+
+But I cannot find an option to convince git that kvm_host.h should be
+treated as a new file. This problem seems to be out of scope for gits
+heuristics.
+
+The only way to get this smaller is to split up the patch but then the
+first of the two patches will not compile.
+
+> In any case, I guess we can handle patch 13 and patch 14 pretty soon upfront so that the patch series gets smaller and is easier to review.
+
+yes +1.
+I would argue that the gmap refactorings (PATCH 15-17) can get handled upfront as
+well. They also have no functional changes as well.
+
+FYI: I made some smaller cleanups on those refactrrings since monday.
+
+	Steffen
