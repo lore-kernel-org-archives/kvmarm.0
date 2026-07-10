@@ -1,204 +1,142 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC1B37AA97
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 08:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B803D88F0
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 08:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783673454; cv=none; b=iXYmUt3BsygXUfZsb4Hs2ZAdNte7oCK7n3Lmb7xWUMaVAOL8qnSa24RWhxYKQyIISufbgdZkfOV8/+5Rf9aES4ADaU1+UpkHEv3fpcF4qr6n9qVgXd2tVu1fEM4YbNJs1jE8jvY9a9eoG9ns+SeUofKzQyTBzygGGeZEwOY89Bo=
+	t=1783673710; cv=none; b=WEvgnQLQE4RFyc1Qv3lPhKyCJAWp1zSgIndlEJRjG1V1y2caCwIVdNHSMI4JoghNML62JNC4tgIlROskzXTPPfsN/nVB320/6IN0el5XJL/fEVeCgPf+HOx0eEygb8OqLs1XoWkntqcb9kaRyoT3aU9/OJaeKri56ExNT53sxuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783673454; c=relaxed/simple;
-	bh=531uqzE4LNSGQaQzGZp72+k4OWpnOWwrASTrhirbtnM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=FJ7yMOND7ZZ32GByATPn2ny5fOlbeIguPYfR/SLXu0QYNkmJjZy1KniaxryL7yDZP+Q+vSAxXt0pMr1Gb4csNrYrtHKTs2e8t9D+KHfg90jEhONukCpGxt8R9sfa1XK4Wf0BRGyu+vfiqUWdAE2fXdNipG6BV8uGELtY0dGx6L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VbknYlqK; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1783673710; c=relaxed/simple;
+	bh=im0MWpiIh7M6OR8CRP5a/qSQGEmTtNGNI0QhiTxgcII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CiMy3ZfQH7h/uvP0ngUfWFHKCNxO/WtwVKi9r+PybUDk+xy3vWT6JyenawUiCBSsHnx19Nvwlu3ginC57oT+TZ7YJvfL27yZgYu9Ls4ezyWhLCDAVTPcgt1hfDzi1uiZ5t2eC/bPJAOeYDVQ9o2Dt25s6IDgL3mbwMUu7jYuEtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=evyLDqua; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VbknYlqK"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="evyLDqua"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A7masZ605539;
+	Fri, 10 Jul 2026 08:54:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=PT5zAyfYZGqrjZ4d9dNVpiOgJ/2Bhf
+	KmMzH9KYHUPCs=; b=evyLDquaWgbDutRXRl7/XsG6iNMUnmOMIZN5YrvXlwKrYN
+	CDJCH8PwqntSSmkeWWiSY5NA6rSpT2vFaVzwIfLyecRZQdMuEpUgZY0+UqkJg0mZ
+	6NUmTjfNgWR1LaxOM+AguEmQ7bXFFJcN4J52fLGs11NS3XmHnsoP2fmeZRX4/PBZ
+	QCmFpL+5s0s2Zg8DGg86RPRbNSC7KZUVNpgbnOZp1UpG0ATQTPVkojg7Gjv5wFnB
+	CUFtVGuHSEKUAS9j+Vd+dlhZfIS3VLPzaPhjsMvXUmrCetkPorj/bhnfpK91ef4X
+	W2zp/g1/6RHhQOCCii4+cVEN0ZGiRfFbQLsTaL7w==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6qknw70r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jul 2026 08:54:52 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66A8ngsj025443;
+	Fri, 10 Jul 2026 08:54:51 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7f6ygvjr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jul 2026 08:54:51 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66A8sink12321080
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Jul 2026 08:54:45 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DB6FD20040;
+	Fri, 10 Jul 2026 08:54:44 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 08E822004D;
+	Fri, 10 Jul 2026 08:54:44 +0000 (GMT)
+Received: from osiris (unknown [9.87.147.219])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 10 Jul 2026 08:54:43 +0000 (GMT)
+Date: Fri, 10 Jul 2026 10:54:42 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 05/27] KVM: Remove KVM_MMIO as config option
+Message-ID: <20260710085442.984749-E-seiden@linux.ibm.com>
+References: <20260706085229.979525-1-seiden@linux.ibm.com>
+ <20260706085229.979525-6-seiden@linux.ibm.com>
+ <87a4s37scc.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783673449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=speNZ5kxqcfvumuAgKlguzjeDrPs0cEQRv6glMz1oGY=;
-	b=VbknYlqKj+XeIwzbMFqz18KoTCbiahRLIUVGMfOYwRvwWQDGfJDqU13WBtB/ZEsWkuWtpf
-	LVp/piuHvqgAGyy/krjeq3Z0CfZpSJGS5hLhzUS23o4QaH1h9OySlwj9sRNCmz9Mjw5s8I
-	WN1kk+gEuGno4d9AStWzQ1C6uj+gB+k=
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 10 Jul 2026 08:50:25 +0000
-Message-Id: <DJURGJEHZHFY.3SINJIME8E9RB@linux.dev>
-Cc: "Ackerley Tng" <ackerleytng@google.com>, "Takahiro Itazuri"
- <itazur@amazon.com>, <fvdl@google.com>, <ljs@kernel.org>,
- <Liam.Howlett@oracle.com>, <agordeev@linux.ibm.com>,
- <ajones@ventanamicro.com>, <akpm@linux-foundation.org>, <alex@ghiti.fr>,
- <andrii@kernel.org>, <aou@eecs.berkeley.edu>, <ast@kernel.org>,
- <baolu.lu@linux.intel.com>, <bp@alien8.de>, <chenhuacai@kernel.org>,
- <corbet@lwn.net>, <coxu@redhat.com>, <daniel@iogearbox.net>,
- <dave.hansen@linux.intel.com>, <david@kernel.org>, <derekmn@amazon.com>,
- <dev.jain@arm.com>, <eddyz87@gmail.com>, <gerald.schaefer@linux.ibm.com>,
- <gor@linux.ibm.com>, <haoluo@google.com>, <hca@linux.ibm.com>,
- <hpa@zytor.com>, <itazur@amazon.co.uk>, <jackabt@amazon.co.uk>,
- <jackmanb@google.com>, <jannh@google.com>, <jgg@ziepe.ca>,
- <jgross@suse.com>, <jhubbard@nvidia.com>, <jiayuan.chen@shopee.com>,
- <jmattson@google.com>, <joey.gouly@arm.com>, <john.fastabend@gmail.com>,
- <jolsa@kernel.org>, <jthoughton@google.com>, <kpsingh@kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <lenb@kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
- <lorenzo.stoakes@oracle.com>, <luto@kernel.org>, <maobibo@loongson.cn>,
- <martin.lau@linux.dev>, <maz@kernel.org>, <mhocko@suse.com>,
- <mingo@redhat.com>, <mlevitsk@redhat.com>, <nikita.kalyazin@linux.dev>,
- <oupton@kernel.org>, <palmer@dabbelt.com>, <patrick.roy@linux.dev>,
- <pavel@kernel.org>, <pbonzini@redhat.com>, <peterx@redhat.com>,
- <peterz@infradead.org>, <pfalcato@suse.de>, <pjw@kernel.org>,
- <prsampat@amd.com>, <rafael@kernel.org>, <riel@surriel.com>,
- <rppt@kernel.org>, <ryan.roberts@arm.com>, <sdf@fomichev.me>,
- <shijie@os.amperecomputing.com>, <skhan@linuxfoundation.org>,
- <song@kernel.org>, <surenb@google.com>, <suzuki.poulose@arm.com>,
- <svens@linux.ibm.com>, <tabba@google.com>, <tglx@kernel.org>,
- <thuth@redhat.com>, <urezki@gmail.com>, <vannapurve@google.com>,
- <vbabka@kernel.org>, <will@kernel.org>, <willy@infradead.org>,
- <wu.fei9@sanechips.com.cn>, <x86@kernel.org>,
- <yang@os.amperecomputing.com>, <yangyicong@hisilicon.com>,
- <yonghong.song@linux.dev>, <yosry@kernel.org>, <yu-cheng.yu@intel.com>,
- <yuzenghui@huawei.com>, <zhengqi.arch@bytedance.com>, <zulinx86@gmai.com>
-Subject: Re: [PATCH v12 10/16] KVM: guest_memfd: Add flag to remove from
- direct map
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Brendan Jackman" <brendan.jackman@linux.dev>
-To: "Sean Christopherson" <seanjc@google.com>, "Brendan Jackman"
- <brendan.jackman@linux.dev>
-References: <CAPTztWb67XZvfcMVnbegDNNW0LJa9UsaTGx3M898xJUJrekk0w@mail.gmail.com> <20260508081812.12345-1-itazur@amazon.com> <CAEvNRgG07EMrx-SpMaO3gHmdGVwOb75XNy7_RARBo0chidn7Yg@mail.gmail.com> <DJP40SEE38XA.3BXJN4U0VDIOS@linux.dev> <akw1lZDEv8_Ub1zQ@google.com>
-In-Reply-To: <akw1lZDEv8_Ub1zQ@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a4s37scc.wl-maz@kernel.org>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Q/XiJY2a c=1 sm=1 tr=0 ts=6a50b35c cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
+ a=9pq-tb42-J4kxd0kViUA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: wM388sXXjnjG4_TIOd2ildNFbThmqmSd
+X-Proofpoint-ORIG-GUID: wM388sXXjnjG4_TIOd2ildNFbThmqmSd
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA4NSBTYWx0ZWRfXxGXLvy3r34pv
+ 2y3rXeOF17UYrpTG1ZMCkfV+BaHFzFD97Qu+UJoguBttolXd/3SdBkI3dtFYW1gi9hsAr/6b+Ou
+ 6ppDN13fVX0ETlOUQQlHey/Isj23Jk0=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA4NSBTYWx0ZWRfX3CFc8mLUo+4u
+ CIYnQElsV3jjWye2hGYjlrMeeLPTvVgLyjSb7KwYSsEc4mE5GvP28T0ObIxEPQ90bOpDcnNvJox
+ IvT2tGBZQiqPu90wCVjhGTpTE0oxdZML6bcTbd1Png+6TvbUuVJRJXc6fBghjx3xRlDIY+N6ajE
+ 0pS6iPYow7kzyjq7FaCZ87RO6zAMaq5duZgDd20bBNyGmLZKSj89yzsKWjwYXSnnDtBeprqQlAe
+ wFDQDDWEYaw1U/aPxtjVjQMK91Kq0Esiy9UqBBFJh8GvhFArW++x6nsyEHpkulsaGtpYfhv/9JE
+ WYY5baWDCUYDpnOtjZDD+InFgnkteq2kVj9DMnWP3KDJf6mp4wB0GwK2OXg/lSgjfcxpqw5DRLp
+ EedaSKfiOVE/jEzH9Z5oU9y5YtCDRRF15Em/72dmPHFEnZpt8tAThxGrBU+tIr9lXMqc/Rd52B3
+ J0XD42UBOQrx8e4SWlg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-10_02,2026-07-09_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0 spamscore=0 phishscore=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100085
 
-On Mon Jul 6, 2026 at 11:09 PM UTC, Sean Christopherson wrote:
-> On Fri, Jul 03, 2026, Brendan Jackman wrote:
->> There are also the fault paths though; if the pages are nonpresent in
->> the direct map for the duration of their life in the page cache (and I
->> think they should be) then by the time we get to
->> kvm_mmu_faultin_pfn_gmem() or kvm_gmem_fault_user_mapping() we lost the
->> ability to zero them.
->>=20
->> My original answer for this was "that's fine, we'll use __GFP_ZERO
->> (which will probably use the mermap under the hood)", but now I've
->> realised there's a good reason we don't set __GFP_ZERO at the moment,
->> namely that it's wasted if we end up doing kvm_gmem_populate()
->
-> Eh, don't worry about the wasted cycles for populate().  The overhead of =
-zeroing
-> a page is dwarfed by the overhead of adding (and in most cases, measuring=
-) the
-> page.
->
-> We (KVM folks) discussed this in the context of in-place conversions, and=
- long
-> story short, the consensus is that shaving cycles by eliding the zeroing =
-in the
-> host isn't worth the complexity.
+On Mon, Jul 06, 2026 at 09:53:23PM +0100, Marc Zyngier wrote:
+> On Mon, 06 Jul 2026 09:52:05 +0100,
+> Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > 
+> > Defining KVM_MMIO is not flexible enough for multi-KVM systems with
+> > different Kconfig options regarding KVM_MMIO. Therefore, remove KVM_MMIO
+> > from the config space and use the macro HAVE_KVM_MMIO instead.
+> >
+> 
+> Given that there is only one KVM architecture that doesn't use
+> KVM_MMIO, it feels like the polarity of this symbol is the wrong way
+> around.
+> 
+> Something like KVM_NO_MMIO, only exposed by S390 for its native
+> support, should significantly reduce the churn.
 
-OK thanks, this is useful. Nonetheless because it leads to a less
-confusing dishgn, I think it still makes sense to just disallow
-__GFP_ZERO for the unmapped pages.=20
+Makes sense. I'll add KVM_NO_MMIO and conitionally compile based on the
+config and not havng this symbol
 
-(At least, at the page allocator level. We might want to allow it in
-address_space.gfp_mask or something and have filemap.c deal with it.
-But, overloading a GFP flag like this is yucky, if we need a flag for
-that I think it's likely neater to make it an AS_ flag or something).
-
->> (Continued below...)
->>=20
->> > I'm a little bit uncomfortable this statement since it seems to say TD=
-X
->> > and SNP aren't taken care of. Would just like to discuss (for
->> > a line of sight to SNP and TDX support):
->>=20
->> Are you saying we need NO_DIRECT_MAP support for TDX/SNP? I think that
->> would be doable but what's the value?
->
-> Hardening against consumption of shared memory?  Yes, the guest has expli=
-citly
-> shared the memory so there are (very) reduced expectations around confide=
-ntiality
-> and integrity, but defense in depth and all that.
-
-Ah yeah, it did not occur to me that there was memory being set up via
-CoCo paths that is not encrypted. So yeah that makes perfect sense.
-Eventually we'll want to be able to lean on this to protect that shared
-memory against attacks by other VMs etc.
-
-> For me, the main thing is that I don't want to completely punt on the int=
-eraction
-> of the two things, and end up with an unworkable mess if there's ever a s=
-trong
-> reason for CoCo VMs to support NO_DIRECT_MAP.
-
-Yeah that makes sense.
-
->> So that we can get a #PF instead of #MCE if we screw up?
->
-> Note, SNP gets a #PF either way.
->
->> NOW, the thing I'm stuck on (again lol) is the patchset-fu. Here's all
->> the parts we need, with dependencies indented:
->>=20
->> 0. efficient GUEST_MEMFD_FLAG_NO_DIRECT_MAP
->>   1. AS_NO_DIRECT_MAP
->>     2. ALLOC_UNMAPPED (formerly known as __GFP_UNMAPPED)
->>       3. alloc_flags arg to the page allocator (I'm sneakily introducing=
- this
->>          in [1])
->>       4. freetype_t=20
->>   5. The mermap
->>     6. The mm-local region
->>=20
->> I originally posted all of those in [0], except part 3. Doing all of
->> that together in one series would be a bit too much though. Approaches I
->> can see to avoid that:
->>=20
->> Approach X:
->> - Do parts 1, 2 and 4 as a standalone series. The only beneficiary of
->>   AS_NO_DIRECT_MAP would be secretmem.=20
->> - Then another series that fills in 0, 5 and 6.
->>=20
->> Approach Y:
->> - One series that does parts 0, 1, 5, and 6. AS_NO_DIRECT_MAP is
->>   implemented by having filemap.c itself call folio_zap_direct_map(),
->>   then guest_memfd.c zeroes it via the mermap. It works but it's really
->>   slow.
->> - Then another series that fills in parts 2 and 4, switches filemap.c
->>   over from manual folio_zap_direct_map() to ALLOC_UNMAPPED, making
->>   things fast.
->>=20
->> Approach X seems natural from a code progression perspective but leaves
->> us with an interim phase where we have a bunch of complexity just to
->> "optimise secretmem" which nobody cares about.
->>=20
->> Approach Y seems natural from a feature progression perspective but
->> leaves us with an interim phase where we expensively zap a page, only to
->> then immediately do this complex mermap dance to access it right
->> afterwards.
->>=20
->> Any thoughts / other ideas? Personally I think I prefer X.
->
-> I don't have preference between those options, mostly because I don't app=
-reciate
-> the difference.  My overarching preference is to separate the mm/ work fr=
-om the
-> guest_memfd as much as possible.  Beyond that, I probably don't care all =
-that much?
-
-Cool thanks, shrugs are fine here.=20
-
-Main thing I'm trying to do here is generate some awareness that the
-decision is being made, so that I don't forge ahead with X and then have
-people going "ugh, why haven't you considered Y?" If nobody cares either
-way then nothing to worry about.
+	Steffen
