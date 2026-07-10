@@ -1,111 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5814138B14C;
-	Fri, 10 Jul 2026 22:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F3137CD3A
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jul 2026 22:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783722869; cv=none; b=kP0H1VF0+vyehVCcl4GzyljU6sOYYX9hVQmbxcN/jQW6kDRu+8agcOuDKdfPYUOeIFe+uJSqacU2juIdhjvJW9SCjyRqExJPr8N6aso7SOoYWsx2QKDmlmibA9VlZNh9fLLpS8BPW1O2Mw8n3adEeWhuz4OhNfpm86nDTRevdaI=
+	t=1783723039; cv=none; b=XjOKafXVvJOQoyyJpsL5JOw98mj1pWtrIAVB0W+5RLpTgGAllzwDkZ2QrIq5wP+0xf5Ag1huDUK29yhF7FmSzmfZqlbaMYSxn+SYXY3FGWqVOoBwiVpLxnEtCIV6bZlPQSMxEv6RsCTlK0HPtejlRsTUB/VnK7NiOLkzIHZcJYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783722869; c=relaxed/simple;
-	bh=UpbED6+qrQeMPVk+gAlO9b9C3AZpm3xQqIjhhHsi8H4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oq9CifAyJsn69ILlEBo1kx5Ut/dCihL6ADuTy2l3WgWH4z+YRPhRuwO2BjEMtD8UYcwOTny9CJW/g3dLLJR2mDJJHC5UK4/Ky2Q+yCjP4D/bf2uu3C5q9fcYxKIqfTD3SYawog8iQFU2l2HVakptg8LbPHO2cXRak9UEnfu7RBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldMowH7d; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783723039; c=relaxed/simple;
+	bh=jsAccQQAHCfDuWmJZaDxbg1DbjhVBnAConRKpZQGpZg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=QgLgymQ7hykKZvsaVNwYqSIOKPR2cpVTbwDIGzcPN+mgRQZ541MIL0qBfmlINtWnSh3k69sdTYkL9L9EE0vdB8kNlX1cnd0ZjcrxSNRsMWC75fm7utPBbgLQHKDuRji0SPFJ1c2WoEO4g2M+9N8IsjwWLP4JYGWtqwWov/CFM80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4Y9iM/j; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldMowH7d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D481F000E9;
-	Fri, 10 Jul 2026 22:34:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4Y9iM/j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C85B1F000E9;
+	Fri, 10 Jul 2026 22:37:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783722867;
-	bh=nUz9HhdoqrTHsTCS29Z7m1e2TJuVsJLqCaqg2KWgFhs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ldMowH7dw+6DV4uL7fBEOoevsFZvKYQaQZ0NYOt6ItRnFeUywfKm5Cb6NvParqi+9
-	 VmDRAp5HRtgrrZS+H/xscZYf7mEkKRXvw/dTF9dqQII+z3qAzNZmH17FrT0MSl8Vco
-	 OL3JVIojHQe4yEY07qjeJ4ZzZnObffTiJNTGm9OFAkIQgP+fQ85UN4P795oFP9zChT
-	 qcSC0tFEaLX7RIrb3DEJVmmLWEqUzUHjOjmHPxiyLDukzvzrNWKxhSVLhALNDNKcb9
-	 hLEi0xGQRMIn5YD9rWje8GJg6tKzS6p43ZxvaehWPLgG7tgo3udLSbTa1EM9TFHFOC
-	 IQ7P4kLrL34eg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wiJnd-00000003seu-29RZ;
-	Fri, 10 Jul 2026 22:34:25 +0000
-Date: Fri, 10 Jul 2026 23:36:14 +0100
-Message-ID: <87pl0u5v6p.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 18/28] KVM: arm64: Add kvm_has_nv{2,3}() predicates
-In-Reply-To: <20260710153016.GF12293@e124191.cambridge.arm.com>
-References: <20260702160248.1377250-1-maz@kernel.org>
-	<20260702160248.1377250-19-maz@kernel.org>
-	<20260710153016.GF12293@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1783723038;
+	bh=ozgC1ZRn2YYImhCsuzRNV1wQ6E7lv1uRQnOwlTsCBy4=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=h4Y9iM/jZYC/dSrCxq8UHt09Mqfh2oj7dV9sd94bOWtiseKqcLJtVcI3DTzqUEnGS
+	 igWmRseGhrpJ5KBa2NwV4l+yMvgUVVW7bSUv1iLpKyAUnIewwZl3yZOkPOzccmsylm
+	 7CxEmeZ185Vv7nbp/6QQJrleKukgWIDj4DU+97M6iMCsboXQFNqtW4vE1lmNvozKM5
+	 XhImPsNdg17EXRolLUmxf7tGTgtjkwiB3iUKchvcD4larBBG/fLYUA4zu8RcfNfGFR
+	 aG3jsznzmKSvfbFNAeY+NBj+S/9O2STYr1gPG3e724N/veRqBB/p+u9z/1rW/K4lnD
+	 mka370ZEEnQwQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57
+ and AC04_CPU_29
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "D Scott Phillips" <scott@os.amperecomputing.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260710222128.416581-1-scott@os.amperecomputing.com>
+References: <20260710222128.416581-1-scott@os.amperecomputing.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Jul 2026 22:37:17 +0000
+Message-Id: <20260710223718.2C85B1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 10 Jul 2026 16:30:16 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Question,
-> 
-> On Thu, Jul 02, 2026 at 05:02:38PM +0100, Marc Zyngier wrote:
-> > Add a new set of predicates indicating whether VM is capable of
-> > NV2, NV3, and is in a nested NV3 context.
-> > 
-> > This is going to become useful as we start dealing with a mix of
-> > behaviours (NV2, NV3, NV2 on NV3...).
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_emulate.h | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index 9831166695186..c562d8171d5e1 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -266,6 +266,26 @@ static inline bool vserror_state_is_nested(struct kvm_vcpu *vcpu)
-> >  	       (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TMEA);
-> >  }
-> >  
-> > +static inline bool kvm_has_nv2(struct kvm *kvm)
-> > +{
-> > +	return (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-> > +		kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY));
-> 
-> Should this also check ID_AA64MMFR2_EL1.NV=0b10? (aka NV2, not just NV2_ONLY)
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
 
-That'd be unnecessary, as KVM always exposes ID_AA64MMFR2_EL1.NV==0,
-owing to the absence of support for the original FEAT_NV (we only
-support FEAT_NV2, and treat FEAT_NV with the utmost contempt).
+New issues:
+- [High] The AmpereOne erratum workaround unconditionally skips deactivatin=
+g physical interrupts for all nested VMs, causing a physical interrupt stat=
+e leak.
 
-For all intents and purposes, ID_AA64MMFR2_EL1.NV is a dead field, and
-KVM will forever expose it as 0 (unless someone at ARM is mad enough
-to repurpose it...).
+Pre-existing issues:
+- [Critical] The AmpereOne erratum workaround fails to mitigate a Guest-to-=
+Host Denial of Service vector for non-nested (L1) guests.
+- [High] Dropping `irq->irq_lock` between computing the LR snapshot and fol=
+ding it creates a race condition that loses concurrent virtual interrupts.
+--
 
-Thanks,
+--- Patch [1]: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_5=
+7 and AC04_CPU_29 ---
+commit d1d195cfc998f3f14be1b81eaa8484fcb7eb08f8
+Author: D Scott Phillips <scott@os.amperecomputing.com>
 
-	M.
+arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57 and AC04_CPU_29
 
--- 
-Jazz isn't dead. It just smells funny.
+This commit introduces a workaround for an AmpereOne CPU erratum where
+deactivating a non-active physical interrupt that is the highest priority
+pending interrupt hangs the CPU. The mitigation avoids physical deactivatio=
+ns
+when KVM handles a nested VM context.
+
+Link: https://lore.kernel.org/linux-arm-kernel/87ecjybz30.wl-maz@kernel.org/
+Link: https://amperecomputing.com/products/developer-errata
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 9e841e7afd4a7..8f1d10872360c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -275,7 +275,9 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 va=
+l)
+>  		lr =3D vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+>  	}
+> =20
+> -	if (lr & ICH_LR_HW)
+> +	if ((lr & ICH_LR_HW) &&
+> +	    !(cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_57) &&
+> +	      vgic_state_is_nested(vcpu)))
+
+[Severity: Critical]
+This is a pre-existing issue, but does the system remain vulnerable to the
+erratum for L1 guests?
+
+Because vgic_state_is_nested(vcpu) evaluates to false for an L1 guest, KVM
+bypasses the workaround and still calls vgic_v3_deactivate_phys(). If an
+unprivileged guest operating in GICv2 mode on a GICv3 host writes the INTID=
+ of
+a hardware-backed interrupt to the GICC_DIR MMIO register while it is inact=
+ive,
+can this directly trigger the host CPU hang?
+
+[Severity: High]
+Does unconditionally bypassing the physical deactivation for nested VMs cau=
+se
+a physical interrupt state leak?
+
+When an L2 guest legitimately deactivates an active hardware-backed
+interrupt and it traps to KVM, vgic_v3_deactivate() is called. Since
+vgic_state_is_nested(vcpu) evaluates to true, it successfully updates the
+virtual state via vgic_v3_fold_lr() but unconditionally skips calling
+vgic_v3_deactivate_phys().
+
+Could this leave hardware-backed interrupts, such as the physical timer,
+permanently active in the physical GIC distributor and block future timer
+interrupts?
+
+>  		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+> =20
+>  	vgic_v3_fold_lr(vcpu, lr);
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does dropping irq->irq_lock
+between computing the LR snapshot and folding it create a race condition th=
+at
+loses concurrent virtual interrupts?
+
+vgic_v3_deactivate() takes the lock, computes the snapshot, and then the
+scoped_guard ends:
+
+scoped_guard(raw_spinlock, &irq->irq_lock) {
+    ...
+    lr =3D vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+}
+
+If a concurrent device injects an interrupt here via vgic_inject_irq() and
+sets irq->pending_latch =3D true, won't the subsequent call to
+vgic_v3_fold_lr(vcpu, lr) re-acquire the lock and evaluate the stale snapsh=
+ot?
+
+vgic_v3_fold_lr() would see !(val & ICH_LR_STATE) is true and execute:
+
+if (irq->config =3D=3D VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+    irq->pending_latch =3D false;
+
+Could this wipe out the newly arrived interrupt and cause guest devices to
+stall?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260710222128.4165=
+81-1-scott@os.amperecomputing.com?part=3D1
