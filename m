@@ -1,66 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC6C35E1CB;
-	Sat, 11 Jul 2026 07:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87022D3220;
+	Sat, 11 Jul 2026 07:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783755367; cv=none; b=W7pib1fOH6vrHYiRQZGys1AoMXHHUX2g9J5RG0p5d7CBHR3nxNzjBZsNPRK4cyHdAUKfAGC5kYijUc1jZidwfS5CMGHklYPY7Prx6YvsuEBa9WTrYStcny+MynkxKPvwufOYbBvKCufB53PuqusiQn3z1Tywp1uv8k2IW1shtfM=
+	t=1783756306; cv=none; b=IP1aMxjDLmHJyPIV7TlN/2SqMm6usNoKSeGI71b849scZVsG6BhBfwoApCnZCmOC+ycw0FEzlu8YPX36+PzEKsoqjKXcdYVz7q3086XVxnCuQD0TOKUFDjgwuC6gaOnAdpTD+hIrU488rMCbsdR+l0FvEO9HwZjF2ZdcofI3yAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783755367; c=relaxed/simple;
-	bh=xvDA3ihShymzlrpZF+Id/IBdvPMSYSOYxB8aCkXWDhI=;
+	s=arc-20240116; t=1783756306; c=relaxed/simple;
+	bh=BUAdh/VUUfR1H9NPa37c6ZkWHxGMzYKhTZNKaNO4/Uo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pDpEGDT2eGnIsmqoiMb0SuKZZK6w/uqhKas5TkPvXjGTPddDf7dREl3kKjbNKL8wKF4wb2MjUdJN87aSWTMPawbc8pMhi5KBaZqwUyzW7tUI492zXpAZIwMSwdOckAJTpQkCCg2pcq7/tGgDNCQWwvVDgc4yJYC7EbKH+Htg73U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYw8Izdt; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Q37Vr4O/6pJfuiK4NK+hzKAkJ/4w46KFtuIW73uhKlM/8yzaQsUtF5PFeFlLpOEOYYfLxDneb9X62THI9uWH+/LF3w4WLBPr/PAp9rMTTjiUr3iMZB2Q/YvD3krwVc1J7/Qd6bJ0VGjSJRvlhC1txUIbtny8YVbJTclUNyLAsDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWDOH2sx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYw8Izdt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 640041F000E9;
-	Sat, 11 Jul 2026 07:36:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWDOH2sx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F7F1F000E9;
+	Sat, 11 Jul 2026 07:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783755365;
-	bh=3hHMuMSGcHj8MSVXJupK58876HkGZrvqVgI8Jh+FeUI=;
+	s=k20260515; t=1783756304;
+	bh=66mRFbHBJXAI0ZPdfAJZ59PJmJOQBOIfD1AUsnfwUM0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=EYw8Izdt+88Jo8Luqm/PUbhw/nFKqEoO1KgRabuVac8asFohgFafDSZcWHKxZ3Enp
-	 sEHsYR7qkJD7Tz6WKRmFfhQ6Lbajc5aU4QEK4vMh+aDIghQQqt38wYELyEM6dgVVkH
-	 woxK9cDVKVOpcXJWh2Qoq4nQrEpU8+cOa21rbt4Bn7nENMnZt2PpwGHi9klT0UOrYM
-	 JvDmAWwuSfI8up9cVooZDL0PwDbfbH48vVoi6SFO2/IXfA5VxFDvb5Yob9NGnEB+Dz
-	 gmrS5XqxWud0PZmIOvEtSYS7LeGbn7IZY23PZ71Gp+/5m7Pkr1mA4mTXzQHAqEugbV
-	 u5yBNFWTW8Z4w==
+	b=nWDOH2sxqUgR4y9yWflDZo4NEe/zQnOkvhCcKQeYSKSd31/yXzzvUnUl9KaLvzTN/
+	 mymZFpUIn7NLK7E5q5E36Qk0Q1eUXJKaMMbWSMtx8ksVRzhF/NEaeDHuW5omqm8A/N
+	 4wQvjfGB9iV6eBEIL4cUEKR0h37lCAijjpTY9EOGcnc/axGFTj0q0pU61dPjVS6cnQ
+	 G8XKypJ+zq++B/Fgr322SwNqdkuMtnhWFZv8G+bKNkZdxURO0/IodnZziOruOP88MH
+	 lWSvbt7Z1h21znbV7sH8Kd952NMYXZ+GNYywuoTuqkfU+p/q7km+zPBtrO8H1p0YmC
+	 Ubl7VZI47Llxg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wiSFm-00000003x2G-3G4i;
-	Sat, 11 Jul 2026 07:36:02 +0000
-Date: Sat, 11 Jul 2026 08:37:51 +0100
-Message-ID: <87mrvy5640.wl-maz@kernel.org>
+	id 1wiSUw-00000003xFJ-2LSF;
+	Sat, 11 Jul 2026 07:51:42 +0000
+Date: Sat, 11 Jul 2026 08:53:31 +0100
+Message-ID: <87ldbi55dw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Zeng Heng <zengheng4@huawei.com>,
-	Wei Xu <xuwei5@hisilicon.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	Lucas Wei <lucaswei@google.com>,
-	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+To: sashiko-reviews@lists.linux.dev
+Cc: "D Scott Phillips" <scott@os.amperecomputing.com>,
+	"Oliver Upton" <oupton@kernel.org>,
 	kvmarm@lists.linux.dev
 Subject: Re: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57 and AC04_CPU_29
-In-Reply-To: <20260710222128.416581-1-scott@os.amperecomputing.com>
+In-Reply-To: <20260710223718.2C85B1F000E9@smtp.kernel.org>
 References: <20260710222128.416581-1-scott@os.amperecomputing.com>
+	<20260710223718.2C85B1F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,226 +54,113 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, zengheng4@huawei.com, xuwei5@hisilicon.com, vladimir.murzin@arm.com, lucaswei@google.com, kuninori.morimoto.gx@renesas.com, Sascha.Bischoff@arm.com, yangyicong@hisilicon.com, yeoreum.yun@arm.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, scott@os.amperecomputing.com, oupton@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Scott,
-
-On Fri, 10 Jul 2026 23:21:28 +0100,
-D Scott Phillips <scott@os.amperecomputing.com> wrote:
+On Fri, 10 Jul 2026 23:37:17 +0100,
+sashiko-bot@kernel.org wrote:
 > 
-> On AmpereOne, deactivating a physical interrupt through ICC_DIR_EL1 or
-> ICC_EOIRx_EL1 (depending on EOImode) which is not active, but is the
-> highest priority pending interrupt causes the cpu to lose the interrupt
-> pending state and also prevents the delivery of future interrupts.
+> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
+> 
+> New issues:
+> - [High] The AmpereOne erratum workaround unconditionally skips deactivating physical interrupts for all nested VMs, causing a physical interrupt state leak.
+> 
+> Pre-existing issues:
+> - [Critical] The AmpereOne erratum workaround fails to mitigate a Guest-to-Host Denial of Service vector for non-nested (L1) guests.
+> - [High] Dropping `irq->irq_lock` between computing the LR snapshot and folding it creates a race condition that loses concurrent virtual interrupts.
+> --
+> 
+> --- Patch [1]: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57 and AC04_CPU_29 ---
+> commit d1d195cfc998f3f14be1b81eaa8484fcb7eb08f8
+> Author: D Scott Phillips <scott@os.amperecomputing.com>
+> 
+> arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57 and AC04_CPU_29
+> 
+> This commit introduces a workaround for an AmpereOne CPU erratum where
+> deactivating a non-active physical interrupt that is the highest priority
+> pending interrupt hangs the CPU. The mitigation avoids physical deactivations
+> when KVM handles a nested VM context.
+> 
+> Link: https://lore.kernel.org/linux-arm-kernel/87ecjybz30.wl-maz@kernel.org/
+> Link: https://amperecomputing.com/products/developer-errata
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> > index 9e841e7afd4a7..8f1d10872360c 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> > @@ -275,7 +275,9 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
+> >  		lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+> >  	}
+> >  
+> > -	if (lr & ICH_LR_HW)
+> > +	if ((lr & ICH_LR_HW) &&
+> > +	    !(cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_57) &&
+> > +	      vgic_state_is_nested(vcpu)))
+> 
+> [Severity: Critical]
+> This is a pre-existing issue, but does the system remain vulnerable to the
+> erratum for L1 guests?
+> 
+> Because vgic_state_is_nested(vcpu) evaluates to false for an L1 guest, KVM
+> bypasses the workaround and still calls vgic_v3_deactivate_phys(). If an
+> unprivileged guest operating in GICv2 mode on a GICv3 host writes the INTID of
+
+There is no such thing with NV, as we only support GICv3 in guests.
+
+> a hardware-backed interrupt to the GICC_DIR MMIO register while it is inactive,
+> can this directly trigger the host CPU hang?
 >
-> Work around this in the vgic, avoiding the cpu issue.
+> [Severity: High]
+> Does unconditionally bypassing the physical deactivation for nested VMs cause
+> a physical interrupt state leak?
+> 
+> When an L2 guest legitimately deactivates an active hardware-backed
+> interrupt and it traps to KVM, vgic_v3_deactivate() is called. Since
+> vgic_state_is_nested(vcpu) evaluates to true, it successfully updates the
+> virtual state via vgic_v3_fold_lr() but unconditionally skips calling
+> vgic_v3_deactivate_phys().
+> 
+> Could this leave hardware-backed interrupts, such as the physical timer,
+> permanently active in the physical GIC distributor and block future timer
+> interrupts?
 
-Thanks for getting to the bottom of this.
+Go read the spec and the effects of the HW bit. This is actively
+advocating for the reintroduction of the bug... :-/
 
 > 
-> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
-> ---
+> >  		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+> >  
+> >  	vgic_v3_fold_lr(vcpu, lr);
 > 
-> Hi Marc, we've tracked down the nested virt hang reported
-> previously[1] to a cpu erratum in AmpereOne[2].
+> [Severity: High]
+> This isn't a bug introduced by this patch, but does dropping irq->irq_lock
+> between computing the LR snapshot and folding it create a race condition that
+> loses concurrent virtual interrupts?
 > 
-> Here I'm just sort of parroting the change you had posted for
-> debugging. I'm not familiar with the vgic logic well enough to know if
-> this change is sufficient and doesn't have some unintended
-> consequences. I guess read this more are as "I've tested this and I'm
-> not seeing it hang now."
->
-> Sorry for sending this half-baked, I didn't want to further delay the
-> errata details on my ongoing vgic education. I'm happy to take any
-> advice you can give, otherwise I'll continue familiarizing myself and
-> will hopefully later have a patch which I can actually claim I think is
-> correct.
-
-No worries.
-
-To be perfectly clear, what I posted at [1] *is* a bug-fix. A very
-minor one. Nothing wrong should come as a result, except when it does,
-such as in your case.
-
-The core reason why this happens is that the L2 will have EOI'd its
-timer, and that the HW bit set in the LR will have propagated the
-deactivation all the way to the HW redistributor. Then L1 takes over,
-and needs to reconcile the LR state with its own, namely its view of
-the active state.
-
-The issue here is that when dealing with a nested vgic (the state
-contained in the LRs is for L2, not L1), the deactivation process
-doesn't need to involve the HW again -- this has already be dealt
-with, and results in the double deactivation I mentioned in my email.
-
+> vgic_v3_deactivate() takes the lock, computes the snapshot, and then the
+> scoped_guard ends:
 > 
-> [1]: https://lore.kernel.org/linux-arm-kernel/87ecjybz30.wl-maz@kernel.org/
+> scoped_guard(raw_spinlock, &irq->irq_lock) {
+>     ...
+>     lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+> }
 > 
-> [2]: https://amperecomputing.com/products/developer-errata
+> If a concurrent device injects an interrupt here via vgic_inject_irq() and
+> sets irq->pending_latch = true, won't the subsequent call to
+> vgic_v3_fold_lr(vcpu, lr) re-acquire the lock and evaluate the stale snapshot?
 > 
-> The updates with AC03_CPU_57 and AC04_CPU_29 have not yet been
-> published at the time I'm writing this. They should be coming
-> soon. I've reproduced the full entries from those two coming documents
-> collapsed together below:
+> vgic_v3_fold_lr() would see !(val & ICH_LR_STATE) is true and execute:
 > 
-> | {AC03_CPU_57, AC04_CPU_29}: Deactivation of the non-active, highest
-> | priority pending interrupt prevents further interrupt delivery.
-> |
-> | Functional Unit: CPU
-> |
-> | Category: 4
-> |
-> | Affected Version(s): AmpereOne AC03 A0, AmpereOne AC03 B0
-> | Affected Version(s): AmpereOne AC04 A0, AmpereOne AC04_1 A0
-> |
-> | Fixed Version(s): Open
-> |
-> | Overview:
-> |
-> | If software directly deactivates a physical interrupt which is not
-> | in the active state, and the interrupt is also currently the highest
-> | priority pending interrupt, then interrupt delivery will cease on
-> | that PE. Deactivation can happen either through ICC_EOIRx_EL1 if
-> | ICC_CTLR_EL1.EOIMode==0, or through ICC_DIR_EL1 if
-> | ICC_CTLR_EL1.EOIMode==1. Deactivation of virtual interrupts that are
-> | redirected through ICV_ registers will not cause this issue, even
-> | when the virtual interrupt deactivation triggers a physical
-> | interrupt deactivation through ICH_LR<n>_EL2.HW=1.
-
-OK, that's pretty good news. Can I safely assume that your HW doesn't
-support VLPIs/VSGIs in any form (no GICv4+)?
-
-> |
-> | This has been observed with Nested Virtualization starting with
-> | Linux-KVM v6.19.
-> |
-> | Impact:
-> |
-> | Physical interrupts will not be delivered after the deactivation of
-> | the non-active, highest priority pending interrupt. A core may
-> | appear to be hung.
-> |
-> | Workaround:
-> |
-> | Software must only deactivate interrupts which are currently active
+> if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+>     irq->pending_latch = false;
 > 
-> 
->  Documentation/arch/arm64/silicon-errata.rst |  4 ++++
->  arch/arm64/Kconfig                          | 17 +++++++++++++++++
->  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
->  arch/arm64/kvm/vgic/vgic-v3.c               |  4 +++-
->  arch/arm64/tools/cpucaps                    |  1 +
->  5 files changed, 40 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-> index 014aa1c215a16..89130404ce572 100644
-> --- a/Documentation/arch/arm64/silicon-errata.rst
-> +++ b/Documentation/arch/arm64/silicon-errata.rst
-> @@ -55,10 +55,14 @@ stable kernels.
->  +----------------+-----------------+-----------------+-----------------------------+
->  | Ampere         | AmpereOne       | AC03_CPU_38     | AMPERE_ERRATUM_AC03_CPU_38  |
->  +----------------+-----------------+-----------------+-----------------------------+
-> +| Ampere         | AmpereOne       | AC03_CPU_57     | AMPERE_ERRATUM_AC03_CPU_57  |
-> ++----------------+-----------------+-----------------+-----------------------------+
->  | Ampere         | AmpereOne AC04  | AC04_CPU_10     | AMPERE_ERRATUM_AC03_CPU_38  |
->  +----------------+-----------------+-----------------+-----------------------------+
->  | Ampere         | AmpereOne AC04  | AC04_CPU_23     | AMPERE_ERRATUM_AC04_CPU_23  |
->  +----------------+-----------------+-----------------+-----------------------------+
-> +| Ampere         | AmpereOne AC04  | AC04_CPU_29     | AMPERE_ERRATUM_AC03_CPU_57  |
-> ++----------------+-----------------+-----------------+-----------------------------+
->  +----------------+-----------------+-----------------+-----------------------------+
->  | ARM            | Cortex-A510     | #2457168        | ARM64_ERRATUM_2457168       |
->  +----------------+-----------------+-----------------+-----------------------------+
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index b3afe0688919b..ee5421283d8df 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -436,6 +436,23 @@ config AMPERE_ERRATUM_AC03_CPU_38
->  
->  	  If unsure, say Y.
->  
-> +config AMPERE_ERRATUM_AC03_CPU_57
-> +	bool "AmpereOne: AC03_CPU_57: Deactivation of the non-active, highest priority pending interrupt prevents further interrupt delivery."
-> +	default y
-> +	help
-> +	  This option adds an alternative code sequence to work around Ampere
-> +	  errata AC03_CPU_57 and AC04_CPU_29 on AmpereOne.
-> +
-> +	  Deactivating a physical interrupt through ICC_DIR_EL1 or
-> +	  ICC_EOIR1_EL1 (depending on EOImode) which is not active, but is the
-> +	  highest priority pending interrupt causes the cpu to lose the
-> +	  interrupt pending state and also prevents the delivery of future
-> +	  interrupts.
-> +
-> +	  The workaround is for KVM to not deactivate interrupts for nested vgics.
-> +
-> +	  If unsure, say Y.
-> +
->  config AMPERE_ERRATUM_AC04_CPU_23
->          bool "AmpereOne: AC04_CPU_23:  Failure to synchronize writes to HCR_EL2 may corrupt address translations."
->  	default y
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index 1995e1198648e..9b03dccd55e09 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -631,6 +631,14 @@ static const struct midr_range erratum_ac03_cpu_38_list[] = {
->  };
->  #endif
->  
-> +#ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_57
-> +static const struct midr_range erratum_ac03_cpu_57_list[] = {
-> +	MIDR_ALL_VERSIONS(MIDR_AMPERE1),
-> +	MIDR_ALL_VERSIONS(MIDR_AMPERE1A),
-> +	{},
-> +};
-> +#endif
-> +
->  #ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
->  static const struct midr_range erratum_ac04_cpu_23_list[] = {
->  	MIDR_ALL_VERSIONS(MIDR_AMPERE1A),
-> @@ -987,6 +995,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
->  		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_38_list),
->  	},
->  #endif
-> +#ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_57
-> +	{
-> +		.desc = "AmpereOne erratum AC03_CPU_57",
-> +		.capability = ARM64_WORKAROUND_AMPERE_AC03_CPU_57,
-> +		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_57_list),
-> +	},
-> +#endif
->  #ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
->  	{
->  		.desc = "AmpereOne erratum AC04_CPU_23",
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 9e841e7afd4a7..8f1d10872360c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -275,7 +275,9 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
->  		lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
->  	}
->  
-> -	if (lr & ICH_LR_HW)
-> +	if ((lr & ICH_LR_HW) &&
-> +	    !(cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_57) &&
-> +	      vgic_state_is_nested(vcpu)))
->  		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+> Could this wipe out the newly arrived interrupt and cause guest devices to
+> stall?
 
-I think this is slightly overkill. The hack I posted should be enough,
-and we can replace all the capability business with a simple comment
-referencing the errata numbers and the entries in silicon-errata.rst.
-
-Use the information provided above to beef up the commit message and
-stick:
-
-Cc: stable@vger.kernel.org
-Fixes: 6dd333c8942b2 ("KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive")
-
-so that we know how far this needs to be backported.
-
-Thanks,
+This one is a potential problem. I'll have a think...
 
 	M.
 
