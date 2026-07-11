@@ -1,203 +1,181 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97FA2F363F
-	for <kvmarm@lists.linux.dev>; Sat, 11 Jul 2026 05:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38032315793
+	for <kvmarm@lists.linux.dev>; Sat, 11 Jul 2026 06:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783749232; cv=none; b=e90Kyn/8P8a7F5scY8KJnDFrytgAE2kV4Y8dyFkpz/6iZHmArFAILvWnRhpTrcXu5kYz88OF6NlF3JZy0xXtnC5FFmYVKaIbnsv5SfNpqa6/605hqhgGqZs2na3f3fL3CP5DWsLLIpggA0uwl65Sft78g4WS00zSrd6grJZe5Qs=
+	t=1783750773; cv=none; b=BU1gGB4K38v7tPQOGAU06nFQ2Dv/8CbbMBPdd8DptlIlZq+uHFCfL02KwmjK82Ocx/HJRmfeiP0i/k1puYjK+LbRONaRfGxLf4qD6ydee7q/dcwEsFVVxczifCEl2/a42fu2rymHz3NpKllVfkMR9oeIrPwTb0vag66GTBqWXcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783749232; c=relaxed/simple;
-	bh=/JDeLfUU8Vo4QZFaEJTH84CGrJxvZ/Cc/cC4kO3egWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CzIwGg0/RFAWAQimTKu8iJJv0gAoe3tUu6xRmjBAM6fX8V+Zceeix+QReLJDGldN88pNaiKPJE9JFtsb6KWjTh8o8LDpor/syyAGvh3pweSBgwIsgAIMUjOBMNzY6zg68PlB6obTZL7XqznUXu2dxj6d8rcuHMghyrQAk1wt0Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QAtqyYGa; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783750773; c=relaxed/simple;
+	bh=bVka9Y/pxBnfhMrcVcpVcQlHeE4oraJ+VZOP20yHSxk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NTe85MnMn+Un5+7FrkFtAf72D6GsB/9LRC361jinQB7nw6idj416GjZ6CNtDbHleaKMXVvczcf94sc8kr9wQpJHgYEWkNpmAcuyB1e8q6glA41tNZG90n7rITQDFna+7HDLR/i4cwhOmhTtYzpOdfrVJzEiMNgmjtl3dLju/1fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=TIktfliC reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QAtqyYGa"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C0DD1477;
-	Fri, 10 Jul 2026 22:53:44 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 271293F85F;
-	Fri, 10 Jul 2026 22:53:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783749228; bh=/JDeLfUU8Vo4QZFaEJTH84CGrJxvZ/Cc/cC4kO3egWI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QAtqyYGas00tRpskypOB10t0acxLWkPMef2DsGevap0wyGrlH5n7obg52O6t9D3Oe
-	 iejfKw8G6Zo24BuK6ULpvhfpKoHhaKGmfMXULjWyTMWHu8yN3+YPm5z6R26omab/WY
-	 +yAZRnr0PoBrcJDP4J7wOl28np+mzfCsgaMgljQk=
-Date: Sat, 11 Jul 2026 06:53:28 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Leonardo Bras <leo.bras@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] KVM: arm64: Introduce
- KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-Message-ID: <jiy6rtx24nqnnduze3uuvc2ifqrjlskhefyctlwyh2jshdjrw2@a2wpodq6ife6>
-References: <20260708134101.2514759-1-leo.bras@arm.com>
- <20260708134101.2514759-3-leo.bras@arm.com>
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="TIktfliC"
+Received: from [133.11.54.183] (h183.csg.ci.i.u-tokyo.ac.jp [133.11.54.183])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 66B6IoIf015927
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 11 Jul 2026 15:18:50 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=jhPYci9Dt8OvtEtcy4b+McdMFRjiobjic+3G8cI6QZI=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20250326; t=1783750731; v=1;
+        b=TIktfliCWLwpd/+swlM0LiA65CD4UnKwP+vi5ebo48IQszOhpbBoisXZWlKlE/dX
+         uAHImhHe1u8Zjp9F1SsNkKIkUb/AXZ9u8Z7NdTlKN2jqD5SOEswuQpbbITyDpknr
+         bQMy8wc6V8eb3bRh5OuNVsh/Fytdus3Lti0kugfIaALxVXZL20RQVbBjguL04sMs
+         aXEazALRVK84+npwac+koioVcBKj9dDnwEKFkIHUTtN1H8w/Ua72wDLMM7mvGBzF
+         WYg5KFzUg1+rIbfhz4gWL1L0e/OW6ioPVpTinpDdvu87eF5MyhfkfpurgzIcIBhd
+         q2uPRk28yyDaK3zl+/06dA==
+Message-ID: <0e5e64ea-2f3c-4ce6-88ac-08b66f13027c@rsg.ci.i.u-tokyo.ac.jp>
+Date: Sat, 11 Jul 2026 15:18:50 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260708134101.2514759-3-leo.bras@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 1/7] KVM: arm64: Disallow vPMU when pPMUs do not cover
+ all CPUs
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu
+ <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20260706-hybrid-v8-0-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <20260706-hybrid-v8-1-de459617b59d@rsg.ci.i.u-tokyo.ac.jp>
+ <akvgIWqBjAp_VA_A@kernel.org>
+ <e03f17b2-a765-4912-adf6-3da26e7eeecd@rsg.ci.i.u-tokyo.ac.jp>
+ <ak1DVUs0bgkpZh0N@kernel.org>
+ <7bf6c440-5f14-4326-9800-9821adc4e2e4@rsg.ci.i.u-tokyo.ac.jp>
+Content-Language: en-US
+In-Reply-To: <7bf6c440-5f14-4326-9800-9821adc4e2e4@rsg.ci.i.u-tokyo.ac.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Leonardo,
-
-On Wed, Jul 08, 2026 at 02:40:58PM +0100, Leonardo Bras wrote:
-> Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
-> when walking the pagetables.
+On 2026/07/08 17:32, Akihiko Odaki wrote:
+> On 2026/07/08 3:20, Oliver Upton wrote:
+>> On Tue, Jul 07, 2026 at 08:08:03PM +0900, Akihiko Odaki wrote:
+>>> On 2026/07/07 2:04, Oliver Upton wrote:
+>>>> Hi,
+>>>>
+>>>> On Mon, Jul 06, 2026 at 07:03:24PM +0900, Akihiko Odaki wrote:
+>>>>> Commit ec3eb9ed6081 ("KVM: arm64: PMU: Disallow vPMU on non-uniform
+>>>>> PMUVer") made KVM reject vPMU unless the system-wide PMUVer is usable.
+>>>>> That covers systems where PMUv3 is absent or non-uniform, as well as
+>>>>> systems where IMPDEF PMUv3 sysreg traps are unavailable.
+>>>>>
+>>>>> However, KVM can still accept vPMU when all CPUs uniformly trap PMUv3
+>>>>> sysregs, but the pPMUs registered with KVM only cover a subset of
+>>>>> possible CPUs.
+>>>>>
+>>>>> Reject vPMU unless the registered pPMUs cover every possible CPU.
+>>>>> This avoids carrying support for partial pPMU coverage into the
+>>>>> fixed-counters-only UAPI introduced later in the series.
+>>>>
+>>>> Doesn't CPU hotplug screw this up? I could online a CPU that doesn't
+>>>> have a PMU after creating the VM.>
+>>>> I'd rather just change ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS to become a
+>>>> system feature. That way any CPU which breaks the system-wide 
+>>>> assumption
+>>>> cannot be onlined.
+>>>
+>>> ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS only says that IMPDEF PMUv3 
+>>> sysregs are
+>>> trapped. It does not say that KVM has a driver-backed PMU usable for 
+>>> PMUv3
+>>> emulation. This patch checks that extra requirement.
+>>>
+>>> I re-checked CPU hotplug. Onlining a CPU without a PMU later does not 
+>>> make
+>>> an accepted VM unsafe, since the check is against cpu_possible_mask.
+>>
+>> Sorry, I missed that this was against the possible mask.
+>>
+>>> The problem is the reverse case on ACPI: this check can disable vPMU 
+>>> when a
+>>> possible CPU is offline. DT populates supported_cpus at boot, while ACPI
+>>> initially populates it only from online CPUs and grows it as matching 
+>>> CPUs
+>>> come online.
+>>>
+>>> That makes this patch too conservative. In practice, I do not expect 
+>>> systems
+>>> to mix CPUs with and without a usable PMU. A better approach is 
+>>> probably to
+>>> treat such a host as out of spec and add TAINT_CPU_OUT_OF_SPEC. We 
+>>> already
+>>> do that for architectural PMUv3 by detecting mismatches in
+>>> ID_AA64DFR0_EL1.PMUVer; we can do the same for
+>>> ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS with non-standard PMUs.
+>>
+>> The presence of the workaround is, by definition, out of spec. I just
+>> never bothered tainting the kernel because these machines are already
+>> TAINT_CPU_OUT_OF_SPEC by way of the broken VGIC.
+>>
+>> Ok, so how about you keep the check that you're doing here and promote
+>> IMPDEF_TRAPS to a system-wide feature? That would satisfy the two
+>> preconditions we have for PMU emulation, which is system register traps
+>> and a backing arm_pmu that understands PMUv3 events.
 > 
-> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 19 ++++++++++++++++---
->  2 files changed, 29 insertions(+), 3 deletions(-)
+> This check turned out to be faulty: it can disable PMU emulation on ACPI
+> systems when a possible CPU is offline, because ACPI grows
+> arm_pmu::supported_cpus as matching CPUs come online.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 41a8687938eb..20c7c12e0e76 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -311,31 +311,44 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
->   * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
->   *					with other software walkers.
->   * @KVM_PGTABLE_WALK_IGNORE_EAGAIN:	Don't terminate the walk early if
->   *					the walker returns -EAGAIN.
->   * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
->   *					without Break-before-make's
->   *					TLB invalidation.
->   * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
->   *					without Cache maintenance
->   *					operations required.
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL0:	Skip visiting level-0+ entries
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL1:	Skip visiting level-1+ entries
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL2:	Skip visiting level-2+ entries
-> + * @KVM_PGTABLE_WALK_SKIP_LEVEL3:	Skip visiting level-3 entries
-
-Just a drive-by nit:
-Maybe avoid the level-$LEVEL terminology? Since as you said there is
-level -1 in the architecture, in that case you'd have to write
-"level--1" which is awkward :)
-
-Thanks,
-Wei-Lin Chang
-
->   */
->  enum kvm_pgtable_walk_flags {
->  	KVM_PGTABLE_WALK_LEAF			= BIT(0),
->  	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
->  	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
->  	KVM_PGTABLE_WALK_SHARED			= BIT(3),
->  	KVM_PGTABLE_WALK_IGNORE_EAGAIN		= BIT(4),
->  	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
->  	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL0		= BIT(7),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL1		= BIT(8),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL2		= BIT(9),
-> +	KVM_PGTABLE_WALK_SKIP_LEVEL3		= BIT(10),
->  };
->  
-> +#define KVM_PGTABLE_WALK_SKIP_LEVELS 	(KVM_PGTABLE_WALK_SKIP_LEVEL0 | \
-> +					 KVM_PGTABLE_WALK_SKIP_LEVEL1 | \
-> +					 KVM_PGTABLE_WALK_SKIP_LEVEL2 | \
-> +					 KVM_PGTABLE_WALK_SKIP_LEVEL3 )
-> +
->  struct kvm_pgtable_visit_ctx {
->  	kvm_pte_t				*ptep;
->  	kvm_pte_t				old;
->  	void					*arg;
->  	struct kvm_pgtable_mm_ops		*mm_ops;
->  	u64					start;
->  	u64					addr;
->  	u64					end;
->  	s8					level;
->  	enum kvm_pgtable_walk_flags		flags;
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 4be1d51a6ac5..b9a2078efc51 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -137,20 +137,33 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
->  	 * Ignore the return code altogether for walkers outside a fault handler
->  	 * (e.g. write protecting a range of memory) and chug along with the
->  	 * page table walk.
->  	 */
->  	if (r == -EAGAIN)
->  		return walker->flags & KVM_PGTABLE_WALK_IGNORE_EAGAIN;
->  
->  	return !r;
->  }
->  
-> +static __always_inline bool kvm_pgtable_skip_level(s8 level, enum kvm_pgtable_walk_flags flags)
-> +{
-> +	flags &= KVM_PGTABLE_WALK_SKIP_LEVELS;
-> +
-> +	if (likely(!flags))
-> +		return false;
-> +
-> +	if (level >= (ffs(flags) - ffs(KVM_PGTABLE_WALK_SKIP_LEVELS)))
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->  			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level);
->  
->  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  				      struct kvm_pgtable_mm_ops *mm_ops,
->  				      kvm_pteref_t pteref, s8 level)
->  {
->  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
->  	kvm_pte_t *ptep = kvm_dereference_pteref(data->walker, pteref);
->  	struct kvm_pgtable_visit_ctx ctx = {
-> @@ -185,35 +198,35 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  	 * into a newly installed or replaced table.
->  	 */
->  	if (reload) {
->  		ctx.old = READ_ONCE(*ptep);
->  		table = kvm_pte_table(ctx.old, level);
->  	}
->  
->  	if (!kvm_pgtable_walk_continue(data->walker, ret))
->  		return ret;
->  
-> -	if (!table) {
-> +	if (!table || kvm_pgtable_skip_level(level + 1, ctx.flags)) {
->  		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
->  		data->addr += kvm_granule_size(level);
->  		goto out;
->  	}
->  
->  	childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
->  	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
->  	if (!kvm_pgtable_walk_continue(data->walker, ret))
->  		return ret;
->  
-> -	if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
-> +out:
-> +	if (table && ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
->  		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
->  
-> -out:
->  	if (kvm_pgtable_walk_continue(data->walker, ret))
->  		return 0;
->  
->  	return ret;
->  }
->  
->  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->  			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level)
->  {
->  	u32 idx;
-> -- 
-> 2.55.0
+> My current plan is:
 > 
+> - drop the possible-mask coverage check, to avoid breaking ACPI;
+> - promote ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS to
+>    ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, so the system will have the
+>    feature only if all online CPUs implement it;
+> - explicitly taint hosts with ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
+>    matching what KVM already does for non-architectural VGICs. The
+>    comment will make it clear that this is out of spec because KVM cannot
+>    make the usual architectural assumptions about PMUv3 sysreg traps and
+>    uniform driver-backed PMU availability.
+
+I sent a new revision implementing these changes, but due to a rebase
+mistake it was also sent as v8.
+
+However, it still does not cover every case of non-uniform driver-backed
+PMU availability. With ACPI, if a CPU is brought online whose MIDR was
+not represented by any CPU online during PMU probing, the PMU code
+cannot associate it with an existing arm_pmu or register a new one.
+This can happen even when PMUVer is uniform across CPUs.
+
+I therefore plan to take a simpler approach: when KVM cannot find a
+registered pPMU for the vCPU's current CPU, emit a one-time warning and
+set TAINT_CPU_OUT_OF_SPEC, matching the treatment of mismatched CPU
+features.
+
+Regards,
+Akihiko Odaki
+
+> 
+> That lets the code keep assuming uniform PMU availability without adding 
+> an ACPI-hostile possible-CPU check, and makes that assumption explicit 
+> for humans like me and tools such as Sashiko [1].
+> 
+> [1] https://sashiko.dev/#/patchset/20260706-hybrid-v8-0- 
+> de459617b59d@rsg.ci.i.u-tokyo.ac.jp?part=6
+> 
+> Regards,
+> Akihiko Odaki
+> 
+
