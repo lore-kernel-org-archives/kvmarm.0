@@ -1,32 +1,32 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976C623394A
-	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 14:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212041FF5E3
+	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 14:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783866345; cv=none; b=cVkClTyMyvD8G0kLm0gcDsb8/FLI84SR5YycQ5oKo44S2noBT83iqnyaD0IOHoiSHbKnHJbjYPSS4Jeq4YFhDHfg0k7fU8BnmJLlKBEYF/COrWZEFx589odkyxPHMoICeEaHZCpEfpYTp2GlTEHkmfPQNGaOLtxlgxkzNiwyrtQ=
+	t=1783866347; cv=none; b=jXNa5E82QhbqfACjIOApONOYA5ntuEdkGcSH11q1EK+D7jbXamfJsQVUMsGAL/A5HF+/u7c46TVUmKEv0JAmrjiRfPGZzNVHGKWIlbmo2/bfpEiJOO5oLHXIPrJ+NoHWQM0BNvZXhw+MCJJghJ3IAhzPVSo9YyVd1Xb1J6/WG9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783866345; c=relaxed/simple;
-	bh=6QNOkdhCbS1zSrynkcrf4iXWNtn7FlSJMHDEznG+FJs=;
+	s=arc-20240116; t=1783866347; c=relaxed/simple;
+	bh=4l0mFBJOiD9VR6tHQIXH8PsiJlQlx/e0iU2aPRxHgKk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YRQHECc1ulYxIRj1ChLhdpdtV5MucXWmVn5y5eSVMYfWOyUaDz7CFxXn0Sx309zRWq5tpkYAblVXdQY0Bht3h9KAqbj+W5W7iuse7zcWeMU+1JD5Y7jpaJBLviB64DeQCvyQz3HtqQh+ENuIdXXocXmdrGXGBZ0jo/R+qYy4Zso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ojFG6rlb; arc=none smtp.client-ip=91.218.175.183
+	 MIME-Version; b=hX+oa5qga92+L+iuVt6JokgaFeTIeHY/O1pXLucRQdLj4jIGgMjU08j4ebMjV4Joq7pHVX1figtIBEjY57gFRTcyUxdx8lH66iLG/OGD8CRcUpl57gd/5CduTRt4hJ2PZ4qycGbL3QlTdNlEFFxnj1IbY7FSkmi0CsFujIKEiEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EAqZC+2C; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ojFG6rlb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EAqZC+2C"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783866341;
+	t=1783866343;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GmUXCwO/YG7npJOqJHZit2JMx0cXqLbuiAg6odak188=;
-	b=ojFG6rlblrgsGAGjGw7OtitTORSccIOnviTuASTt5GfgMAzsyWtg77D05Upb1Bryb5mS0b
-	I8jiWtU5ApMt55aZd3u0k+CzD8gDZFzLejtPUswBoEpHngvhWz8cgremtw6uNG9is6zxe+
-	hpZz2BO3WQ+INuIq4t5Bx70PVvswOhA=
+	bh=PfxyrrfIwD9kYVMYsO/FmdMfv3qC4C0W8ePlEH24TgQ=;
+	b=EAqZC+2CEL6Hub6G614hH4TGbtrQuTLiwmZbaPkexwbcYXsmI2uwgpdBESlloHgUh/SRW9
+	WxyoJPUrAPSCgpRvcu0v6vOT7BVwlNobK9aGh1v4WA/PMSbLZgcPwAhWv10xAaZqxs1Zy0
+	CvdPUhkkoaWC/J7SRFYT7PSp6oWvfDA=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: kvm@vger.kernel.org
 Cc: kvmarm@lists.linux.dev,
@@ -37,9 +37,9 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH kvmtool v3 1/4] Initialize the return value in kvm__for_each_mem_bank()
-Date: Sun, 12 Jul 2026 15:25:33 +0100
-Message-Id: <20260712142536.1391557-2-fuad.tabba@linux.dev>
+Subject: [PATCH kvmtool v3 2/4] Remove newline from end of die() aborts
+Date: Sun, 12 Jul 2026 15:25:34 +0100
+Message-Id: <20260712142536.1391557-3-fuad.tabba@linux.dev>
 In-Reply-To: <20260712142536.1391557-1-fuad.tabba@linux.dev>
 References: <20260712142536.1391557-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -51,36 +51,49 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-If none of the bank types match, the function would return an
-uninitialized value.
+die() already adds the newline at the end of the string.
 
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- kvm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ util/util.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/kvm.c b/kvm.c
-index 7a52c6a..95ccfcb 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -383,14 +383,15 @@ u64 host_to_guest_flat(struct kvm *kvm, void *ptr)
-  * their type.
-  *
-  * If one call to @fun returns a non-zero value, stop iterating and return the
-- * value. Otherwise, return zero.
-+ * value. If none of the bank types match, return -ENODEV. Otherwise, return
-+ * zero.
-  */
- int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
- 			   int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
- 			   void *data)
- {
--	int ret;
- 	struct kvm_mem_bank *bank;
-+	int ret = -ENODEV;
+diff --git a/util/util.c b/util/util.c
+index 6f41e2c..05d49c4 100644
+--- a/util/util.c
++++ b/util/util.c
+@@ -128,14 +128,14 @@ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+ 	unsigned long blk_size;
  
- 	list_for_each_entry(bank, &kvm->mem_banks, list) {
- 		if (type != KVM_MEM_TYPE_ALL && !(bank->type & type))
+ 	if (statfs(htlbfs_path, &sfs) < 0)
+-		die("Can't stat %s\n", htlbfs_path);
++		die("Can't stat %s", htlbfs_path);
+ 
+ 	if ((unsigned int)sfs.f_type != HUGETLBFS_MAGIC)
+-		die("%s is not hugetlbfs!\n", htlbfs_path);
++		die("%s is not hugetlbfs!", htlbfs_path);
+ 
+ 	blk_size = (unsigned long)sfs.f_bsize;
+ 	if (sfs.f_bsize == 0 || blk_size > size) {
+-		die("Can't use hugetlbfs pagesize %ld for mem size %lld\n",
++		die("Can't use hugetlbfs pagesize %ld for mem size %lld",
+ 			blk_size, (unsigned long long)size);
+ 	}
+ 
+@@ -144,10 +144,10 @@ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+ 	snprintf(mpath, PATH_MAX, "%s/kvmtoolXXXXXX", htlbfs_path);
+ 	fd = mkstemp(mpath);
+ 	if (fd < 0)
+-		die("Can't open %s for hugetlbfs map\n", mpath);
++		die("Can't open %s for hugetlbfs map", mpath);
+ 	unlink(mpath);
+ 	if (ftruncate(fd, size) < 0)
+-		die("Can't ftruncate for mem mapping size %lld\n",
++		die("Can't ftruncate for mem mapping size %lld",
+ 			(unsigned long long)size);
+ 	addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
+ 	close(fd);
 -- 
 2.39.5
 
