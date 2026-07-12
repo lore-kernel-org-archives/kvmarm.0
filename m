@@ -1,168 +1,353 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865FF24A078
-	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 14:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A3033FE33
+	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 15:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783867838; cv=none; b=jWT4fcNQPZQO0BioowHKH7bsKgSOorGtJE0PSZpZzXpK3bM0IFw6iApyXShrKjGza4yGbnOZGTRDVBXe9Z9WhlQyDRNevvbQjD/Jo7hekSS/AoofgDLxrguaypBfOTRLLtyTxgT1NHughxG/aZwKe1g3SsqA36fYMYwsgVM2xzg=
+	t=1783870165; cv=none; b=cA0byMlOQErMMvD9Y4bbvcoufN3IBkyjx7ozIDVNcqTYAw5oOi19Is+Cmba5VRsJMSH3qcbLHDFr930oz3D4CCwPA7O52H8bTJkcxgSUxdWYqik3nqoI+3n4morogrpSJPXBbVOX3Cq6TjoXWcNYm1UQmu8JoQSHNqdj6VPXCZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783867838; c=relaxed/simple;
-	bh=O6mKBMmKqYsfl7n4c5R+GT1oCANMK99LD9U/tz2vSjw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kO5PA2lbk+lPa9+jZfDO4juHpn0Fq9jS4N4obRpiKti5DZitfekW8Rm051SGoNihqwl4+IhlYivpM1y9a8k7jFLvXxMGCzgCRvH/7ga4yk4RCNiB7ACxJDTg3c0I4qtzuCCbcn6VT7+AG8aIHN9BLxZiZdGVNY5l2IDfOq6dDxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=D/jWB2/e; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783870165; c=relaxed/simple;
+	bh=HoZm1K0Vxq8QHY4OY0M4l3Gq05opjZyzIxiVdYJMT64=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oYk9XYb8lN2xxl5lqNSECQdJ5/+7hPbAbypvYdrhJbCZR1ZLE/8sqd6uLa03qowvddOr0MZNrry2N8EBa+I/ZqY6/nPsMVJJe5Yg1hzAhvOaxfmCxDeJpu1jZDcUWmKGCIzE3oZPrWOYBXYUxBUK0zFFiHygtd6SecftpiB8v+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GDcdk/ls; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="D/jWB2/e"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 500E71684;
-	Sun, 12 Jul 2026 07:50:31 -0700 (PDT)
-Received: from [10.163.128.224] (unknown [10.163.128.224])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E9B23F7B4;
-	Sun, 12 Jul 2026 07:50:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783867835; bh=O6mKBMmKqYsfl7n4c5R+GT1oCANMK99LD9U/tz2vSjw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=D/jWB2/eTX0HY+XgoYivSzjTMakYQ0k7CVE0G5XpJ+MxvFhPF7nSiytewu45QmGOz
-	 360fT3M1HJrX0we4eSyeQTDq6NC88sSMQcuyqHhbFnS0qH2JZqmns5weuMHQgn0eDA
-	 B/vPu9fywGIpXIncX4dtKf2iNYtASgE5Dh6AXxyc=
-Message-ID: <3cb5f1d7-f1cb-44bc-925c-85b5b6909b64@arm.com>
-Date: Sun, 12 Jul 2026 20:20:28 +0530
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GDcdk/ls"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493c556ada3so57565e9.0
+        for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 08:29:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783870162; x=1784474962; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=EB4yDpb44w+GJHdAYOL5yRV8WP3HkDbon7ZVHvgT3yQ=;
+        b=GDcdk/lstbPRrqtei+2HPYtqxHS5vlKveCKG84Q+2qC8Cj6GvWU0ddu/QfuNzwYtXB
+         dFyC5p4cVFnO7fmESsn9Wt9Db+aev+SMHQvHDBLZuqQ8Zs+YAh1e+NbW9Qf/idHeY9E1
+         J1bth6azhCesJlJ6Gy/Pue0b2kP9B9lqcJnjixvihAQYVYkKvJpEy+HlHRlK4bkuA4tY
+         57hoXV3cF8zMapjPdHypLIahFvtfK2RNG2A6kPDQUD0MZoFplB5zrDE10uWIQK6hTUyn
+         Rp+VZhI+bpDV5PIwiw78FcrNBnuM5gf+RmpSL1HwcvI9dyzOFyXTJlbCTZ3aHO8hN8VE
+         C6AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783870162; x=1784474962;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=EB4yDpb44w+GJHdAYOL5yRV8WP3HkDbon7ZVHvgT3yQ=;
+        b=QxUgylv23L2Zj4EsGSvw9jpOs4jcsJv9ltQjEoj+OpP+hNG/80htvtmeNoljN/GCHe
+         gOU4QwMVeOQX77kl+OTz7lD+ve6liF+AgQ5CHxEXpTTyxwhdxxVXEnoRRppzsPSOs7o5
+         +0YJg5iEXdpRuKSJ8c2VWGlf4aHmWNQtBhO6nK8ZMsMpZ8nDMIV6TncNIPnZBrrWK8SH
+         cEbM+zIqncnHuanKYO+5bdWErde+m5hE5QE++HbW4nl7pMIkc0U+H7eHOhnt/T6UZYrm
+         oD66HGihvn23ULypbxGNzaw2DX3AdmL+Ciqo8bQv4p3X1YlhcgksLt6VSoDJqwSGEsT9
+         Hu+Q==
+X-Forwarded-Encrypted: i=1; AHgh+RrDhruz+mNmZIdDSIAx7OYv9yKTcq3lYN7FRwf/bKozmFTU+uPcB2eC3g0KVIx7z2FngR09TNM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx0UxsHlNlYiYlgJsBO8PpvuupYbP4PeVRsKAyFpU0n82om5qjP
+	RuELwyeQlMuN83lJpNm9CwoGBHDRMNMy9g+VlLNnY1L2/xmKHZJ7FwYHO/30+pHaUQ==
+X-Gm-Gg: AfdE7clvc5MPKugm/gLZV8hp4JA/X5Flwc6Ypfqt+NBOl9DCifb9bPpeM/WHrVntUUV
+	7YGXmh0dKFn2wgtdtJGo6qL2xTRAz9DU2br0Tl63t5bib57GSUq/M4yaRWJdJ12qV/Lq2JrTex9
+	WwZXSf0F8R5S5jhd/nVgBymH2/GbLzHPt4c5RfL7uz3RJB4rU6nyX65n2gnU1D3wrVqXtmbDBh4
+	mWQovc3QTfsAohChVeCI7pC78KNknHDeSfvy3bsXZmLVOq7hGAYfPchDFL9UXZ0OGeMIGe1Cthk
+	vweLW7oycq2slLpfMfdhl78kftscRcdxz/F5JHMgbKMzVLQcdTCaxwbxc7e1G/TVxIjYk3k+6O0
+	EgkNI4EUoc6jAHSclPxJq4wHxZFid6vqmItaYtMNagTB8iq4DIVwU9G9kekeZbTHsRUmelCKwmN
+	MJ/b8nJso7iFr0oKSN/TliBPfi/OkFay9p+bwlIAVzOhtAJjlH
+X-Received: by 2002:a05:600c:8889:20b0:493:a96b:f9fe with SMTP id 5b1f17b1804b1-493f856ecc9mr2162265e9.4.1783870161311;
+        Sun, 12 Jul 2026 08:29:21 -0700 (PDT)
+Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb742d0esm297830905e9.13.2026.07.12.08.29.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jul 2026 08:29:20 -0700 (PDT)
+Date: Sun, 12 Jul 2026 15:29:16 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	jgg@ziepe.ca, mark.rutland@arm.com, qperret@google.com,
+	tabba@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 02/25] KVM: arm64: Donate MMIO to the hypervisor
+Message-ID: <alOyzOL16dhYk724@google.com>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-3-smostafa@google.com>
+ <alEnH98wFppYjmnE@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/3] Optimize S2 page splitting
-To: Leonardo Bras <leo.bras@arm.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20260708134101.2514759-1-leo.bras@arm.com>
-Content-Language: en-US
-From: Dev Jain <dev.jain@arm.com>
-In-Reply-To: <20260708134101.2514759-1-leo.bras@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <alEnH98wFppYjmnE@google.com>
 
+On Fri, Jul 10, 2026 at 06:08:47PM +0100, Vincent Donnefort wrote:
+> On Fri, May 01, 2026 at 11:19:04AM +0000, Mostafa Saleh wrote:
+> > Add a function to donate MMIO to the hypervisor so IOMMU hypervisor
+> > drivers can protect and access the MMIO of IOMMUs.
+> > 
+> > As donating MMIO is very rare, and we don’t need to encode the full
+> > state, it’s reasonable to have a separate function to do this.
+> > It will init the host s2 page table with an invalid leaf with the owner ID
+> > to prevent the host from mapping the page on faults.
+> > 
+> > Also, prevent kvm_pgtable_stage2_unmap() from removing owner ID from
+> > stage-2 PTEs, as this can be triggered from recycle logic under memory
+> > pressure. There is no code relying on this, as all ownership changes is
+> > done via kvm_pgtable_stage2_set_owner()
+> > 
+> > For the error path in IOMMU drivers, add a function to donate MMIO
+> > back from hyp to host. However, that leaks the hypervisor virtual
+> > address range which should be acceptable as this is quite rare and
+> > it matches the behaviour of fix_map/block.
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 119 +++++++++++++++++-
+> >  arch/arm64/kvm/hyp/pgtable.c                  |   9 +-
+> >  3 files changed, 121 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > index 3cbfae0e3dda..ff440204d2c7 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > @@ -36,6 +36,8 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
+> >  int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
+> >  int __pkvm_host_unshare_hyp(u64 pfn);
+> >  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+> > +int __pkvm_host_donate_hyp_mmio(phys_addr_t addr, size_t size, unsigned long *haddr);
+> > +int __pkvm_hyp_donate_host_mmio(phys_addr_t addr, size_t size);
+> 
+> Can we have u64 pfn, u64 nr_pages here to match all the other functions?
+> 
 
+I see the convention is that phys_addr_t is used for physical addresses
+as (addr_is_memory(), host_stage2_idmap_locked(()...) while u64 is used
+for pfn.
 
-On 08/07/26 7:10 pm, Leonardo Bras wrote:
-> While playing with dirty-bit tracking, I decided to take a look on how page
-> splitting works. Found out all entries are walked, even though we can infer,
-> for instance that:
-> - If a level-3 entry is walked, it means the parent level-2 entry is split
-> - If a split just succeeded in an table entry, it means all children nodes
->   are already split
+> Also, as this is used by a "module" perhaps a sort of kerneldoc would be nice,
+> especially to explain this isn't mapped into the hyp idmap range.
 
-That does not happen for force_pte = false right? Or is it guaranteed that
-in your case that force_pte = true always?
+Sure I can add a comment.
+
 > 
-> This patches' idea is to introduce new walking flags to skip pagetable
-> levels 0-3.
+> >  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+> >  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+> >  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 28a471d1927c..2fb20a63a417 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -353,6 +353,38 @@ int __pkvm_prot_finalize(void)
+> >  	return 0;
+> >  }
+> >  
+> > +/* Unmap MMIO region while skipping donated PTEs. */
+> > +static int host_stage2_unmap_mmio_region(u64 start, u64 size)
+> > +{
+> > +	struct kvm_pgtable *pgt = &host_mmu.pgt;
+> > +	u64 unmap_start = start;
+> > +	u64 addr = start;
+> > +	kvm_pte_t pte;
+> > +	int ret = 0;
+> > +	u8 level;
+> > +
+> > +	while (addr < start + size) {
+> > +		ret = kvm_pgtable_get_leaf(pgt, addr, &pte, &level);
+> > +		if (ret)
+> > +			return ret;
+> > +		if (!kvm_pte_valid(pte) && pte != 0) {
+> > +			if (addr > unmap_start) {
+> > +				ret = kvm_pgtable_stage2_unmap(pgt, unmap_start,
+> > +							       addr - unmap_start);
+> > +				if (ret)
+> > +					return ret;
+> > +			}
+> > +			addr += kvm_granule_size(level);
+> > +			unmap_start = addr;
+> > +		} else {
+> > +			addr += kvm_granule_size(level);
+> > +		}
+> > +	}
+> > +	if (addr > unmap_start)
+> > +		ret = kvm_pgtable_stage2_unmap(pgt, unmap_start, addr - unmap_start);
 > 
-> The idea of skipping child nodes was also tested, but it was marginally
-> slower than just skipping levels, so it was discarted.
+> Ah shame, that's a lot of table walking. I guess we could:
 > 
-> Optimization measured on two scenarios involving eager-splitting on a
-> VM with 32 memslot of 2GB (total 64GB), and vcpu per slot:
-> - Scenario 1: No manual protect, whole memslot split at dirty-track enable
->   (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
->   - Split happens only once, whole region
->   - Evalutes improved batch performance of splitting
-> - Scenario 2: Manual protect, split happens during every dirty-bit clean
->   (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
->   - Split called multiple times, for smaller 64-page sections.
->   - Evaluate improved performance for multiple calls
+>  * create our own custom walker here but that would duplicate a lot of logic
+>    from pgtable.c. So doesn't look great.
+
+Yes, that seems too complicated.
+
 > 
-> Scenario 1, improvement on dirty-track enable ioctl for the memslot:
-> - Memory was already split (4k pages):  -43.18% runtime (stdev 3.87%)
-> - THP backed memory:                    -25.77% runtime (stdev 1.01%)
-> - 64x1GB hugetlb memory:                -25.62% runtime (stdev 1.09%)
+>  * Retry kvm_pgtable_stage2_unmap() as long as it return -EPERM... but then we
+>    it needs to return where it has stopped?
+
+Yes, that is not possible with its current interface.
+
 > 
-> Scenario 2, improvement on dirty-log clean ioctl for the memslot:
-> - Memory was already split (4k pages):  -39.88% runtime (stdev 2.71%)
-> - THP backed memory:                    -25.18% runtime (stdev 0.32%)
-> - 64x1GB hugetlb memory:                -49.17% runtime (stdev 1.86%)
+>  * Modify kvm_pgtable_stage2_unmap() to just skip the refcounted entries?
+>    There's already a flag something that looks like this: KVM_PGTABLE_WALK_IGNORE_EAGAIN
 > 
-> For collecting above numbers, the following script was ran in both vanilla
-> and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
-> TX2 with 128GB RAM.
+
+I thought about this, my main concern is that now any unmap will fail
+silently if it hits a refcounted page. Propably not too bad as that only
+is used in recycling.
+
+> I am not so convinced by the first two points but the last one is probably worth
+> exploring.
+>  
+> > +	return ret;
+> > +}
+> > +
+> >  static int host_stage2_unmap_dev_all(void)
+> >  {
+> >  	struct kvm_pgtable *pgt = &host_mmu.pgt;
+> > @@ -363,11 +395,11 @@ static int host_stage2_unmap_dev_all(void)
+> >  	/* Unmap all non-memory regions to recycle the pages */
+> >  	for (i = 0; i < hyp_memblock_nr; i++, addr = reg->base + reg->size) {
+> >  		reg = &hyp_memory[i];
+> > -		ret = kvm_pgtable_stage2_unmap(pgt, addr, reg->base - addr);
+> > +		ret = host_stage2_unmap_mmio_region(addr, reg->base - addr);
+> >  		if (ret)
+> >  			return ret;
+> >  	}
+> > -	return kvm_pgtable_stage2_unmap(pgt, addr, BIT(pgt->ia_bits) - addr);
+> > +	return host_stage2_unmap_mmio_region(addr, BIT(pgt->ia_bits) - addr);
+> >  }
+> >  
+> >  /*
+> > @@ -1087,6 +1119,89 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+> >  	return ret;
+> >  }
+> >  
+> > +int __pkvm_host_donate_hyp_mmio(phys_addr_t addr, size_t size, unsigned long *haddr)
+> > +{
+> > +	kvm_pte_t pte;
+> > +	u64 offset;
+> > +	int ret;
+> > +
+> > +	/* Only before de-privilege. */
+> > +	if (static_branch_unlikely(&kvm_protected_mode_initialized))
+> > +		return -EPERM;
+> > +
+> > +	if (!PAGE_ALIGNED(addr | size))
+> > +		return -EINVAL;
 > 
-> --- dirty_test.sh
-> #!/bin/bash
-> filename=$(uname -r |cut -d'-' -f 4-)
+> Would be nice here to have pfn_range_is_valid() even though this is only
+> used by modules? (ditto __pkvm_hyp_donate_host_mmio())
+
+Will do.
+
 > 
-> run_test(){
->   base_test="./dirty_log_perf_test -b 2G -v 32 -m 6 -m 8"
+> > +
+> > +	ret = __pkvm_create_private_mapping(addr, size, PAGE_HYP_DEVICE, haddr);
+> > +	if (ret)
+> > +		return ret;
 > 
->   # Manual cleaning disable
->   ${base_test} -g
->   ${base_test} -g -s anonymous_thp
->   echo 64 > /proc/sys/vm/nr_hugepages  
->   ${base_test} -g -s shared_hugetlb
->   echo 0 > /proc/sys/vm/nr_hugepages
+> Perhaps better to do it once it's been annotated into the host s2, so that we
+> don't burn the private range in case of failure.
+
+This really should not fail, or the system is already have bigger
+problems, and that also does not allocate much space (128K), I see
+that is easier to do this way than having to fix the host stage-2
+if the allocation fails.
+
 > 
->   # Manual cleaning enable
->   ${base_test}
->   ${base_test} -s anonymous_thp
->   echo 64 > /proc/sys/vm/nr_hugepages  
->   ${base_test} -s shared_hugetlb
->   echo 0 > /proc/sys/vm/nr_hugepages
-> }
+> > +
+> > +	host_lock_component();
+> > +	for (offset = 0; offset < size; offset += PAGE_SIZE) {
+> > +		if (addr_is_memory(addr + offset)) {
+> > +			ret = -EINVAL;
+> > +			goto unlock;
+> > +		}
+> > +		ret = kvm_pgtable_get_leaf(&host_mmu.pgt, addr + offset, &pte, NULL);
+> > +		if (ret)
+> > +			goto unlock;
+> > +		if (pte && !kvm_pte_valid(pte)) {
+> > +			ret = -EPERM;
+> > +			goto unlock;
+> > +		}
+> > +	}
+> > +	/*
+> > +	 * We set HYP as the owner of the MMIO pages in the host stage-2, for:
+> > +	 * - host aborts: host_stage2_adjust_range() would fail for invalid non zero PTEs.
+> > +	 * - recycle under memory pressure: host_stage2_unmap_dev_all() would call
+> > +	 *   kvm_pgtable_stage2_unmap() which will not clear non zero invalid ptes (counted).
+> > +	 * - other MMIO donation: Would fail as we check that the PTE is valid or empty.
+> > +	 */
+> > +	ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
+> > +			      addr, size, &host_s2_pool,
+> > +			      KVM_HOST_INVALID_PTE_TYPE_DONATION,
+> > +			      FIELD_PREP(KVM_HOST_DONATION_PTE_OWNER_MASK, PKVM_ID_HYP));
+> > +unlock:
+> > +	host_unlock_component();
+> > +	return ret;
+> > +}
+> > +
+> > +int __pkvm_hyp_donate_host_mmio(phys_addr_t addr, size_t size)
+> > +{
+> > +	kvm_pte_t pte;
+> > +	u64 offset;
+> > +	int ret = 0;
+> > +
+> > +	if (static_branch_unlikely(&kvm_protected_mode_initialized))
+> > +		return -EPERM;
+> > +
+> > +	if (!PAGE_ALIGNED(addr | size))
+> > +		return -EINVAL;
+> > +
+> > +	host_lock_component();
+> > +	for (offset = 0; offset < size; offset += PAGE_SIZE) {
+> > +		if (addr_is_memory(addr + offset)) {
+> > +			ret = -EINVAL;
+> > +			goto unlock;
+> > +		}
+> > +		ret = kvm_pgtable_get_leaf(&host_mmu.pgt, addr + offset, &pte, NULL);
+> > +		if (ret)
+> > +			goto unlock;
+> > +		if (!pte || kvm_pte_valid(pte)) {
+> > +			ret = -EINVAL;
+> > +			goto unlock;
+> > +		}
 > 
-> run_test 2>&1 | tee ${filename}
-> ---
-> 
-> Above dirty_log_perf_test command is the standard kvm selftest found in the
-> kernel tree. It tested the following guest modes:
-> Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-> Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
-> (Modes with PA-bits:36 were discarted in this version, given the amount
-> of RAM being used for testing, and the similarity of previous results)
-> 
-> Performance numbers from above modes were used to calculate average and
-> stdev showed in the optimization results.
-> 
-> Changes since v2:
-> - Rebased on top of v7.2-rc1
-> - Improved testing, added more memory, re-tested
->   - Now: 32 vcpus @ total of 64G
->   - Before: 1cpu @ 16G
-> 
-> Changes since v1:
-> - Fixed inverted flag verification priority (Sashiko)
-> - Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
-> - New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
-> v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
-> 
-> Changes since RFC:
-> - Changed approach from return value to walk flags (Will Deacon)
-> - Discarted skip_child approach (Oliver Upton)
-> - Measured in real hardware, and from userspace perspective (Marc Zyngier)
-> - Better explanation of what and how numbers were collected
-> RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
-> 
-> Thanks!
-> Leo
+> It should probably verify it is also mapped as we expect into the hyp.
+
+I thought about that, but the caller is be trusted and I was aiming
+for simplicity, so the check for PKVM_ID_HYP seemed enough, but no
+strong opinion.
+
 > 
 > 
-> Leonardo Bras (3):
->   KVM: arm64: Avoid re-testing walk_continue
->   KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
->   KVM: arm64: Make stage2_split_walker() skip unnecessary walks
+> > +		if (FIELD_GET(KVM_HOST_DONATION_PTE_OWNER_MASK, pte) != PKVM_ID_HYP) {
+> > +			ret = -EPERM;
+> > +			goto unlock;
+> > +		}
+> > +	}
+> > +	WARN_ON(host_stage2_idmap_locked(addr, size, PKVM_HOST_MMIO_PROT));
 > 
->  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
->  2 files changed, 34 insertions(+), 7 deletions(-)
+> Perhaps we are better of simply zapping the entry and not map it proactively?
+
+I do not think it matters that much, this is a failure path, and the
+space is too small anyway. But no strong opinion also.
+
 > 
+> And even if we can't "reclaim" the VA-space from the private range, it would be
+> good to unmap it. I have made a function for that as part of the allocator
+> series:
 > 
-> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+> https://lore.kernel.org/all/20260706175415.2604046-3-vdonnefort@google.com/
+>
+I do not think that is a big problem at the moment all the other
+users of the VA space leak it on failure, I can re-use this logic
+when the allocator seires lands, otherwise I'd avoid adding more code.
+
+Thanks,
+Mostafa
+
 
