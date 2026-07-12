@@ -1,127 +1,211 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB997CA52
-	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 15:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255B73033F8
+	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 16:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783871837; cv=none; b=VztIbJ3hbokQuMF8dlklvzNv7UdF8UxLkgcHETQ9LX+eCzt+Teh+4aCT5LKQO+xU0YX4M4tiFKBzTnBp4HmzZWTGNSJl68KF/AxrXUUhW6Huxf+U7gY44FPrMK/f129y7tr6VRGNTmKp7Qj8obixhoYk7jw+ebno71k/iXlMNrM=
+	t=1783873217; cv=none; b=AI9bqieK/51LKbW4aCWx9ujWWravBloDPYHwfw8b6o7jv8Q9pDe2Y245uVIIY14/JGtf/lY+s58QIYbb1rRqmO4ampQe7pf+gMh3adN4I83Mw7whWjUr2hPSxostKtiPBncUBXy4m6hz/+W1a6KuN4ORyIHbHZ8C/urFmLhNoLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783871837; c=relaxed/simple;
-	bh=HtXD3FmX4vZinU5trQGSkj+YRWjgUwGkjyktEEEf3hw=;
+	s=arc-20240116; t=1783873217; c=relaxed/simple;
+	bh=TfN4R7MqLyKIjmZTr3oZQoogoaNxuVYWyndAJVZQTYQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dtR6/5UwHc5Xg67lRRBom6FCxDo/WHgq8hFpXwzX6LmGYh8Uc0Gy6sRnjIb8Hx5wbSkolHR6X0Lanl1bSomnooDuJ9x9A4p5kTjY/pZfX8MNo0ygjgrrDTcxvxuVOD0/8kA+hTHrLUiOVfapx9VdwkyteCgoQ0YK5cBrv43oGAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eTN8Sy3K; arc=none smtp.client-ip=91.218.175.172
+	 To:Cc:Content-Type; b=rxYjPGWQLPL4oqbi7CNy3PlyDEJdLgrUTq9wDxy3+TH/CS7uPCkbPYTJ9PQWzRiiOy95/osQuoj2ZbqBQ8yCPjHXNDrptX0lVOKX24aeKHjA/799tvl0/2oyJ3lHgrP0iUbpenketi4fVQn4+XtGr1lFWOoi/fcGHJwL/HjThP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JQOunDuc; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eTN8Sy3K"
-X-Forwarded-Encrypted: i=1; AHgh+RqD8ukQU0J23pdBy6MROx53CJ2mybkBuRyAEctSVUY/eDLno2aHjejAywi3Xql1a48hvQXdo44=@lists.linux.dev
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JQOunDuc"
+X-Forwarded-Encrypted: i=1; AHgh+Rqez4VyNQD4FGA6lsqWJeeiyygTktP8LAfX3/umJpCiZyjrHSPX/9hHDQgq/G5Gy5+GWDG8nN8=@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783871832;
+	t=1783873214;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0jLcdFtl7R6Tfa/ki2sHb7vZqexvF1gWmIdn1yVC0L4=;
-	b=eTN8Sy3KjUaFgx5dlbvenSlG4c7hlVS004GZw2bix+lx3IZgDxWxzTDSKkVBKEtNIN6CsD
-	IHuIF5bqjjKaX9yMSqtZE0UJRFMloQmT87OXpXBAQrBc0HD3obSoBp5JwlUN/bXpT5GN3a
-	yY+E1PRPM8bjFs+h1TzvjWu6OA6U42Y=
-X-Gm-Message-State: AOJu0YxIsm2KSdeKUEphlN1nNrYnry63oPWh6338LmUIn8mjGz24lhvl
-	Su35yRAWi+O4T9321SuAiAJ/TJFA+ogHg4KSNR6K+TcdFakgqEv/pmZD/DPUQjQux5OUCkICxKh
-	zAO5EQvny/1RcUZxIXdyYR2QRjO9v3t/3IWOif7NK
-X-Received: by 2002:ac8:7fce:0:b0:51c:ad5:93be with SMTP id
- d75a77b69052e-51cbe223323mr11181191cf.8.1783871819977; Sun, 12 Jul 2026
- 08:56:59 -0700 (PDT)
+	bh=janMU5MXezvmZmqnJkQjOF/ir5w8di28OoznHFU8LA0=;
+	b=JQOunDuciGCpZNsZXTI+ojfg4GsIBPFAta1XpUXixlseTzRYfPr1vhmfAuT85m3/E7tza8
+	vylGBz9exv9LM8Sb3LClR0hqAxHuJHfHkBQEU9/xZVzyM7c874H7S4MskLhaDtVvWJLphR
+	vqOwCeq0r7aJMSsXr6LRl5Mmc1xQ6d8=
+X-Gm-Message-State: AOJu0YxaDq+mt0q12huhkqte7zTzyKNtZGTimUUR51snZT/aRmhT3LWf
+	eywB8z83K5n55/ZD6bRorsbEGfJpzCsGUhT3DhjIQ1d8pG4aq1jy/fY94maBLGIeeaCjatZaFgp
+	OItF9jApyCzQDtYbDPdrjzPMFoQmA+5X4o4dcKhCC
+X-Received: by 2002:a05:622a:5805:b0:51c:ae6:a57 with SMTP id
+ d75a77b69052e-51cc08385e1mr10853171cf.11.1783873199708; Sun, 12 Jul 2026
+ 09:19:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260710114819.2689386-1-vdonnefort@google.com> <20260710114819.2689386-3-vdonnefort@google.com>
-In-Reply-To: <20260710114819.2689386-3-vdonnefort@google.com>
+References: <20260712153835.2264905-1-smostafa@google.com>
+In-Reply-To: <20260712153835.2264905-1-smostafa@google.com>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sun, 12 Jul 2026 16:56:23 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwAEhgDLPrpRdSyMYdV5zbt1T2LB=hKxb4PG4JB7XWHUg@mail.gmail.com>
-X-Gm-Features: AUfX_mz6PtwEXTIM6AD8HjcL_CT8j8sTWbGf_r1fC3QNf5VdqNLl-GNqWThuFk8
-Message-ID: <CA+EHjTwAEhgDLPrpRdSyMYdV5zbt1T2LB=hKxb4PG4JB7XWHUg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Fix hyp_trace_desc allocation size in hyp_trace_load()
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	Sashiko <sashiko-bot@kernel.org>
+Date: Sun, 12 Jul 2026 17:19:22 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxN1fcBVRi+yK18UgReGsX8Evu1GsijSQC61dY3XrjCtw@mail.gmail.com>
+X-Gm-Features: AUfX_mw9S0OZ_DagkNOYZ4ShM2Ytghc_E4HL25aTJrhUWph1A1thQJPgeFVqwv0
+Message-ID: <CA+EHjTxN1fcBVRi+yK18UgReGsX8Evu1GsijSQC61dY3XrjCtw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Avoid naming collision in tracing
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oupton@kernel.org, 
+	seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	vdonnefort@google.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, 10 Jul 2026 at 12:48, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> The footprint calculated for struct hyp_trace_desc sizes only
-> trace_buffer_desc and do not take into account the other fields. It
-> worked so far thanks to the follow-up PAGE_ALIGN().
->
-> Fix the descriptor size and while at it, enforce an overflow check after
-> PAGE_ALIGN().
->
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Fixes: 3aed038aac8d ("KVM: arm64: Add trace remote for the nVHE/pKVM hyp")
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+Hi Mostafa,
 
-Applied both patches on v7.2-rc2 and confirmed
-arch/arm64/kvm/hyp_trace.c compiles (CONFIG_NVHE_EL2_TRACING=y).
-Booted protected and non-protected VMs. To exercise hyp_trace_load()
-directly I enabled the hypervisor trace remote via tracefs
-(remotes/hypervisor/tracing_on) at the default 7KiB and reloaded at
-512KiB, so the reworked desc_size/tb_desc_size split and the
-alloc/map/share/__tracing_load path all ran fine.
+On Sun, 12 Jul 2026 at 16:38, Mostafa Saleh <smostafa@google.com> wrote:
+>
+> When the hypervisor tracing (CONFIG_NVHE_EL2_TRACING) is disabled, it
+> defines a static inline stub for trace_clock().
+>
+> However, trace_clock() is already declared as an extern function in
+> linux/trace_clock.h which is pulled in EL2 compilation.
+
+The rename itself looks correct and complete: all three sites (the
+declarations and stubs in nvhe/clock.h, the definitions in clock.c,
+and the two callers in trace.c) are updated, and no other reference to
+the old names remains under arch/arm64/kvm.
+
+Two small things...
+
+>
+> If the file <nvhe/clock.h> is included when CONFIG_NVHE_EL2_TRACING
+> is disabled (by including it manually in setup.c) it will cause:
+> In file included from arch/arm64/kvm/hyp/nvhe/setup.c:22:
+>
+> ./arch/arm64/kvm/hyp/include/nvhe/clock.h:14:19: error: static declaratio=
+n of =E2=80=98trace_clock=E2=80=99 follows non-static declaration
+>
+>    14 | static inline u64 trace_clock(void) { return 0; }
+>
+>       |                   ^~~~~~~~~~~
+>
+> on GCC and a linker error on LLVM (it seems to change the linkage to
+> global)
+>
+> Although that is not a problem at the moment, as no other files
+> include <nvhe/clock.h>. That does not seem to be the intent of
+> this code and that will cause issues with more users as the SMMUv3
+> driver.
+>
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+>
+> --
+
+git am only treats a three-dash "---" line as the scissors; the "--"
+here is two dashes, so mailinfo keeps everything above the diffstat.
+Worth a "---" on the repost so the note stays out of the log.
+
+> I did not add Fixes tag as this is currently dormant and not breaking
+> anything.
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/clock.h | 8 ++++----
+>  arch/arm64/kvm/hyp/nvhe/clock.c         | 4 ++--
+>  arch/arm64/kvm/hyp/nvhe/trace.c         | 4 ++--
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/clock.h b/arch/arm64/kvm/hyp=
+/include/nvhe/clock.h
+> index 9f429f5c0664..c2ccd0e8bf22 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/clock.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/clock.h
+> @@ -6,11 +6,11 @@
+>  #include <asm/kvm_hyp.h>
+>
+>  #ifdef CONFIG_NVHE_EL2_TRACING
+> -void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc=
+);
+> -u64 trace_clock(void);
+> +void hyp_trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch=
+_cyc);
+> +u64 hyp_trace_clock(void);
+
+hyp_trace_clock overlaps the host side: arch/arm64/kvm/hyp_trace.c
+already has a struct hyp_trace_clock and static helpers
+hyp_trace_clock_enable() / hyp_trace_clock_show() for the debugfs view
+of the same clock. No actual collision, so this is only a readability
+point, but a reader grepping hyp_trace_clock now gets two unrelated
+things. Maybe you'd want to consider a different name, but naming is
+hard :)
 
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
 
+Test: builds fine with the different config enables.
+
 Cheers,
 /fuad
 
+
+>  #else
+>  static inline void
+> -trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
+> -static inline u64 trace_clock(void) { return 0; }
+> +hyp_trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)=
+ { }
+> +static inline u64 hyp_trace_clock(void) { return 0; }
+>  #endif
+>  #endif
+> diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/cl=
+ock.c
+> index a7fc61976fd0..8adefb0b696c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/clock.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+> @@ -30,7 +30,7 @@ static u64 __clock_mult_uint128(u64 cyc, u32 mult, u32 =
+shift)
+>  }
 >
-> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-> index a7237aca6898..22437c5e1e7b 100644
-> --- a/arch/arm64/kvm/hyp_trace.c
-> +++ b/arch/arm64/kvm/hyp_trace.c
-> @@ -235,18 +235,22 @@ static int hyp_trace_buffer_share_hyp(struct hyp_trace_buffer *trace_buffer)
->  static struct trace_buffer_desc *hyp_trace_load(unsigned long size, void *priv)
+>  /* Does not guarantee no reader on the modified bank. */
+> -void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc=
+)
+> +void hyp_trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch=
+_cyc)
 >  {
->         struct hyp_trace_buffer *trace_buffer = priv;
-> +       size_t desc_size, tb_desc_size;
->         struct hyp_trace_desc *desc;
-> -       size_t desc_size;
->         int ret;
+>         struct clock_data *clock =3D &trace_clock_data;
+>         u64 bank =3D clock->cur ^ 1;
+> @@ -48,7 +48,7 @@ void trace_clock_update(u32 mult, u32 shift, u64 epoch_=
+ns, u64 epoch_cyc)
+>  }
 >
->         if (WARN_ON(trace_buffer->desc))
->                 return ERR_PTR(-EINVAL);
+>  /* Use untrusted host data */
+> -u64 trace_clock(void)
+> +u64 hyp_trace_clock(void)
+>  {
+>         struct clock_data *clock =3D &trace_clock_data;
+>         u64 bank =3D smp_load_acquire(&clock->cur);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/tr=
+ace.c
+> index e7e150ab265f..f2a32463c6c2 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/trace.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/trace.c
+> @@ -35,7 +35,7 @@ static bool hyp_trace_buffer_loaded(struct hyp_trace_bu=
+ffer *trace_buffer)
+>  void *tracing_reserve_entry(unsigned long length)
+>  {
+>         return simple_ring_buffer_reserve(this_cpu_ptr(trace_buffer.simpl=
+e_rbs), length,
+> -                                         trace_clock());
+> +                                         hyp_trace_clock());
+>  }
 >
-> -       desc_size = trace_buffer_desc_size(size, num_possible_cpus());
-> +       tb_desc_size = trace_buffer_desc_size(size, num_possible_cpus());
-> +       desc_size = size_add(tb_desc_size, offsetof(struct hyp_trace_desc, trace_buffer_desc));
->         if (desc_size == SIZE_MAX)
->                 return ERR_PTR(-E2BIG);
+>  void tracing_commit_entry(void)
+> @@ -290,7 +290,7 @@ void __tracing_update_clock(u32 mult, u32 shift, u64 =
+epoch_ns, u64 epoch_cyc)
+>         }
 >
->         desc_size = PAGE_ALIGN(desc_size);
-> +       if (!desc_size)
-> +               return ERR_PTR(-E2BIG);
-> +
->         desc = (struct hyp_trace_desc *)alloc_pages_exact(desc_size, GFP_KERNEL);
->         if (!desc)
->                 return ERR_PTR(-ENOMEM);
-> @@ -262,7 +266,7 @@ static struct trace_buffer_desc *hyp_trace_load(unsigned long size, void *priv)
->         if (ret)
->                 goto err_free_desc;
+>         /* ...we can now override the old one and swap. */
+> -       trace_clock_update(mult, shift, epoch_ns, epoch_cyc);
+> +       hyp_trace_clock_update(mult, shift, epoch_ns, epoch_cyc);
+>  }
 >
-> -       ret = trace_remote_alloc_buffer(&desc->trace_buffer_desc, desc_size, size,
-> +       ret = trace_remote_alloc_buffer(&desc->trace_buffer_desc, tb_desc_size, size,
->                                         cpu_possible_mask);
->         if (ret)
->                 goto err_free_backing;
+>  int __tracing_reset(unsigned int cpu)
 > --
 > 2.55.0.795.g602f6c329a-goog
 >
