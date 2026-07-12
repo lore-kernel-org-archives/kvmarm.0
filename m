@@ -1,32 +1,32 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212041FF5E3
-	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 14:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EE2240611
+	for <kvmarm@lists.linux.dev>; Sun, 12 Jul 2026 14:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783866347; cv=none; b=jXNa5E82QhbqfACjIOApONOYA5ntuEdkGcSH11q1EK+D7jbXamfJsQVUMsGAL/A5HF+/u7c46TVUmKEv0JAmrjiRfPGZzNVHGKWIlbmo2/bfpEiJOO5oLHXIPrJ+NoHWQM0BNvZXhw+MCJJghJ3IAhzPVSo9YyVd1Xb1J6/WG9o=
+	t=1783866348; cv=none; b=pZHmwbwanDd9MElstAkp3830WE95FeNXnryPdHMBNYjkSevIUdfddRLD0kd6+oeaIBG4LvzewjDMHKV5bG+vRberYIxu4W6dz0PVgGMHWFjNZklyHBeD/tdAgbf1CCKPmQdHl6yJgyw1ZRHMf1Y9AdBF9F6If9LMWX1/X3EO5pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783866347; c=relaxed/simple;
-	bh=4l0mFBJOiD9VR6tHQIXH8PsiJlQlx/e0iU2aPRxHgKk=;
+	s=arc-20240116; t=1783866348; c=relaxed/simple;
+	bh=5F26L2THy8ciTeatfHbCXXtR5LIlN3WXqIRoCEE5UkI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hX+oa5qga92+L+iuVt6JokgaFeTIeHY/O1pXLucRQdLj4jIGgMjU08j4ebMjV4Joq7pHVX1figtIBEjY57gFRTcyUxdx8lH66iLG/OGD8CRcUpl57gd/5CduTRt4hJ2PZ4qycGbL3QlTdNlEFFxnj1IbY7FSkmi0CsFujIKEiEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EAqZC+2C; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version; b=smrIvsJayt5s5Upswcc+ZRKCLc3ZC1LvMRIN8zTPpIU7xNQLtbbQ+TxsvAsBjvIO05z4+6lpVdDVFEknK/dUNobpqbJIGM0S+LfbOmfsgdglRVO1Q/3PaZ+tLPu3xmnhK1hBtwkgP9DnaOsnWIKbHzRRKptE083judVciMOC4sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PHZ0rMny; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EAqZC+2C"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PHZ0rMny"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783866343;
+	t=1783866344;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PfxyrrfIwD9kYVMYsO/FmdMfv3qC4C0W8ePlEH24TgQ=;
-	b=EAqZC+2CEL6Hub6G614hH4TGbtrQuTLiwmZbaPkexwbcYXsmI2uwgpdBESlloHgUh/SRW9
-	WxyoJPUrAPSCgpRvcu0v6vOT7BVwlNobK9aGh1v4WA/PMSbLZgcPwAhWv10xAaZqxs1Zy0
-	CvdPUhkkoaWC/J7SRFYT7PSp6oWvfDA=
+	bh=km9voDa6Lw43hQJpF9SfqmtgdbZ0zmKTpaeKudQBhdU=;
+	b=PHZ0rMnyQ/sPIKXKBDEjhcMQCCJAZPi6yB+DQUf4IcRSP11PKczxtDwezC5OPRcWpQXnqJ
+	xFhfcsxO+6Rr+OshHofL3XKy0S5nDxkSG7fZyBRCZ5GEZJL9y7dSrp/6ZrY52OGBWzNEbG
+	8EO5jeILJL4a8BszIEm4GTyOIyj/ipA=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: kvm@vger.kernel.org
 Cc: kvmarm@lists.linux.dev,
@@ -37,9 +37,9 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH kvmtool v3 2/4] Remove newline from end of die() aborts
-Date: Sun, 12 Jul 2026 15:25:34 +0100
-Message-Id: <20260712142536.1391557-3-fuad.tabba@linux.dev>
+Subject: [PATCH kvmtool v3 3/4] Add support for registering guest_memfd-backed memory regions
+Date: Sun, 12 Jul 2026 15:25:35 +0100
+Message-Id: <20260712142536.1391557-4-fuad.tabba@linux.dev>
 In-Reply-To: <20260712142536.1391557-1-fuad.tabba@linux.dev>
 References: <20260712142536.1391557-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -51,49 +51,133 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-die() already adds the newline at the end of the string.
+Extend kvm__register_mem() with a guest_memfd file descriptor and
+offset. A bank with a guest_memfd is registered with
+KVM_SET_USER_MEMORY_REGION2 and KVM_MEM_GUEST_MEMFD, binding the
+memslot to the file. This prepares for backing guest RAM with
+guest_memfd on arm64.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- util/util.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/cfi_flash.c    |  2 +-
+ include/kvm/kvm.h | 16 ++++++++++++++--
+ kvm.c             | 36 ++++++++++++++++++++++++++----------
+ 3 files changed, 41 insertions(+), 13 deletions(-)
 
-diff --git a/util/util.c b/util/util.c
-index 6f41e2c..05d49c4 100644
---- a/util/util.c
-+++ b/util/util.c
-@@ -128,14 +128,14 @@ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
- 	unsigned long blk_size;
+diff --git a/hw/cfi_flash.c b/hw/cfi_flash.c
+index b68d9e0..4413955 100644
+--- a/hw/cfi_flash.c
++++ b/hw/cfi_flash.c
+@@ -451,7 +451,7 @@ static int map_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
+ 	int ret;
  
- 	if (statfs(htlbfs_path, &sfs) < 0)
--		die("Can't stat %s\n", htlbfs_path);
-+		die("Can't stat %s", htlbfs_path);
+ 	ret = kvm__register_mem(kvm, sfdev->base_addr, sfdev->size,
+-				sfdev->flash_memory,
++				sfdev->flash_memory, -1, 0,
+ 				KVM_MEM_TYPE_RAM | KVM_MEM_TYPE_READONLY);
+ 	if (!ret)
+ 		sfdev->is_mapped = true;
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index eb23e2f..077aaee 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -128,11 +128,23 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
+ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
++		      int guest_memfd, u64 guest_memfd_offset,
+ 		      enum kvm_mem_type type);
+ static inline int kvm__register_ram(struct kvm *kvm, u64 guest_phys, u64 size,
+ 				    void *userspace_addr)
+ {
+ 	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
++				 -1, 0, KVM_MEM_TYPE_RAM);
++}
++
++static inline int kvm__register_ram_guest_memfd(struct kvm *kvm, u64 guest_phys,
++						u64 size, void *userspace_addr,
++						int guest_memfd,
++						u64 guest_memfd_offset)
++{
++	BUG_ON(guest_memfd < 0);
++	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
++				 guest_memfd, guest_memfd_offset,
+ 				 KVM_MEM_TYPE_RAM);
+ }
  
- 	if ((unsigned int)sfs.f_type != HUGETLBFS_MAGIC)
--		die("%s is not hugetlbfs!\n", htlbfs_path);
-+		die("%s is not hugetlbfs!", htlbfs_path);
+@@ -140,13 +152,13 @@ static inline int kvm__register_dev_mem(struct kvm *kvm, u64 guest_phys,
+ 					u64 size, void *userspace_addr)
+ {
+ 	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
+-				 KVM_MEM_TYPE_DEVICE);
++				 -1, 0, KVM_MEM_TYPE_DEVICE);
+ }
  
- 	blk_size = (unsigned long)sfs.f_bsize;
- 	if (sfs.f_bsize == 0 || blk_size > size) {
--		die("Can't use hugetlbfs pagesize %ld for mem size %lld\n",
-+		die("Can't use hugetlbfs pagesize %ld for mem size %lld",
- 			blk_size, (unsigned long long)size);
- 	}
+ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
+ {
+ 	return kvm__register_mem(kvm, guest_phys, size, NULL,
+-				 KVM_MEM_TYPE_RESERVED);
++				 -1, 0, KVM_MEM_TYPE_RESERVED);
+ }
  
-@@ -144,10 +144,10 @@ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
- 	snprintf(mpath, PATH_MAX, "%s/kvmtoolXXXXXX", htlbfs_path);
- 	fd = mkstemp(mpath);
- 	if (fd < 0)
--		die("Can't open %s for hugetlbfs map\n", mpath);
-+		die("Can't open %s for hugetlbfs map", mpath);
- 	unlink(mpath);
- 	if (ftruncate(fd, size) < 0)
--		die("Can't ftruncate for mem mapping size %lld\n",
-+		die("Can't ftruncate for mem mapping size %lld",
- 			(unsigned long long)size);
- 	addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
- 	close(fd);
+ int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
+diff --git a/kvm.c b/kvm.c
+index 95ccfcb..947721b 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -237,9 +237,9 @@ out:
+ }
+ 
+ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+-		      void *userspace_addr, enum kvm_mem_type type)
++		      void *userspace_addr, int guest_memfd,
++		      u64 guest_memfd_offset, enum kvm_mem_type type)
+ {
+-	struct kvm_userspace_memory_region mem;
+ 	struct kvm_mem_bank *merged = NULL;
+ 	struct kvm_mem_bank *bank;
+ 	struct list_head *prev_entry;
+@@ -320,15 +320,31 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		flags |= KVM_MEM_READONLY;
+ 
+ 	if (type != KVM_MEM_TYPE_RESERVED) {
+-		mem = (struct kvm_userspace_memory_region) {
+-			.slot			= slot,
+-			.flags			= flags,
+-			.guest_phys_addr	= guest_phys,
+-			.memory_size		= size,
+-			.userspace_addr		= (unsigned long)userspace_addr,
+-		};
++		if (guest_memfd >= 0) {
++			struct kvm_userspace_memory_region2 mem2 = {
++				.slot			= slot,
++				.flags			= flags | KVM_MEM_GUEST_MEMFD,
++				.guest_phys_addr	= guest_phys,
++				.memory_size		= size,
++				.userspace_addr		= (unsigned long)userspace_addr,
++				.guest_memfd		= guest_memfd,
++				.guest_memfd_offset	= guest_memfd_offset,
++			};
+ 
+-		ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
++			ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2,
++				    &mem2);
++		} else {
++			struct kvm_userspace_memory_region mem = {
++				.slot			= slot,
++				.flags			= flags,
++				.guest_phys_addr	= guest_phys,
++				.memory_size		= size,
++				.userspace_addr		= (unsigned long)userspace_addr,
++			};
++
++			ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION,
++				    &mem);
++		}
+ 		if (ret < 0) {
+ 			ret = -errno;
+ 			goto out;
 -- 
 2.39.5
 
