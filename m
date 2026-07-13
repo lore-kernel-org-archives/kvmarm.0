@@ -1,228 +1,236 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013062.outbound.protection.outlook.com [40.107.159.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B00B3859F7
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 13:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.62
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783950236; cv=fail; b=iFC4B3KH1vkcppLYsLnPZGvIkJaB7L2d9qc6+2wEeqAxFSMCO1pixlhnnrD0iC9QbhO/NmGseco/iP2aJY7seTQw3AfJQFFWrPV7cso/DoPYNEoIN3hmR+bvntRVG1M4bPMnjFYNCRgQlBS6L8jElxpuJyMuHdw0H7sQjK9YHMg=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783950236; c=relaxed/simple;
-	bh=gm1Y2FHCXLhlzAN53s0HluE7CArjW/eUg/Ncr5+mK5g=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ENPN7oR1SmMmXK+4DMaj+BBhbgnaBxih2TY6akB5m0G22uMHEZsEVeVwgw37DDSbLg5v0QYNC3eSXQTe7o75K+PJYiYhi9f24lwBI2u0jFwsP0jcvD3e9tP8K/CCU+UhqkNog1u2iz/LmcfmHtMmah4GCZ8wpE1n3vTqDlJWybw=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CRB8yTvV; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CRB8yTvV; arc=fail smtp.client-ip=40.107.159.62
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCAE4307B3
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 13:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783950500; cv=none; b=CgWoO8MxOdOAwbUTOmlh9AQWR1bgUhfdOuoXp4aa+BchGgJjyNNqb6sd7gmyk1u6kJxT8JPio2295je42NRFF68hybSgc7NMjycPme6GaBapG3mWSVxnOadFoB4aKUNsP2hjDSGvueWo2YkPabvKL1O0uppourPwLVrgniquxho=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783950500; c=relaxed/simple;
+	bh=oI5GkQsfcCtwPh9dQyuxWwDcPHEtAnm1bwD/GTAQD+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UnpBcMwhgDkADkpMrWRdlFzhCi5ATWHoifzzdaGlNHUPwH57K1WFGukO/jYFIP5LleYvotvD1YOiKNOuuAiJ3Qw2/dxwrA0xbXvF0YOjUo/pv40nQdHOs/0n+JkBlIfz/OKRHsbM47AH0EbNoHvyFYQYJrbjTqTKkT+vUZ/pcOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=O/7C8yII; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CRB8yTvV";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CRB8yTvV"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=eh2pfVJzAj1NGrvsdtku2cU6wBhKAe2+kZ+J1hsJOAx5edr21k4NCcmgBi/Xqk4y4MIKCfXEq9RfoejpfaQ4TCvQL9DdAYVyDkXesXTV9cvKOh56G9ahkmbN7jTas/vQAgy/gYgmxlt0EVJzau4KT6f70WseqwJIsrGMZ2T2geV1KbfNknoLrp26CwVw2s8CjoRmKi3m8PoM+EtkGrfy3uJTUyjRNTO17AmJxXA1uCmqkZCWD9xWaMUxzbJScXKBe8DkKKNPLhWU1bA8dZF/v5uJOB+Z5V5eifGsmJn6oXRb1NbZgT77YS9AqOk5o+05/fxsfof89U0OV3k2UE5VlA==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Oqe66u+7laYTduB3fCbqPzp0apkrbgqUeYzANKVlPA0=;
- b=S2ZRDSsLFQPBmbEiKr9pzd1A9q+jk0p2f8hYQkXcP5ToyvOOQlzTSTlDOOyL3VXwiKa73hozBH1DxI35BACmCRCsIqu01JtttFSoQq9LJvHolSuZEAR8xrytTjcDvzjpZMexeza836SQ1VeMYL9TLImF/Wr1eahtf1a96u1MAI0o7or2bkrOePOJD/6R6mAdAK6WCepOWFClM1PHaOIQtuIT0Bg1rsUOCRP8Tvo+ggZkp2RaCszZ2JN28CivsGLIY/i8afKlOiy/4feB1nEUUVqbyEjrcLcitbHVmCgXBiZ57NjK03vpAeq3ZOq1oCMcawV8VLJA7Nnqs2IEujrw4g==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=google.com smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Oqe66u+7laYTduB3fCbqPzp0apkrbgqUeYzANKVlPA0=;
- b=CRB8yTvVWfugroNdZokt9dT/otdJ3pg+PkbciS5KZrHGRk0X+BVUW+UmoZP/dcS0ILArn5U3LDxcBKdZdsn7ImY9GnAMXE0yN9m2YHmoU1DsRUvnUkBGY1R/Y8Bjrj5WolriYL8Qy2yx2VxpqZhIsC/+jkpVf4Pqse/cqOFWB9o=
-Received: from AM0P190CA0004.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::14)
- by DB5PR08MB10114.eurprd08.prod.outlook.com (2603:10a6:10:4a3::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.19; Mon, 13 Jul
- 2026 13:43:45 +0000
-Received: from AMS1EPF0000004D.eurprd04.prod.outlook.com
- (2603:10a6:208:190:cafe::4d) by AM0P190CA0004.outlook.office365.com
- (2603:10a6:208:190::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.19 via Frontend Transport; Mon,
- 13 Jul 2026 13:43:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AMS1EPF0000004D.mail.protection.outlook.com (10.167.16.138) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.223.9
- via Frontend Transport; Mon, 13 Jul 2026 13:43:44 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bEYiK+FaZUY/33bVGL/fZrhZP4SRrU2vsPJxivWUA5Ef8TX2+xHdWTdUtnwN1NgIYYge7eg1yqtIWHtCBOTVIN6KfiDVOKATz7MhM+aZSBpFdYBwfDAsUe8UpMXYiCJoDwvtzRrt8IJB4cEL46zLqSVs1GOMXyNbE4E7NtTinnsHAdDsAkwG8Vy4hRAJxBn1FFiZMshB0cEfZlkJpSBGu2Junulb89iI7NV/IlXtFmCjonoK4tzgcdvMeCYRR2mxM23FDFsVZJjRB96hV9ulBEyLe58FQ8g2nociCGYLMJSx4vub5HO07SbWCwE/VHqzzd0v0EefEwOW6GlYb1Nopw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Oqe66u+7laYTduB3fCbqPzp0apkrbgqUeYzANKVlPA0=;
- b=n64bsWxBehHpIRExw1LJN2CuvHgnGOclBk/ChEaekDdp46i1iT5OXOpUtP+63DwWa5Gc+IEeILmwqPsHXjEvzEQ7qLohd9RNZ85Nbz3p70KZFfjItIHIGGVTgm3DFAAp/bBeIfGEePH4YnmQZKLehsj0Qn6YQ7eWyXoq35eUooHSC+PqUVoDLIClQpOzNzIJpcSx8Y4cTj4+xJ709jXUMm7qVG29BST0KFHo9Bfo9QXdUqoCOxwDMAbv6Cs98qZG25VM2kRgPIfTdZIlUMT2G0j57iCD1bghzAmB59FhCbjMiH+3r1WldscEgQiTRov3fOMr2WnjV0T6eNvJwPRbRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Oqe66u+7laYTduB3fCbqPzp0apkrbgqUeYzANKVlPA0=;
- b=CRB8yTvVWfugroNdZokt9dT/otdJ3pg+PkbciS5KZrHGRk0X+BVUW+UmoZP/dcS0ILArn5U3LDxcBKdZdsn7ImY9GnAMXE0yN9m2YHmoU1DsRUvnUkBGY1R/Y8Bjrj5WolriYL8Qy2yx2VxpqZhIsC/+jkpVf4Pqse/cqOFWB9o=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from AS8PR08MB9597.eurprd08.prod.outlook.com (2603:10a6:20b:61b::18)
- by AM8PR08MB6435.eurprd08.prod.outlook.com (2603:10a6:20b:317::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Mon, 13 Jul
- 2026 13:42:42 +0000
-Received: from AS8PR08MB9597.eurprd08.prod.outlook.com
- ([fe80::e11:42b9:2ed1:ef5f]) by AS8PR08MB9597.eurprd08.prod.outlook.com
- ([fe80::e11:42b9:2ed1:ef5f%4]) with mapi id 15.21.0202.018; Mon, 13 Jul 2026
- 13:42:42 +0000
-Message-ID: <a54c6321-a89c-4d33-a239-0f941777bbaa@arm.com>
-Date: Mon, 13 Jul 2026 15:42:41 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/3] KVM: guest_memfd: Use memslot id to keep track of
- associated memslots
-To: Sean Christopherson <seanjc@google.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- fuad.tabba@linux.dev, mark.rutland@arm.com
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="O/7C8yII"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E63F1576;
+	Mon, 13 Jul 2026 06:48:13 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5D4B73F7B4;
+	Mon, 13 Jul 2026 06:48:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783950497; bh=oI5GkQsfcCtwPh9dQyuxWwDcPHEtAnm1bwD/GTAQD+I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O/7C8yIIf5DL/m7ocg3VC8A/gCcqLF3YHaGiHcFwc5yCjyaUSqLKFsNcgjhDIsTZn
+	 tmxgLvzMcQhp/kmW0r2ccly3QrJYSAlziAaYMdG+iAUvGTbTIj1c9flpFIF3u2bgM5
+	 iguWoSVEfs3wCkFtuGOK14U9iAABMEDXwb9Ic80c=
+Date: Mon, 13 Jul 2026 14:48:12 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+	kvm@vger.kernel.org, david.hildenbrand@arm.com, maz@kernel.org,
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, fuad.tabba@linux.dev, mark.rutland@arm.com
+Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only
+ memslots
+Message-ID: <alTsnNdpsTY0sKdq@raptor>
 References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <20260702142912.6395-2-alexandru.elisei@arm.com>
- <akwhexqW66RK5Gru@google.com>
-From: David Hildenbrand <david.hildenbrand@arm.com>
-Content-Language: en-US
-Autocrypt: addr=david.hildenbrand@arm.com; keydata=
- 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 fa0=
-In-Reply-To: <akwhexqW66RK5Gru@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0125.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:192::22) To AS8PR08MB9597.eurprd08.prod.outlook.com
- (2603:10a6:20b:61b::18)
+ <akxOrMnlNga-vtQv@google.com>
+ <ak0wSQ1133O7B96D@raptor>
+ <alAFmiAsNf6Xm49_@kernel.org>
+ <alDM_yikef16lC5h@raptor>
+ <alE3jRLtYeq-WesA@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	AS8PR08MB9597:EE_|AM8PR08MB6435:EE_|AMS1EPF0000004D:EE_|DB5PR08MB10114:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee846e4c-b533-4f91-0bf4-08dee0e4c238
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|18002099003|22082099003|11063799006|4143699003|56012099006;
-X-Microsoft-Antispam-Message-Info-Original:
- cweZPo9rO8km5SeTKDkV66Tlx8lqdL+/xWSLZuQ29q92TJGdBTsQk1FcEoD9tJemXdlMGmsiFjeB6t4l8OjLOeYplWMsCyfMlydZ8A1uMWyttjGMkS332K1D00OUT+116qkI6x5qibpXG+WNOIPFUR0jFhVy3Ubi2afMr7e02cOXv6JnMuhUPxUJmgM+VppC6WNDlXrEDMS7bJd1iDgTvoZkGHJq+IxXhb9pwts/JGjGz3WdrM0zzFmF3j3j633BuB70d/zMyH5RBJQz3D4JaJU79UpxcuWmx5PbaYBESn2I36PRRuNtjvAAEXQp90LBA/OtBYFoh6SDVGdTxWUONtY1uvM7jkY6YOQCN3v2CXgUaJYlev2aIKJbiM2EsI5hGooKwGv+0iHXIR2Pf4waAUdB6uk/6Q7pJ+AKBl57gaS1r56oALw2vchipX3Iww+Oa9fDcyemQX8VlwcxV/Z/egDVwscHEGqz6BMgPzzx3l7gx4AXZkDKOQuVfsChDiXxlhBrBbzU7lIRiuMJpRC71fPVk5pH+W9+TP+PHDmZTqKGXPR/JhOy84N+DZj7PydM1uZHF/+SuAy++dOJtwh2NhLjwOh8Ur2ZFJfJFY2muedac78EIlFZfAieNyRRFqCUm5eQqJsD1cEdKEav1qtwwuokJT41YVe12zqqnXcLa50=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB9597.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(18002099003)(22082099003)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- XL7hGbCf5LgMtVkQUFWJMnj/zydDOW9mz8rCAOQyLjvYtMzBj3MSmlTOXQPme/VMbfxsE+pKg0wrCkKayBQstIky3dUVf5Llbv6S/qFIkHRmi3MudNa+h/X9v2c8gmHU8P9nz9FW3xP2zUb8l2uZCbHyY/LX27iyN8VONDroVhSQKlj3ydER60KeqUPQz2ArJ7zbngEtcXBopBf3N0g4fEGNZn8OE7VBwjgeqXWM82EcBixJ3fJGkOrHQA2oGz4moae3JqYRGIsRFoEdbO0N750furE4cjD2yg5f+qsEieHjdv78cOyp226dF8cNwi+9FhMLunkmZqFjELjEHi4Ogg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB6435
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AMS1EPF0000004D.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	fccb98fa-a99c-413b-b80d-08dee0e49cbc
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|14060799003|1800799024|36860700016|35042699022|376014|7416014|82310400026|23010399003|22082099003|18002099003|4143699003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	32UqVgIdJsCCfW/8uIwRuIAjuH7V/OXgU0gskhhpHY+5jcD/P8EecYGEhfTIPbC5QuIRCjk5IV3wklk4jagdEgig5z86M0MHrhw76QPgW6FztzxknlOodcZxtQfdyv6q3E8f1oERLY/lwIG2NcJAlKbjOYWoehN0f9qS8mLjlzA0eF8PE6Mp8CEseD3k/uRutz3ScZ4079g3hhvCH/N4On1HWNdhrlxW1qxhgXJBXm0eaVmH64F1SHlUikGzDqi7/e3Q7md8rg46zhMMohQKaFghbN3TmHg20FbJ4nHmTnZS47S+WTIUVYoQzCLF0A5rPaSgkYP0FfPOG406XlrhqlrWDRIB3jkxh3KyrG/AWd1CUpE64G2rxMZOxRMNXsjam999zoSDvelzGkSf9g5tWho1DihY0E9X/uXTS4PjNeENwAgXaBvpVUqTGxeoTnpTDymQBeff4Yc6NVb9YOuzTf33C9LYhrzmNX/ZdM9oN7DFdovOsPQzfv0JMk8o0K8S91ScqpmATuRp+gGXZvWhQr3I2WK+ekDbfrSgOwYxIkLtF6tOtIdRoBUNjkgIsAGXE9EVONTugrkCRqB+CGZplfTpX4tvQTFusho7u3y+RL483h2sHbmNoYMSjkpLBkjZMYsXRXR4gGhgm7zwx8gqP31hjBu9ZONgNyst0p7gdyPrgrVX3I6Mx5wiQLK6+61JhwUVGwvom+TAhP5sdvHiUA==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(1800799024)(36860700016)(35042699022)(376014)(7416014)(82310400026)(23010399003)(22082099003)(18002099003)(4143699003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	56ZAIDhcqIdY8DMUNXvqUK0JVkr0laVbu++1ChEmljseixC7vz3U3rhXS/gD4CKE/xHGHCRwnsE8VXFwH6RzLxSwtjHp6g6rfuaVpgy8e5YbdK0agTNZRxfi9QlkKt0zlpWEKMEcJQEXnVvLu296UAyjFRzEJtk/RrYZfb/yNyry52KySyi5FtZHdDt5bezBAnbXgyN8Vhzk9JcAqDaZJqoLuFjr3FAlJrJWh+OqW/WFWPfPLp/E2qGxKLTTSJ5/d5gUu3+s7quuWC0cmfJw8ejJBtX8n5JeybtT5YIbOqbao/vIGlgVksjydd0t3+AuyqaTsCOingDDWKSKUmUvlY1akmIrsfG0sqfZAnU+yN0kBzVDFhY7A/f5AvfedOagE9bmCS/bstefJWtIm4WPyMKPEVIaYzSa17XZhHN17XaCG90luqAqg7NP0M9QBaWM
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2026 13:43:44.7847
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee846e4c-b533-4f91-0bf4-08dee0e4c238
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF0000004D.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5PR08MB10114
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alE3jRLtYeq-WesA@kernel.org>
 
-On 7/6/26 23:43, Sean Christopherson wrote:
-> On Thu, Jul 02, 2026, Alexandru Elisei wrote:
->> To enable memslot operations, KVM maintains two arrays of memslots, and an
->> RCU pointer to the active (in use) array. Changes are made first to the
->> inactive array, and the RCU pointer is updated to point to the inactive
->> array, which becomes active.
->>
->> The guest_memfd file maintains an xarray of pointers to memslots that use
->> it as the memory provider. After the RCU pointer to the active memslots is
->> updated and until SRCU is synchronized, readers can observe the old or the
->> new value for the active array, and therefore the old or the new pointer
->> for a given memslot.  For memslot creation or deletion that is not an issue
->> for guest_memfd, as readers will either read the same memslot pointer saved
->> by the guest_memfd file, or a non-existing memslot.
->>
->> But when changing the flags for a memslot, readers can read two different
->> and non-NULL memslot pointers. 
+Hi Oliver,
+
+On Fri, Jul 10, 2026 at 11:18:53AM -0700, Oliver Upton wrote:
+> On Fri, Jul 10, 2026 at 11:44:15AM +0100, Alexandru Elisei wrote:
+> > Hi Oliver,
+> > 
+> > On Thu, Jul 09, 2026 at 01:33:30PM -0700, Oliver Upton wrote:
+> > > On Tue, Jul 07, 2026 at 05:58:49PM +0100, Alexandru Elisei wrote:
+> > > > Hi Sean,
+> > > > 
+> > > > On Mon, Jul 06, 2026 at 05:56:12PM -0700, Sean Christopherson wrote:
+> > > > > On Thu, Jul 02, 2026, Alexandru Elisei wrote:
+> > > > > > The memory represented by guest_memfd-only memslots
+> > > > > > (kvm_memslot_is_gmem_only() is true) is shared with userspace, which can
+> > > > > > freely mmap it and access it. The only thing that is preventing dirty page
+> > > > > > logging for such memslots is that KVM doesn't allow slots backed by
+> > > > > > guest_memfd to have their flags changed; they can only be created and
+> > > > > > deleted.
+> > > > > 
+> > > > > Please (publicly) document *why*  you want to add dirty-logging support.  It's
+> > > > > all but impossible to review new uAPI without knowing the use case.
+> > > > 
+> > > > Of course, my mistake, I was so deep in this that I didn't realise that
+> > > > there might be different perspectives.
+> > > > 
+> > > > My thinking was that since guest_memfd created with GUEST_MEMFD_FLAG_MMAP +
+> > > > GUEST_MEMFD_FLAG_INIT_SHARED is extremely similar from a userspace point of
+> > > > view to using an anonymous file (created with memfd_create()), that
+> > > > supporting dirty page logging and migration would be a natural next step
+> > > > and would expand the usefulness of guest_memfd. It has nothing to do with
+> > > > confidential compute.
+> > > > 
+> > > > As to why I'm working on it now, it's because of an arm64 feature that
+> > > > requires that memory remains mapped at stage 2, called Statistical
+> > > > Profiling Extension (SPE), similar to Intel's PEBS or AMD's IBS. Exposing
+> > > > the feature to a guest requires that memory remains mapped at stage 2
+> > > > outside of userspace explicitely unmapping it, and guest_memfd, with the
+> > > > patch to ignore the MMU notifiers [1], has this property.  I wanted to
+> > > > expand the functionality of guest_memfd to support migration of virtual
+> > > > machines when that arm64 feature is exposed to guests.
+> > > 
+> > > Can you please expand a bit on how you actually expect dirty tracking to
+> > > work with SPE? Taking write permission faults seem to be at odds with
+> > > "thou shalt not fault".
+> > 
+> > For the initial posting on the mailing list, my approach was to keep things
+> > as simple as possible: allow memory to be made read-only and then have the
+> > host map the memory as writable at stage 2 when SPE reports a permission
+> > fault, if the buffer happens to be enabled while dirty page logging is also
+> > enabled. Of course, that means that the quality of the profiling data might
+> > be degraded. I was planning to point this out, to start a discussion about
+> > it, but we can talk about it now.
 > 
-> And?  Why does that matter?  KVM memslot updates aren't atomic.  Practically
-> speaking, they _can't_ be made atomic.  Userspace is required to quiesce all
-> activity that must not observe inconsistent state, i.e. userspace must pause
-> (stop running) vCPUs when performing a memslot update.
+> Understanding how this is going to fit together end-to-end seems
+> relevant since you're asking for UAPI guarantees to enable SPE.
 
-I agree with that. It took us quite an effort to sort that out in QEMU.
+Of course. I think it's very useful that we're having this conversation
+now, instead of when the patches hit the list, I think I didn't manage to
+convey that properly in my reply.
 
-I was especially when nasty when, some guest activity resulted in memslot splits
-or merges, while some VCPUs were still active.
+> 
+> I agree that degrading the profile isn't that big of a deal but the buffer
+> may not even be in a restartable state after taking a fault. Who (KVM /
+> VMM) is going to handle rewinding PMBPTR in the case of an incomplete
+> record? Blaming userspace is always a good start but at the same time the
+> more rules/gotchas there are around the feature the less likely it seems a
+> VMM will pick this up.
 
--- 
-Cheers,
+I totally forgot that SPE might write a partial record following a buffer
+management event :/
 
-David
+I don't think KVM should implement a buffer unwinder, and I do agree that
+expecting userspace to do it would further reduce the appeal of supporting
+SPE in its current form.
+
+> 
+> Assuring that there are no KVM-initiated invalidations for guest_memfd
+> doesn't seem unreasonable but we need to have an aligned view on how SPE
+> will actually be enabled in KVM + VMM first.
+
+This is how I see SPE being implemented:
+
+* The VMM sets the interrupt number and SPE instance when it enables SPE
+for a VCPU. Setting the SPE instance is mandatory, similar to the strict
+PMU mode that is being proposed; SPE won't have a non-strict mode.
+
+KVM will enforce this.
+
+* The VMM creates the memslots that represent memory for the buffer
+using guest_memfd created with GUEST_MEMFD_FLAG_MMAP. Create it with
+GUEST_MEMFD_FLAG_INIT_SHARED and it looks a lot like an anonymous file, so
+I assume that it doesn't require too many changes in the VMM.  guest_memfd,
+with this patch [1], guarantees that memory won't be unmapped unexpectedly
+from stage 2.
+
+This will be documented API by KVM; KVM will not enforce it.
+
+* The VMM should pre-map memory at stage 2 before the VM is first run. To
+do this, it will use KVM_PRE_FAULT_MEMORY [2].
+
+Same as the guest_memfd part, documented, but not enforced by KVM.
+
+* When it comes to migration, the first step is to allow guest_memfd-backed
+memslots to have dirty page logging enabled when the guest_memfd file has
+been created with GUEST_MEMFD_FLAG_MMAP; this is what the series is trying
+to achieve.
+
+As for the internal KVM bits, it's mostly context switching the registers
+and injecting the SPE maintenance interrupt.
+
+[1] https://lore.kernel.org/kvmarm/20260625130902.258331-1-alexandru.elisei@arm.com/
+[2] https://lore.kernel.org/kvmarm/20260612162354.73378-1-jackabt.amazon@gmail.com/
+
+> 
+> > Another approach that builds on that, which I have prototyped locally, is
+> > to have a VCPU exit to userspace when/if the buffer is enabled and there is
+> > at least one memslot with dirty page logging enabled (with a specific
+> > hardware_exit_reason) and then let userspace decide what to do: resume the
+> > VCPU and live with the blackout window, or keep the VCPU stopped, and the
+> > guest gets non-degraded profiling data as the expense of the VCPU making
+> > progress.
+> 
+> My take is that there's no amount of idiot-proofing we can do in KVM to
+> prevent the VMM from messing this up somehow. We can just document the
+> limitations and let userspace decide to quiesce when dirty logging is
+> enabled.
+
+Considering that living with SPE permission faults while migration is
+taking place is not possible without userspace implementing a buffer
+unwinder, how do you feel about having the VCPUs return to userspace from
+KVM_RUN? Do you think that's an acceptable approach and something that
+might make migration at least functional?
+
+I'm really not expecting SPE virtualisation to start being widely used, at
+least not in the current state of the architecture (requesting that the
+entire VM memory is pre-mapped kills most of the use cases), what I'm
+hoping for is that SPE will be useful in some limited scenarios, and for
+development.
+
+Another option would be to make migration incompatible with SPE, which
+means dropping the changes to guest_memfd proposed by this series.
+
+> 
+> > My hope is that if migration is fast enough, the VCPU not running
+> > for (possibly) the entire duration of the migration process won't be
+> > noticeable, but I might be naive in thinking that.
+> 
+> Err, for a live upgrade of the VMM or kernel, sure. But an actual copyful
+> migration going over network could be O(minutes).
+
+0 minutes sounds like a good thing, or am I misunderstanding something?
+
+Thanks,
+Alex
+
+> 
+> > According to the Neoverse v3 errata document (MP168), r0p0 is affected,
+> > r0p1 is not affected. A quick google search revealed that Microsoft's
+> > Cobalt 200 CPU is based on Neoverse v3, same for the Arm AGI CPU. Wikipedia
+> > also says that Graviton 5 is based on Neoverse v3. Don't know the exact
+> > revision though, for either of them.
+> > 
+> > I was planning to add a kernel parameter that permits SPE on the affected
+> > parts, so people who trust their guests* can still use it from a VM. I
+> > don't think migration would be possible in this case because SPE bypasses
+> > the read-only permission at stage 2, and the host would not know to mark
+> > that memory as dirty (for dirty page logging).
+> > 
+> > * Ignoring migration, guest_memfd is always mapped as writable at stage 2,
+> > so a guest would have to point the buffer at memory that KVM represents
+> > with a KVM_MEM_READONLY memslot, like the CFI flash device used by EDK2.
+> > 
+> > > 
+> > > Fixing rotten architecture would be a more appropriate starting point :-/
+> > 
+> > I like to think that the architecture is constantly improving :)
+> 
+> I'd like to think that too...
+> 
+> Best,
+> Oliver
