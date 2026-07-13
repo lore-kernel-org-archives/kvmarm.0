@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E0A3F482A;
-	Mon, 13 Jul 2026 12:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3519919F121;
+	Mon, 13 Jul 2026 12:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783944457; cv=none; b=LHOgFLcuqBnDsVPV/A9z8Qb7P1PNRja87b2I3iiO81LLqb48qgEr825lX8Jx7RtpqsvvF5vggZspm7tyuxwH45050DcRXakR8gwzjINESMBYgXFJFr/bd2eNJodSRvoxcYxQA/vD1Hjuvz9OS+ABTNJoLC9cNzxo/ewmTVbPSLo=
+	t=1783947225; cv=none; b=nEDWscJ1ffrZRO0As8FZlmQtRrA9ER/0dHCdiN0OKh373x0fYIkKFCRIzo5buxT5byQGXUPYZbvvhNKznUVD07kAWxPYBdgocZrsUjXDtjs/gIMVyphft9nZvpZLS+QpuS9kOGmGAza0fCvXxiht257ydu0FzL5JIIilJ+bknDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783944457; c=relaxed/simple;
-	bh=7jDZSD0ZXBMKU0DnAOHmPPwvUaOFC7qe+/DOFXEBCrM=;
+	s=arc-20240116; t=1783947225; c=relaxed/simple;
+	bh=67vC3E8mCRha9hYVm2Kif9yJocvFNOZSlF8fz0bW2T0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WbKdtb6zWVOpvitJARAQ5mb0/nDJquvkPXCJYDitJ2CeG4wu01Uih8D0B3++/dGwItnJTzK+c6uui7UVqVQ9ljyzw3hD4nerSGJHVwnLg23BVmH8x4LvY4+pyUwIIOnn2HOZPb4qTxhG0QV42eoGrNGtPJgvKFb19C3UU5rNnTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpA+61ub; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZGTUv6u4uvJNYgrhdSL7PduP851Ay/+vsdRqPfTUSHuHKDvm+i1+X7cMF7t4sOaUpU9tgeCotny5kTkwvaq4xI7n3Tn1y8dAWipSl+sc0po1f301Unelyo5y0psjhTnNrdBiNJF+vFGzPYhHRtbZ/LkG2o1dOsX3UjehXjJFFVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQH+fvdU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpA+61ub"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF2191F00A3A;
-	Mon, 13 Jul 2026 12:07:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQH+fvdU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949301F000E9;
+	Mon, 13 Jul 2026 12:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783944455;
-	bh=7jDZSD0ZXBMKU0DnAOHmPPwvUaOFC7qe+/DOFXEBCrM=;
+	s=k20260515; t=1783947223;
+	bh=67vC3E8mCRha9hYVm2Kif9yJocvFNOZSlF8fz0bW2T0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BpA+61ubk0J051AHcwHvcJDrGcIq7CrWdik61tyJi8gKjWK/Bh6rOoauz4nnoATP9
-	 z9B7lFZLzJDrHlyAzSokl43P2diwlF4AwhbABdmReNTjUMnKd3YKN2oGjFTDCS0boM
-	 z0MNQ52CSqHNk3Tr2wOwfuQ+QcTTesZW3Ksc0KM/lPg00H8Olnz7IF/j3Xud1wfUAc
-	 vgKXYEMmk2C1/RznpAzIjCIb8xHtq1ACvc2WEEJKd+k2G/XgS3DENa2uT6HvvpArcA
-	 ZMPqyJRjF7xI/aIAcegBvA9wwIEhREtkzqapyHKncikPXnkwI86yBPj2yiyibNP1ok
-	 SffBMTrce85bQ==
-Date: Mon, 13 Jul 2026 13:07:29 +0100
+	b=RQH+fvdUuTn7iqWED4cXgkbpL5b565ibEf3+ckEuPZWQBL/DEvzxtTBPyheXNrD4d
+	 AZwGO2Knfc9zJNOzMTQgrrYRaLAN494GiWJ/SPMoTyGZ9Tg8iQjT6y9Hkn5C9TkJsm
+	 T84nVgN6fr1H4NqdnrSjhYak/IQwENtNL7uN1RzQ1hjjRhXU40owmbwRCc1T0BjMkQ
+	 ydN7KVbJeeuJ+eolkwL4kS5PnId4sOXDLLjC/5M22skK0JUWp4DOTMnI1PPOD1+EjG
+	 5ioQsFsS++SqPpCXVk+cD7wghqLhJ2psbuWd5GZfyL2U13Mq4oemSUbU4I9oDyn+0k
+	 SiXEplyovH7Ig==
+Date: Mon, 13 Jul 2026 13:53:37 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
@@ -43,10 +43,12 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v12 00/29] KVM: arm64: Implement support for SME
-Message-ID: <2b521e6d-be72-4d6f-b9f2-87b4d1175803@sirena.org.uk>
+Subject: Re: [PATCH v12 04/29] arm64/sve: Factor virtualizable VL discovery
+ out of SVE specific code
+Message-ID: <a6275b3d-d32a-4658-ae02-6d7af347b3c7@sirena.org.uk>
 References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
- <CA+EHjTw4uz9UjezNdHynMV38P0jORwfcxSSv834nQ8Q1JqW0Jg@mail.gmail.com>
+ <20260709-kvm-arm64-sme-v12-4-d0301d79ef58@kernel.org>
+ <CA+EHjTzVLnXu1E3guYVABoxLLE4foTM6j1fdew-phtFrBqJ2Fg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,38 +56,40 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="/XZSrZTLgS9atLBV"
+	protocol="application/pgp-signature"; boundary="NySqPGRbhkwbqql5"
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTw4uz9UjezNdHynMV38P0jORwfcxSSv834nQ8Q1JqW0Jg@mail.gmail.com>
+In-Reply-To: <CA+EHjTzVLnXu1E3guYVABoxLLE4foTM6j1fdew-phtFrBqJ2Fg@mail.gmail.com>
 X-Cookie: Courage is grace under pressure.
 
 
---/XZSrZTLgS9atLBV
+--NySqPGRbhkwbqql5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Sun, Jul 12, 2026 at 03:03:59PM +0100, Fuad Tabba wrote:
+On Sun, Jul 12, 2026 at 03:12:31PM +0100, Fuad Tabba wrote:
 
-> Unrelated: on the get-reg-list restructuring you mention deferring to
-> a separate series: since ZA, ZT0 and SME_VLS are the
-> migration-critical SME state, it'd be good if that series also covered
-> a save/restore round-trip for them, not just get-reg-list enumeration.
+> nit: this is a reimplementation rather than a straight move, the
+> no-virtualisable case returns 0 (and drops the WARN_ON) where
+> sve_setup() returned SVE_VQ_MIN. No change for SVE (that case isn't
+> architecturally possible), and 0 is correct for the SME case this
+> helper now also serves. Might be worth a word in the changelog, since
+> "pull ... into a separate function" reads as pure code motion.
 
-Yes, better testing for the register interface in general would be good.
+That's reasonable, I'll update the changelog.
 
---/XZSrZTLgS9atLBV
+--NySqPGRbhkwbqql5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpU1QAACgkQJNaLcl1U
-h9DypAf/W0SOgAJEKLIa3gvYV64Dx0urVRKR0KeM2AmELN/5bT9A/YfIHa92+vNh
-LfoAgKaikhNdRjiuGg+BQF7lBPZLLXEvXtZMY8MC1oYyioWaiFvyb/xwvcby6LNP
-RoTvjFB1ONxEfKsdrMhJvWbBJKu5AUc+9LRVSqzdQ5A0RfpKIneMV6kyjSVi2Io4
-1wyPtODfqjf4qCSnqAODl2i/YGv+yROouYCFA24iCMJ9sVpc0UwBHAQb3AFfIWlm
-ETQgCJpqueXMCMJNTXqUqMc1natNGA81jOPIg7CB3a3fxCRb4HxwOf5P8JrUmPWo
-1VvaTIAG01p4n0S8IKjjG34RHqBxkQ==
-=cZj9
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpU39AACgkQJNaLcl1U
+h9Bv8Af/esNQJhQ1vINdTOSWx7oXRYHDQ9JpDR91x/iv9ZbQBhC+p0iJQXu+UHv1
+P3S9sApgeTWxnXK3aRduh//PZzX/hVMaimqGmWv0lsaGZgRiE0YUchgqYiAnnRhU
+q6xuvn5obacZHXSTTca7zfibwlFUqCPj6axMIYvIAQzWIvKNuWUdpv0JHU/x1WAq
+GGKUVhJrTYpFIEYZx18nHFisaImH5GOyLTI4Eug3A3gi514G4frwvVN/1i62szTD
+5N+xYmXfbNiuwfSWlKYj+wn66vI8LxZh7abrF/vQeSGEhYmmpaGxsRbqd8St65wv
+Jc0e8hG53Lv9IuTXclPHyyA7Ui+agA==
+=2Dqq
 -----END PGP SIGNATURE-----
 
---/XZSrZTLgS9atLBV--
+--NySqPGRbhkwbqql5--
