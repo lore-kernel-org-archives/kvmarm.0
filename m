@@ -1,186 +1,169 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6D9352032
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 18:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160BC26F2B0
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 21:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783966773; cv=none; b=iOdlCQbFJjR6EgRS+ngDsd2HmVj+LpwBFKZBzGucRirnA8/Dn5NKfVEsyUireBjORX/M08+oQ2cishITxk4GWHPV9KH8r4IMcgCNLSpRN3ApR+jeolmUN80WFoYAw9At4b77AN3s95gLfDn02a1i7s+5Hsb2Zf3Bq6ZwbvYLEOM=
+	t=1783978331; cv=none; b=JbSPU6khKdeZENOrUIqVp4x6N8C3LdB+pKOdU4GiR53FzB8UBiEnhNJTO/0Y543bjAzqWAv1jnHRKvkwIqmqMMuOZqWqZT5ZcPwlqsIpXEhCdDi0T++oMfW0Z/O40UuOuaN4EuQSwPrEeu0W9XwtEWExiD7mGoug1qtg4FyiG2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783966773; c=relaxed/simple;
-	bh=XcDcA4ks+cWLMqfNxD6uU8FdP6C/NUsSvAF8nhH1dgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWeI8C8rMEhsGsqFqMG4QgfxjGxkxuj4heze2KVF3qgdj9avdD2IWzVF7f79TUi+E0fGOaTdPnaYXQ9jbHg0rBtnHs1ImT/n+25Ump+hfhDqEkYcIyqE6xvUVPEl0oHQfpEQDUDgNDzIqESfa3JNGJw8NfM+88bxnanO9mR1YHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m+Lwq6Gk; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1783978331; c=relaxed/simple;
+	bh=Z0sMSCAgLgyNWSE7K/gg8WQciaf2vPqoggdSKX7+Z/4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=T67Bi7nm70AcpwxxAZhjwkWhfYO49DY9JwgSzy8tU+Bg/Wuhpbym6GKYJXdd0hZIZ5iTC+poZ9CW/b2Z2FI8ionT/xoTy+UWi8HvzocgaBKXOZTdMBkYrI+zL9h3L0+SxvcQRmEuZdvl1mWHmia4Ek8UsaHY78WCHPPQ9IuHF70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=FMjG4TN5 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m+Lwq6Gk"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-493be0fbcc5so8005e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 11:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783966770; x=1784571570; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=TRa3gkBurBR7N5v7ETtohTvNPFwYZWxGltJdYj43XxQ=;
-        b=m+Lwq6Gk7VPqcSJAD8yKKnllb7yIZUIAMABfgEnZQDmfDXh3zhyViA0pgkTQQHsug4
-         kr4kk2PLUm0PLE4p2baK9ZPc15Nc4NUy6ArC/+2ujdWYGcYrJ3eJZ8vHL1YW1S/kNLRK
-         hb9kl3xkjiWxituPt0ljzcpUSDEMOqgR/W5sP4hHprjULFemtO5AJWuNSBR4cFSdEViM
-         CqCdqXijQwS0eX4x+6OBKNXpHlyuyOjDiy64lhYH5TEYOLoMqJC/Qh3qAwHDdC8EsWet
-         MQTdoiTV9+mOkhUhVmWJ4/ojKlDmdm5X3JntaiVQypb3cqBlfwiD0bY+5qq5uMOl4kLf
-         qxFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783966770; x=1784571570;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TRa3gkBurBR7N5v7ETtohTvNPFwYZWxGltJdYj43XxQ=;
-        b=nkyGV+5/LKXWeibi5g64FnTUmmfVh7AIZ3+vdvTA86slBniP1sbGYY66AIMluxmD+j
-         zLSSbCTO2bAhdoJjgyCWSssXJxdftNQ2zCZlOySdlhXT7lJlK2jO0BlX4SJd0qpjFoA8
-         Tja5k4qWPV1OvAJgy0tEJUsMJgSemCm8iJVH3WGNLT8+SvXyillghrg/AXJkmOzlXan1
-         CXh7cCAxP6wMuIzGNylv9edUaTWo1Ennf/y8YMLTh+RKJUvKdpmzTkMZOQLx0mHmxzdH
-         Lgc3XlVdxt/rC6GsN1QEO2WDjnDHz+tkFaOPJGU6UG5wvE5FgMsS6ckoh/cIcNAeZppu
-         C+tw==
-X-Forwarded-Encrypted: i=1; AHgh+RobJ0EtcGEG3CW3raNTrENGwFhxktuvlqVews8cykj1EJtF79R/QlYxr8HH2VpqzzvG4M27pog=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywm57VHva4tSmhzkcIyWjVU1yaDg+NH7D3SLrdTfO88oyB0skTV
-	cqfONxnk2ao/a99VYJwWoY7CcMtrwWZbk9EEbGlDb455r4V5t5XDpKeFz0dVmGxivw==
-X-Gm-Gg: AfdE7cm4RbMTM3IL32rcw0ftFzlchPqpGphMT6EIbcGb4yoL0GG7XQLApgIG3xijVbf
-	bNeSvc8jCjT+1d4u86eEk6t8Q54S04LC2gN3l/eo6eY0+qkcopMy3qVtJwlsl9mMoblFcezpI9y
-	Q4GfqGjVroi4jRVdKD20B54qYlnE3Rwp9OVMm7SwS66kjR1fOvG9Qqgjo+ybqfnTFmkYrBfLlMm
-	xTwLZQAgS1CGHmfE9o4/hPuHPOakcKECOPnEAykg4Zs/GWx3LVrEUjEoMqwEUDNdgJnRY5iFpFG
-	whBcJx07/YmXn0UaBxP3+vuLReF3vpUUKDdFKKJjOQfgpmRb8yKf+f9I8fA7uONBIcv9ZeXxoWd
-	GazcRsLE5jrFdtdOD5Vhgp+2nuU4RU2hAnDzQhmdW/vY+ZG41YcU3Tb+u43JLAEbOiQrU9x/w3C
-	3LATOoOHT1xAYlHbF2ayPTwYIS3sMALs8z4IYD822fXWMgz/bN
-X-Received: by 2002:a05:600c:3f19:b0:493:adf3:d892 with SMTP id 5b1f17b1804b1-49462146d30mr789945e9.3.1783966770170;
-        Mon, 13 Jul 2026 11:19:30 -0700 (PDT)
-Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f2a38b19sm215129925e9.0.2026.07.13.11.19.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 11:19:29 -0700 (PDT)
-Date: Mon, 13 Jul 2026 18:19:24 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
-	jgg@ziepe.ca, mark.rutland@arm.com, qperret@google.com,
-	tabba@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page
- table
-Message-ID: <alUsLFBQ5qKFOgwQ@google.com>
-References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-9-smostafa@google.com>
- <alTnAy7jvjUamwUA@google.com>
- <alTvf7iiOWn4PKE8@google.com>
- <alUA7zsJO1FGnss-@google.com>
- <alUJa5cbjjqZ8n72@google.com>
- <alUMVU7DYcrvgAYi@google.com>
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="FMjG4TN5"
+Received: from [192.168.10.145] (p865013-ipoe.ipoe.ocn.ne.jp [153.242.222.12])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 66DLVGmU018090
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 14 Jul 2026 06:31:16 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=7vu1Cqv1kY9MENEn9rk5xVTv4OyzC50IlKtSKEl+6V4=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20250326; t=1783978277; v=1;
+        b=FMjG4TN5ZC4Lzu6aXdhRf2FxBZecWOyitGLFQbs5P8rBoBKp/nTv9LnXYVx8oAxD
+         HioMIzBQr+XCM+O6fR/Pvg6nKp/eg6Ob+S2qp3XmTrIy8hywhIiaoHUcPKYfv4L1
+         tnJOgYvDpM6/vO3n6m3GEtGPLislK5pioqa1KHKC6Q0HGtPyPrQQPbRtYqbyqL/X
+         Rk/vz4oWXClhNVmeJpbg4C1yARqOa+eOIntlSDqXm/NIVdc9unvml6NsgkKFMRVm
+         gCD0Q0c/NpMtRSfDmGd1egtNS9hNUbih+ffwx9egfb+j+Dm1fBhkUBrr5KtBQr9w
+         PiCYTiHTQ1815xOjwOQfSQ==
+Message-ID: <3389f9d7-15cb-4bf8-804b-7dcaee2d252e@rsg.ci.i.u-tokyo.ac.jp>
+Date: Tue, 14 Jul 2026 06:31:16 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alUMVU7DYcrvgAYi@google.com>
+User-Agent: Mozilla Thunderbird
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Subject: Re: [PATCH v8 01/11] KVM: arm64: Serialize userspace MDCR_EL2 access
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu
+ <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20260710-hybrid-v8-0-621409f3a592@rsg.ci.i.u-tokyo.ac.jp>
+ <20260710-hybrid-v8-1-621409f3a592@rsg.ci.i.u-tokyo.ac.jp>
+ <alSU0ZoIQ3sMLo0p@kernel.org>
+Content-Language: en-US
+In-Reply-To: <alSU0ZoIQ3sMLo0p@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 13, 2026 at 05:03:33PM +0100, Vincent Donnefort wrote:
-> On Mon, Jul 13, 2026 at 03:51:07PM +0000, Mostafa Saleh wrote:
-> > On Mon, Jul 13, 2026 at 04:14:55PM +0100, Vincent Donnefort wrote:
-> > > On Mon, Jul 13, 2026 at 02:00:31PM +0000, Mostafa Saleh wrote:
-> > > > On Mon, Jul 13, 2026 at 02:24:19PM +0100, Vincent Donnefort wrote:
-> > > > > On Fri, May 01, 2026 at 11:19:10AM +0000, Mostafa Saleh wrote:
-> > > > > > Create a page-table for the IOMMU that shadows the host CPU stage-2
-> > > > > > to establish DMA isolation.
-> > > > > > 
-> > > > > > An initial snapshot is created after the driver init, then
-> > > > > > on every permission change a callback would be called for
-> > > > > > the IOMMU driver to update the page table.
-> > > > > > 
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > > +	 */
-> > > > > > +	if (pte && !kvm_pte_valid(pte))
-> > > > > > +		return 0;
-> > > > > > +
-> > > > > > +	if (kvm_pte_valid(pte)) {
-> > > > > > +		prot = pkvm_to_iommu_prot(kvm_pgtable_stage2_pte_prot(pte));
-> > > > > > +		/* If the range is mapped in a single PTE, it must be the same type.*/
-> > > > > > +		if (!addr_is_memory(start))
-> > > > > > +			prot |= IOMMU_MMIO;
-> > > > > > +
-> > > > > > +		return kvm_iommu_ops->host_stage2_idmap(start, end, prot);
-> > > > > 
-> > > > > Do we really need to do that when is_memory()? 
-> > > > > 
-> > > > > fix_host_ownership_walker() by calling host_stage2_idmap_locked() and
-> > > > > host_stage2_set_owner_locked() should already handle the memory region. That
-> > > > > would also get rid of kvm_idmap_initialized.
-> > > > > 
-> > > > > So this one here could only take care of the MMIO?
-> > > > > 
-> > > > > Overall we would have a common point of synchro which is
-> > > > > fix_host_ownership_walker() after which the host ownership is ready for both
-> > > > > CPU stage-2 and the IOMMU?
-> > > > > 
-> > > > 
-> > > > I am not sure I understand, this is another empty page table, so we
-> > > > have to walk all of the host CPU stage-2 page table to shadow it in the
-> > > > IOMMU. if you are refering to the case where it handle zero ptes for
-> > > > memory, I can drop that but it will not change much in this logic.
-> > > 
-> > > In fixup_host_ownership() we already walk the hyp pgtable to know what needs to be
-> > > map/unmapped from the host stage-2. Can't we rely on that for the IOMMU
-> > > page-table as well?
-> > > 
-> > > As of, fix_host_ownership() could handle the host stage-2 __and__ the iommu? 
-> > 
-> > fix_host_ownership() only walks the hypervisor page table, and fixes the
-> > hypervisor pages in the host.
+On 2026/07/13 16:33, Oliver Upton wrote:
+> Hi,
 > 
-> Yeah, Looking closer I don't think my proposal simplify things so much in the
-> end.
+> On Fri, Jul 10, 2026 at 08:14:55PM +0900, Akihiko Odaki wrote:
+>> kvm_arm_set_nr_counters() updates MDCR_EL2.HPMN for every vCPU while
+>> holding kvm->arch.config_lock. However, KVM_SET_ONE_REG currently writes
+>> MDCR_EL2 through the generic sysreg path without taking the same lock.
+>> Concurrent PMU configuration and register restore can therefore race and
+>> lose updates to unrelated MDCR_EL2 bits.
 > 
-> > That means that the IOMMU page table has
-> > to  be fully populated first, then we unmap the donated pages.
-> > That seems more complicated and it feels that decoupling the IOMMU
-> > logic outside of this would be better.
+> Ugh, we should just stop updating MDCR_EL2.HPMN altogether. Since this
+> overwrites the previous value (rather than clamping it) we could discard
+> a legal value set by userspace.
 > 
-> Why more complicated? That's actually another solution I was thinking about, to
-> just map everything as soon as possible and let host_stage2_idmap_locked() and
-> host_stage2_set_owner_locked() unmap what is needed here. (and also in
-> __pkvm_host_donate_hyp_mmio())
+>  From the UAPI POV all we need to do is ensure the reset value is sane.
+> The documentation says that system registers are reset to their warm
+> reset values when KVM_ARM_VCPU_INIT is called. Which in this would mean
+> HPMN is reset to the number of implemented counters at the time of the
+> ioctl.
 > 
-> We wouldn't need any specific setup walker for the iommu at all.
+> If userspace changes the number of counters afterwards, that's their
+> problem.
 
-That would walk the table twice, first time with a massive map, then
-to unmap the pages that was just mapped, issuing TLB invalidations
-for all of those, also as the IOMMU page table code never frees tables
-that means we would immediately exahust the IOMMU pool.
+One wrinkle is that KVM_ARM_VCPU_PMU_V3_SET_PMU and 
+KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS can only be used after 
+KVM_ARM_VCPU_INIT. Thus, either change necessarily occurs after the
+initial MDCR_EL2.HPMN reset value has been established. Userspace can 
+issue KVM_ARM_VCPU_INIT again to reset HPMN from the new counter count.
 
-Also, I believe that it is better to isolate the IOMMU page table
-shadowing logic from the core hypervisor page table setup, specially
-AFAICT, that was not what fix_host_ownership() was designed for, and
-seems the IOMMU will just piggyback on a existing walker.
+This is awkward, but reflects the ordering imposed by the current UAPI. 
+On real hardware, the counter count is fixed before the CPU is reset, 
+whereas the UAPI configures it after the initial vCPU reset. 
+Reinitializing the vCPU is at least consistent with the documented warm
+reset semantics.
+
+I'll update the next version to stop rewriting MDCR_EL2.HPMN after vCPU 
+initialization. This also removes the need to serialize userspace 
+MDCR_EL2 access or reject HPMN values.
+
+Regards,
+Akihiko Odaki
 
 > 
-> > 
-> > Also, I rely on the IOMMU init to be done at the end of setup, so we
-> > do not have to clean the IOMMU init if any other part of KVM fails.
+>> Add explicit userspace accessors for MDCR_EL2. Serialize them with
+>> config_lock so whole-register userspace writes cannot race with HPMN
+>> rewrites, reject HPMN values above the configured PMU counter count, and
+>> request a PMU reload when HPME changes to match guest trap behavior.
+>>
+>> Fixes: c8823e51b534 ("KVM: arm64: Fix MDCR_EL2.HPMN reset value")
+>> Closes: https://sashiko.dev/#/patchset/20260706-hybrid-v8-0-de459617b59d%40rsg.ci.i.u-tokyo.ac.jp?part=6
+>> Assisted-by: Codex:gpt-5.5
+>> Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+>> ---
+>>   arch/arm64/kvm/sys_regs.c | 39 ++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 38 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index d217530359ba..2b2ea33159e9 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -2949,6 +2949,42 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
+>>   	return true;
+>>   }
+>>   
+>> +static int get_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>> +		    u64 *val)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +
+>> +	guard(mutex)(&kvm->arch.config_lock);
 > 
-> We could just leak those pages if it fails?
-
-It is not just about pages, the hypervisor will also configure the SMMU
-registers. Ideally, we would need a remove() driver ops for such cases
-but I added the IOMMU init call at the end to avoid making this series
-any bigger.
-
-Thanks,
-Mostafa
+> Hrm... I would strongly prefer that we *not* take the config_lock for
+> this register since there's no way for userspace to avoid lock
+> contention. ID registers are special and documented as VM-scoped, so an
+> aware VMM could potentially set these once (avoiding the lock).
+> 
+>> +	*val = __vcpu_sys_reg(vcpu, MDCR_EL2);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int set_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>> +		    u64 val)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	u64 old, hpmn = FIELD_GET(MDCR_EL2_HPMN, val);
+>> +
+>> +	guard(mutex)(&kvm->arch.config_lock);
+>> +
+>> +	if (hpmn > vcpu->kvm->arch.nr_pmu_counters)
+>> +		return -EINVAL;
+> 
+> KVM allows userspace to write whatever it wants right now, we can't
+> start rejecting values that were previously valid. The architecture also
+> allows anything to be written to the field, just that unimplemented
+> values have UNKNOWN behavior.
+> 
+> Thanks,
+> Oliver
 
