@@ -1,190 +1,186 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4EC4218B1
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 16:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6D9352032
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 18:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783961384; cv=none; b=HBYvTHsTTAr2K2E4kBWS0Z6zgPVt9SrnkGxig4EczfwVNOV30DKD7eOwXWnXX/cXMqv8S5iVJEogFYiRNnXOyhp35ds48qqk3a5RNzxheq162m51uw7aipugwSwLPXj7Q6m9591tAMbrbVcd46k/q3eo6lUon+75rvQEK4XXhZE=
+	t=1783966773; cv=none; b=iOdlCQbFJjR6EgRS+ngDsd2HmVj+LpwBFKZBzGucRirnA8/Dn5NKfVEsyUireBjORX/M08+oQ2cishITxk4GWHPV9KH8r4IMcgCNLSpRN3ApR+jeolmUN80WFoYAw9At4b77AN3s95gLfDn02a1i7s+5Hsb2Zf3Bq6ZwbvYLEOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783961384; c=relaxed/simple;
-	bh=iBsLy9VMMlE2P+1xnzn7kzv590hlV+78bE+Uh3bXH8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D8TeNR5aYvQcNjXUYtZpQ/wVfKl6Y/TuRf5QvDMWX/RcbNrMsxh31mcqTTzuw9ZgSZr63Fabgx3HsryRGqIsaoEvWYLuiLNouLJL/VklurWz2BuPg9M8VMD6Ch5satpX0X8sZEDyy9+4s0zDE2VhptC+D8A+jvbdLUSkhnZZ944=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dATNxewf; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1783966773; c=relaxed/simple;
+	bh=XcDcA4ks+cWLMqfNxD6uU8FdP6C/NUsSvAF8nhH1dgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eWeI8C8rMEhsGsqFqMG4QgfxjGxkxuj4heze2KVF3qgdj9avdD2IWzVF7f79TUi+E0fGOaTdPnaYXQ9jbHg0rBtnHs1ImT/n+25Ump+hfhDqEkYcIyqE6xvUVPEl0oHQfpEQDUDgNDzIqESfa3JNGJw8NfM+88bxnanO9mR1YHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m+Lwq6Gk; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dATNxewf"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DFEZvH2836434;
-	Mon, 13 Jul 2026 16:49:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=A+Hmim
-	H2s1HAkSgAokpk+iJmU3+iLNnhSMTAZmUnv24=; b=dATNxewfjCQGKXJIS/MCM0
-	QTbLLlxKGhSwOwXFcwj1LTf/sarWVEdoNe4J54bUjfmJCfgfqmjndvjyHAQarIw9
-	IGcg3RZ3kMhE8Aax4Jf7ULuXgqxKvt8qArRqkuBfNX2aQg7bYR30L6tz3ssDaG/7
-	Ci935S8ZKktDo8d/uRyjknkHr+sTSyKVmCCEvcDi8SJjKPf0JLs7mvYyfBEDF6Jk
-	0uAVJ2YTkUWj0CintH8vPWJkw1Vrz+mpvW7KEhbiDrqNCYg1BCT3mVwuDaqezImH
-	bzjTSiAEawiNGSPwPENBli1sWp5csJpgVUUjZYRamyYFrUdNPFZTCP2zvufuzw7g
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbepx9sj8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jul 2026 16:49:28 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66DGYdxO030256;
-	Mon, 13 Jul 2026 16:49:27 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fc2uxxced-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jul 2026 16:49:27 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66DGnKLt16712004
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 Jul 2026 16:49:20 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 646B620043;
-	Mon, 13 Jul 2026 16:49:20 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 585FE20040;
-	Mon, 13 Jul 2026 16:49:18 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.87.153.197])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon, 13 Jul 2026 16:49:18 +0000 (GMT)
-Date: Mon, 13 Jul 2026 18:38:29 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich
- <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Joey Gouly
- <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-        Nico Boehr
- <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch
- <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo
- Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand
- <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon
- <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 13/27] KVM: s390: Prepare KVM/s390 for a second KVM
- module
-Message-ID: <20260713183829.63e570b2@p-imbrenda>
-In-Reply-To: <20260706085229.979525-14-seiden@linux.ibm.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
-	<20260706085229.979525-14-seiden@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-redhat-linux-gnu)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m+Lwq6Gk"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-493be0fbcc5so8005e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 11:19:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783966770; x=1784571570; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=TRa3gkBurBR7N5v7ETtohTvNPFwYZWxGltJdYj43XxQ=;
+        b=m+Lwq6Gk7VPqcSJAD8yKKnllb7yIZUIAMABfgEnZQDmfDXh3zhyViA0pgkTQQHsug4
+         kr4kk2PLUm0PLE4p2baK9ZPc15Nc4NUy6ArC/+2ujdWYGcYrJ3eJZ8vHL1YW1S/kNLRK
+         hb9kl3xkjiWxituPt0ljzcpUSDEMOqgR/W5sP4hHprjULFemtO5AJWuNSBR4cFSdEViM
+         CqCdqXijQwS0eX4x+6OBKNXpHlyuyOjDiy64lhYH5TEYOLoMqJC/Qh3qAwHDdC8EsWet
+         MQTdoiTV9+mOkhUhVmWJ4/ojKlDmdm5X3JntaiVQypb3cqBlfwiD0bY+5qq5uMOl4kLf
+         qxFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783966770; x=1784571570;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=TRa3gkBurBR7N5v7ETtohTvNPFwYZWxGltJdYj43XxQ=;
+        b=nkyGV+5/LKXWeibi5g64FnTUmmfVh7AIZ3+vdvTA86slBniP1sbGYY66AIMluxmD+j
+         zLSSbCTO2bAhdoJjgyCWSssXJxdftNQ2zCZlOySdlhXT7lJlK2jO0BlX4SJd0qpjFoA8
+         Tja5k4qWPV1OvAJgy0tEJUsMJgSemCm8iJVH3WGNLT8+SvXyillghrg/AXJkmOzlXan1
+         CXh7cCAxP6wMuIzGNylv9edUaTWo1Ennf/y8YMLTh+RKJUvKdpmzTkMZOQLx0mHmxzdH
+         Lgc3XlVdxt/rC6GsN1QEO2WDjnDHz+tkFaOPJGU6UG5wvE5FgMsS6ckoh/cIcNAeZppu
+         C+tw==
+X-Forwarded-Encrypted: i=1; AHgh+RobJ0EtcGEG3CW3raNTrENGwFhxktuvlqVews8cykj1EJtF79R/QlYxr8HH2VpqzzvG4M27pog=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywm57VHva4tSmhzkcIyWjVU1yaDg+NH7D3SLrdTfO88oyB0skTV
+	cqfONxnk2ao/a99VYJwWoY7CcMtrwWZbk9EEbGlDb455r4V5t5XDpKeFz0dVmGxivw==
+X-Gm-Gg: AfdE7cm4RbMTM3IL32rcw0ftFzlchPqpGphMT6EIbcGb4yoL0GG7XQLApgIG3xijVbf
+	bNeSvc8jCjT+1d4u86eEk6t8Q54S04LC2gN3l/eo6eY0+qkcopMy3qVtJwlsl9mMoblFcezpI9y
+	Q4GfqGjVroi4jRVdKD20B54qYlnE3Rwp9OVMm7SwS66kjR1fOvG9Qqgjo+ybqfnTFmkYrBfLlMm
+	xTwLZQAgS1CGHmfE9o4/hPuHPOakcKECOPnEAykg4Zs/GWx3LVrEUjEoMqwEUDNdgJnRY5iFpFG
+	whBcJx07/YmXn0UaBxP3+vuLReF3vpUUKDdFKKJjOQfgpmRb8yKf+f9I8fA7uONBIcv9ZeXxoWd
+	GazcRsLE5jrFdtdOD5Vhgp+2nuU4RU2hAnDzQhmdW/vY+ZG41YcU3Tb+u43JLAEbOiQrU9x/w3C
+	3LATOoOHT1xAYlHbF2ayPTwYIS3sMALs8z4IYD822fXWMgz/bN
+X-Received: by 2002:a05:600c:3f19:b0:493:adf3:d892 with SMTP id 5b1f17b1804b1-49462146d30mr789945e9.3.1783966770170;
+        Mon, 13 Jul 2026 11:19:30 -0700 (PDT)
+Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f2a38b19sm215129925e9.0.2026.07.13.11.19.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 11:19:29 -0700 (PDT)
+Date: Mon, 13 Jul 2026 18:19:24 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	jgg@ziepe.ca, mark.rutland@arm.com, qperret@google.com,
+	tabba@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page
+ table
+Message-ID: <alUsLFBQ5qKFOgwQ@google.com>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-9-smostafa@google.com>
+ <alTnAy7jvjUamwUA@google.com>
+ <alTvf7iiOWn4PKE8@google.com>
+ <alUA7zsJO1FGnss-@google.com>
+ <alUJa5cbjjqZ8n72@google.com>
+ <alUMVU7DYcrvgAYi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0jYii26hJDZei0ZDooDfsAPRucOj8cdX
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDE3MyBTYWx0ZWRfXw69rnLVWo3E4
- 5PICwphPZ40aVci50nZ1eTgLri/ZuZgTAPUupH6a7IuYKwh8WxquEBRo6CTdaIfGtRLDLht4Ura
- 30nqzUcyaeSOl1uJaT1mduXv7JmAKKo=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDE3MyBTYWx0ZWRfXxE1JTgVn45BN
- JNTRZG7vw3YykmBtc5HEf8FAJ2MFn5Iu3h/Lop0zkrDZUWx2Teqg6EEyueNiK7Uefyi0tNFNSXf
- x5T7Arpje2lMB4muAEY/hSHd7H4pQEiiuyNqIsdfolYEmsJ2Ue3GhW79GM1Z4kLEszS4IIjDlbi
- Xy6MJBkEDq7AAqMZ3S85uX0flz7PU+JcBEB3zZ9aAY/tePLz/dMLKgvy3lzWX8GXUAlEe1sjL4j
- OKCwjTuHUq5CX8cC/yBxS4EBJGegBxIifHVRtJ0VB145Ctxuyo+KdVfBV9Tje67jnV2auS6L9cf
- KySzy07y3npIC27i0w+/PP6KAtVR34RKa2KxPX7yg9mIuqibiYNd6ll8+d56X0A0Y8rsLLEaDot
- wwmXje+J2QmPY7DQI10ZXQMDuy/mIRABgQTWty02EczWVcvKA1Ac46JOE1dIT24PW0TNytau+gl
- hRHnv2oP/6nsFaBWtnw==
-X-Authority-Analysis: v=2.4 cv=XbS5Co55 c=1 sm=1 tr=0 ts=6a551718 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=X1SsQTfnGOJPsq-MPYYA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: 0jYii26hJDZei0ZDooDfsAPRucOj8cdX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-13_04,2026-07-10_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 malwarescore=0 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607130173
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alUMVU7DYcrvgAYi@google.com>
 
-On Mon,  6 Jul 2026 10:52:13 +0200
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-
-> Lay the groundwork for a second KVM module. Guard KVM/s390 behind the
-> KVM_S390 config and turn CONFIG_KVM on if selected. Move all the
-> kvm_host definitions to _s390 postfixed headers. Prepare local header
-> include guards for a new location. Move gamp related tracing into a
-> separate file. While at it, rename the main KVM/s390 files from
-> s390-kvm.{c,h} to just s390.{c,h} to match the naming scheme of other
-> architectures.
+On Mon, Jul 13, 2026 at 05:03:33PM +0100, Vincent Donnefort wrote:
+> On Mon, Jul 13, 2026 at 03:51:07PM +0000, Mostafa Saleh wrote:
+> > On Mon, Jul 13, 2026 at 04:14:55PM +0100, Vincent Donnefort wrote:
+> > > On Mon, Jul 13, 2026 at 02:00:31PM +0000, Mostafa Saleh wrote:
+> > > > On Mon, Jul 13, 2026 at 02:24:19PM +0100, Vincent Donnefort wrote:
+> > > > > On Fri, May 01, 2026 at 11:19:10AM +0000, Mostafa Saleh wrote:
+> > > > > > Create a page-table for the IOMMU that shadows the host CPU stage-2
+> > > > > > to establish DMA isolation.
+> > > > > > 
+> > > > > > An initial snapshot is created after the driver init, then
+> > > > > > on every permission change a callback would be called for
+> > > > > > the IOMMU driver to update the page table.
+> > > > > > 
+> > > > 
+> > > > [...]
+> > > > 
+> > > > > > +	 */
+> > > > > > +	if (pte && !kvm_pte_valid(pte))
+> > > > > > +		return 0;
+> > > > > > +
+> > > > > > +	if (kvm_pte_valid(pte)) {
+> > > > > > +		prot = pkvm_to_iommu_prot(kvm_pgtable_stage2_pte_prot(pte));
+> > > > > > +		/* If the range is mapped in a single PTE, it must be the same type.*/
+> > > > > > +		if (!addr_is_memory(start))
+> > > > > > +			prot |= IOMMU_MMIO;
+> > > > > > +
+> > > > > > +		return kvm_iommu_ops->host_stage2_idmap(start, end, prot);
+> > > > > 
+> > > > > Do we really need to do that when is_memory()? 
+> > > > > 
+> > > > > fix_host_ownership_walker() by calling host_stage2_idmap_locked() and
+> > > > > host_stage2_set_owner_locked() should already handle the memory region. That
+> > > > > would also get rid of kvm_idmap_initialized.
+> > > > > 
+> > > > > So this one here could only take care of the MMIO?
+> > > > > 
+> > > > > Overall we would have a common point of synchro which is
+> > > > > fix_host_ownership_walker() after which the host ownership is ready for both
+> > > > > CPU stage-2 and the IOMMU?
+> > > > > 
+> > > > 
+> > > > I am not sure I understand, this is another empty page table, so we
+> > > > have to walk all of the host CPU stage-2 page table to shadow it in the
+> > > > IOMMU. if you are refering to the case where it handle zero ptes for
+> > > > memory, I can drop that but it will not change much in this logic.
+> > > 
+> > > In fixup_host_ownership() we already walk the hyp pgtable to know what needs to be
+> > > map/unmapped from the host stage-2. Can't we rely on that for the IOMMU
+> > > page-table as well?
+> > > 
+> > > As of, fix_host_ownership() could handle the host stage-2 __and__ the iommu? 
+> > 
+> > fix_host_ownership() only walks the hypervisor page table, and fixes the
+> > hypervisor pages in the host.
 > 
-> No functional change.
+> Yeah, Looking closer I don't think my proposal simplify things so much in the
+> end.
 > 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/s390/Kconfig                             |   2 +-
->  arch/s390/boot/ipl_parm.c                     |   2 +-
->  arch/s390/boot/uv.c                           |   2 +-
->  arch/s390/configs/debug_defconfig             |   2 +-
->  arch/s390/configs/defconfig                   |   2 +-
->  arch/s390/include/asm/kvm_host.h              | 774 +-----------------
->  .../asm/{kvm_host.h => kvm_host_s390.h}       |   6 +-
->  ...kvm_host_types.h => kvm_host_s390_types.h} |   6 +-
+> > That means that the IOMMU page table has
+> > to  be fully populated first, then we unmap the donated pages.
+> > That seems more complicated and it feels that decoupling the IOMMU
+> > logic outside of this would be better.
+> 
+> Why more complicated? That's actually another solution I was thinking about, to
+> just map everything as soon as possible and let host_stage2_idmap_locked() and
+> host_stage2_set_owner_locked() unmap what is needed here. (and also in
+> __pkvm_host_donate_hyp_mmio())
+> 
+> We wouldn't need any specific setup walker for the iommu at all.
 
-I really dislike those "almost renames". I'd prefer to have a prior
-patch with the differences, and a second patch for the move.
+That would walk the table twice, first time with a massive map, then
+to unmap the pages that was just mapped, issuing TLB invalidations
+for all of those, also as the IOMMU page table code never frees tables
+that means we would immediately exahust the IOMMU pool.
 
->  arch/s390/include/asm/kvm_host_types.h        | 347 +-------
->  arch/s390/kernel/early.c                      |   2 +-
->  arch/s390/kernel/entry.S                      |  10 +-
->  arch/s390/kernel/perf_event.c                 |   2 +-
->  arch/s390/kvm/Kconfig                         |  10 +-
->  arch/s390/kvm/Makefile                        |   2 +-
->  arch/s390/kvm/dat.h                           |   6 +-
->  arch/s390/kvm/diag.c                          |   2 +-
->  arch/s390/kvm/faultin.c                       |   3 +-
->  arch/s390/kvm/faultin.h                       |   6 +-
->  arch/s390/kvm/gaccess.c                       |   2 +-
->  arch/s390/kvm/gaccess.h                       |   2 +-
->  arch/s390/kvm/gmap.c                          |   2 +-
->  arch/s390/kvm/gmap.h                          |   6 +-
->  arch/s390/kvm/guestdbg.c                      |   2 +-
->  arch/s390/kvm/intercept.c                     |   2 +-
->  arch/s390/kvm/interrupt.c                     |   2 +-
->  arch/s390/kvm/pci.c                           |   2 +-
->  arch/s390/kvm/priv.c                          |   2 +-
->  arch/s390/kvm/pv.c                            |   2 +-
->  arch/s390/kvm/{kvm-s390.c => s390.c}          |   2 +-
->  arch/s390/kvm/{kvm-s390.h => s390.h}          |   2 +-
->  arch/s390/kvm/sigp.c                          |   2 +-
->  arch/s390/kvm/trace-gmap.h                    |  45 +
->  arch/s390/kvm/trace.h                         |  14 -
->  arch/s390/kvm/vsie.c                          |   2 +-
->  include/linux/kvm_host.h                      |   2 +-
->  35 files changed, 103 insertions(+), 1176 deletions(-)
+Also, I believe that it is better to isolate the IOMMU page table
+shadowing logic from the core hypervisor page table setup, specially
+AFAICT, that was not what fix_host_ownership() was designed for, and
+seems the IOMMU will just piggyback on a existing walker.
 
-[...]
+> 
+> > 
+> > Also, I rely on the IOMMU init to be done at the end of setup, so we
+> > do not have to clean the IOMMU init if any other part of KVM fails.
+> 
+> We could just leak those pages if it fails?
+
+It is not just about pages, the hypervisor will also configure the SMMU
+registers. Ideally, we would need a remove() driver ops for such cases
+but I added the IOMMU init call at the end to avoid making this series
+any bigger.
+
+Thanks,
+Mostafa
+
