@@ -1,133 +1,179 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3E33093DD
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 16:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA4030D3EF
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 16:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783959227; cv=none; b=a5GthqFgbxeSingztuXxFGQde17CIbLM0nc9ifzap2jX/gd9Z7yFjlY8fN9ln9TCUelp6bHuGutdG3gGxuuaOK/0hMZRQduzvKmfsnKKSaqoantDfoFp68YLEuV32eUehwgaNJuI/SHK1xmIgyPXeTBIecuNFPTTFl0wnhQJlrY=
+	t=1783960043; cv=none; b=oYvg03FoR84vrwfG4sS26wRPKQse1t0VjZ1kbZryO/NrcPN0zSGY4b9pJ8rsm4e4DjoqnfLZ7GUK9H9gC/x6xSsJ0xWyMaieSG1eGk4AKBV4PiDjVXxPq3uexxQ7Ey+AQp8PLadvYkunW+s4T7zTf3uYgbD/xtY5j93MGADJmRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783959227; c=relaxed/simple;
-	bh=mfeGsIUssFD4BDa8yLNU+8MdWvaJJIrNglRzMtuFLbQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QHOThmy5kJ7uSr+c4BiHx9o1LejJKSo0MzPsw8DDfXcVmJ8W66lHuA2dwoHKzx0DQT+kOViL036zwnUl1DgXP3m5++X/z36EF5XqiEu4FvF8uWHUCSv9bZDSUJeo/QqVZnsBboswVtaR6O5vYetR6kYdn/+L/X8pcjCf7wNGSOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ca9QM4EN; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1783960043; c=relaxed/simple;
+	bh=9/dA430eBn0wUibKGs9m2V3IKUxqPP4CnsyZ/vCU/qs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=oLa1P4tWDGA4qnMBzHN56qgUALX1SCR6G7f9w5tLHtjBIs9y6DIy7blsO7Tcja3C8u9l1ANKZRmayAh6oHS8QQrYPE+WqJEItwpWKMl4f5BwgbJe1Y+L9cF4Ew81J7Eo7VNlnrYndLn9Zz4At8cixkxy3JGtn/2OVgSmtc6s3Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rQArY0Lh; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ca9QM4EN"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-84a3514f912so2302498b3a.3
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 09:13:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783959222; x=1784564022; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FaREvBP1gg2ufa+OsQJIcco6qjp0ITtDsYsM/CE0YBo=;
-        b=Ca9QM4ENoFMK2/6bKrxBdbHb2PvgJQ/OgGXkTAQAnRzpi2Ks1fhQsT+F5ME6UTY81h
-         2x/LJYMhV3fEQVF0XuGGx05Vjfo6So97TCGoyghBtfn7aEVJJfj6b5rWwqmWYPU6ptfJ
-         URBVk7SVDMOGP787Kqaut+EJEGyFv1Wq633CnojFqMI67wEPRppYcBCVJnJkrooCi9Wq
-         iHMkjStDJsHLEcSN9UOiMMTCuo2TOCwy8RfGUSLtglAmbYddObzGe5ELE/1MIoiyDwP2
-         Ug2l2g6ulMdsAX0RKLNz4uqlQQNlt9fCHmmxLmJY2O2ZOfJy3Tcjd6eOKMnK8GYKEm3B
-         hY4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783959222; x=1784564022;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=FaREvBP1gg2ufa+OsQJIcco6qjp0ITtDsYsM/CE0YBo=;
-        b=aXI7VBhZjQMxhEK6d24w9LCk/aauccHqUlsnwXcrD2KycCL0jSSy86dnNVLaHzO3cq
-         Nt7OoP5X2mvV7bX/2aiN39pcdMUhUWmI5tsYC3qEX7cFjZL3kq+IoBgXZdsQrMVxUhP3
-         tzqdJcCJE44ZBceKu/Ol2bEXDKQuZCbbkakMHU6eq9YOjxbPc2TNPsu8a1IIsfeCDdpE
-         3lOvMos59dRUrN4724AG3RyqA0M9u3Go6Kxs8wQSGRZ/hAvdxJKra/TMglMw+mTVvSxl
-         zmMgsmz+MtgddbTSqoM57SwZEnr7CyaBBf5YDk8jg+hkXmZrS7zcertj6xTiP29RHPXm
-         W39w==
-X-Forwarded-Encrypted: i=1; AHgh+RonUwCohTLyAbsyMrSTjvCv2Khqj6vZZMFxqXnbk3e9B0MkdXcQjHJQO8dPBZ+ds9Y1o0XYHAI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy7+UgnysLkY990cktKTdMpO6I00lN8nPCBrsNLccBMnAcPB8zY
-	1hphalFC4yigzz36Mz1B4cuK6oRjQQcdS8G2p+kvckpPIJ+9XymmhYBJsUzeyLp2y8+uh5d2Msf
-	pm2a2Mw==
-X-Received: from pfbkq19.prod.google.com ([2002:a05:6a00:4b13:b0:849:145f:7ff1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3021:b0:842:4b88:20ee
- with SMTP id d2e1a72fcca58-84889721d40mr9009472b3a.44.1783959221968; Mon, 13
- Jul 2026 09:13:41 -0700 (PDT)
-Date: Mon, 13 Jul 2026 09:13:41 -0700
-In-Reply-To: <8c0c099d-47aa-4bf0-ab7a-c682b0dccdf5@arm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rQArY0Lh"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 481831576;
+	Mon, 13 Jul 2026 09:27:14 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F11D3F7B4;
+	Mon, 13 Jul 2026 09:27:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783960038; bh=9/dA430eBn0wUibKGs9m2V3IKUxqPP4CnsyZ/vCU/qs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rQArY0LhHeb5W5EWwG94eauzoEVyWqhOvcyOeLx/rgVIDDk4KOvti1M6f+btBGsce
+	 9Aq68e0rcryOv5o8bxmt7e2c2/4tLhdeESV1+y3iEq1pUSBzfo/TlFlLDcKGnWuyd5
+	 GmS527v7pbeRChy4Kt/+Q+CYJzF2OsnvKYeFJu6s=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 0/6] Support the FEAT_HDBSS introduced in Armv9.5
+Date: Mon, 13 Jul 2026 17:27:09 +0100
+Message-ID: <alUR3ez1EKeWb_pM@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <alS-kcwvlASwPIzL@LeoBrasDK>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com> <alS-kcwvlASwPIzL@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <20260702142912.6395-2-alexandru.elisei@arm.com> <akwhexqW66RK5Gru@google.com>
- <ak0x0QIWWw6lFUiy@raptor> <8c0c099d-47aa-4bf0-ab7a-c682b0dccdf5@arm.com>
-Message-ID: <alUOtUEe3EW1NlqI@google.com>
-Subject: Re: [RFC PATCH 1/3] KVM: guest_memfd: Use memslot id to keep track of
- associated memslots
-From: Sean Christopherson <seanjc@google.com>
-To: David Hildenbrand <david.hildenbrand@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	fuad.tabba@linux.dev, mark.rutland@arm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 13, 2026, David Hildenbrand wrote:
-> On 7/7/26 19:05, Alexandru Elisei wrote:
-> > Hi Sean,
+On Mon, Jul 13, 2026 at 11:31:46AM +0100, Leonardo Bras wrote:
+> On Thu, Jul 09, 2026 at 06:40:20PM +0800, Tian Zheng wrote:
+> > This series of patches add support to the Hardware Dirty state tracking
+> > Structure (HDBSS) feature, which is introduced by the ARM architecture
+> > in the DDI0601 (ID121123) version.
 > > 
-> > On Mon, Jul 06, 2026 at 02:43:23PM -0700, Sean Christopherson wrote:
-> >> On Thu, Jul 02, 2026, Alexandru Elisei wrote:
-> >>> To enable memslot operations, KVM maintains two arrays of memslots, and an
-> >>> RCU pointer to the active (in use) array. Changes are made first to the
-> >>> inactive array, and the RCU pointer is updated to point to the inactive
-> >>> array, which becomes active.
-> >>>
-> >>> The guest_memfd file maintains an xarray of pointers to memslots that use
-> >>> it as the memory provider. After the RCU pointer to the active memslots is
-> >>> updated and until SRCU is synchronized, readers can observe the old or the
-> >>> new value for the active array, and therefore the old or the new pointer
-> >>> for a given memslot.  For memslot creation or deletion that is not an issue
-> >>> for guest_memfd, as readers will either read the same memslot pointer saved
-> >>> by the guest_memfd file, or a non-existing memslot.
-> >>>
-> >>> But when changing the flags for a memslot, readers can read two different
-> >>> and non-NULL memslot pointers. 
-> >>
-> >> And?  Why does that matter?  KVM memslot updates aren't atomic.  Practically
-> >> speaking, they _can't_ be made atomic. Userspace is required to quiesce all
-> >> activity that must not observe inconsistent state, i.e. userspace must pause
-> >> (stop running) vCPUs when performing a memslot update.
+> > The HDBSS feature is an extension to the architecture that enhances
+> > tracking translation table descriptors' dirty state, identified as
+> > FEAT_HDBSS. This feature utilizes hardware assistance to achieve dirty
+> > page tracking, aiming to significantly reduce the overhead of scanning
+> > for dirty pages.
 > > 
-> > Is that true when KVM_MEM_LOG_DIRTY_PAGES is toggled for a memslot?
-> 
-> Good point.
-
-Oh, right, that's "fine" because there's never an intermediate state where there's
-an INVALID_SLOT.
-
-> > As far as I can tell, KVM today tolerates VCPUs running while the
-> > KVM_MEM_LOG_DIRTY_PAGES flags is being changed for a memslot. And by
-> > tolarate I mean that VCPUs that are running when the flag is changed don't
-> > return an error from KVM_RUN. If changing a memslot while VCPUs are running
-> > were fatal, I would think that KVM would want to take vcpu->mutex for all
-> > VCPUs to keep them from running. Or is it a case of KVM allowing userspace
-> > to shoot themselves in the foot if they really want it?
+> > The purpose of this feature is to make the execution overhead of live
+> > migration lower to both the guest and the host, compared to existing
+> > approaches (write-protect or search stage-2 tables).
 > > 
-> > When the KVM_MEM_LOG_DIRTY_PAGES flags is being changed, VCPUs handling a
-> > guest fault can observe either the old memslot, with the old flags, or the
-> > new memslot, with the flag changed, but they still continue running without
-> > returning an error.
+> > The required sysreg definitions for FEAT_HDBSS have been merged into
+> > arm64 /sysregs:
+> >   [1/5] arm64/sysreg: Add HDBSS related register information
+> >         https://git.kernel.org/arm64/c/72f7be0c2e30
+> > 
+> > 
+> > After these patches, the kernel automatically enables HDBSS when dirty
+> > logging is enabled on any memslot, and disables HDBSS when dirty logging
+> > is disabled on all memslots. This series does not support dirty ring
+> > mode.
+> > 
+> > Depends-on: "KVM: arm64: Enable eager hugepage splitting if HDBSS is available"
+> > 	https://lore.kernel.org/linux-arm-kernel/20260629111820.1873540-3-leo.bras@arm.com/
 > 
-> Staring at QEMU, kvm_log_start()+kvm_log_stop() do not call
-> accel_ioctl_inhibit_begin() etc.
+> On this, FYI, there have been some discussion on this:
+> https://lore.kernel.org/all/alETGFD2Ogx6N0HB@LeoBrasDK/
 > 
-> So at least QEMU does not force VCPUs out of KVM when only updating flags.
+> Oliver's suggestion is that we don't automatically enable eager splitting, 
+> but instead we have different behaviours if the user enables it.
+> 
+> This is still under discussion there, but I think it can be useful reading. 
+> 
+> > 
+> > This dependency is mandatory. Unlike v3, where DBM was added lazily on
+> > the first dirty access via a page fault, v4 injects DBM into pgt->flags
+> > at stage-2 MMU initialization time. Combined with HDBSS being auto-enabled
+> > during migration setup, the first dirty access no longer triggers a page
+> > fault. Consequently, if lazy hugepage splitting were relied upon (which
+> > requires a page fault to trigger splitting), hugepages would never be
+> > split, leading to guest hang after migration. Leonardo's patch above
+> > ensures eager hugepage splitting is enabled (chunk_size != 0) when HDBSS
+> > is available, guaranteeing that hugepages are properly split before
+> > migration starts.
+> > 
+> > v3: https://lore.kernel.org/linux-arm-kernel/20260225040421.2683931-1-zhengtian10@huawei.com/
+> > 
+> > v3->v4 changes:
+> > - Merge sysreg definitions into the FEAT_HDBSS detection patch (was a
+> >   separate patch in v3).
+> > - Add auto DBM (Dirty Bit Modifier) support as a new patch, suggested
+> >   by Leonardo Bras. DBM is now controlled as a page-table level flag
+> >   (KVM_PGTABLE_S2_DBM) rather than per-PTE. Note that DBM is injected
+> >   at stage-2 MMU creation time, not lazily on first dirty access. This
+> >   means the first write to a dirty-logged page does not generate a
+> >   page fault, which is a key reason for the mandatory dependency on
+> >   Leonardo's eager hugepage splitting patch (see Depends-on above).
+> > - Split the v3 "Enable HDBSS support and handle HDBSSF events" patch
+> >   into three patches: per-vCPU buffer management, fault handling and
+> >   buffer flush, and auto enable/disable on dirty logging change. This
+> >   implements kernel-managed automatic HDBSS enable/disable.
+> > - Remove the KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl for manual HDBSS
+> >   on/off. HDBSS is now automatically enabled/disabled based on dirty
+> >   logging state via kvm_arch_commit_memory_region().
+> > - Change HDBSS buffer flush triggers to vcpu_put, check_vcpu_requests,
+> >   and kvm_handle_guest_abort.
+> > - Store hdbss_order at VM level (kvm->arch.hdbss_order) instead of
+> >   per-vCPU, since all vCPUs share the same order.
+> > - Document patch is not included in this version; will be sent in a
+> >   follow-up series.
+> > 
+> > Leonardo Bras (1):
+> >   KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+> > 
+> > Tian Zheng (2):
+> >   KVM: arm64: Add support for FEAT_HDBSS
+> >   KVM: arm64: Add auto DBM support for hardware dirty tracking
+> > 
+> > eillon (3):
+> >   KVM: arm64: Add HDBSS per-vCPU buffer management
+> >   KVM: arm64: Add HDBSS fault handling and buffer flush
+> >   KVM: arm64: Add auto HDBSS enable/disable on dirty logging change
+> > 
+> >  arch/arm64/include/asm/cpufeature.h    |   5 +
+> >  arch/arm64/include/asm/esr.h           |   5 +
+> >  arch/arm64/include/asm/kvm_dirty_bit.h |  29 ++++
+> >  arch/arm64/include/asm/kvm_host.h      |  14 ++
+> >  arch/arm64/include/asm/kvm_pgtable.h   |   4 +
+> >  arch/arm64/include/asm/sysreg.h        |  11 ++
+> >  arch/arm64/kernel/cpufeature.c         |  12 ++
+> >  arch/arm64/kvm/Makefile                |   1 +
+> >  arch/arm64/kvm/arm.c                   |  29 ++++
+> >  arch/arm64/kvm/dirty_bit.c             | 219 +++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c           |  35 +++-
+> >  arch/arm64/kvm/hyp/vhe/switch.c        |  15 ++
+> >  arch/arm64/kvm/mmu.c                   |  19 ++-
+> >  arch/arm64/kvm/reset.c                 |   4 +
+> >  arch/arm64/tools/cpucaps               |   1 +
+> >  15 files changed, 399 insertions(+), 4 deletions(-)
+> >  create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
+> >  create mode 100644 arch/arm64/kvm/dirty_bit.c
+> > 
+> > --
+> > 2.33.0
+> > 
 
-Yeah, as above, that should work, and KVM needs to maintain that support.
-
-> One option would be to require user space to do that also when starting+stopping
-> dirty page logging. (I'd assume that should work, but it might be tricky
-> depending on in which context it is called from QEMU migration code -- whether
-> we hold the BQL)
+Also, please remember to include the base commit, so it can be applied for 
+testing/reviewing.
