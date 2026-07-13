@@ -1,53 +1,80 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35153D3D00
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 10:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AA53E5ED6
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 10:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783937330; cv=none; b=WJLTo2G1tu225W7IN38J14oJy4izsEeMFV5yD+i66KK5rrCmNb8YTjkxgjZzRwuh5gesawjb2KKjWqj/K+FeXny11VBIR3b7DfaVPj5q9DMGXDTP0UJDKrNyNBE/tXOw/SE4g3eAvRdd3c8x5cqzBREmOjtsv8kVqqux/gH2Dyk=
+	t=1783937601; cv=none; b=dMr6feSw4mT727Ha8rzviNlJJ+VM3JWV/55z+mJHOfxAYmcQrunrn64QK4v+ALcPDm9/K5ttqGxLvoYnMII8z6bvQLdqrxM0sR8NKph7qyTKT80gTXOOYA6b8ex6+aLblWif1qdWlomjzIGBMV3SQHOvwcUS3TYXVY7fapMSlsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783937330; c=relaxed/simple;
-	bh=iGYWauEyEI7qdxoh+eeLhq0GerGnoujG8/HnZ2A/9b4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=YMaQgvHnO8pQ2Vf/2VEwCgvTuBYvkBnWmhnkWdz5qn1/8YY7HV+vNdiYR8nI7DzzgBuHZjs8IQPe4wWmSDuYqhR+v3YwSdubMxarESPeI9Avyty9Cezsdem0QYM7oHUR2dZlJwuaVJXHgaK5owKQsCss+HkMqHVUJD2iiQJ/N+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PpMeKrdN; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1783937601; c=relaxed/simple;
+	bh=u9moo65x03qWiVj+FNv6pjb8T63fO0FWXRaF/TZaVNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LKvtj89gFPXPNtwKQuej/T1Z86bwRmQJp4f24wbPnhGTwbxd9a1rHd5Cz/VmE5klOjkzA1DR3gCTrRNT4l0aXYxVdLw1Rm/5+eNMnXN2oHcnvIgG3oo1uJRPMm7w6uRLsYQWIF7g1LJWrDAQ7Ysme+dAalu8tN0VglXNPYBPIA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GakUp5Oc; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PpMeKrdN"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92D631576;
-	Mon, 13 Jul 2026 03:08:42 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B5F9A3F93E;
-	Mon, 13 Jul 2026 03:08:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1783937326; bh=iGYWauEyEI7qdxoh+eeLhq0GerGnoujG8/HnZ2A/9b4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PpMeKrdNP+xzor49EHWl9BEjBCpAFz8tKR8/wQlOKuPv/BvWV8vEJXg1qaOhKKzJK
-	 R71I7rt+UW6LUp5+/lxEY2RoFL8TycAL/5RSYWFOODNkKgHLkLWX0p1JUOrpLU76sy
-	 TOpGX/ATRzH/2mDnVYu7DP/LLJvMsjQkS63lsFjs=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Dev Jain <dev.jain@arm.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/3] Optimize S2 page splitting
-Date: Mon, 13 Jul 2026 11:08:38 +0100
-Message-ID: <alS5JQAYk9tBiV_I@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <3cb5f1d7-f1cb-44bc-925c-85b5b6909b64@arm.com>
-References: <20260708134101.2514759-1-leo.bras@arm.com> <3cb5f1d7-f1cb-44bc-925c-85b5b6909b64@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GakUp5Oc"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-493b8d99342so71625e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 03:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783937598; x=1784542398; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=4FOjodbDLawuqaxqRGW5J71xttNR9yOzfD0eE/pV9Fc=;
+        b=GakUp5Oc1ARRNMKMdwYCDLZ7Q7inNRoK061V53GcuQAdBdyoL3JACUaBiUpQnLzLuo
+         uC7KU0VgYiHTlrJqYgy66UD7seo7h0urE2TRYGEVNtGtMbPw2iCFw0ZnSN7rWLvlMRm8
+         QqxGjWKmBI6NkA1Zn8btQMQsvsTPckI2Ku2tSbYbRTzmCD8Mq5VWyoUcI4R8hgSB5f5o
+         /BZsT8LlwlpY76OoYDwg5yRRHUhTzUFLnDneuNGFIruSgpQw7YJ7GJJRorEP4buRt2bu
+         PmttwuuXKhsxFGUqPseUfTN+HvTIlNAu39VQss0fvg8PpQM1SI0iwHLkdLAR86OfP2tj
+         4v8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783937598; x=1784542398;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4FOjodbDLawuqaxqRGW5J71xttNR9yOzfD0eE/pV9Fc=;
+        b=KKJNpEm32IoOgHianUDYZobC8IVJg85duLYjhN5yzyPblMXfeFQLn7mMLe8/MiN28/
+         4Q55mZgLnRf1OkINXLpa7NMIaeelBxd7A6RH12MdAIE/9a1lgISZpVevK8VBYyMMiMQV
+         Q+AO5/JExazl0xqdzmbl29C8SeCJa86kC2HSj/m9L97fkcQFaaq086SXs7VmsPv2c83T
+         oeUgtqkBtyxIhfEOC4cGN2xxdpnDu2lfPJEx5v7+bLCZtJW+LdvqfLbcJ6zXcOR0q8Ak
+         /QTacwsWBoVZB3LVLxQ9ESSyZvXOQZ3wBtJ6qPi3YAZfOqyXMd485fhEfYb6KVIkWIYf
+         VmLQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpiLm1QobNNmxzGBaIRgGXoAmuFLZe1UkCTUFrXGwnl9S4s99NBjHL5sag1JdFUfMO6rcsw3ao=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwxbMUTd2zyxmy/tle87XJL1A4I21ql7mA9G/RMkDZq3beatJo4
+	dySYSIgyON6Rxx5F1LRmkASg/uyGmyICMgl/Xv+K9ptwdOBrD0GMusJAzZe42QSCpQ==
+X-Gm-Gg: AfdE7cnrfEqUr7pUAdduaZ+6kq+oDKf0tyJh5dSojPxD5QHg1hfXs/Z4hsL9XugPHSr
+	07ZqdvhWXeR+OMgnZHgeJFUrfVzdyNQsRgK5NN8xUeRb7qDmTvDsAH6LHcrCntVgdLtPniBFnQQ
+	NR47cRPTGwcZgcnm0OBt3rvYZRKB90MvwlC82ghZc31hUAIiSg7z5Vm71ibiEce2ZvdgMpekMKW
+	t7d1aLSLAIf0FtCshd7uVNWSqokUnihJj2ZdEbj5KdDZ9BTwol+w7fW/yrxVlsILnkhfl06YOrB
+	NOvAQ2vy11Z+k0ZbCP7iTXWpeWK69sOeWgtLF21Fjd8IukBO+WPUHkM68p+LZOeoxIJx2nSIUyX
+	R8f81Igqt1oBB6GvHkRKt34SvDyQrEyt6Zd5O8AbvIz3gZylil6JQ2e9q1C4dmOktHcYGnHxm80
+	JbZxM1MFtxtrvXcDuw8NpI+wasjbkRhWN/1SoXgXhH0BHxyzPj
+X-Received: by 2002:a05:600c:4ec6:b0:493:aed4:8d03 with SMTP id 5b1f17b1804b1-49468883469mr153335e9.9.1783937597212;
+        Mon, 13 Jul 2026 03:13:17 -0700 (PDT)
+Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039ae44sm80270824f8f.23.2026.07.13.03.13.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 03:13:15 -0700 (PDT)
+Date: Mon, 13 Jul 2026 10:13:09 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	jgg@ziepe.ca, mark.rutland@arm.com, qperret@google.com,
+	tabba@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 07/25] KVM: arm64: iommu: Introduce IOMMU driver
+ infrastructure
+Message-ID: <alS6NVzDahb2sCQP@google.com>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-8-smostafa@google.com>
+ <alEbHFbmr_PvY6ZB@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,145 +83,235 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <alEbHFbmr_PvY6ZB@google.com>
 
-On Sun, Jul 12, 2026 at 08:20:28PM +0530, Dev Jain wrote:
+On Fri, Jul 10, 2026 at 05:17:32PM +0100, Vincent Donnefort wrote:
+> On Fri, May 01, 2026 at 11:19:09AM +0000, Mostafa Saleh wrote:
+> > To establish DMA isolation, KVM needs an IOMMU driver which provides
+> > ops implemented at EL2.
+> > 
+> > Only one driver can be used and is registered with
+> > kvm_iommu_register_driver() by passing pointer to the ops.
+> > 
+> > This must be called before module_init() which is the point KVM
+> > initializes.
 > 
-> 
-> On 08/07/26 7:10 pm, Leonardo Bras wrote:
-> > While playing with dirty-bit tracking, I decided to take a look on how page
-> > splitting works. Found out all entries are walked, even though we can infer,
-> > for instance that:
-> > - If a level-3 entry is walked, it means the parent level-2 entry is split
-> > - If a split just succeeded in an table entry, it means all children nodes
-> >   are already split
+> Everywhere s/KVM/pKVM/ as this can be registered only if pKVM is enabled.
 
-Hi Dev, thanks for reviewing!
-
+Will do.
 
 > 
-> That does not happen for force_pte = false right? Or is it guaranteed that
-> in your case that force_pte = true always?
-
-IIUC for kvm_pgtable_stage2_split(), force_pte will affect the creation of 
-pagetables, and will only happen to be false if the cache used for  
-splitting hugepages does not contain enough pages to split the whole 
-subtree. In this case, it only maps one page of either table entries or 
-ptes. 
-
-I am not sure how often does that happen for the memory cache not being 
-able to split everythig, but I guess it's only when memory is tight in the 
-system. (Haven't checked, I can be wrong here)
-
-But in any case, the idea of optimizing this was discarted because it ended 
-up being faster to just skip by level.
-
-
 > > 
-> > This patches' idea is to introduce new walking flags to skip pagetable
-> > levels 0-3.
-> > 
-> > The idea of skipping child nodes was also tested, but it was marginally
-> > slower than just skipping levels, so it was discarted.
-
-^ Here
-
-Thanks!
-Leo
-
-> > 
-> > Optimization measured on two scenarios involving eager-splitting on a
-> > VM with 32 memslot of 2GB (total 64GB), and vcpu per slot:
-> > - Scenario 1: No manual protect, whole memslot split at dirty-track enable
-> >   (KVM_SET_USER_MEMORY_REGION2 ioctl with KVM_MEM_LOG_DIRTY_PAGES)
-> >   - Split happens only once, whole region
-> >   - Evalutes improved batch performance of splitting
-> > - Scenario 2: Manual protect, split happens during every dirty-bit clean
-> >   (KVM_CLEAR_DIRTY_LOG ioctl), average for 2 iterations.
-> >   - Split called multiple times, for smaller 64-page sections.
-> >   - Evaluate improved performance for multiple calls
-> > 
-> > Scenario 1, improvement on dirty-track enable ioctl for the memslot:
-> > - Memory was already split (4k pages):  -43.18% runtime (stdev 3.87%)
-> > - THP backed memory:                    -25.77% runtime (stdev 1.01%)
-> > - 64x1GB hugetlb memory:                -25.62% runtime (stdev 1.09%)
-> > 
-> > Scenario 2, improvement on dirty-log clean ioctl for the memslot:
-> > - Memory was already split (4k pages):  -39.88% runtime (stdev 2.71%)
-> > - THP backed memory:                    -25.18% runtime (stdev 0.32%)
-> > - 64x1GB hugetlb memory:                -49.17% runtime (stdev 1.86%)
-> > 
-> > For collecting above numbers, the following script was ran in both vanilla
-> > and patched kernels, with kernel parameter 'default_hugepagesz=1G', on an
-> > TX2 with 128GB RAM.
-> > 
-> > --- dirty_test.sh
-> > #!/bin/bash
-> > filename=$(uname -r |cut -d'-' -f 4-)
-> > 
-> > run_test(){
-> >   base_test="./dirty_log_perf_test -b 2G -v 32 -m 6 -m 8"
-> > 
-> >   # Manual cleaning disable
-> >   ${base_test} -g
-> >   ${base_test} -g -s anonymous_thp
-> >   echo 64 > /proc/sys/vm/nr_hugepages  
-> >   ${base_test} -g -s shared_hugetlb
-> >   echo 0 > /proc/sys/vm/nr_hugepages
-> > 
-> >   # Manual cleaning enable
-> >   ${base_test}
-> >   ${base_test} -s anonymous_thp
-> >   echo 64 > /proc/sys/vm/nr_hugepages  
-> >   ${base_test} -s shared_hugetlb
-> >   echo 0 > /proc/sys/vm/nr_hugepages
-> > }
-> > 
-> > run_test 2>&1 | tee ${filename}
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
 > > ---
+> >  arch/arm64/include/asm/kvm_host.h       |  5 +++++
+> >  arch/arm64/kvm/Makefile                 |  2 +-
+> >  arch/arm64/kvm/hyp/include/nvhe/iommu.h | 13 +++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
+> >  arch/arm64/kvm/hyp/nvhe/iommu/iommu.c   | 20 +++++++++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/setup.c         |  5 +++++
+> >  arch/arm64/kvm/iommu.c                  | 26 +++++++++++++++++++++++++
+> >  7 files changed, 72 insertions(+), 2 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/iommu.h
+> >  create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+> >  create mode 100644 arch/arm64/kvm/iommu.c
 > > 
-> > Above dirty_log_perf_test command is the standard kvm selftest found in the
-> > kernel tree. It tested the following guest modes:
-> > Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-> > Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
-> > (Modes with PA-bits:36 were discarted in this version, given the amount
-> > of RAM being used for testing, and the similarity of previous results)
-> > 
-> > Performance numbers from above modes were used to calculate average and
-> > stdev showed in the optimization results.
-> > 
-> > Changes since v2:
-> > - Rebased on top of v7.2-rc1
-> > - Improved testing, added more memory, re-tested
-> >   - Now: 32 vcpus @ total of 64G
-> >   - Before: 1cpu @ 16G
-> > 
-> > Changes since v1:
-> > - Fixed inverted flag verification priority (Sashiko)
-> > - Fixed incorrectly skipping POST call if level was skipped (Sashiko), and to that
-> > - New pre-patch that changes goto-out -> return to avoid re-testing walk_continue 
-> > v1 Link: https://lore.kernel.org/lkml/20260610202112.2695205-2-leo.bras@arm.com/
-> > 
-> > Changes since RFC:
-> > - Changed approach from return value to walk flags (Will Deacon)
-> > - Discarted skip_child approach (Oliver Upton)
-> > - Measured in real hardware, and from userspace perspective (Marc Zyngier)
-> > - Better explanation of what and how numbers were collected
-> > RFC Link: https://lore.kernel.org/all/20260515195904.2466381-1-leo.bras@arm.com/
-> > 
-> > Thanks!
-> > Leo
-> > 
-> > 
-> > Leonardo Bras (3):
-> >   KVM: arm64: Avoid re-testing walk_continue
-> >   KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-> >   KVM: arm64: Make stage2_split_walker() skip unnecessary walks
-> > 
-> >  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 28 +++++++++++++++++++++-------
-> >  2 files changed, 34 insertions(+), 7 deletions(-)
-> > 
-> > 
-> > base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 851f6171751c..52898d2a3ec6 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1733,4 +1733,9 @@ static __always_inline enum fgt_group_id __fgt_reg_to_group_id(enum vcpu_sysreg
+> >  
+> >  long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext);
+> >  
+> > +#ifndef __KVM_NVHE_HYPERVISOR__
 > 
+> I think it's not necessary, a lot of things aren't guarded for
+> __KVM_NVHE_HYPERVISOR__.
+
+That makes it clear that it is hypervisor code, but no strong opinion.
+
+> 
+> > +struct kvm_iommu_ops;
+> 
+> Perhaps we can keep this private to hyp code by just using (void *) here?
+
+That does not leak the struct, it is just a forward declaration, I
+beleive it is more clear and readable this way.
+
+> 
+> > +int kvm_iommu_register_driver(struct kvm_iommu_ops *hyp_ops);
+> > +#endif
+> > +
+> >  #endif /* __ARM64_KVM_HOST_H__ */
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index 59612d2f277c..0ddef54f7434 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -24,7 +24,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+> >  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+> >  	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
+> > -	 vgic/vgic-v5.o
+> > +	 vgic/vgic-v5.o iommu.o
+> 
+> alphabetical order.
+
+That does not seem to be already sorted.
+
+> 
+> >  
+> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+> >  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/iommu.h b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
+> > new file mode 100644
+> > index 000000000000..1ac70cc28a9e
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
+> > @@ -0,0 +1,13 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef __ARM64_KVM_NVHE_IOMMU_H__
+> > +#define __ARM64_KVM_NVHE_IOMMU_H__
+> > +
+> > +#include <asm/kvm_host.h>
+> > +
+> > +struct kvm_iommu_ops {
+> > +	int (*init)(void);
+> > +};
+> > +
+> > +int kvm_iommu_init(void);
+> > +
+> > +#endif /* __ARM64_KVM_NVHE_IOMMU_H__ */
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > index 89d0533921f9..606c0e1b7bd0 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > @@ -24,7 +24,8 @@ CFLAGS_switch.nvhe.o += -Wno-override-init
+> >  
+> >  hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+> >  	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
+> > -	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
+> > +	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o \
+> > +	 iommu/iommu.o
+> >  hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+> >  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o ../vgic-v5-sr.o clock.o
+> >  hyp-obj-y += ../../../kernel/smccc-call.o
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+> > new file mode 100644
+> > index 000000000000..406c8fb9b3b9
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+> > @@ -0,0 +1,20 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * IOMMU operations for pKVM
+> > + *
+> > + * Copyright (C) 2022 Linaro Ltd.
+> > + */
+> > +#include <nvhe/iommu.h>
+> > +
+> > +/* Only one set of ops supported */
+> > +struct kvm_iommu_ops *kvm_iommu_ops;
+> > +
+> > +
+> 
+> Empty line.
+> 
+
+Will remove it.
+
+> > +int kvm_iommu_init(void)
+> > +{
+> > +	/* Keep DMA isolation optional. */
+> > +	if (!kvm_iommu_ops || !kvm_iommu_ops->init)
+> > +		return 0;
+> 
+> The absence of the SME workaround on affected systems breaks pKVM init. So
+> perhaps the IOMMU should do the same? (see pkvm_check_sme_dvmsync_fw_call())
+> 
+
+I initially done something similar, but I was not sure if that is too
+limiting as now pKVM will not run on many hardware, I think the
+best option is to make this cmdline configurable wether DMA isolation
+is required or not.
+But for this series we can keep it optional.
+
+> > +
+> > +	return kvm_iommu_ops->init();
+> > +}
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > index 8041f6e80cd1..1f6b221db9a0 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > @@ -14,6 +14,7 @@
+> >  #include <nvhe/early_alloc.h>
+> >  #include <nvhe/ffa.h>
+> >  #include <nvhe/gfp.h>
+> > +#include <nvhe/iommu.h>
+> >  #include <nvhe/memory.h>
+> >  #include <nvhe/mem_protect.h>
+> >  #include <nvhe/mm.h>
+> > @@ -329,6 +330,10 @@ void __noreturn __pkvm_init_finalise(void)
+> >  	if (ret)
+> >  		goto out;
+> >  
+> > +	ret = kvm_iommu_init();
+> > +	if (ret)
+> > +		goto out;
+> > +
+> >  	ret = hyp_ffa_init(ffa_proxy_pages);
+> >  	if (ret)
+> >  		goto out;
+> > diff --git a/arch/arm64/kvm/iommu.c b/arch/arm64/kvm/iommu.c
+> > new file mode 100644
+> > index 000000000000..f247384fa193
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/iommu.c
+> > @@ -0,0 +1,26 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (C) 2025 Google LLC
+> > + * Author: Mostafa Saleh <smostafa@google.com>
+> > + */
+> > +
+> > +#include <linux/kvm_host.h>
+> > +
+> > +extern struct kvm_iommu_ops *kvm_nvhe_sym(kvm_iommu_ops);
+> > +
+> > +static DEFINE_MUTEX(kvm_iommu_reg_lock);
+> 
+> could be moved directly into the only user: kvm_iommu_register_driver
+
+No strong opinion, it seemed it can be easily re-used this way.
+
+> 
+> > +
+> > +int kvm_iommu_register_driver(struct kvm_iommu_ops *hyp_ops)
+> 
+> __init ?
+
+Will do.
+
+> 
+> > +{
+> > +	guard(mutex)(&kvm_iommu_reg_lock);
+> > +
+> > +	/* Only protected KVM before de-privilege. */
+> 
+> Don't think that comment brings much information, looking at the line below.
+
+I will remove it.
+
+> 
+> > +	if (!is_protected_kvm_enabled() || is_kvm_arm_initialised())
+> > +		return -EINVAL;
+> 
+> -EPERM?
+
+I can see it both ways, my thought that it is invalid to register a
+driver after a certain point, but -EPERM makes sense also.
+
+Thanks,
+Mostafa
+
