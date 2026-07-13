@@ -1,154 +1,219 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B05C388E51
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 11:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6753A38837F
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 11:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783940878; cv=none; b=Zefyfi7rAGBLnYRzCe1+Gcpk4opUIXXbZTRwg347mXzbIJJYElXFBTN6lDt2/6H6I8lN/UnKBE7eisoneJKzGHdujajAFD/Mmn87PkvU57JmFyCUJuAjVaGsVFXVlKXhXj6lJUlnXL0TlR3pplxNc1ZnWaO6lBiz+xbiOjEaWY4=
+	t=1783941443; cv=none; b=Gux6iyaJcNOLljg3tIRzT27LEWau7U5LWUhuasJmC5xa8BAyKXB+b8dS3WPMNPYy9uaglzBsaGhGKWta9SrCuvZ9MG5JdCE3QkHZKiNbQPgZkYfVtbIDi819vfoqL2ggZb86sCiQKL+JxFepiTlb3/3IhNGNg3kxbUk0gdJpCfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783940878; c=relaxed/simple;
-	bh=Eds3EgvFkpLMHtynlmWxSgjSfgcwXmnfbdoaPHhBueo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WZsBSvm3/2OBokjFx0MBkD2Ryb2Yk7H1QFod9xSW1UVFboCQO5tZwB8pSObC9xKYSbypto8Tw77IK1nvBwZdi6yQTRXbag/C5m885r9sZRfZH8X68EfwCpstIpCKODYRc/VfLxC5ZJiRDuovV3SvRhwN9CtljOM+OtFDDFA9hIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kjQN3VFo; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1783941443; c=relaxed/simple;
+	bh=E779sGiLUlh/9E4uWGKqHbSascm4LusE0eTu206KYNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=HzuPYRFI5+Xc9+oLmcAC/u1VUtWi/0ihM63GWsZPgHTf4y2bxsBK6q7CkxFlI1VNp2pquo2X1v8UIlcvzb+jnWNzImW34yjE9xATBSkqPrnDa600S45c+Aj4ycfch/abvq2XF7xJT+eD9tNt8hLAv8zE9Z1Gw/GlYTmM5rIxqts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=EYB2xZPX; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kjQN3VFo"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b8d92a4eso86545e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 04:07:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783940874; x=1784545674; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=YZ0k43QjY4fFBTZv9XwnB5eVI6fl2iA5pqXp0CRkiRA=;
-        b=kjQN3VFouwZEARB9hUIajlTsgmWEiHve6Yuwo+NxHmbWURYOusdy/YfnvJ0X2iy2U/
-         0fHW+Ike6w0BbWsAFwEKX7rFs0EzVRJb0AQXtJdsOfIf+jKev9X7BASb3rK+ZH+QnECv
-         C4do24yUKpnNhLNjbpKiDmbwCGR2U2PXTXumWVahvbc6Qe4CDyZrgtJRxbdIz8xqWioA
-         hpdk7Ux/Oro22XwJZDZKlRG6HEw/ZkEu/uyYKn3XM2Hby/zc4GwGM6O35WUWuugE7AW7
-         0IMkbubCDeuc0j702sLq6VNrPAuhVJffnQTlElOqFb7k/lRT3APpZ6DVJWVE0mLHif8L
-         1KLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783940874; x=1784545674;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YZ0k43QjY4fFBTZv9XwnB5eVI6fl2iA5pqXp0CRkiRA=;
-        b=Ns++nV/DdXFdAnfPx5X1U/dE0erGxs0iAd+5GX+f5ac55+qI9T0qDAWnv+6bbZYWAu
-         9llVxeCK6EelblpbG5rDx19eTQKkHL7/80jxfHS0o/KL47gFGIeN+w6NW7isZAVCSA6V
-         FxBivBwkgb8yULR1RGvVXF+rXzlZG4p34MmgAVqOPgRKyc+2SX90JsjOAavuEei3ApMk
-         //OV0wUv7uecLTaqlXDoPEEmoTZz3u5imNpqTbg0tj083YLAaczdBCc50LlqzcUOmL4i
-         AAWLGQCbQzXEYWg0FKTutF8SHLer6l1QItyE58wz4iiJtMUnSwvlcC817Aetl+ch3naN
-         2HBg==
-X-Forwarded-Encrypted: i=1; AHgh+RrruLUmq1+oNXbeRlBF0iO2JGT+J8pePTw03BmaMAbM6nJjaIKLl14AYnqdk9/iLSRE+Q9eg4o=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz0t5GuAWwHlk7L86+WejQlkDMSd2iOFrdEhr+hAV5iO2n05dQn
-	yDoL/IJDk8bni1LGRp7WKOrQrTHylzye7rwzpvpPymT8XYqmLl+Snn+MdyOOX8Ds9Q==
-X-Gm-Gg: AfdE7clwtkNId74FQx0XzoEV0EPP2MbjYrG24XsB2qJayPvUK2ugc44z1wXAKq4CJru
-	2xkwsHwxlzFkG1SBC4y3yq1B9Ku3qAThfv02LPLGmp4x8YfE82VIZrq9QUuABYXXkVzipKDqc/W
-	p7K/6X+OgetCTgonXzaWWsZeZ2kD1BFUdePaWI9oifUuZ9L1Rn/+L5BDqYKXaTARWGOffIiGw0c
-	EpWwBH5sLc6PP3b6kToGNE7SscDlq8YEDTX1+3y40a3f8v8zN3yqB7IN4LzPHJgP29LAl3o0WL9
-	19T8/iM09aOgnEYrVgSiMkwVTQyPTZeksiskSU/ch3Y4zCV6wql/5rAr+Dv1ePAAIhkWocvCmkP
-	g5GM89uv26NtGyK8k44bgvC7y5x8pm4ynefVUozVmsFapTlm1AsOzZK3vUTz5OGTmEEXvWxyZXq
-	HOwYSCvo4C1d4Ty8JnuiX+G9mWNIVUaLD7RWas5x4Q1cFK8g1y
-X-Received: by 2002:a05:600c:a088:b0:45f:2940:d194 with SMTP id 5b1f17b1804b1-4945e32136bmr235535e9.2.1783940873591;
-        Mon, 13 Jul 2026 04:07:53 -0700 (PDT)
-Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f214d2sm82275582f8f.33.2026.07.13.04.07.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 04:07:52 -0700 (PDT)
-Date: Mon, 13 Jul 2026 11:07:48 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
-	jgg@ziepe.ca, mark.rutland@arm.com, qperret@google.com,
-	tabba@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v6 16/25] iommu/arm-smmu-v3-kvm: Add CMDQ functions
-Message-ID: <alTHBD1YBiTbdbIG@google.com>
-References: <20260501111928.259252-1-smostafa@google.com>
- <20260501111928.259252-17-smostafa@google.com>
- <alEXQ2X_0XQylvw-@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="EYB2xZPX"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75C29153B;
+	Mon, 13 Jul 2026 04:17:16 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D12173F7B4;
+	Mon, 13 Jul 2026 04:17:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783941440; bh=E779sGiLUlh/9E4uWGKqHbSascm4LusE0eTu206KYNA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=EYB2xZPX4tsfDATUmDOiua1ROO6SUYN8dm74aY14KKpS6jZMibNO3nmvuGMngYSuQ
+	 uFNg1YLuOpUEKmc4XfBN31YpznfcBJk+MGQpMcxIKuEqO4nwqXyc1+QEnSoMTsXbSe
+	 gpN7L2pvG3niRfkbfDCIB/mCW46xIGF4/I0GxQA0=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
+Date: Mon, 13 Jul 2026 12:17:15 +0100
+Message-ID: <alTJOy8Sv4aAp_9y@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260709104026.2612599-4-zhengtian10@huawei.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com> <20260709104026.2612599-4-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <alEXQ2X_0XQylvw-@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 10, 2026 at 05:01:07PM +0100, Vincent Donnefort wrote:
-> On Fri, May 01, 2026 at 11:19:18AM +0000, Mostafa Saleh wrote:
-> > Add functions to access the command queue, there are 2 main usage:
-> > - Hypervisor's own commands, as TLB invalidation, would use functions
-> >   as smmu_send_cmd(), which creates and sends a command.
-> > - Add host commands to the shadow command queue, after being filtered,
-> >   these will be added with smmu_add_cmd_raw.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  14 ++-
-> >  .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 107 ++++++++++++++++++
-> >  2 files changed, 115 insertions(+), 6 deletions(-)
-> > 
-[...]
-
+On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
+> The DBM (Dirty Bit Modifier) attribute, introduced in ARMv8.1, enables
+> hardware to automatically promote write-clean pages to write-dirty. This
+> prevents the guest from being trapped in EL2 due to missing write
+> permissions.
 > 
-> I only looked at that smmu_wait() as this is the hyp_clock_ns() caller.
+> In this design, DBM is controlled by the page-table level flag
+> KVM_PGTABLE_S2_DBM rather than per-PTE software flags. DBM is
+> automatically set for writable non-device pages when the page-table has
+> KVM_PGTABLE_S2_DBM flag, which is determined at MMU init time based on
+> hardware capability.
 > 
-> >  
-> > +/*
-> > + * Wait until @cond is true.
-> > + * Return 0 on success, or -ETIMEDOUT
+> The DBM bit is set in stage2_set_prot_attr() for initial mappings and
+> hugepage splitting, and directly manipulated in
+> kvm_pgtable_stage2_relax_perms() when removing write-protection. On
+> W->RO downgrade, DBM is cleared to prevent hardware from silently
+> upgrading RO+DBM back to W+dirty, which would bypass KVM's write
+> tracking.
 > 
-> nit: Would be nice to explain use_wfe. 
-
-I will add it.
+> kvm_pgtable_stage2_pte_prot() does not extract the DBM bit back into
+> enum kvm_pgtable_prot because DBM is a page-table policy determined by
+> pgt->flags, not a per-PTE property. Callers should check
+> pgt->flags & KVM_PGTABLE_S2_DBM instead.
 > 
-> > + */
-> > +#define smmu_wait(use_wfe, _cond)					\
+> This ensures DBM is consistently applied across all PTEs, including
+> during hugepage splitting where child PTEs inherit DBM from the parent
+> block entry via the pgt->flags mechanism.
 > 
-> nit:, (__use_wfe, __cond), or (use_fw, cond)
-
-Will do.
-
+> Safety: DBM bit is only interpreted by hardware when VTCR_EL2.HD=1.
+> When HDBSS is not enabled (HD=0), ARM architecture guarantees hardware
+> completely ignores DBM bit in PTEs.
 > 
-> > +({									\
-> > +	int __ret = 0;							\
-> > +	u64 delay = hyp_clock_ns() + ARM_SMMU_POLL_TIMEOUT_US * 1000;	\
+> Co-developed-by: Eillon <yezhenyu2@huawei.com>
+> Signed-off-by: Eillon <yezhenyu2@huawei.com>
+> Co-developed-by: Leonardo Bras <leo.bras@arm.com>
+> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+
+Hello Tian,
+
+Have you added the above tags due to this patch being based on the below?
+https://lore.kernel.org/all/20260629111820.1873540-2-leo.bras@arm.com/
+
+Thanks!
+Leo
+
+
+> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  4 ++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 35 ++++++++++++++++++++++++++--
+>  arch/arm64/kvm/mmu.c                 |  3 +++
+>  3 files changed, 40 insertions(+), 2 deletions(-)
 > 
-> Does it help to lower the risk for the 128-bits fallback if we keep the
-> resolution to _us?
-
-I will remove the tracing clock support as mentioned and I will handle
-the overflow in smmu_wait()
-
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 41a8687938eb..5e0fac4bfa53 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -93,6 +93,8 @@ typedef u64 kvm_pte_t;
 > 
-> Also, ARM_SMMU_POLL_TIMEOUT_US seems to be 1s. Blocking that long at EL2 is
-> really terrible. Any chance to lower that? 
+>  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
 > 
-
-That should never really happen, I am re-using the kernel max, but I can
-change this for the hypervisor.
-
-> > +									\
-> > +	while (!(_cond)) {						\
-> > +		if (use_wfe) {						\
-> > +			wfe();						\
-> > +			if ((_cond))					\
+> +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
+> +
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
 > 
-> nit: I believe there's no need for the double () here is there?
+>  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+> @@ -249,10 +251,12 @@ struct kvm_pgtable_mm_ops {
+>   * enum kvm_pgtable_stage2_flags - Stage-2 page-table flags.
+>   * @KVM_PGTABLE_S2_IDMAP:	Only use identity mappings.
+>   * @KVM_PGTABLE_S2_AS_S1:	Final memory attributes are that of Stage-1.
+> + * @KVM_PGTABLE_S2_DBM:	Hardware-managed DBM for writable pages.
+>   */
+>  enum kvm_pgtable_stage2_flags {
+>  	KVM_PGTABLE_S2_IDMAP			= BIT(0),
+>  	KVM_PGTABLE_S2_AS_S1			= BIT(1),
+> +	KVM_PGTABLE_S2_DBM			= BIT(2),
+>  };
 > 
-
-Will do.
-
-Thanks,
-Mostafa
-
+>  /**
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 91a7dfad6686..21ec456ecc41 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -731,9 +731,23 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> 
+> -	if (prot & KVM_PGTABLE_PROT_W)
+> +	if (prot & KVM_PGTABLE_PROT_W) {
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> 
+> +		/*
+> +		 * Set DBM bit for writable non-device pages if the page-table
+> +		 * has KVM_PGTABLE_S2_DBM flag (system supports HDBSS).
+> +		 *
+> +		 * For stage 2 translations using Indirect permissions, if the
+> +		 * Effective value of VTCR_EL2.HD is 0, then dirty state is
+> +		 * managed by software. Hardware only updates the dirty state
+> +		 * when VTCR_EL2.HD=1 (HDBSS enabled).
+> +		 */
+> +		if ((pgt->flags & KVM_PGTABLE_S2_DBM) &&
+> +		    !(prot & KVM_PGTABLE_PROT_DEVICE))
+> +			attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +	}
+> +
+>  	if (!kvm_lpa2_is_enabled())
+>  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> 
+> @@ -1367,9 +1381,26 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> 
+> -	if (prot & KVM_PGTABLE_PROT_W)
+> +	if (prot & KVM_PGTABLE_PROT_W) {
+>  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> 
+> +		/*
+> +		 * No DEVICE filter needed here: relax_perms is only called
+> +		 * on FSC_PERM faults. Device pages always get full RW from
+> +		 * initial mapping and are never write-protected during
+> +		 * migration, so they never trigger a permission fault.
+> +		 */
+> +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
+> +			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +	} else {
+> +		/*
+> +		 * Clear DBM on W→RO downgrade to prevent hardware from
+> +		 * silently upgrading RO+DBM back to W+dirty, which would
+> +		 * bypass KVM's write tracking and cause data corruption.
+> +		 */
+> +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +	}
+> +
+>  	ret = stage2_set_xn_attr(prot, &xn);
+>  	if (ret)
+>  		return ret;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index e086c01a9325..346efed6e605 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1014,6 +1014,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>  	if (err)
+>  		goto out_free_pgtable;
+> 
+> +	if (system_supports_hdbss())
+> +		pgt->flags |= KVM_PGTABLE_S2_DBM;
+> +
+>  	mmu->pgt = pgt;
+>  	if (is_protected_kvm_enabled())
+>  		return 0;
+> --
+> 2.33.0
+> 
