@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E9F30C610;
-	Mon, 13 Jul 2026 15:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A80942DA2E;
+	Mon, 13 Jul 2026 15:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783956686; cv=none; b=fzsZtZ33PaDnrctfXVwUffK4GzYIuOfwXB6a01sfCePy/Rv+81mk9Kc8C/y7aALfPqCaIKWaOYbV5u1syps5345Irrk2nXl1g82zrUD5u4UzeBW7mmn7MEFXkPT3TYwdgCn2XnlwcbtNUGz5IF5e4UNQdwQuK6CjxRTNv4R2PoE=
+	t=1783957220; cv=none; b=ctQJPIk1dB3qmeevGqN3eqC1cXOsaHmoOW4GwC7e2cwulDFioyFZeY8oiV4HuHZaU7Ze7ejkzLDjh4G0xnypucn0XcqiQE+UVUH4gn+qpBGTsX+fJA+FGwLYqRnB4ZPoTXPV0JM6ugswdzOYIYqoEPCA3/t1cGrnWWld/415yWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783956686; c=relaxed/simple;
-	bh=nw9AjyhWyIz8P5XJZ+TTyrl9tuG3aPJ8FfojfWTnTbs=;
+	s=arc-20240116; t=1783957220; c=relaxed/simple;
+	bh=1RP7nIJvZuzFUVz7LbE/87Gze67ycwP4Zd0J1lCM4X4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mzWtnZQNSokZ6Ubk/nKzp5oCO6EBUgGJQ90dV5hvf0oBlJCEsQwWG4BhFLF6cxL8KgmTfZ9suq4SKmLKTv4NJsyVHSCnzKX8ZDs52H6Blp7YB6cX0XU9MnYzyNvWvzpUjzjdtt9XEB7ZTV3oL+ppJEVps7pUREJN2y4fR4hROGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1sjbB13; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=GUYNWELN8z64OiKkvCYeDHP6NheYmCJD4lLkLcqW1CCVv2U2Zds3pEqdHsLsLu0ynbwtrOvx8PGdbXpKFiEveMIIqY6D2qTyH42rRrtCFPmbqMJVuzzgfcGOe2rq7fThl6+PCm1oUrVz50Q45WJLXwB5Q/YetgmpM7N7CjDG4Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cn2ZUCB+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1sjbB13"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA0CE1F000E9;
-	Mon, 13 Jul 2026 15:31:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cn2ZUCB+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F25771F000E9;
+	Mon, 13 Jul 2026 15:40:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783956684;
-	bh=OU0kBWfYm2e1Vbiw7Vo5mciB2uXRYmNVKqqRWrRTVCo=;
+	s=k20260515; t=1783957219;
+	bh=bgGgHEFrLGkQhpGDdK+yppM68Mi1G34yHD+nEZ0cRvI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=R1sjbB13BZ3Mn0ZIwwmn5bjUrr3bXrQOczCT1xn1qei/TKv8hjzqLbIGFNchaa2cz
-	 q8Hw/XnZlSQWMtMq0ndTlVcNR+0PRHbnG4USdth8WMzXqu2hV21Yvks5fFqosdmDmz
-	 RQ5Z4WdNz0w1P6404eF2/A0DJtxvdyB+97oFezHC3IKfpXzFk1qlbIpmNO+AJnkqzl
-	 6aYju/mmpOkYLzscf1KYP7M32eptqvA624cG3QQpUrRW8nEPfuCHAPuEhnUjChXNSq
-	 5OCH7m0bBJV9FSW9qKX3slNiduXaXDrOdPHL4Uev65n7afFW134GKLaCvi0vpowfW6
-	 9JZt5D9LsI+2Q==
+	b=Cn2ZUCB+DP+A+yh8GoVyIuambcgu9zH+5DmmoJPwToYOYq2t2XeVgJO9coDBBFNjk
+	 81ZA7FFzrTucxbUJF7pwryMqEmNaBcfaKPuwAIwEZoiOZ5e4FB2MRdTTJqMSNoXIUj
+	 s5k7KVSP+1VHiZB1j1ulfEzWbLKtlwJqy1Ch0aJkHXnxnhEP0ML/V244TtoHApg79A
+	 69yy93M65/CibCsFPLu/xMTTe9vPbz2E7n7fnDAU4MfIH1rXSHSuagQgyXn7RXB3c6
+	 ySWxQhLOHBX6QHlFiWUnSnDEe+SPVCcpI58lu2N6i2KrU6+0PY5PAJuUF++T+tcdHm
+	 FrGMRexNuXUog==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wjIcs-00000004Y7n-3dqA;
-	Mon, 13 Jul 2026 15:31:22 +0000
-Date: Mon, 13 Jul 2026 16:33:11 +0100
-Message-ID: <87bjca6h1k.wl-maz@kernel.org>
+	id 1wjIlV-00000004YRs-09Of;
+	Mon, 13 Jul 2026 15:40:17 +0000
+Date: Mon, 13 Jul 2026 16:42:06 +0100
+Message-ID: <87a4ru6gmp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steffen Eiden <seiden@linux.ibm.com>
 Cc: kvm@vger.kernel.org,
@@ -66,12 +66,12 @@ Cc: kvm@vger.kernel.org,
 	Vasily Gorbik <gor@linux.ibm.com>,
 	Will Deacon <will@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 07/27] arm64: Prepare sharing arm64 headers with s390
-In-Reply-To: <20260710095426.984749-F-seiden@linux.ibm.com>
+Subject: Re: [PATCH v4 09/27] KVM: arm64: Access elements of vcpu_gp_regs individually
+In-Reply-To: <20260710115637.984749-H-seiden@linux.ibm.com>
 References: <20260706085229.979525-1-seiden@linux.ibm.com>
-	<20260706085229.979525-8-seiden@linux.ibm.com>
-	<878q7n7qzi.wl-maz@kernel.org>
-	<20260710095426.984749-F-seiden@linux.ibm.com>
+	<20260706085229.979525-10-seiden@linux.ibm.com>
+	<86cxx0ovx5.wl-maz@kernel.org>
+	<20260710115637.984749-H-seiden@linux.ibm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,111 +87,103 @@ X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 10 Jul 2026 10:54:26 +0100,
+On Fri, 10 Jul 2026 12:56:37 +0100,
 Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> On Mon, Jul 06, 2026 at 10:22:41PM +0100, Marc Zyngier wrote:
-> > On Mon, 06 Jul 2026 09:52:07 +0100,
+> On Mon, Jul 06, 2026 at 06:44:06PM +0100, Marc Zyngier wrote:
+> > On Mon, 06 Jul 2026 09:52:09 +0100,
 > > Steffen Eiden <seiden@linux.ibm.com> wrote:
 > > > 
-> > > Prepare the sharing of arm64 headers with s390 by marking the shared
-> > > regions or add a comment that the whole file is shared.
-> > > The regions are marked with:
+> > > While for arm64 the members of vcpu_gp_regs are allocated continuous
+> > > this is not necessarily true for other architectures implementing ARM.
 > > > 
-> > >  #define ARM64_S390_COMMON
-> > > 
-> > >  /* insert shared definitions here */
-> > > 
-> > >  #endif /* ARM64_S390_COMMON */
-> > > 
-> > > The preprocessor symbol ARM64_S390_COMMON is always defined for arm64.
-> > > Reduce the include scope where possible and beneficial for s390.
-> > > No functional change.
-> > > 
-> > > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > > ---
-> > >  arch/arm64/Makefile                  |  2 ++
-> > >  arch/arm64/include/asm/brk-imm.h     |  1 +
-> > >  arch/arm64/include/asm/esr.h         |  5 +++--
-> > >  arch/arm64/include/asm/kvm_arm.h     |  6 ++++--
-> > >  arch/arm64/include/asm/kvm_emulate.h | 19 ++++++++++++++++++
-> > >  arch/arm64/include/asm/kvm_host.h    | 28 +++++++++++++++++++++++++++
-> > >  arch/arm64/include/asm/kvm_mmu.h     |  6 ++++++
-> > >  arch/arm64/include/asm/ptrace.h      |  9 +++++++++
-> > >  arch/arm64/include/asm/sysreg.h      | 29 +++++++++++++++++++++++++---
-> > >  9 files changed, 98 insertions(+), 7 deletions(-)
-> > > 
-> 
-> ...
-> 
-> > >  		vcpu_set_flag((v), e);					\
-> > >  	} while (0)
-> > >  
-> > > +#endif /* ARM64_S390_COMMON */
-> > > +
+> > > Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
+> > > the vcpu context but the address of the gp-register array field in the
+> > > user_pt_reg struct.
 > > 
-> > It'd be worth looking at an initial patch reorganising this file to
-> > minimise the number of such markers. This is equally valid for other
-> > files in this patch.
-> > 
-> > [...]
+> > That's an interesting change of semantics, because this excludes PC
+> > from the GPRs. This is valid on AArch64, but wrong for AArch32 (PC
+> > really is R15, and is just another GPR).
+> >
+> 
+> I never looked into AArch32 thanks for pointing this out.
+> 
+> > It isn't a huge deal, and nothing breaks, but that's something that
+> > you may want to capture.
 > > 
 > 
-> So it is fine if I reorganize files a bit to reduce the number of
-> markes?
+> Shall I add a comment into the commit message that this splits pc from
+> the gprs for arm32?
 
-Within reason, yes.
-
-> I feared it would not. I will reorganize the files a bit then if this
-> reduces the number of sections. Also if some thiings are required in a
-> later series I might alreaddy share the stuff if possible if that
-> reduces the number of regions.
-
-We'll have to evaluate the amount of churn this generates, but overall
-it would makes sense to keep related things together, and apply the
-markers sensibly.
+Yeah, I really want this stuff to be correctly documented, just in
+case we break something and have to go back in time to find out why.
+That's overall something that could be improved in this series.
 
 [...]
 
-> > > +#ifdef ARM64_S390_COMMON
-> > > +
-> > >  /*
-> > >   * Instructions for modifying PSTATE fields.
-> > >   * As per Arm ARM for v8-A, Section "C.5.1.3 op0 == 0b00, architectural hints,
-> > > @@ -91,8 +99,6 @@
-> > >   */
-> > >  #define pstate_field(op1, op2)		((op1) << Op1_shift | (op2) << Op2_shift)
-> > >  #define PSTATE_Imm_shift		CRm_shift
-> > > -#define ENCODE_PSTATE(x, r)		(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
-> > > -#define SET_PSTATE(x, r)		__emit_inst(ENCODE_PSTATE(x, r))
+> > > diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> > > index bef40ddb16db..82611442a2d1 100644
+> > > --- a/arch/arm64/kvm/hyp/exception.c
+> > > +++ b/arch/arm64/kvm/hyp/exception.c
+> > > @@ -277,6 +277,9 @@ static const u8 return_offsets[8][2] = {
+> > >  	[7] = { 4, 4 },		/* FIQ, unused */
+> > >  };
 > > >  
-> > >  #define PSTATE_PAN			pstate_field(0, 4)
-> > >  #define PSTATE_UAO			pstate_field(0, 3)
-> > > @@ -100,6 +106,11 @@
-> > >  #define PSTATE_DIT			pstate_field(3, 2)
-> > >  #define PSTATE_TCO			pstate_field(3, 4)
-> > >  
-> > > +#endif /* ARM64_S390_COMMON */
+> > > +#define OFFSETOF_PT_REG(__r) offsetof(struct user_pt_regs, __r)
+> > > +#define COMPAT_IDX(__c) ((OFFSETOF_PT_REG(__c) - OFFSETOF_PT_REG(regs[0])) / sizeof(u64))
 > > > +
-> > > +#define ENCODE_PSTATE(x, r)		(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
-> > > +#define SET_PSTATE(x, r)		__emit_inst(ENCODE_PSTATE(x, r))
-> > > +
-> > >  #define SET_PSTATE_PAN(x)		SET_PSTATE((x), PAN)
-> > >  #define SET_PSTATE_UAO(x)		SET_PSTATE((x), UAO)
-> > >  #define SET_PSTATE_SSBS(x)		SET_PSTATE((x), SSBS)
-> > > @@ -123,6 +134,8 @@
-> > >  #define GSB_SYS_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 0, 31)
-> > >  #define GSB_ACK_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 1, 31)
 > > 
-> > What is the reason to avoid dragging these definitions? They seem
-> > extremely similar to the rest.
+> > Oh $gawd, this is... awful.
 > > 
+> > >  static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+> > >  {
+> > >  	unsigned long spsr = *vcpu_cpsr(vcpu);
+> > > @@ -292,12 +295,12 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+> > >  	switch(mode) {
+> > >  	case PSR_AA32_MODE_ABT:
+> > >  		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
+> > > -		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
+> > > +		vcpu_gp_regs(vcpu)[COMPAT_IDX(compat_lr_abt)] = return_address;
+> > >  		break;
+> > 
+> > Stupid idea: why don't you simply have new #defines that make the
+> > register number standalone, and make ptrace.h use that? Something line
+> > this (which can obviously be extended to all the compat registers):
+> > 
+> > diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
+> > index 39582511ad72f..2d3d324d2598e 100644
+> > --- a/arch/arm64/include/asm/ptrace.h
+> > +++ b/arch/arm64/include/asm/ptrace.h
+> > @@ -104,6 +104,10 @@
+> >  #define COMPAT_USER_SZ	296
+> >  
+> >  /* Architecturally defined mapping between AArch32 and AArch64 registers */
+> > +enum aarch32_reg_mapping {
+> > +	__compat_lr_und = 22,
+> > +};
+> > +
+> >  #define compat_usr(x)	regs[(x)]
+> >  #define compat_fp	regs[11]
+> >  #define compat_sp	regs[13]
+> > @@ -115,7 +119,7 @@
+> >  #define compat_sp_svc	regs[19]
+> >  #define compat_lr_abt	regs[20]
+> >  #define compat_sp_abt	regs[21]
+> > -#define compat_lr_und	regs[22]
+> > +#define compat_lr_und	regs[__compat_lr_und]
+> >  #define compat_sp_und	regs[23]
+> >  #define compat_r8_fiq	regs[24]
+> >  #define compat_r9_fiq	regs[25]
+> > 
+> > and then your #defines from hell can go?
 > 
-> They emit arm64 instructions, dont they?
+> Great suggestion I do not like this macro hell myself. I'll implement it
+> that way. Should I convert all compat_* regs to this concept or just the
+> ones I need?
 
-They emit instructions if you make use of them. And so do all the
-PSTATE macros. Why the different treatment?
-
+All of them, please., I value consistency. As you are doing this,
+consider adding a reference to I_PYKVS, which describes the mapping in
+the ARM ARM.
 
 Thanks,
 
