@@ -1,194 +1,233 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA253019C3
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 15:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5CE33A029
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 15:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783954869; cv=none; b=K7dda1gIeuzifYDkVWO+aG/81WlS4zmrc02W4K0S6tWFLLxMeB+b8QIXbzgPDxbInaJhsBRTAaVZHpQei/BQhZHejBlnAxblAEJGaWp0ZMHZcWehkZzBRfC35cxhsAJ1gNN+rq/iMpDMtGjo2l64hK+t96ODkJqFOKdkSSvtzUA=
+	t=1783955705; cv=none; b=OIZcVI73mw1PEjpS+rs9959pvQHYbzs/Rpbw7cv+HTBg3vfjMLWHoSJnNmKJdBC855acZtiHHyM481+yCaFKJCS4EJa7e9NZ/FgZdUonBdbwriY6JPLFkVKYyn6dvn3/ItRZVGtk1YLWfqA5sdnzTecw9JAZdtIcz3jecXqN0F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783954869; c=relaxed/simple;
-	bh=hlqIiRhZlkCHvonvTzLKSXIZj3XHXhx7E+Rk4m9S1RE=;
+	s=arc-20240116; t=1783955705; c=relaxed/simple;
+	bh=eo3Gk0sg4HBpFkRyTtettI73qSTpNfjBrKAN8O4o0Fs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cc04nWCjcq3ZrujR2AQDyXQXDfHSbKUzBAftnv5p0W+lHZSsXEdFhFrn6+LCO4n3KdS6wAZVHDqUrIcSvyOir/Auxr/N5HX6q7AKg6dLl5XypsVBuWLjpSS6ra1CbvXTN0PPNoXbT8YpnNYLZqEpKpe3DR421seEkC17B/nM50U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hycoharl; arc=none smtp.client-ip=209.85.128.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=JixQL7FecYaTuBQ7lZ00eUXi98XoRCNTMx+Ki1f2fphZwh//XhYve5nTQoTNoGnpsJiTbG6riCq48Fhe9gN32FscNZBVUj8IOsDMDrVm5KkwuyjbUO2K4xg/JGyXHfRz3YPXltPjNXloAVa/YvO57wwwcs7/HQWNZqf6a6kkHak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YhPQqklV; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hycoharl"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493ae59eca6so136045e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 08:01:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YhPQqklV"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-47defd0c1c5so2184760f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 08:15:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783954866; x=1784559666; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=d/zUrdSLYFP5PkDzH1dLf/JMl5TUcm+CxvXCyHNk/cg=;
-        b=HycoharlY1OpC36DpjKuhpWMGNqxfzpQXSMcsAJywc+S56WXHM1Vv/NsiYSnKHe/z6
-         beGdt3QtG1yiQYKNAotjtJCJ5gpbg8QsgcMzfwv+xiSBoAe7ggP4pCc4bzJb1hFJl7Oa
-         IZr2YrcnkF4qM3SQlAiyhw2K+2qgSW39NxbUZuFbjkqw8lfUsjh3aSXOf5K98xpmlgMR
-         NOwDODhBe5C6trzxEQyOXl6tWYPyd6cnk0H6WXiog6qkWj02KT2fA1kTMKK6A1VndpYH
-         H/g1KeevZVx9FFtIUpD8IZOtlDJU2QF2ijvWioDc2ahL3dopPy7vYYloEfw9i41xYzfy
-         RTdg==
+        d=google.com; s=20251104; t=1783955702; x=1784560502; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=P15DWYQO7QDzTQoPbuyf65oQTF47QNr5bOsQquOeepQ=;
+        b=YhPQqklVkOKL9XxMyUpScm6pujViGEIQMqlq4Efqv01FE2UYPQKuhIxWw3CnzxuKQM
+         plOQ/S/I1Rn7utOOmSL85OmzouVZMLgrpF10E5JUyVglndaTdBOo3fBlhCvPyDSVkk/o
+         4dnT2FS+mCyAlpqchECmu4u+8QrP6YGUMYzCC85/7wvhNqpJWqpElp7Sdm37QvmADKgr
+         swV7uYxhrID+zG41crLUP0JkwYxhCxebYx+gaCzCSIIXrA+Xu4z+VgfXg8lOkoDx0wNs
+         EPVcV3kMZSTes6YNrtSc4j/+haobL3X9xELF2xyhAmuLigFyHeRxTSmZwDSGUWcbU5PT
+         E5jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783954866; x=1784559666;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=d/zUrdSLYFP5PkDzH1dLf/JMl5TUcm+CxvXCyHNk/cg=;
-        b=TF7xH9l6gc03mdz39k6uMKYYWwHa8PdX8WJUVJy/8f3hqgxrHH4gaNgbzKdXRhlh8P
-         qPL96VQbn2pMt3MVv3G5CUZQN/W8VPylugqmhwK1DqiOt1Cd1eBgHM1g2/x6vgCS0dbO
-         yivWyHAcnFdUAZgLvPpix+4Ej5TGisQZSK5bsoeVC0BdBZlyaJ/UhaWHuCGAUosMMMpF
-         82qfj/yD00msIC4biUUztAzvuR6TLiLy3gqLbUvkkWOClgw+5yJJzBeDwKP+IoleMo3/
-         CET+SaNoW2hhhB/XHMtryY57Qh14nFJRYzp1ETJhXBLKNDdDRKBWtn2sMWCWavuzx0UU
-         Tg+w==
-X-Forwarded-Encrypted: i=1; AHgh+RrhV3G0vcFaURqqxQGlyxQNAuP8v8Lsi+i94EdsAie0TDK9HVjOZ3VdXQbpEg2bwiwF1TD8s8E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxEiDaaY7ZoHNcyCl7JjxHKbQQZdd3NdBdE11jq80qvM84VpqaA
-	UTwANM3m74CpvBFhKgWMBzyPBIWwwJCv3xTJpHYqhRK9sIRGkcoGhh4DaBY1PIBnBg==
-X-Gm-Gg: AfdE7cmaUkSD/jgoI/YEI/QxI6mspocY0g7u8THoqnXnCcUEcsU9I9e8LSZ3L2DHRbW
-	Dw+XRHgNy1gS5211sTiUdiVA0q/Wulr8CGAzfW6tikGErtATnRyo7IgPGKu0EVGZ54o5FpN03t2
-	g9wQigqeQjGcowUFyz0jpvtAIRlErNeKBYFoW/yAoduOR9tp3nhwyg/f7BdBYRE0KppW3s/ADuI
-	GAw8JUybm5Qr9yrWMw0NYOcxGKdQYoOgrnzBkrtZUP3RKgaCUSKVG8JxgcPjbqcHEAyuzzyysk5
-	liGJqhU2Ltk6SEBfsls7Dps/2EwEDFuO0o78t77gZMR+CCd1ogCPQfLdYxcaJGcjjEWghw7Neuh
-	eN4RnSm0zFo3IcA9p0JtHTHBezNMgEuvlRicS501RJ68wLiXNve38wd87uPAunWv1skGJQZSM0J
-	LguZZw5kf6cS3EFAuEs8ZdB5nRevoiG3/f+sZtpIhbgbNZzhEZkDScg5c9jI6YVg==
-X-Received: by 2002:a5d:588e:0:b0:47d:f43d:8947 with SMTP id ffacd0b85a97d-47f2dce306dmr11031006f8f.47.1783954864981;
-        Mon, 13 Jul 2026 08:01:04 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783955702; x=1784560502;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=P15DWYQO7QDzTQoPbuyf65oQTF47QNr5bOsQquOeepQ=;
+        b=HcL63ny25aLgBlvo/QA67LALpkyDEGC5CclNIMIlksv4S5fM8VYurm/+YRg0hs1uwY
+         0hyxm+zm56ssWC0alx4KAKXTFY6ACtdfQPMxrFQsq2LjMjnYZUENnCHLtKEi5KCcBYCO
+         /3x2ZkbenKmCWfUyCuDGjWeuqomWyIdXD1C9Niv14So/sR8h0uY5gid2kLUHa/1h/1Tu
+         NNSS/pbZTpQuZW0ZYB/hr8z5yctIQa+MipOhYRapmpLNsUhR1Je9FQ/GiLmYPXaIXgqG
+         mYIoNPWgv07AgcqxXr85XyLW05dsnoqpRekraizAGEHXUSWtxKCZXQ8FTgb/bnYAv33X
+         2QSg==
+X-Forwarded-Encrypted: i=1; AHgh+RoqAajFK8ncH9t3Dqyx6h3f0nXSyo825L+3IdQwkI+Fo/wP11JCQI6OoEpmrSWhNK49y2f+dX0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxquELikjrCEw/gBqL1U5C86yA4JWPqnd8Uxa2tbQToU5kCYn+J
+	XHseqSBEcDzL3P8oZapMnVmCTU1XA7DWqK5OwJV0HfrYJe3yzcHfyDzaHl1b3cdPGQ==
+X-Gm-Gg: AfdE7cl0cffbewKIlwHCKCsw2B6gEniDpLzy6Qmba5Nwd0rLP8pnAGJfNIzotzb8EML
+	8Y9HBp9xaGCGM5UZT4/x2ehXEiWb2IxtYGo/EdkYJk7biWGr2iUVY6OmFsabpuBmkhL90VV28g1
+	PR49ipJGYd04w+ruM5pjLURXkD++JokUbQDlkYmUBHO24NweBoWqPwRVD8CrgQZhvdxaP5YA57I
+	rAIJ/1W2yJ+EWnj8sf2LRJwAy8SV25ugoOXbIU1ANGJ/9hCqXqt7FSQo5Cf08+jBjFjlrgUCYNz
+	6oH6Z63/c/ZVqPmkaBC4kOxfpPtblJVbbPRZLjkTk/xEGxCyD9akN3AQdxErdvgX+EcRs7kjWDD
+	VMAY9c2vj5RSpSSGptK9vg8A4QWUFfOt9kdi/RAlp6aqi6HFamQPw47y/OZrAMT8GgFEHuqh2Oo
+	plGKbp9IVbg4T73nVfibAXUknVWEwnZpEWNYpiy0pZBcc1qUDJYpo=
+X-Received: by 2002:a5d:5f88:0:b0:47d:d812:e03b with SMTP id ffacd0b85a97d-47f2dce302amr10841669f8f.43.1783955701310;
+        Mon, 13 Jul 2026 08:15:01 -0700 (PDT)
 Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f2465ae8bsm29830623f8f.36.2026.07.13.08.01.04
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f4635a9cesm64944f8f.14.2026.07.13.08.14.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 08:01:04 -0700 (PDT)
-Date: Mon, 13 Jul 2026 16:01:01 +0100
+        Mon, 13 Jul 2026 08:14:59 -0700 (PDT)
+Date: Mon, 13 Jul 2026 16:14:55 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
 To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, tabba@google.com,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH v2] KVM: arm64: Avoid naming collision in tracing
-Message-ID: <alT9rXz_azhiq6Zu@google.com>
-References: <20260713141320.4065600-1-smostafa@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	jgg@ziepe.ca, mark.rutland@arm.com, qperret@google.com,
+	tabba@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v6 08/25] KVM: arm64: iommu: Shadow host stage-2 page
+ table
+Message-ID: <alUA7zsJO1FGnss-@google.com>
+References: <20260501111928.259252-1-smostafa@google.com>
+ <20260501111928.259252-9-smostafa@google.com>
+ <alTnAy7jvjUamwUA@google.com>
+ <alTvf7iiOWn4PKE8@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260713141320.4065600-1-smostafa@google.com>
+In-Reply-To: <alTvf7iiOWn4PKE8@google.com>
 
-On Mon, Jul 13, 2026 at 02:13:20PM +0000, Mostafa Saleh wrote:
-> When the hypervisor tracing (CONFIG_NVHE_EL2_TRACING) is disabled, it
-> defines a static inline stub for trace_clock().
+On Mon, Jul 13, 2026 at 02:00:31PM +0000, Mostafa Saleh wrote:
+> On Mon, Jul 13, 2026 at 02:24:19PM +0100, Vincent Donnefort wrote:
+> > On Fri, May 01, 2026 at 11:19:10AM +0000, Mostafa Saleh wrote:
+> > > Create a page-table for the IOMMU that shadows the host CPU stage-2
+> > > to establish DMA isolation.
+> > > 
+> > > An initial snapshot is created after the driver init, then
+> > > on every permission change a callback would be called for
+> > > the IOMMU driver to update the page table.
+> > > 
 > 
-> However, trace_clock() is already declared as an extern function in
-> linux/trace_clock.h which is pulled in EL2 compilation.
+> [...]
 > 
-> If the file <nvhe/clock.h> is included when CONFIG_NVHE_EL2_TRACING
-> is disabled (by including it manually in setup.c) it will cause:
-> In file included from arch/arm64/kvm/hyp/nvhe/setup.c:22:
+> > > +	 */
+> > > +	if (pte && !kvm_pte_valid(pte))
+> > > +		return 0;
+> > > +
+> > > +	if (kvm_pte_valid(pte)) {
+> > > +		prot = pkvm_to_iommu_prot(kvm_pgtable_stage2_pte_prot(pte));
+> > > +		/* If the range is mapped in a single PTE, it must be the same type.*/
+> > > +		if (!addr_is_memory(start))
+> > > +			prot |= IOMMU_MMIO;
+> > > +
+> > > +		return kvm_iommu_ops->host_stage2_idmap(start, end, prot);
+> > 
+> > Do we really need to do that when is_memory()? 
+> > 
+> > fix_host_ownership_walker() by calling host_stage2_idmap_locked() and
+> > host_stage2_set_owner_locked() should already handle the memory region. That
+> > would also get rid of kvm_idmap_initialized.
+> > 
+> > So this one here could only take care of the MMIO?
+> > 
+> > Overall we would have a common point of synchro which is
+> > fix_host_ownership_walker() after which the host ownership is ready for both
+> > CPU stage-2 and the IOMMU?
+> > 
 > 
-> ./arch/arm64/kvm/hyp/include/nvhe/clock.h:14:19: error: static declaration of ‘trace_clock’ follows non-static declaration
-> 
->    14 | static inline u64 trace_clock(void) { return 0; }
-> 
->       |                   ^~~~~~~~~~~
-> 
-> on GCC and a linker error on LLVM (it seems to change the linkage to
-> global)
-> 
-> Although that is not a problem at the moment, as no other files
-> include <nvhe/clock.h>. That does not seem to be the intent of
-> this code and that will cause issues with more users as the SMMUv3
-> driver.
-> 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
-> 
-> ---
-> I did not add Fixes tag as this is currently dormant and not breaking
-> anything.
+> I am not sure I understand, this is another empty page table, so we
+> have to walk all of the host CPU stage-2 page table to shadow it in the
+> IOMMU. if you are refering to the case where it handle zero ptes for
+> memory, I can drop that but it will not change much in this logic.
 
-Thanks for the respin
+In fixup_host_ownership() we already walk the hyp pgtable to know what needs to be
+map/unmapped from the host stage-2. Can't we rely on that for the IOMMU
+page-table as well?
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+As of, fix_host_ownership() could handle the host stage-2 __and__ the iommu? 
 
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/clock.h | 8 ++++----
->  arch/arm64/kvm/hyp/nvhe/clock.c         | 4 ++--
->  arch/arm64/kvm/hyp/nvhe/trace.c         | 4 ++--
->  3 files changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/clock.h b/arch/arm64/kvm/hyp/include/nvhe/clock.h
-> index 9f429f5c0664..ae03ec6965af 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/clock.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/clock.h
-> @@ -6,11 +6,11 @@
->  #include <asm/kvm_hyp.h>
->  
->  #ifdef CONFIG_NVHE_EL2_TRACING
-> -void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc);
-> -u64 trace_clock(void);
-> +void trace_hyp_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc);
-> +u64 trace_hyp_clock(void);
->  #else
->  static inline void
-> -trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
-> -static inline u64 trace_clock(void) { return 0; }
-> +trace_hyp_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
-> +static inline u64 trace_hyp_clock(void) { return 0; }
->  #endif
->  #endif
-> diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
-> index a7fc61976fd0..f3e2619db4e4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/clock.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
-> @@ -30,7 +30,7 @@ static u64 __clock_mult_uint128(u64 cyc, u32 mult, u32 shift)
->  }
->  
->  /* Does not guarantee no reader on the modified bank. */
-> -void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
-> +void trace_hyp_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
->  {
->  	struct clock_data *clock = &trace_clock_data;
->  	u64 bank = clock->cur ^ 1;
-> @@ -48,7 +48,7 @@ void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
->  }
->  
->  /* Use untrusted host data */
-> -u64 trace_clock(void)
-> +u64 trace_hyp_clock(void)
->  {
->  	struct clock_data *clock = &trace_clock_data;
->  	u64 bank = smp_load_acquire(&clock->cur);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/trace.c
-> index e7e150ab265f..65be6c9fb379 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/trace.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/trace.c
-> @@ -35,7 +35,7 @@ static bool hyp_trace_buffer_loaded(struct hyp_trace_buffer *trace_buffer)
->  void *tracing_reserve_entry(unsigned long length)
->  {
->  	return simple_ring_buffer_reserve(this_cpu_ptr(trace_buffer.simple_rbs), length,
-> -					  trace_clock());
-> +					  trace_hyp_clock());
->  }
->  
->  void tracing_commit_entry(void)
-> @@ -290,7 +290,7 @@ void __tracing_update_clock(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
->  	}
->  
->  	/* ...we can now override the old one and swap. */
-> -	trace_clock_update(mult, shift, epoch_ns, epoch_cyc);
-> +	trace_hyp_clock_update(mult, shift, epoch_ns, epoch_cyc);
->  }
->  
->  int __tracing_reset(unsigned int cpu)
-> -- 
-> 2.55.0.795.g602f6c329a-goog
+> > > +	}
+> > > +
+> > > +	/* In case of invalid PTE, we need to figure out which part of it is MMIO */
+> 
+> [...]
+> 
+> > >  #include <nvhe/mm.h>
+> > > @@ -481,6 +482,14 @@ static int check_range_allowed_memory(u64 start, u64 end)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +u64 find_mem_range_from(u64 start, bool *is_memory)
+> > > +{
+> > > +	struct kvm_mem_range r;
+> > > +
+> > > +	*is_memory = !!find_mem_range(start, &r);
+> > > +	return r.end;
+> > > +}
+> > > +
+> > >  static bool range_is_memory(u64 start, u64 end)
+> > >  {
+> > >  	struct kvm_mem_range r;
+> > > @@ -577,8 +586,34 @@ int host_stage2_idmap_locked(phys_addr_t addr, u64 size,
+> > >  
+> > >  static void __host_update_page_state(phys_addr_t addr, u64 size, enum pkvm_page_state state)
+> > 
+> > I would really split this. I know that this is convinient, but as the function
+> > says, it only update the page state so it shouldn't hide an update to the IOMMU.
+> 
+> I mention a couple of alternatives in the commit message, I tried to
+> implement it differently which was harder to reason about as the calls
+> was scattered everywhere and any small refactor will possibly break it.
+> 
+> Did you have a split in my mind? I open to rework it.
+
+Yes, I meant the option #2.
+
+> 
+> > 
+> > Beside, we have examples already in Android where we want to update the
+> > page-state but not the IOMMU, so it doesn't feel future-proof...
+> > 
+> > >  {
+> > > +	enum pkvm_page_state old = get_host_state(hyp_phys_to_page(addr));
+> > > +	enum kvm_pgtable_prot prot = 0;
+> > > +
+> > >  	for_each_hyp_page(page, addr, size)
+> > >  		set_host_state(page, state);
+> > > +
+> > > +	/*
+> > > +	 * Any transition to PKVM_NOPAGE, unmaps the page from the host
+> > > +	 * Any transition to PKVM_PAGE_SHARED_BORROWED, maps the page in the host
+> > > +	 * Any transition to PKVM_PAGE_SHARED_OWNED is ignored as page is already mapped.
+> > > +	 * Transitions to PKVM_PAGE_OWNED from anything but PKVM_NOPAGE are ignored.
+> > > +	 * Transitions to PKVM_PAGE_OWNED from PKVM_NOPAGE will map the page.
+> > > +	 */
+> > > +	if ((state == PKVM_PAGE_SHARED_OWNED) ||
+> > > +		((state == PKVM_PAGE_OWNED) && (old != PKVM_NOPAGE)))
+> > > +		return;
+> > > +
+> > > +	if ((state == PKVM_PAGE_SHARED_BORROWED) ||
+> > > +		(state == PKVM_PAGE_OWNED))
+> > > +		prot = PKVM_HOST_MEM_PROT;
+> > 
+> > ... and that would avoid that sort of things here. The caller decides if the IOMMU
+> > is updated or not.
+> 
+> Typically, the IOMMU is updated if the CPU is.
+> 
+> > 
+> > And as the patch says, we "shadow" the host stage2. So probably modifying
+> > host_stage2_idmap and host_stage2_set_owner_metdata() sounds really a better
+> > approach.
+> 
+> Initially, before the pKVM merge upstream I was doing something similar
+> as that only required one hook [1]. However, after rebasing I found that
+> would be too complicated and I have to add many more (as mentioned in
+> the commit message). But I can re-visit this approach in v7.
+
+What bit would be more complicated? As you've wrote in the commit message, in
+option#2 you only need two calls really:
+
+  * host_stage2_set_owner_locked()
+  * host_stage2_set_owner_metadata_locked().
+
+This fits better the narative for the "shadow" page-table: when we map the host
+stage-2, we map the iommu and when we unmap the host stage-2, we unmap the
+iommu.
+
+> 
+> [1] https://lore.kernel.org/all/20250819215156.2494305-11-smostafa@google.com/
+> 
+> Thanks,
+> Mostafa
 > 
