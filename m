@@ -1,254 +1,290 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013006.outbound.protection.outlook.com [40.107.159.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1081F438036
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 14:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.6
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783951469; cv=fail; b=lnEhJp3h3gO1F4340EHanKzwkLqTcj5y6QqVqKLMOzYkEWALZPG0ODezcjWQrrD9lR076OwVcokVg2GWZl1oMxndAZ2EydweLBa1BIFylW9mSNwQ/cHlaPvc28tdmqz7zbB17r4kxi6YN3lwAj5R+/3lqu9T3EX2DFJU9ECv3UA=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783951469; c=relaxed/simple;
-	bh=8gKvo6Li3xMNikvmXp5GKHQcXzyM+2MyTGXDz4fM3e4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Sz1rGphQwqtxapKgR7POg1mUmiyFHGle0jJS5LaOJLgPTZ0Axl0CYSVaTyLkTW90Ie1+A6bQSsxVgQdMhB03cprNB6IVWkfXAjX3U8zRrgUvqG5Y2DbNCw1vKzdOCSJxhZnf+1RxXLfRDKauH6E1l+/7cctGSEN2WYEO0exs7HU=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=F71KFR82; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=F71KFR82; arc=fail smtp.client-ip=40.107.159.6
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC6143B3FF
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jul 2026 14:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783951577; cv=none; b=OtAeoeX3I3lpYko524fQ5Y51Ld+1I2vZ0NNrRsoPYTVJYdikC2XgHkDA2Gk7WIkjahysgdi/j78uaR8NNH0ejimcTSsQiYtGjl2sXuL8Tld8O1P9JEVTerzxRut/rPH9nFfV0NvCDV3dZyAltQXDJ2s5r629lyS0uN9jsVIMKNo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783951577; c=relaxed/simple;
+	bh=O5obKWBC3f0nz8VhvV8KfQWeSGeWkfkmlsDJqw3Penk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=RjeVqtHriNlMJ8RL/wj++FLP/sD3sC5HueNGV2wl+dlFmYoQGfANuaAIkI13XV2UilwRgakAUhutBh6UU3a39KCx9gTs1dIvwnmrV/CUPEOxTw/WlEw3HZM1ftgfgAa2UJ457ECx7tw3NXIaX9OauboTwZ86xx+MyPF8cU/14Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nodE9k5v; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="F71KFR82";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="F71KFR82"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=efnrYEMnmSlFrdRCVyRETDxWV/nT3zOP641GIfYqx0PgKRIu0ix9FnIS+l4vHOBg0FJNAL1a1DqqbVhngc3Wak9ZOn5dyUR09G3cRGuAnRykatDy+g2bUbLivzpG4bBlomEVnaHgNEiwdLgiCXGaSks4N4OtbcNwkJQJSTh9tbD+dz1hS5VqnM046bHFeMPHGMbCIz1IkgYDSza/6IDcyqRmmspLbecpP9Fc/6oOeqDpeAfROG0ngzXxquVKfbV4Tveh74gcs1dwmUXZN0pBBsNZtg9g5QdNMk1hT7EAg2Ytc0tj731m2kFAQOm1ES/4k8VnKuFcEL3MSZX/jsD1Tg==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LQnJjZw+4z9nghA+zmLmUfPytA2LMSb8lumpj0YBR8c=;
- b=uJgfW/t67ai5wtJVa/rtNACgxDG3fwtKw+2EEMdbjLn8IZxVMyH/v8LFDueRGgDKKrHmNXIycQaWcCDqZOqoXvq8RJ/1CywLLenXeFqGJndqtWkcwhH+lOuS/QYfEom37OVrSFacIrN7gbGQKVUBcGqwkiP1/E0USP6Nvxm550ggpLhsWOP8W8kZH3udjzx08uAkZsVzzfqVlrgJizAWNQg42GWMtd67cGM0nNkPb8ss3egJ/37D4UfTaOvJyjw0PG9aWZI+Mqd3Vll7BNhOvE629U9G5vjg5dxTF7ejfWgft/7svyFGMOz3K42VCpa8JrYB/9ccyibGPZrOGNPG1Q==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=google.com smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LQnJjZw+4z9nghA+zmLmUfPytA2LMSb8lumpj0YBR8c=;
- b=F71KFR82TJ++HKsQJaxGWDC7OygBOXJ3ZY4t2vAepexDPsvouGJn6J9/6AilmOl7r39/U0Y4n9O+Py901Kjy6qeBpLLJEmJ16IhzprrAu50VTNhPKrzehG0Z7h9D2C+bq3YaGkvXZImvjz+VOZzSmUVoPCm5gxNDXV88mOlBtN4=
-Received: from AM0PR10CA0006.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::16)
- by PR3PR08MB5593.eurprd08.prod.outlook.com (2603:10a6:102:84::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Mon, 13 Jul
- 2026 14:04:22 +0000
-Received: from AM2PEPF0001C713.eurprd05.prod.outlook.com
- (2603:10a6:208:17c:cafe::2c) by AM0PR10CA0006.outlook.office365.com
- (2603:10a6:208:17c::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.19 via Frontend Transport; Mon,
- 13 Jul 2026 14:04:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM2PEPF0001C713.mail.protection.outlook.com (10.167.16.183) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.223.9
- via Frontend Transport; Mon, 13 Jul 2026 14:04:21 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MSiEJuYl9zH6WaWEeCrsjuBFvbjXb8pkrhFNY4sm7uSv1yAcgQj8J0eEqtm/VWmkhrpourmRzZnFWvS3zO2BGaPFsL/j27FxhYetXZYUzn0PzOdN/vaukziV+b/Tm4cv4MOb5cy2uTIq7lfzOJ4iDc1jKPbSApGQ4f+FdEnsBhDp1iuXVit1XQGc87QiI/EpSr7UrFknsNEY5Rmkgq6AtdxpQjpldDwWpYOUBKnA4d+tW+/nllI++QlW1E4oN3UD1DasqwzAW2lKm9/9RQ+93c7yllQtXa8wnkpC7UMzPK1ziwAhRfZgAuw08y50biynEy4H+pUzWraJ2K3RdDkrmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LQnJjZw+4z9nghA+zmLmUfPytA2LMSb8lumpj0YBR8c=;
- b=aSHgzWh/uyWcAp+SfhvpSOUon/jUfSJ9YWwC2o/ZMVAiNrB1fYQ4Ef8N8PMBZ51BE/chnLR1QdsaiGzkZBZiGHti2mxD0a+1DJfSpKoOvWDst5K/Rp5exhvQT2q6SzCOtE6pKgNKbkH16tJjqTYeZbqWpgLmRtN86hYvAZHwA38yF/GTmdcBl6BaSLVGVbQc5AKdFgwBXz6gEBHXWX/dG58Toop0ENHWDWmue8heo3evdaDhPe8QrgXziWN7r4XBSdf1RadF1sX1yXDCLJWc3exU0jCAgrsUVscAc/Ecjyg+o0Z3Gf5L6kET3p1tma5hlQhQrtkORztpas7bOoyzKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LQnJjZw+4z9nghA+zmLmUfPytA2LMSb8lumpj0YBR8c=;
- b=F71KFR82TJ++HKsQJaxGWDC7OygBOXJ3ZY4t2vAepexDPsvouGJn6J9/6AilmOl7r39/U0Y4n9O+Py901Kjy6qeBpLLJEmJ16IhzprrAu50VTNhPKrzehG0Z7h9D2C+bq3YaGkvXZImvjz+VOZzSmUVoPCm5gxNDXV88mOlBtN4=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from AS8PR08MB9597.eurprd08.prod.outlook.com (2603:10a6:20b:61b::18)
- by AS2PR08MB9619.eurprd08.prod.outlook.com (2603:10a6:20b:608::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Mon, 13 Jul
- 2026 14:03:19 +0000
-Received: from AS8PR08MB9597.eurprd08.prod.outlook.com
- ([fe80::e11:42b9:2ed1:ef5f]) by AS8PR08MB9597.eurprd08.prod.outlook.com
- ([fe80::e11:42b9:2ed1:ef5f%4]) with mapi id 15.21.0202.018; Mon, 13 Jul 2026
- 14:03:19 +0000
-Message-ID: <8c0c099d-47aa-4bf0-ab7a-c682b0dccdf5@arm.com>
-Date: Mon, 13 Jul 2026 16:03:18 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/3] KVM: guest_memfd: Use memslot id to keep track of
- associated memslots
-To: Alexandru Elisei <alexandru.elisei@arm.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- fuad.tabba@linux.dev, mark.rutland@arm.com
-References: <20260702142912.6395-1-alexandru.elisei@arm.com>
- <20260702142912.6395-2-alexandru.elisei@arm.com>
- <akwhexqW66RK5Gru@google.com> <ak0x0QIWWw6lFUiy@raptor>
-From: David Hildenbrand <david.hildenbrand@arm.com>
-Content-Language: en-US
-Autocrypt: addr=david.hildenbrand@arm.com; keydata=
- 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 fa0=
-In-Reply-To: <ak0x0QIWWw6lFUiy@raptor>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO6P123CA0017.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:313::7) To AS8PR08MB9597.eurprd08.prod.outlook.com
- (2603:10a6:20b:61b::18)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nodE9k5v"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 775B61595;
+	Mon, 13 Jul 2026 07:06:11 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE9293F7B4;
+	Mon, 13 Jul 2026 07:06:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783951575; bh=O5obKWBC3f0nz8VhvV8KfQWeSGeWkfkmlsDJqw3Penk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nodE9k5vTbKKc6U9w7bmZEjQVkoZ9peDV0OhvaN9+Rw92spOUUxCq4pAIDkVflkWI
+	 Cp9pH4bxPFf28N+icokpcQsfUVO7l+a1QY1iUrYIJP7D/FHJ4BkLLRcfnFXprOdVPr
+	 2x500Re3yrbQzmWMB5who4Na7nUX0S9+jyNZ6Rek=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer flush
+Date: Mon, 13 Jul 2026 15:06:10 +0100
+Message-ID: <alTw0nwiBDWoFrjB@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260709104026.2612599-6-zhengtian10@huawei.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com> <20260709104026.2612599-6-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	AS8PR08MB9597:EE_|AS2PR08MB9619:EE_|AM2PEPF0001C713:EE_|PR3PR08MB5593:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d42fa0e-b981-4fb8-7047-08dee0e7a393
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|7416014|366016|1800799024|376014|23010399003|18002099003|22082099003|11063799006|56012099006|4143699003;
-X-Microsoft-Antispam-Message-Info-Original:
- mPTs/bE4H7wvSsqdX909+PkUC2YLDGue2PPpr0EVq3Q6N0Lv0BMdCZsPHtcedhJj0GbrXOe1FdGjsDoLdNt9CsOKlFkKkq73wtUu8E/OuYvibr2WoDkB47znnrkyUTNds+t2n13bZra1t1yFjo3ITD4arYskykldXhYeny6h7vkt0guOvAz33FODZFe1LPqbvkmDrD8AgJHh6CczuwnkHVP55NMTJa57onvOfxbmjP2zISp4PAYN0LDLqOKUB9+UW3DkVjG7BWUKS0cX25re/d5Zy3edWbcLIog9CseURkX8uABuoayuckWedS0QLvU3bZp5ShdZeYfFVIpVNzx6mdwduGU7VRP5J2ICd2rl4u2DhIuMuMDEO30gkzu0jK2qRHEpD1rzOt5BSkngdywXk6Gyq2mLDd4hZxQ3NnefZB7gPTOMHIL2SSn44QVVz7LecKUmKG3E5nulCBA4HxH4VzcXf+yQn1RhHBoNmZNj3mHkNTplPHWC3Q3Bxe43Zlb42SSag6ye5B4hvgbpq1keRJG2byxtmkOScHuKlfHVDYVDrnRjq7KenCk802uHkwEn0wZSpeBtyDcQIs/hD7nxV3L+YGABFq7PY1zgHkiltgG2M+ySLHACGprM3UMG+y1W3C7LBxyujaHC3VO4ROxhry9M8+Xbr4EX0qH0DQL8IiA=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB9597.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(23010399003)(18002099003)(22082099003)(11063799006)(56012099006)(4143699003);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- T2klz/5OiraKbt6M2wgHsGorc1ML3q1V7Ma/a4CF3RKDEve+EDGpkyVZRkGJmyjE1CoS9kbGr9LVttVcNHySaNx5L0TIHFJ/ErxmC/6HgiDyaKVNpi3aNivN2UMaoaZm+4zO82d10Wk7I1LbHfkWFIPAc60vPJo5IQc25RSy73iGON1WDwSHW/WRshZpwFzsP4PXGkW+olkpunmnp/q9rUPHttI5wUXfDaD3mRYh0DuQtmAKE2Gh5ymPJVYVN3VAJEgYcjH9NIx3KviJFC8bLRgxpydHANXQT1WXbmMW27M/xRS4qnRygA2cjGsv+pOxikIhDOi+hbiA/1CnTO6sGQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB9619
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM2PEPF0001C713.eurprd05.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	283271d7-34ea-4ff3-fe1d-08dee0e77dfd
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|14060799003|82310400026|35042699022|23010399003|7416014|376014|36860700016|1800799024|18002099003|22082099003|11063799006|4143699003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	VIqE7wHI0BXeNJR/P+xYuB5/vBshH2S22zlEL1ePUSxivDsmImyBLdPbfvTVgYDak0LxC/a5/IU3+BnwxZy8dw3tt68rjSn3rfxaLNOV7eVCh0mcjtYqvHTbIhWcBNuFOy39qRFdmmDPVIX2Lv7ccqIt9fTLAbA/3gcILVmOTtmZehKeGeMC7LLAv4CM+Pwc8598zoQ5Ulo2ZBw3ubIEccirotmbLKCa3dtwGxIJ4bpQoxap9Xrpq65gK35X1sur6iESm9LAx4jSj9a5eNnSy2hOyTGOSEA4xLqKZvOR8QpyM+t29Nwcd62UzhVxLR5XK1cQ2YchG44SdF8j7KT9LHkjtrpUz/S4u+ttdhhJ1s+7cd1cpoWdNRwll8ERFuiajo0EMZko26PEi2MqPZXLGYaUjhAkbYGYsw6/S+SR1pP6k20LMP3sS25OqDh3+KjdyEOSVQompyZjtq29jaWhnseNqb9ktfLV6CeXY9zAxkfF6UbjC1yUXehsmkzHxz4+oVaO5hSToIanVaTCtm6yH7pyuJUsgCeLyR027qSDt//9idaFlLCnR9aURt2INO9oVz+3HDyvXI3vjUm7sTA6bdLxQ8RL8CpjgMBwelvrW7fSkQFlXDQFDMNJmQm90jGyHrApUQb01n/vLaRcIoz8T3UfqkJWFzGt91bR6bEsoKfv2WT+IQG5+mbtmyJq+Y8sxkhCs2FaFoJdzmQaE5Df2g==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(82310400026)(35042699022)(23010399003)(7416014)(376014)(36860700016)(1800799024)(18002099003)(22082099003)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	KhR9zSTncAG3WhrKD43LWTcmH7RXGK2rjLeTWVqjClfznBOkFKPbmFbXDYzsgOYpYHdgFYIAAt6nbRVr4jzBJ499Hi93XgQ8GjNCatvwNhRLxD7qJhLPDl63nbT40OJIG3oYShx7me24DjU0qm4pxDRYqQO1xs2Dre4eoyfZa7wsWdnz0hlcCgnuFWjGeXGZjN52XYgf68lmcq603FGAz9/8UQLXAqX0JrTjxVeN6kRHFo+x0Zr3/vMk++OcHMzLXXmWgmi8G7kgGG1VCVekmfpvykJMmTsrSYqAEKz3Wy9ljwDGZRtZ0/td79XnAutQJCzfy4My9xCj0/+iplDuUMGWdI+IzKfozVDg2nyIG7QTdjNbSddnsfRdG8JebY6WbTyaFPhyfbMLVKiCQvq2ERctnUpGsYf8BVWKUFAJwz9P0aLne3cTnmFiPlisTfMg
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2026 14:04:21.8625
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d42fa0e-b981-4fb8-7047-08dee0e7a393
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM2PEPF0001C713.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR08MB5593
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On 7/7/26 19:05, Alexandru Elisei wrote:
-> Hi Sean,
+On Thu, Jul 09, 2026 at 06:40:25PM +0800, Tian Zheng wrote:
+> From: eillon <yezhenyu2@huawei.com>
 > 
-> On Mon, Jul 06, 2026 at 02:43:23PM -0700, Sean Christopherson wrote:
->> On Thu, Jul 02, 2026, Alexandru Elisei wrote:
->>> To enable memslot operations, KVM maintains two arrays of memslots, and an
->>> RCU pointer to the active (in use) array. Changes are made first to the
->>> inactive array, and the RCU pointer is updated to point to the inactive
->>> array, which becomes active.
->>>
->>> The guest_memfd file maintains an xarray of pointers to memslots that use
->>> it as the memory provider. After the RCU pointer to the active memslots is
->>> updated and until SRCU is synchronized, readers can observe the old or the
->>> new value for the active array, and therefore the old or the new pointer
->>> for a given memslot.  For memslot creation or deletion that is not an issue
->>> for guest_memfd, as readers will either read the same memslot pointer saved
->>> by the guest_memfd file, or a non-existing memslot.
->>>
->>> But when changing the flags for a memslot, readers can read two different
->>> and non-NULL memslot pointers. 
->>
->> And?  Why does that matter?  KVM memslot updates aren't atomic.  Practically
->> speaking, they _can't_ be made atomic. Userspace is required to quiesce all
->> activity that must not observe inconsistent state, i.e. userspace must pause
->> (stop running) vCPUs when performing a memslot update.
+> Add HDBSS fault handling for buffer full, external abort, and general
+> protection fault (GPF) events. When the HDBSS buffer becomes full,
+> the hardware traps to EL2 with an HDBSSF event, which is handled by
+> setting a flush request.
 > 
-> Is that true when KVM_MEM_LOG_DIRTY_PAGES is toggled for a memslot?
-
-Good point.
-
+> Add kvm_flush_hdbss_buffer() to consume HDBSS buffer entries and
+> propagate dirty information into the userspace-visible dirty bitmap.
+> Flush is triggered on vcpu_put, check_vcpu_requests, and
+> sync_dirty_log.
 > 
-> As far as I can tell, KVM today tolerates VCPUs running while the
-> KVM_MEM_LOG_DIRTY_PAGES flags is being changed for a memslot. And by
-> tolarate I mean that VCPUs that are running when the flag is changed don't
-> return an error from KVM_RUN. If changing a memslot while VCPUs are running
-> were fatal, I would think that KVM would want to take vcpu->mutex for all
-> VCPUs to keep them from running. Or is it a case of KVM allowing userspace
-> to shoot themselves in the foot if they really want it?
+> Add esr_iss2_is_hdbssf() helper for HDBSS fault detection in guest
+> abort handling.
 > 
-> When the KVM_MEM_LOG_DIRTY_PAGES flags is being changed, VCPUs handling a
-> guest fault can observe either the old memslot, with the old flags, or the
-> new memslot, with the flag changed, but they still continue running without
-> returning an error.
+> Signed-off-by: Eillon <yezhenyu2@huawei.com>
+> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> ---
+>  arch/arm64/include/asm/esr.h           |  5 +++
+>  arch/arm64/include/asm/kvm_dirty_bit.h | 11 +++++
+>  arch/arm64/include/asm/kvm_host.h      |  1 +
+>  arch/arm64/kvm/arm.c                   | 14 ++++++
+>  arch/arm64/kvm/dirty_bit.c             | 62 ++++++++++++++++++++++++++
+>  arch/arm64/kvm/mmu.c                   |  4 ++
+>  6 files changed, 97 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index 81c17320a588..2e6b679b5908 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -437,6 +437,11 @@
+>  #ifndef __ASSEMBLER__
+>  #include <asm/types.h>
+> 
+> +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+> +{
+> +	return ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF;
 
-Staring at QEMU, kvm_log_start()+kvm_log_stop() do not call
-accel_ioctl_inhibit_begin() etc.
+This will return a long, which will be casted as bool.
+In general, what I see in the kernel is something like:
 
-So at least QEMU does not force VCPUs out of KVM when only updating flags.
+	return !!(ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
 
-One option would be to require user space to do that also when starting+stopping
-dirty page logging. (I'd assume that should work, but it might be tricky
-depending on in which context it is called from QEMU migration code -- whether
-we hold the BQL)
+> +}
+> +
+>  static inline unsigned long esr_brk_comment(unsigned long esr)
+>  {
+>  	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+> index 84b12f0a10af..4b28000e972f 100644
+> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
+> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+> @@ -10,7 +10,18 @@
+>  #include <asm/kvm_pgtable.h>
+>  #include <asm/sysreg.h>
+> 
+> +/* HDBSS entry field definitions */
+> +#define HDBSS_ENTRY_VALID	BIT(0)
+> +#define HDBSS_ENTRY_TTWL_SHIFT (1)
+> +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
+> +#define HDBSS_ENTRY_TTWL(x) \
+> +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+> +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+> +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
+> +
+>  int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
+>  void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
+> 
+>  #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index c41ec6d9c45a..cecfb884a64f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -55,6 +55,7 @@
+>  #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+>  #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+>  #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+> +#define KVM_REQ_FLUSH_HDBSS			KVM_ARCH_REQ(12)
+> 
+>  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>  				     KVM_DIRTY_LOG_INITIALLY_SET)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index bf6688245d83..566953a4e23a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -755,6 +755,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  		kvm_vcpu_put_hw_mmu(vcpu);
+>  	kvm_arm_vmid_clear_active();
+> 
+> +	if (vcpu->kvm->arch.enable_hdbss)
+> +		kvm_flush_hdbss_buffer(vcpu);
+> +
+>  	vcpu_clear_on_unsupported_cpu(vcpu);
+>  	vcpu->cpu = -1;
+>  }
+> @@ -1157,6 +1160,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  		if (kvm_dirty_ring_check_request(vcpu))
+>  			return 0;
+> 
+> +		if (kvm_check_request(KVM_REQ_FLUSH_HDBSS, vcpu))
+> +			kvm_flush_hdbss_buffer(vcpu);
+> +
+>  		check_nested_vcpu_requests(vcpu);
+>  	}
+> 
+> @@ -1971,7 +1977,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+> 
+>  void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>  {
+> +	/*
+> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+> +	 * before reporting dirty_bitmap to userspace. Send a request with
+> +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
+> +	 */
+> +	if (!kvm->arch.enable_hdbss)
+> +		return;
+> 
+> +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS | KVM_REQUEST_WAIT);
+>  }
+> 
+>  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> index 6c7a6ef66b5a..002366337637 100644
+> --- a/arch/arm64/kvm/dirty_bit.c
+> +++ b/arch/arm64/kvm/dirty_bit.c
+> @@ -50,3 +50,65 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+> 
+>  	vcpu->arch.hdbss.hdbssbr_el2 = 0;
+>  }
+> +
+> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+> +{
+> +	int idx, curr_idx;
+> +	u64 *hdbss_buf;
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	if (!kvm->arch.enable_hdbss)
+> +		return;
+> +
+> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+> +
+> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+> +	if (curr_idx == 0 || vcpu->arch.hdbss.hdbssbr_el2 == 0)
+> +		return;
+> +
+> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
+> +	if (!hdbss_buf)
+> +		return;
+> +
+> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
+> +	for (idx = 0; idx < curr_idx; idx++) {
+> +		u64 gpa;
+> +
+> +		gpa = hdbss_buf[idx];
+> +		if (!(gpa & HDBSS_ENTRY_VALID))
+> +			continue;
+> +
+> +		gpa &= HDBSS_ENTRY_IPA;
+> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
 
--- 
-Cheers,
+You mention that it does not support dirty-ring, but above function will 
+mark the page as dirty in the dirty-ring :/
 
-David
+
+> +	}
+> +
+> +	/* reset HDBSS index */
+> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+> +	vcpu->arch.hdbss.hdbssprod_el2 = 0;
+> +	isb();
+> +}
+> +
+> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 prod;
+> +	u64 fsc;
+> +
+> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+> +
+> +	switch (fsc) {
+> +	case HDBSSPROD_EL2_FSC_OK:
+> +		/* Buffer full, set request to flush on next vcpu exit */
+> +		kvm_make_request(KVM_REQ_FLUSH_HDBSS, vcpu);
+> +		return 1;
+> +	case HDBSSPROD_EL2_FSC_ExternalAbort:
+> +	case HDBSSPROD_EL2_FSC_GPF:
+> +		return -EFAULT;
+> +	default:
+> +		/* Unknown fault. */
+> +		WARN_ONCE(1,
+> +			  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
+> +			  fsc, prod, vcpu->vcpu_id);
+> +		return -EFAULT;
+> +	}
+> +}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 83251d95bf3f..949fb895add6 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2242,6 +2242,7 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+>  }
+> 
+>  /**
+> +
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:	the VCPU pointer
+>   *
+> @@ -2279,6 +2280,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> 
+>  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> 
+> +	if (esr_iss2_is_hdbssf(esr))
+> +		return kvm_handle_hdbss_fault(vcpu);
+> +
+>  	if (esr_fsc_is_translation_fault(esr)) {
+>  		/* Beyond sanitised PARange (which is the IPA limit) */
+>  		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> --
+> 2.33.0
+> 
