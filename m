@@ -1,156 +1,129 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C9E466B7B
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 13:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A3A35E1D3;
+	Tue, 14 Jul 2026 14:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784036085; cv=none; b=YUzVGEXjc2XZFpnwQtxGCF+PvcMo8zc1j9EDp8k4zS7+27aOcMYw6/cT7UwaQTt69iE3S0ng3f/eHvOxofsaTtNhSZIHObMttkqlqebO3hfQKSsyPm9l0pv9QICsmpRQzT5I7oGak2oDbI1FErDHeIL16XoOEjXzGSiS15cSaVM=
+	t=1784038344; cv=none; b=UejDA82EXau0Cw43KocA3ESe4KaVdJKDXkKsNVr6iQY8Go5TRRNSN1BhgViqfVn2cFaqlwSlUHV2WXM4Uniz+PsZrS2pl0saQcR5ehNUhqY7v9o4yNTxYC3x/EvD5oCWawfc1N5XWAIU5K3xzrO5cyICHYHRxdtTG9jhziT1MDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784036085; c=relaxed/simple;
-	bh=H/AmSTBFwLLeg7aOa6OP2aXPFDRammnWKbb38VYxOxM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=PhbDguKG3duczf1Cv8ItI7zEJat8JG27eV0+Fcve+LvlqqPVuyiIZk4l2Ge8jnbvEHIWOtsh9sNECDQXrtqE6C5ZT+eyi+vOqejiuIwvXTwb/X6gJaKCKB7/dwVilt9M+4eSPIfMoSbZdW8/COwZ33PSisBLhOCjyIR3nQXDm20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=xrX/jExi; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1784038344; c=relaxed/simple;
+	bh=aLyPVzhCOpxEYvqb+mdtt5+ZdV9EvzfsF8uBakUUHW0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GDS5cpX2Wm2GjP+98ZVi8FbhZtDirEA1sYGhvZcUi64Z8l6yVkRs9CPK4j3MS36u7tPVG1EAHj5sWx2tmIZF83cB9t1hDQ15LMbkNoVafqqXfsAlJjAkIT5547rCvFI5yEFwNqZgO3rg55Um2Hm7yOdg7AImpmLXxa36dwzsJC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7a3NiNh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="xrX/jExi"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=YlPxD8B6RcoJORtYKUz5oe4Ys8TzD6N/C+ChKBexSxY=;
-	b=xrX/jExi/qjNVH7HItZ6fEEIMILI0e60EBeCWj+t6sd94r9ND0nS3zsQ3JEFjA7/D2rd1N18u
-	samw0OV3YFdczzAw4sLdGcuNFplHsl60JdTn3e6uQhJX8Zafi7kjIpfyDgnk0p42+RpV2AYXZKX
-	4IMjLfNdy6Ax4f6JE1b4L7E=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4h00RH5mYyz1cyQ8;
-	Tue, 14 Jul 2026 21:25:15 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 36DA54057A;
-	Tue, 14 Jul 2026 21:34:32 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 14 Jul 2026 21:34:31 +0800
-Message-ID: <5910a3ef-cac0-4a19-99f6-cf7e695c017a@huawei.com>
-Date: Tue, 14 Jul 2026 21:34:31 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7a3NiNh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6971F000E9;
+	Tue, 14 Jul 2026 14:12:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784038343;
+	bh=hNRmwdjWvBOciKRs4ryAEgtsV7SkVI3x2lqu3ub7VWM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=S7a3NiNhkCoB5S81qVFcNTN/3CfyXyUFG+Y2GyW1fh5N4yj3cXWTg84JmLK/ICLvq
+	 0l+aatEwDgQEQ9YVZiLSKh36PgXMwY166nXSgiVjaf4bC8TgtyauZ3/rHHvTva54kV
+	 WCVjMoQBk2LpdhHxi59dDlnzEvjtg/U3DZ4Ud94818y9mP15bKhG6NGiL/wKiiB1sP
+	 tocpVjVeZgb+7UaXKp04ZI0NHGS6uzNrluB0LkEvBGkuO4mD3q+wQ4zkn6NIznfx5V
+	 r9Kq2L906KfmdsBfqvPMZmZoy3S/WECb9PI+wHQ0beAEwndFHnoM6Nk35CSqXrMrAu
+	 YREP8onuq7KdQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wjdrx-00000004w2v-0hGd;
+	Tue, 14 Jul 2026 14:12:21 +0000
+Date: Tue, 14 Jul 2026 15:12:20 +0100
+Message-ID: <86se5loe2j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 09/28] KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present
+In-Reply-To: <20260714101236.905141F000E9@smtp.kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+	<20260714091641.1970822-10-maz@kernel.org>
+	<20260714101236.905141F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/6] Support the FEAT_HDBSS introduced in Armv9.5
-To: Leonardo Bras <leo.bras@arm.com>
-CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
-	<yangjinqian1@huawei.com>, <caijian11@h-partners.com>,
-	<liuyonglong@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
-	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <alS-kcwvlASwPIzL@LeoBrasDK>
- <8757dfcf-aae4-4716-9ff1-c3140d4cc63e@huawei.com>
- <alYNOg7lREtdVE29@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <alYNOg7lREtdVE29@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Tue, 14 Jul 2026 11:12:36 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Nested trap configuration for CPTR_EL2 is evaluated using a stale memory backing store under FEAT_NV2P1, breaking nested virtualization isolation.
+> --
+> 
+> --- Patch [9]: [PATCH v2 09/28] KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present ---
+> commit c67129a02beeb5d291611085a5d2f889ac9d97e8
+> Author: Marc Zyngier <maz@kernel.org>
+> 
+> KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present
+> 
+> This patch relaxes the handling of CPTR_EL2 accesses via CPACR_EL1 when
+> FEAT_NV2P1 is present, stopping the trap of CPACR_EL1. It modifies the
+> read path to use the hardware SYS_CPACR_EL1 register instead of the
+> memory backing store for CPTR_EL2.
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 6b47d936efb32..1dfc1f88bec82 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -326,7 +326,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
+> >  			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
+> >  			return val;
+> >  		case CPTR_EL2:
+> > -			return __vcpu_sys_reg(vcpu, reg);
+> > +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+> > +				return read_sysreg_el1(SYS_CPACR);
+> > +			else
+> > +				return __vcpu_sys_reg(vcpu, reg);
+> 
+> [Severity: High]
+> Since this changes CPTR_EL2 to be read directly from the hardware register
+> SYS_CPACR under FEAT_NV2P1 (as the memory backing store can be stale without
+> trapping), will direct readers of the backing store now read stale values?
+> 
+> For example, in arch/arm64/kvm/emulate-nested.c:get_behaviour():
+> 
+>     val = __vcpu_sys_reg(vcpu, tb->index);
 
-On 7/14/2026 6:19 PM, Leonardo Bras wrote:
-> On Tue, Jul 14, 2026 at 05:37:58PM +0800, Tian Zheng wrote:
->> On 7/13/2026 6:31 PM, Leonardo Bras wrote:
->>> On Thu, Jul 09, 2026 at 06:40:20PM +0800, Tian Zheng wrote:
->>>> This series of patches add support to the Hardware Dirty state tracking
->>>> Structure (HDBSS) feature, which is introduced by the ARM architecture
->>>> in the DDI0601 (ID121123) version.
->>>>
->>>> The HDBSS feature is an extension to the architecture that enhances
->>>> tracking translation table descriptors' dirty state, identified as
->>>> FEAT_HDBSS. This feature utilizes hardware assistance to achieve dirty
->>>> page tracking, aiming to significantly reduce the overhead of scanning
->>>> for dirty pages.
->>>>
->>>> The purpose of this feature is to make the execution overhead of live
->>>> migration lower to both the guest and the host, compared to existing
->>>> approaches (write-protect or search stage-2 tables).
->>>>
->>>> The required sysreg definitions for FEAT_HDBSS have been merged into
->>>> arm64 /sysregs:
->>>>     [1/5] arm64/sysreg: Add HDBSS related register information
->>>>           https://git.kernel.org/arm64/c/72f7be0c2e30
->>>>
->>>>
->>>> After these patches, the kernel automatically enables HDBSS when dirty
->>>> logging is enabled on any memslot, and disables HDBSS when dirty logging
->>>> is disabled on all memslots. This series does not support dirty ring
->>>> mode.
->>>>
->>>> Depends-on: "KVM: arm64: Enable eager hugepage splitting if HDBSS is available"
->>>> 	https://lore.kernel.org/linux-arm-kernel/20260629111820.1873540-3-leo.bras@arm.com/
->>> On this, FYI, there have been some discussion on this:
->>> https://lore.kernel.org/all/alETGFD2Ogx6N0HB@LeoBrasDK/
->>>
->>> Oliver's suggestion is that we don't automatically enable eager splitting,
->>> but instead we have different behaviours if the user enables it.
->>>
->>> This is still under discussion there, but I think it can be useful reading.
->>
->> Thanks for the pointer — I've read through the discussion between you and
->> Oliver, and it's very helpful.
->>
->>
->> If I understand correctly, the proposed approach is to support both modes,
->> with DBM behavior depending
->>
->> on the user's eager split setting:
-> I am still waiting for his feedback on that, but I suppose that's what he
-> meant.
->
->
->> - If users enable eager splitting (chunk_size != 0): use the v4 approach —
->> DBM is set globally.
->>
->> - If users do NOT enable eager splitting (chunk_size == 0, i.e., lazy split
->> mode): use the v3 approach — DBM
->>
->> is set lazily in user_mem_abort on the first write fault.
->>
->>
->> This makes sense to me. It gives users the flexibility to choose.
->>
-> Yes, agree
->
->> As I mentioned in my patch 6/6 reply (https://lore.kernel.org/all/6e8b23bc-d420-4f5a-a921-5a5d64d84200@huawei.com/),
->>
->> I do think the lazy DBM approach is safer overall if the first-fault
->> overhead is acceptable — it avoids accidentally marking
->>
->> special mappings and naturally handles lazy split.
->>
-> I remember a previous discussion in which was concluded that lazy marking
-> DBM carried some issues. I have to go back on that and check if we can take
-> care of that now.
->
->> I'll keep an eye on the discussion and follow up once a conclusion is
->> reached.
->>
-> Thanks!
-> Leo
-All right, I'll support both split modes with different DBM methods in 
-the next version.
+get_behaviour() is only called when a trap from L2 needs to be routed
+to L1. Therefore, the L1 registers cannot be resident at this point,
+and looking for them in memory is the right thing to do.
 
-Please let me know once you've had a chance to revisit the previous lazy 
-DBM issues — happy to adjust if needed.
+> 
+> And in arch/arm64/kvm/emulate-nested.c:check_cptr_tta():
+> 
+>     u64 val = __vcpu_sys_reg(vcpu, CPTR_EL2);
+> 
+> Because the L1 guest writes to CPACR_EL1 natively without trapping, the
+> backing store is not synchronously updated. If an L2 guest traps to host
+> KVM, wouldn't these functions evaluate trap configurations using the stale
+> memory backing store, potentially bypassing the L1 hypervisor's trap
+> configurations?
 
-Thanks!
+If running an L2, L1's view of CPTR_EL2 (which it accessed as
+CPACR_EL1) cannot be resident. Where would L2's accesses to CPACR_EL1
+go otherwise?
 
-Tian
+You don't understand NV.
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
