@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B10F445AF0;
-	Tue, 14 Jul 2026 09:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7E034E75A;
+	Tue, 14 Jul 2026 10:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784022834; cv=none; b=JekW8dYw7+FOYiQqnZDi/XTlhgS0MCzuUqnFm8acbkN1DUxr/C511A5VHhbWEszGMrG7GS+sVhjVz8vu8N3cNEgWwv/BM+Woj5bpCSh17J7w9M5SY1EP/IJjCVsb2Qqictkeyoc2rnecFx6Mz2bRbXmt5e2vLiQQuf1LgelCVOQ=
+	t=1784023403; cv=none; b=KgIPKuMcGvZXbZFPZJQ//zPcT6u4fCrUJyIOxAnHHZyN9DMinmD6mQZxKBd5uAQxa4ndYNo3vEcG+WjXcwrOi4CO7lYBtAY/a3ZM1M6fcivVy/KqND+rgCB4q+03KBu6GLre7siBT2gDLp/vlvxGPBEAmMyYsmJ4rVTdub8R5Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784022834; c=relaxed/simple;
-	bh=SiQS2ofy545Ef/1csN4mdMNYMReSLrIaFJs+Im3AfC0=;
+	s=arc-20240116; t=1784023403; c=relaxed/simple;
+	bh=Nvwan52GrCJOZFS6aOhT1DcTQV+8Ud1p54wP1wi6MEI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=WxPCsFFPnI6V03tmRfsRyZ7CdiwvB3CAfkoZLPUyiyIZjv3+sZYZ+jwEbj8x3O2y1MlGQBzuPsJIVIuiE+Sg9CJGr25mWwbsi6oTlFRnHF4/OQdoJaMFN1cZ1jGZe5xcsmPyRg150FHodcSpk9kuZ80Eq2KMFTE33BZmV0L1aYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dC8vgNbJ; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Cn8YSsq2X6BtQpeS7/69uz2jgwcfnHuMkL925IQO+k5loCov0q9lYYCEdwQeIurADYsBkrdoMwicGBq1/9HLgJrsIvDO842eShgeodnkXTCs38xkr+SCDZCsBnL33+qtfcQBbMv5w3Y78IbJxtp5/scvdVk5X9pVsQQTxD7Bi9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hE7ZH2qz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dC8vgNbJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20AE91F00A3A;
-	Tue, 14 Jul 2026 09:53:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hE7ZH2qz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99ECB1F000E9;
+	Tue, 14 Jul 2026 10:03:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784022830;
-	bh=6v83Y87/3RwGwExS0ySlu3zXIQKUxt+pLt0Vbi+jyZg=;
+	s=k20260515; t=1784023401;
+	bh=J4YvdXY9iSx4StAaBaVKkGrMNpVbigchAnlPGxvoCu0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dC8vgNbJDsV8wpPb5IXTHhLnjNzwrNynW63dQM9kmWnPSXh00Napx1KLuq+504qc3
-	 +zxLC8pJysibJuKGL/E4kHfGfQuEPYaaAG1cO6CFsTcpUa2dE4B+SJdibTPflab+Zz
-	 BgZrHgc4fvW2YBnNCMccSd8dIwesw2mJWcxgJoBm7r8kQOhcPYWDClMTJxGyID2fCA
-	 +Ta8+n5HG2ztPoNAfKbhSBscjKB3mfQVsC8EVBsZThZH4Bk5nix85cTVtQFQdZIcXU
-	 Ff8fEc9549PAvH8P5heTkV8zzR4oPS9aj3LDJg5ppbSris1WqQNSNyWZokH9uSocjp
-	 6beQBz5BIju9Q==
+	b=hE7ZH2qzLvzXAKtDgzwRZ/4fzfkVn/He2mwr3DOBySiFLDTyCS8onOl/gujzYJOL9
+	 MiuGfXSFRWZsXcCJVlev95HSZK5J2DT+qTf29IimiNoCHCDMEhnQMiVCLhyf1zb1uA
+	 3bzAYGBxhENhnvlWUKF5bDkM05fvjgJiCRBBt/fXqqEWJQglvStKe+iQeKVmcypVHY
+	 pedq0htHqzDKTDq0M1cIpWt0CrXBjfZHn6TBd69aX5DGiTxQTTWi5jYhVfLix6FUjU
+	 rVc64RrvTpKvndr1JoE+rgkBf4ksXFVAcfrNcSXqKegIIhL8CaCQq5DmgZb5Y7s7T8
+	 bO3FZy6PT1Ozw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when
- FEAT_NV2p1 is present
+Subject: Re: [PATCH v2 23/28] KVM: arm64: Add NVHCR_EL2 context switching
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260714091641.1970822-11-maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260714091641.1970822-24-maz@kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
- <20260714091641.1970822-11-maz@kernel.org>
+ <20260714091641.1970822-24-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 09:53:49 +0000
-Message-Id: <20260714095350.20AE91F00A3A@smtp.kernel.org>
+Date: Tue, 14 Jul 2026 10:03:21 +0000
+Message-Id: <20260714100321.99ECB1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,127 +47,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Removing the split-state preservation for `CNTHCTL_EL2` on FEAT_NV=
-2p1 systems permanently corrupts the guest's in-memory ECV bit and leaks ho=
-st-specific trap overrides to userspace.
+- [High] A guest can leak the SYS_NVHCR_EL2 hardware register state of a pr=
+evious vCPU by configuring E2H=3D0 and NVTGE=3D1.
 --
 
---- Patch [10]: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling whe=
-n FEAT_NV2p1 is present ---
-commit e272e43dc6ce85d3337902d78430aad6bf5b83fc
+--- Patch [23]: [PATCH v2 23/28] KVM: arm64: Add NVHCR_EL2 context switchin=
+g ---
+commit d9946edce781237514b1a1fe42315834ea75838a
 Author: Marc Zyngier <maz@kernel.org>
 
-KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
-   =20
-With NV2p1, it is no longer necessary to use the split approach
-where bits of CNTHCTL_EL2 cannot be accessed via CNTKCTL_EL1,
-and we can treat the CNTKCTL_EL1 accessor as if it was "normal".
+KVM: arm64: Add NVHCR_EL2 context switching
 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 4155fe89b58a1..db60facad9f3c 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
+This commit introduces context switching for the NVHCR_EL2 register to
+support nested virtualization. For an L1 guest in hyp context, the register
+is eagerly synced with HCR_EL2 emulation. For an L2 guest, it is context
+switched as an EL1 register if NV3 is in use.
 
-[ ... ]
-
-> @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, s=
-truct timer_map *map)
->  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
->  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/=
+hyp/include/hyp/sysreg-sr.h
+> index a17cbe7582de9..c382848d31947 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -172,6 +172,10 @@ static inline void __sysreg_save_el1_state(struct kv=
+m_cpu_context *ctxt)
 > =20
-> -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
-> -	sysreg_clear_set(cnthctl_el2, clr, set);
-> +	/*
-> +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
-> +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
-> +	 */
-> +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +		sysreg_clear_set(cnthctl_el2, clr, set);
-> +	else
-> +		sysreg_clear_set(cntkctl_el1, clr, set);
+>  	if (ctxt_has_sctlr2(ctxt))
+>  		ctxt_sys_reg(ctxt, SCTLR2_EL1) =3D read_sysreg_el1(SYS_SCTLR2);
+> +
+> +	/* Retrieve L2's HCR_EL2, and save it for future use */
+> +	if (is_nested_nv3_ctxt(ctxt_to_vcpu(ctxt)))
+> +		ctxt_sys_reg(ctxt, NVHCR_EL2) =3D read_sysreg_s(SYS_NVHCR_EL2);
+
+[Severity: High]
+Does this create an asymmetry with how __compute_hcr() initializes the
+register?
+
+In __compute_hcr(), the write to SYS_NVHCR_EL2 is gated by an E2H check:
+
+	if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
+		write_sysreg_s(__vcpu_sys_reg(vcpu, HCR_EL2), SYS_NVHCR_EL2);
+
+However, this save path relies on is_nested_nv3_ctxt(), which checks NV and
+NVTGE but does not verify E2H:
+
+static inline bool is_nested_nv3_ctxt(struct kvm_vcpu *vcpu)
+{
+	return (has_vhe() && kvm_has_nv3(vcpu->kvm) && is_nested_ctxt(vcpu) &&
+		(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV) &&
+		(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_NVTGE));
+}
+
+If an L1 guest sets HCR_EL2.E2H =3D 0, HCR_EL2.NV =3D 1, and HCRX_EL2.NVTGE=
+ =3D 1,
+could __compute_hcr() skip writing SYS_NVHCR_EL2 on L1 entry, leaving the
+hardware register uninitialized (holding a previous vCPU's state)?
+
+When transitioning to an L2 guest and later preempting, would this save path
+evaluate is_nested_nv3_ctxt() as true? Could this cause it to read the
+uninitialized SYS_NVHCR_EL2 register and leak the previous vCPU's hardware
+state into the guest's context?
+
 >  }
 
 [ ... ]
 
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/=
-sysreg-sr.c
-> index 6f0f046e4ca4e..0c4ef1ce32ae7 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-
-[ ... ]
-
-> @@ -69,11 +69,18 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu =
-*vcpu)
->  		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
->  		 * the interesting CNTHCTL_EL2 bits live. So preserve these
->  		 * bits when reading back the guest-visible value.
-> +		 *
-> +		 * While NV2p1 fixes some of that, it makes CNTHCTL_EL2.ECV
-> +		 * even more broken than it already was with NV2.
->  		 */
->  		val =3D read_sysreg_el1(SYS_CNTKCTL);
-> -		val &=3D CNTKCTL_VALID_BITS;
-> -		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=3D, ~CNTKCTL_VALID_BITS);
-> -		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=3D, val);
-> +		if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
-> +			val &=3D CNTKCTL_VALID_BITS;
-> +			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=3D, ~CNTKCTL_VALID_BITS);
-> +			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=3D, val);
-> +		} else {
-> +			__vcpu_assign_sys_reg(vcpu, CNTHCTL_EL2, val);
-> +		}
-
-[Severity: High]
-Does removing the split-state preservation for CNTHCTL_EL2 unconditionally
-overwrite the guest's in-memory register state?
-
-Since timer_set_traps() applies host-specific overrides to CNTKCTL_EL1 on t=
-he
-host side, calling __vcpu_assign_sys_reg() here appears to blindly copy tho=
-se
-host-specific traps directly into the guest's architectural state on exit.
-
-Furthermore, as the comment above notes that NV2p1 makes the ECV bit even m=
-ore
-broken, won't this assignment corrupt the guest's ECV state as well?
-
->  	}
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/swi=
+tch.c
+> index ee92f6ad91c2b..e823046d28796 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -71,7 +71,10 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+>  			hcr |=3D HCR_NV1;
 > =20
->  	__vcpu_assign_sys_reg(vcpu, SP_EL2,	 read_sysreg(sp_el1));
-
-[ ... ]
-
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1dfc1f88bec82..9439c5b2b1fe8 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-
-[ ... ]
-
-> @@ -322,8 +322,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, e=
-num vcpu_sysreg reg)
->  		switch (reg) {
->  		case CNTHCTL_EL2:
->  			val =3D read_sysreg_el1(SYS_CNTKCTL);
-> -			val &=3D CNTKCTL_VALID_BITS;
-> -			val |=3D __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> +			if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
-> +				val &=3D CNTKCTL_VALID_BITS;
-> +				val |=3D __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> +			}
->  			return val;
-
-[Severity: High]
-Does this directly return the host-polluted physical register to userspace
-during KVM_GET_ONE_REG?
-
-Because the host-specific overrides from timer_set_traps() are present in
-CNTKCTL_EL1, skipping the bitmasking on ARM64_HAS_NV2P1 systems seems to le=
-ak
-these hypervisor-specific configurations to userspace. This could break live
-migration by restoring an altered execution environment.
+>  		/* Publish the guest's view of HCR_EL2 to the HW */
+> -		__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+> +		if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
+> +			write_sysreg_s(__vcpu_sys_reg(vcpu, HCR_EL2), SYS_NVHCR_EL2);
+> +		else
+> +			__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+> =20
+>  		/*
+>  		 * Nothing in HCR_EL2 should impact running in hypervisor
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714091641.1970=
-822-1-maz@kernel.org?part=3D10
+822-1-maz@kernel.org?part=3D23
