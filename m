@@ -1,28 +1,27 @@
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11022097.outbound.protection.outlook.com [52.101.48.97])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022094.outbound.protection.outlook.com [40.93.195.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518092DB78C
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 23:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28657423EB1
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 23:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.94
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784070374; cv=fail; b=FQ/uh7qay61bRVAzzY04CAerjE2CqRwszYKP8dUNq3ObRZBm8/dS6QmVJKVHM+ZOxxGiNQVzMPhIe0WMbhintt5kIKHtE1vJ2D15zLAM5BDE4DgaS760DfmlMgO7ezEPufOCNNJ3py3ChAYqdw3jsiG9Lrqigmm/LpwG6qsnDCE=
+	t=1784070738; cv=fail; b=GgD8R0hgy1/i1mos117Yw3zyyPSjKl08LqbO6bD17zRyvCegGArUe6y/Wb49n3DhRWtyUzg1i0IG6lS6COwqCGLtVDG+2IVkmsoeNeqjT+A3UdgcmqhGzTNVdNIGmJG/JD7f172jiPYU+IHTfdTyI72JtOX7YsChCjFKTipBsJs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784070374; c=relaxed/simple;
-	bh=DlYnhLe62dy6Qpe+KNsapyXS2ZF36rOX47n6maEkB7Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=ewYI6Hq1cIbg6O8Y1khXuARicW1qCS8ZiqEvlYDp8JMmcnehDzyjfJoNUvDzWP7yGdNw6WWqXxvK6oAAv+TPUbm3pATO3V4O4TuRk70ft+lokvYUyH6DtbL2UQSANrLB/2nvLBs++yAP9niS7VT49JEogX9IuDScYM80Zwjr7SM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=AkaNXNpA; arc=fail smtp.client-ip=52.101.48.97
+	s=arc-20240116; t=1784070738; c=relaxed/simple;
+	bh=mYiozUkig8lYGCYbc2BDf5WT/KzRfMrYxY+EY40Rrj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sfoaLifEGjj1CUPYvYLEbxNTrzS9qfd/0N513g749wBpQ3vddN69vxyra92YjQkGXPSCAwpHkNKloSCT9BSIjWrex/0sp4UKEZNtT304qoZJyegO5nKZxEJyj1IusNk62aKFc0gMCQ3qia1I0RvZ32gDmbq2ZqQDPBxOeo6r9nE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=RkRzx/ex; arc=fail smtp.client-ip=40.93.195.94
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="AkaNXNpA"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="RkRzx/ex"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sdZCLoNe7VSeGQrcLnZ0VpDvuz9D7XJ6iCkkRyYJKmV6q30sosD2Xyi5s851lLuILCXrAdq0qA1BhMLgCAdZ76KK45Qw08cjlvzhq4v8YDH+ORAUpxRSlxzTtX/VDXVDIM+z7F1kIO9f2RrzAT98H0qcvYHcg5cIcyZH2//Xy2U7IZvv4xNL3Kk9c0TkLNegNM8iHBXV7l3cj0cbq67fg4yxj2gk1sYsp1Fp116oOSs0OhTPMURKCp6W/fPPFtap5Hq11pR9rwGZ2YkFUMuDFXSBuvBUVADnjt1AaTHC9WY38rK+jJ9sY1RGYyQKUDyLTocmCER3nLlM0tPFHgl3oA==
+ b=FAi8virO/YrjFtVZlc2gtmT7rVwN17HyMIRBP+sFUId6tk77PtWeFvdfxLfg/bsDuAIwxmBe/zvzvGgANes9j++Mz1tq0E64WGl4bTSuIp3K99mvUU9pDoM7VPWpwut0XDxgZetf2SpQMifn06tczQmyQnzYDuctp0gBzJ6nzNf2S2upUInWOgCrNmjXjs6YucOOhm4lWG5B33tve9TK5hqQ07vg6Ihmum9LniBUwYVJc9AiJuFtAlh+KraVVPUyfuUJ4FoCpxKYmksBLyAYVXi5vuafAmhBc7Aqa/Tifmh4uJnfsBx0Gs3OzPZ9rpvEnT8HTH5P9aDKlehlgvgq4Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=i+CcBB3j488jkuKx+KOLwWykGtY25VR7Awhl1bqG3Ig=;
- b=XIowwivS2JI9FaPiQwNhNarQ802tHm55LRqKnfab/wg/aIRuDHUgdnVlLX8lPeD+jAprD6B3bKx471+MyFfZ+0PySKLNYG7GYas7BQPzCnspMnUdaUialL5Js+QZ0xW0OkbQ/5YyZjUMVrY5Un/AGQSNKEh/afROpeo9tE0aq2Qn2BilgcpsQ5n6ei4uhRcZxuZqQzeWF3HJbawWd1QlioGE8+WiXt0/o/3ALrXMffafaOFZuQgLUOkTUVvQhxJLgQkZtLKs4IEQHqUWMzV7cvKqttmS2s8A+q10tU2OlocbPbKrIcgOOSnfx37O4btWBl7+HKHje7MPyI9fR6PvyA==
+ bh=UPZR4gczJ68KJs3HVBIoXHhO1xtJrYjN3HIDqomlZGk=;
+ b=uTcWWue/QatbBWaEBjL74InydfFcvnF8OSTxXd7WALmb/VJL2eBRDQzMLpFfXoI66KvvB4BdyR4fhn25iyGOT4mNH9bFjCAzjKbNZzxxCAgXL7578bXgiHx8v0MCRcc403Hc8NuPJl41GtQBQhZMm8seWaPpARRNM4pXreNmb9pnC3OalaYWmxRhw6RzSfD/hO+kkmw/bRzSBGKI+0WAVLIgeklUaqfaZPetzJAz8kJjFYMVHKvelpkrI+5qaITTATH4Ue6NpLZDe0Z9us6Eh4gPqr5PVtPDQwfTDLcW9e6mY3ZM7kBUzWZ6YdWTXnAQy89LZj8vGAwgbFovH+Y6ww==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -30,43 +29,50 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i+CcBB3j488jkuKx+KOLwWykGtY25VR7Awhl1bqG3Ig=;
- b=AkaNXNpAD1z3q011eEbLfadBgcV8KrtXpjyBXQktabtUPFRpIuAocEQNu9jmsP+tVF98UljNArfC7+uytwrBy6Z5P1lUrBQBnWjABjxRCl8Wqrpj2cjcE+eAzl46hXxuiBbDvtraQKXKcgAsJl/+v5nf05DfmDHks5AqKz4tCI0=
+ bh=UPZR4gczJ68KJs3HVBIoXHhO1xtJrYjN3HIDqomlZGk=;
+ b=RkRzx/exhjh/qCYKOOOIhhX3dpYQupF2/Vgcw98lELHFrrIoVbmi8NN+/0yHscB/cNukn8UfC2TSCv+N13RF2Mz7MteBzmsVlECbXTy3AyalBmVRdF5R+04yJYF6/LyH91AfXUFSUyVbcoVgpCKF24avEeSvYeXXCR1ZWzLXw7I=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from LV2PR01MB7792.prod.exchangelabs.com (2603:10b6:408:14f::10) by
  LV0PR01MB994054.prod.exchangelabs.com (2603:10b6:408:330::12) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.202.18; Tue, 14 Jul 2026 23:06:05 +0000
+ 15.21.202.18; Tue, 14 Jul 2026 23:12:09 +0000
 Received: from LV2PR01MB7792.prod.exchangelabs.com
  ([fe80::3ee4:7b7c:ee84:7c1a]) by LV2PR01MB7792.prod.exchangelabs.com
  ([fe80::3ee4:7b7c:ee84:7c1a%4]) with mapi id 15.21.0202.014; Tue, 14 Jul 2026
- 23:06:05 +0000
+ 23:12:09 +0000
 From: D Scott Phillips <scott@os.amperecomputing.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Joey Gouly
- <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Mark
- Rutland <mark.rutland@arm.com>, Zeng Heng <zengheng4@huawei.com>, Wei Xu
- <xuwei5@hisilicon.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Lucas
- Wei <lucaswei@google.com>, Kuninori Morimoto
- <kuninori.morimoto.gx@renesas.com>, Sascha Bischoff
- <Sascha.Bischoff@arm.com>, Yicong Yang <yangyicong@hisilicon.com>, Yeoreum
- Yun <yeoreum.yun@arm.com>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-Subject: Re: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57
- and AC04_CPU_29
-In-Reply-To: <87mrvy5640.wl-maz@kernel.org>
-References: <20260710222128.416581-1-scott@os.amperecomputing.com>
- <87mrvy5640.wl-maz@kernel.org>
-Date: Tue, 14 Jul 2026 16:06:00 -0700
-Message-ID: <86jyqx189z.fsf@scott-ph-mail.amperecomputing.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	Zeng Heng <zengheng4@huawei.com>,
+	Wei Xu <xuwei5@hisilicon.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Lucas Wei <lucaswei@google.com>,
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: [PATCH v2] KVM: arm64: vgic: Avoid double-deactivate of IRQs in the nested context.
+Date: Tue, 14 Jul 2026 16:11:58 -0700
+Message-ID: <20260714231158.496808-1-scott@os.amperecomputing.com>
+X-Mailer: git-send-email 2.52.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: MW4PR04CA0108.namprd04.prod.outlook.com
- (2603:10b6:303:83::23) To LV2PR01MB7792.prod.exchangelabs.com
+X-ClientProxiedBy: CYZPR14CA0025.namprd14.prod.outlook.com
+ (2603:10b6:930:a0::27) To LV2PR01MB7792.prod.exchangelabs.com
  (2603:10b6:408:14f::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -76,282 +82,123 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: LV2PR01MB7792:EE_|LV0PR01MB994054:EE_
-X-MS-Office365-Filtering-Correlation-Id: 25f3fa85-618a-4f8e-0631-08dee1fc7b44
+X-MS-Office365-Filtering-Correlation-Id: bb828ef8-66d8-40fc-744c-08dee1fd544d
 X-MS-Exchange-AtpMessageProperties: SA
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|6133799003|5023799004|56012099006|11063799006|4143699003|18002099003|22082099003|55112099003;
+	BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|921020|56012099006|11063799006|18002099003|55112099003;
 X-Microsoft-Antispam-Message-Info:
-	GePt5WzbUGRCiuhgWNVtcn00Z4eXV2Cj2GlRxs3WUILgYjSA369igLBoucIV24G6tconNp4Ai+7iItZwXPrsCIOsqbJBCdUolURHZP4CIZQ25I/pOxyv8qt3yE0/DCynIrIYIghfjxlnu9f75d4NyLHMKc0b3q6dLAgIc7Q+egN1XEQa+hWKQ/D3CfgithWye09MlwnQ6rGWMYyGRZg9X8VM7liaEaOZqv8JKGQc3iJIYRpwVzHpOLvYba4Jw8F0aerZRJ6havAtusTsZklqdpadiwqSv7pDQMSOuOqVxKiJRGqKp5Kt2bGn+yfkFmKjmXqR3a5VbRRmpoYlSXRsM52MxmyrbjTMeKjNGCERN9mGsWb1RVV8sKL4liZT8Nu7cnXCe8GBpZ0vGaonaBXFMYlJvee0qPoJocE9PuwJiUmonFjFF4zJpMBwae+qzqTU4bQvxQ+FOufIwIikAuFNb0ZsEIUl8/jJJ1wASCM4SFAv0lAHgZZrIL3aQf9gvn5Vwn9WnADOzGKCTw7GjJ8mXCzSK5dB5tmeU9cMF7XXuMu/ZmH49ovHledxmv6y6ie6u8y6YuHbIyKFtRwknRHjmz9Crsl3+Rmt2h+DxI3QrsFRCFw1hPH4UN7vYN2Sx5ScPFSdcFQ7OITs+JitWSY86CJ+wtPGCJD1T664g1LRe0A=
+	uSfJXnUhkZe1Z5TFkGpUGTEuLBmJLUruSJ63pLybnef5pViPhYpaK6YJAFVmxY9zbbigl1LeTAX88CrXcmsUZDN4d7arVIcd1fvJOR41RFUuuV9bcDXA6Fv1I7NCHCQW77FtO4E5jwLE5dMWW8TljTzAfJeXRz65Jnt0rOSs0YD2iMR9rdWCpAhgzYn7vr8xWVmR5qO+hmk1Q6kJE7inPiLUZdTrRORCXVMIf7Rbf0rQCrCCcgQCHACrOUG9JZy/tC+mTGY9/ZuEPzX2gF4TjoLwnJAlPfyfmOeTHfhTtrToyuS5k+cX6El+6+x+S1LPbNclp8d+IHOGfB6vtDwlCYxkGnVCZqTcXwLyk3nkeE+Nh1bBw3gO92OuoKOyt6V36m56W4LrxUUeN6xG16+hMC7G2oAKlfaVfOYY4dm9/xtjlXr8GUC/pe9BeDiiQ7vdXnMgbxBB4P+O3lynB8E39y1aWerc0UUan1UaS//Kt0SVi3tb5Kv9FjFpHUOuWAQtjR1QhDTlnzUCavm9a9+oLZl9pwegp8guIbdsEMjTJ7k9QP17plU1+MBcxflB6RUR3cejzyfRr4ZmnILJQ1p++J5C9Tbv7QHsTokcr696ZWXXfl4NKy4r6qa9W19C/m+7FJTJByXGmIoqfWJHklIf8DoLk4Rf1kevrscLDS8NKJbYAw/ST2HjC7Ged4+4yL+6sAX79EHlIVACMAT0N00QOg==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR01MB7792.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(6133799003)(5023799004)(56012099006)(11063799006)(4143699003)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR01MB7792.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(921020)(56012099006)(11063799006)(18002099003)(55112099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2mniLiovGqVT9VlIXwkQZRmPD4/+QEW6Kx4SAvovCAKtoggho4zfRMLy995A?=
- =?us-ascii?Q?4Ok35/QY59CeSCsc1O+VAjkwv084OZ+cU5ojkPKdCLFo1O+h6pNUHHmPs8RI?=
- =?us-ascii?Q?fnDPVJ8k+DcvuJCWboCT0f0I7DorSDy4yMMEZ0xgxFSK1BQdc6+ywEosutOA?=
- =?us-ascii?Q?ROrpOso5LvuowfixhBLD81H111VDivBWL7r4rhgtyv2sKEzxGsCZl/b1d4jl?=
- =?us-ascii?Q?7PvCNK7fpsU1vzIa9dwhkpKodYbFT96/kckoWR6N9XC+ydw5hE4DB3Fqr5SL?=
- =?us-ascii?Q?G03TxIBJ1eKarYd5oRgScAyQo5+pYtszk1fk3hnk4C5OYdC6jVD4WXpkxiMA?=
- =?us-ascii?Q?6+7Jn0hukmWx1aVjRJ8MZx0j24D6EW7+qxdNnfd1OgYe1FztJrvceIIba5Il?=
- =?us-ascii?Q?OBd43ZhZlhHnFG/Hw8DNH7S385Wa9wiu8sCrKCQ+L7tTutRI73pTzP4VNEUr?=
- =?us-ascii?Q?fOdNi0pwSMae1JObBxkrhI2KzMKXmX2CXB7RUpeGB4SYJU7n2DjFoL8YH5I5?=
- =?us-ascii?Q?zCnVBkABY5PcS2X5gGtGu7A4Niijuw+LV8axjV/q4/3BbdVVcp6CVgE0RHXJ?=
- =?us-ascii?Q?5ASRR25uWZ+CX2rUnLG8Dnr/zk/kSpfH49AHpgDgwi6A1m3QGSppagoEhjPV?=
- =?us-ascii?Q?1ys96gGrM24xucrxu2nE71Tjs2xPzIyQFU8rnIWWpxVPUKU2CNC+h+Kf5Q/I?=
- =?us-ascii?Q?Dr21wlW1ITWElXCIvgaDHWtHieR5N31dlcnMXUnkNCUX55QMwbkb39j4gy1L?=
- =?us-ascii?Q?dp4cEpGVDVVSjb/fN4PwiIni8RDh5FVi/FnQiW8z51bEaO17glfXBb78CH0L?=
- =?us-ascii?Q?+/861unYNIKSGjvB2Vrgv020vzGRDs9Kl8BlRvLST4Ai/gKVm/Uc35EQIHUg?=
- =?us-ascii?Q?XX9Gjve9FEn9eLVkiM6xvWP4S1dYEUcADpClUtl+sgDpihYmVvLH7/Rh02tk?=
- =?us-ascii?Q?VFIEgNZNIgj+XGX4bYBZN4zyf12cKWyFXeGuhK5RmNOkniqJWW/IX4LOOXHk?=
- =?us-ascii?Q?fs53ZlrFvDwwlkNn08MDSP6bk8YNwTwIIXhaqIj44PPalDQwIuxn4OSxwM7A?=
- =?us-ascii?Q?uVJ/MgaWLgjHTl2WXol+9J/8OrReZ0TilCwjY0XGJm9cHL2a9KU+OthjxnME?=
- =?us-ascii?Q?qcByXuEtzu21TzMc4kjujfbycHjKp+bPaQ/UDx4kiP4t5Q8LIKjP4DAPcoft?=
- =?us-ascii?Q?TQCFWltIV2pn3EWpkw/rMbUTwv0/pM9qw9JfyG15D3FHGwZXYoBwM2wqBIVq?=
- =?us-ascii?Q?oxI6M69KdQy4Cyqgh5sBPLj7ol/gi0/Y7RpoOZwlhgEeU0K+LvTKfl7LGZKF?=
- =?us-ascii?Q?mwM+xxwDjvPD30deajHiVzDCmZQBeqZW7ttBmvS20RYqxW8l6HTcE2ZD9tWp?=
- =?us-ascii?Q?YFtblaYl2wdw4aSLTyFTUudEJ9KL38JUILE5eDfZ4B6PVyRrQc8eJ2tmdMjd?=
- =?us-ascii?Q?QCSMF9vnLQ2tFgWn385ZZtGnsUG8dgdjFQ9X8Ijrgx6F73U6+RBm/jpjjt0c?=
- =?us-ascii?Q?U3jYeoi5tWcV2nx7SoOTMz75OWFT5m41bAriZHgO3GcHSb7XJ9qC+GjuUf8M?=
- =?us-ascii?Q?LA9RJQnbFS1M3bWZLzMiy+Nyr3CJdciBuIQ18V643+k7cg5AMG1Tdta30VI7?=
- =?us-ascii?Q?Vg0GJjgaVIscTDfqqrWt2FB6a2cV6izv5cVVQKSecIi8FaBJGJuL3US7fI+j?=
- =?us-ascii?Q?pC3j6znsYkIFocbvUaRLIiUXs+ndDO15jUMym27zvH7LVNjAhLs13lAu9OVE?=
- =?us-ascii?Q?uSjKHkJlz41MGJggVuMO02qv22nBhO0=3D?=
+	=?us-ascii?Q?FxY+kgrp8W3ndm/V5/2IS4UfPZ6X4Fkt0cIHPxe7KhGCimdn/p4KPq0FYTbn?=
+ =?us-ascii?Q?IwedG1PNeVVtmDsNvFIiMeNuMbJI90FRKQeUBnaLxV4z2W4GLVUphDPql3oS?=
+ =?us-ascii?Q?gQSwKzjExre78DoZPx8xFqQiuny4htmcOv8hjB3zhsPFGk72R9cSaxNsNY3v?=
+ =?us-ascii?Q?7ZGPAQgejVXN9AXQUi1lG1rphb78qA4dWb4IIYLSt6lBF95Sxk4YzLO/IdrN?=
+ =?us-ascii?Q?vV5+60V+88SaLEtGtfQi25xzr/SwR3CbdaqzRyoVX5RnxLUVdI7BgFQgnnlF?=
+ =?us-ascii?Q?HZfXiuvA4XKLSugb8psFQ8rAjfE7puZfIv9rc87Xqj/Np3ZiTrX5Wq/PGrbT?=
+ =?us-ascii?Q?/OrKXg60XTzNBb8R9/8MAyXPTU8swnGXHdLs3c4B70w+1EtqXduWcvEbEMer?=
+ =?us-ascii?Q?Cat55tUc5EeqMg5BwU5mowN09sUtjlHcoVej/zD3Bl+sj7INoOMSD7Rb3hK7?=
+ =?us-ascii?Q?j/gu1Dm5Fu433y6Ut4sR1ZaZjUZlmhlUPazgUQ+3cXgPtvT/Kwk71Rbsunsw?=
+ =?us-ascii?Q?hjy0J0FNM//g9659VkVPzw1BdNbZo3d2YxGQhD/JMKMXFBs2rvk3LiGJeYc7?=
+ =?us-ascii?Q?CJYumYmV6HYyAJwPFM4tI8SeNml3rlgUJ+HmTSpdSsYqU7XBv0JJyrKq5qX0?=
+ =?us-ascii?Q?8ulJ8k1VhEY/5Zup3ZpKoh1+vAnZz6bLjC4WepyPu3Sp6ZC1/uwFzaXyO3Qc?=
+ =?us-ascii?Q?nQZ1lvf9hjIg3YSQGqskjCjfBgjxALMg8+aviper9kb5Y9BLeUVyORG3SKAk?=
+ =?us-ascii?Q?7Ji4K7YIkdT5OBSUtyQjP/6xIkX4iM8f0fPgVpmElyTWCaBvfR+zuvzEv2er?=
+ =?us-ascii?Q?GCZYFC3heUP2h7PIdVkI2sObXl5iE3bhNW6xjCsRRT5bGoiGHOax9SGMuijh?=
+ =?us-ascii?Q?X93rYpPJa8tPJPaIn1GFJRc5CwoQfUNYkZmAh0WfQR+Q29lAutUxqpX5Vklt?=
+ =?us-ascii?Q?T5Y7usD2ddE/9O8Z/42ILpmIlxh+ixppCTI0ren+/y5gogI0Oz+2e886bO0V?=
+ =?us-ascii?Q?wC+CXWgoZrfLybkiPWmFWKk9+Z9f/fbksX3gBYyszy4dv81iHBP+NC80pAg4?=
+ =?us-ascii?Q?QaHyNiEUCl7W3pRfwu9eJvFjgORK3LpAsIbTlTQ5BLfXqu7VqWM2IxzJzS3a?=
+ =?us-ascii?Q?m1IomU7dIqCrWUITPza1hQ9uPh1rerTEQ2nN9/1cTwpZG7r+mnm/7b7BNTHK?=
+ =?us-ascii?Q?AV1+QHtlNOVh2wHhw7OPHreZlY9iABrU5j3UMKk4fFUbOph3VlwEtfaOH7CU?=
+ =?us-ascii?Q?pf9q7qZNKzgpZJOmAG3CVKYD0kAA9wO0a1fjGGNII4qBXjSAqA3arwxsoBg3?=
+ =?us-ascii?Q?hghvCBJ2X3knyCvE3RDmc767L7ddjOo+sqxFsb9w9saL1xyLmMJk+bMzjI74?=
+ =?us-ascii?Q?rsKLKHOV2uz/ww3kPXSfDkCxhThoQetcdugsHClhtf7Gb9OssDsm/b+RWYfx?=
+ =?us-ascii?Q?c5z4G46dT8h5RhH6IfLyjEjE2DfOlXU9AJd9NUa4EXNARu192hRz1bXzGuf9?=
+ =?us-ascii?Q?QEd/S2CZKADR+vTgJrE361oqIXS7y6FjwcwL23V3oWF9yIn3yp2bLxgjLvUe?=
+ =?us-ascii?Q?d5ahB6dqXg4bgbbmw9iJt4vZFTtTGEmM2bF/4G7TmBaB3CK+LiKB2X3vsalo?=
+ =?us-ascii?Q?CkwsyG22xrpdBqvow8zBkPH+419GVsJ1YBBGcR2k96O5cNviTIQDGpVRK1u+?=
+ =?us-ascii?Q?9ZX7iznyWIr2srt/UbGD4JyfxSYwBoQefw7b5TFhvjB/DA+/SA/2Oq8PKc22?=
+ =?us-ascii?Q?NLO3AcviOvbOoh5SZ7jKR26TMgJdtyA=3D?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25f3fa85-618a-4f8e-0631-08dee1fc7b44
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb828ef8-66d8-40fc-744c-08dee1fd544d
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR01MB7792.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 23:06:05.0934
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 23:12:09.2038
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lOSNC/91bLJatmVngzaDGT+0LtdpAN4XvdFWM5j0PXrUlbiHwtaGyQB3Hnhd60C/gPP0kn0tW4b/vy1lQgoToLN9OrOc3XGBmxgLxKjwIlEQVLro1Flxt378/y1ZlVTr
+X-MS-Exchange-CrossTenant-UserPrincipalName: PQvoO8zkqdKNFIc0IzmUuYQFXqYvFqcoayVG/lONb4t8Qu/V9ba2FCQN+gb002ahEQXO5D5c/h42Z/dLsLmbX7YhNsZ1rXBt6HCASZ/hhlbCv6l/vzJXJH7fXta45QRe
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV0PR01MB994054
 
-Marc Zyngier <maz@kernel.org> writes:
+In the nested state, the physical interrupt has already been
+deactivated through the HW bit in the LR. The extra deactivation
+would be harmless but can hit an errata case on AmpereOne, so
+avoid it here.
 
-> Hi Scott,
->
-> On Fri, 10 Jul 2026 23:21:28 +0100,
-> D Scott Phillips <scott@os.amperecomputing.com> wrote:
->> 
->> On AmpereOne, deactivating a physical interrupt through ICC_DIR_EL1 or
->> ICC_EOIRx_EL1 (depending on EOImode) which is not active, but is the
->> highest priority pending interrupt causes the cpu to lose the interrupt
->> pending state and also prevents the delivery of future interrupts.
->>
->> Work around this in the vgic, avoiding the cpu issue.
->
-> Thanks for getting to the bottom of this.
->
->> 
->> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
->> ---
->> 
->> Hi Marc, we've tracked down the nested virt hang reported
->> previously[1] to a cpu erratum in AmpereOne[2].
->> 
->> Here I'm just sort of parroting the change you had posted for
->> debugging. I'm not familiar with the vgic logic well enough to know if
->> this change is sufficient and doesn't have some unintended
->> consequences. I guess read this more are as "I've tested this and I'm
->> not seeing it hang now."
->>
->> Sorry for sending this half-baked, I didn't want to further delay the
->> errata details on my ongoing vgic education. I'm happy to take any
->> advice you can give, otherwise I'll continue familiarizing myself and
->> will hopefully later have a patch which I can actually claim I think is
->> correct.
->
-> No worries.
->
-> To be perfectly clear, what I posted at [1] *is* a bug-fix. A very
-> minor one. Nothing wrong should come as a result, except when it does,
-> such as in your case.
->
-> The core reason why this happens is that the L2 will have EOI'd its
-> timer, and that the HW bit set in the LR will have propagated the
-> deactivation all the way to the HW redistributor. Then L1 takes over,
-> and needs to reconcile the LR state with its own, namely its view of
-> the active state.
->
-> The issue here is that when dealing with a nested vgic (the state
-> contained in the LRs is for L2, not L1), the deactivation process
-> doesn't need to involve the HW again -- this has already be dealt
-> with, and results in the double deactivation I mentioned in my email.
+On AmpereOne, deactivating a physical interrupt through
+ICC_DIR_EL1 or ICC_EOIR1_EL1 (depending on EOImode) which is not
+active, but is the highest priority pending interrupt causes the
+cpu to lose the interrupt pending state and also prevents the
+delivery of future interrupts.
 
-Ah ok, thanks, I think I get it.
+Fixes: 6dd333c8942b2 ("KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive")
+Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
+Cc: stable@vger.kernel.org
+---
+Link to v1: https://lore.kernel.org/linux-arm-kernel/20260710222128.416581-1-scott@os.amperecomputing.com/
+Changes since v1:
+ - Drop erratum cpucap
+ - Add comment about errata at change
+ - Update commit message with description from Marc, add Fixes:
 
->> 
->> [1]: https://lore.kernel.org/linux-arm-kernel/87ecjybz30.wl-maz@kernel.org/
->> 
->> [2]: https://amperecomputing.com/products/developer-errata
->> 
->> The updates with AC03_CPU_57 and AC04_CPU_29 have not yet been
->> published at the time I'm writing this. They should be coming
->> soon. I've reproduced the full entries from those two coming documents
->> collapsed together below:
->> 
->> | {AC03_CPU_57, AC04_CPU_29}: Deactivation of the non-active, highest
->> | priority pending interrupt prevents further interrupt delivery.
->> |
->> | Functional Unit: CPU
->> |
->> | Category: 4
->> |
->> | Affected Version(s): AmpereOne AC03 A0, AmpereOne AC03 B0
->> | Affected Version(s): AmpereOne AC04 A0, AmpereOne AC04_1 A0
->> |
->> | Fixed Version(s): Open
->> |
->> | Overview:
->> |
->> | If software directly deactivates a physical interrupt which is not
->> | in the active state, and the interrupt is also currently the highest
->> | priority pending interrupt, then interrupt delivery will cease on
->> | that PE. Deactivation can happen either through ICC_EOIRx_EL1 if
->> | ICC_CTLR_EL1.EOIMode==0, or through ICC_DIR_EL1 if
->> | ICC_CTLR_EL1.EOIMode==1. Deactivation of virtual interrupts that are
->> | redirected through ICV_ registers will not cause this issue, even
->> | when the virtual interrupt deactivation triggers a physical
->> | interrupt deactivation through ICH_LR<n>_EL2.HW=1.
->
-> OK, that's pretty good news. Can I safely assume that your HW doesn't
-> support VLPIs/VSGIs in any form (no GICv4+)?
+ Documentation/arch/arm64/silicon-errata.rst | 4 ++++
+ arch/arm64/kvm/vgic/vgic-v3.c               | 8 +++++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-AmpereOne AC04 does have gicv4.1 with vlpis/vsgis. Those take a
-different enough path in the core that a deactivation of a pending
-vlpi/vsgi won't cause the issue. The wording about "physical interrupt"
-is meant to exclude vlpis/vsgis, sorry that it didn't come out clearly.
+diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
+index 014aa1c215a16..88b4aa45a2066 100644
+--- a/Documentation/arch/arm64/silicon-errata.rst
++++ b/Documentation/arch/arm64/silicon-errata.rst
+@@ -55,10 +55,14 @@ stable kernels.
+ +----------------+-----------------+-----------------+-----------------------------+
+ | Ampere         | AmpereOne       | AC03_CPU_38     | AMPERE_ERRATUM_AC03_CPU_38  |
+ +----------------+-----------------+-----------------+-----------------------------+
++| Ampere         | AmpereOne       | AC03_CPU_57     | N/A                         |
+++----------------+-----------------+-----------------+-----------------------------+
+ | Ampere         | AmpereOne AC04  | AC04_CPU_10     | AMPERE_ERRATUM_AC03_CPU_38  |
+ +----------------+-----------------+-----------------+-----------------------------+
+ | Ampere         | AmpereOne AC04  | AC04_CPU_23     | AMPERE_ERRATUM_AC04_CPU_23  |
+ +----------------+-----------------+-----------------+-----------------------------+
++| Ampere         | AmpereOne AC04  | AC04_CPU_29     | N/A                         |
+++----------------+-----------------+-----------------+-----------------------------+
+ +----------------+-----------------+-----------------+-----------------------------+
+ | ARM            | Cortex-A510     | #2457168        | ARM64_ERRATUM_2457168       |
+ +----------------+-----------------+-----------------+-----------------------------+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 9e841e7afd4a7..7aa417440f6a2 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -275,7 +275,13 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
+ 		lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+ 	}
+ 
+-	if (lr & ICH_LR_HW)
++	/*
++	 * In the nested state, the irq has already been deactivated via the HW
++	 * bit in the LR. Deactivating again would be harmless except AmpereOne
++	 * errata AC03_CPU_57, AC04_CPU_29 could cause irq delivery to break if
++	 * the deactivation hits the highest priority pending irq.
++	 */
++	if ((lr & ICH_LR_HW) && !vgic_state_is_nested(vcpu))
+ 		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+ 
+ 	vgic_v3_fold_lr(vcpu, lr);
+-- 
+2.55.0
 
->> |
->> | This has been observed with Nested Virtualization starting with
->> | Linux-KVM v6.19.
->> |
->> | Impact:
->> |
->> | Physical interrupts will not be delivered after the deactivation of
->> | the non-active, highest priority pending interrupt. A core may
->> | appear to be hung.
->> |
->> | Workaround:
->> |
->> | Software must only deactivate interrupts which are currently active
->> 
->> 
->>  Documentation/arch/arm64/silicon-errata.rst |  4 ++++
->>  arch/arm64/Kconfig                          | 17 +++++++++++++++++
->>  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
->>  arch/arm64/kvm/vgic/vgic-v3.c               |  4 +++-
->>  arch/arm64/tools/cpucaps                    |  1 +
->>  5 files changed, 40 insertions(+), 1 deletion(-)
->> 
->> diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
->> index 014aa1c215a16..89130404ce572 100644
->> --- a/Documentation/arch/arm64/silicon-errata.rst
->> +++ b/Documentation/arch/arm64/silicon-errata.rst
->> @@ -55,10 +55,14 @@ stable kernels.
->>  +----------------+-----------------+-----------------+-----------------------------+
->>  | Ampere         | AmpereOne       | AC03_CPU_38     | AMPERE_ERRATUM_AC03_CPU_38  |
->>  +----------------+-----------------+-----------------+-----------------------------+
->> +| Ampere         | AmpereOne       | AC03_CPU_57     | AMPERE_ERRATUM_AC03_CPU_57  |
->> ++----------------+-----------------+-----------------+-----------------------------+
->>  | Ampere         | AmpereOne AC04  | AC04_CPU_10     | AMPERE_ERRATUM_AC03_CPU_38  |
->>  +----------------+-----------------+-----------------+-----------------------------+
->>  | Ampere         | AmpereOne AC04  | AC04_CPU_23     | AMPERE_ERRATUM_AC04_CPU_23  |
->>  +----------------+-----------------+-----------------+-----------------------------+
->> +| Ampere         | AmpereOne AC04  | AC04_CPU_29     | AMPERE_ERRATUM_AC03_CPU_57  |
->> ++----------------+-----------------+-----------------+-----------------------------+
->>  +----------------+-----------------+-----------------+-----------------------------+
->>  | ARM            | Cortex-A510     | #2457168        | ARM64_ERRATUM_2457168       |
->>  +----------------+-----------------+-----------------+-----------------------------+
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index b3afe0688919b..ee5421283d8df 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->> @@ -436,6 +436,23 @@ config AMPERE_ERRATUM_AC03_CPU_38
->>  
->>  	  If unsure, say Y.
->>  
->> +config AMPERE_ERRATUM_AC03_CPU_57
->> +	bool "AmpereOne: AC03_CPU_57: Deactivation of the non-active, highest priority pending interrupt prevents further interrupt delivery."
->> +	default y
->> +	help
->> +	  This option adds an alternative code sequence to work around Ampere
->> +	  errata AC03_CPU_57 and AC04_CPU_29 on AmpereOne.
->> +
->> +	  Deactivating a physical interrupt through ICC_DIR_EL1 or
->> +	  ICC_EOIR1_EL1 (depending on EOImode) which is not active, but is the
->> +	  highest priority pending interrupt causes the cpu to lose the
->> +	  interrupt pending state and also prevents the delivery of future
->> +	  interrupts.
->> +
->> +	  The workaround is for KVM to not deactivate interrupts for nested vgics.
->> +
->> +	  If unsure, say Y.
->> +
->>  config AMPERE_ERRATUM_AC04_CPU_23
->>          bool "AmpereOne: AC04_CPU_23:  Failure to synchronize writes to HCR_EL2 may corrupt address translations."
->>  	default y
->> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
->> index 1995e1198648e..9b03dccd55e09 100644
->> --- a/arch/arm64/kernel/cpu_errata.c
->> +++ b/arch/arm64/kernel/cpu_errata.c
->> @@ -631,6 +631,14 @@ static const struct midr_range erratum_ac03_cpu_38_list[] = {
->>  };
->>  #endif
->>  
->> +#ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_57
->> +static const struct midr_range erratum_ac03_cpu_57_list[] = {
->> +	MIDR_ALL_VERSIONS(MIDR_AMPERE1),
->> +	MIDR_ALL_VERSIONS(MIDR_AMPERE1A),
->> +	{},
->> +};
->> +#endif
->> +
->>  #ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
->>  static const struct midr_range erratum_ac04_cpu_23_list[] = {
->>  	MIDR_ALL_VERSIONS(MIDR_AMPERE1A),
->> @@ -987,6 +995,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
->>  		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_38_list),
->>  	},
->>  #endif
->> +#ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_57
->> +	{
->> +		.desc = "AmpereOne erratum AC03_CPU_57",
->> +		.capability = ARM64_WORKAROUND_AMPERE_AC03_CPU_57,
->> +		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_57_list),
->> +	},
->> +#endif
->>  #ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
->>  	{
->>  		.desc = "AmpereOne erratum AC04_CPU_23",
->> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
->> index 9e841e7afd4a7..8f1d10872360c 100644
->> --- a/arch/arm64/kvm/vgic/vgic-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
->> @@ -275,7 +275,9 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
->>  		lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
->>  	}
->>  
->> -	if (lr & ICH_LR_HW)
->> +	if ((lr & ICH_LR_HW) &&
->> +	    !(cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_57) &&
->> +	      vgic_state_is_nested(vcpu)))
->>  		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
->
-> I think this is slightly overkill. The hack I posted should be enough,
-> and we can replace all the capability business with a simple comment
-> referencing the errata numbers and the entries in silicon-errata.rst.
->
-> Use the information provided above to beef up the commit message and
-> stick:
->
-> Cc: stable@vger.kernel.org
-> Fixes: 6dd333c8942b2 ("KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive")
->
-> so that we know how far this needs to be backported.
-
-Thanks, will do
