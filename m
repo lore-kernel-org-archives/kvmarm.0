@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FA647CC6A;
-	Tue, 14 Jul 2026 14:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDB01A3160;
+	Tue, 14 Jul 2026 14:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784040136; cv=none; b=tYF9jqLvgyCiUy96DWohGNkWtdfUkfboof4oXxvjmL0chECigrF3imNHo7Zk4YYuBfYOCY/c4QgidG0iWYv/6foL8212WZzQgWeVBg5MC3SC6rM+GnNgoksr0h16qIBhJ7NC4T3o3hoOWs38Rk0XrIiNBaDtbqG+3zWTAj2ziuA=
+	t=1784040163; cv=none; b=RumPguY0fxfT3Vd9PLvDja+6iPOOAwkdVPUxGTd5aeuIixwgCcGrlLTSyEgDzGNbEx0ovQ0bZX5c0FHruZyPW8ZACtsbscGZmE0yR7PgmGwSwlSL5fy679d1pa4plMjb31pBhB+3Bsb5xaQ5EkRWR+BhCWaz/yTfvbjIsAg3HiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784040136; c=relaxed/simple;
-	bh=77yt9s2dsnEqZwevHtFDX1yRSt7P0b9WymmWpE3TSdU=;
+	s=arc-20240116; t=1784040163; c=relaxed/simple;
+	bh=24mGL5APZkTLfuw/8iScc+zBzGDnN9HTxzi46AtljAo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cw4MXgdS0IHrLuK4vknwBOmO1z044Y5dLTjVSk4Ojse0mF0uEliw36SUf4Q4keM7fPQ3nRuCgEUe6bE9LZ0uycb27FjnJZF0apGzmlN+1eMdGB1gL+RVORAsjijahZSVXuqig1NfFJPx9cBEXXl8K8vawWdRm0ZrMej2bFtQc58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dWfMJ4oY; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=ihS2kRUb/P7ZWUKyTZpYj+YkDbJjKM4kDoqfkdAIH7sD//S/2v96iM3Lkpuxa8pQqcoQa6dcB27TTiHEDwqnX9AfRNCd+lBlRBQ31tiXRufrNRakRcKB+MtJyW2VP2w4VGKJQXtmupMNFpTkOqT10UM4XREmfRLyTiD7ANs0ZBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIbrfB1z; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dWfMJ4oY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 365771F00A3A;
-	Tue, 14 Jul 2026 14:41:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IIbrfB1z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F7EB1F00A3A;
+	Tue, 14 Jul 2026 14:42:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784040110;
-	bh=tnnh04XIx4SeNGJxduuDCeAhPySgPvNiGa4wErT+ipA=;
+	s=k20260515; t=1784040155;
+	bh=mlBu1Bp61PlIYBzRRe1/GLFDWE1W4Gxddj0ESIkTctE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dWfMJ4oYiSBbjYRXlTw3x7QOOQIU/t8V2TbmqqWKayTfIPv0O68EMjilMTjvVv6Hb
-	 vy4KdgA+xFN9tdwgsEejM7dVRJPdahKjK47yVLv7EFNUxf77zfT7bK5YlmbgFISPYb
-	 Dd3bOm1kehfiuXKfDJ8rccLh1IasYh3VxzdXpBd3DYTObInGnCLbnVUYmEVMvDnbP3
-	 ml+7NRgEYFRXGE/waYNvAZb6XabLgbCrAw2LJp/3b6hw5SUrK5V6CdRdOXylzULi5o
-	 0pXFSKD1o+sp0/ZadRiVKWwvFfliczPY3nE2uQ9OsB3OKUilGXSogZjrjwaGZAVe2O
-	 5yiUbGIMOSVNw==
+	b=IIbrfB1z4kkO6SGsMOnqbn3/2UldkavHVhW8Y4Un9UmibM6eHsgMJsjAZHUmPZ9GA
+	 UMLMswwn5C1D8ESKG8RXlsk0Fl169H4VjQQAU+8vQoxP3o2i965dAYNMMa/0+uV8Hl
+	 aORIHvD3fYe3g5oYneVFO3EwtOMo2AC5PzsgfBuPYcnIu8HjGsCnEmm3ISunQx9VUm
+	 2bHhGhW0JFbpk6xN0MHHGt/C7QfbA0dBj3UNUGepo8hL9QI3dGAIadRjZzQl4xjlrI
+	 Wem+6Sm7A8Urf4IS5vxq12D2eqOPmmyHTTldKq7bSqspFos245QOhPiG+c8T0s6wbK
+	 BVn0ukjDdiwXQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wjeKS-00000004wwr-1fxO;
-	Tue, 14 Jul 2026 14:41:48 +0000
-Date: Tue, 14 Jul 2026 15:41:48 +0100
-Message-ID: <86o6g9ocpf.wl-maz@kernel.org>
+	id 1wjeLB-00000004wxi-28U6;
+	Tue, 14 Jul 2026 14:42:33 +0000
+Date: Tue, 14 Jul 2026 15:42:33 +0100
+Message-ID: <86mrvtoco6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>,
+Cc: "Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 27/28] KVM: arm64: Expose FEAT_NV3 to guests
-In-Reply-To: <20260714101559.C60F61F000E9@smtp.kernel.org>
+Subject: Re: [PATCH v2 26/28] KVM: arm64: Add FEAT_NV3 detection
+In-Reply-To: <20260714100704.206731F000E9@smtp.kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-28-maz@kernel.org>
-	<20260714101559.C60F61F000E9@smtp.kernel.org>
+	<20260714091641.1970822-27-maz@kernel.org>
+	<20260714100704.206731F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,66 +55,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 14 Jul 2026 11:15:59 +0100,
+On Tue, 14 Jul 2026 11:07:03 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
 > 
 > Pre-existing issues:
-> - [High] Host nested virtualization capabilities (ID_AA64MMFR4_EL1.NV_frac) are leaked to non-NV guests, breaking live migration across heterogeneous hosts.
+> - [High] Writes to control-plane system registers (SYS_NVHCR_EL2 and SYS_VNCR_EL2) are missing the architecturally required `isb()` synchronization barrier.
 > --
 > 
-> --- Patch [27]: [PATCH v2 27/28] KVM: arm64: Expose FEAT_NV3 to guests ---
-> commit 508d53194bf7ddb4e61f279e50216aa88dd973ad
+> --- Patch [26]: [PATCH v2 26/28] KVM: arm64: Add FEAT_NV3 detection ---
+> commit 1e08d22547f3313a77b075620f905436357c4b40
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Expose FEAT_NV3 to guests
+> KVM: arm64: Add FEAT_NV3 detection
 >     
-> Further enable FEAT_NV3 by making it visible to NV guests.
+> Now that everything is in place to engage the FEAT_NV3 fast-path,
+> add the detection code to cpufeature.c.
 > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index f646894fec9a9..70d605e60cfb3 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> [ ... ]
-> > @@ -1741,7 +1741,9 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
-> >  			val = 0;
-> >  		} else {
-> >  			val &= ID_AA64MMFR4_EL1_NV_frac;
-> > -			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> > +			if (cpus_have_final_cap(ARM64_HAS_NV3))
-> > +				val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV3);
-> > +			else if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> >  				val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P1);
-> >  			else
-> >  				val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index c9c124b0ccc8e..6ae1c816e2010 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2627,6 +2627,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+> >  		.matches = has_cpuid_feature,
+> >  		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2P1)
+> >  	},
+> > +	{
+> > +		.desc = "FEAT_NV3",
+> > +		.capability = ARM64_HAS_NV3,
+> > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> > +		.matches = has_cpuid_feature,
+> > +		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV3)
+> > +	},
 > 
 > [Severity: High]
-> This isn't a bug introduced by this patch, but while looking at NV feature
-> exposure here, could ID_AA64MMFR4_EL1.NV_frac leak into non-NV guests?
-> 
-> Looking at __kvm_read_sanitised_id_reg() in arch/arm64/kvm/sys_regs.c,
-> it seems SYS_ID_AA64MMFR4_EL1 is not explicitly masked out for non-NV guests
-> in the switch statement:
-> 
-> 	case SYS_ID_MMFR4_EL1:
-> 		val &= ~ID_MMFR4_EL1_CCIDX;
-> 		break;
-> 	}
-> 
-> If a non-NV guest is created on an NV3-capable host, will the host's raw
-> NV_frac leak into the VM's ID_AA64MMFR4_EL1 register?
-> 
-> If this VM is later migrated to a host with only NV2P1, could userspace's
-> attempt to restore the capability via KVM_SET_ONE_REG fail because the
-> destination host's arm64_check_features() rejects the higher NV_frac value?
+> This isn't a bug introduced by this patch, but enabling FEAT_NV3 here exposes
+> pre-existing paths where control-plane system registers are written without
+> the architecturally required immediate isb() synchronization barrier.
 
-Yeah, we should ignore this field being written back for a non-NV
-guest. It won't be evaluated anyway in a non-NV context.
+Plonk.
 
 	M.
 
