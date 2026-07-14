@@ -1,118 +1,364 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3530377019
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0808F2D73BC
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784025835; cv=none; b=W2x/em/qkKZ15OFgwO56Sb6rMfJjLceTHzfkYGv5yg0VlYQ2Ed84hen+zjtVYnBu2P5VKnUeIIlM+rgBeSwFZ1LU375gh34cKvjTiZubk4EGIlC9/9AK5M5jhum28Zc03VugbBCoi74OjEQ8hcsDOzh8pXm/5ICuLadyhb7r7Sk=
+	t=1784026047; cv=none; b=qhpPu8qdpwPbrbXTPhHws9YCiYcu2Jx55oMuVI0y8aFGH5dhbkDlRil7Hx6fyhajwTs93I4dTOv7sDy8GhB+uG5sYDCmWaaSSKrqhkFwwNNB1rFYg99qN1D4MYwE7Cx9GfW5nrvB3mYyUNEzoZUgmitGC1+rjj6sfbaRRPeAQ9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784025835; c=relaxed/simple;
-	bh=xWLngaxltA5NnVjIRwWKcEqNV6xV20PNkz8Yr/EAHoc=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Dbgz57u3HVGso29BOW4uGILPSPBEZ3/VCsTkm/1ROtVvvqxgK/ozBbJaAA9CFGTSTmQDz0U8kqsqmN9VZzXJuycs2kVVFW/LEO7iP0a0/izJ8/oHFvB7b/ixlF3aYwD0PWPT/jhqZPQjnbhU8xtqqiy20ndM8nfvj10ZczVjBck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Udh4FiMy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784026047; c=relaxed/simple;
+	bh=TvHKgQ5HWvVsrB8U4vuNpf9278CkieOEhDGkfuTAmuk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=pzDlbNKZSROreDpzfvW3AP2s7C0LzAJHxTWPIWTvw7+Ye6jGz7FzZ8WMGCIwKVTvpmGoPUoBCj3ZS0EGqJXAWRMO2Jti+A1sXAJTZ/qZlS7PMqQebQ9fAvdLGPZX78hped1v9dg6Rdx1jr61p710C4XtZPf+6nKRKdSsiRHANk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ey6zan9C; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Udh4FiMy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 615DA1F00A3E;
-	Tue, 14 Jul 2026 10:43:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784025824;
-	bh=Gpq/K4Q8AvWCWE/+NAdfxzP0EEx9bFz/LIS9Jp79RJM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Udh4FiMyoK/aNyJ/7NMsQr5MKh77cpXxhcfJ7RkEZcPeBRHH6VAyUHCC+/MA3Mpbs
-	 J4J/Bl7Ttu5ZVZriDT/Pjhvqy/ulVhmDfUiNtENcmoWYaGBjG28pF5vUa5TQEB4AYK
-	 SgNgYJYI3v/IY+s6pLUDFOccLl9FuBpKmPJSRJEz7JQkKXiEt2hEtm9znrdgE0//HT
-	 630nAhYLbjhJjIUl2iiVEYyFgnaAOnz5/iW15zVtWhkNChgF34D/IMvVu147pYJ7YN
-	 QGEzSLAkcSkCbz0TBAQn2bK4TSuW7y0jqB6NY/V3masXndCUoW841+YEF6TKxAID36
-	 M/GRrXJgHtdnQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg
- available to HYP code
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260714101601.4142645-3-fuad.tabba@linux.dev>
-References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
- <20260714101601.4142645-3-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 10:43:44 +0000
-Message-Id: <20260714104344.615DA1F00A3E@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ey6zan9C"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D9E0497;
+	Tue, 14 Jul 2026 03:47:20 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 683253F7B4;
+	Tue, 14 Jul 2026 03:47:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784026044; bh=TvHKgQ5HWvVsrB8U4vuNpf9278CkieOEhDGkfuTAmuk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ey6zan9CktIWFZuePbBBXdgaE4gbiW14x9KPGfFwkgKfqdvg4dHQvdBbVrIK2kboB
+	 Vk4VOEvn/Lm0hCWj86OUmil4ZtyHlT9rxC0EeptSdmcwCluQIiTSYHVJxwOePVNESH
+	 8tZJP2xayRkp9mDZDRtaxysUdydiSWFVUezveBw0=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 4/6] KVM: arm64: Add HDBSS per-vCPU buffer management
+Date: Tue, 14 Jul 2026 11:47:19 +0100
+Message-ID: <alYTt-fG5rJ9D6Dm@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <df479edc-cca0-4b54-aed0-4d8c6fd4ffc7@huawei.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com> <20260709104026.2612599-5-zhengtian10@huawei.com> <alTqqxEZLuYN-gY6@LeoBrasDK> <df479edc-cca0-4b54-aed0-4d8c6fd4ffc7@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] The WARN_ON_ONCE checks in __vcpu_read_sysreg_vhe and __vcpu_write_=
-sysreg_vhe contain impossible conditions.
---
+On Tue, Jul 14, 2026 at 03:15:03PM +0800, Tian Zheng wrote:
+> 
+> On 7/13/2026 9:39 PM, Leonardo Bras wrote:
+> > On Thu, Jul 09, 2026 at 06:40:24PM +0800, Tian Zheng wrote:
+> > > From: eillon <yezhenyu2@huawei.com>
+> > > 
+> > > Add HDBSS (Hardware Dirty Bit State Structure) per-vCPU buffer
+> > > management including allocation, freeing, and loading of HDBSS
+> > > registers during vCPU load.
+> > > 
+> > > This patch creates the foundational infrastructure:
+> > > - struct vcpu_hdbss_state and enable_hdbss/hdbss_order in kvm_arch
+> > > - kvm_dirty_bit.h header with alloc/free declarations
+> > > - dirty_bit.c with alloc/free helpers
+> > > - __load_hdbss() in VHE switch for register loading
+> > > - vCPU create/destroy hooks for buffer lifecycle
+> > > - sysreg definitions for HDBSS register manipulation
+> > > - Makefile update for dirty_bit.o
+> > > 
+> > > Signed-off-by: Eillon <yezhenyu2@huawei.com>
+> > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > > ---
+> > >   arch/arm64/include/asm/kvm_dirty_bit.h | 16 ++++++++
+> > >   arch/arm64/include/asm/kvm_host.h      | 13 +++++++
+> > >   arch/arm64/include/asm/sysreg.h        | 11 ++++++
+> > >   arch/arm64/kvm/Makefile                |  1 +
+> > >   arch/arm64/kvm/arm.c                   |  7 ++++
+> > >   arch/arm64/kvm/dirty_bit.c             | 52 ++++++++++++++++++++++++++
+> > >   arch/arm64/kvm/hyp/vhe/switch.c        | 15 ++++++++
+> > >   arch/arm64/kvm/mmu.c                   |  1 +
+> > >   arch/arm64/kvm/reset.c                 |  4 ++
+> > >   9 files changed, 120 insertions(+)
+> > >   create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
+> > >   create mode 100644 arch/arm64/kvm/dirty_bit.c
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > new file mode 100644
+> > > index 000000000000..84b12f0a10af
+> > > --- /dev/null
+> > > +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > @@ -0,0 +1,16 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > +/*
+> > > + * Copyright (C) 2026 ARM Ltd.
+> > > + * Author: Leonardo Bras <leo.bras@arm.com>
+> > You are adding the file, so the copyright note should be yours, then?
+> 
+> 
+> I originally thought your earlier patchset had already created this file, so
+> I
+> 
+> kept your copyright and author info. I'll update it to mine in the next
+> version.
+> 
+> 
+> Thanks for pointing that out!
 
---- Patch [2]: [PATCH v5 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg av=
-ailable to HYP code ---
-commit fbd97ecacd267a88fbcb547ae114d7b3bbe56fb4
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+:)
 
-KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+> 
+> 
+> > 
+> > > + */
+> > > +
+> > > +#ifndef __ARM64_KVM_DIRTY_BIT_H__
+> > > +#define __ARM64_KVM_DIRTY_BIT_H__
+> > > +
+> > > +#include <asm/kvm_pgtable.h>
+> > > +#include <asm/sysreg.h>
+> > > +
+> > > +int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
+> > > +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+> > > +
+> > > +#endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index bae2c4f92ef5..c41ec6d9c45a 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -420,6 +420,10 @@ struct kvm_arch {
+> > >   	 */
+> > >   	struct kvm_protected_vm pkvm;
+> > > 
+> > > +	/* HDBSS: per-VM dirty tracking state */
+> > > +	bool enable_hdbss;
+> > Is there not a way of checking hdbss without adding this new member on the
+> > struct? Would not checking the vcpu_hdbss_state from current vcpu should be
+> > enough?
+> 
+> 
+> HDBSS is a VM-wide property, so I currently use a VM-level flag
+> (kvm->arch.enable_hdbss)
+> 
+> to track whether it's enabled. Paths like kvm_arch_commit_memory_region()
+> and VM teardown
+> 
+> don't have a vCPU context to query, so per-vCPU state wouldn't work there.
+> 
+> 
+> But you're right, maybe we don't need a value to store it — we could remove
+> this flag and instead
+> 
+> check the VTCR_EL2_HDBSS bit directly from kvm->arch.mmu.vtcr:
+> 
+> 
+> ```
+> static inline bool kvm_hdbss_enabled(const struct kvm *kvm)
+> {
+>     return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
+> }
+> 
+> if (kvm_hdbss_enabled(kvm))
+>     ...
+> ```
 
-This patch renames the host-only implementations to
-__vcpu_{read,write}_sysreg_vhe() and turns vcpu_{read,write}_sys_reg() into
-context-dispatching wrappers. This allows helpers built on them to be shared
-with hyp code.
+That looks better :)
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 08ba882799d48..c6a416974a61f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -291,7 +291,7 @@ static void write_sr_to_cpu(enum vcpu_sysreg reg, u64=
- val)
->  	}
->  }
-> =20
-> -u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
-> +u64 __vcpu_read_sysreg_vhe(const struct kvm_vcpu *vcpu, enum vcpu_sysreg=
- reg)
->  {
->  	struct sr_loc loc =3D {};
-> =20
+> 
+> 
+> > 
+> > > +	unsigned int hdbss_order;
+> > Is that the order for hdbss buffer size?
+> > Haven't finished reading the series, but would that be bad if this was also
+> > in the per-vcpu state struct, instead?
+> > 
+> > Also, here I suggest that we save a number, instead of the encoding for
+> > HDBSSBR_ELS_SZ, and convert it on hdbss setup. It could be either a
+> > shift, or size.
+> > 
+> > Reason being that you used this to compare with HDBSS_MAX_ORDER at some
+> > point, and there is no guarantee that the encoding will always be in
+> > crescent form.
+> > 
+> > Also, it's not clear where you set this value.
+> 
+> 
+> Yes, this is the HDBSS buffer order (2^order bytes per vCPU).
+> 
+> I put it in kvm->arch *to make sure all vCPUs in a VM have the same order*.
+>
 
-[Severity: Low]
-Since the new vcpu_read_sys_reg() wrapper in kvm_emulate.h explicitly checks
-has_vhe(), does this make the WARN_ON_ONCE(!has_vhe() ...) check inside this
-function dead code?
+Right, but do we need to retrieve this value at any context that is not 
+per-vcpu later? If all allocations happen at the same time, and the vcpus 
+can get the size of their arrays (even by the register itself), maybe there 
+is no need to add this member in the kvm_arch structure.
 
-Specifically, just below this declaration:
+> 
+> 
+> I agree we should store a plain order number rather than the raw SZ
+> encoding.
+> 
 
-	locate_register(vcpu, reg, &loc);
-	WARN_ON_ONCE(!has_vhe() && loc.loc !=3D SR_LOC_MEMORY);
+I would recommend we always save the value in the way its most convenient 
+to use. In this case, I only recall it to be used as bounds to read the 
+HDBSS array, so it would be better if we save it as plain size.
 
-Is it worth removing the check now that the caller guarantees has_vhe()
-is true?
+> 
+> The assignment should happen in kvm_arm_enable_hdbss_global(), which I
+> missed in v4 and will add in v5.
+> 
 
-[ ... ]
+Okay
 
-> @@ -338,7 +338,7 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, en=
-um vcpu_sysreg reg)
->  	return __vcpu_sys_reg(vcpu, reg);
->  }
-> =20
-> -void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg=
- reg)
-> +void __vcpu_write_sysreg_vhe(struct kvm_vcpu *vcpu, u64 val, enum vcpu_s=
-ysreg reg)
->  {
->  	struct sr_loc loc =3D {};
-> =20
+> 
+> > > +
+> > >   #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > >   	/* Nested virtualization info */
+> > >   	struct dentry *debugfs_nv_dentry;
+> > > @@ -838,6 +842,12 @@ struct vcpu_reset_state {
+> > >   	bool		reset;
+> > >   };
+> > > 
+> > > +struct vcpu_hdbss_state {
+> > > +	phys_addr_t base_phys;   /* for memory free */
+> > > +	u64 hdbssbr_el2;         /* load directly */
+> > > +	u64 hdbssprod_el2;       /* save directly */
+> > > +};
+> > > +
+> > >   struct vncr_tlb;
+> > > 
+> > >   struct kvm_vcpu_arch {
+> > > @@ -945,6 +955,9 @@ struct kvm_vcpu_arch {
+> > > 
+> > >   	/* Hyp-readable copy of kvm_vcpu::pid */
+> > >   	pid_t pid;
+> > > +
+> > > +	/* HDBSS registers info */
+> > > +	struct vcpu_hdbss_state hdbss;/
+> > >   };
+> > > 
+> > >   /*
+> > > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > > index 7aa08d59d494..1354a58c3316 100644
+> > > --- a/arch/arm64/include/asm/sysreg.h
+> > > +++ b/arch/arm64/include/asm/sysreg.h
+> > > @@ -1039,6 +1039,17 @@
+> > > 
+> > >   #define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
+> > >   					       GCS_CAP_VALID_TOKEN)
+> > > +
+> > > +/*
+> > > + * Definitions for the HDBSS feature
+> > > + */
+> > > +#define HDBSS_MAX_ORDER		HDBSSBR_EL2_SZ_2MB
+> > > +
+> > See above comment on using the encoding instead of an actual size/shift
+> > number.
+> 
+> 
+> You're right — I will fix this in the next version as follows:
+> 
+> First, HDBSS_MAX_ORDER will be defined as a plain order number. In v4 I only
+> considered the 4KB page
 
-[Severity: Low]
-Similarly, does the WARN_ON_ONCE(!has_vhe() ...) check inside this function
-become unreachable now that the wrapper only calls this when has_vhe()
-is true?
+Maybe consider a plain size number, instead.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714101601.4142=
-645-1-fuad.tabba@linux.dev?part=3D2
+> 
+> case and hard-coded it to 9. To make it work for any PAGE_SIZE configuration
+> (4KB, 16KB, or 64KB), I'll derive
+> 
+> it from HDBSSBR_EL2_SZ_2MB:
+> 
+> ```
+> #define HDBSS_MAX_ORDER    (12 + HDBSSBR_EL2_SZ_2MB - PAGE_SHIFT)
+> ```
+> 
+> This evaluates to 9 on 4KB pages, and the correct value on 16KB/64KB pages
+> as well.
+
+Wait, I don't see what you are trying to achieve here with this. 
+This order is related to the size of a HDBSS buffer, which is defined 
+independently of the page size being used. In 2MB example, it does hold 
+256K HDBSS entries, disregarding on the page size, IIRC. 
+
+
+> 
+> Second, I will add two conversion helpers in sysreg.h to bridge between
+> kernel semantics (alloc_pages order)
+> 
+> and hardware encoding (HDBSSBR_EL2.SZ):
+> 
+> ```
+> /* Convert alloc_pages order to HDBSSBR_EL2.SZ encoding */
+> #define hdbss_order_to_sz(order)  (PAGE_SHIFT + (order) - 12)
+> ```
+
+(would be *_to_shift() no?)
+
+In any case, see above.
+
+> 
+> These helpers work for any PAGE_SIZE configuration (4KB, 16KB, or 64KB)
+> because they use PAGE_SHIFT directly.
+> 
+> Third, I will update the HDBSSBR_EL2 register construction in
+> kvm_arm_vcpu_alloc_hdbss()：
+> 
+> ```
+> /* before */
+> .hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg), order),
+> 
+> /* after */
+> .hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg),
+>                             hdbss_order_to_sz(order)),
+> ```
+> 
+
+That would be the other way around, right? I mean, here you would want the 
+order encoded in HDBSSBR_SZ from the page shift, not the other way around.
+
+In any case, see above.
+
+
+> And I will also update the __free_pages() call to use
+> vcpu->kvm->arch.hdbss_order directly, since that field
+> 
+> stores the plain order number and avoids decoding the SZ encoding at free
+> time:
+> 
+> 
+> ```
+> /* before */
+> __free_pages(hdbss_pg,
+>      FIELD_GET(HDBSSBR_EL2_SZ_MASK,
+>                vcpu->arch.hdbss.hdbssbr_el2));
+> 
+> /* after */
+> __free_pages(hdbss_pg,
+>      vcpu->kvm->arch.hdbss_order);
+> ```
+> 
+
+Ah, you use the 'order' to free the buffers as well, ok.
+But those are per-vcpu buffers as well, right? 
+
+Again, the HDBSSBR_EL2.SZ AFAIK is not related to page size. 
+
+Thanks!
+Leo
