@@ -1,132 +1,202 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8425F4657D0;
-	Tue, 14 Jul 2026 13:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6B647B426
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 13:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784034249; cv=none; b=aYxnzWUBX7a1/T0GNP54DdlEPnm2WhGZmv6sgrY9Ob5ddNSUE0/I0NGCkpwpfoucTDtWWLa1qzEpXvnsUcArj1wPkHXXeyCdks/CEY4LMr7TlFu1RkJqxEN2cFyQDpC/LRuQ99rlPhWFHYWxvFxoL4q+geoSsNS4rX23lJj07Xc=
+	t=1784034328; cv=none; b=qPxoipAZoYkO1VuGz+C53WIVvAHBUDLtqdgqioIx8iaazoTC30vSRRhTK66CDeIB0bsu/IHUGg//Aobbcokt8DHvCXQ4XGpw1zg+ErY13pBhOraavuJeutxjn+i/y1ISvFvhq1/nPEUXH4jk8VgrBY6IOYOetDIacGRNJakyyR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784034249; c=relaxed/simple;
-	bh=e99v90nJnuuxgS1dhwcMq/13M+HTJI7u9/3swy3kz7s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IcCUhtQdgLlrQ70uLG9Onki4X2IPO7VDDrwIoZ03v52UMq6NW/wNc39resvCIDDI1Jmv4Gh1Nehg7GcOvh+SH+Wzcc38Gda3bi63/K0/1Lq8ssTN/w18moJ1yo8zYAy2FVkzMkLnf1H1Sti4C98Q5mLjIXm42DgNS95QhW3ngAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVthZ9I3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784034328; c=relaxed/simple;
+	bh=Pid4HPHuEVI5BTjms8jEZFNfwUSmNTjG2RzD1N+Dq34=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vl0qMMgbG5c7onXfBwg7/88E3W2CKFA2DKJBfCaJAitXGeAet5b729XE693Fc7NbQHbQsbp7fgKRGdxcuYXWiewkh5cEP+7j5rAe6AviAB4rPIukakkth+8MV1VbcStoZj+XB1o/0UsoHYlsiw2e4gTfFiF5nHDOYxfd4uBz2j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V8bhEBVy; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVthZ9I3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16A001F000E9;
-	Tue, 14 Jul 2026 13:04:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784034248;
-	bh=y/iGcWhXbHwoQunAy9bNFNUY0N+UnLs70hLnHpj27yU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TVthZ9I356h4baRVivJjB3cWByI4NScaKc6ejiwzCN35f5Q1GTc4ASRfjWyWiGRFp
-	 LgTub7jlvIU++QFMlgseZLTwdNG1exCwHaRsX9M4cAoKA7ytl4kIzGhTF4YQ92ob3I
-	 yXhbVefPbMe09RsigUOJ0Wj6zQBVAn/PChdzP7PiSGOiMDC2EREWrt+NGQS392znAL
-	 s8tEBU/3FR9WA6GY0Gg6TRKN2VjN6ciVM+cl/K94lvl686QoYtDaQvJdWuS1YU2LhZ
-	 2qGIHFJ9j/EecYbTNAW1enPV19knUBOAScC6Vofi/eZYUzEeTSQqT5D6vvspAjDwBv
-	 cqdMWGHPUNNGw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wjcnu-00000004u45-0jyU;
-	Tue, 14 Jul 2026 13:04:06 +0000
-Date: Tue, 14 Jul 2026 14:04:05 +0100
-Message-ID: <86tsq1oh8a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 14/28] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
-In-Reply-To: <20260714094537.5B7131F00A3A@smtp.kernel.org>
-References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-15-maz@kernel.org>
-	<20260714094537.5B7131F00A3A@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V8bhEBVy"
+X-Gm-Message-State: AOJu0YylKsAAQIMZxc3YDw7czSaen+lkZ9WSDyIN2tCAO6Xvy93N8IlY
+	1KJ8i/zoNdHtmcUYzSi1lbKYYf6gxI0z10S1xvVx1ruQ28RUr5HmjR8SExcrLe/gxfElAcB8thL
+	clMEY8hXttP0xlORk2Uvuap0AhHSHdLrTw5WzIYw6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784034323;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2b0nYPQ7iFRKYC7l9DHkU7h83GGC5kCZO6o3BUUeAyI=;
+	b=V8bhEBVyKKDqsx23OmLvA+GybpROL/PZABOggIWycbccugXCXQl0NXzQ+y+caDpvs/WdKS
+	DWF9zgqblQNVC+ydAH8stmLu28HGc5rfUq29H0Mo6yBDB4vkljjAae0BcUvq6dHFJgxm2G
+	9vkrYWPH6mDf6kJ9mZt2LLO8k4fqMmU=
+X-Received: by 2002:a05:622a:4010:b0:517:5ac7:332e with SMTP id
+ d75a77b69052e-51d7bc5040emr14294221cf.6.1784034290465; Tue, 14 Jul 2026
+ 06:04:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
+ <20260714101601.4142645-8-fuad.tabba@linux.dev> <20260714122015.EDCB71F000E9@smtp.kernel.org>
+In-Reply-To: <20260714122015.EDCB71F000E9@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 14 Jul 2026 14:04:13 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx11sRDnH4XTMPREsMj6uX61=O7zqKk6=VAa+C4_2SLmw@mail.gmail.com>
+X-Gm-Features: AUfX_myjEnFIfozSNQOOGekDYHsfc2WHKHyez5Ug6JOHDXind_qhJP1fx_Z6Rq0
+Message-ID: <CA+EHjTx11sRDnH4XTMPREsMj6uX61=O7zqKk6=VAa+C4_2SLmw@mail.gmail.com>
+Subject: Re: [PATCH v5 7/8] KVM: arm64: Add primitives to flush/sync the VGIC
+ state at EL2
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 14 Jul 2026 10:45:36 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Adding FEAT_NV3 fields to HCRX_EL2 in the sysreg file silently alters the auto-generated HCRX_EL2_RES0 mask. Because KVM's manually maintained feature maps were not updated to account for this change, it triggers a boot-time verification failure and allows guests to unconditionally set these unsupported bits, breaching hypervisor isolation.
+On Tue, 14 Jul 2026 at 13:20, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to consider:
+>
+> New issues:
+> - [High] Missing its_vpe copy in flush_hyp_vgic_state breaks GICv4 virtua=
+l LPI injection
+
+pKVM has no vLPI, so  its_vm  is NULL either way; and  En  comes from
+the copied  vgic_hcr  anyway.
+
+>
+> Pre-existing issues:
+> - [High] KVM_SET_ONE_REG updates to GICv3 VMCR are silently dropped under=
+ pKVM during vcpu_put()
+
+The uaccess holds  kvm_trylock_all_vcpus , so it can't run between load and=
+ put.
+
+/fuad
+
 > --
-> 
-> --- Patch [14]: [PATCH v2 14/28] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3 ---
-> commit c8a8a5e81c8baa4b59a436c9bd034245cdeb5fa4
+>
+> --- Patch [7]: [PATCH v5 7/8] KVM: arm64: Add primitives to flush/sync th=
+e VGIC state at EL2 ---
+> commit 5a3c12abf480537e61537f1e45492ee3e349846c
 > Author: Marc Zyngier <maz@kernel.org>
-> 
-> arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
-> 
-> This patch introduces 4 new HCRX_EL2 control bits related to FEAT_NV3 and
-> describes them in the sysreg file.
-> 
-> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > index 42839d2b15ae4..67d013b376a3c 100644
-> > --- a/arch/arm64/tools/sysreg
-> > +++ b/arch/arm64/tools/sysreg
-> > @@ -4548,7 +4548,12 @@ Fields	ZCR_ELx
-> >  EndSysreg
-> >  
-> >  Sysreg	HCRX_EL2	3	4	1	2	2
-> > -Res0	63:27
-> > +Res0	63:35
-> > +Field	34	NVnTTLBOS
-> > +Field	33	NVnTTLBIS
-> > +Field	32	NVnTTLB
-> > +Res0	31:28
-> > +Field	27	NVTGE
-> 
+>
+> KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
+>
+> pKVM performs its own world switch for protected VMs but has no primitive=
+s
+> to move the per-vCPU VGIC state between the host and hypervisor vCPU
+> contexts. Add flush_hyp_vgic_state() and sync_hyp_vgic_state().
+>
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index f3233ee343a39..2db56146ec493 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -104,6 +104,45 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
+> >       *host_data_ptr(fp_owner) =3D FP_STATE_HOST_OWNED;
+> >  }
+> >
+> > +static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +     struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
+> > +     struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
+> > +     unsigned int used_lrs, i;
+> > +
+> > +     host_cpu_if     =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
+> > +     hyp_cpu_if      =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+> > +
+> > +     used_lrs        =3D host_cpu_if->used_lrs;
+> > +     used_lrs        =3D min(used_lrs, hyp_gicv3_nr_lr);
+> > +
+> > +     hyp_cpu_if->vgic_hcr    =3D host_cpu_if->vgic_hcr;
+> > +     /* Should be a one-off */
+> > +     hyp_cpu_if->vgic_sre    =3D (ICC_SRE_EL1_DIB |
+> > +                                ICC_SRE_EL1_DFB |
+> > +                                ICC_SRE_EL1_SRE);
+> > +     hyp_cpu_if->used_lrs    =3D used_lrs;
+> > +
+> > +     for (i =3D 0; i < used_lrs; i++)
+> > +             hyp_cpu_if->vgic_lr[i] =3D host_cpu_if->vgic_lr[i];
+> > +}
+>
 > [Severity: High]
-> Does this change require a corresponding update to KVM's feature map?
-> 
-> By defining these new fields here, the auto-generated HCRX_EL2_RES0 mask is
-> shrunk. Because KVM's manually maintained feature map consumes this mask
-> without adding NEEDS_FEAT rules for the new bits:
-> 
-> arch/arm64/kvm/config.c:hcrx_feat_map[] = {
->         ...
->         FORCE_RES0(HCRX_EL2_RES0),
->         FORCE_RES1(HCRX_EL2_RES1),
-> };
-> 
-> Will this trigger a deterministic verification failure during host boot? 
-> When check_feat_map() validates the map coverage, it checks the mask:
-> 
-> arch/arm64/kvm/config.c:check_feat_map() {
->         ...
->         if (mask != ~resx)
->                 kvm_err("Undefined %s behaviour, bits %016llx\n",
->                         str, mask ^ ~resx);
->         ...
+> Does this code miss copying the its_vpe struct?
+>
+> Previously, this was a full struct assignment. By explicitly copying fiel=
+ds
+> instead, its_vpe is omitted, leaving its_vpe.its_vm as NULL in the
+> hypervisor vCPU state.
+>
+> When the guest runs, __vgic_v3_activate_traps() executes at EL2 and relie=
+s
+> on this field:
+>
+> arch/arm64/kvm/hyp/vgic-v3-sr.c:__vgic_v3_activate_traps() {
+>     if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
+>         cpu_if->its_vpe.its_vm || !cpu_if->vgic_sre)
+>         write_gicreg(vgic_ich_hcr_trap_bits() | ICH_HCR_EL2_En, ICH_HCR_E=
+L2);
+>     ...
 > }
-
-Yes, but that's done on purpose. We never update the two in lockstep,
-which is why we have this warning. See the following patches.
-
-> 
-> Furthermore, without these bits being tracked, could a nested guest be
-> permitted to unconditionally modify these FEAT_NV3 configuration bits via 
-> MSR HCRX_EL2, escaping the hypervisor's RES0 masking protections?
-
-An untracked bit defaults to being RES0. You should try reading the
-code.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>
+> Since its_vm is NULL, ICH_HCR_EL2_En is not set. Could this break GICv4
+> direct virtual LPI injection for non-protected guests?
+>
+> [ ... ]
+>
+> > @@ -166,9 +199,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
+p_vcpu)
+> >  static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+> >  {
+> >       struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
+> > -     struct vgic_v3_cpu_if *hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_c=
+pu.vgic_v3;
+> > -     struct vgic_v3_cpu_if *host_cpu_if =3D &host_vcpu->arch.vgic_cpu.=
+vgic_v3;
+> > -     unsigned int i;
+> >
+> >       fpsimd_sve_sync(&hyp_vcpu->vcpu);
+> >       sync_debug_state(hyp_vcpu);
+> > @@ -181,10 +211,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
+p_vcpu)
+> >
+> >       host_vcpu->arch.iflags          =3D hyp_vcpu->vcpu.arch.iflags;
+> >
+> > -     host_cpu_if->vgic_hcr           =3D hyp_cpu_if->vgic_hcr;
+> > -     host_cpu_if->vgic_vmcr          =3D hyp_cpu_if->vgic_vmcr;
+> > -     for (i =3D 0; i < hyp_cpu_if->used_lrs; ++i)
+> > -             host_cpu_if->vgic_lr[i] =3D hyp_cpu_if->vgic_lr[i];
+> > +     sync_hyp_vgic_state(hyp_vcpu);
+> >  }
+>
+> [Severity: High]
+> This is a pre-existing issue, but does handle___vgic_v3_save_aprs()
+> silently drop userspace modifications to the GICv3 VMCR?
+>
+> When userspace sets the VMCR register, vcpu_load() first calls
+> handle___vgic_v3_restore_vmcr_aprs(), which copies host_cpu_if->vgic_vmcr
+> to the hyp vCPU. KVM_SET_ONE_REG then updates the host copy of the regist=
+er.
+>
+> Finally, vcpu_put() calls handle___vgic_v3_save_aprs():
+>
+> arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v3_save_aprs() {
+>     ...
+>     hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+>     ...
+>     host_cpu_if =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
+>     host_cpu_if->vgic_vmcr =3D hyp_cpu_if->vgic_vmcr;
+> }
+>
+> Doesn't this unconditionally overwrite the new host value (set by
+> KVM_SET_ONE_REG) with the old value stored in the hyp vCPU at load time,
+> potentially breaking VM migration and state restoration?
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714101601.41=
+42645-1-fuad.tabba@linux.dev?part=3D7
