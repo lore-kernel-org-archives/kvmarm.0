@@ -1,32 +1,32 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FE3366566
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F053366DA3
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784024209; cv=none; b=LCmzpwrag61udlflFl3VUhYnOCb8ZGCnCKm2ZHWQNFg9IZyT4ypXr1YybmmfbT+quvDHFtBkWJlALTDBfdmueneEwCuu/S3xOZCVazWFtvYstX6lN5Fs8blqyQ1ZeNcrSE9iKKdq89lfQfO+YMxdY4wATUkLYi1YHGHlhRLcMoA=
+	t=1784024216; cv=none; b=thKDxcSvFfUpsANRpyLA8Q65uwM7rmiAXL9w0GoBw9YoYHYGKeW8BW7oN/tdbAOfaZsiy2ZO2Jw9KIJX5kPwrW1e8Id6SiiZ1jxj6UFComYhzAlvR6+Ec2Ypu5tUTk33ylk2vyOah8Yix7Qi649lsFF6r8QhMBDpZCeOOJJ070w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784024209; c=relaxed/simple;
-	bh=seU745NFUCu9ykrsy0Mp34nXJ0y0BN2RmeJoWPkFp7A=;
+	s=arc-20240116; t=1784024216; c=relaxed/simple;
+	bh=fZBm9U49NriW6i5YLhn3zhSRCOjztPWLyDa0JgPgYNY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P88BN7N1ucm97wdO+Ia7LuzszKSUSxjx8BOVqv19gZYDbGxrsiHuYGxNuXdQwORbm/BgQxEaw+Eu9mWgoFh6yz8j2JmLA7J42bLEaQMjiT9CcYfIgKW/E07QIJaVVp3xLupgxc4TFcUhDoh5EW1Ex7Wwj1D2e9XIZ8LniyZbdfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n9lL7v2m; arc=none smtp.client-ip=91.218.175.184
+	 MIME-Version; b=INlM9sZweTEeMzcRrEwdFYe+/yMYU+sLkKP+onsmo8xjbfdM3P9i+WtOL6CQV7foO8D1ahbHzXjxk9uSthqg5lvJLtK4sqVRRxqly/CpW3RW6064nR3jhBvKtAmM/jZnGWFf3sxkYAzLkH2xGFaWLsOWeynhi8QbRQGbt0yPDZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IEREiKQ8; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n9lL7v2m"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IEREiKQ8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784024205;
+	t=1784024211;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n4y4UR4PmK16GfMJFUFQ14Kb30LFrA+TnM7Dyu73NEs=;
-	b=n9lL7v2mklxI7+c6LYS0lly5GoTMx6UqD/5Nq7OzU26YfM08OHct43hZKqgryO5DNvlsl8
-	PrtfLQhvrErqk3S3RIBva2w0ZKPIqmLz7b6gYz/p0KaIygZ5NBmb+QfM/k02Rhd6td0vo7
-	C6ercOSEO5WhSuL6ptYZ87KIal9Sy5Q=
+	bh=UPa4aylWgI5AC08JpsSdo1aaI++VFHxt+8yeLWVTzSI=;
+	b=IEREiKQ8vzXfvXvn1ISWOsSmfPoYkjTZuLWUBBVvDcujFYRhJkQRr9jaIIKQysSmqdQ6QU
+	eb2vGML/NTvQcCwmbFRCfAdQsA0MkCZBCF5rx8JLpj9XBUpBBwBHa0UCzDtqsoiRTl1UwI
+	yo10efVG4ML6f6aTnufAni0+Rh92PyI=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v5 4/8] KVM: arm64: Move PSCI helper functions to a shared header
-Date: Tue, 14 Jul 2026 11:15:57 +0100
-Message-Id: <20260714101601.4142645-5-fuad.tabba@linux.dev>
+Subject: [PATCH v5 7/8] KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
+Date: Tue, 14 Jul 2026 11:16:00 +0100
+Message-Id: <20260714101601.4142645-8-fuad.tabba@linux.dev>
 In-Reply-To: <20260714101601.4142645-1-fuad.tabba@linux.dev>
 References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -58,121 +58,118 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Move kvm_psci_valid_affinity() and kvm_psci_narrow_to_32bit() from
-psci.c to include/kvm/arm_psci.h, and move psci_affinity_mask() there
-too, renaming it kvm_psci_affinity_mask() now that it is no longer
-file-local. A follow-up series handles some protected-guest PSCI calls
-at EL2 using these helpers.
+From: Marc Zyngier <maz@kernel.org>
 
-No functional change intended.
+pKVM performs its own world switch for protected VMs but has no
+primitives to move the per-vCPU VGIC state between the host and
+hypervisor vCPU contexts.
+
+Add flush_hyp_vgic_state() and sync_hyp_vgic_state(). Flush copies
+vgic_hcr, the in-use list registers and used_lrs from the host into the
+hyp vCPU and pins vgic_sre to a fixed value; sync copies vgic_hcr,
+vgic_vmcr and the in-use list registers back. The active priority
+registers are handled separately by the save/restore-aprs path.
+
+Bound used_lrs by hyp_gicv3_nr_lr, the cached implemented-LR count,
+instead of reading ICH_VTR_EL2 on each entry. That clamps the
+host-supplied value and avoids a per-entry sysreg read that is costly
+under NV.
 
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/psci.c  | 30 +-----------------------------
- include/kvm/arm_psci.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 29 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 55 ++++++++++++++++++++++--------
+ 1 file changed, 41 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 3b5dbe9a0a0ea..e3db84400d1f8 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -21,16 +21,6 @@
-  * as described in ARM document number ARM DEN 0022A.
-  */
- 
--#define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
--
--static unsigned long psci_affinity_mask(unsigned long affinity_level)
--{
--	if (affinity_level <= 3)
--		return MPIDR_HWID_BITMASK & AFFINITY_MASK(affinity_level);
--
--	return 0;
--}
--
- static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- {
- 	/*
-@@ -51,12 +41,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- 	return PSCI_RET_SUCCESS;
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index f3233ee343a39..2db56146ec493 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -104,6 +104,45 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
+ 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
  }
  
--static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
--					   unsigned long affinity)
--{
--	return !(affinity & ~MPIDR_HWID_BITMASK);
--}
--
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
++static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
++	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
++	unsigned int used_lrs, i;
++
++	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
++	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
++
++	used_lrs	= host_cpu_if->used_lrs;
++	used_lrs	= min(used_lrs, hyp_gicv3_nr_lr);
++
++	hyp_cpu_if->vgic_hcr	= host_cpu_if->vgic_hcr;
++	/* Should be a one-off */
++	hyp_cpu_if->vgic_sre	= (ICC_SRE_EL1_DIB |
++				   ICC_SRE_EL1_DFB |
++				   ICC_SRE_EL1_SRE);
++	hyp_cpu_if->used_lrs	= used_lrs;
++
++	for (i = 0; i < used_lrs; i++)
++		hyp_cpu_if->vgic_lr[i] = host_cpu_if->vgic_lr[i];
++}
++
++static void sync_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
++	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
++	unsigned int i;
++
++	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
++	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
++
++	host_cpu_if->vgic_hcr = hyp_cpu_if->vgic_hcr;
++	host_cpu_if->vgic_vmcr = hyp_cpu_if->vgic_vmcr;
++
++	for (i = 0; i < hyp_cpu_if->used_lrs; i++)
++		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
++}
++
+ static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
  {
- 	struct vcpu_reset_state *reset_state;
-@@ -135,7 +119,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
+ 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+@@ -152,13 +191,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
  
- 	/* Determine target affinity mask */
--	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
-+	target_affinity_mask = kvm_psci_affinity_mask(lowest_affinity_level);
- 	if (!target_affinity_mask)
- 		return PSCI_RET_INVALID_PARAMS;
+ 	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
  
-@@ -220,18 +204,6 @@ static void kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
- 	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+-	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
+-
+-	/* Bound used_lrs by the number of implemented list registers. */
+-	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs =
+-		min_t(unsigned int,
+-		      hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs,
+-		      hyp_gicv3_nr_lr);
++	flush_hyp_vgic_state(hyp_vcpu);
+ 
+ 	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
+ }
+@@ -166,9 +199,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ {
+ 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+-	struct vgic_v3_cpu_if *hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+-	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
+-	unsigned int i;
+ 
+ 	fpsimd_sve_sync(&hyp_vcpu->vcpu);
+ 	sync_debug_state(hyp_vcpu);
+@@ -181,10 +211,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 
+ 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
+ 
+-	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
+-	host_cpu_if->vgic_vmcr		= hyp_cpu_if->vgic_vmcr;
+-	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
+-		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
++	sync_hyp_vgic_state(hyp_vcpu);
  }
  
--static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
--{
--	int i;
--
--	/*
--	 * Zero the input registers' upper 32 bits. They will be fully
--	 * zeroed on exit, so we're fine changing them in place.
--	 */
--	for (i = 1; i < 4; i++)
--		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
--}
--
- static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
- {
- 	/*
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index cbaec804eb839..f86a006d67136 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -38,6 +38,33 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- 	return KVM_ARM_PSCI_0_1;
- }
- 
-+/* Narrow the PSCI register arguments (r1 to r3) to 32 bits. */
-+static inline void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	/*
-+	 * Zero the input registers' upper 32 bits. They will be fully
-+	 * zeroed on exit, so we're fine changing them in place.
-+	 */
-+	for (i = 1; i < 4; i++)
-+		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
-+}
-+
-+static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
-+					   unsigned long affinity)
-+{
-+	return !(affinity & ~MPIDR_HWID_BITMASK);
-+}
-+
-+static inline unsigned long kvm_psci_affinity_mask(unsigned long affinity_level)
-+{
-+	if (affinity_level <= 3)
-+		return MPIDR_HWID_BITMASK &
-+			~((0x1UL << (affinity_level * MPIDR_LEVEL_BITS)) - 1);
-+
-+	return 0;
-+}
- 
- int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
+ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
 -- 
 2.39.5
 
