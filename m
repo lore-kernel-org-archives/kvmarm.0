@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9CF441627;
-	Tue, 14 Jul 2026 09:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D8936921E;
+	Tue, 14 Jul 2026 09:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784022341; cv=none; b=XmwjAX0c8uCaQhPzORENpXNK5Xn23yrLKtbJLhF0RgYDEJ3MiirKWcJVhEusisA/MVpSsCkiIpKiDRHO5rCfZQsAqLV/0lgzdiCDhQzN9m3KzWJsFBgh1pW3BF2nY8gy3UcO0wZHhMmUcp1YJDiKAcbZh4omvUVfgFWLfbj3/M4=
+	t=1784022373; cv=none; b=KlPA1bChHyJg6BRBydpb7b3NXj6ZvXHgTVucN+JoyCf1S+jaj9mVVsk9njc3FZI9pgz0bYjxkn85we8v/LtsDYnYUC7QSITqBQrZy5aKxF/DrmnJ94qhEKIMmyIVBeuVe5ER1FI507QLeXSX+7JXp9mJQtdYPh9XHnsYKYH9T1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784022341; c=relaxed/simple;
-	bh=XB8FvJrj7GjhiRFoAVhkI2fSXHjlJGTUb9qPADYMbRQ=;
+	s=arc-20240116; t=1784022373; c=relaxed/simple;
+	bh=nd3tXWs2bLq8vphZEYWHzpKam+fxUz8CzZZzLOajrWo=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ZxWBUCWRPz3SS/Rvav8j5JQ2x09nBlFo5Z00htEEtXAgNo+4zBXLHOJ/qIBJW8MReEMBol0hRwcma8N56NW2d7EF+JgskNISb5RTzaUv/zIlNjyeLtGI5bJPwvxtkho9rC5RYgRSHON0j4Itm26o3Wb/D34HA5YQVrRTDfB2M6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAsm2Nga; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=UvhsUPOIBVhQVI2GRA8C1VDFYmylLiA11kbjiiO7/6uJeGcCJ9jXYD4X3UQudcTU8mfr3vexAI5GBhWjvNlswnlcg8rvw0vaImGJF1kT2PUGRobqQA/WlFXkcefBosJu/IQ1Mq5Z4kiHia1PoIqzhSH2pdE5p3WOH/FxUp3iwBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFPaaBuO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAsm2Nga"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B7131F00A3A;
-	Tue, 14 Jul 2026 09:45:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFPaaBuO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ACD11F00A3E;
+	Tue, 14 Jul 2026 09:46:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784022337;
-	bh=CHTD/kyX08yqDtXu9cIcHqnYlH+tMOWAUnSCbdjIUPk=;
+	s=k20260515; t=1784022369;
+	bh=gUC8fxJDGNOaiW1RXvIHxFL1gk2RrPcTibctzVPs0tE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=gAsm2NgaBxdN7XdMmQ0ae78lg5dEbd3hkFMWiLPaCLItK5N24nOMEMdXnUVbsWVJk
-	 zW7Bpvd3VH6V065BoSwaScHg/ywVNJhwD7hnYeM80mLAqQLF6B8Vav20bR2mPpnSrU
-	 Qevi7DPohwZDQG9Wnak//rGwC/PuH8cAfaHZveV+0h8WyCjLZAE5XUZwjJjEmxBEnM
-	 XQhS/FGCYl1dUB2nXVy7rFc21q1uhByQbS+Rs+xvbH6g4qXfJ4TyEZ2R0grsXwrfng
-	 jIWTjtVyxX6g9Nfnxv+PJBXn7nQw6liS+iPsc4tcWYskRjJ74hWlL1oKMVTVNyNQd+
-	 u0muAYZXkMH+w==
+	b=eFPaaBuODlmmxos/roycZykNJ5cbQLXNIGMzj4XetPejyHM9DsUagMEk4OYp2jMav
+	 V05qwUG2xs26kjIfBX2+wSZH7ix9/zoDIkBNKPuWU3wsZ4B3vEAfP6fXoPpwJlceeh
+	 2mkJd8O8H9a/mokZV8wFsCBByXwzhP9tk91/cQXZooZ/ByoOC5xcxMpLhd9KO++yB/
+	 aa99Zttn2RpWb7zYuSbSuYHDI9j9pXaROjVQ0tAuyBw4FoHdwLKA0ENUu/1QouIKWa
+	 ap4lZFrgd89VoLtDhZVFEvtwv4JVAerceOt0DgrAtgiPKwFD1GQOFfaEbuLYLpsfgf
+	 qSlaoJAl4Myvg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 14/28] arm64: sysreg: Add HCRX_EL2 bits related to
- FEAT_NV3
+Subject: Re: [PATCH v2 12/28] arm64: Add FEAT_NV2p1 detection
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260714091641.1970822-15-maz@kernel.org>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260714091641.1970822-13-maz@kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
- <20260714091641.1970822-15-maz@kernel.org>
+ <20260714091641.1970822-13-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 09:45:36 +0000
-Message-Id: <20260714094537.5B7131F00A3A@smtp.kernel.org>
+Date: Tue, 14 Jul 2026 09:46:08 +0000
+Message-Id: <20260714094609.4ACD11F00A3E@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,71 +47,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Adding FEAT_NV3 fields to HCRX_EL2 in the sysreg file silently alt=
-ers the auto-generated HCRX_EL2_RES0 mask. Because KVM's manually maintaine=
-d feature maps were not updated to account for this change, it triggers a b=
-oot-time verification failure and allows guests to unconditionally set thes=
-e unsupported bits, breaching hypervisor isolation.
+- [Medium] Missing immediate Context Synchronization Event (isb) after writ=
+ing to control-plane system registers cnthctl_el2 and cntkctl_el1.
 --
 
---- Patch [14]: [PATCH v2 14/28] arm64: sysreg: Add HCRX_EL2 bits related t=
-o FEAT_NV3 ---
-commit c8a8a5e81c8baa4b59a436c9bd034245cdeb5fa4
+--- Patch [12]: [PATCH v2 12/28] arm64: Add FEAT_NV2p1 detection ---
+commit e272e43dc6ce85d3337902d78430aad6bf5b83fc
 Author: Marc Zyngier <maz@kernel.org>
 
-arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
+KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
 
-This patch introduces 4 new HCRX_EL2 control bits related to FEAT_NV3 and
-describes them in the sysreg file.
+This commit relaxes the handling of CNTHCTL_EL2 when FEAT_NV2p1 is present.
+It removes the need for a split approach to access bits and instead relies
+on the normal CNTKCTL_EL1 accessor.
 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 42839d2b15ae4..67d013b376a3c 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -4548,7 +4548,12 @@ Fields	ZCR_ELx
->  EndSysreg
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 4155fe89b58a1..db60facad9f3c 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, s=
+truct timer_map *map)
+>  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
+>  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
 > =20
->  Sysreg	HCRX_EL2	3	4	1	2	2
-> -Res0	63:27
-> +Res0	63:35
-> +Field	34	NVnTTLBOS
-> +Field	33	NVnTTLBIS
-> +Field	32	NVnTTLB
-> +Res0	31:28
-> +Field	27	NVTGE
+> -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
+> -	sysreg_clear_set(cnthctl_el2, clr, set);
+> +	/*
+> +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
+> +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
+> +	 */
+> +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
+> +		sysreg_clear_set(cnthctl_el2, clr, set);
+> +	else
+> +		sysreg_clear_set(cntkctl_el1, clr, set);
 
-[Severity: High]
-Does this change require a corresponding update to KVM's feature map?
+[Severity: Medium]
+Does this code need an immediate context synchronization event after writing
+to these control-plane system registers?
 
-By defining these new fields here, the auto-generated HCRX_EL2_RES0 mask is
-shrunk. Because KVM's manually maintained feature map consumes this mask
-without adding NEEDS_FEAT rules for the new bits:
+Modifying cntkctl_el1 (and cnthctl_el2) via sysreg_clear_set() expands to a
+conditional write_sysreg() without an immediate isb() barrier. The function
+returns immediately after, which may allow intervening instructions to exec=
+ute
+with architecturally undefined pipeline state before a context synchronizat=
+ion
+event occurs.
 
-arch/arm64/kvm/config.c:hcrx_feat_map[] =3D {
-        ...
-        FORCE_RES0(HCRX_EL2_RES0),
-        FORCE_RES1(HCRX_EL2_RES1),
-};
+This path is reachable during normal VM execution when loading vCPU timer
+state. While the cnthctl_el2 write is pre-existing, the cntkctl_el1 write
+was newly introduced here, which could introduce a regression.
 
-Will this trigger a deterministic verification failure during host boot?=20
-When check_feat_map() validates the map coverage, it checks the mask:
-
-arch/arm64/kvm/config.c:check_feat_map() {
-        ...
-        if (mask !=3D ~resx)
-                kvm_err("Undefined %s behaviour, bits %016llx\n",
-                        str, mask ^ ~resx);
-        ...
-}
-
-Furthermore, without these bits being tracked, could a nested guest be
-permitted to unconditionally modify these FEAT_NV3 configuration bits via=20
-MSR HCRX_EL2, escaping the hypervisor's RES0 masking protections?
-
->  Field	26	SRMASKEn
->  Res0	25
->  Field	24	PACMEn
+>  }
+> =20
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714091641.1970=
-822-1-maz@kernel.org?part=3D14
+822-1-maz@kernel.org?part=3D12
