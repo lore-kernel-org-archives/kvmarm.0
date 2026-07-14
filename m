@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410BE342CBA;
-	Tue, 14 Jul 2026 12:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8425F4657D0;
+	Tue, 14 Jul 2026 13:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784033816; cv=none; b=o+u7C+aVSJdgqtt+AaVPFxcc+GfWiqyE0aBE0ZbEgqKkYZULzLY2UH5nTeUz7pySrQ+ZnJKZemSnrI02qxPf0YomApfNfx/D6IITMgqwAgonY6NQ9Al4ZWLrw6Mi17oqVXv/8JPIoX6/fqFI4cFbeUn22RSvK3q2NWB39JcxFBM=
+	t=1784034249; cv=none; b=aYxnzWUBX7a1/T0GNP54DdlEPnm2WhGZmv6sgrY9Ob5ddNSUE0/I0NGCkpwpfoucTDtWWLa1qzEpXvnsUcArj1wPkHXXeyCdks/CEY4LMr7TlFu1RkJqxEN2cFyQDpC/LRuQ99rlPhWFHYWxvFxoL4q+geoSsNS4rX23lJj07Xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784033816; c=relaxed/simple;
-	bh=Pimx1eRaDNLaPvWOwAywMPtkm45HP5qyW6AUuGlmxYE=;
+	s=arc-20240116; t=1784034249; c=relaxed/simple;
+	bh=e99v90nJnuuxgS1dhwcMq/13M+HTJI7u9/3swy3kz7s=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vvp8TIUhr0IHK4wLTzqo0OSkZjUdXDleJX+OefXIA1Jkm8fmbVx6z+iiCHue8t4VLp4vOs0DQlLZtBZBnEDYz7gBHGfNSZA5Ikx4A5kEt1Yk/ItTs2JLoeeFrzz8ZV/XuOyDLaEOlWTAOCk4IjuBIBN9thXsvfcTY8s6v/ogR7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T4yguSvy; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=IcCUhtQdgLlrQ70uLG9Onki4X2IPO7VDDrwIoZ03v52UMq6NW/wNc39resvCIDDI1Jmv4Gh1Nehg7GcOvh+SH+Wzcc38Gda3bi63/K0/1Lq8ssTN/w18moJ1yo8zYAy2FVkzMkLnf1H1Sti4C98Q5mLjIXm42DgNS95QhW3ngAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVthZ9I3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T4yguSvy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E69A11F00AC4;
-	Tue, 14 Jul 2026 12:56:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVthZ9I3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16A001F000E9;
+	Tue, 14 Jul 2026 13:04:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784033814;
-	bh=AqkB+gO3NqzY6QcNh0Spffa4y8b55Eb7I3qYIfkQ0n0=;
+	s=k20260515; t=1784034248;
+	bh=y/iGcWhXbHwoQunAy9bNFNUY0N+UnLs70hLnHpj27yU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=T4yguSvyUyBLnSEEP94ITpS6IYpT94x1xSFxLyg0jtFmOoBatX/MB7LHw0F4Dv0UG
-	 UNq0ZRsR17W/qz1SX8VgJ4elK6fsl3UbC1Ad4f6+TWPHzDkC+cdxFifCYBHqPmOj7T
-	 24ildxcg2a86iELph1JeJT7WlGTNTwrlZBLSLDni68RDsmObfWYq/N3NCT/Kkfb1Al
-	 Ju+TINu51biRJuOv3oGiZGmmA1A9YO5i+hALg8BTfyyaHC3XpzOCAht137PGJqIYYq
-	 yob5r8EBboF9U9IvArFCGjd6TGbz5B0EpWdr3N9PUjOMNuH3pejkdFg8Wu2pk+CopI
-	 W7/CVXs4XOKbw==
+	b=TVthZ9I356h4baRVivJjB3cWByI4NScaKc6ejiwzCN35f5Q1GTc4ASRfjWyWiGRFp
+	 LgTub7jlvIU++QFMlgseZLTwdNG1exCwHaRsX9M4cAoKA7ytl4kIzGhTF4YQ92ob3I
+	 yXhbVefPbMe09RsigUOJ0Wj6zQBVAn/PChdzP7PiSGOiMDC2EREWrt+NGQS392znAL
+	 s8tEBU/3FR9WA6GY0Gg6TRKN2VjN6ciVM+cl/K94lvl686QoYtDaQvJdWuS1YU2LhZ
+	 2qGIHFJ9j/EecYbTNAW1enPV19knUBOAScC6Vofi/eZYUzEeTSQqT5D6vvspAjDwBv
+	 cqdMWGHPUNNGw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wjcgv-00000004tpA-04iQ;
-	Tue, 14 Jul 2026 12:56:53 +0000
-Date: Tue, 14 Jul 2026 13:56:52 +0100
-Message-ID: <86v7ahohkb.wl-maz@kernel.org>
+	id 1wjcnu-00000004u45-0jyU;
+	Tue, 14 Jul 2026 13:04:06 +0000
+Date: Tue, 14 Jul 2026 14:04:05 +0100
+Message-ID: <86tsq1oh8a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org,
+Cc: kvmarm@lists.linux.dev,
 	"Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 21/28] KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
-In-Reply-To: <20260714102421.E51341F000E9@smtp.kernel.org>
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 14/28] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
+In-Reply-To: <20260714094537.5B7131F00A3A@smtp.kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-22-maz@kernel.org>
-	<20260714102421.E51341F000E9@smtp.kernel.org>
+	<20260714091641.1970822-15-maz@kernel.org>
+	<20260714094537.5B7131F00A3A@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,75 +55,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 14 Jul 2026 11:24:21 +0100,
+On Tue, 14 Jul 2026 10:45:36 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] Userspace writes to NVHCR_EL2 via KVM_SET_ONE_REG are silently discarded upon L1 guest entry.
+> - [High] Adding FEAT_NV3 fields to HCRX_EL2 in the sysreg file silently alters the auto-generated HCRX_EL2_RES0 mask. Because KVM's manually maintained feature maps were not updated to account for this change, it triggers a boot-time verification failure and allows guests to unconditionally set these unsupported bits, breaching hypervisor isolation.
 > --
 > 
-> --- Patch [21]: [PATCH v2 21/28] KVM: arm64: Add NVHCR_EL2 handling to the sysreg array ---
-> commit 40ce0e0627839603da739968567e9f3998f1ed15
+> --- Patch [14]: [PATCH v2 14/28] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3 ---
+> commit c8a8a5e81c8baa4b59a436c9bd034245cdeb5fa4
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
+> arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
 > 
-> Expose NVHCR_EL2 to userspace, and treat the direct access as UNDEF,
-> as that would only outline a bug in our exception routing.
+> This patch introduces 4 new HCRX_EL2 control bits related to FEAT_NV3 and
+> describes them in the sysreg file.
 > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 9439c5b2b1fe8..0aeb2e736fde3 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> 
-> [ ... ]
-> 
-> > @@ -3774,6 +3800,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  			 sve_el2_visibility),
+> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> > index 42839d2b15ae4..67d013b376a3c 100644
+> > --- a/arch/arm64/tools/sysreg
+> > +++ b/arch/arm64/tools/sysreg
+> > @@ -4548,7 +4548,12 @@ Fields	ZCR_ELx
+> >  EndSysreg
 > >  
-> >  	EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
-> > +	EL2_REG_FILTERED(NVHCR_EL2, undef_access, reset_val, 0,
-> > +			 nvhcr_el2_visibility),
+> >  Sysreg	HCRX_EL2	3	4	1	2	2
+> > -Res0	63:27
+> > +Res0	63:35
+> > +Field	34	NVnTTLBOS
+> > +Field	33	NVnTTLBIS
+> > +Field	32	NVnTTLB
+> > +Res0	31:28
+> > +Field	27	NVTGE
 > 
-> [Severity: Medium]
-> Will userspace writes to NVHCR_EL2 be silently discarded upon L1 guest entry?
-
-Short answer: no. Longer answer follows.
-
-> Because NVHCR_EL2 is exposed without a custom .set_user handler, writes via
-> KVM_SET_ONE_REG will update vcpu->arch.ctxt.sys_regs[NVHCR_EL2] using the
-> default behavior. However, upon running the VCPU in hyp_ctxt (L1 hypervisor),
-> __compute_hcr() unconditionally executes:
+> [Severity: High]
+> Does this change require a corresponding update to KVM's feature map?
 > 
->   __vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+> By defining these new fields here, the auto-generated HCRX_EL2_RES0 mask is
+> shrunk. Because KVM's manually maintained feature map consumes this mask
+> without adding NEEDS_FEAT rules for the new bits:
+> 
+> arch/arm64/kvm/config.c:hcrx_feat_map[] = {
+>         ...
+>         FORCE_RES0(HCRX_EL2_RES0),
+>         FORCE_RES1(HCRX_EL2_RES1),
+> };
+> 
+> Will this trigger a deterministic verification failure during host boot? 
+> When check_feat_map() validates the map coverage, it checks the mask:
+> 
+> arch/arm64/kvm/config.c:check_feat_map() {
+>         ...
+>         if (mask != ~resx)
+>                 kvm_err("Undefined %s behaviour, bits %016llx\n",
+>                         str, mask ^ ~resx);
+>         ...
+> }
 
-If userspace can write to NVHCR_EL2, that's because the guest has NV3
-exposed to it. And if so, then the host also has NV3 and is using it.
-Then the code looks like this:
+Yes, but that's done on purpose. We never update the two in lockstep,
+which is why we have this warning. See the following patches.
 
-	/* Publish the guest's view of HCR_EL2 to the HW */
-	if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
-		write_sysreg_s(__vcpu_sys_reg(vcpu, HCR_EL2), SYS_NVHCR_EL2);
-	else
-		__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+> 
+> Furthermore, without these bits being tracked, could a nested guest be
+> permitted to unconditionally modify these FEAT_NV3 configuration bits via 
+> MSR HCRX_EL2, escaping the hypervisor's RES0 masking protections?
 
-and the value of HCR_EL2 is written into the NVHCR_EL2 *register*.
-
->
-> This seems to clobber the userspace write, causing UAPI state loss and a KVM
-> ABI violation where KVM_SET_ONE_REG writes are expected to be preserved.
-
-See above?
-
->
-> Does this require a custom .set_user handler to maintain alias synchronization
-> between NVHCR_EL2 and HCR_EL2?
-
-No.
+An untracked bit defaults to being RES0. You should try reading the
+code.
 
 	M.
 
