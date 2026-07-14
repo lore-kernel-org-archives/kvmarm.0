@@ -1,201 +1,168 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65F638F239
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0FB391E73
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784029554; cv=none; b=VhDi0dd91lXgNymkIq2R1nPm2LeV+KrvgOXKCRGARs51GMACGwMGy30TAeHezL3QB+JC1ndOLgH6bF0d2mdb7oMfGsmH6nYok+J+O37KtazKMQ3qRP5PKU/QtLL9x0aZNddDt9xrRG8pWcG9zbOiY8Y1jveaLT3qx04ozEAQt0U=
+	t=1784030013; cv=none; b=JTk86KzlCbjAZ4OEPNOD7bbxNTy79hxkw3RhBg0YxpDqUQAbM53WkJZn0yhsEsnqgECwpEmdrMhD/cwVl/lPwHVZkoGmCbGMcfW8WRcZQjht0oXlgCZCV1DyyxY6InWSls4iP3fk9KENGsXOJ/UH0dhQLPmIExMKti9Cr1XF+jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784029554; c=relaxed/simple;
-	bh=BEtUv5XHazbkKt+dlLWpdzQxAaUNzNIGDit24h4+Nwg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A+igl/gjwD7uekaL2XEdoTz9em04I0uHY8uhnvBz6K4CMlCleCHZ1NQ8tHQlQTd4IvX64YpzOwutaZX0uX2dUVLzdIvgtnkO81NavlIgwSvQrSurMOVn2fkdtJ1FqL+QeIQFf8+CkjxmIhured/fiD+yx81blOVHpepT/T65WSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nv1B24vA; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784030013; c=relaxed/simple;
+	bh=7lJ+glw/N1tKV81QfdyBeDME1EJMLKMt4tSo3ODDOBc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=NRYDj+5VqiBhfTHGQhmDhr60cT+Pkml+FYzdWdVSu43BJHj49uXRCRoS6EX1KbTNhiQMqVI7N8oVZ+7V50u+6u5+OndvjBXrDM63HlV2aE0UXxDUboXW+EchSdynNtPm/p+Lrg+4j0qKLEbvoF32CYv9z5uXMhLaIlYjHdIaYyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZUh1SON; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nv1B24vA"
-X-Forwarded-Encrypted: i=1; AHgh+Rozv4KXltemjnSg81A6sUKGUpsD+zxNk9Sc90OtiakETMxtWAXD1v630XBn/ht0J3Jy9H8ijn8=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784029549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0pDkRGaYym4iXIoAiNyXfWBGsGWfcCCYMQLXWrwDv3A=;
-	b=nv1B24vAFYryvAp9Nkme/TlKmriqgOPulqdV3xxREvqQPyaGZ1iM/30P97xBmBFujfWBvq
-	NiUpLnf2Xx//aOyq8bFSoFgaBL3imOa/Fpk1kjgi+imsQVEVtzRjJCBS3hunYE1QtVV+mO
-	UCjgaeQwey611/h9B2a1G4YcKGVY9rE=
-X-Gm-Message-State: AOJu0YxG97YANe551RKv9tmne26x5jI0EhasvDoIuHjb1KA1jMJT6bQb
-	Fc6OmRrjQ0ZxqrqeUBq5iAm/4Tay48yonhAhuQjcBk1wAz9Rbj++I+wMjQp9SSTetPUZ0tIZRq/
-	1p9wadi4bJQSPHr2cF57WLiGn3RmveX2App8ux4LT
-X-Received: by 2002:ac8:7fd1:0:b0:51c:9ad:d76 with SMTP id d75a77b69052e-51d7c6a8b03mr14122751cf.19.1784029540491;
- Tue, 14 Jul 2026 04:45:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZUh1SON"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B2161F000E9;
+	Tue, 14 Jul 2026 11:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784030012;
+	bh=kOdFA5TvqZ7fA3XLGTPIx6VaS2vqHOKZ1KcaoK3TknI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=cZUh1SON31Mr735e/WB7nNvDXTFeFpM7pyW2+E+RkSXfi7mdVPuZf6Ok/Ix44Czyx
+	 gifB9i73p8fbjHKQR9xXZRZltotgJMrjY80Q4PryNa5Ne/SDR3TonffOP819VggyW2
+	 9USAMwvU+NrAN6FxBVpg0EEWggr93Nyp1Dbublpqf95tdPuxc1QG3E6768uw9xqnoR
+	 7rVrzDCjZkO12xa9YlrXwrP1UaIvE0n4sN74fYN6wQ3+0h6CNs9DAuyG6tmNe5NnFY
+	 MI3dj3j74TSN/frbpj1yq8bFhDGxygablM8nKFot3BW/H8dQkW/WEwF0+lz2HpceMo
+	 s2ppYyQ6LbrAg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 6/8] KVM: arm64: Minimise EL2's exposure of host VGIC
+ state during world switch
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260714101601.4142645-7-fuad.tabba@linux.dev>
+References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
+ <20260714101601.4142645-7-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Jul 2026 11:53:31 +0000
+Message-Id: <20260714115332.1B2161F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260714110756.116950-1-alexandru.elisei@arm.com>
-In-Reply-To: <20260714110756.116950-1-alexandru.elisei@arm.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 14 Jul 2026 12:44:57 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxFAqO38zZNTM5oQ26X7eUcu3ggfhMY2gn2bB4sMbOxoQ@mail.gmail.com>
-X-Gm-Features: AUfX_mzZY9UVGBmT0JoFJAIUngCEaTE6JMkLfV1PK-I1CCi-zORRCvzJSWUlQsw
-Message-ID: <CA+EHjTxFAqO38zZNTM5oQ26X7eUcu3ggfhMY2gn2bB4sMbOxoQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Reject guest_memfd memslots when the VM has MTE
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	catalin.marinas@arm.com, will@kernel.org, steven.price@arm.com
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-Hi Alex,
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
 
-On Tue, 14 Jul 2026 at 12:08, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> The user cannot use MTE on VMAs created by mapping a guest_memfd file,
-> as arch_calc_vm_flag_bits() does not set VM_MTE_ALLOWED.
->
-> When creating a guest_memfd backed memslot,
-> kvm_arch_prepare_memory_region() rejects the memslot if MTE is enabled for
-> the VM and if guest_memfd has been mapped in a VMA that intersects the
-> memslot.
->
-> However, the documentation for KVM_SET_USER_MEMORY_REGION2 explicitly
+New issues:
+- [High] handle___vgic_v3_save_aprs erroneously overwrites the host's vgic_=
+vmcr with a stale EL2 value.
 
-nit: s/explicitely/explicitly/
+Pre-existing issues:
+- [Critical] Incomplete fix leaves identical hypervisor memory corruption v=
+ulnerability in GICv5 hypercalls.
+- [Critical] The `handle___kvm_adjust_pc` hypercall blindly dereferences a =
+host-provided `vcpu` pointer via `kern_hyp_va()` without validation.
+--
 
-> states that the only condition for userspace_addr is for it to be a legal
-> userspace address, but the mapping is not required to be valid nor
-> populated at memslot creation.
->
-> If userspace sets userspace_addr to an address that hasn't been mapped, or
-> if userspace_addr belongs to a VMA that isn't backed by the guest_memfd
-> file, or if the VMA doesn't intersect the memslot, memslot creation is
-> successful and KVM ends up with a VM with MTE and guest_memfd-backed
-> memslots.
->
-> Forbid guest_memfd memslots unconditionally when the VM has MTE to prevent
-> this from happening.
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+--- Patch [6]: [PATCH v5 6/8] KVM: arm64: Minimise EL2's exposure of host V=
+GIC state during world switch ---
+commit bad346f74febb306b17aa647c2da5c6747345fe8
+Author: Marc Zyngier <maz@kernel.org>
 
-Is this worth a Fixes: tag?
+KVM: arm64: Minimise EL2's exposure of host VGIC state during world switch
 
-> ---
+The host passes a vgic_v3_cpu_if pointer to the __vgic_v3_save_aprs and
+__vgic_v3_restore_vmcr_aprs hypercalls, which EL2 dereferences wholesale.
+This patch copies only vgic_vmcr and the active priority registers between
+EL2's hyp-side state and the host vCPU to minimise exposure.
 
-git am chokes here: this kvmtool snippet between '---' and the real
-diff parses as a stray patch fragment ("patch fragment without
-header"). Worth indenting it or moving it below a scissors line ("--
->8 --") so the patch applies, though didn't test to see if this
-actually works :)
-
->
-> Tested by using Fuad's patches to add guest_memfd support for kvmtool at [1],
-> with the following changes to arm64/kvm.c:
->
-> @@ -125,10 +125,12 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
->                 return;
->         }
->
-> +       /*
->         if (kvm->cfg.arch.guest_memfd) {
->                 pr_debug("MTE is incompatible with guest_memfd");
->                 return;
->         }
-> +       */
->
->         if (kvm->cfg.arch.mte_disabled) {
->                 pr_debug("MTE disabled by user");
->
-> and kvm.c:
->
-> @@ -332,8 +332,15 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
->                                 .guest_memfd_offset     = guest_memfd_offset,
->                         };
->
-> +                       if (munmap(userspace_addr, size) < 0)
-> +                               die_perror("munmap hack");
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index 45d717889f6ea..f3233ee343a39 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+[ ... ]
+> @@ -508,16 +520,63 @@ static void handle___vgic_v3_init_lrs(struct kvm_cp=
+u_context *host_ctxt)
+> =20
+>  static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
+>  {
+> -	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
+> +	struct pkvm_hyp_vcpu *hyp_vcpu;
+> +	struct kvm_vcpu *host_vcpu;
+> =20
+> -	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
+> +	host_vcpu =3D get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1,
+> +							   &hyp_vcpu);
+> +	if (!host_vcpu)
+> +		return;
 > +
->                         ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION2,
->                                     &mem2);
+> +	if (unlikely(hyp_vcpu)) {
+> +		struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
+> +		int i;
 > +
-> +                       if (mmap(userspace_addr, size, PROT_RW, MAP_SHARED | MAP_FIXED,
-> +                           guest_memfd, guest_memfd_offset) == MAP_FAILED)
-> +                               die_perror("mmap hack");
->                 } else {
->                         struct kvm_userspace_memory_region mem = {
->                                 .slot                   = slot,
->
-> (not pasting the full diff because last time I did, git got confused and
-> considered the snippet part of the actual patch).
->
-> Without this patch, I was able to create a VM with MTE and guest_memfd
-> backed ram (the guest reported MTE as enabled, but I didn't test that it
-> actually worked).
->
-> With this patch, creating a VM with MTE is rejected.
->
-> [1] https://lore.kernel.org/kvmarm/20260712142536.1391557-1-fuad.tabba@linux.dev/
->
->  arch/arm64/kvm/mmu.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6c941aaa10c6..30c2ea235fa5 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2648,8 +2648,11 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->         /*
->          * Only support guest_memfd backed memslots with mappable memory, since
->          * there aren't any CoCo VMs that support only private memory on arm64.
-> +        *
-> +        * MTE is also not supported with guest_memfd.
->          */
-> -       if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
-> +       if (kvm_slot_has_gmem(new) &&
-> +           (kvm_has_mte(kvm) || !kvm_memslot_is_gmem_only(new)))
->                 return -EINVAL;
+> +		hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+> +		__vgic_v3_save_aprs(hyp_cpu_if);
+> +
+> +		host_cpu_if =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
+> +		host_cpu_if->vgic_vmcr =3D hyp_cpu_if->vgic_vmcr;
 
-This folds two unrelated rejections into one condition. I'd split them
-so each carries its own comment:
+[Severity: High]
+Does this overwrite the host's vgic_vmcr with a stale EL2 value?
 
-        /* guest_memfd is incompatible with MTE. */
-        if (kvm_slot_has_gmem(new) && kvm_has_mte(kvm))
-            return -EINVAL;
+When the guest performs an MMIO write to the GICv2 VMCR (emulated on a GICv3
+host), the trap is handled at EL1, updating
+host_vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr.
 
-        /*
-         * Only support guest_memfd backed memslots with mappable memory,
-         * since there aren't any CoCo VMs that support only private memory
-         * on arm64.
-         */
-        if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
-            return -EINVAL;
+Later, if the vCPU is preempted or userspace schedules out,
+__vgic_v3_save_aprs is invoked. Because __vgic_v3_save_aprs() does not read
+VMCR from hardware, hyp_cpu_if->vgic_vmcr contains the stale value from the
+previous guest exit.
 
-More importantly, this only closes one direction.
-prepare_memory_region() runs on memslot changes, but KVM_CAP_ARM_MTE
-gates only on !kvm->created_vcpus and never looks at memslots, so the
-reverse order still gets you there:
+This would silently clobber and destroy the EL1's MMIO emulation updates.
 
-      1. KVM_SET_USER_MEMORY_REGION2 with a gmem slot   (no MTE yet -> ok)
-      2. KVM_ENABLE_CAP(KVM_CAP_ARM_MTE) (no vCPUs -> ok)
+[ ... ]
 
-Since the justification is that userspace can do unexpected things,
-the enable-MTE path wants the symmetric check too (reject if a gmem
-memslot already exists), or enforce the invariant at one choke point.
+This is a pre-existing issue, but I noticed a similar pattern in
+handle___kvm_adjust_pc() in the same file:
 
-Cheers,
-/fuad
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___kvm_adjust_pc() {
+        ...
+        __kvm_adjust_pc(kern_hyp_va(vcpu));
+}
 
->
->         hva = new->userspace_addr;
->
-> base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
-> --
-> 2.55.0
->
+[Severity: Critical]
+Could this allow an EL1 host to corrupt hypervisor memory?
+
+An EL1 host can call the __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc hypercall
+and provide an arbitrary TTBR1 pointer. EL2's handle___kvm_adjust_pc()
+applies kern_hyp_va() without bounds-checking or validation.
+
+When __kvm_adjust_pc() is executed:
+
+arch/arm64/kvm/hyp/exception.c:__kvm_adjust_pc() {
+        if (vcpu_get_flag(vcpu, PENDING_EXCEPTION)) {
+        ...
+
+This dereferences the unvalidated pointer to read flags and modify memory,
+giving EL1 the ability to increment 64-bit values in EL2 memory.
+
+
+This is also a pre-existing issue, but a similar pattern remains in the
+GICv5 counterparts:
+
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_save_apr() {
+        ...
+        __vgic_v5_save_apr(kern_hyp_va(cpu_if));
+}
+
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_restore_vmcr_apr() {
+        ...
+        __vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
+}
+
+[Severity: Critical]
+Does this leave an identical memory corruption regression?
+
+An EL1 host can call these hypercalls with an arbitrary TTBR1 pointer,
+which is directly dereferenced without validation, leading to arbitrary
+memory read/write against EL2.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714101601.4142=
+645-1-fuad.tabba@linux.dev?part=3D6
