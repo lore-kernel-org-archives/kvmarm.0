@@ -1,124 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44C4363087
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835CD1F3BA4;
+	Tue, 14 Jul 2026 10:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784023993; cv=none; b=AqRpdolIOYkReUERCB23+w24HKbcFxBZP1nut1x/uqBSdZuOjRk4hD7cjLX73cXSAZMuBNjAbcqZMKrdIbwzwasy9EaPKOTvRRVXJCKzWR0JeHuBcp9zKNOj94sR2g8FaOiMKQF9RXYs62P5pvYr78i143XpCg44t7y/aBA+3uk=
+	t=1784024161; cv=none; b=AzX1ScwWMJmyoPxrQuVB021TPqT8erxbbUMqiaJg9c/gme9WU3SiibZTJc1X4YhoE93XlQE0uzF/3DaFSa2H6NWD+8/VwnLXkIIbQzcAwB0Y5xze9yY8mNLevHtMeAFGHtIbQW7bXBYBXTdJIW9y1X9EkZYMFMyuNazq4TKkd7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784023993; c=relaxed/simple;
-	bh=g7mASN1w+UMRPcOtlUAKXnklRJCF0YJxJU34hxUurtg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=kqe8chLBJ+7DXYuo58F+YNYHcTsqK/2InNa5ilQKtWKEtv5Qsi6hCidD1q0d0Pgltrp2EhEbcARJUHvzOQYhXFDpY4BVSzrFQUhIm7N04meZS3w/aRu6UBCO+4deTw36Tjcm+5QYaa5CK1TbDj0Rq2Q0NqITHuIrBQ8EEK233/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cvuo8rF7; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784024161; c=relaxed/simple;
+	bh=JnCno2jxTXkQUe36GoS6ojc79zXls/o7MWA1gsEGIdg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=bsTQxAAO6HVs+ViZJyPWgM2GY280KlDslShmnYGjL8HYTVeYpOuPqU51R/CYROHq+/eFDM1DK7WAFvG9NN4lC9x0C6zXIgWNSzVzkaGXwrVeJUSp7Xo8d+2bnSi63yb9ORD9CLO06cvjvKhGq5nShB4ZXBIMEtaj45Ak9eje58Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZRYSMrN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cvuo8rF7"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 919601476;
-	Tue, 14 Jul 2026 03:13:05 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 502F63FAF5;
-	Tue, 14 Jul 2026 03:13:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784023989; bh=g7mASN1w+UMRPcOtlUAKXnklRJCF0YJxJU34hxUurtg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cvuo8rF7fLtQJaXzvusD6AKM4OJ8QEAIeTRlXzwiCpcTpYqUhmJQJKFySi1ejFX+r
-	 w332l+4skESsmVNU8aYYoPQ03Q28sQC6qwWzkcyFtz0NjscDx3ft1WoNmvBBWVeCQ9
-	 mVWQGekFSg5ybgTuAQG6qdN+qvmEydrSXAmGy8Vg=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] KVM: arm64: Introduce KVM_PGTABLE_WALK_SKIP_LEVEL* walk flags
-Date: Tue, 14 Jul 2026 11:13:01 +0100
-Message-ID: <alYLrbArDIKx1hh_@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <4d5imbtps2p35zujbupzmvag6m46yc4jz4qnoje6pdwlx4zuno@wom5iiwkszzs>
-References: <20260708134101.2514759-1-leo.bras@arm.com> <20260708134101.2514759-3-leo.bras@arm.com> <jiy6rtx24nqnnduze3uuvc2ifqrjlskhefyctlwyh2jshdjrw2@a2wpodq6ife6> <alS6hwzsBUEfvBEk@LeoBrasDK> <4d5imbtps2p35zujbupzmvag6m46yc4jz4qnoje6pdwlx4zuno@wom5iiwkszzs>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZRYSMrN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C60F61F000E9;
+	Tue, 14 Jul 2026 10:15:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784024160;
+	bh=Wy0KY8YHux+fWBHAz5oVfuomfaYqKA+n+KXUr57piIQ=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=QZRYSMrNMsH4sv45VWSWoSDsEI3bqsxlD8isnqyv0wJWV3OA1nHVEuHOn27PkX5+2
+	 R10iwGIzvY3YVF/asxhTQXdm606ccWemkUahR5SEpxt8wHCZJfwly6TKai2SjsRtDK
+	 hxoYm9P8l+t94pQWVzKbGUQ2Hq3YurAzvxHqGV9ZiOx2st3ZDl+1kV1WXKEeVf/660
+	 dqVAnITk0EgXZhJG5LqTCEQ0AnP533zT11ist3p/QXgAvs/gtkn285Q5uqUPWERLf9
+	 zbCIbNXwMqSt2PLxbZ7Hug+/ICSiYwdoK8UBHuA5dQwn1IJqJdWNIuS7kMcJVIhGf5
+	 1HoI/zjw3nY6g==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 27/28] KVM: arm64: Expose FEAT_NV3 to guests
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Marc Zyngier" <maz@kernel.org>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260714091641.1970822-28-maz@kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+ <20260714091641.1970822-28-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Jul 2026 10:15:59 +0000
+Message-Id: <20260714101559.C60F61F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 14, 2026 at 06:41:11AM +0100, Wei-Lin Chang wrote:
-> On Mon, Jul 13, 2026 at 11:14:32AM +0100, Leonardo Bras wrote:
-> > On Sat, Jul 11, 2026 at 06:53:28AM +0100, Wei-Lin Chang wrote:
-> > > Hi Leonardo,
-> > 
-> > Hi Wei-Lin, thanks for reviewing!
-> > 
-> > > 
-> > > On Wed, Jul 08, 2026 at 02:40:58PM +0100, Leonardo Bras wrote:
-> > > > Add the new walking flags that tell kvm_pgtable_walk() to skip lower levels
-> > > > when walking the pagetables.
-> > > > 
-> > > > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_pgtable.h | 13 +++++++++++++
-> > > >  arch/arm64/kvm/hyp/pgtable.c         | 19 ++++++++++++++++---
-> > > >  2 files changed, 29 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > > > index 41a8687938eb..20c7c12e0e76 100644
-> > > > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > > > @@ -311,31 +311,44 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
-> > > >   * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
-> > > >   *					with other software walkers.
-> > > >   * @KVM_PGTABLE_WALK_IGNORE_EAGAIN:	Don't terminate the walk early if
-> > > >   *					the walker returns -EAGAIN.
-> > > >   * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
-> > > >   *					without Break-before-make's
-> > > >   *					TLB invalidation.
-> > > >   * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
-> > > >   *					without Cache maintenance
-> > > >   *					operations required.
-> > > > + * @KVM_PGTABLE_WALK_SKIP_LEVEL0:	Skip visiting level-0+ entries
-> > > > + * @KVM_PGTABLE_WALK_SKIP_LEVEL1:	Skip visiting level-1+ entries
-> > > > + * @KVM_PGTABLE_WALK_SKIP_LEVEL2:	Skip visiting level-2+ entries
-> > > > + * @KVM_PGTABLE_WALK_SKIP_LEVEL3:	Skip visiting level-3 entries
-> > > 
-> > > Just a drive-by nit:
-> > > Maybe avoid the level-$LEVEL terminology? Since as you said there is
-> > > level -1 in the architecture, in that case you'd have to write
-> > > "level--1" which is awkward :)
-> > 
-> > It would have to be something like level-(-1), or we could call it level+1, 
-> > LOL.
-> 
-> Good one! :)
-> 
-> > 
-> > Seriously though, yes it's bad.
-> > I could call it level_1 entries, but level_-1 also seems weird :(
-> > level(1) & level(-1) could work, but looks like a function now
-> > 
-> > maybe just saying 'level 1' and 'level -1' can be better.
-> 
-> Yeah, I generally also just go with the space when it's text.
-> For code/variables, I guess a direct concatenation like what's done here
-> for the enum is good.
-> 
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-Sure, noted for next version
+Pre-existing issues:
+- [High] Host nested virtualization capabilities (ID_AA64MMFR4_EL1.NV_frac)=
+ are leaked to non-NV guests, breaking live migration across heterogeneous =
+hosts.
+--
 
-Thanks!
-Leo
+--- Patch [27]: [PATCH v2 27/28] KVM: arm64: Expose FEAT_NV3 to guests ---
+commit 508d53194bf7ddb4e61f279e50216aa88dd973ad
+Author: Marc Zyngier <maz@kernel.org>
+
+KVM: arm64: Expose FEAT_NV3 to guests
+   =20
+Further enable FEAT_NV3 by making it visible to NV guests.
+
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index f646894fec9a9..70d605e60cfb3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+[ ... ]
+> @@ -1741,7 +1741,9 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 v=
+al)
+>  			val =3D 0;
+>  		} else {
+>  			val &=3D ID_AA64MMFR4_EL1_NV_frac;
+> -			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+> +			if (cpus_have_final_cap(ARM64_HAS_NV3))
+> +				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV3);
+> +			else if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+>  				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P=
+1);
+>  			else
+>  				val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+
+[Severity: High]
+This isn't a bug introduced by this patch, but while looking at NV feature
+exposure here, could ID_AA64MMFR4_EL1.NV_frac leak into non-NV guests?
+
+Looking at __kvm_read_sanitised_id_reg() in arch/arm64/kvm/sys_regs.c,
+it seems SYS_ID_AA64MMFR4_EL1 is not explicitly masked out for non-NV guests
+in the switch statement:
+
+	case SYS_ID_MMFR4_EL1:
+		val &=3D ~ID_MMFR4_EL1_CCIDX;
+		break;
+	}
+
+If a non-NV guest is created on an NV3-capable host, will the host's raw
+NV_frac leak into the VM's ID_AA64MMFR4_EL1 register?
+
+If this VM is later migrated to a host with only NV2P1, could userspace's
+attempt to restore the capability via KVM_SET_ONE_REG fail because the
+destination host's arm64_check_features() rejects the higher NV_frac value?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714091641.1970=
+822-1-maz@kernel.org?part=3D27
