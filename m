@@ -1,131 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEF4412C1D
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 18:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB72B377AB6
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 18:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784053547; cv=none; b=uTjBg48SDi99d0KSpiuldmrmYGAKV+S7yDtIV78GEr+9DC88giBJ945pTaVELd9k1ED+182T8bLzM+0ohX0cr3WOonH+Jsrg9M47JxheVB3HyR2sNFlpGYFfmcHe5qFfHPnv9nG5qkasacjEZ6AFzwKUGnQtdbfGKPqmpUFZzuU=
+	t=1784054259; cv=none; b=WLHQt3E9fFrOOdAXFT796ga2Dl4AZCEhurDtXQuBNiBombqBjRY+8L/5Wf4irLZGkRqQuuxwkY3iJIS/iH3r1ftyxO2I+Irtd84wH/hTCquGHRPFwcwpUvQxQ0ldJbnhFG256XuKdbZqF4JuyOKbIYUip/+87ATbIoID2eBxl8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784053547; c=relaxed/simple;
-	bh=UJxitkdaPC5SZC4R34vCKL7FkTZNjaFflB5Ik5kfwb4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=UGQE9WX3RxfBQMK3pR4/Je48cBemifTfa/x1TLT1mp3jjCDTIH4+b13JK6qnGRIAd8blBIytHHq0DH8VT2X8TxXNVUSDXL5Oc7a00OixV5ZLEQqjWJ8kRFHz8OTRuCmYUBnqK12pz8sYgYNUL26hTmAAr1ZJug3p/92DNI95WXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMyvq7jc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784054259; c=relaxed/simple;
+	bh=Fywnf0NhBe2rpVBRTr8CFqs8b3D72FSz2o3nmm3o6Cw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lQUY7b59UN4aB7Yjr7NVh6BrR5se0jfZsLWHFYLCT/G6iwVUvP8x6bEPy0s4dBse8d/w9xftZGxMCQekb8siaERoNvjE4LNU2MwqSekrzNdhBHFZXrAowv+jHeJzp1GKrD8bmHcnANf/8wOyP6VgUozkR0AG44a1V4WSJOQh7+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Bc50wHJH; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMyvq7jc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33421F000E9;
-	Tue, 14 Jul 2026 18:25:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784053543;
-	bh=GtoP/ip2x5uO8OzulHUDfJIe+9sD61VUdNQYhX9tTHw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SMyvq7jccJmpo1IWoRpUVVwJO2Vz2gtQmSAkby/X1xjXEBHs2ndIHaRAg3T9E+Mdk
-	 oWQ1N65guRcnJZm0rzdjS4ZlNZj5rOSewvctHxOrwuHsB2Czx6rou9cH6pYutlH5Np
-	 y0I/nzyFe606I3l8qw1Pk/UoOyqXFfADGgkcN3iSwSLxETU8yDkjwOiqhx8If/lbI8
-	 KhwJIE40xCLxorViUseNTC7I0hjV48FK+RgDTii0fp1yST0VeYbZKHGgHT5SYh5EP3
-	 IKKftH3kCrEwhZJYU8DKhzm1yJfMusvE7myOr7dF2yveBI4jxi/Lx1w5UyHbfVdC3u
-	 DhtM9dm643VTg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix hyp_trace clock disabling
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260714181010.2527225-1-vdonnefort@google.com>
-References: <20260714181010.2527225-1-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 18:25:42 +0000
-Message-Id: <20260714182542.F33421F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Bc50wHJH"
+X-Forwarded-Encrypted: i=1; AHgh+RqDSYxc+Qlg+NcwRkQxvhamVPG7d2e5yft6UZCdmzVmfLEjI2LWOHfozWwjeLnLA4KCYWsJvaM=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784054215;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HNZSBmfBDNmYrRJyHxAOlhjiIPet8aW1LhhHhsLWuDI=;
+	b=Bc50wHJHgUK9w4irpCWjKX5v64PBYgc6YKYPWRcxXHzva3ZFfhKYPoqb0rf037KJpMAoA4
+	uufhKEv+PfnNcfmaReKnOf3SxhJJhvclrieB2OcKEL/DD3dYHHdjcZcI4PzS+fhw/c3bzH
+	V9es5kWABNHkGG/mw0jh0e4QvfHDsNk=
+X-Gm-Message-State: AOJu0YwfYCTaiNWXxCa/32+0TqMFOgwKfJ7Dp2HgwmmolMlBhuwFerA1
+	0aciu+U7iBLcVFAiePB0cTw98W3ptrFQH5A9xgDYcwSZATIbJ0hXz3DZFe2dpVuhXSqy/7w0Ula
+	8UrNhjpudyIxgLDi6oC9UszRMxvcG4qnHpIPauhJO
+X-Received: by 2002:a05:622a:5811:b0:516:d25f:f038 with SMTP id
+ d75a77b69052e-51d7bcdc629mr19496341cf.10.1784054209379; Tue, 14 Jul 2026
+ 11:36:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-5-vdonnefort@google.com>
+In-Reply-To: <20260706175415.2604046-5-vdonnefort@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 14 Jul 2026 19:35:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzbQukkKpNfdTHKS5aAPCn4hnCxu+EHnm6OWpW=mTS+Gw@mail.gmail.com>
+X-Gm-Features: AUfX_mwujOVFYFITNMrHijW4eH9F2RFdyBeop_XKVBPHf6u1glhbNBh1Runw6Wo
+Message-ID: <CA+EHjTzbQukkKpNfdTHKS5aAPCn4hnCxu+EHnm6OWpW=mTS+Gw@mail.gmail.com>
+Subject: Re: [PATCH v2 04/18] KVM: arm64: Add a heap allocator for the pKVM hyp
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] Missing cleanup in the error path of `hyp_trace_enable_tracing()=
-` leaks the clock synchronization delayed work. Furthermore, this patch int=
-roduces a workqueue corruption if tracing is subsequently re-enabled.
---
+On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
 
---- Patch [1]: [PATCH] KVM: arm64: Fix hyp_trace clock disabling ---
-commit c37a59b3ffe1e163385bedc8f21496d8af6fbc61
-Author: Vincent Donnefort <vdonnefort@google.com>
+...
 
-KVM: arm64: Fix hyp_trace clock disabling
+> +static u32 chunk_hash_compute(const struct chunk_hdr *chunk)
+> +{
+> +       u32 hash = 0;
+> +
+> +       BUILD_BUG_ON(sizeof(*chunk) != 16);
+> +
+> +       hash ^= hash_64(*(const u64 *)chunk, 32);
+> +       hash ^= hash_32(chunk->__unmapped, 32);
 
-This commit fixes the disable path in hyp_trace_clock_enable() by returning
-early instead of re-initializing the clock. It also cleans up the unused
-lock and redundant running state from the clock structure.
+Could you state the threat model in the commit msg? The VA range is
+hyp-private and the hash is unkeyed (anything that can write EL2
+memory recomputes it), so this only catches _accidental_ corruption,
+i.e. a debug aid.
 
-> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-> index 2411b4c32932c..0b03117a38ecd 100644
-> --- a/arch/arm64/kvm/hyp_trace.c
-> +++ b/arch/arm64/kvm/hyp_trace.c
-> @@ -37,8 +37,6 @@ static struct hyp_trace_clock {
->  	u32			shift;
->  	struct delayed_work	work;
->  	struct completion	ready;
-> -	struct mutex		lock;
-> -	bool			running;
->  } hyp_clock;
+Since that's the goal, should it be gated on CONFIG_NVHE_EL2_DEBUG
+like the other checks here? As written it's O(n) hashing per
+hyp_alloc(), in production, for a check that only fires on a hyp bug.
+And a plain XOR/additive checksum would be cheaper and just as good
+for accidental corruption.
 
-[ ... ]
+> +       return hash;
+> +}
+> +
 
-> @@ -110,12 +108,9 @@ static void hyp_trace_clock_enable(struct hyp_trace_=
-clock *hyp_clock, bool enabl
->  {
->  	struct system_time_snapshot snap;
-> =20
-> -	if (hyp_clock->running =3D=3D enable)
-> -		return;
-> -
->  	if (!enable) {
->  		cancel_delayed_work_sync(&hyp_clock->work);
-> -		hyp_clock->running =3D false;
-> +		return;
->  	}
-> =20
->  	ktime_get_snapshot_id(CLOCK_BOOTTIME, &snap);
-> @@ -128,7 +123,6 @@ static void hyp_trace_clock_enable(struct hyp_trace_c=
-lock *hyp_clock, bool enabl
->  	INIT_DELAYED_WORK(&hyp_clock->work, __hyp_clock_work);
+...
 
-[Severity: Medium]
-Is it safe to remove the hyp_clock->running check above, considering how
-errors are handled in hyp_trace_enable_tracing()?
 
-Looking at hyp_trace_enable_tracing(), if the hypercall fails, the error
-is propagated but the clock is not stopped:
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 75b00c323310..1c10cf78c869 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -10,6 +10,7 @@
+>  #include <asm/kvm_pgtable.h>
+>  #include <asm/kvm_pkvm.h>
+>
+> +#include <nvhe/alloc.h>
+>  #include <nvhe/early_alloc.h>
+>  #include <nvhe/ffa.h>
+>  #include <nvhe/gfp.h>
+> @@ -363,6 +364,10 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long *per_cpu_bas
+>         if (ret)
+>                 return ret;
+>
+> +       ret = hyp_alloc_init(SZ_128M);
 
-static int hyp_trace_enable_tracing(bool enable, void *priv)
-{
-	hyp_trace_clock_enable(&hyp_clock, enable);
+Where does 128M come from? A comment would help.
 
-	return kvm_call_hyp_nvhe(__tracing_enable, enable);
-}
+Cheers,
+/fuad
 
-If the hypercall returns an error when enable is true, the user might
-try to enable tracing again. This would result in a second call to
-hyp_trace_clock_enable() with enable as true.
 
-Without the running check returning early, the code will fall through and
-call INIT_DELAYED_WORK() on the already active hyp_clock->work item. Can
-this corrupt the workqueue list pointers?
 
-Even though the hypercall might currently be prevented from failing due
-to the remote lock serialization, should we add a rollback to the error
-path in hyp_trace_enable_tracing() before dropping the running state check?
-
->  	schedule_delayed_work(&hyp_clock->work, msecs_to_jiffies(CLOCK_INIT_MS)=
-);
->  	wait_for_completion(&hyp_clock->ready);
-> -	hyp_clock->running =3D true;
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714181010.2527=
-225-1-vdonnefort@google.com?part=3D1
+> +       if (ret)
+> +               return ret;
+> +
+>         update_nvhe_init_params();
+>
+>         /* Jump in the idmap page to switch to the new page-tables */
+> --
+> 2.55.0.rc2.803.g1fd1e6609c-goog
+>
