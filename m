@@ -1,146 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2F436494C
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578C636D51B;
+	Tue, 14 Jul 2026 10:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784024444; cv=none; b=X+oRucoZWnL5SvW6RqDheiqA9ackLnHfrXjOVwaEqClr2he14Go5Sr6GM5LrPJrj36Kf8YHEBZqj7Bb+2AfXSRMnrSoIQVIf1lVlzRQuaVr6Khj6eRg4yEBNa+zZf4rqJH/xw2mcIa/tqR/Wtk6giaM3zilSob00MqcCrMyNNqY=
+	t=1784024663; cv=none; b=WSkIlpsC+y11iJUMRwIAi7T9cnn17Mt5PA0df9QCUtRjnlktaFQPl0DgnRKAcCuXBcTBn6dn1r8jpHZLi6tueNOjxhvaGoGXgDuVMQ2dz5lK0Ks+eEGtQitR0uv5c8w7rj3i0xp8Ob7ae18lGokHQtxN6/gFC08gIpSxJVXVfJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784024444; c=relaxed/simple;
-	bh=c77uFUVgfJ05mGTz42Oxlye2lWOsU1Hake6afPEeEPE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=O/UGmStc0aZsbrbE6c+Sq0X9GZ79n066ctTR8rCA/fPYEnmpg0VCdFCfFnmwnFpE2XnSOcHNl5vRmsSj4ncJTusNvzrsUps0tGlok0AIZmb4nF+/tvzgWDVkiJjIVhrRxti8HnsKMq2LTyP0oJDk5S8vaMzMFrkp/W3XjqsbEjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=uk6F5TpQ; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784024663; c=relaxed/simple;
+	bh=4zRjDrVqf+zN+crKsH68dffewld0b1rT5Q7gMu6Q2Mg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=WqtLxdl2x4qdqjMdCsSWOkn07AwZaurbrqjNH/xS0VVKZF8ZZxvDQY5k5KrUFXADNjHxUZlxIsDw8WXBWXrEiw2TeNdTXvF/adERgIVWB/9IbSRDOLdPTZFx01/kD7111IdLV2VfndE0TbPJG33YHMbb+DldbCoAbI7pxn6MyZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BF6iD9RI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="uk6F5TpQ"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3361497;
-	Tue, 14 Jul 2026 03:20:37 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 88B163F7B4;
-	Tue, 14 Jul 2026 03:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784024441; bh=c77uFUVgfJ05mGTz42Oxlye2lWOsU1Hake6afPEeEPE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uk6F5TpQWkphk/6l4qeUni50zp5hcGobptnFkKTHCmH49LPAMZYLISkl7NeszC45b
-	 OEe++W+nFKAMqOVmeU5Vh7XaiMgzkQmu4OT08Za+vpqtbygAJjAuspZqXmPGyb8sTZ
-	 th3WksP5yMlHkekGOpO4c66dKP8d0d69y+lxxNKk=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
-Date: Tue, 14 Jul 2026 11:20:36 +0100
-Message-ID: <alYNdPKCYOiHXqpZ@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <e01b9a9d-9f38-44ab-acfc-069f143863d6@huawei.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com> <20260709104026.2612599-4-zhengtian10@huawei.com> <alTJOy8Sv4aAp_9y@LeoBrasDK> <8f949334-3ce7-44f4-b6da-f08a4126affd@huawei.com> <86zezunifl.wl-maz@kernel.org> <e01b9a9d-9f38-44ab-acfc-069f143863d6@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BF6iD9RI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E51341F000E9;
+	Tue, 14 Jul 2026 10:24:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784024662;
+	bh=kVTa6hHhrvDzfmFIiasGo8lhxKcyzJN/IkFUa5EyRbs=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=BF6iD9RIDY8qsr7oCnq5WrrKS8d1BEHiOopE9JMfgMWrjmL2lJQ5xErzdffVosmyE
+	 Jj4ikf8H8rwaL73K2mnGx+1dgn0SiF5an8eAFF4i5UrIxnzBWcp72wgvx9hOQuTnaT
+	 +BNlitP8+AC2Jkkc4VlS6aaqo8GOSTfjTdCvn+rQRqCk7BOIeEHneieDAVeXmWNxmU
+	 D7LX/Pn0hr5BQobLhGqaIa0oDL8ODGJv/Aqrn5ctJJxXBGZHkwv4ZTSMpztTuY4IQ3
+	 IlA8xbboFi67OsyFP1omUH2icXoA8u97sOqQyHdrWhZ4JwdU/5CgfgUkUcB+ayQy5u
+	 MuMKBz0znMytg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 21/28] KVM: arm64: Add NVHCR_EL2 handling to the
+ sysreg array
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Marc Zyngier" <maz@kernel.org>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260714091641.1970822-22-maz@kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+ <20260714091641.1970822-22-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Jul 2026 10:24:21 +0000
+Message-Id: <20260714102421.E51341F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 14, 2026 at 03:44:37PM +0800, Tian Zheng wrote:
-> 
-> On 7/14/2026 3:23 PM, Marc Zyngier wrote:
-> > On Tue, 14 Jul 2026 02:14:45 +0100,
-> > Tian Zheng <zhengtian10@huawei.com> wrote:
-> > > 
-> > > On 7/13/2026 7:17 PM, Leonardo Bras wrote:
-> > > > On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
-> > > > > The DBM (Dirty Bit Modifier) attribute, introduced in ARMv8.1, enables
-> > > > > hardware to automatically promote write-clean pages to write-dirty. This
-> > > > > prevents the guest from being trapped in EL2 due to missing write
-> > > > > permissions.
-> > > > > 
-> > > > > In this design, DBM is controlled by the page-table level flag
-> > > > > KVM_PGTABLE_S2_DBM rather than per-PTE software flags. DBM is
-> > > > > automatically set for writable non-device pages when the page-table has
-> > > > > KVM_PGTABLE_S2_DBM flag, which is determined at MMU init time based on
-> > > > > hardware capability.
-> > > > > 
-> > > > > The DBM bit is set in stage2_set_prot_attr() for initial mappings and
-> > > > > hugepage splitting, and directly manipulated in
-> > > > > kvm_pgtable_stage2_relax_perms() when removing write-protection. On
-> > > > > W->RO downgrade, DBM is cleared to prevent hardware from silently
-> > > > > upgrading RO+DBM back to W+dirty, which would bypass KVM's write
-> > > > > tracking.
-> > > > > 
-> > > > > kvm_pgtable_stage2_pte_prot() does not extract the DBM bit back into
-> > > > > enum kvm_pgtable_prot because DBM is a page-table policy determined by
-> > > > > pgt->flags, not a per-PTE property. Callers should check
-> > > > > pgt->flags & KVM_PGTABLE_S2_DBM instead.
-> > > > > 
-> > > > > This ensures DBM is consistently applied across all PTEs, including
-> > > > > during hugepage splitting where child PTEs inherit DBM from the parent
-> > > > > block entry via the pgt->flags mechanism.
-> > > > > 
-> > > > > Safety: DBM bit is only interpreted by hardware when VTCR_EL2.HD=1.
-> > > > > When HDBSS is not enabled (HD=0), ARM architecture guarantees hardware
-> > > > > completely ignores DBM bit in PTEs.
-> > > > > 
-> > > > > Co-developed-by: Eillon <yezhenyu2@huawei.com>
-> > > > > Signed-off-by: Eillon <yezhenyu2@huawei.com>
-> > > > > Co-developed-by: Leonardo Bras <leo.bras@arm.com>
-> > > > > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> > > > Hello Tian,
-> > > > 
-> > > > Have you added the above tags due to this patch being based on the below?
-> > > > https://lore.kernel.org/all/20260629111820.1873540-2-leo.bras@arm.com/
-> > > > 
-> > > > Thanks!
-> > > > Leo
-> > > Hi Leo,
-> > > 
-> > > 
-> > > Yes, I added your Signed-off-by because the DBM-related code in this patch
-> > You really can't do that. Only Leo can give his SoB, you can't forge
-> > it yourself.
-> > 
-> > > is based on your implementation in:
-> > > 
-> > > https://lore.kernel.org/all/20260629111820.1873540-2-leo.bras@arm.com/
-> > Then take the patch as is, and add to it as a separate patch. Or work
-> > out in private with Leo whether he's happy with a Co-dev. But never do
-> > that unilaterally.
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> Got it, thanks for the clarification, Marc.
-> 
-> I'm sorry about that — I'll remove them in the next version.
-> Instead, I'll mention the reference in the commit message with a link to
-> Leo's original patch:
-> 
-> Based on Leonardo Bras's patch:
-> https://lore.kernel.org/all/20260629111820.1873540-2-leo.bras@arm.com/
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] Userspace writes to NVHCR_EL2 via KVM_SET_ONE_REG are silently d=
+iscarded upon L1 guest entry.
+--
 
-That works out for me!
+--- Patch [21]: [PATCH v2 21/28] KVM: arm64: Add NVHCR_EL2 handling to the =
+sysreg array ---
+commit 40ce0e0627839603da739968567e9f3998f1ed15
+Author: Marc Zyngier <maz@kernel.org>
 
-Thanks!
-Leo
+KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
+
+Expose NVHCR_EL2 to userspace, and treat the direct access as UNDEF,
+as that would only outline a bug in our exception routing.
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 9439c5b2b1fe8..0aeb2e736fde3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+
+[ ... ]
+
+> @@ -3774,6 +3800,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+>  			 sve_el2_visibility),
+> =20
+>  	EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
+> +	EL2_REG_FILTERED(NVHCR_EL2, undef_access, reset_val, 0,
+> +			 nvhcr_el2_visibility),
+
+[Severity: Medium]
+Will userspace writes to NVHCR_EL2 be silently discarded upon L1 guest entr=
+y?
+
+Because NVHCR_EL2 is exposed without a custom .set_user handler, writes via
+KVM_SET_ONE_REG will update vcpu->arch.ctxt.sys_regs[NVHCR_EL2] using the
+default behavior. However, upon running the VCPU in hyp_ctxt (L1 hypervisor=
+),
+__compute_hcr() unconditionally executes:
+
+  __vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
+
+This seems to clobber the userspace write, causing UAPI state loss and a KVM
+ABI violation where KVM_SET_ONE_REG writes are expected to be preserved.
+
+Does this require a custom .set_user handler to maintain alias synchronizat=
+ion
+between NVHCR_EL2 and HCR_EL2?
+
+> =20
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714091641.1970=
+822-1-maz@kernel.org?part=3D21
