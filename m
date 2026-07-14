@@ -1,168 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0FB391E73
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BD6367F48
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784030013; cv=none; b=JTk86KzlCbjAZ4OEPNOD7bbxNTy79hxkw3RhBg0YxpDqUQAbM53WkJZn0yhsEsnqgECwpEmdrMhD/cwVl/lPwHVZkoGmCbGMcfW8WRcZQjht0oXlgCZCV1DyyxY6InWSls4iP3fk9KENGsXOJ/UH0dhQLPmIExMKti9Cr1XF+jU=
+	t=1784030402; cv=none; b=BXqPSi0OwjAa0UX0uNDHF3sKAAeMBcrPQQKMF+HTCvvSixLILvdfX6CeuBQxJspCrUKuPqUuEYg+9ZucI5pMV3BKFfeOUunDDmxsf4MUNcCJR8HDDt1F79Kk6E+nKu3xY1/+ZnLTxNwmYL5IJH04qQCh9lva6mHYGdIRsw98J3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784030013; c=relaxed/simple;
-	bh=7lJ+glw/N1tKV81QfdyBeDME1EJMLKMt4tSo3ODDOBc=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=NRYDj+5VqiBhfTHGQhmDhr60cT+Pkml+FYzdWdVSu43BJHj49uXRCRoS6EX1KbTNhiQMqVI7N8oVZ+7V50u+6u5+OndvjBXrDM63HlV2aE0UXxDUboXW+EchSdynNtPm/p+Lrg+4j0qKLEbvoF32CYv9z5uXMhLaIlYjHdIaYyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZUh1SON; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784030402; c=relaxed/simple;
+	bh=Vau5I2x8GnBbz9bN28WC5XKuZItIuXTZBRiRMAyopJc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nvc0885nHxDq4jGWut9l+brcwduL8vQomqKCgml47scSSgGZNxkYXIKtZgTQx4FwivZTWCYZNeAuVv0ysoh5hidAo2nTxJM6+4g93IbeA6vByD65kD9y//l1HzD8h3xN8po81oxy+8tXpn5Y7o4GUSD4e5yoSZNZgHEwnLN9dwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hDiOD7Ts; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZUh1SON"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B2161F000E9;
-	Tue, 14 Jul 2026 11:53:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784030012;
-	bh=kOdFA5TvqZ7fA3XLGTPIx6VaS2vqHOKZ1KcaoK3TknI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=cZUh1SON31Mr735e/WB7nNvDXTFeFpM7pyW2+E+RkSXfi7mdVPuZf6Ok/Ix44Czyx
-	 gifB9i73p8fbjHKQR9xXZRZltotgJMrjY80Q4PryNa5Ne/SDR3TonffOP819VggyW2
-	 9USAMwvU+NrAN6FxBVpg0EEWggr93Nyp1Dbublpqf95tdPuxc1QG3E6768uw9xqnoR
-	 7rVrzDCjZkO12xa9YlrXwrP1UaIvE0n4sN74fYN6wQ3+0h6CNs9DAuyG6tmNe5NnFY
-	 MI3dj3j74TSN/frbpj1yq8bFhDGxygablM8nKFot3BW/H8dQkW/WEwF0+lz2HpceMo
-	 s2ppYyQ6LbrAg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 6/8] KVM: arm64: Minimise EL2's exposure of host VGIC
- state during world switch
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260714101601.4142645-7-fuad.tabba@linux.dev>
-References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
- <20260714101601.4142645-7-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 11:53:31 +0000
-Message-Id: <20260714115332.1B2161F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hDiOD7Ts"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23F90497;
+	Tue, 14 Jul 2026 04:59:55 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E03D03F93E;
+	Tue, 14 Jul 2026 04:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784030399; bh=Vau5I2x8GnBbz9bN28WC5XKuZItIuXTZBRiRMAyopJc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hDiOD7TsElvLBUrXh3C69BLs3efiyfqZtMMmzqSnb4Awgt+4U4HiSuSRdS0JGnlPn
+	 1Y9cPWC7yJj4140hjBSnQwRjyiV5zEeioGzeUH+k7NI4WCBW35I2uyaBK5eSrfMfpM
+	 yrktwGjcnWu+i3FXHpAoC8D7M1fJWn7ZbdVx+jnA=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v4 0/6] KVM: arm64: nv: Implement nested stage-2 reverse map
+Date: Tue, 14 Jul 2026 12:59:19 +0100
+Message-ID: <20260714115926.2044757-1-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
+Hi,
 
-New issues:
-- [High] handle___vgic_v3_save_aprs erroneously overwrites the host's vgic_=
-vmcr with a stale EL2 value.
+This is v4 of optimizing the shadow s2 mmu unmapping during MMU
+notifiers. The general theme stays the same, but various
+improvements/fixes are added. Thanks for all the feedback. Please see
+below for the changes.
 
-Pre-existing issues:
-- [Critical] Incomplete fix leaves identical hypervisor memory corruption v=
-ulnerability in GICv5 hypercalls.
-- [Critical] The `handle___kvm_adjust_pc` hypercall blindly dereferences a =
-host-provided `vcpu` pointer via `kern_hyp_va()` without validation.
---
+* Changes from v3 [1]:
 
---- Patch [6]: [PATCH v5 6/8] KVM: arm64: Minimise EL2's exposure of host V=
-GIC state during world switch ---
-commit bad346f74febb306b17aa647c2da5c6747345fe8
-Author: Marc Zyngier <maz@kernel.org>
+  - Rebased on to the latest kvmarm/fixes.
 
-KVM: arm64: Minimise EL2's exposure of host VGIC state during world switch
+  - Removed commit "KVM: arm64: Move shadow_pt_debugfs_dentry to reduce
+    holes in kvm_s2_mmu" because the current shadow ptdump code is found
+    to be buggy and the proposed fix removes shadow_pt_debugfs_dentry [2].
 
-The host passes a vgic_v3_cpu_if pointer to the __vgic_v3_save_aprs and
-__vgic_v3_restore_vmcr_aprs hypercalls, which EL2 dereferences wholesale.
-This patch copies only vgic_vmcr and the active priority registers between
-EL2's hyp-side state and the host vCPU to minimise exposure.
+  - Rename some variables to improve readability e.g. ipa ->
+    canonical_ipa, fault_ipa -> nested_ipa.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 45d717889f6ea..f3233ee343a39 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-[ ... ]
-> @@ -508,16 +520,63 @@ static void handle___vgic_v3_init_lrs(struct kvm_cp=
-u_context *host_ctxt)
-> =20
->  static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
->  {
-> -	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
-> +	struct pkvm_hyp_vcpu *hyp_vcpu;
-> +	struct kvm_vcpu *host_vcpu;
-> =20
-> -	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-> +	host_vcpu =3D get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1,
-> +							   &hyp_vcpu);
-> +	if (!host_vcpu)
-> +		return;
-> +
-> +	if (unlikely(hyp_vcpu)) {
-> +		struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
-> +		int i;
-> +
-> +		hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-> +		__vgic_v3_save_aprs(hyp_cpu_if);
-> +
-> +		host_cpu_if =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
-> +		host_cpu_if->vgic_vmcr =3D hyp_cpu_if->vgic_vmcr;
+  - Skip reverse map optimization when !mmu->nested_stage2_enabled,
+    and just unmap the canonical IPA range during MMU notifiers.
 
-[Severity: High]
-Does this overwrite the host's vgic_vmcr with a stale EL2 value?
+  - Change comment above the code that checks whether an identical
+    reverse map already exists in kvm_record_nested_revmap() from saying
+    it could be a permission update to saying another parallel stage-2
+    fault could have inserted an identical reverse map. This is because
+    permission update won't trigger kvm_record_nested_revmap().
 
-When the guest performs an MMIO write to the GICv2 VMCR (emulated on a GICv3
-host), the trap is handled at EL1, updating
-host_vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr.
+  - Add helpers for checking maple tree entry flags VALID_ENTRY and
+    UNKNOWN_IPA, also warn if both are set at the same time.
 
-Later, if the vCPU is preempted or userspace schedules out,
-__vgic_v3_save_aprs is invoked. Because __vgic_v3_save_aprs() does not read
-VMCR from hardware, hyp_cpu_if->vgic_vmcr contains the stale value from the
-previous guest exit.
+  - Test canonical IPA alignment with the mapping size during reverse
+    map insertion.
 
-This would silently clobber and destroy the EL1's MMIO emulation updates.
+  - Move clean up of kvm_unmap_gfn_range() to its own patch.
 
-[ ... ]
+  - Avoid naming variables with "*dir*", as it can be misunderstood to
+    be related to directories.
 
-This is a pre-existing issue, but I noticed a similar pattern in
-handle___kvm_adjust_pc() in the same file:
+  - Use mas_find() instead of mas_find_range() as mas_find_range()
+    returns every range including empty/NULL ranges, for our use case
+    we only want to iterate over non-NULL ranges.
 
-arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___kvm_adjust_pc() {
-        ...
-        __kvm_adjust_pc(kern_hyp_va(vcpu));
-}
+  - Added a trace point to track when the reverse map maple tree becomes
+    "broken" i.e. maple tree insertion failure.
 
-[Severity: Critical]
-Could this allow an EL1 host to corrupt hypervisor memory?
+Thanks!
 
-An EL1 host can call the __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc hypercall
-and provide an arbitrary TTBR1 pointer. EL2's handle___kvm_adjust_pc()
-applies kern_hyp_va() without bounds-checking or validation.
+[1]: https://lore.kernel.org/kvmarm/20260510145338.322962-1-weilin.chang@arm.com/
+[2]: https://lore.kernel.org/kvmarm/20260630121005.1130996-1-weilin.chang@arm.com/
 
-When __kvm_adjust_pc() is executed:
+Wei-Lin Chang (6):
+  KVM: arm64: Use a variable for the canonical GPA in kvm_s2_fault_map()
+  KVM: arm64: nv: Avoid full shadow s2 unmap
+  KVM: arm64: nv: Add nested revmap broken tracepoint
+  KVM: arm64: Refactor kvm_unmap_gfn_range() with common variables
+  KVM: arm64: nv: Remove reverse map entries during TLBI handling
+  KVM: arm64: nv: Create nested IPA direct map to speed up reverse map
+    removal
 
-arch/arm64/kvm/hyp/exception.c:__kvm_adjust_pc() {
-        if (vcpu_get_flag(vcpu, PENDING_EXCEPTION)) {
-        ...
+ arch/arm64/include/asm/kvm_host.h   |   9 +
+ arch/arm64/include/asm/kvm_nested.h |   6 +
+ arch/arm64/kvm/mmu.c                |  42 +++--
+ arch/arm64/kvm/nested.c             | 280 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/sys_regs.c           |   3 +
+ arch/arm64/kvm/trace_arm.h          |  27 +++
+ 6 files changed, 349 insertions(+), 18 deletions(-)
 
-This dereferences the unvalidated pointer to read flags and modify memory,
-giving EL1 the ability to increment 64-bit values in EL2 memory.
+-- 
+2.43.0
 
-
-This is also a pre-existing issue, but a similar pattern remains in the
-GICv5 counterparts:
-
-arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_save_apr() {
-        ...
-        __vgic_v5_save_apr(kern_hyp_va(cpu_if));
-}
-
-arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_restore_vmcr_apr() {
-        ...
-        __vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
-}
-
-[Severity: Critical]
-Does this leave an identical memory corruption regression?
-
-An EL1 host can call these hypercalls with an arbitrary TTBR1 pointer,
-which is directly dereferenced without validation, leading to arbitrary
-memory read/write against EL2.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714101601.4142=
-645-1-fuad.tabba@linux.dev?part=3D6
