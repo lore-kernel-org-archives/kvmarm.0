@@ -1,49 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C249C35BDC7;
-	Tue, 14 Jul 2026 11:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6503E5EEE;
+	Tue, 14 Jul 2026 11:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784029369; cv=none; b=o62WX82GFlqzn8zLyRqZENmNGagDkm16wKILUyzT1BA408d+w9Sp4iiNw7FnmdcINo99/qdC9IsqnTnmoOxciZVojlgP0Dc1XUPhsykLcIYv42ZX61k2KwkhJzJN8JQ84pYfVOsur/9DE4IsZ3FVYjSPMHQo2hPqvJ4i4e4rBqc=
+	t=1784029539; cv=none; b=IYXskNT59TnzfIE0j0anLTdVpkQD3FybR6CFhiDeaZJi+KEVMo2c9qQCmzEtFk+ixX50jI34CXZCVa6DuUA0wRNnIJd7TqG6YWvh9PLs5jTyFQ30AtZWgT8PlIRy2Q34UqlfGAeeyt4AkOvvAvqXOnQwA8kSGjdHicMN8HApI0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784029369; c=relaxed/simple;
-	bh=mip6vOotjTeHeHFEye4+QF2YuUNXkW8bczYhq4JMfPc=;
+	s=arc-20240116; t=1784029539; c=relaxed/simple;
+	bh=fBVpdh3rsXHwBqtEJ2zKfACA4KEizfxpM5NCBzcP5vY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cPmDT0QNQBZOHpP4buih4lRKacyQauAyR1Yj2MbcmUrjg+gayN9NjI6XcEBl/Q856Ny3W32p1i8EPix3nEBupFFn6IvmxDeUyOUIdw7Y64Eq8auy82OkfbVb7AQnztfVep2bavJf4a7boXkSqW8U+BaghV6qODb1Ti+19dQ1rlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1PCKt0h; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=p2NBzBm92V+CSc41snwN3XIWKZJ043QcJ71Omb51HUg5ODAtChne9bq4qvxz+2uoHQusRce0k/YKXl6ezXR6Hmw3aYtAJr3rxincgkJJe90XtmFCRIxT8eL7c+ErS/82eUlani6H/qQOlz6Y5phqtI1CUcf67TWCbT57a7WAfDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYyK/rA5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1PCKt0h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59DBA1F000E9;
-	Tue, 14 Jul 2026 11:42:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYyK/rA5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A951F0155A;
+	Tue, 14 Jul 2026 11:45:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784029368;
-	bh=zzyHRR5TfMS1Y5/ZDt2g0bZikwaXGvPTL5IXvljBqq4=;
+	s=k20260515; t=1784029536;
+	bh=hdnDRynVsjFZmm5N9mp8p9XBLkvOBQQB67zloRfXPK4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=W1PCKt0hNROJ3VPfyiO7ay9EGoc10DpyXBHDIaX8lwjxVQxpLlC16NB1stPJjWiIz
-	 6ir//N+T4lgFSGNcpadqvgNaQQ6Ey72WJSLPrp3rNemUT0iZ1jjzvH3A+afT2Rvmzf
-	 /93EMeyjKa4iNZyfhU0EJLY8JzlW/Le4zzqMd+VHtRGr9POiR42/PIFlbaYA7foRry
-	 AoY7hDRoSkPD0HGLBPzgB2WrKUpvrEQSgU66mP+qXWTljif19tyuduCdkOZ2Sc0OZB
-	 Zk1gdr2bmJSXDskyf4Vvq60T3Vs0POX9AlKocdySgFezA+YXKk2VT6Fj3qY+7B01ZL
-	 wNPFV4wabeDaA==
+	b=eYyK/rA5bi3WdR7e49YSnotZ2FXEAt5E52KH+SzpvMFWYeKuVRnaM3vya704bhmZv
+	 U1nxMFhlmkXO4Xj/jKoxntjd0nzrhgafZy6IutsvWBPs5DvVAzZjbHWtTKgJ/Zqm0b
+	 6hu39ujo0lOtZ9AsXqz9y6owew5Dv7KLATyMTFEr3Ayeys6X4Ug3DYkSN9nSPERAAX
+	 wIOHZ5Q80YotnVPaaEQ7pxFH04zdhXL3mx3iDdxtBomeEskqzxBrmyo7O6paNadJS9
+	 +PZlo2Xn68nW1D6i2hvVkUu9qj8FvNQ/UXQ5OKapqTaUaZd6fVx5cpLWIUtsooW1da
+	 FwDCQJpQVBSqQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wjbXC-00000004reb-2Eay;
-	Tue, 14 Jul 2026 11:42:46 +0000
-Date: Tue, 14 Jul 2026 12:42:45 +0100
-Message-ID: <86y0fdokzu.wl-maz@kernel.org>
+	id 1wjbZu-00000004rk1-43gs;
+	Tue, 14 Jul 2026 11:45:35 +0000
+Date: Tue, 14 Jul 2026 12:45:34 +0100
+Message-ID: <86wluxokv5.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 15/28] arm64: Add ARM64_HAS_NV3 capability
-In-Reply-To: <20260714094001.676121F000E9@smtp.kernel.org>
+	kvmarm@lists.linux.dev,
+	"Oliver\
+ Upton" <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2 12/28] arm64: Add FEAT_NV2p1 detection
+In-Reply-To: <20260714094609.4ACD11F00A3E@smtp.kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-16-maz@kernel.org>
-	<20260714094001.676121F000E9@smtp.kernel.org>
+	<20260714091641.1970822-13-maz@kernel.org>
+	<20260714094609.4ACD11F00A3E@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,48 +56,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oupton@kernel.org, fuad.tabba@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 14 Jul 2026 10:40:00 +0100,
++ Fuad.
+
+On Tue, 14 Jul 2026 10:46:08 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] The newly added ARM64_HAS_NV3 capability lacks the required hardware detection logic, rendering it non-functional.
+> - [Medium] Missing immediate Context Synchronization Event (isb) after writing to control-plane system registers cnthctl_el2 and cntkctl_el1.
 > --
 > 
-> --- Patch [15]: [PATCH v2 15/28] arm64: Add ARM64_HAS_NV3 capability ---
-> commit 99ad2a0b713bc6373d924541643c7d6b05f45704
+> --- Patch [12]: [PATCH v2 12/28] arm64: Add FEAT_NV2p1 detection ---
+> commit e272e43dc6ce85d3337902d78430aad6bf5b83fc
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> arm64: Add ARM64_HAS_NV3 capability
+> KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
 > 
-> This commit adds the ARM64_HAS_NV3 capability ID to the cpucaps list. It is
-> intended to describe host support for FEAT_NV3 so that upcoming KVM code can
-> depend on it being detected.
+> This commit relaxes the handling of CNTHCTL_EL2 when FEAT_NV2p1 is present.
+> It removes the need for a split approach to access bits and instead relies
+> on the normal CNTKCTL_EL1 accessor.
 > 
-> > diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> > index 242dc211d8efa..7e0414509e89a 100644
-> > --- a/arch/arm64/tools/cpucaps
-> > +++ b/arch/arm64/tools/cpucaps
-> > @@ -52,6 +52,7 @@ HAS_LSUI
-> >  HAS_MOPS
-> >  HAS_NESTED_VIRT
-> >  HAS_NV2P1
-> > +HAS_NV3
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 4155fe89b58a1..db60facad9f3c 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+> >  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
+> >  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
+> >  
+> > -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
+> > -	sysreg_clear_set(cnthctl_el2, clr, set);
+> > +	/*
+> > +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
+> > +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
+> > +	 */
+> > +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
+> > +		sysreg_clear_set(cnthctl_el2, clr, set);
+> > +	else
+> > +		sysreg_clear_set(cntkctl_el1, clr, set);
 > 
 > [Severity: Medium]
-> Does this capability require a corresponding detection entry in the
-> arm64_features array located in arch/arm64/kernel/cpufeature.c?
-> 
-> Without an entry in the arm64_features array to perform the hardware
-> evaluation, the pointer in cpucap_ptrs for ARM64_HAS_NV3 remains NULL. 
-> Could this cause any subsequent code checking this capability to always
-> receive false, even on capable hardware?
+> Does this code need an immediate context synchronization event after writing
+> to these control-plane system registers?
 
-Yes, on purpose. See the followup patch adding the detection code once
-everything is in place.
+No.
+
+> 
+> Modifying cntkctl_el1 (and cnthctl_el2) via sysreg_clear_set() expands to a
+> conditional write_sysreg() without an immediate isb() barrier. The function
+> returns immediately after, which may allow intervening instructions to execute
+> with architecturally undefined pipeline state before a context synchronization
+> event occurs.
+> 
+> This path is reachable during normal VM execution when loading vCPU timer
+> state. While the cnthctl_el2 write is pre-existing, the cntkctl_el1 write
+> was newly introduced here, which could introduce a regression.
+
+No.
+
+Fuad, can we please either teach Sashiko about out of context register
+updates not immediate requiring synchronisation? The constant
+insistence on having ISBs all over the map is pushing people in doing
+the wrong thing.
+
+Thanks,
 
 	M.
 
