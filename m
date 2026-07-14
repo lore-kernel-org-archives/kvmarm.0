@@ -1,315 +1,188 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D263444717
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 14:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FE347CC6B;
+	Tue, 14 Jul 2026 14:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784038751; cv=none; b=SyA338YFsg6pnlMaiqGMcUKRPDnTwGlaP4zBJizaQzCV8E7z9OFJhPvadl2UBOf9CTEvCDEv+XPY73lWm3023KGP3pxVIwkgxt3c+nihqTx1bYBu0e7Udgokl/qVQ2PgcXQH0aLNxl5Nt0xzqG6m7QRFLvCniDDblVWYvgEYpq8=
+	t=1784038952; cv=none; b=NQbit/u8kovamwhGv7++KNKG7RLLJr/7n4xAItC1XIi1pvwz5lcKkEPOqksd57WFGi1IebwZBFSq5GJ9ZzxoSnU1zw9xS6QEsdRE9Xi8qexMtQ3SgvicIpbvIYB/uT8YfGwOkoQ0TLa0rzX8ybhi0tNMXShri+h6/rZ4gqWUfCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784038751; c=relaxed/simple;
-	bh=qcTExwdZJMkl7IJkTgsyhQKEVirNFDPTNGYLYDR+Rlk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=QqUMItN3IJLUv38xMd1d2B/Nu/G9J5543lft6qICOHC0oDL+fGrRUdF1ZoGNEvy5sDUK7+sBrixKP/sA30BD0X4BS8nVwuf1VuEYONqnvlGE/yYxDVA6AEWq6JYQjNkK+usKkeRxiuZF8Fj0XluvKfb/w4afu3UriT6QvlKg3bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PEVQ7Gwj; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784038952; c=relaxed/simple;
+	bh=pSujG4fpg3r88fOMWrnfYvAIeMhR212/tPgm/tOK+GI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IJNDAOFW0hW4KMoeIqZu24szcXHTpN82uyX5HYHLihzoiroh229wxSIABxQizduZVJWpAGwgeaHPAwNFklNlTUkcD9a5u+cx+KaemXLyPyxMk8UG5SjD2J3Akxv6xXnrQ+FVyZsQfU7C686kzPvdvActe1Timj1V7uIsrwSmCTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAQNYsQe; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PEVQ7Gwj"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 60EBA1DB5;
-	Tue, 14 Jul 2026 07:19:04 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BACE33F7B4;
-	Tue, 14 Jul 2026 07:19:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784038748; bh=qcTExwdZJMkl7IJkTgsyhQKEVirNFDPTNGYLYDR+Rlk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PEVQ7GwjsHfc9pxzl4HdZ2HlrG7yyLU//2MPscWIXxwWhuJNE0yIM4ch1W13LPY69
-	 O1j8q0bUuLe6O0Wzni8gSozYnadI7jpmbEv6upUyMBgCoJQlrQ5Qt+PsuSePjIZguO
-	 Ke5hWbPaq8OrMbM5zn1sjuokEtJpm+6yb9+xRywA=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer flush
-Date: Tue, 14 Jul 2026 15:19:01 +0100
-Message-ID: <alZFVPkS3lgGdruc@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <fa0839f9-7d83-4ad1-80e2-7e7dd0280222@huawei.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com> <20260709104026.2612599-6-zhengtian10@huawei.com> <alTw0nwiBDWoFrjB@LeoBrasDK> <9340fa94-6f26-4053-a4ca-0803af725936@huawei.com> <alYUXkub43YxkeH1@LeoBrasDK> <fa0839f9-7d83-4ad1-80e2-7e7dd0280222@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAQNYsQe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB98F1F000E9;
+	Tue, 14 Jul 2026 14:22:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784038950;
+	bh=+m2w/qHjZy2AWjFKd8uIdBkf4Yzja0dmBvbH2/OEILE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=HAQNYsQeCaKz2zqUbpjWVjQiTg4pcCVA5FkRRmglNAzjGoHffQmwQhGlKeEVw17oO
+	 GgDYK1BmK6McDNCAuISrFeGepV2siq77TN1z+jcoQvasQNsTW8qigcECl2vBI+B6Qe
+	 ioRplYqckXmwSKnbpbQSsWqFXP66SNN5T1/xOKFqugDFgXVElGbmUHLanCZQfZvmRB
+	 KF+xMelhu+hLTcmRUwr8CzYe28sFReItsFg7U1+pt38FmmWP/xlD3li4DbKPbC92KH
+	 yK9QrgH5oMUGgRB/Lj07oAXG4JISPEJ6hK1LxRP7gcuSCqzUofY6mA4CUclknU/Kdr
+	 /RcHI7MIMYL0w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wje1l-00000004wOU-0Ecn;
+	Tue, 14 Jul 2026 14:22:29 +0000
+Date: Tue, 14 Jul 2026 15:22:28 +0100
+Message-ID: <86qzl5odln.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
+In-Reply-To: <20260714095350.20AE91F00A3A@smtp.kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+	<20260714091641.1970822-11-maz@kernel.org>
+	<20260714095350.20AE91F00A3A@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jul 14, 2026 at 09:27:15PM +0800, Tian Zheng wrote:
+On Tue, 14 Jul 2026 10:53:49 +0100,
+sashiko-bot@kernel.org wrote:
 > 
-> On 7/14/2026 6:50 PM, Leonardo Bras wrote:
-> > On Tue, Jul 14, 2026 at 03:38:39PM +0800, Tian Zheng wrote:
-> > > On 7/13/2026 10:06 PM, Leonardo Bras wrote:
-> > > > On Thu, Jul 09, 2026 at 06:40:25PM +0800, Tian Zheng wrote:
-> > > > > From: eillon <yezhenyu2@huawei.com>
-> > > > > 
-> > > > > Add HDBSS fault handling for buffer full, external abort, and general
-> > > > > protection fault (GPF) events. When the HDBSS buffer becomes full,
-> > > > > the hardware traps to EL2 with an HDBSSF event, which is handled by
-> > > > > setting a flush request.
-> > > > > 
-> > > > > Add kvm_flush_hdbss_buffer() to consume HDBSS buffer entries and
-> > > > > propagate dirty information into the userspace-visible dirty bitmap.
-> > > > > Flush is triggered on vcpu_put, check_vcpu_requests, and
-> > > > > sync_dirty_log.
-> > > > > 
-> > > > > Add esr_iss2_is_hdbssf() helper for HDBSS fault detection in guest
-> > > > > abort handling.
-> > > > > 
-> > > > > Signed-off-by: Eillon <yezhenyu2@huawei.com>
-> > > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> > > > > ---
-> > > > >    arch/arm64/include/asm/esr.h           |  5 +++
-> > > > >    arch/arm64/include/asm/kvm_dirty_bit.h | 11 +++++
-> > > > >    arch/arm64/include/asm/kvm_host.h      |  1 +
-> > > > >    arch/arm64/kvm/arm.c                   | 14 ++++++
-> > > > >    arch/arm64/kvm/dirty_bit.c             | 62 ++++++++++++++++++++++++++
-> > > > >    arch/arm64/kvm/mmu.c                   |  4 ++
-> > > > >    6 files changed, 97 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > > > > index 81c17320a588..2e6b679b5908 100644
-> > > > > --- a/arch/arm64/include/asm/esr.h
-> > > > > +++ b/arch/arm64/include/asm/esr.h
-> > > > > @@ -437,6 +437,11 @@
-> > > > >    #ifndef __ASSEMBLER__
-> > > > >    #include <asm/types.h>
-> > > > > 
-> > > > > +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
-> > > > > +{
-> > > > > +	return ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF;
-> > > > This will return a long, which will be casted as bool.
-> > > > In general, what I see in the kernel is something like:
-> > > > 
-> > > > 	return !!(ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
-> > > 
-> > > ok!
-> > > 
-> > > 
-> > > > > +}
-> > > > > +
-> > > > >    static inline unsigned long esr_brk_comment(unsigned long esr)
-> > > > >    {
-> > > > >    	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
-> > > > > diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
-> > > > > index 84b12f0a10af..4b28000e972f 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_dirty_bit.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
-> > > > > @@ -10,7 +10,18 @@
-> > > > >    #include <asm/kvm_pgtable.h>
-> > > > >    #include <asm/sysreg.h>
-> > > > > 
-> > > > > +/* HDBSS entry field definitions */
-> > > > > +#define HDBSS_ENTRY_VALID	BIT(0)
-> > > > > +#define HDBSS_ENTRY_TTWL_SHIFT (1)
-> > > > > +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
-> > > > > +#define HDBSS_ENTRY_TTWL(x) \
-> > > > > +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
-> > > > > +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
-> > > > > +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
-> > > > > +
-> > > > >    int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
-> > > > >    void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
-> > > > > +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
-> > > > > +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
-> > > > > 
-> > > > >    #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
-> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > > > index c41ec6d9c45a..cecfb884a64f 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > > @@ -55,6 +55,7 @@
-> > > > >    #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
-> > > > >    #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
-> > > > >    #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
-> > > > > +#define KVM_REQ_FLUSH_HDBSS			KVM_ARCH_REQ(12)
-> > > > > 
-> > > > >    #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-> > > > >    				     KVM_DIRTY_LOG_INITIALLY_SET)
-> > > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > > index bf6688245d83..566953a4e23a 100644
-> > > > > --- a/arch/arm64/kvm/arm.c
-> > > > > +++ b/arch/arm64/kvm/arm.c
-> > > > > @@ -755,6 +755,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> > > > >    		kvm_vcpu_put_hw_mmu(vcpu);
-> > > > >    	kvm_arm_vmid_clear_active();
-> > > > > 
-> > > > > +	if (vcpu->kvm->arch.enable_hdbss)
-> > > > > +		kvm_flush_hdbss_buffer(vcpu);
-> > > > > +
-> > > > >    	vcpu_clear_on_unsupported_cpu(vcpu);
-> > > > >    	vcpu->cpu = -1;
-> > > > >    }
-> > > > > @@ -1157,6 +1160,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
-> > > > >    		if (kvm_dirty_ring_check_request(vcpu))
-> > > > >    			return 0;
-> > > > > 
-> > > > > +		if (kvm_check_request(KVM_REQ_FLUSH_HDBSS, vcpu))
-> > > > > +			kvm_flush_hdbss_buffer(vcpu);
-> > > > > +
-> > > > >    		check_nested_vcpu_requests(vcpu);
-> > > > >    	}
-> > > > > 
-> > > > > @@ -1971,7 +1977,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-> > > > > 
-> > > > >    void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
-> > > > >    {
-> > > > > +	/*
-> > > > > +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
-> > > > > +	 * before reporting dirty_bitmap to userspace. Send a request with
-> > > > > +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
-> > > > > +	 */
-> > > > > +	if (!kvm->arch.enable_hdbss)
-> > > > > +		return;
-> > > > > 
-> > > > > +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS | KVM_REQUEST_WAIT);
-> > > > >    }
-> > > > > 
-> > > > >    static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> > > > > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> > > > > index 6c7a6ef66b5a..002366337637 100644
-> > > > > --- a/arch/arm64/kvm/dirty_bit.c
-> > > > > +++ b/arch/arm64/kvm/dirty_bit.c
-> > > > > @@ -50,3 +50,65 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
-> > > > > 
-> > > > >    	vcpu->arch.hdbss.hdbssbr_el2 = 0;
-> > > > >    }
-> > > > > +
-> > > > > +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
-> > > > > +{
-> > > > > +	int idx, curr_idx;
-> > > > > +	u64 *hdbss_buf;
-> > > > > +	struct kvm *kvm = vcpu->kvm;
-> > > > > +
-> > > > > +	if (!kvm->arch.enable_hdbss)
-> > > > > +		return;
-> > > > > +
-> > > > > +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
-> > > > > +
-> > > > > +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
-> > > > > +	if (curr_idx == 0 || vcpu->arch.hdbss.hdbssbr_el2 == 0)
-> > > > > +		return;
-> > > > > +
-> > > > > +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
-> > > > > +	if (!hdbss_buf)
-> > > > > +		return;
-> > > > > +
-> > > > > +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
-> > > > > +	for (idx = 0; idx < curr_idx; idx++) {
-> > > > > +		u64 gpa;
-> > > > > +
-> > > > > +		gpa = hdbss_buf[idx];
-> > > > > +		if (!(gpa & HDBSS_ENTRY_VALID))
-> > > > > +			continue;
-> > > > > +
-> > > > > +		gpa &= HDBSS_ENTRY_IPA;
-> > > > > +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-> > > > You mention that it does not support dirty-ring, but above function will
-> > > > mark the page as dirty in the dirty-ring :/
-> > > > 
-> > > In kvm_arm_enable_hdbss_global(), we explicitly check and reject HDBSS
-> > > enablement if dirty-ring is active:
-> > > 
-> > > ```
-> > > if (kvm->dirty_ring_size)
-> > >      return 0;
-> > > ```
-> > > 
-> > > So when kvm_flush_hdbss_buffer() runs (which requires enable_hdbss = true),
-> > > we know for certain that
-> > > 
-> > > kvm->dirty_ring_size == 0. Therefore, kvm_vcpu_mark_page_dirty() will always
-> > > take the dirty_bitmap path,
-> > > 
-> > > never the dirty-ring path.
-> > > 
-> > > That said, I'll add a comment in kvm_flush_hdbss_buffer() before dirty ring
-> > > mode is supported, to make this explicit:
-> > > 
-> > > ```
-> > > /*
-> > >   * HDBSS is mutually exclusive with dirty-ring mode (see
-> > >   * kvm_arm_enable_hdbss_global()), so kvm_vcpu_mark_page_dirty()
-> > >   * will update the dirty_bitmap, not the dirty-ring.
-> > >   */
-> > > ```
-> > > 
-> > Got it :)
-> > 
-> > Out of curiosity: which issues have you found on supporting dirty-ring at
-> > this point?
-> > 
-> > Thanks!
-> > Leo
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Removing the split-state preservation for `CNTHCTL_EL2` on FEAT_NV2p1 systems permanently corrupts the guest's in-memory ECV bit and leaks host-specific trap overrides to userspace.
+> --
 > 
+> --- Patch [10]: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present ---
+> commit e272e43dc6ce85d3337902d78430aad6bf5b83fc
+> Author: Marc Zyngier <maz@kernel.org>
 > 
-> I haven't looked deeply into dirty-ring yet — my main concern is that if
-> both the dirty
+> KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
+>     
+> With NV2p1, it is no longer necessary to use the split approach
+> where bits of CNTHCTL_EL2 cannot be accessed via CNTKCTL_EL1,
+> and we can treat the CNTKCTL_EL1 accessor as if it was "normal".
 > 
-> ring and HDBSS buffer fill up, the flush path might get blocked or
-> complicated.
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 4155fe89b58a1..db60facad9f3c 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
 > 
-> For now, I'm planning to match the HDBSS buffer size to the dirty ring size
-> in v5 and test it.
+> [ ... ]
 > 
-> Ideally, the two buffers would be the same size, and the entire dirty
-> tracking path would use
+> > @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+> >  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
+> >  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
+> >  
+> > -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
+> > -	sysreg_clear_set(cnthctl_el2, clr, set);
+> > +	/*
+> > +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
+> > +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
+> > +	 */
+> > +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
+> > +		sysreg_clear_set(cnthctl_el2, clr, set);
+> > +	else
+> > +		sysreg_clear_set(cntkctl_el1, clr, set);
+> >  }
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > index 6f0f046e4ca4e..0c4ef1ce32ae7 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> 
+> [ ... ]
+> 
+> > @@ -69,11 +69,18 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+> >  		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
+> >  		 * the interesting CNTHCTL_EL2 bits live. So preserve these
+> >  		 * bits when reading back the guest-visible value.
+> > +		 *
+> > +		 * While NV2p1 fixes some of that, it makes CNTHCTL_EL2.ECV
+> > +		 * even more broken than it already was with NV2.
+> >  		 */
+> >  		val = read_sysreg_el1(SYS_CNTKCTL);
+> > -		val &= CNTKCTL_VALID_BITS;
+> > -		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=, ~CNTKCTL_VALID_BITS);
+> > -		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=, val);
+> > +		if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
+> > +			val &= CNTKCTL_VALID_BITS;
+> > +			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=, ~CNTKCTL_VALID_BITS);
+> > +			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=, val);
+> > +		} else {
+> > +			__vcpu_assign_sys_reg(vcpu, CNTHCTL_EL2, val);
+> > +		}
+> 
+> [Severity: High]
+> Does removing the split-state preservation for CNTHCTL_EL2 unconditionally
+> overwrite the guest's in-memory register state?
+
+How?
+
+> 
+> Since timer_set_traps() applies host-specific overrides to CNTKCTL_EL1 on the
+> host side, calling __vcpu_assign_sys_reg() here appears to blindly copy those
+> host-specific traps directly into the guest's architectural state on exit.
+
+No. CNTKCTL_EL1 is not CNTKCTL_EL12. Not only you don't understand NV,
+you don't even understand VHE.
+
 >
-
-Ah, I see the point.
-
-IIRC, when dirty-ring gets full, the kernel returns to userspace with 
-run->exit_reason == KVM_EXIT_DIRTY_RING_FULL, which will warn the VMM to 
-drain the dirty-ring, and that makes space for us draining HDBSS to the 
-dirty-ring again. 
-
-The best way to achieve that, as I remember, is to always drain 
-HDBSS as much as possible at guest_exitting. That will make more space to 
-newer HDBSS entries, and we can get userspace to drain the dirty-ring 
-earlier.
-
-I would say to even make HDBSS buffer half (entries) the dirty-ring. Then 
-we can generally fully drain to the dirty-ring and even report ring full 
-if the ring is above a given threshold percentage full.
- 
-> HDBSS exclusively — no fallback to the legacy dirty bitmap path. If that
-> works, I think this approach should be fine.
+> Furthermore, as the comment above notes that NV2p1 makes the ECV bit even more
+> broken, won't this assignment corrupt the guest's ECV state as well?
 > 
-> Let me know if you have any insights on dirty ring's full-buffer behavior —
-> that would be helpful.
+> >  	}
+> >  
+> >  	__vcpu_assign_sys_reg(vcpu, SP_EL2,	 read_sysreg(sp_el1));
 > 
+> [ ... ]
 > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 1dfc1f88bec82..9439c5b2b1fe8 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> 
+> [ ... ]
+> 
+> > @@ -322,8 +322,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
+> >  		switch (reg) {
+> >  		case CNTHCTL_EL2:
+> >  			val = read_sysreg_el1(SYS_CNTKCTL);
+> > -			val &= CNTKCTL_VALID_BITS;
+> > -			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
+> > +			if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
+> > +				val &= CNTKCTL_VALID_BITS;
+> > +				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
+> > +			}
+> >  			return val;
+> 
+> [Severity: High]
+> Does this directly return the host-polluted physical register to userspace
+> during KVM_GET_ONE_REG?
+> 
+> Because the host-specific overrides from timer_set_traps() are present in
+> CNTKCTL_EL1, skipping the bitmasking on ARM64_HAS_NV2P1 systems seems to leak
+> these hypervisor-specific configurations to userspace. This could break live
+> migration by restoring an altered execution environment.
 
-Will do!
+CNTKCTL_EL1 != CNTKCTL_EL12.
 
-Thanks!
-Leo
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
