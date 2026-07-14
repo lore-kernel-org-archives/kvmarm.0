@@ -1,129 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A3A35E1D3;
-	Tue, 14 Jul 2026 14:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5C326B2CE
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 14:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784038344; cv=none; b=UejDA82EXau0Cw43KocA3ESe4KaVdJKDXkKsNVr6iQY8Go5TRRNSN1BhgViqfVn2cFaqlwSlUHV2WXM4Uniz+PsZrS2pl0saQcR5ehNUhqY7v9o4yNTxYC3x/EvD5oCWawfc1N5XWAIU5K3xzrO5cyICHYHRxdtTG9jhziT1MDY=
+	t=1784038459; cv=none; b=MGbzrO0YSpxhwsqdVE7y6Njv5NxSpvm5cAPcdo4F5cIBY4W326NTj9Oyo5WcJmiotqCXupb459gNBI0yYPFbFnzolWS87VR6b2gIZnwmh8QHZ6gLUbW9PJAicrEdSW2khWiA78wrVaV47mO0pf/sCer2Zy9ZIn7gcUrAJ7+7Vec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784038344; c=relaxed/simple;
-	bh=aLyPVzhCOpxEYvqb+mdtt5+ZdV9EvzfsF8uBakUUHW0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GDS5cpX2Wm2GjP+98ZVi8FbhZtDirEA1sYGhvZcUi64Z8l6yVkRs9CPK4j3MS36u7tPVG1EAHj5sWx2tmIZF83cB9t1hDQ15LMbkNoVafqqXfsAlJjAkIT5547rCvFI5yEFwNqZgO3rg55Um2Hm7yOdg7AImpmLXxa36dwzsJC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7a3NiNh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784038459; c=relaxed/simple;
+	bh=BPIRB9Dd4cOslVY5PESm6bOvGNSOObw9pvt/3Q1F9Uw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lP/xEJyLSeYimrGerx1xyrQrkSePNSk5sQTWgOwoz0GG9eravBiETM1976YdbZSJM2IXE7WtLcc96Qss8NF4Y0Y3FyercYhwr1Pek/e/JCWwynCUwgsRAp3jLAMESxrgFZoyuveun/NLhE/kfw7wufSiU8l+x9xvs+q3p/kN3n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I/WC/u25; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7a3NiNh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6971F000E9;
-	Tue, 14 Jul 2026 14:12:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784038343;
-	bh=hNRmwdjWvBOciKRs4ryAEgtsV7SkVI3x2lqu3ub7VWM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=S7a3NiNhkCoB5S81qVFcNTN/3CfyXyUFG+Y2GyW1fh5N4yj3cXWTg84JmLK/ICLvq
-	 0l+aatEwDgQEQ9YVZiLSKh36PgXMwY166nXSgiVjaf4bC8TgtyauZ3/rHHvTva54kV
-	 WCVjMoQBk2LpdhHxi59dDlnzEvjtg/U3DZ4Ud94818y9mP15bKhG6NGiL/wKiiB1sP
-	 tocpVjVeZgb+7UaXKp04ZI0NHGS6uzNrluB0LkEvBGkuO4mD3q+wQ4zkn6NIznfx5V
-	 r9Kq2L906KfmdsBfqvPMZmZoy3S/WECb9PI+wHQ0beAEwndFHnoM6Nk35CSqXrMrAu
-	 YREP8onuq7KdQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wjdrx-00000004w2v-0hGd;
-	Tue, 14 Jul 2026 14:12:21 +0000
-Date: Tue, 14 Jul 2026 15:12:20 +0100
-Message-ID: <86se5loe2j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 09/28] KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present
-In-Reply-To: <20260714101236.905141F000E9@smtp.kernel.org>
-References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-10-maz@kernel.org>
-	<20260714101236.905141F000E9@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I/WC/u25"
+X-Forwarded-Encrypted: i=1; AHgh+Rr9KPqRPHV0OQ3XG4KqUbjyRogS5jpKbhuujseajfuStbXbkyIsRneqHIOZ2erw1lR3062owlk=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784038454;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BPIRB9Dd4cOslVY5PESm6bOvGNSOObw9pvt/3Q1F9Uw=;
+	b=I/WC/u253jc6TWHGnfW2Y25C3g5KpesjV5mp+JUwvWuan41t2ACRGjaYEXoBLpfyaqhoyZ
+	EXZ8hUlhqwCDdJ9Zce8QuwthqfXZjjbwHWWZ+yo8MIX6TuzvqykWdwMZOyihdhHzDQ1/HU
+	AAD7QtTluVK5cExSPZldGKhvDddfpBM=
+X-Gm-Message-State: AOJu0YyayAThFmsxOb3F6QBHYeHrWcjXx25QLN1eUiLUZqcp0+24eDDq
+	xQzMLEu45xp2tULU7dCdLLSyJgA3VxZUtIR6XNugQFcZf3QyrwqlE3G3amKk7JlNwSX7qF3w2U/
+	tVSQ7nfEmOqadnSzssDu2ZG5OWEiMOJtVAxsgUcOs
+X-Received: by 2002:a05:622a:11d1:b0:51a:72e5:9b2f with SMTP id
+ d75a77b69052e-51d7bd89849mr13077231cf.20.1784038433589; Tue, 14 Jul 2026
+ 07:13:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260714110756.116950-1-alexandru.elisei@arm.com>
+ <CA+EHjTxFAqO38zZNTM5oQ26X7eUcu3ggfhMY2gn2bB4sMbOxoQ@mail.gmail.com> <alY2e8bfsMDyI2QZ@raptor>
+In-Reply-To: <alY2e8bfsMDyI2QZ@raptor>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 14 Jul 2026 15:13:16 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwhYpC-fzXKr9J7015AwAtoHvnUqm31ockQMLjKM-fOoQ@mail.gmail.com>
+X-Gm-Features: AUfX_mzpDe5iSeTUKNhFhM8dxY-CxssfUNHFcChEyJoMZ4XDmFgf8k8egb_tvdk
+Message-ID: <CA+EHjTwhYpC-fzXKr9J7015AwAtoHvnUqm31ockQMLjKM-fOoQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Reject guest_memfd memslots when the VM has MTE
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	catalin.marinas@arm.com, will@kernel.org, steven.price@arm.com
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 14 Jul 2026 11:12:36 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Nested trap configuration for CPTR_EL2 is evaluated using a stale memory backing store under FEAT_NV2P1, breaking nested virtualization isolation.
-> --
-> 
-> --- Patch [9]: [PATCH v2 09/28] KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present ---
-> commit c67129a02beeb5d291611085a5d2f889ac9d97e8
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present
-> 
-> This patch relaxes the handling of CPTR_EL2 accesses via CPACR_EL1 when
-> FEAT_NV2P1 is present, stopping the trap of CPACR_EL1. It modifies the
-> read path to use the hardware SYS_CPACR_EL1 register instead of the
-> memory backing store for CPTR_EL2.
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 6b47d936efb32..1dfc1f88bec82 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -326,7 +326,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
-> >  			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> >  			return val;
-> >  		case CPTR_EL2:
-> > -			return __vcpu_sys_reg(vcpu, reg);
-> > +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> > +				return read_sysreg_el1(SYS_CPACR);
-> > +			else
-> > +				return __vcpu_sys_reg(vcpu, reg);
-> 
-> [Severity: High]
-> Since this changes CPTR_EL2 to be read directly from the hardware register
-> SYS_CPACR under FEAT_NV2P1 (as the memory backing store can be stale without
-> trapping), will direct readers of the backing store now read stale values?
-> 
-> For example, in arch/arm64/kvm/emulate-nested.c:get_behaviour():
-> 
->     val = __vcpu_sys_reg(vcpu, tb->index);
+On Tue, 14 Jul 2026 at 14:15, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi Fuad,
+>
+> On Tue, Jul 14, 2026 at 12:44:57PM +0100, Fuad Tabba wrote:
+> > Hi Alex,
+> >
+> > On Tue, 14 Jul 2026 at 12:08, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > >
+> > > The user cannot use MTE on VMAs created by mapping a guest_memfd file,
+> > > as arch_calc_vm_flag_bits() does not set VM_MTE_ALLOWED.
+> > >
+> > > When creating a guest_memfd backed memslot,
+> > > kvm_arch_prepare_memory_region() rejects the memslot if MTE is enabled for
+> > > the VM and if guest_memfd has been mapped in a VMA that intersects the
+> > > memslot.
+> > >
+> > > However, the documentation for KVM_SET_USER_MEMORY_REGION2 explicitly
+> >
+> > nit: s/explicitely/explicitly/
+>
+> I think that's what I wrote :)
 
-get_behaviour() is only called when a trap from L2 needs to be routed
-to L1. Therefore, the L1 registers cannot be resident at this point,
-and looking for them in memory is the right thing to do.
+I fixed the quoted text (pressing enter right after the word)! :) The
+original msg says `explicitely`
 
-> 
-> And in arch/arm64/kvm/emulate-nested.c:check_cptr_tta():
-> 
->     u64 val = __vcpu_sys_reg(vcpu, CPTR_EL2);
-> 
-> Because the L1 guest writes to CPACR_EL1 natively without trapping, the
-> backing store is not synchronously updated. If an L2 guest traps to host
-> KVM, wouldn't these functions evaluate trap configurations using the stale
-> memory backing store, potentially bypassing the L1 hypervisor's trap
-> configurations?
+It's a nit anyway.
 
-If running an L2, L1's view of CPTR_EL2 (which it accessed as
-CPACR_EL1) cannot be resident. Where would L2's accesses to CPACR_EL1
-go otherwise?
+> >
+> > > states that the only condition for userspace_addr is for it to be a legal
+> > > userspace address, but the mapping is not required to be valid nor
+> > > populated at memslot creation.
+> > >
+> > > If userspace sets userspace_addr to an address that hasn't been mapped, or
+> > > if userspace_addr belongs to a VMA that isn't backed by the guest_memfd
+> > > file, or if the VMA doesn't intersect the memslot, memslot creation is
+> > > successful and KVM ends up with a VM with MTE and guest_memfd-backed
+> > > memslots.
+> > >
+> > > Forbid guest_memfd memslots unconditionally when the VM has MTE to prevent
+> > > this from happening.
+> > >
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >
+> > Is this worth a Fixes: tag?
+>
+> Fixes: 32e200bd6e44 ("KVM: arm64: Enable support for guest_memfd backed memory")
+> ?
 
-You don't understand NV.
+Yes, the author of that patch should have known better...
 
-	M.
+<snip>
 
--- 
-Without deviation from the norm, progress is not possible.
+> I can iterate through all the memslots and check that none are backed by a
+> guest_memfd file when userspace enables the MTE capability.
+
+Sgtm.
+
+Cheers,
+/fuad
+
+> Will wait for a day or two to send v2.
+>
+> Thanks,
+> Alex
