@@ -1,150 +1,321 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C1128643A;
-	Tue, 14 Jul 2026 07:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1E83EEAE1
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 07:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784013810; cv=none; b=cH5zv556jSN+gxhx0HDWB/iB5jMSwd+EqLfCisp3i/l6yvTdnN5yxhDSKwYXsGQkpDYrcPrbqspAtGize7q3IQrVdA5nKycTZy3afg0Qn5BXXvr4RpQ71nJA8ZVE3UzsnQQ7N1PLezG8jqhh90zh80QwGP61wj3oTK1Jb5wy+xQ=
+	t=1784014731; cv=none; b=GKOjc1LEbQGw+yc1+kQ8XsrQCu0PCw8uWZruEO93c57GUVR0JH607OsPyu7xjrnEwH6CFUA5Xe/PjOe1h+o1xCa4Rl1yS5uY+1N4Ve4PR0zz3wQ81rIYn7T5rM26CsCFd/8Ejg0ub62bd4Im2+d+yi+ER8ejzQGVKcRnN9UoHw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784013810; c=relaxed/simple;
-	bh=T1OSjKj5i9KEF0TNvc+VtvmO3SLt6C5mEYVu0INrl8k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bdjkTLbBC71uCMfURpuU8QiUI+XpL+rf9zwoa/3wHslefMehtYMD5dERTDs7vtKZTJAGOHmwLc9MNCGqRtdbqpKayI18jFdnEdhs0WWvhC4U4kpiwt36zjYZAebFoy1vysjdmVpJiYGZNInr91NMefbvMfuGmVLyyEKlAGzcJh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KrUD7qAi; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784014731; c=relaxed/simple;
+	bh=d1Va0OuuwyneVmH5whKzMTOFWTvp3VajzT6XrlSnMO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AT7VmqdEY1yOkIB9Z3V5jQjNmPirVsyOMvEdS/z34DohDTIGkKkhRc4JKVlueWcUhRlcNgP0BTM5OFXZRuCfWOPnnNt8uhetAGLGcGTvsDztx1NNsvfG+ZWQEf0afMyPqq0aqTJA5J6iwEH/w9KHqSAD09TLf3NSxbz1551i9lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=suMbfSMS; arc=none smtp.client-ip=113.46.200.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KrUD7qAi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7072E1F000E9;
-	Tue, 14 Jul 2026 07:23:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784013809;
-	bh=DHMaA5fIY9CPD3euCNH1DVbe8+u3GtJConS0mtyirDE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KrUD7qAix+O1nnUiz5T1cKwig3QocEVMPuz5nExlA3jgejsewFnr7YeJIl+YwkOnW
-	 3zRSqHH951TNy2SeJoRkPNJlTMXEjh0l8iNsfYNuW147Y2Z8oRgXlojOjRRgpotg2v
-	 pvLMXuIffPDlcIevubp4kZtquq8gJs/mYfPELF51xibv7+HgIUkG+HPubq9BeSXr1V
-	 jsj3DbUuf8Kxwjty1gcma0qoXZzzRJn9tzOFYoZZpt1Wx1YRj+ulbLzz8e1IfMdKeu
-	 ZABBwL62TMSFY+/LOV6P5Y02pEIYzHG++zSIPwJmz/paAtnRwkDQxo2+PRQWvjl3LY
-	 QF9W3WrBZiu6Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wjXUF-00000004lba-0qk6;
-	Tue, 14 Jul 2026 07:23:27 +0000
-Date: Tue, 14 Jul 2026 08:23:26 +0100
-Message-ID: <86zezunifl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	<oupton@kernel.org>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>,
-	<yangjinqian1@huawei.com>,
-	<caijian11@h-partners.com>,
-	<liuyonglong@huawei.com>,
-	<yezhenyu2@huawei.com>,
-	<yubihong@huawei.com>,
-	<linuxarm@huawei.com>,
-	<joey.gouly@arm.com>,
-	<kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>,
-	<seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
-In-Reply-To: <8f949334-3ce7-44f4-b6da-f08a4126affd@huawei.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
-	<20260709104026.2612599-4-zhengtian10@huawei.com>
-	<alTJOy8Sv4aAp_9y@LeoBrasDK>
-	<8f949334-3ce7-44f4-b6da-f08a4126affd@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="suMbfSMS"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=/ynr5BYYuvAAGgFG1JBPJ8ExJe4Z1HS483Kq6s4O+1k=;
+	b=suMbfSMSr5eET3ZVh1FM9hAr5uqiOgk1m1xppsXwAY5IUm3NOxqF2FaoM91rALTLw309HWLrP
+	AmMuYk2c9Cv7Zo+mrPwgJOjZ6tcgUaZ0a1s428qhPDNg2q/KdO645k2eT/AgyInyWEQ0wQV4RkI
+	mfFQdB7idh+vCH5LSm1oSbA=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gzrY91gDKzpSvH;
+	Tue, 14 Jul 2026 15:29:49 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id DE52640538;
+	Tue, 14 Jul 2026 15:38:39 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 14 Jul 2026 15:38:39 +0800
+Message-ID: <9340fa94-6f26-4053-a4ca-0803af725936@huawei.com>
+Date: Tue, 14 Jul 2026 15:38:39 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zhengtian10@huawei.com, leo.bras@arm.com, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, yangjinqian1@huawei.com, caijian11@h-partners.com, liuyonglong@huawei.com, yezhenyu2@huawei.com, yubihong@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, seiden@linux.ibm.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer
+ flush
+To: Leonardo Bras <leo.bras@arm.com>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
+	<yangjinqian1@huawei.com>, <caijian11@h-partners.com>,
+	<liuyonglong@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
+ <20260709104026.2612599-6-zhengtian10@huawei.com>
+ <alTw0nwiBDWoFrjB@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <alTw0nwiBDWoFrjB@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On Tue, 14 Jul 2026 02:14:45 +0100,
-Tian Zheng <zhengtian10@huawei.com> wrote:
-> 
-> 
-> On 7/13/2026 7:17 PM, Leonardo Bras wrote:
-> > On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
-> >> The DBM (Dirty Bit Modifier) attribute, introduced in ARMv8.1, enables
-> >> hardware to automatically promote write-clean pages to write-dirty. This
-> >> prevents the guest from being trapped in EL2 due to missing write
-> >> permissions.
-> >> 
-> >> In this design, DBM is controlled by the page-table level flag
-> >> KVM_PGTABLE_S2_DBM rather than per-PTE software flags. DBM is
-> >> automatically set for writable non-device pages when the page-table has
-> >> KVM_PGTABLE_S2_DBM flag, which is determined at MMU init time based on
-> >> hardware capability.
-> >> 
-> >> The DBM bit is set in stage2_set_prot_attr() for initial mappings and
-> >> hugepage splitting, and directly manipulated in
-> >> kvm_pgtable_stage2_relax_perms() when removing write-protection. On
-> >> W->RO downgrade, DBM is cleared to prevent hardware from silently
-> >> upgrading RO+DBM back to W+dirty, which would bypass KVM's write
-> >> tracking.
-> >> 
-> >> kvm_pgtable_stage2_pte_prot() does not extract the DBM bit back into
-> >> enum kvm_pgtable_prot because DBM is a page-table policy determined by
-> >> pgt->flags, not a per-PTE property. Callers should check
-> >> pgt->flags & KVM_PGTABLE_S2_DBM instead.
-> >> 
-> >> This ensures DBM is consistently applied across all PTEs, including
-> >> during hugepage splitting where child PTEs inherit DBM from the parent
-> >> block entry via the pgt->flags mechanism.
-> >> 
-> >> Safety: DBM bit is only interpreted by hardware when VTCR_EL2.HD=1.
-> >> When HDBSS is not enabled (HD=0), ARM architecture guarantees hardware
-> >> completely ignores DBM bit in PTEs.
-> >> 
-> >> Co-developed-by: Eillon <yezhenyu2@huawei.com>
-> >> Signed-off-by: Eillon <yezhenyu2@huawei.com>
-> >> Co-developed-by: Leonardo Bras <leo.bras@arm.com>
-> >> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> > Hello Tian,
-> > 
-> > Have you added the above tags due to this patch being based on the below?
-> > https://lore.kernel.org/all/20260629111820.1873540-2-leo.bras@arm.com/
-> > 
-> > Thanks!
-> > Leo
-> 
-> Hi Leo,
-> 
-> 
-> Yes, I added your Signed-off-by because the DBM-related code in this patch
 
-You really can't do that. Only Leo can give his SoB, you can't forge
-it yourself.
-
+On 7/13/2026 10:06 PM, Leonardo Bras wrote:
+> On Thu, Jul 09, 2026 at 06:40:25PM +0800, Tian Zheng wrote:
+>> From: eillon <yezhenyu2@huawei.com>
+>>
+>> Add HDBSS fault handling for buffer full, external abort, and general
+>> protection fault (GPF) events. When the HDBSS buffer becomes full,
+>> the hardware traps to EL2 with an HDBSSF event, which is handled by
+>> setting a flush request.
+>>
+>> Add kvm_flush_hdbss_buffer() to consume HDBSS buffer entries and
+>> propagate dirty information into the userspace-visible dirty bitmap.
+>> Flush is triggered on vcpu_put, check_vcpu_requests, and
+>> sync_dirty_log.
+>>
+>> Add esr_iss2_is_hdbssf() helper for HDBSS fault detection in guest
+>> abort handling.
+>>
+>> Signed-off-by: Eillon <yezhenyu2@huawei.com>
+>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+>> ---
+>>   arch/arm64/include/asm/esr.h           |  5 +++
+>>   arch/arm64/include/asm/kvm_dirty_bit.h | 11 +++++
+>>   arch/arm64/include/asm/kvm_host.h      |  1 +
+>>   arch/arm64/kvm/arm.c                   | 14 ++++++
+>>   arch/arm64/kvm/dirty_bit.c             | 62 ++++++++++++++++++++++++++
+>>   arch/arm64/kvm/mmu.c                   |  4 ++
+>>   6 files changed, 97 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>> index 81c17320a588..2e6b679b5908 100644
+>> --- a/arch/arm64/include/asm/esr.h
+>> +++ b/arch/arm64/include/asm/esr.h
+>> @@ -437,6 +437,11 @@
+>>   #ifndef __ASSEMBLER__
+>>   #include <asm/types.h>
+>>
+>> +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+>> +{
+>> +	return ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF;
+> This will return a long, which will be casted as bool.
+> In general, what I see in the kernel is something like:
 >
-> is based on your implementation in:
-> 
-> https://lore.kernel.org/all/20260629111820.1873540-2-leo.bras@arm.com/
+> 	return !!(ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
 
-Then take the patch as is, and add to it as a separate patch. Or work
-out in private with Leo whether he's happy with a Co-dev. But never do
-that unilaterally.
 
-Thanks,
+ok!
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+>> +}
+>> +
+>>   static inline unsigned long esr_brk_comment(unsigned long esr)
+>>   {
+>>   	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+>> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+>> index 84b12f0a10af..4b28000e972f 100644
+>> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
+>> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+>> @@ -10,7 +10,18 @@
+>>   #include <asm/kvm_pgtable.h>
+>>   #include <asm/sysreg.h>
+>>
+>> +/* HDBSS entry field definitions */
+>> +#define HDBSS_ENTRY_VALID	BIT(0)
+>> +#define HDBSS_ENTRY_TTWL_SHIFT (1)
+>> +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
+>> +#define HDBSS_ENTRY_TTWL(x) \
+>> +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+>> +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+>> +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
+>> +
+>>   int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
+>>   void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+>> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+>> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
+>>
+>>   #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index c41ec6d9c45a..cecfb884a64f 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -55,6 +55,7 @@
+>>   #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+>>   #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+>>   #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+>> +#define KVM_REQ_FLUSH_HDBSS			KVM_ARCH_REQ(12)
+>>
+>>   #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>>   				     KVM_DIRTY_LOG_INITIALLY_SET)
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index bf6688245d83..566953a4e23a 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -755,6 +755,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>   		kvm_vcpu_put_hw_mmu(vcpu);
+>>   	kvm_arm_vmid_clear_active();
+>>
+>> +	if (vcpu->kvm->arch.enable_hdbss)
+>> +		kvm_flush_hdbss_buffer(vcpu);
+>> +
+>>   	vcpu_clear_on_unsupported_cpu(vcpu);
+>>   	vcpu->cpu = -1;
+>>   }
+>> @@ -1157,6 +1160,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>>   		if (kvm_dirty_ring_check_request(vcpu))
+>>   			return 0;
+>>
+>> +		if (kvm_check_request(KVM_REQ_FLUSH_HDBSS, vcpu))
+>> +			kvm_flush_hdbss_buffer(vcpu);
+>> +
+>>   		check_nested_vcpu_requests(vcpu);
+>>   	}
+>>
+>> @@ -1971,7 +1977,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+>>
+>>   void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>>   {
+>> +	/*
+>> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+>> +	 * before reporting dirty_bitmap to userspace. Send a request with
+>> +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
+>> +	 */
+>> +	if (!kvm->arch.enable_hdbss)
+>> +		return;
+>>
+>> +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS | KVM_REQUEST_WAIT);
+>>   }
+>>
+>>   static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+>> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+>> index 6c7a6ef66b5a..002366337637 100644
+>> --- a/arch/arm64/kvm/dirty_bit.c
+>> +++ b/arch/arm64/kvm/dirty_bit.c
+>> @@ -50,3 +50,65 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+>>
+>>   	vcpu->arch.hdbss.hdbssbr_el2 = 0;
+>>   }
+>> +
+>> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+>> +{
+>> +	int idx, curr_idx;
+>> +	u64 *hdbss_buf;
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +
+>> +	if (!kvm->arch.enable_hdbss)
+>> +		return;
+>> +
+>> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+>> +
+>> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+>> +	if (curr_idx == 0 || vcpu->arch.hdbss.hdbssbr_el2 == 0)
+>> +		return;
+>> +
+>> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
+>> +	if (!hdbss_buf)
+>> +		return;
+>> +
+>> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
+>> +	for (idx = 0; idx < curr_idx; idx++) {
+>> +		u64 gpa;
+>> +
+>> +		gpa = hdbss_buf[idx];
+>> +		if (!(gpa & HDBSS_ENTRY_VALID))
+>> +			continue;
+>> +
+>> +		gpa &= HDBSS_ENTRY_IPA;
+>> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+> You mention that it does not support dirty-ring, but above function will
+> mark the page as dirty in the dirty-ring :/
+>
+
+In kvm_arm_enable_hdbss_global(), we explicitly check and reject HDBSS 
+enablement if dirty-ring is active:
+
+```
+if (kvm->dirty_ring_size)
+     return 0;
+```
+
+So when kvm_flush_hdbss_buffer() runs (which requires enable_hdbss = 
+true), we know for certain that
+
+kvm->dirty_ring_size == 0. Therefore, kvm_vcpu_mark_page_dirty() will 
+always take the dirty_bitmap path,
+
+never the dirty-ring path.
+
+That said, I'll add a comment in kvm_flush_hdbss_buffer() before dirty 
+ring mode is supported, to make this explicit:
+
+```
+/*
+  * HDBSS is mutually exclusive with dirty-ring mode (see
+  * kvm_arm_enable_hdbss_global()), so kvm_vcpu_mark_page_dirty()
+  * will update the dirty_bitmap, not the dirty-ring.
+  */
+```
+
+
+>> +	}
+>> +
+>> +	/* reset HDBSS index */
+>> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+>> +	vcpu->arch.hdbss.hdbssprod_el2 = 0;
+>> +	isb();
+>> +}
+>> +
+>> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+>> +{
+>> +	u64 prod;
+>> +	u64 fsc;
+>> +
+>> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+>> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+>> +
+>> +	switch (fsc) {
+>> +	case HDBSSPROD_EL2_FSC_OK:
+>> +		/* Buffer full, set request to flush on next vcpu exit */
+>> +		kvm_make_request(KVM_REQ_FLUSH_HDBSS, vcpu);
+>> +		return 1;
+>> +	case HDBSSPROD_EL2_FSC_ExternalAbort:
+>> +	case HDBSSPROD_EL2_FSC_GPF:
+>> +		return -EFAULT;
+>> +	default:
+>> +		/* Unknown fault. */
+>> +		WARN_ONCE(1,
+>> +			  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
+>> +			  fsc, prod, vcpu->vcpu_id);
+>> +		return -EFAULT;
+>> +	}
+>> +}
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 83251d95bf3f..949fb895add6 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -2242,6 +2242,7 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+>>   }
+>>
+>>   /**
+>> +
+>>    * kvm_handle_guest_abort - handles all 2nd stage aborts
+>>    * @vcpu:	the VCPU pointer
+>>    *
+>> @@ -2279,6 +2280,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>>
+>>   	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+>>
+>> +	if (esr_iss2_is_hdbssf(esr))
+>> +		return kvm_handle_hdbss_fault(vcpu);
+>> +
+>>   	if (esr_fsc_is_translation_fault(esr)) {
+>>   		/* Beyond sanitised PARange (which is the IPA limit) */
+>>   		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+>> --
+>> 2.33.0
+>>
