@@ -1,145 +1,104 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DF6367F4A
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C249C35BDC7;
+	Tue, 14 Jul 2026 11:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784028028; cv=none; b=Sjv4k41jsUgywTra1KPIruO/EIVLPFDjZcwTdKDABh1ycuBJZgDBljpRNCI+2BQd/RBGQlH+C9lhs89/HWZus9ozGD0TaPqw4XxUrJKiwDXQkabZsVvaGJE15HFppqVh0Lma6/dmwTMyhI/k1LckWKpLlxmlRi9yhF9yp0g5JL0=
+	t=1784029369; cv=none; b=o62WX82GFlqzn8zLyRqZENmNGagDkm16wKILUyzT1BA408d+w9Sp4iiNw7FnmdcINo99/qdC9IsqnTnmoOxciZVojlgP0Dc1XUPhsykLcIYv42ZX61k2KwkhJzJN8JQ84pYfVOsur/9DE4IsZ3FVYjSPMHQo2hPqvJ4i4e4rBqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784028028; c=relaxed/simple;
-	bh=WOrw5qkPzB9oBFNLNJC9BzO5cCVnCxgoXPquHjdt+Wo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R4O4ykxZyeBuWFQhRKMDn/BdnsQRNntbkhHaZTMxE7mqF0Iy1UXWR+4aKTlZM1liAtfq5EvVoZXcwaCvIo9cYJISh7hlRrC3/fckYSvJJFccGu1rzWwk/xVUMmfiX9pqxHEIX8J7d2gh67XVS5NxTc2VzP6OS4R8jF4ea8rtnKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ppYj2fDR; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784029369; c=relaxed/simple;
+	bh=mip6vOotjTeHeHFEye4+QF2YuUNXkW8bczYhq4JMfPc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cPmDT0QNQBZOHpP4buih4lRKacyQauAyR1Yj2MbcmUrjg+gayN9NjI6XcEBl/Q856Ny3W32p1i8EPix3nEBupFFn6IvmxDeUyOUIdw7Y64Eq8auy82OkfbVb7AQnztfVep2bavJf4a7boXkSqW8U+BaghV6qODb1Ti+19dQ1rlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1PCKt0h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ppYj2fDR"
-X-Gm-Message-State: AOJu0YygwRNFLwIMGlI4kOQjTee7I+g8NK5WJvznFMgZ6nHqVpEZnWdk
-	XUI0Yy09WxBYplKEAjGf+cm/Ub6O+UL263tIkH1rBGyncK7A9vl+gkyBvdsPQ1jK5YosT4utCCA
-	hyjZmxbPFTQEmr46z2/Hc16D+UKQjZGV8jRV3oU+I
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784028024;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jmFzw5bK929H9HFeKxXeNcRuvnnjQishKFDcT6QYAsc=;
-	b=ppYj2fDRP2GLE/yuSB8MJpCL5Oiad0m0tQc+JlgQy/pxEjHEIMFkjy9bzdIt/Od/wjIEXB
-	VRrxhNk15pbtMf98nbW2VkjgCUbDLdymVtg6QdNgvv3DXzR6bfCoK1cVE3xo18ych6ehy3
-	+c0BF9X7rMFjw9gRtcfO0zNtsGgLYPY=
-X-Received: by 2002:ac8:5cc6:0:b0:51b:fd5e:e81a with SMTP id
- d75a77b69052e-51d7c6a88e1mr14320221cf.20.1784028017417; Tue, 14 Jul 2026
- 04:20:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1PCKt0h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59DBA1F000E9;
+	Tue, 14 Jul 2026 11:42:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784029368;
+	bh=zzyHRR5TfMS1Y5/ZDt2g0bZikwaXGvPTL5IXvljBqq4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=W1PCKt0hNROJ3VPfyiO7ay9EGoc10DpyXBHDIaX8lwjxVQxpLlC16NB1stPJjWiIz
+	 6ir//N+T4lgFSGNcpadqvgNaQQ6Ey72WJSLPrp3rNemUT0iZ1jjzvH3A+afT2Rvmzf
+	 /93EMeyjKa4iNZyfhU0EJLY8JzlW/Le4zzqMd+VHtRGr9POiR42/PIFlbaYA7foRry
+	 AoY7hDRoSkPD0HGLBPzgB2WrKUpvrEQSgU66mP+qXWTljif19tyuduCdkOZ2Sc0OZB
+	 Zk1gdr2bmJSXDskyf4Vvq60T3Vs0POX9AlKocdySgFezA+YXKk2VT6Fj3qY+7B01ZL
+	 wNPFV4wabeDaA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wjbXC-00000004reb-2Eay;
+	Tue, 14 Jul 2026 11:42:46 +0000
+Date: Tue, 14 Jul 2026 12:42:45 +0100
+Message-ID: <86y0fdokzu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 15/28] arm64: Add ARM64_HAS_NV3 capability
+In-Reply-To: <20260714094001.676121F000E9@smtp.kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+	<20260714091641.1970822-16-maz@kernel.org>
+	<20260714094001.676121F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
- <20260714101601.4142645-3-fuad.tabba@linux.dev> <20260714104344.615DA1F00A3E@smtp.kernel.org>
-In-Reply-To: <20260714104344.615DA1F00A3E@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 14 Jul 2026 12:19:40 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw5H7zJSuvWhbAYpnuy0ByG1j3RWfSWRRs_tRfY7F98vQ@mail.gmail.com>
-X-Gm-Features: AUfX_mz_vzWbO-_sHqGhxx3rD9jTsIh6c9xeT2ohmEmGvcHrpTax4TWHK2rpQI8
-Message-ID: <CA+EHjTw5H7zJSuvWhbAYpnuy0ByG1j3RWfSWRRs_tRfY7F98vQ@mail.gmail.com>
-Subject: Re: [PATCH v5 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg
- available to HYP code
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 14 Jul 2026 at 11:43, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Low] The WARN_ON_ONCE checks in __vcpu_read_sysreg_vhe and __vcpu_writ=
-e_sysreg_vhe contain impossible conditions.
+On Tue, 14 Jul 2026 10:40:00 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] The newly added ARM64_HAS_NV3 capability lacks the required hardware detection logic, rendering it non-functional.
 > --
+> 
+> --- Patch [15]: [PATCH v2 15/28] arm64: Add ARM64_HAS_NV3 capability ---
+> commit 99ad2a0b713bc6373d924541643c7d6b05f45704
+> Author: Marc Zyngier <maz@kernel.org>
+> 
+> arm64: Add ARM64_HAS_NV3 capability
+> 
+> This commit adds the ARM64_HAS_NV3 capability ID to the cpucaps list. It is
+> intended to describe host support for FEAT_NV3 so that upcoming KVM code can
+> depend on it being detected.
+> 
+> > diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> > index 242dc211d8efa..7e0414509e89a 100644
+> > --- a/arch/arm64/tools/cpucaps
+> > +++ b/arch/arm64/tools/cpucaps
+> > @@ -52,6 +52,7 @@ HAS_LSUI
+> >  HAS_MOPS
+> >  HAS_NESTED_VIRT
+> >  HAS_NV2P1
+> > +HAS_NV3
+> 
+> [Severity: Medium]
+> Does this capability require a corresponding detection entry in the
+> arm64_features array located in arch/arm64/kernel/cpufeature.c?
+> 
+> Without an entry in the arm64_features array to perform the hardware
+> evaluation, the pointer in cpucap_ptrs for ARM64_HAS_NV3 remains NULL. 
+> Could this cause any subsequent code checking this capability to always
+> receive false, even on capable hardware?
 
-That WARN_ON_ONCE() is unchanged from the current
-vcpu_read_sys_reg()/vcpu_write_sys_reg() in mainline; this patch only
-renames them, no functional change. It's now unreachable via the
-wrapper, but since the patch exports the symbol it still guards a
-direct non-VHE caller. I'd keep it and remove it in a separate patch
-after this series if we decide it's worth it.
+Yes, on purpose. See the followup patch adding the detection code once
+everything is in place.
 
-/fuad
+	M.
 
-> --- Patch [2]: [PATCH v5 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg =
-available to HYP code ---
-> commit fbd97ecacd267a88fbcb547ae114d7b3bbe56fb4
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
->
-> This patch renames the host-only implementations to
-> __vcpu_{read,write}_sysreg_vhe() and turns vcpu_{read,write}_sys_reg() in=
-to
-> context-dispatching wrappers. This allows helpers built on them to be sha=
-red
-> with hyp code.
->
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 08ba882799d48..c6a416974a61f 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -291,7 +291,7 @@ static void write_sr_to_cpu(enum vcpu_sysreg reg, u=
-64 val)
-> >       }
-> >  }
-> >
-> > -u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg re=
-g)
-> > +u64 __vcpu_read_sysreg_vhe(const struct kvm_vcpu *vcpu, enum vcpu_sysr=
-eg reg)
-> >  {
-> >       struct sr_loc loc =3D {};
-> >
->
-> [Severity: Low]
-> Since the new vcpu_read_sys_reg() wrapper in kvm_emulate.h explicitly che=
-cks
-> has_vhe(), does this make the WARN_ON_ONCE(!has_vhe() ...) check inside t=
-his
-> function dead code?
->
-> Specifically, just below this declaration:
->
->         locate_register(vcpu, reg, &loc);
->         WARN_ON_ONCE(!has_vhe() && loc.loc !=3D SR_LOC_MEMORY);
->
-> Is it worth removing the check now that the caller guarantees has_vhe()
-> is true?
->
-> [ ... ]
->
-> > @@ -338,7 +338,7 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, =
-enum vcpu_sysreg reg)
-> >       return __vcpu_sys_reg(vcpu, reg);
-> >  }
-> >
-> > -void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysr=
-eg reg)
-> > +void __vcpu_write_sysreg_vhe(struct kvm_vcpu *vcpu, u64 val, enum vcpu=
-_sysreg reg)
-> >  {
-> >       struct sr_loc loc =3D {};
-> >
->
-> [Severity: Low]
-> Similarly, does the WARN_ON_ONCE(!has_vhe() ...) check inside this functi=
-on
-> become unreachable now that the wrapper only calls this when has_vhe()
-> is true?
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714101601.41=
-42645-1-fuad.tabba@linux.dev?part=3D2
+-- 
+Without deviation from the norm, progress is not possible.
