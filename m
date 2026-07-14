@@ -1,32 +1,32 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F053366DA3
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33843365A03
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784024216; cv=none; b=thKDxcSvFfUpsANRpyLA8Q65uwM7rmiAXL9w0GoBw9YoYHYGKeW8BW7oN/tdbAOfaZsiy2ZO2Jw9KIJX5kPwrW1e8Id6SiiZ1jxj6UFComYhzAlvR6+Ec2Ypu5tUTk33ylk2vyOah8Yix7Qi649lsFF6r8QhMBDpZCeOOJJ070w=
+	t=1784024216; cv=none; b=mZb8+qLqTTIyNOoWgIchrRH3YH2OLGZTVlYnu/kzwKbVokDgEEHN75FkhSjH5h9QS9cUh1dxLcRfoxZK3RomjBa4flvDHA6IrGkCYVhi39DD7nxvStE4Hz6HuI7WlpgSB2FhhMsVb1xjh7QLXYbi04r4AGTcQ/4bDfyEZcCaFiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784024216; c=relaxed/simple;
-	bh=fZBm9U49NriW6i5YLhn3zhSRCOjztPWLyDa0JgPgYNY=;
+	bh=h8bGkvVSgaFGg0a8ROSm/bYwk4LcvU0kTIHFxDd0kCw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=INlM9sZweTEeMzcRrEwdFYe+/yMYU+sLkKP+onsmo8xjbfdM3P9i+WtOL6CQV7foO8D1ahbHzXjxk9uSthqg5lvJLtK4sqVRRxqly/CpW3RW6064nR3jhBvKtAmM/jZnGWFf3sxkYAzLkH2xGFaWLsOWeynhi8QbRQGbt0yPDZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IEREiKQ8; arc=none smtp.client-ip=91.218.175.182
+	 MIME-Version; b=h7ylGqYuuBTOn+qVz6InnoqNMZBHJneaNd3G8gBgEEmfvyPlsvC+Oy4G10b7FDkYay0OnR4aLuJXrSp2uKXOOsh7K6oatMyCd3QWDBb8VuDpj9+5e/9fae4SxmmSNGEfrNoCZrOA+bLhbT9+wFstyTaPQTgfTDNULucSeHXAZhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S34prvk9; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IEREiKQ8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S34prvk9"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784024211;
+	t=1784024209;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UPa4aylWgI5AC08JpsSdo1aaI++VFHxt+8yeLWVTzSI=;
-	b=IEREiKQ8vzXfvXvn1ISWOsSmfPoYkjTZuLWUBBVvDcujFYRhJkQRr9jaIIKQysSmqdQ6QU
-	eb2vGML/NTvQcCwmbFRCfAdQsA0MkCZBCF5rx8JLpj9XBUpBBwBHa0UCzDtqsoiRTl1UwI
-	yo10efVG4ML6f6aTnufAni0+Rh92PyI=
+	bh=0lRjC8sbxSnb8bmyPxIrTX3A1cB87UfAbp+R6QRvhw8=;
+	b=S34prvk9NkJYEqztj9FBQtP9Pzyrf4dWRUm19c0Cj2tzdMHeYKLEYyblT8eFoEJDwm7yqD
+	s84RJuUYoGXzsi0waiHriWX7O1lq3n2Yc/gIydRt3pwJqWm+CgLYtu+8bNC4H1M4bMOOA6
+	slcuuxsuBNCWEPZQJl6BKi+VI0pDKfc=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v5 7/8] KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
-Date: Tue, 14 Jul 2026 11:16:00 +0100
-Message-Id: <20260714101601.4142645-8-fuad.tabba@linux.dev>
+Subject: [PATCH v5 6/8] KVM: arm64: Minimise EL2's exposure of host VGIC state during world switch
+Date: Tue, 14 Jul 2026 11:15:59 +0100
+Message-Id: <20260714101601.4142645-7-fuad.tabba@linux.dev>
 In-Reply-To: <20260714101601.4142645-1-fuad.tabba@linux.dev>
 References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -60,116 +60,122 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Marc Zyngier <maz@kernel.org>
 
-pKVM performs its own world switch for protected VMs but has no
-primitives to move the per-vCPU VGIC state between the host and
-hypervisor vCPU contexts.
+The host passes a vgic_v3_cpu_if pointer to the __vgic_v3_save_aprs and
+__vgic_v3_restore_vmcr_aprs hypercalls, which EL2 dereferences
+wholesale. That exposes the host's full VGIC emulation state to the
+hypervisor, against pKVM's isolation goals.
 
-Add flush_hyp_vgic_state() and sync_hyp_vgic_state(). Flush copies
-vgic_hcr, the in-use list registers and used_lrs from the host into the
-hyp vCPU and pins vgic_sre to a fixed value; sync copies vgic_hcr,
-vgic_vmcr and the in-use list registers back. The active priority
-registers are handled separately by the save/restore-aprs path.
-
-Bound used_lrs by hyp_gicv3_nr_lr, the cached implemented-LR count,
-instead of reading ICH_VTR_EL2 on each entry. That clamps the
-host-supplied value and avoids a per-entry sysreg read that is costly
-under NV.
+Recover the host vCPU from the supplied cpu_if via container_of() and
+copy only vgic_vmcr and the active priority registers between EL2's
+hyp-side state and the host vCPU, so EL2 no longer dereferences the
+host's vgic_v3_cpu_if directly.
 
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 55 ++++++++++++++++++++++--------
- 1 file changed, 41 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 67 ++++++++++++++++++++++++++++--
+ 1 file changed, 63 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f3233ee343a39..2db56146ec493 100644
+index 45d717889f6ea..f3233ee343a39 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -104,6 +104,45 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
- }
+@@ -7,6 +7,8 @@
+ #include <hyp/adjust_pc.h>
+ #include <hyp/switch.h>
  
-+static void flush_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
-+	unsigned int used_lrs, i;
++#include <linux/irqchip/arm-gic-v3.h>
 +
-+	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+ #include <asm/pgtable-types.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+@@ -239,6 +241,16 @@ static struct kvm_vcpu *__get_host_hyp_vcpus(struct kvm_vcpu *arg,
+ 		__get_host_hyp_vcpus(__vcpu, hyp_vcpup);		\
+ 	})
+ 
++#define get_host_hyp_vcpus_from_vgic_v3_cpu_if(ctxt, regnr, hyp_vcpup)		\
++	({									\
++		DECLARE_REG(struct vgic_v3_cpu_if *, cif, ctxt, regnr);\
++		struct kvm_vcpu *__vcpu = container_of(cif,			\
++						       struct kvm_vcpu,		\
++						       arch.vgic_cpu.vgic_v3);	\
++										\
++		__get_host_hyp_vcpus(__vcpu, hyp_vcpup);			\
++	})
 +
-+	used_lrs	= host_cpu_if->used_lrs;
-+	used_lrs	= min(used_lrs, hyp_gicv3_nr_lr);
-+
-+	hyp_cpu_if->vgic_hcr	= host_cpu_if->vgic_hcr;
-+	/* Should be a one-off */
-+	hyp_cpu_if->vgic_sre	= (ICC_SRE_EL1_DIB |
-+				   ICC_SRE_EL1_DFB |
-+				   ICC_SRE_EL1_SRE);
-+	hyp_cpu_if->used_lrs	= used_lrs;
-+
-+	for (i = 0; i < used_lrs; i++)
-+		hyp_cpu_if->vgic_lr[i] = host_cpu_if->vgic_lr[i];
-+}
-+
-+static void sync_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *host_cpu_if, *hyp_cpu_if;
-+	unsigned int i;
-+
-+	host_cpu_if	= &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	hyp_cpu_if	= &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-+
-+	host_cpu_if->vgic_hcr = hyp_cpu_if->vgic_hcr;
-+	host_cpu_if->vgic_vmcr = hyp_cpu_if->vgic_vmcr;
-+
-+	for (i = 0; i < hyp_cpu_if->used_lrs; i++)
-+		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
-+}
-+
- static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
  {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-@@ -152,13 +191,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
+@@ -508,16 +520,63 @@ static void handle___vgic_v3_init_lrs(struct kvm_cpu_context *host_ctxt)
  
- 	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
- 
--	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
--
--	/* Bound used_lrs by the number of implemented list registers. */
--	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs =
--		min_t(unsigned int,
--		      hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3.used_lrs,
--		      hyp_gicv3_nr_lr);
-+	flush_hyp_vgic_state(hyp_vcpu);
- 
- 	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
- }
-@@ -166,9 +199,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
  {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
--	struct vgic_v3_cpu_if *hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
--	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
--	unsigned int i;
+-	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++	struct kvm_vcpu *host_vcpu;
  
- 	fpsimd_sve_sync(&hyp_vcpu->vcpu);
- 	sync_debug_state(hyp_vcpu);
-@@ -181,10 +211,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 
- 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
- 
--	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
--	host_cpu_if->vgic_vmcr		= hyp_cpu_if->vgic_vmcr;
--	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
--		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
-+	sync_hyp_vgic_state(hyp_vcpu);
+-	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
++	host_vcpu = get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1,
++							   &hyp_vcpu);
++	if (!host_vcpu)
++		return;
++
++	if (unlikely(hyp_vcpu)) {
++		struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
++		int i;
++
++		hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
++		__vgic_v3_save_aprs(hyp_cpu_if);
++
++		host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
++		host_cpu_if->vgic_vmcr = hyp_cpu_if->vgic_vmcr;
++		for (i = 0; i < ARRAY_SIZE(host_cpu_if->vgic_ap0r); i++) {
++			host_cpu_if->vgic_ap0r[i] = hyp_cpu_if->vgic_ap0r[i];
++			host_cpu_if->vgic_ap1r[i] = hyp_cpu_if->vgic_ap1r[i];
++		}
++	} else {
++		__vgic_v3_save_aprs(&host_vcpu->arch.vgic_cpu.vgic_v3);
++	}
  }
  
- static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
+ static void handle___vgic_v3_restore_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
+ {
+-	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++	struct kvm_vcpu *host_vcpu;
+ 
+-	__vgic_v3_restore_vmcr_aprs(kern_hyp_va(cpu_if));
++	host_vcpu = get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1,
++							   &hyp_vcpu);
++	if (!host_vcpu)
++		return;
++
++	if (unlikely(hyp_vcpu)) {
++		struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
++		int i;
++
++		hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
++		host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
++
++		hyp_cpu_if->vgic_vmcr = host_cpu_if->vgic_vmcr;
++		/* Should be a one-off */
++		hyp_cpu_if->vgic_sre = (ICC_SRE_EL1_DIB |
++					ICC_SRE_EL1_DFB |
++					ICC_SRE_EL1_SRE);
++		for (i = 0; i < ARRAY_SIZE(host_cpu_if->vgic_ap0r); i++) {
++			hyp_cpu_if->vgic_ap0r[i] = host_cpu_if->vgic_ap0r[i];
++			hyp_cpu_if->vgic_ap1r[i] = host_cpu_if->vgic_ap1r[i];
++		}
++
++		__vgic_v3_restore_vmcr_aprs(hyp_cpu_if);
++	} else {
++		__vgic_v3_restore_vmcr_aprs(&host_vcpu->arch.vgic_cpu.vgic_v3);
++	}
+ }
+ 
+ static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
 -- 
 2.39.5
 
