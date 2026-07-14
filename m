@@ -1,105 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835CD1F3BA4;
-	Tue, 14 Jul 2026 10:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEA32FF147
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 10:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784024161; cv=none; b=AzX1ScwWMJmyoPxrQuVB021TPqT8erxbbUMqiaJg9c/gme9WU3SiibZTJc1X4YhoE93XlQE0uzF/3DaFSa2H6NWD+8/VwnLXkIIbQzcAwB0Y5xze9yY8mNLevHtMeAFGHtIbQW7bXBYBXTdJIW9y1X9EkZYMFMyuNazq4TKkd7s=
+	t=1784024201; cv=none; b=Cb5ji/4/ftf+8NKL3GTXUxdIyLGjnLK1XkGwNa2WU1M388WSx459XN6uVT+cBKFKc4PhuswYby7A0bTGssLeuUGizJhwi3kzO/phbyvUGgEiXt7UoZ4Ib/VVyDci6/j0BFvQSE5V3Sen7eJi3n648xsl8MMnz0xaH9EYEHz9nP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784024161; c=relaxed/simple;
-	bh=JnCno2jxTXkQUe36GoS6ojc79zXls/o7MWA1gsEGIdg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=bsTQxAAO6HVs+ViZJyPWgM2GY280KlDslShmnYGjL8HYTVeYpOuPqU51R/CYROHq+/eFDM1DK7WAFvG9NN4lC9x0C6zXIgWNSzVzkaGXwrVeJUSp7Xo8d+2bnSi63yb9ORD9CLO06cvjvKhGq5nShB4ZXBIMEtaj45Ak9eje58Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZRYSMrN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784024201; c=relaxed/simple;
+	bh=uxgtveE3/w1nMLAg4CqNI1BwRhJgSJXZTcbJlghYN78=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s63hRNmqSOBGHtIMzlLc6lyI0Hu4gkt794MhYhFw9LfxdYoQcYK4S1QWYqrExgJaOXlhgoESKAM2VK4AQwBcB+98Bhyy06mUI5CriBqhv/tvRU7AmQbe2XMZDFxgIQvj6zOSrbpnKZYeBpb3IBLXbCw13S5H+PoTuuFAEGpylsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S+q/f9eK; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZRYSMrN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C60F61F000E9;
-	Tue, 14 Jul 2026 10:15:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784024160;
-	bh=Wy0KY8YHux+fWBHAz5oVfuomfaYqKA+n+KXUr57piIQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QZRYSMrNMsH4sv45VWSWoSDsEI3bqsxlD8isnqyv0wJWV3OA1nHVEuHOn27PkX5+2
-	 R10iwGIzvY3YVF/asxhTQXdm606ccWemkUahR5SEpxt8wHCZJfwly6TKai2SjsRtDK
-	 hxoYm9P8l+t94pQWVzKbGUQ2Hq3YurAzvxHqGV9ZiOx2st3ZDl+1kV1WXKEeVf/660
-	 dqVAnITk0EgXZhJG5LqTCEQ0AnP533zT11ist3p/QXgAvs/gtkn285Q5uqUPWERLf9
-	 zbCIbNXwMqSt2PLxbZ7Hug+/ICSiYwdoK8UBHuA5dQwn1IJqJdWNIuS7kMcJVIhGf5
-	 1HoI/zjw3nY6g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 27/28] KVM: arm64: Expose FEAT_NV3 to guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260714091641.1970822-28-maz@kernel.org>
-References: <20260714091641.1970822-1-maz@kernel.org>
- <20260714091641.1970822-28-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 10:15:59 +0000
-Message-Id: <20260714101559.C60F61F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S+q/f9eK"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784024197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IGGPtHL/McwRSrgBlkOgO9CvLa+/+toxJU/7GfFUsLs=;
+	b=S+q/f9eK0zAPQ774VDggYx7rcMe2jVvz5a7y/lVfWx0GnCOegyhEeHS7scTpD15E5YYNSd
+	kuZWlhVsMDfdQnkmogupsuNcJSFM3x7MQdeIy1sTN2FzMJ/xw6L2G84hDiKjxI95KRqjvA
+	/OhhhjvUic5BxnKsCUbkiooVcbu6zOQ=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v5 0/8] KVM: arm64: pKVM vCPU state management at EL2 (series A)
+Date: Tue, 14 Jul 2026 11:15:53 +0100
+Message-Id: <20260714101601.4142645-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+Hi folks,
 
-Pre-existing issues:
-- [High] Host nested virtualization capabilities (ID_AA64MMFR4_EL1.NV_frac)=
- are leaked to non-NV guests, breaking live migration across heterogeneous =
-hosts.
---
+Changes since v4 [1]:
+  - Renamed the sys register accessors: vcpu_{read,write}_sys_reg() are
+    now the context-dispatching wrappers valid in any context, and the
+    host-only implementations are __vcpu_{read,write}_sysreg_vhe(). This
+    avoids introducing a kvm_vcpu_ prefix that would be easy to confuse
+    with vcpu_. (Oliver)
+  - Dropped Vincent's Reviewed-by on the sys register accessor patch,
+    since it changed materially with the rename.
+  - Rebased onto v7.2-rc3.
 
---- Patch [27]: [PATCH v2 27/28] KVM: arm64: Expose FEAT_NV3 to guests ---
-commit 508d53194bf7ddb4e61f279e50216aa88dd973ad
-Author: Marc Zyngier <maz@kernel.org>
+Building on Will's pKVM infrastructure series [2], this series reworks
+how pKVM moves vCPU state between the host and EL2, and stops copying a
+non-protected guest's state on every world switch.
 
-KVM: arm64: Expose FEAT_NV3 to guests
-   =20
-Further enable FEAT_NV3 by making it visible to NV guests.
+EL2 gains proper primitives for the state it transfers: vCPU lookup
+helpers, and VGIC flush/sync that reduces how much host state EL2
+dereferences. The series also moves some preparatory code (such as sys
+reg access and PSCI helpers) to shared headers and HYP, and implements
+lazy copying of a non-protected guest's register state back to the host
+until the host actually needs it, instead of on every exit.
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index f646894fec9a9..70d605e60cfb3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-[ ... ]
-> @@ -1741,7 +1741,9 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 v=
-al)
->  			val =3D 0;
->  		} else {
->  			val &=3D ID_AA64MMFR4_EL1_NV_frac;
-> -			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +			if (cpus_have_final_cap(ARM64_HAS_NV3))
-> +				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV3);
-> +			else if (cpus_have_final_cap(ARM64_HAS_NV2P1))
->  				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P=
-1);
->  			else
->  				val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+This is the first of two series moving pKVM vCPU state management to
+EL2. The follow-up completes the job for protected VMs: state
+isolation, PSCI handling at EL2, and the resulting API behaviour.
 
-[Severity: High]
-This isn't a bug introduced by this patch, but while looking at NV feature
-exposure here, could ID_AA64MMFR4_EL1.NV_frac leak into non-NV guests?
+The series is structured as follows:
 
-Looking at __kvm_read_sanitised_id_reg() in arch/arm64/kvm/sys_regs.c,
-it seems SYS_ID_AA64MMFR4_EL1 is not explicitly masked out for non-NV guests
-in the switch statement:
+  01-04:  Preparatory refactoring (MPIDR, sys reg access, vCPU reset, PSCI
+          helpers) to shared headers and HYP.
+  05:     Host and hypervisor vCPU lookup primitives.
+  06-07:  VGIC: reduce EL2's exposure to host state, add flush/sync primitives.
+  08:     Lazy state sync for non-protected guests.
 
-	case SYS_ID_MMFR4_EL1:
-		val &=3D ~ID_MMFR4_EL1_CCIDX;
-		break;
-	}
+Based on v7.2-rc3 (a13c140cc289c).
 
-If a non-NV guest is created on an NV3-capable host, will the host's raw
-NV_frac leak into the VM's ID_AA64MMFR4_EL1 register?
+Cheers,
+/fuad
 
-If this VM is later migrated to a host with only NV2P1, could userspace's
-attempt to restore the capability via KVM_SET_ONE_REG fail because the
-destination host's arm64_check_features() rejects the higher NV_frac value?
+[1] https://lore.kernel.org/all/20260706095927.560795-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260105154939.11041-1-will@kernel.org/
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714091641.1970=
-822-1-maz@kernel.org?part=3D27
+Fuad Tabba (5):
+  KVM: arm64: Extract MPIDR computation into a shared header
+  KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+  KVM: arm64: Factor out reusable vCPU reset helpers
+  KVM: arm64: Move PSCI helper functions to a shared header
+  KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+
+Marc Zyngier (3):
+  KVM: arm64: Add host and hypervisor vCPU lookup primitives
+  KVM: arm64: Minimise EL2's exposure of host VGIC state during world
+    switch
+  KVM: arm64: Add primitives to flush/sync the VGIC state at EL2
+
+ arch/arm64/include/asm/kvm_arm.h     |  12 ++
+ arch/arm64/include/asm/kvm_asm.h     |   1 +
+ arch/arm64/include/asm/kvm_emulate.h |  77 ++++++++
+ arch/arm64/include/asm/kvm_host.h    |   6 +-
+ arch/arm64/kvm/arm.c                 |   7 +
+ arch/arm64/kvm/handle_exit.c         |  23 +++
+ arch/arm64/kvm/hyp/exception.c       |  34 +---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 258 +++++++++++++++++++++++----
+ arch/arm64/kvm/psci.c                |  30 +---
+ arch/arm64/kvm/reset.c               |  60 +------
+ arch/arm64/kvm/sys_regs.c            |  18 +-
+ arch/arm64/kvm/sys_regs.h            |  19 ++
+ include/kvm/arm_psci.h               |  27 +++
+ 13 files changed, 408 insertions(+), 164 deletions(-)
+
+
+base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
+-- 
+2.39.5
+
