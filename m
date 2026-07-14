@@ -1,155 +1,211 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B15441606;
-	Tue, 14 Jul 2026 09:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C7442DA3F
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 09:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784020616; cv=none; b=jjHQyteAu3C3o9G2Zg/ZgsDGJHelpSPQevo+4GF8loQPd/AqAOO8mKI9vvhPdko6VaB8xTd+hPrFsxJYTe7Ah8MeKQnLEr6VOeuf2ufk84iEJ1GUX0jk6JMi0hvK20BXr98LlB9VnTh8nCHI6diPuPp9UKhCQ2E9SdKflhFM9Gk=
+	t=1784021887; cv=none; b=QJilVsstZm0SVVL0IrPtIRNUztwg0Sm1vRNk+XWGO4A0579QDCkcQWzzdmv3b/+cgzPU+eChxyn4FwaPsQsANI0AQtQGuc1N0ezxRgF8A4YbvWkw66bgR0JQIbcGVRROgf8lMe5xYdheFAHRGnazr212C8QFNzL3IbirxsLFgo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784020616; c=relaxed/simple;
-	bh=TI6EYGOCRgNk/ucDoE12A0BQnvQn+jC2XBs9+FkWCJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ae+KZyjUEn+HNQizOiACp0zgh/XV8oYgA/LXYyXBgUfjIzhPLAM3/2aOcGM/jl4wUy6/yKO2rMrKNDiJzAFeW26H4vULPYGXct2u0GJLrMCoPu0VAlsd3LzfeuLge5NAmloYqLizrG6b/YR1VyfkONoQbwT+a2LQQxVayM0nh3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXtImsb+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784021887; c=relaxed/simple;
+	bh=zSs1vVHrcxxcrfM0ZL6tc0tnBlsgj6zPN7yhxivI0S4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=o9tp6swSfzZIgZuieuDfiQX62sWvWzGS4sO2bT+vTfa9AvewHT6G31FAEwUno7Cx+vLY4z3pj4HOcNCv2So8NIL2R4+DdFUUrchIEaQYT4/d2TfJB5Mw/aCmvpbsDPFcVYtLuP5h+GtIOPI+z8rGodMc4glRJqshMm2rSoLpxGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Bnux4+E7; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXtImsb+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 975DE1F01558;
-	Tue, 14 Jul 2026 09:16:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784020614;
-	bh=jlKRqeuAHeiHYifY33jkifn9qRcM+UmxYlbf8Yr05cs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fXtImsb+wmuA++d/4zzGA0PWIEV2fo8cVnJUdikHDPSYcFQXCebNHlbDnoxl5qIul
-	 Qu42l7OseJRSqMBcgFBdwQsAEk8AM4LE+MFx2Tcky9PXjq1HIstN82DqKted6Qfdhj
-	 vWo+o8cH7s+rzO8hnN+5aSN20TMspL+FeYYrswxxFB/Jrt33cCffty1EQnDsI2yU2x
-	 VNKfLSju7crIXSPmfPG2cUIm2nyofoduqC329h4DzJA0TT9b9Wc/TTiE5OYHTCKgoY
-	 ru3M7b7k05yQjjPa1qPwb/qR1sxxTNZ7NCFQGimuD0iYflQQLOads+kGHB8Eh4DUKv
-	 Nnv4ruMjg9AdQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wjZG0-00000004ny1-3ud5;
-	Tue, 14 Jul 2026 09:16:53 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 28/28] arm64: Add override for ID_AA64MMFR4_EL1.NV_frac
-Date: Tue, 14 Jul 2026 10:16:41 +0100
-Message-ID: <20260714091641.1970822-29-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260714091641.1970822-1-maz@kernel.org>
-References: <20260714091641.1970822-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Bnux4+E7"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=RV9UaR4NO/02VSBp05qT9Vmz9xMDQk+3YYbop8A72PI=;
+	b=Bnux4+E7bg7xEesKINA/c0rqmpGNyFpxbjsmn+z8917qknoTbgRCOYbgCUgYCFNfIze0GxOo2
+	EmCos8EhIeWJqIykSFij7EiQ4vwj0dTqNZiB1G5NqDAfeavGzfbkaG20tryA2TVkOH9XP7TTJOq
+	lhAsE2xaqkMnPttKsXJnV2E=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4gzv9w0z8gz12LCc;
+	Tue, 14 Jul 2026 17:28:20 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 788B740579;
+	Tue, 14 Jul 2026 17:37:58 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 14 Jul 2026 17:37:57 +0800
+Message-ID: <8757dfcf-aae4-4716-9ff1-c3140d4cc63e@huawei.com>
+Date: Tue, 14 Jul 2026 17:37:58 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/6] Support the FEAT_HDBSS introduced in Armv9.5
+To: Leonardo Bras <leo.bras@arm.com>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
+	<yangjinqian1@huawei.com>, <caijian11@h-partners.com>,
+	<liuyonglong@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
+ <alS-kcwvlASwPIzL@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <alS-kcwvlASwPIzL@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-In a very unsurprising turn of events, there is a large class of
-firmware that is totally unable to deal with FEAT_NV3, and doesn't
-set the required SCR2_EL3.NV3En bit, leading to an UNDEF exception
-or an unhandled trap to EL3, depending on the implementation.
 
-Allow the unfortunate user to override ID_AA64MMFR4_EL1.NV_frac
-and get a working system. Hopefully firmware will be fixed before
-actually HW ships, but I have been there before... :-/
+On 7/13/2026 6:31 PM, Leonardo Bras wrote:
+> On Thu, Jul 09, 2026 at 06:40:20PM +0800, Tian Zheng wrote:
+>> This series of patches add support to the Hardware Dirty state tracking
+>> Structure (HDBSS) feature, which is introduced by the ARM architecture
+>> in the DDI0601 (ID121123) version.
+>>
+>> The HDBSS feature is an extension to the architecture that enhances
+>> tracking translation table descriptors' dirty state, identified as
+>> FEAT_HDBSS. This feature utilizes hardware assistance to achieve dirty
+>> page tracking, aiming to significantly reduce the overhead of scanning
+>> for dirty pages.
+>>
+>> The purpose of this feature is to make the execution overhead of live
+>> migration lower to both the guest and the host, compared to existing
+>> approaches (write-protect or search stage-2 tables).
+>>
+>> The required sysreg definitions for FEAT_HDBSS have been merged into
+>> arm64 /sysregs:
+>>    [1/5] arm64/sysreg: Add HDBSS related register information
+>>          https://git.kernel.org/arm64/c/72f7be0c2e30
+>>
+>>
+>> After these patches, the kernel automatically enables HDBSS when dirty
+>> logging is enabled on any memslot, and disables HDBSS when dirty logging
+>> is disabled on all memslots. This series does not support dirty ring
+>> mode.
+>>
+>> Depends-on: "KVM: arm64: Enable eager hugepage splitting if HDBSS is available"
+>> 	https://lore.kernel.org/linux-arm-kernel/20260629111820.1873540-3-leo.bras@arm.com/
+> On this, FYI, there have been some discussion on this:
+> https://lore.kernel.org/all/alETGFD2Ogx6N0HB@LeoBrasDK/
+>
+> Oliver's suggestion is that we don't automatically enable eager splitting,
+> but instead we have different behaviours if the user enables it.
+>
+> This is still under discussion there, but I think it can be useful reading.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/cpufeature.h   |  1 +
- arch/arm64/kernel/cpufeature.c        |  4 +++-
- arch/arm64/kernel/image-vars.h        |  1 +
- arch/arm64/kernel/pi/idreg-override.c | 10 ++++++++++
- 4 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index a57870fa96db5..a42683af79fb5 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -968,6 +968,7 @@ struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- extern struct arm64_ftr_override id_aa64mmfr0_override;
- extern struct arm64_ftr_override id_aa64mmfr1_override;
- extern struct arm64_ftr_override id_aa64mmfr2_override;
-+extern struct arm64_ftr_override id_aa64mmfr4_override;
- extern struct arm64_ftr_override id_aa64pfr0_override;
- extern struct arm64_ftr_override id_aa64pfr1_override;
- extern struct arm64_ftr_override id_aa64zfr0_override;
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 6ae1c816e2010..14fbfa8e6b7b5 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -785,6 +785,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- struct arm64_ftr_override __read_mostly id_aa64mmfr0_override;
- struct arm64_ftr_override __read_mostly id_aa64mmfr1_override;
- struct arm64_ftr_override __read_mostly id_aa64mmfr2_override;
-+struct arm64_ftr_override __read_mostly id_aa64mmfr4_override;
- struct arm64_ftr_override __read_mostly id_aa64pfr0_override;
- struct arm64_ftr_override __read_mostly id_aa64pfr1_override;
- struct arm64_ftr_override __read_mostly id_aa64zfr0_override;
-@@ -858,7 +859,8 @@ static const struct __ftr_reg_entry {
- 	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2,
- 			       &id_aa64mmfr2_override),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
--	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4,
-+			       &id_aa64mmfr4_override),
- 
- 	/* Op1 = 0, CRn = 10, CRm = 4 */
- 	ARM64_FTR_REG(SYS_MPAMIDR_EL1, ftr_mpamidr),
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index d4c7d45ae6bc8..d15c2cb1b0f28 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -51,6 +51,7 @@ PI_EXPORT_SYM(id_aa64isar2_override);
- PI_EXPORT_SYM(id_aa64mmfr0_override);
- PI_EXPORT_SYM(id_aa64mmfr1_override);
- PI_EXPORT_SYM(id_aa64mmfr2_override);
-+PI_EXPORT_SYM(id_aa64mmfr4_override);
- PI_EXPORT_SYM(id_aa64pfr0_override);
- PI_EXPORT_SYM(id_aa64pfr1_override);
- PI_EXPORT_SYM(id_aa64smfr0_override);
-diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
-index bc57b290e5e7b..4e47616bcac23 100644
---- a/arch/arm64/kernel/pi/idreg-override.c
-+++ b/arch/arm64/kernel/pi/idreg-override.c
-@@ -106,6 +106,15 @@ static const struct ftr_set_desc mmfr2 __prel64_initconst = {
- 	},
- };
- 
-+static const struct ftr_set_desc mmfr4 __prel64_initconst = {
-+	.name		= "id_aa64mmfr4",
-+	.override	= &id_aa64mmfr4_override,
-+	.fields		= {
-+		FIELD("nv_frac", ID_AA64MMFR4_EL1_NV_frac_SHIFT, NULL),
-+		{}
-+	},
-+};
-+
- static bool __init pfr0_sve_filter(u64 val)
- {
- 	/*
-@@ -220,6 +229,7 @@ PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
- 	{ &mmfr0	},
- 	{ &mmfr1	},
- 	{ &mmfr2	},
-+	{ &mmfr4	},
- 	{ &pfr0 	},
- 	{ &pfr1 	},
- 	{ &isar1	},
--- 
-2.47.3
+Thanks for the pointer — I've read through the discussion between you 
+and Oliver, and it's very helpful.
 
+
+If I understand correctly, the proposed approach is to support both 
+modes, with DBM behavior depending
+
+on the user's eager split setting:
+
+- If users enable eager splitting (chunk_size != 0): use the v4 approach 
+— DBM is set globally.
+
+- If users do NOT enable eager splitting (chunk_size == 0, i.e., lazy 
+split mode): use the v3 approach — DBM
+
+is set lazily in user_mem_abort on the first write fault.
+
+
+This makes sense to me. It gives users the flexibility to choose.
+
+
+As I mentioned in my patch 6/6 reply 
+(https://lore.kernel.org/all/6e8b23bc-d420-4f5a-a921-5a5d64d84200@huawei.com/),
+
+I do think the lazy DBM approach is safer overall if the first-fault 
+overhead is acceptable — it avoids accidentally marking
+
+special mappings and naturally handles lazy split.
+
+
+I'll keep an eye on the discussion and follow up once a conclusion is 
+reached.
+
+
+Thanks!
+
+Tian
+
+>> This dependency is mandatory. Unlike v3, where DBM was added lazily on
+>> the first dirty access via a page fault, v4 injects DBM into pgt->flags
+>> at stage-2 MMU initialization time. Combined with HDBSS being auto-enabled
+>> during migration setup, the first dirty access no longer triggers a page
+>> fault. Consequently, if lazy hugepage splitting were relied upon (which
+>> requires a page fault to trigger splitting), hugepages would never be
+>> split, leading to guest hang after migration. Leonardo's patch above
+>> ensures eager hugepage splitting is enabled (chunk_size != 0) when HDBSS
+>> is available, guaranteeing that hugepages are properly split before
+>> migration starts.
+>>
+>> v3: https://lore.kernel.org/linux-arm-kernel/20260225040421.2683931-1-zhengtian10@huawei.com/
+>>
+>> v3->v4 changes:
+>> - Merge sysreg definitions into the FEAT_HDBSS detection patch (was a
+>>    separate patch in v3).
+>> - Add auto DBM (Dirty Bit Modifier) support as a new patch, suggested
+>>    by Leonardo Bras. DBM is now controlled as a page-table level flag
+>>    (KVM_PGTABLE_S2_DBM) rather than per-PTE. Note that DBM is injected
+>>    at stage-2 MMU creation time, not lazily on first dirty access. This
+>>    means the first write to a dirty-logged page does not generate a
+>>    page fault, which is a key reason for the mandatory dependency on
+>>    Leonardo's eager hugepage splitting patch (see Depends-on above).
+>> - Split the v3 "Enable HDBSS support and handle HDBSSF events" patch
+>>    into three patches: per-vCPU buffer management, fault handling and
+>>    buffer flush, and auto enable/disable on dirty logging change. This
+>>    implements kernel-managed automatic HDBSS enable/disable.
+>> - Remove the KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl for manual HDBSS
+>>    on/off. HDBSS is now automatically enabled/disabled based on dirty
+>>    logging state via kvm_arch_commit_memory_region().
+>> - Change HDBSS buffer flush triggers to vcpu_put, check_vcpu_requests,
+>>    and kvm_handle_guest_abort.
+>> - Store hdbss_order at VM level (kvm->arch.hdbss_order) instead of
+>>    per-vCPU, since all vCPUs share the same order.
+>> - Document patch is not included in this version; will be sent in a
+>>    follow-up series.
+>>
+>> Leonardo Bras (1):
+>>    KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+>>
+>> Tian Zheng (2):
+>>    KVM: arm64: Add support for FEAT_HDBSS
+>>    KVM: arm64: Add auto DBM support for hardware dirty tracking
+>>
+>> eillon (3):
+>>    KVM: arm64: Add HDBSS per-vCPU buffer management
+>>    KVM: arm64: Add HDBSS fault handling and buffer flush
+>>    KVM: arm64: Add auto HDBSS enable/disable on dirty logging change
+>>
+>>   arch/arm64/include/asm/cpufeature.h    |   5 +
+>>   arch/arm64/include/asm/esr.h           |   5 +
+>>   arch/arm64/include/asm/kvm_dirty_bit.h |  29 ++++
+>>   arch/arm64/include/asm/kvm_host.h      |  14 ++
+>>   arch/arm64/include/asm/kvm_pgtable.h   |   4 +
+>>   arch/arm64/include/asm/sysreg.h        |  11 ++
+>>   arch/arm64/kernel/cpufeature.c         |  12 ++
+>>   arch/arm64/kvm/Makefile                |   1 +
+>>   arch/arm64/kvm/arm.c                   |  29 ++++
+>>   arch/arm64/kvm/dirty_bit.c             | 219 +++++++++++++++++++++++++
+>>   arch/arm64/kvm/hyp/pgtable.c           |  35 +++-
+>>   arch/arm64/kvm/hyp/vhe/switch.c        |  15 ++
+>>   arch/arm64/kvm/mmu.c                   |  19 ++-
+>>   arch/arm64/kvm/reset.c                 |   4 +
+>>   arch/arm64/tools/cpucaps               |   1 +
+>>   15 files changed, 399 insertions(+), 4 deletions(-)
+>>   create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
+>>   create mode 100644 arch/arm64/kvm/dirty_bit.c
+>>
+>> --
+>> 2.33.0
+>>
