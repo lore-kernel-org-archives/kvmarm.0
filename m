@@ -1,83 +1,71 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from relay.hostedemail.com (smtprelay0016.hostedemail.com [216.40.44.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BDA39CD04
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 20:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190FE424D60
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 22:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784059834; cv=none; b=tp/1BTbOxyi/VEHUIP/cmpTGKR499qmoSeZFwQvziTpOKDiCSRTTU/Ig32M/9xAoZ0W1RHy3BREaAkg7W8HFuTT/Kk8yzWkr+9V+y+Ct+N5osjvqtXxM5lkqTu6UqZ6Q4QAS0DutgfVaTUT0sGfn362tkYJYEDs9eRqJKTNTrVU=
+	t=1784068843; cv=none; b=eHxInux1CJbE69+MWsv0aeECFrq2L21+JI8UCADAlDA8AoyU1Jq9hGj459Ci+nablrfTDVW8ScPJrteRH/1B7K8ws7iTpx7qNucVau/mLRgiCRdAuCE9nI8rYMvLECjvx44qATTL04ss3BvORXLss6RnhGjoTrp2cOlZweaoVtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784059834; c=relaxed/simple;
-	bh=sVnVFGLfReg2RKeoIZ682VlIKd99aJ7tnRlIOx/+zYM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CGI10Ry5W4hkDsQd+q3HHg7PHrTYwuTwDDFv8ID52biQw0E6GmUyC8smqgD7kE6oaa+5LntHwnFZd0bhk1FY08NXjQoquuanoYplt3BLJwEDwVW0KGwzcFcTakVAKRAzHbiqoLrwO76k343oEjVQxFp7ctZ8WxMXCO8G8iMVsfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tu8QSplp; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tu8QSplp"
-X-Forwarded-Encrypted: i=1; AHgh+RqN2T71gzF0YyGD8xBDR4IZ+JfJLb5pSzEf9zHVQnRTCanlLK+Qo/l8gc4v3ngcyzie2f3TEs0=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784059831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cqlSeCpwocQEmK8jPueF1yCbKiDV3dojuJhXPMIV//w=;
-	b=tu8QSplpAPmpBpq8Sd9vH32RHwuJ4y1Y0bd8tFTJ/ABZbkWQ6kBqASXmqKF5mbvc2fGz0a
-	OML/SGUZjOpk+2TFAff3DHIpUtnMKgpfpCE5QYL6+5ugyB/ZZ/quSm2urmyAphbJOeklzr
-	ySLZ012XsVoDT0RpuRIfBCs5YGVhSGY=
-X-Gm-Message-State: AOJu0YzZUbNz0tosocexzfbW2mBwmjYfmbyy99Za4v4px5TaLhiFXgop
-	duOxHFtPxtxRVgwdcSTy9nlSvbnS9eKhavCo6G+s+nzNakLrJ7UlIV4enqAlv8d51IIRYcpHFcT
-	gmj1shTgYxdU2wR6VbzhVdBVquK7zIkWQE9QB3Sbs
-X-Received: by 2002:a05:622a:289:b0:519:b82d:fe62 with SMTP id
- d75a77b69052e-51d7bcc96ffmr17653231cf.7.1784059812809; Tue, 14 Jul 2026
- 13:10:12 -0700 (PDT)
+	s=arc-20240116; t=1784068843; c=relaxed/simple;
+	bh=lgoqblNuB3ZXdfSbEhgeHOJiaAzwJ2NUaEi430cN6Zs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K++SQmo/2l0z/MRjCZzKgn+neXuZaC61Q6WxT0iaA4FGbps5Mxgzzbwv3e3f6lNCPGIS9RMFqUsddguTQ56w0tm7r+jr6J7u22wm5o2PY1JlgVL/HJWgr0CUQYOKWeVCJYwL+tk96nuJMyENnA2JD4P2pjsKpUCcQKFBFOclIL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf09.hostedemail.com (lb01a-stub [10.200.18.249])
+	by unirelay10.hostedemail.com (Postfix) with ESMTP id 17EC9C04A6;
+	Tue, 14 Jul 2026 22:40:36 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf09.hostedemail.com (Postfix) with ESMTPA id 68F5B20028;
+	Tue, 14 Jul 2026 22:40:33 +0000 (UTC)
+Date: Tue, 14 Jul 2026 18:40:37 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kernel-team@android.com, qperret@google.com,
+ tabba@google.com, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] tracing/remotes: Add
+ REMOTE_EVENT_CUSTOM_PRINTK() helper
+Message-ID: <20260714184037.2daf3246@gandalf.local.home>
+In-Reply-To: <20260708075435.47419-4-vdonnefort@google.com>
+References: <20260708075435.47419-1-vdonnefort@google.com>
+	<20260708075435.47419-4-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-10-vdonnefort@google.com>
-In-Reply-To: <20260706175415.2604046-10-vdonnefort@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 14 Jul 2026 21:10:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzm-Nv_FaTGT1-f0tx1v4kYVaa9LcfNgvEiQJOo_nyF3Q@mail.gmail.com>
-X-Gm-Features: AUfX_mzBFXy0D-wOkq0LD_Ri-IqJu87749Yb0iJ6-50K_-aUHBIcRFe2rotbFjY
-Message-ID: <CA+EHjTzm-Nv_FaTGT1-f0tx1v4kYVaa9LcfNgvEiQJOo_nyF3Q@mail.gmail.com>
-Subject: Re: [PATCH v2 09/18] KVM: arm64: Add reclaim interface for the pKVM
- heap alloc
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: ux4411ip4e8gupicefg384teix9wtjo9
+X-Rspamd-Server: rspamout04
+X-Rspamd-Queue-Id: 68F5B20028
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19AI8xridY/1XYZQXkip1JQIP3/WAuCU/M=
+X-HE-Tag: 1784068833-43235
+X-HE-Meta: U2FsdGVkX18wrqZpiGZBLOb8lhHF/GZHPknmYHAe4VYwZ0no09tBevZMCXc2iSsoPbmS2y9T4taShAi2StnD5BWdS1taTJMCKlfsYfgp/BE6pKmA2fk1rfbczZ7ukY9K/xaAYC6UnreC9jrKK3I2c987LInX4fGjvAejfBHBFWjp4mDp9HQRJhuseBRcfrwISkYSmR9RA1yNf6EoVCud6Up4bI9Rx3KDFn4GABKoRaTmWC8bV9sCd0vAfXWCJwnvMQR5HP14TibnEJC1q1YL8WqLMc0IPwCEYpMFHthwTB+pS8SiOtHas6+QrnoenYYBKb5PW0Hi2rOKUpT7o39XqeVjLmKTYCrRhnpT6CjlzduS9ljYyteuFDxPjr2t2f1wOUC6F4yJWOZ4oHCn/tmcDw==
 
-On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
+On Wed,  8 Jul 2026 08:54:34 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-...
+> The current REMOTE_EVENT() takes as a __printk argument a string format
+> and a list of arguments, such as RE_STRUCT("foo=%d bar=%d", foo, bar).
+> Add a REMOTE_EVENT_CUSTOM_PRINTK() where the __printk argument can be a
+> function. This intends to support the creation of a "printk" event for
+> the arm64 nVHE/pKVM hypervisor with a dynamic prototype and by extension
+> a dynamic print format.
+> 
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-> +
-> +unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
-> +{
-> +       return kvm_call_hyp_nvhe(__pkvm_hyp_reclaimable, id);
-> +}
+I'm assuming this goes in via the arm64 or KVM trees?
 
-Missing new line.
+Acked-by: Steven Rostedt <rostedt@goodmis.org>
 
-With that fixed:
-
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-
-Cheers,
-/fuad
-
->  static void __pkvm_destroy_hyp_vm(struct kvm *kvm)
->  {
->         if (pkvm_hyp_vm_is_created(kvm)) {
-> --
-> 2.55.0.rc2.803.g1fd1e6609c-goog
->
+-- Steve
